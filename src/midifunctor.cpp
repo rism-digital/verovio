@@ -44,8 +44,6 @@ InitOnsetOffsetFunctor::InitOnsetOffsetFunctor() : Functor()
 {
     m_currentScoreTime = 0;
     m_currentRealTimeSeconds = 0.0;
-    m_meterParams.mensur = NULL;
-    m_meterParams.meterSig = NULL;
     m_notationType = NOTATIONTYPE_cmn;
     m_currentTempo = MIDI_TEMPO;
 }

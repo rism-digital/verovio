@@ -332,6 +332,12 @@
 		4D64137E2035F68600BB630E /* mdiv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64137D2035F68600BB630E /* mdiv.cpp */; };
 		4D64137F2035F68600BB630E /* mdiv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64137D2035F68600BB630E /* mdiv.cpp */; };
 		4D6413802035F68600BB630E /* mdiv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64137D2035F68600BB630E /* mdiv.cpp */; };
+		4D6479372C9881B800CD9539 /* iocmme.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6479362C9881B800CD9539 /* iocmme.cpp */; };
+		4D6479392C98825900CD9539 /* iocmme.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6479362C9881B800CD9539 /* iocmme.cpp */; };
+		4D64793A2C98825A00CD9539 /* iocmme.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6479362C9881B800CD9539 /* iocmme.cpp */; };
+		4D64793B2C98825A00CD9539 /* iocmme.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6479362C9881B800CD9539 /* iocmme.cpp */; };
+		4D64793C2C98826600CD9539 /* iocmme.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D6479382C9881DB00CD9539 /* iocmme.h */; };
+		4D64793D2C98826600CD9539 /* iocmme.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D6479382C9881DB00CD9539 /* iocmme.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D64793F2C9C0F1C00CD9539 /* genericlayerelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64793E2C9C0F1C00CD9539 /* genericlayerelement.cpp */; };
 		4D6479412C9C0F4200CD9539 /* genericlayerelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64793E2C9C0F1C00CD9539 /* genericlayerelement.cpp */; };
 		4D6479422C9C0F4300CD9539 /* genericlayerelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64793E2C9C0F1C00CD9539 /* genericlayerelement.cpp */; };
@@ -1885,6 +1891,8 @@
 		4D6413772035F58200BB630E /* pages.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pages.cpp; path = src/pages.cpp; sourceTree = "<group>"; };
 		4D64137B2035F67C00BB630E /* mdiv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mdiv.h; path = include/vrv/mdiv.h; sourceTree = "<group>"; };
 		4D64137D2035F68600BB630E /* mdiv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mdiv.cpp; path = src/mdiv.cpp; sourceTree = "<group>"; };
+		4D6479362C9881B800CD9539 /* iocmme.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = iocmme.cpp; path = src/iocmme.cpp; sourceTree = "<group>"; };
+		4D6479382C9881DB00CD9539 /* iocmme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iocmme.h; path = include/vrv/iocmme.h; sourceTree = "<group>"; };
 		4D64793E2C9C0F1C00CD9539 /* genericlayerelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = genericlayerelement.cpp; path = src/genericlayerelement.cpp; sourceTree = "<group>"; };
 		4D6479402C9C0F2D00CD9539 /* genericlayerelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = genericlayerelement.h; path = include/vrv/genericlayerelement.h; sourceTree = "<group>"; };
 		4D674B3E255F40AC008AEF4C /* plica.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = plica.h; path = include/vrv/plica.h; sourceTree = "<group>"; };
@@ -2895,6 +2903,8 @@
 				8F59291718854BF800FE51AD /* iobase.h */,
 				402197931F2E09DA00182DF1 /* ioabc.cpp */,
 				402197921F2E09CB00182DF1 /* ioabc.h */,
+				4D6479382C9881DB00CD9539 /* iocmme.h */,
+				4D6479362C9881B800CD9539 /* iocmme.cpp */,
 				8F086EC1188539540037FD8E /* iodarms.cpp */,
 				8F59291818854BF800FE51AD /* iodarms.h */,
 				4DA20ED01D0F151900706C4A /* iohumdrum.cpp */,
@@ -3461,6 +3471,7 @@
 				E7901659298BCA97008FDB4E /* calcalignmentxposfunctor.h in Headers */,
 				BDEF9ECC26725248008A3A47 /* caesura.h in Headers */,
 				E7ADB3AB29D1921300825D5D /* adjustarticfunctor.h in Headers */,
+				4D64793C2C98826600CD9539 /* iocmme.h in Headers */,
 				E73E86252A069C640089DF74 /* transposefunctor.h in Headers */,
 				4DEC4DD921C8295700D1D273 /* rdg.h in Headers */,
 				4DB3D8D01F83D11800B5FC2B /* mordent.h in Headers */,
@@ -3584,6 +3595,7 @@
 				4D4CDEA82C079026005621E9 /* adjustneumexfunctor.h in Headers */,
 				BB4C4B5222A932D7001F6AF0 /* ftrem.h in Headers */,
 				E7E9C11329B0A1E200CFCE2F /* adjustaccidxfunctor.h in Headers */,
+				4D64793D2C98826600CD9539 /* iocmme.h in Headers */,
 				4D88AD0B289673F50006D7DA /* symbol.h in Headers */,
 				4D1EB6A72A2A40CB00AF2F98 /* textlayoutelement.h in Headers */,
 				4D2E759022BC2B71004C51F0 /* course.h in Headers */,
@@ -4110,6 +4122,7 @@
 				40C2E4222052A6F60003625F /* pb.cpp in Sources */,
 				4DA0EAF322BB77C300A7EBEB /* facsimileinterface.cpp in Sources */,
 				4D1694241E3A44F300569BF4 /* positioninterface.cpp in Sources */,
+				4D6479392C98825900CD9539 /* iocmme.cpp in Sources */,
 				4D1694251E3A44F300569BF4 /* timestamp.cpp in Sources */,
 				4D1694261E3A44F300569BF4 /* MidiEventList.cpp in Sources */,
 				4DA0EAC822BB779400A7EBEB /* facsimile.cpp in Sources */,
@@ -4449,6 +4462,7 @@
 				4D79642126C167100026288B /* pagemilestone.cpp in Sources */,
 				4D2073FB22A3BCE000E0765F /* tabgrp.cpp in Sources */,
 				4DEC4DBA21C8288900D1D273 /* choice.cpp in Sources */,
+				4D6479372C9881B800CD9539 /* iocmme.cpp in Sources */,
 				4DACC9882990F29A00B55913 /* atts_mei.cpp in Sources */,
 				4D2073F522A3BCE000E0765F /* tuning.cpp in Sources */,
 				8F086F06188539540037FD8E /* view_beam.cpp in Sources */,
@@ -4691,6 +4705,7 @@
 				8F3DD35418854B2E0051330C /* slur.cpp in Sources */,
 				40C2E4232052A6F70003625F /* pb.cpp in Sources */,
 				4D64137A2035F58200BB630E /* pages.cpp in Sources */,
+				4D64793A2C98825A00CD9539 /* iocmme.cpp in Sources */,
 				4D1694741E3A455200569BF4 /* humlib.cpp in Sources */,
 				4DB3D8C31F83D0EF00B5FC2B /* anchoredtext.cpp in Sources */,
 				4DB3D8E71F83D16A00B5FC2B /* ftrem.cpp in Sources */,
@@ -4982,6 +4997,7 @@
 				BB4C4B6122A932D7001F6AF0 /* mrpt.cpp in Sources */,
 				BB4C4AE722A932BC001F6AF0 /* damage.cpp in Sources */,
 				4DA0EACA22BB779400A7EBEB /* facsimile.cpp in Sources */,
+				4D64793B2C98825A00CD9539 /* iocmme.cpp in Sources */,
 				BB4C4B4B22A932D7001F6AF0 /* custos.cpp in Sources */,
 				BB4C4BB822A932FC001F6AF0 /* Binasc.cpp in Sources */,
 				BB4C4B7B22A932D7001F6AF0 /* tuplet.cpp in Sources */,

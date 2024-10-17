@@ -51,6 +51,7 @@
 #include "neume.h"
 #include "note.h"
 #include "page.h"
+#include "proport.h"
 #include "rest.h"
 #include "slur.h"
 #include "smufl.h"
@@ -677,6 +678,18 @@ Fraction LayerElement::GetAlignmentDuration(
         return Fraction(0, 1);
     }
 
+    // Mensural chords are aligned looking at the duration of the notes
+    if (this->Is(CHORD) && IsMensuralType(notationType)) {
+        Fraction duration = 0;
+        ListOfConstObjects notes = this->FindAllDescendantsByType(NOTE);
+        for (const Object *object : notes) {
+            const Note *note = vrv_cast<const Note *>(object);
+            Fraction noteDuration = note->GetAlignmentDuration(params, notGraceOnly, notationType);
+            duration = std::max(duration, noteDuration);
+        }
+        return duration;
+    }
+
     // Only resolve simple sameas links to avoid infinite recursion
     const LayerElement *sameas = dynamic_cast<const LayerElement *>(this->GetSameasLink());
     if (sameas && !sameas->HasSameasLink()) {
@@ -686,6 +699,13 @@ Fraction LayerElement::GetAlignmentDuration(
     if (this->HasInterface(INTERFACE_DURATION)) {
         int num = 1;
         int numbase = 1;
+
+        if (params.proport) {
+            // Proportion are applied reversly - higher ratio means shorter values
+            if (params.proport->HasNum()) num *= params.proport->GetCumulatedNum();
+            if (params.proport->HasNumbase()) numbase *= params.proport->GetCumulatedNumbase();
+        }
+
         const Tuplet *tuplet = vrv_cast<const Tuplet *>(this->GetFirstAncestor(TUPLET, MAX_TUPLET_DEPTH));
         if (tuplet) {
             ListOfConstObjects objects;
@@ -764,8 +784,6 @@ Fraction LayerElement::GetAlignmentDuration(
 Fraction LayerElement::GetAlignmentDuration(bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     AlignMeterParams params;
-    params.meterSig = NULL;
-    params.mensur = NULL;
     return this->GetAlignmentDuration(params, notGraceOnly, notationType);
 }
 
@@ -807,8 +825,6 @@ Fraction LayerElement::GetContentAlignmentDuration(
 Fraction LayerElement::GetContentAlignmentDuration(bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     AlignMeterParams params;
-    params.meterSig = NULL;
-    params.mensur = NULL;
     return this->GetContentAlignmentDuration(params, notGraceOnly, notationType);
 }
 

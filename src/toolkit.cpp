@@ -23,6 +23,7 @@
 #include "filereader.h"
 #include "findfunctor.h"
 #include "ioabc.h"
+#include "iocmme.h"
 #include "iodarms.h"
 #include "iohumdrum.h"
 #include "iomei.h"
@@ -205,6 +206,9 @@ bool Toolkit::SetInputFrom(std::string const &inputFrom)
     else if (inputFrom == "volpiano") {
         m_inputFrom = VOLPIANO;
     }
+    else if (inputFrom == "cmme.xml") {
+        m_inputFrom = CMME;
+    }
     else if ((inputFrom == "humdrum") || (inputFrom == "hum")) {
         m_inputFrom = HUMDRUM;
     }
@@ -294,6 +298,9 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         }
         if (std::regex_search(initial, std::regex("<(!DOCTYPE )?(score-partwise|opus|score-timewise)[\\s\\n>]"))) {
             return musicxmlDefault;
+        }
+        if (std::regex_search(initial, std::regex("<(Piece xmlns=\"http://www.cmme.org\")[\\s\\n>]"))) {
+            return CMME;
         }
         LogWarning("Warning: Trying to load unknown XML data which cannot be identified.");
         return UNKNOWN;
@@ -562,6 +569,9 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     }
     else if (inputFormat == VOLPIANO) {
         input = new VolpianoInput(&m_doc);
+    }
+    else if (inputFormat == CMME) {
+        input = new CmmeInput(&m_doc);
     }
 #ifndef NO_HUMDRUM_SUPPORT
     else if (inputFormat == HUMDRUM) {
