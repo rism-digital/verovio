@@ -88,7 +88,10 @@ public:
 protected:
     //
 private:
-    std::map<std::string, int> m_mensuration;
+    int m_modusMaior;
+    int m_modusMinor;
+    int m_tempus;
+    int m_prolatio;
     ArrayOfElementDurPairs m_dursInVoiceSameMensur;
     std::vector<ArrayOfElementDurPairs> m_listOfSequences;
 

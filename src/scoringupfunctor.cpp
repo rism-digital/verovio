@@ -77,28 +77,28 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
     else if (element->Is(MENSUR)) {
         this->m_currentMensur = vrv_cast<Mensur *>(element);
         if (m_currentMensur->GetModusmaior() == MODUSMAIOR_3) {
-            m_mensuration["modusmaior"] = 3;
+            m_modusMaior = 3;
         }
         else {
-            m_mensuration["modusmaior"] = 2;
+            m_modusMaior = 2;
         }
         if (m_currentMensur->GetModusminor() == MODUSMINOR_3) {
-            m_mensuration["modusminor"] = 3;
+            m_modusMinor = 3;
         }
         else {
-            m_mensuration["modusminor"] = 2;
+            m_modusMinor = 2;
         }
         if (m_currentMensur->GetTempus() == TEMPUS_3) {
-            m_mensuration["tempus"] = 3;
+            m_tempus = 3;
         }
         else {
-            m_mensuration["tempus"] = 2;
+            m_tempus = 2;
         }
         if (m_currentMensur->GetProlatio() == PROLATIO_3) {
-            m_mensuration["prolatio"] = 3;
+            m_prolatio = 3;
         }
         else {
-            m_mensuration["prolatio"] = 2;
+            m_prolatio = 2;
         }
     }
     return FUNCTOR_CONTINUE;
@@ -411,35 +411,32 @@ double ScoringUpFunctor::GetDurNumberValue(
         assert(note);
         durquality = note->GetDurQuality();
     }
-    int modusminor = m_mensuration["modusminor"];
-    int tempus = m_mensuration["tempus"];
-    int prolatio = m_mensuration["prolatio"];
-    // int longaDefaultVal = modusminor * tempus * prolatio;
-    int brevisDefaultVal = tempus * prolatio;
-    int semibrevisDefaultVal = prolatio;
+    // int longaDefaultVal = m_modusMinor * m_tempus * m_prolatio;
+    int brevisDefaultVal = m_tempus * m_prolatio;
+    int semibrevisDefaultVal = m_prolatio;
     double durnum = 0;
     switch (dur) {
         case DURATION_longa:
-            if (modusminor == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
+            if (m_modusMinor == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
                 durnum = 3 * brevisDefaultVal;
             }
-            else if (modusminor == 2 || durquality == DURQUALITY_mensural_imperfecta) {
+            else if (m_modusMinor == 2 || durquality == DURQUALITY_mensural_imperfecta) {
                 durnum = 2 * brevisDefaultVal;
             }
             break;
         case DURATION_brevis:
-            if (tempus == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
+            if (m_tempus == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
                 durnum = 3 * semibrevisDefaultVal;
             }
-            else if (tempus == 2 || durquality == DURQUALITY_mensural_imperfecta) {
+            else if (m_tempus == 2 || durquality == DURQUALITY_mensural_imperfecta) {
                 durnum = 2 * semibrevisDefaultVal;
             }
             break;
         case DURATION_semibrevis:
-            if (prolatio == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
+            if (m_prolatio == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
                 durnum = 3;
             }
-            else if (prolatio == 2 || durquality == DURQUALITY_mensural_imperfecta) {
+            else if (m_prolatio == 2 || durquality == DURQUALITY_mensural_imperfecta) {
                 durnum = 2;
             }
             break;
