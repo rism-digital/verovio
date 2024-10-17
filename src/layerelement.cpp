@@ -984,9 +984,20 @@ int LayerElement::CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2
 {
     Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     if (!parentLayer) return 0;
-    // Check whether there are elements on other layer in the duration of the current beam. If there are none - stop
-    // here, there's nothing to be done
+    // Check whether there are elements on the other layer in the duration of the current beam
     ListOfObjects collidingElementsList = parentLayer->GetLayerElementsForTimeSpanOf(this, true);
+    // Ignore any elements part of a stem-sameas beam
+    if (this->Is(BEAM)) {
+        const Beam *beam = vrv_cast<Beam *>(this);
+        const Beam *stemSameAsBeam = beam->GetStemSameasBeam();
+        if (stemSameAsBeam) {
+            collidingElementsList.remove_if([stemSameAsBeam](Object *object) {
+                const LayerElement *layerElement = vrv_cast<LayerElement *>(object);
+                return (layerElement->GetAncestorBeam() == stemSameAsBeam);
+            });
+        }
+    }
+    // If there are none - stop here, there's nothing to be done
     if (collidingElementsList.empty()) return 0;
 
     Staff *staff = this->GetAncestorStaff();
