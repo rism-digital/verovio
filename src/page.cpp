@@ -653,7 +653,8 @@ void Page::ReduceJustifiableHeight(const Doc *doc)
         const System *firstSystem = vrv_cast<const System *>(this->GetFirst(SYSTEM));
         const System *lastSystem = vrv_cast<const System *>(this->GetLast(SYSTEM));
         if (firstSystem && lastSystem) {
-            const int usedDrawingHeight = firstSystem->GetDrawingY() - lastSystem->GetDrawingY() + lastSystem->GetHeight();
+            const int usedDrawingHeight
+                = firstSystem->GetDrawingY() - lastSystem->GetDrawingY() + lastSystem->GetHeight();
             maxRatio *= (double)usedDrawingHeight / (double)doc->m_drawingPageHeight;
         }
     }
