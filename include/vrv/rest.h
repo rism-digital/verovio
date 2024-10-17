@@ -8,6 +8,7 @@
 #ifndef __VRV_REST_H__
 #define __VRV_REST_H__
 
+#include "altsyminterface.h"
 #include "atts_externalsymbols.h"
 #include "atts_mensural.h"
 #include "durationinterface.h"
@@ -34,6 +35,7 @@ enum RestNotePlace { RNP_UNSET = -1, RNP_noteInSpace, RNP_noteOnLine };
  * This class models the MEI <rest> element.
  */
 class Rest : public LayerElement,
+             public AltSymInterface,
              public DurationInterface,
              public PositionInterface,
              public AttColor,
@@ -69,6 +71,7 @@ public:
      * @name Getter to interfaces
      */
     ///@{
+    AltSymInterface *GetAltSymInterface() override { return vrv_cast<AltSymInterface *>(this); }
     PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
     const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
     DurationInterface *GetDurationInterface() override { return vrv_cast<DurationInterface *>(this); }

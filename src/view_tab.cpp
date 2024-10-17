@@ -22,6 +22,7 @@
 #include "rend.h"
 #include "smufl.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "stem.h"
 #include "system.h"
 #include "tabdursym.h"
@@ -103,10 +104,13 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     int glyphSize = staff->GetDrawingStaffNotationSize();
     bool drawingCueSize = false;
+    int overline = 0;
+    int strike = 0;
+    int underline = 0;
 
     if (staff->m_drawingNotationType == NOTATIONTYPE_tab_guitar) {
 
-        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType);
+        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType, overline, strike, underline);
 
         FontInfo fretTxt;
         if (!dc->UseGlobalStyling()) {
@@ -132,7 +136,7 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     }
     else {
 
-        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType);
+        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType, overline, strike, underline);
         // Center for italian tablature
         if (staff->IsTabLuteItalian()) {
             y -= (m_doc->GetGlyphHeight(SMUFL_EBE0_luteItalianFret0, glyphSize, drawingCueSize) / 2);
@@ -142,9 +146,59 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
             y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
                 - m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
         }
+        // Center for German tablature
+        else if (staff->IsTabLuteGerman()) {
+            y -= m_doc->GetGlyphHeight(SMUFL_EC17_luteGermanAUpper, glyphSize, drawingCueSize) / 2;
+        }
 
         dc->SetFont(m_doc->GetDrawingSmuflFont(glyphSize, false));
         this->DrawSmuflString(dc, x, y, fret, HORIZONTALALIGNMENT_center, glyphSize);
+
+        // Add overlines, strikethoughs and underlines if required
+        if ((overline > 0 || strike > 0 || underline > 0) && !fret.empty()) {
+            const int lineThickness
+                = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            const int widthFront = m_doc->GetGlyphWidth(fret.front(), glyphSize, drawingCueSize);
+            const int widthBack = m_doc->GetGlyphWidth(fret.back(), glyphSize, drawingCueSize);
+            TextExtend extend;
+            dc->GetSmuflTextExtent(fret, &extend);
+
+            // TODO These fiddle factors seem necessary to get the lines balanced on either side
+            // of the fret string.  Can we do better?
+            const int x1
+                = x - (fret.size() == 1 ? widthFront * 7 / 10 : widthFront * 12 / 10); // extend on the left hand side
+            const int x2 = x + extend.m_width - widthBack * 1 / 10; // trim right hand overhang on last character
+
+            dc->SetPen(m_currentColor, lineThickness, AxSOLID);
+            dc->SetBrush(m_currentColor, AxSOLID);
+
+            // overlines
+            int y1 = y + extend.m_ascent + lineThickness;
+
+            for (int i = 0; i < overline; ++i) {
+                dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+                y1 += 2 * lineThickness;
+            }
+
+            // strikethroughs
+            y1 = y + extend.m_ascent / 2 - (strike - 1) * lineThickness;
+
+            for (int i = 0; i < strike; ++i) {
+                dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+                y1 += 2 * lineThickness;
+            }
+
+            // underlines
+            y1 = y - extend.m_descent - lineThickness;
+
+            for (int i = 0; i < underline; ++i) {
+                dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+                y1 -= 2 * lineThickness;
+            }
+
+            dc->ResetPen();
+            dc->ResetBrush();
+        }
         dc->ResetFont();
     }
 
@@ -167,10 +221,23 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     dc->StartGraphic(tabDurSym, "", tabDurSym->GetID());
 
+    if (tabDurSym->HasLoc()) {
+        const int yRel = ((staff->m_drawingLines - 1) * 2 - tabDurSym->GetLoc())
+            * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        tabDurSym->SetDrawingYRel(-yRel);
+    }
+    else if (staff->IsTabLuteItalian()) {
+        // make space for 7th course
+        const int yRel
+            = ((staff->m_drawingLines - 1) * 2 - 7 * 2 + 1) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        tabDurSym->SetDrawingYRel(-yRel);
+    }
+
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
     const int glyphSize = staff->GetDrawingStaffNotationSize();
+
     const int drawingDur = (tabGrp->GetDurGes() != DURATION_NONE) ? tabGrp->GetActualDurGes() : tabGrp->GetActualDur();
 
     // For beam and guitar notation, stem are drawn through the child Stem

@@ -22,6 +22,7 @@
 #include "layer.h"
 #include "smufl.h"
 #include "staff.h"
+#include "symboldef.h"
 #include "system.h"
 #include "transposition.h"
 #include "vrv.h"
@@ -171,6 +172,7 @@ static const ClassRegistrar<Rest> s_factory("rest", REST);
 
 Rest::Rest()
     : LayerElement(REST, "rest-")
+    , AltSymInterface()
     , DurationInterface()
     , PositionInterface()
     , AttColor()
@@ -179,6 +181,7 @@ Rest::Rest()
     , AttExtSymNames()
     , AttRestVisMensural()
 {
+    this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
     this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
@@ -194,6 +197,7 @@ Rest::~Rest() {}
 void Rest::Reset()
 {
     LayerElement::Reset();
+    AltSymInterface::Reset();
     DurationInterface::Reset();
     PositionInterface::Reset();
     this->ResetColor();
@@ -258,6 +262,23 @@ char32_t Rest::GetRestGlyph(const data_DURATION duration) const
     else if (this->HasGlyphName()) {
         char32_t code = resources->GetGlyphCode(this->GetGlyphName());
         if (NULL != resources->GetGlyph(code)) return code;
+    }
+    // If there is @altsym (third priority)
+    else if (this->HasAltsym() && this->HasAltSymbolDef()) {
+        const SymbolDef *symbolDef = this->GetAltSymbolDef();
+        const Symbol *symbol = vrv_cast<const Symbol *>(symbolDef->GetFirst(SYMBOL));
+        if (symbol != NULL) {
+            // If there is @glyph.num, return glyph based on it (fourth priority)
+            if (symbol->HasGlyphNum()) {
+                const char32_t code = symbol->GetGlyphNum();
+                if (NULL != resources->GetGlyph(code)) return code;
+            }
+            // If there is @glyph.name (fifth priority)
+            else if (symbol->HasGlyphName()) {
+                const char32_t code = resources->GetGlyphCode(symbol->GetGlyphName());
+                if (NULL != resources->GetGlyph(code)) return code;
+            }
+        }
     }
 
     if (this->IsMensuralDur()) {

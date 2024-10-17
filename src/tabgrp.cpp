@@ -16,6 +16,7 @@
 #include "editorial.h"
 #include "functor.h"
 #include "note.h"
+#include "rest.h"
 #include "tabdursym.h"
 
 namespace vrv {
@@ -45,6 +46,9 @@ bool TabGrp::IsSupportedChild(Object *child)
 {
     if (child->Is(NOTE)) {
         assert(dynamic_cast<Note *>(child));
+    }
+    else if (child->Is(REST)) {
+        assert(dynamic_cast<Rest *>(child));
     }
     else if (child->Is(TABDURSYM)) {
         assert(dynamic_cast<TabDurSym *>(child));
