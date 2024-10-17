@@ -650,13 +650,11 @@ void Page::ReduceJustifiableHeight(const Doc *doc)
     double maxRatio = doc->GetOptions()->m_justificationMaxVertical.GetValue();
     // Special handling for justification of last page
     if (pages->GetLast() == this) {
-        const Page *previousPage = vrv_cast<const Page *>(pages->GetPrevious(this, PAGE));
-        if (previousPage) {
-            const int systemCount = this->GetChildCount(SYSTEM);
-            const int previousSystemCount = previousPage->GetChildCount(SYSTEM);
-            if (systemCount < previousSystemCount) {
-                maxRatio *= (double)systemCount / (double)previousSystemCount;
-            }
+        const System *firstSystem = vrv_cast<const System *>(this->GetFirst(SYSTEM));
+        const System *lastSystem = vrv_cast<const System *>(this->GetLast(SYSTEM));
+        if (firstSystem && lastSystem) {
+            const int usedDrawingHeight = firstSystem->GetDrawingY() - lastSystem->GetDrawingY() + lastSystem->GetHeight();
+            maxRatio *= (double)usedDrawingHeight / (double)doc->m_drawingPageHeight;
         }
     }
 
