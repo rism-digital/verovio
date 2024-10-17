@@ -91,6 +91,7 @@ private:
     std::map<std::string, int> m_mensuration;
     ArrayOfElementDurPairs m_dursInVoiceSameMensur;
     std::vector<ArrayOfElementDurPairs> m_listOfSequences;
+
 public:
     //
 
