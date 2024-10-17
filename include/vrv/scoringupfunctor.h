@@ -32,7 +32,7 @@ public:
     /*
      * Abstract base implementation
      */
-    bool ImplementsEndInterface() const override { return true; }
+    bool ImplementsEndInterface() const override { return false; }
 
     /*
      * Methods
