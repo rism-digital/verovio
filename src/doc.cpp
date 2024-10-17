@@ -53,6 +53,7 @@
 #include "resetfunctor.h"
 #include "runningelement.h"
 #include "score.h"
+#include "scoringupfunctor.h"
 #include "setscoredeffunctor.h"
 #include "slur.h"
 #include "smufl.h"
@@ -1397,6 +1398,12 @@ void Doc::ConvertMarkupDoc(bool permanent)
         ConvertMarkupScoreDefFunctor convertMarkupScoreDef(this);
         this->Process(convertMarkupScoreDef);
     }
+}
+
+void Doc::ScoringUpDoc()
+{
+    ScoringUpFunctor scoringUp;
+    this->Process(scoringUp);
 }
 
 void Doc::SyncFromFacsimileDoc()
