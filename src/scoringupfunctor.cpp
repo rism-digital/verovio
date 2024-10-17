@@ -47,8 +47,8 @@ FunctorCode ScoringUpFunctor::VisitLayer(Layer *layer)
     data_PROLATIO prolatio = m_currentMensur->GetProlatio();*/
     // Doesn't get it from the staffDef, right?//
     if (!m_dursInVoiceSameMensur.empty()) {
-        m_listOfSequences = SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur);
-        ProcessBoundedSequences(m_listOfSequences);
+        m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur);
+        this->ProcessBoundedSequences(m_listOfSequences);
         m_dursInVoiceSameMensur = {}; // restart for next voice (layer)
     }
     return FUNCTOR_CONTINUE;
@@ -149,8 +149,8 @@ bool ScoringUpFunctor::EvalDotOfDiv(
     // Evaluate if the dot passed to the method (by the dotInd) is behaving as a dot of division
     ArrayOfElementDurPairs middleSeq1 = { middleSeq.begin(), middleSeq.begin() + dotInd };
     ArrayOfElementDurPairs middleSeq2 = { middleSeq.begin() + dotInd + 1, middleSeq.end() };
-    double sum1 = GetValueInUnit(GetValueInMinims(middleSeq1), DURATION_semibrevis);
-    double sum2 = GetValueInUnit(GetValueInMinims(middleSeq2), DURATION_semibrevis);
+    double sum1 = this->GetValueInUnit(this->GetValueInMinims(middleSeq1), DURATION_semibrevis);
+    double sum2 = this->GetValueInUnit(this->GetValueInMinims(middleSeq2), DURATION_semibrevis);
     // This condition is to discard it being a dot of perfection
     if (middleSeq1.size() != 0) {
         // This other condition is to evaluate if it is a dot of division
@@ -165,8 +165,8 @@ bool ScoringUpFunctor::EvalDotOfDiv(
             Dot *dot = vrv_cast<Dot *>(dotElement);
             dot->SetForm(dotLog_FORM_div);
             // Encode its effect on the notes preceding and following:
-            FindDurQuals(seq1, sum1);
-            FindDurQuals(seq2, sum2);
+            this->FindDurQuals(seq1, sum1);
+            this->FindDurQuals(seq2, sum2);
         }
     }
     return flagDotOfDiv;
@@ -175,14 +175,14 @@ bool ScoringUpFunctor::EvalDotOfDiv(
 void ScoringUpFunctor::ProcessBoundedSequences(const std::vector<ArrayOfElementDurPairs> &listOfSequences)
 {
     for (ArrayOfElementDurPairs sequence : listOfSequences) {
-        ProcessBoundedSequences(sequence);
+        this->ProcessBoundedSequences(sequence);
     }
 }
 
 void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &sequence)
 {
     // Get the notes in the middle of the boundaries of the sequence
-    ArrayOfElementDurPairs middleSeq = GetBoundedNotes(sequence);
+    ArrayOfElementDurPairs middleSeq = this->GetBoundedNotes(sequence);
 
     // Check if there are dots in the middleSeq and how many. The dots in the middleSeq are the only ones that have the
     // possibility of being a dot of imperfection (or alteration) or a dot of augmentation---the dots of perfection are
@@ -198,18 +198,18 @@ void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &seq
     // 0. No dots
     double sum;
     if (numberOfDots == 0) {
-        sum = GetValueInUnit(GetValueInMinims(middleSeq), DURATION_semibrevis);
-        FindDurQuals(sequence, sum);
+        sum = this->GetValueInUnit(this->GetValueInMinims(middleSeq), DURATION_semibrevis);
+        this->FindDurQuals(sequence, sum);
     }
     // 1. Single dot in middle sequence sequence
     else if (numberOfDots == 1) {
         // If there is one dot,
         int dotInd = indecesOfDots.at(0);
-        bool isDotOfDiv = EvalDotOfDiv(middleSeq, sequence, dotInd);
+        bool isDotOfDiv = this->EvalDotOfDiv(middleSeq, sequence, dotInd);
         if (not isDotOfDiv) {
             // This is a dot of augmentation
-            sum = GetValueInUnit(GetValueInMinims(middleSeq), DURATION_semibrevis);
-            FindDurQuals(sequence, sum);
+            sum = this->GetValueInUnit(this->GetValueInMinims(middleSeq), DURATION_semibrevis);
+            this->FindDurQuals(sequence, sum);
         }
     }
     // 3. More than one dot in middle sequence
@@ -217,18 +217,18 @@ void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &seq
         // Take first dot and evaluate if it is a dot of imperfection (check if it is "integer number of semibreves"
         // away from the beginning of the sequence, and if the rest of the sequence still sums an integer number)
         int startDotInd = indecesOfDots.at(0);
-        bool isStartDotOfDiv = EvalDotOfDiv(middleSeq, sequence, startDotInd);
+        bool isStartDotOfDiv = this->EvalDotOfDiv(middleSeq, sequence, startDotInd);
 
         // Take last dot and evaluate if it is a dot of division (check if it is "integer number of semibreves" away
         // from the end of the sequence, and if the rest of the sequence still sums an integer number)
         int endDotInd = indecesOfDots.at(indecesOfDots.size() - 1);
-        bool isEndDotOfDiv = EvalDotOfDiv(middleSeq, sequence, endDotInd);
+        bool isEndDotOfDiv = this->EvalDotOfDiv(middleSeq, sequence, endDotInd);
 
         // If neither, all dots are dots of augmentation
         if (not isStartDotOfDiv and not isEndDotOfDiv) {
             // This is a dot of augmentation
-            sum = GetValueInUnit(GetValueInMinims(middleSeq), DURATION_semibrevis);
-            FindDurQuals(sequence, sum);
+            sum = this->GetValueInUnit(this->GetValueInMinims(middleSeq), DURATION_semibrevis);
+            this->FindDurQuals(sequence, sum);
         }
     }
 }
@@ -264,13 +264,13 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence, doub
             case 0: break; // No modifications
             case 1:
                 // Evaluate 'default' case: Imperfection APP
-                impappCandidate = ImperfectionAPP(sequence);
+                impappCandidate = this->ImperfectionAPP(sequence);
                 if (impappCandidate) {
                     impappCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
                     break;
                 }
                 // Evaluate 'alternative' case: Imperfection APA
-                impapaCandidate = ImperfectionAPA(sequence);
+                impapaCandidate = this->ImperfectionAPA(sequence);
                 if (impapaCandidate) {
                     impapaCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
                     break;
@@ -280,14 +280,14 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence, doub
                 break;
             case 2:
                 // Evaluate 'default' case: Alteration
-                alterationCandidate = Alteration(sequence);
+                alterationCandidate = this->Alteration(sequence);
                 if (alterationCandidate && !dotOfImperf) {
                     alterationCandidate->SetDurQuality(DURQUALITY_mensural_altera);
                     break;
                 }
                 // Evaluate 'alternative' case: Imperfection APP and Imperfection APA
-                impappCandidate = ImperfectionAPP(sequence);
-                impapaCandidate = ImperfectionAPA(sequence);
+                impappCandidate = this->ImperfectionAPP(sequence);
+                impapaCandidate = this->ImperfectionAPA(sequence);
                 if (impappCandidate && impapaCandidate) {
                     impappCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
                     impapaCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
@@ -299,7 +299,7 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence, doub
         }
     }
     else if (sum == 3) {
-        bool leavePerfectFlag = LeavePerfect(sequence);
+        bool leavePerfectFlag = this->LeavePerfect(sequence);
         if (!leavePerfectFlag || dotOfImperf) {
         }
     }
@@ -307,8 +307,8 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence, doub
         switch (remainder) {
             case 0:
                 // Evaluate 'default' case: Imperfection APP and Alteration
-                impappCandidate = ImperfectionAPP(sequence);
-                alterationCandidate = Alteration(sequence);
+                impappCandidate = this->ImperfectionAPP(sequence);
+                alterationCandidate = this->Alteration(sequence);
                 if (impappCandidate && alterationCandidate) {
                     impappCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
                     alterationCandidate->SetDurQuality(DURQUALITY_mensural_altera);
@@ -318,13 +318,13 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence, doub
                 break;
             case 1:
                 // Evaluate 'default' case: Imperfection APP
-                impappCandidate = ImperfectionAPP(sequence);
+                impappCandidate = this->ImperfectionAPP(sequence);
                 if (impappCandidate) {
                     impappCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
                     break;
                 }
                 // Evaluate 'alternative' case: Imperfection APA
-                impapaCandidate = ImperfectionAPA(sequence);
+                impapaCandidate = this->ImperfectionAPA(sequence);
                 if (impapaCandidate) {
                     impapaCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
                     break;
@@ -333,15 +333,15 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence, doub
                 break;
             case 2:
                 // Evaluate 'default' case: Imperfection APP and Imperfection APA
-                impappCandidate = ImperfectionAPP(sequence);
-                impapaCandidate = ImperfectionAPA(sequence);
+                impappCandidate = this->ImperfectionAPP(sequence);
+                impapaCandidate = this->ImperfectionAPA(sequence);
                 if (impappCandidate && impapaCandidate && !simileAnteSimile) {
                     impappCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
                     impapaCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
                     break;
                 }
                 // Evaluate 'alternative' case: Alteration
-                alterationCandidate = Alteration(sequence);
+                alterationCandidate = this->Alteration(sequence);
                 if (alterationCandidate) {
                     alterationCandidate->SetDurQuality(DURQUALITY_mensural_altera);
                     break;
@@ -368,7 +368,7 @@ double ScoringUpFunctor::GetValueInMinims(const ArrayOfElementDurPairs &middleSe
         else {
             followedByDot = false;
         }
-        sum += GetDurNumberValue(elementDurPair, followedByDot, nextElement);
+        sum += this->GetDurNumberValue(elementDurPair, followedByDot, nextElement);
     }
     return sum;
 }
