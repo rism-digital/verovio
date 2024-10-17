@@ -63,7 +63,9 @@ int Tuning::CalcPitchPos(
         case NOTATIONTYPE_tab_lute_french:
             // all courses >= 7 are positioned above line 0
             return (lines - std::min(course, 7)) * 2 + 1; // above the line
-        case NOTATIONTYPE_tab_lute_italian: return (course - 1) * 2;
+        case NOTATIONTYPE_tab_lute_italian:
+            // all courses >= 7 are positioned on line 7
+            return (std::min(course, 7) - 1) * 2;
         case NOTATIONTYPE_tab_lute_german:
             if (loc != MEI_UNSET) {
                 return loc;
