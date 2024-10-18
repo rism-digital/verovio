@@ -101,11 +101,6 @@ int Clef::GetClefLocOffset(data_NOTATIONTYPE notationType) const
         defaultOct = 3;
         offset = 4;
     }
-    else if (this->GetShape() == CLEFSHAPE_C) {
-        if (notationType == NOTATIONTYPE_neume) {
-            offset = 7;
-        }
-    }
 
     if (this->HasOct()) {
         int oct = this->GetOct();
