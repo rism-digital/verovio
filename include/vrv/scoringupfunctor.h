@@ -54,8 +54,8 @@ public:
      * altera) for sequences with or without dots of division
      */
     ///@{
-    bool EvalDotOfDiv(const ArrayOfElementDurPairs &middleSeq, const ArrayOfElementDurPairs &sequence, int dotInd);
-    void FindDurQuals(const ArrayOfElementDurPairs &middleSeq, double valueInUnit);
+    bool EvalDotOfDiv(const ArrayOfElementDurPairs &middleSeq, const ArrayOfElementDurPairs &sequence, int dotInd, data_DURATION unit);
+    void FindDurQuals(const ArrayOfElementDurPairs &middleSeq, double valueInUnit, data_DURATION boundUnit);
     ///@}
 
     /**
@@ -72,10 +72,10 @@ public:
      * @name Apply the modifications of imperfection and alteration or leaves the notes with their default perfect value
      */
     ///@{
-    Note *ImperfectionAPP(const ArrayOfElementDurPairs &sequence);
-    Note *ImperfectionAPA(const ArrayOfElementDurPairs &sequence);
-    Note *Alteration(const ArrayOfElementDurPairs &sequence);
-    bool LeavePerfect(const ArrayOfElementDurPairs &sequence);
+    Note *ImperfectionAPP(const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit);
+    Note *ImperfectionAPA(const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit);
+    Note *Alteration(const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit);
+    bool LeavePerfect(const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit);
     ///@}
 
     /*
