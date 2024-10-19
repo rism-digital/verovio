@@ -260,11 +260,11 @@ void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &seq
 ArrayOfElementDurPairs ScoringUpFunctor::GetBoundedNotes(
     const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit)
 {
+    data_DURATION firstNoteDur;
     ArrayOfElementDurPairs middleSeq = {};
-
-    if (boundUnit == DURATION_semibrevis) {
-        if (sequence.size() >= 2) {
-            data_DURATION firstNoteDur = sequence.at(0).second;
+    if (sequence.size() >= 2) {
+        if (boundUnit == DURATION_semibrevis) {
+            firstNoteDur = sequence.at(0).second;
             if (firstNoteDur == DURATION_minima || firstNoteDur == DURATION_semiminima || firstNoteDur == DURATION_fusa
                 || firstNoteDur == DURATION_semifusa) {
                 middleSeq = { sequence.begin(), sequence.end() - 1 };
@@ -273,10 +273,8 @@ ArrayOfElementDurPairs ScoringUpFunctor::GetBoundedNotes(
                 middleSeq = { sequence.begin() + 1, sequence.end() - 1 };
             }
         }
-    }
-    else if (boundUnit == DURATION_brevis) {
-        if (sequence.size() >= 2) {
-            data_DURATION firstNoteDur = sequence.at(0).second;
+        else if (boundUnit == DURATION_brevis) {
+            firstNoteDur = sequence.at(0).second;
             if (firstNoteDur == DURATION_semibrevis || firstNoteDur == DURATION_minima
                 || firstNoteDur == DURATION_semiminima || firstNoteDur == DURATION_fusa
                 || firstNoteDur == DURATION_semifusa) {
@@ -286,10 +284,8 @@ ArrayOfElementDurPairs ScoringUpFunctor::GetBoundedNotes(
                 middleSeq = { sequence.begin() + 1, sequence.end() - 1 };
             }
         }
-    }
-    else if (boundUnit == DURATION_longa) {
-        if (sequence.size() >= 2) {
-            data_DURATION firstNoteDur = sequence.at(0).second;
+        else if (boundUnit == DURATION_longa) {
+            firstNoteDur = sequence.at(0).second;
             if (firstNoteDur == DURATION_brevis || firstNoteDur == DURATION_semibrevis
                 || firstNoteDur == DURATION_minima || firstNoteDur == DURATION_semiminima
                 || firstNoteDur == DURATION_fusa || firstNoteDur == DURATION_semifusa) {
@@ -299,10 +295,8 @@ ArrayOfElementDurPairs ScoringUpFunctor::GetBoundedNotes(
                 middleSeq = { sequence.begin() + 1, sequence.end() - 1 };
             }
         }
-    }
-    else if (boundUnit == DURATION_maxima) {
-        if (sequence.size() >= 2) {
-            data_DURATION firstNoteDur = sequence.at(0).second;
+        else if (boundUnit == DURATION_maxima) {
+            firstNoteDur = sequence.at(0).second;
             if (firstNoteDur == DURATION_longa || firstNoteDur == DURATION_brevis || firstNoteDur == DURATION_semibrevis
                 || firstNoteDur == DURATION_minima || firstNoteDur == DURATION_semiminima
                 || firstNoteDur == DURATION_fusa || firstNoteDur == DURATION_semifusa) {
