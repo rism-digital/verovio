@@ -41,6 +41,7 @@ public:
      * @name: Divide the notes of a voice into sequences to be processed individualy
      */
     ///@{
+    void workInMensur(const ArrayOfElementDurPairs &m_dursInVoiceSameMensur, data_DURATION noteLevel);
     std::vector<ArrayOfElementDurPairs> SubdivideIntoBoundedSequences(
         const ArrayOfElementDurPairs &dursInVoiceSameMensur, data_DURATION boundUnit);
     void ProcessBoundedSequences(const std::vector<ArrayOfElementDurPairs> &listOfSequences, data_DURATION boundUnit);

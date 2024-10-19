@@ -48,24 +48,26 @@ FunctorCode ScoringUpFunctor::VisitLayer(Layer *layer)
     // Doesn't get it from the staffDef, right?//
     if (!m_dursInVoiceSameMensur.empty()) {
         if (m_prolatio == 3) {
-            m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur, DURATION_semibrevis);
-            this->ProcessBoundedSequences(m_listOfSequences, DURATION_semibrevis);
+            workInMensur(m_dursInVoiceSameMensur, DURATION_semibrevis);
         }
         if (m_tempus == 3) {
-            m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur, DURATION_brevis);
-            this->ProcessBoundedSequences(m_listOfSequences, DURATION_brevis);
+            workInMensur(m_dursInVoiceSameMensur, DURATION_brevis);
         }
         if (m_modusMinor == 3) {
-            m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur, DURATION_longa);
-            this->ProcessBoundedSequences(m_listOfSequences, DURATION_longa);
+            workInMensur(m_dursInVoiceSameMensur, DURATION_longa);
         }
         if (m_modusMaior == 3) {
-            m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur, DURATION_maxima);
-            this->ProcessBoundedSequences(m_listOfSequences, DURATION_maxima);
+            workInMensur(m_dursInVoiceSameMensur, DURATION_maxima);
         }
         m_dursInVoiceSameMensur = {}; // restart for next voice (layer)
     }
     return FUNCTOR_CONTINUE;
+}
+
+void ScoringUpFunctor::workInMensur(const ArrayOfElementDurPairs &m_dursInVoiceSameMensur, data_DURATION noteLevel)
+{
+    m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur, noteLevel);
+    this->ProcessBoundedSequences(m_listOfSequences, noteLevel);
 }
 
 FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
