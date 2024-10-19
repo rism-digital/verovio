@@ -104,6 +104,9 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
     return FUNCTOR_CONTINUE;
 }
 
+// Functions to find and process the bounded sequences:
+// 1. Find the bounded sequences by dividing all the notes in a given mensuration and voice into sequences bounded by
+// "supposedly" perfect notes
 std::vector<ArrayOfElementDurPairs> ScoringUpFunctor::SubdivideIntoBoundedSequences(
     const ArrayOfElementDurPairs &dursInVoiceSameMensur)
 {
@@ -124,54 +127,7 @@ std::vector<ArrayOfElementDurPairs> ScoringUpFunctor::SubdivideIntoBoundedSequen
     return listOfBoundedSequences;
 }
 
-ArrayOfElementDurPairs ScoringUpFunctor::GetBoundedNotes(const ArrayOfElementDurPairs &sequence)
-{
-    ArrayOfElementDurPairs middleSeq = {};
-    if (sequence.size() >= 2) {
-        data_DURATION firstNoteDur = sequence.at(0).second;
-        if (firstNoteDur == DURATION_semibrevis || firstNoteDur == DURATION_minima
-            || firstNoteDur == DURATION_semiminima || firstNoteDur == DURATION_fusa
-            || firstNoteDur == DURATION_semifusa) {
-            middleSeq = { sequence.begin(), sequence.end() - 1 };
-        }
-        else {
-            middleSeq = { sequence.begin() + 1, sequence.end() - 1 };
-        }
-    }
-    return middleSeq;
-}
-
-bool ScoringUpFunctor::EvalDotOfDiv(
-    const ArrayOfElementDurPairs &middleSeq, const ArrayOfElementDurPairs &sequence, int dotInd)
-{
-    // Initial assumption: the sequence doesn't have a dot of division
-    bool flagDotOfDiv = false;
-    // Evaluate if the dot passed to the method (by the dotInd) is behaving as a dot of division
-    ArrayOfElementDurPairs middleSeq1 = { middleSeq.begin(), middleSeq.begin() + dotInd };
-    ArrayOfElementDurPairs middleSeq2 = { middleSeq.begin() + dotInd + 1, middleSeq.end() };
-    double sum1 = this->GetValueInUnit(this->GetValueInMinims(middleSeq1), DURATION_semibrevis);
-    double sum2 = this->GetValueInUnit(this->GetValueInMinims(middleSeq2), DURATION_semibrevis);
-    // This condition is to discard it being a dot of perfection
-    if (middleSeq1.size() != 0) {
-        // This other condition is to evaluate if it is a dot of division
-        if ((sum1 == (int)sum1) and (sum2 == (int)sum2)) {
-            // This is a "dot of division"
-            flagDotOfDiv = true;
-            // Then it divides the sequence into the following two:
-            ArrayOfElementDurPairs seq1 = { sequence.begin(), sequence.begin() + dotInd + 1 };
-            ArrayOfElementDurPairs seq2 = { sequence.begin() + dotInd + 2, sequence.end() };
-            // Encode the dot of division:
-            LayerElement *dotElement = sequence.at(dotInd + 1).first;
-            Dot *dot = vrv_cast<Dot *>(dotElement);
-            dot->SetForm(dotLog_FORM_div);
-            // Encode its effect on the notes preceding and following:
-            this->FindDurQuals(seq1, sum1);
-            this->FindDurQuals(seq2, sum2);
-        }
-    }
-    return flagDotOfDiv;
-}
-
+// 2. Process the bounded sequences, with the list of all bounded sequences as argument
 void ScoringUpFunctor::ProcessBoundedSequences(const std::vector<ArrayOfElementDurPairs> &listOfSequences)
 {
     for (ArrayOfElementDurPairs sequence : listOfSequences) {
@@ -179,6 +135,7 @@ void ScoringUpFunctor::ProcessBoundedSequences(const std::vector<ArrayOfElementD
     }
 }
 
+// 3. Process the bounded sequences, with the individual bounded sequences as argument
 void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &sequence)
 {
     // Get the notes in the middle of the boundaries of the sequence
@@ -233,6 +190,157 @@ void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &seq
     }
 }
 
+// 4. Get the notes bounded by the "supposedly" perfect notes (the 'middle note of the bounded sequence')
+ArrayOfElementDurPairs ScoringUpFunctor::GetBoundedNotes(const ArrayOfElementDurPairs &sequence)
+{
+    ArrayOfElementDurPairs middleSeq = {};
+    if (sequence.size() >= 2) {
+        data_DURATION firstNoteDur = sequence.at(0).second;
+        if (firstNoteDur == DURATION_semibrevis || firstNoteDur == DURATION_minima
+            || firstNoteDur == DURATION_semiminima || firstNoteDur == DURATION_fusa
+            || firstNoteDur == DURATION_semifusa) {
+            middleSeq = { sequence.begin(), sequence.end() - 1 };
+        }
+        else {
+            middleSeq = { sequence.begin() + 1, sequence.end() - 1 };
+        }
+    }
+    return middleSeq;
+}
+
+// Get the value of a note or collection of consecutinve notes in a given unit (minims, semibreves, or breves):
+// 1. Get value of the single note in minims
+double ScoringUpFunctor::GetDurNumberValue(
+    const std::pair<LayerElement *, data_DURATION> &elementDurPair, bool followedByDot, LayerElement *nextElement)
+{
+    data_DURQUALITY_mensural durquality;
+    data_DURATION dur = elementDurPair.second;
+    LayerElement *element = elementDurPair.first;
+    Note *note;
+    if (element->Is(NOTE)) {
+        note = vrv_cast<Note *>(element);
+        assert(note);
+        durquality = note->GetDurQuality();
+    }
+    // int longaDefaultVal = m_modusMinor * m_tempus * m_prolatio;
+    int brevisDefaultVal = m_tempus * m_prolatio;
+    int semibrevisDefaultVal = m_prolatio;
+    double durnum = 0;
+    switch (dur) {
+        case DURATION_longa:
+            if (m_modusMinor == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
+                durnum = 3 * brevisDefaultVal;
+            }
+            else if (m_modusMinor == 2 || durquality == DURQUALITY_mensural_imperfecta) {
+                durnum = 2 * brevisDefaultVal;
+            }
+            break;
+        case DURATION_brevis:
+            if (m_tempus == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
+                durnum = 3 * semibrevisDefaultVal;
+            }
+            else if (m_tempus == 2 || durquality == DURQUALITY_mensural_imperfecta) {
+                durnum = 2 * semibrevisDefaultVal;
+            }
+            break;
+        case DURATION_semibrevis:
+            if (m_prolatio == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
+                durnum = 3;
+            }
+            else if (m_prolatio == 2 || durquality == DURQUALITY_mensural_imperfecta) {
+                durnum = 2;
+            }
+            break;
+        case DURATION_minima:
+            if (followedByDot) {
+                durnum = 1.5;
+                note->SetDurQuality(DURQUALITY_mensural_perfecta);
+                Dot *dot = vrv_cast<Dot *>(nextElement);
+                dot->SetForm(dotLog_FORM_aug);
+            }
+            else {
+                durnum = 1;
+            }
+            break;
+        case DURATION_semiminima:
+            if (followedByDot) {
+                durnum = 0.75;
+                note->SetDurQuality(DURQUALITY_mensural_perfecta);
+                Dot *dot = vrv_cast<Dot *>(nextElement);
+                dot->SetForm(dotLog_FORM_aug);
+            }
+            else {
+                durnum = 0.5;
+            }
+            break;
+        case DURATION_fusa:
+            if (followedByDot) {
+                durnum = 0.375;
+                note->SetDurQuality(DURQUALITY_mensural_perfecta);
+                Dot *dot = vrv_cast<Dot *>(nextElement);
+                dot->SetForm(dotLog_FORM_aug);
+            }
+            else {
+                durnum = 0.25;
+            }
+            break;
+        case DURATION_semifusa: durnum = 0.125; break;
+        default: break;
+    }
+    return durnum;
+}
+
+// 2. Get value of a collection of notes in minims
+double ScoringUpFunctor::GetValueInMinims(const ArrayOfElementDurPairs &middleSeq)
+{
+    // Value in minims:
+    double sum = 0;
+    bool followedByDot = false;
+    LayerElement *nextElement = NULL;
+    for (int i = 0; i < middleSeq.size(); i++) {
+        std::pair<LayerElement *, data_DURATION> elementDurPair = middleSeq.at(i);
+        // Check if there is a dot after the element being evaluated
+        if (i + 1 < middleSeq.size()) {
+            nextElement = middleSeq.at(i + 1).first;
+            followedByDot = nextElement->Is(DOT);
+        }
+        else {
+            followedByDot = false;
+        }
+        sum += this->GetDurNumberValue(elementDurPair, followedByDot, nextElement);
+    }
+    return sum;
+}
+
+// 3. Get value of a collection of notes in a given note unit (e.g., in semibrevis or brevis)
+double ScoringUpFunctor::GetValueInUnit(double valueInMinims, data_DURATION unit)
+{
+    double valueInUnit = 0.0;
+    if (unit == DURATION_semibrevis) {
+        valueInUnit = valueInMinims / 2;
+        // imperfect mensur
+        // MISSING perfect mensur
+    }
+    else if (unit == DURATION_brevis) {
+        valueInUnit = valueInMinims / 4;
+        // imperfect mensur
+        // MISSING perfect mensur
+    }
+    else if (unit == DURATION_longa) {
+        valueInUnit = valueInMinims / 8;
+        // imperfect mensur
+        // MISSING perfect mensur
+    }
+    else if (unit == DURATION_maxima) {
+        valueInUnit = valueInMinims / 16;
+        // imperfect mensur
+        // MISSING perfect mensur
+    }
+    return valueInUnit;
+}
+
+// Find the quality of notes by applying the "principles of imperfection and alteration" based on the number of notes
+// between a bounded sequence
 void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence, double valueInSmallerUnit)
 {
     double sum = valueInSmallerUnit; // JUST IN THIS CASE
@@ -352,133 +460,9 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence, doub
         }
     }
 }
-double ScoringUpFunctor::GetValueInMinims(const ArrayOfElementDurPairs &middleSeq)
-{
-    // Value in minims:
-    double sum = 0;
-    bool followedByDot = false;
-    LayerElement *nextElement = NULL;
-    for (int i = 0; i < middleSeq.size(); i++) {
-        std::pair<LayerElement *, data_DURATION> elementDurPair = middleSeq.at(i);
-        // Check if there is a dot after the element being evaluated
-        if (i + 1 < middleSeq.size()) {
-            nextElement = middleSeq.at(i + 1).first;
-            followedByDot = nextElement->Is(DOT);
-        }
-        else {
-            followedByDot = false;
-        }
-        sum += this->GetDurNumberValue(elementDurPair, followedByDot, nextElement);
-    }
-    return sum;
-}
 
-double ScoringUpFunctor::GetValueInUnit(double valueInMinims, data_DURATION unit)
-{
-    double valueInUnit = 0.0;
-    if (unit == DURATION_semibrevis) {
-        valueInUnit = valueInMinims / 2;
-        // imperfect mensur
-        // MISSING perfect mensur
-    }
-    else if (unit == DURATION_brevis) {
-        valueInUnit = valueInMinims / 4;
-        // imperfect mensur
-        // MISSING perfect mensur
-    }
-    else if (unit == DURATION_longa) {
-        valueInUnit = valueInMinims / 8;
-        // imperfect mensur
-        // MISSING perfect mensur
-    }
-    else if (unit == DURATION_maxima) {
-        valueInUnit = valueInMinims / 16;
-        // imperfect mensur
-        // MISSING perfect mensur
-    }
-    return valueInUnit;
-}
-
-double ScoringUpFunctor::GetDurNumberValue(
-    const std::pair<LayerElement *, data_DURATION> &elementDurPair, bool followedByDot, LayerElement *nextElement)
-{
-    data_DURQUALITY_mensural durquality;
-    data_DURATION dur = elementDurPair.second;
-    LayerElement *element = elementDurPair.first;
-    Note *note;
-    if (element->Is(NOTE)) {
-        note = vrv_cast<Note *>(element);
-        assert(note);
-        durquality = note->GetDurQuality();
-    }
-    // int longaDefaultVal = m_modusMinor * m_tempus * m_prolatio;
-    int brevisDefaultVal = m_tempus * m_prolatio;
-    int semibrevisDefaultVal = m_prolatio;
-    double durnum = 0;
-    switch (dur) {
-        case DURATION_longa:
-            if (m_modusMinor == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
-                durnum = 3 * brevisDefaultVal;
-            }
-            else if (m_modusMinor == 2 || durquality == DURQUALITY_mensural_imperfecta) {
-                durnum = 2 * brevisDefaultVal;
-            }
-            break;
-        case DURATION_brevis:
-            if (m_tempus == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
-                durnum = 3 * semibrevisDefaultVal;
-            }
-            else if (m_tempus == 2 || durquality == DURQUALITY_mensural_imperfecta) {
-                durnum = 2 * semibrevisDefaultVal;
-            }
-            break;
-        case DURATION_semibrevis:
-            if (m_prolatio == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
-                durnum = 3;
-            }
-            else if (m_prolatio == 2 || durquality == DURQUALITY_mensural_imperfecta) {
-                durnum = 2;
-            }
-            break;
-        case DURATION_minima:
-            if (followedByDot) {
-                durnum = 1.5;
-                note->SetDurQuality(DURQUALITY_mensural_perfecta);
-                Dot *dot = vrv_cast<Dot *>(nextElement);
-                dot->SetForm(dotLog_FORM_aug);
-            }
-            else {
-                durnum = 1;
-            }
-            break;
-        case DURATION_semiminima:
-            if (followedByDot) {
-                durnum = 0.75;
-                note->SetDurQuality(DURQUALITY_mensural_perfecta);
-                Dot *dot = vrv_cast<Dot *>(nextElement);
-                dot->SetForm(dotLog_FORM_aug);
-            }
-            else {
-                durnum = 0.5;
-            }
-            break;
-        case DURATION_fusa:
-            if (followedByDot) {
-                durnum = 0.375;
-                note->SetDurQuality(DURQUALITY_mensural_perfecta);
-                Dot *dot = vrv_cast<Dot *>(nextElement);
-                dot->SetForm(dotLog_FORM_aug);
-            }
-            else {
-                durnum = 0.25;
-            }
-            break;
-        case DURATION_semifusa: durnum = 0.125; break;
-        default: break;
-    }
-    return durnum;
-}
-
+// Context-dependent modifications:
+// 1. Imperfection a parte post (imperfection by the notes that follow)
 Note *ScoringUpFunctor::ImperfectionAPP(const ArrayOfElementDurPairs &sequence)
 {
     std::pair<LayerElement *, data_DURATION> firstElementDurPair = sequence.at(0);
@@ -520,6 +504,7 @@ Note *ScoringUpFunctor::ImperfectionAPP(const ArrayOfElementDurPairs &sequence)
     }
 }
 
+// 2. Imperfection a parte ante (imperfection by the notes preceding)
 Note *ScoringUpFunctor::ImperfectionAPA(const ArrayOfElementDurPairs &sequence)
 {
     std::pair<LayerElement *, data_DURATION> lastElementDurPair = sequence.at(sequence.size() - 1);
@@ -538,6 +523,7 @@ Note *ScoringUpFunctor::ImperfectionAPA(const ArrayOfElementDurPairs &sequence)
     }
 }
 
+// 3. Alteration (making a note twice as long)
 Note *ScoringUpFunctor::Alteration(const ArrayOfElementDurPairs &sequence)
 {
     std::pair<LayerElement *, data_DURATION> penultElementDurPair = sequence.at(sequence.size() - 2);
@@ -556,9 +542,42 @@ Note *ScoringUpFunctor::Alteration(const ArrayOfElementDurPairs &sequence)
     }
 }
 
+// 4. No modification
 bool ScoringUpFunctor::LeavePerfect(const ArrayOfElementDurPairs &sequence)
 {
     return true;
 }
 
+// Evaluation of whether a dot in a given position (dotInd) is acting as a dot of division. If it is, apply the
+// principles of imperfection and alteration to the sequence of notes preceding and following the dot, and return true.
+bool ScoringUpFunctor::EvalDotOfDiv(
+    const ArrayOfElementDurPairs &middleSeq, const ArrayOfElementDurPairs &sequence, int dotInd)
+{
+    // Initial assumption: the sequence doesn't have a dot of division
+    bool flagDotOfDiv = false;
+    // Evaluate if the dot passed to the method (by the dotInd) is behaving as a dot of division
+    ArrayOfElementDurPairs middleSeq1 = { middleSeq.begin(), middleSeq.begin() + dotInd };
+    ArrayOfElementDurPairs middleSeq2 = { middleSeq.begin() + dotInd + 1, middleSeq.end() };
+    double sum1 = this->GetValueInUnit(this->GetValueInMinims(middleSeq1), DURATION_semibrevis);
+    double sum2 = this->GetValueInUnit(this->GetValueInMinims(middleSeq2), DURATION_semibrevis);
+    // This condition is to discard it being a dot of perfection
+    if (middleSeq1.size() != 0) {
+        // This other condition is to evaluate if it is a dot of division
+        if ((sum1 == (int)sum1) and (sum2 == (int)sum2)) {
+            // This is a "dot of division"
+            flagDotOfDiv = true;
+            // Then it divides the sequence into the following two:
+            ArrayOfElementDurPairs seq1 = { sequence.begin(), sequence.begin() + dotInd + 1 };
+            ArrayOfElementDurPairs seq2 = { sequence.begin() + dotInd + 2, sequence.end() };
+            // Encode the dot of division:
+            LayerElement *dotElement = sequence.at(dotInd + 1).first;
+            Dot *dot = vrv_cast<Dot *>(dotElement);
+            dot->SetForm(dotLog_FORM_div);
+            // Encode its effect on the notes preceding and following:
+            this->FindDurQuals(seq1, sum1);
+            this->FindDurQuals(seq2, sum2);
+        }
+    }
+    return flagDotOfDiv;
+}
 } // namespace vrv

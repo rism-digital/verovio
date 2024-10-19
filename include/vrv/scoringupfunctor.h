@@ -43,31 +43,32 @@ public:
     ///@{
     std::vector<ArrayOfElementDurPairs> SubdivideIntoBoundedSequences(
         const ArrayOfElementDurPairs &dursInVoiceSameMensur);
-    ///@}
-
-    /**
-     * @name: Find @dur.quality of notes (perfecta / imperfecta / altera)
-     */
-    ///@{
     void ProcessBoundedSequences(const std::vector<ArrayOfElementDurPairs> &listOfSequences);
     void ProcessBoundedSequences(const ArrayOfElementDurPairs &sequence);
     ArrayOfElementDurPairs GetBoundedNotes(const ArrayOfElementDurPairs &sequence);
+    ///@}
+
+    /**
+     * @name: Apply the principles of imperfection and alteration (find @dur.quality of notes, perfecta / imperfecta /
+     * altera) for sequences with or without dots of division
+     */
+    ///@{
     bool EvalDotOfDiv(const ArrayOfElementDurPairs &middleSeq, const ArrayOfElementDurPairs &sequence, int dotInd);
     void FindDurQuals(const ArrayOfElementDurPairs &middleSeq, double valueInUnit);
     ///@}
 
     /**
-     * @name: Find the duration value of the note in minims
+     * @name: Find the duration value of the note in minims or another given unit
      */
     ///@{
-    double GetValueInUnit(double valueInMinims, data_DURATION unit);
-    double GetValueInMinims(const ArrayOfElementDurPairs &middleSeq);
     double GetDurNumberValue(
         const std::pair<LayerElement *, data_DURATION> &elementDurPair, bool followedByDot, LayerElement *nextElement);
+    double GetValueInMinims(const ArrayOfElementDurPairs &middleSeq);
+    double GetValueInUnit(double valueInMinims, data_DURATION unit);
     ///@}
 
     /**
-     * @name Apply principles of imperfection and alteration
+     * @name Apply the modifications of imperfection and alteration or leaves the notes with their default perfect value
      */
     ///@{
     Note *ImperfectionAPP(const ArrayOfElementDurPairs &sequence);
