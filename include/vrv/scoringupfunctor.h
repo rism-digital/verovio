@@ -43,9 +43,9 @@ public:
     ///@{
     std::vector<ArrayOfElementDurPairs> SubdivideIntoBoundedSequences(
         const ArrayOfElementDurPairs &dursInVoiceSameMensur, data_DURATION boundUnit);
-    void ProcessBoundedSequences(const std::vector<ArrayOfElementDurPairs> &listOfSequences);
-    void ProcessBoundedSequences(const ArrayOfElementDurPairs &sequence);
-    ArrayOfElementDurPairs GetBoundedNotes(const ArrayOfElementDurPairs &sequence);
+    void ProcessBoundedSequences(const std::vector<ArrayOfElementDurPairs> &listOfSequences, data_DURATION boundUnit);
+    void ProcessBoundedSequences(const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit);
+    ArrayOfElementDurPairs GetBoundedNotes(const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit);
     ///@}
 
     /**

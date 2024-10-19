@@ -49,19 +49,19 @@ FunctorCode ScoringUpFunctor::VisitLayer(Layer *layer)
     if (!m_dursInVoiceSameMensur.empty()) {
         if (m_prolatio == 3) {
             m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur, DURATION_semibrevis);
-            this->ProcessBoundedSequences(m_listOfSequences);
+            this->ProcessBoundedSequences(m_listOfSequences, DURATION_semibrevis);
         }
         if (m_tempus == 3) {
             m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur, DURATION_brevis);
-            this->ProcessBoundedSequences(m_listOfSequences);
+            this->ProcessBoundedSequences(m_listOfSequences, DURATION_brevis);
         }
         if (m_modusMinor == 3) {
             m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur, DURATION_longa);
-            this->ProcessBoundedSequences(m_listOfSequences);
+            this->ProcessBoundedSequences(m_listOfSequences, DURATION_longa);
         }
         if (m_modusMaior == 3) {
             m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur, DURATION_maxima);
-            this->ProcessBoundedSequences(m_listOfSequences);
+            this->ProcessBoundedSequences(m_listOfSequences, DURATION_maxima);
         }
         m_dursInVoiceSameMensur = {}; // restart for next voice (layer)
     }
@@ -191,18 +191,19 @@ std::vector<ArrayOfElementDurPairs> ScoringUpFunctor::SubdivideIntoBoundedSequen
 }
 
 // 2. Process the bounded sequences, with the list of all bounded sequences as argument
-void ScoringUpFunctor::ProcessBoundedSequences(const std::vector<ArrayOfElementDurPairs> &listOfSequences)
+void ScoringUpFunctor::ProcessBoundedSequences(
+    const std::vector<ArrayOfElementDurPairs> &listOfSequences, data_DURATION boundUnit)
 {
     for (ArrayOfElementDurPairs sequence : listOfSequences) {
-        this->ProcessBoundedSequences(sequence);
+        this->ProcessBoundedSequences(sequence, boundUnit);
     }
 }
 
 // 3. Process the bounded sequences, with the individual bounded sequences as argument
-void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &sequence)
+void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit)
 {
     // Get the notes in the middle of the boundaries of the sequence
-    ArrayOfElementDurPairs middleSeq = this->GetBoundedNotes(sequence);
+    ArrayOfElementDurPairs middleSeq = this->GetBoundedNotes(sequence, boundUnit);
 
     // Check if there are dots in the middleSeq and how many. The dots in the middleSeq are the only ones that have the
     // possibility of being a dot of imperfection (or alteration) or a dot of augmentation---the dots of perfection are
@@ -254,18 +255,60 @@ void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &seq
 }
 
 // 4. Get the notes bounded by the "supposedly" perfect notes (the 'middle note of the bounded sequence')
-ArrayOfElementDurPairs ScoringUpFunctor::GetBoundedNotes(const ArrayOfElementDurPairs &sequence)
+ArrayOfElementDurPairs ScoringUpFunctor::GetBoundedNotes(
+    const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit)
 {
     ArrayOfElementDurPairs middleSeq = {};
-    if (sequence.size() >= 2) {
-        data_DURATION firstNoteDur = sequence.at(0).second;
-        if (firstNoteDur == DURATION_semibrevis || firstNoteDur == DURATION_minima
-            || firstNoteDur == DURATION_semiminima || firstNoteDur == DURATION_fusa
-            || firstNoteDur == DURATION_semifusa) {
-            middleSeq = { sequence.begin(), sequence.end() - 1 };
+
+    if (boundUnit == DURATION_semibrevis) {
+        if (sequence.size() >= 2) {
+            data_DURATION firstNoteDur = sequence.at(0).second;
+            if (firstNoteDur == DURATION_minima || firstNoteDur == DURATION_semiminima || firstNoteDur == DURATION_fusa
+                || firstNoteDur == DURATION_semifusa) {
+                middleSeq = { sequence.begin(), sequence.end() - 1 };
+            }
+            else {
+                middleSeq = { sequence.begin() + 1, sequence.end() - 1 };
+            }
         }
-        else {
-            middleSeq = { sequence.begin() + 1, sequence.end() - 1 };
+    }
+    else if (boundUnit == DURATION_brevis) {
+        if (sequence.size() >= 2) {
+            data_DURATION firstNoteDur = sequence.at(0).second;
+            if (firstNoteDur == DURATION_semibrevis || firstNoteDur == DURATION_minima
+                || firstNoteDur == DURATION_semiminima || firstNoteDur == DURATION_fusa
+                || firstNoteDur == DURATION_semifusa) {
+                middleSeq = { sequence.begin(), sequence.end() - 1 };
+            }
+            else {
+                middleSeq = { sequence.begin() + 1, sequence.end() - 1 };
+            }
+        }
+    }
+    else if (boundUnit == DURATION_longa) {
+        if (sequence.size() >= 2) {
+            data_DURATION firstNoteDur = sequence.at(0).second;
+            if (firstNoteDur == DURATION_brevis || firstNoteDur == DURATION_semibrevis
+                || firstNoteDur == DURATION_minima || firstNoteDur == DURATION_semiminima
+                || firstNoteDur == DURATION_fusa || firstNoteDur == DURATION_semifusa) {
+                middleSeq = { sequence.begin(), sequence.end() - 1 };
+            }
+            else {
+                middleSeq = { sequence.begin() + 1, sequence.end() - 1 };
+            }
+        }
+    }
+    else if (boundUnit == DURATION_maxima) {
+        if (sequence.size() >= 2) {
+            data_DURATION firstNoteDur = sequence.at(0).second;
+            if (firstNoteDur == DURATION_longa || firstNoteDur == DURATION_brevis || firstNoteDur == DURATION_semibrevis
+                || firstNoteDur == DURATION_minima || firstNoteDur == DURATION_semiminima
+                || firstNoteDur == DURATION_fusa || firstNoteDur == DURATION_semifusa) {
+                middleSeq = { sequence.begin(), sequence.end() - 1 };
+            }
+            else {
+                middleSeq = { sequence.begin() + 1, sequence.end() - 1 };
+            }
         }
     }
     return middleSeq;
