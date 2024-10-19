@@ -47,8 +47,22 @@ FunctorCode ScoringUpFunctor::VisitLayer(Layer *layer)
     data_PROLATIO prolatio = m_currentMensur->GetProlatio();*/
     // Doesn't get it from the staffDef, right?//
     if (!m_dursInVoiceSameMensur.empty()) {
-        m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur, DURATION_brevis);
-        this->ProcessBoundedSequences(m_listOfSequences);
+        if (m_prolatio == 3) {
+            m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur, DURATION_semibrevis);
+            this->ProcessBoundedSequences(m_listOfSequences);
+        }
+        if (m_tempus == 3) {
+            m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur, DURATION_brevis);
+            this->ProcessBoundedSequences(m_listOfSequences);
+        }
+        if (m_modusMinor == 3) {
+            m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur, DURATION_longa);
+            this->ProcessBoundedSequences(m_listOfSequences);
+        }
+        if (m_modusMaior == 3) {
+            m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur, DURATION_maxima);
+            this->ProcessBoundedSequences(m_listOfSequences);
+        }
         m_dursInVoiceSameMensur = {}; // restart for next voice (layer)
     }
     return FUNCTOR_CONTINUE;
