@@ -47,7 +47,7 @@ FunctorCode ScoringUpFunctor::VisitLayer(Layer *layer)
     data_PROLATIO prolatio = m_currentMensur->GetProlatio();*/
     // Doesn't get it from the staffDef, right?//
     if (!m_dursInVoiceSameMensur.empty()) {
-        m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur);
+        m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur, DURATION_brevis);
         this->ProcessBoundedSequences(m_listOfSequences);
         m_dursInVoiceSameMensur = {}; // restart for next voice (layer)
     }
@@ -108,21 +108,67 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
 // 1. Find the bounded sequences by dividing all the notes in a given mensuration and voice into sequences bounded by
 // "supposedly" perfect notes
 std::vector<ArrayOfElementDurPairs> ScoringUpFunctor::SubdivideIntoBoundedSequences(
-    const ArrayOfElementDurPairs &dursInVoiceSameMensur)
+    const ArrayOfElementDurPairs &dursInVoiceSameMensur, data_DURATION boundUnit)
 {
     std::vector<ArrayOfElementDurPairs> listOfBoundedSequences = {};
     ArrayOfElementDurPairs boundedSequence = {};
-    for (std::pair<LayerElement *, data_DURATION> elementDurPair : dursInVoiceSameMensur) {
-        data_DURATION dur = elementDurPair.second;
-        if (dur == DURATION_brevis || dur == DURATION_longa || dur == DURATION_maxima) {
-            boundedSequence.insert(boundedSequence.end(), elementDurPair);
-            listOfBoundedSequences.insert(listOfBoundedSequences.end(), boundedSequence);
-            boundedSequence = { elementDurPair };
+
+    // Depending on the boundUnit which could be a semibrevis (when in major prolation), a breve (when in perfect tempus), a longa (when in perfect modus minor), or a maxima (when in perfect modus major). The boundaries become the boundUnit note and any note of a higher value:
+    if (boundUnit == DURATION_semibrevis) {
+        for (std::pair<LayerElement *, data_DURATION> elementDurPair : dursInVoiceSameMensur) {
+            data_DURATION dur = elementDurPair.second;
+            if (dur == DURATION_semibrevis || dur == DURATION_brevis || dur == DURATION_longa || dur == DURATION_maxima) {
+                boundedSequence.insert(boundedSequence.end(), elementDurPair);
+                listOfBoundedSequences.insert(listOfBoundedSequences.end(), boundedSequence);
+                boundedSequence = { elementDurPair };
+            }
+            else {
+                boundedSequence.insert(boundedSequence.end(), elementDurPair);
+            }
+            LogDebug("dur is:", dur);
         }
-        else {
-            boundedSequence.insert(boundedSequence.end(), elementDurPair);
+    }
+    else if (boundUnit == DURATION_brevis) {
+        for (std::pair<LayerElement *, data_DURATION> elementDurPair : dursInVoiceSameMensur) {
+            data_DURATION dur = elementDurPair.second;
+            if (dur == DURATION_brevis || dur == DURATION_longa || dur == DURATION_maxima) {
+                boundedSequence.insert(boundedSequence.end(), elementDurPair);
+                listOfBoundedSequences.insert(listOfBoundedSequences.end(), boundedSequence);
+                boundedSequence = { elementDurPair };
+            }
+            else {
+                boundedSequence.insert(boundedSequence.end(), elementDurPair);
+            }
+            LogDebug("dur is:", dur);
         }
-        LogDebug("dur is:", dur);
+    }
+    else if (boundUnit == DURATION_longa) {
+        for (std::pair<LayerElement *, data_DURATION> elementDurPair : dursInVoiceSameMensur) {
+            data_DURATION dur = elementDurPair.second;
+            if (dur == DURATION_longa || dur == DURATION_maxima) {
+                boundedSequence.insert(boundedSequence.end(), elementDurPair);
+                listOfBoundedSequences.insert(listOfBoundedSequences.end(), boundedSequence);
+                boundedSequence = { elementDurPair };
+            }
+            else {
+                boundedSequence.insert(boundedSequence.end(), elementDurPair);
+            }
+            LogDebug("dur is:", dur);
+        }
+    }
+    else if (boundUnit == DURATION_maxima) {
+        for (std::pair<LayerElement *, data_DURATION> elementDurPair : dursInVoiceSameMensur) {
+            data_DURATION dur = elementDurPair.second;
+            if (dur == DURATION_maxima) {
+                boundedSequence.insert(boundedSequence.end(), elementDurPair);
+                listOfBoundedSequences.insert(listOfBoundedSequences.end(), boundedSequence);
+                boundedSequence = { elementDurPair };
+            }
+            else {
+                boundedSequence.insert(boundedSequence.end(), elementDurPair);
+            }
+            LogDebug("dur is:", dur);
+        }
     }
     return listOfBoundedSequences;
 }
