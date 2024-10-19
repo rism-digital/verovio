@@ -113,11 +113,14 @@ std::vector<ArrayOfElementDurPairs> ScoringUpFunctor::SubdivideIntoBoundedSequen
     std::vector<ArrayOfElementDurPairs> listOfBoundedSequences = {};
     ArrayOfElementDurPairs boundedSequence = {};
 
-    // Depending on the boundUnit which could be a semibrevis (when in major prolation), a breve (when in perfect tempus), a longa (when in perfect modus minor), or a maxima (when in perfect modus major). The boundaries become the boundUnit note and any note of a higher value:
+    // Depending on the boundUnit which could be a semibrevis (when in major prolation), a breve (when in perfect
+    // tempus), a longa (when in perfect modus minor), or a maxima (when in perfect modus major). The boundaries become
+    // the boundUnit note and any note of a higher value:
     if (boundUnit == DURATION_semibrevis) {
         for (std::pair<LayerElement *, data_DURATION> elementDurPair : dursInVoiceSameMensur) {
             data_DURATION dur = elementDurPair.second;
-            if (dur == DURATION_semibrevis || dur == DURATION_brevis || dur == DURATION_longa || dur == DURATION_maxima) {
+            if (dur == DURATION_semibrevis || dur == DURATION_brevis || dur == DURATION_longa
+                || dur == DURATION_maxima) {
                 boundedSequence.insert(boundedSequence.end(), elementDurPair);
                 listOfBoundedSequences.insert(listOfBoundedSequences.end(), boundedSequence);
                 boundedSequence = { elementDurPair };
