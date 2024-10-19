@@ -59,7 +59,7 @@ FunctorCode AdjustAccidXFunctor::VisitAlignmentReference(AlignmentReference *ali
     // Align the octaves
     for (Accid *accid : accids) {
         // Skip any accid that was already adjusted
-        if (m_adjustedAccids.count(accid) > 0) continue;
+        if (m_adjustedAccids.contains(accid)) continue;
         // Skip accid not descendant of a note (e.g., mensural)
         if (!accid->GetFirstAncestor(NOTE)) continue;
 
@@ -102,7 +102,7 @@ FunctorCode AdjustAccidXFunctor::VisitAlignmentReference(AlignmentReference *ali
     // Zig-zag processing
     for (int i = 0, j = count - 1; i < middle; ++i, --j) {
         // top one - but skip if already adjusted (i.e. octaves)
-        if (m_adjustedAccids.count(accids.at(i)) == 0) {
+        if (!m_adjustedAccids.contains(accids.at(i))) {
             this->AdjustAccidWithSpace(accids.at(i), alignmentReference, staffSize);
         }
 
@@ -110,7 +110,7 @@ FunctorCode AdjustAccidXFunctor::VisitAlignmentReference(AlignmentReference *ali
         if (i == j) break;
 
         // bottom one - but skip if already adjusted
-        if (m_adjustedAccids.count(accids.at(j)) == 0) {
+        if (!m_adjustedAccids.contains(accids.at(j))) {
             this->AdjustAccidWithSpace(accids.at(j), alignmentReference, staffSize);
         }
     }
