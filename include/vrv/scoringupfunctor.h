@@ -49,7 +49,7 @@ public:
     ///@}
 
     /**
-     * @name: Apply the principles of imperfection and alteration (find @dur.quality of notes, perfecta / imperfecta /
+     * @name: Apply the principles of imperfection and alteration (find @dur.quality of notes: perfecta / imperfecta /
      * altera) for sequences with or without dots of division
      */
     ///@{
