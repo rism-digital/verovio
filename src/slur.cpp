@@ -380,9 +380,9 @@ void Slur::AddSpannedElements(
                                  TimeSpanningInterface *interface = positioner->GetObject()->GetTimeSpanningInterface();
                                  assert(interface);
                                  const bool startsInCollisionLayer
-                                     = (spanned.layersN.count(interface->GetStart()->GetOriginalLayerN()) > 0);
+                                     = spanned.layersN.contains(interface->GetStart()->GetOriginalLayerN());
                                  const bool endsInCollisionLayer
-                                     = (spanned.layersN.count(interface->GetEnd()->GetOriginalLayerN()) > 0);
+                                     = spanned.layersN.contains(interface->GetEnd()->GetOriginalLayerN());
                                  return (!startsInCollisionLayer && !endsInCollisionLayer);
                              }),
         tiePositioners.end());

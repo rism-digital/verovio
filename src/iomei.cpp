@@ -1270,7 +1270,7 @@ bool MEIOutput::ProcessScoreBasedFilterEnd(Object *object)
 void MEIOutput::PruneAttributes(pugi::xml_node node)
 {
     if (node.text()) return;
-    if (!MEIBasic::map.count(node.name())) {
+    if (!MEIBasic::map.contains(node.name())) {
         LogWarning("Element '%s' is not supported but will be preserved", node.name());
         return;
     }
