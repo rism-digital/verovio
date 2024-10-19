@@ -317,24 +317,16 @@ double ScoringUpFunctor::GetValueInUnit(double valueInMinims, data_DURATION unit
 {
     double valueInUnit = 0.0;
     if (unit == DURATION_semibrevis) {
-        valueInUnit = valueInMinims / 2;
-        // imperfect mensur
-        // MISSING perfect mensur
+        valueInUnit = valueInMinims / m_prolatio;
     }
     else if (unit == DURATION_brevis) {
-        valueInUnit = valueInMinims / 4;
-        // imperfect mensur
-        // MISSING perfect mensur
+        valueInUnit = valueInMinims / (m_prolatio * m_tempus);
     }
     else if (unit == DURATION_longa) {
-        valueInUnit = valueInMinims / 8;
-        // imperfect mensur
-        // MISSING perfect mensur
+        valueInUnit = valueInMinims / (m_prolatio * m_tempus * m_modusMinor);
     }
     else if (unit == DURATION_maxima) {
-        valueInUnit = valueInMinims / 16;
-        // imperfect mensur
-        // MISSING perfect mensur
+        valueInUnit = valueInMinims / (m_prolatio * m_tempus * m_modusMinor * m_modusMaior);
     }
     return valueInUnit;
 }
