@@ -112,12 +112,6 @@ std::pair<int, int> FTrem::GetFloatingBeamCount() const
     return { this->GetBeams(), this->GetBeamsFloat() };
 }
 
-void FTrem::SetElementShortening(int shortening)
-{
-    std::for_each(m_beamSegment.m_beamElementCoordRefs.begin(), m_beamSegment.m_beamElementCoordRefs.end(),
-        [shortening](BeamElementCoord *coord) { coord->m_maxShortening = shortening; });
-}
-
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------

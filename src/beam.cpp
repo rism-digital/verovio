@@ -1951,13 +1951,9 @@ int BeamElementCoord::CalculateStemLength(
     const int standardStemLen = STANDARD_STEMLENGTH * 2;
     // Check if the stem has to be shortened because outside the staff
     // In this case, Note::CalcStemLenInThirdUnits will return a value shorter than 2 * STANDARD_STEMLENGTH
-    int stemLenInHalfUnits
-        = !m_maxShortening ? standardStemLen : m_closestNote->CalcStemLenInThirdUnits(staff, stemDir) * 2 / 3;
+    const int stemLenInHalfUnits = m_closestNote->CalcStemLenInThirdUnits(staff, stemDir) * 2 / 3;
     // Do not extend when not on the staff line
     if (stemLenInHalfUnits != standardStemLen) {
-        if ((m_maxShortening > 0) && ((stemLenInHalfUnits - standardStemLen) > m_maxShortening)) {
-            stemLenInHalfUnits = standardStemLen - m_maxShortening;
-        }
         extend = false;
     }
 
@@ -2096,12 +2092,6 @@ std::pair<int, int> Beam::GetAdditionalBeamCount() const
     });
 
     return { topShortestDur - DURATION_8, bottomShortestDur - DURATION_8 };
-}
-
-void Beam::SetElementShortening(int shortening)
-{
-    std::for_each(m_beamSegment.m_beamElementCoordRefs.begin(), m_beamSegment.m_beamElementCoordRefs.end(),
-        [shortening](BeamElementCoord *coord) { coord->m_maxShortening = shortening; });
 }
 
 int Beam::GetBeamPartDuration(int x, bool includeRests) const

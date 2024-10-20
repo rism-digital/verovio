@@ -305,11 +305,6 @@ public:
         bool areDotsAdjusted, bool isChordElement, bool isLowerElement = false, bool unison = true);
 
     /**
-     * Helper function to set shortening for elements with beam interface
-     */
-    virtual void SetElementShortening(int shortening) {}
-
-    /**
      * Get the stem mod for the element (if any)
      */
     virtual data_STEMMODIFIER GetDrawingStemMod() const;
