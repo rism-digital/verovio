@@ -1612,7 +1612,7 @@ ClassId ObjectFactory::GetClassId(std::string name)
 void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
 {
     for (const std::string &str : classStrings) {
-        if (s_classIdsRegistry.count(str) > 0) {
+        if (s_classIdsRegistry.contains(str)) {
             classIds.push_back(s_classIdsRegistry.at(str));
         }
         else {

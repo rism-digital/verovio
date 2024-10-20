@@ -39,6 +39,12 @@ public:
      */
     std::string GetMEIName() const { return m_meiName; }
 
+    /**
+     * Return the MEI element original name
+     */
+    std::string GetContent() { return m_content; }
+    void SetContent(std::string content) { m_content = content; }
+
     //----------//
     // Functors //
     //----------//
@@ -58,6 +64,8 @@ private:
     std::string m_className;
     /** The MEI element name */
     std::string m_meiName;
+    /** The MEI element content */
+    std::string m_content;
 
 public:
     //

@@ -51,6 +51,7 @@
 #include "neume.h"
 #include "note.h"
 #include "page.h"
+#include "proport.h"
 #include "rest.h"
 #include "slur.h"
 #include "smufl.h"
@@ -677,6 +678,18 @@ Fraction LayerElement::GetAlignmentDuration(
         return Fraction(0, 1);
     }
 
+    // Mensural chords are aligned looking at the duration of the notes
+    if (this->Is(CHORD) && IsMensuralType(notationType)) {
+        Fraction duration = 0;
+        ListOfConstObjects notes = this->FindAllDescendantsByType(NOTE);
+        for (const Object *object : notes) {
+            const Note *note = vrv_cast<const Note *>(object);
+            Fraction noteDuration = note->GetAlignmentDuration(params, notGraceOnly, notationType);
+            duration = std::max(duration, noteDuration);
+        }
+        return duration;
+    }
+
     // Only resolve simple sameas links to avoid infinite recursion
     const LayerElement *sameas = dynamic_cast<const LayerElement *>(this->GetSameasLink());
     if (sameas && !sameas->HasSameasLink()) {
@@ -686,6 +699,13 @@ Fraction LayerElement::GetAlignmentDuration(
     if (this->HasInterface(INTERFACE_DURATION)) {
         int num = 1;
         int numbase = 1;
+
+        if (params.proport) {
+            // Proportion are applied reversly - higher ratio means shorter values
+            if (params.proport->HasNum()) num *= params.proport->GetCumulatedNum();
+            if (params.proport->HasNumbase()) numbase *= params.proport->GetCumulatedNumbase();
+        }
+
         const Tuplet *tuplet = vrv_cast<const Tuplet *>(this->GetFirstAncestor(TUPLET, MAX_TUPLET_DEPTH));
         if (tuplet) {
             ListOfConstObjects objects;
@@ -764,8 +784,6 @@ Fraction LayerElement::GetAlignmentDuration(
 Fraction LayerElement::GetAlignmentDuration(bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     AlignMeterParams params;
-    params.meterSig = NULL;
-    params.mensur = NULL;
     return this->GetAlignmentDuration(params, notGraceOnly, notationType);
 }
 
@@ -807,8 +825,6 @@ Fraction LayerElement::GetContentAlignmentDuration(
 Fraction LayerElement::GetContentAlignmentDuration(bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     AlignMeterParams params;
-    params.meterSig = NULL;
-    params.mensur = NULL;
     return this->GetContentAlignmentDuration(params, notGraceOnly, notationType);
 }
 
@@ -984,9 +1000,20 @@ int LayerElement::CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2
 {
     Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     if (!parentLayer) return 0;
-    // Check whether there are elements on other layer in the duration of the current beam. If there are none - stop
-    // here, there's nothing to be done
+    // Check whether there are elements on the other layer in the duration of the current beam
     ListOfObjects collidingElementsList = parentLayer->GetLayerElementsForTimeSpanOf(this, true);
+    // Ignore any elements part of a stem-sameas beam
+    if (this->Is(BEAM)) {
+        const Beam *beam = vrv_cast<Beam *>(this);
+        const Beam *stemSameAsBeam = beam->GetStemSameasBeam();
+        if (stemSameAsBeam) {
+            collidingElementsList.remove_if([stemSameAsBeam](Object *object) {
+                const LayerElement *layerElement = vrv_cast<LayerElement *>(object);
+                return (layerElement->GetAncestorBeam() == stemSameAsBeam);
+            });
+        }
+    }
+    // If there are none - stop here, there's nothing to be done
     if (collidingElementsList.empty()) return 0;
 
     Staff *staff = this->GetAncestorStaff();

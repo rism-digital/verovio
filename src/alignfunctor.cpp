@@ -18,6 +18,7 @@
 #include "nc.h"
 #include "neume.h"
 #include "page.h"
+#include "proport.h"
 #include "rend.h"
 #include "rest.h"
 #include "runningelement.h"
@@ -41,8 +42,6 @@ AlignHorizontallyFunctor::AlignHorizontallyFunctor(Doc *doc) : DocFunctor(doc)
 {
     m_measureAligner = NULL;
     m_time = 0;
-    m_currentParams.mensur = NULL;
-    m_currentParams.meterSig = NULL;
     m_notationType = NOTATIONTYPE_cmn;
     m_scoreDefRole = SCOREDEF_NONE;
     m_isFirstMeasure = false;
@@ -53,6 +52,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
 {
     m_currentParams.mensur = layer->GetCurrentMensur();
     m_currentParams.meterSig = layer->GetCurrentMeterSig();
+    m_currentParams.proport = layer->GetCurrentProport();
 
     // We are starting a new layer, reset the time;
     // We set it to -1.0 for the scoreDef attributes since they have to be aligned before any timestamp event (-1.0)
@@ -234,6 +234,16 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             type = ALIGNMENT_SCOREDEF_METERSIG;
         }
     }
+    else if (layerElement->Is(PROPORT)) {
+        // replace the current proport
+        const Proport *previous = (m_currentParams.proport) ? (m_currentParams.proport) : NULL;
+        m_currentParams.proport = vrv_cast<Proport *>(layerElement);
+        assert(m_currentParams.proport);
+        if (previous) {
+            m_currentParams.proport->Cumulate(previous);
+        }
+        type = ALIGNMENT_PROPORT;
+    }
     else if (layerElement->Is({ MULTIREST, MREST, MRPT })) {
         type = ALIGNMENT_FULLMEASURE;
     }
@@ -250,6 +260,9 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             // Create an alignment only if the dot has no resolved preceeding note
             type = ALIGNMENT_DOT;
         }
+    }
+    else if (layerElement->Is(CUSTOS)) {
+        type = ALIGNMENT_CUSTOS;
     }
     else if (layerElement->Is(ACCID)) {
         // accid within note was already taken into account by noteParent

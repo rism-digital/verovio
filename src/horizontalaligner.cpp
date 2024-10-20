@@ -675,7 +675,7 @@ void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight, const std:
 
 GraceAligner *Alignment::GetGraceAligner(int id)
 {
-    if (m_graceAligners.count(id) == 0) {
+    if (!m_graceAligners.contains(id)) {
         m_graceAligners[id] = new GraceAligner();
     }
     return m_graceAligners[id];
