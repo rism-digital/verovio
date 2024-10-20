@@ -76,6 +76,7 @@ public:
     Note *ImperfectionAPA(const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit);
     Note *Alteration(const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit);
     bool LeavePerfect(const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit);
+    void ApplyAugmentationsAndPerfections();
     ///@}
 
     /*
@@ -96,6 +97,8 @@ private:
     int m_prolatio;
     ArrayOfElementDurPairs m_dursInVoiceSameMensur;
     std::vector<ArrayOfElementDurPairs> m_listOfSequences;
+    std::list<std::pair<Note*, Dot*>> m_listOfAugNotesDotsPairs;
+    std::list<std::pair<Note*, Dot*>> m_listOfPerfNotesDotsPairs;
 
 public:
     //
