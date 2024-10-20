@@ -327,13 +327,16 @@ double ScoringUpFunctor::GetDurNumberValue(
         assert(note);
         durquality = note->GetDurQuality();
     }
-    // int longaDefaultVal = m_modusMinor * m_tempus * m_prolatio;
+    int longaDefaultVal = m_modusMinor * m_tempus * m_prolatio;
     int brevisDefaultVal = m_tempus * m_prolatio;
     int semibrevisDefaultVal = m_prolatio;
     double durnum = 0;
     switch (dur) {
         case DURATION_longa:
-            if (m_modusMinor == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
+            if (durquality == DURQUALITY_mensural_altera) {
+                durnum = 2 * longaDefaultVal;
+            }
+            else if (m_modusMinor == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
                 durnum = 3 * brevisDefaultVal;
                 if (m_modusMinor == 2 && followedByDot) {
                     // Candidate for augmentation (<dot form="aug"> and @num="2", @numbase="3")
@@ -351,7 +354,10 @@ double ScoringUpFunctor::GetDurNumberValue(
             }
             break;
         case DURATION_brevis:
-            if (m_tempus == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
+            if (durquality == DURQUALITY_mensural_altera) {
+                durnum = 2 * brevisDefaultVal;
+            }
+            else if (m_tempus == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
                 durnum = 3 * semibrevisDefaultVal;
                 if (m_tempus == 2 && followedByDot) {
                     // Candidate for augmentation (<dot form="aug"> and @num="2", @numbase="3")
@@ -369,7 +375,10 @@ double ScoringUpFunctor::GetDurNumberValue(
             }
             break;
         case DURATION_semibrevis:
-            if (m_prolatio == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
+            if (durquality == DURQUALITY_mensural_altera) {
+                durnum = 2 * semibrevisDefaultVal;
+            }
+            else if (m_prolatio == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
                 durnum = 3;
                 if (m_prolatio == 2 && followedByDot) {
                     // Candidate for augmentation (<dot form="aug"> and @num="2", @numbase="3")
@@ -392,6 +401,9 @@ double ScoringUpFunctor::GetDurNumberValue(
                 // Candidate for augmentation (<dot form="aug"> and @num="2", @numbase="3")
                 Dot *dot = vrv_cast<Dot *>(nextElement);
                 m_listOfAugNotesDotsPairs.push_back({ note, dot });
+            }
+            else if (durquality == DURQUALITY_mensural_altera) {
+                durnum = 2;
             }
             else {
                 durnum = 1;
@@ -714,7 +726,7 @@ bool ScoringUpFunctor::EvalDotOfDiv(
             // This is a "dot of division"
             flagDotOfDiv = true;
             // Then it divides the sequence into the following two:
-            ArrayOfElementDurPairs seq1 = { sequence.begin(), sequence.begin() + dotInd + 1 };
+            ArrayOfElementDurPairs seq1 = { sequence.begin(), sequence.begin() + dotInd + 2 };
             ArrayOfElementDurPairs seq2 = { sequence.begin() + dotInd + 2, sequence.end() };
             // Encode the dot of division:
             LayerElement *dotElement = sequence.at(dotInd + 1).first;
