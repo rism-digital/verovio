@@ -338,11 +338,12 @@ double ScoringUpFunctor::GetDurNumberValue(
                 if (m_modusMinor == 2 && followedByDot) {
                     // Candidate for augmentation (<dot form="aug"> and @num="2", @numbase="3")
                     Dot *dot = vrv_cast<Dot *>(nextElement);
-                    m_listOfAugNotesDotsPairs.push_back({note, dot});
-                } else if (m_modusMinor == 3 && followedByDot) {
+                    m_listOfAugNotesDotsPairs.push_back({ note, dot });
+                }
+                else if (m_modusMinor == 3 && followedByDot) {
                     // Candidate for dot of perfection (<dot form="div"> and @dur.quality="perfecta")
                     Dot *dot = vrv_cast<Dot *>(nextElement);
-                    m_listOfPerfNotesDotsPairs.push_back({note, dot});
+                    m_listOfPerfNotesDotsPairs.push_back({ note, dot });
                 }
             }
             else if (m_modusMinor == 2 || durquality == DURQUALITY_mensural_imperfecta) {
@@ -355,11 +356,12 @@ double ScoringUpFunctor::GetDurNumberValue(
                 if (m_tempus == 2 && followedByDot) {
                     // Candidate for augmentation (<dot form="aug"> and @num="2", @numbase="3")
                     Dot *dot = vrv_cast<Dot *>(nextElement);
-                    m_listOfAugNotesDotsPairs.push_back({note, dot});
-                } else if (m_tempus == 3 && followedByDot) {
+                    m_listOfAugNotesDotsPairs.push_back({ note, dot });
+                }
+                else if (m_tempus == 3 && followedByDot) {
                     // Candidate for dot of perfection (<dot form="div"> and @dur.quality="perfecta")
                     Dot *dot = vrv_cast<Dot *>(nextElement);
-                    m_listOfPerfNotesDotsPairs.push_back({note, dot});
+                    m_listOfPerfNotesDotsPairs.push_back({ note, dot });
                 }
             }
             else if (m_tempus == 2 || durquality == DURQUALITY_mensural_imperfecta) {
@@ -372,11 +374,12 @@ double ScoringUpFunctor::GetDurNumberValue(
                 if (m_prolatio == 2 && followedByDot) {
                     // Candidate for augmentation (<dot form="aug"> and @num="2", @numbase="3")
                     Dot *dot = vrv_cast<Dot *>(nextElement);
-                    m_listOfAugNotesDotsPairs.push_back({note, dot});
-                } else if (m_prolatio == 3 && followedByDot) {
+                    m_listOfAugNotesDotsPairs.push_back({ note, dot });
+                }
+                else if (m_prolatio == 3 && followedByDot) {
                     // Candidate for dot of perfection (<dot form="div"> and @dur.quality="perfecta")
                     Dot *dot = vrv_cast<Dot *>(nextElement);
-                    m_listOfPerfNotesDotsPairs.push_back({note, dot});
+                    m_listOfPerfNotesDotsPairs.push_back({ note, dot });
                 }
             }
             else if (m_prolatio == 2 || durquality == DURQUALITY_mensural_imperfecta) {
@@ -388,7 +391,7 @@ double ScoringUpFunctor::GetDurNumberValue(
                 durnum = 1.5;
                 // Candidate for augmentation (<dot form="aug"> and @num="2", @numbase="3")
                 Dot *dot = vrv_cast<Dot *>(nextElement);
-                m_listOfAugNotesDotsPairs.push_back({note, dot});
+                m_listOfAugNotesDotsPairs.push_back({ note, dot });
             }
             else {
                 durnum = 1;
@@ -399,7 +402,7 @@ double ScoringUpFunctor::GetDurNumberValue(
                 durnum = 0.75;
                 // Candidate for augmentation (<dot form="aug"> and @num="2", @numbase="3")
                 Dot *dot = vrv_cast<Dot *>(nextElement);
-                m_listOfAugNotesDotsPairs.push_back({note, dot});
+                m_listOfAugNotesDotsPairs.push_back({ note, dot });
             }
             else {
                 durnum = 0.5;
@@ -410,7 +413,7 @@ double ScoringUpFunctor::GetDurNumberValue(
                 durnum = 0.375;
                 // Candidate for augmentation (<dot form="aug"> and @num="2", @numbase="3")
                 Dot *dot = vrv_cast<Dot *>(nextElement);
-                m_listOfAugNotesDotsPairs.push_back({note, dot});
+                m_listOfAugNotesDotsPairs.push_back({ note, dot });
             }
             else {
                 durnum = 0.25;
@@ -465,7 +468,8 @@ double ScoringUpFunctor::GetValueInUnit(double valueInMinims, data_DURATION unit
 
 // Find the quality of notes by applying the "principles of imperfection and alteration" based on the number of notes
 // between a bounded sequence
-void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence, double valueInSmallerUnit, data_DURATION boundUnit)
+void ScoringUpFunctor::FindDurQuals(
+    const ArrayOfElementDurPairs &sequence, double valueInSmallerUnit, data_DURATION boundUnit)
 {
     double sum = valueInSmallerUnit; // JUST IN THIS CASE
     int remainder = (int)sum % 3;
@@ -655,7 +659,9 @@ Note *ScoringUpFunctor::Alteration(const ArrayOfElementDurPairs &sequence, data_
     data_DURATION penultDur = penultElementDurPair.second;
     /// Evaluates what is the type of the penultimate element in the sequence. If it is a rest, it forbids Alteration
     /// (returns false). If it is a note, and the note is a 'semibrevis', it alters the note (and returns true).
-    std::map<data_DURATION, data_DURATION> nextSmallLevel = {{DURATION_maxima, DURATION_longa}, {DURATION_longa, DURATION_brevis}, {DURATION_brevis, DURATION_semibrevis}, {DURATION_semibrevis, DURATION_minima}};
+    std::map<data_DURATION, data_DURATION> nextSmallLevel
+        = { { DURATION_maxima, DURATION_longa }, { DURATION_longa, DURATION_brevis },
+              { DURATION_brevis, DURATION_semibrevis }, { DURATION_semibrevis, DURATION_minima } };
     data_DURATION smallerValue = nextSmallLevel[boundUnit];
     if (penultElement->Is(NOTE) && penultDur == smallerValue) {
         Note *penultNote = vrv_cast<Note *>(penultElement);
@@ -675,11 +681,13 @@ bool ScoringUpFunctor::LeavePerfect(const ArrayOfElementDurPairs &sequence, data
 }
 
 // 5. Apply augmentations (due to a dot of augmentation) and perfections (due to a dot of perfection)
-void ScoringUpFunctor::ApplyAugmentationsAndPerfections(){
-    for (std::pair<Note*, Dot*> pairNoteAndDot : m_listOfAugNotesDotsPairs) {
+void ScoringUpFunctor::ApplyAugmentationsAndPerfections()
+{
+    for (std::pair<Note *, Dot *> pairNoteAndDot : m_listOfAugNotesDotsPairs) {
         pairNoteAndDot.first->SetDurQuality(DURQUALITY_mensural_perfecta);
         pairNoteAndDot.second->SetForm(dotLog_FORM_aug);
-    }for (std::pair<Note*, Dot*> pairNoteAndDot : m_listOfPerfNotesDotsPairs) {
+    }
+    for (std::pair<Note *, Dot *> pairNoteAndDot : m_listOfPerfNotesDotsPairs) {
         pairNoteAndDot.first->SetDurQuality(DURQUALITY_mensural_perfecta);
         pairNoteAndDot.second->SetForm(dotLog_FORM_div);
     }
@@ -716,7 +724,8 @@ bool ScoringUpFunctor::EvalDotOfDiv(
             this->FindDurQuals(seq1, sum1, unit);
             this->FindDurQuals(seq2, sum2, unit);
             ApplyAugmentationsAndPerfections();
-        } else {
+        }
+        else {
             m_listOfAugNotesDotsPairs.clear();
             m_listOfPerfNotesDotsPairs.clear();
         }

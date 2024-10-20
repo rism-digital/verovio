@@ -54,7 +54,8 @@ public:
      * altera) for sequences with or without dots of division
      */
     ///@{
-    bool EvalDotOfDiv(const ArrayOfElementDurPairs &middleSeq, const ArrayOfElementDurPairs &sequence, int dotInd, data_DURATION unit);
+    bool EvalDotOfDiv(const ArrayOfElementDurPairs &middleSeq, const ArrayOfElementDurPairs &sequence, int dotInd,
+        data_DURATION unit);
     void FindDurQuals(const ArrayOfElementDurPairs &middleSeq, double valueInUnit, data_DURATION boundUnit);
     ///@}
 
@@ -97,8 +98,8 @@ private:
     int m_prolatio;
     ArrayOfElementDurPairs m_dursInVoiceSameMensur;
     std::vector<ArrayOfElementDurPairs> m_listOfSequences;
-    std::list<std::pair<Note*, Dot*>> m_listOfAugNotesDotsPairs;
-    std::list<std::pair<Note*, Dot*>> m_listOfPerfNotesDotsPairs;
+    std::list<std::pair<Note *, Dot *>> m_listOfAugNotesDotsPairs;
+    std::list<std::pair<Note *, Dot *>> m_listOfPerfNotesDotsPairs;
 
 public:
     //
