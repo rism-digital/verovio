@@ -1019,9 +1019,8 @@ int LayerElement::CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2
     Staff *staff = this->GetAncestorStaff();
 
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    int leftMargin = 0;
-    int rightMargin = 0;
-    bool sameDirElement = false;
+    int leftOverlap = 0;
+    int rightOverlap = 0;
     std::vector<int> elementOverlaps;
     for (Object *object : collidingElementsList) {
         LayerElement *layerElement = vrv_cast<LayerElement *>(object);
@@ -1029,53 +1028,47 @@ int LayerElement::CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2
         const int elementBottom = layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize);
         const int elementTop = layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize);
         if (direction > 0) {
-            // make sure that there's actual overlap first
+            // Ensure that there's actual overlap first
             if ((elementBottom > y1) && (elementBottom > y2)) continue;
             const int currentBottom = this->GetDrawingBottom(doc, staff->m_drawingStaffSize);
             if (currentBottom >= elementTop) continue;
-            const StemmedDrawingInterface *stemInterface = layerElement->GetStemmedDrawingInterface();
-            if (stemInterface && (sameDirElement || (stemInterface->GetDrawingStemDir() == STEMDIRECTION_up))) {
-                if (elementBottom - stemInterface->GetDrawingStemLen() < currentBottom) continue;
-                leftMargin = unit + y1 - elementBottom;
-                rightMargin = unit + y2 - elementBottom;
-                sameDirElement = true;
+            // If there is a mild overlap, then decrease the beam stem length via negative overlap
+            if (elementBottom > std::max(y1, y2) - 3 * unit) {
+                leftOverlap = std::min(elementBottom - y1, 0);
+                rightOverlap = std::min(elementBottom - y2, 0);
             }
             else {
-                leftMargin = elementTop - y1;
-                rightMargin = elementTop - y2;
+                leftOverlap = std::max(elementTop - y1, 0);
+                rightOverlap = std::max(elementTop - y2, 0);
             }
         }
         else {
-            // make sure that there's actual overlap first
+            // Ensure that there's actual overlap first
             if ((elementTop < y1) && (elementTop < y2)) continue;
             const int currentTop = this->GetDrawingTop(doc, staff->m_drawingStaffSize);
             if (currentTop <= elementBottom) continue;
-            const StemmedDrawingInterface *stemInterface = layerElement->GetStemmedDrawingInterface();
-            if (stemInterface && (sameDirElement || (stemInterface->GetDrawingStemDir() == STEMDIRECTION_down))) {
-                if (currentTop - stemInterface->GetDrawingStemLen() > currentTop) continue;
-                leftMargin = unit + y1 - elementTop;
-                rightMargin = unit + y2 - elementTop;
-                sameDirElement = true;
+            // If there is a mild overlap, then decrease the beam stem length via negative overlap
+            if (elementTop < std::min(y1, y2) + 3 * unit) {
+                leftOverlap = std::min(y1 - elementTop, 0);
+                rightOverlap = std::min(y2 - elementTop, 0);
             }
             else {
-                leftMargin = elementBottom - y1;
-                rightMargin = elementBottom - y2;
+                leftOverlap = std::max(y1 - elementBottom, 0);
+                rightOverlap = std::max(y2 - elementBottom, 0);
             }
         }
-        elementOverlaps.emplace_back(std::max(leftMargin * direction, rightMargin * direction));
+        elementOverlaps.emplace_back(leftOverlap);
+        elementOverlaps.emplace_back(rightOverlap);
     }
     if (elementOverlaps.empty()) return 0;
 
-    const auto maxOverlap = std::max_element(elementOverlaps.begin(), elementOverlaps.end());
+    const auto [minOverlap, maxOverlap] = std::minmax_element(elementOverlaps.begin(), elementOverlaps.end());
     int overlap = 0;
-    if (*maxOverlap >= 0) {
-        const int multiplier = sameDirElement ? -1 : 1;
-        overlap = ((*maxOverlap == 0) ? unit : *maxOverlap) * direction * multiplier;
+    if (*maxOverlap > 0) {
+        overlap = *maxOverlap * direction;
     }
-    else {
-        int maxShorteningInHalfUnits = (std::abs(*maxOverlap) / unit) * 2;
-        if (maxShorteningInHalfUnits > 0) --maxShorteningInHalfUnits;
-        this->SetElementShortening(maxShorteningInHalfUnits);
+    else if (*minOverlap < 0) {
+        overlap = (*minOverlap - unit) * direction;
     }
     return overlap;
 }
