@@ -41,11 +41,12 @@ public:
      * @name: Divide the notes of a voice into sequences to be processed individualy
      */
     ///@{
+    void workInMensur(const ArrayOfElementDurPairs &m_dursInVoiceSameMensur, data_DURATION noteLevel);
     std::vector<ArrayOfElementDurPairs> SubdivideIntoBoundedSequences(
-        const ArrayOfElementDurPairs &dursInVoiceSameMensur);
-    void ProcessBoundedSequences(const std::vector<ArrayOfElementDurPairs> &listOfSequences);
-    void ProcessBoundedSequences(const ArrayOfElementDurPairs &sequence);
-    ArrayOfElementDurPairs GetBoundedNotes(const ArrayOfElementDurPairs &sequence);
+        const ArrayOfElementDurPairs &dursInVoiceSameMensur, data_DURATION boundUnit);
+    void ProcessBoundedSequences(const std::vector<ArrayOfElementDurPairs> &listOfSequences, data_DURATION boundUnit);
+    void ProcessBoundedSequences(const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit);
+    ArrayOfElementDurPairs GetBoundedNotes(const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit);
     ///@}
 
     /**
@@ -53,8 +54,9 @@ public:
      * altera) for sequences with or without dots of division
      */
     ///@{
-    bool EvalDotOfDiv(const ArrayOfElementDurPairs &middleSeq, const ArrayOfElementDurPairs &sequence, int dotInd);
-    void FindDurQuals(const ArrayOfElementDurPairs &middleSeq, double valueInUnit);
+    bool EvalDotOfDiv(const ArrayOfElementDurPairs &middleSeq, const ArrayOfElementDurPairs &sequence, int dotInd,
+        data_DURATION unit);
+    void FindDurQuals(const ArrayOfElementDurPairs &middleSeq, double valueInUnit, data_DURATION boundUnit);
     ///@}
 
     /**
@@ -71,10 +73,11 @@ public:
      * @name Apply the modifications of imperfection and alteration or leaves the notes with their default perfect value
      */
     ///@{
-    Note *ImperfectionAPP(const ArrayOfElementDurPairs &sequence);
-    Note *ImperfectionAPA(const ArrayOfElementDurPairs &sequence);
-    Note *Alteration(const ArrayOfElementDurPairs &sequence);
-    bool LeavePerfect(const ArrayOfElementDurPairs &sequence);
+    Note *ImperfectionAPP(const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit);
+    Note *ImperfectionAPA(const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit);
+    Note *Alteration(const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit);
+    bool LeavePerfect(const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit);
+    void ApplyAugmentationsAndPerfections();
     ///@}
 
     /*
@@ -95,6 +98,8 @@ private:
     int m_prolatio;
     ArrayOfElementDurPairs m_dursInVoiceSameMensur;
     std::vector<ArrayOfElementDurPairs> m_listOfSequences;
+    std::list<std::pair<Note *, Dot *>> m_listOfAugNotesDotsPairs;
+    std::list<std::pair<Note *, Dot *>> m_listOfPerfNotesDotsPairs;
 
 public:
     //

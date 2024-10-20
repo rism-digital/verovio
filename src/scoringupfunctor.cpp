@@ -47,11 +47,27 @@ FunctorCode ScoringUpFunctor::VisitLayer(Layer *layer)
     data_PROLATIO prolatio = m_currentMensur->GetProlatio();*/
     // Doesn't get it from the staffDef, right?//
     if (!m_dursInVoiceSameMensur.empty()) {
-        m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur);
-        this->ProcessBoundedSequences(m_listOfSequences);
+        if (m_prolatio == 3) {
+            workInMensur(m_dursInVoiceSameMensur, DURATION_semibrevis);
+        }
+        if (m_tempus == 3) {
+            workInMensur(m_dursInVoiceSameMensur, DURATION_brevis);
+        }
+        if (m_modusMinor == 3) {
+            workInMensur(m_dursInVoiceSameMensur, DURATION_longa);
+        }
+        if (m_modusMaior == 3) {
+            workInMensur(m_dursInVoiceSameMensur, DURATION_maxima);
+        }
         m_dursInVoiceSameMensur = {}; // restart for next voice (layer)
     }
     return FUNCTOR_CONTINUE;
+}
+
+void ScoringUpFunctor::workInMensur(const ArrayOfElementDurPairs &m_dursInVoiceSameMensur, data_DURATION noteLevel)
+{
+    m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur, noteLevel);
+    this->ProcessBoundedSequences(m_listOfSequences, noteLevel);
 }
 
 FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
@@ -108,38 +124,88 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
 // 1. Find the bounded sequences by dividing all the notes in a given mensuration and voice into sequences bounded by
 // "supposedly" perfect notes
 std::vector<ArrayOfElementDurPairs> ScoringUpFunctor::SubdivideIntoBoundedSequences(
-    const ArrayOfElementDurPairs &dursInVoiceSameMensur)
+    const ArrayOfElementDurPairs &dursInVoiceSameMensur, data_DURATION boundUnit)
 {
     std::vector<ArrayOfElementDurPairs> listOfBoundedSequences = {};
     ArrayOfElementDurPairs boundedSequence = {};
-    for (std::pair<LayerElement *, data_DURATION> elementDurPair : dursInVoiceSameMensur) {
-        data_DURATION dur = elementDurPair.second;
-        if (dur == DURATION_brevis || dur == DURATION_longa || dur == DURATION_maxima) {
-            boundedSequence.insert(boundedSequence.end(), elementDurPair);
-            listOfBoundedSequences.insert(listOfBoundedSequences.end(), boundedSequence);
-            boundedSequence = { elementDurPair };
+
+    // Depending on the boundUnit which could be a semibrevis (when in major prolation), a breve (when in perfect
+    // tempus), a longa (when in perfect modus minor), or a maxima (when in perfect modus major). The boundaries become
+    // the boundUnit note and any note of a higher value:
+    if (boundUnit == DURATION_semibrevis) {
+        for (std::pair<LayerElement *, data_DURATION> elementDurPair : dursInVoiceSameMensur) {
+            data_DURATION dur = elementDurPair.second;
+            if (dur == DURATION_semibrevis || dur == DURATION_brevis || dur == DURATION_longa
+                || dur == DURATION_maxima) {
+                boundedSequence.insert(boundedSequence.end(), elementDurPair);
+                listOfBoundedSequences.insert(listOfBoundedSequences.end(), boundedSequence);
+                boundedSequence = { elementDurPair };
+            }
+            else {
+                boundedSequence.insert(boundedSequence.end(), elementDurPair);
+            }
+            LogDebug("dur is:", dur);
         }
-        else {
-            boundedSequence.insert(boundedSequence.end(), elementDurPair);
+    }
+    else if (boundUnit == DURATION_brevis) {
+        for (std::pair<LayerElement *, data_DURATION> elementDurPair : dursInVoiceSameMensur) {
+            data_DURATION dur = elementDurPair.second;
+            if (dur == DURATION_brevis || dur == DURATION_longa || dur == DURATION_maxima) {
+                boundedSequence.insert(boundedSequence.end(), elementDurPair);
+                listOfBoundedSequences.insert(listOfBoundedSequences.end(), boundedSequence);
+                boundedSequence = { elementDurPair };
+            }
+            else {
+                boundedSequence.insert(boundedSequence.end(), elementDurPair);
+            }
+            LogDebug("dur is:", dur);
         }
-        LogDebug("dur is:", dur);
+    }
+    else if (boundUnit == DURATION_longa) {
+        for (std::pair<LayerElement *, data_DURATION> elementDurPair : dursInVoiceSameMensur) {
+            data_DURATION dur = elementDurPair.second;
+            if (dur == DURATION_longa || dur == DURATION_maxima) {
+                boundedSequence.insert(boundedSequence.end(), elementDurPair);
+                listOfBoundedSequences.insert(listOfBoundedSequences.end(), boundedSequence);
+                boundedSequence = { elementDurPair };
+            }
+            else {
+                boundedSequence.insert(boundedSequence.end(), elementDurPair);
+            }
+            LogDebug("dur is:", dur);
+        }
+    }
+    else if (boundUnit == DURATION_maxima) {
+        for (std::pair<LayerElement *, data_DURATION> elementDurPair : dursInVoiceSameMensur) {
+            data_DURATION dur = elementDurPair.second;
+            if (dur == DURATION_maxima) {
+                boundedSequence.insert(boundedSequence.end(), elementDurPair);
+                listOfBoundedSequences.insert(listOfBoundedSequences.end(), boundedSequence);
+                boundedSequence = { elementDurPair };
+            }
+            else {
+                boundedSequence.insert(boundedSequence.end(), elementDurPair);
+            }
+            LogDebug("dur is:", dur);
+        }
     }
     return listOfBoundedSequences;
 }
 
 // 2. Process the bounded sequences, with the list of all bounded sequences as argument
-void ScoringUpFunctor::ProcessBoundedSequences(const std::vector<ArrayOfElementDurPairs> &listOfSequences)
+void ScoringUpFunctor::ProcessBoundedSequences(
+    const std::vector<ArrayOfElementDurPairs> &listOfSequences, data_DURATION boundUnit)
 {
     for (ArrayOfElementDurPairs sequence : listOfSequences) {
-        this->ProcessBoundedSequences(sequence);
+        this->ProcessBoundedSequences(sequence, boundUnit);
     }
 }
 
 // 3. Process the bounded sequences, with the individual bounded sequences as argument
-void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &sequence)
+void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit)
 {
     // Get the notes in the middle of the boundaries of the sequence
-    ArrayOfElementDurPairs middleSeq = this->GetBoundedNotes(sequence);
+    ArrayOfElementDurPairs middleSeq = this->GetBoundedNotes(sequence, boundUnit);
 
     // Check if there are dots in the middleSeq and how many. The dots in the middleSeq are the only ones that have the
     // possibility of being a dot of imperfection (or alteration) or a dot of augmentation---the dots of perfection are
@@ -155,18 +221,20 @@ void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &seq
     // 0. No dots
     double sum;
     if (numberOfDots == 0) {
-        sum = this->GetValueInUnit(this->GetValueInMinims(middleSeq), DURATION_semibrevis);
-        this->FindDurQuals(sequence, sum);
+        sum = this->GetValueInUnit(this->GetValueInMinims(middleSeq), boundUnit);
+        this->FindDurQuals(sequence, sum, boundUnit);
+        ApplyAugmentationsAndPerfections();
     }
     // 1. Single dot in middle sequence sequence
     else if (numberOfDots == 1) {
         // If there is one dot,
         int dotInd = indecesOfDots.at(0);
-        bool isDotOfDiv = this->EvalDotOfDiv(middleSeq, sequence, dotInd);
+        bool isDotOfDiv = this->EvalDotOfDiv(middleSeq, sequence, dotInd, boundUnit);
         if (not isDotOfDiv) {
             // This is a dot of augmentation
-            sum = this->GetValueInUnit(this->GetValueInMinims(middleSeq), DURATION_semibrevis);
-            this->FindDurQuals(sequence, sum);
+            sum = this->GetValueInUnit(this->GetValueInMinims(middleSeq), boundUnit);
+            this->FindDurQuals(sequence, sum, boundUnit);
+            ApplyAugmentationsAndPerfections();
         }
     }
     // 3. More than one dot in middle sequence
@@ -174,35 +242,72 @@ void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &seq
         // Take first dot and evaluate if it is a dot of imperfection (check if it is "integer number of semibreves"
         // away from the beginning of the sequence, and if the rest of the sequence still sums an integer number)
         int startDotInd = indecesOfDots.at(0);
-        bool isStartDotOfDiv = this->EvalDotOfDiv(middleSeq, sequence, startDotInd);
+        bool isStartDotOfDiv = this->EvalDotOfDiv(middleSeq, sequence, startDotInd, boundUnit);
 
         // Take last dot and evaluate if it is a dot of division (check if it is "integer number of semibreves" away
         // from the end of the sequence, and if the rest of the sequence still sums an integer number)
         int endDotInd = indecesOfDots.at(indecesOfDots.size() - 1);
-        bool isEndDotOfDiv = this->EvalDotOfDiv(middleSeq, sequence, endDotInd);
+        bool isEndDotOfDiv = this->EvalDotOfDiv(middleSeq, sequence, endDotInd, boundUnit);
 
         // If neither, all dots are dots of augmentation
         if (not isStartDotOfDiv and not isEndDotOfDiv) {
             // This is a dot of augmentation
-            sum = this->GetValueInUnit(this->GetValueInMinims(middleSeq), DURATION_semibrevis);
-            this->FindDurQuals(sequence, sum);
+            sum = this->GetValueInUnit(this->GetValueInMinims(middleSeq), boundUnit);
+            this->FindDurQuals(sequence, sum, boundUnit);
+            ApplyAugmentationsAndPerfections();
         }
     }
 }
 
 // 4. Get the notes bounded by the "supposedly" perfect notes (the 'middle note of the bounded sequence')
-ArrayOfElementDurPairs ScoringUpFunctor::GetBoundedNotes(const ArrayOfElementDurPairs &sequence)
+ArrayOfElementDurPairs ScoringUpFunctor::GetBoundedNotes(
+    const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit)
 {
+    data_DURATION firstNoteDur;
     ArrayOfElementDurPairs middleSeq = {};
     if (sequence.size() >= 2) {
-        data_DURATION firstNoteDur = sequence.at(0).second;
-        if (firstNoteDur == DURATION_semibrevis || firstNoteDur == DURATION_minima
-            || firstNoteDur == DURATION_semiminima || firstNoteDur == DURATION_fusa
-            || firstNoteDur == DURATION_semifusa) {
-            middleSeq = { sequence.begin(), sequence.end() - 1 };
+        if (boundUnit == DURATION_semibrevis) {
+            firstNoteDur = sequence.at(0).second;
+            if (firstNoteDur == DURATION_minima || firstNoteDur == DURATION_semiminima || firstNoteDur == DURATION_fusa
+                || firstNoteDur == DURATION_semifusa) {
+                middleSeq = { sequence.begin(), sequence.end() - 1 };
+            }
+            else {
+                middleSeq = { sequence.begin() + 1, sequence.end() - 1 };
+            }
         }
-        else {
-            middleSeq = { sequence.begin() + 1, sequence.end() - 1 };
+        else if (boundUnit == DURATION_brevis) {
+            firstNoteDur = sequence.at(0).second;
+            if (firstNoteDur == DURATION_semibrevis || firstNoteDur == DURATION_minima
+                || firstNoteDur == DURATION_semiminima || firstNoteDur == DURATION_fusa
+                || firstNoteDur == DURATION_semifusa) {
+                middleSeq = { sequence.begin(), sequence.end() - 1 };
+            }
+            else {
+                middleSeq = { sequence.begin() + 1, sequence.end() - 1 };
+            }
+        }
+        else if (boundUnit == DURATION_longa) {
+            firstNoteDur = sequence.at(0).second;
+            if (firstNoteDur == DURATION_brevis || firstNoteDur == DURATION_semibrevis
+                || firstNoteDur == DURATION_minima || firstNoteDur == DURATION_semiminima
+                || firstNoteDur == DURATION_fusa || firstNoteDur == DURATION_semifusa) {
+                middleSeq = { sequence.begin(), sequence.end() - 1 };
+            }
+            else {
+                middleSeq = { sequence.begin() + 1, sequence.end() - 1 };
+            }
+        }
+        else if (boundUnit == DURATION_maxima) {
+            firstNoteDur = sequence.at(0).second;
+            if (firstNoteDur == DURATION_longa || firstNoteDur == DURATION_brevis || firstNoteDur == DURATION_semibrevis
+                || firstNoteDur == DURATION_minima || firstNoteDur == DURATION_semiminima
+                || firstNoteDur == DURATION_fusa || firstNoteDur == DURATION_semifusa) {
+                middleSeq = { sequence.begin(), sequence.end() - 1 };
+            }
+            else {
+                middleSeq = { sequence.begin() + 1, sequence.end() - 1 };
+            }
         }
     }
     return middleSeq;
@@ -222,30 +327,69 @@ double ScoringUpFunctor::GetDurNumberValue(
         assert(note);
         durquality = note->GetDurQuality();
     }
-    // int longaDefaultVal = m_modusMinor * m_tempus * m_prolatio;
+    int longaDefaultVal = m_modusMinor * m_tempus * m_prolatio;
     int brevisDefaultVal = m_tempus * m_prolatio;
     int semibrevisDefaultVal = m_prolatio;
     double durnum = 0;
     switch (dur) {
         case DURATION_longa:
-            if (m_modusMinor == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
+            if (durquality == DURQUALITY_mensural_altera) {
+                durnum = 2 * longaDefaultVal;
+            }
+            else if (m_modusMinor == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
                 durnum = 3 * brevisDefaultVal;
+                if (m_modusMinor == 2 && followedByDot) {
+                    // Candidate for augmentation (<dot form="aug"> and @num="2", @numbase="3")
+                    Dot *dot = vrv_cast<Dot *>(nextElement);
+                    m_listOfAugNotesDotsPairs.push_back({ note, dot });
+                }
+                else if (m_modusMinor == 3 && followedByDot) {
+                    // Candidate for dot of perfection (<dot form="div"> and @dur.quality="perfecta")
+                    Dot *dot = vrv_cast<Dot *>(nextElement);
+                    m_listOfPerfNotesDotsPairs.push_back({ note, dot });
+                }
             }
             else if (m_modusMinor == 2 || durquality == DURQUALITY_mensural_imperfecta) {
                 durnum = 2 * brevisDefaultVal;
             }
             break;
         case DURATION_brevis:
-            if (m_tempus == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
+            if (durquality == DURQUALITY_mensural_altera) {
+                durnum = 2 * brevisDefaultVal;
+            }
+            else if (m_tempus == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
                 durnum = 3 * semibrevisDefaultVal;
+                if (m_tempus == 2 && followedByDot) {
+                    // Candidate for augmentation (<dot form="aug"> and @num="2", @numbase="3")
+                    Dot *dot = vrv_cast<Dot *>(nextElement);
+                    m_listOfAugNotesDotsPairs.push_back({ note, dot });
+                }
+                else if (m_tempus == 3 && followedByDot) {
+                    // Candidate for dot of perfection (<dot form="div"> and @dur.quality="perfecta")
+                    Dot *dot = vrv_cast<Dot *>(nextElement);
+                    m_listOfPerfNotesDotsPairs.push_back({ note, dot });
+                }
             }
             else if (m_tempus == 2 || durquality == DURQUALITY_mensural_imperfecta) {
                 durnum = 2 * semibrevisDefaultVal;
             }
             break;
         case DURATION_semibrevis:
-            if (m_prolatio == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
+            if (durquality == DURQUALITY_mensural_altera) {
+                durnum = 2 * semibrevisDefaultVal;
+            }
+            else if (m_prolatio == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
                 durnum = 3;
+                if (m_prolatio == 2 && followedByDot) {
+                    // Candidate for augmentation (<dot form="aug"> and @num="2", @numbase="3")
+                    Dot *dot = vrv_cast<Dot *>(nextElement);
+                    m_listOfAugNotesDotsPairs.push_back({ note, dot });
+                }
+                else if (m_prolatio == 3 && followedByDot) {
+                    // Candidate for dot of perfection (<dot form="div"> and @dur.quality="perfecta")
+                    Dot *dot = vrv_cast<Dot *>(nextElement);
+                    m_listOfPerfNotesDotsPairs.push_back({ note, dot });
+                }
             }
             else if (m_prolatio == 2 || durquality == DURQUALITY_mensural_imperfecta) {
                 durnum = 2;
@@ -254,9 +398,12 @@ double ScoringUpFunctor::GetDurNumberValue(
         case DURATION_minima:
             if (followedByDot) {
                 durnum = 1.5;
-                note->SetDurQuality(DURQUALITY_mensural_perfecta);
+                // Candidate for augmentation (<dot form="aug"> and @num="2", @numbase="3")
                 Dot *dot = vrv_cast<Dot *>(nextElement);
-                dot->SetForm(dotLog_FORM_aug);
+                m_listOfAugNotesDotsPairs.push_back({ note, dot });
+            }
+            else if (durquality == DURQUALITY_mensural_altera) {
+                durnum = 2;
             }
             else {
                 durnum = 1;
@@ -265,9 +412,9 @@ double ScoringUpFunctor::GetDurNumberValue(
         case DURATION_semiminima:
             if (followedByDot) {
                 durnum = 0.75;
-                note->SetDurQuality(DURQUALITY_mensural_perfecta);
+                // Candidate for augmentation (<dot form="aug"> and @num="2", @numbase="3")
                 Dot *dot = vrv_cast<Dot *>(nextElement);
-                dot->SetForm(dotLog_FORM_aug);
+                m_listOfAugNotesDotsPairs.push_back({ note, dot });
             }
             else {
                 durnum = 0.5;
@@ -276,9 +423,9 @@ double ScoringUpFunctor::GetDurNumberValue(
         case DURATION_fusa:
             if (followedByDot) {
                 durnum = 0.375;
-                note->SetDurQuality(DURQUALITY_mensural_perfecta);
+                // Candidate for augmentation (<dot form="aug"> and @num="2", @numbase="3")
                 Dot *dot = vrv_cast<Dot *>(nextElement);
-                dot->SetForm(dotLog_FORM_aug);
+                m_listOfAugNotesDotsPairs.push_back({ note, dot });
             }
             else {
                 durnum = 0.25;
@@ -317,31 +464,24 @@ double ScoringUpFunctor::GetValueInUnit(double valueInMinims, data_DURATION unit
 {
     double valueInUnit = 0.0;
     if (unit == DURATION_semibrevis) {
-        valueInUnit = valueInMinims / 2;
-        // imperfect mensur
-        // MISSING perfect mensur
+        valueInUnit = valueInMinims;
     }
     else if (unit == DURATION_brevis) {
-        valueInUnit = valueInMinims / 4;
-        // imperfect mensur
-        // MISSING perfect mensur
+        valueInUnit = valueInMinims / (m_prolatio);
     }
     else if (unit == DURATION_longa) {
-        valueInUnit = valueInMinims / 8;
-        // imperfect mensur
-        // MISSING perfect mensur
+        valueInUnit = valueInMinims / (m_prolatio * m_tempus);
     }
     else if (unit == DURATION_maxima) {
-        valueInUnit = valueInMinims / 16;
-        // imperfect mensur
-        // MISSING perfect mensur
+        valueInUnit = valueInMinims / (m_prolatio * m_tempus * m_modusMinor);
     }
     return valueInUnit;
 }
 
 // Find the quality of notes by applying the "principles of imperfection and alteration" based on the number of notes
 // between a bounded sequence
-void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence, double valueInSmallerUnit)
+void ScoringUpFunctor::FindDurQuals(
+    const ArrayOfElementDurPairs &sequence, double valueInSmallerUnit, data_DURATION boundUnit)
 {
     double sum = valueInSmallerUnit; // JUST IN THIS CASE
     int remainder = (int)sum % 3;
@@ -372,13 +512,13 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence, doub
             case 0: break; // No modifications
             case 1:
                 // Evaluate 'default' case: Imperfection APP
-                impappCandidate = this->ImperfectionAPP(sequence);
+                impappCandidate = this->ImperfectionAPP(sequence, boundUnit);
                 if (impappCandidate) {
                     impappCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
                     break;
                 }
                 // Evaluate 'alternative' case: Imperfection APA
-                impapaCandidate = this->ImperfectionAPA(sequence);
+                impapaCandidate = this->ImperfectionAPA(sequence, boundUnit);
                 if (impapaCandidate) {
                     impapaCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
                     break;
@@ -388,14 +528,14 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence, doub
                 break;
             case 2:
                 // Evaluate 'default' case: Alteration
-                alterationCandidate = this->Alteration(sequence);
+                alterationCandidate = this->Alteration(sequence, boundUnit);
                 if (alterationCandidate && !dotOfImperf) {
                     alterationCandidate->SetDurQuality(DURQUALITY_mensural_altera);
                     break;
                 }
                 // Evaluate 'alternative' case: Imperfection APP and Imperfection APA
-                impappCandidate = this->ImperfectionAPP(sequence);
-                impapaCandidate = this->ImperfectionAPA(sequence);
+                impappCandidate = this->ImperfectionAPP(sequence, boundUnit);
+                impapaCandidate = this->ImperfectionAPA(sequence, boundUnit);
                 if (impappCandidate && impapaCandidate) {
                     impappCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
                     impapaCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
@@ -407,7 +547,7 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence, doub
         }
     }
     else if (sum == 3) {
-        bool leavePerfectFlag = this->LeavePerfect(sequence);
+        bool leavePerfectFlag = this->LeavePerfect(sequence, boundUnit);
         if (!leavePerfectFlag || dotOfImperf) {
         }
     }
@@ -415,8 +555,8 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence, doub
         switch (remainder) {
             case 0:
                 // Evaluate 'default' case: Imperfection APP and Alteration
-                impappCandidate = this->ImperfectionAPP(sequence);
-                alterationCandidate = this->Alteration(sequence);
+                impappCandidate = this->ImperfectionAPP(sequence, boundUnit);
+                alterationCandidate = this->Alteration(sequence, boundUnit);
                 if (impappCandidate && alterationCandidate) {
                     impappCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
                     alterationCandidate->SetDurQuality(DURQUALITY_mensural_altera);
@@ -426,13 +566,13 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence, doub
                 break;
             case 1:
                 // Evaluate 'default' case: Imperfection APP
-                impappCandidate = this->ImperfectionAPP(sequence);
+                impappCandidate = this->ImperfectionAPP(sequence, boundUnit);
                 if (impappCandidate) {
                     impappCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
                     break;
                 }
                 // Evaluate 'alternative' case: Imperfection APA
-                impapaCandidate = this->ImperfectionAPA(sequence);
+                impapaCandidate = this->ImperfectionAPA(sequence, boundUnit);
                 if (impapaCandidate) {
                     impapaCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
                     break;
@@ -441,15 +581,15 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence, doub
                 break;
             case 2:
                 // Evaluate 'default' case: Imperfection APP and Imperfection APA
-                impappCandidate = this->ImperfectionAPP(sequence);
-                impapaCandidate = this->ImperfectionAPA(sequence);
+                impappCandidate = this->ImperfectionAPP(sequence, boundUnit);
+                impapaCandidate = this->ImperfectionAPA(sequence, boundUnit);
                 if (impappCandidate && impapaCandidate && !simileAnteSimile) {
                     impappCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
                     impapaCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
                     break;
                 }
                 // Evaluate 'alternative' case: Alteration
-                alterationCandidate = this->Alteration(sequence);
+                alterationCandidate = this->Alteration(sequence, boundUnit);
                 if (alterationCandidate) {
                     alterationCandidate->SetDurQuality(DURQUALITY_mensural_altera);
                     break;
@@ -463,7 +603,7 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence, doub
 
 // Context-dependent modifications:
 // 1. Imperfection a parte post (imperfection by the notes that follow)
-Note *ScoringUpFunctor::ImperfectionAPP(const ArrayOfElementDurPairs &sequence)
+Note *ScoringUpFunctor::ImperfectionAPP(const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit)
 {
     std::pair<LayerElement *, data_DURATION> firstElementDurPair = sequence.at(0);
     LayerElement *firstElement = firstElementDurPair.first;
@@ -471,7 +611,7 @@ Note *ScoringUpFunctor::ImperfectionAPP(const ArrayOfElementDurPairs &sequence)
     LayerElement *nextElement;
     /// Evaluates if the first note in the sequence is a brevis. If it is, then it imperfects it (and returns true). If
     /// it is a rest or a larger note, then it forbids imperfection (and returns false).
-    if (firstElement->Is(NOTE) && firstDur == DURATION_brevis) {
+    if (firstElement->Is(NOTE) && firstDur == boundUnit) {
         /// Before imperfecting the starting brevis, check if it is followed by a dot. If it is, this would be a dot of
         /// perfectio, i.e., a dot that forces perfection (forbidding the imperfection and returning false). Otherwise,
         /// if there is no dot following the starting brevis, proceed to perform the imperfection a.p.p. and return
@@ -505,14 +645,14 @@ Note *ScoringUpFunctor::ImperfectionAPP(const ArrayOfElementDurPairs &sequence)
 }
 
 // 2. Imperfection a parte ante (imperfection by the notes preceding)
-Note *ScoringUpFunctor::ImperfectionAPA(const ArrayOfElementDurPairs &sequence)
+Note *ScoringUpFunctor::ImperfectionAPA(const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit)
 {
     std::pair<LayerElement *, data_DURATION> lastElementDurPair = sequence.at(sequence.size() - 1);
     LayerElement *lastElement = lastElementDurPair.first;
     data_DURATION lastDur = lastElementDurPair.second;
     /// Evaluates if the last note in the sequence is a brevis. If it is, then it imperfects it (and returns true). If
     /// it is a rest or a larger note, then it forbids imperfection (and returns false).
-    if (lastElement->Is(NOTE) && lastDur == DURATION_brevis) {
+    if (lastElement->Is(NOTE) && lastDur == boundUnit) {
         Note *lastNote = vrv_cast<Note *>(lastElement);
         assert(lastNote);
         // lastNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
@@ -524,14 +664,18 @@ Note *ScoringUpFunctor::ImperfectionAPA(const ArrayOfElementDurPairs &sequence)
 }
 
 // 3. Alteration (making a note twice as long)
-Note *ScoringUpFunctor::Alteration(const ArrayOfElementDurPairs &sequence)
+Note *ScoringUpFunctor::Alteration(const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit)
 {
     std::pair<LayerElement *, data_DURATION> penultElementDurPair = sequence.at(sequence.size() - 2);
     LayerElement *penultElement = penultElementDurPair.first;
     data_DURATION penultDur = penultElementDurPair.second;
     /// Evaluates what is the type of the penultimate element in the sequence. If it is a rest, it forbids Alteration
     /// (returns false). If it is a note, and the note is a 'semibrevis', it alters the note (and returns true).
-    if (penultElement->Is(NOTE) && penultDur == DURATION_semibrevis) {
+    std::map<data_DURATION, data_DURATION> nextSmallLevel
+        = { { DURATION_maxima, DURATION_longa }, { DURATION_longa, DURATION_brevis },
+              { DURATION_brevis, DURATION_semibrevis }, { DURATION_semibrevis, DURATION_minima } };
+    data_DURATION smallerValue = nextSmallLevel[boundUnit];
+    if (penultElement->Is(NOTE) && penultDur == smallerValue) {
         Note *penultNote = vrv_cast<Note *>(penultElement);
         assert(penultNote);
         // penultNote->SetDurQuality(DURQUALITY_mensural_altera);
@@ -543,23 +687,38 @@ Note *ScoringUpFunctor::Alteration(const ArrayOfElementDurPairs &sequence)
 }
 
 // 4. No modification
-bool ScoringUpFunctor::LeavePerfect(const ArrayOfElementDurPairs &sequence)
+bool ScoringUpFunctor::LeavePerfect(const ArrayOfElementDurPairs &sequence, data_DURATION boundUnit)
 {
     return true;
+}
+
+// 5. Apply augmentations (due to a dot of augmentation) and perfections (due to a dot of perfection)
+void ScoringUpFunctor::ApplyAugmentationsAndPerfections()
+{
+    for (std::pair<Note *, Dot *> pairNoteAndDot : m_listOfAugNotesDotsPairs) {
+        pairNoteAndDot.first->SetDurQuality(DURQUALITY_mensural_perfecta);
+        pairNoteAndDot.second->SetForm(dotLog_FORM_aug);
+    }
+    for (std::pair<Note *, Dot *> pairNoteAndDot : m_listOfPerfNotesDotsPairs) {
+        pairNoteAndDot.first->SetDurQuality(DURQUALITY_mensural_perfecta);
+        pairNoteAndDot.second->SetForm(dotLog_FORM_div);
+    }
+    m_listOfAugNotesDotsPairs.clear();
+    m_listOfPerfNotesDotsPairs.clear();
 }
 
 // Evaluation of whether a dot in a given position (dotInd) is acting as a dot of division. If it is, apply the
 // principles of imperfection and alteration to the sequence of notes preceding and following the dot, and return true.
 bool ScoringUpFunctor::EvalDotOfDiv(
-    const ArrayOfElementDurPairs &middleSeq, const ArrayOfElementDurPairs &sequence, int dotInd)
+    const ArrayOfElementDurPairs &middleSeq, const ArrayOfElementDurPairs &sequence, int dotInd, data_DURATION unit)
 {
     // Initial assumption: the sequence doesn't have a dot of division
     bool flagDotOfDiv = false;
     // Evaluate if the dot passed to the method (by the dotInd) is behaving as a dot of division
     ArrayOfElementDurPairs middleSeq1 = { middleSeq.begin(), middleSeq.begin() + dotInd };
     ArrayOfElementDurPairs middleSeq2 = { middleSeq.begin() + dotInd + 1, middleSeq.end() };
-    double sum1 = this->GetValueInUnit(this->GetValueInMinims(middleSeq1), DURATION_semibrevis);
-    double sum2 = this->GetValueInUnit(this->GetValueInMinims(middleSeq2), DURATION_semibrevis);
+    double sum1 = this->GetValueInUnit(this->GetValueInMinims(middleSeq1), unit);
+    double sum2 = this->GetValueInUnit(this->GetValueInMinims(middleSeq2), unit);
     // This condition is to discard it being a dot of perfection
     if (middleSeq1.size() != 0) {
         // This other condition is to evaluate if it is a dot of division
@@ -567,15 +726,20 @@ bool ScoringUpFunctor::EvalDotOfDiv(
             // This is a "dot of division"
             flagDotOfDiv = true;
             // Then it divides the sequence into the following two:
-            ArrayOfElementDurPairs seq1 = { sequence.begin(), sequence.begin() + dotInd + 1 };
+            ArrayOfElementDurPairs seq1 = { sequence.begin(), sequence.begin() + dotInd + 2 };
             ArrayOfElementDurPairs seq2 = { sequence.begin() + dotInd + 2, sequence.end() };
             // Encode the dot of division:
             LayerElement *dotElement = sequence.at(dotInd + 1).first;
             Dot *dot = vrv_cast<Dot *>(dotElement);
             dot->SetForm(dotLog_FORM_div);
             // Encode its effect on the notes preceding and following:
-            this->FindDurQuals(seq1, sum1);
-            this->FindDurQuals(seq2, sum2);
+            this->FindDurQuals(seq1, sum1, unit);
+            this->FindDurQuals(seq2, sum2, unit);
+            ApplyAugmentationsAndPerfections();
+        }
+        else {
+            m_listOfAugNotesDotsPairs.clear();
+            m_listOfPerfNotesDotsPairs.clear();
         }
     }
     return flagDotOfDiv;
