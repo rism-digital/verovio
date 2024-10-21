@@ -59,6 +59,9 @@ private:
      */
     int CalcLayerOverlap(const LayerElement *beamElement) const;
 
+    // Rounds the overlap to the closest multiple of a half unit
+    int AdjustOverlapToHalfUnit(int overlap, int unit) const;
+
 public:
     //
 private:

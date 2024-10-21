@@ -148,15 +148,13 @@ FunctorCode AdjustBeamsFunctor::VisitClef(Clef *clef)
     // calculate margins for the clef
     const int leftMargin = m_directionBias * (currentBeamYLeft - clefBounds) - beams * beamWidth;
     const int rightMargin = m_directionBias * (currentBeamYRight - clefBounds) - beams * beamWidth;
-    const int overlapMargin = std::min(leftMargin, rightMargin);
+    int overlapMargin = std::min(leftMargin, rightMargin);
     if (overlapMargin >= 0) return FUNCTOR_CONTINUE;
     // calculate offset required for the beam
+    overlapMargin *= -m_directionBias;
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int unitChangeNumber = ((std::abs(overlapMargin) + unit / 6) / unit);
-    if (unitChangeNumber > 0) {
-        const int adjust = unitChangeNumber * unit * m_directionBias;
-        if (std::abs(adjust) > std::abs(m_overlapMargin)) m_overlapMargin = adjust;
-    }
+    const int adjust = this->AdjustOverlapToHalfUnit(overlapMargin, unit);
+    if (std::abs(adjust) > std::abs(m_overlapMargin)) m_overlapMargin = adjust;
 
     return FUNCTOR_CONTINUE;
 }
@@ -301,7 +299,7 @@ FunctorCode AdjustBeamsFunctor::VisitRest(Rest *rest)
     // Calculate possible overlap for the rest with beams
     const int beams = m_outerBeam->GetBeamPartDuration(rest, false) - DURATION_4;
     const int beamWidth = m_outerBeam->m_beamWidth;
-    const int overlapMargin = rest->Intersects(m_outerBeam, SELF, beams * beamWidth, true) * m_directionBias;
+    int overlapMargin = rest->Intersects(m_outerBeam, SELF, beams * beamWidth, true) * m_directionBias;
 
     // Adjust drawing location for the rest based on the overlap with beams.
     // Adjustment should be an even number, so that the rest is positioned properly
@@ -335,9 +333,9 @@ FunctorCode AdjustBeamsFunctor::VisitRest(Rest *rest)
         }
     }
 
+    overlapMargin *= -m_directionBias;
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int unitChangeNumber = std::abs(overlapMargin) / unit + 1;
-    const int adjust = unitChangeNumber * unit * m_directionBias;
+    const int adjust = this->AdjustOverlapToHalfUnit(overlapMargin, unit);
     if (std::abs(adjust) > std::abs(m_overlapMargin)) m_overlapMargin = adjust;
 
     return FUNCTOR_CONTINUE;
@@ -426,7 +424,16 @@ int AdjustBeamsFunctor::CalcLayerOverlap(const LayerElement *beamElement) const
     else if (*minOverlap < 0) {
         overlap = (*minOverlap - unit) * m_directionBias;
     }
-    return overlap;
+    const int adjust = this->AdjustOverlapToHalfUnit(overlap, unit);
+    return adjust;
+}
+
+int AdjustBeamsFunctor::AdjustOverlapToHalfUnit(int overlap, int unit) const
+{
+    const int overlapSign = (overlap >= 0) ? 1 : -1;
+    const int halfUnit = unit / 2;
+    const int halfUnitChangeNumber = (std::abs(overlap) + halfUnit / 2) / halfUnit;
+    return halfUnitChangeNumber * halfUnit * overlapSign;
 }
 
 } // namespace vrv
