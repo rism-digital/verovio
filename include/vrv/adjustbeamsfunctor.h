@@ -53,6 +53,12 @@ private:
     // Get the drawing interface of the outer beam or the outer ftrem
     BeamDrawingInterface *GetOuterBeamInterface() const;
 
+    /**
+     * Calculate the overlap with other layer elements that
+     * are placed within the duration of the element
+     */
+    int CalcLayerOverlap(LayerElement *beamElement);
+
 public:
     //
 private:

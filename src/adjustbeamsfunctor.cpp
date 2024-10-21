@@ -63,7 +63,7 @@ FunctorCode AdjustBeamsFunctor::VisitBeam(Beam *beam)
             m_x2 = beamSegment.m_beamElementCoordRefs.back()->m_x;
             m_beamSlope = beamSegment.m_beamSlope;
             m_directionBias = (beam->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
-            m_overlapMargin = beam->CalcLayerOverlap(m_doc, m_directionBias, m_y1, m_y2);
+            m_overlapMargin = this->CalcLayerOverlap(beam);
         }
         return FUNCTOR_CONTINUE;
     }
@@ -181,7 +181,7 @@ FunctorCode AdjustBeamsFunctor::VisitFTrem(FTrem *fTrem)
             m_x2 = beamSegment.m_beamElementCoordRefs.back()->m_x;
             m_beamSlope = beamSegment.m_beamSlope;
             m_directionBias = (fTrem->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
-            m_overlapMargin = fTrem->CalcLayerOverlap(m_doc, m_directionBias, m_y1, m_y2);
+            m_overlapMargin = this->CalcLayerOverlap(fTrem);
         }
         return FUNCTOR_CONTINUE;
     }
@@ -348,6 +348,85 @@ BeamDrawingInterface *AdjustBeamsFunctor::GetOuterBeamInterface() const
     if (m_outerBeam) return m_outerBeam;
     if (m_outerFTrem) return m_outerFTrem;
     return NULL;
+}
+
+int AdjustBeamsFunctor::CalcLayerOverlap(LayerElement *beamElement)
+{
+    assert(beamElement);
+
+    Layer *parentLayer = vrv_cast<Layer *>(beamElement->GetFirstAncestor(LAYER));
+    if (!parentLayer) return 0;
+    // Check whether there are elements on the other layer in the duration of the current beam
+    ListOfObjects collidingElementsList = parentLayer->GetLayerElementsForTimeSpanOf(beamElement, true);
+    // Ignore any elements part of a stem-sameas beam
+    if (beamElement->Is(BEAM)) {
+        const Beam *beam = vrv_cast<Beam *>(beamElement);
+        const Beam *stemSameAsBeam = beam->GetStemSameasBeam();
+        if (stemSameAsBeam) {
+            collidingElementsList.remove_if([stemSameAsBeam](Object *object) {
+                const LayerElement *layerElement = vrv_cast<LayerElement *>(object);
+                return (layerElement->GetAncestorBeam() == stemSameAsBeam);
+            });
+        }
+    }
+    // If there are none - stop here, there's nothing to be done
+    if (collidingElementsList.empty()) return 0;
+
+    Staff *staff = beamElement->GetAncestorStaff();
+
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int leftOverlap = 0;
+    int rightOverlap = 0;
+    std::vector<int> elementOverlaps;
+    for (Object *object : collidingElementsList) {
+        LayerElement *layerElement = vrv_cast<LayerElement *>(object);
+        if (!beamElement->HorizontalContentOverlap(object)) continue;
+        const int elementBottom = layerElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+        const int elementTop = layerElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
+        if (m_directionBias > 0) {
+            // Ensure that there's actual overlap first
+            if ((elementBottom > m_y1) && (elementBottom > m_y2)) continue;
+            const int currentBottom = beamElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+            if (currentBottom >= elementTop) continue;
+            // If there is a mild overlap, then decrease the beam stem length via negative overlap
+            if (elementBottom > std::max(m_y1, m_y2) - 3 * unit) {
+                leftOverlap = std::min(elementBottom - m_y1, 0);
+                rightOverlap = std::min(elementBottom - m_y2, 0);
+            }
+            else {
+                leftOverlap = std::max(elementTop - m_y1, 0);
+                rightOverlap = std::max(elementTop - m_y2, 0);
+            }
+        }
+        else {
+            // Ensure that there's actual overlap first
+            if ((elementTop < m_y1) && (elementTop < m_y2)) continue;
+            const int currentTop = beamElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
+            if (currentTop <= elementBottom) continue;
+            // If there is a mild overlap, then decrease the beam stem length via negative overlap
+            if (elementTop < std::min(m_y1, m_y2) + 3 * unit) {
+                leftOverlap = std::min(m_y1 - elementTop, 0);
+                rightOverlap = std::min(m_y2 - elementTop, 0);
+            }
+            else {
+                leftOverlap = std::max(m_y1 - elementBottom, 0);
+                rightOverlap = std::max(m_y2 - elementBottom, 0);
+            }
+        }
+        elementOverlaps.emplace_back(leftOverlap);
+        elementOverlaps.emplace_back(rightOverlap);
+    }
+    if (elementOverlaps.empty()) return 0;
+
+    const auto [minOverlap, maxOverlap] = std::minmax_element(elementOverlaps.begin(), elementOverlaps.end());
+    int overlap = 0;
+    if (*maxOverlap > 0) {
+        overlap = *maxOverlap * m_directionBias;
+    }
+    else if (*minOverlap < 0) {
+        overlap = (*minOverlap - unit) * m_directionBias;
+    }
+    return overlap;
 }
 
 } // namespace vrv
