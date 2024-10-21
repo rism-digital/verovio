@@ -4532,7 +4532,7 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
                     }
                     else {
                         unmeasured = new Measure(UNMEASURED);
-                        m_doc->SetMensuralMusicOnly(true);
+                        m_doc->SetMensuralMusicOnly(BOOLEAN_true);
                     }
                     parent->AddChild(unmeasured);
                 }
@@ -4568,7 +4568,7 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
         }
         else {
             unmeasured = new Measure(UNMEASURED);
-            m_doc->SetMensuralMusicOnly(true);
+            m_doc->SetMensuralMusicOnly(BOOLEAN_true);
         }
         parent->AddChild(unmeasured);
     }
@@ -4713,7 +4713,7 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
                     System *system = vrv_cast<System *>(parent);
                     assert(system);
                     unmeasured = new Measure(UNMEASURED);
-                    m_doc->SetMensuralMusicOnly(true);
+                    m_doc->SetMensuralMusicOnly(BOOLEAN_true);
                     if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
                         UpgradeMeasureTo_3_0_0(unmeasured, system);
                     }
@@ -5439,7 +5439,7 @@ bool MEIInput::ReadMeasure(Object *parent, pugi::xml_node measure)
     Measure *vrvMeasure = new Measure();
     if (m_doc->IsMensuralMusicOnly()) {
         LogWarning("Mixing mensural and non mensural music is not supported. Trying to go ahead...");
-        m_doc->SetMensuralMusicOnly(false);
+        m_doc->SetMensuralMusicOnly(BOOLEAN_false);
     }
     this->SetMeiID(measure, vrvMeasure);
     this->ReadFacsimileInterface(measure, vrvMeasure);
@@ -6206,6 +6206,12 @@ bool MEIInput::ReadLayer(Object *parent, pugi::xml_node layer)
     }
     else if (vrvLayer->GetN() == 0) {
         LogWarning("Value @n='0' on <layer> might yield unpredictable results");
+    }
+
+    // Check that we have only one single layer in mensural music staves
+    if (m_doc->IsMensuralMusicOnly() && (parent->GetChildCount(LAYER) > 0)) {
+        LogWarning("Mensural music with more than one layer is not supported. Trying to go ahead...");
+        m_doc->SetMensuralMusicOnly(BOOLEAN_false);
     }
 
     parent->AddChild(vrvLayer);

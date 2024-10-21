@@ -131,7 +131,7 @@ void Doc::Reset()
     m_dataPreparationDone = false;
     m_timemapTempo = 0.0;
     m_markup = MARKUP_DEFAULT;
-    m_isMensuralMusicOnly = false;
+    m_isMensuralMusicOnly = BOOLEAN_NONE;
     m_isNeumeLines = false;
     m_isCastOff = false;
     m_visibleScores.clear();
@@ -1299,7 +1299,7 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
 
     // We are converting to measure music in a definite way
     if (this->GetOptions()->m_mensuralToMeasure.GetValue()) {
-        m_isMensuralMusicOnly = false;
+        m_isMensuralMusicOnly = BOOLEAN_false;
     }
 
     // Make sure the document is not cast-off
@@ -2182,6 +2182,14 @@ int Doc::GetAdjustedDrawingPageWidth() const
 
     int contentWidth = m_drawingPage->GetContentWidth();
     return (contentWidth + m_drawingPageMarginLeft + m_drawingPageMarginRight) / DEFINITION_FACTOR;
+}
+
+void Doc::SetMensuralMusicOnly(data_BOOLEAN isMensuralMusicOnly)
+{
+    // Already marked as non mensural only cannoy be set back
+    if (m_isMensuralMusicOnly != BOOLEAN_false) {
+        m_isMensuralMusicOnly = isMensuralMusicOnly;
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -457,8 +457,8 @@ public:
      * @name Setter for and getter for mensural only flag
      */
     ///@{
-    void SetMensuralMusicOnly(bool isMensuralMusicOnly) { m_isMensuralMusicOnly = isMensuralMusicOnly; }
-    bool IsMensuralMusicOnly() const { return m_isMensuralMusicOnly; }
+    void SetMensuralMusicOnly(data_BOOLEAN isMensuralMusicOnly);
+    bool IsMensuralMusicOnly() const { return (m_isMensuralMusicOnly == BOOLEAN_true); }
     ///@}
 
     /**
@@ -676,7 +676,7 @@ private:
      * A flag to indicate whereas to document contains only mensural music.
      * Mensural only music will be converted to cast-off segments by Doc::ConvertToCastOffMensuralDoc
      */
-    bool m_isMensuralMusicOnly;
+    data_BOOLEAN m_isMensuralMusicOnly;
 
     /**
      * A flag to indicate that the document contains neume lines.
