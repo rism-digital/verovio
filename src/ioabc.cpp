@@ -325,7 +325,7 @@ int ABCInput::ParseTuplet(const std::string &musicCode, int index)
     // List of tuplets with default base of 3
     const std::unordered_set<int> threeBase = { 2, 4, 8, 9 };
     if (!tupletNumbase) {
-        tupletNumbase = threeBase.count(tupletNum) ? 3 : 2;
+        tupletNumbase = threeBase.contains(tupletNum) ? 3 : 2;
     }
     // Get number of elements supposed to be in the tuplet _:_:9
     // Ignore this for the time being

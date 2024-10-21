@@ -461,7 +461,7 @@ void PrepareLinkingFunctor::ResolveStemSameas(Note *note)
     // Second pass we resolve links
     else {
         const std::string id = note->GetID();
-        if (m_stemSameasIDPairs.count(id)) {
+        if (m_stemSameasIDPairs.contains(id)) {
             Note *noteStemSameas = m_stemSameasIDPairs.at(id);
             // Instanciate the bi-directional references and mark the roles as unset
             note->SetStemSameasNote(noteStemSameas);
@@ -542,7 +542,7 @@ FunctorCode PrepareDurationFunctor::VisitLayerElement(LayerElement *layerElement
         // Check if there is a duration default for the staff
         if (!m_durDefaultForStaffN.empty()) {
             Staff *staff = layerElement->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-            if (m_durDefaultForStaffN.count(staff->GetN()) > 0) {
+            if (m_durDefaultForStaffN.contains(staff->GetN())) {
                 durInterface->SetDurDefault(m_durDefaultForStaffN.at(staff->GetN()));
             }
         }
@@ -1435,7 +1435,7 @@ FunctorCode PrepareDelayedTurnsFunctor::VisitLayerElement(LayerElement *layerEle
         this->ResetCurrent();
     }
 
-    if (m_delayedTurns.count(layerElement)) {
+    if (m_delayedTurns.contains(layerElement)) {
         m_previousElement = layerElement;
         m_currentTurn = m_delayedTurns.at(layerElement);
         if (layerElement->Is(CHORD)) {

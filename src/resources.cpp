@@ -260,7 +260,7 @@ void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontSt
     }
 
     m_currentStyle = { fontWeight, fontStyle };
-    if (m_textFont.count(m_currentStyle) == 0) {
+    if (!m_textFont.contains(m_currentStyle)) {
         LogWarning("Text font for style (%d, %d) is not loaded. Use default", fontWeight, fontStyle);
         m_currentStyle = k_defaultStyle;
     }
@@ -268,11 +268,11 @@ void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontSt
 
 const Glyph *Resources::GetTextGlyph(char32_t code) const
 {
-    const StyleAttributes style = (m_textFont.count(m_currentStyle) != 0) ? m_currentStyle : k_defaultStyle;
-    if (m_textFont.count(style) == 0) return NULL;
+    const StyleAttributes style = m_textFont.contains(m_currentStyle) ? m_currentStyle : k_defaultStyle;
+    if (!m_textFont.contains(style)) return NULL;
 
     const GlyphTable &currentTable = m_textFont.at(style);
-    if (currentTable.count(code) == 0) {
+    if (!currentTable.contains(code)) {
         return NULL;
     }
 
@@ -414,7 +414,7 @@ bool Resources::InitTextFont(const std::string &fontName, const StyleAttributes 
     }
     const int unitsPerEm = root.attribute("units-per-em").as_int();
     pugi::xml_node current;
-    if (m_textFont.count(style) == 0) {
+    if (!m_textFont.contains(style)) {
         m_textFont[style] = {};
     }
     GlyphTable &currentTable = m_textFont.at(style);
@@ -433,7 +433,7 @@ bool Resources::InitTextFont(const std::string &fontName, const StyleAttributes 
             glyph.SetBoundingBox(x, y, width, height);
 
             if (current.attribute("h-a-x")) glyph.SetHorizAdvX(current.attribute("h-a-x").as_float());
-            if (currentTable.count(code) > 0) {
+            if (currentTable.contains(code)) {
                 LogDebug("Redefining %d with %s", code, fontName.c_str());
             }
             currentTable[code] = glyph;

@@ -665,7 +665,7 @@ bool StaffAlignment::IsInBracketGroup(bool isFirst) const
             });
 
             const int currentN = this->m_staff->GetN();
-            if (staffNs.count(currentN)) {
+            if (staffNs.contains(currentN)) {
                 if ((isFirst && (*staffNs.begin() == currentN)) || (!isFirst && (*staffNs.rbegin() == currentN)))
                     return true;
             }

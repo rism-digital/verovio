@@ -217,6 +217,8 @@ elseif (BUILD_AS_PYTHON)
 
     if(${SWIG_VERSION} VERSION_GREATER_EQUAL "4.1.0")
         list(APPEND CMAKE_SWIG_FLAGS "-doxygen")
+        list(APPEND CMAKE_SWIG_FLAGS "-fastproxy")
+        list(APPEND CMAKE_SWIG_FLAGS "-olddefs")
     else()
         list(APPEND CMAKE_SWIG_FLAGS "-py3;-DPY3")
     endif()
@@ -234,7 +236,7 @@ elseif (BUILD_AS_PYTHON)
     swig_add_library(verovio_module_${OUTPUT_VERSION_STRING} LANGUAGE python TYPE MODULE SOURCES ../bindings/python/verovio.i)
     swig_link_libraries(verovio_module_${OUTPUT_VERSION_STRING} verovio ${Python_LIBRARIES})
 
-    add_library(verovio STATIC ../tools/c_wrapper.cpp ${all_SRC})
+    add_library(verovio STATIC ${all_SRC})
 
 #####################
 # Command-line tool #

@@ -4572,14 +4572,14 @@ bool PAEInput::ConvertAccidGes()
             std::string noteID = note->GetID();
             if (!accid) {
                 // Tied note with a previous note with an accidental
-                if (ties.count(noteID)) {
+                if (ties.contains(noteID)) {
                     Accid *tieAccid = new Accid();
                     note->AddChild(tieAccid);
                     tieAccid->SetAccidGes(Att::AccidentalWrittenToGestural(ties[noteID]));
                     ties.erase(noteID);
                 }
                 // Nothing in front of the note, but something in the list - make it an accid.ges
-                else if ((currentAccids.count(octavedPitch) != 0)) {
+                else if (currentAccids.contains(octavedPitch)) {
                     Accid *gesAccid = new Accid();
                     note->AddChild(gesAccid);
                     data_ACCIDENTAL_WRITTEN accidWritten = currentAccids.at(octavedPitch);
@@ -4590,7 +4590,7 @@ bool PAEInput::ConvertAccidGes()
                 data_ACCIDENTAL_WRITTEN noteAccid = accid->GetAccid();
                 // Natural in front of the note, remove it from the current list
                 if (noteAccid == ACCIDENTAL_WRITTEN_n) {
-                    if (currentAccids.count(octavedPitch) != 0) {
+                    if (currentAccids.contains(octavedPitch)) {
                         currentAccids[octavedPitch] = ACCIDENTAL_WRITTEN_n;
                     }
                 }

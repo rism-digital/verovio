@@ -53,6 +53,9 @@ FunctorCode CalcSlurDirectionFunctor::VisitSlur(Slur *slur)
         if (slur->HasBulge()) {
             LogWarning("Mixed curve direction is ignored for slurs with prescribed bulge.");
         }
+        else if (start->Is(TIMESTAMP_ATTR) || end->Is(TIMESTAMP_ATTR)) {
+            LogWarning("Mixed curve direction is ignored for slurs with tstamp boundary.");
+        }
         else {
             const int startStaffN = start->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
             const int endStaffN = end->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
