@@ -57,7 +57,7 @@ private:
      * Calculate the overlap with other layer elements that
      * are placed within the duration of the element
      */
-    int CalcLayerOverlap(LayerElement *beamElement);
+    int CalcLayerOverlap(const LayerElement *beamElement) const;
 
 public:
     //

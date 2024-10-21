@@ -350,21 +350,21 @@ BeamDrawingInterface *AdjustBeamsFunctor::GetOuterBeamInterface() const
     return NULL;
 }
 
-int AdjustBeamsFunctor::CalcLayerOverlap(LayerElement *beamElement)
+int AdjustBeamsFunctor::CalcLayerOverlap(const LayerElement *beamElement) const
 {
     assert(beamElement);
 
-    Layer *parentLayer = vrv_cast<Layer *>(beamElement->GetFirstAncestor(LAYER));
+    const Layer *parentLayer = vrv_cast<const Layer *>(beamElement->GetFirstAncestor(LAYER));
     if (!parentLayer) return 0;
     // Check whether there are elements on the other layer in the duration of the current beam
-    ListOfObjects collidingElementsList = parentLayer->GetLayerElementsForTimeSpanOf(beamElement, true);
+    ListOfConstObjects collidingElementsList = parentLayer->GetLayerElementsForTimeSpanOf(beamElement, true);
     // Ignore any elements part of a stem-sameas beam
     if (beamElement->Is(BEAM)) {
-        const Beam *beam = vrv_cast<Beam *>(beamElement);
+        const Beam *beam = vrv_cast<const Beam *>(beamElement);
         const Beam *stemSameAsBeam = beam->GetStemSameasBeam();
         if (stemSameAsBeam) {
-            collidingElementsList.remove_if([stemSameAsBeam](Object *object) {
-                const LayerElement *layerElement = vrv_cast<LayerElement *>(object);
+            collidingElementsList.remove_if([stemSameAsBeam](const Object *object) {
+                const LayerElement *layerElement = vrv_cast<const LayerElement *>(object);
                 return (layerElement->GetAncestorBeam() == stemSameAsBeam);
             });
         }
@@ -372,14 +372,14 @@ int AdjustBeamsFunctor::CalcLayerOverlap(LayerElement *beamElement)
     // If there are none - stop here, there's nothing to be done
     if (collidingElementsList.empty()) return 0;
 
-    Staff *staff = beamElement->GetAncestorStaff();
+    const Staff *staff = beamElement->GetAncestorStaff();
 
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int leftOverlap = 0;
     int rightOverlap = 0;
     std::vector<int> elementOverlaps;
-    for (Object *object : collidingElementsList) {
-        LayerElement *layerElement = vrv_cast<LayerElement *>(object);
+    for (const Object *object : collidingElementsList) {
+        const LayerElement *layerElement = vrv_cast<const LayerElement *>(object);
         if (!beamElement->HorizontalContentOverlap(object)) continue;
         const int elementBottom = layerElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
         const int elementTop = layerElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
