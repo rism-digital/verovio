@@ -371,6 +371,7 @@ int AdjustBeamsFunctor::CalcLayerOverlap(const LayerElement *beamElement) const
     if (collidingElementsList.empty()) return 0;
 
     const Staff *staff = beamElement->GetAncestorStaff();
+    const int drawingY = beamElement->GetDrawingY();
 
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int leftOverlap = 0;
@@ -379,13 +380,12 @@ int AdjustBeamsFunctor::CalcLayerOverlap(const LayerElement *beamElement) const
     for (const Object *object : collidingElementsList) {
         const LayerElement *layerElement = vrv_cast<const LayerElement *>(object);
         if (!beamElement->HorizontalContentOverlap(object)) continue;
-        const int elementBottom = layerElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
-        const int elementTop = layerElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
+        const int elementBottom = layerElement->GetContentBottom();
+        const int elementTop = layerElement->GetContentTop();
         if (m_directionBias > 0) {
             // Ensure that there's actual overlap first
             if ((elementBottom > m_y1) && (elementBottom > m_y2)) continue;
-            const int currentBottom = beamElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
-            if (currentBottom >= elementTop) continue;
+            if (drawingY >= elementTop) continue;
             // If there is a mild overlap, then decrease the beam stem length via negative overlap
             if (elementBottom > std::max(m_y1, m_y2) - 3 * unit) {
                 leftOverlap = std::min(elementBottom - m_y1, 0);
@@ -399,8 +399,7 @@ int AdjustBeamsFunctor::CalcLayerOverlap(const LayerElement *beamElement) const
         else {
             // Ensure that there's actual overlap first
             if ((elementTop < m_y1) && (elementTop < m_y2)) continue;
-            const int currentTop = beamElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
-            if (currentTop <= elementBottom) continue;
+            if (drawingY <= elementBottom) continue;
             // If there is a mild overlap, then decrease the beam stem length via negative overlap
             if (elementTop < std::min(m_y1, m_y2) + 3 * unit) {
                 leftOverlap = std::min(m_y1 - elementTop, 0);
