@@ -33,8 +33,16 @@ namespace vrv {
 ScoringUpFunctor::ScoringUpFunctor() : Functor()
 {
     m_currentScoreTime = 0.0;
-    m_currentMensur = NULL;
     m_notationType = NOTATIONTYPE_cmn;
+    m_currentMensur = NULL;
+    m_modusMaior = 2;
+    m_modusMinor = 2;
+    m_tempus = 2;
+    m_prolatio = 2;
+    ArrayOfElementDurPairs m_dursInVoiceSameMensur = {};
+    std::vector<ArrayOfElementDurPairs> m_listOfSequences = {};
+    std::list<std::pair<Note *, Dot *>> m_listOfAugNotesDotsPairs = {};
+    std::list<std::pair<Note *, Dot *>> m_listOfPerfNotesDotsPairs = {};
 }
 
 FunctorCode ScoringUpFunctor::VisitLayer(Layer *layer)

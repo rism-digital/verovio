@@ -92,14 +92,7 @@ public:
 protected:
     //
 private:
-    int m_modusMaior;
-    int m_modusMinor;
-    int m_tempus;
-    int m_prolatio;
-    ArrayOfElementDurPairs m_dursInVoiceSameMensur;
-    std::vector<ArrayOfElementDurPairs> m_listOfSequences;
-    std::list<std::pair<Note *, Dot *>> m_listOfAugNotesDotsPairs;
-    std::list<std::pair<Note *, Dot *>> m_listOfPerfNotesDotsPairs;
+    //
 
 public:
     //
@@ -107,10 +100,22 @@ public:
 private:
     // The current score time in the measure (incremented by each element)
     double m_currentScoreTime;
-    // The current Mensur
-    Mensur *m_currentMensur;
     // The current notation type
     data_NOTATIONTYPE m_notationType;
+    // The current Mensur
+    Mensur *m_currentMensur;
+    int m_modusMaior;
+    int m_modusMinor;
+    int m_tempus;
+    int m_prolatio;
+    // Vector of pairs of elements (that are notes, rests, or dots) and their durations
+    ArrayOfElementDurPairs m_dursInVoiceSameMensur;
+    // Vector of vectors of pairs of elements (that are notes, rests, or dots) and their durations
+    std::vector<ArrayOfElementDurPairs> m_listOfSequences;
+    // List of pairs made of the form {note, following_dot} for notes followed by dots of augmentation
+    std::list<std::pair<Note *, Dot *>> m_listOfAugNotesDotsPairs;
+    // List of pairs made of the form {note, following_dot} for notes followed by dots of perfection
+    std::list<std::pair<Note *, Dot *>> m_listOfPerfNotesDotsPairs;
 };
 
 } // namespace vrv
