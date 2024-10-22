@@ -11,10 +11,12 @@
 
 #include <cassert>
 #include <climits>
+#include <future>
 #include <iostream>
 #include <math.h>
 #include <random>
 #include <sstream>
+#include <thread>
 
 //----------------------------------------------------------------------------
 
@@ -1039,30 +1041,90 @@ void Object::Process(Functor &functor, int deepness, bool skipFirst)
     --deepness;
 
     if (!this->SkipChildren(functor.VisibleOnly())) {
-        // We need a pointer to the array for the option to work on a reversed copy
-        ArrayOfObjects *children = &m_children;
-        Filters *filters = functor.GetFilters();
-        if (functor.GetDirection() == BACKWARD) {
-            for (ArrayOfObjects::reverse_iterator iter = children->rbegin(); iter != children->rend(); ++iter) {
-                // we will end here if there is no filter at all or for the current child type
-                if (this->FiltersApply(filters, *iter)) {
-                    (*iter)->Process(functor, deepness);
-                }
-            }
-        }
-        else {
-            for (ArrayOfObjects::iterator iter = children->begin(); iter != children->end(); ++iter) {
-                // we will end here if there is no filter at all or for the current child type
-                if (this->FiltersApply(filters, *iter)) {
-                    (*iter)->Process(functor, deepness);
-                }
-            }
-        }
+        this->ProcessChildren(functor, deepness);
     }
 
     if (functor.ImplementsEndInterface() && !skipFirst) {
         FunctorCode code = this->AcceptEnd(functor);
         functor.SetCode(code);
+    }
+}
+
+void Object::ProcessChildren(Functor &functor, int deepness)
+{
+    // Objects which will be processed in parallel are collected here
+    ArrayOfObjects parallelProcessed;
+    const std::optional<ClassId> concurrentClass = functor.GetConcurrentClass();
+    // We need a pointer to the array for the option to work on a reversed copy
+    ArrayOfObjects *children = &m_children;
+    Filters *filters = functor.GetFilters();
+    if (functor.GetDirection() == BACKWARD) {
+        for (ArrayOfObjects::reverse_iterator iter = children->rbegin(); iter != children->rend(); ++iter) {
+            // we will end here if there is no filter at all or for the current child type
+            if (this->FiltersApply(filters, *iter)) {
+                if (concurrentClass && (*iter)->Is(*concurrentClass)) {
+                    parallelProcessed.push_back(*iter);
+                }
+                else {
+                    (*iter)->Process(functor, deepness);
+                }
+            }
+        }
+    }
+    else {
+        for (ArrayOfObjects::iterator iter = children->begin(); iter != children->end(); ++iter) {
+            // we will end here if there is no filter at all or for the current child type
+            if (this->FiltersApply(filters, *iter)) {
+                if (concurrentClass && (*iter)->Is(*concurrentClass)) {
+                    parallelProcessed.push_back(*iter);
+                }
+                else {
+                    (*iter)->Process(functor, deepness);
+                }
+            }
+        }
+    }
+    // Perform parallel processing
+    if (!parallelProcessed.empty()) {
+        this->ProcessInParallel(functor, deepness, parallelProcessed);
+    }
+}
+
+void Object::ProcessInParallel(Functor &functor, int deepness, const ArrayOfObjects &objects)
+{
+    const int hardwareLimit = static_cast<int>(std::thread::hardware_concurrency());
+    const int concurrency = std::min(functor.GetMaxNumberOfThreads(), hardwareLimit);
+    assert(concurrency >= 1);
+
+    // Assign the objects to tasks
+    std::vector<ArrayOfObjects> objectsPerTask(concurrency);
+    for (int index = 0; index < objects.size(); ++index) {
+        objectsPerTask[index % concurrency].push_back(objects[index]);
+    }
+
+    // Clone the functor for each task
+    std::vector<Functor *> functorClones;
+    for (int taskIndex = 0; taskIndex < concurrency; ++taskIndex) {
+        functorClones.push_back(functor.CloneFunctor());
+    }
+
+    // Launch parallel tasks
+    std::vector<std::future<void>> futures;
+    for (int taskIndex = 0; taskIndex < concurrency; ++taskIndex) {
+        futures.push_back(std::async(std::launch::async, [&objectsPerTask, &functorClones, taskIndex, deepness] {
+            for (Object *object : objectsPerTask[taskIndex]) {
+                object->Process(*functorClones[taskIndex], deepness);
+            }
+        }));
+    }
+
+    // Synchronize and merge
+    for (std::future<void> &future : futures) {
+        future.get();
+    }
+    for (Functor *clone : functorClones) {
+        functor.MergeFunctor(clone);
+        delete clone;
     }
 }
 
@@ -1093,30 +1155,90 @@ void Object::Process(ConstFunctor &functor, int deepness, bool skipFirst) const
     --deepness;
 
     if (!this->SkipChildren(functor.VisibleOnly())) {
-        // We need a pointer to the array for the option to work on a reversed copy
-        const ArrayOfObjects *children = &m_children;
-        Filters *filters = functor.GetFilters();
-        if (functor.GetDirection() == BACKWARD) {
-            for (ArrayOfObjects::const_reverse_iterator iter = children->rbegin(); iter != children->rend(); ++iter) {
-                // we will end here if there is no filter at all or for the current child type
-                if (this->FiltersApply(filters, *iter)) {
-                    (*iter)->Process(functor, deepness);
-                }
-            }
-        }
-        else {
-            for (ArrayOfObjects::const_iterator iter = children->begin(); iter != children->end(); ++iter) {
-                // we will end here if there is no filter at all or for the current child type
-                if (this->FiltersApply(filters, *iter)) {
-                    (*iter)->Process(functor, deepness);
-                }
-            }
-        }
+        this->ProcessChildren(functor, deepness);
     }
 
     if (functor.ImplementsEndInterface() && !skipFirst) {
         FunctorCode code = this->AcceptEnd(functor);
         functor.SetCode(code);
+    }
+}
+
+void Object::ProcessChildren(ConstFunctor &functor, int deepness) const
+{
+    // Objects which will be processed in parallel are collected here
+    ArrayOfConstObjects parallelProcessed;
+    const std::optional<ClassId> concurrentClass = functor.GetConcurrentClass();
+    // We need a pointer to the array for the option to work on a reversed copy
+    const ArrayOfObjects *children = &m_children;
+    Filters *filters = functor.GetFilters();
+    if (functor.GetDirection() == BACKWARD) {
+        for (ArrayOfObjects::const_reverse_iterator iter = children->rbegin(); iter != children->rend(); ++iter) {
+            // we will end here if there is no filter at all or for the current child type
+            if (this->FiltersApply(filters, *iter)) {
+                if (concurrentClass && (*iter)->Is(*concurrentClass)) {
+                    parallelProcessed.push_back(*iter);
+                }
+                else {
+                    (*iter)->Process(functor, deepness);
+                }
+            }
+        }
+    }
+    else {
+        for (ArrayOfObjects::const_iterator iter = children->begin(); iter != children->end(); ++iter) {
+            // we will end here if there is no filter at all or for the current child type
+            if (this->FiltersApply(filters, *iter)) {
+                if (concurrentClass && (*iter)->Is(*concurrentClass)) {
+                    parallelProcessed.push_back(*iter);
+                }
+                else {
+                    (*iter)->Process(functor, deepness);
+                }
+            }
+        }
+    }
+    // Perform parallel processing
+    if (!parallelProcessed.empty()) {
+        this->ProcessInParallel(functor, deepness, parallelProcessed);
+    }
+}
+
+void Object::ProcessInParallel(ConstFunctor &functor, int deepness, const ArrayOfConstObjects &objects) const
+{
+    const int hardwareLimit = static_cast<int>(std::thread::hardware_concurrency());
+    const int concurrency = std::min(functor.GetMaxNumberOfThreads(), hardwareLimit);
+    assert(concurrency >= 1);
+
+    // Assign the objects to tasks
+    std::vector<ArrayOfConstObjects> objectsPerTask(concurrency);
+    for (int index = 0; index < objects.size(); ++index) {
+        objectsPerTask[index % concurrency].push_back(objects[index]);
+    }
+
+    // Clone the functor for each task
+    std::vector<ConstFunctor *> functorClones;
+    for (int taskIndex = 0; taskIndex < concurrency; ++taskIndex) {
+        functorClones.push_back(functor.CloneFunctor());
+    }
+
+    // Launch parallel tasks
+    std::vector<std::future<void>> futures;
+    for (int taskIndex = 0; taskIndex < concurrency; ++taskIndex) {
+        futures.push_back(std::async(std::launch::async, [&objectsPerTask, &functorClones, taskIndex, deepness] {
+            for (const Object *object : objectsPerTask[taskIndex]) {
+                object->Process(*functorClones[taskIndex], deepness);
+            }
+        }));
+    }
+
+    // Synchronize and merge
+    for (std::future<void> &future : futures) {
+        future.get();
+    }
+    for (ConstFunctor *clone : functorClones) {
+        functor.MergeFunctor(clone);
+        delete clone;
     }
 }
 

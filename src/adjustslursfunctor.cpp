@@ -30,6 +30,16 @@ AdjustSlursFunctor::AdjustSlursFunctor(Doc *doc) : DocFunctor(doc)
     this->ResetCurrent();
 }
 
+void AdjustSlursFunctor::MergeFunctor(const Functor *functor)
+{
+    Functor::MergeFunctor(functor);
+
+    const AdjustSlursFunctor *adjustSlursFunctor = dynamic_cast<const AdjustSlursFunctor *>(functor);
+    if (adjustSlursFunctor && adjustSlursFunctor->HasCrossStaffSlurs()) {
+        m_crossStaffSlurs = true;
+    }
+}
+
 void AdjustSlursFunctor::ResetCurrent()
 {
     m_currentCurve = NULL;
