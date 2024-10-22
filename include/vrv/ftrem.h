@@ -90,11 +90,6 @@ protected:
      */
     void FilterList(ListOfConstObjects &childList) const override;
 
-    /**
-     * See LayerElement::SetElementShortening
-     */
-    void SetElementShortening(int shortening) override;
-
 public:
     /** */
     BeamSegment m_beamSegment;
