@@ -81,7 +81,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    ConvertToCastOffMensuralFunctor(Doc *doc, System *targetSystem, const IntTree *layerTree);
+    ConvertToCastOffMensuralFunctor(Doc *doc, System *targetSystem);
     virtual ~ConvertToCastOffMensuralFunctor() = default;
     ///@}
 
@@ -91,51 +91,43 @@ public:
     bool ImplementsEndInterface() const override { return false; }
 
     /*
-     * Setter for staff @n
-     */
-    ///@{
-    void AddStaffN(int staffN) { m_staffNs.push_back(staffN); }
-    void ClearStaffNs() { m_staffNs.clear(); }
-    ///@}
-
-    /*
      * Functor interface
      */
     ///@{
-    FunctorCode VisitBarLine(BarLine *barLine) override;
     FunctorCode VisitLayer(Layer *layer) override;
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitObject(Object *object) override;
     FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
     FunctorCode VisitStaff(Staff *staff) override;
-    FunctorCode VisitSyllable(Syllable *syllable) override;
     FunctorCode VisitSystemElement(SystemElement *systemElement) override;
     ///@}
 
 protected:
     //
 private:
-    //
+    /** Check if the alignment is a valid breakpoint */
+    bool IsValidBreakPoint(const Alignment *alignment, const int nbLayers);
+    /** Create the staff and layer when a new segment starts */
+    void InitSegment(Object *object);
+
 public:
     //
 private:
-    // The staff @n for finding splitting bar lines
-    std::vector<int> m_staffNs;
+    /** The list of segments (i.e., measures) we are going to create */
+    std::list<Measure *> m_measures;
+    /** The current segment, reset at for every staff/layer */
+    std::list<Measure *>::iterator m_currentMeasure;
+    /** The list of break points (one less than the measures) */
+    std::list<const Alignment *> m_breakPoints;
+    /** The current breakpoint, reset for every staff/layer */
+    std::list<const Alignment *>::const_iterator m_currentBreakPoint;
     // The content layer from which we are copying the elements
+    Staff *m_contentStaff;
     Layer *m_contentLayer;
     // The target system, measure, staff & layer
     System *m_targetSystem;
-    Measure *m_targetMeasure;
     Staff *m_targetStaff;
     Layer *m_targetLayer;
-    // A sub-system (e.g., section) to add measure segments
-    System *m_targetSubSystem;
-    // A counter for segments in the sub-system (section)
-    int m_segmentIdx;
-    // The total number of segments (previous sections)
-    int m_segmentTotal;
-    // An IntTree for processing by layer
-    const IntTree *m_layerTree;
 };
 
 //----------------------------------------------------------------------------

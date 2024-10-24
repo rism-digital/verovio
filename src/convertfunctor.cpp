@@ -160,171 +160,54 @@ FunctorCode ConvertToPageBasedFunctor::VisitSystemElement(SystemElement *systemE
 // ConvertToCastOffMensuralFunctor
 //----------------------------------------------------------------------------
 
-ConvertToCastOffMensuralFunctor::ConvertToCastOffMensuralFunctor(
-    Doc *doc, System *targetSystem, const IntTree *layerTree)
-    : DocFunctor(doc)
+ConvertToCastOffMensuralFunctor::ConvertToCastOffMensuralFunctor(Doc *doc, System *targetSystem) : DocFunctor(doc)
 {
+    m_contentStaff = NULL;
     m_contentLayer = NULL;
     m_targetSystem = targetSystem;
-    m_targetSubSystem = NULL;
-    m_targetMeasure = NULL;
     m_targetStaff = NULL;
     m_targetLayer = NULL;
-    m_segmentIdx = 0;
-    m_segmentTotal = 0;
-    m_layerTree = layerTree;
-}
-
-FunctorCode ConvertToCastOffMensuralFunctor::VisitBarLine(BarLine *barLine)
-{
-    assert(barLine->GetAlignment());
-    assert(m_targetSubSystem);
-    assert(m_targetLayer);
-
-    // If this is the last barline of the layer, we will just move it and do not create a new segment
-    bool isLast = (m_contentLayer->GetLast() == barLine);
-    Object *next = m_contentLayer->GetNext(barLine);
-    bool nextIsBarline = (next && next->Is(BARLINE));
-
-    // See if we create proper measures and what to do with the barLine
-    MeasureType convertToMeasured = UNMEASURED;
-    if (m_doc->GetOptions()->m_mensuralToMeasure.GetValue()) {
-        convertToMeasured = MEASURED;
-    }
-
-    if (convertToMeasured == MEASURED) {
-        // barLine object will be deleted
-        m_targetMeasure->SetRight(barLine->GetForm());
-    }
-    else {
-        barLine->MoveItselfTo(m_targetLayer);
-    }
-
-    // Now we can return if this is the end barLine
-    if (isLast || nextIsBarline) return FUNCTOR_SIBLINGS;
-
-    for (int staffN : m_staffNs) {
-        // The barline is missing in at least one of the staves - do not break here
-        if (!barLine->GetAlignment()->HasAlignmentReference(staffN)) {
-            // LogDebug("BarLine not on all staves %d %s", m_targetStaff->GetN(), barLine->GetClassName().c_str());
-            return FUNCTOR_SIBLINGS;
-        }
-    }
-
-    // Make a segment break
-    // First case: add a new measure segment (e.g., first pass)
-    if (m_targetSubSystem->GetChildCount() <= m_segmentIdx) {
-        m_targetMeasure = new Measure(convertToMeasured);
-        if (convertToMeasured == MEASURED) {
-            m_targetMeasure->SetN(StringFormat("%d", m_segmentTotal + 1 + m_segmentIdx));
-        }
-        m_targetSubSystem->AddChild(m_targetMeasure);
-        // Add a staff with same attributes as in the previous segment
-        Staff *staff = new Staff();
-        m_targetStaff->CopyAttributesTo(staff);
-        m_targetStaff = staff;
-        m_targetMeasure->AddChild(m_targetStaff);
-        // Add a layer also with the same attributes as in the previous segment
-        Layer *layer = new Layer();
-        m_targetLayer->CopyAttributesTo(layer);
-        m_targetLayer = layer;
-        m_targetStaff->AddChild(m_targetLayer);
-    }
-    // Second case: retrieve the appropriate segment
-    else {
-        m_targetMeasure = dynamic_cast<Measure *>(m_targetSubSystem->GetChild(m_segmentIdx));
-        // It must be there
-        assert(m_targetMeasure);
-
-        // Look if we already have the staff (e.g., with more than one layer)
-        AttNIntegerComparison comparisonStaffN(STAFF, m_targetStaff->GetN());
-        Staff *staff = vrv_cast<Staff *>(m_targetMeasure->FindDescendantByComparison(&comparisonStaffN));
-        if (!staff) {
-            staff = new Staff();
-            m_targetStaff->CopyAttributesTo(staff);
-            m_targetMeasure->AddChild(staff);
-        }
-        m_targetStaff = staff;
-
-        // Add a new layer as the new target
-        Layer *layer = new Layer();
-        m_targetLayer->CopyAttributesTo(layer);
-        m_targetLayer = layer;
-        m_targetStaff->AddChild(m_targetLayer);
-    }
-    ++m_segmentIdx;
-
-    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode ConvertToCastOffMensuralFunctor::VisitLayer(Layer *layer)
 {
     m_contentLayer = layer;
-
-    m_targetLayer = new Layer();
-    layer->CopyAttributesTo(m_targetLayer);
-    // Keep the xml:id of the layer in the first segment
-    m_targetLayer->SwapID(layer);
-    assert(m_targetStaff);
-    m_targetStaff->AddChild(m_targetLayer);
+    m_targetLayer = NULL;
 
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ConvertToCastOffMensuralFunctor::VisitMeasure(Measure *measure)
 {
-    // We are processing by staff/layer from the call below - we obviously do not want to loop...
-    if (m_targetMeasure) {
-        return FUNCTOR_CONTINUE;
-    }
+    m_measures.clear();
+    m_breakPoints.clear();
 
-    MeasureType convertToMeasured = UNMEASURED;
-    if (m_doc->GetOptions()->m_mensuralToMeasure.GetValue()) {
-        convertToMeasured = MEASURED;
-    }
+    const int nbLayers = measure->GetDescendantCount(LAYER);
+    bool isFirst = true;
 
-    assert(m_targetSystem);
-    assert(m_layerTree);
+    // Create at least one measure to copy stuff to
+    Measure *segment = new Measure(UNMEASURED);
+    m_targetSystem->AddChild(segment);
+    m_measures.push_back(segment);
 
-    // Create a temporary subsystem for receiving the measure segments
-    System targetSubSystem;
-    m_targetSubSystem = &targetSubSystem;
-
-    // Create the first measure segment - problem: we are dropping the section element - we should create a score-based
-    // MEI file instead
-    Measure *targetMeasure = new Measure(convertToMeasured);
-    if (convertToMeasured == MEASURED) {
-        targetMeasure->SetN(StringFormat("%d", m_segmentTotal + 1));
-    }
-    m_targetSubSystem->AddChild(targetMeasure);
-
-    Filters filters;
-    Filters *previousFilters = this->SetFilters(&filters);
-
-    // Now we can process by layer and move their content to (measure) segments
-    for (const auto &staves : m_layerTree->child) {
-        for (const auto &layers : staves.second.child) {
-            // Create ad comparison object for each type / @n
-            AttNIntegerComparison matchStaff(STAFF, staves.first);
-            AttNIntegerComparison matchLayer(LAYER, layers.first);
-            filters = { &matchStaff, &matchLayer };
-
-            m_segmentIdx = 1;
-            m_targetMeasure = targetMeasure;
-
-            measure->Process(*this);
+    for (const Object *child : measure->m_measureAligner.GetChildren()) {
+        const Alignment *alignment = vrv_cast<const Alignment *>(child);
+        assert(alignment);
+        // We use the alignments with an element at all layer as a breakpoint
+        if (!this->IsValidBreakPoint(alignment, nbLayers)) continue;
+        // Do not break at the first one
+        if (isFirst) {
+            isFirst = false;
+            continue;
         }
+        Measure *segment = new Measure(UNMEASURED);
+        m_targetSystem->AddChild(segment);
+        m_measures.push_back(segment);
+        m_breakPoints.push_back(alignment);
     }
 
-    this->SetFilters(previousFilters);
-
-    m_targetMeasure = NULL;
-    m_targetSubSystem = NULL;
-    m_segmentTotal = targetSubSystem.GetChildCount();
-    // Copy the measure segments to the final target segment
-    m_targetSystem->MoveChildrenFrom(&targetSubSystem);
-
-    return FUNCTOR_SIBLINGS;
+    // Now we are ready to process staves/layers and to move content to m_measures
+    return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ConvertToCastOffMensuralFunctor::VisitObject(Object *object)
@@ -332,6 +215,7 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitObject(Object *object)
     assert(object->GetParent());
     // We want to move only the children of the layer of any type (notes, editorial elements, etc)
     if (object->GetParent()->Is(LAYER)) {
+        this->InitSegment(object);
         assert(m_targetLayer);
         object->MoveItselfTo(m_targetLayer);
         // Do not process children because we move the full sub-tree
@@ -351,72 +235,13 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitScoreDef(ScoreDef *scoreDef)
 
 FunctorCode ConvertToCastOffMensuralFunctor::VisitStaff(Staff *staff)
 {
-    m_targetStaff = new Staff();
-    staff->CopyAttributesTo(m_targetStaff);
-    // Keep the xml:id of the staff in the first staff segment
-    m_targetStaff->SwapID(staff);
-    assert(m_targetMeasure);
-    m_targetMeasure->AddChild(m_targetStaff);
+    m_currentMeasure = m_measures.begin();
+    m_currentBreakPoint = m_breakPoints.begin();
+
+    m_contentStaff = staff;
+    m_targetStaff = NULL;
 
     return FUNCTOR_CONTINUE;
-}
-
-FunctorCode ConvertToCastOffMensuralFunctor::VisitSyllable(Syllable *syllable)
-{
-    assert(m_targetSubSystem);
-    assert(m_targetLayer);
-    assert(syllable->GetParent());
-
-    // If this is the first syllable of the layer, we do not create a new segment
-    if (m_contentLayer->GetFirst() == syllable) {
-        syllable->MoveItselfTo(m_targetLayer);
-        return FUNCTOR_SIBLINGS;
-    }
-    // If the syllable is in editorial markup, do not create a new segment
-    if (!syllable->GetParent()->Is(LAYER)) return FUNCTOR_SIBLINGS;
-
-    // Make a segment break
-    // First case: add a new measure segment (e.g., first pass)
-    if (m_targetSubSystem->GetChildCount() <= m_segmentIdx) {
-        m_targetMeasure = new Measure(UNMEASURED);
-        m_targetSubSystem->AddChild(m_targetMeasure);
-        // Add a staff with same attributes as in the previous segment
-        Staff *staff = new Staff();
-        m_targetStaff->CopyAttributesTo(staff);
-        m_targetStaff = staff;
-        m_targetMeasure->AddChild(m_targetStaff);
-        // Add a layer also with the same attributes as in the previous segment
-        Layer *layer = new Layer();
-        m_targetLayer->CopyAttributesTo(layer);
-        m_targetLayer = layer;
-        m_targetStaff->AddChild(m_targetLayer);
-    }
-    // Second case: retrieve the appropriate segment
-    else {
-        m_targetMeasure = dynamic_cast<Measure *>(m_targetSubSystem->GetChild(m_segmentIdx));
-        // It must be there
-        assert(m_targetMeasure);
-
-        // Look if we already have the staff (e.g., with more than one layer)
-        AttNIntegerComparison comparisonStaffN(STAFF, m_targetStaff->GetN());
-        Staff *staff = vrv_cast<Staff *>(m_targetMeasure->FindDescendantByComparison(&comparisonStaffN));
-        if (!staff) {
-            staff = new Staff();
-            m_targetStaff->CopyAttributesTo(staff);
-            m_targetMeasure->AddChild(staff);
-        }
-        m_targetStaff = staff;
-
-        // Add a new layer as the new target
-        Layer *layer = new Layer();
-        m_targetLayer->CopyAttributesTo(layer);
-        m_targetLayer = layer;
-        m_targetStaff->AddChild(m_targetLayer);
-    }
-    syllable->MoveItselfTo(m_targetLayer);
-    ++m_segmentIdx;
-
-    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode ConvertToCastOffMensuralFunctor::VisitSystemElement(SystemElement *systemElement)
@@ -425,6 +250,62 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitSystemElement(SystemElement *s
     systemElement->MoveItselfTo(m_targetSystem);
 
     return FUNCTOR_CONTINUE;
+}
+
+bool ConvertToCastOffMensuralFunctor::IsValidBreakPoint(const Alignment *alignment, const int nbLayers)
+{
+    if (alignment->GetType() != ALIGNMENT_DEFAULT) return false;
+
+    // Not all layers have an alignment and we cannot break here
+    if (alignment->GetChildCount() != nbLayers) return false;
+
+    for (const Object *child : alignment->GetChildren()) {
+        for (const Object *refChild : child->GetChildren()) {
+            // Do not break within editorial markup
+            if (refChild->GetFirstAncestorInRange(EDITORIAL_ELEMENT, EDITORIAL_ELEMENT_max)) return false;
+            // Do not break within a ligature
+            if (refChild->GetFirstAncestor(LIGATURE)) return false;
+        }
+        // When we have more than one neume in a syllable, every neume has its own alignment.
+        // Only the first one, which is shared with the syllable, is a valid break point
+        if (child->FindDescendantByType(NEUME) && !child->FindDescendantByType(SYLLABLE)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void ConvertToCastOffMensuralFunctor::InitSegment(Object *object)
+{
+    assert(m_contentStaff);
+    assert(m_contentLayer);
+
+    LayerElement *element = NULL;
+    if (object->IsLayerElement()) element = vrv_cast<LayerElement *>(object);
+
+    if (element && (element->GetAlignment() == *m_currentBreakPoint)) {
+        m_targetStaff = NULL;
+        m_targetLayer = NULL;
+        std::advance(m_currentBreakPoint, 1);
+        std::advance(m_currentMeasure, 1);
+    }
+
+    if (m_targetStaff && m_targetLayer) return;
+
+    m_targetStaff = new Staff();
+    m_contentStaff->CopyAttributesTo(m_targetStaff);
+    // Keep the xml:id of the staff in the first staff segment
+    m_targetStaff->SwapID(m_contentStaff);
+    assert(*m_currentMeasure);
+    (*m_currentMeasure)->AddChild(m_targetStaff);
+
+    m_targetLayer = new Layer();
+    m_contentLayer->CopyAttributesTo(m_targetLayer);
+    // Keep the xml:id of the layer in the first segment
+    m_targetLayer->SwapID(m_contentLayer);
+    assert(m_targetStaff);
+    m_targetStaff->AddChild(m_targetLayer);
 }
 
 //----------------------------------------------------------------------------

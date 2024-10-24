@@ -1318,7 +1318,9 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
         assert(system);
         if (castOff) {
             System *convertedSystem = new System();
-            system->ConvertToCastOffMensuralSystem(this, convertedSystem);
+            ConvertToCastOffMensuralFunctor convertToCastOffMensural(this, convertedSystem);
+            // Convert the system and replace it
+            system->Process(convertToCastOffMensural);
             contentPage->ReplaceChild(system, convertedSystem);
             delete system;
         }
