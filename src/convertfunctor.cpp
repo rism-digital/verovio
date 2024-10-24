@@ -315,6 +315,7 @@ void ConvertToCastOffMensuralFunctor::InitSegment(Object *object)
 ConvertToUnCastOffMensuralFunctor::ConvertToUnCastOffMensuralFunctor() : Functor()
 {
     this->ResetContent();
+    // We process layer by layer, keep a list of segments to be deleted the first time we go through
     m_trackSegmentsToDelete = true;
 }
 
@@ -338,9 +339,11 @@ FunctorCode ConvertToUnCastOffMensuralFunctor::VisitLayer(Layer *layer)
 
 FunctorCode ConvertToUnCastOffMensuralFunctor::VisitMeasure(Measure *measure)
 {
+    // First measure of the section, move all content to it and keep it
     if (!m_contentMeasure) {
         m_contentMeasure = measure;
     }
+    // First pass, mark the measure to be deleted once finished
     else if (m_trackSegmentsToDelete) {
         m_segmentsToDelete.push_back(measure);
     }
