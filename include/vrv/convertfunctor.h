@@ -114,10 +114,10 @@ public:
     //
 private:
     /** The list of segments (i.e., measures) we are going to create */
-    std::list<Measure *> m_measures;
+    std::list<Measure *> m_segments;
     /** The current segment, reset at for every staff/layer */
-    std::list<Measure *>::iterator m_currentMeasure;
-    /** The list of break points (one less than the measures) */
+    std::list<Measure *>::iterator m_currentSegment;
+    /** The list of break points (one less than the segments) */
     std::list<const Alignment *> m_breakPoints;
     /** The current breakpoint, reset for every staff/layer */
     std::list<const Alignment *>::const_iterator m_currentBreakPoint;

@@ -179,16 +179,16 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitLayer(Layer *layer)
 
 FunctorCode ConvertToCastOffMensuralFunctor::VisitMeasure(Measure *measure)
 {
-    m_measures.clear();
+    m_segments.clear();
     m_breakPoints.clear();
 
     const int nbLayers = measure->GetDescendantCount(LAYER);
     bool isFirst = true;
 
-    // Create at least one measure to copy stuff to
+    // Create at least one segment to copy stuff to
     Measure *segment = new Measure(UNMEASURED);
     m_targetSystem->AddChild(segment);
-    m_measures.push_back(segment);
+    m_segments.push_back(segment);
 
     for (const Object *child : measure->m_measureAligner.GetChildren()) {
         const Alignment *alignment = vrv_cast<const Alignment *>(child);
@@ -202,11 +202,11 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitMeasure(Measure *measure)
         }
         Measure *segment = new Measure(UNMEASURED);
         m_targetSystem->AddChild(segment);
-        m_measures.push_back(segment);
+        m_segments.push_back(segment);
         m_breakPoints.push_back(alignment);
     }
 
-    // Now we are ready to process staves/layers and to move content to m_measures
+    // Now we are ready to process staves/layers and to move content to m_segments
     return FUNCTOR_CONTINUE;
 }
 
@@ -235,7 +235,7 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitScoreDef(ScoreDef *scoreDef)
 
 FunctorCode ConvertToCastOffMensuralFunctor::VisitStaff(Staff *staff)
 {
-    m_currentMeasure = m_measures.begin();
+    m_currentSegment = m_segments.begin();
     m_currentBreakPoint = m_breakPoints.begin();
 
     m_contentStaff = staff;
@@ -288,7 +288,7 @@ void ConvertToCastOffMensuralFunctor::InitSegment(Object *object)
         m_targetStaff = NULL;
         m_targetLayer = NULL;
         std::advance(m_currentBreakPoint, 1);
-        std::advance(m_currentMeasure, 1);
+        std::advance(m_currentSegment, 1);
     }
 
     if (m_targetStaff && m_targetLayer) return;
@@ -297,8 +297,8 @@ void ConvertToCastOffMensuralFunctor::InitSegment(Object *object)
     m_contentStaff->CopyAttributesTo(m_targetStaff);
     // Keep the xml:id of the staff in the first staff segment
     m_targetStaff->SwapID(m_contentStaff);
-    assert(*m_currentMeasure);
-    (*m_currentMeasure)->AddChild(m_targetStaff);
+    assert(*m_currentSegment);
+    (*m_currentSegment)->AddChild(m_targetStaff);
 
     m_targetLayer = new Layer();
     m_contentLayer->CopyAttributesTo(m_targetLayer);
