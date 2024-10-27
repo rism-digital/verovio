@@ -311,7 +311,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
                 if (this->GetSlurHandling() == SlurHandling::Ignore) break;
                 Slur *slur = vrv_cast<Slur *>(element);
                 assert(slur);
-                staff = slur->CalculateExtremalStaff(staff, x1, x2);
+                staff = slur->CalculatePrincipalStaff(staff, x1, x2);
             }
 
             // Create the floating positioner
