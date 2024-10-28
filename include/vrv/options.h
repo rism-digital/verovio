@@ -841,6 +841,7 @@ public:
 
     OptionBool m_ligatureAsBracket;
     OptionBool m_mensuralToMeasure;
+    OptionBool m_mensuralScoreUp;
 
     /**
      * Additional options for passing method JSON options to the command-line
