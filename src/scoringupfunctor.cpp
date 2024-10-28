@@ -73,8 +73,12 @@ FunctorCode ScoringUpFunctor::VisitLayerEnd(Layer *layer)
         if (m_modusMaior == 3) {
             ProcessPerfectMensurPassage(dursInVoiceWithSameMensur, DURATION_maxima);
         }
-        m_voiceData = {}; // restart for next voice (layer)
     }
+    // restart for next voice (layer)
+    m_voiceData = {};
+    m_mensurAsTuplet = { 0, 0, 0, 0 };
+    m_dursInVoiceWithSameMensur = {};
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -167,7 +171,6 @@ std::vector<ArrayOfElementDurPairs> ScoringUpFunctor::SubdivideIntoBoundedSequen
             else {
                 boundedSequence.insert(boundedSequence.end(), elementDurPair);
             }
-            LogDebug("dur is:", dur);
         }
     }
     else if (boundUnit == DURATION_brevis) {
@@ -181,7 +184,6 @@ std::vector<ArrayOfElementDurPairs> ScoringUpFunctor::SubdivideIntoBoundedSequen
             else {
                 boundedSequence.insert(boundedSequence.end(), elementDurPair);
             }
-            LogDebug("dur is:", dur);
         }
     }
     else if (boundUnit == DURATION_longa) {
@@ -195,7 +197,6 @@ std::vector<ArrayOfElementDurPairs> ScoringUpFunctor::SubdivideIntoBoundedSequen
             else {
                 boundedSequence.insert(boundedSequence.end(), elementDurPair);
             }
-            LogDebug("dur is:", dur);
         }
     }
     else if (boundUnit == DURATION_maxima) {
@@ -209,7 +210,6 @@ std::vector<ArrayOfElementDurPairs> ScoringUpFunctor::SubdivideIntoBoundedSequen
             else {
                 boundedSequence.insert(boundedSequence.end(), elementDurPair);
             }
-            LogDebug("dur is:", dur);
         }
     }
     return listOfBoundedSequences;
