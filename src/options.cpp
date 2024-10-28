@@ -29,6 +29,9 @@ const std::map<int, std::string> Option::s_breaks = { { BREAKS_none, "none" }, {
 const std::map<int, std::string> Option::s_condense
     = { { CONDENSE_none, "none" }, { CONDENSE_auto, "auto" }, { CONDENSE_encoded, "encoded" } };
 
+const std::map<int, std::string> Option::s_durationEq
+    = { { DURATION_EQ_brevis, "brevis" }, { DURATION_EQ_semibrevis, "semibrevis" }, { DURATION_EQ_minima, "minima" } };
+
 const std::map<int, std::string> Option::s_elision = { { ELISION_regular, "regular" }, { ELISION_narrow, "narrow" },
     { ELISION_wide, "wide" }, { ELISION_unicode, "unicode" } };
 
@@ -1819,6 +1822,10 @@ Options::Options()
     m_mensural.SetCategory(OptionsCategory::Mensural);
     m_grps.push_back(&m_mensural);
 
+    m_durationEquivalence.SetInfo("Duration equivalence", "The mensural duration equivalence");
+    m_durationEquivalence.Init(DURATION_EQ_brevis, &Option::s_durationEq);
+    this->Register(&m_durationEquivalence, "durationEquivalence", &m_mensural);
+
     m_ligatureAsBracket.SetInfo("Ligature as bracket", "Render ligatures as bracket instead of original notation");
     m_ligatureAsBracket.Init(false);
     this->Register(&m_ligatureAsBracket, "ligatureAsBracket", &m_mensural);
@@ -1828,9 +1835,9 @@ Options::Options()
     m_mensuralResponsiveView.Init(false);
     this->Register(&m_mensuralResponsiveView, "mensuralResponsiveView", &m_mensural);
 
-    m_mensuralToMeasure.SetInfo("Mensural to measure", "Convert mensural sections to measure-based MEI");
-    m_mensuralToMeasure.Init(false);
-    this->Register(&m_mensuralToMeasure, "mensuralToMeasure", &m_mensural);
+    m_mensuralToCmn.SetInfo("Mensural to CMN", "Convert mensural sections to CMN measure-based MEI");
+    m_mensuralToCmn.Init(false);
+    this->Register(&m_mensuralToCmn, "mensuralToCmn", &m_mensural);
 
     /********* Method JSON options to the command-line *********/
 

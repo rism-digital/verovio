@@ -23,6 +23,7 @@ struct AlignMeterParams {
     const Mensur *mensur = NULL;
     // Not const since we are cumulating proportion
     Proport *proport = NULL;
+    data_DURATION equivalence = DURATION_brevis;
 };
 
 //----------------------------------------------------------------------------

@@ -40,12 +40,19 @@ namespace vrv {
 
 AlignHorizontallyFunctor::AlignHorizontallyFunctor(Doc *doc) : DocFunctor(doc)
 {
+    static const std::map<int, data_DURATION> durationEq{
+        { DURATION_EQ_brevis, DURATION_brevis }, //
+        { DURATION_EQ_semibrevis, DURATION_semibrevis }, //
+        { DURATION_EQ_minima, DURATION_minima }, //
+    };
+
     m_measureAligner = NULL;
     m_time = 0;
     m_notationType = NOTATIONTYPE_cmn;
     m_scoreDefRole = SCOREDEF_NONE;
     m_isFirstMeasure = false;
     m_hasMultipleLayer = false;
+    m_currentParams.equivalence = durationEq.at(m_doc->GetOptions()->m_durationEquivalence.GetValue());
 }
 
 FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
