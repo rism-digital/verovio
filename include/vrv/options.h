@@ -845,7 +845,7 @@ public:
     OptionIntMap m_durationEquivalence;
     OptionBool m_ligatureAsBracket;
     OptionBool m_mensuralResponsiveView;
-    OptionBool m_mensuralToMeasure;
+    OptionBool m_mensuralToCmn;
 
     /**
      * Additional options for passing method JSON options to the command-line
