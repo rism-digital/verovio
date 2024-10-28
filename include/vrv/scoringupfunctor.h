@@ -41,7 +41,8 @@ public:
      * @name: Divide the notes of a voice into sequences to be processed individualy
      */
     ///@{
-    void WorkInMensur(const ArrayOfElementDurPairs &m_dursInVoiceSameMensur, data_DURATION noteLevel);
+    void ProcessPerfectMensurPassage(
+        const ArrayOfElementDurPairs &m_dursInVoiceWithSameMensur, data_DURATION noteLevel);
     std::vector<ArrayOfElementDurPairs> SubdivideIntoBoundedSequences(
         const ArrayOfElementDurPairs &dursInVoiceSameMensur, data_DURATION boundUnit);
     void ProcessBoundedSequences(const std::vector<ArrayOfElementDurPairs> &listOfSequences, data_DURATION boundUnit);
@@ -108,8 +109,12 @@ private:
     int m_modusMinor;
     int m_tempus;
     int m_prolatio;
+    // The data of each voice in the form of an array of pairs made up of 'mensuration' {m_modusMaior, m_modusMinor,
+    // m_tempus, m_prolatio} and the notes/rests/dots in that voice that follows that mensuration
+    // (m_dursInVoiceWithSameMensur)
+    std::vector<std::pair<std::tuple<int, int, int, int>, ArrayOfElementDurPairs>> m_voiceData;
     // Vector of pairs of elements (that are notes, rests, or dots) and their durations
-    ArrayOfElementDurPairs m_dursInVoiceSameMensur;
+    ArrayOfElementDurPairs m_dursInVoiceWithSameMensur;
     // Vector of vectors of pairs of elements (that are notes, rests, or dots) and their durations
     std::vector<ArrayOfElementDurPairs> m_listOfSequences;
     // List of pairs made of the form {note, following_dot} for notes followed by dots of augmentation

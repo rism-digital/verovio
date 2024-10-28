@@ -39,7 +39,8 @@ ScoringUpFunctor::ScoringUpFunctor() : Functor()
     m_modusMinor = 2;
     m_tempus = 2;
     m_prolatio = 2;
-    ArrayOfElementDurPairs m_dursInVoiceSameMensur = {};
+    std::vector<std::pair<std::tuple<int, int, int, int>, ArrayOfElementDurPairs>> m_voiceData = {};
+    ArrayOfElementDurPairs m_dursInVoiceWithSameMensur = {};
     std::vector<ArrayOfElementDurPairs> m_listOfSequences = {};
     std::list<std::pair<Note *, Dot *>> m_listOfAugNotesDotsPairs = {};
     std::list<std::pair<Note *, Dot *>> m_listOfPerfNotesDotsPairs = {};
@@ -49,28 +50,29 @@ FunctorCode ScoringUpFunctor::VisitLayerEnd(Layer *layer)
 {
     m_currentScoreTime = 0.0;
     // Doesn't get it from the staffDef, right?//
-    if (!m_dursInVoiceSameMensur.empty()) {
+    for (std::pair<std::tuple<int, int, int, int>, ArrayOfElementDurPairs> mensurPassage : m_voiceData) {
+        std::tuple<int, int, int, int> mensurAsTuplet = mensurPassage.first;
+        ArrayOfElementDurPairs m_dursInVoiceWithSameMensur = mensurPassage.second;
+        m_modusMaior = std::get<0>(mensurAsTuplet);
+        m_modusMinor = std::get<1>(mensurAsTuplet);
+        m_tempus = std::get<2>(mensurAsTuplet);
+        m_prolatio = std::get<3>(mensurAsTuplet);
+        // Process each perfect mensuration passage from lowest to highest note level
         if (m_prolatio == 3) {
-            WorkInMensur(m_dursInVoiceSameMensur, DURATION_semibrevis);
+            ProcessPerfectMensurPassage(m_dursInVoiceWithSameMensur, DURATION_semibrevis);
         }
         if (m_tempus == 3) {
-            WorkInMensur(m_dursInVoiceSameMensur, DURATION_brevis);
+            ProcessPerfectMensurPassage(m_dursInVoiceWithSameMensur, DURATION_brevis);
         }
         if (m_modusMinor == 3) {
-            WorkInMensur(m_dursInVoiceSameMensur, DURATION_longa);
+            ProcessPerfectMensurPassage(m_dursInVoiceWithSameMensur, DURATION_longa);
         }
         if (m_modusMaior == 3) {
-            WorkInMensur(m_dursInVoiceSameMensur, DURATION_maxima);
+            ProcessPerfectMensurPassage(m_dursInVoiceWithSameMensur, DURATION_maxima);
         }
-        m_dursInVoiceSameMensur = {}; // restart for next voice (layer)
+        m_voiceData = {}; // restart for next voice (layer)
     }
     return FUNCTOR_CONTINUE;
-}
-
-void ScoringUpFunctor::WorkInMensur(const ArrayOfElementDurPairs &m_dursInVoiceSameMensur, data_DURATION noteLevel)
-{
-    m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur, noteLevel);
-    this->ProcessBoundedSequences(m_listOfSequences, noteLevel);
 }
 
 FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
@@ -79,6 +81,8 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
 
     LayerElement *element = layerElement->ThisOrSameasLink();
 
+    std::tuple<int, int, int, int> mensur = { 0, 0, 0, 0 };
+    m_dursInVoiceWithSameMensur = {};
     if (element->Is(REST) || element->Is(NOTE) || element->Is(DOT)) {
         data_DURATION dur = DURATION_NONE;
         if (element->Is(NOTE)) {
@@ -91,9 +95,13 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
             assert(rest);
             dur = rest->GetDur();
         }
-        m_dursInVoiceSameMensur.insert(m_dursInVoiceSameMensur.end(), { element, dur });
+        m_dursInVoiceWithSameMensur.insert(m_dursInVoiceWithSameMensur.end(), { element, dur });
     }
     else if (element->Is(MENSUR)) {
+        // The new mensuration indicates the end of the passage with the old mensuration;
+        // therefore, (1) let's store the old passage and its mensuration,
+        m_voiceData.insert(m_voiceData.end(), { mensur, m_dursInVoiceWithSameMensur });
+        // and (2) start collecting the data for the new passage
         this->m_currentMensur = vrv_cast<Mensur *>(element);
         if (m_currentMensur->GetModusmaior() == MODUSMAIOR_3) {
             m_modusMaior = 3;
@@ -119,8 +127,19 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
         else {
             m_prolatio = 2;
         }
+        // Establish the mensuration of the new passage and empty the m_dursInVoiceWithSameMensur vector to start
+        // collecting the notes, rests, and dots in the new passage
+        mensur = { m_modusMaior, m_modusMinor, m_tempus, m_prolatio };
+        m_dursInVoiceWithSameMensur = {};
     }
     return FUNCTOR_CONTINUE;
+}
+
+void ScoringUpFunctor::ProcessPerfectMensurPassage(
+    const ArrayOfElementDurPairs &m_dursInVoiceWithSameMensur, data_DURATION noteLevel)
+{
+    m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceWithSameMensur, noteLevel);
+    this->ProcessBoundedSequences(m_listOfSequences, noteLevel);
 }
 
 // Functions to find and process the bounded sequences:
