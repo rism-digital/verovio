@@ -107,6 +107,7 @@ private:
     int m_modusMinor;
     int m_tempus;
     int m_prolatio;
+    std::tuple<int, int, int, int> m_mensurAsTuplet;
     // The data of each voice in the form of an array of pairs made up of 'mensuration' {m_modusMaior, m_modusMinor,
     // m_tempus, m_prolatio} and the notes/rests/dots in that voice that follows that mensuration
     // (m_dursInVoiceWithSameMensur)
