@@ -45,14 +45,9 @@ ScoringUpFunctor::ScoringUpFunctor() : Functor()
     std::list<std::pair<Note *, Dot *>> m_listOfPerfNotesDotsPairs = {};
 }
 
-FunctorCode ScoringUpFunctor::VisitLayer(Layer *layer)
+FunctorCode ScoringUpFunctor::VisitLayerEnd(Layer *layer)
 {
     m_currentScoreTime = 0.0;
-    m_currentMensur = layer->GetCurrentMensur();
-    /*data_MODUSMAIOR modusmaior = m_currentMensur->GetModusmaior();
-    data_MODUSMINOR modusminor = m_currentMensur->GetModusminor();
-    data_TEMPUS tempus = m_currentMensur->GetTempus();
-    data_PROLATIO prolatio = m_currentMensur->GetProlatio();*/
     // Doesn't get it from the staffDef, right?//
     if (!m_dursInVoiceSameMensur.empty()) {
         if (m_prolatio == 3) {

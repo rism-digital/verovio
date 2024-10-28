@@ -32,7 +32,7 @@ public:
     /*
      * Abstract base implementation
      */
-    bool ImplementsEndInterface() const override { return false; }
+    bool ImplementsEndInterface() const override { return true; }
 
     /*
      * Methods
@@ -84,7 +84,7 @@ public:
      * Functor interface
      */
     ///@{
-    FunctorCode VisitLayer(Layer *layer) override;
+    FunctorCode VisitLayerEnd(Layer *layer) override;
     FunctorCode VisitLayerElement(LayerElement *layerElement) override;
     ///@}
     ///
