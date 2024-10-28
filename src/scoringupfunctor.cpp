@@ -51,23 +51,23 @@ FunctorCode ScoringUpFunctor::VisitLayerEnd(Layer *layer)
     // Doesn't get it from the staffDef, right?//
     if (!m_dursInVoiceSameMensur.empty()) {
         if (m_prolatio == 3) {
-            workInMensur(m_dursInVoiceSameMensur, DURATION_semibrevis);
+            WorkInMensur(m_dursInVoiceSameMensur, DURATION_semibrevis);
         }
         if (m_tempus == 3) {
-            workInMensur(m_dursInVoiceSameMensur, DURATION_brevis);
+            WorkInMensur(m_dursInVoiceSameMensur, DURATION_brevis);
         }
         if (m_modusMinor == 3) {
-            workInMensur(m_dursInVoiceSameMensur, DURATION_longa);
+            WorkInMensur(m_dursInVoiceSameMensur, DURATION_longa);
         }
         if (m_modusMaior == 3) {
-            workInMensur(m_dursInVoiceSameMensur, DURATION_maxima);
+            WorkInMensur(m_dursInVoiceSameMensur, DURATION_maxima);
         }
         m_dursInVoiceSameMensur = {}; // restart for next voice (layer)
     }
     return FUNCTOR_CONTINUE;
 }
 
-void ScoringUpFunctor::workInMensur(const ArrayOfElementDurPairs &m_dursInVoiceSameMensur, data_DURATION noteLevel)
+void ScoringUpFunctor::WorkInMensur(const ArrayOfElementDurPairs &m_dursInVoiceSameMensur, data_DURATION noteLevel)
 {
     m_listOfSequences = this->SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur, noteLevel);
     this->ProcessBoundedSequences(m_listOfSequences, noteLevel);
