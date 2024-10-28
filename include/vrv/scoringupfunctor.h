@@ -101,8 +101,6 @@ public:
 private:
     // The current score time in the measure (incremented by each element)
     double m_currentScoreTime;
-    // The current notation type
-    data_NOTATIONTYPE m_notationType;
     // The current Mensur
     Mensur *m_currentMensur;
     int m_modusMaior;

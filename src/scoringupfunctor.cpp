@@ -33,7 +33,6 @@ namespace vrv {
 ScoringUpFunctor::ScoringUpFunctor() : Functor()
 {
     m_currentScoreTime = 0.0;
-    m_notationType = NOTATIONTYPE_cmn;
     m_currentMensur = NULL;
     m_modusMaior = 2;
     m_modusMinor = 2;
