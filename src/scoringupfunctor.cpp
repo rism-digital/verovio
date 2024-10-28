@@ -38,7 +38,7 @@ ScoringUpFunctor::ScoringUpFunctor() : Functor()
     m_modusMinor = 2;
     m_tempus = 2;
     m_prolatio = 2;
-    m_mensurAsTuplet = {0, 0, 0, 0};
+    m_mensurAsTuplet = { 0, 0, 0, 0 };
     std::vector<std::pair<std::tuple<int, int, int, int>, ArrayOfElementDurPairs>> m_voiceData = {};
     ArrayOfElementDurPairs m_dursInVoiceWithSameMensur = {};
     std::vector<ArrayOfElementDurPairs> m_listOfSequences = {};
@@ -51,7 +51,8 @@ FunctorCode ScoringUpFunctor::VisitLayerEnd(Layer *layer)
     m_currentScoreTime = 0.0;
     // Add the last passage (as there won't be any more changes in mensuration)
     m_voiceData.insert(m_voiceData.end(), { m_mensurAsTuplet, m_dursInVoiceWithSameMensur });
-    // Start: (assumption, mensuration is defined in layer, even the starting one; staffDef mensuration definitions will be ignored for now)
+    // Start: (assumption, mensuration is defined in layer, even the starting one; staffDef mensuration definitions will
+    // be ignored for now)
     for (std::pair<std::tuple<int, int, int, int>, ArrayOfElementDurPairs> mensurPassage : m_voiceData) {
         m_mensurAsTuplet = mensurPassage.first;
         ArrayOfElementDurPairs dursInVoiceWithSameMensur = mensurPassage.second;
