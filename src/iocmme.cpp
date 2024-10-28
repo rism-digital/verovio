@@ -80,6 +80,7 @@ bool CmmeInput::Import(const std::string &cmme)
     try {
         m_doc->Reset();
         m_doc->SetType(Raw);
+        m_doc->SetMensuralMusicOnly(BOOLEAN_true);
 
         // Genereate the header and add a comment to the project description
         m_doc->GenerateMEIHeader(false);
