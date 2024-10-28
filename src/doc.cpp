@@ -1297,11 +1297,6 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
     // Do not convert facs files
     if (this->IsFacs()) return;
 
-    // We are converting to measure music in a definite way
-    if (this->GetOptions()->m_mensuralToMeasure.GetValue()) {
-        m_isMensuralMusicOnly = BOOLEAN_false;
-    }
-
     // Make sure the document is not cast-off
     if (this->IsCastOff()) this->UnCastOffDoc();
 
@@ -1335,6 +1330,55 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
     // because idx will still be 0 but contentPage is dead!
     this->ResetDataPage();
     this->ScoreDefSetCurrentDoc(true);
+}
+
+void Doc::ConvertToCmnDoc()
+{
+    if (!m_isMensuralMusicOnly) return;
+
+    // Do not convert transcription files
+    if (this->IsTranscription()) return;
+
+    // Do not convert facs files
+    if (this->IsFacs()) return;
+
+    m_isMensuralMusicOnly = BOOLEAN_false;
+
+    // Temporarily change the equivalence option to minima
+    int previousEquivalence = m_options->m_durationEquivalence.GetValue();
+    m_options->m_durationEquivalence.SetValue(DURATION_EQ_minima);
+
+    // Make sure the document is not cast-off
+    if (this->IsCastOff()) this->UnCastOffDoc();
+
+    this->ScoreDefSetCurrentDoc();
+
+    Page *contentPage = this->SetDrawingPage(0);
+    assert(contentPage);
+
+    contentPage->LayOutHorizontally();
+
+    ListOfObjects systems = contentPage->FindAllDescendantsByType(SYSTEM, false, 1);
+    for (const auto item : systems) {
+        System *system = vrv_cast<System *>(item);
+        assert(system);
+        System *convertedSystem = new System();
+        ConvertToCmnFunctor convertToCmn(this, convertedSystem);
+        // Convert the system and replace it
+        system->Process(convertToCmn);
+        contentPage->ReplaceChild(system, convertedSystem);
+        delete system;
+    }
+
+    this->PrepareData();
+
+    // We need to reset the drawing page to NULL
+    // because idx will still be 0 but contentPage is dead!
+    this->ResetDataPage();
+    this->ScoreDefSetCurrentDoc(true);
+
+    // Reset the option
+    m_options->m_durationEquivalence.SetValue(previousEquivalence);
 }
 
 void Doc::ConvertMarkupDoc(bool permanent)

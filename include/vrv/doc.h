@@ -366,6 +366,11 @@ public:
     void ConvertToCastOffMensuralDoc(bool castOff);
 
     /**
+     * Convert mensural MEI into CMN measure-based MEI.
+     */
+    void ConvertToCmnDoc();
+
+    /**
      * Convert analytical encoding (@fermata, @tie) to correpsonding elements
      * By default, the element are used only for the rendering and not preserved in the MEI output
      * Permanent conversion discard analytical markup and elements will be preserved in the MEI output.

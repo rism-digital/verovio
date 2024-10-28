@@ -359,6 +359,189 @@ FunctorCode ConvertToUnCastOffMensuralFunctor::VisitSection(Section *section)
 }
 
 //----------------------------------------------------------------------------
+// ConvertToCmnFunctor
+//----------------------------------------------------------------------------
+
+ConvertToCmnFunctor::ConvertToCmnFunctor(Doc *doc, System *targetSystem) : DocFunctor(doc)
+{
+    m_contentStaff = NULL;
+    m_contentLayer = NULL;
+    m_targetSystem = targetSystem;
+    m_targetStaff = NULL;
+    m_targetLayer = NULL;
+}
+
+FunctorCode ConvertToCmnFunctor::VisitLayer(Layer *layer)
+{
+    m_contentLayer = layer;
+    m_targetLayer = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
+{
+    m_measures.clear();
+    m_breakPoints.clear();
+
+    measure->m_measureAligner.LogDebugTree();
+
+    const int nbLayers = measure->GetDescendantCount(LAYER);
+    bool isFirst = true;
+
+    std::list<MensurInfo> mensurs;
+    MensurInfo mensur;
+
+    for (const Object *child : measure->m_measureAligner.GetChildren()) {
+        const Alignment *alignment = vrv_cast<const Alignment *>(child);
+        assert(alignment);
+        // We use the alignments with an element at all layer as a breakpoint
+        if (!this->IsGlobalMensur(alignment, nbLayers, mensur.m_mensur)) continue;
+        //
+        mensur.m_time = alignment->GetTime();
+        mensurs.push_back(mensur);
+    }
+    if (mensurs.empty() || (mensurs.front().m_time != 0)) {
+        mensur.m_time = 0;
+        mensurs.push_back(mensur);
+    }
+
+    Fraction totalTime = measure->m_measureAligner.GetMaxTime();
+    Fraction time(0);
+    std::list<MensurInfo>::iterator mensurIter = mensurs.begin();
+    std::advance(mensurIter, 1);
+    Fraction next = (mensurIter == mensurs.end()) ? totalTime : (*mensurIter).m_time;
+
+    Fraction measureDuration = this->CalcMeasureDuration(mensurs.front().m_mensur);
+
+    MeasureInfo measureInfo;
+
+    while (time < next) {
+
+        Measure *cmnMeasure = new Measure();
+        measureInfo.m_measure = cmnMeasure;
+        measureInfo.m_time = time;
+        measureInfo.m_duration = measureDuration;
+        if ((time + measureInfo.m_duration) > next) {
+            measureInfo.m_duration = next - time;
+            cmnMeasure->SetMetcon(BOOLEAN_false);
+        }
+        m_targetSystem->AddChild(cmnMeasure);
+        m_measures.push_back(measureInfo);
+
+        time = time + measureDuration;
+        if ((time >= next) && (mensurIter != mensurs.end())) {
+            time = next;
+            std::advance(mensurIter, 1);
+            next = (mensurIter == mensurs.end()) ? totalTime : (*mensurIter).m_time;
+        }
+    }
+
+    // Now we are ready to process staves/layers and to move content to m_measures
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToCmnFunctor::VisitObject(Object *object)
+{
+    assert(object->GetParent());
+    // We want to move only the children of the layer of any type (notes, editorial elements, etc)
+    if (object->GetParent()->Is(LAYER)) {
+        this->InitMeasure(object);
+        assert(m_targetLayer);
+        object->MoveItselfTo(m_targetLayer);
+        // Do not process children because we move the full sub-tree
+        return FUNCTOR_SIBLINGS;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToCmnFunctor::VisitScoreDef(ScoreDef *scoreDef)
+{
+    assert(m_targetSystem);
+    scoreDef->MoveItselfTo(m_targetSystem);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToCmnFunctor::VisitStaff(Staff *staff)
+{
+    m_currentMeasure = m_measures.begin();
+    m_currentBreakPoint = m_breakPoints.begin();
+
+    m_contentStaff = staff;
+    m_targetStaff = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToCmnFunctor::VisitSystemElement(SystemElement *systemElement)
+{
+    assert(m_targetSystem);
+    systemElement->MoveItselfTo(m_targetSystem);
+
+    return FUNCTOR_CONTINUE;
+}
+
+bool ConvertToCmnFunctor::IsGlobalMensur(const Alignment *alignment, const int nbLayers, Mensur &mensur)
+{
+    if (alignment->GetType() != ALIGNMENT_MENSUR) return false;
+
+    // Not all layers have an alignment and we cannot break here
+    // if (alignment->GetChildCount() != nbLayers) return false;
+
+    for (const Object *child : alignment->GetChildren()) {
+        const Mensur *mensurRef = vrv_cast<const Mensur *>(child->FindDescendantByType(MENSUR));
+        if (mensurRef) {
+            mensur = *mensurRef;
+            return true;
+        }
+    }
+
+    return true;
+}
+
+Fraction ConvertToCmnFunctor::CalcMeasureDuration(const Mensur &mensur)
+{
+    Fraction duration(DURATION_2);
+    duration = duration * abs(mensur.GetProlatio());
+    duration = duration * abs(mensur.GetTempus());
+    return duration;
+}
+
+void ConvertToCmnFunctor::InitMeasure(Object *object)
+{
+    assert(m_contentStaff);
+    assert(m_contentLayer);
+
+    LayerElement *element = NULL;
+    if (object->IsLayerElement()) element = vrv_cast<LayerElement *>(object);
+
+    if (element && (element->GetAlignment() == *m_currentBreakPoint)) {
+        m_targetStaff = NULL;
+        m_targetLayer = NULL;
+        std::advance(m_currentBreakPoint, 1);
+        std::advance(m_currentMeasure, 1);
+    }
+
+    if (m_targetStaff && m_targetLayer) return;
+
+    m_targetStaff = new Staff();
+    m_contentStaff->CopyAttributesTo(m_targetStaff);
+    // Keep the xml:id of the staff in the first staff segment
+    m_targetStaff->SwapID(m_contentStaff);
+    // assert(*m_currentMeasure);
+    //(*m_currentMeasure)->AddChild(m_targetStaff);
+
+    m_targetLayer = new Layer();
+    m_contentLayer->CopyAttributesTo(m_targetLayer);
+    // Keep the xml:id of the layer in the first segment
+    m_targetLayer->SwapID(m_contentLayer);
+    assert(m_targetStaff);
+    m_targetStaff->AddChild(m_targetLayer);
+}
+
+//----------------------------------------------------------------------------
 // ConvertMarkupAnalyticalFunctor
 //----------------------------------------------------------------------------
 

@@ -187,6 +187,83 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ConvertToCmnFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class converts mensural MEI into cast-off (measure) segments looking at the barLine objects.
+ * Segment positions occur where a barLine is set on all staves.
+ */
+class ConvertToCmnFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    ConvertToCmnFunctor(Doc *doc, System *targetSystem);
+    virtual ~ConvertToCmnFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitLayer(Layer *layer) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitObject(Object *object) override;
+    FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
+    FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitSystemElement(SystemElement *systemElement) override;
+    ///@}
+
+protected:
+    //
+private:
+    /** Check if the alignment correspond to a global mensur change */
+    bool IsGlobalMensur(const Alignment *alignment, const int nbLayers, Mensur &mensur);
+    /** */
+    Fraction CalcMeasureDuration(const Mensur &mensur);
+    /** Create the staff and layer when a new segment starts */
+    void InitMeasure(Object *object);
+
+    class MensurInfo {
+    public:
+        Mensur m_mensur;
+        Fraction m_time;
+    };
+
+    class MeasureInfo : public MensurInfo {
+    public:
+        Measure *m_measure;
+        Fraction m_duration;
+    };
+
+public:
+    //
+private:
+    /** The list of segments (i.e., measures) we are going to create */
+    std::list<MeasureInfo> m_measures;
+    /** The current segment, reset at for every staff/layer */
+    std::list<MeasureInfo>::iterator m_currentMeasure;
+    /** The list of break points (one less than the measures) */
+    std::list<const Alignment *> m_breakPoints;
+    /** The current breakpoint, reset for every staff/layer */
+    std::list<const Alignment *>::const_iterator m_currentBreakPoint;
+    // The content layer from which we are copying the elements
+    Staff *m_contentStaff;
+    Layer *m_contentLayer;
+    // The target system, measure, staff & layer
+    System *m_targetSystem;
+    Staff *m_targetStaff;
+    Layer *m_targetLayer;
+};
+
+//----------------------------------------------------------------------------
 // ConvertMarkupAnalyticalFunctor
 //----------------------------------------------------------------------------
 

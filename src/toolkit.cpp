@@ -816,10 +816,15 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
 
     // Convert pseudo-measures into distinct segments based on barLine elements
     if (m_doc.IsMensuralMusicOnly()) {
-        if (m_options->m_mensuralResponsiveView.GetValue()) {
+        if (m_options->m_mensuralResponsiveView.GetValue() || m_options->m_mensuralToCmn.GetValue()) {
             m_doc.ConvertToMensuralViewDoc();
         }
-        m_doc.ConvertToCastOffMensuralDoc(true);
+        if (m_options->m_mensuralToCmn.GetValue()) {
+            m_doc.ConvertToCmnDoc();
+        }
+        else {
+            m_doc.ConvertToCastOffMensuralDoc(true);
+        }
     }
 
     // Do the layout? this depends on the options and the file. PAE and
