@@ -262,11 +262,8 @@ private:
     std::vector<Layer *> m_layers;
     /** The current breakpoint, reset for every staff/layer */
     std::vector<Layer *>::iterator m_currentLayer;
-    // The content layer from which we are copying the elements
-    Layer *m_contentLayer;
     // The target system, measure, staff & layer
     System *m_targetSystem;
-    Layer *m_targetLayer;
     // The current Mensur and Proport
     AlignMeterParams m_currentParams;
     // List of duration element potentially splitted across measures

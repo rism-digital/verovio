@@ -368,20 +368,15 @@ FunctorCode ConvertToUnCastOffMensuralFunctor::VisitSection(Section *section)
 
 ConvertToCmnFunctor::ConvertToCmnFunctor(Doc *doc, System *targetSystem) : DocFunctor(doc)
 {
-    m_contentLayer = NULL;
     m_targetSystem = targetSystem;
-    m_targetLayer = NULL;
 }
 
 FunctorCode ConvertToCmnFunctor::VisitLayer(Layer *layer)
 {
-    m_contentLayer = layer;
-
     m_currentParams.mensur = layer->GetCurrentMensur();
     m_currentParams.meterSig = layer->GetCurrentMeterSig();
     m_currentParams.proport = layer->GetCurrentProport();
 
-    m_targetLayer = NULL;
     m_currentLayer = m_layers.begin();
 
     return FUNCTOR_CONTINUE;
@@ -510,7 +505,7 @@ FunctorCode ConvertToCmnFunctor::VisitNote(Note *note)
 FunctorCode ConvertToCmnFunctor::VisitRest(Rest *rest)
 {
     this->ConvertDurationElement(rest, REST);
-    
+
     return FUNCTOR_SIBLINGS;
 }
 
