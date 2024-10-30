@@ -1599,7 +1599,7 @@ void TextListInterface::FilterList(ListOfConstObjects &childList) const
 // ObjectFactory methods
 //----------------------------------------------------------------------------
 
-thread_local MapOfStrConstructors ObjectFactory::s_ctorsRegistry;
+thread_local MapOfClassIdConstructors ObjectFactory::s_ctorsRegistry;
 thread_local MapOfStrClassIds ObjectFactory::s_classIdsRegistry;
 
 ObjectFactory *ObjectFactory::GetInstance()
@@ -1610,16 +1610,24 @@ ObjectFactory *ObjectFactory::GetInstance()
 
 Object *ObjectFactory::Create(std::string name)
 {
+    ClassId classId = this->GetClassId(name);
+    if (classId == OBJECT) return NULL;
+
+    return this->Create(classId);
+}
+
+Object *ObjectFactory::Create(ClassId classId)
+{
     Object *object = NULL;
 
-    MapOfStrConstructors::iterator it = s_ctorsRegistry.find(name);
+    MapOfClassIdConstructors::iterator it = s_ctorsRegistry.find(classId);
     if (it != s_ctorsRegistry.end()) object = it->second();
 
     if (object) {
         return object;
     }
     else {
-        LogError("Factory for '%s' not found", name.c_str());
+        LogError("Factory for '%d' not found", classId);
         return NULL;
     }
 }
@@ -1653,7 +1661,7 @@ void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, st
 
 void ObjectFactory::Register(std::string name, ClassId classId, std::function<Object *(void)> function)
 {
-    s_ctorsRegistry[name] = function;
+    s_ctorsRegistry[classId] = function;
     s_classIdsRegistry[name] = classId;
 }
 
