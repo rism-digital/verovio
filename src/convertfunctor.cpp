@@ -9,6 +9,10 @@
 
 //----------------------------------------------------------------------------
 
+#include <ranges>
+
+//----------------------------------------------------------------------------
+
 #include "div.h"
 #include "doc.h"
 #include "ending.h"
@@ -364,33 +368,61 @@ FunctorCode ConvertToUnCastOffMensuralFunctor::VisitSection(Section *section)
 
 ConvertToCmnFunctor::ConvertToCmnFunctor(Doc *doc, System *targetSystem) : DocFunctor(doc)
 {
-    m_contentStaff = NULL;
     m_contentLayer = NULL;
     m_targetSystem = targetSystem;
-    m_targetStaff = NULL;
     m_targetLayer = NULL;
 }
 
 FunctorCode ConvertToCmnFunctor::VisitLayer(Layer *layer)
 {
     m_contentLayer = layer;
+
+    m_currentParams.mensur = layer->GetCurrentMensur();
+    m_currentParams.meterSig = layer->GetCurrentMeterSig();
+    m_currentParams.proport = layer->GetCurrentProport();
+
     m_targetLayer = NULL;
+    m_currentLayer = m_layers.begin();
 
     return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToCmnFunctor::VisitLayerElement(LayerElement *layerElement)
+{
+    if (layerElement->IsSystemElement()) return FUNCTOR_CONTINUE;
+
+    LogDebug(layerElement->GetClassName().c_str());
+
+    if (layerElement->Is(MENSUR)) {
+        // replace the current mensur
+        m_currentParams.mensur = vrv_cast<Mensur *>(layerElement);
+        assert(m_currentParams.mensur);
+    }
+    else if (layerElement->Is(PROPORT)) {
+        // replace the current proport
+        const Proport *previous = (m_currentParams.proport) ? (m_currentParams.proport) : NULL;
+        m_currentParams.proport = vrv_cast<Proport *>(layerElement);
+        assert(m_currentParams.proport);
+        if (previous) {
+            m_currentParams.proport->Cumulate(previous);
+        }
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
 {
     m_measures.clear();
-    m_breakPoints.clear();
 
     measure->m_measureAligner.LogDebugTree();
 
     const int nbLayers = measure->GetDescendantCount(LAYER);
-    bool isFirst = true;
 
-    std::list<MensurInfo> mensurs;
-    MensurInfo mensur;
+    // First build an array of all mensuration signs that correspond to a time signature change
+    // Mensur sign should appear at all voices to be considered global
+    std::vector<MensurInfo> mensurs;
+    MensurInfo mensur; // Will be copied when added to the array, so we can re-use it.
 
     for (const Object *child : measure->m_measureAligner.GetChildren()) {
         const Alignment *alignment = vrv_cast<const Alignment *>(child);
@@ -401,37 +433,44 @@ FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
         mensur.m_time = alignment->GetTime();
         mensurs.push_back(mensur);
     }
+    // We need to have at least one and at least one at beginning (time 0)
     if (mensurs.empty() || (mensurs.front().m_time != 0)) {
         mensur.m_time = 0;
         mensurs.push_back(mensur);
     }
 
+    // Now we can create measure object based on the mensur and the time of each MensurInfo section
+    // The total time of the piece
     Fraction totalTime = measure->m_measureAligner.GetMaxTime();
     Fraction time(0);
-    std::list<MensurInfo>::iterator mensurIter = mensurs.begin();
+    // We know that we have at least one MensurInfo
+    std::vector<MensurInfo>::iterator mensurIter = mensurs.begin();
+    Fraction measureDuration = this->CalcMeasureDuration(mensurs.front().m_mensur);
+    Mensur currentMensur = mensurs.front().m_mensur;
     std::advance(mensurIter, 1);
+    // The next is either the next MensurInfo or the end of the piece
     Fraction next = (mensurIter == mensurs.end()) ? totalTime : (*mensurIter).m_time;
 
-    Fraction measureDuration = this->CalcMeasureDuration(mensurs.front().m_mensur);
-
-    MeasureInfo measureInfo;
-
     while (time < next) {
-
+        MeasureInfo measureInfo;
         Measure *cmnMeasure = new Measure();
         measureInfo.m_measure = cmnMeasure;
         measureInfo.m_time = time;
         measureInfo.m_duration = measureDuration;
+        measureInfo.m_mensur = currentMensur;
         if ((time + measureInfo.m_duration) > next) {
             measureInfo.m_duration = next - time;
             cmnMeasure->SetMetcon(BOOLEAN_false);
         }
         m_targetSystem->AddChild(cmnMeasure);
         m_measures.push_back(measureInfo);
+        // cmnMeasure->SetType(time.ToString());
 
         time = time + measureDuration;
         if ((time >= next) && (mensurIter != mensurs.end())) {
             time = next;
+            measureDuration = this->CalcMeasureDuration((*mensurIter).m_mensur);
+            currentMensur = (*mensurIter).m_mensur;
             std::advance(mensurIter, 1);
             next = (mensurIter == mensurs.end()) ? totalTime : (*mensurIter).m_time;
         }
@@ -441,19 +480,38 @@ FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ConvertToCmnFunctor::VisitObject(Object *object)
+FunctorCode ConvertToCmnFunctor::VisitNote(Note *note)
 {
-    assert(object->GetParent());
-    // We want to move only the children of the layer of any type (notes, editorial elements, etc)
-    if (object->GetParent()->Is(LAYER)) {
-        this->InitMeasure(object);
-        assert(m_targetLayer);
-        object->MoveItselfTo(m_targetLayer);
-        // Do not process children because we move the full sub-tree
-        return FUNCTOR_SIBLINGS;
+    this->ConvertDurationElement(note, NOTE);
+
+    if (m_durationElements.empty()) return FUNCTOR_SIBLINGS;
+
+    for (Object *object : m_durationElements) {
+        Note *cmnNote = vrv_cast<Note *>(object);
+        assert(cmnNote);
+        cmnNote->SetPname(note->GetPname());
+        cmnNote->SetOct(note->GetOct());
     }
 
-    return FUNCTOR_CONTINUE;
+    Object *tieStart = m_durationElements.front();
+    for (Object *tieEnd : m_durationElements | std::views::drop(1)) {
+        Object *measure = tieStart->GetFirstAncestor(MEASURE);
+        assert(measure);
+        Tie *tie = new Tie();
+        tie->SetStartid("#" + tieStart->GetID());
+        tie->SetEndid("#" + tieEnd->GetID());
+        measure->AddChild(tie);
+        tieStart = tieEnd;
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode ConvertToCmnFunctor::VisitRest(Rest *rest)
+{
+    this->ConvertDurationElement(rest, REST);
+    
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode ConvertToCmnFunctor::VisitScoreDef(ScoreDef *scoreDef)
@@ -467,10 +525,21 @@ FunctorCode ConvertToCmnFunctor::VisitScoreDef(ScoreDef *scoreDef)
 FunctorCode ConvertToCmnFunctor::VisitStaff(Staff *staff)
 {
     m_currentMeasure = m_measures.begin();
-    m_currentBreakPoint = m_breakPoints.begin();
 
-    m_contentStaff = staff;
-    m_targetStaff = NULL;
+    m_layers.clear();
+    m_layers.reserve(m_measures.size());
+    for (int i = 0; i < (int)m_measures.size(); ++i) {
+        Layer *layer = new Layer();
+        m_layers.push_back(layer);
+    }
+    m_currentLayer = m_layers.begin();
+
+    for (int i = 0; i < (int)m_measures.size(); ++i) {
+        Staff *cmnStaff = new Staff();
+        cmnStaff->SetN(staff->GetN());
+        cmnStaff->AddChild(m_layers.at(i));
+        m_measures.at(i).m_measure->AddChild(cmnStaff);
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -509,36 +578,51 @@ Fraction ConvertToCmnFunctor::CalcMeasureDuration(const Mensur &mensur)
     return duration;
 }
 
-void ConvertToCmnFunctor::InitMeasure(Object *object)
+void ConvertToCmnFunctor::ConvertDurationElement(DurationInterface *interface, ClassId classId)
 {
-    assert(m_contentStaff);
-    assert(m_contentLayer);
+    m_durationElements.clear();
 
-    LayerElement *element = NULL;
-    if (object->IsLayerElement()) element = vrv_cast<LayerElement *>(object);
+    Fraction duration = interface->GetScoreTimeOffset() - interface->GetScoreTimeOnset();
+    data_DURATION noteDur = interface->GetActualDur();
+    if (noteDur < DURATION_breve) noteDur = DURATION_breve;
 
-    if (element && (element->GetAlignment() == *m_currentBreakPoint)) {
-        m_targetStaff = NULL;
-        m_targetLayer = NULL;
-        std::advance(m_currentBreakPoint, 1);
-        std::advance(m_currentMeasure, 1);
+    this->ConvertDuationInterface(
+        NOTE, noteDur, interface->GetScoreTimeOnset() / SCORE_TIME_UNIT, duration / SCORE_TIME_UNIT);
+}
+
+void ConvertToCmnFunctor::ConvertDuationInterface(
+    ClassId classId, data_DURATION noteDur, Fraction time, Fraction duration)
+{
+    const Fraction measureEnd = (*m_currentMeasure).m_time + (*m_currentMeasure).m_duration;
+    const Fraction noteEnd = time + duration;
+
+    ObjectFactory *instance = ObjectFactory::GetInstance();
+    Object *layerElement = instance->Create(NOTE);
+    assert(layerElement);
+    m_durationElements.push_back(layerElement);
+    DurationInterface *interface = layerElement->GetDurationInterface();
+    assert(interface);
+
+    (*m_currentLayer)->AddChild(layerElement);
+
+    if (noteEnd > measureEnd) {
+        Fraction processed = measureEnd - time;
+        auto [durPart, remainder] = (measureEnd - time).ToDur();
+        if (remainder != 0) {
+            LogWarning("The remainder of a duration '%' will be missing", remainder.ToString().c_str());
+        }
+        interface->SetDur(durPart);
+        ++m_currentMeasure;
+        ++m_currentLayer;
+        this->ConvertDuationInterface(classId, noteDur, (*m_currentMeasure).m_time, duration - processed);
     }
-
-    if (m_targetStaff && m_targetLayer) return;
-
-    m_targetStaff = new Staff();
-    m_contentStaff->CopyAttributesTo(m_targetStaff);
-    // Keep the xml:id of the staff in the first staff segment
-    m_targetStaff->SwapID(m_contentStaff);
-    // assert(*m_currentMeasure);
-    //(*m_currentMeasure)->AddChild(m_targetStaff);
-
-    m_targetLayer = new Layer();
-    m_contentLayer->CopyAttributesTo(m_targetLayer);
-    // Keep the xml:id of the layer in the first segment
-    m_targetLayer->SwapID(m_contentLayer);
-    assert(m_targetStaff);
-    m_targetStaff->AddChild(m_targetLayer);
+    else {
+        interface->SetDur(noteDur);
+        if (time + duration == measureEnd) {
+            ++m_currentMeasure;
+            ++m_currentLayer;
+        }
+    }
 }
 
 //----------------------------------------------------------------------------

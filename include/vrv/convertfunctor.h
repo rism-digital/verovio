@@ -10,6 +10,10 @@
 
 #include "functor.h"
 
+//----------------------------------------------------------------------------
+
+#include "alignfunctor.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -214,8 +218,10 @@ public:
      */
     ///@{
     FunctorCode VisitLayer(Layer *layer) override;
+    FunctorCode VisitLayerElement(LayerElement *object) override;
     FunctorCode VisitMeasure(Measure *measure) override;
-    FunctorCode VisitObject(Object *object) override;
+    FunctorCode VisitNote(Note *note) override;
+    FunctorCode VisitRest(Rest *rest) override;
     FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
     FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitSystemElement(SystemElement *systemElement) override;
@@ -229,7 +235,9 @@ private:
     /** */
     Fraction CalcMeasureDuration(const Mensur &mensur);
     /** Create the staff and layer when a new segment starts */
-    void InitMeasure(Object *object);
+    // void InitMeasure(Object *object);
+    void ConvertDurationElement(DurationInterface *interface, ClassId classId);
+    void ConvertDuationInterface(ClassId classId, data_DURATION elementDur, Fraction time, Fraction duration);
 
     class MensurInfo {
     public:
@@ -247,20 +255,22 @@ public:
     //
 private:
     /** The list of segments (i.e., measures) we are going to create */
-    std::list<MeasureInfo> m_measures;
+    std::vector<MeasureInfo> m_measures;
     /** The current segment, reset at for every staff/layer */
-    std::list<MeasureInfo>::iterator m_currentMeasure;
+    std::vector<MeasureInfo>::iterator m_currentMeasure;
     /** The list of break points (one less than the measures) */
-    std::list<const Alignment *> m_breakPoints;
+    std::vector<Layer *> m_layers;
     /** The current breakpoint, reset for every staff/layer */
-    std::list<const Alignment *>::const_iterator m_currentBreakPoint;
+    std::vector<Layer *>::iterator m_currentLayer;
     // The content layer from which we are copying the elements
-    Staff *m_contentStaff;
     Layer *m_contentLayer;
     // The target system, measure, staff & layer
     System *m_targetSystem;
-    Staff *m_targetStaff;
     Layer *m_targetLayer;
+    // The current Mensur and Proport
+    AlignMeterParams m_currentParams;
+    // List of duration element potentially splitted across measures
+    ListOfObjects m_durationElements;
 };
 
 //----------------------------------------------------------------------------
