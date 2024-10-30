@@ -477,7 +477,7 @@ FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
 
 FunctorCode ConvertToCmnFunctor::VisitNote(Note *note)
 {
-    this->ConvertDurationElement(note, NOTE);
+    this->ConvertDurationInterface(note, NOTE);
 
     if (m_durationElements.empty()) return FUNCTOR_SIBLINGS;
 
@@ -504,7 +504,7 @@ FunctorCode ConvertToCmnFunctor::VisitNote(Note *note)
 
 FunctorCode ConvertToCmnFunctor::VisitRest(Rest *rest)
 {
-    this->ConvertDurationElement(rest, REST);
+    this->ConvertDurationInterface(rest, REST);
 
     return FUNCTOR_SIBLINGS;
 }
@@ -573,50 +573,94 @@ Fraction ConvertToCmnFunctor::CalcMeasureDuration(const Mensur &mensur)
     return duration;
 }
 
-void ConvertToCmnFunctor::ConvertDurationElement(DurationInterface *interface, ClassId classId)
+void ConvertToCmnFunctor::ConvertDurationInterface(DurationInterface *interface, ClassId classId)
 {
     m_durationElements.clear();
 
     Fraction duration = interface->GetScoreTimeOffset() - interface->GetScoreTimeOnset();
     data_DURATION noteDur = interface->GetActualDur();
+    // Longa and maxima is converted into repeated breves since breve is the longest duration we can fit in a measure
     if (noteDur < DURATION_breve) noteDur = DURATION_breve;
 
-    this->ConvertDuationInterface(
+    this->SplitDurationInterface(
         NOTE, noteDur, interface->GetScoreTimeOnset() / SCORE_TIME_UNIT, duration / SCORE_TIME_UNIT);
 }
 
-void ConvertToCmnFunctor::ConvertDuationInterface(
+void ConvertToCmnFunctor::SplitDurationInterface(
     ClassId classId, data_DURATION noteDur, Fraction time, Fraction duration)
 {
     const Fraction measureEnd = (*m_currentMeasure).m_time + (*m_currentMeasure).m_duration;
     const Fraction noteEnd = time + duration;
 
-    ObjectFactory *instance = ObjectFactory::GetInstance();
-    Object *layerElement = instance->Create(NOTE);
-    assert(layerElement);
-    m_durationElements.push_back(layerElement);
-    DurationInterface *interface = layerElement->GetDurationInterface();
-    assert(interface);
+    std::list<CmnDuration> cmnDurations;
 
-    (*m_currentLayer)->AddChild(layerElement);
-
+    Fraction processed = duration;
+    // If we go beyon the end of the measure, first processed only what fits
     if (noteEnd > measureEnd) {
-        Fraction processed = measureEnd - time;
-        auto [durPart, remainder] = (measureEnd - time).ToDur();
-        if (remainder != 0) {
-            LogWarning("The remainder of a duration '%' will be missing", remainder.ToString().c_str());
-        }
-        interface->SetDur(durPart);
+        processed = measureEnd - time;
+    }
+
+    // Split what we can fit within a measure into cmn duration (e.g., B => B. Sb. in tempus perfectum and prolatio
+    // major) Fill a list of CMN duration with dots (and num / numbase, unused for now)
+    this->SplitDurationIntoCmn(noteDur, processed, m_currentParams.mensur, cmnDurations);
+
+    // Add them to the layer using the ObjectFactory (create notes or rests)
+    for (const CmnDuration &cmnDuration : cmnDurations) {
+        ObjectFactory *instance = ObjectFactory::GetInstance();
+        Object *layerElement = instance->Create(classId);
+        assert(layerElement);
+        // Add it to the durationElement for post processing (e.g., setting note attributes or adding ties)
+        m_durationElements.push_back(layerElement);
+        DurationInterface *interface = layerElement->GetDurationInterface();
+        assert(interface);
+        (*m_currentLayer)->AddChild(layerElement);
+        interface->SetDur(cmnDuration.m_duration);
+        interface->SetDots(cmnDuration.m_dots);
+    }
+
+    // If we have reach the end of the measure, go to the next one
+    if (time + processed == measureEnd) {
         ++m_currentMeasure;
         ++m_currentLayer;
-        this->ConvertDuationInterface(classId, noteDur, (*m_currentMeasure).m_time, duration - processed);
     }
-    else {
-        interface->SetDur(noteDur);
-        if (time + duration == measureEnd) {
-            ++m_currentMeasure;
-            ++m_currentLayer;
+    // Also check if we have more to process for that note or rest - if yes, call it recursively
+    if (duration - processed != 0) {
+        this->SplitDurationInterface(classId, noteDur, time = (*m_currentMeasure).m_time, duration - processed);
+    }
+}
+
+void ConvertToCmnFunctor::SplitDurationIntoCmn(
+    data_DURATION elementDur, Fraction duration, const Mensur *mensur, std::list<CmnDuration> &cmnDurations)
+{
+    bool prolatioMajor = (abs(mensur->GetProlatio()) == 3);
+    bool tempusPerfectum = (abs(mensur->GetTempus()) == 3);
+    const int semiBrevisDots = (prolatioMajor) ? 1 : 0;
+    const int brevisDots = (tempusPerfectum) ? 1 : 0;
+
+    const Fraction semiBrevis = Fraction(1, 1) * abs(mensur->GetProlatio()) / 2;
+    const Fraction brevis = Fraction(1, 1) * abs(mensur->GetTempus());
+
+    // First see if we are expecting a breve and if the duration is long enough
+    if (elementDur == DURATION_breve) {
+        while (duration >= brevis) {
+            cmnDurations.push_back(CmnDuration(DURATION_breve, brevisDots));
+            duration = duration - brevis;
         }
+        // If we have not processed everything, go down to the level of semibrevis
+        if (duration != 0) elementDur = DURATION_1;
+    }
+    // See now if the duration is long enough for a semibrevis
+    if (elementDur == DURATION_1) {
+        while (duration >= semiBrevis) {
+            cmnDurations.push_back(CmnDuration(DURATION_1, semiBrevisDots));
+            duration = duration - semiBrevis;
+        }
+    }
+    // The process the rest util everything processed
+    while (duration != 0) {
+        auto [durPart, remainder] = duration.ToDur();
+        cmnDurations.push_back(CmnDuration(durPart, 0));
+        duration = remainder;
     }
 }
 

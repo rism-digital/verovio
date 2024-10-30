@@ -234,22 +234,43 @@ private:
     bool IsGlobalMensur(const Alignment *alignment, const int nbLayers, Mensur &mensur);
     /** */
     Fraction CalcMeasureDuration(const Mensur &mensur);
-    /** Create the staff and layer when a new segment starts */
-    // void InitMeasure(Object *object);
-    void ConvertDurationElement(DurationInterface *interface, ClassId classId);
-    void ConvertDuationInterface(ClassId classId, data_DURATION elementDur, Fraction time, Fraction duration);
+    /** Convert the objects with a DurationInterface into corresponding CMN notes or rests */
+    void ConvertDurationInterface(DurationInterface *interface, ClassId classId);
+    /** Split DurationInterface objects into CMN ones - including over several measures with a recursive call */
+    void SplitDurationInterface(ClassId classId, data_DURATION elementDur, Fraction time, Fraction duration);
 
+    /** Internal class for holding information about the mensur considered for meter signature (changes) */
     class MensurInfo {
     public:
         Mensur m_mensur;
         Fraction m_time;
     };
 
+    /** Internal class for holding infromation about the measures (time, duration, mensur) */
     class MeasureInfo : public MensurInfo {
     public:
         Measure *m_measure;
         Fraction m_duration;
     };
+
+    /** Internal class for holding information about the CMN notes to be generated in the process */
+    class CmnDuration {
+    public:
+        CmnDuration(data_DURATION duration, int dots, int num = 1, int numbase = 1)
+            : m_duration(duration), m_dots(dots), m_num(num), m_numbase(numbase) {};
+
+    public:
+        data_DURATION m_duration;
+        int m_dots;
+        int m_num;
+        int m_numbase;
+    };
+
+    /**
+     * Split a mensural duration into corresponding CMN durations - which can be more than one.
+     */
+    void SplitDurationIntoCmn(
+        data_DURATION elementDur, Fraction duration, const Mensur *mensur, std::list<CmnDuration> &cmnDurations);
 
 public:
     //
