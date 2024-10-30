@@ -48,6 +48,8 @@ protected:
 private:
     // Calculate shift for the articulation based on its type and presence of other articulations
     int CalculateHorizontalShift(const Artic *artic, bool virtualStem) const;
+    // Include the parent beam staff in the calculation of the above and below staff
+    void IncludeBeamStaff(LayerElement *layerElement);
 
 public:
     //
