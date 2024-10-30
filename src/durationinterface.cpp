@@ -179,7 +179,7 @@ Fraction DurationInterface::DurationWithSemibrevisEquivalence(
     int ratio = 0;
     Fraction duration(DURATION_1);
     switch (noteDur) {
-        case DURATION_maxima: duration = duration * abs(currentMensur->GetModusminor());
+        case DURATION_maxima: duration = duration * abs(currentMensur->GetModusmaior());
         case DURATION_long: duration = duration * abs(currentMensur->GetModusminor());
         case DURATION_breve: duration = duration * abs(currentMensur->GetTempus());
         case DURATION_1: break;
@@ -199,7 +199,7 @@ Fraction DurationInterface::DurationWithMinimaEquivalence(
     int ratio = 0;
     Fraction duration(DURATION_2);
     switch (noteDur) {
-        case DURATION_maxima: duration = duration * abs(currentMensur->GetModusminor());
+        case DURATION_maxima: duration = duration * abs(currentMensur->GetModusmaior());
         case DURATION_long: duration = duration * abs(currentMensur->GetModusminor());
         case DURATION_breve: duration = duration * abs(currentMensur->GetTempus());
         case DURATION_1: duration = duration * abs(currentMensur->GetProlatio()); break;
