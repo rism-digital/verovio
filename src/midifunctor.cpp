@@ -12,6 +12,7 @@
 #include "arpeg.h"
 #include "beatrpt.h"
 #include "btrem.h"
+#include "doc.h"
 #include "featureextractor.h"
 #include "ftrem.h"
 #include "gracegrp.h"
@@ -40,12 +41,19 @@ namespace vrv {
 // InitOnsetOffsetFunctor
 //----------------------------------------------------------------------------
 
-InitOnsetOffsetFunctor::InitOnsetOffsetFunctor() : Functor()
+InitOnsetOffsetFunctor::InitOnsetOffsetFunctor(Doc *doc) : DocFunctor(doc)
 {
+    static const std::map<int, data_DURATION> durationEq{
+        { DURATION_EQ_brevis, DURATION_brevis }, //
+        { DURATION_EQ_semibrevis, DURATION_semibrevis }, //
+        { DURATION_EQ_minima, DURATION_minima }, //
+    };
+
     m_currentScoreTime = 0;
     m_currentRealTimeSeconds = 0.0;
     m_notationType = NOTATIONTYPE_cmn;
     m_currentTempo = MIDI_TEMPO;
+    m_meterParams.equivalence = durationEq.at(m_doc->GetOptions()->m_durationEquivalence.GetValue());
 }
 
 FunctorCode InitOnsetOffsetFunctor::VisitChordEnd(Chord *chord)

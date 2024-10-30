@@ -30,13 +30,13 @@ class Timemap;
 /**
  * This class prepares Note onsets.
  */
-class InitOnsetOffsetFunctor : public Functor {
+class InitOnsetOffsetFunctor : public DocFunctor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    InitOnsetOffsetFunctor();
+    InitOnsetOffsetFunctor(Doc *doc);
     virtual ~InitOnsetOffsetFunctor() = default;
     ///@}
 

@@ -384,7 +384,7 @@ void Doc::CalculateTimemap()
     this->Process(initMaxMeasureDuration);
 
     // Then calculate the onset and offset times (w.r.t. the measure) for every note
-    InitOnsetOffsetFunctor initOnsetOffset;
+    InitOnsetOffsetFunctor initOnsetOffset(this);
     this->Process(initOnsetOffset);
 
     // Adjust the duration of tied notes
@@ -1289,7 +1289,7 @@ void Doc::ConvertToPageBasedDoc()
 
 void Doc::ConvertToCastOffMensuralDoc(bool castOff)
 {
-    if (!m_isMensuralMusicOnly) return;
+    if (!this->IsMensuralMusicOnly()) return;
 
     // Do not convert transcription files
     if (this->IsTranscription()) return;
@@ -1334,7 +1334,7 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
 
 void Doc::ConvertToCmnDoc()
 {
-    if (!m_isMensuralMusicOnly) return;
+    if (!this->IsMensuralMusicOnly()) return;
 
     // Do not convert transcription files
     if (this->IsTranscription()) return;
@@ -1352,6 +1352,8 @@ void Doc::ConvertToCmnDoc()
     if (this->IsCastOff()) this->UnCastOffDoc();
 
     this->ScoreDefSetCurrentDoc();
+
+    this->CalculateTimemap();
 
     Page *contentPage = this->SetDrawingPage(0);
     assert(contentPage);
