@@ -690,6 +690,11 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     std::string signValue = this->ChildAsString(signNode, "MainSymbol");
     if (signValue == "O") {
         mensur->SetSign(MENSURATIONSIGN_O);
+        // If the  is no mensInfo, infer it from the Sign
+        if (!mensInfo) {
+            m_mensInfo->tempus = 3;
+            mensur->SetTempus(TEMPUS_3);
+        }
     }
     else if (signValue == "C") {
         mensur->SetSign(MENSURATIONSIGN_C);
@@ -701,6 +706,11 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     /// Mensuration/Sign/Dot to @dot
     if (signNode.child("Dot")) {
         mensur->SetDot(BOOLEAN_true);
+        // If there is no mensInfo, infer it from the Dot
+        if (!mensInfo) {
+            m_mensInfo->prolatio = 3;
+            mensur->SetProlatio(PROLATIO_3);
+        }
     }
 
     /// Mensuration/Sign/Strokes to @slash
