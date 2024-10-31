@@ -211,7 +211,7 @@ public:
     /*
      * Abstract base implementation
      */
-    bool ImplementsEndInterface() const override { return false; }
+    bool ImplementsEndInterface() const override { return true; }
 
     /*
      * Functor interface
@@ -219,6 +219,8 @@ public:
     ///@{
     FunctorCode VisitLayer(Layer *layer) override;
     FunctorCode VisitLayerElement(LayerElement *object) override;
+    FunctorCode VisitLigature(Ligature *ligature) override;
+    FunctorCode VisitLigatureEnd(Ligature *ligature) override;
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitNote(Note *note) override;
     FunctorCode VisitRest(Rest *rest) override;
@@ -298,6 +300,8 @@ private:
     AlignMeterParams m_currentParams;
     // List of duration element potentially splitted across measures
     ListOfObjects m_durationElements;
+    // Bracket span for ligature
+    BracketSpan *m_ligature;
 };
 
 //----------------------------------------------------------------------------

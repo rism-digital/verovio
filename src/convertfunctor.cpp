@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "bracketspan.h"
 #include "div.h"
 #include "doc.h"
 #include "ending.h"
@@ -404,6 +405,18 @@ FunctorCode ConvertToCmnFunctor::VisitLayerElement(LayerElement *layerElement)
     }
 
     return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode ConvertToCmnFunctor::VisitLigature(Ligature *ligature)
+{
+    assert(!m_ligature);
+    
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToCmnFunctor::VisitLigatureEnd(Ligature *ligature)
+{
+    return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
