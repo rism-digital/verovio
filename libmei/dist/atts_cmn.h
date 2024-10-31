@@ -435,14 +435,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetFunc(std::string func_) { m_func = func_; }
-    std::string GetFunc() const { return m_func; }
+    void SetFunc(bracketSpanLog_FUNC func_) { m_func = func_; }
+    bracketSpanLog_FUNC GetFunc() const { return m_func; }
     bool HasFunc() const;
     ///@}
 
 private:
     /** Describes the function of the bracketed event sequence. **/
-    std::string m_func;
+    bracketSpanLog_FUNC m_func;
 };
 
 //----------------------------------------------------------------------------

@@ -2009,7 +2009,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             bracketSpan->SetLform(
                 bracketSpan->AttLineRendBase::StrToLineform(bracket.attribute("line-type").as_string()));
             // bracketSpan->SetPlace(bracketSpan->AttPlacementRelStaff::StrToStaffrel(placeStr.c_str()));
-            bracketSpan->SetFunc("unclear");
+            // bracketSpan->SetFunc("unclear");
             bracketSpan->SetLstartsym(ConvertLineEndSymbol(bracket.attribute("line-end").as_string()));
             bracketSpan->SetTstamp(timeStamp);
             m_controlElements.push_back({ measureNum, bracketSpan });
@@ -2434,7 +2434,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             musicxml::OpenSpanner openBracket(voiceNumber, m_measureCounts.at(measure));
             bracketSpan->SetColor(lead.attribute("color").as_string());
             // bracketSpan->SetPlace(bracketSpan->AttPlacementRelStaff::StrToStaffrel(placeStr.c_str()));
-            bracketSpan->SetFunc("analytical");
+            // bracketSpan->SetFunc("analytical");
             bracketSpan->SetLstartsym(ConvertLineEndSymbol(lead.attribute("symbol").as_string()));
             bracketSpan->SetTstamp(timeStamp);
             bracketSpan->SetType("principal-voice");
