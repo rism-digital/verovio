@@ -530,6 +530,11 @@ FunctorCode ConvertToCmnFunctor::VisitNote(Note *note)
         m_coloration = NULL;
     }
 
+    Object *verse = note->FindDescendantByType(VERSE);
+    if (verse) {
+        verse->MoveItselfTo(m_durationElements.front());
+    }
+
     Object *tieStart = m_durationElements.front();
     for (Object *tieEnd : m_durationElements | std::views::drop(1)) {
         Object *measure = tieStart->GetFirstAncestor(MEASURE);
