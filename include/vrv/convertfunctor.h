@@ -264,7 +264,9 @@ private:
     class CmnDuration {
     public:
         CmnDuration(data_DURATION duration, int dots, int num = 1, int numbase = 1)
-            : m_duration(duration), m_dots(dots), m_num(num), m_numbase(numbase) {};
+            : m_duration(duration), m_dots(dots), m_num(num), m_numbase(numbase)
+        {
+        }
 
     public:
         data_DURATION m_duration;
