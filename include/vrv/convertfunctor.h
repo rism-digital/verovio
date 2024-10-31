@@ -300,8 +300,10 @@ private:
     AlignMeterParams m_currentParams;
     // List of duration element potentially splitted across measures
     ListOfObjects m_durationElements;
-    // Bracket span for ligature
+    // Bracket span for ligature, which also acts as a flag
     BracketSpan *m_ligature;
+    // A flag indicating we have started as coloration bracket
+    BracketSpan *m_coloration;
 };
 
 //----------------------------------------------------------------------------

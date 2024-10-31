@@ -378,7 +378,11 @@ FunctorCode ConvertToCmnFunctor::VisitLayer(Layer *layer)
     m_currentParams.meterSig = layer->GetCurrentMeterSig();
     m_currentParams.proport = layer->GetCurrentProport();
 
+    m_ligature = NULL;
+    m_coloration = NULL;
+
     m_currentLayer = m_layers.begin();
+    m_currentMeasure = m_measures.begin();
 
     return FUNCTOR_CONTINUE;
 }
@@ -410,12 +414,19 @@ FunctorCode ConvertToCmnFunctor::VisitLayerElement(LayerElement *layerElement)
 FunctorCode ConvertToCmnFunctor::VisitLigature(Ligature *ligature)
 {
     assert(!m_ligature);
-    
+
+    m_ligature = new BracketSpan();
+    m_ligature->SetFunc(bracketSpanLog_FUNC_ligature);
+    m_ligature->SetLform(LINEFORM_solid);
+    (*m_currentMeasure).m_measure->AddChild(m_ligature);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ConvertToCmnFunctor::VisitLigatureEnd(Ligature *ligature)
 {
+    m_ligature = NULL;
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -495,6 +506,28 @@ FunctorCode ConvertToCmnFunctor::VisitNote(Note *note)
         assert(cmnNote);
         cmnNote->SetPname(note->GetPname());
         cmnNote->SetOct(note->GetOct());
+    }
+
+    if (m_ligature) {
+        // The ligature has just been created, add the first note as `@startid`
+        if (!m_ligature->HasStartid()) m_ligature->SetStartid("#" + m_durationElements.front()->GetID());
+        // Set the last as `@endid` - will be updated until the ligature is closed
+        m_ligature->SetEndid("#" + m_durationElements.back()->GetID());
+    }
+
+    if (note->HasColored()) {
+        if (!m_coloration) {
+            m_coloration = new BracketSpan();
+            m_coloration->SetFunc(bracketSpanLog_FUNC_coloration);
+            // m_colored->SetLform(LINEFORM_);
+            (*m_currentMeasure).m_measure->AddChild(m_coloration);
+            m_coloration->SetStartid("#" + m_durationElements.front()->GetID());
+        }
+        // Set the last as `@endid` - will be updated if next note is also colored
+        m_coloration->SetEndid("#" + m_durationElements.back()->GetID());
+    }
+    else if (m_coloration) {
+        m_coloration = NULL;
     }
 
     Object *tieStart = m_durationElements.front();
