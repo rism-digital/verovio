@@ -15755,7 +15755,7 @@ void HumdrumInput::handleLigature(hum::HTp token)
     ligature->SetEndid("#" + endid);
 
     ligature->SetLform(LINEFORM_solid);
-    ligature->SetFunc("ligature");
+    ligature->SetFunc(bracketSpanLog_FUNC_ligature);
 
     addChildMeasureOrSection(ligature);
 }
@@ -15838,7 +15838,7 @@ void HumdrumInput::handleColoration(hum::HTp token)
     // data_LINEWIDTH lw;
     // lw.SetLineWidthTerm(LINEWIDTHTERM_medium);
     // coloration->SetLwidth(lw);
-    coloration->SetFunc("coloration");
+    coloration->SetFunc(bracketSpanLog_FUNC_coloration);
 
     addChildMeasureOrSection(coloration);
 }
@@ -21233,8 +21233,6 @@ void HumdrumInput::processPhrases(hum::HTp phraseend)
                 insertPhrase(bracket, phrasestart, phraseend, startmeasure, startchordsorted, endchordsorted,
                     phrasestartnoteinfo, phraseendnoteinfo, ndex, phraseindex, i, j, startpitches, endpitches,
                     indexused);
-                // bracket will not be drawn without the following line:
-                bracket->SetFunc("phrase");
             }
         }
     }

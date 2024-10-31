@@ -448,11 +448,6 @@ void View::DrawBracketSpan(
     assert(bracketSpan->GetStart());
     assert(bracketSpan->GetEnd());
 
-    if (!bracketSpan->HasFunc()) {
-        // we cannot draw a bracketSpan that has no func
-        return;
-    }
-
     const int y = bracketSpan->GetDrawingY();
 
     if (graphic) {
