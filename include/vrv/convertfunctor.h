@@ -246,10 +246,17 @@ private:
         Fraction m_time;
     };
 
-    /** Internal class for holding infromation about the measures (time, duration, mensur) */
-    class MeasureInfo : public MensurInfo {
+    /** Internal class for holding infromation about the measures (time, duration) */
+    class MeasureInfo {
+    public:
+        MeasureInfo(const Fraction &time, const Fraction &duration) : m_time(time), m_duration(duration)
+        {
+            m_measure = NULL;
+        }
+
     public:
         Measure *m_measure;
+        Fraction m_time;
         Fraction m_duration;
     };
 

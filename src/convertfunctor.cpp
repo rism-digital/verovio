@@ -447,19 +447,15 @@ FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
     Fraction next = (mensurIter == mensurs.end()) ? totalTime : (*mensurIter).m_time;
 
     while (time < next) {
-        MeasureInfo measureInfo;
+        MeasureInfo measureInfo(time, measureDuration);
         Measure *cmnMeasure = new Measure();
         measureInfo.m_measure = cmnMeasure;
-        measureInfo.m_time = time;
-        measureInfo.m_duration = measureDuration;
-        measureInfo.m_mensur = currentMensur;
         if ((time + measureInfo.m_duration) > next) {
             measureInfo.m_duration = next - time;
             cmnMeasure->SetMetcon(BOOLEAN_false);
         }
         m_targetSystem->AddChild(cmnMeasure);
         m_measures.push_back(measureInfo);
-        // cmnMeasure->SetType(time.ToString());
 
         time = time + measureDuration;
         if ((time >= next) && (mensurIter != mensurs.end())) {
@@ -471,7 +467,7 @@ FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
         }
     }
 
-    // Now we are ready to process staves/layers and to move content to m_measures
+    // Now we are ready to process layers and to move content to m_measures
     return FUNCTOR_CONTINUE;
 }
 
@@ -583,7 +579,7 @@ void ConvertToCmnFunctor::ConvertDurationInterface(DurationInterface *interface,
     if (noteDur < DURATION_breve) noteDur = DURATION_breve;
 
     this->SplitDurationInterface(
-        NOTE, noteDur, interface->GetScoreTimeOnset() / SCORE_TIME_UNIT, duration / SCORE_TIME_UNIT);
+        classId, noteDur, interface->GetScoreTimeOnset() / SCORE_TIME_UNIT, duration / SCORE_TIME_UNIT);
 }
 
 void ConvertToCmnFunctor::SplitDurationInterface(
@@ -656,7 +652,7 @@ void ConvertToCmnFunctor::SplitDurationIntoCmn(
             duration = duration - semiBrevis;
         }
     }
-    // The process the rest util everything processed
+    // Then process the rest until everything is processed
     while (duration != 0) {
         auto [durPart, remainder] = duration.ToDur();
         cmnDurations.push_back(CmnDuration(durPart, 0));
