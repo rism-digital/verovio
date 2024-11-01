@@ -499,8 +499,10 @@ FunctorCode ConvertToCmnFunctor::VisitNote(Note *note)
 {
     this->ConvertDurationInterface(note, NOTE);
 
+    // This should not happen, just check it once for all
     if (m_durationElements.empty()) return FUNCTOR_SIBLINGS;
 
+    // Copy the `@pname` and `@oct` from the mensural note
     for (Object *object : m_durationElements) {
         Note *cmnNote = vrv_cast<Note *>(object);
         assert(cmnNote);
@@ -508,6 +510,7 @@ FunctorCode ConvertToCmnFunctor::VisitNote(Note *note)
         cmnNote->SetOct(note->GetOct());
     }
 
+    // Check if we are in a ligature and set `@startid` and `@endid` as needed
     if (m_ligature) {
         // The ligature has just been created, add the first note as `@startid`
         if (!m_ligature->HasStartid()) m_ligature->SetStartid("#" + m_durationElements.front()->GetID());
@@ -515,6 +518,7 @@ FunctorCode ConvertToCmnFunctor::VisitNote(Note *note)
         m_ligature->SetEndid("#" + m_durationElements.back()->GetID());
     }
 
+    // Check if the note has coloration - create or add it to the coloration bracket as appropriate
     if (note->HasColored()) {
         if (!m_coloration) {
             m_coloration = new BracketSpan();
@@ -526,15 +530,18 @@ FunctorCode ConvertToCmnFunctor::VisitNote(Note *note)
         // Set the last as `@endid` - will be updated if next note is also colored
         m_coloration->SetEndid("#" + m_durationElements.back()->GetID());
     }
+    // End the coloration bracket if any
     else if (m_coloration) {
         m_coloration = NULL;
     }
 
+    // Move the verse
     Object *verse = note->FindDescendantByType(VERSE);
     if (verse) {
         verse->MoveItselfTo(m_durationElements.front());
     }
 
+    // Add the tie
     Object *tieStart = m_durationElements.front();
     for (Object *tieEnd : m_durationElements | std::views::drop(1)) {
         Object *measure = tieStart->GetFirstAncestor(MEASURE);
@@ -580,7 +587,7 @@ FunctorCode ConvertToCmnFunctor::VisitStaff(Staff *staff)
         Staff *cmnStaff = new Staff();
         cmnStaff->SetN(staff->GetN());
         cmnStaff->AddChild(m_layers.at(i));
-        m_measures.at(i).m_measure->AddChild(cmnStaff);
+        m_measures.at(i).m_measure->AddChildBack(cmnStaff);
     }
 
     return FUNCTOR_CONTINUE;
