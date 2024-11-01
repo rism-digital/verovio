@@ -1049,10 +1049,6 @@ data_DURATION CmmeInput::ReadDuration(pugi::xml_node durationNode, int &num, int
             return duration;
         }
 
-        // Apply the proportion
-        cmmeNum *= m_mensInfo->proportNum;
-        cmmeDen *= m_mensInfo->proportDen;
-
         std::pair<int, int> ratio = { 1, 1 };
 
         if (type == "Maxima") {
@@ -1076,6 +1072,11 @@ data_DURATION CmmeInput::ReadDuration(pugi::xml_node durationNode, int &num, int
         else if (type == "Semifusa") {
             ratio.second = 8;
         }
+
+        // That would apply the proportion, but not needed because CMME works the other way around
+        // That is, the propostion is not coded in the note value but applied by the CMME processor
+        // cmmeNum *= m_mensInfo->proportNum;
+        // cmmeDen *= m_mensInfo->proportDen;
 
         cmmeNum *= ratio.second;
         cmmeDen *= ratio.first;

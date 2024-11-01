@@ -659,7 +659,7 @@ bool ConvertToCmnFunctor::IsGlobalMensur(const Alignment *alignment, const int n
     if (alignment->GetType() != ALIGNMENT_MENSUR) return false;
 
     // Not all layers have an alignment and we cannot break here
-    // if (alignment->GetChildCount() != nbLayers) return false;
+    if (alignment->GetChildCount() != nbLayers) return false;
 
     for (const Object *child : alignment->GetChildren()) {
         const Mensur *mensurRef = vrv_cast<const Mensur *>(child->FindDescendantByType(MENSUR));
@@ -692,7 +692,7 @@ void ConvertToCmnFunctor::ConvertDurationInterface(DurationInterface *interface,
         interface->GetScoreTimeDuration() / SCORE_TIME_UNIT);
 }
 
-#define PROPORT_AS_TUPLET false
+#define PROPORT_AS_TUPLET true
 
 void ConvertToCmnFunctor::SplitDurationInterface(
     ClassId classId, data_DURATION noteDur, Fraction time, Fraction duration)
@@ -740,11 +740,12 @@ void ConvertToCmnFunctor::SplitDurationInterface(
         interface->SetDur(cmnDuration.m_duration);
         // Add a `@dots` only if not 0
         if (cmnDuration.m_dots != 0) interface->SetDots(cmnDuration.m_dots);
-        
+
         if (PROPORT_AS_TUPLET) {
             // Reapply num and numbase - should be made a tuplet
             if (m_currentParams.proport->HasNum()) interface->SetNum(m_currentParams.proport->GetCumulatedNum());
-            if (m_currentParams.proport->HasNumbase()) interface->SetNumbase(m_currentParams.proport->GetCumulatedNumbase());
+            if (m_currentParams.proport->HasNumbase())
+                interface->SetNumbase(m_currentParams.proport->GetCumulatedNumbase());
         }
     }
 
