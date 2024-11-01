@@ -684,14 +684,15 @@ void ConvertToCmnFunctor::ConvertDurationInterface(DurationInterface *interface,
 {
     m_durationElements.clear();
 
-    Fraction duration = interface->GetScoreTimeOffset() - interface->GetScoreTimeOnset();
     data_DURATION noteDur = interface->GetActualDur();
-    // Longa and maxima is converted into repeated breves since breve is the longest duration we can fit in a measure
+    // Longa and maxima are converted into repeated breves since breve is the longest duration we can fit in a measure
     if (noteDur < DURATION_breve) noteDur = DURATION_breve;
 
-    this->SplitDurationInterface(
-        classId, noteDur, interface->GetScoreTimeOnset() / SCORE_TIME_UNIT, duration / SCORE_TIME_UNIT);
+    this->SplitDurationInterface(classId, noteDur, interface->GetScoreTimeOnset() / SCORE_TIME_UNIT,
+        interface->GetScoreTimeDuration() / SCORE_TIME_UNIT);
 }
+
+#define PROPORT_AS_TUPLET false
 
 void ConvertToCmnFunctor::SplitDurationInterface(
     ClassId classId, data_DURATION noteDur, Fraction time, Fraction duration)
@@ -712,9 +713,19 @@ void ConvertToCmnFunctor::SplitDurationInterface(
         processed = measureEnd - time;
     }
 
+    // The aligne duration features in the proportion - we can apply it back and make tuplets
+    Fraction durationWithoutProport = processed;
+    if (PROPORT_AS_TUPLET) {
+        // Invert apply num and numbase
+        if (m_currentParams.proport->HasNum())
+            durationWithoutProport = durationWithoutProport * m_currentParams.proport->GetCumulatedNum();
+        if (m_currentParams.proport->HasNumbase())
+            durationWithoutProport = durationWithoutProport / m_currentParams.proport->GetCumulatedNumbase();
+    }
+
     // Split what we can fit within a measure into cmn duration (e.g., B => B. Sb. in tempus perfectum and prolatio
     // major) Fill a list of CMN duration with dots (and num / numbase, unused for now)
-    this->SplitDurationIntoCmn(noteDur, processed, m_currentParams.mensur, cmnDurations);
+    this->SplitDurationIntoCmn(noteDur, durationWithoutProport, m_currentParams.mensur, cmnDurations);
 
     // Add them to the layer using the ObjectFactory (create notes or rests)
     for (const CmnDuration &cmnDuration : cmnDurations) {
@@ -729,6 +740,12 @@ void ConvertToCmnFunctor::SplitDurationInterface(
         interface->SetDur(cmnDuration.m_duration);
         // Add a `@dots` only if not 0
         if (cmnDuration.m_dots != 0) interface->SetDots(cmnDuration.m_dots);
+        
+        if (PROPORT_AS_TUPLET) {
+            // Reapply num and numbase - should be made a tuplet
+            if (m_currentParams.proport->HasNum()) interface->SetNum(m_currentParams.proport->GetCumulatedNum());
+            if (m_currentParams.proport->HasNumbase()) interface->SetNumbase(m_currentParams.proport->GetCumulatedNumbase());
+        }
     }
 
     // If we have reach the end of the measure, go to the next one
@@ -750,14 +767,19 @@ void ConvertToCmnFunctor::SplitDurationIntoCmn(
     const int semiBrevisDots = (prolatioMajor) ? 1 : 0;
     const int brevisDots = (tempusPerfectum) ? 1 : 0;
 
-    const Fraction semiBrevis = Fraction(1, 1) * abs(mensur->GetProlatio()) / 2;
-    const Fraction brevis = Fraction(1, 1) * abs(mensur->GetTempus());
+    Fraction semiBrevis = Fraction(1, 1) * abs(mensur->GetProlatio()) / 2;
+    Fraction brevis = Fraction(1, 1) * abs(mensur->GetTempus());
 
     // First see if we are expecting a breve and if the duration is long enough
     if (elementDur == DURATION_breve) {
         while (duration >= brevis) {
             cmnDurations.push_back(CmnDuration(DURATION_breve, brevisDots));
             duration = duration - brevis;
+            // Check if we can use a dotted breve
+            if ((duration == brevis / 2) && (brevisDots == 0)) {
+                cmnDurations.back().m_dots = 1;
+                duration = 0;
+            }
         }
         // If we have not processed everything, go down to the level of semibrevis
         if (duration != 0) elementDur = DURATION_1;
@@ -767,13 +789,24 @@ void ConvertToCmnFunctor::SplitDurationIntoCmn(
         while (duration >= semiBrevis) {
             cmnDurations.push_back(CmnDuration(DURATION_1, semiBrevisDots));
             duration = duration - semiBrevis;
+            // Check if we can use a dotted whole note
+            if ((duration == semiBrevis / 2) && (semiBrevisDots == 0)) {
+                cmnDurations.back().m_dots = 1;
+                duration = 0;
+            }
         }
     }
     // Then process the rest until everything is processed
     while (duration != 0) {
         auto [durPart, remainder] = duration.ToDur();
+        Fraction durPartDuration = duration - remainder;
         cmnDurations.push_back(CmnDuration(durPart, 0));
         duration = remainder;
+        // Check if we can use a dotted value
+        if (duration == durPartDuration / 2) {
+            cmnDurations.back().m_dots = 1;
+            duration = 0;
+        }
     }
 }
 

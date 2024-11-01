@@ -165,6 +165,15 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayerElement(LayerElement *layerElement
     else if (layerElement->Is(METERSIG)) {
         this->m_meterParams.meterSig = vrv_cast<MeterSig *>(layerElement);
     }
+    else if (layerElement->Is(PROPORT)) {
+        // replace the current proport
+        const Proport *previous = (m_meterParams.proport) ? (m_meterParams.proport) : NULL;
+        m_meterParams.proport = vrv_cast<Proport *>(layerElement);
+        assert(m_meterParams.proport);
+        if (previous) {
+            m_meterParams.proport->Cumulate(previous);
+        }
+    }
 
     return FUNCTOR_CONTINUE;
 }
