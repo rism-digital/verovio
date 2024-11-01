@@ -217,6 +217,7 @@ public:
      * Functor interface
      */
     ///@{
+    FunctorCode VisitChord(Chord *chord) override;
     FunctorCode VisitLayer(Layer *layer) override;
     FunctorCode VisitLayerElement(LayerElement *object) override;
     FunctorCode VisitLigature(Ligature *ligature) override;

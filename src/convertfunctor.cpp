@@ -372,6 +372,59 @@ ConvertToCmnFunctor::ConvertToCmnFunctor(Doc *doc, System *targetSystem) : DocFu
     m_targetSystem = targetSystem;
 }
 
+FunctorCode ConvertToCmnFunctor::VisitChord(Chord *chord)
+{
+    // Mensural chords are aligned looking at the longest duration in the notes
+    Note *longestNote = NULL;
+    ListOfObjects notes = chord->FindAllDescendantsByType(NOTE);
+    for (Object *object : notes) {
+        Note *note = vrv_cast<Note *>(object);
+        if (!longestNote || (note->GetScoreTimeDuration() > longestNote->GetScoreTimeDuration())) {
+            longestNote = note;
+        }
+    }
+
+    // Use the longest note duration but create Chords
+    // That way the (longest) duration it move up from the note elements to the chord
+    // As it stands we ignore notes with shorter duration in the chords
+    // We also ignore coloration
+    this->ConvertDurationInterface(longestNote, CHORD);
+
+    // This should not happen, just check it once for all
+    if (m_durationElements.empty()) return FUNCTOR_SIBLINGS;
+
+    // Copy the `@pname` and `@oct` from the mensural note
+    for (Object *noteObject : notes) {
+        Object *tieStart = NULL;
+        for (Object *object : m_durationElements) {
+            Note *note = vrv_cast<Note *>(noteObject);
+            Note *cmnNote = new Note();
+            cmnNote->SetPname(note->GetPname());
+            cmnNote->SetOct(note->GetOct());
+            object->AddChild(cmnNote);
+
+            // Also create the ties for notes in the chord
+            if (tieStart) {
+                Object *measure = tieStart->GetFirstAncestor(MEASURE);
+                assert(measure);
+                Tie *tie = new Tie();
+                tie->SetStartid("#" + tieStart->GetID());
+                tie->SetEndid("#" + cmnNote->GetID());
+                measure->AddChild(tie);
+            }
+            tieStart = cmnNote;
+        }
+    }
+
+    // Move the verse
+    Object *verse = chord->FindDescendantByType(VERSE);
+    if (verse) {
+        verse->MoveItselfTo(m_durationElements.front());
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
 FunctorCode ConvertToCmnFunctor::VisitLayer(Layer *layer)
 {
     m_currentParams.mensur = layer->GetCurrentMensur();
@@ -643,6 +696,11 @@ void ConvertToCmnFunctor::ConvertDurationInterface(DurationInterface *interface,
 void ConvertToCmnFunctor::SplitDurationInterface(
     ClassId classId, data_DURATION noteDur, Fraction time, Fraction duration)
 {
+    if (m_currentLayer == m_layers.end()) {
+        LogDebug("Extraneous content not processed");
+        return;
+    }
+
     const Fraction measureEnd = (*m_currentMeasure).m_time + (*m_currentMeasure).m_duration;
     const Fraction noteEnd = time + duration;
 
@@ -669,7 +727,8 @@ void ConvertToCmnFunctor::SplitDurationInterface(
         assert(interface);
         (*m_currentLayer)->AddChild(layerElement);
         interface->SetDur(cmnDuration.m_duration);
-        interface->SetDots(cmnDuration.m_dots);
+        // Add a `@dots` only if not 0
+        if (cmnDuration.m_dots != 0) interface->SetDots(cmnDuration.m_dots);
     }
 
     // If we have reach the end of the measure, go to the next one
