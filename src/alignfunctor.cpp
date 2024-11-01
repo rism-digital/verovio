@@ -242,6 +242,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         }
     }
     else if (layerElement->Is(PROPORT)) {
+        if (layerElement->GetType() == "cmme_tempo_change") return FUNCTOR_SIBLINGS;
         // replace the current proport
         const Proport *previous = (m_currentParams.proport) ? (m_currentParams.proport) : NULL;
         m_currentParams.proport = vrv_cast<Proport *>(layerElement);

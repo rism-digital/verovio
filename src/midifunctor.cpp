@@ -166,6 +166,7 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayerElement(LayerElement *layerElement
         this->m_meterParams.meterSig = vrv_cast<MeterSig *>(layerElement);
     }
     else if (layerElement->Is(PROPORT)) {
+        if (layerElement->GetType() == "cmme_tempo_change") return FUNCTOR_SIBLINGS;
         // replace the current proport
         const Proport *previous = (m_meterParams.proport) ? (m_meterParams.proport) : NULL;
         m_meterParams.proport = vrv_cast<Proport *>(layerElement);
