@@ -488,7 +488,7 @@ FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
 {
     m_measures.clear();
 
-    measure->m_measureAligner.LogDebugTree();
+    // measure->m_measureAligner.LogDebugTree();
 
     const int nbLayers = measure->GetDescendantCount(LAYER);
 
@@ -577,8 +577,9 @@ FunctorCode ConvertToCmnFunctor::VisitNote(Note *note)
         if (!m_coloration) {
             m_coloration = new BracketSpan();
             m_coloration->SetFunc(bracketSpanLog_FUNC_coloration);
-            // m_colored->SetLform(LINEFORM_);
-            (*m_currentMeasure).m_measure->AddChild(m_coloration);
+            Object *measure = m_durationElements.front()->GetFirstAncestor(MEASURE);
+            assert(measure);
+            measure->AddChild(m_coloration);
             m_coloration->SetStartid("#" + m_durationElements.front()->GetID());
         }
         // Set the last as `@endid` - will be updated if next note is also colored
@@ -764,20 +765,29 @@ void ConvertToCmnFunctor::SplitDurationInterface(
 void ConvertToCmnFunctor::SplitDurationIntoCmn(
     data_DURATION elementDur, Fraction duration, const Mensur *mensur, std::list<CmnDuration> &cmnDurations)
 {
-    bool prolatioMajor = (abs(mensur->GetProlatio()) == 3);
-    bool tempusPerfectum = (abs(mensur->GetTempus()) == 3);
+    const bool prolatioMajor = (abs(mensur->GetProlatio()) == 3);
+    const bool tempusPerfectum = (abs(mensur->GetTempus()) == 3);
     const int semiBrevisDots = (prolatioMajor) ? 1 : 0;
     const int brevisDots = (tempusPerfectum) ? 1 : 0;
 
-    Fraction semiBrevis = Fraction(1, 1) * abs(mensur->GetProlatio()) / 2;
-    Fraction brevis = Fraction(1, 1) * abs(mensur->GetTempus());
+    const Fraction semiBrevis = Fraction(1, 1) * abs(mensur->GetProlatio()) / 2;
+    const Fraction brevis = Fraction(1, 1) * abs(mensur->GetTempus());
 
     // First see if we are expecting a breve and if the duration is long enough
     if (elementDur == DURATION_breve) {
+        // First check if this in an imperfecta breve, which can be converted as a non dotted breve
+        if (tempusPerfectum && (duration == brevis * 2 / 3)) {
+            cmnDurations.push_back(CmnDuration(DURATION_breve, 0));
+            duration = 0;
+        }
         while (duration >= brevis) {
             cmnDurations.push_back(CmnDuration(DURATION_breve, brevisDots));
             duration = duration - brevis;
             // Check if we can use a dotted breve
+            if ((duration == brevis / 2) && (brevisDots == 0)) {
+                cmnDurations.back().m_dots = 1;
+                duration = 0;
+            }
             if ((duration == brevis / 2) && (brevisDots == 0)) {
                 cmnDurations.back().m_dots = 1;
                 duration = 0;
@@ -788,6 +798,11 @@ void ConvertToCmnFunctor::SplitDurationIntoCmn(
     }
     // See now if the duration is long enough for a semibrevis
     if (elementDur == DURATION_1) {
+        // First check if this in an imperfecta semibreve, which can be converted as a non dotted semibreve
+        if (prolatioMajor && (duration == semiBrevis * 2 / 3)) {
+            cmnDurations.push_back(CmnDuration(DURATION_1, 0));
+            duration = 0;
+        }
         while (duration >= semiBrevis) {
             cmnDurations.push_back(CmnDuration(DURATION_1, semiBrevisDots));
             duration = duration - semiBrevis;
