@@ -305,6 +305,8 @@ private:
     BracketSpan *m_ligature;
     // Bracket span for coloration, which also acts as a flag
     BracketSpan *m_coloration;
+    // Proportion tuplet
+    Tuplet *m_proportTuplet;
 };
 
 //----------------------------------------------------------------------------

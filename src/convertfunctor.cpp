@@ -29,6 +29,7 @@
 #include "syllable.h"
 #include "system.h"
 #include "tie.h"
+#include "tuplet.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -433,6 +434,7 @@ FunctorCode ConvertToCmnFunctor::VisitLayer(Layer *layer)
 
     m_ligature = NULL;
     m_coloration = NULL;
+    m_proportTuplet = NULL;
 
     m_currentLayer = m_layers.begin();
     m_currentMeasure = m_measures.begin();
@@ -460,6 +462,8 @@ FunctorCode ConvertToCmnFunctor::VisitLayerElement(LayerElement *layerElement)
         if (previous) {
             m_currentParams.proport->Cumulate(previous);
         }
+        // Reset the tuplet since we expect the num / numbase to be different
+        m_proportTuplet = NULL;
     }
 
     return FUNCTOR_SIBLINGS;
@@ -719,12 +723,20 @@ void ConvertToCmnFunctor::SplitDurationInterface(
 
     // The alignement duration features in the proportion - we can revert it back and make tuplets
     Fraction durationWithoutProport = processed;
-    if (PROPORT_AS_TUPLET) {
-        // Invert apply num and numbase
-        if (m_currentParams.proport->HasNum())
-            durationWithoutProport = durationWithoutProport * m_currentParams.proport->GetCumulatedNum();
-        if (m_currentParams.proport->HasNumbase())
-            durationWithoutProport = durationWithoutProport / m_currentParams.proport->GetCumulatedNumbase();
+    // Invert apply num and numbase
+    if (m_currentParams.proport->HasNum())
+        durationWithoutProport = durationWithoutProport * m_currentParams.proport->GetCumulatedNum();
+    if (m_currentParams.proport->HasNumbase())
+        durationWithoutProport = durationWithoutProport / m_currentParams.proport->GetCumulatedNumbase();
+    // We have a proportion being not 1/1
+    if (durationWithoutProport != processed) {
+        // Create a new tuplet but only if we have not already created one for the previous note
+        if (!m_proportTuplet) {
+            m_proportTuplet = new Tuplet();
+            m_proportTuplet->SetNum(m_currentParams.proport->GetCumulatedNum());
+            m_proportTuplet->SetNumbase(m_currentParams.proport->GetCumulatedNumbase());
+            (*m_currentLayer)->AddChild(m_proportTuplet);
+        }
     }
 
     // Split what we can fit within a measure into cmn duration (e.g., B => B. Sb. in tempus perfectum and prolatio
@@ -740,23 +752,23 @@ void ConvertToCmnFunctor::SplitDurationInterface(
         m_durationElements.push_back(layerElement);
         DurationInterface *interface = layerElement->GetDurationInterface();
         assert(interface);
-        (*m_currentLayer)->AddChild(layerElement);
+        if (m_proportTuplet) {
+            m_proportTuplet->AddChild(layerElement);
+        }
+        else {
+            (*m_currentLayer)->AddChild(layerElement);
+        }
         interface->SetDur(cmnDuration.m_duration);
         // Add a `@dots` only if not 0
         if (cmnDuration.m_dots != 0) interface->SetDots(cmnDuration.m_dots);
-
-        if (PROPORT_AS_TUPLET) {
-            // Reapply num and numbase - should be made a tuplet
-            if (m_currentParams.proport->HasNum()) interface->SetNum(m_currentParams.proport->GetCumulatedNum());
-            if (m_currentParams.proport->HasNumbase())
-                interface->SetNumbase(m_currentParams.proport->GetCumulatedNumbase());
-        }
     }
 
     // If we have reach the end of the measure, go to the next one
     if (time + processed == measureEnd) {
         ++m_currentMeasure;
         ++m_currentLayer;
+        // End of the measure, close the tuplet
+        m_proportTuplet = NULL;
     }
     // Also check if we have more to process for that note or rest - if yes, call it recursively
     if (duration - processed != 0) {
