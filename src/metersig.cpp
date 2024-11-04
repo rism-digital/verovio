@@ -70,7 +70,7 @@ int MeterSig::GetTotalCount() const
     // If @count is empty, look at the sym to return a resonable value
     if (counts.empty()) {
         if (this->HasSym()) {
-            return (this->GetSym() == METERSIGN_common) ? 4 : 2;
+            return (this->GetSym() == METERSIGN_cut) ? 2 : 4;
         }
         else {
             return 0;
@@ -106,6 +106,16 @@ int MeterSig::GetTotalCount() const
     }
 
     return counts.front();
+}
+
+int MeterSig::GetSymImplicitUnit() const
+{
+    if (this->HasSym()) {
+        return (this->GetSym() == METERSIGN_cut) ? 2 : 4;
+    }
+    else {
+        return 0;
+    }
 }
 
 data_DURATION MeterSig::GetUnitAsDur() const

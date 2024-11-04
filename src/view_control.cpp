@@ -305,13 +305,13 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     bool isFirst = true;
     for (Staff *staff : staffList) {
 
-        // TimeSpanning element are not necessary floating elements (e.g., syl) - we have a bounding box only for them
+        // TimeSpanning elements are not necessary floating elements (e.g., syl) - we have a bounding box only for them
         if (element->IsControlElement()) {
             if (element->Is({ PHRASE, SLUR })) {
                 if (this->GetSlurHandling() == SlurHandling::Ignore) break;
                 Slur *slur = vrv_cast<Slur *>(element);
                 assert(slur);
-                staff = slur->CalculateExtremalStaff(staff, x1, x2);
+                staff = slur->CalculatePrincipalStaff(staff, x1, x2);
             }
 
             // Create the floating positioner

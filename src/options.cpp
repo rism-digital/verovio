@@ -914,7 +914,8 @@ Options::Options()
     m_baseOptions.AddOption(&m_allPages);
 
     m_inputFrom.SetInfo("Input from",
-        "Select input format from: \"abc\", \"darms\", \"esac\", \"humdrum\", \"mei\", \"pae\", \"volpiano\", \"xml\" "
+        "Select input format from: \"abc\", \"cmme.xml\", \"darms\", \"esac\", \"humdrum\", \"mei\", \"pae\", "
+        "\"volpiano\", \"xml\" "
         "(musicxml), \"musicxml-hum\" (musicxml via humdrum)");
     m_inputFrom.Init("mei");
     m_inputFrom.SetKey("inputFrom");
@@ -1353,7 +1354,7 @@ Options::Options()
 
     m_justificationMaxVertical.SetInfo("Maximum ratio of justifiable height for page",
         "Maximum ratio of justifiable height to page height that can be used for the vertical justification");
-    m_justificationMaxVertical.Init(0.3, 0.0, 1.0);
+    m_justificationMaxVertical.Init(0.2, 0.0, 1.0);
     this->Register(&m_justificationMaxVertical, "justificationMaxVertical", &m_generalLayout);
 
     m_ledgerLineThickness.SetInfo("Ledger line thickness", "The thickness of the ledger lines");

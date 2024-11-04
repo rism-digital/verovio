@@ -23,6 +23,7 @@
 #include "filereader.h"
 #include "findfunctor.h"
 #include "ioabc.h"
+#include "iocmme.h"
 #include "iodarms.h"
 #include "iohumdrum.h"
 #include "iomei.h"
@@ -205,6 +206,9 @@ bool Toolkit::SetInputFrom(std::string const &inputFrom)
     else if (inputFrom == "volpiano") {
         m_inputFrom = VOLPIANO;
     }
+    else if (inputFrom == "cmme.xml") {
+        m_inputFrom = CMME;
+    }
     else if ((inputFrom == "humdrum") || (inputFrom == "hum")) {
         m_inputFrom = HUMDRUM;
     }
@@ -295,6 +299,9 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         if (std::regex_search(initial, std::regex("<(!DOCTYPE )?(score-partwise|opus|score-timewise)[\\s\\n>]"))) {
             return musicxmlDefault;
         }
+        if (std::regex_search(initial, std::regex("<(Piece xmlns=\"http://www.cmme.org\")[\\s\\n>]"))) {
+            return CMME;
+        }
         LogWarning("Warning: Trying to load unknown XML data which cannot be identified.");
         return UNKNOWN;
     }
@@ -367,7 +374,7 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
     /// Loading a UTF-16 file with basic conversion ot UTF-8
     /// This is called after checking if the file has a UTF-16 BOM
 
-    LogWarning("The file seems to be UTF-16 - trying to convert to UTF-8");
+    LogInfo("The file seems to be UTF-16 - trying to convert to UTF-8");
 
     std::ifstream fin(filename.c_str(), std::ios::in | std::ios::binary);
     if (!fin.is_open()) {
@@ -385,7 +392,7 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
 
     // order of the bytes has to be flipped
     if (u16data.at(0) == u'\uFFFE') {
-        LogWarning("The file seems to have been loaded as little endian - trying to convert to big endian");
+        LogInfo("The file seems to have been loaded as little endian - trying to convert to big endian");
         // convert to big endian (swap bytes)
         std::transform(std::begin(u16data), std::end(u16data), std::begin(u16data), [](char16_t c) {
             auto p = reinterpret_cast<char *>(&c);
@@ -562,6 +569,9 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     }
     else if (inputFormat == VOLPIANO) {
         input = new VolpianoInput(&m_doc);
+    }
+    else if (inputFormat == CMME) {
+        input = new CmmeInput(&m_doc);
     }
 #ifndef NO_HUMDRUM_SUPPORT
     else if (inputFormat == HUMDRUM) {
@@ -1799,6 +1809,7 @@ std::string Toolkit::RenderToTimemap(const std::string &jsonOptions)
 {
     bool includeMeasures = false;
     bool includeRests = false;
+    bool useFractions = false;
 
     jsonxx::Object json;
 
@@ -1811,13 +1822,14 @@ std::string Toolkit::RenderToTimemap(const std::string &jsonOptions)
             if (json.has<jsonxx::Boolean>("includeMeasures"))
                 includeMeasures = json.get<jsonxx::Boolean>("includeMeasures");
             if (json.has<jsonxx::Boolean>("includeRests")) includeRests = json.get<jsonxx::Boolean>("includeRests");
+            if (json.has<jsonxx::Boolean>("useFractions")) useFractions = json.get<jsonxx::Boolean>("useFractions");
         }
     }
 
     this->ResetLogBuffer();
 
     std::string output;
-    m_doc.ExportTimemap(output, includeRests, includeMeasures);
+    m_doc.ExportTimemap(output, includeRests, includeMeasures, useFractions);
     return output;
 }
 

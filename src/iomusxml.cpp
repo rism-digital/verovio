@@ -422,7 +422,7 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element, int dur
     assert(element);
 
     int currTime = 0;
-    if (m_layerEndTimes.count(layer) > 0) currTime = m_layerEndTimes.at(layer);
+    if (m_layerEndTimes.contains(layer)) currTime = m_layerEndTimes.at(layer);
     if ((layer->GetChildren().size() == 0 && m_durTotal > 0) || currTime < m_durTotal) {
         FillSpace(layer, m_durTotal - currTime);
     }

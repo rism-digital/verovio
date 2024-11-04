@@ -134,6 +134,8 @@ FunctorCode CalcArticFunctor::VisitChord(Chord *chord)
         }
     }
 
+    this->IncludeBeamStaff(chord);
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -164,6 +166,8 @@ FunctorCode CalcArticFunctor::VisitNote(Note *note)
         m_crossStaffBelow = true;
     }
 
+    this->IncludeBeamStaff(note);
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -192,6 +196,18 @@ int CalcArticFunctor::CalculateHorizontalShift(const Artic *artic, bool virtualS
     }
 
     return shift;
+}
+
+void CalcArticFunctor::IncludeBeamStaff(LayerElement *layerElement)
+{
+    if (Beam *beam = layerElement->GetAncestorBeam(); beam) {
+        if (m_crossStaffAbove && (beam->m_drawingPlace == BEAMPLACE_above)) {
+            m_staffAbove = beam->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+        }
+        else if (m_crossStaffBelow && (beam->m_drawingPlace == BEAMPLACE_below)) {
+            m_staffBelow = beam->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+        }
+    }
 }
 
 } // namespace vrv

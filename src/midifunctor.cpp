@@ -44,8 +44,6 @@ InitOnsetOffsetFunctor::InitOnsetOffsetFunctor() : Functor()
 {
     m_currentScoreTime = 0;
     m_currentRealTimeSeconds = 0.0;
-    m_meterParams.mensur = NULL;
-    m_meterParams.meterSig = NULL;
     m_notationType = NOTATIONTYPE_cmn;
     m_currentTempo = MIDI_TEMPO;
 }
@@ -776,6 +774,10 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
         if (meterSig && meterSig->HasCount() && meterSig->HasUnit()) {
             m_midiFile->addTimeSignature(m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetUnit());
         }
+        else if (meterSig && meterSig->HasUnit()) {
+            m_midiFile->addTimeSignature(
+                m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetSymImplicitUnit());
+        }
     }
 
     return FUNCTOR_CONTINUE;
@@ -951,11 +953,11 @@ void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)
 
         /*********** start values ***********/
 
-        TimemapEntry &startEntry = m_timemap->GetEntry(realTimeStart);
+        TimemapEntry &startEntry = m_timemap->GetEntry(scoreTimeStart);
 
         // Should check if value for realTimeStart already exists and if so, then
         // ensure that it is equal to scoreTimeStart:
-        startEntry.qstamp = scoreTimeStart.ToDouble();
+        startEntry.tstamp = realTimeStart;
 
         // Store the element ID in list to turn on at given time - note or rest
         if (!isRest) startEntry.notesOn.push_back(object->GetID());
@@ -966,11 +968,11 @@ void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)
 
         /*********** end values ***********/
 
-        TimemapEntry &endEntry = m_timemap->GetEntry(realTimeEnd);
+        TimemapEntry &endEntry = m_timemap->GetEntry(scoreTimeEnd);
 
         // Should check if value for realTimeEnd already exists and if so, then
         // ensure that it is equal to scoreTimeEnd:
-        endEntry.qstamp = scoreTimeEnd.ToDouble();
+        endEntry.tstamp = realTimeEnd;
 
         // Store the element ID in list to turn off at given time - notes or rest
         if (!isRest) endEntry.notesOff.push_back(object->GetID());
@@ -985,11 +987,11 @@ void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)
         Fraction scoreTimeStart = m_scoreTimeOffset;
         double realTimeStart = round(m_realTimeOffsetMilliseconds);
 
-        TimemapEntry &startEntry = m_timemap->GetEntry(realTimeStart);
+        TimemapEntry &startEntry = m_timemap->GetEntry(scoreTimeStart);
 
         // Should check if value for realTimeStart already exists and if so, then
         // ensure that it is equal to scoreTimeStart:
-        startEntry.qstamp = scoreTimeStart.ToDouble();
+        startEntry.tstamp = realTimeStart;
 
         // Add the measureOn
         startEntry.measureOn = measure->GetID();
