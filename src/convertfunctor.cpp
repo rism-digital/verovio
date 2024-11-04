@@ -664,6 +664,8 @@ bool ConvertToCmnFunctor::IsGlobalMensur(const Alignment *alignment, const int n
     if (alignment->GetChildCount() != nbLayers) return false;
 
     for (const Object *child : alignment->GetChildren()) {
+        // Just pick the one of the first layer - quite arbitrary and we should check if they are all the same
+        // and decide what to do if they are not
         const Mensur *mensurRef = vrv_cast<const Mensur *>(child->FindDescendantByType(MENSUR));
         if (mensurRef) {
             mensur = *mensurRef;
@@ -710,12 +712,12 @@ void ConvertToCmnFunctor::SplitDurationInterface(
     std::list<CmnDuration> cmnDurations;
 
     Fraction processed = duration;
-    // If we go beyon the end of the measure, first processed only what fits
+    // If we go beyond the end of the measure, first process only what fits
     if (noteEnd > measureEnd) {
         processed = measureEnd - time;
     }
 
-    // The aligne duration features in the proportion - we can apply it back and make tuplets
+    // The alignement duration features in the proportion - we can revert it back and make tuplets
     Fraction durationWithoutProport = processed;
     if (PROPORT_AS_TUPLET) {
         // Invert apply num and numbase
