@@ -397,11 +397,14 @@ FunctorCode ConvertToCmnFunctor::VisitChord(Chord *chord)
     // Copy the `@pname` and `@oct` from the mensural note
     for (Object *noteObject : notes) {
         Object *tieStart = NULL;
+        const Accid *accid = vrv_cast<const Accid *>(noteObject->FindDescendantByType(ACCID));
+        bool isFirstNote = true;
         for (Object *object : m_durationElements) {
             Note *note = vrv_cast<Note *>(noteObject);
             Note *cmnNote = new Note();
             cmnNote->SetPname(note->GetPname());
             cmnNote->SetOct(note->GetOct());
+            this->ConvertAccid(cmnNote, accid, isFirstNote);
             object->AddChild(cmnNote);
 
             // Also create the ties for notes in the chord
@@ -560,12 +563,16 @@ FunctorCode ConvertToCmnFunctor::VisitNote(Note *note)
     // This should not happen, just check it once for all
     if (m_durationElements.empty()) return FUNCTOR_SIBLINGS;
 
+    const Accid *accid = vrv_cast<const Accid *>(note->FindDescendantByType(ACCID));
+    bool isFirstNote = true;
+
     // Copy the `@pname` and `@oct` from the mensural note
     for (Object *object : m_durationElements) {
         Note *cmnNote = vrv_cast<Note *>(object);
         assert(cmnNote);
         cmnNote->SetPname(note->GetPname());
         cmnNote->SetOct(note->GetOct());
+        this->ConvertAccid(cmnNote, accid, isFirstNote);
     }
 
     // Check if we are in a ligature and set `@startid` and `@endid` as needed
@@ -873,6 +880,21 @@ void ConvertToCmnFunctor::SplitDurationIntoCmn(
             duration = 0;
         }
     }
+}
+
+void ConvertToCmnFunctor::ConvertAccid(Note *cmnNote, const Accid *accid, bool &isFirstNote)
+{
+    if (!accid) return;
+
+    Accid *cmnAccid = new Accid();
+    if (isFirstNote) {
+        accid->CopyAttributesTo(cmnAccid);
+        isFirstNote = false;
+    }
+    else {
+        cmnAccid->SetAccidGes(Att::AccidentalWrittenToGestural(accid->GetAccid()));
+    }
+    cmnNote->AddChild(cmnAccid);
 }
 
 //----------------------------------------------------------------------------

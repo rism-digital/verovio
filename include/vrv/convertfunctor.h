@@ -241,6 +241,8 @@ private:
     void ConvertDurationInterface(DurationInterface *interface, ClassId classId);
     /** Split DurationInterface objects into CMN ones - including over several measures with a recursive call */
     void SplitDurationInterface(ClassId classId, data_DURATION elementDur, Fraction time, Fraction duration);
+    /** Convert accid (mensural) into cmn accids - when not the first note, added as `@accid.ges` */
+    void ConvertAccid(Note *cmnNote, const Accid *accid, bool &isFirstNote);
 
     /** Internal class for holding information about the mensur considered for meter signature (changes) */
     class MensurInfo {
