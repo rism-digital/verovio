@@ -728,13 +728,41 @@ void ConvertToCmnFunctor::SplitDurationInterface(
         durationWithoutProport = durationWithoutProport * m_currentParams.proport->GetCumulatedNum();
     if (m_currentParams.proport->HasNumbase())
         durationWithoutProport = durationWithoutProport / m_currentParams.proport->GetCumulatedNumbase();
+    // A flag indicating if the tuplet is a temporary one not corresponding to the proportion when notes are split
+    // across measures
+    bool nonProportTuplet = false;
     // We have a proportion being not 1/1
     if (durationWithoutProport != processed) {
+        // If we have a proportion, check if the value can be represented by value up to 16th (arbitrary)
+        // This is not always the case when notes are split across measures
+        if ((durationWithoutProport % Fraction(DURATION_16)) != 0) {
+            // If not, do not use the proportion tuplet an revert the duration back
+            m_proportTuplet = NULL;
+            durationWithoutProport = processed;
+            // If the remaining duration cannot be represented as well, last resort option with a specific tuplet
+            if ((durationWithoutProport % Fraction(DURATION_16)) != 0) {
+                m_proportTuplet = new Tuplet();
+                // Use a note with half of the noteDur expected - create a tuplet with according ratio
+                Fraction tupletRatio = durationWithoutProport / Fraction(noteDur) * 2;
+                LogWarning("The tuplet corresponding to proportion is not appropriate and must be changed to %s",
+                    tupletRatio.ToString().c_str());
+                m_proportTuplet->SetNum(tupletRatio.GetDenominator());
+                m_proportTuplet->SetNumbase(tupletRatio.GetNumerator());
+                m_proportTuplet->SetNumFormat(tupletVis_NUMFORMAT_ratio);
+                m_proportTuplet->SetBracketVisible(BOOLEAN_false);
+                durationWithoutProport = Fraction(noteDur) / 2;
+                (*m_currentLayer)->AddChild(m_proportTuplet);
+                // Mark the tuplet as temporary
+                nonProportTuplet = true;
+            }
+        }
         // Create a new tuplet but only if we have not already created one for the previous note
-        if (!m_proportTuplet) {
+        else if (!m_proportTuplet) {
             m_proportTuplet = new Tuplet();
             m_proportTuplet->SetNum(m_currentParams.proport->GetCumulatedNum());
             m_proportTuplet->SetNumbase(m_currentParams.proport->GetCumulatedNumbase());
+            m_proportTuplet->SetNumFormat(tupletVis_NUMFORMAT_ratio);
+            m_proportTuplet->SetBracketVisible(BOOLEAN_false);
             (*m_currentLayer)->AddChild(m_proportTuplet);
         }
     }
@@ -753,6 +781,8 @@ void ConvertToCmnFunctor::SplitDurationInterface(
         DurationInterface *interface = layerElement->GetDurationInterface();
         assert(interface);
         if (m_proportTuplet) {
+            // We already have note in the tuplet so we should show the bracket
+            if (m_proportTuplet->GetChildCount() > 0) m_proportTuplet->SetBracketVisible(BOOLEAN_true);
             m_proportTuplet->AddChild(layerElement);
         }
         else {
@@ -762,6 +792,10 @@ void ConvertToCmnFunctor::SplitDurationInterface(
         // Add a `@dots` only if not 0
         if (cmnDuration.m_dots != 0) interface->SetDots(cmnDuration.m_dots);
     }
+
+    // The tuplet is specific to the partial duration, reset it (e.g., at the beginning of a measure with a note split
+    // from the previous measure)
+    if (nonProportTuplet) m_proportTuplet = NULL;
 
     // If we have reach the end of the measure, go to the next one
     if (time + processed == measureEnd) {

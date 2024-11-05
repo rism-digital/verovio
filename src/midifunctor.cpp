@@ -76,6 +76,7 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayer(Layer *layer)
 
     m_meterParams.mensur = layer->GetCurrentMensur();
     m_meterParams.meterSig = layer->GetCurrentMeterSig();
+    m_meterParams.proport = layer->GetCurrentProport();
 
     return FUNCTOR_CONTINUE;
 }
