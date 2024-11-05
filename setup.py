@@ -83,10 +83,10 @@ def get_version() -> str:
 # extra compile arguments
 EXTRA_COMPILE_ARGS = ['-DPYTHON_BINDING']
 if platform.system() != 'Windows':
-    EXTRA_COMPILE_ARGS += ['-std=c++20',
+    EXTRA_COMPILE_ARGS += ['-std=c++23',
                            '-Wno-write-strings', '-Wno-overloaded-virtual', '-g0']
 else:
-    EXTRA_COMPILE_ARGS += ['/std:c++20',
+    EXTRA_COMPILE_ARGS += ['/std:c++23',
                            '-DNO_PAE_SUPPORT']
 
 verovio_module = Extension('verovio._verovio',
