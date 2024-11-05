@@ -152,8 +152,8 @@ public:
      * Calculate the staff where the slur's floating curve positioner lives
      */
     ///@{
-    Staff *CalculateExtremalStaff(const Staff *staff, int xMin, int xMax);
-    const Staff *CalculateExtremalStaff(const Staff *staff, int xMin, int xMax) const;
+    Staff *CalculatePrincipalStaff(const Staff *staff, int xMin, int xMax);
+    const Staff *CalculatePrincipalStaff(const Staff *staff, int xMin, int xMax) const;
     ///@}
 
     /**
