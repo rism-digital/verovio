@@ -368,9 +368,10 @@ FunctorCode ConvertToUnCastOffMensuralFunctor::VisitSection(Section *section)
 // ConvertToCmnFunctor
 //----------------------------------------------------------------------------
 
-ConvertToCmnFunctor::ConvertToCmnFunctor(Doc *doc, System *targetSystem) : DocFunctor(doc)
+ConvertToCmnFunctor::ConvertToCmnFunctor(Doc *doc, System *targetSystem, Score *score) : DocFunctor(doc)
 {
     m_targetSystem = targetSystem;
+    m_score = score;
 }
 
 FunctorCode ConvertToCmnFunctor::VisitChord(Chord *chord)
@@ -550,6 +551,22 @@ FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
             std::advance(mensurIter, 1);
             next = (mensurIter == mensurs.end()) ? totalTime : (*mensurIter).m_time;
         }
+    }
+
+    // This is the first measure in the system - we need to update the scoreDef
+    if (m_score) {
+        for (Object *child : m_score->GetScoreDef()->GetList()) {
+            StaffDef *staffDef = vrv_cast<StaffDef *>(child);
+            assert(staffDef);
+            staffDef->SetNotationtype(NOTATIONTYPE_NONE);
+            Object *mensur = staffDef->GetFirst(MENSUR);
+            if (mensur) staffDef->DeleteChild(mensur);
+            MeterSig *meterSig = new MeterSig();
+            meterSig->SetUnit(2);
+            meterSig->SetCount({ { m_measures.front().m_duration.GetNumerator() }, MeterCountSign::None });
+            staffDef->AddChild(meterSig);
+        }
+        m_score = NULL;
     }
 
     // Now we are ready to process layers and to move content to m_measures

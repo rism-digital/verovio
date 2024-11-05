@@ -204,7 +204,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    ConvertToCmnFunctor(Doc *doc, System *targetSystem);
+    ConvertToCmnFunctor(Doc *doc, System *targetSystem, Score *score);
     virtual ~ConvertToCmnFunctor() = default;
     ///@}
 
@@ -289,6 +289,8 @@ private:
 public:
     //
 private:
+    /** The score with the main scoreDef */
+    Score *m_score;
     /** The list of segments (i.e., measures) we are going to create */
     std::vector<MeasureInfo> m_measures;
     /** The current segment, reset at for every staff/layer */
