@@ -11,6 +11,7 @@
 
 #include <cassert>
 #include <math.h>
+#include <ranges>
 
 //----------------------------------------------------------------------------
 
@@ -1361,7 +1362,8 @@ void Doc::ConvertToCmnDoc()
     contentPage->LayOutHorizontally();
 
     ListOfObjects systems = contentPage->FindAllDescendantsByType(SYSTEM, false, 1);
-    for (const auto item : systems) {
+    ListOfObjects scores = contentPage->FindAllDescendantsByType(SCORE, false, 1);
+    for (const auto [item, score] : std::ranges::zip_view(systems, scores)) {
         System *system = vrv_cast<System *>(item);
         assert(system);
         System *convertedSystem = new System();
