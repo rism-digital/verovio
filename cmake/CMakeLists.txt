@@ -48,7 +48,7 @@ if(MSVC)
     add_definitions(/wd4244)          # suppress warning of possible loss of precision
     add_definitions(-DNO_PAE_SUPPORT) # regex is working differently under Windows so PAE is not supported (yet)
     add_definitions(-DUSE_PAE_OLD_PARSER)
-    add_definitions(/std:c++23)
+    add_definitions(/std:c++latest)
     include_directories(../include/win32)
 else()
     if(CMAKE_BUILD_TYPE MATCHES Debug)
