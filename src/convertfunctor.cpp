@@ -563,7 +563,8 @@ FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
             if (mensur) staffDef->DeleteChild(mensur);
             MeterSig *meterSig = new MeterSig();
             meterSig->SetUnit(2);
-            meterSig->SetCount({ { m_measures.front().m_duration.GetNumerator() }, MeterCountSign::None });
+            Fraction count = m_measures.front().m_duration / Fraction(DURATION_2);
+            meterSig->SetCount({ { count.GetNumerator() }, MeterCountSign::None });
             staffDef->AddChild(meterSig);
         }
         m_score = NULL;
@@ -708,7 +709,7 @@ Fraction ConvertToCmnFunctor::CalcMeasureDuration(const Mensur &mensur)
 {
     Fraction duration(DURATION_2);
     duration = duration * abs(mensur.GetProlatio());
-    duration = duration * abs(mensur.GetTempus());
+    if (abs(mensur.GetProlatio()) == 2) duration = duration * abs(mensur.GetTempus());
     return duration;
 }
 
@@ -723,8 +724,6 @@ void ConvertToCmnFunctor::ConvertDurationInterface(DurationInterface *interface,
     this->SplitDurationInterface(classId, noteDur, interface->GetScoreTimeOnset() / SCORE_TIME_UNIT,
         interface->GetScoreTimeDuration() / SCORE_TIME_UNIT);
 }
-
-#define PROPORT_AS_TUPLET true
 
 void ConvertToCmnFunctor::SplitDurationInterface(
     ClassId classId, data_DURATION noteDur, Fraction time, Fraction duration)
