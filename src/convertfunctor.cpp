@@ -450,9 +450,10 @@ FunctorCode ConvertToCmnFunctor::VisitLayerElement(LayerElement *layerElement)
 {
     if (layerElement->IsSystemElement()) return FUNCTOR_CONTINUE;
 
-    LogDebug(layerElement->GetClassName().c_str());
-
-    if (layerElement->Is(MENSUR)) {
+    if (layerElement->Is(CLEF)) {
+        if (!m_layerClef) m_layerClef = vrv_cast<Clef *>(layerElement);
+    }
+    else if (layerElement->Is(MENSUR)) {
         // replace the current mensur
         m_currentParams.mensur = vrv_cast<Mensur *>(layerElement);
         assert(m_currentParams.mensur);
@@ -468,6 +469,9 @@ FunctorCode ConvertToCmnFunctor::VisitLayerElement(LayerElement *layerElement)
         }
         // Reset the tuplet since we expect the num / numbase to be different
         m_proportTuplet = NULL;
+    }
+    else {
+        LogDebug(layerElement->GetClassName().c_str());
     }
 
     return FUNCTOR_SIBLINGS;
@@ -553,24 +557,44 @@ FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
         }
     }
 
+    // Now we are ready to process layers and to move content to m_measures
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToCmnFunctor::VisitMeasureEnd(Measure *measure)
+{
     // This is the first measure in the system - we need to update the scoreDef
     if (m_score) {
         for (Object *child : m_score->GetScoreDef()->GetList()) {
             StaffDef *staffDef = vrv_cast<StaffDef *>(child);
             assert(staffDef);
+            // Remove the notation type (CMN is normally the default)
             staffDef->SetNotationtype(NOTATIONTYPE_NONE);
+            // Remove the mensur
             Object *mensur = staffDef->GetFirst(MENSUR);
             if (mensur) staffDef->DeleteChild(mensur);
+            // Add the meterSig
             MeterSig *meterSig = new MeterSig();
             meterSig->SetUnit(2);
             Fraction count = m_measures.front().m_duration / Fraction(DURATION_2);
             meterSig->SetCount({ { count.GetNumerator() }, MeterCountSign::None });
             staffDef->AddChild(meterSig);
+            // Add or replace the clef
+            Object *clef = staffDef->GetFirst(CLEF);
+            // We must have m_clefs filled with clefs converted when processing layers
+            // However, if we have a clef in the staffDef, convert and use that one
+            if (clef) {
+                ConvertClef(m_clefs.back(), vrv_cast<Clef *>(clef));
+                staffDef->DeleteChild(clef);
+            }
+            staffDef->AddChild(m_clefs.back());
+            // Pop it from the list
+            m_clefs.pop_back();
         }
+        // Adjust the scoreDef only for the first measure, set it to NULL;
         m_score = NULL;
     }
 
-    // Now we are ready to process layers and to move content to m_measures
     return FUNCTOR_CONTINUE;
 }
 
@@ -657,6 +681,7 @@ FunctorCode ConvertToCmnFunctor::VisitScoreDef(ScoreDef *scoreDef)
 
 FunctorCode ConvertToCmnFunctor::VisitStaff(Staff *staff)
 {
+    m_layerClef = NULL;
     m_currentMeasure = m_measures.begin();
 
     m_layers.clear();
@@ -673,6 +698,23 @@ FunctorCode ConvertToCmnFunctor::VisitStaff(Staff *staff)
         cmnStaff->AddChild(m_layers.at(i));
         m_measures.at(i).m_measure->AddChildBack(cmnStaff);
     }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToCmnFunctor::VisitStaffEnd(Staff *staff)
+{
+    // Add mRest to empty layers
+    for (auto *layer : m_layers) {
+        if (layer->GetChildCount() == 0) {
+            layer->AddChild(new MRest());
+        }
+    }
+
+    Clef *clef = new Clef();
+    ConvertClef(clef, m_layerClef);
+    // Add to the list of clef (one per staff)
+    m_clefs.push_front(clef);
 
     return FUNCTOR_CONTINUE;
 }
@@ -911,6 +953,42 @@ void ConvertToCmnFunctor::ConvertAccid(Note *cmnNote, const Accid *accid, bool &
         cmnAccid->SetAccidGes(Att::AccidentalWrittenToGestural(accid->GetAccid()));
     }
     cmnNote->AddChild(cmnAccid);
+}
+
+void ConvertToCmnFunctor::ConvertClef(Clef *cmnClef, const Clef *clef)
+{
+    assert(cmnClef);
+
+    if (!clef) {
+        // Default to C3 clef since this is the most neutral one ambitus-wise
+        cmnClef->SetLine(3);
+        cmnClef->SetShape(CLEFSHAPE_C);
+    }
+    else if (clef->GetShape() == CLEFSHAPE_F) {
+        cmnClef->SetShape(CLEFSHAPE_F);
+        cmnClef->SetLine(4);
+    }
+    else if (clef->GetShape() == CLEFSHAPE_G) {
+        cmnClef->SetShape(CLEFSHAPE_G);
+        cmnClef->SetLine(2);
+    }
+    // Assuming to be C
+    else {
+        if (clef->GetLine() > 4) {
+            cmnClef->SetShape(CLEFSHAPE_F);
+            cmnClef->SetLine(4);
+        }
+        else if (clef->GetLine() > 2) {
+            cmnClef->SetShape(CLEFSHAPE_G);
+            cmnClef->SetLine(2);
+            cmnClef->SetDis(OCTAVE_DIS_8);
+            cmnClef->SetDisPlace(STAFFREL_basic_below);
+        }
+        else {
+            cmnClef->SetShape(CLEFSHAPE_G);
+            cmnClef->SetLine(2);
+        }
+    }
 }
 
 //----------------------------------------------------------------------------

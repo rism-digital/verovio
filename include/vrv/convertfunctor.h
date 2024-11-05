@@ -223,10 +223,12 @@ public:
     FunctorCode VisitLigature(Ligature *ligature) override;
     FunctorCode VisitLigatureEnd(Ligature *ligature) override;
     FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitMeasureEnd(Measure *measure) override;
     FunctorCode VisitNote(Note *note) override;
     FunctorCode VisitRest(Rest *rest) override;
     FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
     FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitStaffEnd(Staff *staff) override;
     FunctorCode VisitSystemElement(SystemElement *systemElement) override;
     ///@}
 
@@ -243,6 +245,8 @@ private:
     void SplitDurationInterface(ClassId classId, data_DURATION elementDur, Fraction time, Fraction duration);
     /** Convert accid (mensural) into cmn accids - when not the first note, added as `@accid.ges` */
     void ConvertAccid(Note *cmnNote, const Accid *accid, bool &isFirstNote);
+    /** Convert clef (mensural) into cmn clef */
+    void ConvertClef(Clef *cmnClef, const Clef *clef);
 
     /** Internal class for holding information about the mensur considered for meter signature (changes) */
     class MensurInfo {
@@ -299,6 +303,10 @@ private:
     std::vector<Layer *> m_layers;
     /** The current breakpoint, reset for every staff/layer */
     std::vector<Layer *>::iterator m_currentLayer;
+    /** A list with the clef for each staff */
+    std::list<Clef *> m_clefs;
+    /** The first clef encountered in the layer */
+    Clef *m_layerClef;
     // The target system, measure, staff & layer
     System *m_targetSystem;
     // The current Mensur and Proport
