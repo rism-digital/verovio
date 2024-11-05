@@ -571,6 +571,10 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         input = new VolpianoInput(&m_doc);
     }
     else if (inputFormat == CMME) {
+        if (m_options->m_durationEquivalence.GetValue() != DURATION_EQ_minima) {
+            LogWarning("CMME input uses 'minima' duration equivalence, changing the option accordingly.");
+            m_options->m_durationEquivalence.SetValue(DURATION_EQ_minima);
+        }
         input = new CmmeInput(&m_doc);
     }
 #ifndef NO_HUMDRUM_SUPPORT
