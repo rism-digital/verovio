@@ -300,6 +300,9 @@ void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
                 CreateAccid(eventNode);
             }
         }
+        else if (name == "ColorChange") {
+            CreateColorchange(eventNode);
+        }
         else if (name == "Custos") {
             CreateCustos(eventNode);
         }
@@ -534,6 +537,27 @@ void CmmeInput::CreateClef(pugi::xml_node clefNode)
     return;
 }
 
+void CmmeInput::CreateColorchange(pugi::xml_node colorChangeNode)
+{
+    static const std::map<std::string, std::string> colorMap{
+        { "Black", "" }, //
+        { "Red", "red" }, //
+        { "Blue", "blue" }, //
+        { "Green", "green" }, //
+        { "Yellow", "yellow" }, //
+    };
+
+    assert(m_currentContainer);
+
+    std::string color;
+    if (colorChangeNode.child("PrimaryColor")) {
+        color = this->ChildAsString(colorChangeNode.child("PrimaryColor"), "Color");
+    }
+    m_currentColor = colorMap.contains(color) ? colorMap.at(color) : "";
+
+    return;
+}
+
 void CmmeInput::CreateCustos(pugi::xml_node custosNode)
 {
     static const std::map<std::string, data_PITCHNAME> pitchMap{
@@ -553,6 +577,7 @@ void CmmeInput::CreateCustos(pugi::xml_node custosNode)
     // Default pitch to C
     data_PITCHNAME pname = pitchMap.contains(step) ? pitchMap.at(step) : PITCHNAME_c;
     custos->SetPname(pname);
+    if (!m_currentColor.empty()) custos->SetColor(m_currentColor);
 
     int oct = this->ChildAsInt(custosNode, "OctaveNum");
     if ((pname != PITCHNAME_a) && (pname != PITCHNAME_b)) oct += 1;
@@ -827,6 +852,7 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
     // Default pitch to C
     data_PITCHNAME pname = pitchMap.contains(step) ? pitchMap.at(step) : PITCHNAME_c;
     note->SetPname(pname);
+    if (!m_currentColor.empty()) note->SetColor(m_currentColor);
 
     int num;
     int numbase;
@@ -970,6 +996,8 @@ void CmmeInput::CreateRest(pugi::xml_node restNode)
     int numbase;
     data_DURATION duration = this->ReadDuration(restNode, num, numbase);
     rest->SetDur(duration);
+    if (!m_currentColor.empty()) rest->SetColor(m_currentColor);
+
     if (num != VRV_UNSET && numbase != VRV_UNSET) {
         rest->SetNum(num);
         rest->SetNumbase(numbase);
