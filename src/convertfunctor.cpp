@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "bracketspan.h"
+#include "dir.h"
 #include "div.h"
 #include "doc.h"
 #include "ending.h"
@@ -28,6 +29,7 @@
 #include "staff.h"
 #include "syllable.h"
 #include "system.h"
+#include "text.h"
 #include "tie.h"
 #include "tuplet.h"
 #include "vrv.h"
@@ -372,6 +374,7 @@ ConvertToCmnFunctor::ConvertToCmnFunctor(Doc *doc, System *targetSystem, Score *
 {
     m_targetSystem = targetSystem;
     m_score = score;
+    m_currentStaff = NULL;
 }
 
 FunctorCode ConvertToCmnFunctor::VisitChord(Chord *chord)
@@ -440,6 +443,8 @@ FunctorCode ConvertToCmnFunctor::VisitLayer(Layer *layer)
     m_coloration = NULL;
     m_proportTuplet = NULL;
 
+    m_startid = "";
+
     m_currentLayer = m_layers.begin();
     m_currentMeasure = m_measures.begin();
 
@@ -457,6 +462,7 @@ FunctorCode ConvertToCmnFunctor::VisitLayerElement(LayerElement *layerElement)
         // replace the current mensur
         m_currentParams.mensur = vrv_cast<Mensur *>(layerElement);
         assert(m_currentParams.mensur);
+        this->ConvertMensur(m_currentParams.mensur);
     }
     else if (layerElement->Is(PROPORT)) {
         if (layerElement->GetType() == "cmme_tempo_change") return FUNCTOR_SIBLINGS;
@@ -469,6 +475,9 @@ FunctorCode ConvertToCmnFunctor::VisitLayerElement(LayerElement *layerElement)
         }
         // Reset the tuplet since we expect the num / numbase to be different
         m_proportTuplet = NULL;
+    }
+    else if (layerElement->Is({ ACCID, BARLINE, DOT })) {
+        // can be ignored
     }
     else {
         LogDebug(layerElement->GetClassName().c_str());
@@ -690,6 +699,7 @@ FunctorCode ConvertToCmnFunctor::VisitScoreDef(ScoreDef *scoreDef)
 
 FunctorCode ConvertToCmnFunctor::VisitStaff(Staff *staff)
 {
+    m_currentStaff = staff;
     m_layerClef = NULL;
     m_currentMeasure = m_measures.begin();
 
@@ -871,12 +881,17 @@ void ConvertToCmnFunctor::SplitDurationInterface(
     // from the previous measure)
     if (nonProportTuplet) m_proportTuplet = NULL;
 
+    // Increase the tstamp by the value processed
+    m_startid = m_durationElements.front()->GetID();
+
     // If we have reach the end of the measure, go to the next one
     if (time + processed == measureEnd) {
         ++m_currentMeasure;
         ++m_currentLayer;
         // End of the measure, close the tuplet
         m_proportTuplet = NULL;
+        // Reset the tstamp
+        m_startid = "";
     }
     // Also check if we have more to process for that note or rest - if yes, call it recursively
     if (duration - processed != 0) {
@@ -998,6 +1013,38 @@ void ConvertToCmnFunctor::ConvertClef(Clef *cmnClef, const Clef *clef)
             cmnClef->SetLine(2);
         }
     }
+}
+
+void ConvertToCmnFunctor::ConvertMensur(const Mensur *mensur)
+{
+    // We need as least a sign or a num
+    if (!mensur->HasSign() && !mensur->HasNum()) return;
+
+    Dir *dir = new Dir();
+    dir->SetStaff(m_currentStaff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(m_currentStaff->GetN())));
+    if (m_startid.empty()) {
+        dir->SetTstamp(0.0);
+    }
+    else {
+        dir->SetStartid("#" + m_startid);
+    }
+    dir->SetType("mscore-staff-text");
+    dir->SetPlace(STAFFREL_above);
+    Text *text = new Text();
+    std::string str;
+    if (mensur->HasSign()) {
+        str += (mensur->GetSign() == MENSURATIONSIGN_C) ? "C" : "O";
+        if (mensur->GetOrient() == ORIENTATION_reversed) str += "r";
+        if (mensur->HasSlash()) str += "|";
+        if (mensur->HasDot()) str += std::string(mensur->GetDot(), '.');
+    }
+    if (mensur->HasNum()) {
+        str += std::to_string(mensur->GetNum());
+        if (mensur->HasNumbase()) str += "/" + std::to_string(mensur->GetNumbase());
+    }
+    text->SetText(UTF8to32(str));
+    dir->AddChild(text);
+    (*m_currentMeasure).m_measure->AddChild(dir);
 }
 
 //----------------------------------------------------------------------------

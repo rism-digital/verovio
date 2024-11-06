@@ -247,6 +247,8 @@ private:
     void ConvertAccid(Note *cmnNote, const Accid *accid, bool &isFirstNote);
     /** Convert clef (mensural) into cmn clef */
     void ConvertClef(Clef *cmnClef, const Clef *clef);
+    /** Convert mensur to dir */
+    void ConvertMensur(const Mensur *mensur);
 
     /** Internal class for holding information about the mensur considered for meter signature (changes) */
     class MensurInfo {
@@ -319,6 +321,10 @@ private:
     BracketSpan *m_coloration;
     // Proportion tuplet
     Tuplet *m_proportTuplet;
+    // The current staffN
+    Staff *m_currentStaff;
+    // The current startid (empty string means beginning of the measure and tstamp 0.0)
+    std::string m_startid;
 };
 
 //----------------------------------------------------------------------------
