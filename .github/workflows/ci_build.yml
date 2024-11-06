@@ -367,7 +367,7 @@ jobs:
           path: ${{ env.GH_PAGES_DIR }}
 
       - name: Download TOOLKIT_BUILD artifacts
-        uses: actions/download-artifact@v4.4.3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: ${{ env.TOOLKIT_BUILD }}-${{ github.run_id }}
           path: artifacts/${{ env.TOOLKIT_BUILD }}
@@ -377,7 +377,7 @@ jobs:
           cp -r artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
 
       - name: Download FONTS artifacts
-        uses: actions/download-artifact@v4.4.3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: ${{ env.FONTS }}-${{ github.run_id }}
           path: artifacts/${{ env.FONTS }}
