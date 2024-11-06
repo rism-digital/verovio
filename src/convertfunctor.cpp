@@ -614,6 +614,7 @@ FunctorCode ConvertToCmnFunctor::VisitNote(Note *note)
         assert(cmnNote);
         cmnNote->SetPname(note->GetPname());
         cmnNote->SetOct(note->GetOct());
+        if (note->HasColor()) cmnNote->SetColor(note->GetColor());
         this->ConvertAccid(cmnNote, accid, isFirstNote);
     }
 
@@ -658,6 +659,7 @@ FunctorCode ConvertToCmnFunctor::VisitNote(Note *note)
         tie->SetStartid("#" + tieStart->GetID());
         tie->SetEndid("#" + tieEnd->GetID());
         measure->AddChild(tie);
+        if (note->HasColor()) tie->SetColor(note->GetColor());
         tieStart = tieEnd;
     }
 
@@ -667,6 +669,13 @@ FunctorCode ConvertToCmnFunctor::VisitNote(Note *note)
 FunctorCode ConvertToCmnFunctor::VisitRest(Rest *rest)
 {
     this->ConvertDurationInterface(rest, REST);
+
+    // Copy the `@color` from the mensural rest
+    for (Object *object : m_durationElements) {
+        Rest *cmnRest = vrv_cast<Rest *>(object);
+        assert(cmnRest);
+        if (rest->HasColor()) cmnRest->SetColor(rest->GetColor());
+    }
 
     return FUNCTOR_SIBLINGS;
 }
