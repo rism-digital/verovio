@@ -375,6 +375,7 @@ ConvertToCmnFunctor::ConvertToCmnFunctor(Doc *doc, System *targetSystem, Score *
     m_targetSystem = targetSystem;
     m_score = score;
     m_currentStaff = NULL;
+    m_n = 0;
 }
 
 FunctorCode ConvertToCmnFunctor::VisitChord(Chord *chord)
@@ -548,6 +549,7 @@ FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
     while (time < next) {
         MeasureInfo measureInfo(time, measureDuration);
         Measure *cmnMeasure = new Measure();
+        cmnMeasure->SetN(std::to_string(++m_n));
         measureInfo.m_measure = cmnMeasure;
         if ((time + measureInfo.m_duration) > next) {
             measureInfo.m_duration = next - time;
@@ -559,8 +561,19 @@ FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
         time = time + measureDuration;
         if ((time >= next) && (mensurIter != mensurs.end())) {
             time = next;
-            measureDuration = this->CalcMeasureDuration((*mensurIter).m_mensur);
             currentMensur = (*mensurIter).m_mensur;
+            Fraction duration = this->CalcMeasureDuration(currentMensur);
+            if (duration != measureDuration) {
+                ScoreDef *scoreDef = new ScoreDef();
+                MeterSig *meterSig = new MeterSig();
+                meterSig->IsAttribute(true);
+                meterSig->SetUnit(2);
+                Fraction count = duration / Fraction(DURATION_2);
+                meterSig->SetCount({ { count.GetNumerator() }, MeterCountSign::None });
+                scoreDef->AddChild(meterSig);
+                m_targetSystem->AddChild(scoreDef);
+            }
+            measureDuration = duration;
             std::advance(mensurIter, 1);
             next = (mensurIter == mensurs.end()) ? totalTime : (*mensurIter).m_time;
         }
@@ -1036,7 +1049,7 @@ void ConvertToCmnFunctor::ConvertMensur(const Mensur *mensur)
         str += (mensur->GetSign() == MENSURATIONSIGN_C) ? "C" : "O";
         if (mensur->GetOrient() == ORIENTATION_reversed) str += "r";
         if (mensur->HasSlash()) str += "|";
-        if (mensur->HasDot()) str += std::string(mensur->GetDot(), '.');
+        if (mensur->HasDot()) str += ".";
     }
     if (mensur->HasNum()) {
         str += std::to_string(mensur->GetNum());

@@ -309,22 +309,24 @@ private:
     std::list<Clef *> m_clefs;
     /** The first clef encountered in the layer */
     Clef *m_layerClef;
-    // The target system, measure, staff & layer
+    /** The target system, measure, staff & layer */
     System *m_targetSystem;
-    // The current Mensur and Proport
+    /** The current Mensur and Proport */
     AlignMeterParams m_currentParams;
-    // List of duration element potentially splitted across measures
+    /** List of duration element potentially splitted across measures */
     ListOfObjects m_durationElements;
-    // Bracket span for ligature, which also acts as a flag
+    /** Bracket span for ligature, which also acts as a flag */
     BracketSpan *m_ligature;
-    // Bracket span for coloration, which also acts as a flag
+    /** Bracket span for coloration, which also acts as a flag */
     BracketSpan *m_coloration;
-    // Proportion tuplet
+    /** Proportion tuplet */
     Tuplet *m_proportTuplet;
-    // The current staffN
+    /** The current staffN */
     Staff *m_currentStaff;
-    // The current startid (empty string means beginning of the measure and tstamp 0.0)
+    /** The current startid (empty string means beginning of the measure and tstamp 0.0) */
     std::string m_startid;
+    /** The number of CMN measures generated */
+    int m_n;
 };
 
 //----------------------------------------------------------------------------
