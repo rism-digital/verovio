@@ -563,6 +563,7 @@ FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
             time = next;
             currentMensur = (*mensurIter).m_mensur;
             Fraction duration = this->CalcMeasureDuration(currentMensur);
+            // The new measure does not have the same duration - add a scoreDef with a meterSig change
             if (duration != measureDuration) {
                 ScoreDef *scoreDef = new ScoreDef();
                 MeterSig *meterSig = new MeterSig();
@@ -578,6 +579,7 @@ FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
             next = (mensurIter == mensurs.end()) ? totalTime : (*mensurIter).m_time;
         }
     }
+    m_measures.back().m_measure->SetRight(BARRENDITION_end);
 
     // Now we are ready to process layers and to move content to m_measures
     return FUNCTOR_CONTINUE;
