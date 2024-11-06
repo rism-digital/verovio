@@ -278,7 +278,7 @@ jobs:
         if: ${{ matrix.toolkit.upload == true }}
         uses: actions/upload-artifact@v4.4.3
         with:
-          name: ${{ env.TOOLKIT_BUILD }}
+          name: ${{ env.TOOLKIT_BUILD }}-${{ github.run_id }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ matrix.toolkit.filepath }}
 
 
@@ -303,7 +303,7 @@ jobs:
       - name: Upload font data artifact
         uses: actions/upload-artifact@v4.4.3
         with:
-          name: ${{ env.TOOLKIT_BUILD }}
+          name: ${{ env.TOOLKIT_BUILD }}-${{ github.run_id }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}
 
   ##################################
@@ -368,7 +368,7 @@ jobs:
       - name: Download TOOLKIT_BUILD artifacts
         uses: actions/download-artifact@v4.4.3
         with:
-          name: ${{ env.TOOLKIT_BUILD }}
+          name: ${{ env.TOOLKIT_BUILD }}-${{ github.run_id }}
           path: artifacts/${{ env.TOOLKIT_BUILD }}
 
       - name: Copy artifacts to gh-pages
@@ -457,7 +457,7 @@ jobs:
       - name: Upload doxygen build artifact
         uses: actions/upload-artifact@v4.4.3
         with:
-          name: ${{ env.DOC_BUILD }}
+          name: ${{ env.DOC_BUILD }}-${{ github.run_id }}
           path: ${{ github.workspace }}/${{ env.DOXYGEN_DIR }}
 
   ###############################################
@@ -487,7 +487,7 @@ jobs:
       - name: Download DOC_BUILD artifacts
         uses: actions/download-artifact@v4.1.7
         with:
-          name: ${{ env.DOC_BUILD }}
+          name: ${{ env.DOC_BUILD }}-${{ github.run_id }}
           path: artifacts/${{ env.DOC_BUILD }}
 
       - name: Remove old doc and copy build artifacts to DOXYGEN_DIR
