@@ -1469,7 +1469,9 @@ bool MEIOutput::WriteDoc(Doc *doc)
 
     // ---- header ----
     if (!m_ignoreHeader) {
-        if (this->GetBasic() || !m_doc->m_header.first_child()) m_doc->GenerateMEIHeader(this->GetBasic());
+        if (!m_doc->m_header.first_child()) m_doc->GenerateMEIHeader();
+        if (this->GetBasic()) m_doc->ConvertHeaderToMEIBasic();
+        // Now copy it to the m_mei node;
         m_mei.append_copy(m_doc->m_header.first_child());
         // Add transposition in the revision list but not in mei-basic
         if (!this->GetBasic() && !m_doc->GetOptions()->m_transpose.GetValue().empty()) {

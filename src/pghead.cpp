@@ -85,13 +85,15 @@ bool PgHead::GenerateFromMEIHeader(const pugi::xml_document &header)
         this->AddChild(titleRend);
     }
 
-    nodeSet = header.select_nodes(
-        "//fileDesc/titleStmt/respStmt/persName[contains('lyricist translator composer harmonizer arranger', @role)]");
-    for (pugi::xpath_node_set::const_iterator it = nodeSet.begin(); it != nodeSet.end(); ++it) {
-        node = *it;
+    nodeSet
+        = header.select_nodes("//fileDesc/titleStmt/composer|arranger|lyricist|respStmt/persName[contains('lyricist "
+                              "translator composer harmonizer arranger', @role)]");
+
+    for (auto node : nodeSet) {
         Rend *personRend = new Rend();
         std::string role = node.node().attribute("role").as_string();
-        if (role == "lyricist" || role == "translator") {
+        std::string name = node.node().name();
+        if (name == "lyricist" || role == "lyricist" || role == "translator") {
             personRend->SetHalign(HORIZONTALALIGNMENT_left);
         }
         else {

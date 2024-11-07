@@ -291,33 +291,14 @@ bool Doc::GenerateMeasureNumbers()
     return true;
 }
 
-void Doc::GenerateMEIHeader(bool meiBasic)
+void Doc::GenerateMEIHeader()
 {
-    // Try to preserve titles if we have an existing header
-    std::list<std::string> titles;
-    pugi::xpath_node_set titlesNodeSet = m_header.select_nodes("//meiHead/fileDesc/titleStmt/title/text()");
-    for (pugi::xpath_node titleXpathNode : titlesNodeSet) {
-        pugi::xml_node titleNode = titleXpathNode.node();
-        if (!titleNode) continue;
-        titles.push_back(titleNode.text().as_string());
-    }
-
     m_header.remove_children();
     pugi::xml_node meiHead = m_header.append_child("meiHead");
     pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
     pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
-    // Re-add preserved titles
-    if (titles.size() > 0) {
-        for (auto &title : titles) {
-            pugi::xml_node titleNode = titleStmt.append_child("title");
-            pugi::xml_node textNode = titleNode.append_child(pugi::node_pcdata);
-            textNode.text() = title.c_str();
-        }
-    }
-    // Add an empty title for validity
-    else {
-        titleStmt.append_child("title");
-    }
+    titleStmt.append_child("title");
+
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
     pugi::xml_node date = pubStmt.append_child("date");
 
@@ -328,20 +309,40 @@ void Doc::GenerateMEIHeader(bool meiBasic)
         now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
     date.append_attribute("isodate") = dateStr.c_str();
 
-    if (!meiBasic) {
-        // encodingDesc
-        pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
-        // appInfo/application/name
-        pugi::xml_node appInfo = encodingDesc.append_child("appInfo");
-        pugi::xml_node application = appInfo.append_child("application");
-        application.append_attribute("xml:id") = "verovio";
-        application.append_attribute("version") = GetVersion().c_str();
-        pugi::xml_node name = application.append_child("name");
-        name.text().set(StringFormat("Verovio (%s)", GetVersion().c_str()).c_str());
-        // projectDesc
-        pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
-        pugi::xml_node p1 = projectDesc.append_child("p");
-        p1.text().set(StringFormat("MEI encoded with Verovio").c_str());
+    // encodingDesc
+    pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
+    // appInfo/application/name
+    pugi::xml_node appInfo = encodingDesc.append_child("appInfo");
+    pugi::xml_node application = appInfo.append_child("application");
+    application.append_attribute("xml:id") = "verovio";
+    application.append_attribute("version") = GetVersion().c_str();
+    pugi::xml_node name = application.append_child("name");
+    name.text().set(StringFormat("Verovio (%s)", GetVersion().c_str()).c_str());
+    // projectDesc
+    pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
+    pugi::xml_node p1 = projectDesc.append_child("p");
+    p1.text().set(StringFormat("MEI encoded with Verovio").c_str());
+}
+
+void Doc::ConvertHeaderToMEIBasic()
+{
+    pugi::xpath_node_set toRemove;
+
+    // Keep only fileDesc
+    toRemove = m_header.select_nodes("//meiHead/*[not(self::fileDesc)]");
+    // Remove each of the selected nodes
+    for (pugi::xpath_node node : toRemove) {
+        node.node().parent().remove_child(node.node());
+    }
+
+    // Keep only  titleStmt, respStmt, composer, arranger and lyricist in fileDesc
+    pugi::xml_node titleStmt = m_header.select_node("//meiHead/fileDesc/titleStmt").node();
+    // Remove each of the selected nodes
+    toRemove = titleStmt.select_nodes(
+        "./*[not(self::title or self::respStmt or self::composer or self::arranger or self::lyricist)]");
+    // Remove each of the selected nodes
+    for (pugi::xpath_node node : toRemove) {
+        node.node().parent().remove_child(node.node());
     }
 }
 

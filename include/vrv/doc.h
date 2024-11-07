@@ -103,9 +103,14 @@ public:
     bool GenerateMeasureNumbers();
 
     /**
-     * Generate an MEI header
+     * Generate a minimal MEI header
      */
-    void GenerateMEIHeader(bool meiBasic);
+    void GenerateMEIHeader();
+
+    /**
+     * Convert the header to MEI basic by preserving only the fileDesc and its titleStmt
+     */
+    void ConvertHeaderToMEIBasic();
 
     /**
      * Getter and setter for the DocType.
