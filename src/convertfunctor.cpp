@@ -579,7 +579,7 @@ FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
             next = (mensurIter == mensurs.end()) ? totalTime : (*mensurIter).m_time;
         }
     }
-    m_measures.back().m_measure->SetRight(BARRENDITION_end);
+    m_measures.back().m_measure->SetRight(BARRENDITION_dbl);
 
     // Now we are ready to process layers and to move content to m_measures
     return FUNCTOR_CONTINUE;
@@ -757,6 +757,16 @@ FunctorCode ConvertToCmnFunctor::VisitSystemElement(SystemElement *systemElement
 {
     assert(m_targetSystem);
     systemElement->MoveItselfTo(m_targetSystem);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToCmnFunctor::VisitSystemEnd(System *system)
+{
+    assert(m_targetSystem);
+    Measure *last = vrv_cast<Measure *>(m_targetSystem->GetLast(MEASURE));
+    assert(last);
+    last->SetRight(BARRENDITION_end);
 
     return FUNCTOR_CONTINUE;
 }

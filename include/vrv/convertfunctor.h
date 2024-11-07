@@ -230,6 +230,7 @@ public:
     FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitStaffEnd(Staff *staff) override;
     FunctorCode VisitSystemElement(SystemElement *systemElement) override;
+    FunctorCode VisitSystemEnd(System *system) override;
     ///@}
 
 protected:
