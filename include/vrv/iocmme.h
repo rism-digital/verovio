@@ -54,6 +54,7 @@ public:
     bool Import(const std::string &cmme) override;
 
 private:
+    void CreateMetadata(pugi::xml_node metadataNode);
     void CreateSection(pugi::xml_node musicSectionNode);
     void CreateStaff(pugi::xml_node voiceNode);
     void CreateApp(pugi::xml_node appNode);

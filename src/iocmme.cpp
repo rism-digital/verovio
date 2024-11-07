@@ -83,7 +83,7 @@ bool CmmeInput::Import(const std::string &cmme)
         m_doc->SetMensuralMusicOnly(BOOLEAN_true);
 
         // Genereate the header and add a comment to the project description
-        m_doc->GenerateMEIHeader(false);
+        m_doc->GenerateMEIHeader();
         pugi::xml_node projectDesc = m_doc->m_header.first_child().select_node("//projectDesc").node();
         if (projectDesc) {
             pugi::xml_node p1 = projectDesc.append_child("p");
@@ -93,6 +93,10 @@ bool CmmeInput::Import(const std::string &cmme)
         pugi::xml_document doc;
         doc.load_string(cmme.c_str(), (pugi::parse_comments | pugi::parse_default) & ~pugi::parse_eol);
         pugi::xml_node root = doc.first_child();
+
+        if (root.child("GeneralData")) {
+            this->CreateMetadata(root.child("GeneralData"));
+        }
 
         // The mDiv
         Mdiv *mdiv = new Mdiv();
@@ -157,6 +161,36 @@ bool CmmeInput::Import(const std::string &cmme)
     }
 
     return true;
+}
+
+void CmmeInput::CreateMetadata(pugi::xml_node metadataNode)
+{
+    pugi::xml_node titleStmt = m_doc->m_header.first_child().select_node("//titleStmt").node();
+    // Should have been created by Doc::GenerateHeader
+    if (!titleStmt) return;
+
+    std::string titleStr = this->ChildAsString(metadataNode, "Title");
+    if (!titleStr.empty()) {
+        pugi::xml_node title = titleStmt.child("title");
+        title.text().set(titleStr.c_str());
+    }
+
+    std::string sectionStr = this->ChildAsString(metadataNode, "Section");
+    if (!sectionStr.empty()) {
+        pugi::xml_node title = titleStmt.append_child("title");
+        title.append_attribute("type") = "subordinate";
+        title.text().set(sectionStr.c_str());
+    }
+
+    std::string composerStr = this->ChildAsString(metadataNode, "Composer");
+    if (!composerStr.empty()) {
+        // pugi::xml_node respStmt = titleStmt.append_child("respStmt");
+        // pugi::xml_node persName = respStmt.append_child("persName");
+        // persName.append_attribute("role") = "composer";
+        // persName.text().set(composerStr.c_str());
+        pugi::xml_node composer = titleStmt.append_child("composer");
+        composer.text().set(composerStr.c_str());
+    }
 }
 
 void CmmeInput::CreateSection(pugi::xml_node musicSectionNode)
