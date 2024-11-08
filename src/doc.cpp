@@ -1378,6 +1378,8 @@ void Doc::ConvertToCmnDoc()
         delete system;
     }
 
+    this->GenerateMeasureNumbers();
+
     this->PrepareData();
 
     // We need to reset the drawing page to NULL
