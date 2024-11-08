@@ -59,6 +59,7 @@ Resources::Resources()
 
 bool Resources::InitFonts()
 {
+    m_cachedGlyph.reset();
     m_loadedFonts.clear();
 
     // Font Bravura first. As it is expected to have always all symbols we build the code -> name table from it
@@ -95,6 +96,8 @@ bool Resources::InitFonts()
 
 bool Resources::SetFont(const std::string &fontName)
 {
+    m_cachedGlyph.reset();
+
     // and the default font provided in options, if it is not one of the previous
     if (!fontName.empty() && !IsFontLoaded(fontName)) {
         if (!LoadFont(fontName)) {
@@ -148,12 +151,15 @@ bool Resources::LoadAll()
 
 bool Resources::SetFallback(const std::string &fontName)
 {
+    m_cachedGlyph.reset();
     m_fallbackFontName = fontName;
     return true;
 }
 
 bool Resources::SetCurrentFont(const std::string &fontName, bool allowLoading)
 {
+    m_cachedGlyph.reset();
+
     if (IsFontLoaded(fontName)) {
         m_currentFontName = fontName;
         return true;
@@ -169,14 +175,22 @@ bool Resources::SetCurrentFont(const std::string &fontName, bool allowLoading)
 
 const Glyph *Resources::GetGlyph(char32_t smuflCode) const
 {
+    if (m_cachedGlyph && m_cachedGlyph->first == smuflCode) {
+        return m_cachedGlyph->second;
+    }
+
     const GlyphTable &currentTable = this->GetCurrentGlyphTable();
     if (auto glyphIter = currentTable.find(smuflCode); glyphIter != currentTable.end()) {
-        return &glyphIter->second;
+        const Glyph *glyph = &glyphIter->second;
+        m_cachedGlyph = std::make_pair(glyphIter->first, glyph);
+        return glyph;
     }
     else if (!this->IsCurrentFontFallback()) {
         const GlyphTable &fallbackTable = this->GetFallbackGlyphTable();
         if (auto glyphIter = fallbackTable.find(smuflCode); glyphIter != fallbackTable.end()) {
-            return &glyphIter->second;
+            const Glyph *glyph = &glyphIter->second;
+            m_cachedGlyph = std::make_pair(glyphIter->first, glyph);
+            return glyph;
         }
     }
     return NULL;

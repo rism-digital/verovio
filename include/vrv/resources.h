@@ -177,6 +177,9 @@ private:
      */
     GlyphNameTable m_glyphNameTable;
 
+    /** Cache of the last glyph that was looked up in loaded fonts */
+    mutable std::optional<std::pair<char32_t, const Glyph *>> m_cachedGlyph;
+
     //----------------//
     // Static members //
     //----------------//
