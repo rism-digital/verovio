@@ -292,7 +292,7 @@ void ConvertToCastOffMensuralFunctor::InitSegment(Object *object)
     LayerElement *element = NULL;
     if (object->IsLayerElement()) element = vrv_cast<LayerElement *>(object);
 
-    if (element && (element->GetAlignment() == *m_currentBreakPoint)) {
+    if (element && element->GetAlignment() && (element->GetAlignment() == *m_currentBreakPoint)) {
         m_targetStaff = NULL;
         m_targetLayer = NULL;
         std::advance(m_currentBreakPoint, 1);
