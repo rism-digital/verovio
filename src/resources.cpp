@@ -184,7 +184,10 @@ const Glyph *Resources::GetGlyph(char32_t smuflCode) const
 
 const Glyph *Resources::GetGlyph(const std::string &smuflName) const
 {
-    return (this->GetGlyphCode(smuflName)) ? &GetCurrentGlyphTable().at(this->GetGlyphCode(smuflName)) : NULL;
+    if (const char32_t code = this->GetGlyphCode(smuflName); code) {
+        return this->GetGlyph(code);
+    }
+    return NULL;
 }
 
 char32_t Resources::GetGlyphCode(const std::string &smuflName) const
