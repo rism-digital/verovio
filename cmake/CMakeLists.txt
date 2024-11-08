@@ -66,6 +66,7 @@ else()
     add_definitions(-Wall -W -pedantic -Wno-unused-parameter -Wno-dollar-in-identifier-extension)
     add_definitions(-std=c++23)
     add_definitions(-std=c++2b)
+    add_definitions(-std=gnu++2b)
 
     # extra warnings similar to Xcode compiling settings (most probably covered by -Wall):
     # https://github.com/llvm-mirror/clang/blob/master/include/clang/Basic/DiagnosticGroups.td
