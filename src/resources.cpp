@@ -192,7 +192,10 @@ const Glyph *Resources::GetGlyph(const std::string &smuflName) const
 
 char32_t Resources::GetGlyphCode(const std::string &smuflName) const
 {
-    return m_glyphNameTable.contains(smuflName) ? m_glyphNameTable.at(smuflName) : 0;
+    if (auto glyphNameIter = m_glyphNameTable.find(smuflName); glyphNameIter != m_glyphNameTable.end()) {
+        return glyphNameIter->second;
+    }
+    return 0;
 }
 
 bool Resources::IsSmuflFallbackNeeded(const std::u32string &text) const
