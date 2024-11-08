@@ -62,7 +62,7 @@ jobs:
           mkdir -p ${{ env.OUTPUT_DIR }}
           ls -alh
           ls -alh ${{ env.OUTPUT_DIR }}
-          sudo apt-get install openresolv wireguard
+          sudo apt-get install wireguard
           sudo echo "${{ secrets.VPN_CONFIGURATION }}" > wg0.conf
           python3 -m pip install diffimg jsondiff lxml xmldiff cairosvg
 
