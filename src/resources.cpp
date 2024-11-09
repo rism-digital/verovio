@@ -98,7 +98,7 @@ bool Resources::SetFont(const std::string &fontName)
 {
     m_cachedGlyph.reset();
 
-    // and the default font provided in options, if it is not one of the previous
+    // add the default font provided in options, if it is not one of the previous
     if (!fontName.empty() && !IsFontLoaded(fontName)) {
         if (!LoadFont(fontName)) {
             LogError("%s font could not be loaded.", fontName.c_str());
