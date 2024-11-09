@@ -8,6 +8,7 @@
 #ifndef __VRV_RESOURCES_H__
 #define __VRV_RESOURCES_H__
 
+#include <optional>
 #include <unordered_map>
 
 //----------------------------------------------------------------------------
