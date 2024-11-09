@@ -135,18 +135,18 @@ bool Resources::AddCustom(const std::vector<std::string> &extraFonts)
 
 bool Resources::LoadAll()
 {
-    bool success = true;
     std::string path = Resources::GetPath() + "/";
-    for (const std::filesystem::directory_entry &entry : std::filesystem::directory_iterator(path)) {
-        const std::filesystem::path path = entry.path();
-        if (path.has_extension() && path.has_stem() && path.extension() == ".xml") {
-            const std::string fontName = path.stem().string();
-            if (!IsFontLoaded(fontName)) {
-                success = success && LoadFont(fontName);
+    return std::ranges::all_of(
+        std::filesystem::directory_iterator(path), [this](const std::filesystem::directory_entry &entry) {
+            const std::filesystem::path &path = entry.path();
+            if (path.has_extension() && path.has_stem() && path.extension() == ".xml") {
+                const std::string fontName = path.stem().string();
+                if (!this->IsFontLoaded(fontName) && !this->LoadFont(fontName)) {
+                    return false;
+                }
             }
-        }
-    }
-    return success;
+            return true;
+        });
 }
 
 void Resources::SetFallbackFont(const std::string &fontName)
@@ -167,7 +167,7 @@ bool Resources::SetCurrentFont(const std::string &fontName, bool allowLoading)
         m_currentFontName = fontName;
         return true;
     }
-    
+
     return false;
 }
 
