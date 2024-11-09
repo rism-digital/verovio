@@ -167,9 +167,8 @@ bool Resources::SetCurrentFont(const std::string &fontName, bool allowLoading)
         m_currentFontName = fontName;
         return true;
     }
-    else {
-        return false;
-    }
+    
+    return false;
 }
 
 const Glyph *Resources::GetGlyph(char32_t smuflCode) const
@@ -234,12 +233,7 @@ bool Resources::FontHasGlyphAvailable(const std::string &fontName, char32_t smuf
     }
 
     const GlyphTable &table = m_loadedFonts.at(fontName).GetGlyphTable();
-    if (table.find(smuflCode) != table.end()) {
-        return true;
-    }
-    else {
-        return false;
-    }
+    return (table.find(smuflCode) != table.end());
 }
 
 std::string Resources::GetCSSFontFor(const std::string &fontName) const
