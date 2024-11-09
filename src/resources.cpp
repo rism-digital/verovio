@@ -149,11 +149,10 @@ bool Resources::LoadAll()
     return success;
 }
 
-bool Resources::SetFallback(const std::string &fontName)
+void Resources::SetFallbackFont(const std::string &fontName)
 {
     m_cachedGlyph.reset();
     m_fallbackFontName = fontName;
-    return true;
 }
 
 bool Resources::SetCurrentFont(const std::string &fontName, bool allowLoading)
