@@ -68,8 +68,6 @@ public:
     void SetFallbackFont(const std::string &fontName);
     /** Get the fallback font name */
     std::string GetFallbackFont() const { return m_defaultFontName; }
-    /** Init the text font (bounding boxes and ASCII only) */
-    bool InitTextFont(const std::string &fontName, const StyleAttributes &style);
 
     /** Select a particular font */
     bool SetCurrentFont(const std::string &fontName, bool allowLoading = false);
@@ -159,6 +157,9 @@ private:
     //----------------------------------------------------------------------------
 
     bool LoadFont(const std::string &fontName, ZipFileReader *zipFile = NULL);
+
+    /** Init the text font (bounding boxes and ASCII only) */
+    bool InitTextFont(const std::string &fontName, const StyleAttributes &style);
 
     const GlyphTable &GetCurrentGlyphTable() const { return m_loadedFonts.at(m_currentFontName).GetGlyphTable(); };
     const GlyphTable &GetFallbackGlyphTable() const { return m_loadedFonts.at(m_fallbackFontName).GetGlyphTable(); };
