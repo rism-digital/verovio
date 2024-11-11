@@ -127,7 +127,7 @@ bool Toolkit::SetResourcePath(const std::string &path)
         success = success && this->SetFont(m_options->m_font.GetValue());
     }
     if (m_options->m_fontFallback.IsSet()) {
-        success = success && resources.SetFallback(m_options->m_fontFallback.GetStrValue());
+        resources.SetFallbackFont(m_options->m_fontFallback.GetStrValue());
     }
     if (m_options->m_fontLoadAll.IsSet()) {
         success = success && resources.LoadAll();
@@ -1224,7 +1224,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
     }
     if (json.has<jsonxx::String>("fontFallback")) {
         Resources &resources = m_doc.GetResourcesForModification();
-        resources.SetFallback(m_options->m_fontFallback.GetStrValue());
+        resources.SetFallbackFont(m_options->m_fontFallback.GetStrValue());
     }
     if (json.has<jsonxx::Boolean>("fontLoadAll")) {
         Resources &resources = m_doc.GetResourcesForModification();
