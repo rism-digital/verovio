@@ -63,7 +63,7 @@ public:
      * Otherwise, it will look for the Staff ancestor.
      * Set the value of ledger lines above or below.
      */
-    bool HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff = NULL) const;
+    bool HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff) const;
 
     //-----------------//
     // Pseudo functors //

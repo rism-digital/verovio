@@ -130,7 +130,8 @@ void Accid::AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::v
         Note *note = vrv_cast<Note *>(element);
         int ledgerAbove = 0;
         int ledgerBelow = 0;
-        if (note->HasLedgerLines(ledgerAbove, ledgerBelow)) {
+        Staff *staff = note->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+        if (note->HasLedgerLines(ledgerAbove, ledgerBelow, staff)) {
             const int value = doc->GetOptions()->m_ledgerLineExtension.GetValue() * unit + 0.5 * horizontalMargin;
             horizontalMargin = std::max(horizontalMargin, value);
         }

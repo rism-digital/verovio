@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "dot.h"
 #include "note.h"
 #include "staff.h"
 
@@ -21,6 +22,21 @@ namespace vrv {
 
 CalcLedgerLinesFunctor::CalcLedgerLinesFunctor(Doc *doc) : DocFunctor(doc) {}
 
+FunctorCode CalcLedgerLinesFunctor::VisitAccid(Accid *accid)
+{
+    if (accid->GetFirstAncestor(NOTE)) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    Staff *staff = accid->GetAncestorStaff();
+
+    const int width = m_doc->GetGlyphWidth(Accid::GetAccidGlyph(accid->GetAccid()), staff->m_drawingStaffSize, false);
+
+    this->CalcForLayerElement(accid, width, HORIZONTALALIGNMENT_center);
+
+    return FUNCTOR_SIBLINGS;
+}
+
 FunctorCode CalcLedgerLinesFunctor::VisitNote(Note *note)
 {
     if (note->GetVisible() == BOOLEAN_false) {
@@ -31,29 +47,39 @@ FunctorCode CalcLedgerLinesFunctor::VisitNote(Note *note)
         return FUNCTOR_SIBLINGS;
     }
 
-    this->CalcFor(note);
+    const int radius = note->GetDrawingRadius(m_doc);
+
+    this->CalcForLayerElement(note, 2 * radius, HORIZONTALALIGNMENT_left);
 
     return FUNCTOR_SIBLINGS;
 }
 
-void CalcLedgerLinesFunctor::CalcFor(LayerElement *layerElement)
+void CalcLedgerLinesFunctor::CalcForLayerElement(
+    LayerElement *layerElement, int width, data_HORIZONTALALIGNMENT alignment)
 {
-    /*
     Staff *staff = layerElement->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+    assert(staff);
+
     const int staffSize = staff->m_drawingStaffSize;
     const int staffX = staff->GetDrawingX();
-    const bool drawingCueSize = note->GetDrawingCueSize();
-    const int radius = layerElement->GetDrawingRadius(m_doc);
-
+    const bool drawingCueSize = layerElement->GetDrawingCueSize();
 
     int linesAbove = 0;
     int linesBelow = 0;
 
-    if (!layerElement->HasLedgerLines(linesAbove, linesBelow, staff)) return FUNCTOR_SIBLINGS;
+    PositionInterface *interface = layerElement->GetPositionInterface();
+    assert(interface);
+
+    if (!interface->HasLedgerLines(linesAbove, linesBelow, staff)) return;
 
     const int extension = m_doc->GetDrawingLedgerLineExtension(staffSize, drawingCueSize);
-    const int left = layerElement->GetDrawingX() - extension - staffX;
-    int right = layerElement->GetDrawingX() + 2 * radius + extension - staffX;
+    int left = layerElement->GetDrawingX() - extension - staffX;
+    int right = layerElement->GetDrawingX() + width + extension - staffX;
+
+    if (alignment == HORIZONTALALIGNMENT_center) {
+        right -= width / 2;
+        left -= width / 2;
+    }
 
     if (linesAbove > 0) {
         staff->AddLedgerLineAbove(linesAbove, left, right, extension, drawingCueSize);
@@ -61,7 +87,6 @@ void CalcLedgerLinesFunctor::CalcFor(LayerElement *layerElement)
     else {
         staff->AddLedgerLineBelow(linesBelow, left, right, extension, drawingCueSize);
     }
-    */
 }
 
 FunctorCode CalcLedgerLinesFunctor::VisitStaffEnd(Staff *staff)

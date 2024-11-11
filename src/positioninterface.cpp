@@ -15,6 +15,7 @@
 
 #include "layer.h"
 #include "pitchinterface.h"
+#include "staff.h"
 
 namespace vrv {
 
@@ -73,10 +74,7 @@ int PositionInterface::CalcDrawingLoc(const Layer *layer, const LayerElement *el
 
 bool PositionInterface::HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff) const
 {
-    /*
-    if (!staff) {
-        staff = this->GetAncestorStaff();
-    }
+    if (!staff) return false;
 
     linesAbove = (this->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
     linesBelow = -(this->GetDrawingLoc()) / 2;
@@ -85,7 +83,7 @@ bool PositionInterface::HasLedgerLines(int &linesAbove, int &linesBelow, const S
     linesBelow = std::max(linesBelow, 0);
 
     return ((linesAbove > 0) || (linesBelow > 0));
-     */
+
     return false;
 }
 

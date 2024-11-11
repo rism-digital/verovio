@@ -660,7 +660,9 @@ void CalcStemFunctor::AdjustFlagPlacement(
     }
     int ledgerAbove = 0;
     int ledgerBelow = 0;
-    if (!note || !note->HasLedgerLines(ledgerAbove, ledgerBelow)) return;
+
+    Staff *staff = note->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+    if (!note || !note->HasLedgerLines(ledgerAbove, ledgerBelow, staff)) return;
     if (((stemDirection == STEMDIRECTION_up) && !ledgerBelow)
         || ((stemDirection == STEMDIRECTION_down) && !ledgerAbove))
         return;
