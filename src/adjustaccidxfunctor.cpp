@@ -133,7 +133,7 @@ std::vector<Accid *> AdjustAccidXFunctor::GetAccidentalsForAdjustment(AlignmentR
     for (Object *child : alignmentReference->GetChildren()) {
         if (child->Is(ACCID)) {
             Accid *accid = vrv_cast<Accid *>(child);
-            if (accid->HasAccid()) accidentals.push_back(accid);
+            if (accid->HasAccid() && accid->GetFirstAncestor(NOTE)) accidentals.push_back(accid);
         }
     }
     return accidentals;
