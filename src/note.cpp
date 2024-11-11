@@ -121,7 +121,6 @@ void Note::Reset()
     m_noteGroupPosition = 0;
     m_noteGroup = NULL;
 
-    m_drawingLoc = 0;
     m_flippedNotehead = false;
 
     m_stemSameas = NULL;

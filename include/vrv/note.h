@@ -124,15 +124,6 @@ public:
     ///@}
 
     /**
-     * @name Setter and getter for the drawing staff loc.
-     * This is set by the CalcAlignmentPitchPosFunctor.
-     */
-    ///@{
-    void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }
-    int GetDrawingLoc() const { return m_drawingLoc; }
-    ///@}
-
-    /**
      * Overriding functions to return information from chord parent if any
      */
     ///@{
@@ -318,11 +309,6 @@ private:
 public:
     //
 private:
-    /**
-     * The drawing location of the note
-     */
-    int m_drawingLoc;
-
     /**
      * A fling indicating if the note head is flipped
      */
