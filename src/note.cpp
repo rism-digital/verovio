@@ -121,7 +121,6 @@ void Note::Reset()
     m_noteGroupPosition = 0;
     m_noteGroup = NULL;
 
-    m_drawingLoc = 0;
     m_flippedNotehead = false;
 
     m_stemSameas = NULL;
@@ -212,21 +211,6 @@ Accid *Note::GetDrawingAccid()
 const Accid *Note::GetDrawingAccid() const
 {
     return vrv_cast<const Accid *>(this->FindDescendantByType(ACCID));
-}
-
-bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff) const
-{
-    if (!staff) {
-        staff = this->GetAncestorStaff();
-    }
-
-    linesAbove = (this->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
-    linesBelow = -(this->GetDrawingLoc()) / 2;
-
-    linesAbove = std::max(linesAbove, 0);
-    linesBelow = std::max(linesBelow, 0);
-
-    return ((linesAbove > 0) || (linesBelow > 0));
 }
 
 Chord *Note::IsChordTone()
