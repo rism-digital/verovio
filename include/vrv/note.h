@@ -133,14 +133,6 @@ public:
     ///@}
 
     /**
-     * Check if the note has ledger lines.
-     * If staff is passed, use it for getting the staff line number.
-     * Otherwise, it will look for the Staff ancestor.
-     * Set the value of ledger lines above or below.
-     */
-    bool HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff = NULL) const;
-
-    /**
      * Overriding functions to return information from chord parent if any
      */
     ///@{

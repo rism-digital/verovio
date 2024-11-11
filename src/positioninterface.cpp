@@ -71,6 +71,24 @@ int PositionInterface::CalcDrawingLoc(const Layer *layer, const LayerElement *el
     return m_drawingLoc;
 }
 
+bool PositionInterface::HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff) const
+{
+    /*
+    if (!staff) {
+        staff = this->GetAncestorStaff();
+    }
+
+    linesAbove = (this->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
+    linesBelow = -(this->GetDrawingLoc()) / 2;
+
+    linesAbove = std::max(linesAbove, 0);
+    linesBelow = std::max(linesBelow, 0);
+
+    return ((linesAbove > 0) || (linesBelow > 0));
+     */
+    return false;
+}
+
 //----------------------------------------------------------------------------
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------

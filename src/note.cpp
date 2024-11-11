@@ -214,21 +214,6 @@ const Accid *Note::GetDrawingAccid() const
     return vrv_cast<const Accid *>(this->FindDescendantByType(ACCID));
 }
 
-bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff) const
-{
-    if (!staff) {
-        staff = this->GetAncestorStaff();
-    }
-
-    linesAbove = (this->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
-    linesBelow = -(this->GetDrawingLoc()) / 2;
-
-    linesAbove = std::max(linesAbove, 0);
-    linesBelow = std::max(linesBelow, 0);
-
-    return ((linesAbove > 0) || (linesBelow > 0));
-}
-
 Chord *Note::IsChordTone()
 {
     return vrv_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));

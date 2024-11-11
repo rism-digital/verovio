@@ -31,22 +31,29 @@ FunctorCode CalcLedgerLinesFunctor::VisitNote(Note *note)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = note->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+    this->CalcFor(note);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+void CalcLedgerLinesFunctor::CalcFor(LayerElement *layerElement)
+{
+    /*
+    Staff *staff = layerElement->GetAncestorStaff(RESOLVE_CROSS_STAFF);
     const int staffSize = staff->m_drawingStaffSize;
     const int staffX = staff->GetDrawingX();
     const bool drawingCueSize = note->GetDrawingCueSize();
-    const int radius = note->GetDrawingRadius(m_doc);
+    const int radius = layerElement->GetDrawingRadius(m_doc);
 
-    /************** Ledger lines: **************/
 
     int linesAbove = 0;
     int linesBelow = 0;
 
-    if (!note->HasLedgerLines(linesAbove, linesBelow, staff)) return FUNCTOR_SIBLINGS;
+    if (!layerElement->HasLedgerLines(linesAbove, linesBelow, staff)) return FUNCTOR_SIBLINGS;
 
     const int extension = m_doc->GetDrawingLedgerLineExtension(staffSize, drawingCueSize);
-    const int left = note->GetDrawingX() - extension - staffX;
-    int right = note->GetDrawingX() + 2 * radius + extension - staffX;
+    const int left = layerElement->GetDrawingX() - extension - staffX;
+    int right = layerElement->GetDrawingX() + 2 * radius + extension - staffX;
 
     if (linesAbove > 0) {
         staff->AddLedgerLineAbove(linesAbove, left, right, extension, drawingCueSize);
@@ -54,8 +61,7 @@ FunctorCode CalcLedgerLinesFunctor::VisitNote(Note *note)
     else {
         staff->AddLedgerLineBelow(linesBelow, left, right, extension, drawingCueSize);
     }
-
-    return FUNCTOR_SIBLINGS;
+    */
 }
 
 FunctorCode CalcLedgerLinesFunctor::VisitStaffEnd(Staff *staff)

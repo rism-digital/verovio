@@ -46,6 +46,10 @@ protected:
     //
 private:
     /**
+     *
+     */
+    void CalcFor(LayerElement *layerElement);
+    /**
      * Shorten ledger lines which overlap with neighbors
      */
     void AdjustLedgerLines(
