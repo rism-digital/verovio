@@ -193,7 +193,7 @@ public:
      */
     std::string LogDebugTreeMsg() override
     {
-        return StringFormat("%d %s", this->GetXRel(), this->GetTime().ToString().c_str());
+        return StringFormat("%d %f", this->GetXRel(), this->GetTime().ToDouble());
     }
 
     //----------------//

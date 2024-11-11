@@ -181,8 +181,12 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             return FUNCTOR_CONTINUE;
         }
     }
+    // A ligature gets a default alignment in order to allow mensural cast-off
+    else if (layerElement->Is(LIGATURE)) {
+        // Nothing to do
+    }
     // We do not align these (container). Any other?
-    else if (layerElement->Is({ BEAM, LIGATURE, FTREM, TUPLET })) {
+    else if (layerElement->Is({ BEAM, FTREM, TUPLET })) {
         Fraction duration = layerElement->GetSameAsContentAlignmentDuration(m_currentParams, true, m_notationType);
         m_time = m_time + duration;
         return FUNCTOR_CONTINUE;

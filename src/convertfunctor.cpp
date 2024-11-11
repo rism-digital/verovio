@@ -20,6 +20,7 @@
 #include "ending.h"
 #include "fermata.h"
 #include "layer.h"
+#include "ligature.h"
 #include "mdiv.h"
 #include "mrest.h"
 #include "page.h"
@@ -267,12 +268,19 @@ bool ConvertToCastOffMensuralFunctor::IsValidBreakPoint(const Alignment *alignme
     // Not all layers have an alignment and we cannot break here
     if (alignment->GetChildCount() != nbLayers) return false;
 
+    const bool ligatureAsBracket = m_doc->GetOptions()->m_ligatureAsBracket.GetValue();
+
     for (const Object *child : alignment->GetChildren()) {
         for (const Object *refChild : child->GetChildren()) {
             // Do not break within editorial markup
             if (refChild->GetFirstAncestorInRange(EDITORIAL_ELEMENT, EDITORIAL_ELEMENT_max)) return false;
-            // Do not break within a ligature
-            if (refChild->GetFirstAncestor(LIGATURE)) return false;
+            // Do not break within a ligature when rendered as bracket - (notes in it will have a different aligner
+            // execpt for the first one)
+            if (ligatureAsBracket && refChild->GetFirstAncestor(LIGATURE)) {
+                const Ligature *ligature = vrv_cast<const Ligature *>(refChild->GetFirstAncestor(LIGATURE));
+                assert(ligature);
+                if (ligature->GetAlignment() != alignment) return false;
+            }
         }
         // When we have more than one neume in a syllable, every neume has its own alignment.
         // Only the first one, which is shared with the syllable, is a valid break point
