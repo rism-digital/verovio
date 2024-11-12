@@ -121,15 +121,14 @@ void CalcLedgerLinesFunctor::AdjustLedgerLines(
     // For each dash on the inner line (both cue and normal) we construct an adjustment with zero delta
     // and sort them
     std::vector<Adjustment> adjustments;
-    using DashType = std::pair<int, int>;
     if (!lines.empty()) {
-        for (const DashType &dash : lines.at(0).m_dashes) {
-            adjustments.push_back({ dash.first, dash.second, false, 0 });
+        for (const LedgerLine::Dash &dash : lines.at(0).m_dashes) {
+            adjustments.push_back({ dash.m_x1, dash.m_x2, false, 0 });
         }
     }
     if (!cueLines.empty()) {
-        for (const DashType &dash : cueLines.at(0).m_dashes) {
-            adjustments.push_back({ dash.first, dash.second, true, 0 });
+        for (const LedgerLine::Dash &dash : cueLines.at(0).m_dashes) {
+            adjustments.push_back({ dash.m_x1, dash.m_x2, true, 0 });
         }
     }
 
@@ -175,13 +174,13 @@ void CalcLedgerLinesFunctor::AdjustLedgerLines(
         if (adjustment.delta > 0) {
             ArrayOfLedgerLines &linesToAdjust = adjustment.isCue ? cueLines : lines;
             for (LedgerLine &line : linesToAdjust) {
-                std::list<DashType>::iterator iterDash
-                    = std::find_if(line.m_dashes.begin(), line.m_dashes.end(), [&adjustment](const DashType &dash) {
-                          return ((dash.first >= adjustment.left) && (dash.second <= adjustment.right));
-                      });
+                std::list<LedgerLine::Dash>::iterator iterDash = std::find_if(
+                    line.m_dashes.begin(), line.m_dashes.end(), [&adjustment](const LedgerLine::Dash &dash) {
+                        return ((dash.m_x1 >= adjustment.left) && (dash.m_x2 <= adjustment.right));
+                    });
                 if (iterDash != line.m_dashes.end()) {
-                    iterDash->first += adjustment.delta;
-                    iterDash->second -= adjustment.delta;
+                    iterDash->m_x1 += adjustment.delta;
+                    iterDash->m_x2 -= adjustment.delta;
                 }
             }
         }

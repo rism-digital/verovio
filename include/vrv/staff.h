@@ -45,6 +45,31 @@ public:
      */
     void AddDash(int left, int right, int extension);
 
+    class Dash {
+    public:
+        int m_x1;
+        int m_x2;
+        ListOfConstObjects m_events;
+
+        // Constructor
+        Dash(int x1, int x2, const Object *object)
+        {
+            m_x1 = x1;
+            m_x2 = x2;
+            m_events.push_back(object);
+        }
+
+        // Merge function to merge another Dash object into this one
+        void MergeWith(const Dash &other)
+        {
+            // Keep the first int from this Dash object, and the second int from the other
+            this->m_x1 = std::min(other.m_x1, this->m_x1);
+            this->m_x2 = std::max(other.m_x2, this->m_x2);
+            // Append the list from other to this
+            this->m_events.insert(this->m_events.end(), other.m_events.begin(), other.m_events.end());
+        }
+    };
+
 protected:
     //
 private:
@@ -53,7 +78,8 @@ public:
     /**
      * A list of dashes relative to the staff position.
      */
-    std::list<std::pair<int, int>> m_dashes;
+    // std::list<std::pair<int, int>> m_dashes;
+    std::list<Dash> m_dashes;
 
 protected:
     //

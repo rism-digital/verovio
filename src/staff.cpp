@@ -302,23 +302,24 @@ void LedgerLine::AddDash(int left, int right, int extension)
 {
     assert(left < right);
 
-    std::list<std::pair<int, int>>::iterator iter;
+    std::list<LedgerLine::Dash>::iterator iter;
 
     // First add the dash
     for (iter = m_dashes.begin(); iter != m_dashes.end(); ++iter) {
-        if (iter->first > left) break;
+        if (iter->m_x1 > left) break;
     }
-    m_dashes.insert(iter, { left, right });
+    m_dashes.insert(iter, LedgerLine::Dash(left, right, NULL));
 
     // Merge dashes which overlap by more than 1.5 extensions
     // => Dashes belonging to the same chord overlap at least by two extensions and will get merged
     // => Overlapping dashes of adjacent notes will not get merged
-    std::list<std::pair<int, int>>::iterator previous = m_dashes.begin();
+    std::list<LedgerLine::Dash>::iterator previous = m_dashes.begin();
     iter = m_dashes.begin();
     ++iter;
     while (iter != m_dashes.end()) {
-        if (previous->second > iter->first + 1.5 * extension) {
-            previous->second = std::max(iter->second, previous->second);
+        if (previous->m_x1 > iter->m_x1 + 1.5 * extension) {
+            previous->MergeWith(*iter);
+            previous->m_x2 = std::max(iter->m_x2, previous->m_x2);
             iter = m_dashes.erase(iter);
         }
         else {

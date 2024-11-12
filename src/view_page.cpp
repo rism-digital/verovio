@@ -1376,8 +1376,8 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerL
     dc->SetBrush(m_currentColor, AxSOLID);
 
     for (const LedgerLine &line : lines) {
-        for (const std::pair<int, int> &dash : line.m_dashes) {
-            dc->DrawLine(ToDeviceContextX(x + dash.first), ToDeviceContextY(y), ToDeviceContextX(x + dash.second),
+        for (const LedgerLine::Dash &dash : line.m_dashes) {
+            dc->DrawLine(ToDeviceContextX(x + dash.m_x1), ToDeviceContextY(y), ToDeviceContextX(x + dash.m_x2),
                 ToDeviceContextY(y));
         }
         y += ySpace;
