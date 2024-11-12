@@ -133,6 +133,8 @@ private:
     //
     int m_pageMarginTop;
     int m_pageMarginLeft;
+    // A flag indicating we are dealing with a neume line
+    bool m_currentNeumeLine;
 };
 
 } // namespace vrv
