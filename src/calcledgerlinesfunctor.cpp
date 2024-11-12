@@ -82,10 +82,10 @@ void CalcLedgerLinesFunctor::CalcForLayerElement(
     }
 
     if (linesAbove > 0) {
-        staff->AddLedgerLineAbove(linesAbove, left, right, extension, drawingCueSize);
+        staff->AddLedgerLineAbove(linesAbove, left, right, extension, drawingCueSize, layerElement);
     }
     else {
-        staff->AddLedgerLineBelow(linesBelow, left, right, extension, drawingCueSize);
+        staff->AddLedgerLineBelow(linesBelow, left, right, extension, drawingCueSize, layerElement);
     }
 }
 

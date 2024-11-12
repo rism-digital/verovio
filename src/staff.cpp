@@ -239,23 +239,24 @@ int Staff::CalcPitchPosYRel(const Doc *doc, int loc) const
     return (loc - staffLocOffset) * doc->GetDrawingUnit(m_drawingStaffSize);
 }
 
-void Staff::AddLedgerLineAbove(int count, int left, int right, int extension, bool cueSize)
+void Staff::AddLedgerLineAbove(int count, int left, int right, int extension, bool cueSize, const Object *event)
 {
-    this->AddLedgerLines(cueSize ? m_ledgerLinesAboveCue : m_ledgerLinesAbove, count, left, right, extension);
+    this->AddLedgerLines(cueSize ? m_ledgerLinesAboveCue : m_ledgerLinesAbove, count, left, right, extension, event);
 }
 
-void Staff::AddLedgerLineBelow(int count, int left, int right, int extension, bool cueSize)
+void Staff::AddLedgerLineBelow(int count, int left, int right, int extension, bool cueSize, const Object *event)
 {
-    this->AddLedgerLines(cueSize ? m_ledgerLinesBelowCue : m_ledgerLinesBelow, count, left, right, extension);
+    this->AddLedgerLines(cueSize ? m_ledgerLinesBelowCue : m_ledgerLinesBelow, count, left, right, extension, event);
 }
 
-void Staff::AddLedgerLines(ArrayOfLedgerLines &lines, int count, int left, int right, int extension)
+void Staff::AddLedgerLines(
+    ArrayOfLedgerLines &lines, int count, int left, int right, int extension, const Object *event)
 {
     assert(left < right);
 
     if ((int)lines.size() < count) lines.resize(count);
     for (int i = 0; i < count; ++i) {
-        lines.at(i).AddDash(left, right, extension);
+        lines.at(i).AddDash(left, right, extension, event);
     }
 }
 
@@ -298,7 +299,7 @@ int Staff::GetNearestInterStaffPosition(int y, const Doc *doc, data_STAFFREL pla
 // LedgerLine
 //----------------------------------------------------------------------------
 
-void LedgerLine::AddDash(int left, int right, int extension)
+void LedgerLine::AddDash(int left, int right, int extension, const Object *event)
 {
     assert(left < right);
 
@@ -308,7 +309,7 @@ void LedgerLine::AddDash(int left, int right, int extension)
     for (iter = m_dashes.begin(); iter != m_dashes.end(); ++iter) {
         if (iter->m_x1 > left) break;
     }
-    m_dashes.insert(iter, LedgerLine::Dash(left, right, NULL));
+    m_dashes.insert(iter, LedgerLine::Dash(left, right, event));
 
     // Merge dashes which overlap by more than 1.5 extensions
     // => Dashes belonging to the same chord overlap at least by two extensions and will get merged

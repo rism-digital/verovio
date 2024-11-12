@@ -43,7 +43,7 @@ public:
      * Add a dash to the ledger line object.
      * If necessary merges overlapping dashes.
      */
-    void AddDash(int left, int right, int extension);
+    void AddDash(int left, int right, int extension, const Object *event);
 
     class Dash {
     public:
@@ -233,8 +233,8 @@ public:
      * If necessary creates the ledger line array.
      */
     ///@{
-    void AddLedgerLineAbove(int count, int left, int right, int extension, bool cueSize);
-    void AddLedgerLineBelow(int count, int left, int right, int extension, bool cueSize);
+    void AddLedgerLineAbove(int count, int left, int right, int extension, bool cueSize, const Object *event);
+    void AddLedgerLineBelow(int count, int left, int right, int extension, bool cueSize, const Object *event);
     ///@}
 
     /**
@@ -274,7 +274,7 @@ private:
     /**
      * Add the ledger line dashes to the legderline array.
      */
-    void AddLedgerLines(ArrayOfLedgerLines &lines, int count, int left, int right, int extension);
+    void AddLedgerLines(ArrayOfLedgerLines &lines, int count, int left, int right, int extension, const Object *event);
 
 public:
     /**
