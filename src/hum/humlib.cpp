@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Sep 12 14:59:38 PDT 2024
+// Last Modified: Wed Nov 13 13:08:51 PST 2024
 // Filename:      min/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.cpp
 // Syntax:        C++11
@@ -45496,8 +45496,8 @@ char& MuseRecordBasic::getColumn(int columnNumber) {
 	int length = (int)m_recordString.size();
 	// originally the limit for data columns was 80:
 	// if (realindex < 0 || realindex >= 80) {
-	// the new limit is somewhere above 900, but limit to 180
-	if (realindex < 0 || realindex >= 180) {
+	// the new limit is somewhere above 900, but limit to 1024
+	if (realindex < 0 || realindex >= 1024) {
 		cerr << "Error trying to access column: " << columnNumber  << endl;
 		cerr << "CURRENT DATA: ===============================" << endl;
 		cerr << (*this);
@@ -58766,6 +58766,305 @@ void Tool_autostem::countBeamStuff(const string& token, int& start, int& stop,
 			case 'K': flagr++;  break;
 			case 'k': flagl++;  break;
 		}
+	}
+}
+
+
+
+
+/////////////////////////////////
+//
+// Tool_bardash::Tool_bardash -- Set the recognized options for the tool.
+//
+
+Tool_bardash::Tool_bardash(void) {
+	define("r|remove=b",    "remove any dot/dash/invisible barline stylings");
+}
+
+
+
+///////////////////////////////
+//
+// Tool_bardash::run -- Primary interfaces to the tool.
+//
+
+bool Tool_bardash::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_bardash::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	return run(infile, out);
+}
+
+
+bool Tool_bardash::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	out << m_free_text.str();
+	return status;
+}
+
+
+bool Tool_bardash::run(HumdrumFile& infile) {
+   initialize();
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_bardash::initialize --
+//
+
+void Tool_bardash::initialize(void) {
+	m_removeQ = getBoolean("remove");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_bardash::processFile --
+//
+
+void Tool_bardash::processFile(HumdrumFile& infile) {
+	if (m_removeQ) {
+		removeBarStylings(infile);
+	} else {
+		applyBarStylings(infile);
+	}
+	infile.createLinesFromTokens();
+	m_humdrum_text << infile;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_bardash::removeBarStylings --
+//
+
+void Tool_bardash::removeBarStylings(HumdrumFile& infile) {
+	vector<HTp> kstarts = infile.getKernSpineStartList();
+	for (int i=0; i<(int)kstarts.size(); i++) {
+		removeBarStylings(kstarts.at(i));
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_bardash::removeBarStylings --
+//
+
+void Tool_bardash::removeBarStylings(HTp spine) {
+
+	HTp current = spine->getNextToken();
+	bool activeQ = false;
+	bool dashQ   = false;
+	bool dotQ    = false;
+	bool invisQ  = false;
+	HumRegex hre;
+	while (current) {
+		if (current->isInterpretation()) {
+			if (hre.search(current, "^\\*bar:")) {
+				if (hre.search(current, "stop")) {
+					activeQ = false;
+					dashQ  = false;
+					dotQ   = false;
+					invisQ = false;
+				} else {
+					activeQ = true;
+					if (hre.search(current, "^\\*bar:.*dash=(\\d+)")) {
+						dashQ  = true;
+						dotQ   = false;
+						invisQ = false;
+					} else if (hre.search(current, "^\\*bar:.*dot=(\\d+)")) {
+						dashQ  = false;
+						dotQ   = true;
+						invisQ = false;
+					} else if (hre.search(current, "^\\*bar:.*invis=(\\d+)")) {
+						dashQ  = false;
+						dotQ   = false;
+						invisQ = true;
+					}
+				}
+			}
+		}
+		if (!current->isBarline()) {
+			current = current->getNextToken();
+			return;
+		}
+		if (!activeQ) {
+			current = current->getNextToken();
+			return;
+		}
+		int track = current->getTrack();
+		HTp rcurrent = current;
+		while (rcurrent) {
+			if (track != rcurrent->getTrack()) {
+				break;
+			}
+			string text = *rcurrent;
+			int length = (int)text.size();
+			if (dashQ) {
+				hre.replaceDestructive(text, "", ":", "g");
+			} else if (dotQ) {
+				hre.replaceDestructive(text, "", ".", "g");
+			} else if (invisQ) {
+				hre.replaceDestructive(text, "", "-", "g");
+			}
+			if (length > (int)text.size()) {
+				rcurrent->setText(text);
+			}
+			rcurrent = rcurrent->getNextFieldToken();
+		}
+		current = current->getNextToken();
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_bardash::applyBarStylings --
+//
+
+void Tool_bardash::applyBarStylings(HumdrumFile& infile) {
+	vector<HTp> kstarts = infile.getKernSpineStartList();
+	for (int i=0; i<(int)kstarts.size(); i++) {
+		applyBarStylings(kstarts.at(i));
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_bardash::applyBarStylings --
+//
+
+void Tool_bardash::applyBarStylings(HTp spine) {
+
+	HTp current = spine->getNextToken();
+	bool activeQ = false;
+	bool dashQ   = false;
+	bool dotQ    = false;
+	bool invisQ  = false;
+	int dash  = 0;
+	int dot   = 0;
+	int invis = 0;
+	int counter = 0;
+	HumRegex hre;
+	while (current) {
+		if (current->isInterpretation()) {
+			if (hre.search(current, "^\\*bar:")) {
+				if (hre.search(current, "stop")) {
+					activeQ = false;
+					dashQ   = false;
+					dotQ    = false;
+					invisQ  = false;
+					dash    = 0;
+					dot     = 0;
+					invis   = 0;
+				} else {
+					activeQ = true;
+					if (hre.search(current, "^\\*bar:.*dash=(\\d+)")) {
+						dashQ  = true;
+						dotQ   = false;
+						invisQ = false;
+						dash   = hre.getMatchInt(1);
+						counter = 0;
+					} else if (hre.search(current, "^\\*bar:.*dot=(\\d+)")) {
+						dashQ  = false;
+						dotQ   = true;
+						invisQ = false;
+						dot    = hre.getMatchInt(1);
+						counter = 0;
+					} else if (hre.search(current, "^\\*bar:.*invis=(\\d+)")) {
+						dashQ  = false;
+						dotQ   = false;
+						invisQ = true;
+						invis  = hre.getMatchInt(1);
+						counter = 0;
+					}
+				}
+			}
+			current = current->getNextToken();
+			continue;
+		}
+		if (!current->isBarline()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (!activeQ) {
+			current = current->getNextToken();
+			continue;
+		}
+
+		int track = current->getTrack();
+		HTp rcurrent = current;
+
+		if (dashQ && (dash > 0)) {
+
+			if (counter % dash != 0) {
+				while (rcurrent) {
+					if (track != rcurrent->getTrack()) {
+						break;
+					}
+					string text = *rcurrent;
+					if (text.find(":") == string::npos) {
+						text += ":";
+						rcurrent->setText(text);
+					}
+					rcurrent = rcurrent->getNextFieldToken();
+				}
+			}
+
+		} else if (dotQ && (dot > 0)) {
+
+			if (counter % dot != 0) {
+				while (rcurrent) {
+					if (track != rcurrent->getTrack()) {
+						break;
+					}
+					string text = *rcurrent;
+					if (text.find(".") == string::npos) {
+						text += ".";
+						rcurrent->setText(text);
+					}
+					rcurrent = rcurrent->getNextFieldToken();
+				}
+			}
+
+		} else if (invisQ && (invis > 0)) {
+
+			if (counter % invis != 0) {
+				while (rcurrent) {
+					if (track != rcurrent->getTrack()) {
+						break;
+					}
+					string text = *rcurrent;
+					if (text.find("-") == string::npos) {
+						text += "-";
+						rcurrent->setText(text);
+					}
+					rcurrent = rcurrent->getNextFieldToken();
+				}
+			}
+
+		}
+		counter++;
+		current = current->getNextToken();
 	}
 }
 
@@ -79174,17 +79473,16 @@ Tool_esac2hum::Tool_esac2hum(void) {
 
 //////////////////////////////
 //
-// Tool_esac2hum::convert -- Convert a MusicXML file into
-//     Humdrum content.
+// Tool_esac2hum::convert -- Convert an EsAC data into Humdrum data.
 //
 
 bool Tool_esac2hum::convertFile(ostream& out, const string& filename) {
 	initialize();
-   ifstream file(filename);
-   if (file) {
-      return convert(out, file);
-   }
-   return false;
+	ifstream file(filename);
+	if (file) {
+		return convert(out, file);
+	}
+	return false;
 }
 
 
@@ -79321,6 +79619,8 @@ bool Tool_esac2hum::getSong(vector<string>& song, istream& infile) {
 
 	bool expectingCloseQ = false;
 
+	// Now collect lines for the song until another CUT[] is found
+	// (do not store previous line above CUT[] which is the source edition label.)
 	while (!infile.eof()) {
 		getline(infile, buffer);
 
@@ -79367,13 +79667,12 @@ bool Tool_esac2hum::getSong(vector<string>& song, istream& infile) {
 		if (hre.search(buffer, "^[A-Za-z][^\\[\\]]*$")) {
 			// collection line
 			m_prevline = buffer;
-			continue;
+			return true;
 		}
 
 		if (hre.search(buffer, "^[A-Za-z]+\\s*\\[[^\\]]*\\s*$")) {
 			// parameter with opening [
 			expectingCloseQ = true;
-		} else {
 		}
 
 		song.push_back(buffer);
@@ -79711,7 +80010,7 @@ bool Tool_esac2hum::Score::parseMel(const string& mel) {
 
 	analyzeTies();
 	analyzePhrases();
- 	generateHumdrumNotes();
+	generateHumdrumNotes();
 	calculateClef();
 	calculateKeyInformation();
 	calculateTimeSignatures();
@@ -80007,11 +80306,11 @@ void Tool_esac2hum::Score::prepareMultipleTimeSignatures(const string& ts) {
 	for (int i=0; i<(int)size()-1; i++) {
 		Tool_esac2hum::Phrase& phrase = at(i);
 		Tool_esac2hum::Phrase& nextphrase = at(i+1);
-      if (phrase.size() < 2) {
+		if (phrase.size() < 2) {
 			// deal with phrases with a single measure later
 			continue;
 		}
-      if (nextphrase.size() < 2) {
+		if (nextphrase.size() < 2) {
 			// deal with phrases with a single measure later
 			continue;
 		}
@@ -80805,7 +81104,7 @@ bool Tool_esac2hum::Note::parseNote(const string& note, HumNum factor) {
 	}
 
 	m_alter = s - b;
- 	m_octave = plus - minus;
+	m_octave = plus - minus;
 
 	m_factor = factor;
 
@@ -81146,9 +81445,9 @@ void Tool_esac2hum::getParameters(vector<string>& infile) {
 void Tool_esac2hum::printParameters(void) {
 	cerr << endl;
 	cerr << "========================================" << endl;
-    for (const auto& [key, value] : m_score.m_params) {
-        cerr << "Key: " << key << ", Value: " << value << endl;
-    }
+	for (const auto& [key, value] : m_score.m_params) {
+		cerr << "Key: " << key << ", Value: " << value << endl;
+	}
 	cerr << "========================================" << endl;
 	cerr << endl;
 }
@@ -81165,6 +81464,8 @@ void Tool_esac2hum::printBemComment(ostream& output) {
 	if (bem.empty()) {
 		return;
 	}
+	HumRegex hre;
+	hre.replaceDestructive(bem, " ", "\n", "g");
 	output << "!!!ONB: " << bem << endl;
 }
 
@@ -86952,6 +87253,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(autobeam, infile, commands[i].second, status);
 		} else if (commands[i].first == "autostem") {
 			RUNTOOL(autostem, infile, commands[i].second, status);
+		} else if (commands[i].first == "bardash") {
+			RUNTOOL(bardash, infile, commands[i].second, status);
 		} else if (commands[i].first == "binroll") {
 			RUNTOOL(binroll, infile, commands[i].second, status);
 		} else if (commands[i].first == "chantize") {
@@ -101237,6 +101540,9 @@ void Tool_melisma::extractWordlist(vector<WordInfo>& wordinfo, map<string, int>&
 		mincount = 2;
 	}
 	string word;
+	vector<HumNum> lastTimes;
+	lastTimes.resize(infile.getMaxTrack() + 1);
+	std::fill(lastTimes.begin(), lastTimes.end(), -1);
 	WordInfo winfo;
 	for (int i=0; i<(int)notecount.size(); i++) {
 		for (int j=0; j<(int)notecount[i].size(); j++) {
@@ -101245,8 +101551,13 @@ void Tool_melisma::extractWordlist(vector<WordInfo>& wordinfo, map<string, int>&
 			}
 			HTp token = infile.token(i, j);
 			word = extractWord(winfo, token, notecount);
-			wordlist[word]++;
 			int track = token->getTrack();
+			if (winfo.starttime == lastTimes.at(track)) {
+				// Exclude duplicate entries of words (multiple melismas in same word).
+				continue;
+			}
+			lastTimes.at(track) = winfo.starttime;
+			wordlist[word]++;
 			winfo.name = m_names[track];
 			winfo.abbreviation = m_abbreviations[track];
 			winfo.partnum = m_partnums[track];
@@ -126392,6 +126703,9 @@ void Tool_shed::processFile(HumdrumFile& infile) {
 	if (m_modified) {
 		infile.createLinesFromTokens();
 	}
+
+	// needed only for command-line version of tool?:
+	m_humdrum_text << infile;
 }
 
 

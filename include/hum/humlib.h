@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Sep 12 14:59:38 PDT 2024
+// Last Modified: Wed Nov 13 13:08:51 PST 2024
 // Filename:      min/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.h
 // Syntax:        C++11
@@ -5953,6 +5953,31 @@ class Tool_autostem : public HumTool {
 		int    Borderline    = 0;       // really used with -u option
 		int    notlongQ      = 0;       // used with -L option
 		bool   m_quit        = false;
+
+};
+
+
+class Tool_bardash : public HumTool {
+
+	public:
+		     Tool_bardash (void);
+		     ~Tool_bardash() {};
+
+		bool run     (HumdrumFileSet& infiles);
+		bool run     (HumdrumFile& infile);
+		bool run     (const std::string& indata, std::ostream& out);
+		bool run     (HumdrumFile& infile, std::ostream& out);
+
+	protected:
+		void         initialize   (void);
+      void         processFile  (HumdrumFile& infile);
+		void         removeBarStylings(HumdrumFile& infile);
+		void         removeBarStylings(HTp spine);
+		void         applyBarStylings(HumdrumFile& infile);
+		void         applyBarStylings(HTp spine);
+
+	private:
+		bool  m_removeQ = false;  // used with -r option
 
 };
 
