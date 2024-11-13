@@ -66,7 +66,9 @@ public:
             this->m_x1 = std::min(other.m_x1, this->m_x1);
             this->m_x2 = std::max(other.m_x2, this->m_x2);
             // Append the list from other to this
-            this->m_events.insert(this->m_events.end(), other.m_events.begin(), other.m_events.end());
+            if (!other.m_events.empty()) {
+                this->m_events.insert(this->m_events.end(), other.m_events.begin(), other.m_events.end());
+            }
         }
     };
 

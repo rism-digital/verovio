@@ -81,11 +81,12 @@ void CalcLedgerLinesFunctor::CalcForLayerElement(
         left -= width / 2;
     }
 
+    const LayerElement *event = (m_doc->GetOptions()->m_svgHtml5.GetValue()) ? layerElement : NULL;
     if (linesAbove > 0) {
-        staff->AddLedgerLineAbove(linesAbove, left, right, extension, drawingCueSize, layerElement);
+        staff->AddLedgerLineAbove(linesAbove, left, right, extension, drawingCueSize, event);
     }
     else {
-        staff->AddLedgerLineBelow(linesBelow, left, right, extension, drawingCueSize, layerElement);
+        staff->AddLedgerLineBelow(linesBelow, left, right, extension, drawingCueSize, event);
     }
 }
 
