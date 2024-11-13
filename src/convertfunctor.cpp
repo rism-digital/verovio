@@ -587,6 +587,19 @@ FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
             next = (mensurIter == mensurs.end()) ? totalTime : (*mensurIter).m_time;
         }
     }
+    // This will happen with empty CMME files
+    if (m_measures.empty()) {
+        LogWarning("The content of the measure seems empty, creating one for the process not to fail.");
+        MeasureInfo measureInfo(time, measureDuration);
+        Measure *cmnMeasure = new Measure();
+        measureInfo.m_measure = cmnMeasure;
+        // Arbitrary duration
+        measureInfo.m_duration = 2;
+        cmnMeasure->SetMetcon(BOOLEAN_false);
+        m_targetSystem->AddChild(cmnMeasure);
+        m_measures.push_back(measureInfo);
+    }
+
     m_measures.back().m_measure->SetRight(BARRENDITION_dbl);
 
     // Now we are ready to process layers and to move content to m_measures
