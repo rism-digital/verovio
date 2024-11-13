@@ -858,43 +858,51 @@ void ConvertToCmnFunctor::SplitDurationInterface(
         durationWithoutProport = durationWithoutProport * m_currentParams.proport->GetCumulatedNum();
     if (m_currentParams.proport->HasNumbase())
         durationWithoutProport = durationWithoutProport / m_currentParams.proport->GetCumulatedNumbase();
+    // We have a proportion applied, so the duration is different
+    bool hasProportion = (durationWithoutProport != processed);
     // A flag indicating if the tuplet is a temporary one not corresponding to the proportion when notes are split
     // across measures
     bool nonProportTuplet = false;
-    // We have a proportion being not 1/1
-    if (durationWithoutProport != processed) {
-        // If we have a proportion, check if the value can be represented by value up to 16th (arbitrary)
-        // This is not always the case when notes are split across measures
+
+    // Check if the value can be represented by value up to 16th (arbitrary)
+    // This is not always the case when notes are split across measures
+    // It is most likely to happen with proportions, but not only and it can also happen with coloration and notes
+    // having `@num` and `@numbase` One possible improvement would be to regroup sequences of notes with the same `@num`
+    // and `@numbase` under the same tuplet
+    if ((durationWithoutProport % Fraction(DURATION_16)) != 0) {
+        // If not, do not use the proportion tuplet an revert the duration back - however, that happens only when we
+        // have a proportion
+        m_proportTuplet = NULL;
+        durationWithoutProport = processed;
+        // If the remaining duration cannot be represented as well, last resort option with a specific tuplet
         if ((durationWithoutProport % Fraction(DURATION_16)) != 0) {
-            // If not, do not use the proportion tuplet an revert the duration back
-            m_proportTuplet = NULL;
-            durationWithoutProport = processed;
-            // If the remaining duration cannot be represented as well, last resort option with a specific tuplet
-            if ((durationWithoutProport % Fraction(DURATION_16)) != 0) {
-                m_proportTuplet = new Tuplet();
-                // Use a note with half of the noteDur expected - create a tuplet with according ratio
-                Fraction tupletRatio = durationWithoutProport / Fraction(noteDur) * 2;
-                LogWarning("The tuplet corresponding to proportion is not appropriate and must be changed to %s",
-                    tupletRatio.ToString().c_str());
-                m_proportTuplet->SetNum(tupletRatio.GetDenominator());
-                m_proportTuplet->SetNumbase(tupletRatio.GetNumerator());
-                m_proportTuplet->SetNumFormat(tupletVis_NUMFORMAT_ratio);
-                m_proportTuplet->SetBracketVisible(BOOLEAN_false);
-                durationWithoutProport = Fraction(noteDur) / 2;
-                (*m_currentLayer)->AddChild(m_proportTuplet);
-                // Mark the tuplet as temporary
-                nonProportTuplet = true;
-            }
-        }
-        // Create a new tuplet but only if we have not already created one for the previous note
-        else if (!m_proportTuplet) {
             m_proportTuplet = new Tuplet();
-            m_proportTuplet->SetNum(m_currentParams.proport->GetCumulatedNum());
-            m_proportTuplet->SetNumbase(m_currentParams.proport->GetCumulatedNumbase());
+            // Use a note with half of the noteDur expected when in a proportion since the note is being split across
+            // measures - create a tuplet with according ratio
+            Fraction tupletRatio = (hasProportion) ? durationWithoutProport / Fraction(noteDur) * 2
+                                                   : durationWithoutProport / Fraction(noteDur);
+            LogWarning("The tuplet corresponding to proportion is not appropriate and must be changed to %s",
+                tupletRatio.ToString().c_str());
+            m_proportTuplet->SetNum(tupletRatio.GetDenominator());
+            m_proportTuplet->SetNumbase(tupletRatio.GetNumerator());
             m_proportTuplet->SetNumFormat(tupletVis_NUMFORMAT_ratio);
             m_proportTuplet->SetBracketVisible(BOOLEAN_false);
+            // Same here : use a note with half of the noteDur expected when in a proportion since the note is being
+            // split across measures
+            durationWithoutProport = (hasProportion) ? Fraction(noteDur) / 2 : Fraction(noteDur);
             (*m_currentLayer)->AddChild(m_proportTuplet);
+            // Mark the tuplet as temporary
+            nonProportTuplet = true;
         }
+    }
+    // Create a new tuplet but only if we have not already created one for the previous note
+    else if (hasProportion && !m_proportTuplet) {
+        m_proportTuplet = new Tuplet();
+        m_proportTuplet->SetNum(m_currentParams.proport->GetCumulatedNum());
+        m_proportTuplet->SetNumbase(m_currentParams.proport->GetCumulatedNumbase());
+        m_proportTuplet->SetNumFormat(tupletVis_NUMFORMAT_ratio);
+        m_proportTuplet->SetBracketVisible(BOOLEAN_false);
+        (*m_currentLayer)->AddChild(m_proportTuplet);
     }
 
     // Split what we can fit within a measure into cmn duration (e.g., B => B. Sb. in tempus perfectum and prolatio
