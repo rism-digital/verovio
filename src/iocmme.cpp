@@ -524,10 +524,10 @@ void CmmeInput::CreateBreak(pugi::xml_node breakNode)
 void CmmeInput::CreateChord(pugi::xml_node chordNode)
 {
     assert(m_currentContainer);
-    
+
     // CMME can have 'chords' in ligatures - we keep only the first note
     bool inLigature = (m_currentContainer->Is(LIGATURE));
-    
+
     if (!inLigature) {
         Chord *chord = new Chord();
         m_currentContainer->AddChild(chord);
