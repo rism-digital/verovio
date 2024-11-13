@@ -11,7 +11,6 @@
 
 #include <cassert>
 #include <cmath>
-#include <codecvt>
 #include <cstdlib>
 #include <iostream>
 #include <locale>
@@ -264,14 +263,125 @@ std::string ExtractIDFragment(std::string refID)
 
 std::string UTF32to8(const std::u32string &in)
 {
+    std::string out;
+    for (auto cp : in) {
+        if (cp < 0x80) { // One byte
+            out.push_back(static_cast<char>(cp));
+        }
+        else if (cp < 0x800) { // Two bytes
+            out.push_back(static_cast<char>((cp >> 6) | 0xC0));
+            out.push_back(static_cast<char>((cp & 0x3F) | 0x80));
+        }
+        else if (cp < 0x10000) { // Three bytes
+            out.push_back(static_cast<char>((cp >> 12) | 0xE0));
+            out.push_back(static_cast<char>(((cp >> 6) & 0x3F) | 0x80));
+            out.push_back(static_cast<char>((cp & 0x3F) | 0x80));
+        }
+        else { // Four bytes
+            out.push_back(static_cast<char>((cp >> 18) | 0xF0));
+            out.push_back(static_cast<char>(((cp >> 12) & 0x3F) | 0x80));
+            out.push_back(static_cast<char>(((cp >> 6) & 0x3F) | 0x80));
+            out.push_back(static_cast<char>((cp & 0x3F) | 0x80));
+        }
+    }
+    return out;
+
+    // deprecated code
+    /*
     std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> strCnv;
     return strCnv.to_bytes(in);
+    */
 }
 
 std::u32string UTF8to32(const std::string &in)
 {
+    std::u32string out;
+    for (size_t i = 0; i < in.size();) {
+        uint32_t cp = in[i] & 0xFF;
+        if (cp <= 0x7F) { // One byte
+            out.push_back(cp);
+            ++i;
+        }
+        else if (cp <= 0xDF) { // Two bytes
+            cp = ((cp & 0x1F) << 6) | (in[i + 1] & 0x3F);
+            out.push_back(cp);
+            i += 2;
+        }
+        else if (cp <= 0xEF) { // Three bytes
+            cp = ((cp & 0x0F) << 12) | ((in[i + 1] & 0x3F) << 6) | (in[i + 2] & 0x3F);
+            out.push_back(cp);
+            i += 3;
+        }
+        else { // Four bytes
+            cp = ((cp & 0x07) << 18) | ((in[i + 1] & 0x3F) << 12) | ((in[i + 2] & 0x3F) << 6) | (in[i + 3] & 0x3F);
+            out.push_back(cp);
+            i += 4;
+        }
+    }
+    return out;
+
+    // deprecated code
+    /*
     std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> strCnv;
     return strCnv.from_bytes(in);
+    */
+}
+
+std::string UTF16to8(const std::u16string &in)
+{
+    std::string out;
+    auto it = in.begin();
+
+    while (it != in.end()) {
+        uint32_t cp; // Code point
+
+        // Read the first UTF-16 unit
+        uint16_t lead = *it++;
+
+        // If it's a high surrogate, read the next unit to form a full code point
+        if (lead >= 0xD800 && lead <= 0xDBFF) {
+            // Make sure there's a trailing surrogate
+            if (it != in.end()) {
+                uint16_t trail = *it++;
+                if (trail >= 0xDC00 && trail <= 0xDFFF) {
+                    // Combine lead and trail to form a full code point
+                    cp = ((lead - 0xD800) << 10) + (trail - 0xDC00) + 0x10000;
+                }
+                else {
+                    throw std::runtime_error("Invalid UTF-16 sequence");
+                }
+            }
+            else {
+                throw std::runtime_error("Incomplete UTF-16 sequence");
+            }
+        }
+        else {
+            // It's a single UTF-16 unit, treat as a single code point
+            cp = lead;
+        }
+
+        // Convert code point to UTF-8
+        if (cp < 0x80) { // One byte
+            out.push_back(static_cast<char>(cp));
+        }
+        else if (cp < 0x800) { // Two bytes
+            out.push_back(static_cast<char>((cp >> 6) | 0xC0));
+            out.push_back(static_cast<char>((cp & 0x3F) | 0x80));
+        }
+        else if (cp < 0x10000) { // Three bytes
+            out.push_back(static_cast<char>((cp >> 12) | 0xE0));
+            out.push_back(static_cast<char>(((cp >> 6) & 0x3F) | 0x80));
+            out.push_back(static_cast<char>((cp & 0x3F) | 0x80));
+        }
+        else { // Four bytes
+            out.push_back(static_cast<char>((cp >> 18) | 0xF0));
+            out.push_back(static_cast<char>(((cp >> 12) & 0x3F) | 0x80));
+            out.push_back(static_cast<char>(((cp >> 6) & 0x3F) | 0x80));
+            out.push_back(static_cast<char>((cp & 0x3F) | 0x80));
+        }
+    }
+
+    return out;
 }
 
 std::string GetFileVersion(int vmaj, int vmin, int vrev)
@@ -347,6 +457,16 @@ std::string ToCamelCase(const std::string &s)
     result[0] = tolower(result[0]);
 
     return result;
+}
+
+data_DURATION DurationMin(data_DURATION dur1, data_DURATION dur2)
+{
+    return (dur1 < dur2) ? dur1 : dur2;
+}
+
+data_DURATION DurationMax(data_DURATION dur1, data_DURATION dur2)
+{
+    return (dur1 > dur2) ? dur1 : dur2;
 }
 
 //----------------------------------------------------------------------------

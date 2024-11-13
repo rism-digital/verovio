@@ -225,7 +225,7 @@ bool ExpansionMap::AddExpandedIDToExpansionMap(const std::string &origXmlId, std
 
 std::vector<std::string> ExpansionMap::GetExpansionIDsForElement(const std::string &xmlId)
 {
-    if (m_map.count(xmlId)) {
+    if (m_map.contains(xmlId)) {
         return m_map.at(xmlId);
     }
     else {

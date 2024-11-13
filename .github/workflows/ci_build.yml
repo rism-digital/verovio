@@ -36,6 +36,7 @@ env:
   # build artifacts
   DOC_BUILD: doc-build
   TOOLKIT_BUILD: toolkit-build
+  FONTS: fonts
 
   # doxygen
   DOXYGEN_REPO: ${{ github.repository_owner }}/verovio-doxygen # works from rism-digital and from forks
@@ -276,9 +277,9 @@ jobs:
 
       - name: Upload js build artifact (${{ matrix.toolkit.target }})
         if: ${{ matrix.toolkit.upload == true }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4.4.3
         with:
-          name: ${{ env.TOOLKIT_BUILD }}
+          name: ${{ env.TOOLKIT_BUILD }}-${{ github.run_id }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ matrix.toolkit.filepath }}
 
 
@@ -301,9 +302,9 @@ jobs:
         run: cp data/*.css $GITHUB_WORKSPACE/$TEMP_DIR/data/
 
       - name: Upload font data artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4.4.3
         with:
-          name: ${{ env.TOOLKIT_BUILD }}
+          name: ${{ env.FONTS }}-${{ github.run_id }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}
 
   ##################################
@@ -366,14 +367,24 @@ jobs:
           path: ${{ env.GH_PAGES_DIR }}
 
       - name: Download TOOLKIT_BUILD artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
-          name: ${{ env.TOOLKIT_BUILD }}
+          name: ${{ env.TOOLKIT_BUILD }}-${{ github.run_id }}
           path: artifacts/${{ env.TOOLKIT_BUILD }}
 
-      - name: Copy artifacts to gh-pages
+      - name: Copy the toolkit artifacts to gh-pages
         run: |
           cp -r artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
+
+      - name: Download FONTS artifacts
+        uses: actions/download-artifact@v4.1.7
+        with:
+          name: ${{ env.FONTS }}-${{ github.run_id }}
+          path: artifacts/${{ env.FONTS }}
+
+      - name: Copy the fonts artifacts to gh-pages
+        run: |
+          cp -r artifacts/$FONTS/* $GH_PAGES_DIR/javascript/develop/
 
       - name: Check git status before commit
         working-directory: ${{ env.GH_PAGES_DIR }}
@@ -455,9 +466,9 @@ jobs:
         run: (cat verovio.conf ; echo "OUTPUT_DIRECTORY = $GITHUB_WORKSPACE/$DOXYGEN_DIR") | doxygen -
 
       - name: Upload doxygen build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4.4.3
         with:
-          name: ${{ env.DOC_BUILD }}
+          name: ${{ env.DOC_BUILD }}-${{ github.run_id }}
           path: ${{ github.workspace }}/${{ env.DOXYGEN_DIR }}
 
   ###############################################
@@ -485,9 +496,9 @@ jobs:
           path: ${{ env.DOXYGEN_DIR }}
 
       - name: Download DOC_BUILD artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
-          name: ${{ env.DOC_BUILD }}
+          name: ${{ env.DOC_BUILD }}-${{ github.run_id }}
           path: artifacts/${{ env.DOC_BUILD }}
 
       - name: Remove old doc and copy build artifacts to DOXYGEN_DIR

@@ -45,7 +45,7 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
     if (pitchInterface) {
         pitchInterface->SetOctDefault(m_octDefault);
         // Check if there is a octave default for the staff - ignore cross-staff for this and use staffY
-        if (m_octDefaultForStaffN.count(staffY->GetN()) > 0) {
+        if (m_octDefaultForStaffN.contains(staffY->GetN())) {
             pitchInterface->SetOctDefault(m_octDefaultForStaffN.at(staffY->GetN()));
         }
     }
@@ -169,10 +169,10 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
             // set default location to the middle of the staff
             Staff *staff = layerElement->GetAncestorStaff();
             loc = staff->m_drawingLines - 1;
-            if ((durInterface->GetDur() < DUR_4) && (loc % 2 != 0)) --loc;
+            if ((durInterface->GetDur() < DURATION_4) && (loc % 2 != 0)) --loc;
             // Adjust special cases
-            if ((durInterface->GetDur() == DUR_1) && (staff->m_drawingLines > 1)) loc += 2;
-            if ((durInterface->GetDur() == DUR_BR) && (staff->m_drawingLines < 2)) loc -= 2;
+            if ((durInterface->GetDur() == DURATION_1) && (staff->m_drawingLines > 1)) loc += 2;
+            if ((durInterface->GetDur() == DURATION_breve) && (staff->m_drawingLines < 2)) loc -= 2;
 
             // If within a beam, calculate the rest's height based on it's relationship to the notes that surround it
             Beam *beam = vrv_cast<Beam *>(layerElement->GetFirstAncestor(BEAM, 1));

@@ -505,6 +505,9 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             if (meterSig && meterSig->HasCount() && meterSig->HasUnit()) {
                 midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetUnit());
             }
+            else if (meterSig && meterSig->HasSym()) {
+                midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetSymImplicitUnit());
+            }
         }
 
         // Set initial scoreDef values for tuning
@@ -542,7 +545,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     midiFile->sortTracks();
 }
 
-bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeasures)
+bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeasures, bool useFractions)
 {
     if (!this->HasTimemap()) {
         // generate MIDI timemap before progressing
@@ -558,7 +561,7 @@ bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeas
     generateTimemap.SetCueExclusion(this->GetOptions()->m_midiNoCue.GetValue());
     this->Process(generateTimemap);
 
-    timemap.ToJson(output, includeRests, includeMeasures);
+    timemap.ToJson(output, includeRests, includeMeasures, useFractions);
 
     return true;
 }

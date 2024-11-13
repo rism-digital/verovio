@@ -12,18 +12,17 @@
 
 namespace vrv {
 
-class Mensur;
-class MeterSig;
-
 //----------------------------------------------------------------------------
-// AlignmentParams
+// AlignMeterParams
 //----------------------------------------------------------------------------
 /**
  * Regroup pointers to meterSig, mensur and proport objects
  */
 struct AlignMeterParams {
-    const MeterSig *meterSig;
-    const Mensur *mensur;
+    const MeterSig *meterSig = NULL;
+    const Mensur *mensur = NULL;
+    // Not const since we are cumulating proportion
+    Proport *proport = NULL;
 };
 
 //----------------------------------------------------------------------------
@@ -75,7 +74,7 @@ private:
     // The measureAligner
     MeasureAligner *m_measureAligner;
     // The time
-    double m_time;
+    Fraction m_time;
     // The current MeterSig, Mensur and Proport
     AlignMeterParams m_currentParams;
     // The current notation type

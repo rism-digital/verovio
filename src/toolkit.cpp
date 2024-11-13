@@ -10,7 +10,6 @@
 //----------------------------------------------------------------------------
 
 #include <cassert>
-#include <codecvt>
 #include <locale>
 #include <regex>
 
@@ -24,6 +23,7 @@
 #include "filereader.h"
 #include "findfunctor.h"
 #include "ioabc.h"
+#include "iocmme.h"
 #include "iodarms.h"
 #include "iohumdrum.h"
 #include "iomei.h"
@@ -127,7 +127,7 @@ bool Toolkit::SetResourcePath(const std::string &path)
         success = success && this->SetFont(m_options->m_font.GetValue());
     }
     if (m_options->m_fontFallback.IsSet()) {
-        success = success && resources.SetFallback(m_options->m_fontFallback.GetStrValue());
+        resources.SetFallbackFont(m_options->m_fontFallback.GetStrValue());
     }
     if (m_options->m_fontLoadAll.IsSet()) {
         success = success && resources.LoadAll();
@@ -205,6 +205,9 @@ bool Toolkit::SetInputFrom(std::string const &inputFrom)
     }
     else if (inputFrom == "volpiano") {
         m_inputFrom = VOLPIANO;
+    }
+    else if (inputFrom == "cmme.xml") {
+        m_inputFrom = CMME;
     }
     else if ((inputFrom == "humdrum") || (inputFrom == "hum")) {
         m_inputFrom = HUMDRUM;
@@ -296,6 +299,9 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         if (std::regex_search(initial, std::regex("<(!DOCTYPE )?(score-partwise|opus|score-timewise)[\\s\\n>]"))) {
             return musicxmlDefault;
         }
+        if (std::regex_search(initial, std::regex("<(Piece xmlns=\"http://www.cmme.org\")[\\s\\n>]"))) {
+            return CMME;
+        }
         LogWarning("Warning: Trying to load unknown XML data which cannot be identified.");
         return UNKNOWN;
     }
@@ -368,7 +374,7 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
     /// Loading a UTF-16 file with basic conversion ot UTF-8
     /// This is called after checking if the file has a UTF-16 BOM
 
-    LogWarning("The file seems to be UTF-16 - trying to convert to UTF-8");
+    LogInfo("The file seems to be UTF-16 - trying to convert to UTF-8");
 
     std::ifstream fin(filename.c_str(), std::ios::in | std::ios::binary);
     if (!fin.is_open()) {
@@ -386,7 +392,7 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
 
     // order of the bytes has to be flipped
     if (u16data.at(0) == u'\uFFFE') {
-        LogWarning("The file seems to have been loaded as little endian - trying to convert to big endian");
+        LogInfo("The file seems to have been loaded as little endian - trying to convert to big endian");
         // convert to big endian (swap bytes)
         std::transform(std::begin(u16data), std::end(u16data), std::begin(u16data), [](char16_t c) {
             auto p = reinterpret_cast<char *>(&c);
@@ -400,10 +406,26 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
         u16data.erase(0, 1);
     }
 
-    std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> convert;
-    std::string utf8line = convert.to_bytes(u16data);
+    // std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> convert;
+    std::string utf8line = vrv::UTF16to8(u16data); // convert.to_bytes(u16data);
 
     return this->LoadData(utf8line, false);
+}
+
+std::string UTF16toUTF8(const std::u16string &input)
+{
+    std::string output;
+    // Placeholder for manual conversion logic
+    // Real conversion logic here should handle actual UTF-16 to UTF-8 conversion
+    for (char16_t c : input) {
+        if (c < 0x80) { // Handle basic ASCII conversion
+            output.push_back(static_cast<char8_t>(c));
+        }
+        else {
+            // Extend this block to handle non-ASCII characters
+        }
+    }
+    return output;
 }
 
 bool Toolkit::IsZip(const std::string &filename)
@@ -547,6 +569,9 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     }
     else if (inputFormat == VOLPIANO) {
         input = new VolpianoInput(&m_doc);
+    }
+    else if (inputFormat == CMME) {
+        input = new CmmeInput(&m_doc);
     }
 #ifndef NO_HUMDRUM_SUPPORT
     else if (inputFormat == HUMDRUM) {
@@ -1199,7 +1224,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
     }
     if (json.has<jsonxx::String>("fontFallback")) {
         Resources &resources = m_doc.GetResourcesForModification();
-        resources.SetFallback(m_options->m_fontFallback.GetStrValue());
+        resources.SetFallbackFont(m_options->m_fontFallback.GetStrValue());
     }
     if (json.has<jsonxx::Boolean>("fontLoadAll")) {
         Resources &resources = m_doc.GetResourcesForModification();
@@ -1288,11 +1313,11 @@ void Toolkit::PrintOptionUsageOutput(const vrv::Option *option, std::ostream &ou
 void Toolkit::PrintOptionUsage(const std::string &category, std::ostream &output) const
 {
     // map of all categories and expected string arguments for them
-    const std::map<vrv::OptionsCategory, std::string> categories
-        = { { vrv::OptionsCategory::Base, "base" }, { vrv::OptionsCategory::General, "general" },
-              { vrv::OptionsCategory::Layout, "layout" }, { vrv::OptionsCategory::Margins, "margins" },
-              { vrv::OptionsCategory::Mensural, "mensural" }, { vrv::OptionsCategory::Midi, "midi" },
-              { vrv::OptionsCategory::Selectors, "selectors" }, { vrv::OptionsCategory::Full, "full" } };
+    const std::map<vrv::OptionsCategory, std::string> categories = { { vrv::OptionsCategory::Base, "base" },
+        { vrv::OptionsCategory::General, "general" }, { vrv::OptionsCategory::Json, "json" },
+        { vrv::OptionsCategory::Layout, "layout" }, { vrv::OptionsCategory::Margins, "margins" },
+        { vrv::OptionsCategory::Mensural, "mensural" }, { vrv::OptionsCategory::Midi, "midi" },
+        { vrv::OptionsCategory::Selectors, "selectors" }, { vrv::OptionsCategory::Full, "full" } };
 
     output.precision(2);
     // display_version();
@@ -1782,6 +1807,7 @@ std::string Toolkit::RenderToTimemap(const std::string &jsonOptions)
 {
     bool includeMeasures = false;
     bool includeRests = false;
+    bool useFractions = false;
 
     jsonxx::Object json;
 
@@ -1794,13 +1820,14 @@ std::string Toolkit::RenderToTimemap(const std::string &jsonOptions)
             if (json.has<jsonxx::Boolean>("includeMeasures"))
                 includeMeasures = json.get<jsonxx::Boolean>("includeMeasures");
             if (json.has<jsonxx::Boolean>("includeRests")) includeRests = json.get<jsonxx::Boolean>("includeRests");
+            if (json.has<jsonxx::Boolean>("useFractions")) useFractions = json.get<jsonxx::Boolean>("useFractions");
         }
     }
 
     this->ResetLogBuffer();
 
     std::string output;
-    m_doc.ExportTimemap(output, includeRests, includeMeasures);
+    m_doc.ExportTimemap(output, includeRests, includeMeasures, useFractions);
     return output;
 }
 

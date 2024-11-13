@@ -422,7 +422,7 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element, int dur
     assert(element);
 
     int currTime = 0;
-    if (m_layerEndTimes.count(layer) > 0) currTime = m_layerEndTimes.at(layer);
+    if (m_layerEndTimes.contains(layer)) currTime = m_layerEndTimes.at(layer);
     if ((layer->GetChildren().size() == 0 && m_durTotal > 0) || currTime < m_durTotal) {
         FillSpace(layer, m_durTotal - currTime);
     }
@@ -1761,11 +1761,11 @@ void MusicXmlInput::MatchTies(bool matchLayers)
             // match tie stop with pitch/oct identity, with start note earlier than end note,
             // and with earliest end note.
             if ((iter->m_note->IsEnharmonicWith(jter->m_note))
-                && (iter->m_note->GetScoreTimeOnset() < jter->m_note->GetScoreTimeOnset())
-                && (jter->m_note->GetScoreTimeOnset() < lastScoreTimeOnset)
+                && (iter->m_note->GetRealTimeOnsetMilliseconds() < jter->m_note->GetRealTimeOnsetMilliseconds())
+                && (jter->m_note->GetRealTimeOnsetMilliseconds() < lastScoreTimeOnset)
                 && (!matchLayers || (iter->m_layerNum == jter->m_layerNum))) {
                 iter->m_tie->SetEndid("#" + jter->m_note->GetID());
-                lastScoreTimeOnset = jter->m_note->GetScoreTimeOnset();
+                lastScoreTimeOnset = jter->m_note->GetRealTimeOnsetMilliseconds();
                 tieMatched = true;
                 break;
             }
@@ -2009,7 +2009,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             bracketSpan->SetLform(
                 bracketSpan->AttLineRendBase::StrToLineform(bracket.attribute("line-type").as_string()));
             // bracketSpan->SetPlace(bracketSpan->AttPlacementRelStaff::StrToStaffrel(placeStr.c_str()));
-            bracketSpan->SetFunc("unclear");
+            // bracketSpan->SetFunc("unclear");
             bracketSpan->SetLstartsym(ConvertLineEndSymbol(bracket.attribute("line-end").as_string()));
             bracketSpan->SetTstamp(timeStamp);
             m_controlElements.push_back({ measureNum, bracketSpan });
@@ -2434,7 +2434,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             musicxml::OpenSpanner openBracket(voiceNumber, m_measureCounts.at(measure));
             bracketSpan->SetColor(lead.attribute("color").as_string());
             // bracketSpan->SetPlace(bracketSpan->AttPlacementRelStaff::StrToStaffrel(placeStr.c_str()));
-            bracketSpan->SetFunc("analytical");
+            // bracketSpan->SetFunc("analytical");
             bracketSpan->SetLstartsym(ConvertLineEndSymbol(lead.attribute("symbol").as_string()));
             bracketSpan->SetTstamp(timeStamp);
             bracketSpan->SetType("principal-voice");
@@ -2830,7 +2830,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         if (!noteID.empty()) {
             note->SetID(noteID);
         }
-        note->SetScoreTimeOnset(onset); // remember the MIDI onset within that measure
+        note->SetRealTimeOnsetSeconds(onset); // remember the MIDI onset within that measure
         // set @staff attribute, if existing and different from parent staff number
         if (noteStaffNum > 0 && noteStaffNum + staffOffset != staff->GetN())
             note->SetStaff(

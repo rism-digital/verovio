@@ -18,6 +18,7 @@
 #include "nc.h"
 #include "neume.h"
 #include "page.h"
+#include "proport.h"
 #include "rend.h"
 #include "rest.h"
 #include "runningelement.h"
@@ -40,9 +41,7 @@ namespace vrv {
 AlignHorizontallyFunctor::AlignHorizontallyFunctor(Doc *doc) : DocFunctor(doc)
 {
     m_measureAligner = NULL;
-    m_time = 0.0;
-    m_currentParams.mensur = NULL;
-    m_currentParams.meterSig = NULL;
+    m_time = 0;
     m_notationType = NOTATIONTYPE_cmn;
     m_scoreDefRole = SCOREDEF_NONE;
     m_isFirstMeasure = false;
@@ -53,10 +52,11 @@ FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
 {
     m_currentParams.mensur = layer->GetCurrentMensur();
     m_currentParams.meterSig = layer->GetCurrentMeterSig();
+    m_currentParams.proport = layer->GetCurrentProport();
 
     // We are starting a new layer, reset the time;
     // We set it to -1.0 for the scoreDef attributes since they have to be aligned before any timestamp event (-1.0)
-    m_time = DUR_MAX * -1.0;
+    m_time = -1;
 
     m_scoreDefRole = m_isFirstMeasure ? SCOREDEF_SYSTEM : SCOREDEF_INTERMEDIATE;
 
@@ -87,7 +87,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
     m_scoreDefRole = SCOREDEF_NONE;
 
     // Now we have to set it to 0.0 since we will start aligning musical content
-    m_time = 0.0;
+    m_time = 0;
 
     return FUNCTOR_CONTINUE;
 }
@@ -169,15 +169,15 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             Alignment *alignment = firstNote->GetAlignment();
             layerElement->SetAlignment(alignment);
             alignment->AddLayerElementRef(layerElement);
-            double duration = layerElement->GetAlignmentDuration(m_currentParams, true, m_notationType);
-            m_time += duration;
+            Fraction duration = layerElement->GetAlignmentDuration(m_currentParams, true, m_notationType);
+            m_time = m_time + duration;
             return FUNCTOR_CONTINUE;
         }
     }
     // We do not align these (container). Any other?
     else if (layerElement->Is({ BEAM, LIGATURE, FTREM, TUPLET })) {
-        double duration = layerElement->GetSameAsContentAlignmentDuration(m_currentParams, true, m_notationType);
-        m_time += duration;
+        Fraction duration = layerElement->GetSameAsContentAlignmentDuration(m_currentParams, true, m_notationType);
+        m_time = m_time + duration;
         return FUNCTOR_CONTINUE;
     }
     else if (layerElement->Is(BARLINE)) {
@@ -234,6 +234,16 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             type = ALIGNMENT_SCOREDEF_METERSIG;
         }
     }
+    else if (layerElement->Is(PROPORT)) {
+        // replace the current proport
+        const Proport *previous = (m_currentParams.proport) ? (m_currentParams.proport) : NULL;
+        m_currentParams.proport = vrv_cast<Proport *>(layerElement);
+        assert(m_currentParams.proport);
+        if (previous) {
+            m_currentParams.proport->Cumulate(previous);
+        }
+        type = ALIGNMENT_PROPORT;
+    }
     else if (layerElement->Is({ MULTIREST, MREST, MRPT })) {
         type = ALIGNMENT_FULLMEASURE;
     }
@@ -250,6 +260,9 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             // Create an alignment only if the dot has no resolved preceeding note
             type = ALIGNMENT_DOT;
         }
+    }
+    else if (layerElement->Is(CUSTOS)) {
+        type = ALIGNMENT_CUSTOS;
     }
     else if (layerElement->Is(ACCID)) {
         // accid within note was already taken into account by noteParent
@@ -304,7 +317,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         type = ALIGNMENT_GRACENOTE;
     }
 
-    double duration = 0.0;
+    Fraction duration;
     // We have already an alignment with grace note children - skip this
     if (!layerElement->GetAlignment()) {
         // get the duration of the event
@@ -350,7 +363,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
 
     if (!layerElement->Is(TIMESTAMP_ATTR)) {
         // increase the time position, but only when not a timestamp (it would actually do nothing)
-        m_time += duration;
+        m_time = m_time + duration;
     }
 
     return FUNCTOR_CONTINUE;
@@ -376,7 +389,9 @@ FunctorCode AlignHorizontallyFunctor::VisitMeasure(Measure *measure)
 
 FunctorCode AlignHorizontallyFunctor::VisitMeasureEnd(Measure *measure)
 {
-    int meterUnit = m_currentParams.meterSig ? m_currentParams.meterSig->GetUnit() : 4;
+    data_DURATION meterUnit = (m_currentParams.meterSig && m_currentParams.meterSig->HasUnit())
+        ? m_currentParams.meterSig->GetUnitAsDur()
+        : DURATION_4;
     measure->m_measureAligner.SetInitialTstamp(meterUnit);
 
     // We also need to align the timestamps - we do it at the end since we need the *meterSig to be initialized by a

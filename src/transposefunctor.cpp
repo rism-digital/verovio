@@ -109,7 +109,7 @@ FunctorCode TransposeFunctor::VisitNote(Note *note)
     m_transposer->Transpose(pitch);
 
     const int staffN = note->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
-    const bool hasKeySig = ((m_keySigForStaffN.count(staffN) > 0) || (m_keySigForStaffN.count(-1) > 0));
+    const bool hasKeySig = m_keySigForStaffN.contains(staffN) || m_keySigForStaffN.contains(-1);
     note->UpdateFromTransPitch(pitch, hasKeySig);
 
     return FUNCTOR_SIBLINGS;
@@ -329,7 +329,7 @@ FunctorCode TransposeToSoundingPitchFunctor::VisitScoreDef(ScoreDef *scoreDef)
 
 FunctorCode TransposeToSoundingPitchFunctor::VisitScoreDefEnd(ScoreDef *scoreDef)
 {
-    const bool hasScoreDefKeySig = (m_keySigForStaffN.count(-1) > 0);
+    const bool hasScoreDefKeySig = m_keySigForStaffN.contains(-1);
     if (hasScoreDefKeySig) {
         bool showWarning = false;
         // Check if some staves are untransposed
@@ -389,7 +389,7 @@ FunctorCode TransposeToSoundingPitchFunctor::VisitStaffDef(StaffDef *staffDef)
 void TransposeToSoundingPitchFunctor::UpdateTranspositionFromStaffN(const AttNInteger *staffN)
 {
     int transposeInterval = 0;
-    if (staffN->HasN() && (m_transposeIntervalForStaffN.count(staffN->GetN()) > 0)) {
+    if (staffN->HasN() && m_transposeIntervalForStaffN.contains(staffN->GetN())) {
         transposeInterval = m_transposeIntervalForStaffN.at(staffN->GetN());
     }
     m_transposer->SetTransposition(transposeInterval);

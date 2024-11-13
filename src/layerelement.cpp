@@ -32,6 +32,7 @@
 #include "doc.h"
 #include "dot.h"
 #include "elementpart.h"
+#include "fraction.h"
 #include "ftrem.h"
 #include "functor.h"
 #include "horizontalaligner.h"
@@ -50,6 +51,7 @@
 #include "neume.h"
 #include "note.h"
 #include "page.h"
+#include "proport.h"
 #include "rest.h"
 #include "slur.h"
 #include "smufl.h"
@@ -73,14 +75,12 @@
 namespace vrv {
 
 // Large spacing between syllables is a quarter note space
-// MAX_DURATION / pow(2.0, (DUR_4 - 2.0))
+// MAX_DURATION / pow(2.0, (DURATION_4 - 2.0))
 #define NEUME_LARGE_SPACE 256
 // Medium spacing between neume is a 8th note space
-// MAX_DURATION / pow(2.0, (DUR_5 - 2.0))
-#define NEUME_MEDIUM_SPACE 128
+#define NEUME_MEDIUM_SPACE Fraction(1, 8)
 // Small spacing between neume components is a 16th note space
-// MAX_DURATION / pow(2.0, (DUR_6 - 2.0))
-#define NEUME_SMALL_SPACE 64
+#define NEUME_SMALL_SPACE Fraction(1, 16)
 
 //----------------------------------------------------------------------------
 // LayerElement
@@ -554,7 +554,7 @@ int LayerElement::GetDrawingTop(const Doc *doc, int staffSize, bool withArtic, A
     if (note) {
         const DurationInterface *durationInterface = this->GetDurationInterface();
         assert(durationInterface);
-        if (durationInterface->GetNoteOrChordDur(this) < DUR_2) {
+        if (durationInterface->GetNoteOrChordDur(this) < DURATION_2) {
             return note->GetDrawingY() + doc->GetDrawingUnit(staffSize);
         }
         // We should also take into account the stem shift to the right
@@ -592,7 +592,7 @@ int LayerElement::GetDrawingBottom(const Doc *doc, int staffSize, bool withArtic
     if (note) {
         const DurationInterface *durationInterface = this->GetDurationInterface();
         assert(durationInterface);
-        if (durationInterface->GetNoteOrChordDur(this) < DUR_2) {
+        if (durationInterface->GetNoteOrChordDur(this) < DURATION_2) {
             return note->GetDrawingY() - doc->GetDrawingUnit(staffSize);
         }
         // We should also take into account the stem shift to the right
@@ -616,7 +616,7 @@ int LayerElement::GetDrawingRadius(const Doc *doc, bool isInLigature) const
     if (!this->Is({ CHORD, NC, NOTE, REST })) return 0;
 
     char32_t code = 0;
-    int dur = DUR_4;
+    data_DURATION dur = DURATION_4;
     const Staff *staff = this->GetAncestorStaff();
     bool isMensuralDur = false;
     if (this->Is(NOTE)) {
@@ -636,13 +636,13 @@ int LayerElement::GetDrawingRadius(const Doc *doc, bool isInLigature) const
         assert(chord);
         dur = chord->GetActualDur();
         isMensuralDur = chord->IsMensuralDur();
-        if (dur == DUR_BR) {
+        if (dur == DURATION_breve) {
             code = SMUFL_E0A1_noteheadDoubleWholeSquare;
         }
-        else if (dur == DUR_1) {
+        else if (dur == DURATION_1) {
             code = SMUFL_E0A2_noteheadWhole;
         }
-        else if (dur == DUR_2) {
+        else if (dur == DURATION_2) {
             code = SMUFL_E0A3_noteheadHalf;
         }
         else {
@@ -653,9 +653,9 @@ int LayerElement::GetDrawingRadius(const Doc *doc, bool isInLigature) const
         code = SMUFL_E0A4_noteheadBlack;
     }
 
-    // Mensural note shorter than DUR_BR
-    if ((isMensuralDur && (dur <= DUR_BR)) || ((dur == DUR_1) && isInLigature)) {
-        int widthFactor = (dur == DUR_MX) ? 2 : 1;
+    // Mensural note shorter than DURATION_breve
+    if ((isMensuralDur && (dur <= DURATION_breve)) || ((dur == DURATION_1) && isInLigature)) {
+        int widthFactor = (dur == DURATION_maxima) ? 2 : 1;
         if (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black) {
             return widthFactor * doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize) * 0.7;
         }
@@ -671,11 +671,23 @@ int LayerElement::GetDrawingRadius(const Doc *doc, bool isInLigature) const
     return doc->GetGlyphWidth(code, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
 }
 
-double LayerElement::GetAlignmentDuration(
+Fraction LayerElement::GetAlignmentDuration(
     const AlignMeterParams &params, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (this->IsGraceNote() && notGraceOnly) {
-        return 0.0;
+        return Fraction(0, 1);
+    }
+
+    // Mensural chords are aligned looking at the duration of the notes
+    if (this->Is(CHORD) && IsMensuralType(notationType)) {
+        Fraction duration = 0;
+        ListOfConstObjects notes = this->FindAllDescendantsByType(NOTE);
+        for (const Object *object : notes) {
+            const Note *note = vrv_cast<const Note *>(object);
+            Fraction noteDuration = note->GetAlignmentDuration(params, notGraceOnly, notationType);
+            duration = std::max(duration, noteDuration);
+        }
+        return duration;
     }
 
     // Only resolve simple sameas links to avoid infinite recursion
@@ -687,6 +699,13 @@ double LayerElement::GetAlignmentDuration(
     if (this->HasInterface(INTERFACE_DURATION)) {
         int num = 1;
         int numbase = 1;
+
+        if (params.proport) {
+            // Proportion are applied reversly - higher ratio means shorter values
+            if (params.proport->HasNum()) num *= params.proport->GetCumulatedNum();
+            if (params.proport->HasNumbase()) numbase *= params.proport->GetCumulatedNumbase();
+        }
+
         const Tuplet *tuplet = vrv_cast<const Tuplet *>(this->GetFirstAncestor(TUPLET, MAX_TUPLET_DEPTH));
         if (tuplet) {
             ListOfConstObjects objects;
@@ -695,9 +714,9 @@ double LayerElement::GetAlignmentDuration(
             if (objects.size() > 0) {
                 num = tuplet->GetNum();
                 numbase = tuplet->GetNumbase();
-                // 0 is not valid in MEI anyway - just correct it silently
-                if (num == 0) num = 1;
-                if (numbase == 0) numbase = 1;
+                // Adjust VRV_UNSET and 0 - which is not valid in MEI anyway
+                num = std::max(1, num);
+                numbase = std::max(1, numbase);
             }
         }
         const DurationInterface *duration = this->GetDurationInterface();
@@ -719,41 +738,36 @@ double LayerElement::GetAlignmentDuration(
                 return NEUME_SMALL_SPACE;
             }
         }
-        double durationValue = duration->GetInterfaceAlignmentDuration(num, numbase);
+        Fraction durationValue = duration->GetInterfaceAlignmentDuration(num, numbase);
         // With fTrem we need to divide the duration by two
         const FTrem *fTrem = vrv_cast<const FTrem *>(this->GetFirstAncestor(FTREM, MAX_FTREM_DEPTH));
         if (fTrem) {
-            durationValue /= 2.0;
+            durationValue = durationValue * Fraction(1, 2);
         }
         return durationValue;
     }
     else if (this->Is(BEATRPT)) {
         const BeatRpt *beatRpt = vrv_cast<const BeatRpt *>(this);
         assert(beatRpt);
-        int meterUnit = 4;
-        if (params.meterSig && params.meterSig->HasUnit()) meterUnit = params.meterSig->GetUnit();
+        data_DURATION meterUnit = DURATION_4;
+        if (params.meterSig && params.meterSig->HasUnit()) meterUnit = params.meterSig->GetUnitAsDur();
         return beatRpt->GetBeatRptAlignmentDuration(meterUnit);
     }
     else if (this->Is(TIMESTAMP_ATTR)) {
         const TimestampAttr *timestampAttr = vrv_cast<const TimestampAttr *>(this);
         assert(timestampAttr);
-        int meterUnit = 4;
-        if (params.meterSig && params.meterSig->HasUnit()) meterUnit = params.meterSig->GetUnit();
+        data_DURATION meterUnit = DURATION_4;
+        if (params.meterSig && params.meterSig->HasUnit()) meterUnit = params.meterSig->GetUnitAsDur();
         return timestampAttr->GetTimestampAttrAlignmentDuration(meterUnit);
     }
     // We align all full measure element to the current time signature, even the ones that last longer than one measure
     else if (this->Is({ HALFMRPT, MREST, MULTIREST, MRPT, MRPT2, MULTIRPT })) {
-        int meterUnit = 4;
+        data_DURATION meterUnit = DURATION_4;
         int meterCount = 4;
-        if (params.meterSig && params.meterSig->HasUnit()) meterUnit = params.meterSig->GetUnit();
+        if (params.meterSig && params.meterSig->HasUnit()) meterUnit = params.meterSig->GetUnitAsDur();
         if (params.meterSig && params.meterSig->HasCount()) meterCount = params.meterSig->GetTotalCount();
-
-        if (this->Is(HALFMRPT)) {
-            return (DUR_MAX / meterUnit * meterCount) / 2;
-        }
-        else {
-            return DUR_MAX / meterUnit * meterCount;
-        }
+        Fraction duration = Fraction(meterUnit) * meterCount;
+        return (this->Is(HALFMRPT)) ? (duration / 2) : duration;
     }
     // This is not called with --neume-as-note since otherwise each nc has an aligner
     else if (this->Is(NEUME)) {
@@ -763,23 +777,21 @@ double LayerElement::GetAlignmentDuration(
         return (syllable->GetLast() == this) ? NEUME_MEDIUM_SPACE : NEUME_SMALL_SPACE;
     }
     else {
-        return 0.0;
+        return Fraction(0, 1);
     }
 }
 
-double LayerElement::GetAlignmentDuration(bool notGraceOnly, data_NOTATIONTYPE notationType) const
+Fraction LayerElement::GetAlignmentDuration(bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     AlignMeterParams params;
-    params.meterSig = NULL;
-    params.mensur = NULL;
     return this->GetAlignmentDuration(params, notGraceOnly, notationType);
 }
 
-double LayerElement::GetSameAsContentAlignmentDuration(
+Fraction LayerElement::GetSameAsContentAlignmentDuration(
     const AlignMeterParams &params, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (!this->HasSameasLink() || !this->GetSameasLink()->Is({ BEAM, FTREM, TUPLET })) {
-        return 0.0;
+        return Fraction(0, 1);
     }
 
     const LayerElement *sameas = vrv_cast<const LayerElement *>(this->GetSameasLink());
@@ -788,14 +800,14 @@ double LayerElement::GetSameAsContentAlignmentDuration(
     return sameas->GetContentAlignmentDuration(params, notGraceOnly, notationType);
 }
 
-double LayerElement::GetContentAlignmentDuration(
+Fraction LayerElement::GetContentAlignmentDuration(
     const AlignMeterParams &params, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (!this->Is({ BEAM, FTREM, TUPLET })) {
-        return 0.0;
+        return Fraction(0, 1);
     }
 
-    double duration = 0.0;
+    Fraction duration;
 
     for (const Object *child : this->GetChildren()) {
         // Skip everything that does not have a duration interface and notes in chords
@@ -804,17 +816,15 @@ double LayerElement::GetContentAlignmentDuration(
         }
         const LayerElement *element = vrv_cast<const LayerElement *>(child);
         assert(element);
-        duration += element->GetAlignmentDuration(params, notGraceOnly, notationType);
+        duration = duration + element->GetAlignmentDuration(params, notGraceOnly, notationType);
     }
 
     return duration;
 }
 
-double LayerElement::GetContentAlignmentDuration(bool notGraceOnly, data_NOTATIONTYPE notationType) const
+Fraction LayerElement::GetContentAlignmentDuration(bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     AlignMeterParams params;
-    params.meterSig = NULL;
-    params.mensur = NULL;
     return this->GetContentAlignmentDuration(params, notGraceOnly, notationType);
 }
 
@@ -986,79 +996,6 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
     return usePrimary ? dotLocs1 : dotLocs2;
 }
 
-int LayerElement::CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2)
-{
-    Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    if (!parentLayer) return 0;
-    // Check whether there are elements on other layer in the duration of the current beam. If there are none - stop
-    // here, there's nothing to be done
-    ListOfObjects collidingElementsList = parentLayer->GetLayerElementsForTimeSpanOf(this, true);
-    if (collidingElementsList.empty()) return 0;
-
-    Staff *staff = this->GetAncestorStaff();
-
-    const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    int leftMargin = 0;
-    int rightMargin = 0;
-    bool sameDirElement = false;
-    std::vector<int> elementOverlaps;
-    for (Object *object : collidingElementsList) {
-        LayerElement *layerElement = vrv_cast<LayerElement *>(object);
-        if (!this->HorizontalContentOverlap(object)) continue;
-        const int elementBottom = layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize);
-        const int elementTop = layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize);
-        if (direction > 0) {
-            // make sure that there's actual overlap first
-            if ((elementBottom > y1) && (elementBottom > y2)) continue;
-            const int currentBottom = this->GetDrawingBottom(doc, staff->m_drawingStaffSize);
-            if (currentBottom >= elementTop) continue;
-            const StemmedDrawingInterface *stemInterface = layerElement->GetStemmedDrawingInterface();
-            if (stemInterface && (sameDirElement || (stemInterface->GetDrawingStemDir() == STEMDIRECTION_up))) {
-                if (elementBottom - stemInterface->GetDrawingStemLen() < currentBottom) continue;
-                leftMargin = unit + y1 - elementBottom;
-                rightMargin = unit + y2 - elementBottom;
-                sameDirElement = true;
-            }
-            else {
-                leftMargin = elementTop - y1;
-                rightMargin = elementTop - y2;
-            }
-        }
-        else {
-            // make sure that there's actual overlap first
-            if ((elementTop < y1) && (elementTop < y2)) continue;
-            const int currentTop = this->GetDrawingTop(doc, staff->m_drawingStaffSize);
-            if (currentTop <= elementBottom) continue;
-            const StemmedDrawingInterface *stemInterface = layerElement->GetStemmedDrawingInterface();
-            if (stemInterface && (sameDirElement || (stemInterface->GetDrawingStemDir() == STEMDIRECTION_down))) {
-                if (currentTop - stemInterface->GetDrawingStemLen() > currentTop) continue;
-                leftMargin = unit + y1 - elementTop;
-                rightMargin = unit + y2 - elementTop;
-                sameDirElement = true;
-            }
-            else {
-                leftMargin = elementBottom - y1;
-                rightMargin = elementBottom - y2;
-            }
-        }
-        elementOverlaps.emplace_back(std::max(leftMargin * direction, rightMargin * direction));
-    }
-    if (elementOverlaps.empty()) return 0;
-
-    const auto maxOverlap = std::max_element(elementOverlaps.begin(), elementOverlaps.end());
-    int overlap = 0;
-    if (*maxOverlap >= 0) {
-        const int multiplier = sameDirElement ? -1 : 1;
-        overlap = ((*maxOverlap == 0) ? unit : *maxOverlap) * direction * multiplier;
-    }
-    else {
-        int maxShorteningInHalfUnits = (std::abs(*maxOverlap) / unit) * 2;
-        if (maxShorteningInHalfUnits > 0) --maxShorteningInHalfUnits;
-        this->SetElementShortening(maxShorteningInHalfUnits);
-    }
-    return overlap;
-}
-
 data_STEMMODIFIER LayerElement::GetDrawingStemMod() const
 {
     const AttStems *stem = dynamic_cast<const AttStems *>(this);
@@ -1200,7 +1137,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
             isUnisonElement = currentNote->IsUnisonWith(previousNote, true);
             // Unisson, look at the duration for the note heads
             if (unison && currentNote->IsUnisonWith(previousNote, false)) {
-                int previousDuration = previousNote->GetDrawingDur();
+                data_DURATION previousDuration = previousNote->GetDrawingDur();
                 assert(previousNote->GetParent());
                 const bool isPreviousChord = previousNote->GetParent()->Is(CHORD);
                 bool isEdgeElement = false;
@@ -1212,11 +1149,11 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
                         || ((STEMDIRECTION_up == stemDir) && (parentChord->GetTopNote() == previousNote));
                 }
                 // Reduce the margin to 0 for whole notes unisson
-                else if ((currentNote->GetDrawingDur() == DUR_1) && (previousDuration == DUR_1)) {
+                else if ((currentNote->GetDrawingDur() == DURATION_1) && (previousDuration == DURATION_1)) {
                     horizontalMargin = 0;
                 }
                 if (!isPreviousChord || isEdgeElement || isChordElement) {
-                    if ((currentNote->GetDrawingDur() == DUR_2) && (previousDuration == DUR_2)) {
+                    if ((currentNote->GetDrawingDur() == DURATION_2) && (previousDuration == DURATION_2)) {
                         isInUnison = true;
                     }
                     else if ((!currentNote->IsGraceNote() && !currentNote->GetDrawingCueSize())
@@ -1232,7 +1169,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
                         isInUnison = true;
                         continue;
                     }
-                    else if ((currentNote->GetDrawingDur() > DUR_2) && (previousDuration > DUR_2)) {
+                    else if ((currentNote->GetDrawingDur() > DURATION_2) && (previousDuration > DURATION_2)) {
                         isInUnison = true;
                     }
                     if (isInUnison && (currentNote->GetDots() == previousNote->GetDots())) {
@@ -1240,7 +1177,8 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
                     }
                     else {
                         isInUnison = false;
-                        if ((currentNote->GetDrawingDur() <= DUR_1) || (previousNote->GetDrawingDur() <= DUR_1)) {
+                        if ((currentNote->GetDrawingDur() <= DURATION_1)
+                            || (previousNote->GetDrawingDur() <= DURATION_1)) {
                             horizontalMargin *= -1;
                         }
                         else {
@@ -1263,7 +1201,8 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
                 if (previousNote->GetDrawingLoc() - currentNote->GetDrawingLoc() == -1) {
                     horizontalMargin *= -1;
                 }
-                else if ((currentNote->GetDrawingDur() <= DUR_1) && (previousNote->GetDrawingDur() <= DUR_1)) {
+                else if ((currentNote->GetDrawingDur() <= DURATION_1)
+                    && (previousNote->GetDrawingDur() <= DURATION_1)) {
                     continue;
                 }
                 else if (previousNote->m_crossStaff || m_crossStaff)

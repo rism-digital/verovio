@@ -316,7 +316,7 @@ public:
     /**
      * Read only access to m_scoreTimeOffset
      */
-    double GetLastTimeOffset() const { return m_scoreTimeOffset.back(); }
+    Fraction GetLastTimeOffset() const { return m_scoreTimeOffset.back(); }
 
     /**
      * Return the real time offset in milliseconds
@@ -331,7 +331,7 @@ public:
      */
     ///@{
     void ClearScoreTimeOffset() { m_scoreTimeOffset.clear(); }
-    void AddScoreTimeOffset(double offset) { m_scoreTimeOffset.push_back(offset); }
+    void AddScoreTimeOffset(Fraction offset) { m_scoreTimeOffset.push_back(offset); }
     void ClearRealTimeOffset() { m_realTimeOffsetMilliseconds.clear(); }
     void AddRealTimeOffset(double milliseconds) { m_realTimeOffsetMilliseconds.push_back(milliseconds); }
     ///@}
@@ -448,7 +448,7 @@ private:
     /**
      * Start time state variables.
      */
-    std::vector<double> m_scoreTimeOffset;
+    std::vector<Fraction> m_scoreTimeOffset;
     std::vector<double> m_realTimeOffsetMilliseconds;
     double m_currentTempo;
 

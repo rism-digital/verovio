@@ -461,7 +461,7 @@ void PrepareLinkingFunctor::ResolveStemSameas(Note *note)
     // Second pass we resolve links
     else {
         const std::string id = note->GetID();
-        if (m_stemSameasIDPairs.count(id)) {
+        if (m_stemSameasIDPairs.contains(id)) {
             Note *noteStemSameas = m_stemSameasIDPairs.at(id);
             // Instanciate the bi-directional references and mark the roles as unset
             note->SetStemSameasNote(noteStemSameas);
@@ -542,7 +542,7 @@ FunctorCode PrepareDurationFunctor::VisitLayerElement(LayerElement *layerElement
         // Check if there is a duration default for the staff
         if (!m_durDefaultForStaffN.empty()) {
             Staff *staff = layerElement->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-            if (m_durDefaultForStaffN.count(staff->GetN()) > 0) {
+            if (m_durDefaultForStaffN.contains(staff->GetN())) {
                 durInterface->SetDurDefault(m_durDefaultForStaffN.at(staff->GetN()));
             }
         }
@@ -1101,12 +1101,12 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitChord(Chord *chord)
     currentStem->AttGraced::operator=(*chord);
     currentStem->FillAttributes(*chord);
 
-    int duration = chord->GetNoteOrChordDur(chord);
-    if ((duration < DUR_2) || (chord->GetStemVisible() == BOOLEAN_false)) {
+    data_DURATION duration = chord->GetNoteOrChordDur(chord);
+    if ((duration < DURATION_2) || (chord->GetStemVisible() == BOOLEAN_false)) {
         currentStem->IsVirtual(true);
     }
 
-    const bool shouldHaveFlag = ((duration > DUR_4) && !chord->IsInBeam() && !chord->GetAncestorFTrem());
+    const bool shouldHaveFlag = ((duration > DURATION_4) && !chord->IsInBeam() && !chord->GetAncestorFTrem());
     currentFlag = this->ProcessFlag(currentFlag, currentStem, shouldHaveFlag);
 
     chord->SetDrawingStem(currentStem);
@@ -1150,7 +1150,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
         currentStem->AttGraced::operator=(*note);
         currentStem->FillAttributes(*note);
 
-        if (note->GetActualDur() < DUR_2 || (note->GetStemVisible() == BOOLEAN_false)) {
+        if (note->GetActualDur() < DURATION_2 || (note->GetStemVisible() == BOOLEAN_false)) {
             currentStem->IsVirtual(true);
         }
     }
@@ -1177,8 +1177,8 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
     if (note->IsMensuralDur()) return FUNCTOR_CONTINUE;
 
     if (currentStem) {
-        const bool shouldHaveFlag = ((note->GetActualDur() > DUR_4) && !note->IsInBeam() && !note->GetAncestorFTrem()
-            && !note->IsChordTone() && !note->IsTabGrpNote());
+        const bool shouldHaveFlag = ((note->GetActualDur() > DURATION_4) && !note->IsInBeam()
+            && !note->GetAncestorFTrem() && !note->IsChordTone() && !note->IsTabGrpNote());
         currentFlag = this->ProcessFlag(currentFlag, currentStem, shouldHaveFlag);
 
         if (!chord) note->SetDrawingStem(currentStem);
@@ -1196,7 +1196,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitRest(Rest *rest)
 {
     Dots *currentDots = vrv_cast<Dots *>(rest->FindDescendantByType(DOTS, 1));
 
-    const bool shouldHaveDots = (rest->GetDur() > DUR_BR) && (rest->GetDots() > 0);
+    const bool shouldHaveDots = (rest->GetDur() > DURATION_breve) && (rest->GetDots() > 0);
     currentDots = this->ProcessDots(currentDots, rest, shouldHaveDots);
 
     /************ Prepare the drawing cue size ************/
@@ -1222,7 +1222,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTabDurSym(TabDurSym *tabDurSym
     assert(tabGrp);
 
     // No flag within beam for durations longer than 8th notes
-    const bool shouldHaveFlag = (!tabDurSym->IsInBeam() && (tabGrp->GetActualDur() > DUR_4));
+    const bool shouldHaveFlag = (!tabDurSym->IsInBeam() && (tabGrp->GetActualDur() > DURATION_4));
     currentFlag = this->ProcessFlag(currentFlag, currentStem, shouldHaveFlag);
 
     return FUNCTOR_SIBLINGS;
@@ -1435,7 +1435,7 @@ FunctorCode PrepareDelayedTurnsFunctor::VisitLayerElement(LayerElement *layerEle
         this->ResetCurrent();
     }
 
-    if (m_delayedTurns.count(layerElement)) {
+    if (m_delayedTurns.contains(layerElement)) {
         m_previousElement = layerElement;
         m_currentTurn = m_delayedTurns.at(layerElement);
         if (layerElement->Is(CHORD)) {

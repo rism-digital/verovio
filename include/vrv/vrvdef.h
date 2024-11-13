@@ -430,8 +430,6 @@ typedef std::map<int, LayerN_VerserN_t> StaffN_LayerN_VerseN_t;
 
 #define isIn(x, a, b) (((x) >= std::min((a), (b))) && ((x) <= std::max((a), (b))))
 
-#define durRound(dur) round(dur *pow(10, 8)) / pow(10, 8)
-
 /**
  * Codes returned by Functors.
  * Default is FUNCTOR_CONTINUE.
@@ -669,6 +667,16 @@ enum GraphicID { PRIMARY = 0, SPANNING, SYMBOLREF };
 //----------------------------------------------------------------------------
 
 enum MeasureType { MEASURED = 0, UNMEASURED, NEUMELINE };
+
+//----------------------------------------------------------------------------
+// The score time unit (quarter note)
+//----------------------------------------------------------------------------
+
+#define SCORE_TIME_UNIT 4
+
+//----------------------------------------------------------------------------
+// Section representing a line in neon
+//----------------------------------------------------------------------------
 
 #define NEUME_LINE_TYPE "neon-neume-line"
 

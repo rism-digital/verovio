@@ -304,7 +304,7 @@ bool AttModule::SetCmn(Object *element, const std::string &attrType, const std::
         AttBracketSpanLog *att = dynamic_cast<AttBracketSpanLog *>(element);
         assert(att);
         if (attrType == "func") {
-            att->SetFunc(att->StrToStr(attrValue));
+            att->SetFunc(att->StrToBracketSpanLogFunc(attrValue));
             return true;
         }
     }
@@ -599,7 +599,7 @@ void AttModule::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
         const AttBracketSpanLog *att = dynamic_cast<const AttBracketSpanLog *>(element);
         assert(att);
         if (att->HasFunc()) {
-            attributes->push_back({ "func", att->StrToStr(att->GetFunc()) });
+            attributes->push_back({ "func", att->BracketSpanLogFuncToStr(att->GetFunc()) });
         }
     }
     if (element->HasAttClass(ATT_CUTOUT)) {

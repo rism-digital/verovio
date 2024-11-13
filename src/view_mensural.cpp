@@ -50,7 +50,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
     const int yNote = element->GetDrawingY();
     const int xNote = element->GetDrawingX();
-    const int drawingDur = note->GetDrawingDur();
+    const data_DURATION drawingDur = note->GetDrawingDur();
 
     /************** Noteheads: **************/
 
@@ -58,7 +58,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     if (note->IsInLigature() && !m_options->m_ligatureAsBracket.GetValue()) {
         this->DrawLigatureNote(dc, element, layer, staff);
     }
-    else if (drawingDur < DUR_1) {
+    else if (drawingDur < DURATION_1) {
         this->DrawMaximaToBrevis(dc, yNote, element, layer, staff);
     }
     // Semibrevis and shorter
@@ -85,7 +85,7 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
     Mensur *mensur = vrv_cast<Mensur *>(element);
     assert(mensur);
 
-    if (!mensur->HasSign()) {
+    if (!mensur->HasSign() && !mensur->HasNum()) {
         // only react to visual attributes
         return;
     }
@@ -161,7 +161,7 @@ void View::DrawMensuralStem(DeviceContext *dc, Note *note, Staff *staff, data_ST
     assert(note);
 
     const int staffSize = staff->m_drawingStaffSize;
-    const int drawingDur = note->GetDrawingDur();
+    const data_DURATION drawingDur = note->GetDrawingDur();
     const int radius = note->GetDrawingRadius(m_doc);
     // Cue size is currently disabled
     const bool drawingCueSize = false;
@@ -169,7 +169,7 @@ void View::DrawMensuralStem(DeviceContext *dc, Note *note, Staff *staff, data_ST
 
     /* In black notation, the semiminima gets one flag; in white notation, it gets none.
         In both cases, as in CWMN, each shorter duration gets one additional flag. */
-    const int nbFlags = (mensural_black ? drawingDur - DUR_2 : drawingDur - DUR_4);
+    const int nbFlags = (mensural_black ? drawingDur - DURATION_2 : drawingDur - DURATION_4);
 
     // SMuFL's mensural stems are not centered
     const int halfStemWidth
@@ -218,7 +218,7 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     const int staffSize = staff->m_drawingStaffSize;
 
     int shape = LIGATURE_DEFAULT;
-    if (note->GetActualDur() != DUR_BR) {
+    if (note->GetActualDur() != DURATION_breve) {
         bool up = false;
         // Mensural notes have no Stem child - rely on the MEI @stem.dir
         if (note->GetStemDir() != STEMDIRECTION_NONE) {
@@ -263,7 +263,7 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     // serifs and / or stem
     this->DrawFilledRectangle(dc, topLeft.x, sides[0], topLeft.x + stemWidth, sides[1]);
 
-    if (note->GetActualDur() != DUR_BR) {
+    if (note->GetActualDur() != DURATION_breve) {
         // Right side is a stem - end the notehead first
         dc->EndCustomGraphic();
         dc->StartCustomGraphic("stem");
@@ -449,7 +449,7 @@ void View::DrawDotInLigature(DeviceContext *dc, LayerElement *element, Layer *la
         isVerticalDot = !isLast && (shape & LIGATURE_OBLIQUE);
     }
     else {
-        if (note->GetActualDur() == DUR_1) shiftMultiplier = 3.5;
+        if (note->GetActualDur() == DURATION_1) shiftMultiplier = 3.5;
     }
 
     int y = note->GetDrawingY();
@@ -484,7 +484,7 @@ void View::DrawPlica(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     const bool isMensuralBlack = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
     const int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
 
-    const bool isLonga = (note->GetActualDur() == DUR_LG);
+    const bool isLonga = (note->GetActualDur() == DURATION_long);
     const bool up = (plica->GetDir() == STEMDIRECTION_basic_up);
 
     int shape = LIGATURE_DEFAULT;
@@ -562,38 +562,11 @@ void View::DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numB
 
 void View::DrawProport(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
+    assert(element);
     assert(layer);
     assert(staff);
-    assert(dynamic_cast<Proport *>(element)); // Element must be a Proport"
-
-    int x1, x2, y1, y2;
-
-    Proport *proport = dynamic_cast<Proport *>(element);
 
     dc->StartGraphic(element, "", element->GetID());
-
-    int y = staff->GetDrawingY() - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4);
-    int x = element->GetDrawingX();
-
-    x1 = x + 120;
-    x2 = x1 + 150; // ??TEST: JUST DRAW AN ARBITRARY RECTANGLE
-    y1 = y;
-    y2 = y + 50 + (50 * proport->GetNum());
-    // DrawFilledRectangle(dc,x1,y1,x2,y2);
-    this->DrawPartFilledRectangle(dc, x1, y1, x2, y2, 0);
-
-    if (proport->HasNum()) {
-        x = element->GetDrawingX();
-        // if (proport->GetSign() || proport->HasTempus())           // ??WHAT SHOULD THIS BE?
-        {
-            x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
-                * 5; // step forward because we have a sign or a meter symbol
-        }
-        int numbase = proport->HasNumbase() ? proport->GetNumbase() : 0;
-        this->DrawProportFigures(dc, x,
-            staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1),
-            proport->GetNum(), numbase, staff);
-    }
 
     dc->EndGraphic(element, this);
 }
@@ -710,7 +683,7 @@ void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point point
 data_STEMDIRECTION View::GetMensuralStemDir(Layer *layer, Note *note, int verticalCenter)
 {
     // constants
-    const int drawingDur = note->GetDrawingDur();
+    const data_DURATION drawingDur = note->GetDrawingDur();
     const int yNote = note->GetDrawingY();
 
     data_STEMDIRECTION layerStemDir;
@@ -722,7 +695,7 @@ data_STEMDIRECTION View::GetMensuralStemDir(Layer *layer, Note *note, int vertic
         stemDir = layerStemDir;
     }
     else {
-        if (drawingDur < DUR_1) {
+        if (drawingDur < DURATION_1) {
             stemDir = STEMDIRECTION_down;
         }
         else {

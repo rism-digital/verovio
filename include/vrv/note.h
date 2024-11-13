@@ -124,29 +124,12 @@ public:
     ///@}
 
     /**
-     * @name Setter and getter for the drawing staff loc.
-     * This is set by the CalcAlignmentPitchPosFunctor.
-     */
-    ///@{
-    void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }
-    int GetDrawingLoc() const { return m_drawingLoc; }
-    ///@}
-
-    /**
-     * Check if the note has ledger lines.
-     * If staff is passed, use it for getting the staff line number.
-     * Otherwise, it will look for the Staff ancestor.
-     * Set the value of ledger lines above or below.
-     */
-    bool HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff = NULL) const;
-
-    /**
      * Overriding functions to return information from chord parent if any
      */
     ///@{
     Chord *IsChordTone();
     const Chord *IsChordTone() const;
-    int GetDrawingDur() const;
+    data_DURATION GetDrawingDur() const;
     bool IsNoteGroupExtreme() const; // used to find if it is the highest or lowest note in a note group
     ///@}
 
@@ -211,7 +194,7 @@ public:
     /**
      * Return a SMuFL code for the notehead
      */
-    char32_t GetNoteheadGlyph(const int duration) const;
+    char32_t GetNoteheadGlyph(const data_DURATION duration) const;
 
     /**
      * Check whether current note is enharmonic with another
@@ -326,11 +309,6 @@ private:
 public:
     //
 private:
-    /**
-     * The drawing location of the note
-     */
-    int m_drawingLoc;
-
     /**
      * A fling indicating if the note head is flipped
      */
