@@ -1386,13 +1386,11 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerL
                 // Function to concatenate IDs from the list of Object events
                 auto concatenateIDs = [](const ListOfConstObjects &objects) {
                     // Get a list of strings
-                    std::vector<std::string> ids = objects
-                        | std::views::transform([](const Object *object) { return ("#" + object->GetID() + " ");})
-                        | std::ranges::to<std::vector<std::string>>();
+                    std::vector<std::string> ids;
+                    for (const auto& object : objects) {
+                        ids.push_back("#" + object->GetID() + " ");
+                    }
                     // Concatenate IDs
-                    // Once we have C++ 23 we can add the space above and do
-                    // std::ranges::to<std::string>(std::views::join(ids));
-                    // But for now use a stringstream
                     std::stringstream sstream;
                     std::copy(ids.begin(), ids.end(), std::ostream_iterator<std::string>(sstream));
                     return sstream.str();
