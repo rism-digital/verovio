@@ -1365,10 +1365,13 @@ void Doc::ConvertToCmnDoc()
     ListOfObjects systems = contentPage->FindAllDescendantsByType(SYSTEM, false, 1);
     ListOfObjects scores = contentPage->FindAllDescendantsByType(SCORE, false, 1);
     assert(systems.size() == scores.size());
-    for (const auto [systemItem, scoreItem] : std::ranges::zip_view(systems, scores)) {
-        System *system = vrv_cast<System *>(systemItem);
+
+    ListOfObjects::iterator systemsIt = systems.begin();
+    ListOfObjects::iterator scoresIt = scores.begin();
+    for (; systemsIt != systems.end(); ++systemsIt, ++scoresIt) {
+        System *system = vrv_cast<System *>(*systemsIt);
         assert(system);
-        Score *score = vrv_cast<Score *>(scoreItem);
+        Score *score = vrv_cast<Score *>(*scoresIt);
         assert(score);
         System *convertedSystem = new System();
         ConvertToCmnFunctor convertToCmn(this, convertedSystem, score);
