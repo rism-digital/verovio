@@ -335,7 +335,7 @@ void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
             }
         }
         else if (name == "ColorChange") {
-            CreateColorchange(eventNode);
+            CreateColorChange(eventNode);
         }
         else if (name == "Custos") {
             CreateCustos(eventNode);
