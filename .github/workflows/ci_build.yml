@@ -101,11 +101,7 @@ jobs:
 
           - os: macos-latest
             compiler: xcode
-            version: "14.3"
-
-          - os: macos-latest
-            compiler: xcode
-            version: "15.3"
+            version: "15.4"
 
           - os: macos-latest
             compiler: g++
@@ -147,7 +143,6 @@ jobs:
             echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
 
           else
-            ls /Applications/
             TARGET_XCODE="/Applications/Xcode_${{ matrix.version }}.app/Contents/Developer"
 
             # check XCode version
