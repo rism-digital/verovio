@@ -41,6 +41,7 @@ class EditorialElement;
 class Ending;
 class Expansion;
 class F;
+class Facsimile;
 class Fb;
 class Fermata;
 class Fing;
@@ -52,6 +53,7 @@ class GenericLayerElement;
 class Gliss;
 class GraceAligner;
 class GraceGrp;
+class Graphic;
 class GrpSym;
 class Hairpin;
 class HalfmRpt;
@@ -118,6 +120,7 @@ class StaffAlignment;
 class StaffDef;
 class StaffGrp;
 class Stem;
+class Surface;
 class Svg;
 class Syl;
 class Syllable;
@@ -142,6 +145,7 @@ class TupletBracket;
 class TupletNum;
 class Turn;
 class Verse;
+class Zone;
 
 //----------------------------------------------------------------------------
 // FunctorInterface
@@ -456,6 +460,20 @@ public:
     virtual FunctorCode VisitTextEnd(Text *text);
     virtual FunctorCode VisitTextElement(TextElement *textElement);
     virtual FunctorCode VisitTextElementEnd(TextElement *textElement);
+    ///@}
+
+    /**
+     * @name Visit facsimle elements
+     */
+    ///@{
+    virtual FunctorCode VisitFacsimile(Facsimile *facsimile);
+    virtual FunctorCode VisitFacsimileEnd(Facsimile *facsimile);
+    virtual FunctorCode VisitGraphic(Graphic *graphic);
+    virtual FunctorCode VisitGraphicEnd(Graphic *graphic);
+    virtual FunctorCode VisitSurface(Surface *surface);
+    virtual FunctorCode VisitSurfaceEnd(Surface *surface);
+    virtual FunctorCode VisitZone(Zone *zone);
+    virtual FunctorCode VisitZoneEnd(Zone *zone);
     ///@}
 
     /**
@@ -815,6 +833,20 @@ public:
     virtual FunctorCode VisitTextEnd(const Text *text);
     virtual FunctorCode VisitTextElement(const TextElement *textElement);
     virtual FunctorCode VisitTextElementEnd(const TextElement *textElement);
+    ///@}
+
+    /**
+     * @name Visit facsimle elements
+     */
+    ///@{
+    virtual FunctorCode VisitFacsimile(const Facsimile *facsimile);
+    virtual FunctorCode VisitFacsimileEnd(const Facsimile *facsimile);
+    virtual FunctorCode VisitGraphic(const Graphic *graphic);
+    virtual FunctorCode VisitGraphicEnd(const Graphic *graphic);
+    virtual FunctorCode VisitSurface(const Surface *surface);
+    virtual FunctorCode VisitSurfaceEnd(const Surface *surface);
+    virtual FunctorCode VisitZone(const Zone *zone);
+    virtual FunctorCode VisitZoneEnd(const Zone *zone);
     ///@}
 
     /**

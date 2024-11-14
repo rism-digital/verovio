@@ -35,6 +35,7 @@
 #include "ending.h"
 #include "expansion.h"
 #include "f.h"
+#include "facsimile.h"
 #include "fb.h"
 #include "fermata.h"
 #include "fig.h"
@@ -43,6 +44,7 @@
 #include "genericlayerelement.h"
 #include "gliss.h"
 #include "gracegrp.h"
+#include "graphic.h"
 #include "grpsym.h"
 #include "hairpin.h"
 #include "halfmrpt.h"
@@ -101,6 +103,7 @@
 #include "staffdef.h"
 #include "staffgrp.h"
 #include "stem.h"
+#include "surface.h"
 #include "svg.h"
 #include "syl.h"
 #include "syllable.h"
@@ -119,6 +122,7 @@
 #include "tuplet.h"
 #include "turn.h"
 #include "verse.h"
+#include "zone.h"
 
 namespace vrv {
 
@@ -1324,6 +1328,46 @@ FunctorCode FunctorInterface::VisitTextElement(TextElement *textElement)
 FunctorCode FunctorInterface::VisitTextElementEnd(TextElement *textElement)
 {
     return this->VisitObjectEnd(textElement);
+}
+
+FunctorCode FunctorInterface::VisitFacsimile(Facsimile *facsimile)
+{
+    return this->VisitObject(facsimile);
+}
+
+FunctorCode FunctorInterface::VisitFacsimileEnd(Facsimile *facsimile)
+{
+    return this->VisitObjectEnd(facsimile);
+}
+
+FunctorCode FunctorInterface::VisitGraphic(Graphic *graphic)
+{
+    return this->VisitObject(graphic);
+}
+
+FunctorCode FunctorInterface::VisitGraphicEnd(Graphic *graphic)
+{
+    return this->VisitObjectEnd(graphic);
+}
+
+FunctorCode FunctorInterface::VisitSurface(Surface *surface)
+{
+    return this->VisitObject(surface);
+}
+
+FunctorCode FunctorInterface::VisitSurfaceEnd(Surface *surface)
+{
+    return this->VisitObjectEnd(surface);
+}
+
+FunctorCode FunctorInterface::VisitZone(Zone *zone)
+{
+    return this->VisitObject(zone);
+}
+
+FunctorCode FunctorInterface::VisitZoneEnd(Zone *zone)
+{
+    return this->VisitObjectEnd(zone);
 }
 
 FunctorCode FunctorInterface::VisitAlignment(Alignment *alignment)
@@ -2618,6 +2662,46 @@ FunctorCode ConstFunctorInterface::VisitTextElement(const TextElement *textEleme
 FunctorCode ConstFunctorInterface::VisitTextElementEnd(const TextElement *textElement)
 {
     return this->VisitObjectEnd(textElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitFacsimile(const Facsimile *facsimile)
+{
+    return this->VisitObject(facsimile);
+}
+
+FunctorCode ConstFunctorInterface::VisitFacsimileEnd(const Facsimile *facsimile)
+{
+    return this->VisitObjectEnd(facsimile);
+}
+
+FunctorCode ConstFunctorInterface::VisitGraphic(const Graphic *graphic)
+{
+    return this->VisitObject(graphic);
+}
+
+FunctorCode ConstFunctorInterface::VisitGraphicEnd(const Graphic *graphic)
+{
+    return this->VisitObjectEnd(graphic);
+}
+
+FunctorCode ConstFunctorInterface::VisitSurface(const Surface *surface)
+{
+    return this->VisitObject(surface);
+}
+
+FunctorCode ConstFunctorInterface::VisitSurfaceEnd(const Surface *surface)
+{
+    return this->VisitObjectEnd(surface);
+}
+
+FunctorCode ConstFunctorInterface::VisitZone(const Zone *zone)
+{
+    return this->VisitObject(zone);
+}
+
+FunctorCode ConstFunctorInterface::VisitZoneEnd(const Zone *zone)
+{
+    return this->VisitObjectEnd(zone);
 }
 
 FunctorCode ConstFunctorInterface::VisitAlignment(const Alignment *alignment)

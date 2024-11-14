@@ -15,6 +15,7 @@
 
 #include "comparison.h"
 #include "facsimile.h"
+#include "functor.h"
 #include "graphic.h"
 #include "vrv.h"
 #include "zone.h"
@@ -83,6 +84,30 @@ int Surface::GetMaxY() const
         max = (zone->GetLry() > max) ? zone->GetLry() : max;
     }
     return max;
+}
+
+//----------------------------------------------------------------------------
+// Functor methods
+//----------------------------------------------------------------------------
+
+FunctorCode Surface::Accept(Functor &functor)
+{
+    return functor.VisitSurface(this);
+}
+
+FunctorCode Surface::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitSurface(this);
+}
+
+FunctorCode Surface::AcceptEnd(Functor &functor)
+{
+    return functor.VisitSurfaceEnd(this);
+}
+
+FunctorCode Surface::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitSurfaceEnd(this);
 }
 
 } // namespace vrv

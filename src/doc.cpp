@@ -1410,20 +1410,20 @@ void Doc::SyncFromFacsimileDoc()
 
 void Doc::SyncToFacsimileDoc()
 {
+    double ppuFactor = 1.0;
     // Create a new facsimile object if we do not have one already
     if (!this->HasFacsimile()) {
         Facsimile *facsimile = new Facsimile();
         this->SetFacsimile(facsimile);
+        m_facsimile->SetType("transcription");
+        // We use the scale option to determine the ppu and adjust the ppu factor accordingly
+        // For example, with scale 50 and the default unit, the ppu will be 4.5 (instead of 9.0)
+        ppuFactor = (double)m_options->m_scale.GetValue() / 100.0;
     }
-    if (!m_facsimile->FindDescendantByType(SURFACE)) {
-        m_facsimile->AddChild(new Surface());
-    }
+
     this->ScoreDefSetCurrentDoc();
 
-    m_facsimile->SetType("transcription");
-    m_facsimile->ClearChildren();
-
-    SyncToFacsimileFunctor syncToFacimileFunctor(this);
+    SyncToFacsimileFunctor syncToFacimileFunctor(this, ppuFactor);
     this->Process(syncToFacimileFunctor);
 }
 
@@ -2143,8 +2143,7 @@ int Doc::GetAdjustedDrawingPageHeight() const
 
     // Take into account the PPU when getting the page height in facsimile
     if (this->IsTranscription() || this->IsFacs()) {
-        const int factor = DEFINITION_FACTOR / m_drawingPage->GetPPUFactor();
-        return m_drawingPage->m_pageHeight / factor;
+        return m_drawingPage->m_pageHeight * m_drawingPage->GetPPUFactor() / DEFINITION_FACTOR;
     }
 
     int contentHeight = m_drawingPage->GetContentHeight();
@@ -2157,8 +2156,7 @@ int Doc::GetAdjustedDrawingPageWidth() const
 
     // Take into account the PPU when getting the page width in facsimile
     if (this->IsTranscription() || this->IsFacs()) {
-        const int factor = DEFINITION_FACTOR / m_drawingPage->GetPPUFactor();
-        return m_drawingPage->m_pageWidth / factor;
+        return m_drawingPage->m_pageWidth * m_drawingPage->GetPPUFactor() / DEFINITION_FACTOR;
     }
 
     int contentWidth = m_drawingPage->GetContentWidth();
