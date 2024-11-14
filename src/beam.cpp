@@ -336,21 +336,20 @@ std::pair<int, int> BeamSegment::GetMinimalStemLength(const BeamDrawingInterface
     const auto isNoteOrChord
         = [](BeamElementCoord *coord) { return (coord->m_element && coord->m_element->Is({ CHORD, NOTE })); };
 
-    using CoordIt = ArrayOfBeamElementCoords::const_iterator;
-    for (CoordIt it = m_beamElementCoordRefs.begin(); it != m_beamElementCoordRefs.end(); ++it) {
-        if (!isNoteOrChord(*it)) continue;
+    for (BeamElementCoord *coord : m_beamElementCoordRefs) {
+        if (!isNoteOrChord(coord)) continue;
 
         // Get the stem direction
-        const StemmedDrawingInterface *stemmedInterface = (*it)->GetStemHolderInterface();
+        const StemmedDrawingInterface *stemmedInterface = coord->GetStemHolderInterface();
         if (!stemmedInterface) continue;
         const Stem *stem = stemmedInterface->GetDrawingStem();
         const bool isStemUp = (stem->GetDrawingStemDir() == STEMDIRECTION_up);
 
         if (isStemUp) {
-            currentLength = (*it)->m_yBeam - bottomOffset - (*it)->m_closestNote->GetDrawingY();
+            currentLength = coord->m_yBeam - bottomOffset - coord->m_closestNote->GetDrawingY();
         }
         else {
-            currentLength = (*it)->m_closestNote->GetDrawingY() - (*it)->m_yBeam - topOffset;
+            currentLength = coord->m_closestNote->GetDrawingY() - coord->m_yBeam - topOffset;
         }
 
         // Update the min length
