@@ -64,7 +64,7 @@ private:
     void ReadEditorialCommentary(pugi::xml_node evenNode, Object *object);
 
     void CreateAccid(pugi::xml_node accidNode);
-    void CreateColorchange(pugi::xml_node colorChangeNode);
+    void CreateColorChange(pugi::xml_node colorChangeNode);
     void CreateBarline(pugi::xml_node barlineNode);
     void CreateBreak(pugi::xml_node breakNode);
     void CreateChord(pugi::xml_node chordNode);
