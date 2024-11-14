@@ -577,7 +577,7 @@ void CmmeInput::CreateClef(pugi::xml_node clefNode)
     return;
 }
 
-void CmmeInput::CreateColorchange(pugi::xml_node colorChangeNode)
+void CmmeInput::CreateColorChange(pugi::xml_node colorChangeNode)
 {
     static const std::map<std::string, std::string> colorMap{
         { "Black", "" }, //
