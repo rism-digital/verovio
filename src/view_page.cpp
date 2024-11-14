@@ -11,7 +11,7 @@
 
 #include <cassert>
 #include <math.h>
-#include <ranges>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 
