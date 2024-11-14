@@ -1387,7 +1387,7 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerL
                 auto concatenateIDs = [](const ListOfConstObjects &objects) {
                     // Get a list of strings
                     std::vector<std::string> ids;
-                    for (const auto& object : objects) {
+                    for (const auto &object : objects) {
                         ids.push_back("#" + object->GetID() + " ");
                     }
                     // Concatenate IDs
