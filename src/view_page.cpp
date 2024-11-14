@@ -1386,15 +1386,19 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerL
                 // Function to concatenate IDs from the list of Object events
                 auto concatenateIDs = [](const ListOfConstObjects &objects) {
                     // Get a list of strings
-                    auto ids = objects | std::views::transform([](const Object *object) { return object->GetID(); });
-                    // Concatenate IDs with a space separator
+                    auto ids = objects
+                        | std::views::transform([](const Object *object) { return ("#" + object->GetID() + " "); });
+                    // Concatenate IDs
+                    // Once we have C++ 23 we can add the space above and do
+                    // std::ranges::to<std::string>(std::views::join(ids));
+                    // But for now use a stringstream
                     std::stringstream sstream;
-                    std::copy(ids.begin(), ids.end(), std::ostream_iterator<std::string>(sstream, " "));
+                    std::copy(ids.begin(), ids.end(), std::ostream_iterator<std::string>(sstream));
                     return sstream.str();
                 };
                 std::string events = concatenateIDs(dash.m_events);
                 if (!events.empty()) events.pop_back(); // Remove extra space added by the concatenation
-                dc->SetCustomGraphicAttributes("mei-id", events);
+                dc->SetCustomGraphicAttributes("related", events);
             }
 
             dc->DrawLine(ToDeviceContextX(x + dash.m_x1), ToDeviceContextY(y), ToDeviceContextX(x + dash.m_x2),
