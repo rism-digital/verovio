@@ -87,9 +87,29 @@ jobs:
             compiler: g++
             version: "12"
 
+          - os: ubuntu-20.04
+            compiler: clang
+            version: "11"
+
           - os: ubuntu-22.04
             compiler: clang
-            version: "10"
+            version: "12"
+
+          - os: ubuntu-22.04
+            compiler: clang
+            version: "12"
+
+          - os: ubuntu-22.04
+            compiler: clang
+            version: "12"
+
+          - os: ubuntu-22.04
+            compiler: clang
+            version: "13"
+
+          - os: ubuntu-22.04
+            compiler: clang
+            version: "14"
 
           - os: ubuntu-22.04
             compiler: clang
@@ -97,7 +117,7 @@ jobs:
 
           - os: ubuntu-22.04
             compiler: clang
-            version: "12"
+            version: "15"
 
           - os: macos-latest
             compiler: xcode
