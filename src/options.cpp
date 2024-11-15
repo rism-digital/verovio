@@ -1827,6 +1827,11 @@ Options::Options()
     m_mensuralToMeasure.Init(false);
     this->Register(&m_mensuralToMeasure, "mensuralToMeasure", &m_mensural);
 
+    m_mensuralScoreUp.SetInfo(
+        "Mensural scoring up", "Score up the mensural voices by providing a dur.quality to the notes");
+    m_mensuralScoreUp.Init(false);
+    this->Register(&m_mensuralScoreUp, "mensuralScoreUp", &m_mensural);
+
     /********* Method JSON options to the command-line *********/
 
     m_jsonCmdLineOptions.SetLabel("Method JSON options for the command-line", "7-methodJson");
