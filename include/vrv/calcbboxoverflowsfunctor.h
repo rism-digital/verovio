@@ -36,6 +36,14 @@ public:
     bool ImplementsEndInterface() const override { return true; }
 
     /*
+     * Enable parallelization
+     */
+    ///@{
+    ProcessingStrategy GetProcessingStrategy() const override { return ProcessingStrategy::SystemParallel; }
+    CalcBBoxOverflowsFunctor *CloneFunctor() const override { return new CalcBBoxOverflowsFunctor(*this); }
+    ///@}
+
+    /*
      * Functor interface
      */
     ///@{

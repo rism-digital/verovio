@@ -632,6 +632,7 @@ public:
     OptionBool m_incip;
     OptionBool m_justifyVertically;
     OptionBool m_landscape;
+    OptionInt m_maxThreads;
     OptionDbl m_minLastJustification;
     OptionBool m_mmOutput;
     OptionBool m_moveScoreDefinitionToStaff;
