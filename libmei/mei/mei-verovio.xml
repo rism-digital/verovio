@@ -54,7 +54,7 @@
 			<divGen type="toc"/>
 		</front>
 		<body>
-			<schemaSpec ident="mei" start="mei meiHead meiCorpus music" ns="http://www.music-encoding.org/ns/mei">
+			<schemaSpec ident="mei-verovio" start="mei meiHead meiCorpus music" ns="http://www.music-encoding.org/ns/mei">
 				<moduleRef key="MEI"/>
 				<moduleRef key="MEI.analytical"/>
 				<moduleRef key="MEI.cmn"/>
