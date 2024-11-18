@@ -257,8 +257,8 @@ void ABCInput::AddLayerElement()
     // otherwise we can have beam or tuplet (for now)
     Beam *beam = new Beam();
     // add stacked notes to the current element
-    for (auto iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
-        beam->AddChild(*iter);
+    for (LayerElement *element : m_noteStack) {
+        beam->AddChild(element);
     }
     if (beam->FindDescendantByType(NOTE)) {
         LayerElement *element = NULL;
@@ -376,11 +376,11 @@ void ABCInput::AddDynamic(LayerElement *element)
 {
     assert(element);
 
-    for (auto it = m_dynam.begin(); it != m_dynam.end(); ++it) {
+    for (const std::string &str : m_dynam) {
         Dynam *dynam = new Dynam();
         dynam->SetStartid("#" + element->GetID());
         Text *text = new Text();
-        text->SetText(UTF8to32(*it));
+        text->SetText(UTF8to32(str));
         dynam->AddChild(text);
         m_controlElements.push_back(std::make_pair(m_layer->GetID(), dynam));
     }
@@ -833,26 +833,26 @@ void ABCInput::parseReferenceNumber(const std::string &referenceNumberString)
 void ABCInput::PrintInformationFields(Score *score)
 {
     PgHead *pgHead = new PgHead();
-    for (auto it = m_title.begin(); it != m_title.end(); ++it) {
+    for (auto it : m_title) {
         Rend *titleRend = new Rend();
         titleRend->SetHalign(HORIZONTALALIGNMENT_center);
         titleRend->SetValign(VERTICALALIGNMENT_middle);
-        if (it != m_title.begin()) {
+        if (it != m_title.front()) {
             data_FONTSIZE fontsize;
             fontsize.SetTerm(FONTSIZETERM_small);
             titleRend->SetFontsize(fontsize);
         }
         Text *text = new Text();
-        text->SetText(UTF8to32(it->first));
+        text->SetText(UTF8to32(it.first));
         titleRend->AddChild(text);
         pgHead->AddChild(titleRend);
     }
-    for (auto it = m_composer.begin(); it != m_composer.end(); ++it) {
+    for (auto it : m_composer) {
         Rend *compRend = new Rend();
         compRend->SetHalign(HORIZONTALALIGNMENT_right);
         compRend->SetValign(VERTICALALIGNMENT_bottom);
         Text *composer = new Text();
-        composer->SetText(UTF8to32(it->first));
+        composer->SetText(UTF8to32(it.first));
         compRend->AddChild(composer);
         if (!m_origin.empty()) {
             Text *origin = new Text();
@@ -883,10 +883,10 @@ void ABCInput::CreateHeader()
     pugi::xml_node fileTitle = fileTitleStmt.append_child("title");
     fileTitle.text().set(m_filename.c_str());
     if (!m_composer.empty()) {
-        for (auto it = m_composer.begin(); it != m_composer.end(); ++it) {
+        for (auto it : m_composer) {
             pugi::xml_node composer = fileTitleStmt.append_child("composer");
-            composer.text().set((it->first).c_str());
-            composer.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it->second).c_str());
+            composer.text().set((it.first).c_str());
+            composer.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it.second).c_str());
             composer.append_attribute("analog").set_value("abc:C");
         }
     }
@@ -897,10 +897,10 @@ void ABCInput::CreateHeader()
     // <notesStmt> //
     if (!m_notes.empty()) {
         pugi::xml_node notes = fileDesc.append_child("notesStmt");
-        for (auto it = m_notes.begin(); it != m_notes.end(); ++it) {
+        for (auto it : m_notes) {
             pugi::xml_node annot = notes.append_child("annot");
-            annot.text().set((it->first).c_str());
-            annot.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it->second).c_str());
+            annot.text().set((it.first).c_str());
+            annot.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it.second).c_str());
             annot.append_attribute("analog").set_value("abc:N");
         }
     }
@@ -931,13 +931,12 @@ void ABCInput::CreateWorkEntry()
     pugi::xml_node work = m_workList.append_child("work");
     work.append_attribute("n").set_value(m_mdiv->GetN().c_str());
     work.append_attribute("data").set_value(StringFormat("#%s", m_mdiv->GetID().c_str()).c_str());
-    for (auto it = m_title.begin(); it != m_title.end(); ++it) {
+    for (auto it : m_title) {
         pugi::xml_node title = work.append_child("title");
-        title.text().set((it->first).c_str());
-        if (it->second != 0)
-            title.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it->second).c_str());
+        title.text().set((it.first).c_str());
+        if (it.second != 0) title.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it.second).c_str());
         title.append_attribute("analog").set_value("abc:T");
-        if (it == m_title.begin()) {
+        if (it == m_title.front()) {
             title.append_attribute("type").set_value("main");
         }
         else {
@@ -945,29 +944,29 @@ void ABCInput::CreateWorkEntry()
         }
     }
     if (!m_composer.empty()) {
-        for (auto it = m_composer.begin(); it != m_composer.end(); ++it) {
+        for (auto it : m_composer) {
             pugi::xml_node composer = work.append_child("composer");
-            composer.text().set((it->first).c_str());
-            composer.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it->second).c_str());
+            composer.text().set((it.first).c_str());
+            composer.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it.second).c_str());
             composer.append_attribute("analog").set_value("abc:C");
         }
     }
     if (!m_history.empty()) {
         pugi::xml_node history = work.append_child("history");
         history.append_attribute("analog").set_value("abc:H");
-        for (auto it = m_history.begin(); it != m_history.end(); ++it) {
+        for (auto it : m_history) {
             pugi::xml_node histLine = history.append_child("p");
-            histLine.text().set((it->first).c_str());
-            histLine.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it->second).c_str());
+            histLine.text().set((it.first).c_str());
+            histLine.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it.second).c_str());
         }
     }
     if (!m_info.empty()) {
         pugi::xml_node notes = work.append_child("notesStmt");
-        for (auto it = m_info.begin(); it != m_info.end(); ++it) {
+        for (auto it : m_info) {
             pugi::xml_node annot = notes.append_child("annot");
-            annot.text().set((it->first).first.c_str());
-            annot.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it->first.second).c_str());
-            annot.append_attribute("analog").set_value(StringFormat("abc:%c", it->second).c_str());
+            annot.text().set((it.first).first.c_str());
+            annot.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it.first.second).c_str());
+            annot.append_attribute("analog").set_value(StringFormat("abc:%c", it.second).c_str());
         }
     }
 }
@@ -976,20 +975,20 @@ void ABCInput::FlushControlElements(Score *score, Section *section)
 {
     Layer *layer = NULL;
     Measure *measure = NULL;
-    for (auto iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
-        if (!measure || (layer && layer->GetID() != iter->first)) {
-            layer = dynamic_cast<Layer *>(section->FindDescendantByID(iter->first));
+    for (auto iter : m_controlElements) {
+        if (!measure || (layer && layer->GetID() != iter.first)) {
+            layer = dynamic_cast<Layer *>(section->FindDescendantByID(iter.first));
         }
         if (!layer) {
             LogWarning("ABC import: Element '%s' could not be assigned to layer '%s'",
-                iter->second->GetClassName().c_str(), iter->first.c_str());
-            delete iter->second;
-            iter->second = NULL;
+                iter.second->GetClassName().c_str(), iter.first.c_str());
+            delete iter.second;
+            iter.second = NULL;
             continue;
         }
         measure = vrv_cast<Measure *>(layer->GetFirstAncestor(MEASURE));
         assert(measure);
-        measure->AddChild(iter->second);
+        measure->AddChild(iter.second);
     }
     if (!section->GetParent()) {
         score->AddChild(section);
@@ -1520,9 +1519,9 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
                 m_tieStack.back()->SetEndid("#" + m_ID);
                 m_tieStack.clear();
             }
-            for (auto it = m_slurStack.begin(); it != m_slurStack.end(); ++it) {
-                if (!((*it)->HasStartid())) {
-                    (*it)->SetStartid("#" + m_ID);
+            for (Slur *slur : m_slurStack) {
+                if (!slur->HasStartid()) {
+                    slur->SetStartid("#" + m_ID);
                 }
             }
         }
@@ -1726,8 +1725,8 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
                 section->AddChild(measure);
                 m_layer = new Layer();
                 m_layer->SetN(1);
-                for (auto it = m_tempoStack.begin(); it != m_tempoStack.end(); ++it) {
-                    measure->AddChild(*it);
+                for (ControlElement *tempo : m_tempoStack) {
+                    measure->AddChild(tempo);
                 }
                 m_tempoStack.clear();
             }

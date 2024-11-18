@@ -574,8 +574,8 @@ void MusicXmlInput::OpenTie(Note *note, Tie *tie, int layerNum)
 void MusicXmlInput::CloseTie(Note *note, int layerNum)
 {
     // add all notes with identical pitch/oct to m_tieStopStack
-    for (auto iter = m_tieStack.begin(); iter != m_tieStack.end(); ++iter) {
-        if (note->IsEnharmonicWith(iter->m_note)) {
+    for (const musicxml::OpenTie &tie : m_tieStack) {
+        if (note->IsEnharmonicWith(tie.m_note)) {
             m_tieStopStack.push_back(musicxml::CloseTie(note, layerNum));
         }
     }
@@ -1093,37 +1093,37 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     ProcessClefChangeQueue(section);
 
     Measure *measure = NULL;
-    for (auto iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
-        if (!measure || (measure->GetN() != iter->first)) {
-            AttNNumberLikeComparison comparisonMeasure(MEASURE, iter->first);
+    for (auto iter : m_controlElements) {
+        if (!measure || (measure->GetN() != iter.first)) {
+            AttNNumberLikeComparison comparisonMeasure(MEASURE, iter.first);
             measure = vrv_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure, 1));
         }
         if (!measure) {
             LogWarning("MusicXML import: Element '%s' could not be added to measure %s",
-                iter->second->GetClassName().c_str(), iter->first.c_str());
-            delete iter->second;
+                iter.second->GetClassName().c_str(), iter.first.c_str());
+            delete iter.second;
             continue;
         }
-        measure->AddChild(iter->second);
+        measure->AddChild(iter.second);
     }
 
     // manage endings stack: create new <ending> elements and move the corresponding measures into them
     if (!m_endingStack.empty()) {
-        for (auto iter = m_endingStack.begin(); iter != m_endingStack.end(); ++iter) {
+        for (auto iter : m_endingStack) {
             std::string logString = "";
-            logString = logString + "MusicXML import: Ending number='" + iter->second.m_endingNumber.c_str()
-                + "', type='" + iter->second.m_endingType.c_str() + "', text='" + iter->second.m_endingText + "' (";
-            std::vector<Measure *> measureList = iter->first;
+            logString = logString + "MusicXML import: Ending number='" + iter.second.m_endingNumber.c_str()
+                + "', type='" + iter.second.m_endingType.c_str() + "', text='" + iter.second.m_endingText + "' (";
+            std::vector<Measure *> measureList = iter.first;
             Ending *ending = new Ending();
-            if (iter->second.m_endingText
+            if (iter.second.m_endingText
                     .empty()) { // some musicXML exporters tend to ignore the <ending> text, so take @number instead.
-                ending->SetN(iter->second.m_endingNumber);
+                ending->SetN(iter.second.m_endingNumber);
             }
             else {
-                ending->SetN(iter->second.m_endingText);
+                ending->SetN(iter.second.m_endingText);
             }
             ending->SetLendsym(LINESTARTENDSYMBOL_angledown); // default, does not need to be written
-            if (iter->second.m_endingType == "discontinue") {
+            if (iter.second.m_endingType == "discontinue") {
                 ending->SetLendsym(LINESTARTENDSYMBOL_none); // no ending symbol
             }
             // replace first <measure> with <ending> element
@@ -1158,29 +1158,29 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         m_tieStack.clear();
     }
     if (!m_slurStack.empty()) { // There are slurs left open
-        for (auto iter = m_slurStack.begin(); iter != m_slurStack.end(); ++iter) {
-            LogWarning("MusicXML import: slur %d from measure %s could not be ended", iter->second.m_number,
-                iter->second.m_measureNum.c_str());
+        for (auto iter : m_slurStack) {
+            LogWarning("MusicXML import: slur %d from measure %s could not be ended", iter.second.m_number,
+                iter.second.m_measureNum.c_str());
         }
         m_slurStack.clear();
     }
     if (!m_slurStopStack.empty()) { // There are slurs ends without opening
-        for (auto iter = m_slurStopStack.begin(); iter != m_slurStopStack.end(); ++iter) {
+        for (auto iter : m_slurStopStack) {
             LogWarning("MusicXML import: slur ending for element '%s' could not be "
                        "matched to a start element",
-                iter->first->GetID().c_str());
+                iter.first->GetID().c_str());
         }
         m_slurStopStack.clear();
     }
     if (!m_glissStack.empty()) {
-        for (auto iter = m_glissStack.begin(); iter != m_glissStack.end(); ++iter) {
-            LogWarning("MusicXML import: gliss for '%s' could not be closed", (*iter)->GetID().c_str());
+        for (Gliss *gliss : m_glissStack) {
+            LogWarning("MusicXML import: gliss for '%s' could not be closed", gliss->GetID().c_str());
         }
         m_glissStack.clear();
     }
     if (!m_trillStack.empty()) { // open trills without ending
-        for (auto iter = m_trillStack.begin(); iter != m_trillStack.end(); ++iter) {
-            LogWarning("MusicXML import: trill extender for '%s' could not be ended", iter->first->GetID().c_str());
+        for (auto iter : m_trillStack) {
+            LogWarning("MusicXML import: trill extender for '%s' could not be ended", iter.first->GetID().c_str());
         }
         m_trillStack.clear();
     }
@@ -1594,15 +1594,15 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, shor
 
     // clean up part specific stacks
     if (!m_openDashesStack.empty()) { // open dashes without ending
-        for (auto iter = m_openDashesStack.begin(); iter != m_openDashesStack.end(); ++iter) {
+        for (auto iter : m_openDashesStack) {
             LogWarning(
-                "MusicXML import: dashes/extender lines for '%s' could not be closed", iter->first->GetID().c_str());
+                "MusicXML import: dashes/extender lines for '%s' could not be closed", iter.first->GetID().c_str());
         }
         m_openDashesStack.clear();
     }
     if (!m_bracketStack.empty()) { // open brackets without ending
-        for (auto iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
-            LogWarning("MusicXML import: bracketSpan for '%s' could not be closed", iter->first->GetID().c_str());
+        for (auto iter : m_bracketStack) {
+            LogWarning("MusicXML import: bracketSpan for '%s' could not be closed", iter.first->GetID().c_str());
         }
         m_bracketStack.clear();
     }
@@ -1723,7 +1723,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     m_hairpinStopStack.clear();
     m_tieStopStack.clear();
 
-    for (auto staff : measure->GetChildren()) {
+    for (Object *staff : measure->GetChildren()) {
         if (!staff->Is(STAFF)) {
             continue;
         }
@@ -2556,7 +2556,7 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, c
 
     Harm *harm = new Harm();
     Fb *fb = new Fb();
-    for (auto &fig : figures) {
+    for (F *fig : figures) {
         fb->AddChild(fig);
     }
     harm->AddChild(fb);
@@ -3572,10 +3572,10 @@ void MusicXmlInput::ReadMusicXmlNote(
         const std::string direction = xmlArpeggiate.node().attribute("direction").as_string();
         bool added = false;
         if (!m_ArpeggioStack.empty()) { // check existing arpeggios
-            for (auto iter = m_ArpeggioStack.begin(); iter != m_ArpeggioStack.end(); ++iter) {
-                if (iter->second.m_arpegN == arpegN && onset == iter->second.m_timeStamp) {
+            for (auto iter : m_ArpeggioStack) {
+                if (iter.second.m_arpegN == arpegN && onset == iter.second.m_timeStamp) {
                     // don't add other chord notes, because the chord is already referenced.
-                    if (!isChord) iter->first->GetPlistInterface()->AddRef("#" + element->GetID());
+                    if (!isChord) iter.first->GetPlistInterface()->AddRef("#" + element->GetID());
                     added = true; // so that no new Arpeg gets created below
                     break;
                 }
@@ -3694,15 +3694,15 @@ void MusicXmlInput::ReadMusicXmlNote(
         m_pedalStack.clear();
     }
     if (!m_bracketStack.empty()) {
-        for (auto iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
-            if (!(iter->first)->HasStaff())
-                iter->first->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        for (auto iter : m_bracketStack) {
+            if (!(iter.first)->HasStaff())
+                iter.first->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         }
     }
     if (!m_tempoStack.empty()) {
-        for (auto iter = m_tempoStack.begin(); iter != m_tempoStack.end(); ++iter) {
-            if (!(*iter)->HasStaff())
-                (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        for (Tempo *tempo : m_tempoStack) {
+            if (!tempo->HasStaff())
+                tempo->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         }
         m_tempoStack.clear();
     }
