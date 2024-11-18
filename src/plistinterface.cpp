@@ -104,9 +104,8 @@ FunctorCode PlistInterface::InterfacePreparePlist(PreparePlistFunctor &functor, 
 
     this->SetIDStrs();
 
-    std::vector<std::string>::iterator iter;
-    for (iter = m_ids.begin(); iter != m_ids.end(); ++iter) {
-        functor.InsertInterfaceIDPair(*iter, this);
+    for (const std::string &id : m_ids) {
+        functor.InsertInterfaceIDPair(id, this);
     }
 
     return FUNCTOR_CONTINUE;

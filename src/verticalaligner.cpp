@@ -336,9 +336,8 @@ StaffAlignment::~StaffAlignment()
 
 void StaffAlignment::ClearPositioners()
 {
-    ArrayOfFloatingPositioners::iterator iter;
-    for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
-        delete *iter;
+    for (FloatingPositioner *positioner : m_floatingPositioners) {
+        delete positioner;
     }
     m_floatingPositioners.clear();
 

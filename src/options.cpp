@@ -139,10 +139,9 @@ jsonxx::Object Option::ToJson() const
     else if (optArray) {
         opt << "type" << "array";
         std::vector<std::string> strValues = optArray->GetDefault();
-        std::vector<std::string>::iterator strIter;
         jsonxx::Array values;
-        for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
-            values << (*strIter);
+        for (const std::string &value : strValues) {
+            values << value;
         }
         opt << "default" << values;
     }
@@ -150,10 +149,9 @@ jsonxx::Object Option::ToJson() const
         opt << "type" << "std::string-list";
         opt << "default" << optIntMap->GetDefaultStrValue();
         std::vector<std::string> strValues = optIntMap->GetStrValues(false);
-        std::vector<std::string>::iterator strIter;
         jsonxx::Array values;
-        for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
-            values << (*strIter);
+        for (const std::string &value : strValues) {
+            values << value;
         }
         opt << "values" << values;
     }
