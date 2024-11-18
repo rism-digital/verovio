@@ -125,6 +125,34 @@
 					</attList>
 				</classSpec>
 
+				<classSpec ident="att.bracketSpan.log" module="MEI.cmn" type="atts" mode="change">
+					<attList>
+						<attDef ident="func" usage="req" mode="change">
+							<datatype>
+								<rng:data type="NMTOKENS"/>
+							</datatype>
+							<valList type="closed" mode="replace">
+								<valItem ident="coloration">
+									<desc xml:lang="en">Represents coloration in the mensural notation source material.</desc>
+								</valItem>
+								<valItem ident="cross-rhythm">
+									<desc xml:lang="en">Marks a sequence which does not match the current meter.</desc>
+								</valItem>
+								<valItem ident="ligature">
+									<desc xml:lang="en">Represents a ligature in the mensural notation source material.</desc>
+								</valItem>
+								<!-- Verovio specific values -->
+								<valItem ident="analytical">
+									<desc xml:lang="en">Represents a ligature in the mensural notation source material.</desc>
+								</valItem>
+								<valItem ident="uspecified">
+									<desc xml:lang="en">Represents a ligature in the mensural notation source material.</desc>
+								</valItem>
+							</valList>
+						</attDef>
+					</attList>
+				</classSpec>
+
 				<!-- ****************************************************************** -->
 				<!-- Page-based MEI -->
 				<!-- ****************************************************************** -->
@@ -522,8 +550,8 @@
 				<moduleSpec ident="MEI.frettab" mode="add">
 					<desc/>
 				</moduleSpec>
-				<dataSpec ident="data.COURSENUMBER" module="MEI.frettab" mode="add">
-					<desc xml:lang="en">In string tablature, the number of the course to be played, i.e., [1-9]+.</desc>
+				<dataSpec ident="data.COURSENUMBER" module="MEI.stringtab" mode="add">
+					<desc xml:lang="en">In string tablature, the number of the course to be played.</desc>
 					<content>
 						<rng:data type="positiveInteger"/>
 					</content>

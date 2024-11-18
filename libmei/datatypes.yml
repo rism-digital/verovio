@@ -187,11 +187,6 @@ defaults:
         data_STAFFREL()
 
 modules:
-    cmn:
-        att.bracketSpan.log:
-            func:
-                type: bracketSpanLog_FUNC
-
     externalsymbols:
         att.extsym:
             glyphnum:
