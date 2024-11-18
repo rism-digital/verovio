@@ -763,7 +763,7 @@ void Doc::PrepareData()
 
     if (!prepareDelayedTurns.GetDelayedTurns().empty()) {
         for (auto &staves : layerTree.child) {
-            for (auto layers : staves.second.child) {
+            for (auto &layers : staves.second.child) {
                 filters.Clear();
                 // Create ad comparison object for each type / @n
                 AttNIntegerComparison matchStaff(STAFF, staves.first);
