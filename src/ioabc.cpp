@@ -275,8 +275,8 @@ void ABCInput::AddLayerElement()
         beam = NULL;
     }
     else {
-        for (auto iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
-            m_layer->AddChild(*iter);
+        for (LayerElement *element : m_noteStack) {
+            m_layer->AddChild(element);
         }
     }
     // clean-up leftover data, if any
@@ -833,7 +833,7 @@ void ABCInput::parseReferenceNumber(const std::string &referenceNumberString)
 void ABCInput::PrintInformationFields(Score *score)
 {
     PgHead *pgHead = new PgHead();
-    for (auto it : m_title) {
+    for (const auto &it : m_title) {
         Rend *titleRend = new Rend();
         titleRend->SetHalign(HORIZONTALALIGNMENT_center);
         titleRend->SetValign(VERTICALALIGNMENT_middle);
@@ -847,7 +847,7 @@ void ABCInput::PrintInformationFields(Score *score)
         titleRend->AddChild(text);
         pgHead->AddChild(titleRend);
     }
-    for (auto it : m_composer) {
+    for (const auto &it : m_composer) {
         Rend *compRend = new Rend();
         compRend->SetHalign(HORIZONTALALIGNMENT_right);
         compRend->SetValign(VERTICALALIGNMENT_bottom);
@@ -883,7 +883,7 @@ void ABCInput::CreateHeader()
     pugi::xml_node fileTitle = fileTitleStmt.append_child("title");
     fileTitle.text().set(m_filename.c_str());
     if (!m_composer.empty()) {
-        for (auto it : m_composer) {
+        for (const auto &it : m_composer) {
             pugi::xml_node composer = fileTitleStmt.append_child("composer");
             composer.text().set((it.first).c_str());
             composer.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it.second).c_str());
@@ -897,7 +897,7 @@ void ABCInput::CreateHeader()
     // <notesStmt> //
     if (!m_notes.empty()) {
         pugi::xml_node notes = fileDesc.append_child("notesStmt");
-        for (auto it : m_notes) {
+        for (const auto &it : m_notes) {
             pugi::xml_node annot = notes.append_child("annot");
             annot.text().set((it.first).c_str());
             annot.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it.second).c_str());
@@ -931,7 +931,7 @@ void ABCInput::CreateWorkEntry()
     pugi::xml_node work = m_workList.append_child("work");
     work.append_attribute("n").set_value(m_mdiv->GetN().c_str());
     work.append_attribute("data").set_value(StringFormat("#%s", m_mdiv->GetID().c_str()).c_str());
-    for (auto it : m_title) {
+    for (const auto &it : m_title) {
         pugi::xml_node title = work.append_child("title");
         title.text().set((it.first).c_str());
         if (it.second != 0) title.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it.second).c_str());
@@ -944,7 +944,7 @@ void ABCInput::CreateWorkEntry()
         }
     }
     if (!m_composer.empty()) {
-        for (auto it : m_composer) {
+        for (const auto &it : m_composer) {
             pugi::xml_node composer = work.append_child("composer");
             composer.text().set((it.first).c_str());
             composer.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it.second).c_str());
@@ -954,7 +954,7 @@ void ABCInput::CreateWorkEntry()
     if (!m_history.empty()) {
         pugi::xml_node history = work.append_child("history");
         history.append_attribute("analog").set_value("abc:H");
-        for (auto it : m_history) {
+        for (const auto &it : m_history) {
             pugi::xml_node histLine = history.append_child("p");
             histLine.text().set((it.first).c_str());
             histLine.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it.second).c_str());
@@ -962,7 +962,7 @@ void ABCInput::CreateWorkEntry()
     }
     if (!m_info.empty()) {
         pugi::xml_node notes = work.append_child("notesStmt");
-        for (auto it : m_info) {
+        for (const auto &it : m_info) {
             pugi::xml_node annot = notes.append_child("annot");
             annot.text().set((it.first).first.c_str());
             annot.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it.first.second).c_str());
@@ -975,7 +975,7 @@ void ABCInput::FlushControlElements(Score *score, Section *section)
 {
     Layer *layer = NULL;
     Measure *measure = NULL;
-    for (auto iter : m_controlElements) {
+    for (auto &iter : m_controlElements) {
         if (!measure || (layer && layer->GetID() != iter.first)) {
             layer = dynamic_cast<Layer *>(section->FindDescendantByID(iter.first));
         }

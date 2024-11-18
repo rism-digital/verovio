@@ -280,11 +280,11 @@ void MusicXmlInput::InsertClefToLayer(Staff *staff, Layer *layer, Clef *clef, in
     // Since AddClef handles #sameas clef only for the future layers, we need to check any previous existing layers for
     // the same staff to see if we need to insert #sameas clef to them.
     ListOfObjects staffLayers = staff->FindAllDescendantsByType(LAYER, false);
-    for (const auto listLayer : staffLayers) {
+    for (const auto &listLayer : staffLayers) {
         Layer *otherLayer = vrv_cast<Layer *>(listLayer);
         if (m_layerTimes.find(otherLayer) == m_layerTimes.end()) continue;
         // Get first element for the same (or higher if same is not present) duration
-        const auto start = m_layerTimes.at(otherLayer).lower_bound(scoreOnset);
+        const auto &start = m_layerTimes.at(otherLayer).lower_bound(scoreOnset);
         // Add either clef or #sameas, depending on the layer we're adding to
         Clef *clefToAdd = NULL;
         if (listLayer == layer) {
@@ -3572,7 +3572,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         const std::string direction = xmlArpeggiate.node().attribute("direction").as_string();
         bool added = false;
         if (!m_ArpeggioStack.empty()) { // check existing arpeggios
-            for (auto iter : m_ArpeggioStack) {
+            for (const auto &iter : m_ArpeggioStack) {
                 if (iter.second.m_arpegN == arpegN && onset == iter.second.m_timeStamp) {
                     // don't add other chord notes, because the chord is already referenced.
                     if (!isChord) iter.first->GetPlistInterface()->AddRef("#" + element->GetID());
@@ -3657,7 +3657,7 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     // add StartIDs to dir, dynam, and pedal
     if (!m_dirStack.empty()) {
-        for (auto &dir : m_dirStack) {
+        for (Dir *dir : m_dirStack) {
             if (!dir->HasStaff()) {
                 dir->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
             }
@@ -3665,7 +3665,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         m_dirStack.clear();
     }
     if (!m_dynamStack.empty()) {
-        for (auto &dynam : m_dynamStack) {
+        for (Dynam *dynam : m_dynamStack) {
             if (!dynam->HasStaff()) {
                 dynam->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
             }
@@ -3673,20 +3673,20 @@ void MusicXmlInput::ReadMusicXmlNote(
         m_dynamStack.clear();
     }
     if (!m_harmStack.empty()) {
-        for (auto &harm : m_harmStack) {
+        for (Harm *harm : m_harmStack) {
             harm->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         }
         m_harmStack.clear();
     }
     if (!m_octaveStack.empty()) {
-        for (auto &oct : m_octaveStack) {
+        for (Octave *oct : m_octaveStack) {
             oct->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
             oct->SetStartid(m_ID);
         }
         m_octaveStack.clear();
     }
     if (!m_pedalStack.empty()) {
-        for (auto &ped : m_pedalStack) {
+        for (Pedal *ped : m_pedalStack) {
             if (!ped->HasStaff()) {
                 ped->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
             }
@@ -3694,7 +3694,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         m_pedalStack.clear();
     }
     if (!m_bracketStack.empty()) {
-        for (auto iter : m_bracketStack) {
+        for (const auto &iter : m_bracketStack) {
             if (!(iter.first)->HasStaff())
                 iter.first->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         }

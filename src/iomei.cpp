@@ -3180,7 +3180,7 @@ void MEIOutput::WriteTimeSpanningInterface(pugi::xml_node element, TimeSpanningI
 
 void MEIOutput::WriteUnsupportedAttr(pugi::xml_node element, Object *object)
 {
-    for (auto &pair : object->m_unsupported) {
+    for (const auto &pair : object->m_unsupported) {
         if (element.attribute(pair.first.c_str())) {
             LogDebug("Attribute '%s' for '%s' is not supported", pair.first.c_str(), object->GetClassName().c_str());
         }
@@ -4099,7 +4099,7 @@ bool MEIInput::ReadIncipits(pugi::xml_node root)
     int incipCount = 0;
     bool success = true;
 
-    for (auto &incipItem : incipSet) {
+    for (const auto &incipItem : incipSet) {
         if (!success) break;
         pugi::xml_node incip = incipItem.node();
         pugi::xml_node incipCode = incip.child("incipCode");
