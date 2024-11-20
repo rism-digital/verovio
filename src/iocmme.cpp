@@ -37,6 +37,7 @@
 #include "measure.h"
 #include "mensur.h"
 #include "note.h"
+#include "page.h"
 #include "proport.h"
 #include "rdg.h"
 #include "rest.h"
@@ -48,6 +49,7 @@
 #include "staffgrp.h"
 #include "supplied.h"
 #include "syl.h"
+#include "system.h"
 #include "text.h"
 #include "verse.h"
 #include "vrv.h"
@@ -154,6 +156,8 @@ bool CmmeInput::Import(const std::string &cmme)
         m_score->GetScoreDef()->AddChild(staffGrp);
 
         m_doc->ConvertToPageBasedDoc();
+
+        this->PostProcessProport();
     }
     catch (char *str) {
         LogError("%s", str);
@@ -161,6 +165,66 @@ bool CmmeInput::Import(const std::string &cmme)
     }
 
     return true;
+}
+
+void CmmeInput::PostProcessProport()
+{
+    m_doc->PrepareData();
+    m_doc->ScoreDefSetCurrentDoc();
+
+    Page *contentPage = m_doc->SetDrawingPage(0);
+    assert(contentPage);
+
+    // Layout the content with tempo changes as original
+    contentPage->LayOutHorizontally();
+
+    // Go through all proportion marked as potentential tempo change, which is their
+    // status at this stage of import
+    // See if they are occurring at all voices with the same values
+    // If yes, this is a tempo change and mark them as such
+    // Otherwise mark them as "reset" since CMME does not cummulate values for tempo change
+    ListOfObjects proports = contentPage->FindAllDescendantsByType(PROPORT);
+    for (Object *object : proports) {
+        Proport *proport = vrv_cast<Proport *>(object);
+        assert(proport);
+        // Not a potential tempo change, or already processed
+        if (proport->GetType() != "cmme_tempo_change?") continue;
+        // Default type for tempo changes
+        std::string propType = "cmme_tempo_change";
+        proport->SetType(propType);
+
+        // Look at proportion aligned with it
+        Alignment *alignment = proport->GetAlignment();
+        Object *measure = proport->GetFirstAncestor(MEASURE);
+        // Just in case
+        if (!measure || !alignment) continue;
+        // Check for the number of layer within the measure (e.g., section in CMME)
+        const int nbLayers = measure->GetDescendantCount(LAYER);
+
+        bool isTempoChange = true;
+        // Not at all voices
+        if (nbLayers != alignment->GetChildCount()) isTempoChange = false;
+        // Check if the value of other proportions are the same
+        ListOfObjects alignProports = alignment->FindAllDescendantsByType(PROPORT);
+        for (Object *alignObject : alignProports) {
+            Proport *alignProport = vrv_cast<Proport *>(alignObject);
+            assert(proport);
+            isTempoChange = isTempoChange && (proport->GetNum() == alignProport->GetNum());
+            isTempoChange = isTempoChange && (proport->GetNumbase() == alignProport->GetNumbase());
+        }
+        if (!isTempoChange) {
+            propType = "reset";
+            LogWarning("A tempo change not occuring at all voices detected");
+        }
+
+        for (Object *alignObject : alignProports) {
+            Proport *alignProport = vrv_cast<Proport *>(alignObject);
+            assert(proport);
+            alignProport->SetType(propType);
+        }
+    }
+
+    m_doc->ResetDataPage();
 }
 
 void CmmeInput::CreateMetadata(pugi::xml_node metadataNode)
@@ -849,7 +913,8 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
         if (denVal != VRV_UNSET) {
             proport->SetNumbase(denVal);
         }
-        proport->SetType("cmme_tempo_change");
+        // Mark them as potential tempo changes
+        proport->SetType("cmme_tempo_change?");
         m_currentContainer->AddChild(proport);
     }
 

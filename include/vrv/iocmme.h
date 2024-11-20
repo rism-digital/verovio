@@ -96,6 +96,11 @@ private:
     int ChildAsInt(const pugi::xml_node node, const std::string &child) const;
     ///@}
 
+    /**
+     * Post-process the data to adjust the type of tempo change proport.
+     */
+    void PostProcessProport();
+
 public:
     //
 private:

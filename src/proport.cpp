@@ -50,6 +50,8 @@ int Proport::GetCumulatedNumbase() const
 void Proport::Cumulate(const Proport *proport)
 {
     // Unset values are not cumulated
+    if (this->GetType() == "reset") return;
+
     if (proport->HasNum() && this->HasNum()) {
         m_cumulatedNum = this->GetNum() * proport->GetCumulatedNum();
     }
@@ -59,6 +61,12 @@ void Proport::Cumulate(const Proport *proport)
     if ((m_cumulatedNum != VRV_UNSET) && (m_cumulatedNumbase != VRV_UNSET)) {
         Fraction::Reduce(m_cumulatedNum, m_cumulatedNumbase);
     }
+}
+
+void Proport::ResetCumulate()
+{
+    m_cumulatedNum = VRV_UNSET;
+    m_cumulatedNumbase = VRV_UNSET;
 }
 
 FunctorCode Proport::Accept(Functor &functor)
