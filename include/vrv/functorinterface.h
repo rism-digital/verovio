@@ -16,6 +16,7 @@ class Accid;
 class Alignment;
 class AlignmentReference;
 class AnchoredText;
+class AnnotScore;
 class Arpeg;
 class Artic;
 class BarLine;
@@ -280,6 +281,8 @@ public:
     ///@{
     virtual FunctorCode VisitAnchoredText(AnchoredText *anchoredText);
     virtual FunctorCode VisitAnchoredTextEnd(AnchoredText *anchoredText);
+    virtual FunctorCode VisitAnnotScore(AnnotScore *annotScore);
+    virtual FunctorCode VisitAnnotScoreEnd(AnnotScore *annotScore);
     virtual FunctorCode VisitArpeg(Arpeg *arpeg);
     virtual FunctorCode VisitArpegEnd(Arpeg *arpeg);
     virtual FunctorCode VisitBeamSpan(BeamSpan *beamSpan);
@@ -653,6 +656,8 @@ public:
     ///@{
     virtual FunctorCode VisitAnchoredText(const AnchoredText *anchoredText);
     virtual FunctorCode VisitAnchoredTextEnd(const AnchoredText *anchoredText);
+    virtual FunctorCode VisitAnnotScore(const AnnotScore *annotScore);
+    virtual FunctorCode VisitAnnotScoreEnd(const AnnotScore *annotScore);
     virtual FunctorCode VisitArpeg(const Arpeg *arpeg);
     virtual FunctorCode VisitArpegEnd(const Arpeg *arpeg);
     virtual FunctorCode VisitBeamSpan(const BeamSpan *beamSpan);
