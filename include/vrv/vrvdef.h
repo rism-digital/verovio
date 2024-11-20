@@ -177,6 +177,7 @@ enum ClassId : uint16_t {
     // Ids for ControlElement child classes
     CONTROL_ELEMENT,
     ANCHOREDTEXT,
+    ANNOTSCORE,
     ARPEG,
     BEAMSPAN,
     BRACKETSPAN,
