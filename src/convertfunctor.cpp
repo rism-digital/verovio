@@ -537,9 +537,16 @@ FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
         mensurs.push_back(mensur);
     }
     // We need to have at least one and at least one at beginning (time 0)
-    if (mensurs.empty() || (mensurs.front().m_time != 0)) {
+    if (mensurs.empty()) {
         mensur.m_time = 0;
         mensurs.push_back(mensur);
+        LogWarning("No mensur detected");
+    }
+    else if (mensurs.front().m_time != 0) {
+        mensur.m_time = 0;
+        mensur.m_mensur.Reset();
+        mensurs.insert(mensurs.begin(), mensur);
+        LogWarning("No mensur detected at the beginning");
     }
 
     // Now we can create measure object based on the mensur and the time of each MensurInfo section
