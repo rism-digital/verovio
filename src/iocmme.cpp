@@ -304,6 +304,7 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
     // Reset the syllable position
     m_isInSyllable = false;
     m_currentSignature = NULL;
+    m_activeTempoChange = false;
 
     staff->AddChild(m_currentContainer);
     m_currentSection->AddChild(staff);
@@ -916,6 +917,18 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
         // Mark them as potential tempo changes
         proport->SetType("cmme_tempo_change?");
         m_currentContainer->AddChild(proport);
+        m_activeTempoChange = true;
+    }
+    // CMME resets the tempo change with a Mensuration with no tempo change
+    // We need to add one in the MEI
+    else if (m_activeTempoChange) {
+        Proport *proport = new Proport();
+        proport->SetNum(1);
+        proport->SetNumbase(1);
+        // Mark them as potential tempo changes
+        proport->SetType("cmme_tempo_change?");
+        m_currentContainer->AddChild(proport);
+        m_activeTempoChange = false;
     }
 
     return;

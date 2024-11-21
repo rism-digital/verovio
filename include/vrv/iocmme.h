@@ -127,6 +127,8 @@ private:
     int m_numVoices;
     /** The name of the voices - if any */
     std::vector<std::string> m_voices;
+    /** A flag indicating we had a tempo change */
+    bool m_activeTempoChange;
 };
 
 } // namespace vrv
