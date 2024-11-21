@@ -20438,7 +20438,7 @@
 								<desc xml:lang="en">Open D tuning for guitars. D2 A2 D3 F3s A3 D4.</desc>
 							</valItem>
 							<valItem ident="guitar.open.G">
-								<desc xml:lang="en">Open G tuning for guitars. D2 G2 D2 G2 B3 D4.</desc>
+								<desc xml:lang="en">Open G tuning for guitars. D2 G2 D3 G3 B3 D4.</desc>
 							</valItem>
 							<valItem ident="guitar.open.A">
 								<desc xml:lang="en">Open A tuning for guitars. E2 A2 E3 A3 C4s E4.</desc>
