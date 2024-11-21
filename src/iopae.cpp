@@ -4755,7 +4755,7 @@ bool PAEInput::CheckContentPostBuild()
     ClassIdsComparison noteOrRest({ NOTE, REST });
     ListOfObjects containers;
     m_doc->FindAllDescendantsByComparison(&containers, &comparison);
-    for (auto &container : containers) {
+    for (const auto &container : containers) {
         ListOfObjects notesOrRests;
         container->FindAllDescendantsByComparison(&notesOrRests, &noteOrRest);
         if ((int)notesOrRests.size() < 1) {

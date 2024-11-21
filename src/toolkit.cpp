@@ -1440,10 +1440,9 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     element->GetAttributes(&attributes);
 
     // Fill the JSON object
-    ArrayOfStrAttr::iterator iter;
-    for (iter = attributes.begin(); iter != attributes.end(); ++iter) {
-        o << (*iter).first << (*iter).second;
-        // LogInfo("Element %s - %s", (*iter).first.c_str(), (*iter).second.c_str());
+    for (const auto &attribute : attributes) {
+        o << attribute.first << attribute.second;
+        // LogInfo("Element %s - %s", attribute.first.c_str(), attribute.second.c_str());
     }
     return o.json();
 }

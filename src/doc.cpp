@@ -437,17 +437,14 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     // For this, we use a array of AttNIntegerComparison that looks for each object if it is of the type
     // and with @n specified
 
-    IntTree_t::const_iterator staves;
-    IntTree_t::const_iterator layers;
-
     // Process notes and chords, rests, spaces layer by layer
     // track 0 (included by default) is reserved for meta messages common to all tracks
     int midiChannel = 0;
     int midiTrack = 1;
     Filters filters;
-    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
+    for (auto &staves : layerTree.child) {
         int transSemi = 0;
-        if (StaffDef *staffDef = scoreDef->GetStaffDef(staves->first)) {
+        if (StaffDef *staffDef = scoreDef->GetStaffDef(staves.first)) {
             // get the transposition (semi-tone) value for the staff
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
             midiTrack = staffDef->GetN();
@@ -514,11 +511,11 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         generateScoreDefMIDI.SetTrack(midiTrack);
         scoreDef->Process(generateScoreDefMIDI);
 
-        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+        for (auto &layers : staves.second.child) {
             filters.Clear();
             // Create ad comparison object for each type / @n
-            AttNIntegerComparison matchStaff(STAFF, staves->first);
-            AttNIntegerComparison matchLayer(LAYER, layers->first);
+            AttNIntegerComparison matchStaff(STAFF, staves.first);
+            AttNIntegerComparison matchLayer(LAYER, layers.first);
             filters.Add(&matchStaff);
             filters.Add(&matchLayer);
 
@@ -527,7 +524,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
 
             generateMIDI.SetChannel(midiChannel);
             generateMIDI.SetTrack(midiTrack);
-            generateMIDI.SetStaffN(staves->first);
+            generateMIDI.SetStaffN(staves.first);
             generateMIDI.SetTempoEventTicks(tempoEventTicks);
             generateMIDI.SetTransSemi(transSemi);
             generateMIDI.SetCurrentTempo(tempo);
@@ -740,19 +737,15 @@ void Doc::PrepareData()
     // For this, we use an array of AttNIntegerComparison that looks for each object if it is of the type
     // and with @n specified
 
-    IntTree_t::const_iterator staves;
-    IntTree_t::const_iterator layers;
-    IntTree_t::const_iterator verses;
-
     /************ Resolve some pointers by layer ************/
 
     Filters filters;
-    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
-        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+    for (auto &staves : layerTree.child) {
+        for (auto &layers : staves.second.child) {
             filters.Clear();
             // Create ad comparison object for each type / @n
-            AttNIntegerComparison matchStaff(STAFF, staves->first);
-            AttNIntegerComparison matchLayer(LAYER, layers->first);
+            AttNIntegerComparison matchStaff(STAFF, staves.first);
+            AttNIntegerComparison matchLayer(LAYER, layers.first);
             filters.Add(&matchStaff);
             filters.Add(&matchLayer);
 
@@ -769,12 +762,12 @@ void Doc::PrepareData()
     prepareDelayedTurns.SetDataCollectionCompleted();
 
     if (!prepareDelayedTurns.GetDelayedTurns().empty()) {
-        for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
-            for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+        for (auto &staves : layerTree.child) {
+            for (auto &layers : staves.second.child) {
                 filters.Clear();
                 // Create ad comparison object for each type / @n
-                AttNIntegerComparison matchStaff(STAFF, staves->first);
-                AttNIntegerComparison matchLayer(LAYER, layers->first);
+                AttNIntegerComparison matchStaff(STAFF, staves.first);
+                AttNIntegerComparison matchLayer(LAYER, layers.first);
                 filters.Add(&matchStaff);
                 filters.Add(&matchLayer);
 
@@ -788,15 +781,15 @@ void Doc::PrepareData()
     /************ Resolve lyric connectors ************/
 
     // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
-    for (staves = verseTree.child.begin(); staves != verseTree.child.end(); ++staves) {
-        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
-            for (verses = layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
+    for (auto &staves : verseTree.child) {
+        for (auto &layers : staves.second.child) {
+            for (auto &verses : layers.second.child) {
                 // std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
                 filters.Clear();
                 // Create ad comparison object for each type / @n
-                AttNIntegerComparison matchStaff(STAFF, staves->first);
-                AttNIntegerComparison matchLayer(LAYER, layers->first);
-                AttNIntegerComparison matchVerse(VERSE, verses->first);
+                AttNIntegerComparison matchStaff(STAFF, staves.first);
+                AttNIntegerComparison matchLayer(LAYER, layers.first);
+                AttNIntegerComparison matchVerse(VERSE, verses.first);
                 filters.Add(&matchStaff);
                 filters.Add(&matchLayer);
                 filters.Add(&matchVerse);
@@ -827,12 +820,12 @@ void Doc::PrepareData()
     /************ Resolve mRpt ************/
 
     // Process by staff for matching mRpt elements and setting the drawing number
-    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
-        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+    for (auto &staves : layerTree.child) {
+        for (auto &layers : staves.second.child) {
             filters.Clear();
             // Create ad comparison object for each type / @n
-            AttNIntegerComparison matchStaff(STAFF, staves->first);
-            AttNIntegerComparison matchLayer(LAYER, layers->first);
+            AttNIntegerComparison matchStaff(STAFF, staves.first);
+            AttNIntegerComparison matchLayer(LAYER, layers.first);
             filters.Add(&matchStaff);
             filters.Add(&matchLayer);
 
@@ -1362,20 +1355,17 @@ void Doc::ConvertMarkupDoc(bool permanent)
         this->Process(initProcessingLists);
         const IntTree &layerTree = initProcessingLists.GetLayerTree();
 
-        IntTree_t::const_iterator staves;
-        IntTree_t::const_iterator layers;
-
         /************ Resolve ties ************/
 
         // Process by layer for matching @tie attribute - we process notes and chords, looking at
         // GetTie values and pitch and oct for matching notes
         Filters filters;
-        for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
-            for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+        for (auto &staves : layerTree.child) {
+            for (auto &layers : staves.second.child) {
                 filters.Clear();
                 // Create ad comparison object for each type / @n
-                AttNIntegerComparison matchStaff(STAFF, staves->first);
-                AttNIntegerComparison matchLayer(LAYER, layers->first);
+                AttNIntegerComparison matchStaff(STAFF, staves.first);
+                AttNIntegerComparison matchLayer(LAYER, layers.first);
                 filters.Add(&matchStaff);
                 filters.Add(&matchLayer);
 

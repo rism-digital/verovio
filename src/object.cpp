@@ -366,12 +366,11 @@ void Object::ClearChildren()
         return;
     }
 
-    ArrayOfObjects::iterator iter;
-    for (iter = m_children.begin(); iter != m_children.end(); ++iter) {
+    for (Object *child : m_children) {
         // we need to check if this is the parent
         // ownership might have been given up with Relinquish
-        if ((*iter)->GetParent() == this) {
-            delete *iter;
+        if (child->GetParent() == this) {
+            delete child;
         }
     }
     m_children.clear();
@@ -1051,10 +1050,10 @@ void Object::Process(Functor &functor, int deepness, bool skipFirst)
             }
         }
         else {
-            for (ArrayOfObjects::iterator iter = children->begin(); iter != children->end(); ++iter) {
+            for (Object *child : m_children) {
                 // we will end here if there is no filter at all or for the current child type
-                if (this->FiltersApply(filters, *iter)) {
-                    (*iter)->Process(functor, deepness);
+                if (this->FiltersApply(filters, child)) {
+                    child->Process(functor, deepness);
                 }
             }
         }
