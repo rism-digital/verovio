@@ -202,8 +202,12 @@ void CmmeInput::PostProcessProport()
         const int nbLayers = measure->GetDescendantCount(LAYER);
 
         bool isTempoChange = true;
+        bool allVoices = true;
         // Not at all voices
-        if (nbLayers != alignment->GetChildCount()) isTempoChange = false;
+        if (nbLayers != alignment->GetChildCount()) {
+            isTempoChange = false;
+            allVoices = false;
+        }
         // Check if the value of other proportions are the same
         ListOfObjects alignProports = alignment->FindAllDescendantsByType(PROPORT);
         for (Object *alignObject : alignProports) {
@@ -214,7 +218,12 @@ void CmmeInput::PostProcessProport()
         }
         if (!isTempoChange) {
             propType = "reset";
-            LogWarning("A tempo change not occuring at all voices detected");
+            if (allVoices) {
+                LogWarning("A tempo change at all voices with different values detected");
+            }
+            else {
+                LogWarning("A tempo change not occurring at all voices detected");
+            }
         }
 
         for (Object *alignObject : alignProports) {
