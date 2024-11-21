@@ -1888,6 +1888,8 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     ListOfObjects chords;
 
     measure->FindAllDescendantsByComparison(&notesOrRests, &matchTime);
+    ClassIdsComparison mRestComparison({ MULTIREST, MREST });
+    measure->FindAllDescendantsByComparison(&notesOrRests, &mRestComparison, UNLIMITED_DEPTH, FORWARD, false);
 
     // Fill the JSON object
     for (Object *object : notesOrRests) {
@@ -1898,7 +1900,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
             Chord *chord = note->IsChordTone();
             if (chord) chords.push_back(chord);
         }
-        else if (object->Is(REST)) {
+        else if (object->Is({ MREST, MULTIREST, REST })) {
             restArray << object->GetID();
         }
     }
