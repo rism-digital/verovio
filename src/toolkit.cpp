@@ -571,6 +571,10 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         input = new VolpianoInput(&m_doc);
     }
     else if (inputFormat == CMME) {
+        if (m_options->m_durationEquivalence.GetValue() != DURATION_EQ_minima) {
+            LogWarning("CMME input uses 'minima' duration equivalence, changing the option accordingly.");
+            m_options->m_durationEquivalence.SetValue(DURATION_EQ_minima);
+        }
         input = new CmmeInput(&m_doc);
     }
 #ifndef NO_HUMDRUM_SUPPORT
@@ -816,7 +820,15 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
 
     // Convert pseudo-measures into distinct segments based on barLine elements
     if (m_doc.IsMensuralMusicOnly()) {
-        m_doc.ConvertToCastOffMensuralDoc(true);
+        if (m_options->m_mensuralResponsiveView.GetValue()) {
+            m_doc.ConvertToMensuralViewDoc();
+        }
+        else if (m_options->m_mensuralToCmn.GetValue()) {
+            m_doc.ConvertToCmnDoc();
+        }
+        else {
+            m_doc.ConvertToCastOffMensuralDoc(true);
+        }
     }
 
     // Do the layout? this depends on the options and the file. PAE and

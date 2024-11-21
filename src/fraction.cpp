@@ -74,6 +74,28 @@ Fraction Fraction::operator/(const Fraction &other) const
     return Fraction(num, denom);
 }
 
+Fraction Fraction::operator%(const Fraction &other) const
+{
+    if (other.m_numerator == 0) {
+        LogDebug("Cannot divide by zero.");
+        return *this;
+    }
+
+    // Convert both fractions to common denominator
+    int commonDenominator = m_denominator * other.m_denominator;
+    int leftNumerator = m_numerator * other.m_denominator;
+    int rightNumerator = other.m_numerator * m_denominator;
+
+    // Integer quotient
+    int quotient = leftNumerator / rightNumerator;
+
+    // Remainder as a fraction
+    Fraction remainder(leftNumerator - quotient * rightNumerator, commonDenominator);
+    remainder.Reduce();
+
+    return remainder;
+}
+
 bool Fraction::operator==(const Fraction &other) const
 {
     return m_numerator * other.m_denominator == other.m_numerator * m_denominator;
@@ -117,7 +139,7 @@ std::pair<data_DURATION, Fraction> Fraction::ToDur() const
     dur = vrv::DurationMin(DURATION_2048, dur);
 
     Fraction remainder = *this - Fraction(dur);
-    // Making sure we would not be trigger an inifite loop when looping over the remainder
+    // Making sure we would not be triggering an inifite loop when looping over the remainder
     if ((remainder >= *this) || (remainder < 0)) remainder = 0;
     return { dur, remainder };
 }

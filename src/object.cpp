@@ -393,6 +393,36 @@ int Object::GetDescendantCount(const ClassId classId) const
     return (int)objects.size();
 }
 
+void Object::CopyAttributesTo(Object *target) const
+{
+    assert(this->GetClassId() == target->GetClassId());
+
+    AttModule::CopyAnalytical(this, target);
+    AttModule::CopyCmn(this, target);
+    AttModule::CopyCmnornaments(this, target);
+    AttModule::CopyCritapp(this, target);
+    // AttModule::CopyEdittrans(this, target);
+    AttModule::CopyExternalsymbols(this, target);
+    AttModule::CopyFrettab(this, target);
+    AttModule::CopyFacsimile(this, target);
+    // AttModule::CopyFigtable(this, target);
+    // AttModule::CopyFingering(this, target);
+    AttModule::CopyGestural(this, target);
+    // AttModule::CopyHarmony(this, target);
+    // AttModule::CopyHeader(this, target);
+    AttModule::CopyMei(this, target);
+    AttModule::CopyMensural(this, target);
+    AttModule::CopyMidi(this, target);
+    AttModule::CopyNeumes(this, target);
+    AttModule::CopyPagebased(this, target);
+    // AttModule::CopyPerformance(this, target);
+    AttModule::CopyShared(this, target);
+    // AttModule::CopyUsersymbols(this, target);
+    AttModule::CopyVisual(this, target);
+
+    target->m_unsupported = this->m_unsupported;
+}
+
 int Object::GetAttributes(ArrayOfStrAttr *attributes) const
 {
     assert(attributes);
@@ -1568,7 +1598,7 @@ void TextListInterface::FilterList(ListOfConstObjects &childList) const
 // ObjectFactory methods
 //----------------------------------------------------------------------------
 
-thread_local MapOfStrConstructors ObjectFactory::s_ctorsRegistry;
+thread_local MapOfClassIdConstructors ObjectFactory::s_ctorsRegistry;
 thread_local MapOfStrClassIds ObjectFactory::s_classIdsRegistry;
 
 ObjectFactory *ObjectFactory::GetInstance()
@@ -1579,16 +1609,24 @@ ObjectFactory *ObjectFactory::GetInstance()
 
 Object *ObjectFactory::Create(std::string name)
 {
+    ClassId classId = this->GetClassId(name);
+    if (classId == OBJECT) return NULL;
+
+    return this->Create(classId);
+}
+
+Object *ObjectFactory::Create(ClassId classId)
+{
     Object *object = NULL;
 
-    MapOfStrConstructors::iterator it = s_ctorsRegistry.find(name);
+    MapOfClassIdConstructors::iterator it = s_ctorsRegistry.find(classId);
     if (it != s_ctorsRegistry.end()) object = it->second();
 
     if (object) {
         return object;
     }
     else {
-        LogError("Factory for '%s' not found", name.c_str());
+        LogError("Factory for '%d' not found", classId);
         return NULL;
     }
 }
@@ -1622,7 +1660,7 @@ void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, st
 
 void ObjectFactory::Register(std::string name, ClassId classId, std::function<Object *(void)> function)
 {
-    s_ctorsRegistry[name] = function;
+    s_ctorsRegistry[classId] = function;
     s_classIdsRegistry[name] = classId;
 }
 

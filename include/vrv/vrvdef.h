@@ -389,7 +389,7 @@ typedef std::map<int, GraceAligner *> MapOfIntGraceAligners;
 
 typedef std::vector<std::pair<std::u32string, bool>> ArrayOfStringDynamTypePairs;
 
-typedef std::map<std::string, std::function<Object *(void)>> MapOfStrConstructors;
+typedef std::map<ClassId, std::function<Object *(void)>> MapOfClassIdConstructors;
 
 typedef std::map<std::string, ClassId> MapOfStrClassIds;
 

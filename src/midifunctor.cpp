@@ -12,6 +12,7 @@
 #include "arpeg.h"
 #include "beatrpt.h"
 #include "btrem.h"
+#include "doc.h"
 #include "featureextractor.h"
 #include "ftrem.h"
 #include "gracegrp.h"
@@ -40,12 +41,19 @@ namespace vrv {
 // InitOnsetOffsetFunctor
 //----------------------------------------------------------------------------
 
-InitOnsetOffsetFunctor::InitOnsetOffsetFunctor() : Functor()
+InitOnsetOffsetFunctor::InitOnsetOffsetFunctor(Doc *doc) : DocFunctor(doc)
 {
+    static const std::map<int, data_DURATION> durationEq{
+        { DURATION_EQ_brevis, DURATION_brevis }, //
+        { DURATION_EQ_semibrevis, DURATION_semibrevis }, //
+        { DURATION_EQ_minima, DURATION_minima }, //
+    };
+
     m_currentScoreTime = 0;
     m_currentRealTimeSeconds = 0.0;
     m_notationType = NOTATIONTYPE_cmn;
     m_currentTempo = MIDI_TEMPO;
+    m_meterParams.equivalence = durationEq.at(m_doc->GetOptions()->m_durationEquivalence.GetValue());
 }
 
 FunctorCode InitOnsetOffsetFunctor::VisitChordEnd(Chord *chord)
@@ -68,6 +76,7 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayer(Layer *layer)
 
     m_meterParams.mensur = layer->GetCurrentMensur();
     m_meterParams.meterSig = layer->GetCurrentMeterSig();
+    m_meterParams.proport = layer->GetCurrentProport();
 
     return FUNCTOR_CONTINUE;
 }
@@ -156,6 +165,16 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayerElement(LayerElement *layerElement
     }
     else if (layerElement->Is(METERSIG)) {
         this->m_meterParams.meterSig = vrv_cast<MeterSig *>(layerElement);
+    }
+    else if (layerElement->Is(PROPORT)) {
+        if (layerElement->GetType() == "cmme_tempo_change") return FUNCTOR_SIBLINGS;
+        // replace the current proport
+        const Proport *previous = (m_meterParams.proport) ? (m_meterParams.proport) : NULL;
+        m_meterParams.proport = vrv_cast<Proport *>(layerElement);
+        assert(m_meterParams.proport);
+        if (previous) {
+            m_meterParams.proport->Cumulate(previous);
+        }
     }
 
     return FUNCTOR_CONTINUE;

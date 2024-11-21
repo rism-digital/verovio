@@ -103,9 +103,14 @@ public:
     bool GenerateMeasureNumbers();
 
     /**
-     * Generate an MEI header
+     * Generate a minimal MEI header
      */
-    void GenerateMEIHeader(bool meiBasic);
+    void GenerateMEIHeader();
+
+    /**
+     * Convert the header to MEI basic by preserving only the fileDesc and its titleStmt
+     */
+    void ConvertHeaderToMEIBasic();
 
     /**
      * Getter and setter for the DocType.
@@ -366,11 +371,26 @@ public:
     void ConvertToCastOffMensuralDoc(bool castOff);
 
     /**
+     * Convert mensural MEI into CMN measure-based MEI.
+     */
+    void ConvertToCmnDoc();
+
+    /**
      * Convert analytical encoding (@fermata, @tie) to correpsonding elements
      * By default, the element are used only for the rendering and not preserved in the MEI output
      * Permanent conversion discard analytical markup and elements will be preserved in the MEI output.
      */
     void ConvertMarkupDoc(bool permanent = true);
+
+    /**
+     * Convert the doc from mensural to a flattened version with no ligatures and the selected editorial markup.
+     */
+    void ConvertToMensuralViewDoc();
+
+    /**
+     * Convert the doc from mensural to CMN.
+     */
+    void ConvertMensuralToCmnDoc();
 
     /**
      * Sync the coordinate provided trought <facsimile> to m_drawingFacsX/Y.
@@ -447,8 +467,8 @@ public:
      * @name Setter for and getter for mensural only flag
      */
     ///@{
-    void SetMensuralMusicOnly(bool isMensuralMusicOnly) { m_isMensuralMusicOnly = isMensuralMusicOnly; }
-    bool IsMensuralMusicOnly() const { return m_isMensuralMusicOnly; }
+    void SetMensuralMusicOnly(data_BOOLEAN isMensuralMusicOnly);
+    bool IsMensuralMusicOnly() const { return (m_isMensuralMusicOnly == BOOLEAN_true); }
     ///@}
 
     /**
@@ -666,7 +686,7 @@ private:
      * A flag to indicate whereas to document contains only mensural music.
      * Mensural only music will be converted to cast-off segments by Doc::ConvertToCastOffMensuralDoc
      */
-    bool m_isMensuralMusicOnly;
+    data_BOOLEAN m_isMensuralMusicOnly;
 
     /**
      * A flag to indicate that the document contains neume lines.

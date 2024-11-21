@@ -2826,7 +2826,7 @@ bool PAEInput::Import(const std::string &input)
     m_doc->SetType(Raw);
 
     // Genereate the header and add a comment to the project description
-    m_doc->GenerateMEIHeader(false);
+    m_doc->GenerateMEIHeader();
     pugi::xml_node projectDesc = m_doc->m_header.first_child().select_node("//projectDesc").node();
     if (projectDesc) {
         pugi::xml_node p1 = projectDesc.append_child("p");

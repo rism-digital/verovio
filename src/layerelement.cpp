@@ -722,7 +722,7 @@ Fraction LayerElement::GetAlignmentDuration(
         const DurationInterface *duration = this->GetDurationInterface();
         assert(duration);
         if (duration->IsMensuralDur() && (notationType != NOTATIONTYPE_cmn)) {
-            return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, params.mensur);
+            return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, params.mensur, params.equivalence);
         }
         if (this->Is(NC)) {
             // This is called only with --neume-as-note
