@@ -9,10 +9,6 @@
 
 //----------------------------------------------------------------------------
 
-#include <ranges>
-
-//----------------------------------------------------------------------------
-
 #include "bracketspan.h"
 #include "dir.h"
 #include "div.h"
@@ -704,7 +700,8 @@ FunctorCode ConvertToCmnFunctor::VisitNote(Note *note)
 
     // Add the tie
     Object *tieStart = m_durationElements.front();
-    for (Object *tieEnd : m_durationElements | std::views::drop(1)) {
+    for (Object *tieEnd : m_durationElements) {
+        if (tieStart == tieEnd) continue;
         Object *measure = tieStart->GetFirstAncestor(MEASURE);
         assert(measure);
         Tie *tie = new Tie();
