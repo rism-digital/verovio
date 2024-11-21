@@ -678,6 +678,18 @@ FunctorCode AlignVerticallyFunctor::VisitStaffAlignmentEnd(StaffAlignment *staff
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode AlignVerticallyFunctor::VisitSyllable(Syllable *syllable)
+{
+    if (!syllable->FindDescendantByType(SYL)) return FUNCTOR_CONTINUE;
+
+    StaffAlignment *alignment = m_systemAligner->GetStaffAlignmentForStaffN(m_staffN);
+    if (!alignment) return FUNCTOR_CONTINUE;
+    // Current limitation of only one syl (verse n) by syllable
+    alignment->AddVerseN(1);
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode AlignVerticallyFunctor::VisitSystem(System *system)
 {
     m_systemAligner = &system->m_systemAligner;

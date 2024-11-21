@@ -180,6 +180,7 @@ public:
     FunctorCode VisitRunningElement(RunningElement *runningElement) override;
     FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitStaffAlignmentEnd(StaffAlignment *staffAlignment) override;
+    FunctorCode VisitSyllable(Syllable *syllable) override;
     FunctorCode VisitSystem(System *system) override;
     FunctorCode VisitSystemEnd(System *system) override;
     FunctorCode VisitVerse(Verse *verse) override;
