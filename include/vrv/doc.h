@@ -60,6 +60,11 @@ public:
     void Reset() override;
 
     /**
+     *
+     */
+    void ResetToLoading();
+
+    /**
      * Clear the selection pages.
      */
     void ClearSelectionPages();

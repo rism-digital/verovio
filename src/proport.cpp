@@ -49,9 +49,12 @@ int Proport::GetCumulatedNumbase() const
 
 void Proport::Cumulate(const Proport *proport)
 {
-    // Unset values are not cumulated
+    // Reset type proportion - do not cumulate
     if (this->GetType() == "reset") return;
+    // Potential reset (tempo change) in CMME - do not cumulate
+    if (this->GetType() == "reset?") return;
 
+    // Unset values are not cumulated
     if (proport->HasNum() && this->HasNum()) {
         m_cumulatedNum = this->GetNum() * proport->GetCumulatedNum();
     }

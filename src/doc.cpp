@@ -147,6 +147,15 @@ void Doc::Reset()
     m_back.reset();
 }
 
+void Doc::ResetToLoading()
+{
+    if (m_currentScoreDefDone) {
+        ScoreDefUnsetCurrentFunctor scoreDefUnsetCurrent;
+        this->Process(scoreDefUnsetCurrent);
+        m_currentScoreDefDone = false;
+    }
+}
+
 void Doc::ClearSelectionPages()
 {
     if (m_selectionPreceding) {

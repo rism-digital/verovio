@@ -187,8 +187,8 @@ void CmmeInput::PostProcessProport()
     for (Object *object : proports) {
         Proport *proport = vrv_cast<Proport *>(object);
         assert(proport);
-        // Not a potential tempo change, or already processed
-        if (proport->GetType() != "cmme_tempo_change?") continue;
+        // Not a potential reset, or already processed
+        if (proport->GetType() != "reset?") continue;
         // Default type for tempo changes
         std::string propType = "cmme_tempo_change";
         proport->SetType(propType);
@@ -232,6 +232,8 @@ void CmmeInput::PostProcessProport()
             alignProport->SetType(propType);
         }
     }
+
+    m_doc->ResetToLoading();
 
     m_doc->ResetDataPage();
 }
@@ -923,8 +925,8 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
         if (denVal != VRV_UNSET) {
             proport->SetNumbase(denVal);
         }
-        // Mark them as potential tempo changes
-        proport->SetType("cmme_tempo_change?");
+        // Mark them as potential tempo changes (i.e., reset)
+        proport->SetType("reset?");
         m_currentContainer->AddChild(proport);
         m_activeTempoChange = true;
     }
