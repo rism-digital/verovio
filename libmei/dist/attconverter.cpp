@@ -3995,6 +3995,7 @@ std::string AttConverterBase::BracketSpanLogFuncToStr(bracketSpanLog_FUNC data) 
         case bracketSpanLog_FUNC_cross_rhythm: value = "cross-rhythm"; break;
         case bracketSpanLog_FUNC_ligature: value = "ligature"; break;
         case bracketSpanLog_FUNC_analytical: value = "analytical"; break;
+        case bracketSpanLog_FUNC_phrase: value = "phrase"; break;
         case bracketSpanLog_FUNC_uspecified: value = "uspecified"; break;
         default:
             LogWarning("Unknown value '%d' for att.bracketSpan.log@func", data);
@@ -4010,6 +4011,7 @@ bracketSpanLog_FUNC AttConverterBase::StrToBracketSpanLogFunc(const std::string 
     if (value == "cross-rhythm") return bracketSpanLog_FUNC_cross_rhythm;
     if (value == "ligature") return bracketSpanLog_FUNC_ligature;
     if (value == "analytical") return bracketSpanLog_FUNC_analytical;
+    if (value == "phrase") return bracketSpanLog_FUNC_phrase;
     if (value == "uspecified") return bracketSpanLog_FUNC_uspecified;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.bracketSpan.log@func", value.c_str());

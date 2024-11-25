@@ -4199,9 +4199,11 @@
 								</valItem><valItem ident="ligature">
 									<desc xml:lang="en">Represents a ligature in the mensural notation source material.</desc>
 								</valItem><valItem ident="analytical">
-									<desc xml:lang="en">Represents a ligature in the mensural notation source material.</desc>
+									<desc xml:lang="en">Highlights a grouping of some sort.</desc>
+								</valItem><valItem ident="phrase">
+									<desc xml:lang="en">Marks a phrase.</desc>
 								</valItem><valItem ident="uspecified">
-									<desc xml:lang="en">Represents a ligature in the mensural notation source material.</desc>
+									<desc xml:lang="en">Unspecified bracket.</desc>
 								</valItem></valList></attDef></attList></classSpec><classSpec rend="add" ident="att.breath.log" module="MEI.cmn" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Logical domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
