@@ -143,10 +143,13 @@
 								</valItem>
 								<!-- Verovio specific values -->
 								<valItem ident="analytical">
-									<desc xml:lang="en">Represents a ligature in the mensural notation source material.</desc>
+									<desc xml:lang="en">Highlights a grouping of some sort.</desc>
+								</valItem>
+								<valItem ident="phrase">
+									<desc xml:lang="en">Marks a phrase.</desc>
 								</valItem>
 								<valItem ident="uspecified">
-									<desc xml:lang="en">Represents a ligature in the mensural notation source material.</desc>
+									<desc xml:lang="en">Unspecified bracket.</desc>
 								</valItem>
 							</valList>
 						</attDef>
