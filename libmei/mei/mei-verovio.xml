@@ -54,7 +54,7 @@
 			<divGen type="toc"/>
 		</front>
 		<body>
-			<schemaSpec ident="mei" start="mei meiHead meiCorpus music" ns="http://www.music-encoding.org/ns/mei">
+			<schemaSpec ident="mei-verovio" start="mei meiHead meiCorpus music" ns="http://www.music-encoding.org/ns/mei">
 				<moduleRef key="MEI"/>
 				<moduleRef key="MEI.analytical"/>
 				<moduleRef key="MEI.cmn"/>
@@ -119,6 +119,37 @@
 								</valItem>
 								<valItem ident="5.0+Neumes">
 									<desc>MEI 5.0+Neumes</desc>
+								</valItem>
+							</valList>
+						</attDef>
+					</attList>
+				</classSpec>
+
+				<classSpec ident="att.bracketSpan.log" module="MEI.cmn" type="atts" mode="change">
+					<attList>
+						<attDef ident="func" usage="req" mode="change">
+							<datatype>
+								<rng:data type="NMTOKENS"/>
+							</datatype>
+							<valList type="closed" mode="replace">
+								<valItem ident="coloration">
+									<desc xml:lang="en">Represents coloration in the mensural notation source material.</desc>
+								</valItem>
+								<valItem ident="cross-rhythm">
+									<desc xml:lang="en">Marks a sequence which does not match the current meter.</desc>
+								</valItem>
+								<valItem ident="ligature">
+									<desc xml:lang="en">Represents a ligature in the mensural notation source material.</desc>
+								</valItem>
+								<!-- Verovio specific values -->
+								<valItem ident="analytical">
+									<desc xml:lang="en">Highlights a grouping of some sort.</desc>
+								</valItem>
+								<valItem ident="phrase">
+									<desc xml:lang="en">Marks a phrase.</desc>
+								</valItem>
+								<valItem ident="uspecified">
+									<desc xml:lang="en">Unspecified bracket.</desc>
 								</valItem>
 							</valList>
 						</attDef>
@@ -522,8 +553,8 @@
 				<moduleSpec ident="MEI.frettab" mode="add">
 					<desc/>
 				</moduleSpec>
-				<dataSpec ident="data.COURSENUMBER" module="MEI.frettab" mode="add">
-					<desc xml:lang="en">In string tablature, the number of the course to be played, i.e., [1-9]+.</desc>
+				<dataSpec ident="data.COURSENUMBER" module="MEI.stringtab" mode="add">
+					<desc xml:lang="en">In string tablature, the number of the course to be played.</desc>
 					<content>
 						<rng:data type="positiveInteger"/>
 					</content>
@@ -542,7 +573,7 @@
 								<desc xml:lang="en">Open D tuning for guitars. D2 A2 D3 F3s A3 D4.</desc>
 							</valItem>
 							<valItem ident="guitar.open.G">
-								<desc xml:lang="en">Open G tuning for guitars. D2 G2 D2 G2 B3 D4.</desc>
+								<desc xml:lang="en">Open G tuning for guitars. D2 G2 D3 G3 B3 D4.</desc>
 							</valItem>
 							<valItem ident="guitar.open.A">
 								<desc xml:lang="en">Open A tuning for guitars. E2 A2 E3 A3 C4s E4.</desc>
