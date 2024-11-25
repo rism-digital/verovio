@@ -408,6 +408,8 @@ void Doc::CalculateTimemap()
 
 void Doc::ExportMIDI(smf::MidiFile *midiFile)
 {
+    midiFile->absoluteTicks();
+
     if (!this->HasTimemap()) {
         // generate MIDI timemap before progressing
         CalculateTimemap();
@@ -548,6 +550,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             tempoEventTicks = generateMIDI.GetTempoEventTicks();
         }
     }
+    midiFile->sortTracks();
 }
 
 bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeasures, bool useFractions)

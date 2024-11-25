@@ -1772,9 +1772,7 @@ std::string Toolkit::RenderToMIDI()
     this->ResetLogBuffer();
 
     smf::MidiFile outputfile;
-    outputfile.absoluteTicks();
     m_doc.ExportMIDI(&outputfile);
-    outputfile.sortTracks();
 
     std::stringstream stream;
     outputfile.write(stream);
@@ -1923,9 +1921,7 @@ bool Toolkit::RenderToMIDIFile(const std::string &filename)
     this->ResetLogBuffer();
 
     smf::MidiFile outputfile;
-    outputfile.absoluteTicks();
     m_doc.ExportMIDI(&outputfile);
-    outputfile.sortTracks();
     outputfile.write(filename);
 
     return true;
