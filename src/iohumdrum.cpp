@@ -21245,6 +21245,7 @@ void HumdrumInput::processPhrases(hum::HTp phraseend)
                 insertPhrase(bracket, phrasestart, phraseend, startmeasure, startchordsorted, endchordsorted,
                     phrasestartnoteinfo, phraseendnoteinfo, ndex, phraseindex, i, j, startpitches, endpitches,
                     indexused);
+                bracket->SetFunc(bracketSpanLog_FUNC_phrase);
             }
         }
     }
