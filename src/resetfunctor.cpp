@@ -658,6 +658,14 @@ FunctorCode ResetHorizontalAlignmentFunctor::VisitNote(Note *note)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode ResetHorizontalAlignmentFunctor::VisitProport(Proport *proport)
+{
+    this->VisitLayerElement(proport);
+    proport->ResetCumulate();
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ResetHorizontalAlignmentFunctor::VisitRest(Rest *rest)
 {
     this->VisitLayerElement(rest);

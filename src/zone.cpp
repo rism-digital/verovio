@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
+#include "functor.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -57,6 +58,30 @@ int Zone::GetLogicalUly() const
 int Zone::GetLogicalLry() const
 {
     return (this->GetLry());
+}
+
+//----------------------------------------------------------------------------
+// Functor methods
+//----------------------------------------------------------------------------
+
+FunctorCode Zone::Accept(Functor &functor)
+{
+    return functor.VisitZone(this);
+}
+
+FunctorCode Zone::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitZone(this);
+}
+
+FunctorCode Zone::AcceptEnd(Functor &functor)
+{
+    return functor.VisitZoneEnd(this);
+}
+
+FunctorCode Zone::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitZoneEnd(this);
 }
 
 } // namespace vrv

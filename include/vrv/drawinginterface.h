@@ -14,6 +14,7 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "metersiggrp.h"
+#include "proport.h"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -186,7 +187,7 @@ public:
     Staff *m_crossStaffContent;
     data_STAFFREL_basic m_crossStaffRel;
     bool m_isSpanningElement;
-    int m_shortestDur;
+    data_DURATION m_shortestDur;
     data_STEMDIRECTION m_notesStemDir;
     data_BEAMPLACE m_drawingPlace;
     Staff *m_beamStaff;
@@ -239,7 +240,7 @@ public:
     void SetDrawClef(bool drawClef) { m_drawClef = drawClef; }
     bool DrawKeySig() const { return (m_drawKeySig); }
     void SetDrawKeySig(bool drawKeySig) { m_drawKeySig = drawKeySig; }
-    bool DrawMensur() const { return (m_drawMensur && m_currentMensur.HasSign()); }
+    bool DrawMensur() const { return (m_drawMensur && (m_currentMensur.HasSign() || m_currentMensur.HasNum())); }
     void SetDrawMensur(bool drawMensur) { m_drawMensur = drawMensur; }
     bool DrawMeterSig() const
     {
@@ -260,6 +261,7 @@ public:
     void SetCurrentMeterSig(const MeterSig *meterSig);
     void SetCurrentMeterSigGrp(const MeterSigGrp *meterSigGrp);
     void AlternateCurrentMeterSig(const Measure *measure);
+    void SetCurrentProport(const Proport *proport);
     ///@}
 
     /**
@@ -277,6 +279,8 @@ public:
     const MeterSig *GetCurrentMeterSig() const { return &m_currentMeterSig; }
     MeterSigGrp *GetCurrentMeterSigGrp() { return &m_currentMeterSigGrp; }
     const MeterSigGrp *GetCurrentMeterSigGrp() const { return &m_currentMeterSigGrp; }
+    Proport *GetCurrentProport() { return &m_currentProport; }
+    const Proport *GetCurrentProport() const { return &m_currentProport; }
     ///@}
 
 private:
@@ -290,6 +294,8 @@ private:
     MeterSig m_currentMeterSig;
     /** The meter signature group */
     MeterSigGrp m_currentMeterSigGrp;
+    /** The proport */
+    Proport m_currentProport;
 
     /**
      *  @name Flags for indicating whether the clef, keysig and mensur needs to be drawn or not

@@ -60,6 +60,8 @@ enum option_BREAKS { BREAKS_none = 0, BREAKS_auto, BREAKS_line, BREAKS_smart, BR
 
 enum option_CONDENSE { CONDENSE_none = 0, CONDENSE_auto, CONDENSE_all, CONDENSE_encoded };
 
+enum option_DURATION_EQ { DURATION_EQ_brevis = 0, DURATION_EQ_semibrevis, DURATION_EQ_minima };
+
 enum option_ELISION {
     ELISION_regular = SMUFL_E551_lyricsElision,
     ELISION_narrow = SMUFL_E550_lyricsElisionNarrow,
@@ -88,7 +90,7 @@ enum option_SMUFLTEXTFONT { SMUFLTEXTFONT_embedded = 0, SMUFLTEXTFONT_linked, SM
 // Option
 //----------------------------------------------------------------------------
 
-enum class OptionsCategory { None, Base, General, Layout, Mensural, Margins, Midi, Selectors, Full };
+enum class OptionsCategory { None, Base, General, Json, Layout, Mensural, Margins, Midi, Selectors, Full };
 
 /**
  * This class is a base class of each styling parameter
@@ -141,6 +143,7 @@ public:
      */
     static const std::map<int, std::string> s_breaks;
     static const std::map<int, std::string> s_condense;
+    static const std::map<int, std::string> s_durationEq;
     static const std::map<int, std::string> s_elision;
     static const std::map<int, std::string> s_fontFallback;
     static const std::map<int, std::string> s_footer;
@@ -417,8 +420,8 @@ private:
 class OptionStaffrel : public Option {
 public:
     // constructors and destructors
-    OptionStaffrel(){};
-    virtual ~OptionStaffrel(){};
+    OptionStaffrel() {}
+    virtual ~OptionStaffrel() {}
     void CopyTo(Option *option) override;
     // Alternate type style cannot have a restricted list of possible values
     void Init(data_STAFFREL defaultValue);
@@ -839,8 +842,17 @@ public:
      */
     OptionGrp m_mensural;
 
+    OptionIntMap m_durationEquivalence;
     OptionBool m_ligatureAsBracket;
-    OptionBool m_mensuralToMeasure;
+    OptionBool m_mensuralResponsiveView;
+    OptionBool m_mensuralToCmn;
+
+    /**
+     * Additional options for passing method JSON options to the command-line
+     */
+    OptionGrp m_jsonCmdLineOptions;
+
+    OptionString m_timemapOptions;
 
     /**
      * Deprecated options

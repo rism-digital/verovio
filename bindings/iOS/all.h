@@ -107,9 +107,11 @@
 #import <VerovioFramework/findlayerelementsfunctor.h>
 #import <VerovioFramework/fing.h>
 #import <VerovioFramework/floatingobject.h>
+#import <VerovioFramework/fraction.h>
 #import <VerovioFramework/ftrem.h>
 #import <VerovioFramework/functor.h>
 #import <VerovioFramework/functorinterface.h>
+#import <VerovioFramework/genericlayerelement.h>
 #import <VerovioFramework/git_commit.h>
 #import <VerovioFramework/gliss.h>
 #import <VerovioFramework/glyph.h>
@@ -125,6 +127,7 @@
 #import <VerovioFramework/interface.h>
 #import <VerovioFramework/ioabc.h>
 #import <VerovioFramework/iobase.h>
+#import <VerovioFramework/iocmme.h>
 #import <VerovioFramework/iodarms.h>
 #import <VerovioFramework/iohumdrum.h>
 #import <VerovioFramework/iomei.h>

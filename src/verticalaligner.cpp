@@ -336,9 +336,8 @@ StaffAlignment::~StaffAlignment()
 
 void StaffAlignment::ClearPositioners()
 {
-    ArrayOfFloatingPositioners::iterator iter;
-    for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
-        delete *iter;
+    for (FloatingPositioner *positioner : m_floatingPositioners) {
+        delete positioner;
     }
     m_floatingPositioners.clear();
 
@@ -665,7 +664,7 @@ bool StaffAlignment::IsInBracketGroup(bool isFirst) const
             });
 
             const int currentN = this->m_staff->GetN();
-            if (staffNs.count(currentN)) {
+            if (staffNs.contains(currentN)) {
                 if ((isFirst && (*staffNs.begin() == currentN)) || (!isFirst && (*staffNs.rbegin() == currentN)))
                     return true;
             }

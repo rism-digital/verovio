@@ -8,6 +8,7 @@
 #ifndef __VRV_RESOURCES_H__
 #define __VRV_RESOURCES_H__
 
+#include <optional>
 #include <unordered_map>
 
 //----------------------------------------------------------------------------
@@ -65,11 +66,9 @@ public:
     /** Load all music fonts available in the resource directory */
     bool LoadAll();
     /** Set the fallback font (Leipzig or Bravura) when some glyphs are missing in the current font */
-    bool SetFallback(const std::string &fontName);
+    void SetFallbackFont(const std::string &fontName);
     /** Get the fallback font name */
-    std::string GetFallbackFont() const { return m_defaultFontName; }
-    /** Init the text font (bounding boxes and ASCII only) */
-    bool InitTextFont(const std::string &fontName, const StyleAttributes &style);
+    std::string GetFallbackFont() const { return m_fallbackFontName; }
 
     /** Select a particular font */
     bool SetCurrentFont(const std::string &fontName, bool allowLoading = false);
@@ -136,8 +135,8 @@ private:
     class LoadedFont {
 
     public:
-        LoadedFont(const std::string &name, bool isFallback) : m_name(name), m_isFallback(isFallback){};
-        ~LoadedFont(){};
+        LoadedFont(const std::string &name, bool isFallback) : m_name(name), m_isFallback(isFallback) {}
+        ~LoadedFont() {}
         const std::string GetName() const { return m_name; };
         const GlyphTable &GetGlyphTable() const { return m_glyphTable; };
         GlyphTable &GetGlyphTableForModification() { return m_glyphTable; };
@@ -160,6 +159,9 @@ private:
 
     bool LoadFont(const std::string &fontName, ZipFileReader *zipFile = NULL);
 
+    /** Init the text font (bounding boxes and ASCII only) */
+    bool InitTextFont(const std::string &fontName, const StyleAttributes &style);
+
     const GlyphTable &GetCurrentGlyphTable() const { return m_loadedFonts.at(m_currentFontName).GetGlyphTable(); };
     const GlyphTable &GetFallbackGlyphTable() const { return m_loadedFonts.at(m_fallbackFontName).GetGlyphTable(); };
 
@@ -176,6 +178,9 @@ private:
      * A map of glyph name / code
      */
     GlyphNameTable m_glyphNameTable;
+
+    /** Cache of the last glyph that was looked up in loaded fonts */
+    mutable std::optional<std::pair<char32_t, const Glyph *>> m_cachedGlyph;
 
     //----------------//
     // Static members //

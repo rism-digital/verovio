@@ -130,8 +130,10 @@ public:
      * Takes into account cross-staff situations: cross staff layers have negative N.
      */
     ///@{
-    std::set<int> GetLayersNInTimeSpan(double time, double duration, const Measure *measure, int staff) const;
-    int GetLayerCountInTimeSpan(double time, double duration, const Measure *measure, int staff) const;
+    std::set<int> GetLayersNInTimeSpan(
+        const Fraction &time, const Fraction &duration, const Measure *measure, int staff) const;
+    int GetLayerCountInTimeSpan(
+        const Fraction &time, const Fraction &duration, const Measure *measure, int staff) const;
     ///@}
 
     /**
@@ -150,9 +152,9 @@ public:
      */
     ///@{
     ListOfObjects GetLayerElementsInTimeSpan(
-        double time, double duration, const Measure *measure, int staff, bool excludeCurrent);
+        const Fraction &time, const Fraction &duration, const Measure *measure, int staff, bool excludeCurrent);
     ListOfConstObjects GetLayerElementsInTimeSpan(
-        double time, double duration, const Measure *measure, int staff, bool excludeCurrent) const;
+        const Fraction &time, const Fraction &duration, const Measure *measure, int staff, bool excludeCurrent) const;
     ///@}
 
     /**
@@ -167,6 +169,8 @@ public:
     const Mensur *GetCurrentMensur() const;
     MeterSig *GetCurrentMeterSig();
     const MeterSig *GetCurrentMeterSig() const;
+    Proport *GetCurrentProport();
+    const Proport *GetCurrentProport() const;
     ///@}
 
     void ResetStaffDefObjects();

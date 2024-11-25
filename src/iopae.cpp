@@ -521,23 +521,24 @@ void PAEOutput::WriteTuplet(Tuplet *tuplet)
 
     Staff *staff = tuplet->GetAncestorStaff();
 
-    double content = tuplet->GetContentAlignmentDuration(NULL, NULL, true, staff->m_drawingNotationType);
-    // content = DUR_MAX / 2^(dur - 2)
-    int tupletDur = (content != 0.0) ? log2(DUR_MAX / content) + 2 : 4;
+    auto [tupletDur, remainder] = tuplet->GetContentAlignmentDuration(true, staff->m_drawingNotationType).ToDur();
     // We should be looking for dotted values
+    if (remainder != 0) {
+        LogWarning("The tuplet content is not a single non-dotted duration");
+    }
 
     std::string dur;
     switch (tupletDur) {
-        case (DUR_LG): dur = "0"; break;
-        case (DUR_BR): dur = "9"; break;
-        case (DUR_1): dur = "1"; break;
-        case (DUR_2): dur = "2"; break;
-        case (DUR_4): dur = "4"; break;
-        case (DUR_8): dur = "8"; break;
-        case (DUR_16): dur = "6"; break;
-        case (DUR_32): dur = "3"; break;
-        case (DUR_64): dur = "5"; break;
-        case (DUR_128): dur = "7"; break;
+        case (DURATION_long): dur = "0"; break;
+        case (DURATION_breve): dur = "9"; break;
+        case (DURATION_1): dur = "1"; break;
+        case (DURATION_2): dur = "2"; break;
+        case (DURATION_4): dur = "4"; break;
+        case (DURATION_8): dur = "8"; break;
+        case (DURATION_16): dur = "6"; break;
+        case (DURATION_32): dur = "3"; break;
+        case (DURATION_64): dur = "5"; break;
+        case (DURATION_128): dur = "7"; break;
         default: LogWarning("Unsupported tuplet duration"); dur = "4";
     }
 
@@ -2825,7 +2826,7 @@ bool PAEInput::Import(const std::string &input)
     m_doc->SetType(Raw);
 
     // Genereate the header and add a comment to the project description
-    m_doc->GenerateMEIHeader(false);
+    m_doc->GenerateMEIHeader();
     pugi::xml_node projectDesc = m_doc->m_header.first_child().select_node("//projectDesc").node();
     if (projectDesc) {
         pugi::xml_node p1 = projectDesc.append_child("p");
@@ -4571,14 +4572,14 @@ bool PAEInput::ConvertAccidGes()
             std::string noteID = note->GetID();
             if (!accid) {
                 // Tied note with a previous note with an accidental
-                if (ties.count(noteID)) {
+                if (ties.contains(noteID)) {
                     Accid *tieAccid = new Accid();
                     note->AddChild(tieAccid);
                     tieAccid->SetAccidGes(Att::AccidentalWrittenToGestural(ties[noteID]));
                     ties.erase(noteID);
                 }
                 // Nothing in front of the note, but something in the list - make it an accid.ges
-                else if ((currentAccids.count(octavedPitch) != 0)) {
+                else if (currentAccids.contains(octavedPitch)) {
                     Accid *gesAccid = new Accid();
                     note->AddChild(gesAccid);
                     data_ACCIDENTAL_WRITTEN accidWritten = currentAccids.at(octavedPitch);
@@ -4589,7 +4590,7 @@ bool PAEInput::ConvertAccidGes()
                 data_ACCIDENTAL_WRITTEN noteAccid = accid->GetAccid();
                 // Natural in front of the note, remove it from the current list
                 if (noteAccid == ACCIDENTAL_WRITTEN_n) {
-                    if (currentAccids.count(octavedPitch) != 0) {
+                    if (currentAccids.contains(octavedPitch)) {
                         currentAccids[octavedPitch] = ACCIDENTAL_WRITTEN_n;
                     }
                 }
@@ -4754,7 +4755,7 @@ bool PAEInput::CheckContentPostBuild()
     ClassIdsComparison noteOrRest({ NOTE, REST });
     ListOfObjects containers;
     m_doc->FindAllDescendantsByComparison(&containers, &comparison);
-    for (auto &container : containers) {
+    for (const auto &container : containers) {
         ListOfObjects notesOrRests;
         container->FindAllDescendantsByComparison(&notesOrRests, &noteOrRest);
         if ((int)notesOrRests.size() < 1) {

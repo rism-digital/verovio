@@ -128,6 +128,7 @@ public:
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitMRest(MRest *mRest) override;
     FunctorCode VisitNote(Note *note) override;
+    FunctorCode VisitProport(Proport *proport) override;
     FunctorCode VisitRest(Rest *rest) override;
     FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
     FunctorCode VisitSystem(System *system) override;

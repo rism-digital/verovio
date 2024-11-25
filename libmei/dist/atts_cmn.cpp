@@ -373,14 +373,14 @@ AttBracketSpanLog::AttBracketSpanLog() : Att()
 
 void AttBracketSpanLog::ResetBracketSpanLog()
 {
-    m_func = "";
+    m_func = bracketSpanLog_FUNC_NONE;
 }
 
 bool AttBracketSpanLog::ReadBracketSpanLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("func")) {
-        this->SetFunc(StrToStr(element.attribute("func").value()));
+        this->SetFunc(StrToBracketSpanLogFunc(element.attribute("func").value()));
         if (removeAttr) element.remove_attribute("func");
         hasAttribute = true;
     }
@@ -391,7 +391,7 @@ bool AttBracketSpanLog::WriteBracketSpanLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasFunc()) {
-        element.append_attribute("func") = StrToStr(this->GetFunc()).c_str();
+        element.append_attribute("func") = BracketSpanLogFuncToStr(this->GetFunc()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -399,7 +399,7 @@ bool AttBracketSpanLog::WriteBracketSpanLog(pugi::xml_node element)
 
 bool AttBracketSpanLog::HasFunc() const
 {
-    return (m_func != "");
+    return (m_func != bracketSpanLog_FUNC_NONE);
 }
 
 //----------------------------------------------------------------------------

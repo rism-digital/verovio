@@ -11,6 +11,7 @@
 
 #include <cassert>
 #include <math.h>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 
@@ -1375,10 +1376,34 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerL
     dc->SetPen(m_currentColor, ToDeviceContextX(lineWidth), AxSOLID);
     dc->SetBrush(m_currentColor, AxSOLID);
 
+    bool svgHtml5 = (m_doc->GetOptions()->m_svgHtml5.GetValue());
+
     for (const LedgerLine &line : lines) {
-        for (const std::pair<int, int> &dash : line.m_dashes) {
-            dc->DrawLine(ToDeviceContextX(x + dash.first), ToDeviceContextY(y), ToDeviceContextX(x + dash.second),
+        for (const LedgerLine::Dash &dash : line.m_dashes) {
+            if (svgHtml5) {
+                // Add the custom graphic only with html5
+                dc->StartCustomGraphic("lineDash");
+                // Function to concatenate IDs from the list of Object events
+                auto concatenateIDs = [](const ListOfConstObjects &objects) {
+                    // Get a list of strings
+                    std::vector<std::string> ids;
+                    for (const auto &object : objects) {
+                        ids.push_back("#" + object->GetID() + " ");
+                    }
+                    // Concatenate IDs
+                    std::stringstream sstream;
+                    std::copy(ids.begin(), ids.end(), std::ostream_iterator<std::string>(sstream));
+                    return sstream.str();
+                };
+                std::string events = concatenateIDs(dash.m_events);
+                if (!events.empty()) events.pop_back(); // Remove extra space added by the concatenation
+                dc->SetCustomGraphicAttributes("related", events);
+            }
+
+            dc->DrawLine(ToDeviceContextX(x + dash.m_x1), ToDeviceContextY(y), ToDeviceContextX(x + dash.m_x2),
                 ToDeviceContextY(y));
+
+            if (svgHtml5) dc->EndCustomGraphic();
         }
         y += ySpace;
     }

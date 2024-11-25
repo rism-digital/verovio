@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
+#include "functor.h"
 #include "surface.h"
 #include "vrv.h"
 #include "zone.h"
@@ -78,6 +79,30 @@ int Facsimile::GetMaxY() const
         max = (surface->GetMaxY() > max) ? surface->GetMaxY() : max;
     }
     return max;
+}
+
+//----------------------------------------------------------------------------
+// Functor methods
+//----------------------------------------------------------------------------
+
+FunctorCode Facsimile::Accept(Functor &functor)
+{
+    return functor.VisitFacsimile(this);
+}
+
+FunctorCode Facsimile::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitFacsimile(this);
+}
+
+FunctorCode Facsimile::AcceptEnd(Functor &functor)
+{
+    return functor.VisitFacsimileEnd(this);
+}
+
+FunctorCode Facsimile::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitFacsimileEnd(this);
 }
 
 } // namespace vrv

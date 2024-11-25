@@ -43,7 +43,7 @@ function getToolkitFunction(VerovioModule, method) {
     mapping.getExpansionIdsForElement = VerovioModule.cwrap("vrvToolkit_getExpansionIdsForElement", "string", ["number", "string"]);
 
     // char *getHumdrum(Toolkit *ic)
-    mapping.getHumdrum = VerovioModule.cwrap("vrvToolkit_getHumdrum", "string");
+    mapping.getHumdrum = VerovioModule.cwrap("vrvToolkit_getHumdrum", "string", ["number"]);
 
     // char *convertMEIToHumdrum(Toolkit *ic, const char *meiData)
     mapping.convertMEIToHumdrum = VerovioModule.cwrap("vrvToolkit_convertMEIToHumdrum", "string", ["number", "string"]);
@@ -105,8 +105,8 @@ function getToolkitFunction(VerovioModule, method) {
     // char *renderToExpansionMap(Toolkit *ic)
     mapping.renderToExpansionMap = VerovioModule.cwrap("vrvToolkit_renderToExpansionMap", "string", ["number"]);
 
-    // char *renderToMIDI(Toolkit *ic, const char *rendering_options)
-    mapping.renderToMIDI = VerovioModule.cwrap("vrvToolkit_renderToMIDI", "string", ["number", "string"]);
+    // char *renderToMIDI(Toolkit *ic)
+    mapping.renderToMIDI = VerovioModule.cwrap("vrvToolkit_renderToMIDI", "string", ["number"]);
 
     // char *renderToPAE(Toolkit *ic)
     mapping.renderToPAE = VerovioModule.cwrap("vrvToolkit_renderToPAE", "string", ["number"]);

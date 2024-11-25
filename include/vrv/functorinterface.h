@@ -41,6 +41,7 @@ class EditorialElement;
 class Ending;
 class Expansion;
 class F;
+class Facsimile;
 class Fb;
 class Fermata;
 class Fing;
@@ -48,9 +49,11 @@ class Fig;
 class Flag;
 class FloatingObject;
 class FTrem;
+class GenericLayerElement;
 class Gliss;
 class GraceAligner;
 class GraceGrp;
+class Graphic;
 class GrpSym;
 class Hairpin;
 class HalfmRpt;
@@ -117,6 +120,7 @@ class StaffAlignment;
 class StaffDef;
 class StaffGrp;
 class Stem;
+class Surface;
 class Svg;
 class Syl;
 class Syllable;
@@ -141,6 +145,7 @@ class TupletBracket;
 class TupletNum;
 class Turn;
 class Verse;
+class Zone;
 
 //----------------------------------------------------------------------------
 // FunctorInterface
@@ -156,7 +161,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    FunctorInterface(){};
+    FunctorInterface() {}
     virtual ~FunctorInterface() = default;
     ///@}
 
@@ -361,6 +366,8 @@ public:
     virtual FunctorCode VisitFlagEnd(Flag *flag);
     virtual FunctorCode VisitFTrem(FTrem *fTrem);
     virtual FunctorCode VisitFTremEnd(FTrem *fTrem);
+    virtual FunctorCode VisitGenericLayerElement(GenericLayerElement *genericLayerElement);
+    virtual FunctorCode VisitGenericLayerElementEnd(GenericLayerElement *genericLayerElement);
     virtual FunctorCode VisitGraceGrp(GraceGrp *graceGrp);
     virtual FunctorCode VisitGraceGrpEnd(GraceGrp *graceGrp);
     virtual FunctorCode VisitHalfmRpt(HalfmRpt *halfmRpt);
@@ -456,6 +463,20 @@ public:
     ///@}
 
     /**
+     * @name Visit facsimle elements
+     */
+    ///@{
+    virtual FunctorCode VisitFacsimile(Facsimile *facsimile);
+    virtual FunctorCode VisitFacsimileEnd(Facsimile *facsimile);
+    virtual FunctorCode VisitGraphic(Graphic *graphic);
+    virtual FunctorCode VisitGraphicEnd(Graphic *graphic);
+    virtual FunctorCode VisitSurface(Surface *surface);
+    virtual FunctorCode VisitSurfaceEnd(Surface *surface);
+    virtual FunctorCode VisitZone(Zone *zone);
+    virtual FunctorCode VisitZoneEnd(Zone *zone);
+    ///@}
+
+    /**
      * @name Visit horizontal aligners
      */
     ///@{
@@ -513,7 +534,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    ConstFunctorInterface(){};
+    ConstFunctorInterface() {}
     virtual ~ConstFunctorInterface() = default;
     ///@}
 
@@ -718,6 +739,8 @@ public:
     virtual FunctorCode VisitFlagEnd(const Flag *flag);
     virtual FunctorCode VisitFTrem(const FTrem *fTrem);
     virtual FunctorCode VisitFTremEnd(const FTrem *fTrem);
+    virtual FunctorCode VisitGenericLayerElement(const GenericLayerElement *genericLayerElement);
+    virtual FunctorCode VisitGenericLayerElementEnd(const GenericLayerElement *genericLayerElement);
     virtual FunctorCode VisitGraceGrp(const GraceGrp *graceGrp);
     virtual FunctorCode VisitGraceGrpEnd(const GraceGrp *graceGrp);
     virtual FunctorCode VisitHalfmRpt(const HalfmRpt *halfmRpt);
@@ -810,6 +833,20 @@ public:
     virtual FunctorCode VisitTextEnd(const Text *text);
     virtual FunctorCode VisitTextElement(const TextElement *textElement);
     virtual FunctorCode VisitTextElementEnd(const TextElement *textElement);
+    ///@}
+
+    /**
+     * @name Visit facsimle elements
+     */
+    ///@{
+    virtual FunctorCode VisitFacsimile(const Facsimile *facsimile);
+    virtual FunctorCode VisitFacsimileEnd(const Facsimile *facsimile);
+    virtual FunctorCode VisitGraphic(const Graphic *graphic);
+    virtual FunctorCode VisitGraphicEnd(const Graphic *graphic);
+    virtual FunctorCode VisitSurface(const Surface *surface);
+    virtual FunctorCode VisitSurfaceEnd(const Surface *surface);
+    virtual FunctorCode VisitZone(const Zone *zone);
+    virtual FunctorCode VisitZoneEnd(const Zone *zone);
     ///@}
 
     /**

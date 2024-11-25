@@ -15,6 +15,12 @@
 
 //----------------------------------------------------------------------------
 
+#include "horizontalaligner.h"
+
+//----------------------------------------------------------------------------
+
+#include "jsonxx.h"
+
 namespace vrv {
 
 class Object;
@@ -28,7 +34,7 @@ class Object;
  */
 struct TimemapEntry {
     double tempo = -1000.0;
-    double qstamp;
+    double tstamp;
     std::vector<std::string> notesOn;
     std::vector<std::string> notesOff;
     std::vector<std::string> restsOn;
@@ -59,12 +65,14 @@ public:
     /**
      * Return (and possibly add) an entry for the given time.
      */
-    TimemapEntry &GetEntry(double time) { return m_map[time]; }
+    TimemapEntry &GetEntry(const Fraction &time) { return m_map[time]; }
 
     /**
      * Write the current timemap to a JSON string
      */
-    void ToJson(std::string &output, bool includetRests, bool includetMeasures);
+    void ToJson(std::string &output, bool includeRests, bool includeMeasures, bool useFractions);
+
+    static jsonxx::Array ToArray(const Fraction &fraction);
 
 private:
     //
@@ -72,7 +80,7 @@ public:
     //
 private:
     /** The map with time values as keys */
-    std::map<double, TimemapEntry> m_map;
+    std::map<Fraction, TimemapEntry> m_map;
 
 }; // class Timemap
 

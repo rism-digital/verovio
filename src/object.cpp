@@ -366,12 +366,11 @@ void Object::ClearChildren()
         return;
     }
 
-    ArrayOfObjects::iterator iter;
-    for (iter = m_children.begin(); iter != m_children.end(); ++iter) {
+    for (Object *child : m_children) {
         // we need to check if this is the parent
         // ownership might have been given up with Relinquish
-        if ((*iter)->GetParent() == this) {
-            delete *iter;
+        if (child->GetParent() == this) {
+            delete child;
         }
     }
     m_children.clear();
@@ -392,6 +391,36 @@ int Object::GetDescendantCount(const ClassId classId) const
 {
     ListOfConstObjects objects = this->FindAllDescendantsByType(classId);
     return (int)objects.size();
+}
+
+void Object::CopyAttributesTo(Object *target) const
+{
+    assert(this->GetClassId() == target->GetClassId());
+
+    AttModule::CopyAnalytical(this, target);
+    AttModule::CopyCmn(this, target);
+    AttModule::CopyCmnornaments(this, target);
+    AttModule::CopyCritapp(this, target);
+    // AttModule::CopyEdittrans(this, target);
+    AttModule::CopyExternalsymbols(this, target);
+    AttModule::CopyFrettab(this, target);
+    AttModule::CopyFacsimile(this, target);
+    // AttModule::CopyFigtable(this, target);
+    // AttModule::CopyFingering(this, target);
+    AttModule::CopyGestural(this, target);
+    // AttModule::CopyHarmony(this, target);
+    // AttModule::CopyHeader(this, target);
+    AttModule::CopyMei(this, target);
+    AttModule::CopyMensural(this, target);
+    AttModule::CopyMidi(this, target);
+    AttModule::CopyNeumes(this, target);
+    AttModule::CopyPagebased(this, target);
+    // AttModule::CopyPerformance(this, target);
+    AttModule::CopyShared(this, target);
+    // AttModule::CopyUsersymbols(this, target);
+    AttModule::CopyVisual(this, target);
+
+    target->m_unsupported = this->m_unsupported;
 }
 
 int Object::GetAttributes(ArrayOfStrAttr *attributes) const
@@ -1051,10 +1080,10 @@ void Object::Process(Functor &functor, int deepness, bool skipFirst)
             }
         }
         else {
-            for (ArrayOfObjects::iterator iter = children->begin(); iter != children->end(); ++iter) {
+            for (Object *child : m_children) {
                 // we will end here if there is no filter at all or for the current child type
-                if (this->FiltersApply(filters, *iter)) {
-                    (*iter)->Process(functor, deepness);
+                if (this->FiltersApply(filters, child)) {
+                    child->Process(functor, deepness);
                 }
             }
         }
@@ -1569,7 +1598,7 @@ void TextListInterface::FilterList(ListOfConstObjects &childList) const
 // ObjectFactory methods
 //----------------------------------------------------------------------------
 
-thread_local MapOfStrConstructors ObjectFactory::s_ctorsRegistry;
+thread_local MapOfClassIdConstructors ObjectFactory::s_ctorsRegistry;
 thread_local MapOfStrClassIds ObjectFactory::s_classIdsRegistry;
 
 ObjectFactory *ObjectFactory::GetInstance()
@@ -1580,16 +1609,24 @@ ObjectFactory *ObjectFactory::GetInstance()
 
 Object *ObjectFactory::Create(std::string name)
 {
+    ClassId classId = this->GetClassId(name);
+    if (classId == OBJECT) return NULL;
+
+    return this->Create(classId);
+}
+
+Object *ObjectFactory::Create(ClassId classId)
+{
     Object *object = NULL;
 
-    MapOfStrConstructors::iterator it = s_ctorsRegistry.find(name);
+    MapOfClassIdConstructors::iterator it = s_ctorsRegistry.find(classId);
     if (it != s_ctorsRegistry.end()) object = it->second();
 
     if (object) {
         return object;
     }
     else {
-        LogError("Factory for '%s' not found", name.c_str());
+        LogError("Factory for '%d' not found", classId);
         return NULL;
     }
 }
@@ -1612,7 +1649,7 @@ ClassId ObjectFactory::GetClassId(std::string name)
 void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
 {
     for (const std::string &str : classStrings) {
-        if (s_classIdsRegistry.count(str) > 0) {
+        if (s_classIdsRegistry.contains(str)) {
             classIds.push_back(s_classIdsRegistry.at(str));
         }
         else {
@@ -1623,7 +1660,7 @@ void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, st
 
 void ObjectFactory::Register(std::string name, ClassId classId, std::function<Object *(void)> function)
 {
-    s_ctorsRegistry[name] = function;
+    s_ctorsRegistry[classId] = function;
     s_classIdsRegistry[name] = classId;
 }
 

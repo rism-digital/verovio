@@ -29,6 +29,9 @@ const std::map<int, std::string> Option::s_breaks = { { BREAKS_none, "none" }, {
 const std::map<int, std::string> Option::s_condense
     = { { CONDENSE_none, "none" }, { CONDENSE_auto, "auto" }, { CONDENSE_encoded, "encoded" } };
 
+const std::map<int, std::string> Option::s_durationEq
+    = { { DURATION_EQ_brevis, "brevis" }, { DURATION_EQ_semibrevis, "semibrevis" }, { DURATION_EQ_minima, "minima" } };
+
 const std::map<int, std::string> Option::s_elision = { { ELISION_regular, "regular" }, { ELISION_narrow, "narrow" },
     { ELISION_wide, "wide" }, { ELISION_unicode, "unicode" } };
 
@@ -139,10 +142,9 @@ jsonxx::Object Option::ToJson() const
     else if (optArray) {
         opt << "type" << "array";
         std::vector<std::string> strValues = optArray->GetDefault();
-        std::vector<std::string>::iterator strIter;
         jsonxx::Array values;
-        for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
-            values << (*strIter);
+        for (const std::string &value : strValues) {
+            values << value;
         }
         opt << "default" << values;
     }
@@ -150,10 +152,9 @@ jsonxx::Object Option::ToJson() const
         opt << "type" << "std::string-list";
         opt << "default" << optIntMap->GetDefaultStrValue();
         std::vector<std::string> strValues = optIntMap->GetStrValues(false);
-        std::vector<std::string>::iterator strIter;
         jsonxx::Array values;
-        for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
-            values << (*strIter);
+        for (const std::string &value : strValues) {
+            values << value;
         }
         opt << "values" << values;
     }
@@ -914,7 +915,8 @@ Options::Options()
     m_baseOptions.AddOption(&m_allPages);
 
     m_inputFrom.SetInfo("Input from",
-        "Select input format from: \"abc\", \"darms\", \"esac\", \"humdrum\", \"mei\", \"pae\", \"volpiano\", \"xml\" "
+        "Select input format from: \"abc\", \"cmme.xml\", \"darms\", \"esac\", \"humdrum\", \"mei\", \"pae\", "
+        "\"volpiano\", \"xml\" "
         "(musicxml), \"musicxml-hum\" (musicxml via humdrum)");
     m_inputFrom.Init("mei");
     m_inputFrom.SetKey("inputFrom");
@@ -1353,7 +1355,7 @@ Options::Options()
 
     m_justificationMaxVertical.SetInfo("Maximum ratio of justifiable height for page",
         "Maximum ratio of justifiable height to page height that can be used for the vertical justification");
-    m_justificationMaxVertical.Init(0.3, 0.0, 1.0);
+    m_justificationMaxVertical.Init(0.2, 0.0, 1.0);
     this->Register(&m_justificationMaxVertical, "justificationMaxVertical", &m_generalLayout);
 
     m_ledgerLineThickness.SetInfo("Ledger line thickness", "The thickness of the ledger lines");
@@ -1798,7 +1800,7 @@ Options::Options()
     m_topMarginPgFooter.Init(2.0, 0.0, 24.0);
     this->Register(&m_topMarginPgFooter, "topMarginPgFooter", &m_elementMargins);
 
-    /********* midi *********/
+    /********* MIDI *********/
 
     m_midi.SetLabel("Midi options", "5-midi");
     m_midi.SetCategory(OptionsCategory::Midi);
@@ -1812,19 +1814,38 @@ Options::Options()
     m_midiTempoAdjustment.Init(1.0, 0.2, 4.0);
     this->Register(&m_midiTempoAdjustment, "midiTempoAdjustment", &m_midi);
 
-    /********* General *********/
+    /********* Mensural *********/
 
     m_mensural.SetLabel("Mensural notation options", "6-mensural");
     m_mensural.SetCategory(OptionsCategory::Mensural);
     m_grps.push_back(&m_mensural);
 
+    m_durationEquivalence.SetInfo("Duration equivalence", "The mensural duration equivalence");
+    m_durationEquivalence.Init(DURATION_EQ_brevis, &Option::s_durationEq);
+    this->Register(&m_durationEquivalence, "durationEquivalence", &m_mensural);
+
     m_ligatureAsBracket.SetInfo("Ligature as bracket", "Render ligatures as bracket instead of original notation");
     m_ligatureAsBracket.Init(false);
     this->Register(&m_ligatureAsBracket, "ligatureAsBracket", &m_mensural);
 
-    m_mensuralToMeasure.SetInfo("Mensural to measure", "Convert mensural sections to measure-based MEI");
-    m_mensuralToMeasure.Init(false);
-    this->Register(&m_mensuralToMeasure, "mensuralToMeasure", &m_mensural);
+    m_mensuralResponsiveView.SetInfo(
+        "Mensural reduced view", "Convert mensural content to a more responsive view reduced to the seleceted markup");
+    m_mensuralResponsiveView.Init(false);
+    this->Register(&m_mensuralResponsiveView, "mensuralResponsiveView", &m_mensural);
+
+    m_mensuralToCmn.SetInfo("Mensural to CMN", "Convert mensural sections to CMN measure-based MEI");
+    m_mensuralToCmn.Init(false);
+    this->Register(&m_mensuralToCmn, "mensuralToCmn", &m_mensural);
+
+    /********* Method JSON options to the command-line *********/
+
+    m_jsonCmdLineOptions.SetLabel("Method JSON options for the command-line", "7-methodJson");
+    m_jsonCmdLineOptions.SetCategory(OptionsCategory::Json);
+    m_grps.push_back(&m_jsonCmdLineOptions);
+
+    m_timemapOptions.SetInfo("Timemap options", "The JSON options to be passed when producing the timemap");
+    m_timemapOptions.Init("{}");
+    this->Register(&m_timemapOptions, "timemapOptions", &m_jsonCmdLineOptions);
 
     /********* Deprecated options *********/
 

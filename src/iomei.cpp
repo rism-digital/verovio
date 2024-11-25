@@ -56,6 +56,7 @@
 #include "findfunctor.h"
 #include "fing.h"
 #include "ftrem.h"
+#include "genericlayerelement.h"
 #include "gliss.h"
 #include "gracegrp.h"
 #include "graphic.h"
@@ -638,6 +639,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         else if (object->Is(FTREM)) {
             m_currentNode = m_currentNode.append_child("fTrem");
             this->WriteFTrem(m_currentNode, vrv_cast<FTrem *>(object));
+        }
+        else if (object->Is(GENERIC_ELEMENT)) {
+            m_currentNode = m_currentNode.append_child("generic");
+            this->WriteGenericLayerElement(m_currentNode, vrv_cast<GenericLayerElement *>(object));
         }
         else if (object->Is(GRACEGRP)) {
             m_currentNode = m_currentNode.append_child("graceGrp");
@@ -1265,7 +1270,7 @@ bool MEIOutput::ProcessScoreBasedFilterEnd(Object *object)
 void MEIOutput::PruneAttributes(pugi::xml_node node)
 {
     if (node.text()) return;
-    if (!MEIBasic::map.count(node.name())) {
+    if (!MEIBasic::map.contains(node.name())) {
         LogWarning("Element '%s' is not supported but will be preserved", node.name());
         return;
     }
@@ -1464,7 +1469,9 @@ bool MEIOutput::WriteDoc(Doc *doc)
 
     // ---- header ----
     if (!m_ignoreHeader) {
-        if (this->GetBasic() || !m_doc->m_header.first_child()) m_doc->GenerateMEIHeader(this->GetBasic());
+        if (!m_doc->m_header.first_child()) m_doc->GenerateMEIHeader();
+        if (this->GetBasic()) m_doc->ConvertHeaderToMEIBasic();
+        // Now copy it to the m_mei node;
         m_mei.append_copy(m_doc->m_header.first_child());
         // Add transposition in the revision list but not in mei-basic
         if (!this->GetBasic() && !m_doc->GetOptions()->m_transpose.GetValue().empty()) {
@@ -2511,6 +2518,22 @@ void MEIOutput::WriteFTrem(pugi::xml_node currentNode, FTrem *fTrem)
     fTrem->WriteTremMeasured(currentNode);
 }
 
+void MEIOutput::WriteGenericLayerElement(pugi::xml_node currentNode, GenericLayerElement *element)
+{
+    assert(element);
+
+    currentNode.set_name(element->GetMEIName().c_str());
+
+    // Reparse the original content stored as a string document
+    pugi::xml_document content;
+    content.load_string(element->GetContent().c_str());
+    for (pugi::xml_node child : content.first_child().children()) {
+        currentNode.append_copy(child);
+    }
+
+    this->WriteLayerElement(currentNode, element);
+}
+
 void MEIOutput::WriteGraceGrp(pugi::xml_node currentNode, GraceGrp *graceGrp)
 {
     assert(graceGrp);
@@ -2782,6 +2805,8 @@ void MEIOutput::WriteProport(pugi::xml_node currentNode, Proport *proport)
     assert(proport);
 
     this->WriteLayerElement(currentNode, proport);
+
+    proport->WriteDurationRatio(currentNode);
 }
 
 void MEIOutput::WriteQuilisma(pugi::xml_node currentNode, Quilisma *quilisma)
@@ -3157,7 +3182,7 @@ void MEIOutput::WriteTimeSpanningInterface(pugi::xml_node element, TimeSpanningI
 
 void MEIOutput::WriteUnsupportedAttr(pugi::xml_node element, Object *object)
 {
-    for (auto &pair : object->m_unsupported) {
+    for (const auto &pair : object->m_unsupported) {
         if (element.attribute(pair.first.c_str())) {
             LogDebug("Attribute '%s' for '%s' is not supported", pair.first.c_str(), object->GetClassName().c_str());
         }
@@ -4076,7 +4101,7 @@ bool MEIInput::ReadIncipits(pugi::xml_node root)
     int incipCount = 0;
     bool success = true;
 
-    for (auto &incipItem : incipSet) {
+    for (const auto &incipItem : incipSet) {
         if (!success) break;
         pugi::xml_node incip = incipItem.node();
         pugi::xml_node incipCode = incip.child("incipCode");
@@ -4509,7 +4534,7 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
                     }
                     else {
                         unmeasured = new Measure(UNMEASURED);
-                        m_doc->SetMensuralMusicOnly(true);
+                        m_doc->SetMensuralMusicOnly(BOOLEAN_true);
                     }
                     parent->AddChild(unmeasured);
                 }
@@ -4545,7 +4570,7 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
         }
         else {
             unmeasured = new Measure(UNMEASURED);
-            m_doc->SetMensuralMusicOnly(true);
+            m_doc->SetMensuralMusicOnly(BOOLEAN_true);
         }
         parent->AddChild(unmeasured);
     }
@@ -4690,7 +4715,7 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
                     System *system = vrv_cast<System *>(parent);
                     assert(system);
                     unmeasured = new Measure(UNMEASURED);
-                    m_doc->SetMensuralMusicOnly(true);
+                    m_doc->SetMensuralMusicOnly(BOOLEAN_true);
                     if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
                         UpgradeMeasureTo_3_0_0(unmeasured, system);
                     }
@@ -5416,7 +5441,7 @@ bool MEIInput::ReadMeasure(Object *parent, pugi::xml_node measure)
     Measure *vrvMeasure = new Measure();
     if (m_doc->IsMensuralMusicOnly()) {
         LogWarning("Mixing mensural and non mensural music is not supported. Trying to go ahead...");
-        m_doc->SetMensuralMusicOnly(false);
+        m_doc->SetMensuralMusicOnly(BOOLEAN_false);
     }
     this->SetMeiID(measure, vrvMeasure);
     this->ReadFacsimileInterface(measure, vrvMeasure);
@@ -6185,6 +6210,12 @@ bool MEIInput::ReadLayer(Object *parent, pugi::xml_node layer)
         LogWarning("Value @n='0' on <layer> might yield unpredictable results");
     }
 
+    // Check that we have only one single layer in mensural music staves
+    if (m_doc->IsMensuralMusicOnly() && (parent->GetChildCount(LAYER) > 0)) {
+        LogWarning("Mensural music with more than one layer is not supported. Trying to go ahead...");
+        m_doc->SetMensuralMusicOnly(BOOLEAN_false);
+    }
+
     parent->AddChild(vrvLayer);
     this->ReadUnsupportedAttr(layer, vrvLayer);
     return this->ReadLayerChildren(vrvLayer, layer);
@@ -6248,6 +6279,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         }
         else if (elementName == "fTrem") {
             success = this->ReadFTrem(parent, xmlElement);
+        }
+        else if (elementName == "gap") {
+            success = this->ReadGenericLayerElement(parent, xmlElement);
         }
         else if (elementName == "graceGrp") {
             success = this->ReadGraceGrp(parent, xmlElement);
@@ -6318,11 +6352,17 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "multiRpt") {
             success = this->ReadMultiRpt(parent, xmlElement);
         }
+        else if (elementName == "pb") {
+            success = this->ReadGenericLayerElement(parent, xmlElement);
+        }
         else if (elementName == "plica") {
             success = this->ReadPlica(parent, xmlElement);
         }
         else if (elementName == "proport") {
             success = this->ReadProport(parent, xmlElement);
+        }
+        else if (elementName == "sb") {
+            success = this->ReadGenericLayerElement(parent, xmlElement);
         }
         else if (elementName == "space") {
             success = this->ReadSpace(parent, xmlElement);
@@ -6629,6 +6669,23 @@ bool MEIInput::ReadFTrem(Object *parent, pugi::xml_node fTrem)
     parent->AddChild(vrvFTrem);
     this->ReadUnsupportedAttr(fTrem, vrvFTrem);
     return this->ReadLayerChildren(vrvFTrem, fTrem, vrvFTrem);
+}
+
+bool MEIInput::ReadGenericLayerElement(Object *parent, pugi::xml_node element)
+{
+    GenericLayerElement *vrvElement = new GenericLayerElement(element.name());
+    this->ReadLayerElement(element, vrvElement);
+
+    // Store the content as a string document
+    pugi::xml_document content;
+    content.append_copy(element);
+    std::ostringstream oss;
+    content.save(oss);
+    vrvElement->SetContent(oss.str());
+
+    parent->AddChild(vrvElement);
+    this->ReadUnsupportedAttr(element, vrvElement);
+    return true;
 }
 
 bool MEIInput::ReadGraceGrp(Object *parent, pugi::xml_node graceGrp)

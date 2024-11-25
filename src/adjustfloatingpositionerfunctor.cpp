@@ -120,10 +120,10 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitStaffAlignment(StaffAlignment
         }
 
         // Find all the overflowing elements from the staff that overlap horizontally
-        for (auto i = overflowBoxes.begin(); i != overflowBoxes.end(); ++i) {
-            if (positioner->HasHorizontalOverlapWith(*i, drawingUnit)) {
+        for (BoundingBox *bbox : overflowBoxes) {
+            if (positioner->HasHorizontalOverlapWith(bbox, drawingUnit)) {
                 // update the yRel accordingly
-                positioner->CalcDrawingYRel(m_doc, staffAlignment, *i);
+                positioner->CalcDrawingYRel(m_doc, staffAlignment, bbox);
             }
         }
 

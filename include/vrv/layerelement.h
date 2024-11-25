@@ -14,12 +14,12 @@
 
 #include "atts_shared.h"
 #include "facsimileinterface.h"
+#include "fraction.h"
 #include "linkinginterface.h"
 #include "object.h"
 
 namespace vrv {
 
-class Alignment;
 class Beam;
 class BeamElementCoord;
 class FTrem;
@@ -29,6 +29,8 @@ class Mensur;
 class MeterSig;
 class Staff;
 class StaffAlignment;
+
+struct AlignMeterParams;
 
 // Helper enums
 enum StaffSearch { ANCESTOR_ONLY = 0, RESOLVE_CROSS_STAFF };
@@ -258,19 +260,28 @@ public:
     ///@}
 
     /**
-     * Returns the duration if the element has a DurationInterface
+     * Return the duration if the element has a DurationInterface.
      */
-    double GetAlignmentDuration(const Mensur *mensur = NULL, const MeterSig *meterSig = NULL, bool notGraceOnly = true,
+    Fraction GetAlignmentDuration(const AlignMeterParams &params, bool notGraceOnly = true,
         data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
 
     /**
-     * Returns the duration if the content of the layer element with a @sameas attribute.
+     * Return the duration if the element has a DurationInterface.
+     * Shortcut assigning default values for AlignParameter.
+     */
+    Fraction GetAlignmentDuration(bool notGraceOnly = true, data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
+
+    /**
+     * Return the duration if the content of the layer element with a @sameas attribute.
      * Used only on beam, tuplet or ftrem have.
      */
-    double GetSameAsContentAlignmentDuration(const Mensur *mensur = NULL, const MeterSig *meterSig = NULL,
-        bool notGraceOnly = true, data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
+    Fraction GetSameAsContentAlignmentDuration(const AlignMeterParams &params, bool notGraceOnly = true,
+        data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
 
-    double GetContentAlignmentDuration(const Mensur *mensur = NULL, const MeterSig *meterSig = NULL,
+    Fraction GetContentAlignmentDuration(const AlignMeterParams &params, bool notGraceOnly = true,
+        data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
+
+    Fraction GetContentAlignmentDuration(
         bool notGraceOnly = true, data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
 
     /**
@@ -294,11 +305,6 @@ public:
         bool areDotsAdjusted, bool isChordElement, bool isLowerElement = false, bool unison = true);
 
     /**
-     * Helper function to set shortening for elements with beam interface
-     */
-    virtual void SetElementShortening(int shortening) {};
-
-    /**
      * Get the stem mod for the element (if any)
      */
     virtual data_STEMMODIFIER GetDrawingStemMod() const;
@@ -318,12 +324,6 @@ public:
      * Takes two layers into account in order to avoid collisions of dots between corresponding notes/chords
      */
     MapOfDotLocs CalcOptimalDotLocations();
-
-    /**
-     * Calculate the overlap with other layer elements that
-     * are placed within the duration of the element
-     */
-    int CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2);
 
     //----------//
     // Functors //

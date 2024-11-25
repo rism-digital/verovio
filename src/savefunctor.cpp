@@ -77,7 +77,8 @@ FunctorCode SaveFunctor::VisitFlagEnd(Flag *flag)
 FunctorCode SaveFunctor::VisitMdiv(Mdiv *mdiv)
 {
     MEIOutput *meiOutput = dynamic_cast<MEIOutput *>(m_output);
-    if ((mdiv->m_visibility == Hidden) && meiOutput) {
+
+    if (meiOutput && (mdiv->m_visibility == Hidden)) {
         // Do not output hidden mdivs in page-based MEI or when saving score-based MEI with filter
         if (!meiOutput->GetScoreBasedMEI() || meiOutput->HasFilter()) return FUNCTOR_SIBLINGS;
     }
@@ -87,7 +88,8 @@ FunctorCode SaveFunctor::VisitMdiv(Mdiv *mdiv)
 FunctorCode SaveFunctor::VisitMdivEnd(Mdiv *mdiv)
 {
     MEIOutput *meiOutput = dynamic_cast<MEIOutput *>(m_output);
-    if ((mdiv->m_visibility == Hidden) && meiOutput) {
+
+    if (meiOutput && (mdiv->m_visibility == Hidden)) {
         // Do not output hidden mdivs in page-based MEI or when saving score-based MEI with filter
         if (!meiOutput->GetScoreBasedMEI() || meiOutput->HasFilter()) return FUNCTOR_SIBLINGS;
     }

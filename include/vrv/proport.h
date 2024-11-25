@@ -34,6 +34,12 @@ public:
     std::string GetClassName() const override { return "Proport"; }
     ///@}
 
+    int GetCumulatedNum() const;
+    int GetCumulatedNumbase() const;
+
+    void Cumulate(const Proport *proport);
+    void ResetCumulate();
+
     /** Override the method since alignment is required */
     bool HasToBeAligned() const override { return true; }
 
@@ -52,6 +58,9 @@ private:
 public:
     //
 private:
+    /** the cumulated num and numbase */
+    int m_cumulatedNum;
+    int m_cumulatedNumbase;
 };
 
 } // namespace vrv

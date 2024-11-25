@@ -380,9 +380,9 @@ void Slur::AddSpannedElements(
                                  TimeSpanningInterface *interface = positioner->GetObject()->GetTimeSpanningInterface();
                                  assert(interface);
                                  const bool startsInCollisionLayer
-                                     = (spanned.layersN.count(interface->GetStart()->GetOriginalLayerN()) > 0);
+                                     = spanned.layersN.contains(interface->GetStart()->GetOriginalLayerN());
                                  const bool endsInCollisionLayer
-                                     = (spanned.layersN.count(interface->GetEnd()->GetOriginalLayerN()) > 0);
+                                     = spanned.layersN.contains(interface->GetEnd()->GetOriginalLayerN());
                                  return (!startsInCollisionLayer && !endsInCollisionLayer);
                              }),
         tiePositioners.end());
@@ -487,27 +487,32 @@ void Slur::AddPositionerToArticulations(FloatingCurvePositioner *curve)
     }
 }
 
-Staff *Slur::CalculateExtremalStaff(const Staff *staff, int xMin, int xMax)
+Staff *Slur::CalculatePrincipalStaff(const Staff *staff, int xMin, int xMax)
 {
-    return const_cast<Staff *>(std::as_const(*this).CalculateExtremalStaff(staff, xMin, xMax));
+    return const_cast<Staff *>(std::as_const(*this).CalculatePrincipalStaff(staff, xMin, xMax));
 }
 
-const Staff *Slur::CalculateExtremalStaff(const Staff *staff, int xMin, int xMax) const
+const Staff *Slur::CalculatePrincipalStaff(const Staff *staff, int xMin, int xMax) const
 {
-    const Staff *extremalStaff = staff;
+    assert(staff);
+
+    const Staff *principalStaff = NULL;
 
     const SlurCurveDirection curveDir = this->GetDrawingCurveDir();
     const SpannedElements spanned = this->CollectSpannedElements(staff, xMin, xMax);
+    if (spanned.elements.empty()) {
+        return staff;
+    }
 
     // The floating curve positioner of cross staff slurs should live in the lower/upper staff alignment
     // corresponding to whether the slur is curved below or not
-    auto adaptStaff = [&extremalStaff, curveDir](const LayerElement *element) {
+    auto adaptStaff = [&principalStaff, curveDir](const LayerElement *element) {
         const Staff *elementStaff = element->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-        const bool updateExtremal = (curveDir == SlurCurveDirection::Below)
-            ? (elementStaff->GetN() > extremalStaff->GetN())
-            : (elementStaff->GetN() < extremalStaff->GetN());
-        if (updateExtremal) {
-            extremalStaff = elementStaff;
+        const bool updatePrincipal = !principalStaff
+            || ((curveDir == SlurCurveDirection::Below) ? (elementStaff->GetN() > principalStaff->GetN())
+                                                        : (elementStaff->GetN() < principalStaff->GetN()));
+        if (updatePrincipal) {
+            principalStaff = elementStaff;
         }
     };
 
@@ -521,17 +526,24 @@ const Staff *Slur::CalculateExtremalStaff(const Staff *staff, int xMin, int xMax
         }
     });
 
-    return extremalStaff;
+    assert(principalStaff);
+    return principalStaff;
 }
 
 bool Slur::IsElementBelow(const LayerElement *element, const Staff *startStaff, const Staff *endStaff) const
 {
+    assert(element);
+    // startStaff and endStaff may be NULL (if the boundary is a tstamp)
+    // however, slurs with tstamp should never have S-shape
+
     switch (this->GetDrawingCurveDir()) {
         case SlurCurveDirection::Above: return true;
         case SlurCurveDirection::Below: return false;
         case SlurCurveDirection::AboveBelow:
+            assert(startStaff);
             return (element->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN() == startStaff->GetN());
         case SlurCurveDirection::BelowAbove:
+            assert(endStaff);
             return (element->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN() == endStaff->GetN());
         default: return false;
     }
@@ -539,12 +551,18 @@ bool Slur::IsElementBelow(const LayerElement *element, const Staff *startStaff, 
 
 bool Slur::IsElementBelow(const FloatingPositioner *positioner, const Staff *startStaff, const Staff *endStaff) const
 {
+    assert(positioner);
+    // startStaff and endStaff may be NULL (if the boundary is a tstamp)
+    // however, slurs with tstamp should never have S-shape
+
     switch (this->GetDrawingCurveDir()) {
         case SlurCurveDirection::Above: return true;
         case SlurCurveDirection::Below: return false;
         case SlurCurveDirection::AboveBelow:
+            assert(startStaff);
             return (positioner->GetAlignment()->GetStaff()->GetN() == startStaff->GetN());
         case SlurCurveDirection::BelowAbove:
+            assert(endStaff);
             return (positioner->GetAlignment()->GetStaff()->GetN() == endStaff->GetN());
         default: return false;
     }

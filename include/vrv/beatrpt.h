@@ -40,17 +40,17 @@ public:
     bool HasToBeAligned() const override { return true; }
 
     /**
-     * Returns the duration (in double) for the BeatRpt.
+     * Returns the duration (in Fraction) for the BeatRpt.
      */
 
-    double GetBeatRptAlignmentDuration(int meterUnit) const;
+    Fraction GetBeatRptAlignmentDuration(data_DURATION meterUnit) const;
 
     /**
      * MIDI timing information
      */
     ///@{
-    void SetScoreTimeOnset(double scoreTime);
-    double GetScoreTimeOnset() const;
+    void SetScoreTimeOnset(Fraction scoreTime);
+    Fraction GetScoreTimeOnset() const;
 
     //----------//
     // Functors //
@@ -75,7 +75,7 @@ private:
      * The score-time onset of the note in the measure (duration from the start of measure in
      * quarter notes).
      */
-    double m_scoreTimeOnset;
+    Fraction m_scoreTimeOnset;
 };
 
 } // namespace vrv

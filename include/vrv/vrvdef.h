@@ -39,8 +39,8 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 4
-#define VERSION_MINOR 3
-#define VERSION_REVISION 1
+#define VERSION_MINOR 4
+#define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV false
 
@@ -220,6 +220,7 @@ enum ClassId : uint16_t {
     DOTS,
     FLAG,
     FTREM,
+    GENERIC_ELEMENT,
     GRACEGRP,
     HALFMRPT,
     KEYSIG,
@@ -388,7 +389,7 @@ typedef std::map<int, GraceAligner *> MapOfIntGraceAligners;
 
 typedef std::vector<std::pair<std::u32string, bool>> ArrayOfStringDynamTypePairs;
 
-typedef std::map<std::string, std::function<Object *(void)>> MapOfStrConstructors;
+typedef std::map<ClassId, std::function<Object *(void)>> MapOfClassIdConstructors;
 
 typedef std::map<std::string, ClassId> MapOfStrClassIds;
 
@@ -428,8 +429,6 @@ typedef std::map<int, LayerN_VerserN_t> StaffN_LayerN_VerseN_t;
 #define DEFINITION_FACTOR 10
 
 #define isIn(x, a, b) (((x) >= std::min((a), (b))) && ((x) <= std::max((a), (b))))
-
-#define durRound(dur) round(dur *pow(10, 8)) / pow(10, 8)
 
 /**
  * Codes returned by Functors.
@@ -668,6 +667,16 @@ enum GraphicID { PRIMARY = 0, SPANNING, SYMBOLREF };
 //----------------------------------------------------------------------------
 
 enum MeasureType { MEASURED = 0, UNMEASURED, NEUMELINE };
+
+//----------------------------------------------------------------------------
+// The score time unit (quarter note)
+//----------------------------------------------------------------------------
+
+#define SCORE_TIME_UNIT 4
+
+//----------------------------------------------------------------------------
+// Section representing a line in neon
+//----------------------------------------------------------------------------
 
 #define NEUME_LINE_TYPE "neon-neume-line"
 

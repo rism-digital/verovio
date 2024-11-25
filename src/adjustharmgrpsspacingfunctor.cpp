@@ -121,6 +121,9 @@ FunctorCode AdjustHarmGrpsSpacingFunctor::VisitHarm(Harm *harm)
         xShift = m_previousMeasure->GetWidth();
     }
 
+    assert(m_previousHarmStart);
+    assert(m_previousHarmPositioner);
+
     int overlap = m_previousHarmPositioner->GetContentRight() - (harmPositioner->GetContentLeft() + xShift);
     // Two units as default spacing
     int wordSpace = 2 * m_doc->GetDrawingUnit(100);

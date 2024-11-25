@@ -54,6 +54,15 @@ public:
     /** Evaluate additive meter counts */
     int GetTotalCount() const;
 
+    /** Return the implicit unit according to the sym (if any, return 0 otherwise) */
+    int GetSymImplicitUnit() const;
+
+    /**
+     * Return the unit (int) as data_DURATION (up to 32).
+     * Return DURATION_4 if no match.
+     */
+    data_DURATION GetUnitAsDur() const;
+
     /** Retrieves the symbol glyph */
     char32_t GetSymbolGlyph() const;
 
