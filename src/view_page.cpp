@@ -1292,7 +1292,7 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, M
 
     // If German lute tablature the default is @lines.visible="false", but setting @lines.visible="true"
     // will draw the staff lines.
-    bool gltLines = (staff->IsTabLuteGerman() && staffDef->GetLinesVisible() == BOOLEAN_true);
+    bool gltLines = (staff->IsTabLuteGerman() && staffDef->GetLinesVisible() != BOOLEAN_true);
     // For anything other than German lute tablature the default is @lines.visible="true"
     bool visibleLines = (staffDef->GetLinesVisible() != BOOLEAN_false);
 
