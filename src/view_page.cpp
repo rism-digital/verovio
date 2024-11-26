@@ -1290,6 +1290,15 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, M
     assert(measure);
     assert(system);
 
+    // If German lute tablature the default is @lines.visible="false", but setting @lines.visible="true"
+    // will draw the staff lines.
+    bool gltLines = (staff->IsTabLuteGerman() && staffDef->GetLinesVisible() == BOOLEAN_true);
+    // For anything other than German lute tablature the default is @lines.visible="true"
+    bool visibleLines = (staffDef->GetLinesVisible() != BOOLEAN_false);
+
+    // Nothing to do if both are false
+    if (!gltLines && !visibleLines) return;
+
     int j, x1, x2, y1, y2;
 
     x1 = measure->GetDrawingX();
@@ -1309,7 +1318,7 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, M
     // If German lute tablature the default is @lines.visible="false", but setting @lines.visible="true"
     // will draw the staff lines.
     // For anything other than German lute tablature the default is @lines.visible="true"
-    if (staff->IsTabLuteGerman() && staffDef->GetLinesVisible() != BOOLEAN_true) {
+    if (gltLines) {
         // German tablature has no staff, just a single base line
         // But internally we maintain the fiction of an invisible staff as a coordinate system
         SegmentedLine line(x1, x2);
@@ -1317,7 +1326,8 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, M
         y1 -= (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * staff->m_drawingLines) * 11 / 10;
         this->DrawHorizontalSegmentedLine(dc, y1, line, lineWidth / 2);
     }
-    else if (staffDef->GetLinesVisible() != BOOLEAN_false) {
+    // Normal staff lines
+    else {
         // draw staff lines
         for (j = 0; j < staff->m_drawingLines; ++j) {
             // Skewed lines - with Facs (neumes) only for now
