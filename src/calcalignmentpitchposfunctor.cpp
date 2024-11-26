@@ -46,7 +46,7 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
     if (pitchInterface) {
         pitchInterface->SetOctDefault(m_octDefault);
         // Check if there is a octave default for the staff - ignore cross-staff for this and use staffY
-        if (m_octDefaultForStaffN.count(staffY->GetN()) > 0) {
+        if (m_octDefaultForStaffN.contains(staffY->GetN())) {
             pitchInterface->SetOctDefault(m_octDefaultForStaffN.at(staffY->GetN()));
         }
     }

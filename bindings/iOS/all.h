@@ -18,6 +18,7 @@
 #import <VerovioFramework/adjustgracexposfunctor.h>
 #import <VerovioFramework/adjustharmgrpsspacingfunctor.h>
 #import <VerovioFramework/adjustlayersfunctor.h>
+#import <VerovioFramework/adjustneumexfunctor.h>
 #import <VerovioFramework/adjustslursfunctor.h>
 #import <VerovioFramework/adjuststaffoverlapfunctor.h>
 #import <VerovioFramework/adjustsylspacingfunctor.h>
@@ -28,6 +29,7 @@
 #import <VerovioFramework/adjustxposfunctor.h>
 #import <VerovioFramework/adjustxrelfortranscriptionfunctor.h>
 #import <VerovioFramework/adjustyposfunctor.h>
+#import <VerovioFramework/adjustyrelfortranscriptionfunctor.h>
 #import <VerovioFramework/alignfunctor.h>
 #import <VerovioFramework/altsyminterface.h>
 #import <VerovioFramework/anchoredtext.h>
@@ -105,9 +107,11 @@
 #import <VerovioFramework/findlayerelementsfunctor.h>
 #import <VerovioFramework/fing.h>
 #import <VerovioFramework/floatingobject.h>
+#import <VerovioFramework/fraction.h>
 #import <VerovioFramework/ftrem.h>
 #import <VerovioFramework/functor.h>
 #import <VerovioFramework/functorinterface.h>
+#import <VerovioFramework/genericlayerelement.h>
 #import <VerovioFramework/git_commit.h>
 #import <VerovioFramework/gliss.h>
 #import <VerovioFramework/glyph.h>
@@ -121,13 +125,15 @@
 #import <VerovioFramework/humlib.h>
 #import <VerovioFramework/instrdef.h>
 #import <VerovioFramework/interface.h>
-#import <VerovioFramework/iobase.h>
 #import <VerovioFramework/ioabc.h>
+#import <VerovioFramework/iobase.h>
+#import <VerovioFramework/iocmme.h>
 #import <VerovioFramework/iodarms.h>
 #import <VerovioFramework/iohumdrum.h>
 #import <VerovioFramework/iomei.h>
 #import <VerovioFramework/iomusxml.h>
 #import <VerovioFramework/iopae.h>
+#import <VerovioFramework/iovolpiano.h>
 #import <VerovioFramework/jsonxx.h>
 #import <VerovioFramework/justifyfunctor.h>
 #import <VerovioFramework/keyaccid.h>
@@ -167,6 +173,7 @@
 #import <VerovioFramework/octave.h>
 #import <VerovioFramework/options.h>
 #import <VerovioFramework/orig.h>
+#import <VerovioFramework/oriscus.h>
 #import <VerovioFramework/ornam.h>
 #import <VerovioFramework/page.h>
 #import <VerovioFramework/pageelement.h>
@@ -184,6 +191,7 @@
 #import <VerovioFramework/positioninterface.h>
 #import <VerovioFramework/preparedatafunctor.h>
 #import <VerovioFramework/proport.h>
+#import <VerovioFramework/quilisma.h>
 #import <VerovioFramework/rdg.h>
 #import <VerovioFramework/ref.h>
 #import <VerovioFramework/reg.h>

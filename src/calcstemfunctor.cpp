@@ -444,11 +444,12 @@ FunctorCode CalcStemFunctor::VisitStem(Stem *stem)
     if (m_dur > DURATION_16) {
         assert(flag);
         Point stemEnd;
+        // Commented since this is crashing - needs investigating
         if (stem->GetDrawingStemDir() == STEMDIRECTION_up) {
-            stemEnd = flag->GetStemUpSE(m_doc, staffSize, drawingCueSize);
+            // stemEnd = flag->GetStemUpSE(m_doc, staffSize, drawingCueSize);
         }
         else {
-            stemEnd = flag->GetStemDownNW(m_doc, staffSize, drawingCueSize);
+            // stemEnd = flag->GetStemDownNW(m_doc, staffSize, drawingCueSize);
         }
         // Trick for shortening the stem with DURATION_8
         flagHeight = stemEnd.y;
@@ -660,7 +661,9 @@ void CalcStemFunctor::AdjustFlagPlacement(
     }
     int ledgerAbove = 0;
     int ledgerBelow = 0;
-    if (!note || !note->HasLedgerLines(ledgerAbove, ledgerBelow)) return;
+
+    Staff *staff = note->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+    if (!note || !note->HasLedgerLines(ledgerAbove, ledgerBelow, staff)) return;
     if (((stemDirection == STEMDIRECTION_up) && !ledgerBelow)
         || ((stemDirection == STEMDIRECTION_down) && !ledgerAbove))
         return;

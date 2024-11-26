@@ -11,6 +11,7 @@
 
 #include <cassert>
 #include <math.h>
+#include <ranges>
 
 //----------------------------------------------------------------------------
 
@@ -131,7 +132,7 @@ void Doc::Reset()
     m_dataPreparationDone = false;
     m_timemapTempo = 0.0;
     m_markup = MARKUP_DEFAULT;
-    m_isMensuralMusicOnly = false;
+    m_isMensuralMusicOnly = BOOLEAN_NONE;
     m_isNeumeLines = false;
     m_isCastOff = false;
     m_visibleScores.clear();
@@ -144,6 +145,15 @@ void Doc::Reset()
     m_header.reset();
     m_front.reset();
     m_back.reset();
+}
+
+void Doc::ResetToLoading()
+{
+    if (m_currentScoreDefDone) {
+        ScoreDefUnsetCurrentFunctor scoreDefUnsetCurrent;
+        this->Process(scoreDefUnsetCurrent);
+        m_currentScoreDefDone = false;
+    }
 }
 
 void Doc::ClearSelectionPages()
@@ -290,33 +300,14 @@ bool Doc::GenerateMeasureNumbers()
     return true;
 }
 
-void Doc::GenerateMEIHeader(bool meiBasic)
+void Doc::GenerateMEIHeader()
 {
-    // Try to preserve titles if we have an existing header
-    std::list<std::string> titles;
-    pugi::xpath_node_set titlesNodeSet = m_header.select_nodes("//meiHead/fileDesc/titleStmt/title/text()");
-    for (pugi::xpath_node titleXpathNode : titlesNodeSet) {
-        pugi::xml_node titleNode = titleXpathNode.node();
-        if (!titleNode) continue;
-        titles.push_back(titleNode.text().as_string());
-    }
-
     m_header.remove_children();
     pugi::xml_node meiHead = m_header.append_child("meiHead");
     pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
     pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
-    // Re-add preserved titles
-    if (titles.size() > 0) {
-        for (auto &title : titles) {
-            pugi::xml_node titleNode = titleStmt.append_child("title");
-            pugi::xml_node textNode = titleNode.append_child(pugi::node_pcdata);
-            textNode.text() = title.c_str();
-        }
-    }
-    // Add an empty title for validity
-    else {
-        titleStmt.append_child("title");
-    }
+    titleStmt.append_child("title");
+
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
     pugi::xml_node date = pubStmt.append_child("date");
 
@@ -327,20 +318,40 @@ void Doc::GenerateMEIHeader(bool meiBasic)
         now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
     date.append_attribute("isodate") = dateStr.c_str();
 
-    if (!meiBasic) {
-        // encodingDesc
-        pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
-        // appInfo/application/name
-        pugi::xml_node appInfo = encodingDesc.append_child("appInfo");
-        pugi::xml_node application = appInfo.append_child("application");
-        application.append_attribute("xml:id") = "verovio";
-        application.append_attribute("version") = GetVersion().c_str();
-        pugi::xml_node name = application.append_child("name");
-        name.text().set(StringFormat("Verovio (%s)", GetVersion().c_str()).c_str());
-        // projectDesc
-        pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
-        pugi::xml_node p1 = projectDesc.append_child("p");
-        p1.text().set(StringFormat("MEI encoded with Verovio").c_str());
+    // encodingDesc
+    pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
+    // appInfo/application/name
+    pugi::xml_node appInfo = encodingDesc.append_child("appInfo");
+    pugi::xml_node application = appInfo.append_child("application");
+    application.append_attribute("xml:id") = "verovio";
+    application.append_attribute("version") = GetVersion().c_str();
+    pugi::xml_node name = application.append_child("name");
+    name.text().set(StringFormat("Verovio (%s)", GetVersion().c_str()).c_str());
+    // projectDesc
+    pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
+    pugi::xml_node p1 = projectDesc.append_child("p");
+    p1.text().set(StringFormat("MEI encoded with Verovio").c_str());
+}
+
+void Doc::ConvertHeaderToMEIBasic()
+{
+    pugi::xpath_node_set toRemove;
+
+    // Keep only fileDesc
+    toRemove = m_header.select_nodes("//meiHead/*[not(self::fileDesc)]");
+    // Remove each of the selected nodes
+    for (pugi::xpath_node node : toRemove) {
+        node.node().parent().remove_child(node.node());
+    }
+
+    // Keep only  titleStmt, respStmt, composer, arranger and lyricist in fileDesc
+    pugi::xml_node titleStmt = m_header.select_node("//meiHead/fileDesc/titleStmt").node();
+    // Remove each of the selected nodes
+    toRemove = titleStmt.select_nodes(
+        "./*[not(self::title or self::respStmt or self::composer or self::arranger or self::lyricist)]");
+    // Remove each of the selected nodes
+    for (pugi::xpath_node node : toRemove) {
+        node.node().parent().remove_child(node.node());
     }
 }
 
@@ -384,7 +395,7 @@ void Doc::CalculateTimemap()
     this->Process(initMaxMeasureDuration);
 
     // Then calculate the onset and offset times (w.r.t. the measure) for every note
-    InitOnsetOffsetFunctor initOnsetOffset;
+    InitOnsetOffsetFunctor initOnsetOffset(this);
     this->Process(initOnsetOffset);
 
     // Adjust the duration of tied notes
@@ -397,6 +408,8 @@ void Doc::CalculateTimemap()
 
 void Doc::ExportMIDI(smf::MidiFile *midiFile)
 {
+    midiFile->absoluteTicks();
+
     if (!this->HasTimemap()) {
         // generate MIDI timemap before progressing
         CalculateTimemap();
@@ -437,17 +450,14 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     // For this, we use a array of AttNIntegerComparison that looks for each object if it is of the type
     // and with @n specified
 
-    IntTree_t::const_iterator staves;
-    IntTree_t::const_iterator layers;
-
     // Process notes and chords, rests, spaces layer by layer
     // track 0 (included by default) is reserved for meta messages common to all tracks
     int midiChannel = 0;
     int midiTrack = 1;
     Filters filters;
-    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
+    for (auto &staves : layerTree.child) {
         int transSemi = 0;
-        if (StaffDef *staffDef = scoreDef->GetStaffDef(staves->first)) {
+        if (StaffDef *staffDef = scoreDef->GetStaffDef(staves.first)) {
             // get the transposition (semi-tone) value for the staff
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
             midiTrack = staffDef->GetN();
@@ -503,6 +513,9 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             if (meterSig && meterSig->HasCount() && meterSig->HasUnit()) {
                 midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetUnit());
             }
+            else if (meterSig && meterSig->HasSym()) {
+                midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetSymImplicitUnit());
+            }
         }
 
         // Set initial scoreDef values for tuning
@@ -511,11 +524,11 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         generateScoreDefMIDI.SetTrack(midiTrack);
         scoreDef->Process(generateScoreDefMIDI);
 
-        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+        for (auto &layers : staves.second.child) {
             filters.Clear();
             // Create ad comparison object for each type / @n
-            AttNIntegerComparison matchStaff(STAFF, staves->first);
-            AttNIntegerComparison matchLayer(LAYER, layers->first);
+            AttNIntegerComparison matchStaff(STAFF, staves.first);
+            AttNIntegerComparison matchLayer(LAYER, layers.first);
             filters.Add(&matchStaff);
             filters.Add(&matchLayer);
 
@@ -524,7 +537,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
 
             generateMIDI.SetChannel(midiChannel);
             generateMIDI.SetTrack(midiTrack);
-            generateMIDI.SetStaffN(staves->first);
+            generateMIDI.SetStaffN(staves.first);
             generateMIDI.SetTempoEventTicks(tempoEventTicks);
             generateMIDI.SetTransSemi(transSemi);
             generateMIDI.SetCurrentTempo(tempo);
@@ -537,9 +550,10 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             tempoEventTicks = generateMIDI.GetTempoEventTicks();
         }
     }
+    midiFile->sortTracks();
 }
 
-bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeasures)
+bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeasures, bool useFractions)
 {
     if (!this->HasTimemap()) {
         // generate MIDI timemap before progressing
@@ -555,7 +569,7 @@ bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeas
     generateTimemap.SetCueExclusion(this->GetOptions()->m_midiNoCue.GetValue());
     this->Process(generateTimemap);
 
-    timemap.ToJson(output, includeRests, includeMeasures);
+    timemap.ToJson(output, includeRests, includeMeasures, useFractions);
 
     return true;
 }
@@ -737,19 +751,15 @@ void Doc::PrepareData()
     // For this, we use an array of AttNIntegerComparison that looks for each object if it is of the type
     // and with @n specified
 
-    IntTree_t::const_iterator staves;
-    IntTree_t::const_iterator layers;
-    IntTree_t::const_iterator verses;
-
     /************ Resolve some pointers by layer ************/
 
     Filters filters;
-    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
-        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+    for (auto &staves : layerTree.child) {
+        for (auto &layers : staves.second.child) {
             filters.Clear();
             // Create ad comparison object for each type / @n
-            AttNIntegerComparison matchStaff(STAFF, staves->first);
-            AttNIntegerComparison matchLayer(LAYER, layers->first);
+            AttNIntegerComparison matchStaff(STAFF, staves.first);
+            AttNIntegerComparison matchLayer(LAYER, layers.first);
             filters.Add(&matchStaff);
             filters.Add(&matchLayer);
 
@@ -766,12 +776,12 @@ void Doc::PrepareData()
     prepareDelayedTurns.SetDataCollectionCompleted();
 
     if (!prepareDelayedTurns.GetDelayedTurns().empty()) {
-        for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
-            for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+        for (auto &staves : layerTree.child) {
+            for (auto &layers : staves.second.child) {
                 filters.Clear();
                 // Create ad comparison object for each type / @n
-                AttNIntegerComparison matchStaff(STAFF, staves->first);
-                AttNIntegerComparison matchLayer(LAYER, layers->first);
+                AttNIntegerComparison matchStaff(STAFF, staves.first);
+                AttNIntegerComparison matchLayer(LAYER, layers.first);
                 filters.Add(&matchStaff);
                 filters.Add(&matchLayer);
 
@@ -785,15 +795,15 @@ void Doc::PrepareData()
     /************ Resolve lyric connectors ************/
 
     // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
-    for (staves = verseTree.child.begin(); staves != verseTree.child.end(); ++staves) {
-        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
-            for (verses = layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
+    for (auto &staves : verseTree.child) {
+        for (auto &layers : staves.second.child) {
+            for (auto &verses : layers.second.child) {
                 // std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
                 filters.Clear();
                 // Create ad comparison object for each type / @n
-                AttNIntegerComparison matchStaff(STAFF, staves->first);
-                AttNIntegerComparison matchLayer(LAYER, layers->first);
-                AttNIntegerComparison matchVerse(VERSE, verses->first);
+                AttNIntegerComparison matchStaff(STAFF, staves.first);
+                AttNIntegerComparison matchLayer(LAYER, layers.first);
+                AttNIntegerComparison matchVerse(VERSE, verses.first);
                 filters.Add(&matchStaff);
                 filters.Add(&matchLayer);
                 filters.Add(&matchVerse);
@@ -824,12 +834,12 @@ void Doc::PrepareData()
     /************ Resolve mRpt ************/
 
     // Process by staff for matching mRpt elements and setting the drawing number
-    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
-        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+    for (auto &staves : layerTree.child) {
+        for (auto &layers : staves.second.child) {
             filters.Clear();
             // Create ad comparison object for each type / @n
-            AttNIntegerComparison matchStaff(STAFF, staves->first);
-            AttNIntegerComparison matchLayer(LAYER, layers->first);
+            AttNIntegerComparison matchStaff(STAFF, staves.first);
+            AttNIntegerComparison matchLayer(LAYER, layers.first);
             filters.Add(&matchStaff);
             filters.Add(&matchLayer);
 
@@ -1286,7 +1296,7 @@ void Doc::ConvertToPageBasedDoc()
 
 void Doc::ConvertToCastOffMensuralDoc(bool castOff)
 {
-    if (!m_isMensuralMusicOnly) return;
+    if (!this->IsMensuralMusicOnly()) return;
 
     // Do not convert transcription files
     if (this->IsTranscription()) return;
@@ -1294,13 +1304,8 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
     // Do not convert facs files
     if (this->IsFacs()) return;
 
-    // We are converting to measure music in a definite way
-    if (this->GetOptions()->m_mensuralToMeasure.GetValue()) {
-        m_isMensuralMusicOnly = false;
-    }
-
     // Make sure the document is not cast-off
-    this->UnCastOffDoc();
+    if (this->IsCastOff()) this->UnCastOffDoc();
 
     this->ScoreDefSetCurrentDoc();
 
@@ -1315,7 +1320,9 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
         assert(system);
         if (castOff) {
             System *convertedSystem = new System();
-            system->ConvertToCastOffMensuralSystem(this, convertedSystem);
+            ConvertToCastOffMensuralFunctor convertToCastOffMensural(this, convertedSystem);
+            // Convert the system and replace it
+            system->Process(convertToCastOffMensural);
             contentPage->ReplaceChild(system, convertedSystem);
             delete system;
         }
@@ -1330,6 +1337,66 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
     // because idx will still be 0 but contentPage is dead!
     this->ResetDataPage();
     this->ScoreDefSetCurrentDoc(true);
+}
+
+void Doc::ConvertToCmnDoc()
+{
+    if (!this->IsMensuralMusicOnly()) return;
+
+    // Do not convert transcription files
+    if (this->IsTranscription()) return;
+
+    // Do not convert facs files
+    if (this->IsFacs()) return;
+
+    m_isMensuralMusicOnly = BOOLEAN_false;
+
+    // Temporarily change the equivalence option to minima
+    int previousEquivalence = m_options->m_durationEquivalence.GetValue();
+    m_options->m_durationEquivalence.SetValue(DURATION_EQ_minima);
+
+    // Make sure the document is not cast-off
+    if (this->IsCastOff()) this->UnCastOffDoc();
+
+    this->ScoreDefSetCurrentDoc();
+
+    this->CalculateTimemap();
+
+    Page *contentPage = this->SetDrawingPage(0);
+    assert(contentPage);
+
+    contentPage->LayOutHorizontally();
+
+    ListOfObjects systems = contentPage->FindAllDescendantsByType(SYSTEM, false, 1);
+    ListOfObjects scores = contentPage->FindAllDescendantsByType(SCORE, false, 1);
+    assert(systems.size() == scores.size());
+
+    ListOfObjects::iterator systemsIt = systems.begin();
+    ListOfObjects::iterator scoresIt = scores.begin();
+    for (; systemsIt != systems.end(); ++systemsIt, ++scoresIt) {
+        System *system = vrv_cast<System *>(*systemsIt);
+        assert(system);
+        Score *score = vrv_cast<Score *>(*scoresIt);
+        assert(score);
+        System *convertedSystem = new System();
+        ConvertToCmnFunctor convertToCmn(this, convertedSystem, score);
+        // Convert the system and replace it
+        system->Process(convertToCmn);
+        contentPage->ReplaceChild(system, convertedSystem);
+        delete system;
+    }
+
+    this->GenerateMeasureNumbers();
+
+    this->PrepareData();
+
+    // We need to reset the drawing page to NULL
+    // because idx will still be 0 but contentPage is dead!
+    this->ResetDataPage();
+    this->ScoreDefSetCurrentDoc(true);
+
+    // Reset the option
+    m_options->m_durationEquivalence.SetValue(previousEquivalence);
 }
 
 void Doc::ConvertMarkupDoc(bool permanent)
@@ -1359,20 +1426,17 @@ void Doc::ConvertMarkupDoc(bool permanent)
         this->Process(initProcessingLists);
         const IntTree &layerTree = initProcessingLists.GetLayerTree();
 
-        IntTree_t::const_iterator staves;
-        IntTree_t::const_iterator layers;
-
         /************ Resolve ties ************/
 
         // Process by layer for matching @tie attribute - we process notes and chords, looking at
         // GetTie values and pitch and oct for matching notes
         Filters filters;
-        for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
-            for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+        for (auto &staves : layerTree.child) {
+            for (auto &layers : staves.second.child) {
                 filters.Clear();
                 // Create ad comparison object for each type / @n
-                AttNIntegerComparison matchStaff(STAFF, staves->first);
-                AttNIntegerComparison matchLayer(LAYER, layers->first);
+                AttNIntegerComparison matchStaff(STAFF, staves.first);
+                AttNIntegerComparison matchLayer(LAYER, layers.first);
                 filters.Add(&matchStaff);
                 filters.Add(&matchLayer);
 
@@ -1396,6 +1460,25 @@ void Doc::ConvertMarkupDoc(bool permanent)
     }
 }
 
+void Doc::ConvertToMensuralViewDoc()
+{
+    if (this->IsCastOff()) {
+        LogDebug("Document is cast off");
+        return;
+    }
+
+    ConvertToMensuralViewFunctor convertToMensuralView(this);
+    this->Process(convertToMensuralView);
+}
+
+void Doc::ConvertMensuralToCmnDoc()
+{
+    if (this->IsCastOff()) {
+        LogDebug("Document is cast off");
+        return;
+    }
+}
+
 void Doc::SyncFromFacsimileDoc()
 {
     PrepareFacsimileFunctor prepareFacsimile(this->GetFacsimile());
@@ -1407,20 +1490,20 @@ void Doc::SyncFromFacsimileDoc()
 
 void Doc::SyncToFacsimileDoc()
 {
+    double ppuFactor = 1.0;
     // Create a new facsimile object if we do not have one already
     if (!this->HasFacsimile()) {
         Facsimile *facsimile = new Facsimile();
         this->SetFacsimile(facsimile);
+        m_facsimile->SetType("transcription");
+        // We use the scale option to determine the ppu and adjust the ppu factor accordingly
+        // For example, with scale 50 and the default unit, the ppu will be 4.5 (instead of 9.0)
+        ppuFactor = (double)m_options->m_scale.GetValue() / 100.0;
     }
-    if (!m_facsimile->FindDescendantByType(SURFACE)) {
-        m_facsimile->AddChild(new Surface());
-    }
+
     this->ScoreDefSetCurrentDoc();
 
-    m_facsimile->SetType("transcription");
-    m_facsimile->ClearChildren();
-
-    SyncToFacsimileFunctor syncToFacimileFunctor(this);
+    SyncToFacsimileFunctor syncToFacimileFunctor(this, ppuFactor);
     this->Process(syncToFacimileFunctor);
 }
 
@@ -2140,8 +2223,7 @@ int Doc::GetAdjustedDrawingPageHeight() const
 
     // Take into account the PPU when getting the page height in facsimile
     if (this->IsTranscription() || this->IsFacs()) {
-        const int factor = DEFINITION_FACTOR / m_drawingPage->GetPPUFactor();
-        return m_drawingPage->m_pageHeight / factor;
+        return m_drawingPage->m_pageHeight * m_drawingPage->GetPPUFactor() / DEFINITION_FACTOR;
     }
 
     int contentHeight = m_drawingPage->GetContentHeight();
@@ -2154,12 +2236,19 @@ int Doc::GetAdjustedDrawingPageWidth() const
 
     // Take into account the PPU when getting the page width in facsimile
     if (this->IsTranscription() || this->IsFacs()) {
-        const int factor = DEFINITION_FACTOR / m_drawingPage->GetPPUFactor();
-        return m_drawingPage->m_pageWidth / factor;
+        return m_drawingPage->m_pageWidth * m_drawingPage->GetPPUFactor() / DEFINITION_FACTOR;
     }
 
     int contentWidth = m_drawingPage->GetContentWidth();
     return (contentWidth + m_drawingPageMarginLeft + m_drawingPageMarginRight) / DEFINITION_FACTOR;
+}
+
+void Doc::SetMensuralMusicOnly(data_BOOLEAN isMensuralMusicOnly)
+{
+    // Already marked as non mensural only cannoy be set back
+    if (m_isMensuralMusicOnly != BOOLEAN_false) {
+        m_isMensuralMusicOnly = isMensuralMusicOnly;
+    }
 }
 
 //----------------------------------------------------------------------------

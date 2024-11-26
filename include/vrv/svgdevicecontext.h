@@ -131,7 +131,12 @@ public:
     /**
      * Method for changing the color of a custom graphic
      */
-    virtual void SetCustomGraphicColor(const std::string &color) override;
+    void SetCustomGraphicColor(const std::string &color) override;
+
+    /**
+     * Method for adding custom graphic data-* attributes
+     */
+    void SetCustomGraphicAttributes(const std::string &data, const std::string &value) override;
 
     /**
      * @name Methods for re-starting and ending a graphic for objects drawn in separate steps

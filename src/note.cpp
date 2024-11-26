@@ -125,7 +125,6 @@ void Note::Reset()
     m_noteGroupPosition = 0;
     m_noteGroup = NULL;
 
-    m_drawingLoc = 0;
     m_flippedNotehead = false;
 
     m_stemSameas = NULL;
@@ -216,32 +215,6 @@ Accid *Note::GetDrawingAccid()
 const Accid *Note::GetDrawingAccid() const
 {
     return vrv_cast<const Accid *>(this->FindDescendantByType(ACCID));
-}
-
-bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff) const
-{
-    if (!staff) {
-        staff = this->GetAncestorStaff();
-    }
-
-    if (staff->IsTabLuteFrench() || staff->IsTabLuteGerman() || staff->IsTabLuteItalian()) {
-        // French and German tablature do not use ledger lines.
-        // Italian tablature does use a single ledger line for 7th course, and compressed
-        // ledger lines for fretted 8th and above, but not for open 8th and above. So
-        // rather than use the CMN ledger line handling we draw our own.
-        // Guitar tablature has been left as originally implemented.
-        linesAbove = 0;
-        linesBelow = 0;
-        return false;
-    }
-
-    linesAbove = (this->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
-    linesBelow = -(this->GetDrawingLoc()) / 2;
-
-    linesAbove = std::max(linesAbove, 0);
-    linesBelow = std::max(linesBelow, 0);
-
-    return ((linesAbove > 0) || (linesBelow > 0));
 }
 
 Chord *Note::IsChordTone()

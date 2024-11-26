@@ -286,7 +286,7 @@ public:
      *
      * @remark nojs
      *
-     * @param outputTo the output to value as string
+     * @param outputTo the value to output as string
      * @return True if the option was successfully set
      */
     bool SetOutputTo(std::string const &outputTo);
@@ -313,7 +313,7 @@ public:
     ///@{
 
     /**
-     * Edit the MEI data.
+     * Edit the MEI data - experimental code not to rely on.
      *
      * @param editorAction The editor actions as a stringified JSON object
      * @return True if the edit action was successfully applied
@@ -321,7 +321,7 @@ public:
     bool Edit(const std::string &editorAction);
 
     /**
-     * Return the editor status.
+     * Return the editor status - experimental code not to rely on.
      *
      * @return The editor status as a string
      **/

@@ -272,6 +272,11 @@ public:
     virtual void SetCustomGraphicColor(const std::string &color) {}
 
     /**
+     * Method for adding custom graphic data-* attributes
+     */
+    virtual void SetCustomGraphicAttributes(const std::string &data, const std::string &value) {}
+
+    /**
      * @name Methods for re-starting and ending a graphic for objects drawn in separate steps
      * The methods can be used to the output together, for example for a Beam
      */

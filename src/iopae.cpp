@@ -2826,7 +2826,7 @@ bool PAEInput::Import(const std::string &input)
     m_doc->SetType(Raw);
 
     // Genereate the header and add a comment to the project description
-    m_doc->GenerateMEIHeader(false);
+    m_doc->GenerateMEIHeader();
     pugi::xml_node projectDesc = m_doc->m_header.first_child().select_node("//projectDesc").node();
     if (projectDesc) {
         pugi::xml_node p1 = projectDesc.append_child("p");
@@ -4572,14 +4572,14 @@ bool PAEInput::ConvertAccidGes()
             std::string noteID = note->GetID();
             if (!accid) {
                 // Tied note with a previous note with an accidental
-                if (ties.count(noteID)) {
+                if (ties.contains(noteID)) {
                     Accid *tieAccid = new Accid();
                     note->AddChild(tieAccid);
                     tieAccid->SetAccidGes(Att::AccidentalWrittenToGestural(ties[noteID]));
                     ties.erase(noteID);
                 }
                 // Nothing in front of the note, but something in the list - make it an accid.ges
-                else if ((currentAccids.count(octavedPitch) != 0)) {
+                else if (currentAccids.contains(octavedPitch)) {
                     Accid *gesAccid = new Accid();
                     note->AddChild(gesAccid);
                     data_ACCIDENTAL_WRITTEN accidWritten = currentAccids.at(octavedPitch);
@@ -4590,7 +4590,7 @@ bool PAEInput::ConvertAccidGes()
                 data_ACCIDENTAL_WRITTEN noteAccid = accid->GetAccid();
                 // Natural in front of the note, remove it from the current list
                 if (noteAccid == ACCIDENTAL_WRITTEN_n) {
-                    if (currentAccids.count(octavedPitch) != 0) {
+                    if (currentAccids.contains(octavedPitch)) {
                         currentAccids[octavedPitch] = ACCIDENTAL_WRITTEN_n;
                     }
                 }
@@ -4755,7 +4755,7 @@ bool PAEInput::CheckContentPostBuild()
     ClassIdsComparison noteOrRest({ NOTE, REST });
     ListOfObjects containers;
     m_doc->FindAllDescendantsByComparison(&containers, &comparison);
-    for (auto &container : containers) {
+    for (const auto &container : containers) {
         ListOfObjects notesOrRests;
         container->FindAllDescendantsByComparison(&notesOrRests, &noteOrRest);
         if ((int)notesOrRests.size() < 1) {

@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
+#include "functor.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -57,6 +58,30 @@ int Graphic::GetDrawingHeight(int unit, int staffSize) const
     if (this->GetHeight().GetType() == MEASUREMENTTYPE_px) return (this->GetHeight().GetPx() * staffSize / 100);
     // The staffSize is already taken into account in the unit
     return (this->GetHeight().GetVu() * unit);
+}
+
+//----------------------------------------------------------------------------
+// Functor methods
+//----------------------------------------------------------------------------
+
+FunctorCode Graphic::Accept(Functor &functor)
+{
+    return functor.VisitGraphic(this);
+}
+
+FunctorCode Graphic::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitGraphic(this);
+}
+
+FunctorCode Graphic::AcceptEnd(Functor &functor)
+{
+    return functor.VisitGraphicEnd(this);
+}
+
+FunctorCode Graphic::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitGraphicEnd(this);
 }
 
 } // namespace vrv

@@ -18,6 +18,7 @@
 #include "nc.h"
 #include "neume.h"
 #include "page.h"
+#include "proport.h"
 #include "rend.h"
 #include "rest.h"
 #include "runningelement.h"
@@ -39,20 +40,26 @@ namespace vrv {
 
 AlignHorizontallyFunctor::AlignHorizontallyFunctor(Doc *doc) : DocFunctor(doc)
 {
+    static const std::map<int, data_DURATION> durationEq{
+        { DURATION_EQ_brevis, DURATION_brevis }, //
+        { DURATION_EQ_semibrevis, DURATION_semibrevis }, //
+        { DURATION_EQ_minima, DURATION_minima }, //
+    };
+
     m_measureAligner = NULL;
     m_time = 0;
-    m_currentParams.mensur = NULL;
-    m_currentParams.meterSig = NULL;
     m_notationType = NOTATIONTYPE_cmn;
     m_scoreDefRole = SCOREDEF_NONE;
     m_isFirstMeasure = false;
     m_hasMultipleLayer = false;
+    m_currentParams.equivalence = durationEq.at(m_doc->GetOptions()->m_durationEquivalence.GetValue());
 }
 
 FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
 {
     m_currentParams.mensur = layer->GetCurrentMensur();
     m_currentParams.meterSig = layer->GetCurrentMeterSig();
+    m_currentParams.proport = layer->GetCurrentProport();
 
     // We are starting a new layer, reset the time;
     // We set it to -1.0 for the scoreDef attributes since they have to be aligned before any timestamp event (-1.0)
@@ -174,8 +181,12 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             return FUNCTOR_CONTINUE;
         }
     }
+    // A ligature gets a default alignment in order to allow mensural cast-off
+    else if (layerElement->Is(LIGATURE)) {
+        // Nothing to do
+    }
     // We do not align these (container). Any other?
-    else if (layerElement->Is({ BEAM, LIGATURE, FTREM, TUPLET })) {
+    else if (layerElement->Is({ BEAM, FTREM, TUPLET })) {
         Fraction duration = layerElement->GetSameAsContentAlignmentDuration(m_currentParams, true, m_notationType);
         m_time = m_time + duration;
         return FUNCTOR_CONTINUE;
@@ -234,6 +245,17 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             type = ALIGNMENT_SCOREDEF_METERSIG;
         }
     }
+    else if (layerElement->Is(PROPORT)) {
+        if (layerElement->GetType() == "cmme_tempo_change") return FUNCTOR_SIBLINGS;
+        // replace the current proport
+        const Proport *previous = (m_currentParams.proport) ? (m_currentParams.proport) : NULL;
+        m_currentParams.proport = vrv_cast<Proport *>(layerElement);
+        assert(m_currentParams.proport);
+        if (previous) {
+            m_currentParams.proport->Cumulate(previous);
+        }
+        type = ALIGNMENT_PROPORT;
+    }
     else if (layerElement->Is({ MULTIREST, MREST, MRPT })) {
         type = ALIGNMENT_FULLMEASURE;
     }
@@ -250,6 +272,9 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             // Create an alignment only if the dot has no resolved preceeding note
             type = ALIGNMENT_DOT;
         }
+    }
+    else if (layerElement->Is(CUSTOS)) {
+        type = ALIGNMENT_CUSTOS;
     }
     else if (layerElement->Is(ACCID)) {
         // accid within note was already taken into account by noteParent
@@ -649,6 +674,18 @@ FunctorCode AlignVerticallyFunctor::VisitStaffAlignmentEnd(StaffAlignment *staff
 
     m_cumulatedShift += staffAlignment->GetStaffHeight();
     ++m_staffIdx;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitSyllable(Syllable *syllable)
+{
+    if (!syllable->FindDescendantByType(SYL)) return FUNCTOR_CONTINUE;
+
+    StaffAlignment *alignment = m_systemAligner->GetStaffAlignmentForStaffN(m_staffN);
+    if (!alignment) return FUNCTOR_CONTINUE;
+    // Current limitation of only one syl (verse n) by syllable
+    alignment->AddVerseN(1);
 
     return FUNCTOR_CONTINUE;
 }

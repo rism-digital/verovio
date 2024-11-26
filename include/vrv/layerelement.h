@@ -14,7 +14,7 @@
 
 #include "atts_shared.h"
 #include "facsimileinterface.h"
-#include "horizontalaligner.h"
+#include "fraction.h"
 #include "linkinginterface.h"
 #include "object.h"
 
@@ -305,11 +305,6 @@ public:
         bool areDotsAdjusted, bool isChordElement, bool isLowerElement = false, bool unison = true);
 
     /**
-     * Helper function to set shortening for elements with beam interface
-     */
-    virtual void SetElementShortening(int shortening) {}
-
-    /**
      * Get the stem mod for the element (if any)
      */
     virtual data_STEMMODIFIER GetDrawingStemMod() const;
@@ -329,12 +324,6 @@ public:
      * Takes two layers into account in order to avoid collisions of dots between corresponding notes/chords
      */
     MapOfDotLocs CalcOptimalDotLocations();
-
-    /**
-     * Calculate the overlap with other layer elements that
-     * are placed within the duration of the element
-     */
-    int CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2);
 
     //----------//
     // Functors //

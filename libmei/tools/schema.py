@@ -24,7 +24,7 @@ class MeiSchema(object):
         # self.customization = etree.parse(customization_file)
 
         self.active_modules = []  # the modules active in the resulting output
-        self.element_structure = {}  # the element structure.
+        self.element_structure = {}  # the element structure
 
         self.attribute_group_structure = {}  # the attribute group structure
         # inverted, so we can map attgroups to modules
@@ -237,9 +237,9 @@ class MeiSchema(object):
 
     def get_att_desc(self, att_name: str) -> str:
         """
-        Returns the documentation string for an attribute by name.
+        Return the documentation string for an attribute by name.
         """
-        desc = self.schema.find(f"//tei:attDef[@ident='{att_name}']/tei:desc", namespaces=TEI_NS)
+        desc = self.schema.find(f".//tei:attDef[@ident='{att_name}']/tei:desc", namespaces=TEI_NS)
         if desc is None:
             return ""
 

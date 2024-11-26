@@ -12,6 +12,7 @@
 #include "arpeg.h"
 #include "beatrpt.h"
 #include "btrem.h"
+#include "doc.h"
 #include "featureextractor.h"
 #include "ftrem.h"
 #include "gracegrp.h"
@@ -40,14 +41,19 @@ namespace vrv {
 // InitOnsetOffsetFunctor
 //----------------------------------------------------------------------------
 
-InitOnsetOffsetFunctor::InitOnsetOffsetFunctor() : Functor()
+InitOnsetOffsetFunctor::InitOnsetOffsetFunctor(Doc *doc) : DocFunctor(doc)
 {
+    static const std::map<int, data_DURATION> durationEq{
+        { DURATION_EQ_brevis, DURATION_brevis }, //
+        { DURATION_EQ_semibrevis, DURATION_semibrevis }, //
+        { DURATION_EQ_minima, DURATION_minima }, //
+    };
+
     m_currentScoreTime = 0;
     m_currentRealTimeSeconds = 0.0;
-    m_meterParams.mensur = NULL;
-    m_meterParams.meterSig = NULL;
     m_notationType = NOTATIONTYPE_cmn;
     m_currentTempo = MIDI_TEMPO;
+    m_meterParams.equivalence = durationEq.at(m_doc->GetOptions()->m_durationEquivalence.GetValue());
 }
 
 FunctorCode InitOnsetOffsetFunctor::VisitChordEnd(Chord *chord)
@@ -70,6 +76,7 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayer(Layer *layer)
 
     m_meterParams.mensur = layer->GetCurrentMensur();
     m_meterParams.meterSig = layer->GetCurrentMeterSig();
+    m_meterParams.proport = layer->GetCurrentProport();
 
     return FUNCTOR_CONTINUE;
 }
@@ -158,6 +165,16 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayerElement(LayerElement *layerElement
     }
     else if (layerElement->Is(METERSIG)) {
         this->m_meterParams.meterSig = vrv_cast<MeterSig *>(layerElement);
+    }
+    else if (layerElement->Is(PROPORT)) {
+        if (layerElement->GetType() == "cmme_tempo_change") return FUNCTOR_SIBLINGS;
+        // replace the current proport
+        const Proport *previous = (m_meterParams.proport) ? (m_meterParams.proport) : NULL;
+        m_meterParams.proport = vrv_cast<Proport *>(layerElement);
+        assert(m_meterParams.proport);
+        if (previous) {
+            m_meterParams.proport->Cumulate(previous);
+        }
     }
 
     return FUNCTOR_CONTINUE;
@@ -776,6 +793,10 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
         if (meterSig && meterSig->HasCount() && meterSig->HasUnit()) {
             m_midiFile->addTimeSignature(m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetUnit());
         }
+        else if (meterSig && meterSig->HasUnit()) {
+            m_midiFile->addTimeSignature(
+                m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetSymImplicitUnit());
+        }
     }
 
     return FUNCTOR_CONTINUE;
@@ -951,11 +972,11 @@ void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)
 
         /*********** start values ***********/
 
-        TimemapEntry &startEntry = m_timemap->GetEntry(realTimeStart);
+        TimemapEntry &startEntry = m_timemap->GetEntry(scoreTimeStart);
 
         // Should check if value for realTimeStart already exists and if so, then
         // ensure that it is equal to scoreTimeStart:
-        startEntry.qstamp = scoreTimeStart.ToDouble();
+        startEntry.tstamp = realTimeStart;
 
         // Store the element ID in list to turn on at given time - note or rest
         if (!isRest) startEntry.notesOn.push_back(object->GetID());
@@ -966,11 +987,11 @@ void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)
 
         /*********** end values ***********/
 
-        TimemapEntry &endEntry = m_timemap->GetEntry(realTimeEnd);
+        TimemapEntry &endEntry = m_timemap->GetEntry(scoreTimeEnd);
 
         // Should check if value for realTimeEnd already exists and if so, then
         // ensure that it is equal to scoreTimeEnd:
-        endEntry.qstamp = scoreTimeEnd.ToDouble();
+        endEntry.tstamp = realTimeEnd;
 
         // Store the element ID in list to turn off at given time - notes or rest
         if (!isRest) endEntry.notesOff.push_back(object->GetID());
@@ -985,11 +1006,11 @@ void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)
         Fraction scoreTimeStart = m_scoreTimeOffset;
         double realTimeStart = round(m_realTimeOffsetMilliseconds);
 
-        TimemapEntry &startEntry = m_timemap->GetEntry(realTimeStart);
+        TimemapEntry &startEntry = m_timemap->GetEntry(scoreTimeStart);
 
         // Should check if value for realTimeStart already exists and if so, then
         // ensure that it is equal to scoreTimeStart:
-        startEntry.qstamp = scoreTimeStart.ToDouble();
+        startEntry.tstamp = realTimeStart;
 
         // Add the measureOn
         startEntry.measureOn = measure->GetID();

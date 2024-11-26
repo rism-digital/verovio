@@ -32,7 +32,7 @@ jobs:
   ###################################################
   build_python:
     name: Build the test suite
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: FranzDiebold/github-env-vars-action@v2.8.0
@@ -62,7 +62,7 @@ jobs:
           mkdir -p ${{ env.OUTPUT_DIR }}
           ls -alh
           ls -alh ${{ env.OUTPUT_DIR }}
-          sudo apt-get install openresolv wireguard
+          sudo apt-get install wireguard
           sudo echo "${{ secrets.VPN_CONFIGURATION }}" > wg0.conf
           python3 -m pip install diffimg jsondiff lxml xmldiff cairosvg
 
