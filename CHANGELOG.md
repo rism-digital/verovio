@@ -1,5 +1,21 @@
 # Changelog
 
+## [unreleased]
+
+## [4.4.0] – 2024-11-25
+* Support for CMME import
+* Support for conversion from mensural to CMN (with `--mensural-to-cmn`)
+* Improved mensural cast-off (without `barLine`)
+* Improved justification of last / single pages (@brdvd)
+* Improved performance by optimizing glyph lookup (@brdvd)
+* Improved facsimile rendering
+* Connection of ledger lines to notes or accidentals with `--svg-html5`
+* Refactoring of internal time alignment using fraction instead of double
+* Option `--timemap` for controlling the time map from the command-line
+* Option `--mensural-to-measure` renamed `--mensural-to-cmn`
+* Option `--duration-equivalence` (`brevis`, `semibrevis` or `minima`) for mensural alignment
+* Option `--mensural-responsive-view` for cast-off on simplified encoding
+
 ## [4.3.1] - 2024-09-10
 * Fix JS builds (JavaScript release only)
 

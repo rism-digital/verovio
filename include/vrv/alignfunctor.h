@@ -12,9 +12,6 @@
 
 namespace vrv {
 
-class Mensur;
-class MeterSig;
-
 //----------------------------------------------------------------------------
 // AlignMeterParams
 //----------------------------------------------------------------------------
@@ -22,8 +19,11 @@ class MeterSig;
  * Regroup pointers to meterSig, mensur and proport objects
  */
 struct AlignMeterParams {
-    const MeterSig *meterSig;
-    const Mensur *mensur;
+    const MeterSig *meterSig = NULL;
+    const Mensur *mensur = NULL;
+    // Not const since we are cumulating proportion
+    Proport *proport = NULL;
+    data_DURATION equivalence = DURATION_brevis;
 };
 
 //----------------------------------------------------------------------------
@@ -180,6 +180,7 @@ public:
     FunctorCode VisitRunningElement(RunningElement *runningElement) override;
     FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitStaffAlignmentEnd(StaffAlignment *staffAlignment) override;
+    FunctorCode VisitSyllable(Syllable *syllable) override;
     FunctorCode VisitSystem(System *system) override;
     FunctorCode VisitSystemEnd(System *system) override;
     FunctorCode VisitVerse(Verse *verse) override;

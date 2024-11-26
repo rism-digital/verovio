@@ -132,7 +132,7 @@ NeumeGroup Neume::GetNeumeGroup() const
         previous = current;
     }
 
-    if (s_neumes.count(key) > 0) {
+    if (s_neumes.contains(key)) {
         return s_neumes.at(key);
     }
     else {

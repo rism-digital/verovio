@@ -1872,6 +1872,9 @@ enum bracketSpanLog_FUNC : int8_t {
     bracketSpanLog_FUNC_coloration,
     bracketSpanLog_FUNC_cross_rhythm,
     bracketSpanLog_FUNC_ligature,
+    bracketSpanLog_FUNC_analytical,
+    bracketSpanLog_FUNC_phrase,
+    bracketSpanLog_FUNC_uspecified,
     bracketSpanLog_FUNC_MAX
 };
 

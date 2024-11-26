@@ -32,6 +32,7 @@
 #include "doc.h"
 #include "dot.h"
 #include "elementpart.h"
+#include "fraction.h"
 #include "ftrem.h"
 #include "functor.h"
 #include "horizontalaligner.h"
@@ -50,6 +51,7 @@
 #include "neume.h"
 #include "note.h"
 #include "page.h"
+#include "proport.h"
 #include "rest.h"
 #include "slur.h"
 #include "smufl.h"
@@ -676,6 +678,18 @@ Fraction LayerElement::GetAlignmentDuration(
         return Fraction(0, 1);
     }
 
+    // Mensural chords are aligned looking at the duration of the notes
+    if (this->Is(CHORD) && IsMensuralType(notationType)) {
+        Fraction duration = 0;
+        ListOfConstObjects notes = this->FindAllDescendantsByType(NOTE);
+        for (const Object *object : notes) {
+            const Note *note = vrv_cast<const Note *>(object);
+            Fraction noteDuration = note->GetAlignmentDuration(params, notGraceOnly, notationType);
+            duration = std::max(duration, noteDuration);
+        }
+        return duration;
+    }
+
     // Only resolve simple sameas links to avoid infinite recursion
     const LayerElement *sameas = dynamic_cast<const LayerElement *>(this->GetSameasLink());
     if (sameas && !sameas->HasSameasLink()) {
@@ -685,6 +699,13 @@ Fraction LayerElement::GetAlignmentDuration(
     if (this->HasInterface(INTERFACE_DURATION)) {
         int num = 1;
         int numbase = 1;
+
+        if (params.proport) {
+            // Proportion are applied reversly - higher ratio means shorter values
+            if (params.proport->HasNum()) num *= params.proport->GetCumulatedNum();
+            if (params.proport->HasNumbase()) numbase *= params.proport->GetCumulatedNumbase();
+        }
+
         const Tuplet *tuplet = vrv_cast<const Tuplet *>(this->GetFirstAncestor(TUPLET, MAX_TUPLET_DEPTH));
         if (tuplet) {
             ListOfConstObjects objects;
@@ -701,7 +722,7 @@ Fraction LayerElement::GetAlignmentDuration(
         const DurationInterface *duration = this->GetDurationInterface();
         assert(duration);
         if (duration->IsMensuralDur() && (notationType != NOTATIONTYPE_cmn)) {
-            return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, params.mensur);
+            return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, params.mensur, params.equivalence);
         }
         if (this->Is(NC)) {
             // This is called only with --neume-as-note
@@ -763,8 +784,6 @@ Fraction LayerElement::GetAlignmentDuration(
 Fraction LayerElement::GetAlignmentDuration(bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     AlignMeterParams params;
-    params.meterSig = NULL;
-    params.mensur = NULL;
     return this->GetAlignmentDuration(params, notGraceOnly, notationType);
 }
 
@@ -806,8 +825,6 @@ Fraction LayerElement::GetContentAlignmentDuration(
 Fraction LayerElement::GetContentAlignmentDuration(bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     AlignMeterParams params;
-    params.meterSig = NULL;
-    params.mensur = NULL;
     return this->GetContentAlignmentDuration(params, notGraceOnly, notationType);
 }
 
@@ -977,79 +994,6 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
     // Count dots to decide which set is used
     const bool usePrimary = (this->GetDotCount(dotLocs1) >= this->GetDotCount(dotLocs2));
     return usePrimary ? dotLocs1 : dotLocs2;
-}
-
-int LayerElement::CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2)
-{
-    Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    if (!parentLayer) return 0;
-    // Check whether there are elements on other layer in the duration of the current beam. If there are none - stop
-    // here, there's nothing to be done
-    ListOfObjects collidingElementsList = parentLayer->GetLayerElementsForTimeSpanOf(this, true);
-    if (collidingElementsList.empty()) return 0;
-
-    Staff *staff = this->GetAncestorStaff();
-
-    const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    int leftMargin = 0;
-    int rightMargin = 0;
-    bool sameDirElement = false;
-    std::vector<int> elementOverlaps;
-    for (Object *object : collidingElementsList) {
-        LayerElement *layerElement = vrv_cast<LayerElement *>(object);
-        if (!this->HorizontalContentOverlap(object)) continue;
-        const int elementBottom = layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize);
-        const int elementTop = layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize);
-        if (direction > 0) {
-            // make sure that there's actual overlap first
-            if ((elementBottom > y1) && (elementBottom > y2)) continue;
-            const int currentBottom = this->GetDrawingBottom(doc, staff->m_drawingStaffSize);
-            if (currentBottom >= elementTop) continue;
-            const StemmedDrawingInterface *stemInterface = layerElement->GetStemmedDrawingInterface();
-            if (stemInterface && (sameDirElement || (stemInterface->GetDrawingStemDir() == STEMDIRECTION_up))) {
-                if (elementBottom - stemInterface->GetDrawingStemLen() < currentBottom) continue;
-                leftMargin = unit + y1 - elementBottom;
-                rightMargin = unit + y2 - elementBottom;
-                sameDirElement = true;
-            }
-            else {
-                leftMargin = elementTop - y1;
-                rightMargin = elementTop - y2;
-            }
-        }
-        else {
-            // make sure that there's actual overlap first
-            if ((elementTop < y1) && (elementTop < y2)) continue;
-            const int currentTop = this->GetDrawingTop(doc, staff->m_drawingStaffSize);
-            if (currentTop <= elementBottom) continue;
-            const StemmedDrawingInterface *stemInterface = layerElement->GetStemmedDrawingInterface();
-            if (stemInterface && (sameDirElement || (stemInterface->GetDrawingStemDir() == STEMDIRECTION_down))) {
-                if (currentTop - stemInterface->GetDrawingStemLen() > currentTop) continue;
-                leftMargin = unit + y1 - elementTop;
-                rightMargin = unit + y2 - elementTop;
-                sameDirElement = true;
-            }
-            else {
-                leftMargin = elementBottom - y1;
-                rightMargin = elementBottom - y2;
-            }
-        }
-        elementOverlaps.emplace_back(std::max(leftMargin * direction, rightMargin * direction));
-    }
-    if (elementOverlaps.empty()) return 0;
-
-    const auto maxOverlap = std::max_element(elementOverlaps.begin(), elementOverlaps.end());
-    int overlap = 0;
-    if (*maxOverlap >= 0) {
-        const int multiplier = sameDirElement ? -1 : 1;
-        overlap = ((*maxOverlap == 0) ? unit : *maxOverlap) * direction * multiplier;
-    }
-    else {
-        int maxShorteningInHalfUnits = (std::abs(*maxOverlap) / unit) * 2;
-        if (maxShorteningInHalfUnits > 0) --maxShorteningInHalfUnits;
-        this->SetElementShortening(maxShorteningInHalfUnits);
-    }
-    return overlap;
 }
 
 data_STEMMODIFIER LayerElement::GetDrawingStemMod() const

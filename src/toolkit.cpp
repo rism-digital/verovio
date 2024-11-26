@@ -27,6 +27,7 @@
 #include "filereader.h"
 #include "findfunctor.h"
 #include "ioabc.h"
+#include "iocmme.h"
 #include "iodarms.h"
 #include "iohumdrum.h"
 #include "iomei.h"
@@ -134,7 +135,7 @@ bool Toolkit::SetResourcePath(const std::string &path)
         success = success && this->SetFont(m_options->m_font.GetValue());
     }
     if (m_options->m_fontFallback.IsSet()) {
-        success = success && resources.SetFallback(m_options->m_fontFallback.GetStrValue());
+        resources.SetFallbackFont(m_options->m_fontFallback.GetStrValue());
     }
     if (m_options->m_fontLoadAll.IsSet()) {
         success = success && resources.LoadAll();
@@ -212,6 +213,9 @@ bool Toolkit::SetInputFrom(std::string const &inputFrom)
     }
     else if (inputFrom == "volpiano") {
         m_inputFrom = VOLPIANO;
+    }
+    else if (inputFrom == "cmme.xml") {
+        m_inputFrom = CMME;
     }
     else if ((inputFrom == "humdrum") || (inputFrom == "hum")) {
         m_inputFrom = HUMDRUM;
@@ -303,6 +307,9 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         if (std::regex_search(initial, std::regex("<(!DOCTYPE )?(score-partwise|opus|score-timewise)[\\s\\n>]"))) {
             return musicxmlDefault;
         }
+        if (std::regex_search(initial, std::regex("<(Piece xmlns=\"http://www.cmme.org\")[\\s\\n>]"))) {
+            return CMME;
+        }
         LogWarning("Warning: Trying to load unknown XML data which cannot be identified.");
         return UNKNOWN;
     }
@@ -375,7 +382,7 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
     /// Loading a UTF-16 file with basic conversion ot UTF-8
     /// This is called after checking if the file has a UTF-16 BOM
 
-    LogWarning("The file seems to be UTF-16 - trying to convert to UTF-8");
+    LogInfo("The file seems to be UTF-16 - trying to convert to UTF-8");
 
     std::ifstream fin(filename.c_str(), std::ios::in | std::ios::binary);
     if (!fin.is_open()) {
@@ -393,7 +400,7 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
 
     // order of the bytes has to be flipped
     if (u16data.at(0) == u'\uFFFE') {
-        LogWarning("The file seems to have been loaded as little endian - trying to convert to big endian");
+        LogInfo("The file seems to have been loaded as little endian - trying to convert to big endian");
         // convert to big endian (swap bytes)
         std::transform(std::begin(u16data), std::end(u16data), std::begin(u16data), [](char16_t c) {
             auto p = reinterpret_cast<char *>(&c);
@@ -570,6 +577,13 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     }
     else if (inputFormat == VOLPIANO) {
         input = new VolpianoInput(&m_doc);
+    }
+    else if (inputFormat == CMME) {
+        if (m_options->m_durationEquivalence.GetValue() != DURATION_EQ_minima) {
+            LogWarning("CMME input uses 'minima' duration equivalence, changing the option accordingly.");
+            m_options->m_durationEquivalence.SetValue(DURATION_EQ_minima);
+        }
+        input = new CmmeInput(&m_doc);
     }
 #ifndef NO_HUMDRUM_SUPPORT
     else if (inputFormat == HUMDRUM) {
@@ -818,7 +832,15 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
 
     // Convert pseudo-measures into distinct segments based on barLine elements
     if (m_doc.IsMensuralMusicOnly()) {
-        m_doc.ConvertToCastOffMensuralDoc(true);
+        if (m_options->m_mensuralResponsiveView.GetValue()) {
+            m_doc.ConvertToMensuralViewDoc();
+        }
+        else if (m_options->m_mensuralToCmn.GetValue()) {
+            m_doc.ConvertToCmnDoc();
+        }
+        else {
+            m_doc.ConvertToCastOffMensuralDoc(true);
+        }
     }
 
     // Do the layout? this depends on the options and the file. PAE and
@@ -1290,7 +1312,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
     }
     if (json.has<jsonxx::String>("fontFallback")) {
         Resources &resources = m_doc.GetResourcesForModification();
-        resources.SetFallback(m_options->m_fontFallback.GetStrValue());
+        resources.SetFallbackFont(m_options->m_fontFallback.GetStrValue());
     }
     if (json.has<jsonxx::Boolean>("fontLoadAll")) {
         Resources &resources = m_doc.GetResourcesForModification();
@@ -1506,10 +1528,9 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     element->GetAttributes(&attributes);
 
     // Fill the JSON object
-    ArrayOfStrAttr::iterator iter;
-    for (iter = attributes.begin(); iter != attributes.end(); ++iter) {
-        o << (*iter).first << (*iter).second;
-        // LogInfo("Element %s - %s", (*iter).first.c_str(), (*iter).second.c_str());
+    for (const auto &attribute : attributes) {
+        o << attribute.first << attribute.second;
+        // LogInfo("Element %s - %s", attribute.first.c_str(), attribute.second.c_str());
     }
     return o.json();
 }
@@ -1827,9 +1848,7 @@ std::string Toolkit::RenderToMIDI()
     this->ResetLogBuffer();
 
     smf::MidiFile outputfile;
-    outputfile.absoluteTicks();
     m_doc.ExportMIDI(&outputfile);
-    outputfile.sortTracks();
 
     std::stringstream stream;
     outputfile.write(stream);
@@ -1875,6 +1894,7 @@ std::string Toolkit::RenderToTimemap(const std::string &jsonOptions)
 {
     bool includeMeasures = false;
     bool includeRests = false;
+    bool useFractions = false;
 
     jsonxx::Object json;
 
@@ -1887,13 +1907,14 @@ std::string Toolkit::RenderToTimemap(const std::string &jsonOptions)
             if (json.has<jsonxx::Boolean>("includeMeasures"))
                 includeMeasures = json.get<jsonxx::Boolean>("includeMeasures");
             if (json.has<jsonxx::Boolean>("includeRests")) includeRests = json.get<jsonxx::Boolean>("includeRests");
+            if (json.has<jsonxx::Boolean>("useFractions")) useFractions = json.get<jsonxx::Boolean>("useFractions");
         }
     }
 
     this->ResetLogBuffer();
 
     std::string output;
-    m_doc.ExportTimemap(output, includeRests, includeMeasures);
+    m_doc.ExportTimemap(output, includeRests, includeMeasures, useFractions);
     return output;
 }
 
@@ -1941,6 +1962,8 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     ListOfObjects chords;
 
     measure->FindAllDescendantsByComparison(&notesOrRests, &matchTime);
+    ClassIdsComparison mRestComparison({ MULTIREST, MREST });
+    measure->FindAllDescendantsByComparison(&notesOrRests, &mRestComparison, UNLIMITED_DEPTH, FORWARD, false);
 
     // Fill the JSON object
     for (Object *object : notesOrRests) {
@@ -1951,7 +1974,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
             Chord *chord = note->IsChordTone();
             if (chord) chords.push_back(chord);
         }
-        else if (object->Is(REST)) {
+        else if (object->Is({ MREST, MULTIREST, REST })) {
             restArray << object->GetID();
         }
     }
@@ -1974,9 +1997,7 @@ bool Toolkit::RenderToMIDIFile(const std::string &filename)
     this->ResetLogBuffer();
 
     smf::MidiFile outputfile;
-    outputfile.absoluteTicks();
     m_doc.ExportMIDI(&outputfile);
-    outputfile.sortTracks();
     outputfile.write(filename);
 
     return true;

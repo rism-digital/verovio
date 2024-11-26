@@ -59,6 +59,7 @@ Resources::Resources()
 
 bool Resources::InitFonts()
 {
+    m_cachedGlyph.reset();
     m_loadedFonts.clear();
 
     // Font Bravura first. As it is expected to have always all symbols we build the code -> name table from it
@@ -95,7 +96,9 @@ bool Resources::InitFonts()
 
 bool Resources::SetFont(const std::string &fontName)
 {
-    // and the default font provided in options, if it is not one of the previous
+    m_cachedGlyph.reset();
+
+    // add the default font provided in options, if it is not one of the previous
     if (!fontName.empty() && !IsFontLoaded(fontName)) {
         if (!LoadFont(fontName)) {
             LogError("%s font could not be loaded.", fontName.c_str());
@@ -132,28 +135,30 @@ bool Resources::AddCustom(const std::vector<std::string> &extraFonts)
 
 bool Resources::LoadAll()
 {
-    bool success = true;
     std::string path = Resources::GetPath() + "/";
-    for (const std::filesystem::directory_entry &entry : std::filesystem::directory_iterator(path)) {
-        const std::filesystem::path path = entry.path();
-        if (path.has_extension() && path.has_stem() && path.extension() == ".xml") {
-            const std::string fontName = path.stem().string();
-            if (!IsFontLoaded(fontName)) {
-                success = success && LoadFont(fontName);
+    return std::ranges::all_of(
+        std::filesystem::directory_iterator(path), [this](const std::filesystem::directory_entry &entry) {
+            const std::filesystem::path &path = entry.path();
+            if (path.has_extension() && path.has_stem() && path.extension() == ".xml") {
+                const std::string fontName = path.stem().string();
+                if (!this->IsFontLoaded(fontName) && !this->LoadFont(fontName)) {
+                    return false;
+                }
             }
-        }
-    }
-    return success;
+            return true;
+        });
 }
 
-bool Resources::SetFallback(const std::string &fontName)
+void Resources::SetFallbackFont(const std::string &fontName)
 {
+    m_cachedGlyph.reset();
     m_fallbackFontName = fontName;
-    return true;
 }
 
 bool Resources::SetCurrentFont(const std::string &fontName, bool allowLoading)
 {
+    m_cachedGlyph.reset();
+
     if (IsFontLoaded(fontName)) {
         m_currentFontName = fontName;
         return true;
@@ -162,33 +167,47 @@ bool Resources::SetCurrentFont(const std::string &fontName, bool allowLoading)
         m_currentFontName = fontName;
         return true;
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 const Glyph *Resources::GetGlyph(char32_t smuflCode) const
 {
-    if (GetCurrentGlyphTable().contains(smuflCode)) {
-        return &GetCurrentGlyphTable().at(smuflCode);
+    if (m_cachedGlyph && m_cachedGlyph->first == smuflCode) {
+        return m_cachedGlyph->second;
+    }
+
+    const GlyphTable &currentTable = this->GetCurrentGlyphTable();
+    if (auto glyphIter = currentTable.find(smuflCode); glyphIter != currentTable.end()) {
+        const Glyph *glyph = &glyphIter->second;
+        m_cachedGlyph = std::make_pair(glyphIter->first, glyph);
+        return glyph;
     }
     else if (!this->IsCurrentFontFallback()) {
         const GlyphTable &fallbackTable = this->GetFallbackGlyphTable();
-        return (fallbackTable.contains(smuflCode)) ? &fallbackTable.at(smuflCode) : NULL;
+        if (auto glyphIter = fallbackTable.find(smuflCode); glyphIter != fallbackTable.end()) {
+            const Glyph *glyph = &glyphIter->second;
+            m_cachedGlyph = std::make_pair(glyphIter->first, glyph);
+            return glyph;
+        }
     }
-    else {
-        return NULL;
-    }
+    return NULL;
 }
 
 const Glyph *Resources::GetGlyph(const std::string &smuflName) const
 {
-    return (this->GetGlyphCode(smuflName)) ? &GetCurrentGlyphTable().at(this->GetGlyphCode(smuflName)) : NULL;
+    if (const char32_t code = this->GetGlyphCode(smuflName); code) {
+        return this->GetGlyph(code);
+    }
+    return NULL;
 }
 
 char32_t Resources::GetGlyphCode(const std::string &smuflName) const
 {
-    return m_glyphNameTable.contains(smuflName) ? m_glyphNameTable.at(smuflName) : 0;
+    if (auto glyphNameIter = m_glyphNameTable.find(smuflName); glyphNameIter != m_glyphNameTable.end()) {
+        return glyphNameIter->second;
+    }
+    return 0;
 }
 
 bool Resources::IsSmuflFallbackNeeded(const std::u32string &text) const
@@ -214,12 +233,7 @@ bool Resources::FontHasGlyphAvailable(const std::string &fontName, char32_t smuf
     }
 
     const GlyphTable &table = m_loadedFonts.at(fontName).GetGlyphTable();
-    if (table.find(smuflCode) != table.end()) {
-        return true;
-    }
-    else {
-        return false;
-    }
+    return (table.find(smuflCode) != table.end());
 }
 
 std::string Resources::GetCSSFontFor(const std::string &fontName) const
@@ -260,7 +274,7 @@ void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontSt
     }
 
     m_currentStyle = { fontWeight, fontStyle };
-    if (m_textFont.count(m_currentStyle) == 0) {
+    if (!m_textFont.contains(m_currentStyle)) {
         LogWarning("Text font for style (%d, %d) is not loaded. Use default", fontWeight, fontStyle);
         m_currentStyle = k_defaultStyle;
     }
@@ -268,11 +282,11 @@ void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontSt
 
 const Glyph *Resources::GetTextGlyph(char32_t code) const
 {
-    const StyleAttributes style = (m_textFont.count(m_currentStyle) != 0) ? m_currentStyle : k_defaultStyle;
-    if (m_textFont.count(style) == 0) return NULL;
+    const StyleAttributes style = m_textFont.contains(m_currentStyle) ? m_currentStyle : k_defaultStyle;
+    if (!m_textFont.contains(style)) return NULL;
 
     const GlyphTable &currentTable = m_textFont.at(style);
-    if (currentTable.count(code) == 0) {
+    if (!currentTable.contains(code)) {
         return NULL;
     }
 
@@ -414,7 +428,7 @@ bool Resources::InitTextFont(const std::string &fontName, const StyleAttributes 
     }
     const int unitsPerEm = root.attribute("units-per-em").as_int();
     pugi::xml_node current;
-    if (m_textFont.count(style) == 0) {
+    if (!m_textFont.contains(style)) {
         m_textFont[style] = {};
     }
     GlyphTable &currentTable = m_textFont.at(style);
@@ -433,7 +447,7 @@ bool Resources::InitTextFont(const std::string &fontName, const StyleAttributes 
             glyph.SetBoundingBox(x, y, width, height);
 
             if (current.attribute("h-a-x")) glyph.SetHorizAdvX(current.attribute("h-a-x").as_float());
-            if (currentTable.count(code) > 0) {
+            if (currentTable.contains(code)) {
                 LogDebug("Redefining %d with %s", code, fontName.c_str());
             }
             currentTable[code] = glyph;

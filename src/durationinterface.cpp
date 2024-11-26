@@ -93,7 +93,7 @@ Fraction DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase) 
 }
 
 Fraction DurationInterface::GetInterfaceAlignmentMensuralDuration(
-    int num, int numBase, const Mensur *currentMensur) const
+    int num, int numBase, const Mensur *currentMensur, data_DURATION equivalence) const
 {
     data_DURATION noteDur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
     if (noteDur == DURATION_NONE) noteDur = DURATION_4;
@@ -136,9 +136,24 @@ Fraction DurationInterface::GetInterfaceAlignmentMensuralDuration(
     } // Any other case (minor, perfecta in tempus perfectum, and imperfecta in tempus imperfectum) follows the
       // mensuration and has no @num and @numbase attributes
 
-    if (currentMensur->HasNum()) num *= currentMensur->GetNum();
-    if (currentMensur->HasNumbase()) numBase *= currentMensur->GetNumbase();
+    Fraction duration;
+    if (equivalence == DURATION_minima) {
+        duration = this->DurationWithMinimaEquivalence(num, numBase, currentMensur, noteDur);
+    }
+    else if (equivalence == DURATION_semibrevis) {
+        duration = this->DurationWithSemibrevisEquivalence(num, numBase, currentMensur, noteDur);
+    }
+    else {
+        duration = this->DurationWithBrevisEquivalence(num, numBase, currentMensur, noteDur);
+    }
+    duration = duration * numBase / num;
 
+    return duration;
+}
+
+Fraction DurationInterface::DurationWithBrevisEquivalence(
+    int num, int numBase, const Mensur *currentMensur, data_DURATION noteDur) const
+{
     int ratio = 0;
     Fraction duration(DURATION_breve);
     switch (noteDur) {
@@ -149,13 +164,52 @@ Fraction DurationInterface::GetInterfaceAlignmentMensuralDuration(
         case DURATION_breve: break;
         case DURATION_1: duration = duration / abs(currentMensur->GetTempus()); break;
         default:
+            // ratio will be 1 for DURATION_2 (minima) where we apply the tempus and the prolatio
             ratio = pow(2.0, (double)(noteDur - DURATION_2));
             assert(ratio);
             duration = duration / abs(currentMensur->GetTempus()) / abs(currentMensur->GetProlatio()) / ratio;
             break;
     }
-    duration = duration * numBase / num;
+    return duration;
+}
 
+Fraction DurationInterface::DurationWithSemibrevisEquivalence(
+    int num, int numBase, const Mensur *currentMensur, data_DURATION noteDur) const
+{
+    int ratio = 0;
+    Fraction duration(DURATION_1);
+    switch (noteDur) {
+        case DURATION_maxima: duration = duration * abs(currentMensur->GetModusmaior());
+        case DURATION_long: duration = duration * abs(currentMensur->GetModusminor());
+        case DURATION_breve: duration = duration * abs(currentMensur->GetTempus());
+        case DURATION_1: break;
+        default:
+            // ratio will be 1 for DURATION_2 (minima) where we apply the prolatio
+            ratio = pow(2.0, (double)(noteDur - DURATION_2));
+            assert(ratio);
+            duration = duration / abs(currentMensur->GetProlatio()) / ratio;
+            break;
+    }
+    return duration;
+}
+
+Fraction DurationInterface::DurationWithMinimaEquivalence(
+    int num, int numBase, const Mensur *currentMensur, data_DURATION noteDur) const
+{
+    int ratio = 0;
+    Fraction duration(DURATION_2);
+    switch (noteDur) {
+        case DURATION_maxima: duration = duration * abs(currentMensur->GetModusmaior());
+        case DURATION_long: duration = duration * abs(currentMensur->GetModusminor());
+        case DURATION_breve: duration = duration * abs(currentMensur->GetTempus());
+        case DURATION_1: duration = duration * abs(currentMensur->GetProlatio()); break;
+        default:
+            // ratio will be 1 for DURATION_2 (minima)
+            ratio = pow(2.0, (double)(noteDur - DURATION_2));
+            assert(ratio);
+            duration = duration / ratio;
+            break;
+    }
     return duration;
 }
 

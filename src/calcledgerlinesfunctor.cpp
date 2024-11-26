@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "dot.h"
 #include "note.h"
 #include "staff.h"
 
@@ -21,6 +22,21 @@ namespace vrv {
 
 CalcLedgerLinesFunctor::CalcLedgerLinesFunctor(Doc *doc) : DocFunctor(doc) {}
 
+FunctorCode CalcLedgerLinesFunctor::VisitAccid(Accid *accid)
+{
+    if (accid->GetFirstAncestor(NOTE)) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    Staff *staff = accid->GetAncestorStaff();
+
+    const int width = m_doc->GetGlyphWidth(Accid::GetAccidGlyph(accid->GetAccid()), staff->m_drawingStaffSize, false);
+
+    this->CalcForLayerElement(accid, width, HORIZONTALALIGNMENT_center);
+
+    return FUNCTOR_SIBLINGS;
+}
+
 FunctorCode CalcLedgerLinesFunctor::VisitNote(Note *note)
 {
     if (note->GetVisible() == BOOLEAN_false) {
@@ -31,31 +47,47 @@ FunctorCode CalcLedgerLinesFunctor::VisitNote(Note *note)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = note->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-    const int staffSize = staff->m_drawingStaffSize;
-    const int staffX = staff->GetDrawingX();
-    const bool drawingCueSize = note->GetDrawingCueSize();
     const int radius = note->GetDrawingRadius(m_doc);
 
-    /************** Ledger lines: **************/
+    this->CalcForLayerElement(note, 2 * radius, HORIZONTALALIGNMENT_left);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+void CalcLedgerLinesFunctor::CalcForLayerElement(
+    LayerElement *layerElement, int width, data_HORIZONTALALIGNMENT alignment)
+{
+    Staff *staff = layerElement->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+    assert(staff);
+
+    const int staffSize = staff->m_drawingStaffSize;
+    const int staffX = staff->GetDrawingX();
+    const bool drawingCueSize = layerElement->GetDrawingCueSize();
 
     int linesAbove = 0;
     int linesBelow = 0;
 
-    if (!note->HasLedgerLines(linesAbove, linesBelow, staff)) return FUNCTOR_SIBLINGS;
+    PositionInterface *interface = layerElement->GetPositionInterface();
+    assert(interface);
+
+    if (!interface->HasLedgerLines(linesAbove, linesBelow, staff)) return;
 
     const int extension = m_doc->GetDrawingLedgerLineExtension(staffSize, drawingCueSize);
-    const int left = note->GetDrawingX() - extension - staffX;
-    int right = note->GetDrawingX() + 2 * radius + extension - staffX;
+    int left = layerElement->GetDrawingX() - extension - staffX;
+    int right = layerElement->GetDrawingX() + width + extension - staffX;
 
+    if (alignment == HORIZONTALALIGNMENT_center) {
+        right -= width / 2;
+        left -= width / 2;
+    }
+
+    const LayerElement *event = (m_doc->GetOptions()->m_svgHtml5.GetValue()) ? layerElement : NULL;
     if (linesAbove > 0) {
-        staff->AddLedgerLineAbove(linesAbove, left, right, extension, drawingCueSize);
+        staff->AddLedgerLineAbove(linesAbove, left, right, extension, drawingCueSize, event);
     }
     else {
-        staff->AddLedgerLineBelow(linesBelow, left, right, extension, drawingCueSize);
+        staff->AddLedgerLineBelow(linesBelow, left, right, extension, drawingCueSize, event);
     }
-
-    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode CalcLedgerLinesFunctor::VisitStaffEnd(Staff *staff)
@@ -90,15 +122,14 @@ void CalcLedgerLinesFunctor::AdjustLedgerLines(
     // For each dash on the inner line (both cue and normal) we construct an adjustment with zero delta
     // and sort them
     std::vector<Adjustment> adjustments;
-    using DashType = std::pair<int, int>;
     if (!lines.empty()) {
-        for (const DashType &dash : lines.at(0).m_dashes) {
-            adjustments.push_back({ dash.first, dash.second, false, 0 });
+        for (const LedgerLine::Dash &dash : lines.at(0).m_dashes) {
+            adjustments.push_back({ dash.m_x1, dash.m_x2, false, 0 });
         }
     }
     if (!cueLines.empty()) {
-        for (const DashType &dash : cueLines.at(0).m_dashes) {
-            adjustments.push_back({ dash.first, dash.second, true, 0 });
+        for (const LedgerLine::Dash &dash : cueLines.at(0).m_dashes) {
+            adjustments.push_back({ dash.m_x1, dash.m_x2, true, 0 });
         }
     }
 
@@ -144,13 +175,13 @@ void CalcLedgerLinesFunctor::AdjustLedgerLines(
         if (adjustment.delta > 0) {
             ArrayOfLedgerLines &linesToAdjust = adjustment.isCue ? cueLines : lines;
             for (LedgerLine &line : linesToAdjust) {
-                std::list<DashType>::iterator iterDash
-                    = std::find_if(line.m_dashes.begin(), line.m_dashes.end(), [&adjustment](const DashType &dash) {
-                          return ((dash.first >= adjustment.left) && (dash.second <= adjustment.right));
-                      });
+                std::list<LedgerLine::Dash>::iterator iterDash = std::find_if(
+                    line.m_dashes.begin(), line.m_dashes.end(), [&adjustment](const LedgerLine::Dash &dash) {
+                        return ((dash.m_x1 >= adjustment.left) && (dash.m_x2 <= adjustment.right));
+                    });
                 if (iterDash != line.m_dashes.end()) {
-                    iterDash->first += adjustment.delta;
-                    iterDash->second -= adjustment.delta;
+                    iterDash->m_x1 += adjustment.delta;
+                    iterDash->m_x2 -= adjustment.delta;
                 }
             }
         }
