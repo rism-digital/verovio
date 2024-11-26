@@ -75,7 +75,7 @@ int PositionInterface::CalcDrawingLoc(const Layer *layer, const LayerElement *el
 bool PositionInterface::HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff) const
 {
     if (!staff) return false;
-    
+
     if (staff->IsTabLuteFrench() || staff->IsTabLuteGerman() || staff->IsTabLuteItalian()) {
         // French and German tablature do not use ledger lines.
         // Italian tablature does use a single ledger line for 7th course, and compressed
