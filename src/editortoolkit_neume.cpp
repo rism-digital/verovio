@@ -4252,11 +4252,10 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             LogError("Clef %s does not have valid shape. Shape is %s", clef->GetID().c_str(), clef->GetShape());
             return false;
         }
-        pi->SetOct(3);
 
-        // The default octave = 3, but the actual octave is calculated by
+        // The default octave = 4, but the actual octave is calculated by
         // taking into account the displacement of the clef
-        int octave = 3;
+        int octave = 4;
         if (clef->GetDis() && clef->GetDisPlace()) {
             octave += (clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1) * (clef->GetDis() / 7);
         }
@@ -4323,9 +4322,9 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             assert(pi);
             pi->SetPname(pname);
 
-            // The default octave = 3, but the actual octave is calculated by
+            // The default octave = 4, but the actual octave is calculated by
             // taking into account the displacement of the clef
-            int octave = 3;
+            int octave = 4;
             if (clef->GetDis() && clef->GetDisPlace()) {
                 octave += (clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1) * (clef->GetDis() / 7);
             }
