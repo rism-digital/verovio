@@ -24,7 +24,7 @@ FILES="$SRCFILES \
  ../../src/json/jsonxx.cc \
  ../../src/crc/crc.cpp"
 
-CXXOPTS="-g -fpic -std=c++17 -I../../include -I../../include/vrv -I../../include/json -I../../include/hum -I../../include/crc -I../../include/midi -I../../include/pugi -I../../include/zip -I../../libmei/addons -I../../libmei/dist -I/opt/local/include/ "
+CXXOPTS="-g -fpic -std=c++20 -I../../include -I../../include/vrv -I../../include/json -I../../include/hum -I../../include/crc -I../../include/midi -I../../include/pugi -I../../include/zip -I../../libmei/addons -I../../libmei/dist -I/opt/local/include/ "
 
 PATHS=""
 unamestr=$(uname)
