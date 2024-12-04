@@ -4226,24 +4226,31 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             return false;
         }
 
+        int clefOffset = 0;
         if (clef == NULL) {
             ClassIdComparison ac(CLEF);
             clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
+            int clefOffset = 0;
             if (clef == NULL) {
-                Layer *layer = vrv_cast<Layer *>(staff->FindDescendantByType(LAYER));
-                assert(layer);
-                clef = layer->GetCurrentClef();
+                ClassIdComparison ac(CLEF);
+                clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
+                if (clef == NULL) {
+                    Layer *layer = vrv_cast<Layer *>(staff->FindDescendantByType(LAYER));
+                    assert(layer);
+                    clef = layer->GetCurrentClef();
+                }
+                else {
+                    Staff *clefStaff = dynamic_cast<Staff *>(clef->GetFirstAncestor(STAFF));
+                    assert(clefStaff);
+                    clefOffset = round((double)(clefStaff->GetDrawingY()
+                        - clefStaff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(clef->GetZone()->GetUlx()))
+                        - m_view->ToLogicalY(clef->GetZone()->GetUly())));
+                }
             }
         }
 
         data_PITCHNAME pname;
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        Staff *clefStaff = dynamic_cast<Staff *>(clef->GetFirstAncestor(STAFF));
-        assert(clefStaff);
-        const int clefOffset = round((double)(clefStaff->GetDrawingY()
-            - clefStaff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(clef->GetZone()->GetUlx()))
-            - m_view->ToLogicalY(clef->GetZone()->GetUly())));
-
         switch (clef->GetShape()) {
             case CLEFSHAPE_C: pname = PITCHNAME_c; break;
             case CLEFSHAPE_F: pname = PITCHNAME_f; break;
@@ -4283,6 +4290,8 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             LogWarning("Syllable/neume had no pitched children to reorder for syllable/neume %s", obj->GetID().c_str());
             return true;
         }
+
+        int clefOffset = 0;
         if (clef == NULL) {
             ClassIdComparison ac(CLEF);
             clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
@@ -4291,17 +4300,17 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
                 assert(layer);
                 clef = layer->GetCurrentClef();
             }
+            else {
+                Staff *clefStaff = dynamic_cast<Staff *>(clef->GetFirstAncestor(STAFF));
+                assert(clefStaff);
+                clefOffset = round((double)(clefStaff->GetDrawingY()
+                    - clefStaff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(clef->GetZone()->GetUlx()))
+                    - m_view->ToLogicalY(clef->GetZone()->GetUly())));
+            }
         }
 
-        assert(clef);
-
-        data_PITCHNAME pname;
+        data_PITCHNAME pname = PITCHNAME_c;
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        Staff *clefStaff = dynamic_cast<Staff *>(clef->GetFirstAncestor(STAFF));
-        assert(clefStaff);
-        const int clefOffset = round((double)(clefStaff->GetDrawingY()
-            - clefStaff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(clef->GetZone()->GetUlx()))
-            - m_view->ToLogicalY(clef->GetZone()->GetUly())));
 
         switch (clef->GetShape()) {
             case CLEFSHAPE_C: pname = PITCHNAME_c; break;
