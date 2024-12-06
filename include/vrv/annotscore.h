@@ -9,7 +9,9 @@
 #define __VRV_ANNOTSCORE_H__
 
 #include "atts_cmn.h"
+#include "atts_shared.h"
 #include "controlelement.h"
+#include "editorial.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -21,7 +23,7 @@ namespace vrv {
 /**
  * This class models the MEI <annot> element where @type is score.
  */
-class AnnotScore : public ControlElement, public TextListInterface, public TimeSpanningInterface, public AttPlist {
+class AnnotScore : public ControlElement,  public TimeSpanningInterface, public AttPlist {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -30,7 +32,7 @@ public:
     ///@{
     AnnotScore();
     virtual ~AnnotScore();
-    Object *Clone() const override { return new AnnotScore(*this); }
+    //Object *Clone() const override { return new AnnotScore(*this); }
     void Reset() override;
     std::string GetClassName() const override { return "AnnotScore"; }
     ///@}
@@ -49,6 +51,14 @@ public:
     {
         return vrv_cast<const TimeSpanningInterface *>(this);
     }
+
+    /**
+     * Add a text element to an annotation.
+     * Only supported elements will be actually added to the child list.
+     */
+    bool IsSupportedChild(Object *object) override;
+
+
     ///@}
 
     //----------//
