@@ -16,6 +16,7 @@
 #include "devicecontext.h"
 #include "doc.h"
 #include "functor.h"
+#include "text.h"
 #include "verticalaligner.h"
 #include "vrv.h"
 
@@ -28,7 +29,7 @@ namespace vrv {
 static const ClassRegistrar<AnnotScore> s_factory("annot", ANNOTSCORE);
 
 AnnotScore::AnnotScore()
-    : ControlElement(ANNOTSCORE, "annot-"), TextListInterface(), TimeSpanningInterface(), AttPlist()
+    : ControlElement(ANNOTSCORE, "annot-"),  AttPlist()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_PLIST);
@@ -43,6 +44,20 @@ void AnnotScore::Reset()
     ControlElement::Reset();
     this->ResetPlist();
     TimeSpanningInterface::Reset();
+}
+
+bool AnnotScore::IsSupportedChild(Object *child)
+{
+    if (child->IsTextElement()) {
+        assert(dynamic_cast<TextElement *>(child));
+    }
+    else if (child->Is(ANNOT)) {
+        assert(dynamic_cast<AnnotScore *>(child));
+    }
+    else {
+        return false;
+    }
+    return true;
 }
 
 //----------------------------------------------------------------------------
