@@ -28,6 +28,7 @@ class Add;
 class AltSymInterface;
 class AnchoredText;
 class Annot;
+class AnnotScore;
 class App;
 class AreaPosInterface;
 class Arpeg;
@@ -800,6 +801,7 @@ private:
     bool ReadAbbr(Object *parent, pugi::xml_node abbr, EditorialLevel level, Object *filter = NULL);
     bool ReadAdd(Object *parent, pugi::xml_node add, EditorialLevel level, Object *filter = NULL);
     bool ReadAnnot(Object *parent, pugi::xml_node annot);
+    bool ReadAnnotScore(Object *parent, pugi::xml_node annot);
     bool ReadApp(Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter = NULL);
     bool ReadAppChildren(Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter = NULL);
     bool ReadChoice(Object *parent, pugi::xml_node choice, EditorialLevel level, Object *filter = NULL);
@@ -864,6 +866,11 @@ private:
      * Write unsupported attributes and store them in Object::m_unsupported (not tested)
      */
     void ReadUnsupportedAttr(pugi::xml_node element, Object *object);
+
+    /**
+     * Returns true if the element is a 'score' annotation. Currently based on @type
+     */
+    bool IsAnnotScore(pugi::xml_node element);
 
     /**
      * Returns true if the element is name is an editorial element (e.g., "app", "supplied", etc.)

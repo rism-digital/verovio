@@ -20,6 +20,7 @@
 #include "altsyminterface.h"
 #include "anchoredtext.h"
 #include "annot.h"
+#include "annotscore.h"
 #include "app.h"
 #include "arpeg.h"
 #include "artic.h"
@@ -5479,7 +5480,11 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         this->NormalizeAttributes(current);
         // editorial
         if (this->IsEditorialElementName(currentName)) {
-            success = this->ReadEditorialElement(parent, current, EDITORIAL_MEASURE);
+            if(currentName == "annot" && this->IsAnnotScore(current)) {
+                success = this->ReadAnnotScore(parent, current);
+            } else {
+                success = this->ReadEditorialElement(parent, current, EDITORIAL_MEASURE);
+            }
         }
         // content
         else if (currentName == "anchoredText") {
@@ -7683,6 +7688,36 @@ bool MEIInput::ReadAnnot(Object *parent, pugi::xml_node annot)
     }
 }
 
+bool MEIInput::ReadAnnotScore(Object *parent, pugi::xml_node annot)
+{
+   AnnotScore *vrvAnnotScore = new AnnotScore();
+    //this->ReadEditorialElement(annot, vrvAnnotScore);
+
+    vrvAnnotScore->ReadPlist(annot);
+    //vrvAnnotScore->ReadSource(annot);
+
+    parent->AddChild(vrvAnnotScore);
+    //vrvAnnotScore->m_content.reset();
+
+    bool hasNonTextContent = false;
+    // copy all the nodes inside into the document
+    for (pugi::xml_node child = annot.first_child(); child; child = child.next_sibling()) {
+        const std::string nodeName = child.name();
+        if (!hasNonTextContent && (!nodeName.empty())) hasNonTextContent = true;
+        //vrvAnnotScore->m_content.append_copy(child);
+    }
+    this->ReadUnsupportedAttr(annot, vrvAnnotScore);
+    // Unless annot has only text we do not load children because they are preserved in Annot::m_content
+    if (hasNonTextContent) {
+        return true;
+    }
+    else {
+        //vrvAnnot->m_content.remove_children();
+        return this->ReadTextChildren(vrvAnnotScore, annot, vrvAnnotScore);
+    }
+
+}
+
 bool MEIInput::ReadApp(Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter)
 {
     if (!m_hasScoreDef) {
@@ -8279,6 +8314,12 @@ bool MEIInput::ReadXMLComment(Object *object, pugi::xml_node element)
         object->SetClosingComment(element.value());
     }
     return true;
+}
+
+bool MEIInput::IsAnnotScore(pugi::xml_node annot) {
+    // If the annotation is a score annotation, it'll have @type="score" (we can also guess)
+    std::string value = annot.attribute("type").value();
+    return value == "score";
 }
 
 bool MEIInput::IsEditorialElementName(std::string elementName)
