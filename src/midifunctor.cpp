@@ -718,7 +718,7 @@ FunctorCode GenerateMIDIFunctor::VisitPedal(const Pedal *pedal)
 {
     if (!pedal->HasDir()) return FUNCTOR_CONTINUE;
 
-    // Check the functor flag - filters should always be there, but just in case we can the call
+    // Check the functor flag - filters should always be there, but just in case we change how it is calle
     if (!m_controlEvents || !this->GetFilters()) return FUNCTOR_CONTINUE;
 
     // Check if the pedal applies to the staff filtered
