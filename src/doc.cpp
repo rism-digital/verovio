@@ -534,7 +534,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             AttNIntegerComparison matchLayer(LAYER, layers.first);
             filters.Add(&matchStaff);
             filters.Add(&matchLayer);
-            
+
             GenerateMIDIFunctor generateMIDI(midiFile);
             generateMIDI.SetFilters(&filters);
 
