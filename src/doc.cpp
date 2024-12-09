@@ -522,7 +522,11 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         GenerateMIDIFunctor generateScoreDefMIDI(midiFile);
         generateScoreDefMIDI.SetChannel(midiChannel);
         generateScoreDefMIDI.SetTrack(midiTrack);
+
         scoreDef->Process(generateScoreDefMIDI);
+
+        GenerateMIDIFunctor generateMIDI(midiFile);
+        generateMIDI.SetControlEvents(true);
 
         for (auto &layers : staves.second.child) {
             filters.Clear();
@@ -531,8 +535,6 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             AttNIntegerComparison matchLayer(LAYER, layers.first);
             filters.Add(&matchStaff);
             filters.Add(&matchLayer);
-
-            GenerateMIDIFunctor generateMIDI(midiFile);
             generateMIDI.SetFilters(&filters);
 
             generateMIDI.SetChannel(midiChannel);
@@ -548,6 +550,8 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             this->Process(generateMIDI);
 
             tempoEventTicks = generateMIDI.GetTempoEventTicks();
+            // Process them only once per staff
+            generateMIDI.SetControlEvents(false);
         }
     }
     midiFile->sortTracks();

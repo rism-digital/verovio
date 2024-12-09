@@ -368,6 +368,7 @@ GenerateMIDIFunctor::GenerateMIDIFunctor(smf::MidiFile *midiFile) : ConstFunctor
     m_lastNote = NULL;
     m_accentedGraceNote = false;
     m_cueExclusion = false;
+    m_controlEvents = false;
 }
 
 FunctorCode GenerateMIDIFunctor::VisitBeatRpt(const BeatRpt *beatRpt)
@@ -717,18 +718,19 @@ FunctorCode GenerateMIDIFunctor::VisitPedal(const Pedal *pedal)
 {
     if (!pedal->HasDir()) return FUNCTOR_CONTINUE;
 
+    // Check the functor flag - filters should always be there, but just in case we can the call
+    if (!m_controlEvents || !this->GetFilters()) return FUNCTOR_CONTINUE;
+
     // Check if the pedal applies to the staff filtered
-    if (this->GetFilters()) {
-        Pedal *nonConstPedal = const_cast<Pedal *>(pedal);
-        Measure *measure = vrv_cast<Measure *>(nonConstPedal->GetFirstAncestor(MEASURE));
-        assert(measure);
-        std::vector<Staff *> staffList = nonConstPedal->GetTstampStaves(measure, nonConstPedal);
-        bool applies = false;
-        for (Staff *staff : staffList) {
-            applies = (applies || this->GetFilters()->Apply(staff));
-        }
-        if (!applies) return FUNCTOR_CONTINUE;
+    Pedal *nonConstPedal = const_cast<Pedal *>(pedal);
+    Measure *measure = vrv_cast<Measure *>(nonConstPedal->GetFirstAncestor(MEASURE));
+    assert(measure);
+    std::vector<Staff *> staffList = nonConstPedal->GetTstampStaves(measure, nonConstPedal);
+    bool applies = false;
+    for (Staff *staff : staffList) {
+        applies = (applies || this->GetFilters()->Apply(staff));
     }
+    if (!applies) return FUNCTOR_CONTINUE;
 
     double pedalTime = pedal->GetStart()->GetAlignment()->GetTime().ToDouble() * SCORE_TIME_UNIT;
     double startTime = m_totalTime + pedalTime;
