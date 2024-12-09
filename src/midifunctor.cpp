@@ -722,12 +722,11 @@ FunctorCode GenerateMIDIFunctor::VisitPedal(const Pedal *pedal)
     if (!m_controlEvents || !this->GetFilters()) return FUNCTOR_CONTINUE;
 
     // Check if the pedal applies to the staff filtered
-    Pedal *nonConstPedal = const_cast<Pedal *>(pedal);
-    Measure *measure = vrv_cast<Measure *>(nonConstPedal->GetFirstAncestor(MEASURE));
+    const Measure *measure = vrv_cast<const Measure *>(pedal->GetFirstAncestor(MEASURE));
     assert(measure);
-    std::vector<Staff *> staffList = nonConstPedal->GetTstampStaves(measure, nonConstPedal);
+    std::vector<const Staff *> staffList = pedal->GetTstampStaves(measure, pedal);
     bool applies = false;
-    for (Staff *staff : staffList) {
+    for (const Staff *staff : staffList) {
         applies = (applies || this->GetFilters()->Apply(staff));
     }
     if (!applies) return FUNCTOR_CONTINUE;
