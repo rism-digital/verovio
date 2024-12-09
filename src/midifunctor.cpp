@@ -717,6 +717,19 @@ FunctorCode GenerateMIDIFunctor::VisitPedal(const Pedal *pedal)
 {
     if (!pedal->HasDir()) return FUNCTOR_CONTINUE;
 
+    // Check if the pedal applies to the staff filtered
+    if (this->GetFilters()) {
+        Pedal *nonConstPedal = const_cast<Pedal *>(pedal);
+        Measure *measure = vrv_cast<Measure *>(nonConstPedal->GetFirstAncestor(MEASURE));
+        assert(measure);
+        std::vector<Staff *> staffList = nonConstPedal->GetTstampStaves(measure, nonConstPedal);
+        bool applies = false;
+        for (Staff *staff : staffList) {
+            applies = (applies || this->GetFilters()->Apply(staff));
+        }
+        if (!applies) return FUNCTOR_CONTINUE;
+    }
+
     double pedalTime = pedal->GetStart()->GetAlignment()->GetTime().ToDouble() * SCORE_TIME_UNIT;
     double startTime = m_totalTime + pedalTime;
     int tpq = m_midiFile->getTPQ();
