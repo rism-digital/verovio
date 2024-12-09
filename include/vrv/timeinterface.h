@@ -87,7 +87,10 @@ public:
     /**
      * Return a vector of staves looking at the @staff attribute or at the parent staff or the @startid
      */
-    std::vector<Staff *> GetTstampStaves(Measure *measure, Object *object);
+    ///@{
+    std::vector<const Staff *> GetTstampStaves(const Measure *measure, const Object *object) const;
+    std::vector<Staff *> GetTstampStaves(const Measure *measure, const Object *object);
+    ///@}
 
     /**
      * Return true if the interface owner is encoded in the measure of its start element
