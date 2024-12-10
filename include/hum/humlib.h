@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Nov 13 13:08:51 PST 2024
+// Last Modified: Tue Dec 10 14:37:55 JST 2024
 // Filename:      min/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.h
 // Syntax:        C++11
@@ -5957,31 +5957,6 @@ class Tool_autostem : public HumTool {
 };
 
 
-class Tool_bardash : public HumTool {
-
-	public:
-		     Tool_bardash (void);
-		     ~Tool_bardash() {};
-
-		bool run     (HumdrumFileSet& infiles);
-		bool run     (HumdrumFile& infile);
-		bool run     (const std::string& indata, std::ostream& out);
-		bool run     (HumdrumFile& infile, std::ostream& out);
-
-	protected:
-		void         initialize   (void);
-      void         processFile  (HumdrumFile& infile);
-		void         removeBarStylings(HumdrumFile& infile);
-		void         removeBarStylings(HTp spine);
-		void         applyBarStylings(HumdrumFile& infile);
-		void         applyBarStylings(HTp spine);
-
-	private:
-		bool  m_removeQ = false;  // used with -r option
-
-};
-
-
 class Tool_binroll : public HumTool {
 	public:
 		         Tool_binroll      (void);
@@ -6001,6 +5976,31 @@ class Tool_binroll : public HumTool {
 
 	private:
 		HumNum    m_duration;
+
+};
+
+
+class Tool_bstyle : public HumTool {
+
+	public:
+		     Tool_bstyle (void);
+		     ~Tool_bstyle() {};
+
+		bool run     (HumdrumFileSet& infiles);
+		bool run     (HumdrumFile& infile);
+		bool run     (const std::string& indata, std::ostream& out);
+		bool run     (HumdrumFile& infile, std::ostream& out);
+
+	protected:
+		void         initialize   (void);
+      void         processFile  (HumdrumFile& infile);
+		void         removeBarStylings(HumdrumFile& infile);
+		void         removeBarStylings(HTp spine);
+		void         applyBarStylings(HumdrumFile& infile);
+		void         applyBarStylings(HTp spine);
+
+	private:
+		bool  m_removeQ = false;  // used with -r option
 
 };
 
@@ -10856,6 +10856,7 @@ class Tool_shed : public HumTool {
 
 	protected:
 		void    processFile                      (HumdrumFile& infile);
+		void    processExpression                (HumdrumFile& infile);
 		void    searchAndReplaceInterpretation   (HumdrumFile& infile);
 		void    searchAndReplaceExinterp         (HumdrumFile& infile);
 		void    searchAndReplaceData             (HumdrumFile& infile);
