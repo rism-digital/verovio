@@ -26,10 +26,10 @@ namespace vrv {
 // AnnotScore
 //----------------------------------------------------------------------------
 
-static const ClassRegistrar<AnnotScore> s_factory("annot", ANNOTSCORE);
+static const ClassRegistrar<AnnotScore> s_factory("annotScore", ANNOTSCORE);
 
 AnnotScore::AnnotScore()
-    : ControlElement(ANNOTSCORE, "annot-"),  AttPlist()
+    : ControlElement(ANNOTSCORE, "annotscore-"),  AttPlist()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_PLIST);
