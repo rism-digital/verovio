@@ -434,6 +434,7 @@ private:
      */
     ///@{
     void WriteAnchoredText(pugi::xml_node currentNode, AnchoredText *anchoredText);
+    void WriteAnnotScore(pugi::xml_node currentNode, AnnotScore *annotScore);
     void WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg);
     void WriteBeamSpan(pugi::xml_node currentNode, BeamSpan *beamSpan);
     void WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracketSpan);

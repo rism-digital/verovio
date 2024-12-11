@@ -473,8 +473,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->Is(ANCHOREDTEXT)) {
         m_currentNode = m_currentNode.append_child("anchoredText");
         this->WriteAnchoredText(m_currentNode, vrv_cast<AnchoredText *>(object));
-    }
-    else if (object->Is(ARPEG)) {
+    } else if (object->Is(ANNOTSCORE)){
+            m_currentNode = m_currentNode.append_child("annot");
+            this->WriteAnnotScore(m_currentNode, vrv_cast<AnnotScore *>(object));
+    } else if (object->Is(ARPEG)) {
         m_currentNode = m_currentNode.append_child("arpeg");
         this->WriteArpeg(m_currentNode, vrv_cast<Arpeg *>(object));
     }
@@ -838,12 +840,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         else if (object->Is(ANNOT)) {
             m_currentNode = m_currentNode.append_child("annot");
             this->WriteAnnot(m_currentNode, vrv_cast<Annot *>(object));
-        }
-        else if (object->Is(APP)) {
+        } else if (object->Is(APP)) {
             m_currentNode = m_currentNode.append_child("app");
             this->WriteApp(m_currentNode, vrv_cast<App *>(object));
-        }
-        else if (object->Is(CHOICE)) {
+        }  else if (object->Is(CHOICE)) {
             m_currentNode = m_currentNode.append_child("choice");
             this->WriteChoice(m_currentNode, vrv_cast<Choice *>(object));
         }
@@ -1968,6 +1968,20 @@ void MEIOutput::WriteAnchoredText(pugi::xml_node currentNode, AnchoredText *anch
 
     this->WriteControlElement(currentNode, anchoredText);
     this->WriteTextDirInterface(currentNode, anchoredText);
+}
+
+void MEIOutput::WriteAnnotScore(pugi::xml_node currentNode, AnnotScore *annotScore)
+{
+    assert(annotScore);
+
+    this->WriteControlElement(currentNode, annotScore);
+    annotScore->WritePlist(currentNode);
+    // FIXME: currently ignoring annot contents
+/*     // special case where we keep the pugi::nodes
+    for (pugi::xml_node child = annotScore->m_content.first_child(); child; child = child.next_sibling()) {
+        currentNode.append_copy(child);
+    }
+ */
 }
 
 void MEIOutput::WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg)
