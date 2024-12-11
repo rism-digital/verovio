@@ -679,9 +679,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 
         SortStaves();
 
-        m_doc->GetDrawingPage()->LayOutTranscription(true);
-
         if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+        m_doc->GetDrawingPage()->LayOutTranscription(true);
 
         return true; // Can't reorder by layer since staves contain layers
     }
@@ -740,8 +739,9 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
     }
     Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
     layer->ReorderByXPos(); // Reflect position order of elements internally (and in the resulting output file)
-    m_doc->GetDrawingPage()->LayOutPitchPos();
     if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    m_doc->GetDrawingPage()->LayOutTranscription(true);
+
     m_editInfo.import("status", status);
     m_editInfo.import("message", message);
     return true;
@@ -1075,7 +1075,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         layer->ReorderByXPos();
 
         // ensure pitched elements associated with this clef keep their x,y positions
-
+        m_doc->ScoreDefSetCurrentDoc(true); // this is needed for staves without clef
         ClassIdComparison ac(CLEF);
         Clef *previousClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, clef));
         Clef *nextClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&ac, clef));
@@ -1253,9 +1253,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
     }
     layer->ReorderByXPos();
 
-    m_doc->GetDrawingPage()->LayOutTranscription(true);
-
     if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    m_doc->GetDrawingPage()->LayOutTranscription(true);
 
     m_editInfo.import("status", status);
     m_editInfo.import("message", message);
@@ -3522,8 +3521,8 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
         return false;
     }
 
-    m_doc->GetDrawingPage()->LayOutTranscription(true);
     if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    m_doc->GetDrawingPage()->LayOutTranscription(true);
 
     m_editInfo.import("status", "OK");
     m_editInfo.import("message", "");
@@ -4230,7 +4229,6 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
         if (clef == NULL) {
             ClassIdComparison ac(CLEF);
             clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
-            int clefOffset = 0;
             if (clef == NULL) {
                 ClassIdComparison ac(CLEF);
                 clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
@@ -4251,19 +4249,30 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
 
         data_PITCHNAME pname;
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        int baseOctave;
+
         switch (clef->GetShape()) {
-            case CLEFSHAPE_C: pname = PITCHNAME_c; break;
-            case CLEFSHAPE_F: pname = PITCHNAME_f; break;
-            case CLEFSHAPE_G: pname = PITCHNAME_g; break;
+            case CLEFSHAPE_C:
+                pname = PITCHNAME_c;
+                baseOctave = 4;
+                break;
+            case CLEFSHAPE_F:
+                pname = PITCHNAME_f;
+                baseOctave = 3;
+                break;
+            case CLEFSHAPE_G:
+                pname = PITCHNAME_g;
+                baseOctave = 4;
+                break;
             default:
                 LogError("Clef %s does not have valid shape. Shape is %s", clef->GetID().c_str(), clef->GetShape());
                 return false;
         }
         pi->SetPname(pname);
 
-        // The default octave = 4, but the actual octave is calculated by
+        // The actual octave is calculated by
         // taking into account the displacement of the clef
-        int octave = 4;
+        int octave = baseOctave;
         if (clef->GetDis() && clef->GetDisPlace()) {
             octave += (clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1) * (clef->GetDis() / 7);
         }
@@ -4311,11 +4320,21 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
 
         data_PITCHNAME pname = PITCHNAME_c;
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        int baseOctave;
 
         switch (clef->GetShape()) {
-            case CLEFSHAPE_C: pname = PITCHNAME_c; break;
-            case CLEFSHAPE_F: pname = PITCHNAME_f; break;
-            case CLEFSHAPE_G: pname = PITCHNAME_g; break;
+            case CLEFSHAPE_C:
+                pname = PITCHNAME_c;
+                baseOctave = 4;
+                break;
+            case CLEFSHAPE_F:
+                pname = PITCHNAME_f;
+                baseOctave = 3;
+                break;
+            case CLEFSHAPE_G:
+                pname = PITCHNAME_g;
+                baseOctave = 4;
+                break;
             default:
                 LogError("Clef %s does not have valid shape. Shape is %s", clef->GetID().c_str(), clef->GetShape());
                 return false;
@@ -4334,9 +4353,9 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             assert(pi);
             pi->SetPname(pname);
 
-            // The default octave = 4, but the actual octave is calculated by
+            // The actual octave is calculated by
             // taking into account the displacement of the clef
-            int octave = 4;
+            int octave = baseOctave;
             if (clef->GetDis() && clef->GetDisPlace()) {
                 octave += (clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1) * (clef->GetDis() / 7);
             }
