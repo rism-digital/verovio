@@ -67,10 +67,22 @@ public:
 
     /**
      * Returns the duration (in Fraction) for the element for mensural notation
-     * Currently this assume brevis equality and would
-     * need to be modified for shorter equality in later repertoire.
+     * The level of equality is given in equivalence (brevis, semibrevis or minima)
      */
-    Fraction GetInterfaceAlignmentMensuralDuration(int num, int numBase, const Mensur *currentMensur) const;
+    Fraction GetInterfaceAlignmentMensuralDuration(
+        int num, int numBase, const Mensur *currentMensur, data_DURATION equivalence) const;
+
+    /**
+     * @name Return the duration (in Fraction) for the corresponding level of equivalence
+     */
+    ///@{
+    Fraction DurationWithBrevisEquivalence(
+        int num, int numBase, const Mensur *currentMensur, data_DURATION noteDur) const;
+    Fraction DurationWithSemibrevisEquivalence(
+        int num, int numBase, const Mensur *currentMensur, data_DURATION noteDur) const;
+    Fraction DurationWithMinimaEquivalence(
+        int num, int numBase, const Mensur *currentMensur, data_DURATION noteDur) const;
+    ///@}
 
     /**
      * Return true if the note or rest is the first of a beam.

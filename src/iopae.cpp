@@ -2826,7 +2826,7 @@ bool PAEInput::Import(const std::string &input)
     m_doc->SetType(Raw);
 
     // Genereate the header and add a comment to the project description
-    m_doc->GenerateMEIHeader(false);
+    m_doc->GenerateMEIHeader();
     pugi::xml_node projectDesc = m_doc->m_header.first_child().select_node("//projectDesc").node();
     if (projectDesc) {
         pugi::xml_node p1 = projectDesc.append_child("p");
@@ -4755,7 +4755,7 @@ bool PAEInput::CheckContentPostBuild()
     ClassIdsComparison noteOrRest({ NOTE, REST });
     ListOfObjects containers;
     m_doc->FindAllDescendantsByComparison(&containers, &comparison);
-    for (auto &container : containers) {
+    for (const auto &container : containers) {
         ListOfObjects notesOrRests;
         container->FindAllDescendantsByComparison(&notesOrRests, &noteOrRest);
         if ((int)notesOrRests.size() < 1) {

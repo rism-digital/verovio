@@ -127,6 +127,7 @@
 #import <VerovioFramework/interface.h>
 #import <VerovioFramework/ioabc.h>
 #import <VerovioFramework/iobase.h>
+#import <VerovioFramework/iocmme.h>
 #import <VerovioFramework/iodarms.h>
 #import <VerovioFramework/iohumdrum.h>
 #import <VerovioFramework/iomei.h>

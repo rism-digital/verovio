@@ -1470,7 +1470,9 @@ bool MEIOutput::WriteDoc(Doc *doc)
 
     // ---- header ----
     if (!m_ignoreHeader) {
-        if (this->GetBasic() || !m_doc->m_header.first_child()) m_doc->GenerateMEIHeader(this->GetBasic());
+        if (!m_doc->m_header.first_child()) m_doc->GenerateMEIHeader();
+        if (this->GetBasic()) m_doc->ConvertHeaderToMEIBasic();
+        // Now copy it to the m_mei node;
         m_mei.append_copy(m_doc->m_header.first_child());
         // Add transposition in the revision list but not in mei-basic
         if (!this->GetBasic() && !m_doc->GetOptions()->m_transpose.GetValue().empty()) {
@@ -1839,6 +1841,7 @@ void MEIOutput::WriteStaffDef(pugi::xml_node currentNode, StaffDef *staffDef)
     staffDef->WriteStaffDefVis(currentNode);
     staffDef->WriteTimeBase(currentNode);
     staffDef->WriteTransposition(currentNode);
+    staffDef->WriteVerticalAlign(currentNode);
 }
 
 void MEIOutput::WriteInstrDef(pugi::xml_node currentNode, InstrDef *instrDef)
@@ -2776,6 +2779,7 @@ void MEIOutput::WriteNote(pugi::xml_node currentNode, Note *note)
     assert(note);
 
     this->WriteLayerElement(currentNode, note);
+    this->WriteAltSymInterface(currentNode, note);
     this->WriteDurationInterface(currentNode, note);
     this->WritePitchInterface(currentNode, note);
     this->WritePositionInterface(currentNode, note);
@@ -2836,6 +2840,7 @@ void MEIOutput::WriteRest(pugi::xml_node currentNode, Rest *rest)
     assert(rest);
 
     this->WriteLayerElement(currentNode, rest);
+    this->WriteAltSymInterface(currentNode, rest);
     this->WriteDurationInterface(currentNode, rest);
     this->WritePositionInterface(currentNode, rest);
     rest->WriteColor(currentNode);
@@ -2869,6 +2874,7 @@ void MEIOutput::WriteTabDurSym(pugi::xml_node currentNode, TabDurSym *tabDurSym)
 
     this->WriteLayerElement(currentNode, tabDurSym);
     tabDurSym->WriteNNumberLike(currentNode);
+    tabDurSym->WriteStaffLoc(currentNode);
 }
 
 void MEIOutput::WriteTabGrp(pugi::xml_node currentNode, TabGrp *tabGrp)
@@ -3195,7 +3201,7 @@ void MEIOutput::WriteTimeSpanningInterface(pugi::xml_node element, TimeSpanningI
 
 void MEIOutput::WriteUnsupportedAttr(pugi::xml_node element, Object *object)
 {
-    for (auto &pair : object->m_unsupported) {
+    for (const auto &pair : object->m_unsupported) {
         if (element.attribute(pair.first.c_str())) {
             LogDebug("Attribute '%s' for '%s' is not supported", pair.first.c_str(), object->GetClassName().c_str());
         }
@@ -3855,6 +3861,9 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
         if (element == "note") {
             return true;
         }
+        if (element == "rest") {
+            return true;
+        }
         else {
             return false;
         }
@@ -4114,7 +4123,7 @@ bool MEIInput::ReadIncipits(pugi::xml_node root)
     int incipCount = 0;
     bool success = true;
 
-    for (auto &incipItem : incipSet) {
+    for (const auto &incipItem : incipSet) {
         if (!success) break;
         pugi::xml_node incip = incipItem.node();
         pugi::xml_node incipCode = incip.child("incipCode");
@@ -4547,7 +4556,7 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
                     }
                     else {
                         unmeasured = new Measure(UNMEASURED);
-                        m_doc->SetMensuralMusicOnly(true);
+                        m_doc->SetMensuralMusicOnly(BOOLEAN_true);
                     }
                     parent->AddChild(unmeasured);
                 }
@@ -4583,7 +4592,7 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
         }
         else {
             unmeasured = new Measure(UNMEASURED);
-            m_doc->SetMensuralMusicOnly(true);
+            m_doc->SetMensuralMusicOnly(BOOLEAN_true);
         }
         parent->AddChild(unmeasured);
     }
@@ -4728,7 +4737,7 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
                     System *system = vrv_cast<System *>(parent);
                     assert(system);
                     unmeasured = new Measure(UNMEASURED);
-                    m_doc->SetMensuralMusicOnly(true);
+                    m_doc->SetMensuralMusicOnly(BOOLEAN_true);
                     if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
                         UpgradeMeasureTo_3_0_0(unmeasured, system);
                     }
@@ -5220,6 +5229,7 @@ bool MEIInput::ReadStaffDef(Object *parent, pugi::xml_node staffDef)
     vrvStaffDef->ReadStaffDefVis(staffDef);
     vrvStaffDef->ReadTimeBase(staffDef);
     vrvStaffDef->ReadTransposition(staffDef);
+    vrvStaffDef->ReadVerticalAlign(staffDef);
 
     if (!vrvStaffDef->HasN()) {
         LogWarning("No @n on <staffDef> might yield unpredictable results");
@@ -5454,7 +5464,7 @@ bool MEIInput::ReadMeasure(Object *parent, pugi::xml_node measure)
     Measure *vrvMeasure = new Measure();
     if (m_doc->IsMensuralMusicOnly()) {
         LogWarning("Mixing mensural and non mensural music is not supported. Trying to go ahead...");
-        m_doc->SetMensuralMusicOnly(false);
+        m_doc->SetMensuralMusicOnly(BOOLEAN_false);
     }
     this->SetMeiID(measure, vrvMeasure);
     this->ReadFacsimileInterface(measure, vrvMeasure);
@@ -6227,6 +6237,12 @@ bool MEIInput::ReadLayer(Object *parent, pugi::xml_node layer)
         LogWarning("Value @n='0' on <layer> might yield unpredictable results");
     }
 
+    // Check that we have only one single layer in mensural music staves
+    if (m_doc->IsMensuralMusicOnly() && (parent->GetChildCount(LAYER) > 0)) {
+        LogWarning("Mensural music with more than one layer is not supported. Trying to go ahead...");
+        m_doc->SetMensuralMusicOnly(BOOLEAN_false);
+    }
+
     parent->AddChild(vrvLayer);
     this->ReadUnsupportedAttr(layer, vrvLayer);
     return this->ReadLayerChildren(vrvLayer, layer);
@@ -6978,6 +6994,7 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
         }
     }
 
+    this->ReadAltSymInterface(note, vrvNote);
     this->ReadDurationInterface(note, vrvNote);
     this->ReadPitchInterface(note, vrvNote);
     this->ReadPositionInterface(note, vrvNote);
@@ -7032,6 +7049,7 @@ bool MEIInput::ReadRest(Object *parent, pugi::xml_node rest)
         }
     }
 
+    this->ReadAltSymInterface(rest, vrvRest);
     this->ReadDurationInterface(rest, vrvRest);
     this->ReadPositionInterface(rest, vrvRest);
     vrvRest->ReadColor(rest);
@@ -7161,6 +7179,7 @@ bool MEIInput::ReadTabDurSym(Object *parent, pugi::xml_node tabRhyhtm)
     this->ReadLayerElement(tabRhyhtm, vrvTabDurSym);
 
     vrvTabDurSym->ReadNNumberLike(tabRhyhtm);
+    vrvTabDurSym->ReadStaffLoc(tabRhyhtm);
 
     parent->AddChild(vrvTabDurSym);
     this->ReadUnsupportedAttr(tabRhyhtm, vrvTabDurSym);
@@ -7297,6 +7316,9 @@ bool MEIInput::ReadSymbolDefChildren(Object *parent, pugi::xml_node parentNode, 
         }
         else if (elementName == "svg") {
             success = this->ReadSvg(parent, xmlElement);
+        }
+        else if (elementName == "symbol") {
+            success = this->ReadSymbol(parent, xmlElement);
         }
         // xml comment
         else if (elementName == "") {

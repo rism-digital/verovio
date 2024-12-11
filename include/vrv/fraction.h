@@ -37,6 +37,8 @@ public:
     Fraction operator*(const Fraction &other) const;
     /** Division operator */
     Fraction operator/(const Fraction &other) const;
+    /** Modulo operator */
+    Fraction operator%(const Fraction &other) const;
 
     /** Equality operator */
     bool operator==(const Fraction &other) const;

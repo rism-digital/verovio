@@ -293,6 +293,13 @@ public:
     ArrayOfObjects &GetChildrenForModification() { return m_children; }
 
     /**
+     * Copy all the attributes of an obejct to target.
+     * The object must be of the same ClassId.
+     * Unsupported attrbutes are also copied.
+     */
+    void CopyAttributesTo(Object *target) const;
+
+    /**
      * Fill an array of pairs with all attributes and their values.
      * Return the number of attributes found.
      */
@@ -995,6 +1002,11 @@ public:
     Object *Create(std::string name);
 
     /**
+     * Create the object from the ClassId  by making a lookup in the register
+     */
+    Object *Create(ClassId classId);
+
+    /**
      * Add the name / constructor map entry to the static register
      */
     void Register(std::string name, ClassId classId, std::function<Object *(void)> function);
@@ -1010,7 +1022,7 @@ public:
     void GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds);
 
 public:
-    static thread_local MapOfStrConstructors s_ctorsRegistry;
+    static thread_local MapOfClassIdConstructors s_ctorsRegistry;
     static thread_local MapOfStrClassIds s_classIdsRegistry;
 };
 

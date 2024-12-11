@@ -8737,13 +8737,25 @@ void HumdrumInput::setMensurationSymbol(
         tempus = 2;
         prolatio = 2;
     }
-    else if (metdata == "C|3") { // fix for regular and sesquialtera
+    else if (metdata == "C|3") {
         if (m_mens) {
             vrvmensur->SetTempus(TEMPUS_2);
             vrvmensur->SetProlatio(PROLATIO_2);
         }
         vrvmensur->SetSlash(1);
         vrvmensur->SetNum(3);
+        maximodus = 2;
+        modus = 2;
+        tempus = 2;
+        prolatio = 2;
+    }
+    else if (metdata == "C|/3") {
+        if (m_mens) {
+            vrvmensur->SetTempus(TEMPUS_2);
+            vrvmensur->SetProlatio(PROLATIO_2);
+        }
+        vrvmensur->SetSlash(1);
+        vrvmensur->SetNumbase(3);
         maximodus = 2;
         modus = 2;
         tempus = 2;
@@ -21233,6 +21245,7 @@ void HumdrumInput::processPhrases(hum::HTp phraseend)
                 insertPhrase(bracket, phrasestart, phraseend, startmeasure, startchordsorted, endchordsorted,
                     phrasestartnoteinfo, phraseendnoteinfo, ndex, phraseindex, i, j, startpitches, endpitches,
                     indexused);
+                bracket->SetFunc(bracketSpanLog_FUNC_phrase);
             }
         }
     }
@@ -32285,7 +32298,7 @@ void HumdrumInput::finalizeDocument(Doc *doc)
 
     if (m_mens) {
         doc->PrepareData();
-        doc->SetMensuralMusicOnly(true);
+        doc->SetMensuralMusicOnly(BOOLEAN_true);
         doc->m_notationType = NOTATIONTYPE_mensural;
         doc->ConvertToCastOffMensuralDoc(true);
     }

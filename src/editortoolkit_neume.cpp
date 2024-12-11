@@ -4226,48 +4226,53 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             return false;
         }
 
+        int clefOffset = 0;
         if (clef == NULL) {
             ClassIdComparison ac(CLEF);
             clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
+            int clefOffset = 0;
             if (clef == NULL) {
-                Layer *layer = vrv_cast<Layer *>(staff->FindDescendantByType(LAYER));
-                assert(layer);
-                clef = layer->GetCurrentClef();
+                ClassIdComparison ac(CLEF);
+                clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
+                if (clef == NULL) {
+                    Layer *layer = vrv_cast<Layer *>(staff->FindDescendantByType(LAYER));
+                    assert(layer);
+                    clef = layer->GetCurrentClef();
+                }
+                else {
+                    Staff *clefStaff = dynamic_cast<Staff *>(clef->GetFirstAncestor(STAFF));
+                    assert(clefStaff);
+                    clefOffset = round((double)(clefStaff->GetDrawingY()
+                        - clefStaff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(clef->GetZone()->GetUlx()))
+                        - m_view->ToLogicalY(clef->GetZone()->GetUly())));
+                }
             }
         }
 
-        assert(clef);
+        data_PITCHNAME pname;
+        const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        switch (clef->GetShape()) {
+            case CLEFSHAPE_C: pname = PITCHNAME_c; break;
+            case CLEFSHAPE_F: pname = PITCHNAME_f; break;
+            case CLEFSHAPE_G: pname = PITCHNAME_g; break;
+            default:
+                LogError("Clef %s does not have valid shape. Shape is %s", clef->GetID().c_str(), clef->GetShape());
+                return false;
+        }
+        pi->SetPname(pname);
 
-        // Reset pitch to be "on clef"
-        if (clef->GetShape() == CLEFSHAPE_C) {
-            pi->SetPname(PITCHNAME_c);
-        }
-        else if (clef->GetShape() == CLEFSHAPE_F) {
-            pi->SetPname(PITCHNAME_f);
-        }
-        else if (clef->GetShape() == CLEFSHAPE_G) {
-            pi->SetPname(PITCHNAME_g);
-        }
-        else {
-            LogError("Clef %s does not have valid shape. Shape is %s", clef->GetID().c_str(), clef->GetShape());
-            return false;
-        }
-        pi->SetOct(3);
-
-        // The default octave = 3, but the actual octave is calculated by
+        // The default octave = 4, but the actual octave is calculated by
         // taking into account the displacement of the clef
-        int octave = 3;
+        int octave = 4;
         if (clef->GetDis() && clef->GetDisPlace()) {
             octave += (clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1) * (clef->GetDis() / 7);
         }
         pi->SetOct(octave);
 
-        const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-
         const int pitchDifference
             = round((double)((staff->GetDrawingY()
                         - staff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(fi->GetZone()->GetUlx()))
-                        - m_view->ToLogicalY(fi->GetZone()->GetUly())))
+                        - m_view->ToLogicalY(fi->GetZone()->GetUly()) - clefOffset))
                 / (double)(staffSize));
         pi->AdjustPitchByOffset(-pitchDifference);
         return true;
@@ -4286,6 +4291,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             return true;
         }
 
+        int clefOffset = 0;
         if (clef == NULL) {
             ClassIdComparison ac(CLEF);
             clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
@@ -4294,11 +4300,18 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
                 assert(layer);
                 clef = layer->GetCurrentClef();
             }
+            else {
+                Staff *clefStaff = dynamic_cast<Staff *>(clef->GetFirstAncestor(STAFF));
+                assert(clefStaff);
+                clefOffset = round((double)(clefStaff->GetDrawingY()
+                    - clefStaff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(clef->GetZone()->GetUlx()))
+                    - m_view->ToLogicalY(clef->GetZone()->GetUly())));
+            }
         }
 
-        assert(clef);
+        data_PITCHNAME pname = PITCHNAME_c;
+        const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-        data_PITCHNAME pname;
         switch (clef->GetShape()) {
             case CLEFSHAPE_C: pname = PITCHNAME_c; break;
             case CLEFSHAPE_F: pname = PITCHNAME_f; break;
@@ -4307,8 +4320,6 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
                 LogError("Clef %s does not have valid shape. Shape is %s", clef->GetID().c_str(), clef->GetShape());
                 return false;
         }
-
-        const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
         for (auto it = pitchedChildren.begin(); it != pitchedChildren.end(); ++it) {
             if ((*it)->Is(LIQUESCENT)) continue;
@@ -4323,9 +4334,9 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             assert(pi);
             pi->SetPname(pname);
 
-            // The default octave = 3, but the actual octave is calculated by
+            // The default octave = 4, but the actual octave is calculated by
             // taking into account the displacement of the clef
-            int octave = 3;
+            int octave = 4;
             if (clef->GetDis() && clef->GetDisPlace()) {
                 octave += (clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1) * (clef->GetDis() / 7);
             }
@@ -4334,8 +4345,9 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             const int pitchDifference
                 = round((double)((staff->GetDrawingY()
                             - staff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(fi->GetZone()->GetUlx()))
-                            - m_view->ToLogicalY(fi->GetZone()->GetUly())))
+                            - m_view->ToLogicalY(fi->GetZone()->GetUly()) - clefOffset))
                     / (double)(staffSize));
+
             pi->AdjustPitchByOffset(-pitchDifference);
         }
 

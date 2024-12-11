@@ -127,14 +127,13 @@ FunctorCode AdjustLayersFunctor::VisitMeasure(Measure *measure)
     Filters filters;
     Filters *previousFilters = this->SetFilters(&filters);
 
-    std::vector<int>::iterator iter;
-    for (iter = m_staffNs.begin(); iter != m_staffNs.end(); ++iter) {
+    for (int &n : m_staffNs) {
         filters.Clear();
         // Create ad comparison object for each type / @n
         std::vector<int> ns;
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(BARLINE_REFERENCES);
-        ns.push_back(*iter);
+        ns.push_back(n);
         AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.Add(&matchStaff);
 

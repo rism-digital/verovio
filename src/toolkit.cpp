@@ -571,6 +571,10 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         input = new VolpianoInput(&m_doc);
     }
     else if (inputFormat == CMME) {
+        if (m_options->m_durationEquivalence.GetValue() != DURATION_EQ_minima) {
+            LogWarning("CMME input uses 'minima' duration equivalence, changing the option accordingly.");
+            m_options->m_durationEquivalence.SetValue(DURATION_EQ_minima);
+        }
         input = new CmmeInput(&m_doc);
     }
 #ifndef NO_HUMDRUM_SUPPORT
@@ -816,7 +820,15 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
 
     // Convert pseudo-measures into distinct segments based on barLine elements
     if (m_doc.IsMensuralMusicOnly()) {
-        m_doc.ConvertToCastOffMensuralDoc(true);
+        if (m_options->m_mensuralResponsiveView.GetValue()) {
+            m_doc.ConvertToMensuralViewDoc();
+        }
+        else if (m_options->m_mensuralToCmn.GetValue()) {
+            m_doc.ConvertToCmnDoc();
+        }
+        else {
+            m_doc.ConvertToCastOffMensuralDoc(true);
+        }
     }
 
     // Do the layout? this depends on the options and the file. PAE and
@@ -1440,10 +1452,9 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     element->GetAttributes(&attributes);
 
     // Fill the JSON object
-    ArrayOfStrAttr::iterator iter;
-    for (iter = attributes.begin(); iter != attributes.end(); ++iter) {
-        o << (*iter).first << (*iter).second;
-        // LogInfo("Element %s - %s", (*iter).first.c_str(), (*iter).second.c_str());
+    for (const auto &attribute : attributes) {
+        o << attribute.first << attribute.second;
+        // LogInfo("Element %s - %s", attribute.first.c_str(), attribute.second.c_str());
     }
     return o.json();
 }
@@ -1761,9 +1772,7 @@ std::string Toolkit::RenderToMIDI()
     this->ResetLogBuffer();
 
     smf::MidiFile outputfile;
-    outputfile.absoluteTicks();
     m_doc.ExportMIDI(&outputfile);
-    outputfile.sortTracks();
 
     std::stringstream stream;
     outputfile.write(stream);
@@ -1877,6 +1886,8 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     ListOfObjects chords;
 
     measure->FindAllDescendantsByComparison(&notesOrRests, &matchTime);
+    ClassIdsComparison mRestComparison({ MULTIREST, MREST });
+    measure->FindAllDescendantsByComparison(&notesOrRests, &mRestComparison, UNLIMITED_DEPTH, FORWARD, false);
 
     // Fill the JSON object
     for (Object *object : notesOrRests) {
@@ -1887,7 +1898,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
             Chord *chord = note->IsChordTone();
             if (chord) chords.push_back(chord);
         }
-        else if (object->Is(REST)) {
+        else if (object->Is({ MREST, MULTIREST, REST })) {
             restArray << object->GetID();
         }
     }
@@ -1910,9 +1921,7 @@ bool Toolkit::RenderToMIDIFile(const std::string &filename)
     this->ResetLogBuffer();
 
     smf::MidiFile outputfile;
-    outputfile.absoluteTicks();
     m_doc.ExportMIDI(&outputfile);
-    outputfile.sortTracks();
     outputfile.write(filename);
 
     return true;

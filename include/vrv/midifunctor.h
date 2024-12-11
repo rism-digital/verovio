@@ -30,13 +30,13 @@ class Timemap;
 /**
  * This class prepares Note onsets.
  */
-class InitOnsetOffsetFunctor : public Functor {
+class InitOnsetOffsetFunctor : public DocFunctor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    InitOnsetOffsetFunctor();
+    InitOnsetOffsetFunctor(Doc *doc);
     virtual ~InitOnsetOffsetFunctor() = default;
     ///@}
 
@@ -299,6 +299,7 @@ public:
     void SetTempoEventTicks(const std::set<int> &ticks) { m_tempoEventTicks = ticks; }
     void SetTrack(int track) { m_midiTrack = track; }
     void SetTransSemi(int transSemi) { m_transSemi = transSemi; }
+    void SetControlEvents(bool controlEvents) { m_controlEvents = controlEvents; }
     ///@}
 
     /*
@@ -372,6 +373,8 @@ private:
     bool m_cueExclusion;
     // Tablature held notes indexed by (course - 1)
     std::vector<MIDIHeldNote> m_heldNotes;
+    // A flag indicating we want to process control events
+    bool m_controlEvents;
 };
 
 //----------------------------------------------------------------------------

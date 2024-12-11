@@ -54,6 +54,7 @@ public:
     bool Import(const std::string &cmme) override;
 
 private:
+    void CreateMetadata(pugi::xml_node metadataNode);
     void CreateSection(pugi::xml_node musicSectionNode);
     void CreateStaff(pugi::xml_node voiceNode);
     void CreateApp(pugi::xml_node appNode);
@@ -63,6 +64,7 @@ private:
     void ReadEditorialCommentary(pugi::xml_node evenNode, Object *object);
 
     void CreateAccid(pugi::xml_node accidNode);
+    void CreateColorChange(pugi::xml_node colorChangeNode);
     void CreateBarline(pugi::xml_node barlineNode);
     void CreateBreak(pugi::xml_node breakNode);
     void CreateChord(pugi::xml_node chordNode);
@@ -94,6 +96,11 @@ private:
     int ChildAsInt(const pugi::xml_node node, const std::string &child) const;
     ///@}
 
+    /**
+     * Post-process the data to adjust the type of tempo change proport.
+     */
+    void PostProcessProport();
+
 public:
     //
 private:
@@ -113,11 +120,15 @@ private:
     std::vector<cmme::mensInfo> m_mensInfos;
     /** The mensural info for the current voice */
     cmme::mensInfo *m_mensInfo;
+    /** The current color (if not black) */
+    std::string m_currentColor;
 
     /** The number of voices as given in the general data */
     int m_numVoices;
     /** The name of the voices - if any */
     std::vector<std::string> m_voices;
+    /** A flag indicating we had a tempo change */
+    bool m_activeTempoChange;
 };
 
 } // namespace vrv

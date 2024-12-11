@@ -60,6 +60,8 @@ enum option_BREAKS { BREAKS_none = 0, BREAKS_auto, BREAKS_line, BREAKS_smart, BR
 
 enum option_CONDENSE { CONDENSE_none = 0, CONDENSE_auto, CONDENSE_all, CONDENSE_encoded };
 
+enum option_DURATION_EQ { DURATION_EQ_brevis = 0, DURATION_EQ_semibrevis, DURATION_EQ_minima };
+
 enum option_ELISION {
     ELISION_regular = SMUFL_E551_lyricsElision,
     ELISION_narrow = SMUFL_E550_lyricsElisionNarrow,
@@ -141,6 +143,7 @@ public:
      */
     static const std::map<int, std::string> s_breaks;
     static const std::map<int, std::string> s_condense;
+    static const std::map<int, std::string> s_durationEq;
     static const std::map<int, std::string> s_elision;
     static const std::map<int, std::string> s_fontFallback;
     static const std::map<int, std::string> s_footer;
@@ -839,8 +842,10 @@ public:
      */
     OptionGrp m_mensural;
 
+    OptionIntMap m_durationEquivalence;
     OptionBool m_ligatureAsBracket;
-    OptionBool m_mensuralToMeasure;
+    OptionBool m_mensuralResponsiveView;
+    OptionBool m_mensuralToCmn;
 
     /**
      * Additional options for passing method JSON options to the command-line

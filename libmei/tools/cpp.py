@@ -473,6 +473,7 @@ public:
 
 SETTERS_GETTERS_H = """    static bool Set{moduleNameCap}(Object *element, const std::string &attrType, const std::string &attrValue);
     static void Get{moduleNameCap}(const Object *element, ArrayOfStrAttr *attributes);
+    static void Copy{moduleNameCap}(const Object *element, Object *target);
 
 """
 
@@ -552,6 +553,31 @@ GETTERS_GRP_END_CPP = """    }}
 """
 
 GETTERS_END_CPP = """}}
+
+"""
+
+#
+# These templates generate a module level static method for copying attributes of an unspecified Object
+#
+
+COPYERS_START_CPP = """void AttModule::Copy{moduleNameCap}(const Object *element, Object *target)
+{{
+"""
+
+COPYERS_GRP_START_CPP = """    if (element->HasAttClass({attId})) {{
+        const Att{attGroupNameUpper} *att = dynamic_cast<const Att{attGroupNameUpper} *>(element);
+        assert(att);
+        Att{attGroupNameUpper} *attTarget = dynamic_cast<Att{attGroupNameUpper} *>(target);
+        assert(attTarget);
+"""
+
+COPYERS_GRP_CPP = """        attTarget->Set{attNameUpper}(att->Get{attNameUpper}());
+"""
+
+COPYERS_GRP_END_CPP = """    }}
+"""
+
+COPYERS_END_CPP = """}}
 
 }} // namespace {ns}
 """
@@ -1110,6 +1136,7 @@ def create_att_module(cpp_ns: str, schema, outdir: Path):
 
         setters: list = []
         getters: list = []
+        copyers: list = []
 
         for gp, atts in sorted(atgroup.items()):
             if not atts:
@@ -1121,6 +1148,7 @@ def create_att_module(cpp_ns: str, schema, outdir: Path):
             }
             setters.append(SETTERS_GRP_START_CPP.format_map(set_get_fmt))
             getters.append(GETTERS_GRP_START_CPP.format_map(set_get_fmt))
+            copyers.append(COPYERS_GRP_START_CPP.format_map(set_get_fmt))
 
             for att in atts:
                 if "|" in att:
@@ -1142,9 +1170,11 @@ def create_att_module(cpp_ns: str, schema, outdir: Path):
                 }
                 setters.append(SETTERS_GRP_CPP.format_map(attsubstr))
                 getters.append(GETTERS_GRP_CPP.format_map(attsubstr))
+                copyers.append(COPYERS_GRP_CPP.format_map(attsubstr))
 
             setters.append(SETTERS_GRP_END_CPP.format_map(attsubstr))
             getters.append(GETTERS_GRP_END_CPP.format_map(attsubstr))
+            copyers.append(COPYERS_GRP_END_CPP.format_map(attsubstr))
 
         tplvars = {
             "license": LICENSE.format(authors=AUTHORS),
@@ -1160,6 +1190,9 @@ def create_att_module(cpp_ns: str, schema, outdir: Path):
         impl_modules.append(GETTERS_START_CPP.format_map(tplvars))
         impl_modules.append("".join(getters))
         impl_modules.append(GETTERS_END_CPP.format_map(tplvars))
+        impl_modules.append(COPYERS_START_CPP.format_map(tplvars))
+        impl_modules.append("".join(copyers))
+        impl_modules.append(COPYERS_END_CPP.format_map(tplvars))
 
     with Path(outdir, "attmodule.h").open("w") as f_att_module_h:
         lg.debug("\tCreating attmodule.h")

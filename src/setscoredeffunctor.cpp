@@ -232,6 +232,7 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitPage(Page *page)
 
 FunctorCode ScoreDefSetCurrentFunctor::VisitProport(Proport *proport)
 {
+    if (proport->GetType() == "cmme_tempo_change") return FUNCTOR_SIBLINGS;
     assert(m_currentStaffDef);
     StaffDef *upcomingStaffDef = m_upcomingScoreDef.GetStaffDef(m_currentStaffDef->GetN());
     assert(upcomingStaffDef);
