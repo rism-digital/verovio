@@ -489,7 +489,7 @@ bool EditorToolkitNeume::ClefMovementHandler(Clef *clef, int x, int y)
     return true;
 }
 
-bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
+bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool topLevel)
 {
     std::string status = "OK", message = "";
     if (!m_doc->GetDrawingPage()) {
@@ -520,87 +520,55 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         assert(zone);
         zone->ShiftByXY(x, -y);
 
-        AdjustPitchFromPosition(element);
+        AdjustPitchAfterDrag(element, y);
     }
-    else if (element->HasInterface(INTERFACE_PITCH) || element->Is(NEUME) || element->Is(SYLLABLE)) {
-        Layer *layer = dynamic_cast<Layer *>(element->GetFirstAncestor(LAYER));
-        if (!layer) {
-            LogError("Element does not have Layer parent. This should not happen.");
-            m_editInfo.import("status", "FAILURE");
-            m_editInfo.import("message", "Element does not have Layer parent.");
-            return false;
-        }
-
-        // clef association is done at the syllable level because of MEI structure
-        // also note this will initialize syllable as null in the case of custos
-        // which is why all the references to syllable are ternary
-
-        Object *syllable = ((element->Is(SYLLABLE) ? (element) : element->GetFirstAncestor(SYLLABLE)));
-
-        ClassIdComparison ac(CLEF);
-        InterfaceComparison facsIC(INTERFACE_FACSIMILE);
-        InterfaceComparison pitchIC(INTERFACE_PITCH);
-
+    else if (element->Is(SYLLABLE)) {
         // Check for clefs in syllable
         ListOfObjects clefs;
-        syllable->FindAllDescendantsByComparison(&clefs, &ac);
+        ClassIdComparison ac(CLEF);
+        element->FindAllDescendantsByComparison(&clefs, &ac);
         bool hasClef = (clefs.size() != 0);
-
-        FacsimileInterface *fi = element->GetFacsimileInterface();
-        if (fi && fi->HasFacs()) {
-            bool ignoreFacs = false;
-            // Dont adjust the same facsimile twice. NCs in a ligature share a single zone.
-            if (element->Is(NC)) {
-                Nc *nc = dynamic_cast<Nc *>(element);
-                if (nc->GetLigated() == BOOLEAN_true) {
-                    Neume *neume = vrv_cast<Neume *>(nc->GetFirstAncestor(NEUME));
-                    Nc *nextNc = dynamic_cast<Nc *>(neume->GetChild(1 + neume->GetChildIndex(element)));
-                    if (nextNc != NULL && nextNc->GetLigated() == BOOLEAN_true && nextNc->GetZone() == nc->GetZone()) {
-                        ignoreFacs = true;
-                    }
-                }
-            }
-            if (!ignoreFacs) {
-                FacsimileInterface *fi = element->GetFacsimileInterface();
-                assert(fi);
-                Zone *zone = fi->GetZone();
-                assert(zone);
-                zone->ShiftByXY(x, -y);
-            }
-        }
-        else {
-            ListOfObjects facsChildren;
-            element->FindAllDescendantsByComparison(&facsChildren, &facsIC);
-            for (auto it = facsChildren.begin(); it != facsChildren.end(); ++it) {
-                // Don't change the text bbox position and skip clefs until later
-                if ((*it)->Is(SYL) || !(*it)->GetFacsimileInterface()->HasFacs() || (*it)->Is(CLEF)) {
-                    continue;
-                }
-                else {
-                    (*it)->GetFacsimileInterface()->GetZone()->ShiftByXY(x, -y);
-                }
-            }
-        }
-
         if (hasClef) {
             for (Object *obj : clefs) {
                 Clef *clef = dynamic_cast<Clef *>(obj);
-                ClefMovementHandler(clef, x, 0);
-            }
-
-            // if syllable contains clef, adjust individual neumes
-            ListOfObjects neumes;
-            ClassIdComparison neumeCompare(NEUME);
-            element->FindAllDescendantsByComparison(&neumes, &neumeCompare);
-            for (auto neume = neumes.begin(); neume != neumes.end(); ++neume) {
-                AdjustPitchFromPosition(*neume);
+                Drag(clef->GetID(), x, y, false);
             }
         }
-        else {
-            AdjustPitchFromPosition(syllable);
-        }
 
-        layer->ReorderByXPos();
+        ListOfObjects ncs;
+        ClassIdComparison ncComp(NC);
+        element->FindAllDescendantsByComparison(&ncs, &ncComp);
+        for (auto nc = ncs.begin(); nc != ncs.end(); ++nc) {
+            Drag((*nc)->GetID(), x, y, false);
+        }
+    }
+    else if (element->Is(NEUME)) {
+        ListOfObjects ncs;
+        ClassIdComparison ncComp(NC);
+        element->FindAllDescendantsByComparison(&ncs, &ncComp);
+        for (auto nc = ncs.begin(); nc != ncs.end(); ++nc) {
+            Drag((*nc)->GetID(), x, y, false);
+        }
+    }
+    else if (element->Is(NC)) {
+        // Don't adjust the same facsimile twice. NCs in a ligature share a single zone.
+        bool skipLigature = false;
+        Nc *nc = dynamic_cast<Nc *>(element);
+        if (nc->GetLigated() == BOOLEAN_true) {
+            Neume *neume = vrv_cast<Neume *>(nc->GetFirstAncestor(NEUME));
+            Nc *nextNc = dynamic_cast<Nc *>(neume->GetChild(1 + neume->GetChildIndex(element)));
+            if (nextNc != NULL && nextNc->GetLigated() == BOOLEAN_true && nextNc->GetZone() == nc->GetZone()) {
+                skipLigature = true;
+            }
+        }
+        if (!skipLigature) {
+            FacsimileInterface *fi = element->GetFacsimileInterface();
+            assert(fi);
+            Zone *zone = fi->GetZone();
+            assert(zone);
+            zone->ShiftByXY(x, -y);
+        }
+        AdjustPitchAfterDrag(nc, y);
     }
     else if (element->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(element);
@@ -653,6 +621,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         else {
             ClefMovementHandler(clef, x, y);
         }
+        m_doc->ScoreDefSetCurrentDoc(true); // this is needed for staves without clef
     }
     else if (element->Is(STAFF)) {
         Staff *staff = vrv_cast<Staff *>(element);
@@ -737,13 +706,17 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         m_editInfo.import("message", "Unsupported element for dragging.");
         return false;
     }
-    Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
-    layer->ReorderByXPos(); // Reflect position order of elements internally (and in the resulting output file)
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
-    m_doc->GetDrawingPage()->LayOutTranscription(true);
 
-    m_editInfo.import("status", status);
-    m_editInfo.import("message", message);
+    if (topLevel) {
+        Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
+        layer->ReorderByXPos(); // Reflect position order of elements internally (and in the resulting output file)
+        if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+        m_doc->GetDrawingPage()->LayOutTranscription(true);
+
+        m_editInfo.import("status", status);
+        m_editInfo.import("message", message);
+    }
+
     return true;
 }
 
@@ -1116,9 +1089,9 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         uly -= noteHeight / 2;
 
         zone->SetUlx(ulx + offsetX);
-        zone->SetUly(uly);
+        zone->SetUly(uly + noteHeight);
         zone->SetLrx(ulx + noteWidth + offsetX);
-        zone->SetLry(uly + noteHeight);
+        zone->SetLry(uly + noteHeight * 2);
         layer->ReorderByXPos();
         if (!AdjustPitchFromPosition(custos)) {
             LogError("Failed to set pitch.");
@@ -4199,85 +4172,80 @@ bool EditorToolkitNeume::ParseChangeStaffToAction(jsonxx::Object param, std::str
     return true;
 }
 
-bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
+bool EditorToolkitNeume::AdjustPitchAfterDrag(Object *obj, int y)
 {
-    // remember to reorderbyxpos! (not called in function so that it can be used in loops)
-    // this should only be called in cases where finding the old clef is not required
-    // since doing it based only on clefs is much more efficient than based on position
-    // also if you are calling this function in a loop you should always be passing a clef argument
-    // since repeatedly finding the previous clef is very inefficient
+    if (!obj->Is(NC) && !obj->Is(CUSTOS)) {
+        LogError("AdjustPitchAfterDrag should only be called on custos or ncs."
+                 "It has been called on %s, whose id is %s",
+            obj->GetClassName().c_str(), obj->GetID().c_str());
+        return false;
+    }
+    PitchInterface *pi = obj->GetPitchInterface();
+    assert(pi);
+    Staff *staff = dynamic_cast<Staff *>(obj->GetFirstAncestor(STAFF));
+    const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int noteHeight = (int)(staffSize * 2 / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+    const int yOffset = y > 0 ? noteHeight / 2 : -noteHeight / 2;
+    const int pitchDifference = (y + yOffset) / staffSize;
+    pi->AdjustPitchByOffset(pitchDifference);
+    return true;
+}
 
-    if (obj->Is(CUSTOS)) {
-        Custos *custos = dynamic_cast<Custos *>(obj);
-        Staff *staff = custos->GetAncestorStaff();
+bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj)
+{
+    if (!obj->Is(CUSTOS) && !obj->Is(SYLLABLE) && !obj->Is(NEUME)) {
+        LogError("AdjustPitchFromPosition should only be called on custos or syllables/neumes. Called on %s, ID: %s",
+            obj->GetClassName().c_str(), obj->GetID().c_str());
+        return false;
+    }
 
-        // Check interfaces
-        if ((custos->GetPitchInterface() == NULL) || (custos->GetFacsimileInterface() == NULL)) {
-            LogError("Element is lacking an interface which is required for pitch adjusting");
-            return false;
-        }
-        PitchInterface *pi = custos->GetPitchInterface();
-        FacsimileInterface *fi = custos->GetFacsimileInterface();
+    // Helper lambda to retrieve the clef and calculate its offset
+    auto getClefAndOffset = [this](Object *obj, Staff *staff, int staffSize, Clef *&clef, int &clefOffset) -> bool {
+        clefOffset = 0;
+        ClassIdComparison ac(CLEF);
+        clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
 
-        // Check for facsimile
-        if (!fi->HasFacs() || !staff->HasFacs()) {
-            LogError("Could not adjust pitch: the element or staff lacks facsimile data");
-            return false;
-        }
-
-        int clefOffset = 0;
-        if (clef == NULL) {
-            ClassIdComparison ac(CLEF);
-            clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
-            if (clef == NULL) {
-                ClassIdComparison ac(CLEF);
-                clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
-                if (clef == NULL) {
-                    Layer *layer = vrv_cast<Layer *>(staff->FindDescendantByType(LAYER));
-                    assert(layer);
-                    clef = layer->GetCurrentClef();
-                }
-                else {
-                    Staff *clefStaff = dynamic_cast<Staff *>(clef->GetFirstAncestor(STAFF));
-                    assert(clefStaff);
-                    clefOffset = round((double)(clefStaff->GetDrawingY()
-                        - clefStaff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(clef->GetZone()->GetUlx()))
-                        - m_view->ToLogicalY(clef->GetZone()->GetUly())));
-                }
-            }
-        }
-
-        data_PITCHNAME pname;
-        const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        int baseOctave;
-
-        switch (clef->GetShape()) {
-            case CLEFSHAPE_C:
-                pname = PITCHNAME_c;
-                baseOctave = 4;
-                break;
-            case CLEFSHAPE_F:
-                pname = PITCHNAME_f;
-                baseOctave = 3;
-                break;
-            case CLEFSHAPE_G:
-                pname = PITCHNAME_g;
-                baseOctave = 4;
-                break;
-            default:
-                LogError("Clef %s does not have valid shape. Shape is %s", clef->GetID().c_str(), clef->GetShape());
+        if (!clef) {
+            Layer *layer = vrv_cast<Layer *>(staff->FindDescendantByType(LAYER));
+            if (!layer) {
+                LogError("Unable to find layer for staff.");
                 return false;
+            }
+            clef = layer->GetCurrentClef();
         }
+        else {
+            Staff *clefStaff = dynamic_cast<Staff *>(clef->GetFirstAncestor(STAFF));
+            if (!clefStaff) {
+                LogError("Clef is missing its parent staff.");
+                return false;
+            }
+            clefOffset
+                = round((double)(clefStaff->GetDrawingY()
+                            - clefStaff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(clef->GetZone()->GetUlx()))
+                            - m_view->ToLogicalY(clef->GetZone()->GetUly()))
+                    + staffSize);
+        }
+        return true;
+    };
+
+    // Common logic for adjusting pitch
+    auto adjustPitch = [this](PitchInterface *pi, FacsimileInterface *fi, Clef *clef, int clefOffset, int staffSize,
+                           int baseOctave, data_PITCHNAME pname, Staff *staff) {
+        if (!pi || !fi || !fi->HasFacs()) {
+            LogError("Pitch adjustment failed due to missing interfaces or facsimile data.");
+            return false;
+        }
+
         pi->SetPname(pname);
 
-        // The actual octave is calculated by
-        // taking into account the displacement of the clef
+        // Calculate the octave based on clef displacement
         int octave = baseOctave;
         if (clef->GetDis() && clef->GetDisPlace()) {
             octave += (clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1) * (clef->GetDis() / 7);
         }
         pi->SetOct(octave);
 
+        // Adjust pitch difference
         const int pitchDifference
             = round((double)((staff->GetDrawingY()
                         - staff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(fi->GetZone()->GetUlx()))
@@ -4285,100 +4253,68 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
                 / (double)(staffSize));
         pi->AdjustPitchByOffset(-pitchDifference);
         return true;
+    };
+
+    Staff *staff = dynamic_cast<Staff *>(obj->GetFirstAncestor(STAFF));
+    const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    if (!staff) {
+        LogError("Object does not have a valid parent staff.");
+        return false;
     }
 
-    else if (obj->Is(SYLLABLE) || obj->Is(NEUME)) {
-        Staff *staff = dynamic_cast<Staff *>(obj->GetFirstAncestor(STAFF));
-        assert(staff);
+    Clef *clef = nullptr;
+    int clefOffset = 0;
+    if (!getClefAndOffset(obj, staff, staffSize, clef, clefOffset)) {
+        return false;
+    }
 
+    data_PITCHNAME pname;
+    int baseOctave;
+
+    // Determine pitch name and base octave based on clef shape
+    switch (clef->GetShape()) {
+        case CLEFSHAPE_C:
+            pname = PITCHNAME_c;
+            baseOctave = 4;
+            break;
+        case CLEFSHAPE_F:
+            pname = PITCHNAME_f;
+            baseOctave = 3;
+            break;
+        case CLEFSHAPE_G:
+            pname = PITCHNAME_g;
+            baseOctave = 4;
+            break;
+        default:
+            LogError("Clef %s does not have a valid shape: %s", clef->GetID().c_str(), clef->GetShape());
+            return false;
+    }
+
+    if (obj->Is(CUSTOS)) {
+        return adjustPitch(obj->GetPitchInterface(), obj->GetFacsimileInterface(), clef, clefOffset, staffSize,
+            baseOctave, pname, staff);
+    }
+    // syllable/neume: call the adjustPitch on children
+    else {
         ListOfObjects pitchedChildren;
         InterfaceComparison ic(INTERFACE_PITCH);
         obj->FindAllDescendantsByComparison(&pitchedChildren, &ic);
 
         if (pitchedChildren.empty()) {
-            LogWarning("Syllable/neume had no pitched children to reorder for syllable/neume %s", obj->GetID().c_str());
+            LogWarning("Syllable/neume has no pitched children: %s", obj->GetID().c_str());
             return true;
         }
 
-        int clefOffset = 0;
-        if (clef == NULL) {
-            ClassIdComparison ac(CLEF);
-            clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
-            if (clef == NULL) {
-                Layer *layer = vrv_cast<Layer *>(staff->FindDescendantByType(LAYER));
-                assert(layer);
-                clef = layer->GetCurrentClef();
-            }
-            else {
-                Staff *clefStaff = dynamic_cast<Staff *>(clef->GetFirstAncestor(STAFF));
-                assert(clefStaff);
-                clefOffset = round((double)(clefStaff->GetDrawingY()
-                    - clefStaff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(clef->GetZone()->GetUlx()))
-                    - m_view->ToLogicalY(clef->GetZone()->GetUly())));
+        for (auto *child : pitchedChildren) {
+            if (!child->Is(LIQUESCENT)) {
+                if (!adjustPitch(child->GetPitchInterface(), child->GetFacsimileInterface(), clef, clefOffset,
+                        staffSize, baseOctave, pname, staff)) {
+                    return false;
+                }
             }
         }
-
-        data_PITCHNAME pname = PITCHNAME_c;
-        const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        int baseOctave;
-
-        switch (clef->GetShape()) {
-            case CLEFSHAPE_C:
-                pname = PITCHNAME_c;
-                baseOctave = 4;
-                break;
-            case CLEFSHAPE_F:
-                pname = PITCHNAME_f;
-                baseOctave = 3;
-                break;
-            case CLEFSHAPE_G:
-                pname = PITCHNAME_g;
-                baseOctave = 4;
-                break;
-            default:
-                LogError("Clef %s does not have valid shape. Shape is %s", clef->GetID().c_str(), clef->GetShape());
-                return false;
-        }
-
-        for (auto it = pitchedChildren.begin(); it != pitchedChildren.end(); ++it) {
-            if ((*it)->Is(LIQUESCENT)) continue;
-
-            FacsimileInterface *fi = (*it)->GetFacsimileInterface();
-            if (fi == NULL || !fi->HasFacs()) {
-                LogError("Could not adjust pitch: child %s does not have facsimile data", (*it)->GetID().c_str());
-                return false;
-            }
-
-            PitchInterface *pi = (*it)->GetPitchInterface();
-            assert(pi);
-            pi->SetPname(pname);
-
-            // The actual octave is calculated by
-            // taking into account the displacement of the clef
-            int octave = baseOctave;
-            if (clef->GetDis() && clef->GetDisPlace()) {
-                octave += (clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1) * (clef->GetDis() / 7);
-            }
-            pi->SetOct(octave);
-
-            const int pitchDifference
-                = round((double)((staff->GetDrawingY()
-                            - staff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(fi->GetZone()->GetUlx()))
-                            - m_view->ToLogicalY(fi->GetZone()->GetUly()) - clefOffset))
-                    / (double)(staffSize));
-
-            pi->AdjustPitchByOffset(-pitchDifference);
-        }
-
-        return true;
     }
-
-    else {
-        LogError("AdjustPitchFromPosition should only be called on custos or syllables."
-                 "It has been called on %s, whose id is %s",
-            obj->GetClassName().c_str(), obj->GetID().c_str());
-        return false;
-    }
+    return true;
 }
 
 bool EditorToolkitNeume::AdjustClefLineFromPosition(Clef *clef, Staff *staff)
