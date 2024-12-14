@@ -34,12 +34,10 @@ Ornam::Ornam()
     , TextListInterface()
     , TextDirInterface()
     , TimePointInterface()
-    , AttColor()
     , AttOrnamentAccid()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ORNAMENTACCID);
 
     this->Reset();
@@ -52,7 +50,6 @@ void Ornam::Reset()
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimePointInterface::Reset();
-    this->ResetColor();
     this->ResetOrnamentAccid();
 }
 

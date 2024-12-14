@@ -28,10 +28,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 ControlElement::ControlElement()
-    : FloatingObject(CONTROL_ELEMENT, "ce"), AltSymInterface(), LinkingInterface(), AttLabelled(), AttTyped()
+    : FloatingObject(CONTROL_ELEMENT, "ce"), AltSymInterface(), LinkingInterface(), AttColor(), AttLabelled(), AttTyped()
 {
     this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
     this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_TYPED);
 
@@ -43,6 +44,7 @@ ControlElement::ControlElement(ClassId classId)
 {
     this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
     this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_TYPED);
 
@@ -54,6 +56,7 @@ ControlElement::ControlElement(ClassId classId, const std::string &classIdStr)
 {
     this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
     this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_TYPED);
 
@@ -67,6 +70,7 @@ void ControlElement::Reset()
     FloatingObject::Reset();
     AltSymInterface::Reset();
     LinkingInterface::Reset();
+    this->ResetColor();
     this->ResetLabelled();
     this->ResetTyped();
 }

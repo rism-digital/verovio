@@ -26,7 +26,6 @@ class System;
  */
 class Pedal : public ControlElement,
               public TimeSpanningInterface,
-              public AttColor,
               public AttExtSymAuth,
               public AttExtSymNames,
               public AttPedalLog,

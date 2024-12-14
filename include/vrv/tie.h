@@ -26,7 +26,6 @@ class Note;
  */
 class Tie : public ControlElement,
             public TimeSpanningInterface,
-            public AttColor,
             public AttCurvature,
             public AttLineRendBase {
 public:

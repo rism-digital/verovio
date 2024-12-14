@@ -34,10 +34,9 @@ namespace vrv {
 
 static const ClassRegistrar<Tie> s_factory("tie", TIE);
 
-Tie::Tie() : ControlElement(TIE, "tie-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttLineRendBase()
+Tie::Tie() : ControlElement(TIE, "tie-"), TimeSpanningInterface(), AttCurvature(), AttLineRendBase()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_CURVATURE);
     this->RegisterAttClass(ATT_LINERENDBASE);
 
@@ -45,10 +44,9 @@ Tie::Tie() : ControlElement(TIE, "tie-"), TimeSpanningInterface(), AttColor(), A
 }
 
 Tie::Tie(ClassId classId)
-    : ControlElement(classId, "tie-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttLineRendBase()
+    : ControlElement(classId, "tie-"), TimeSpanningInterface(), AttCurvature(), AttLineRendBase()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_CURVATURE);
     this->RegisterAttClass(ATT_LINERENDBASE);
 
@@ -56,10 +54,9 @@ Tie::Tie(ClassId classId)
 }
 
 Tie::Tie(ClassId classId, const std::string &classIdStr)
-    : ControlElement(classId, classIdStr), TimeSpanningInterface(), AttColor(), AttCurvature(), AttLineRendBase()
+    : ControlElement(classId, classIdStr), TimeSpanningInterface(), AttCurvature(), AttLineRendBase()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_CURVATURE);
     this->RegisterAttClass(ATT_LINERENDBASE);
 
@@ -72,7 +69,6 @@ void Tie::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
-    this->ResetColor();
     this->ResetCurvature();
     this->ResetLineRendBase();
 }

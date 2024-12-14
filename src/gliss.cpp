@@ -29,13 +29,11 @@ static const ClassRegistrar<Gliss> s_factory("gliss", GLISS);
 Gliss::Gliss()
     : ControlElement(GLISS, "gliss-")
     , TimeSpanningInterface()
-    , AttColor()
     , AttLineRend()
     , AttLineRendBase()
     , AttNNumberLike()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_LINEREND);
     this->RegisterAttClass(ATT_LINERENDBASE);
     this->RegisterAttClass(ATT_NNUMBERLIKE);
@@ -49,7 +47,6 @@ void Gliss::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
-    this->ResetColor();
     this->ResetLineRend();
     this->ResetLineRendBase();
     this->ResetNNumberLike();
