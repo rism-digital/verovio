@@ -27,11 +27,7 @@ namespace vrv {
 static const ClassRegistrar<Gliss> s_factory("gliss", GLISS);
 
 Gliss::Gliss()
-    : ControlElement(GLISS, "gliss-")
-    , TimeSpanningInterface()
-    , AttLineRend()
-    , AttLineRendBase()
-    , AttNNumberLike()
+    : ControlElement(GLISS, "gliss-"), TimeSpanningInterface(), AttLineRend(), AttLineRendBase(), AttNNumberLike()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_LINEREND);

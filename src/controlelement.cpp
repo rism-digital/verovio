@@ -28,7 +28,12 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 ControlElement::ControlElement()
-    : FloatingObject(CONTROL_ELEMENT, "ce"), AltSymInterface(), LinkingInterface(), AttColor(), AttLabelled(), AttTyped()
+    : FloatingObject(CONTROL_ELEMENT, "ce")
+    , AltSymInterface()
+    , LinkingInterface()
+    , AttColor()
+    , AttLabelled()
+    , AttTyped()
 {
     this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
     this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());

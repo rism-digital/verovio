@@ -28,8 +28,7 @@ namespace vrv {
 
 static const ClassRegistrar<Reh> s_factory("reh", REH);
 
-Reh::Reh()
-    : ControlElement(REH, "reh-"), TextDirInterface(), TimePointInterface(), AttLang(), AttVerticalGroup()
+Reh::Reh() : ControlElement(REH, "reh-"), TextDirInterface(), TimePointInterface(), AttLang(), AttVerticalGroup()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());

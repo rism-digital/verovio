@@ -24,10 +24,7 @@ class Note;
 /**
  * This class models the MEI <tie> element.
  */
-class Tie : public ControlElement,
-            public TimeSpanningInterface,
-            public AttCurvature,
-            public AttLineRendBase {
+class Tie : public ControlElement, public TimeSpanningInterface, public AttCurvature, public AttLineRendBase {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

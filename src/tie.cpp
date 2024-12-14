@@ -43,8 +43,7 @@ Tie::Tie() : ControlElement(TIE, "tie-"), TimeSpanningInterface(), AttCurvature(
     this->Reset();
 }
 
-Tie::Tie(ClassId classId)
-    : ControlElement(classId, "tie-"), TimeSpanningInterface(), AttCurvature(), AttLineRendBase()
+Tie::Tie(ClassId classId) : ControlElement(classId, "tie-"), TimeSpanningInterface(), AttCurvature(), AttLineRendBase()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_CURVATURE);
