@@ -28,7 +28,6 @@ class Ornam : public ControlElement,
               public TextListInterface,
               public TextDirInterface,
               public TimePointInterface,
-              public AttColor,
               public AttOrnamentAccid {
 public:
     /**

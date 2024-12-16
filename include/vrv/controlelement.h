@@ -10,6 +10,7 @@
 
 #include "altsyminterface.h"
 #include "atts_shared.h"
+#include "atts_visual.h"
 #include "devicecontextbase.h"
 #include "floatingobject.h"
 #include "linkinginterface.h"
@@ -27,6 +28,7 @@ namespace vrv {
 class ControlElement : public FloatingObject,
                        public AltSymInterface,
                        public LinkingInterface,
+                       public AttColor,
                        public AttLabelled,
                        public AttTyped {
 public:

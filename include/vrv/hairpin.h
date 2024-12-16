@@ -24,7 +24,6 @@ namespace vrv {
  */
 class Hairpin : public ControlElement,
                 public TimeSpanningInterface,
-                public AttColor,
                 public AttHairpinLog,
                 public AttHairpinVis,
                 public AttLineRendBase,

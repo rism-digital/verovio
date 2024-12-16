@@ -31,13 +31,11 @@ BracketSpan::BracketSpan()
     : ControlElement(BRACKETSPAN, "bspan-")
     , TimeSpanningInterface()
     , AttBracketSpanLog()
-    , AttColor()
     , AttLineRend()
     , AttLineRendBase()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_BRACKETSPANLOG);
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_LINEREND);
     this->RegisterAttClass(ATT_LINERENDBASE);
 
@@ -51,7 +49,6 @@ void BracketSpan::Reset()
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
     this->ResetBracketSpanLog();
-    this->ResetColor();
     this->ResetLineRend();
     this->ResetLineRendBase();
 }

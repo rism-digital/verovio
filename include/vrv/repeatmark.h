@@ -27,7 +27,6 @@ class RepeatMark : public ControlElement,
                    public TextListInterface,
                    public TextDirInterface,
                    public TimePointInterface,
-                   public AttColor,
                    public AttExtSymAuth,
                    public AttExtSymNames,
                    public AttRepeatMarkLog {

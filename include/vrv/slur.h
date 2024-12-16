@@ -52,7 +52,6 @@ enum class PortatoSlurType { None, StemSide, Centered };
 
 class Slur : public ControlElement,
              public TimeSpanningInterface,
-             public AttColor,
              public AttCurvature,
              public AttLayerIdent,
              public AttLineRendBase {
