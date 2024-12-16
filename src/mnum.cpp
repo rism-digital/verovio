@@ -30,13 +30,11 @@ MNum::MNum()
     , TextListInterface()
     , TextDirInterface()
     , TimePointInterface()
-    , AttColor()
     , AttLang()
     , AttTypography()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_LANG);
     this->RegisterAttClass(ATT_TYPOGRAPHY);
 
@@ -50,7 +48,6 @@ void MNum::Reset()
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimePointInterface::Reset();
-    this->ResetColor();
     this->ResetLang();
     this->ResetTypography();
 

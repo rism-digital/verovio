@@ -34,14 +34,12 @@ RepeatMark::RepeatMark()
     , TextListInterface()
     , TextDirInterface()
     , TimePointInterface()
-    , AttColor()
     , AttExtSymAuth()
     , AttExtSymNames()
     , AttRepeatMarkLog()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_EXTSYMAUTH);
     this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_REPEATMARKLOG);
@@ -56,7 +54,6 @@ void RepeatMark::Reset()
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimePointInterface::Reset();
-    this->ResetColor();
     this->ResetExtSymAuth();
     this->ResetExtSymNames();
     this->ResetRepeatMarkLog();

@@ -34,14 +34,12 @@ static const ClassRegistrar<Hairpin> s_factory("hairpin", HAIRPIN);
 Hairpin::Hairpin()
     : ControlElement(HAIRPIN, "hairpin-")
     , TimeSpanningInterface()
-    , AttColor()
     , AttHairpinLog()
     , AttHairpinVis()
     , AttPlacementRelStaff()
     , AttVerticalGroup()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_HAIRPINLOG);
     this->RegisterAttClass(ATT_HAIRPINVIS);
     this->RegisterAttClass(ATT_LINERENDBASE);
@@ -57,7 +55,6 @@ void Hairpin::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
-    this->ResetColor();
     this->ResetHairpinLog();
     this->ResetHairpinVis();
     this->ResetLineRendBase();
