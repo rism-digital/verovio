@@ -1796,8 +1796,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     }
 
     // read clef changes as MEI clef and add them to the stack
-    pugi::xml_node clef = node.child("clef");
-    if (clef) {
+    for (pugi::xml_node clef : node.children("clef")) {
         // check if we have a staff number
         short int staffNum = clef.attribute("number").as_int();
         staffNum = (staffNum < 1) ? 1 : staffNum;
