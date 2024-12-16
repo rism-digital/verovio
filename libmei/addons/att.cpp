@@ -158,6 +158,21 @@ data_BULGE Att::StrToBulge(const std::string &value, bool logWarning) const
     return bulge;
 }
 
+std::string Att::DegreesToStr(data_DEGREES data) const
+{
+    return StringFormat("%f", data);
+}
+
+data_DEGREES Att::StrToDegrees(const std::string &value, bool logWarning) const
+{
+    double degrees = atof(value.c_str());
+    if ((degrees > 360.0) || (degrees < -360.0)) {
+        if (logWarning) LogWarning("Unsupported data.DEGREES '%s'", value.c_str());
+        return 0;
+    }
+    return degrees;
+}
+
 std::string Att::DurationToStr(data_DURATION data) const
 {
     std::string value;
