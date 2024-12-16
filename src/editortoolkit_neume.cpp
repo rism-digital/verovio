@@ -2496,6 +2496,8 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
                 accidZone->SetLry(accidZone->GetLry() + int(rotationOffset));
             }
         }
+        if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+        m_doc->GetDrawingPage()->LayOutTranscription(true);
     }
     else if (obj->Is(SYL)) {
         Syl *syl = vrv_cast<Syl *>(obj);
@@ -2530,6 +2532,7 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
             zone->SetRotate(rotate);
         }
         zone->Modify();
+        if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
     }
     else {
         LogError("Element of type '%s' is unsupported.", obj->GetClassName().c_str());
@@ -2537,8 +2540,6 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
         m_editInfo.import("message", "Element of type '" + obj->GetClassName() + "' is unsupported.");
         return false;
     }
-
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
 
     m_editInfo.import("status", "OK");
     m_editInfo.import("message", "");
