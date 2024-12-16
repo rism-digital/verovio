@@ -3051,9 +3051,9 @@ void MusicXmlInput::ReadMusicXmlNote(
                     std::string textStr = childNode.text().as_string();
 
                     // convert verse numbers to labels
-                    std::regex labelSearch("^([^[:alpha:]]*\\d[^[:alpha:]]*)$");
+                    static const std::regex labelSearch("^([^[:alpha:]]*\\d[^[:alpha:]]*)$");
                     std::smatch labelSearchMatches;
-                    std::regex labelPrefixSearch("^([^[:alpha:]]*\\d[^[:alpha:]]*)[\\s\\u00A0]+");
+                    static const std::regex labelPrefixSearch("^([^[:alpha:]]*\\d[^[:alpha:]]*)[\\s\\u00A0]+");
                     std::smatch labelPrefixSearchMatches;
                     if (!textStr.empty() && std::regex_search(textStr, labelSearchMatches, labelSearch)
                         && labelSearchMatches.ready() && childNode.next_sibling("elision")) {
