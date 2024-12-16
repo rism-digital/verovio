@@ -41,7 +41,7 @@ public:
     ///@{
     bool Chain(jsonxx::Array actions);
     bool DisplaceClefOctave(std::string elementId, std::string direction);
-    bool Drag(std::string elementId, int x, int y);
+    bool Drag(std::string elementId, int x, int y, bool topLevel = true);
     bool Insert(std::string elementType, std::string staffId, int ulx, int uly, int lrx, int lry,
         std::vector<std::pair<std::string, std::string>> attributes);
     bool InsertToSyllable(std::string elementId);
@@ -102,7 +102,8 @@ protected:
      * Helper functions for editor actions.
      */
     ///@{
-    bool AdjustPitchFromPosition(Object *obj, Clef *clef = NULL);
+    bool AdjustPitchAfterDrag(Object *obj, int y = 0);
+    bool AdjustPitchFromPosition(Object *obj);
     bool AdjustClefLineFromPosition(Clef *clef, Staff *staff = NULL);
     ///@}
 };
