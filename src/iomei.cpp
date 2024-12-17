@@ -8321,7 +8321,7 @@ bool MEIInput::IsAnnotScore(pugi::xml_node annot)
 {
     // If the annotation is a score annotation, it'll have @type="score" (we can also guess)
     std::string value = annot.attribute("type").value();
-    return value == "score";
+    return (value == "score");
 }
 
 bool MEIInput::IsEditorialElementName(std::string elementName)
