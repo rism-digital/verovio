@@ -1977,12 +1977,7 @@ void MEIOutput::WriteAnnotScore(pugi::xml_node currentNode, AnnotScore *annotSco
 
     this->WriteControlElement(currentNode, annotScore);
     annotScore->WritePlist(currentNode);
-    // FIXME: currently ignoring annot contents
-    /*     // special case where we keep the pugi::nodes
-        for (pugi::xml_node child = annotScore->m_content.first_child(); child; child = child.next_sibling()) {
-            currentNode.append_copy(child);
-        }
-     */
+    // Currently ignoring annot contents -- normal annot looks at child elements here
 }
 
 void MEIOutput::WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg)
@@ -7725,20 +7720,18 @@ bool MEIInput::ReadAnnot(Object *parent, pugi::xml_node annot)
 bool MEIInput::ReadAnnotScore(Object *parent, pugi::xml_node annot)
 {
     AnnotScore *vrvAnnotScore = new AnnotScore();
-    // this->ReadEditorialElement(annot, vrvAnnotScore);
+    // Note: there probably needs to be more in here (see model methods)
 
     vrvAnnotScore->ReadPlist(annot);
-    // vrvAnnotScore->ReadSource(annot);
 
     parent->AddChild(vrvAnnotScore);
-    // vrvAnnotScore->m_content.reset();
 
     bool hasNonTextContent = false;
     // copy all the nodes inside into the document
     for (pugi::xml_node child = annot.first_child(); child; child = child.next_sibling()) {
         const std::string nodeName = child.name();
         if (!hasNonTextContent && (!nodeName.empty())) hasNonTextContent = true;
-        // vrvAnnotScore->m_content.append_copy(child);
+        // This is also orphan code -- we can't copy the contents here
     }
     this->ReadUnsupportedAttr(annot, vrvAnnotScore);
     // Unless annot has only text we do not load children because they are preserved in Annot::m_content
@@ -7746,7 +7739,7 @@ bool MEIInput::ReadAnnotScore(Object *parent, pugi::xml_node annot)
         return true;
     }
     else {
-        // vrvAnnot->m_content.remove_children();
+        // Again, this is code that may not apply for annotScore
         return this->ReadTextChildren(vrvAnnotScore, annot, vrvAnnotScore);
     }
 }
