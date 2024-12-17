@@ -472,10 +472,12 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->Is(ANCHOREDTEXT)) {
         m_currentNode = m_currentNode.append_child("anchoredText");
         this->WriteAnchoredText(m_currentNode, vrv_cast<AnchoredText *>(object));
-    } else if (object->Is(ANNOTSCORE)){
-            m_currentNode = m_currentNode.append_child("annot");
-            this->WriteAnnotScore(m_currentNode, vrv_cast<AnnotScore *>(object));
-    } else if (object->Is(ARPEG)) {
+    }
+    else if (object->Is(ANNOTSCORE)) {
+        m_currentNode = m_currentNode.append_child("annot");
+        this->WriteAnnotScore(m_currentNode, vrv_cast<AnnotScore *>(object));
+    }
+    else if (object->Is(ARPEG)) {
         m_currentNode = m_currentNode.append_child("arpeg");
         this->WriteArpeg(m_currentNode, vrv_cast<Arpeg *>(object));
     }
@@ -839,10 +841,12 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         else if (object->Is(ANNOT)) {
             m_currentNode = m_currentNode.append_child("annot");
             this->WriteAnnot(m_currentNode, vrv_cast<Annot *>(object));
-        } else if (object->Is(APP)) {
+        }
+        else if (object->Is(APP)) {
             m_currentNode = m_currentNode.append_child("app");
             this->WriteApp(m_currentNode, vrv_cast<App *>(object));
-        }  else if (object->Is(CHOICE)) {
+        }
+        else if (object->Is(CHOICE)) {
             m_currentNode = m_currentNode.append_child("choice");
             this->WriteChoice(m_currentNode, vrv_cast<Choice *>(object));
         }
@@ -1974,11 +1978,11 @@ void MEIOutput::WriteAnnotScore(pugi::xml_node currentNode, AnnotScore *annotSco
     this->WriteControlElement(currentNode, annotScore);
     annotScore->WritePlist(currentNode);
     // FIXME: currently ignoring annot contents
-/*     // special case where we keep the pugi::nodes
-    for (pugi::xml_node child = annotScore->m_content.first_child(); child; child = child.next_sibling()) {
-        currentNode.append_copy(child);
-    }
- */
+    /*     // special case where we keep the pugi::nodes
+        for (pugi::xml_node child = annotScore->m_content.first_child(); child; child = child.next_sibling()) {
+            currentNode.append_copy(child);
+        }
+     */
 }
 
 void MEIOutput::WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg)
@@ -5500,9 +5504,10 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         this->NormalizeAttributes(current);
         // editorial
         if (this->IsEditorialElementName(currentName)) {
-            if(currentName == "annot" && this->IsAnnotScore(current)) {
+            if (currentName == "annot" && this->IsAnnotScore(current)) {
                 success = this->ReadAnnotScore(parent, current);
-            } else {
+            }
+            else {
                 success = this->ReadEditorialElement(parent, current, EDITORIAL_MEASURE);
             }
         }
@@ -7719,21 +7724,21 @@ bool MEIInput::ReadAnnot(Object *parent, pugi::xml_node annot)
 
 bool MEIInput::ReadAnnotScore(Object *parent, pugi::xml_node annot)
 {
-   AnnotScore *vrvAnnotScore = new AnnotScore();
-    //this->ReadEditorialElement(annot, vrvAnnotScore);
+    AnnotScore *vrvAnnotScore = new AnnotScore();
+    // this->ReadEditorialElement(annot, vrvAnnotScore);
 
     vrvAnnotScore->ReadPlist(annot);
-    //vrvAnnotScore->ReadSource(annot);
+    // vrvAnnotScore->ReadSource(annot);
 
     parent->AddChild(vrvAnnotScore);
-    //vrvAnnotScore->m_content.reset();
+    // vrvAnnotScore->m_content.reset();
 
     bool hasNonTextContent = false;
     // copy all the nodes inside into the document
     for (pugi::xml_node child = annot.first_child(); child; child = child.next_sibling()) {
         const std::string nodeName = child.name();
         if (!hasNonTextContent && (!nodeName.empty())) hasNonTextContent = true;
-        //vrvAnnotScore->m_content.append_copy(child);
+        // vrvAnnotScore->m_content.append_copy(child);
     }
     this->ReadUnsupportedAttr(annot, vrvAnnotScore);
     // Unless annot has only text we do not load children because they are preserved in Annot::m_content
@@ -7741,10 +7746,9 @@ bool MEIInput::ReadAnnotScore(Object *parent, pugi::xml_node annot)
         return true;
     }
     else {
-        //vrvAnnot->m_content.remove_children();
+        // vrvAnnot->m_content.remove_children();
         return this->ReadTextChildren(vrvAnnotScore, annot, vrvAnnotScore);
     }
-
 }
 
 bool MEIInput::ReadApp(Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter)
@@ -8345,7 +8349,8 @@ bool MEIInput::ReadXMLComment(Object *object, pugi::xml_node element)
     return true;
 }
 
-bool MEIInput::IsAnnotScore(pugi::xml_node annot) {
+bool MEIInput::IsAnnotScore(pugi::xml_node annot)
+{
     // If the annotation is a score annotation, it'll have @type="score" (we can also guess)
     std::string value = annot.attribute("type").value();
     return value == "score";
