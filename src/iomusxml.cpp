@@ -3492,7 +3492,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             m_trillStack.push_back({ trill, openTrill });
         }
         for (pugi::xml_node xmlAccidMark = xmlTrill.node().next_sibling("accidental-mark"); xmlAccidMark;
-            xmlAccidMark = xmlAccidMark.next_sibling("accidental-mark")) {
+             xmlAccidMark = xmlAccidMark.next_sibling("accidental-mark")) {
             if (HasAttributeWithValue(xmlAccidMark, "placement", "below")) {
                 trill->SetAccidlower(ConvertAccidentalToAccid(xmlAccidMark.text().as_string()));
             }
@@ -3530,7 +3530,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         turn->SetPlace(turn->AttPlacementRelStaff::StrToStaffrel(xmlTurn.node().attribute("placement").as_string()));
         turn->SetForm(turnLog_FORM_upper);
         for (pugi::xml_node xmlAccidMark = xmlTurn.node().next_sibling("accidental-mark"); xmlAccidMark;
-            xmlAccidMark = xmlAccidMark.next_sibling("accidental-mark")) {
+             xmlAccidMark = xmlAccidMark.next_sibling("accidental-mark")) {
             if (HasAttributeWithValue(xmlAccidMark, "placement", "above")) {
                 turn->SetAccidupper(ConvertAccidentalToAccid(xmlAccidMark.text().as_string()));
             }
@@ -4691,7 +4691,7 @@ std::pair<std::vector<int>, int> MusicXmlInput::GetMeterSigGrpValues(const pugi:
     int maxUnit = 0;
     std::vector<int> meterCounts;
     for (auto iter1 = beats.begin(), iter2 = beat_type.begin(); (iter1 != beats.end()) && (iter2 != beat_type.end());
-        ++iter1, ++iter2) {
+         ++iter1, ++iter2) {
         // Process current beat/beat-type combination and add it to the meterSigGrp
         MeterSig *meterSig = new MeterSig();
         data_METERCOUNT_pair count = meterSig->AttMeterSigLog::StrToMetercountPair(iter1->node().text().as_string());
