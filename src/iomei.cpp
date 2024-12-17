@@ -1952,6 +1952,7 @@ void MEIOutput::WriteControlElement(pugi::xml_node currentNode, ControlElement *
     this->WriteXmlId(currentNode, controlElement);
     this->WriteAltSymInterface(currentNode, controlElement);
     this->WriteLinkingInterface(currentNode, controlElement);
+    controlElement->WriteColor(currentNode);
     controlElement->WriteLabelled(currentNode);
     controlElement->WriteTyped(currentNode);
 }
@@ -1987,7 +1988,6 @@ void MEIOutput::WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg)
     this->WriteTimePointInterface(currentNode, arpeg);
     arpeg->WriteArpegLog(currentNode);
     arpeg->WriteArpegVis(currentNode);
-    arpeg->WriteColor(currentNode);
     arpeg->WriteEnclosingChars(currentNode);
 }
 
@@ -2000,7 +2000,6 @@ void MEIOutput::WriteBeamSpan(pugi::xml_node currentNode, BeamSpan *beamSpan)
     WriteTimeSpanningInterface(currentNode, beamSpan);
     beamSpan->WriteBeamedWith(currentNode);
     beamSpan->WriteBeamRend(currentNode);
-    beamSpan->WriteColor(currentNode);
 }
 
 void MEIOutput::WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracketSpan)
@@ -2010,7 +2009,6 @@ void MEIOutput::WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracke
     this->WriteControlElement(currentNode, bracketSpan);
     this->WriteTimeSpanningInterface(currentNode, bracketSpan);
     bracketSpan->WriteBracketSpanLog(currentNode);
-    bracketSpan->WriteColor(currentNode);
     bracketSpan->WriteLineRend(currentNode);
     bracketSpan->WriteLineRendBase(currentNode);
 }
@@ -2021,7 +2019,6 @@ void MEIOutput::WriteBreath(pugi::xml_node currentNode, Breath *breath)
 
     this->WriteControlElement(currentNode, breath);
     this->WriteTimePointInterface(currentNode, breath);
-    breath->WriteColor(currentNode);
     breath->WritePlacementRelStaff(currentNode);
 }
 
@@ -2031,7 +2028,6 @@ void MEIOutput::WriteCaesura(pugi::xml_node currentNode, Caesura *caesura)
 
     this->WriteControlElement(currentNode, caesura);
     this->WriteTimePointInterface(currentNode, caesura);
-    caesura->WriteColor(currentNode);
     caesura->WriteExtSymAuth(currentNode);
     caesura->WriteExtSymNames(currentNode);
     caesura->WritePlacementRelStaff(currentNode);
@@ -2071,7 +2067,6 @@ void MEIOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
 
     this->WriteControlElement(currentNode, fermata);
     this->WriteTimePointInterface(currentNode, fermata);
-    fermata->WriteColor(currentNode);
     fermata->WriteEnclosingChars(currentNode);
     fermata->WriteExtSymAuth(currentNode);
     fermata->WriteExtSymNames(currentNode);
@@ -2095,7 +2090,6 @@ void MEIOutput::WriteGliss(pugi::xml_node currentNode, Gliss *gliss)
 
     this->WriteControlElement(currentNode, gliss);
     this->WriteTimeSpanningInterface(currentNode, gliss);
-    gliss->WriteColor(currentNode);
     gliss->WriteLineRend(currentNode);
     gliss->WriteLineRendBase(currentNode);
     gliss->WriteNNumberLike(currentNode);
@@ -2107,7 +2101,6 @@ void MEIOutput::WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
 
     this->WriteControlElement(currentNode, hairpin);
     this->WriteTimeSpanningInterface(currentNode, hairpin);
-    hairpin->WriteColor(currentNode);
     hairpin->WriteHairpinLog(currentNode);
     hairpin->WriteHairpinVis(currentNode);
     hairpin->WriteLineRendBase(currentNode);
@@ -2132,7 +2125,6 @@ void MEIOutput::WriteLv(pugi::xml_node currentNode, Lv *lv)
 
     this->WriteControlElement(currentNode, lv);
     this->WriteTimeSpanningInterface(currentNode, lv);
-    lv->WriteColor(currentNode);
     lv->WriteCurvature(currentNode);
     lv->WriteLineRendBase(currentNode);
 }
@@ -2144,7 +2136,6 @@ void MEIOutput::WriteMNum(pugi::xml_node currentNode, MNum *mNum)
     this->WriteControlElement(currentNode, mNum);
     this->WriteTextDirInterface(currentNode, mNum);
     this->WriteTimePointInterface(currentNode, mNum);
-    mNum->WriteColor(currentNode);
     mNum->WriteLang(currentNode);
     mNum->WriteTypography(currentNode);
 }
@@ -2155,7 +2146,6 @@ void MEIOutput::WriteMordent(pugi::xml_node currentNode, Mordent *mordent)
 
     this->WriteControlElement(currentNode, mordent);
     this->WriteTimePointInterface(currentNode, mordent);
-    mordent->WriteColor(currentNode);
     mordent->WriteExtSymAuth(currentNode);
     mordent->WriteExtSymNames(currentNode);
     mordent->WriteOrnamentAccid(currentNode);
@@ -2169,7 +2159,6 @@ void MEIOutput::WriteOctave(pugi::xml_node currentNode, Octave *octave)
 
     this->WriteControlElement(currentNode, octave);
     this->WriteTimeSpanningInterface(currentNode, octave);
-    octave->WriteColor(currentNode);
     octave->WriteExtender(currentNode);
     octave->WriteLineRend(currentNode);
     octave->WriteLineRendBase(currentNode);
@@ -2184,7 +2173,6 @@ void MEIOutput::WriteOrnam(pugi::xml_node currentNode, Ornam *ornam)
     this->WriteControlElement(currentNode, ornam);
     this->WriteTextDirInterface(currentNode, ornam);
     this->WriteTimePointInterface(currentNode, ornam);
-    ornam->WriteColor(currentNode);
     ornam->WriteOrnamentAccid(currentNode);
 }
 
@@ -2194,7 +2182,6 @@ void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
 
     this->WriteControlElement(currentNode, pedal);
     this->WriteTimeSpanningInterface(currentNode, pedal);
-    pedal->WriteColor(currentNode);
     pedal->WriteExtSymAuth(currentNode);
     pedal->WriteExtSymNames(currentNode);
     pedal->WritePedalLog(currentNode);
@@ -2225,7 +2212,6 @@ void MEIOutput::WriteReh(pugi::xml_node currentNode, Reh *reh)
     this->WriteControlElement(currentNode, reh);
     this->WriteTextDirInterface(currentNode, reh);
     this->WriteTimePointInterface(currentNode, reh);
-    reh->WriteColor(currentNode);
     reh->WriteLang(currentNode);
     reh->WriteVerticalGroup(currentNode);
 }
@@ -2237,7 +2223,6 @@ void MEIOutput::WriteRepeatMark(pugi::xml_node currentNode, RepeatMark *repeatMa
     this->WriteControlElement(currentNode, repeatMark);
     this->WriteTextDirInterface(currentNode, repeatMark);
     this->WriteTimePointInterface(currentNode, repeatMark);
-    repeatMark->WriteColor(currentNode);
     repeatMark->WriteExtSymAuth(currentNode);
     repeatMark->WriteExtSymNames(currentNode);
     repeatMark->WriteRepeatMarkLog(currentNode);
@@ -2249,7 +2234,6 @@ void MEIOutput::WriteSlur(pugi::xml_node currentNode, Slur *slur)
 
     this->WriteControlElement(currentNode, slur);
     this->WriteTimeSpanningInterface(currentNode, slur);
-    slur->WriteColor(currentNode);
     slur->WriteCurvature(currentNode);
     slur->WriteLayerIdent(currentNode);
     slur->WriteLineRendBase(currentNode);
@@ -2291,7 +2275,6 @@ void MEIOutput::WriteTie(pugi::xml_node currentNode, Tie *tie)
 
     this->WriteControlElement(currentNode, tie);
     this->WriteTimeSpanningInterface(currentNode, tie);
-    tie->WriteColor(currentNode);
     tie->WriteCurvature(currentNode);
     tie->WriteLineRendBase(currentNode);
 }
@@ -2302,7 +2285,6 @@ void MEIOutput::WriteTrill(pugi::xml_node currentNode, Trill *trill)
 
     this->WriteControlElement(currentNode, trill);
     this->WriteTimeSpanningInterface(currentNode, trill);
-    trill->WriteColor(currentNode);
     trill->WriteExtender(currentNode);
     trill->WriteExtSymAuth(currentNode);
     trill->WriteExtSymNames(currentNode);
@@ -2318,7 +2300,6 @@ void MEIOutput::WriteTurn(pugi::xml_node currentNode, Turn *turn)
 
     this->WriteControlElement(currentNode, turn);
     this->WriteTimePointInterface(currentNode, turn);
-    turn->WriteColor(currentNode);
     turn->WriteExtSymAuth(currentNode);
     turn->WriteExtSymNames(currentNode);
     turn->WriteOrnamentAccid(currentNode);
@@ -5657,6 +5638,7 @@ bool MEIInput::ReadControlElement(pugi::xml_node element, ControlElement *object
     this->SetMeiID(element, object);
     this->ReadAltSymInterface(element, object);
     this->ReadLinkingInterface(element, object);
+    object->ReadColor(element);
     object->ReadLabelled(element);
     object->ReadTyped(element);
 
@@ -5684,7 +5666,6 @@ bool MEIInput::ReadArpeg(Object *parent, pugi::xml_node arpeg)
     this->ReadTimePointInterface(arpeg, vrvArpeg);
     vrvArpeg->ReadArpegLog(arpeg);
     vrvArpeg->ReadArpegVis(arpeg);
-    vrvArpeg->ReadColor(arpeg);
     vrvArpeg->ReadEnclosingChars(arpeg);
 
     parent->AddChild(vrvArpeg);
@@ -5701,7 +5682,6 @@ bool MEIInput::ReadBeamSpan(Object *parent, pugi::xml_node beamSpan)
     this->ReadTimeSpanningInterface(beamSpan, vrvBeamSpan);
     vrvBeamSpan->ReadBeamedWith(beamSpan);
     vrvBeamSpan->ReadBeamRend(beamSpan);
-    vrvBeamSpan->ReadColor(beamSpan);
 
     parent->AddChild(vrvBeamSpan);
     this->ReadUnsupportedAttr(beamSpan, vrvBeamSpan);
@@ -5715,7 +5695,6 @@ bool MEIInput::ReadBracketSpan(Object *parent, pugi::xml_node bracketSpan)
 
     this->ReadTimeSpanningInterface(bracketSpan, vrvBracketSpan);
     vrvBracketSpan->ReadBracketSpanLog(bracketSpan);
-    vrvBracketSpan->ReadColor(bracketSpan);
     vrvBracketSpan->ReadLineRend(bracketSpan);
     vrvBracketSpan->ReadLineRendBase(bracketSpan);
 
@@ -5730,7 +5709,6 @@ bool MEIInput::ReadBreath(Object *parent, pugi::xml_node breath)
     this->ReadControlElement(breath, vrvBreath);
 
     this->ReadTimePointInterface(breath, vrvBreath);
-    vrvBreath->ReadColor(breath);
     vrvBreath->ReadPlacementRelStaff(breath);
 
     parent->AddChild(vrvBreath);
@@ -5744,7 +5722,6 @@ bool MEIInput::ReadCaesura(Object *parent, pugi::xml_node caesura)
     this->ReadControlElement(caesura, vrvCaesura);
 
     this->ReadTimePointInterface(caesura, vrvCaesura);
-    vrvCaesura->ReadColor(caesura);
     vrvCaesura->ReadExtSymAuth(caesura);
     vrvCaesura->ReadExtSymNames(caesura);
     vrvCaesura->ReadPlacementRelStaff(caesura);
@@ -5796,7 +5773,6 @@ bool MEIInput::ReadFermata(Object *parent, pugi::xml_node fermata)
     this->ReadControlElement(fermata, vrvFermata);
 
     this->ReadTimePointInterface(fermata, vrvFermata);
-    vrvFermata->ReadColor(fermata);
     vrvFermata->ReadEnclosingChars(fermata);
     vrvFermata->ReadExtSymAuth(fermata);
     vrvFermata->ReadExtSymNames(fermata);
@@ -5828,7 +5804,6 @@ bool MEIInput::ReadGliss(Object *parent, pugi::xml_node gliss)
     this->ReadControlElement(gliss, vrvGliss);
 
     this->ReadTimeSpanningInterface(gliss, vrvGliss);
-    vrvGliss->ReadColor(gliss);
     vrvGliss->ReadLineRend(gliss);
     vrvGliss->ReadLineRendBase(gliss);
     vrvGliss->ReadNNumberLike(gliss);
@@ -5844,7 +5819,6 @@ bool MEIInput::ReadHairpin(Object *parent, pugi::xml_node hairpin)
     this->ReadControlElement(hairpin, vrvHairpin);
 
     this->ReadTimeSpanningInterface(hairpin, vrvHairpin);
-    vrvHairpin->ReadColor(hairpin);
     vrvHairpin->ReadHairpinLog(hairpin);
     vrvHairpin->ReadHairpinVis(hairpin);
     vrvHairpin->ReadLineRendBase(hairpin);
@@ -5877,7 +5851,6 @@ bool MEIInput::ReadLv(Object *parent, pugi::xml_node lv)
     this->ReadControlElement(lv, vrvLv);
 
     this->ReadTimeSpanningInterface(lv, vrvLv);
-    vrvLv->ReadColor(lv);
     vrvLv->ReadCurvature(lv);
     vrvLv->ReadLineRendBase(lv);
 
@@ -5893,7 +5866,6 @@ bool MEIInput::ReadMNum(Object *parent, pugi::xml_node mNum)
 
     this->ReadTextDirInterface(mNum, vrvMNum);
     this->ReadTimePointInterface(mNum, vrvMNum);
-    vrvMNum->ReadColor(mNum);
     vrvMNum->ReadLang(mNum);
     vrvMNum->ReadTypography(mNum);
 
@@ -5911,7 +5883,6 @@ bool MEIInput::ReadMordent(Object *parent, pugi::xml_node mordent)
     }
 
     this->ReadTimePointInterface(mordent, vrvMordent);
-    vrvMordent->ReadColor(mordent);
     vrvMordent->ReadExtSymAuth(mordent);
     vrvMordent->ReadExtSymNames(mordent);
     vrvMordent->ReadOrnamentAccid(mordent);
@@ -5929,7 +5900,6 @@ bool MEIInput::ReadOctave(Object *parent, pugi::xml_node octave)
     this->ReadControlElement(octave, vrvOctave);
 
     this->ReadTimeSpanningInterface(octave, vrvOctave);
-    vrvOctave->ReadColor(octave);
     vrvOctave->ReadExtender(octave);
     vrvOctave->ReadLineRend(octave);
     vrvOctave->ReadLineRendBase(octave);
@@ -5948,7 +5918,6 @@ bool MEIInput::ReadOrnam(Object *parent, pugi::xml_node ornam)
 
     this->ReadTextDirInterface(ornam, vrvOrnam);
     this->ReadTimePointInterface(ornam, vrvOrnam);
-    vrvOrnam->ReadColor(ornam);
     vrvOrnam->ReadOrnamentAccid(ornam);
 
     parent->AddChild(vrvOrnam);
@@ -5962,7 +5931,6 @@ bool MEIInput::ReadPedal(Object *parent, pugi::xml_node pedal)
     this->ReadControlElement(pedal, vrvPedal);
 
     this->ReadTimeSpanningInterface(pedal, vrvPedal);
-    vrvPedal->ReadColor(pedal);
     vrvPedal->ReadExtSymAuth(pedal);
     vrvPedal->ReadExtSymNames(pedal);
     vrvPedal->ReadPedalLog(pedal);
@@ -5981,7 +5949,6 @@ bool MEIInput::ReadPhrase(Object *parent, pugi::xml_node phrase)
     this->ReadControlElement(phrase, vrvPhrase);
 
     this->ReadTimeSpanningInterface(phrase, vrvPhrase);
-    vrvPhrase->ReadColor(phrase);
     vrvPhrase->ReadCurvature(phrase);
     vrvPhrase->ReadLayerIdent(phrase);
     vrvPhrase->ReadLineRendBase(phrase);
@@ -6010,7 +5977,6 @@ bool MEIInput::ReadReh(Object *parent, pugi::xml_node reh)
 
     this->ReadTextDirInterface(reh, vrvReh);
     this->ReadTimePointInterface(reh, vrvReh);
-    vrvReh->ReadColor(reh);
     vrvReh->ReadLang(reh);
     vrvReh->ReadVerticalGroup(reh);
 
@@ -6026,7 +5992,6 @@ bool MEIInput::ReadRepeatMark(Object *parent, pugi::xml_node repeatMark)
 
     this->ReadTextDirInterface(repeatMark, vrvRepeatMark);
     this->ReadTimePointInterface(repeatMark, vrvRepeatMark);
-    vrvRepeatMark->ReadColor(repeatMark);
     vrvRepeatMark->ReadExtSymAuth(repeatMark);
     vrvRepeatMark->ReadExtSymNames(repeatMark);
     vrvRepeatMark->ReadRepeatMarkLog(repeatMark);
@@ -6042,7 +6007,6 @@ bool MEIInput::ReadSlur(Object *parent, pugi::xml_node slur)
     this->ReadControlElement(slur, vrvSlur);
 
     this->ReadTimeSpanningInterface(slur, vrvSlur);
-    vrvSlur->ReadColor(slur);
     vrvSlur->ReadCurvature(slur);
     vrvSlur->ReadLayerIdent(slur);
     vrvSlur->ReadLineRendBase(slur);
@@ -6075,7 +6039,6 @@ bool MEIInput::ReadTie(Object *parent, pugi::xml_node tie)
     this->ReadControlElement(tie, vrvTie);
 
     this->ReadTimeSpanningInterface(tie, vrvTie);
-    vrvTie->ReadColor(tie);
     vrvTie->ReadCurvature(tie);
     vrvTie->ReadLineRendBase(tie);
 
@@ -6090,7 +6053,6 @@ bool MEIInput::ReadTrill(Object *parent, pugi::xml_node trill)
     this->ReadControlElement(trill, vrvTrill);
 
     this->ReadTimeSpanningInterface(trill, vrvTrill);
-    vrvTrill->ReadColor(trill);
     vrvTrill->ReadExtender(trill);
     vrvTrill->ReadExtSymAuth(trill);
     vrvTrill->ReadExtSymNames(trill);
@@ -6114,7 +6076,6 @@ bool MEIInput::ReadTurn(Object *parent, pugi::xml_node turn)
     }
 
     this->ReadTimePointInterface(turn, vrvTurn);
-    vrvTurn->ReadColor(turn);
     vrvTurn->ReadExtSymAuth(turn);
     vrvTurn->ReadExtSymNames(turn);
     vrvTurn->ReadOrnamentAccid(turn);

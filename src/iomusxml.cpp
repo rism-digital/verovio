@@ -1796,8 +1796,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     }
 
     // read clef changes as MEI clef and add them to the stack
-    pugi::xml_node clef = node.child("clef");
-    if (clef) {
+    for (pugi::xml_node clef : node.children("clef")) {
         // check if we have a staff number
         short int staffNum = clef.attribute("number").as_int();
         staffNum = (staffNum < 1) ? 1 : staffNum;
@@ -3051,9 +3050,9 @@ void MusicXmlInput::ReadMusicXmlNote(
                     std::string textStr = childNode.text().as_string();
 
                     // convert verse numbers to labels
-                    std::regex labelSearch("^([^[:alpha:]]*\\d[^[:alpha:]]*)$");
+                    static const std::regex labelSearch("^([^[:alpha:]]*\\d[^[:alpha:]]*)$");
                     std::smatch labelSearchMatches;
-                    std::regex labelPrefixSearch("^([^[:alpha:]]*\\d[^[:alpha:]]*)[\\s\\u00A0]+");
+                    static const std::regex labelPrefixSearch("^([^[:alpha:]]*\\d[^[:alpha:]]*)[\\s\\u00A0]+");
                     std::smatch labelPrefixSearchMatches;
                     if (!textStr.empty() && std::regex_search(textStr, labelSearchMatches, labelSearch)
                         && labelSearchMatches.ready() && childNode.next_sibling("elision")) {

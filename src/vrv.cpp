@@ -235,20 +235,20 @@ bool AreEqual(double dFirstVal, double dSecondVal)
 bool IsValidInteger(const std::string &value)
 {
     // Accept "1" " 1 " "+1" "-1" "1." "1.0"
-    std::regex re(R"(^\s*[+-]?\d+\.?\d*\s*$)");
+    static const std::regex re(R"(^\s*[+-]?\d+\.?\d*\s*$)");
     return std::regex_match(value, re);
 }
 
 bool IsValidDouble(const std::string &value)
 {
     // Accept "1.0" " 1.0 " ".0"  "1." "+1.0" "-1.0"
-    std::regex re(R"(^\s*[+-]?(?:\d+\.?\d*|\.\d+)\s*$)");
+    static const std::regex re(R"(^\s*[+-]?(?:\d+\.?\d*|\.\d+)\s*$)");
     return std::regex_match(value, re);
 }
 
 bool IsDigits(const std::string &value)
 {
-    std::regex re(R"(^\d+$)");
+    static const std::regex re(R"(^\d+$)");
     return std::regex_match(value, re);
 }
 
@@ -432,8 +432,8 @@ std::string BaseEncodeInt(uint32_t value, uint8_t base)
 
 std::string FromCamelCase(const std::string &s)
 {
-    std::regex regExp1("(.)([A-Z][a-z]+)");
-    std::regex regExp2("([a-z0-9])([A-Z])");
+    static const std::regex regExp1("(.)([A-Z][a-z]+)");
+    static const std::regex regExp2("([a-z0-9])([A-Z])");
 
     std::string result = s;
     result = std::regex_replace(result, regExp1, "$1-$2");

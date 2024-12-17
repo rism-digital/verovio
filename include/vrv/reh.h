@@ -26,7 +26,6 @@ class TextElement;
 class Reh : public ControlElement,
             public TextDirInterface,
             public TimePointInterface,
-            public AttColor,
             public AttLang,
             public AttVerticalGroup {
 public:

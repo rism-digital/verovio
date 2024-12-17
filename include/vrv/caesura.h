@@ -24,7 +24,6 @@ namespace vrv {
  */
 class Caesura : public ControlElement,
                 public TimePointInterface,
-                public AttColor,
                 public AttExtSymAuth,
                 public AttExtSymNames,
                 public AttPlacementRelStaff {

@@ -8443,13 +8443,13 @@ void HumdrumInput::setInstrumentAbbreviation(ELEMENT *element, const std::string
 
     std::string name8 = name;
     // Substitute b and "-flat" for Unicode flat symbol:
-    std::regex exp1("\\b([ABDEFG])b\\b");
-    std::regex exp2("\\b([A-Ga-g])-flat\\b");
+    static const std::regex exp1("\\b([ABDEFG])b\\b");
+    static const std::regex exp2("\\b([A-Ga-g])-flat\\b");
     name8 = std::regex_replace(name8, exp1, "$1\xe2\x99\xad");
     name8 = std::regex_replace(name8, exp2, "$1\xe2\x99\xad");
     // Substitute # and "-sharp" for Unicode sharp symbol:
-    std::regex exp3("\\b([A-G])#\\b");
-    std::regex exp4("\\b([A-Ga-g])-sharp\\b");
+    static const std::regex exp3("\\b([A-G])#\\b");
+    static const std::regex exp4("\\b([A-Ga-g])-sharp\\b");
     name8 = std::regex_replace(name8, exp3, "$1\xe2\x99\xaf");
     name8 = std::regex_replace(name8, exp4, "$1\xe2\x99\xaf");
 
