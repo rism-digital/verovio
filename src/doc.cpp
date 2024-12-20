@@ -541,6 +541,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             generateMIDI.SetChannel(midiChannel);
             generateMIDI.SetTrack(midiTrack);
             generateMIDI.SetStaffN(staves.first);
+            generateMIDI.SetLayerN(layers.first);
             generateMIDI.SetTempoEventTicks(tempoEventTicks);
             generateMIDI.SetTransSemi(transSemi);
             generateMIDI.SetCurrentTempo(tempo);

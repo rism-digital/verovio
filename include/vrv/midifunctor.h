@@ -292,14 +292,15 @@ public:
      */
     ///@{
     void SetChannel(int channel) { m_midiChannel = channel; }
+    void SetControlEvents(bool controlEvents) { m_controlEvents = controlEvents; }
     void SetCueExclusion(bool cueExclusion) { m_cueExclusion = cueExclusion; }
     void SetCurrentTempo(double tempo) { m_currentTempo = tempo; }
     void SetDeferredNotes(const std::map<const Note *, double> &deferredNotes) { m_deferredNotes = deferredNotes; }
+    void SetLayerN(int layerN) { m_layerN = layerN; }
     void SetStaffN(int staffN) { m_staffN = staffN; }
     void SetTempoEventTicks(const std::set<int> &ticks) { m_tempoEventTicks = ticks; }
     void SetTrack(int track) { m_midiTrack = track; }
     void SetTransSemi(int transSemi) { m_transSemi = transSemi; }
-    void SetControlEvents(bool controlEvents) { m_controlEvents = controlEvents; }
     ///@}
 
     /*
@@ -352,6 +353,8 @@ private:
     double m_totalTime;
     // The current staff number
     int m_staffN;
+    // The current layer number
+    int m_layerN;
     // The semi tone transposition for the current track
     int m_transSemi;
     // The current tempo
