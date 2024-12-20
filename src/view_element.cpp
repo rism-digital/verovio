@@ -53,6 +53,7 @@
 #include "stem.h"
 #include "syl.h"
 #include "system.h"
+#include "tabgrp.h"
 #include "tie.h"
 #include "tuplet.h"
 #include "verse.h"
@@ -1538,12 +1539,17 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     const bool drawingCueSize = rest->GetDrawingCueSize();
     const int staffSize = staff->GetDrawingStaffNotationSize();
     data_DURATION drawingDur = rest->GetActualDur();
-    if (drawingDur == DURATION_NONE) {
-        if (!dc->Is(BBOX_DEVICE_CONTEXT)) {
-            LogWarning("Missing duration for rest '%s'", rest->GetID().c_str());
-        }
+    // in tablature the @dur is in the parent TabGrp - try to get if from there
+    if ((drawingDur == DURATION_NONE) && staff->IsTablature()) {
+        TabGrp *tabGrp = vrv_cast<TabGrp *>(rest->GetFirstAncestor(TABGRP));
+        if (tabGrp != NULL) drawingDur = tabGrp->GetActualDur();
+    }
+    // Make sure we have something to draw
+    if ((drawingDur == DURATION_NONE) && !dc->Is(BBOX_DEVICE_CONTEXT)) {
+        LogWarning("Missing duration for rest '%s'", rest->GetID().c_str());
         drawingDur = DURATION_4;
     }
+
     const char32_t drawingGlyph = rest->GetRestGlyph(drawingDur);
 
     const int x = element->GetDrawingX();

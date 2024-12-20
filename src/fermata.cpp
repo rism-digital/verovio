@@ -29,14 +29,12 @@ static const ClassRegistrar<Fermata> s_factory("fermata", FERMATA);
 Fermata::Fermata()
     : ControlElement(FERMATA, "fermata-")
     , TimePointInterface()
-    , AttColor()
     , AttExtSymAuth()
     , AttExtSymNames()
     , AttFermataVis()
     , AttPlacementRelStaff()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
     this->RegisterAttClass(ATT_EXTSYMAUTH);
     this->RegisterAttClass(ATT_EXTSYMNAMES);
@@ -53,7 +51,6 @@ void Fermata::Reset()
     ControlElement::Reset();
     AltSymInterface::Reset();
     TimePointInterface::Reset();
-    this->ResetColor();
     this->ResetEnclosingChars();
     this->ResetExtSymAuth();
     this->ResetExtSymNames();

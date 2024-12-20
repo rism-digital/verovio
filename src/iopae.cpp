@@ -1249,7 +1249,7 @@ int PAEInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
     // std::regex_constants::ECMAScript is the default syntax, so optional.
     // Previously these were extended regex syntax, but this case
     // is the same in ECMAScript syntax.
-    std::regex exp("^([^)]*[ABCDEFG-][^)]*[ABCDEFG-][^)]*)", std::regex_constants::ECMAScript);
+    static const std::regex exp("^([^)]*[ABCDEFG-][^)]*[ABCDEFG-][^)]*)", std::regex_constants::ECMAScript);
     bool is_tuplet = regex_search(incipit + i, exp);
 
     if (is_tuplet) {
