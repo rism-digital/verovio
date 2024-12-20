@@ -364,6 +364,7 @@ GenerateMIDIFunctor::GenerateMIDIFunctor(smf::MidiFile *midiFile) : ConstFunctor
     m_totalTime = 0.0;
     m_staffN = 0;
     m_transSemi = 0;
+    m_octaveShift = 0;
     m_currentTempo = MIDI_TEMPO;
     m_lastNote = NULL;
     m_accentedGraceNote = false;
@@ -429,7 +430,7 @@ FunctorCode GenerateMIDIFunctor::VisitBTrem(const BTrem *bTrem)
     auto expandNote = [this, noteInQuarterDur, num](const Object *obj) {
         const Note *note = vrv_cast<const Note *>(obj);
         assert(note);
-        const int pitch = note->GetMIDIPitch(m_transSemi);
+        const int pitch = this->GetMIDIPitch(note);
         const double totalInQuarterDur
             = note->GetScoreTimeDuration().ToDouble() + note->GetScoreTimeTiedDuration().ToDouble();
         int multiplicity = totalInQuarterDur / noteInQuarterDur;
@@ -467,7 +468,7 @@ FunctorCode GenerateMIDIFunctor::VisitChord(const Chord *chord)
         for (const Object *obj : notes) {
             const Note *note = vrv_cast<const Note *>(obj);
             assert(note);
-            pitches.insert(note->GetMIDIPitch(m_transSemi));
+            pitches.insert(this->GetMIDIPitch(note));
         }
 
         double quarterDuration = 0.0;
@@ -612,7 +613,7 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
 
     // Handle grace notes
     if (note->IsGraceNote()) {
-        const int pitch = note->GetMIDIPitch(m_transSemi);
+        const int pitch = this->GetMIDIPitch(note);
 
         double quarterDuration = 0.0;
         const data_DURATION dur = note->GetDur();
@@ -662,7 +663,7 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
         }
     }
     else {
-        const int pitch = note->GetMIDIPitch(m_transSemi);
+        const int pitch = this->GetMIDIPitch(note);
 
         if (note->HasTabCourse() && (note->GetTabCourse() >= 1)) {
             // Tablature 'rule of holds'.  A note on a course is held until the next note

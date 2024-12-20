@@ -340,6 +340,11 @@ private:
      */
     void GenerateGraceNoteMIDI(const Note *refNote, double startTime, int tpq, int channel, int velocity);
 
+    /**
+     * Convenience helper
+     */
+    int GetMIDIPitch(const Note *note) { return note->GetMIDIPitch(m_transSemi, m_octaveShift); }
+
 public:
     //
 private:
@@ -357,6 +362,8 @@ private:
     int m_layerN;
     // The semi tone transposition for the current track
     int m_transSemi;
+    // The octave shift for the current track
+    int m_octaveShift;
     // The current tempo
     double m_currentTempo;
     // Tempo events are always added on track 0
