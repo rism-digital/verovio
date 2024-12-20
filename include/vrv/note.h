@@ -213,7 +213,7 @@ public:
     /**
      * MIDI pitch
      */
-    int GetMIDIPitch(int shift = 0) const;
+    int GetMIDIPitch(int shift = 0, int octaveShift = 0) const;
 
     /**
      * Get pitch class of the current note
