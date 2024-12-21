@@ -226,6 +226,7 @@ public:
     ///@{
     FunctorCode VisitArpeg(const Arpeg *arpeg) override;
     FunctorCode VisitMeasure(const Measure *measure) override;
+    FunctorCode VisitOctave(const Octave *octave) override;
     ///@}
 
 protected:

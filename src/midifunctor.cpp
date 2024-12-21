@@ -18,6 +18,7 @@
 #include "gracegrp.h"
 #include "layer.h"
 #include "multirest.h"
+#include "octave.h"
 #include "pedal.h"
 #include "rest.h"
 #include "staff.h"
@@ -348,6 +349,31 @@ FunctorCode InitMIDIFunctor::VisitArpeg(const Arpeg *arpeg)
 FunctorCode InitMIDIFunctor::VisitMeasure(const Measure *measure)
 {
     m_currentTempo = measure->GetCurrentTempo();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode InitMIDIFunctor::VisitOctave(const Octave *octave)
+{
+    const Measure *measure = vrv_cast<const Measure *>(octave->GetFirstAncestor(MEASURE));
+    assert(measure);
+    std::vector<const Staff *> staffList = octave->GetTstampStaves(measure, octave);
+    if (staffList.size() != 1) return FUNCTOR_CONTINUE;
+    const Staff *staff = staffList[0];
+
+    const bool raisePitch = (octave->GetDisPlace() != STAFFREL_basic_below);
+    int shift = 0;
+    switch (octave->GetDis()) {
+        case OCTAVE_DIS_8: shift = 1; break;
+        case OCTAVE_DIS_15: shift = 2; break;
+        case OCTAVE_DIS_22: shift = 3; break;
+        default: break;
+    }
+
+    const Layer *layer = vrv_cast<const Layer *>(raisePitch ? staff->GetFirst(LAYER) : staff->GetLast(LAYER));
+    assert(layer);
+
+    m_octaves.push_back({ octave, staff->GetN(), layer->GetN(), (raisePitch ? shift : -shift) });
 
     return FUNCTOR_CONTINUE;
 }
