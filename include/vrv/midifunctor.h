@@ -182,6 +182,16 @@ private:
 //----------------------------------------------------------------------------
 
 /**
+ * Helper struct to store octave data
+ */
+struct OctaveInfo {
+    const Octave *octave;
+    int staffN;
+    int layerN;
+    int octaveShift;
+};
+
+/**
  * This class initializes the MIDI export.
  * Captures information (i.e. from control elements) for MIDI interpretation
  * which is required beforehand in GenerateMIDI.
@@ -207,6 +217,7 @@ public:
     ///@{
     void SetCurrentTempo(double tempo) { m_currentTempo = tempo; }
     const std::map<const Note *, double> &GetDeferredNotes() const { return m_deferredNotes; }
+    const std::list<OctaveInfo> &GetOctaves() const { return m_octaves; }
     ///@}
 
     /*
@@ -228,6 +239,8 @@ private:
     double m_currentTempo;
     // Deferred notes which start slightly later
     std::map<const Note *, double> m_deferredNotes;
+    // Octave info which is collected
+    std::list<OctaveInfo> m_octaves;
 };
 
 //----------------------------------------------------------------------------
