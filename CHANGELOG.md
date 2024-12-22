@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+
+## [4.5.0] – 2024-12-22
 * Integration of tablature customization implementation
 * Optimization of regex calls (@paul-bayleaf)
 
