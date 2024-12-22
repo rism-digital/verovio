@@ -61,7 +61,7 @@ int Att::StrToInt(const std::string &value) const
 
 data_VU Att::StrToVU(const std::string &value, bool logWarning) const
 {
-    std::regex test("[+-]?[0-9]*(\\.[0-9]+)?(vu)?");
+    static const std::regex test("[+-]?[0-9]*(\\.[0-9]+)?(vu)?");
     if (!std::regex_match(value, test)) {
         if (logWarning && !value.empty()) LogWarning("Unsupported virtual unit value '%s'", value.c_str());
         return MEI_UNSET;
@@ -315,7 +315,7 @@ std::string Att::FontsizenumericToStr(data_FONTSIZENUMERIC data) const
 
 data_FONTSIZENUMERIC Att::StrToFontsizenumeric(const std::string &value, bool logWarning) const
 {
-    std::regex test("[0-9]*(\\.[0-9]+)?(pt)");
+    static const std::regex test("[0-9]*(\\.[0-9]+)?(pt)");
     if (!std::regex_match(value, test)) {
         if (logWarning && !value.empty()) LogWarning("Unsupported data.FONTSIZENUMERIC '%s'", value.c_str());
         return MEI_UNSET;
@@ -345,7 +345,7 @@ data_KEYSIGNATURE Att::StrToKeysignature(const std::string &value, bool logWarni
     int alterationNumber = 0;
     data_ACCIDENTAL_WRITTEN alterationType = ACCIDENTAL_WRITTEN_NONE;
 
-    std::regex test("mixed|0|([1-9]|1[0-2])[f|s]");
+    static const std::regex test("mixed|0|([1-9]|1[0-2])[f|s]");
     if (!std::regex_match(value, test)) {
         if (logWarning) LogWarning("Unsupported data.KEYSIGNATURE '%s'", value.c_str());
         return { -1, ACCIDENTAL_WRITTEN_NONE };
@@ -411,7 +411,7 @@ data_MEASUREMENTSIGNED Att::StrToMeasurementsigned(const std::string &value, boo
 {
     data_MEASUREMENTSIGNED data;
 
-    std::regex px(".*px$");
+    static const std::regex px(".*px$");
     if (std::regex_match(value, px)) {
         data.SetPx(atoi(value.substr(0, value.find("px")).c_str()) * DEFINITION_FACTOR);
     }
@@ -446,7 +446,7 @@ std::string Att::MetercountPairToStr(const data_METERCOUNT_pair &data) const
 
 data_METERCOUNT_pair Att::StrToMetercountPair(const std::string &value) const
 {
-    std::regex re("[\\*\\+/-]");
+    static const std::regex re("[\\*\\+/-]");
     std::sregex_token_iterator first{ value.begin(), value.end(), re, -1 }, last;
     std::vector<std::string> tokens{ first, last };
 
@@ -621,7 +621,7 @@ std::string Att::PercentToStr(data_PERCENT data) const
 
 data_PERCENT Att::StrToPercent(const std::string &value, bool logWarning) const
 {
-    std::regex test("[0-9]+(\\.?[0-9]*)?%");
+    static const std::regex test("[0-9]+(\\.?[0-9]*)?%");
     if (!std::regex_match(value, test)) {
         if (logWarning) LogWarning("Unsupported data.PERCENT '%s'", value.c_str());
         return 0;
@@ -636,7 +636,7 @@ std::string Att::PercentLimitedToStr(data_PERCENT_LIMITED data) const
 
 data_PERCENT_LIMITED Att::StrToPercentLimited(const std::string &value, bool logWarning) const
 {
-    std::regex test("[0-9]+(\\.?[0-9]*)?%");
+    static const std::regex test("[0-9]+(\\.?[0-9]*)?%");
     if (!std::regex_match(value, test)) {
         if (logWarning) LogWarning("Unsupported data.PERCENT.LIMITED '%s'", value.c_str());
         return 0;
@@ -651,7 +651,7 @@ std::string Att::PercentLimitedSignedToStr(data_PERCENT_LIMITED_SIGNED data) con
 
 data_PERCENT_LIMITED_SIGNED Att::StrToPercentLimitedSigned(const std::string &value, bool logWarning) const
 {
-    std::regex test("(+|-)?[0-9]+(\\.?[0-9]*)?%");
+    static const std::regex test("(+|-)?[0-9]+(\\.?[0-9]*)?%");
     if (!std::regex_match(value, test)) {
         if (logWarning) LogWarning("Unsupported data.PERCENT.LIMITED.SIGNEd '%s'", value.c_str());
         return 0;
