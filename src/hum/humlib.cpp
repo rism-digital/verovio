@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Nov 13 13:08:51 PST 2024
+// Last Modified: Tue Dec 10 14:37:55 JST 2024
 // Filename:      min/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.cpp
 // Syntax:        C++11
@@ -58774,305 +58774,6 @@ void Tool_autostem::countBeamStuff(const string& token, int& start, int& stop,
 
 /////////////////////////////////
 //
-// Tool_bardash::Tool_bardash -- Set the recognized options for the tool.
-//
-
-Tool_bardash::Tool_bardash(void) {
-	define("r|remove=b",    "remove any dot/dash/invisible barline stylings");
-}
-
-
-
-///////////////////////////////
-//
-// Tool_bardash::run -- Primary interfaces to the tool.
-//
-
-bool Tool_bardash::run(HumdrumFileSet& infiles) {
-	bool status = true;
-	for (int i=0; i<infiles.getCount(); i++) {
-		status &= run(infiles[i]);
-	}
-	return status;
-}
-
-
-bool Tool_bardash::run(const string& indata, ostream& out) {
-	HumdrumFile infile(indata);
-	return run(infile, out);
-}
-
-
-bool Tool_bardash::run(HumdrumFile& infile, ostream& out) {
-	bool status = run(infile);
-	out << m_free_text.str();
-	return status;
-}
-
-
-bool Tool_bardash::run(HumdrumFile& infile) {
-   initialize();
-	processFile(infile);
-	return true;
-}
-
-
-
-//////////////////////////////
-//
-// Tool_bardash::initialize --
-//
-
-void Tool_bardash::initialize(void) {
-	m_removeQ = getBoolean("remove");
-}
-
-
-
-//////////////////////////////
-//
-// Tool_bardash::processFile --
-//
-
-void Tool_bardash::processFile(HumdrumFile& infile) {
-	if (m_removeQ) {
-		removeBarStylings(infile);
-	} else {
-		applyBarStylings(infile);
-	}
-	infile.createLinesFromTokens();
-	m_humdrum_text << infile;
-}
-
-
-
-//////////////////////////////
-//
-// Tool_bardash::removeBarStylings --
-//
-
-void Tool_bardash::removeBarStylings(HumdrumFile& infile) {
-	vector<HTp> kstarts = infile.getKernSpineStartList();
-	for (int i=0; i<(int)kstarts.size(); i++) {
-		removeBarStylings(kstarts.at(i));
-	}
-}
-
-
-
-//////////////////////////////
-//
-// Tool_bardash::removeBarStylings --
-//
-
-void Tool_bardash::removeBarStylings(HTp spine) {
-
-	HTp current = spine->getNextToken();
-	bool activeQ = false;
-	bool dashQ   = false;
-	bool dotQ    = false;
-	bool invisQ  = false;
-	HumRegex hre;
-	while (current) {
-		if (current->isInterpretation()) {
-			if (hre.search(current, "^\\*bar:")) {
-				if (hre.search(current, "stop")) {
-					activeQ = false;
-					dashQ  = false;
-					dotQ   = false;
-					invisQ = false;
-				} else {
-					activeQ = true;
-					if (hre.search(current, "^\\*bar:.*dash=(\\d+)")) {
-						dashQ  = true;
-						dotQ   = false;
-						invisQ = false;
-					} else if (hre.search(current, "^\\*bar:.*dot=(\\d+)")) {
-						dashQ  = false;
-						dotQ   = true;
-						invisQ = false;
-					} else if (hre.search(current, "^\\*bar:.*invis=(\\d+)")) {
-						dashQ  = false;
-						dotQ   = false;
-						invisQ = true;
-					}
-				}
-			}
-		}
-		if (!current->isBarline()) {
-			current = current->getNextToken();
-			return;
-		}
-		if (!activeQ) {
-			current = current->getNextToken();
-			return;
-		}
-		int track = current->getTrack();
-		HTp rcurrent = current;
-		while (rcurrent) {
-			if (track != rcurrent->getTrack()) {
-				break;
-			}
-			string text = *rcurrent;
-			int length = (int)text.size();
-			if (dashQ) {
-				hre.replaceDestructive(text, "", ":", "g");
-			} else if (dotQ) {
-				hre.replaceDestructive(text, "", ".", "g");
-			} else if (invisQ) {
-				hre.replaceDestructive(text, "", "-", "g");
-			}
-			if (length > (int)text.size()) {
-				rcurrent->setText(text);
-			}
-			rcurrent = rcurrent->getNextFieldToken();
-		}
-		current = current->getNextToken();
-	}
-
-}
-
-
-
-//////////////////////////////
-//
-// Tool_bardash::applyBarStylings --
-//
-
-void Tool_bardash::applyBarStylings(HumdrumFile& infile) {
-	vector<HTp> kstarts = infile.getKernSpineStartList();
-	for (int i=0; i<(int)kstarts.size(); i++) {
-		applyBarStylings(kstarts.at(i));
-	}
-}
-
-
-
-//////////////////////////////
-//
-// Tool_bardash::applyBarStylings --
-//
-
-void Tool_bardash::applyBarStylings(HTp spine) {
-
-	HTp current = spine->getNextToken();
-	bool activeQ = false;
-	bool dashQ   = false;
-	bool dotQ    = false;
-	bool invisQ  = false;
-	int dash  = 0;
-	int dot   = 0;
-	int invis = 0;
-	int counter = 0;
-	HumRegex hre;
-	while (current) {
-		if (current->isInterpretation()) {
-			if (hre.search(current, "^\\*bar:")) {
-				if (hre.search(current, "stop")) {
-					activeQ = false;
-					dashQ   = false;
-					dotQ    = false;
-					invisQ  = false;
-					dash    = 0;
-					dot     = 0;
-					invis   = 0;
-				} else {
-					activeQ = true;
-					if (hre.search(current, "^\\*bar:.*dash=(\\d+)")) {
-						dashQ  = true;
-						dotQ   = false;
-						invisQ = false;
-						dash   = hre.getMatchInt(1);
-						counter = 0;
-					} else if (hre.search(current, "^\\*bar:.*dot=(\\d+)")) {
-						dashQ  = false;
-						dotQ   = true;
-						invisQ = false;
-						dot    = hre.getMatchInt(1);
-						counter = 0;
-					} else if (hre.search(current, "^\\*bar:.*invis=(\\d+)")) {
-						dashQ  = false;
-						dotQ   = false;
-						invisQ = true;
-						invis  = hre.getMatchInt(1);
-						counter = 0;
-					}
-				}
-			}
-			current = current->getNextToken();
-			continue;
-		}
-		if (!current->isBarline()) {
-			current = current->getNextToken();
-			continue;
-		}
-		if (!activeQ) {
-			current = current->getNextToken();
-			continue;
-		}
-
-		int track = current->getTrack();
-		HTp rcurrent = current;
-
-		if (dashQ && (dash > 0)) {
-
-			if (counter % dash != 0) {
-				while (rcurrent) {
-					if (track != rcurrent->getTrack()) {
-						break;
-					}
-					string text = *rcurrent;
-					if (text.find(":") == string::npos) {
-						text += ":";
-						rcurrent->setText(text);
-					}
-					rcurrent = rcurrent->getNextFieldToken();
-				}
-			}
-
-		} else if (dotQ && (dot > 0)) {
-
-			if (counter % dot != 0) {
-				while (rcurrent) {
-					if (track != rcurrent->getTrack()) {
-						break;
-					}
-					string text = *rcurrent;
-					if (text.find(".") == string::npos) {
-						text += ".";
-						rcurrent->setText(text);
-					}
-					rcurrent = rcurrent->getNextFieldToken();
-				}
-			}
-
-		} else if (invisQ && (invis > 0)) {
-
-			if (counter % invis != 0) {
-				while (rcurrent) {
-					if (track != rcurrent->getTrack()) {
-						break;
-					}
-					string text = *rcurrent;
-					if (text.find("-") == string::npos) {
-						text += "-";
-						rcurrent->setText(text);
-					}
-					rcurrent = rcurrent->getNextFieldToken();
-				}
-			}
-
-		}
-		counter++;
-		current = current->getNextToken();
-	}
-}
-
-
-
-
-/////////////////////////////////
-//
 // Tool_binroll::Tool_binroll -- Set the recognized options for the tool.
 //
 
@@ -59286,6 +58987,305 @@ void Tool_binroll::processStrand(vector<vector<char>>& roll, HTp starting,
 }
 
 
+
+
+
+
+/////////////////////////////////
+//
+// Tool_bstyle::Tool_bstyle -- Set the recognized options for the tool.
+//
+
+Tool_bstyle::Tool_bstyle(void) {
+	define("r|remove=b",    "remove any dot/dash/invisible barline stylings");
+}
+
+
+
+///////////////////////////////
+//
+// Tool_bstyle::run -- Primary interfaces to the tool.
+//
+
+bool Tool_bstyle::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_bstyle::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	return run(infile, out);
+}
+
+
+bool Tool_bstyle::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	out << m_free_text.str();
+	return status;
+}
+
+
+bool Tool_bstyle::run(HumdrumFile& infile) {
+   initialize();
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_bstyle::initialize --
+//
+
+void Tool_bstyle::initialize(void) {
+	m_removeQ = getBoolean("remove");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_bstyle::processFile --
+//
+
+void Tool_bstyle::processFile(HumdrumFile& infile) {
+	if (m_removeQ) {
+		removeBarStylings(infile);
+	} else {
+		applyBarStylings(infile);
+	}
+	infile.createLinesFromTokens();
+	m_humdrum_text << infile;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_bstyle::removeBarStylings --
+//
+
+void Tool_bstyle::removeBarStylings(HumdrumFile& infile) {
+	vector<HTp> kstarts = infile.getKernSpineStartList();
+	for (int i=0; i<(int)kstarts.size(); i++) {
+		removeBarStylings(kstarts.at(i));
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_bstyle::removeBarStylings --
+//
+
+void Tool_bstyle::removeBarStylings(HTp spine) {
+
+	HTp current = spine->getNextToken();
+	bool activeQ = false;
+	bool dashQ   = false;
+	bool dotQ    = false;
+	bool invisQ  = false;
+	HumRegex hre;
+	while (current) {
+		if (current->isInterpretation()) {
+			if (hre.search(current, "^\\*bstyle:")) {
+				if (hre.search(current, "stop")) {
+					activeQ = false;
+					dashQ  = false;
+					dotQ   = false;
+					invisQ = false;
+				} else {
+					activeQ = true;
+					if (hre.search(current, "^\\*bstyle:.*dash=(\\d+)")) {
+						dashQ  = true;
+						dotQ   = false;
+						invisQ = false;
+					} else if (hre.search(current, "^\\*bstyle:.*dot=(\\d+)")) {
+						dashQ  = false;
+						dotQ   = true;
+						invisQ = false;
+					} else if (hre.search(current, "^\\*bstyle:.*invis=(\\d+)")) {
+						dashQ  = false;
+						dotQ   = false;
+						invisQ = true;
+					}
+				}
+			}
+		}
+		if (!current->isBarline()) {
+			current = current->getNextToken();
+			return;
+		}
+		if (!activeQ) {
+			current = current->getNextToken();
+			return;
+		}
+		int track = current->getTrack();
+		HTp rcurrent = current;
+		while (rcurrent) {
+			if (track != rcurrent->getTrack()) {
+				break;
+			}
+			string text = *rcurrent;
+			int length = (int)text.size();
+			if (dashQ) {
+				hre.replaceDestructive(text, "", ":", "g");
+			} else if (dotQ) {
+				hre.replaceDestructive(text, "", ".", "g");
+			} else if (invisQ) {
+				hre.replaceDestructive(text, "", "-", "g");
+			}
+			if (length > (int)text.size()) {
+				rcurrent->setText(text);
+			}
+			rcurrent = rcurrent->getNextFieldToken();
+		}
+		current = current->getNextToken();
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_bstyle::applyBarStylings --
+//
+
+void Tool_bstyle::applyBarStylings(HumdrumFile& infile) {
+	vector<HTp> kstarts = infile.getKernSpineStartList();
+	for (int i=0; i<(int)kstarts.size(); i++) {
+		applyBarStylings(kstarts.at(i));
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_bstyle::applyBarStylings --
+//
+
+void Tool_bstyle::applyBarStylings(HTp spine) {
+
+	HTp current = spine->getNextToken();
+	bool activeQ = false;
+	bool dashQ   = false;
+	bool dotQ    = false;
+	bool invisQ  = false;
+	int dash  = 0;
+	int dot   = 0;
+	int invis = 0;
+	int counter = 0;
+	HumRegex hre;
+	while (current) {
+		if (current->isInterpretation()) {
+			if (hre.search(current, "^\\*bstyle:")) {
+				if (hre.search(current, "stop")) {
+					activeQ = false;
+					dashQ   = false;
+					dotQ    = false;
+					invisQ  = false;
+					dash    = 0;
+					dot     = 0;
+					invis   = 0;
+				} else {
+					activeQ = true;
+					if (hre.search(current, "^\\*bstyle:.*dash=(\\d+)")) {
+						dashQ  = true;
+						dotQ   = false;
+						invisQ = false;
+						dash   = hre.getMatchInt(1);
+						counter = 0;
+					} else if (hre.search(current, "^\\*bstyle:.*dot=(\\d+)")) {
+						dashQ  = false;
+						dotQ   = true;
+						invisQ = false;
+						dot    = hre.getMatchInt(1);
+						counter = 0;
+					} else if (hre.search(current, "^\\*bstyle:.*invis=(\\d+)")) {
+						dashQ  = false;
+						dotQ   = false;
+						invisQ = true;
+						invis  = hre.getMatchInt(1);
+						counter = 0;
+					}
+				}
+			}
+			current = current->getNextToken();
+			continue;
+		}
+		if (!current->isBarline()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (!activeQ) {
+			current = current->getNextToken();
+			continue;
+		}
+
+		int track = current->getTrack();
+		HTp rcurrent = current;
+
+		if (dashQ && (dash > 0)) {
+
+			if (counter % dash != 0) {
+				while (rcurrent) {
+					if (track != rcurrent->getTrack()) {
+						break;
+					}
+					string text = *rcurrent;
+					if (text.find(":") == string::npos) {
+						text += ":";
+						rcurrent->setText(text);
+					}
+					rcurrent = rcurrent->getNextFieldToken();
+				}
+			}
+
+		} else if (dotQ && (dot > 0)) {
+
+			if (counter % dot != 0) {
+				while (rcurrent) {
+					if (track != rcurrent->getTrack()) {
+						break;
+					}
+					string text = *rcurrent;
+					if (text.find(".") == string::npos) {
+						text += ".";
+						rcurrent->setText(text);
+					}
+					rcurrent = rcurrent->getNextFieldToken();
+				}
+			}
+
+		} else if (invisQ && (invis > 0)) {
+
+			if (counter % invis != 0) {
+				while (rcurrent) {
+					if (track != rcurrent->getTrack()) {
+						break;
+					}
+					string text = *rcurrent;
+					if (text.find("-") == string::npos) {
+						text += "-";
+						rcurrent->setText(text);
+					}
+					rcurrent = rcurrent->getNextFieldToken();
+				}
+			}
+
+		}
+		counter++;
+		current = current->getNextToken();
+	}
+}
 
 
 
@@ -87253,8 +87253,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(autobeam, infile, commands[i].second, status);
 		} else if (commands[i].first == "autostem") {
 			RUNTOOL(autostem, infile, commands[i].second, status);
-		} else if (commands[i].first == "bardash") {
-			RUNTOOL(bardash, infile, commands[i].second, status);
+		} else if (commands[i].first == "bstyle") {
+			RUNTOOL(bstyle, infile, commands[i].second, status);
 		} else if (commands[i].first == "binroll") {
 			RUNTOOL(binroll, infile, commands[i].second, status);
 		} else if (commands[i].first == "chantize") {
@@ -120419,8 +120419,10 @@ void Tool_prange::assignHorizontalPosition(vector<_VoiceInfo>& voiceInfo, int mi
 	}
 
 	vector<double> hpos(count, 0);
-	hpos[0] = maxval;
-	hpos.back() = minval;
+	if (count >= 2) {
+		hpos[0] = maxval;
+		hpos.back() = minval;
+	}
 
 	if (hpos.size() > 2) {
 		for (int i=1; i<(int)hpos.size()-1; i++) {
@@ -126363,10 +126365,7 @@ bool Tool_shed::run(HumdrumFile& infile) {
 		cerr << "Error: -e option is required" << endl;
 		return false;
 	}
-	for (int i=0; i<(int)m_options.size(); i++) {
-		prepareSearch(i);
-		processFile(infile);
-	}
+	processFile(infile);
 	return true;
 }
 
@@ -126658,6 +126657,21 @@ vector<string> Tool_shed::addToExInterpList(void) {
 //
 
 void Tool_shed::processFile(HumdrumFile& infile) {
+	for (int i=0; i<(int)m_options.size(); i++) {
+		prepareSearch(i);
+		processExpression(infile);
+	}
+	m_humdrum_text << infile;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_shed::processExpression --
+//
+
+void Tool_shed::processExpression(HumdrumFile& infile) {
 	if (m_search == "") {
 		// nothing to do
 		return;
@@ -126703,9 +126717,6 @@ void Tool_shed::processFile(HumdrumFile& infile) {
 	if (m_modified) {
 		infile.createLinesFromTokens();
 	}
-
-	// needed only for command-line version of tool?:
-	m_humdrum_text << infile;
 }
 
 
