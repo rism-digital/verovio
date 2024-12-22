@@ -487,6 +487,8 @@ FunctorCode GenerateMIDIFunctor::VisitBTrem(const BTrem *bTrem)
 
 FunctorCode GenerateMIDIFunctor::VisitChord(const Chord *chord)
 {
+    this->HandleOctaveBegin(chord);
+
     // Handle grace chords
     if (chord->IsGraceNote()) {
         std::set<int> pitches;
@@ -518,6 +520,8 @@ FunctorCode GenerateMIDIFunctor::VisitChord(const Chord *chord)
 
 FunctorCode GenerateMIDIFunctor::VisitFTrem(const FTrem *fTrem)
 {
+    this->HandleOctaveBegin(fTrem);
+
     if (fTrem->HasUnitdur()) {
         LogWarning("FTrem produces incorrect MIDI output");
     }
@@ -551,6 +555,8 @@ FunctorCode GenerateMIDIFunctor::VisitGraceGrpEnd(const GraceGrp *graceGrp)
 
         m_graceNotes.clear();
     }
+
+    this->HandleOctaveEnd(graceGrp);
 
     return FUNCTOR_CONTINUE;
 }
@@ -587,11 +593,20 @@ FunctorCode GenerateMIDIFunctor::VisitLayerElement(const LayerElement *layerElem
 {
     if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
+    this->HandleOctaveBegin(layerElement);
+
     // Only resolve simple sameas links to avoid infinite recursion
     const LayerElement *sameas = dynamic_cast<const LayerElement *>(layerElement->GetSameasLink());
     if (sameas && !sameas->HasSameasLink()) {
         sameas->Process(*this);
     }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateMIDIFunctor::VisitLayerElementEnd(const LayerElement *layerElement)
+{
+    this->HandleOctaveEnd(layerElement);
 
     return FUNCTOR_CONTINUE;
 }
@@ -622,6 +637,8 @@ FunctorCode GenerateMIDIFunctor::VisitMRpt(const MRpt *mRpt)
 
 FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
 {
+    this->HandleOctaveBegin(note);
+
     // Skip linked notes
     if (note->HasSameasLink()) {
         return FUNCTOR_SIBLINGS;
@@ -931,6 +948,28 @@ void GenerateMIDIFunctor::GenerateGraceNoteMIDI(
             m_midiFile->addNoteOff(m_midiTrack, stopTime * tpq, channel, pitch);
         }
         startTime = stopTime;
+    }
+}
+
+void GenerateMIDIFunctor::HandleOctaveBegin(const LayerElement *layerElement)
+{
+    const auto octaveIter
+        = std::find_if(m_octaves.begin(), m_octaves.end(), [this, layerElement](const OctaveInfo &octave) {
+              return ((octave.staffN == m_staffN) && (octave.layerN == m_layerN)
+                  && (octave.octave->GetStart() == layerElement));
+          });
+    if (octaveIter != m_octaves.end()) {
+        m_octaveShift = octaveIter->octaveShift;
+    }
+}
+
+void GenerateMIDIFunctor::HandleOctaveEnd(const LayerElement *layerElement)
+{
+    if (std::any_of(m_octaves.begin(), m_octaves.end(), [this, layerElement](const OctaveInfo &octave) {
+            return ((octave.staffN == m_staffN) && (octave.layerN == m_layerN)
+                && (octave.octave->GetEnd() == layerElement));
+        })) {
+        m_octaveShift = 0;
     }
 }
 

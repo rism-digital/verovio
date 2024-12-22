@@ -331,6 +331,7 @@ public:
     FunctorCode VisitLayer(const Layer *layer) override;
     FunctorCode VisitLayerEnd(const Layer *layer) override;
     FunctorCode VisitLayerElement(const LayerElement *layerElement) override;
+    FunctorCode VisitLayerElementEnd(const LayerElement *layerElement) override;
     FunctorCode VisitMeasure(const Measure *measure) override;
     FunctorCode VisitMRpt(const MRpt *mRpt) override;
     FunctorCode VisitNote(const Note *note) override;
@@ -354,6 +355,14 @@ private:
      * Creates the MIDI output of the grace note sequence
      */
     void GenerateGraceNoteMIDI(const Note *refNote, double startTime, int tpq, int channel, int velocity);
+
+    /**
+     * Change the octave shift at the begin/end of octaves
+     */
+    ///@{
+    void HandleOctaveBegin(const LayerElement *layerElement);
+    void HandleOctaveEnd(const LayerElement *layerElement);
+    ///@}
 
     /**
      * Convenience helper
