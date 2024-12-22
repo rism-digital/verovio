@@ -311,6 +311,7 @@ public:
     void SetCurrentTempo(double tempo) { m_currentTempo = tempo; }
     void SetDeferredNotes(const std::map<const Note *, double> &deferredNotes) { m_deferredNotes = deferredNotes; }
     void SetLayerN(int layerN) { m_layerN = layerN; }
+    void SetOctaves(const std::list<OctaveInfo> &octaves) { m_octaves = octaves; }
     void SetStaffN(int staffN) { m_staffN = staffN; }
     void SetTempoEventTicks(const std::set<int> &ticks) { m_tempoEventTicks = ticks; }
     void SetTrack(int track) { m_midiTrack = track; }
@@ -389,6 +390,8 @@ private:
     std::map<const Note *, MIDINoteSequence> m_expandedNotes;
     // Deferred notes which start slightly later
     std::map<const Note *, double> m_deferredNotes;
+    // Octave info which is used to determine the octave shift
+    std::list<OctaveInfo> m_octaves;
     // Grace note sequence
     MIDIChordSequence m_graceNotes;
     // Indicates whether the last grace note/chord was accented
