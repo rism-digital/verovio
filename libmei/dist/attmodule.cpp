@@ -1756,11 +1756,11 @@ bool AttModule::SetGestural(Object *element, const std::string &attrType, const 
         AttSoundLocation *att = dynamic_cast<AttSoundLocation *>(element);
         assert(att);
         if (attrType == "azimuth") {
-            att->SetAzimuth(att->StrToDbl(attrValue));
+            att->SetAzimuth(att->StrToDegrees(attrValue));
             return true;
         }
         if (attrType == "elevation") {
-            att->SetElevation(att->StrToDbl(attrValue));
+            att->SetElevation(att->StrToDegrees(attrValue));
             return true;
         }
     }
@@ -1878,10 +1878,10 @@ void AttModule::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
         const AttSoundLocation *att = dynamic_cast<const AttSoundLocation *>(element);
         assert(att);
         if (att->HasAzimuth()) {
-            attributes->push_back({ "azimuth", att->DblToStr(att->GetAzimuth()) });
+            attributes->push_back({ "azimuth", att->DegreesToStr(att->GetAzimuth()) });
         }
         if (att->HasElevation()) {
-            attributes->push_back({ "elevation", att->DblToStr(att->GetElevation()) });
+            attributes->push_back({ "elevation", att->DegreesToStr(att->GetElevation()) });
         }
     }
     if (element->HasAttClass(ATT_TIMESTAMPGES)) {
@@ -3252,7 +3252,7 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
             return true;
         }
         if (attrType == "rotate") {
-            att->SetRotate(att->StrToDbl(attrValue));
+            att->SetRotate(att->StrToDegrees(attrValue));
             return true;
         }
     }
@@ -4856,7 +4856,7 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "lry", att->IntToStr(att->GetLry()) });
         }
         if (att->HasRotate()) {
-            attributes->push_back({ "rotate", att->DblToStr(att->GetRotate()) });
+            attributes->push_back({ "rotate", att->DegreesToStr(att->GetRotate()) });
         }
     }
     if (element->HasAttClass(ATT_COORDINATEDUL)) {
