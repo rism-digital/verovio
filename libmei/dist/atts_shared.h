@@ -1223,8 +1223,8 @@ public:
     int GetLry() const { return m_lry; }
     bool HasLry() const;
     //
-    void SetRotate(double rotate_) { m_rotate = rotate_; }
-    double GetRotate() const { return m_rotate; }
+    void SetRotate(data_DEGREES rotate_) { m_rotate = rotate_; }
+    data_DEGREES GetRotate() const { return m_rotate; }
     bool HasRotate() const;
     ///@}
 
@@ -1239,7 +1239,7 @@ private:
      * interpreted, with respect to the normal orientation of the parent surface.
      * The orientation is expressed in arc degrees.
      **/
-    double m_rotate;
+    data_DEGREES m_rotate;
 };
 
 //----------------------------------------------------------------------------

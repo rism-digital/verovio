@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.5.0] – 2024-12-22
+* Integration of tablature customization implementation
+* Optimization of regex calls (@paul-bayleaf)
+
 ## [4.4.0] – 2024-11-25
 * Support for CMME import
 * Support for conversion from mensural to CMN (with `--mensural-to-cmn`)

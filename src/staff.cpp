@@ -186,6 +186,8 @@ void Staff::AdjustDrawingStaffSize()
 
 int Staff::GetDrawingStaffNotationSize() const
 {
+    if (this->IsTabLuteGerman()) return m_drawingStaffSize / GERMAN_TAB_STAFF_RATIO;
+
     return (this->IsTablature()) ? m_drawingStaffSize / TABLATURE_STAFF_RATIO : m_drawingStaffSize;
 }
 
@@ -318,9 +320,8 @@ void LedgerLine::AddDash(int left, int right, int extension, const Object *event
     iter = m_dashes.begin();
     ++iter;
     while (iter != m_dashes.end()) {
-        if (previous->m_x1 > iter->m_x1 + 1.5 * extension) {
+        if (previous->m_x2 > iter->m_x1 + 1.5 * extension) {
             previous->MergeWith(*iter);
-            previous->m_x2 = std::max(iter->m_x2, previous->m_x2);
             iter = m_dashes.erase(iter);
         }
         else {

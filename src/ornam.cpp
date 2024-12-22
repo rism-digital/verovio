@@ -30,16 +30,10 @@ namespace vrv {
 static const ClassRegistrar<Ornam> s_factory("ornam", ORNAM);
 
 Ornam::Ornam()
-    : ControlElement(ORNAM, "ornam-")
-    , TextListInterface()
-    , TextDirInterface()
-    , TimePointInterface()
-    , AttColor()
-    , AttOrnamentAccid()
+    : ControlElement(ORNAM, "ornam-"), TextListInterface(), TextDirInterface(), TimePointInterface(), AttOrnamentAccid()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ORNAMENTACCID);
 
     this->Reset();
@@ -52,7 +46,6 @@ void Ornam::Reset()
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimePointInterface::Reset();
-    this->ResetColor();
     this->ResetOrnamentAccid();
 }
 

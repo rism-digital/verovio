@@ -368,6 +368,7 @@ GenerateMIDIFunctor::GenerateMIDIFunctor(smf::MidiFile *midiFile) : ConstFunctor
     m_lastNote = NULL;
     m_accentedGraceNote = false;
     m_cueExclusion = false;
+    m_controlEvents = false;
 }
 
 FunctorCode GenerateMIDIFunctor::VisitBeatRpt(const BeatRpt *beatRpt)
@@ -716,6 +717,19 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
 FunctorCode GenerateMIDIFunctor::VisitPedal(const Pedal *pedal)
 {
     if (!pedal->HasDir()) return FUNCTOR_CONTINUE;
+
+    // Check the functor flag - filters should always be there, but just in case we change how it is called
+    if (!m_controlEvents || !this->GetFilters()) return FUNCTOR_CONTINUE;
+
+    // Check if the pedal applies to the staff filtered
+    const Measure *measure = vrv_cast<const Measure *>(pedal->GetFirstAncestor(MEASURE));
+    assert(measure);
+    std::vector<const Staff *> staffList = pedal->GetTstampStaves(measure, pedal);
+    bool applies = false;
+    for (const Staff *staff : staffList) {
+        applies = (applies || this->GetFilters()->Apply(staff));
+    }
+    if (!applies) return FUNCTOR_CONTINUE;
 
     double pedalTime = pedal->GetStart()->GetAlignment()->GetTime().ToDouble() * SCORE_TIME_UNIT;
     double startTime = m_totalTime + pedalTime;

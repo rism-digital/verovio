@@ -41,15 +41,9 @@ namespace vrv {
 static const ClassRegistrar<Slur> s_factory("slur", SLUR);
 
 Slur::Slur()
-    : ControlElement(SLUR, "slur-")
-    , TimeSpanningInterface()
-    , AttColor()
-    , AttCurvature()
-    , AttLayerIdent()
-    , AttLineRendBase()
+    : ControlElement(SLUR, "slur-"), TimeSpanningInterface(), AttCurvature(), AttLayerIdent(), AttLineRendBase()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_CURVATURE);
     this->RegisterAttClass(ATT_LAYERIDENT);
     this->RegisterAttClass(ATT_LINERENDBASE);
@@ -58,15 +52,9 @@ Slur::Slur()
 }
 
 Slur::Slur(ClassId classId)
-    : ControlElement(classId, "slur-")
-    , TimeSpanningInterface()
-    , AttColor()
-    , AttCurvature()
-    , AttLayerIdent()
-    , AttLineRendBase()
+    : ControlElement(classId, "slur-"), TimeSpanningInterface(), AttCurvature(), AttLayerIdent(), AttLineRendBase()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_CURVATURE);
     this->RegisterAttClass(ATT_LAYERIDENT);
     this->RegisterAttClass(ATT_LINERENDBASE);
@@ -75,15 +63,9 @@ Slur::Slur(ClassId classId)
 }
 
 Slur::Slur(ClassId classId, const std::string &classIdStr)
-    : ControlElement(classId, classIdStr)
-    , TimeSpanningInterface()
-    , AttColor()
-    , AttCurvature()
-    , AttLayerIdent()
-    , AttLineRendBase()
+    : ControlElement(classId, classIdStr), TimeSpanningInterface(), AttCurvature(), AttLayerIdent(), AttLineRendBase()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_CURVATURE);
     this->RegisterAttClass(ATT_LAYERIDENT);
     this->RegisterAttClass(ATT_LINERENDBASE);
@@ -97,7 +79,6 @@ void Slur::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
-    this->ResetColor();
     this->ResetCurvature();
     this->ResetLayerIdent();
     this->ResetLineRendBase();

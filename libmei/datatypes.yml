@@ -44,8 +44,6 @@ mapped:
         std::string
     data.CONFIDENCE:
         double
-    data.DEGREES:
-        double
     data.CLEFLINE:
         char
     data.COURSENUMBER:
@@ -135,6 +133,8 @@ defaults:
         std::vector<std::pair<double, double>>()
     data_COMPASSDIRECTION:
         data_COMPASSDIRECTION()
+    data_DEGREES:
+        MEI_UNSET
     data_EVENTREL:
         data_EVENTREL()
     data_HEXNUM:
