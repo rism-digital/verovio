@@ -484,21 +484,21 @@ void ScoreDef::ResetFromDrawingValues()
         assert(staffDef);
 
         Clef *clef = vrv_cast<Clef *>(staffDef->FindDescendantByType(CLEF));
-        if (clef) *clef = *staffDef->GetCurrentClef();
+        if (clef) clef->ReplaceWithCopyOf(staffDef->GetCurrentClef());
 
         KeySig *keySig = vrv_cast<KeySig *>(staffDef->FindDescendantByType(KEYSIG));
-        if (keySig) *keySig = *staffDef->GetCurrentKeySig();
+        if (keySig) keySig->ReplaceWithCopyOf(staffDef->GetCurrentKeySig());
 
         Mensur *mensur = vrv_cast<Mensur *>(staffDef->FindDescendantByType(MENSUR));
-        if (mensur) *mensur = *staffDef->GetCurrentMensur();
+        if (mensur) mensur->ReplaceWithCopyOf(staffDef->GetCurrentMensur());
 
         MeterSigGrp *meterSigGrp = vrv_cast<MeterSigGrp *>(staffDef->FindDescendantByType(METERSIGGRP));
         MeterSig *meterSig = vrv_cast<MeterSig *>(staffDef->FindDescendantByType(METERSIG));
         if (meterSigGrp) {
-            *meterSigGrp = *staffDef->GetCurrentMeterSigGrp();
+            meterSigGrp->ReplaceWithCopyOf(staffDef->GetCurrentMeterSigGrp());
         }
         else if (meterSig) {
-            *meterSig = *staffDef->GetCurrentMeterSig();
+            meterSig->ReplaceWithCopyOf(staffDef->GetCurrentMeterSig());
         }
     }
 }
