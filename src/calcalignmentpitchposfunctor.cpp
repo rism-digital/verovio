@@ -357,7 +357,7 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitStaffDef(StaffDef *staffDef)
         m_octDefaultForStaffN[staffDef->GetN()] = staffDef->GetOctDefault();
     }
 
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv
