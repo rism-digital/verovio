@@ -189,6 +189,7 @@ struct OctaveInfo {
     int staffN;
     int layerN;
     int octaveShift;
+    bool isActive;
 };
 
 /**
@@ -331,7 +332,6 @@ public:
     FunctorCode VisitLayer(const Layer *layer) override;
     FunctorCode VisitLayerEnd(const Layer *layer) override;
     FunctorCode VisitLayerElement(const LayerElement *layerElement) override;
-    FunctorCode VisitLayerElementEnd(const LayerElement *layerElement) override;
     FunctorCode VisitMeasure(const Measure *measure) override;
     FunctorCode VisitMRpt(const MRpt *mRpt) override;
     FunctorCode VisitNote(const Note *note) override;
@@ -359,10 +359,7 @@ private:
     /**
      * Change the octave shift at the begin/end of octaves
      */
-    ///@{
-    void HandleOctaveBegin(const LayerElement *layerElement);
-    void HandleOctaveEnd(const LayerElement *layerElement);
-    ///@}
+    void HandleOctave(const LayerElement *layerElement);
 
     /**
      * Convenience helper

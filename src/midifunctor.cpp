@@ -373,7 +373,7 @@ FunctorCode InitMIDIFunctor::VisitOctave(const Octave *octave)
     const Layer *layer = vrv_cast<const Layer *>(raisePitch ? staff->GetFirst(LAYER) : staff->GetLast(LAYER));
     assert(layer);
 
-    m_octaves.push_back({ octave, staff->GetN(), layer->GetN(), (raisePitch ? shift : -shift) });
+    m_octaves.push_back({ octave, staff->GetN(), layer->GetN(), (raisePitch ? shift : -shift), false });
 
     return FUNCTOR_CONTINUE;
 }
@@ -487,7 +487,7 @@ FunctorCode GenerateMIDIFunctor::VisitBTrem(const BTrem *bTrem)
 
 FunctorCode GenerateMIDIFunctor::VisitChord(const Chord *chord)
 {
-    this->HandleOctaveBegin(chord);
+    this->HandleOctave(chord);
 
     // Handle grace chords
     if (chord->IsGraceNote()) {
@@ -520,7 +520,7 @@ FunctorCode GenerateMIDIFunctor::VisitChord(const Chord *chord)
 
 FunctorCode GenerateMIDIFunctor::VisitFTrem(const FTrem *fTrem)
 {
-    this->HandleOctaveBegin(fTrem);
+    this->HandleOctave(fTrem);
 
     if (fTrem->HasUnitdur()) {
         LogWarning("FTrem produces incorrect MIDI output");
@@ -555,8 +555,6 @@ FunctorCode GenerateMIDIFunctor::VisitGraceGrpEnd(const GraceGrp *graceGrp)
 
         m_graceNotes.clear();
     }
-
-    this->HandleOctaveEnd(graceGrp);
 
     return FUNCTOR_CONTINUE;
 }
@@ -593,20 +591,13 @@ FunctorCode GenerateMIDIFunctor::VisitLayerElement(const LayerElement *layerElem
 {
     if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
-    this->HandleOctaveBegin(layerElement);
+    this->HandleOctave(layerElement);
 
     // Only resolve simple sameas links to avoid infinite recursion
     const LayerElement *sameas = dynamic_cast<const LayerElement *>(layerElement->GetSameasLink());
     if (sameas && !sameas->HasSameasLink()) {
         sameas->Process(*this);
     }
-
-    return FUNCTOR_CONTINUE;
-}
-
-FunctorCode GenerateMIDIFunctor::VisitLayerElementEnd(const LayerElement *layerElement)
-{
-    this->HandleOctaveEnd(layerElement);
 
     return FUNCTOR_CONTINUE;
 }
@@ -637,7 +628,7 @@ FunctorCode GenerateMIDIFunctor::VisitMRpt(const MRpt *mRpt)
 
 FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
 {
-    this->HandleOctaveBegin(note);
+    this->HandleOctave(note);
 
     // Skip linked notes
     if (note->HasSameasLink()) {
@@ -951,25 +942,38 @@ void GenerateMIDIFunctor::GenerateGraceNoteMIDI(
     }
 }
 
-void GenerateMIDIFunctor::HandleOctaveBegin(const LayerElement *layerElement)
+void GenerateMIDIFunctor::HandleOctave(const LayerElement *layerElement)
 {
-    const auto octaveIter
-        = std::find_if(m_octaves.begin(), m_octaves.end(), [this, layerElement](const OctaveInfo &octave) {
-              return ((octave.staffN == m_staffN) && (octave.layerN == m_layerN)
-                  && (octave.octave->GetStart() == layerElement));
-          });
+    // Handle octave end
+    auto octaveIter = std::find_if(m_octaves.begin(), m_octaves.end(), [this, layerElement](const OctaveInfo &octave) {
+        if (octave.isActive && (octave.staffN == m_staffN) && (octave.layerN == m_layerN)) {
+            const Alignment *endAlignment = octave.octave->GetEnd()->GetAlignment();
+            const Alignment *alignment = layerElement->GetAlignment();
+            if (endAlignment && alignment) {
+                return *endAlignment < *alignment;
+            }
+        }
+        return false;
+    });
     if (octaveIter != m_octaves.end()) {
-        m_octaveShift = octaveIter->octaveShift;
+        m_octaveShift -= octaveIter->octaveShift;
+        m_octaves.erase(octaveIter);
     }
-}
 
-void GenerateMIDIFunctor::HandleOctaveEnd(const LayerElement *layerElement)
-{
-    if (std::any_of(m_octaves.begin(), m_octaves.end(), [this, layerElement](const OctaveInfo &octave) {
-            return ((octave.staffN == m_staffN) && (octave.layerN == m_layerN)
-                && (octave.octave->GetEnd() == layerElement));
-        })) {
-        m_octaveShift = 0;
+    // Handle octave begin
+    octaveIter = std::find_if(m_octaves.begin(), m_octaves.end(), [this, layerElement](const OctaveInfo &octave) {
+        if (!octave.isActive && (octave.staffN == m_staffN) && (octave.layerN == m_layerN)) {
+            const Alignment *startAlignment = octave.octave->GetStart()->GetAlignment();
+            const Alignment *alignment = layerElement->GetAlignment();
+            if (startAlignment && alignment) {
+                return *startAlignment <= *alignment;
+            }
+        }
+        return false;
+    });
+    if (octaveIter != m_octaves.end()) {
+        m_octaveShift += octaveIter->octaveShift;
+        octaveIter->isActive = true;
     }
 }
 
