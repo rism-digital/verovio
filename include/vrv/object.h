@@ -431,6 +431,12 @@ public:
     Object *DetachChild(int idx);
 
     /**
+     * Replace an object with a copy of the other.
+     * They must be of the same class.
+     */
+    void ReplaceWithCopyOf(Object *object);
+
+    /**
      * Return true if the object has the child Object as descendant (reference of direct).
      * Processes in depth-first.
      */
