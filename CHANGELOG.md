@@ -1,5 +1,8 @@
 # Changelog
 
+## [4.5.1] – 2024-12-24
+* Fix bug in RedoLayout
+
 ## [4.5.0] – 2024-12-22
 * Integration of tablature customization implementation
 * Optimization of regex calls (@paul-bayleaf)
