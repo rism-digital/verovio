@@ -1256,8 +1256,8 @@ void Doc::ReactivateSelection(bool resetAligners)
     System *system = vrv_cast<System *>(selectionPage->FindDescendantByType(SYSTEM));
     // Add a selection scoreDef based on the current drawing system scoreDef
     Score *selectionScore = new Score();
+    selectionScore->GetScoreDef()->ReplaceWithCopyOf(system->GetDrawingScoreDef());
     selectionScore->SetLabel("[selectionScore]");
-    *selectionScore->GetScoreDef() = *system->GetDrawingScoreDef();
     // Use the drawing values as actual scoreDef
     selectionScore->GetScoreDef()->ResetFromDrawingValues();
     selectionPage->InsertChild(selectionScore, 0);

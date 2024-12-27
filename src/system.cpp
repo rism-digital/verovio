@@ -203,7 +203,7 @@ void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
     assert(!m_drawingScoreDef); // We should always call ResetDrawingScoreDef before
 
     m_drawingScoreDef = new ScoreDef();
-    *m_drawingScoreDef = *drawingScoreDef;
+    m_drawingScoreDef->ReplaceWithCopyOf(drawingScoreDef);
     m_drawingScoreDef->SetParent(this);
 }
 
