@@ -69,6 +69,7 @@
 #import <VerovioFramework/convertfunctor.h>
 #import <VerovioFramework/corr.h>
 #import <VerovioFramework/course.h>
+#import <VerovioFramework/cpmark.h>
 #import <VerovioFramework/crc.h>
 #import <VerovioFramework/custos.h>
 #import <VerovioFramework/damage.h>

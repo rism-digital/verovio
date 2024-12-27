@@ -655,6 +655,12 @@
 		4DACCA162990F2E600B55913 /* att.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DACCA0D2990F2E600B55913 /* att.cpp */; };
 		4DACCA172990F2E600B55913 /* attdef.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DACCA0E2990F2E600B55913 /* attdef.h */; };
 		4DACCA182990F2E600B55913 /* attdef.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DACCA0E2990F2E600B55913 /* attdef.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4DAD09052D1EA207006095DC /* cpmark.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DAD09042D1EA207006095DC /* cpmark.cpp */; };
+		4DAD09062D1EA207006095DC /* cpmark.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DAD09042D1EA207006095DC /* cpmark.cpp */; };
+		4DAD09072D1EA207006095DC /* cpmark.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DAD09042D1EA207006095DC /* cpmark.cpp */; };
+		4DAD09082D1EA207006095DC /* cpmark.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DAD09042D1EA207006095DC /* cpmark.cpp */; };
+		4DAD090A2D1EA236006095DC /* cpmark.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DAD09092D1EA236006095DC /* cpmark.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4DAD090B2D1EA236006095DC /* cpmark.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DAD09092D1EA236006095DC /* cpmark.h */; };
 		4DB0B0161C44129300DBDCC3 /* timestamp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB0B0151C44129300DBDCC3 /* timestamp.cpp */; };
 		4DB0B0171C44129300DBDCC3 /* timestamp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB0B0151C44129300DBDCC3 /* timestamp.cpp */; };
 		4DB0B0191C4412A400DBDCC3 /* timestamp.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DB0B0181C4412A400DBDCC3 /* timestamp.h */; };
@@ -1435,7 +1441,7 @@
 		BDEF9EC926725234008A3A47 /* caesura.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDEF9EC626725234008A3A47 /* caesura.cpp */; };
 		BDEF9ECA26725234008A3A47 /* caesura.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDEF9EC626725234008A3A47 /* caesura.cpp */; };
 		BDEF9ECC26725248008A3A47 /* caesura.h in Headers */ = {isa = PBXBuildFile; fileRef = BDEF9ECB26725248008A3A47 /* caesura.h */; };
-		BDEF9ECD26725248008A3A47 /* caesura.h in Headers */ = {isa = PBXBuildFile; fileRef = BDEF9ECB26725248008A3A47 /* caesura.h */; };
+		BDEF9ECD26725248008A3A47 /* caesura.h in Headers */ = {isa = PBXBuildFile; fileRef = BDEF9ECB26725248008A3A47 /* caesura.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E708AA6229D2B96A001F937A /* adjustfloatingpositionerfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E708AA6129D2B965001F937A /* adjustfloatingpositionerfunctor.h */; };
 		E708AA6329D2B96B001F937A /* adjustfloatingpositionerfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E708AA6129D2B965001F937A /* adjustfloatingpositionerfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E708AA6529D2B985001F937A /* adjustfloatingpositionerfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E708AA6429D2B985001F937A /* adjustfloatingpositionerfunctor.cpp */; };
@@ -2026,6 +2032,8 @@
 		4DACCA0C2990F2E600B55913 /* attalternates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = attalternates.h; path = libmei/addons/attalternates.h; sourceTree = "<group>"; };
 		4DACCA0D2990F2E600B55913 /* att.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = att.cpp; path = libmei/addons/att.cpp; sourceTree = "<group>"; };
 		4DACCA0E2990F2E600B55913 /* attdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = attdef.h; path = libmei/addons/attdef.h; sourceTree = "<group>"; };
+		4DAD09042D1EA207006095DC /* cpmark.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = cpmark.cpp; path = src/cpmark.cpp; sourceTree = "<group>"; };
+		4DAD09092D1EA236006095DC /* cpmark.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = cpmark.h; path = include/vrv/cpmark.h; sourceTree = "<group>"; };
 		4DB0B0151C44129300DBDCC3 /* timestamp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = timestamp.cpp; path = src/timestamp.cpp; sourceTree = "<group>"; };
 		4DB0B0181C4412A400DBDCC3 /* timestamp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = timestamp.h; path = include/vrv/timestamp.h; sourceTree = "<group>"; };
 		4DB3072D1AC9ED1800EE0982 /* space.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space.h; path = include/vrv/space.h; sourceTree = "<group>"; };
@@ -2742,6 +2750,8 @@
 				4DE644F31EDBE9F8002FBE6C /* breath.h */,
 				BDEF9EC626725234008A3A47 /* caesura.cpp */,
 				BDEF9ECB26725248008A3A47 /* caesura.h */,
+				4DAD09042D1EA207006095DC /* cpmark.cpp */,
+				4DAD09092D1EA236006095DC /* cpmark.h */,
 				4DB351111C8040B1002DD057 /* dir.cpp */,
 				4DB3510E1C80409E002DD057 /* dir.h */,
 				4DDBBB591C7AE45900054AFF /* dynam.cpp */,
@@ -3480,6 +3490,7 @@
 				4D1BE7821C69434C0086DC0E /* MidiFile.h in Headers */,
 				4DACC9B62990F29A00B55913 /* atts_edittrans.h in Headers */,
 				4DEC4DD221C8295700D1D273 /* supplied.h in Headers */,
+				4DAD090B2D1EA236006095DC /* cpmark.h in Headers */,
 				4D3C3F11294B89C9009993E6 /* ornam.h in Headers */,
 				4DD7C0FF27A55CFD00B9C017 /* timemap.h in Headers */,
 				E79320642991452100D80975 /* calcstemfunctor.h in Headers */,
@@ -3707,6 +3718,7 @@
 				BB4C4B8622A932DF001F6AF0 /* lb.h in Headers */,
 				E77C197E28CD317B00F5BADA /* calcdotsfunctor.h in Headers */,
 				BD0562302518CD12004057EB /* beamspan.h in Headers */,
+				4DAD090A2D1EA236006095DC /* cpmark.h in Headers */,
 				E7E9C11B29B0EF9700CFCE2F /* adjusttempofunctor.h in Headers */,
 				BB4C4AFE22A932BC001F6AF0 /* subst.h in Headers */,
 				BB4C4AFC22A932BC001F6AF0 /* sic.h in Headers */,
@@ -4080,6 +4092,7 @@
 				E78F204B29D98D2B00CD5910 /* adjustxrelfortranscriptionfunctor.cpp in Sources */,
 				BD0562372518CD20004057EB /* beamspan.cpp in Sources */,
 				4D1694181E3A44F300569BF4 /* text.cpp in Sources */,
+				4DAD09052D1EA207006095DC /* cpmark.cpp in Sources */,
 				E7265E7329DC701000D11F41 /* castofffunctor.cpp in Sources */,
 				E7D48C7529D21F2B0031D89D /* adjustyposfunctor.cpp in Sources */,
 				E77C198228CD31AC00F5BADA /* calcdotsfunctor.cpp in Sources */,
@@ -4392,6 +4405,7 @@
 				E7770F8629D0DA1800A9BECF /* adjustslursfunctor.cpp in Sources */,
 				E7F39C6129A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp in Sources */,
 				8F086EF8188539540037FD8E /* note.cpp in Sources */,
+				4DAD09082D1EA207006095DC /* cpmark.cpp in Sources */,
 				409B3DD91F2D1C2A0098A265 /* ftrem.cpp in Sources */,
 				4D5FA9111E16A93F00F3B919 /* boundingbox.cpp in Sources */,
 				8F086EF9188539540037FD8E /* object.cpp in Sources */,
@@ -4663,6 +4677,7 @@
 				E78F204C29D98D2C00CD5910 /* adjustxrelfortranscriptionfunctor.cpp in Sources */,
 				4DDBBCC61C2EBAE7001AB50A /* view_text.cpp in Sources */,
 				8F3DD34618854B2E0051330C /* layerelement.cpp in Sources */,
+				4DAD09072D1EA207006095DC /* cpmark.cpp in Sources */,
 				BD6E5C3E290007CA0039B0F1 /* graphic.cpp in Sources */,
 				E7265E7129DC700800D11F41 /* castofffunctor.cpp in Sources */,
 				E7D48C7629D21F2C0031D89D /* adjustyposfunctor.cpp in Sources */,
@@ -4955,6 +4970,7 @@
 				E78F204D29D98D2D00CD5910 /* adjustxrelfortranscriptionfunctor.cpp in Sources */,
 				E77C198128CD318B00F5BADA /* calcdotsfunctor.cpp in Sources */,
 				BD87768627CE8A1A005B97EA /* layerdef.cpp in Sources */,
+				4DAD09062D1EA207006095DC /* cpmark.cpp in Sources */,
 				BB4C4AF722A932BC001F6AF0 /* reg.cpp in Sources */,
 				E7265E7229DC700800D11F41 /* castofffunctor.cpp in Sources */,
 				E7D48C7729D21F2D0031D89D /* adjustyposfunctor.cpp in Sources */,
