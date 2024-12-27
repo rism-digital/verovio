@@ -36,6 +36,7 @@
 #include "comparison.h"
 #include "corr.h"
 #include "course.h"
+#include "cpmark.h"
 #include "custos.h"
 #include "damage.h"
 #include "del.h"
@@ -491,6 +492,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->Is(CAESURA)) {
         m_currentNode = m_currentNode.append_child("caesura");
         this->WriteCaesura(m_currentNode, vrv_cast<Caesura *>(object));
+    }
+    else if (object->Is(CPMARK)) {
+        m_currentNode = m_currentNode.append_child("cpMark");
+        this->WriteCpMark(m_currentNode, vrv_cast<CpMark *>(object));
     }
     else if (object->Is(DIR)) {
         m_currentNode = m_currentNode.append_child("dir");
@@ -2016,6 +2021,15 @@ void MEIOutput::WriteCaesura(pugi::xml_node currentNode, Caesura *caesura)
     caesura->WriteExtSymAuth(currentNode);
     caesura->WriteExtSymNames(currentNode);
     caesura->WritePlacementRelStaff(currentNode);
+}
+
+void MEIOutput::WriteCpMark(pugi::xml_node currentNode, CpMark *cpMark)
+{
+    assert(cpMark);
+
+    this->WriteControlElement(currentNode, cpMark);
+    this->WriteTextDirInterface(currentNode, cpMark);
+    this->WriteTimeSpanningInterface(currentNode, cpMark);
 }
 
 void MEIOutput::WriteDir(pugi::xml_node currentNode, Dir *dir)
@@ -5491,6 +5505,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (currentName == "caesura") {
             success = this->ReadCaesura(parent, current);
         }
+        else if (currentName == "cpMark") {
+            success = this->ReadCpMark(parent, current);
+        }
         else if (currentName == "dir") {
             success = this->ReadDir(parent, current);
         }
@@ -5710,6 +5727,19 @@ bool MEIInput::ReadCaesura(Object *parent, pugi::xml_node caesura)
     parent->AddChild(vrvCaesura);
     this->ReadUnsupportedAttr(caesura, vrvCaesura);
     return true;
+}
+
+bool MEIInput::ReadCpMark(Object *parent, pugi::xml_node cpMark)
+{
+    CpMark *vrvCpMark = new CpMark();
+    this->ReadControlElement(cpMark, vrvCpMark);
+
+    this->ReadTextDirInterface(cpMark, vrvCpMark);
+    this->ReadTimeSpanningInterface(cpMark, vrvCpMark);
+
+    parent->AddChild(vrvCpMark);
+    this->ReadUnsupportedAttr(cpMark, vrvCpMark);
+    return this->ReadTextChildren(vrvCpMark, cpMark, vrvCpMark);
 }
 
 bool MEIInput::ReadDir(Object *parent, pugi::xml_node dir)
