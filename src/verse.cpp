@@ -38,6 +38,7 @@ Verse::Verse() : LayerElement(VERSE, "verse-"), AttColor(), AttLang(), AttNInteg
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_LANG);
     this->RegisterAttClass(ATT_NINTEGER);
+    this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
     this->RegisterAttClass(ATT_TYPOGRAPHY);
 
     this->Reset();
@@ -51,6 +52,7 @@ void Verse::Reset()
     this->ResetColor();
     this->ResetLang();
     this->ResetNInteger();
+    this->ResetPlacementRelStaff();
     this->ResetTypography();
 
     m_drawingLabelAbbr = NULL;
