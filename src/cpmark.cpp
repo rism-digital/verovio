@@ -29,7 +29,7 @@ namespace vrv {
 
 static const ClassRegistrar<CpMark> s_factory("cpMark", CPMARK);
 
-CpMark::CpMark() : ControlElement(DIR, "cpmark-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface()
+CpMark::CpMark() : ControlElement(CPMARK, "cpmark-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());

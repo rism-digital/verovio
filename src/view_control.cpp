@@ -22,6 +22,7 @@
 #include "caesura.h"
 #include "clef.h"
 #include "comparison.h"
+#include "cpmark.h"
 #include "devicecontext.h"
 #include "dir.h"
 #include "doc.h"
@@ -96,6 +97,11 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Caesura *caesura = vrv_cast<Caesura *>(element);
         assert(caesura);
         this->DrawCaesura(dc, caesura, measure, system);
+    }
+    else if (element->Is(CPMARK)) {
+        CpMark *cpMark = vrv_cast<CpMark *>(element);
+        assert(cpMark);
+        this->DrawControlElementText(dc, cpMark, measure, system);
     }
     else if (element->Is(DIR)) {
         Dir *dir = vrv_cast<Dir *>(element);

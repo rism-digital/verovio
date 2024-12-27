@@ -924,7 +924,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
             lines.UpdateContentBBoxX(minX, maxX);
             lines.UpdateContentBBoxY(yTop, yBottom);
             const int margin = unit / 2;
-            system->m_systemAligner.FindAllIntersectionPoints(line, lines, { DIR, DYNAM, TEMPO }, margin);
+            system->m_systemAligner.FindAllIntersectionPoints(line, lines, { CPMARK, DIR, DYNAM, TEMPO }, margin);
         }
     }
 
