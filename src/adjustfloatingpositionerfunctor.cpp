@@ -40,14 +40,26 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitStaffAlignment(StaffAlignment
             FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staffAlignment->GetStaff()->m_drawingStaffSize);
             int descender = m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
             int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
-            int margin = m_doc->GetBottomMargin(SYL) * drawingUnit;
-            int minMargin = std::max((int)(m_doc->GetOptions()->m_lyricTopMinMargin.GetValue() * drawingUnit),
-                staffAlignment->GetOverflowBelow());
-            staffAlignment->SetOverflowBelow(
-                minMargin + staffAlignment->GetVerseCount(verseCollapse) * (height - descender + margin));
-            // For now just clear the overflowBelow, which avoids the overlap to be calculated. We could also keep them
-            // and check if they are some lyrics in order to know if the overlap needs to be calculated or not.
-            staffAlignment->ClearBBoxesBelow();
+            if (staffAlignment->GetVerseCountAbove(verseCollapse)) {
+                int margin = m_doc->GetTopMargin(SYL) * drawingUnit;
+                int minMargin = std::max((int)(m_doc->GetOptions()->m_lyricTopMinMargin.GetValue() * drawingUnit),
+                    staffAlignment->GetOverflowAbove());
+                staffAlignment->SetOverflowAbove(
+                    minMargin + staffAlignment->GetVerseCountAbove(verseCollapse) * (height - descender + margin));
+                // For now just clear the overflowBelow, which avoids the overlap to be calculated. We could also keep
+                // them and check if they are some lyrics in order to know if the overlap needs to be calculated or not.
+                staffAlignment->ClearBBoxesAbove();
+            }
+            if (staffAlignment->GetVerseCountBelow(verseCollapse)) {
+                int margin = m_doc->GetBottomMargin(SYL) * drawingUnit;
+                int minMargin = std::max((int)(m_doc->GetOptions()->m_lyricTopMinMargin.GetValue() * drawingUnit),
+                    staffAlignment->GetOverflowBelow());
+                staffAlignment->SetOverflowBelow(
+                    minMargin + staffAlignment->GetVerseCountBelow(verseCollapse) * (height - descender + margin));
+                // For now just clear the overflowBelow, which avoids the overlap to be calculated. We could also keep
+                // them and check if they are some lyrics in order to know if the overlap needs to be calculated or not.
+                staffAlignment->ClearBBoxesBelow();
+            }
         }
         return FUNCTOR_SIBLINGS;
     }

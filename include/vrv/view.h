@@ -624,7 +624,7 @@ private:
     std::u32string IntToTimeSigFigures(unsigned short number);
     std::u32string IntToSmuflFigures(unsigned short number, int offset);
     int NestedTuplets(Object *object);
-    int GetSylYRel(int verseN, Staff *staff);
+    int GetSylYRel(int verseN, Staff *staff, data_STAFFREL place);
     int GetFYRel(F *f, Staff *staff);
     ///@}
 

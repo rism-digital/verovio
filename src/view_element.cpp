@@ -1753,7 +1753,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     }
 
     if (!m_doc->IsFacs() && !m_doc->IsTranscription() && !m_doc->IsNeumeLines()) {
-        syl->SetDrawingYRel(this->GetSylYRel(syl->m_drawingVerse, staff));
+        syl->SetDrawingYRel(this->GetSylYRel(syl->m_drawingVerseN, staff, syl->m_drawingVersePlace));
     }
 
     dc->StartGraphic(syl, "", syl->GetID());
@@ -1871,7 +1871,7 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
         TextDrawingParams params;
         params.m_x = verse->GetDrawingX() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        params.m_y = staff->GetDrawingY() + this->GetSylYRel(std::max(1, verse->GetN()), staff);
+        params.m_y = staff->GetDrawingY() + this->GetSylYRel(std::max(1, verse->GetN()), staff, verse->GetPlace());
         params.m_pointSize = labelTxt.GetPointSize();
 
         dc->SetBrush(m_currentColor, AxSOLID);
@@ -2098,22 +2098,31 @@ int View::GetFYRel(F *f, Staff *staff)
     return y;
 }
 
-int View::GetSylYRel(int verseN, Staff *staff)
+int View::GetSylYRel(int verseN, Staff *staff, data_STAFFREL place)
 {
     assert(staff);
 
+    StaffAlignment *alignment = staff->GetAlignment();
+    if (!alignment) return 0;
+
     const bool verseCollapse = m_options->m_lyricVerseCollapse.GetValue();
     int y = 0;
-    StaffAlignment *alignment = staff->GetAlignment();
-    if (alignment) {
-        FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-        int descender = -m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
-        int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
-        int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-        y = -alignment->GetStaffHeight() - alignment->GetOverflowBelow()
-            + alignment->GetVersePosition(verseN, verseCollapse) * (height + descender + margin) + (descender);
+    FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+    int descender = -m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
+    int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
+    int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+
+    // above the staff
+    if (place == STAFFREL_above) {
+        y = alignment->GetOverflowAbove()
+            - (alignment->GetVersePositionAbove(verseN, verseCollapse)) * (height + descender + margin) - (height);
     }
+    else {
+        y = -alignment->GetStaffHeight() - alignment->GetOverflowBelow()
+            + alignment->GetVersePositionBelow(verseN, verseCollapse) * (height + descender + margin) + (descender);
+    }
+
     return y;
 }
 
