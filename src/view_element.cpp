@@ -2105,22 +2105,31 @@ int View::GetSylYRel(int verseN, Staff *staff, data_STAFFREL place)
     StaffAlignment *alignment = staff->GetAlignment();
     if (!alignment) return 0;
 
+    const int drawingUnit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+
     const bool verseCollapse = m_options->m_lyricVerseCollapse.GetValue();
     int y = 0;
 
     FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-    int descender = -m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
-    int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
+    const int descender = m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
+    const int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
+
+    int verseHeight = (int)m_doc->GetOptions()->m_lyricHeight.GetValue() * drawingUnit;
+    if (verseHeight == 0) {
+        verseHeight -= descender;
+        verseHeight += height;
+    }
+
     int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     // above the staff
     if (place == STAFFREL_above) {
         y = alignment->GetOverflowAbove()
-            - (alignment->GetVersePositionAbove(verseN, verseCollapse)) * (height + descender + margin) - (height);
+            - (alignment->GetVersePositionAbove(verseN, verseCollapse)) * (verseHeight + margin) - (height);
     }
     else {
         y = -alignment->GetStaffHeight() - alignment->GetOverflowBelow()
-            + alignment->GetVersePositionBelow(verseN, verseCollapse) * (height + descender + margin) + (descender);
+            + alignment->GetVersePositionBelow(verseN, verseCollapse) * (verseHeight + margin) + verseHeight - height;
     }
 
     return y;

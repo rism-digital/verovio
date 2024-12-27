@@ -1371,6 +1371,10 @@ Options::Options()
     m_lyricElision.Init(ELISION_regular, &Option::s_elision);
     this->Register(&m_lyricElision, "lyricElision", &m_generalLayout);
 
+    m_lyricHeight.SetInfo("Lyric height", "The lyric verse line height in MEI units (0.0 for the default text height)");
+    m_lyricHeight.Init(0.0, 0.0, 20.0);
+    this->Register(&m_lyricHeight, "lyricHeight", &m_generalLayout);
+
     m_lyricLineThickness.SetInfo("Lyric line thickness", "The lyric extender line thickness");
     m_lyricLineThickness.Init(0.25, 0.10, 0.50);
     this->Register(&m_lyricLineThickness, "lyricLineThickness", &m_generalLayout);
