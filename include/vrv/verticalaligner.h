@@ -405,7 +405,7 @@ private:
      */
     int m_yRel;
     /**
-     * Stores the verse@n of the staves attached to the aligner (above and below
+     * Stores the verse@n of the staves attached to the aligner (above and below)
      */
     std::set<int> m_verseAboveNs;
     std::set<int> m_verseBelowNs;
