@@ -1245,7 +1245,7 @@ void View::DrawSylConnector(
     assert(syl->GetStart() && syl->GetEnd());
     if (!syl->GetStart() || !syl->GetEnd()) return;
 
-    const int y = staff->GetDrawingY() + this->GetSylYRel(syl->m_drawingVerse, staff);
+    const int y = staff->GetDrawingY() + this->GetSylYRel(syl->m_drawingVerseN, staff, syl->m_drawingVersePlace);
 
     // Invalid bounding boxes might occur for empty syllables without text child
     if (!syl->HasContentHorizontalBB()) return;
