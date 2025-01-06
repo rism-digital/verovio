@@ -655,8 +655,11 @@ FunctorCode AlignVerticallyFunctor::VisitStaff(Staff *staff)
             const int verseNumber = verse->GetN();
             const data_STAFFREL versePlace = verse->GetPlace();
             const bool verseCollapse = m_doc->GetOptions()->m_lyricVerseCollapse.GetValue();
-            if (!alignment->GetVersePositionAbove(verseNumber, verseCollapse)) {
-                alignment->AddVerseN(verseNumber, versePlace);
+            if ((versePlace == STAFFREL_above) && !alignment->GetVersePositionAbove(verseNumber, verseCollapse)) {
+                alignment->AddVerseN(verseNumber, verse->GetPlace());
+            }
+            if ((versePlace != STAFFREL_above) && !alignment->GetVersePositionBelow(verseNumber, verseCollapse)) {
+                alignment->AddVerseN(verseNumber, verse->GetPlace());
             }
         }
     }
