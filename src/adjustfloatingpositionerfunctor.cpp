@@ -58,7 +58,7 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitStaffAlignment(StaffAlignment
                 staffAlignment->SetOverflowBelow(
                     minMargin + staffAlignment->GetVerseCountBelow(verseCollapse) * (verseHeight + margin));
                 // For now just clear the overflowBelow, which avoids the overlap to be calculated. We could also keep
-                // them and check if they are some lyrics in order to know if the overlap needs to be calculated or not.
+                // them and check if there are some lyrics in order to know if the overlap needs to be calculated or not.
                 staffAlignment->ClearBBoxesBelow();
             }
         }
