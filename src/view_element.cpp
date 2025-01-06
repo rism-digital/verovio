@@ -2105,8 +2105,6 @@ int View::GetSylYRel(int verseN, Staff *staff, data_STAFFREL place)
     StaffAlignment *alignment = staff->GetAlignment();
     if (!alignment) return 0;
 
-    const int drawingUnit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-
     const bool verseCollapse = m_options->m_lyricVerseCollapse.GetValue();
     int y = 0;
 
@@ -2114,12 +2112,8 @@ int View::GetSylYRel(int verseN, Staff *staff, data_STAFFREL place)
     const int descender = m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
     const int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
 
-    int verseHeight = (int)m_doc->GetOptions()->m_lyricHeight.GetValue() * drawingUnit;
-    if (verseHeight == 0) {
-        verseHeight -= descender;
-        verseHeight += height;
-    }
-
+    int verseHeight = height - descender;
+    verseHeight *= m_doc->GetOptions()->m_lyricHeightFactor.GetValue();
     int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     // above the staff

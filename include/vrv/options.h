@@ -714,7 +714,7 @@ public:
     OptionDbl m_ledgerLineThickness;
     OptionDbl m_ledgerLineExtension;
     OptionIntMap m_lyricElision;
-    OptionDbl m_lyricHeight;
+    OptionDbl m_lyricHeightFactor;
     OptionDbl m_lyricLineThickness;
     OptionBool m_lyricNoStartHyphen;
     OptionDbl m_lyricSize;

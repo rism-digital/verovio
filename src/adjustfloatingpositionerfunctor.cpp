@@ -37,12 +37,10 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitStaffAlignment(StaffAlignment
     if (m_classId == SYL) {
         const bool verseCollapse = m_doc->GetOptions()->m_lyricVerseCollapse.GetValue();
         if (staffAlignment->GetVerseCount(verseCollapse) > 0) {
-            int verseHeight = (int)m_doc->GetOptions()->m_lyricHeight.GetValue() * drawingUnit;
-            if (verseHeight == 0) {
-                FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staffAlignment->GetStaff()->m_drawingStaffSize);
-                verseHeight -= m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
-                verseHeight += m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
-            }
+            FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staffAlignment->GetStaff()->m_drawingStaffSize);
+            int verseHeight = m_doc->GetTextGlyphHeight(L'I', lyricFont, false)
+                - m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
+            verseHeight *= m_doc->GetOptions()->m_lyricHeightFactor.GetValue();
             if (staffAlignment->GetVerseCountAbove(verseCollapse)) {
                 int margin = m_doc->GetTopMargin(SYL) * drawingUnit;
                 int minMargin = std::max((int)(m_doc->GetOptions()->m_lyricTopMinMargin.GetValue() * drawingUnit),
