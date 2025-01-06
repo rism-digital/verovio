@@ -18,6 +18,7 @@
 #include "gracegrp.h"
 #include "layer.h"
 #include "multirest.h"
+#include "octave.h"
 #include "pedal.h"
 #include "rest.h"
 #include "staff.h"
@@ -352,6 +353,31 @@ FunctorCode InitMIDIFunctor::VisitMeasure(const Measure *measure)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode InitMIDIFunctor::VisitOctave(const Octave *octave)
+{
+    const Measure *measure = vrv_cast<const Measure *>(octave->GetFirstAncestor(MEASURE));
+    assert(measure);
+    std::vector<const Staff *> staffList = octave->GetTstampStaves(measure, octave);
+    if (staffList.size() != 1) return FUNCTOR_CONTINUE;
+    const Staff *staff = staffList[0];
+
+    const bool raisePitch = (octave->GetDisPlace() != STAFFREL_basic_below);
+    int shift = 0;
+    switch (octave->GetDis()) {
+        case OCTAVE_DIS_8: shift = 1; break;
+        case OCTAVE_DIS_15: shift = 2; break;
+        case OCTAVE_DIS_22: shift = 3; break;
+        default: break;
+    }
+
+    const Layer *layer = vrv_cast<const Layer *>(raisePitch ? staff->GetFirst(LAYER) : staff->GetLast(LAYER));
+    assert(layer);
+
+    m_octaves.push_back({ octave, staff->GetN(), layer->GetN(), (raisePitch ? shift : -shift), false });
+
+    return FUNCTOR_CONTINUE;
+}
+
 //----------------------------------------------------------------------------
 // GenerateMIDIFunctor
 //----------------------------------------------------------------------------
@@ -364,6 +390,7 @@ GenerateMIDIFunctor::GenerateMIDIFunctor(smf::MidiFile *midiFile) : ConstFunctor
     m_totalTime = 0.0;
     m_staffN = 0;
     m_transSemi = 0;
+    m_octaveShift = 0;
     m_currentTempo = MIDI_TEMPO;
     m_lastNote = NULL;
     m_accentedGraceNote = false;
@@ -429,7 +456,7 @@ FunctorCode GenerateMIDIFunctor::VisitBTrem(const BTrem *bTrem)
     auto expandNote = [this, noteInQuarterDur, num](const Object *obj) {
         const Note *note = vrv_cast<const Note *>(obj);
         assert(note);
-        const int pitch = note->GetMIDIPitch(m_transSemi);
+        const int pitch = this->GetMIDIPitch(note);
         const double totalInQuarterDur
             = note->GetScoreTimeDuration().ToDouble() + note->GetScoreTimeTiedDuration().ToDouble();
         int multiplicity = totalInQuarterDur / noteInQuarterDur;
@@ -460,6 +487,8 @@ FunctorCode GenerateMIDIFunctor::VisitBTrem(const BTrem *bTrem)
 
 FunctorCode GenerateMIDIFunctor::VisitChord(const Chord *chord)
 {
+    this->HandleOctave(chord);
+
     // Handle grace chords
     if (chord->IsGraceNote()) {
         std::set<int> pitches;
@@ -467,7 +496,7 @@ FunctorCode GenerateMIDIFunctor::VisitChord(const Chord *chord)
         for (const Object *obj : notes) {
             const Note *note = vrv_cast<const Note *>(obj);
             assert(note);
-            pitches.insert(note->GetMIDIPitch(m_transSemi));
+            pitches.insert(this->GetMIDIPitch(note));
         }
 
         double quarterDuration = 0.0;
@@ -491,6 +520,8 @@ FunctorCode GenerateMIDIFunctor::VisitChord(const Chord *chord)
 
 FunctorCode GenerateMIDIFunctor::VisitFTrem(const FTrem *fTrem)
 {
+    this->HandleOctave(fTrem);
+
     if (fTrem->HasUnitdur()) {
         LogWarning("FTrem produces incorrect MIDI output");
     }
@@ -560,6 +591,8 @@ FunctorCode GenerateMIDIFunctor::VisitLayerElement(const LayerElement *layerElem
 {
     if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
+    this->HandleOctave(layerElement);
+
     // Only resolve simple sameas links to avoid infinite recursion
     const LayerElement *sameas = dynamic_cast<const LayerElement *>(layerElement->GetSameasLink());
     if (sameas && !sameas->HasSameasLink()) {
@@ -595,6 +628,8 @@ FunctorCode GenerateMIDIFunctor::VisitMRpt(const MRpt *mRpt)
 
 FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
 {
+    this->HandleOctave(note);
+
     // Skip linked notes
     if (note->HasSameasLink()) {
         return FUNCTOR_SIBLINGS;
@@ -612,7 +647,7 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
 
     // Handle grace notes
     if (note->IsGraceNote()) {
-        const int pitch = note->GetMIDIPitch(m_transSemi);
+        const int pitch = this->GetMIDIPitch(note);
 
         double quarterDuration = 0.0;
         const data_DURATION dur = note->GetDur();
@@ -662,7 +697,7 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
         }
     }
     else {
-        const int pitch = note->GetMIDIPitch(m_transSemi);
+        const int pitch = this->GetMIDIPitch(note);
 
         if (note->HasTabCourse() && (note->GetTabCourse() >= 1)) {
             // Tablature 'rule of holds'.  A note on a course is held until the next note
@@ -904,6 +939,41 @@ void GenerateMIDIFunctor::GenerateGraceNoteMIDI(
             m_midiFile->addNoteOff(m_midiTrack, stopTime * tpq, channel, pitch);
         }
         startTime = stopTime;
+    }
+}
+
+void GenerateMIDIFunctor::HandleOctave(const LayerElement *layerElement)
+{
+    // Handle octave end
+    auto octaveIter = std::find_if(m_octaves.begin(), m_octaves.end(), [this, layerElement](const OctaveInfo &octave) {
+        if (octave.isActive && (octave.staffN == m_staffN) && (octave.layerN == m_layerN)) {
+            const Alignment *endAlignment = octave.octave->GetEnd()->GetAlignment();
+            const Alignment *alignment = layerElement->GetAlignment();
+            if (endAlignment && alignment) {
+                return *endAlignment < *alignment;
+            }
+        }
+        return false;
+    });
+    if (octaveIter != m_octaves.end()) {
+        m_octaveShift -= octaveIter->octaveShift;
+        m_octaves.erase(octaveIter);
+    }
+
+    // Handle octave begin
+    octaveIter = std::find_if(m_octaves.begin(), m_octaves.end(), [this, layerElement](const OctaveInfo &octave) {
+        if (!octave.isActive && (octave.staffN == m_staffN) && (octave.layerN == m_layerN)) {
+            const Alignment *startAlignment = octave.octave->GetStart()->GetAlignment();
+            const Alignment *alignment = layerElement->GetAlignment();
+            if (startAlignment && alignment) {
+                return *startAlignment <= *alignment;
+            }
+        }
+        return false;
+    });
+    if (octaveIter != m_octaves.end()) {
+        m_octaveShift += octaveIter->octaveShift;
+        octaveIter->isActive = true;
     }
 }
 

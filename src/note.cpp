@@ -787,7 +787,7 @@ bool Note::IsEnharmonicWith(const Note *note) const
     return (this->GetMIDIPitch() == note->GetMIDIPitch());
 }
 
-int Note::GetMIDIPitch(const int shift) const
+int Note::GetMIDIPitch(const int shift, const int octaveShift) const
 {
     int pitch = 0;
 
@@ -797,7 +797,7 @@ int Note::GetMIDIPitch(const int shift) const
     else if (this->HasPname() || this->HasPnameGes()) {
         const int pclass = this->GetPitchClass();
 
-        int oct = this->GetOct();
+        int oct = this->GetOct() + octaveShift;
         if (this->HasOctGes()) oct = this->GetOctGes();
 
         pitch = pclass + (oct + 1) * 12;
