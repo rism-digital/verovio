@@ -30,6 +30,7 @@ class Chord;
 class Clef;
 class ControlElement;
 class Course;
+class CpMark;
 class Custos;
 class Dir;
 class Div;
@@ -292,6 +293,8 @@ public:
     virtual FunctorCode VisitCaesuraEnd(Caesura *caesura);
     virtual FunctorCode VisitControlElement(ControlElement *controlElement);
     virtual FunctorCode VisitControlElementEnd(ControlElement *controlElement);
+    virtual FunctorCode VisitCpMark(CpMark *cpMark);
+    virtual FunctorCode VisitCpMarkEnd(CpMark *cpMark);
     virtual FunctorCode VisitDir(Dir *dir);
     virtual FunctorCode VisitDirEnd(Dir *dir);
     virtual FunctorCode VisitDynam(Dynam *dynam);
@@ -665,6 +668,8 @@ public:
     virtual FunctorCode VisitCaesuraEnd(const Caesura *caesura);
     virtual FunctorCode VisitControlElement(const ControlElement *controlElement);
     virtual FunctorCode VisitControlElementEnd(const ControlElement *controlElement);
+    virtual FunctorCode VisitCpMark(const CpMark *cpMark);
+    virtual FunctorCode VisitCpMarkEnd(const CpMark *cpMark);
     virtual FunctorCode VisitDir(const Dir *dir);
     virtual FunctorCode VisitDirEnd(const Dir *dir);
     virtual FunctorCode VisitDynam(const Dynam *dynam);

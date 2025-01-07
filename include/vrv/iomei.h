@@ -46,6 +46,7 @@ class Clef;
 class ControlElement;
 class Corr;
 class Course;
+class CpMark;
 class Custos;
 class Damage;
 class Del;
@@ -437,6 +438,7 @@ private:
     void WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracketSpan);
     void WriteBreath(pugi::xml_node currentNode, Breath *breath);
     void WriteCaesura(pugi::xml_node currentNode, Caesura *caesura);
+    void WriteCpMark(pugi::xml_node currentNode, CpMark *cpMark);
     void WriteDir(pugi::xml_node currentNode, Dir *dir);
     void WriteDynam(pugi::xml_node currentNode, Dynam *dynam);
     void WriteFermata(pugi::xml_node currentNode, Fermata *fermata);
@@ -753,6 +755,7 @@ private:
     bool ReadBracketSpan(Object *parent, pugi::xml_node bracketSpan);
     bool ReadBreath(Object *parent, pugi::xml_node breath);
     bool ReadCaesura(Object *parent, pugi::xml_node caesura);
+    bool ReadCpMark(Object *parent, pugi::xml_node cpMark);
     bool ReadDir(Object *parent, pugi::xml_node dir);
     bool ReadDynam(Object *parent, pugi::xml_node dynam);
     bool ReadFermata(Object *parent, pugi::xml_node fermata);

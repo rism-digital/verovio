@@ -181,6 +181,7 @@ enum ClassId : uint16_t {
     BRACKETSPAN,
     BREATH,
     CAESURA,
+    CPMARK,
     DIR,
     DYNAM,
     FERMATA,

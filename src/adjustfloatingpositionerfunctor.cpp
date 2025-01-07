@@ -129,6 +129,7 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitStaffAlignment(StaffAlignment
 
         // Handle within placement (ignore collisions for certain classes)
         if (place == STAFFREL_within) {
+            if (m_classId == CPMARK) continue;
             if (m_classId == DIR) continue;
             if (m_classId == HAIRPIN) continue;
         }
@@ -227,6 +228,9 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitSystem(System *system)
     system->m_systemAligner.Process(adjustFloatingPositionerGrps);
     adjustFloatingPositionerGrps.SetPlace(STAFFREL_below);
     system->m_systemAligner.Process(adjustFloatingPositionerGrps);
+
+    m_classId = CPMARK;
+    system->m_systemAligner.Process(*this);
 
     m_classId = REPEATMARK;
     system->m_systemAligner.Process(*this);
@@ -444,7 +448,7 @@ FunctorCode AdjustFloatingPositionersBetweenFunctor::VisitStaffAlignment(StaffAl
 
     for (FloatingPositioner *positioner : m_previousStaffAlignment->GetFloatingPositioners()) {
         assert(positioner->GetObject());
-        if (!positioner->GetObject()->Is({ DIR, DYNAM, HAIRPIN, TEMPO })) continue;
+        if (!positioner->GetObject()->Is({ CPMARK, DIR, DYNAM, HAIRPIN, TEMPO })) continue;
 
         if (positioner->GetDrawingPlace() != STAFFREL_between) continue;
 
