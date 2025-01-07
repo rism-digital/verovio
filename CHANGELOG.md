@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for `cpMark` (_colla parte_)
 * Support for `verse@place` for lyrics above the staff
 * Support for MIDI octave displacement without `@oct.ges` (@brdvd)
 * Option `--lyric-height-factor` to increase the spacing of the lyrics
