@@ -547,7 +547,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             generateMIDI.SetCurrentTempo(tempo);
             generateMIDI.SetDeferredNotes(initMIDI.GetDeferredNotes());
             generateMIDI.SetOctaves(initMIDI.GetOctaves());
-            generateMIDI.SetCueExclusion(this->GetOptions()->m_midiNoCue.GetValue());
+            generateMIDI.SetNoCue(this->GetOptions()->m_midiNoCue.GetValue());
             generateMIDI.SetControlEvents(controlEvents);
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
@@ -574,7 +574,7 @@ bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeas
     }
     Timemap timemap;
     GenerateTimemapFunctor generateTimemap(&timemap);
-    generateTimemap.SetCueExclusion(this->GetOptions()->m_midiNoCue.GetValue());
+    generateTimemap.SetNoCue(this->GetOptions()->m_midiNoCue.GetValue());
     this->Process(generateTimemap);
 
     timemap.ToJson(output, includeRests, includeMeasures, useFractions);

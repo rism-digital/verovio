@@ -394,7 +394,7 @@ GenerateMIDIFunctor::GenerateMIDIFunctor(smf::MidiFile *midiFile) : ConstFunctor
     m_currentTempo = MIDI_TEMPO;
     m_lastNote = NULL;
     m_accentedGraceNote = false;
-    m_cueExclusion = false;
+    m_noCue = false;
     m_controlEvents = false;
 }
 
@@ -568,7 +568,7 @@ FunctorCode GenerateMIDIFunctor::VisitHalfmRpt(const HalfmRpt *halfmRpt)
 
 FunctorCode GenerateMIDIFunctor::VisitLayer(const Layer *layer)
 {
-    if ((layer->GetCue() == BOOLEAN_true) && m_cueExclusion) return FUNCTOR_SIBLINGS;
+    if ((layer->GetCue() == BOOLEAN_true) && m_noCue) return FUNCTOR_SIBLINGS;
 
     return FUNCTOR_CONTINUE;
 }
@@ -636,7 +636,7 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
     }
 
     // Skip cue notes when midiNoCue is activated
-    if ((note->GetCue() == BOOLEAN_true) && m_cueExclusion) {
+    if ((note->GetCue() == BOOLEAN_true) && m_noCue) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -986,7 +986,7 @@ GenerateTimemapFunctor::GenerateTimemapFunctor(Timemap *timemap) : ConstFunctor(
     m_scoreTimeOffset = 0;
     m_realTimeOffsetMilliseconds = 0.0;
     m_currentTempo = MIDI_TEMPO;
-    m_cueExclusion = false;
+    m_noCue = false;
     m_timemap = timemap;
 }
 
@@ -1019,7 +1019,7 @@ FunctorCode GenerateTimemapFunctor::VisitNote(const Note *note)
     if (note->HasGrace()) return FUNCTOR_SIBLINGS;
 
     // Skip cue notes when midiNoCue is activated
-    if ((note->GetCue() == BOOLEAN_true) && m_cueExclusion) {
+    if ((note->GetCue() == BOOLEAN_true) && m_noCue) {
         return FUNCTOR_SIBLINGS;
     }
 

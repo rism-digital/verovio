@@ -308,7 +308,7 @@ public:
     ///@{
     void SetChannel(int channel) { m_midiChannel = channel; }
     void SetControlEvents(bool controlEvents) { m_controlEvents = controlEvents; }
-    void SetCueExclusion(bool cueExclusion) { m_cueExclusion = cueExclusion; }
+    void SetNoCue(bool noCue) { m_noCue = noCue; }
     void SetCurrentTempo(double tempo) { m_currentTempo = tempo; }
     void SetDeferredNotes(const std::map<const Note *, double> &deferredNotes) { m_deferredNotes = deferredNotes; }
     void SetLayerN(int layerN) { m_layerN = layerN; }
@@ -403,7 +403,7 @@ private:
     // Indicates whether the last grace note/chord was accented
     bool m_accentedGraceNote;
     // Indicates whether cue notes should be included
-    bool m_cueExclusion;
+    bool m_noCue;
     // Tablature held notes indexed by (course - 1)
     std::vector<MIDIHeldNote> m_heldNotes;
     // A flag indicating we want to process control events
@@ -435,7 +435,7 @@ public:
     /*
      * Set the cue exclusion flag
      */
-    void SetCueExclusion(bool cueExclusion) { m_cueExclusion = cueExclusion; }
+    void SetNoCue(bool noCue) { m_noCue = noCue; }
 
     /*
      * Functor interface
@@ -465,7 +465,7 @@ private:
     // The current tempo
     double m_currentTempo;
     // Indicates whether cue notes should be included
-    bool m_cueExclusion;
+    bool m_noCue;
     // The timemap
     Timemap *m_timemap;
 };
