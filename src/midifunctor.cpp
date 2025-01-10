@@ -314,6 +314,27 @@ FunctorCode InitTimemapTiesFunctor::VisitTie(Tie *tie)
 }
 
 //----------------------------------------------------------------------------
+// InitTimemapNotesFunctor
+//----------------------------------------------------------------------------
+
+InitTimemapNotesFunctor::InitTimemapNotesFunctor() : Functor() {}
+
+FunctorCode InitTimemapNotesFunctor::VisitChord(Chord *chord)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode InitTimemapNotesFunctor::VisitGraceGrpEnd(GraceGrp *graceGrp)
+{
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode InitTimemapNotesFunctor::VisitNote(Note *note)
+{
+    return FUNCTOR_SIBLINGS;
+}
+
+//----------------------------------------------------------------------------
 // InitMidiFunctor
 //----------------------------------------------------------------------------
 

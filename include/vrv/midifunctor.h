@@ -178,6 +178,50 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InitTimemapNotesFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class adjusts note duration for grace notes and arpeggios.
+ */
+class InitTimemapNotesFunctor : public Functor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    InitTimemapNotesFunctor();
+    virtual ~InitTimemapNotesFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitChord(Chord *chord) override;
+    FunctorCode VisitGraceGrpEnd(GraceGrp *graceGrp) override;
+    FunctorCode VisitNote(Note *note) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // Grace note sequence
+    std::list<Note *> m_graceNotes;
+    // Indicates whether the last grace note/chord was accented
+    bool m_accentedGraceNote;
+};
+
+//----------------------------------------------------------------------------
 // InitMIDIFunctor
 //----------------------------------------------------------------------------
 
