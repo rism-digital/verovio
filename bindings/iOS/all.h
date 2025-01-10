@@ -34,6 +34,7 @@
 #import <VerovioFramework/altsyminterface.h>
 #import <VerovioFramework/anchoredtext.h>
 #import <VerovioFramework/annot.h>
+#import <VerovioFramework/annotscore.h>
 #import <VerovioFramework/app.h>
 #import <VerovioFramework/areaposinterface.h>
 #import <VerovioFramework/arpeg.h>
