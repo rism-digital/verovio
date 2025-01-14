@@ -29,7 +29,6 @@ endif()
 
 # Sets the compile-time value for the RESOURCE_DIR macro in the source code.
 add_compile_definitions(RESOURCE_DIR="${CMAKE_INSTALL_PREFIX}/share/verovio")
-add_compile_options(/bigobj)
 
 include_directories(
     ../include
@@ -45,6 +44,7 @@ include_directories(
 )
 
 if(MSVC)
+    add_compile_options(/bigobj)
     add_definitions(/W2)
     add_definitions(/wd4244)          # suppress warning of possible loss of precision
     add_definitions(-DNO_PAE_SUPPORT) # regex is working differently under Windows so PAE is not supported (yet)
