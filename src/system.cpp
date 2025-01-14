@@ -203,7 +203,7 @@ void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
     assert(!m_drawingScoreDef); // We should always call ResetDrawingScoreDef before
 
     m_drawingScoreDef = new ScoreDef();
-    *m_drawingScoreDef = *drawingScoreDef;
+    m_drawingScoreDef->ReplaceWithCopyOf(drawingScoreDef);
     m_drawingScoreDef->SetParent(this);
 }
 
@@ -427,27 +427,6 @@ double System::EstimateJustificationRatio(const Doc *doc) const
     estimatedRatio = std::max(estimatedRatio, 0.8);
 
     return estimatedRatio;
-}
-
-void System::ConvertToCastOffMensuralSystem(Doc *doc, System *targetSystem)
-{
-    assert(doc);
-    assert(targetSystem);
-
-    // We need to populate processing lists for processing the document by Layer
-    InitProcessingListsFunctor initProcessingLists;
-    this->Process(initProcessingLists);
-    const IntTree &layerTree = initProcessingLists.GetLayerTree();
-
-    // Checking just in case
-    if (layerTree.child.empty()) return;
-
-    ConvertToCastOffMensuralFunctor convertToCastOffMensural(doc, targetSystem, &layerTree);
-    // Store the list of staff N for detecting barLines that are on all systems
-    for (const auto &staves : layerTree.child) {
-        convertToCastOffMensural.AddStaffN(staves.first);
-    }
-    this->Process(convertToCastOffMensural);
 }
 
 void System::ConvertToUnCastOffMensuralSystem()

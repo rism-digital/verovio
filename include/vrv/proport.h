@@ -38,6 +38,7 @@ public:
     int GetCumulatedNumbase() const;
 
     void Cumulate(const Proport *proport);
+    void ResetCumulate();
 
     /** Override the method since alignment is required */
     bool HasToBeAligned() const override { return true; }

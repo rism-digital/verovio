@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        reh.cpp
-// Author:      Klaus Rettinghaus
-// Created:     2020
+// Name:        cpmark.cpp
+// Author:      Laurent Pugin
+// Created:     2024
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "reh.h"
+#include "cpmark.h"
 
 //----------------------------------------------------------------------------
 
@@ -13,9 +13,10 @@
 
 //----------------------------------------------------------------------------
 
+#include "comparison.h"
 #include "editorial.h"
 #include "functor.h"
-#include "measure.h"
+#include "symbol.h"
 #include "text.h"
 #include "verticalaligner.h"
 #include "vrv.h"
@@ -23,35 +24,31 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Reh
+// CpMark
 //----------------------------------------------------------------------------
 
-static const ClassRegistrar<Reh> s_factory("reh", REH);
+static const ClassRegistrar<CpMark> s_factory("cpMark", CPMARK);
 
-Reh::Reh() : ControlElement(REH, "reh-"), TextDirInterface(), TimePointInterface(), AttLang(), AttVerticalGroup()
+CpMark::CpMark() : ControlElement(CPMARK, "cpmark-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
-    this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
-    this->RegisterAttClass(ATT_LANG);
-    this->RegisterAttClass(ATT_VERTICALGROUP);
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
 
     this->Reset();
 }
 
-Reh::~Reh() {}
+CpMark::~CpMark() {}
 
-void Reh::Reset()
+void CpMark::Reset()
 {
     ControlElement::Reset();
     TextDirInterface::Reset();
-    TimePointInterface::Reset();
-    this->ResetLang();
-    this->ResetVerticalGroup();
+    TimeSpanningInterface::Reset();
 }
 
-bool Reh::IsSupportedChild(Object *child)
+bool CpMark::IsSupportedChild(Object *child)
 {
-    if (child->Is({ LB, REND, TEXT })) {
+    if (child->Is({ LB, REND, SYMBOL, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
     }
     else if (child->IsEditorialElement()) {
@@ -64,27 +61,27 @@ bool Reh::IsSupportedChild(Object *child)
 }
 
 //----------------------------------------------------------------------------
-// Reh functor methods
+// CpMark functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Reh::Accept(Functor &functor)
+FunctorCode CpMark::Accept(Functor &functor)
 {
-    return functor.VisitReh(this);
+    return functor.VisitCpMark(this);
 }
 
-FunctorCode Reh::Accept(ConstFunctor &functor) const
+FunctorCode CpMark::Accept(ConstFunctor &functor) const
 {
-    return functor.VisitReh(this);
+    return functor.VisitCpMark(this);
 }
 
-FunctorCode Reh::AcceptEnd(Functor &functor)
+FunctorCode CpMark::AcceptEnd(Functor &functor)
 {
-    return functor.VisitRehEnd(this);
+    return functor.VisitCpMarkEnd(this);
 }
 
-FunctorCode Reh::AcceptEnd(ConstFunctor &functor) const
+FunctorCode CpMark::AcceptEnd(ConstFunctor &functor) const
 {
-    return functor.VisitRehEnd(this);
+    return functor.VisitCpMarkEnd(this);
 }
 
 } // namespace vrv

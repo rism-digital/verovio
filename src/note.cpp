@@ -31,6 +31,7 @@
 #include "staff.h"
 #include "stem.h"
 #include "syl.h"
+#include "symboldef.h"
 #include "tabgrp.h"
 #include "tie.h"
 #include "tuning.h"
@@ -52,6 +53,7 @@ static const ClassRegistrar<Note> s_factory("note", NOTE);
 Note::Note()
     : LayerElement(NOTE, "note-")
     , StemmedDrawingInterface()
+    , AltSymInterface()
     , DurationInterface()
     , PitchInterface()
     , PositionInterface()
@@ -71,6 +73,7 @@ Note::Note()
     , AttTiePresent()
     , AttVisibility()
 {
+    this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
     this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
@@ -99,6 +102,7 @@ void Note::Reset()
 {
     LayerElement::Reset();
     StemmedDrawingInterface::Reset();
+    AltSymInterface::Reset();
     DurationInterface::Reset();
     PitchInterface::Reset();
     PositionInterface::Reset();
@@ -121,7 +125,6 @@ void Note::Reset()
     m_noteGroupPosition = 0;
     m_noteGroup = NULL;
 
-    m_drawingLoc = 0;
     m_flippedNotehead = false;
 
     m_stemSameas = NULL;
@@ -214,21 +217,6 @@ const Accid *Note::GetDrawingAccid() const
     return vrv_cast<const Accid *>(this->FindDescendantByType(ACCID));
 }
 
-bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff) const
-{
-    if (!staff) {
-        staff = this->GetAncestorStaff();
-    }
-
-    linesAbove = (this->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
-    linesBelow = -(this->GetDrawingLoc()) / 2;
-
-    linesAbove = std::max(linesAbove, 0);
-    linesBelow = std::max(linesBelow, 0);
-
-    return ((linesAbove > 0) || (linesBelow > 0));
-}
-
 Chord *Note::IsChordTone()
 {
     return vrv_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
@@ -267,25 +255,78 @@ const TabGrp *Note::IsTabGrpNote() const
     return vrv_cast<const TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
 }
 
-std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType) const
+std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType, int &overline, int &strike, int &underline) const
 {
+    overline = 0;
+    strike = 0;
+    underline = 0;
+
+    // @glyph.num, @glyph.name or @altsym
+    const Resources *resources = this->GetDocResources();
+    if (resources != NULL) {
+        std::u32string fretStr;
+        // If there is @glyph.num, return glyph based on it (first priority)
+        if (this->HasGlyphNum()) {
+            const char32_t code = this->GetGlyphNum();
+            if (NULL != resources->GetGlyph(code)) fretStr.push_back(code);
+        }
+
+        // If there is @glyph.name (second priority)
+        else if (this->HasGlyphName()) {
+            const char32_t code = resources->GetGlyphCode(this->GetGlyphName());
+            if (NULL != resources->GetGlyph(code)) fretStr.push_back(code);
+        }
+
+        // If there is @altsym (third priority)
+        else if (this->HasAltsym() && this->HasAltSymbolDef()) {
+            const SymbolDef *symbolDef = this->GetAltSymbolDef();
+
+            // there may be more than one <symbol>
+            for (const Object *child : symbolDef->GetChildren()) {
+                if (child->Is(SYMBOL)) {
+                    const Symbol *symbol = vrv_cast<const Symbol *>(child);
+
+                    // If there is @glyph.num, return glyph based on it (fourth priority)
+                    if (symbol->HasGlyphNum()) {
+                        const char32_t code = symbol->GetGlyphNum();
+                        if (NULL != resources->GetGlyph(code)) fretStr.push_back(code);
+                    }
+
+                    // If there is @glyph.name (fifth priority)
+                    else if (symbol->HasGlyphName()) {
+                        const char32_t code = resources->GetGlyphCode(symbol->GetGlyphName());
+                        if (NULL != resources->GetGlyph(code)) fretStr.push_back(code);
+                    }
+                }
+            }
+        }
+
+        if (!fretStr.empty()) return fretStr;
+    }
+
     if (notationType == NOTATIONTYPE_tab_lute_italian) {
         std::u32string fretStr;
-        int fret = this->GetTabFret();
-        // Maximum allowed would be 19 (always bindly addind 1 as first figure)
-        if (fret > 9) fretStr.push_back(SMUFL_EBE1_luteItalianFret1);
-        switch (fret % 10) {
-            case 0: fretStr.push_back(SMUFL_EBE0_luteItalianFret0); break;
-            case 1: fretStr.push_back(SMUFL_EBE1_luteItalianFret1); break;
-            case 2: fretStr.push_back(SMUFL_EBE2_luteItalianFret2); break;
-            case 3: fretStr.push_back(SMUFL_EBE3_luteItalianFret3); break;
-            case 4: fretStr.push_back(SMUFL_EBE4_luteItalianFret4); break;
-            case 5: fretStr.push_back(SMUFL_EBE5_luteItalianFret5); break;
-            case 6: fretStr.push_back(SMUFL_EBE6_luteItalianFret6); break;
-            case 7: fretStr.push_back(SMUFL_EBE7_luteItalianFret7); break;
-            case 8: fretStr.push_back(SMUFL_EBE8_luteItalianFret8); break;
-            case 9: fretStr.push_back(SMUFL_EBE9_luteItalianFret9); break;
-            default: break;
+        const int fret = this->GetTabFret();
+        const int course = this->GetTabCourse();
+
+        // Italian tablature glyphs are contiguous
+        static_assert(SMUFL_EBE1_luteItalianFret1 == SMUFL_EBE0_luteItalianFret0 + 1);
+        static_assert(SMUFL_EBE2_luteItalianFret2 == SMUFL_EBE0_luteItalianFret0 + 2);
+        // ...
+        static_assert(SMUFL_EBE9_luteItalianFret9 == SMUFL_EBE0_luteItalianFret0 + 9);
+
+        if (course <= 7 || fret != 0) {
+            const auto decimal = std::div(fret, 10);
+            if (decimal.quot > 0) fretStr.push_back(SMUFL_EBE0_luteItalianFret0 + decimal.quot);
+            if (decimal.rem <= 9) fretStr.push_back(SMUFL_EBE0_luteItalianFret0 + decimal.rem);
+            if (course >= 7) strike = 1; // course 7 and fretted courses >= 8 use a ledger line
+            underline = std::max(0, course - 7); // compressed ledger lines for fretted courses >= 8
+        }
+        else {
+            // open courses >= 8 just use the number of the course on stave line 7
+            const auto decimal = std::div(course, 10);
+            if (decimal.quot > 0) fretStr.push_back(SMUFL_EBE0_luteItalianFret0 + decimal.quot);
+            if (decimal.rem <= 9) fretStr.push_back(SMUFL_EBE0_luteItalianFret0 + decimal.rem);
         }
         return fretStr;
     }
@@ -333,6 +374,75 @@ std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType) const
 
             // TODO what if fret > 12?  Some tablatures use fret p.
             if (fret >= 0 && fret < static_cast<int>(sizeof(letter) / sizeof(letter[0]))) fretStr += letter[fret];
+        }
+        return fretStr;
+    }
+    else if (notationType == NOTATIONTYPE_tab_lute_german) {
+        std::u32string fretStr;
+        const int fret = this->GetTabFret();
+        const int course = this->GetTabCourse();
+
+        // SMuFL has glyphs for German lute tablature following Hans and Melchior Newsidler's notation
+        // for the >= 6th courses.
+        // "German Renaissance lute tablature (U+EC00–U+EC2F)"
+        // https://w3c.github.io/smufl/latest/tables/german-renaissance-lute-tablature.html
+        //
+        // However, some glyphs are missing:
+        //
+        //   Digit 1 with a strike through for the open 6th course.
+        //   Digit 1 with two strike throughs for the open 7th course.
+        //   Digit 1 with three strike throughs for the open 8th course.
+        //   "et" for 2nd course 5th fret.
+        //   "con" for 1st course 5th fret.
+        //   Gothic font digits 1-5 for the open courses <= 5.
+        //   Second lowercase alphabet with an overline used for courses <= 5 frets 6 to 10.
+        //
+        // To overcome these omissions I've substituted missing glyphs from other
+        // parts of the SMuFL collection.  Overlines and strike throughs are drawn separately.
+
+        if (course >= 6 && fret >= 0 && fret <= 13) {
+            // + A B C D ...
+            if (fret == 0) {
+                fretStr = SMUFL_EA51_figbass1; // substitute for 1 with oblique stroke
+                strike = course - 5; // 6 course 1 strike, 7 course 2 strikes, ...
+            }
+            else {
+                // The German tablature uppercase letters A-N are contiguous, correctly omitting J
+                static_assert(SMUFL_EC23_luteGermanNUpper == SMUFL_EC17_luteGermanAUpper + 13 - 1);
+                fretStr = SMUFL_EC17_luteGermanAUpper + fret - 1;
+                overline = course - 6; // 6 course 0 overline, 7 course 1 overline, ...
+            }
+        }
+        else if (course >= 1 && course <= 5 && fret == 0) {
+            // Substitute for gothic digits
+            static const char32_t digit[] = { SMUFL_EA51_figbass1, SMUFL_EA52_figbass2, SMUFL_EA54_figbass3,
+                SMUFL_EA55_figbass4, SMUFL_EA57_figbass5 };
+            fretStr = digit[5 - course];
+        }
+        else if (course >= 1 && course <= 5 && fret >= 0 && fret <= 10) {
+            const int firstAlphabetFret = fret <= 5 ? fret : fret - 5; // map second alphabet to first
+
+            if (course == 2 && firstAlphabetFret == 5) {
+                // TODO replace with U+EC24, luteGermanEt when available
+                //      https://github.com/w3c/smufl/issues/274
+                fretStr = SMUFL_EA5F_figbass7Raised2; // substitute for "et"
+            }
+            else if (course == 1 && firstAlphabetFret == 5) {
+                // TODO replace with U+EC25, luteGermanCon when available
+                //      https://github.com/w3c/smufl/issues/274
+                fretStr = SMUFL_EA61_figbass9; // substitute for "con"
+            }
+            else {
+                // The German tablature lowercase letters a-z are contiguous, correctly omitting j u w
+                static_assert(SMUFL_EC16_luteGermanZLower == SMUFL_EC00_luteGermanALower + 23 - 1);
+
+                // lowercase letters run 5th to 1st course, frets 1 to 5
+                // and frets 6 to 10 with an overline
+                fretStr = SMUFL_EC00_luteGermanALower + (5 - course) + (firstAlphabetFret - 1) * 5;
+            }
+
+            // second alphabet needs an overline
+            overline = (fret >= 6) ? 1 : 0;
         }
         return fretStr;
     }
@@ -677,7 +787,7 @@ bool Note::IsEnharmonicWith(const Note *note) const
     return (this->GetMIDIPitch() == note->GetMIDIPitch());
 }
 
-int Note::GetMIDIPitch(const int shift) const
+int Note::GetMIDIPitch(const int shift, const int octaveShift) const
 {
     int pitch = 0;
 
@@ -687,7 +797,7 @@ int Note::GetMIDIPitch(const int shift) const
     else if (this->HasPname() || this->HasPnameGes()) {
         const int pclass = this->GetPitchClass();
 
-        int oct = this->GetOct();
+        int oct = this->GetOct() + octaveShift;
         if (this->HasOctGes()) oct = this->GetOctGes();
 
         pitch = pclass + (oct + 1) * 12;

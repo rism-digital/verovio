@@ -37,7 +37,6 @@ static const ClassRegistrar<Pedal> s_factory("pedal", PEDAL);
 Pedal::Pedal()
     : ControlElement(PEDAL, "pedal-")
     , TimeSpanningInterface()
-    , AttColor()
     , AttExtSymAuth()
     , AttExtSymNames()
     , AttPedalLog()
@@ -46,7 +45,6 @@ Pedal::Pedal()
     , AttVerticalGroup()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_EXTSYMAUTH);
     this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_PEDALLOG);
@@ -63,7 +61,6 @@ void Pedal::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
-    this->ResetColor();
     this->ResetExtSymAuth();
     this->ResetExtSymNames();
     this->ResetPedalLog();

@@ -59,7 +59,8 @@ void Syl::Reset()
     this->ResetTypography();
     this->ResetSylLog();
 
-    m_drawingVerse = 1;
+    m_drawingVerseN = 1;
+    m_drawingVersePlace = STAFFREL_below;
     m_nextWordSyl = NULL;
 }
 

@@ -38,8 +38,8 @@ namespace vrv {
 // Version
 //----------------------------------------------------------------------------
 
-#define VERSION_MAJOR 4
-#define VERSION_MINOR 4
+#define VERSION_MAJOR 5
+#define VERSION_MINOR 0
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -181,6 +181,7 @@ enum ClassId : uint16_t {
     BRACKETSPAN,
     BREATH,
     CAESURA,
+    CPMARK,
     DIR,
     DYNAM,
     FERMATA,
@@ -389,7 +390,7 @@ typedef std::map<int, GraceAligner *> MapOfIntGraceAligners;
 
 typedef std::vector<std::pair<std::u32string, bool>> ArrayOfStringDynamTypePairs;
 
-typedef std::map<std::string, std::function<Object *(void)>> MapOfStrConstructors;
+typedef std::map<ClassId, std::function<Object *(void)>> MapOfClassIdConstructors;
 
 typedef std::map<std::string, ClassId> MapOfStrClassIds;
 
@@ -697,6 +698,7 @@ enum MeasureType { MEASURED = 0, UNMEASURED, NEUMELINE };
 //----------------------------------------------------------------------------
 
 #define TABLATURE_STAFF_RATIO 1.75
+#define GERMAN_TAB_STAFF_RATIO 2.2
 
 #define SUPER_SCRIPT_FACTOR 0.58
 #define SUPER_SCRIPT_POSITION -0.20 // lowered down from the midline

@@ -314,7 +314,8 @@ FunctorCode SystemAligner::AcceptEnd(ConstFunctor &functor) const
 StaffAlignment::StaffAlignment() : Object(STAFF_ALIGNMENT)
 {
     m_yRel = 0;
-    m_verseNs.clear();
+    m_verseAboveNs.clear();
+    m_verseBelowNs.clear();
     m_staff = NULL;
     m_floatingPositionersSorted = true;
 
@@ -336,9 +337,8 @@ StaffAlignment::~StaffAlignment()
 
 void StaffAlignment::ClearPositioners()
 {
-    ArrayOfFloatingPositioners::iterator iter;
-    for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
-        delete *iter;
+    for (FloatingPositioner *positioner : m_floatingPositioners) {
+        delete positioner;
     }
     m_floatingPositioners.clear();
 
@@ -437,39 +437,73 @@ void StaffAlignment::SetRequestedSpaceBelow(int space)
     }
 }
 
-void StaffAlignment::AddVerseN(int verseN)
+void StaffAlignment::AddVerseN(int verseN, data_STAFFREL place)
 {
     // if 0, then assume 1;
     verseN = std::max(verseN, 1);
-    m_verseNs.insert(verseN);
+    (place == STAFFREL_above) ? m_verseAboveNs.insert(verseN) : m_verseBelowNs.insert(verseN);
 }
 
 int StaffAlignment::GetVerseCount(bool collapse) const
 {
-    if (m_verseNs.empty()) {
+    return (this->GetVerseCountAbove(collapse) + this->GetVerseCountBelow(collapse));
+}
+
+int StaffAlignment::GetVerseCountAbove(bool collapse) const
+{
+    if (m_verseAboveNs.empty()) {
         return 0;
     }
     else if (collapse) {
-        return (int)m_verseNs.size();
+        return (int)m_verseAboveNs.size();
     }
     else {
-        return *m_verseNs.rbegin();
+        return (*m_verseAboveNs.rbegin());
     }
 }
 
-int StaffAlignment::GetVersePosition(int verseN, bool collapse) const
+int StaffAlignment::GetVerseCountBelow(bool collapse) const
 {
-    if (m_verseNs.empty()) {
+    if (m_verseBelowNs.empty()) {
+        return 0;
+    }
+    else if (collapse) {
+        return (int)m_verseBelowNs.size();
+    }
+    else {
+        return (*m_verseBelowNs.rbegin());
+    }
+}
+
+int StaffAlignment::GetVersePositionAbove(int verseN, bool collapse) const
+{
+    if (m_verseAboveNs.empty()) {
         // Syl in neumatic notation - since verse count will be 0, position is -1
         return -1;
     }
     else if (collapse) {
-        auto it = std::find(m_verseNs.rbegin(), m_verseNs.rend(), verseN);
-        int pos = (int)std::distance(m_verseNs.rbegin(), it);
+        auto it = std::find(m_verseAboveNs.begin(), m_verseAboveNs.end(), verseN);
+        int pos = (int)std::distance(m_verseAboveNs.begin(), it);
         return pos;
     }
     else {
-        return (*m_verseNs.rbegin()) - verseN;
+        return verseN - 1;
+    }
+}
+
+int StaffAlignment::GetVersePositionBelow(int verseN, bool collapse) const
+{
+    if (m_verseBelowNs.empty()) {
+        // Syl in neumatic notation - since verse count will be 0, position is -1
+        return -1;
+    }
+    else if (collapse) {
+        auto it = std::find(m_verseBelowNs.rbegin(), m_verseBelowNs.rend(), verseN);
+        int pos = (int)std::distance(m_verseBelowNs.rbegin(), it);
+        return pos;
+    }
+    else {
+        return (*m_verseBelowNs.rbegin()) - verseN;
     }
 }
 

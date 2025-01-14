@@ -232,7 +232,7 @@ protected:
     void DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff);
     void DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *system, int yOffset);
     void DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
-    void DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
+    void DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, Measure *measure, System *system);
     void DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure);
     void DrawLayerList(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure, const ClassId classId);
     void DrawLayerDefLabels(
@@ -624,7 +624,7 @@ private:
     std::u32string IntToTimeSigFigures(unsigned short number);
     std::u32string IntToSmuflFigures(unsigned short number, int offset);
     int NestedTuplets(Object *object);
-    int GetSylYRel(int verseN, Staff *staff);
+    int GetSylYRel(int verseN, Staff *staff, data_STAFFREL place);
     int GetFYRel(F *f, Staff *staff);
     ///@}
 

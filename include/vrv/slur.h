@@ -52,7 +52,6 @@ enum class PortatoSlurType { None, StemSide, Centered };
 
 class Slur : public ControlElement,
              public TimeSpanningInterface,
-             public AttColor,
              public AttCurvature,
              public AttLayerIdent,
              public AttLineRendBase {
@@ -152,8 +151,8 @@ public:
      * Calculate the staff where the slur's floating curve positioner lives
      */
     ///@{
-    Staff *CalculateExtremalStaff(const Staff *staff, int xMin, int xMax);
-    const Staff *CalculateExtremalStaff(const Staff *staff, int xMin, int xMax) const;
+    Staff *CalculatePrincipalStaff(const Staff *staff, int xMin, int xMax);
+    const Staff *CalculatePrincipalStaff(const Staff *staff, int xMin, int xMax) const;
     ///@}
 
     /**

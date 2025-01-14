@@ -11,6 +11,7 @@
 
 #include <cassert>
 #include <math.h>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 
@@ -923,7 +924,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
             lines.UpdateContentBBoxX(minX, maxX);
             lines.UpdateContentBBoxY(yTop, yBottom);
             const int margin = unit / 2;
-            system->m_systemAligner.FindAllIntersectionPoints(line, lines, { DIR, DYNAM, TEMPO }, margin);
+            system->m_systemAligner.FindAllIntersectionPoints(line, lines, { CPMARK, DIR, DYNAM, TEMPO }, margin);
         }
     }
 
@@ -1252,9 +1253,7 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
         staff->SetFromFacsimile(m_doc);
     }
 
-    if (staffDef && (staffDef->GetLinesVisible() != BOOLEAN_false)) {
-        this->DrawStaffLines(dc, staff, measure, system);
-    }
+    this->DrawStaffLines(dc, staff, staffDef, measure, system);
 
     if (staffDef && (m_doc->GetType() != Facs)) {
         this->DrawStaffDef(dc, staff, measure);
@@ -1284,12 +1283,21 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
     dc->EndGraphic(staff, this);
 }
 
-void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, System *system)
+void View::DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, Measure *measure, System *system)
 {
     assert(dc);
     assert(staff);
     assert(measure);
     assert(system);
+
+    // If German lute tablature the default is @lines.visible="false", but setting @lines.visible="true"
+    // will draw the staff lines.
+    bool gltLines = (staff->IsTabLuteGerman() && staffDef->GetLinesVisible() != BOOLEAN_true);
+    // For anything other than German lute tablature the default is @lines.visible="true"
+    bool visibleLines = (staffDef->GetLinesVisible() != BOOLEAN_false);
+
+    // Nothing to do if both are false
+    if (!gltLines && !visibleLines) return;
 
     int j, x1, x2, y1, y2;
 
@@ -1307,35 +1315,51 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     dc->SetPen(m_currentColor, ToDeviceContextX(lineWidth), AxSOLID);
     dc->SetBrush(m_currentColor, AxSOLID);
 
-    for (j = 0; j < staff->m_drawingLines; ++j) {
-        // Skewed lines - with Facs (neumes) only for now
-        if (y1 != y2) {
-            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
-            // For drawing rectangles instead of lines
-            y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            y2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        }
-        else {
-            const bool isFrenchOrItalianTablature = (staff->IsTabLuteFrench() || staff->IsTabLuteItalian());
-            SegmentedLine line(x1, x2);
-            // We do not need to do this during layout calculation - and only with tablature but not for French or
-            // Italian tablature
-            if (!dc->Is(BBOX_DEVICE_CONTEXT) && staff->IsTablature() && !isFrenchOrItalianTablature) {
-                Object fullLine;
-                fullLine.SetParent(system);
-                fullLine.UpdateContentBBoxY(y1 + (lineWidth / 2), y1 - (lineWidth / 2));
-                fullLine.UpdateContentBBoxX(x1, x2);
-                int margin = m_doc->GetDrawingUnit(100) / 2;
-                ListOfObjects notes = staff->FindAllDescendantsByType(NOTE, false);
-                for (Object *note : notes) {
-                    if (note->VerticalContentOverlap(&fullLine, margin / 2)) {
-                        line.AddGap(note->GetContentLeft() - margin, note->GetContentRight() + margin);
+    // If German lute tablature the default is @lines.visible="false", but setting @lines.visible="true"
+    // will draw the staff lines.
+    // For anything other than German lute tablature the default is @lines.visible="true"
+    if (gltLines) {
+        // German tablature has no staff, just a single base line
+        // But internally we maintain the fiction of an invisible staff as a coordinate system
+        SegmentedLine line(x1, x2);
+        // Issue #3589 move base line slightly further down and reduce thickness
+        y1 -= (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * staff->m_drawingLines) * 11 / 10;
+        this->DrawHorizontalSegmentedLine(dc, y1, line, lineWidth / 2);
+    }
+    // Normal staff lines
+    else {
+        // draw staff lines
+        for (j = 0; j < staff->m_drawingLines; ++j) {
+            // Skewed lines - with Facs (neumes) only for now
+            if (y1 != y2) {
+                dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+                // For drawing rectangles instead of lines
+                y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+                y2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+            }
+            else {
+                const bool isFrenchOrGermanOrItalianTablature
+                    = (staff->IsTabLuteFrench() || staff->IsTabLuteGerman() || staff->IsTabLuteItalian());
+                SegmentedLine line(x1, x2);
+                // We do not need to do this during layout calculation - and only with guitar tablature but not for
+                // French, German or Italian lute tablature
+                if (!dc->Is(BBOX_DEVICE_CONTEXT) && staff->IsTablature() && !isFrenchOrGermanOrItalianTablature) {
+                    Object fullLine;
+                    fullLine.SetParent(system);
+                    fullLine.UpdateContentBBoxY(y1 + (lineWidth / 2), y1 - (lineWidth / 2));
+                    fullLine.UpdateContentBBoxX(x1, x2);
+                    int margin = m_doc->GetDrawingUnit(100) / 2;
+                    ListOfObjects notes = staff->FindAllDescendantsByType(NOTE, false);
+                    for (Object *note : notes) {
+                        if (note->VerticalContentOverlap(&fullLine, margin / 2)) {
+                            line.AddGap(note->GetContentLeft() - margin, note->GetContentRight() + margin);
+                        }
                     }
                 }
+                this->DrawHorizontalSegmentedLine(dc, y1, line, lineWidth);
+                y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+                y2 = y1;
             }
-            this->DrawHorizontalSegmentedLine(dc, y1, line, lineWidth);
-            y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            y2 = y1;
         }
     }
 
@@ -1375,10 +1399,34 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerL
     dc->SetPen(m_currentColor, ToDeviceContextX(lineWidth), AxSOLID);
     dc->SetBrush(m_currentColor, AxSOLID);
 
+    bool svgHtml5 = (m_doc->GetOptions()->m_svgHtml5.GetValue());
+
     for (const LedgerLine &line : lines) {
-        for (const std::pair<int, int> &dash : line.m_dashes) {
-            dc->DrawLine(ToDeviceContextX(x + dash.first), ToDeviceContextY(y), ToDeviceContextX(x + dash.second),
+        for (const LedgerLine::Dash &dash : line.m_dashes) {
+            if (svgHtml5) {
+                // Add the custom graphic only with html5
+                dc->StartCustomGraphic("lineDash");
+                // Function to concatenate IDs from the list of Object events
+                auto concatenateIDs = [](const ListOfConstObjects &objects) {
+                    // Get a list of strings
+                    std::vector<std::string> ids;
+                    for (const auto &object : objects) {
+                        ids.push_back("#" + object->GetID() + " ");
+                    }
+                    // Concatenate IDs
+                    std::stringstream sstream;
+                    std::copy(ids.begin(), ids.end(), std::ostream_iterator<std::string>(sstream));
+                    return sstream.str();
+                };
+                std::string events = concatenateIDs(dash.m_events);
+                if (!events.empty()) events.pop_back(); // Remove extra space added by the concatenation
+                dc->SetCustomGraphicAttributes("related", events);
+            }
+
+            dc->DrawLine(ToDeviceContextX(x + dash.m_x1), ToDeviceContextY(y), ToDeviceContextX(x + dash.m_x2),
                 ToDeviceContextY(y));
+
+            if (svgHtml5) dc->EndCustomGraphic();
         }
         y += ySpace;
     }

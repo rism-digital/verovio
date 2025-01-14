@@ -30,13 +30,13 @@ class Timemap;
 /**
  * This class prepares Note onsets.
  */
-class InitOnsetOffsetFunctor : public Functor {
+class InitOnsetOffsetFunctor : public DocFunctor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    InitOnsetOffsetFunctor();
+    InitOnsetOffsetFunctor(Doc *doc);
     virtual ~InitOnsetOffsetFunctor() = default;
     ///@}
 
@@ -182,6 +182,17 @@ private:
 //----------------------------------------------------------------------------
 
 /**
+ * Helper struct to store octave data
+ */
+struct OctaveInfo {
+    const Octave *octave;
+    int staffN;
+    int layerN;
+    int octaveShift;
+    bool isActive;
+};
+
+/**
  * This class initializes the MIDI export.
  * Captures information (i.e. from control elements) for MIDI interpretation
  * which is required beforehand in GenerateMIDI.
@@ -207,6 +218,7 @@ public:
     ///@{
     void SetCurrentTempo(double tempo) { m_currentTempo = tempo; }
     const std::map<const Note *, double> &GetDeferredNotes() const { return m_deferredNotes; }
+    const std::list<OctaveInfo> &GetOctaves() const { return m_octaves; }
     ///@}
 
     /*
@@ -215,6 +227,7 @@ public:
     ///@{
     FunctorCode VisitArpeg(const Arpeg *arpeg) override;
     FunctorCode VisitMeasure(const Measure *measure) override;
+    FunctorCode VisitOctave(const Octave *octave) override;
     ///@}
 
 protected:
@@ -228,6 +241,8 @@ private:
     double m_currentTempo;
     // Deferred notes which start slightly later
     std::map<const Note *, double> m_deferredNotes;
+    // Octave info which is collected
+    std::list<OctaveInfo> m_octaves;
 };
 
 //----------------------------------------------------------------------------
@@ -292,9 +307,12 @@ public:
      */
     ///@{
     void SetChannel(int channel) { m_midiChannel = channel; }
-    void SetCueExclusion(bool cueExclusion) { m_cueExclusion = cueExclusion; }
+    void SetControlEvents(bool controlEvents) { m_controlEvents = controlEvents; }
+    void SetNoCue(bool noCue) { m_noCue = noCue; }
     void SetCurrentTempo(double tempo) { m_currentTempo = tempo; }
     void SetDeferredNotes(const std::map<const Note *, double> &deferredNotes) { m_deferredNotes = deferredNotes; }
+    void SetLayerN(int layerN) { m_layerN = layerN; }
+    void SetOctaves(const std::list<OctaveInfo> &octaves) { m_octaves = octaves; }
     void SetStaffN(int staffN) { m_staffN = staffN; }
     void SetTempoEventTicks(const std::set<int> &ticks) { m_tempoEventTicks = ticks; }
     void SetTrack(int track) { m_midiTrack = track; }
@@ -338,6 +356,16 @@ private:
      */
     void GenerateGraceNoteMIDI(const Note *refNote, double startTime, int tpq, int channel, int velocity);
 
+    /**
+     * Change the octave shift at the begin/end of octaves
+     */
+    void HandleOctave(const LayerElement *layerElement);
+
+    /**
+     * Convenience helper
+     */
+    int GetMIDIPitch(const Note *note) { return note->GetMIDIPitch(m_transSemi, m_octaveShift); }
+
 public:
     //
 private:
@@ -351,8 +379,12 @@ private:
     double m_totalTime;
     // The current staff number
     int m_staffN;
+    // The current layer number
+    int m_layerN;
     // The semi tone transposition for the current track
     int m_transSemi;
+    // The octave shift for the current track
+    int m_octaveShift;
     // The current tempo
     double m_currentTempo;
     // Tempo events are always added on track 0
@@ -364,14 +396,18 @@ private:
     std::map<const Note *, MIDINoteSequence> m_expandedNotes;
     // Deferred notes which start slightly later
     std::map<const Note *, double> m_deferredNotes;
+    // Octave info which is used to determine the octave shift
+    std::list<OctaveInfo> m_octaves;
     // Grace note sequence
     MIDIChordSequence m_graceNotes;
     // Indicates whether the last grace note/chord was accented
     bool m_accentedGraceNote;
     // Indicates whether cue notes should be included
-    bool m_cueExclusion;
+    bool m_noCue;
     // Tablature held notes indexed by (course - 1)
     std::vector<MIDIHeldNote> m_heldNotes;
+    // A flag indicating we want to process control events
+    bool m_controlEvents;
 };
 
 //----------------------------------------------------------------------------
@@ -399,7 +435,7 @@ public:
     /*
      * Set the cue exclusion flag
      */
-    void SetCueExclusion(bool cueExclusion) { m_cueExclusion = cueExclusion; }
+    void SetNoCue(bool noCue) { m_noCue = noCue; }
 
     /*
      * Functor interface
@@ -429,7 +465,7 @@ private:
     // The current tempo
     double m_currentTempo;
     // Indicates whether cue notes should be included
-    bool m_cueExclusion;
+    bool m_noCue;
     // The timemap
     Timemap *m_timemap;
 };

@@ -23,6 +23,7 @@ struct AlignMeterParams {
     const Mensur *mensur = NULL;
     // Not const since we are cumulating proportion
     Proport *proport = NULL;
+    data_DURATION equivalence = DURATION_brevis;
 };
 
 //----------------------------------------------------------------------------
@@ -179,6 +180,7 @@ public:
     FunctorCode VisitRunningElement(RunningElement *runningElement) override;
     FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitStaffAlignmentEnd(StaffAlignment *staffAlignment) override;
+    FunctorCode VisitSyllable(Syllable *syllable) override;
     FunctorCode VisitSystem(System *system) override;
     FunctorCode VisitSystemEnd(System *system) override;
     FunctorCode VisitVerse(Verse *verse) override;

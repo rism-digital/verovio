@@ -40,12 +40,19 @@ namespace vrv {
 
 AlignHorizontallyFunctor::AlignHorizontallyFunctor(Doc *doc) : DocFunctor(doc)
 {
+    static const std::map<int, data_DURATION> durationEq{
+        { DURATION_EQ_brevis, DURATION_brevis }, //
+        { DURATION_EQ_semibrevis, DURATION_semibrevis }, //
+        { DURATION_EQ_minima, DURATION_minima }, //
+    };
+
     m_measureAligner = NULL;
     m_time = 0;
     m_notationType = NOTATIONTYPE_cmn;
     m_scoreDefRole = SCOREDEF_NONE;
     m_isFirstMeasure = false;
     m_hasMultipleLayer = false;
+    m_currentParams.equivalence = durationEq.at(m_doc->GetOptions()->m_durationEquivalence.GetValue());
 }
 
 FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
@@ -174,8 +181,12 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             return FUNCTOR_CONTINUE;
         }
     }
+    // A ligature gets a default alignment in order to allow mensural cast-off
+    else if (layerElement->Is(LIGATURE)) {
+        // Nothing to do
+    }
     // We do not align these (container). Any other?
-    else if (layerElement->Is({ BEAM, LIGATURE, FTREM, TUPLET })) {
+    else if (layerElement->Is({ BEAM, FTREM, TUPLET })) {
         Fraction duration = layerElement->GetSameAsContentAlignmentDuration(m_currentParams, true, m_notationType);
         m_time = m_time + duration;
         return FUNCTOR_CONTINUE;
@@ -235,6 +246,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         }
     }
     else if (layerElement->Is(PROPORT)) {
+        if (layerElement->GetType() == "cmme_tempo_change") return FUNCTOR_SIBLINGS;
         // replace the current proport
         const Proport *previous = (m_currentParams.proport) ? (m_currentParams.proport) : NULL;
         m_currentParams.proport = vrv_cast<Proport *>(layerElement);
@@ -628,9 +640,9 @@ FunctorCode AlignVerticallyFunctor::VisitStaff(Staff *staff)
     std::vector<Object *>::const_iterator verseIterator = std::find_if(
         staff->m_timeSpanningElements.begin(), staff->m_timeSpanningElements.end(), ObjectComparison(VERSE));
     if (verseIterator != staff->m_timeSpanningElements.end()) {
-        Verse *v = vrv_cast<Verse *>(*verseIterator);
-        assert(v);
-        alignment->AddVerseN(v->GetN());
+        Verse *verse = vrv_cast<Verse *>(*verseIterator);
+        assert(verse);
+        alignment->AddVerseN(verse->GetN(), verse->GetPlace());
     }
 
     // add verse number to alignment in case there are spanning SYL elements but there is no verse number already - this
@@ -641,9 +653,13 @@ FunctorCode AlignVerticallyFunctor::VisitStaff(Staff *staff)
         Verse *verse = vrv_cast<Verse *>((*sylIterator)->GetFirstAncestor(VERSE));
         if (verse) {
             const int verseNumber = verse->GetN();
+            const data_STAFFREL versePlace = verse->GetPlace();
             const bool verseCollapse = m_doc->GetOptions()->m_lyricVerseCollapse.GetValue();
-            if (!alignment->GetVersePosition(verseNumber, verseCollapse)) {
-                alignment->AddVerseN(verseNumber);
+            if ((versePlace == STAFFREL_above) && !alignment->GetVersePositionAbove(verseNumber, verseCollapse)) {
+                alignment->AddVerseN(verseNumber, verse->GetPlace());
+            }
+            if ((versePlace != STAFFREL_above) && !alignment->GetVersePositionBelow(verseNumber, verseCollapse)) {
+                alignment->AddVerseN(verseNumber, verse->GetPlace());
             }
         }
     }
@@ -662,6 +678,18 @@ FunctorCode AlignVerticallyFunctor::VisitStaffAlignmentEnd(StaffAlignment *staff
 
     m_cumulatedShift += staffAlignment->GetStaffHeight();
     ++m_staffIdx;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitSyllable(Syllable *syllable)
+{
+    if (!syllable->FindDescendantByType(SYL)) return FUNCTOR_CONTINUE;
+
+    StaffAlignment *alignment = m_systemAligner->GetStaffAlignmentForStaffN(m_staffN);
+    if (!alignment) return FUNCTOR_CONTINUE;
+    // Current limitation of only one syl (verse n) by syllable
+    alignment->AddVerseN(1, STAFFREL_below);
 
     return FUNCTOR_CONTINUE;
 }
@@ -696,7 +724,7 @@ FunctorCode AlignVerticallyFunctor::VisitVerse(Verse *verse)
     if (!alignment) return FUNCTOR_CONTINUE;
 
     // Add the number count
-    alignment->AddVerseN(verse->GetN());
+    alignment->AddVerseN(verse->GetN(), verse->GetPlace());
 
     return FUNCTOR_CONTINUE;
 }

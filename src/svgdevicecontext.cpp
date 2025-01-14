@@ -438,6 +438,11 @@ void SvgDeviceContext::SetCustomGraphicColor(const std::string &color)
     m_currentNode.append_attribute("fill") = color.c_str();
 }
 
+void SvgDeviceContext::SetCustomGraphicAttributes(const std::string &data, const std::string &value)
+{
+    m_currentNode.append_attribute(("data-" + data).c_str()) = value.c_str();
+}
+
 void SvgDeviceContext::EndResumedGraphic(Object *object, View *view)
 {
     m_svgNodeStack.pop_back();

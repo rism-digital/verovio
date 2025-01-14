@@ -1005,7 +1005,7 @@ void AttCoordinated::ResetCoordinated()
 {
     m_lrx = MEI_UNSET;
     m_lry = MEI_UNSET;
-    m_rotate = 0.0;
+    m_rotate = MEI_UNSET;
 }
 
 bool AttCoordinated::ReadCoordinated(pugi::xml_node element, bool removeAttr)
@@ -1022,7 +1022,7 @@ bool AttCoordinated::ReadCoordinated(pugi::xml_node element, bool removeAttr)
         hasAttribute = true;
     }
     if (element.attribute("rotate")) {
-        this->SetRotate(StrToDbl(element.attribute("rotate").value()));
+        this->SetRotate(StrToDegrees(element.attribute("rotate").value()));
         if (removeAttr) element.remove_attribute("rotate");
         hasAttribute = true;
     }
@@ -1041,7 +1041,7 @@ bool AttCoordinated::WriteCoordinated(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasRotate()) {
-        element.append_attribute("rotate") = DblToStr(this->GetRotate()).c_str();
+        element.append_attribute("rotate") = DegreesToStr(this->GetRotate()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1059,7 +1059,7 @@ bool AttCoordinated::HasLry() const
 
 bool AttCoordinated::HasRotate() const
 {
-    return (m_rotate != 0.0);
+    return (m_rotate != MEI_UNSET);
 }
 
 //----------------------------------------------------------------------------

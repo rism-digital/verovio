@@ -13,6 +13,7 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
+#include "altsyminterface.h"
 #include "atts_analytical.h"
 #include "atts_externalsymbols.h"
 #include "atts_frettab.h"
@@ -45,6 +46,7 @@ class Verse;
  */
 class Note : public LayerElement,
              public StemmedDrawingInterface,
+             public AltSymInterface,
              public DurationInterface,
              public PitchInterface,
              public PositionInterface,
@@ -80,6 +82,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
+    AltSymInterface *GetAltSymInterface() override { return vrv_cast<AltSymInterface *>(this); }
+    const AltSymInterface *GetAltSymInterface() const override { return vrv_cast<const AltSymInterface *>(this); }
     DurationInterface *GetDurationInterface() override { return vrv_cast<DurationInterface *>(this); }
     const DurationInterface *GetDurationInterface() const override { return vrv_cast<const DurationInterface *>(this); }
     PitchInterface *GetPitchInterface() override { return vrv_cast<PitchInterface *>(this); }
@@ -124,23 +128,6 @@ public:
     ///@}
 
     /**
-     * @name Setter and getter for the drawing staff loc.
-     * This is set by the CalcAlignmentPitchPosFunctor.
-     */
-    ///@{
-    void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }
-    int GetDrawingLoc() const { return m_drawingLoc; }
-    ///@}
-
-    /**
-     * Check if the note has ledger lines.
-     * If staff is passed, use it for getting the staff line number.
-     * Otherwise, it will look for the Staff ancestor.
-     * Set the value of ledger lines above or below.
-     */
-    bool HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff = NULL) const;
-
-    /**
      * Overriding functions to return information from chord parent if any
      */
     ///@{
@@ -162,7 +149,7 @@ public:
      * @name Return the smufl string to use for a note give the notation type
      */
     ///@{
-    std::u32string GetTabFretString(data_NOTATIONTYPE notationType) const;
+    std::u32string GetTabFretString(data_NOTATIONTYPE notationType, int &overline, int &strike, int &underline) const;
     ///@}
 
     /**
@@ -226,7 +213,7 @@ public:
     /**
      * MIDI pitch
      */
-    int GetMIDIPitch(int shift = 0) const;
+    int GetMIDIPitch(int shift = 0, int octaveShift = 0) const;
 
     /**
      * Get pitch class of the current note
@@ -326,11 +313,6 @@ private:
 public:
     //
 private:
-    /**
-     * The drawing location of the note
-     */
-    int m_drawingLoc;
-
     /**
      * A fling indicating if the note head is flipped
      */

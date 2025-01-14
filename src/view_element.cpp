@@ -53,6 +53,7 @@
 #include "stem.h"
 #include "syl.h"
 #include "system.h"
+#include "tabgrp.h"
 #include "tie.h"
 #include "tuplet.h"
 #include "verse.h"
@@ -1538,12 +1539,17 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     const bool drawingCueSize = rest->GetDrawingCueSize();
     const int staffSize = staff->GetDrawingStaffNotationSize();
     data_DURATION drawingDur = rest->GetActualDur();
-    if (drawingDur == DURATION_NONE) {
-        if (!dc->Is(BBOX_DEVICE_CONTEXT)) {
-            LogWarning("Missing duration for rest '%s'", rest->GetID().c_str());
-        }
+    // in tablature the @dur is in the parent TabGrp - try to get if from there
+    if ((drawingDur == DURATION_NONE) && staff->IsTablature()) {
+        TabGrp *tabGrp = vrv_cast<TabGrp *>(rest->GetFirstAncestor(TABGRP));
+        if (tabGrp != NULL) drawingDur = tabGrp->GetActualDur();
+    }
+    // Make sure we have something to draw
+    if ((drawingDur == DURATION_NONE) && !dc->Is(BBOX_DEVICE_CONTEXT)) {
+        LogWarning("Missing duration for rest '%s'", rest->GetID().c_str());
         drawingDur = DURATION_4;
     }
+
     const char32_t drawingGlyph = rest->GetRestGlyph(drawingDur);
 
     const int x = element->GetDrawingX();
@@ -1746,8 +1752,8 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         return;
     }
 
-    if (!m_doc->IsFacs() && !m_doc->IsNeumeLines()) {
-        syl->SetDrawingYRel(this->GetSylYRel(syl->m_drawingVerse, staff));
+    if (!m_doc->IsFacs() && !m_doc->IsTranscription() && !m_doc->IsNeumeLines()) {
+        syl->SetDrawingYRel(this->GetSylYRel(syl->m_drawingVerseN, staff, syl->m_drawingVersePlace));
     }
 
     dc->StartGraphic(syl, "", syl->GetID());
@@ -1865,7 +1871,7 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
         TextDrawingParams params;
         params.m_x = verse->GetDrawingX() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        params.m_y = staff->GetDrawingY() + this->GetSylYRel(std::max(1, verse->GetN()), staff);
+        params.m_y = staff->GetDrawingY() + this->GetSylYRel(std::max(1, verse->GetN()), staff, verse->GetPlace());
         params.m_pointSize = labelTxt.GetPointSize();
 
         dc->SetBrush(m_currentColor, AxSOLID);
@@ -2092,22 +2098,34 @@ int View::GetFYRel(F *f, Staff *staff)
     return y;
 }
 
-int View::GetSylYRel(int verseN, Staff *staff)
+int View::GetSylYRel(int verseN, Staff *staff, data_STAFFREL place)
 {
     assert(staff);
 
+    StaffAlignment *alignment = staff->GetAlignment();
+    if (!alignment) return 0;
+
     const bool verseCollapse = m_options->m_lyricVerseCollapse.GetValue();
     int y = 0;
-    StaffAlignment *alignment = staff->GetAlignment();
-    if (alignment) {
-        FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-        int descender = -m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
-        int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
-        int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-        y = -alignment->GetStaffHeight() - alignment->GetOverflowBelow()
-            + alignment->GetVersePosition(verseN, verseCollapse) * (height + descender + margin) + (descender);
+    FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+    const int descender = m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
+    const int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
+
+    int verseHeight = height - descender;
+    verseHeight *= m_doc->GetOptions()->m_lyricHeightFactor.GetValue();
+    int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+
+    // above the staff
+    if (place == STAFFREL_above) {
+        y = alignment->GetOverflowAbove()
+            - (alignment->GetVersePositionAbove(verseN, verseCollapse)) * (verseHeight + margin) - (height);
     }
+    else {
+        y = -alignment->GetStaffHeight() - alignment->GetOverflowBelow()
+            + alignment->GetVersePositionBelow(verseN, verseCollapse) * (verseHeight + margin) + verseHeight - height;
+    }
+
     return y;
 }
 

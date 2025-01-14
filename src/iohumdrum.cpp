@@ -8443,13 +8443,13 @@ void HumdrumInput::setInstrumentAbbreviation(ELEMENT *element, const std::string
 
     std::string name8 = name;
     // Substitute b and "-flat" for Unicode flat symbol:
-    std::regex exp1("\\b([ABDEFG])b\\b");
-    std::regex exp2("\\b([A-Ga-g])-flat\\b");
+    static const std::regex exp1("\\b([ABDEFG])b\\b");
+    static const std::regex exp2("\\b([A-Ga-g])-flat\\b");
     name8 = std::regex_replace(name8, exp1, "$1\xe2\x99\xad");
     name8 = std::regex_replace(name8, exp2, "$1\xe2\x99\xad");
     // Substitute # and "-sharp" for Unicode sharp symbol:
-    std::regex exp3("\\b([A-G])#\\b");
-    std::regex exp4("\\b([A-Ga-g])-sharp\\b");
+    static const std::regex exp3("\\b([A-G])#\\b");
+    static const std::regex exp4("\\b([A-Ga-g])-sharp\\b");
     name8 = std::regex_replace(name8, exp3, "$1\xe2\x99\xaf");
     name8 = std::regex_replace(name8, exp4, "$1\xe2\x99\xaf");
 
@@ -8737,13 +8737,25 @@ void HumdrumInput::setMensurationSymbol(
         tempus = 2;
         prolatio = 2;
     }
-    else if (metdata == "C|3") { // fix for regular and sesquialtera
+    else if (metdata == "C|3") {
         if (m_mens) {
             vrvmensur->SetTempus(TEMPUS_2);
             vrvmensur->SetProlatio(PROLATIO_2);
         }
         vrvmensur->SetSlash(1);
         vrvmensur->SetNum(3);
+        maximodus = 2;
+        modus = 2;
+        tempus = 2;
+        prolatio = 2;
+    }
+    else if (metdata == "C|/3") {
+        if (m_mens) {
+            vrvmensur->SetTempus(TEMPUS_2);
+            vrvmensur->SetProlatio(PROLATIO_2);
+        }
+        vrvmensur->SetSlash(1);
+        vrvmensur->SetNumbase(3);
         maximodus = 2;
         modus = 2;
         tempus = 2;
@@ -15755,7 +15767,7 @@ void HumdrumInput::handleLigature(hum::HTp token)
     ligature->SetEndid("#" + endid);
 
     ligature->SetLform(LINEFORM_solid);
-    ligature->SetFunc("ligature");
+    ligature->SetFunc(bracketSpanLog_FUNC_ligature);
 
     addChildMeasureOrSection(ligature);
 }
@@ -15838,7 +15850,7 @@ void HumdrumInput::handleColoration(hum::HTp token)
     // data_LINEWIDTH lw;
     // lw.SetLineWidthTerm(LINEWIDTHTERM_medium);
     // coloration->SetLwidth(lw);
-    coloration->SetFunc("coloration");
+    coloration->SetFunc(bracketSpanLog_FUNC_coloration);
 
     addChildMeasureOrSection(coloration);
 }
@@ -21233,8 +21245,7 @@ void HumdrumInput::processPhrases(hum::HTp phraseend)
                 insertPhrase(bracket, phrasestart, phraseend, startmeasure, startchordsorted, endchordsorted,
                     phrasestartnoteinfo, phraseendnoteinfo, ndex, phraseindex, i, j, startpitches, endpitches,
                     indexused);
-                // bracket will not be drawn without the following line:
-                bracket->SetFunc("phrase");
+                bracket->SetFunc(bracketSpanLog_FUNC_phrase);
             }
         }
     }
@@ -32287,7 +32298,7 @@ void HumdrumInput::finalizeDocument(Doc *doc)
 
     if (m_mens) {
         doc->PrepareData();
-        doc->SetMensuralMusicOnly(true);
+        doc->SetMensuralMusicOnly(BOOLEAN_true);
         doc->m_notationType = NOTATIONTYPE_mensural;
         doc->ConvertToCastOffMensuralDoc(true);
     }

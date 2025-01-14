@@ -37,6 +37,7 @@
 #include "measure.h"
 #include "mensur.h"
 #include "note.h"
+#include "page.h"
 #include "proport.h"
 #include "rdg.h"
 #include "rest.h"
@@ -48,6 +49,7 @@
 #include "staffgrp.h"
 #include "supplied.h"
 #include "syl.h"
+#include "system.h"
 #include "text.h"
 #include "verse.h"
 #include "vrv.h"
@@ -80,9 +82,10 @@ bool CmmeInput::Import(const std::string &cmme)
     try {
         m_doc->Reset();
         m_doc->SetType(Raw);
+        m_doc->SetMensuralMusicOnly(BOOLEAN_true);
 
         // Genereate the header and add a comment to the project description
-        m_doc->GenerateMEIHeader(false);
+        m_doc->GenerateMEIHeader();
         pugi::xml_node projectDesc = m_doc->m_header.first_child().select_node("//projectDesc").node();
         if (projectDesc) {
             pugi::xml_node p1 = projectDesc.append_child("p");
@@ -92,6 +95,10 @@ bool CmmeInput::Import(const std::string &cmme)
         pugi::xml_document doc;
         doc.load_string(cmme.c_str(), (pugi::parse_comments | pugi::parse_default) & ~pugi::parse_eol);
         pugi::xml_node root = doc.first_child();
+
+        if (root.child("GeneralData")) {
+            this->CreateMetadata(root.child("GeneralData"));
+        }
 
         // The mDiv
         Mdiv *mdiv = new Mdiv();
@@ -149,6 +156,8 @@ bool CmmeInput::Import(const std::string &cmme)
         m_score->GetScoreDef()->AddChild(staffGrp);
 
         m_doc->ConvertToPageBasedDoc();
+
+        this->PostProcessProport();
     }
     catch (char *str) {
         LogError("%s", str);
@@ -156,6 +165,107 @@ bool CmmeInput::Import(const std::string &cmme)
     }
 
     return true;
+}
+
+void CmmeInput::PostProcessProport()
+{
+    m_doc->PrepareData();
+    m_doc->ScoreDefSetCurrentDoc();
+
+    Page *contentPage = m_doc->SetDrawingPage(0);
+    assert(contentPage);
+
+    // Layout the content with tempo changes as original
+    contentPage->LayOutHorizontally();
+
+    // Go through all proportion marked as potentential tempo change, which is their
+    // status at this stage of import
+    // See if they are occurring at all voices with the same values
+    // If yes, this is a tempo change and mark them as such
+    // Otherwise mark them as "reset" since CMME does not cummulate values for tempo change
+    ListOfObjects proports = contentPage->FindAllDescendantsByType(PROPORT);
+    for (Object *object : proports) {
+        Proport *proport = vrv_cast<Proport *>(object);
+        assert(proport);
+        // Not a potential reset, or already processed
+        if (proport->GetType() != "reset?") continue;
+        // Default type for tempo changes
+        std::string propType = "cmme_tempo_change";
+        proport->SetType(propType);
+
+        // Look at proportion aligned with it
+        Alignment *alignment = proport->GetAlignment();
+        Object *measure = proport->GetFirstAncestor(MEASURE);
+        // Just in case
+        if (!measure || !alignment) continue;
+        // Check for the number of layer within the measure (e.g., section in CMME)
+        const int nbLayers = measure->GetDescendantCount(LAYER);
+
+        bool isTempoChange = true;
+        bool allVoices = true;
+        // Not at all voices
+        if (nbLayers != alignment->GetChildCount()) {
+            isTempoChange = false;
+            allVoices = false;
+        }
+        // Check if the value of other proportions are the same
+        ListOfObjects alignProports = alignment->FindAllDescendantsByType(PROPORT);
+        for (Object *alignObject : alignProports) {
+            Proport *alignProport = vrv_cast<Proport *>(alignObject);
+            assert(proport);
+            isTempoChange = isTempoChange && (proport->GetNum() == alignProport->GetNum());
+            isTempoChange = isTempoChange && (proport->GetNumbase() == alignProport->GetNumbase());
+        }
+        if (!isTempoChange) {
+            propType = "reset";
+            if (allVoices) {
+                LogWarning("A tempo change at all voices with different values detected");
+            }
+            else {
+                LogWarning("A tempo change not occurring at all voices detected");
+            }
+        }
+
+        for (Object *alignObject : alignProports) {
+            Proport *alignProport = vrv_cast<Proport *>(alignObject);
+            assert(proport);
+            alignProport->SetType(propType);
+        }
+    }
+
+    m_doc->ResetToLoading();
+
+    m_doc->ResetDataPage();
+}
+
+void CmmeInput::CreateMetadata(pugi::xml_node metadataNode)
+{
+    pugi::xml_node titleStmt = m_doc->m_header.first_child().select_node("//titleStmt").node();
+    // Should have been created by Doc::GenerateHeader
+    if (!titleStmt) return;
+
+    std::string titleStr = this->ChildAsString(metadataNode, "Title");
+    if (!titleStr.empty()) {
+        pugi::xml_node title = titleStmt.child("title");
+        title.text().set(titleStr.c_str());
+    }
+
+    std::string sectionStr = this->ChildAsString(metadataNode, "Section");
+    if (!sectionStr.empty()) {
+        pugi::xml_node title = titleStmt.append_child("title");
+        title.append_attribute("type") = "subordinate";
+        title.text().set(sectionStr.c_str());
+    }
+
+    std::string composerStr = this->ChildAsString(metadataNode, "Composer");
+    if (!composerStr.empty()) {
+        // pugi::xml_node respStmt = titleStmt.append_child("respStmt");
+        // pugi::xml_node persName = respStmt.append_child("persName");
+        // persName.append_attribute("role") = "composer";
+        // persName.text().set(composerStr.c_str());
+        pugi::xml_node composer = titleStmt.append_child("composer");
+        composer.text().set(composerStr.c_str());
+    }
 }
 
 void CmmeInput::CreateSection(pugi::xml_node musicSectionNode)
@@ -205,6 +315,7 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
     // Reset the syllable position
     m_isInSyllable = false;
     m_currentSignature = NULL;
+    m_activeTempoChange = false;
 
     staff->AddChild(m_currentContainer);
     m_currentSection->AddChild(staff);
@@ -298,6 +409,9 @@ void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
             else {
                 CreateAccid(eventNode);
             }
+        }
+        else if (name == "ColorChange") {
+            CreateColorChange(eventNode);
         }
         else if (name == "Custos") {
             CreateCustos(eventNode);
@@ -487,21 +601,27 @@ void CmmeInput::CreateChord(pugi::xml_node chordNode)
 {
     assert(m_currentContainer);
 
-    Chord *chord = new Chord();
-    m_currentContainer->AddChild(chord);
-    m_currentContainer = chord;
+    // CMME can have 'chords' in ligatures - we keep only the first note
+    bool inLigature = (m_currentContainer->Is(LIGATURE));
+
+    if (!inLigature) {
+        Chord *chord = new Chord();
+        m_currentContainer->AddChild(chord);
+        m_currentContainer = chord;
+    }
     pugi::xpath_node_set events = chordNode.select_nodes("./*");
     for (pugi::xpath_node event : events) {
         pugi::xml_node eventNode = event.node();
         std::string name = eventNode.name();
         if (name == "Note") {
             CreateNote(eventNode);
+            if (inLigature) break;
         }
         else {
             LogWarning("Unsupported chord component: '%s'", name.c_str());
         }
     }
-    m_currentContainer = m_currentContainer->GetParent();
+    if (!inLigature) m_currentContainer = m_currentContainer->GetParent();
 }
 
 void CmmeInput::CreateClef(pugi::xml_node clefNode)
@@ -533,6 +653,27 @@ void CmmeInput::CreateClef(pugi::xml_node clefNode)
     return;
 }
 
+void CmmeInput::CreateColorChange(pugi::xml_node colorChangeNode)
+{
+    static const std::map<std::string, std::string> colorMap{
+        { "Black", "" }, //
+        { "Red", "red" }, //
+        { "Blue", "blue" }, //
+        { "Green", "green" }, //
+        { "Yellow", "yellow" }, //
+    };
+
+    assert(m_currentContainer);
+
+    std::string color;
+    if (colorChangeNode.child("PrimaryColor")) {
+        color = this->ChildAsString(colorChangeNode.child("PrimaryColor"), "Color");
+    }
+    m_currentColor = colorMap.contains(color) ? colorMap.at(color) : "";
+
+    return;
+}
+
 void CmmeInput::CreateCustos(pugi::xml_node custosNode)
 {
     static const std::map<std::string, data_PITCHNAME> pitchMap{
@@ -552,6 +693,7 @@ void CmmeInput::CreateCustos(pugi::xml_node custosNode)
     // Default pitch to C
     data_PITCHNAME pname = pitchMap.contains(step) ? pitchMap.at(step) : PITCHNAME_c;
     custos->SetPname(pname);
+    if (!m_currentColor.empty()) custos->SetColor(m_currentColor);
 
     int oct = this->ChildAsInt(custosNode, "OctaveNum");
     if ((pname != PITCHNAME_a) && (pname != PITCHNAME_b)) oct += 1;
@@ -690,6 +832,11 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     std::string signValue = this->ChildAsString(signNode, "MainSymbol");
     if (signValue == "O") {
         mensur->SetSign(MENSURATIONSIGN_O);
+        // If the  is no mensInfo, infer it from the Sign
+        if (!mensInfo) {
+            m_mensInfo->tempus = 3;
+            mensur->SetTempus(TEMPUS_3);
+        }
     }
     else if (signValue == "C") {
         mensur->SetSign(MENSURATIONSIGN_C);
@@ -701,6 +848,11 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     /// Mensuration/Sign/Dot to @dot
     if (signNode.child("Dot")) {
         mensur->SetDot(BOOLEAN_true);
+        // If there is no mensInfo, infer it from the Dot
+        if (!mensInfo) {
+            m_mensInfo->prolatio = 3;
+            mensur->SetProlatio(PROLATIO_3);
+        }
     }
 
     /// Mensuration/Sign/Strokes to @slash
@@ -773,8 +925,21 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
         if (denVal != VRV_UNSET) {
             proport->SetNumbase(denVal);
         }
-        proport->SetType("cmme_tempo_change");
+        // Mark them as potential tempo changes (i.e., reset)
+        proport->SetType("reset?");
         m_currentContainer->AddChild(proport);
+        m_activeTempoChange = true;
+    }
+    // CMME resets the tempo change with a Mensuration with no tempo change
+    // We need to add one in the MEI
+    else if (m_activeTempoChange) {
+        Proport *proport = new Proport();
+        proport->SetNum(1);
+        proport->SetNumbase(1);
+        // Mark them as potential tempo changes
+        proport->SetType("cmme_tempo_change?");
+        m_currentContainer->AddChild(proport);
+        m_activeTempoChange = false;
     }
 
     return;
@@ -816,6 +981,7 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
     // Default pitch to C
     data_PITCHNAME pname = pitchMap.contains(step) ? pitchMap.at(step) : PITCHNAME_c;
     note->SetPname(pname);
+    if (!m_currentColor.empty()) note->SetColor(m_currentColor);
 
     int num;
     int numbase;
@@ -959,6 +1125,8 @@ void CmmeInput::CreateRest(pugi::xml_node restNode)
     int numbase;
     data_DURATION duration = this->ReadDuration(restNode, num, numbase);
     rest->SetDur(duration);
+    if (!m_currentColor.empty()) rest->SetColor(m_currentColor);
+
     if (num != VRV_UNSET && numbase != VRV_UNSET) {
         rest->SetNum(num);
         rest->SetNumbase(numbase);
@@ -1038,10 +1206,6 @@ data_DURATION CmmeInput::ReadDuration(pugi::xml_node durationNode, int &num, int
             return duration;
         }
 
-        // Apply the proportion
-        cmmeNum *= m_mensInfo->proportNum;
-        cmmeDen *= m_mensInfo->proportDen;
-
         std::pair<int, int> ratio = { 1, 1 };
 
         if (type == "Maxima") {
@@ -1065,6 +1229,11 @@ data_DURATION CmmeInput::ReadDuration(pugi::xml_node durationNode, int &num, int
         else if (type == "Semifusa") {
             ratio.second = 8;
         }
+
+        // That would apply the proportion, but not needed because CMME works the other way around
+        // That is, the propostion is not coded in the note value but applied by the CMME processor
+        // cmmeNum *= m_mensInfo->proportNum;
+        // cmmeDen *= m_mensInfo->proportDen;
 
         cmmeNum *= ratio.second;
         cmmeDen *= ratio.first;

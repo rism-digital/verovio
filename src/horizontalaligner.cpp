@@ -542,6 +542,29 @@ bool Alignment::IsSupportedChild(Object *child)
     return true;
 }
 
+bool Alignment::operator==(const Alignment &other) const
+{
+    const Measure *measure = vrv_cast<const Measure *>(this->GetFirstAncestor(MEASURE));
+    const Measure *otherMeasure = vrv_cast<const Measure *>(other.GetFirstAncestor(MEASURE));
+    assert(measure && otherMeasure);
+
+    return (measure == otherMeasure) && (this->GetTime() == other.GetTime());
+}
+
+std::weak_ordering Alignment::operator<=>(const Alignment &other) const
+{
+    const Measure *measure = vrv_cast<const Measure *>(this->GetFirstAncestor(MEASURE));
+    const Measure *otherMeasure = vrv_cast<const Measure *>(other.GetFirstAncestor(MEASURE));
+    assert(measure && otherMeasure);
+
+    if (measure == otherMeasure) {
+        return this->GetTime() <=> other.GetTime();
+    }
+    else {
+        return Object::IsPreOrdered(measure, otherMeasure) ? std::weak_ordering::less : std::weak_ordering::greater;
+    }
+}
+
 bool Alignment::HasAccidVerticalOverlap(const Alignment *otherAlignment, int staffN) const
 {
     if (!otherAlignment) return false;

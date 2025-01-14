@@ -29,6 +29,9 @@ const std::map<int, std::string> Option::s_breaks = { { BREAKS_none, "none" }, {
 const std::map<int, std::string> Option::s_condense
     = { { CONDENSE_none, "none" }, { CONDENSE_auto, "auto" }, { CONDENSE_encoded, "encoded" } };
 
+const std::map<int, std::string> Option::s_durationEq
+    = { { DURATION_EQ_brevis, "brevis" }, { DURATION_EQ_semibrevis, "semibrevis" }, { DURATION_EQ_minima, "minima" } };
+
 const std::map<int, std::string> Option::s_elision = { { ELISION_regular, "regular" }, { ELISION_narrow, "narrow" },
     { ELISION_wide, "wide" }, { ELISION_unicode, "unicode" } };
 
@@ -139,10 +142,9 @@ jsonxx::Object Option::ToJson() const
     else if (optArray) {
         opt << "type" << "array";
         std::vector<std::string> strValues = optArray->GetDefault();
-        std::vector<std::string>::iterator strIter;
         jsonxx::Array values;
-        for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
-            values << (*strIter);
+        for (const std::string &value : strValues) {
+            values << value;
         }
         opt << "default" << values;
     }
@@ -150,10 +152,9 @@ jsonxx::Object Option::ToJson() const
         opt << "type" << "std::string-list";
         opt << "default" << optIntMap->GetDefaultStrValue();
         std::vector<std::string> strValues = optIntMap->GetStrValues(false);
-        std::vector<std::string>::iterator strIter;
         jsonxx::Array values;
-        for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
-            values << (*strIter);
+        for (const std::string &value : strValues) {
+            values << value;
         }
         opt << "values" << values;
     }
@@ -1370,6 +1371,10 @@ Options::Options()
     m_lyricElision.Init(ELISION_regular, &Option::s_elision);
     this->Register(&m_lyricElision, "lyricElision", &m_generalLayout);
 
+    m_lyricHeightFactor.SetInfo("Lyric height factor", "The lyric verse line height factor");
+    m_lyricHeightFactor.Init(1.0, 1.0, 20.0);
+    this->Register(&m_lyricHeightFactor, "lyricHeightFactor", &m_generalLayout);
+
     m_lyricLineThickness.SetInfo("Lyric line thickness", "The lyric extender line thickness");
     m_lyricLineThickness.Init(0.25, 0.10, 0.50);
     this->Register(&m_lyricLineThickness, "lyricLineThickness", &m_generalLayout);
@@ -1819,13 +1824,22 @@ Options::Options()
     m_mensural.SetCategory(OptionsCategory::Mensural);
     m_grps.push_back(&m_mensural);
 
+    m_durationEquivalence.SetInfo("Duration equivalence", "The mensural duration equivalence");
+    m_durationEquivalence.Init(DURATION_EQ_brevis, &Option::s_durationEq);
+    this->Register(&m_durationEquivalence, "durationEquivalence", &m_mensural);
+
     m_ligatureAsBracket.SetInfo("Ligature as bracket", "Render ligatures as bracket instead of original notation");
     m_ligatureAsBracket.Init(false);
     this->Register(&m_ligatureAsBracket, "ligatureAsBracket", &m_mensural);
 
-    m_mensuralToMeasure.SetInfo("Mensural to measure", "Convert mensural sections to measure-based MEI");
-    m_mensuralToMeasure.Init(false);
-    this->Register(&m_mensuralToMeasure, "mensuralToMeasure", &m_mensural);
+    m_mensuralResponsiveView.SetInfo(
+        "Mensural reduced view", "Convert mensural content to a more responsive view reduced to the seleceted markup");
+    m_mensuralResponsiveView.Init(false);
+    this->Register(&m_mensuralResponsiveView, "mensuralResponsiveView", &m_mensural);
+
+    m_mensuralToCmn.SetInfo("Mensural to CMN", "Convert mensural sections to CMN measure-based MEI");
+    m_mensuralToCmn.Init(false);
+    this->Register(&m_mensuralToCmn, "mensuralToCmn", &m_mensural);
 
     m_mensuralScoreUp.SetInfo(
         "Mensural scoring up", "Score up the mensural voices by providing a dur.quality to the notes");

@@ -1249,7 +1249,7 @@ int PAEInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
     // std::regex_constants::ECMAScript is the default syntax, so optional.
     // Previously these were extended regex syntax, but this case
     // is the same in ECMAScript syntax.
-    std::regex exp("^([^)]*[ABCDEFG-][^)]*[ABCDEFG-][^)]*)", std::regex_constants::ECMAScript);
+    static const std::regex exp("^([^)]*[ABCDEFG-][^)]*[ABCDEFG-][^)]*)", std::regex_constants::ECMAScript);
     bool is_tuplet = regex_search(incipit + i, exp);
 
     if (is_tuplet) {
@@ -2826,7 +2826,7 @@ bool PAEInput::Import(const std::string &input)
     m_doc->SetType(Raw);
 
     // Genereate the header and add a comment to the project description
-    m_doc->GenerateMEIHeader(false);
+    m_doc->GenerateMEIHeader();
     pugi::xml_node projectDesc = m_doc->m_header.first_child().select_node("//projectDesc").node();
     if (projectDesc) {
         pugi::xml_node p1 = projectDesc.append_child("p");
@@ -4755,7 +4755,7 @@ bool PAEInput::CheckContentPostBuild()
     ClassIdsComparison noteOrRest({ NOTE, REST });
     ListOfObjects containers;
     m_doc->FindAllDescendantsByComparison(&containers, &comparison);
-    for (auto &container : containers) {
+    for (const auto &container : containers) {
         ListOfObjects notesOrRests;
         container->FindAllDescendantsByComparison(&notesOrRests, &noteOrRest);
         if ((int)notesOrRests.size() < 1) {

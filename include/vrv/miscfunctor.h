@@ -25,7 +25,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    ApplyPPUFactorFunctor();
+    ApplyPPUFactorFunctor(Page *page = NULL);
     virtual ~ApplyPPUFactorFunctor() = default;
     ///@}
 
@@ -42,7 +42,9 @@ public:
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitPage(Page *page) override;
     FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitSurface(Surface *surface) override;
     FunctorCode VisitSystem(System *system) override;
+    FunctorCode VisitZone(Zone *zone) override;
     ///@}
 
 protected:

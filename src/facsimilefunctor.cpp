@@ -36,17 +36,21 @@ SyncFromFacsimileFunctor::SyncFromFacsimileFunctor(Doc *doc) : Functor()
     m_view.SetDoc(doc);
     m_currentPage = NULL;
     m_currentSystem = NULL;
+    m_pageMarginTop = 0;
+    m_pageMarginLeft = 0;
+    m_ppuFactor = 1.0;
 }
 
 FunctorCode SyncFromFacsimileFunctor::VisitLayerElement(LayerElement *layerElement)
 {
-    if (!layerElement->Is({ ACCID, CLEF, CUSTOS, DIVLINE, LIQUESCENT, NC, NOTE, REST, SYL })) return FUNCTOR_CONTINUE;
+    if (!layerElement->Is({ ACCID, BARLINE, CLEF, CUSTOS, DIVLINE, LIQUESCENT, NC, NOTE, REST, SYL }))
+        return FUNCTOR_CONTINUE;
 
     Zone *zone = layerElement->GetZone();
     assert(zone);
-    layerElement->m_drawingFacsX = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR);
-    if (layerElement->Is({ ACCID, SYL })) {
-        layerElement->m_drawingFacsY = m_view.ToLogicalY(zone->GetUly() * DEFINITION_FACTOR);
+    layerElement->m_drawingFacsX = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR - m_pageMarginLeft);
+    if (m_currentNeumeLine && layerElement->Is({ ACCID, SYL })) {
+        layerElement->m_drawingFacsY = m_view.ToLogicalY(zone->GetUly() * DEFINITION_FACTOR - m_pageMarginTop);
     }
 
     return FUNCTOR_CONTINUE;
@@ -61,8 +65,8 @@ FunctorCode SyncFromFacsimileFunctor::VisitMeasure(Measure *measure)
     else {
         Zone *zone = measure->GetZone();
         assert(zone);
-        measure->m_drawingFacsX1 = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR);
-        measure->m_drawingFacsX2 = m_view.ToLogicalX(zone->GetLrx() * DEFINITION_FACTOR);
+        measure->m_drawingFacsX1 = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR - m_pageMarginLeft);
+        measure->m_drawingFacsX2 = m_view.ToLogicalX(zone->GetLrx() * DEFINITION_FACTOR - m_pageMarginLeft);
     }
 
     return FUNCTOR_CONTINUE;
@@ -80,7 +84,10 @@ FunctorCode SyncFromFacsimileFunctor::VisitPage(Page *page)
 FunctorCode SyncFromFacsimileFunctor::VisitPageEnd(Page *page)
 {
     // Used for adjusting staff size in neon - filled in VisitStaff
-    if (m_staffZones.empty()) return FUNCTOR_CONTINUE;
+    if (!m_staffZones.empty()) {
+        // Since we multiply all values by the DEFINITION_FACTOR, set it as PPU for neon facs
+        m_ppuFactor = DEFINITION_FACTOR;
+    }
 
     // The staff size is calculated based on the zone height and takes into acocunt the rotation
     for (auto &[staff, zone] : m_staffZones) {
@@ -92,8 +99,7 @@ FunctorCode SyncFromFacsimileFunctor::VisitPageEnd(Page *page)
         staff->SetDrawingRotation(rotate);
     }
 
-    // Since we multiply all values by the DEFINITION_FACTOR, set it as PPU
-    m_currentPage->SetPPUFactor(DEFINITION_FACTOR);
+    m_currentPage->SetPPUFactor(m_ppuFactor);
     if (m_currentPage->GetPPUFactor() != 1.0) {
         ApplyPPUFactorFunctor applyPPUFactor;
         m_currentPage->Process(applyPPUFactor);
@@ -117,12 +123,35 @@ FunctorCode SyncFromFacsimileFunctor::VisitPb(Pb *pb)
     if (surface && surface->HasLrx() && surface->HasLry()) {
         m_currentPage->m_pageHeight = surface->GetLry() * DEFINITION_FACTOR;
         m_currentPage->m_pageWidth = surface->GetLrx() * DEFINITION_FACTOR;
+        // Read the ppu factor from surface@type
+        std::string surfaceType = surface->GetType();
+        if (surfaceType.starts_with("ppu:")) {
+            std::string ppuFactorStr = surfaceType.substr(surfaceType.find(":") + 1);
+            if (vrv::IsValidDouble(ppuFactorStr)) {
+                m_ppuFactor = std::strtod(ppuFactorStr.c_str(), NULL);
+                m_ppuFactor *= DEFINITION_FACTOR / m_doc->GetOptions()->m_unit.GetValue();
+            }
+        }
+        // Read margins
+        if (zone && zone->HasUlx() && zone->HasUly() && zone->HasLrx() && zone->HasLry()) {
+            m_pageMarginTop = zone->GetUly() * DEFINITION_FACTOR;
+            m_pageMarginLeft = zone->GetUlx() * DEFINITION_FACTOR;
+            m_currentPage->m_pageMarginTop = m_pageMarginTop;
+            // Calculate the bottom margin looking at the surface lry and zone lry
+            m_currentPage->m_pageMarginBottom = m_currentPage->m_pageHeight - zone->GetLry() * DEFINITION_FACTOR;
+            m_currentPage->m_pageMarginLeft = m_pageMarginLeft;
+            // Calculate the right margin looking at the surface lrx and zone lrx
+            m_currentPage->m_pageMarginRight = m_currentPage->m_pageWidth - zone->GetLrx() * DEFINITION_FACTOR;
+            ;
+            m_doc->UpdatePageDrawingSizes();
+        }
     }
     // Fallback on zone
     else {
         m_currentPage->m_pageHeight = zone->GetLry() * DEFINITION_FACTOR;
         m_currentPage->m_pageWidth = zone->GetLrx() * DEFINITION_FACTOR;
     }
+
     // Update the page size to have to View::ToLogicalX/Y valid
     m_doc->UpdatePageDrawingSizes();
 
@@ -136,8 +165,8 @@ FunctorCode SyncFromFacsimileFunctor::VisitSb(Sb *sb)
 
     Zone *zone = sb->GetZone();
     assert(zone);
-    m_currentSystem->m_drawingFacsX = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR);
-    m_currentSystem->m_drawingFacsY = m_view.ToLogicalY(zone->GetUly() * DEFINITION_FACTOR);
+    m_currentSystem->m_drawingFacsX = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR - m_pageMarginLeft);
+    m_currentSystem->m_drawingFacsY = m_view.ToLogicalY(zone->GetUly() * DEFINITION_FACTOR - m_pageMarginTop);
 
     return FUNCTOR_CONTINUE;
 }
@@ -146,16 +175,16 @@ FunctorCode SyncFromFacsimileFunctor::VisitStaff(Staff *staff)
 {
     Zone *zone = staff->GetZone();
     assert(zone);
-    staff->m_drawingFacsY = m_view.ToLogicalY(zone->GetUly() * DEFINITION_FACTOR);
+    staff->m_drawingFacsY = m_view.ToLogicalY(zone->GetUly() * DEFINITION_FACTOR - m_pageMarginTop);
 
     // neon specific code - set the position of the pseudo measure (neume line)
     if (m_currentNeumeLine) {
-        m_currentNeumeLine->m_drawingFacsX1 = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR);
-        m_currentNeumeLine->m_drawingFacsX2 = m_view.ToLogicalX(zone->GetLrx() * DEFINITION_FACTOR);
+        m_currentNeumeLine->m_drawingFacsX1 = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR - m_pageMarginLeft);
+        m_currentNeumeLine->m_drawingFacsX2 = m_view.ToLogicalX(zone->GetLrx() * DEFINITION_FACTOR - m_pageMarginLeft);
         m_staffZones[staff] = zone;
 
         // The staff slope is going up. The y left position needs to be adjusted accordingly
-        if (zone->GetRotate() < 0) {
+        if (zone->HasRotate() && zone->GetRotate() < 0) {
             staff->m_drawingFacsY = staff->m_drawingFacsY
                 + (m_currentNeumeLine->m_drawingFacsX2 - m_currentNeumeLine->m_drawingFacsX1)
                     * tan(zone->GetRotate() * M_PI / 180.0);
@@ -177,24 +206,27 @@ FunctorCode SyncFromFacsimileFunctor::VisitSystem(System *system)
 // SyncToFacsimileFunctor
 //----------------------------------------------------------------------------
 
-SyncToFacsimileFunctor::SyncToFacsimileFunctor(Doc *doc) : Functor()
+SyncToFacsimileFunctor::SyncToFacsimileFunctor(Doc *doc, double ppuFactor) : Functor()
 {
     m_doc = doc;
+    m_ppuFactor = ppuFactor;
     m_view.SetDoc(doc);
     m_surface = NULL;
     m_currentPage = NULL;
     m_currentSystem = NULL;
     m_pageMarginTop = 0;
     m_pageMarginLeft = 0;
+    m_currentNeumeLine = false;
 }
 
 FunctorCode SyncToFacsimileFunctor::VisitLayerElement(LayerElement *layerElement)
 {
-    if (!layerElement->Is({ ACCID, CLEF, CUSTOS, DIVLINE, LIQUESCENT, NC, NOTE, REST, SYL })) return FUNCTOR_CONTINUE;
+    if (!layerElement->Is({ ACCID, BARLINE, CLEF, CUSTOS, DIVLINE, LIQUESCENT, NC, NOTE, REST, SYL }))
+        return FUNCTOR_CONTINUE;
 
     Zone *zone = this->GetZone(layerElement, layerElement->GetClassName());
     zone->SetUlx(m_view.ToDeviceContextX(layerElement->GetDrawingX()) / DEFINITION_FACTOR + m_pageMarginLeft);
-    if (layerElement->Is({ ACCID, SYL })) {
+    if (m_currentNeumeLine && layerElement->Is({ ACCID, SYL })) {
         zone->SetUly(m_view.ToDeviceContextY(layerElement->GetDrawingY()) / DEFINITION_FACTOR + m_pageMarginTop);
     }
 
@@ -208,34 +240,75 @@ FunctorCode SyncToFacsimileFunctor::VisitMeasure(Measure *measure)
     zone->SetLrx(
         m_view.ToDeviceContextX(measure->GetDrawingX() + measure->GetWidth()) / DEFINITION_FACTOR + m_pageMarginLeft);
 
+    m_currentNeumeLine = measure->IsNeumeLine();
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode SyncToFacsimileFunctor::VisitPage(Page *page)
 {
+    // This is required since processing Pb will create or select the Surface
+    if (!page->FindDescendantByType(PB)) {
+        LogWarning("Page without <pb> skipped when synching to facsimile");
+        return FUNCTOR_SIBLINGS;
+    }
+
     m_currentPage = page;
     m_doc->SetDrawingPage(page->GetIdx());
     page->LayOut();
-    //
-    m_surface = new Surface();
-    assert(m_doc->GetFacsimile());
-    m_doc->GetFacsimile()->AddChild(m_surface);
-    m_surface->SetLrx(m_doc->m_drawingPageWidth / DEFINITION_FACTOR);
-    m_surface->SetLry(m_doc->m_drawingPageHeight / DEFINITION_FACTOR);
-    // Because the facsimile output zone positions include the margins, we will add them to each zone
-    m_pageMarginTop = m_doc->m_drawingPageMarginTop / DEFINITION_FACTOR;
-    m_pageMarginLeft = m_doc->m_drawingPageMarginLeft / DEFINITION_FACTOR;
+    // From a previously loaded facsimile
+    if (page->GetPPUFactor() != 1.0) {
+        m_ppuFactor = page->GetPPUFactor();
+    }
+    // When generating a facsimile with a scale option
+    else {
+        page->SetPPUFactor(m_ppuFactor);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode SyncToFacsimileFunctor::VisitPageEnd(Page *page)
+{
+    if (m_ppuFactor != 1.0) {
+        ApplyPPUFactorFunctor applyPPUFactor(m_currentPage);
+        m_surface->Process(applyPPUFactor);
+        m_surface->SetType(
+            StringFormat("ppu:%f", m_ppuFactor * m_doc->GetOptions()->m_unit.GetValue() / DEFINITION_FACTOR));
+    }
 
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode SyncToFacsimileFunctor::VisitPb(Pb *pb)
 {
-    Zone *zone = this->GetZone(pb, pb->GetClassName());
+    Zone *zone = pb->GetZone();
+    // Assume to be creating the facsimile data from scratch
+    if (!pb->GetZone()) {
+        // Also create a new surface
+        m_surface = new Surface();
+        assert(m_doc->GetFacsimile());
+        m_doc->GetFacsimile()->AddChild(m_surface);
+        zone = this->GetZone(pb, pb->GetClassName());
+    }
+    // We already have some facsimile data - retrieve the surface ancestor
+    else {
+        m_surface = vrv_cast<Surface *>(zone->GetFirstAncestor(SURFACE));
+    }
+    assert(m_surface);
+    assert(zone);
+
+    m_surface->SetLrx(m_doc->m_drawingPageWidth / DEFINITION_FACTOR);
+    m_surface->SetLry(m_doc->m_drawingPageHeight / DEFINITION_FACTOR);
+    // Because the facsimile output zone positions include the margins, we will add them to each zone
+    m_pageMarginTop = m_doc->m_drawingPageMarginTop / DEFINITION_FACTOR;
+    m_pageMarginLeft = m_doc->m_drawingPageMarginLeft / DEFINITION_FACTOR;
+
     // The Pb zone values are currently not used in SyncFromFacsimileFunctor because the
     // page sizes are synced from the parent Surface and zone positions include margins
     zone->SetUlx(m_pageMarginLeft);
     zone->SetUly(m_pageMarginTop);
+    // Use the page content size to factor in the bottom and right margins
     zone->SetLrx(m_doc->m_drawingPageContentWidth / DEFINITION_FACTOR + m_pageMarginLeft);
     zone->SetLry(m_doc->m_drawingPageContentHeight / DEFINITION_FACTOR + m_pageMarginTop);
 
@@ -268,8 +341,11 @@ FunctorCode SyncToFacsimileFunctor::VisitSystem(System *system)
 
 Zone *SyncToFacsimileFunctor::GetZone(FacsimileInterface *interface, std::string type)
 {
+    assert(m_surface);
+
     if (interface->GetZone()) {
         // Here we should probably check if the zone is a child of m_surface
+        assert(interface->GetZone()->GetParent() == m_surface);
         return interface->GetZone();
     }
     else {

@@ -118,7 +118,9 @@ public:
      * The verse number with multiple verses
      * Value is 1 by default, set in PrepareLyrics
      */
-    int m_drawingVerse;
+    int m_drawingVerseN;
+    /** The verse place (below by default) */
+    data_STAFFREL m_drawingVersePlace;
 
     /**
      * A pointer to the next syllable of the word.

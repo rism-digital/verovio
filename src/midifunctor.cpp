@@ -12,11 +12,13 @@
 #include "arpeg.h"
 #include "beatrpt.h"
 #include "btrem.h"
+#include "doc.h"
 #include "featureextractor.h"
 #include "ftrem.h"
 #include "gracegrp.h"
 #include "layer.h"
 #include "multirest.h"
+#include "octave.h"
 #include "pedal.h"
 #include "rest.h"
 #include "staff.h"
@@ -40,12 +42,19 @@ namespace vrv {
 // InitOnsetOffsetFunctor
 //----------------------------------------------------------------------------
 
-InitOnsetOffsetFunctor::InitOnsetOffsetFunctor() : Functor()
+InitOnsetOffsetFunctor::InitOnsetOffsetFunctor(Doc *doc) : DocFunctor(doc)
 {
+    static const std::map<int, data_DURATION> durationEq{
+        { DURATION_EQ_brevis, DURATION_brevis }, //
+        { DURATION_EQ_semibrevis, DURATION_semibrevis }, //
+        { DURATION_EQ_minima, DURATION_minima }, //
+    };
+
     m_currentScoreTime = 0;
     m_currentRealTimeSeconds = 0.0;
     m_notationType = NOTATIONTYPE_cmn;
     m_currentTempo = MIDI_TEMPO;
+    m_meterParams.equivalence = durationEq.at(m_doc->GetOptions()->m_durationEquivalence.GetValue());
 }
 
 FunctorCode InitOnsetOffsetFunctor::VisitChordEnd(Chord *chord)
@@ -68,6 +77,7 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayer(Layer *layer)
 
     m_meterParams.mensur = layer->GetCurrentMensur();
     m_meterParams.meterSig = layer->GetCurrentMeterSig();
+    m_meterParams.proport = layer->GetCurrentProport();
 
     return FUNCTOR_CONTINUE;
 }
@@ -156,6 +166,16 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayerElement(LayerElement *layerElement
     }
     else if (layerElement->Is(METERSIG)) {
         this->m_meterParams.meterSig = vrv_cast<MeterSig *>(layerElement);
+    }
+    else if (layerElement->Is(PROPORT)) {
+        if (layerElement->GetType() == "cmme_tempo_change") return FUNCTOR_SIBLINGS;
+        // replace the current proport
+        const Proport *previous = (m_meterParams.proport) ? (m_meterParams.proport) : NULL;
+        m_meterParams.proport = vrv_cast<Proport *>(layerElement);
+        assert(m_meterParams.proport);
+        if (previous) {
+            m_meterParams.proport->Cumulate(previous);
+        }
     }
 
     return FUNCTOR_CONTINUE;
@@ -333,6 +353,31 @@ FunctorCode InitMIDIFunctor::VisitMeasure(const Measure *measure)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode InitMIDIFunctor::VisitOctave(const Octave *octave)
+{
+    const Measure *measure = vrv_cast<const Measure *>(octave->GetFirstAncestor(MEASURE));
+    assert(measure);
+    std::vector<const Staff *> staffList = octave->GetTstampStaves(measure, octave);
+    if (staffList.size() != 1) return FUNCTOR_CONTINUE;
+    const Staff *staff = staffList[0];
+
+    const bool raisePitch = (octave->GetDisPlace() != STAFFREL_basic_below);
+    int shift = 0;
+    switch (octave->GetDis()) {
+        case OCTAVE_DIS_8: shift = 1; break;
+        case OCTAVE_DIS_15: shift = 2; break;
+        case OCTAVE_DIS_22: shift = 3; break;
+        default: break;
+    }
+
+    const Layer *layer = vrv_cast<const Layer *>(raisePitch ? staff->GetFirst(LAYER) : staff->GetLast(LAYER));
+    assert(layer);
+
+    m_octaves.push_back({ octave, staff->GetN(), layer->GetN(), (raisePitch ? shift : -shift), false });
+
+    return FUNCTOR_CONTINUE;
+}
+
 //----------------------------------------------------------------------------
 // GenerateMIDIFunctor
 //----------------------------------------------------------------------------
@@ -345,10 +390,12 @@ GenerateMIDIFunctor::GenerateMIDIFunctor(smf::MidiFile *midiFile) : ConstFunctor
     m_totalTime = 0.0;
     m_staffN = 0;
     m_transSemi = 0;
+    m_octaveShift = 0;
     m_currentTempo = MIDI_TEMPO;
     m_lastNote = NULL;
     m_accentedGraceNote = false;
-    m_cueExclusion = false;
+    m_noCue = false;
+    m_controlEvents = false;
 }
 
 FunctorCode GenerateMIDIFunctor::VisitBeatRpt(const BeatRpt *beatRpt)
@@ -409,7 +456,7 @@ FunctorCode GenerateMIDIFunctor::VisitBTrem(const BTrem *bTrem)
     auto expandNote = [this, noteInQuarterDur, num](const Object *obj) {
         const Note *note = vrv_cast<const Note *>(obj);
         assert(note);
-        const int pitch = note->GetMIDIPitch(m_transSemi);
+        const int pitch = this->GetMIDIPitch(note);
         const double totalInQuarterDur
             = note->GetScoreTimeDuration().ToDouble() + note->GetScoreTimeTiedDuration().ToDouble();
         int multiplicity = totalInQuarterDur / noteInQuarterDur;
@@ -440,6 +487,8 @@ FunctorCode GenerateMIDIFunctor::VisitBTrem(const BTrem *bTrem)
 
 FunctorCode GenerateMIDIFunctor::VisitChord(const Chord *chord)
 {
+    this->HandleOctave(chord);
+
     // Handle grace chords
     if (chord->IsGraceNote()) {
         std::set<int> pitches;
@@ -447,7 +496,7 @@ FunctorCode GenerateMIDIFunctor::VisitChord(const Chord *chord)
         for (const Object *obj : notes) {
             const Note *note = vrv_cast<const Note *>(obj);
             assert(note);
-            pitches.insert(note->GetMIDIPitch(m_transSemi));
+            pitches.insert(this->GetMIDIPitch(note));
         }
 
         double quarterDuration = 0.0;
@@ -471,6 +520,8 @@ FunctorCode GenerateMIDIFunctor::VisitChord(const Chord *chord)
 
 FunctorCode GenerateMIDIFunctor::VisitFTrem(const FTrem *fTrem)
 {
+    this->HandleOctave(fTrem);
+
     if (fTrem->HasUnitdur()) {
         LogWarning("FTrem produces incorrect MIDI output");
     }
@@ -517,7 +568,7 @@ FunctorCode GenerateMIDIFunctor::VisitHalfmRpt(const HalfmRpt *halfmRpt)
 
 FunctorCode GenerateMIDIFunctor::VisitLayer(const Layer *layer)
 {
-    if ((layer->GetCue() == BOOLEAN_true) && m_cueExclusion) return FUNCTOR_SIBLINGS;
+    if ((layer->GetCue() == BOOLEAN_true) && m_noCue) return FUNCTOR_SIBLINGS;
 
     return FUNCTOR_CONTINUE;
 }
@@ -539,6 +590,8 @@ FunctorCode GenerateMIDIFunctor::VisitLayerEnd(const Layer *layer)
 FunctorCode GenerateMIDIFunctor::VisitLayerElement(const LayerElement *layerElement)
 {
     if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
+    this->HandleOctave(layerElement);
 
     // Only resolve simple sameas links to avoid infinite recursion
     const LayerElement *sameas = dynamic_cast<const LayerElement *>(layerElement->GetSameasLink());
@@ -575,13 +628,15 @@ FunctorCode GenerateMIDIFunctor::VisitMRpt(const MRpt *mRpt)
 
 FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
 {
+    this->HandleOctave(note);
+
     // Skip linked notes
     if (note->HasSameasLink()) {
         return FUNCTOR_SIBLINGS;
     }
 
     // Skip cue notes when midiNoCue is activated
-    if ((note->GetCue() == BOOLEAN_true) && m_cueExclusion) {
+    if ((note->GetCue() == BOOLEAN_true) && m_noCue) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -592,7 +647,7 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
 
     // Handle grace notes
     if (note->IsGraceNote()) {
-        const int pitch = note->GetMIDIPitch(m_transSemi);
+        const int pitch = this->GetMIDIPitch(note);
 
         double quarterDuration = 0.0;
         const data_DURATION dur = note->GetDur();
@@ -642,7 +697,7 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
         }
     }
     else {
-        const int pitch = note->GetMIDIPitch(m_transSemi);
+        const int pitch = this->GetMIDIPitch(note);
 
         if (note->HasTabCourse() && (note->GetTabCourse() >= 1)) {
             // Tablature 'rule of holds'.  A note on a course is held until the next note
@@ -697,6 +752,19 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
 FunctorCode GenerateMIDIFunctor::VisitPedal(const Pedal *pedal)
 {
     if (!pedal->HasDir()) return FUNCTOR_CONTINUE;
+
+    // Check the functor flag - filters should always be there, but just in case we change how it is called
+    if (!m_controlEvents || !this->GetFilters()) return FUNCTOR_CONTINUE;
+
+    // Check if the pedal applies to the staff filtered
+    const Measure *measure = vrv_cast<const Measure *>(pedal->GetFirstAncestor(MEASURE));
+    assert(measure);
+    std::vector<const Staff *> staffList = pedal->GetTstampStaves(measure, pedal);
+    bool applies = false;
+    for (const Staff *staff : staffList) {
+        applies = (applies || this->GetFilters()->Apply(staff));
+    }
+    if (!applies) return FUNCTOR_CONTINUE;
 
     double pedalTime = pedal->GetStart()->GetAlignment()->GetTime().ToDouble() * SCORE_TIME_UNIT;
     double startTime = m_totalTime + pedalTime;
@@ -874,6 +942,41 @@ void GenerateMIDIFunctor::GenerateGraceNoteMIDI(
     }
 }
 
+void GenerateMIDIFunctor::HandleOctave(const LayerElement *layerElement)
+{
+    // Handle octave end
+    auto octaveIter = std::find_if(m_octaves.begin(), m_octaves.end(), [this, layerElement](const OctaveInfo &octave) {
+        if (octave.isActive && (octave.staffN == m_staffN) && (octave.layerN == m_layerN)) {
+            const Alignment *endAlignment = octave.octave->GetEnd()->GetAlignment();
+            const Alignment *alignment = layerElement->GetAlignment();
+            if (endAlignment && alignment) {
+                return *endAlignment < *alignment;
+            }
+        }
+        return false;
+    });
+    if (octaveIter != m_octaves.end()) {
+        m_octaveShift -= octaveIter->octaveShift;
+        m_octaves.erase(octaveIter);
+    }
+
+    // Handle octave begin
+    octaveIter = std::find_if(m_octaves.begin(), m_octaves.end(), [this, layerElement](const OctaveInfo &octave) {
+        if (!octave.isActive && (octave.staffN == m_staffN) && (octave.layerN == m_layerN)) {
+            const Alignment *startAlignment = octave.octave->GetStart()->GetAlignment();
+            const Alignment *alignment = layerElement->GetAlignment();
+            if (startAlignment && alignment) {
+                return *startAlignment <= *alignment;
+            }
+        }
+        return false;
+    });
+    if (octaveIter != m_octaves.end()) {
+        m_octaveShift += octaveIter->octaveShift;
+        octaveIter->isActive = true;
+    }
+}
+
 //----------------------------------------------------------------------------
 // GenerateTimemapFunctor
 //----------------------------------------------------------------------------
@@ -883,7 +986,7 @@ GenerateTimemapFunctor::GenerateTimemapFunctor(Timemap *timemap) : ConstFunctor(
     m_scoreTimeOffset = 0;
     m_realTimeOffsetMilliseconds = 0.0;
     m_currentTempo = MIDI_TEMPO;
-    m_cueExclusion = false;
+    m_noCue = false;
     m_timemap = timemap;
 }
 
@@ -916,7 +1019,7 @@ FunctorCode GenerateTimemapFunctor::VisitNote(const Note *note)
     if (note->HasGrace()) return FUNCTOR_SIBLINGS;
 
     // Skip cue notes when midiNoCue is activated
-    if ((note->GetCue() == BOOLEAN_true) && m_cueExclusion) {
+    if ((note->GetCue() == BOOLEAN_true) && m_noCue) {
         return FUNCTOR_SIBLINGS;
     }
 

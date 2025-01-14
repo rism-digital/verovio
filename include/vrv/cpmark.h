@@ -1,54 +1,48 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        pedal.h
+// Name:        cpmark.h
 // Author:      Laurent Pugin
-// Created:     2016
+// Created:     2024
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_PEDAL_H__
-#define __VRV_PEDAL_H__
+#ifndef __VRV_CPMARK_H__
+#define __VRV_CPMARK_H__
 
-#include "atts_cmn.h"
-#include "atts_externalsymbols.h"
-#include "atts_visual.h"
 #include "controlelement.h"
+#include "textdirinterface.h"
 #include "timeinterface.h"
 
 namespace vrv {
 
-class System;
+class TextElement;
+
 //----------------------------------------------------------------------------
-// Pedal
+// CpMark (copy/colla parte mark)
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <pedal> element.
+ * This class models the MEI <cpMark> element.
  */
-class Pedal : public ControlElement,
-              public TimeSpanningInterface,
-              public AttExtSymAuth,
-              public AttExtSymNames,
-              public AttPedalLog,
-              public AttPedalVis,
-              public AttPlacementRelStaff,
-              public AttVerticalGroup {
+class CpMark : public ControlElement, public TextListInterface, public TextDirInterface, public TimeSpanningInterface {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      * Reset method reset all attribute classes
      */
     ///@{
-    Pedal();
-    virtual ~Pedal();
-    Object *Clone() const override { return new Pedal(*this); }
+    CpMark();
+    virtual ~CpMark();
+    Object *Clone() const override { return new CpMark(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Pedal"; }
+    std::string GetClassName() const override { return "CpMark"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
+    TextDirInterface *GetTextDirInterface() override { return vrv_cast<TextDirInterface *>(this); }
+    const TextDirInterface *GetTextDirInterface() const override { return vrv_cast<const TextDirInterface *>(this); }
     TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
     const TimePointInterface *GetTimePointInterface() const override
     {
@@ -59,25 +53,13 @@ public:
     {
         return vrv_cast<const TimeSpanningInterface *>(this);
     }
-    ////@}
-
-    /**
-     * @name Setter and getter of the bounce flag
-     */
-    ///@{
-    bool EndsWithBounce() const { return m_endsWithBounce; }
-    void EndsWithBounce(bool endsWithBounce) { m_endsWithBounce = endsWithBounce; }
     ///@}
 
     /**
-     * Get the SMuFL glyph for the pedal based on function or glyph.num
+     * Add an element (text, rend. etc.) to a cpMark.
+     * Only supported elements will be actually added to the child list.
      */
-    char32_t GetPedalGlyph() const;
-
-    /**
-     * Get the pedal form based on the options and corresponding attributes from <pedal> and <scoreDef>
-     */
-    data_PEDALSTYLE GetPedalForm(const Doc *doc, const System *system) const;
+    bool IsSupportedChild(Object *object) override;
 
     //----------//
     // Functors //
@@ -93,11 +75,14 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
+protected:
+    //
 private:
-    /**
-     * Flag indicating if following pedal mark is a bounce
-     */
-    bool m_endsWithBounce;
+    //
+public:
+    //
+private:
+    //
 };
 
 } // namespace vrv
