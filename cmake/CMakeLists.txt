@@ -29,6 +29,7 @@ endif()
 
 # Sets the compile-time value for the RESOURCE_DIR macro in the source code.
 add_compile_definitions(RESOURCE_DIR="${CMAKE_INSTALL_PREFIX}/share/verovio")
+add_compile_options(/bigobj)
 
 include_directories(
     ../include
