@@ -2044,6 +2044,8 @@ bool EditorToolkitNeume::SetLiquescent(std::string elementId, std::string curve)
         }
     }
 
+    m_doc->GetDrawingPage()->LayOutTranscription(true);
+
     m_editInfo.import("status", "OK");
     m_editInfo.import("message", "");
     return true;
