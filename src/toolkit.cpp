@@ -820,7 +820,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
 
     if (m_options->m_mensuralScoreUp.GetValue()) {
         m_doc.ScoringUpDoc();
-        //m_doc.ConvertToCastOffMensuralDoc(true);
+        // m_doc.ConvertToCastOffMensuralDoc(true);
     }
 
     // Convert pseudo-measures into distinct segments based on barLine elements
