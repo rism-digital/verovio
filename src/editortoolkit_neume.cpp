@@ -360,7 +360,7 @@ bool EditorToolkitNeume::ClefMovementHandler(Clef *clef, int x, int y)
 
     // Note that y param is relative to initial position for clefs
     int initialClefLine = clef->GetLine();
-    int clefLine = round(((double)y - x * tan(staff->GetDrawingRotate() * M_PI / 180.0))
+    int clefLine = round(((double)y - x * tan(staff->GetDrawingRotation() * M_PI / 180.0))
             / (double)m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)
         + initialClefLine);
 
@@ -384,7 +384,7 @@ bool EditorToolkitNeume::ClefMovementHandler(Clef *clef, int x, int y)
         Zone *zone = clef->GetZone();
         assert(zone);
         int y = (clefLine - initialClefLine) * 2 * staff->m_drawingStaffSize
-            - x * tan(staff->GetDrawingRotate() * M_PI / 180.0);
+            - x * tan(staff->GetDrawingRotation() * M_PI / 180.0);
         zone->ShiftByXY(x, -y);
     }
 
@@ -875,7 +875,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             int bboxOffsetX = 50;
 
             // calculate staff rotation offset
-            double theta = staff->GetDrawingRotate();
+            double theta = staff->GetDrawingRotation();
             int offsetY = 0;
             if (theta) {
                 double factor = 1.3;
@@ -967,7 +967,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 }
 
                 // Apply offset due to rotate
-                newUly += (newUlx - ulx) * tan(-staff->GetDrawingRotate() * M_PI / 180.0);
+                newUly += (newUlx - ulx) * tan(-staff->GetDrawingRotation() * M_PI / 180.0);
                 newZone->SetUlx(newUlx - offsetX);
                 newZone->SetUly(newUly);
                 newZone->SetLrx(newUlx + offsetX);
@@ -1030,7 +1030,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         clef->SetShape(clefShape);
         int yDiff = -staff->GetZone()->GetUly() + uly;
         yDiff += ((ulx - staff->GetZone()->GetUlx()))
-            * tan(-staff->GetDrawingRotate() * M_PI / 180.0); // Subtract distance due to rotate.
+            * tan(-staff->GetDrawingRotation() * M_PI / 180.0); // Subtract distance due to rotate.
         int clefLine = staff->m_drawingLines - round((double)yDiff / (double)staffSize);
         clef->SetLine(clefLine);
 
@@ -1083,15 +1083,11 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
         const int noteWidth
             = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
-        const int offsetX = (int)(noteWidth / 4);
 
-        ulx -= noteWidth / 2;
-        uly -= noteHeight / 2;
-
-        zone->SetUlx(ulx + offsetX);
-        zone->SetUly(uly + noteHeight);
-        zone->SetLrx(ulx + noteWidth + offsetX);
-        zone->SetLry(uly + noteHeight * 2);
+        zone->SetUlx(ulx - noteWidth * 0.25);
+        zone->SetUly(uly);
+        zone->SetLrx(ulx + noteWidth * 0.75);
+        zone->SetLry(uly + noteHeight);
         layer->ReorderByXPos();
         if (!AdjustPitchFromPosition(custos)) {
             LogError("Failed to set pitch.");
@@ -1649,7 +1645,7 @@ bool EditorToolkitNeume::MatchHeight(std::string elementId)
     // int itLrx;
     int offsetY;
     // int rightMost = -1;
-    double theta = staffParent->GetFacsimileInterface()->GetZone()->GetRotate();
+    double theta = (dynamic_cast<Staff *>(staffParent))->GetDrawingRotation();
 
     for (auto it = syls.begin(); it != syls.end(); ++it) {
         syl = dynamic_cast<Syl *>(*it);
@@ -2117,10 +2113,10 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
     }
 
     // Resize current staff and insert new one filling remaining area.
+    double theta = staff->GetDrawingRotation();
     int newUlx = x;
     int newLrx = staff->GetZone()->GetLrx();
-    int newUly = staff->GetZone()->GetUly()
-        - ((x - staff->GetZone()->GetUlx()) * tan(staff->GetZone()->GetRotate() * M_PI / 180.0));
+    int newUly = staff->GetZone()->GetUly() - ((x - staff->GetZone()->GetUlx()) * tan(theta * M_PI / 180.0));
     int newLry = staff->GetZone()->GetLry(); // don't need to maintain height since we're setting rotate manually
     std::vector<std::pair<std::string, std::string>> v;
 
@@ -2142,12 +2138,11 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
         return false;
     }
 
-    splitStaff->GetZone()->SetRotate(staff->GetZone()->GetRotate());
+    splitStaff->GetZone()->SetRotate(theta);
 
     staff->GetZone()->SetLrx(x);
-    if (staff->GetZone()->GetRotate() != 0) {
-        staff->GetZone()->SetLry(
-            staff->GetZone()->GetLry() + (newLrx - x) * tan(staff->GetZone()->GetRotate() * M_PI / 180.0));
+    if (theta) {
+        staff->GetZone()->SetLry(staff->GetZone()->GetLry() + (newLrx - x) * tan(theta * M_PI / 180.0));
     }
 
     Layer *layer = vrv_cast<Layer *>(staff->GetFirst(LAYER));
@@ -4222,12 +4217,9 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj)
                 LogError("Clef is missing its parent staff.");
                 return false;
             }
-            clefOffset
-                = round((double)(clefStaff->GetDrawingY()
-                            - clefStaff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(clef->GetZone()->GetUlx()))
-                            - m_view->ToLogicalY(clef->GetZone()->GetUly()))
-                    + staffSize);
         }
+        clefOffset = round((double)((staff->m_drawingLines - clef->GetLine() + 0.5) * staffSize));
+
         return true;
     };
 
@@ -4334,7 +4326,7 @@ bool EditorToolkitNeume::AdjustClefLineFromPosition(Clef *clef, Staff *staff)
 
     const double staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     const double yDiff = clef->GetZone()->GetUly() - staff->GetZone()->GetUly()
-        + (clef->GetZone()->GetUlx() - staff->GetZone()->GetUlx()) * tan(staff->GetDrawingRotate() * M_PI / 180.0);
+        + (clef->GetZone()->GetUlx() - staff->GetZone()->GetUlx()) * tan(staff->GetDrawingRotation() * M_PI / 180.0);
     const int clefLine = staff->m_drawingLines - round(yDiff / staffSize);
     clef->SetLine(clefLine);
     return true;
