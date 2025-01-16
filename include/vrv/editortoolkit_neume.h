@@ -135,10 +135,10 @@ struct ClosestBB {
         Zone *zoneA = a->GetFacsimileInterface()->GetZone();
         Zone *zoneB = b->GetFacsimileInterface()->GetZone();
 
-        int distA
-            = distanceToBB(zoneA->GetUlx(), zoneA->GetUly(), zoneA->GetLrx(), zoneA->GetLry(), zoneA->GetRotate());
-        int distB
-            = distanceToBB(zoneB->GetUlx(), zoneB->GetUly(), zoneB->GetLrx(), zoneB->GetLry(), zoneB->GetRotate());
+        int distA = distanceToBB(zoneA->GetUlx(), zoneA->GetUly(), zoneA->GetLrx(), zoneA->GetLry(),
+            zoneA->HasRotate() ? zoneA->GetRotate() : 0);
+        int distB = distanceToBB(zoneB->GetUlx(), zoneB->GetUly(), zoneB->GetLrx(), zoneB->GetLry(),
+            zoneB->HasRotate() ? zoneB->GetRotate() : 0);
         return (distA < distB);
     }
 };
