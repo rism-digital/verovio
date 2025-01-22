@@ -48,7 +48,7 @@ public:
         {"chordTable", {"label", "type"}},
         {"f", {"label", "type", "layer", "plist", "staff", "tstamp", "dur", "endid", "startid", "tstamp2", "color", "extender", "lendsym", "lendsym.size", "lstartsym", "lstartsym.size", "lform", "lwidth", "lsegs", "place", "ho", "vo"}},
         {"fb", {"label", "type"}},
-        {"harm", {"label", "type", "chordref", "layer", "plist", "staff", "tstamp", "dur", "endid", "startid", "tstamp2", "rendgrid", "extender", "lendsym", "lendsym.size", "lstartsym", "lstartsym.size", "lform", "lwidth", "lsegs", "place", "ho", "vo", "startho", "endho"}},
+        {"harm", {"label", "type", "chordref", "layer", "plist", "staff", "tstamp", "dur", "endid", "startid", "tstamp2", "rendgrid", "color", "extender", "lendsym", "lendsym.size", "lstartsym", "lstartsym.size", "lform", "lwidth", "lsegs", "place", "ho", "vo", "startho", "endho"}},
         {"availability", {"label", "type", "data"}},
         {"fileDesc", {"label", "type", "corresp"}},
         {"meiHead", {"label", "xml:lang", "type"}},
