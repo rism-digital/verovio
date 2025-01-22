@@ -8480,7 +8480,7 @@
       <memberOf key="att.typography"/>
       <memberOf key="att.visualOffset"/>
     </classes>
-  </classSpec><classSpec rend="add" ident="att.harm.vis" module="MEI.visual" type="atts"><desc xml:lang="en">Visual domain attributes.</desc><classes><memberOf key="att.extender"/><memberOf key="att.placementRelStaff"/><memberOf key="att.visualOffset"/><memberOf key="att.visualOffset2.ho"/></classes><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="rendgrid" usage="opt">
+  </classSpec><classSpec rend="add" ident="att.harm.vis" module="MEI.visual" type="atts"><desc xml:lang="en">Visual domain attributes.</desc><classes><memberOf key="att.color"/><memberOf key="att.extender"/><memberOf key="att.placementRelStaff"/><memberOf key="att.visualOffset"/><memberOf key="att.visualOffset2.ho"/></classes><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="rendgrid" usage="opt">
         <desc xml:lang="en">Describes how the harmonic indication should be rendered.</desc>
         <valList type="closed">
           <valItem ident="grid">
