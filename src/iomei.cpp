@@ -250,8 +250,8 @@ bool MEIOutput::Export()
         m_mei = meiDoc.append_child("mei");
         m_mei.append_attribute("xmlns") = "http://www.music-encoding.org/ns/mei";
         AttConverter converter;
-        meiVersion_MEIVERSION meiVersion = meiVersion_MEIVERSION_5_0;
-        if (this->GetBasic()) meiVersion = meiVersion_MEIVERSION_5_0plusbasic;
+        meiVersion_MEIVERSION meiVersion = meiVersion_MEIVERSION_5_1;
+        if (this->GetBasic()) meiVersion = meiVersion_MEIVERSION_5_1plusbasic;
         m_mei.append_attribute("meiversion") = (converter.MeiVersionMeiversionToStr(meiVersion)).c_str();
 
         // If the document is mensural, we have to undo the mensural (segments) cast off
@@ -3931,10 +3931,10 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
         AttConverter converter;
         m_meiversion = converter.StrToMeiVersionMeiversion(version);
     }
-    // Default to MEI 5.0
+    // Default to MEI 5.1
     if (m_meiversion == meiVersion_MEIVERSION_NONE) {
-        LogWarning("MEI version found or not known, falling back to MEI 5.0");
-        m_meiversion = meiVersion_MEIVERSION_5_0;
+        LogWarning("MEI version found or not known, falling back to MEI 5.1");
+        m_meiversion = meiVersion_MEIVERSION_5_1;
     }
 
     // only try to handle meiHead if we have a full MEI document
