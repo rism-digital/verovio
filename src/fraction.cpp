@@ -122,7 +122,7 @@ void Fraction::Reduce()
         m_numerator = -m_numerator;
         m_denominator = -m_denominator;
     }
-    int gcdVal = std::gcd(abs(m_numerator), abs(m_denominator));
+    const int gcdVal = std::gcd(m_numerator, m_denominator);
     if (gcdVal != 1) {
         m_numerator /= gcdVal;
         m_denominator /= gcdVal;
