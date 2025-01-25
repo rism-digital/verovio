@@ -29,7 +29,7 @@ Fraction::Fraction(int num, int denom)
         denom = 1;
     }
     m_denominator = denom;
-    Reduce();
+    this->Reduce();
 }
 
 Fraction::Fraction(data_DURATION duration)
@@ -39,7 +39,7 @@ Fraction::Fraction(data_DURATION duration)
     int den = pow(2, (duration + 1));
     m_numerator = 8;
     m_denominator = den;
-    Reduce();
+    this->Reduce();
 }
 
 Fraction Fraction::operator+(const Fraction &other) const
