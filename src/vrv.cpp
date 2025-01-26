@@ -184,12 +184,6 @@ bool LogBufferContains(const std::string &s)
     return false;
 }
 
-bool Check(Object *object)
-{
-    assert(object);
-    return (object != NULL);
-}
-
 //----------------------------------------------------------------------------
 // Function defined in toolkitdef.h
 //----------------------------------------------------------------------------
