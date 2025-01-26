@@ -938,7 +938,7 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
         assert(timestampAttr);
 
         double alignmentTime = timestampAttr->GetActualDurPos();
-        if (AreNearlyEqual(alignmentTime, time)) {
+        if (ApproximatelyEqual(alignmentTime, time)) {
             return timestampAttr;
         }
         // nothing found, do not go any further but keep the index

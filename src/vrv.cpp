@@ -218,9 +218,9 @@ std::string StringFormatVariable(const char *format, va_list arg)
     return str;
 }
 
-bool AreNearlyEqual(double dFirstVal, double dSecondVal)
+bool ApproximatelyEqual(double firstVal, double secondVal)
 {
-    return std::fabs(dFirstVal - dSecondVal) < 1E-3;
+    return std::fabs(firstVal - secondVal) < 1E-3;
 }
 
 bool IsValidInteger(const std::string &value)
