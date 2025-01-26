@@ -178,10 +178,7 @@ LogLevel StrToLogLevel(const std::string &level)
 
 bool LogBufferContains(const std::string &s)
 {
-    for (const std::string &logStr : logBuffer) {
-        if (logStr == s) return true;
-    }
-    return false;
+    return (std::find(logBuffer.cbegin(), logBuffer.cend(), s) != logBuffer.cend());
 }
 
 //----------------------------------------------------------------------------
