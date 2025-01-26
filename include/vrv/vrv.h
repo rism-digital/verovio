@@ -55,7 +55,7 @@ LogLevel StrToLogLevel(const std::string &level);
 /**
  * Utility for comparing doubles
  */
-bool AreEqual(double dFirstVal, double dSecondVal);
+bool AreNearlyEqual(double dFirstVal, double dSecondVal);
 
 /**
  * Utility to check if the string is a valid integer for std::stoi

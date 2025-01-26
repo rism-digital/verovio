@@ -227,7 +227,7 @@ std::string StringFormatVariable(const char *format, va_list arg)
     return str;
 }
 
-bool AreEqual(double dFirstVal, double dSecondVal)
+bool AreNearlyEqual(double dFirstVal, double dSecondVal)
 {
     return std::fabs(dFirstVal - dSecondVal) < 1E-3;
 }

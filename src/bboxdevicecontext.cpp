@@ -82,7 +82,7 @@ void BBoxDeviceContext::EndResumedGraphic(Object *object, View *view)
 
 void BBoxDeviceContext::RotateGraphic(Point const &orig, double angle)
 {
-    assert(AreEqual(m_rotationAngle, 0.0));
+    assert(AreNearlyEqual(m_rotationAngle, 0.0));
 
     m_rotationAngle = angle;
     m_rotationOrigin = orig;
@@ -401,7 +401,7 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2, char32_t glyph)
         return;
     }
 
-    if (!AreEqual(m_rotationAngle, 0.0)) {
+    if (!AreNearlyEqual(m_rotationAngle, 0.0)) {
         Point p1 = BoundingBox::CalcPositionAfterRotation(Point(x1, y1), DegToRad(m_rotationAngle), m_rotationOrigin);
         Point p2 = BoundingBox::CalcPositionAfterRotation(Point(x2, y2), DegToRad(m_rotationAngle), m_rotationOrigin);
         x1 = p1.x;
