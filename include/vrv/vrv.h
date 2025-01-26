@@ -132,11 +132,17 @@ std::string FromCamelCase(const std::string &s);
  */
 std::string ToCamelCase(const std::string &s);
 
-/*
- * Min / Max for data_DURATION (std::min/max not possible)
+/**
+ * Min / Max for data_DURATION
  */
-data_DURATION DurationMin(data_DURATION dur1, data_DURATION dur2);
-data_DURATION DurationMax(data_DURATION dur1, data_DURATION dur2);
+inline data_DURATION DurationMin(data_DURATION dur1, data_DURATION dur2)
+{
+    return std::min(dur1, dur2);
+}
+inline data_DURATION DurationMax(data_DURATION dur1, data_DURATION dur2)
+{
+    return std::max(dur1, dur2);
+}
 
 /**
  *
