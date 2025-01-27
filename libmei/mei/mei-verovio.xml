@@ -108,6 +108,9 @@
 								<valItem ident="5.0">
 									<desc xml:lang="en">MEI 5.0</desc>
 								</valItem>
+								<valItem ident="5.1">
+									<desc xml:lang="en">MEI 5.1</desc>
+								</valItem>
 								<valItem ident="5.0+basic">
 									<desc>MEI 5.0+basic</desc>
 								</valItem>
@@ -119,6 +122,18 @@
 								</valItem>
 								<valItem ident="5.0+Neumes">
 									<desc>MEI 5.0+Neumes</desc>
+								</valItem>
+								<valItem ident="5.1+basic">
+									<desc>MEI 5.1+basic</desc>
+								</valItem>
+								<valItem ident="5.1+CMN">
+									<desc>MEI 5.1+CMN</desc>
+								</valItem>
+								<valItem ident="5.1+Mensural">
+									<desc>MEI 5.1+Mensural</desc>
+								</valItem>
+								<valItem ident="5.1+Neumes">
+									<desc>MEI 5.1+Neumes</desc>
 								</valItem>
 							</valList>
 						</attDef>

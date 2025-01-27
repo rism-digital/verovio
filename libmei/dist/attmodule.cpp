@@ -442,31 +442,31 @@ bool AttModule::SetCmn(Object *element, const std::string &attrType, const std::
         AttHarpPedalLog *att = dynamic_cast<AttHarpPedalLog *>(element);
         assert(att);
         if (attrType == "c") {
-            att->SetC(att->StrToHarpPedalLogC(attrValue));
+            att->SetC(att->StrToHarppedalposition(attrValue));
             return true;
         }
         if (attrType == "d") {
-            att->SetD(att->StrToHarpPedalLogD(attrValue));
+            att->SetD(att->StrToHarppedalposition(attrValue));
             return true;
         }
         if (attrType == "e") {
-            att->SetE(att->StrToHarpPedalLogE(attrValue));
+            att->SetE(att->StrToHarppedalposition(attrValue));
             return true;
         }
         if (attrType == "f") {
-            att->SetF(att->StrToHarpPedalLogF(attrValue));
+            att->SetF(att->StrToHarppedalposition(attrValue));
             return true;
         }
         if (attrType == "g") {
-            att->SetG(att->StrToHarpPedalLogG(attrValue));
+            att->SetG(att->StrToHarppedalposition(attrValue));
             return true;
         }
         if (attrType == "a") {
-            att->SetA(att->StrToHarpPedalLogA(attrValue));
+            att->SetA(att->StrToHarppedalposition(attrValue));
             return true;
         }
         if (attrType == "b") {
-            att->SetB(att->StrToHarpPedalLogB(attrValue));
+            att->SetB(att->StrToHarppedalposition(attrValue));
             return true;
         }
     }
@@ -728,25 +728,25 @@ void AttModule::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
         const AttHarpPedalLog *att = dynamic_cast<const AttHarpPedalLog *>(element);
         assert(att);
         if (att->HasC()) {
-            attributes->push_back({ "c", att->HarpPedalLogCToStr(att->GetC()) });
+            attributes->push_back({ "c", att->HarppedalpositionToStr(att->GetC()) });
         }
         if (att->HasD()) {
-            attributes->push_back({ "d", att->HarpPedalLogDToStr(att->GetD()) });
+            attributes->push_back({ "d", att->HarppedalpositionToStr(att->GetD()) });
         }
         if (att->HasE()) {
-            attributes->push_back({ "e", att->HarpPedalLogEToStr(att->GetE()) });
+            attributes->push_back({ "e", att->HarppedalpositionToStr(att->GetE()) });
         }
         if (att->HasF()) {
-            attributes->push_back({ "f", att->HarpPedalLogFToStr(att->GetF()) });
+            attributes->push_back({ "f", att->HarppedalpositionToStr(att->GetF()) });
         }
         if (att->HasG()) {
-            attributes->push_back({ "g", att->HarpPedalLogGToStr(att->GetG()) });
+            attributes->push_back({ "g", att->HarppedalpositionToStr(att->GetG()) });
         }
         if (att->HasA()) {
-            attributes->push_back({ "a", att->HarpPedalLogAToStr(att->GetA()) });
+            attributes->push_back({ "a", att->HarppedalpositionToStr(att->GetA()) });
         }
         if (att->HasB()) {
-            attributes->push_back({ "b", att->HarpPedalLogBToStr(att->GetB()) });
+            attributes->push_back({ "b", att->HarppedalpositionToStr(att->GetB()) });
         }
     }
     if (element->HasAttClass(ATT_LVPRESENT)) {
@@ -3308,6 +3308,14 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
             return true;
         }
     }
+    if (element->HasAttClass(ATT_DATASELECTING)) {
+        AttDataSelecting *att = dynamic_cast<AttDataSelecting *>(element);
+        assert(att);
+        if (attrType == "select") {
+            att->SetSelect(att->StrToStr(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_DATABLE)) {
         AttDatable *att = dynamic_cast<AttDatable *>(element);
         assert(att);
@@ -4488,6 +4496,14 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
             return true;
         }
     }
+    if (element->HasAttClass(ATT_TUNINGLOG)) {
+        AttTuningLog *att = dynamic_cast<AttTuningLog *>(element);
+        assert(att);
+        if (attrType == "tuning.standard") {
+            att->SetTuningStandard(att->StrToCoursetuning(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_TUPLETPRESENT)) {
         AttTupletPresent *att = dynamic_cast<AttTupletPresent *>(element);
         assert(att);
@@ -4901,6 +4917,13 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasData()) {
             attributes->push_back({ "data", att->StrToStr(att->GetData()) });
+        }
+    }
+    if (element->HasAttClass(ATT_DATASELECTING)) {
+        const AttDataSelecting *att = dynamic_cast<const AttDataSelecting *>(element);
+        assert(att);
+        if (att->HasSelect()) {
+            attributes->push_back({ "select", att->StrToStr(att->GetSelect()) });
         }
     }
     if (element->HasAttClass(ATT_DATABLE)) {
@@ -5889,6 +5912,13 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "tune.temper", att->TemperamentToStr(att->GetTuneTemper()) });
         }
     }
+    if (element->HasAttClass(ATT_TUNINGLOG)) {
+        const AttTuningLog *att = dynamic_cast<const AttTuningLog *>(element);
+        assert(att);
+        if (att->HasTuningStandard()) {
+            attributes->push_back({ "tuning.standard", att->CoursetuningToStr(att->GetTuningStandard()) });
+        }
+    }
     if (element->HasAttClass(ATT_TUPLETPRESENT)) {
         const AttTupletPresent *att = dynamic_cast<const AttTupletPresent *>(element);
         assert(att);
@@ -6251,6 +6281,13 @@ void AttModule::CopyShared(const Object *element, Object *target)
         AttDataPointing *attTarget = dynamic_cast<AttDataPointing *>(target);
         assert(attTarget);
         attTarget->SetData(att->GetData());
+    }
+    if (element->HasAttClass(ATT_DATASELECTING)) {
+        const AttDataSelecting *att = dynamic_cast<const AttDataSelecting *>(element);
+        assert(att);
+        AttDataSelecting *attTarget = dynamic_cast<AttDataSelecting *>(target);
+        assert(attTarget);
+        attTarget->SetSelect(att->GetSelect());
     }
     if (element->HasAttClass(ATT_DATABLE)) {
         const AttDatable *att = dynamic_cast<const AttDatable *>(element);
@@ -7051,6 +7088,13 @@ void AttModule::CopyShared(const Object *element, Object *target)
         attTarget->SetTuneHz(att->GetTuneHz());
         attTarget->SetTunePname(att->GetTunePname());
         attTarget->SetTuneTemper(att->GetTuneTemper());
+    }
+    if (element->HasAttClass(ATT_TUNINGLOG)) {
+        const AttTuningLog *att = dynamic_cast<const AttTuningLog *>(element);
+        assert(att);
+        AttTuningLog *attTarget = dynamic_cast<AttTuningLog *>(target);
+        assert(attTarget);
+        attTarget->SetTuningStandard(att->GetTuningStandard());
     }
     if (element->HasAttClass(ATT_TUPLETPRESENT)) {
         const AttTupletPresent *att = dynamic_cast<const AttTupletPresent *>(element);
