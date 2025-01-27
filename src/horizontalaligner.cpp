@@ -516,15 +516,15 @@ void Alignment::Reset()
     Object::Reset();
 
     m_xRel = 0;
-    m_time = Fraction(0, 1);
+    m_time = Fraction(0);
     m_type = ALIGNMENT_DEFAULT;
 
-    ClearGraceAligners();
+    this->ClearGraceAligners();
 }
 
 Alignment::~Alignment()
 {
-    ClearGraceAligners();
+    this->ClearGraceAligners();
 }
 
 void Alignment::ClearGraceAligners()

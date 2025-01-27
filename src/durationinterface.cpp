@@ -100,7 +100,7 @@ Fraction DurationInterface::GetInterfaceAlignmentMensuralDuration(
 
     if (!currentMensur) {
         LogWarning("No current mensur for calculating duration");
-        return Fraction(1, 1);
+        return Fraction(1);
     }
 
     if (this->HasNum() || this->HasNumbase()) {

@@ -675,7 +675,7 @@ Fraction LayerElement::GetAlignmentDuration(
     const AlignMeterParams &params, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (this->IsGraceNote() && notGraceOnly) {
-        return Fraction(0, 1);
+        return Fraction(0);
     }
 
     // Mensural chords are aligned looking at the duration of the notes
@@ -777,7 +777,7 @@ Fraction LayerElement::GetAlignmentDuration(
         return (syllable->GetLast() == this) ? NEUME_MEDIUM_SPACE : NEUME_SMALL_SPACE;
     }
     else {
-        return Fraction(0, 1);
+        return Fraction(0);
     }
 }
 
@@ -791,7 +791,7 @@ Fraction LayerElement::GetSameAsContentAlignmentDuration(
     const AlignMeterParams &params, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (!this->HasSameasLink() || !this->GetSameasLink()->Is({ BEAM, FTREM, TUPLET })) {
-        return Fraction(0, 1);
+        return Fraction(0);
     }
 
     const LayerElement *sameas = vrv_cast<const LayerElement *>(this->GetSameasLink());
@@ -804,7 +804,7 @@ Fraction LayerElement::GetContentAlignmentDuration(
     const AlignMeterParams &params, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (!this->Is({ BEAM, FTREM, TUPLET })) {
-        return Fraction(0, 1);
+        return Fraction(0);
     }
 
     Fraction duration;
