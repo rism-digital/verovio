@@ -887,13 +887,6 @@ void Doc::PrepareData()
     PrepareLayerElementPartsFunctor prepareLayerElementParts;
     this->Process(prepareLayerElementParts);
 
-    /************ Add default syl for syllables (if applicable) ************/
-    ListOfObjects syllables = this->FindAllDescendantsByType(SYLLABLE);
-    for (Object *object : syllables) {
-        Syllable *syllable = dynamic_cast<Syllable *>(object);
-        syllable->MarkupAddSyl();
-    }
-
     /************ Resolve @facs ************/
     if (this->IsFacs()) {
         // Associate zones with elements

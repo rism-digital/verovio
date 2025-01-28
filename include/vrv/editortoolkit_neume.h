@@ -39,6 +39,7 @@ public:
      * Experimental editor functions.
      */
     ///@{
+    bool AddSyl(std::string elementId, std::string sylText);
     bool Chain(jsonxx::Array actions);
     bool DisplaceClefOctave(std::string elementId, std::string direction);
     bool Drag(std::string elementId, int x, int y, bool topLevel = true);
@@ -71,6 +72,7 @@ protected:
      * Parse JSON instructions for experimental editor functions.
      */
     ///@{
+    bool ParseAddSylAction(jsonxx::Object param, std::string *elementId, std::string *sylText);
     bool ParseDisplaceClefAction(jsonxx::Object param, std::string *elementId, std::string *direction);
     bool ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y);
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startId, std::string *endId);

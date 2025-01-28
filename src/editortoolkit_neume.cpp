@@ -77,8 +77,14 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
         m_editInfo.import("message", "'param' can only be an array for a chain action.");
         return false;
     }
-
-    if (action == "drag") {
+    if (action == "addSyl") {
+        std::string elementId, sylText;
+        if (this->ParseAddSylAction(json.get<jsonxx::Object>("param"), &elementId, &sylText)) {
+            return this->AddSyl(elementId, sylText);
+        }
+        LogWarning("Could not parse the addSyl action");
+    }
+    else if (action == "drag") {
         std::string elementId;
         int x, y;
         if (this->ParseDragAction(json.get<jsonxx::Object>("param"), &elementId, &x, &y)) {
@@ -277,6 +283,60 @@ bool EditorToolkitNeume::Chain(jsonxx::Array actions)
     return status;
 }
 
+bool EditorToolkitNeume::AddSyl(std::string elementId, std::string sylText)
+{
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page.");
+        m_editInfo.import("status", "FAILURE");
+        m_editInfo.import("message", "Could not get the drawing page.");
+        return true;
+    }
+
+    Syllable *syllable = dynamic_cast<Syllable *>(m_doc->GetDrawingPage()->FindDescendantByID(elementId));
+    if (syllable == NULL) {
+        LogError("Unable to find syllable with id %s", elementId.c_str());
+        m_editInfo.import("status", "FAILURE");
+        m_editInfo.import("message", "Unable to find neume with id " + elementId + ".");
+        return false;
+    }
+
+    // Create a new syl element
+    Syl *syl = new Syl();
+    Text *text = new Text();
+    text->SetText(UTF8to32(sylText));
+    syl->AddChild(text);
+    syllable->AddChild(syl);
+
+    // Create default bounding box if facs
+    if (m_doc->HasFacsimile()) {
+        Zone *zone = new Zone();
+        Staff *staff = syllable->GetAncestorStaff();
+        const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+
+        zone->SetUlx(syllable->GetFirst(NEUME)->GetFirst(NC)->GetFacsimileInterface()->GetZone()->GetUlx());
+        zone->SetUly(staff->GetFacsimileInterface()->GetZone()->GetLry());
+        zone->SetLrx(syllable->GetLast(NEUME)->GetLast(NC)->GetFacsimileInterface()->GetZone()->GetLrx());
+        zone->SetLry(zone->GetUly() + staffSize * 2);
+
+        // Make bbox larger if it has less than 2 ncs
+        if (syllable->GetChildCount(NC, 2) <= 2) {
+            zone->SetLrx(zone->GetLrx() + 50);
+        }
+
+        assert(m_doc->GetFacsimile());
+        m_doc->GetFacsimile()->FindDescendantByType(SURFACE)->AddChild(zone);
+        FacsimileInterface *fi = syl->GetFacsimileInterface();
+        assert(fi);
+        fi->AttachZone(zone);
+
+        if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    }
+
+    m_editInfo.import("uuid", elementId);
+    m_editInfo.import("status", "OK");
+    m_editInfo.import("message", "");
+    return true;
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Author: jacob-hutnyk
 //
@@ -2214,12 +2274,14 @@ void EditorToolkitNeume::UnlinkSyllable(Syllable *syllable)
             // Create default bounding box if facs
             if (m_doc->HasFacsimile()) {
                 Zone *zone = new Zone();
+                Staff *staff = linkedSyllable->GetAncestorStaff();
+                const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
                 zone->SetUlx(
                     linkedSyllable->GetFirst(NEUME)->GetFirst(NC)->GetFacsimileInterface()->GetZone()->GetUlx());
-                zone->SetUly(linkedSyllable->GetAncestorStaff()->GetFacsimileInterface()->GetZone()->GetLry());
+                zone->SetUly(staff->GetFacsimileInterface()->GetZone()->GetLry());
                 zone->SetLrx(linkedSyllable->GetLast(NEUME)->GetLast(NC)->GetFacsimileInterface()->GetZone()->GetLrx());
-                zone->SetLry(zone->GetUly() + 100);
+                zone->SetLry(zone->GetUly() + staffSize * 2);
 
                 // Make bbox larger if it has less than 2 ncs
                 if (linkedSyllable->GetChildCount(NC, 2) <= 2) {
@@ -3862,6 +3924,15 @@ bool EditorToolkitNeume::ChangeStaffTo(std::string elementId, std::string staffI
     m_editInfo.import("message", "");
     m_editInfo.import("elementId", elementId);
     m_editInfo.import("newStaffId", staff->GetID());
+    return true;
+}
+
+bool EditorToolkitNeume::ParseAddSylAction(jsonxx::Object param, std::string *elementId, std::string *sylText)
+{
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    (*elementId) = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::String>("sylText")) return false;
+    (*sylText) = param.get<jsonxx::String>("sylText");
     return true;
 }
 
