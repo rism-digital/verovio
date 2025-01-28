@@ -52,15 +52,7 @@ FunctorCode TransposeFunctor::VisitHarm(Harm *harm)
 FunctorCode TransposeFunctor::VisitKeySig(KeySig *keySig)
 {
     // Store current KeySig
-    int staffN = -1;
-    const StaffDef *staffDef = vrv_cast<StaffDef *>(keySig->GetFirstAncestor(STAFFDEF));
-    if (staffDef) {
-        staffN = staffDef->GetN();
-    }
-    else {
-        const Staff *staff = keySig->GetAncestorStaff(ANCESTOR_ONLY, false);
-        if (staff) staffN = staff->GetN();
-    }
+    const int staffN = this->GetStaffNForKeySig(keySig);
     m_keySigForStaffN[staffN] = keySig;
 
     // Transpose
@@ -242,6 +234,20 @@ const KeySig *TransposeFunctor::GetKeySigForStaffDef(const StaffDef *staffDef) c
         keySig = vrv_cast<const KeySig *>(scoreDef->FindDescendantByType(KEYSIG));
     }
     return keySig;
+}
+
+int TransposeFunctor::GetStaffNForKeySig(const KeySig *keySig) const
+{
+    int staffN = -1;
+    const StaffDef *staffDef = vrv_cast<const StaffDef *>(keySig->GetFirstAncestor(STAFFDEF));
+    if (staffDef) {
+        staffN = staffDef->GetN();
+    }
+    else {
+        const Staff *staff = keySig->GetAncestorStaff(ANCESTOR_ONLY, false);
+        if (staff) staffN = staff->GetN();
+    }
+    return staffN;
 }
 
 //----------------------------------------------------------------------------

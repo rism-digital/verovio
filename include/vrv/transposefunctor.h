@@ -57,6 +57,7 @@ protected:
      */
     ///@{
     const KeySig *GetKeySigForStaffDef(const StaffDef *staffDef) const;
+    int GetStaffNForKeySig(const KeySig *keySig) const;
     ///@}
 
 private:
