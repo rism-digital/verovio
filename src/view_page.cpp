@@ -208,6 +208,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     this->DrawSystemChildren(dc, system, system);
 
     this->DrawSystemList(dc, system, SYL);
+    this->DrawSystemList(dc, system, ANNOTSCORE);
     this->DrawSystemList(dc, system, BEAMSPAN);
     this->DrawSystemList(dc, system, BRACKETSPAN);
     this->DrawSystemList(dc, system, DYNAM);
@@ -238,6 +239,9 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
     ArrayOfObjects *drawingList = system->GetDrawingList();
 
     for (Object *object : *drawingList) {
+        if (object->Is(classId) && (classId == ANNOTSCORE)) {
+            this->DrawTimeSpanningElement(dc, object, system);
+        }
         if (object->Is(classId) && (classId == BEAMSPAN)) {
             this->DrawTimeSpanningElement(dc, object, system);
         }

@@ -45,6 +45,12 @@ void AnnotScore::Reset()
     TimeSpanningInterface::Reset();
 }
 
+int AnnotScore::GetBoxHeight(const Doc *doc, int unit) const
+{
+    int boxHeight = doc->GetOptions()->m_octaveLineThickness.GetValue() * unit;
+    return boxHeight;
+}
+
 bool AnnotScore::IsSupportedChild(Object *child)
 {
     if (child->IsTextElement()) {

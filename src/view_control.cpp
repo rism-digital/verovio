@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "annotscore.h"
 #include "arpeg.h"
 #include "bboxdevicecontext.h"
 #include "beamspan.h"
@@ -76,8 +77,8 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     assert(element);
 
     // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
-    if (element->Is(
-            { BEAMSPAN, BRACKETSPAN, FIGURE, GLISS, HAIRPIN, LV, OCTAVE, PHRASE, PITCHINFLECTION, SLUR, TIE })) {
+    if (element->Is({ ANNOTSCORE, BEAMSPAN, BRACKETSPAN, FIGURE, GLISS, HAIRPIN, LV, OCTAVE, PHRASE, PITCHINFLECTION,
+            SLUR, TIE })) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetID());
         dc->EndGraphic(element, this);
@@ -327,7 +328,11 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             }
         }
 
-        if (element->Is(DIR)) {
+        if (element->Is(ANNOTSCORE)) {
+            // cast to Dir check in DrawControlElementConnector
+            this->DrawAnnotScoreBox(dc, dynamic_cast<AnnotScore *>(element), x1, x2, staff, spanningType, graphic);
+        }
+        else if (element->Is(DIR)) {
             // cast to Dir check in DrawControlElementConnector
             this->DrawControlElementConnector(dc, dynamic_cast<Dir *>(element), x1, x2, staff, spanningType, graphic);
         }
@@ -442,6 +447,58 @@ bool View::HasValidTimeSpanningOrder(DeviceContext *dc, Object *element, LayerEl
     }
 
     return true;
+}
+
+void View::DrawAnnotScoreBox(
+    DeviceContext *dc, AnnotScore *annotScore, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+{
+    assert(dc);
+    assert(annotScore);
+    assert(staff);
+
+    assert(annotScore->GetStart());
+    assert(annotScore->GetEnd());
+
+    // May need to set/tweak y pos
+    const int y = annotScore->GetDrawingY();
+
+    // This has been copied from bracketSpan and is likely to be wrong
+    if (graphic) {
+        dc->ResumeGraphic(graphic, graphic->GetID());
+    }
+    else {
+        dc->StartGraphic(annotScore, "", annotScore->GetID(), SPANNING);
+    }
+
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int lineWidth = annotScore->GetBoxHeight(m_doc, unit);
+
+    x1 += lineWidth / 2;
+    x2 -= lineWidth / 2;
+
+    dc->SetPen(m_currentColor, lineWidth, AxSOLID, 0, 0, AxCAP_BUTT, AxJOIN_MITER);
+    dc->SetBrush(m_currentColor, AxSOLID);
+
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
+        if (!annotScore->GetStart()->Is(TIMESTAMP_ATTR)) {
+            x1 -= annotScore->GetStart()->GetDrawingRadius(m_doc);
+        }
+    }
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
+        if (!annotScore->GetEnd()->Is(TIMESTAMP_ATTR)) {
+            x2 += annotScore->GetEnd()->GetDrawingRadius(m_doc);
+        }
+    }
+    this->DrawFilledRectangle(dc, x1, y, x2, y + lineWidth);
+    dc->ResetPen();
+    dc->ResetBrush();
+
+    if (graphic) {
+        dc->EndResumedGraphic(graphic, this);
+    }
+    else {
+        dc->EndGraphic(annotScore, this);
+    }
 }
 
 void View::DrawBracketSpan(
