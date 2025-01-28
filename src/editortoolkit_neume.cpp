@@ -1961,11 +1961,11 @@ bool EditorToolkitNeume::SetClef(std::string elementId, std::string shape)
 
     if (shape == "C") {
         clefShape = CLEFSHAPE_C;
-        shift = -3;
+        shift = 4;
     }
     else if (shape == "F") {
         clefShape = CLEFSHAPE_F;
-        shift = 3;
+        shift = -4;
     }
 
     if (clef->GetShape() != clefShape) {
