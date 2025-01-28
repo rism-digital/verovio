@@ -53,6 +53,11 @@ public:
     }
 
     /**
+     * Get a value for the height of the drawn box
+     */
+    int GetBoxHeight(const Doc *doc, int unit) const;
+
+    /**
      * Add a text element to an annotation.
      * Only supported elements will be actually added to the child list.
      */
