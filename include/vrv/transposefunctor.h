@@ -52,7 +52,13 @@ public:
     ///@}
 
 protected:
-    //
+    /*
+     * Retrieve corresponding elements
+     */
+    ///@{
+    const KeySig *GetKeySigForStaffDef(const StaffDef *staffDef) const;
+    ///@}
+
 private:
     //
 public:
