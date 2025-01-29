@@ -317,10 +317,32 @@ FunctorCode InitTimemapTiesFunctor::VisitTie(Tie *tie)
 // InitTimemapNotesFunctor
 //----------------------------------------------------------------------------
 
-InitTimemapNotesFunctor::InitTimemapNotesFunctor() : Functor() {}
+InitTimemapNotesFunctor::InitTimemapNotesFunctor() : Functor()
+{
+    m_noCue = false;
+}
 
 FunctorCode InitTimemapNotesFunctor::VisitChord(Chord *chord)
 {
+    if (chord->IsGraceNote()) {
+        std::list<Note *> pitches;
+        const ListOfObjects &notes = chord->GetList();
+        for (Object *obj : notes) {
+            Note *note = vrv_cast<Note *>(obj);
+            assert(note);
+            pitches.push_back(note);
+        }
+
+        m_graceNotes.push_back({ pitches, chord->GetActualDur() });
+
+        bool accented = (chord->GetGrace() == GRACE_acc);
+        const GraceGrp *graceGrp = vrv_cast<const GraceGrp *>(chord->GetFirstAncestor(GRACEGRP));
+        if (graceGrp && (graceGrp->GetGrace() == GRACE_acc)) accented = true;
+        m_accentedGraceNote = accented;
+
+        return FUNCTOR_SIBLINGS;
+    }
+    
     return FUNCTOR_CONTINUE;
 }
 
@@ -331,6 +353,54 @@ FunctorCode InitTimemapNotesFunctor::VisitGraceGrpEnd(GraceGrp *graceGrp)
 
 FunctorCode InitTimemapNotesFunctor::VisitNote(Note *note)
 {
+    // Skip linked notes
+    if (note->HasSameasLink()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    // Skip cue notes when midiNoCue is activated
+    if ((note->GetCue() == BOOLEAN_true) && m_noCue) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    // If the note is a secondary tied note, then ignore it
+    if (note->GetScoreTimeTiedDuration() < 0) {
+        return FUNCTOR_SIBLINGS;
+    }
+    
+    // Handle grace notes
+    if (note->IsGraceNote()) {
+        m_graceNotes.push_back({ { note }, note->GetDur() });
+
+        bool accented = (note->GetGrace() == GRACE_acc);
+        const GraceGrp *graceGrp = vrv_cast<const GraceGrp *>(note->GetFirstAncestor(GRACEGRP));
+        if (graceGrp && (graceGrp->GetGrace() == GRACE_acc)) accented = true;
+        m_accentedGraceNote = accented;
+
+        return FUNCTOR_SIBLINGS;
+    }
+
+    const int channel = 0;
+    int velocity = MIDI_VELOCITY;
+    if (note->HasVel()) velocity = note->GetVel();
+
+    const int tpq = m_midiFile->getTPQ();
+
+    // Check if some grace notes must be performed
+    if (!m_graceNotes.empty()) {
+        this->GenerateGraceNoteMIDI(note, startTime, tpq, channel, velocity);
+        m_graceNotes.clear();
+    }
+
+    // Check if note is deferred
+    if (m_deferredNotes.find(note) != m_deferredNotes.end()) {
+        startTime += m_deferredNotes.at(note);
+        m_deferredNotes.erase(note);
+    }
+
+    // Store reference, i.e. for Nachschlag
+    m_lastNote = note;
+    
     return FUNCTOR_SIBLINGS;
 }
 

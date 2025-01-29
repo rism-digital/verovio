@@ -177,6 +177,14 @@ private:
     //
 };
 
+/**
+ * Helper struct to store grace note/chord sequences
+ */
+struct GraceChord {
+    std::list<Note *> pitches;
+    data_DURATION duration;
+};
+
 //----------------------------------------------------------------------------
 // InitTimemapNotesFunctor
 //----------------------------------------------------------------------------
@@ -200,6 +208,13 @@ public:
     bool ImplementsEndInterface() const override { return true; }
 
     /*
+     * Setter for various properties
+     */
+    ///@{
+    void SetNoCue(bool noCue) { m_noCue = noCue; }
+    ///@}
+    
+    /*
      * Functor interface
      */
     ///@{
@@ -215,8 +230,10 @@ private:
 public:
     //
 private:
-    // Grace note sequence
-    std::list<Note *> m_graceNotes;
+    // Indicates whether cue notes should be included
+    bool m_noCue;
+    // Grace note/chord sequence
+    std::list<GraceChord> m_graceNotes;
     // Indicates whether the last grace note/chord was accented
     bool m_accentedGraceNote;
 };
