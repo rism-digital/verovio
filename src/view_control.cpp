@@ -330,7 +330,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
 
         if (element->Is(ANNOTSCORE)) {
             // cast to AnnotScore check in DrawControlElementConnector
-            this->DrawAnnotScoreBox(dc, dynamic_cast<AnnotScore *>(element), x1, x2, staff, spanningType, graphic);
+            this->DrawAnnotScore(dc, dynamic_cast<AnnotScore *>(element), x1, x2, staff, spanningType, graphic);
         }
         else if (element->Is(DIR)) {
             // cast to Dir check in DrawControlElementConnector
@@ -449,7 +449,7 @@ bool View::HasValidTimeSpanningOrder(DeviceContext *dc, Object *element, LayerEl
     return true;
 }
 
-void View::DrawAnnotScoreBox(
+void View::DrawAnnotScore(
     DeviceContext *dc, AnnotScore *annotScore, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
     assert(dc);
@@ -471,7 +471,7 @@ void View::DrawAnnotScoreBox(
     }
 
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int lineWidth = annotScore->GetBoxHeight(m_doc, unit);
+    const int lineWidth = annotScore->GetBoxHeight(m_doc, unit) * 10;
 
     x1 += lineWidth / 2;
     x2 -= lineWidth / 2;
