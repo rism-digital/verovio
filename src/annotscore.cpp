@@ -32,7 +32,6 @@ AnnotScore::AnnotScore() : ControlElement(ANNOTSCORE, "annotscore-"), PlistInter
 {
     this->RegisterInterface(PlistInterface::GetAttClasses(), PlistInterface::IsInterface());
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    this->RegisterAttClass(ATT_PLIST);
 
     this->Reset();
 }
