@@ -18,6 +18,7 @@
 namespace vrv {
 
 class Accid;
+class AnnotScore;
 class Arpeg;
 class BarLine;
 class Beam;
@@ -471,6 +472,8 @@ protected:
     ///@{
     void DrawControlElementConnector(DeviceContext *dc, ControlElement *element, int x1, int x2, Staff *staff,
         char spanningType, Object *graphic = NULL);
+    void DrawAnnotScoreBox(DeviceContext *dc, AnnotScore *annotScore, int x1, int x2, Staff *staff, char spanningType,
+        Object *graphic = NULL);
     void DrawBracketSpan(DeviceContext *dc, BracketSpan *bracketSpan, int x1, int x2, Staff *staff, char spanningType,
         Object *graphic = NULL);
     void DrawFConnector(
