@@ -12,6 +12,7 @@
 #include "atts_shared.h"
 #include "controlelement.h"
 #include "editorial.h"
+#include "plistinterface.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -23,7 +24,7 @@ namespace vrv {
 /**
  * This class models the MEI <annot> element where @type is score.
  */
-class AnnotScore : public ControlElement, public TimeSpanningInterface, public AttPlist {
+class AnnotScore : public ControlElement, public PlistInterface, public TimeSpanningInterface {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -41,7 +42,9 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
+    PlistInterface *GetPlistInterface() override { return vrv_cast<PlistInterface *>(this); }
+    const PlistInterface *GetPlistInterface() const override { return vrv_cast<const PlistInterface *>(this); }
+   TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
     const TimePointInterface *GetTimePointInterface() const override
     {
         return vrv_cast<const TimePointInterface *>(this);
