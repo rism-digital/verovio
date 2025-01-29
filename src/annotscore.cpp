@@ -42,7 +42,7 @@ AnnotScore::~AnnotScore() {}
 void AnnotScore::Reset()
 {
     ControlElement::Reset();
-    this->ResetPlist();
+    PlistInterface::Reset();
     TimeSpanningInterface::Reset();
 }
 
