@@ -186,7 +186,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         BBoxDeviceContext *bBoxDC = vrv_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {
-            if (element->Is({ BRACKETSPAN, HAIRPIN, OCTAVE, PITCHINFLECTION })) return;
+            if (element->Is({ ANNOTSCORE, BRACKETSPAN, HAIRPIN, OCTAVE, PITCHINFLECTION })) return;
         }
     }
 
