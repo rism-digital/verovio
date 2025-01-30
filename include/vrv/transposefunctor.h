@@ -49,6 +49,7 @@ public:
     FunctorCode VisitNote(Note *note) override;
     FunctorCode VisitRest(Rest *rest) override;
     FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitStaffDef(StaffDef *staffDef) override;
     ///@}
 
 protected:

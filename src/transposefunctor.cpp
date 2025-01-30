@@ -226,12 +226,23 @@ FunctorCode TransposeFunctor::VisitScore(Score *score)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode TransposeFunctor::VisitStaffDef(StaffDef *staffDef)
+{
+    if (!this->GetKeySigForStaffDef(staffDef)) {
+        KeySig *keySig = new KeySig();
+        staffDef->AddChild(keySig);
+        LogWarning("Adding auxiliary KeySig for transposition");
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 const KeySig *TransposeFunctor::GetKeySigForStaffDef(const StaffDef *staffDef) const
 {
     const KeySig *keySig = vrv_cast<const KeySig *>(staffDef->FindDescendantByType(KEYSIG));
     if (!keySig) {
         const ScoreDef *scoreDef = vrv_cast<const ScoreDef *>(staffDef->GetFirstAncestor(SCOREDEF));
-        keySig = vrv_cast<const KeySig *>(scoreDef->FindDescendantByType(KEYSIG));
+        keySig = vrv_cast<const KeySig *>(scoreDef->FindDescendantByType(KEYSIG, 1));
     }
     return keySig;
 }
@@ -378,6 +389,9 @@ FunctorCode TransposeToSoundingPitchFunctor::VisitStaff(Staff *staff)
 
 FunctorCode TransposeToSoundingPitchFunctor::VisitStaffDef(StaffDef *staffDef)
 {
+    // Call base method (creates KeySig if missing)
+    TransposeFunctor::VisitStaffDef(staffDef);
+
     const KeySig *keySig = this->GetKeySigForStaffDef(staffDef);
 
     // Determine and store the transposition interval (based on keySig)
