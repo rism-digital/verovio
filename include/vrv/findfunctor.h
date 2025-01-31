@@ -409,7 +409,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    FindAllReferencedObjectsFunctor(ListOfObjects *elements);
+    FindAllReferencedObjectsFunctor(SetOfObjects *elements);
     virtual ~FindAllReferencedObjectsFunctor() = default;
     ///@}
 
@@ -437,8 +437,8 @@ private:
 public:
     //
 private:
-    // The array of all matching objects
-    ListOfObjects *m_elements;
+    // The set of all matching objects
+    SetOfObjects *m_elements;
     // A flag indicating if milestone references should be included as well
     bool m_milestoneReferences;
 };
