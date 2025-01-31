@@ -342,6 +342,10 @@ typedef std::list<Object *> ListOfObjects;
 
 typedef std::list<const Object *> ListOfConstObjects;
 
+typedef std::set<Object *> SetOfObjects;
+
+typedef std::set<const Object *> SetOfConstObjects;
+
 typedef std::vector<Note *> ChordNoteGroup;
 
 typedef std::vector<std::tuple<Alignment *, Alignment *, int>> ArrayOfAdjustmentTuples;

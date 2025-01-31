@@ -188,7 +188,6 @@ bool MEIOutput::Export()
         // When saving page-based MEI we also want to keep IDs for milestone elements
         findAllReferencedObjects.IncludeMilestoneReferences(this->IsPageBasedMEI());
         m_doc->Process(findAllReferencedObjects);
-        m_referredObjects.unique();
     }
 
     try {
@@ -1459,10 +1458,8 @@ std::string MEIOutput::IDToMeiStr(Object *element)
 
 void MEIOutput::WriteXmlId(pugi::xml_node currentNode, Object *object)
 {
-    if (m_removeIds) {
-        ListOfObjects::iterator it = std::find(m_referredObjects.begin(), m_referredObjects.end(), object);
-        if (it == m_referredObjects.end()) return;
-        m_referredObjects.erase(it);
+    if (m_removeIds && !m_referredObjects.contains(object)) {
+        return;
     }
     currentNode.append_attribute("xml:id") = IDToMeiStr(object).c_str();
 }
