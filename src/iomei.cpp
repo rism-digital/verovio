@@ -2662,6 +2662,7 @@ void MEIOutput::WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
         meterSigDefaultLog.WriteMeterSigDefaultLog(currentNode);
         InstMeterSigDefaultVis meterSigDefaultVis;
         meterSigDefaultVis.SetMeterForm(meterSig->GetForm());
+        meterSigDefaultVis.SetMeterVisible(meterSig->GetVisible());
         meterSigDefaultVis.WriteMeterSigDefaultVis(currentNode);
         return;
     }
