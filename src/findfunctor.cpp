@@ -14,7 +14,9 @@
 #include "object.h"
 #include "plistinterface.h"
 #include "score.h"
+#include "surface.h"
 #include "symboldef.h"
+#include "zone.h"
 
 namespace vrv {
 
@@ -272,6 +274,12 @@ FunctorCode FindAllReferencedObjectsFunctor::VisitObject(Object *object)
         assert(interface);
         if (interface->GetNextLink()) m_elements->insert(interface->GetNextLink());
         if (interface->GetSameasLink()) m_elements->insert(interface->GetSameasLink());
+    }
+    if (object->HasInterface(INTERFACE_FACSIMILE)) {
+        FacsimileInterface *interface = object->GetFacsimileInterface();
+        assert(interface);
+        if (interface->GetSurface()) m_elements->push_back(interface->GetSurface());
+        if (interface->GetZone()) m_elements->push_back(interface->GetZone());
     }
     if (object->HasInterface(INTERFACE_PLIST)) {
         PlistInterface *interface = object->GetPlistInterface();
