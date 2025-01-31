@@ -5,7 +5,7 @@
 * Support for `verse@place` for lyrics above the staff
 * Support for MIDI octave displacement without `@oct.ges` (@brdvd)
 * Option `--lyric-height-factor` to increase the spacing of the lyrics
-* Fix `symbolDef` losing `@xml:id`s (@rettinghaus)
+* Fix `symbolDef` losing `@xml:id`s with `--remove-ids` (@rettinghaus)
 
 ## [4.5.0] – 2024-12-22
 * Integration of tablature customization implementation
