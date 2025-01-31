@@ -56,9 +56,10 @@ public:
     }
 
     /**
-     * Get a value for the height of the drawn box
+     * Get a value for the height of the drawn box and the border width
      */
     int GetBoxHeight(const Doc *doc, int unit) const;
+    int GetLineWidth(const Doc *doc, int unit) const;
 
     /**
      * Add a text element to an annotation.

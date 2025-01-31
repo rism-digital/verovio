@@ -47,6 +47,14 @@ void AnnotScore::Reset()
 
 int AnnotScore::GetBoxHeight(const Doc *doc, int unit) const
 {
+    // This is the height of the visible box. This should use a more sensible metric (rastral size?)
+    int boxHeight = doc->GetOptions()->m_octaveLineThickness.GetValue() * unit * 10;
+    return boxHeight;
+}
+
+int AnnotScore::GetLineWidth(const Doc *doc, int unit) const
+{
+    // This is the width of the border of the visible box. This should use a more sensible metric, probably
     int boxHeight = doc->GetOptions()->m_octaveLineThickness.GetValue() * unit;
     return boxHeight;
 }
