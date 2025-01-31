@@ -2468,6 +2468,7 @@ void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
     clef->WriteOctave(currentNode);
     clef->WriteOctaveDisplacement(currentNode);
     clef->WriteStaffIdent(currentNode);
+    clef->WriteTypography(currentNode);
     clef->WriteVisibility(currentNode);
 }
 
@@ -2672,6 +2673,7 @@ void MEIOutput::WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
     meterSig->WriteEnclosingChars(currentNode);
     meterSig->WriteMeterSigLog(currentNode);
     meterSig->WriteMeterSigVis(currentNode);
+    meterSig->WriteTypography(currentNode);
     meterSig->WriteVisibility(currentNode);
 }
 
