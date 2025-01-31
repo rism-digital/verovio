@@ -44,9 +44,7 @@ std::string Att::IntToStr(int data) const
 
 std::string Att::VUToStr(data_VU data) const
 {
-    std::stringstream sstream;
-    sstream << round(data * 10000.0) / 10000.0 << "vu";
-    return sstream.str();
+    return DblToStr(data) + "vu";
 }
 
 // Basic converters for reading
