@@ -44,7 +44,7 @@ std::string Att::IntToStr(int data) const
 
 std::string Att::VUToStr(data_VU data) const
 {
-    return StringFormat("%fvu", data);
+    return DblToStr(data) + "vu";
 }
 
 // Basic converters for reading
@@ -416,7 +416,7 @@ std::string Att::MeasurementsignedToStr(data_MEASUREMENTSIGNED data) const
         value = StringFormat("%dpx", data.GetPx() / DEFINITION_FACTOR);
     }
     else if (data.GetType() == MEASUREMENTTYPE_vu) {
-        value = StringFormat("%.4fvu", data.GetVu());
+        value = VUToStr(data.GetVu());
     }
 
     return value;
