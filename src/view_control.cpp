@@ -475,8 +475,8 @@ void View::DrawAnnotScore(
     const int lineWidth = annotScore->GetLineWidth(m_doc, unit);
 
     //    dc->SetPen(m_currentColor, lineWidth, AxSOLID, 0, 0, AxCAP_BUTT, AxJOIN_MITER);
-    dc->SetPen(m_currentColor, 0, AxSOLID, 0, 0, AxCAP_BUTT, AxJOIN_MITER);
     dc->SetBrush(m_currentColor, AxSOLID);
+    dc->SetPen(m_currentColor, lineWidth, AxSOLID, 0, 0, AxCAP_BUTT, AxJOIN_MITER);
     Point boxOutline[4];
     switch (spanningType) {
         case SPANNING_START:
@@ -484,24 +484,24 @@ void View::DrawAnnotScore(
             if (!annotScore->GetStart()->Is(TIMESTAMP_ATTR)) {
                 x1 -= annotScore->GetStart()->GetDrawingRadius(m_doc);
             }
-            this->DrawFilledRectangle(dc, x1, y, x2, y + boxHeight);
-            dc->SetPen(m_currentColor, lineWidth, AxSOLID, 0, 0, AxCAP_BUTT, AxJOIN_MITER);
             boxOutline[0] = { ToDeviceContextX(x2), ToDeviceContextY(y) };
             boxOutline[1] = { ToDeviceContextX(x1), ToDeviceContextY(y) };
             boxOutline[2] = { ToDeviceContextX(x1), ToDeviceContextY(y + boxHeight) };
             boxOutline[3] = { ToDeviceContextX(x2), ToDeviceContextY(y + boxHeight) };
             dc->DrawPolyline(4, boxOutline);
+            dc->SetPen(m_currentColor, 0, AxSOLID, 0, 0, AxCAP_BUTT, AxJOIN_MITER);
+            this->DrawFilledRectangle(dc, x1, y, x2, y + boxHeight);
             break;
         case SPANNING_MIDDLE:
             // Draw a box with  both sides open (to show it continues)
             if (!annotScore->GetStart()->Is(TIMESTAMP_ATTR)) {
                 x1 -= annotScore->GetStart()->GetDrawingRadius(m_doc);
             }
-            this->DrawFilledRectangle(dc, x1, y, x2, y + boxHeight);
-            dc->SetPen(m_currentColor, lineWidth, AxSOLID, 0, 0, AxCAP_BUTT, AxJOIN_MITER);
             dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
             dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y + boxHeight), ToDeviceContextX(x2),
                 ToDeviceContextY(y + boxHeight));
+            dc->SetPen(m_currentColor, 0, AxSOLID, 0, 0, AxCAP_BUTT, AxJOIN_MITER);
+            this->DrawFilledRectangle(dc, x1, y, x2, y + boxHeight);
             break;
         case SPANNING_START_END:
             // Draw a closed box
@@ -519,6 +519,7 @@ void View::DrawAnnotScore(
             boxOutline[3] = { ToDeviceContextX(x2), ToDeviceContextY(y + boxHeight) };
             dc->DrawPolygon(4, boxOutline);
             // Drawing the rectangle afterwards because I can't work out how to make the polygon transparent
+            dc->SetPen(m_currentColor, 0, AxSOLID, 0, 0, AxCAP_BUTT, AxJOIN_MITER);
             this->DrawFilledRectangle(dc, x1, y, x2, y + boxHeight);
             break;
         case SPANNING_END:
@@ -526,13 +527,14 @@ void View::DrawAnnotScore(
             if (!annotScore->GetEnd()->Is(TIMESTAMP_ATTR)) {
                 x2 += annotScore->GetEnd()->GetDrawingRadius(m_doc);
             }
-            this->DrawFilledRectangle(dc, x1, y, x2, y + boxHeight);
             dc->SetPen(m_currentColor, lineWidth, AxSOLID, 0, 0, AxCAP_BUTT, AxJOIN_MITER);
             boxOutline[0] = { ToDeviceContextX(x1), ToDeviceContextY(y) };
             boxOutline[1] = { ToDeviceContextX(x2), ToDeviceContextY(y) };
             boxOutline[2] = { ToDeviceContextX(x2), ToDeviceContextY(y + boxHeight) };
             boxOutline[3] = { ToDeviceContextX(x1), ToDeviceContextY(y + boxHeight) };
             dc->DrawPolyline(4, boxOutline);
+            dc->SetPen(m_currentColor, 0, AxSOLID, 0, 0, AxCAP_BUTT, AxJOIN_MITER);
+            this->DrawFilledRectangle(dc, x1, y, x2, y + boxHeight);
             break;
     }
     dc->ResetPen();

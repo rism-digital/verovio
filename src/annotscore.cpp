@@ -55,7 +55,7 @@ int AnnotScore::GetBoxHeight(const Doc *doc, int unit) const
 int AnnotScore::GetLineWidth(const Doc *doc, int unit) const
 {
     // This is the width of the border of the visible box. This should use a more sensible metric, probably
-    int boxHeight = doc->GetOptions()->m_octaveLineThickness.GetValue() * unit;
+    int boxHeight = doc->GetOptions()->m_octaveLineThickness.GetValue() * unit * 2;
     return boxHeight;
 }
 
