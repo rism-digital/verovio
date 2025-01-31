@@ -14,6 +14,7 @@
 #include "object.h"
 #include "plistinterface.h"
 #include "score.h"
+#include "symboldef.h"
 
 namespace vrv {
 
@@ -261,6 +262,11 @@ FindAllReferencedObjectsFunctor::FindAllReferencedObjectsFunctor(ListOfObjects *
 
 FunctorCode FindAllReferencedObjectsFunctor::VisitObject(Object *object)
 {
+    if (object->HasInterface(INTERFACE_ALT_SYM)) {
+        AltSymInterface *interface = object->GetAltSymInterface();
+        assert(interface);
+        if (interface->GetAltSymbolDef()) m_elements->push_back(interface->GetAltSymbolDef());
+    }
     if (object->HasInterface(INTERFACE_LINKING)) {
         LinkingInterface *interface = object->GetLinkingInterface();
         assert(interface);
