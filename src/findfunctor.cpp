@@ -278,8 +278,8 @@ FunctorCode FindAllReferencedObjectsFunctor::VisitObject(Object *object)
     if (object->HasInterface(INTERFACE_FACSIMILE)) {
         FacsimileInterface *interface = object->GetFacsimileInterface();
         assert(interface);
-        if (interface->GetSurface()) m_elements->push_back(interface->GetSurface());
-        if (interface->GetZone()) m_elements->push_back(interface->GetZone());
+        if (interface->GetSurface()) m_elements->insert(interface->GetSurface());
+        if (interface->GetZone()) m_elements->insert(interface->GetZone());
     }
     if (object->HasInterface(INTERFACE_PLIST)) {
         PlistInterface *interface = object->GetPlistInterface();
