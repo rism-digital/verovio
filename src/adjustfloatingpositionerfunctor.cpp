@@ -270,7 +270,7 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitSystem(System *system)
 
     m_classId = CAESURA;
     system->m_systemAligner.Process(*this);
-    
+
     m_classId = ANNOTSCORE;
     system->m_systemAligner.Process(*this);
 
