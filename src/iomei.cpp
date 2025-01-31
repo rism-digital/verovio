@@ -8676,6 +8676,7 @@ bool MEIInput::ReadGraphic(Object *parent, pugi::xml_node graphic)
     vrvGraphic->ReadHeight(graphic);
     vrvGraphic->ReadTyped(graphic);
     parent->AddChild(vrvGraphic);
+    this->ReadUnsupportedAttr(graphic, vrvGraphic);
     return true;
 }
 
