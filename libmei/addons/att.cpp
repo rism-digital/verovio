@@ -631,7 +631,7 @@ data_ORIENTATION Att::StrToOrientation(const std::string &value, bool logWarning
 
 std::string Att::PercentToStr(data_PERCENT data) const
 {
-    return StringFormat("%.2f%%", data);
+    return DblToStr(data) + "%";
 }
 
 data_PERCENT Att::StrToPercent(const std::string &value, bool logWarning) const
@@ -646,7 +646,7 @@ data_PERCENT Att::StrToPercent(const std::string &value, bool logWarning) const
 
 std::string Att::PercentLimitedToStr(data_PERCENT_LIMITED data) const
 {
-    return StringFormat("%.2f%%", data);
+    return DblToStr(data) + "%";
 }
 
 data_PERCENT_LIMITED Att::StrToPercentLimited(const std::string &value, bool logWarning) const
@@ -661,7 +661,7 @@ data_PERCENT_LIMITED Att::StrToPercentLimited(const std::string &value, bool log
 
 std::string Att::PercentLimitedSignedToStr(data_PERCENT_LIMITED_SIGNED data) const
 {
-    return StringFormat("%.2f%%", data);
+    return DblToStr(data) + "%";
 }
 
 data_PERCENT_LIMITED_SIGNED Att::StrToPercentLimitedSigned(const std::string &value, bool logWarning) const
