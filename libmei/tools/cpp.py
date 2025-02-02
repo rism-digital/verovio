@@ -1159,7 +1159,7 @@ def create_att_module(cpp_ns: str, schema, outdir: Path):
                 else:
                     att_name_lower = att
 
-                attdefault, converters = vrv_getattdefault(schema.schema, module, gp, att)
+                _, converters = vrv_getattdefault(schema.schema, module, gp, att)
                 attsubstr = {
                     "attGroupNameUpper": schema.cc(schema.strpatt(gp)),
                     "attNameUpper": schema.cc(att),
