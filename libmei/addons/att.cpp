@@ -644,11 +644,6 @@ data_PERCENT Att::StrToPercent(const std::string &value, bool logWarning) const
     return atof(value.substr(0, value.find("%")).c_str());
 }
 
-std::string Att::PercentLimitedToStr(data_PERCENT_LIMITED data) const
-{
-    return DblToStr(data) + "%";
-}
-
 data_PERCENT_LIMITED Att::StrToPercentLimited(const std::string &value, bool logWarning) const
 {
     static const std::regex test("[0-9]+(\\.?[0-9]*)?%");
@@ -657,11 +652,6 @@ data_PERCENT_LIMITED Att::StrToPercentLimited(const std::string &value, bool log
         return 0;
     }
     return atof(value.substr(0, value.find("%")).c_str());
-}
-
-std::string Att::PercentLimitedSignedToStr(data_PERCENT_LIMITED_SIGNED data) const
-{
-    return DblToStr(data) + "%";
 }
 
 data_PERCENT_LIMITED_SIGNED Att::StrToPercentLimitedSigned(const std::string &value, bool logWarning) const
