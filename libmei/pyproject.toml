@@ -6,7 +6,7 @@ dependencies = [
     "lxml (>=5.3.0)",
 ]
 requires-python = ">=3.9"
-description = ""
+description = "LibMEI is a C++ library for reading and writing MEI files"
 authors = [
     {name = "Andrew Hankinson", email="andrew.hankinson@gmail.com"},
 ]
@@ -14,7 +14,7 @@ readme = "README.md"
 license = "MIT"
 
 [tool.poetry]
-packages = [{include = "poetry_demo"}]
+package-mode = false
 
 [build-system]
 requires = ["poetry-core>=2.0"]
