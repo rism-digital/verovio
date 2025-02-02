@@ -10,12 +10,9 @@ from pathlib import Path
 
 from schema import MeiSchema
 
-lg = logging.getLogger('schemaparser')
+lg = logging.getLogger("schemaparser")
 
-NS_PREFIX_MAP = {
-    "http://www.w3.org/XML/1998/namespace": "xml",
-    "http://www.w3.org/1999/xlink": "xlink"
-}
+NS_PREFIX_MAP = {"http://www.w3.org/XML/1998/namespace": "xml", "http://www.w3.org/1999/xlink": "xlink"}
 
 AUTHORS = "Andrew Hankinson, Alastair Porter, and Others"
 
@@ -584,8 +581,7 @@ COPYERS_END_CPP = """}}
 
 DATATYPES: dict
 
-TEI_RNG_NS = {"tei": "http://www.tei-c.org/ns/1.0",
-              "rng": "http://relaxng.org/ns/structure/1.0"}
+TEI_RNG_NS = {"tei": "http://www.tei-c.org/ns/1.0", "rng": "http://relaxng.org/ns/structure/1.0"}
 
 
 def vrv_member_cc(name: str) -> str:
@@ -598,7 +594,7 @@ def vrv_member_cc_upper(name: str) -> str:
 
 
 def vrv_converter_cc(name: str) -> str:
-    left, right = name.split('_', 1)
+    left, right = name.split("_", 1)
     rest = "".join([n[0].upper() + n[1:].lower() for n in right.split("_")])
     if left == "data":
         return rest
@@ -668,12 +664,16 @@ def vrv_getatttype(schema, module: str, gp: str, aname: str) -> str:
         return attype
 
     # No override, get it from the schema
-    definition = schema.xpath("//tei:classSpec[@ident=$gp]/tei:attList/tei:attDef[@ident=$name]", gp=gp, name=aname, namespaces=TEI_RNG_NS)
+    definition = schema.xpath(
+        "//tei:classSpec[@ident=$gp]/tei:attList/tei:attDef[@ident=$name]", gp=gp, name=aname, namespaces=TEI_RNG_NS
+    )
     if not definition:
         return "std::string"
 
     # First numbers
-    el = definition[0].xpath("tei:datatype/tei:dataRef/@name|tei:datatype/rng:data/@type", name=aname, namespaces=TEI_RNG_NS)
+    el = definition[0].xpath(
+        "tei:datatype/tei:dataRef/@name|tei:datatype/rng:data/@type", name=aname, namespaces=TEI_RNG_NS
+    )
     if el:
         if el[0] in ("integer", "positiveInteger", "nonNegativeInteger"):
             return "int"
@@ -681,7 +681,9 @@ def vrv_getatttype(schema, module: str, gp: str, aname: str) -> str:
             return "double"
 
     # The data types
-    ref = definition[0].xpath("tei:datatype/tei:dataRef/@key|tei:datatype/rng:ref/@name", gp=gp, name=aname, namespaces=TEI_RNG_NS)
+    ref = definition[0].xpath(
+        "tei:datatype/tei:dataRef/@key|tei:datatype/rng:ref/@name", gp=gp, name=aname, namespaces=TEI_RNG_NS
+    )
     if ref:
         return vrv_getformattedtype(f"{ref[0]}")
 
@@ -726,16 +728,16 @@ def vrv_getattdefault(schema, module: str, gp: str, aname: str) -> tuple:
 
 def create_docstr(text: str, indent: int = 0) -> str:
     """
-        Format a docstring. Take the first sentence (. followed by a space)
-        and use it for the brief. Then put the rest of the text after a blank
-        line if there is text there
+    Format a docstring. Take the first sentence (. followed by a space)
+    and use it for the brief. Then put the rest of the text after a blank
+    line if there is text there
     """
     text = text.strip()
     dotpos = text.find(". ")
 
     if dotpos > 0:
-        brief = text[:dotpos+1]
-        content = text[dotpos+2:]
+        brief = text[: dotpos + 1]
+        content = text[dotpos + 2 :]
     else:
         brief = text
         content = ""
@@ -810,7 +812,7 @@ def create_att_classes(cpp_ns: str, schema, outdir: Path):
                     "attType": att_type,
                     "attDefault": attdefault,
                     "converterRead": converters[0],
-                    "converterWrite": converters[1]
+                    "converterWrite": converters[1],
                 }
 
                 if len(methods) > 0:
@@ -844,7 +846,6 @@ def create_att_classes(cpp_ns: str, schema, outdir: Path):
                 "reads": "".join(reads),
                 "writes": "".join(writes),
                 "checkers": "".join(checkers),
-
             }
             header_classes.append(ATTCLASS_H.format_map(clsubstr).strip())
             impl_classes.append(ATTCLASS_CPP.format_map(clsubstr).strip())
@@ -852,13 +853,13 @@ def create_att_classes(cpp_ns: str, schema, outdir: Path):
 
         tplvars = {
             "includes": "#include <string>",
-            'license': LICENSE.format(authors=AUTHORS),
-            'moduleNameCaps': f"ATTS_{module.upper()}",
+            "license": LICENSE.format(authors=AUTHORS),
+            "moduleNameCaps": f"ATTS_{module.upper()}",
             "moduleNameCap": module.capitalize(),
             "moduleNameLower": f"atts_{module.lower()}",
-            'headerElements': "\n\n".join(header_classes),
-            'implElements': "\n\n".join(impl_classes),
-            'ns': cpp_ns
+            "headerElements": "\n\n".join(header_classes),
+            "implElements": "\n\n".join(impl_classes),
+            "ns": cpp_ns,
         }
 
         with Path(outdir, f"atts_{module.lower()}.h").open("w") as f_att_class_h:
@@ -899,16 +900,13 @@ def create_att_datatypes(cpp_ns: str, schema, outdir: Path):
             "meitype": data_type,
             "vrvtype": vrv_getformattedtype(data_type),
             "enumtype": " : int8_t" if len(values) < 64 else "",
-            "val_prefix":  val_prefix
+            "val_prefix": val_prefix,
         }
         att_type_data_types.append(TYPE_START.format_map(type_start_fmt))
 
         vrv_type = vrv_getformattedtype(data_type)
         vrv_fname = vrv_converter_cc(vrv_type)
-        converter_start_fmt = {
-            "type": vrv_type,
-            "fname": vrv_fname
-        }
+        converter_start_fmt = {"type": vrv_type, "fname": vrv_fname}
 
         att_converter_header_data_types.append(CONVERTER_METHODS_H.format_map(converter_start_fmt))
         att_converter_impl_from_converters.append(CONVERTER_METHOD1_START_CPP.format_map(converter_start_fmt))
@@ -917,11 +915,7 @@ def create_att_datatypes(cpp_ns: str, schema, outdir: Path):
         for v in values:
             val: str = re.sub(r"[\.\-\,]", "_", v)
             val = re.sub(r"\+", "plus", val)
-            val_fmt = {
-                "val_prefix": val_prefix,
-                "value": val,
-                "string": v
-            }
+            val_fmt = {"val_prefix": val_prefix, "value": val, "string": v}
 
             att_type_data_types.append(TYPE_VALUE.format_map(val_fmt))
             att_converter_impl_from_converters.append(CONVERTER_METHOD1_CPP.format_map(val_fmt))
@@ -929,10 +923,7 @@ def create_att_datatypes(cpp_ns: str, schema, outdir: Path):
 
         att_type_data_types.append(TYPE_END.format(val_prefix=val_prefix))
 
-        converter_end_fmt = {
-            "prefix": val_prefix,
-            "type": data_type
-        }
+        converter_end_fmt = {"prefix": val_prefix, "type": data_type}
         att_converter_impl_from_converters.append(CONVERTER_METHOD1_END_CPP.format_map(converter_end_fmt))
         att_converter_impl_to_converters.append(CONVERTER_METHOD2_END_CPP.format_map(converter_end_fmt))
 
@@ -950,21 +941,18 @@ def create_att_datatypes(cpp_ns: str, schema, outdir: Path):
             lg.debug("Skipping %s", list_type)
             continue
 
-        val_prefix = vrv_getformattedvallist(list_type.rsplit('@')[0], list_type.rsplit('@')[1])
+        val_prefix = vrv_getformattedvallist(list_type.rsplit("@")[0], list_type.rsplit("@")[1])
         type_start_fmt = {
             "meitype": list_type.replace("@", "\@"),
             "vrvtype": val_prefix,
             "enumtype": " : int8_t" if len(values) < 64 else "",
-            "val_prefix":  val_prefix
+            "val_prefix": val_prefix,
         }
         att_type_data_list.append(TYPE_START.format_map(type_start_fmt))
         vrv_type = val_prefix
         vrv_fname = vrv_converter_cc(vrv_type)
 
-        converter_start_fmt = {
-            "type": vrv_type,
-            "fname": vrv_fname
-        }
+        converter_start_fmt = {"type": vrv_type, "fname": vrv_fname}
         att_converter_header_data_list.append(CONVERTER_METHODS_H.format_map(converter_start_fmt))
         att_converter_impl_from_converters.append(CONVERTER_METHOD1_START_CPP.format_map(converter_start_fmt))
         att_converter_impl_to_converters.append(CONVERTER_METHOD2_START_CPP.format_map(converter_start_fmt))
@@ -972,11 +960,7 @@ def create_att_datatypes(cpp_ns: str, schema, outdir: Path):
         for v in values:
             val: str = re.sub(r"[\.\-\,]", "_", v)
             val = re.sub(r"\+", "plus", val)
-            val_fmt = {
-                "val_prefix": val_prefix,
-                "value": val,
-                "string": v
-            }
+            val_fmt = {"val_prefix": val_prefix, "value": val, "string": v}
             att_type_data_list.append(TYPE_VALUE.format_map(val_fmt))
             att_converter_impl_from_converters.append(CONVERTER_METHOD1_CPP.format_map(val_fmt))
             att_converter_impl_to_converters.append(CONVERTER_METHOD2_CPP.format_map(val_fmt))
@@ -1045,7 +1029,7 @@ def create_element_classes(cpp_ns: str, schema, outdir: Path):
                 "elementNameUpper": schema.cc(element),
                 "attClasses": "".join(element_att_classes),
                 "documentation": docstr.strip(),
-                "elementName": element
+                "elementName": element,
             }
 
             element_output.append(ELEMENTCLASS_H.format_map(elvars))
@@ -1062,7 +1046,7 @@ def create_element_classes(cpp_ns: str, schema, outdir: Path):
             "license": LICENSE.format(authors=AUTHORS),
             "ns": cpp_ns,
             "moduleNameCaps": module.upper().replace("-", "_"),
-            "headerElements": "".join(element_output).strip()
+            "headerElements": "".join(element_output).strip(),
         }
 
         with Path(outdir, f"{module.lower()}.h").open("w") as f_element_class_h:
@@ -1101,22 +1085,22 @@ def create_element_classes(cpp_ns: str, schema, outdir: Path):
             write_param = "pugi::xml_node element, const std::string &xmlId"
 
             consvars = {
-                'elementNameUpper': schema.cc(element),
-                'elementNameLower': element,
-                'attClasses': "".join(element_att_classes),
-                'elementRead': "".join(element_read),
-                'elementWrite': "".join(element_write),
-                'elementReset': "".join(element_reset),
-                'readParam': read_param,
-                'writeParam': write_param
+                "elementNameUpper": schema.cc(element),
+                "elementNameLower": element,
+                "attClasses": "".join(element_att_classes),
+                "elementRead": "".join(element_read),
+                "elementWrite": "".join(element_write),
+                "elementReset": "".join(element_reset),
+                "readParam": read_param,
+                "writeParam": write_param,
             }
             element_constructor.append(ELEMENTCLASS_CPP.format_map(consvars))
 
         implvars = {
-            'moduleNameLower': module.lower(),
-            'elements': "".join(element_constructor),
-            'license': LICENSE.format(authors=AUTHORS),
-            'ns': cpp_ns
+            "moduleNameLower": module.lower(),
+            "elements": "".join(element_constructor),
+            "license": LICENSE.format(authors=AUTHORS),
+            "ns": cpp_ns,
         }
 
         with Path(outdir, f"{module.lower()}.cpp").open("w") as f_element_class_cpp:
@@ -1144,7 +1128,7 @@ def create_att_module(cpp_ns: str, schema, outdir: Path):
 
             set_get_fmt = {
                 "attGroupNameUpper": schema.cc(schema.strpatt(gp)),
-                "attId": f"ATT_{schema.cc(schema.strpatt(gp)).upper()}"
+                "attId": f"ATT_{schema.cc(schema.strpatt(gp)).upper()}",
             }
             setters.append(SETTERS_GRP_START_CPP.format_map(set_get_fmt))
             getters.append(GETTERS_GRP_START_CPP.format_map(set_get_fmt))
@@ -1166,7 +1150,7 @@ def create_att_module(cpp_ns: str, schema, outdir: Path):
                     "attNameLower": att_name_lower,
                     "attNameLowerJoined": vrv_member_cc(att),
                     "converterRead": converters[0],
-                    "converterWrite": converters[1]
+                    "converterWrite": converters[1],
                 }
                 setters.append(SETTERS_GRP_CPP.format_map(attsubstr))
                 getters.append(GETTERS_GRP_CPP.format_map(attsubstr))
@@ -1285,10 +1269,10 @@ def create_basic_validator(configure: dict, outdir: Path):
                 attrlist.append(att)
 
         if attrlist:
-            fmt_attr = "\", \"".join(attrlist)
+            fmt_attr = '", "'.join(attrlist)
             fmt_attr_str = f'{{"{fmt_attr}"}}'
         else:
-            fmt_attr_str = '{}'
+            fmt_attr_str = "{}"
 
         fmt_attr_map = f'        {{"{elname}", {fmt_attr_str}}},\n'
         formatted_attr_map.append(fmt_attr_map)
