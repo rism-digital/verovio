@@ -1,9 +1,9 @@
 LibMEI
 ------
 
-LibMEI is a C++ library for reading and writing [MEI](http://music-encoding.org) files
+LibMEI is a C++ library for reading and writing [MEI](https://music-encoding.org/) files
 
-It was originally developed by the [Distributed Digital Music Archives and Libraries Lab](http://ddmal.music.mcgill.ca/) at the Schulich School of Music at McGill University, Montréal, Canada
+It was originally developed by the [Distributed Digital Music Archives and Libraries Lab](https://ddmal.music.mcgill.ca/) at the Schulich School of Music at McGill University, Montréal, Canada
 
 This is a modified version that is used for generating C++ code for Verovio.
 
