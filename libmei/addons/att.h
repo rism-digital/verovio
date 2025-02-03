@@ -90,8 +90,11 @@ public:
     std::string MeasurementsignedToStr(data_MEASUREMENTSIGNED data) const;
     data_MEASUREMENTSIGNED StrToMeasurementsigned(const std::string &value, bool logWarning = true) const;
 
-    std::string MeasurementunsignedToStr(data_MEASUREMENTUNSIGNED data) const { return MeasurementsignedToStr(data); }
-    data_MEASUREMENTUNSIGNED StrToMeasurementunsigned(const std::string &value, bool logWarning = true) const
+    inline std::string MeasurementunsignedToStr(data_MEASUREMENTUNSIGNED data) const
+    {
+        return MeasurementsignedToStr(data);
+    }
+    inline data_MEASUREMENTUNSIGNED StrToMeasurementunsigned(const std::string &value, bool logWarning = true) const
     {
         return StrToMeasurementsigned(value, logWarning);
     }
