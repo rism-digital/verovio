@@ -818,13 +818,12 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     m_doc.PrepareData();
     m_doc.InitSelectionDoc(m_docSelection, true);
 
-    if (m_options->m_mensuralScoreUp.GetValue()) {
-        m_doc.ScoringUpDoc();
-        // m_doc.ConvertToCastOffMensuralDoc(true);
-    }
-
     // Convert pseudo-measures into distinct segments based on barLine elements
     if (m_doc.IsMensuralMusicOnly()) {
+        if (m_options->m_mensuralScoreUp.GetValue()) {
+            m_doc.ScoringUpDoc();
+        }
+        m_doc.ConvertToCastOffMensuralDoc(true);
         if (m_options->m_mensuralResponsiveView.GetValue()) {
             m_doc.ConvertToMensuralViewDoc();
         }
