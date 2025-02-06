@@ -6,16 +6,17 @@ Pod::Spec.new do |s|
   s.authors        = { 'Contributors List' => 'https://github.com/rism-digital/verovio/graphs/contributors' }
   s.summary        = 'Verovio'
   s.source         = { :git => 'https://github.com/rism-digital/verovio.git', :tag => 'version-' + s.version.to_s }
-  s.swift_versions = ['3.0', '4.0', '4.1', '4.2', '5.0', '5.1', '5.2', '5.3', '5.4', '5.5', '5.6', '5.7']
-  s.source_files        = 'src/**/*.{h,cpp,cc}',
-                        'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
-                        'libmei/{dist,addons}/*.{h,cpp}'
+  s.source_files   = 'src/**/*.{h,cpp,cc}',
+      'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
+      'libmei/{dist,addons}/*.{h,cpp}'
   s.public_header_files = 'src/**/*.{h}',
-                          'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
-                          'libmei/{dist,addons}/*.{h}'
+      'include/{crc, hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
+      'libmei/{dist,addons}/*.{h}'
+  s.private_header_files = 'include/{crc, hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
+      'libmei/{dist,addons}/*.{h}'
   s.resources      = 'data'
-  s.ios.deployment_target = '14.0'
-  s.osx.deployment_target = '10.15'
+  s.ios.deployment_target = '16.0'
+  s.osx.deployment_target = '11.0'
   s.pod_target_xcconfig = {
       "CLANG_CXX_LANGUAGE_STANDARD" => "c++20",
       "CLANG_CXX_LIBRARY" => "libc++",
