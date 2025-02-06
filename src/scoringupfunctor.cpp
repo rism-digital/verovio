@@ -308,7 +308,7 @@ ArrayOfElementDurPairs ScoringUpFunctor::GetBoundedNotes(
 double ScoringUpFunctor::GetDurNumberValue(
     const std::pair<LayerElement *, data_DURATION> &elementDurPair, bool followedByDot, LayerElement *nextElement)
 {
-    data_DURQUALITY_mensural durquality;
+    data_DURQUALITY_mensural durquality = DURQUALITY_mensural_NONE;
     data_DURATION dur = elementDurPair.second;
     LayerElement *element = elementDurPair.first;
     Note *note;
