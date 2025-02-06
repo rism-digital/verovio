@@ -3115,8 +3115,6 @@
 		E765675628BBF9CD00BC6490 /* functors */ = {
 			isa = PBXGroup;
 			children = (
-				B464F4922C6D665300A778D2 /* scoringupfunctor.h */,
-				B464F48E2C6D664300A778D2 /* scoringupfunctor.cpp */,
 				E786CD09298AA3BC009BAC58 /* horizontal-layout */,
 				E786CD0A298AA3D8009BAC58 /* vertical-layout */,
 				E7908EA12985829F0004C1F9 /* alignfunctor.cpp */,
@@ -3146,6 +3144,8 @@
 				E71EF3C22975E4DC00D36264 /* resetfunctor.h */,
 				E7F1C36629F0345D007E12C1 /* savefunctor.cpp */,
 				E7F1C36329F033FB007E12C1 /* savefunctor.h */,
+				B464F4922C6D665300A778D2 /* scoringupfunctor.h */,
+				B464F48E2C6D664300A778D2 /* scoringupfunctor.cpp */,
 				E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */,
 				E7D33899293E057100C40B81 /* setscoredeffunctor.h */,
 				E73E86272A069C920089DF74 /* transposefunctor.cpp */,
