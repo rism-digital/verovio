@@ -32,7 +32,6 @@ namespace vrv {
 
 ScoringUpFunctor::ScoringUpFunctor() : Functor()
 {
-    m_currentScoreTime = 0.0;
     m_currentMensur = NULL;
     m_modusMaior = 2;
     m_modusMinor = 2;
@@ -48,7 +47,6 @@ ScoringUpFunctor::ScoringUpFunctor() : Functor()
 
 FunctorCode ScoringUpFunctor::VisitLayerEnd(Layer *layer)
 {
-    m_currentScoreTime = 0.0;
     // Add the last passage (as there won't be any more changes in mensuration)
     m_voiceData.insert(m_voiceData.end(), { m_mensurAsTuplet, m_dursInVoiceWithSameMensur });
     // Start: (assumption, mensuration is defined in layer, even the starting one; staffDef mensuration definitions will
