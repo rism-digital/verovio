@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+* Switching to MEI 5.1
+* Implementation of mensural notation scoring up with `--mensural-score-up` (@martha-thomae)
 * Support for `cpMark` (_colla parte_)
 * Support for `verse@place` for lyrics above the staff
 * Support for MIDI octave displacement without `@oct.ges` (@brdvd)
