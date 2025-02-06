@@ -106,30 +106,10 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
         m_voiceData.insert(m_voiceData.end(), { m_mensurAsTuplet, m_dursInVoiceWithSameMensur });
         // and (2) start collecting the data for the new passage
         this->m_currentMensur = vrv_cast<Mensur *>(element);
-        if (m_currentMensur->GetModusmaior() == MODUSMAIOR_3) {
-            m_modusMaior = 3;
-        }
-        else {
-            m_modusMaior = 2;
-        }
-        if (m_currentMensur->GetModusminor() == MODUSMINOR_3) {
-            m_modusMinor = 3;
-        }
-        else {
-            m_modusMinor = 2;
-        }
-        if (m_currentMensur->GetTempus() == TEMPUS_3) {
-            m_tempus = 3;
-        }
-        else {
-            m_tempus = 2;
-        }
-        if (m_currentMensur->GetProlatio() == PROLATIO_3) {
-            m_prolatio = 3;
-        }
-        else {
-            m_prolatio = 2;
-        }
+        m_modusMaior = abs(m_currentMensur->GetModusmaior());
+        m_modusMinor = abs(m_currentMensur->GetModusminor());
+        m_tempus = abs(m_currentMensur->GetTempus());
+        m_prolatio = abs(m_currentMensur->GetProlatio());
         // Establish the mensuration of the new passage and empty the m_dursInVoiceWithSameMensur vector to start
         // collecting the notes, rests, and dots in the new passage
         m_mensurAsTuplet = { m_modusMaior, m_modusMinor, m_tempus, m_prolatio };
