@@ -168,7 +168,7 @@ void DeviceContext::SetBrush(int color, int opacity)
 
     switch (opacity) {
         case AxSOLID: opacityValue = 1.0; break;
-        case AxTRANSPARENT: opacityValue = 0.0; break;
+        case AxTRANSPARENT: opacityValue = .5; break;
         default: opacityValue = 1.0; // solid brush by default
     }
 

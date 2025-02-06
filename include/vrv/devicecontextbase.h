@@ -30,7 +30,7 @@ class Doc;
 #undef max
 #undef min
 
-enum {
+enum PenStyles : int8_t  {
     /*  Pen styles */
     AxSOLID = 100,
     AxDOT,
@@ -41,7 +41,7 @@ enum {
     AxTRANSPARENT
 };
 
-enum {
+enum LineCapStyles : int8_t {
     /* Line cap styles */
     AxCAP_UNKNOWN = 0,
     AxCAP_BUTT,
@@ -49,7 +49,7 @@ enum {
     AxCAP_SQUARE
 };
 
-enum {
+enum LineJoinStyles : int8_t {
     /* Line join styles */
     AxJOIN_UNKNOWN = 0,
     AxJOIN_ARCS,
@@ -57,6 +57,12 @@ enum {
     AxJOIN_MITER,
     AxJOIN_MITER_CLIP,
     AxJOIN_ROUND
+};
+
+enum BrushOpacity : int8_t  {
+    /*  Pen styles */
+    BRUSH_TRANSPARENT = 0,
+    BRUSH_SOLID = 100,
 };
 
 // ---------------------------------------------------------------------------
@@ -101,7 +107,10 @@ public:
     void SetOpacity(float opacity) { m_penOpacity = opacity; }
 
 private:
-    int m_penColor, m_penWidth, m_dashLength, m_gapLength, m_lineCap, m_lineJoin;
+    int m_penColor, m_dashLength, m_gapLength;
+    PenStyle m_penWidth,
+    LineCapStyle m_lineCap;
+    LineJoinStyle m_lineJoin;
     float m_penOpacity;
 };
 
