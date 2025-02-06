@@ -93,7 +93,13 @@ public:
 protected:
     //
 private:
-    //
+    // Simplified structure for a Mensur
+    struct MensInfo {
+        int prolatio = 2;
+        int tempus = 2;
+        int modusminor = 2;
+        int modusmaior = 2;
+    };
 
 public:
     //
@@ -103,15 +109,12 @@ private:
     double m_currentScoreTime;
     // The current Mensur
     Mensur *m_currentMensur;
-    int m_modusMaior;
-    int m_modusMinor;
-    int m_tempus;
-    int m_prolatio;
-    std::tuple<int, int, int, int> m_mensurAsTuplet;
-    // The data of each voice in the form of an array of pairs made up of 'mensuration' {m_modusMaior, m_modusMinor,
-    // m_tempus, m_prolatio} and the notes/rests/dots in that voice that follows that mensuration
+    // The current mensuration info
+    MensInfo m_mensInfo;
+    // The data of each voice in the form of an array of pairs made up of mensuratin info
+    // and the notes/rests/dots in that voice that follows that mensuration
     // (m_dursInVoiceWithSameMensur)
-    std::vector<std::pair<std::tuple<int, int, int, int>, ArrayOfElementDurPairs>> m_voiceData;
+    std::vector<std::pair<MensInfo, ArrayOfElementDurPairs>> m_voiceData;
     // Vector of pairs of elements (that are notes, rests, or dots) and their durations
     ArrayOfElementDurPairs m_dursInVoiceWithSameMensur;
     // Vector of vectors of pairs of elements (that are notes, rests, or dots) and their durations

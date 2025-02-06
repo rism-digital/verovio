@@ -33,12 +33,7 @@ namespace vrv {
 ScoringUpFunctor::ScoringUpFunctor() : Functor()
 {
     m_currentMensur = NULL;
-    m_modusMaior = 2;
-    m_modusMinor = 2;
-    m_tempus = 2;
-    m_prolatio = 2;
-    m_mensurAsTuplet = { 0, 0, 0, 0 };
-    std::vector<std::pair<std::tuple<int, int, int, int>, ArrayOfElementDurPairs>> m_voiceData = {};
+    std::vector<std::pair<MensInfo, ArrayOfElementDurPairs>> m_voiceData = {};
     ArrayOfElementDurPairs m_dursInVoiceWithSameMensur = {};
     std::vector<ArrayOfElementDurPairs> m_listOfSequences = {};
     std::list<std::pair<Note *, Dot *>> m_listOfAugNotesDotsPairs = {};
@@ -48,33 +43,28 @@ ScoringUpFunctor::ScoringUpFunctor() : Functor()
 FunctorCode ScoringUpFunctor::VisitLayerEnd(Layer *layer)
 {
     // Add the last passage (as there won't be any more changes in mensuration)
-    m_voiceData.insert(m_voiceData.end(), { m_mensurAsTuplet, m_dursInVoiceWithSameMensur });
+    m_voiceData.insert(m_voiceData.end(), { m_mensInfo, m_dursInVoiceWithSameMensur });
     // Start: (assumption, mensuration is defined in layer, even the starting one; staffDef mensuration definitions will
     // be ignored for now)
-    for (std::pair<std::tuple<int, int, int, int>, ArrayOfElementDurPairs> mensurPassage : m_voiceData) {
-        m_mensurAsTuplet = mensurPassage.first;
+    for (std::pair<MensInfo, ArrayOfElementDurPairs> mensurPassage : m_voiceData) {
+        m_mensInfo = mensurPassage.first;
         ArrayOfElementDurPairs dursInVoiceWithSameMensur = mensurPassage.second;
-        m_modusMaior = std::get<0>(m_mensurAsTuplet);
-        m_modusMinor = std::get<1>(m_mensurAsTuplet);
-        m_tempus = std::get<2>(m_mensurAsTuplet);
-        m_prolatio = std::get<3>(m_mensurAsTuplet);
         // Process each perfect mensuration passage from lowest to highest note level
-        if (m_prolatio == 3) {
+        if (m_mensInfo.prolatio == 3) {
             ProcessPerfectMensurPassage(dursInVoiceWithSameMensur, DURATION_semibrevis);
         }
-        if (m_tempus == 3) {
+        if (m_mensInfo.tempus == 3) {
             ProcessPerfectMensurPassage(dursInVoiceWithSameMensur, DURATION_brevis);
         }
-        if (m_modusMinor == 3) {
+        if (m_mensInfo.modusminor == 3) {
             ProcessPerfectMensurPassage(dursInVoiceWithSameMensur, DURATION_longa);
         }
-        if (m_modusMaior == 3) {
+        if (m_mensInfo.modusmaior == 3) {
             ProcessPerfectMensurPassage(dursInVoiceWithSameMensur, DURATION_maxima);
         }
     }
     // restart for next voice (layer)
     m_voiceData = {};
-    m_mensurAsTuplet = { 0, 0, 0, 0 };
     m_dursInVoiceWithSameMensur = {};
 
     return FUNCTOR_CONTINUE;
@@ -103,16 +93,15 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
     else if (element->Is(MENSUR)) {
         // The new mensuration indicates the end of the passage with the old mensuration;
         // therefore, (1) let's store the old passage and its mensuration,
-        m_voiceData.insert(m_voiceData.end(), { m_mensurAsTuplet, m_dursInVoiceWithSameMensur });
+        m_voiceData.insert(m_voiceData.end(), { m_mensInfo, m_dursInVoiceWithSameMensur });
         // and (2) start collecting the data for the new passage
         this->m_currentMensur = vrv_cast<Mensur *>(element);
-        m_modusMaior = abs(m_currentMensur->GetModusmaior());
-        m_modusMinor = abs(m_currentMensur->GetModusminor());
-        m_tempus = abs(m_currentMensur->GetTempus());
-        m_prolatio = abs(m_currentMensur->GetProlatio());
+        m_mensInfo.modusmaior = abs(m_currentMensur->GetModusmaior());
+        m_mensInfo.modusminor = abs(m_currentMensur->GetModusminor());
+        m_mensInfo.tempus = abs(m_currentMensur->GetTempus());
+        m_mensInfo.prolatio = abs(m_currentMensur->GetProlatio());
         // Establish the mensuration of the new passage and empty the m_dursInVoiceWithSameMensur vector to start
         // collecting the notes, rests, and dots in the new passage
-        m_mensurAsTuplet = { m_modusMaior, m_modusMinor, m_tempus, m_prolatio };
         m_dursInVoiceWithSameMensur = {};
     }
     return FUNCTOR_CONTINUE;
@@ -328,29 +317,29 @@ double ScoringUpFunctor::GetDurNumberValue(
         assert(note);
         durquality = note->GetDurQuality();
     }
-    int longaDefaultVal = m_modusMinor * m_tempus * m_prolatio;
-    int brevisDefaultVal = m_tempus * m_prolatio;
-    int semibrevisDefaultVal = m_prolatio;
+    int longaDefaultVal = m_mensInfo.modusminor * m_mensInfo.tempus * m_mensInfo.prolatio;
+    int brevisDefaultVal = m_mensInfo.tempus * m_mensInfo.prolatio;
+    int semibrevisDefaultVal = m_mensInfo.prolatio;
     double durnum = 0;
     switch (dur) {
         case DURATION_longa:
             if (durquality == DURQUALITY_mensural_altera) {
                 durnum = 2 * longaDefaultVal;
             }
-            else if (m_modusMinor == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
+            else if (m_mensInfo.modusminor == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
                 durnum = 3 * brevisDefaultVal;
-                if (m_modusMinor == 2 && followedByDot) {
+                if (m_mensInfo.modusminor == 2 && followedByDot) {
                     // Candidate for augmentation (<dot form="aug"> and @num="2", @numbase="3")
                     Dot *dot = vrv_cast<Dot *>(nextElement);
                     m_listOfAugNotesDotsPairs.push_back({ note, dot });
                 }
-                else if (m_modusMinor == 3 && followedByDot) {
+                else if (m_mensInfo.modusminor == 3 && followedByDot) {
                     // Candidate for dot of perfection (<dot form="div"> and @dur.quality="perfecta")
                     Dot *dot = vrv_cast<Dot *>(nextElement);
                     m_listOfPerfNotesDotsPairs.push_back({ note, dot });
                 }
             }
-            else if (m_modusMinor == 2 || durquality == DURQUALITY_mensural_imperfecta) {
+            else if (m_mensInfo.modusminor == 2 || durquality == DURQUALITY_mensural_imperfecta) {
                 durnum = 2 * brevisDefaultVal;
             }
             break;
@@ -358,20 +347,20 @@ double ScoringUpFunctor::GetDurNumberValue(
             if (durquality == DURQUALITY_mensural_altera) {
                 durnum = 2 * brevisDefaultVal;
             }
-            else if (m_tempus == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
+            else if (m_mensInfo.tempus == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
                 durnum = 3 * semibrevisDefaultVal;
-                if (m_tempus == 2 && followedByDot) {
+                if (m_mensInfo.tempus == 2 && followedByDot) {
                     // Candidate for augmentation (<dot form="aug"> and @num="2", @numbase="3")
                     Dot *dot = vrv_cast<Dot *>(nextElement);
                     m_listOfAugNotesDotsPairs.push_back({ note, dot });
                 }
-                else if (m_tempus == 3 && followedByDot) {
+                else if (m_mensInfo.tempus == 3 && followedByDot) {
                     // Candidate for dot of perfection (<dot form="div"> and @dur.quality="perfecta")
                     Dot *dot = vrv_cast<Dot *>(nextElement);
                     m_listOfPerfNotesDotsPairs.push_back({ note, dot });
                 }
             }
-            else if (m_tempus == 2 || durquality == DURQUALITY_mensural_imperfecta) {
+            else if (m_mensInfo.tempus == 2 || durquality == DURQUALITY_mensural_imperfecta) {
                 durnum = 2 * semibrevisDefaultVal;
             }
             break;
@@ -379,20 +368,20 @@ double ScoringUpFunctor::GetDurNumberValue(
             if (durquality == DURQUALITY_mensural_altera) {
                 durnum = 2 * semibrevisDefaultVal;
             }
-            else if (m_prolatio == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
+            else if (m_mensInfo.prolatio == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
                 durnum = 3;
-                if (m_prolatio == 2 && followedByDot) {
+                if (m_mensInfo.prolatio == 2 && followedByDot) {
                     // Candidate for augmentation (<dot form="aug"> and @num="2", @numbase="3")
                     Dot *dot = vrv_cast<Dot *>(nextElement);
                     m_listOfAugNotesDotsPairs.push_back({ note, dot });
                 }
-                else if (m_prolatio == 3 && followedByDot) {
+                else if (m_mensInfo.prolatio == 3 && followedByDot) {
                     // Candidate for dot of perfection (<dot form="div"> and @dur.quality="perfecta")
                     Dot *dot = vrv_cast<Dot *>(nextElement);
                     m_listOfPerfNotesDotsPairs.push_back({ note, dot });
                 }
             }
-            else if (m_prolatio == 2 || durquality == DURQUALITY_mensural_imperfecta) {
+            else if (m_mensInfo.prolatio == 2 || durquality == DURQUALITY_mensural_imperfecta) {
                 durnum = 2;
             }
             break;
@@ -468,13 +457,13 @@ double ScoringUpFunctor::GetValueInUnit(double valueInMinims, data_DURATION unit
         valueInUnit = valueInMinims;
     }
     else if (unit == DURATION_brevis) {
-        valueInUnit = valueInMinims / (m_prolatio);
+        valueInUnit = valueInMinims / (m_mensInfo.prolatio);
     }
     else if (unit == DURATION_longa) {
-        valueInUnit = valueInMinims / (m_prolatio * m_tempus);
+        valueInUnit = valueInMinims / (m_mensInfo.prolatio * m_mensInfo.tempus);
     }
     else if (unit == DURATION_maxima) {
-        valueInUnit = valueInMinims / (m_prolatio * m_tempus * m_modusMinor);
+        valueInUnit = valueInMinims / (m_mensInfo.prolatio * m_mensInfo.tempus * m_mensInfo.modusminor);
     }
     return valueInUnit;
 }
