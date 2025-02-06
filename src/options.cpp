@@ -1371,6 +1371,10 @@ Options::Options()
     m_lyricElision.Init(ELISION_regular, &Option::s_elision);
     this->Register(&m_lyricElision, "lyricElision", &m_generalLayout);
 
+    m_lyricHeightFactor.SetInfo("Lyric height factor", "The lyric verse line height factor");
+    m_lyricHeightFactor.Init(1.0, 1.0, 20.0);
+    this->Register(&m_lyricHeightFactor, "lyricHeightFactor", &m_generalLayout);
+
     m_lyricLineThickness.SetInfo("Lyric line thickness", "The lyric extender line thickness");
     m_lyricLineThickness.Init(0.25, 0.10, 0.50);
     this->Register(&m_lyricLineThickness, "lyricLineThickness", &m_generalLayout);
@@ -1836,6 +1840,11 @@ Options::Options()
     m_mensuralToCmn.SetInfo("Mensural to CMN", "Convert mensural sections to CMN measure-based MEI");
     m_mensuralToCmn.Init(false);
     this->Register(&m_mensuralToCmn, "mensuralToCmn", &m_mensural);
+
+    m_mensuralScoreUp.SetInfo(
+        "Mensural scoring up", "Score up the mensural voices by providing a dur.quality to the notes");
+    m_mensuralScoreUp.Init(false);
+    this->Register(&m_mensuralScoreUp, "mensuralScoreUp", &m_mensural);
 
     /********* Method JSON options to the command-line *********/
 

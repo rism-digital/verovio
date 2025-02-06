@@ -1041,7 +1041,8 @@ FunctorCode PrepareLyricsFunctor::VisitSyl(Syl *syl)
 {
     Verse *verse = vrv_cast<Verse *>(syl->GetFirstAncestor(VERSE, MAX_NOTE_DEPTH));
     if (verse) {
-        syl->m_drawingVerse = std::max(verse->GetN(), 1);
+        syl->m_drawingVerseN = std::max(verse->GetN(), 1);
+        syl->m_drawingVersePlace = verse->GetPlace();
     }
 
     syl->SetStart(vrv_cast<LayerElement *>(syl->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH)));

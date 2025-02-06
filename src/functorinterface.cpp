@@ -24,6 +24,7 @@
 #include "chord.h"
 #include "clef.h"
 #include "course.h"
+#include "cpmark.h"
 #include "custos.h"
 #include "dir.h"
 #include "div.h"
@@ -548,6 +549,16 @@ FunctorCode FunctorInterface::VisitControlElement(ControlElement *controlElement
 FunctorCode FunctorInterface::VisitControlElementEnd(ControlElement *controlElement)
 {
     return this->VisitFloatingObjectEnd(controlElement);
+}
+
+FunctorCode FunctorInterface::VisitCpMark(CpMark *cpMark)
+{
+    return this->VisitControlElement(cpMark);
+}
+
+FunctorCode FunctorInterface::VisitCpMarkEnd(CpMark *cpMark)
+{
+    return this->VisitControlElementEnd(cpMark);
 }
 
 FunctorCode FunctorInterface::VisitDir(Dir *dir)
@@ -1882,6 +1893,16 @@ FunctorCode ConstFunctorInterface::VisitControlElement(const ControlElement *con
 FunctorCode ConstFunctorInterface::VisitControlElementEnd(const ControlElement *controlElement)
 {
     return this->VisitFloatingObjectEnd(controlElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitCpMark(const CpMark *cpMark)
+{
+    return this->VisitControlElement(cpMark);
+}
+
+FunctorCode ConstFunctorInterface::VisitCpMarkEnd(const CpMark *cpMark)
+{
+    return this->VisitControlElementEnd(cpMark);
 }
 
 FunctorCode ConstFunctorInterface::VisitDir(const Dir *dir)

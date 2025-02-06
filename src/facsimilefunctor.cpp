@@ -184,7 +184,7 @@ FunctorCode SyncFromFacsimileFunctor::VisitStaff(Staff *staff)
         m_staffZones[staff] = zone;
 
         // The staff slope is going up. The y left position needs to be adjusted accordingly
-        if (zone->GetRotate() < 0) {
+        if (zone->HasRotate() && zone->GetRotate() < 0) {
             staff->m_drawingFacsY = staff->m_drawingFacsY
                 + (m_currentNeumeLine->m_drawingFacsX2 - m_currentNeumeLine->m_drawingFacsX1)
                     * tan(zone->GetRotate() * M_PI / 180.0);

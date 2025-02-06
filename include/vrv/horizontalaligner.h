@@ -110,6 +110,14 @@ public:
     ///@}
 
     /**
+     * @name Weak ordering: for alignments in the same measure it is based on time, otherwise on the measure order
+     */
+    ///@{
+    bool operator==(const Alignment &other) const;
+    std::weak_ordering operator<=>(const Alignment &other) const;
+    ///@}
+
+    /**
      * Add the LayerElement to the appropriate AlignmentReference child.
      * Looks at the cross-staff situation (@staff or parent @staff).
      * Return true if the AlignmentReference holds more than one layer

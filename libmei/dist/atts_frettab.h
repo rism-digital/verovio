@@ -56,7 +56,7 @@ public:
     ///@}
 
 private:
-    /** Indicates a tuning standard for the course. **/
+    /** Describes the tuning standard used. **/
     data_COURSETUNING m_tuningStandard;
 };
 

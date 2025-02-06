@@ -49,10 +49,18 @@ public:
     FunctorCode VisitNote(Note *note) override;
     FunctorCode VisitRest(Rest *rest) override;
     FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitStaffDef(StaffDef *staffDef) override;
     ///@}
 
 protected:
-    //
+    /*
+     * Retrieve corresponding elements
+     */
+    ///@{
+    const KeySig *GetKeySigForStaffDef(const StaffDef *staffDef) const;
+    int GetStaffNForKeySig(const KeySig *keySig) const;
+    ///@}
+
 private:
     //
 public:

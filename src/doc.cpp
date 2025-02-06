@@ -54,6 +54,7 @@
 #include "resetfunctor.h"
 #include "runningelement.h"
 #include "score.h"
+#include "scoringupfunctor.h"
 #include "setscoredeffunctor.h"
 #include "slur.h"
 #include "smufl.h"
@@ -541,11 +542,13 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             generateMIDI.SetChannel(midiChannel);
             generateMIDI.SetTrack(midiTrack);
             generateMIDI.SetStaffN(staves.first);
+            generateMIDI.SetLayerN(layers.first);
             generateMIDI.SetTempoEventTicks(tempoEventTicks);
             generateMIDI.SetTransSemi(transSemi);
             generateMIDI.SetCurrentTempo(tempo);
             generateMIDI.SetDeferredNotes(initMIDI.GetDeferredNotes());
-            generateMIDI.SetCueExclusion(this->GetOptions()->m_midiNoCue.GetValue());
+            generateMIDI.SetOctaves(initMIDI.GetOctaves());
+            generateMIDI.SetNoCue(this->GetOptions()->m_midiNoCue.GetValue());
             generateMIDI.SetControlEvents(controlEvents);
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
@@ -572,7 +575,7 @@ bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeas
     }
     Timemap timemap;
     GenerateTimemapFunctor generateTimemap(&timemap);
-    generateTimemap.SetCueExclusion(this->GetOptions()->m_midiNoCue.GetValue());
+    generateTimemap.SetNoCue(this->GetOptions()->m_midiNoCue.GetValue());
     this->Process(generateTimemap);
 
     timemap.ToJson(output, includeRests, includeMeasures, useFractions);
@@ -884,13 +887,6 @@ void Doc::PrepareData()
 
     PrepareLayerElementPartsFunctor prepareLayerElementParts;
     this->Process(prepareLayerElementParts);
-
-    /************ Add default syl for syllables (if applicable) ************/
-    ListOfObjects syllables = this->FindAllDescendantsByType(SYLLABLE);
-    for (Object *object : syllables) {
-        Syllable *syllable = dynamic_cast<Syllable *>(object);
-        syllable->MarkupAddSyl();
-    }
 
     /************ Resolve @facs ************/
     if (this->IsFacs()) {
@@ -1256,8 +1252,8 @@ void Doc::ReactivateSelection(bool resetAligners)
     System *system = vrv_cast<System *>(selectionPage->FindDescendantByType(SYSTEM));
     // Add a selection scoreDef based on the current drawing system scoreDef
     Score *selectionScore = new Score();
+    selectionScore->GetScoreDef()->ReplaceWithCopyOf(system->GetDrawingScoreDef());
     selectionScore->SetLabel("[selectionScore]");
-    *selectionScore->GetScoreDef() = *system->GetDrawingScoreDef();
     // Use the drawing values as actual scoreDef
     selectionScore->GetScoreDef()->ResetFromDrawingValues();
     selectionPage->InsertChild(selectionScore, 0);
@@ -1464,6 +1460,12 @@ void Doc::ConvertMarkupDoc(bool permanent)
         ConvertMarkupScoreDefFunctor convertMarkupScoreDef(this);
         this->Process(convertMarkupScoreDef);
     }
+}
+
+void Doc::ScoringUpDoc()
+{
+    ScoringUpFunctor scoringUp;
+    this->Process(scoringUp);
 }
 
 void Doc::ConvertToMensuralViewDoc()

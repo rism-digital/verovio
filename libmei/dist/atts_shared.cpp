@@ -1308,6 +1308,46 @@ bool AttDataPointing::HasData() const
 }
 
 //----------------------------------------------------------------------------
+// AttDataSelecting
+//----------------------------------------------------------------------------
+
+AttDataSelecting::AttDataSelecting() : Att()
+{
+    ResetDataSelecting();
+}
+
+void AttDataSelecting::ResetDataSelecting()
+{
+    m_select = "";
+}
+
+bool AttDataSelecting::ReadDataSelecting(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("select")) {
+        this->SetSelect(StrToStr(element.attribute("select").value()));
+        if (removeAttr) element.remove_attribute("select");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttDataSelecting::WriteDataSelecting(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasSelect()) {
+        element.append_attribute("select") = StrToStr(this->GetSelect()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttDataSelecting::HasSelect() const
+{
+    return (m_select != "");
+}
+
+//----------------------------------------------------------------------------
 // AttDatable
 //----------------------------------------------------------------------------
 
@@ -6740,6 +6780,46 @@ bool AttTuning::HasTunePname() const
 bool AttTuning::HasTuneTemper() const
 {
     return (m_tuneTemper != TEMPERAMENT_NONE);
+}
+
+//----------------------------------------------------------------------------
+// AttTuningLog
+//----------------------------------------------------------------------------
+
+AttTuningLog::AttTuningLog() : Att()
+{
+    ResetTuningLog();
+}
+
+void AttTuningLog::ResetTuningLog()
+{
+    m_tuningStandard = COURSETUNING_NONE;
+}
+
+bool AttTuningLog::ReadTuningLog(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("tuning.standard")) {
+        this->SetTuningStandard(StrToCoursetuning(element.attribute("tuning.standard").value()));
+        if (removeAttr) element.remove_attribute("tuning.standard");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttTuningLog::WriteTuningLog(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasTuningStandard()) {
+        element.append_attribute("tuning.standard") = CoursetuningToStr(this->GetTuningStandard()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttTuningLog::HasTuningStandard() const
+{
+    return (m_tuningStandard != COURSETUNING_NONE);
 }
 
 //----------------------------------------------------------------------------

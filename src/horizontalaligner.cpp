@@ -516,15 +516,15 @@ void Alignment::Reset()
     Object::Reset();
 
     m_xRel = 0;
-    m_time = Fraction(0, 1);
+    m_time = Fraction(0);
     m_type = ALIGNMENT_DEFAULT;
 
-    ClearGraceAligners();
+    this->ClearGraceAligners();
 }
 
 Alignment::~Alignment()
 {
-    ClearGraceAligners();
+    this->ClearGraceAligners();
 }
 
 void Alignment::ClearGraceAligners()
@@ -540,6 +540,29 @@ bool Alignment::IsSupportedChild(Object *child)
 {
     assert(dynamic_cast<AlignmentReference *>(child));
     return true;
+}
+
+bool Alignment::operator==(const Alignment &other) const
+{
+    const Measure *measure = vrv_cast<const Measure *>(this->GetFirstAncestor(MEASURE));
+    const Measure *otherMeasure = vrv_cast<const Measure *>(other.GetFirstAncestor(MEASURE));
+    assert(measure && otherMeasure);
+
+    return (measure == otherMeasure) && (this->GetTime() == other.GetTime());
+}
+
+std::weak_ordering Alignment::operator<=>(const Alignment &other) const
+{
+    const Measure *measure = vrv_cast<const Measure *>(this->GetFirstAncestor(MEASURE));
+    const Measure *otherMeasure = vrv_cast<const Measure *>(other.GetFirstAncestor(MEASURE));
+    assert(measure && otherMeasure);
+
+    if (measure == otherMeasure) {
+        return this->GetTime() <=> other.GetTime();
+    }
+    else {
+        return Object::IsPreOrdered(measure, otherMeasure) ? std::weak_ordering::less : std::weak_ordering::greater;
+    }
 }
 
 bool Alignment::HasAccidVerticalOverlap(const Alignment *otherAlignment, int staffN) const
@@ -915,7 +938,7 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
         assert(timestampAttr);
 
         double alignmentTime = timestampAttr->GetActualDurPos();
-        if (AreEqual(alignmentTime, time)) {
+        if (ApproximatelyEqual(alignmentTime, time)) {
             return timestampAttr;
         }
         // nothing found, do not go any further but keep the index

@@ -572,6 +572,14 @@ Object *Object::DetachChild(int idx)
     return child;
 }
 
+void Object::ReplaceWithCopyOf(Object *object)
+{
+    Object *parent = this->GetParent();
+    *this = *object;
+    this->CloneReset();
+    this->SetParent(parent);
+}
+
 bool Object::HasDescendant(const Object *child, int deepness) const
 {
     ArrayOfObjects::const_iterator iter;

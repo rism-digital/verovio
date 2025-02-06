@@ -39,6 +39,7 @@ public:
      * Experimental editor functions.
      */
     ///@{
+    bool AddSyl(std::string elementId, std::string sylText);
     bool Chain(jsonxx::Array actions);
     bool DisplaceClefOctave(std::string elementId, std::string direction);
     bool Drag(std::string elementId, int x, int y, bool topLevel = true);
@@ -71,6 +72,7 @@ protected:
      * Parse JSON instructions for experimental editor functions.
      */
     ///@{
+    bool ParseAddSylAction(jsonxx::Object param, std::string *elementId, std::string *sylText);
     bool ParseDisplaceClefAction(jsonxx::Object param, std::string *elementId, std::string *direction);
     bool ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y);
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startId, std::string *endId);
@@ -135,10 +137,10 @@ struct ClosestBB {
         Zone *zoneA = a->GetFacsimileInterface()->GetZone();
         Zone *zoneB = b->GetFacsimileInterface()->GetZone();
 
-        int distA
-            = distanceToBB(zoneA->GetUlx(), zoneA->GetUly(), zoneA->GetLrx(), zoneA->GetLry(), zoneA->GetRotate());
-        int distB
-            = distanceToBB(zoneB->GetUlx(), zoneB->GetUly(), zoneB->GetLrx(), zoneB->GetLry(), zoneB->GetRotate());
+        int distA = distanceToBB(zoneA->GetUlx(), zoneA->GetUly(), zoneA->GetLrx(), zoneA->GetLry(),
+            zoneA->HasRotate() ? zoneA->GetRotate() : 0);
+        int distB = distanceToBB(zoneB->GetUlx(), zoneB->GetUly(), zoneB->GetLrx(), zoneB->GetLry(),
+            zoneB->HasRotate() ? zoneB->GetRotate() : 0);
         return (distA < distB);
     }
 };

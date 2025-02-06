@@ -36,6 +36,7 @@
 #include "comparison.h"
 #include "corr.h"
 #include "course.h"
+#include "cpmark.h"
 #include "custos.h"
 #include "damage.h"
 #include "del.h"
@@ -187,7 +188,6 @@ bool MEIOutput::Export()
         // When saving page-based MEI we also want to keep IDs for milestone elements
         findAllReferencedObjects.IncludeMilestoneReferences(this->IsPageBasedMEI());
         m_doc->Process(findAllReferencedObjects);
-        m_referredObjects.unique();
     }
 
     try {
@@ -222,13 +222,13 @@ bool MEIOutput::Export()
         // schema processing instruction
         std::string schema;
         if (this->IsPageBasedMEI()) {
-            schema = "https://www.verovio.org/schema/5.0/mei-verovio.rng";
+            schema = "https://www.verovio.org/schema/5.1/mei-verovio.rng";
         }
         else if (this->GetBasic()) {
-            schema = "https://music-encoding.org/schema/5.0/mei-basic.rng";
+            schema = "https://music-encoding.org/schema/5.1/mei-basic.rng";
         }
         else {
-            schema = "https://music-encoding.org/schema/5.0/mei-all.rng";
+            schema = "https://music-encoding.org/schema/5.1/mei-all.rng";
         }
 
         decl = meiDoc.append_child(pugi::node_declaration);
@@ -249,8 +249,8 @@ bool MEIOutput::Export()
         m_mei = meiDoc.append_child("mei");
         m_mei.append_attribute("xmlns") = "http://www.music-encoding.org/ns/mei";
         AttConverter converter;
-        meiVersion_MEIVERSION meiVersion = meiVersion_MEIVERSION_5_0;
-        if (this->GetBasic()) meiVersion = meiVersion_MEIVERSION_5_0plusbasic;
+        meiVersion_MEIVERSION meiVersion = meiVersion_MEIVERSION_5_1;
+        if (this->GetBasic()) meiVersion = meiVersion_MEIVERSION_5_1plusbasic;
         m_mei.append_attribute("meiversion") = (converter.MeiVersionMeiversionToStr(meiVersion)).c_str();
 
         // If the document is mensural, we have to undo the mensural (segments) cast off
@@ -491,6 +491,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->Is(CAESURA)) {
         m_currentNode = m_currentNode.append_child("caesura");
         this->WriteCaesura(m_currentNode, vrv_cast<Caesura *>(object));
+    }
+    else if (object->Is(CPMARK)) {
+        m_currentNode = m_currentNode.append_child("cpMark");
+        this->WriteCpMark(m_currentNode, vrv_cast<CpMark *>(object));
     }
     else if (object->Is(DIR)) {
         m_currentNode = m_currentNode.append_child("dir");
@@ -1454,10 +1458,8 @@ std::string MEIOutput::IDToMeiStr(Object *element)
 
 void MEIOutput::WriteXmlId(pugi::xml_node currentNode, Object *object)
 {
-    if (m_removeIds) {
-        ListOfObjects::iterator it = std::find(m_referredObjects.begin(), m_referredObjects.end(), object);
-        if (it == m_referredObjects.end()) return;
-        m_referredObjects.erase(it);
+    if (m_removeIds && !m_referredObjects.contains(object)) {
+        return;
     }
     currentNode.append_attribute("xml:id") = IDToMeiStr(object).c_str();
 }
@@ -2018,6 +2020,15 @@ void MEIOutput::WriteCaesura(pugi::xml_node currentNode, Caesura *caesura)
     caesura->WritePlacementRelStaff(currentNode);
 }
 
+void MEIOutput::WriteCpMark(pugi::xml_node currentNode, CpMark *cpMark)
+{
+    assert(cpMark);
+
+    this->WriteControlElement(currentNode, cpMark);
+    this->WriteTextDirInterface(currentNode, cpMark);
+    this->WriteTimeSpanningInterface(currentNode, cpMark);
+}
+
 void MEIOutput::WriteDir(pugi::xml_node currentNode, Dir *dir)
 {
     assert(dir);
@@ -2454,6 +2465,7 @@ void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
     clef->WriteOctave(currentNode);
     clef->WriteOctaveDisplacement(currentNode);
     clef->WriteStaffIdent(currentNode);
+    clef->WriteTypography(currentNode);
     clef->WriteVisibility(currentNode);
 }
 
@@ -2648,6 +2660,7 @@ void MEIOutput::WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
         meterSigDefaultLog.WriteMeterSigDefaultLog(currentNode);
         InstMeterSigDefaultVis meterSigDefaultVis;
         meterSigDefaultVis.SetMeterForm(meterSig->GetForm());
+        meterSigDefaultVis.SetMeterVisible(meterSig->GetVisible());
         meterSigDefaultVis.WriteMeterSigDefaultVis(currentNode);
         return;
     }
@@ -2657,6 +2670,7 @@ void MEIOutput::WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
     meterSig->WriteEnclosingChars(currentNode);
     meterSig->WriteMeterSigLog(currentNode);
     meterSig->WriteMeterSigVis(currentNode);
+    meterSig->WriteTypography(currentNode);
     meterSig->WriteVisibility(currentNode);
 }
 
@@ -2870,6 +2884,7 @@ void MEIOutput::WriteVerse(pugi::xml_node currentNode, Verse *verse)
     verse->WriteColor(currentNode);
     verse->WriteLang(currentNode);
     verse->WriteNInteger(currentNode);
+    verse->WritePlacementRelStaff(currentNode);
     verse->WriteTypography(currentNode);
 }
 
@@ -3916,10 +3931,10 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
         AttConverter converter;
         m_meiversion = converter.StrToMeiVersionMeiversion(version);
     }
-    // Default to MEI 5.0
+    // Default to MEI 5.1
     if (m_meiversion == meiVersion_MEIVERSION_NONE) {
-        LogWarning("MEI version found or not known, falling back to MEI 5.0");
-        m_meiversion = meiVersion_MEIVERSION_5_0;
+        LogWarning("MEI version found or not known, falling back to MEI 5.1");
+        m_meiversion = meiVersion_MEIVERSION_5_1;
     }
 
     // only try to handle meiHead if we have a full MEI document
@@ -5491,6 +5506,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (currentName == "caesura") {
             success = this->ReadCaesura(parent, current);
         }
+        else if (currentName == "cpMark") {
+            success = this->ReadCpMark(parent, current);
+        }
         else if (currentName == "dir") {
             success = this->ReadDir(parent, current);
         }
@@ -5710,6 +5728,19 @@ bool MEIInput::ReadCaesura(Object *parent, pugi::xml_node caesura)
     parent->AddChild(vrvCaesura);
     this->ReadUnsupportedAttr(caesura, vrvCaesura);
     return true;
+}
+
+bool MEIInput::ReadCpMark(Object *parent, pugi::xml_node cpMark)
+{
+    CpMark *vrvCpMark = new CpMark();
+    this->ReadControlElement(cpMark, vrvCpMark);
+
+    this->ReadTextDirInterface(cpMark, vrvCpMark);
+    this->ReadTimeSpanningInterface(cpMark, vrvCpMark);
+
+    parent->AddChild(vrvCpMark);
+    this->ReadUnsupportedAttr(cpMark, vrvCpMark);
+    return this->ReadTextChildren(vrvCpMark, cpMark, vrvCpMark);
 }
 
 bool MEIInput::ReadDir(Object *parent, pugi::xml_node dir)
@@ -7163,6 +7194,7 @@ bool MEIInput::ReadVerse(Object *parent, pugi::xml_node verse)
     vrvVerse->ReadColor(verse);
     vrvVerse->ReadLang(verse);
     vrvVerse->ReadNInteger(verse);
+    vrvVerse->ReadPlacementRelStaff(verse);
     vrvVerse->ReadTypography(verse);
 
     parent->AddChild(vrvVerse);
@@ -8644,6 +8676,7 @@ bool MEIInput::ReadGraphic(Object *parent, pugi::xml_node graphic)
     vrvGraphic->ReadHeight(graphic);
     vrvGraphic->ReadTyped(graphic);
     parent->AddChild(vrvGraphic);
+    this->ReadUnsupportedAttr(graphic, vrvGraphic);
     return true;
 }
 

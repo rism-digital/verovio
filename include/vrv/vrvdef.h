@@ -181,6 +181,7 @@ enum ClassId : uint16_t {
     BRACKETSPAN,
     BREATH,
     CAESURA,
+    CPMARK,
     DIR,
     DYNAM,
     FERMATA,
@@ -341,6 +342,10 @@ typedef std::list<Object *> ListOfObjects;
 
 typedef std::list<const Object *> ListOfConstObjects;
 
+typedef std::set<Object *> SetOfObjects;
+
+typedef std::set<const Object *> SetOfConstObjects;
+
 typedef std::vector<Note *> ChordNoteGroup;
 
 typedef std::vector<std::tuple<Alignment *, Alignment *, int>> ArrayOfAdjustmentTuples;
@@ -396,6 +401,8 @@ typedef std::map<std::string, ClassId> MapOfStrClassIds;
 typedef std::vector<std::pair<LayerElement *, LayerElement *>> MeasureTieEndpoints;
 
 typedef bool (*NotePredicate)(const Note *);
+
+typedef std::vector<std::pair<LayerElement *, data_DURATION>> ArrayOfElementDurPairs;
 
 /**
  * Generic int map recursive structure for storing hierachy of values

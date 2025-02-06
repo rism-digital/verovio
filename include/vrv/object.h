@@ -251,10 +251,10 @@ public:
      */
     std::string GetComment() const { return m_comment; }
     void SetComment(std::string comment) { m_comment = comment; }
-    bool HasComment() { return !m_comment.empty(); }
+    bool HasComment() const { return !m_comment.empty(); }
     std::string GetClosingComment() const { return m_closingComment; }
     void SetClosingComment(std::string endComment) { m_closingComment = endComment; }
-    bool HasClosingComment() { return !m_closingComment.empty(); }
+    bool HasClosingComment() const { return !m_closingComment.empty(); }
 
     /**
      * @name Children count, with or without a ClassId.
@@ -429,6 +429,12 @@ public:
      * The parent pointer is set to NULL.
      */
     Object *DetachChild(int idx);
+
+    /**
+     * Replace an object with a copy of the other.
+     * They must be of the same class.
+     */
+    void ReplaceWithCopyOf(Object *object);
 
     /**
      * Return true if the object has the child Object as descendant (reference of direct).

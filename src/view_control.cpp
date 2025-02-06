@@ -22,6 +22,7 @@
 #include "caesura.h"
 #include "clef.h"
 #include "comparison.h"
+#include "cpmark.h"
 #include "devicecontext.h"
 #include "dir.h"
 #include "doc.h"
@@ -96,6 +97,11 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Caesura *caesura = vrv_cast<Caesura *>(element);
         assert(caesura);
         this->DrawCaesura(dc, caesura, measure, system);
+    }
+    else if (element->Is(CPMARK)) {
+        CpMark *cpMark = vrv_cast<CpMark *>(element);
+        assert(cpMark);
+        this->DrawControlElementText(dc, cpMark, measure, system);
     }
     else if (element->Is(DIR)) {
         Dir *dir = vrv_cast<Dir *>(element);
@@ -1245,7 +1251,7 @@ void View::DrawSylConnector(
     assert(syl->GetStart() && syl->GetEnd());
     if (!syl->GetStart() || !syl->GetEnd()) return;
 
-    const int y = staff->GetDrawingY() + this->GetSylYRel(syl->m_drawingVerse, staff);
+    const int y = staff->GetDrawingY() + this->GetSylYRel(syl->m_drawingVerseN, staff, syl->m_drawingVersePlace);
 
     // Invalid bounding boxes might occur for empty syllables without text child
     if (!syl->HasContentHorizontalBB()) return;
