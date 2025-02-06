@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+
+## [5.0.0] – 2025-02-06
 * Switching to MEI 5.1
 * Implementation of mensural notation scoring up with `--mensural-score-up` (@martha-thomae)
 * Support for `cpMark` (_colla parte_)
@@ -8,6 +10,9 @@
 * Support for MIDI octave displacement without `@oct.ges` (@brdvd)
 * Option `--lyric-height-factor` to increase the spacing of the lyrics
 * Fix `surface`, `symbolDef`, and `zone` losing `@xml:id`s with `--remove-ids` (@rettinghaus)
+
+## [4.5.1] – 2024-12-24
+* Fix bug in RedoLayout
 
 ## [4.5.0] – 2024-12-22
 * Integration of tablature customization implementation
