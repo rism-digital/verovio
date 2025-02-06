@@ -178,16 +178,7 @@ LogLevel StrToLogLevel(const std::string &level)
 
 bool LogBufferContains(const std::string &s)
 {
-    for (const std::string &logStr : logBuffer) {
-        if (logStr == s) return true;
-    }
-    return false;
-}
-
-bool Check(Object *object)
-{
-    assert(object);
-    return (object != NULL);
+    return (std::find(logBuffer.cbegin(), logBuffer.cend(), s) != logBuffer.cend());
 }
 
 //----------------------------------------------------------------------------
@@ -227,9 +218,9 @@ std::string StringFormatVariable(const char *format, va_list arg)
     return str;
 }
 
-bool AreEqual(double dFirstVal, double dSecondVal)
+bool ApproximatelyEqual(double firstVal, double secondVal)
 {
-    return std::fabs(dFirstVal - dSecondVal) < 1E-3;
+    return std::fabs(firstVal - secondVal) < 1E-3;
 }
 
 bool IsValidInteger(const std::string &value)
@@ -457,16 +448,6 @@ std::string ToCamelCase(const std::string &s)
     result[0] = tolower(result[0]);
 
     return result;
-}
-
-data_DURATION DurationMin(data_DURATION dur1, data_DURATION dur2)
-{
-    return (dur1 < dur2) ? dur1 : dur2;
-}
-
-data_DURATION DurationMax(data_DURATION dur1, data_DURATION dur2)
-{
-    return (dur1 > dur2) ? dur1 : dur2;
 }
 
 //----------------------------------------------------------------------------

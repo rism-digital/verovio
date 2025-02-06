@@ -251,10 +251,10 @@ public:
      */
     std::string GetComment() const { return m_comment; }
     void SetComment(std::string comment) { m_comment = comment; }
-    bool HasComment() { return !m_comment.empty(); }
+    bool HasComment() const { return !m_comment.empty(); }
     std::string GetClosingComment() const { return m_closingComment; }
     void SetClosingComment(std::string endComment) { m_closingComment = endComment; }
-    bool HasClosingComment() { return !m_closingComment.empty(); }
+    bool HasClosingComment() const { return !m_closingComment.empty(); }
 
     /**
      * @name Children count, with or without a ClassId.

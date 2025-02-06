@@ -388,6 +388,11 @@ public:
     void ConvertMarkupDoc(bool permanent = true);
 
     /**
+     * Calls the scoringUpFunctor and applies it.
+     */
+    void ScoringUpDoc();
+
+    /*
      * Convert the doc from mensural to a flattened version with no ligatures and the selected editorial markup.
      */
     void ConvertToMensuralViewDoc();

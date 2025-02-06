@@ -714,6 +714,7 @@ public:
     OptionDbl m_ledgerLineThickness;
     OptionDbl m_ledgerLineExtension;
     OptionIntMap m_lyricElision;
+    OptionDbl m_lyricHeightFactor;
     OptionDbl m_lyricLineThickness;
     OptionBool m_lyricNoStartHyphen;
     OptionDbl m_lyricSize;
@@ -844,6 +845,7 @@ public:
 
     OptionIntMap m_durationEquivalence;
     OptionBool m_ligatureAsBracket;
+    OptionBool m_mensuralScoreUp;
     OptionBool m_mensuralResponsiveView;
     OptionBool m_mensuralToCmn;
 

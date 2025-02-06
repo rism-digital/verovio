@@ -965,8 +965,8 @@ void ConvertToCmnFunctor::SplitDurationIntoCmn(
     const int semiBrevisDots = (prolatioMajor) ? 1 : 0;
     const int brevisDots = (tempusPerfectum) ? 1 : 0;
 
-    const Fraction semiBrevis = Fraction(1, 1) * abs(mensur->GetProlatio()) / 2;
-    const Fraction brevis = Fraction(1, 1) * abs(mensur->GetTempus());
+    const Fraction semiBrevis = Fraction(1) * abs(mensur->GetProlatio()) / 2;
+    const Fraction brevis = Fraction(1) * abs(mensur->GetTempus());
 
     // First see if we are expecting a breve and if the duration is long enough
     if (elementDur == DURATION_breve) {

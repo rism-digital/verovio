@@ -14,6 +14,9 @@
 #include "object.h"
 #include "plistinterface.h"
 #include "score.h"
+#include "surface.h"
+#include "symboldef.h"
+#include "zone.h"
 
 namespace vrv {
 
@@ -253,7 +256,7 @@ FunctorCode FindExtremeByComparisonFunctor::VisitObject(const Object *object)
 // FindAllReferencedObjectsFunctor
 //----------------------------------------------------------------------------
 
-FindAllReferencedObjectsFunctor::FindAllReferencedObjectsFunctor(ListOfObjects *elements) : Functor()
+FindAllReferencedObjectsFunctor::FindAllReferencedObjectsFunctor(SetOfObjects *elements) : Functor()
 {
     m_elements = elements;
     m_milestoneReferences = false;
@@ -261,41 +264,55 @@ FindAllReferencedObjectsFunctor::FindAllReferencedObjectsFunctor(ListOfObjects *
 
 FunctorCode FindAllReferencedObjectsFunctor::VisitObject(Object *object)
 {
+    if (object->HasInterface(INTERFACE_ALT_SYM)) {
+        AltSymInterface *interface = object->GetAltSymInterface();
+        assert(interface);
+        if (interface->GetAltSymbolDef()) m_elements->insert(interface->GetAltSymbolDef());
+    }
     if (object->HasInterface(INTERFACE_LINKING)) {
         LinkingInterface *interface = object->GetLinkingInterface();
         assert(interface);
-        if (interface->GetNextLink()) m_elements->push_back(interface->GetNextLink());
-        if (interface->GetSameasLink()) m_elements->push_back(interface->GetSameasLink());
+        if (interface->GetNextLink()) m_elements->insert(interface->GetNextLink());
+        if (interface->GetSameasLink()) m_elements->insert(interface->GetSameasLink());
+    }
+    if (object->HasInterface(INTERFACE_FACSIMILE)) {
+        FacsimileInterface *interface = object->GetFacsimileInterface();
+        assert(interface);
+        if (interface->GetSurface()) m_elements->insert(interface->GetSurface());
+        if (interface->GetZone()) m_elements->insert(interface->GetZone());
     }
     if (object->HasInterface(INTERFACE_PLIST)) {
         PlistInterface *interface = object->GetPlistInterface();
         assert(interface);
         for (Object *object : interface->GetRefs()) {
-            m_elements->push_back(object);
+            m_elements->insert(object);
         }
     }
     if (object->HasInterface(INTERFACE_TIME_POINT) || object->HasInterface(INTERFACE_TIME_SPANNING)) {
         TimePointInterface *interface = object->GetTimePointInterface();
         assert(interface);
-        if (interface->GetStart() && !interface->GetStart()->Is(TIMESTAMP_ATTR))
-            m_elements->push_back(interface->GetStart());
+        if (interface->GetStart() && !interface->GetStart()->Is(TIMESTAMP_ATTR)) {
+            m_elements->insert(interface->GetStart());
+        }
     }
     if (object->HasInterface(INTERFACE_TIME_SPANNING)) {
         TimeSpanningInterface *interface = object->GetTimeSpanningInterface();
         assert(interface);
-        if (interface->GetEnd() && !interface->GetEnd()->Is(TIMESTAMP_ATTR)) m_elements->push_back(interface->GetEnd());
+        if (interface->GetEnd() && !interface->GetEnd()->Is(TIMESTAMP_ATTR)) {
+            m_elements->insert(interface->GetEnd());
+        }
     }
     if (object->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(object);
         assert(note);
         // The note has a stem.sameas that was resolved the a note, then that one is referenced
         if (note->HasStemSameas() && note->HasStemSameasNote()) {
-            m_elements->push_back(note->GetStemSameasNote());
+            m_elements->insert(note->GetStemSameasNote());
         }
     }
     // These will also be referred to as milestones in page-based MEI
     if (m_milestoneReferences && object->IsMilestoneElement()) {
-        m_elements->push_back(object);
+        m_elements->insert(object);
     }
 
     // continue until the end

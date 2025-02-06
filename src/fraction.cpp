@@ -29,7 +29,7 @@ Fraction::Fraction(int num, int denom)
         denom = 1;
     }
     m_denominator = denom;
-    Reduce();
+    this->Reduce();
 }
 
 Fraction::Fraction(data_DURATION duration)
@@ -39,7 +39,7 @@ Fraction::Fraction(data_DURATION duration)
     int den = pow(2, (duration + 1));
     m_numerator = 8;
     m_denominator = den;
-    Reduce();
+    this->Reduce();
 }
 
 Fraction Fraction::operator+(const Fraction &other) const
@@ -122,7 +122,7 @@ void Fraction::Reduce()
         m_numerator = -m_numerator;
         m_denominator = -m_denominator;
     }
-    int gcdVal = std::gcd(abs(m_numerator), abs(m_denominator));
+    const int gcdVal = std::gcd(m_numerator, m_denominator);
     if (gcdVal != 1) {
         m_numerator /= gcdVal;
         m_denominator /= gcdVal;
