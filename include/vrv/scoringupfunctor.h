@@ -105,8 +105,6 @@ public:
     //
 
 private:
-    // The current score time in the measure (incremented by each element)
-    double m_currentScoreTime;
     // The current Mensur
     Mensur *m_currentMensur;
     // The current mensuration info
