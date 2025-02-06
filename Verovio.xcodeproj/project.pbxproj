@@ -1078,6 +1078,11 @@
 		8F7DD0551EAF3682001B072A /* fb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F7DD0531EAF3682001B072A /* fb.cpp */; };
 		8F7DD0561EAF3682001B072A /* fb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F7DD0531EAF3682001B072A /* fb.cpp */; };
 		8F7DD0571EAF3682001B072A /* fb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F7DD0531EAF3682001B072A /* fb.cpp */; };
+		B464F48F2C6D664300A778D2 /* scoringupfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B464F48E2C6D664300A778D2 /* scoringupfunctor.cpp */; };
+		B464F4902C6D664300A778D2 /* scoringupfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B464F48E2C6D664300A778D2 /* scoringupfunctor.cpp */; };
+		B464F4912C6D664300A778D2 /* scoringupfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B464F48E2C6D664300A778D2 /* scoringupfunctor.cpp */; };
+		B464F4932C6D665300A778D2 /* scoringupfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = B464F4922C6D665300A778D2 /* scoringupfunctor.h */; };
+		B464F4942C6D665300A778D2 /* scoringupfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = B464F4922C6D665300A778D2 /* scoringupfunctor.h */; };
 		BB4C4A5A22A9318B001F6AF0 /* humlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06581E351161009CFDD7 /* humlib.cpp */; };
 		BB4C4A5B22A9318E001F6AF0 /* humlib.h in Headers */ = {isa = PBXBuildFile; fileRef = 40CA064C1E351125009CFDD7 /* humlib.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4A8822A93225001F6AF0 /* c_wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD11DC22240E78B00A405D8 /* c_wrapper.cpp */; };
@@ -2230,6 +2235,8 @@
 		8F59293218854BF800FE51AD /* vrv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrv.h; path = include/vrv/vrv.h; sourceTree = "<group>"; };
 		8F59293318854BF800FE51AD /* vrvdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrvdef.h; path = include/vrv/vrvdef.h; sourceTree = "<group>"; };
 		8F7DD0531EAF3682001B072A /* fb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fb.cpp; path = src/fb.cpp; sourceTree = "<group>"; };
+		B464F48E2C6D664300A778D2 /* scoringupfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scoringupfunctor.cpp; path = src/scoringupfunctor.cpp; sourceTree = "<group>"; };
+		B464F4922C6D665300A778D2 /* scoringupfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = scoringupfunctor.h; path = include/vrv/scoringupfunctor.h; sourceTree = "<group>"; };
 		BB4C4A5222A930A3001F6AF0 /* VerovioFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = VerovioFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB4C4A5522A930A3001F6AF0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = bindings/iOS/Info.plist; sourceTree = SOURCE_ROOT; };
 		BB4C4BCA22A941F9001F6AF0 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = data; sourceTree = SOURCE_ROOT; };
@@ -3108,6 +3115,8 @@
 		E765675628BBF9CD00BC6490 /* functors */ = {
 			isa = PBXGroup;
 			children = (
+				B464F4922C6D665300A778D2 /* scoringupfunctor.h */,
+				B464F48E2C6D664300A778D2 /* scoringupfunctor.cpp */,
 				E786CD09298AA3BC009BAC58 /* horizontal-layout */,
 				E786CD0A298AA3D8009BAC58 /* vertical-layout */,
 				E7908EA12985829F0004C1F9 /* alignfunctor.cpp */,
@@ -3318,6 +3327,7 @@
 				8F59294218854BF800FE51AD /* iopae.h in Headers */,
 				8F59294318854BF800FE51AD /* keysig.h in Headers */,
 				403B0514244F3E4D00EE4F71 /* gliss.h in Headers */,
+				B464F4932C6D665300A778D2 /* scoringupfunctor.h in Headers */,
 				E741ACFF299A3D3400854426 /* calcslurdirectionfunctor.h in Headers */,
 				4DEF8A6221B7AACC0093A76B /* f.h in Headers */,
 				4DACC9DE2990F29A00B55913 /* atts_performance.h in Headers */,
@@ -3650,6 +3660,7 @@
 				BB4C4ACA22A932B6001F6AF0 /* pages.h in Headers */,
 				BB4C4ACC22A932B6001F6AF0 /* pb.h in Headers */,
 				BB4C4B1222A932C8001F6AF0 /* expansion.h in Headers */,
+				B464F4942C6D665300A778D2 /* scoringupfunctor.h in Headers */,
 				BB4C4AC822A932B6001F6AF0 /* page.h in Headers */,
 				4DACC9952990F29A00B55913 /* atts_neumes.h in Headers */,
 				4DACC9CF2990F29A00B55913 /* atts_mei.h in Headers */,
@@ -4286,6 +4297,7 @@
 				4DB3D89E1F7E7FAA00B5FC2B /* fig.cpp in Sources */,
 				4D1AC9772B6A9BB200434023 /* filereader.cpp in Sources */,
 				4D4FCD121F54570E0009C455 /* staffdef.cpp in Sources */,
+				B464F48F2C6D664300A778D2 /* scoringupfunctor.cpp in Sources */,
 				8F086EE2188539540037FD8E /* verticalaligner.cpp in Sources */,
 				4DEC4D9621C81E3B00D1D273 /* expan.cpp in Sources */,
 				4D508C3026D4E64C00020F35 /* crc.cpp in Sources */,
@@ -4757,6 +4769,7 @@
 				4D6413802035F68600BB630E /* mdiv.cpp in Sources */,
 				4D766F0320ACAD6E006875D8 /* neume.cpp in Sources */,
 				4DACC9C22990F29A00B55913 /* atts_cmn.cpp in Sources */,
+				B464F4902C6D664300A778D2 /* scoringupfunctor.cpp in Sources */,
 				4D94722120CA702C00C780C8 /* linkinginterface.cpp in Sources */,
 				4DACCA152990F2E600B55913 /* att.cpp in Sources */,
 				4DB3D8EB1F83D18000B5FC2B /* proport.cpp in Sources */,
@@ -5050,6 +5063,7 @@
 				4DACC9C32990F29A00B55913 /* atts_cmn.cpp in Sources */,
 				BB4C4AEB22A932BC001F6AF0 /* editorial.cpp in Sources */,
 				BB4C4B8F22A932DF001F6AF0 /* text.cpp in Sources */,
+				B464F4912C6D664300A778D2 /* scoringupfunctor.cpp in Sources */,
 				4DACCA162990F2E600B55913 /* att.cpp in Sources */,
 				BB4C4ADF22A932BC001F6AF0 /* annot.cpp in Sources */,
 				E79ADDCA26BD645B00527E4B /* runtimeclock.cpp in Sources */,

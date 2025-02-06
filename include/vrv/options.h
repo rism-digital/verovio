@@ -845,6 +845,7 @@ public:
 
     OptionIntMap m_durationEquivalence;
     OptionBool m_ligatureAsBracket;
+    OptionBool m_mensuralScoreUp;
     OptionBool m_mensuralResponsiveView;
     OptionBool m_mensuralToCmn;
 
