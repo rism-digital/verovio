@@ -222,7 +222,7 @@ bool MEIOutput::Export()
         // schema processing instruction
         std::string schema;
         if (this->IsPageBasedMEI()) {
-            schema = "https://www.verovio.org/schema/5.0/mei-verovio.rng";
+            schema = "https://www.verovio.org/schema/5.1/mei-verovio.rng";
         }
         else if (this->GetBasic()) {
             schema = "https://music-encoding.org/schema/5.1/mei-basic.rng";
