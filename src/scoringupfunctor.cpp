@@ -201,7 +201,7 @@ void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &seq
     // possibility of being a dot of imperfection (or alteration) or a dot of augmentation---the dots of perfection are
     // not in the middleSeq.
     std::vector<int> indecesOfDots;
-    for (int i = 0; i < middleSeq.size(); i++) {
+    for (int i = 0; i < (int)middleSeq.size(); i++) {
         std::pair<LayerElement *, data_DURATION> elementDurPair = middleSeq.at(i);
         if (elementDurPair.first->Is(DOT)) {
             indecesOfDots.insert(indecesOfDots.end(), i);
@@ -434,10 +434,10 @@ double ScoringUpFunctor::GetValueInMinims(const ArrayOfElementDurPairs &middleSe
     double sum = 0;
     bool followedByDot = false;
     LayerElement *nextElement = NULL;
-    for (int i = 0; i < middleSeq.size(); i++) {
+    for (int i = 0; i < (int)middleSeq.size(); i++) {
         std::pair<LayerElement *, data_DURATION> elementDurPair = middleSeq.at(i);
         // Check if there is a dot after the element being evaluated
-        if (i + 1 < middleSeq.size()) {
+        if (i + 1 < (int)middleSeq.size()) {
             nextElement = middleSeq.at(i + 1).first;
             followedByDot = nextElement->Is(DOT);
         }
