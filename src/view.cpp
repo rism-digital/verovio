@@ -31,7 +31,7 @@ View::View()
     m_pageIdx = 0;
     m_slurHandling = SlurHandling::Initialize;
 
-    m_currentColor = AxNONE;
+    m_currentColor = COLOR_NONE;
     m_currentElement = NULL;
     m_currentLayer = NULL;
     m_currentMeasure = NULL;

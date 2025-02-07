@@ -49,7 +49,7 @@ public:
      * @name Setters
      */
     ///@{
-    void SetBackground(int color, int style = AxSOLID) override;
+    void SetBackground(int color, int style = PEN_SOLID) override;
     void SetBackgroundImage(void *image, double opacity = 1.0) override {};
     void SetBackgroundMode(int mode) override;
     void SetTextForeground(int color) override;

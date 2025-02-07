@@ -138,16 +138,16 @@ void DeviceContext::SetPen(int color, int width, PenStyle style, int dashLength,
     LineJoinStyle lineJoin, float opacity)
 {
     switch (style) {
-        case AxSOLID: break;
-        case AxDOT:
+        case PEN_SOLID: break;
+        case PEN_DOT:
             dashLength = dashLength ? dashLength : 1;
             gapLength = gapLength ? gapLength : width * 3;
             break;
-        case AxLONG_DASH:
+        case PEN_LONG_DASH:
             dashLength = dashLength ? dashLength : width * 4;
             gapLength = gapLength ? gapLength : width * 3;
             break;
-        case AxSHORT_DASH:
+        case PEN_SHORT_DASH:
             dashLength = dashLength ? dashLength : width * 2;
             gapLength = gapLength ? gapLength : width * 3;
             break;

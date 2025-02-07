@@ -19,49 +19,26 @@ namespace vrv {
 
 class Doc;
 
-#define AxNONE -1
-#define AxWHITE 255 << 16 | 255 << 8 | 255
-#define AxBLACK 0
-#define AxRED 255 << 16
-#define AxBLUE 255
-#define AxGREEN 255 << 8
-#define AxCYAN 255 << 8 | 255
-#define AxLIGHT_GREY 127 << 16 | 127 << 8 | 127
-#undef max
-#undef min
+#define COLOR_NONE -1
+#define COLOR_WHITE 255 << 16 | 255 << 8 | 255
+#define COLOR_BLACK 0
+#define COLOR_RED 255 << 16
+#define COLOR_BLUE 255
+#define COLOR_GREEN 255 << 8
+#define COLOR_CYAN 255 << 8 | 255
+#define COLOR_LIGHT_GREY 127 << 16 | 127 << 8 | 127
 
-enum PenStyle : int8_t {
-    /*  Pen styles */
-    AxSOLID = 100,
-    AxDOT,
-    AxLONG_DASH,
-    AxSHORT_DASH,
-    AxDOT_DASH,
-    AxUSER_DASH
-};
+enum PenStyle : int8_t { PEN_SOLID = 0, PEN_DOT, PEN_LONG_DASH, PEN_SHORT_DASH, PEN_DOT_DASH };
 
-enum LineCapStyle : int8_t {
-    /* Line cap styles */
-    AxCAP_UNKNOWN = 0,
-    AxCAP_BUTT,
-    AxCAP_ROUND,
-    AxCAP_SQUARE
-};
+enum LineCapStyle : int8_t { LINECAP_DEFAULT = 0, LINECAP_BUTT, LINECAP_ROUND, LINECAP_SQUARE };
 
 enum LineJoinStyle : int8_t {
-    /* Line join styles */
-    AxJOIN_UNKNOWN = 0,
-    AxJOIN_ARCS,
-    AxJOIN_BEVEL,
-    AxJOIN_MITER,
-    AxJOIN_MITER_CLIP,
-    AxJOIN_ROUND
-};
-
-enum BrushOpacity : int8_t {
-    /*  Pen styles */
-    BRUSH_TRANSPARENT = 0,
-    BRUSH_SOLID = 100,
+    LINEJOIN_DEFAULT = 0,
+    LINEJOIN_ARCS,
+    LINEJOIN_BEVEL,
+    LINEJOIN_MITER,
+    LINEJOIN_MITER_CLIP,
+    LINEJOIN_ROUND
 };
 
 // ---------------------------------------------------------------------------
@@ -78,11 +55,11 @@ public:
     Pen()
         : m_color(0)
         , m_width(0)
-        , m_style(AxSOLID)
+        , m_style(PEN_SOLID)
         , m_dashLength(0)
         , m_gapLength(0)
-        , m_lineCap(AxCAP_UNKNOWN)
-        , m_lineJoin(AxJOIN_UNKNOWN)
+        , m_lineCap(LINECAP_DEFAULT)
+        , m_lineJoin(LINEJOIN_DEFAULT)
         , m_opacity(1.0)
     {
     }
