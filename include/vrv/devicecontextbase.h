@@ -53,7 +53,7 @@ enum LineJoinStyle : int8_t {
 class Pen {
 public:
     Pen()
-        : m_color(0)
+        : m_color(COLOR_NONE)
         , m_width(0)
         , m_style(PEN_SOLID)
         , m_dashLength(0)
@@ -104,7 +104,7 @@ private:
 
 class Brush {
 public:
-    Brush() : m_color(0), m_opacity(1.0) {}
+    Brush() : m_color(COLOR_NONE), m_opacity(1.0) {}
     Brush(int color, float opacity) : m_color(color), m_opacity(opacity) {}
 
     int GetColor() const { return m_color; }
