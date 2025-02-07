@@ -579,7 +579,7 @@ protected:
     //     int staffSize, bool dimin, bool setBBGlyph = false);
 
     void DrawThickBezierCurve(
-        DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, int penStyle = AxSOLID);
+        DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, PenStyle penStyle = AxSOLID);
     void DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
     void DrawTextString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params);
     void DrawDirString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params);

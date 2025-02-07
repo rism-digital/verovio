@@ -625,14 +625,14 @@ void View::DrawHairpin(
 
     const double hairpinThickness = m_options->m_hairpinThickness.GetValue() * unit;
 
-    int style;
+    PenStyle style;
     switch (hairpin->GetLform()) {
         case LINEFORM_dashed: style = AxLONG_DASH; break;
         case LINEFORM_dotted: style = AxDOT; break;
         default: style = AxSOLID; break;
     }
 
-    const int cap = (style == AxDOT) ? AxCAP_ROUND : AxCAP_SQUARE;
+    const LineCapStyle cap = (style == AxDOT) ? AxCAP_ROUND : AxCAP_SQUARE;
 
     dc->SetPen(m_currentColor, hairpinThickness, style, 0, 0, cap, AxJOIN_MITER);
 
@@ -933,7 +933,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     Point bezier[4];
     if (!tie->CalculatePosition(m_doc, staff, x1, x2, spanningType, bezier)) return;
 
-    int penStyle = AxSOLID;
+    PenStyle penStyle = AxSOLID;
     switch (tie->GetLform()) {
         case LINEFORM_dashed: penStyle = AxSHORT_DASH; break;
         case LINEFORM_dotted: penStyle = AxDOT; break;
@@ -2983,8 +2983,8 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
             endX -= std::max(lineWidth + unit / 2 - rightBarLineWidth, 0);
         }
 
-        int penStyle = AxSOLID;
-        int capStyle = AxCAP_SQUARE;
+        PenStyle penStyle = AxSOLID;
+        LineCapStyle capStyle = AxCAP_SQUARE;
         switch (ending->GetLform()) {
             case (LINEFORM_dashed): penStyle = AxLONG_DASH; break;
             case (LINEFORM_dotted):

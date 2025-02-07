@@ -47,7 +47,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         dc->StartGraphic(slur, "", slur->GetID(), SPANNING);
     }
 
-    int penStyle = AxSOLID;
+    PenStyle penStyle = AxSOLID;
     switch (slur->GetLform()) {
         case LINEFORM_dashed: penStyle = AxSHORT_DASH; break;
         case LINEFORM_dotted: penStyle = AxDOT; break;

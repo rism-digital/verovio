@@ -30,7 +30,7 @@ class Doc;
 #undef max
 #undef min
 
-enum PenStyles : int8_t  {
+enum PenStyle : int8_t {
     /*  Pen styles */
     AxSOLID = 100,
     AxDOT,
@@ -41,7 +41,7 @@ enum PenStyles : int8_t  {
     AxTRANSPARENT
 };
 
-enum LineCapStyles : int8_t {
+enum LineCapStyle : int8_t {
     /* Line cap styles */
     AxCAP_UNKNOWN = 0,
     AxCAP_BUTT,
@@ -49,7 +49,7 @@ enum LineCapStyles : int8_t {
     AxCAP_SQUARE
 };
 
-enum LineJoinStyles : int8_t {
+enum LineJoinStyle : int8_t {
     /* Line join styles */
     AxJOIN_UNKNOWN = 0,
     AxJOIN_ARCS,
@@ -59,7 +59,7 @@ enum LineJoinStyles : int8_t {
     AxJOIN_ROUND
 };
 
-enum BrushOpacity : int8_t  {
+enum BrushOpacity : int8_t {
     /*  Pen styles */
     BRUSH_TRANSPARENT = 0,
     BRUSH_SOLID = 100,
@@ -77,17 +77,24 @@ enum BrushOpacity : int8_t  {
 class Pen {
 public:
     Pen()
-        : m_penColor(0), m_penWidth(0), m_dashLength(0), m_gapLength(0), m_lineCap(0), m_lineJoin(0), m_penOpacity(0.0)
+        : m_penColor(0)
+        , m_penWidth(0)
+        , m_penStyle(AxSOLID)
+        , m_dashLength(0)
+        , m_gapLength(0)
+        , m_lineCap(AxCAP_UNKNOWN)
+        , m_lineJoin(AxJOIN_UNKNOWN)
     {
     }
-    Pen(int color, int width, float opacity, int dashLength, int gapLength, int lineCap, int lineJoin)
+    Pen(int color, int width, PenStyle style, int dashLength, int gapLength, LineCapStyle lineCap,
+        LineJoinStyle lineJoin)
         : m_penColor(color)
         , m_penWidth(width)
+        , m_penStyle(style)
         , m_dashLength(dashLength)
         , m_gapLength(gapLength)
         , m_lineCap(lineCap)
         , m_lineJoin(lineJoin)
-        , m_penOpacity(opacity)
     {
     }
 
@@ -99,19 +106,18 @@ public:
     void SetDashLength(int dashLength) { m_dashLength = dashLength; }
     int GetGapLength() const { return m_gapLength; }
     void SetGapLength(int gapLength) { m_gapLength = gapLength; }
-    int GetLineCap() const { return m_lineCap; }
-    void SetLineCap(int lineCap) { m_lineCap = lineCap; }
-    int GetLineJoin() const { return m_lineJoin; }
-    void SetLineJoin(int lineJoin) { m_lineJoin = lineJoin; }
-    float GetOpacity() const { return m_penOpacity; }
-    void SetOpacity(float opacity) { m_penOpacity = opacity; }
+    LineCapStyle GetLineCap() const { return m_lineCap; }
+    void SetLineCap(LineCapStyle lineCap) { m_lineCap = lineCap; }
+    LineJoinStyle GetLineJoin() const { return m_lineJoin; }
+    void SetLineJoin(LineJoinStyle lineJoin) { m_lineJoin = lineJoin; }
+    PenStyle GetStyle() const { return m_penStyle; }
+    void SetStyle(PenStyle style) { m_penStyle = style; }
 
 private:
-    int m_penColor, m_dashLength, m_gapLength;
-    PenStyle m_penWidth,
+    int m_penColor, m_penWidth, m_dashLength, m_gapLength;
     LineCapStyle m_lineCap;
     LineJoinStyle m_lineJoin;
-    float m_penOpacity;
+    PenStyle m_penStyle;
 };
 
 class Brush {

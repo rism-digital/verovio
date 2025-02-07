@@ -134,32 +134,28 @@ void DeviceContext::SetViewBoxFactor(double ppuFactor)
     m_viewBoxFactor = double(DEFINITION_FACTOR) / ppuFactor;
 }
 
-void DeviceContext::SetPen(int color, int width, int style, int dashLength, int gapLength, int lineCap, int lineJoin)
+void DeviceContext::SetPen(
+    int color, int width, PenStyle style, int dashLength, int gapLength, LineCapStyle lineCap, LineJoinStyle lineJoin)
 {
-    float opacityValue;
-
     switch (style) {
-        case AxSOLID: opacityValue = 1.0; break;
+        case AxSOLID: break;
         case AxDOT:
             dashLength = dashLength ? dashLength : 1;
             gapLength = gapLength ? gapLength : width * 3;
-            opacityValue = 1.0;
             break;
         case AxLONG_DASH:
             dashLength = dashLength ? dashLength : width * 4;
             gapLength = gapLength ? gapLength : width * 3;
-            opacityValue = 1.0;
             break;
         case AxSHORT_DASH:
             dashLength = dashLength ? dashLength : width * 2;
             gapLength = gapLength ? gapLength : width * 3;
-            opacityValue = 1.0;
             break;
-        case AxTRANSPARENT: opacityValue = 0.0; break;
-        default: opacityValue = 1.0; // solid brush by default
+        case AxTRANSPARENT: break;
+        default: break; // solid brush by default
     }
 
-    m_penStack.push(Pen(color, width, opacityValue, dashLength, gapLength, lineCap, lineJoin));
+    m_penStack.push(Pen(color, width, style, dashLength, gapLength, lineCap, lineJoin));
 }
 
 void DeviceContext::SetBrush(int color, int opacity)
@@ -168,7 +164,7 @@ void DeviceContext::SetBrush(int color, int opacity)
 
     switch (opacity) {
         case AxSOLID: opacityValue = 1.0; break;
-        case AxTRANSPARENT: opacityValue = .5; break;
+        case AxTRANSPARENT: opacityValue = 0.0; break;
         default: opacityValue = 1.0; // solid brush by default
     }
 

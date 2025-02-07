@@ -397,7 +397,7 @@ void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::u32string s, da
 }
 
 void View::DrawThickBezierCurve(
-    DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, int penStyle)
+    DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, PenStyle penStyle)
 {
     assert(dc);
 

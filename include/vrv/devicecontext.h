@@ -142,8 +142,8 @@ public:
      */
     ///@{
     void SetBrush(int color, int opacity);
-    void SetPen(
-        int color, int width, int style, int dashLength = 0, int gapLength = 0, int lineCap = 0, int lineJoin = 0);
+    void SetPen(int color, int width, PenStyle style, int dashLength = 0, int gapLength = 0,
+        LineCapStyle lineCap = AxCAP_UNKNOWN, LineJoinStyle lineJoin = AxJOIN_UNKNOWN);
     void SetFont(FontInfo *font);
     void SetPushBack() { m_pushBack = true; }
     void ResetBrush();
