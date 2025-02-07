@@ -104,29 +104,6 @@ void View::DrawNotFilledEllipse(DeviceContext *dc, int x1, int y1, int x2, int y
     dc->ResetBrush();
 }
 
-/*
- * Draw rectangle partly filled in, as specified by <fillSection>: 1=top, 2=bottom, 3=left side,
- * 4=right side; 0=don't fill in any part. FIXME: <fillSection> IS IGNORED.
- */
-void View::DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection)
-{
-    assert(dc); // DC cannot be NULL
-
-    std::swap(y1, y2);
-
-    // dc->SetPen(m_currentColor, 0, AxSOLID );
-    // dc->SetBrush(AxWHITE, AxTRANSPARENT);
-    dc->SetPen(COLOR_BLUE, 0, PEN_SOLID);
-    dc->SetBrush(COLOR_RED, 0.0);
-
-    dc->DrawRectangle(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1), ToDeviceContextX(y1 - y2));
-
-    dc->ResetPen();
-    dc->ResetBrush();
-
-    return;
-}
-
 void View::DrawNotFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int lineThickness, int radius = 0)
 {
     assert(dc); // DC cannot be NULL

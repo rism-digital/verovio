@@ -580,7 +580,6 @@ protected:
 
     void DrawThickBezierCurve(
         DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, PenStyle penStyle = PEN_SOLID);
-    void DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
     void DrawTextString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params);
     void DrawDirString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params);
     void DrawDynamString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params, Rend *rend);
