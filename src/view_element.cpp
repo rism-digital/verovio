@@ -80,10 +80,10 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     int previousColor = m_currentColor;
 
     if (element == m_currentElement) {
-        m_currentColor = AxRED;
+        m_currentColor = COLOR_RED;
     }
     else {
-        m_currentColor = AxNONE;
+        m_currentColor = COLOR_NONE;
     }
 
     if (element->Is(ACCID)) {
@@ -1759,7 +1759,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     dc->StartGraphic(syl, "", syl->GetID());
     dc->DeactivateGraphicY();
 
-    dc->SetBrush(m_currentColor, AxSOLID);
+    dc->SetBrush(m_currentColor);
 
     FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
     if (syl->HasFontweight()) {
@@ -1874,7 +1874,7 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         params.m_y = staff->GetDrawingY() + this->GetSylYRel(std::max(1, verse->GetN()), staff, verse->GetPlace());
         params.m_pointSize = labelTxt.GetPointSize();
 
-        dc->SetBrush(m_currentColor, AxSOLID);
+        dc->SetBrush(m_currentColor);
         dc->SetFont(&labelTxt);
 
         dc->StartGraphic(graphic, "", graphic->GetID());
@@ -1906,8 +1906,8 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff)
     assert(stem);
     assert(staff);
 
-    dc->SetPen(AxNONE, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 1.2, AxSOLID);
-    dc->SetBrush(AxNONE, AxSOLID);
+    dc->SetPen(m_currentColor, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 1.2, PEN_SOLID);
+    dc->SetBrush(m_currentColor);
 
     int positionShift = m_doc->GetCueSize(m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
     int positionShiftX1 = positionShift;

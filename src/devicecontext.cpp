@@ -134,45 +134,32 @@ void DeviceContext::SetViewBoxFactor(double ppuFactor)
     m_viewBoxFactor = double(DEFINITION_FACTOR) / ppuFactor;
 }
 
-void DeviceContext::SetPen(int color, int width, int style, int dashLength, int gapLength, int lineCap, int lineJoin)
+void DeviceContext::SetPen(int color, int width, PenStyle style, int dashLength, int gapLength, LineCapStyle lineCap,
+    LineJoinStyle lineJoin, float opacity)
 {
-    float opacityValue;
-
     switch (style) {
-        case AxSOLID: opacityValue = 1.0; break;
-        case AxDOT:
+        case PEN_SOLID: break;
+        case PEN_DOT:
             dashLength = dashLength ? dashLength : 1;
             gapLength = gapLength ? gapLength : width * 3;
-            opacityValue = 1.0;
             break;
-        case AxLONG_DASH:
+        case PEN_LONG_DASH:
             dashLength = dashLength ? dashLength : width * 4;
             gapLength = gapLength ? gapLength : width * 3;
-            opacityValue = 1.0;
             break;
-        case AxSHORT_DASH:
+        case PEN_SHORT_DASH:
             dashLength = dashLength ? dashLength : width * 2;
             gapLength = gapLength ? gapLength : width * 3;
-            opacityValue = 1.0;
             break;
-        case AxTRANSPARENT: opacityValue = 0.0; break;
-        default: opacityValue = 1.0; // solid brush by default
+        default: break; // solid brush by default
     }
 
-    m_penStack.push(Pen(color, width, opacityValue, dashLength, gapLength, lineCap, lineJoin));
+    m_penStack.push(Pen(color, width, style, dashLength, gapLength, lineCap, lineJoin, opacity));
 }
 
-void DeviceContext::SetBrush(int color, int opacity)
+void DeviceContext::SetBrush(int color, float opacity)
 {
-    float opacityValue;
-
-    switch (opacity) {
-        case AxSOLID: opacityValue = 1.0; break;
-        case AxTRANSPARENT: opacityValue = 0.0; break;
-        default: opacityValue = 1.0; // solid brush by default
-    }
-
-    m_brushStack.push(Brush(color, opacityValue));
+    m_brushStack.push(Brush(color, opacity));
 }
 
 void DeviceContext::SetFont(FontInfo *font)
