@@ -10,9 +10,9 @@ Pod::Spec.new do |s|
       'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
       'libmei/{dist,addons}/*.{h,cpp}'
   s.public_header_files = 'src/**/*.{h}',
-      'include/{crc, hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
+      'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
       'libmei/{dist,addons}/*.{h}'
-  s.private_header_files = 'include/{crc, hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
+  s.private_header_files = 'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
       'libmei/{dist,addons}/*.{h}'
   s.resources      = 'data'
   s.ios.deployment_target = '16.0'
@@ -20,6 +20,7 @@ Pod::Spec.new do |s|
   s.pod_target_xcconfig = {
       "CLANG_CXX_LANGUAGE_STANDARD" => "c++23",
       "CLANG_CXX_LIBRARY" => "libc++",
+      "CLANG_WARN_COMMA" => "NO",
       "GCC_C_LANGUAGE_STANDARD" => "gnu11",
       "GCC_DYNAMIC_NO_PIC" => "NO",
       "GCC_NO_COMMON_BLOCKS" => "YES",
