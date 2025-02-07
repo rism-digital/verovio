@@ -5823,7 +5823,7 @@ string Convert::generateRandomId(int length) {
     const string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     std::random_device rd;  // Non-deterministic generator
     std::mt19937 gen(rd()); // Seed the generator
-    std::uniform_int_distribution<> distr(0, characters.size() - 1);
+    std::uniform_int_distribution<> distr(0, (int)characters.size() - 1);
     string randomId;
     std::generate_n(std::back_inserter(randomId), length, [&]() {
         return characters[distr(gen)];
@@ -27840,7 +27840,7 @@ restarting:
 			break;
 		}
 
-		int len = templine.length();
+		int len = (int)templine.length();
 		if ((len > 4) && (templine.compare(0, 4, "!!!!") == 0) &&
 		    (templine[4] != '!') &&
 		    (dataFoundQ == 0) &&
@@ -120426,7 +120426,7 @@ void Tool_prange::assignHorizontalPosition(vector<_VoiceInfo>& voiceInfo, int mi
 
 	if (hpos.size() > 2) {
 		for (int i=1; i<(int)hpos.size()-1; i++) {
-			int ii = hpos.size() - i - 1;
+			int ii = (int)hpos.size() - i - 1;
 			hpos[i] = (double)ii / (hpos.size()-1) * (maxval - minval) + minval;
 		}
 	}
@@ -120939,7 +120939,7 @@ int Tool_prange::getTopQuartile(vector<double>& midibins) {
 
 	double cumsum = 0.0;
 	int i;
-	for (i=midibins.size()-1; i>=0; i--) {
+	for (i=(int)midibins.size()-1; i>=0; i--) {
 		if (midibins[i] <= 0.0) {
 			continue;
 		}
@@ -121037,7 +121037,7 @@ int Tool_prange::getStaffBase7(int base7) {
 //
 
 int Tool_prange::getMaxDiatonicIndex(vector<vector<double>>& diatonic) {
-	for (int i=diatonic.size()-1; i>=0; i--) {
+	for (int i=(int)diatonic.size()-1; i>=0; i--) {
 		if (diatonic.at(i).at(0) != 0.0) {
 			return i;
 		}
