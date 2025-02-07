@@ -570,7 +570,7 @@ void View::DrawLabels(
     params.m_y = y;
     params.m_pointSize = labelTxt.GetPointSize();
 
-    dc->SetBrush(m_currentColor, AxSOLID);
+    dc->SetBrush(m_currentColor);
     dc->SetFont(&labelTxt);
 
     dc->StartGraphic(graphic, "", graphic->GetID());
@@ -695,7 +695,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     bez2[3] = points[3];
 
     dc->SetPen(m_currentColor, std::max(1, penWidth), AxSOLID);
-    dc->SetBrush(m_currentColor, AxSOLID);
+    dc->SetBrush(m_currentColor);
 
     dc->DrawCubicBezierPathFilled(bez1, bez2);
 
@@ -1214,7 +1214,7 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
             mnumTxt.SetPointSize(m_doc->GetDrawingLyricFont(80)->GetPointSize());
         }
 
-        dc->SetBrush(m_currentColor, AxSOLID);
+        dc->SetBrush(m_currentColor);
         dc->SetFont(&mnumTxt);
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
@@ -1313,7 +1313,7 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, M
 
     const int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
     dc->SetPen(m_currentColor, ToDeviceContextX(lineWidth), AxSOLID);
-    dc->SetBrush(m_currentColor, AxSOLID);
+    dc->SetBrush(m_currentColor);
 
     // If German lute tablature the default is @lines.visible="false", but setting @lines.visible="true"
     // will draw the staff lines.
@@ -1397,7 +1397,7 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerL
     if (cueSize) lineWidth *= m_doc->GetOptions()->m_graceFactor.GetValue();
 
     dc->SetPen(m_currentColor, ToDeviceContextX(lineWidth), AxSOLID);
-    dc->SetBrush(m_currentColor, AxSOLID);
+    dc->SetBrush(m_currentColor);
 
     bool svgHtml5 = (m_doc->GetOptions()->m_svgHtml5.GetValue());
 

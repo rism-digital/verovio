@@ -134,8 +134,8 @@ void DeviceContext::SetViewBoxFactor(double ppuFactor)
     m_viewBoxFactor = double(DEFINITION_FACTOR) / ppuFactor;
 }
 
-void DeviceContext::SetPen(
-    int color, int width, PenStyle style, int dashLength, int gapLength, LineCapStyle lineCap, LineJoinStyle lineJoin)
+void DeviceContext::SetPen(int color, int width, PenStyle style, int dashLength, int gapLength, LineCapStyle lineCap,
+    LineJoinStyle lineJoin, float opacity)
 {
     switch (style) {
         case AxSOLID: break;
@@ -151,24 +151,15 @@ void DeviceContext::SetPen(
             dashLength = dashLength ? dashLength : width * 2;
             gapLength = gapLength ? gapLength : width * 3;
             break;
-        case AxTRANSPARENT: break;
         default: break; // solid brush by default
     }
 
-    m_penStack.push(Pen(color, width, style, dashLength, gapLength, lineCap, lineJoin));
+    m_penStack.push(Pen(color, width, style, dashLength, gapLength, lineCap, lineJoin, opacity));
 }
 
-void DeviceContext::SetBrush(int color, int opacity)
+void DeviceContext::SetBrush(int color, float opacity)
 {
-    float opacityValue;
-
-    switch (opacity) {
-        case AxSOLID: opacityValue = 1.0; break;
-        case AxTRANSPARENT: opacityValue = 0.0; break;
-        default: opacityValue = 1.0; // solid brush by default
-    }
-
-    m_brushStack.push(Brush(color, opacityValue));
+    m_brushStack.push(Brush(color, opacity));
 }
 
 void DeviceContext::SetFont(FontInfo *font)

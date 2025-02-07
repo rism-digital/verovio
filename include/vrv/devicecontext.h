@@ -141,9 +141,9 @@ public:
      * Non-virtual methods cannot be overridden and manage the Pen, Brush and FontInfo stacks
      */
     ///@{
-    void SetBrush(int color, int opacity);
+    void SetBrush(int color, float opacity = 1.0);
     void SetPen(int color, int width, PenStyle style, int dashLength = 0, int gapLength = 0,
-        LineCapStyle lineCap = AxCAP_UNKNOWN, LineJoinStyle lineJoin = AxJOIN_UNKNOWN);
+        LineCapStyle lineCap = AxCAP_UNKNOWN, LineJoinStyle lineJoin = AxJOIN_UNKNOWN, float opacity = 1.0);
     void SetFont(FontInfo *font);
     void SetPushBack() { m_pushBack = true; }
     void ResetBrush();

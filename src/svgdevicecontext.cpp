@@ -38,7 +38,7 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext(SVG_DEVICE_CONTEXT)
     m_originX = 0;
     m_originY = 0;
 
-    this->SetBrush(AxNONE, AxSOLID);
+    this->SetBrush(AxNONE);
     this->SetPen(AxNONE, 1, AxSOLID);
 
     m_smuflGlyphs.clear();
@@ -688,7 +688,7 @@ void SvgDeviceContext::DrawEllipse(int x, int y, int width, int height)
     ellipseChild.append_attribute("rx") = rw;
     ellipseChild.append_attribute("ry") = rh;
     if (currentBrush.GetOpacity() != 1.0) ellipseChild.append_attribute("fill-opacity") = currentBrush.GetOpacity();
-    if (currentPen.GetStyle() != 1.0) ellipseChild.append_attribute("stroke-opacity") = currentPen.GetStyle();
+    if (currentPen.GetOpacity() != 1.0) ellipseChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
     if (currentPen.GetWidth() > 0) {
         ellipseChild.append_attribute("stroke-width") = currentPen.GetWidth();
         ellipseChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
@@ -751,7 +751,7 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
                                           .c_str();
     // pathChild.append_attribute("fill") = "currentColor";
     if (currentBrush.GetOpacity() != 1.0) pathChild.append_attribute("fill-opacity") = currentBrush.GetOpacity();
-    if (currentPen.GetStyle() != 1.0) pathChild.append_attribute("stroke-opacity") = currentPen.GetStyle();
+    if (currentPen.GetOpacity() != 1.0) pathChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
     if (currentPen.GetWidth() > 0) {
         pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
         pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
@@ -779,10 +779,10 @@ void SvgDeviceContext::DrawPolyline(int n, Point points[], int xOffset, int yOff
         polylineChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
     if (currentPen.GetWidth() > 1) {
-        polylineChild.append_attribute("stroke-width") = StringFormat("%d", currentPen.GetWidth()).c_str();
+        polylineChild.append_attribute("stroke-width") = currentPen.GetWidth();
     }
-    if (currentPen.GetStyle() != 1.0) {
-        polylineChild.append_attribute("stroke-opacity") = StringFormat("%f", currentPen.GetStyle()).c_str();
+    if (currentPen.GetOpacity() != 1.0) {
+        polylineChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
     }
 
     this->AppendStrokeLineCap(polylineChild, currentPen);
@@ -812,10 +812,10 @@ void SvgDeviceContext::DrawPolygon(int n, Point points[], int xOffset, int yOffs
         polygonChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
     if (currentPen.GetWidth() > 1) {
-        polygonChild.append_attribute("stroke-width") = StringFormat("%d", currentPen.GetWidth()).c_str();
+        polygonChild.append_attribute("stroke-width") = currentPen.GetWidth();
     }
-    if (currentPen.GetStyle() != 1.0) {
-        polygonChild.append_attribute("stroke-opacity") = StringFormat("%f", currentPen.GetStyle()).c_str();
+    if (currentPen.GetOpacity() != 1.0) {
+        polygonChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
     }
 
     this->AppendStrokeLineJoin(polygonChild, currentPen);
@@ -844,12 +844,15 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
 
     if (m_penStack.size()) {
         Pen currentPen = m_penStack.top();
-        if (currentPen.GetWidth() > 0)
+        if (currentPen.GetWidth() > 0) {
             rectChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
-        if (currentPen.GetWidth() > 1)
-            rectChild.append_attribute("stroke-width") = StringFormat("%d", currentPen.GetWidth()).c_str();
-        if (currentPen.GetStyle() != 1.0)
-            rectChild.append_attribute("stroke-opacity") = StringFormat("%f", currentPen.GetStyle()).c_str();
+        }
+        if (currentPen.GetWidth() > 1) {
+            rectChild.append_attribute("stroke-width") = currentPen.GetWidth();
+        }
+        if (currentPen.GetOpacity() != 1.0) {
+            rectChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
+        }
     }
 
     if (m_brushStack.size()) {
@@ -1269,10 +1272,10 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
                         p.y += (fontPoint->y * smuflGlyphFontSize / glyph->GetUnitsPerEm());
 
                         this->SetPen(AxGREEN, 10, AxSOLID);
-                        this->SetBrush(AxGREEN, AxSOLID);
+                        this->SetBrush(AxGREEN);
                         this->DrawCircle(view->ToDeviceContextX(p.x), view->ToDeviceContextY(p.y), 5);
                         this->SetPen(AxNONE, 1, AxSOLID);
-                        this->SetBrush(AxNONE, AxSOLID);
+                        this->SetBrush(AxNONE);
                     }
                 }
             }
