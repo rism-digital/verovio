@@ -775,6 +775,10 @@ Fraction LayerElement::GetAlignmentDuration(
         // Add a larger gap after the last neume of the syllable
         return (syllable->GetLast() == this) ? NEUME_MEDIUM_SPACE : NEUME_SMALL_SPACE;
     }
+    // This is not called with --neume-as-note since otherwise each nc has an aligner
+    //else if (this->Is(SYLLABLE) && !this->FindDescendantByType(NEUME)) {
+    //    return NEUME_MEDIUM_SPACE;
+    //}
     else {
         return Fraction(0);
     }
