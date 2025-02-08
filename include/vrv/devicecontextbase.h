@@ -8,6 +8,7 @@
 #ifndef __VRV_DC_BASE_H__
 #define __VRV_DC_BASE_H__
 
+#include <algorithm>
 #include <string>
 
 //----------------------------------------------------------------------------
