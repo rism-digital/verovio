@@ -223,17 +223,17 @@ public:
 
     Point operator-() const { return { -x, -y }; }
 
-    Point min(const Point &p) const
+    static Point Min(const Point &p1, const Point &p2)
     {
-        int x = std::min(this->x, p.x);
-        int y = std::min(this->y, p.y);
+        int x = std::min(p1.x, p2.x);
+        int y = std::min(p1.y, p2.y);
         return { x, y };
     }
 
-    Point max(const Point &p) const
+    static Point Max(const Point &p1, const Point &p2)
     {
-        int x = std::max(this->x, p.x);
-        int y = std::max(this->y, p.y);
+        int x = std::max(p1.x, p2.x);
+        int y = std::max(p1.y, p2.y);
         return { x, y };
     }
 };

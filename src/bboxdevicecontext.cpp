@@ -126,8 +126,8 @@ Point BBoxDeviceContext::GetLogicalOrigin()
 // calculated better
 void BBoxDeviceContext::DrawQuadBezierPath(Point bezier[3])
 {
-    Point pMin = bezier[0].min(bezier[2]);
-    Point pMax = bezier[0].max(bezier[2]);
+    Point pMin = Point::Min(bezier[0], bezier[2]);
+    Point pMax = Point::Max(bezier[0], bezier[2]);
 
     // From https://iquilezles.org/www/articles/bezierbbox/bezierbbox.htm
     if ((bezier[1].x < pMin.x) || (bezier[1].x > pMax.x) || (bezier[1].y < pMin.y) || (bezier[1].y > pMax.y)) {
@@ -140,8 +140,8 @@ void BBoxDeviceContext::DrawQuadBezierPath(Point bezier[3])
         // vec2 q = s*s*p0 + 2.0*s*t*p1 + t*t*p2;
         int qx = sx * sx * bezier[0].x + 2.0 * sx * tx * bezier[1].x + tx * tx * bezier[2].x;
         int qy = sy * sy * bezier[0].y + 2.0 * sy * ty * bezier[1].y + ty * ty * bezier[2].y;
-        pMin = pMin.min(Point(qx, qy));
-        pMax = pMax.max(Point(qx, qy));
+        pMin = Point::Min(pMin, Point(qx, qy));
+        pMax = Point::Max(pMax, Point(qx, qy));
     }
 
     this->UpdateBB(pMin.x, pMin.y, pMax.x, pMax.y);
