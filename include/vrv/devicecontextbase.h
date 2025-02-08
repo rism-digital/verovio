@@ -29,6 +29,9 @@ class Doc;
 #define COLOR_CYAN 255 << 8 | 255
 #define COLOR_LIGHT_GREY 127 << 16 | 127 << 8 | 127
 
+#undef max
+#undef min
+
 enum PenStyle : int8_t { PEN_SOLID = 0, PEN_DOT, PEN_LONG_DASH, PEN_SHORT_DASH, PEN_DOT_DASH };
 
 enum LineCapStyle : int8_t { LINECAP_DEFAULT = 0, LINECAP_BUTT, LINECAP_ROUND, LINECAP_SQUARE };
