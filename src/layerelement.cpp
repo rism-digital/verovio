@@ -76,7 +76,7 @@ namespace vrv {
 
 // Large spacing between syllables is a quarter note space
 // MAX_DURATION / pow(2.0, (DURATION_4 - 2.0))
-#define NEUME_LARGE_SPACE 256
+#define NEUME_LARGE_SPACE Fraction(1, 4)
 // Medium spacing between neume is a 8th note space
 #define NEUME_MEDIUM_SPACE Fraction(1, 8)
 // Small spacing between neume components is a 16th note space
