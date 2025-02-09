@@ -363,7 +363,7 @@ int main(int argc, char **argv)
 
     if (outformat == "svg") {
         const int from = page ? *page : 1;
-        const int to = (page && !all_pages) ? *page : toolkit.GetPageCount();
+        const int to = all_pages ? toolkit.GetPageCount() : from;
 
         for (int p = from; p <= to; ++p) {
             std::string cur_outfile = outfile;
