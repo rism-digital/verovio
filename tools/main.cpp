@@ -348,14 +348,14 @@ int main(int argc, char **argv)
         }
     }
 
-    if (toolkit.GetOutputTo() != vrv::HUMDRUM) {
+    if (page && (toolkit.GetOutputTo() != vrv::HUMDRUM)) {
         // Check the page range
-        if (page > toolkit.GetPageCount()) {
-            std::cerr << "The page requested (" << page << ") is not in the page range (max is "
+        if (*page > toolkit.GetPageCount()) {
+            std::cerr << "The page requested (" << *page << ") is not in the page range (max is "
                       << toolkit.GetPageCount() << ")." << std::endl;
             exit(1);
         }
-        if (page < 1) {
+        if (*page < 1) {
             std::cerr << "The page number has to be greater than 0." << std::endl;
             exit(1);
         }
@@ -570,7 +570,7 @@ int main(int argc, char **argv)
         outfile += ".mei";
         const std::string params = page
             ? vrv::StringFormat("{'scoreBased': %s, 'basic': %s, 'pageNo': %d, 'removeIds': %s, 'generateFacs': %s}",
-                  scoreBased, basic, page, removeIds, generateFacs)
+                  scoreBased, basic, *page, removeIds, generateFacs)
             : vrv::StringFormat("{'scoreBased': %s, 'basic': %s, 'removeIds': %s, 'generateFacs': %s}", scoreBased,
                   basic, removeIds, generateFacs);
         if (std_output) {
