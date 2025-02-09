@@ -81,32 +81,6 @@ FunctorCode AdjustNeumeXFunctor::VisitStaff(Staff *staff)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode AdjustNeumeXFunctor::VisitSyllable(Syllable *syllable)
-{
-    if (syllable->FindDescendantByType(NEUME)) return FUNCTOR_CONTINUE;
-    /*
-    // It is 0 when we process the first neume of the syllable
-    
-    if (m_neumeMinPos != VRV_UNSET) {
-        Alignment *alignment = syllable->GetAlignment();
-
-        int selfLeft = syllable->GetContentLeft();
-        if (selfLeft < m_neumeMinPos) {
-            const int adjust = m_neumeMinPos - selfLeft;
-            alignment->SetXRel(alignment->GetXRel() + adjust);
-        }
-    }
-    
-
-    m_minPos = syllable->GetContentRight() + m_doc->GetDrawingUnit(100);
-
-    // Check if the neume takes more space the the syllable text
-    //if (m_neumeMinPos > m_minPos) m_minPos = m_neumeMinPos;
-    */
-
-    return FUNCTOR_CONTINUE;
-}
-
 FunctorCode AdjustNeumeXFunctor::VisitSyl(Syl *syl)
 {
     Alignment *alignment = syl->GetAlignment();

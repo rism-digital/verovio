@@ -43,7 +43,6 @@ public:
     FunctorCode VisitLayerEnd(Layer *layer) override;
     FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitNeume(Neume *neume) override;
-    FunctorCode VisitSyllable(Syllable *syllable) override;
     FunctorCode VisitSyl(Syl *syl) override;
 
     ///@}
