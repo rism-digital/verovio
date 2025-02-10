@@ -36,34 +36,29 @@ struct MatchPathSeparator {
     bool operator()(char ch) const { return ch == '\\' || ch == '/'; }
 };
 
-std::string basename(std::string const &pathname)
+std::string Basename(const std::string &pathname)
 {
     return std::string(std::find_if(pathname.rbegin(), pathname.rend(), MatchPathSeparator()).base(), pathname.end());
 }
 
-std::string removeExtension(std::string const &filename)
+std::string RemoveExtension(const std::string &filename)
 {
     std::string::const_reverse_iterator pivot = std::find(filename.rbegin(), filename.rend(), '.');
-    return pivot == filename.rend() ? filename : std::string(filename.begin(), pivot.base() - 1);
+    return (pivot == filename.rend()) ? filename : std::string(filename.begin(), pivot.base() - 1);
 }
 
-bool dir_exists(std::string dir)
+bool DirExists(const std::string &dir)
 {
     struct stat st;
-    if ((stat(dir.c_str(), &st) == 0) && (((st.st_mode) & S_IFMT) == S_IFDIR)) {
-        return true;
-    }
-    else {
-        return false;
-    }
+    return (stat(dir.c_str(), &st) == 0) && (((st.st_mode) & S_IFMT) == S_IFDIR);
 }
 
-void display_version()
+void DisplayVersion()
 {
     std::cout << "Verovio " << vrv::GetVersion() << std::endl;
 }
 
-bool optionExists(const std::string &option, int argc, char **argv, std::string &badOption)
+bool OptionExists(const std::string &option, int argc, char **argv, std::string &badOption)
 {
     for (int i = 0; i < argc; ++i) {
         if (!strncmp(option.c_str(), argv[i], option.size())) return true;
@@ -72,7 +67,7 @@ bool optionExists(const std::string &option, int argc, char **argv, std::string 
     return false;
 }
 
-option optionStruct(vrv::Option *option, const std::map<vrv::Option *, std::string> &optionNames)
+option OptionStruct(vrv::Option *option, const std::map<vrv::Option *, std::string> &optionNames)
 {
     return { optionNames.at(option).c_str(), option->IsArgumentRequired() ? required_argument : no_argument, 0,
         option->GetShortOption() };
@@ -112,17 +107,17 @@ int main(int argc, char **argv)
               { &options->m_xmlIdSeed, vrv::FromCamelCase(options->m_xmlIdSeed.GetKey()) } };
 
     static struct option baseOptions[] = { //
-        optionStruct(&options->m_allPages, optionNames), //
-        optionStruct(&options->m_inputFrom, optionNames), //
-        optionStruct(&options->m_help, optionNames), //
-        optionStruct(&options->m_logLevel, optionNames), //
-        optionStruct(&options->m_outfile, optionNames), //
-        optionStruct(&options->m_page, optionNames), //
-        optionStruct(&options->m_resourcePath, optionNames), //
-        optionStruct(&options->m_scale, optionNames), //
-        optionStruct(&options->m_outputTo, optionNames), //
-        optionStruct(&options->m_version, optionNames), //
-        optionStruct(&options->m_xmlIdSeed, optionNames), //
+        OptionStruct(&options->m_allPages, optionNames), //
+        OptionStruct(&options->m_inputFrom, optionNames), //
+        OptionStruct(&options->m_help, optionNames), //
+        OptionStruct(&options->m_logLevel, optionNames), //
+        OptionStruct(&options->m_outfile, optionNames), //
+        OptionStruct(&options->m_page, optionNames), //
+        OptionStruct(&options->m_resourcePath, optionNames), //
+        OptionStruct(&options->m_scale, optionNames), //
+        OptionStruct(&options->m_outputTo, optionNames), //
+        OptionStruct(&options->m_version, optionNames), //
+        OptionStruct(&options->m_xmlIdSeed, optionNames), //
         // standard input - long options only or - as filename
         { "stdin", no_argument, 0, 'z' }, //
         { 0, 0, 0, 0 }
@@ -182,7 +177,7 @@ int main(int argc, char **argv)
                 key = longOptions[optionIndex].name;
                 opt = params->at(vrv::ToCamelCase(key));
                 optBool = dynamic_cast<vrv::OptionBool *>(opt);
-                if (std::string badOption; !optionExists("--" + key, argc, argv, badOption)) {
+                if (std::string badOption; !OptionExists("--" + key, argc, argv, badOption)) {
                     vrv::LogError("Unrecognized option %s has been skipped.", badOption.c_str());
                     continue;
                 }
@@ -262,7 +257,7 @@ int main(int argc, char **argv)
     toolkit.SetLocale();
 
     if (showVersion) {
-        display_version();
+        DisplayVersion();
         exit(0);
     }
 
@@ -283,7 +278,7 @@ int main(int argc, char **argv)
 
     // Make sure the user uses a valid Resource path
     // Save many headaches for empty SVGs
-    if (!dir_exists(resourcePath)) {
+    if (!DirExists(resourcePath)) {
         std::cerr << "The resource path " << resourcePath << " could not be found; please use -r option." << std::endl;
         exit(1);
     }
@@ -313,14 +308,14 @@ int main(int argc, char **argv)
 
     // Hardcode svg ext for now
     if (outfile.empty()) {
-        outfile = removeExtension(infile);
+        outfile = RemoveExtension(infile);
     }
     else if (outfile == "-") {
         // vrv::EnableLog(false);
         stdOutput = true;
     }
     else {
-        outfile = removeExtension(outfile);
+        outfile = RemoveExtension(outfile);
     }
 
     // Skip the layout for MIDI and timemap output by setting --breaks to none
