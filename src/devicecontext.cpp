@@ -123,6 +123,13 @@ std::pair<double, double> BezierCurve::EstimateCurveParamForControlPoints() cons
 // DeviceContext
 //----------------------------------------------------------------------------
 
+DeviceContext::~DeviceContext()
+{
+    if (m_penStack.size() != 1) LogDebug("Pen stack should have only one pen");
+    if (m_brushStack.size() != 1) LogDebug("Brush stack should have only one brush");
+    if (!m_fontStack.empty()) LogDebug("Font stack should be empty");
+}
+
 const Resources *DeviceContext::GetResources(bool showWarning) const
 {
     if (!m_resources && showWarning) LogWarning("Requested resources unavailable.");

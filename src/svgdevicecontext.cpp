@@ -38,9 +38,6 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext(SVG_DEVICE_CONTEXT)
     m_originX = 0;
     m_originY = 0;
 
-    this->SetBrush(COLOR_NONE);
-    this->SetPen(COLOR_NONE, 1, PEN_SOLID);
-
     m_smuflGlyphs.clear();
 
     m_committed = false;

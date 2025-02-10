@@ -75,6 +75,8 @@ public:
         m_baseHeight = 0;
         m_pushBack = false;
         m_viewBoxFactor = (double)DEFINITION_FACTOR;
+        this->SetBrush(COLOR_NONE);
+        this->SetPen(COLOR_NONE, 1, PEN_SOLID);
     }
     DeviceContext(ClassId classId)
     {
@@ -91,8 +93,10 @@ public:
         m_baseHeight = 0;
         m_pushBack = false;
         m_viewBoxFactor = (double)DEFINITION_FACTOR;
+        this->SetBrush(COLOR_NONE);
+        this->SetPen(COLOR_NONE, 1, PEN_SOLID);
     }
-    virtual ~DeviceContext() {}
+    virtual ~DeviceContext();
     ClassId GetClassId() const { return m_classId; }
     bool Is(ClassId classId) const { return (m_classId == classId); }
     ///@}

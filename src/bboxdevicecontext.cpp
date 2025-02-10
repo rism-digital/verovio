@@ -37,9 +37,6 @@ BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height, unsigned
     m_drawingText = false;
     m_textAlignment = HORIZONTALALIGNMENT_left;
 
-    this->SetBrush(COLOR_NONE);
-    this->SetPen(COLOR_NONE, 1, PEN_SOLID);
-
     m_update = update;
 
     this->ResetGraphicRotation();
