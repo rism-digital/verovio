@@ -107,7 +107,7 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
     const int yRight = tupletBracket->GetDrawingYRight();
     int bracketHeight = (tuplet->GetDrawingBracketPos() == STAFFREL_basic_above) ? -1 : 1;
 
-    dc->SetPen(m_currentColor, lineWidth, PEN_SOLID, 0, 0, LINECAP_BUTT, LINEJOIN_MITER);
+    dc->SetPen(lineWidth, PEN_SOLID, 0, 0, LINECAP_BUTT, LINEJOIN_MITER);
 
     // Draw a bracket with a gap
     if (tupletBracket->GetAlignedNum() && tupletBracket->GetAlignedNum()->HasSelfBB()) {

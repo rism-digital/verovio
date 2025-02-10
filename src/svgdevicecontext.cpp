@@ -1280,11 +1280,11 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
                         p.y = object->GetSelfBottom() - y * smuflGlyphFontSize / glyph->GetUnitsPerEm();
                         p.y += (fontPoint->y * smuflGlyphFontSize / glyph->GetUnitsPerEm());
 
-                        this->SetPen(COLOR_GREEN, 10, PEN_SOLID);
+                        this->SetPen(10, PEN_SOLID, 0, 0, LINECAP_DEFAULT, LINEJOIN_DEFAULT, 1.0, COLOR_GREEN);
                         this->SetBrush(COLOR_GREEN);
                         this->DrawCircle(view->ToDeviceContextX(p.x), view->ToDeviceContextY(p.y), 5);
-                        this->SetPen(COLOR_NONE, 1, PEN_SOLID);
-                        this->SetBrush(COLOR_NONE);
+                        this->ResetBrush();
+                        this->ResetPen();
                     }
                 }
             }

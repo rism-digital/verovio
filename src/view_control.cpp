@@ -469,7 +469,7 @@ void View::DrawBracketSpan(
     x1 += lineWidth / 2;
     x2 -= lineWidth / 2;
 
-    dc->SetPen(m_currentColor, lineWidth, PEN_SOLID, 0, 0, LINECAP_BUTT, LINEJOIN_MITER);
+    dc->SetPen(lineWidth, PEN_SOLID, 0, 0, LINECAP_BUTT, LINEJOIN_MITER);
     dc->SetBrush(m_currentColor);
 
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
@@ -515,7 +515,7 @@ void View::DrawBracketSpan(
             const int diff = (x2 - x1) % (lineWidth * 3 + 1);
             x1 += diff / 2;
         }
-        dc->SetPen(m_currentColor, lineWidth, penStyle, 0, 0, lineCapStyle);
+        dc->SetPen(lineWidth, penStyle, 0, 0, lineCapStyle);
         dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
         dc->ResetPen();
     }
@@ -640,7 +640,7 @@ void View::DrawHairpin(
 
     const LineCapStyle cap = (style == PEN_DOT) ? LINECAP_ROUND : LINECAP_SQUARE;
 
-    dc->SetPen(m_currentColor, hairpinThickness, style, 0, 0, cap, LINEJOIN_MITER);
+    dc->SetPen(hairpinThickness, style, 0, 0, cap, LINEJOIN_MITER);
 
     if ((startY == 0) && !niente) {
         Point p[3];
@@ -787,7 +787,7 @@ void View::DrawOctave(
                 actualLineWidth = lineWidth * 3 / 2;
             }
         }
-        dc->SetPen(m_currentColor, actualLineWidth, penStyle, 0, actualGap, lineCapStyle);
+        dc->SetPen(actualLineWidth, penStyle, 0, actualGap, lineCapStyle);
         dc->SetBrush(m_currentColor);
 
         // adjust vertical ends
@@ -808,14 +808,13 @@ void View::DrawOctave(
             if (spanningType == SPANNING_END || spanningType == SPANNING_START_END) {
                 if (octave->GetLform() == LINEFORM_dotted) {
                     // make sure we have at least two dots for the dotted hook
-                    dc->SetPen(m_currentColor, lineWidth * 3 / 2, PEN_DOT, 0, std::min(gap, unit * 2 - lineWidth),
-                        LINECAP_ROUND);
+                    dc->SetPen(lineWidth * 3 / 2, PEN_DOT, 0, std::min(gap, unit * 2 - lineWidth), LINECAP_ROUND);
                     dc->DrawLine(
                         ToDeviceContextX(x2), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
                     dc->ResetPen();
                 }
                 else {
-                    dc->SetPen(m_currentColor, lineWidth, PEN_SOLID);
+                    dc->SetPen(lineWidth, PEN_SOLID);
                     // Right hook
                     Point hookRight[3];
                     hookRight[0] = { ToDeviceContextX(x2), ToDeviceContextY(y2) };
@@ -922,7 +921,7 @@ void View::DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflecti
         dc->StartGraphic(pitchInflection, "spanning-pinflection", "");
     }
 
-    dc->SetPen(m_currentColor, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), PEN_SOLID);
+    dc->SetPen(m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), PEN_SOLID);
     dc->SetBrush(m_currentColor);
 
     dc->DrawQuadBezierPath(points);
@@ -2102,18 +2101,18 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
             break;
         }
         case LINEFORM_dashed:
-            dc->SetPen(m_currentColor, lineWidth, PEN_SHORT_DASH, 0, 0, LINECAP_ROUND);
+            dc->SetPen(lineWidth, PEN_SHORT_DASH, 0, 0, LINECAP_ROUND);
             dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
             dc->ResetPen();
             break;
         case LINEFORM_dotted:
-            dc->SetPen(m_currentColor, lineWidth * 3 / 2, PEN_DOT, 0, 0, LINECAP_ROUND);
+            dc->SetPen(lineWidth * 3 / 2, PEN_DOT, 0, 0, LINECAP_ROUND);
             dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
             dc->ResetPen();
             break;
         case LINEFORM_solid: [[fallthrough]];
         default: {
-            dc->SetPen(m_currentColor, lineWidth, PEN_SOLID, 0, 0, LINECAP_ROUND);
+            dc->SetPen(lineWidth, PEN_SOLID, 0, 0, LINECAP_ROUND);
             dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
             dc->ResetPen();
             break;
@@ -3008,7 +3007,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
             default: penStyle = PEN_SOLID;
         }
 
-        dc->SetPen(m_currentColor, lineWidth, penStyle, 0, 0, capStyle);
+        dc->SetPen(lineWidth, penStyle, 0, 0, capStyle);
         dc->DrawLine(ToDeviceContextX(startX), ToDeviceContextY(y2), ToDeviceContextX(endX), ToDeviceContextY(y2));
         if ((spanningType != SPANNING_END) && (spanningType != SPANNING_MIDDLE)
             && (ending->GetLstartsym() != LINESTARTENDSYMBOL_none)) {

@@ -28,7 +28,7 @@ void View::DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int width
 {
     assert(dc);
 
-    dc->SetPen(m_currentColor, std::max(1, ToDeviceContextX(width)), PEN_SOLID, dashLength, gapLength);
+    dc->SetPen(std::max(1, ToDeviceContextX(width)), PEN_SOLID, dashLength, gapLength);
     dc->SetBrush(m_currentColor);
 
     dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x1), ToDeviceContextY(y2));
@@ -42,7 +42,7 @@ void View::DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int wid
 {
     assert(dc);
 
-    dc->SetPen(m_currentColor, std::max(1, ToDeviceContextX(width)), PEN_SOLID, dashLength, gapLength);
+    dc->SetPen(std::max(1, ToDeviceContextX(width)), PEN_SOLID, dashLength, gapLength);
     dc->SetBrush(m_currentColor);
 
     dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
@@ -56,7 +56,7 @@ void View::DrawObliqueLine(DeviceContext *dc, int x1, int x2, int y1, int y2, in
 {
     assert(dc);
 
-    dc->SetPen(m_currentColor, std::max(1, ToDeviceContextX(width)), PEN_SOLID, dashLength, gapLength);
+    dc->SetPen(std::max(1, ToDeviceContextX(width)), PEN_SOLID, dashLength, gapLength);
     dc->SetBrush(m_currentColor);
 
     dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
@@ -92,7 +92,7 @@ void View::DrawNotFilledEllipse(DeviceContext *dc, int x1, int y1, int x2, int y
 
     std::swap(y1, y2);
 
-    dc->SetPen(m_currentColor, lineThickness, PEN_SOLID);
+    dc->SetPen(lineThickness, PEN_SOLID);
     dc->SetBrush(m_currentColor, 0.0);
 
     int width = x2 - x1;
@@ -111,7 +111,7 @@ void View::DrawNotFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int
     std::swap(y1, y2);
 
     const int penWidth = lineThickness;
-    dc->SetPen(m_currentColor, penWidth, PEN_SOLID);
+    dc->SetPen(penWidth, PEN_SOLID);
     dc->SetBrush(m_currentColor, 0.0);
 
     dc->DrawRoundedRectangle(
@@ -139,7 +139,7 @@ void View::DrawFilledRoundedRectangle(DeviceContext *dc, int x1, int y1, int x2,
 
     std::swap(y1, y2);
 
-    dc->SetPen(m_currentColor, 0, PEN_SOLID);
+    dc->SetPen(0, PEN_SOLID);
     dc->SetBrush(m_currentColor);
 
     dc->DrawRoundedRectangle(
@@ -157,7 +157,7 @@ void View::DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2,
 {
     Point p[4];
 
-    dc->SetPen(m_currentColor, 0, PEN_SOLID);
+    dc->SetPen(0, PEN_SOLID);
     dc->SetBrush(m_currentColor);
 
     height = ToDeviceContextX(height);
@@ -182,7 +182,7 @@ void View::DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width,
 {
     Point p[4];
 
-    dc->SetPen(m_currentColor, linewidth, PEN_SOLID);
+    dc->SetPen(linewidth, PEN_SOLID);
     if (fill) {
         dc->SetBrush(m_currentColor);
     }
@@ -212,7 +212,7 @@ void View::DrawDot(DeviceContext *dc, int x, int y, int staffSize, bool dimin)
     int r = std::max(ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize) / 5), 2);
     if (dimin) r *= m_doc->GetOptions()->m_graceFactor.GetValue();
 
-    dc->SetPen(m_currentColor, 0, PEN_SOLID);
+    dc->SetPen(0, PEN_SOLID);
     dc->SetBrush(m_currentColor);
 
     dc->DrawCircle(ToDeviceContextX(x), ToDeviceContextY(y), r);
@@ -229,7 +229,7 @@ void View::DrawVerticalDots(DeviceContext *dc, int x, const SegmentedLine &line,
     const int radius = std::max(barlineWidth, 2);
     int drawingPosition = top - interval / 2;
 
-    dc->SetPen(m_currentColor, 0, PEN_SOLID);
+    dc->SetPen(0, PEN_SOLID);
     dc->SetBrush(m_currentColor);
 
     while (drawingPosition > bottom) {
@@ -395,12 +395,12 @@ void View::DrawThickBezierCurve(
     // Actually draw it
     if (penStyle == PEN_SOLID) {
         // Solid Thick Bezier Curves are made of two beziers, filled in.
-        dc->SetPen(m_currentColor, std::max(1, m_doc->GetDrawingStemWidth(staffSize) / 2), penStyle);
+        dc->SetPen(std::max(1, m_doc->GetDrawingStemWidth(staffSize) / 2), penStyle);
         dc->DrawCubicBezierPathFilled(bez1, bez2);
     }
     else {
         // Dashed or Dotted Thick Bezier Curves have a uniform line width.
-        dc->SetPen(m_currentColor, thickness, penStyle);
+        dc->SetPen(thickness, penStyle);
         dc->DrawCubicBezierPath(bez1);
     }
     dc->ResetPen();

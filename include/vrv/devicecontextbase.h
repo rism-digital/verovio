@@ -57,26 +57,26 @@ enum LineJoinStyle : int8_t {
 class Pen {
 public:
     Pen()
-        : m_color(COLOR_NONE)
-        , m_width(0)
+        : m_width(0)
         , m_style(PEN_SOLID)
         , m_dashLength(0)
         , m_gapLength(0)
         , m_lineCap(LINECAP_DEFAULT)
         , m_lineJoin(LINEJOIN_DEFAULT)
         , m_opacity(1.0)
+        , m_color(COLOR_NONE)
     {
     }
-    Pen(int color, int width, PenStyle style, int dashLength, int gapLength, LineCapStyle lineCap,
-        LineJoinStyle lineJoin, float opacity)
-        : m_color(color)
-        , m_width(width)
+    Pen(int width, PenStyle style, int dashLength, int gapLength, LineCapStyle lineCap, LineJoinStyle lineJoin,
+        float opacity, int color)
+        : m_width(width)
         , m_style(style)
         , m_dashLength(dashLength)
         , m_gapLength(gapLength)
         , m_lineCap(lineCap)
         , m_lineJoin(lineJoin)
         , m_opacity(opacity)
+        , m_color(color)
     {
     }
 
@@ -98,12 +98,13 @@ public:
     void SetOpacity(float opacity) { m_opacity = opacity; }
 
 private:
-    int m_color, m_width;
+    int m_width;
     PenStyle m_style;
     int m_dashLength, m_gapLength;
     LineCapStyle m_lineCap;
     LineJoinStyle m_lineJoin;
     float m_opacity;
+    int m_color;
 };
 
 class Brush {

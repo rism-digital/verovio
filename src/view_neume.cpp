@@ -132,7 +132,7 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             x1 += lineWidth / 2;
             x2 += 2 * last->GetDrawingRadius(m_doc) - lineWidth / 2;
 
-            dc->SetPen(m_currentColor, lineWidth, PEN_SOLID, 0, 0, LINECAP_BUTT, LINEJOIN_MITER);
+            dc->SetPen(lineWidth, PEN_SOLID, 0, 0, LINECAP_BUTT, LINEJOIN_MITER);
 
             dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
             dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y + lineWidth / 2), ToDeviceContextX(x1),

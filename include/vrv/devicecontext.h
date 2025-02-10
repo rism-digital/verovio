@@ -76,7 +76,7 @@ public:
         m_pushBack = false;
         m_viewBoxFactor = (double)DEFINITION_FACTOR;
         this->SetBrush(COLOR_NONE);
-        this->SetPen(COLOR_NONE, 1, PEN_SOLID);
+        this->SetPen(1, PEN_SOLID);
     }
     DeviceContext(ClassId classId)
     {
@@ -94,7 +94,7 @@ public:
         m_pushBack = false;
         m_viewBoxFactor = (double)DEFINITION_FACTOR;
         this->SetBrush(COLOR_NONE);
-        this->SetPen(COLOR_NONE, 1, PEN_SOLID);
+        this->SetPen(1, PEN_SOLID);
     }
     virtual ~DeviceContext();
     ClassId GetClassId() const { return m_classId; }
@@ -146,8 +146,9 @@ public:
      */
     ///@{
     void SetBrush(int color, float opacity = 1.0);
-    void SetPen(int color, int width, PenStyle style, int dashLength = 0, int gapLength = 0,
-        LineCapStyle lineCap = LINECAP_DEFAULT, LineJoinStyle lineJoin = LINEJOIN_DEFAULT, float opacity = 1.0);
+    void SetPen(int width, PenStyle style, int dashLength = 0, int gapLength = 0,
+        LineCapStyle lineCap = LINECAP_DEFAULT, LineJoinStyle lineJoin = LINEJOIN_DEFAULT, float opacity = 1.0,
+        int color = COLOR_NONE);
     void SetFont(FontInfo *font);
     void SetPushBack() { m_pushBack = true; }
     void ResetBrush();

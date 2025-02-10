@@ -141,8 +141,8 @@ void DeviceContext::SetViewBoxFactor(double ppuFactor)
     m_viewBoxFactor = double(DEFINITION_FACTOR) / ppuFactor;
 }
 
-void DeviceContext::SetPen(int color, int width, PenStyle style, int dashLength, int gapLength, LineCapStyle lineCap,
-    LineJoinStyle lineJoin, float opacity)
+void DeviceContext::SetPen(int width, PenStyle style, int dashLength, int gapLength, LineCapStyle lineCap,
+    LineJoinStyle lineJoin, float opacity, int color)
 {
     switch (style) {
         case PEN_SOLID: break;
@@ -161,7 +161,7 @@ void DeviceContext::SetPen(int color, int width, PenStyle style, int dashLength,
         default: break; // solid brush by default
     }
 
-    m_penStack.push(Pen(color, width, style, dashLength, gapLength, lineCap, lineJoin, opacity));
+    m_penStack.push(Pen(width, style, dashLength, gapLength, lineCap, lineJoin, opacity, color));
 }
 
 void DeviceContext::SetBrush(int color, float opacity)
