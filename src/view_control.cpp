@@ -500,18 +500,24 @@ void View::DrawBracketSpan(
     }
     // We have a @lform - draw a full line
     if (bracketSpan->HasLform()) {
+        PenStyle penStyle = PEN_SOLID;
+        LineCapStyle lineCapStyle = LINECAP_BUTT;
         if (bracketSpan->GetLform() == LINEFORM_dashed) {
-            dc->SetPen(m_currentColor, lineWidth, PEN_LONG_DASH, 0, 0, LINECAP_SQUARE);
+            penStyle = PEN_LONG_DASH;
+            lineCapStyle = LINECAP_SQUARE;
         }
         else if (bracketSpan->GetLform() == LINEFORM_dotted) {
+            penStyle = PEN_DOT;
+            lineCapStyle = LINECAP_ROUND;
             // Adjust start and end
-            dc->SetPen(m_currentColor, lineWidth, PEN_DOT, 0, 0, LINECAP_ROUND);
             x1 += unit + lineWidth * 2;
             x2 -= unit + lineWidth * 2;
             const int diff = (x2 - x1) % (lineWidth * 3 + 1);
             x1 += diff / 2;
         }
+        dc->SetPen(m_currentColor, lineWidth, penStyle, 0, 0, lineCapStyle);
         dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
+        dc->ResetPen();
     }
 
     dc->ResetPen();
@@ -760,12 +766,15 @@ void View::DrawOctave(
         x1 += lineWidth;
         if (altSymbols) x1 += extend.m_width / 2;
 
-        dc->SetPen(m_currentColor, lineWidth, PEN_SHORT_DASH, 0, gap, LINECAP_SQUARE);
-        dc->SetBrush(m_currentColor);
+        PenStyle penStyle = PEN_SHORT_DASH;
+        LineCapStyle lineCapStyle = LINECAP_SQUARE;
+        int actualGap = gap;
+        int actualLineWidth = lineWidth;
+
         if (octave->HasLform()) {
             if (octave->GetLform() == LINEFORM_solid) {
-                dc->SetPen(m_currentColor, lineWidth, PEN_SOLID, 0, 0, LINECAP_SQUARE);
-                dc->SetBrush(m_currentColor);
+                penStyle = PEN_SOLID;
+                actualGap = 0;
             }
             else if (octave->GetLform() == LINEFORM_dotted) {
                 if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
@@ -773,10 +782,13 @@ void View::DrawOctave(
                     const int diff = (x2 - x1) % (gap + 1);
                     x2 += (gap - diff < diff) ? gap - diff : -diff;
                 }
-                dc->SetPen(m_currentColor, lineWidth * 3 / 2, PEN_DOT, 0, gap, LINECAP_ROUND);
-                dc->SetBrush(m_currentColor);
+                penStyle = PEN_SOLID;
+                lineCapStyle = LINECAP_ROUND;
+                actualLineWidth = lineWidth * 3 / 2;
             }
         }
+        dc->SetPen(m_currentColor, actualLineWidth, penStyle, 0, actualGap, lineCapStyle);
+        dc->SetBrush(m_currentColor);
 
         // adjust vertical ends
         y1 += (disPlace == STAFFREL_basic_above) ? -lineWidth / 2 : lineWidth / 2;
@@ -800,6 +812,7 @@ void View::DrawOctave(
                         LINECAP_ROUND);
                     dc->DrawLine(
                         ToDeviceContextX(x2), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+                    dc->ResetPen();
                 }
                 else {
                     dc->SetPen(m_currentColor, lineWidth, PEN_SOLID);
@@ -809,9 +822,13 @@ void View::DrawOctave(
                     hookRight[1] = { ToDeviceContextX(x2), ToDeviceContextY(y1) };
                     hookRight[2] = { ToDeviceContextX(x2 - unit), ToDeviceContextY(y1) };
                     dc->DrawPolyline(3, hookRight);
+                    dc->ResetPen();
                 }
             }
         }
+
+        dc->ResetBrush();
+        dc->ResetPen();
     }
 
     if (graphic) {
@@ -2086,20 +2103,17 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
         }
         case LINEFORM_dashed:
             dc->SetPen(m_currentColor, lineWidth, PEN_SHORT_DASH, 0, 0, LINECAP_ROUND);
-            dc->SetBrush(m_currentColor);
             dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
             dc->ResetPen();
             break;
         case LINEFORM_dotted:
             dc->SetPen(m_currentColor, lineWidth * 3 / 2, PEN_DOT, 0, 0, LINECAP_ROUND);
-            dc->SetBrush(m_currentColor);
             dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
             dc->ResetPen();
             break;
         case LINEFORM_solid: [[fallthrough]];
         default: {
             dc->SetPen(m_currentColor, lineWidth, PEN_SOLID, 0, 0, LINECAP_ROUND);
-            dc->SetBrush(m_currentColor);
             dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
             dc->ResetPen();
             break;
