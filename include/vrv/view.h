@@ -676,11 +676,6 @@ public:
      * useful for changing the color, for example
      */
     ///@{
-    LayerElement *m_currentElement;
-    Layer *m_currentLayer;
-    Measure *m_currentMeasure;
-    Staff *m_currentStaff;
-    System *m_currentSystem;
     Page *m_currentPage;
     ///@}
 

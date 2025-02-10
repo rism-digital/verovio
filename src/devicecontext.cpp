@@ -123,6 +123,13 @@ std::pair<double, double> BezierCurve::EstimateCurveParamForControlPoints() cons
 // DeviceContext
 //----------------------------------------------------------------------------
 
+DeviceContext::~DeviceContext()
+{
+    if (m_penStack.size() != 1) LogDebug("Pen stack should have only one pen");
+    if (m_brushStack.size() != 1) LogDebug("Brush stack should have only one brush");
+    if (!m_fontStack.empty()) LogDebug("Font stack should be empty");
+}
+
 const Resources *DeviceContext::GetResources(bool showWarning) const
 {
     if (!m_resources && showWarning) LogWarning("Requested resources unavailable.");
@@ -134,8 +141,8 @@ void DeviceContext::SetViewBoxFactor(double ppuFactor)
     m_viewBoxFactor = double(DEFINITION_FACTOR) / ppuFactor;
 }
 
-void DeviceContext::SetPen(int color, int width, PenStyle style, int dashLength, int gapLength, LineCapStyle lineCap,
-    LineJoinStyle lineJoin, float opacity)
+void DeviceContext::SetPen(int width, PenStyle style, int dashLength, int gapLength, LineCapStyle lineCap,
+    LineJoinStyle lineJoin, float opacity, int color)
 {
     switch (style) {
         case PEN_SOLID: break;
@@ -154,12 +161,12 @@ void DeviceContext::SetPen(int color, int width, PenStyle style, int dashLength,
         default: break; // solid brush by default
     }
 
-    m_penStack.push(Pen(color, width, style, dashLength, gapLength, lineCap, lineJoin, opacity));
+    m_penStack.push(Pen(width, style, dashLength, gapLength, lineCap, lineJoin, opacity, color));
 }
 
-void DeviceContext::SetBrush(int color, float opacity)
+void DeviceContext::SetBrush(float opacity, int color)
 {
-    m_brushStack.push(Brush(color, opacity));
+    m_brushStack.push(Brush(opacity, color));
 }
 
 void DeviceContext::SetFont(FontInfo *font)

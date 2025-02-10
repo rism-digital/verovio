@@ -77,15 +77,6 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         return;
     }
 
-    int previousColor = m_currentColor;
-
-    if (element == m_currentElement) {
-        m_currentColor = COLOR_RED;
-    }
-    else {
-        m_currentColor = COLOR_NONE;
-    }
-
     if (element->Is(ACCID)) {
         this->DrawAccid(dc, element, layer, staff, measure);
     }
@@ -232,8 +223,6 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         // This should never happen
         LogError("Element '%s' cannot be drawn", element->GetClassName().c_str());
     }
-
-    m_currentColor = previousColor;
 }
 
 //----------------------------------------------------------------------------
@@ -1759,8 +1748,6 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     dc->StartGraphic(syl, "", syl->GetID());
     dc->DeactivateGraphicY();
 
-    dc->SetBrush(m_currentColor);
-
     FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
     if (syl->HasFontweight()) {
         currentFont.SetWeight(syl->GetFontweight());
@@ -1817,7 +1804,6 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     dc->EndText();
 
     dc->ResetFont();
-    dc->ResetBrush();
 
     if (syl->GetStart() && syl->GetEnd()) {
         System *currentSystem = vrv_cast<System *>(measure->GetFirstAncestor(SYSTEM));
@@ -1874,7 +1860,6 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         params.m_y = staff->GetDrawingY() + this->GetSylYRel(std::max(1, verse->GetN()), staff, verse->GetPlace());
         params.m_pointSize = labelTxt.GetPointSize();
 
-        dc->SetBrush(m_currentColor);
         dc->SetFont(&labelTxt);
 
         dc->StartGraphic(graphic, "", graphic->GetID());
@@ -1886,7 +1871,6 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         dc->EndGraphic(graphic, this);
 
         dc->ResetFont();
-        dc->ResetBrush();
     }
 
     dc->StartGraphic(verse, "", verse->GetID());
@@ -1906,8 +1890,7 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff)
     assert(stem);
     assert(staff);
 
-    dc->SetPen(m_currentColor, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 1.2, PEN_SOLID);
-    dc->SetBrush(m_currentColor);
+    dc->SetPen(m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 1.2, PEN_SOLID);
 
     int positionShift = m_doc->GetCueSize(m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
     int positionShiftX1 = positionShift;
@@ -1944,7 +1927,6 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff)
     }
 
     dc->ResetPen();
-    dc->ResetBrush();
 }
 
 void View::DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, const Staff *staff, bool dimin)

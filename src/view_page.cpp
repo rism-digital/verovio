@@ -570,7 +570,6 @@ void View::DrawLabels(
     params.m_y = y;
     params.m_pointSize = labelTxt.GetPointSize();
 
-    dc->SetBrush(m_currentColor);
     dc->SetFont(&labelTxt);
 
     dc->StartGraphic(graphic, "", graphic->GetID());
@@ -599,7 +598,6 @@ void View::DrawLabels(
     }
 
     dc->ResetFont();
-    dc->ResetBrush();
 }
 
 void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
@@ -694,8 +692,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     bez2[2] = points[2];
     bez2[3] = points[3];
 
-    dc->SetPen(m_currentColor, std::max(1, penWidth), PEN_SOLID);
-    dc->SetBrush(m_currentColor);
+    dc->SetPen(std::max(1, penWidth), PEN_SOLID);
 
     dc->DrawCubicBezierPathFilled(bez1, bez2);
 
@@ -721,7 +718,6 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     dc->DrawCubicBezierPathFilled(bez1, bez2);
 
     dc->ResetPen();
-    dc->ResetBrush();
 
     return;
 }
@@ -1214,7 +1210,6 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
             mnumTxt.SetPointSize(m_doc->GetDrawingLyricFont(80)->GetPointSize());
         }
 
-        dc->SetBrush(m_currentColor);
         dc->SetFont(&mnumTxt);
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
@@ -1222,7 +1217,6 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
         dc->EndText();
 
         dc->ResetFont();
-        dc->ResetBrush();
 
         this->DrawTextEnclosure(dc, params, staff->m_drawingStaffSize);
 
@@ -1312,8 +1306,7 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, M
     }
 
     const int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
-    dc->SetPen(m_currentColor, ToDeviceContextX(lineWidth), PEN_SOLID);
-    dc->SetBrush(m_currentColor);
+    dc->SetPen(ToDeviceContextX(lineWidth), PEN_SOLID);
 
     // If German lute tablature the default is @lines.visible="false", but setting @lines.visible="true"
     // will draw the staff lines.
@@ -1364,7 +1357,6 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, M
     }
 
     dc->ResetPen();
-    dc->ResetBrush();
 
     return;
 }
@@ -1396,8 +1388,7 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerL
         = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     if (cueSize) lineWidth *= m_doc->GetOptions()->m_graceFactor.GetValue();
 
-    dc->SetPen(m_currentColor, ToDeviceContextX(lineWidth), PEN_SOLID);
-    dc->SetBrush(m_currentColor);
+    dc->SetPen(ToDeviceContextX(lineWidth), PEN_SOLID);
 
     bool svgHtml5 = (m_doc->GetOptions()->m_svgHtml5.GetValue());
 
@@ -1432,7 +1423,6 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerL
     }
 
     dc->ResetPen();
-    dc->ResetBrush();
 
     dc->EndCustomGraphic();
 }
