@@ -82,8 +82,8 @@ public:
     void DrawEllipse(int x, int y, int width, int height) override;
     void DrawEllipticArc(int x, int y, int width, int height, double start, double end) override;
     void DrawLine(int x1, int y1, int x2, int y2) override;
-    void DrawPolyline(int n, Point points[], int xOffset, int yOffset) override;
-    void DrawPolygon(int n, Point points[], int xOffset, int yOffset) override;
+    void DrawPolyline(int n, Point points[], bool close) override;
+    void DrawPolygon(int n, Point points[]) override;
     void DrawRectangle(int x, int y, int width, int height) override;
     void DrawRotatedText(const std::string &text, int x, int y, double angle) override;
     void DrawRoundedRectangle(int x, int y, int width, int height, int radius) override;

@@ -785,12 +785,12 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
     this->AppendStrokeDashArray(pathChild, m_penStack.top());
 }
 
-void SvgDeviceContext::DrawPolyline(int n, Point points[], int xOffset, int yOffset)
+void SvgDeviceContext::DrawPolyline(int n, Point points[], bool close)
 {
     assert(m_penStack.size());
     const Pen &currentPen = m_penStack.top();
 
-    pugi::xml_node polylineChild = AddChild("polyline");
+    pugi::xml_node polylineChild = (close) ? AddChild("polygon") : AddChild("polyline");
 
     if (currentPen.GetWidth() > 0) {
         polylineChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
@@ -810,12 +810,12 @@ void SvgDeviceContext::DrawPolyline(int n, Point points[], int xOffset, int yOff
 
     std::string pointsString;
     for (int i = 0; i < n; ++i) {
-        pointsString += StringFormat("%d,%d ", points[i].x + xOffset, points[i].y + yOffset);
+        pointsString += StringFormat("%d,%d ", points[i].x, points[i].y);
     }
     polylineChild.append_attribute("points") = pointsString.c_str();
 }
 
-void SvgDeviceContext::DrawPolygon(int n, Point points[], int xOffset, int yOffset)
+void SvgDeviceContext::DrawPolygon(int n, Point points[])
 {
     assert(m_penStack.size());
     assert(m_brushStack.size());
@@ -845,9 +845,9 @@ void SvgDeviceContext::DrawPolygon(int n, Point points[], int xOffset, int yOffs
         polygonChild.append_attribute("fill-opacity") = currentBrush.GetOpacity();
     }
 
-    std::string pointsString = StringFormat("%d,%d", points[0].x + xOffset, points[0].y + yOffset);
+    std::string pointsString = StringFormat("%d,%d", points[0].x, points[0].y);
     for (int i = 1; i < n; ++i) {
-        pointsString += " " + StringFormat("%d,%d", points[i].x + xOffset, points[i].y + yOffset);
+        pointsString += " " + StringFormat("%d,%d", points[i].x, points[i].y);
     }
     polygonChild.append_attribute("points") = pointsString.c_str();
 }

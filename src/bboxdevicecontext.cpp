@@ -197,27 +197,27 @@ void BBoxDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
     this->UpdateBB(x1 - overlap.first, y1 - overlap.second, x2 + overlap.second, y2 + overlap.first);
 }
 
-void BBoxDeviceContext::DrawPolyline(int n, Point points[], int xOffset, int yOffset)
+void BBoxDeviceContext::DrawPolyline(int n, Point points[], bool close)
 {
     // Same bounding box as corresponding polygon
-    this->DrawPolygon(n, points, xOffset, yOffset);
+    this->DrawPolygon(n, points);
 }
 
-void BBoxDeviceContext::DrawPolygon(int n, Point points[], int xOffset, int yOffset)
+void BBoxDeviceContext::DrawPolygon(int n, Point points[])
 {
     if (n == 0) {
         return;
     }
-    int x1 = points[0].x + xOffset;
+    int x1 = points[0].x;
     int x2 = x1;
-    int y1 = points[0].y + yOffset;
+    int y1 = points[0].y;
     int y2 = y1;
 
     for (int i = 0; i < n; ++i) {
-        x1 = std::min(x1, points[i].x + xOffset);
-        x2 = std::max(x2, points[i].x + xOffset);
-        y1 = std::min(y1, points[i].y + yOffset);
-        y2 = std::max(y2, points[i].y + yOffset);
+        x1 = std::min(x1, points[i].x);
+        x2 = std::max(x2, points[i].x);
+        y1 = std::min(y1, points[i].y);
+        y2 = std::max(y2, points[i].y);
     }
 
     const std::pair<int, int> overlap = this->GetPenWidthOverlap();
