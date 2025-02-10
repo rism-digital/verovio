@@ -75,7 +75,7 @@ public:
         m_baseHeight = 0;
         m_pushBack = false;
         m_viewBoxFactor = (double)DEFINITION_FACTOR;
-        this->SetBrush(COLOR_NONE);
+        this->SetBrush(1.0);
         this->SetPen(1, PEN_SOLID);
     }
     DeviceContext(ClassId classId)
@@ -93,7 +93,7 @@ public:
         m_baseHeight = 0;
         m_pushBack = false;
         m_viewBoxFactor = (double)DEFINITION_FACTOR;
-        this->SetBrush(COLOR_NONE);
+        this->SetBrush(1.0);
         this->SetPen(1, PEN_SOLID);
     }
     virtual ~DeviceContext();
@@ -145,7 +145,7 @@ public:
      * Non-virtual methods cannot be overridden and manage the Pen, Brush and FontInfo stacks
      */
     ///@{
-    void SetBrush(int color, float opacity = 1.0);
+    void SetBrush(float opacity, int color = COLOR_NONE);
     void SetPen(int width, PenStyle style, int dashLength = 0, int gapLength = 0,
         LineCapStyle lineCap = LINECAP_DEFAULT, LineJoinStyle lineJoin = LINEJOIN_DEFAULT, float opacity = 1.0,
         int color = COLOR_NONE);

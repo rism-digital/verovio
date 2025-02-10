@@ -164,9 +164,9 @@ void DeviceContext::SetPen(int width, PenStyle style, int dashLength, int gapLen
     m_penStack.push(Pen(width, style, dashLength, gapLength, lineCap, lineJoin, opacity, color));
 }
 
-void DeviceContext::SetBrush(int color, float opacity)
+void DeviceContext::SetBrush(float opacity, int color)
 {
-    m_brushStack.push(Brush(color, opacity));
+    m_brushStack.push(Brush(opacity, color));
 }
 
 void DeviceContext::SetFont(FontInfo *font)

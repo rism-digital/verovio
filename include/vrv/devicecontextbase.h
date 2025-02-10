@@ -109,8 +109,8 @@ private:
 
 class Brush {
 public:
-    Brush() : m_color(COLOR_NONE), m_opacity(1.0) {}
-    Brush(int color, float opacity) : m_color(color), m_opacity(opacity) {}
+    Brush() : m_opacity(1.0), m_color(COLOR_NONE) {}
+    Brush(float opacity, int color) : m_opacity(opacity), m_color(color) {}
 
     int GetColor() const { return m_color; }
     void SetColor(int color) { m_color = color; }
@@ -118,8 +118,8 @@ public:
     void SetOpacity(float opacity) { m_opacity = opacity; }
 
 private:
-    int m_color;
     float m_opacity;
+    int m_color;
 };
 
 // ---------------------------------------------------------------------------

@@ -470,7 +470,6 @@ void View::DrawBracketSpan(
     x2 -= lineWidth / 2;
 
     dc->SetPen(lineWidth, PEN_SOLID, 0, 0, LINECAP_BUTT, LINEJOIN_MITER);
-    dc->SetBrush(m_currentColor);
 
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         if (!bracketSpan->GetStart()->Is(TIMESTAMP_ATTR)) {
@@ -521,7 +520,6 @@ void View::DrawBracketSpan(
     }
 
     dc->ResetPen();
-    dc->ResetBrush();
 
     if (graphic) {
         dc->EndResumedGraphic(graphic, this);
@@ -658,7 +656,7 @@ void View::DrawHairpin(
     }
     else {
         if (niente) {
-            dc->SetBrush(m_currentColor, 0.0);
+            dc->SetBrush(0.0);
             if (startY == 0) {
                 dc->DrawCircle(ToDeviceContextX(x1), ToDeviceContextY(y), unit / 2);
                 startY = unit * endY / (x2 - x1) / 2;
@@ -788,7 +786,6 @@ void View::DrawOctave(
             }
         }
         dc->SetPen(actualLineWidth, penStyle, 0, actualGap, lineCapStyle);
-        dc->SetBrush(m_currentColor);
 
         // adjust vertical ends
         y1 += (disPlace == STAFFREL_basic_above) ? -lineWidth / 2 : lineWidth / 2;
@@ -826,7 +823,6 @@ void View::DrawOctave(
             }
         }
 
-        dc->ResetBrush();
         dc->ResetPen();
     }
 
@@ -922,7 +918,6 @@ void View::DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflecti
     }
 
     dc->SetPen(m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), PEN_SOLID);
-    dc->SetBrush(m_currentColor);
 
     dc->DrawQuadBezierPath(points);
     if (drawArrow) {
@@ -930,7 +925,6 @@ void View::DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflecti
     }
 
     dc->ResetPen();
-    dc->ResetBrush();
 
     if (graphic) {
         dc->EndResumedGraphic(graphic, this);
@@ -1663,7 +1657,6 @@ void View::DrawControlElementText(DeviceContext *dc, ControlElement *element, Me
             params.m_y -= m_doc->GetTextXHeight(&dirTxt, false) / 2;
         }
 
-        dc->SetBrush(m_currentColor);
         dc->SetFont(&dirTxt);
 
         dc->StartText(ToDeviceContextX(params.m_x - xAdjust), ToDeviceContextY(params.m_y), alignment);
@@ -1671,7 +1664,6 @@ void View::DrawControlElementText(DeviceContext *dc, ControlElement *element, Me
         dc->EndText();
 
         dc->ResetFont();
-        dc->ResetBrush();
 
         this->DrawTextEnclosure(dc, params, staffSize);
     }
@@ -1742,7 +1734,6 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
             this->DrawDynamSymbolOnly(dc, staff, dynam, dynamSymbol, alignment, params);
         }
         else {
-            dc->SetBrush(m_currentColor);
             dc->SetFont(&dynamTxt);
 
             dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
@@ -1750,7 +1741,6 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
             dc->EndText();
 
             dc->ResetFont();
-            dc->ResetBrush();
         }
         this->DrawTextEnclosure(dc, params, staffSize);
     }
@@ -1821,7 +1811,6 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, TextDrawingParams &pa
 
     fontDim->SetPointSize(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize());
 
-    dc->SetBrush(m_currentColor);
     dc->SetFont(fontDim);
 
     for (Object *current : fb->GetChildren()) {
@@ -1844,7 +1833,6 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, TextDrawingParams &pa
     }
 
     dc->ResetFont();
-    dc->ResetBrush();
 
     dc->EndGraphic(fb, this);
 }
@@ -1973,7 +1961,6 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
 
         fingTxt.SetPointSize(params.m_pointSize);
 
-        dc->SetBrush(m_currentColor);
         dc->SetFont(&fingTxt);
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
@@ -1981,7 +1968,6 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
         dc->EndText();
 
         dc->ResetFont();
-        dc->ResetBrush();
 
         this->DrawTextEnclosure(dc, params, staffSize);
     }
@@ -2171,7 +2157,6 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
 
             harmTxt.SetPointSize(params.m_pointSize);
 
-            dc->SetBrush(m_currentColor);
             dc->SetFont(&harmTxt);
 
             dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
@@ -2179,7 +2164,6 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
             dc->EndText();
 
             dc->ResetFont();
-            dc->ResetBrush();
 
             this->DrawTextEnclosure(dc, params, staffSize);
         }
@@ -2467,7 +2451,6 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
 
         rehTxt.SetPointSize(params.m_pointSize);
 
-        dc->SetBrush(m_currentColor);
         dc->SetFont(&rehTxt);
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
@@ -2475,7 +2458,6 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
         dc->EndText();
 
         dc->ResetFont();
-        dc->ResetBrush();
 
         this->DrawTextEnclosure(dc, params, staffSize);
     }
@@ -2588,7 +2570,6 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
             params.m_y -= m_doc->GetTextXHeight(&tempoTxt, false) / 2;
         }
 
-        dc->SetBrush(m_currentColor);
         dc->SetFont(&tempoTxt);
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
@@ -2596,7 +2577,6 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         dc->EndText();
 
         dc->ResetFont();
-        dc->ResetBrush();
 
         this->DrawTextEnclosure(dc, params, staffSize);
     }

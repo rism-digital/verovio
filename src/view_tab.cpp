@@ -123,7 +123,6 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
         params.m_pointSize = m_doc->GetDrawingLyricFont(glyphSize)->GetPointSize() * 4 / 5;
         fretTxt.SetPointSize(params.m_pointSize);
 
-        dc->SetBrush(m_currentColor);
         dc->SetFont(&fretTxt);
 
         params.m_y -= (m_doc->GetTextGlyphHeight(L'0', &fretTxt, drawingCueSize) / 2);
@@ -170,7 +169,6 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
             const int x2 = x + extend.m_width - widthBack * 1 / 10; // trim right hand overhang on last character
 
             dc->SetPen(lineThickness, PEN_SOLID);
-            dc->SetBrush(m_currentColor);
 
             // overlines
             int y1 = y + extend.m_ascent + lineThickness;
@@ -197,7 +195,6 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
             }
 
             dc->ResetPen();
-            dc->ResetBrush();
         }
         dc->ResetFont();
     }

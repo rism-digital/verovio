@@ -680,13 +680,11 @@ void View::DrawTextLayoutElement(DeviceContext *dc, TextLayoutElement *textLayou
 
     textElementFont.SetPointSize(params.m_pointSize);
 
-    dc->SetBrush(m_currentColor);
     dc->SetFont(&textElementFont);
 
     this->DrawRunningChildren(dc, textLayoutElement, params);
 
     dc->ResetFont();
-    dc->ResetBrush();
 
     dc->EndGraphic(textLayoutElement, this);
 }
