@@ -473,6 +473,7 @@ void View::DrawAnnotScore(
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const int boxHeight = annotScore->GetBoxHeight(m_doc, unit);
     const int lineWidth = annotScore->GetLineWidth(m_doc, unit);
+    const int halfLineWidth = lineWidth / 2;
 
     dc->SetPen(lineWidth, PEN_SOLID, 0, 0, LINECAP_BUTT, LINEJOIN_MITER);
     Point boxOutline[4];
@@ -487,7 +488,9 @@ void View::DrawAnnotScore(
             boxOutline[2] = { ToDeviceContextX(x1), ToDeviceContextY(y + boxHeight) };
             boxOutline[3] = { ToDeviceContextX(x2), ToDeviceContextY(y + boxHeight) };
             dc->DrawPolyline(4, boxOutline);
-            // this->DrawFilledRectangle(dc, x1, y, x2, y + boxHeight);
+            dc->SetBrush(0.5, COLOR_RED);
+            this->DrawFilledRectangle(dc, x1 + halfLineWidth, y + halfLineWidth, x2, y + boxHeight - halfLineWidth);
+            dc->ResetBrush();
             break;
         case SPANNING_MIDDLE:
             // Draw a box with  both sides open (to show it continues)
@@ -497,7 +500,9 @@ void View::DrawAnnotScore(
             dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
             dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y + boxHeight), ToDeviceContextX(x2),
                 ToDeviceContextY(y + boxHeight));
-            // this->DrawFilledRectangle(dc, x1, y, x2, y + boxHeight);
+            dc->SetBrush(0.5);
+            this->DrawFilledRectangle(dc, x1, y + halfLineWidth, x2, y + boxHeight - halfLineWidth);
+            dc->ResetBrush();
             break;
         case SPANNING_START_END:
             // Draw a closed box
@@ -511,8 +516,11 @@ void View::DrawAnnotScore(
             boxOutline[1] = { ToDeviceContextX(x1), ToDeviceContextY(y) };
             boxOutline[2] = { ToDeviceContextX(x1), ToDeviceContextY(y + boxHeight) };
             boxOutline[3] = { ToDeviceContextX(x2), ToDeviceContextY(y + boxHeight) };
-            dc->DrawPolyline(4, boxOutline);
-            // this->DrawFilledRectangle(dc, x1, y, x2, y + boxHeight);
+            dc->DrawPolyline(4, boxOutline, true);
+            dc->SetBrush(0.5);
+            this->DrawFilledRectangle(
+                dc, x1 + halfLineWidth, y + halfLineWidth, x2 - halfLineWidth, y + boxHeight - halfLineWidth);
+            dc->ResetBrush();
             break;
         case SPANNING_END:
             // Draw a box with the left side open to show it continues from previous system
@@ -524,7 +532,9 @@ void View::DrawAnnotScore(
             boxOutline[2] = { ToDeviceContextX(x2), ToDeviceContextY(y + boxHeight) };
             boxOutline[3] = { ToDeviceContextX(x1), ToDeviceContextY(y + boxHeight) };
             dc->DrawPolyline(4, boxOutline);
-            // this->DrawFilledRectangle(dc, x1, y, x2, y + boxHeight);
+            dc->SetBrush(0.5);
+            this->DrawFilledRectangle(dc, x1, y + halfLineWidth, x2 - halfLineWidth, y + boxHeight - halfLineWidth);
+            dc->ResetBrush();
             break;
     }
     dc->ResetPen();
