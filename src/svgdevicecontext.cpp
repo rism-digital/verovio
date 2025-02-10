@@ -477,7 +477,7 @@ void SvgDeviceContext::StartPage()
                                  //"g.bounding-box{stroke:red; stroke-width:10} "
                                  //"g.content-bounding-box{stroke:blue; stroke-width:10} "
                                  "g.ending, g.fing, g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
-                                 "g.mNum{font-style:italic;} g.label{font-weight:normal;}");
+                                 "g.mNum{font-style:italic;} g.label{font-weight:normal;} path{stroke:currentColor}");
         m_currentNode = m_svgNodeStack.back();
     }
 
@@ -622,7 +622,9 @@ void SvgDeviceContext::DrawQuadBezierPath(Point bezier[3])
         bezier[1].x, bezier[1].y, bezier[2].x, bezier[2].y)
                                           .c_str();
     pathChild.append_attribute("fill") = "none";
-    pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
+    if (m_penStack.top().GetColor() != COLOR_NONE) {
+        pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
+    }
     pathChild.append_attribute("stroke-linecap") = "round";
     pathChild.append_attribute("stroke-linejoin") = "round";
     pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
@@ -638,7 +640,9 @@ void SvgDeviceContext::DrawCubicBezierPath(Point bezier[4])
         )
                                           .c_str();
     pathChild.append_attribute("fill") = "none";
-    pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
+    if (m_penStack.top().GetColor() != COLOR_NONE) {
+        pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
+    }
     pathChild.append_attribute("stroke-linecap") = "round";
     pathChild.append_attribute("stroke-linejoin") = "round";
     pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
@@ -656,7 +660,9 @@ void SvgDeviceContext::DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2
               .c_str();
     // pathChild.append_attribute("fill") = "currentColor";
     // pathChild.append_attribute("fill-opacity") = "1";
-    pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
+    if (m_penStack.top().GetColor() != COLOR_NONE) {
+        pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
+    }
     pathChild.append_attribute("stroke-linecap") = "round";
     pathChild.append_attribute("stroke-linejoin") = "round";
     // pathChild.append_attribute("stroke-opacity") = "1";
@@ -692,7 +698,9 @@ void SvgDeviceContext::DrawEllipse(int x, int y, int width, int height)
     }
     if (currentPen.GetWidth() > 0) {
         ellipseChild.append_attribute("stroke-width") = currentPen.GetWidth();
-        ellipseChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
+    }
+    if (currentPen.GetColor() != COLOR_NONE) {
+        ellipseChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
 }
 
@@ -759,7 +767,9 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
     }
     if (currentPen.GetWidth() > 0) {
         pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
-        pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
+    }
+    if (currentPen.GetColor() != COLOR_NONE) {
+        pathChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
 }
 
@@ -767,7 +777,9 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
     pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d L%d %d", x1, y1, x2, y2).c_str();
-    pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
+    if (m_penStack.top().GetColor() != COLOR_NONE) {
+        pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
+    }
     if (m_penStack.top().GetWidth() > 1) pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
     this->AppendStrokeLineCap(pathChild, m_penStack.top());
     this->AppendStrokeDashArray(pathChild, m_penStack.top());
