@@ -77,15 +77,6 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         return;
     }
 
-    int previousColor = m_currentColor;
-
-    if (element == m_currentElement) {
-        m_currentColor = COLOR_RED;
-    }
-    else {
-        m_currentColor = COLOR_NONE;
-    }
-
     if (element->Is(ACCID)) {
         this->DrawAccid(dc, element, layer, staff, measure);
     }
@@ -232,8 +223,6 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         // This should never happen
         LogError("Element '%s' cannot be drawn", element->GetClassName().c_str());
     }
-
-    m_currentColor = previousColor;
 }
 
 //----------------------------------------------------------------------------
