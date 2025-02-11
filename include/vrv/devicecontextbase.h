@@ -63,7 +63,7 @@ public:
         , m_gapLength(0)
         , m_lineCap(LINECAP_DEFAULT)
         , m_lineJoin(LINEJOIN_DEFAULT)
-        , m_opacity(1.0)
+        , m_opacity(-1.0)
         , m_color(COLOR_NONE)
     {
     }
@@ -82,6 +82,7 @@ public:
 
     int GetColor() const { return m_color; }
     void SetColor(int color) { m_color = color; }
+    bool HasColor() const { return (m_color != COLOR_NONE); }
     int GetWidth() const { return m_width; }
     void SetWidth(int width) { m_width = width; }
     int GetDashLength() const { return m_dashLength; }
@@ -96,6 +97,7 @@ public:
     void SetStyle(PenStyle style) { m_style = style; }
     float GetOpacity() const { return m_opacity; }
     void SetOpacity(float opacity) { m_opacity = opacity; }
+    bool HasOpacity() const { return (m_opacity != -1.0); }
 
 private:
     int m_width;
@@ -109,13 +111,15 @@ private:
 
 class Brush {
 public:
-    Brush() : m_opacity(1.0), m_color(COLOR_NONE) {}
+    Brush() : m_opacity(-1.0), m_color(COLOR_NONE) {}
     Brush(float opacity, int color) : m_opacity(opacity), m_color(color) {}
 
     int GetColor() const { return m_color; }
     void SetColor(int color) { m_color = color; }
+    bool HasColor() const { return (m_color != COLOR_NONE); }
     float GetOpacity() const { return m_opacity; }
     void SetOpacity(float opacity) { m_opacity = opacity; }
+    bool HasOpacity() const { return (m_opacity != -1.0); }
 
 private:
     float m_opacity;

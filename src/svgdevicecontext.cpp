@@ -622,7 +622,7 @@ void SvgDeviceContext::DrawQuadBezierPath(Point bezier[3])
         bezier[1].x, bezier[1].y, bezier[2].x, bezier[2].y)
                                           .c_str();
     pathChild.append_attribute("fill") = "none";
-    if (m_penStack.top().GetColor() != COLOR_NONE) {
+    if (m_penStack.top().HasColor()) {
         pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
     }
     pathChild.append_attribute("stroke-linecap") = "round";
@@ -640,7 +640,7 @@ void SvgDeviceContext::DrawCubicBezierPath(Point bezier[4])
         )
                                           .c_str();
     pathChild.append_attribute("fill") = "none";
-    if (m_penStack.top().GetColor() != COLOR_NONE) {
+    if (m_penStack.top().HasColor()) {
         pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
     }
     pathChild.append_attribute("stroke-linecap") = "round";
@@ -660,7 +660,7 @@ void SvgDeviceContext::DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2
               .c_str();
     // pathChild.append_attribute("fill") = "currentColor";
     // pathChild.append_attribute("fill-opacity") = "1";
-    if (m_penStack.top().GetColor() != COLOR_NONE) {
+    if (m_penStack.top().HasColor()) {
         pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
     }
     pathChild.append_attribute("stroke-linecap") = "round";
@@ -690,16 +690,16 @@ void SvgDeviceContext::DrawEllipse(int x, int y, int width, int height)
     ellipseChild.append_attribute("cy") = y + rh;
     ellipseChild.append_attribute("rx") = rw;
     ellipseChild.append_attribute("ry") = rh;
-    if (currentBrush.GetOpacity() != 1.0) {
+    if (currentBrush.HasOpacity()) {
         ellipseChild.append_attribute("fill-opacity") = currentBrush.GetOpacity();
     }
-    if (currentPen.GetOpacity() != 1.0) {
+    if (currentPen.HasOpacity()) {
         ellipseChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
     }
     if (currentPen.GetWidth() > 0) {
         ellipseChild.append_attribute("stroke-width") = currentPen.GetWidth();
     }
-    if (currentPen.GetColor() != COLOR_NONE) {
+    if (currentPen.HasColor()) {
         ellipseChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
 }
@@ -759,16 +759,16 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
         "M%d %d A%d %d 0.0 %d %d %d %d", int(xs), int(ys), abs(int(rx)), abs(int(ry)), fArc, fSweep, int(xe), int(ye))
                                           .c_str();
     // pathChild.append_attribute("fill") = "currentColor";
-    if (currentBrush.GetOpacity() != 1.0) {
+    if (currentBrush.HasOpacity()) {
         pathChild.append_attribute("fill-opacity") = currentBrush.GetOpacity();
     }
-    if (currentPen.GetOpacity() != 1.0) {
+    if (currentPen.HasOpacity()) {
         pathChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
     }
     if (currentPen.GetWidth() > 0) {
         pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
     }
-    if (currentPen.GetColor() != COLOR_NONE) {
+    if (currentPen.HasColor()) {
         pathChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
 }
@@ -777,7 +777,7 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
     pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d L%d %d", x1, y1, x2, y2).c_str();
-    if (m_penStack.top().GetColor() != COLOR_NONE) {
+    if (m_penStack.top().HasColor()) {
         pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
     }
     if (m_penStack.top().GetWidth() > 1) pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
@@ -798,7 +798,7 @@ void SvgDeviceContext::DrawPolyline(int n, Point points[], bool close)
     if (currentPen.GetWidth() > 1) {
         polylineChild.append_attribute("stroke-width") = currentPen.GetWidth();
     }
-    if (currentPen.GetOpacity() != 1.0) {
+    if (currentPen.HasOpacity()) {
         polylineChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
     }
 
@@ -831,17 +831,17 @@ void SvgDeviceContext::DrawPolygon(int n, Point points[])
     if (currentPen.GetWidth() > 1) {
         polygonChild.append_attribute("stroke-width") = currentPen.GetWidth();
     }
-    if (currentPen.GetOpacity() != 1.0) {
+    if (currentPen.HasOpacity()) {
         polygonChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
     }
 
     this->AppendStrokeLineJoin(polygonChild, currentPen);
     this->AppendStrokeDashArray(polygonChild, currentPen);
 
-    if (currentBrush.GetColor() != COLOR_NONE) {
+    if (currentBrush.HasColor()) {
         polygonChild.append_attribute("fill") = this->GetColor(currentBrush.GetColor()).c_str();
     }
-    if (currentBrush.GetOpacity() != 1.0) {
+    if (currentBrush.HasOpacity()) {
         polygonChild.append_attribute("fill-opacity") = currentBrush.GetOpacity();
     }
 
@@ -869,17 +869,17 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
         if (currentPen.GetWidth() > 1) {
             rectChild.append_attribute("stroke-width") = currentPen.GetWidth();
         }
-        if (currentPen.GetOpacity() != 1.0) {
+        if (currentPen.HasOpacity()) {
             rectChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
         }
     }
 
     if (m_brushStack.size()) {
         Brush currentBrush = m_brushStack.top();
-        if (currentBrush.GetColor() != COLOR_NONE) {
+        if (currentBrush.HasColor()) {
             rectChild.append_attribute("fill") = this->GetColor(currentBrush.GetColor()).c_str();
         }
-        if (currentBrush.GetOpacity() != 1.0) {
+        if (currentBrush.HasOpacity()) {
             rectChild.append_attribute("fill-opacity") = currentBrush.GetOpacity();
         }
     }
