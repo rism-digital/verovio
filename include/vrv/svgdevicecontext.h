@@ -42,7 +42,7 @@ public:
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    SvgDeviceContext();
+    SvgDeviceContext(const std::string &docId);
     virtual ~SvgDeviceContext();
     ///@}
 
@@ -384,6 +384,8 @@ private:
     std::string m_glyphPostfixId;
     // embedding of the smufl text font
     option_SMUFLTEXTFONT m_smuflTextFont;
+    // the document id
+    std::string m_docId;
 };
 
 } // namespace vrv

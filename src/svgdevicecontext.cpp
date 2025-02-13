@@ -33,8 +33,10 @@ namespace vrv {
 // SvgDeviceContext
 //----------------------------------------------------------------------------
 
-SvgDeviceContext::SvgDeviceContext() : DeviceContext(SVG_DEVICE_CONTEXT)
+SvgDeviceContext::SvgDeviceContext(const std::string &docId) : DeviceContext(SVG_DEVICE_CONTEXT)
 {
+    m_docId = docId;
+
     m_originX = 0;
     m_originY = 0;
 
@@ -61,6 +63,7 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext(SVG_DEVICE_CONTEXT)
     m_svgNode.append_attribute("xmlns:xlink") = "http://www.w3.org/1999/xlink";
     m_svgNode.append_attribute("xmlns:mei") = "http://www.music-encoding.org/ns/mei";
     m_svgNode.append_attribute("overflow") = "visible";
+    m_svgNode.append_attribute("id") = m_docId;
 
     // start the stack
     m_svgNodeStack.push_back(m_svgNode);
@@ -472,19 +475,21 @@ void SvgDeviceContext::StartPage()
     if (this->UseGlobalStyling()) {
         m_currentNode = m_currentNode.append_child("style");
         m_currentNode.append_attribute("type") = "text/css";
-        m_currentNode.text().set("g.page-margin{font-family:Times,serif;} "
-                                 //"g.page-margin{background: pink;} "
-                                 //"g.bounding-box{stroke:red; stroke-width:10} "
-                                 //"g.content-bounding-box{stroke:blue; stroke-width:10} "
-                                 "g.ending, g.fing, g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
-                                 "g.mNum{font-style:italic;} g.label{font-weight:normal;} path{stroke:currentColor}");
+        m_currentNode.text().set("#" + m_docId
+            + " "
+              "g.page-margin{font-family:Times,serif;} "
+              //"g.page-margin{background: pink;} "
+              //"g.bounding-box{stroke:red; stroke-width:10} "
+              //"g.content-bounding-box{stroke:blue; stroke-width:10} "
+              "g.ending, g.fing, g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
+              "g.mNum{font-style:italic;} g.label{font-weight:normal;} path{stroke:currentColor}");
         m_currentNode = m_svgNodeStack.back();
     }
 
     if (!m_css.empty()) {
         m_currentNode = m_currentNode.append_child("style");
         m_currentNode.append_attribute("type") = "text/css";
-        m_currentNode.text().set(m_css.c_str());
+        m_currentNode.text().set(("#" + m_docId + " " + m_css).c_str());
         m_currentNode = m_svgNodeStack.back();
     }
 
