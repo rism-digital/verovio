@@ -621,7 +621,7 @@ void SvgDeviceContext::AppendStrokeDashArray(pugi::xml_node node, const Pen &pen
 void SvgDeviceContext::PrefixCssRules(std::string &rules)
 {
     static std::regex selectorRegex(R"(([^{}]+)\s*\{([^}]*)\})");
-    static std::regex multiSelectorRegex(R"((\b\w+\.[\w-]+\b))");
+    static std::regex multiSelectorRegex(R"((\b\w+\.?[\w-]+\b))");
 
     std::sregex_iterator it(rules.begin(), rules.end(), selectorRegex);
     std::sregex_iterator end;
