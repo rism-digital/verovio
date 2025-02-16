@@ -327,15 +327,15 @@ InitTimemapNotesFunctor::InitTimemapNotesFunctor() : Functor()
 FunctorCode InitTimemapNotesFunctor::VisitChord(Chord *chord)
 {
     if (chord->IsGraceNote()) {
-        std::list<Note *> pitches;
-        const ListOfObjects &notes = chord->GetList();
+        std::list<Note *> notes;
+        const ListOfObjects &chordNotes = chord->GetList();
         for (Object *obj : notes) {
             Note *note = vrv_cast<Note *>(obj);
             assert(note);
-            pitches.push_back(note);
+            notes.push_back(note);
         }
 
-        m_graceNotes.push_back({ pitches, chord->GetActualDur() });
+        m_graces.push_back({ notes, chord->GetActualDur() });
 
         bool accented = (chord->GetGrace() == GRACE_acc);
         const GraceGrp *graceGrp = vrv_cast<const GraceGrp *>(chord->GetFirstAncestor(GRACEGRP));
@@ -351,17 +351,16 @@ FunctorCode InitTimemapNotesFunctor::VisitChord(Chord *chord)
 FunctorCode InitTimemapNotesFunctor::VisitGraceGrpEnd(GraceGrp *graceGrp)
 {
     // Handling of Nachschlag
-    if (!m_graceNotes.empty() && (graceGrp->GetAttach() == graceGrpLog_ATTACH_pre) && !m_accentedGraceNote
-        && m_lastNote) {
+    if (!m_graces.empty() && (graceGrp->GetAttach() == graceGrpLog_ATTACH_pre) && !m_accentedGraceNote && m_lastNote) {
         Fraction startTime = m_lastNote->GetScoreTimeOffset();
         const Fraction graceNoteDur = UNACC_GRANENOTE_FRACTION * (int)m_currentTempo / 120;
-        const Fraction totalDur = graceNoteDur * (int)m_graceNotes.size();
+        const Fraction totalDur = graceNoteDur * (int)m_graces.size();
         startTime = startTime - totalDur;
         startTime = (startTime < 0) ? 0 : startTime;
 
-        for (const auto &chord : m_graceNotes) {
+        for (const auto &grace : m_graces) {
             const Fraction stopTime = startTime + graceNoteDur;
-            for (const auto &note : chord.pitches) {
+            for (const auto &note : grace.notes) {
                 // Set the start (onset) and end (offset) of the grace note
                 note->SetScoreTimeOnset(startTime);
                 note->SetScoreTimeOffset(stopTime);
@@ -373,7 +372,7 @@ FunctorCode InitTimemapNotesFunctor::VisitGraceGrpEnd(GraceGrp *graceGrp)
             startTime = stopTime;
         }
 
-        m_graceNotes.clear();
+        m_graces.clear();
     }
 
     return FUNCTOR_CONTINUE;
@@ -406,7 +405,7 @@ FunctorCode InitTimemapNotesFunctor::VisitNote(Note *note)
 
     // Handle grace notes
     if (note->IsGraceNote()) {
-        m_graceNotes.push_back({ { note }, note->GetDur() });
+        m_graces.push_back({ { note }, note->GetDur() });
 
         bool accented = (note->GetGrace() == GRACE_acc);
         const GraceGrp *graceGrp = vrv_cast<const GraceGrp *>(note->GetFirstAncestor(GRACEGRP));
@@ -417,9 +416,9 @@ FunctorCode InitTimemapNotesFunctor::VisitNote(Note *note)
     }
 
     // Check if some grace notes must be performed
-    if (!m_graceNotes.empty()) {
-        this->GenerateGraceNoteMIDI(note);
-        m_graceNotes.clear();
+    if (!m_graces.empty()) {
+        this->AddGraceNotesFor(note);
+        m_graces.clear();
     }
 
     // Store reference, i.e. for Nachschlag
@@ -428,22 +427,22 @@ FunctorCode InitTimemapNotesFunctor::VisitNote(Note *note)
     return FUNCTOR_SIBLINGS;
 }
 
-void InitTimemapNotesFunctor::GenerateGraceNoteMIDI(Note *refNote)
+void InitTimemapNotesFunctor::AddGraceNotesFor(Note *refNote)
 {
     Fraction startTime = refNote->GetScoreTimeOnset();
 
     Fraction graceNoteDur = 0;
-    if (m_accentedGraceNote && !m_graceNotes.empty()) {
+    if (m_accentedGraceNote && !m_graces.empty()) {
         const Fraction totalDur = refNote->GetScoreTimeDuration() / 2;
         // Adjust the start of the main note
         refNote->SetScoreTimeOnset(startTime + totalDur);
         double startRealTime = (startTime + totalDur).ToDouble() * 60.0 / m_currentTempo;
         refNote->SetRealTimeOnsetSeconds(startRealTime);
-        graceNoteDur = totalDur / (int)m_graceNotes.size();
+        graceNoteDur = totalDur / (int)m_graces.size();
     }
     else {
         graceNoteDur = UNACC_GRANENOTE_FRACTION * (int)m_currentTempo / 120;
-        const Fraction totalDur = graceNoteDur * (int)m_graceNotes.size();
+        const Fraction totalDur = graceNoteDur * (int)m_graces.size();
         if (startTime >= totalDur) {
             startTime = startTime - totalDur;
         }
@@ -455,9 +454,9 @@ void InitTimemapNotesFunctor::GenerateGraceNoteMIDI(Note *refNote)
         }
     }
 
-    for (const auto &chord : m_graceNotes) {
+    for (const auto &grace : m_graces) {
         const Fraction stopTime = startTime + graceNoteDur;
-        for (const auto &note : chord.pitches) {
+        for (const auto &note : grace.notes) {
             // Set the start (onset) and end (offset) of the grace note
             note->SetScoreTimeOnset(startTime);
             note->SetScoreTimeOffset(stopTime);
@@ -1060,8 +1059,6 @@ FunctorCode GenerateTimemapFunctor::VisitMeasure(const Measure *measure)
 
 FunctorCode GenerateTimemapFunctor::VisitNote(const Note *note)
 {
-    // if (note->HasGrace()) return FUNCTOR_SIBLINGS;
-
     // Skip cue notes when midiNoCue is activated
     if ((note->GetCue() == BOOLEAN_true) && m_noCue) {
         return FUNCTOR_SIBLINGS;

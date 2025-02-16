@@ -176,15 +176,6 @@ public:
 private:
     //
 };
-
-/**
- * Helper struct to store grace note/chord sequences
- */
-struct GraceChord {
-    std::list<Note *> pitches;
-    data_DURATION duration;
-};
-
 //----------------------------------------------------------------------------
 // InitTimemapNotesFunctor
 //----------------------------------------------------------------------------
@@ -228,9 +219,17 @@ protected:
     //
 private:
     /**
+     * Helper struct to store grace note/chord sequences
+     */
+    struct Grace {
+        std::list<Note *> notes;
+        data_DURATION duration;
+    };
+
+    /**
      * Creates the MIDI output of the grace note sequence
      */
-    void GenerateGraceNoteMIDI(Note *refNote);
+    void AddGraceNotesFor(Note *refNote);
 
 public:
     //
@@ -238,7 +237,7 @@ private:
     // Indicates whether cue notes should be included
     bool m_noCue;
     // Grace note/chord sequence
-    std::list<GraceChord> m_graceNotes;
+    std::list<Grace> m_graces;
     // Indicates whether the last grace note/chord was accented
     bool m_accentedGraceNote;
     // The current tempo
