@@ -9,6 +9,10 @@
 
 //----------------------------------------------------------------------------
 
+#include <algorithm>
+
+//----------------------------------------------------------------------------
+
 #include "arpeg.h"
 #include "beatrpt.h"
 #include "btrem.h"
@@ -335,12 +339,14 @@ FunctorCode InitTimemapNotesFunctor::VisitChord(Chord *chord)
             notes.push_back(note);
         }
 
-        m_graces.push_back({ notes, chord->GetActualDur() });
-
-        bool accented = (chord->GetGrace() == GRACE_acc);
+        m_accentedGraceNote = (chord->GetGrace() == GRACE_acc);
+        double time = chord->HasGraceTime() ? chord->GetGraceTime() : 50.0;
         const GraceGrp *graceGrp = vrv_cast<const GraceGrp *>(chord->GetFirstAncestor(GRACEGRP));
-        if (graceGrp && (graceGrp->GetGrace() == GRACE_acc)) accented = true;
-        m_accentedGraceNote = accented;
+        if (graceGrp) {
+            if (graceGrp->GetGrace() == GRACE_acc) m_accentedGraceNote = true;
+            time = (graceGrp->HasGraceTime()) ? graceGrp->GetGraceTime() : 50.0;
+        }
+        m_graces.push_back({ notes, chord->GetActualDur(), time });
 
         return FUNCTOR_SIBLINGS;
     }
@@ -405,12 +411,14 @@ FunctorCode InitTimemapNotesFunctor::VisitNote(Note *note)
 
     // Handle grace notes
     if (note->IsGraceNote()) {
-        m_graces.push_back({ { note }, note->GetDur() });
-
-        bool accented = (note->GetGrace() == GRACE_acc);
+        m_accentedGraceNote = (note->GetGrace() == GRACE_acc);
+        double time = note->HasGraceTime() ? note->GetGraceTime() : 50.0;
         const GraceGrp *graceGrp = vrv_cast<const GraceGrp *>(note->GetFirstAncestor(GRACEGRP));
-        if (graceGrp && (graceGrp->GetGrace() == GRACE_acc)) accented = true;
-        m_accentedGraceNote = accented;
+        if (graceGrp) {
+            if (graceGrp->GetGrace() == GRACE_acc) m_accentedGraceNote = true;
+            time = (graceGrp->HasGraceTime()) ? graceGrp->GetGraceTime() : 50.0;
+        }
+        m_graces.push_back({ { note }, note->GetDur(), time });
 
         return FUNCTOR_SIBLINGS;
     }
@@ -433,7 +441,11 @@ void InitTimemapNotesFunctor::AddGraceNotesFor(Note *refNote)
 
     Fraction graceNoteDur = 0;
     if (m_accentedGraceNote && !m_graces.empty()) {
-        const Fraction totalDur = refNote->GetScoreTimeDuration() / 2;
+        // Arbitraritly looks at the first note, not sure what to do if we have condradictory values
+        double percent = m_graces.front().time;
+        // Arbitraritly constraint the time between 5% and 95%
+        percent = std::min(95.0, std::max(5.0, percent));
+        const Fraction totalDur = refNote->GetScoreTimeDuration() * (int)percent / 100;
         // Adjust the start of the main note
         refNote->SetScoreTimeOnset(startTime + totalDur);
         double startRealTime = (startTime + totalDur).ToDouble() * 60.0 / m_currentTempo;

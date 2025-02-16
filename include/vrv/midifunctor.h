@@ -224,6 +224,7 @@ private:
     struct Grace {
         std::list<Note *> notes;
         data_DURATION duration;
+        data_PERCENT time;
     };
 
     /**
