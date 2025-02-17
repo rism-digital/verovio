@@ -551,7 +551,6 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             generateMIDI.SetTempoEventTicks(tempoEventTicks);
             generateMIDI.SetTransSemi(transSemi);
             generateMIDI.SetCurrentTempo(tempo);
-            generateMIDI.SetDeferredNotes(initMIDI.GetDeferredNotes());
             generateMIDI.SetOctaves(initMIDI.GetOctaves());
             generateMIDI.SetNoCue(this->GetOptions()->m_midiNoCue.GetValue());
             generateMIDI.SetControlEvents(controlEvents);

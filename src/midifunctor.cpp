@@ -328,6 +328,33 @@ InitTimemapAdjustNotesFunctor::InitTimemapAdjustNotesFunctor() : Functor()
     m_currentTempo = MIDI_TEMPO;
 }
 
+FunctorCode InitTimemapAdjustNotesFunctor::VisitArpeg(Arpeg *arpeg)
+{
+    // Sort the involved notes by playing order
+    const bool playTopDown = (arpeg->GetOrder() == arpegLog_ORDER_down);
+    std::set<Note *> notes = arpeg->GetNotes();
+    if (notes.empty()) return FUNCTOR_CONTINUE;
+
+    std::vector<Note *> sortedNotes;
+    std::copy(notes.begin(), notes.end(), std::back_inserter(sortedNotes));
+    std::sort(sortedNotes.begin(), sortedNotes.end(), [playTopDown](const Note *note1, const Note *note2) {
+        const int pitch1 = note1->GetMIDIPitch();
+        const int pitch2 = note2->GetMIDIPitch();
+        return playTopDown ? (pitch1 > pitch2) : (pitch1 < pitch2);
+    });
+
+    // Defer the notes in playing order
+    Fraction shift = 0;
+    Fraction startTime = sortedNotes.front()->GetScoreTimeOffset();
+    const Fraction increment = UNACC_GRACENOTE_FRACTION * (int)m_currentTempo;
+    for (Note *note : sortedNotes) {
+        if (shift != 0) this->SetNoteStart(note, startTime + shift);
+        shift = shift + increment;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode InitTimemapAdjustNotesFunctor::VisitChord(Chord *chord)
 {
     if (chord->IsGraceNote()) {
@@ -368,12 +395,7 @@ FunctorCode InitTimemapAdjustNotesFunctor::VisitGraceGrpEnd(GraceGrp *graceGrp)
             const Fraction stopTime = startTime + graceNoteDur;
             for (const auto &note : grace.notes) {
                 // Set the start (onset) and end (offset) of the grace note
-                note->SetScoreTimeOnset(startTime);
-                note->SetScoreTimeOffset(stopTime);
-                double startRealTimeSeconds = startTime.ToDouble() * 60.0 / m_currentTempo;
-                double stopRealTimeSeconds = stopTime.ToDouble() * 60.0 / m_currentTempo;
-                note->SetRealTimeOnsetSeconds(startRealTimeSeconds);
-                note->SetRealTimeOffsetSeconds(stopRealTimeSeconds);
+                this->SetNoteStartStop(note, startTime, stopTime);
             }
             startTime = stopTime;
         }
@@ -447,9 +469,7 @@ void InitTimemapAdjustNotesFunctor::SetGraceNotesFor(Note *refNote)
         percent = std::min(95.0, std::max(5.0, percent));
         const Fraction totalDur = refNote->GetScoreTimeDuration() * (int)percent / 100;
         // Adjust the start of the main note
-        refNote->SetScoreTimeOnset(startTime + totalDur);
-        double startRealTime = (startTime + totalDur).ToDouble() * 60.0 / m_currentTempo;
-        refNote->SetRealTimeOnsetSeconds(startRealTime);
+        this->SetNoteStart(refNote, startTime + totalDur);
         graceNoteDur = totalDur / (int)m_graces.size();
     }
     else {
@@ -470,15 +490,29 @@ void InitTimemapAdjustNotesFunctor::SetGraceNotesFor(Note *refNote)
         const Fraction stopTime = startTime + graceNoteDur;
         for (const auto &note : grace.notes) {
             // Set the start (onset) and end (offset) of the grace note
-            note->SetScoreTimeOnset(startTime);
-            note->SetScoreTimeOffset(stopTime);
-            double startRealTimeSeconds = startTime.ToDouble() * 60.0 / m_currentTempo;
-            double stopRealTimeSeconds = stopTime.ToDouble() * 60.0 / m_currentTempo;
-            note->SetRealTimeOnsetSeconds(startRealTimeSeconds);
-            note->SetRealTimeOffsetSeconds(stopRealTimeSeconds);
+            this->SetNoteStartStop(note, startTime, stopTime);
         }
         startTime = stopTime;
     }
+}
+
+void InitTimemapAdjustNotesFunctor::SetNoteStartStop(Note *note, const Fraction &startTime, const Fraction &stopTime)
+{
+    assert(note);
+
+    this->SetNoteStart(note, startTime);
+    note->SetScoreTimeOffset(stopTime);
+    double stopRealTimeSeconds = stopTime.ToDouble() * 60.0 / m_currentTempo;
+    note->SetRealTimeOffsetSeconds(stopRealTimeSeconds);
+}
+
+void InitTimemapAdjustNotesFunctor::SetNoteStart(Note *note, const Fraction &startTime)
+{
+    assert(note);
+
+    note->SetScoreTimeOnset(startTime);
+    double startRealTimeSeconds = startTime.ToDouble() * 60.0 / m_currentTempo;
+    note->SetRealTimeOnsetSeconds(startRealTimeSeconds);
 }
 
 //----------------------------------------------------------------------------
@@ -488,30 +522,6 @@ void InitTimemapAdjustNotesFunctor::SetGraceNotesFor(Note *refNote)
 InitMIDIFunctor::InitMIDIFunctor() : ConstFunctor()
 {
     m_currentTempo = MIDI_TEMPO;
-}
-
-FunctorCode InitMIDIFunctor::VisitArpeg(const Arpeg *arpeg)
-{
-    // Sort the involved notes by playing order
-    const bool playTopDown = (arpeg->GetOrder() == arpegLog_ORDER_down);
-    std::set<const Note *> notes = arpeg->GetNotes();
-    std::vector<const Note *> sortedNotes;
-    std::copy(notes.begin(), notes.end(), std::back_inserter(sortedNotes));
-    std::sort(sortedNotes.begin(), sortedNotes.end(), [playTopDown](const Note *note1, const Note *note2) {
-        const int pitch1 = note1->GetMIDIPitch();
-        const int pitch2 = note2->GetMIDIPitch();
-        return playTopDown ? (pitch1 > pitch2) : (pitch1 < pitch2);
-    });
-
-    // Defer the notes in playing order
-    double shift = 0.0;
-    const double increment = UNACC_GRACENOTE_DUR * m_currentTempo / 60000.0;
-    for (const Note *note : sortedNotes) {
-        if (shift > 0.0) m_deferredNotes[note] = shift;
-        shift += increment;
-    }
-
-    return FUNCTOR_CONTINUE;
 }
 
 FunctorCode InitMIDIFunctor::VisitMeasure(const Measure *measure)

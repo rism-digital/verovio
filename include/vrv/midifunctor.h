@@ -209,6 +209,7 @@ public:
      * Functor interface
      */
     ///@{
+    FunctorCode VisitArpeg(Arpeg *arpeg) override;
     FunctorCode VisitChord(Chord *chord) override;
     FunctorCode VisitGraceGrpEnd(GraceGrp *graceGrp) override;
     FunctorCode VisitMeasure(Measure *measure) override;
@@ -231,6 +232,12 @@ private:
      * Set the grace note onset and offset times for the reference note
      */
     void SetGraceNotesFor(Note *refNote);
+
+    /**
+     * Set the start (and stop) time for a note (score and real times)
+     */
+    void SetNoteStartStop(Note *note, const Fraction &startTime, const Fraction &stopTime);
+    void SetNoteStart(Note *note, const Fraction &startTime);
 
 public:
     //
@@ -287,7 +294,6 @@ public:
      */
     ///@{
     void SetCurrentTempo(double tempo) { m_currentTempo = tempo; }
-    const std::map<const Note *, double> &GetDeferredNotes() const { return m_deferredNotes; }
     const std::list<OctaveInfo> &GetOctaves() const { return m_octaves; }
     ///@}
 
@@ -295,7 +301,6 @@ public:
      * Functor interface
      */
     ///@{
-    FunctorCode VisitArpeg(const Arpeg *arpeg) override;
     FunctorCode VisitMeasure(const Measure *measure) override;
     FunctorCode VisitOctave(const Octave *octave) override;
     ///@}
@@ -309,8 +314,6 @@ public:
 private:
     // The current tempo
     double m_currentTempo;
-    // Deferred notes which start slightly later
-    std::map<const Note *, double> m_deferredNotes;
     // Octave info which is collected
     std::list<OctaveInfo> m_octaves;
 };
