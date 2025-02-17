@@ -28,13 +28,11 @@ void View::DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int width
 {
     assert(dc);
 
-    dc->SetPen(m_currentColor, std::max(1, ToDeviceContextX(width)), AxSOLID, dashLength, gapLength);
-    dc->SetBrush(m_currentColor, AxSOLID);
+    dc->SetPen(std::max(1, ToDeviceContextX(width)), PEN_SOLID, dashLength, gapLength);
 
     dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x1), ToDeviceContextY(y2));
 
     dc->ResetPen();
-    dc->ResetBrush();
     return;
 }
 
@@ -42,13 +40,11 @@ void View::DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int wid
 {
     assert(dc);
 
-    dc->SetPen(m_currentColor, std::max(1, ToDeviceContextX(width)), AxSOLID, dashLength, gapLength);
-    dc->SetBrush(m_currentColor, AxSOLID);
+    dc->SetPen(std::max(1, ToDeviceContextX(width)), PEN_SOLID, dashLength, gapLength);
 
     dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
 
     dc->ResetPen();
-    dc->ResetBrush();
     return;
 }
 
@@ -56,13 +52,11 @@ void View::DrawObliqueLine(DeviceContext *dc, int x1, int x2, int y1, int y2, in
 {
     assert(dc);
 
-    dc->SetPen(m_currentColor, std::max(1, ToDeviceContextX(width)), AxSOLID, dashLength, gapLength);
-    dc->SetBrush(m_currentColor, AxSOLID);
+    dc->SetPen(std::max(1, ToDeviceContextX(width)), PEN_SOLID, dashLength, gapLength);
 
     dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
 
     dc->ResetPen();
-    dc->ResetBrush();
     return;
 }
 
@@ -92,8 +86,8 @@ void View::DrawNotFilledEllipse(DeviceContext *dc, int x1, int y1, int x2, int y
 
     std::swap(y1, y2);
 
-    dc->SetPen(m_currentColor, lineThickness, AxSOLID);
-    dc->SetBrush(m_currentColor, AxTRANSPARENT);
+    dc->SetPen(lineThickness, PEN_SOLID);
+    dc->SetBrush(0.0);
 
     int width = x2 - x1;
     int height = y1 - y2;
@@ -104,29 +98,6 @@ void View::DrawNotFilledEllipse(DeviceContext *dc, int x1, int y1, int x2, int y
     dc->ResetBrush();
 }
 
-/*
- * Draw rectangle partly filled in, as specified by <fillSection>: 1=top, 2=bottom, 3=left side,
- * 4=right side; 0=don't fill in any part. FIXME: <fillSection> IS IGNORED.
- */
-void View::DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection)
-{
-    assert(dc); // DC cannot be NULL
-
-    std::swap(y1, y2);
-
-    // dc->SetPen(m_currentColor, 0, AxSOLID );
-    // dc->SetBrush(AxWHITE, AxTRANSPARENT);
-    dc->SetPen(AxBLUE, 0, AxSOLID);
-    dc->SetBrush(AxRED, AxTRANSPARENT);
-
-    dc->DrawRectangle(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1), ToDeviceContextX(y1 - y2));
-
-    dc->ResetPen();
-    dc->ResetBrush();
-
-    return;
-}
-
 void View::DrawNotFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int lineThickness, int radius = 0)
 {
     assert(dc); // DC cannot be NULL
@@ -134,8 +105,8 @@ void View::DrawNotFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int
     std::swap(y1, y2);
 
     const int penWidth = lineThickness;
-    dc->SetPen(m_currentColor, penWidth, AxSOLID);
-    dc->SetBrush(m_currentColor, AxTRANSPARENT);
+    dc->SetPen(penWidth, PEN_SOLID);
+    dc->SetBrush(0.0);
 
     dc->DrawRoundedRectangle(
         ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1), ToDeviceContextX(y1 - y2), radius);
@@ -162,14 +133,12 @@ void View::DrawFilledRoundedRectangle(DeviceContext *dc, int x1, int y1, int x2,
 
     std::swap(y1, y2);
 
-    dc->SetPen(m_currentColor, 0, AxSOLID);
-    dc->SetBrush(m_currentColor, AxSOLID);
+    dc->SetPen(0, PEN_SOLID);
 
     dc->DrawRoundedRectangle(
         ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1), ToDeviceContextX(y1 - y2), radius);
 
     dc->ResetPen();
-    dc->ResetBrush();
 
     return;
 }
@@ -180,8 +149,7 @@ void View::DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2,
 {
     Point p[4];
 
-    dc->SetPen(m_currentColor, 0, AxSOLID);
-    dc->SetBrush(m_currentColor, AxSOLID);
+    dc->SetPen(0, PEN_SOLID);
 
     height = ToDeviceContextX(height);
     p[0].x = ToDeviceContextX(x1);
@@ -196,7 +164,6 @@ void View::DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2,
     dc->DrawPolygon(4, p);
 
     dc->ResetPen();
-    dc->ResetBrush();
 }
 
 /* Draw an empty ("void") diamond with its top lefthand point at (x1, y1). */
@@ -205,12 +172,12 @@ void View::DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width,
 {
     Point p[4];
 
-    dc->SetPen(m_currentColor, linewidth, AxSOLID);
+    dc->SetPen(linewidth, PEN_SOLID);
     if (fill) {
-        dc->SetBrush(m_currentColor, AxSOLID);
+        dc->SetBrush(1.0);
     }
     else {
-        dc->SetBrush(m_currentColor, AxTRANSPARENT);
+        dc->SetBrush(0.0);
     }
 
     int dHeight = ToDeviceContextX(height);
@@ -235,13 +202,11 @@ void View::DrawDot(DeviceContext *dc, int x, int y, int staffSize, bool dimin)
     int r = std::max(ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize) / 5), 2);
     if (dimin) r *= m_doc->GetOptions()->m_graceFactor.GetValue();
 
-    dc->SetPen(m_currentColor, 0, AxSOLID);
-    dc->SetBrush(m_currentColor, AxSOLID);
+    dc->SetPen(0, PEN_SOLID);
 
     dc->DrawCircle(ToDeviceContextX(x), ToDeviceContextY(y), r);
 
     dc->ResetPen();
-    dc->ResetBrush();
 }
 
 void View::DrawVerticalDots(DeviceContext *dc, int x, const SegmentedLine &line, int barlineWidth, int interval)
@@ -252,8 +217,7 @@ void View::DrawVerticalDots(DeviceContext *dc, int x, const SegmentedLine &line,
     const int radius = std::max(barlineWidth, 2);
     int drawingPosition = top - interval / 2;
 
-    dc->SetPen(m_currentColor, 0, AxSOLID);
-    dc->SetBrush(m_currentColor, AxSOLID);
+    dc->SetPen(0, PEN_SOLID);
 
     while (drawingPosition > bottom) {
         dc->DrawCircle(ToDeviceContextX(x), ToDeviceContextY(drawingPosition), radius);
@@ -261,7 +225,6 @@ void View::DrawVerticalDots(DeviceContext *dc, int x, const SegmentedLine &line,
     }
 
     dc->ResetPen();
-    dc->ResetBrush();
 }
 
 void View::DrawSquareBracket(DeviceContext *dc, bool leftBracket, int x, int y, int height, int width,
@@ -319,13 +282,11 @@ void View::DrawSmuflCode(DeviceContext *dc, int x, int y, char32_t code, int sta
     std::u32string str;
     str.push_back(code);
 
-    dc->SetBrush(m_currentColor, AxSOLID);
     dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, dimin));
 
     dc->DrawMusicText(str, ToDeviceContextX(x), ToDeviceContextY(y), setBBGlyph);
 
     dc->ResetFont();
-    dc->ResetBrush();
 
     return;
 }
@@ -346,7 +307,6 @@ void View::DrawSmuflLine(
     // We add half a fill length for an average shorter / longer line result
     const int count = (length + fillWidth / 2 - startWidth - endWidth) / fillWidth;
 
-    dc->SetBrush(m_currentColor, AxSOLID);
     dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, dimin));
 
     std::u32string str;
@@ -366,7 +326,6 @@ void View::DrawSmuflLine(
     dc->DrawMusicText(str, ToDeviceContextX(orig.x), ToDeviceContextY(orig.y), false);
 
     dc->ResetFont();
-    dc->ResetBrush();
 }
 
 void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::u32string s, data_HORIZONTALALIGNMENT alignment,
@@ -376,7 +335,6 @@ void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::u32string s, da
 
     int xDC = ToDeviceContextX(x);
 
-    dc->SetBrush(m_currentColor, AxSOLID);
     dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, dimin));
 
     if (alignment == HORIZONTALALIGNMENT_center) {
@@ -393,11 +351,10 @@ void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::u32string s, da
     dc->DrawMusicText(s, xDC, ToDeviceContextY(y), setBBGlyph);
 
     dc->ResetFont();
-    dc->ResetBrush();
 }
 
 void View::DrawThickBezierCurve(
-    DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, int penStyle)
+    DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, PenStyle penStyle)
 {
     assert(dc);
 
@@ -416,14 +373,14 @@ void View::DrawThickBezierCurve(
     bez2[3] = ToDeviceContext(bez2[3]);
 
     // Actually draw it
-    if (penStyle == AxSOLID) {
+    if (penStyle == PEN_SOLID) {
         // Solid Thick Bezier Curves are made of two beziers, filled in.
-        dc->SetPen(m_currentColor, std::max(1, m_doc->GetDrawingStemWidth(staffSize) / 2), penStyle);
+        dc->SetPen(std::max(1, m_doc->GetDrawingStemWidth(staffSize) / 2), penStyle);
         dc->DrawCubicBezierPathFilled(bez1, bez2);
     }
     else {
         // Dashed or Dotted Thick Bezier Curves have a uniform line width.
-        dc->SetPen(m_currentColor, thickness, penStyle);
+        dc->SetPen(thickness, penStyle);
         dc->DrawCubicBezierPath(bez1);
     }
     dc->ResetPen();

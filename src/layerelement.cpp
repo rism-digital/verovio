@@ -75,8 +75,7 @@
 namespace vrv {
 
 // Large spacing between syllables is a quarter note space
-// MAX_DURATION / pow(2.0, (DURATION_4 - 2.0))
-#define NEUME_LARGE_SPACE 256
+#define NEUME_LARGE_SPACE Fraction(1, 4)
 // Medium spacing between neume is a 8th note space
 #define NEUME_MEDIUM_SPACE Fraction(1, 8)
 // Small spacing between neume components is a 16th note space
@@ -775,6 +774,11 @@ Fraction LayerElement::GetAlignmentDuration(
         assert(syllable);
         // Add a larger gap after the last neume of the syllable
         return (syllable->GetLast() == this) ? NEUME_MEDIUM_SPACE : NEUME_SMALL_SPACE;
+    }
+    // This is called only with syallable without neume
+    // Otherwise the duration is given by the neume (or by the nc with --neume-as-note)
+    else if (this->Is(SYLLABLE) && !this->FindDescendantByType(NEUME)) {
+        return NEUME_MEDIUM_SPACE;
     }
     else {
         return Fraction(0);

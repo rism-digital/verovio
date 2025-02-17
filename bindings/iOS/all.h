@@ -210,6 +210,7 @@
 #import <VerovioFramework/score.h>
 #import <VerovioFramework/scoredef.h>
 #import <VerovioFramework/scoredefinterface.h>
+#import <VerovioFramework/scoringupfunctor.h>
 #import <VerovioFramework/section.h>
 #import <VerovioFramework/setscoredeffunctor.h>
 #import <VerovioFramework/sic.h>
