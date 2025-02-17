@@ -359,7 +359,7 @@ FunctorCode InitTimemapAdjustNotesFunctor::VisitGraceGrpEnd(GraceGrp *graceGrp)
     // Handling of Nachschlag
     if (!m_graces.empty() && (graceGrp->GetAttach() == graceGrpLog_ATTACH_pre) && !m_accentedGraceNote && m_lastNote) {
         Fraction startTime = m_lastNote->GetScoreTimeOffset();
-        const Fraction graceNoteDur = UNACC_GRANENOTE_FRACTION * (int)m_currentTempo / 120;
+        const Fraction graceNoteDur = UNACC_GRACENOTE_FRACTION * (int)m_currentTempo;
         const Fraction totalDur = graceNoteDur * (int)m_graces.size();
         startTime = startTime - totalDur;
         startTime = (startTime < 0) ? 0 : startTime;
@@ -453,7 +453,7 @@ void InitTimemapAdjustNotesFunctor::AddGraceNotesFor(Note *refNote)
         graceNoteDur = totalDur / (int)m_graces.size();
     }
     else {
-        graceNoteDur = UNACC_GRANENOTE_FRACTION * (int)m_currentTempo / 120;
+        graceNoteDur = UNACC_GRACENOTE_FRACTION * (int)m_currentTempo;
         const Fraction totalDur = graceNoteDur * (int)m_graces.size();
         if (startTime >= totalDur) {
             startTime = startTime - totalDur;
