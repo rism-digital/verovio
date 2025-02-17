@@ -425,7 +425,7 @@ FunctorCode InitTimemapAdjustNotesFunctor::VisitNote(Note *note)
 
     // Check if some grace notes must be performed
     if (!m_graces.empty()) {
-        this->AddGraceNotesFor(note);
+        this->SetGraceNotesFor(note);
         m_graces.clear();
     }
 
@@ -435,15 +435,15 @@ FunctorCode InitTimemapAdjustNotesFunctor::VisitNote(Note *note)
     return FUNCTOR_SIBLINGS;
 }
 
-void InitTimemapAdjustNotesFunctor::AddGraceNotesFor(Note *refNote)
+void InitTimemapAdjustNotesFunctor::SetGraceNotesFor(Note *refNote)
 {
     Fraction startTime = refNote->GetScoreTimeOnset();
 
     Fraction graceNoteDur = 0;
     if (m_accentedGraceNote && !m_graces.empty()) {
-        // Arbitraritly looks at the first note, not sure what to do if we have condradictory values
+        // Arbitrarily looks at the first note, not sure what to do if we have contradictory values
         double percent = m_graces.front().time;
-        // Arbitraritly constraint the time between 5% and 95%
+        // Arbitrarily constraint the time between 5% and 95%
         percent = std::min(95.0, std::max(5.0, percent));
         const Fraction totalDur = refNote->GetScoreTimeDuration() * (int)percent / 100;
         // Adjust the start of the main note

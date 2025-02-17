@@ -228,9 +228,9 @@ private:
     };
 
     /**
-     * Creates the MIDI output of the grace note sequence
+     * Set the grace note onset and offset times for the reference note
      */
-    void AddGraceNotesFor(Note *refNote);
+    void SetGraceNotesFor(Note *refNote);
 
 public:
     //
