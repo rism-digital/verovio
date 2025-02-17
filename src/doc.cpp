@@ -107,6 +107,7 @@ Doc::~Doc()
 void Doc::Reset()
 {
     Object::Reset();
+    this->ResetID();
 
     this->ClearSelectionPages();
 
