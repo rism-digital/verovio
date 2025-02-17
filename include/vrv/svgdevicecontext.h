@@ -42,7 +42,7 @@ public:
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    SvgDeviceContext();
+    SvgDeviceContext(const std::string &docId);
     virtual ~SvgDeviceContext();
     ///@}
 
@@ -233,7 +233,11 @@ public:
     /**
      * Setter for an additional CSS
      */
-    void SetCss(const std::string &css) { m_css = css; }
+    void SetCss(const std::string &css)
+    {
+        m_css = css;
+        this->PrefixCssRules(m_css);
+    }
 
     /**
      *  Copies additional attributes of defined elements to the SVG, each string in the form "elementName@attribute"
@@ -306,6 +310,11 @@ private:
     void AppendStrokeLineJoin(pugi::xml_node node, const Pen &pen);
     void AppendStrokeDashArray(pugi::xml_node node, const Pen &pen);
     ///@}
+
+    /**
+     * Prefix the CSS rules with a #docId for scoping them to the SVG
+     */
+    void PrefixCssRules(std::string &rules);
 
 public:
     //
@@ -384,6 +393,8 @@ private:
     std::string m_glyphPostfixId;
     // embedding of the smufl text font
     option_SMUFLTEXTFONT m_smuflTextFont;
+    // the document id
+    std::string m_docId;
 };
 
 } // namespace vrv

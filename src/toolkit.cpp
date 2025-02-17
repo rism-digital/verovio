@@ -1684,7 +1684,7 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
     int initialPageNo = (m_doc.GetDrawingPage() == NULL) ? -1 : m_doc.GetDrawingPage()->GetIdx();
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
-    SvgDeviceContext svg;
+    SvgDeviceContext svg(m_doc.GetID());
     svg.SetResources(&m_doc.GetResources());
 
     int indent = (m_options->m_outputIndentTab.GetValue()) ? -1 : m_options->m_outputIndent.GetValue();

@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <cassert>
+#include <regex>
 
 //----------------------------------------------------------------------------
 
@@ -33,8 +34,10 @@ namespace vrv {
 // SvgDeviceContext
 //----------------------------------------------------------------------------
 
-SvgDeviceContext::SvgDeviceContext() : DeviceContext(SVG_DEVICE_CONTEXT)
+SvgDeviceContext::SvgDeviceContext(const std::string &docId) : DeviceContext(SVG_DEVICE_CONTEXT)
 {
+    m_docId = docId;
+
     m_originX = 0;
     m_originY = 0;
 
@@ -59,8 +62,8 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext(SVG_DEVICE_CONTEXT)
     m_svgNode.append_attribute("version") = "1.1";
     m_svgNode.append_attribute("xmlns") = "http://www.w3.org/2000/svg";
     m_svgNode.append_attribute("xmlns:xlink") = "http://www.w3.org/1999/xlink";
-    m_svgNode.append_attribute("xmlns:mei") = "http://www.music-encoding.org/ns/mei";
     m_svgNode.append_attribute("overflow") = "visible";
+    m_svgNode.append_attribute("id") = m_docId;
 
     // start the stack
     m_svgNodeStack.push_back(m_svgNode);
@@ -472,19 +475,21 @@ void SvgDeviceContext::StartPage()
     if (this->UseGlobalStyling()) {
         m_currentNode = m_currentNode.append_child("style");
         m_currentNode.append_attribute("type") = "text/css";
-        m_currentNode.text().set("g.page-margin{font-family:Times,serif;} "
-                                 //"g.page-margin{background: pink;} "
-                                 //"g.bounding-box{stroke:red; stroke-width:10} "
-                                 //"g.content-bounding-box{stroke:blue; stroke-width:10} "
-                                 "g.ending, g.fing, g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
-                                 "g.mNum{font-style:italic;} g.label{font-weight:normal;} path{stroke:currentColor}");
+        std::string css = "g.page-margin{font-family:Times,serif;} "
+                          "g.ending, g.fing, g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
+                          "g.mNum{font-style:italic;} g.label{font-weight:normal;} path{stroke:currentColor}";
+        // bounding box css - for debugging
+        // css += " g.bounding-box{stroke:red; stroke-width:10} "
+        //        "g.content-bounding-box{stroke:blue; stroke-width:10}";
+        this->PrefixCssRules(css);
+        m_currentNode.text().set(css);
         m_currentNode = m_svgNodeStack.back();
     }
 
     if (!m_css.empty()) {
         m_currentNode = m_currentNode.append_child("style");
         m_currentNode.append_attribute("type") = "text/css";
-        m_currentNode.text().set(m_css.c_str());
+        m_currentNode.text().set(m_css);
         m_currentNode = m_svgNodeStack.back();
     }
 
@@ -611,6 +616,36 @@ void SvgDeviceContext::AppendStrokeDashArray(pugi::xml_node node, const Pen &pen
         const int gapLength = (pen.GetGapLength() > 0) ? pen.GetGapLength() : dashLength;
         node.append_attribute("stroke-dasharray") = StringFormat("%d %d", dashLength, gapLength).c_str();
     }
+}
+
+void SvgDeviceContext::PrefixCssRules(std::string &rules)
+{
+    static std::regex selectorRegex(R"(([^{}]+)\s*\{([^}]*)\})");
+    static std::regex multiSelectorRegex(R"((\b\w+\.?[\w-]+\b))");
+
+    std::sregex_iterator it(rules.begin(), rules.end(), selectorRegex);
+    std::sregex_iterator end;
+
+    std::string result;
+
+    while (it != end) {
+
+        std::string selectors = (*it)[1].str();
+        std::string properties = (*it)[2].str();
+
+        // Trim trailing spaces from selectors to prevent extra spaces before `{`
+        selectors = std::regex_replace(selectors, std::regex(R"(\s+$)"), "");
+
+        // Prepend `#docId` to each selector
+        selectors = std::regex_replace(selectors, multiSelectorRegex, "#" + m_docId + " $1");
+
+        // Keep contents inside `{}` unchanged
+        result += selectors + " {" + properties + "}";
+
+        ++it;
+    }
+
+    rules = result;
 }
 
 // Drawing methods
