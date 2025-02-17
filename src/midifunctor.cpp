@@ -321,14 +321,14 @@ FunctorCode InitTimemapTiesFunctor::VisitTie(Tie *tie)
 // InitTimemapNotesFunctor
 //----------------------------------------------------------------------------
 
-InitTimemapNotesFunctor::InitTimemapNotesFunctor() : Functor()
+InitTimemapAdjustNotesFunctor::InitTimemapAdjustNotesFunctor() : Functor()
 {
     m_noCue = false;
     m_lastNote = NULL;
     m_currentTempo = MIDI_TEMPO;
 }
 
-FunctorCode InitTimemapNotesFunctor::VisitChord(Chord *chord)
+FunctorCode InitTimemapAdjustNotesFunctor::VisitChord(Chord *chord)
 {
     if (chord->IsGraceNote()) {
         std::list<Note *> notes;
@@ -354,7 +354,7 @@ FunctorCode InitTimemapNotesFunctor::VisitChord(Chord *chord)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode InitTimemapNotesFunctor::VisitGraceGrpEnd(GraceGrp *graceGrp)
+FunctorCode InitTimemapAdjustNotesFunctor::VisitGraceGrpEnd(GraceGrp *graceGrp)
 {
     // Handling of Nachschlag
     if (!m_graces.empty() && (graceGrp->GetAttach() == graceGrpLog_ATTACH_pre) && !m_accentedGraceNote && m_lastNote) {
@@ -384,7 +384,7 @@ FunctorCode InitTimemapNotesFunctor::VisitGraceGrpEnd(GraceGrp *graceGrp)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode InitTimemapNotesFunctor::VisitMeasure(Measure *measure)
+FunctorCode InitTimemapAdjustNotesFunctor::VisitMeasure(Measure *measure)
 {
     // Update the current tempo
     m_currentTempo = measure->GetCurrentTempo();
@@ -392,7 +392,7 @@ FunctorCode InitTimemapNotesFunctor::VisitMeasure(Measure *measure)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode InitTimemapNotesFunctor::VisitNote(Note *note)
+FunctorCode InitTimemapAdjustNotesFunctor::VisitNote(Note *note)
 {
     // Skip linked notes
     if (note->HasSameasLink()) {
@@ -435,7 +435,7 @@ FunctorCode InitTimemapNotesFunctor::VisitNote(Note *note)
     return FUNCTOR_SIBLINGS;
 }
 
-void InitTimemapNotesFunctor::AddGraceNotesFor(Note *refNote)
+void InitTimemapAdjustNotesFunctor::AddGraceNotesFor(Note *refNote)
 {
     Fraction startTime = refNote->GetScoreTimeOnset();
 

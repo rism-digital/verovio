@@ -183,14 +183,14 @@ private:
 /**
  * This class adjusts note duration for grace notes and arpeggios.
  */
-class InitTimemapNotesFunctor : public Functor {
+class InitTimemapAdjustNotesFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    InitTimemapNotesFunctor();
-    virtual ~InitTimemapNotesFunctor() = default;
+    InitTimemapAdjustNotesFunctor();
+    virtual ~InitTimemapAdjustNotesFunctor() = default;
     ///@}
 
     /*

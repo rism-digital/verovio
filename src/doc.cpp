@@ -405,9 +405,9 @@ void Doc::CalculateTimemap()
     this->Process(initTimemapTies);
 
     // Adjust the duration of notes (grace notes and arpeggios)
-    InitTimemapNotesFunctor initTimemapNotes;
-    initTimemapNotes.SetNoCue(this->GetOptions()->m_midiNoCue.GetValue());
-    this->Process(initTimemapNotes);
+    InitTimemapAdjustNotesFunctor initTimemapAdjustNotes;
+    initTimemapAdjustNotes.SetNoCue(this->GetOptions()->m_midiNoCue.GetValue());
+    this->Process(initTimemapAdjustNotes);
 
     m_timemapTempo = m_options->m_midiTempoAdjustment.GetValue();
 }
