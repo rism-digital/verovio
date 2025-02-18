@@ -333,17 +333,6 @@ void SvgDeviceContext::StartGraphic(
         }
     }
 
-    if (object->HasAttClass(ATT_LINKING)) {
-        AttLinking *att = dynamic_cast<AttLinking *>(object);
-        assert(att);
-        if (att->HasFollows()) {
-            m_currentNode.append_attribute("mei:follows") = att->GetFollows().c_str();
-        }
-        if (att->HasPrecedes()) {
-            m_currentNode.append_attribute("mei:precedes") = att->GetPrecedes().c_str();
-        }
-    }
-
     // m_currentNode.append_attribute("style") = StringFormat("stroke: #%s; stroke-opacity: %f; fill: #%s; fill-opacity:
     // %f;",
     // this->GetColor(currentPen.GetColor()).c_str(), currentPen.GetOpacity(),
