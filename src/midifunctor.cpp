@@ -318,7 +318,7 @@ FunctorCode InitTimemapTiesFunctor::VisitTie(Tie *tie)
 }
 
 //----------------------------------------------------------------------------
-// InitTimemapNotesFunctor
+// InitTimemapAdjustNotesFunctor
 //----------------------------------------------------------------------------
 
 InitTimemapAdjustNotesFunctor::InitTimemapAdjustNotesFunctor() : Functor()
