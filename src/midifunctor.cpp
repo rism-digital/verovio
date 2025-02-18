@@ -345,7 +345,7 @@ FunctorCode InitTimemapAdjustNotesFunctor::VisitArpeg(Arpeg *arpeg)
 
     // Defer the notes in playing order
     Fraction shift = 0;
-    Fraction startTime = sortedNotes.front()->GetScoreTimeOffset();
+    Fraction startTime = sortedNotes.front()->GetScoreTimeOnset();
     const Fraction increment = UNACC_GRACENOTE_FRACTION * (int)m_currentTempo;
     for (Note *note : sortedNotes) {
         if (shift != 0) this->SetNoteStart(note, startTime + shift);
