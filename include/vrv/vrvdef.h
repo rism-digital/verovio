@@ -73,7 +73,7 @@ namespace vrv {
 #define MIDI_TEMPO 120
 
 #define UNACC_GRACENOTE_DUR 27 // in milliseconds
-#define UNACC_GRACENOTE_FRACTION Fraction(1, 2024)
+#define UNACC_GRACENOTE_FRACTION Fraction(1, 2048)
 
 //----------------------------------------------------------------------------
 // Object defines
