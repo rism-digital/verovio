@@ -229,8 +229,8 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
             || staff->m_drawingNotationType == NOTATIONTYPE_cmn) {
             up = (note->GetDrawingStemDir() == STEMDIRECTION_up);
         }
-        // For mensural just calculate it here
-        else {
+        // For mensural white, just calculate it here - keep it down for mensural black
+        else if (staff->m_drawingNotationType != NOTATIONTYPE_mensural_black) {
             int verticalCenter = staff->GetDrawingY() - m_doc->GetDrawingUnit(staffSize) * (staff->m_drawingLines - 1);
             up = (note->GetDrawingY() < verticalCenter);
         }
