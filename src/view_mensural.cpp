@@ -383,31 +383,33 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
         }
     }
 
+    Point side1[4];
+    int thickness = topLeft->y - bottomLeft->y;
+    side1[0] = ToDeviceContext(*topLeft);
+    side1[3] = ToDeviceContext(*topRight);
+    //
+    int width = (side1[3].x - side1[0].x);
+    int height = (side1[3].y - side1[0].y);
+    side1[1] = side1[3];
+    side1[1].x -= (width * 0.75);
+    side1[1].y -= (height * 0.75) + (height * 0.05);
+    side1[2] = side1[3];
+    side1[2].x -= (width * 0.25);
+    side1[2].y -= (height * 0.25) + (height * 0.05);
+
     if (!fillNotehead) {
         // double the bases of rectangles
-        this->DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, -strokeWidth);
-        this->DrawObliquePolygon(dc, bottomLeft->x, bottomLeft->y, bottomRight->x, bottomRight->y, strokeWidth);
+        dc->DrawBentParallelogramFilled(side1, strokeWidth);
+        for (Point &point : side1) {
+            point.y += thickness - strokeWidth;
+        }
+        dc->DrawBentParallelogramFilled(side1, strokeWidth);
+
+        // this->DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, -strokeWidth);
+        // this->DrawObliquePolygon(dc, bottomLeft->x, bottomLeft->y, bottomRight->x, bottomRight->y, strokeWidth);
     }
     else {
-        Point side1[4];
-        Point side2[4];
-        side1[0] = ToDeviceContext(*topLeft);
-        side1[2] = ToDeviceContext(*topRight);
-        //
-        side2[0] = ToDeviceContext(*bottomLeft);
-        side2[2] = ToDeviceContext(*bottomRight);
-        //
-        double ratio = (obliqueEnd) ? .5 : 0.5;
-        int width = (side1[2].x - side1[0].x);
-        int height = (side1[2].y - side1[0].y);
-        side1[1] = side1[2];
-        side1[1].x -= (width * ratio);
-        side1[1].y -= (1.15 * height * ratio);
-        side2[1] = side2[2];
-        side2[1].x -= width * ratio;
-        side2[1].y -= (1.15 * height * ratio);
-
-        dc->DrawBentParallelogramFilled(side1, side2);
+        dc->DrawBentParallelogramFilled(side1, thickness);
     }
 
     // Do not draw a left connector with obliques
