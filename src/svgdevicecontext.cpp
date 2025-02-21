@@ -693,7 +693,7 @@ void SvgDeviceContext::DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2
     pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
 }
 
-void SvgDeviceContext::DrawBentParallelogramFilled(Point side1[3], Point side2[3])
+void SvgDeviceContext::DrawBentParallelogramFilled(Point side1[4], Point side2[4])
 {
     pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d")

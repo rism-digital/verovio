@@ -389,7 +389,35 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
         this->DrawObliquePolygon(dc, bottomLeft->x, bottomLeft->y, bottomRight->x, bottomRight->y, strokeWidth);
     }
     else {
-        this->DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, bottomLeft->y - topLeft->y);
+
+        /*
+        Point side1[4];
+        Point side2[4];
+        side1[0] = ToDeviceContext(*topLeft);
+        side1[2] = ToDeviceContext(*topRight);
+        //
+        side2[0] = ToDeviceContext(*bottomLeft);
+        side2[2] = ToDeviceContext(*bottomRight);
+        //
+        double ratio = (obliqueEnd) ? .5 : 0;
+        int width = (side1[2].x - side1[0].x);
+        int height = (side1[2].y - side1[0].y);
+        side1[1] = side1[2];
+        side1[1].x -= width * ratio;
+        side2[1].y -= height * ratio;
+        side2[1] = side2[2];
+        side2[1].x -= width * ratio;
+        //side2[1].y -= height * ratio;
+
+        dc->DrawBentParallelogramFilled(side1, side2);
+        //}
+        // else {
+        //    this->DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, //bottomLeft->y -
+        //    topLeft->y);
+        //}
+        */
+        this->DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, bottomLeft->y -
+            topLeft->y);
     }
 
     // Do not draw a left connector with obliques
@@ -624,6 +652,9 @@ void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point point
     assert(staff);
 
     const int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    const int noteDiff = note1->PitchDifferenceTo(note2);
+    
+    const int yAdjust = noteDiff * stemWidth / 10;
 
     Point *topLeft = &points[0];
     Point *bottomLeft = &points[1];
@@ -648,25 +679,97 @@ void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point point
     sides[3] = sides2[3];
 
     // With oblique it is best visually to move them up / down - more with (white) ligatures with serif
-    double adjustmentFactor = (isMensuralBlack) ? 0.5 : 1.8;
+    //double adjustmentFactor = (isMensuralBlack) ? 2.5 : 1.8;
     double slope = 0.0;
+    if (bottomRight->x != bottomLeft->x)
+        slope = (double)(bottomRight->y - bottomLeft->y) / (double)(bottomRight->x - bottomLeft->x);
+
+    int length = (bottomRight->x - bottomLeft->x) / 2;
+    slope *= 0.85;
+
+    if (firstHalf) {
+        // make sure there are some pixels of overlap
+        length += 1;
+        bottomRight->x = bottomLeft->x + length;
+        topRight->x = bottomRight->x;
+        bottomRight->y = bottomLeft->y + (int)(length * slope);
+        topRight->y = topLeft->y + (int)(length * slope);
+        //
+        topLeft->y += yAdjust;
+        bottomLeft->y += yAdjust;
+    }
+    else {
+        bottomLeft->x = bottomLeft->x + length;
+        topLeft->x = bottomLeft->x;
+        bottomLeft->y = bottomLeft->y + (int)(length * slope);
+        topLeft->y = topLeft->y + (int)(length * slope);
+        //
+        topRight->y -= yAdjust;
+        bottomRight->y -= yAdjust;
+    }
+
+}
+
+/*
+void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point points[4], int sides[4], int shape,
+    bool isMensuralBlack, bool firstHalf)
+{
+    assert(note1);
+    assert(note2);
+    assert(staff);
+
+    const int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+
+    Point *topLeft = &points[0];
+    Point *bottomLeft = &points[1];
+    Point *topRight = &points[2];
+    Point *bottomRight = &points[3];
+
+    int sides1[4];
+    CalcBrevisPoints(note1, staff, topLeft, bottomLeft, sides1, shape, isMensuralBlack);
+    // Correct the x of bottomLeft
+    bottomLeft->x = topLeft->x;
+    // Copy the left sides
+    sides[0] = sides1[0];
+    sides[1] = sides1[1];
+
+    int sides2[4];
+    // add OBLIQUE shape to make sure sides are shortened in mensural black
+    CalcBrevisPoints(note2, staff, topRight, bottomRight, sides2, LIGATURE_OBLIQUE, isMensuralBlack);
+    // Correct the x of topRight;
+    topRight->x = bottomRight->x;
+    // Copy the right sides
+    sides[2] = sides2[2];
+    sides[3] = sides2[3];
+
+    // With oblique it is best visually to move them up / down - more with (white) ligatures with serif
+    double adjustmentFactor = (isMensuralBlack) ? 2.5 : 1.8;
+    double slope = 0.0;
+    slope *= 1.6;
     if (bottomRight->x != bottomLeft->x)
         slope = (double)(bottomRight->y - bottomLeft->y) / (double)(bottomRight->x - bottomLeft->x);
     int adjustment = (int)(slope * stemWidth) * adjustmentFactor;
     topLeft->y -= adjustment;
-    bottomLeft->y -= adjustment;
-    topRight->y += adjustment;
-    bottomRight->y += adjustment;
+    // bottomLeft->y -= adjustment;
+    if (firstHalf) {
+        topRight->y -= adjustment;
+        // bottomRight->y += adjustment;
+    }
+    else {
+        // topRight->y += adjustment;
+        // bottomRight->y -= adjustment;
+    }
 
     slope = 0.0;
     // recalculate slope after adjustment
     if (bottomRight->x != bottomLeft->x)
         slope = (double)(bottomRight->y - bottomLeft->y) / (double)(bottomRight->x - bottomLeft->x);
     int length = (bottomRight->x - bottomLeft->x) / 2;
+    slope *= 1.6;
 
     if (firstHalf) {
         // make sure there are some pixels of overlap
-        length += 10;
+        // length += 10;
         bottomRight->x = bottomLeft->x + length;
         topRight->x = bottomRight->x;
         bottomRight->y = bottomLeft->y + (int)(length * slope);
@@ -679,6 +782,7 @@ void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point point
         topLeft->y = topLeft->y + (int)(length * slope);
     }
 }
+*/
 
 data_STEMDIRECTION View::GetMensuralStemDir(Layer *layer, Note *note, int verticalCenter)
 {

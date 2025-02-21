@@ -72,7 +72,7 @@ public:
     void DrawQuadBezierPath(Point bezier[3]) override;
     void DrawCubicBezierPath(Point bezier[4]) override;
     void DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2[4]) override;
-    void DrawBentParallelogramFilled(Point side1[3], Point side2[3]) override;
+    void DrawBentParallelogramFilled(Point side1[4], Point side2[4]) override;
     void DrawCircle(int x, int y, int radius) override;
     void DrawEllipse(int x, int y, int width, int height) override;
     void DrawEllipticArc(int x, int y, int width, int height, double start, double end) override;
