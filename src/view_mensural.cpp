@@ -389,8 +389,6 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
         this->DrawObliquePolygon(dc, bottomLeft->x, bottomLeft->y, bottomRight->x, bottomRight->y, strokeWidth);
     }
     else {
-
-        /*
         Point side1[4];
         Point side2[4];
         side1[0] = ToDeviceContext(*topLeft);
@@ -399,25 +397,17 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
         side2[0] = ToDeviceContext(*bottomLeft);
         side2[2] = ToDeviceContext(*bottomRight);
         //
-        double ratio = (obliqueEnd) ? .5 : 0;
+        double ratio = (obliqueEnd) ? .5 : 0.5;
         int width = (side1[2].x - side1[0].x);
         int height = (side1[2].y - side1[0].y);
         side1[1] = side1[2];
-        side1[1].x -= width * ratio;
-        side2[1].y -= height * ratio;
+        side1[1].x -= (width * ratio);
+        side1[1].y -= (1.15 * height * ratio);
         side2[1] = side2[2];
         side2[1].x -= width * ratio;
-        //side2[1].y -= height * ratio;
+        side2[1].y -= (1.15 * height * ratio);
 
         dc->DrawBentParallelogramFilled(side1, side2);
-        //}
-        // else {
-        //    this->DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, //bottomLeft->y -
-        //    topLeft->y);
-        //}
-        */
-        this->DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, bottomLeft->y -
-            topLeft->y);
     }
 
     // Do not draw a left connector with obliques
@@ -653,7 +643,7 @@ void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point point
 
     const int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     const int noteDiff = note1->PitchDifferenceTo(note2);
-    
+
     const int yAdjust = noteDiff * stemWidth / 10;
 
     Point *topLeft = &points[0];
@@ -679,7 +669,7 @@ void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point point
     sides[3] = sides2[3];
 
     // With oblique it is best visually to move them up / down - more with (white) ligatures with serif
-    //double adjustmentFactor = (isMensuralBlack) ? 2.5 : 1.8;
+    // double adjustmentFactor = (isMensuralBlack) ? 2.5 : 1.8;
     double slope = 0.0;
     if (bottomRight->x != bottomLeft->x)
         slope = (double)(bottomRight->y - bottomLeft->y) / (double)(bottomRight->x - bottomLeft->x);
@@ -707,7 +697,6 @@ void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point point
         topRight->y -= yAdjust;
         bottomRight->y -= yAdjust;
     }
-
 }
 
 /*
