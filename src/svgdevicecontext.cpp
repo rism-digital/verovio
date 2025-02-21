@@ -693,6 +693,24 @@ void SvgDeviceContext::DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2
     pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
 }
 
+void SvgDeviceContext::DrawBentParallelogramFilled(Point side1[3], Point side2[3])
+{
+    pugi::xml_node pathChild = AddChild("path");
+    pathChild.append_attribute("d")
+        = StringFormat("M%d,%d Q%d,%d %d,%d L%d,%d Q%d,%d %d,%d Z", side1[0].x, side1[0].y, // M command
+            side1[1].x, side1[1].y, side1[2].x, side1[2].y, side2[2].x, side2[2].y, side2[1].x, side2[1].y, side2[0].x,
+            side2[0].y // Second Bezier
+            )
+              .c_str();
+    // pathChild.append_attribute("fill") = "currentColor";
+    // pathChild.append_attribute("fill-opacity") = "1";
+    pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
+    pathChild.append_attribute("stroke-linecap") = "round";
+    pathChild.append_attribute("stroke-linejoin") = "round";
+    // pathChild.append_attribute("stroke-opacity") = "1";
+    pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
+}
+
 void SvgDeviceContext::DrawCircle(int x, int y, int radius)
 {
     this->DrawEllipse(x - radius, y - radius, 2 * radius, 2 * radius);
