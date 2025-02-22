@@ -1574,14 +1574,28 @@ double MidiFile::getAbsoluteTickTime(double starttime) {
 //     that were linked.
 //
 
-int MidiFile::linkNotePairs(void) {
+int MidiFile::linkNotePairsFIFO(void) {
 	int i;
 	int sum = 0;
 	for (i=0; i<getTrackCount(); i++) {
 		if (m_events[i] == NULL) {
 			continue;
 		}
-		sum += m_events[i]->linkNotePairs();
+		sum += m_events[i]->linkNotePairsFIFO();
+	}
+	m_linkedEventsQ = true;
+	return sum;
+}
+
+
+int MidiFile::linkNotePairsLIFO(void) {
+	int i;
+	int sum = 0;
+	for (i=0; i<getTrackCount(); i++) {
+		if (m_events[i] == NULL) {
+			continue;
+		}
+		sum += m_events[i]->linkNotePairsLIFO();
 	}
 	m_linkedEventsQ = true;
 	return sum;
@@ -1592,7 +1606,7 @@ int MidiFile::linkNotePairs(void) {
 //
 
 int MidiFile::linkEventPairs(void) {
-	return linkNotePairs();
+	return linkNotePairsFIFO();
 }
 
 
@@ -2477,9 +2491,18 @@ void MidiFile::setMillisecondTicks(void) {
 //    was done.
 //
 
-void MidiFile::sortTrack(int track) {
+
+void MidiFile::sortTrackNoteOnsBeforeOffs(int track) {
 	if ((track >= 0) && (track < getTrackCount())) {
-		m_events.at(track)->sort();
+		m_events.at(track)->sortNoteOnsBeforeOffs();
+	} else {
+		std::cerr << "Warning: track " << track << " does not exist." << std::endl;
+	}
+}
+
+void MidiFile::sortTrackNoteOffsBeforeOns(int track) {
+	if ((track >= 0) && (track < getTrackCount())) {
+		m_events.at(track)->sortNoteOffsBeforeOns();
 	} else {
 		std::cerr << "Warning: track " << track << " does not exist." << std::endl;
 	}
@@ -2492,10 +2515,20 @@ void MidiFile::sortTrack(int track) {
 // MidiFile::sortTracks -- sort all tracks in the MidiFile.
 //
 
-void MidiFile::sortTracks(void) {
+void MidiFile::sortTracksNoteOnsBeforeOffs(void) {
 	if (m_theTimeState == TIME_STATE_ABSOLUTE) {
 		for (int i=0; i<getTrackCount(); i++) {
-			m_events.at(i)->sort();
+			m_events.at(i)->sortNoteOnsBeforeOffs();
+		}
+	} else {
+		std::cerr << "Warning: Sorting only allowed in absolute tick mode.";
+	}
+}
+
+void MidiFile::sortTracksNoteOffsBeforeOns(void) {
+	if (m_theTimeState == TIME_STATE_ABSOLUTE) {
+		for (int i=0; i<getTrackCount(); i++) {
+			m_events.at(i)->sortNoteOffsBeforeOns();
 		}
 	} else {
 		std::cerr << "Warning: Sorting only allowed in absolute tick mode.";

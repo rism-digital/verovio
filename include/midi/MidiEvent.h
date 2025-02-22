@@ -51,6 +51,7 @@ class MidiEvent : public MidiMessage {
 		void       linkEvent             (MidiEvent& mev);
 		void       linkEvents            (MidiEvent& mev);
 		int        isLinked              (void) const;
+		int        hasLink               (void) const { return isLinked(); }
 		MidiEvent* getLinkedEvent        (void);
 		const MidiEvent* getLinkedEvent  (void) const;
 		int        getTickDuration       (void) const;
