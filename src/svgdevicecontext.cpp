@@ -693,20 +693,16 @@ void SvgDeviceContext::DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2
     pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
 }
 
-void SvgDeviceContext::DrawBentParallelogramFilled(Point side1[4], int height)
+void SvgDeviceContext::DrawBentParallelogramFilled(Point side[4], int height)
 {
     pugi::xml_node pathChild = AddChild("path");
-    pathChild.append_attribute("d")
-        = StringFormat("M%d,%d C%d,%d %d,%d %d,%d L%d,%d C%d,%d %d,%d %d,%d Z", side1[0].x, side1[0].y, // M command
-            side1[1].x, side1[1].y, side1[2].x, side1[2].y, side1[3].x, side1[3].y, side1[3].x, side1[3].y + height,
-            side1[2].x, side1[2].y + height, side1[1].x, side1[1].y + height, side1[0].x, side1[0].y + height)
-              .c_str();
-    // pathChild.append_attribute("fill") = "currentColor";
-    // pathChild.append_attribute("fill-opacity") = "1";
+    pathChild.append_attribute("d") = StringFormat("M%d,%d C%d,%d %d,%d %d,%d L%d,%d C%d,%d %d,%d %d,%d Z", side[0].x,
+        side[0].y, side[1].x, side[1].y, side[2].x, side[2].y, side[3].x, side[3].y, side[3].x, side[3].y + height,
+        side[2].x, side[2].y + height, side[1].x, side[1].y + height, side[0].x, side[0].y + height)
+                                          .c_str();
     pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
     pathChild.append_attribute("stroke-linecap") = "round";
     pathChild.append_attribute("stroke-linejoin") = "round";
-    // pathChild.append_attribute("stroke-opacity") = "1";
     pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
 }
 
