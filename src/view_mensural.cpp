@@ -405,11 +405,11 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
         const int width = (curvedSide[3].x - curvedSide[0].x);
         const int height = (curvedSide[3].y - curvedSide[0].y);
         curvedSide[1] = curvedSide[3];
-        curvedSide[1].x -= (width * 0.75);
-        curvedSide[1].y -= (height * 0.75) + (height * 0.05);
+        curvedSide[1].x -= (width * 0.7);
+        curvedSide[1].y -= (height * 0.7) + (height * 0.07);
         curvedSide[2] = curvedSide[3];
-        curvedSide[2].x -= (width * 0.25);
-        curvedSide[2].y -= (height * 0.25) + (height * 0.05);
+        curvedSide[2].x -= (width * 0.3);
+        curvedSide[2].y -= (height * 0.3) + (height * 0.07);
 
         if (!fillNotehead) {
             dc->DrawBentParallelogramFilled(curvedSide, strokeWidth);
