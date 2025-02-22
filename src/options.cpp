@@ -1832,6 +1832,10 @@ Options::Options()
     m_ligatureAsBracket.Init(false);
     this->Register(&m_ligatureAsBracket, "ligatureAsBracket", &m_mensural);
 
+    m_ligatureStraight.SetInfo("Ligature straight", "Render oblique ligatures as straight polygons");
+    m_ligatureStraight.Init(false);
+    this->Register(&m_ligatureStraight, "ligatureStraight", &m_mensural);
+
     m_mensuralResponsiveView.SetInfo(
         "Mensural reduced view", "Convert mensural content to a more responsive view reduced to the seleceted markup");
     m_mensuralResponsiveView.Init(false);

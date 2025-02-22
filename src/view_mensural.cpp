@@ -350,6 +350,7 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     bool oblique = ((shape & LIGATURE_OBLIQUE) || (prevShape & LIGATURE_OBLIQUE));
     bool obliqueEnd = (prevShape & LIGATURE_OBLIQUE);
     bool stackedEnd = (shape & LIGATURE_STACKED);
+    bool straight = m_doc->GetOptions()->m_ligatureStraight.GetValue();
 
     int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     int strokeWidth = 2.8 * stemWidth;
@@ -383,33 +384,41 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
         }
     }
 
-    Point side1[4];
-    int thickness = topLeft->y - bottomLeft->y;
-    side1[0] = ToDeviceContext(*topLeft);
-    side1[3] = ToDeviceContext(*topRight);
-    //
-    int width = (side1[3].x - side1[0].x);
-    int height = (side1[3].y - side1[0].y);
-    side1[1] = side1[3];
-    side1[1].x -= (width * 0.75);
-    side1[1].y -= (height * 0.75) + (height * 0.05);
-    side1[2] = side1[3];
-    side1[2].x -= (width * 0.25);
-    side1[2].y -= (height * 0.25) + (height * 0.05);
-
-    if (!fillNotehead) {
-        // double the bases of rectangles
-        dc->DrawBentParallelogramFilled(side1, strokeWidth);
-        for (Point &point : side1) {
-            point.y += thickness - strokeWidth;
+    // Oblique polygons
+    if (straight) {
+        if (fillNotehead) {
+            this->DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, -strokeWidth);
+            this->DrawObliquePolygon(dc, bottomLeft->x, bottomLeft->y, bottomRight->x, bottomRight->y, strokeWidth);
         }
-        dc->DrawBentParallelogramFilled(side1, strokeWidth);
-
-        // this->DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, -strokeWidth);
-        // this->DrawObliquePolygon(dc, bottomLeft->x, bottomLeft->y, bottomRight->x, bottomRight->y, strokeWidth);
+        else {
+            this->DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, bottomLeft->y - topLeft->y);
+        }
     }
+    // Bent parallelograms
     else {
-        dc->DrawBentParallelogramFilled(side1, thickness);
+        const int thickness = topLeft->y - bottomLeft->y;
+        // The curved side points (two ends and two control points)
+        Point curvedSide[4];
+        curvedSide[0] = ToDeviceContext(*topLeft);
+        curvedSide[3] = ToDeviceContext(*topRight);
+        //
+        const int width = (curvedSide[3].x - curvedSide[0].x);
+        const int height = (curvedSide[3].y - curvedSide[0].y);
+        curvedSide[1] = curvedSide[3];
+        curvedSide[1].x -= (width * 0.75);
+        curvedSide[1].y -= (height * 0.75) + (height * 0.05);
+        curvedSide[2] = curvedSide[3];
+        curvedSide[2].x -= (width * 0.25);
+        curvedSide[2].y -= (height * 0.25) + (height * 0.05);
+
+        if (!fillNotehead) {
+            dc->DrawBentParallelogramFilled(curvedSide, strokeWidth);
+            for (Point &point : curvedSide) point.y += thickness - strokeWidth;
+            dc->DrawBentParallelogramFilled(curvedSide, strokeWidth);
+        }
+        else {
+            dc->DrawBentParallelogramFilled(curvedSide, thickness);
+        }
     }
 
     // Do not draw a left connector with obliques
