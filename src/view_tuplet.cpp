@@ -182,8 +182,10 @@ void View::DrawTupletNum(DeviceContext *dc, LayerElement *element, Layer *layer,
     dc->SetFont(m_doc->GetDrawingSmuflFont(glyphSize, drawingCueSize));
     notes = IntToTupletFigures((short int)tuplet->GetNum());
     if (tuplet->GetNumFormat() == tupletVis_NUMFORMAT_ratio) {
-        notes.push_back(SMUFL_E88A_tupletColon);
-        notes += IntToTupletFigures((short int)tuplet->GetNumbase());
+        if (tuplet->HasNumbase()) {
+            notes.push_back(SMUFL_E88A_tupletColon);
+            notes += IntToTupletFigures((short int)tuplet->GetNumbase());
+        }
     }
     dc->GetSmuflTextExtent(notes, &extend);
 
