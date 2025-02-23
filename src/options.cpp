@@ -44,6 +44,9 @@ const std::map<int, std::string> Option::s_footer
 const std::map<int, std::string> Option::s_header
     = { { HEADER_none, "none" }, { HEADER_auto, "auto" }, { HEADER_encoded, "encoded" } };
 
+const std::map<int, std::string> Option::s_ligatureOblique
+    = { { LIGATURE_OBL_auto, "auto" }, { LIGATURE_OBL_straight, "straight" }, { LIGATURE_OBL_curved, "curved" } };
+
 const std::map<int, std::string> Option::s_multiRestStyle = { { MULTIRESTSTYLE_auto, "auto" },
     { MULTIRESTSTYLE_default, "default" }, { MULTIRESTSTYLE_block, "block" }, { MULTIRESTSTYLE_symbols, "symbols" } };
 
@@ -1832,9 +1835,9 @@ Options::Options()
     m_ligatureAsBracket.Init(false);
     this->Register(&m_ligatureAsBracket, "ligatureAsBracket", &m_mensural);
 
-    m_ligatureStraight.SetInfo("Ligature straight", "Render oblique ligatures as straight polygons");
-    m_ligatureStraight.Init(false);
-    this->Register(&m_ligatureStraight, "ligatureStraight", &m_mensural);
+    m_ligatureOblique.SetInfo("Ligature oblique", "Ligature oblique shape");
+    m_ligatureOblique.Init(LIGATURE_OBL_auto, &Option::s_ligatureOblique);
+    this->Register(&m_ligatureOblique, "ligatureOblique", &m_mensural);
 
     m_mensuralResponsiveView.SetInfo(
         "Mensural reduced view", "Convert mensural content to a more responsive view reduced to the seleceted markup");
