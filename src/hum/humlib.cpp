@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Dec 10 14:37:55 JST 2024
+// Last Modified: Wed Feb 26 02:08:25 PST 2025
 // Filename:      min/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.cpp
 // Syntax:        C++11
@@ -5823,7 +5823,7 @@ string Convert::generateRandomId(int length) {
     const string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     std::random_device rd;  // Non-deterministic generator
     std::mt19937 gen(rd()); // Seed the generator
-    std::uniform_int_distribution<> distr(0, (int)characters.size() - 1);
+    std::uniform_int_distribution<> distr(0, characters.size() - 1);
     string randomId;
     std::generate_n(std::back_inserter(randomId), length, [&]() {
         return characters[distr(gen)];
@@ -27840,7 +27840,7 @@ restarting:
 			break;
 		}
 
-		int len = (int)templine.length();
+		int len = templine.length();
 		if ((len > 4) && (templine.compare(0, 4, "!!!!") == 0) &&
 		    (templine[4] != '!') &&
 		    (dataFoundQ == 0) &&
@@ -57322,6 +57322,18 @@ void Tool_autobeam::processMeasure(vector<HTp>& measure) {
 
 	// First, get the beat positions of all notes in the measure:
 	vector<pair<int, HumNum> >& timesig = m_timesigs[measure[0]->getTrack()];
+	// Force 4/4 time signature if no time siguature (perhaps refine the 
+	// top number of the time signature to the duration of the measure, but
+	// currently this is probably not necessary.
+	for (int i=0; i<(int)timesig.size(); i++) {
+		if (timesig[i].first == 0) {
+			timesig[i].first = 4;
+		}
+		if (timesig[i].second == 0) {
+			timesig[i].second = 4;
+		}
+	}
+
 	for (int i=0; i<(int)measure.size(); i++) {
 		int line = measure[i]->getLineIndex();
 		if ((current.first != timesig.at(line).first) ||
@@ -57331,7 +57343,7 @@ void Tool_autobeam::processMeasure(vector<HTp>& measure) {
 			beatdur /= current.second;
 			beatdur *= 4; // convert to quarter-notes units from whole-notes.
 			if ((current.first % 3 == 0) && (current.first != 3)) {
-				// compound meter, so shift the beat to 3x the demoniator
+				// compound meter, so shift the beat to 3x the denominator
 				beatdur *= 3;
 			} else if (current.first == 3 && (current.second < 4)) {
 				// time signatures such as 3/8 and 3/16 which should
@@ -81415,10 +81427,36 @@ void Tool_esac2hum::getParameters(vector<string>& infile) {
 	if (hre.search(trd, "^\\s*(.*)\\ss\\.")) {
 		m_score.m_params["_source_trd"] = hre.getMatch(1);
 	}
-	if (hre.search(trd, "\\bs\\.\\s*(\\d+)\\s*-\\s*(\\d+)?")) {
+
+	// Search for page number in TRD[] record.   The canonical form is:
+	//     s. #
+	// or multipage:
+   //     s. #-#
+   // or multipage alternate:
+   //     s. # - #
+	// There are variants to also handle, however:
+	//     s.#
+   //     str. #     (particularly DWOK16)
+   //     str.#
+   //     s #
+   //     .s #
+   //     S.#
+   //     s, #
+
+	if (hre.search(trd, "\\bs(?:tr)?\\.?\\s*(\\d+)\\s*-\\s*(\\d+)?", "i")) {
+		// s.   #-#
+		// s    #-#
+		// str. #-#
 		m_score.m_params["_page"] = hre.getMatch(1) + "-" + hre.getMatch(2);
-	} else if (hre.search(trd, "\\bs\\.\\s*(\\d+)")) {
+	} else if (hre.search(trd, "\\bs(?:tr)?\\.?\\s*(\\d+)", "i")) {
+		// s. #
+		// s #
+		// str. #
 		m_score.m_params["_page"] = hre.getMatch(1);
+	} else if (hre.search(trd, "\\bs,\\s*(\\d+)\\s*-\\s*(\\d+)?", "i")) {
+		// s, #-#
+	} else if (hre.search(trd, "\\bs,\\s*(\\d+)", "i")) {
+		// s, #
 	} else {
 		cerr << "CANNOT FIND PAGE NUMBER IN " << trd << endl;
 	}
@@ -120426,7 +120464,7 @@ void Tool_prange::assignHorizontalPosition(vector<_VoiceInfo>& voiceInfo, int mi
 
 	if (hpos.size() > 2) {
 		for (int i=1; i<(int)hpos.size()-1; i++) {
-			int ii = (int)hpos.size() - i - 1;
+			int ii = hpos.size() - i - 1;
 			hpos[i] = (double)ii / (hpos.size()-1) * (maxval - minval) + minval;
 		}
 	}
@@ -120939,7 +120977,7 @@ int Tool_prange::getTopQuartile(vector<double>& midibins) {
 
 	double cumsum = 0.0;
 	int i;
-	for (i=(int)midibins.size()-1; i>=0; i--) {
+	for (i=midibins.size()-1; i>=0; i--) {
 		if (midibins[i] <= 0.0) {
 			continue;
 		}
@@ -121037,7 +121075,7 @@ int Tool_prange::getStaffBase7(int base7) {
 //
 
 int Tool_prange::getMaxDiatonicIndex(vector<vector<double>>& diatonic) {
-	for (int i=(int)diatonic.size()-1; i>=0; i--) {
+	for (int i=diatonic.size()-1; i>=0; i--) {
 		if (diatonic.at(i).at(0) != 0.0) {
 			return i;
 		}
