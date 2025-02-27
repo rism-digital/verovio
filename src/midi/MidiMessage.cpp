@@ -1008,7 +1008,7 @@ void MidiMessage::setP3(int value) {
 
 void MidiMessage::setKeyNumber(int value) {
 	if (isNote() || isAftertouch()) {
-		setP1(value & 0xff);
+		setP1(value & 0x7f);
 	} else {
 		// don't do anything since this is not a note-related message.
 	}
@@ -1025,7 +1025,7 @@ void MidiMessage::setKeyNumber(int value) {
 
 void MidiMessage::setVelocity(int value) {
 	if (isNote()) {
-		setP2(value & 0xff);
+		setP2(value & 0x7f);
 	} else {
 		// don't do anything since this is not a note-related message.
 	}
@@ -1495,7 +1495,7 @@ void MidiMessage::getSpelling(int& base7, int& accidental) {
 //   message after the length (which is a variable-length-value).
 //
 
-std::string MidiMessage::getMetaContent(void) {
+std::string MidiMessage::getMetaContent(void) const {
 	std::string output;
 	if (!isMetaMessage()) {
 		return output;

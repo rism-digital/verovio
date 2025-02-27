@@ -579,8 +579,7 @@ protected:
     //     int staffSize, bool dimin, bool setBBGlyph = false);
 
     void DrawThickBezierCurve(
-        DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, int penStyle = AxSOLID);
-    void DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
+        DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, PenStyle penStyle = PEN_SOLID);
     void DrawTextString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params);
     void DrawDirString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params);
     void DrawDynamString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params, Rend *rend);
@@ -642,7 +641,7 @@ private:
     void CalcBrevisPoints(
         Note *note, Staff *staff, Point *topLeft, Point *bottomRight, int sides[4], int shape, bool isMensuralBlack);
     void CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point points[4], int sides[4], int shape,
-        bool isMensuralBlack, bool firstHalf);
+        bool isMensuralBlack, bool firstHalf, bool straight);
 
     /**
      * Internal methods for drawing a BeamSegment
@@ -677,11 +676,6 @@ public:
      * useful for changing the color, for example
      */
     ///@{
-    LayerElement *m_currentElement;
-    Layer *m_currentLayer;
-    Measure *m_currentMeasure;
-    Staff *m_currentStaff;
-    System *m_currentSystem;
     Page *m_currentPage;
     ///@}
 

@@ -893,7 +893,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         Syl *syl = new Syl();
         Neume *neume = new Neume();
         Nc *nc = new Nc();
-        Zone *sylZone;
+        Zone *sylZone = NULL;
         std::string contour = "";
         nc->AttachZone(zone);
 
@@ -1061,7 +1061,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         data_CLEFSHAPE clefShape = CLEFSHAPE_NONE;
 
         const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        int offsetR, offsetL;
+        int offsetR = 0, offsetL = 0;
 
         for (auto it = attributes.begin(); it != attributes.end(); ++it) {
             if (it->first == "shape") {
@@ -2887,6 +2887,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             parent = new Syllable();
             Syl *fullSyl = NULL;
             int ulx, uly, lrx, lry;
+            ulx = uly = lrx = lry = 0;
 
             // construct concatenated string of all the syls
             std::u32string fullString = U"";
@@ -3013,7 +3014,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
 
     Nc *firstNc = NULL;
     Nc *secondNc = NULL;
-    bool success1, success2;
+    bool success1 = false, success2 = false;
     int ligCount = 0; // for ungroup ligature into nc
     int ligNum = 0; // for ligature in ungroupNcs
     int firstIsLig = false;

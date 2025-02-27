@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <iterator>
+#include <list>
 #include <utility>
 #include <vector>
 
@@ -279,11 +280,103 @@ void MidiEventList::removeEmpties(void) {
 //
 
 int MidiEventList::linkEventPairs(void) {
-	return linkNotePairs();
+	return linkNotePairsFIFO();
 }
 
 
-int MidiEventList::linkNotePairs(void) {
+int MidiEventList::linkNotePairsFIFO(void) {
+	// Note-on states:
+	// dimension 1: MIDI channel (0-15)
+	// dimension 2: MIDI key     (0-127)  (but 0 not used for note-ons)
+	// dimension 3: List of active note-ons or note-offs (FIFO behavior).
+	std::vector<std::vector<std::list<MidiEvent*>>> noteons;
+	noteons.resize(16);
+	for (auto& noteon : noteons) {
+		noteon.resize(128);
+	}
+
+	// Controller linking: The following General MIDI controller numbers are
+	// also monitored for linking within the track (but not between tracks).
+	// hex dec  name                                    range
+	// 40  64   Hold pedal (Sustain) on/off             0..63=off  64..127=on
+	// 41  65   Portamento on/off                       0..63=off  64..127=on
+	// 42  66   Sustenuto Pedal on/off                  0..63=off  64..127=on
+	// 43  67   Soft Pedal on/off                       0..63=off  64..127=on
+	// 44  68   Legato Pedal on/off                     0..63=off  64..127=on
+	// 45  69   Hold Pedal 2 on/off                     0..63=off  64..127=on
+	// 50  80   General Purpose Button                  0..63=off  64..127=on
+	// 51  81   General Purpose Button                  0..63=off  64..127=on
+	// 52  82   General Purpose Button                  0..63=off  64..127=on
+	// 53  83   General Purpose Button                  0..63=off  64..127=on
+	// 54  84   Undefined on/off                        0..63=off  64..127=on
+	// 55  85   Undefined on/off                        0..63=off  64..127=on
+	// 56  86   Undefined on/off                        0..63=off  64..127=on
+	// 57  87   Undefined on/off                        0..63=off  64..127=on
+	// 58  88   Undefined on/off                        0..63=off  64..127=on
+	// 59  89   Undefined on/off                        0..63=off  64..127=on
+	// 5A  90   Undefined on/off                        0..63=off  64..127=on
+	// 7A 122   Local Keyboard On/Off                   0..63=off  64..127=on
+
+	// first keep track of whether the controller is an on/off switch:
+	std::vector<std::pair<int, int>> contmap(128, {0, 0});
+	contmap[64] = {1, 0}; contmap[65] = {1, 1}; contmap[66] = {1, 2}; 
+	contmap[67] = {1, 3}; contmap[68] = {1, 4}; contmap[69] = {1, 5};
+	contmap[80] = {1, 6}; contmap[81] = {1, 7}; contmap[82] = {1, 8}; 
+	contmap[83] = {1, 9}; contmap[84] = {1, 10}; contmap[85] = {1, 11};
+	contmap[86] = {1, 12}; contmap[87] = {1, 13}; contmap[88] = {1, 14}; 
+	contmap[89] = {1, 15}; contmap[90] = {1, 16}; contmap[122] = {1, 17};
+
+	std::vector<std::vector<MidiEvent*>> contevents(18, std::vector<MidiEvent*>(16, nullptr));
+	std::vector<std::vector<int>> oldstates(18, std::vector<int>(16, -1));
+
+	int counter = 0;
+	for (int i = 0; i < getSize(); i++) {
+		MidiEvent* mev = &getEvent(i);
+		mev->unlinkEvent();
+
+		if (mev->isNoteOn()) {
+			int key = mev->getKeyNumber();
+			int channel = mev->getChannel();
+			noteons[channel][key].push_back(mev);  // Enqueue (FIFO)
+		} else if (mev->isNoteOff()) {
+			int key = mev->getKeyNumber();
+			int channel = mev->getChannel();
+			if (!noteons[channel][key].empty()) {  // **Check before accessing**
+				MidiEvent* noteon = noteons[channel][key].front(); // Safely access first event
+				noteons[channel][key].pop_front(); // Remove first event (FIFO)
+				noteon->linkEvent(mev);
+				counter++;
+			}
+		} else if (mev->isController()) {
+			int contnum = mev->getP1();
+			if (contmap[contnum].first) {
+				int conti = contmap[contnum].second;
+				int channel = mev->getChannel();
+				int contval = mev->getP2();
+				int contstate = contval < 64 ? 0 : 1;
+
+				if ((oldstates[conti][channel] == -1) && contstate) {
+					contevents[conti][channel] = mev;
+					oldstates[conti][channel] = contstate;
+				} else if (oldstates[conti][channel] == contstate) {
+					// Redundant controller state, ignore.
+				} else if ((oldstates[conti][channel] == 0) && contstate) {
+					contevents[conti][channel] = mev;
+					oldstates[conti][channel] = contstate;
+				} else if ((oldstates[conti][channel] == 1) && (contstate == 0)) {
+					contevents[conti][channel]->linkEvent(mev);
+					oldstates[conti][channel] = contstate;
+					contevents[conti][channel] = mev;
+				}
+			}
+		}
+	}
+	return counter;
+}
+
+
+
+int MidiEventList::linkNotePairsLIFO(void) {
 
 	// Note-on states:
 	// dimension 1: MIDI channel (0-15)
@@ -526,8 +619,12 @@ MidiEventList& MidiEventList::operator=(MidiEventList& other) {
 //    does not know about delta/absolute tick states of its contents).
 //
 
-void MidiEventList::sort(void) {
-	qsort(data(), getEventCount(), sizeof(MidiEvent*), eventcompare);
+void MidiEventList::sortNoteOnsBeforeOffs(void) {
+	qsort(data(), getEventCount(), sizeof(MidiEvent*), MidiEventList::eventCompareNoteOnsBeforeOffs);
+}
+
+void MidiEventList::sortNoteOffsBeforeOns(void) {
+	qsort(data(), getEventCount(), sizeof(MidiEvent*), MidiEventList::eventCompareNoteOnsBeforeOffs);
 }
 
 
@@ -539,7 +636,7 @@ void MidiEventList::sort(void) {
 
 //////////////////////////////
 //
-// eventcompare -- Event comparison function for sorting tracks.
+// MidiEventList::eventCompare -- Event comparison function for sorting tracks.
 //
 // Sorting rules:
 //    (1) sort by (absolute) tick value; otherwise, if tick values are the same:
@@ -548,31 +645,38 @@ void MidiEventList::sort(void) {
 //    (4) note-offs come after all other regular MIDI messages except note-ons.
 //    (5) note-ons come after all other regular MIDI messages.
 //
+// Note: If you load a MIDI file from a file, MidiMessage.seq numbers
+// will automatically be added, and sorting will follow the sequence
+// numbers.  Use MidiFile::clearSequence() if you want to sort the
+// MIDI events (occuring at the same time) using the rest of the sorting
+// algorithm (such as to place note-offs before note-ons when they
+// occur at the same time).
+//
 
-int eventcompare(const void* a, const void* b) {
+int MidiEventList::eventCompareNoteOnsBeforeOffs(const void* a, const void* b) {
 	MidiEvent& aevent = **((MidiEvent**)a);
 	MidiEvent& bevent = **((MidiEvent**)b);
 
-	if (aevent.tick > bevent.tick) {
-		// aevent occurs after bevent
-		return +1;
-	} else if (aevent.tick < bevent.tick) {
+	if (aevent.tick < bevent.tick) {
 		// aevent occurs before bevent
 		return -1;
-	} else if ((aevent.seq != 0) && (bevent.seq != 0) && (aevent.seq > bevent.seq)) {
-		// aevent sequencing state occurs after bevent
-		// see MidiEventList::markSequence()
+	} else if (aevent.tick > bevent.tick) {
+		// aevent occurs after bevent
 		return +1;
 	} else if ((aevent.seq != 0) && (bevent.seq != 0) && (aevent.seq < bevent.seq)) {
 		// aevent sequencing state occurs before bevent
 		// see MidiEventList::markSequence()
 		return -1;
-	} else if (aevent.getP0() == 0xff && aevent.getP1() == 0x2f) {
-		// end-of-track meta-message should always be last (but won't really
+	} else if ((aevent.seq != 0) && (bevent.seq != 0) && (aevent.seq > bevent.seq)) {
+		// aevent sequencing state occurs after bevent
+		// see MidiEventList::markSequence()
+		return +1;
+	} else if ((aevent.getP0() == 0xff) && (aevent.getP1() == 0x2f)) {
+		// end-of-track meta-message should always be last (but this won't really
 		// matter since the writing function ignores all end-of-track messages
 		// and writes its own.
 		return +1;
-	} else if (bevent.getP0() == 0xff && bevent.getP1() == 0x2f) {
+	} else if ((bevent.getP0() == 0xff) && (bevent.getP1() == 0x2f)) {
 		// end-of-track meta-message should always be last (but won't really
 		// matter since the writing function ignores all end-of-track messages
 		// and writes its own.
@@ -580,29 +684,146 @@ int eventcompare(const void* a, const void* b) {
 	} else if (aevent.getP0() == 0xff && bevent.getP0() != 0xff) {
 		// other meta-messages are placed before real MIDI messages
 		return -1;
-	} else if (aevent.getP0() != 0xff && bevent.getP0() == 0xff) {
+	} else if ((aevent.getP0() != 0xff) && (bevent.getP0() == 0xff)) {
 		// other meta-messages are placed before real MIDI messages
 		return +1;
-	} else if (((aevent.getP0() & 0xf0) == 0x90) && (aevent.getP2() != 0)) {
-		// note-ons come after all other types of MIDI messages
+	} else if ((aevent.getP0() == 0xff) && (bevent.getP0() == 0xff)) {
+		// could sort by meta-message number here
+		return 0;
+	} else if (aevent.isNote() && !bevent.isNote()) {
+		// notes come after all other message types
 		return +1;
-	} else if (((bevent.getP0() & 0xf0) == 0x90) && (bevent.getP2() != 0)) {
-		// note-ons come after all other types of MIDI messages
+	} else if (!aevent.isNote() && bevent.isNote()) {
+		// notes come after all other message types
 		return -1;
-	} else if (((aevent.getP0() & 0xf0) == 0x90) || ((aevent.getP0() & 0xf0) == 0x80)) {
-		// note-offs come after all other MIDI messages (except note-ons)
+	} else if (aevent.isNoteOff() && bevent.isNoteOn()) {
+		// note-offs come after note-ons
 		return +1;
-	} else if (((bevent.getP0() & 0xf0) == 0x90) || ((bevent.getP0() & 0xf0) == 0x80)) {
-		// note-offs come after all other MIDI messages (except note-ons)
+	} else if (aevent.isNoteOn() && bevent.isNoteOff()) {
+		// note-ons come before all other types of MIDI messages
 		return -1;
+	} else if (aevent.isNoteOn() && bevent.isNoteOn()) {
+		// sorted further by key number
+		if (aevent.getP1() < bevent.getP1()) {
+			return -1;
+		} else if (aevent.getP1() > bevent.getP1()) {
+			return +1;
+		} else {
+			return 0;
+		}
+		return 0;
+	} else if (aevent.isNoteOff() && bevent.isNoteOff()) {
+		// sorted further by key number
+		if (aevent.getP1() < bevent.getP1()) {
+			return -1;
+		} else if (aevent.getP1() > bevent.getP1()) {
+			return +1;
+		} else {
+			return 0;
+		}
+		// could be sorted further by key number.
+		return 0;
 	} else if (((aevent.getP0() & 0xf0) == 0xb0) && ((bevent.getP0() & 0xf0) == 0xb0)) {
-		// both events are continuous controllers.  Sort them by controller number
+		// both events are continuous controllers.  Sort them by controller number and value if equal
 		if (aevent.getP1() > bevent.getP1()) {
 			return +1;
 		} if (aevent.getP1() < bevent.getP1()) {
 			return -1;
 		} else {
 			// same controller number, so sort by data value
+			// useful for sustain pedalling, for example.
+			if (aevent.getP2() > bevent.getP2()) {
+				return +1;
+			} if (aevent.getP2() < bevent.getP2()) {
+				return -1;
+			} else {
+				return 0;
+			}
+		}
+	} else {
+		return 0;
+	}
+}
+
+int MidiEventList::eventCompareNoteOffsBeforeOns(const void* a, const void* b) {
+	MidiEvent& aevent = **((MidiEvent**)a);
+	MidiEvent& bevent = **((MidiEvent**)b);
+
+	if (aevent.tick < bevent.tick) {
+		// aevent occurs before bevent
+		return -1;
+	} else if (aevent.tick > bevent.tick) {
+		// aevent occurs after bevent
+		return +1;
+	} else if ((aevent.seq != 0) && (bevent.seq != 0) && (aevent.seq < bevent.seq)) {
+		// aevent sequencing state occurs before bevent
+		// see MidiEventList::markSequence()
+		return -1;
+	} else if ((aevent.seq != 0) && (bevent.seq != 0) && (aevent.seq > bevent.seq)) {
+		// aevent sequencing state occurs after bevent
+		// see MidiEventList::markSequence()
+		return +1;
+	} else if ((aevent.getP0() == 0xff) && (aevent.getP1() == 0x2f)) {
+		// end-of-track meta-message should always be last (but this won't really
+		// matter since the writing function ignores all end-of-track messages
+		// and writes its own.
+		return +1;
+	} else if ((bevent.getP0() == 0xff) && (bevent.getP1() == 0x2f)) {
+		// end-of-track meta-message should always be last (but won't really
+		// matter since the writing function ignores all end-of-track messages
+		// and writes its own.
+		return -1;
+	} else if (aevent.getP0() == 0xff && bevent.getP0() != 0xff) {
+		// other meta-messages are placed before real MIDI messages
+		return -1;
+	} else if ((aevent.getP0() != 0xff) && (bevent.getP0() == 0xff)) {
+		// other meta-messages are placed before real MIDI messages
+		return +1;
+	} else if ((aevent.getP0() == 0xff) && (bevent.getP0() == 0xff)) {
+		// could sort by meta-message number here
+		return 0;
+	} else if (aevent.isNote() && !bevent.isNote()) {
+		// notes come after all other message types
+		return +1;
+	} else if (!aevent.isNote() && bevent.isNote()) {
+		// notes come after all other message types
+		return -1;
+	} else if (aevent.isNoteOff() && bevent.isNoteOn()) {
+		// note-offs come before note-ons
+		return -1;
+	} else if (aevent.isNoteOn() && bevent.isNoteOff()) {
+		// note-ons come after all other types of MIDI messages
+		return +1;
+	} else if (aevent.isNoteOn() && bevent.isNoteOn()) {
+		// sorted further by key number
+		if (aevent.getP1() < bevent.getP1()) {
+			return -1;
+		} else if (aevent.getP1() > bevent.getP1()) {
+			return +1;
+		} else {
+			return 0;
+		}
+		return 0;
+	} else if (aevent.isNoteOff() && bevent.isNoteOff()) {
+		// sorted further by key number
+		if (aevent.getP1() < bevent.getP1()) {
+			return -1;
+		} else if (aevent.getP1() > bevent.getP1()) {
+			return +1;
+		} else {
+			return 0;
+		}
+		// could be sorted further by key number.
+		return 0;
+	} else if (((aevent.getP0() & 0xf0) == 0xb0) && ((bevent.getP0() & 0xf0) == 0xb0)) {
+		// both events are continuous controllers.  Sort them by controller number and value if equal
+		if (aevent.getP1() > bevent.getP1()) {
+			return +1;
+		} if (aevent.getP1() < bevent.getP1()) {
+			return -1;
+		} else {
+			// same controller number, so sort by data value
+			// useful for sustain pedalling, for example.
 			if (aevent.getP2() > bevent.getP2()) {
 				return +1;
 			} if (aevent.getP2() < bevent.getP2()) {

@@ -280,7 +280,7 @@ bool ConvertToCastOffMensuralFunctor::IsValidBreakPoint(const Alignment *alignme
         }
         // When we have more than one neume in a syllable, every neume has its own alignment.
         // Only the first one, which is shared with the syllable, is a valid break point
-        if (child->FindDescendantByType(NEUME) && !child->FindDescendantByType(SYLLABLE)) {
+        if (child->FindDescendantByType(NC) && !child->FindDescendantByType(SYLLABLE)) {
             return false;
         }
     }

@@ -75,6 +75,8 @@ enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded, FOOTER_always
 
 enum option_HEADER { HEADER_none = 0, HEADER_auto, HEADER_encoded };
 
+enum option_LIGATURE_OBL { LIGATURE_OBL_auto = 0, LIGATURE_OBL_straight, LIGATURE_OBL_curved };
+
 enum option_MULTIRESTSTYLE {
     MULTIRESTSTYLE_auto = 0,
     MULTIRESTSTYLE_default,
@@ -148,6 +150,7 @@ public:
     static const std::map<int, std::string> s_fontFallback;
     static const std::map<int, std::string> s_footer;
     static const std::map<int, std::string> s_header;
+    static const std::map<int, std::string> s_ligatureOblique;
     static const std::map<int, std::string> s_multiRestStyle;
     static const std::map<int, std::string> s_pedalStyle;
     static const std::map<int, std::string> s_systemDivider;
@@ -845,6 +848,7 @@ public:
 
     OptionIntMap m_durationEquivalence;
     OptionBool m_ligatureAsBracket;
+    OptionIntMap m_ligatureOblique;
     OptionBool m_mensuralScoreUp;
     OptionBool m_mensuralResponsiveView;
     OptionBool m_mensuralToCmn;

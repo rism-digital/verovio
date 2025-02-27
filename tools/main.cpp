@@ -86,9 +86,9 @@ int main(int argc, char **argv)
     std::string outformat = "svg";
     bool std_output = false;
 
-    int all_pages = 0;
-    int page = 1;
-    int show_version = 0;
+    bool all_pages = false;
+    std::optional<int> page;
+    bool show_version = false;
 
     // Create the toolkit instance without loading the font because
     // the resource path might be specified in the parameters
@@ -202,7 +202,7 @@ int main(int argc, char **argv)
                 }
                 break;
 
-            case 'a': all_pages = 1; break;
+            case 'a': all_pages = true; break;
 
             case 'f':
                 if (!toolkit.SetInputFrom(std::string(optarg))) {
@@ -229,7 +229,7 @@ int main(int argc, char **argv)
                 }
                 break;
 
-            case 'v': show_version = 1; break;
+            case 'v': show_version = true; break;
 
             case 'x':
                 if (!options->m_xmlIdSeed.SetValue(optarg)) {
@@ -348,30 +348,26 @@ int main(int argc, char **argv)
         }
     }
 
-    if (toolkit.GetOutputTo() != vrv::HUMDRUM) {
+    if (page && (toolkit.GetOutputTo() != vrv::HUMDRUM)) {
         // Check the page range
-        if (page > toolkit.GetPageCount()) {
-            std::cerr << "The page requested (" << page << ") is not in the page range (max is "
+        if (*page > toolkit.GetPageCount()) {
+            std::cerr << "The page requested (" << *page << ") is not in the page range (max is "
                       << toolkit.GetPageCount() << ")." << std::endl;
             exit(1);
         }
-        if (page < 1) {
+        if (*page < 1) {
             std::cerr << "The page number has to be greater than 0." << std::endl;
             exit(1);
         }
     }
 
-    int from = page;
-    int to = page + 1;
-    if (all_pages) {
-        to = toolkit.GetPageCount() + 1;
-    }
-
     if (outformat == "svg") {
-        int p;
-        for (p = from; p < to; ++p) {
+        const int from = page ? *page : 1;
+        const int to = all_pages ? toolkit.GetPageCount() : from;
+
+        for (int p = from; p <= to; ++p) {
             std::string cur_outfile = outfile;
-            if (all_pages) {
+            if (from < to) {
                 cur_outfile += vrv::StringFormat("_%03d", p);
             }
             cur_outfile += ".svg";
@@ -572,35 +568,20 @@ int main(int argc, char **argv)
         const char *removeIds = (options->m_removeIds.GetValue()) ? "true" : "false";
         const char *generateFacs = (outformat == "mei-facs") ? "true" : "false";
         outfile += ".mei";
-        if (all_pages) {
-            std::string params
-                = vrv::StringFormat("{'scoreBased': %s, 'basic': %s, 'removeIds': %s, 'generateFacs': %s}", scoreBased,
-                    basic, removeIds, generateFacs);
-            if (std_output) {
-                std::string output;
-                std::cout << toolkit.GetMEI(params);
-            }
-            else if (!toolkit.SaveFile(outfile, params)) {
-                exit(1);
-            }
-            else {
-                std::cerr << "Output written to " << outfile << "." << std::endl;
-            }
+        const std::string params = page
+            ? vrv::StringFormat("{'scoreBased': %s, 'basic': %s, 'pageNo': %d, 'removeIds': %s, 'generateFacs': %s}",
+                  scoreBased, basic, *page, removeIds, generateFacs)
+            : vrv::StringFormat("{'scoreBased': %s, 'basic': %s, 'removeIds': %s, 'generateFacs': %s}", scoreBased,
+                  basic, removeIds, generateFacs);
+        if (std_output) {
+            std::cout << toolkit.GetMEI(params);
+        }
+        else if (!toolkit.SaveFile(outfile, params)) {
+            std::cerr << "Unable to write MEI to " << outfile << "." << std::endl;
+            exit(1);
         }
         else {
-            std::string params = vrv::StringFormat(
-                "{'scoreBased': %s, 'basic': %s, 'pageNo': %d, 'removeIds': %s, 'generateFacs': %s}", scoreBased, basic,
-                page, removeIds, generateFacs);
-            if (std_output) {
-                std::cout << toolkit.GetMEI(params);
-            }
-            else if (!toolkit.SaveFile(outfile, params)) {
-                std::cerr << "Unable to write MEI to " << outfile << "." << std::endl;
-                exit(1);
-            }
-            else {
-                std::cerr << "Output written to " << outfile << "." << std::endl;
-            }
+            std::cerr << "Output written to " << outfile << "." << std::endl;
         }
     }
 

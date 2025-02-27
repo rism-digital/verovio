@@ -45,13 +45,13 @@ public:
      * German tablature: the line is based on the note's index in the note list
      * or by explicit @loc.
      *
-     * @param[in] course
-     * @param[in] notationType
-     * @param[in] lines
-     * @param[in] listSize
-     * @param[in] index - 0 based from the bottom of the chord
-     * @param[in] loc - German tablature: note@loc if specified, 0 at the bottom
-     * @param[in] topAlign - German tablature: true => align at the top, false => align at the bottom
+     * @param [in] course The course number
+     * @param [in] notationType The notationType used to default tuning if not otherwise specified
+     * @param [in] lines The number of lines
+     * @param [in] listSize The number of objects in the tabGrp
+     * @param [in] index 0 based from the bottom of the chord
+     * @param [in] loc German tablature: note@loc if specified, 0 at the bottom
+     * @param [in] topAlign German tablature: true => align at the top, false => align at the bottom
      * @return position in staff half lines
      */
     int CalcPitchPos(
@@ -60,9 +60,9 @@ public:
     /**
      * Calculate the MIDI note number for course/fret
      *
-     * @param[in] course The course number
-     * @param[in] fret The fret number
-     * @param[in] notationType The notationType used to default tuning if not otherwise specified
+     * @param [in] course The course number
+     * @param [in] fret The fret number
+     * @param [in] notationType The notationType used to default tuning if not otherwise specified
      *
      * @return MIDI note number
      */

@@ -31,12 +31,7 @@ View::View()
     m_pageIdx = 0;
     m_slurHandling = SlurHandling::Initialize;
 
-    m_currentColor = AxNONE;
-    m_currentElement = NULL;
-    m_currentLayer = NULL;
-    m_currentMeasure = NULL;
-    m_currentStaff = NULL;
-    m_currentSystem = NULL;
+    m_currentColor = COLOR_NONE;
 }
 
 View::~View() {}
@@ -53,11 +48,6 @@ void View::SetDoc(Doc *doc)
         m_doc = doc;
         m_options = doc->GetOptions();
     }
-    m_currentElement = NULL;
-    m_currentLayer = NULL;
-    m_currentMeasure = NULL;
-    m_currentStaff = NULL;
-    m_currentSystem = NULL;
     m_currentPage = NULL;
     m_pageIdx = 0;
 }
@@ -81,12 +71,6 @@ void View::SetPage(int pageIdx, bool doLayout)
             m_currentPage->LayOut();
         }
     }
-
-    m_currentElement = NULL;
-    m_currentLayer = NULL;
-    m_currentMeasure = NULL;
-    m_currentStaff = NULL;
-    m_currentSystem = NULL;
 
     OnPageChange();
     DoRefresh();

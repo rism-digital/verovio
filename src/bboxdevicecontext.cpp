@@ -37,9 +37,6 @@ BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height, unsigned
     m_drawingText = false;
     m_textAlignment = HORIZONTALALIGNMENT_left;
 
-    this->SetBrush(AxNONE, AxSOLID);
-    this->SetPen(AxNONE, 1, AxSOLID);
-
     m_update = update;
 
     this->ResetGraphicRotation();
@@ -126,8 +123,8 @@ Point BBoxDeviceContext::GetLogicalOrigin()
 // calculated better
 void BBoxDeviceContext::DrawQuadBezierPath(Point bezier[3])
 {
-    Point pMin = bezier[0].min(bezier[2]);
-    Point pMax = bezier[0].max(bezier[2]);
+    Point pMin = Point::Min(bezier[0], bezier[2]);
+    Point pMax = Point::Max(bezier[0], bezier[2]);
 
     // From https://iquilezles.org/www/articles/bezierbbox/bezierbbox.htm
     if ((bezier[1].x < pMin.x) || (bezier[1].x > pMax.x) || (bezier[1].y < pMin.y) || (bezier[1].y > pMax.y)) {
@@ -140,8 +137,8 @@ void BBoxDeviceContext::DrawQuadBezierPath(Point bezier[3])
         // vec2 q = s*s*p0 + 2.0*s*t*p1 + t*t*p2;
         int qx = sx * sx * bezier[0].x + 2.0 * sx * tx * bezier[1].x + tx * tx * bezier[2].x;
         int qy = sy * sy * bezier[0].y + 2.0 * sy * ty * bezier[1].y + ty * ty * bezier[2].y;
-        pMin = pMin.min(Point(qx, qy));
-        pMax = pMax.max(Point(qx, qy));
+        pMin = Point::Min(pMin, Point(qx, qy));
+        pMax = Point::Max(pMax, Point(qx, qy));
     }
 
     this->UpdateBB(pMin.x, pMin.y, pMax.x, pMax.y);
@@ -172,6 +169,11 @@ void BBoxDeviceContext::DrawCubicBezierPathFilled(Point bezier1[4], Point bezier
     this->UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
 }
 
+void BBoxDeviceContext::DrawBentParallelogramFilled(Point side[4], int height)
+{
+    this->UpdateBB(side[0].x, side[0].y, side[3].x, side[3].y + height);
+}
+
 void BBoxDeviceContext::DrawCircle(int x, int y, int radius)
 {
     this->DrawEllipse(x - radius, y - radius, 2 * radius, 2 * radius);
@@ -200,27 +202,27 @@ void BBoxDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
     this->UpdateBB(x1 - overlap.first, y1 - overlap.second, x2 + overlap.second, y2 + overlap.first);
 }
 
-void BBoxDeviceContext::DrawPolyline(int n, Point points[], int xOffset, int yOffset)
+void BBoxDeviceContext::DrawPolyline(int n, Point points[], bool close)
 {
     // Same bounding box as corresponding polygon
-    this->DrawPolygon(n, points, xOffset, yOffset);
+    this->DrawPolygon(n, points);
 }
 
-void BBoxDeviceContext::DrawPolygon(int n, Point points[], int xOffset, int yOffset)
+void BBoxDeviceContext::DrawPolygon(int n, Point points[])
 {
     if (n == 0) {
         return;
     }
-    int x1 = points[0].x + xOffset;
+    int x1 = points[0].x;
     int x2 = x1;
-    int y1 = points[0].y + yOffset;
+    int y1 = points[0].y;
     int y2 = y1;
 
     for (int i = 0; i < n; ++i) {
-        x1 = std::min(x1, points[i].x + xOffset);
-        x2 = std::max(x2, points[i].x + xOffset);
-        y1 = std::min(y1, points[i].y + yOffset);
-        y2 = std::max(y2, points[i].y + yOffset);
+        x1 = std::min(x1, points[i].x);
+        x2 = std::max(x2, points[i].x);
+        y1 = std::min(y1, points[i].y);
+        y2 = std::max(y2, points[i].y);
     }
 
     const std::pair<int, int> overlap = this->GetPenWidthOverlap();
