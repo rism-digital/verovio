@@ -425,6 +425,13 @@ public:
     void InsertChild(Object *element, int idx);
 
     /**
+     * Rotates the child elements of the object leftwards, using std::rotate() with the given indices.
+     * All elements from first (included) to last (not included) are rotated leftwards, with the element at middle
+     * becoming the new first element, see std::rotate() for more details.
+     */
+    void RotateChildren(int first, int middle, int last);
+
+    /**
      * Detach the child at the idx position (NULL if not found)
      * The parent pointer is set to NULL.
      */
