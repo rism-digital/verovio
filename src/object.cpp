@@ -560,6 +560,11 @@ void Object::InsertChild(Object *element, int idx)
     m_children.insert(iter + (idx), element);
 }
 
+void Object::RotateChildren(int first, int middle, int last)
+{
+    std::rotate(m_children.begin() + first, m_children.begin() + middle, m_children.begin() + last);
+}
+
 Object *Object::DetachChild(int idx)
 {
     if (idx >= (int)m_children.size()) {
