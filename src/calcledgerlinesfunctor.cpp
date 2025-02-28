@@ -24,7 +24,7 @@ CalcLedgerLinesFunctor::CalcLedgerLinesFunctor(Doc *doc) : DocFunctor(doc) {}
 
 FunctorCode CalcLedgerLinesFunctor::VisitAccid(Accid *accid)
 {
-    if (accid->GetFirstAncestor(NOTE)) {
+    if (accid->GetFirstAncestor(NOTE) || !accid->HasAccid()) {
         return FUNCTOR_SIBLINGS;
     }
 
