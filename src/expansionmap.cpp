@@ -136,18 +136,14 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
             }
         }
     }
-    // make unused sections hidden
+
+    // remove unused sections from structure
     for (std::string r : reductionList) {
         Object *currSect = prevSect->GetParent()->FindDescendantByID(r);
         assert(currSect);
-        if (currSect->Is(ENDING) || currSect->Is(SECTION)) {
-            SystemElement *tmp = dynamic_cast<SystemElement *>(currSect);
-            tmp->m_visibility = Hidden;
-        }
-        else if (currSect->Is(LEM) || currSect->Is(RDG)) {
-            EditorialElement *tmp = dynamic_cast<EditorialElement *>(currSect);
-            tmp->m_visibility = Hidden;
-        }
+
+        int idx = currSect->GetIdx();
+        prevSect->GetParent()->DetachChild(idx);
     }
 }
 
