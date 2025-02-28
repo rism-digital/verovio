@@ -39,6 +39,8 @@ void ExpansionMap::Reset()
 void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &existingList, Object *prevSect)
 {
     assert(prevSect);
+    assert(prevSect->GetParent());
+
     // find all siblings of expansion element to know what in MEI file
     const ArrayOfObjects &expansionSiblings = prevSect->GetParent()->GetChildren();
     std::vector<std::string> reductionList;
@@ -50,7 +52,9 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
         if (s.rfind("#", 0) == 0) s = s.substr(1, s.size() - 1); // remove trailing hash from reference
         Object *currSect = prevSect->GetParent()->FindDescendantByID(s); // find section pointer of reference string
         if (!currSect) {
-            return;
+            // Warn about referenced element not found and continue
+            LogWarning("ExpansionMap::Expand: Element referenced in @plist not found: %s", s.c_str());
+            continue;
         }
         if (currSect->Is(EXPANSION)) { // if reference is itself an expansion, resolve it recursively
             // remove parent from reductionList, if expansion
@@ -89,7 +93,6 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
                 // go through cloned objects, find TimePointing/SpanningInterface, PListInterface, LinkingInterface
                 this->UpdateIDs(clonedObject);
 
-                assert(prevSect->GetParent());
                 prevSect->GetParent()->InsertAfter(prevSect, clonedObject);
                 prevSect = clonedObject;
             }
