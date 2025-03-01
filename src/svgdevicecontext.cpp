@@ -817,6 +817,9 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
     if (m_penStack.top().HasColor()) {
         pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
     }
+    else if (!this->UseGlobalStyling()) {
+        pathChild.append_attribute("stroke") = "currentColor";
+    }
     if (m_penStack.top().GetWidth() > 1) pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
     this->AppendStrokeLineCap(pathChild, m_penStack.top());
     this->AppendStrokeDashArray(pathChild, m_penStack.top());
