@@ -61,6 +61,7 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
     // Action without parameter
     if (action == "commit") {
         m_doc->PrepareData();
+        m_doc->ScoreDefSetCurrentDoc(true);
         return true;
     }
 

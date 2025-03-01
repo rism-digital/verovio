@@ -999,7 +999,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 
     if (hadSelection) m_doc.ReactivateSelection(false);
 
-    if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);
+    if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo, true);
     return output;
 }
 
@@ -1622,7 +1622,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     pageNo--;
 
     // Get the current system for the SVG clipping size
-    m_view.SetPage(pageNo);
+    m_view.SetPage(pageNo, true);
 
     // Adjusting page width and height according to the options
     int width = m_options->m_pageWidth.GetUnfactoredValue();
@@ -1722,7 +1722,7 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
     this->RenderToDeviceContext(pageNo, &svg);
 
     std::string out_str = svg.GetStringSVG(xmlDeclaration);
-    if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);
+    if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo, true);
     return out_str;
 }
 

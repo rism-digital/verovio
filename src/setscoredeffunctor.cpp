@@ -681,4 +681,47 @@ FunctorCode SetStaffDefRedrawFlagsFunctor::VisitStaffDef(StaffDef *staffDef)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// SetFocusFunctor
+//----------------------------------------------------------------------------
+
+SetFocusFunctor::SetFocusFunctor(Object *page, System *focusStart, System *focusEnd, Doc *doc) : DocFunctor(doc)
+{
+    assert(page);
+    assert(focusStart);
+    assert(focusEnd);
+
+    m_page = page;
+    m_focusStart = focusStart;
+    m_focusEnd = focusEnd;
+    m_focusStart->ClearChildren();
+    m_focusEnd->ClearChildren();
+}
+
+FunctorCode SetFocusFunctor::VisitObject(Object *object)
+{
+    if (!object->HasInterface(INTERFACE_TIME_SPANNING)) return FUNCTOR_CONTINUE;
+
+    TimeSpanningInterface *interface = object->GetTimeSpanningInterface();
+    assert(interface);
+    if (interface->GetStart() && interface->GetStart()->GetFirstAncestor(PAGE) != m_page) {
+        Object *measure = interface->GetStart()->GetFirstAncestor(MEASURE);
+        assert(measure);
+        ArrayOfObjects &children = m_focusStart->GetChildrenForModification();
+        if (std::find(children.begin(), children.end(), measure) == children.end()) {
+            m_focusStart->AddChild(measure);
+        }
+    }
+    if (interface->GetEnd() && interface->GetEnd()->GetFirstAncestor(PAGE) != m_page) {
+        Object *measure = interface->GetEnd()->GetFirstAncestor(MEASURE);
+        assert(measure);
+        ArrayOfObjects &children = m_focusEnd->GetChildrenForModification();
+        if (std::find(children.begin(), children.end(), measure) == children.end()) {
+            m_focusEnd->AddChild(measure);
+        }
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
 } // namespace vrv

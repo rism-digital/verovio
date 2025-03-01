@@ -429,7 +429,7 @@ public:
      * By default, the page size of the document is taken.
      * If a page is given, the size of the page is taken.
      */
-    Page *SetDrawingPage(int pageIdx);
+    Page *SetDrawingPage(int pageIdx, bool setFocus = false);
 
     /**
      * Update the drawing page sizes when a page is set as drawing page.
@@ -550,11 +550,22 @@ private:
      */
     void CollectVisibleScores();
 
+    /**
+     * Set the document focus
+     */
+    void SetFocus();
+
 public:
     Page *m_selectionPreceding;
     Page *m_selectionFollowing;
     std::string m_selectionStart;
     std::string m_selectionEnd;
+
+    Pages *m_focusSet;
+    Page *m_focusStart;
+    Page *m_focusEnd;
+    System *m_focusStartSystem;
+    System *m_focusEndSystem;
 
     /**
      * A copy of the header tree stored as pugi::xml_document
@@ -633,6 +644,11 @@ private:
      * A flag indicating if the document has been cast off or not.
      */
     bool m_isCastOff;
+
+    /**
+     * A flag indicating the focus status (unset, set, used)
+     */
+    FocusStatusType m_focusStatus;
 
     /*
      * The following values are set in the Doc::SetDrawingPage.

@@ -405,6 +405,49 @@ private:
     int m_redrawFlags;
 };
 
+//----------------------------------------------------------------------------
+// SetFocusFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class casts off a document to selection.
+ * Moves everything before the selection to the first page, the selection to a second page,
+ * and everything after the selection to a third page.
+ */
+class SetFocusFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    SetFocusFunctor(Object *page, System *focusStart, System *focusEnd, Doc *doc);
+    virtual ~SetFocusFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitObject(Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    Object *m_page;
+    System *m_focusStart;
+    System *m_focusEnd;
+};
+
 } // namespace vrv
 
 #endif // __VRV_SETSCOREDEFFUNCTOR_H__
