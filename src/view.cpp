@@ -42,7 +42,6 @@ void View::SetDoc(Doc *doc)
     if (doc == NULL) {
         m_doc = NULL;
         m_options = NULL;
-        DoReset();
     }
     else {
         m_doc = doc;
@@ -71,28 +70,6 @@ void View::SetPage(int pageIdx, bool doLayout)
             m_currentPage->LayOut();
         }
     }
-
-    OnPageChange();
-    DoRefresh();
-}
-
-bool View::HasNext(bool forward)
-{
-    if (forward) return (m_doc && (m_doc->HasPage(m_pageIdx + 1)));
-    return (m_doc && (m_doc->HasPage(m_pageIdx - 1)));
-}
-
-void View::Next(bool forward)
-{
-    if (!m_doc) return;
-
-    if (forward && this->HasNext(true)) {
-        m_pageIdx++;
-    }
-    else if (!forward && this->HasNext(false)) {
-        m_pageIdx--;
-    }
-    this->SetPage(m_pageIdx);
 }
 
 int View::ToDeviceContextX(int i)
