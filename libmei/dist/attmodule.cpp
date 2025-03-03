@@ -7184,7 +7184,7 @@ bool AttModule::SetStringtab(Object *element, const std::string &attrType, const
             return true;
         }
         if (attrType == "tab.fret") {
-            att->SetTabFret(att->StrToStr(attrValue));
+            att->SetTabFret(att->StrToInt(attrValue));
             return true;
         }
         if (attrType == "tab.line") {
@@ -7243,7 +7243,7 @@ void AttModule::GetStringtab(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "tab.fing", att->StrToStr(att->GetTabFing()) });
         }
         if (att->HasTabFret()) {
-            attributes->push_back({ "tab.fret", att->StrToStr(att->GetTabFret()) });
+            attributes->push_back({ "tab.fret", att->IntToStr(att->GetTabFret()) });
         }
         if (att->HasTabLine()) {
             attributes->push_back({ "tab.line", att->IntToStr(att->GetTabLine()) });

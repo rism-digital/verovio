@@ -3209,7 +3209,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                     // set @tab.string and @tab.fret
                     const int fret = technicalChild.text().as_int();
                     const int course = technical.child("string").text().as_int();
-                    note->SetTabFret(std::to_string(fret));
+                    note->SetTabFret(fret);
                     note->SetTabCourse(course);
 
                     // Do we have the pitch for this note, if so do we have the tuning for this course?

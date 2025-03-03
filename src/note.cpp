@@ -304,17 +304,10 @@ std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType, int &overl
         if (!fretStr.empty()) return fretStr;
     }
 
-    int fret = 0;
-    try {
-        fret = std::stoi(this->GetTabFret());
-    }
-    catch (...) {
-        fret = 0;
-    }
-    const int course = this->GetTabCourse();
-
     if (notationType == NOTATIONTYPE_tab_lute_italian) {
         std::u32string fretStr;
+        const int fret = this->GetTabFret();
+        const int course = this->GetTabCourse();
 
         // Italian tablature glyphs are contiguous
         static_assert(SMUFL_EBE1_luteItalianFret1 == SMUFL_EBE0_luteItalianFret0 + 1);
@@ -339,6 +332,8 @@ std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType, int &overl
     }
     else if (notationType == NOTATIONTYPE_tab_lute_french) {
         std::u32string fretStr;
+        const int fret = this->GetTabFret();
+        const int course = this->GetTabCourse();
         if (course >= 11) {
             // french tab uses number 4 ... for courses 11 ..., always open fret a.
             // TODO need Baroque font SMUFL_xxxx_luteDiapason4, 5, 6 ... or somesuch.
@@ -384,6 +379,8 @@ std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType, int &overl
     }
     else if (notationType == NOTATIONTYPE_tab_lute_german) {
         std::u32string fretStr;
+        const int fret = this->GetTabFret();
+        const int course = this->GetTabCourse();
 
         // SMuFL has glyphs for German lute tablature following Hans and Melchior Newsidler's notation
         // for the >= 6th courses.
@@ -450,7 +447,8 @@ std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType, int &overl
         return fretStr;
     }
     else {
-        return UTF8to32(this->GetTabFret());
+        std::string str = StringFormat("%d", this->GetTabFret());
+        return UTF8to32(str);
     }
 }
 
@@ -808,15 +806,8 @@ int Note::GetMIDIPitch(const int shift, const int octaveShift) const
         // tablature
         const Staff *staff = this->GetAncestorStaff();
         if (staff->m_drawingTuning) {
-            int fret = 0;
-            try {
-                fret = std::stoi(this->GetTabFret());
-            }
-            catch (...) {
-                fret = 0;
-            }
-
-            pitch = staff->m_drawingTuning->CalcPitchNumber(this->GetTabCourse(), fret, staff->m_drawingNotationType);
+            pitch = staff->m_drawingTuning->CalcPitchNumber(
+                this->GetTabCourse(), this->GetTabFret(), staff->m_drawingNotationType);
         }
     }
 

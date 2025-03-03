@@ -89,7 +89,7 @@ AttStringtab::AttStringtab() : Att()
 void AttStringtab::ResetStringtab()
 {
     m_tabFing = "";
-    m_tabFret = "";
+    m_tabFret = MEI_UNSET;
     m_tabLine = 0;
     m_tabString = "";
     m_tabCourse = MEI_UNSET;
@@ -104,7 +104,7 @@ bool AttStringtab::ReadStringtab(pugi::xml_node element, bool removeAttr)
         hasAttribute = true;
     }
     if (element.attribute("tab.fret")) {
-        this->SetTabFret(StrToStr(element.attribute("tab.fret").value()));
+        this->SetTabFret(StrToInt(element.attribute("tab.fret").value()));
         if (removeAttr) element.remove_attribute("tab.fret");
         hasAttribute = true;
     }
@@ -134,7 +134,7 @@ bool AttStringtab::WriteStringtab(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasTabFret()) {
-        element.append_attribute("tab.fret") = StrToStr(this->GetTabFret()).c_str();
+        element.append_attribute("tab.fret") = IntToStr(this->GetTabFret()).c_str();
         wroteAttribute = true;
     }
     if (this->HasTabLine()) {
@@ -159,7 +159,7 @@ bool AttStringtab::HasTabFing() const
 
 bool AttStringtab::HasTabFret() const
 {
-    return (m_tabFret != "");
+    return (m_tabFret != MEI_UNSET);
 }
 
 bool AttStringtab::HasTabLine() const

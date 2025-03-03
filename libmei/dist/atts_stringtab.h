@@ -126,8 +126,8 @@ public:
     std::string GetTabFing() const { return m_tabFing; }
     bool HasTabFing() const;
     //
-    void SetTabFret(std::string tabFret_) { m_tabFret = tabFret_; }
-    std::string GetTabFret() const { return m_tabFret; }
+    void SetTabFret(int tabFret_) { m_tabFret = tabFret_; }
+    int GetTabFret() const { return m_tabFret; }
     bool HasTabFret() const;
     //
     void SetTabLine(char tabLine_) { m_tabLine = tabLine_; }
@@ -153,7 +153,7 @@ private:
      **/
     std::string m_tabFing;
     /** Records the location at which a string should be stopped against a fret. **/
-    std::string m_tabFret;
+    int m_tabFret;
     /**
      * Used in German lute tablature in cases where vertical positioning deviates from
      * the norm which can be specified by tab.align.
