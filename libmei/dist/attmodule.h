@@ -86,10 +86,6 @@ public:
     static void GetFingering(const Object *element, ArrayOfStrAttr *attributes);
     static void CopyFingering(const Object *element, Object *target);
 
-    static bool SetFrettab(Object *element, const std::string &attrType, const std::string &attrValue);
-    static void GetFrettab(const Object *element, ArrayOfStrAttr *attributes);
-    static void CopyFrettab(const Object *element, Object *target);
-
     static bool SetGestural(Object *element, const std::string &attrType, const std::string &attrValue);
     static void GetGestural(const Object *element, ArrayOfStrAttr *attributes);
     static void CopyGestural(const Object *element, Object *target);
@@ -125,6 +121,10 @@ public:
     static bool SetShared(Object *element, const std::string &attrType, const std::string &attrValue);
     static void GetShared(const Object *element, ArrayOfStrAttr *attributes);
     static void CopyShared(const Object *element, Object *target);
+
+    static bool SetStringtab(Object *element, const std::string &attrType, const std::string &attrValue);
+    static void GetStringtab(const Object *element, ArrayOfStrAttr *attributes);
+    static void CopyStringtab(const Object *element, Object *target);
 
     static bool SetUsersymbols(Object *element, const std::string &attrType, const std::string &attrValue);
     static void GetUsersymbols(const Object *element, ArrayOfStrAttr *attributes);

@@ -11,6 +11,7 @@
 #include "atts_mei.h"
 #include "atts_midi.h"
 #include "atts_shared.h"
+#include "atts_stringtab.h"
 #include "scoredef.h"
 
 namespace vrv {
@@ -31,9 +32,9 @@ class StaffDef : public ScoreDefElement,
                  public AttScalable,
                  public AttStaffDefLog,
                  public AttStaffDefVis,
+                 public AttStaffDefVisTablature,
                  public AttTimeBase,
-                 public AttTransposition,
-                 public AttVerticalAlign {
+                 public AttTransposition {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
