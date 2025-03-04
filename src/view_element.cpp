@@ -1164,8 +1164,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     this->DrawSmuflCode(dc, x, y, rest, staffSize, drawingCueSize);
 
     // single legder line for whole rest glyphs
-    if ((measure->m_measureAligner.GetMaxTime() < Fraction(DURATION_1))
-        && (y > staff->GetDrawingY()
+    if (!isDouble && (y > staff->GetDrawingY()
             || y < staff->GetDrawingY() - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize))) {
         const int width = m_doc->GetGlyphWidth(rest, staffSize, drawingCueSize);
         int ledgerLineThickness
