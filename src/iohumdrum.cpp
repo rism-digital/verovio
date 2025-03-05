@@ -2939,7 +2939,7 @@ void HumdrumInput::createDigitalSource(pugi::xml_node sourceDesc)
     pugi::xml_node bibl = source.append_child("bibl");
     bibl.append_copy(m_simpleTitle);
     for (pugi::xml_node_iterator childIt = m_simpleComposersDoc.begin(); childIt != m_simpleComposersDoc.end();
-         ++childIt) {
+        ++childIt) {
         bibl.append_copy(*childIt);
     }
 
@@ -3691,7 +3691,7 @@ void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)
 
     bibl.append_copy(m_simpleTitle);
     for (pugi::xml_node_iterator childIt = m_simpleComposersDoc.begin(); childIt != m_simpleComposersDoc.end();
-         ++childIt) {
+        ++childIt) {
         bibl.append_copy(*childIt);
     }
 
