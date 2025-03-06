@@ -57,7 +57,7 @@ void View::SetPage(int pageIdx, bool doLayout)
     assert(m_doc->HasPage(pageIdx));
 
     m_pageIdx = pageIdx;
-    m_currentPage = m_doc->SetDrawingPage(pageIdx);
+    m_currentPage = m_doc->SetDrawingPage(pageIdx, doLayout);
 
     if (doLayout) {
         m_doc->ScoreDefSetCurrentDoc();

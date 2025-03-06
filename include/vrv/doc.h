@@ -22,6 +22,7 @@ class MidiFile;
 namespace vrv {
 
 class DocSelection;
+class FocusSet;
 class FontInfo;
 class Glyph;
 class Pages;
@@ -520,6 +521,11 @@ public:
     void ReactivateSelection(bool resetAligners);
     ///@}
 
+    /**
+     * Reset the document focus
+     */
+    void SetFocus();
+    
     //----------//
     // Functors //
     //----------//
@@ -551,21 +557,17 @@ private:
     void CollectVisibleScores();
 
     /**
-     * Set the document focus
+     * Reset the document focus
      */
-    void SetFocus();
-
+    void ResetFocus();
+    
 public:
     Page *m_selectionPreceding;
     Page *m_selectionFollowing;
     std::string m_selectionStart;
     std::string m_selectionEnd;
 
-    Pages *m_focusSet;
-    Page *m_focusStart;
-    Page *m_focusEnd;
-    System *m_focusStartSystem;
-    System *m_focusEndSystem;
+    FocusSet* m_focusSet;
 
     /**
      * A copy of the header tree stored as pugi::xml_document

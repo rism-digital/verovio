@@ -12,6 +12,8 @@
 
 namespace vrv {
 
+class FocusSet;
+
 //----------------------------------------------------------------------------
 // ReplaceDrawingValuesInStaffDefFunctor
 //----------------------------------------------------------------------------
@@ -420,9 +422,11 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    SetFocusFunctor(Object *page, System *focusStart, System *focusEnd, Doc *doc);
+    SetFocusFunctor(Object *page, Doc *doc);
     virtual ~SetFocusFunctor() = default;
     ///@}
+    
+    void Apply(FocusSet *focusSet);
 
     /*
      * Abstract base implementation
@@ -444,8 +448,8 @@ public:
     //
 private:
     Object *m_page;
-    System *m_focusStart;
-    System *m_focusEnd;
+    std::list<Page *> m_pageBefore;
+    std::list<Page *> m_pageAfter;
 };
 
 } // namespace vrv

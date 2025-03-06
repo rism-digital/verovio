@@ -83,9 +83,9 @@ public:
     /**
      * Do the layout of the page, which means aligning its content horizontally
      * and vertically, and justify horizontally and vertically if wanted.
-     * This will be done only if m_layoutDone is false or force is true.
+     * This will be done only if m_layoutDone is false.
      */
-    void LayOut(bool force = false);
+    void LayOut();
     void InvalidLayout() { m_layoutDone = false; }
 
     /**

@@ -12,6 +12,7 @@
 #include "doc.h"
 #include "layer.h"
 #include "page.h"
+#include "pages.h"
 #include "score.h"
 #include "staff.h"
 #include "system.h"
@@ -685,43 +686,92 @@ FunctorCode SetStaffDefRedrawFlagsFunctor::VisitStaffDef(StaffDef *staffDef)
 // SetFocusFunctor
 //----------------------------------------------------------------------------
 
-SetFocusFunctor::SetFocusFunctor(Object *page, System *focusStart, System *focusEnd, Doc *doc) : DocFunctor(doc)
+SetFocusFunctor::SetFocusFunctor(Object *page, Doc *doc) : DocFunctor(doc)
 {
     assert(page);
-    assert(focusStart);
-    assert(focusEnd);
 
     m_page = page;
-    m_focusStart = focusStart;
-    m_focusEnd = focusEnd;
-    m_focusStart->ClearChildren();
-    m_focusEnd->ClearChildren();
 }
 
 FunctorCode SetFocusFunctor::VisitObject(Object *object)
 {
+    if (object->Is(SYSTEM)) {
+        System *system = vrv_cast<System *>(object);
+        for (auto object : *system->GetDrawingList())
+            object->Process(*this);
+    }
+    
+    
     if (!object->HasInterface(INTERFACE_TIME_SPANNING)) return FUNCTOR_CONTINUE;
 
     TimeSpanningInterface *interface = object->GetTimeSpanningInterface();
     assert(interface);
     if (interface->GetStart() && interface->GetStart()->GetFirstAncestor(PAGE) != m_page) {
-        Object *measure = interface->GetStart()->GetFirstAncestor(MEASURE);
-        assert(measure);
-        ArrayOfObjects &children = m_focusStart->GetChildrenForModification();
-        if (std::find(children.begin(), children.end(), measure) == children.end()) {
-            m_focusStart->AddChild(measure);
+        Page *page = vrv_cast<Page*>(interface->GetStart()->GetFirstAncestor(PAGE));
+        assert(page);
+        if (std::find(m_pageBefore.begin(), m_pageBefore.end(), page) == m_pageBefore.end()) {
+            m_pageBefore.push_back(page);
         }
     }
     if (interface->GetEnd() && interface->GetEnd()->GetFirstAncestor(PAGE) != m_page) {
-        Object *measure = interface->GetEnd()->GetFirstAncestor(MEASURE);
-        assert(measure);
-        ArrayOfObjects &children = m_focusEnd->GetChildrenForModification();
-        if (std::find(children.begin(), children.end(), measure) == children.end()) {
-            m_focusEnd->AddChild(measure);
+        Page *page = vrv_cast<Page*>(interface->GetEnd()->GetFirstAncestor(PAGE));
+        assert(page);
+        if (std::find(m_pageAfter.begin(), m_pageAfter.end(), page) == m_pageAfter.end()) {
+            m_pageAfter.push_back(page);
         }
     }
 
     return FUNCTOR_SIBLINGS;
+}
+
+void SetFocusFunctor::Apply(FocusSet *focusSet)
+{
+    assert(focusSet);
+    assert(m_doc);
+    assert(m_page);
+    
+    
+    ArrayOfObjects pages = m_doc->GetPages()->GetChildren();
+    
+    // Find position of p1 in v1
+    auto p1_it = std::find(pages.begin(), pages.end(), m_page);
+    // Should not happen
+    if (p1_it == pages.end()) return;
+
+    // Find the furthest element in l1 (earliest in v1)
+    auto furthestBefore = pages.end();
+    for (Page* page : m_pageBefore) {
+        auto it = std::find(pages.begin(), pages.end(), page);
+        if (it != pages.end() && it < p1_it && it < furthestBefore) {
+            furthestBefore = it;
+        }
+    }
+
+    // Create the list of pages before p1 up to the furthest element
+    if (furthestBefore != pages.end()) {
+        for (auto it = furthestBefore; it < p1_it; ++it) {
+            focusSet->AddChild(*it);
+        }
+    }
+    
+    focusSet->AddChild(m_page);
+    focusSet->SetAsFocus(vrv_cast<Page*>(m_page));
+    
+    // Find the furthest element in l1 (earliest in v1)
+    auto furthestAfter = pages.begin();
+    for (Page* page : m_pageAfter) {
+        auto it = std::find(p1_it, pages.end(), page);
+        if (it != pages.end() && it > p1_it && it > furthestAfter) {
+            furthestAfter = it;
+        }
+    }
+
+    // Create the list of pages before p1 up to the furthest element
+    if (furthestAfter != pages.begin()) {
+        for (auto it = p1_it + 1; it <= furthestAfter; ++it) {
+            focusSet->AddChild(*it);
+        }
+    }
 }
 
 } // namespace vrv

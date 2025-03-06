@@ -13,7 +13,9 @@
 
 namespace vrv {
 
+class Page;
 class Score;
+class System;
 
 //----------------------------------------------------------------------------
 // Pages
@@ -47,6 +49,8 @@ public:
      *
      */
     void ConvertFrom(Score *score);
+    
+    void LayoutAll();
 
     //----------//
     // Functors //
@@ -68,6 +72,38 @@ public:
     //
 private:
     //
+};
+
+//----------------------------------------------------------------------------
+// FocusSet
+//----------------------------------------------------------------------------
+
+/**
+ * This class represent a <pages> in page-based MEI.
+ */
+class FocusSet : public Pages {
+    
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method resets all attribute classes
+     */
+    ///@{
+    FocusSet(Doc *doc);
+    virtual ~FocusSet();
+    
+    void Reset() override;
+    
+    void SetAsFocus(Page *page);
+    
+    void Layout();
+    
+    
+    Doc *m_doc;
+    
+    Page *m_focus;
+
+    
 };
 
 } // namespace vrv

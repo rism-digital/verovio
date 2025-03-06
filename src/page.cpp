@@ -188,9 +188,9 @@ const RunningElement *Page::GetFooter() const
     }
 }
 
-void Page::LayOut(bool force)
+void Page::LayOut()
 {
-    if (m_layoutDone && !force) {
+    if (m_layoutDone) {
         // We only need to reset the header - this will adjust the page number if necessary
         if (this->GetHeader()) this->GetHeader()->SetDrawingPage(this);
         if (this->GetFooter()) this->GetFooter()->SetDrawingPage(this);

@@ -94,10 +94,6 @@ Doc::Doc() : Object(DOC, "doc-")
     m_selectionPreceding = NULL;
     m_selectionFollowing = NULL;
     m_focusSet = NULL;
-    m_focusStart = NULL;
-    m_focusStartSystem = NULL;
-    m_focusEnd = NULL;
-    m_focusEndSystem = NULL;
 
     this->Reset();
 }
@@ -108,9 +104,6 @@ Doc::~Doc()
 
     delete m_options;
     if (m_focusSet) delete m_focusSet;
-    if (m_focusStart) delete m_focusStart;
-    if (m_focusEnd) delete m_focusEnd;
-    // m_focusStartSystem and m_focusEndSystem own by m_focusStart and m_focusEnd
 }
 
 void Doc::Reset()
@@ -1714,26 +1707,39 @@ void Doc::CollectVisibleScores()
 void Doc::SetFocus()
 {
     if (!m_focusSet) {
-        m_focusSet = new Pages();
-        m_focusSet->SetAsReferenceObject();
-        m_focusStart = new Page();
-        m_focusStartSystem = new System();
-        m_focusStartSystem->SetAsReferenceObject();
-        m_focusEnd = new Page();
-        m_focusEndSystem = new System();
-        m_focusEndSystem->SetAsReferenceObject();
+        m_focusSet = new FocusSet(this);
+    }
+    else {
+        this->ResetFocus();
     }
     m_focusSet->ClearChildren();
 
-    SetFocusFunctor setFocusFunctor(m_drawingPage, m_focusStartSystem, m_focusEndSystem, this);
+    SetFocusFunctor setFocusFunctor(m_drawingPage, this);
     m_drawingPage->Process(setFocusFunctor);
-    m_focusSet->AddChild(m_focusStart);
-    m_focusSet->AddChild(m_drawingPage);
-    m_focusSet->AddChild(m_focusEnd);
+    setFocusFunctor.Apply(m_focusSet);
     m_focusStatus = FOCUS_SET;
 
-    this->PrepareData();
-    this->ScoreDefSetCurrentDoc(true);
+    //this->PrepareData();
+    //this->ScoreDefSetCurrentDoc(true);
+    //m_focusSet->Layout();
+    
+}
+
+void Doc::ResetFocus()
+{
+    if (m_focusStatus == FOCUS_UNSET) return;
+
+    m_focusSet->ClearChildren();
+    
+    if (m_focusStatus == FOCUS_SET) {
+        m_focusStatus = FOCUS_UNSET;
+    }
+    else {
+        m_focusStatus = FOCUS_UNSET;
+        this->PrepareData();
+        this->ScoreDefSetCurrentDoc(true);
+        this->GetPages()->LayoutAll();
+    }
 }
 
 int Doc::GetGlyphHeight(char32_t code, int staffSize, bool graceSize) const
@@ -2195,7 +2201,8 @@ Page *Doc::SetDrawingPage(int pageIdx, bool setFocus)
     m_drawingPage = vrv_cast<Page *>(pages->GetChild(pageIdx));
     assert(m_drawingPage);
 
-    if (setFocus) this->SetFocus();
+    if (setFocus)
+        this->SetFocus();
 
     UpdatePageDrawingSizes();
 
