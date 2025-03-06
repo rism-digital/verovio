@@ -35,6 +35,7 @@
 #include "stem.h"
 #include "syl.h"
 #include "system.h"
+#include "tabdursym.h"
 #include "tempo.h"
 #include "textlayoutelement.h"
 #include "tuplet.h"
@@ -83,7 +84,8 @@ FunctorCode ResetDataFunctor::VisitBeam(Beam *beam)
 {
     // Call parent one too
     this->VisitLayerElement(beam);
-    beam->BeamDrawingInterface::Reset();
+    // Drawing interface functor to be called explicitly
+    beam->BeamDrawingInterface::InterfaceResetData(*this);
 
     beam->m_beamSegment.Reset();
     beam->SetStemSameasBeam(NULL);
@@ -98,8 +100,8 @@ FunctorCode ResetDataFunctor::VisitBeamSpan(BeamSpan *beamSpan)
 {
     // Call parent one too
     this->VisitControlElement(beamSpan);
-    beamSpan->BeamDrawingInterface::Reset();
-    beamSpan->PlistInterface::InterfaceResetData(*this, beamSpan);
+    // Drawing interface functor to be called explicitly
+    beamSpan->BeamDrawingInterface::InterfaceResetData(*this);
 
     beamSpan->ResetBeamedElements();
     beamSpan->ClearBeamSegments();
@@ -112,6 +114,9 @@ FunctorCode ResetDataFunctor::VisitChord(Chord *chord)
 {
     // Call parent one too
     this->VisitLayerElement(chord);
+    // Drawing interface functor to be called explicitly
+    chord->DrawingListInterface::InterfaceResetData(*this);
+    chord->StemmedDrawingInterface::InterfaceResetData(*this);
 
     // We want the list of the ObjectListInterface to be regenerated
     chord->Modify();
@@ -220,6 +225,8 @@ FunctorCode ResetDataFunctor::VisitFTrem(FTrem *fTrem)
 {
     // Call parent one too
     this->VisitLayerElement(fTrem);
+    // Drawing interface functor to be called explicitly
+    fTrem->BeamDrawingInterface::InterfaceResetData(*this);
 
     fTrem->m_beamSegment.Reset();
 
@@ -244,6 +251,8 @@ FunctorCode ResetDataFunctor::VisitLayer(Layer *layer)
 {
     // Call parent one too
     this->VisitObject(layer);
+    // Drawing interface functor to be called explicitly
+    layer->DrawingListInterface::InterfaceResetData(*this);
 
     layer->SetCrossStaffFromAbove(false);
     layer->SetCrossStaffFromBelow(false);
@@ -297,6 +306,8 @@ FunctorCode ResetDataFunctor::VisitNote(Note *note)
 {
     // Call parent one too
     this->VisitLayerElement(note);
+    // Drawing interface functor to be called explicitly
+    note->StemmedDrawingInterface::InterfaceResetData(*this);
 
     note->SetDrawingLoc(0);
     note->SetFlippedNotehead(false);
@@ -408,6 +419,16 @@ FunctorCode ResetDataFunctor::VisitStaff(Staff *staff)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode ResetDataFunctor::VisitStaffDef(StaffDef *staffDef)
+{
+    // Call parent one too
+    this->VisitObject(staffDef);
+    // Drawing interface functor to be called explicitly
+    staffDef->StaffDefDrawingInterface::InterfaceResetData(*this);
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ResetDataFunctor::VisitStem(Stem *stem)
 {
     // Call parent one too
@@ -429,11 +450,31 @@ FunctorCode ResetDataFunctor::VisitSyl(Syl *syl)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode ResetDataFunctor::VisitSystem(System *system)
+{
+    // Call parent one too
+    this->VisitObject(system);
+    // Drawing interface functor to be called explicitly
+    system->DrawingListInterface::InterfaceResetData(*this);
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ResetDataFunctor::VisitSystemMilestone(SystemMilestoneEnd *systemMilestoneEnd)
 {
     this->VisitFloatingObject(systemMilestoneEnd);
 
     systemMilestoneEnd->SetMeasure(NULL);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetDataFunctor::VisitTabDurSym(TabDurSym *tabDurSym)
+{
+    // Call parent one too
+    this->VisitLayerElement(tabDurSym);
+    // Drawing interface functor to be called explicitly
+    tabDurSym->StemmedDrawingInterface::InterfaceResetData(*this);
 
     return FUNCTOR_CONTINUE;
 }
