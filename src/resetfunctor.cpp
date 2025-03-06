@@ -123,18 +123,6 @@ FunctorCode ResetDataFunctor::VisitControlElement(ControlElement *controlElement
     // Call parent one too
     this->VisitFloatingObject(controlElement);
 
-    // Pass it to the pseudo functor of the interface
-    if (controlElement->HasInterface(INTERFACE_ALT_SYM)) {
-        AltSymInterface *interface = controlElement->GetAltSymInterface();
-        assert(interface);
-        interface->InterfaceResetData(*this, controlElement);
-    }
-    if (controlElement->HasInterface(INTERFACE_LINKING)) {
-        LinkingInterface *interface = controlElement->GetLinkingInterface();
-        assert(interface);
-        interface->InterfaceResetData(*this, controlElement);
-    }
-
     return FUNCTOR_CONTINUE;
 }
 
@@ -225,23 +213,6 @@ FunctorCode ResetDataFunctor::VisitFloatingObject(FloatingObject *floatingObject
     floatingObject->ResetDrawing();
     floatingObject->SetDrawingGrpId(0);
 
-    // Pass it to the pseudo functor of the interface
-    if (floatingObject->HasInterface(INTERFACE_FACSIMILE)) {
-        FacsimileInterface *interface = floatingObject->GetFacsimileInterface();
-        assert(interface);
-        interface->InterfaceResetData(*this, floatingObject);
-    }
-    // else / else if because TimpeSpanningInterface::InterfaceResetData resets TimePointingInterface
-    if (floatingObject->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimeSpanningInterface *interface = floatingObject->GetTimeSpanningInterface();
-        assert(interface);
-        interface->InterfaceResetData(*this, floatingObject);
-    }
-    else if (floatingObject->HasInterface(INTERFACE_TIME_POINT)) {
-        TimePointInterface *interface = floatingObject->GetTimePointInterface();
-        assert(interface);
-        interface->InterfaceResetData(*this, floatingObject);
-    }
     return FUNCTOR_CONTINUE;
 }
 
@@ -283,17 +254,11 @@ FunctorCode ResetDataFunctor::VisitLayerElement(LayerElement *layerElement)
 {
     // Call parent one too
     this->VisitObject(layerElement);
-    layerElement->FacsimileInterface::InterfaceResetData(*this, layerElement);
 
     layerElement->SetIsInBeamSpan(false);
     layerElement->SetDrawingCueSize(false);
     layerElement->m_crossStaff = NULL;
     layerElement->m_crossLayer = NULL;
-
-    // Pass it to the pseudo functor of the interface
-    LinkingInterface *interface = layerElement->GetLinkingInterface();
-    assert(interface);
-    interface->InterfaceResetData(*this, layerElement);
 
     return FUNCTOR_CONTINUE;
 }
@@ -314,7 +279,6 @@ FunctorCode ResetDataFunctor::VisitMeasure(Measure *measure)
 {
     // Call parent one too
     this->VisitObject(measure);
-    measure->FacsimileInterface::InterfaceResetData(*this, measure);
 
     measure->m_timestampAligner.Reset();
     measure->SetDrawingEnding(NULL);
@@ -325,7 +289,6 @@ FunctorCode ResetDataFunctor::VisitMRest(MRest *mRest)
 {
     // Call parent one too
     this->VisitLayerElement(mRest);
-    mRest->PositionInterface::InterfaceResetData(*this, mRest);
 
     return FUNCTOR_CONTINUE;
 }
@@ -334,7 +297,6 @@ FunctorCode ResetDataFunctor::VisitNote(Note *note)
 {
     // Call parent one too
     this->VisitLayerElement(note);
-    note->PositionInterface::InterfaceResetData(*this, note);
 
     note->SetDrawingLoc(0);
     note->SetFlippedNotehead(false);
@@ -358,6 +320,41 @@ FunctorCode ResetDataFunctor::VisitNc(Nc *nc)
 
 FunctorCode ResetDataFunctor::VisitObject(Object *object)
 {
+    if (object->HasInterface(INTERFACE_ALT_SYM)) {
+        AltSymInterface *interface = object->GetAltSymInterface();
+        assert(interface);
+        interface->InterfaceResetData(*this, object);
+    }
+    if (object->HasInterface(INTERFACE_FACSIMILE)) {
+        FacsimileInterface *interface = object->GetFacsimileInterface();
+        interface->InterfaceResetData(*this, object);
+    }
+    if (object->HasInterface(INTERFACE_LINKING)) {
+        LinkingInterface *interface = object->GetLinkingInterface();
+        assert(interface);
+        interface->InterfaceResetData(*this, object);
+    }
+    if (object->HasInterface(INTERFACE_PLIST)) {
+        PlistInterface *interface = object->GetPlistInterface();
+        assert(interface);
+        interface->InterfaceResetData(*this, object);
+    }
+    if (object->HasInterface(INTERFACE_POSITION)) {
+        PositionInterface *interface = object->GetPositionInterface();
+        assert(interface);
+        interface->InterfaceResetData(*this, object);
+    }
+    if (object->HasInterface(INTERFACE_TIME_POINT)) {
+        TimePointInterface *interface = object->GetTimePointInterface();
+        assert(interface);
+        interface->InterfaceResetData(*this, object);
+    }
+    if (object->HasInterface(INTERFACE_TIME_SPANNING)) {
+        TimeSpanningInterface *interface = object->GetTimeSpanningInterface();
+        assert(interface);
+        interface->InterfaceResetData(*this, object);
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -375,7 +372,6 @@ FunctorCode ResetDataFunctor::VisitRest(Rest *rest)
 {
     // Call parent one too
     this->VisitLayerElement(rest);
-    rest->PositionInterface::InterfaceResetData(*this, rest);
 
     return FUNCTOR_CONTINUE;
 }
@@ -406,7 +402,6 @@ FunctorCode ResetDataFunctor::VisitStaff(Staff *staff)
 {
     // Call parent one too
     this->VisitObject(staff);
-    staff->FacsimileInterface::InterfaceResetData(*this, staff);
 
     staff->m_timeSpanningElements.clear();
     staff->ClearLedgerLines();
@@ -428,7 +423,6 @@ FunctorCode ResetDataFunctor::VisitSyl(Syl *syl)
 {
     // Call parent one too
     this->VisitLayerElement(syl);
-    syl->TimeSpanningInterface::InterfaceResetData(*this, syl);
 
     syl->m_nextWordSyl = NULL;
 
