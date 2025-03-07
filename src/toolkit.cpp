@@ -1681,7 +1681,6 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
 {
     this->ResetLogBuffer();
 
-    int initialPageNo = (m_doc.GetDrawingPage() == NULL) ? -1 : m_doc.GetDrawingPage()->GetIdx();
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
     SvgDeviceContext svg(m_doc.GetID());
@@ -1722,7 +1721,6 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
     this->RenderToDeviceContext(pageNo, &svg);
 
     std::string out_str = svg.GetStringSVG(xmlDeclaration);
-    if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo, true);
     return out_str;
 }
 
