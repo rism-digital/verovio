@@ -430,7 +430,7 @@ public:
      * By default, the page size of the document is taken.
      * If a page is given, the size of the page is taken.
      */
-    Page *SetDrawingPage(int pageIdx, bool setFocus = false);
+    Page *SetDrawingPage(int pageIdx);
 
     /**
      * Update the drawing page sizes when a page is set as drawing page.

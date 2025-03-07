@@ -2186,7 +2186,7 @@ data_MEASUREMENTSIGNED Doc::GetStaffDistance(const Object *object, int staffInde
     return distance;
 }
 
-Page *Doc::SetDrawingPage(int pageIdx, bool setFocus)
+Page *Doc::SetDrawingPage(int pageIdx)
 {
     // out of range
     if (!HasPage(pageIdx)) {
