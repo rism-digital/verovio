@@ -999,7 +999,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 
     if (hadSelection) m_doc.ReactivateSelection(false);
 
-    if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo, true);
+    if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);
     return output;
 }
 

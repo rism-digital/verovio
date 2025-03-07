@@ -49,8 +49,11 @@ public:
      *
      */
     void ConvertFrom(Score *score);
-    
-    void LayoutAll();
+
+    /**
+     * Refresh the layout of all the child pages.
+     */
+    void LayOutAll();
 
     //----------//
     // Functors //
@@ -82,7 +85,7 @@ private:
  * This class represent a <pages> in page-based MEI.
  */
 class FocusSet : public Pages {
-    
+
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -91,19 +94,23 @@ public:
     ///@{
     FocusSet(Doc *doc);
     virtual ~FocusSet();
-    
     void Reset() override;
-    
-    void SetAsFocus(Page *page);
-    
-    void Layout();
-    
-    
-    Doc *m_doc;
-    
-    Page *m_focus;
+    ///@}
 
-    
+    /**
+     * The the specified page as focus page in the set.
+     */
+    void SetAsFocus(Page *page);
+
+private:
+    //
+public:
+    //
+private:
+    /** A pointer to the doc owning the focus set */
+    Doc *m_doc;
+    /** A pointer to the page with the focus */
+    Page *m_focus;
 };
 
 } // namespace vrv

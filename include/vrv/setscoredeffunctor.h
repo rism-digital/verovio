@@ -412,9 +412,7 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * This class casts off a document to selection.
- * Moves everything before the selection to the first page, the selection to a second page,
- * and everything after the selection to a third page.
+ * This class generates a focus set for the page passed as parameter.
  */
 class SetFocusFunctor : public DocFunctor {
 public:
@@ -425,8 +423,11 @@ public:
     SetFocusFunctor(Object *page, Doc *doc);
     virtual ~SetFocusFunctor() = default;
     ///@}
-    
-    void Apply(FocusSet *focusSet);
+
+    /**
+     * Apply the calculated focus to the focusSet object
+     */
+    void ApplyTo(FocusSet *focusSet);
 
     /*
      * Abstract base implementation

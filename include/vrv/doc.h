@@ -527,10 +527,15 @@ public:
     ///@}
 
     /**
+     * Refresh the layout of all pages in the doc.
+     */
+    void RefreshLayout();
+
+    /**
      * Reset the document focus
      */
     void SetFocus();
-    
+
     //----------//
     // Functors //
     //----------//
@@ -565,14 +570,14 @@ private:
      * Reset the document focus
      */
     void ResetFocus();
-    
+
 public:
     Page *m_selectionPreceding;
     Page *m_selectionFollowing;
     std::string m_selectionStart;
     std::string m_selectionEnd;
 
-    FocusSet* m_focusSet;
+    FocusSet *m_focusSet;
 
     /**
      * A copy of the header tree stored as pugi::xml_document

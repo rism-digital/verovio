@@ -64,14 +64,10 @@ void Pages::ConvertFrom(Score *score)
     this->AttNNumberLike::operator=(*score);
 }
 
-void Pages::LayoutAll()
+void Pages::LayOutAll()
 {
-    Doc *doc = vrv_cast<Doc*>(this->GetFirstAncestor(DOC));
-    
     for (auto child : this->GetChildren()) {
-        Page *page = vrv_cast<Page*>(child);
-        page->InvalidLayout();
-        doc->SetDrawingPage(page->GetIdx(), false);
+        Page *page = vrv_cast<Page *>(child);
         page->LayOut();
     }
 }
@@ -108,17 +104,13 @@ FocusSet::FocusSet(Doc *doc) : Pages()
 {
     assert(doc);
     m_doc = doc;
-    
+
     this->Reset();
-    
+
     this->SetAsReferenceObject();
-
 }
 
-FocusSet::~FocusSet()
-{
-
-}
+FocusSet::~FocusSet() {}
 
 void FocusSet::Reset()
 {
@@ -130,19 +122,5 @@ void FocusSet::SetAsFocus(Page *page)
 {
     m_focus = page;
 }
-
-void FocusSet::Layout()
-{
-    assert(m_focus);
-    
-    for (auto child : this->GetChildren()) {
-        Page *page = vrv_cast<Page*>(child);
-        page->InvalidLayout();
-        m_doc->SetDrawingPage(page->GetIdx(), false);
-        page->LayOut();
-    }
-    m_doc->SetDrawingPage(m_focus->GetIdx(), false);
-}
-
 
 } // namespace vrv

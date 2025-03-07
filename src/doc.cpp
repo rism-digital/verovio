@@ -626,7 +626,6 @@ void Doc::PrepareData()
     if (m_focusStatus != FOCUS_UNSET) {
         m_focusStatus = FOCUS_USED;
         root = m_focusSet;
-        if (m_drawingPage) m_drawingPage->InvalidLayout();
     }
 
     /************ Reset and initialization ************/
@@ -1704,25 +1703,34 @@ void Doc::CollectVisibleScores()
     }
 }
 
-void Doc::SetFocus()
+void Doc::RefreshLayout()
 {
-    if (!m_focusSet) {
-        m_focusSet = new FocusSet(this);
+    if (m_focusStatus != FOCUS_UNSET) {
+        m_focusSet->LayOutAll();
     }
     else {
-        this->ResetFocus();
+        this->GetPages()->LayOutAll();
+    }
+}
+
+void Doc::SetFocus()
+{
+    // Focus has already been set
+    if (m_focusStatus != FOCUS_UNSET) return;
+
+    if (!m_focusSet) {
+        m_focusSet = new FocusSet(this);
     }
     m_focusSet->ClearChildren();
 
     SetFocusFunctor setFocusFunctor(m_drawingPage, this);
     m_drawingPage->Process(setFocusFunctor);
-    setFocusFunctor.Apply(m_focusSet);
+    setFocusFunctor.ApplyTo(m_focusSet);
     m_focusStatus = FOCUS_SET;
 
-    //this->PrepareData();
-    //this->ScoreDefSetCurrentDoc(true);
-    //m_focusSet->Layout();
-    
+    this->PrepareData();
+    this->ScoreDefSetCurrentDoc(true);
+    this->RefreshLayout();
 }
 
 void Doc::ResetFocus()
@@ -1730,7 +1738,7 @@ void Doc::ResetFocus()
     if (m_focusStatus == FOCUS_UNSET) return;
 
     m_focusSet->ClearChildren();
-    
+
     if (m_focusStatus == FOCUS_SET) {
         m_focusStatus = FOCUS_UNSET;
     }
@@ -1738,7 +1746,7 @@ void Doc::ResetFocus()
         m_focusStatus = FOCUS_UNSET;
         this->PrepareData();
         this->ScoreDefSetCurrentDoc(true);
-        this->GetPages()->LayoutAll();
+        this->GetPages()->LayOutAll();
     }
 }
 
@@ -2201,10 +2209,9 @@ Page *Doc::SetDrawingPage(int pageIdx)
     m_drawingPage = vrv_cast<Page *>(pages->GetChild(pageIdx));
     assert(m_drawingPage);
 
-    if (setFocus)
-        this->SetFocus();
+    this->ResetFocus();
 
-    UpdatePageDrawingSizes();
+    this->UpdatePageDrawingSizes();
 
     return m_drawingPage;
 }
@@ -2284,9 +2291,9 @@ bool Doc::CheckPageSize(const Page *page) const
 {
     assert(page);
     assert(m_drawingPage);
-    
+
     if (page == m_drawingPage) return true;
-    
+
     return ((page->m_pageHeight == -1) && (m_drawingPage->m_pageHeight == -1));
 }
 

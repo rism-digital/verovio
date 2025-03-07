@@ -697,24 +697,22 @@ FunctorCode SetFocusFunctor::VisitObject(Object *object)
 {
     if (object->Is(SYSTEM)) {
         System *system = vrv_cast<System *>(object);
-        for (auto object : *system->GetDrawingList())
-            object->Process(*this);
+        for (auto object : *system->GetDrawingList()) object->Process(*this);
     }
-    
-    
+
     if (!object->HasInterface(INTERFACE_TIME_SPANNING)) return FUNCTOR_CONTINUE;
 
     TimeSpanningInterface *interface = object->GetTimeSpanningInterface();
     assert(interface);
     if (interface->GetStart() && interface->GetStart()->GetFirstAncestor(PAGE) != m_page) {
-        Page *page = vrv_cast<Page*>(interface->GetStart()->GetFirstAncestor(PAGE));
+        Page *page = vrv_cast<Page *>(interface->GetStart()->GetFirstAncestor(PAGE));
         assert(page);
         if (std::find(m_pageBefore.begin(), m_pageBefore.end(), page) == m_pageBefore.end()) {
             m_pageBefore.push_back(page);
         }
     }
     if (interface->GetEnd() && interface->GetEnd()->GetFirstAncestor(PAGE) != m_page) {
-        Page *page = vrv_cast<Page*>(interface->GetEnd()->GetFirstAncestor(PAGE));
+        Page *page = vrv_cast<Page *>(interface->GetEnd()->GetFirstAncestor(PAGE));
         assert(page);
         if (std::find(m_pageAfter.begin(), m_pageAfter.end(), page) == m_pageAfter.end()) {
             m_pageAfter.push_back(page);
@@ -724,15 +722,16 @@ FunctorCode SetFocusFunctor::VisitObject(Object *object)
     return FUNCTOR_SIBLINGS;
 }
 
-void SetFocusFunctor::Apply(FocusSet *focusSet)
+void SetFocusFunctor::ApplyTo(FocusSet *focusSet)
 {
     assert(focusSet);
     assert(m_doc);
     assert(m_page);
-    
-    
+
+    LogDebug("Page %d", m_page->GetIdx());
+
     ArrayOfObjects pages = m_doc->GetPages()->GetChildren();
-    
+
     // Find position of p1 in v1
     auto p1_it = std::find(pages.begin(), pages.end(), m_page);
     // Should not happen
@@ -740,7 +739,7 @@ void SetFocusFunctor::Apply(FocusSet *focusSet)
 
     // Find the furthest element in l1 (earliest in v1)
     auto furthestBefore = pages.end();
-    for (Page* page : m_pageBefore) {
+    for (Page *page : m_pageBefore) {
         auto it = std::find(pages.begin(), pages.end(), page);
         if (it != pages.end() && it < p1_it && it < furthestBefore) {
             furthestBefore = it;
@@ -753,13 +752,13 @@ void SetFocusFunctor::Apply(FocusSet *focusSet)
             focusSet->AddChild(*it);
         }
     }
-    
+
     focusSet->AddChild(m_page);
-    focusSet->SetAsFocus(vrv_cast<Page*>(m_page));
-    
+    focusSet->SetAsFocus(vrv_cast<Page *>(m_page));
+
     // Find the furthest element in l1 (earliest in v1)
     auto furthestAfter = pages.begin();
-    for (Page* page : m_pageAfter) {
+    for (Page *page : m_pageAfter) {
         auto it = std::find(p1_it, pages.end(), page);
         if (it != pages.end() && it > p1_it && it > furthestAfter) {
             furthestAfter = it;
