@@ -1621,8 +1621,8 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     // Page number is one-based - correct it to 0-based first
     pageNo--;
 
-    // Get the current system for the SVG clipping size
-    m_view.SetPage(pageNo, true);
+    m_doc.SetDrawingPage(pageNo);
+    m_view.SetPage(m_doc.GetDrawingPage(), true);
 
     // Adjusting page width and height according to the options
     int width = m_options->m_pageWidth.GetUnfactoredValue();

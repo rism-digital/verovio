@@ -209,7 +209,7 @@ void Page::LayOut()
         view.SetDoc(doc);
         BBoxDeviceContext bBoxDC(&view, 0, 0);
         // Do not do the layout in this view - otherwise we will loop...
-        view.SetPage(this->GetIdx(), false);
+        view.SetPage(this, false);
         view.DrawCurrentPage(&bBoxDC, false);
     }
 
@@ -270,7 +270,7 @@ void Page::LayOutTranscription(bool force)
         view.SetDoc(doc);
         BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
         // Do not do the layout in this view - otherwise we will loop...
-        view.SetPage(this->GetIdx(), false);
+        view.SetPage(this, false);
         view.DrawCurrentPage(&bBoxDC, false);
     }
 
@@ -379,7 +379,7 @@ void Page::LayOutHorizontally()
     view.SetSlurHandling(SlurHandling::Ignore);
     BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
     // Do not do the layout in this view - otherwise we will loop...
-    view.SetPage(this->GetIdx(), false);
+    view.SetPage(this, false);
     view.DrawCurrentPage(&bBoxDC, false);
 
     // Get the scoreDef at the beginning of the page
@@ -502,7 +502,7 @@ void Page::LayOutVertically()
     BBoxDeviceContext bBoxDC(&view, 0, 0);
     view.SetDoc(doc);
     // Do not do the layout in this view - otherwise we will loop...
-    view.SetPage(this->GetIdx(), false);
+    view.SetPage(this, false);
     view.DrawCurrentPage(&bBoxDC, false);
 
     // Adjust the position of outside articulations with slurs end and start positions
@@ -523,7 +523,7 @@ void Page::LayOutVertically()
 
     // At this point slurs must not be reinitialized, otherwise the adjustment we just did was in vain
     view.SetSlurHandling(SlurHandling::Drawing);
-    view.SetPage(this->GetIdx(), false);
+    view.SetPage(this, false);
     view.DrawCurrentPage(&bBoxDC, false);
 
     // Adjust the position of tuplets by slurs
@@ -557,7 +557,7 @@ void Page::LayOutVertically()
     // Redraw are re-adjust the position of the slurs when we have cross-staff ones
     if (adjustSlurs.HasCrossStaffSlurs()) {
         view.SetSlurHandling(SlurHandling::Initialize);
-        view.SetPage(this->GetIdx(), false);
+        view.SetPage(this, false);
         view.DrawCurrentPage(&bBoxDC, false);
         this->Process(adjustSlurs);
     }

@@ -28,7 +28,6 @@ View::View()
 {
     m_doc = NULL;
     m_options = NULL;
-    m_pageIdx = 0;
     m_slurHandling = SlurHandling::Initialize;
 
     m_currentColor = COLOR_NONE;
@@ -48,16 +47,13 @@ void View::SetDoc(Doc *doc)
         m_options = doc->GetOptions();
     }
     m_currentPage = NULL;
-    m_pageIdx = 0;
 }
 
-void View::SetPage(int pageIdx, bool doLayout)
+void View::SetPage(Page *page, bool doLayout)
 {
-    assert(m_doc); // Page cannot be NULL
-    assert(m_doc->HasPage(pageIdx));
+    assert(page); // Page cannot be NULL
 
-    m_pageIdx = pageIdx;
-    m_currentPage = m_doc->SetDrawingPage(pageIdx, doLayout);
+    m_currentPage = page;
 
     if (doLayout) {
         m_doc->ScoreDefSetCurrentDoc();
