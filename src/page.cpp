@@ -225,9 +225,8 @@ void Page::LayOutTranscription(bool force)
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    // Doc::SetDrawingPage should have been called before
-    // Make sure we have the correct page
-    assert(this == doc->GetDrawingPage());
+    // Make sure we have the correct page size
+    assert(doc->CheckPageSize(this));
 
     // Reset the horizontal alignment
     ResetHorizontalAlignmentFunctor resetHorizontalAlignment;
@@ -291,9 +290,8 @@ void Page::ResetAligners()
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    // Doc::SetDrawingPage should have been called before
-    // Make sure we have the correct page
-    assert(this == doc->GetDrawingPage());
+    // Make sure we have the correct page size
+    assert(doc->CheckPageSize(this));
 
     // Reset the horizontal alignment
     ResetHorizontalAlignmentFunctor resetHorizontalAlignment;
@@ -370,9 +368,8 @@ void Page::LayOutHorizontally()
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    // Doc::SetDrawingPage should have been called before
-    // Make sure we have the correct page
-    assert(this == doc->GetDrawingPage());
+    // Make sure we have the correct page size
+    assert(doc->CheckPageSize(this));
 
     this->ResetAligners();
 
@@ -484,9 +481,8 @@ void Page::LayOutVertically()
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    // Doc::SetDrawingPage should have been called before
-    // Make sure we have the correct page
-    assert(this == doc->GetDrawingPage());
+    // Make sure we have the correct page size
+    assert(doc->CheckPageSize(this));
 
     // Reset the vertical alignment
     ResetVerticalAlignmentFunctor resetVerticalAlignment;
@@ -590,9 +586,8 @@ void Page::JustifyHorizontally()
         return;
     }
 
-    // Doc::SetDrawingPage should have been called before
-    // Make sure we have the correct page
-    assert(this == doc->GetDrawingPage());
+    // Make sure we have the correct page size
+    assert(doc->CheckPageSize(this));
 
     if ((doc->GetOptions()->m_adjustPageWidth.GetValue())) {
         doc->m_drawingPageContentWidth = this->GetContentWidth();
@@ -612,9 +607,8 @@ void Page::JustifyVertically()
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    // Doc::SetDrawingPage should have been called before
-    // Make sure we have the correct page
-    assert(this == doc->GetDrawingPage());
+    // Make sure we have the correct page size
+    assert(doc->CheckPageSize(this));
 
     // Nothing to justify
     if (m_drawingJustifiableHeight <= 0 || m_justificationSum <= 0) {
@@ -667,9 +661,8 @@ void Page::LayOutPitchPos()
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    // Doc::SetDrawingPage should have been called before
-    // Make sure we have the correct page
-    assert(this == doc->GetDrawingPage());
+    // Make sure we have the correct page size
+    assert(doc->CheckPageSize(this));
 
     // Set the pitch / pos alignment
     CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(doc);
@@ -684,9 +677,8 @@ int Page::GetContentHeight() const
     const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    // Doc::SetDrawingPage should have been called before
-    // Make sure we have the correct page
-    assert(this == doc->GetDrawingPage());
+    // Make sure we have the correct page size
+    assert(doc->CheckPageSize(this));
 
     if (!this->GetChildCount()) {
         return 0;
@@ -710,9 +702,8 @@ int Page::GetContentWidth() const
     // in non debug
     if (!doc) return 0;
 
-    // Doc::SetDrawingPage should have been called before
-    // Make sure we have the correct page
-    assert(this == doc->GetDrawingPage());
+    // Make sure we have the correct page size
+    assert(doc->CheckPageSize(this));
 
     int maxWidth = 0;
     for (const Object *child : this->GetChildren()) {

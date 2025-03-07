@@ -2280,6 +2280,16 @@ void Doc::UpdatePageDrawingSizes()
     m_drawingBrevisWidth = (int)((glyph_size * 0.8) / 2);
 }
 
+bool Doc::CheckPageSize(const Page *page) const
+{
+    assert(page);
+    assert(m_drawingPage);
+    
+    if (page == m_drawingPage) return true;
+    
+    return ((page->m_pageHeight == -1) && (m_drawingPage->m_pageHeight == -1));
+}
+
 int Doc::CalcMusicFontSize()
 {
     return m_options->m_unit.GetValue() * 8;

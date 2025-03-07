@@ -456,6 +456,11 @@ public:
     ///@}
 
     /**
+     * Check that the page is the drawing page or that they have no given dimensions
+     */
+    bool CheckPageSize(const Page *page) const;
+
+    /**
      * Return the width adjusted to the content of the current drawing page.
      * This includes the appropriate left and right margins.
      */
