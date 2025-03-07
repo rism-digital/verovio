@@ -86,7 +86,7 @@ public:
      * This will be done only if m_layoutDone is false.
      */
     void LayOut();
-    void InvalidLayout() { m_layoutDone = false; }
+    void DeprecateLayout() { m_layoutDone = false; }
 
     /**
      * Do the layout for a transcription page (with layout information).
