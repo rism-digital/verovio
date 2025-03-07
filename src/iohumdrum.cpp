@@ -2939,7 +2939,7 @@ void HumdrumInput::createDigitalSource(pugi::xml_node sourceDesc)
     pugi::xml_node bibl = source.append_child("bibl");
     bibl.append_copy(m_simpleTitle);
     for (pugi::xml_node_iterator childIt = m_simpleComposersDoc.begin(); childIt != m_simpleComposersDoc.end();
-         ++childIt) {
+        ++childIt) {
         bibl.append_copy(*childIt);
     }
 
@@ -3691,7 +3691,7 @@ void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)
 
     bibl.append_copy(m_simpleTitle);
     for (pugi::xml_node_iterator childIt = m_simpleComposersDoc.begin(); childIt != m_simpleComposersDoc.end();
-         ++childIt) {
+        ++childIt) {
         bibl.append_copy(*childIt);
     }
 
@@ -8877,28 +8877,24 @@ void HumdrumInput::setMensurationSymbol(
 
     if (metdata.find('C') != std::string::npos) {
         vrvmensur->SetSign(MENSURATIONSIGN_C);
-        if (metdata.find("3/2") != std::string::npos) {
-            vrvmensur->SetNum(3);
-            vrvmensur->SetNumbase(2);
+        hum::HumRegex hre;
+        if (hre.search(metdata, "(\\d+)/(\\d+)$")) {
+            vrvmensur->SetNum(hre.getMatchInt(1));
+            vrvmensur->SetNumbase(hre.getMatchInt(2));
         }
-        else if (metdata.find("C2") != std::string::npos) {
-            vrvmensur->SetNum(2);
-        }
-        else if (metdata.find("C3") != std::string::npos) {
-            vrvmensur->SetNum(3);
+        else if (hre.search(metdata, "(\\d+)$")) {
+            vrvmensur->SetNum(hre.getMatchInt(1));
         }
     }
     else if (metdata.find('O') != std::string::npos) {
         vrvmensur->SetSign(MENSURATIONSIGN_O);
-        if (metdata.find("3/2") != std::string::npos) {
-            vrvmensur->SetNum(3);
-            vrvmensur->SetNumbase(2);
+        hum::HumRegex hre;
+        if (hre.search(metdata, "(\\d+)/(\\d+)$")) {
+            vrvmensur->SetNum(hre.getMatchInt(1));
+            vrvmensur->SetNumbase(hre.getMatchInt(2));
         }
-        else if (metdata.find("O2") != std::string::npos) {
-            vrvmensur->SetNum(2);
-        }
-        else if (metdata.find("O3") != std::string::npos) {
-            vrvmensur->SetNum(3);
+        else if (hre.search(metdata, "(\\d+)$")) {
+            vrvmensur->SetNum(hre.getMatchInt(1));
         }
     }
     else {
