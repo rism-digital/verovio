@@ -569,7 +569,7 @@ private:
     /**
      * Reset the document focus
      */
-    void ResetFocus();
+    void ResetFocus(bool refresh);
 
 public:
     Page *m_selectionPreceding;

@@ -1095,6 +1095,8 @@ void Doc::UnCastOffDoc(bool resetCache)
         LogDebug("Document is not cast off");
         return;
     }
+    
+    this->ResetFocus(false);
 
     Pages *pages = this->GetPages();
     assert(pages);
@@ -1733,21 +1735,15 @@ void Doc::SetFocus()
     this->RefreshLayout();
 }
 
-void Doc::ResetFocus()
+void Doc::ResetFocus(bool refresh)
 {
     if (m_focusStatus == FOCUS_UNSET) return;
 
     m_focusSet->ClearChildren();
-
-    if (m_focusStatus == FOCUS_SET) {
-        m_focusStatus = FOCUS_UNSET;
-    }
-    else {
-        m_focusStatus = FOCUS_UNSET;
-        this->PrepareData();
-        this->ScoreDefSetCurrentDoc(true);
-        this->GetPages()->LayOutAll();
-    }
+    m_focusStatus = FOCUS_UNSET;
+    this->PrepareData();
+    this->ScoreDefSetCurrentDoc(true);
+    if (refresh) this->RefreshLayout();
 }
 
 int Doc::GetGlyphHeight(char32_t code, int staffSize, bool graceSize) const
@@ -2209,7 +2205,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
     m_drawingPage = vrv_cast<Page *>(pages->GetChild(pageIdx));
     assert(m_drawingPage);
 
-    this->ResetFocus();
+    this->ResetFocus(true);
 
     this->UpdatePageDrawingSizes();
 
