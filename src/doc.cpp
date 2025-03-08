@@ -93,7 +93,7 @@ Doc::Doc() : Object(DOC, "doc-")
     // owned pointers need to be set to NULL;
     m_selectionPreceding = NULL;
     m_selectionFollowing = NULL;
-    m_focusSet = NULL;
+    m_focusRange = NULL;
 
     this->Reset();
 }
@@ -103,7 +103,7 @@ Doc::~Doc()
     this->ClearSelectionPages();
 
     delete m_options;
-    if (m_focusSet) delete m_focusSet;
+    if (m_focusRange) delete m_focusRange;
 }
 
 void Doc::Reset()
@@ -625,7 +625,7 @@ void Doc::PrepareData()
     Object *root = this;
     if (m_focusStatus != FOCUS_UNSET) {
         m_focusStatus = FOCUS_USED;
-        root = m_focusSet;
+        root = m_focusRange;
     }
 
     /************ Reset and initialization ************/
@@ -1095,8 +1095,8 @@ void Doc::UnCastOffDoc(bool resetCache)
         LogDebug("Document is not cast off");
         return;
     }
-    
-    this->ResetFocus(false);
+
+    this->ResetFocus();
 
     Pages *pages = this->GetPages();
     assert(pages);
@@ -1708,7 +1708,7 @@ void Doc::CollectVisibleScores()
 void Doc::RefreshLayout()
 {
     if (m_focusStatus != FOCUS_UNSET) {
-        m_focusSet->LayOutAll();
+        m_focusRange->LayOutAll();
     }
     else {
         this->GetPages()->LayOutAll();
@@ -1720,14 +1720,11 @@ void Doc::SetFocus()
     // Focus has already been set
     if (m_focusStatus != FOCUS_UNSET) return;
 
-    if (!m_focusSet) {
-        m_focusSet = new FocusSet(this);
+    if (!m_focusRange) {
+        m_focusRange = new PageRange(this);
     }
-    m_focusSet->ClearChildren();
-
-    SetFocusFunctor setFocusFunctor(m_drawingPage, this);
-    m_drawingPage->Process(setFocusFunctor);
-    setFocusFunctor.ApplyTo(m_focusSet);
+    m_focusRange->Reset();
+    m_focusRange->SetAsFocus(m_drawingPage);
     m_focusStatus = FOCUS_SET;
 
     this->PrepareData();
@@ -1735,15 +1732,14 @@ void Doc::SetFocus()
     this->RefreshLayout();
 }
 
-void Doc::ResetFocus(bool refresh)
+void Doc::ResetFocus()
 {
     if (m_focusStatus == FOCUS_UNSET) return;
 
-    m_focusSet->ClearChildren();
+    m_focusRange->ClearChildren();
     m_focusStatus = FOCUS_UNSET;
     this->PrepareData();
     this->ScoreDefSetCurrentDoc(true);
-    if (refresh) this->RefreshLayout();
 }
 
 int Doc::GetGlyphHeight(char32_t code, int staffSize, bool graceSize) const
@@ -2190,7 +2186,7 @@ data_MEASUREMENTSIGNED Doc::GetStaffDistance(const Object *object, int staffInde
     return distance;
 }
 
-Page *Doc::SetDrawingPage(int pageIdx)
+Page *Doc::SetDrawingPage(int pageIdx, bool withPageRange)
 {
     // out of range
     if (!HasPage(pageIdx)) {
@@ -2205,9 +2201,16 @@ Page *Doc::SetDrawingPage(int pageIdx)
     m_drawingPage = vrv_cast<Page *>(pages->GetChild(pageIdx));
     assert(m_drawingPage);
 
-    this->ResetFocus(true);
+    this->ResetFocus();
 
     this->UpdatePageDrawingSizes();
+
+    // Layout pages in the corresponding range
+    if (withPageRange) {
+        PageRange pageRange(this);
+        pageRange.SetAsFocus(m_drawingPage);
+        pageRange.LayOutAll();
+    }
 
     return m_drawingPage;
 }

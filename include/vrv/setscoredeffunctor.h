@@ -12,8 +12,6 @@
 
 namespace vrv {
 
-class FocusSet;
-
 //----------------------------------------------------------------------------
 // ReplaceDrawingValuesInStaffDefFunctor
 //----------------------------------------------------------------------------
@@ -405,52 +403,6 @@ public:
 private:
     // The staffDef redraw flags
     int m_redrawFlags;
-};
-
-//----------------------------------------------------------------------------
-// SetFocusFunctor
-//----------------------------------------------------------------------------
-
-/**
- * This class generates a focus set for the page passed as parameter.
- */
-class SetFocusFunctor : public DocFunctor {
-public:
-    /**
-     * @name Constructors, destructors
-     */
-    ///@{
-    SetFocusFunctor(Object *page, Doc *doc);
-    virtual ~SetFocusFunctor() = default;
-    ///@}
-
-    /**
-     * Apply the calculated focus to the focusSet object
-     */
-    void ApplyTo(FocusSet *focusSet);
-
-    /*
-     * Abstract base implementation
-     */
-    bool ImplementsEndInterface() const override { return false; }
-
-    /*
-     * Functor interface
-     */
-    ///@{
-    FunctorCode VisitObject(Object *object) override;
-    ///@}
-
-protected:
-    //
-private:
-    //
-public:
-    //
-private:
-    Object *m_page;
-    std::list<Page *> m_pageBefore;
-    std::list<Page *> m_pageAfter;
 };
 
 } // namespace vrv

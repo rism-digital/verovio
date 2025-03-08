@@ -1621,7 +1621,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     // Page number is one-based - correct it to 0-based first
     pageNo--;
 
-    m_doc.SetDrawingPage(pageNo);
+    m_doc.SetDrawingPage(pageNo, true);
     m_view.SetPage(m_doc.GetDrawingPage(), true);
 
     // Adjusting page width and height according to the options

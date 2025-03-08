@@ -22,7 +22,7 @@ class MidiFile;
 namespace vrv {
 
 class DocSelection;
-class FocusSet;
+class PageRange;
 class FontInfo;
 class Glyph;
 class Pages;
@@ -429,8 +429,9 @@ public:
      * Set drawing values (page size, etc) when drawing a page.
      * By default, the page size of the document is taken.
      * If a page is given, the size of the page is taken.
+     * The withPageRange parameter trigger layout of pages in the appropriate range.
      */
-    Page *SetDrawingPage(int pageIdx);
+    Page *SetDrawingPage(int pageIdx, bool withPageRange = false);
 
     /**
      * Update the drawing page sizes when a page is set as drawing page.
@@ -569,7 +570,7 @@ private:
     /**
      * Reset the document focus
      */
-    void ResetFocus(bool refresh);
+    void ResetFocus();
 
 public:
     Page *m_selectionPreceding;
@@ -577,7 +578,10 @@ public:
     std::string m_selectionStart;
     std::string m_selectionEnd;
 
-    FocusSet *m_focusSet;
+    /**
+     * A page range (owned object) with focus in the document.
+     */
+    PageRange *m_focusRange;
 
     /**
      * A copy of the header tree stored as pugi::xml_document
