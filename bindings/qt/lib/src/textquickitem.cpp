@@ -11,7 +11,7 @@
 
 #include <QPainter>
 
-//#define DRAW_DEBUG_BOUNDING_BOXES
+// #define DRAW_DEBUG_BOUNDING_BOXES
 
 namespace vrvQt {
 
