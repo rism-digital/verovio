@@ -64,12 +64,11 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
 {
     assert(dc);
     assert(m_doc);
+    assert(m_currentPage);
 
     // Ensure that resources are set
     const bool dcHasResources = dc->HasResources();
     if (!dcHasResources) dc->SetResources(&m_doc->GetResources());
-
-    m_currentPage = m_doc->SetDrawingPage(m_pageIdx);
 
     // Keep the width of the initial scoreDef
     SetScoreDefDrawingWidth(dc, &m_currentPage->m_drawingScoreDef);
