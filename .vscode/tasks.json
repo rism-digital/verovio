@@ -9,8 +9,7 @@
 			},
 			"command": "cmake",
 			"args": [
-				"${workspaceRoot}/cmake",
-				"-DNO_HUMDRUM_SUPPORT=ON"
+				"${workspaceRoot}/cmake"
 			]
 		},
 		{

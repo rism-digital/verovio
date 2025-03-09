@@ -2,6 +2,14 @@
 
 ## [unreleased]
 
+## [5.1.0] – 2025-02-27
+* Improved timemap with grace notes and arpeggios
+* CSS scoped to the specific MEI document based on `mei@xml:id`
+* Option `--ligature-oblique` for controlling ligature shape (curved or straight)
+* Fix handling of `-p` and `-a` options regarding MEI output (@brdvd)
+* Fix Cocoapods building (@rettinghaus)
+* Fix rendering of neumes rendered as notes
+
 ## [5.0.0] – 2025-02-06
 * Switching to MEI 5.1
 * Implementation of mensural notation scoring up with `--mensural-score-up` (@martha-thomae)
