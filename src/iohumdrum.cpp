@@ -26708,6 +26708,64 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
                     accid->SetAccid(ACCIDENTAL_WRITTEN_tf);
                     showInAccidGes = true;
                 }
+
+                // Extended MEI accidentals:
+                else if (loaccid == "su") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_su);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "sd") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_sd);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "fu") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_fu);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "fd") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_fd);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "nu") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_nu);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "nd") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_nd);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "xu") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_xu);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "xd") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_xd);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "ffu") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_ffu);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "ffd") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_ffd);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "1qf") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_1qf);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "3qf") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_3qf);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "1qs") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_1qs);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "3qs") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_3qs);
+                    showInAccidGes = true;
+                }
                 else {
                     std::stringstream warning;
                     warning << "In HumdrumInput::convertNote: ";
