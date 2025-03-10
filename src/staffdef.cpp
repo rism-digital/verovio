@@ -40,9 +40,9 @@ StaffDef::StaffDef()
     , AttScalable()
     , AttStaffDefLog()
     , AttStaffDefVis()
+    , AttStaffDefVisTablature()
     , AttTimeBase()
     , AttTransposition()
-    , AttVerticalAlign()
 {
     this->RegisterAttClass(ATT_DISTANCES);
     this->RegisterAttClass(ATT_LABELLED);
@@ -51,9 +51,9 @@ StaffDef::StaffDef()
     this->RegisterAttClass(ATT_SCALABLE);
     this->RegisterAttClass(ATT_STAFFDEFLOG);
     this->RegisterAttClass(ATT_STAFFDEFVIS);
+    this->RegisterAttClass(ATT_STAFFDEFVISTABLATURE);
     this->RegisterAttClass(ATT_TIMEBASE);
     this->RegisterAttClass(ATT_TRANSPOSITION);
-    this->RegisterAttClass(ATT_VERTICALALIGN);
 
     this->Reset();
 }
@@ -71,9 +71,9 @@ void StaffDef::Reset()
     this->ResetScalable();
     this->ResetStaffDefLog();
     this->ResetStaffDefVis();
+    this->ResetStaffDefVisTablature();
     this->ResetTimeBase();
     this->ResetTransposition();
-    this->ResetVerticalAlign();
 
     m_drawingVisibility = OPTIMIZATION_NONE;
 }
