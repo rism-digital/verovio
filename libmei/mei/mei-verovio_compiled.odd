@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:rng="http://relaxng.org/ns/structure/1.0" xmlns:sch="http://purl.oclc.org/dsdl/schematron" xml:base="file:/Users/rettinghaus/Git/verovio/libmei/mei/mei-verovio.xml"><?TEIVERSION MEI 5.1?>
+<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:rng="http://relaxng.org/ns/structure/1.0" xmlns:sch="http://purl.oclc.org/dsdl/schematron" xml:base="file:/home/paul/Documents/github/verovio/libmei/mei/mei-verovio.xml"><?TEIVERSION MEI 5.1?>
 	<teiHeader>
 		<fileDesc>
 			<titleStmt>
@@ -19,6 +19,9 @@
 			</sourceDesc>
 		</fileDesc>
 		<revisionDesc>
+			<change n="6" when="2025-03-01">
+				<desc xml:lang="en">Replaced MEI.frettab with MEI.stringtab for MEI 5.1 tablature</desc>
+			</change>
 			<change n="5" when="2022-11-08" resp="#KR">
 				<desc xml:lang="en">Added att.margins.</desc>
 			</change>
@@ -50,7 +53,7 @@
 			<divGen type="toc"/>
 		</front>
 		<body>
-			<schemaSpec ident="mei-verovio" start="mei meiHead meiCorpus music" ns="http://www.music-encoding.org/ns/mei" source="/Users/rettinghaus/Git/music-encoding/build/mei-source_canonicalized_v5.1.xml"><macroSpec rend="add" ident="data.ACCIDENTAL.WRITTEN" module="MEI" type="dt">
+			<schemaSpec ident="mei-verovio" start="mei meiHead meiCorpus music" ns="http://www.music-encoding.org/ns/mei" source="/home/paul/Documents/github/music-encoding/build/mei-source_canonicalized_v5.1.xml"><macroSpec rend="add" ident="data.ACCIDENTAL.WRITTEN" module="MEI" type="dt">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Written accidental values.</desc>
     <content xmlns:xi="http://www.w3.org/2001/XInclude">
       <alternate minOccurs="1" maxOccurs="1"><macroRef key="data.ACCIDENTAL.WRITTEN.basic"/><macroRef key="data.ACCIDENTAL.WRITTEN.extended"/><macroRef key="data.ACCIDENTAL.aeu"/><macroRef key="data.ACCIDENTAL.persian"/></alternate>
@@ -437,16 +440,16 @@
         </valItem>
         <valItem ident="dblheavy">
           <desc xml:lang="en">Heavy double bar line (SMuFL E035).</desc>
-        </valItem> 
+        </valItem>
         <valItem ident="dblsegno">
           <desc xml:lang="en">Segno serpent with vertical lines (SMuFL E04B).</desc>
-        </valItem> 
+        </valItem>
         <valItem ident="end">
           <desc xml:lang="en">End bar line (SMuFL E032 and Unicode 1D102).</desc>
         </valItem>
         <valItem ident="heavy">
           <desc xml:lang="en">Heavy bar line (SMuFL E034).</desc>
-        </valItem> 
+        </valItem>
         <valItem ident="invis">
           <desc xml:lang="en">Bar line not rendered.</desc>
         </valItem>
@@ -1289,6 +1292,19 @@
           <desc xml:lang="en">Right half filled</desc>
         </valItem>
       </valList>
+    </content>
+  </macroSpec><macroSpec rend="add" ident="data.FINGER.FRET" module="MEI" type="dt">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">In a guitar chord diagram, a label indicating which finger, if any, should be used to play
+      an individual string. The index, middle, ring, and little fingers are represented by the
+      values 1-4, while 't' is for the thumb. The values 'x' and 'o' indicate stopped and open
+      strings, respectively.</desc>
+    <content xmlns:xi="http://www.w3.org/2001/XInclude">
+      <choice xmlns="http://relaxng.org/ns/structure/1.0"><rng:data xmlns="http://www.tei-c.org/ns/1.0" type="positiveInteger">
+          <rng:param name="minInclusive">1</rng:param>
+          <rng:param name="maxInclusive">4</rng:param>
+        </rng:data><rng:data xmlns="http://www.tei-c.org/ns/1.0" type="token">
+          <rng:param name="pattern">x|o|t</rng:param>
+        </rng:data></choice>
     </content>
   </macroSpec><macroSpec rend="add" ident="data.FONTFAMILY" module="MEI" type="dt">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Font family (for text) attribute values.</desc>
@@ -2806,7 +2822,7 @@
         </valItem>
         <valItem ident="tab.lute.german">
           <desc xml:lang="en">"German" tablature notation for lutes. Fret and course information is conveyed solely by choice of symbol (vertical position is not used for this).</desc>
-        </valItem>     
+        </valItem>
       </valList>
     </content>
   </macroSpec><macroSpec rend="add" ident="data.NOTEHEADMODIFIER" module="MEI" type="dt">
@@ -3273,6 +3289,11 @@
         </valItem>
       </valList>
     </content>
+  </macroSpec><macroSpec rend="add" ident="data.STRINGNUMBER" module="MEI" type="dt">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">This datatype is deprecated in favor of data.COURSENUMBER and will be removed in a future version. In string tablature, the number of the string to be played.</desc>
+    <content xmlns:xi="http://www.w3.org/2001/XInclude">
+      <rng:data type="positiveInteger"/>
+    </content>
   </macroSpec><macroSpec rend="add" ident="data.TEMPERAMENT" module="MEI" type="dt">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Temperament or tuning system.</desc>
     <content xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -3542,6 +3563,8 @@
   </classSpec><classSpec rend="add" ident="att.clef.anl" module="MEI.analytical" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Analytical domain attributes.</desc>
   </classSpec><classSpec rend="add" ident="att.clefGrp.anl" module="MEI.analytical" type="atts">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Analytical domain attributes.</desc>
+  </classSpec><classSpec rend="add" ident="att.course.anl" module="MEI.analytical" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Analytical domain attributes.</desc>
   </classSpec><classSpec rend="add" ident="att.cpMark.anl" module="MEI.analytical" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Analytical domain attributes.</desc>
@@ -3884,6 +3907,13 @@
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Analytical domain attributes.</desc>
   </classSpec><classSpec rend="add" ident="att.symbol.anl" module="MEI.analytical" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Analytical domain attributes.</desc>
+  </classSpec><classSpec rend="add" ident="att.tabDurSym.anl" module="MEI.analytical" type="atts">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Analytical domain attributes.</desc>
+  </classSpec><classSpec rend="add" ident="att.tabGrp.anl" module="MEI.analytical" type="atts">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Analytical domain attributes.</desc>
+    <classes xmlns:xi="http://www.w3.org/2001/XInclude">
+      
+    </classes>
   </classSpec><classSpec rend="add" ident="att.tempo.anl" module="MEI.analytical" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Analytical domain attributes.</desc>
   </classSpec><classSpec rend="add" ident="att.tie.anl" module="MEI.analytical" type="atts">
@@ -7455,6 +7485,8 @@
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
   </classSpec><classSpec rend="add" ident="att.clefGrp.ges" module="MEI.gestural" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
+  </classSpec><classSpec rend="add" ident="att.course.ges" module="MEI.gestural" type="atts">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
   </classSpec><classSpec rend="add" ident="att.cpMark.ges" module="MEI.gestural" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -7719,7 +7751,7 @@
       <memberOf key="att.midiVelocity"/>
       <memberOf key="att.note.ges.mensural"/>
       <memberOf key="att.pitch.ges"/>
-      
+      <memberOf key="att.stringtab"/>
     </classes>
     <constraintSpec xmlns:xi="http://www.w3.org/2001/XInclude" ident="extremis_disallows_gestural_pitch" scheme="schematron">
       <constraint>
@@ -7919,7 +7951,7 @@
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes for staffDef in the CMN repertoire.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.instrumentIdent"/>
-      
+      <memberOf key="att.stringtab.tuning"/>
       <memberOf key="att.timeBase"/>
       <memberOf key="att.tuning"/>
     </classes>
@@ -7943,6 +7975,14 @@
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
   </classSpec><classSpec rend="add" ident="att.symbol.ges" module="MEI.gestural" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
+  </classSpec><classSpec rend="add" ident="att.tabDurSym.ges" module="MEI.gestural" type="atts">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
+  </classSpec><classSpec rend="add" ident="att.tabGrp.ges" module="MEI.gestural" type="atts">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
+    <classes xmlns:xi="http://www.w3.org/2001/XInclude">
+      
+      <memberOf key="att.duration.ges"/>
+    </classes>
   </classSpec><classSpec rend="add" ident="att.tempo.ges" module="MEI.gestural" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -8016,14 +8056,14 @@
   </classSpec><classSpec rend="add" ident="att.chordDef.log" module="MEI.harmony" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Logical domain attributes.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
-      
-      
+      <memberOf key="att.stringtab.position"/>
+      <memberOf key="att.stringtab.tuning"/>
     </classes>
   </classSpec><classSpec rend="add" ident="att.chordMember.log" module="MEI.harmony" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Logical domain attributes.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.pitched"/>
-      
+      <memberOf key="att.stringtab"/>
     </classes>
   </classSpec><classSpec rend="add" ident="att.f.log" module="MEI.harmony" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Logical domain attributes.</desc>
@@ -17881,6 +17921,204 @@
       <memberOf key="model.dimLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore>
+    </content></elementSpec><macroSpec rend="add" ident="data.COURSENUMBER" module="MEI.stringtab" type="dt">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">In string tablature, the number of the course to be played.</desc>
+    <content xmlns:xi="http://www.w3.org/2001/XInclude">
+      <rng:data type="positiveInteger"/>
+    </content>
+  </macroSpec><macroSpec rend="add" ident="data.COURSETUNING" module="MEI.stringtab" type="dt">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Standard course tunings.</desc>
+    <content xmlns:xi="http://www.w3.org/2001/XInclude">
+      <valList type="semi">
+        <valItem ident="guitar.standard">
+          <desc xml:lang="en">Standard tuning for current guitars. The courses are tuned to E2 A2 D3 G3 B3 E4.</desc>
+        </valItem>
+        <valItem ident="guitar.drop.D">
+          <desc xml:lang="en">Drop D tuning for guitars. The lowest course is tuned down to D, while all other courses are kept to their regular pitches. D2 A2 D3 G3 B3 E4.</desc>
+        </valItem>
+        <valItem ident="guitar.open.D">
+          <desc xml:lang="en">Open D tuning for guitars. D2 A2 D3 F3s A3 D4.</desc>
+        </valItem>
+        <valItem ident="guitar.open.G">
+          <desc xml:lang="en">Open G tuning for guitars. D2 G2 D3 G3 B3 D4.</desc>
+        </valItem>
+        <valItem ident="guitar.open.A">
+          <desc xml:lang="en">Open A tuning for guitars. E2 A2 E3 A3 C4s E4.</desc>
+        </valItem>
+        <valItem ident="lute.renaissance.6">
+          <desc xml:lang="en">Renaissance tuning for lutes with 6 courses. G2 C3 F3 A3 D4 G4.</desc>
+        </valItem>
+        <valItem ident="lute.baroque.d.major">
+          <desc xml:lang="en">Baroque tuning for lutes with 6 stable courses, and additional bass courses tuned to the key of D Major. A2 D3 F3s A3 D4 F4s for the main six courses, and bass courses descending in pitch from G2, F2s, etc., depending on the size of the instrument.</desc>
+        </valItem>
+        <valItem ident="lute.baroque.d.minor">
+          <desc xml:lang="en">Baroque tuning for lutes with 6 stable courses, and additional bass courses tuned to the key of D minor. A2 D3 F3 A3 D4 F4 for the main six courses, and bass courses descending in pitch from G2, F2, etc., depending on the size of the instrument. </desc>
+        </valItem>
+      </valList>
+    </content>
+  </macroSpec><classSpec rend="add" ident="att.course.log" module="MEI.stringtab" type="atts">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Logical domain attributes.</desc>
+    <classes xmlns:xi="http://www.w3.org/2001/XInclude">
+      <memberOf key="att.accidental"/>
+      <memberOf key="att.pitched"/>
+    </classes>
+  </classSpec><classSpec rend="add" ident="att.scoreDef.vis.tablature" module="MEI.stringtab" type="atts">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Visual domain attributes for scoreDef in the tablature repertoire.</desc>
+  </classSpec><classSpec rend="add" ident="att.staffDef.vis.tablature" module="MEI.stringtab" type="atts">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Visual domain attributes for staffDef in the tablature repertoire.</desc>
+    <attList xmlns:xi="http://www.w3.org/2001/XInclude">
+      <attDef ident="tab.align" usage="opt">
+        <desc xml:lang="en">Attribute that describes the vertical alignment of tablature symbols. Only applicable in cases where the symbols' vertical position does not communicate other information, such as courses (<abbr>i.e.</abbr>, only in German lute tablature). Typical values are <val>top</val> and <val>bottom</val>.</desc>
+        <datatype>
+          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.VERTICALALIGNMENT"/>
+        </datatype>
+      </attDef>
+      <attDef ident="tab.anchorline" usage="opt">
+        <desc xml:lang="en">Used in German lute tablature where the vertical alignment of tab notes is consistent but cannot be identified using a typical value of <att>tab.align</att> (<abbr>i.e.</abbr>, <val>top</val> or <val>bottom</val>). Specifies the horizontal strand corresponding to the <att>lines</att> attribute on <gi scheme="MEI">staffDef</gi> that anchors the vertical position of tab notes. This anchorline is used as the vertical starting position when stacking tab notes into chords. Single tab notes simply occupy this position. Chords <q>grow upwards</q> from this position. If the chord extends further than the number of available horizontal strands (<q>lines</q>) above the anchorline, the entire chord is shifted downward until its top tab note is positioned on the top-most line. (Note that in German lute tablature, the lines are conceptual rather than visible).
+        </desc>
+        <datatype>
+          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.CLEFLINE"/>
+        </datatype>
+      </attDef>
+    </attList>
+  </classSpec><classSpec rend="add" ident="att.stringtab" module="MEI.stringtab" type="atts">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">String tablature string and fret information.</desc>
+    <attList xmlns:xi="http://www.w3.org/2001/XInclude">
+      <attDef ident="tab.fing" usage="opt">
+        <desc xml:lang="en">This attribute is deprecated and will be removed in a future version. Indicates which finger, if any, should be used to play an individual string. The index, middle, ring, and little fingers are represented by the values 1-4, while <val>t</val> is for the thumb. The values <val>x</val> and <val>o</val> indicate muffled and open strings, respectively.</desc>
+        <datatype>
+          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.FINGER.FRET"/>
+        </datatype>
+      </attDef>
+      <attDef ident="tab.fret" usage="opt">
+        <desc xml:lang="en">Records the location at which a string should be stopped against a fret.</desc>
+        <datatype>
+          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.FRETNUMBER"/>
+        </datatype>
+      </attDef>
+      <attDef ident="tab.line" usage="opt">
+        <desc xml:lang="en">Used in German lute tablature in cases where vertical positioning deviates from the norm which can be specified by <att>tab.align</att>. Indicates the position of the tab note on one of the horizontal strands corresponding to the <att>lines</att> attribute on <gi scheme="MEI">staffDef</gi>. (Note that in this case, the lines are conceptual rather than visible).</desc>
+        <datatype>
+          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.CLEFLINE"/>
+        </datatype>
+      </attDef>
+      <attDef ident="tab.string" usage="opt">
+        <desc xml:lang="en">This attribute is deprecated in favor of <att>tab.course</att> and will be removed in a future version. Records which string is to be played.</desc>
+        <datatype>
+          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.STRINGNUMBER"/>
+        </datatype>
+      </attDef>
+      <attDef ident="tab.course" usage="opt">
+        <desc xml:lang="en">Records which course is to be played.</desc>
+        <datatype>
+          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.COURSENUMBER"/>
+        </datatype>
+      </attDef>
+    </attList>
+  </classSpec><classSpec rend="add" ident="att.stringtab.position" module="MEI.stringtab" type="atts">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">String tablature position information.</desc>
+    <attList xmlns:xi="http://www.w3.org/2001/XInclude">
+      <attDef ident="tab.pos" usage="opt">
+        <desc xml:lang="en">Records fret position.</desc>
+        <datatype>
+          <rng:data type="positiveInteger"/>
+        </datatype>
+      </attDef>
+    </attList>
+  </classSpec><classSpec rend="add" ident="att.stringtab.tuning" module="MEI.stringtab" type="atts">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">This collection of attributes is deprecated in favor of the new <gi scheme="MEI">tuning</gi> element and will be removed in a future version. String tablature tuning information.</desc>
+    <attList xmlns:xi="http://www.w3.org/2001/XInclude">
+      <attDef ident="tab.strings" usage="opt">
+        <desc xml:lang="en">This attribute is deprecated in favor of the new <gi scheme="MEI">tuning</gi> element and will be removed in a future version. Provides a *written* pitch and octave for each open string or course of
+          strings.</desc>
+        <datatype>
+          <list xmlns="http://relaxng.org/ns/structure/1.0"><oneOrMore><rng:data xmlns="http://www.tei-c.org/ns/1.0" type="token">
+                <rng:param name="pattern">
+                  [a-g][0-9](s|f|ss|x|ff|xs|sx|ts|tf|n|nf|ns|su|sd|fu|fd|nu|nd|1qf|3qf|1qs|3qs)?([a-g][0-9](s|f|ss|x|ff|xs|sx|ts|tf|n|nf|ns|su|sd|fu|fd|nu|nd|1qf|3qf|1qs|3qs)?)*</rng:param>
+              </rng:data></oneOrMore></list>
+        </datatype>
+      </attDef>
+      <attDef ident="tab.courses" usage="opt">
+        <desc xml:lang="en">This attribute is deprecated in favor of the new <gi scheme="MEI">tuning</gi> element and will be removed in a future version. Provides a *written* pitch and octave for each open string or course of strings.</desc>
+        <datatype>
+          <list xmlns="http://relaxng.org/ns/structure/1.0"><oneOrMore><rng:data xmlns="http://www.tei-c.org/ns/1.0" type="token">
+                <rng:param name="pattern">
+                  [a-g][0-9](s|f|ss|x|ff|xs|sx|ts|tf|n|nf|ns|su|sd|fu|fd|nu|nd|1qf|3qf|1qs|3qs)?([a-g][0-9](s|f|ss|x|ff|xs|sx|ts|tf|n|nf|ns|su|sd|fu|fd|nu|nd|1qf|3qf|1qs|3qs)?)*</rng:param>
+              </rng:data></oneOrMore></list>
+        </datatype>
+      </attDef>
+    </attList>
+  </classSpec><classSpec rend="add" ident="att.tabDurSym.log" module="MEI.stringtab" type="atts">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Logical domain attributes.</desc>
+    <classes xmlns:xi="http://www.w3.org/2001/XInclude">
+      <memberOf key="att.layerIdent"/>
+      <memberOf key="att.partIdent"/>
+    </classes>
+  </classSpec><classSpec rend="add" ident="att.tabGrp.log" module="MEI.stringtab" type="atts">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Logical domain attributes.</desc>
+    <classes xmlns:xi="http://www.w3.org/2001/XInclude">
+      
+      <memberOf key="att.augmentDots"/>
+      <memberOf key="att.duration.log"/>
+      <memberOf key="att.event"/>
+    </classes>
+  </classSpec><elementSpec rend="add" ident="barre" module="MEI.stringtab"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">A barre in a chord tablature grid.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
+      <memberOf key="att.common"/>
+      <memberOf key="att.startEndId"/>
+    </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
+      <empty/>
+    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="fret" usage="opt">
+        <desc xml:lang="en">This attribute is deprecated in favor of <att>tab.fret</att>, and will be removed in a future version. Records the location at which the strings should be stopped against a fret in a fretboard diagram. This may or may not be the same as the actual location on the fretboard of the instrument in performance.</desc>
+        <datatype>
+          <rng:data type="positiveInteger">
+            <rng:param name="minInclusive">1</rng:param>
+            <rng:param name="maxInclusive">5</rng:param>
+          </rng:data>
+        </datatype>
+      </attDef></attList><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
+      <p>The <att>startid</att> and <att>endid</att> attributes are used to indicate the <gi scheme="MEI">chordMember</gi> elements on which the barre starts and finishes
+        respectively. The fret at which the barre should be created is recorded by the <att>fret</att>
+        attribute.</p>
+    </remarks></elementSpec><elementSpec rend="add" ident="course" module="MEI.stringtab"><gloss xmlns:xi="http://www.w3.org/2001/XInclude">individual course tuning information</gloss><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Describes the tuning of a course on a stringed instrument (<abbr>e.g.</abbr>, guitar, lute).</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
+      <memberOf key="att.common"/>
+      <memberOf key="att.course.log"/>
+      <memberOf key="att.course.vis"/>
+      <memberOf key="att.course.ges"/>
+      <memberOf key="att.course.anl"/>
+      <memberOf key="model.tuningPart"/>
+    </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
+      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="string"/></zeroOrMore>
+    </content></elementSpec><elementSpec rend="add" ident="string" module="MEI.stringtab"><gloss xmlns:xi="http://www.w3.org/2001/XInclude">individual string tuning information</gloss><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Used to modify tuning information given by the course element. Describes the tuning of an individual string within a course on a stringed instrument (<abbr>e.g.</abbr>, guitar, lute).</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
+      <memberOf key="att.common"/>
+      <memberOf key="att.course.log"/>
+      <memberOf key="att.course.vis"/>
+      <memberOf key="att.course.ges"/>
+      <memberOf key="att.course.anl"/>
+    </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
+      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="string"/></zeroOrMore>
+    </content></elementSpec><elementSpec rend="add" ident="tabDurSym" module="MEI.stringtab"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">A visual indication of the duration of a <gi scheme="MEI">tabGrp</gi>.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
+      <memberOf key="att.common"/>
+      <memberOf key="att.facsimile"/>
+      <memberOf key="att.stringtab"/>
+      <memberOf key="att.tabDurSym.log"/>
+      <memberOf key="att.tabDurSym.vis"/>
+      <memberOf key="att.tabDurSym.ges"/>
+      <memberOf key="att.tabDurSym.anl"/>
+    </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
+      <empty/>
+    </content><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
+      <p>The presence of a <gi scheme="MEI">tabDurSym</gi> indicates that there is a symbol rendered for the parent <gi scheme="MEI">tabGrp</gi>. If no additional attributes like <att>altsym</att>are given, a default symbol conforming to the current notation style or font is to be used. The absence of this elements indicates that the last provided duration symbol equally applies to the current tab group.</p>
+    </remarks></elementSpec><elementSpec rend="add" ident="tabGrp" module="MEI.stringtab"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">A group of simultaneous tab notes, comparable to a <gi scheme="MEI">chord</gi> in CMN. Rarely, may also contain rests, as in some "German" lute tablatures.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
+      <memberOf key="att.common"/>
+      <memberOf key="att.facsimile"/>
+      <memberOf key="att.tabGrp.log"/>
+      <memberOf key="att.tabGrp.vis"/>
+      <memberOf key="att.tabGrp.ges"/>
+      <memberOf key="att.tabGrp.anl"/>
+      <memberOf key="model.eventLike"/>
+    </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="tabDurSym"/></optional>
+      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="note"/><ref name="model.transcriptionLike"/><ref name="model.editLike"/><ref name="model.appLike"/><ref name="rest"/></choice></zeroOrMore>
     </content></elementSpec><classSpec rend="add" predeclare="true" ident="model.backLike" module="MEI.text" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups elements that may contain back matter.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -18747,6 +18985,8 @@
       </attDef>
     </attList>
   </classSpec><classSpec rend="add" ident="att.clefGrp.vis" module="MEI.visual" type="atts">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Visual domain attributes.</desc>
+  </classSpec><classSpec rend="add" ident="att.course.vis" module="MEI.visual" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Visual domain attributes.</desc>
   </classSpec><classSpec rend="add" ident="att.cpMark.vis" module="MEI.visual" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Visual domain attributes.</desc>
@@ -19874,7 +20114,7 @@
       <memberOf key="att.textStyle"/>
       <memberOf key="att.scoreDef.vis.cmn"/>
       <memberOf key="att.scoreDef.vis.mensural"/>
-      
+      <memberOf key="att.scoreDef.vis.tablature"/>
     </classes>
     <attList xmlns:xi="http://www.w3.org/2001/XInclude">
       <attDef ident="vu.height" usage="opt">
@@ -19980,7 +20220,7 @@
       <memberOf key="att.visibility"/>
       <memberOf key="att.staffDef.vis.cmn"/>
       <memberOf key="att.staffDef.vis.mensural"/>
-      
+      <memberOf key="att.staffDef.vis.tablature"/>
     </classes>
     <attList xmlns:xi="http://www.w3.org/2001/XInclude">
       <attDef ident="layerscheme" usage="opt">
@@ -20130,6 +20370,28 @@
       <memberOf key="att.scalable"/>
       <memberOf key="att.typography"/>
       <memberOf key="att.visualOffset"/>
+      <memberOf key="att.xy"/>
+    </classes>
+  </classSpec><classSpec rend="add" ident="att.tabDurSym.vis" module="MEI.visual" type="atts">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Visual domain attributes.</desc>
+    <classes xmlns:xi="http://www.w3.org/2001/XInclude">
+      <memberOf key="att.altSym"/>
+      <memberOf key="att.color"/>
+      <memberOf key="att.extSym"/>
+      <memberOf key="att.placementRelStaff"/>
+      <memberOf key="att.typography"/>
+      <memberOf key="att.visibility"/>
+      <memberOf key="att.visualOffset"/>
+      <memberOf key="att.xy"/>
+    </classes>
+  </classSpec><classSpec rend="add" ident="att.tabGrp.vis" module="MEI.visual" type="atts">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Visual domain attributes.</desc>
+    <classes xmlns:xi="http://www.w3.org/2001/XInclude">
+      
+      
+      <memberOf key="att.visibility"/>
+      <memberOf key="att.visualOffset.ho"/>
+      <memberOf key="att.visualOffset.to"/>
       <memberOf key="att.xy"/>
     </classes>
   </classSpec><classSpec rend="add" ident="att.tempo.vis" module="MEI.visual" type="atts">
@@ -20420,72 +20682,7 @@
 							</datatype>
 						</attDef>
 					</attList>
-				</classSpec><moduleSpec ident="MEI.frettab" mode="add">
-					<desc/>
-				</moduleSpec><dataSpec rend="add" ident="data.COURSENUMBER" module="MEI.stringtab" mode="add">
-					<desc xml:lang="en">In string tablature, the number of the course to be played.</desc>
-					<content>
-						<rng:data type="positiveInteger"/>
-					</content>
-				</dataSpec><dataSpec rend="add" ident="data.COURSETUNING" module="MEI.frettab">
-					<desc xml:lang="en">Standard course tunings.</desc>
-					<content>
-						<valList type="semi">
-							<valItem ident="guitar.standard">
-								<desc xml:lang="en">Standard tuning for current guitars. The courses are tuned to E2 A2 D3 G3 B3 E4.</desc>
-							</valItem>
-							<valItem ident="guitar.drop.D">
-								<desc xml:lang="en">Drop D tuning for guitars. The lowest course is tuned down to D, while all other courses are kept to their regular pitches. D2 A2 D3 G3 B3 E4.</desc>
-							</valItem>
-							<valItem ident="guitar.open.D">
-								<desc xml:lang="en">Open D tuning for guitars. D2 A2 D3 F3s A3 D4.</desc>
-							</valItem>
-							<valItem ident="guitar.open.G">
-								<desc xml:lang="en">Open G tuning for guitars. D2 G2 D3 G3 B3 D4.</desc>
-							</valItem>
-							<valItem ident="guitar.open.A">
-								<desc xml:lang="en">Open A tuning for guitars. E2 A2 E3 A3 C4s E4.</desc>
-							</valItem>
-							<valItem ident="lute.renaissance.6">
-								<desc xml:lang="en">Renaissance tuning for lutes with 10 strings on 6 courses. G2G3 C3C4 F3F4 A4A4 D4 G4.</desc>
-							</valItem>
-							<valItem ident="lute.baroque.d.major">
-								<desc xml:lang="en">Baroque tuning for lutes with 6 stable courses, and additional bass courses tuned to the key of D Major.</desc>
-							</valItem>
-							<valItem ident="lute.baroque.d.minor">
-								<desc xml:lang="en">Baroque tuning for lutes with 6 stable courses, and additional bass courses tuned to the key of D minor.</desc>
-							</valItem>
-						</valList>
-					</content>
-				</dataSpec><classSpec rend="add" ident="att.note.ges.tab" module="MEI.frettab" type="atts" mode="add">
-					<attList>
-						<attDef ident="tab.course" usage="opt" mode="add">
-							<desc xml:lang="en">Records which course is to be played.</desc>
-							<datatype>
-								<dataRef key="data.COURSENUMBER"/>
-							</datatype>
-						</attDef>
-						<attDef ident="tab.fret" usage="opt" mode="add">
-							<desc xml:lang="en">Records which course is to be played.</desc>
-							<datatype>
-								<dataRef key="data.FRETNUMBER"/>
-							</datatype>
-						</attDef>
-					</attList>
-				</classSpec><classSpec rend="add" ident="att.course.log" module="MEI.frettab" type="atts" mode="add">
-					<attList>
-						<attDef ident="tuning.standard" usage="opt" mode="add">
-							<desc xml:lang="en">Indicates a tuning standard for the course.</desc>
-							<datatype>
-								<dataRef key="data.COURSETUNING"/>
-							</datatype>
-						</attDef>
-					</attList>
-				</classSpec><elementSpec rend="add" ident="course" module="MEI.frettab" mode="add"><gloss>course tuning information</gloss><desc xml:lang="en">Describes the tuning of a course on a lute.</desc><classes>
-						<memberOf key="att.course.log"/>
-					</classes></elementSpec><elementSpec rend="add" ident="foo" module="MEI.frettab" mode="add"><gloss>foo information</gloss><desc xml:lang="en">Dummy element for enforcing that the att classes are used.</desc><classes>
-						<memberOf key="att.note.ges.tab"/>
-					</classes></elementSpec><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.analytical"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.cmn"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.cmnOrnaments"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.corpus"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.critapp"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.drama"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.edittrans"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.externalsymbols"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.facsimile"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.figtable"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.fingering"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.frbr"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.gestural"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.harmony"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.header"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.lyrics"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.mensural"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.midi"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.namesdates"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.neumes"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.performance"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.ptrref"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.shared"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.text"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.usersymbols"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.visual"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.stringtab"/></schemaSpec>
+				</classSpec><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.analytical"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.cmn"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.cmnOrnaments"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.corpus"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.critapp"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.drama"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.edittrans"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.externalsymbols"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.facsimile"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.figtable"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.fingering"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.frbr"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.gestural"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.harmony"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.header"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.lyrics"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.mensural"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.midi"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.namesdates"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.neumes"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.performance"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.ptrref"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.shared"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.stringtab"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.text"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.usersymbols"/><moduleSpec xmlns:xi="http://www.w3.org/2001/XInclude" n="" ident="MEI.visual"/></schemaSpec>
 		</body>
 	</text>
 </TEI>
