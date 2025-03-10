@@ -841,7 +841,9 @@ void Object::AddChild(Object *child)
         }
     }
 
-    child->SetParent(this);
+    if (!this->IsReferenceObject()) {
+        child->SetParent(this);
+    }
     const int insertOrder = this->GetInsertOrderFor(child->GetClassId());
     // no child or no order specify, the child is appended at the end
     if (m_children.empty() || insertOrder == VRV_UNSET) {

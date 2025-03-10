@@ -360,6 +360,7 @@ void Slur::AddSpannedElements(
                              [&spanned](FloatingPositioner *positioner) {
                                  TimeSpanningInterface *interface = positioner->GetObject()->GetTimeSpanningInterface();
                                  assert(interface);
+                                 if (!interface->GetStart() || !interface->GetEnd()) return true;
                                  const bool startsInCollisionLayer
                                      = spanned.layersN.contains(interface->GetStart()->GetOriginalLayerN());
                                  const bool endsInCollisionLayer

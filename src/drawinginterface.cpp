@@ -71,6 +71,17 @@ void DrawingListInterface::ResetDrawingList()
 }
 
 //----------------------------------------------------------------------------
+// Interface pseudo functor (redirected)
+//----------------------------------------------------------------------------
+
+FunctorCode DrawingListInterface::InterfaceResetData(ResetDataFunctor &functor)
+{
+    this->DrawingListInterface::Reset();
+
+    return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
 // BeamDrawingInterface
 //----------------------------------------------------------------------------
 
@@ -555,6 +566,17 @@ void BeamDrawingInterface::GetBeamChildOverflow(StaffAlignment *&above, StaffAli
 }
 
 //----------------------------------------------------------------------------
+// Interface pseudo functor (redirected)
+//----------------------------------------------------------------------------
+
+FunctorCode BeamDrawingInterface::InterfaceResetData(ResetDataFunctor &functor)
+{
+    this->BeamDrawingInterface::Reset();
+
+    return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
 // StaffDefDrawingInterface
 //----------------------------------------------------------------------------
 
@@ -660,6 +682,19 @@ void StaffDefDrawingInterface::SetCurrentProport(const Proport *proport)
 }
 
 //----------------------------------------------------------------------------
+// Interface pseudo functor (redirected)
+//----------------------------------------------------------------------------
+
+FunctorCode StaffDefDrawingInterface::InterfaceResetData(ResetDataFunctor &functor)
+{
+    // ScoreDefSetCurrent expect the interface content to be preserved
+    // Since CloneReset call the ResetData functor, this need to be disabled
+    // this->StaffDefDrawingInterface::Reset();
+
+    return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
 // StemmedDrawingInterface
 //----------------------------------------------------------------------------
 
@@ -734,6 +769,17 @@ Point StemmedDrawingInterface::GetDrawingStemEnd(const Object *object) const
         }
     }
     return Point(m_drawingStem->GetDrawingX(), m_drawingStem->GetDrawingY() - this->GetDrawingStemLen());
+}
+
+//----------------------------------------------------------------------------
+// Interface pseudo functor (redirected)
+//----------------------------------------------------------------------------
+
+FunctorCode StemmedDrawingInterface::InterfaceResetData(ResetDataFunctor &functor)
+{
+    this->StemmedDrawingInterface::Reset();
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv
