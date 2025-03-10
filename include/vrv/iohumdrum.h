@@ -663,7 +663,8 @@ protected:
     std::vector<hum::HTp> getSystemArpeggioTokens(hum::HTp token);
     std::vector<hum::HTp> getStaffArpeggioTokens(hum::HTp token);
     void addDirection(const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token,
-        int staffindex, int justification = 0, const std::string &color = "", int vgroup = -1);
+        int staffindex, int justification = 0, const std::string &color = "", int vgroup = -1,
+        const std::string &label = "");
     bool addTempoDirection(const std::string &text, const std::string &placement, bool bold, bool italic,
         hum::HTp token, int staffindex, int justification, const std::string &color);
     bool setTempoContent(Tempo *tempo, const std::string &text);

@@ -17339,6 +17339,8 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
         return;
     }
 
+    std::string label = hline->getValue("LO", "TX", "pop");
+
     bool zparam = hline->isDefined("LO", "TX", "Z");
     bool yparam = hline->isDefined("LO", "TX", "Y");
 
@@ -17478,6 +17480,9 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
         }
         else {
             addTextElement(tempo, text);
+            if (!label.empty()) {
+                tempo->SetLabel(label);
+            }
         }
     }
     else {
@@ -17530,6 +17535,9 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
         }
         else {
             addTextElement(dir, text);
+            if (!label.empty()) {
+                dir->SetLabel(label);
+            }
         }
     }
 }
@@ -17552,6 +17560,7 @@ void HumdrumInput::processDirections(hum::HTp token, int staffindex)
     if (text.size() == 0) {
         return;
     }
+    std::string label = token->getValue("LO", "TX", "pop");
 
     // justification == 0 means no explicit justification (mostly left justified)
     // justification == 1 means right justified
@@ -17649,7 +17658,7 @@ void HumdrumInput::processDirections(hum::HTp token, int staffindex)
         placement = "above";
     }
 
-    addDirection(text, placement, bold, italic, token, staffindex, justification, color, vgroup);
+    addDirection(text, placement, bold, italic, token, staffindex, justification, color, vgroup, label);
 }
 
 //////////////////////////////
@@ -17749,6 +17758,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     bool verboseQ = false;
     bool tempoQ = false;
     std::string text;
+    std::string label;
     std::string key;
     std::string value;
     std::string typevalue;
@@ -17761,6 +17771,9 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     for (int i = 0; i < hps->getCount(); ++i) {
         key = hps->getParameterName(i);
         value = hps->getParameterValue(i);
+        if (key == "pop") {
+            label = value;
+        }
         if (key == "a") {
             aparam = true;
         }
@@ -17948,7 +17961,6 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     }
 
     if (tempoQ) {
-
         tempo = new Tempo();
         if (midibpm > 0) {
             tempo->SetMidiBpm(midibpm * m_globalTempoScaling * m_localTempoScaling.getFloat());
@@ -18001,6 +18013,9 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     }
     else {
         dir = new Dir();
+        if (!label.empty()) {
+            dir->SetLabel(label);
+        }
         if (placement == "between") {
             setStaffBetween(dir, m_currentstaff);
         }
@@ -18833,16 +18848,22 @@ std::vector<std::string> HumdrumInput::convertMusicSymbolNameToSmuflName(const s
 //////////////////////////////
 //
 // HumdrumInput::addDirection --
-//     default value: color = "";
+//     default value: justification: 0
+//     default value: color = ""
+//     default value: vgroup = -1
+//     default value: label = ""
 //
 //     token->getLayoutParameter() should not be used in this function.  Instead
 //     paste the parameter set that generate a text direction (there could be multiple
 //     text directions attached to the note, and using getPayoutParameter() will merge
 //     all of their parameters incorrectly.
 //
+void addDirection(const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token,
+    int staffindex, int justification = 0, const std::string &color = "", int vgroup = -1,
+    const std::string label = "");
 
 void HumdrumInput::addDirection(const std::string &text, const std::string &placement, bool bold, bool italic,
-    hum::HTp token, int staffindex, int justification, const std::string &color, int vgroup)
+    hum::HTp token, int staffindex, int justification, const std::string &color, int vgroup, const std::string &label)
 {
     hum::HumRegex hre;
     if (hre.search(text, "\\[[^=]*\\]\\s*=\\s*\\d+")) {
@@ -18862,6 +18883,9 @@ void HumdrumInput::addDirection(const std::string &text, const std::string &plac
     }
     else {
         setStaff(dir, m_currentstaff);
+    }
+    if (!label.empty()) {
+        dir->SetLabel(label);
     }
     setLocationId(dir, token);
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
