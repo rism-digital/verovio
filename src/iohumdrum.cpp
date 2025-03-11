@@ -8877,27 +8877,12 @@ void HumdrumInput::setMensurationSymbol(
 
     if (metdata.find('C') != std::string::npos) {
         vrvmensur->SetSign(MENSURATIONSIGN_C);
-        hum::HumRegex hre;
-        if (hre.search(metdata, "(\\d+)/(\\d+)$")) {
-            vrvmensur->SetNum(hre.getMatchInt(1));
-            vrvmensur->SetNumbase(hre.getMatchInt(2));
-        }
-        else if (hre.search(metdata, "(\\d+)$")) {
-            vrvmensur->SetNum(hre.getMatchInt(1));
-        }
     }
     else if (metdata.find('O') != std::string::npos) {
         vrvmensur->SetSign(MENSURATIONSIGN_O);
-        hum::HumRegex hre;
-        if (hre.search(metdata, "(\\d+)/(\\d+)$")) {
-            vrvmensur->SetNum(hre.getMatchInt(1));
-            vrvmensur->SetNumbase(hre.getMatchInt(2));
-        }
-        else if (hre.search(metdata, "(\\d+)$")) {
-            vrvmensur->SetNum(hre.getMatchInt(1));
-        }
     }
     else {
+        // deal with cases where C or O are not displayed
         std::stringstream warning;
         warning << "In HumdrumInput::setMensurationSymbol: Problem parsing mensuration: ";
         warning << metdata;
@@ -8915,14 +8900,15 @@ void HumdrumInput::setMensurationSymbol(
         vrvmensur->SetOrient(ORIENTATION_reversed);
     }
 
-    if (hre.search(metdata, "(\\d+)/(\\d+)")) {
+    // Add numbers to mensuration:
+    if (hre.search(metdata, "(\\d+)/(\\d+)$")) {
         vrvmensur->SetNum(hre.getMatchInt(1));
         vrvmensur->SetNumbase(hre.getMatchInt(2));
     }
-    else if (hre.search(metdata, "/(\\d+)")) {
+    else if (hre.search(metdata, "/(\\d+)$")) {
         vrvmensur->SetNumbase(hre.getMatchInt(1));
     }
-    else if (hre.search(metdata, "(\\d+).*\\)")) {
+    else if (hre.search(metdata, "(\\d+)$")) {
         vrvmensur->SetNum(hre.getMatchInt(1));
     }
 
