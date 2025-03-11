@@ -4747,8 +4747,9 @@ std::string MusicXmlInput::GetOrnamentGlyphNumber(int attributes) const
     static std::map<int, std::string> precomposedNames = {
         { APPR_Above | FORM_Inverted, "U+E5C6" }, { APPR_Below | FORM_Inverted, "U+E5B5" },
         { APPR_Above | FORM_Normal, "U+E5C7" }, { APPR_Below | FORM_Normal, "U+E5B8" },
-        { FORM_Inverted | DEP_Above, "U+E5BB" },
-        { FORM_Inverted | DEP_Below, "U+E5C8" } // these values need to be matched with proper SMuFL codes first
+        { FORM_Inverted | DEP_Above, "U+E5BB" }, { FORM_Inverted | DEP_Below, "U+E5C8" }
+
+        // these values need to be matched with proper SMuFL codes first
         /*, { FORM_Normal | DEP_Above, "U+????" },
         { FORM_Normal | DEP_Below, "U+????" }, { APPR_Above | FORM_Normal | DEP_Above, "U+????" },
         { APPR_Above | FORM_Normal | DEP_Above, "U+????" }, { APPR_Above | FORM_Normal | DEP_Below, "U+????" },
