@@ -16,10 +16,10 @@
 #include "altsyminterface.h"
 #include "atts_analytical.h"
 #include "atts_externalsymbols.h"
-#include "atts_frettab.h"
 #include "atts_mensural.h"
 #include "atts_midi.h"
 #include "atts_shared.h"
+#include "atts_stringtab.h"
 #include "beam.h"
 #include "chord.h"
 #include "durationinterface.h"
@@ -58,11 +58,11 @@ class Note : public LayerElement,
              public AttGraced,
              public AttHarmonicFunction,
              public AttMidiVelocity,
-             public AttNoteGesTab,
              public AttNoteHeads,
              public AttNoteVisMensural,
              public AttStems,
              public AttStemsCmn,
+             public AttStringtab,
              public AttTiePresent,
              public AttVisibility {
 public:
