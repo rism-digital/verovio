@@ -1226,7 +1226,7 @@ std::string SvgDeviceContext::GetColor(int color) const
         case (COLOR_BLUE): return "#0000FF";
         case (COLOR_CYAN): return "#00FFFF";
         case (COLOR_LIGHT_GREY): return "#777777";
-        default: return StringFormat("#%X", color);
+        default: return StringFormat("#%06X", color);
     }
 }
 
