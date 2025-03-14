@@ -299,7 +299,7 @@ private:
 
     void WriteLine(std::string);
 
-    std::string GetColor(int color);
+    std::string GetColor(int color) const;
 
     pugi::xml_node AddChild(std::string name);
 
