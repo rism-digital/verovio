@@ -757,7 +757,8 @@ protected:
         std::vector<string> &elements, std::vector<void *> &pointers, std::vector<hum::HTp> tokens, int index);
     void setRepeatSlashes(BeatRpt *repeat, std::vector<hum::HTp> &tokens, int index);
     std::string getLabelFromInstrumentCode(hum::HTp icode, const std::string &transpose);
-    void checkForRehearsal(int line);
+    void checkForGlobalRehearsal(int line);
+    void checkForLocalRehearsal(hum::HTp);
     bool isBlackNotation(hum::HTp starting);
     std::string checkNoteForScordatura(const std::string &token);
     bool checkForScordatura(hum::HumdrumFile &infile);

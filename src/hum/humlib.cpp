@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Mar  4 09:02:49 PST 2025
+// Last Modified: Tue Mar 11 00:32:24 PDT 2025
 // Filename:      min/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.cpp
 // Syntax:        C++11
@@ -57529,6 +57529,8 @@ Tool_autocadence::Tool_autocadence(void) {
 	define("I|intervals-only=b",      "Display interval strings for notes in score (no further analysis)");
 	define("color=s:dodgerblue",      "Color cadence formula notes with given color");
 	define("count|match-count=b",     "Return number of cadence formulas that match");
+	define("B|no-back-highlight=b",   "Do not color start of sustain note at start of cadence definition");
+	define("S|no-suspensions=b",      "Do not use suspensions from dissonance analysis");
 }
 
 
@@ -57585,18 +57587,23 @@ bool Tool_autocadence::run(HumdrumFile& infile) {
 //
 
 void Tool_autocadence::initialize(void) {
-	m_printRawDiatonicPitchesQ = getBoolean("pitches");
-	m_intervalsOnlyQ           = getBoolean("intervals-only");
-	m_matchesQ                 = getBoolean("matches");
-	m_printSequenceInfoQ       = getBoolean("sequences");
-	m_countQ                   = getBoolean("match-count");
-	m_colorQ                   = getBoolean("color-cadence-notes");
-	m_color                    = getString("color");
-	m_showFormulaIndexQ        = getBoolean("show-formula-index");
-	m_evenNoteSpacingQ         = getBoolean("even-note-spacing");
-	m_regexQ                   = getBoolean("regex");
+	m_printRawDiatonicPitchesQ =  getBoolean("pitches");
+	m_intervalsOnlyQ           =  getBoolean("intervals-only");
+	m_intervalsQ               =  getBoolean("include-intervals");
+	m_matchesQ                 =  getBoolean("matches");
+	m_printSequenceInfoQ       =  getBoolean("sequences");
+	m_countQ                   =  getBoolean("match-count");
+	m_colorQ                   =  getBoolean("color-cadence-notes");
+	m_color                    =  getString("color");
+	m_showFormulaIndexQ        =  getBoolean("show-formula-index");
+	m_evenNoteSpacingQ         =  getBoolean("even-note-spacing");
+	m_regexQ                   =  getBoolean("regex");
+	m_nobackQ                  = !getBoolean("no-back-highlight");
+	m_suspensionsQ             = !getBoolean("no-suspensions");
 
-	fillCadenceDefinitions();
+	prepareCadenceDefinitions();
+	prepareCvfNames();
+	prepareDissonanceNames();
 }
 
 
@@ -57608,11 +57615,17 @@ void Tool_autocadence::initialize(void) {
 
 void Tool_autocadence::processFile(HumdrumFile& infile) {
 
+
 	// fill m_pitches and m_lowestPitch
 	preparePitchInfo(infile);
 	if (m_printRawDiatonicPitchesQ) {
 		printExtractedPitchInfo(infile);
 		return;
+	}
+
+	// identify dissonances
+	if (m_suspensionsQ) {
+		prepareDissonances(infile);
 	}
 
 	// fill m_intervals
@@ -57685,7 +57698,10 @@ void Tool_autocadence::printScore(HumdrumFile& infile) {
 	}
 
 	if (m_colorQ) {
-		m_humdrum_text << "!!!RDF**kern: @ = marked note, color=" << m_color << endl;
+		m_humdrum_text << "!!!RDF**kern: " << m_marker << " = marked note, color=" << m_color << endl;
+	}
+	if (m_hasSuspensionMarkersQ) {
+		m_humdrum_text << "!!!RDF**kern: " << m_suspensionMarker << " = marked note, color=" << m_suspensionColor << endl;
 	}
 	if (m_evenNoteSpacingQ) {
 		m_humdrum_text << "!!!verovio: evenNoteSpacing" << endl;
@@ -57695,6 +57711,7 @@ void Tool_autocadence::printScore(HumdrumFile& infile) {
 		printRegexTable();
 	}
 }
+
 
 
 //////////////////////////////
@@ -57721,8 +57738,8 @@ void Tool_autocadence::printRegexTable(void) {
 	m_humdrum_text << "!! <table class=regex>" << endl;
 
 	m_humdrum_text << "!! <tr>" << endl;
-	m_humdrum_text << "!! <th class=lcvf title='lower counterpoint vocal function'>LCVF</th>" << endl;
-	m_humdrum_text << "!! <th class=ucvf title='upper counterpoint vocal function'>UCVF</th>" << endl;
+	m_humdrum_text << "!! <th class=lcvf title='lower cadence vocal function'>LCVF</th>" << endl;
+	m_humdrum_text << "!! <th class=ucvf title='upper cadence vocal function'>UCVF</th>" << endl;
 	m_humdrum_text << "!! <th class=name title='cadence name (abbreviation)'>Name</th>" << endl;
 	m_humdrum_text << "!! <th class='index' title='cadence enumeration'>Index</th>" << endl;
 	m_humdrum_text << "!! <th title='regular expression definition for cadence formula'>Cadence formula</th>" << endl;
@@ -57754,8 +57771,22 @@ void Tool_autocadence::printDefinitionRow(int index) {
 
 	m_humdrum_text << "!! <tr>" << endl;
 
-	m_humdrum_text << "!! <td class=lcvf>" << def.m_funcL << "</td>" << endl;
-	m_humdrum_text << "!! <td class=ucvf>" << def.m_funcU << "</td>" << endl;
+	string nameL = m_functionNames[def.m_funcL];
+	string nameU = m_functionNames[def.m_funcU];
+
+	m_humdrum_text << "!! <td class=lcvf";
+	if (!nameL.empty()) {
+		m_humdrum_text << " title='" << nameL << "'";
+	}
+	m_humdrum_text << ">" << def.m_funcL << "</td>" << endl;
+
+
+	m_humdrum_text << "!! <td class=ucvf";
+	if (!nameU.empty()) {
+		m_humdrum_text << " title='" << nameU << "'";
+	}
+	m_humdrum_text << ">" << def.m_funcU << "</td>" << endl;
+
 	m_humdrum_text << "!! <td class=name>" << def.m_name  << "</td>" << endl;
 	m_humdrum_text << "!! <td class=index>" << index << "</td>" << endl;
 	m_humdrum_text << "!! <td class=definition>" << def.m_regex << "</td>" << endl;
@@ -57780,7 +57811,8 @@ void Tool_autocadence::printDefinitionRow(int index) {
 !! table.regex td.lcvf,
 !! table.regex td.ucvf,
 !! table.regex td.name {
-!!    text-align:center;
+!!    text-align: center;
+!!    cursor: help;
 !! }
 !! table.regex th {
 !!    vertical-align: top;
@@ -57831,6 +57863,7 @@ void Tool_autocadence::addMatchToScore(HumdrumFile& infile, int matchIndex) {
 	// get<0> is the sequence string.
 	HTp startL = get<1>(info);  // starting token of cadence formula, lower voice
 	HTp startU = get<2>(info);  // starting token of cadence formula, upper voice
+
 	if (startL == NULL) {
 		cerr << "WARNING: startL is NULL" << endl;
 		return;
@@ -57839,6 +57872,7 @@ void Tool_autocadence::addMatchToScore(HumdrumFile& infile, int matchIndex) {
 		cerr << "WARNING: startU is NULL" << endl;
 		return;
 	}
+
 	int lindex = startL->getLineIndex();
 	vector<int>& dindexes = get<3>(info);
 	if (dindexes.empty()) {
@@ -57874,6 +57908,9 @@ void Tool_autocadence::addMatchToScore(HumdrumFile& infile, int matchIndex) {
 	if (m_showFormulaIndexQ) {
 		valueL += to_string(dindex);
 	}
+	// Indicate voice indexes of two voices involved in CVF pair:
+	// valueL += "V" + to_string(vindex);
+	// valueL += "P" + to_string(pindex);
 	endL->setValue("auto", "cvf", valueL);
 
 	string valueU = endU->getValue("auto", "cvf");
@@ -57909,6 +57946,14 @@ void Tool_autocadence::colorNotes(HTp startTok, HTp endTok) {
 	if (endTok == NULL) {
 		cerr << "Warning: endTok is null" << endl;
 	}
+	int startTrack = startTok->getTrack();
+	int endTrack = startTok->getTrack();
+	if (startTrack != endTrack) {
+		cerr << "Start and ending tracks are not the same: " << startTrack << " and " << endTrack << endl;
+		return;
+	}
+	// cerr << "\n\tcolor notes startLine = " << startTok->getLineIndex() << endl;
+	// cerr << "\tcolor notes endLine   = " << endTok->getLineIndex() << endl;
 	HTp current = startTok;
 	while (current) {
 		if (!current->isData()) {
@@ -57919,12 +57964,12 @@ void Tool_autocadence::colorNotes(HTp startTok, HTp endTok) {
 			current = current->getNextToken();
 			continue;
 		}
-		if (current->isRest()) {
-			current = current->getNextToken();
-			continue;
-		}
+		//	if (current->isRest()) {
+		//		current = current->getNextToken();
+		//		continue;
+		//	}
 		string text = *current;
-		text += "@";
+		text += m_marker;
 		current->setText(text);
 	
 		if (current == endTok) {
@@ -57934,7 +57979,77 @@ void Tool_autocadence::colorNotes(HTp startTok, HTp endTok) {
 		current = current->getNextToken();
 	}
 
+	if (m_nobackQ && (startTok->isNullToken() || startTok->isSustainedNote())) {
+		highlightNoteAttack(startTok);
+	}
+}
 
+
+
+//////////////////////////////
+//
+// Tool_autocadence::highlightNoteAttack -- search backards from a sustain
+//    to highlight start of note.
+//
+
+void Tool_autocadence::highlightNoteAttack(HTp startTok) {
+	bool markedQ = true;
+	if (startTok->isNullToken()) {
+		HTp resolved = startTok->resolveNullToken();
+		if (!resolved) {
+			return;
+		}
+		if (resolved->isRest()) {
+			// maybe color?
+			return;
+		}
+		if (resolved->isNoteAttack()) {
+			string text = resolved->getText();
+			text += m_marker;
+			resolved->setText(text);
+			return;
+		} else {
+			startTok = resolved;
+			string text = resolved->getText();
+			text += m_marker;
+			resolved->setText(text);
+			markedQ = true;
+		}
+	}
+	if (startTok->isRest()) {
+		return;
+	}
+	int b40 = Convert::kernToBase40(startTok);
+	if (!markedQ) {
+		string text = startTok->getText();
+		text += m_marker;
+		startTok->setText(text);
+	}
+	HTp current = startTok->getPreviousToken();
+	while (current) {
+		if (!current->isData()) {
+			current = current->getPreviousToken();
+			continue;
+		}
+		if (current->isNullToken()) {
+			current = current->getPreviousToken();
+			continue;
+		}
+		if (current->isRest()) {
+			break;
+		}
+		int b40t = Convert::kernToBase40(current);
+		if (b40t != b40) {
+			break;
+		}
+		string text = current->getText();
+		text += m_marker;
+		current->setText(text);
+		if (current->isNoteAttack()) {
+			break;
+		}
+		current = current->getPreviousToken();
+	}
 }
 
 
@@ -58185,13 +58300,8 @@ void Tool_autocadence::printSequenceMatches(void) {
 		if (matches.empty()) {
 			continue;
 		}
-		for (int m=0; m<(int)matches.size(); m++) {
-			m_humdrum_text << matches[m];
-			if (m<(int)matches.size() - 1) {
-				m_humdrum_text << ",";
-			}
-		}
-		m_humdrum_text << "\t";
+
+
 		for (int m=0; m<(int)matches.size(); m++) {
 			int dindex = matches.at(m);
 			auto& cinfo = m_definitions.at(dindex);
@@ -58201,6 +58311,16 @@ void Tool_autocadence::printSequenceMatches(void) {
 				m_humdrum_text << ",";
 			}
 		}
+
+		m_humdrum_text << "\t";
+
+		for (int m=0; m<(int)matches.size(); m++) {
+			m_humdrum_text << matches[m];
+			if (m<(int)matches.size() - 1) {
+				m_humdrum_text << ",";
+			}
+		}
+
 		m_humdrum_text << "\t";
 		string& sequence = get<0>(info);
 		m_humdrum_text << sequence << endl;
@@ -58596,12 +58716,18 @@ void Tool_autocadence::printIntervalDataLine(HumdrumFile& infile, int index, int
 //     markers for CFV if present.
 //
 
-void Tool_autocadence::printIntervalDataLineScore(HumdrumFile& infile, int index, int kcount) {
+void Tool_autocadence::printIntervalDataLineScore(HumdrumFile& infile,
+		int index, int kcount) {
+
 	vector<string> labels(infile[index].getFieldCount());
 	bool foundLabelQ = false;
 
-	stringstream dataline;
+	vector<string> dissonances(infile[index].getFieldCount());
+	bool foundDissonanceQ = false; // just for suspensions
+
 	int fcount = infile[index].getFieldCount();
+
+	stringstream dataline;
 	for (int i=0; i<fcount; i++) {
 		HTp token = infile.token(index, i);
 		if (i != 0) {
@@ -58615,6 +58741,13 @@ void Tool_autocadence::printIntervalDataLineScore(HumdrumFile& infile, int index
 		if (!label.empty()) {
 			labels.at(i) = label;
 			foundLabelQ = true;
+		}
+		string dissonance = token->getValue("auto", "dissonance");
+		if ((dissonance == "s") || (dissonance == "S") || (dissonance == "g") || (dissonance == "G")) {
+			if (!dissonance.empty()) {
+				dissonances.at(i) = dissonance;
+				foundDissonanceQ = true;
+			}
 		}
 		int track = token->getTrack();
 		int ntrack = 0;
@@ -58635,25 +58768,155 @@ void Tool_autocadence::printIntervalDataLineScore(HumdrumFile& infile, int index
 				dataline << "\t" << value;
 			}
 		}
+
 	}
 
+	stringstream labelline;
 	if (foundLabelQ) {
-		for (int i=0; i<(int)labels.size(); i++) {
-			if (labels[i].empty()) {
-				m_humdrum_text << "!";
-			} else {
-				m_humdrum_text << "!LO:TX:a:B:cvf";
-				m_humdrum_text << ":color=" << m_color;
-				m_humdrum_text << ":t=" << labels[i];
+		for (int i=0; i<fcount; i++) {
+			HTp token = infile.token(index, i);
+			int track = token->getTrack();
+			int vindex = m_trackToVoiceIndex.at(track);
+			if (i != 0) {
+				labelline << "\t";
 			}
-			if (i <(int)labels.size() - 1) {
-				m_humdrum_text << "\t";
+			string label = labels.at(i);
+			if (label.empty()) {
+				labelline << "!";
+			} else {
+				labelline << "!LO:TX:a:B:cvf";
+				labelline << ":color=" << m_color;
+				labelline << ":t=" << label;
+				if (m_popupQ) {
+				 	string fname = getFunctionNames(label);
+				 	if (!fname.empty()) {
+				 		labelline << ":pop=" << fname;
+				 	}
+				}
+			}
+			if ((kcount > 0) && (vindex >= 0))  {
+				int tcount = kcount - vindex - 1;
+				for (int j=0; j<tcount; j++) {
+					labelline << "\t!";
+				}
 			}
 		}
-		m_humdrum_text << endl;
 	}
 
-	m_humdrum_text << dataline.str() << endl;
+	stringstream dissonanceline;
+	if (foundDissonanceQ) {
+		for (int i=0; i<fcount; i++) {
+			HTp token = infile.token(index, i);
+			int track = token->getTrack();
+			int vindex = m_trackToVoiceIndex.at(track);
+			if (i != 0) {
+				dissonanceline << "\t";
+			}
+			string dissonance = dissonances.at(i);
+			if (dissonance.empty()) {
+				dissonanceline << "!";
+			} else {
+				dissonanceline << "!LO:TX:a:diss";
+				dissonanceline << ":color=" << m_suspensionColor;
+				dissonanceline << ":t=" << dissonance;
+				if (m_popupQ) {
+				 	string dname = getDissonanceNames(dissonance);
+				 	if (!dname.empty()) {
+				 		dissonanceline << ":pop=" << dname;
+				 	}
+				}
+			}
+			if ((kcount > 0) && (vindex >= 0))  {
+				int tcount = kcount - vindex - 1;
+				for (int j=0; j<tcount; j++) {
+					dissonanceline << "\t!";
+				}
+			}
+		}
+	}
+
+	if (!dissonanceline.str().empty()) {
+		m_humdrum_text << dissonanceline.str() << endl;
+	}
+	if (!labelline.str().empty()) {
+		m_humdrum_text << labelline.str() << endl;
+	}
+	if (!dataline.str().empty()) {
+		m_humdrum_text << dataline.str() << endl;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cadence::getDissonanceNames --
+//
+
+string Tool_autocadence::getDissonanceNames(const string& input) {
+	HumRegex hre;
+	string output;
+	vector<string> pieces;
+	hre.split(pieces, input, "[^A-Za-z]");
+	map<string, bool> found;
+	int counter = 0;
+	for (int i=0; i<(int)pieces.size(); i++) {
+		if (pieces[i].empty()) {
+			continue;
+		}
+		if (found[pieces[i]] == true) {
+			continue;
+		}
+		found[pieces[i]] = true;
+		string name = m_dissonanceNames[pieces[i]];
+		if (name.empty()) {
+			name = pieces[i];
+		}
+		if (counter > 0) {
+			output += ", ";
+		}
+		output += name;
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_autocadence::getFunctionNames -- convert CVF name list into a popup title string.
+//     The names can be postfixed with the cadence formula index number.
+//        Example: C73,C29
+//     In this case the output will be "Cantizans".  
+//        Example: C73,T29
+//     In this case the output will be "Cantizans, Tenorzans".
+//
+
+string Tool_autocadence::getFunctionNames(const string& input) {
+	HumRegex hre;
+	string output;
+	vector<string> pieces;
+	hre.split(pieces, input, "[^A-Za-z]");
+	map<string, bool> found;
+	int counter = 0;
+	for (int i=0; i<(int)pieces.size(); i++) {
+		if (pieces[i].empty()) {
+			continue;
+		}
+		if (found[pieces[i]] == true) {
+			continue;
+		}
+		found[pieces[i]] = true;
+		string name = m_functionNames[pieces[i]];
+		if (name.empty()) {
+			name = pieces[i];
+		}
+		if (counter > 0) {
+			output += ", ";
+		}
+		output += name;
+	}
+	return output;
 }
 
 
@@ -58983,12 +59246,25 @@ string Tool_autocadence::generateCounterpointString(vector<vector<HTp>>& pairing
 		dissonant4 = "D";
 	}
 
+	string dissonanceU;
+	string dissonanceL;
+	if (m_suspensionsQ) {
+		dissonanceL = lower->getValue("auto", "dissonance");
+		dissonanceU = upper->getValue("auto", "dissonance");
+cerr << "DISSONANCES: " << dissonanceL << "\t" << dissonanceU << endl;
+	}
+
 	string mintL = "R";
 	string mintU = "R";
+
 	string hint  = getDiatonicIntervalString(b7L, b7U);
 	if (index < (int)pairings[0].size() - 1){
 		mintL = getDiatonicIntervalString(b7L, b7Ln);
 		mintU = getDiatonicIntervalString(b7U, b7Un);
+	}
+
+	if ((mintL == "R") || (mintU == "R")) {
+		dissonant4 = "";
 	}
 
 	string output = hint;
@@ -59074,147 +59350,147 @@ void Tool_autocadence::fillNotes(vector<HTp>& voice, HTp exinterp) {
 
 //////////////////////////////
 //
-// Tool_autocadence::fillCadenceDefinitions --
+// Tool_autocadence::prepareCadenceDefinitions --
 //
 
-void Tool_autocadence::fillCadenceDefinitions(void) {
+void Tool_autocadence::prepareCadenceDefinitions(void) {
 	m_definitions.clear();
 	m_definitions.reserve(200);
 
-	// LowserCVF, UpperCVF, Name, Regex
-	addCadenceDefinition("", "",		"__1",	R"(^(?:-?\d+|R)_1:-?\d+, 7_1:-2, 6_R:-2, R_)");
-	addCadenceDefinition("", "",		"__2",	R"(^[^R]_1, 2_1:-2, (?:1|8)_-3:2, 4D?_)");
-	addCadenceDefinition("", "",		"__3",	R"(^[^R]_1:, 4D_1:-2, 3_1:-2, 2_1:2, 3_-3:2, 6_)");
-	addCadenceDefinition("", "",		"__4",	R"(^[^R]_1:-?\d+, 7_1:-2, 6_-2:2, 8_)");
-	addCadenceDefinition("A", "T",	"AT1",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_-2:1, -2_2:1, -3_2:-2, -5_)");
-	addCadenceDefinition("A", "T",	"AT2",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_-2:1, -2_3:-2, -5_)");
-	addCadenceDefinition("A", "T",	"AT3",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_1:1, -3_-2:1, -2_3:-2, -5_)");
-	addCadenceDefinition("A", "T",	"AT4",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_2:-2, -5_)");
-	addCadenceDefinition("B", "C",	"BC1",	R"("^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_1:2, 3_4:2, (?:1|8)_)");
-	addCadenceDefinition("B", "C",	"BC2",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]), 4D_1:-2, 3_1:-2, 2_1:2, 3_1:1, 3_-5:2, 8_)");
-	addCadenceDefinition("B", "C",	"BC3",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_-5:2, 8_)");
-	addCadenceDefinition("B", "C",	"BC4",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_-5:3, 8_)");
-	addCadenceDefinition("B", "C",	"BC5",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_1:2, 3_-5:2, 8_)");
-	addCadenceDefinition("B", "C",	"BC6",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_-5:2, 8_)");
-	addCadenceDefinition("B", "C",	"BC7",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_1:-2, 2_-5:3, 8_)");
-	addCadenceDefinition("B", "C",	"BC8",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_1:-2, 2_1:2, 3_-5:2, 8_)");
-	addCadenceDefinition("B", "C",	"BC9",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_4:2, (?:8|1)_)");
-	addCadenceDefinition("B", "C",	"BC10",	R"(^3_1:2, 4D_1:-2, 3_(?:4|-5):2, (?:1|8)_)");
-	addCadenceDefinition("B", "C",	"BC11",	R"(^5_1:-2, 4D_1:-2, 3_(?:4|-5):2, (?:1|8)_)");
-	addCadenceDefinition("B", "c",	"Bc1",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_(?:4|-5):(?:4|-5), 3_)");
-	addCadenceDefinition("C", "B",	"CB1",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_-2:1, -2_2:1, -3_2:(?:-5|4), -8_)");
-	addCadenceDefinition("C", "B",	"CB2",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_-2:1, -2_2:1, -3_2:4, (?:1|-8)_)");
-	addCadenceDefinition("C", "B",	"CB3",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_-2:1, -2_3:-5, -8_)");
-	addCadenceDefinition("C", "B",	"CB4",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_-2:1, -2_3:4, (?:1|-8)_)");
-	addCadenceDefinition("C", "B",	"CB5",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_1:1, -3_-2:1, -2_3:-5, -8_)");
-	addCadenceDefinition("C", "B",	"CB6",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_1:1, -3_-2:1, -2_3:4, (?:1|-8)_)");
-	addCadenceDefinition("C", "B",	"CB7",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_2:-5, -8_)");
-	addCadenceDefinition("C", "B",	"CB8",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_2:4, -8_)");
-	addCadenceDefinition("C", "B",	"CB9",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_2:4, 1_)");
-	addCadenceDefinition("C", "Q",	"CQ1",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_2:(?:-5|4), 5_)");
-	addCadenceDefinition("C", "T",	"CT1",	R"(^(?:-?\d+|R)_1:-?\d+, -7_-2:1, -6_-2:1, -5_2:1, -6_2:-2, -8_)");
-	addCadenceDefinition("C", "T",	"CT2",	R"(^(?:-?\d+|R)_1:-?\d+, -7_-2:1, -6_-2:1, -5_3:-2, -8_)");
-	addCadenceDefinition("C", "T",	"CT3",	R"(^(?:-?\d+|R)_1:-?\d+, -7_-2:1, -6_1:1, -6_-2:1, -5_3:-2, -8_)");
-	addCadenceDefinition("C", "T",	"CT4",	R"(^(?:-?\d+|R)_1:-?\d+, -7_-2:1, -6_2:-2, -8_)");
-	addCadenceDefinition("C", "T",	"CT5",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_-2:1, 4D?_2:1, 3_2:-2, (?:1|8)_)");
-	addCadenceDefinition("C", "T",	"CT6",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_-2:1, 4D?_3:-2, (?:1|8)_)");
-	addCadenceDefinition("C", "T",	"CT7",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_1:1, 3_-2:1, 4D?_2:1, 3_2:-2, (?:1|8)_)");
-	addCadenceDefinition("C", "T",	"CT8",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_1:1, 3_-2:1, 4D?_3:-2, (?:1|8)_)");
-	addCadenceDefinition("C", "T",	"CT9",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_1:1, 3_2:-2, (?:1|8)_)");
-	addCadenceDefinition("C", "T",	"CT10",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_2:-2, (?:1|8)_)");
-	addCadenceDefinition("C", "T",	"CT11",	R"(^3_2:1, 2_-2:1, 3_2:-2, (?:1|8)_)");
-	addCadenceDefinition("C", "T",	"CT11",	R"(^8_-2:1, 2_-2:1, 3_2:-2, (?:1|8)_)");
-	addCadenceDefinition("C", "t",	"ct1",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_-2:1, 4D?_2:1, 3_1:1, 3_2:2, 3_)");
-	addCadenceDefinition("C", "t",	"ct2",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_1:1, 3_-2:1, 4D?_2:1, 3_2:2, 3_)");
-	addCadenceDefinition("C", "t",	"ct3",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_2:2, 3_)");
-	addCadenceDefinition("C", "t",	"ct4",	R"(^3_2:1, 2_-2:1, 3_2:2, 3_)");
-	addCadenceDefinition("C", "u",	"Cu1",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_-2:1, -2_2:1, -3_2:-3, -6_)");
-	addCadenceDefinition("C", "u",	"Cu2",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_-2:1, -2_3:-3, -6_)");
-	addCadenceDefinition("C", "u",	"Cu3",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_1:1, -3_-2:1, -2_3:-3, -6_)");
-	addCadenceDefinition("C", "u",	"Cu4",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_2:-3, -6_)");
-	addCadenceDefinition("C", "z",	"Cz1",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_2:R, R_)");
-	addCadenceDefinition("L", "C",	"LC1",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_1:2, 3_8:2, (?:4|-5)_)");
-	addCadenceDefinition("L", "C",	"LC2",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_8:3, (?:4|-5)_)");
-	addCadenceDefinition("L", "C",	"LC3",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_1:-2, 2_1:2, 3_8:2, (?:4|-5)_)");
-	addCadenceDefinition("L", "C",	"LC4",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_1:-2, 2_8:3, (?:4|-5)_)");
-	addCadenceDefinition("L", "C",	"LC5",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_8:2, (?:4|-5)_)");
-	addCadenceDefinition("L", "C",	"LC6",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_8:2, (?:4|-5)_)");
-	addCadenceDefinition("P", "C",	"PC1",	R"(^(?:R_1|-?\d+_-?[^1]):1, 2_1:-2, 1_-4:2, 5_)");
-	addCadenceDefinition("P", "C",	"PC2",	R"(^(?:R_1|-?\d+_-?[^1]):1, 2_1:-2, 8_(?:5|-4):2, 5_)");
-	addCadenceDefinition("P", "C",	"PC3",	R"(^(?:R_1|-?\d+_-?[^1]):1, 2_1:-2, 8_1:1, 8_(?:5|-4):2, 5_)");
-	addCadenceDefinition("Q", "C",	"QC1",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_-5:2, 4D?_)");
-	addCadenceDefinition("Q", "C",	"QC2",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_4:2, -5_)");
-	addCadenceDefinition("Q", "C",	"QC3",	R"(^(?:R_1|-?\d+_-?[^1]):1, 7_1:-2, 6_(?:-5|4):2, 4D?_)");
-	addCadenceDefinition("Q", "C",	"QC4",	R"(^(?:R_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:1, 6_(?:-5|4):2, 4D?_)");
-	addCadenceDefinition("S", "C",	"SC1",	R"(^(?:R_1|-?\d+_-?[^1]):1, 2_1:-2, (?:1|8)_-3:2, 4D?_)");
-	addCadenceDefinition("S", "C",	"SC2",	R"(^(?:R_1|-?\d+_-?[^1]):1, 2_1:-2, (?:1|8)_1:1, (?:1|8)_-3:2, 4D?_)");
-	addCadenceDefinition("T", "A",	"TA1",	R"(^(?:R_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_-2:2, 5_)");
-	addCadenceDefinition("T", "A",	"TA2",	R"(^(?:R_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_-2:2, 5_)");
-	addCadenceDefinition("T", "A",	"TA3",	R"(^(?:R_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_-2:2, 5_)");
-	addCadenceDefinition("T", "A",	"TA4",	R"(^(?:R_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_-2:3, 5_)");
-	addCadenceDefinition("T", "A",	"TA5",	R"(^(?:R_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_1:2, 3_-2:2, 5_)");
-	addCadenceDefinition("T", "A",	"TA6",	R"(^(?:R_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_1:2, 3_1:1, 3_-2:2, 5_)");
-	addCadenceDefinition("T", "A",	"TA7",	R"(^(?:R_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_1:-2, 2_-2:3, 5_)");
-	addCadenceDefinition("T", "C",	"TC1",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_-2:2, 8_)");
-	addCadenceDefinition("T", "C",	"TC2",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:-2, 5_-2:3, 8_)");
-	addCadenceDefinition("T", "C",	"TC3",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:-2, 5_1:2, 6_-2:2, 8_)");
-	addCadenceDefinition("T", "C",	"TC4",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:-2, 5_1:2, 6_1:1, 6_-2:2, 8_)");
-	addCadenceDefinition("T", "C",	"TC5",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:1, 6_-2:2, 8_)");
-	addCadenceDefinition("T", "C",	"TC6",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:1, 6_1:-2, 5_-2:3, 8_)");
-	addCadenceDefinition("T", "C",	"TC7",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:1, 6_1:-2, 5_1:2, 6_-2:2, 8_)");
-	addCadenceDefinition("T", "C",	"TC8",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:2, 7_1:-2, 6_1:-2, 5_-2:3, 8_)");
-	addCadenceDefinition("T", "C",	"TC9",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:2, 7_1:2, 8_1:-3, 6_-2:2, 8_)");
-	addCadenceDefinition("T", "C",	"TC10",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:2, 7_1:2, 8_1:-3, 6_1:-2, 5_-2:3, 8_)");
-	addCadenceDefinition("T", "C",	"TC11",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:3, 8_1:-3, 6_-2:2, 8_)");
-	addCadenceDefinition("T", "C",	"TC12",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-3, 5_1:2, 6_-2:2, 8_)");
-	addCadenceDefinition("T", "C",	"TC13",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:2, 8_1:-3, 6_-2:2, 8_)");
-	addCadenceDefinition("T", "C",	"TC14",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:2, 8_1:-3, 6_1:-2, 5_-2:3, 8_)");
-	addCadenceDefinition("T", "C",	"TC15",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:2, 8_1:-3, 6_1:1, 6_-2:2, 8_)");
-	addCadenceDefinition("T", "C",	"TC16",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_-2:2, (?:1|-8)_)");
-	addCadenceDefinition("T", "C",	"TC17",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_1:-2, -4D?_-2:3, (?:1|-8)_)");
-	addCadenceDefinition("T", "C",	"TC18",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_1:-2, -4D?_1:2, -3_-2:2, (?:1|-8)_)");
-	addCadenceDefinition("T", "C",	"TC19",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_1:1, -3_1:-2, -4D?_-2:3, (?:1|-8)_)");
-	addCadenceDefinition("T", "C",	"TC20",	R"(^6_1:2, 7_1:-2, 6_-2:2, 8_)");
-	addCadenceDefinition("T", "C",	"TC21",	R"(^8_1:-2, 7_1:-2, 6_-2:2, 8_)");
-	addCadenceDefinition("T", "a",	"Ta1",	R"(^(?:-?\d+_-?[^1]):1, 4D_1:-2, 3_-2:-2, 3_)");
-	addCadenceDefinition("T", "c",	"Tc1",	R"(^(?:R_1|-?\d+_-?[^1]):1, 7_1:-2, 6_-2:4, 3_)");
-	addCadenceDefinition("T", "y",	"Ty1",	R"(^(?:R_1|-?\d+_-?[^1]):1, 7_1:-2, 6_-2:R, R_)");
-	addCadenceDefinition("b", "C",	"bC1",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_1:2, 3_2:2, 3_)");
-	addCadenceDefinition("b", "C",	"bC2",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_2:2, 3_)");
-	addCadenceDefinition("b", "C",	"bC3",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_1:-2, 2_2:2, 3_)");
-	addCadenceDefinition("b", "C",	"bC4",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_2:2, 3_)");
-	addCadenceDefinition("b", "C",	"bC5",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:2, 4D_1:2, 5_1:-3, 3_2:2, 3_)");
-	addCadenceDefinition("b", "C",	"bC6",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_2:2, 3_)");
-	addCadenceDefinition("c", "B",	"cB1",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_(?:4|-5):4, -3_)");
-	addCadenceDefinition("c", "B",	"cB2",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_-2:(?:4|-5), (?:-6|3)_)");
-	addCadenceDefinition("c", "T",	"cT1",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_-2:-2, 3_)");
-	addCadenceDefinition("c", "T",	"cT2",	R"(^[^R]_1, 7_1:-2, 6_-2:4, 3_)");
-	addCadenceDefinition("p", "C",	"pC1",	R"(^(?:R_1|-?\d+_-?[^1]):1, 7_1:-2, 6_(?:5|-4):2, 3_)");
-	addCadenceDefinition("s", "",		"s_1",	R"(^(?:R_1|-?\d+_-?[^1]):1, 2_1:-2, 8_-2:2, 3_)");
-	addCadenceDefinition("t", "C",	"tC1",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_1:-2, -4D?_1:2, -3_2:2, -3_)");
-	addCadenceDefinition("t", "C",	"tC2",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_2:2, -3_)");
-	addCadenceDefinition("t", "C",	"tC3",	R"(^(?:R_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:1, 6_1:-2, 5_1:2, 6_2:2, 6_)");
-	addCadenceDefinition("t", "C",	"tC4",	R"(^(?:R_1|-?\d+_-?[^1]):1, 7_1:-2, 6_2:2, 6_)");
-	addCadenceDefinition("u", "C",	"uC1",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_-2:1, 4D_-2:2, 6_)");
-	addCadenceDefinition("u", "C",	"uC2",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_-3:2, 6_)");
-	addCadenceDefinition("u", "C",	"uC3",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_-3:3, 6_)");
-	addCadenceDefinition("u", "C",	"uC4",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_1:2, 3_-3:2, 6_)");
-	addCadenceDefinition("u", "C",	"uC5",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_-3:2, 6_)");
-	addCadenceDefinition("u", "C",	"uC6",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_1:-2, 2_-3:3, 6_)");
-	addCadenceDefinition("u", "C",	"uC7",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_1:-2, 2_1:2, 3_-3:2, 6_)");
-	addCadenceDefinition("x", "C",	"xC1",	R"(^(?:-?\d+_-?[^1]):1, 4D_1:-2, 3_R:2, R_)");
-	addCadenceDefinition("x", "C",	"xC2",	R"(^3_1:2, 4D_1:-2, 3_R:2, R_)");
-	addCadenceDefinition("x", "C",	"xC3",	R"(^5_1:-2, 4D_1:-2, 3_R:2, R_)");
-	addCadenceDefinition("x", "c",	"xc1",	R"(^(?:R_1|4_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_R:-2, R_)");
-	addCadenceDefinition("y", "z",	"yz1",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_R:R, R_)");
-	addCadenceDefinition("z", "C",	"zC2",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:1, 6_R:2, R_)");
-	addCadenceDefinition("z", "C",	"zC3",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_1:1, -3_R:2, R_)");
-	addCadenceDefinition("z", "C",	"zC4",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_R:2, R_)");
-	addCadenceDefinition("z", "C",	"zC5",	R"(^(?:R_1|-?\d+_-?[^1]):1, 7_1:-2, 6_R:2, R_)");
-	addCadenceDefinition("z", "c",	"zc1",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_R:-2, R_)");
-	addCadenceDefinition("z", "c",	"zc2",	R"(^(?:R_1|-?\d+_-?[^1]):1, 7_1:-2, 6_R:-2, R_)");
-	addCadenceDefinition("z", "y",	"zy1",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_1:1, -3_R:R, R_)");
-	addCadenceDefinition("z", "y",	"zy2",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_R:R, R_)");
+	// /* Index */                 LowserCVF, UpperCVF, Name, Regex
+	/*   0 */ addCadenceDefinition("", "",		"__1",	R"(^(?:-?\d+|R)_1:-?\d+, 7_1:-2, 6_R:-2, R_)");
+	/*   1 */ addCadenceDefinition("", "",		"__2",	R"(^[^R]_1, 2_1:-2, (?:1|8)_-3:2, 4D?_)");
+	/*   2 */ addCadenceDefinition("", "",		"__3",	R"(^[^R]_1:, 4D_1:-2, 3_1:-2, 2_1:2, 3_-3:2, 6_)");
+	/*   3 */ addCadenceDefinition("", "",		"__4",	R"(^[^R]_1:-?\d+, 7_1:-2, 6_-2:2, 8_)");
+	/*   4 */ addCadenceDefinition("A", "T",	"AT1",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_-2:1, -2_2:1, -3_2:-2, -5_)");
+	/*   5 */ addCadenceDefinition("A", "T",	"AT2",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_-2:1, -2_3:-2, -5_)");
+	/*   6 */ addCadenceDefinition("A", "T",	"AT3",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_1:1, -3_-2:1, -2_3:-2, -5_)");
+	/*   7 */ addCadenceDefinition("A", "T",	"AT4",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_2:-2, -5_)");
+	/*   8 */ addCadenceDefinition("B", "C",	"BC1",	R"("^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_1:2, 3_4:2, (?:1|8)_)");
+	/*   9 */ addCadenceDefinition("B", "C",	"BC2",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]), 4D_1:-2, 3_1:-2, 2_1:2, 3_1:1, 3_-5:2, 8_)");
+	/*  10 */ addCadenceDefinition("B", "C",	"BC3",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_-5:2, 8_)");
+	/*  11 */ addCadenceDefinition("B", "C",	"BC4",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_-5:3, 8_)");
+	/*  12 */ addCadenceDefinition("B", "C",	"BC5",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_1:2, 3_-5:2, 8_)");
+	/*  13 */ addCadenceDefinition("B", "C",	"BC6",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_-5:2, 8_)");
+	/*  14 */ addCadenceDefinition("B", "C",	"BC7",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_1:-2, 2_-5:3, 8_)");
+	/*  15 */ addCadenceDefinition("B", "C",	"BC8",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_1:-2, 2_1:2, 3_-5:2, 8_)");
+	/*  16 */ addCadenceDefinition("B", "C",	"BC9",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_4:2, (?:8|1)_)");
+	/*  17 */ addCadenceDefinition("B", "C",	"BC10",	R"(^3_1:2, 4D_1:-2, 3_(?:4|-5):2, (?:1|8)_)");
+	/*  18 */ addCadenceDefinition("B", "C",	"BC11",	R"(^5_1:-2, 4D_1:-2, 3_(?:4|-5):2, (?:1|8)_)");
+	/*  19 */ addCadenceDefinition("B", "c",	"Bc1",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_(?:4|-5):(?:4|-5), 3_)");
+	/*  20 */ addCadenceDefinition("C", "B",	"CB1",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_-2:1, -2_2:1, -3_2:(?:-5|4), -8_)");
+	/*  21 */ addCadenceDefinition("C", "B",	"CB2",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_-2:1, -2_2:1, -3_2:4, (?:1|-8)_)");
+	/*  22 */ addCadenceDefinition("C", "B",	"CB3",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_-2:1, -2_3:-5, -8_)");
+	/*  23 */ addCadenceDefinition("C", "B",	"CB4",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_-2:1, -2_3:4, (?:1|-8)_)");
+	/*  24 */ addCadenceDefinition("C", "B",	"CB5",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_1:1, -3_-2:1, -2_3:-5, -8_)");
+	/*  25 */ addCadenceDefinition("C", "B",	"CB6",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_1:1, -3_-2:1, -2_3:4, (?:1|-8)_)");
+	/*  26 */ addCadenceDefinition("C", "B",	"CB7",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_2:-5, -8_)");
+	/*  27 */ addCadenceDefinition("C", "B",	"CB8",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_2:4, -8_)");
+	/*  28 */ addCadenceDefinition("C", "B",	"CB9",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_2:4, 1_)");
+	/*  29 */ addCadenceDefinition("C", "Q",	"CQ1",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_2:(?:-5|4), 5_)");
+	/*  30 */ addCadenceDefinition("C", "T",	"CT1",	R"(^(?:-?\d+|R)_1:-?\d+, -7_-2:1, -6_-2:1, -5_2:1, -6_2:-2, -8_)");
+	/*  31 */ addCadenceDefinition("C", "T",	"CT2",	R"(^(?:-?\d+|R)_1:-?\d+, -7_-2:1, -6_-2:1, -5_3:-2, -8_)");
+	/*  32 */ addCadenceDefinition("C", "T",	"CT3",	R"(^(?:-?\d+|R)_1:-?\d+, -7_-2:1, -6_1:1, -6_-2:1, -5_3:-2, -8_)");
+	/*  33 */ addCadenceDefinition("C", "T",	"CT4",	R"(^(?:-?\d+|R)_1:-?\d+, -7_-2:1, -6_2:-2, -8_)");
+	/*  34 */ addCadenceDefinition("C", "T",	"CT5",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_-2:1, 4D?_2:1, 3_2:-2, (?:1|8)_)");
+	/*  35 */ addCadenceDefinition("C", "T",	"CT6",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_-2:1, 4D?_3:-2, (?:1|8)_)");
+	/*  36 */ addCadenceDefinition("C", "T",	"CT7",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_1:1, 3_-2:1, 4D?_2:1, 3_2:-2, (?:1|8)_)");
+	/*  37 */ addCadenceDefinition("C", "T",	"CT8",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_1:1, 3_-2:1, 4D?_3:-2, (?:1|8)_)");
+	/*  38 */ addCadenceDefinition("C", "T",	"CT9",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_1:1, 3_2:-2, (?:1|8)_)");
+	/*  39 */ addCadenceDefinition("C", "T",	"CT10",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_2:-2, (?:1|8)_)");
+	/*  40 */ addCadenceDefinition("C", "T",	"CT11",	R"(^3_2:1, 2_-2:1, 3_2:-2, (?:1|8)_)");
+	/*  41 */ addCadenceDefinition("C", "T",	"CT11",	R"(^8_-2:1, 2_-2:1, 3_2:-2, (?:1|8)_)");
+	/*  42 */ addCadenceDefinition("C", "t",	"ct1",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_-2:1, 4D?_2:1, 3_1:1, 3_2:2, 3_)");
+	/*  43 */ addCadenceDefinition("C", "t",	"ct2",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_1:1, 3_-2:1, 4D?_2:1, 3_2:2, 3_)");
+	/*  44 */ addCadenceDefinition("C", "t",	"ct3",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_2:2, 3_)");
+	/*  45 */ addCadenceDefinition("C", "t",	"ct4",	R"(^3_2:1, 2_-2:1, 3_2:2, 3_)");
+	/*  46 */ addCadenceDefinition("C", "u",	"Cu1",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_-2:1, -2_2:1, -3_2:-3, -6_)");
+	/*  47 */ addCadenceDefinition("C", "u",	"Cu2",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_-2:1, -2_3:-3, -6_)");
+	/*  48 */ addCadenceDefinition("C", "u",	"Cu3",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_1:1, -3_-2:1, -2_3:-3, -6_)");
+	/*  49 */ addCadenceDefinition("C", "u",	"Cu4",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_2:-3, -6_)");
+	/*  50 */ addCadenceDefinition("C", "z",	"Cz1",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_2:R, R_)");
+	/*  51 */ addCadenceDefinition("L", "C",	"LC1",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_1:2, 3_8:2, (?:4|-5)_)");
+	/*  52 */ addCadenceDefinition("L", "C",	"LC2",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_8:3, (?:4|-5)_)");
+	/*  53 */ addCadenceDefinition("L", "C",	"LC3",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_1:-2, 2_1:2, 3_8:2, (?:4|-5)_)");
+	/*  54 */ addCadenceDefinition("L", "C",	"LC4",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_1:-2, 2_8:3, (?:4|-5)_)");
+	/*  55 */ addCadenceDefinition("L", "C",	"LC5",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_8:2, (?:4|-5)_)");
+	/*  56 */ addCadenceDefinition("L", "C",	"LC6",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_8:2, (?:4|-5)_)");
+	/*  57 */ addCadenceDefinition("P", "C",	"PC1",	R"(^(?:R_1|-?\d+_-?[^1]):1, 2_1:-2, 1_-4:2, 5_)");
+	/*  58 */ addCadenceDefinition("P", "C",	"PC2",	R"(^(?:R_1|-?\d+_-?[^1]):1, 2_1:-2, 8_(?:5|-4):2, 5_)");
+	/*  59 */ addCadenceDefinition("P", "C",	"PC3",	R"(^(?:R_1|-?\d+_-?[^1]):1, 2_1:-2, 8_1:1, 8_(?:5|-4):2, 5_)");
+	/*  60 */ addCadenceDefinition("Q", "C",	"QC1",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_-5:2, 4D?_)");
+	/*  61 */ addCadenceDefinition("Q", "C",	"QC2",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_4:2, -5_)");
+	/*  62 */ addCadenceDefinition("Q", "C",	"QC3",	R"(^(?:R_1|-?\d+_-?[^1]):1, 7_1:-2, 6_(?:-5|4):2, 4D?_)");
+	/*  63 */ addCadenceDefinition("Q", "C",	"QC4",	R"(^(?:R_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:1, 6_(?:-5|4):2, 4D?_)");
+	/*  64 */ addCadenceDefinition("S", "C",	"SC1",	R"(^(?:R_1|-?\d+_-?[^1]):1, 2_1:-2, (?:1|8)_-3:2, 4D?_)");
+	/*  65 */ addCadenceDefinition("S", "C",	"SC2",	R"(^(?:R_1|-?\d+_-?[^1]):1, 2_1:-2, (?:1|8)_1:1, (?:1|8)_-3:2, 4D?_)");
+	/*  66 */ addCadenceDefinition("T", "A",	"TA1",	R"(^(?:R_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_-2:2, 5_)");
+	/*  67 */ addCadenceDefinition("T", "A",	"TA2",	R"(^(?:R_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_-2:2, 5_)");
+	/*  68 */ addCadenceDefinition("T", "A",	"TA3",	R"(^(?:R_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_-2:2, 5_)");
+	/*  69 */ addCadenceDefinition("T", "A",	"TA4",	R"(^(?:R_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_-2:3, 5_)");
+	/*  70 */ addCadenceDefinition("T", "A",	"TA5",	R"(^(?:R_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_1:2, 3_-2:2, 5_)");
+	/*  71 */ addCadenceDefinition("T", "A",	"TA6",	R"(^(?:R_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_1:2, 3_1:1, 3_-2:2, 5_)");
+	/*  72 */ addCadenceDefinition("T", "A",	"TA7",	R"(^(?:R_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_1:-2, 2_-2:3, 5_)");
+	/*  73 */ addCadenceDefinition("T", "C",	"TC1",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_-2:2, 8_)");
+	/*  74 */ addCadenceDefinition("T", "C",	"TC2",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:-2, 5_-2:3, 8_)");
+	/*  75 */ addCadenceDefinition("T", "C",	"TC3",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:-2, 5_1:2, 6_-2:2, 8_)");
+	/*  76 */ addCadenceDefinition("T", "C",	"TC4",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:-2, 5_1:2, 6_1:1, 6_-2:2, 8_)");
+	/*  77 */ addCadenceDefinition("T", "C",	"TC5",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:1, 6_-2:2, 8_)");
+	/*  78 */ addCadenceDefinition("T", "C",	"TC6",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:1, 6_1:-2, 5_-2:3, 8_)");
+	/*  79 */ addCadenceDefinition("T", "C",	"TC7",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:1, 6_1:-2, 5_1:2, 6_-2:2, 8_)");
+	/*  80 */ addCadenceDefinition("T", "C",	"TC8",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:2, 7_1:-2, 6_1:-2, 5_-2:3, 8_)");
+	/*  81 */ addCadenceDefinition("T", "C",	"TC9",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:2, 7_1:2, 8_1:-3, 6_-2:2, 8_)");
+	/*  82 */ addCadenceDefinition("T", "C",	"TC10",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:2, 7_1:2, 8_1:-3, 6_1:-2, 5_-2:3, 8_)");
+	/*  83 */ addCadenceDefinition("T", "C",	"TC11",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:3, 8_1:-3, 6_-2:2, 8_)");
+	/*  84 */ addCadenceDefinition("T", "C",	"TC12",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-3, 5_1:2, 6_-2:2, 8_)");
+	/*  85 */ addCadenceDefinition("T", "C",	"TC13",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:2, 8_1:-3, 6_-2:2, 8_)");
+	/*  86 */ addCadenceDefinition("T", "C",	"TC14",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:2, 8_1:-3, 6_1:-2, 5_-2:3, 8_)");
+	/*  87 */ addCadenceDefinition("T", "C",	"TC15",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:2, 8_1:-3, 6_1:1, 6_-2:2, 8_)");
+	/*  88 */ addCadenceDefinition("T", "C",	"TC16",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_-2:2, (?:1|-8)_)");
+	/*  89 */ addCadenceDefinition("T", "C",	"TC17",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_1:-2, -4D?_-2:3, (?:1|-8)_)");
+	/*  90 */ addCadenceDefinition("T", "C",	"TC18",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_1:-2, -4D?_1:2, -3_-2:2, (?:1|-8)_)");
+	/*  91 */ addCadenceDefinition("T", "C",	"TC19",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_1:1, -3_1:-2, -4D?_-2:3, (?:1|-8)_)");
+	/*  92 */ addCadenceDefinition("T", "C",	"TC20",	R"(^6_1:2, 7_1:-2, 6_-2:2, 8_)");
+	/*  93 */ addCadenceDefinition("T", "C",	"TC21",	R"(^8_1:-2, 7_1:-2, 6_-2:2, 8_)");
+	/*  94 */ addCadenceDefinition("T", "a",	"Ta1",	R"(^(?:-?\d+_-?[^1]):1, 4D_1:-2, 3_-2:-2, 3_)");
+	/*  95 */ addCadenceDefinition("T", "c",	"Tc1",	R"(^(?:R_1|-?\d+_-?[^1]):1, 7_1:-2, 6_-2:4, 3_)");
+	/*  96 */ addCadenceDefinition("T", "y",	"Ty1",	R"(^(?:R_1|-?\d+_-?[^1]):1, 7_1:-2, 6_-2:R, R_)");
+	/*  97 */ addCadenceDefinition("b", "C",	"bC1",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_1:2, 3_2:2, 3_)");
+	/*  98 */ addCadenceDefinition("b", "C",	"bC2",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_2:2, 3_)");
+	/*  99 */ addCadenceDefinition("b", "C",	"bC3",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_1:-2, 2_2:2, 3_)");
+	/* 100 */ addCadenceDefinition("b", "C",	"bC4",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_2:2, 3_)");
+	/* 101 */ addCadenceDefinition("b", "C",	"bC5",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:2, 4D_1:2, 5_1:-3, 3_2:2, 3_)");
+	/* 102 */ addCadenceDefinition("b", "C",	"bC6",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_2:2, 3_)");
+	/* 103 */ addCadenceDefinition("c", "B",	"cB1",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_(?:4|-5):4, -3_)");
+	/* 104 */ addCadenceDefinition("c", "B",	"cB2",	R"(^(?:-?\d+|R)_1:-?\d+, -4D_-2:1, -3_-2:(?:4|-5), (?:-6|3)_)");
+	/* 105 */ addCadenceDefinition("c", "T",	"cT1",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_-2:-2, 3_)");
+	/* 106 */ addCadenceDefinition("c", "T",	"cT2",	R"(^[^R]_1, 7_1:-2, 6_-2:4, 3_)");
+	/* 107 */ addCadenceDefinition("p", "C",	"pC1",	R"(^(?:R_1|-?\d+_-?[^1]):1, 7_1:-2, 6_(?:5|-4):2, 3_)");
+	/* 108 */ addCadenceDefinition("s", "",		"s_1",	R"(^(?:R_1|-?\d+_-?[^1]):1, 2_1:-2, 8_-2:2, 3_)");
+	/* 109 */ addCadenceDefinition("t", "C",	"tC1",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_1:-2, -4D?_1:2, -3_2:2, -3_)");
+	/* 110 */ addCadenceDefinition("t", "C",	"tC2",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_2:2, -3_)");
+	/* 111 */ addCadenceDefinition("t", "C",	"tC3",	R"(^(?:R_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:1, 6_1:-2, 5_1:2, 6_2:2, 6_)");
+	/* 112 */ addCadenceDefinition("t", "C",	"tC4",	R"(^(?:R_1|-?\d+_-?[^1]):1, 7_1:-2, 6_2:2, 6_)");
+	/* 113 */ addCadenceDefinition("u", "C",	"uC1",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_-2:1, 4D_-2:2, 6_)");
+	/* 114 */ addCadenceDefinition("u", "C",	"uC2",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_-3:2, 6_)");
+	/* 115 */ addCadenceDefinition("u", "C",	"uC3",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_-3:3, 6_)");
+	/* 116 */ addCadenceDefinition("u", "C",	"uC4",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:-2, 2_1:2, 3_-3:2, 6_)");
+	/* 117 */ addCadenceDefinition("u", "C",	"uC5",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_-3:2, 6_)");
+	/* 118 */ addCadenceDefinition("u", "C",	"uC6",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_1:-2, 2_-3:3, 6_)");
+	/* 119 */ addCadenceDefinition("u", "C",	"uC7",	R"(^(?:R_1|4D?_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_1:1, 3_1:-2, 2_1:2, 3_-3:2, 6_)");
+	/* 120 */ addCadenceDefinition("x", "C",	"xC1",	R"(^(?:-?\d+_-?[^1]):1, 4D_1:-2, 3_R:2, R_)");
+	/* 121 */ addCadenceDefinition("x", "C",	"xC2",	R"(^3_1:2, 4D_1:-2, 3_R:2, R_)");
+	/* 122 */ addCadenceDefinition("x", "C",	"xC3",	R"(^5_1:-2, 4D_1:-2, 3_R:2, R_)");
+	/* 123 */ addCadenceDefinition("x", "c",	"xc1",	R"(^(?:R_1|4_1|-?\d+_-?[^1]):1, 4D_1:-2, 3_R:-2, R_)");
+	/* 124 */ addCadenceDefinition("y", "z",	"yz1",	R"(^(?:-?\d+|R)_1:-?\d+, 2_-2:1, 3_R:R, R_)");
+	/* 125 */ addCadenceDefinition("z", "C",	"zC2",	R"(^(?:R_1|7_1|-?\d+_-?[^1]):1, 7_1:-2, 6_1:1, 6_R:2, R_)");
+	/* 126 */ addCadenceDefinition("z", "C",	"zC3",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_1:1, -3_R:2, R_)");
+	/* 127 */ addCadenceDefinition("z", "C",	"zC4",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_R:2, R_)");
+	/* 128 */ addCadenceDefinition("z", "C",	"zC5",	R"(^(?:R_1|-?\d+_-?[^1]):1, 7_1:-2, 6_R:2, R_)");
+	/* 129 */ addCadenceDefinition("z", "c",	"zc1",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_R:-2, R_)");
+	/* 130 */ addCadenceDefinition("z", "c",	"zc2",	R"(^(?:R_1|-?\d+_-?[^1]):1, 7_1:-2, 6_R:-2, R_)");
+	/* 131 */ addCadenceDefinition("z", "y",	"zy1",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_1:1, -3_R:R, R_)");
+	/* 132 */ addCadenceDefinition("z", "y",	"zy2",	R"(^(?:R_1|-?\d+_-?[^1]):1, -2_1:-2, -3_R:R, R_)");
 }
 
 
@@ -59250,6 +59526,121 @@ void Tool_autocadence::prepareAbbreviations(HumdrumFile& infile) {
 				break;
 			}
 			current = current->getNextToken();
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_autocadence::prepareDissonanceNames -- Only labeling suspensions for now.
+//
+
+void Tool_autocadence::prepareDissonanceNames(void) {
+	m_dissonanceNames.clear();
+
+	m_dissonanceNames.emplace("s", "binary suspension");
+	m_dissonanceNames.emplace("S", "ternary suspension");
+	m_dissonanceNames.emplace("g", "binary suspension agent");
+	m_dissonanceNames.emplace("G", "ternary suspension agent");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_autocadence::prepareCvfNames -- Counterpoint voice function names and abbreviations.
+//
+
+void Tool_autocadence::prepareCvfNames(void) {
+	m_functionNames.clear();
+
+	// Realized Cadential Voice Functions (uppercase letters):
+	m_functionNames.emplace("C", "Cantizans");
+	m_functionNames.emplace("A", "Altizans");
+	m_functionNames.emplace("T", "Tenorizans");
+	m_functionNames.emplace("B", "Bassizans");
+	m_functionNames.emplace("L", "Leaping Contratenor");
+	m_functionNames.emplace("P", "Plagal Bassizans");
+	m_functionNames.emplace("S", "Sestizans");
+	m_functionNames.emplace("Q", "Quintizans");
+
+	// Evaded Cadential Voice Functions (lowercase letters):
+	m_functionNames.emplace("c", "Evaded Cantizans");
+	m_functionNames.emplace("a", "Evaded Altizans");
+	m_functionNames.emplace("t", "Evaded Tenorizans");
+	m_functionNames.emplace("b", "Evaded Bassizans");
+	m_functionNames.emplace("u", "Evaded Bassizans (down third");
+
+	// Abandoned Cadential Voice Functions (also lowercase letters):
+	m_functionNames.emplace("x", "Abandoned Bassizans");
+	m_functionNames.emplace("y", "Abandoned Cantizans");
+	m_functionNames.emplace("z", "Abandoned Tenorizans");
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_autocadence::prepareDissonances --
+//
+
+void Tool_autocadence::prepareDissonances(HumdrumFile& infile) {
+	HumdrumFile dfile;
+	stringstream ss;
+	ss << infile;
+	dfile.readString(ss.str());
+   hum::Tool_dissonant dissonant;
+	dissonant.run(dfile);
+	// cout << dfile;
+	int dsize = dfile.getLineCount();
+	int isize = infile.getLineCount();
+	if (dsize != isize) {
+		// number of lines in input/output are expected to be the same.
+		cerr << "LINE COUNTS OF FILES FOR DISSONANCE ANALYSIS DO NOT MATCH." << endl;
+		m_suspensionsQ = false;
+		return;
+	}
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isData()) {
+			prepareDissonancesForLine(infile[i], dfile[i]);
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_autocadence::prepareDissonancesForLine -- Transfer dissonance analysis to
+//     input file for a single data line.
+//
+
+void Tool_autocadence::prepareDissonancesForLine(HumdrumLine& iline, HumdrumLine& dline) {
+	vector<HTp> ikern;
+	for (int i=0; i<iline.getFieldCount(); i++) {
+		HTp token = iline.token(i);
+		if (token->isKern()) {
+			ikern.push_back(token);
+		}
+	}
+
+	int kindex = -1;
+	for (int i=0; i<dline.getFieldCount(); i++) {
+		HTp token = dline.token(i);
+		if (token->isKern()) {
+			kindex++;
+			continue;
+		}
+		if (token->isDataType("**cdata-rdiss")) {
+			if (kindex >= 0) {
+				string text = token->getText();
+				if (text != ".") {
+					ikern.at(kindex)->setValue("auto", "dissonance", text);
+				}
+			}
 		}
 	}
 }
@@ -78399,8 +78790,8 @@ Tool_dissonant::Tool_dissonant(void) {
 	define("u|undirected=b",                 "use undirected dissonance labels");
 	define("c|count=b",                      "count dissonances by category");
 	define("i|x|e|exinterp=s:**cdata-rdiss", "specify exinterp for **diss spines");
-	define("color|color-by-rhythm=b",        "color dissonant notes by beat level");
-	define("color2|color-by-interval=b",     "color dissonant notes by dissonant interval");
+	define("color|colorize|color-by-rhythm=b",        "color dissonant notes by beat level");
+	define("color2|colorize2|color-by-interval=b",    "color dissonant notes by dissonant interval");
 }
 
 
