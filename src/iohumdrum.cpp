@@ -9826,7 +9826,7 @@ bool HumdrumInput::convertSystemMeasure(int &line)
     if (!infile.token(startline, 0)->isBarline()) {
         checkline = getNextBarlineIndex(infile, startline);
     }
-    checkForRehearsal(checkline);
+    checkForGlobalRehearsal(checkline);
 
     addFTremSlurs();
 
@@ -18525,9 +18525,9 @@ void HumdrumInput::setFontsize(ELEMENT *element, const std::string &smuflname, c
     //   xx_large => 200
     //   x_large  => 150
     //   large    => 110
-    //   larger   => 110 (not used since same as large)
+    //   larger   => 110 (not used since a relative size relative to current size)
     //   small    => 80
-    //   smaller  => 80 (not used since same as small)
+    //   smaller  => 80 (not used since a relative size relative to current size)
     //   x_small  => 60
     //   xx_small => 50
 
@@ -30251,12 +30251,21 @@ bool HumdrumInput::hasMensuralStaff(hum::HLp line)
 
 //////////////////////////////
 //
-// HumdrumInput::checkForRehearsal -- Only attached to barlines for now.
-//     Also required to be global layout for now, add note attachment
-//     later.
+// HumdrumInput::checkForLocalRehearsal -- Only attached to barlines for now.
 //
 
-void HumdrumInput::checkForRehearsal(int line)
+void checkForLocalRehearsal(hum::HTp)
+{
+
+    cerr << "CHECKING FOR LOCAL REHEARSAL" << endl;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::checkForGlobalRehearsal -- Only attached to barlines for now.
+//
+
+void HumdrumInput::checkForGlobalRehearsal(int line)
 {
     hum::HumdrumFile &infile = m_infiles[0];
     if (!infile[line].isBarline()) {
@@ -30282,20 +30291,27 @@ void HumdrumInput::checkForRehearsal(int line)
         if (!rehQ) {
             continue;
         }
-        std::string tvalue;
-        std::string key;
-        std::string value;
-        for (int j = 0; j < hps->getCount(); ++j) {
+        bool absysQ = false;
+        std::string fontsize = "";
+        std::string tvalue = "";
+        std::string key = "";
+        std::string value = "";
+        int pcount = hps->getCount();
+        for (int j = 0; j < pcount; ++j) {
             key = hps->getParameterName(j);
             value = hps->getParameterValue(j);
             if (key == "t") {
                 tvalue = value;
-                break;
+            }
+            if (key == "absys") {
+                absysQ = true;
             }
         }
+
         if (tvalue.empty()) {
             continue;
         }
+
         Reh *reh = new Reh();
         Rend *rend = new Rend();
         Text *text = new Text();
@@ -30305,11 +30321,42 @@ void HumdrumInput::checkForRehearsal(int line)
         rend->AddChild(text);
         rend->SetRend(TEXTRENDITION_box);
         addChildMeasureOrSection(reh);
-        // Add to top staff for now, but add to top of
-        // each instrumentalgoup probably in the future.
         setStaff(reh, 1);
         // Only attached to barline for now:
         reh->SetTstamp(0.0);
+        // Default size is x-large:
+        if (fontsize.empty()) {
+            fontsize = "large";
+        }
+        setFontsize(rend, "", fontsize);
+        // rend->SetHalign(HORIZONTALALIGNMENT_center);
+
+        if (absysQ) {
+            // place rehersal marks above/below system
+            std::vector<hum::HTp> &staffstarts = m_staffstarts;
+            int staffCount = (int)staffstarts.size();
+
+            Reh *reh = new Reh();
+            Rend *rend = new Rend();
+            Text *text = new Text();
+            std::u32string wtext = UTF8to32(tvalue);
+            text->SetText(wtext);
+            reh->AddChild(rend);
+            rend->AddChild(text);
+            rend->SetRend(TEXTRENDITION_box);
+            addChildMeasureOrSection(reh);
+            setStaff(reh, staffCount);
+            // Only attached to barline for now:
+            reh->SetTstamp(0.0);
+            // Default size is x-large:
+            if (fontsize.empty()) {
+                fontsize = "large";
+            }
+            setFontsize(rend, "", fontsize);
+            // rend->SetHalign(HORIZONTALALIGNMENT_center);
+
+            setPlaceRelStaff(reh, "below", false);
+        }
     }
 }
 
