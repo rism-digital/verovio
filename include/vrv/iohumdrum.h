@@ -903,6 +903,8 @@ protected:
     void processMeiOptions(hum::HumdrumFile &infile);
     std::string getInstrumentNumber(hum::HTp icode);
     void insertTextWithNewlines(Label *label, const std::string &text);
+    bool hasBounceAfter(hum::HTp token);
+    bool hasBounceBefore(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

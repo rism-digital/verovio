@@ -25127,6 +25127,8 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
     hum::HumNum barbuffer(1, 4);
 
     if (*token == "*ped") {
+        bool bounceQ = hasBounceBefore(token);
+
         // turn on pedal
         Pedal *pedal = new Pedal();
         setLocationId(pedal, token);
@@ -25146,24 +25148,77 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
             pedal->SetDir(pedalLog_DIR_bounce);
             pedal->SetForm(PEDALSTYLE_altpedstar);
         }
+        else if (bounceQ) {
+            pedal->SetDir(pedalLog_DIR_bounce);
+        }
         ss[staffindex].pedal = true;
     }
     else if (*token == "*Xped") {
-        Pedal *pedal = new Pedal();
-        setLocationId(pedal, token);
-        addChildMeasureOrSection(pedal);
-        hum::HumNum tstamp = getMeasureTstamp(token, staffindex, hum::HumNum(1, 1));
-        if (durtobar == 0) {
-            tstamp -= barbuffer;
-            appendTypeTag(pedal, "endbar-25");
+        bool bounceQ = hasBounceAfter(token);
+        if (!bounceQ) {
+            Pedal *pedal = new Pedal();
+            setLocationId(pedal, token);
+            addChildMeasureOrSection(pedal);
+            hum::HumNum tstamp = getMeasureTstamp(token, staffindex, hum::HumNum(1, 1));
+            if (durtobar == 0) {
+                tstamp -= barbuffer;
+                appendTypeTag(pedal, "endbar-25");
+            }
+            hum::HTp attachment = getNextNonNullDataOrMeasureToken(token);
+            setAttachmentType(pedal, attachment);
+            pedal->SetDir(pedalLog_DIR_up);
+            assignVerticalGroup(pedal, token);
+            setStaff(pedal, m_currentstaff);
         }
-        hum::HTp attachment = getNextNonNullDataOrMeasureToken(token);
-        setAttachmentType(pedal, attachment);
-        pedal->SetDir(pedalLog_DIR_up);
-        assignVerticalGroup(pedal, token);
-        setStaff(pedal, m_currentstaff);
         ss[staffindex].pedal = false;
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::hasBounceAfter -- If an *Xped has a *ped after it
+//    at the same timestamp, then the *Xped should be ignored
+//    as the following *ped will be turned into a bounce.
+//
+
+bool HumdrumInput::hasBounceAfter(hum::HTp token)
+{
+    if (*token != "*Xped") {
+        return false;
+    }
+    hum::HumNum timestamp = token->getDurationFromStart();
+    hum::HTp current = token->getNextToken();
+    while (current && (current->getDurationFromStart() == timestamp)) {
+        if (*current == "*ped") {
+            return true;
+        }
+        current = current->getNextToken();
+    }
+    return false;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::hasBounceBefore -- If a *ped has an *Xped before it
+//    at the same timestamp, then it should be converted to a bounce.
+//    Future: if *ped is followed later by another *ped without
+//    *Xped, then the second *ped should be marked as a bounce.
+//
+
+bool HumdrumInput::hasBounceBefore(hum::HTp token)
+{
+    if (*token != "*ped") {
+        return false;
+    }
+    hum::HumNum timestamp = token->getDurationFromStart();
+    hum::HTp current = token->getPreviousToken();
+    while (current && (current->getDurationFromStart() == timestamp)) {
+        if (*current == "*Xped") {
+            return true;
+        }
+        current = current->getPreviousToken();
+    }
+    return false;
 }
 
 //////////////////////////////
