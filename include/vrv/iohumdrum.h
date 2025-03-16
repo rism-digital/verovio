@@ -758,7 +758,6 @@ protected:
     void setRepeatSlashes(BeatRpt *repeat, std::vector<hum::HTp> &tokens, int index);
     std::string getLabelFromInstrumentCode(hum::HTp icode, const std::string &transpose);
     void checkForGlobalRehearsal(int line);
-    void checkForLocalRehearsal(hum::HTp);
     bool isBlackNotation(hum::HTp starting);
     std::string checkNoteForScordatura(const std::string &token);
     bool checkForScordatura(hum::HumdrumFile &infile);
@@ -1003,6 +1002,7 @@ protected:
     template <class ELEMENT> void setAttachmentType(ELEMENT *element, hum::HTp token);
     template <class ELEMENT>
     void setFontsize(ELEMENT *element, const std::string &percentage, const std::string &original);
+    template <class ELEMENT> void setTstamp(ELEMENT *element, const string &value);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);

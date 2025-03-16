@@ -30251,17 +30251,6 @@ bool HumdrumInput::hasMensuralStaff(hum::HLp line)
 
 //////////////////////////////
 //
-// HumdrumInput::checkForLocalRehearsal -- Only attached to barlines for now.
-//
-
-void checkForLocalRehearsal(hum::HTp)
-{
-
-    cerr << "CHECKING FOR LOCAL REHEARSAL" << endl;
-}
-
-//////////////////////////////
-//
 // HumdrumInput::checkForGlobalRehearsal -- Only attached to barlines for now.
 //
 
@@ -30296,6 +30285,7 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
         std::string tvalue = "";
         std::string key = "";
         std::string value = "";
+        std::string qoffset = "";
         int pcount = hps->getCount();
         for (int j = 0; j < pcount; ++j) {
             key = hps->getParameterName(j);
@@ -30305,6 +30295,9 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
             }
             if (key == "absys") {
                 absysQ = true;
+            }
+            if (key == "qo") {
+                qoffset = value;
             }
         }
 
@@ -30322,8 +30315,12 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
         rend->SetRend(TEXTRENDITION_box);
         addChildMeasureOrSection(reh);
         setStaff(reh, 1);
-        // Only attached to barline for now:
-        reh->SetTstamp(0.0);
+        if (!qoffset.empty()) {
+            setTstamp(reh, qoffset);
+        }
+        else {
+            reh->SetTstamp(0.0);
+        }
         // Default size is x-large:
         if (fontsize.empty()) {
             fontsize = "large";
@@ -30346,8 +30343,12 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
             rend->SetRend(TEXTRENDITION_box);
             addChildMeasureOrSection(reh);
             setStaff(reh, staffCount);
-            // Only attached to barline for now:
-            reh->SetTstamp(0.0);
+            if (!qoffset.empty()) {
+                setTstamp(reh, qoffset);
+            }
+            else {
+                reh->SetTstamp(0.0);
+            }
             // Default size is x-large:
             if (fontsize.empty()) {
                 fontsize = "large";
@@ -30358,6 +30359,43 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
             setPlaceRelStaff(reh, "below", false);
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setTstamp -- set the @tstamp for an element.  The input can
+//   be a string representing either a float or a HumNum (rational number)
+//   and is in units of quarter notes which will be translated into MEI units
+//   (bottom of time signatures, excluding "0" case for breves.
+//
+
+template <class ELEMENT> void HumdrumInput::setTstamp(ELEMENT *element, const string &value)
+{
+    if (value.empty()) {
+        return;
+    }
+    if (value == ".") {
+        return;
+    }
+
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    int staffindex = m_currentstaff - 1;
+    double qfactor = ss[staffindex].meter_bottom.getFloat() / 4.0;
+
+    hum::HumRegex hre;
+    if (hre.search(value, "^\\s*([\\d.]+)")) {
+        double dvalue = qfactor * hre.getMatchDouble(1) + 1;
+        element->SetTstamp(dvalue);
+        return;
+    }
+    else if (hre.search(value, "^(\\d+/\\d+)")) {
+        hum::HumNum num = hre.getMatch(1);
+        double dvalue = qfactor * num.getFloat() + 1;
+        element->SetTstamp(dvalue);
+        return;
+    }
+    std::string str = "Unknown REH quarter-note offset: " + value;
+    LogError("%s", str.c_str());
 }
 
 //////////////////////////////
