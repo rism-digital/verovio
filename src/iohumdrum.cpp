@@ -30251,7 +30251,7 @@ bool HumdrumInput::hasMensuralStaff(hum::HLp line)
 
 //////////////////////////////
 //
-// HumdrumInput::checkForGlobalRehearsal -- Only attached to barlines for now.
+// HumdrumInput::checkForGlobalRehearsal -- Attaches to barlines.
 //
 
 void HumdrumInput::checkForGlobalRehearsal(int line)
@@ -30298,6 +30298,9 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
             }
             if (key == "qo") {
                 qoffset = value;
+            }
+            if (key == "fs") {
+                fontsize = value;
             }
         }
 
