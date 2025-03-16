@@ -30331,10 +30331,10 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
         setFontsize(rend, "", fontsize);
         // rend->SetHalign(HORIZONTALALIGNMENT_center);
 
-        if (absysQ) {
+        std::vector<hum::HTp> &staffstarts = m_staffstarts;
+        int staffCount = (int)staffstarts.size();
+        if (absysQ && (staffCount > 1)) {
             // place rehersal marks above/below system
-            std::vector<hum::HTp> &staffstarts = m_staffstarts;
-            int staffCount = (int)staffstarts.size();
 
             Reh *reh = new Reh();
             Rend *rend = new Rend();
