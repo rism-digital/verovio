@@ -30288,6 +30288,7 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
         std::string qoffset = "";
         std::string enclosure = "";
         std::string color = "";
+        std::string enclosureColor = "";
         int pcount = hps->getCount();
         for (int j = 0; j < pcount; ++j) {
             key = hps->getParameterName(j);
@@ -30310,6 +30311,9 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
             if (key == "color") {
                 color = value;
             }
+            if (key == "encc") {
+                enclosureColor = value;
+            }
         }
 
         if (tvalue.empty()) {
@@ -30330,8 +30334,15 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
         else {
             setEnclosure(rend, enclosure);
         }
-        if (!color.empty()) {
+        if (!color.empty() && enclosureColor.empty()) {
             reh->SetColor(color);
+        }
+        else if (color.empty() && !enclosureColor.empty()) {
+            reh->SetColor(enclosureColor);
+            rend->SetColor("black");
+        }
+        else if (!color.empty() && !enclosureColor.empty()) {
+            reh->SetColor(enclosureColor);
             rend->SetColor(color);
         }
         addChildMeasureOrSection(reh);
@@ -30342,7 +30353,7 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
         else {
             reh->SetTstamp(0.0);
         }
-        // Default size is x-large:
+        // Default size is large:
         if (fontsize.empty()) {
             fontsize = "large";
         }
@@ -30367,8 +30378,15 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
             else {
                 setEnclosure(rend, enclosure);
             }
-            if (!color.empty()) {
+            if (!color.empty() && enclosureColor.empty()) {
                 reh->SetColor(color);
+            }
+            else if (color.empty() && !enclosureColor.empty()) {
+                reh->SetColor(enclosureColor);
+                rend->SetColor("black");
+            }
+            else if (!color.empty() && !enclosureColor.empty()) {
+                reh->SetColor(enclosureColor);
                 rend->SetColor(color);
             }
             addChildMeasureOrSection(reh);
@@ -30379,7 +30397,7 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
             else {
                 reh->SetTstamp(0.0);
             }
-            // Default size is x-large:
+            // Default size is large:
             if (fontsize.empty()) {
                 fontsize = "large";
             }
