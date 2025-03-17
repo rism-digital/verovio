@@ -278,7 +278,7 @@ public:
 
     /**
      * Export the document to a MIDI file.
-     * Run trough all the layers and fill the midi file content.
+     * Run trough all the layers and fill the MIDI file content.
      */
     void ExportMIDI(smf::MidiFile *midiFile);
 
