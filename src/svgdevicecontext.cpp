@@ -814,7 +814,7 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
     pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d L%d %d", x1, y1, x2, y2).c_str();
-    if (m_penStack.top().HasColor() || !this->UseGlobalStyling()) {
+    if (m_penStack.top().HasColor()) {
         pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
     }
     if (m_penStack.top().GetWidth() > 1) pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
@@ -1215,8 +1215,12 @@ void SvgDeviceContext::AppendAdditionalAttributes(Object *object)
     }
 }
 
-std::string SvgDeviceContext::GetColor(int color) const
+std::string SvgDeviceContext::GetColor(int color)
 {
+    std::ostringstream ss;
+    ss << "#";
+    ss << std::hex;
+
     switch (color) {
         case (COLOR_NONE): return "currentColor";
         case (COLOR_BLACK): return "#000000";
@@ -1226,7 +1230,13 @@ std::string SvgDeviceContext::GetColor(int color) const
         case (COLOR_BLUE): return "#0000FF";
         case (COLOR_CYAN): return "#00FFFF";
         case (COLOR_LIGHT_GREY): return "#777777";
-        default: return StringFormat("#%06X", color);
+        default:
+            int blue = (color & 255);
+            int green = (color >> 8) & 255;
+            int red = (color >> 16) & 255;
+            ss << red << green << blue;
+            // std::strin = wxDecToHex(char(red)) + wxDecToHex(char(green)) + wxDecToHex(char(blue)) ;  // ax3
+            return ss.str();
     }
 }
 

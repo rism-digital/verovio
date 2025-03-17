@@ -734,5 +734,4 @@ bool ScoringUpFunctor::EvalDotOfDiv(
     }
     return flagDotOfDiv;
 }
-
 } // namespace vrv

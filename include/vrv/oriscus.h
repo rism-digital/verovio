@@ -38,8 +38,7 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    PitchInterface *GetPitchInterface() override { return vrv_cast<PitchInterface *>(this); }
-    const PitchInterface *GetPitchInterface() const override { return vrv_cast<const PitchInterface *>(this); }
+    PitchInterface *GetPitchInterface() override { return dynamic_cast<PitchInterface *>(this); }
     ///@}
 
     /** Override the method since alignment is required */

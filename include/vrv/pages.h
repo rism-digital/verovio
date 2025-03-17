@@ -13,9 +13,7 @@
 
 namespace vrv {
 
-class Page;
 class Score;
-class System;
 
 //----------------------------------------------------------------------------
 // Pages
@@ -50,11 +48,6 @@ public:
      */
     void ConvertFrom(Score *score);
 
-    /**
-     * Refresh the layout of all the child pages.
-     */
-    void LayOutAll();
-
     //----------//
     // Functors //
     //----------//
@@ -75,48 +68,6 @@ public:
     //
 private:
     //
-};
-
-//----------------------------------------------------------------------------
-// PageRange
-//----------------------------------------------------------------------------
-
-/**
- * This class represent a page range not owning child pages.
- */
-class PageRange : public Pages {
-
-public:
-    /**
-     * @name Constructors, destructors, and other standard methods
-     * Reset method resets all attribute classes
-     */
-    ///@{
-    PageRange(Doc *doc);
-    virtual ~PageRange();
-    void Reset() override;
-    ///@}
-
-    /**
-     * The the specified page as focus page in the range.
-     */
-    void SetAsFocus(Page *page);
-
-private:
-    void Evaluate(const Object *object);
-
-    void EvaluateSpanningElementsIn(const Object *measure);
-
-public:
-    //
-private:
-    /** A pointer to the doc owning the page range */
-    Doc *m_doc;
-    /** A pointer to the page with the focus in the range */
-    Page *m_focusPage;
-
-    std::list<Page *> m_pageBefore;
-    std::list<Page *> m_pageAfter;
 };
 
 } // namespace vrv

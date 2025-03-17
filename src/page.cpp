@@ -188,9 +188,9 @@ const RunningElement *Page::GetFooter() const
     }
 }
 
-void Page::LayOut()
+void Page::LayOut(bool force)
 {
-    if (m_layoutDone) {
+    if (m_layoutDone && !force) {
         // We only need to reset the header - this will adjust the page number if necessary
         if (this->GetHeader()) this->GetHeader()->SetDrawingPage(this);
         if (this->GetFooter()) this->GetFooter()->SetDrawingPage(this);
@@ -209,7 +209,7 @@ void Page::LayOut()
         view.SetDoc(doc);
         BBoxDeviceContext bBoxDC(&view, 0, 0);
         // Do not do the layout in this view - otherwise we will loop...
-        view.SetPage(this, false);
+        view.SetPage(this->GetIdx(), false);
         view.DrawCurrentPage(&bBoxDC, false);
     }
 
@@ -225,8 +225,9 @@ void Page::LayOutTranscription(bool force)
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    // Make sure we have the correct page size
-    assert(doc->CheckPageSize(this));
+    // Doc::SetDrawingPage should have been called before
+    // Make sure we have the correct page
+    assert(this == doc->GetDrawingPage());
 
     // Reset the horizontal alignment
     ResetHorizontalAlignmentFunctor resetHorizontalAlignment;
@@ -270,7 +271,7 @@ void Page::LayOutTranscription(bool force)
         view.SetDoc(doc);
         BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
         // Do not do the layout in this view - otherwise we will loop...
-        view.SetPage(this, false);
+        view.SetPage(this->GetIdx(), false);
         view.DrawCurrentPage(&bBoxDC, false);
     }
 
@@ -290,8 +291,9 @@ void Page::ResetAligners()
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    // Make sure we have the correct page size
-    assert(doc->CheckPageSize(this));
+    // Doc::SetDrawingPage should have been called before
+    // Make sure we have the correct page
+    assert(this == doc->GetDrawingPage());
 
     // Reset the horizontal alignment
     ResetHorizontalAlignmentFunctor resetHorizontalAlignment;
@@ -368,8 +370,9 @@ void Page::LayOutHorizontally()
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    // Make sure we have the correct page size
-    assert(doc->CheckPageSize(this));
+    // Doc::SetDrawingPage should have been called before
+    // Make sure we have the correct page
+    assert(this == doc->GetDrawingPage());
 
     this->ResetAligners();
 
@@ -379,7 +382,7 @@ void Page::LayOutHorizontally()
     view.SetSlurHandling(SlurHandling::Ignore);
     BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
     // Do not do the layout in this view - otherwise we will loop...
-    view.SetPage(this, false);
+    view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
 
     // Get the scoreDef at the beginning of the page
@@ -481,8 +484,9 @@ void Page::LayOutVertically()
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    // Make sure we have the correct page size
-    assert(doc->CheckPageSize(this));
+    // Doc::SetDrawingPage should have been called before
+    // Make sure we have the correct page
+    assert(this == doc->GetDrawingPage());
 
     // Reset the vertical alignment
     ResetVerticalAlignmentFunctor resetVerticalAlignment;
@@ -502,7 +506,7 @@ void Page::LayOutVertically()
     BBoxDeviceContext bBoxDC(&view, 0, 0);
     view.SetDoc(doc);
     // Do not do the layout in this view - otherwise we will loop...
-    view.SetPage(this, false);
+    view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
 
     // Adjust the position of outside articulations with slurs end and start positions
@@ -523,7 +527,7 @@ void Page::LayOutVertically()
 
     // At this point slurs must not be reinitialized, otherwise the adjustment we just did was in vain
     view.SetSlurHandling(SlurHandling::Drawing);
-    view.SetPage(this, false);
+    view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
 
     // Adjust the position of tuplets by slurs
@@ -557,7 +561,7 @@ void Page::LayOutVertically()
     // Redraw are re-adjust the position of the slurs when we have cross-staff ones
     if (adjustSlurs.HasCrossStaffSlurs()) {
         view.SetSlurHandling(SlurHandling::Initialize);
-        view.SetPage(this, false);
+        view.SetPage(this->GetIdx(), false);
         view.DrawCurrentPage(&bBoxDC, false);
         this->Process(adjustSlurs);
     }
@@ -586,8 +590,9 @@ void Page::JustifyHorizontally()
         return;
     }
 
-    // Make sure we have the correct page size
-    assert(doc->CheckPageSize(this));
+    // Doc::SetDrawingPage should have been called before
+    // Make sure we have the correct page
+    assert(this == doc->GetDrawingPage());
 
     if ((doc->GetOptions()->m_adjustPageWidth.GetValue())) {
         doc->m_drawingPageContentWidth = this->GetContentWidth();
@@ -607,8 +612,9 @@ void Page::JustifyVertically()
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    // Make sure we have the correct page size
-    assert(doc->CheckPageSize(this));
+    // Doc::SetDrawingPage should have been called before
+    // Make sure we have the correct page
+    assert(this == doc->GetDrawingPage());
 
     // Nothing to justify
     if (m_drawingJustifiableHeight <= 0 || m_justificationSum <= 0) {
@@ -661,8 +667,9 @@ void Page::LayOutPitchPos()
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    // Make sure we have the correct page size
-    assert(doc->CheckPageSize(this));
+    // Doc::SetDrawingPage should have been called before
+    // Make sure we have the correct page
+    assert(this == doc->GetDrawingPage());
 
     // Set the pitch / pos alignment
     CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(doc);
@@ -677,8 +684,9 @@ int Page::GetContentHeight() const
     const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    // Make sure we have the correct page size
-    assert(doc->CheckPageSize(this));
+    // Doc::SetDrawingPage should have been called before
+    // Make sure we have the correct page
+    assert(this == doc->GetDrawingPage());
 
     if (!this->GetChildCount()) {
         return 0;
@@ -702,8 +710,9 @@ int Page::GetContentWidth() const
     // in non debug
     if (!doc) return 0;
 
-    // Make sure we have the correct page size
-    assert(doc->CheckPageSize(this));
+    // Doc::SetDrawingPage should have been called before
+    // Make sure we have the correct page
+    assert(this == doc->GetDrawingPage());
 
     int maxWidth = 0;
     for (const Object *child : this->GetChildren()) {

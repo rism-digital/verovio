@@ -58,13 +58,9 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
 
     std::string action = json.get<jsonxx::String>("action");
 
-    m_doc->SetFocus();
-
     // Action without parameter
     if (action == "commit") {
         m_doc->PrepareData();
-        m_doc->ScoreDefSetCurrentDoc(true);
-        m_doc->RefreshLayout();
         return true;
     }
 

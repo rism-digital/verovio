@@ -246,7 +246,7 @@ public:
     ///@}
 
     /**
-     * @name Getters to improve code readability
+     * @name Gettersto improve code readability
      */
     ///@{
     bool IsScoreBasedMEI() const { return m_scoreBasedMEI; }

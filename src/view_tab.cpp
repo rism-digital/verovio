@@ -10,7 +10,6 @@
 //----------------------------------------------------------------------------
 
 #include <cassert>
-#include <cmath>
 #include <iostream>
 #include <math.h>
 
@@ -219,31 +218,16 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     dc->StartGraphic(tabDurSym, "", tabDurSym->GetID());
 
-    // adjust vertical position for tabDurSym@tab.line, tabDurSym@vo and tablature type
-    // tabDurSym@tab.line takes priority over tabDurSym@vo
-    if (!tabGrp->IsInBeam() && !staff->IsTabGuitar()) {
-        if (tabDurSym->HasTabLine()) {
-            const int yAdjust = (tabDurSym->GetTabLine() - staff->m_drawingLines) * 2;
-            tabDurSym->SetDrawingYRel(yAdjust * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
-        }
-        else {
-            int yAdjust = 1; // margin between staff line and rhythm sign, in half lines
-
-            // position rhythm sign according to tablature type
-            if (staff->IsTabLuteFrench() || staff->IsTabLuteGerman()) {
-                yAdjust = 2;
-            }
-            else if (staff->IsTabLuteItalian() && staff->m_drawingLines >= 6) {
-                yAdjust = 3; //  allow for >= 7 course Italian tablature
-            }
-
-            // adjust for tabDurSym@vo
-            if (tabDurSym->HasVo() && tabDurSym->GetVo().GetType() == MEASUREMENTTYPE_vu) {
-                yAdjust += std::round(tabDurSym->GetVo().GetVu());
-            }
-
-            tabDurSym->SetDrawingYRel(yAdjust * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
-        }
+    if (tabDurSym->HasLoc()) {
+        const int yRel = ((staff->m_drawingLines - 1) * 2 - tabDurSym->GetLoc())
+            * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        tabDurSym->SetDrawingYRel(-yRel);
+    }
+    else if (staff->IsTabLuteItalian()) {
+        // make space for 7th course
+        const int yRel
+            = ((staff->m_drawingLines - 1) * 2 - 7 * 2 + 1) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        tabDurSym->SetDrawingYRel(-yRel);
     }
 
     int x = element->GetDrawingX();

@@ -677,12 +677,6 @@ enum GraphicID { PRIMARY = 0, SPANNING, SYMBOLREF };
 enum MeasureType { MEASURED = 0, UNMEASURED, NEUMELINE };
 
 //----------------------------------------------------------------------------
-// Focus status type
-//----------------------------------------------------------------------------
-
-enum FocusStatusType { FOCUS_UNSET = 0, FOCUS_SET, FOCUS_USED };
-
-//----------------------------------------------------------------------------
 // The score time unit (quarter note)
 //----------------------------------------------------------------------------
 

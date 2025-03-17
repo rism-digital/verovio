@@ -65,11 +65,11 @@ Note::Note()
     , AttGraced()
     , AttHarmonicFunction()
     , AttMidiVelocity()
+    , AttNoteGesTab()
     , AttNoteHeads()
     , AttNoteVisMensural()
     , AttStems()
     , AttStemsCmn()
-    , AttStringtab()
     , AttTiePresent()
     , AttVisibility()
 {
@@ -84,12 +84,12 @@ Note::Note()
     this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_GRACED);
     this->RegisterAttClass(ATT_HARMONICFUNCTION);
+    this->RegisterAttClass(ATT_NOTEGESTAB);
     this->RegisterAttClass(ATT_NOTEHEADS);
     this->RegisterAttClass(ATT_NOTEVISMENSURAL);
     this->RegisterAttClass(ATT_MIDIVELOCITY);
     this->RegisterAttClass(ATT_STEMS);
     this->RegisterAttClass(ATT_STEMSCMN);
-    this->RegisterAttClass(ATT_STRINGTAB);
     this->RegisterAttClass(ATT_TIEPRESENT);
     this->RegisterAttClass(ATT_VISIBILITY);
 
@@ -113,12 +113,12 @@ void Note::Reset()
     this->ResetExtSymNames();
     this->ResetGraced();
     this->ResetHarmonicFunction();
+    this->ResetNoteGesTab();
     this->ResetNoteHeads();
     this->ResetNoteVisMensural();
     this->ResetMidiVelocity();
     this->ResetStems();
     this->ResetStemsCmn();
-    this->ResetStringtab();
     this->ResetTiePresent();
     this->ResetVisibility();
 

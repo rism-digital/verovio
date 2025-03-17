@@ -12,7 +12,6 @@
 #include "doc.h"
 #include "layer.h"
 #include "page.h"
-#include "pages.h"
 #include "score.h"
 #include "staff.h"
 #include "system.h"
