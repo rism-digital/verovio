@@ -34,7 +34,7 @@ public:
     /**
      * Add childElement to a element.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     //----------//
     // Functors //

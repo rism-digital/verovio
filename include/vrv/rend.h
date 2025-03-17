@@ -59,7 +59,7 @@ public:
      * Add an element (text, rend. etc.) to a rend.
      * Only supported elements will be actually added to the child list.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Check if rend has an enclosing.

@@ -44,7 +44,7 @@ public:
     /**
      * Add an element (only flag supported) to a stem.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Fill the attributes from the AttStems attribute of the parent note/chord

@@ -75,7 +75,7 @@ public:
      * Add an element (a note or a rest) to a syllable.
      * Only syl or neume will be added.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     int GetLigatureCount(int position);
     bool IsLastInNeume(const LayerElement *element) const;

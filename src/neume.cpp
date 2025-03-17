@@ -58,15 +58,16 @@ void Neume::Reset()
     this->ResetColor();
 }
 
-bool Neume::IsSupportedChild(Object *child)
+bool Neume::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(NC)) {
-        assert(dynamic_cast<Nc *>(child));
+    static const std::vector<ClassId> supported{ NC };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 int Neume::GetPosition(const LayerElement *element) const

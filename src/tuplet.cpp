@@ -70,56 +70,25 @@ void Tuplet::Reset()
     m_numAlignedBeam = NULL;
 }
 
-bool Tuplet::IsSupportedChild(Object *child)
+bool Tuplet::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(BEAM)) {
-        assert(dynamic_cast<Beam *>(child));
+    static const std::vector<ClassId> supported{ BEAM, TUPLET_BRACKET, BTREM, CHORD, CLEF, FTREM, NOTE, TUPLET_NUM,
+        REST, SPACE, TABGRP, TUPLET };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(TUPLET_BRACKET)) {
-        assert(dynamic_cast<TupletBracket *>(child));
-    }
-    else if (child->Is(BTREM)) {
-        assert(dynamic_cast<BTrem *>(child));
-    }
-    else if (child->Is(CHORD)) {
-        assert(dynamic_cast<Chord *>(child));
-    }
-    else if (child->Is(CLEF)) {
-        assert(dynamic_cast<Clef *>(child));
-    }
-    else if (child->Is(FTREM)) {
-        assert(dynamic_cast<FTrem *>(child));
-    }
-    else if (child->Is(NOTE)) {
-        assert(dynamic_cast<Note *>(child));
-    }
-    else if (child->Is(TUPLET_NUM)) {
-        assert(dynamic_cast<TupletNum *>(child));
-    }
-    else if (child->Is(REST)) {
-        assert(dynamic_cast<Rest *>(child));
-    }
-    else if (child->Is(SPACE)) {
-        assert(dynamic_cast<Space *>(child));
-    }
-    else if (child->Is(TABGRP)) {
-        assert(dynamic_cast<TabGrp *>(child));
-    }
-    else if (child->Is(TUPLET)) {
-        assert(dynamic_cast<Tuplet *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 void Tuplet::AddChild(Object *child)
 {
-    if (!this->IsSupportedChild(child)) {
+    if (!this->IsSupportedChild(child->GetClassId())) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
         return;
     }

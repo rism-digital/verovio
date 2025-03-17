@@ -131,9 +131,10 @@ void Note::Reset()
     m_stemSameasRole = SAMEAS_NONE;
 }
 
-bool Note::IsSupportedChild(Object *child)
+bool Note::IsSupportedChild(ClassId classId)
 {
     // additional verification for accid and artic - this will not be raised with editorial markup, though
+    /*
     if (child->Is(ACCID)) {
         IsAttributeComparison isAttributeComparison(ACCID);
         if (this->FindDescendantByComparison(&isAttributeComparison))
@@ -144,40 +145,24 @@ bool Note::IsSupportedChild(Object *child)
         if (this->FindDescendantByComparison(&isAttributeComparison))
             LogWarning("Having both @artic and <artic> child will cause problems");
     }
+    */
 
-    if (child->Is(ACCID)) {
-        assert(dynamic_cast<Accid *>(child));
+    static const std::vector<ClassId> supported{ ACCID, ARTIC, DOTS, PLICA, STEM, SYL, VERSE };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(ARTIC)) {
-        assert(dynamic_cast<Artic *>(child));
-    }
-    else if (child->Is(DOTS)) {
-        assert(dynamic_cast<Dots *>(child));
-    }
-    else if (child->Is(PLICA)) {
-        assert(dynamic_cast<Plica *>(child));
-    }
-    else if (child->Is(STEM)) {
-        assert(dynamic_cast<Stem *>(child));
-    }
-    else if (child->Is(SYL)) {
-        assert(dynamic_cast<Syl *>(child));
-    }
-    else if (child->Is(VERSE)) {
-        assert(dynamic_cast<Verse *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 void Note::AddChild(Object *child)
 {
-    if (!this->IsSupportedChild(child)) {
+    if (!this->IsSupportedChild(child->GetClassId())) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
         return;
     }

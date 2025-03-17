@@ -39,7 +39,7 @@ public:
     /**
      * Only supported elements will be actually added to the child list.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Get the SMuFL glyph for the symbol based on glyph.num or glyph.name

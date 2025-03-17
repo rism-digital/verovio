@@ -145,9 +145,9 @@ void MeasureAligner::Reset()
     m_initialTstampDur = -1;
 }
 
-bool MeasureAligner::IsSupportedChild(Object *child)
+bool MeasureAligner::IsSupportedChild(ClassId classId)
 {
-    assert(dynamic_cast<Alignment *>(child));
+    // Nothing to check here
     return true;
 }
 
@@ -536,9 +536,9 @@ void Alignment::ClearGraceAligners()
     m_graceAligners.clear();
 }
 
-bool Alignment::IsSupportedChild(Object *child)
+bool Alignment::IsSupportedChild(ClassId classId)
 {
-    assert(dynamic_cast<AlignmentReference *>(child));
+    // Nothing to check here
     return true;
 }
 
@@ -820,9 +820,9 @@ void AlignmentReference::Reset()
     m_layerCount = 0;
 }
 
-bool AlignmentReference::IsSupportedChild(Object *child)
+bool AlignmentReference::IsSupportedChild(ClassId classId)
 {
-    assert(dynamic_cast<LayerElement *>(child));
+    // Nothing to check here
     return true;
 }
 
@@ -916,9 +916,9 @@ void TimestampAligner::Reset()
     Object::Reset();
 }
 
-bool TimestampAligner::IsSupportedChild(Object *child)
+bool TimestampAligner::IsSupportedChild(ClassId classId)
 {
-    assert(dynamic_cast<TimestampAttr *>(child));
+    // Nothing to check here
     return true;
 }
 

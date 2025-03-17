@@ -159,21 +159,17 @@ void Layer::ResetStaffDefObjects()
     }
 }
 
-bool Layer::IsSupportedChild(Object *child)
+bool Layer::IsSupportedChild(ClassId classId)
 {
-    if (child->IsLayerElement()) {
-        assert(dynamic_cast<LayerElement *>(child));
+    if (Object::IsLayerElement(classId)) {
+        return true;
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
-    }
-    else if (child->Is(METERSIGGRP)) {
-        assert(dynamic_cast<MeterSigGrp *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 LayerElement *Layer::GetPrevious(const LayerElement *element)

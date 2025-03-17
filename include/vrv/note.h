@@ -107,7 +107,7 @@ public:
      * Add an element (a verse or an accid) to a note.
      * Only Verse and Accid elements will be actually added to the note.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Overwritten method for note

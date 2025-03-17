@@ -47,7 +47,7 @@ public:
     /**
      * Method for adding allowed content
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     //----------//
     // Functors //

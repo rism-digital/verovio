@@ -72,7 +72,7 @@ public:
     /**
      * Add an element (a keyAccid) to a keySig.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /** Accid number getter */
     int GetAccidCount(bool fromAttribute = false) const;

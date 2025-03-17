@@ -56,20 +56,21 @@ void TabDurSym::Reset()
     this->ResetVisualOffsetVo();
 }
 
-bool TabDurSym::IsSupportedChild(Object *child)
+bool TabDurSym::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(STEM)) {
-        assert(dynamic_cast<Stem *>(child));
+    static const std::vector<ClassId> supported{ STEM };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 void TabDurSym::AddChild(Object *child)
 {
-    if (!this->IsSupportedChild(child)) {
+    if (!this->IsSupportedChild(child->GetClassId())) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
         return;
     }

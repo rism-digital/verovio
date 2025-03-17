@@ -822,11 +822,10 @@ void Object::SetParent(Object *parent)
     m_parent = parent;
 }
 
-bool Object::IsSupportedChild(Object *child)
+bool Object::IsSupportedChild(ClassId classId)
 {
     // This should never happen because the method should be overridden
-    LogDebug(
-        "Method for adding %s to %s should be overridden", child->GetClassName().c_str(), this->GetClassName().c_str());
+    LogDebug("Method for adding %d to %s should be overridden", classId, this->GetClassName().c_str());
     // assert(false);
     return false;
 }
@@ -835,7 +834,7 @@ void Object::AddChild(Object *child)
 {
     if (!((child->GetClassName() == "Staff") && (this->GetClassName() == "Section"))) {
         // temporarily allowing staff in section for issue https://github.com/MeasuringPolyphony/mp_editor/issues/62
-        if (!this->IsSupportedChild(child)) {
+        if (!this->IsSupportedChild(child->GetClassId())) {
             LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
             return;
         }

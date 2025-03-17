@@ -256,41 +256,20 @@ void ScoreDef::Reset()
     m_setAsDrawing = false;
 }
 
-bool ScoreDef::IsSupportedChild(Object *child)
+bool ScoreDef::IsSupportedChild(ClassId classId)
 {
-    // Clef is actually not allowed as child of scoreDef in MEI
-    if (child->Is(CLEF)) {
-        assert(dynamic_cast<Clef *>(child));
+    static const std::vector<ClassId> supported{ CLEF, GRPSYM, KEYSIG, MENSUR, METERSIG, METERSIGGRP, STAFFGRP,
+        SYMBOLTABLE };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(GRPSYM)) {
-        assert(dynamic_cast<GrpSym *>(child));
-    }
-    else if (child->Is(KEYSIG)) {
-        assert(dynamic_cast<KeySig *>(child));
-    }
-    else if (child->Is(STAFFGRP)) {
-        assert(dynamic_cast<StaffGrp *>(child));
-    }
-    // Mensur is actually not allowed as child of scoreDef in MEI
-    else if (child->Is(MENSUR)) {
-        assert(dynamic_cast<Mensur *>(child));
-    }
-    else if (child->Is(METERSIG)) {
-        assert(dynamic_cast<MeterSig *>(child));
-    }
-    else if (child->Is(METERSIGGRP)) {
-        assert(dynamic_cast<MeterSigGrp *>(child));
-    }
-    else if (child->IsRunningElement()) {
-        assert(dynamic_cast<RunningElement *>(child));
-    }
-    else if (child->Is(SYMBOLTABLE)) {
-        assert(dynamic_cast<SymbolTable *>(child));
+    else if (Object::IsRunningElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 int ScoreDef::GetInsertOrderFor(ClassId classId) const

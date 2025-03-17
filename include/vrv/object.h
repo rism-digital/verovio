@@ -95,18 +95,48 @@ public:
 
     /**
      * @name Methods for checking if an object is part of a group of classId's.
+     * Used the static methods passing the object m_classId.
+     */
+    ///@{
+    bool IsControlElement() const { return Object::IsControlElement(m_classId); }
+    bool IsEditorialElement() const { return Object::IsEditorialElement(m_classId); }
+    bool IsLayerElement() const { return Object::IsLayerElement(m_classId); }
+    bool IsPageElement() const { return Object::IsPageElement(m_classId); }
+    bool IsRunningElement() const { return Object::IsRunningElement(m_classId); }
+    bool IsScoreDefElement() const { return Object::IsScoreDefElement(m_classId); }
+    bool IsSystemElement() const { return Object::IsSystemElement(m_classId); }
+    bool IsTextElement() const { return Object::IsTextElement(m_classId); }
+    ///@}
+
+    /**
+     * @name Static methods for checking if classId is part of a group of classId's.
      * For example, all LayerElement child class classId's are between LAYER_ELEMENT and LAYER_ELEMENT_max.
      * See classId enum.
      */
     ///@{
-    bool IsControlElement() const { return ((m_classId > CONTROL_ELEMENT) && (m_classId < CONTROL_ELEMENT_max)); }
-    bool IsEditorialElement() const { return ((m_classId > EDITORIAL_ELEMENT) && (m_classId < EDITORIAL_ELEMENT_max)); }
-    bool IsLayerElement() const { return ((m_classId > LAYER_ELEMENT) && (m_classId < LAYER_ELEMENT_max)); }
-    bool IsPageElement() const { return ((m_classId > PAGE_ELEMENT) && (m_classId < PAGE_ELEMENT_max)); }
-    bool IsRunningElement() const { return ((m_classId > RUNNING_ELEMENT) && (m_classId < RUNNING_ELEMENT_max)); }
-    bool IsScoreDefElement() const { return ((m_classId > SCOREDEF_ELEMENT) && (m_classId < SCOREDEF_ELEMENT_max)); }
-    bool IsSystemElement() const { return ((m_classId > SYSTEM_ELEMENT) && (m_classId < SYSTEM_ELEMENT_max)); }
-    bool IsTextElement() const { return ((m_classId > TEXT_ELEMENT) && (m_classId < TEXT_ELEMENT_max)); }
+    static bool IsControlElement(ClassId classId)
+    {
+        return ((classId > CONTROL_ELEMENT) && (classId < CONTROL_ELEMENT_max));
+    }
+    static bool IsEditorialElement(ClassId classId)
+    {
+        return ((classId > EDITORIAL_ELEMENT) && (classId < EDITORIAL_ELEMENT_max));
+    }
+    static bool IsLayerElement(ClassId classId) { return ((classId > LAYER_ELEMENT) && (classId < LAYER_ELEMENT_max)); }
+    static bool IsPageElement(ClassId classId) { return ((classId > PAGE_ELEMENT) && (classId < PAGE_ELEMENT_max)); }
+    static bool IsRunningElement(ClassId classId)
+    {
+        return ((classId > RUNNING_ELEMENT) && (classId < RUNNING_ELEMENT_max));
+    }
+    static bool IsScoreDefElement(ClassId classId)
+    {
+        return ((classId > SCOREDEF_ELEMENT) && (classId < SCOREDEF_ELEMENT_max));
+    }
+    static bool IsSystemElement(ClassId classId)
+    {
+        return ((classId > SYSTEM_ELEMENT) && (classId < SYSTEM_ELEMENT_max));
+    }
+    static bool IsTextElement(ClassId classId) { return ((classId > TEXT_ELEMENT) && (classId < TEXT_ELEMENT_max)); }
     ///@}
 
     /**
@@ -367,7 +397,7 @@ public:
      * Base method for checking if a child can be added.
      * The method has to be overridden.
      */
-    virtual bool IsSupportedChild(Object *object);
+    virtual bool IsSupportedChild(ClassId classId);
 
     /**
      * Base method for adding children.

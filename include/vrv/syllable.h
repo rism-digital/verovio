@@ -41,7 +41,7 @@ public:
      * Add an element (a note or a rest) to a syllable.
      * Only syl or neume will be added.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /** Override the method since alignment is required */
     bool HasToBeAligned() const override { return true; }

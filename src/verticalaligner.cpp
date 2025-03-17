@@ -54,9 +54,9 @@ void SystemAligner::Reset()
     this->AddChild(m_bottomAlignment);
 }
 
-bool SystemAligner::IsSupportedChild(Object *child)
+bool SystemAligner::IsSupportedChild(ClassId classId)
 {
-    assert(dynamic_cast<StaffAlignment *>(child));
+    // Nothing to check here
     return true;
 }
 

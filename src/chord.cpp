@@ -169,35 +169,24 @@ void Chord::CalculateNoteGroups()
     }
 }
 
-bool Chord::IsSupportedChild(Object *child)
+bool Chord::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(ARTIC)) {
-        assert(dynamic_cast<Artic *>(child));
+    static const std::vector<ClassId> supported{ ARTIC, DOTS, NOTE, STEM, VERSE };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(DOTS)) {
-        assert(dynamic_cast<Dots *>(child));
-    }
-    else if (child->Is(NOTE)) {
-        assert(dynamic_cast<Note *>(child));
-    }
-    else if (child->Is(STEM)) {
-        assert(dynamic_cast<Stem *>(child));
-    }
-    else if (child->Is(VERSE)) {
-        assert(dynamic_cast<Verse *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 void Chord::AddChild(Object *child)
 {
-    if (!this->IsSupportedChild(child)) {
+    if (!this->IsSupportedChild(child->GetClassId())) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
         return;
     }

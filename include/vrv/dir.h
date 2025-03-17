@@ -66,7 +66,7 @@ public:
      * Add an element (text, rend. etc.) to a dir.
      * Only supported elements will be actually added to the child list.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * See FloatingObject::IsExtenderElement

@@ -125,22 +125,26 @@ void KeySig::FilterList(ListOfConstObjects &childList) const
     }
 }
 
-bool KeySig::IsSupportedChild(Object *child)
+bool KeySig::IsSupportedChild(ClassId classId)
 {
+    /*
     if (this->IsAttribute() && !child->IsAttribute()) {
         LogError("Adding a non-attribute child to an attribute is not allowed");
         assert(false);
     }
-    else if (child->Is(KEYACCID)) {
-        assert(dynamic_cast<KeyAccid *>(child));
+    */
+
+    static const std::vector<ClassId> supported{ KEYACCID };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 int KeySig::GetAccidCount(bool fromAttribute) const

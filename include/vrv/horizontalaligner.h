@@ -91,7 +91,7 @@ public:
     /**
      * Override the method of adding AlignmentReference children
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * @name Set and get the xRel value of the alignment
@@ -303,7 +303,7 @@ public:
     /**
      * Override the method of adding Alignment children
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Overwritten method for AlignmentReference children
@@ -437,7 +437,7 @@ public:
     /**
      * Override the method of adding AlignmentReference children
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Retrieve the alignmnet of the type at that time.
@@ -675,7 +675,7 @@ public:
     /**
      * Override the method of adding TimestampAttr children
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Look for an existing TimestampAttr at a certain time.

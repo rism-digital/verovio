@@ -39,7 +39,7 @@ public:
      * Add a text element to an annotation.
      * Only supported elements will be actually added to the child list.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     //----------//
     // Functors //
