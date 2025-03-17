@@ -62,6 +62,17 @@ public:
      */
     void ResetDrawingList();
 
+    //-----------------//
+    // Pseudo functors //
+    //-----------------//
+
+    /**
+     * Called explicitly from ResetDataFunctor
+     */
+    ///@{
+    FunctorCode InterfaceResetData(ResetDataFunctor &functor);
+    ///@}
+
 private:
     //
 public:
@@ -162,6 +173,17 @@ public:
      * Get above/below overflow for the children
      */
     void GetBeamChildOverflow(StaffAlignment *&above, StaffAlignment *&below) const;
+
+    //-----------------//
+    // Pseudo functors //
+    //-----------------//
+
+    /**
+     * Called explicitly from ResetDataFunctor
+     */
+    ///@{
+    FunctorCode InterfaceResetData(ResetDataFunctor &functor);
+    ///@}
 
 protected:
     /**
@@ -283,6 +305,17 @@ public:
     const Proport *GetCurrentProport() const { return &m_currentProport; }
     ///@}
 
+    //-----------------//
+    // Pseudo functors //
+    //-----------------//
+
+    /**
+     * Called explicitly from ResetDataFunctor
+     */
+    ///@{
+    FunctorCode InterfaceResetData(ResetDataFunctor &functor);
+    ///@}
+
 private:
     /** The clef or clef attributes */
     Clef m_currentClef;
@@ -359,6 +392,17 @@ public:
     virtual Point GetStemUpSE(const Doc *doc, int staffSize, bool graceSize) const = 0;
     virtual Point GetStemDownNW(const Doc *doc, int staffSize, bool graceSize) const = 0;
     virtual int CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir) const = 0;
+    ///@}
+
+    //-----------------//
+    // Pseudo functors //
+    //-----------------//
+
+    /**
+     * Called explicitly from ResetDataFunctor
+     */
+    ///@{
+    FunctorCode InterfaceResetData(ResetDataFunctor &functor);
     ///@}
 
 protected:

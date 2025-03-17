@@ -403,7 +403,6 @@ void Object::CopyAttributesTo(Object *target) const
     AttModule::CopyCritapp(this, target);
     // AttModule::CopyEdittrans(this, target);
     AttModule::CopyExternalsymbols(this, target);
-    AttModule::CopyFrettab(this, target);
     AttModule::CopyFacsimile(this, target);
     // AttModule::CopyFigtable(this, target);
     // AttModule::CopyFingering(this, target);
@@ -417,6 +416,7 @@ void Object::CopyAttributesTo(Object *target) const
     AttModule::CopyPagebased(this, target);
     // AttModule::CopyPerformance(this, target);
     AttModule::CopyShared(this, target);
+    AttModule::CopyStringtab(this, target);
     // AttModule::CopyUsersymbols(this, target);
     AttModule::CopyVisual(this, target);
 
@@ -434,7 +434,6 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     AttModule::GetCritapp(this, attributes);
     // AttModule::GetEdittrans(this, attributes);
     AttModule::GetExternalsymbols(this, attributes);
-    AttModule::GetFrettab(this, attributes);
     AttModule::GetFacsimile(this, attributes);
     // AttModule::GetFigtable(this, attributes);
     // AttModule::GetFingering(this, attributes);
@@ -448,6 +447,7 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     AttModule::GetPagebased(this, attributes);
     // AttModule::GetPerformance(this, attributes);
     AttModule::GetShared(this, attributes);
+    AttModule::GetStringtab(this, attributes);
     // AttModule::GetUsersymbols(this, attributes);
     AttModule::GetVisual(this, attributes);
 
@@ -841,7 +841,9 @@ void Object::AddChild(Object *child)
         }
     }
 
-    child->SetParent(this);
+    if (!this->IsReferenceObject()) {
+        child->SetParent(this);
+    }
     const int insertOrder = this->GetInsertOrderFor(child->GetClassId());
     // no child or no order specify, the child is appended at the end
     if (m_children.empty() || insertOrder == VRV_UNSET) {
