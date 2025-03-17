@@ -723,7 +723,7 @@ FunctorCode PrepareTimeSpanningFunctor::VisitMeasureEnd(Measure *measure)
         while (iter != m_timeSpanningInterfaces.end()) {
             // At the end of the measure we remove elements for which we do not need to match the end (for now).
             // Eventually, we could consider them, for example if we want to display their spanning or for
-            // improved midi output
+            // improved MIDI output
             if (iter->second->GetClassId() == HARM) {
                 iter = m_timeSpanningInterfaces.erase(iter);
             }
