@@ -2514,7 +2514,7 @@ bool HumdrumInput::checkForScordatura(hum::HumdrumFile &infile)
 //////////////////////////////
 //
 // HumdrumInput::initializeIgnoreVector -- Mark areas of the input file that
-//     should not be converted into
+//     should not be converted into music.
 //
 
 void HumdrumInput::initializeIgnoreVector(hum::HumdrumFile &infile)
@@ -30287,6 +30287,7 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
         std::string value = "";
         std::string qoffset = "";
         std::string enclosure = "";
+        std::string color = "";
         int pcount = hps->getCount();
         for (int j = 0; j < pcount; ++j) {
             key = hps->getParameterName(j);
@@ -30305,6 +30306,9 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
             }
             if (key == "enc") {
                 enclosure = value;
+            }
+            if (key == "color") {
+                color = value;
             }
         }
 
@@ -30325,6 +30329,10 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
         }
         else {
             setEnclosure(rend, enclosure);
+        }
+        if (!color.empty()) {
+            reh->SetColor(color);
+            rend->SetColor(color);
         }
         addChildMeasureOrSection(reh);
         setStaff(reh, 1);
@@ -30358,6 +30366,10 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
             }
             else {
                 setEnclosure(rend, enclosure);
+            }
+            if (!color.empty()) {
+                reh->SetColor(color);
+                rend->SetColor(color);
             }
             addChildMeasureOrSection(reh);
             setStaff(reh, staffCount);
