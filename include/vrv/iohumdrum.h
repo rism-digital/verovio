@@ -1003,6 +1003,7 @@ protected:
     template <class ELEMENT>
     void setFontsize(ELEMENT *element, const std::string &percentage, const std::string &original);
     template <class ELEMENT> void setTstamp(ELEMENT *element, const string &value);
+    template <class ELEMENT> void setEnclosure(ELEMENT *element, const string &value);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);

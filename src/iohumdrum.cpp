@@ -30286,6 +30286,7 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
         std::string key = "";
         std::string value = "";
         std::string qoffset = "";
+        std::string enclosure = "";
         int pcount = hps->getCount();
         for (int j = 0; j < pcount; ++j) {
             key = hps->getParameterName(j);
@@ -30302,6 +30303,9 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
             if (key == "fs") {
                 fontsize = value;
             }
+            if (key == "enc") {
+                enclosure = value;
+            }
         }
 
         if (tvalue.empty()) {
@@ -30316,6 +30320,12 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
         reh->AddChild(rend);
         rend->AddChild(text);
         rend->SetRend(TEXTRENDITION_box);
+        if (enclosure.empty()) {
+            rend->SetRend(TEXTRENDITION_box);
+        }
+        else {
+            setEnclosure(rend, enclosure);
+        }
         addChildMeasureOrSection(reh);
         setStaff(reh, 1);
         if (!qoffset.empty()) {
@@ -30343,7 +30353,12 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
             text->SetText(wtext);
             reh->AddChild(rend);
             rend->AddChild(text);
-            rend->SetRend(TEXTRENDITION_box);
+            if (enclosure.empty()) {
+                rend->SetRend(TEXTRENDITION_box);
+            }
+            else {
+                setEnclosure(rend, enclosure);
+            }
             addChildMeasureOrSection(reh);
             setStaff(reh, staffCount);
             if (!qoffset.empty()) {
@@ -30357,10 +30372,38 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
                 fontsize = "large";
             }
             setFontsize(rend, "", fontsize);
-            // rend->SetHalign(HORIZONTALALIGNMENT_center);
 
             setPlaceRelStaff(reh, "below", false);
         }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setEnclosure -- values are "box", "dbox", "tbox" and "circle"
+//    (tbox and circle are not implemented in verovio).
+//
+
+template <class ELEMENT> void HumdrumInput::setEnclosure(ELEMENT *element, const string &value)
+{
+    if (value == "box") {
+        element->SetRend(TEXTRENDITION_box);
+    }
+    else if (value == "dbox") {
+        element->SetRend(TEXTRENDITION_dbox);
+    }
+    else if (value == "tbox") {
+        element->SetRend(TEXTRENDITION_tbox);
+    }
+    else if (value == "circle") {
+        element->SetRend(TEXTRENDITION_circle);
+    }
+    else if (value == "none") {
+        element->SetRend(TEXTRENDITION_none);
+    }
+    else {
+        std::string str = "Unknown enclosure type: " + value;
+        LogError("%s", str.c_str());
     }
 }
 
