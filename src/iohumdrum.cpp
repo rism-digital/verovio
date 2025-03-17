@@ -771,6 +771,7 @@ bool HumdrumInput::convertHumdrum()
     m_multirest = analyzeMultiRest(infile);
     m_breaks = analyzeBreaks(infile);
     analyzeVerseColor(infile);
+    analyzeDefaultLayoutStyles(infile);
 
     infile.analyzeSlurs();
     infile.analyzeBeams();
@@ -30280,19 +30281,23 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
         if (!rehQ) {
             continue;
         }
+
         bool absysQ = false;
-        std::string fontsize = "";
-        std::string tvalue = "";
-        std::string key = "";
-        std::string value = "";
-        std::string qoffset = "";
-        std::string enclosure = "";
-        std::string color = "";
-        std::string enclosureColor = "";
+        std::string absysDefault = getDefaultLayoutParameter("REH", "absys");
+        if (absysDefault == "1") {
+            absysQ = true;
+        }
+        std::string fontsize = getDefaultLayoutParameter("REH", "fs");
+        std::string tvalue = getDefaultLayoutParameter("REH", "t");
+        std::string qoffset = getDefaultLayoutParameter("REH", "qo");
+        std::string enclosure = getDefaultLayoutParameter("REH", "enc");
+        std::string color = getDefaultLayoutParameter("REH", "color");
+        std::string enclosureColor = getDefaultLayoutParameter("REH", "encc");
+
         int pcount = hps->getCount();
         for (int j = 0; j < pcount; ++j) {
-            key = hps->getParameterName(j);
-            value = hps->getParameterValue(j);
+            std::string key = hps->getParameterName(j);
+            std::string value = hps->getParameterValue(j);
             if (key == "t") {
                 tvalue = value;
             }
@@ -32825,6 +32830,92 @@ void HumdrumInput::createGlissando(hum::HTp glissStart, hum::HTp glissEnd)
         gliss->SetID(glissId);
         m_measure->AddChild(gliss);
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::analyzeDefaultLayoutStyles -- search for lines starting with:
+//   !!LO-style: and set the default parameters for the given LO category.
+// Example:
+//   !!!LO-style:REH:enc=dbox:encc=crimson:color=limegreen:absys:fs=200%
+//
+//   These values will be inserted into the m_layoutDefaultStyles variable.
+//   In this case:
+//       m_layoutDefaultStyle["REH"]["enc"]   = "dbox";
+//       m_layoutDefaultStyle["REH"]["encc"]  = "crimson";
+//       m_layoutDefaultStyle["REH"]["color"] = "limegreen";
+//       m_layoutDefaultStyle["REH"]["absys"] = "1";
+//       m_layoutDefaultStyle["REH"]["fs"]    = "200%";
+//  These defaults will be loaded before processing a !!LO:REH layout parameter set.
+//  The defaults can be placed anywhere in the file, and later defaults for the
+//  same category will replace ones earllier in the file.
+//
+
+void HumdrumInput::analyzeDefaultLayoutStyles(hum::HumdrumFile &infile)
+{
+    hum::HumRegex hre;
+    std::string prefix = "!!!LO-style:";
+    for (int i = 0; i < infile.getLineCount(); i++) {
+        if (infile[i].hasSpines()) {
+            continue;
+        }
+        if (infile[i].compare(0, prefix.length(), prefix) != 0) {
+            continue;
+        }
+        std::string rest = infile[i].substr(prefix.length());
+        std::vector<std::string> pieces;
+        hre.split(pieces, rest, ":");
+        if (pieces.empty()) {
+            continue;
+        }
+        std::string category = pieces.at(0);
+        m_layoutDefaultStyles.erase(category);
+        for (int j = 1; j < (int)pieces.size(); j++) {
+            if (pieces[j] == "") {
+                continue;
+            }
+            else if (!pieces[j].empty()) {
+                if (pieces[0] == "=") {
+                    continue;
+                }
+            }
+            if (hre.search(pieces[j], "^([^=]+)=(.*)$")) {
+                std::string key = hre.getMatch(1);
+                std::string value = hre.getMatch(2);
+                hre.replaceDestructive(value, ":", "&colon;", "g");
+                m_layoutDefaultStyles[category][key] = value;
+            }
+            else {
+                std::string key = pieces[j];
+                std::string value = "1";
+                m_layoutDefaultStyles[category][key] = value;
+            }
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getDefaultLayoutParameter -- Return the default layout
+//   parameter for a given cateogry and category parameter.  If there is
+//   no given parameter, returns "".
+//
+
+std::string HumdrumInput::getDefaultLayoutParameter(const std::string &category, const std::string &parameter)
+{
+    auto &plist = m_layoutDefaultStyles;
+    if (plist.empty()) {
+        return "";
+    }
+    auto categoryEntry = plist.find(category);
+    if (categoryEntry == plist.end()) {
+        return "";
+    }
+    auto param = categoryEntry->second.find(parameter);
+    if (param == categoryEntry->second.end()) {
+        return "";
+    }
+    return param->second;
 }
 
 #endif /* NO_HUMDRUM_SUPPORT */

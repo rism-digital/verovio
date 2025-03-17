@@ -905,6 +905,8 @@ protected:
     void insertTextWithNewlines(Label *label, const std::string &text);
     bool hasBounceAfter(hum::HTp token);
     bool hasBounceBefore(hum::HTp token);
+    void analyzeDefaultLayoutStyles(hum::HumdrumFile &infile);
+    std::string getDefaultLayoutParameter(const std::string &category, const std::string &parameter);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -1295,6 +1297,9 @@ private:
     // m_textSmuflSpace = space to give between SMuFL characters
     // (excluding augmentation dots).
     std::string m_textSmuflSpacer = "\xc2\xa0";
+
+    // m_layoutDefaultStyles = default layout styles for LO categories.
+    std::map<std::string, std::map<string, std::string>> m_layoutDefaultStyles;
 
     // Some metadata elements that are computed once and used multiple times
     std::vector<hum::HumdrumLine *> m_humdrumLineReferences;
