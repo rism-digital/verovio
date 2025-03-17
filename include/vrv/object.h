@@ -406,6 +406,11 @@ public:
     virtual void AddChild(Object *object);
 
     /**
+     * Additional check when adding a child.
+     */
+    virtual bool AddChildAdditionalCheck(Object *child) { return true; };
+
+    /**
      * Return the child order for a the given ClassId.
      * By default, a child is added at the end, but a class can override the method to order them.
      * The overriden method specifies a static vector with the expected order of ClassIds.

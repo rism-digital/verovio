@@ -70,7 +70,7 @@ bool TabDurSym::IsSupportedChild(ClassId classId)
 
 void TabDurSym::AddChild(Object *child)
 {
-    if (!this->IsSupportedChild(child->GetClassId())) {
+    if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
         return;
     }

@@ -832,12 +832,9 @@ bool Object::IsSupportedChild(ClassId classId)
 
 void Object::AddChild(Object *child)
 {
-    if (!((child->GetClassName() == "Staff") && (this->GetClassName() == "Section"))) {
-        // temporarily allowing staff in section for issue https://github.com/MeasuringPolyphony/mp_editor/issues/62
-        if (!this->IsSupportedChild(child->GetClassId())) {
-            LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-            return;
-        }
+    if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        return;
     }
 
     if (!this->IsReferenceObject()) {

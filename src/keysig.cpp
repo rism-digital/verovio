@@ -127,12 +127,6 @@ void KeySig::FilterList(ListOfConstObjects &childList) const
 
 bool KeySig::IsSupportedChild(ClassId classId)
 {
-    /*
-    if (this->IsAttribute() && !child->IsAttribute()) {
-        LogError("Adding a non-attribute child to an attribute is not allowed");
-        assert(false);
-    }
-    */
 
     static const std::vector<ClassId> supported{ KEYACCID };
 
@@ -145,6 +139,16 @@ bool KeySig::IsSupportedChild(ClassId classId)
     else {
         return false;
     }
+}
+
+bool KeySig::AddChildAdditionalCheck(Object *child)
+{
+
+    if (this->IsAttribute() && !child->IsAttribute()) {
+        LogError("Adding a non-attribute child to an attribute is not allowed");
+        return false;
+    }
+    return (LayerElement::AddChildAdditionalCheck(child));
 }
 
 int KeySig::GetAccidCount(bool fromAttribute) const

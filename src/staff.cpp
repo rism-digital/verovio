@@ -115,7 +115,16 @@ bool Staff::IsSupportedChild(ClassId classId)
     if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
         return true;
     }
-    /*
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+bool Staff::AddChildAdditionalCheck(Object *child)
+{
     if (child->Is(LAYER)) {
         Layer *layer = vrv_cast<Layer *>(child);
         assert(layer);
@@ -125,13 +134,7 @@ bool Staff::IsSupportedChild(ClassId classId)
             layer->SetN(this->GetChildCount(LAYER) + 1);
         }
     }
-    */
-    else if (Object::IsEditorialElement(classId)) {
-        return true;
-    }
-    else {
-        return false;
-    }
+    return (Object::AddChildAdditionalCheck(child));
 }
 
 int Staff::GetDrawingX() const

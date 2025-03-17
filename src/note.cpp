@@ -133,20 +133,6 @@ void Note::Reset()
 
 bool Note::IsSupportedChild(ClassId classId)
 {
-    // additional verification for accid and artic - this will not be raised with editorial markup, though
-    /*
-    if (child->Is(ACCID)) {
-        IsAttributeComparison isAttributeComparison(ACCID);
-        if (this->FindDescendantByComparison(&isAttributeComparison))
-            LogWarning("Having both @accid or @accid.ges and <accid> child will cause problems");
-    }
-    else if (child->Is(ARTIC)) {
-        IsAttributeComparison isAttributeComparison(ARTIC);
-        if (this->FindDescendantByComparison(&isAttributeComparison))
-            LogWarning("Having both @artic and <artic> child will cause problems");
-    }
-    */
-
     static const std::vector<ClassId> supported{ ACCID, ARTIC, DOTS, PLICA, STEM, SYL, VERSE };
 
     if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
@@ -162,7 +148,7 @@ bool Note::IsSupportedChild(ClassId classId)
 
 void Note::AddChild(Object *child)
 {
-    if (!this->IsSupportedChild(child->GetClassId())) {
+    if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
         return;
     }
@@ -180,6 +166,23 @@ void Note::AddChild(Object *child)
         children.push_back(child);
     }
     Modify();
+}
+
+bool Note::AddChildAdditionalCheck(Object *child)
+{
+    // Additional verification for accid and artic - this will not be raised with editorial markup, though
+    // Left as a warning for now.
+    if (child->Is(ACCID)) {
+        IsAttributeComparison isAttributeComparison(ACCID);
+        if (this->FindDescendantByComparison(&isAttributeComparison))
+            LogWarning("Having both @accid or @accid.ges and <accid> child will cause problems");
+    }
+    else if (child->Is(ARTIC)) {
+        IsAttributeComparison isAttributeComparison(ARTIC);
+        if (this->FindDescendantByComparison(&isAttributeComparison))
+            LogWarning("Having both @artic and <artic> child will cause problems");
+    }
+    return (LayerElement::AddChildAdditionalCheck(child));
 }
 
 void Note::AlignDotsShift(const Note *otherNote)

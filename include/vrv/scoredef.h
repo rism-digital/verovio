@@ -153,6 +153,11 @@ public:
     bool IsSupportedChild(ClassId classId) override;
 
     /**
+     * Additional check when adding a child.
+     */
+    bool AddChildAdditionalCheck(Object *child) override;
+
+    /**
      * Return an order for the given ClassId.
      */
     int GetInsertOrderFor(ClassId classId) const override;

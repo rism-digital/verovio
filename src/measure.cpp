@@ -173,17 +173,6 @@ bool Measure::IsSupportedChild(ClassId classId)
     else if (Object::IsEditorialElement(classId)) {
         return true;
     }
-    /*
-    else if (child->Is(STAFF)) {
-        Staff *staff = vrv_cast<Staff *>(child);
-        assert(staff);
-        if (staff && (staff->GetN() < 1)) {
-            // This is not 100% safe if we have a <app> and <rdg> with more than
-            // one staff as a previous child.
-            staff->SetN(this->GetChildCount());
-        }
-    }
-    */
     else {
         return false;
     }
@@ -191,7 +180,7 @@ bool Measure::IsSupportedChild(ClassId classId)
 
 void Measure::AddChildBack(Object *child)
 {
-    if (!this->IsSupportedChild(child->GetClassId())) {
+    if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
         return;
     }
@@ -213,6 +202,20 @@ void Measure::AddChildBack(Object *child)
         }
     }
     Modify();
+}
+
+bool Measure::AddChildAdditionalCheck(Object *child)
+{
+    if (child->Is(STAFF)) {
+        Staff *staff = vrv_cast<Staff *>(child);
+        assert(staff);
+        if (staff && (staff->GetN() < 1)) {
+            // This is not 100% safe if we have a <app> and <rdg> with more than
+            // one staff as a previous child.
+            staff->SetN(this->GetChildCount());
+        }
+    }
+    return (Object::AddChildAdditionalCheck(child));
 }
 
 int Measure::GetDrawingX() const

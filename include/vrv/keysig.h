@@ -74,6 +74,11 @@ public:
      */
     bool IsSupportedChild(ClassId classId) override;
 
+    /**
+     * Additional check when adding a child.
+     */
+    bool AddChildAdditionalCheck(Object *child) override;
+
     /** Accid number getter */
     int GetAccidCount(bool fromAttribute = false) const;
 

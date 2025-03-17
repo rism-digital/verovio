@@ -115,6 +115,11 @@ public:
     void AddChild(Object *object) override;
 
     /**
+     * Additional check when adding a child.
+     */
+    bool AddChildAdditionalCheck(Object *child) override;
+
+    /**
      * Align dots shift for two notes. Should be used for unison notes to align dots positioning
      */
     void AlignDotsShift(const Note *otherNote);

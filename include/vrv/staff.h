@@ -159,6 +159,11 @@ public:
     ///@}
 
     /**
+     * Additional check when adding a child.
+     */
+    bool AddChildAdditionalCheck(Object *child) override;
+
+    /**
      * @name Get the X, Y, and angle of drawing position
      */
     ///@{
