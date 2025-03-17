@@ -766,12 +766,12 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
         return FUNCTOR_SIBLINGS;
     }
 
-    const int channel = m_midiChannel;
-    int velocity = MIDI_VELOCITY;
-    if (note->HasVel()) velocity = note->GetVel();
+    const int velocity = (note->HasVel()) ? note->GetVel() : MIDI_VELOCITY;
+    if (!velocity) return FUNCTOR_SIBLINGS;;
 
-    double startTime = m_totalTime + note->GetScoreTimeOnset().ToDouble();
+    const int channel = m_midiChannel;
     const int tpq = m_midiFile->getTPQ();
+    double startTime = m_totalTime + note->GetScoreTimeOnset().ToDouble();
 
     // Check if note is deferred
     if (m_deferredNotes.find(note) != m_deferredNotes.end()) {
