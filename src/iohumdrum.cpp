@@ -30302,7 +30302,12 @@ void HumdrumInput::checkForGlobalRehearsal(int line)
                 tvalue = value;
             }
             if (key == "absys") {
-                absysQ = true;
+                if ((value == "0") || (value == "false")) {
+                    absysQ = false;
+                }
+                else {
+                    absysQ = true;
+                }
             }
             if (key == "qo") {
                 qoffset = value;
