@@ -59,7 +59,6 @@ bool FTrem::IsSupportedChild(ClassId classId)
     if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
         return true;
     }
-
     else if (Object::IsEditorialElement(classId)) {
         return true;
     }
