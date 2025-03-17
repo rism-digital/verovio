@@ -127,7 +127,6 @@ void KeySig::FilterList(ListOfConstObjects &childList) const
 
 bool KeySig::IsSupportedChild(ClassId classId)
 {
-
     static const std::vector<ClassId> supported{ KEYACCID };
 
     if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
@@ -143,7 +142,6 @@ bool KeySig::IsSupportedChild(ClassId classId)
 
 bool KeySig::AddChildAdditionalCheck(Object *child)
 {
-
     if (this->IsAttribute() && !child->IsAttribute()) {
         LogError("Adding a non-attribute child to an attribute is not allowed");
         return false;
