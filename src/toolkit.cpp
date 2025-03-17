@@ -1861,7 +1861,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     jsonxx::Array chordArray;
     jsonxx::Array restArray;
 
-    // Here we need to check that the midi timemap is done
+    // Here we need to check that the MIDI timemap is done
     if (!m_doc.HasTimemap()) {
         // generate MIDI timemap before progressing
         m_doc.CalculateTimemap();

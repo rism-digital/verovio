@@ -516,7 +516,7 @@ void InitTimemapAdjustNotesFunctor::SetNoteStart(Note *note, const Fraction &sta
 }
 
 //----------------------------------------------------------------------------
-// InitMidiFunctor
+// InitMIDIFunctor
 //----------------------------------------------------------------------------
 
 InitMIDIFunctor::InitMIDIFunctor() : ConstFunctor()
