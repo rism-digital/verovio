@@ -1215,12 +1215,8 @@ void SvgDeviceContext::AppendAdditionalAttributes(Object *object)
     }
 }
 
-std::string SvgDeviceContext::GetColor(int color)
+std::string SvgDeviceContext::GetColor(int color) const
 {
-    std::ostringstream ss;
-    ss << "#";
-    ss << std::hex;
-
     switch (color) {
         case (COLOR_NONE): return "currentColor";
         case (COLOR_BLACK): return "#000000";
@@ -1230,13 +1226,7 @@ std::string SvgDeviceContext::GetColor(int color)
         case (COLOR_BLUE): return "#0000FF";
         case (COLOR_CYAN): return "#00FFFF";
         case (COLOR_LIGHT_GREY): return "#777777";
-        default:
-            int blue = (color & 255);
-            int green = (color >> 8) & 255;
-            int red = (color >> 16) & 255;
-            ss << red << green << blue;
-            // std::strin = wxDecToHex(char(red)) + wxDecToHex(char(green)) + wxDecToHex(char(blue)) ;  // ax3
-            return ss.str();
+        default: return StringFormat("#%06X", color);
     }
 }
 
