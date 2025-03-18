@@ -767,7 +767,7 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
     }
 
     const int velocity = (note->HasVel()) ? note->GetVel() : MIDI_VELOCITY;
-    if (!velocity) return FUNCTOR_SIBLINGS;;
+    if (!velocity) return FUNCTOR_SIBLINGS;
 
     const int channel = m_midiChannel;
     const int tpq = m_midiFile->getTPQ();
