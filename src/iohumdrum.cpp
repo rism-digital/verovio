@@ -17893,6 +17893,14 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     }
 
     if (sicQ) {
+        if (label.empty()) {
+            if (!ovalue.empty()) {
+                label = "orig: " + ovalue;
+            }
+            if (!svalue.empty()) {
+                label = "corr: " + svalue;
+            }
+        }
         if (verboseType == "text") {
             if (!ovalue.empty()) {
                 text = ovalue;
@@ -18087,7 +18095,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         else if (dir) {
             dir->AddChild(rend);
         }
-        addTextElement(rend, text);
+        addTextElement(rend, text, "", false, label);
         if (!italic) {
             rend->SetFontstyle(FONTSTYLE_normal);
         }
@@ -18108,7 +18116,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     else {
 
         if (tempoQ && tempo) {
-            addTextElement(tempo, text);
+            addTextElement(tempo, text, "", false, label);
             if (onlysmufl && needrend) {
                 int count = tempo->GetChildCount();
                 for (int j = 0; j < count; j++) {
@@ -18149,7 +18157,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
             if (onlysmufl && needrend) {
                 Rend *rend = new Rend();
                 dir->AddChild(rend);
-                addTextElement(rend, text);
+                addTextElement(rend, text, "", false, label);
                 if (!color.empty()) {
                     rend->SetColor(color);
                 }
@@ -18177,7 +18185,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
                 }
             }
             else {
-                addTextElement(dir, text);
+                addTextElement(dir, text, "", false, label);
             }
         }
     }
@@ -20629,13 +20637,17 @@ template <class ELEMENT> void HumdrumInput::addMusicSymbol(ELEMENT *element, con
 // HumdumInput::addTextElement -- Append text to a regular element.
 //   default value: fontstyle == ""
 //   default value: addSpacer == true
+//   default value: label     == true
 //
 
 template <class ELEMENT>
 void HumdrumInput::addTextElement(
-    ELEMENT *element, const std::string &content, const std::string &fontstyle, bool addSpacer)
+    ELEMENT *element, const std::string &content, const std::string &fontstyle, bool addSpacer, const string &label)
 {
     Text *text = new Text();
+    if (!label.empty()) {
+        text->SetLabel(label);
+    }
     std::string myfontstyle = fontstyle;
 
     std::string data = content;
@@ -20704,7 +20716,7 @@ void HumdrumInput::addTextElement(
             rend->AddChild(text);
             text->SetText(UTF8to32(pretext));
             setFontStyle(rend, myfontstyle);
-            // addTextElement(element, pretext, myfontstyle, addSpacer);
+            // addTextElement(element, pretext, myfontstyle, addSpacer, label);
         }
         if (!musictext.empty()) {
             addMusicSymbol(element, rawmusictext);
@@ -20747,6 +20759,9 @@ void HumdrumInput::addTextElement(
             Lb *lb = new Lb();
             element->AddChild(lb);
             text = new Text();
+            if (!label.empty()) {
+                text->SetLabel(label);
+            }
         }
     }
 }

@@ -979,8 +979,8 @@ protected:
     void appendElement(const std::vector<std::string> &name, const std::vector<void *> &pointers, CHILD child);
     void popElementStack(std::vector<std::string> &elements, std::vector<void *> &pointers);
     template <class ELEMENT>
-    void addTextElement(
-        ELEMENT *element, const std::string &content, const std::string &fontstyle = "", bool addSpacer = true);
+    void addTextElement(ELEMENT *element, const std::string &content, const std::string &fontstyle = "",
+        bool addSpacer = true, const std::string &label = "");
     template <class ELEMENT> void addMusicSymbol(ELEMENT *element, const std::string &musictext);
     template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
     template <class ELEMENT> void appendTypeTag(ELEMENT *element, const std::string &tag);
