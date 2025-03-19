@@ -27,9 +27,9 @@ namespace vrv {
 
 static const ClassRegistrar<Tuning> s_factory("tuning", TUNING);
 
-Tuning::Tuning() : Object(TUNING, "tuning-"), AttCourseLog()
+Tuning::Tuning() : Object(TUNING, "tuning-"), AttTuningLog()
 {
-    this->RegisterAttClass(ATT_COURSELOG);
+    this->RegisterAttClass(ATT_TUNINGLOG);
 
     this->Reset();
 }
@@ -39,7 +39,7 @@ Tuning::~Tuning() {}
 void Tuning::Reset()
 {
     Object::Reset();
-    this->ResetCourseLog();
+    this->ResetTuningLog();
 }
 
 bool Tuning::IsSupportedChild(Object *child)
@@ -56,8 +56,8 @@ bool Tuning::IsSupportedChild(Object *child)
     return true;
 }
 
-int Tuning::CalcPitchPos(
-    int course, data_NOTATIONTYPE notationType, int lines, int listSize, int index, int loc, bool topAlign) const
+int Tuning::CalcPitchPos(int course, data_NOTATIONTYPE notationType, int lines, int listSize, int index, int loc,
+    int tabLine, int tabAnchorline, bool topAlign) const
 {
     switch (notationType) {
         case NOTATIONTYPE_tab_lute_french:
@@ -67,14 +67,24 @@ int Tuning::CalcPitchPos(
             // all courses >= 7 are positioned on line 7
             return (std::min(course, 7) - 1) * 2;
         case NOTATIONTYPE_tab_lute_german:
-            if (loc != MEI_UNSET) {
+            if (tabLine != 0) {
+                // explicit position, 1st priority
+                return (tabLine - 1) * 2;
+            }
+            else if (loc != MEI_UNSET) {
+                // explicit position, 2nd priority
                 return loc;
             }
+            else if (tabAnchorline != 0) {
+                // align bottom note to given anchor line, but don't extend chord above the top line, 3rd priority
+                return (std::min(tabAnchorline - 1, lines - listSize) + index) * 2;
+            }
             else if (topAlign) {
-                return (lines - (listSize - index)) * 2;
+                // align top note with top line, joint 4th priority (default positioning)
+                return (lines - listSize + index) * 2;
             }
             else {
-                // bottom align
+                // align bottom note with bottom line, joint 4th priority
                 return index * 2;
             }
         case NOTATIONTYPE_tab_guitar: [[fallthrough]];

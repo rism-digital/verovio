@@ -105,7 +105,7 @@ FunctorCode PlistInterface::InterfacePreparePlist(PreparePlistFunctor &functor, 
     this->SetIDStrs();
 
     for (const std::string &id : m_ids) {
-        functor.InsertInterfaceIDPair(id, this);
+        functor.InsertInterfaceObjectIDPair(object, id);
     }
 
     return FUNCTOR_CONTINUE;

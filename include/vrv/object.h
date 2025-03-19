@@ -650,6 +650,16 @@ public:
     Object *FindPreviousChild(Comparison *comp, Object *start);
 
     /**
+     * @name Methods for managing the list of back-links from plist
+     */
+    ///@{
+    bool HasPlistReferences() const { return (m_plistReferences.has_value()); }
+    void ResetPlistReferences() { m_plistReferences.reset(); }
+    const std::optional<ListOfConstObjects> *GetPlistReferences() const { return &m_plistReferences; }
+    void AddPlistReference(const Object *object);
+    ///@}
+
+    /**
      * Main method that processes functors.
      * For each object, it will call the functor.
      * Depending on the code returned by the functor, it will also process it for all children.
@@ -803,6 +813,11 @@ private:
      * A flag indicating if the Object is a copy created by an expanded expansion element.
      */
     bool m_isExpansion;
+
+    /**
+     * An optional list of back-links to plist referring objects
+     */
+    std::optional<ListOfConstObjects> m_plistReferences;
 
     //----------------//
     // Static members //

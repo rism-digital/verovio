@@ -64,14 +64,18 @@ public:
     FunctorCode VisitNote(Note *note) override;
     FunctorCode VisitNc(Nc *nc) override;
     FunctorCode VisitObject(Object *object) override;
+    FunctorCode VisitPage(Page *page) override;
     FunctorCode VisitRepeatMark(RepeatMark *repeatMark) override;
     FunctorCode VisitRest(Rest *rest) override;
     FunctorCode VisitSection(Section *section) override;
     FunctorCode VisitSlur(Slur *slur) override;
     FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitStaffDef(StaffDef *staffDef) override;
     FunctorCode VisitStem(Stem *stem) override;
     FunctorCode VisitSyl(Syl *syl) override;
+    FunctorCode VisitSystem(System *system) override;
     FunctorCode VisitSystemMilestone(SystemMilestoneEnd *systemMilestoneEnd) override;
+    FunctorCode VisitTabDurSym(TabDurSym *tabDurSym) override;
     FunctorCode VisitTempo(Tempo *tempo) override;
     FunctorCode VisitTuplet(Tuplet *tuplet) override;
     FunctorCode VisitTurn(Turn *turn) override;

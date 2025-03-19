@@ -38,6 +38,7 @@
 #define GIT_COMMIT "[undefined]"
 #endif
 
+#include "object.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -250,6 +251,21 @@ std::string ExtractIDFragment(std::string refID)
         refID = refID.substr(pos + 1);
     }
     return refID;
+}
+
+std::string ConcatenateIDs(const ListOfConstObjects &objects)
+{
+    // Get a list of strings
+    std::vector<std::string> ids;
+    for (const auto &object : objects) {
+        ids.push_back("#" + object->GetID() + " ");
+    }
+    // Concatenate IDs
+    std::stringstream sstream;
+    std::copy(ids.begin(), ids.end(), std::ostream_iterator<std::string>(sstream));
+    std::string uris = sstream.str();
+    if (!uris.empty()) uris.pop_back(); // Remove extra space added by the concatenation
+    return uris;
 }
 
 std::string UTF32to8(const std::u32string &in)

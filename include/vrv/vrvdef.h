@@ -66,7 +66,7 @@ namespace vrv {
 #endif
 
 //----------------------------------------------------------------------------
-// Default midi values
+// Default MIDI values
 //----------------------------------------------------------------------------
 
 #define MIDI_VELOCITY 90
@@ -362,7 +362,7 @@ typedef std::multimap<std::string, LinkingInterface *> MapOfLinkingInterfaceIDPa
 
 typedef std::map<std::string, Note *> MapOfNoteIDPairs;
 
-typedef std::vector<std::pair<PlistInterface *, std::string>> ArrayOfPlistInterfaceIDPairs;
+typedef std::vector<std::pair<Object *, std::string>> ArrayOfPlistObjectIDPairs;
 
 typedef std::vector<CurveSpannedElement *> ArrayOfCurveSpannedElements;
 
@@ -676,6 +676,12 @@ enum GraphicID { PRIMARY = 0, SPANNING, SYMBOLREF };
 //----------------------------------------------------------------------------
 
 enum MeasureType { MEASURED = 0, UNMEASURED, NEUMELINE };
+
+//----------------------------------------------------------------------------
+// Focus status type
+//----------------------------------------------------------------------------
+
+enum FocusStatusType { FOCUS_UNSET = 0, FOCUS_SET, FOCUS_USED };
 
 //----------------------------------------------------------------------------
 // The score time unit (quarter note)

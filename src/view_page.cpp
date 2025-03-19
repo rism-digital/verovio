@@ -64,12 +64,11 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
 {
     assert(dc);
     assert(m_doc);
+    assert(m_currentPage);
 
     // Ensure that resources are set
     const bool dcHasResources = dc->HasResources();
     if (!dcHasResources) dc->SetResources(&m_doc->GetResources());
-
-    m_currentPage = m_doc->SetDrawingPage(m_pageIdx);
 
     // Keep the width of the initial scoreDef
     SetScoreDefDrawingWidth(dc, &m_currentPage->m_drawingScoreDef);
@@ -1401,20 +1400,7 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerL
             if (svgHtml5) {
                 // Add the custom graphic only with html5
                 dc->StartCustomGraphic("lineDash");
-                // Function to concatenate IDs from the list of Object events
-                auto concatenateIDs = [](const ListOfConstObjects &objects) {
-                    // Get a list of strings
-                    std::vector<std::string> ids;
-                    for (const auto &object : objects) {
-                        ids.push_back("#" + object->GetID() + " ");
-                    }
-                    // Concatenate IDs
-                    std::stringstream sstream;
-                    std::copy(ids.begin(), ids.end(), std::ostream_iterator<std::string>(sstream));
-                    return sstream.str();
-                };
-                std::string events = concatenateIDs(dash.m_events);
-                if (!events.empty()) events.pop_back(); // Remove extra space added by the concatenation
+                std::string events = ConcatenateIDs(dash.m_events);
                 dc->SetCustomGraphicAttributes("related", events);
             }
 

@@ -17,6 +17,7 @@
 #include "doc.h"
 #include "editortoolkit.h"
 #include "measure.h"
+#include "staff.h"
 #include "view.h"
 #include "vrv.h"
 #include "zone.h"
@@ -183,24 +184,43 @@ struct ClosestNeume {
 // To be used with std::stable_sort to find the position to insert a new staff
 
 struct StaffSort {
-    // Sort staves left-to-right and top-to-bottom
-    // Sort by y if there is no intersection, by x if there is x intersection is smaller than half length of staff line
-
     // Update 2024-04:
     // Used only in neume lines,
     // System->(Measure->Staff)
     // Need to sort Measure to sort staff
+
+    // Sort staves by:
+    // 1. Column number derived from staff@type (column1, column2, etc)
+    // 2. Within each column: left-to-right and top-to-bottom
     bool operator()(Object *a, Object *b)
     {
         if (!a->Is(SYSTEM) || !b->Is(SYSTEM)) return false;
         if (!a->FindDescendantByType(MEASURE) || !b->FindDescendantByType(MEASURE)) return false;
+
         Measure *measureA = dynamic_cast<Measure *>(a->FindDescendantByType(MEASURE));
         Measure *measureB = dynamic_cast<Measure *>(b->FindDescendantByType(MEASURE));
         if (!measureA->IsNeumeLine() || !measureB->IsNeumeLine()) return true;
-        Object *staffA = a->FindDescendantByType(STAFF);
-        Object *staffB = b->FindDescendantByType(STAFF);
+
+        Staff *staffA = dynamic_cast<Staff *>(a->FindDescendantByType(STAFF));
+        Staff *staffB = dynamic_cast<Staff *>(b->FindDescendantByType(STAFF));
         assert(staffA);
         assert(staffB);
+
+        if (staffA->HasType() && staffB->HasType()) {
+            // First compare column numbers from staff@type
+            std::string typeA = staffA->GetType();
+            std::string typeB = staffB->GetType();
+
+            if (staffA->GetType().find("column") == 0 && staffB->GetType().find("column") == 0) {
+                int columnA = std::stoi(typeA.substr(6));
+                int columnB = std::stoi(typeB.substr(6));
+                if (columnA != columnB) {
+                    return columnA < columnB;
+                }
+            }
+        }
+
+        // If in same column, use position-based sorting logic
         Zone *zoneA = staffA->GetFacsimileInterface()->GetZone();
         Zone *zoneB = staffB->GetFacsimileInterface()->GetZone();
         assert(zoneA);

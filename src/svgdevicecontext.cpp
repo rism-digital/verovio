@@ -258,6 +258,13 @@ void SvgDeviceContext::StartGraphic(
     AppendIdAndClass(gId, object->GetClassName(), gClassFull, graphicID);
     AppendAdditionalAttributes(object);
 
+    // Add data-plist with html5 (now only for annot)
+    if (!m_html5 && object->HasPlistReferences()) {
+        auto plist = object->GetPlistReferences();
+        std::string ids = ConcatenateIDs(**plist);
+        this->SetCustomGraphicAttributes("plist", ids);
+    }
+
     // this sets staffDef styles for lyrics
     if (object->Is(STAFF)) {
         Staff *staff = vrv_cast<Staff *>(object);
@@ -814,7 +821,7 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
     pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d L%d %d", x1, y1, x2, y2).c_str();
-    if (m_penStack.top().HasColor()) {
+    if (m_penStack.top().HasColor() || !this->UseGlobalStyling()) {
         pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
     }
     if (m_penStack.top().GetWidth() > 1) pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
@@ -1215,12 +1222,8 @@ void SvgDeviceContext::AppendAdditionalAttributes(Object *object)
     }
 }
 
-std::string SvgDeviceContext::GetColor(int color)
+std::string SvgDeviceContext::GetColor(int color) const
 {
-    std::ostringstream ss;
-    ss << "#";
-    ss << std::hex;
-
     switch (color) {
         case (COLOR_NONE): return "currentColor";
         case (COLOR_BLACK): return "#000000";
@@ -1230,13 +1233,7 @@ std::string SvgDeviceContext::GetColor(int color)
         case (COLOR_BLUE): return "#0000FF";
         case (COLOR_CYAN): return "#00FFFF";
         case (COLOR_LIGHT_GREY): return "#777777";
-        default:
-            int blue = (color & 255);
-            int green = (color >> 8) & 255;
-            int red = (color >> 16) & 255;
-            ss << red << green << blue;
-            // std::strin = wxDecToHex(char(red)) + wxDecToHex(char(green)) + wxDecToHex(char(blue)) ;  // ax3
-            return ss.str();
+        default: return StringFormat("#%06X", color);
     }
 }
 

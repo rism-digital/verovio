@@ -22,6 +22,7 @@ class MidiFile;
 namespace vrv {
 
 class DocSelection;
+class PageRange;
 class FontInfo;
 class Glyph;
 class Pages;
@@ -278,7 +279,7 @@ public:
 
     /**
      * Export the document to a MIDI file.
-     * Run trough all the layers and fill the midi file content.
+     * Run trough all the layers and fill the MIDI file content.
      */
     void ExportMIDI(smf::MidiFile *midiFile);
 
@@ -428,8 +429,9 @@ public:
      * Set drawing values (page size, etc) when drawing a page.
      * By default, the page size of the document is taken.
      * If a page is given, the size of the page is taken.
+     * The withPageRange parameter trigger layout of pages in the appropriate range.
      */
-    Page *SetDrawingPage(int pageIdx);
+    Page *SetDrawingPage(int pageIdx, bool withPageRange = false);
 
     /**
      * Update the drawing page sizes when a page is set as drawing page.
@@ -453,6 +455,11 @@ public:
     Page *GetDrawingPage() { return m_drawingPage; }
     const Page *GetDrawingPage() const { return m_drawingPage; }
     ///@}
+
+    /**
+     * Check that the page is the drawing page or that they have no given dimensions
+     */
+    bool CheckPageSize(const Page *page) const;
 
     /**
      * Return the width adjusted to the content of the current drawing page.
@@ -520,6 +527,16 @@ public:
     void ReactivateSelection(bool resetAligners);
     ///@}
 
+    /**
+     * Refresh the layout of all pages in the doc.
+     */
+    void RefreshLayout();
+
+    /**
+     * Reset the document focus
+     */
+    void SetFocus();
+
     //----------//
     // Functors //
     //----------//
@@ -550,11 +567,21 @@ private:
      */
     void CollectVisibleScores();
 
+    /**
+     * Reset the document focus
+     */
+    void ResetFocus();
+
 public:
     Page *m_selectionPreceding;
     Page *m_selectionFollowing;
     std::string m_selectionStart;
     std::string m_selectionEnd;
+
+    /**
+     * A page range (owned object) with focus in the document.
+     */
+    PageRange *m_focusRange;
 
     /**
      * A copy of the header tree stored as pugi::xml_document
@@ -633,6 +660,11 @@ private:
      * A flag indicating if the document has been cast off or not.
      */
     bool m_isCastOff;
+
+    /**
+     * A flag indicating the focus status (unset, set, used)
+     */
+    FocusStatusType m_focusStatus;
 
     /*
      * The following values are set in the Doc::SetDrawingPage.

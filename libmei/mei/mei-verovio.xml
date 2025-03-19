@@ -23,6 +23,9 @@
 			</sourceDesc>
 		</fileDesc>
 		<revisionDesc>
+			<change n="6" when="2025-03-01">
+				<desc xml:lang="en">Replaced MEI.frettab with MEI.stringtab for MEI 5.1 tablature</desc>
+			</change>
 			<change n="5" when="2022-11-08" resp="#KR">
 				<desc xml:lang="en">Added att.margins.</desc>
 			</change>
@@ -79,12 +82,11 @@
 				<moduleRef key="MEI.performance"/>
 				<moduleRef key="MEI.ptrref"/>
 				<moduleRef key="MEI.shared"/>
-				<moduleRef key="MEI.tablature"/>
+				<moduleRef key="MEI.stringtab"/>
 				<moduleRef key="MEI.text"/>
 				<moduleRef key="MEI.usersymbols"/>
 				<moduleRef key="MEI.visual"/>
 				<moduleRef key="MEI.pageBased"/>
-				<moduleRef key="MEI.frettab"/>
 
 				<classSpec ident="att.meiVersion" module="MEI.shared" type="atts" mode="replace">
 					<desc xml:lang="en">Attributes that record the version of MEI supported.</desc>
@@ -560,131 +562,6 @@
 						</attDef>
 					</attList>
 				</classSpec>
-
-				<!-- ****************************************************************** -->
-				<!-- Tablature MEI -->
-				<!-- ****************************************************************** -->
-
-				<moduleSpec ident="MEI.frettab" mode="add">
-					<desc/>
-				</moduleSpec>
-				<dataSpec ident="data.COURSENUMBER" module="MEI.stringtab" mode="add">
-					<desc xml:lang="en">In string tablature, the number of the course to be played.</desc>
-					<content>
-						<rng:data type="positiveInteger"/>
-					</content>
-				</dataSpec>
-				<dataSpec ident="data.COURSETUNING" module="MEI.frettab">
-					<desc xml:lang="en">Standard course tunings.</desc>
-					<content>
-						<valList type="semi">
-							<valItem ident="guitar.standard">
-								<desc xml:lang="en">Standard tuning for current guitars. The courses are tuned to E2 A2 D3 G3 B3 E4.</desc>
-							</valItem>
-							<valItem ident="guitar.drop.D">
-								<desc xml:lang="en">Drop D tuning for guitars. The lowest course is tuned down to D, while all other courses are kept to their regular pitches. D2 A2 D3 G3 B3 E4.</desc>
-							</valItem>
-							<valItem ident="guitar.open.D">
-								<desc xml:lang="en">Open D tuning for guitars. D2 A2 D3 F3s A3 D4.</desc>
-							</valItem>
-							<valItem ident="guitar.open.G">
-								<desc xml:lang="en">Open G tuning for guitars. D2 G2 D3 G3 B3 D4.</desc>
-							</valItem>
-							<valItem ident="guitar.open.A">
-								<desc xml:lang="en">Open A tuning for guitars. E2 A2 E3 A3 C4s E4.</desc>
-							</valItem>
-							<valItem ident="lute.renaissance.6">
-								<desc xml:lang="en">Renaissance tuning for lutes with 10 strings on 6 courses. G2G3 C3C4 F3F4 A4A4 D4 G4.</desc>
-							</valItem>
-							<valItem ident="lute.baroque.d.major">
-								<desc xml:lang="en">Baroque tuning for lutes with 6 stable courses, and additional bass courses tuned to the key of D Major.</desc>
-							</valItem>
-							<valItem ident="lute.baroque.d.minor">
-								<desc xml:lang="en">Baroque tuning for lutes with 6 stable courses, and additional bass courses tuned to the key of D minor.</desc>
-							</valItem>
-						</valList>
-					</content>
-				</dataSpec>
-				<dataSpec ident="data.NOTATIONTYPE" module="MEI" mode="replace">
-					<desc xml:lang="en">Notation type and subtype</desc>
-					<content>
-						<valList type="closed">
-							<valItem ident="cmn">
-								<desc xml:lang="en">Common Music Notation.</desc>
-							</valItem>
-							<valItem ident="mensural">
-								<desc xml:lang="en">Mensural notation.</desc>
-							</valItem>
-							<valItem ident="mensural.black">
-								<desc xml:lang="en">Black mensural notation.</desc>
-							</valItem>
-							<valItem ident="mensural.white">
-								<desc xml:lang="en">White mensural notation.</desc>
-							</valItem>
-							<!-- Adding four notation types -->
-							<valItem ident="tab.lute.french">
-								<desc xml:lang="en">Letters for fret and courses closest to the ground when playing are at the top of the stave.</desc>
-							</valItem>
-							<valItem ident="tab.lute.italian">
-								<desc xml:lang="en">Numbers for fret and courses closest to the ground when playing are at the bottom of the stave.</desc>
-							</valItem>
-							<valItem ident="tab.lute.german">
-								<desc xml:lang="en">No staff lines, although vertical position may imply voicing and symbols (based on letters) for fret and course.</desc>
-							</valItem>
-							<valItem ident="tab.guitar">
-								<desc xml:lang="en">Numbers for frets and courses closest to the ground when playing are at the top of the stave.</desc>
-							</valItem>
-							<valItem ident="neume">
-								<desc xml:lang="en">Neumatic notation.</desc>
-							</valItem>
-							<!-- <valItem ident="neume.heighted"> <desc xml:lang="en">Heighted neumatic notation</desc> </valItem> <valItem ident="neume.unheighted"> <desc xml:lang="en">Unheighted neumatic notation</desc> </valItem> -->
-							<valItem ident="tab">
-								<desc xml:lang="en">Tablature notation.</desc>
-							</valItem>
-						</valList>
-					</content>
-				</dataSpec>
-
-				<classSpec ident="att.note.ges.tab" module="MEI.frettab" type="atts" mode="add">
-					<attList>
-						<attDef ident="tab.course" usage="opt" mode="add">
-							<desc xml:lang="en">Records which course is to be played.</desc>
-							<datatype>
-								<dataRef key="data.COURSENUMBER"/>
-							</datatype>
-						</attDef>
-						<attDef ident="tab.fret" usage="opt" mode="add">
-							<desc xml:lang="en">Records which course is to be played.</desc>
-							<datatype>
-								<dataRef key="data.FRETNUMBER"/>
-							</datatype>
-						</attDef>
-					</attList>
-				</classSpec>
-				<classSpec ident="att.course.log" module="MEI.frettab" type="atts" mode="add">
-					<attList>
-						<attDef ident="tuning.standard" usage="opt" mode="add">
-							<desc xml:lang="en">Indicates a tuning standard for the course.</desc>
-							<datatype>
-								<dataRef key="data.COURSETUNING"/>
-							</datatype>
-						</attDef>
-					</attList>
-				</classSpec>
-				<elementSpec ident="course" module="MEI.frettab" mode="add">
-					<gloss>course tuning information</gloss>
-					<desc xml:lang="en">Describes the tuning of a course on a lute.</desc>
-					<classes>
-						<memberOf key="att.course.log"/>
-					</classes>
-				</elementSpec>
-				<elementSpec ident="foo" module="MEI.frettab" mode="add">
-					<gloss>foo information</gloss>
-					<desc xml:lang="en">Dummy element for enforcing that the att classes are used.</desc>
-					<classes>
-						<memberOf key="att.note.ges.tab"/>
-					</classes>
-				</elementSpec>
 			</schemaSpec>
 		</body>
 	</text>

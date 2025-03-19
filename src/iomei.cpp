@@ -1845,9 +1845,9 @@ void MEIOutput::WriteStaffDef(pugi::xml_node currentNode, StaffDef *staffDef)
     staffDef->WriteScalable(currentNode);
     staffDef->WriteStaffDefLog(currentNode);
     staffDef->WriteStaffDefVis(currentNode);
+    staffDef->WriteStaffDefVisTablature(currentNode);
     staffDef->WriteTimeBase(currentNode);
     staffDef->WriteTransposition(currentNode);
-    staffDef->WriteVerticalAlign(currentNode);
 }
 
 void MEIOutput::WriteInstrDef(pugi::xml_node currentNode, InstrDef *instrDef)
@@ -1891,7 +1891,7 @@ void MEIOutput::WriteTuning(pugi::xml_node currentNode, Tuning *tuning)
     assert(tuning);
 
     this->WriteXmlId(currentNode, tuning);
-    tuning->WriteCourseLog(currentNode);
+    tuning->WriteTuningLog(currentNode);
 }
 
 void MEIOutput::WriteCourse(pugi::xml_node currentNode, Course *course)
@@ -2787,11 +2787,11 @@ void MEIOutput::WriteNote(pugi::xml_node currentNode, Note *note)
     note->WriteGraced(currentNode);
     note->WriteHarmonicFunction(currentNode);
     note->WriteMidiVelocity(currentNode);
-    note->WriteNoteGesTab(currentNode);
     note->WriteNoteHeads(currentNode);
     note->WriteNoteVisMensural(currentNode);
     note->WriteStems(currentNode);
     note->WriteStemsCmn(currentNode);
+    note->WriteStringtab(currentNode);
     note->WriteTiePresent(currentNode);
     note->WriteVisibility(currentNode);
 }
@@ -2870,7 +2870,8 @@ void MEIOutput::WriteTabDurSym(pugi::xml_node currentNode, TabDurSym *tabDurSym)
 
     this->WriteLayerElement(currentNode, tabDurSym);
     tabDurSym->WriteNNumberLike(currentNode);
-    tabDurSym->WriteStaffLoc(currentNode);
+    tabDurSym->WriteStringtab(currentNode);
+    tabDurSym->WriteVisualOffsetVo(currentNode);
 }
 
 void MEIOutput::WriteTabGrp(pugi::xml_node currentNode, TabGrp *tabGrp)
@@ -5224,9 +5225,9 @@ bool MEIInput::ReadStaffDef(Object *parent, pugi::xml_node staffDef)
     vrvStaffDef->ReadScalable(staffDef);
     vrvStaffDef->ReadStaffDefLog(staffDef);
     vrvStaffDef->ReadStaffDefVis(staffDef);
+    vrvStaffDef->ReadStaffDefVisTablature(staffDef);
     vrvStaffDef->ReadTimeBase(staffDef);
     vrvStaffDef->ReadTransposition(staffDef);
-    vrvStaffDef->ReadVerticalAlign(staffDef);
 
     if (!vrvStaffDef->HasN()) {
         LogWarning("No @n on <staffDef> might yield unpredictable results");
@@ -5300,7 +5301,7 @@ bool MEIInput::ReadTuning(Object *parent, pugi::xml_node tuning)
     this->SetMeiID(tuning, vrvTuning);
 
     parent->AddChild(vrvTuning);
-    vrvTuning->ReadCourseLog(tuning);
+    vrvTuning->ReadTuningLog(tuning);
 
     this->ReadUnsupportedAttr(tuning, vrvTuning);
     return this->ReadTuningChildren(vrvTuning, tuning);
@@ -7000,11 +7001,11 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
     vrvNote->ReadGraced(note);
     vrvNote->ReadHarmonicFunction(note);
     vrvNote->ReadMidiVelocity(note);
-    vrvNote->ReadNoteGesTab(note);
     vrvNote->ReadNoteHeads(note);
     vrvNote->ReadNoteVisMensural(note);
     vrvNote->ReadStems(note);
     vrvNote->ReadStemsCmn(note);
+    vrvNote->ReadStringtab(note);
     vrvNote->ReadTiePresent(note);
     vrvNote->ReadVisibility(note);
 
@@ -7173,7 +7174,8 @@ bool MEIInput::ReadTabDurSym(Object *parent, pugi::xml_node tabRhyhtm)
     this->ReadLayerElement(tabRhyhtm, vrvTabDurSym);
 
     vrvTabDurSym->ReadNNumberLike(tabRhyhtm);
-    vrvTabDurSym->ReadStaffLoc(tabRhyhtm);
+    vrvTabDurSym->ReadStringtab(tabRhyhtm);
+    vrvTabDurSym->ReadVisualOffsetVo(tabRhyhtm);
 
     parent->AddChild(vrvTabDurSym);
     this->ReadUnsupportedAttr(tabRhyhtm, vrvTabDurSym);
