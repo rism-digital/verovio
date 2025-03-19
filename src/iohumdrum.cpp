@@ -17735,12 +17735,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         }
     }
 
-    std::string color;
-    if (sicQ) {
-        // default color for sic text directions (set to black if not wanted)
-        color = "limegreen";
-    }
-
+    std::string problemLabel;
     bool problemQ = false;
     bool verboseQ = false;
     bool tempoQ = false;
@@ -17752,6 +17747,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     std::string verboseType;
     std::string ovalue;
     std::string svalue;
+    std::string color;
     Dir *dir = NULL;
     Tempo *tempo = NULL;
 
@@ -17827,6 +17823,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         }
         if (key == "problem") {
             problemQ = true;
+            problemLabel = value;
         }
         if (key == "type") {
             typevalue = value;
@@ -17848,6 +17845,15 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
 
     if ((namespace2 == "SIC") && !verboseQ) {
         return;
+    }
+
+    if (sicQ) {
+        // default color for sic markers (set to black if not wanted)
+        color = "limegreen";
+    }
+    if (problemQ) {
+        // default color for sic problem markers (set to black if not wanted)
+        color = "crimson";
     }
 
     double Y = 0.0;
@@ -17916,6 +17922,10 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
             text = "S";
         }
     }
+    if (problemQ && !problemLabel.empty()) {
+        label = problemLabel;
+    }
+    // Probably need to escape " in label
 
     int maxstaff = (int)m_staffstarts.size() - 1;
 
@@ -18084,7 +18094,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
             rend->SetColor(color);
         }
         else if (problemQ) {
-            rend->SetColor("red");
+            rend->SetColor("crimson");
         }
         else if (sicQ) {
             rend->SetColor("limegreen");
@@ -18129,7 +18139,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
                         item->SetColor(color);
                     }
                     else if (problemQ) {
-                        item->SetColor("red");
+                        item->SetColor("crimson");
                     }
                     else if (sicQ) {
                         item->SetColor("limegreen");
@@ -18162,7 +18172,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
                     rend->SetColor(color);
                 }
                 else if (problemQ) {
-                    rend->SetColor("red");
+                    rend->SetColor("crimson");
                 }
                 else if (sicQ) {
                     rend->SetColor("limegreen");
@@ -18937,7 +18947,7 @@ void HumdrumInput::addDirection(const std::string &text, const std::string &plac
             rend->SetColor(color);
         }
         else if (problemQ) {
-            rend->SetColor("red");
+            rend->SetColor("crimson");
         }
         else if (sicQ) {
             rend->SetColor("limegreen");
