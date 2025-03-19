@@ -1396,20 +1396,7 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerL
             if (svgHtml5) {
                 // Add the custom graphic only with html5
                 dc->StartCustomGraphic("lineDash");
-                // Function to concatenate IDs from the list of Object events
-                auto concatenateIDs = [](const ListOfConstObjects &objects) {
-                    // Get a list of strings
-                    std::vector<std::string> ids;
-                    for (const auto &object : objects) {
-                        ids.push_back("#" + object->GetID() + " ");
-                    }
-                    // Concatenate IDs
-                    std::stringstream sstream;
-                    std::copy(ids.begin(), ids.end(), std::ostream_iterator<std::string>(sstream));
-                    return sstream.str();
-                };
-                std::string events = concatenateIDs(dash.m_events);
-                if (!events.empty()) events.pop_back(); // Remove extra space added by the concatenation
+                std::string events = ConcatenateIDs(dash.m_events);
                 dc->SetCustomGraphicAttributes("related", events);
             }
 
