@@ -52,24 +52,19 @@ void BTrem::Reset()
     this->ResetTremMeasured();
 }
 
-bool BTrem::IsSupportedChild(Object *child)
+bool BTrem::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(CHORD)) {
-        assert(dynamic_cast<Chord *>(child));
+    static const std::vector<ClassId> supported{ CHORD, CLEF, NOTE };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(CLEF)) {
-        assert(dynamic_cast<Clef *>(child));
-    }
-    else if (child->Is(NOTE)) {
-        assert(dynamic_cast<Note *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 FunctorCode BTrem::Accept(Functor &functor)

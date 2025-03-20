@@ -150,7 +150,12 @@ public:
     /**
      * Check if a object is allowed as child.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
+
+    /**
+     * Additional check when adding a child.
+     */
+    bool AddChildAdditionalCheck(Object *child) override;
 
     /**
      * Return an order for the given ClassId.

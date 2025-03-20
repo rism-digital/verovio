@@ -180,18 +180,16 @@ void Doc::SetType(DocType type)
     m_type = type;
 }
 
-bool Doc::IsSupportedChild(Object *child)
+bool Doc::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(MDIV)) {
-        assert(dynamic_cast<Mdiv *>(child));
-    }
-    else if (child->Is(PAGES)) {
-        assert(dynamic_cast<Pages *>(child));
+    static const std::vector<ClassId> supported{ MDIV, PAGES };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 bool Doc::GenerateDocumentScoreDef()

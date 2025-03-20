@@ -54,7 +54,7 @@ public:
     /**
      * Add an accid to a custos.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Return a SMuFL code for the custos

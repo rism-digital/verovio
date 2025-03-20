@@ -42,18 +42,19 @@ void Tuning::Reset()
     this->ResetTuningLog();
 }
 
-bool Tuning::IsSupportedChild(Object *child)
+bool Tuning::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(COURSE)) {
-        assert(dynamic_cast<Course *>(child));
+    static const std::vector<ClassId> supported{ COURSE };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 int Tuning::CalcPitchPos(int course, data_NOTATIONTYPE notationType, int lines, int listSize, int index, int loc,

@@ -58,7 +58,7 @@ public:
      * Add an element (text, rend. etc.) to a reh.
      * Only supported elements will be actually added to the child list.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     //----------//
     // Functors //

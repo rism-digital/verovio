@@ -46,21 +46,16 @@ void Subst::Reset()
 
 Subst::~Subst() {}
 
-bool Subst::IsSupportedChild(Object *child)
+bool Subst::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(ADD)) {
-        assert(dynamic_cast<Add *>(child));
-    }
-    else if (child->Is(DEL)) {
-        assert(dynamic_cast<Del *>(child));
-    }
-    else if (child->Is(SUBST)) {
-        assert(dynamic_cast<Subst *>(child));
+    static const std::vector<ClassId> supported{ ADD, DEL, SUBST };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 //----------------------------------------------------------------------------

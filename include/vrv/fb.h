@@ -38,7 +38,7 @@ public:
      * Add an element (f) to an fb.
      * Only supported elements will be actually added to the child list.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Interface for class functor visitation

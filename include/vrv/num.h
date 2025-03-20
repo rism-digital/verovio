@@ -38,7 +38,7 @@ public:
     /**
      * Add an element (text) to a num.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Return a pointer to the current text object.

@@ -38,15 +38,16 @@ void Num::Reset()
     m_currentText.SetText(U"");
 }
 
-bool Num::IsSupportedChild(Object *child)
+bool Num::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(TEXT)) {
-        assert(dynamic_cast<Text *>(child));
+    static const std::vector<ClassId> supported{ TEXT };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 FunctorCode Num::Accept(Functor &functor)

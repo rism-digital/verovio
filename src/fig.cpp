@@ -40,15 +40,16 @@ void Fig::Reset()
     AreaPosInterface::Reset();
 }
 
-bool Fig::IsSupportedChild(Object *child)
+bool Fig::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(SVG)) {
-        assert(dynamic_cast<Svg *>(child));
+    static const std::vector<ClassId> supported{ SVG };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 //----------------------------------------------------------------------------

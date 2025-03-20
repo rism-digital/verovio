@@ -53,7 +53,7 @@ public:
      * @name Add children to an editorial element.
      */
     ///@{
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
     ///@}
 
     //----------//
