@@ -1978,7 +1978,6 @@ void MEIOutput::WriteAnnotScore(pugi::xml_node currentNode, AnnotScore *annotSco
     this->WriteControlElement(currentNode, annotScore);
     this->WritePlistInterface(currentNode, annotScore);
     this->WriteTimeSpanningInterface(currentNode, annotScore);
-    annotScore->WritePlist(currentNode);
     // Currently ignoring annot contents -- normal annot looks at child elements here
 }
 
@@ -7728,8 +7727,6 @@ bool MEIInput::ReadAnnotScore(Object *parent, pugi::xml_node annot)
     this->ReadControlElement(annot, vrvAnnotScore);
     this->ReadPlistInterface(annot, vrvAnnotScore);
     this->ReadTimeSpanningInterface(annot, vrvAnnotScore);
-
-    vrvAnnotScore->ReadPlist(annot);
 
     parent->AddChild(vrvAnnotScore);
 
