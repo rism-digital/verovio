@@ -494,9 +494,9 @@ void PrepareLinkingFunctor::ResolveStemSameas(Note *note)
 
 PreparePlistFunctor::PreparePlistFunctor() : Functor(), CollectAndProcess() {}
 
-void PreparePlistFunctor::InsertInterfaceIDPair(const std::string &elementID, PlistInterface *interface)
+void PreparePlistFunctor::InsertInterfaceObjectIDPair(Object *objectWithPlist, const std::string &elementID)
 {
-    m_interfaceIDPairs.push_back(std::make_pair(interface, elementID));
+    m_plistObjectIDPairs.push_back(std::make_pair(objectWithPlist, elementID));
 }
 
 FunctorCode PreparePlistFunctor::VisitObject(Object *object)
@@ -513,12 +513,18 @@ FunctorCode PreparePlistFunctor::VisitObject(Object *object)
         if (!object->IsLayerElement()) return FUNCTOR_CONTINUE;
 
         const std::string &id = object->GetID();
-        auto iter = std::find_if(m_interfaceIDPairs.begin(), m_interfaceIDPairs.end(),
-            [&id](const std::pair<PlistInterface *, std::string> &pair) { return (pair.second == id); });
-        if (iter != m_interfaceIDPairs.end()) {
+        auto iter = std::find_if(m_plistObjectIDPairs.begin(), m_plistObjectIDPairs.end(),
+            [&id](const std::pair<Object *, std::string> &pair) { return (pair.second == id); });
+        if (iter != m_plistObjectIDPairs.end()) {
             // Set reference for matched pair and erase it from the list
-            iter->first->SetRef(object);
-            m_interfaceIDPairs.erase(iter);
+            PlistInterface *interface = iter->first->GetPlistInterface();
+            assert(interface);
+            interface->SetRef(object);
+            // Add back link to the object referred in the plist - for now only for Annot
+            if (iter->first->Is(ANNOT)) {
+                object->AddPlistReference(const_cast<Object *>(iter->first));
+            }
+            m_plistObjectIDPairs.erase(iter);
         }
     }
 
@@ -723,7 +729,7 @@ FunctorCode PrepareTimeSpanningFunctor::VisitMeasureEnd(Measure *measure)
         while (iter != m_timeSpanningInterfaces.end()) {
             // At the end of the measure we remove elements for which we do not need to match the end (for now).
             // Eventually, we could consider them, for example if we want to display their spanning or for
-            // improved midi output
+            // improved MIDI output
             if (iter->second->GetClassId() == HARM) {
                 iter = m_timeSpanningInterfaces.erase(iter);
             }
