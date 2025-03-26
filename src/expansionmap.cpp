@@ -39,6 +39,8 @@ void ExpansionMap::Reset()
 void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &existingList, Object *prevSect)
 {
     assert(prevSect);
+    assert(prevSect->GetParent());
+
     // find all siblings of expansion element to know what in MEI file
     const ArrayOfObjects &expansionSiblings = prevSect->GetParent()->GetChildren();
     std::vector<std::string> reductionList;
@@ -50,7 +52,9 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
         if (s.rfind("#", 0) == 0) s = s.substr(1, s.size() - 1); // remove trailing hash from reference
         Object *currSect = prevSect->GetParent()->FindDescendantByID(s); // find section pointer of reference string
         if (!currSect) {
-            return;
+            // Warn about referenced element not found and continue
+            LogWarning("ExpansionMap::Expand: Element referenced in @plist not found: %s", s.c_str());
+            continue;
         }
         if (currSect->Is(EXPANSION)) { // if reference is itself an expansion, resolve it recursively
             // remove parent from reductionList, if expansion
@@ -89,11 +93,34 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
                 // go through cloned objects, find TimePointing/SpanningInterface, PListInterface, LinkingInterface
                 this->UpdateIDs(clonedObject);
 
-                assert(prevSect->GetParent());
                 prevSect->GetParent()->InsertAfter(prevSect, clonedObject);
                 prevSect = clonedObject;
             }
-            else { // add to existingList, remember previous element, but do nothing else
+            else { // add to existingList, remember previous element, re-order if necessary
+
+                bool moveCurrentElement = false;
+                int prevIdx = prevSect->GetIdx();
+                int childCount = prevSect->GetParent()->GetChildCount();
+                int currIdx = currSect->GetIdx();
+
+                // If prevSect has a next element and if it is different than the currSect or has no next element,
+                // move it to after the currSect.
+                if (prevIdx < childCount - 1) {
+                    Object *nextElement = prevSect->GetParent()->GetChild(prevIdx + 1);
+                    assert(nextElement);
+                    if (nextElement->Is({ SECTION, ENDING, LEM, RDG }) && nextElement != currSect) {
+                        moveCurrentElement = true;
+                    }
+                }
+                else {
+                    moveCurrentElement = true;
+                }
+
+                // move prevSect to after currSect
+                if (moveCurrentElement && currIdx < prevIdx && prevIdx < childCount) {
+                    currSect->GetParent()->RotateChildren(currIdx, currIdx + 1, prevIdx + 1);
+                }
+
                 prevSect = currSect;
                 existingList.push_back(s);
             }
@@ -109,18 +136,14 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
             }
         }
     }
-    // make unused sections hidden
+
+    // remove unused sections from structure
     for (std::string r : reductionList) {
         Object *currSect = prevSect->GetParent()->FindDescendantByID(r);
         assert(currSect);
-        if (currSect->Is(ENDING) || currSect->Is(SECTION)) {
-            SystemElement *tmp = dynamic_cast<SystemElement *>(currSect);
-            tmp->m_visibility = Hidden;
-        }
-        else if (currSect->Is(LEM) || currSect->Is(RDG)) {
-            EditorialElement *tmp = dynamic_cast<EditorialElement *>(currSect);
-            tmp->m_visibility = Hidden;
-        }
+
+        int idx = currSect->GetIdx();
+        prevSect->GetParent()->DetachChild(idx);
     }
 }
 
