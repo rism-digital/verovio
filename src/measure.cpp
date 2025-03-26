@@ -55,7 +55,7 @@ namespace vrv {
 static const ClassRegistrar<Measure> s_factory("measure", MEASURE);
 
 Measure::Measure(MeasureType measureMusic, int logMeasureNb)
-    : Object(MEASURE, "measure-")
+    : Object(MEASURE)
     , FacsimileInterface()
     , AttBarring()
     , AttCoordX1()

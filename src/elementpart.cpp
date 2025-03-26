@@ -30,7 +30,7 @@ namespace vrv {
 // Dots
 //----------------------------------------------------------------------------
 
-Dots::Dots() : LayerElement(DOTS, "dots-"), AttAugmentDots()
+Dots::Dots() : LayerElement(DOTS), AttAugmentDots()
 {
     this->RegisterAttClass(ATT_AUGMENTDOTS);
 
@@ -66,7 +66,7 @@ std::set<int> &Dots::ModifyDotLocsForStaff(const Staff *staff)
 // Flag
 //----------------------------------------------------------------------------
 
-Flag::Flag() : LayerElement(FLAG, "flag-")
+Flag::Flag() : LayerElement(FLAG)
 {
 
     this->Reset();
@@ -129,7 +129,7 @@ Point Flag::GetStemDownNW(const Doc *doc, int staffSize, bool graceSize) const
 // TupletBracket
 //----------------------------------------------------------------------------
 
-TupletBracket::TupletBracket() : LayerElement(TUPLET_BRACKET, "bracket-"), AttTupletVis()
+TupletBracket::TupletBracket() : LayerElement(TUPLET_BRACKET), AttTupletVis()
 {
     this->RegisterAttClass(ATT_TUPLETVIS);
 
@@ -206,7 +206,7 @@ int TupletBracket::GetDrawingYRight() const
 // TupletNum
 //----------------------------------------------------------------------------
 
-TupletNum::TupletNum() : LayerElement(TUPLET_NUM, "num-"), AttNumberPlacement(), AttTupletVis()
+TupletNum::TupletNum() : LayerElement(TUPLET_NUM), AttNumberPlacement(), AttTupletVis()
 {
     this->RegisterAttClass(ATT_NUMBERPLACEMENT);
     this->RegisterAttClass(ATT_TUPLETVIS);

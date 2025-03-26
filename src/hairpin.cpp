@@ -32,7 +32,7 @@ namespace vrv {
 static const ClassRegistrar<Hairpin> s_factory("hairpin", HAIRPIN);
 
 Hairpin::Hairpin()
-    : ControlElement(HAIRPIN, "hairpin-")
+    : ControlElement(HAIRPIN)
     , TimeSpanningInterface()
     , AttHairpinLog()
     , AttHairpinVis()

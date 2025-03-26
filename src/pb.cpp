@@ -29,7 +29,7 @@ namespace vrv {
 
 static const ClassRegistrar<Pb> s_factory("pb", PB);
 
-Pb::Pb() : SystemElement(PB, "pb-"), FacsimileInterface(), AttNNumberLike()
+Pb::Pb() : SystemElement(PB), FacsimileInterface(), AttNNumberLike()
 {
     this->RegisterAttClass(ATT_NNUMBERLIKE);
     this->RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());

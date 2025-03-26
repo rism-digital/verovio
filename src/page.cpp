@@ -72,7 +72,7 @@ namespace vrv {
 // Page
 //----------------------------------------------------------------------------
 
-Page::Page() : Object(PAGE, "page-")
+Page::Page() : Object(PAGE)
 {
     this->Reset();
 }

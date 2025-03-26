@@ -36,7 +36,7 @@ namespace vrv {
 
 static const ClassRegistrar<Score> s_factory("score", SCORE);
 
-Score::Score() : PageElement(SCORE, "score-"), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
+Score::Score() : PageElement(SCORE), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
 {
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_NNUMBERLIKE);

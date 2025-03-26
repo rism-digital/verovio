@@ -26,7 +26,7 @@ namespace vrv {
 
 static const ClassRegistrar<LayerDef> s_factory("layerDef", LAYERDEF);
 
-LayerDef::LayerDef() : Object(LAYERDEF, "layerdef-"), AttLabelled(), AttNInteger(), AttTyped()
+LayerDef::LayerDef() : Object(LAYERDEF), AttLabelled(), AttNInteger(), AttTyped()
 {
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_NINTEGER);

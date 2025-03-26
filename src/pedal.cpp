@@ -35,7 +35,7 @@ namespace vrv {
 static const ClassRegistrar<Pedal> s_factory("pedal", PEDAL);
 
 Pedal::Pedal()
-    : ControlElement(PEDAL, "pedal-")
+    : ControlElement(PEDAL)
     , TimeSpanningInterface()
     , AttExtSymAuth()
     , AttExtSymNames()

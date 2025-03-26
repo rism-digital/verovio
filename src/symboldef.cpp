@@ -27,7 +27,7 @@ namespace vrv {
 
 static const ClassRegistrar<SymbolDef> s_factory("symbolDef", SYMBOLDEF);
 
-SymbolDef::SymbolDef() : Object(SYMBOLDEF, "symdef-")
+SymbolDef::SymbolDef() : Object(SYMBOLDEF)
 {
     this->Reset();
 }

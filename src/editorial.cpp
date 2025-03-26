@@ -34,8 +34,7 @@ namespace vrv {
 // EditorialElement
 //----------------------------------------------------------------------------
 
-EditorialElement::EditorialElement()
-    : Object(EDITORIAL_ELEMENT, "ee-"), SystemMilestoneInterface(), AttLabelled(), AttTyped()
+EditorialElement::EditorialElement() : Object(EDITORIAL_ELEMENT), SystemMilestoneInterface(), AttLabelled(), AttTyped()
 {
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_TYPED);
@@ -44,16 +43,7 @@ EditorialElement::EditorialElement()
 }
 
 EditorialElement::EditorialElement(ClassId classId)
-    : Object(classId, "ee-"), SystemMilestoneInterface(), AttLabelled(), AttTyped()
-{
-    this->RegisterAttClass(ATT_LABELLED);
-    this->RegisterAttClass(ATT_TYPED);
-
-    this->Reset();
-}
-
-EditorialElement::EditorialElement(ClassId classId, const std::string &classIdStr)
-    : Object(classId, classIdStr), SystemMilestoneInterface(), AttLabelled(), AttTyped()
+    : Object(classId), SystemMilestoneInterface(), AttLabelled(), AttTyped()
 {
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_TYPED);

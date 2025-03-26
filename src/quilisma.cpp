@@ -24,7 +24,7 @@ namespace vrv {
 // Quilisma
 //----------------------------------------------------------------------------
 
-Quilisma::Quilisma() : LayerElement(QUILISMA, "quilisma-"), PitchInterface(), PositionInterface(), AttColor()
+Quilisma::Quilisma() : LayerElement(QUILISMA), PitchInterface(), PositionInterface(), AttColor()
 {
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());

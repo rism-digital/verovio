@@ -72,7 +72,7 @@ const int KeySig::octave_map[2][9][7] = {
 static const ClassRegistrar<KeySig> s_factory("keySig", KEYSIG);
 
 KeySig::KeySig()
-    : LayerElement(KEYSIG, "keysig-")
+    : LayerElement(KEYSIG)
     , ObjectListInterface()
     , AttAccidental()
     , AttColor()

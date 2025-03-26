@@ -47,7 +47,6 @@ public:
     ///@{
     ScoreDefElement();
     ScoreDefElement(ClassId classId);
-    ScoreDefElement(ClassId classId, const std::string &classIdStr);
     virtual ~ScoreDefElement();
     void Reset() override;
     ///@}

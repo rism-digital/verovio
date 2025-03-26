@@ -46,7 +46,7 @@ namespace vrv {
 // ScoreDefElement
 //----------------------------------------------------------------------------
 
-ScoreDefElement::ScoreDefElement() : Object(SCOREDEF_ELEMENT, "scoredefelement-"), ScoreDefInterface(), AttTyped()
+ScoreDefElement::ScoreDefElement() : Object(SCOREDEF_ELEMENT), ScoreDefInterface(), AttTyped()
 {
     this->RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
     this->RegisterAttClass(ATT_TYPED);
@@ -54,16 +54,7 @@ ScoreDefElement::ScoreDefElement() : Object(SCOREDEF_ELEMENT, "scoredefelement-"
     this->Reset();
 }
 
-ScoreDefElement::ScoreDefElement(ClassId classId) : Object(classId, "scoredefelement-"), ScoreDefInterface(), AttTyped()
-{
-    this->RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
-    this->RegisterAttClass(ATT_TYPED);
-
-    this->Reset();
-}
-
-ScoreDefElement::ScoreDefElement(ClassId classId, const std::string &classIdStr)
-    : Object(classId, classIdStr), ScoreDefInterface(), AttTyped()
+ScoreDefElement::ScoreDefElement(ClassId classId) : Object(classId), ScoreDefInterface(), AttTyped()
 {
     this->RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
     this->RegisterAttClass(ATT_TYPED);
@@ -222,7 +213,7 @@ MeterSigGrp *ScoreDefElement::GetMeterSigGrpCopy() const
 static const ClassRegistrar<ScoreDef> s_factory("scoreDef", SCOREDEF);
 
 ScoreDef::ScoreDef()
-    : ScoreDefElement(SCOREDEF, "scoredef-")
+    : ScoreDefElement(SCOREDEF)
     , ObjectListInterface()
     , AttDistances()
     , AttEndings()

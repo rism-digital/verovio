@@ -30,7 +30,7 @@ namespace vrv {
 static const ClassRegistrar<Ending> s_factory("ending", ENDING);
 
 Ending::Ending()
-    : SystemElement(ENDING, "ending-")
+    : SystemElement(ENDING)
     , SystemMilestoneInterface()
     , AttLabelled()
     , AttLineRend()

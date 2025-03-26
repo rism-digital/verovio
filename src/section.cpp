@@ -33,7 +33,7 @@ namespace vrv {
 
 static const ClassRegistrar<Section> s_factory("section", SECTION);
 
-Section::Section() : SystemElement(SECTION, "section-"), SystemMilestoneInterface(), AttNNumberLike(), AttSectionVis()
+Section::Section() : SystemElement(SECTION), SystemMilestoneInterface(), AttNNumberLike(), AttSectionVis()
 {
     this->RegisterAttClass(ATT_NNUMBERLIKE);
     this->RegisterAttClass(ATT_SECTIONVIS);

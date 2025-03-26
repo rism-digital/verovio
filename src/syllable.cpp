@@ -31,7 +31,7 @@ namespace vrv {
 
 static const ClassRegistrar<Syllable> s_factory("syllable", SYLLABLE);
 
-Syllable::Syllable() : LayerElement(SYLLABLE, "syllable-"), ObjectListInterface(), AttColor(), AttSlashCount()
+Syllable::Syllable() : LayerElement(SYLLABLE), ObjectListInterface(), AttColor(), AttSlashCount()
 {
     Init();
 }

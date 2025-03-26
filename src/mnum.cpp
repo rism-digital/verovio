@@ -26,12 +26,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 MNum::MNum()
-    : ControlElement(MNUM, "mnum-")
-    , TextListInterface()
-    , TextDirInterface()
-    , TimePointInterface()
-    , AttLang()
-    , AttTypography()
+    : ControlElement(MNUM), TextListInterface(), TextDirInterface(), TimePointInterface(), AttLang(), AttTypography()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());

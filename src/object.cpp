@@ -73,7 +73,7 @@ Object::Object() : BoundingBox()
     if (s_objectCounter++ == 0) {
         this->SeedID();
     }
-    this->Init(OBJECT, "m-");
+    this->Init(OBJECT);
 }
 
 Object::Object(ClassId classId) : BoundingBox()
@@ -81,15 +81,7 @@ Object::Object(ClassId classId) : BoundingBox()
     if (s_objectCounter++ == 0) {
         this->SeedID();
     }
-    this->Init(classId, "m-");
-}
-
-Object::Object(ClassId classId, const std::string &classIdStr) : BoundingBox()
-{
-    if (s_objectCounter++ == 0) {
-        this->SeedID();
-    }
-    this->Init(classId, classIdStr);
+    this->Init(classId);
 }
 
 Object *Object::Clone() const
@@ -104,7 +96,6 @@ Object::Object(const Object &object) : BoundingBox(object)
     this->ResetBoundingBox(); // It does not make sense to keep the values of the BBox
 
     m_classId = object.m_classId;
-    m_classIdStr = object.m_classIdStr;
     m_parent = NULL;
 
     // Flags
@@ -151,7 +142,6 @@ Object &Object::operator=(const Object &object)
         this->ResetBoundingBox(); // It does not make sense to keep the values of the BBox
 
         m_classId = object.m_classId;
-        m_classIdStr = object.m_classIdStr;
         m_parent = NULL;
         // Flags
         m_isAttribute = object.m_isAttribute;
@@ -189,12 +179,9 @@ Object::~Object()
     ClearChildren();
 }
 
-void Object::Init(ClassId classId, const std::string &classIdStr)
+void Object::Init(ClassId classId)
 {
-    assert(classIdStr.size());
-
     m_classId = classId;
-    m_classIdStr = classIdStr;
     m_parent = NULL;
     // Flags
     m_isAttribute = false;
@@ -813,7 +800,9 @@ int Object::DeleteChildrenByComparison(Comparison *comparison)
 
 void Object::GenerateID()
 {
-    m_id = m_classIdStr.at(0) + Object::GenerateHashID();
+    // A random letter from a-z
+    char letter = 'a' + (std::rand() % 26);
+    m_id = letter + Object::GenerateHashID();
 }
 
 void Object::ResetID()
