@@ -71,8 +71,8 @@ protected:
     Object *GetElement(std::string &elementId);
 
     void ContextForObject(const Object *object, jsonxx::Object &element);
-    void ContextForSiblings(const ListOfConstObjects &objects, jsonxx::Array &siblings);
-    void ContextForLinks(const ListOfObjectAttNamePairs &objects, jsonxx::Array &links);
+    void ContextForObjects(const ListOfConstObjects &objects, jsonxx::Array &siblings);
+    void ContextForReferences(const ListOfObjectAttNamePairs &objects, jsonxx::Array &links);
 
 public:
     //

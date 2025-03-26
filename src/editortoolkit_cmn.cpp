@@ -711,33 +711,88 @@ bool EditorToolkitCMN::Context(std::string &elementId, bool contentOnly)
     ListOfConstObjects following;
     if (targetIt != objects.end()) std::copy(std::next(targetIt), objects.end(), std::back_inserter(following));
 
-    jsonxx::Array elements;
-    this->ContextForSiblings(previous, elements);
-    m_editInfo << "previousSiblings" << elements;
-    this->ContextForSiblings(following, elements);
-    m_editInfo << "followingSiblings" << elements;
+    // Build the json context
+    
+    jsonxx::Object section;
+    section << "id" << 0;
+    section << "element" << ".";
+    jsonxx::Object jsonContext;
+    
+    ListOfConstObjects ancestors;
+    jsonxx::Array jsonAncestors;
+    
+    const Object *context = object->GetParent();
+    const Object *parent = context->GetParent();
+    
+    if (!context->Is(SYSTEM)) {
+        // Look for additional ancestors
+        while (parent) {
+            if (parent->Is(SYSTEM)) break;
+            ancestors.push_back(parent);
+            parent = parent->GetParent();
+        }
+        this->ContextForObjects(ancestors, jsonAncestors);
+        // Also add the section (.) as ancestor
+        jsonAncestors << section;
+        
+        this->ContextForObject(context, jsonContext);
+    }
+    else {
+        jsonContext = section;
+    }
 
+    // Ancestors in addition to the parent of the target (context object)
+    m_editInfo << "ancestors" << jsonAncestors;
+    
+    // Build the list of children in which the target is included
+    jsonxx::Array contextChildren;
+    
+    // Preceeding siblings
+    jsonxx::Array elements;
+    this->ContextForObjects(previous, elements);
+    contextChildren << elements;
+
+    // The target object
+    jsonxx::Object jsonObject;
+    this->ContextForObject(object, jsonObject);
+    // Inlude all attributes
+    ArrayOfStrAttr attributes;
+    object->GetAttributes(&attributes);
+    jsonxx::Object jsonAttributes;
+    for (const auto &attribute : attributes) {
+        jsonAttributes << attribute.first << attribute.second;
+    }
+    jsonObject << "attributes" << jsonAttributes;
+    // Include its children
+    jsonxx::Array jsonObjectChildren;
+    ListOfConstObjects objectChildren;
+    const ArrayOfObjects &objectsArr = object->GetChildren();
+    std::copy(objectsArr.begin(), objectsArr.end(), std::back_inserter(objectChildren));
+    this->ContextForObjects(objectChildren, jsonObjectChildren);
+    if (!jsonObjectChildren.empty()) jsonObject << "children" << jsonObjectChildren;
+    // Add it to the list
+    contextChildren << jsonObject;
+    
+    // Following siblings
+    this->ContextForObjects(following, elements);
+    contextChildren << elements;
+    
+    // Add all children of to context (include target and surrounding siblings)
+    jsonContext << "children" << contextChildren;
+    m_editInfo << "context" << jsonContext;
+
+    // Find referring objects
     ListOfObjectAttNamePairs referringObjects;
     FindAllReferringObjectsFunctor findAllReferringObjects(object, &referringObjects);
     m_doc->Process(findAllReferringObjects);
-
+    this->ContextForReferences(referringObjects, elements);
+    m_editInfo << "referringElements" << elements;
+    
+    // Find referenced objects
     ListOfObjectAttNamePairs referencedObjects;
     FindAllReferencedObjectsFunctor findAllReferencedObjects(NULL, &referencedObjects);
-    object->Process(findAllReferencedObjects);
-
-    ListOfConstObjects ancestors;
-    const Object *parent = object->GetParent();
-    while (parent) {
-        ancestors.push_back(parent);
-        parent = parent->GetParent();
-        if (!parent || parent->Is(SYSTEM)) break;
-    }
-    this->ContextForSiblings(ancestors, elements);
-    m_editInfo << "ancestors" << elements;
-
-    this->ContextForLinks(referringObjects, elements);
-    m_editInfo << "referringElements" << elements;
-    this->ContextForLinks(referencedObjects, elements);
+    object->Process(findAllReferencedObjects, 0);
+    this->ContextForReferences(referencedObjects, elements);
     m_editInfo << "referencedElements" << elements;
 
     return true;
@@ -747,21 +802,25 @@ void EditorToolkitCMN::ContextForObject(const Object *object, jsonxx::Object &el
 {
     element << "name" << object->GetClassName();
     element << "id" << object->GetID();
+    jsonxx::Object attributes;
     if (object->HasAttClass(ATT_NINTEGER)) {
         const AttNInteger *att = dynamic_cast<const AttNInteger *>(object);
         assert(att);
-        element << "n" << att->GetN();
+        attributes << "n" << att->GetN();
     }
     if (object->HasAttClass(ATT_NNUMBERLIKE)) {
         const AttNNumberLike *att = dynamic_cast<const AttNNumberLike *>(object);
         assert(att);
-        element << "n" << att->GetN();
+        attributes << "n" << att->GetN();
+    }
+    if (!attributes.empty()) {
+        element << "attributes" << attributes;
     }
 }
 
-void EditorToolkitCMN::ContextForSiblings(const ListOfConstObjects &objects, jsonxx::Array &siblings)
+void EditorToolkitCMN::ContextForObjects(const ListOfConstObjects &objects, jsonxx::Array &elements)
 {
-    siblings.reset();
+    elements.reset();
 
     for (const Object *object : objects) {
         if (object->Is(MNUM)) {
@@ -769,22 +828,24 @@ void EditorToolkitCMN::ContextForSiblings(const ListOfConstObjects &objects, jso
             assert(mNum);
             if (mNum->IsGenerated()) continue;
         }
-
+        if (object->IsAttribute()) continue;
+        if (object->Is({DOTS, FLAG, STEM, TUPLET_NUM, TUPLET_BRACKET})) continue;
+        
         jsonxx::Object element;
         this->ContextForObject(object, element);
-        siblings << element;
+        elements << element;
     }
 }
 
-void EditorToolkitCMN::ContextForLinks(const ListOfObjectAttNamePairs &objects, jsonxx::Array &links)
+void EditorToolkitCMN::ContextForReferences(const ListOfObjectAttNamePairs &objectAttNames, jsonxx::Array &references)
 {
-    links.reset();
+    references.reset();
 
-    for (auto &link : objects) {
+    for (auto &objectAttName : objectAttNames) {
         jsonxx::Object element;
-        this->ContextForObject(link.first, element);
-        element << "attribute" << link.second;
-        links << element;
+        this->ContextForObject(objectAttName.first, element);
+        element << "referenceAttribute" << objectAttName.second;
+        references << element;
     }
 }
 
