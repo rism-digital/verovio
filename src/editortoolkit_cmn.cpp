@@ -19,17 +19,24 @@
 #include "comparison.h"
 #include "dir.h"
 #include "dynam.h"
+#include "findfunctor.h"
 #include "hairpin.h"
 #include "layer.h"
 #include "measure.h"
+#include "mnum.h"
 #include "note.h"
 #include "page.h"
+#include "plistinterface.h"
 #include "rend.h"
 #include "rest.h"
 #include "slur.h"
 #include "staff.h"
+#include "surface.h"
+#include "symboldef.h"
 #include "tie.h"
+#include "timeinterface.h"
 #include "vrv.h"
+#include "zone.h"
 
 //--------------------------------------------------------------------------------
 
@@ -84,6 +91,14 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
         }
         return this->Chain(json.get<jsonxx::Array>("param"));
     }
+    else if (action == "context") {
+        std::string elementId;
+        bool contentOnly;
+        if (this->ParseContextAction(json.get<jsonxx::Object>("param"), elementId, contentOnly)) {
+            return this->Context(elementId, contentOnly);
+        }
+        LogWarning("Could not parse the context action");
+    }
     else if (action == "delete") {
         std::string elementId;
         if (this->ParseDeleteAction(json.get<jsonxx::Object>("param"), elementId)) {
@@ -131,6 +146,18 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
         LogWarning("Unknown action type '%s'.", action.c_str());
     }
     return false;
+}
+
+bool EditorToolkitCMN::ParseContextAction(jsonxx::Object param, std::string &elementId, bool &contentOnly)
+{
+    contentOnly = false;
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    elementId = param.get<jsonxx::String>("elementId");
+    // optional
+    if (param.has<jsonxx::Boolean>("contentOnly")) {
+        contentOnly = param.get<jsonxx::Boolean>("contentOnly");
+    }
+    return true;
 }
 
 bool EditorToolkitCMN::ParseDeleteAction(jsonxx::Object param, std::string &elementId)
@@ -635,6 +662,129 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
         delete note;
         m_chainedId = rest->GetID();
         return true;
+    }
+}
+
+bool EditorToolkitCMN::Context(std::string &elementId, bool contentOnly)
+{
+    m_editInfo.reset();
+
+    Object *object = this->GetElement(elementId);
+    if (!object || !object->GetParent()) return false;
+
+    ListOfConstObjects objects;
+    ListOfConstObjects::iterator targetIt;
+
+    if (object->GetParent()->Is(SYSTEM)) {
+        ChildOfClassIdComparison systemChild(SYSTEM);
+        // System children are level 4, no needt to go deeper
+        m_doc->FindAllDescendantsByComparison(&objects, &systemChild, 4);
+
+        targetIt = std::find(objects.begin(), objects.end(), object);
+        // This should not happen
+        if (targetIt == objects.end()) return false;
+
+        // Lambda to check if the object is a delimiter (ending, section, milestone end)
+        auto isSectionDelimiter
+            = [](const Object *item) { return (item->Is({ ENDING, SECTION, SYSTEM_MILESTONE_END })); };
+
+        // Find the last occurrence of a delimiter  before the target - erase before it if found
+        auto delimiterBefore = std::find_if(
+            std::make_reverse_iterator(targetIt), std::make_reverse_iterator(objects.begin()), isSectionDelimiter)
+                                   .base();
+        objects.erase(objects.begin(), delimiterBefore);
+
+        // Find the first occurrence of delimiter after the target - eraase after it if found
+        auto delimiterAfter = std::find_if(std::next(targetIt), objects.end(), isSectionDelimiter);
+        if (delimiterAfter != objects.end()) objects.erase(delimiterAfter, objects.end());
+    }
+    else {
+        const ArrayOfObjects &objectsArr = object->GetParent()->GetChildren();
+        std::copy(objectsArr.begin(), objectsArr.end(), std::back_inserter(objects));
+        targetIt = std::find(objects.begin(), objects.end(), object);
+        // This should not happen
+        if (targetIt == objects.end()) return false;
+    }
+    ListOfConstObjects previous;
+    if (targetIt != objects.begin()) std::copy(objects.begin(), targetIt, std::back_inserter(previous));
+
+    ListOfConstObjects following;
+    if (targetIt != objects.end()) std::copy(std::next(targetIt), objects.end(), std::back_inserter(following));
+
+    jsonxx::Array elements;
+    this->ContextForSiblings(previous, elements);
+    m_editInfo << "previousSiblings" << elements;
+    this->ContextForSiblings(following, elements);
+    m_editInfo << "followingSiblings" << elements;
+
+    ListOfObjectAttNamePairs referringObjects;
+    FindAllReferringObjectsFunctor findAllReferringObjects(object, &referringObjects);
+    m_doc->Process(findAllReferringObjects);
+
+    ListOfObjectAttNamePairs referencedObjects;
+    FindAllReferencedObjectsFunctor findAllReferencedObjects(NULL, &referencedObjects);
+    object->Process(findAllReferencedObjects);
+
+    ListOfConstObjects ancestors;
+    const Object *parent = object->GetParent();
+    while (parent) {
+        ancestors.push_back(parent);
+        parent = parent->GetParent();
+        if (!parent || parent->Is(SYSTEM)) break;
+    }
+    this->ContextForSiblings(ancestors, elements);
+    m_editInfo << "ancestors" << elements;
+
+    this->ContextForLinks(referringObjects, elements);
+    m_editInfo << "referringElements" << elements;
+    this->ContextForLinks(referencedObjects, elements);
+    m_editInfo << "referencedElements" << elements;
+
+    return true;
+}
+
+void EditorToolkitCMN::ContextForObject(const Object *object, jsonxx::Object &element)
+{
+    element << "name" << object->GetClassName();
+    element << "id" << object->GetID();
+    if (object->HasAttClass(ATT_NINTEGER)) {
+        const AttNInteger *att = dynamic_cast<const AttNInteger *>(object);
+        assert(att);
+        element << "n" << att->GetN();
+    }
+    if (object->HasAttClass(ATT_NNUMBERLIKE)) {
+        const AttNNumberLike *att = dynamic_cast<const AttNNumberLike *>(object);
+        assert(att);
+        element << "n" << att->GetN();
+    }
+}
+
+void EditorToolkitCMN::ContextForSiblings(const ListOfConstObjects &objects, jsonxx::Array &siblings)
+{
+    siblings.reset();
+
+    for (const Object *object : objects) {
+        if (object->Is(MNUM)) {
+            const MNum *mNum = vrv_cast<const MNum *>(object);
+            assert(mNum);
+            if (mNum->IsGenerated()) continue;
+        }
+
+        jsonxx::Object element;
+        this->ContextForObject(object, element);
+        siblings << element;
+    }
+}
+
+void EditorToolkitCMN::ContextForLinks(const ListOfObjectAttNamePairs &objects, jsonxx::Array &links)
+{
+    links.reset();
+
+    for (auto &link : objects) {
+        jsonxx::Object element;
+        this->ContextForObject(link.first, element);
+        element << "attribute" << link.second;
+        links << element;
     }
 }
 

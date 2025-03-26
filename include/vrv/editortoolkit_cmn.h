@@ -42,6 +42,7 @@ protected:
      */
     ///@{
     bool Chain(jsonxx::Array actions);
+    bool ParseContextAction(jsonxx::Object param, std::string &elementId, bool &contentOnly);
     bool ParseDeleteAction(jsonxx::Object param, std::string &elementId);
     bool ParseDragAction(jsonxx::Object param, std::string &elementId, int &x, int &y);
     bool ParseKeyDownAction(jsonxx::Object param, std::string &elementid, int &key, bool &shiftKey, bool &ctrlKey);
@@ -65,7 +66,13 @@ protected:
 
     bool DeleteNote(Note *note);
 
+    bool Context(std::string &elementId, bool contentOnly);
+
     Object *GetElement(std::string &elementId);
+
+    void ContextForObject(const Object *object, jsonxx::Object &element);
+    void ContextForSiblings(const ListOfConstObjects &objects, jsonxx::Array &siblings);
+    void ContextForLinks(const ListOfObjectAttNamePairs &objects, jsonxx::Array &links);
 
 public:
     //
