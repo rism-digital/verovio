@@ -34,7 +34,7 @@ public:
     virtual ~CpMark();
     Object *Clone() const override { return new CpMark(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "CpMark"; }
+    std::string GetClassName() const override { return "cpMark"; }
     ///@}
 
     /**

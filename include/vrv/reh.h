@@ -38,7 +38,7 @@ public:
     virtual ~Reh();
     Object *Clone() const override { return new Reh(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Reh"; }
+    std::string GetClassName() const override { return "reh"; }
     ///@}
 
     /**

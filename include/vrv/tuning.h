@@ -31,7 +31,7 @@ public:
     virtual ~Tuning();
     Object *Clone() const override { return new Tuning(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Tuning"; }
+    std::string GetClassName() const override { return "tuning"; }
     ///@}
 
     /**

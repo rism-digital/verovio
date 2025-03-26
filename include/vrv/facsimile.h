@@ -39,7 +39,7 @@ public:
     virtual ~Facsimile();
     Object *Clone() const override { return new Facsimile(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Facsimile"; }
+    std::string GetClassName() const override { return "facsimile"; }
     ///@}
     bool IsSupportedChild(ClassId classId) override;
 

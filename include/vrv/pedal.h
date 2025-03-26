@@ -42,7 +42,7 @@ public:
     virtual ~Pedal();
     Object *Clone() const override { return new Pedal(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Pedal"; }
+    std::string GetClassName() const override { return "pedal"; }
     ///@}
 
     /**

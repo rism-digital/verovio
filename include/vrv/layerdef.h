@@ -26,7 +26,7 @@ public:
     virtual ~LayerDef();
     Object *Clone() const override { return new LayerDef(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "LayerDef"; }
+    std::string GetClassName() const override { return "layerDef"; }
     ///@}
 
     /**

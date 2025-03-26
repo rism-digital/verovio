@@ -40,7 +40,7 @@ public:
     virtual ~Mordent();
     Object *Clone() const override { return new Mordent(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Mordent"; }
+    std::string GetClassName() const override { return "mordent"; }
     ///@}
 
     /**

@@ -31,7 +31,7 @@ public:
     virtual ~Fb();
     Object *Clone() const override { return new Fb(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Fb"; }
+    std::string GetClassName() const override { return "fb"; }
     ///@}
 
     /**
