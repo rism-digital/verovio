@@ -37,7 +37,7 @@ public:
     virtual ~Caesura();
     Object *Clone() const override { return new Caesura(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Caesura"; }
+    std::string GetClassName() const override { return "caesura"; }
     ///@}
 
     /**

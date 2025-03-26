@@ -52,7 +52,7 @@ public:
     virtual ~Chord();
     Object *Clone() const override { return new Chord(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Chord"; }
+    std::string GetClassName() const override { return "chord"; }
     ///@}
 
     /**

@@ -116,7 +116,7 @@ public:
     virtual ~Staff();
     Object *Clone() const override { return new Staff(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Staff"; }
+    std::string GetClassName() const override { return "staff"; }
     ///@}
 
     /**

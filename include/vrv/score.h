@@ -38,7 +38,7 @@ public:
     Score();
     virtual ~Score();
     void Reset() override;
-    std::string GetClassName() const override { return "Score"; }
+    std::string GetClassName() const override { return "score"; }
     ///@}
 
     /**

@@ -39,7 +39,7 @@ public:
     virtual ~Ornam();
     Object *Clone() const override { return new Ornam(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Ornam"; }
+    std::string GetClassName() const override { return "ornam"; }
     ///@}
 
     /**

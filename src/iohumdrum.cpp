@@ -15470,7 +15470,7 @@ void HumdrumInput::addExplicitStemDirection(FTrem *ftrem, hum::HTp start)
     // also deal with chords later
     for (int i = 0; i < count; ++i) {
         Object *obj = ftrem->GetChild(i);
-        if (obj->GetClassName() == "Note") {
+        if (obj->GetClassName() == "note") {
             if (direction > 0) {
                 ((Note *)obj)->SetStemDir(STEMDIRECTION_up);
                 if (m_humtype && showplace) {
@@ -18115,7 +18115,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
                 int count = tempo->GetChildCount();
                 for (int j = 0; j < count; j++) {
                     Object *obj = tempo->GetChild(j);
-                    if (obj->GetClassName() != "Rend") {
+                    if (obj->GetClassName() != "rend") {
                         continue;
                     }
                     Rend *item = (Rend *)obj;
@@ -20642,7 +20642,7 @@ void HumdrumInput::addTextElement(
         hre.replaceDestructive(data, "", "</i>", "g");
     }
 
-    if (element->GetClassName() == "Syl") {
+    if (element->GetClassName() == "syl") {
         // Approximate centering of single-letter text on noteheads.
         // currently the text is left justified to before the left edge of the notehead.
         hum::HumRegex hre;
@@ -28116,7 +28116,7 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
                 int staffindex = staff - 1;
                 std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
                 if (ss[staffindex].righthalfstem
-                    && ((element->GetClassName() == "Note") || (element->GetClassName() == "Chord"))) {
+                    && ((element->GetClassName() == "note") || (element->GetClassName() == "chord"))) {
                     m_setrightstem = true;
                 }
             } break;

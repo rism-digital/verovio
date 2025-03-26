@@ -39,7 +39,7 @@ public:
     virtual ~MNum();
     Object *Clone() const override { return new MNum(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "MNum"; }
+    std::string GetClassName() const override { return "mNum"; }
     ///@}
 
     /**

@@ -40,7 +40,7 @@ public:
     virtual ~Harm();
     Object *Clone() const override { return new Harm(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Harm"; }
+    std::string GetClassName() const override { return "harm"; }
     ///@}
 
     /**
