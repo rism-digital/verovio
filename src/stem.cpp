@@ -31,7 +31,7 @@ namespace vrv {
 
 static const ClassRegistrar<Note> s_factory("stem", STEM);
 
-Stem::Stem() : LayerElement(STEM, "stem-"), AttGraced(), AttStemVis(), AttVisibility()
+Stem::Stem() : LayerElement(STEM), AttGraced(), AttStemVis(), AttVisibility()
 {
     this->RegisterAttClass(ATT_GRACED);
     this->RegisterAttClass(ATT_STEMVIS);

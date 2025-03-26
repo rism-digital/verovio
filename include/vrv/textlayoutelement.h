@@ -28,7 +28,7 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    TextLayoutElement(ClassId classId, const std::string &classIdStr);
+    TextLayoutElement(ClassId classId);
     virtual ~TextLayoutElement();
     void Reset() override;
     ///@}

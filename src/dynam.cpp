@@ -36,7 +36,7 @@ const std::u32string dynamSmufl[] = { U"\uE520", U"\uE521", U"\uE522", U"\uE523"
 static const ClassRegistrar<Dynam> s_factory("dynam", DYNAM);
 
 Dynam::Dynam()
-    : ControlElement(DYNAM, "dynam-")
+    : ControlElement(DYNAM)
     , TextListInterface()
     , TextDirInterface()
     , TimeSpanningInterface()

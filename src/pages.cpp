@@ -27,7 +27,7 @@ namespace vrv {
 // Pages
 //----------------------------------------------------------------------------
 
-Pages::Pages() : Object(PAGES, "pages-"), AttLabelled(), AttNNumberLike()
+Pages::Pages() : Object(PAGES), AttLabelled(), AttNNumberLike()
 {
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_NNUMBERLIKE);

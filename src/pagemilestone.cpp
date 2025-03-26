@@ -25,7 +25,7 @@ namespace vrv {
 // PageMilestoneEnd
 //----------------------------------------------------------------------------
 
-PageMilestoneEnd::PageMilestoneEnd(Object *start) : PageElement(PAGE_MILESTONE_END, "page-milestone-end-")
+PageMilestoneEnd::PageMilestoneEnd(Object *start) : PageElement(PAGE_MILESTONE_END)
 {
     this->Reset();
     m_start = start;

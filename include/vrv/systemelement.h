@@ -31,7 +31,6 @@ public:
     ///@{
     SystemElement();
     SystemElement(ClassId classId);
-    SystemElement(ClassId classId, const std::string &classIdStr);
     virtual ~SystemElement();
     void Reset() override;
     ///@}

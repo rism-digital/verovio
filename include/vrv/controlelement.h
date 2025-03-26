@@ -39,7 +39,6 @@ public:
     ///@{
     ControlElement();
     ControlElement(ClassId classId);
-    ControlElement(ClassId classId, const std::string &classIdStr);
     virtual ~ControlElement();
     void Reset() override;
     ///@}

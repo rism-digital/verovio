@@ -63,7 +63,6 @@ public:
     ///@{
     Slur();
     Slur(ClassId classId);
-    Slur(ClassId classId, const std::string &classIdStr);
     virtual ~Slur();
     Object *Clone() const override { return new Slur(*this); }
     void Reset() override;

@@ -30,14 +30,14 @@ namespace vrv {
 
 static const ClassRegistrar<Choice> s_factory("choice", CHOICE);
 
-Choice::Choice() : EditorialElement(CHOICE, "choice-")
+Choice::Choice() : EditorialElement(CHOICE)
 {
     m_level = EDITORIAL_UNDEFINED;
 
     this->Reset();
 }
 
-Choice::Choice(EditorialLevel level) : EditorialElement(CHOICE, "choice-")
+Choice::Choice(EditorialLevel level) : EditorialElement(CHOICE)
 {
     m_level = level;
 

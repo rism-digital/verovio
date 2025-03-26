@@ -25,7 +25,7 @@ namespace vrv {
 // SystemMilestoneEnd
 //----------------------------------------------------------------------------
 
-SystemMilestoneEnd::SystemMilestoneEnd(Object *start) : SystemElement(SYSTEM_MILESTONE_END, "system-milestone-end-")
+SystemMilestoneEnd::SystemMilestoneEnd(Object *start) : SystemElement(SYSTEM_MILESTONE_END)
 {
     this->Reset();
     m_start = start;

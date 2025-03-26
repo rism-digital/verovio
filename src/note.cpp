@@ -51,7 +51,7 @@ namespace vrv {
 static const ClassRegistrar<Note> s_factory("note", NOTE);
 
 Note::Note()
-    : LayerElement(NOTE, "note-")
+    : LayerElement(NOTE)
     , StemmedDrawingInterface()
     , AltSymInterface()
     , DurationInterface()

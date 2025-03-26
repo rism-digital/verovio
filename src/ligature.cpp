@@ -30,7 +30,7 @@ namespace vrv {
 
 static const ClassRegistrar<Ligature> s_factory("ligature", LIGATURE);
 
-Ligature::Ligature() : LayerElement(LIGATURE, "ligature-"), ObjectListInterface(), AttLigatureVis()
+Ligature::Ligature() : LayerElement(LIGATURE), ObjectListInterface(), AttLigatureVis()
 {
     this->RegisterAttClass(ATT_LIGATUREVIS);
 

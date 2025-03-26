@@ -32,7 +32,7 @@ namespace vrv {
 static const ClassRegistrar<Nc> s_factory("nc", NC);
 
 Nc::Nc()
-    : LayerElement(NC, "nc-")
+    : LayerElement(NC)
     , DurationInterface()
     , PitchInterface()
     , PositionInterface()

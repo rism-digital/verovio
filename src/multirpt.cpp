@@ -30,7 +30,7 @@ namespace vrv {
 
 static const ClassRegistrar<MultiRpt> s_factory("multiRpt", MULTIRPT);
 
-MultiRpt::MultiRpt() : LayerElement(MULTIRPT, "multirpt-"), AttNumbered()
+MultiRpt::MultiRpt() : LayerElement(MULTIRPT), AttNumbered()
 {
     this->RegisterAttClass(ATT_NUMBERED);
     this->Reset();

@@ -44,7 +44,6 @@ public:
     ///@{
     EditorialElement();
     EditorialElement(ClassId classId);
-    EditorialElement(ClassId classId, const std::string &classIdStr);
     virtual ~EditorialElement();
     void Reset() override;
     ///@}

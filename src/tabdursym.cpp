@@ -32,11 +32,7 @@ namespace vrv {
 static const ClassRegistrar<TabDurSym> s_factory("tabDurSym", TABDURSYM);
 
 TabDurSym::TabDurSym()
-    : LayerElement(TABDURSYM, "tabdursym-")
-    , StemmedDrawingInterface()
-    , AttNNumberLike()
-    , AttStringtab()
-    , AttVisualOffsetVo()
+    : LayerElement(TABDURSYM), StemmedDrawingInterface(), AttNNumberLike(), AttStringtab(), AttVisualOffsetVo()
 {
     this->RegisterAttClass(ATT_NNUMBERLIKE);
     this->RegisterAttClass(ATT_STRINGTAB);

@@ -34,7 +34,7 @@ namespace vrv {
 
 static const ClassRegistrar<FTrem> s_factory("fTrem", FTREM);
 
-FTrem::FTrem() : LayerElement(FTREM, "ftrem-"), BeamDrawingInterface(), AttFTremVis(), AttTremMeasured()
+FTrem::FTrem() : LayerElement(FTREM), BeamDrawingInterface(), AttFTremVis(), AttTremMeasured()
 {
     this->RegisterAttClass(ATT_FTREMVIS);
     this->RegisterAttClass(ATT_TREMMEASURED);

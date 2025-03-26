@@ -30,7 +30,7 @@ namespace vrv {
 static const ClassRegistrar<RepeatMark> s_factory("repeatMark", REPEATMARK);
 
 RepeatMark::RepeatMark()
-    : ControlElement(REPEATMARK, "repeatMark-")
+    : ControlElement(REPEATMARK)
     , TextListInterface()
     , TextDirInterface()
     , TimePointInterface()

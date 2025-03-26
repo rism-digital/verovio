@@ -66,7 +66,7 @@ template <typename Iterator> std::set<int> CalculateDotLocations(Iterator begin,
 static const ClassRegistrar<Chord> s_factory("chord", CHORD);
 
 Chord::Chord()
-    : LayerElement(CHORD, "chord-")
+    : LayerElement(CHORD)
     , ObjectListInterface()
     , DrawingListInterface()
     , StemmedDrawingInterface()

@@ -32,7 +32,7 @@ namespace vrv {
 static const ClassRegistrar<StaffDef> s_factory("staffDef", STAFFDEF);
 
 StaffDef::StaffDef()
-    : ScoreDefElement(STAFFDEF, "staffdef-")
+    : ScoreDefElement(STAFFDEF)
     , AttDistances()
     , AttLabelled()
     , AttNInteger()
