@@ -42,7 +42,7 @@ public:
     /**
      * Override the method of adding AlignmentReference children
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Do not copy children for HorizontalAligner

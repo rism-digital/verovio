@@ -39,7 +39,7 @@ public:
     void Reset() override;
     std::string GetClassName() const override { return "Surface"; }
     ///@}
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     int GetMaxX() const;
     int GetMaxY() const;

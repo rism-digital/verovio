@@ -97,7 +97,12 @@ public:
     /**
      * Methods for adding allowed content
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
+
+    /**
+     * Additional check when adding a child.
+     */
+    bool AddChildAdditionalCheck(Object *child) override;
 
     /**
      * Specific method for measures

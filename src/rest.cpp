@@ -207,23 +207,24 @@ void Rest::Reset()
     this->ResetRestVisMensural();
 }
 
-bool Rest::IsSupportedChild(Object *child)
+bool Rest::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(DOTS)) {
-        assert(dynamic_cast<Dots *>(child));
+    static const std::vector<ClassId> supported{ DOTS };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 void Rest::AddChild(Object *child)
 {
-    if (!this->IsSupportedChild(child)) {
+    if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
         return;
     }

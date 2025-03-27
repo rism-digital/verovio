@@ -41,7 +41,7 @@ public:
     void Reset() override;
     std::string GetClassName() const override { return "Facsimile"; }
     ///@}
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     Zone *FindZoneByID(const std::string &zoneId);
     const Zone *FindZoneByID(const std::string &zoneId) const;

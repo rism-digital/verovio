@@ -45,7 +45,7 @@ public:
     /**
      * Add children (notes or editorial markup)
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Return the first or last note

@@ -51,27 +51,22 @@ void Section::Reset()
     this->ResetSectionVis();
 }
 
-bool Section::IsSupportedChild(Object *child)
+bool Section::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(MEASURE)) {
-        assert(dynamic_cast<Measure *>(child));
+    static const std::vector<ClassId> supported{ DIV, MEASURE, SCOREDEF };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(SCOREDEF)) {
-        assert(dynamic_cast<ScoreDef *>(child));
+    else if (Object::IsSystemElement(classId)) {
+        return true;
     }
-    else if (child->IsSystemElement()) {
-        assert(dynamic_cast<SystemElement *>(child));
-    }
-    else if (child->Is(DIV)) {
-        assert(dynamic_cast<Div *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 //----------------------------------------------------------------------------

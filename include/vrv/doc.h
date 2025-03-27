@@ -52,7 +52,7 @@ public:
     /**
      * Add a page to the document
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Clear the content of the document.

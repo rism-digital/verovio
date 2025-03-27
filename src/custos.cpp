@@ -54,15 +54,16 @@ void Custos::Reset()
     this->ResetExtSymNames();
 }
 
-bool Custos::IsSupportedChild(Object *child)
+bool Custos::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(ACCID)) {
-        assert(dynamic_cast<Accid *>(child));
+    static const std::vector<ClassId> supported{ ACCID };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 char32_t Custos::GetCustosGlyph(const data_NOTATIONTYPE notationtype) const

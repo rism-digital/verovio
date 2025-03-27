@@ -48,7 +48,7 @@ void Symbol::Reset()
     this->ResetTypography();
 }
 
-bool Symbol::IsSupportedChild(Object *child)
+bool Symbol::IsSupportedChild(ClassId classId)
 {
     return false;
 }

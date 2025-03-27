@@ -46,18 +46,16 @@ void App::Reset()
 
 App::~App() {}
 
-bool App::IsSupportedChild(Object *child)
+bool App::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(LEM)) {
-        assert(dynamic_cast<Lem *>(child));
-    }
-    else if (child->Is(RDG)) {
-        assert(dynamic_cast<Rdg *>(child));
+    static const std::vector<ClassId> supported{ LEM, RDG };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 //----------------------------------------------------------------------------

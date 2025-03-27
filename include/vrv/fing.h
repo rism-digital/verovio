@@ -53,7 +53,7 @@ public:
      * Add an element (text, rend) to a fing.
      * Only supported elements will be actually added to the child list.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Check whether the current object must be positioned closer to the staff than the other

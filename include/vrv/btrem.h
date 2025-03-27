@@ -42,7 +42,7 @@ public:
      * Add an element (a note or a chord) to a fTrem.
      * Only Note or Chord elements will be actually added to the fTrem.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Get stem mod if encoded explicitly, or determine based on duration of bTrem and underlying elements

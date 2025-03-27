@@ -38,7 +38,7 @@ public:
     /**
      * Add children to a apparatus.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
 protected:
     /** We store the level of the <choice> for integrity check */

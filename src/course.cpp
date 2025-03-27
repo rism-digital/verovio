@@ -44,7 +44,7 @@ void Course::Reset()
     this->ResetPitch();
 }
 
-bool Course::IsSupportedChild(Object *child)
+bool Course::IsSupportedChild(ClassId classId)
 {
     // Nothing for now
     return false;

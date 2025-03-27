@@ -78,42 +78,17 @@ void StaffDef::Reset()
     m_drawingVisibility = OPTIMIZATION_NONE;
 }
 
-bool StaffDef::IsSupportedChild(Object *child)
+bool StaffDef::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(CLEF)) {
-        assert(dynamic_cast<Clef *>(child));
-    }
-    else if (child->Is(INSTRDEF)) {
-        assert(dynamic_cast<InstrDef *>(child));
-    }
-    else if (child->Is(KEYSIG)) {
-        assert(dynamic_cast<KeySig *>(child));
-    }
-    else if (child->Is(LABEL)) {
-        assert(dynamic_cast<Label *>(child));
-    }
-    else if (child->Is(LABELABBR)) {
-        assert(dynamic_cast<LabelAbbr *>(child));
-    }
-    else if (child->Is(LAYERDEF)) {
-        assert(dynamic_cast<LayerDef *>(child));
-    }
-    else if (child->Is(MENSUR)) {
-        assert(dynamic_cast<Mensur *>(child));
-    }
-    else if (child->Is(METERSIG)) {
-        assert(dynamic_cast<MeterSig *>(child));
-    }
-    else if (child->Is(METERSIGGRP)) {
-        assert(dynamic_cast<MeterSigGrp *>(child));
-    }
-    else if (child->Is(TUNING)) {
-        assert(dynamic_cast<Tuning *>(child));
+    static const std::vector<ClassId> supported{ CLEF, INSTRDEF, KEYSIG, LABEL, LABELABBR, LAYERDEF, MENSUR, METERSIG,
+        METERSIGGRP, TUNING };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 int StaffDef::GetInsertOrderFor(ClassId classId) const
