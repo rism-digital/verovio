@@ -5520,8 +5520,7 @@ void HumdrumInput::promoteInstrumentNamesToGroup()
     int count = sdf->GetChildCount();
     for (int i = 0; i < count; ++i) {
         Object *obj = sdf->GetChild(i);
-        std::string name = obj->GetClassName();
-        if (name != "StaffGrp") {
+        if (obj->GetClassId() != STAFFGRP) {
             continue;
         }
         StaffGrp *sg = (StaffGrp *)obj;
@@ -5539,16 +5538,14 @@ void HumdrumInput::promoteInstrumentsForStaffGroup(StaffGrp *group)
 {
     int count = group->GetChildCount();
     std::vector<std::string> names;
-    std::string name;
     std::vector<StaffDef *> sds;
     sds.clear();
     for (int i = 0; i < count; ++i) {
         Object *obj = group->GetChild(i);
-        name = obj->GetClassName();
-        if (name == "StaffGrp") {
+        if (obj->GetClassId() == STAFFGRP) {
             promoteInstrumentsForStaffGroup((StaffGrp *)obj);
         }
-        if (name != "StaffDef") {
+        if (obj->GetClassId() != STAFFDEF) {
             continue;
         }
         StaffDef *sd = (StaffDef *)obj;
@@ -5595,8 +5592,7 @@ void HumdrumInput::promoteInstrumentAbbreviationsToGroup()
 
     for (int i = 0; i < count; ++i) {
         Object *obj = sdf->GetChild(i);
-        std::string name = obj->GetClassName();
-        if (name != "StaffGrp") {
+        if (obj->GetClassId() != STAFFGRP) {
             continue;
         }
         StaffGrp *sg = (StaffGrp *)obj;
@@ -5614,16 +5610,14 @@ void HumdrumInput::promoteInstrumentAbbreviationsForStaffGroup(StaffGrp *group)
 {
     int count = group->GetChildCount();
     std::vector<std::string> names;
-    std::string name;
     std::vector<StaffDef *> sds;
     sds.clear();
     for (int i = 0; i < count; ++i) {
         Object *obj = group->GetChild(i);
-        name = obj->GetClassName();
-        if (name == "StaffGrp") {
+        if (obj->GetClassId() == STAFFGRP) {
             promoteInstrumentAbbreviationsForStaffGroup((StaffGrp *)obj);
         }
-        if (name != "StaffDef") {
+        if (obj->GetClassId() != STAFFDEF) {
             continue;
         }
         StaffDef *sd = (StaffDef *)obj;
@@ -10103,8 +10097,7 @@ template <class ELEMENT> void HumdrumInput::setStaffBetween(ELEMENT element, int
 
 template <class ELEMENT> void HumdrumInput::setN(ELEMENT element, int nvalue, hum::HTp tok)
 {
-    std::string name = element->GetClassName();
-    if (tok && (name == "Ending")) {
+    if (tok && (element->GetClassId() == ENDING)) {
         // Check if there is a LO:TX text to replace number.
         std::string textlabel = tok->getLayoutParameter("TX", "t");
         if (!textlabel.empty()) {
@@ -11229,8 +11222,7 @@ void HumdrumInput::setFontStyleForHarm(Harm *harm, const std::string &style)
         if (!child) {
             return;
         }
-        std::string childname = child->GetClassName();
-        if (childname == "Rend") {
+        if (child->GetClassId() == REND) {
             if (style == "bold") {
                 setFontWeight((Rend *)child, style);
             }
@@ -11309,8 +11301,7 @@ void HumdrumInput::setFontsizeForHarm(Harm *harm, const std::string &fontsize)
         if (!child) {
             return;
         }
-        std::string childname = child->GetClassName();
-        if (childname == "Rend") {
+        if (child->GetClassId() == REND) {
             bool emptyfontstyle = child->HasAttribute("fontstyle", "");
             if (emptyfontstyle) {
                 setFontsize((Rend *)child, "", fontsize);
@@ -12462,8 +12453,7 @@ void HumdrumInput::appendTextToRend(Rend *rend, const std::string &content)
 
     Object *lastRendChild = rend->GetLast();
     if (lastRendChild) {
-        std::string classname = lastRendChild->GetClassName();
-        if (classname == "text") {
+        if (lastRendChild->GetClassId() == TEXT) {
             // Place secondary text inside of last text element:
             std::u32string ztext = ((Text *)lastRendChild)->GetText();
             std::u32string ytext = UTF8to32(content);
@@ -15453,7 +15443,7 @@ void HumdrumInput::addExplicitStemDirection(FTrem *ftrem, hum::HTp start)
     // also deal with chords later
     for (int i = 0; i < count; ++i) {
         Object *obj = ftrem->GetChild(i);
-        if (obj->GetClassName() == "Note") {
+        if (obj->GetClassId() == NOTE) {
             if (direction > 0) {
                 ((Note *)obj)->SetStemDir(STEMDIRECTION_up);
                 if (m_humtype && showplace) {
@@ -18131,7 +18121,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
                 int count = tempo->GetChildCount();
                 for (int j = 0; j < count; j++) {
                     Object *obj = tempo->GetChild(j);
-                    if (obj->GetClassName() != "Rend") {
+                    if (obj->GetClassId() != REND) {
                         continue;
                     }
                     Rend *item = (Rend *)obj;
@@ -20671,7 +20661,7 @@ void HumdrumInput::addTextElement(
         hre.replaceDestructive(data, "", "</i>", "g");
     }
 
-    if (element->GetClassName() == "Syl") {
+    if (element->GetClassId() == SYL) {
         // Approximate centering of single-letter text on noteheads.
         // currently the text is left justified to before the left edge of the notehead.
         hum::HumRegex hre;
@@ -28261,7 +28251,7 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
                 int staffindex = staff - 1;
                 std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
                 if (ss[staffindex].righthalfstem
-                    && ((element->GetClassName() == "Note") || (element->GetClassName() == "Chord"))) {
+                    && ((element->GetClassId() == NOTE) || (element->GetClassId() == CHORD))) {
                     m_setrightstem = true;
                 }
             } break;
