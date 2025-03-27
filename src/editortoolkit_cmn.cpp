@@ -714,7 +714,7 @@ bool EditorToolkitCMN::Context(std::string &elementId, bool contentOnly)
     // Build the json context
     
     jsonxx::Object section;
-    section << "id" << 0;
+    section << "id" << "";
     section << "element" << ".";
     jsonxx::Object jsonContext;
     
@@ -800,7 +800,7 @@ bool EditorToolkitCMN::Context(std::string &elementId, bool contentOnly)
 
 void EditorToolkitCMN::ContextForObject(const Object *object, jsonxx::Object &element)
 {
-    element << "name" << object->GetClassName();
+    element << "element" << object->GetClassName();
     element << "id" << object->GetID();
     jsonxx::Object attributes;
     if (object->HasAttClass(ATT_NINTEGER)) {
