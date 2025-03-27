@@ -28,11 +28,7 @@ namespace vrv {
 static const ClassRegistrar<BracketSpan> s_factory("bracketSpan", BRACKETSPAN);
 
 BracketSpan::BracketSpan()
-    : ControlElement(BRACKETSPAN, "bspan-")
-    , TimeSpanningInterface()
-    , AttBracketSpanLog()
-    , AttLineRend()
-    , AttLineRendBase()
+    : ControlElement(BRACKETSPAN), TimeSpanningInterface(), AttBracketSpanLog(), AttLineRend(), AttLineRendBase()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_BRACKETSPANLOG);

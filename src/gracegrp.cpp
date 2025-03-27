@@ -34,7 +34,7 @@ namespace vrv {
 
 static const ClassRegistrar<GraceGrp> s_factory("graceGrp", GRACEGRP);
 
-GraceGrp::GraceGrp() : LayerElement(GRACEGRP, "gracegrp-"), AttColor(), AttGraced(), AttGraceGrpLog()
+GraceGrp::GraceGrp() : LayerElement(GRACEGRP), AttColor(), AttGraced(), AttGraceGrpLog()
 {
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_GRACED);

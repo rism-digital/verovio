@@ -30,7 +30,7 @@ namespace vrv {
 static const ClassRegistrar<BeamSpan> s_factory("beamSpan", BEAMSPAN);
 
 BeamSpan::BeamSpan()
-    : ControlElement(BEAMSPAN, "beamspan-")
+    : ControlElement(BEAMSPAN)
     , BeamDrawingInterface()
     , PlistInterface()
     , TimeSpanningInterface()

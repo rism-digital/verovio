@@ -43,7 +43,7 @@ public:
     virtual ~BarLine();
     Object *Clone() const override { return new BarLine(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "BarLine"; }
+    std::string GetClassName() const override { return "barLine"; }
     ///@}
 
     /** Override the method since alignment is required */

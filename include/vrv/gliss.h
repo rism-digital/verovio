@@ -36,7 +36,7 @@ public:
     virtual ~Gliss();
     Object *Clone() const override { return new Gliss(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Gliss"; }
+    std::string GetClassName() const override { return "gliss"; }
     ///@}
 
     /**

@@ -38,12 +38,7 @@ namespace vrv {
 static const ClassRegistrar<Tuplet> s_factory("tuplet", TUPLET);
 
 Tuplet::Tuplet()
-    : LayerElement(TUPLET, "tuplet-")
-    , ObjectListInterface()
-    , AttColor()
-    , AttDurationRatio()
-    , AttNumberPlacement()
-    , AttTupletVis()
+    : LayerElement(TUPLET), ObjectListInterface(), AttColor(), AttDurationRatio(), AttNumberPlacement(), AttTupletVis()
 {
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_DURATIONRATIO);

@@ -86,7 +86,7 @@ namespace vrv {
 // Doc
 //----------------------------------------------------------------------------
 
-Doc::Doc() : Object(DOC, "doc-")
+Doc::Doc() : Object(DOC)
 {
     m_options = new Options();
 

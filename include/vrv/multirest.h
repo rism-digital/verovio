@@ -40,7 +40,7 @@ public:
     virtual ~MultiRest();
     Object *Clone() const override { return new MultiRest(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "MultiRest"; }
+    std::string GetClassName() const override { return "multiRest"; }
     ///@}
 
     /**

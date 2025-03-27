@@ -31,7 +31,7 @@ public:
     virtual ~Lb();
     Object *Clone() const override { return new Lb(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Lb"; }
+    std::string GetClassName() const override { return "lb"; }
     ///@}
 
     /**

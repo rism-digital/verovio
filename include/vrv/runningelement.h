@@ -33,8 +33,7 @@ public:
      */
     ///@{
     // RunningElement();
-    // RunningElement(ClassId classId);
-    RunningElement(ClassId classId, const std::string &classIdStr);
+    RunningElement(ClassId classId);
     virtual ~RunningElement();
     void Reset() override;
     ///@}

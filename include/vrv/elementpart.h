@@ -34,7 +34,7 @@ public:
     Dots();
     virtual ~Dots();
     void Reset() override;
-    std::string GetClassName() const override { return "Dots"; }
+    std::string GetClassName() const override { return "dots"; }
     Object *Clone() const override { return new Dots(*this); }
     ///@}
 
@@ -104,7 +104,7 @@ public:
     Flag();
     virtual ~Flag();
     void Reset() override;
-    std::string GetClassName() const override { return "Flag"; }
+    std::string GetClassName() const override { return "flag"; }
     Object *Clone() const override { return new Flag(*this); }
     ///@}
 
@@ -157,7 +157,7 @@ public:
     TupletBracket();
     virtual ~TupletBracket();
     void Reset() override;
-    std::string GetClassName() const override { return "TupletBracket"; }
+    std::string GetClassName() const override { return "tupletBracket"; }
     ///@}
 
     /**
@@ -256,7 +256,7 @@ public:
     TupletNum();
     virtual ~TupletNum();
     void Reset() override;
-    std::string GetClassName() const override { return "TupletNum"; }
+    std::string GetClassName() const override { return "tupletNum"; }
     ///@}
 
     /**

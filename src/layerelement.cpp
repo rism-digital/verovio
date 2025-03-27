@@ -86,7 +86,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 LayerElement::LayerElement()
-    : Object(LAYER_ELEMENT, "le-"), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
+    : Object(LAYER_ELEMENT), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
 {
     this->RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
@@ -98,19 +98,7 @@ LayerElement::LayerElement()
 }
 
 LayerElement::LayerElement(ClassId classId)
-    : Object(classId, "le-"), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
-{
-    this->RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
-    this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
-    this->RegisterAttClass(ATT_COORDX1);
-    this->RegisterAttClass(ATT_LABELLED);
-    this->RegisterAttClass(ATT_TYPED);
-
-    this->Reset();
-}
-
-LayerElement::LayerElement(ClassId classId, const std::string &classIdStr)
-    : Object(classId, classIdStr), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
+    : Object(classId), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
 {
     this->RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());

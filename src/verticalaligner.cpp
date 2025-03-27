@@ -35,7 +35,7 @@ namespace vrv {
 // SystemAligner
 //----------------------------------------------------------------------------
 
-SystemAligner::SystemAligner() : Object(SYSTEM_ALIGNER), m_bottomAlignment(NULL), m_system(NULL)
+SystemAligner::SystemAligner() : Object(SYSTEM_ALIGNER)
 {
     this->Reset();
 }

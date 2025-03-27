@@ -37,7 +37,7 @@ public:
     virtual ~Artic();
     Object *Clone() const override { return new Artic(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Artic"; }
+    std::string GetClassName() const override { return "artic"; }
     ///@}
 
     /** Override the method since alignment is required */

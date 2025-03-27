@@ -1598,7 +1598,7 @@ void BeamSegment::RequestStaffSpace(const Doc *doc, const BeamDrawingInterface *
 
 static const ClassRegistrar<Beam> s_factory("beam", BEAM);
 
-Beam::Beam() : LayerElement(BEAM, "beam-"), BeamDrawingInterface(), AttBeamedWith(), AttBeamRend(), AttColor(), AttCue()
+Beam::Beam() : LayerElement(BEAM), BeamDrawingInterface(), AttBeamedWith(), AttBeamRend(), AttColor(), AttCue()
 {
     this->RegisterAttClass(ATT_BEAMEDWITH);
     this->RegisterAttClass(ATT_BEAMREND);

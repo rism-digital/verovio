@@ -33,7 +33,7 @@ public:
     virtual ~FTrem();
     Object *Clone() const override { return new FTrem(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "FTrem"; }
+    std::string GetClassName() const override { return "fTrem"; }
     ///@}
 
     /**

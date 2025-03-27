@@ -23,7 +23,7 @@ namespace vrv {
 // Text
 //----------------------------------------------------------------------------
 
-Text::Text() : TextElement(TEXT, "text-")
+Text::Text() : TextElement(TEXT)
 {
     this->Reset();
 }

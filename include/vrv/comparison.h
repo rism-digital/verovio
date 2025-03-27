@@ -117,6 +117,24 @@ protected:
 };
 
 //----------------------------------------------------------------------------
+// ChildOfClassIdComparison
+//----------------------------------------------------------------------------
+
+class ChildOfClassIdComparison : public Comparison {
+
+public:
+    ChildOfClassIdComparison(ClassId classId) { m_classId = classId; }
+
+    bool operator()(const Object *object) override
+    {
+        return (object->GetParent() && object->GetParent()->GetClassId() == m_classId);
+    }
+
+protected:
+    ClassId m_classId;
+};
+
+//----------------------------------------------------------------------------
 // PointingToComparison
 //----------------------------------------------------------------------------
 

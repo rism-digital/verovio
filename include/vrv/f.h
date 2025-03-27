@@ -32,7 +32,7 @@ public:
     virtual ~F();
     Object *Clone() const override { return new F(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "F"; }
+    std::string GetClassName() const override { return "f"; }
     ///@}
 
     /**

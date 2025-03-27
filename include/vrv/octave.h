@@ -39,7 +39,7 @@ public:
     virtual ~Octave();
     Object *Clone() const override { return new Octave(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Octave"; }
+    std::string GetClassName() const override { return "octave"; }
     ///@}
 
     /**

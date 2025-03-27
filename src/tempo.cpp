@@ -31,7 +31,7 @@ namespace vrv {
 static const ClassRegistrar<Tempo> s_factory("tempo", TEMPO);
 
 Tempo::Tempo()
-    : ControlElement(TEMPO, "tempo-")
+    : ControlElement(TEMPO)
     , TextDirInterface()
     , TimeSpanningInterface()
     , AttExtender()

@@ -44,7 +44,7 @@ public:
     virtual ~Syl();
     Object *Clone() const override { return new Syl(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Syl"; }
+    std::string GetClassName() const override { return "syl"; }
     ///@}
 
     /** Override the method since it is align to the staff */

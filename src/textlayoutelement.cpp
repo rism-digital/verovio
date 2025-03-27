@@ -25,8 +25,7 @@ namespace vrv {
 // TextLayoutElement
 //----------------------------------------------------------------------------
 
-TextLayoutElement::TextLayoutElement(ClassId classId, const std::string &classIdStr)
-    : Object(classId, classIdStr), ObjectListInterface(), AttTyped()
+TextLayoutElement::TextLayoutElement(ClassId classId) : Object(classId), ObjectListInterface(), AttTyped()
 {
     this->RegisterAttClass(ATT_TYPED);
 

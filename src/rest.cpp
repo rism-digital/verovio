@@ -171,7 +171,7 @@ RestAccidental MeiAccidentalToRestAccidental(data_ACCIDENTAL_WRITTEN accidental)
 static const ClassRegistrar<Rest> s_factory("rest", REST);
 
 Rest::Rest()
-    : LayerElement(REST, "rest-")
+    : LayerElement(REST)
     , AltSymInterface()
     , DurationInterface()
     , PositionInterface()

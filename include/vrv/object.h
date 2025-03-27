@@ -65,7 +65,6 @@ public:
     ///@{
     Object();
     Object(ClassId classId);
-    Object(ClassId classId, const std::string &classIdStr);
     virtual ~Object();
     ClassId GetClassId() const final { return m_classId; }
     virtual std::string GetClassName() const { return "[MISSING]"; }
@@ -746,9 +745,9 @@ private:
     void GenerateID();
 
     /**
-     * Initialisation method taking the class id and a id prefix argument.
+     * Initialisation method taking the class id argument.
      */
-    void Init(ClassId classId, const std::string &classIdStr);
+    void Init(ClassId classId);
 
     /**
      * Helper methods for functor processing
@@ -789,7 +788,6 @@ private:
      */
     ///@{
     std::string m_id;
-    std::string m_classIdStr;
     ///@}
 
     /**

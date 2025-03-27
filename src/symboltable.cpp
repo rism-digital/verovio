@@ -24,7 +24,7 @@ namespace vrv {
 
 static const ClassRegistrar<SymbolTable> s_factory("symbolTable", SYMBOLTABLE);
 
-SymbolTable::SymbolTable() : Object(SYMBOLTABLE, "symtable-")
+SymbolTable::SymbolTable() : Object(SYMBOLTABLE)
 {
     this->Reset();
 }

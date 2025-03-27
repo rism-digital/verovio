@@ -27,7 +27,7 @@ public:
     SymbolDef();
     virtual ~SymbolDef();
     void Reset() override;
-    std::string GetClassName() const override { return "SymbolDef"; }
+    std::string GetClassName() const override { return "symbolDef"; }
     ///@}
 
     /**

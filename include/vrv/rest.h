@@ -53,7 +53,7 @@ public:
     virtual ~Rest();
     Object *Clone() const override { return new Rest(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Rest"; }
+    std::string GetClassName() const override { return "rest"; }
     ///@}
 
     /**
