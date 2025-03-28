@@ -44,7 +44,7 @@ public:
     virtual ~StaffDef();
     Object *Clone() const override { return new StaffDef(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "staffDef"; }
+    std::string GetClassName() const override { return "staffDef"; }
     ///@}
 
     /**

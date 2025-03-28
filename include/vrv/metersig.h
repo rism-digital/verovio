@@ -42,7 +42,7 @@ public:
     virtual ~MeterSig();
     Object *Clone() const override { return new MeterSig(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "meterSig"; }
+    std::string GetClassName() const override { return "meterSig"; }
     ///@}
 
     /** Override the method since alignment is required */

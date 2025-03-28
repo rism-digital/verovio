@@ -28,7 +28,7 @@ public:
     virtual ~App();
     Object *Clone() const override { return new App(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "app"; }
+    std::string GetClassName() const override { return "app"; }
     ///@}
 
     /** Getter for level **/

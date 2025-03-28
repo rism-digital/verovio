@@ -31,7 +31,7 @@ public:
     virtual ~Oriscus();
     Object *Clone() const override { return new Oriscus(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "oriscus"; }
+    std::string GetClassName() const override { return "oriscus"; }
     ///@}
 
     /**

@@ -292,7 +292,7 @@ public:
     virtual ~Beam();
     Object *Clone() const override { return new Beam(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "beam"; }
+    std::string GetClassName() const override { return "beam"; }
     ///@}
 
     /**

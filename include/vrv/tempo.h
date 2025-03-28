@@ -41,7 +41,7 @@ public:
     virtual ~Tempo();
     Object *Clone() const override { return new Tempo(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "tempo"; }
+    std::string GetClassName() const override { return "tempo"; }
     ///@}
 
     /**

@@ -33,7 +33,7 @@ public:
     virtual ~Sb();
     Object *Clone() const override { return new Sb(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "sb"; }
+    std::string GetClassName() const override { return "sb"; }
     ///@}
 
     /**

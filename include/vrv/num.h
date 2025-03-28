@@ -32,7 +32,7 @@ public:
     virtual ~Num();
     Object *Clone() const override { return new Num(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "num"; }
+    std::string GetClassName() const override { return "num"; }
     ///@}
 
     /**

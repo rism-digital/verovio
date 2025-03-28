@@ -36,7 +36,7 @@ public:
     virtual ~Section();
     Object *Clone() const override { return new Section(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "section"; }
+    std::string GetClassName() const override { return "section"; }
     ///@}
 
     /**

@@ -440,8 +440,8 @@ FunctorCode PrepareLinkingFunctor::VisitObject(Object *object)
             // Issue a warning if classes of object and sameas do not match
             Object *owner = dynamic_cast<Object *>(j->second);
             if (owner && (owner->GetClassId() != object->GetClassId())) {
-                LogWarning("%s with @xml:id %s has @sameas to an element of class %s.", owner->GetClassName().data(),
-                    owner->GetID().c_str(), object->GetClassName().data());
+                LogWarning("%s with @xml:id %s has @sameas to an element of class %s.", owner->GetClassName().c_str(),
+                    owner->GetID().c_str(), object->GetClassName().c_str());
             }
         }
         m_sameasIDPairs.erase(r2.first, r2.second);

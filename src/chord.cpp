@@ -187,7 +187,7 @@ bool Chord::IsSupportedChild(ClassId classId)
 void Chord::AddChild(Object *child)
 {
     if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().data(), this->GetClassName().data());
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
         return;
     }
 

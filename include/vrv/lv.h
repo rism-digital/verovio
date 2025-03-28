@@ -30,7 +30,7 @@ public:
     virtual ~Lv();
     Object *Clone() const override { return new Lv(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "lv"; }
+    std::string GetClassName() const override { return "lv"; }
     ///@}
 
     bool CalculatePosition(

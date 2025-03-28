@@ -33,7 +33,7 @@ public:
     virtual ~Mdiv();
     Object *Clone() const override { return new Mdiv(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "mdiv"; }
+    std::string GetClassName() const override { return "mdiv"; }
     ///@}
 
     /**

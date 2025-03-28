@@ -32,7 +32,7 @@ public:
     // This fails because of the copy contructor in ObjectListInterface (TextListInterface parent)
     // Object *Clone() const override { return new Annot(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "annot"; }
+    std::string GetClassName() const override { return "annot"; }
     ///@}
 
     /**

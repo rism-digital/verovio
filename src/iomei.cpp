@@ -932,7 +932,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
 
     else {
         // Missing output method for the class
-        LogError("Output method missing for '%s'", object->GetClassName().data());
+        LogError("Output method missing for '%s'", object->GetClassName().c_str());
         assert(false); // let's make it stop because this should not happen
     }
 
@@ -1650,7 +1650,7 @@ void MEIOutput::WritePageMilestoneEnd(pugi::xml_node currentNode, PageMilestoneE
 
     this->WritePageElement(currentNode, milestoneEnd);
     currentNode.append_attribute("startid") = ("#" + IDToMeiStr(milestoneEnd->GetStart())).c_str();
-    currentNode.append_attribute("type") = milestoneEnd->GetStart()->GetClassName().data();
+    currentNode.append_attribute("type") = milestoneEnd->GetStart()->GetClassName().c_str();
 }
 
 void MEIOutput::WriteSystem(pugi::xml_node currentNode, System *system)
@@ -1684,7 +1684,7 @@ void MEIOutput::WriteSystemMilestoneEnd(pugi::xml_node currentNode, SystemMilest
 
     this->WriteSystemElement(currentNode, milestoneEnd);
     currentNode.append_attribute("startid") = ("#" + IDToMeiStr(milestoneEnd->GetStart())).c_str();
-    currentNode.append_attribute("type") = milestoneEnd->GetStart()->GetClassName().data();
+    currentNode.append_attribute("type") = milestoneEnd->GetStart()->GetClassName().c_str();
 }
 
 void MEIOutput::WriteSection(pugi::xml_node currentNode, Section *section)
@@ -2916,7 +2916,7 @@ void MEIOutput::WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile)
             this->WriteSurface(childNode, dynamic_cast<Surface *>(child));
         }
         else {
-            LogWarning("Unable to write child '%s' of facsimile", child->GetClassName().data());
+            LogWarning("Unable to write child '%s' of facsimile", child->GetClassName().c_str());
         }
     }
 }
@@ -2949,7 +2949,7 @@ void MEIOutput::WriteSurface(pugi::xml_node currentNode, Surface *surface)
             this->WriteZone(childNode, dynamic_cast<Zone *>(child));
         }
         else {
-            LogWarning("Unable to write child '%s' of surface", child->GetClassName().data());
+            LogWarning("Unable to write child '%s' of surface", child->GetClassName().c_str());
         }
     }
 }
@@ -3180,7 +3180,7 @@ void MEIOutput::WriteUnsupportedAttr(pugi::xml_node element, Object *object)
 {
     for (const auto &pair : object->m_unsupported) {
         if (element.attribute(pair.first.c_str())) {
-            LogDebug("Attribute '%s' for '%s' is not supported", pair.first.c_str(), object->GetClassName().data());
+            LogDebug("Attribute '%s' for '%s' is not supported", pair.first.c_str(), object->GetClassName().c_str());
         }
         else {
             element.append_attribute(pair.first.c_str()) = pair.second.c_str();
@@ -3906,7 +3906,7 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
         }
     }
     else {
-        LogDebug("Unknown filter for '%s'", filterParent->GetClassName().data());
+        LogDebug("Unknown filter for '%s'", filterParent->GetClassName().c_str());
         return true;
     }
 }
@@ -5157,7 +5157,7 @@ bool MEIInput::ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Ob
         elementName = std::string(xmlElement.name());
         if (filter && !this->IsAllowed(elementName, filter)) {
             LogWarning("Element <%s> within <%s> is not supported and will be ignored ", xmlElement.name(),
-                filter->GetClassName().data());
+                filter->GetClassName().c_str());
             continue;
         }
         // editorial
@@ -6228,7 +6228,7 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         // LogDebug("ReadLayerChildren: element <%s>", xmlElement.name());
         if (!this->IsAllowed(elementName, filter)) {
             LogWarning("Element <%s> within <%s> is not supported and will be ignored ", xmlElement.name(),
-                filter->GetClassName().data());
+                filter->GetClassName().c_str());
             continue;
         }
         // editorial
@@ -7208,7 +7208,7 @@ bool MEIInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
         elementName = std::string(xmlElement.name());
         if (filter && !this->IsAllowed(elementName, filter)) {
             LogWarning("Element <%s> within <%s> is not supported and will be ignored ", xmlElement.name(),
-                filter->GetClassName().data());
+                filter->GetClassName().c_str());
             continue;
         }
         // editorial
@@ -7269,7 +7269,7 @@ bool MEIInput::ReadSymbolDefChildren(Object *parent, pugi::xml_node parentNode, 
         elementName = std::string(xmlElement.name());
         if (filter && !this->IsAllowed(elementName, filter)) {
             LogWarning("Element <%s> within <%s> is not supported and will be ignored ", xmlElement.name(),
-                filter->GetClassName().data());
+                filter->GetClassName().c_str());
             continue;
         }
         // content

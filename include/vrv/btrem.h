@@ -35,7 +35,7 @@ public:
     virtual ~BTrem();
     Object *Clone() const override { return new BTrem(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "bTrem"; }
+    std::string GetClassName() const override { return "bTrem"; }
     ///@}
 
     /**

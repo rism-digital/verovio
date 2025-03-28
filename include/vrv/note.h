@@ -75,7 +75,7 @@ public:
     virtual ~Note();
     Object *Clone() const override { return new Note(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "note"; }
+    std::string GetClassName() const override { return "note"; }
     ///@}
 
     /**

@@ -77,7 +77,7 @@ bool Arpeg::IsValidRef(const Object *ref) const
 {
     if (!ref->Is({ CHORD, NOTE })) {
         LogWarning(
-            "%s is not supported as @plist target for %s", ref->GetClassName().data(), this->GetClassName().data());
+            "%s is not supported as @plist target for %s", ref->GetClassName().c_str(), this->GetClassName().c_str());
         return false;
     }
     return true;

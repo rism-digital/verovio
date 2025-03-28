@@ -224,7 +224,7 @@ FunctorCode SyncToFacsimileFunctor::VisitLayerElement(LayerElement *layerElement
     if (!layerElement->Is({ ACCID, BARLINE, CLEF, CUSTOS, DOT, DIVLINE, LIQUESCENT, NC, NOTE, REST, SYL }))
         return FUNCTOR_CONTINUE;
 
-    Zone *zone = this->GetZone(layerElement, std::string(layerElement->GetClassName()));
+    Zone *zone = this->GetZone(layerElement, layerElement->GetClassName());
     zone->SetUlx(m_view.ToDeviceContextX(layerElement->GetDrawingX()) / DEFINITION_FACTOR + m_pageMarginLeft);
     if (m_currentNeumeLine && layerElement->Is({ ACCID, SYL })) {
         zone->SetUly(m_view.ToDeviceContextY(layerElement->GetDrawingY()) / DEFINITION_FACTOR + m_pageMarginTop);
@@ -235,7 +235,7 @@ FunctorCode SyncToFacsimileFunctor::VisitLayerElement(LayerElement *layerElement
 
 FunctorCode SyncToFacsimileFunctor::VisitMeasure(Measure *measure)
 {
-    Zone *zone = this->GetZone(measure, std::string(measure->GetClassName()));
+    Zone *zone = this->GetZone(measure, measure->GetClassName());
     zone->SetUlx(m_view.ToDeviceContextX(measure->GetDrawingX()) / DEFINITION_FACTOR + m_pageMarginLeft);
     zone->SetLrx(
         m_view.ToDeviceContextX(measure->GetDrawingX() + measure->GetWidth()) / DEFINITION_FACTOR + m_pageMarginLeft);
@@ -289,7 +289,7 @@ FunctorCode SyncToFacsimileFunctor::VisitPb(Pb *pb)
         m_surface = new Surface();
         assert(m_doc->GetFacsimile());
         m_doc->GetFacsimile()->AddChild(m_surface);
-        zone = this->GetZone(pb, std::string(pb->GetClassName()));
+        zone = this->GetZone(pb, pb->GetClassName());
     }
     // We already have some facsimile data - retrieve the surface ancestor
     else {
@@ -317,7 +317,7 @@ FunctorCode SyncToFacsimileFunctor::VisitPb(Pb *pb)
 
 FunctorCode SyncToFacsimileFunctor::VisitSb(Sb *sb)
 {
-    Zone *zone = this->GetZone(sb, std::string(sb->GetClassName()));
+    Zone *zone = this->GetZone(sb, sb->GetClassName());
     zone->SetUlx(m_view.ToDeviceContextX(m_currentSystem->GetDrawingX()) / DEFINITION_FACTOR + m_pageMarginLeft);
     zone->SetUly(m_view.ToDeviceContextY(m_currentSystem->GetDrawingY()) / DEFINITION_FACTOR + m_pageMarginTop);
 
@@ -326,7 +326,7 @@ FunctorCode SyncToFacsimileFunctor::VisitSb(Sb *sb)
 
 FunctorCode SyncToFacsimileFunctor::VisitStaff(Staff *staff)
 {
-    Zone *zone = this->GetZone(staff, std::string(staff->GetClassName()));
+    Zone *zone = this->GetZone(staff, staff->GetClassName());
     zone->SetUly(m_view.ToDeviceContextY(staff->GetDrawingY()) / DEFINITION_FACTOR + m_pageMarginTop);
 
     return FUNCTOR_CONTINUE;

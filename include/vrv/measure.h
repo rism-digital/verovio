@@ -57,7 +57,7 @@ public:
     virtual ~Measure();
     Object *Clone() const override { return new Measure(*this); };
     void Reset() override;
-    std::string_view GetClassName() const override { return "measure"; }
+    std::string GetClassName() const override { return "measure"; }
     ///@}
 
     /**
