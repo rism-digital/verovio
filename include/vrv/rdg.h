@@ -28,7 +28,7 @@ public:
     virtual ~Rdg();
     Object *Clone() const override { return new Rdg(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "rdg"; }
+    std::string_view GetClassName() const override { return "rdg"; }
     ///@}
 
 private:

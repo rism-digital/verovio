@@ -31,7 +31,7 @@ public:
     virtual ~LabelAbbr();
     Object *Clone() const override { return new LabelAbbr(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "labelAbbr"; }
+    std::string_view GetClassName() const override { return "labelAbbr"; }
     ///@}
 
     /**

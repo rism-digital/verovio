@@ -160,7 +160,7 @@ FunctorCode AdjustGraceXPosFunctor::VisitLayerElement(LayerElement *layerElement
 
     if (m_graceCumulatedXShift == VRV_UNSET) m_graceCumulatedXShift = 0;
 
-    // LogDebug("********* Aligning %s", layerElement->GetClassName().c_str());
+    // LogDebug("********* Aligning %s", layerElement->GetClassName().data());
 
     // With non grace alignment we do not need to do this
     layerElement->ResetCachedDrawingX();

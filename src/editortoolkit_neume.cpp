@@ -1319,17 +1319,17 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
     }
     if (!(element->Is(DIVLINE) || element->Is(ACCID) || element->Is(CLEF))) {
         LogError("Element is of type %s, but only Divlines and Accids can be inserted into syllables.",
-            element->GetClassName().c_str());
+            std::string(element->GetClassName()).data());
         m_editInfo.import("status", "FAILURE");
         m_editInfo.import("message",
-            "Element is of type " + element->GetClassName()
+            "Element is of type " + std::string(element->GetClassName())
                 + ", but only DivLines, Accids, and Clefs can be inserted into syllables.");
         return false;
     }
     if (!parent->Is(LAYER)) {
-        LogError("The selected %s is not a child of layer.", element->GetClassName().c_str());
+        LogError("The selected %s is not a child of layer.", std::string(element->GetClassName()).data());
         m_editInfo.import("status", "FAILURE");
-        m_editInfo.import("message", "The selected " + element->GetClassName() + "is not a child of layer.");
+        m_editInfo.import("message", "The selected " + std::string(element->GetClassName()) + "is not a child of layer.");
         return false;
     }
 
@@ -1341,9 +1341,9 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
         uly = element->GetFacsimileInterface()->GetZone()->GetUly();
     }
     else {
-        LogError("Selected '%s' without facsimile", element->GetClassName().c_str());
+        LogError("Selected '%s' without facsimile", std::string(element->GetClassName()).data());
         m_editInfo.import("status", "FAILURE");
-        m_editInfo.import("message", "Selected '" + element->GetClassName() + "' without facsimile is unsupported.");
+        m_editInfo.import("message", "Selected '" + std::string(element->GetClassName()) + "' without facsimile is unsupported.");
         return false;
     }
 
@@ -1356,10 +1356,10 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
     staff->FindAllDescendantsByComparison(&neumes, &ac);
 
     if (neumes.empty()) {
-        LogError("A syllable must exist in the staff to insert a '%s' into.", element->GetClassName().c_str());
+        LogError("A syllable must exist in the staff to insert a '%s' into.", std::string(element->GetClassName()).data());
         m_editInfo.import("status", "FAILURE");
         m_editInfo.import(
-            "message", "A syllable must exist in the staff to insert a '" + element->GetClassName() + "' into.");
+            "message", "A syllable must exist in the staff to insert a '" + std::string(element->GetClassName()) + "' into.");
         return false;
     }
 
@@ -1469,17 +1469,17 @@ bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId)
     }
     if (!(element->Is(DIVLINE) || element->Is(ACCID) || element->Is(CLEF))) {
         LogError("Element is of type %s, but only Divlines, Accids, and Clefs can be moved out of syllables.",
-            element->GetClassName().c_str());
+            std::string(element->GetClassName()).data());
         m_editInfo.import("status", "FAILURE");
         m_editInfo.import("message",
-            "Element is of type " + element->GetClassName()
+            "Element is of type " + std::string(element->GetClassName())
                 + ", but only DivLines and Accids can be inserted into syllables.");
         return false;
     }
     if (!parent->Is(SYLLABLE)) {
-        LogError("The selected %s is not a child of syllable.", element->GetClassName().c_str());
+        LogError("The selected %s is not a child of syllable.", std::string(element->GetClassName()).data());
         m_editInfo.import("status", "FAILURE");
-        m_editInfo.import("message", "The selected " + element->GetClassName() + "is not a child of syllable.");
+        m_editInfo.import("message", "The selected " + std::string(element->GetClassName()) + "is not a child of syllable.");
         return false;
     }
 
@@ -1673,10 +1673,10 @@ bool EditorToolkitNeume::MatchHeight(std::string elementId)
         return false;
     }
     if (!element->Is(SYL)) {
-        LogError("Element is of type %s, but only <syl> element can match height.", element->GetClassName().c_str());
+        LogError("Element is of type %s, but only <syl> element can match height.", std::string(element->GetClassName()).data());
         m_editInfo.import("status", "FAILURE");
         m_editInfo.import(
-            "message", "Element is of type " + element->GetClassName() + ", but only <syl> element can match height.");
+            "message", "Element is of type " + std::string(element->GetClassName()) + ", but only <syl> element can match height.");
         return false;
     }
 
@@ -1690,9 +1690,9 @@ bool EditorToolkitNeume::MatchHeight(std::string elementId)
         height = element->GetFacsimileInterface()->GetZone()->GetLry() - uly;
     }
     else {
-        LogError("Selected '%s' without facsimile", element->GetClassName().c_str());
+        LogError("Selected '%s' without facsimile", std::string(element->GetClassName()).data());
         m_editInfo.import("status", "FAILURE");
-        m_editInfo.import("message", "Selected '" + element->GetClassName() + "' without facsimile is unsupported.");
+        m_editInfo.import("message", "Selected '" + std::string(element->GetClassName()) + "' without facsimile is unsupported.");
         return false;
     }
 
@@ -1992,9 +1992,9 @@ bool EditorToolkitNeume::SetText(std::string elementId, const std::string &text)
         }
     }
     else {
-        LogError("Element type '%s' is unsupported for SetText", element->GetClassName().c_str());
+        LogError("Element type '%s' is unsupported for SetText", std::string(element->GetClassName()).data());
         m_editInfo.import("status", "FAILURE");
-        m_editInfo.import("message", "Element type '" + element->GetClassName() + "' is unsupported for SetText.");
+        m_editInfo.import("message", "Element type '" + std::string(element->GetClassName()) + "' is unsupported for SetText.");
         return false;
     }
 
@@ -2595,9 +2595,9 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
         if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
     }
     else {
-        LogError("Element of type '%s' is unsupported.", obj->GetClassName().c_str());
+        LogError("Element of type '%s' is unsupported.", obj->GetClassName().data());
         m_editInfo.import("status", "FAILURE");
-        m_editInfo.import("message", "Element of type '" + obj->GetClassName() + "' is unsupported.");
+        m_editInfo.import("message", "Element of type '" + std::string(obj->GetClassName()) + "' is unsupported.");
         return false;
     }
 
@@ -2656,11 +2656,11 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             return false;
         }
         if (el->GetClassId() != elementClass) {
-            LogError("Element %s was of class %s. Expected class %s", el->GetID().c_str(), el->GetClassName().c_str(),
+            LogError("Element %s was of class %s. Expected class %s", el->GetID().c_str(), el->GetClassName().data(),
                 groupType.c_str());
             m_editInfo.import("status", "FAILURE");
             m_editInfo.import("message",
-                "Element " + el->GetID() + " was of class " + el->GetClassName() + " but expected class " + groupType
+                "Element " + el->GetID() + " was of class " + std::string(el->GetClassName()) + " but expected class " + groupType
                     + ".");
             return false;
         }
@@ -3592,10 +3592,10 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
     if (!(element->Is(SYLLABLE) || element->Is(CUSTOS) || element->Is(CLEF) || element->Is(DIVLINE)
             || element->Is(ACCID))) {
         LogError("Element is of type %s, but only Syllables, Custos, Clefs, Divlines, and Accids can change staves.",
-            element->GetClassName().c_str());
+            std::string(element->GetClassName()).data());
         m_editInfo.import("status", "FAILURE");
         m_editInfo.import("message",
-            "Element is of type " + element->GetClassName()
+            "Element is of type " + std::string(element->GetClassName())
                 + ", but only Syllables, Custos, Clefs, DivLines, and Accids can change staves.");
         return false;
     }
@@ -3796,10 +3796,10 @@ bool EditorToolkitNeume::ChangeStaffTo(std::string elementId, std::string staffI
 
     if (!(element->Is(CLEF) || element->Is(DIVLINE) || element->Is(ACCID))) {
         LogError("Element is of type %s, but only Clefs, Divlines, and Accids can change to a specified staff.",
-            element->GetClassName().c_str());
+            std::string(element->GetClassName()).data());
         m_editInfo.import("status", "FAILURE");
         m_editInfo.import("message",
-            "Element is of type " + element->GetClassName()
+            "Element is of type " + std::string(element->GetClassName())
                 + ", but only Clefs, Divlines, and Accids can change to a specified staff.");
         return false;
     }
@@ -4248,7 +4248,7 @@ bool EditorToolkitNeume::AdjustPitchAfterDrag(Object *obj, int y)
     if (!obj->Is(NC) && !obj->Is(CUSTOS)) {
         LogError("AdjustPitchAfterDrag should only be called on custos or ncs."
                  "It has been called on %s, whose id is %s",
-            obj->GetClassName().c_str(), obj->GetID().c_str());
+            obj->GetClassName().data(), obj->GetID().c_str());
         return false;
     }
     PitchInterface *pi = obj->GetPitchInterface();
@@ -4266,7 +4266,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj)
 {
     if (!obj->Is(CUSTOS) && !obj->Is(SYLLABLE) && !obj->Is(NEUME)) {
         LogError("AdjustPitchFromPosition should only be called on custos or syllables/neumes. Called on %s, ID: %s",
-            obj->GetClassName().c_str(), obj->GetID().c_str());
+            obj->GetClassName().data(), obj->GetID().c_str());
         return false;
     }
 

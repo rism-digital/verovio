@@ -37,7 +37,7 @@ public:
     virtual ~Custos();
     Object *Clone() const override { return new Custos(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "custos"; }
+    std::string_view GetClassName() const override { return "custos"; }
     ///@}
 
     /**

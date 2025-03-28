@@ -28,7 +28,7 @@ public:
     virtual ~GraceGrp();
     Object *Clone() const override { return new GraceGrp(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "graceGrp"; }
+    std::string_view GetClassName() const override { return "graceGrp"; }
     ///@}
 
     /**

@@ -31,7 +31,7 @@ public:
     virtual ~GenericLayerElement();
     Object *Clone() const override { return new GenericLayerElement(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return m_className; }
+    std::string_view GetClassName() const override { return m_className; }
     ///@}
 
     /**

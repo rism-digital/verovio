@@ -39,7 +39,7 @@ public:
     virtual ~Arpeg();
     Object *Clone() const override { return new Arpeg(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "arpeg"; }
+    std::string_view GetClassName() const override { return "arpeg"; }
     ///@}
 
     /**

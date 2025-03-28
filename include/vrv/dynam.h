@@ -41,7 +41,7 @@ public:
     virtual ~Dynam();
     Object *Clone() const override { return new Dynam(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "dynam"; }
+    std::string_view GetClassName() const override { return "dynam"; }
     ///@}
 
     /**

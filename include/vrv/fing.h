@@ -33,7 +33,7 @@ public:
     virtual ~Fing();
     Object *Clone() const override { return new Fing(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "fing"; }
+    std::string_view GetClassName() const override { return "fing"; }
     ///@}
 
     /**

@@ -41,7 +41,7 @@ public:
     virtual ~Rend();
     Object *Clone() const override { return new Rend(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "rend"; }
+    std::string_view GetClassName() const override { return "rend"; }
     ///@}
 
     /**

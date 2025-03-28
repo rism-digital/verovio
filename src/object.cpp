@@ -819,7 +819,7 @@ void Object::SetParent(Object *parent)
 bool Object::IsSupportedChild(ClassId classId)
 {
     // This should never happen because the method should be overridden
-    LogDebug("Method for adding %d to %s should be overridden", classId, this->GetClassName().c_str());
+    LogDebug("Method for adding %d to %s should be overridden", classId, this->GetClassName().data());
     // assert(false);
     return false;
 }
@@ -827,7 +827,7 @@ bool Object::IsSupportedChild(ClassId classId)
 void Object::AddChild(Object *child)
 {
     if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        LogError("Adding '%s' to a '%s'", child->GetClassName().data(), this->GetClassName().data());
         return;
     }
 

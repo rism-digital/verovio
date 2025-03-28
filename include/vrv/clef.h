@@ -47,7 +47,7 @@ public:
     virtual ~Clef();
     Object *Clone() const override { return new Clef(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "clef"; }
+    std::string_view GetClassName() const override { return "clef"; }
     ///@}
 
     /** Override the method since alignment is required */

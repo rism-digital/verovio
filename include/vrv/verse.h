@@ -36,7 +36,7 @@ public:
     virtual ~Verse();
     Object *Clone() const override { return new Verse(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "verse"; }
+    std::string_view GetClassName() const override { return "verse"; }
     ///@}
 
     /**
