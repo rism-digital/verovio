@@ -39,7 +39,7 @@ public:
     virtual ~DivLine();
     Object *Clone() const override { return new DivLine(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "civLine"; }
+    std::string GetClassName() const override { return "divLine"; }
     ///@}
 
     /** Override the method since alignment is required */
