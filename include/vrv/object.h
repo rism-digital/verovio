@@ -718,7 +718,7 @@ public:
      */
     ///@{
     void LogDebugTree(int maxDepth = UNLIMITED_DEPTH, int level = 0);
-    virtual std::string LogDebugTreeMsg() { std::string name(this->GetClassName()); return name; }
+    virtual std::string LogDebugTreeMsg() { return std::string(this->GetClassName()); }
     ///@}
 
     //----------------//
