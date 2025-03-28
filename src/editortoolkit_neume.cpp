@@ -4271,8 +4271,8 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj)
     }
 
     // Helper lambda to retrieve the clef and calculate its offset
-    auto getClefAndOffset = [this](Object *obj, Staff *staff, int staffSize, Clef *&clef, int &clefOffset) -> bool {
-        clefOffset = 0;
+    auto getClefAndPosY = [this](Object *obj, Staff *staff, int staffSize, Clef *&clef, int &clefPosY) -> bool {
+        clefPosY = 0;
         ClassIdComparison ac(CLEF);
         clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
 
@@ -4283,21 +4283,15 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj)
                 return false;
             }
             clef = layer->GetCurrentClef();
-        }
-        else {
-            Staff *clefStaff = dynamic_cast<Staff *>(clef->GetFirstAncestor(STAFF));
-            if (!clefStaff) {
-                LogError("Clef is missing its parent staff.");
-                return false;
-            }
-        }
-        clefOffset = round((double)((staff->m_drawingLines - clef->GetLine() + 0.5) * staffSize));
 
+        }
+        clefPosY = round((double)(staff->GetDrawingY()
+            - (staff->m_drawingLines - clef->GetLine()) * m_doc->GetDrawingDoubleUnit(staffSize)));
         return true;
     };
 
     // Common logic for adjusting pitch
-    auto adjustPitch = [this](PitchInterface *pi, FacsimileInterface *fi, Clef *clef, int clefOffset, int staffSize,
+    auto adjustPitch = [this](PitchInterface *pi, FacsimileInterface *fi, Clef *clef, int clefPosY, int staffSize,
                            int baseOctave, data_PITCHNAME pname, Staff *staff) {
         if (!pi || !fi || !fi->HasFacs()) {
             LogError("Pitch adjustment failed due to missing interfaces or facsimile data.");
@@ -4315,10 +4309,9 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj)
 
         // Adjust pitch difference
         const int pitchDifference
-            = round((double)((staff->GetDrawingY()
-                        - staff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(fi->GetZone()->GetUlx()))
-                        - m_view->ToLogicalY(fi->GetZone()->GetUly()) - clefOffset))
-                / (double)(staffSize));
+            = round((double)(clefPosY - staff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(fi->GetZone()->GetUlx()))
+                        - m_view->ToLogicalY(fi->GetZone()->GetUly()))
+                / staffSize);
         pi->AdjustPitchByOffset(-pitchDifference);
         return true;
     };
@@ -4331,8 +4324,8 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj)
     }
 
     Clef *clef = nullptr;
-    int clefOffset = 0;
-    if (!getClefAndOffset(obj, staff, staffSize, clef, clefOffset)) {
+    int clefPosY = 0;
+    if (!getClefAndPosY(obj, staff, staffSize, clef, clefPosY)) {
         return false;
     }
 
@@ -4359,7 +4352,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj)
     }
 
     if (obj->Is(CUSTOS)) {
-        return adjustPitch(obj->GetPitchInterface(), obj->GetFacsimileInterface(), clef, clefOffset, staffSize,
+        return adjustPitch(obj->GetPitchInterface(), obj->GetFacsimileInterface(), clef, clefPosY, staffSize,
             baseOctave, pname, staff);
     }
     // syllable/neume: call the adjustPitch on children
@@ -4375,8 +4368,8 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj)
 
         for (auto *child : pitchedChildren) {
             if (!child->Is(LIQUESCENT)) {
-                if (!adjustPitch(child->GetPitchInterface(), child->GetFacsimileInterface(), clef, clefOffset,
-                        staffSize, baseOctave, pname, staff)) {
+                if (!adjustPitch(child->GetPitchInterface(), child->GetFacsimileInterface(), clef, clefPosY, staffSize,
+                        baseOctave, pname, staff)) {
                     return false;
                 }
             }
