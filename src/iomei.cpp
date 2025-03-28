@@ -8353,7 +8353,7 @@ bool MEIInput::IsAnnotScore(pugi::xml_node annot)
     // or at least @type as a set of tokens, one of which is 'score'.
     // N.B. Future versions of MEI might have a dedicated attribute for this
     std::string value = annot.attribute("type").value();
-    std::regex scoreRegex("(^|\\s)score($|\\s)");
+    static const std::regex scoreRegex("(^|\\s)score($|\\s)");
     return (std::regex_search(value, scoreRegex));
 }
 
