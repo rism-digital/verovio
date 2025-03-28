@@ -221,7 +221,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     else {
         // This should never happen
-        LogError("Element '%s' cannot be drawn", element->GetClassName().c_str());
+        LogError("Element '%s' cannot be drawn", element->GetClassName().data());
     }
 }
 

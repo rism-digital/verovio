@@ -65,7 +65,7 @@ FunctorCode AdjustHarmGrpsSpacingFunctor::VisitHarm(Harm *harm)
     FloatingPositioner *harmPositioner = NULL;
     // Something is probably not right if nothing found - maybe no @staff
     if (positioners.empty()) {
-        LogDebug("Something was wrong when searching positioners for %s '%s'", harm->GetClassName().c_str(),
+        LogDebug("Something was wrong when searching positioners for %s '%s'", harm->GetClassName().data(),
             harm->GetID().c_str());
         return FUNCTOR_SIBLINGS;
     }

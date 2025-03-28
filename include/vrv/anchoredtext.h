@@ -33,7 +33,7 @@ public:
     virtual ~AnchoredText();
     Object *Clone() const override { return new AnchoredText(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "anchoredText"; }
+    std::string_view GetClassName() const override { return "anchoredText"; }
     ///@}
 
     /**

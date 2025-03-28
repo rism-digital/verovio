@@ -485,7 +485,7 @@ FunctorCode ConvertToCmnFunctor::VisitLayerElement(LayerElement *layerElement)
         // can be ignored
     }
     else {
-        LogDebug(layerElement->GetClassName().c_str());
+        LogDebug(layerElement->GetClassName().data());
     }
 
     return FUNCTOR_SIBLINGS;

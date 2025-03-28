@@ -41,7 +41,7 @@ public:
     virtual ~Dir();
     Object *Clone() const override { return new Dir(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "dir"; }
+    std::string_view GetClassName() const override { return "dir"; }
     ///@}
 
     /**

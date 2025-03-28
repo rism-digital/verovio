@@ -31,7 +31,7 @@ public:
     virtual ~Fig();
     Object *Clone() const override { return new Fig(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "fig"; }
+    std::string_view GetClassName() const override { return "fig"; }
     ///@}
 
     /**

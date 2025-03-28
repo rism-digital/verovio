@@ -35,7 +35,7 @@ public:
     virtual ~Stem();
     Object *Clone() const override { return new Stem(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "stem"; }
+    std::string_view GetClassName() const override { return "stem"; }
     ///@}
 
     /** Override the method since alignment is required */

@@ -2469,7 +2469,7 @@ namespace pae {
     std::string Token::GetName()
     {
         if (!m_object) return "?";
-        std::string name = m_object->GetClassName();
+        std::string name(m_object->GetClassName());
         std::transform(name.begin(), name.end(), name.begin(), ::tolower);
         return name;
     }
@@ -2498,7 +2498,7 @@ void PAEInput::ClearTokenObjects()
     // Normally, they should be none because they are passed to the doc.
     for (pae::Token &token : m_pae) {
         if (!token.m_object || token.IsContainerEnd()) continue;
-        LogDebug("Delete token %s", token.m_object->GetClassName().c_str());
+        LogDebug("Delete token %s", token.m_object->GetClassName().data());
         delete token.m_object;
         token.m_object = NULL;
     }
@@ -2589,7 +2589,7 @@ void PAEInput::LogDebugTokens(bool vertical)
         for (pae::Token &token : m_pae) {
             char c1 = (token.m_char) ? token.m_char : ' ';
             char c2 = (token.m_inputChar) ? token.m_inputChar : ' ';
-            std::string className = (token.m_object) ? token.m_object->GetClassName() : "";
+            std::string className = (token.m_object) ? std::string(token.m_object->GetClassName()) : "";
             if (token.m_isError) className += " <";
             LogDebug(" %c | %c | %s", c1, c2, className.c_str());
         }
@@ -2612,7 +2612,7 @@ void PAEInput::LogDebugTokens(bool vertical)
         }
         row.clear();
         for (pae::Token &token : m_pae) {
-            std::string className = (token.m_object) ? token.m_object->GetClassName() : " ";
+            std::string className = (token.m_object) ? std::string(token.m_object->GetClassName()) : " ";
             row.push_back(className.at(0));
         }
         LogDebug(row.c_str());
@@ -4779,7 +4779,7 @@ void PAEInput::RemoveContainerToken(Object *object)
         if (token.m_object == object) {
             if (!token.IsContainerEnd()) {
                 // Make sure we delete it only once - even though it should never be there more than once
-                LogDebug("Deleting %s", object->GetClassName().c_str());
+                LogDebug("Deleting %s", object->GetClassName().data());
                 if (!deleted) delete token.m_object;
                 deleted = true;
             }

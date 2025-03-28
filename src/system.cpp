@@ -185,7 +185,7 @@ bool System::SetCurrentFloatingPositioner(
     if (m_systemAligner.GetChildCount() == 1) return false;
     StaffAlignment *alignment = m_systemAligner.GetStaffAlignmentForStaffN(staffN);
     if (!alignment) {
-        LogError("Staff @n='%d' for rendering control event %s %s not found", staffN, object->GetClassName().c_str(),
+        LogError("Staff @n='%d' for rendering control event %s %s not found", staffN, object->GetClassName().data(),
             object->GetID().c_str());
         return false;
     }

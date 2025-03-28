@@ -49,7 +49,7 @@ public:
     virtual ~Nc();
     Object *Clone() const override { return new Nc(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "nc"; }
+    std::string_view GetClassName() const override { return "nc"; }
     ///@}
 
     bool IsSupportedChild(ClassId classId) override;

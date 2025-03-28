@@ -32,7 +32,7 @@ public:
     virtual ~TabDurSym();
     Object *Clone() const override { return new TabDurSym(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "tabDurSym"; }
+    std::string_view GetClassName() const override { return "tabDurSym"; }
     ///@}
 
     /**

@@ -67,7 +67,7 @@ public:
     Object(ClassId classId);
     virtual ~Object();
     ClassId GetClassId() const final { return m_classId; }
-    virtual std::string GetClassName() const { return "[MISSING]"; }
+    virtual std::string_view GetClassName() const { return "[MISSING]"; }
     ///@}
 
     /**
@@ -718,7 +718,7 @@ public:
      */
     ///@{
     void LogDebugTree(int maxDepth = UNLIMITED_DEPTH, int level = 0);
-    virtual std::string LogDebugTreeMsg() { return this->GetClassName(); }
+    virtual std::string LogDebugTreeMsg() { std::string name(this->GetClassName()); return name; }
     ///@}
 
     //----------------//

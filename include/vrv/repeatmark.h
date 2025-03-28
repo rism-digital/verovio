@@ -40,7 +40,7 @@ public:
     virtual ~RepeatMark();
     Object *Clone() const override { return new RepeatMark(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "repeatMark"; }
+    std::string_view GetClassName() const override { return "repeatMark"; }
     ///@}
 
     /**

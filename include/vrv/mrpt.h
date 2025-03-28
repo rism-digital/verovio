@@ -34,7 +34,7 @@ public:
     virtual ~MRpt();
     Object *Clone() const override { return new MRpt(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "mRpt"; }
+    std::string_view GetClassName() const override { return "mRpt"; }
     ///@}
 
     //----------//

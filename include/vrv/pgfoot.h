@@ -29,7 +29,7 @@ public:
     PgFoot();
     virtual ~PgFoot();
     void Reset() override;
-    std::string GetClassName() const override { return "pgFoot"; }
+    std::string_view GetClassName() const override { return "pgFoot"; }
     ///@}
 
     /**

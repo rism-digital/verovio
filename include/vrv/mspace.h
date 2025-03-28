@@ -30,7 +30,7 @@ public:
     virtual ~MSpace();
     Object *Clone() const override { return new MSpace(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "mSpace"; }
+    std::string_view GetClassName() const override { return "mSpace"; }
     ///@}
 
     //----------//

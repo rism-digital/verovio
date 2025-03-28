@@ -43,7 +43,7 @@ public:
     System();
     virtual ~System();
     void Reset() override;
-    std::string GetClassName() const override { return "system"; }
+    std::string_view GetClassName() const override { return "system"; }
     ///@}
 
     /**

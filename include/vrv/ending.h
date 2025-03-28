@@ -41,7 +41,7 @@ public:
     virtual ~Ending();
     Object *Clone() const override { return new Ending(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "ending"; }
+    std::string_view GetClassName() const override { return "ending"; }
     ///@}
 
     /**

@@ -47,7 +47,7 @@ public:
     virtual ~Layer();
     Object *Clone() const override { return new Layer(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "layer"; }
+    std::string_view GetClassName() const override { return "layer"; }
     ///@}
 
     /**

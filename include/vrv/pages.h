@@ -33,7 +33,7 @@ public:
     Pages();
     virtual ~Pages();
     void Reset() override;
-    std::string GetClassName() const override { return "pages"; }
+    std::string_view GetClassName() const override { return "pages"; }
     ///@}
 
     /**

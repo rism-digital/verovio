@@ -31,7 +31,7 @@ public:
     virtual ~Subst();
     Object *Clone() const override { return new Subst(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "subst"; }
+    std::string_view GetClassName() const override { return "subst"; }
     ///@}
 
     /** Getter for level **/

@@ -38,7 +38,7 @@ public:
     Page();
     virtual ~Page();
     void Reset() override;
-    std::string GetClassName() const override { return "page"; }
+    std::string_view GetClassName() const override { return "page"; }
     ///@}
 
     /**

@@ -179,7 +179,7 @@ bool TimePointInterface::VerifyMeasure(const Object *owner) const
     assert(owner);
     if (m_start && (owner->GetFirstAncestor(MEASURE) != this->GetStartMeasure())) {
         LogWarning("%s '%s' is not encoded in the measure of its start '%s'. This may cause improper rendering.",
-            owner->GetClassName().c_str(), owner->GetID().c_str(), m_start->GetID().c_str());
+            owner->GetClassName().data(), owner->GetID().c_str(), m_start->GetID().c_str());
         return false;
     }
     return true;
@@ -366,7 +366,7 @@ FunctorCode TimePointInterface::InterfacePrepareTimestamps(PrepareTimestampsFunc
     if (this->HasStart()) {
         if (this->HasTstamp())
             LogWarning("%s with @xml:id %s has both a @startid and an @tstamp; @tstamp is ignored",
-                object->GetClassName().c_str(), object->GetID().c_str());
+                object->GetClassName().data(), object->GetID().c_str());
         return FUNCTOR_CONTINUE;
     }
     else if (!this->HasTstamp()) {
@@ -408,10 +408,10 @@ FunctorCode TimeSpanningInterface::InterfacePrepareTimestamps(PrepareTimestampsF
     if (this->HasEndid()) {
         if (this->HasTstamp2())
             LogWarning("%s with @xml:id %s has both a @endid and an @tstamp2; @tstamp2 is ignored",
-                object->GetClassName().c_str(), object->GetID().c_str());
+                object->GetClassName().data(), object->GetID().c_str());
         if ((this->GetStartid() == this->GetEndid()) && !object->Is(OCTAVE)) {
             LogWarning("%s with @xml:id %s will not get rendered as it has identical values in @startid and @endid",
-                object->GetClassName().c_str(), object->GetID().c_str());
+                object->GetClassName().data(), object->GetID().c_str());
         }
         return TimePointInterface::InterfacePrepareTimestamps(functor, object);
     }

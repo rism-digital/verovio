@@ -371,7 +371,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         }
     }
 
-    // LogDebug("Element %f %s", m_time, layerElement->GetClassName().c_str());
+    // LogDebug("Element %f %s", m_time, layerElement->GetClassName().data());
 
     if (!layerElement->Is(TIMESTAMP_ATTR)) {
         // increase the time position, but only when not a timestamp (it would actually do nothing)
