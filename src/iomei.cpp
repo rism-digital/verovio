@@ -11,6 +11,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <regex>
 
 //----------------------------------------------------------------------------
 
@@ -8348,9 +8349,12 @@ bool MEIInput::ReadXMLComment(Object *object, pugi::xml_node element)
 
 bool MEIInput::IsAnnotScore(pugi::xml_node annot)
 {
-    // If the annotation is a score annotation, it'll have @type="score" (we can also guess)
+    // If the annotation is a score annotation, it'll have @type="score"
+    // or at least @type as a set of tokens, one of which is 'score'.
+    // N.B. Future versions of MEI might have a dedicated attribute for this
     std::string value = annot.attribute("type").value();
-    return (value == "score");
+    static const std::regex scoreRegex("(^|\\s)score($|\\s)");
+    return (std::regex_search(value, scoreRegex));
 }
 
 bool MEIInput::IsEditorialElementName(std::string elementName)
