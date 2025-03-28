@@ -27,7 +27,7 @@ public:
     SymbolTable();
     virtual ~SymbolTable();
     void Reset() override;
-    std::string_view GetClassName() const override { return "symbolTable"; }
+    std::string GetClassName() const override { return "symbolTable"; }
     ///@}
 
     /**

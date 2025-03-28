@@ -981,7 +981,7 @@ void ABCInput::FlushControlElements(Score *score, Section *section)
         }
         if (!layer) {
             LogWarning("ABC import: Element '%s' could not be assigned to layer '%s'",
-                iter.second->GetClassName().data(), iter.first.c_str());
+                iter.second->GetClassName().c_str(), iter.first.c_str());
             delete iter.second;
             iter.second = NULL;
             continue;

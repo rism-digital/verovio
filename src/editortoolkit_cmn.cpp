@@ -276,11 +276,11 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     }
     // Check if it is a LayerElement
     if (!dynamic_cast<LayerElement *>(start)) {
-        LogInfo("Element '%s' is not supported as start element", start->GetClassName().data());
+        LogInfo("Element '%s' is not supported as start element", start->GetClassName().c_str());
         return false;
     }
     if (!dynamic_cast<LayerElement *>(end)) {
-        LogInfo("Element '%s' is not supported as end element", start->GetClassName().data());
+        LogInfo("Element '%s' is not supported as end element", start->GetClassName().c_str());
         return false;
     }
 
@@ -330,7 +330,7 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     }
     // Check if it is a LayerElement
     if (!dynamic_cast<LayerElement *>(start)) {
-        LogInfo("Element '%s' is not supported as start element", start->GetClassName().data());
+        LogInfo("Element '%s' is not supported as start element", start->GetClassName().c_str());
         return false;
     }
 

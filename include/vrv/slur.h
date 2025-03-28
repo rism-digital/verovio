@@ -66,7 +66,7 @@ public:
     virtual ~Slur();
     Object *Clone() const override { return new Slur(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "slur"; }
+    std::string GetClassName() const override { return "slur"; }
     ///@}
 
     /**

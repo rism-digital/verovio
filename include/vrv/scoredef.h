@@ -143,7 +143,7 @@ public:
     virtual ~ScoreDef();
     Object *Clone() const override { return new ScoreDef(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "scoreDef"; }
+    std::string GetClassName() const override { return "scoreDef"; }
     ///@}
 
     /**

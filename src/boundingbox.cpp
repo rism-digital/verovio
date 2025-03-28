@@ -63,7 +63,7 @@ void BoundingBox::UpdateContentBBoxX(int x1, int x2)
     if (m_contentBB_x2 < maxX) m_contentBB_x2 = maxX;
 
     // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
-    // this->GetClassName().data());
+    // this->GetClassName().c_str());
 }
 
 void BoundingBox::UpdateContentBBoxY(int y1, int y2)
@@ -82,7 +82,7 @@ void BoundingBox::UpdateContentBBoxY(int y1, int y2)
     if (m_contentBB_y2 < max_y) m_contentBB_y2 = max_y;
 
     // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
-    // this->GetClassName().data());
+    // this->GetClassName().c_str());
 }
 
 void BoundingBox::UpdateSelfBBoxX(int x1, int x2)

@@ -202,7 +202,7 @@ bool Syl::CreateDefaultZone(Doc *doc)
             zone->SetLry(lry + offsetLry);
         }
         else {
-            LogWarning("Failed to create zone for %s of type %s", this->GetID().c_str(), this->GetClassName().data());
+            LogWarning("Failed to create zone for %s of type %s", this->GetID().c_str(), this->GetClassName().c_str());
             delete zone;
             return false;
         }

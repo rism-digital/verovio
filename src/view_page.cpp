@@ -1725,7 +1725,7 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
             this->DrawMeasureEditorialElement(dc, dynamic_cast<EditorialElement *>(current), measure, system);
         }
         else {
-            LogDebug("Current is %s", current->GetClassName().data());
+            LogDebug("Current is %s", current->GetClassName().c_str());
             assert(false);
         }
     }

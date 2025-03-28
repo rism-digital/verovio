@@ -29,7 +29,7 @@ public:
     PgHead();
     virtual ~PgHead();
     void Reset() override;
-    std::string_view GetClassName() const override { return "pgHead"; }
+    std::string GetClassName() const override { return "pgHead"; }
     ///@}
 
     /**

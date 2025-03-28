@@ -37,7 +37,7 @@ public:
     virtual ~Zone();
     Object *Clone() const override { return new Zone(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "zone"; }
+    std::string GetClassName() const override { return "zone"; }
     ///@}
     void ShiftByXY(int xDiff, int yDiff);
     int GetLogicalUly() const;

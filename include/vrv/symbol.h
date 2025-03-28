@@ -33,7 +33,7 @@ public:
     virtual ~Symbol();
     Object *Clone() const override { return new Symbol(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "symbol"; }
+    std::string GetClassName() const override { return "symbol"; }
     ///@}
 
     /**

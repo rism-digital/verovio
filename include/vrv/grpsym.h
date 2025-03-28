@@ -38,7 +38,7 @@ public:
     virtual ~GrpSym();
     Object *Clone() const override { return new GrpSym(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "grpSym"; }
+    std::string GetClassName() const override { return "grpSym"; }
     ///@}
 
     /**

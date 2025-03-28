@@ -33,7 +33,7 @@ public:
     PageMilestoneEnd(Object *start);
     virtual ~PageMilestoneEnd();
     void Reset() override;
-    std::string_view GetClassName() const override { return "pageMilestoneEnd"; }
+    std::string GetClassName() const override { return "pageMilestoneEnd"; }
     ///@}
 
     /**

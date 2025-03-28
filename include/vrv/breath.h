@@ -32,7 +32,7 @@ public:
     virtual ~Breath();
     Object *Clone() const override { return new Breath(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "breath"; }
+    std::string GetClassName() const override { return "breath"; }
     ///@}
 
     /**

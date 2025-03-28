@@ -36,7 +36,7 @@ public:
     virtual ~MeterSigGrp();
     Object *Clone() const override { return new MeterSigGrp(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "meterSigGrp"; }
+    std::string GetClassName() const override { return "meterSigGrp"; }
     ///@}
 
     /**

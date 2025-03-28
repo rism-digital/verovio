@@ -36,7 +36,7 @@ public:
     virtual ~Tie();
     Object *Clone() const override { return new Tie(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "tie"; }
+    std::string GetClassName() const override { return "tie"; }
     ///@}
 
     /**

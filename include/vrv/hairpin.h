@@ -39,7 +39,7 @@ public:
     virtual ~Hairpin();
     Object *Clone() const override { return new Hairpin(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "hairpin"; }
+    std::string GetClassName() const override { return "hairpin"; }
     ///@}
 
     /**

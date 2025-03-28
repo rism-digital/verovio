@@ -41,7 +41,7 @@ public:
     virtual ~Tuplet();
     Object *Clone() const override { return new Tuplet(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "tuplet"; }
+    std::string GetClassName() const override { return "tuplet"; }
     ///@}
 
     /**

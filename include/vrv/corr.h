@@ -28,7 +28,7 @@ public:
     virtual ~Corr();
     Object *Clone() const override { return new Corr(*this); }
     void Reset() override;
-    std::string_view GetClassName() const override { return "corr"; }
+    std::string GetClassName() const override { return "corr"; }
     ///@}
 
 private:

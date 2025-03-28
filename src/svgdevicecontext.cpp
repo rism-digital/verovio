@@ -255,8 +255,7 @@ void SvgDeviceContext::StartGraphic(
         m_currentNode = m_currentNode.append_child("g");
     }
     m_svgNodeStack.push_back(m_currentNode);
-    std::string className(object->GetClassName());
-    AppendIdAndClass(gId, className, gClassFull, graphicID);
+    AppendIdAndClass(gId, object->GetClassName(), gClassFull, graphicID);
     AppendAdditionalAttributes(object);
 
     // this sets staffDef styles for lyrics
@@ -351,8 +350,7 @@ void SvgDeviceContext::StartTextGraphic(Object *object, const std::string &gClas
 {
     m_currentNode = AddChild("tspan");
     m_svgNodeStack.push_back(m_currentNode);
-    std::string className(object->GetClassName());
-    AppendIdAndClass(gId, className, gClass);
+    AppendIdAndClass(gId, object->GetClassName(), gClass);
     AppendAdditionalAttributes(object);
 
     if (object->HasAttClass(ATT_COLOR)) {

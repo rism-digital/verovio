@@ -27,7 +27,7 @@ public:
     Svg();
     virtual ~Svg();
     void Reset() override;
-    std::string_view GetClassName() const override { return "svg"; }
+    std::string GetClassName() const override { return "svg"; }
     ///@}
 
     /**
