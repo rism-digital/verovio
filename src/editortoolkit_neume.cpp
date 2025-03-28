@@ -4270,7 +4270,15 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj)
         return false;
     }
 
-    // Helper lambda to retrieve the clef and calculate its offset
+    // Get parent staff and validate
+    Staff *staff = dynamic_cast<Staff *>(obj->GetFirstAncestor(STAFF));
+    if (!staff) {
+        LogError("Object does not have a valid parent staff.");
+        return false;
+    }
+    const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+
+    // Helper lambda to retrieve the clef and calculate its vertical position
     auto getClefAndPosY = [this](Object *obj, Staff *staff, int staffSize, Clef *&clef, int &clefPosY) -> bool {
         clefPosY = 0;
         ClassIdComparison ac(CLEF);
@@ -4285,12 +4293,15 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj)
             clef = layer->GetCurrentClef();
 
         }
-        clefPosY = round((double)(staff->GetDrawingY()
-            - (staff->m_drawingLines - clef->GetLine()) * m_doc->GetDrawingDoubleUnit(staffSize)));
+        // Calculate vertical position of clef
+        double staffY = staff->GetDrawingY();
+        double lineSpacing = m_doc->GetDrawingDoubleUnit(staffSize);
+        int lineOffset = staff->m_drawingLines - clef->GetLine();
+        clefPosY = round(staffY - lineOffset * lineSpacing);
         return true;
     };
 
-    // Common logic for adjusting pitch
+    // Helper lambda for pitch adjustment calculations
     auto adjustPitch = [this](PitchInterface *pi, FacsimileInterface *fi, Clef *clef, int clefPosY, int staffSize,
                            int baseOctave, data_PITCHNAME pname, Staff *staff) {
         if (!pi || !fi || !fi->HasFacs()) {
@@ -4300,39 +4311,33 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj)
 
         pi->SetPname(pname);
 
-        // Calculate the octave based on clef displacement
+        // Adjust octave based on clef displacement
         int octave = baseOctave;
         if (clef->GetDis() && clef->GetDisPlace()) {
-            octave += (clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1) * (clef->GetDis() / 7);
+            int direction = (clef->GetDisPlace() == STAFFREL_basic_above) ? 1 : -1;
+            octave += direction * (clef->GetDis() / 7);
         }
         pi->SetOct(octave);
 
-        // Adjust pitch difference
-        const int pitchDifference
-            = round((double)(clefPosY - staff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(fi->GetZone()->GetUlx()))
-                        - m_view->ToLogicalY(fi->GetZone()->GetUly()))
-                / staffSize);
+        // Calculate pitch difference based on vertical position
+        Zone *zone = fi->GetZone();
+        double rotationOffset = staff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(zone->GetUlx()));
+        double yPos = m_view->ToLogicalY(zone->GetUly());
+        int pitchDifference = round((clefPosY - rotationOffset - yPos) / staffSize);
         pi->AdjustPitchByOffset(-pitchDifference);
         return true;
     };
 
-    Staff *staff = dynamic_cast<Staff *>(obj->GetFirstAncestor(STAFF));
-    const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    if (!staff) {
-        LogError("Object does not have a valid parent staff.");
-        return false;
-    }
-
+    // Get clef and its position
     Clef *clef = nullptr;
     int clefPosY = 0;
     if (!getClefAndPosY(obj, staff, staffSize, clef, clefPosY)) {
         return false;
     }
 
+    // Determine base pitch properties from clef shape
     data_PITCHNAME pname;
     int baseOctave;
-
-    // Determine pitch name and base octave based on clef shape
     switch (clef->GetShape()) {
         case CLEFSHAPE_C:
             pname = PITCHNAME_c;
@@ -4351,27 +4356,28 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj)
             return false;
     }
 
+    // Handle custos directly
     if (obj->Is(CUSTOS)) {
         return adjustPitch(obj->GetPitchInterface(), obj->GetFacsimileInterface(), clef, clefPosY, staffSize,
             baseOctave, pname, staff);
     }
-    // syllable/neume: call the adjustPitch on children
-    else {
-        ListOfObjects pitchedChildren;
-        InterfaceComparison ic(INTERFACE_PITCH);
-        obj->FindAllDescendantsByComparison(&pitchedChildren, &ic);
 
-        if (pitchedChildren.empty()) {
-            LogWarning("Syllable/neume has no pitched children: %s", obj->GetID().c_str());
-            return true;
-        }
+    // Handle syllable/neume by adjusting all pitched children
+    ListOfObjects pitchedChildren;
+    InterfaceComparison ic(INTERFACE_PITCH);
+    obj->FindAllDescendantsByComparison(&pitchedChildren, &ic);
 
-        for (auto *child : pitchedChildren) {
-            if (!child->Is(LIQUESCENT)) {
-                if (!adjustPitch(child->GetPitchInterface(), child->GetFacsimileInterface(), clef, clefPosY, staffSize,
-                        baseOctave, pname, staff)) {
-                    return false;
-                }
+    if (pitchedChildren.empty()) {
+        LogWarning("Syllable/neume has no pitched children: %s", obj->GetID().c_str());
+        return true;
+    }
+
+    // Adjust pitch for each non-liquescent child
+    for (auto *child : pitchedChildren) {
+        if (!child->Is(LIQUESCENT)) {
+            if (!adjustPitch(child->GetPitchInterface(), child->GetFacsimileInterface(), clef, clefPosY, staffSize,
+                    baseOctave, pname, staff)) {
+                return false;
             }
         }
     }
