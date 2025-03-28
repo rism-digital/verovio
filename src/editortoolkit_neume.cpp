@@ -1328,7 +1328,8 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
     if (!parent->Is(LAYER)) {
         LogError("The selected %s is not a child of layer.", std::string(element->GetClassName()).data());
         m_editInfo.import("status", "FAILURE");
-        m_editInfo.import("message", "The selected " + std::string(element->GetClassName()) + "is not a child of layer.");
+        m_editInfo.import(
+            "message", "The selected " + std::string(element->GetClassName()) + "is not a child of layer.");
         return false;
     }
 
@@ -1342,7 +1343,8 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
     else {
         LogError("Selected '%s' without facsimile", std::string(element->GetClassName()).data());
         m_editInfo.import("status", "FAILURE");
-        m_editInfo.import("message", "Selected '" + std::string(element->GetClassName()) + "' without facsimile is unsupported.");
+        m_editInfo.import(
+            "message", "Selected '" + std::string(element->GetClassName()) + "' without facsimile is unsupported.");
         return false;
     }
 
@@ -1355,10 +1357,11 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
     staff->FindAllDescendantsByComparison(&neumes, &ac);
 
     if (neumes.empty()) {
-        LogError("A syllable must exist in the staff to insert a '%s' into.", std::string(element->GetClassName()).data());
+        LogError(
+            "A syllable must exist in the staff to insert a '%s' into.", std::string(element->GetClassName()).data());
         m_editInfo.import("status", "FAILURE");
-        m_editInfo.import(
-            "message", "A syllable must exist in the staff to insert a '" + std::string(element->GetClassName()) + "' into.");
+        m_editInfo.import("message",
+            "A syllable must exist in the staff to insert a '" + std::string(element->GetClassName()) + "' into.");
         return false;
     }
 
@@ -1478,7 +1481,8 @@ bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId)
     if (!parent->Is(SYLLABLE)) {
         LogError("The selected %s is not a child of syllable.", std::string(element->GetClassName()).data());
         m_editInfo.import("status", "FAILURE");
-        m_editInfo.import("message", "The selected " + std::string(element->GetClassName()) + "is not a child of syllable.");
+        m_editInfo.import(
+            "message", "The selected " + std::string(element->GetClassName()) + "is not a child of syllable.");
         return false;
     }
 
@@ -1672,10 +1676,12 @@ bool EditorToolkitNeume::MatchHeight(std::string elementId)
         return false;
     }
     if (!element->Is(SYL)) {
-        LogError("Element is of type %s, but only <syl> element can match height.", std::string(element->GetClassName()).data());
+        LogError("Element is of type %s, but only <syl> element can match height.",
+            std::string(element->GetClassName()).data());
         m_editInfo.import("status", "FAILURE");
-        m_editInfo.import(
-            "message", "Element is of type " + std::string(element->GetClassName()) + ", but only <syl> element can match height.");
+        m_editInfo.import("message",
+            "Element is of type " + std::string(element->GetClassName())
+                + ", but only <syl> element can match height.");
         return false;
     }
 
@@ -1691,7 +1697,8 @@ bool EditorToolkitNeume::MatchHeight(std::string elementId)
     else {
         LogError("Selected '%s' without facsimile", std::string(element->GetClassName()).data());
         m_editInfo.import("status", "FAILURE");
-        m_editInfo.import("message", "Selected '" + std::string(element->GetClassName()) + "' without facsimile is unsupported.");
+        m_editInfo.import(
+            "message", "Selected '" + std::string(element->GetClassName()) + "' without facsimile is unsupported.");
         return false;
     }
 
@@ -1993,7 +2000,8 @@ bool EditorToolkitNeume::SetText(std::string elementId, const std::string &text)
     else {
         LogError("Element type '%s' is unsupported for SetText", std::string(element->GetClassName()).data());
         m_editInfo.import("status", "FAILURE");
-        m_editInfo.import("message", "Element type '" + std::string(element->GetClassName()) + "' is unsupported for SetText.");
+        m_editInfo.import(
+            "message", "Element type '" + std::string(element->GetClassName()) + "' is unsupported for SetText.");
         return false;
     }
 
@@ -2659,8 +2667,8 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 groupType.c_str());
             m_editInfo.import("status", "FAILURE");
             m_editInfo.import("message",
-                "Element " + el->GetID() + " was of class " + std::string(el->GetClassName()) + " but expected class " + groupType
-                    + ".");
+                "Element " + el->GetID() + " was of class " + std::string(el->GetClassName()) + " but expected class "
+                    + groupType + ".");
             return false;
         }
 
