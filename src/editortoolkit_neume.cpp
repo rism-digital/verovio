@@ -4291,7 +4291,6 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj)
                 return false;
             }
             clef = layer->GetCurrentClef();
-
         }
         // Calculate vertical position of clef
         double staffY = staff->GetDrawingY();
