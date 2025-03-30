@@ -311,6 +311,7 @@
 		4D543E221B80AACF004B823C /* view_control.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D543E211B80AACF004B823C /* view_control.cpp */; };
 		4D5572401CF3F32A008D06A0 /* octave.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D55723F1CF3F32A008D06A0 /* octave.cpp */; };
 		4D5572441CF57B5C008D06A0 /* pedal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D5572431CF57B5C008D06A0 /* pedal.cpp */; };
+		4D57D0DC2D993DC800C67757 /* scoringupfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B464F48E2C6D664300A778D2 /* scoringupfunctor.cpp */; };
 		4D5FA9111E16A93F00F3B919 /* boundingbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D5FA9101E16A93F00F3B919 /* boundingbox.cpp */; };
 		4D6122BC1F77E1B900FC90A0 /* rend.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D6122BB1F77E1B900FC90A0 /* rend.h */; };
 		4D6122BE1F77E1E000FC90A0 /* rend.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6122BD1F77E1E000FC90A0 /* rend.cpp */; };
@@ -4150,6 +4151,7 @@
 				4D1694251E3A44F300569BF4 /* timestamp.cpp in Sources */,
 				4D1694261E3A44F300569BF4 /* MidiEventList.cpp in Sources */,
 				4DA0EAC822BB779400A7EBEB /* facsimile.cpp in Sources */,
+				4D57D0DC2D993DC800C67757 /* scoringupfunctor.cpp in Sources */,
 				4D1694271E3A44F300569BF4 /* iohumdrum.cpp in Sources */,
 				4D1694281E3A44F300569BF4 /* rest.cpp in Sources */,
 				4D1694291E3A44F300569BF4 /* scoredef.cpp in Sources */,
