@@ -31,7 +31,7 @@ public:
     virtual ~Liquescent();
     Object *Clone() const override { return new Liquescent(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "liquescent"; }
+    std::string_view GetClassName() const override { return "liquescent"; }
     ///@}
 
     /**

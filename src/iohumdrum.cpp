@@ -2940,7 +2940,7 @@ void HumdrumInput::createDigitalSource(pugi::xml_node sourceDesc)
     pugi::xml_node bibl = source.append_child("bibl");
     bibl.append_copy(m_simpleTitle);
     for (pugi::xml_node_iterator childIt = m_simpleComposersDoc.begin(); childIt != m_simpleComposersDoc.end();
-        ++childIt) {
+         ++childIt) {
         bibl.append_copy(*childIt);
     }
 
@@ -3692,7 +3692,7 @@ void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)
 
     bibl.append_copy(m_simpleTitle);
     for (pugi::xml_node_iterator childIt = m_simpleComposersDoc.begin(); childIt != m_simpleComposersDoc.end();
-        ++childIt) {
+         ++childIt) {
         bibl.append_copy(*childIt);
     }
 
@@ -31214,7 +31214,7 @@ std::string HumdrumInput::getLocationId(Object *object, hum::HTp token, int subt
 {
     int line = token->getLineIndex() + 1;
     int field = token->getFieldIndex() + 1;
-    std::string id = object->GetClassName();
+    std::string id(object->GetClassName());
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
     id += "-L" + to_string(line);
     id += "F" + to_string(field);
@@ -31242,7 +31242,7 @@ std::string HumdrumInput::getLocationId(Object *object, int lineindex, int field
     int line = lineindex + 1;
     int field = fieldindex + 1;
     int subtoken = subtokenindex + 1;
-    std::string id = object->GetClassName();
+    std::string id(object->GetClassName());
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
     if (line > 0) {
         id += "-L" + to_string(line);
@@ -31283,7 +31283,7 @@ void HumdrumInput::setLocationIdNSuffix(Object *object, hum::HTp token, int numb
 {
     int line = token->getLineIndex() + 1;
     int field = token->getFieldIndex() + 1;
-    std::string id = object->GetClassName();
+    std::string id(object->GetClassName());
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
     id += "-L" + to_string(line);
     id += "F" + to_string(field);
@@ -31370,7 +31370,7 @@ void HumdrumInput::setBeamLocationId(Object *object, const std::vector<humaux::H
     int startline = starttoken->getLineNumber();
     int startfield = starttoken->getFieldNumber();
 
-    std::string id = object->GetClassName();
+    std::string id(object->GetClassName());
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
     id += "-L" + to_string(startline);
     id += "F" + to_string(startfield);
@@ -31409,7 +31409,7 @@ void HumdrumInput::setTupletLocationId(Object *object, const std::vector<humaux:
     int startline = starttoken->getLineNumber();
     int startfield = starttoken->getFieldNumber();
 
-    std::string id = object->GetClassName();
+    std::string id(object->GetClassName());
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
     id += "-L" + to_string(startline);
     id += "F" + to_string(startfield);
@@ -31457,7 +31457,7 @@ void HumdrumInput::setTieLocationId(Object *object, hum::HTp tiestart, int sinde
         endfield = tieend->getFieldNumber();
     }
 
-    std::string id = object->GetClassName();
+    std::string id(object->GetClassName());
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
 
     id += "-L" + to_string(startline);

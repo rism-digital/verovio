@@ -68,7 +68,7 @@ public:
     virtual ~Neume();
     void Reset() override;
     Object *Clone() const override { return new Neume(*this); }
-    std::string GetClassName() const override { return "neume"; }
+    std::string_view GetClassName() const override { return "neume"; }
     ///@}
 
     /**

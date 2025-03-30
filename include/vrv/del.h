@@ -28,7 +28,7 @@ public:
     virtual ~Del();
     Object *Clone() const override { return new Del(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "del"; }
+    std::string_view GetClassName() const override { return "del"; }
     ///@}
 
 private:

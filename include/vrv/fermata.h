@@ -40,7 +40,7 @@ public:
     virtual ~Fermata();
     Object *Clone() const override { return new Fermata(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "fermata"; }
+    std::string_view GetClassName() const override { return "fermata"; }
     ///@}
 
     /**

@@ -60,7 +60,7 @@ public:
     virtual ~KeySig();
     Object *Clone() const override { return new KeySig(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "keySig"; }
+    std::string_view GetClassName() const override { return "keySig"; }
     ///@}
 
     /** Override the method since alignment is required */

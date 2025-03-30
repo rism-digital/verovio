@@ -84,7 +84,7 @@ bool Tuplet::IsSupportedChild(ClassId classId)
 void Tuplet::AddChild(Object *child)
 {
     if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        LogError("Adding '%s' to a '%s'", child->GetClassName().data(), this->GetClassName().data());
         return;
     }
 

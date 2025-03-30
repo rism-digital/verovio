@@ -28,7 +28,7 @@ public:
     virtual ~Restore();
     Object *Clone() const override { return new Restore(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "restore"; }
+    std::string_view GetClassName() const override { return "restore"; }
     ///@}
 
 private:

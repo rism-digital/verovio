@@ -34,7 +34,7 @@ public:
     virtual ~Syllable();
     Object *Clone() const override { return new Syllable(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "syllable"; }
+    std::string_view GetClassName() const override { return "syllable"; }
     ///@}
 
     /**

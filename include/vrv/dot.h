@@ -30,7 +30,7 @@ public:
     virtual ~Dot();
     Object *Clone() const override { return new Dot(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "dot"; }
+    std::string_view GetClassName() const override { return "dot"; }
     ///@}
 
     /**
