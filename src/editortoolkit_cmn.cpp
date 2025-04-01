@@ -65,7 +65,9 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
 
     std::string action = json.get<jsonxx::String>("action");
 
-    m_doc->SetFocus();
+    if (action != "context") {
+        m_doc->SetFocus();
+    }
 
     // Action without parameter
     if (action == "commit") {
@@ -712,41 +714,35 @@ bool EditorToolkitCMN::Context(std::string &elementId, bool contentOnly)
     if (targetIt != objects.end()) std::copy(std::next(targetIt), objects.end(), std::back_inserter(following));
 
     // Build the json context
-    
+
     jsonxx::Object section;
     section << "id" << "";
     section << "element" << ".";
     jsonxx::Object jsonContext;
-    
+
     ListOfConstObjects ancestors;
     jsonxx::Array jsonAncestors;
-    
+
     const Object *context = object->GetParent();
-    const Object *parent = context->GetParent();
-    
-    if (!context->Is(SYSTEM)) {
-        // Look for additional ancestors
-        while (parent) {
-            if (parent->Is(SYSTEM)) break;
-            ancestors.push_back(parent);
-            parent = parent->GetParent();
-        }
-        this->ContextForObjects(ancestors, jsonAncestors);
-        // Also add the section (.) as ancestor
-        jsonAncestors << section;
-        
-        this->ContextForObject(context, jsonContext);
+    const Object *parent = context;
+    // Look for additional ancestors
+    while (parent) {
+        if (parent->Is(SYSTEM)) break;
+        ancestors.push_back(parent);
+        parent = parent->GetParent();
     }
-    else {
-        jsonContext = section;
-    }
+    this->ContextForObjects(ancestors, jsonAncestors);
+    // Also add the section (.) as ancestor
+    jsonAncestors << section;
+
+    this->ContextForObject(context, jsonContext);
 
     // Ancestors in addition to the parent of the target (context object)
     m_editInfo << "ancestors" << jsonAncestors;
-    
+
     // Build the list of children in which the target is included
     jsonxx::Array contextChildren;
-    
+
     // Preceeding siblings
     jsonxx::Array elements;
     this->ContextForObjects(previous, elements);
@@ -755,14 +751,6 @@ bool EditorToolkitCMN::Context(std::string &elementId, bool contentOnly)
     // The target object
     jsonxx::Object jsonObject;
     this->ContextForObject(object, jsonObject);
-    // Inlude all attributes
-    ArrayOfStrAttr attributes;
-    object->GetAttributes(&attributes);
-    jsonxx::Object jsonAttributes;
-    for (const auto &attribute : attributes) {
-        jsonAttributes << attribute.first << attribute.second;
-    }
-    jsonObject << "attributes" << jsonAttributes;
     // Include its children
     jsonxx::Array jsonObjectChildren;
     ListOfConstObjects objectChildren;
@@ -772,14 +760,24 @@ bool EditorToolkitCMN::Context(std::string &elementId, bool contentOnly)
     if (!jsonObjectChildren.empty()) jsonObject << "children" << jsonObjectChildren;
     // Add it to the list
     contextChildren << jsonObject;
-    
+
     // Following siblings
     this->ContextForObjects(following, elements);
     contextChildren << elements;
-    
+
     // Add all children of to context (include target and surrounding siblings)
     jsonContext << "children" << contextChildren;
     m_editInfo << "context" << jsonContext;
+
+    // Inlude all attributes
+    ArrayOfStrAttr attributes;
+    object->GetAttributes(&attributes);
+    jsonxx::Object jsonAttributes;
+    for (const auto &attribute : attributes) {
+        jsonAttributes << attribute.first << attribute.second;
+    }
+    jsonObject << "attributes" << jsonAttributes;
+    m_editInfo << "object" << jsonObject;
 
     // Find referring objects
     ListOfObjectAttNamePairs referringObjects;
@@ -787,7 +785,7 @@ bool EditorToolkitCMN::Context(std::string &elementId, bool contentOnly)
     m_doc->Process(findAllReferringObjects);
     this->ContextForReferences(referringObjects, elements);
     m_editInfo << "referringElements" << elements;
-    
+
     // Find referenced objects
     ListOfObjectAttNamePairs referencedObjects;
     FindAllReferencedObjectsFunctor findAllReferencedObjects(NULL, &referencedObjects);
@@ -816,6 +814,17 @@ void EditorToolkitCMN::ContextForObject(const Object *object, jsonxx::Object &el
     if (!attributes.empty()) {
         element << "attributes" << attributes;
     }
+
+    ClassIdsComparison notClassIds({ DOTS, FLAG, STEM, TUPLET_NUM, TUPLET_BRACKET });
+    notClassIds.ReverseComparison();
+    ListOfConstObjects children;
+    object->FindAllDescendantsByComparison(&children, &notClassIds);
+    if (children.size() > 0) {
+        element << "children" << jsonxx::Array();
+    }
+    else {
+        element << "isLeaf" << true;
+    }
 }
 
 void EditorToolkitCMN::ContextForObjects(const ListOfConstObjects &objects, jsonxx::Array &elements)
@@ -829,8 +838,8 @@ void EditorToolkitCMN::ContextForObjects(const ListOfConstObjects &objects, json
             if (mNum->IsGenerated()) continue;
         }
         if (object->IsAttribute()) continue;
-        if (object->Is({DOTS, FLAG, STEM, TUPLET_NUM, TUPLET_BRACKET})) continue;
-        
+        if (object->Is({ DOTS, FLAG, STEM, TUPLET_NUM, TUPLET_BRACKET })) continue;
+
         jsonxx::Object element;
         this->ContextForObject(object, element);
         elements << element;
