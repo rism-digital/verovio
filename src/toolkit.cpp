@@ -890,7 +890,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         }
     }
     else {
-        // We need at least for this with breaks auto
+        // We need at least this to be done with breaks auto
         m_doc.ScoreDefSetCurrentDoc();
     }
 
