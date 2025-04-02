@@ -889,6 +889,10 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
             // LogElapsedTimeEnd("cast-off");
         }
     }
+    else {
+        // We need at least for this with breaks auto
+        m_doc.ScoreDefSetCurrentDoc();
+    }
 
     if (m_doc.IsTranscription() && m_doc.HasFacsimile()) {
         m_doc.SyncFromFacsimileDoc();
