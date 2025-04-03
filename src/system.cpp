@@ -140,6 +140,20 @@ int System::GetHeight() const
     return 0;
 }
 
+Staff *System::GetTopVisibleStaff()
+{
+    return const_cast<Staff *>(std::as_const(*this).GetTopVisibleStaff());
+}
+
+const Staff *System::GetTopVisibleStaff() const
+{
+    for (auto child : m_systemAligner.GetChildren()) {
+        const StaffAlignment *alignment = vrv_cast<const StaffAlignment *>(child);
+        if (alignment->GetStaff()) return alignment->GetStaff();
+    }
+    return NULL;
+}
+
 int System::GetMinimumSystemSpacing(const Doc *doc) const
 {
     const auto &spacingSystem = doc->GetOptions()->m_spacingSystem;

@@ -88,6 +88,15 @@ public:
     int GetHeight() const;
 
     /**
+     * Return the top (first) visible staff in the measure (if any).
+     * Takes into account system optimization
+     */
+    ///@{
+    Staff *GetTopVisibleStaff();
+    const Staff *GetTopVisibleStaff() const;
+    ///@}
+
+    /**
      * Return the minimus system spacing
      */
     int GetMinimumSystemSpacing(const Doc *doc) const;

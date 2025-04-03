@@ -441,26 +441,6 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     return staves;
 }
 
-Staff *Measure::GetTopVisibleStaff()
-{
-    return const_cast<Staff *>(std::as_const(*this).GetTopVisibleStaff());
-}
-
-const Staff *Measure::GetTopVisibleStaff() const
-{
-    const Staff *staff = NULL;
-    ListOfConstObjects staves = this->FindAllDescendantsByType(STAFF, false);
-    for (const Object *child : staves) {
-        staff = vrv_cast<const Staff *>(child);
-        assert(staff);
-        if (staff->DrawingIsVisible()) {
-            break;
-        }
-        staff = NULL;
-    }
-    return staff;
-}
-
 Staff *Measure::GetBottomVisibleStaff()
 {
     return const_cast<Staff *>(std::as_const(*this).GetBottomVisibleStaff());
