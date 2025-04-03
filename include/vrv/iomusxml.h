@@ -103,14 +103,14 @@ namespace musicxml {
     };
 
     struct OpenArpeggio {
-        OpenArpeggio(const int &arpegN, const int &timeStamp)
+        OpenArpeggio(const int &arpegN, const Fraction &timeStamp)
         {
             m_arpegN = arpegN;
             m_timeStamp = timeStamp;
         }
 
         int m_arpegN;
-        int m_timeStamp;
+        Fraction m_timeStamp;
     };
 
     struct EndingInfo {

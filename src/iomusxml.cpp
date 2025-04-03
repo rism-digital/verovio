@@ -1753,18 +1753,18 @@ void MusicXmlInput::MatchTies(bool matchLayers)
     // match open ties with close ties
     std::vector<musicxml::OpenTie>::iterator iter = m_tieStack.begin();
     while (iter != m_tieStack.end()) {
-        double lastScoreTimeOnset = 9999; // __DBL_MAX__;
+        Fraction lastScoreTimeOnset(9999); // __DBL_MAX__;
         bool tieMatched = false;
         std::vector<musicxml::CloseTie>::iterator jter;
         for (jter = m_tieStopStack.begin(); jter != m_tieStopStack.end(); ++jter) {
             // match tie stop with pitch/oct identity, with start note earlier than end note,
             // and with earliest end note.
             if ((iter->m_note->IsEnharmonicWith(jter->m_note))
-                && (iter->m_note->GetRealTimeOnsetMilliseconds() < jter->m_note->GetRealTimeOnsetMilliseconds())
-                && (jter->m_note->GetRealTimeOnsetMilliseconds() < lastScoreTimeOnset)
+                && (iter->m_note->GetScoreTimeOnset() < jter->m_note->GetScoreTimeOnset())
+                && (jter->m_note->GetScoreTimeOnset() < lastScoreTimeOnset)
                 && (!matchLayers || (iter->m_layerNum == jter->m_layerNum))) {
                 iter->m_tie->SetEndid("#" + jter->m_note->GetID());
-                lastScoreTimeOnset = jter->m_note->GetRealTimeOnsetMilliseconds();
+                lastScoreTimeOnset = jter->m_note->GetScoreTimeOnset();
                 tieMatched = true;
                 break;
             }
@@ -2663,7 +2663,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     Note *note = NULL;
 
     bool nextIsChord = false;
-    double onset = m_durTotal; // keep note onsets for later
+    Fraction onset = m_durTotal; // keep note onsets for later
 
     // for measure repeats add a single <mRpt> and return
     if (m_mRpt) {
@@ -2828,7 +2828,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         if (!noteID.empty()) {
             note->SetID(noteID);
         }
-        note->SetRealTimeOnsetSeconds(onset); // remember the MIDI onset within that measure
+        note->SetScoreTimeOnset(onset); // remember the MIDI onset within that measure
         // set @staff attribute, if existing and different from parent staff number
         if (noteStaffNum > 0 && noteStaffNum + staffOffset != staff->GetN())
             note->SetStaff(
