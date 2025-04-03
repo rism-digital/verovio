@@ -3163,6 +3163,7 @@ void MEIOutput::WriteTimePointInterface(pugi::xml_node element, TimePointInterfa
 {
     assert(interface);
 
+    interface->WritePartIdent(element);
     interface->WriteStaffIdent(element);
     interface->WriteStartId(element);
     interface->WriteTimestampLog(element);
@@ -7545,6 +7546,7 @@ bool MEIInput::ReadTextDirInterface(pugi::xml_node element, TextDirInterface *in
 
 bool MEIInput::ReadTimePointInterface(pugi::xml_node element, TimePointInterface *interface)
 {
+    interface->ReadPartIdent(element);
     interface->ReadStaffIdent(element);
     interface->ReadStartId(element);
     interface->ReadTimestampLog(element);
