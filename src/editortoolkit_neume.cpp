@@ -1074,8 +1074,12 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 }
                 else if (it->second == "F") {
                     clefShape = CLEFSHAPE_F;
-                    offsetR = 0;
                     offsetL = (int)(staffSize / NOTE_WIDTH_TO_STAFF_SIZE_RATIO / 2);
+                    break;
+                }
+                else if (it->second == "G") {
+                    clefShape = CLEFSHAPE_G;
+                    offsetR = (int)(staffSize / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
                     break;
                 }
             }
