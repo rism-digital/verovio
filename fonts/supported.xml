@@ -2196,7 +2196,7 @@
     </medievalAndRenaissanceStaves>
     <medievalAndRenaissanceClefs>
         <description>Medieval and Renaissance clefs</description>
-        <!--<glyph glyph-code="E900" smufl-name="mensuralGclef" />-->
+        <glyph glyph-code="E900" smufl-name="mensuralGclef" />
         <glyph glyph-code="E901" smufl-name="mensuralGclefPetrucci" />
         <glyph glyph-code="E902" smufl-name="chantFclef" />
         <glyph glyph-code="E903" smufl-name="mensuralFclef" />

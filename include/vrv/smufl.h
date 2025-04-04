@@ -403,6 +403,7 @@ enum {
     SMUFL_E8F6_chantDivisioFinalis = 0xE8F6,
     SMUFL_E8F7_chantVirgula = 0xE8F7,
     SMUFL_E8F8_chantCaesura = 0xE8F8,
+    SMUFL_E900_mensuralGclef = 0xE900,
     SMUFL_E901_mensuralGclefPetrucci = 0xE901,
     SMUFL_E902_chantFclef = 0xE902,
     SMUFL_E903_mensuralFclef = 0xE903,
@@ -660,7 +661,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 635
+#define SMUFL_COUNT 636
 
 } // namespace vrv
 

@@ -660,6 +660,7 @@
   <g c="E8F6" x="0.0" y="-375.0" w="120.0" h="750.0" h-a-x="119" n="chantDivisioFinalis" />
   <g c="E8F7" x="0.0" y="255.0" w="91.0" h="245.0" h-a-x="91" n="chantVirgula" />
   <g c="E8F8" x="0.0" y="260.0" w="143.0" h="240.0" h-a-x="143" n="chantCaesura" />
+  <g c="E900" x="0.0" y="-232.0" w="396.0" h="463.0" h-a-x="396" n="mensuralGclef" />
   <g c="E901" x="0.0" y="-169.0" w="339.0" h="1091.0" h-a-x="339" n="mensuralGclefPetrucci" />
   <g c="E902" x="0.0" y="-231.0" w="264.0" h="452.0" h-a-x="264" n="chantFclef" />
   <g c="E903" x="0.0" y="-172.0" w="297.0" h="344.0" h-a-x="298" n="mensuralFclef" />
