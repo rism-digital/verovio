@@ -69,7 +69,7 @@ bool OptionExists(const std::string &option, int argc, char **argv, std::string 
 
 option OptionStruct(vrv::Option *option, const std::map<vrv::Option *, std::string> &optionNames)
 {
-    return { optionNames.at(option).c_str(), option->IsArgumentRequired() ? required_argument : no_argument, 0,
+    return { optionNames.at(option).c_str(), option->IsArgumentRequired() ? required_argument : no_argument, NULL,
         option->GetShortOption() };
 }
 
@@ -106,7 +106,7 @@ int main(int argc, char **argv)
               { &options->m_version, vrv::FromCamelCase(options->m_version.GetKey()) },
               { &options->m_xmlIdSeed, vrv::FromCamelCase(options->m_xmlIdSeed.GetKey()) } };
 
-    static struct option baseOptions[] = { //
+    static const auto baseOptions = std::to_array({ //
         OptionStruct(&options->m_allPages, optionNames), //
         OptionStruct(&options->m_inputFrom, optionNames), //
         OptionStruct(&options->m_help, optionNames), //
@@ -120,13 +120,9 @@ int main(int argc, char **argv)
         OptionStruct(&options->m_xmlIdSeed, optionNames), //
         // standard input - long options only or - as filename
         { "stdin", no_argument, 0, 'z' }, //
-        { 0, 0, 0, 0 }
-    };
-
-    int baseSize = sizeof(baseOptions) / sizeof(option);
+        { 0, 0, 0, 0 } });
 
     const vrv::MapOfStrOptions *params = options->GetItems();
-    int mapSize = (int)params->size();
 
     if (argc < 2) {
         std::cerr << "Expected one input file but found none." << std::endl << std::endl;
@@ -134,36 +130,27 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    struct option *longOptions;
-    int i = 0;
-    longOptions = (struct option *)malloc(sizeof(struct option) * (baseSize + mapSize));
-
-    // A vector of string for storing names as const char* for long_options
-    std::vector<std::string> optNames;
-    optNames.reserve(mapSize);
-
-    vrv::MapOfStrOptions::const_iterator iter;
-    for (iter = params->begin(); iter != params->end(); ++iter) {
+    std::vector<option> longOptions;
+    std::vector<std::unique_ptr<std::string>> longOptionNames;
+    for (const auto &param : *params) {
         // Double check that back and forth convertion is correct
-        assert(vrv::ToCamelCase(vrv::FromCamelCase(iter->first)) == iter->first);
+        assert(vrv::ToCamelCase(vrv::FromCamelCase(param.first)) == param.first);
 
-        optNames.push_back(vrv::FromCamelCase(iter->first));
-        longOptions[i].name = optNames.at(i).c_str();
-        vrv::OptionBool *optBool = dynamic_cast<vrv::OptionBool *>(iter->second);
-        longOptions[i].has_arg = (optBool) ? no_argument : required_argument;
-        longOptions[i].flag = 0;
-        longOptions[i].val = 0;
-        ++i;
+        longOptions.emplace_back();
+
+        // It is crucial to keep the camel cased name alive, since we store a pointer to it in longOptions
+        const std::string name = vrv::FromCamelCase(param.first);
+        longOptionNames.push_back(std::make_unique<std::string>(name));
+        longOptions.back().name = longOptionNames.back()->c_str();
+
+        vrv::OptionBool *optBool = dynamic_cast<vrv::OptionBool *>(param.second);
+        longOptions.back().has_arg = (optBool) ? no_argument : required_argument;
+        longOptions.back().flag = NULL;
+        longOptions.back().val = 0;
     }
 
     // Concatenate the base options
-    assert(i == mapSize);
-    for (; i < mapSize + baseSize; ++i) {
-        longOptions[i].name = baseOptions[i - mapSize].name;
-        longOptions[i].has_arg = baseOptions[i - mapSize].has_arg;
-        longOptions[i].flag = baseOptions[i - mapSize].flag;
-        longOptions[i].val = baseOptions[i - mapSize].val;
-    }
+    longOptions.insert(longOptions.end(), baseOptions.begin(), baseOptions.end());
 
     int c;
     std::string key;
@@ -171,7 +158,7 @@ int main(int argc, char **argv)
     vrv::Option *opt = NULL;
     vrv::OptionBool *optBool = NULL;
     std::string resourcePath = toolkit.GetResourcePath();
-    while ((c = getopt_long(argc, argv, "ab:f:h:l:o:p:r:s:t:vx:z", longOptions, &optionIndex)) != -1) {
+    while ((c = getopt_long(argc, argv, "ab:f:h:l:o:p:r:s:t:vx:z", longOptions.data(), &optionIndex)) != -1) {
         switch (c) {
             case 0:
                 key = longOptions[optionIndex].name;
@@ -585,6 +572,5 @@ int main(int argc, char **argv)
         toolkit.LogRuntime();
     }
 
-    free(longOptions);
     return 0;
 }
