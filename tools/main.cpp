@@ -107,7 +107,9 @@ int main(int argc, char **argv)
               { &options->m_version, vrv::FromCamelCase(options->m_version.GetKey()) },
               { &options->m_xmlIdSeed, vrv::FromCamelCase(options->m_xmlIdSeed.GetKey()) } };
 
-    static const auto baseOptions = std::to_array({ //
+    // TODO: Use std::to_array to get rid of the explicit array dimension, once MSVC supports it
+    // See the final comment in https://github.com/rism-digital/verovio/pull/4023
+    static const std::array<option, 13> baseOptions = {
         OptionStruct(&options->m_allPages, optionNames), //
         OptionStruct(&options->m_inputFrom, optionNames), //
         OptionStruct(&options->m_help, optionNames), //
@@ -121,7 +123,8 @@ int main(int argc, char **argv)
         OptionStruct(&options->m_xmlIdSeed, optionNames), //
         // standard input - long options only or - as filename
         { "stdin", no_argument, 0, 'z' }, //
-        { 0, 0, 0, 0 } });
+        { 0, 0, 0, 0 } //
+    };
 
     const vrv::MapOfStrOptions *params = options->GetItems();
 
