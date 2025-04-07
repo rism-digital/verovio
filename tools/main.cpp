@@ -5,6 +5,7 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
+#include <array>
 #include <cassert>
 #include <fstream>
 #include <iostream>
