@@ -509,7 +509,7 @@ static const std::string base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                        "abcdefghijklmnopqrstuvwxyz"
                                        "0123456789+/";
 
-static inline bool isBase64(unsigned char c)
+static inline bool IsBase64(unsigned char c)
 {
     return (isalnum(c) || (c == '+') || (c == '/'));
 }
@@ -558,7 +558,7 @@ std::vector<unsigned char> Base64Decode(std::string const &encodedString)
     unsigned char charArray4[4], charArray3[3];
     std::vector<unsigned char> ret;
 
-    while (inLen-- && (encodedString[in_] != '=') && isBase64(encodedString[in_])) {
+    while (inLen-- && (encodedString[in_] != '=') && IsBase64(encodedString[in_])) {
         charArray4[i++] = encodedString[in_];
         in_++;
         if (i == 4) {
