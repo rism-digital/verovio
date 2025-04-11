@@ -28,7 +28,7 @@ namespace vrv {
 
 static const ClassRegistrar<AnnotScore> s_factory("annotScore", ANNOTSCORE);
 
-AnnotScore::AnnotScore() : ControlElement(ANNOTSCORE, "annotscore-"), PlistInterface(), TimeSpanningInterface()
+AnnotScore::AnnotScore() : ControlElement(ANNOTSCORE), PlistInterface(), TimeSpanningInterface()
 {
     this->RegisterInterface(PlistInterface::GetAttClasses(), PlistInterface::IsInterface());
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
@@ -59,18 +59,19 @@ int AnnotScore::GetLineWidth(const Doc *doc, int unit) const
     return boxHeight;
 }
 
-bool AnnotScore::IsSupportedChild(Object *child)
+bool AnnotScore::IsSupportedChild(ClassId classId)
 {
-    if (child->IsTextElement()) {
-        assert(dynamic_cast<TextElement *>(child));
+    static const std::vector<ClassId> supported{ ANNOTSCORE };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(ANNOT)) {
-        assert(dynamic_cast<AnnotScore *>(child));
+    else if (Object::IsTextElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 //----------------------------------------------------------------------------
