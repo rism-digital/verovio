@@ -47,14 +47,14 @@ public:
     virtual ~StaffGrp();
     Object *Clone() const override { return new StaffGrp(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "StaffGrp"; }
+    std::string GetClassName() const override { return "staffGrp"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
     ///@}
 
     /**

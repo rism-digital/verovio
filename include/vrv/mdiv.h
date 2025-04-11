@@ -33,14 +33,14 @@ public:
     virtual ~Mdiv();
     Object *Clone() const override { return new Mdiv(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Mdiv"; }
+    std::string GetClassName() const override { return "mdiv"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
     ///@}
 
     /**

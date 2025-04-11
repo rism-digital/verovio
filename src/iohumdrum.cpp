@@ -771,6 +771,7 @@ bool HumdrumInput::convertHumdrum()
     m_multirest = analyzeMultiRest(infile);
     m_breaks = analyzeBreaks(infile);
     analyzeVerseColor(infile);
+    analyzeDefaultLayoutStyles(infile);
 
     infile.analyzeSlurs();
     infile.analyzeBeams();
@@ -2514,7 +2515,7 @@ bool HumdrumInput::checkForScordatura(hum::HumdrumFile &infile)
 //////////////////////////////
 //
 // HumdrumInput::initializeIgnoreVector -- Mark areas of the input file that
-//     should not be converted into
+//     should not be converted into music.
 //
 
 void HumdrumInput::initializeIgnoreVector(hum::HumdrumFile &infile)
@@ -5519,8 +5520,7 @@ void HumdrumInput::promoteInstrumentNamesToGroup()
     int count = sdf->GetChildCount();
     for (int i = 0; i < count; ++i) {
         Object *obj = sdf->GetChild(i);
-        std::string name = obj->GetClassName();
-        if (name != "StaffGrp") {
+        if (obj->GetClassId() != STAFFGRP) {
             continue;
         }
         StaffGrp *sg = (StaffGrp *)obj;
@@ -5538,16 +5538,14 @@ void HumdrumInput::promoteInstrumentsForStaffGroup(StaffGrp *group)
 {
     int count = group->GetChildCount();
     std::vector<std::string> names;
-    std::string name;
     std::vector<StaffDef *> sds;
     sds.clear();
     for (int i = 0; i < count; ++i) {
         Object *obj = group->GetChild(i);
-        name = obj->GetClassName();
-        if (name == "StaffGrp") {
+        if (obj->GetClassId() == STAFFGRP) {
             promoteInstrumentsForStaffGroup((StaffGrp *)obj);
         }
-        if (name != "StaffDef") {
+        if (obj->GetClassId() != STAFFDEF) {
             continue;
         }
         StaffDef *sd = (StaffDef *)obj;
@@ -5594,8 +5592,7 @@ void HumdrumInput::promoteInstrumentAbbreviationsToGroup()
 
     for (int i = 0; i < count; ++i) {
         Object *obj = sdf->GetChild(i);
-        std::string name = obj->GetClassName();
-        if (name != "StaffGrp") {
+        if (obj->GetClassId() != STAFFGRP) {
             continue;
         }
         StaffGrp *sg = (StaffGrp *)obj;
@@ -5613,16 +5610,14 @@ void HumdrumInput::promoteInstrumentAbbreviationsForStaffGroup(StaffGrp *group)
 {
     int count = group->GetChildCount();
     std::vector<std::string> names;
-    std::string name;
     std::vector<StaffDef *> sds;
     sds.clear();
     for (int i = 0; i < count; ++i) {
         Object *obj = group->GetChild(i);
-        name = obj->GetClassName();
-        if (name == "StaffGrp") {
+        if (obj->GetClassId() == STAFFGRP) {
             promoteInstrumentAbbreviationsForStaffGroup((StaffGrp *)obj);
         }
-        if (name != "StaffDef") {
+        if (obj->GetClassId() != STAFFDEF) {
             continue;
         }
         StaffDef *sd = (StaffDef *)obj;
@@ -8877,31 +8872,12 @@ void HumdrumInput::setMensurationSymbol(
 
     if (metdata.find('C') != std::string::npos) {
         vrvmensur->SetSign(MENSURATIONSIGN_C);
-        if (metdata.find("3/2") != std::string::npos) {
-            vrvmensur->SetNum(3);
-            vrvmensur->SetNumbase(2);
-        }
-        else if (metdata.find("C2") != std::string::npos) {
-            vrvmensur->SetNum(2);
-        }
-        else if (metdata.find("C3") != std::string::npos) {
-            vrvmensur->SetNum(3);
-        }
     }
     else if (metdata.find('O') != std::string::npos) {
         vrvmensur->SetSign(MENSURATIONSIGN_O);
-        if (metdata.find("3/2") != std::string::npos) {
-            vrvmensur->SetNum(3);
-            vrvmensur->SetNumbase(2);
-        }
-        else if (metdata.find("O2") != std::string::npos) {
-            vrvmensur->SetNum(2);
-        }
-        else if (metdata.find("O3") != std::string::npos) {
-            vrvmensur->SetNum(3);
-        }
     }
     else {
+        // deal with cases where C or O are not displayed
         std::stringstream warning;
         warning << "In HumdrumInput::setMensurationSymbol: Problem parsing mensuration: ";
         warning << metdata;
@@ -8919,14 +8895,15 @@ void HumdrumInput::setMensurationSymbol(
         vrvmensur->SetOrient(ORIENTATION_reversed);
     }
 
-    if (hre.search(metdata, "(\\d+)/(\\d+)")) {
+    // Add numbers to mensuration:
+    if (hre.search(metdata, "(\\d+)/(\\d+)$")) {
         vrvmensur->SetNum(hre.getMatchInt(1));
         vrvmensur->SetNumbase(hre.getMatchInt(2));
     }
-    else if (hre.search(metdata, "/(\\d+)")) {
+    else if (hre.search(metdata, "/(\\d+)$")) {
         vrvmensur->SetNumbase(hre.getMatchInt(1));
     }
-    else if (hre.search(metdata, "(\\d+).*\\)")) {
+    else if (hre.search(metdata, "(\\d+)$")) {
         vrvmensur->SetNum(hre.getMatchInt(1));
     }
 
@@ -9844,7 +9821,7 @@ bool HumdrumInput::convertSystemMeasure(int &line)
     if (!infile.token(startline, 0)->isBarline()) {
         checkline = getNextBarlineIndex(infile, startline);
     }
-    checkForRehearsal(checkline);
+    checkForGlobalRehearsal(checkline);
 
     addFTremSlurs();
 
@@ -10120,8 +10097,7 @@ template <class ELEMENT> void HumdrumInput::setStaffBetween(ELEMENT element, int
 
 template <class ELEMENT> void HumdrumInput::setN(ELEMENT element, int nvalue, hum::HTp tok)
 {
-    std::string name = element->GetClassName();
-    if (tok && (name == "Ending")) {
+    if (tok && (element->GetClassId() == ENDING)) {
         // Check if there is a LO:TX text to replace number.
         std::string textlabel = tok->getLayoutParameter("TX", "t");
         if (!textlabel.empty()) {
@@ -11246,8 +11222,7 @@ void HumdrumInput::setFontStyleForHarm(Harm *harm, const std::string &style)
         if (!child) {
             return;
         }
-        std::string childname = child->GetClassName();
-        if (childname == "Rend") {
+        if (child->GetClassId() == REND) {
             if (style == "bold") {
                 setFontWeight((Rend *)child, style);
             }
@@ -11326,8 +11301,7 @@ void HumdrumInput::setFontsizeForHarm(Harm *harm, const std::string &fontsize)
         if (!child) {
             return;
         }
-        std::string childname = child->GetClassName();
-        if (childname == "Rend") {
+        if (child->GetClassId() == REND) {
             bool emptyfontstyle = child->HasAttribute("fontstyle", "");
             if (emptyfontstyle) {
                 setFontsize((Rend *)child, "", fontsize);
@@ -12479,8 +12453,7 @@ void HumdrumInput::appendTextToRend(Rend *rend, const std::string &content)
 
     Object *lastRendChild = rend->GetLast();
     if (lastRendChild) {
-        std::string classname = lastRendChild->GetClassName();
-        if (classname == "text") {
+        if (lastRendChild->GetClassId() == TEXT) {
             // Place secondary text inside of last text element:
             std::u32string ztext = ((Text *)lastRendChild)->GetText();
             std::u32string ytext = UTF8to32(content);
@@ -15470,7 +15443,7 @@ void HumdrumInput::addExplicitStemDirection(FTrem *ftrem, hum::HTp start)
     // also deal with chords later
     for (int i = 0; i < count; ++i) {
         Object *obj = ftrem->GetChild(i);
-        if (obj->GetClassName() == "Note") {
+        if (obj->GetClassId() == NOTE) {
             if (direction > 0) {
                 ((Note *)obj)->SetStemDir(STEMDIRECTION_up);
                 if (m_humtype && showplace) {
@@ -17343,6 +17316,8 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
         return;
     }
 
+    std::string label = hline->getValue("LO", "TX", "pop");
+
     bool zparam = hline->isDefined("LO", "TX", "Z");
     bool yparam = hline->isDefined("LO", "TX", "Y");
 
@@ -17482,6 +17457,9 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
         }
         else {
             addTextElement(tempo, text);
+            if (!label.empty()) {
+                tempo->SetLabel(label);
+            }
         }
     }
     else {
@@ -17534,6 +17512,9 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
         }
         else {
             addTextElement(dir, text);
+            if (!label.empty()) {
+                dir->SetLabel(label);
+            }
         }
     }
 }
@@ -17556,6 +17537,7 @@ void HumdrumInput::processDirections(hum::HTp token, int staffindex)
     if (text.size() == 0) {
         return;
     }
+    std::string label = token->getValue("LO", "TX", "pop");
 
     // justification == 0 means no explicit justification (mostly left justified)
     // justification == 1 means right justified
@@ -17653,7 +17635,7 @@ void HumdrumInput::processDirections(hum::HTp token, int staffindex)
         placement = "above";
     }
 
-    addDirection(text, placement, bold, italic, token, staffindex, justification, color, vgroup);
+    addDirection(text, placement, bold, italic, token, staffindex, justification, color, vgroup, label);
 }
 
 //////////////////////////////
@@ -17743,28 +17725,28 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         }
     }
 
-    std::string color;
-    if (sicQ) {
-        // default color for sic text directions (set to black if not wanted)
-        color = "limegreen";
-    }
-
+    std::string problemLabel;
     bool problemQ = false;
     bool verboseQ = false;
     bool tempoQ = false;
     std::string text;
+    std::string label;
     std::string key;
     std::string value;
     std::string typevalue;
     std::string verboseType;
     std::string ovalue;
     std::string svalue;
+    std::string color;
     Dir *dir = NULL;
     Tempo *tempo = NULL;
 
     for (int i = 0; i < hps->getCount(); ++i) {
         key = hps->getParameterName(i);
         value = hps->getParameterValue(i);
+        if (key == "pop") {
+            label = value;
+        }
         if (key == "a") {
             aparam = true;
         }
@@ -17831,6 +17813,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         }
         if (key == "problem") {
             problemQ = true;
+            problemLabel = value;
         }
         if (key == "type") {
             typevalue = value;
@@ -17852,6 +17835,15 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
 
     if ((namespace2 == "SIC") && !verboseQ) {
         return;
+    }
+
+    if (sicQ) {
+        // default color for sic markers (set to black if not wanted)
+        color = "limegreen";
+    }
+    if (problemQ) {
+        // default color for sic problem markers (set to black if not wanted)
+        color = "crimson";
     }
 
     double Y = 0.0;
@@ -17897,6 +17889,14 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     }
 
     if (sicQ) {
+        if (label.empty()) {
+            if (!ovalue.empty()) {
+                label = "orig: " + ovalue;
+            }
+            if (!svalue.empty()) {
+                label = "corr: " + svalue;
+            }
+        }
         if (verboseType == "text") {
             if (!ovalue.empty()) {
                 text = ovalue;
@@ -17912,6 +17912,10 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
             text = "S";
         }
     }
+    if (problemQ && !problemLabel.empty()) {
+        label = problemLabel;
+    }
+    // Probably need to escape " in label
 
     int maxstaff = (int)m_staffstarts.size() - 1;
 
@@ -17952,7 +17956,6 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     }
 
     if (tempoQ) {
-
         tempo = new Tempo();
         if (midibpm > 0) {
             tempo->SetMidiBpm(midibpm * m_globalTempoScaling * m_localTempoScaling.getFloat());
@@ -18005,6 +18008,9 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     }
     else {
         dir = new Dir();
+        if (!label.empty()) {
+            dir->SetLabel(label);
+        }
         if (placement == "between") {
             setStaffBetween(dir, m_currentstaff);
         }
@@ -18078,7 +18084,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
             rend->SetColor(color);
         }
         else if (problemQ) {
-            rend->SetColor("red");
+            rend->SetColor("crimson");
         }
         else if (sicQ) {
             rend->SetColor("limegreen");
@@ -18089,7 +18095,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         else if (dir) {
             dir->AddChild(rend);
         }
-        addTextElement(rend, text);
+        addTextElement(rend, text, "", false, label);
         if (!italic) {
             rend->SetFontstyle(FONTSTYLE_normal);
         }
@@ -18110,12 +18116,12 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     else {
 
         if (tempoQ && tempo) {
-            addTextElement(tempo, text);
+            addTextElement(tempo, text, "", false, label);
             if (onlysmufl && needrend) {
                 int count = tempo->GetChildCount();
                 for (int j = 0; j < count; j++) {
                     Object *obj = tempo->GetChild(j);
-                    if (obj->GetClassName() != "Rend") {
+                    if (obj->GetClassId() != REND) {
                         continue;
                     }
                     Rend *item = (Rend *)obj;
@@ -18123,7 +18129,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
                         item->SetColor(color);
                     }
                     else if (problemQ) {
-                        item->SetColor("red");
+                        item->SetColor("crimson");
                     }
                     else if (sicQ) {
                         item->SetColor("limegreen");
@@ -18151,12 +18157,12 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
             if (onlysmufl && needrend) {
                 Rend *rend = new Rend();
                 dir->AddChild(rend);
-                addTextElement(rend, text);
+                addTextElement(rend, text, "", false, label);
                 if (!color.empty()) {
                     rend->SetColor(color);
                 }
                 else if (problemQ) {
-                    rend->SetColor("red");
+                    rend->SetColor("crimson");
                 }
                 else if (sicQ) {
                     rend->SetColor("limegreen");
@@ -18179,7 +18185,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
                 }
             }
             else {
-                addTextElement(dir, text);
+                addTextElement(dir, text, "", false, label);
             }
         }
     }
@@ -18528,9 +18534,9 @@ void HumdrumInput::setFontsize(ELEMENT *element, const std::string &smuflname, c
     //   xx_large => 200
     //   x_large  => 150
     //   large    => 110
-    //   larger   => 110 (not used since same as large)
+    //   larger   => 110 (not used since a relative size relative to current size)
     //   small    => 80
-    //   smaller  => 80 (not used since same as small)
+    //   smaller  => 80 (not used since a relative size relative to current size)
     //   x_small  => 60
     //   xx_small => 50
 
@@ -18837,16 +18843,22 @@ std::vector<std::string> HumdrumInput::convertMusicSymbolNameToSmuflName(const s
 //////////////////////////////
 //
 // HumdrumInput::addDirection --
-//     default value: color = "";
+//     default value: justification: 0
+//     default value: color = ""
+//     default value: vgroup = -1
+//     default value: label = ""
 //
 //     token->getLayoutParameter() should not be used in this function.  Instead
 //     paste the parameter set that generate a text direction (there could be multiple
 //     text directions attached to the note, and using getPayoutParameter() will merge
 //     all of their parameters incorrectly.
 //
+void addDirection(const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token,
+    int staffindex, int justification = 0, const std::string &color = "", int vgroup = -1,
+    const std::string label = "");
 
 void HumdrumInput::addDirection(const std::string &text, const std::string &placement, bool bold, bool italic,
-    hum::HTp token, int staffindex, int justification, const std::string &color, int vgroup)
+    hum::HTp token, int staffindex, int justification, const std::string &color, int vgroup, const std::string &label)
 {
     hum::HumRegex hre;
     if (hre.search(text, "\\[[^=]*\\]\\s*=\\s*\\d+")) {
@@ -18866,6 +18878,9 @@ void HumdrumInput::addDirection(const std::string &text, const std::string &plac
     }
     else {
         setStaff(dir, m_currentstaff);
+    }
+    if (!label.empty()) {
+        dir->SetLabel(label);
     }
     setLocationId(dir, token);
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
@@ -18922,7 +18937,7 @@ void HumdrumInput::addDirection(const std::string &text, const std::string &plac
             rend->SetColor(color);
         }
         else if (problemQ) {
-            rend->SetColor("red");
+            rend->SetColor("crimson");
         }
         else if (sicQ) {
             rend->SetColor("limegreen");
@@ -20622,13 +20637,17 @@ template <class ELEMENT> void HumdrumInput::addMusicSymbol(ELEMENT *element, con
 // HumdumInput::addTextElement -- Append text to a regular element.
 //   default value: fontstyle == ""
 //   default value: addSpacer == true
+//   default value: label     == true
 //
 
 template <class ELEMENT>
 void HumdrumInput::addTextElement(
-    ELEMENT *element, const std::string &content, const std::string &fontstyle, bool addSpacer)
+    ELEMENT *element, const std::string &content, const std::string &fontstyle, bool addSpacer, const string &label)
 {
     Text *text = new Text();
+    if (!label.empty()) {
+        text->SetLabel(label);
+    }
     std::string myfontstyle = fontstyle;
 
     std::string data = content;
@@ -20642,7 +20661,7 @@ void HumdrumInput::addTextElement(
         hre.replaceDestructive(data, "", "</i>", "g");
     }
 
-    if (element->GetClassName() == "Syl") {
+    if (element->GetClassId() == SYL) {
         // Approximate centering of single-letter text on noteheads.
         // currently the text is left justified to before the left edge of the notehead.
         hum::HumRegex hre;
@@ -20697,7 +20716,7 @@ void HumdrumInput::addTextElement(
             rend->AddChild(text);
             text->SetText(UTF8to32(pretext));
             setFontStyle(rend, myfontstyle);
-            // addTextElement(element, pretext, myfontstyle, addSpacer);
+            // addTextElement(element, pretext, myfontstyle, addSpacer, label);
         }
         if (!musictext.empty()) {
             addMusicSymbol(element, rawmusictext);
@@ -20740,6 +20759,9 @@ void HumdrumInput::addTextElement(
             Lb *lb = new Lb();
             element->AddChild(lb);
             text = new Text();
+            if (!label.empty()) {
+                text->SetLabel(label);
+            }
         }
     }
 }
@@ -25121,6 +25143,8 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
     hum::HumNum barbuffer(1, 4);
 
     if (*token == "*ped") {
+        bool bounceQ = hasBounceBefore(token);
+
         // turn on pedal
         Pedal *pedal = new Pedal();
         setLocationId(pedal, token);
@@ -25140,24 +25164,77 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
             pedal->SetDir(pedalLog_DIR_bounce);
             pedal->SetForm(PEDALSTYLE_altpedstar);
         }
+        else if (bounceQ) {
+            pedal->SetDir(pedalLog_DIR_bounce);
+        }
         ss[staffindex].pedal = true;
     }
     else if (*token == "*Xped") {
-        Pedal *pedal = new Pedal();
-        setLocationId(pedal, token);
-        addChildMeasureOrSection(pedal);
-        hum::HumNum tstamp = getMeasureTstamp(token, staffindex, hum::HumNum(1, 1));
-        if (durtobar == 0) {
-            tstamp -= barbuffer;
-            appendTypeTag(pedal, "endbar-25");
+        bool bounceQ = hasBounceAfter(token);
+        if (!bounceQ) {
+            Pedal *pedal = new Pedal();
+            setLocationId(pedal, token);
+            addChildMeasureOrSection(pedal);
+            hum::HumNum tstamp = getMeasureTstamp(token, staffindex, hum::HumNum(1, 1));
+            if (durtobar == 0) {
+                tstamp -= barbuffer;
+                appendTypeTag(pedal, "endbar-25");
+            }
+            hum::HTp attachment = getNextNonNullDataOrMeasureToken(token);
+            setAttachmentType(pedal, attachment);
+            pedal->SetDir(pedalLog_DIR_up);
+            assignVerticalGroup(pedal, token);
+            setStaff(pedal, m_currentstaff);
         }
-        hum::HTp attachment = getNextNonNullDataOrMeasureToken(token);
-        setAttachmentType(pedal, attachment);
-        pedal->SetDir(pedalLog_DIR_up);
-        assignVerticalGroup(pedal, token);
-        setStaff(pedal, m_currentstaff);
         ss[staffindex].pedal = false;
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::hasBounceAfter -- If an *Xped has a *ped after it
+//    at the same timestamp, then the *Xped should be ignored
+//    as the following *ped will be turned into a bounce.
+//
+
+bool HumdrumInput::hasBounceAfter(hum::HTp token)
+{
+    if (*token != "*Xped") {
+        return false;
+    }
+    hum::HumNum timestamp = token->getDurationFromStart();
+    hum::HTp current = token->getNextToken();
+    while (current && (current->getDurationFromStart() == timestamp)) {
+        if (*current == "*ped") {
+            return true;
+        }
+        current = current->getNextToken();
+    }
+    return false;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::hasBounceBefore -- If a *ped has an *Xped before it
+//    at the same timestamp, then it should be converted to a bounce.
+//    Future: if *ped is followed later by another *ped without
+//    *Xped, then the second *ped should be marked as a bounce.
+//
+
+bool HumdrumInput::hasBounceBefore(hum::HTp token)
+{
+    if (*token != "*ped") {
+        return false;
+    }
+    hum::HumNum timestamp = token->getDurationFromStart();
+    hum::HTp current = token->getPreviousToken();
+    while (current && (current->getDurationFromStart() == timestamp)) {
+        if (*current == "*Xped") {
+            return true;
+        }
+        current = current->getPreviousToken();
+    }
+    return false;
 }
 
 //////////////////////////////
@@ -26712,6 +26789,64 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
                     accid->SetAccid(ACCIDENTAL_WRITTEN_tf);
                     showInAccidGes = true;
                 }
+
+                // Extended MEI accidentals:
+                else if (loaccid == "su") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_su);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "sd") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_sd);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "fu") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_fu);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "fd") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_fd);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "nu") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_nu);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "nd") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_nd);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "xu") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_xu);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "xd") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_xd);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "ffu") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_ffu);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "ffd") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_ffd);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "1qf") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_1qf);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "3qf") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_3qf);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "1qs") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_1qs);
+                    showInAccidGes = true;
+                }
+                else if (loaccid == "3qs") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_3qs);
+                    showInAccidGes = true;
+                }
                 else {
                     std::stringstream warning;
                     warning << "In HumdrumInput::convertNote: ";
@@ -28116,7 +28251,7 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
                 int staffindex = staff - 1;
                 std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
                 if (ss[staffindex].righthalfstem
-                    && ((element->GetClassName() == "Note") || (element->GetClassName() == "Chord"))) {
+                    && ((element->GetClassId() == NOTE) || (element->GetClassId() == CHORD))) {
                     m_setrightstem = true;
                 }
             } break;
@@ -30132,12 +30267,10 @@ bool HumdrumInput::hasMensuralStaff(hum::HLp line)
 
 //////////////////////////////
 //
-// HumdrumInput::checkForRehearsal -- Only attached to barlines for now.
-//     Also required to be global layout for now, add note attachment
-//     later.
+// HumdrumInput::checkForGlobalRehearsal -- Attaches to barlines.
 //
 
-void HumdrumInput::checkForRehearsal(int line)
+void HumdrumInput::checkForGlobalRehearsal(int line)
 {
     hum::HumdrumFile &infile = m_infiles[0];
     if (!infile[line].isBarline()) {
@@ -30163,20 +30296,55 @@ void HumdrumInput::checkForRehearsal(int line)
         if (!rehQ) {
             continue;
         }
-        std::string tvalue;
-        std::string key;
-        std::string value;
-        for (int j = 0; j < hps->getCount(); ++j) {
-            key = hps->getParameterName(j);
-            value = hps->getParameterValue(j);
+
+        bool absysQ = false;
+        std::string absysDefault = getDefaultLayoutParameter("REH", "absys");
+        if (absysDefault == "1") {
+            absysQ = true;
+        }
+        std::string fontsize = getDefaultLayoutParameter("REH", "fs");
+        std::string tvalue = getDefaultLayoutParameter("REH", "t");
+        std::string qoffset = getDefaultLayoutParameter("REH", "qo");
+        std::string enclosure = getDefaultLayoutParameter("REH", "enc");
+        std::string color = getDefaultLayoutParameter("REH", "color");
+        std::string enclosureColor = getDefaultLayoutParameter("REH", "encc");
+
+        int pcount = hps->getCount();
+        for (int j = 0; j < pcount; ++j) {
+            std::string key = hps->getParameterName(j);
+            std::string value = hps->getParameterValue(j);
             if (key == "t") {
                 tvalue = value;
-                break;
+            }
+            if (key == "absys") {
+                if ((value == "0") || (value == "false")) {
+                    absysQ = false;
+                }
+                else {
+                    absysQ = true;
+                }
+            }
+            if (key == "qo") {
+                qoffset = value;
+            }
+            if (key == "fs") {
+                fontsize = value;
+            }
+            if (key == "enc") {
+                enclosure = value;
+            }
+            if (key == "color") {
+                color = value;
+            }
+            if (key == "encc") {
+                enclosureColor = value;
             }
         }
+
         if (tvalue.empty()) {
             continue;
         }
+
         Reh *reh = new Reh();
         Rend *rend = new Rend();
         Text *text = new Text();
@@ -30185,13 +30353,150 @@ void HumdrumInput::checkForRehearsal(int line)
         reh->AddChild(rend);
         rend->AddChild(text);
         rend->SetRend(TEXTRENDITION_box);
+        if (enclosure.empty()) {
+            rend->SetRend(TEXTRENDITION_box);
+        }
+        else {
+            setEnclosure(rend, enclosure);
+        }
+        if (!color.empty() && enclosureColor.empty()) {
+            reh->SetColor(color);
+        }
+        else if (color.empty() && !enclosureColor.empty()) {
+            reh->SetColor(enclosureColor);
+            rend->SetColor("black");
+        }
+        else if (!color.empty() && !enclosureColor.empty()) {
+            reh->SetColor(enclosureColor);
+            rend->SetColor(color);
+        }
         addChildMeasureOrSection(reh);
-        // Add to top staff for now, but add to top of
-        // each instrumentalgoup probably in the future.
         setStaff(reh, 1);
-        // Only attached to barline for now:
-        reh->SetTstamp(0.0);
+        if (!qoffset.empty()) {
+            setTstamp(reh, qoffset);
+        }
+        else {
+            reh->SetTstamp(0.0);
+        }
+        // Default size is large:
+        if (fontsize.empty()) {
+            fontsize = "large";
+        }
+        setFontsize(rend, "", fontsize);
+        // rend->SetHalign(HORIZONTALALIGNMENT_center);
+
+        std::vector<hum::HTp> &staffstarts = m_staffstarts;
+        int staffCount = (int)staffstarts.size();
+        if (absysQ && (staffCount > 1)) {
+            // place rehersal marks above/below system
+
+            Reh *reh = new Reh();
+            Rend *rend = new Rend();
+            Text *text = new Text();
+            std::u32string wtext = UTF8to32(tvalue);
+            text->SetText(wtext);
+            reh->AddChild(rend);
+            rend->AddChild(text);
+            if (enclosure.empty()) {
+                rend->SetRend(TEXTRENDITION_box);
+            }
+            else {
+                setEnclosure(rend, enclosure);
+            }
+            if (!color.empty() && enclosureColor.empty()) {
+                reh->SetColor(color);
+            }
+            else if (color.empty() && !enclosureColor.empty()) {
+                reh->SetColor(enclosureColor);
+                rend->SetColor("black");
+            }
+            else if (!color.empty() && !enclosureColor.empty()) {
+                reh->SetColor(enclosureColor);
+                rend->SetColor(color);
+            }
+            addChildMeasureOrSection(reh);
+            setStaff(reh, staffCount);
+            if (!qoffset.empty()) {
+                setTstamp(reh, qoffset);
+            }
+            else {
+                reh->SetTstamp(0.0);
+            }
+            // Default size is large:
+            if (fontsize.empty()) {
+                fontsize = "large";
+            }
+            setFontsize(rend, "", fontsize);
+
+            setPlaceRelStaff(reh, "below", false);
+        }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setEnclosure -- values are "box", "dbox", "tbox" and "circle"
+//    (tbox and circle are not implemented in verovio).
+//
+
+template <class ELEMENT> void HumdrumInput::setEnclosure(ELEMENT *element, const string &value)
+{
+    if (value == "box") {
+        element->SetRend(TEXTRENDITION_box);
+    }
+    else if (value == "dbox") {
+        element->SetRend(TEXTRENDITION_dbox);
+    }
+    else if (value == "tbox") {
+        element->SetRend(TEXTRENDITION_tbox);
+    }
+    else if (value == "circle") {
+        element->SetRend(TEXTRENDITION_circle);
+    }
+    else if (value == "none") {
+        element->SetRend(TEXTRENDITION_none);
+    }
+    else {
+        std::string str = "Unknown enclosure type: " + value;
+        LogError("%s", str.c_str());
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setTstamp -- set the @tstamp for an element.  The input can
+//   be a string representing either a float or a HumNum (rational number)
+//   and is in units of quarter notes which will be translated into MEI units
+//   (bottom of time signatures, excluding "0" case for breves.
+//
+
+template <class ELEMENT> void HumdrumInput::setTstamp(ELEMENT *element, const string &value)
+{
+    if (value.empty()) {
+        return;
+    }
+    if (value == ".") {
+        return;
+    }
+
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    int staffindex = m_currentstaff - 1;
+    double qfactor = ss[staffindex].meter_bottom.getFloat() / 4.0;
+
+    hum::HumRegex hre;
+    if (hre.search(value, "^\\s*([\\d.]+)")) {
+        double dvalue = qfactor * hre.getMatchDouble(1) + 1;
+        element->SetTstamp(dvalue);
+        return;
+    }
+    else if (hre.search(value, "^(\\d+/\\d+)")) {
+        hum::HumNum num = hre.getMatch(1);
+        double dvalue = qfactor * num.getFloat() + 1;
+        element->SetTstamp(dvalue);
+        return;
+    }
+    std::string str = "Unknown REH quarter-note offset: " + value;
+    LogError("%s", str.c_str());
 }
 
 //////////////////////////////
@@ -32545,6 +32850,92 @@ void HumdrumInput::createGlissando(hum::HTp glissStart, hum::HTp glissEnd)
         gliss->SetID(glissId);
         m_measure->AddChild(gliss);
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::analyzeDefaultLayoutStyles -- search for lines starting with:
+//   !!LO-style: and set the default parameters for the given LO category.
+// Example:
+//   !!!LO-style:REH:enc=dbox:encc=crimson:color=limegreen:absys:fs=200%
+//
+//   These values will be inserted into the m_layoutDefaultStyles variable.
+//   In this case:
+//       m_layoutDefaultStyle["REH"]["enc"]   = "dbox";
+//       m_layoutDefaultStyle["REH"]["encc"]  = "crimson";
+//       m_layoutDefaultStyle["REH"]["color"] = "limegreen";
+//       m_layoutDefaultStyle["REH"]["absys"] = "1";
+//       m_layoutDefaultStyle["REH"]["fs"]    = "200%";
+//  These defaults will be loaded before processing a !!LO:REH layout parameter set.
+//  The defaults can be placed anywhere in the file, and later defaults for the
+//  same category will replace ones earllier in the file.
+//
+
+void HumdrumInput::analyzeDefaultLayoutStyles(hum::HumdrumFile &infile)
+{
+    hum::HumRegex hre;
+    std::string prefix = "!!!LO-style:";
+    for (int i = 0; i < infile.getLineCount(); i++) {
+        if (infile[i].hasSpines()) {
+            continue;
+        }
+        if (infile[i].compare(0, prefix.length(), prefix) != 0) {
+            continue;
+        }
+        std::string rest = infile[i].substr(prefix.length());
+        std::vector<std::string> pieces;
+        hre.split(pieces, rest, ":");
+        if (pieces.empty()) {
+            continue;
+        }
+        std::string category = pieces.at(0);
+        m_layoutDefaultStyles.erase(category);
+        for (int j = 1; j < (int)pieces.size(); j++) {
+            if (pieces[j] == "") {
+                continue;
+            }
+            else if (!pieces[j].empty()) {
+                if (pieces[0] == "=") {
+                    continue;
+                }
+            }
+            if (hre.search(pieces[j], "^([^=]+)=(.*)$")) {
+                std::string key = hre.getMatch(1);
+                std::string value = hre.getMatch(2);
+                hre.replaceDestructive(value, ":", "&colon;", "g");
+                m_layoutDefaultStyles[category][key] = value;
+            }
+            else {
+                std::string key = pieces[j];
+                std::string value = "1";
+                m_layoutDefaultStyles[category][key] = value;
+            }
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getDefaultLayoutParameter -- Return the default layout
+//   parameter for a given cateogry and category parameter.  If there is
+//   no given parameter, returns "".
+//
+
+std::string HumdrumInput::getDefaultLayoutParameter(const std::string &category, const std::string &parameter)
+{
+    auto &plist = m_layoutDefaultStyles;
+    if (plist.empty()) {
+        return "";
+    }
+    auto categoryEntry = plist.find(category);
+    if (categoryEntry == plist.end()) {
+        return "";
+    }
+    auto param = categoryEntry->second.find(parameter);
+    if (param == categoryEntry->second.end()) {
+        return "";
+    }
+    return param->second;
 }
 
 #endif /* NO_HUMDRUM_SUPPORT */

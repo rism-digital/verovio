@@ -28,7 +28,7 @@ namespace vrv {
 
 static const ClassRegistrar<Mdiv> s_factory("mdiv", MDIV);
 
-Mdiv::Mdiv() : PageElement(MDIV, "mdiv-"), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
+Mdiv::Mdiv() : PageElement(MDIV), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
 {
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_NNUMBERLIKE);
@@ -47,18 +47,16 @@ void Mdiv::Reset()
     m_visibility = Hidden;
 }
 
-bool Mdiv::IsSupportedChild(Object *child)
+bool Mdiv::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(MDIV)) {
-        assert(dynamic_cast<Mdiv *>(child));
-    }
-    else if (child->Is(SCORE)) {
-        assert(dynamic_cast<Score *>(child));
+    static const std::vector<ClassId> supported{ MDIV, SCORE };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 void Mdiv::MakeVisible()

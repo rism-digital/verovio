@@ -38,7 +38,7 @@ public:
     virtual ~Reh();
     Object *Clone() const override { return new Reh(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Reh"; }
+    std::string GetClassName() const override { return "reh"; }
     ///@}
 
     /**
@@ -58,7 +58,7 @@ public:
      * Add an element (text, rend. etc.) to a reh.
      * Only supported elements will be actually added to the child list.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     //----------//
     // Functors //

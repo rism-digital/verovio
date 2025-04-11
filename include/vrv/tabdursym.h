@@ -37,7 +37,7 @@ public:
     virtual ~TabDurSym();
     Object *Clone() const override { return new TabDurSym(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "TabDurSym"; }
+    std::string GetClassName() const override { return "tabDurSym"; }
     ///@}
 
     /**
@@ -57,7 +57,7 @@ public:
     /**
      * Add an element to a element.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Overwritten method for note

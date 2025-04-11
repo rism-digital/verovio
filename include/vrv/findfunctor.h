@@ -402,6 +402,7 @@ private:
 
 /**
  * This class finds all objects to which another object refers to.
+ * The constructor should take either elements or a listWithAttName pointer set, the other should be NULL.
  */
 class FindAllReferencedObjectsFunctor : public Functor {
 public:
@@ -409,7 +410,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    FindAllReferencedObjectsFunctor(SetOfObjects *elements);
+    FindAllReferencedObjectsFunctor(SetOfObjects *elements, ListOfObjectAttNamePairs *listWithAttName);
     virtual ~FindAllReferencedObjectsFunctor() = default;
     ///@}
 
@@ -434,13 +435,59 @@ protected:
     //
 private:
     //
+    void AddObject(Object *object, const std::string &attribute);
+
 public:
     //
 private:
     // The set of all matching objects
     SetOfObjects *m_elements;
+    // The list of pairs of matching objects with the attribute name
+    ListOfObjectAttNamePairs *m_listWithAttName;
     // A flag indicating if milestone references should be included as well
     bool m_milestoneReferences;
+};
+
+//----------------------------------------------------------------------------
+// FindAllReferringObjectsFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class finds all objects referring to a specific object
+ */
+class FindAllReferringObjectsFunctor : public Functor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    FindAllReferringObjectsFunctor(const Object *object, ListOfObjectAttNamePairs *elements);
+    virtual ~FindAllReferringObjectsFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitObject(Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The object referred to
+    const Object *m_object;
+    // The set of all objects with the attribute name they are referring through
+    ListOfObjectAttNamePairs *m_elements;
 };
 
 //----------------------------------------------------------------------------

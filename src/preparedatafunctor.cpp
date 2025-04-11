@@ -1849,7 +1849,7 @@ PrepareRehPositionFunctor::PrepareRehPositionFunctor() : Functor() {}
 
 FunctorCode PrepareRehPositionFunctor::VisitReh(Reh *reh)
 {
-    if (!reh->HasStart() && !reh->HasTstamp()) {
+    if (!reh->HasStartid() && !reh->HasTstamp()) {
         Measure *measure = vrv_cast<Measure *>(reh->GetFirstAncestor(MEASURE));
         if (measure->GetLeftBarLine()) reh->SetStart(measure->GetLeftBarLine());
     }

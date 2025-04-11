@@ -73,7 +73,7 @@ Object::Object() : BoundingBox()
     if (s_objectCounter++ == 0) {
         this->SeedID();
     }
-    this->Init(OBJECT, "m-");
+    this->Init(OBJECT);
 }
 
 Object::Object(ClassId classId) : BoundingBox()
@@ -81,15 +81,7 @@ Object::Object(ClassId classId) : BoundingBox()
     if (s_objectCounter++ == 0) {
         this->SeedID();
     }
-    this->Init(classId, "m-");
-}
-
-Object::Object(ClassId classId, const std::string &classIdStr) : BoundingBox()
-{
-    if (s_objectCounter++ == 0) {
-        this->SeedID();
-    }
-    this->Init(classId, classIdStr);
+    this->Init(classId);
 }
 
 Object *Object::Clone() const
@@ -104,7 +96,6 @@ Object::Object(const Object &object) : BoundingBox(object)
     this->ResetBoundingBox(); // It does not make sense to keep the values of the BBox
 
     m_classId = object.m_classId;
-    m_classIdStr = object.m_classIdStr;
     m_parent = NULL;
 
     // Flags
@@ -151,7 +142,6 @@ Object &Object::operator=(const Object &object)
         this->ResetBoundingBox(); // It does not make sense to keep the values of the BBox
 
         m_classId = object.m_classId;
-        m_classIdStr = object.m_classIdStr;
         m_parent = NULL;
         // Flags
         m_isAttribute = object.m_isAttribute;
@@ -189,12 +179,9 @@ Object::~Object()
     ClearChildren();
 }
 
-void Object::Init(ClassId classId, const std::string &classIdStr)
+void Object::Init(ClassId classId)
 {
-    assert(classIdStr.size());
-
     m_classId = classId;
-    m_classIdStr = classIdStr;
     m_parent = NULL;
     // Flags
     m_isAttribute = false;
@@ -560,6 +547,11 @@ void Object::InsertChild(Object *element, int idx)
     m_children.insert(iter + (idx), element);
 }
 
+void Object::RotateChildren(int first, int middle, int last)
+{
+    std::rotate(m_children.begin() + first, m_children.begin() + middle, m_children.begin() + last);
+}
+
 Object *Object::DetachChild(int idx)
 {
     if (idx >= (int)m_children.size()) {
@@ -808,7 +800,9 @@ int Object::DeleteChildrenByComparison(Comparison *comparison)
 
 void Object::GenerateID()
 {
-    m_id = m_classIdStr.at(0) + Object::GenerateHashID();
+    // A random letter from a-z
+    char letter = 'a' + (std::rand() % 26);
+    m_id = letter + Object::GenerateHashID();
 }
 
 void Object::ResetID()
@@ -822,23 +816,19 @@ void Object::SetParent(Object *parent)
     m_parent = parent;
 }
 
-bool Object::IsSupportedChild(Object *child)
+bool Object::IsSupportedChild(ClassId classId)
 {
     // This should never happen because the method should be overridden
-    LogDebug(
-        "Method for adding %s to %s should be overridden", child->GetClassName().c_str(), this->GetClassName().c_str());
+    LogDebug("Method for adding %d to %s should be overridden", classId, this->GetClassName().c_str());
     // assert(false);
     return false;
 }
 
 void Object::AddChild(Object *child)
 {
-    if (!((child->GetClassName() == "Staff") && (this->GetClassName() == "Section"))) {
-        // temporarily allowing staff in section for issue https://github.com/MeasuringPolyphony/mp_editor/issues/62
-        if (!this->IsSupportedChild(child)) {
-            LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-            return;
-        }
+    if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        return;
     }
 
     if (!this->IsReferenceObject()) {

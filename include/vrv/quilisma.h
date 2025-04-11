@@ -31,7 +31,7 @@ public:
     virtual ~Quilisma();
     Object *Clone() const override { return new Quilisma(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Quilisma"; }
+    std::string GetClassName() const override { return "quilisma"; }
     ///@}
 
     /**

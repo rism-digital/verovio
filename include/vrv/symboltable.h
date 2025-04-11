@@ -27,14 +27,14 @@ public:
     SymbolTable();
     virtual ~SymbolTable();
     void Reset() override;
-    std::string GetClassName() const override { return "SymbolTable"; }
+    std::string GetClassName() const override { return "symbolTable"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
     ///@}
 
     /**

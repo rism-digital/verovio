@@ -29,7 +29,7 @@ public:
     Object *Clone() const override { return new Choice(*this); }
     virtual ~Choice();
     void Reset() override;
-    std::string GetClassName() const override { return "Choice"; }
+    std::string GetClassName() const override { return "choice"; }
     ///@}
 
     /** Getter for level **/
@@ -38,7 +38,7 @@ public:
     /**
      * Add children to a apparatus.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
 protected:
     /** We store the level of the <choice> for integrity check */

@@ -1181,7 +1181,6 @@ void SvgDeviceContext::AppendIdAndClass(
     const std::string &gId, const std::string &baseClass, const std::string &addedClasses, GraphicID graphicID)
 {
     std::string baseClassFull = baseClass;
-    std::transform(baseClassFull.begin(), baseClassFull.begin() + 1, baseClassFull.begin(), ::tolower);
 
     if (gId.length() > 0) {
         if (m_html5) {

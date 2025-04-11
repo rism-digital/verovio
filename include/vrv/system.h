@@ -43,14 +43,14 @@ public:
     System();
     virtual ~System();
     void Reset() override;
-    std::string GetClassName() const override { return "System"; }
+    std::string GetClassName() const override { return "system"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
     ///@}
 
     /**

@@ -27,7 +27,7 @@ namespace vrv {
 // Pages
 //----------------------------------------------------------------------------
 
-Pages::Pages() : Object(PAGES, "pages-"), AttLabelled(), AttNNumberLike()
+Pages::Pages() : Object(PAGES), AttLabelled(), AttNNumberLike()
 {
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_NNUMBERLIKE);
@@ -44,18 +44,16 @@ void Pages::Reset()
     this->ResetNNumberLike();
 }
 
-bool Pages::IsSupportedChild(Object *child)
+bool Pages::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(PAGE)) {
-        assert(dynamic_cast<Page *>(child));
-    }
-    else if (child->Is(SCOREDEF)) {
-        assert(dynamic_cast<ScoreDef *>(child));
+    static const std::vector<ClassId> supported{ PAGE, SCOREDEF };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 void Pages::ConvertFrom(Score *score)

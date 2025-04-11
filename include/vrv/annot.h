@@ -32,14 +32,14 @@ public:
     // This fails because of the copy contructor in ObjectListInterface (TextListInterface parent)
     // Object *Clone() const override { return new Annot(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Annot"; }
+    std::string GetClassName() const override { return "annot"; }
     ///@}
 
     /**
      * Add a text element to an annotation.
      * Only supported elements will be actually added to the child list.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     //----------//
     // Functors //

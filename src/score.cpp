@@ -36,7 +36,7 @@ namespace vrv {
 
 static const ClassRegistrar<Score> s_factory("score", SCORE);
 
-Score::Score() : PageElement(SCORE, "score-"), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
+Score::Score() : PageElement(SCORE), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
 {
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_NNUMBERLIKE);
@@ -60,30 +60,19 @@ void Score::Reset()
     m_drawingPgFoot2Height = 0;
 }
 
-bool Score::IsSupportedChild(Object *child)
+bool Score::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(SCOREDEF)) {
-        assert(dynamic_cast<ScoreDef *>(child));
+    static const std::vector<ClassId> supported{ ENDING, PB, SCOREDEF, SB, SECTION };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(SB)) {
-        assert(dynamic_cast<Sb *>(child));
-    }
-    else if (child->Is(SECTION)) {
-        assert(dynamic_cast<Section *>(child));
-    }
-    else if (child->Is(ENDING)) {
-        assert(dynamic_cast<Ending *>(child));
-    }
-    else if (child->Is(PB)) {
-        assert(dynamic_cast<Pb *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 void Score::CalcRunningElementHeight(Doc *doc)

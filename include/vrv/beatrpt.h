@@ -33,7 +33,7 @@ public:
     virtual ~BeatRpt();
     Object *Clone() const override { return new BeatRpt(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "BeatRpt"; }
+    std::string GetClassName() const override { return "beatRpt"; }
     ///@}
 
     /** Override the method since alignment is required */

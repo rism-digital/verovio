@@ -26,8 +26,7 @@ namespace vrv {
 
 static const ClassRegistrar<GrpSym> s_factory("grpSym", GRPSYM);
 
-GrpSym::GrpSym()
-    : Object(GRPSYM, "grpsym-"), AttColor(), AttGrpSymLog(), AttStaffGroupingSym(), AttStartId(), AttStartEndId()
+GrpSym::GrpSym() : Object(GRPSYM), AttColor(), AttGrpSymLog(), AttStaffGroupingSym(), AttStartId(), AttStartEndId()
 {
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_GRPSYMLOG);

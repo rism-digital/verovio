@@ -186,7 +186,7 @@ bool MEIOutput::Export()
 {
 
     if (m_removeIds) {
-        FindAllReferencedObjectsFunctor findAllReferencedObjects(&m_referredObjects);
+        FindAllReferencedObjectsFunctor findAllReferencedObjects(&m_referredObjects, NULL);
         // When saving page-based MEI we also want to keep IDs for milestone elements
         findAllReferencedObjects.IncludeMilestoneReferences(this->IsPageBasedMEI());
         m_doc->Process(findAllReferencedObjects);
@@ -1656,9 +1656,7 @@ void MEIOutput::WritePageMilestoneEnd(pugi::xml_node currentNode, PageMilestoneE
 
     this->WritePageElement(currentNode, milestoneEnd);
     currentNode.append_attribute("startid") = ("#" + IDToMeiStr(milestoneEnd->GetStart())).c_str();
-    std::string meiElementName = milestoneEnd->GetStart()->GetClassName();
-    std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
-    currentNode.append_attribute("type") = meiElementName.c_str();
+    currentNode.append_attribute("type") = milestoneEnd->GetStart()->GetClassName().c_str();
 }
 
 void MEIOutput::WriteSystem(pugi::xml_node currentNode, System *system)
@@ -1692,9 +1690,7 @@ void MEIOutput::WriteSystemMilestoneEnd(pugi::xml_node currentNode, SystemMilest
 
     this->WriteSystemElement(currentNode, milestoneEnd);
     currentNode.append_attribute("startid") = ("#" + IDToMeiStr(milestoneEnd->GetStart())).c_str();
-    std::string meiElementName = milestoneEnd->GetStart()->GetClassName();
-    std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
-    currentNode.append_attribute("type") = meiElementName.c_str();
+    currentNode.append_attribute("type") = milestoneEnd->GetStart()->GetClassName().c_str();
 }
 
 void MEIOutput::WriteSection(pugi::xml_node currentNode, Section *section)
@@ -5177,10 +5173,8 @@ bool MEIInput::ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Ob
         this->NormalizeAttributes(xmlElement);
         elementName = std::string(xmlElement.name());
         if (filter && !this->IsAllowed(elementName, filter)) {
-            std::string meiElementName = filter->GetClassName();
-            std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
             LogWarning("Element <%s> within <%s> is not supported and will be ignored ", xmlElement.name(),
-                meiElementName.c_str());
+                filter->GetClassName().c_str());
             continue;
         }
         // editorial
@@ -6255,10 +6249,8 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         elementName = std::string(xmlElement.name());
         // LogDebug("ReadLayerChildren: element <%s>", xmlElement.name());
         if (!this->IsAllowed(elementName, filter)) {
-            std::string meiElementName = filter->GetClassName();
-            std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
             LogWarning("Element <%s> within <%s> is not supported and will be ignored ", xmlElement.name(),
-                meiElementName.c_str());
+                filter->GetClassName().c_str());
             continue;
         }
         // editorial
@@ -7238,10 +7230,8 @@ bool MEIInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
         this->NormalizeAttributes(xmlElement);
         elementName = std::string(xmlElement.name());
         if (filter && !this->IsAllowed(elementName, filter)) {
-            std::string meiElementName = filter->GetClassName();
-            std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
             LogWarning("Element <%s> within <%s> is not supported and will be ignored ", xmlElement.name(),
-                meiElementName.c_str());
+                filter->GetClassName().c_str());
             continue;
         }
         // editorial
@@ -7301,10 +7291,8 @@ bool MEIInput::ReadSymbolDefChildren(Object *parent, pugi::xml_node parentNode, 
         this->NormalizeAttributes(xmlElement);
         elementName = std::string(xmlElement.name());
         if (filter && !this->IsAllowed(elementName, filter)) {
-            std::string meiElementName = filter->GetClassName();
-            std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
             LogWarning("Element <%s> within <%s> is not supported and will be ignored ", xmlElement.name(),
-                meiElementName.c_str());
+                filter->GetClassName().c_str());
             continue;
         }
         // content

@@ -24,7 +24,7 @@ namespace vrv {
 
 static const ClassRegistrar<Breath> s_factory("breath", BREATH);
 
-Breath::Breath() : ControlElement(BREATH, "breath-"), TimePointInterface(), AttPlacementRelStaff()
+Breath::Breath() : ControlElement(BREATH), TimePointInterface(), AttPlacementRelStaff()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);

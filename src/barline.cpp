@@ -34,7 +34,7 @@ namespace vrv {
 static const ClassRegistrar<BarLine> s_factory("barLine", BARLINE);
 
 BarLine::BarLine()
-    : LayerElement(BARLINE, "bline-"), AttBarLineLog(), AttBarLineVis(), AttColor(), AttNNumberLike(), AttVisibility()
+    : LayerElement(BARLINE), AttBarLineLog(), AttBarLineVis(), AttColor(), AttNNumberLike(), AttVisibility()
 {
     this->RegisterAttClass(ATT_BARLINELOG);
     this->RegisterAttClass(ATT_BARLINEVIS);
@@ -45,7 +45,7 @@ BarLine::BarLine()
 }
 
 BarLine::BarLine(ClassId classId)
-    : LayerElement(classId, "bline-"), AttBarLineLog(), AttBarLineVis(), AttColor(), AttNNumberLike(), AttVisibility()
+    : LayerElement(classId), AttBarLineLog(), AttBarLineVis(), AttColor(), AttNNumberLike(), AttVisibility()
 {
     this->RegisterAttClass(ATT_BARLINELOG);
     this->RegisterAttClass(ATT_BARLINEVIS);

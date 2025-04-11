@@ -72,7 +72,7 @@ namespace vrv {
 // Page
 //----------------------------------------------------------------------------
 
-Page::Page() : Object(PAGE, "page-")
+Page::Page() : Object(PAGE)
 {
     this->Reset();
 }
@@ -102,18 +102,19 @@ void Page::Reset()
     m_justificationSum = 0.;
 }
 
-bool Page::IsSupportedChild(Object *child)
+bool Page::IsSupportedChild(ClassId classId)
 {
-    if (child->IsPageElement()) {
-        assert(dynamic_cast<PageElement *>(child));
+    static const std::vector<ClassId> supported{ SYSTEM };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(SYSTEM)) {
-        assert(dynamic_cast<System *>(child));
+    else if (Object::IsPageElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 bool Page::IsFirstOfSelection() const

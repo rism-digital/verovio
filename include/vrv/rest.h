@@ -53,14 +53,14 @@ public:
     virtual ~Rest();
     Object *Clone() const override { return new Rest(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Rest"; }
+    std::string GetClassName() const override { return "rest"; }
     ///@}
 
     /**
      * Add an element to a rest.
      * Only Dots elements will be actually added to the rest.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Overwritten method for rest

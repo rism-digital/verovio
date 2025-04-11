@@ -29,7 +29,7 @@ namespace vrv {
 
 static const ClassRegistrar<CpMark> s_factory("cpMark", CPMARK);
 
-CpMark::CpMark() : ControlElement(CPMARK, "cpmark-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface()
+CpMark::CpMark() : ControlElement(CPMARK), TextListInterface(), TextDirInterface(), TimeSpanningInterface()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
@@ -46,18 +46,19 @@ void CpMark::Reset()
     TimeSpanningInterface::Reset();
 }
 
-bool CpMark::IsSupportedChild(Object *child)
+bool CpMark::IsSupportedChild(ClassId classId)
 {
-    if (child->Is({ LB, REND, SYMBOL, TEXT })) {
-        assert(dynamic_cast<TextElement *>(child));
+    static const std::vector<ClassId> supported{ LB, REND, SYMBOL, TEXT };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 //----------------------------------------------------------------------------

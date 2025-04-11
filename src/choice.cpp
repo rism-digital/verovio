@@ -30,14 +30,14 @@ namespace vrv {
 
 static const ClassRegistrar<Choice> s_factory("choice", CHOICE);
 
-Choice::Choice() : EditorialElement(CHOICE, "choice-")
+Choice::Choice() : EditorialElement(CHOICE)
 {
     m_level = EDITORIAL_UNDEFINED;
 
     this->Reset();
 }
 
-Choice::Choice(EditorialLevel level) : EditorialElement(CHOICE, "choice-")
+Choice::Choice(EditorialLevel level) : EditorialElement(CHOICE)
 {
     m_level = level;
 
@@ -51,36 +51,16 @@ void Choice::Reset()
 
 Choice::~Choice() {}
 
-bool Choice::IsSupportedChild(Object *child)
+bool Choice::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(ABBR)) {
-        assert(dynamic_cast<Abbr *>(child));
-    }
-    else if (child->Is(CHOICE)) {
-        assert(dynamic_cast<Choice *>(child));
-    }
-    else if (child->Is(CORR)) {
-        assert(dynamic_cast<Corr *>(child));
-    }
-    else if (child->Is(EXPAN)) {
-        assert(dynamic_cast<Expan *>(child));
-    }
-    else if (child->Is(ORIG)) {
-        assert(dynamic_cast<Orig *>(child));
-    }
-    else if (child->Is(REG)) {
-        assert(dynamic_cast<Reg *>(child));
-    }
-    else if (child->Is(SIC)) {
-        assert(dynamic_cast<Sic *>(child));
-    }
-    else if (child->Is(UNCLEAR)) {
-        assert(dynamic_cast<Unclear *>(child));
+    static const std::vector<ClassId> supported{ ABBR, CHOICE, CORR, EXPAN, ORIG, REG, SIC, UNCLEAR };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 //----------------------------------------------------------------------------

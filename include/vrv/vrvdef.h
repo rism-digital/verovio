@@ -368,6 +368,8 @@ typedef std::vector<CurveSpannedElement *> ArrayOfCurveSpannedElements;
 
 typedef std::list<std::pair<Object *, data_MEASUREBEAT>> ListOfObjectBeatPairs;
 
+typedef std::list<std::pair<Object *, std::string>> ListOfObjectAttNamePairs;
+
 typedef std::list<std::pair<TimePointInterface *, ClassId>> ListOfPointingInterClassIdPairs;
 
 typedef std::list<std::pair<TimeSpanningInterface *, ClassId>> ListOfSpanningInterClassIdPairs;

@@ -45,14 +45,14 @@ public:
     virtual ~StaffDef();
     Object *Clone() const override { return new StaffDef(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "StaffDef"; }
+    std::string GetClassName() const override { return "staffDef"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Return an order for the given ClassId.

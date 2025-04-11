@@ -26,14 +26,14 @@ public:
     virtual ~LayerDef();
     Object *Clone() const override { return new LayerDef(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "LayerDef"; }
+    std::string GetClassName() const override { return "layerDef"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
     ///@}
 
     /**

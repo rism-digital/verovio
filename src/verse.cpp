@@ -33,7 +33,7 @@ namespace vrv {
 
 static const ClassRegistrar<Verse> s_factory("verse", VERSE);
 
-Verse::Verse() : LayerElement(VERSE, "verse-"), AttColor(), AttLang(), AttNInteger(), AttTypography()
+Verse::Verse() : LayerElement(VERSE), AttColor(), AttLang(), AttNInteger(), AttTypography()
 {
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_LANG);
@@ -58,24 +58,19 @@ void Verse::Reset()
     m_drawingLabelAbbr = NULL;
 }
 
-bool Verse::IsSupportedChild(Object *child)
+bool Verse::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(LABEL)) {
-        assert(dynamic_cast<Label *>(child));
+    static const std::vector<ClassId> supported{ LABEL, LABELABBR, SYL };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(LABELABBR)) {
-        assert(dynamic_cast<LabelAbbr *>(child));
-    }
-    else if (child->Is(SYL)) {
-        assert(dynamic_cast<Syl *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 int Verse::AdjustPosition(int &overlap, int freeSpace, const Doc *doc)

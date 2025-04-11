@@ -28,7 +28,7 @@ public:
     virtual ~Unclear();
     Object *Clone() const override { return new Unclear(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Unclear"; }
+    std::string GetClassName() const override { return "unclear"; }
     ///@}
 
 private:
