@@ -500,7 +500,7 @@ void View::DrawAnnotScore(
             dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
             dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y + boxHeight), ToDeviceContextX(x2),
                 ToDeviceContextY(y + boxHeight));
-            dc->SetBrush(0.5);
+            dc->SetBrush(0.5, COLOR_RED);
             this->DrawFilledRectangle(dc, x1, y + halfLineWidth, x2, y + boxHeight - halfLineWidth);
             dc->ResetBrush();
             break;
@@ -517,7 +517,7 @@ void View::DrawAnnotScore(
             boxOutline[2] = { ToDeviceContextX(x1), ToDeviceContextY(y + boxHeight) };
             boxOutline[3] = { ToDeviceContextX(x2), ToDeviceContextY(y + boxHeight) };
             dc->DrawPolyline(4, boxOutline, true);
-            dc->SetBrush(0.5);
+            dc->SetBrush(0.5, COLOR_RED);
             this->DrawFilledRectangle(
                 dc, x1 + halfLineWidth, y + halfLineWidth, x2 - halfLineWidth, y + boxHeight - halfLineWidth);
             dc->ResetBrush();
@@ -532,7 +532,7 @@ void View::DrawAnnotScore(
             boxOutline[2] = { ToDeviceContextX(x2), ToDeviceContextY(y + boxHeight) };
             boxOutline[3] = { ToDeviceContextX(x1), ToDeviceContextY(y + boxHeight) };
             dc->DrawPolyline(4, boxOutline);
-            dc->SetBrush(0.5);
+            dc->SetBrush(0.5, COLOR_RED);
             this->DrawFilledRectangle(dc, x1, y + halfLineWidth, x2 - halfLineWidth, y + boxHeight - halfLineWidth);
             dc->ResetBrush();
             break;
