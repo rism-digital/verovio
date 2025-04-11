@@ -671,6 +671,9 @@ void Page::LayOutPitchPos()
 
     CalcStemFunctor calcStem(doc);
     this->Process(calcStem);
+
+    CalcLedgerLinesFunctor calcLedgerLines(doc);
+    this->Process(calcLedgerLines);
 }
 
 int Page::GetContentHeight() const
