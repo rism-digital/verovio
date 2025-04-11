@@ -518,13 +518,6 @@ void View::DrawLayerDefLabels(
         LayerDef *layerDef = vrv_cast<LayerDef *>(staffDef->GetChild(i, LAYERDEF));
         if (!layerDef) continue;
 
-        AttNIntegerComparison comparison(LAYER, layerDef->GetN());
-        Layer *layer = vrv_cast<Layer *>(staff->FindDescendantByComparison(&comparison, 1));
-        if (!layer) {
-            LogDebug("Layer or LayerDef missing in View::DrawLayerDefLabels");
-            continue;
-        }
-
         this->DrawLabels(dc, scoreDef, layerDef, x - space, initialY, abbreviations, staffSize, space);
         initialY -= pointSize;
     }

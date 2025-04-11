@@ -5,6 +5,7 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
+#include <array>
 #include <cassert>
 #include <fstream>
 #include <iostream>
@@ -36,34 +37,29 @@ struct MatchPathSeparator {
     bool operator()(char ch) const { return ch == '\\' || ch == '/'; }
 };
 
-std::string basename(std::string const &pathname)
+std::string Basename(const std::string &pathname)
 {
     return std::string(std::find_if(pathname.rbegin(), pathname.rend(), MatchPathSeparator()).base(), pathname.end());
 }
 
-std::string removeExtension(std::string const &filename)
+std::string RemoveExtension(const std::string &filename)
 {
     std::string::const_reverse_iterator pivot = std::find(filename.rbegin(), filename.rend(), '.');
-    return pivot == filename.rend() ? filename : std::string(filename.begin(), pivot.base() - 1);
+    return (pivot == filename.rend()) ? filename : std::string(filename.begin(), pivot.base() - 1);
 }
 
-bool dir_exists(std::string dir)
+bool DirExists(const std::string &dir)
 {
     struct stat st;
-    if ((stat(dir.c_str(), &st) == 0) && (((st.st_mode) & S_IFMT) == S_IFDIR)) {
-        return true;
-    }
-    else {
-        return false;
-    }
+    return (stat(dir.c_str(), &st) == 0) && (((st.st_mode) & S_IFMT) == S_IFDIR);
 }
 
-void display_version()
+void DisplayVersion()
 {
     std::cout << "Verovio " << vrv::GetVersion() << std::endl;
 }
 
-bool optionExists(const std::string &option, int argc, char **argv, std::string &badOption)
+bool OptionExists(const std::string &option, int argc, char **argv, std::string &badOption)
 {
     for (int i = 0; i < argc; ++i) {
         if (!strncmp(option.c_str(), argv[i], option.size())) return true;
@@ -72,9 +68,9 @@ bool optionExists(const std::string &option, int argc, char **argv, std::string 
     return false;
 }
 
-option optionStruct(vrv::Option *option, const std::map<vrv::Option *, std::string> &optionNames)
+option OptionStruct(vrv::Option *option, const std::map<vrv::Option *, std::string> &optionNames)
 {
-    return { optionNames.at(option).c_str(), option->IsArgumentRequired() ? required_argument : no_argument, 0,
+    return { optionNames.at(option).c_str(), option->IsArgumentRequired() ? required_argument : no_argument, NULL,
         option->GetShortOption() };
 }
 
@@ -84,11 +80,11 @@ int main(int argc, char **argv)
     std::string svgdir;
     std::string outfile;
     std::string outformat = "svg";
-    bool std_output = false;
+    bool stdOutput = false;
 
-    bool all_pages = false;
+    bool allPages = false;
     std::optional<int> page;
-    bool show_version = false;
+    bool showVersion = false;
 
     // Create the toolkit instance without loading the font because
     // the resource path might be specified in the parameters
@@ -111,27 +107,26 @@ int main(int argc, char **argv)
               { &options->m_version, vrv::FromCamelCase(options->m_version.GetKey()) },
               { &options->m_xmlIdSeed, vrv::FromCamelCase(options->m_xmlIdSeed.GetKey()) } };
 
-    static struct option base_options[] = { //
-        optionStruct(&options->m_allPages, optionNames), //
-        optionStruct(&options->m_inputFrom, optionNames), //
-        optionStruct(&options->m_help, optionNames), //
-        optionStruct(&options->m_logLevel, optionNames), //
-        optionStruct(&options->m_outfile, optionNames), //
-        optionStruct(&options->m_page, optionNames), //
-        optionStruct(&options->m_resourcePath, optionNames), //
-        optionStruct(&options->m_scale, optionNames), //
-        optionStruct(&options->m_outputTo, optionNames), //
-        optionStruct(&options->m_version, optionNames), //
-        optionStruct(&options->m_xmlIdSeed, optionNames), //
+    // TODO: Use std::to_array to get rid of the explicit array dimension, once MSVC supports it
+    // See the final comment in https://github.com/rism-digital/verovio/pull/4023
+    static const std::array<option, 13> baseOptions = {
+        OptionStruct(&options->m_allPages, optionNames), //
+        OptionStruct(&options->m_inputFrom, optionNames), //
+        OptionStruct(&options->m_help, optionNames), //
+        OptionStruct(&options->m_logLevel, optionNames), //
+        OptionStruct(&options->m_outfile, optionNames), //
+        OptionStruct(&options->m_page, optionNames), //
+        OptionStruct(&options->m_resourcePath, optionNames), //
+        OptionStruct(&options->m_scale, optionNames), //
+        OptionStruct(&options->m_outputTo, optionNames), //
+        OptionStruct(&options->m_version, optionNames), //
+        OptionStruct(&options->m_xmlIdSeed, optionNames), //
         // standard input - long options only or - as filename
         { "stdin", no_argument, 0, 'z' }, //
-        { 0, 0, 0, 0 }
+        { 0, 0, 0, 0 } //
     };
 
-    int baseSize = sizeof(base_options) / sizeof(option);
-
     const vrv::MapOfStrOptions *params = options->GetItems();
-    int mapSize = (int)params->size();
 
     if (argc < 2) {
         std::cerr << "Expected one input file but found none." << std::endl << std::endl;
@@ -139,50 +134,41 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    struct option *long_options;
-    int i = 0;
-    long_options = (struct option *)malloc(sizeof(struct option) * (baseSize + mapSize));
-
-    // A vector of string for storing names as const char* for long_options
-    std::vector<std::string> optNames;
-    optNames.reserve(mapSize);
-
-    vrv::MapOfStrOptions::const_iterator iter;
-    for (iter = params->begin(); iter != params->end(); ++iter) {
+    std::vector<option> longOptions;
+    std::vector<std::unique_ptr<std::string>> longOptionNames;
+    for (const auto &param : *params) {
         // Double check that back and forth convertion is correct
-        assert(vrv::ToCamelCase(vrv::FromCamelCase(iter->first)) == iter->first);
+        assert(vrv::ToCamelCase(vrv::FromCamelCase(param.first)) == param.first);
 
-        optNames.push_back(vrv::FromCamelCase(iter->first));
-        long_options[i].name = optNames.at(i).c_str();
-        vrv::OptionBool *optBool = dynamic_cast<vrv::OptionBool *>(iter->second);
-        long_options[i].has_arg = (optBool) ? no_argument : required_argument;
-        long_options[i].flag = 0;
-        long_options[i].val = 0;
-        ++i;
+        longOptions.emplace_back();
+
+        // It is crucial to keep the camel cased name alive, since we store a pointer to it in longOptions
+        const std::string name = vrv::FromCamelCase(param.first);
+        longOptionNames.push_back(std::make_unique<std::string>(name));
+        longOptions.back().name = longOptionNames.back()->c_str();
+
+        vrv::OptionBool *optBool = dynamic_cast<vrv::OptionBool *>(param.second);
+        longOptions.back().has_arg = (optBool) ? no_argument : required_argument;
+        longOptions.back().flag = NULL;
+        longOptions.back().val = 0;
     }
 
     // Concatenate the base options
-    assert(i == mapSize);
-    for (; i < mapSize + baseSize; ++i) {
-        long_options[i].name = base_options[i - mapSize].name;
-        long_options[i].has_arg = base_options[i - mapSize].has_arg;
-        long_options[i].flag = base_options[i - mapSize].flag;
-        long_options[i].val = base_options[i - mapSize].val;
-    }
+    longOptions.insert(longOptions.end(), baseOptions.begin(), baseOptions.end());
 
     int c;
     std::string key;
-    int option_index = 0;
+    int optionIndex = 0;
     vrv::Option *opt = NULL;
     vrv::OptionBool *optBool = NULL;
     std::string resourcePath = toolkit.GetResourcePath();
-    while ((c = getopt_long(argc, argv, "ab:f:h:l:o:p:r:s:t:vx:z", long_options, &option_index)) != -1) {
+    while ((c = getopt_long(argc, argv, "ab:f:h:l:o:p:r:s:t:vx:z", longOptions.data(), &optionIndex)) != -1) {
         switch (c) {
             case 0:
-                key = long_options[option_index].name;
+                key = longOptions[optionIndex].name;
                 opt = params->at(vrv::ToCamelCase(key));
                 optBool = dynamic_cast<vrv::OptionBool *>(opt);
-                if (std::string badOption; !optionExists("--" + key, argc, argv, badOption)) {
+                if (std::string badOption; !OptionExists("--" + key, argc, argv, badOption)) {
                     vrv::LogError("Unrecognized option %s has been skipped.", badOption.c_str());
                     continue;
                 }
@@ -193,16 +179,16 @@ int main(int argc, char **argv)
                 else if (opt) {
                     if (!opt->SetValue(optarg)) {
                         vrv::LogWarning("Setting option %s with %s failed, default value used",
-                            long_options[option_index].name, optarg);
+                            longOptions[optionIndex].name, optarg);
                     }
                 }
                 else {
-                    vrv::LogError("Something went wrong with option %s", long_options[option_index].name);
+                    vrv::LogError("Something went wrong with option %s", longOptions[optionIndex].name);
                     exit(1);
                 }
                 break;
 
-            case 'a': all_pages = true; break;
+            case 'a': allPages = true; break;
 
             case 'f':
                 if (!toolkit.SetInputFrom(std::string(optarg))) {
@@ -229,7 +215,7 @@ int main(int argc, char **argv)
                 }
                 break;
 
-            case 'v': show_version = true; break;
+            case 'v': showVersion = true; break;
 
             case 'x':
                 if (!options->m_xmlIdSeed.SetValue(optarg)) {
@@ -239,7 +225,7 @@ int main(int argc, char **argv)
                 break;
 
             case 'z':
-                if (!strcmp(long_options[option_index].name, "stdin")) {
+                if (!strcmp(longOptions[optionIndex].name, "stdin")) {
                     infile = "-";
                 }
                 break;
@@ -261,8 +247,8 @@ int main(int argc, char **argv)
 
     toolkit.SetLocale();
 
-    if (show_version) {
-        display_version();
+    if (showVersion) {
+        DisplayVersion();
         exit(0);
     }
 
@@ -283,7 +269,7 @@ int main(int argc, char **argv)
 
     // Make sure the user uses a valid Resource path
     // Save many headaches for empty SVGs
-    if (!dir_exists(resourcePath)) {
+    if (!DirExists(resourcePath)) {
         std::cerr << "The resource path " << resourcePath << " could not be found; please use -r option." << std::endl;
         exit(1);
     }
@@ -313,14 +299,14 @@ int main(int argc, char **argv)
 
     // Hardcode svg ext for now
     if (outfile.empty()) {
-        outfile = removeExtension(infile);
+        outfile = RemoveExtension(infile);
     }
     else if (outfile == "-") {
         // vrv::EnableLog(false);
-        std_output = true;
+        stdOutput = true;
     }
     else {
-        outfile = removeExtension(outfile);
+        outfile = RemoveExtension(outfile);
     }
 
     // Skip the layout for MIDI and timemap output by setting --breaks to none
@@ -331,11 +317,11 @@ int main(int argc, char **argv)
     // Load the std input or load the file
     if (!((toolkit.GetOutputTo() == vrv::HUMDRUM) && (toolkit.GetInputFrom() == vrv::MEI))) {
         if (infile == "-") {
-            std::ostringstream data_stream;
+            std::ostringstream dataStream;
             for (std::string line; getline(std::cin, line);) {
-                data_stream << line << std::endl;
+                dataStream << line << std::endl;
             }
-            if (!toolkit.LoadData(data_stream.str())) {
+            if (!toolkit.LoadData(dataStream.str())) {
                 std::cerr << "The input could not be loaded." << std::endl;
                 exit(1);
             }
@@ -363,23 +349,23 @@ int main(int argc, char **argv)
 
     if (outformat == "svg") {
         const int from = page ? *page : 1;
-        const int to = all_pages ? toolkit.GetPageCount() : from;
+        const int to = allPages ? toolkit.GetPageCount() : from;
 
         for (int p = from; p <= to; ++p) {
-            std::string cur_outfile = outfile;
+            std::string curOutfile = outfile;
             if (from < to) {
-                cur_outfile += vrv::StringFormat("_%03d", p);
+                curOutfile += vrv::StringFormat("_%03d", p);
             }
-            cur_outfile += ".svg";
-            if (std_output) {
+            curOutfile += ".svg";
+            if (stdOutput) {
                 std::cout << toolkit.RenderToSVG(p);
             }
-            else if (!toolkit.RenderToSVGFile(cur_outfile, p)) {
-                std::cerr << "Unable to write SVG to " << cur_outfile << "." << std::endl;
+            else if (!toolkit.RenderToSVGFile(curOutfile, p)) {
+                std::cerr << "Unable to write SVG to " << curOutfile << "." << std::endl;
                 exit(1);
             }
             else {
-                std::cerr << "Output written to " << cur_outfile << "." << std::endl;
+                std::cerr << "Output written to " << curOutfile << "." << std::endl;
             }
         }
     }
@@ -387,15 +373,15 @@ int main(int argc, char **argv)
     else if (outformat == "hummidi") {
         std::string humdata;
         if (infile == "-") {
-            std::ostringstream input_data;
+            std::ostringstream inputData;
             for (std::string line; getline(std::cin, line);) {
-                input_data << line << std::endl;
+                inputData << line << std::endl;
             }
-            if (input_data.str().empty()) {
+            if (inputData.str().empty()) {
                 std::cerr << "The input could not be loaded." << std::endl;
                 exit(1);
             }
-            humdata = input_data.str();
+            humdata = inputData.str();
         }
         else {
             std::ifstream instream(infile.c_str());
@@ -413,9 +399,9 @@ int main(int argc, char **argv)
             instream.read(humdata.data(), fileSize);
         }
 
-        std::string base64midi = toolkit.ConvertHumdrumToMIDI(humdata);
-        if (std_output) {
-            std::cout << base64midi << std::endl;
+        const std::string base64Midi = toolkit.ConvertHumdrumToMIDI(humdata);
+        if (stdOutput) {
+            std::cout << base64Midi << std::endl;
         }
         else {
             std::cerr << "Humdrum-MIDI to file not yet implemented." << std::endl;
@@ -427,7 +413,7 @@ int main(int argc, char **argv)
     }
     else if (outformat == "midi") {
         outfile += ".mid";
-        if (std_output) {
+        if (stdOutput) {
             std::cerr << "Midi cannot write to standard output." << std::endl;
             exit(1);
         }
@@ -441,7 +427,7 @@ int main(int argc, char **argv)
     }
     else if (outformat == "timemap") {
         outfile += ".json";
-        if (std_output) {
+        if (stdOutput) {
             std::string output;
             std::cout << toolkit.RenderToTimemap(options->m_timemapOptions.GetValue());
         }
@@ -455,7 +441,7 @@ int main(int argc, char **argv)
     }
     else if (outformat == "expansionmap") {
         outfile += "-em.json";
-        if (std_output) {
+        if (stdOutput) {
             std::string output;
             std::cout << toolkit.RenderToExpansionMap();
         }
@@ -472,15 +458,15 @@ int main(int argc, char **argv)
             std::string meidata;
 
             if (infile == "-") {
-                std::ostringstream input_data;
+                std::ostringstream inputData;
                 for (std::string line; getline(std::cin, line);) {
-                    input_data << line << std::endl;
+                    inputData << line << std::endl;
                 }
-                if (input_data.str().empty()) {
+                if (inputData.str().empty()) {
                     std::cerr << "The input could not be loaded." << std::endl;
                     exit(1);
                 }
-                meidata = input_data.str();
+                meidata = inputData.str();
             }
             else {
                 std::ifstream instream(infile.c_str());
@@ -505,15 +491,15 @@ int main(int argc, char **argv)
 
             std::string humdata;
             if (infile == "-") {
-                std::ostringstream input_data;
+                std::ostringstream inputData;
                 for (std::string line; getline(std::cin, line);) {
-                    input_data << line << std::endl;
+                    inputData << line << std::endl;
                 }
-                if (input_data.str().empty()) {
+                if (inputData.str().empty()) {
                     std::cerr << "The input could not be loaded." << std::endl;
                     exit(1);
                 }
-                humdata = input_data.str();
+                humdata = inputData.str();
             }
             else {
                 std::ifstream instream(infile.c_str());
@@ -535,7 +521,7 @@ int main(int argc, char **argv)
         }
 
         outfile += ".krn";
-        if (std_output) {
+        if (stdOutput) {
             toolkit.GetHumdrum(std::cout);
         }
         else {
@@ -550,7 +536,7 @@ int main(int argc, char **argv)
     }
     else if (outformat == "pae") {
         outfile += ".pae";
-        if (std_output) {
+        if (stdOutput) {
             std::string output;
             std::cout << toolkit.RenderToPAE();
         }
@@ -573,7 +559,7 @@ int main(int argc, char **argv)
                   scoreBased, basic, *page, removeIds, generateFacs)
             : vrv::StringFormat("{'scoreBased': %s, 'basic': %s, 'removeIds': %s, 'generateFacs': %s}", scoreBased,
                   basic, removeIds, generateFacs);
-        if (std_output) {
+        if (stdOutput) {
             std::cout << toolkit.GetMEI(params);
         }
         else if (!toolkit.SaveFile(outfile, params)) {
@@ -590,6 +576,5 @@ int main(int argc, char **argv)
         toolkit.LogRuntime();
     }
 
-    free(long_options);
     return 0;
 }
