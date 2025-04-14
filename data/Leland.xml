@@ -569,6 +569,32 @@
   <g c="F426" x="0.0" y="-1125.0" w="306.0" h="1517.0" h-a-x="306" n="flag1024thDownStraight">
     <a n="stemDownSW" x="0.0" y="-4.46" />
   </g>
+  <g c="E0CF" x="-98.0" y="-213.0" w="522.0" h="425.0" h-a-x="325" n="noteheadSlashedBlack1">
+    <a n="stemDownNW" x="0.0" y="-0.17" />
+    <a n="stemUpSE" x="1.3" y="0.15" />
+  </g>
+  <g c="E0D0" x="-99.0" y="-213.0" w="523.0" h="425.0" h-a-x="325" n="noteheadSlashedBlack2">
+    <a n="stemDownNW" x="0.0" y="-0.17" />
+    <a n="stemUpSE" x="1.3" y="0.15" />
+  </g>
+  <g c="E0D1" x="-98.0" y="-213.0" w="522.0" h="425.0" h-a-x="325" n="noteheadSlashedHalf1">
+    <a n="stemDownNW" x="0.0" y="-0.17" />
+    <a n="stemUpSE" x="1.3" y="0.16" />
+  </g>
+  <g c="E0D2" x="-98.0" y="-213.0" w="522.0" h="425.0" h-a-x="325" n="noteheadSlashedHalf2">
+    <a n="stemDownNW" x="0.0" y="-0.17" />
+    <a n="stemUpSE" x="1.3" y="0.16" />
+  </g>
+  <g c="E0D3" x="-75.0" y="-212.0" w="523.0" h="426.0" h-a-x="373" n="noteheadSlashedWhole1">
+    <a n="cutOutNW" x="0.2" y="0.4" />
+    <a n="cutOutSE" x="1.28" y="-0.4" />
+  </g>
+  <g c="E0D4" x="-75.0" y="-212.0" w="523.0" h="426.0" h-a-x="373" n="noteheadSlashedWhole2">
+    <a n="cutOutNE" x="1.3" y="0.4" />
+    <a n="cutOutSW" x="0.21" y="-0.4" />
+  </g>
+  <g c="E0D5" x="-66.0" y="-213.0" w="522.0" h="425.0" h-a-x="390" n="noteheadSlashedDoubleWhole1" />
+  <g c="E0D6" x="-66.0" y="-213.0" w="522.0" h="425.0" h-a-x="390" n="noteheadSlashedDoubleWhole2" />
   <g c="ECAB" x="0.0" y="-173.0" w="711.0" h="1316.0" h-a-x="712" n="metNote32ndUp" />
   <g c="ECA2" x="0.0" y="-172.0" w="475.0" h="344.0" h-a-x="475" n="metNoteWhole" />
   <g c="ECA0" x="0.0" y="-222.0" w="672.0" h="446.0" h-a-x="672" n="metNoteDoubleWhole" />

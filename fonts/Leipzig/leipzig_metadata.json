@@ -5082,6 +5082,16 @@
                 -0.68
             ]
         },
+        "noteheadDoubleWholeWithX": {
+            "bBoxNE": [
+                2.18,
+                0.68
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.68
+            ]
+        },
         "noteheadHalf": {
             "bBoxNE": [
                 1.256,
@@ -5190,6 +5200,86 @@
             "bBoxSW": [
                 0.0,
                 -1.0
+            ]
+        },
+        "noteheadSlashedBlack1": {
+            "bBoxNE": [
+                1.4066,
+                0.575
+            ],
+            "bBoxSW": [
+                -0.1786,
+                -0.575
+            ]
+        },
+        "noteheadSlashedBlack2": {
+            "bBoxNE": [
+                1.4066,
+                0.575
+            ],
+            "bBoxSW": [
+                -0.1786,
+                -0.575
+            ]
+        },
+        "noteheadSlashedDoubleWhole1": {
+            "bBoxNE": [
+                2.18,
+                0.68
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.68
+            ]
+        },
+        "noteheadSlashedDoubleWhole2": {
+            "bBoxNE": [
+                2.18,
+                0.68
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.68
+            ]
+        },
+        "noteheadSlashedHalf1": {
+            "bBoxNE": [
+                1.4066,
+                0.575
+            ],
+            "bBoxSW": [
+                -0.1786,
+                -0.575
+            ]
+        },
+        "noteheadSlashedHalf2": {
+            "bBoxNE": [
+                1.4066,
+                0.575
+            ],
+            "bBoxSW": [
+                -0.1786,
+                -0.575
+            ]
+        },
+        "noteheadSlashedWhole1": {
+            "bBoxNE": [
+                1.62,
+                0.575
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.575
+            ]
+        },
+        "noteheadSlashedWhole2": {
+            "bBoxNE": [
+                1.62,
+                0.575
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.575
             ]
         },
         "noteheadSquareBlack": {
@@ -8030,6 +8120,98 @@
             "stemUpSE": [
                 1.84,
                 1.0
+            ]
+        },
+        "noteheadSlashedBlack1": {
+            "cutOutNW": [
+                0.144,
+                0.24
+            ],
+            "cutOutSE": [
+                1.088,
+                -0.244
+            ],
+            "stemDownNW": [
+                -0.0,
+                -0.156
+            ],
+            "stemUpSE": [
+                1.256,
+                0.156
+            ]
+        },
+        "noteheadSlashedBlack2": {
+            "cutOutNW": [
+                0.144,
+                0.24
+            ],
+            "cutOutSE": [
+                1.088,
+                -0.244
+            ],
+            "stemDownNW": [
+                -0.0,
+                -0.156
+            ],
+            "stemUpSE": [
+                1.256,
+                0.156
+            ]
+        },
+        "noteheadSlashedHalf1": {
+            "cutOutNW": [
+                0.14,
+                0.24
+            ],
+            "cutOutSE": [
+                1.076,
+                -0.24
+            ],
+            "stemDownNW": [
+                0.0,
+                -0.144
+            ],
+            "stemUpSE": [
+                1.256,
+                0.164
+            ]
+        },
+        "noteheadSlashedHalf2": {
+            "cutOutNW": [
+                0.14,
+                0.24
+            ],
+            "cutOutSE": [
+                1.076,
+                -0.24
+            ],
+            "stemDownNW": [
+                0.0,
+                -0.144
+            ],
+            "stemUpSE": [
+                1.256,
+                0.164
+            ]
+        },
+        "noteheadSlashedWhole1": {
+            "cutOutNW": [
+                0.06,
+                0.244
+            ],
+            "cutOutSE": [
+                1.568,
+                -0.232
+            ]
+        },
+        "noteheadSlashedWhole2": {
+            "cutOutNW": [
+                0.06,
+                0.244
+            ],
+            "cutOutSE": [
+                1.568,
+                -0.232
             ]
         },
         "noteheadVoidWithX": {

@@ -225,14 +225,14 @@
         <!--<glyph glyph-code="E0CC" smufl-name="noteheadTriangleRoundDownWhite" />-->
         <!--<glyph glyph-code="E0CD" smufl-name="noteheadTriangleRoundDownBlack" />-->
         <!--<glyph glyph-code="E0CE" smufl-name="noteheadParenthesis" />-->
-        <!--<glyph glyph-code="E0CF" smufl-name="noteheadSlashedBlack1" />-->
-        <!--<glyph glyph-code="E0D0" smufl-name="noteheadSlashedBlack2" />-->
-        <!--<glyph glyph-code="E0D1" smufl-name="noteheadSlashedHalf1" />-->
-        <!--<glyph glyph-code="E0D2" smufl-name="noteheadSlashedHalf2" />-->
-        <!--<glyph glyph-code="E0D3" smufl-name="noteheadSlashedWhole1" />-->
-        <!--<glyph glyph-code="E0D4" smufl-name="noteheadSlashedWhole2" />-->
-        <!--<glyph glyph-code="E0D5" smufl-name="noteheadSlashedDoubleWhole1" />-->
-        <!--<glyph glyph-code="E0D6" smufl-name="noteheadSlashedDoubleWhole2" />-->
+        <glyph glyph-code="E0CF" smufl-name="noteheadSlashedBlack1" />
+        <glyph glyph-code="E0D0" smufl-name="noteheadSlashedBlack2" />
+        <glyph glyph-code="E0D1" smufl-name="noteheadSlashedHalf1" />
+        <glyph glyph-code="E0D2" smufl-name="noteheadSlashedHalf2" />
+        <glyph glyph-code="E0D3" smufl-name="noteheadSlashedWhole1" />
+        <glyph glyph-code="E0D4" smufl-name="noteheadSlashedWhole2" />
+        <glyph glyph-code="E0D5" smufl-name="noteheadSlashedDoubleWhole1" />
+        <glyph glyph-code="E0D6" smufl-name="noteheadSlashedDoubleWhole2" />
         <!--<glyph glyph-code="E0D7" smufl-name="noteheadDiamondDoubleWhole" />-->
         <!--<glyph glyph-code="E0D8" smufl-name="noteheadDiamondWhole" />-->
         <glyph glyph-code="E0D9" smufl-name="noteheadDiamondHalf" />
