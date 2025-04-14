@@ -671,7 +671,13 @@ bool EditorToolkitCMN::Context(std::string &elementId, bool contentOnly)
 {
     m_editInfo.reset();
 
-    Object *object = this->GetElement(elementId);
+    Object *object = NULL;
+    if (elementId == "[unspecified]") {
+        object = m_doc->GetDrawingPage()->FindDescendantByType(MEASURE);
+    }
+    else {
+        object = this->GetElement(elementId);
+    }
     if (!object || !object->GetParent()) return false;
 
     ListOfConstObjects objects;
@@ -716,7 +722,7 @@ bool EditorToolkitCMN::Context(std::string &elementId, bool contentOnly)
     // Build the json context
 
     jsonxx::Object section;
-    section << "id" << "";
+    section << "id" << "[unspecified]";
     section << "element" << ".";
     jsonxx::Object jsonContext;
 
