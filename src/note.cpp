@@ -639,49 +639,55 @@ char32_t Note::GetNoteheadGlyph(const data_DURATION duration) const
         return additionalNoteheadSymbols[glyph];
     }
 
-    switch (this->GetHeadShape()) {
-        case HEADSHAPE_quarter: return SMUFL_E0A4_noteheadBlack;
-        case HEADSHAPE_half: return SMUFL_E0A3_noteheadHalf;
-        case HEADSHAPE_whole: return SMUFL_E0A2_noteheadWhole;
-        // case HEADSHAPE_backslash: return SMUFL_noteheadBackslash;
-        // case HEADSHAPE_circle: return SMUFL_E0B3_noteheadCircleX;
-        case HEADSHAPE_plus: return SMUFL_E0AF_noteheadPlusBlack;
-        case HEADSHAPE_diamond: {
-            if (duration < DURATION_4) {
-                return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0DB_noteheadDiamondBlack
-                                                           : SMUFL_E0D9_noteheadDiamondHalf;
-            }
-            else {
-                return (this->GetHeadFill() == FILL_void) ? SMUFL_E0D9_noteheadDiamondHalf
-                                                          : SMUFL_E0DB_noteheadDiamondBlack;
+    if (this->HasHeadShape()) {
+        data_HEADSHAPE *hs = (const_cast<Note *>(this))->GetHeadShapeAlternate();
+        if (hs->GetType() == HEADSHAPE_headShapeList) {
+            switch (this->GetHeadShape().GetHeadShapeList()) {
+                case HEADSHAPE_list_quarter: return SMUFL_E0A4_noteheadBlack;
+                case HEADSHAPE_list_half: return SMUFL_E0A3_noteheadHalf;
+                case HEADSHAPE_list_whole:
+                    return SMUFL_E0A2_noteheadWhole;
+                    // case HEADSHAPE_backslash: return SMUFL_noteheadBackslash;
+                    // case HEADSHAPE_circle: return SMUFL_E0B3_noteheadCircleX;
+                case HEADSHAPE_list_plus: return SMUFL_E0AF_noteheadPlusBlack;
+                case HEADSHAPE_list_diamond: {
+                    if (duration < DURATION_4) {
+                        return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0DB_noteheadDiamondBlack
+                                                                   : SMUFL_E0D9_noteheadDiamondHalf;
+                    }
+                    else {
+                        return (this->GetHeadFill() == FILL_void) ? SMUFL_E0D9_noteheadDiamondHalf
+                                                                  : SMUFL_E0DB_noteheadDiamondBlack;
+                    }
+                }
+                    // case HEADSHAPE_isotriangle: return SMUFL_E0BC_noteheadTriangleUpHalf;
+                    // case HEADSHAPE_oval: return SMUFL_noteheadOval;
+                    // case HEADSHAPE_piewedge: return SMUFL_noteheadPieWedge;
+                case HEADSHAPE_list_rectangle:
+                    if (duration < DURATION_4) {
+                        return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0B9_noteheadSquareBlack
+                                                                   : SMUFL_E0B8_noteheadSquareWhite;
+                    }
+                    else {
+                        return (this->GetHeadFill() == FILL_void) ? SMUFL_E0B8_noteheadSquareWhite
+                                                                  : SMUFL_E0B9_noteheadSquareBlack;
+                    }
+                    // case HEADSHAPE_rtriangle: return SMUFL_noteheadRTriangle;
+                    // case HEADSHAPE_semicircle: return SMUFL_noteheadSemicircle;
+                case HEADSHAPE_list_slash: {
+                    if (DURATION_1 >= duration) return SMUFL_E102_noteheadSlashWhiteWhole;
+                    if (DURATION_2 == duration) return SMUFL_E103_noteheadSlashWhiteHalf;
+                    return SMUFL_E101_noteheadSlashHorizontalEnds;
+                }
+                    // case HEADSHAPE_square: return SMUFL_noteheadSquare;
+                case HEADSHAPE_list_x: {
+                    if (DURATION_1 == duration) return SMUFL_E0B5_noteheadWholeWithX;
+                    if (DURATION_2 == duration) return SMUFL_E0B6_noteheadHalfWithX;
+                    return SMUFL_E0A9_noteheadXBlack;
+                }
+                default: break;
             }
         }
-        // case HEADSHAPE_isotriangle: return SMUFL_E0BC_noteheadTriangleUpHalf;
-        // case HEADSHAPE_oval: return SMUFL_noteheadOval;
-        // case HEADSHAPE_piewedge: return SMUFL_noteheadPieWedge;
-        case HEADSHAPE_rectangle:
-            if (duration < DURATION_4) {
-                return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0B9_noteheadSquareBlack
-                                                           : SMUFL_E0B8_noteheadSquareWhite;
-            }
-            else {
-                return (this->GetHeadFill() == FILL_void) ? SMUFL_E0B8_noteheadSquareWhite
-                                                          : SMUFL_E0B9_noteheadSquareBlack;
-            }
-        // case HEADSHAPE_rtriangle: return SMUFL_noteheadRTriangle;
-        // case HEADSHAPE_semicircle: return SMUFL_noteheadSemicircle;
-        case HEADSHAPE_slash: {
-            if (DURATION_1 >= duration) return SMUFL_E102_noteheadSlashWhiteWhole;
-            if (DURATION_2 == duration) return SMUFL_E103_noteheadSlashWhiteHalf;
-            return SMUFL_E101_noteheadSlashHorizontalEnds;
-        }
-        // case HEADSHAPE_square: return SMUFL_noteheadSquare;
-        case HEADSHAPE_x: {
-            if (DURATION_1 == duration) return SMUFL_E0B5_noteheadWholeWithX;
-            if (DURATION_2 == duration) return SMUFL_E0B6_noteheadHalfWithX;
-            return SMUFL_E0A9_noteheadXBlack;
-        }
-        default: break;
     }
 
     switch (this->GetHeadMod()) {

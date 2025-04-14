@@ -1764,57 +1764,6 @@ data_HARPPEDALPOSITION AttConverterBase::StrToHarppedalposition(const std::strin
     return HARPPEDALPOSITION_NONE;
 }
 
-std::string AttConverterBase::HeadshapeToStr(data_HEADSHAPE data) const
-{
-    std::string value;
-    switch (data) {
-        case HEADSHAPE_quarter: value = "quarter"; break;
-        case HEADSHAPE_half: value = "half"; break;
-        case HEADSHAPE_whole: value = "whole"; break;
-        case HEADSHAPE_backslash: value = "backslash"; break;
-        case HEADSHAPE_circle: value = "circle"; break;
-        case HEADSHAPE_plus: value = "+"; break;
-        case HEADSHAPE_diamond: value = "diamond"; break;
-        case HEADSHAPE_isotriangle: value = "isotriangle"; break;
-        case HEADSHAPE_oval: value = "oval"; break;
-        case HEADSHAPE_piewedge: value = "piewedge"; break;
-        case HEADSHAPE_rectangle: value = "rectangle"; break;
-        case HEADSHAPE_rtriangle: value = "rtriangle"; break;
-        case HEADSHAPE_semicircle: value = "semicircle"; break;
-        case HEADSHAPE_slash: value = "slash"; break;
-        case HEADSHAPE_square: value = "square"; break;
-        case HEADSHAPE_x: value = "x"; break;
-        default:
-            LogWarning("Unknown value '%d' for data.HEADSHAPE", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-data_HEADSHAPE AttConverterBase::StrToHeadshape(const std::string &value, bool logWarning) const
-{
-    if (value == "quarter") return HEADSHAPE_quarter;
-    if (value == "half") return HEADSHAPE_half;
-    if (value == "whole") return HEADSHAPE_whole;
-    if (value == "backslash") return HEADSHAPE_backslash;
-    if (value == "circle") return HEADSHAPE_circle;
-    if (value == "+") return HEADSHAPE_plus;
-    if (value == "diamond") return HEADSHAPE_diamond;
-    if (value == "isotriangle") return HEADSHAPE_isotriangle;
-    if (value == "oval") return HEADSHAPE_oval;
-    if (value == "piewedge") return HEADSHAPE_piewedge;
-    if (value == "rectangle") return HEADSHAPE_rectangle;
-    if (value == "rtriangle") return HEADSHAPE_rtriangle;
-    if (value == "semicircle") return HEADSHAPE_semicircle;
-    if (value == "slash") return HEADSHAPE_slash;
-    if (value == "square") return HEADSHAPE_square;
-    if (value == "x") return HEADSHAPE_x;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for data.HEADSHAPE", value.c_str());
-    return HEADSHAPE_NONE;
-}
-
 std::string AttConverterBase::HeadshapeListToStr(data_HEADSHAPE_list data) const
 {
     std::string value;

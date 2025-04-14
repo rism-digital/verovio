@@ -271,6 +271,30 @@ data_HEXNUM Att::StrToHexnum(std::string value, bool logWarning) const
     return 0;
 }
 
+std::string Att::HeadshapeToStr(data_HEADSHAPE data) const
+{
+    std::string value;
+    if (data.GetType() == HEADSHAPE_headShapeList)
+        value = HeadshapeListToStr(data.GetHeadShapeList());
+    else if (data.GetType() == HEADSHAPE_hexnum)
+        value = HexnumToStr(data.GetHexnum());
+
+    return value;
+}
+
+data_HEADSHAPE Att::StrToHeadshape(const std::string &value, bool logWarning) const
+{
+    data_HEADSHAPE data;
+    data.SetHeadShapeList(StrToHeadshapeList(value, false));
+    if (data.HasValue()) return data;
+    data.SetHexnum(StrToHexnum(value, false));
+    if (data.HasValue()) return data;
+
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.HEADSHAPE '%s'", value.c_str());
+
+    return data;
+}
+
 std::string Att::FontsizeToStr(data_FONTSIZE data) const
 {
     std::string value;

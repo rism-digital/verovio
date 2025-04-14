@@ -2910,7 +2910,9 @@ void MusicXmlInput::ReadMusicXmlNote(
         const pugi::xml_node notehead = node.child("notehead");
         if (notehead) {
             note->SetHeadColor(notehead.attribute("color").as_string());
-            note->SetHeadShape(ConvertNotehead(notehead.text().as_string()));
+            data_HEADSHAPE hs;
+            hs.SetHeadShapeList(ConvertNotehead(notehead.text().as_string()));
+            note->SetHeadShape(hs);
             if (notehead.attribute("parentheses").as_bool()) note->SetHeadMod(NOTEHEADMODIFIER_paren);
             note->SetGlyphName(notehead.attribute("smufl").as_string());
             auto noteHeadFill = notehead.attribute("filled");
@@ -4263,20 +4265,20 @@ std::u32string MusicXmlInput::ConvertTypeToVerovioText(const std::string &value)
     return std::u32string();
 }
 
-data_HEADSHAPE MusicXmlInput::ConvertNotehead(const std::string &value)
+data_HEADSHAPE_list MusicXmlInput::ConvertNotehead(const std::string &value)
 {
-    static const std::map<std::string, data_HEADSHAPE> Notehead2Id{
-        { "slash", HEADSHAPE_slash }, //
-        { "triangle", HEADSHAPE_rtriangle }, //
-        { "diamond", HEADSHAPE_diamond }, //
-        { "square", HEADSHAPE_square }, //
-        { "cross", HEADSHAPE_plus }, //
-        { "x", HEADSHAPE_x }, //
-        { "circle-x", HEADSHAPE_slash }, //
-        { "inverted triangle", HEADSHAPE_slash }, //
-        { "arrow down", HEADSHAPE_slash }, //
-        { "arrow up", HEADSHAPE_slash }, //
-        { "circle dot", HEADSHAPE_circle } //
+    static const std::map<std::string, data_HEADSHAPE_list> Notehead2Id{
+        { "slash", HEADSHAPE_list_slash }, //
+        { "triangle", HEADSHAPE_list_rtriangle }, //
+        { "diamond", HEADSHAPE_list_diamond }, //
+        { "square", HEADSHAPE_list_square }, //
+        { "cross", HEADSHAPE_list_plus }, //
+        { "x", HEADSHAPE_list_x }, //
+        { "circle-x", HEADSHAPE_list_slash }, //
+        { "inverted triangle", HEADSHAPE_list_slash }, //
+        { "arrow down", HEADSHAPE_list_slash }, //
+        { "arrow up", HEADSHAPE_list_slash }, //
+        { "circle dot", HEADSHAPE_list_circle } //
     };
 
     const auto result = Notehead2Id.find(value);
@@ -4284,7 +4286,7 @@ data_HEADSHAPE MusicXmlInput::ConvertNotehead(const std::string &value)
         return result->second;
     }
 
-    return HEADSHAPE_NONE;
+    return HEADSHAPE_list_NONE;
 }
 
 data_LINESTARTENDSYMBOL MusicXmlInput::ConvertLineEndSymbol(const std::string &value)

@@ -15144,7 +15144,9 @@ void HumdrumInput::checkForFingeredHarmonic(Chord *chord, hum::HTp token)
 
     if (middleo >= 0) {
         Note *middle = vrv_cast<Note *>(notes.at(middleo));
-        middle->SetHeadShape(HEADSHAPE_diamond);
+        data_HEADSHAPE hs;
+        hs.SetHeadShapeList(HEADSHAPE_list_diamond);
+        middle->SetHeadShape(hs);
     }
 
     // Mute all notes that are not the highest one in the chord:
@@ -26492,42 +26494,54 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     if (!head.empty()) {
         // See https://music-encoding.org/guidelines/v4/data-types/data.headshape.list.html
         // not all available in veorvio yet.
+        data_HEADSHAPE hs;
         if (head == "invis") {
             note->SetHeadVisible(BOOLEAN_false);
         }
         if (head == "x") {
-            note->SetHeadShape(HEADSHAPE_x);
+            hs.SetHeadShapeList(HEADSHAPE_list_x);
+            note->SetHeadShape(hs);
         }
         else if (head == "quarter") {
-            note->SetHeadShape(HEADSHAPE_quarter);
+            hs.SetHeadShapeList(HEADSHAPE_list_quarter);
+            note->SetHeadShape(hs);
         }
         else if (head == "solid") {
-            note->SetHeadShape(HEADSHAPE_quarter);
+            hs.SetHeadShapeList(HEADSHAPE_list_quarter);
+            note->SetHeadShape(hs);
         }
         else if (head == "open") {
-            note->SetHeadShape(HEADSHAPE_half);
+            hs.SetHeadShapeList(HEADSHAPE_list_half);
+            note->SetHeadShape(hs);
         }
         else if (head == "half") {
-            note->SetHeadShape(HEADSHAPE_half);
+            hs.SetHeadShapeList(HEADSHAPE_list_half);
+            note->SetHeadShape(hs);
         }
         else if (head == "whole") {
-            note->SetHeadShape(HEADSHAPE_whole);
+            hs.SetHeadShapeList(HEADSHAPE_list_whole);
+            note->SetHeadShape(hs);
         }
         else if (head == "rhombus") {
-            note->SetHeadShape(HEADSHAPE_diamond);
+            hs.SetHeadShapeList(HEADSHAPE_list_diamond);
+            note->SetHeadShape(hs);
         }
         else if (head.compare(0, 3, "dia") == 0) {
-            note->SetHeadShape(HEADSHAPE_diamond);
+            hs.SetHeadShapeList(HEADSHAPE_list_diamond);
+            note->SetHeadShape(hs);
         }
         else if (head.compare(0, 4, "odia") == 0) {
-            note->SetHeadShape(HEADSHAPE_diamond);
+            hs.SetHeadShapeList(HEADSHAPE_list_diamond);
+            note->SetHeadShape(hs);
             note->SetHeadFill(FILL_void);
         }
         else if (head == "slash") {
-            note->SetHeadShape(HEADSHAPE_slash);
+            hs.SetHeadShapeList(HEADSHAPE_list_slash);
+            note->SetHeadShape(hs);
         }
         else if (head == "plus") {
-            note->SetHeadShape(HEADSHAPE_plus);
+            hs.SetHeadShapeList(HEADSHAPE_list_plus);
+            note->SetHeadShape(hs);
         }
         else if (head == "regular") {
             // do nothing, using default nohead-shape
