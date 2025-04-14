@@ -63,7 +63,9 @@ data_VU Att::StrToVU(const std::string &value, bool logWarning) const
 {
     static const std::regex test("[+-]?[0-9]*(\\.[0-9]+)?(vu)?");
     if (!std::regex_match(value, test)) {
-        if (logWarning && !value.empty()) LogWarning("Unsupported virtual unit value '%s'", value.c_str());
+        if (logWarning && !value.empty()) {
+            LogWarning("Unsupported virtual unit value '%s'", value.c_str());
+        }
         return MEI_UNSET;
     }
     return atof(value.substr(0, value.find("vu")).c_str());
@@ -118,7 +120,9 @@ data_BEATRPT_REND Att::StrToBeatrptRend(const std::string &value, bool logWarnin
     if (value == "4") return BEATRPT_REND_4;
     if (value == "5") return BEATRPT_REND_5;
     if (value == "mixed") return BEATRPT_REND_mixed;
-    if (logWarning && !value.empty()) LogWarning("Unsupported beatrpt rend '%s'", value.c_str());
+    if (logWarning && !value.empty()) {
+        LogWarning("Unsupported beatrpt rend '%s'", value.c_str());
+    }
     return BEATRPT_REND_NONE;
 }
 
@@ -273,10 +277,12 @@ data_HEXNUM Att::StrToHexnum(std::string value, bool logWarning) const
 std::string Att::HeadshapeToStr(data_HEADSHAPE data) const
 {
     std::string value;
-    if (data.GetType() == HEADSHAPE_headShapeList)
+    if (data.GetType() == HEADSHAPE_headShapeList) {
         value = HeadshapeListToStr(data.GetHeadShapeList());
-    else if (data.GetType() == HEADSHAPE_hexnum)
+    }
+    else if (data.GetType() == HEADSHAPE_hexnum) {
         value = HexnumToStr(data.GetHexnum());
+    }
 
     return value;
 }
@@ -289,7 +295,9 @@ data_HEADSHAPE Att::StrToHeadshape(const std::string &value, bool logWarning) co
     data.SetHexnum(StrToHexnum(value, false));
     if (data.HasValue()) return data;
 
-    if (logWarning && !value.empty()) LogWarning("Unsupported data.HEADSHAPE '%s'", value.c_str());
+    if (logWarning && !value.empty()) {
+        LogWarning("Unsupported data.HEADSHAPE '%s'", value.c_str());
+    }
 
     return data;
 }
@@ -297,12 +305,15 @@ data_HEADSHAPE Att::StrToHeadshape(const std::string &value, bool logWarning) co
 std::string Att::FontsizeToStr(data_FONTSIZE data) const
 {
     std::string value;
-    if (data.GetType() == FONTSIZE_fontSizeNumeric)
+    if (data.GetType() == FONTSIZE_fontSizeNumeric) {
         value = StringFormat("%fpt", data.GetFontSizeNumeric());
-    else if (data.GetType() == FONTSIZE_term)
+    }
+    else if (data.GetType() == FONTSIZE_term) {
         value = FontsizetermToStr(data.GetTerm());
-    else if (data.GetType() == FONTSIZE_percent)
+    }
+    else if (data.GetType() == FONTSIZE_percent) {
         value = PercentToStr(data.GetPercent());
+    }
 
     return value;
 }
@@ -317,7 +328,9 @@ data_FONTSIZE Att::StrToFontsize(const std::string &value, bool logWarning) cons
     data.SetPercent(StrToPercent(value, false));
     if (data.HasValue()) return data;
 
-    if (logWarning && !value.empty()) LogWarning("Unsupported data.FONTSIZE '%s'", value.c_str());
+    if (logWarning && !value.empty()) {
+        LogWarning("Unsupported data.FONTSIZE '%s'", value.c_str());
+    }
 
     return data;
 }
@@ -325,10 +338,12 @@ data_FONTSIZE Att::StrToFontsize(const std::string &value, bool logWarning) cons
 std::string Att::LinewidthToStr(data_LINEWIDTH data) const
 {
     std::string value;
-    if (data.GetType() == LINEWIDTHTYPE_lineWidthTerm)
+    if (data.GetType() == LINEWIDTHTYPE_lineWidthTerm) {
         value = data.GetLineWithTerm();
-    else if (data.GetType() == LINEWIDTHTYPE_measurementunsigned)
+    }
+    else if (data.GetType() == LINEWIDTHTYPE_measurementunsigned) {
         value = MeasurementunsignedToStr(data.GetMeasurementunsigned());
+    }
 
     return value;
 }
@@ -341,7 +356,9 @@ data_LINEWIDTH Att::StrToLinewidth(const std::string &value, bool logWarning) co
     data.SetMeasurementunsigned(StrToMeasurementunsigned(value));
     if (data.HasValue()) return data;
 
-    if (logWarning && !value.empty()) LogWarning("Unsupported data.LINEWIDTH '%s'", value.c_str());
+    if (logWarning && !value.empty()) {
+        LogWarning("Unsupported data.LINEWIDTH '%s'", value.c_str());
+    }
 
     return data;
 }
@@ -355,7 +372,9 @@ data_FONTSIZENUMERIC Att::StrToFontsizenumeric(const std::string &value, bool lo
 {
     static const std::regex test("[0-9]*(\\.[0-9]+)?(pt)");
     if (!std::regex_match(value, test)) {
-        if (logWarning && !value.empty()) LogWarning("Unsupported data.FONTSIZENUMERIC '%s'", value.c_str());
+        if (logWarning && !value.empty()) {
+            LogWarning("Unsupported data.FONTSIZENUMERIC '%s'", value.c_str());
+        }
         return MEI_UNSET;
     }
     return atof(value.substr(0, value.find("pt")).c_str());
@@ -457,8 +476,9 @@ data_MEASUREMENTSIGNED Att::StrToMeasurementsigned(const std::string &value, boo
         data.SetVu(atof(value.c_str()));
     }
 
-    if (logWarning && !value.empty() && !data.HasValue())
+    if (logWarning && !value.empty() && !data.HasValue()) {
         LogWarning("Unsupported data.MEASUREMENTSIGNED '%s'", value.c_str());
+    }
 
     return data;
 }
@@ -515,10 +535,12 @@ data_METERCOUNT_pair Att::StrToMetercountPair(const std::string &value) const
 std::string Att::MidivalueNameToStr(data_MIDIVALUE_NAME data) const
 {
     std::string value;
-    if (data.GetType() == MIDIVALUENAMETYPE_midivalue)
+    if (data.GetType() == MIDIVALUENAMETYPE_midivalue) {
         value = MidivalueToStr(data.GetMidivalue());
-    else if (data.GetType() == MIDIVALUENAMETYPE_mcname)
+    }
+    else if (data.GetType() == MIDIVALUENAMETYPE_mcname) {
         value = NcnameToStr(data.GetNcname());
+    }
 
     return value;
 }
@@ -531,7 +553,9 @@ data_MIDIVALUE_NAME Att::StrToMidivalueName(const std::string &value, bool logWa
     data.SetNcname(StrToNcname(value));
     if (data.HasValue()) return data;
 
-    if (logWarning && !value.empty()) LogWarning("Unsupported data.MIDIVALUE_NAME '%s'", value.c_str());
+    if (logWarning && !value.empty()) {
+        LogWarning("Unsupported data.MIDIVALUE_NAME '%s'", value.c_str());
+    }
 
     return data;
 }
@@ -539,10 +563,12 @@ data_MIDIVALUE_NAME Att::StrToMidivalueName(const std::string &value, bool logWa
 std::string Att::MidivaluePanToStr(data_MIDIVALUE_PAN data) const
 {
     std::string value;
-    if (data.GetType() == MIDIVALUEPANTYPE_midivalue)
+    if (data.GetType() == MIDIVALUEPANTYPE_midivalue) {
         value = MidivalueToStr(data.GetMidivalue());
-    else if (data.GetType() == MIDIVALUEPANTYPE_percentLimitedSigned)
+    }
+    else if (data.GetType() == MIDIVALUEPANTYPE_percentLimitedSigned) {
         value = PercentLimitedSignedToStr(data.GetPercentLimitedSigned());
+    }
 
     return value;
 }
@@ -555,7 +581,9 @@ data_MIDIVALUE_PAN Att::StrToMidivaluePan(const std::string &value, bool logWarn
     data.SetPercentLimitedSigned(StrToPercentLimitedSigned(value));
     if (data.HasValue()) return data;
 
-    if (logWarning && !value.empty()) LogWarning("Unsupported data.MIDIVALUE_PAN '%s'", value.c_str());
+    if (logWarning && !value.empty()) {
+        LogWarning("Unsupported data.MIDIVALUE_PAN '%s'", value.c_str());
+    }
 
     return data;
 }
@@ -578,7 +606,9 @@ data_MODUSMAIOR Att::StrToModusmaior(const std::string &value, bool logWarning) 
 {
     if (value == "2") return MODUSMAIOR_2;
     if (value == "3") return MODUSMAIOR_3;
-    if (logWarning && !value.empty()) LogWarning("Unsupported data.MODUSMAIOR '%s'", value.c_str());
+    if (logWarning && !value.empty()) {
+        LogWarning("Unsupported data.MODUSMAIOR '%s'", value.c_str());
+    }
     return MODUSMAIOR_NONE;
 }
 
@@ -600,7 +630,9 @@ data_MODUSMINOR Att::StrToModusminor(const std::string &value, bool logWarning) 
 {
     if (value == "2") return MODUSMINOR_2;
     if (value == "3") return MODUSMINOR_3;
-    if (logWarning && !value.empty()) LogWarning("Unsupported data.MODUSMINOR '%s'", value.c_str());
+    if (logWarning && !value.empty()) {
+        LogWarning("Unsupported data.MODUSMINOR '%s'", value.c_str());
+    }
     return MODUSMINOR_NONE;
 }
 
@@ -624,7 +656,9 @@ data_OCTAVE_DIS Att::StrToOctaveDis(const std::string &value, bool logWarning) c
     if (value == "8") return OCTAVE_DIS_8;
     if (value == "15") return OCTAVE_DIS_15;
     if (value == "22") return OCTAVE_DIS_22;
-    if (logWarning && !value.empty()) LogWarning("Unsupported data.OCTAVE.DIS '%s'", value.c_str());
+    if (logWarning && !value.empty()) {
+        LogWarning("Unsupported data.OCTAVE.DIS '%s'", value.c_str());
+    }
     return OCTAVE_DIS_NONE;
 }
 
@@ -648,7 +682,9 @@ data_ORIENTATION Att::StrToOrientation(const std::string &value, bool logWarning
     if (value == "reversed") return ORIENTATION_reversed;
     if (value == "90CW") return ORIENTATION_90CW;
     if (value == "90CCW") return ORIENTATION_90CCW;
-    if (logWarning && !value.empty()) LogWarning("Unsupported data.ORIENTATION '%s'", value.c_str());
+    if (logWarning && !value.empty()) {
+        LogWarning("Unsupported data.ORIENTATION '%s'", value.c_str());
+    }
     return ORIENTATION_NONE;
 }
 
@@ -681,7 +717,9 @@ data_PERCENT_LIMITED_SIGNED Att::StrToPercentLimitedSigned(const std::string &va
 {
     static const std::regex test("(+|-)?[0-9]+(\\.?[0-9]*)?%");
     if (!std::regex_match(value, test)) {
-        if (logWarning) LogWarning("Unsupported data.PERCENT.LIMITED.SIGNED '%s'", value.c_str());
+        if (logWarning) {
+            LogWarning("Unsupported data.PERCENT.LIMITED.SIGNED '%s'", value.c_str());
+        }
         return 0;
     }
     return atof(value.substr(0, value.find("%")).c_str());
@@ -715,19 +753,24 @@ data_PITCHNAME Att::StrToPitchname(const std::string &value, bool logWarning) co
     if (value == "g") return PITCHNAME_g;
     if (value == "a") return PITCHNAME_a;
     if (value == "b") return PITCHNAME_b;
-    if (logWarning && !value.empty()) LogWarning("Unsupported data.PITCHNAME '%s'", value.c_str());
+    if (logWarning && !value.empty()) {
+        LogWarning("Unsupported data.PITCHNAME '%s'", value.c_str());
+    }
     return PITCHNAME_NONE;
 }
 
 std::string Att::PlacementToStr(data_PLACEMENT data) const
 {
     std::string value;
-    if (data.GetType() == PLACEMENT_staffRel)
+    if (data.GetType() == PLACEMENT_staffRel) {
         value = StaffrelToStr(data.GetStaffRel());
-    else if (data.GetType() == PLACEMENT_nonStaffPlace)
+    }
+    else if (data.GetType() == PLACEMENT_nonStaffPlace) {
         value = NonstaffplaceToStr(data.GetNonStaffPlace());
-    else if (data.GetType() == PLACEMENT_nmtoken)
+    }
+    else if (data.GetType() == PLACEMENT_nmtoken) {
         value = data.GetNMToken();
+    }
 
     return value;
 }
@@ -743,7 +786,9 @@ data_PLACEMENT Att::StrToPlacement(const std::string &value, bool logWarning) co
     data.SetNMToken(value);
     if (data.HasValue()) return data;
 
-    if (logWarning && !value.empty()) LogWarning("Unsupported data.PLACEMENT '%s'", value.c_str());
+    if (logWarning && !value.empty()) {
+        LogWarning("Unsupported data.PLACEMENT '%s'", value.c_str());
+    }
 
     return data;
 }
@@ -766,7 +811,9 @@ data_PROLATIO Att::StrToProlatio(const std::string &value, bool logWarning) cons
 {
     if (value == "2") return PROLATIO_2;
     if (value == "3") return PROLATIO_3;
-    if (logWarning && !value.empty()) LogWarning("Unsupported data.PROLATIO '%s'", value.c_str());
+    if (logWarning && !value.empty()) {
+        LogWarning("Unsupported data.PROLATIO '%s'", value.c_str());
+    }
     return PROLATIO_NONE;
 }
 
@@ -788,7 +835,9 @@ data_TEMPUS Att::StrToTempus(const std::string &value, bool logWarning) const
 {
     if (value == "2") return TEMPUS_2;
     if (value == "3") return TEMPUS_3;
-    if (logWarning && !value.empty()) LogWarning("Unsupported data.TEMPUS '%s'", value.c_str());
+    if (logWarning && !value.empty()) {
+        LogWarning("Unsupported data.TEMPUS '%s'", value.c_str());
+    }
     return TEMPUS_NONE;
 }
 
@@ -812,7 +861,9 @@ data_TIE Att::StrToTie(const std::string &value, bool logWarning) const
     if (value == "i") return TIE_i;
     if (value == "m") return TIE_m;
     if (value == "t") return TIE_t;
-    if (logWarning && !value.empty()) LogWarning("Unsupported data.TIE '%s'", value.c_str());
+    if (logWarning && !value.empty()) {
+        LogWarning("Unsupported data.TIE '%s'", value.c_str());
+    }
     return TIE_NONE;
 }
 
