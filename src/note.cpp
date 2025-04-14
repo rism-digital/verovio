@@ -688,6 +688,9 @@ char32_t Note::GetNoteheadGlyph(const data_DURATION duration) const
                 default: break;
             }
         }
+        else if (hs->GetType() == HEADSHAPE_hexnum) {
+            return (this->GetHeadShape().GetHexnum());
+        }
     }
 
     switch (this->GetHeadMod()) {

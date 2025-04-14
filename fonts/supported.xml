@@ -197,7 +197,7 @@
         <!--<glyph glyph-code="E0B0" smufl-name="noteheadCircleXDoubleWhole" />-->
         <!--<glyph glyph-code="E0B1" smufl-name="noteheadCircleXWhole" />-->
         <!--<glyph glyph-code="E0B2" smufl-name="noteheadCircleXHalf" />-->
-        <!--<glyph glyph-code="E0B3" smufl-name="noteheadCircleX" />-->
+        <glyph glyph-code="E0B3" smufl-name="noteheadCircleX" />
         <!--<glyph glyph-code="E0B4" smufl-name="noteheadDoubleWholeWithX" />-->
         <glyph glyph-code="E0B5" smufl-name="noteheadWholeWithX" />
         <glyph glyph-code="E0B6" smufl-name="noteheadHalfWithX" />

@@ -609,6 +609,10 @@
     <a n="stemDownNW" x="0.0" y="0.01" />
     <a n="stemUpSE" x="1.33" y="-0.06" />
   </g>
+  <g c="E0B3" x="0.0" y="-179.0" w="344.0" h="354.13" h-a-x="344" n="noteheadCircleX">
+    <a n="stemDownNW" x="0.0" y="-0.01" />
+    <a n="stemUpSE" x="1.38" y="-0.01" />
+  </g>
   <g c="E0B5" x="0.0" y="-157.0" w="476.0" h="314.0" h-a-x="476" n="noteheadWholeWithX" />
   <g c="E0B6" x="0.0" y="-148.67" w="520.0" h="300.67" h-a-x="520" n="noteheadHalfWithX">
     <a n="stemDownNW" x="0.0" y="-0.02" />
