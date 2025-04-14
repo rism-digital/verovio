@@ -249,25 +249,24 @@ std::string Att::HexnumToStr(data_HEXNUM data) const
 
 data_HEXNUM Att::StrToHexnum(std::string value, bool logWarning) const
 {
-    std::string prefix1 = "U+";
-    std::string prefix2 = "#x";
-    if (value.compare(0, prefix1.length(), prefix1) == 0) {
-        value.erase(0, 2);
-    }
-    else if (value.compare(0, prefix2.length(), prefix2) == 0) {
+    if (value.starts_with("U+") || value.starts_with("#x")) {
         value.erase(0, 2);
     }
     else {
-        LogWarning("Unable to parse glyph code '%s'", value.c_str());
+        if (logWarning) {
+            LogWarning("Unable to parse glyph code '%s'. Unknown prefix value.", value.c_str());
+        }
         return 0;
     }
     char32_t wc = (char32_t)strtol(value.c_str(), NULL, 16);
     // Check that the value is in a SMuFL private area range - this does not check that it is an
     // existing SMuFL glyph num or that it is supported by Verovio
-    if ((wc >= 0xE000) && (wc <= 0xF8FF))
+    if ((wc >= 0xE000) && (wc <= 0xF8FF)) {
         return wc;
-    else if (logWarning && !value.empty())
+    }
+    else if (logWarning && !value.empty()) {
         LogWarning("Value '%s' is not in the SMuFL (private area) range", value.c_str());
+    }
     return 0;
 }
 
