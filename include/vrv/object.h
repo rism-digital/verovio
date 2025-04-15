@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <functional>
 #include <iterator>
+#include <optional>
 #include <map>
 #include <string>
 
