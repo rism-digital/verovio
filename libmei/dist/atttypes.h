@@ -830,30 +830,6 @@ enum data_HARPPEDALPOSITION : int8_t {
 };
 
 /**
- * MEI data.HEADSHAPE
- */
-enum data_HEADSHAPE : int8_t {
-    HEADSHAPE_NONE = 0,
-    HEADSHAPE_quarter,
-    HEADSHAPE_half,
-    HEADSHAPE_whole,
-    HEADSHAPE_backslash,
-    HEADSHAPE_circle,
-    HEADSHAPE_plus,
-    HEADSHAPE_diamond,
-    HEADSHAPE_isotriangle,
-    HEADSHAPE_oval,
-    HEADSHAPE_piewedge,
-    HEADSHAPE_rectangle,
-    HEADSHAPE_rtriangle,
-    HEADSHAPE_semicircle,
-    HEADSHAPE_slash,
-    HEADSHAPE_square,
-    HEADSHAPE_x,
-    HEADSHAPE_MAX
-};
-
-/**
  * MEI data.HEADSHAPE.list
  */
 enum data_HEADSHAPE_list : int8_t {
