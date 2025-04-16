@@ -671,13 +671,16 @@ bool EditorToolkitCMN::Context(std::string &elementId, bool contentOnly)
 {
     m_editInfo.reset();
 
+    bool hasTargetID = (elementId != "[unspecified]");
     Object *object = NULL;
-    if (elementId == "[unspecified]") {
-        object = m_doc->GetDrawingPage()->FindDescendantByType(MEASURE);
-    }
-    else {
+    if (hasTargetID) {
         object = this->GetElement(elementId);
     }
+    // Retrieve the context from the first measure in the current page
+    else {
+        object = m_doc->GetDrawingPage()->FindDescendantByType(MEASURE);
+    }
+    // We cannot continue without object
     if (!object || !object->GetParent()) return false;
 
     ListOfConstObjects objects;
@@ -757,15 +760,17 @@ bool EditorToolkitCMN::Context(std::string &elementId, bool contentOnly)
     // The target object
     jsonxx::Object jsonObject;
     this->ContextForObject(object, jsonObject);
-    // Include its children
-    jsonxx::Array jsonObjectChildren;
-    ListOfConstObjects objectChildren;
-    const ArrayOfObjects &objectsArr = object->GetChildren();
-    std::copy(objectsArr.begin(), objectsArr.end(), std::back_inserter(objectChildren));
-    this->ContextForObjects(objectChildren, jsonObjectChildren);
-    if (!jsonObjectChildren.empty()) jsonObject << "children" << jsonObjectChildren;
-    // Add it to the list
-    contextChildren << jsonObject;
+    // Include its children, but only if we specified a target ID
+    if (hasTargetID) {
+        jsonxx::Array jsonObjectChildren;
+        ListOfConstObjects objectChildren;
+        const ArrayOfObjects &objectsArr = object->GetChildren();
+        std::copy(objectsArr.begin(), objectsArr.end(), std::back_inserter(objectChildren));
+        this->ContextForObjects(objectChildren, jsonObjectChildren);
+        if (!jsonObjectChildren.empty()) jsonObject << "children" << jsonObjectChildren;
+        // Add it to the list
+        contextChildren << jsonObject;
+    }
 
     // Following siblings
     this->ContextForObjects(following, elements);
@@ -774,6 +779,15 @@ bool EditorToolkitCMN::Context(std::string &elementId, bool contentOnly)
     // Add all children of to context (include target and surrounding siblings)
     jsonContext << "children" << contextChildren;
     m_editInfo << "context" << jsonContext;
+
+    // Stop here without targetID, but still add empty objects or arrays to the info
+    if (!hasTargetID) {
+        m_editInfo << "attributes" << jsonxx::Object();
+        m_editInfo << "object" << jsonxx::Object();
+        m_editInfo << "referringElements" << jsonxx::Array();
+        m_editInfo << "referencedElements" << jsonxx::Array();
+        return true;
+    }
 
     // Inlude all attributes
     ArrayOfStrAttr attributes;
