@@ -35,7 +35,7 @@ public:
     virtual ~AnnotScore();
     // Object *Clone() const override { return new AnnotScore(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "annotScore"; }
+    std::string GetClassName() const override { return "annot"; }
     ///@}
 
     /**
