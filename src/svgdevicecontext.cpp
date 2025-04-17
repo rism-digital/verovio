@@ -632,8 +632,10 @@ void SvgDeviceContext::PrefixCssRules(std::string &rules)
             prefixedSelectors.push_back("#" + m_docId + " " + selector);
         }
 
+        if (prefixedSelectors.empty()) continue;
+
         std::string finalSelector = std::accumulate(std::next(prefixedSelectors.begin()), prefixedSelectors.end(),
-            prefixedSelectors[0], [](std::string a, std::string b) { return a + ", " + b; });
+            prefixedSelectors.at(0), [](std::string a, std::string b) { return a + ", " + b; });
 
         result += finalSelector + " {" + properties + "}";
         ++it;
