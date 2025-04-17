@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <cassert>
+#include <numeric>
 #include <regex>
 
 //----------------------------------------------------------------------------
@@ -610,7 +611,6 @@ void SvgDeviceContext::AppendStrokeDashArray(pugi::xml_node node, const Pen &pen
 void SvgDeviceContext::PrefixCssRules(std::string &rules)
 {
     static std::regex selectorRegex(R"(([^{}]+)\s*\{([^}]*)\})");
-    static std::regex multiSelectorRegex(R"((\b\w+\.?[\w-]+\b))");
 
     std::sregex_iterator it(rules.begin(), rules.end(), selectorRegex);
     std::sregex_iterator end;
@@ -618,19 +618,26 @@ void SvgDeviceContext::PrefixCssRules(std::string &rules)
     std::string result;
 
     while (it != end) {
-
         std::string selectors = (*it)[1].str();
         std::string properties = (*it)[2].str();
 
-        // Trim trailing spaces from selectors to prevent extra spaces before `{`
-        selectors = std::regex_replace(selectors, std::regex(R"(\s+$)"), "");
+        // Split by comma to handle multi-selectors
+        std::stringstream ss(selectors);
+        std::string selector;
+        std::vector<std::string> prefixedSelectors;
 
-        // Prepend `#docId` to each selector
-        selectors = std::regex_replace(selectors, multiSelectorRegex, "#" + m_docId + " $1");
+        while (std::getline(ss, selector, ',')) {
+            // Trim whitespace
+            selector = std::regex_replace(selector, std::regex(R"(^\s+|\s+$)"), "");
+            prefixedSelectors.push_back("#" + m_docId + " " + selector);
+        }
 
-        // Keep contents inside `{}` unchanged
-        result += selectors + " {" + properties + "}";
+        if (prefixedSelectors.empty()) continue;
 
+        std::string finalSelector = std::accumulate(std::next(prefixedSelectors.begin()), prefixedSelectors.end(),
+            prefixedSelectors.at(0), [](std::string a, std::string b) { return a + ", " + b; });
+
+        result += finalSelector + " {" + properties + "}";
         ++it;
     }
 
