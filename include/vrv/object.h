@@ -43,6 +43,7 @@ class StemmedDrawingInterface;
 class TextDirInterface;
 class TimePointInterface;
 class TimeSpanningInterface;
+class VisibilityDrawingInterface;
 class Zone;
 
 #define UNLIMITED_DEPTH -10000
@@ -186,6 +187,8 @@ public:
     virtual const TimePointInterface *GetTimePointInterface() const { return NULL; }
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return NULL; }
     virtual const TimeSpanningInterface *GetTimeSpanningInterface() const { return NULL; }
+    virtual VisibilityDrawingInterface *GetVisibilityDrawingInterface() { return NULL; }
+    virtual const VisibilityDrawingInterface *GetVisibilityDrawingInterface() const { return NULL; }
     ///@}
 
     /**

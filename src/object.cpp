@@ -1173,7 +1173,7 @@ bool Object::SkipChildren(bool visibleOnly) const
 {
     if (visibleOnly) {
         if (this->IsEditorialElement() || this->Is(MDIV) || this->IsSystemElement()) {
-            const VisibilityDrawingInterface *interface = vrv_cast<const VisibilityDrawingInterface *>(this);
+            const VisibilityDrawingInterface *interface = this->GetVisibilityDrawingInterface();
             assert(interface);
             if (interface->IsHidden()) {
                 return true;
