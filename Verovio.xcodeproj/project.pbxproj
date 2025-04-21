@@ -351,6 +351,12 @@
 		4D674B48255F40B7008AEF4C /* plica.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D674B45255F40B7008AEF4C /* plica.cpp */; };
 		4D674B49255F40B7008AEF4C /* plica.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D674B45255F40B7008AEF4C /* plica.cpp */; };
 		4D677B5E2D9D7224006A2EF7 /* scoringupfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B464F48E2C6D664300A778D2 /* scoringupfunctor.cpp */; };
+		4D6B00EB2DB6788200313743 /* editfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B00EA2DB6788200313743 /* editfunctor.cpp */; };
+		4D6B00EC2DB6788200313743 /* editfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B00EA2DB6788200313743 /* editfunctor.cpp */; };
+		4D6B00ED2DB6788200313743 /* editfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B00EA2DB6788200313743 /* editfunctor.cpp */; };
+		4D6B00EE2DB6788200313743 /* editfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B00EA2DB6788200313743 /* editfunctor.cpp */; };
+		4D6B00F02DB6789900313743 /* editfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D6B00EF2DB6789900313743 /* editfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D6B00F12DB6789900313743 /* editfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D6B00EF2DB6789900313743 /* editfunctor.h */; };
 		4D6DF9F520E1071F00C12BBD /* subst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6DF9F420E1071E00C12BBD /* subst.cpp */; };
 		4D6DF9F720E1074100C12BBD /* subst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6DF9F420E1071E00C12BBD /* subst.cpp */; };
 		4D6DF9F820E1074200C12BBD /* subst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6DF9F420E1071E00C12BBD /* subst.cpp */; };
@@ -1909,6 +1915,8 @@
 		4D6479402C9C0F2D00CD9539 /* genericlayerelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = genericlayerelement.h; path = include/vrv/genericlayerelement.h; sourceTree = "<group>"; };
 		4D674B3E255F40AC008AEF4C /* plica.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = plica.h; path = include/vrv/plica.h; sourceTree = "<group>"; };
 		4D674B45255F40B7008AEF4C /* plica.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = plica.cpp; path = src/plica.cpp; sourceTree = "<group>"; };
+		4D6B00EA2DB6788200313743 /* editfunctor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = editfunctor.cpp; path = src/editfunctor.cpp; sourceTree = "<group>"; };
+		4D6B00EF2DB6789900313743 /* editfunctor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = editfunctor.h; path = include/vrv/editfunctor.h; sourceTree = "<group>"; };
 		4D6DF9F420E1071E00C12BBD /* subst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = subst.cpp; path = src/subst.cpp; sourceTree = "<group>"; };
 		4D6DF9F620E1072B00C12BBD /* subst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = subst.h; path = include/vrv/subst.h; sourceTree = "<group>"; };
 		4D71BEA62D875DF800CE0001 /* atts_stringtab.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = atts_stringtab.h; path = libmei/dist/atts_stringtab.h; sourceTree = "<group>"; };
@@ -3126,6 +3134,8 @@
 				E763EF3E29E939C00029E56D /* convertfunctor.h */,
 				4DEBE6E32B36E79600B67DFB /* facsimilefunctor.cpp */,
 				4DEBE6E02B36E78900B67DFB /* facsimilefunctor.h */,
+				4D6B00EA2DB6788200313743 /* editfunctor.cpp */,
+				4D6B00EF2DB6789900313743 /* editfunctor.h */,
 				E74A806028BC9111005274E7 /* findfunctor.cpp */,
 				E74A806528BC97D5005274E7 /* findfunctor.h */,
 				E722106528F856C4002CD6E9 /* findlayerelementsfunctor.cpp */,
@@ -3286,6 +3296,7 @@
 				E765675928BBFBA400BC6490 /* functorinterface.h in Headers */,
 				E78F204F29D9B02600CD5910 /* calcbboxoverflowsfunctor.h in Headers */,
 				8F59293C18854BF800FE51AD /* durationinterface.h in Headers */,
+				4D6B00F12DB6789900313743 /* editfunctor.h in Headers */,
 				8F59293D18854BF800FE51AD /* toolkit.h in Headers */,
 				E763EF3F29E939C00029E56D /* convertfunctor.h in Headers */,
 				4D1D733C1A1D0390001E08F6 /* smufl.h in Headers */,
@@ -3622,6 +3633,7 @@
 				4D1EB6A72A2A40CB00AF2F98 /* textlayoutelement.h in Headers */,
 				4D2E759022BC2B71004C51F0 /* course.h in Headers */,
 				BB4C4AA722A932A0001F6AF0 /* bboxdevicecontext.h in Headers */,
+				4D6B00F02DB6789900313743 /* editfunctor.h in Headers */,
 				BB4C4AF822A932BC001F6AF0 /* reg.h in Headers */,
 				BB4C4AF022A932BC001F6AF0 /* lem.h in Headers */,
 				4D3C3F12294B89C9009993E6 /* ornam.h in Headers */,
@@ -4008,6 +4020,7 @@
 				400FEDD6206FA74D000D3233 /* gracegrp.cpp in Sources */,
 				4DE0198F2C495E7400B5B6BF /* iovolpiano.cpp in Sources */,
 				4D1AC9782B6A9BB200434023 /* filereader.cpp in Sources */,
+				4D6B00EE2DB6788200313743 /* editfunctor.cpp in Sources */,
 				4D89F90F201771AE00A4D336 /* num.cpp in Sources */,
 				4D1693F71E3A44F300569BF4 /* bboxdevicecontext.cpp in Sources */,
 				4D1693F81E3A44F300569BF4 /* beam.cpp in Sources */,
@@ -4413,6 +4426,7 @@
 				4DEC4DAE21C81F0600D1D273 /* sic.cpp in Sources */,
 				40C2E41F2052A6E00003625F /* pb.cpp in Sources */,
 				4DF440771D39575500152B7E /* ending.cpp in Sources */,
+				4D6B00EC2DB6788200313743 /* editfunctor.cpp in Sources */,
 				4DB351141C8040B1002DD057 /* dir.cpp in Sources */,
 				4D308104203DB6B500BC44F6 /* ref.cpp in Sources */,
 				E7770F8629D0DA1800A9BECF /* adjustslursfunctor.cpp in Sources */,
@@ -4595,6 +4609,7 @@
 				8F3DD36718854B410051330C /* verticalaligner.cpp in Sources */,
 				4DE019902C495E7600B5B6BF /* iovolpiano.cpp in Sources */,
 				4D1AC9792B6A9BB200434023 /* filereader.cpp in Sources */,
+				4D6B00ED2DB6788200313743 /* editfunctor.cpp in Sources */,
 				4D766F0220ACAD6E006875D8 /* nc.cpp in Sources */,
 				4DEC4D9821C81E3B00D1D273 /* expan.cpp in Sources */,
 				4D3C3F0E294B89AF009993E6 /* ornam.cpp in Sources */,
@@ -4889,6 +4904,7 @@
 				BB4C4AA122A9328F001F6AF0 /* verticalaligner.cpp in Sources */,
 				4DE019912C495E7700B5B6BF /* iovolpiano.cpp in Sources */,
 				4D1AC97A2B6A9BB200434023 /* filereader.cpp in Sources */,
+				4D6B00EB2DB6788200313743 /* editfunctor.cpp in Sources */,
 				BB4C4B2F22A932CF001F6AF0 /* pedal.cpp in Sources */,
 				4D2E759222BC2B80004C51F0 /* tuning.cpp in Sources */,
 				BB4C4B4922A932D7001F6AF0 /* clef.cpp in Sources */,

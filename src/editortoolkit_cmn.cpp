@@ -19,9 +19,12 @@
 #include "comparison.h"
 #include "dir.h"
 #include "dynam.h"
+#include "editfunctor.h"
+#include "editorial.h"
 #include "findfunctor.h"
 #include "hairpin.h"
 #include "layer.h"
+#include "mdiv.h"
 #include "measure.h"
 #include "mnum.h"
 #include "note.h"
@@ -33,6 +36,7 @@
 #include "staff.h"
 #include "surface.h"
 #include "symboldef.h"
+#include "systemelement.h"
 #include "tie.h"
 #include "timeinterface.h"
 #include "vrv.h"
@@ -95,9 +99,18 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
     }
     else if (action == "context") {
         std::string elementId;
-        bool contentOnly;
-        if (this->ParseContextAction(json.get<jsonxx::Object>("param"), elementId, contentOnly)) {
-            return this->Context(elementId, contentOnly);
+        bool scores;
+        bool sections;
+        if (this->ParseContextAction(json.get<jsonxx::Object>("param"), elementId, scores, sections)) {
+            if (scores) {
+                return this->ContextForScores(true);
+            }
+            else if (sections) {
+                return this->ContextForSections(true);
+            }
+            else {
+                return this->ContextForElement(elementId);
+            }
         }
         LogWarning("Could not parse the context action");
     }
@@ -150,14 +163,17 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
     return false;
 }
 
-bool EditorToolkitCMN::ParseContextAction(jsonxx::Object param, std::string &elementId, bool &contentOnly)
+bool EditorToolkitCMN::ParseContextAction(jsonxx::Object param, std::string &elementId, bool &scores, bool &sections)
 {
-    contentOnly = false;
-    if (!param.has<jsonxx::String>("elementId")) return false;
-    elementId = param.get<jsonxx::String>("elementId");
-    // optional
-    if (param.has<jsonxx::Boolean>("contentOnly")) {
-        contentOnly = param.get<jsonxx::Boolean>("contentOnly");
+    scores = false;
+    sections = false;
+    if (param.has<jsonxx::String>("elementId")) {
+        elementId = param.get<jsonxx::String>("elementId");
+        return true;
+    }
+    else if (param.has<jsonxx::String>("document")) {
+        scores = param.get<jsonxx::String>("document") == "scores";
+        sections = !scores;
     }
     return true;
 }
@@ -667,7 +683,49 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
     }
 }
 
-bool EditorToolkitCMN::Context(std::string &elementId, bool contentOnly)
+bool EditorToolkitCMN::ContextForScores(bool editInfo)
+{
+    if (!m_scoreContext) {
+        m_scoreContext = new EditorTreeObject(m_doc);
+        StructFunctor structFunct(m_scoreContext, true);
+        m_doc->Process(structFunct);
+    }
+    
+    if (!editInfo) return true;
+    
+    m_editInfo.reset();
+    
+    // The target object
+    jsonxx::Object jsonObject;
+    this->ContextForObject(m_scoreContext, jsonObject, true);
+    
+    m_editInfo << jsonObject;
+    
+    return true;
+}
+
+bool EditorToolkitCMN::ContextForSections(bool editInfo)
+{
+    if (!m_sectionContext) {
+        m_sectionContext = new EditorTreeObject(m_doc);
+        StructFunctor structFunct(m_sectionContext, false);
+        m_doc->Process(structFunct);
+    }
+    
+    if (!editInfo) return true;
+    
+    m_editInfo.reset();
+    
+    // The target object
+    jsonxx::Object jsonObject;
+    this->ContextForObject(m_sectionContext, jsonObject, true);
+    
+    m_editInfo << jsonObject;
+    
+    return true;
+}
+
+bool EditorToolkitCMN::ContextForElement(std::string &elementId)
 {
     m_editInfo.reset();
 
@@ -686,6 +744,8 @@ bool EditorToolkitCMN::Context(std::string &elementId, bool contentOnly)
     ListOfConstObjects objects;
     ListOfConstObjects::iterator targetIt;
 
+    const Object *sectionDelimiter = NULL;
+
     if (object->GetParent()->Is(SYSTEM)) {
         ChildOfClassIdComparison systemChild(SYSTEM);
         // System children are level 4, no needt to go deeper
@@ -696,17 +756,19 @@ bool EditorToolkitCMN::Context(std::string &elementId, bool contentOnly)
         if (targetIt == objects.end()) return false;
 
         // Lambda to check if the object is a delimiter (ending, section, milestone end)
-        auto isSectionDelimiter
-            = [](const Object *item) { return (item->Is({ ENDING, SECTION, SYSTEM_MILESTONE_END })); };
+        auto isSectionDelimiterBefore = [](const Object *item) { return (item->Is({ ENDING, SECTION })); };
+
+        auto isSectionDelimiterAfter = [](const Object *item) { return (item->Is(SYSTEM_MILESTONE_END)); };
 
         // Find the last occurrence of a delimiter  before the target - erase before it if found
         auto delimiterBefore = std::find_if(
-            std::make_reverse_iterator(targetIt), std::make_reverse_iterator(objects.begin()), isSectionDelimiter)
+            std::make_reverse_iterator(targetIt), std::make_reverse_iterator(objects.begin()), isSectionDelimiterBefore)
                                    .base();
         objects.erase(objects.begin(), delimiterBefore);
+        sectionDelimiter = *delimiterBefore;
 
-        // Find the first occurrence of delimiter after the target - eraase after it if found
-        auto delimiterAfter = std::find_if(std::next(targetIt), objects.end(), isSectionDelimiter);
+        // Find the first occurrence of delimiter after the target - erase after it if found
+        auto delimiterAfter = std::find_if(std::next(targetIt), objects.end(), isSectionDelimiterAfter);
         if (delimiterAfter != objects.end()) objects.erase(delimiterAfter, objects.end());
     }
     else {
@@ -715,6 +777,31 @@ bool EditorToolkitCMN::Context(std::string &elementId, bool contentOnly)
         targetIt = std::find(objects.begin(), objects.end(), object);
         // This should not happen
         if (targetIt == objects.end()) return false;
+
+        const Object *systemObject = object->GetLastAncestorNot(SYSTEM);
+        LogWarning("%s", systemObject->GetClassName().c_str());
+        ListOfConstObjects sobjects;
+        ListOfConstObjects::iterator stargetIt;
+
+        ChildOfClassIdComparison systemChild(SYSTEM);
+        // System children are level 4, no needt to go deeper
+        m_doc->FindAllDescendantsByComparison(&sobjects, &systemChild, 4);
+
+        stargetIt = std::find(sobjects.begin(), sobjects.end(), systemObject);
+        // This should not happen
+        if (stargetIt == sobjects.end()) return false;
+
+        // Lambda to check if the object is a delimiter (ending, section, milestone end)
+        auto isSectionDelimiter
+            = [](const Object *item) { return (item->Is({ ENDING, SECTION, SYSTEM_MILESTONE_END })); };
+
+        // Find the last occurrence of a delimiter  before the target - erase before it if found
+        auto delimiterBefore = std::find_if(
+            std::make_reverse_iterator(stargetIt), std::make_reverse_iterator(sobjects.begin()), isSectionDelimiter)
+                                   .base();
+        if (delimiterBefore != sobjects.begin()) delimiterBefore--;
+        sectionDelimiter = *delimiterBefore;
+        LogWarning("%s", (*delimiterBefore)->GetClassName().c_str());
     }
     ListOfConstObjects previous;
     if (targetIt != objects.begin()) std::copy(objects.begin(), targetIt, std::back_inserter(previous));
@@ -725,7 +812,7 @@ bool EditorToolkitCMN::Context(std::string &elementId, bool contentOnly)
     // Build the json context
 
     jsonxx::Object section;
-    section << "id" << "[unspecified]";
+    section << "id" << sectionDelimiter->GetID();
     section << "element" << ".";
     jsonxx::Object jsonContext;
 
@@ -816,7 +903,7 @@ bool EditorToolkitCMN::Context(std::string &elementId, bool contentOnly)
     return true;
 }
 
-void EditorToolkitCMN::ContextForObject(const Object *object, jsonxx::Object &element)
+void EditorToolkitCMN::ContextForObject(const Object *object, jsonxx::Object &element, bool recursive)
 {
     element << "element" << object->GetClassName();
     element << "id" << object->GetID();
@@ -840,7 +927,15 @@ void EditorToolkitCMN::ContextForObject(const Object *object, jsonxx::Object &el
     ListOfConstObjects children;
     object->FindAllDescendantsByComparison(&children, &notClassIds);
     if (children.size() > 0) {
-        element << "children" << jsonxx::Array();
+        jsonxx::Array jsonChildren;
+        if (recursive) {
+            for (auto child : children) {
+                jsonxx::Object jsonChild;
+                this->ContextForObject(child, jsonChild, true);
+                jsonChildren << jsonChild;
+            }
+        }
+        element << "children" << jsonChildren;
     }
     else {
         element << "isLeaf" << true;
@@ -876,6 +971,38 @@ void EditorToolkitCMN::ContextForReferences(const ListOfObjectAttNamePairs &obje
         element << "referenceAttribute" << objectAttName.second;
         references << element;
     }
+}
+
+//----------------------------------------------------------------------------
+// EditorTreeObject
+//----------------------------------------------------------------------------
+
+EditorTreeObject::EditorTreeObject(const Object *object) : Object(object->GetClassId())
+{
+    this->Reset();
+
+    this->SetID(object->GetID());
+    m_className = object->GetClassName();
+    if (this->IsEditorialElement()) {
+        const EditorialElement *editorialElement = vrv_cast<const EditorialElement *>(object);
+        assert(editorialElement);
+        m_visibility = editorialElement->m_visibility;
+    }
+    else if (this->Is(MDIV)) {
+        const Mdiv *mdiv = vrv_cast<const Mdiv *>(object);
+        assert(mdiv);
+        m_visibility = mdiv->m_visibility;
+    }
+    else if (this->IsSystemElement()) {
+        const SystemElement *systemElement = vrv_cast<const SystemElement *>(object);
+        assert(systemElement);
+        m_visibility = systemElement->m_visibility;
+    }
+}
+
+void EditorTreeObject::Reset()
+{
+    Object::Reset();
 }
 
 } // namespace vrv
