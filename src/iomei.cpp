@@ -7738,7 +7738,7 @@ bool MEIInput::ReadAppChildren(Object *parent, pugi::xml_node parentNode, Editor
         if (selectedLemOrRdg == current) {
             EditorialElement *last = dynamic_cast<EditorialElement *>(parent->GetLast());
             if (last) {
-                last->m_visibility = Visible;
+                last->SetVisibility(Visible);
                 hasXPathSelected = true;
             }
         }
@@ -7748,7 +7748,7 @@ bool MEIInput::ReadAppChildren(Object *parent, pugi::xml_node parentNode, Editor
     if (!hasXPathSelected) {
         EditorialElement *first = dynamic_cast<EditorialElement *>(parent->GetFirst());
         if (first) {
-            first->m_visibility = Visible;
+            first->SetVisibility(Visible);
         }
         else {
             LogWarning("Could not make one <rdg> or <lem> visible");
@@ -7830,11 +7830,11 @@ bool MEIInput::ReadChoiceChildren(Object *parent, pugi::xml_node parentNode, Edi
         EditorialElement *last = dynamic_cast<EditorialElement *>(parent->GetLast());
         if (success && last) {
             if (selectedChild == current) {
-                last->m_visibility = Visible;
+                last->SetVisibility(Visible);
                 hasXPathSelected = true;
             }
             else {
-                last->m_visibility = Hidden;
+                last->SetVisibility(Hidden);
             }
         }
     }
@@ -7843,7 +7843,7 @@ bool MEIInput::ReadChoiceChildren(Object *parent, pugi::xml_node parentNode, Edi
     if (!hasXPathSelected) {
         EditorialElement *first = dynamic_cast<EditorialElement *>(parent->GetFirst());
         if (first) {
-            first->m_visibility = Visible;
+            first->SetVisibility(Visible);
         }
         else {
             LogWarning("Could not make one child of <choice> visible");
@@ -7906,7 +7906,7 @@ bool MEIInput::ReadLem(Object *parent, pugi::xml_node lem, EditorialLevel level,
 
     Lem *vrvLem = new Lem();
     // By default make them all hidden. MEIInput::ReadAppChildren will make one visible.
-    vrvLem->m_visibility = Hidden;
+    vrvLem->SetVisibility(Hidden);
     this->ReadEditorialElement(lem, vrvLem);
 
     vrvLem->ReadSource(lem);
@@ -7934,7 +7934,7 @@ bool MEIInput::ReadRdg(Object *parent, pugi::xml_node rdg, EditorialLevel level,
 
     Rdg *vrvRdg = new Rdg();
     // By default make them all hidden. MEIInput::ReadAppChildren will make one visible.
-    vrvRdg->m_visibility = Hidden;
+    vrvRdg->SetVisibility(Hidden);
     this->ReadEditorialElement(rdg, vrvRdg);
 
     vrvRdg->ReadSource(rdg);
@@ -8045,11 +8045,11 @@ bool MEIInput::ReadSubstChildren(Object *parent, pugi::xml_node parentNode, Edit
         EditorialElement *last = dynamic_cast<EditorialElement *>(parent->GetLast());
         if (success && last) {
             if (selectedChild == current) {
-                last->m_visibility = Visible;
+                last->SetVisibility(Visible);
                 hasXPathSelected = true;
             }
             else {
-                last->m_visibility = Hidden;
+                last->SetVisibility(Hidden);
             }
         }
     }
@@ -8058,7 +8058,7 @@ bool MEIInput::ReadSubstChildren(Object *parent, pugi::xml_node parentNode, Edit
     if (!hasXPathSelected) {
         EditorialElement *first = dynamic_cast<EditorialElement *>(parent->GetFirst());
         if (first) {
-            first->m_visibility = Visible;
+            first->SetVisibility(Visible);
         }
         else {
             LogWarning("Could not make one child of <subst> visible");

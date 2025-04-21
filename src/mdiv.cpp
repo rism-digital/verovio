@@ -28,7 +28,8 @@ namespace vrv {
 
 static const ClassRegistrar<Mdiv> s_factory("mdiv", MDIV);
 
-Mdiv::Mdiv() : PageElement(MDIV), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
+Mdiv::Mdiv()
+    : PageElement(MDIV), VisibilityDrawingInterface(), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
 {
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_NNUMBERLIKE);
@@ -41,10 +42,12 @@ Mdiv::~Mdiv() {}
 void Mdiv::Reset()
 {
     Object::Reset();
+    VisibilityDrawingInterface::Reset();
+    PageMilestoneInterface::Reset();
     this->ResetLabelled();
     this->ResetNNumberLike();
 
-    m_visibility = Hidden;
+    this->SetVisibility(Hidden);
 }
 
 bool Mdiv::IsSupportedChild(ClassId classId)
@@ -61,7 +64,7 @@ bool Mdiv::IsSupportedChild(ClassId classId)
 
 void Mdiv::MakeVisible()
 {
-    m_visibility = Visible;
+    this->SetVisibility(Visible);
     if (this->GetParent() && this->GetParent()->Is(MDIV)) {
         Mdiv *parent = vrv_cast<Mdiv *>(this->GetParent());
         assert(parent);
