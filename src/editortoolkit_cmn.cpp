@@ -48,6 +48,12 @@
 
 namespace vrv {
 
+EditorToolkitCMN::EditorToolkitCMN(Doc *doc, View *view) : EditorToolkit(doc, view)
+{
+    m_scoreContext = NULL;
+    m_sectionContext = NULL;
+}
+
 std::string EditorToolkitCMN::EditInfo()
 {
     return m_editInfo.json();
@@ -56,23 +62,23 @@ std::string EditorToolkitCMN::EditInfo()
 bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, bool commitOnly)
 {
     jsonxx::Object json;
-
+    
     // Read JSON actions
     if (!json.parse(json_editorAction)) {
         LogError("Cannot parse JSON std::string.");
         return false;
     }
-
+    
     if (!json.has<jsonxx::String>("action")) {
         LogWarning("Incorrectly formatted JSON action.");
     }
-
+    
     std::string action = json.get<jsonxx::String>("action");
-
+    
     if (action != "context") {
         m_doc->SetFocus();
     }
-
+    
     // Action without parameter
     if (action == "commit") {
         m_doc->PrepareData();
@@ -80,16 +86,16 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
         m_doc->RefreshLayout();
         return true;
     }
-
+    
     if (commitOnly) {
         // Only process commit actions
         return false;
     }
-
+    
     if (!json.has<jsonxx::Object>("param") && !json.has<jsonxx::Array>("param")) {
         LogWarning("Incorrectly formatted JSON param.");
     }
-
+    
     if (action == "chain") {
         if (!json.has<jsonxx::Array>("param")) {
             LogError("Incorrectly formatted JSON action");
@@ -197,11 +203,11 @@ bool EditorToolkitCMN::ParseDragAction(jsonxx::Object param, std::string &elemen
 }
 
 bool EditorToolkitCMN::ParseInsertAction(
-    jsonxx::Object param, std::string &elementType, std::string &startid, std::string &endid)
+                                         jsonxx::Object param, std::string &elementType, std::string &startid, std::string &endid)
 {
     // assign optional member
     endid = "";
-
+    
     if (!param.has<jsonxx::String>("elementType")) return false;
     elementType = param.get<jsonxx::String>("elementType");
     if (!param.has<jsonxx::String>("startid")) return false;
@@ -214,12 +220,12 @@ bool EditorToolkitCMN::ParseInsertAction(
 }
 
 bool EditorToolkitCMN::ParseKeyDownAction(
-    jsonxx::Object param, std::string &elementId, int &key, bool &shiftKey, bool &ctrlKey)
+                                          jsonxx::Object param, std::string &elementId, int &key, bool &shiftKey, bool &ctrlKey)
 {
     // assign optional member
     shiftKey = false;
     ctrlKey = false;
-
+    
     if (!param.has<jsonxx::String>("elementId")) return false;
     elementId = param.get<jsonxx::String>("elementId");
     if (!param.has<jsonxx::Number>("key")) return false;
@@ -235,7 +241,7 @@ bool EditorToolkitCMN::ParseKeyDownAction(
 }
 
 bool EditorToolkitCMN::ParseSetAction(
-    jsonxx::Object param, std::string &elementId, std::string &attribute, std::string &value)
+                                      jsonxx::Object param, std::string &elementId, std::string &attribute, std::string &value)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
     elementId = param.get<jsonxx::String>("elementId");
@@ -271,17 +277,17 @@ bool EditorToolkitCMN::Drag(std::string &elementId, int x, int y)
 {
     Object *element = this->GetElement(elementId);
     if (!element) return false;
-
+    
     // For elements whose y-position corresponds to a certain pitch
     if (element->HasInterface(INTERFACE_PITCH)) {
         Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
         if (!layer) return false;
         int oct;
         data_PITCHNAME pname
-            = (data_PITCHNAME)m_view->CalculatePitchCode(layer, m_view->ToLogicalY(y), element->GetDrawingX(), &oct);
+        = (data_PITCHNAME)m_view->CalculatePitchCode(layer, m_view->ToLogicalY(y), element->GetDrawingX(), &oct);
         element->GetPitchInterface()->SetPname(pname);
         element->GetPitchInterface()->SetOct(oct);
-
+        
         return true;
     }
     return false;
@@ -291,7 +297,7 @@ bool EditorToolkitCMN::KeyDown(std::string &elementId, int key, bool shiftKey, b
 {
     Object *element = this->GetElement(elementId);
     if (!element) return false;
-
+    
     // For elements whose y-position corresponds to a certain pitch
     if (element->HasInterface(INTERFACE_PITCH)) {
         PitchInterface *interface = element->GetPitchInterface();
@@ -311,7 +317,7 @@ bool EditorToolkitCMN::KeyDown(std::string &elementId, int key, bool shiftKey, b
 bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &startid, std::string const &endid)
 {
     if (!m_doc->GetDrawingPage()) return false;
-
+    
     Object *start = m_doc->GetDrawingPage()->FindDescendantByID(startid);
     Object *end = m_doc->GetDrawingPage()->FindDescendantByID(endid);
     // Check if both start and end elements exist
@@ -328,10 +334,10 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
         LogInfo("Element '%s' is not supported as end element", start->GetClassName().c_str());
         return false;
     }
-
+    
     Measure *measure = vrv_cast<Measure *>(start->GetFirstAncestor(MEASURE));
     assert(measure);
-
+    
     ControlElement *element = NULL;
     if (elementType == "slur") {
         element = new Slur();
@@ -346,24 +352,24 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
         LogInfo("Inserting control event '%s' is not supported", elementType.c_str());
         return false;
     }
-
+    
     assert(element);
     TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
     assert(interface);
     measure->AddChild(element);
     interface->SetStartid("#" + startid);
     interface->SetEndid("#" + endid);
-
+    
     m_chainedId = element->GetID();
     m_editInfo.import("uuid", element->GetID());
-
+    
     return true;
 }
 
 bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &startid)
 {
     if (!m_doc->GetDrawingPage()) return false;
-
+    
     Object *start = m_doc->GetDrawingPage()->FindDescendantByID(startid);
     // Check if both start and end elements exist
     if (!start) {
@@ -378,10 +384,10 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
         LogInfo("Element '%s' is not supported as start element", start->GetClassName().c_str());
         return false;
     }
-
+    
     Measure *measure = vrv_cast<Measure *>(start->GetFirstAncestor(MEASURE));
     assert(measure);
-
+    
     ControlElement *element = NULL;
     if (elementType == "dir") {
         element = new Dir();
@@ -393,16 +399,16 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
         LogInfo("Inserting control event '%s' is not supported", elementType.c_str());
         return false;
     }
-
+    
     assert(element);
     TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
     assert(interface);
     measure->AddChild(element);
     interface->SetStartid("#" + startid);
-
+    
     m_chainedId = element->GetID();
     m_editInfo.import("uuid", element->GetID());
-
+    
     return true;
 }
 
@@ -410,7 +416,7 @@ bool EditorToolkitCMN::Set(std::string &elementId, std::string const &attribute,
 {
     Object *element = this->GetElement(elementId);
     if (!element) return false;
-
+    
     bool success = false;
     if (AttModule::SetAnalytical(element, attribute, value))
         success = true;
@@ -454,9 +460,9 @@ Object *EditorToolkitCMN::GetElement(std::string &elementId)
     else {
         m_chainedId = elementId;
     }
-
+    
     Object *element = NULL;
-
+    
     // Try to get the element on the current drawing page
     if (m_doc->GetDrawingPage()) {
         element = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
@@ -465,19 +471,19 @@ Object *EditorToolkitCMN::GetElement(std::string &elementId)
     if (!element) {
         element = m_doc->FindDescendantByID(elementId);
     }
-
+    
     return element;
 }
 
 bool EditorToolkitCMN::InsertNote(Object *object)
 {
     assert(object);
-
+    
     if (!object->Is({ CHORD, NOTE, REST })) {
         LogInfo("Inserting a note is possible only in a chord, note or rest");
         return false;
     }
-
+    
     if (object->Is(CHORD)) {
         Chord *currentChord = vrv_cast<Chord *>(object);
         assert(currentChord);
@@ -489,7 +495,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
     else if (object->Is(NOTE)) {
         Note *currentNote = vrv_cast<Note *>(object);
         assert(currentNote);
-
+        
         Chord *currentChord = currentNote->IsChordTone();
         if (currentChord) {
             Note *note = new Note();
@@ -497,13 +503,13 @@ bool EditorToolkitCMN::InsertNote(Object *object)
             m_chainedId = note->GetID();
             return true;
         }
-
+        
         if (currentNote->HasEditorialContent()) {
             LogInfo("Inserting a note where a note has editorial content is not "
                     "possible");
             return false;
         }
-
+        
         ListOfObjects lyric;
         ClassIdsComparison lyricsComparison({ VERSE, SYL });
         currentNote->FindAllDescendantsByComparison(&lyric, &lyricsComparison);
@@ -526,16 +532,16 @@ bool EditorToolkitCMN::InsertNote(Object *object)
         assert(parent);
         parent->ReplaceChild(currentNote, chord);
         chord->AddChild(currentNote);
-
+        
         Note *note = new Note();
         chord->AddChild(note);
-
+        
         ListOfObjects artics = currentNote->FindAllDescendantsByType(ARTIC);
         for (Object *artic : artics) {
             artic->MoveItselfTo(chord);
         }
         currentNote->ClearRelinquishedChildren();
-
+        
         m_chainedId = note->GetID();
         return true;
     }
@@ -557,7 +563,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
 bool EditorToolkitCMN::DeleteNote(Note *note)
 {
     assert(note);
-
+    
     Chord *chord = note->IsChordTone();
     Beam *beam = note->GetAncestorBeam();
     if (chord) {
@@ -582,7 +588,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             assert(parent);
             chord->DetachChild(otherNote->GetIdx());
             parent->ReplaceChild(chord, otherNote);
-
+            
             ListOfObjects artics = chord->FindAllDescendantsByType(ARTIC, false, 1);
             for (Object *artic : artics) {
                 artic->MoveItselfTo(otherNote);
@@ -710,6 +716,7 @@ bool EditorToolkitCMN::ContextForSections(bool editInfo)
         m_sectionContext = new EditorTreeObject(m_doc);
         StructFunctor structFunct(m_sectionContext, false);
         m_doc->Process(structFunct);
+        m_sectionContext->LogDebugTree();
     }
     
     if (!editInfo) return true;
@@ -728,7 +735,11 @@ bool EditorToolkitCMN::ContextForSections(bool editInfo)
 bool EditorToolkitCMN::ContextForElement(std::string &elementId)
 {
     m_editInfo.reset();
-
+    
+    // Make sure we have a section tree
+    this->ContextForSections(false);
+    assert(m_sectionContext);
+    
     bool hasTargetID = (elementId != "[unspecified]");
     Object *object = NULL;
     if (hasTargetID) {
@@ -740,36 +751,53 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
     }
     // We cannot continue without object
     if (!object || !object->GetParent()) return false;
-
+    
     ListOfConstObjects objects;
     ListOfConstObjects::iterator targetIt;
-
-    const Object *sectionDelimiter = NULL;
-
+    
+    const Object *contextRoot = NULL;
+    
     if (object->GetParent()->Is(SYSTEM)) {
-        ChildOfClassIdComparison systemChild(SYSTEM);
-        // System children are level 4, no needt to go deeper
-        m_doc->FindAllDescendantsByComparison(&objects, &systemChild, 4);
-
+        const Object *editorTreeObject = m_sectionContext->FindDescendantByID(object->GetID());
+        if (!editorTreeObject) {
+            return false;
+        }
+        contextRoot = editorTreeObject->GetParent();
+        const ArrayOfConstObjects &objectsArr = contextRoot->GetChildren();
+        for (auto child : contextRoot->GetChildren()) {
+            const EditorTreeObject *editorTreeChild = vrv_cast<const EditorTreeObject*>(child);
+            objects.push_back(editorTreeChild->m_object);
+        }
         targetIt = std::find(objects.begin(), objects.end(), object);
         // This should not happen
         if (targetIt == objects.end()) return false;
-
+        
+        //std::copy(objectsArr.begin(), objectsArr.end(), std::back_inserter(objects));
+        
+        /*
+        ChildOfClassIdComparison systemChild(SYSTEM);
+        // System children are level 4, no needt to go deeper
+        m_doc->FindAllDescendantsByComparison(&objects, &systemChild, 4);
+        
+        targetIt = std::find(objects.begin(), objects.end(), object);
+        // This should not happen
+        if (targetIt == objects.end()) return false;
+        
         // Lambda to check if the object is a delimiter (ending, section, milestone end)
         auto isSectionDelimiterBefore = [](const Object *item) { return (item->Is({ ENDING, SECTION })); };
-
+        
         auto isSectionDelimiterAfter = [](const Object *item) { return (item->Is(SYSTEM_MILESTONE_END)); };
-
+        
         // Find the last occurrence of a delimiter  before the target - erase before it if found
         auto delimiterBefore = std::find_if(
-            std::make_reverse_iterator(targetIt), std::make_reverse_iterator(objects.begin()), isSectionDelimiterBefore)
-                                   .base();
+                                            std::make_reverse_iterator(targetIt), std::make_reverse_iterator(objects.begin()), isSectionDelimiterBefore)
+        .base();
         objects.erase(objects.begin(), delimiterBefore);
-        sectionDelimiter = *delimiterBefore;
-
+        
         // Find the first occurrence of delimiter after the target - erase after it if found
         auto delimiterAfter = std::find_if(std::next(targetIt), objects.end(), isSectionDelimiterAfter);
         if (delimiterAfter != objects.end()) objects.erase(delimiterAfter, objects.end());
+        */
     }
     else {
         const ArrayOfObjects &objectsArr = object->GetParent()->GetChildren();
@@ -779,46 +807,29 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
         if (targetIt == objects.end()) return false;
 
         const Object *systemObject = object->GetLastAncestorNot(SYSTEM);
-        LogWarning("%s", systemObject->GetClassName().c_str());
-        ListOfConstObjects sobjects;
-        ListOfConstObjects::iterator stargetIt;
-
-        ChildOfClassIdComparison systemChild(SYSTEM);
-        // System children are level 4, no needt to go deeper
-        m_doc->FindAllDescendantsByComparison(&sobjects, &systemChild, 4);
-
-        stargetIt = std::find(sobjects.begin(), sobjects.end(), systemObject);
-        // This should not happen
-        if (stargetIt == sobjects.end()) return false;
-
-        // Lambda to check if the object is a delimiter (ending, section, milestone end)
-        auto isSectionDelimiter
-            = [](const Object *item) { return (item->Is({ ENDING, SECTION, SYSTEM_MILESTONE_END })); };
-
-        // Find the last occurrence of a delimiter  before the target - erase before it if found
-        auto delimiterBefore = std::find_if(
-            std::make_reverse_iterator(stargetIt), std::make_reverse_iterator(sobjects.begin()), isSectionDelimiter)
-                                   .base();
-        if (delimiterBefore != sobjects.begin()) delimiterBefore--;
-        sectionDelimiter = *delimiterBefore;
-        LogWarning("%s", (*delimiterBefore)->GetClassName().c_str());
+        const Object *editorTreeObject = m_sectionContext->FindDescendantByID(systemObject->GetID());
+        if (!editorTreeObject) {
+            return false;
+        }
+        contextRoot = editorTreeObject->GetParent();
     }
     ListOfConstObjects previous;
     if (targetIt != objects.begin()) std::copy(objects.begin(), targetIt, std::back_inserter(previous));
-
+    
     ListOfConstObjects following;
     if (targetIt != objects.end()) std::copy(std::next(targetIt), objects.end(), std::back_inserter(following));
-
+    
     // Build the json context
-
+    
     jsonxx::Object section;
-    section << "id" << sectionDelimiter->GetID();
+    section << "id" << contextRoot->GetID();
     section << "element" << ".";
+    section << "prout" << contextRoot->GetClassName();
     jsonxx::Object jsonContext;
-
+    
     ListOfConstObjects ancestors;
     jsonxx::Array jsonAncestors;
-
+    
     const Object *context = object->GetParent();
     const Object *parent = context;
     // Look for additional ancestors
@@ -830,20 +841,20 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
     this->ContextForObjects(ancestors, jsonAncestors);
     // Also add the section (.) as ancestor
     jsonAncestors << section;
-
+    
     this->ContextForObject(context, jsonContext);
-
+    
     // Ancestors in addition to the parent of the target (context object)
     m_editInfo << "ancestors" << jsonAncestors;
-
+    
     // Build the list of children in which the target is included
     jsonxx::Array contextChildren;
-
+    
     // Preceeding siblings
     jsonxx::Array elements;
     this->ContextForObjects(previous, elements);
     contextChildren << elements;
-
+    
     // The target object
     jsonxx::Object jsonObject;
     this->ContextForObject(object, jsonObject);
@@ -858,15 +869,15 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
         // Add it to the list
         contextChildren << jsonObject;
     }
-
+    
     // Following siblings
     this->ContextForObjects(following, elements);
     contextChildren << elements;
-
+    
     // Add all children of to context (include target and surrounding siblings)
     jsonContext << "children" << contextChildren;
     m_editInfo << "context" << jsonContext;
-
+    
     // Stop here without targetID, but still add empty objects or arrays to the info
     if (!hasTargetID) {
         m_editInfo << "attributes" << jsonxx::Object();
@@ -875,7 +886,7 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
         m_editInfo << "referencedElements" << jsonxx::Array();
         return true;
     }
-
+    
     // Inlude all attributes
     ArrayOfStrAttr attributes;
     object->GetAttributes(&attributes);
@@ -885,21 +896,21 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
     }
     jsonObject << "attributes" << jsonAttributes;
     m_editInfo << "object" << jsonObject;
-
+    
     // Find referring objects
     ListOfObjectAttNamePairs referringObjects;
     FindAllReferringObjectsFunctor findAllReferringObjects(object, &referringObjects);
     m_doc->Process(findAllReferringObjects);
     this->ContextForReferences(referringObjects, elements);
     m_editInfo << "referringElements" << elements;
-
+    
     // Find referenced objects
     ListOfObjectAttNamePairs referencedObjects;
     FindAllReferencedObjectsFunctor findAllReferencedObjects(NULL, &referencedObjects);
     object->Process(findAllReferencedObjects, 0);
     this->ContextForReferences(referencedObjects, elements);
     m_editInfo << "referencedElements" << elements;
-
+    
     return true;
 }
 
@@ -921,11 +932,11 @@ void EditorToolkitCMN::ContextForObject(const Object *object, jsonxx::Object &el
     if (!attributes.empty()) {
         element << "attributes" << attributes;
     }
-
+    
     ClassIdsComparison notClassIds({ DOTS, FLAG, STEM, TUPLET_NUM, TUPLET_BRACKET });
     notClassIds.ReverseComparison();
     ListOfConstObjects children;
-    object->FindAllDescendantsByComparison(&children, &notClassIds);
+    object->FindAllDescendantsByComparison(&children, &notClassIds, 1);
     if (children.size() > 0) {
         jsonxx::Array jsonChildren;
         if (recursive) {
@@ -945,7 +956,7 @@ void EditorToolkitCMN::ContextForObject(const Object *object, jsonxx::Object &el
 void EditorToolkitCMN::ContextForObjects(const ListOfConstObjects &objects, jsonxx::Array &elements)
 {
     elements.reset();
-
+    
     for (const Object *object : objects) {
         if (object->Is(MNUM)) {
             const MNum *mNum = vrv_cast<const MNum *>(object);
@@ -954,7 +965,7 @@ void EditorToolkitCMN::ContextForObjects(const ListOfConstObjects &objects, json
         }
         if (object->IsAttribute()) continue;
         if (object->Is({ DOTS, FLAG, STEM, TUPLET_NUM, TUPLET_BRACKET })) continue;
-
+        
         jsonxx::Object element;
         this->ContextForObject(object, element);
         elements << element;
@@ -964,7 +975,7 @@ void EditorToolkitCMN::ContextForObjects(const ListOfConstObjects &objects, json
 void EditorToolkitCMN::ContextForReferences(const ListOfObjectAttNamePairs &objectAttNames, jsonxx::Array &references)
 {
     references.reset();
-
+    
     for (auto &objectAttName : objectAttNames) {
         jsonxx::Object element;
         this->ContextForObject(objectAttName.first, element);
@@ -977,32 +988,26 @@ void EditorToolkitCMN::ContextForReferences(const ListOfObjectAttNamePairs &obje
 // EditorTreeObject
 //----------------------------------------------------------------------------
 
-EditorTreeObject::EditorTreeObject(const Object *object) : Object(object->GetClassId())
+EditorTreeObject::EditorTreeObject(const Object *object) : Object(object->GetClassId()), VisibilityDrawingInterface()
 {
     this->Reset();
-
+    
     this->SetID(object->GetID());
     m_className = object->GetClassName();
-    if (this->IsEditorialElement()) {
-        const EditorialElement *editorialElement = vrv_cast<const EditorialElement *>(object);
-        assert(editorialElement);
-        m_visibility = editorialElement->m_visibility;
+    if (this->IsEditorialElement() || this->Is(MDIV) || this->IsSystemElement()) {
+        //const VisibilityDrawingInterface *interface = vrv_cast<const VisibilityDrawingInterface *>(object);
+        //assert(interface);
+        // If we keep them hidden, then other functors will no process them.
+        // this->SetVisibility(interface->IsHidden() ? Hidden : Visible);
+        this->SetVisibility(Visible);
     }
-    else if (this->Is(MDIV)) {
-        const Mdiv *mdiv = vrv_cast<const Mdiv *>(object);
-        assert(mdiv);
-        m_visibility = mdiv->m_visibility;
-    }
-    else if (this->IsSystemElement()) {
-        const SystemElement *systemElement = vrv_cast<const SystemElement *>(object);
-        assert(systemElement);
-        m_visibility = systemElement->m_visibility;
-    }
+    m_object = object;
 }
 
 void EditorTreeObject::Reset()
 {
     Object::Reset();
+    VisibilityDrawingInterface::Reset();
 }
 
 } // namespace vrv

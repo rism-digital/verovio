@@ -48,6 +48,7 @@ public:
     ///@{
     Doc();
     virtual ~Doc();
+    std::string GetClassName() const override { return "body"; }
     ///@}
 
     /**

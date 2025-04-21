@@ -30,7 +30,7 @@ class EditorTreeObject;
 
 class EditorToolkitCMN : public EditorToolkit {
 public:
-    EditorToolkitCMN(Doc *doc, View *view) : EditorToolkit(doc, view) {}
+    EditorToolkitCMN(Doc *doc, View *view);
     bool ParseEditorAction(const std::string &json_editorAction) override
     {
         return ParseEditorAction(json_editorAction, false);
@@ -94,7 +94,7 @@ protected:
 /**
  * This class stores an alignment position elements will point to
  */
-class EditorTreeObject : public Object {
+class EditorTreeObject : public Object, public VisibilityDrawingInterface {
 
 public:
     /**
@@ -119,7 +119,7 @@ private:
     //
 public:
     std::string m_className;
-    VisibilityType m_visibility;
+    const Object *m_object;
 
 private:
     //
