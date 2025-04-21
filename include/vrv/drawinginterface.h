@@ -412,6 +412,45 @@ protected:
     Stem *m_drawingStem;
 };
 
+//----------------------------------------------------------------------------
+// VisibilityDrawingInterface
+//----------------------------------------------------------------------------
+
+/**
+ * This class is an interface for MEI element that can be hidden during drawing.
+ */
+class VisibilityDrawingInterface {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     */
+    ///@{
+    VisibilityDrawingInterface();
+    virtual ~VisibilityDrawingInterface();
+    virtual void Reset();
+    ///@}
+
+    /**
+     * @name Set and get the visibility
+     */
+    ///@{
+    void SetVisibility(VisibilityType visibility) { m_visibility = visibility; }
+    const bool IsHidden() const { return (m_visibility == Hidden); }
+    ///@}
+
+    //-----------------//
+    // Pseudo functors //
+    //-----------------//
+
+private:
+    /**
+     * Holds the visibility (hidden or visible) for an element implementing the interface.
+     * By default, all editorial elements are visible. However, in an <app>, only one <rdg> is visible at the time. When
+     * loading the file, the first <rdg> (or the <lem>) is made visible.
+     */
+    VisibilityType m_visibility;
+};
+
 } // namespace vrv
 
 #endif

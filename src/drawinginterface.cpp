@@ -782,4 +782,20 @@ FunctorCode StemmedDrawingInterface::InterfaceResetData(ResetDataFunctor &functo
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// VisibilityDrawingInterface
+//----------------------------------------------------------------------------
+
+VisibilityDrawingInterface::VisibilityDrawingInterface()
+{
+    this->Reset();
+}
+
+VisibilityDrawingInterface::~VisibilityDrawingInterface() {}
+
+void VisibilityDrawingInterface::Reset()
+{
+    m_visibility = Visible;
+}
+
 } // namespace vrv

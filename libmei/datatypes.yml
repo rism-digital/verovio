@@ -19,6 +19,7 @@ excludes:
     # string
     data.URI,
     # alternates but with .
+    data.HEADSHAPE,
     data.FONTSIZE,
     data.LINEWIDTH,
     data.PLACEMENT
@@ -26,6 +27,7 @@ excludes:
 
 alternates:
     [
+    data_HEADSHAPE,
     data_FONTSIZE,
     data_LINEWIDTH,
     data_PLACEMENT
@@ -137,6 +139,8 @@ defaults:
         MEI_UNSET
     data_EVENTREL:
         data_EVENTREL()
+    data_HEADSHAPE:
+        data_HEADSHAPE()
     data_HEXNUM:
         0
     data_FONTSIZE:

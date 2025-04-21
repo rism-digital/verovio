@@ -3980,7 +3980,7 @@ void AttNoteHeads::ResetNoteHeads()
     m_headFillcolor = "";
     m_headMod = NOTEHEADMODIFIER_NONE;
     m_headRotation = ROTATION_NONE;
-    m_headShape = HEADSHAPE_NONE;
+    m_headShape = data_HEADSHAPE();
     m_headVisible = BOOLEAN_NONE;
 }
 
@@ -4114,7 +4114,7 @@ bool AttNoteHeads::HasHeadRotation() const
 
 bool AttNoteHeads::HasHeadShape() const
 {
-    return (m_headShape != HEADSHAPE_NONE);
+    return (m_headShape.HasValue());
 }
 
 bool AttNoteHeads::HasHeadVisible() const

@@ -106,6 +106,64 @@ protected:
 };
 
 /**
+ * MEI data.HEADSHAPE
+ * Since it can contain different subtype we need a dedicated class for it.
+ */
+
+enum HeadShapeType { HEADSHAPE_NONE = 0, HEADSHAPE_headShapeList, HEADSHAPE_hexnum };
+
+class data_HEADSHAPE {
+public:
+    data_HEADSHAPE() { Reset(HEADSHAPE_NONE); }
+    virtual ~data_HEADSHAPE() {}
+
+    void Reset(HeadShapeType type)
+    {
+        m_type = type;
+        m_headShapeList = HEADSHAPE_list_NONE;
+        m_hexnum = 0;
+    }
+
+    HeadShapeType GetType() const { return m_type; }
+
+    data_HEADSHAPE_list GetHeadShapeList() const { return m_headShapeList; }
+    void SetHeadShapeList(data_HEADSHAPE_list value)
+    {
+        Reset(HEADSHAPE_headShapeList);
+        m_headShapeList = value;
+    }
+
+    data_HEXNUM GetHexnum() const { return m_hexnum; }
+    void SetHexnum(data_HEXNUM value)
+    {
+        Reset(HEADSHAPE_hexnum);
+        m_hexnum = value;
+    }
+
+    bool HasValue() const
+    {
+        if (m_headShapeList != HEADSHAPE_list_NONE) return true;
+        if (m_hexnum != 0) return true;
+        return false;
+    }
+
+    // comparison
+    bool operator==(const data_HEADSHAPE &val) const
+    {
+        if (m_type != val.GetType()) return false;
+        if (m_headShapeList != val.GetHeadShapeList()) return false;
+        if (m_hexnum != val.GetHexnum()) return false;
+        return true;
+    }
+    bool operator!=(const data_HEADSHAPE &val) const { return !(*this == val); }
+
+protected:
+    HeadShapeType m_type;
+    data_HEADSHAPE_list m_headShapeList;
+    data_HEXNUM m_hexnum;
+};
+
+/**
  * MEI data.MEASUREMENTSIGNED
  * Since it can contain different subtype we need a dedicated class for it.
  */

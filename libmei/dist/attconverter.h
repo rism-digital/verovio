@@ -153,9 +153,6 @@ public:
     std::string HarppedalpositionToStr(data_HARPPEDALPOSITION data) const;
     data_HARPPEDALPOSITION StrToHarppedalposition(const std::string &value, bool logWarning = true) const;
 
-    std::string HeadshapeToStr(data_HEADSHAPE data) const;
-    data_HEADSHAPE StrToHeadshape(const std::string &value, bool logWarning = true) const;
-
     std::string HeadshapeListToStr(data_HEADSHAPE_list data) const;
     data_HEADSHAPE_list StrToHeadshapeList(const std::string &value, bool logWarning = true) const;
 

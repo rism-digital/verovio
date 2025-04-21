@@ -63,7 +63,7 @@ FunctorCode ConvertToPageBasedFunctor::VisitEditorialElement(EditorialElement *e
 
 FunctorCode ConvertToPageBasedFunctor::VisitEditorialElementEnd(EditorialElement *editorialElement)
 {
-    if (editorialElement->m_visibility == Visible) {
+    if (!editorialElement->IsHidden()) {
         editorialElement->ConvertToPageBasedMilestone(editorialElement, m_currentSystem);
     }
 
@@ -103,7 +103,7 @@ FunctorCode ConvertToPageBasedFunctor::VisitMdiv(Mdiv *mdiv)
 
 FunctorCode ConvertToPageBasedFunctor::VisitMdivEnd(Mdiv *mdiv)
 {
-    if (mdiv->m_visibility == Visible) {
+    if (!mdiv->IsHidden()) {
         mdiv->ConvertToPageBasedMilestone(mdiv, m_page);
     }
 

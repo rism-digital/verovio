@@ -34,7 +34,8 @@ namespace vrv {
 // EditorialElement
 //----------------------------------------------------------------------------
 
-EditorialElement::EditorialElement() : Object(EDITORIAL_ELEMENT), SystemMilestoneInterface(), AttLabelled(), AttTyped()
+EditorialElement::EditorialElement()
+    : Object(EDITORIAL_ELEMENT), VisibilityDrawingInterface(), SystemMilestoneInterface(), AttLabelled(), AttTyped()
 {
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_TYPED);
@@ -43,7 +44,7 @@ EditorialElement::EditorialElement() : Object(EDITORIAL_ELEMENT), SystemMileston
 }
 
 EditorialElement::EditorialElement(ClassId classId)
-    : Object(classId), SystemMilestoneInterface(), AttLabelled(), AttTyped()
+    : Object(classId), VisibilityDrawingInterface(), SystemMilestoneInterface(), AttLabelled(), AttTyped()
 {
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_TYPED);
@@ -54,11 +55,10 @@ EditorialElement::EditorialElement(ClassId classId)
 void EditorialElement::Reset()
 {
     Object::Reset();
+    VisibilityDrawingInterface::Reset();
     SystemMilestoneInterface::Reset();
     this->ResetLabelled();
     this->ResetTyped();
-
-    m_visibility = Visible;
 }
 
 EditorialElement::~EditorialElement() {}

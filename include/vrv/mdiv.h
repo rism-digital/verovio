@@ -9,6 +9,7 @@
 #define __VRV_MDIV_H__
 
 #include "atts_shared.h"
+#include "drawinginterface.h"
 #include "pageelement.h"
 #include "pagemilestone.h"
 
@@ -21,7 +22,11 @@ namespace vrv {
 /**
  * This class represent a <mdiv> in page-based MEI.
  */
-class Mdiv : public PageElement, public PageMilestoneInterface, public AttLabelled, public AttNNumberLike {
+class Mdiv : public PageElement,
+             public VisibilityDrawingInterface,
+             public PageMilestoneInterface,
+             public AttLabelled,
+             public AttNNumberLike {
 
 public:
     /**
@@ -65,13 +70,7 @@ public:
 private:
     //
 public:
-    /**
-     * Holds the visibility (hidden or visible) for an mdiv element.
-     * By default, a mdiv elements is hidden, and one <mdiv> branchn has to be made visible.
-     * See Mdiv::MakeVisible();
-     */
-    VisibilityType m_visibility;
-
+    //
 private:
     //
 };

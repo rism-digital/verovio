@@ -1172,24 +1172,10 @@ FunctorCode Object::AcceptEnd(ConstFunctor &functor) const
 bool Object::SkipChildren(bool visibleOnly) const
 {
     if (visibleOnly) {
-        if (this->IsEditorialElement()) {
-            const EditorialElement *editorialElement = vrv_cast<const EditorialElement *>(this);
-            assert(editorialElement);
-            if (editorialElement->m_visibility == Hidden) {
-                return true;
-            }
-        }
-        else if (this->Is(MDIV)) {
-            const Mdiv *mdiv = vrv_cast<const Mdiv *>(this);
-            assert(mdiv);
-            if (mdiv->m_visibility == Hidden) {
-                return true;
-            }
-        }
-        else if (this->IsSystemElement()) {
-            const SystemElement *systemElement = vrv_cast<const SystemElement *>(this);
-            assert(systemElement);
-            if (systemElement->m_visibility == Hidden) {
+        if (this->IsEditorialElement() || this->Is(MDIV) || this->IsSystemElement()) {
+            const VisibilityDrawingInterface *interface = vrv_cast<const VisibilityDrawingInterface *>(this);
+            assert(interface);
+            if (interface->IsHidden()) {
                 return true;
             }
         }
