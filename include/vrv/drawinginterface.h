@@ -435,7 +435,7 @@ public:
      */
     ///@{
     void SetVisibility(VisibilityType visibility) { m_visibility = visibility; }
-    const bool IsHidden() const { return (m_visibility == Hidden); }
+    bool IsHidden() const { return (m_visibility == Hidden); }
     ///@}
 
     //-----------------//

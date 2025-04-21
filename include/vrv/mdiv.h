@@ -49,6 +49,20 @@ public:
     ///@}
 
     /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    VisibilityDrawingInterface *GetVisibilityDrawingInterface() override
+    {
+        return vrv_cast<VisibilityDrawingInterface *>(this);
+    }
+    const VisibilityDrawingInterface *GetVisibilityDrawingInterface() const override
+    {
+        return vrv_cast<const VisibilityDrawingInterface *>(this);
+    }
+    ///@}
+
+    /**
      * Make the mdiv and its parent (recursively) visible
      */
     void MakeVisible();
