@@ -236,7 +236,7 @@ void Object::RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId 
     m_interfaces.push_back(interfaceId);
 }
 
-bool Object::IsMilestoneElement()
+bool Object::IsMilestoneElement() const
 {
     if (this->IsEditorialElement() || this->Is(ENDING) || this->Is(SECTION)) {
         SystemMilestoneInterface *interface = dynamic_cast<SystemMilestoneInterface *>(this);

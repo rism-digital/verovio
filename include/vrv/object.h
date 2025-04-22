@@ -89,7 +89,7 @@ public:
      * Wrapper for checking if an element has a milestone start interface and also if is set as a milestone element
      */
     ///@{
-    bool IsMilestoneElement();
+    bool IsMilestoneElement() const;
     Object *GetMilestoneEnd();
     ///@}
 
