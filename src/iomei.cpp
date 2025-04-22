@@ -11,6 +11,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <regex>
 
 //----------------------------------------------------------------------------
 
@@ -20,6 +21,7 @@
 #include "altsyminterface.h"
 #include "anchoredtext.h"
 #include "annot.h"
+#include "annotscore.h"
 #include "app.h"
 #include "arpeg.h"
 #include "artic.h"
@@ -471,6 +473,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->Is(ANCHOREDTEXT)) {
         m_currentNode = m_currentNode.append_child("anchoredText");
         this->WriteAnchoredText(m_currentNode, vrv_cast<AnchoredText *>(object));
+    }
+    else if (object->Is(ANNOTSCORE)) {
+        m_currentNode = m_currentNode.append_child("annot");
+        this->WriteAnnotScore(m_currentNode, vrv_cast<AnnotScore *>(object));
     }
     else if (object->Is(ARPEG)) {
         m_currentNode = m_currentNode.append_child("arpeg");
@@ -1962,6 +1968,16 @@ void MEIOutput::WriteAnchoredText(pugi::xml_node currentNode, AnchoredText *anch
     this->WriteTextDirInterface(currentNode, anchoredText);
 }
 
+void MEIOutput::WriteAnnotScore(pugi::xml_node currentNode, AnnotScore *annotScore)
+{
+    assert(annotScore);
+
+    this->WriteControlElement(currentNode, annotScore);
+    this->WritePlistInterface(currentNode, annotScore);
+    this->WriteTimeSpanningInterface(currentNode, annotScore);
+    // Currently ignoring annot contents -- normal annot looks at child elements here
+}
+
 void MEIOutput::WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg)
 {
     assert(arpeg);
@@ -3163,6 +3179,7 @@ void MEIOutput::WriteTimePointInterface(pugi::xml_node element, TimePointInterfa
 {
     assert(interface);
 
+    interface->WritePartIdent(element);
     interface->WriteStaffIdent(element);
     interface->WriteStartId(element);
     interface->WriteTimestampLog(element);
@@ -5480,7 +5497,12 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         this->NormalizeAttributes(current);
         // editorial
         if (this->IsEditorialElementName(currentName)) {
-            success = this->ReadEditorialElement(parent, current, EDITORIAL_MEASURE);
+            if (currentName == "annot" && this->IsAnnotScore(current)) {
+                success = this->ReadAnnotScore(parent, current);
+            }
+            else {
+                success = this->ReadEditorialElement(parent, current, EDITORIAL_MEASURE);
+            }
         }
         // content
         else if (currentName == "anchoredText") {
@@ -7545,6 +7567,7 @@ bool MEIInput::ReadTextDirInterface(pugi::xml_node element, TextDirInterface *in
 
 bool MEIInput::ReadTimePointInterface(pugi::xml_node element, TimePointInterface *interface)
 {
+    interface->ReadPartIdent(element);
     interface->ReadStaffIdent(element);
     interface->ReadStartId(element);
     interface->ReadTimestampLog(element);
@@ -7685,6 +7708,34 @@ bool MEIInput::ReadAnnot(Object *parent, pugi::xml_node annot)
     else {
         vrvAnnot->m_content.remove_children();
         return this->ReadTextChildren(vrvAnnot, annot, vrvAnnot);
+    }
+}
+
+bool MEIInput::ReadAnnotScore(Object *parent, pugi::xml_node annot)
+{
+    AnnotScore *vrvAnnotScore = new AnnotScore();
+
+    this->ReadControlElement(annot, vrvAnnotScore);
+    this->ReadPlistInterface(annot, vrvAnnotScore);
+    this->ReadTimeSpanningInterface(annot, vrvAnnotScore);
+
+    parent->AddChild(vrvAnnotScore);
+
+    bool hasNonTextContent = false;
+    // copy all the nodes inside into the document
+    for (pugi::xml_node child = annot.first_child(); child; child = child.next_sibling()) {
+        const std::string nodeName = child.name();
+        if (!hasNonTextContent && (!nodeName.empty())) hasNonTextContent = true;
+        // This is also orphan code -- we can't copy the contents here
+    }
+    this->ReadUnsupportedAttr(annot, vrvAnnotScore);
+    // Unless annot has only text we do not load children because they are preserved in Annot::m_content
+    if (hasNonTextContent) {
+        return true;
+    }
+    else {
+        // Again, this is code that may not apply for annotScore
+        return this->ReadTextChildren(vrvAnnotScore, annot, vrvAnnotScore);
     }
 }
 
@@ -8284,6 +8335,16 @@ bool MEIInput::ReadXMLComment(Object *object, pugi::xml_node element)
         object->SetClosingComment(element.value());
     }
     return true;
+}
+
+bool MEIInput::IsAnnotScore(pugi::xml_node annot)
+{
+    // If the annotation is a score annotation, it'll have @type="score"
+    // or at least @type as a set of tokens, one of which is 'score'.
+    // N.B. Future versions of MEI might have a dedicated attribute for this
+    std::string value = annot.attribute("type").value();
+    static const std::regex scoreRegex("(^|\\s)score($|\\s)");
+    return (std::regex_search(value, scoreRegex));
 }
 
 bool MEIInput::IsEditorialElementName(std::string elementName)

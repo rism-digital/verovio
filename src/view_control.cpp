@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "annotscore.h"
 #include "arpeg.h"
 #include "bboxdevicecontext.h"
 #include "beamspan.h"
@@ -76,8 +77,8 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     assert(element);
 
     // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
-    if (element->Is(
-            { BEAMSPAN, BRACKETSPAN, FIGURE, GLISS, HAIRPIN, LV, OCTAVE, PHRASE, PITCHINFLECTION, SLUR, TIE })) {
+    if (element->Is({ ANNOTSCORE, BEAMSPAN, BRACKETSPAN, FIGURE, GLISS, HAIRPIN, LV, OCTAVE, PHRASE, PITCHINFLECTION,
+            SLUR, TIE })) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetID());
         dc->EndGraphic(element, this);
@@ -185,7 +186,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         BBoxDeviceContext *bBoxDC = vrv_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {
-            if (element->Is({ BRACKETSPAN, HAIRPIN, OCTAVE, PITCHINFLECTION })) return;
+            if (element->Is({ ANNOTSCORE, BRACKETSPAN, HAIRPIN, OCTAVE, PITCHINFLECTION })) return;
         }
     }
 
@@ -327,7 +328,11 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             }
         }
 
-        if (element->Is(DIR)) {
+        if (element->Is(ANNOTSCORE)) {
+            // cast to AnnotScore check in DrawControlElementConnector
+            this->DrawAnnotScore(dc, dynamic_cast<AnnotScore *>(element), x1, x2, staff, spanningType, graphic);
+        }
+        else if (element->Is(DIR)) {
             // cast to Dir check in DrawControlElementConnector
             this->DrawControlElementConnector(dc, dynamic_cast<Dir *>(element), x1, x2, staff, spanningType, graphic);
         }
@@ -442,6 +447,104 @@ bool View::HasValidTimeSpanningOrder(DeviceContext *dc, Object *element, LayerEl
     }
 
     return true;
+}
+
+void View::DrawAnnotScore(
+    DeviceContext *dc, AnnotScore *annotScore, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+{
+    assert(dc);
+    assert(annotScore);
+    assert(staff);
+
+    assert(annotScore->GetStart());
+    assert(annotScore->GetEnd());
+
+    // May need to set/tweak y pos
+    const int y = annotScore->GetDrawingY();
+
+    // This has been copied from bracketSpan and is likely to be wrong
+    if (graphic) {
+        dc->ResumeGraphic(graphic, graphic->GetID());
+    }
+    else {
+        dc->StartGraphic(annotScore, "", annotScore->GetID(), SPANNING);
+    }
+
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int boxHeight = annotScore->GetBoxHeight(m_doc, unit);
+    const int lineWidth = annotScore->GetLineWidth(m_doc, unit);
+    const int halfLineWidth = lineWidth / 2;
+
+    dc->SetPen(lineWidth, PEN_SOLID, 0, 0, LINECAP_BUTT, LINEJOIN_MITER);
+    Point boxOutline[4];
+    switch (spanningType) {
+        case SPANNING_START:
+            // Draw a box with an open right-hand side (to show it continues)
+            if (!annotScore->GetStart()->Is(TIMESTAMP_ATTR)) {
+                x1 -= annotScore->GetStart()->GetDrawingRadius(m_doc);
+            }
+            boxOutline[0] = { ToDeviceContextX(x2), ToDeviceContextY(y) };
+            boxOutline[1] = { ToDeviceContextX(x1), ToDeviceContextY(y) };
+            boxOutline[2] = { ToDeviceContextX(x1), ToDeviceContextY(y + boxHeight) };
+            boxOutline[3] = { ToDeviceContextX(x2), ToDeviceContextY(y + boxHeight) };
+            dc->DrawPolyline(4, boxOutline);
+            dc->SetBrush(0.5, COLOR_RED);
+            this->DrawFilledRectangle(dc, x1 + halfLineWidth, y + halfLineWidth, x2, y + boxHeight - halfLineWidth);
+            dc->ResetBrush();
+            break;
+        case SPANNING_MIDDLE:
+            // Draw a box with  both sides open (to show it continues)
+            if (!annotScore->GetStart()->Is(TIMESTAMP_ATTR)) {
+                x1 -= annotScore->GetStart()->GetDrawingRadius(m_doc);
+            }
+            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
+            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y + boxHeight), ToDeviceContextX(x2),
+                ToDeviceContextY(y + boxHeight));
+            dc->SetBrush(0.5, COLOR_RED);
+            this->DrawFilledRectangle(dc, x1, y + halfLineWidth, x2, y + boxHeight - halfLineWidth);
+            dc->ResetBrush();
+            break;
+        case SPANNING_START_END:
+            // Draw a closed box
+            if (!annotScore->GetStart()->Is(TIMESTAMP_ATTR)) {
+                x1 -= annotScore->GetStart()->GetDrawingRadius(m_doc);
+            }
+            if (!annotScore->GetEnd()->Is(TIMESTAMP_ATTR)) {
+                x2 += annotScore->GetEnd()->GetDrawingRadius(m_doc);
+            }
+            boxOutline[0] = { ToDeviceContextX(x2), ToDeviceContextY(y) };
+            boxOutline[1] = { ToDeviceContextX(x1), ToDeviceContextY(y) };
+            boxOutline[2] = { ToDeviceContextX(x1), ToDeviceContextY(y + boxHeight) };
+            boxOutline[3] = { ToDeviceContextX(x2), ToDeviceContextY(y + boxHeight) };
+            dc->DrawPolyline(4, boxOutline, true);
+            dc->SetBrush(0.5, COLOR_RED);
+            this->DrawFilledRectangle(
+                dc, x1 + halfLineWidth, y + halfLineWidth, x2 - halfLineWidth, y + boxHeight - halfLineWidth);
+            dc->ResetBrush();
+            break;
+        case SPANNING_END:
+            // Draw a box with the left side open to show it continues from previous system
+            if (!annotScore->GetEnd()->Is(TIMESTAMP_ATTR)) {
+                x2 += annotScore->GetEnd()->GetDrawingRadius(m_doc);
+            }
+            boxOutline[0] = { ToDeviceContextX(x1), ToDeviceContextY(y) };
+            boxOutline[1] = { ToDeviceContextX(x2), ToDeviceContextY(y) };
+            boxOutline[2] = { ToDeviceContextX(x2), ToDeviceContextY(y + boxHeight) };
+            boxOutline[3] = { ToDeviceContextX(x1), ToDeviceContextY(y + boxHeight) };
+            dc->DrawPolyline(4, boxOutline);
+            dc->SetBrush(0.5, COLOR_RED);
+            this->DrawFilledRectangle(dc, x1, y + halfLineWidth, x2 - halfLineWidth, y + boxHeight - halfLineWidth);
+            dc->ResetBrush();
+            break;
+    }
+    dc->ResetPen();
+
+    if (graphic) {
+        dc->EndResumedGraphic(graphic, this);
+    }
+    else {
+        dc->EndGraphic(annotScore, this);
+    }
 }
 
 void View::DrawBracketSpan(
@@ -2431,7 +2534,7 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
 
     std::vector<Staff *> staffList = reh->GetTstampStaves(measure, reh);
     if (staffList.empty()) {
-        Staff *staff = measure->GetTopVisibleStaff();
+        Staff *staff = system->GetTopVisibleStaff();
         if (staff) staffList.push_back(staff);
     }
 

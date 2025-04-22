@@ -271,6 +271,9 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitSystem(System *system)
     m_classId = CAESURA;
     system->m_systemAligner.Process(*this);
 
+    m_classId = ANNOTSCORE;
+    system->m_systemAligner.Process(*this);
+
     // SYL check if there are some lyrics and make space for them if any
     m_classId = SYL;
     system->m_systemAligner.Process(*this);

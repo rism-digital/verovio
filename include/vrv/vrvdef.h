@@ -177,6 +177,7 @@ enum ClassId : uint16_t {
     // Ids for ControlElement child classes
     CONTROL_ELEMENT,
     ANCHOREDTEXT,
+    ANNOTSCORE,
     ARPEG,
     BEAMSPAN,
     BRACKETSPAN,
@@ -347,6 +348,8 @@ typedef std::set<Object *> SetOfObjects;
 
 typedef std::set<const Object *> SetOfConstObjects;
 
+typedef std::set<const Object *> SetOfConstObjects;
+
 typedef std::vector<Note *> ChordNoteGroup;
 
 typedef std::vector<std::tuple<Alignment *, Alignment *, int>> ArrayOfAdjustmentTuples;
@@ -361,13 +364,13 @@ typedef std::multimap<std::string, LinkingInterface *> MapOfLinkingInterfaceIDPa
 
 typedef std::map<std::string, Note *> MapOfNoteIDPairs;
 
-typedef std::vector<std::pair<PlistInterface *, std::string>> ArrayOfPlistInterfaceIDPairs;
+typedef std::vector<std::pair<Object *, std::string>> ArrayOfPlistObjectIDPairs;
 
 typedef std::vector<CurveSpannedElement *> ArrayOfCurveSpannedElements;
 
 typedef std::list<std::pair<Object *, data_MEASUREBEAT>> ListOfObjectBeatPairs;
 
-typedef std::list<std::pair<Object *, std::string>> ListOfObjectAttNamePairs;
+typedef std::list<std::pair<const Object *, std::string>> ListOfObjectAttNamePairs;
 
 typedef std::list<std::pair<TimePointInterface *, ClassId>> ListOfPointingInterClassIdPairs;
 

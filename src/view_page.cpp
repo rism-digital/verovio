@@ -207,6 +207,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     this->DrawSystemChildren(dc, system, system);
 
     this->DrawSystemList(dc, system, SYL);
+    this->DrawSystemList(dc, system, ANNOTSCORE);
     this->DrawSystemList(dc, system, BEAMSPAN);
     this->DrawSystemList(dc, system, BRACKETSPAN);
     this->DrawSystemList(dc, system, DYNAM);
@@ -237,6 +238,9 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
     ArrayOfObjects *drawingList = system->GetDrawingList();
 
     for (Object *object : *drawingList) {
+        if (object->Is(classId) && (classId == ANNOTSCORE)) {
+            this->DrawTimeSpanningElement(dc, object, system);
+        }
         if (object->Is(classId) && (classId == BEAMSPAN)) {
             this->DrawTimeSpanningElement(dc, object, system);
         }
@@ -1160,7 +1164,7 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
     assert(measure);
     assert(mnum);
 
-    Staff *staff = measure->GetTopVisibleStaff();
+    Staff *staff = system->GetTopVisibleStaff();
     if (staff) {
         // Only one FloatingPositioner on the top (visible) staff
         if (!system->SetCurrentFloatingPositioner(staff->GetN(), mnum, staff, staff)) {
@@ -1389,20 +1393,7 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerL
             if (svgHtml5) {
                 // Add the custom graphic only with html5
                 dc->StartCustomGraphic("lineDash");
-                // Function to concatenate IDs from the list of Object events
-                auto concatenateIDs = [](const ListOfConstObjects &objects) {
-                    // Get a list of strings
-                    std::vector<std::string> ids;
-                    for (const auto &object : objects) {
-                        ids.push_back("#" + object->GetID() + " ");
-                    }
-                    // Concatenate IDs
-                    std::stringstream sstream;
-                    std::copy(ids.begin(), ids.end(), std::ostream_iterator<std::string>(sstream));
-                    return sstream.str();
-                };
-                std::string events = concatenateIDs(dash.m_events);
-                if (!events.empty()) events.pop_back(); // Remove extra space added by the concatenation
+                std::string events = ConcatenateIDs(dash.m_events);
                 dc->SetCustomGraphicAttributes("related", events);
             }
 
@@ -1610,7 +1601,7 @@ void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMe
 
     if ((system->IsDrawingOptimized() || (m_options->m_systemDivider.GetValue() > SYSTEMDIVIDER_auto))) {
         int y = system->GetDrawingY();
-        Staff *staff = firstMeasure->GetTopVisibleStaff();
+        Staff *staff = system->GetTopVisibleStaff();
         if (staff) {
             // Place it in the middle of current and previous systems - in very tight layout this can collision with
             // the staff above. To be improved

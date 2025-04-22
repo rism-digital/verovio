@@ -30815,7 +30815,7 @@ void HumdrumInput::setupMeiDocument()
     m_doc->SetType(Raw);
     // The mdiv
     Mdiv *mdiv = new Mdiv();
-    mdiv->m_visibility = Visible;
+    mdiv->SetVisibility(Visible);
     m_doc->AddChild(mdiv);
     // The score
     m_score = new Score();

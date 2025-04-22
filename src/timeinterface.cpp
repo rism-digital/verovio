@@ -19,6 +19,7 @@
 #include "measure.h"
 #include "preparedatafunctor.h"
 #include "staff.h"
+#include "system.h"
 #include "verticalaligner.h"
 #include "vrv.h"
 
@@ -28,8 +29,9 @@ namespace vrv {
 // TimePointInterface
 //----------------------------------------------------------------------------
 
-TimePointInterface::TimePointInterface() : Interface(), AttStaffIdent(), AttStartId(), AttTimestampLog()
+TimePointInterface::TimePointInterface() : Interface(), AttPartIdent(), AttStaffIdent(), AttStartId(), AttTimestampLog()
 {
+    this->RegisterInterfaceAttClass(ATT_PARTIDENT);
     this->RegisterInterfaceAttClass(ATT_STAFFIDENT);
     this->RegisterInterfaceAttClass(ATT_STARTID);
     this->RegisterInterfaceAttClass(ATT_TIMESTAMPLOG);
@@ -41,6 +43,7 @@ TimePointInterface::~TimePointInterface() {}
 
 void TimePointInterface::Reset()
 {
+    this->ResetPartIdent();
     this->ResetStaffIdent();
     this->ResetStartId();
     this->ResetTimestampLog();
@@ -131,6 +134,13 @@ std::vector<const Staff *> TimePointInterface::GetTstampStaves(const Measure *me
         if (harm) {
             staffList = harm->GetStaff();
         }
+    }
+    // For control elements with `@part="%all`, use the top visible staff indenpendently from the `@staff`
+    else if (this->HasPart() && (this->GetPart() == "%all")) {
+        const System *system = vrv_cast<const System *>(measure->GetFirstAncestor(SYSTEM));
+        assert(system);
+        const Staff *staff = system->GetTopVisibleStaff();
+        if (staff) staffList.push_back(staff->GetN());
     }
     else if (this->HasStaff()) {
         bool isInBetween = false;

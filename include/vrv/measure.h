@@ -295,15 +295,6 @@ public:
     std::vector<Staff *> GetFirstStaffGrpStaves(ScoreDef *scoreDef);
 
     /**
-     * Return the top (first) visible staff in the measure (if any).
-     * Takes into account system optimization
-     */
-    ///@{
-    Staff *GetTopVisibleStaff();
-    const Staff *GetTopVisibleStaff() const;
-    ///@}
-
-    /**
      * Return the bottom (last) visible staff in the measure (if any).
      * Takes into account system optimization
      */

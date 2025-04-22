@@ -257,8 +257,8 @@ FunctorCode FindExtremeByComparisonFunctor::VisitObject(const Object *object)
 //----------------------------------------------------------------------------
 
 FindAllReferencedObjectsFunctor::FindAllReferencedObjectsFunctor(
-    SetOfObjects *elements, ListOfObjectAttNamePairs *listWithAttName)
-    : Functor()
+    SetOfConstObjects *elements, ListOfObjectAttNamePairs *listWithAttName)
+    : ConstFunctor()
 {
     m_elements = elements;
     m_listWithAttName = listWithAttName;
@@ -267,48 +267,48 @@ FindAllReferencedObjectsFunctor::FindAllReferencedObjectsFunctor(
     m_milestoneReferences = false;
 }
 
-FunctorCode FindAllReferencedObjectsFunctor::VisitObject(Object *object)
+FunctorCode FindAllReferencedObjectsFunctor::VisitObject(const Object *object)
 {
     if (object->HasInterface(INTERFACE_ALT_SYM)) {
-        AltSymInterface *interface = object->GetAltSymInterface();
+        const AltSymInterface *interface = object->GetAltSymInterface();
         assert(interface);
         if (interface->GetAltSymbolDef()) this->AddObject(interface->GetAltSymbolDef(), "altsym");
     }
     if (object->HasInterface(INTERFACE_LINKING)) {
-        LinkingInterface *interface = object->GetLinkingInterface();
+        const LinkingInterface *interface = object->GetLinkingInterface();
         assert(interface);
         if (interface->GetNextLink()) this->AddObject(interface->GetNextLink(), "link");
         if (interface->GetSameasLink()) this->AddObject(interface->GetSameasLink(), "sameas");
     }
     if (object->HasInterface(INTERFACE_FACSIMILE)) {
-        FacsimileInterface *interface = object->GetFacsimileInterface();
+        const FacsimileInterface *interface = object->GetFacsimileInterface();
         assert(interface);
         if (interface->GetSurface()) this->AddObject(interface->GetSurface(), "surface");
         if (interface->GetZone()) this->AddObject(interface->GetZone(), "zone");
     }
     if (object->HasInterface(INTERFACE_PLIST)) {
-        PlistInterface *interface = object->GetPlistInterface();
+        const PlistInterface *interface = object->GetPlistInterface();
         assert(interface);
-        for (Object *object : interface->GetRefs()) {
+        for (const Object *object : interface->GetRefs()) {
             this->AddObject(object, "plist");
         }
     }
     if (object->HasInterface(INTERFACE_TIME_POINT) || object->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimePointInterface *interface = object->GetTimePointInterface();
+        const TimePointInterface *interface = object->GetTimePointInterface();
         assert(interface);
         if (interface->GetStart() && !interface->GetStart()->Is(TIMESTAMP_ATTR)) {
             this->AddObject(interface->GetStart(), "startid");
         }
     }
     if (object->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimeSpanningInterface *interface = object->GetTimeSpanningInterface();
+        const TimeSpanningInterface *interface = object->GetTimeSpanningInterface();
         assert(interface);
         if (interface->GetEnd() && !interface->GetEnd()->Is(TIMESTAMP_ATTR)) {
             this->AddObject(interface->GetEnd(), "endid");
         }
     }
     if (object->Is(NOTE)) {
-        Note *note = vrv_cast<Note *>(object);
+        const Note *note = vrv_cast<const Note *>(object);
         assert(note);
         // The note has a stem.sameas that was resolved the a note, then that one is referenced
         if (note->HasStemSameas() && note->HasStemSameasNote()) {
@@ -324,7 +324,7 @@ FunctorCode FindAllReferencedObjectsFunctor::VisitObject(Object *object)
     return FUNCTOR_CONTINUE;
 }
 
-void FindAllReferencedObjectsFunctor::AddObject(Object *object, const std::string &attribute)
+void FindAllReferencedObjectsFunctor::AddObject(const Object *object, const std::string &attribute)
 {
     if (m_elements) {
         m_elements->insert(object);
@@ -339,23 +339,23 @@ void FindAllReferencedObjectsFunctor::AddObject(Object *object, const std::strin
 //----------------------------------------------------------------------------
 
 FindAllReferringObjectsFunctor::FindAllReferringObjectsFunctor(const Object *object, ListOfObjectAttNamePairs *elements)
-    : Functor()
+    : ConstFunctor()
 {
     m_object = object;
     m_elements = elements;
 }
 
-FunctorCode FindAllReferringObjectsFunctor::VisitObject(Object *object)
+FunctorCode FindAllReferringObjectsFunctor::VisitObject(const Object *object)
 {
     if (object->HasInterface(INTERFACE_ALT_SYM)) {
-        AltSymInterface *interface = object->GetAltSymInterface();
+        const AltSymInterface *interface = object->GetAltSymInterface();
         assert(interface);
         if (interface->GetAltSymbolDef() == m_object) {
             m_elements->push_back(std::make_pair(object, "altsym"));
         }
     }
     if (object->HasInterface(INTERFACE_LINKING)) {
-        LinkingInterface *interface = object->GetLinkingInterface();
+        const LinkingInterface *interface = object->GetLinkingInterface();
         assert(interface);
         if (interface->GetNextLink() == m_object) {
             m_elements->push_back(std::make_pair(object, "next"));
@@ -365,7 +365,7 @@ FunctorCode FindAllReferringObjectsFunctor::VisitObject(Object *object)
         }
     }
     if (object->HasInterface(INTERFACE_FACSIMILE)) {
-        FacsimileInterface *interface = object->GetFacsimileInterface();
+        const FacsimileInterface *interface = object->GetFacsimileInterface();
         assert(interface);
         if (interface->GetSurface() == m_object) {
             m_elements->push_back(std::make_pair(object, "surface"));
@@ -375,30 +375,30 @@ FunctorCode FindAllReferringObjectsFunctor::VisitObject(Object *object)
         }
     }
     if (object->HasInterface(INTERFACE_PLIST)) {
-        PlistInterface *interface = object->GetPlistInterface();
+        const PlistInterface *interface = object->GetPlistInterface();
         assert(interface);
-        for (Object *plistObject : interface->GetRefs()) {
+        for (const Object *plistObject : interface->GetRefs()) {
             if (m_object == plistObject) {
                 m_elements->push_back(std::make_pair(object, "plist"));
             }
         }
     }
     if (object->HasInterface(INTERFACE_TIME_POINT) || object->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimePointInterface *interface = object->GetTimePointInterface();
+        const TimePointInterface *interface = object->GetTimePointInterface();
         assert(interface);
         if (interface->GetStart() == m_object) {
             m_elements->push_back(std::make_pair(object, "startid"));
         }
     }
     if (object->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimeSpanningInterface *interface = object->GetTimeSpanningInterface();
+        const TimeSpanningInterface *interface = object->GetTimeSpanningInterface();
         assert(interface);
         if ((interface->GetEnd() == m_object)) {
             m_elements->push_back(std::make_pair(object, "endid"));
         }
     }
     if (object->Is(NOTE)) {
-        Note *note = vrv_cast<Note *>(object);
+        const Note *note = vrv_cast<const Note *>(object);
         assert(note);
         // The note has a stem.sameas that was resolved the a note, then that one is referenced
         if (note->HasStemSameas() && (note->GetStemSameasNote() == m_object)) {
