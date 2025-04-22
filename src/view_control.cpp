@@ -2431,7 +2431,7 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
 
     std::vector<Staff *> staffList = reh->GetTstampStaves(measure, reh);
     if (staffList.empty()) {
-        Staff *staff = measure->GetTopVisibleStaff();
+        Staff *staff = system->GetTopVisibleStaff();
         if (staff) staffList.push_back(staff);
     }
 
