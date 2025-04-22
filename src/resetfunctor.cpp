@@ -368,6 +368,7 @@ FunctorCode ResetDataFunctor::VisitObject(Object *object)
         assert(interface);
         interface->InterfaceResetData(*this, object);
     }
+    if (object->HasPlistReferences()) object->ResetPlistReferences();
 
     return FUNCTOR_CONTINUE;
 }

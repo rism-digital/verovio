@@ -1216,6 +1216,12 @@ Object *Object::FindPreviousChild(Comparison *comp, Object *start)
     return const_cast<Object *>(findPreviousChildByComparison.GetElement());
 }
 
+void Object::AddPlistReference(const Object *object)
+{
+    if (!m_plistReferences) m_plistReferences.emplace();
+    m_plistReferences->push_back(object);
+}
+
 void Object::LogDebugTree(int maxDepth, int level)
 {
     std::string indent(level, '\t');

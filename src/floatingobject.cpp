@@ -214,7 +214,10 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
     m_alignment = alignment;
     m_spanningType = spanningType;
 
-    if (object->Is(BRACKETSPAN)) {
+    if (object->Is(ANNOTSCORE)) {
+        m_place = STAFFREL_above;
+    }
+    else if (object->Is(BRACKETSPAN)) {
         m_place = STAFFREL_above;
     }
     else if (object->Is(BREATH)) {

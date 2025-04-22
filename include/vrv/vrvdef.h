@@ -177,6 +177,7 @@ enum ClassId : uint16_t {
     // Ids for ControlElement child classes
     CONTROL_ELEMENT,
     ANCHOREDTEXT,
+    ANNOTSCORE,
     ARPEG,
     BEAMSPAN,
     BRACKETSPAN,
@@ -363,7 +364,7 @@ typedef std::multimap<std::string, LinkingInterface *> MapOfLinkingInterfaceIDPa
 
 typedef std::map<std::string, Note *> MapOfNoteIDPairs;
 
-typedef std::vector<std::pair<PlistInterface *, std::string>> ArrayOfPlistInterfaceIDPairs;
+typedef std::vector<std::pair<Object *, std::string>> ArrayOfPlistObjectIDPairs;
 
 typedef std::vector<CurveSpannedElement *> ArrayOfCurveSpannedElements;
 

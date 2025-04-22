@@ -337,8 +337,8 @@ public:
      * Getter and modifier for the interface / id pairs
      */
     ///@{
-    const ArrayOfPlistInterfaceIDPairs &GetInterfaceIDPairs() const { return m_interfaceIDPairs; }
-    void InsertInterfaceIDPair(const std::string &elementID, PlistInterface *interface);
+    const ArrayOfPlistObjectIDPairs &GetInterfaceIDPairs() const { return m_plistObjectIDPairs; }
+    void InsertInterfaceObjectIDPair(Object *objectWithPlist, const std::string &elementID);
     ///@}
 
     /*
@@ -355,8 +355,8 @@ private:
 public:
     //
 private:
-    // Holds the interface / id pairs to match
-    ArrayOfPlistInterfaceIDPairs m_interfaceIDPairs;
+    // Holds the object with plist / id pairs to match
+    ArrayOfPlistObjectIDPairs m_plistObjectIDPairs;
 };
 
 //----------------------------------------------------------------------------

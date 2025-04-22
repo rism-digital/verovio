@@ -259,6 +259,13 @@ void SvgDeviceContext::StartGraphic(
     AppendIdAndClass(gId, object->GetClassName(), gClassFull, graphicID);
     AppendAdditionalAttributes(object);
 
+    // Add data-plist with html5 (now only for annot)
+    if (m_html5 && object->HasPlistReferences()) {
+        auto plist = object->GetPlistReferences();
+        std::string ids = ConcatenateIDs(**plist);
+        this->SetCustomGraphicAttributes("plist-referring", ids);
+    }
+
     // this sets staffDef styles for lyrics
     if (object->Is(STAFF)) {
         Staff *staff = vrv_cast<Staff *>(object);
