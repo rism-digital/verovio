@@ -2998,7 +2998,7 @@ bool PAEInput::Parse()
     if (m_isMensural) m_doc->m_notationType = NOTATIONTYPE_mensural;
     // The mdiv
     Mdiv *mdiv = new Mdiv();
-    mdiv->m_visibility = Visible;
+    mdiv->SetVisibility(Visible);
     m_doc->AddChild(mdiv);
     // The score
     Score *score = new Score();

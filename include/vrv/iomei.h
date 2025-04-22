@@ -597,7 +597,7 @@ private:
 
     bool m_ignoreHeader;
     bool m_removeIds;
-    SetOfObjects m_referredObjects;
+    SetOfConstObjects m_referredObjects;
 };
 
 //----------------------------------------------------------------------------

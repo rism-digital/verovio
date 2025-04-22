@@ -236,15 +236,15 @@ void Object::RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId 
     m_interfaces.push_back(interfaceId);
 }
 
-bool Object::IsMilestoneElement()
+bool Object::IsMilestoneElement() const
 {
     if (this->IsEditorialElement() || this->Is(ENDING) || this->Is(SECTION)) {
-        SystemMilestoneInterface *interface = dynamic_cast<SystemMilestoneInterface *>(this);
+        const SystemMilestoneInterface *interface = dynamic_cast<const SystemMilestoneInterface *>(this);
         assert(interface);
         return (interface->IsSystemMilestone());
     }
     else if (this->Is(MDIV) || this->Is(SCORE)) {
-        PageMilestoneInterface *interface = dynamic_cast<PageMilestoneInterface *>(this);
+        const PageMilestoneInterface *interface = dynamic_cast<const PageMilestoneInterface *>(this);
         assert(interface);
         return (interface->IsPageMilestone());
     }
@@ -1172,24 +1172,10 @@ FunctorCode Object::AcceptEnd(ConstFunctor &functor) const
 bool Object::SkipChildren(bool visibleOnly) const
 {
     if (visibleOnly) {
-        if (this->IsEditorialElement()) {
-            const EditorialElement *editorialElement = vrv_cast<const EditorialElement *>(this);
-            assert(editorialElement);
-            if (editorialElement->m_visibility == Hidden) {
-                return true;
-            }
-        }
-        else if (this->Is(MDIV)) {
-            const Mdiv *mdiv = vrv_cast<const Mdiv *>(this);
-            assert(mdiv);
-            if (mdiv->m_visibility == Hidden) {
-                return true;
-            }
-        }
-        else if (this->IsSystemElement()) {
-            const SystemElement *systemElement = vrv_cast<const SystemElement *>(this);
-            assert(systemElement);
-            if (systemElement->m_visibility == Hidden) {
+        if (this->IsEditorialElement() || this->Is(MDIV) || this->IsSystemElement()) {
+            const VisibilityDrawingInterface *interface = this->GetVisibilityDrawingInterface();
+            assert(interface);
+            if (interface->IsHidden()) {
                 return true;
             }
         }

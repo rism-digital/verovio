@@ -44,7 +44,7 @@ FunctorCode SaveFunctor::VisitDotsEnd(Dots *dots)
 FunctorCode SaveFunctor::VisitEditorialElement(EditorialElement *editorialElement)
 {
     // When writing MEI basic, only visible elements within editorial markup are saved
-    if (m_basic && (editorialElement->m_visibility == Hidden)) {
+    if (m_basic && (editorialElement->IsHidden())) {
         return FUNCTOR_SIBLINGS;
     }
     else {
@@ -55,7 +55,7 @@ FunctorCode SaveFunctor::VisitEditorialElement(EditorialElement *editorialElemen
 FunctorCode SaveFunctor::VisitEditorialElementEnd(EditorialElement *editorialElement)
 {
     // Same as above
-    if (m_basic && (editorialElement->m_visibility == Hidden)) {
+    if (m_basic && (editorialElement->IsHidden())) {
         return FUNCTOR_SIBLINGS;
     }
     else {
@@ -78,7 +78,7 @@ FunctorCode SaveFunctor::VisitMdiv(Mdiv *mdiv)
 {
     MEIOutput *meiOutput = dynamic_cast<MEIOutput *>(m_output);
 
-    if (meiOutput && (mdiv->m_visibility == Hidden)) {
+    if (meiOutput && (mdiv->IsHidden())) {
         // Do not output hidden mdivs in page-based MEI or when saving score-based MEI with filter
         if (!meiOutput->GetScoreBasedMEI() || meiOutput->HasFilter()) return FUNCTOR_SIBLINGS;
     }
@@ -89,7 +89,7 @@ FunctorCode SaveFunctor::VisitMdivEnd(Mdiv *mdiv)
 {
     MEIOutput *meiOutput = dynamic_cast<MEIOutput *>(m_output);
 
-    if (meiOutput && (mdiv->m_visibility == Hidden)) {
+    if (meiOutput && (mdiv->IsHidden())) {
         // Do not output hidden mdivs in page-based MEI or when saving score-based MEI with filter
         if (!meiOutput->GetScoreBasedMEI() || meiOutput->HasFilter()) return FUNCTOR_SIBLINGS;
     }

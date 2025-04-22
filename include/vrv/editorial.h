@@ -10,6 +10,7 @@
 
 #include "atts_critapp.h"
 #include "atts_shared.h"
+#include "drawinginterface.h"
 #include "object.h"
 #include "systemmilestone.h"
 
@@ -35,7 +36,11 @@ class TextElement;
  * It is not an abstract class but should not be instantiated directly.
  * It can be both a container (in score-based MEI) and a milestone (in page-based MEI).
  */
-class EditorialElement : public Object, public SystemMilestoneInterface, public AttLabelled, public AttTyped {
+class EditorialElement : public Object,
+                         public VisibilityDrawingInterface,
+                         public SystemMilestoneInterface,
+                         public AttLabelled,
+                         public AttTyped {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -55,6 +60,20 @@ public:
     bool IsSupportedChild(ClassId classId) override;
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    VisibilityDrawingInterface *GetVisibilityDrawingInterface() override
+    {
+        return vrv_cast<VisibilityDrawingInterface *>(this);
+    }
+    const VisibilityDrawingInterface *GetVisibilityDrawingInterface() const override
+    {
+        return vrv_cast<const VisibilityDrawingInterface *>(this);
+    }
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -72,13 +91,7 @@ public:
 private:
     //
 public:
-    /**
-     * Holds the visibility (hidden or visible) for an editorial element.
-     * By default, all editorial elements are visible. However, in an <app>, only one <rdg> is visible at the time. When
-     * loading the file, the first <rdg> (or the <lem>) is made visible.
-     */
-    VisibilityType m_visibility;
-
+    //
 private:
 };
 

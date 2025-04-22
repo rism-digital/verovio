@@ -49,6 +49,7 @@ Score::~Score() {}
 void Score::Reset()
 {
     Object::Reset();
+    PageMilestoneInterface::Reset();
     this->ResetLabelled();
     this->ResetNNumberLike();
 

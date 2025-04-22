@@ -404,13 +404,13 @@ private:
  * This class finds all objects to which another object refers to.
  * The constructor should take either elements or a listWithAttName pointer set, the other should be NULL.
  */
-class FindAllReferencedObjectsFunctor : public Functor {
+class FindAllReferencedObjectsFunctor : public ConstFunctor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    FindAllReferencedObjectsFunctor(SetOfObjects *elements, ListOfObjectAttNamePairs *listWithAttName);
+    FindAllReferencedObjectsFunctor(SetOfConstObjects *elements, ListOfObjectAttNamePairs *listWithAttName);
     virtual ~FindAllReferencedObjectsFunctor() = default;
     ///@}
 
@@ -428,20 +428,20 @@ public:
      * Functor interface
      */
     ///@{
-    FunctorCode VisitObject(Object *object) override;
+    FunctorCode VisitObject(const Object *object) override;
     ///@}
 
 protected:
     //
 private:
     //
-    void AddObject(Object *object, const std::string &attribute);
+    void AddObject(const Object *object, const std::string &attribute);
 
 public:
     //
 private:
     // The set of all matching objects
-    SetOfObjects *m_elements;
+    SetOfConstObjects *m_elements;
     // The list of pairs of matching objects with the attribute name
     ListOfObjectAttNamePairs *m_listWithAttName;
     // A flag indicating if milestone references should be included as well
@@ -455,7 +455,7 @@ private:
 /**
  * This class finds all objects referring to a specific object
  */
-class FindAllReferringObjectsFunctor : public Functor {
+class FindAllReferringObjectsFunctor : public ConstFunctor {
 public:
     /**
      * @name Constructors, destructors
@@ -474,7 +474,7 @@ public:
      * Functor interface
      */
     ///@{
-    FunctorCode VisitObject(Object *object) override;
+    FunctorCode VisitObject(const Object *object) override;
     ///@}
 
 protected:

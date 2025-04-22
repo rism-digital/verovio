@@ -1886,7 +1886,7 @@ void View::DrawMeasureEditorialElement(DeviceContext *dc, EditorialElement *elem
     }
 
     dc->StartGraphic(element, "", element->GetID());
-    if (element->m_visibility == Visible) {
+    if (!element->IsHidden()) {
         this->DrawMeasureChildren(dc, element, measure, system);
     }
     dc->EndGraphic(element, this);
@@ -1907,7 +1907,7 @@ void View::DrawStaffEditorialElement(DeviceContext *dc, EditorialElement *elemen
     }
 
     dc->StartGraphic(element, "", element->GetID());
-    if (element->m_visibility == Visible) {
+    if (!element->IsHidden()) {
         this->DrawStaffChildren(dc, element, staff, measure);
     }
     dc->EndGraphic(element, this);
@@ -1929,7 +1929,7 @@ void View::DrawLayerEditorialElement(
     }
 
     dc->StartGraphic(element, "", element->GetID());
-    if (element->m_visibility == Visible) {
+    if (!element->IsHidden()) {
         this->DrawLayerChildren(dc, element, layer, staff, measure);
     }
     dc->EndGraphic(element, this);
@@ -1950,7 +1950,7 @@ void View::DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element
     }
 
     dc->StartTextGraphic(element, "", element->GetID());
-    if (element->m_visibility == Visible) {
+    if (!element->IsHidden()) {
         this->DrawTextChildren(dc, element, params);
     }
     dc->EndTextGraphic(element, this);
@@ -1971,7 +1971,7 @@ void View::DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, 
     }
 
     dc->StartTextGraphic(element, "", element->GetID());
-    if (element->m_visibility == Visible) {
+    if (!element->IsHidden()) {
         this->DrawFbChildren(dc, element, params);
     }
     dc->EndTextGraphic(element, this);
@@ -1992,7 +1992,7 @@ void View::DrawRunningEditorialElement(DeviceContext *dc, EditorialElement *elem
     }
 
     dc->StartGraphic(element, "", element->GetID());
-    if (element->m_visibility == Visible) {
+    if (!element->IsHidden()) {
         this->DrawRunningChildren(dc, element, params);
     }
     dc->EndGraphic(element, this);

@@ -832,7 +832,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 
     // the mdiv
     Mdiv *mdiv = new Mdiv();
-    mdiv->m_visibility = Visible;
+    mdiv->SetVisibility(Visible);
     m_doc->AddChild(mdiv);
     // the score
     Score *score = new Score();
