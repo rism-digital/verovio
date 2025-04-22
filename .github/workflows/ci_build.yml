@@ -45,7 +45,7 @@ env:
   # emscripten
   EM_VERSION: latest
   EM_CACHE_FOLDER: "emsdk-cache"
-  EM_CACHE_ID: 3
+  EM_CACHE_ID: 4
 
   # gh-pages
   GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org # works from rism-digital and from forks
@@ -130,6 +130,14 @@ jobs:
           - os: macos-latest
             compiler: g++
             version: "12"
+            
+          - os: macos-latest
+            compiler: g++
+            version: "13"
+            
+          - os: macos-latest
+            compiler: g++
+            version: "14"
 
     steps:
       - name: Checkout main repo
