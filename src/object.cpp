@@ -239,12 +239,12 @@ void Object::RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId 
 bool Object::IsMilestoneElement() const
 {
     if (this->IsEditorialElement() || this->Is(ENDING) || this->Is(SECTION)) {
-        SystemMilestoneInterface *interface = dynamic_cast<SystemMilestoneInterface *>(this);
+        const SystemMilestoneInterface *interface = dynamic_cast<const SystemMilestoneInterface *>(this);
         assert(interface);
         return (interface->IsSystemMilestone());
     }
     else if (this->Is(MDIV) || this->Is(SCORE)) {
-        PageMilestoneInterface *interface = dynamic_cast<PageMilestoneInterface *>(this);
+        const PageMilestoneInterface *interface = dynamic_cast<const PageMilestoneInterface *>(this);
         assert(interface);
         return (interface->IsPageMilestone());
     }
