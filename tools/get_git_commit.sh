@@ -18,7 +18,7 @@ fi
 
 echo "////////////////////////////////////////////////////////" > $output
 echo "/// Git commit version file generated at compilation ///" >> $output
-echo "/// Timestamp: $(date +"%Y-%m-%dT%H:%M:%S%:z")             ///" >> $output
+echo "/// Timestamp: $(date -u +"%Y-%m-%dT%H:%M:%SZ")                  ///" >> $output
 echo "////////////////////////////////////////////////////////" >> $output
 echo "" >> $output
 echo "#define GIT_COMMIT \"$COMMIT\"" >> $output
