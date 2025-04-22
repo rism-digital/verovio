@@ -75,10 +75,10 @@ protected:
     Object *GetElement(std::string &elementId);
 
     void ContextForObject(const Object *object, jsonxx::Object &element, bool recursive = false);
-    void ContextForObjects(const ListOfConstObjects &objects, jsonxx::Array &siblings);
+    void ContextForObjects(const ArrayOfConstObjects &objects, jsonxx::Array &siblings);
     void ContextForReferences(const ListOfObjectAttNamePairs &objects, jsonxx::Array &links);
 
-    void GetScoreBasedChildrenFor(const Object *object, ListOfConstObjects &children);
+    ArrayOfConstObjects GetScoreBasedChildrenFor(const Object *object);
 
 public:
     //

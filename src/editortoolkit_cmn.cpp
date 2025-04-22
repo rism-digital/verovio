@@ -741,7 +741,7 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
     assert(m_sectionContext);
 
     bool hasTargetID = (elementId != "[unspecified]");
-    Object *object = NULL;
+    const Object *object = NULL;
     if (hasTargetID) {
         object = this->GetElement(elementId);
     }
@@ -752,8 +752,8 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
     // We cannot continue without object
     if (!object || !object->GetParent()) return false;
 
-    ListOfConstObjects objects;
-    ListOfConstObjects::iterator targetIt;
+    ArrayOfConstObjects objects;
+    ArrayOfConstObjects::iterator targetIt;
 
     const Object *contextRoot = NULL;
 
@@ -763,15 +763,14 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
             return false;
         }
         contextRoot = editorTreeObject->GetParent();
-        this->GetScoreBasedChildrenFor(contextRoot, objects);
+        objects = this->GetScoreBasedChildrenFor(contextRoot);
 
         targetIt = std::find(objects.begin(), objects.end(), object);
         // This should not happen
         if (targetIt == objects.end()) return false;
     }
     else {
-        const ArrayOfObjects &objectsArr = object->GetParent()->GetChildren();
-        std::copy(objectsArr.begin(), objectsArr.end(), std::back_inserter(objects));
+        objects = object->GetParent()->GetChildren();
         targetIt = std::find(objects.begin(), objects.end(), object);
         // This should not happen
         if (targetIt == objects.end()) return false;
@@ -783,35 +782,42 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
         }
         contextRoot = editorTreeObject->GetParent();
     }
-    ListOfConstObjects previous;
+    ArrayOfConstObjects previous;
     if (targetIt != objects.begin()) std::copy(objects.begin(), targetIt, std::back_inserter(previous));
 
-    ListOfConstObjects following;
+    ArrayOfConstObjects following;
     if (targetIt != objects.end()) std::copy(std::next(targetIt), objects.end(), std::back_inserter(following));
 
     // Build the json context
 
+    /*
     jsonxx::Object section;
     section << "id" << contextRoot->GetID();
     section << "element" << ".";
     section << "prout" << contextRoot->GetClassName();
     jsonxx::Object jsonContext;
+    */
 
-    ListOfConstObjects ancestors;
+    ArrayOfConstObjects ancestors;
     jsonxx::Array jsonAncestors;
 
     const Object *context = object->GetParent();
-    const Object *parent = context;
+    const Object *ancestor = object;
+
     // Look for additional ancestors
-    while (parent) {
-        if (parent->Is(SYSTEM)) break;
-        ancestors.push_back(parent);
-        parent = parent->GetParent();
+    while (ancestor->GetParent()) {
+        if (ancestor->GetParent()->Is(SYSTEM)) {
+            ancestor = m_sectionContext->FindDescendantByID(ancestor->GetID());
+            if (!ancestor || !ancestor->GetParent()) return false;
+        }
+        if (ancestor->GetParent()->Is(SCORE)) break;
+        ancestor = ancestor->GetParent();
+        ancestors.push_back(ancestor);
     }
     this->ContextForObjects(ancestors, jsonAncestors);
     // Also add the section (.) as ancestor
-    jsonAncestors << section;
-
+    // jsonAncestors << section;
+    jsonxx::Object jsonContext;
     this->ContextForObject(context, jsonContext);
 
     // Ancestors in addition to the parent of the target (context object)
@@ -831,13 +837,12 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
     // Include its children, but only if we specified a target ID
     if (hasTargetID) {
         jsonxx::Array jsonObjectChildren;
-        ListOfConstObjects objectChildren;
+        ArrayOfConstObjects objectChildren;
         if (object->IsMilestoneElement()) {
-            this->GetScoreBasedChildrenFor(object, objectChildren);
+            objectChildren = this->GetScoreBasedChildrenFor(object);
         }
         else {
-            const ArrayOfObjects &objectsArr = object->GetChildren();
-            std::copy(objectsArr.begin(), objectsArr.end(), std::back_inserter(objectChildren));
+            objectChildren = object->GetChildren();
         }
         this->ContextForObjects(objectChildren, jsonObjectChildren);
         if (!jsonObjectChildren.empty()) jsonObject << "children" << jsonObjectChildren;
@@ -908,14 +913,19 @@ void EditorToolkitCMN::ContextForObject(const Object *object, jsonxx::Object &el
         element << "attributes" << attributes;
     }
 
-    ClassIdsComparison notClassIds({ DOTS, FLAG, STEM, TUPLET_NUM, TUPLET_BRACKET });
-    notClassIds.ReverseComparison();
-    ListOfConstObjects children;
-    if (object->IsMilestoneElement()) {
-        this->GetScoreBasedChildrenFor(object, children);
+    ArrayOfConstObjects children;
+    // First check that this is an EditorTreeObject bcause otherwise checking
+    // Object::IsMilestoneElement will be missing the interfaces on pseudo types
+    if ((dynamic_cast<const EditorTreeObject *>(object)) || object->IsMilestoneElement()) {
+        children = this->GetScoreBasedChildrenFor(object);
     }
     else {
-        object->FindAllDescendantsByComparison(&children, &notClassIds, 1);
+        children = object->GetChildren();
+        // Remove children that are added as element parts
+        children.erase(
+            std::remove_if(children.begin(), children.end(),
+                [](const Object *item) { return item->Is({ DOTS, FLAG, STEM, TUPLET_NUM, TUPLET_BRACKET }); }),
+            children.end());
     }
     if (children.size() > 0) {
         jsonxx::Array jsonChildren;
@@ -933,7 +943,7 @@ void EditorToolkitCMN::ContextForObject(const Object *object, jsonxx::Object &el
     }
 }
 
-void EditorToolkitCMN::ContextForObjects(const ListOfConstObjects &objects, jsonxx::Array &elements)
+void EditorToolkitCMN::ContextForObjects(const ArrayOfConstObjects &objects, jsonxx::Array &elements)
 {
     elements.reset();
 
@@ -964,16 +974,15 @@ void EditorToolkitCMN::ContextForReferences(const ListOfObjectAttNamePairs &obje
     }
 }
 
-void EditorToolkitCMN::GetScoreBasedChildrenFor(const Object *object, ListOfConstObjects &children)
+ArrayOfConstObjects EditorToolkitCMN::GetScoreBasedChildrenFor(const Object *object)
 {
     assert(m_sectionContext);
     const EditorTreeObject *editorTreeObject
         = vrv_cast<const EditorTreeObject *>(m_sectionContext->FindDescendantByID(object->GetID()));
     if (!editorTreeObject) {
-        return;
+        return ArrayOfConstObjects();
     }
-    const ArrayOfConstObjects &objectsArr = editorTreeObject->GetChildrenObjects();
-    std::copy(objectsArr.begin(), objectsArr.end(), std::back_inserter(children));
+    return editorTreeObject->GetChildrenObjects();
 }
 
 //----------------------------------------------------------------------------
