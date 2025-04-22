@@ -75,10 +75,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-20.04
-            compiler: g++
-            version: "10"
-
           - os: ubuntu-22.04
             compiler: g++
             version: "11"
@@ -87,16 +83,8 @@ jobs:
             compiler: g++
             version: "12"
 
-          - os: ubuntu-20.04
-            compiler: clang
-            version: "11"
-
-          - os: ubuntu-22.04
-            compiler: clang
-            version: "12"
-
-          - os: ubuntu-22.04
-            compiler: clang
+          - os: ubuntu-24.04
+            compiler: g++
             version: "12"
 
           - os: ubuntu-22.04
@@ -113,9 +101,17 @@ jobs:
 
           - os: ubuntu-22.04
             compiler: clang
-            version: "11"
+            version: "15"
 
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
+            compiler: clang
+            version: "13"
+
+          - os: ubuntu-24.04
+            compiler: clang
+            version: "14"
+
+          - os: ubuntu-24.04
             compiler: clang
             version: "15"
 
