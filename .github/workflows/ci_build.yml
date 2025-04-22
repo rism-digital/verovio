@@ -86,6 +86,14 @@ jobs:
           - os: ubuntu-24.04
             compiler: g++
             version: "12"
+            
+          - os: ubuntu-24.04
+            compiler: g++
+            version: "13"
+            
+          - os: ubuntu-24.04
+            compiler: g++
+            version: "14"
 
           - os: ubuntu-22.04
             compiler: clang
@@ -105,15 +113,15 @@ jobs:
 
           - os: ubuntu-24.04
             compiler: clang
-            version: "13"
+            version: "16"
 
           - os: ubuntu-24.04
             compiler: clang
-            version: "14"
+            version: "17"
 
           - os: ubuntu-24.04
             compiler: clang
-            version: "15"
+            version: "18"
 
           - os: macos-latest
             compiler: xcode
@@ -199,7 +207,7 @@ jobs:
     if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
 
     name: Set up and cache emscripten
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Set up cache
@@ -225,7 +233,7 @@ jobs:
   ##################################
   build_js:
     name: Build JS toolkit
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: [setup_emscripten]
 
     # set matrix with toolkit options (runs the following steps for every target in parallel)
@@ -300,7 +308,7 @@ jobs:
   ############################
   copy_font_files:
     name: Copy the font files
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout main repo
@@ -324,7 +332,7 @@ jobs:
   ##################################
   check_deploy_settings:
     name: Check settings for deployment
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     # run deployment only after finishing the build jobs
     needs: [build_cpp, build_js]
 
@@ -359,7 +367,7 @@ jobs:
   #########################################
   deploy_toolkit:
     name: Deploy JS toolkit
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: ${{ needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'false' }}
     # run deployment only after finishing the build jobs
     needs: [build_cpp, build_js, check_deploy_settings]
@@ -452,7 +460,7 @@ jobs:
   ###################################
   build_docs:
     name: Build documentation
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     # run only after finishing other build jobs
     needs: [build_cpp, build_js]
 
@@ -488,7 +496,7 @@ jobs:
   ###############################################
   deploy_docs:
     name: Deploy documentation
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: ${{ needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'false' }}
     # run deployment only after finishing the build job
     needs: [build_docs, check_deploy_settings]
@@ -573,7 +581,7 @@ jobs:
   ###############################################
   skip_deploy:
     name: Skip deployment if set
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     # always() is needed here to meet if-condition even if earlier steps failed
     # cf. https://github.com/actions/runner/issues/491
     if: ${{ always() && needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'true' }}
