@@ -22,9 +22,9 @@ namespace vrv {
 
 StructFunctor::StructFunctor(Object *object, bool scoreContext) : Functor()
 {
-    //m_stack.push_back(node);
+    // m_stack.push_back(node);
     m_current = object;
-    
+
     m_scoreContext = scoreContext;
     this->SetVisibleOnly(!m_scoreContext);
 }
@@ -35,7 +35,7 @@ FunctorCode StructFunctor::VisitObject(Object *object)
     if (object->GetParent() && object->GetParent()->Is({ DIV, MEASURE, SCOREDEF })) {
         return FUNCTOR_SIBLINGS;
     }
-    
+
     if (m_scoreContext) {
         if (!object->Is({ MDIV, SCORE })) {
             return FUNCTOR_CONTINUE;
@@ -60,7 +60,7 @@ FunctorCode StructFunctor::VisitObjectEnd(Object *object)
     if (object->IsMilestoneElement()) {
         return FUNCTOR_CONTINUE;
     }
-    
+
     if (m_scoreContext) {
         if (object->Is(PAGE_MILESTONE_END)) {
             m_current = m_current->GetParent();
@@ -77,9 +77,9 @@ FunctorCode StructFunctor::VisitObjectEnd(Object *object)
             return FUNCTOR_CONTINUE;
         }
     }
-    
+
     m_current = m_current->GetParent();
-    
+
     return FUNCTOR_CONTINUE;
 }
 

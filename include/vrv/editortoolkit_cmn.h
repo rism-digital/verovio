@@ -37,7 +37,7 @@ public:
     }
     bool ParseEditorAction(const std::string &json_editorAction, bool commitOnly = false);
     std::string EditInfo() override;
-    
+
 protected:
     /**
      * Parse JSON instructions for experimental editor functions.
@@ -51,7 +51,7 @@ protected:
     bool ParseInsertAction(jsonxx::Object param, std::string &elementType, std::string &startid, std::string &endid);
     bool ParseSetAction(jsonxx::Object param, std::string &elementId, std::string &attribute, std::string &value);
     ///@}
-    
+
     /**
      * Experimental editor functions.
      */
@@ -63,26 +63,28 @@ protected:
     bool Insert(std::string &elementType, std::string const &startid);
     bool Set(std::string &elementId, std::string const &attribute, std::string const &value);
     ///@}
-    
+
     bool InsertNote(Object *object);
-    
+
     bool DeleteNote(Note *note);
-    
+
     bool ContextForElement(std::string &elementId);
     bool ContextForScores(bool editInfo);
     bool ContextForSections(bool editInfo);
-    
+
     Object *GetElement(std::string &elementId);
-    
+
     void ContextForObject(const Object *object, jsonxx::Object &element, bool recursive = false);
     void ContextForObjects(const ListOfConstObjects &objects, jsonxx::Array &siblings);
     void ContextForReferences(const ListOfObjectAttNamePairs &objects, jsonxx::Array &links);
+
+    void GetScoreBasedChildrenFor(const Object *object, ListOfConstObjects &children);
 
 public:
     //
 protected:
     std::string m_chainedId;
-    
+
     EditorTreeObject *m_scoreContext;
     EditorTreeObject *m_sectionContext;
 };
@@ -114,7 +116,23 @@ public:
     ///@{
     bool IsSupportedChild(ClassId classId) override { return true; }
     ///@}
-    
+
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    VisibilityDrawingInterface *GetVisibilityDrawingInterface() override
+    {
+        return vrv_cast<VisibilityDrawingInterface *>(this);
+    }
+    const VisibilityDrawingInterface *GetVisibilityDrawingInterface() const override
+    {
+        return vrv_cast<const VisibilityDrawingInterface *>(this);
+    }
+    ///@}
+
+    ArrayOfConstObjects GetChildrenObjects() const;
+
 private:
     //
 public:
