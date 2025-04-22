@@ -347,6 +347,8 @@ typedef std::set<Object *> SetOfObjects;
 
 typedef std::set<const Object *> SetOfConstObjects;
 
+typedef std::set<const Object *> SetOfConstObjects;
+
 typedef std::vector<Note *> ChordNoteGroup;
 
 typedef std::vector<std::tuple<Alignment *, Alignment *, int>> ArrayOfAdjustmentTuples;
@@ -367,7 +369,7 @@ typedef std::vector<CurveSpannedElement *> ArrayOfCurveSpannedElements;
 
 typedef std::list<std::pair<Object *, data_MEASUREBEAT>> ListOfObjectBeatPairs;
 
-typedef std::list<std::pair<Object *, std::string>> ListOfObjectAttNamePairs;
+typedef std::list<std::pair<const Object *, std::string>> ListOfObjectAttNamePairs;
 
 typedef std::list<std::pair<TimePointInterface *, ClassId>> ListOfPointingInterClassIdPairs;
 
