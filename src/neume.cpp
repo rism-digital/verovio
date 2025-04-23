@@ -44,7 +44,7 @@ const std::map<std::string, NeumeGroup> Neume::s_neumes
 
 static const ClassRegistrar<Neume> s_factory("neume", NEUME);
 
-Neume::Neume() : LayerElement(NEUME, "neume-"), ObjectListInterface(), AttColor()
+Neume::Neume() : LayerElement(NEUME), ObjectListInterface(), AttColor()
 {
     this->RegisterAttClass(ATT_COLOR);
     this->Reset();
@@ -58,15 +58,16 @@ void Neume::Reset()
     this->ResetColor();
 }
 
-bool Neume::IsSupportedChild(Object *child)
+bool Neume::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(NC)) {
-        assert(dynamic_cast<Nc *>(child));
+    static const std::vector<ClassId> supported{ NC };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 int Neume::GetPosition(const LayerElement *element) const

@@ -39,7 +39,7 @@ public:
     virtual ~MNum();
     Object *Clone() const override { return new MNum(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "MNum"; }
+    std::string GetClassName() const override { return "mNum"; }
     ///@}
 
     /**
@@ -59,7 +59,7 @@ public:
      * Add an element (text, rend. etc.) to a dynam.
      * Only supported elements will be actually added to the child list.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * @name Setter and getter of the generated flag

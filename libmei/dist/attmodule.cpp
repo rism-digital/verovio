@@ -1570,82 +1570,6 @@ void AttModule::CopyFingering(const Object *element, Object *target)
 
 } // namespace vrv
 
-#include "atts_frettab.h"
-
-namespace vrv {
-
-//----------------------------------------------------------------------------
-// Frettab
-//----------------------------------------------------------------------------
-
-bool AttModule::SetFrettab(Object *element, const std::string &attrType, const std::string &attrValue)
-{
-    if (element->HasAttClass(ATT_COURSELOG)) {
-        AttCourseLog *att = dynamic_cast<AttCourseLog *>(element);
-        assert(att);
-        if (attrType == "tuning.standard") {
-            att->SetTuningStandard(att->StrToCoursetuning(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_NOTEGESTAB)) {
-        AttNoteGesTab *att = dynamic_cast<AttNoteGesTab *>(element);
-        assert(att);
-        if (attrType == "tab.course") {
-            att->SetTabCourse(att->StrToInt(attrValue));
-            return true;
-        }
-        if (attrType == "tab.fret") {
-            att->SetTabFret(att->StrToInt(attrValue));
-            return true;
-        }
-    }
-
-    return false;
-}
-
-void AttModule::GetFrettab(const Object *element, ArrayOfStrAttr *attributes)
-{
-    if (element->HasAttClass(ATT_COURSELOG)) {
-        const AttCourseLog *att = dynamic_cast<const AttCourseLog *>(element);
-        assert(att);
-        if (att->HasTuningStandard()) {
-            attributes->push_back({ "tuning.standard", att->CoursetuningToStr(att->GetTuningStandard()) });
-        }
-    }
-    if (element->HasAttClass(ATT_NOTEGESTAB)) {
-        const AttNoteGesTab *att = dynamic_cast<const AttNoteGesTab *>(element);
-        assert(att);
-        if (att->HasTabCourse()) {
-            attributes->push_back({ "tab.course", att->IntToStr(att->GetTabCourse()) });
-        }
-        if (att->HasTabFret()) {
-            attributes->push_back({ "tab.fret", att->IntToStr(att->GetTabFret()) });
-        }
-    }
-}
-
-void AttModule::CopyFrettab(const Object *element, Object *target)
-{
-    if (element->HasAttClass(ATT_COURSELOG)) {
-        const AttCourseLog *att = dynamic_cast<const AttCourseLog *>(element);
-        assert(att);
-        AttCourseLog *attTarget = dynamic_cast<AttCourseLog *>(target);
-        assert(attTarget);
-        attTarget->SetTuningStandard(att->GetTuningStandard());
-    }
-    if (element->HasAttClass(ATT_NOTEGESTAB)) {
-        const AttNoteGesTab *att = dynamic_cast<const AttNoteGesTab *>(element);
-        assert(att);
-        AttNoteGesTab *attTarget = dynamic_cast<AttNoteGesTab *>(target);
-        assert(attTarget);
-        attTarget->SetTabCourse(att->GetTabCourse());
-        attTarget->SetTabFret(att->GetTabFret());
-    }
-}
-
-} // namespace vrv
-
 #include "atts_gestural.h"
 
 namespace vrv {
@@ -7225,6 +7149,166 @@ void AttModule::CopyShared(const Object *element, Object *target)
         assert(attTarget);
         attTarget->SetX2(att->GetX2());
         attTarget->SetY2(att->GetY2());
+    }
+}
+
+} // namespace vrv
+
+#include "atts_stringtab.h"
+
+namespace vrv {
+
+//----------------------------------------------------------------------------
+// Stringtab
+//----------------------------------------------------------------------------
+
+bool AttModule::SetStringtab(Object *element, const std::string &attrType, const std::string &attrValue)
+{
+    if (element->HasAttClass(ATT_STAFFDEFVISTABLATURE)) {
+        AttStaffDefVisTablature *att = dynamic_cast<AttStaffDefVisTablature *>(element);
+        assert(att);
+        if (attrType == "tab.align") {
+            att->SetTabAlign(att->StrToVerticalalignment(attrValue));
+            return true;
+        }
+        if (attrType == "tab.anchorline") {
+            att->SetTabAnchorline(att->StrToInt(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_STRINGTAB)) {
+        AttStringtab *att = dynamic_cast<AttStringtab *>(element);
+        assert(att);
+        if (attrType == "tab.fing") {
+            att->SetTabFing(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "tab.fret") {
+            att->SetTabFret(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "tab.line") {
+            att->SetTabLine(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "tab.string") {
+            att->SetTabString(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "tab.course") {
+            att->SetTabCourse(att->StrToInt(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_STRINGTABPOSITION)) {
+        AttStringtabPosition *att = dynamic_cast<AttStringtabPosition *>(element);
+        assert(att);
+        if (attrType == "tab.pos") {
+            att->SetTabPos(att->StrToInt(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_STRINGTABTUNING)) {
+        AttStringtabTuning *att = dynamic_cast<AttStringtabTuning *>(element);
+        assert(att);
+        if (attrType == "tab.strings") {
+            att->SetTabStrings(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "tab.courses") {
+            att->SetTabCourses(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void AttModule::GetStringtab(const Object *element, ArrayOfStrAttr *attributes)
+{
+    if (element->HasAttClass(ATT_STAFFDEFVISTABLATURE)) {
+        const AttStaffDefVisTablature *att = dynamic_cast<const AttStaffDefVisTablature *>(element);
+        assert(att);
+        if (att->HasTabAlign()) {
+            attributes->push_back({ "tab.align", att->VerticalalignmentToStr(att->GetTabAlign()) });
+        }
+        if (att->HasTabAnchorline()) {
+            attributes->push_back({ "tab.anchorline", att->IntToStr(att->GetTabAnchorline()) });
+        }
+    }
+    if (element->HasAttClass(ATT_STRINGTAB)) {
+        const AttStringtab *att = dynamic_cast<const AttStringtab *>(element);
+        assert(att);
+        if (att->HasTabFing()) {
+            attributes->push_back({ "tab.fing", att->StrToStr(att->GetTabFing()) });
+        }
+        if (att->HasTabFret()) {
+            attributes->push_back({ "tab.fret", att->IntToStr(att->GetTabFret()) });
+        }
+        if (att->HasTabLine()) {
+            attributes->push_back({ "tab.line", att->IntToStr(att->GetTabLine()) });
+        }
+        if (att->HasTabString()) {
+            attributes->push_back({ "tab.string", att->StrToStr(att->GetTabString()) });
+        }
+        if (att->HasTabCourse()) {
+            attributes->push_back({ "tab.course", att->IntToStr(att->GetTabCourse()) });
+        }
+    }
+    if (element->HasAttClass(ATT_STRINGTABPOSITION)) {
+        const AttStringtabPosition *att = dynamic_cast<const AttStringtabPosition *>(element);
+        assert(att);
+        if (att->HasTabPos()) {
+            attributes->push_back({ "tab.pos", att->IntToStr(att->GetTabPos()) });
+        }
+    }
+    if (element->HasAttClass(ATT_STRINGTABTUNING)) {
+        const AttStringtabTuning *att = dynamic_cast<const AttStringtabTuning *>(element);
+        assert(att);
+        if (att->HasTabStrings()) {
+            attributes->push_back({ "tab.strings", att->StrToStr(att->GetTabStrings()) });
+        }
+        if (att->HasTabCourses()) {
+            attributes->push_back({ "tab.courses", att->StrToStr(att->GetTabCourses()) });
+        }
+    }
+}
+
+void AttModule::CopyStringtab(const Object *element, Object *target)
+{
+    if (element->HasAttClass(ATT_STAFFDEFVISTABLATURE)) {
+        const AttStaffDefVisTablature *att = dynamic_cast<const AttStaffDefVisTablature *>(element);
+        assert(att);
+        AttStaffDefVisTablature *attTarget = dynamic_cast<AttStaffDefVisTablature *>(target);
+        assert(attTarget);
+        attTarget->SetTabAlign(att->GetTabAlign());
+        attTarget->SetTabAnchorline(att->GetTabAnchorline());
+    }
+    if (element->HasAttClass(ATT_STRINGTAB)) {
+        const AttStringtab *att = dynamic_cast<const AttStringtab *>(element);
+        assert(att);
+        AttStringtab *attTarget = dynamic_cast<AttStringtab *>(target);
+        assert(attTarget);
+        attTarget->SetTabFing(att->GetTabFing());
+        attTarget->SetTabFret(att->GetTabFret());
+        attTarget->SetTabLine(att->GetTabLine());
+        attTarget->SetTabString(att->GetTabString());
+        attTarget->SetTabCourse(att->GetTabCourse());
+    }
+    if (element->HasAttClass(ATT_STRINGTABPOSITION)) {
+        const AttStringtabPosition *att = dynamic_cast<const AttStringtabPosition *>(element);
+        assert(att);
+        AttStringtabPosition *attTarget = dynamic_cast<AttStringtabPosition *>(target);
+        assert(attTarget);
+        attTarget->SetTabPos(att->GetTabPos());
+    }
+    if (element->HasAttClass(ATT_STRINGTABTUNING)) {
+        const AttStringtabTuning *att = dynamic_cast<const AttStringtabTuning *>(element);
+        assert(att);
+        AttStringtabTuning *attTarget = dynamic_cast<AttStringtabTuning *>(target);
+        assert(attTarget);
+        attTarget->SetTabStrings(att->GetTabStrings());
+        attTarget->SetTabCourses(att->GetTabCourses());
     }
 }
 

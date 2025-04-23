@@ -38,8 +38,7 @@ namespace vrv {
 
 static const ClassRegistrar<Syl> s_factory("syl", SYL);
 
-Syl::Syl()
-    : LayerElement(SYL, "syl-"), TextListInterface(), TimeSpanningInterface(), AttLang(), AttTypography(), AttSylLog()
+Syl::Syl() : LayerElement(SYL), TextListInterface(), TimeSpanningInterface(), AttLang(), AttTypography(), AttSylLog()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_LANG);
@@ -64,21 +63,19 @@ void Syl::Reset()
     m_nextWordSyl = NULL;
 }
 
-bool Syl::IsSupportedChild(Object *child)
+bool Syl::IsSupportedChild(ClassId classId)
 {
-    if (child->Is({ REND, TEXT })) {
-        assert(dynamic_cast<TextElement *>(child));
+    static const std::vector<ClassId> supported{ REND, TEXT };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
-    }
-    else if (child->Is(REND)) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 int Syl::CalcHyphenLength(Doc *doc, int staffSize)

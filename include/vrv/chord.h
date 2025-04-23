@@ -52,7 +52,7 @@ public:
     virtual ~Chord();
     Object *Clone() const override { return new Chord(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Chord"; }
+    std::string GetClassName() const override { return "chord"; }
     ///@}
 
     /**
@@ -74,7 +74,7 @@ public:
     /**
      * Add an element (only note supported) to a chord.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Overwritten method for chord

@@ -18,6 +18,7 @@
 namespace vrv {
 
 class Accid;
+class AnnotScore;
 class Arpeg;
 class BarLine;
 class Beam;
@@ -111,30 +112,6 @@ public:
     ///@}
 
     /**
-     * @name Virtual methods that are triggered when necessary but they do nothing in
-     * the View class. They can be overridden when necessary in the child classses.
-     */
-    ///@{
-    virtual void OnBeginEdition() {}
-    virtual void OnEndEdition() {}
-    virtual void OnBeginEditionClef() {}
-    virtual void OnEndEditionClef() {}
-    virtual void DoRefresh() {}
-    virtual void DoResize() {}
-    virtual void DoReset() {}
-    virtual void OnPageChange() {}
-    ///@}
-
-    /**
-     * @name Navigation methods for changing the page in the view.
-     * Navigating will check that the page exists in the document and also set it
-     * by calling SetPage (with doLayout = true);
-     */
-    void Next(bool forward);
-    bool HasNext(bool forward);
-    ///@}
-
-    /**
      * Simply returns the value of the last note-type element (mensural or neume)
      */
     bool GetNotationMode();
@@ -161,12 +138,12 @@ public:
     ///@}
 
     /**
-     * Set the current page to pageIdx.
+     * Set the current page.
      * If doLayout is true, the layout of the page will be calculated.
      * This is the default behavior, however, in some cases, we do not
      * want it. For example, when drawing the pages for getting the bounding boxes.
      */
-    void SetPage(int pageIdx, bool doLayout = true);
+    void SetPage(Page *page, bool doLayout);
 
     /**
      * Method that actually draw the current page.
@@ -471,6 +448,8 @@ protected:
     ///@{
     void DrawControlElementConnector(DeviceContext *dc, ControlElement *element, int x1, int x2, Staff *staff,
         char spanningType, Object *graphic = NULL);
+    void DrawAnnotScore(DeviceContext *dc, AnnotScore *annotScore, int x1, int x2, Staff *staff, char spanningType,
+        Object *graphic = NULL);
     void DrawBracketSpan(DeviceContext *dc, BracketSpan *bracketSpan, int x1, int x2, Staff *staff, char spanningType,
         Object *graphic = NULL);
     void DrawFConnector(
@@ -667,8 +646,6 @@ public:
     Doc *m_doc;
     /** Options of the document */
     Options *m_options;
-    /** Index of the current page */
-    int m_pageIdx;
 
     /**
      * @name The objects currently selected.

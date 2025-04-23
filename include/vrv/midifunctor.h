@@ -428,9 +428,9 @@ public:
 private:
     // The MidiFile we are writing to
     smf::MidiFile *m_midiFile;
-    // The midi track number
+    // The MIDI track number
     int m_midiTrack;
-    // The midi channel number
+    // The MIDI channel number
     int m_midiChannel;
     // The score time from the start of the music to the start of the current measure
     double m_totalTime;

@@ -27,22 +27,22 @@ namespace vrv {
 
 static const ClassRegistrar<Facsimile> s_factory("facsimile", FACSIMILE);
 
-Facsimile::Facsimile() : Object(FACSIMILE, "facsimile-"), AttTyped() {}
+Facsimile::Facsimile() : Object(FACSIMILE), AttTyped() {}
 
 Facsimile::~Facsimile() {}
 
 void Facsimile::Reset() {}
 
-bool Facsimile::IsSupportedChild(Object *object)
+bool Facsimile::IsSupportedChild(ClassId classId)
 {
-    if (object->Is(SURFACE)) {
-        assert(dynamic_cast<Surface *>(object));
+    static const std::vector<ClassId> supported{ SURFACE };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
-        LogError("Unsupported child '%s' of facsimile", object->GetClassName().c_str());
         return false;
     }
-    return true;
 }
 
 Zone *Facsimile::FindZoneByID(const std::string &zoneId)

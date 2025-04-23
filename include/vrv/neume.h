@@ -68,14 +68,14 @@ public:
     virtual ~Neume();
     void Reset() override;
     Object *Clone() const override { return new Neume(*this); }
-    std::string GetClassName() const override { return "Neume"; }
+    std::string GetClassName() const override { return "neume"; }
     ///@}
 
     /**
      * Add an element (a note or a rest) to a syllable.
      * Only syl or neume will be added.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     int GetLigatureCount(int position);
     bool IsLastInNeume(const LayerElement *element) const;

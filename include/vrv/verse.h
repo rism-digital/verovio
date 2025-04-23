@@ -36,14 +36,14 @@ public:
     virtual ~Verse();
     Object *Clone() const override { return new Verse(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Verse"; }
+    std::string GetClassName() const override { return "verse"; }
     ///@}
 
     /**
      * Add an element (a syl) to a verse.
      * Only Syl elements will be actually added to the verse.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * @name Getter and setter for the labelAbbr

@@ -809,7 +809,7 @@ void ABCInput::parseReferenceNumber(const std::string &referenceNumberString)
 {
     // The X: field is also used to indicate the start of the tune
     m_mdiv = new Mdiv();
-    m_mdiv->m_visibility = Visible;
+    m_mdiv->SetVisibility(Visible);
     if (!referenceNumberString.empty()) {
         const int mdivNum = atoi(referenceNumberString.c_str());
         if (mdivNum < 1) {

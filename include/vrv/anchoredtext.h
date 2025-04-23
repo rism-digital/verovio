@@ -33,7 +33,7 @@ public:
     virtual ~AnchoredText();
     Object *Clone() const override { return new AnchoredText(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "AnchoredText"; }
+    std::string GetClassName() const override { return "anchoredText"; }
     ///@}
 
     /**
@@ -48,7 +48,7 @@ public:
      * Add an element (text, rend. etc.) to a tempo.
      * Only supported elements will be actually added to the child list.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     //----------//
     // Functors //

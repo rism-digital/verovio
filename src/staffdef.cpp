@@ -32,7 +32,7 @@ namespace vrv {
 static const ClassRegistrar<StaffDef> s_factory("staffDef", STAFFDEF);
 
 StaffDef::StaffDef()
-    : ScoreDefElement(STAFFDEF, "staffdef-")
+    : ScoreDefElement(STAFFDEF)
     , AttDistances()
     , AttLabelled()
     , AttNInteger()
@@ -40,9 +40,9 @@ StaffDef::StaffDef()
     , AttScalable()
     , AttStaffDefLog()
     , AttStaffDefVis()
+    , AttStaffDefVisTablature()
     , AttTimeBase()
     , AttTransposition()
-    , AttVerticalAlign()
 {
     this->RegisterAttClass(ATT_DISTANCES);
     this->RegisterAttClass(ATT_LABELLED);
@@ -51,9 +51,9 @@ StaffDef::StaffDef()
     this->RegisterAttClass(ATT_SCALABLE);
     this->RegisterAttClass(ATT_STAFFDEFLOG);
     this->RegisterAttClass(ATT_STAFFDEFVIS);
+    this->RegisterAttClass(ATT_STAFFDEFVISTABLATURE);
     this->RegisterAttClass(ATT_TIMEBASE);
     this->RegisterAttClass(ATT_TRANSPOSITION);
-    this->RegisterAttClass(ATT_VERTICALALIGN);
 
     this->Reset();
 }
@@ -71,49 +71,24 @@ void StaffDef::Reset()
     this->ResetScalable();
     this->ResetStaffDefLog();
     this->ResetStaffDefVis();
+    this->ResetStaffDefVisTablature();
     this->ResetTimeBase();
     this->ResetTransposition();
-    this->ResetVerticalAlign();
 
     m_drawingVisibility = OPTIMIZATION_NONE;
 }
 
-bool StaffDef::IsSupportedChild(Object *child)
+bool StaffDef::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(CLEF)) {
-        assert(dynamic_cast<Clef *>(child));
-    }
-    else if (child->Is(INSTRDEF)) {
-        assert(dynamic_cast<InstrDef *>(child));
-    }
-    else if (child->Is(KEYSIG)) {
-        assert(dynamic_cast<KeySig *>(child));
-    }
-    else if (child->Is(LABEL)) {
-        assert(dynamic_cast<Label *>(child));
-    }
-    else if (child->Is(LABELABBR)) {
-        assert(dynamic_cast<LabelAbbr *>(child));
-    }
-    else if (child->Is(LAYERDEF)) {
-        assert(dynamic_cast<LayerDef *>(child));
-    }
-    else if (child->Is(MENSUR)) {
-        assert(dynamic_cast<Mensur *>(child));
-    }
-    else if (child->Is(METERSIG)) {
-        assert(dynamic_cast<MeterSig *>(child));
-    }
-    else if (child->Is(METERSIGGRP)) {
-        assert(dynamic_cast<MeterSigGrp *>(child));
-    }
-    else if (child->Is(TUNING)) {
-        assert(dynamic_cast<Tuning *>(child));
+    static const std::vector<ClassId> supported{ CLEF, INSTRDEF, KEYSIG, LABEL, LABELABBR, LAYERDEF, MENSUR, METERSIG,
+        METERSIGGRP, TUNING };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 int StaffDef::GetInsertOrderFor(ClassId classId) const

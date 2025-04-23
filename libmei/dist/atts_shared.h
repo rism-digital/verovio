@@ -4485,6 +4485,8 @@ public:
     void SetHeadShape(data_HEADSHAPE headShape_) { m_headShape = headShape_; }
     data_HEADSHAPE GetHeadShape() const { return m_headShape; }
     bool HasHeadShape() const;
+    /** Getter for reference (for alternate type only) */
+    data_HEADSHAPE *GetHeadShapeAlternate() { return &m_headShape; }
     //
     void SetHeadVisible(data_BOOLEAN headVisible_) { m_headVisible = headVisible_; }
     data_BOOLEAN GetHeadVisible() const { return m_headVisible; }

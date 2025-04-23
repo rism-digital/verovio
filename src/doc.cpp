@@ -86,13 +86,14 @@ namespace vrv {
 // Doc
 //----------------------------------------------------------------------------
 
-Doc::Doc() : Object(DOC, "doc-")
+Doc::Doc() : Object(DOC)
 {
     m_options = new Options();
 
     // owned pointers need to be set to NULL;
     m_selectionPreceding = NULL;
     m_selectionFollowing = NULL;
+    m_focusRange = NULL;
 
     this->Reset();
 }
@@ -102,6 +103,7 @@ Doc::~Doc()
     this->ClearSelectionPages();
 
     delete m_options;
+    if (m_focusRange) delete m_focusRange;
 }
 
 void Doc::Reset()
@@ -138,6 +140,7 @@ void Doc::Reset()
     m_isNeumeLines = false;
     m_isCastOff = false;
     m_visibleScores.clear();
+    m_focusStatus = FOCUS_UNSET;
 
     m_facsimile = NULL;
 
@@ -177,18 +180,16 @@ void Doc::SetType(DocType type)
     m_type = type;
 }
 
-bool Doc::IsSupportedChild(Object *child)
+bool Doc::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(MDIV)) {
-        assert(dynamic_cast<Mdiv *>(child));
-    }
-    else if (child->Is(PAGES)) {
-        assert(dynamic_cast<Pages *>(child));
+    static const std::vector<ClassId> supported{ MDIV, PAGES };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 bool Doc::GenerateDocumentScoreDef()
@@ -619,14 +620,20 @@ bool Doc::ExportFeatures(std::string &output, const std::string &options)
 
 void Doc::PrepareData()
 {
+    Object *root = this;
+    if (m_focusStatus != FOCUS_UNSET) {
+        m_focusStatus = FOCUS_USED;
+        root = m_focusRange;
+    }
+
     /************ Reset and initialization ************/
 
     if (m_dataPreparationDone) {
         ResetDataFunctor resetData;
-        this->Process(resetData);
+        root->Process(resetData);
     }
     PrepareDataInitializationFunctor prepareDataInitialization(this);
-    this->Process(prepareDataInitialization);
+    root->Process(prepareDataInitialization);
 
     /************ Generate measure indices ************/
 
@@ -639,13 +646,13 @@ void Doc::PrepareData()
     /************ Store default durations ************/
 
     PrepareDurationFunctor prepareDuration;
-    this->Process(prepareDuration);
+    root->Process(prepareDuration);
 
     /************ Resolve @startid / @endid ************/
 
     // Try to match all spanning elements (slur, tie, etc) by processing backwards
     PrepareTimeSpanningFunctor prepareTimeSpanning;
-    this->Process(prepareTimeSpanning);
+    root->Process(prepareTimeSpanning);
     prepareTimeSpanning.SetDataCollectionCompleted();
 
     // First we try a forward pass which should collect most of the spanning elements.
@@ -655,7 +662,7 @@ void Doc::PrepareData()
     // without filling the list (that is only resolving remaining elements).
     const ListOfSpanningInterOwnerPairs &interfaceOwnerPairs = prepareTimeSpanning.GetInterfaceOwnerPairs();
     if (!interfaceOwnerPairs.empty()) {
-        this->Process(prepareTimeSpanning);
+        root->Process(prepareTimeSpanning);
     }
 
     // Display warning if some elements were not matched
@@ -672,18 +679,18 @@ void Doc::PrepareData()
     // Resolve <reh> elements first, since they can be encoded without @startid or @tstamp, but we need one internally
     // for placement
     PrepareRehPositionFunctor prepareRehPosition;
-    this->Process(prepareRehPosition);
+    root->Process(prepareRehPosition);
 
     // Try to match all time pointing elements (tempo, fermata, etc) by processing backwards
     PrepareTimePointingFunctor prepareTimePointing;
     prepareTimePointing.SetDirection(BACKWARD);
-    this->Process(prepareTimePointing);
+    root->Process(prepareTimePointing);
 
     /************ Resolve @tstamp / tstamp2 ************/
 
     // Now try to match the @tstamp and @tstamp2 attributes.
     PrepareTimestampsFunctor prepareTimestamps;
-    this->Process(prepareTimestamps);
+    root->Process(prepareTimestamps);
 
     // If some are still there, then it is probably an issue in the encoding
     if (!prepareTimestamps.GetInterfaceIDPairs().empty()) {
@@ -695,13 +702,13 @@ void Doc::PrepareData()
 
     // Try to match all pointing elements using @next, @sameas and @stem.sameas
     PrepareLinkingFunctor prepareLinking;
-    this->Process(prepareLinking);
+    root->Process(prepareLinking);
     prepareLinking.SetDataCollectionCompleted();
 
     // If we have some left process again backward
     if (!prepareLinking.GetSameasIDPairs().empty() || !prepareLinking.GetStemSameasIDPairs().empty()) {
         prepareLinking.SetDirection(BACKWARD);
-        this->Process(prepareLinking);
+        root->Process(prepareLinking);
     }
 
     // If some are still there, then it is probably an issue in the encoding
@@ -720,12 +727,12 @@ void Doc::PrepareData()
 
     // Try to match all pointing elements using @plist
     PreparePlistFunctor preparePlist;
-    this->Process(preparePlist);
+    root->Process(preparePlist);
     preparePlist.SetDataCollectionCompleted();
 
     // Process plist after all pairs have been collected
     if (!preparePlist.GetInterfaceIDPairs().empty()) {
-        this->Process(preparePlist);
+        root->Process(preparePlist);
     }
 
     // If some are still there, then it is probably an issue in the encoding
@@ -737,17 +744,17 @@ void Doc::PrepareData()
 
     // Prepare the cross-staff pointers
     PrepareCrossStaffFunctor prepareCrossStaff;
-    this->Process(prepareCrossStaff);
+    root->Process(prepareCrossStaff);
 
     /************ Resolve beamspan elements ***********/
 
     PrepareBeamSpanElementsFunctor prepareBeamSpanElements;
-    this->Process(prepareBeamSpanElements);
+    root->Process(prepareBeamSpanElements);
 
     /************ Match pedal lines ***********/
 
     PreparePedalsFunctor preparePedals(this);
-    this->Process(preparePedals);
+    root->Process(preparePedals);
 
     /************ Prepare processing by staff/layer/verse ************/
 
@@ -757,7 +764,7 @@ void Doc::PrepareData()
 
     // We first fill a tree of ints with [staff/layer] and [staff/layer/verse] numbers (@n) to be processed
     // LogElapsedTimeStart();
-    this->Process(initProcessingLists);
+    root->Process(initProcessingLists);
     const IntTree &layerTree = initProcessingLists.GetLayerTree();
     const IntTree &verseTree = initProcessingLists.GetVerseTree();
 
@@ -779,14 +786,14 @@ void Doc::PrepareData()
 
             PreparePointersByLayerFunctor preparePointersByLayer;
             preparePointersByLayer.SetFilters(&filters);
-            this->Process(preparePointersByLayer);
+            root->Process(preparePointersByLayer);
         }
     }
 
     /************ Resolve delayed turns ************/
 
     PrepareDelayedTurnsFunctor prepareDelayedTurns;
-    this->Process(prepareDelayedTurns);
+    root->Process(prepareDelayedTurns);
     prepareDelayedTurns.SetDataCollectionCompleted();
 
     if (!prepareDelayedTurns.GetDelayedTurns().empty()) {
@@ -801,7 +808,7 @@ void Doc::PrepareData()
 
                 prepareDelayedTurns.SetFilters(&filters);
                 prepareDelayedTurns.ResetCurrent();
-                this->Process(prepareDelayedTurns);
+                root->Process(prepareDelayedTurns);
             }
         }
     }
@@ -826,7 +833,7 @@ void Doc::PrepareData()
                 // m_drawingLastNote is set only if the syl has a forward connector
                 PrepareLyricsFunctor prepareLyrics;
                 prepareLyrics.SetFilters(&filters);
-                this->Process(prepareLyrics);
+                root->Process(prepareLyrics);
             }
         }
     }
@@ -837,7 +844,7 @@ void Doc::PrepareData()
     // TimeSpanningInterface to each staff they are extended. This does not need to be done staff by staff because we
     // can just check the staff->GetN to see where we are (see PrepareStaffCurrentTimeSpanningFunctor::VisitStaff)
     PrepareStaffCurrentTimeSpanningFunctor prepareStaffCurrentTimeSpanning;
-    this->Process(prepareStaffCurrentTimeSpanning);
+    root->Process(prepareStaffCurrentTimeSpanning);
 
     // Something must be wrong in the encoding because a TimeSpanningInterface was left open
     if (!prepareStaffCurrentTimeSpanning.GetTimeSpanningElements().empty()) {
@@ -860,7 +867,7 @@ void Doc::PrepareData()
             // We set multiNumber to NONE for indicated we need to look at the staffDef when reaching the first staff
             PrepareRptFunctor prepareRpt(this);
             prepareRpt.SetFilters(&filters);
-            this->Process(prepareRpt);
+            root->Process(prepareRpt);
         }
     }
 
@@ -868,36 +875,36 @@ void Doc::PrepareData()
 
     // Prepare the endings (pointers to the measure after and before the boundaries)
     PrepareMilestonesFunctor prepareMilestones;
-    this->Process(prepareMilestones);
+    root->Process(prepareMilestones);
 
     /************ Resolve floating groups for vertical alignment ************/
 
     // Prepare the floating drawing groups
     PrepareFloatingGrpsFunctor prepareFloatingGrps;
-    this->Process(prepareFloatingGrps);
+    root->Process(prepareFloatingGrps);
 
     /************ Resolve cue size ************/
 
     // Prepare the drawing cue size
     PrepareCueSizeFunctor prepareCueSize;
-    this->Process(prepareCueSize);
+    root->Process(prepareCueSize);
 
     /************ Resolve @altsym ************/
 
     // Try to match all pointing elements using @next, @sameas and @stem.sameas
     PrepareAltSymFunctor prepareAltSym;
-    this->Process(prepareAltSym);
+    root->Process(prepareAltSym);
 
     /************ Instanciate LayerElement parts (stem, flag, dots, etc) ************/
 
     PrepareLayerElementPartsFunctor prepareLayerElementParts;
-    this->Process(prepareLayerElementParts);
+    root->Process(prepareLayerElementParts);
 
     /************ Resolve @facs ************/
     if (this->IsFacs()) {
         // Associate zones with elements
         PrepareFacsimileFunctor prepareFacsimile(this->GetFacsimile());
-        this->Process(prepareFacsimile);
+        root->Process(prepareFacsimile);
 
         // Add default syl zone if one is not present.
         for (Object *object : prepareFacsimile.GetZonelessSyls()) {
@@ -984,6 +991,10 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     std::list<Score *> scores = this->GetVisibleScores();
     assert(!scores.empty());
 
+    if (m_focusStatus == FOCUS_USED) {
+        m_focusStatus = FOCUS_UNSET;
+        this->PrepareData();
+    }
     this->ScoreDefSetCurrentDoc();
 
     Page *unCastOffPage = this->SetDrawingPage(0);
@@ -1082,6 +1093,8 @@ void Doc::UnCastOffDoc(bool resetCache)
         LogDebug("Document is not cast off");
         return;
     }
+
+    this->ResetFocus();
 
     Pages *pages = this->GetPages();
     assert(pages);
@@ -1690,6 +1703,43 @@ void Doc::CollectVisibleScores()
     }
 }
 
+void Doc::RefreshLayout()
+{
+    if (m_focusStatus != FOCUS_UNSET) {
+        m_focusRange->LayOutAll();
+    }
+    else {
+        this->GetPages()->LayOutAll();
+    }
+}
+
+void Doc::SetFocus()
+{
+    // Focus has already been set
+    if (m_focusStatus != FOCUS_UNSET) return;
+
+    if (!m_focusRange) {
+        m_focusRange = new PageRange(this);
+    }
+    m_focusRange->Reset();
+    m_focusRange->SetAsFocus(m_drawingPage);
+    m_focusStatus = FOCUS_SET;
+
+    this->PrepareData();
+    this->ScoreDefSetCurrentDoc(true);
+    this->RefreshLayout();
+}
+
+void Doc::ResetFocus()
+{
+    if (m_focusStatus == FOCUS_UNSET) return;
+
+    m_focusRange->ClearChildren();
+    m_focusStatus = FOCUS_UNSET;
+    this->PrepareData();
+    this->ScoreDefSetCurrentDoc(true);
+}
+
 int Doc::GetGlyphHeight(char32_t code, int staffSize, bool graceSize) const
 {
     int x, y, w, h;
@@ -2134,7 +2184,7 @@ data_MEASUREMENTSIGNED Doc::GetStaffDistance(const Object *object, int staffInde
     return distance;
 }
 
-Page *Doc::SetDrawingPage(int pageIdx)
+Page *Doc::SetDrawingPage(int pageIdx, bool withPageRange)
 {
     // out of range
     if (!HasPage(pageIdx)) {
@@ -2149,7 +2199,16 @@ Page *Doc::SetDrawingPage(int pageIdx)
     m_drawingPage = vrv_cast<Page *>(pages->GetChild(pageIdx));
     assert(m_drawingPage);
 
-    UpdatePageDrawingSizes();
+    this->ResetFocus();
+
+    this->UpdatePageDrawingSizes();
+
+    // Layout pages in the corresponding range
+    if (withPageRange) {
+        PageRange pageRange(this);
+        pageRange.SetAsFocus(m_drawingPage);
+        pageRange.LayOutAll();
+    }
 
     return m_drawingPage;
 }
@@ -2223,6 +2282,16 @@ void Doc::UpdatePageDrawingSizes()
     glyph_size = this->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, 100, 0);
 
     m_drawingBrevisWidth = (int)((glyph_size * 0.8) / 2);
+}
+
+bool Doc::CheckPageSize(const Page *page) const
+{
+    assert(page);
+    assert(m_drawingPage);
+
+    if (page == m_drawingPage) return true;
+
+    return ((page->m_pageHeight == -1) && (m_drawingPage->m_pageHeight == -1));
 }
 
 int Doc::CalcMusicFontSize()

@@ -32,7 +32,7 @@ namespace vrv {
 static const ClassRegistrar<Nc> s_factory("nc", NC);
 
 Nc::Nc()
-    : LayerElement(NC, "nc-")
+    : LayerElement(NC)
     , DurationInterface()
     , PitchInterface()
     , PositionInterface()
@@ -96,21 +96,16 @@ FunctorCode Nc::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitNcEnd(this);
 }
 
-bool Nc::IsSupportedChild(Object *child)
+bool Nc::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(LIQUESCENT)) {
-        assert(dynamic_cast<Liquescent *>(child));
-    }
-    else if (child->Is(ORISCUS)) {
-        assert(dynamic_cast<Oriscus *>(child));
-    }
-    else if (child->Is(QUILISMA)) {
-        assert(dynamic_cast<Quilisma *>(child));
+    static const std::vector<ClassId> supported{ LIQUESCENT, ORISCUS, QUILISMA };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 } // namespace vrv

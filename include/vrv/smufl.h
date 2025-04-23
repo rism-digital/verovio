@@ -94,11 +94,20 @@ enum {
     SMUFL_E0A5_noteheadNull = 0xE0A5,
     SMUFL_E0A9_noteheadXBlack = 0xE0A9,
     SMUFL_E0AF_noteheadPlusBlack = 0xE0AF,
+    SMUFL_E0B3_noteheadCircleX = 0xE0B3,
     SMUFL_E0B5_noteheadWholeWithX = 0xE0B5,
     SMUFL_E0B6_noteheadHalfWithX = 0xE0B6,
     SMUFL_E0B7_noteheadVoidWithX = 0xE0B7,
     SMUFL_E0B8_noteheadSquareWhite = 0xE0B8,
     SMUFL_E0B9_noteheadSquareBlack = 0xE0B9,
+    SMUFL_E0CF_noteheadSlashedBlack1 = 0xE0CF,
+    SMUFL_E0D0_noteheadSlashedBlack2 = 0xE0D0,
+    SMUFL_E0D1_noteheadSlashedHalf1 = 0xE0D1,
+    SMUFL_E0D2_noteheadSlashedHalf2 = 0xE0D2,
+    SMUFL_E0D3_noteheadSlashedWhole1 = 0xE0D3,
+    SMUFL_E0D4_noteheadSlashedWhole2 = 0xE0D4,
+    SMUFL_E0D5_noteheadSlashedDoubleWhole1 = 0xE0D5,
+    SMUFL_E0D6_noteheadSlashedDoubleWhole2 = 0xE0D6,
     SMUFL_E0D9_noteheadDiamondHalf = 0xE0D9,
     SMUFL_E0DA_noteheadDiamondHalfWide = 0xE0DA,
     SMUFL_E0DB_noteheadDiamondBlack = 0xE0DB,
@@ -403,6 +412,7 @@ enum {
     SMUFL_E8F6_chantDivisioFinalis = 0xE8F6,
     SMUFL_E8F7_chantVirgula = 0xE8F7,
     SMUFL_E8F8_chantCaesura = 0xE8F8,
+    SMUFL_E900_mensuralGclef = 0xE900,
     SMUFL_E901_mensuralGclefPetrucci = 0xE901,
     SMUFL_E902_chantFclef = 0xE902,
     SMUFL_E903_mensuralFclef = 0xE903,
@@ -660,7 +670,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 635
+#define SMUFL_COUNT 645
 
 } // namespace vrv
 

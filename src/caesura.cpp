@@ -27,11 +27,7 @@ namespace vrv {
 static const ClassRegistrar<Caesura> s_factory("caesura", CAESURA);
 
 Caesura::Caesura()
-    : ControlElement(CAESURA, "caesura-")
-    , TimePointInterface()
-    , AttExtSymAuth()
-    , AttExtSymNames()
-    , AttPlacementRelStaff()
+    : ControlElement(CAESURA), TimePointInterface(), AttExtSymAuth(), AttExtSymNames(), AttPlacementRelStaff()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_EXTSYMAUTH);

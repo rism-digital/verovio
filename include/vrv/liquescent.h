@@ -31,14 +31,17 @@ public:
     virtual ~Liquescent();
     Object *Clone() const override { return new Liquescent(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Liquescent"; }
+    std::string GetClassName() const override { return "liquescent"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    PitchInterface *GetPitchInterface() override { return dynamic_cast<PitchInterface *>(this); }
+    PitchInterface *GetPitchInterface() override { return vrv_cast<PitchInterface *>(this); }
+    const PitchInterface *GetPitchInterface() const override { return vrv_cast<const PitchInterface *>(this); }
+    PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
+    const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
     ///@}
 
     /** Override the method since alignment is required */

@@ -30,7 +30,7 @@ namespace vrv {
 static const ClassRegistrar<RepeatMark> s_factory("repeatMark", REPEATMARK);
 
 RepeatMark::RepeatMark()
-    : ControlElement(REPEATMARK, "repeatMark-")
+    : ControlElement(REPEATMARK)
     , TextListInterface()
     , TextDirInterface()
     , TimePointInterface()
@@ -59,18 +59,19 @@ void RepeatMark::Reset()
     this->ResetRepeatMarkLog();
 }
 
-bool RepeatMark::IsSupportedChild(Object *child)
+bool RepeatMark::IsSupportedChild(ClassId classId)
 {
-    if (child->Is({ LB, REND, SYMBOL, TEXT })) {
-        assert(dynamic_cast<TextElement *>(child));
+    static const std::vector<ClassId> supported{ LB, REND, SYMBOL, TEXT };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 char32_t RepeatMark::GetMarkGlyph() const

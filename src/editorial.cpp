@@ -35,7 +35,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 EditorialElement::EditorialElement()
-    : Object(EDITORIAL_ELEMENT, "ee-"), SystemMilestoneInterface(), AttLabelled(), AttTyped()
+    : Object(EDITORIAL_ELEMENT), VisibilityDrawingInterface(), SystemMilestoneInterface(), AttLabelled(), AttTyped()
 {
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_TYPED);
@@ -44,16 +44,7 @@ EditorialElement::EditorialElement()
 }
 
 EditorialElement::EditorialElement(ClassId classId)
-    : Object(classId, "ee-"), SystemMilestoneInterface(), AttLabelled(), AttTyped()
-{
-    this->RegisterAttClass(ATT_LABELLED);
-    this->RegisterAttClass(ATT_TYPED);
-
-    this->Reset();
-}
-
-EditorialElement::EditorialElement(ClassId classId, const std::string &classIdStr)
-    : Object(classId, classIdStr), SystemMilestoneInterface(), AttLabelled(), AttTyped()
+    : Object(classId), VisibilityDrawingInterface(), SystemMilestoneInterface(), AttLabelled(), AttTyped()
 {
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_TYPED);
@@ -64,57 +55,39 @@ EditorialElement::EditorialElement(ClassId classId, const std::string &classIdSt
 void EditorialElement::Reset()
 {
     Object::Reset();
+    VisibilityDrawingInterface::Reset();
     SystemMilestoneInterface::Reset();
     this->ResetLabelled();
     this->ResetTyped();
-
-    m_visibility = Visible;
 }
 
 EditorialElement::~EditorialElement() {}
 
-bool EditorialElement::IsSupportedChild(Object *child)
+bool EditorialElement::IsSupportedChild(ClassId classId)
 {
-    if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    static const std::vector<ClassId> supported{ LAYER, MEASURE, SCOREDEF, STAFF, STAFFDEF, STAFFGRP };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->IsSystemElement()) {
-        assert(dynamic_cast<SystemElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
-    else if (child->IsControlElement()) {
-        assert(dynamic_cast<ControlElement *>(child));
+    else if (Object::IsSystemElement(classId)) {
+        return true;
     }
-    else if (child->IsLayerElement()) {
-        assert(dynamic_cast<LayerElement *>(child));
+    else if (Object::IsControlElement(classId)) {
+        return true;
     }
-    else if (child->IsTextElement()) {
-        assert(dynamic_cast<TextElement *>(child));
+    else if (Object::IsLayerElement(classId)) {
+        return true;
     }
-    else if (child->Is(LAYER)) {
-        assert(dynamic_cast<Layer *>(child));
-    }
-    else if (child->Is(MEASURE)) {
-        assert(dynamic_cast<Measure *>(child));
-    }
-    else if (child->Is(SCOREDEF)) {
-        assert(dynamic_cast<ScoreDef *>(child));
-    }
-    else if (child->Is(STAFF)) {
-        assert(dynamic_cast<Staff *>(child));
-    }
-    else if (child->Is(STAFFDEF)) {
-        assert(dynamic_cast<Staff *>(child));
-    }
-    else if (child->Is(STAFFGRP)) {
-        assert(dynamic_cast<Staff *>(child));
-    }
-    else if (child->Is(SYMBOL)) {
-        assert(dynamic_cast<Symbol *>(child));
+    else if (Object::IsTextElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 //----------------------------------------------------------------------------

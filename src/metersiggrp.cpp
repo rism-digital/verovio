@@ -24,8 +24,7 @@ namespace vrv {
 
 static const ClassRegistrar<MeterSigGrp> s_factory("meterSigGrp", METERSIGGRP);
 
-MeterSigGrp::MeterSigGrp()
-    : LayerElement(METERSIGGRP, "metersiggrp-"), ObjectListInterface(), AttBasic(), AttMeterSigGrpLog()
+MeterSigGrp::MeterSigGrp() : LayerElement(METERSIGGRP), ObjectListInterface(), AttBasic(), AttMeterSigGrpLog()
 {
     this->RegisterAttClass(ATT_BASIC);
     this->RegisterAttClass(ATT_METERSIGGRPLOG);
@@ -42,15 +41,16 @@ void MeterSigGrp::Reset()
     this->ResetMeterSigGrpLog();
 }
 
-bool MeterSigGrp::IsSupportedChild(Object *child)
+bool MeterSigGrp::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(METERSIG)) {
-        assert(dynamic_cast<MeterSig *>(child));
+    static const std::vector<ClassId> supported{ METERSIG };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 void MeterSigGrp::FilterList(ListOfConstObjects &childList) const

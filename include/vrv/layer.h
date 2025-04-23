@@ -47,7 +47,7 @@ public:
     virtual ~Layer();
     Object *Clone() const override { return new Layer(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Layer"; }
+    std::string GetClassName() const override { return "layer"; }
     ///@}
 
     /**
@@ -59,7 +59,7 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
     ///@}
 
     /**

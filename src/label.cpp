@@ -26,7 +26,7 @@ namespace vrv {
 
 static const ClassRegistrar<Label> s_factory("label", LABEL);
 
-Label::Label() : Object(LABEL, "label-"), TextListInterface()
+Label::Label() : Object(LABEL), TextListInterface()
 {
     this->Reset();
 }
@@ -38,18 +38,19 @@ void Label::Reset()
     Object::Reset();
 }
 
-bool Label::IsSupportedChild(Object *child)
+bool Label::IsSupportedChild(ClassId classId)
 {
-    if (child->Is({ LB, REND, TEXT })) {
-        assert(dynamic_cast<TextElement *>(child));
+    static const std::vector<ClassId> supported{ LB, REND, TEXT };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 //----------------------------------------------------------------------------

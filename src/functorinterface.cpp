@@ -11,6 +11,7 @@
 
 #include "accid.h"
 #include "anchoredtext.h"
+#include "annotscore.h"
 #include "arpeg.h"
 #include "artic.h"
 #include "barline.h"
@@ -489,6 +490,16 @@ FunctorCode FunctorInterface::VisitAnchoredText(AnchoredText *anchoredText)
 FunctorCode FunctorInterface::VisitAnchoredTextEnd(AnchoredText *anchoredText)
 {
     return this->VisitControlElementEnd(anchoredText);
+}
+
+FunctorCode FunctorInterface::VisitAnnotScore(AnnotScore *annotScore)
+{
+    return this->VisitControlElement(annotScore);
+}
+
+FunctorCode FunctorInterface::VisitAnnotScoreEnd(AnnotScore *annotScore)
+{
+    return this->VisitControlElementEnd(annotScore);
 }
 
 FunctorCode FunctorInterface::VisitArpeg(Arpeg *arpeg)
@@ -1833,6 +1844,16 @@ FunctorCode ConstFunctorInterface::VisitAnchoredText(const AnchoredText *anchore
 FunctorCode ConstFunctorInterface::VisitAnchoredTextEnd(const AnchoredText *anchoredText)
 {
     return this->VisitControlElementEnd(anchoredText);
+}
+
+FunctorCode ConstFunctorInterface::VisitAnnotScore(const AnnotScore *annotScore)
+{
+    return this->VisitControlElement(annotScore);
+}
+
+FunctorCode ConstFunctorInterface::VisitAnnotScoreEnd(const AnnotScore *annotScore)
+{
+    return this->VisitControlElementEnd(annotScore);
 }
 
 FunctorCode ConstFunctorInterface::VisitArpeg(const Arpeg *arpeg)

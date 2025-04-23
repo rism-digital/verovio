@@ -29,7 +29,7 @@ namespace vrv {
 static const ClassRegistrar<Turn> s_factory("turn", TURN);
 
 Turn::Turn()
-    : ControlElement(TURN, "turn-")
+    : ControlElement(TURN)
     , TimePointInterface()
     , AttExtSymAuth()
     , AttExtSymNames()

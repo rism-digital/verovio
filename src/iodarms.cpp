@@ -463,7 +463,7 @@ bool DarmsInput::Import(const std::string &data_str)
     m_doc->SetType(Raw);
     // The mDiv
     Mdiv *mdiv = new Mdiv();
-    mdiv->m_visibility = Visible;
+    mdiv->SetVisibility(Visible);
     m_doc->AddChild(mdiv);
     // The score
     Score *score = new Score();

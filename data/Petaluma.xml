@@ -609,6 +609,10 @@
     <a n="stemDownNW" x="0.0" y="0.01" />
     <a n="stemUpSE" x="1.33" y="-0.06" />
   </g>
+  <g c="E0B3" x="0.0" y="-179.0" w="344.0" h="354.13" h-a-x="344" n="noteheadCircleX">
+    <a n="stemDownNW" x="0.0" y="-0.01" />
+    <a n="stemUpSE" x="1.38" y="-0.01" />
+  </g>
   <g c="E0B5" x="0.0" y="-157.0" w="476.0" h="314.0" h-a-x="476" n="noteheadWholeWithX" />
   <g c="E0B6" x="0.0" y="-148.67" w="520.0" h="300.67" h-a-x="520" n="noteheadHalfWithX">
     <a n="stemDownNW" x="0.0" y="-0.02" />
@@ -625,6 +629,30 @@
   <g c="E0B9" x="0.0" y="-129.99" w="342.0" h="262.43" h-a-x="342" n="noteheadSquareBlack">
     <a n="stemDownNW" x="0.0" y="-0.41" />
     <a n="stemUpSE" x="1.37" y="0.4" />
+  </g>
+  <g c="E0CF" x="-110.0" y="-190.0" w="562.0" h="380.0" h-a-x="338" n="noteheadSlashedBlack1">
+    <a n="stemDownNW" x="-0.0" y="-0.17" />
+    <a n="stemUpSE" x="1.35" y="0.12" />
+  </g>
+  <g c="E0D0" x="-84.0" y="-189.0" w="489.0" h="378.0" h-a-x="347" n="noteheadSlashedBlack2">
+    <a n="stemDownNW" x="-0.0" y="-0.1" />
+    <a n="stemUpSE" x="1.39" y="0.2" />
+  </g>
+  <g c="E0D1" x="-79.34" y="-184.0" w="550.34" h="368.0" h-a-x="445" n="noteheadSlashedHalf1">
+    <a n="stemDownNW" x="-0.0" y="-0.05" />
+    <a n="stemUpSE" x="1.78" y="0.01" />
+  </g>
+  <g c="E0D2" x="-73.0" y="-188.0" w="527.0" h="376.0" h-a-x="429" n="noteheadSlashedHalf2">
+    <a n="stemDownNW" x="0.0" y="-0.07" />
+    <a n="stemUpSE" x="1.71" y="0.14" />
+  </g>
+  <g c="E0D3" x="-76.0" y="-168.0" w="574.0" h="336.0" h-a-x="458" n="noteheadSlashedWhole1" />
+  <g c="E0D4" x="-83.0" y="-201.0" w="593.0" h="399.0" h-a-x="456" n="noteheadSlashedWhole2" />
+  <g c="E0D5" x="0.0" y="-290.0" w="697.0" h="580.0" h-a-x="698" n="noteheadSlashedDoubleWhole1">
+    <a n="noteheadOrigin" x="0.52" y="0.03" />
+  </g>
+  <g c="E0D6" x="-0.12" y="-295.0" w="697.6" h="590.0" h-a-x="698" n="noteheadSlashedDoubleWhole2">
+    <a n="noteheadOrigin" x="0.42" y="0.02" />
   </g>
   <g c="E0D9" x="0.0" y="-148.0" w="295.0" h="296.0" h-a-x="294" n="noteheadDiamondHalf">
     <a n="stemDownNW" x="0.0" y="-0.0" />

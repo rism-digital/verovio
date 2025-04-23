@@ -32,7 +32,11 @@ class StaffAlignment;
  * This class is an interface for elements having a single time point, such as tempo, reh, etc..
  * It is not an abstract class but should not be instantiated directly.
  */
-class TimePointInterface : public Interface, public AttStaffIdent, public AttStartId, public AttTimestampLog {
+class TimePointInterface : public Interface,
+                           public AttPartIdent,
+                           public AttStaffIdent,
+                           public AttStartId,
+                           public AttTimestampLog {
 public:
     /**
      * @name Constructors, destructors, reset methods

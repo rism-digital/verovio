@@ -27,7 +27,7 @@ namespace vrv {
 
 static const ClassRegistrar<SymbolDef> s_factory("symbolDef", SYMBOLDEF);
 
-SymbolDef::SymbolDef() : Object(SYMBOLDEF, "symdef-")
+SymbolDef::SymbolDef() : Object(SYMBOLDEF)
 {
     this->Reset();
 }
@@ -41,21 +41,16 @@ void SymbolDef::Reset()
     m_originalParent = NULL;
 }
 
-bool SymbolDef::IsSupportedChild(Object *child)
+bool SymbolDef::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(GRAPHIC)) {
-        assert(dynamic_cast<Graphic *>(child));
-    }
-    else if (child->Is(SVG)) {
-        assert(dynamic_cast<Svg *>(child));
-    }
-    else if (child->Is(SYMBOL)) {
-        assert(dynamic_cast<Symbol *>(child));
+    static const std::vector<ClassId> supported{ GRAPHIC, SVG, SYMBOL };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 int SymbolDef::GetSymbolWidth(Doc *doc, int staffSize, bool dimin) const

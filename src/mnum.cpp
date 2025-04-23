@@ -26,12 +26,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 MNum::MNum()
-    : ControlElement(MNUM, "mnum-")
-    , TextListInterface()
-    , TextDirInterface()
-    , TimePointInterface()
-    , AttLang()
-    , AttTypography()
+    : ControlElement(MNUM), TextListInterface(), TextDirInterface(), TimePointInterface(), AttLang(), AttTypography()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
@@ -54,18 +49,19 @@ void MNum::Reset()
     m_isGenerated = false;
 }
 
-bool MNum::IsSupportedChild(Object *child)
+bool MNum::IsSupportedChild(ClassId classId)
 {
-    if (child->Is({ REND, TEXT })) {
-        assert(dynamic_cast<TextElement *>(child));
+    static const std::vector<ClassId> supported{ REND, TEXT };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 //----------------------------------------------------------------------------

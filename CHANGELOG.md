@@ -1,5 +1,16 @@
 # Changelog
 
+## [unreleased]
+* Support for `data.HEXNUM` in `note@head.shape`
+* Support for additional tablature features introduced in MEI 5.1 (@paul-bayleaf)
+* Support for `annot` as control event (@oerc-music)
+* Support for `@part="%all"` for displaying control events above the first staff
+* Improved support for expansion lists (@wergo)
+* Improved support for staff order diverging from order in `scoreDef`
+* Change element name logging to lowerCamelCase (MEI element name)
+* Remove non-sounding notes from MIDI output (@rettinghaus)
+* Fix lines disappearing in the SVG output with `--mm-output` option
+
 ## [5.1.0] – 2025-02-27
 * Improved timemap with grace notes and arpeggios
 * CSS scoped to the specific MEI document based on `mei@xml:id`

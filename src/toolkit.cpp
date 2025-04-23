@@ -889,6 +889,10 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
             // LogElapsedTimeEnd("cast-off");
         }
     }
+    else {
+        // We need at least this to be done with breaks auto
+        m_doc.ScoreDefSetCurrentDoc();
+    }
 
     if (m_doc.IsTranscription() && m_doc.HasFacsimile()) {
         m_doc.SyncFromFacsimileDoc();
@@ -1621,8 +1625,8 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     // Page number is one-based - correct it to 0-based first
     pageNo--;
 
-    // Get the current system for the SVG clipping size
-    m_view.SetPage(pageNo);
+    m_doc.SetDrawingPage(pageNo, true);
+    m_view.SetPage(m_doc.GetDrawingPage(), true);
 
     // Adjusting page width and height according to the options
     int width = m_options->m_pageWidth.GetUnfactoredValue();
@@ -1681,7 +1685,6 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
 {
     this->ResetLogBuffer();
 
-    int initialPageNo = (m_doc.GetDrawingPage() == NULL) ? -1 : m_doc.GetDrawingPage()->GetIdx();
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
     SvgDeviceContext svg(m_doc.GetID());
@@ -1722,7 +1725,6 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
     this->RenderToDeviceContext(pageNo, &svg);
 
     std::string out_str = svg.GetStringSVG(xmlDeclaration);
-    if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);
     return out_str;
 }
 
@@ -1863,7 +1865,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     jsonxx::Array chordArray;
     jsonxx::Array restArray;
 
-    // Here we need to check that the midi timemap is done
+    // Here we need to check that the MIDI timemap is done
     if (!m_doc.HasTimemap()) {
         // generate MIDI timemap before progressing
         m_doc.CalculateTimemap();

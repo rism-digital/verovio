@@ -24,7 +24,7 @@ namespace vrv {
 // Oriscus
 //----------------------------------------------------------------------------
 
-Oriscus::Oriscus() : LayerElement(ORISCUS, "oriscus-"), PitchInterface(), PositionInterface(), AttColor()
+Oriscus::Oriscus() : LayerElement(ORISCUS), PitchInterface(), PositionInterface(), AttColor()
 {
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());

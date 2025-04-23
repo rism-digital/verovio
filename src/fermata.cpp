@@ -27,7 +27,7 @@ namespace vrv {
 static const ClassRegistrar<Fermata> s_factory("fermata", FERMATA);
 
 Fermata::Fermata()
-    : ControlElement(FERMATA, "fermata-")
+    : ControlElement(FERMATA)
     , TimePointInterface()
     , AttExtSymAuth()
     , AttExtSymNames()

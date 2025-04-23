@@ -820,4 +820,40 @@
   <g c="E595" x="0.0" y="0.0" w="210.0" h="400.0" h-a-x="210" n="ornamentLeftVerticalStrokeWithCross" />
   <g c="E0B8" x="0.0" y="-125.0" w="300.0" h="250.0" h-a-x="300" n="noteheadSquareWhite" />
   <g c="E0B9" x="0.0" y="-125.0" w="300.0" h="250.0" h-a-x="300" n="noteheadSquareBlack" />
+  <g c="E900" x="0.0" y="-232.0" w="378.0" h="463.0" h-a-x="378" n="mensuralGclef" />
+  <g c="E0B3" x="0.0" y="-125.0" w="249.0" h="250.0" h-a-x="249" n="noteheadCircleX" />
+  <g c="E0CF" x="-44.66" y="-143.76" w="396.31" h="287.52" h-a-x="314" n="noteheadSlashedBlack1">
+    <a n="cutOutNW" x="0.14" y="0.24" />
+    <a n="cutOutSE" x="1.09" y="-0.24" />
+    <a n="stemDownNW" x="-0.0" y="-0.16" />
+    <a n="stemUpSE" x="1.26" y="0.16" />
+  </g>
+  <g c="E0D0" x="-44.65" y="-143.76" w="396.31" h="287.52" h-a-x="314" n="noteheadSlashedBlack2">
+    <a n="cutOutNW" x="0.14" y="0.24" />
+    <a n="cutOutSE" x="1.09" y="-0.24" />
+    <a n="stemDownNW" x="-0.0" y="-0.16" />
+    <a n="stemUpSE" x="1.26" y="0.16" />
+  </g>
+  <g c="E0D1" x="-44.66" y="-143.76" w="396.31" h="287.52" h-a-x="314" n="noteheadSlashedHalf1">
+    <a n="cutOutNW" x="0.14" y="0.24" />
+    <a n="cutOutSE" x="1.08" y="-0.24" />
+    <a n="stemDownNW" x="0.0" y="-0.14" />
+    <a n="stemUpSE" x="1.26" y="0.16" />
+  </g>
+  <g c="E0D2" x="-44.65" y="-143.76" w="396.31" h="287.52" h-a-x="314" n="noteheadSlashedHalf2">
+    <a n="cutOutNW" x="0.14" y="0.24" />
+    <a n="cutOutSE" x="1.08" y="-0.24" />
+    <a n="stemDownNW" x="0.0" y="-0.14" />
+    <a n="stemUpSE" x="1.26" y="0.16" />
+  </g>
+  <g c="E0D3" x="0.0" y="-143.76" w="405.0" h="287.52" h-a-x="405" n="noteheadSlashedWhole1">
+    <a n="cutOutNW" x="0.06" y="0.24" />
+    <a n="cutOutSE" x="1.57" y="-0.23" />
+  </g>
+  <g c="E0D4" x="-0.0" y="-143.76" w="405.0" h="287.52" h-a-x="405" n="noteheadSlashedWhole2">
+    <a n="cutOutNW" x="0.06" y="0.24" />
+    <a n="cutOutSE" x="1.57" y="-0.23" />
+  </g>
+  <g c="E0D5" x="0.0" y="-170.0" w="545.0" h="340.0" h-a-x="545" n="noteheadSlashedDoubleWhole1" />
+  <g c="E0D6" x="0.0" y="-170.0" w="545.0" h="340.0" h-a-x="545" n="noteheadSlashedDoubleWhole2" />
 </bounding-boxes>

@@ -57,7 +57,6 @@ public:
     ///@{
     LayerElement();
     LayerElement(ClassId classId);
-    LayerElement(ClassId classId, const std::string &classIdStr);
     virtual ~LayerElement();
     void Reset() override;
     ///@}

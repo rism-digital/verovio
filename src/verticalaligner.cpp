@@ -35,7 +35,7 @@ namespace vrv {
 // SystemAligner
 //----------------------------------------------------------------------------
 
-SystemAligner::SystemAligner() : Object(SYSTEM_ALIGNER), m_bottomAlignment(NULL), m_system(NULL)
+SystemAligner::SystemAligner() : Object(SYSTEM_ALIGNER)
 {
     this->Reset();
 }
@@ -54,9 +54,9 @@ void SystemAligner::Reset()
     this->AddChild(m_bottomAlignment);
 }
 
-bool SystemAligner::IsSupportedChild(Object *child)
+bool SystemAligner::IsSupportedChild(ClassId classId)
 {
-    assert(dynamic_cast<StaffAlignment *>(child));
+    // Nothing to check here
     return true;
 }
 
@@ -103,13 +103,14 @@ void SystemAligner::ReorderBy(const std::vector<int> &staffNs)
     ArrayOfObjects &children = this->GetChildrenForModification();
 
     // Since we have a bottom alignment, the number is +1
-    if (children.size() != staffNs.size() + 1) return;
+    // The children list can be smaller with optimized systems
+    if (children.size() > staffNs.size() + 1) return;
 
     ListOfObjects orderedAlignments;
     for (auto staffN : staffNs) {
         StaffAlignment *alignment = this->GetStaffAlignmentForStaffN(staffN);
-        // Something is wrong in the data, we keep the order as it is
-        if (!alignment) return;
+        // This happens with condensed systems where some alignment for staffN are not there
+        if (!alignment) continue;
         orderedAlignments.push_back(alignment);
     }
     int i = 0;
@@ -135,7 +136,7 @@ const StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN) cons
 
         if ((alignment->GetStaff()) && (alignment->GetStaff()->GetN() == staffN)) return alignment;
     }
-    LogDebug("Staff alignment for staff %d not found", staffN);
+    // LogDebug("Staff alignment for staff %d not found", staffN);
     return NULL;
 }
 
