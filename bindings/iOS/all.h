@@ -86,6 +86,7 @@
 #import <VerovioFramework/drawinginterface.h>
 #import <VerovioFramework/durationinterface.h>
 #import <VerovioFramework/dynam.h>
+#import <VerovioFramework/editfunctor.h>
 #import <VerovioFramework/editorial.h>
 #import <VerovioFramework/editortoolkit.h>
 #import <VerovioFramework/editortoolkit_cmn.h>
