@@ -1,8 +1,12 @@
 # Changelog
 
 ## [unreleased]
+
+## [5.2.0] – 2025-04-23
 * Support for `data.HEXNUM` in `note@head.shape`
 * Support for additional tablature features introduced in MEI 5.1 (@paul-bayleaf)
+* Support for `annot` as control event (@oerc-music)
+* Support for `@part="%all"` for displaying control events above the first staff
 * Improved support for expansion lists (@wergo)
 * Improved support for staff order diverging from order in `scoreDef`
 * Change element name logging to lowerCamelCase (MEI element name)
