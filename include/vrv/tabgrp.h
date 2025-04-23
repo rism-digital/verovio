@@ -31,7 +31,7 @@ public:
     virtual ~TabGrp();
     Object *Clone() const override { return new TabGrp(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "TabGrp"; }
+    std::string GetClassName() const override { return "tabGrp"; }
     ///@}
 
     /**
@@ -45,7 +45,7 @@ public:
     /**
      * Add an element to a element.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Return the top or bottom note or their Y position

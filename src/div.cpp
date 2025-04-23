@@ -25,7 +25,7 @@ namespace vrv {
 
 static const ClassRegistrar<Div> s_factory("div", DIV);
 
-Div::Div() : TextLayoutElement(DIV, "div-")
+Div::Div() : TextLayoutElement(DIV)
 {
     this->Reset();
 }

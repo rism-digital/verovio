@@ -37,7 +37,7 @@ public:
     virtual ~Custos();
     Object *Clone() const override { return new Custos(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Custos"; }
+    std::string GetClassName() const override { return "custos"; }
     ///@}
 
     /**
@@ -54,7 +54,7 @@ public:
     /**
      * Add an accid to a custos.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Return a SMuFL code for the custos

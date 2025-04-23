@@ -16,10 +16,10 @@
 #include "altsyminterface.h"
 #include "atts_analytical.h"
 #include "atts_externalsymbols.h"
-#include "atts_frettab.h"
 #include "atts_mensural.h"
 #include "atts_midi.h"
 #include "atts_shared.h"
+#include "atts_stringtab.h"
 #include "beam.h"
 #include "chord.h"
 #include "durationinterface.h"
@@ -58,11 +58,11 @@ class Note : public LayerElement,
              public AttGraced,
              public AttHarmonicFunction,
              public AttMidiVelocity,
-             public AttNoteGesTab,
              public AttNoteHeads,
              public AttNoteVisMensural,
              public AttStems,
              public AttStemsCmn,
+             public AttStringtab,
              public AttTiePresent,
              public AttVisibility {
 public:
@@ -75,7 +75,7 @@ public:
     virtual ~Note();
     Object *Clone() const override { return new Note(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Note"; }
+    std::string GetClassName() const override { return "note"; }
     ///@}
 
     /**
@@ -107,12 +107,17 @@ public:
      * Add an element (a verse or an accid) to a note.
      * Only Verse and Accid elements will be actually added to the note.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Overwritten method for note
      */
     void AddChild(Object *object) override;
+
+    /**
+     * Additional check when adding a child.
+     */
+    bool AddChildAdditionalCheck(Object *child) override;
 
     /**
      * Align dots shift for two notes. Should be used for unison notes to align dots positioning

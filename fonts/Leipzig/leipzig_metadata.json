@@ -30,7 +30,7 @@
         "tupletBracketThickness": 0.16
     },
     "fontName": "Leipzig",
-    "fontVersion": "5.2.93",
+    "fontVersion": "5.2.94",
     "glyphBBoxes": {
         "4stringTabClef": {
             "bBoxNE": [
@@ -3912,6 +3912,16 @@
                 -3.532
             ]
         },
+        "mensuralGclef": {
+            "bBoxNE": [
+                1.512,
+                0.924
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.928
+            ]
+        },
         "mensuralGclefPetrucci": {
             "bBoxNE": [
                 1.072,
@@ -4982,6 +4992,16 @@
                 -0.532
             ]
         },
+        "noteheadCircleX": {
+            "bBoxNE": [
+                0.996,
+                0.5
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.5
+            ]
+        },
         "noteheadDiamondBlack": {
             "bBoxNE": [
                 1.256,
@@ -5055,6 +5075,16 @@
         "noteheadDoubleWholeSquare": {
             "bBoxNE": [
                 1.392,
+                0.68
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.68
+            ]
+        },
+        "noteheadDoubleWholeWithX": {
+            "bBoxNE": [
+                2.18,
                 0.68
             ],
             "bBoxSW": [
@@ -5170,6 +5200,86 @@
             "bBoxSW": [
                 0.0,
                 -1.0
+            ]
+        },
+        "noteheadSlashedBlack1": {
+            "bBoxNE": [
+                1.4066,
+                0.575
+            ],
+            "bBoxSW": [
+                -0.1786,
+                -0.575
+            ]
+        },
+        "noteheadSlashedBlack2": {
+            "bBoxNE": [
+                1.4066,
+                0.575
+            ],
+            "bBoxSW": [
+                -0.1786,
+                -0.575
+            ]
+        },
+        "noteheadSlashedDoubleWhole1": {
+            "bBoxNE": [
+                2.18,
+                0.68
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.68
+            ]
+        },
+        "noteheadSlashedDoubleWhole2": {
+            "bBoxNE": [
+                2.18,
+                0.68
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.68
+            ]
+        },
+        "noteheadSlashedHalf1": {
+            "bBoxNE": [
+                1.4066,
+                0.575
+            ],
+            "bBoxSW": [
+                -0.1786,
+                -0.575
+            ]
+        },
+        "noteheadSlashedHalf2": {
+            "bBoxNE": [
+                1.4066,
+                0.575
+            ],
+            "bBoxSW": [
+                -0.1786,
+                -0.575
+            ]
+        },
+        "noteheadSlashedWhole1": {
+            "bBoxNE": [
+                1.62,
+                0.575
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.575
+            ]
+        },
+        "noteheadSlashedWhole2": {
+            "bBoxNE": [
+                1.62,
+                0.575
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.575
             ]
         },
         "noteheadSquareBlack": {
@@ -8010,6 +8120,98 @@
             "stemUpSE": [
                 1.84,
                 1.0
+            ]
+        },
+        "noteheadSlashedBlack1": {
+            "cutOutNW": [
+                0.144,
+                0.24
+            ],
+            "cutOutSE": [
+                1.088,
+                -0.244
+            ],
+            "stemDownNW": [
+                -0.0,
+                -0.156
+            ],
+            "stemUpSE": [
+                1.256,
+                0.156
+            ]
+        },
+        "noteheadSlashedBlack2": {
+            "cutOutNW": [
+                0.144,
+                0.24
+            ],
+            "cutOutSE": [
+                1.088,
+                -0.244
+            ],
+            "stemDownNW": [
+                -0.0,
+                -0.156
+            ],
+            "stemUpSE": [
+                1.256,
+                0.156
+            ]
+        },
+        "noteheadSlashedHalf1": {
+            "cutOutNW": [
+                0.14,
+                0.24
+            ],
+            "cutOutSE": [
+                1.076,
+                -0.24
+            ],
+            "stemDownNW": [
+                0.0,
+                -0.144
+            ],
+            "stemUpSE": [
+                1.256,
+                0.164
+            ]
+        },
+        "noteheadSlashedHalf2": {
+            "cutOutNW": [
+                0.14,
+                0.24
+            ],
+            "cutOutSE": [
+                1.076,
+                -0.24
+            ],
+            "stemDownNW": [
+                0.0,
+                -0.144
+            ],
+            "stemUpSE": [
+                1.256,
+                0.164
+            ]
+        },
+        "noteheadSlashedWhole1": {
+            "cutOutNW": [
+                0.06,
+                0.244
+            ],
+            "cutOutSE": [
+                1.568,
+                -0.232
+            ]
+        },
+        "noteheadSlashedWhole2": {
+            "cutOutNW": [
+                0.06,
+                0.244
+            ],
+            "cutOutSE": [
+                1.568,
+                -0.232
             ]
         },
         "noteheadVoidWithX": {

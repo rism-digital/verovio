@@ -102,7 +102,7 @@ bool CmmeInput::Import(const std::string &cmme)
 
         // The mDiv
         Mdiv *mdiv = new Mdiv();
-        mdiv->m_visibility = Visible;
+        mdiv->SetVisibility(Visible);
         m_doc->AddChild(mdiv);
         // The score
         m_score = new Score();
@@ -356,7 +356,7 @@ void CmmeInput::CreateLemOrRdg(pugi::xml_node lemOrRdgNode, bool isFirst)
     else {
         lemOrRdg = new Rdg();
     }
-    lemOrRdg->m_visibility = (isFirst) ? Visible : Hidden;
+    lemOrRdg->SetVisibility((isFirst) ? Visible : Hidden);
 
     if (lemOrRdg->Is(RDG)) {
         std::string label;

@@ -45,7 +45,7 @@ public:
     virtual ~Accid();
     Object *Clone() const override { return new Accid(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Accid"; }
+    std::string GetClassName() const override { return "accid"; }
     ///@}
 
     /** Override the method since it is align to the staff */

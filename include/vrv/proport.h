@@ -31,7 +31,7 @@ public:
     virtual ~Proport();
     Object *Clone() const override { return new Proport(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Proport"; }
+    std::string GetClassName() const override { return "proport"; }
     ///@}
 
     int GetCumulatedNum() const;

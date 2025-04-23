@@ -42,8 +42,7 @@ namespace vrv {
 
 static const ClassRegistrar<Staff> s_factory("staff", STAFF);
 
-Staff::Staff(int n)
-    : Object(STAFF, "staff-"), FacsimileInterface(), AttCoordY1(), AttNInteger(), AttTyped(), AttVisibility()
+Staff::Staff(int n) : Object(STAFF), FacsimileInterface(), AttCoordY1(), AttNInteger(), AttTyped(), AttVisibility()
 {
     this->RegisterAttClass(ATT_COORDY1);
     this->RegisterAttClass(ATT_NINTEGER);
@@ -108,7 +107,22 @@ void Staff::ClearLedgerLines()
     m_ledgerLinesBelowCue.clear();
 }
 
-bool Staff::IsSupportedChild(Object *child)
+bool Staff::IsSupportedChild(ClassId classId)
+{
+    static const std::vector<ClassId> supported{ LAYER };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
+    }
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+bool Staff::AddChildAdditionalCheck(Object *child)
 {
     if (child->Is(LAYER)) {
         Layer *layer = vrv_cast<Layer *>(child);
@@ -119,13 +133,7 @@ bool Staff::IsSupportedChild(Object *child)
             layer->SetN(this->GetChildCount(LAYER) + 1);
         }
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
-    }
-    else {
-        return false;
-    }
-    return true;
+    return (Object::AddChildAdditionalCheck(child));
 }
 
 int Staff::GetDrawingX() const

@@ -663,7 +663,8 @@ protected:
     std::vector<hum::HTp> getSystemArpeggioTokens(hum::HTp token);
     std::vector<hum::HTp> getStaffArpeggioTokens(hum::HTp token);
     void addDirection(const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token,
-        int staffindex, int justification = 0, const std::string &color = "", int vgroup = -1);
+        int staffindex, int justification = 0, const std::string &color = "", int vgroup = -1,
+        const std::string &label = "");
     bool addTempoDirection(const std::string &text, const std::string &placement, bool bold, bool italic,
         hum::HTp token, int staffindex, int justification, const std::string &color);
     bool setTempoContent(Tempo *tempo, const std::string &text);
@@ -756,7 +757,7 @@ protected:
         std::vector<string> &elements, std::vector<void *> &pointers, std::vector<hum::HTp> tokens, int index);
     void setRepeatSlashes(BeatRpt *repeat, std::vector<hum::HTp> &tokens, int index);
     std::string getLabelFromInstrumentCode(hum::HTp icode, const std::string &transpose);
-    void checkForRehearsal(int line);
+    void checkForGlobalRehearsal(int line);
     bool isBlackNotation(hum::HTp starting);
     std::string checkNoteForScordatura(const std::string &token);
     bool checkForScordatura(hum::HumdrumFile &infile);
@@ -902,6 +903,10 @@ protected:
     void processMeiOptions(hum::HumdrumFile &infile);
     std::string getInstrumentNumber(hum::HTp icode);
     void insertTextWithNewlines(Label *label, const std::string &text);
+    bool hasBounceAfter(hum::HTp token);
+    bool hasBounceBefore(hum::HTp token);
+    void analyzeDefaultLayoutStyles(hum::HumdrumFile &infile);
+    std::string getDefaultLayoutParameter(const std::string &category, const std::string &parameter);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -974,8 +979,8 @@ protected:
     void appendElement(const std::vector<std::string> &name, const std::vector<void *> &pointers, CHILD child);
     void popElementStack(std::vector<std::string> &elements, std::vector<void *> &pointers);
     template <class ELEMENT>
-    void addTextElement(
-        ELEMENT *element, const std::string &content, const std::string &fontstyle = "", bool addSpacer = true);
+    void addTextElement(ELEMENT *element, const std::string &content, const std::string &fontstyle = "",
+        bool addSpacer = true, const std::string &label = "");
     template <class ELEMENT> void addMusicSymbol(ELEMENT *element, const std::string &musictext);
     template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
     template <class ELEMENT> void appendTypeTag(ELEMENT *element, const std::string &tag);
@@ -999,6 +1004,8 @@ protected:
     template <class ELEMENT> void setAttachmentType(ELEMENT *element, hum::HTp token);
     template <class ELEMENT>
     void setFontsize(ELEMENT *element, const std::string &percentage, const std::string &original);
+    template <class ELEMENT> void setTstamp(ELEMENT *element, const string &value);
+    template <class ELEMENT> void setEnclosure(ELEMENT *element, const string &value);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);
@@ -1290,6 +1297,9 @@ private:
     // m_textSmuflSpace = space to give between SMuFL characters
     // (excluding augmentation dots).
     std::string m_textSmuflSpacer = "\xc2\xa0";
+
+    // m_layoutDefaultStyles = default layout styles for LO categories.
+    std::map<std::string, std::map<string, std::string>> m_layoutDefaultStyles;
 
     // Some metadata elements that are computed once and used multiple times
     std::vector<hum::HumdrumLine *> m_humdrumLineReferences;

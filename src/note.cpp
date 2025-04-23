@@ -51,7 +51,7 @@ namespace vrv {
 static const ClassRegistrar<Note> s_factory("note", NOTE);
 
 Note::Note()
-    : LayerElement(NOTE, "note-")
+    : LayerElement(NOTE)
     , StemmedDrawingInterface()
     , AltSymInterface()
     , DurationInterface()
@@ -65,11 +65,11 @@ Note::Note()
     , AttGraced()
     , AttHarmonicFunction()
     , AttMidiVelocity()
-    , AttNoteGesTab()
     , AttNoteHeads()
     , AttNoteVisMensural()
     , AttStems()
     , AttStemsCmn()
+    , AttStringtab()
     , AttTiePresent()
     , AttVisibility()
 {
@@ -84,12 +84,12 @@ Note::Note()
     this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_GRACED);
     this->RegisterAttClass(ATT_HARMONICFUNCTION);
-    this->RegisterAttClass(ATT_NOTEGESTAB);
     this->RegisterAttClass(ATT_NOTEHEADS);
     this->RegisterAttClass(ATT_NOTEVISMENSURAL);
     this->RegisterAttClass(ATT_MIDIVELOCITY);
     this->RegisterAttClass(ATT_STEMS);
     this->RegisterAttClass(ATT_STEMSCMN);
+    this->RegisterAttClass(ATT_STRINGTAB);
     this->RegisterAttClass(ATT_TIEPRESENT);
     this->RegisterAttClass(ATT_VISIBILITY);
 
@@ -113,12 +113,12 @@ void Note::Reset()
     this->ResetExtSymNames();
     this->ResetGraced();
     this->ResetHarmonicFunction();
-    this->ResetNoteGesTab();
     this->ResetNoteHeads();
     this->ResetNoteVisMensural();
     this->ResetMidiVelocity();
     this->ResetStems();
     this->ResetStemsCmn();
+    this->ResetStringtab();
     this->ResetTiePresent();
     this->ResetVisibility();
 
@@ -131,53 +131,24 @@ void Note::Reset()
     m_stemSameasRole = SAMEAS_NONE;
 }
 
-bool Note::IsSupportedChild(Object *child)
+bool Note::IsSupportedChild(ClassId classId)
 {
-    // additional verification for accid and artic - this will not be raised with editorial markup, though
-    if (child->Is(ACCID)) {
-        IsAttributeComparison isAttributeComparison(ACCID);
-        if (this->FindDescendantByComparison(&isAttributeComparison))
-            LogWarning("Having both @accid or @accid.ges and <accid> child will cause problems");
-    }
-    else if (child->Is(ARTIC)) {
-        IsAttributeComparison isAttributeComparison(ARTIC);
-        if (this->FindDescendantByComparison(&isAttributeComparison))
-            LogWarning("Having both @artic and <artic> child will cause problems");
-    }
+    static const std::vector<ClassId> supported{ ACCID, ARTIC, DOTS, PLICA, STEM, SYL, VERSE };
 
-    if (child->Is(ACCID)) {
-        assert(dynamic_cast<Accid *>(child));
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(ARTIC)) {
-        assert(dynamic_cast<Artic *>(child));
-    }
-    else if (child->Is(DOTS)) {
-        assert(dynamic_cast<Dots *>(child));
-    }
-    else if (child->Is(PLICA)) {
-        assert(dynamic_cast<Plica *>(child));
-    }
-    else if (child->Is(STEM)) {
-        assert(dynamic_cast<Stem *>(child));
-    }
-    else if (child->Is(SYL)) {
-        assert(dynamic_cast<Syl *>(child));
-    }
-    else if (child->Is(VERSE)) {
-        assert(dynamic_cast<Verse *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 void Note::AddChild(Object *child)
 {
-    if (!this->IsSupportedChild(child)) {
+    if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
         return;
     }
@@ -195,6 +166,23 @@ void Note::AddChild(Object *child)
         children.push_back(child);
     }
     Modify();
+}
+
+bool Note::AddChildAdditionalCheck(Object *child)
+{
+    // Additional verification for accid and artic - this will not be raised with editorial markup, though
+    // Left as a warning for now.
+    if (child->Is(ACCID)) {
+        IsAttributeComparison isAttributeComparison(ACCID);
+        if (this->FindDescendantByComparison(&isAttributeComparison))
+            LogWarning("Having both @accid or @accid.ges and <accid> child will cause problems");
+    }
+    else if (child->Is(ARTIC)) {
+        IsAttributeComparison isAttributeComparison(ARTIC);
+        if (this->FindDescendantByComparison(&isAttributeComparison))
+            LogWarning("Having both @artic and <artic> child will cause problems");
+    }
+    return (LayerElement::AddChildAdditionalCheck(child));
 }
 
 void Note::AlignDotsShift(const Note *otherNote)
@@ -651,49 +639,58 @@ char32_t Note::GetNoteheadGlyph(const data_DURATION duration) const
         return additionalNoteheadSymbols[glyph];
     }
 
-    switch (this->GetHeadShape()) {
-        case HEADSHAPE_quarter: return SMUFL_E0A4_noteheadBlack;
-        case HEADSHAPE_half: return SMUFL_E0A3_noteheadHalf;
-        case HEADSHAPE_whole: return SMUFL_E0A2_noteheadWhole;
-        // case HEADSHAPE_backslash: return SMUFL_noteheadBackslash;
-        // case HEADSHAPE_circle: return SMUFL_E0B3_noteheadCircleX;
-        case HEADSHAPE_plus: return SMUFL_E0AF_noteheadPlusBlack;
-        case HEADSHAPE_diamond: {
-            if (duration < DURATION_4) {
-                return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0DB_noteheadDiamondBlack
-                                                           : SMUFL_E0D9_noteheadDiamondHalf;
-            }
-            else {
-                return (this->GetHeadFill() == FILL_void) ? SMUFL_E0D9_noteheadDiamondHalf
-                                                          : SMUFL_E0DB_noteheadDiamondBlack;
+    if (this->HasHeadShape()) {
+        data_HEADSHAPE *hs = (const_cast<Note *>(this))->GetHeadShapeAlternate();
+        if (hs->GetType() == HEADSHAPE_headShapeList) {
+            switch (this->GetHeadShape().GetHeadShapeList()) {
+                case HEADSHAPE_list_quarter: return SMUFL_E0A4_noteheadBlack;
+                case HEADSHAPE_list_half: return SMUFL_E0A3_noteheadHalf;
+                case HEADSHAPE_list_whole:
+                    return SMUFL_E0A2_noteheadWhole;
+                    // case HEADSHAPE_backslash: return SMUFL_noteheadBackslash;
+                    // case HEADSHAPE_circle: return SMUFL_E0B3_noteheadCircleX;
+                case HEADSHAPE_list_plus: return SMUFL_E0AF_noteheadPlusBlack;
+                case HEADSHAPE_list_diamond: {
+                    if (duration < DURATION_4) {
+                        return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0DB_noteheadDiamondBlack
+                                                                   : SMUFL_E0D9_noteheadDiamondHalf;
+                    }
+                    else {
+                        return (this->GetHeadFill() == FILL_void) ? SMUFL_E0D9_noteheadDiamondHalf
+                                                                  : SMUFL_E0DB_noteheadDiamondBlack;
+                    }
+                }
+                    // case HEADSHAPE_isotriangle: return SMUFL_E0BC_noteheadTriangleUpHalf;
+                    // case HEADSHAPE_oval: return SMUFL_noteheadOval;
+                    // case HEADSHAPE_piewedge: return SMUFL_noteheadPieWedge;
+                case HEADSHAPE_list_rectangle:
+                    if (duration < DURATION_4) {
+                        return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0B9_noteheadSquareBlack
+                                                                   : SMUFL_E0B8_noteheadSquareWhite;
+                    }
+                    else {
+                        return (this->GetHeadFill() == FILL_void) ? SMUFL_E0B8_noteheadSquareWhite
+                                                                  : SMUFL_E0B9_noteheadSquareBlack;
+                    }
+                    // case HEADSHAPE_rtriangle: return SMUFL_noteheadRTriangle;
+                    // case HEADSHAPE_semicircle: return SMUFL_noteheadSemicircle;
+                case HEADSHAPE_list_slash: {
+                    if (DURATION_1 >= duration) return SMUFL_E102_noteheadSlashWhiteWhole;
+                    if (DURATION_2 == duration) return SMUFL_E103_noteheadSlashWhiteHalf;
+                    return SMUFL_E101_noteheadSlashHorizontalEnds;
+                }
+                    // case HEADSHAPE_square: return SMUFL_noteheadSquare;
+                case HEADSHAPE_list_x: {
+                    if (DURATION_1 == duration) return SMUFL_E0B5_noteheadWholeWithX;
+                    if (DURATION_2 == duration) return SMUFL_E0B6_noteheadHalfWithX;
+                    return SMUFL_E0A9_noteheadXBlack;
+                }
+                default: break;
             }
         }
-        // case HEADSHAPE_isotriangle: return SMUFL_E0BC_noteheadTriangleUpHalf;
-        // case HEADSHAPE_oval: return SMUFL_noteheadOval;
-        // case HEADSHAPE_piewedge: return SMUFL_noteheadPieWedge;
-        case HEADSHAPE_rectangle:
-            if (duration < DURATION_4) {
-                return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0B9_noteheadSquareBlack
-                                                           : SMUFL_E0B8_noteheadSquareWhite;
-            }
-            else {
-                return (this->GetHeadFill() == FILL_void) ? SMUFL_E0B8_noteheadSquareWhite
-                                                          : SMUFL_E0B9_noteheadSquareBlack;
-            }
-        // case HEADSHAPE_rtriangle: return SMUFL_noteheadRTriangle;
-        // case HEADSHAPE_semicircle: return SMUFL_noteheadSemicircle;
-        case HEADSHAPE_slash: {
-            if (DURATION_1 >= duration) return SMUFL_E102_noteheadSlashWhiteWhole;
-            if (DURATION_2 == duration) return SMUFL_E103_noteheadSlashWhiteHalf;
-            return SMUFL_E101_noteheadSlashHorizontalEnds;
+        else if (hs->GetType() == HEADSHAPE_hexnum) {
+            return (this->GetHeadShape().GetHexnum());
         }
-        // case HEADSHAPE_square: return SMUFL_noteheadSquare;
-        case HEADSHAPE_x: {
-            if (DURATION_1 == duration) return SMUFL_E0B5_noteheadWholeWithX;
-            if (DURATION_2 == duration) return SMUFL_E0B6_noteheadHalfWithX;
-            return SMUFL_E0A9_noteheadXBlack;
-        }
-        default: break;
     }
 
     switch (this->GetHeadMod()) {

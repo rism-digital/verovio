@@ -42,7 +42,7 @@ public:
     virtual ~Mensur();
     Object *Clone() const override { return new Mensur(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Mensur"; }
+    std::string GetClassName() const override { return "mensur"; }
     ///@}
 
     /** Override the method since alignment is required */

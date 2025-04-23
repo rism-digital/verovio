@@ -30,7 +30,7 @@ namespace vrv {
 static const ClassRegistrar<Ending> s_factory("ending", ENDING);
 
 Ending::Ending()
-    : SystemElement(ENDING, "ending-")
+    : SystemElement(ENDING)
     , SystemMilestoneInterface()
     , AttLabelled()
     , AttLineRend()
@@ -57,28 +57,23 @@ void Ending::Reset()
     this->ResetNNumberLike();
 }
 
-bool Ending::IsSupportedChild(Object *child)
+bool Ending::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(MEASURE)) {
-        assert(dynamic_cast<Measure *>(child));
+    static const std::vector<ClassId> supported{ MEASURE, SCOREDEF };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(SCOREDEF)) {
-        assert(dynamic_cast<ScoreDef *>(child));
+    else if (Object::IsSystemElement(classId)) {
+        // without this we would be allowing ending within ending, which is wrong
+        return (classId != ENDING);
     }
-    else if (child->IsSystemElement()) {
-        assert(dynamic_cast<SystemElement *>(child));
-        // here we are actually allowing ending within ending, which is wrong
-        if (child->Is(ENDING)) {
-            return false;
-        }
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 //----------------------------------------------------------------------------

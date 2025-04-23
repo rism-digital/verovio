@@ -42,7 +42,7 @@ public:
     virtual ~Trill();
     Object *Clone() const override { return new Trill(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Trill"; }
+    std::string GetClassName() const override { return "trill"; }
     ///@}
 
     /**

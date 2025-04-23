@@ -2998,7 +2998,7 @@ bool PAEInput::Parse()
     if (m_isMensural) m_doc->m_notationType = NOTATIONTYPE_mensural;
     // The mdiv
     Mdiv *mdiv = new Mdiv();
-    mdiv->m_visibility = Visible;
+    mdiv->SetVisibility(Visible);
     m_doc->AddChild(mdiv);
     // The score
     Score *score = new Score();
@@ -4655,7 +4655,7 @@ bool PAEInput::CheckHierarchy()
             if (token.m_object->Is({ KEYSIG, METERSIG, MENSUR })) continue;
 
             // Test is the element is supported by the current top container
-            if (!token.IsContainerEnd() && !stack.back()->m_object->IsSupportedChild(token.m_object)) {
+            if (!token.IsContainerEnd() && !stack.back()->m_object->IsSupportedChild(token.m_object->GetClassId())) {
                 LogPAE(ERR_040_HIERARCHY_INVALID, token,
                     StringFormat("%s / %s", token.GetName().c_str(), stack.back()->GetName().c_str()));
                 if (m_pedanticMode) return false;

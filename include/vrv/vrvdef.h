@@ -39,7 +39,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 5
-#define VERSION_MINOR 1
+#define VERSION_MINOR 2
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -66,13 +66,14 @@ namespace vrv {
 #endif
 
 //----------------------------------------------------------------------------
-// Default midi values
+// Default MIDI values
 //----------------------------------------------------------------------------
 
 #define MIDI_VELOCITY 90
 #define MIDI_TEMPO 120
 
 #define UNACC_GRACENOTE_DUR 27 // in milliseconds
+#define UNACC_GRACENOTE_FRACTION Fraction(1, 2048)
 
 //----------------------------------------------------------------------------
 // Object defines
@@ -176,6 +177,7 @@ enum ClassId : uint16_t {
     // Ids for ControlElement child classes
     CONTROL_ELEMENT,
     ANCHOREDTEXT,
+    ANNOTSCORE,
     ARPEG,
     BEAMSPAN,
     BRACKETSPAN,
@@ -346,6 +348,8 @@ typedef std::set<Object *> SetOfObjects;
 
 typedef std::set<const Object *> SetOfConstObjects;
 
+typedef std::set<const Object *> SetOfConstObjects;
+
 typedef std::vector<Note *> ChordNoteGroup;
 
 typedef std::vector<std::tuple<Alignment *, Alignment *, int>> ArrayOfAdjustmentTuples;
@@ -360,11 +364,13 @@ typedef std::multimap<std::string, LinkingInterface *> MapOfLinkingInterfaceIDPa
 
 typedef std::map<std::string, Note *> MapOfNoteIDPairs;
 
-typedef std::vector<std::pair<PlistInterface *, std::string>> ArrayOfPlistInterfaceIDPairs;
+typedef std::vector<std::pair<Object *, std::string>> ArrayOfPlistObjectIDPairs;
 
 typedef std::vector<CurveSpannedElement *> ArrayOfCurveSpannedElements;
 
 typedef std::list<std::pair<Object *, data_MEASUREBEAT>> ListOfObjectBeatPairs;
+
+typedef std::list<std::pair<const Object *, std::string>> ListOfObjectAttNamePairs;
 
 typedef std::list<std::pair<TimePointInterface *, ClassId>> ListOfPointingInterClassIdPairs;
 
@@ -674,6 +680,12 @@ enum GraphicID { PRIMARY = 0, SPANNING, SYMBOLREF };
 //----------------------------------------------------------------------------
 
 enum MeasureType { MEASURED = 0, UNMEASURED, NEUMELINE };
+
+//----------------------------------------------------------------------------
+// Focus status type
+//----------------------------------------------------------------------------
+
+enum FocusStatusType { FOCUS_UNSET = 0, FOCUS_SET, FOCUS_USED };
 
 //----------------------------------------------------------------------------
 // The score time unit (quarter note)

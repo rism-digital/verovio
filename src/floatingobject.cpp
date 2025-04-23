@@ -56,17 +56,12 @@ thread_local std::vector<void *> FloatingObject::s_drawingObjectIds;
 // FloatingObject
 //----------------------------------------------------------------------------
 
-FloatingObject::FloatingObject() : Object(FLOATING_OBJECT, "fe")
+FloatingObject::FloatingObject() : Object(FLOATING_OBJECT)
 {
     this->Reset();
 }
 
-FloatingObject::FloatingObject(ClassId classId) : Object(classId, "fe")
-{
-    this->Reset();
-}
-
-FloatingObject::FloatingObject(ClassId classId, const std::string &classIdStr) : Object(classId, classIdStr)
+FloatingObject::FloatingObject(ClassId classId) : Object(classId)
 {
     this->Reset();
 }
@@ -219,7 +214,10 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
     m_alignment = alignment;
     m_spanningType = spanningType;
 
-    if (object->Is(BRACKETSPAN)) {
+    if (object->Is(ANNOTSCORE)) {
+        m_place = STAFFREL_above;
+    }
+    else if (object->Is(BRACKETSPAN)) {
         m_place = STAFFREL_above;
     }
     else if (object->Is(BREATH)) {

@@ -25,7 +25,7 @@ namespace vrv {
 
 static const ClassRegistrar<Lv> s_factory("lv", LV);
 
-Lv::Lv() : Tie(LV, "lv-")
+Lv::Lv() : Tie(LV)
 {
     this->Reset();
 }

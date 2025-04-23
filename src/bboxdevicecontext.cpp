@@ -169,6 +169,11 @@ void BBoxDeviceContext::DrawCubicBezierPathFilled(Point bezier1[4], Point bezier
     this->UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
 }
 
+void BBoxDeviceContext::DrawBentParallelogramFilled(Point side[4], int height)
+{
+    this->UpdateBB(side[0].x, side[0].y, side[3].x, side[3].y + height);
+}
+
 void BBoxDeviceContext::DrawCircle(int x, int y, int radius)
 {
     this->DrawEllipse(x - radius, y - radius, 2 * radius, 2 * radius);

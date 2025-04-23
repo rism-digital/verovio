@@ -46,13 +46,7 @@ namespace vrv {
 static const ClassRegistrar<Layer> s_factory("layer", LAYER);
 
 Layer::Layer()
-    : Object(LAYER, "layer-")
-    , DrawingListInterface()
-    , ObjectListInterface()
-    , AttCue()
-    , AttNInteger()
-    , AttTyped()
-    , AttVisibility()
+    : Object(LAYER), DrawingListInterface(), ObjectListInterface(), AttCue(), AttNInteger(), AttTyped(), AttVisibility()
 {
     this->RegisterAttClass(ATT_CUE);
     this->RegisterAttClass(ATT_NINTEGER);
@@ -159,21 +153,17 @@ void Layer::ResetStaffDefObjects()
     }
 }
 
-bool Layer::IsSupportedChild(Object *child)
+bool Layer::IsSupportedChild(ClassId classId)
 {
-    if (child->IsLayerElement()) {
-        assert(dynamic_cast<LayerElement *>(child));
+    if (Object::IsLayerElement(classId)) {
+        return true;
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
-    }
-    else if (child->Is(METERSIGGRP)) {
-        assert(dynamic_cast<MeterSigGrp *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 LayerElement *Layer::GetPrevious(const LayerElement *element)

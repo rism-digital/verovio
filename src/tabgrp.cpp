@@ -27,7 +27,7 @@ namespace vrv {
 
 static const ClassRegistrar<TabGrp> s_factory("tabGrp", TABGRP);
 
-TabGrp::TabGrp() : LayerElement(TABGRP, "tabgrp-"), ObjectListInterface(), DurationInterface()
+TabGrp::TabGrp() : LayerElement(TABGRP), ObjectListInterface(), DurationInterface()
 {
     this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
 
@@ -42,24 +42,19 @@ void TabGrp::Reset()
     DurationInterface::Reset();
 }
 
-bool TabGrp::IsSupportedChild(Object *child)
+bool TabGrp::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(NOTE)) {
-        assert(dynamic_cast<Note *>(child));
+    static const std::vector<ClassId> supported{ NOTE, REST, TABDURSYM };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(REST)) {
-        assert(dynamic_cast<Rest *>(child));
-    }
-    else if (child->Is(TABDURSYM)) {
-        assert(dynamic_cast<TabDurSym *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 void TabGrp::FilterList(ListOfConstObjects &childList) const

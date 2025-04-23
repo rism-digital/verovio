@@ -53,14 +53,14 @@ public:
     virtual ~Rest();
     Object *Clone() const override { return new Rest(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Rest"; }
+    std::string GetClassName() const override { return "rest"; }
     ///@}
 
     /**
      * Add an element to a rest.
      * Only Dots elements will be actually added to the rest.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Overwritten method for rest
@@ -72,6 +72,7 @@ public:
      */
     ///@{
     AltSymInterface *GetAltSymInterface() override { return vrv_cast<AltSymInterface *>(this); }
+    const AltSymInterface *GetAltSymInterface() const override { return vrv_cast<const AltSymInterface *>(this); }
     PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
     const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
     DurationInterface *GetDurationInterface() override { return vrv_cast<DurationInterface *>(this); }

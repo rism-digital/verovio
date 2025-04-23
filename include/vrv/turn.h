@@ -40,7 +40,7 @@ public:
     virtual ~Turn();
     Object *Clone() const override { return new Turn(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Turn"; }
+    std::string GetClassName() const override { return "turn"; }
     ///@}
 
     /**

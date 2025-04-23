@@ -57,7 +57,7 @@ public:
     virtual ~Measure();
     Object *Clone() const override { return new Measure(*this); };
     void Reset() override;
-    std::string GetClassName() const override { return "Measure"; }
+    std::string GetClassName() const override { return "measure"; }
     ///@}
 
     /**
@@ -97,7 +97,12 @@ public:
     /**
      * Methods for adding allowed content
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
+
+    /**
+     * Additional check when adding a child.
+     */
+    bool AddChildAdditionalCheck(Object *child) override;
 
     /**
      * Specific method for measures
@@ -288,15 +293,6 @@ public:
      * Return the first staff of each staffGrp according to the scoreDef
      */
     std::vector<Staff *> GetFirstStaffGrpStaves(ScoreDef *scoreDef);
-
-    /**
-     * Return the top (first) visible staff in the measure (if any).
-     * Takes into account system optimization
-     */
-    ///@{
-    Staff *GetTopVisibleStaff();
-    const Staff *GetTopVisibleStaff() const;
-    ///@}
 
     /**
      * Return the bottom (last) visible staff in the measure (if any).

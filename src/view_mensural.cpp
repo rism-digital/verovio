@@ -229,8 +229,8 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
             || staff->m_drawingNotationType == NOTATIONTYPE_cmn) {
             up = (note->GetDrawingStemDir() == STEMDIRECTION_up);
         }
-        // For mensural just calculate it here
-        else {
+        // For mensural white, just calculate it here - keep it down for mensural black
+        else if (staff->m_drawingNotationType != NOTATIONTYPE_mensural_black) {
             int verticalCenter = staff->GetDrawingY() - m_doc->GetDrawingUnit(staffSize) * (staff->m_drawingLines - 1);
             up = (note->GetDrawingY() < verticalCenter);
         }
@@ -350,10 +350,16 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     bool oblique = ((shape & LIGATURE_OBLIQUE) || (prevShape & LIGATURE_OBLIQUE));
     bool obliqueEnd = (prevShape & LIGATURE_OBLIQUE);
     bool stackedEnd = (shape & LIGATURE_STACKED);
-
     int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     int strokeWidth = 2.8 * stemWidth;
     /** end code duplicated */
+
+    bool straight = true;
+    switch (m_doc->GetOptions()->m_ligatureOblique.GetValue()) {
+        case LIGATURE_OBL_auto: straight = !isMensuralBlack; break;
+        case LIGATURE_OBL_straight: straight = true; break;
+        case LIGATURE_OBL_curved: straight = false; break;
+    }
 
     Point points[4];
     Point *topLeft = &points[0];
@@ -372,24 +378,52 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
         // First half of the oblique - checking the nextNote is there just in case, but is should
         if ((shape & LIGATURE_OBLIQUE) && nextNote) {
             // return;
-            CalcObliquePoints(note, nextNote, staff, points, sides, shape, isMensuralBlack, true);
+            CalcObliquePoints(note, nextNote, staff, points, sides, shape, isMensuralBlack, true, straight);
         }
         // Second half of the oblique - checking the prevNote is there just in case, but is should
         else if ((prevShape & LIGATURE_OBLIQUE) && prevNote) {
-            CalcObliquePoints(prevNote, note, staff, points, sides, prevShape, isMensuralBlack, false);
+            CalcObliquePoints(prevNote, note, staff, points, sides, prevShape, isMensuralBlack, false, straight);
         }
         else {
             assert(false);
         }
     }
 
-    if (!fillNotehead) {
-        // double the bases of rectangles
-        this->DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, -strokeWidth);
-        this->DrawObliquePolygon(dc, bottomLeft->x, bottomLeft->y, bottomRight->x, bottomRight->y, strokeWidth);
+    // Oblique polygons
+    if (straight) {
+        if (!fillNotehead) {
+            this->DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, -strokeWidth);
+            this->DrawObliquePolygon(dc, bottomLeft->x, bottomLeft->y, bottomRight->x, bottomRight->y, strokeWidth);
+        }
+        else {
+            this->DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, bottomLeft->y - topLeft->y);
+        }
     }
+    // Bent parallelograms
     else {
-        this->DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, bottomLeft->y - topLeft->y);
+        const int thickness = topLeft->y - bottomLeft->y;
+        // The curved side points (two ends and two control points)
+        Point curvedSide[4];
+        curvedSide[0] = ToDeviceContext(*topLeft);
+        curvedSide[3] = ToDeviceContext(*topRight);
+        //
+        const int width = (curvedSide[3].x - curvedSide[0].x);
+        const int height = (curvedSide[3].y - curvedSide[0].y);
+        curvedSide[1] = curvedSide[3];
+        curvedSide[1].x -= (width * 0.7);
+        curvedSide[1].y -= (height * 0.7) + (height * 0.07);
+        curvedSide[2] = curvedSide[3];
+        curvedSide[2].x -= (width * 0.3);
+        curvedSide[2].y -= (height * 0.3) + (height * 0.07);
+
+        if (!fillNotehead) {
+            dc->DrawBentParallelogramFilled(curvedSide, strokeWidth);
+            for (Point &point : curvedSide) point.y += thickness - strokeWidth;
+            dc->DrawBentParallelogramFilled(curvedSide, strokeWidth);
+        }
+        else {
+            dc->DrawBentParallelogramFilled(curvedSide, thickness);
+        }
     }
 
     // Do not draw a left connector with obliques
@@ -617,13 +651,17 @@ void View::CalcBrevisPoints(
 }
 
 void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point points[4], int sides[4], int shape,
-    bool isMensuralBlack, bool firstHalf)
+    bool isMensuralBlack, bool firstHalf, bool straight)
 {
     assert(note1);
     assert(note2);
     assert(staff);
 
     const int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    const int noteDiff = note1->PitchDifferenceTo(note2);
+
+    // Adjustment for end points according to the note diff
+    const int yAdjust = noteDiff * stemWidth / 5;
 
     Point *topLeft = &points[0];
     Point *bottomLeft = &points[1];
@@ -648,35 +686,33 @@ void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point point
     sides[3] = sides2[3];
 
     // With oblique it is best visually to move them up / down - more with (white) ligatures with serif
-    double adjustmentFactor = (isMensuralBlack) ? 0.5 : 1.8;
+    // double adjustmentFactor = (isMensuralBlack) ? 2.5 : 1.8;
     double slope = 0.0;
     if (bottomRight->x != bottomLeft->x)
         slope = (double)(bottomRight->y - bottomLeft->y) / (double)(bottomRight->x - bottomLeft->x);
-    int adjustment = (int)(slope * stemWidth) * adjustmentFactor;
-    topLeft->y -= adjustment;
-    bottomLeft->y -= adjustment;
-    topRight->y += adjustment;
-    bottomRight->y += adjustment;
 
-    slope = 0.0;
-    // recalculate slope after adjustment
-    if (bottomRight->x != bottomLeft->x)
-        slope = (double)(bottomRight->y - bottomLeft->y) / (double)(bottomRight->x - bottomLeft->x);
     int length = (bottomRight->x - bottomLeft->x) / 2;
+    if (!straight) slope *= 0.85;
 
     if (firstHalf) {
-        // make sure there are some pixels of overlap
-        length += 10;
+        // make sure there is one pixel of overlap
+        length += 1;
         bottomRight->x = bottomLeft->x + length;
         topRight->x = bottomRight->x;
         bottomRight->y = bottomLeft->y + (int)(length * slope);
         topRight->y = topLeft->y + (int)(length * slope);
+        //
+        topLeft->y += yAdjust;
+        bottomLeft->y += yAdjust;
     }
     else {
         bottomLeft->x = bottomLeft->x + length;
         topLeft->x = bottomLeft->x;
         bottomLeft->y = bottomLeft->y + (int)(length * slope);
         topLeft->y = topLeft->y + (int)(length * slope);
+        //
+        topRight->y -= yAdjust;
+        bottomRight->y -= yAdjust;
     }
 }
 

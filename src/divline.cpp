@@ -27,7 +27,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 DivLine::DivLine()
-    : LayerElement(DIVLINE, "dline-")
+    : LayerElement(DIVLINE)
     , AttColor()
     , AttDivLineLog()
     , AttExtSymAuth()

@@ -30,7 +30,7 @@ namespace vrv {
 
 static const ClassRegistrar<Ligature> s_factory("ligature", LIGATURE);
 
-Ligature::Ligature() : LayerElement(LIGATURE, "ligature-"), ObjectListInterface(), AttLigatureVis()
+Ligature::Ligature() : LayerElement(LIGATURE), ObjectListInterface(), AttLigatureVis()
 {
     this->RegisterAttClass(ATT_LIGATUREVIS);
 
@@ -45,21 +45,19 @@ void Ligature::Reset()
     this->ResetLigatureVis();
 }
 
-bool Ligature::IsSupportedChild(Object *child)
+bool Ligature::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(DOT)) {
-        assert(dynamic_cast<Dot *>(child));
+    static const std::vector<ClassId> supported{ DOT, NOTE };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(NOTE)) {
-        assert(dynamic_cast<Note *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 Note *Ligature::GetFirstNote()

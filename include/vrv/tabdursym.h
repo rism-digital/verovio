@@ -9,6 +9,7 @@
 #define __VRV_TABDURSYM_H__
 
 #include "atts_shared.h"
+#include "atts_stringtab.h"
 #include "drawinginterface.h"
 #include "layerelement.h"
 
@@ -21,7 +22,11 @@ namespace vrv {
 /**
  * This class models the MEI <tabDurSym> element.
  */
-class TabDurSym : public LayerElement, public StemmedDrawingInterface, public AttNNumberLike, public AttStaffLoc {
+class TabDurSym : public LayerElement,
+                  public StemmedDrawingInterface,
+                  public AttNNumberLike,
+                  public AttStringtab,
+                  public AttVisualOffsetVo {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -32,7 +37,7 @@ public:
     virtual ~TabDurSym();
     Object *Clone() const override { return new TabDurSym(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "TabDurSym"; }
+    std::string GetClassName() const override { return "tabDurSym"; }
     ///@}
 
     /**
@@ -52,7 +57,7 @@ public:
     /**
      * Add an element to a element.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Overwritten method for note

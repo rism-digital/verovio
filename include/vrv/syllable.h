@@ -34,14 +34,14 @@ public:
     virtual ~Syllable();
     Object *Clone() const override { return new Syllable(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Syllable"; }
+    std::string GetClassName() const override { return "syllable"; }
     ///@}
 
     /**
      * Add an element (a note or a rest) to a syllable.
      * Only syl or neume will be added.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /** Override the method since alignment is required */
     bool HasToBeAligned() const override { return true; }

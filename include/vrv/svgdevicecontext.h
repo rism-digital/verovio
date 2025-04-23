@@ -78,6 +78,7 @@ public:
     void DrawQuadBezierPath(Point bezier[3]) override;
     void DrawCubicBezierPath(Point bezier[4]) override;
     void DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2[4]) override;
+    void DrawBentParallelogramFilled(Point side[4], int height) override;
     void DrawCircle(int x, int y, int radius) override;
     void DrawEllipse(int x, int y, int width, int height) override;
     void DrawEllipticArc(int x, int y, int width, int height, double start, double end) override;
@@ -298,7 +299,7 @@ private:
 
     void WriteLine(std::string);
 
-    std::string GetColor(int color);
+    std::string GetColor(int color) const;
 
     pugi::xml_node AddChild(std::string name);
 

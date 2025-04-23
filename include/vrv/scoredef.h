@@ -47,7 +47,6 @@ public:
     ///@{
     ScoreDefElement();
     ScoreDefElement(ClassId classId);
-    ScoreDefElement(ClassId classId, const std::string &classIdStr);
     virtual ~ScoreDefElement();
     void Reset() override;
     ///@}
@@ -144,13 +143,18 @@ public:
     virtual ~ScoreDef();
     Object *Clone() const override { return new ScoreDef(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "ScoreDef"; }
+    std::string GetClassName() const override { return "scoreDef"; }
     ///@}
 
     /**
      * Check if a object is allowed as child.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
+
+    /**
+     * Additional check when adding a child.
+     */
+    bool AddChildAdditionalCheck(Object *child) override;
 
     /**
      * Return an order for the given ClassId.

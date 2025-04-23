@@ -28,7 +28,6 @@ View::View()
 {
     m_doc = NULL;
     m_options = NULL;
-    m_pageIdx = 0;
     m_slurHandling = SlurHandling::Initialize;
 
     m_currentColor = COLOR_NONE;
@@ -42,23 +41,19 @@ void View::SetDoc(Doc *doc)
     if (doc == NULL) {
         m_doc = NULL;
         m_options = NULL;
-        DoReset();
     }
     else {
         m_doc = doc;
         m_options = doc->GetOptions();
     }
     m_currentPage = NULL;
-    m_pageIdx = 0;
 }
 
-void View::SetPage(int pageIdx, bool doLayout)
+void View::SetPage(Page *page, bool doLayout)
 {
-    assert(m_doc); // Page cannot be NULL
-    assert(m_doc->HasPage(pageIdx));
+    assert(page); // Page cannot be NULL
 
-    m_pageIdx = pageIdx;
-    m_currentPage = m_doc->SetDrawingPage(pageIdx);
+    m_currentPage = page;
 
     if (doLayout) {
         m_doc->ScoreDefSetCurrentDoc();
@@ -71,28 +66,6 @@ void View::SetPage(int pageIdx, bool doLayout)
             m_currentPage->LayOut();
         }
     }
-
-    OnPageChange();
-    DoRefresh();
-}
-
-bool View::HasNext(bool forward)
-{
-    if (forward) return (m_doc && (m_doc->HasPage(m_pageIdx + 1)));
-    return (m_doc && (m_doc->HasPage(m_pageIdx - 1)));
-}
-
-void View::Next(bool forward)
-{
-    if (!m_doc) return;
-
-    if (forward && this->HasNext(true)) {
-        m_pageIdx++;
-    }
-    else if (!forward && this->HasNext(false)) {
-        m_pageIdx--;
-    }
-    this->SetPage(m_pageIdx);
 }
 
 int View::ToDeviceContextX(int i)

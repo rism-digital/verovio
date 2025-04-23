@@ -31,14 +31,15 @@ public:
     virtual ~Oriscus();
     Object *Clone() const override { return new Oriscus(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Oriscus"; }
+    std::string GetClassName() const override { return "oriscus"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    PitchInterface *GetPitchInterface() override { return dynamic_cast<PitchInterface *>(this); }
+    PitchInterface *GetPitchInterface() override { return vrv_cast<PitchInterface *>(this); }
+    const PitchInterface *GetPitchInterface() const override { return vrv_cast<const PitchInterface *>(this); }
     ///@}
 
     /** Override the method since alignment is required */

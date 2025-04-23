@@ -28,7 +28,7 @@ namespace vrv {
 
 static const ClassRegistrar<Surface> s_factory("surface", SURFACE);
 
-Surface::Surface() : Object(SURFACE, "surface-"), AttTyped(), AttCoordinated()
+Surface::Surface() : Object(SURFACE), AttTyped(), AttCoordinated()
 {
     this->RegisterAttClass(ATT_TYPED);
     this->RegisterAttClass(ATT_COORDINATED);
@@ -45,19 +45,16 @@ void Surface::Reset()
     this->ResetCoordinatedUl();
 }
 
-bool Surface::IsSupportedChild(Object *object)
+bool Surface::IsSupportedChild(ClassId classId)
 {
-    if (object->Is(GRAPHIC)) {
-        assert(dynamic_cast<Graphic *>(object));
-    }
-    else if (object->Is(ZONE)) {
-        assert(dynamic_cast<Zone *>(object));
+    static const std::vector<ClassId> supported{ GRAPHIC, ZONE };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
-        LogError("Unsupported child '%s' of surface", object->GetClassName().c_str());
         return false;
     }
-    return true;
 }
 
 int Surface::GetMaxX() const

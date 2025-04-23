@@ -60,7 +60,7 @@ public:
     virtual ~KeySig();
     Object *Clone() const override { return new KeySig(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "KeySig"; }
+    std::string GetClassName() const override { return "keySig"; }
     ///@}
 
     /** Override the method since alignment is required */
@@ -72,7 +72,12 @@ public:
     /**
      * Add an element (a keyAccid) to a keySig.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
+
+    /**
+     * Additional check when adding a child.
+     */
+    bool AddChildAdditionalCheck(Object *child) override;
 
     /** Accid number getter */
     int GetAccidCount(bool fromAttribute = false) const;

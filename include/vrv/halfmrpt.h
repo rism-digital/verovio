@@ -34,7 +34,7 @@ public:
     virtual ~HalfmRpt();
     Object *Clone() const override { return new HalfmRpt(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "HalfmRpt"; }
+    std::string GetClassName() const override { return "halfmRpt"; }
     ///@}
 
     /** Override the method since alignment is required */

@@ -45,7 +45,7 @@ namespace vrv {
 // System
 //----------------------------------------------------------------------------
 
-System::System() : Object(SYSTEM, "system-"), DrawingListInterface(), AttTyped()
+System::System() : Object(SYSTEM), DrawingListInterface(), AttTyped()
 {
     this->RegisterAttClass(ATT_TYPED);
 
@@ -86,27 +86,22 @@ void System::Reset()
     m_drawingIsOptimized = false;
 }
 
-bool System::IsSupportedChild(Object *child)
+bool System::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(MEASURE)) {
-        assert(dynamic_cast<Measure *>(child));
+    static const std::vector<ClassId> supported{ DIV, MEASURE, SCOREDEF };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(SCOREDEF)) {
-        assert(dynamic_cast<ScoreDef *>(child));
+    else if (Object::IsSystemElement(classId)) {
+        return true;
     }
-    else if (child->IsSystemElement()) {
-        assert(dynamic_cast<SystemElement *>(child));
-    }
-    else if (child->Is(DIV)) {
-        assert(dynamic_cast<Div *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 int System::GetDrawingX() const
@@ -143,6 +138,20 @@ int System::GetHeight() const
         return -m_systemAligner.GetBottomAlignment()->GetYRel();
     }
     return 0;
+}
+
+Staff *System::GetTopVisibleStaff()
+{
+    return const_cast<Staff *>(std::as_const(*this).GetTopVisibleStaff());
+}
+
+const Staff *System::GetTopVisibleStaff() const
+{
+    for (auto child : m_systemAligner.GetChildren()) {
+        const StaffAlignment *alignment = vrv_cast<const StaffAlignment *>(child);
+        if (alignment->GetStaff()) return alignment->GetStaff();
+    }
+    return NULL;
 }
 
 int System::GetMinimumSystemSpacing(const Doc *doc) const
@@ -327,8 +336,8 @@ void System::AddToDrawingListIfNecessary(Object *object)
 
     if (!object->HasInterface(INTERFACE_TIME_SPANNING)) return;
 
-    if (object->Is(
-            { BEAMSPAN, BRACKETSPAN, FIGURE, GLISS, HAIRPIN, LV, OCTAVE, PHRASE, PITCHINFLECTION, SLUR, SYL, TIE })) {
+    if (object->Is({ ANNOTSCORE, BEAMSPAN, BRACKETSPAN, FIGURE, GLISS, HAIRPIN, LV, OCTAVE, PHRASE, PITCHINFLECTION,
+            SLUR, SYL, TIE })) {
         this->AddToDrawingList(object);
     }
     else if (object->Is(DIR)) {

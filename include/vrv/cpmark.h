@@ -34,7 +34,7 @@ public:
     virtual ~CpMark();
     Object *Clone() const override { return new CpMark(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "CpMark"; }
+    std::string GetClassName() const override { return "cpMark"; }
     ///@}
 
     /**
@@ -59,7 +59,7 @@ public:
      * Add an element (text, rend. etc.) to a cpMark.
      * Only supported elements will be actually added to the child list.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     //----------//
     // Functors //

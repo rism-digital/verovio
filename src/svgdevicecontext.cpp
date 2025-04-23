@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <cassert>
+#include <numeric>
 #include <regex>
 
 //----------------------------------------------------------------------------
@@ -71,7 +72,7 @@ SvgDeviceContext::SvgDeviceContext(const std::string &docId) : DeviceContext(SVG
 
     m_outdata.clear();
 
-    m_glyphPostfixId = Object::GenerateHashID();
+    m_glyphPostfixId = m_docId;
 }
 
 SvgDeviceContext::~SvgDeviceContext() {}
@@ -258,6 +259,13 @@ void SvgDeviceContext::StartGraphic(
     AppendIdAndClass(gId, object->GetClassName(), gClassFull, graphicID);
     AppendAdditionalAttributes(object);
 
+    // Add data-plist with html5 (now only for annot)
+    if (m_html5 && object->HasPlistReferences()) {
+        auto plist = object->GetPlistReferences();
+        std::string ids = ConcatenateIDs(**plist);
+        this->SetCustomGraphicAttributes("plist-referring", ids);
+    }
+
     // this sets staffDef styles for lyrics
     if (object->Is(STAFF)) {
         Staff *staff = vrv_cast<Staff *>(object);
@@ -330,17 +338,6 @@ void SvgDeviceContext::StartGraphic(
             else if (att->GetVisible() == BOOLEAN_false) {
                 m_currentNode.append_attribute("visibility") = "hidden";
             }
-        }
-    }
-
-    if (object->HasAttClass(ATT_LINKING)) {
-        AttLinking *att = dynamic_cast<AttLinking *>(object);
-        assert(att);
-        if (att->HasFollows()) {
-            m_currentNode.append_attribute("mei:follows") = att->GetFollows().c_str();
-        }
-        if (att->HasPrecedes()) {
-            m_currentNode.append_attribute("mei:precedes") = att->GetPrecedes().c_str();
         }
     }
 
@@ -621,7 +618,6 @@ void SvgDeviceContext::AppendStrokeDashArray(pugi::xml_node node, const Pen &pen
 void SvgDeviceContext::PrefixCssRules(std::string &rules)
 {
     static std::regex selectorRegex(R"(([^{}]+)\s*\{([^}]*)\})");
-    static std::regex multiSelectorRegex(R"((\b\w+\.?[\w-]+\b))");
 
     std::sregex_iterator it(rules.begin(), rules.end(), selectorRegex);
     std::sregex_iterator end;
@@ -629,19 +625,26 @@ void SvgDeviceContext::PrefixCssRules(std::string &rules)
     std::string result;
 
     while (it != end) {
-
         std::string selectors = (*it)[1].str();
         std::string properties = (*it)[2].str();
 
-        // Trim trailing spaces from selectors to prevent extra spaces before `{`
-        selectors = std::regex_replace(selectors, std::regex(R"(\s+$)"), "");
+        // Split by comma to handle multi-selectors
+        std::stringstream ss(selectors);
+        std::string selector;
+        std::vector<std::string> prefixedSelectors;
 
-        // Prepend `#docId` to each selector
-        selectors = std::regex_replace(selectors, multiSelectorRegex, "#" + m_docId + " $1");
+        while (std::getline(ss, selector, ',')) {
+            // Trim whitespace
+            selector = std::regex_replace(selector, std::regex(R"(^\s+|\s+$)"), "");
+            prefixedSelectors.push_back("#" + m_docId + " " + selector);
+        }
 
-        // Keep contents inside `{}` unchanged
-        result += selectors + " {" + properties + "}";
+        if (prefixedSelectors.empty()) continue;
 
+        std::string finalSelector = std::accumulate(std::next(prefixedSelectors.begin()), prefixedSelectors.end(),
+            prefixedSelectors.at(0), [](std::string a, std::string b) { return a + ", " + b; });
+
+        result += finalSelector + " {" + properties + "}";
         ++it;
     }
 
@@ -701,6 +704,19 @@ void SvgDeviceContext::DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2
     pathChild.append_attribute("stroke-linecap") = "round";
     pathChild.append_attribute("stroke-linejoin") = "round";
     // pathChild.append_attribute("stroke-opacity") = "1";
+    pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
+}
+
+void SvgDeviceContext::DrawBentParallelogramFilled(Point side[4], int height)
+{
+    pugi::xml_node pathChild = AddChild("path");
+    pathChild.append_attribute("d") = StringFormat("M%d,%d C%d,%d %d,%d %d,%d L%d,%d C%d,%d %d,%d %d,%d Z", side[0].x,
+        side[0].y, side[1].x, side[1].y, side[2].x, side[2].y, side[3].x, side[3].y, side[3].x, side[3].y + height,
+        side[2].x, side[2].y + height, side[1].x, side[1].y + height, side[0].x, side[0].y + height)
+                                          .c_str();
+    pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
+    pathChild.append_attribute("stroke-linecap") = "round";
+    pathChild.append_attribute("stroke-linejoin") = "round";
     pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
 }
 
@@ -812,7 +828,7 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
     pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d L%d %d", x1, y1, x2, y2).c_str();
-    if (m_penStack.top().HasColor()) {
+    if (m_penStack.top().HasColor() || !this->UseGlobalStyling()) {
         pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
     }
     if (m_penStack.top().GetWidth() > 1) pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
@@ -1172,7 +1188,6 @@ void SvgDeviceContext::AppendIdAndClass(
     const std::string &gId, const std::string &baseClass, const std::string &addedClasses, GraphicID graphicID)
 {
     std::string baseClassFull = baseClass;
-    std::transform(baseClassFull.begin(), baseClassFull.begin() + 1, baseClassFull.begin(), ::tolower);
 
     if (gId.length() > 0) {
         if (m_html5) {
@@ -1213,12 +1228,8 @@ void SvgDeviceContext::AppendAdditionalAttributes(Object *object)
     }
 }
 
-std::string SvgDeviceContext::GetColor(int color)
+std::string SvgDeviceContext::GetColor(int color) const
 {
-    std::ostringstream ss;
-    ss << "#";
-    ss << std::hex;
-
     switch (color) {
         case (COLOR_NONE): return "currentColor";
         case (COLOR_BLACK): return "#000000";
@@ -1228,13 +1239,7 @@ std::string SvgDeviceContext::GetColor(int color)
         case (COLOR_BLUE): return "#0000FF";
         case (COLOR_CYAN): return "#00FFFF";
         case (COLOR_LIGHT_GREY): return "#777777";
-        default:
-            int blue = (color & 255);
-            int green = (color >> 8) & 255;
-            int red = (color >> 16) & 255;
-            ss << red << green << blue;
-            // std::strin = wxDecToHex(char(red)) + wxDecToHex(char(green)) + wxDecToHex(char(blue)) ;  // ax3
-            return ss.str();
+        default: return StringFormat("#%06X", color);
     }
 }
 

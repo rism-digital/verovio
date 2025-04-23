@@ -38,6 +38,7 @@
 #define GIT_COMMIT "[undefined]"
 #endif
 
+#include "object.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -250,6 +251,21 @@ std::string ExtractIDFragment(std::string refID)
         refID = refID.substr(pos + 1);
     }
     return refID;
+}
+
+std::string ConcatenateIDs(const ListOfConstObjects &objects)
+{
+    // Get a list of strings
+    std::vector<std::string> ids;
+    for (const auto &object : objects) {
+        ids.push_back("#" + object->GetID() + " ");
+    }
+    // Concatenate IDs
+    std::stringstream sstream;
+    std::copy(ids.begin(), ids.end(), std::ostream_iterator<std::string>(sstream));
+    std::string uris = sstream.str();
+    if (!uris.empty()) uris.pop_back(); // Remove extra space added by the concatenation
+    return uris;
 }
 
 std::string UTF32to8(const std::u32string &in)
@@ -509,7 +525,7 @@ static const std::string base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                        "abcdefghijklmnopqrstuvwxyz"
                                        "0123456789+/";
 
-static inline bool isBase64(unsigned char c)
+static inline bool IsBase64(unsigned char c)
 {
     return (isalnum(c) || (c == '+') || (c == '/'));
 }
@@ -558,7 +574,7 @@ std::vector<unsigned char> Base64Decode(std::string const &encodedString)
     unsigned char charArray4[4], charArray3[3];
     std::vector<unsigned char> ret;
 
-    while (inLen-- && (encodedString[in_] != '=') && isBase64(encodedString[in_])) {
+    while (inLen-- && (encodedString[in_] != '=') && IsBase64(encodedString[in_])) {
         charArray4[i++] = encodedString[in_];
         in_++;
         if (i == 4) {

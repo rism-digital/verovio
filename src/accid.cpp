@@ -29,7 +29,7 @@ namespace vrv {
 static const ClassRegistrar<Accid> s_factory("accid", ACCID);
 
 Accid::Accid()
-    : LayerElement(ACCID, "accid-")
+    : LayerElement(ACCID)
     , PositionInterface()
     , AttAccidental()
     , AttAccidentalGes()

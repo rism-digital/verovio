@@ -103,14 +103,14 @@ namespace musicxml {
     };
 
     struct OpenArpeggio {
-        OpenArpeggio(const int &arpegN, const int &timeStamp)
+        OpenArpeggio(const int &arpegN, const Fraction &timeStamp)
         {
             m_arpegN = arpegN;
             m_timeStamp = timeStamp;
         }
 
         int m_arpegN;
-        int m_timeStamp;
+        Fraction m_timeStamp;
     };
 
     struct EndingInfo {
@@ -458,7 +458,7 @@ private:
     static data_BARRENDITION ConvertStyleToRend(const std::string &value, const bool repeat);
     static data_BOOLEAN ConvertWordToBool(const std::string &value);
     static data_DURATION ConvertTypeToDur(const std::string &value);
-    static data_HEADSHAPE ConvertNotehead(const std::string &value);
+    static data_HEADSHAPE_list ConvertNotehead(const std::string &value);
     static data_LINESTARTENDSYMBOL ConvertLineEndSymbol(const std::string &value);
     static data_MIDIVALUE ConvertDynamicsToMidiVal(const float dynamics);
     static data_PITCHNAME ConvertStepToPitchName(const std::string &value);

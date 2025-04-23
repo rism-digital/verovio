@@ -30,7 +30,7 @@ namespace vrv {
 static const ClassRegistrar<StaffGrp> s_factory("staffGrp", STAFFGRP);
 
 StaffGrp::StaffGrp()
-    : Object(STAFFGRP, "staffgrp-")
+    : Object(STAFFGRP)
     , ObjectListInterface()
     , AttBarring()
     , AttBasic()
@@ -68,33 +68,19 @@ void StaffGrp::Reset()
     m_groupSymbol = NULL;
 }
 
-bool StaffGrp::IsSupportedChild(Object *child)
+bool StaffGrp::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(GRPSYM)) {
-        assert(dynamic_cast<GrpSym *>(child));
+    static const std::vector<ClassId> supported{ GRPSYM, INSTRDEF, LABEL, LABELABBR, STAFFDEF, STAFFGRP };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(INSTRDEF)) {
-        assert(dynamic_cast<InstrDef *>(child));
-    }
-    else if (child->Is(LABEL)) {
-        assert(dynamic_cast<Label *>(child));
-    }
-    else if (child->Is(LABELABBR)) {
-        assert(dynamic_cast<LabelAbbr *>(child));
-    }
-    else if (child->Is(STAFFDEF)) {
-        assert(dynamic_cast<StaffDef *>(child));
-    }
-    else if (child->Is(STAFFGRP)) {
-        assert(dynamic_cast<StaffGrp *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 int StaffGrp::GetInsertOrderFor(ClassId classId) const
