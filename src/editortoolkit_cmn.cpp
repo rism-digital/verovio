@@ -52,6 +52,7 @@ EditorToolkitCMN::EditorToolkitCMN(Doc *doc, View *view) : EditorToolkit(doc, vi
 {
     m_scoreContext = NULL;
     m_sectionContext = NULL;
+    m_currentContext = NULL;
 }
 
 std::string EditorToolkitCMN::EditInfo()
@@ -696,6 +697,7 @@ bool EditorToolkitCMN::ContextForScores(bool editInfo)
         StructFunctor structFunct(m_scoreContext, true);
         m_doc->Process(structFunct);
     }
+    m_currentContext = m_scoreContext;
 
     if (!editInfo) return true;
 
@@ -703,7 +705,7 @@ bool EditorToolkitCMN::ContextForScores(bool editInfo)
 
     // The target object
     jsonxx::Object jsonObject;
-    this->ContextForObject(m_scoreContext, jsonObject, true);
+    this->ContextForObject(m_scoreContext, jsonObject, true, true);
 
     m_editInfo << jsonObject;
 
@@ -718,6 +720,7 @@ bool EditorToolkitCMN::ContextForSections(bool editInfo)
         m_doc->Process(structFunct);
         m_sectionContext->LogDebugTree();
     }
+    m_currentContext = m_sectionContext;
 
     if (!editInfo) return true;
 
@@ -725,7 +728,7 @@ bool EditorToolkitCMN::ContextForSections(bool editInfo)
 
     // The target object
     jsonxx::Object jsonObject;
-    this->ContextForObject(m_sectionContext, jsonObject, true);
+    this->ContextForObject(m_sectionContext, jsonObject, true, true);
 
     m_editInfo << jsonObject;
 
@@ -736,100 +739,85 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
 {
     m_editInfo.reset();
 
-    // Make sure we have a section tree
+    // Make sure we have a section tree - this also sets m_currentContext
     this->ContextForSections(false);
     assert(m_sectionContext);
 
-    bool hasTargetID = (elementId != "[unspecified]");
+    bool hasTargetID = (elementId != "");
     const Object *object = NULL;
     if (hasTargetID) {
         object = this->GetElement(elementId);
     }
-    // Retrieve the context from the first measure in the current page
+    // Retrieve the context from the first measure in the document
     else {
-        object = m_doc->GetDrawingPage()->FindDescendantByType(MEASURE);
+        object = m_doc->FindDescendantByType(MEASURE);
     }
     // We cannot continue without object
     if (!object || !object->GetParent()) return false;
 
-    ArrayOfConstObjects objects;
+    ArrayOfConstObjects siblings;
     ArrayOfConstObjects::iterator targetIt;
 
     const Object *contextRoot = NULL;
 
+    // If the object parent (context root), this means it must we selected from the MEI section context tree - and so
+    // are its siblings
     if (object->GetParent()->Is(SYSTEM)) {
         const Object *editorTreeObject = m_sectionContext->FindDescendantByID(object->GetID());
         if (!editorTreeObject) {
             return false;
         }
         contextRoot = editorTreeObject->GetParent();
-        objects = this->GetScoreBasedChildrenFor(contextRoot);
-
-        targetIt = std::find(objects.begin(), objects.end(), object);
+        siblings = this->GetScoreBasedChildrenFor(contextRoot);
+        targetIt = std::find(siblings.begin(), siblings.end(), object);
         // This should not happen
-        if (targetIt == objects.end()) return false;
+        if (targetIt == siblings.end()) return false;
     }
     else {
-        objects = object->GetParent()->GetChildren();
-        targetIt = std::find(objects.begin(), objects.end(), object);
+        contextRoot = object->GetParent();
+        siblings = object->GetParent()->GetChildren();
+        targetIt = std::find(siblings.begin(), siblings.end(), object);
         // This should not happen
-        if (targetIt == objects.end()) return false;
-
-        const Object *systemObject = object->GetLastAncestorNot(SYSTEM);
-        const Object *editorTreeObject = m_sectionContext->FindDescendantByID(systemObject->GetID());
-        if (!editorTreeObject) {
-            return false;
-        }
-        contextRoot = editorTreeObject->GetParent();
+        if (targetIt == siblings.end()) return false;
     }
-    ArrayOfConstObjects previous;
-    if (targetIt != objects.begin()) std::copy(objects.begin(), targetIt, std::back_inserter(previous));
+    assert(contextRoot);
 
-    ArrayOfConstObjects following;
-    if (targetIt != objects.end()) std::copy(std::next(targetIt), objects.end(), std::back_inserter(following));
+    ArrayOfConstObjects previousSiblings;
+    if (targetIt != siblings.begin()) std::copy(siblings.begin(), targetIt, std::back_inserter(previousSiblings));
 
-    // Build the json context
-
-    /*
-    jsonxx::Object section;
-    section << "id" << contextRoot->GetID();
-    section << "element" << ".";
-    section << "prout" << contextRoot->GetClassName();
-    jsonxx::Object jsonContext;
-    */
+    ArrayOfConstObjects followingSiblings;
+    if (targetIt != siblings.end())
+        std::copy(std::next(targetIt), siblings.end(), std::back_inserter(followingSiblings));
 
     ArrayOfConstObjects ancestors;
+    // Reserved size for optimizing loop filling
+    ancestors.reserve(10);
     jsonxx::Array jsonAncestors;
 
-    const Object *context = object->GetParent();
-    const Object *ancestor = object;
-
-    // Look for additional ancestors
-    while (ancestor->GetParent()) {
-        if (ancestor->GetParent()->Is(SYSTEM)) {
-            ancestor = m_sectionContext->FindDescendantByID(ancestor->GetID());
-            if (!ancestor || !ancestor->GetParent()) return false;
+    // Look for ancestors starting from the object parent
+    const Object *current = object;
+    while (current->GetParent()) {
+        if (current->GetParent()->Is(SYSTEM)) {
+            // Switch to the MEI sectionContext tree
+            current = m_sectionContext->FindDescendantByID(current->GetID());
+            if (!current || !current->GetParent()) return false;
         }
-        if (ancestor->GetParent()->Is(SCORE)) break;
-        ancestor = ancestor->GetParent();
-        ancestors.push_back(ancestor);
+        // Top element in the score subtree
+        if (current->GetParent()->Is(SCORE)) break;
+        current = current->GetParent();
+        ancestors.push_back(current);
     }
     this->ContextForObjects(ancestors, jsonAncestors);
-    // Also add the section (.) as ancestor
-    // jsonAncestors << section;
-    jsonxx::Object jsonContext;
-    this->ContextForObject(context, jsonContext);
-
-    // Ancestors in addition to the parent of the target (context object)
     m_editInfo << "ancestors" << jsonAncestors;
 
-    // Build the list of children in which the target is included
-    jsonxx::Array contextChildren;
+    jsonxx::Object jsonContextRoot;
+    this->ContextForObject(contextRoot, jsonContextRoot);
+    jsonxx::Array jsonContext;
 
     // Preceeding siblings
     jsonxx::Array elements;
-    this->ContextForObjects(previous, elements);
-    contextChildren << elements;
+    this->ContextForObjects(previousSiblings, elements);
+    jsonContext << elements;
 
     // The target object
     jsonxx::Object jsonObject;
@@ -846,17 +834,17 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
         }
         this->ContextForObjects(objectChildren, jsonObjectChildren);
         if (!jsonObjectChildren.empty()) jsonObject << "children" << jsonObjectChildren;
-        // Add it to the list
-        contextChildren << jsonObject;
     }
+    // Add it to the list
+    jsonContext << jsonObject;
 
     // Following siblings
-    this->ContextForObjects(following, elements);
-    contextChildren << elements;
+    this->ContextForObjects(followingSiblings, elements);
+    jsonContext << elements;
 
     // Add all children of to context (include target and surrounding siblings)
-    jsonContext << "children" << contextChildren;
-    m_editInfo << "context" << jsonContext;
+    jsonContextRoot << "children" << jsonContext;
+    m_editInfo << "context" << jsonContextRoot;
 
     // Stop here without targetID, but still add empty objects or arrays to the info
     if (!hasTargetID) {
@@ -894,7 +882,8 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
     return true;
 }
 
-void EditorToolkitCMN::ContextForObject(const Object *object, jsonxx::Object &element, bool recursive)
+void EditorToolkitCMN::ContextForObject(
+    const Object *object, jsonxx::Object &element, bool recursive, bool editorTreeOnly)
 {
     element << "element" << object->GetClassName();
     element << "id" << object->GetID();
@@ -915,24 +904,26 @@ void EditorToolkitCMN::ContextForObject(const Object *object, jsonxx::Object &el
 
     ArrayOfConstObjects children;
     // First check that this is an EditorTreeObject bcause otherwise checking
-    // Object::IsMilestoneElement will be missing the interfaces on pseudo types
+    // Object::IsMilestoneElement will be missing the interfaces on EditorTreeObject objects
     if ((dynamic_cast<const EditorTreeObject *>(object)) || object->IsMilestoneElement()) {
         children = this->GetScoreBasedChildrenFor(object);
     }
-    else {
+    // We retrieving the scores or the sections, we don't want the complete tree
+    else if (!editorTreeOnly) {
         children = object->GetChildren();
-        // Remove children that are added as element parts
+        // Remove children that are added as element parts (never exist in EditorTreeObject)
         children.erase(
             std::remove_if(children.begin(), children.end(),
                 [](const Object *item) { return item->Is({ DOTS, FLAG, STEM, TUPLET_NUM, TUPLET_BRACKET }); }),
             children.end());
     }
+
     if (children.size() > 0) {
         jsonxx::Array jsonChildren;
         if (recursive) {
             for (auto child : children) {
                 jsonxx::Object jsonChild;
-                this->ContextForObject(child, jsonChild, true);
+                this->ContextForObject(child, jsonChild, true, editorTreeOnly);
                 jsonChildren << jsonChild;
             }
         }
@@ -976,9 +967,11 @@ void EditorToolkitCMN::ContextForReferences(const ListOfObjectAttNamePairs &obje
 
 ArrayOfConstObjects EditorToolkitCMN::GetScoreBasedChildrenFor(const Object *object)
 {
-    assert(m_sectionContext);
-    const EditorTreeObject *editorTreeObject
-        = vrv_cast<const EditorTreeObject *>(m_sectionContext->FindDescendantByID(object->GetID()));
+    // m_currentContext is set by ContextForScores or ContextForSections
+    assert(m_currentContext);
+    const EditorTreeObject *editorTreeObject = (m_currentContext->GetID() == object->GetID())
+        ? vrv_cast<const EditorTreeObject *>(object)
+        : vrv_cast<const EditorTreeObject *>(m_currentContext->FindDescendantByID(object->GetID()));
     if (!editorTreeObject) {
         return ArrayOfConstObjects();
     }

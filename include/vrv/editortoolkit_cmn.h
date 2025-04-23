@@ -74,7 +74,8 @@ protected:
 
     Object *GetElement(std::string &elementId);
 
-    void ContextForObject(const Object *object, jsonxx::Object &element, bool recursive = false);
+    void ContextForObject(
+        const Object *object, jsonxx::Object &element, bool recursive = false, bool editorTreeOnly = false);
     void ContextForObjects(const ArrayOfConstObjects &objects, jsonxx::Array &siblings);
     void ContextForReferences(const ListOfObjectAttNamePairs &objects, jsonxx::Array &links);
 
@@ -87,6 +88,7 @@ protected:
 
     EditorTreeObject *m_scoreContext;
     EditorTreeObject *m_sectionContext;
+    EditorTreeObject *m_currentContext;
 };
 
 //----------------------------------------------------------------------------
