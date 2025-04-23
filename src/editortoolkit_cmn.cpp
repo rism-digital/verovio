@@ -179,10 +179,11 @@ bool EditorToolkitCMN::ParseContextAction(jsonxx::Object param, std::string &ele
         return true;
     }
     else if (param.has<jsonxx::String>("document")) {
-        scores = param.get<jsonxx::String>("document") == "scores";
+        scores = (param.get<jsonxx::String>("document") == "scores");
         sections = !scores;
+        return true;
     }
-    return true;
+    return false;
 }
 
 bool EditorToolkitCMN::ParseDeleteAction(jsonxx::Object param, std::string &elementId)
@@ -693,6 +694,11 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
 bool EditorToolkitCMN::ContextForScores(bool editInfo)
 {
     if (!m_scoreContext) {
+        // if (!m_doc->CheckIDs()) {
+        //     LogError("Action cannot be performed on documents with duplicated IDs");
+        //     return false;
+        // }
+
         m_scoreContext = new EditorTreeObject(m_doc);
         StructFunctor structFunct(m_scoreContext, true);
         m_doc->Process(structFunct);
@@ -707,7 +713,7 @@ bool EditorToolkitCMN::ContextForScores(bool editInfo)
     jsonxx::Object jsonObject;
     this->ContextForObject(m_scoreContext, jsonObject, true, true);
 
-    m_editInfo << jsonObject;
+    m_editInfo = jsonObject;
 
     return true;
 }
@@ -715,10 +721,14 @@ bool EditorToolkitCMN::ContextForScores(bool editInfo)
 bool EditorToolkitCMN::ContextForSections(bool editInfo)
 {
     if (!m_sectionContext) {
+        // if (!m_doc->CheckIDs()) {
+        //     LogWarning("Action cannot be performed on documents with duplicated IDs");
+        //     return false;
+        // }
+
         m_sectionContext = new EditorTreeObject(m_doc);
         StructFunctor structFunct(m_sectionContext, false);
         m_doc->Process(structFunct);
-        m_sectionContext->LogDebugTree();
     }
     m_currentContext = m_sectionContext;
 
@@ -730,7 +740,7 @@ bool EditorToolkitCMN::ContextForSections(bool editInfo)
     jsonxx::Object jsonObject;
     this->ContextForObject(m_sectionContext, jsonObject, true, true);
 
-    m_editInfo << jsonObject;
+    m_editInfo = jsonObject;
 
     return true;
 }
@@ -908,7 +918,7 @@ void EditorToolkitCMN::ContextForObject(
     if ((dynamic_cast<const EditorTreeObject *>(object)) || object->IsMilestoneElement()) {
         children = this->GetScoreBasedChildrenFor(object);
     }
-    // We retrieving the scores or the sections, we don't want the complete tree
+    // When retrieving the scores or the sections, we don't want the complete tree
     else if (!editorTreeOnly) {
         children = object->GetChildren();
         // Remove children that are added as element parts (never exist in EditorTreeObject)
@@ -919,9 +929,17 @@ void EditorToolkitCMN::ContextForObject(
     }
 
     if (children.size() > 0) {
+        // If we do not call it recusrively, still include an empty array
         jsonxx::Array jsonChildren;
         if (recursive) {
             for (auto child : children) {
+                // Go back to the editor tree if needed - that is necessary when going through subtree from mdiv not
+                // transformed to page-based Because GetScoreBasedChildrenFor() will have returned the original subtree,
+                // and going through it would stop with !editorTreeOnly
+                if (editorTreeOnly && !dynamic_cast<const EditorTreeObject *>(child)) {
+                    const Object *editorTreeObject = m_currentContext->FindDescendantByID(child->GetID());
+                    if (editorTreeObject) child = editorTreeObject;
+                }
                 jsonxx::Object jsonChild;
                 this->ContextForObject(child, jsonChild, true, editorTreeOnly);
                 jsonChildren << jsonChild;
