@@ -810,6 +810,25 @@ void Object::ResetID()
     GenerateID();
 }
 
+bool Object::CheckUniqueID(std::unordered_set<std::string> &usedIDs)
+{
+    // This needs to be double check. Seems to find non existing duplicated IDs in the JS binding
+    // Might be related to the ID generator
+    if (!usedIDs.insert(this->GetID()).second) {
+        // Duplicate found
+        LogError("Duplicated ID %s on %s", this->GetID().c_str(), this->GetClassName().c_str());
+        return false;
+    }
+
+    for (auto child : this->GetChildren()) {
+        if (!child->CheckUniqueID(usedIDs)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void Object::SetParent(Object *parent)
 {
     assert(!m_parent);

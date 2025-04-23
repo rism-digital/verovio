@@ -14,6 +14,7 @@
 #include <map>
 #include <optional>
 #include <string>
+#include <unordered_set>
 
 //----------------------------------------------------------------------------
 
@@ -278,6 +279,7 @@ public:
     void SetID(const std::string &id) { m_id = id; }
     void SwapID(Object *other);
     void ResetID();
+    bool CheckUniqueID(std::unordered_set<std::string> &usedIDs);
 
     /**
      * Methods for setting / getting comments

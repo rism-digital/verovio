@@ -1740,6 +1740,12 @@ void Doc::ResetFocus()
     this->ScoreDefSetCurrentDoc(true);
 }
 
+bool Doc::CheckIDs()
+{
+    std::unordered_set<std::string> usedIDs;
+    return this->CheckUniqueID(usedIDs);
+}
+
 int Doc::GetGlyphHeight(char32_t code, int staffSize, bool graceSize) const
 {
     int x, y, w, h;
