@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+
+## [5.2.0] – 2025-04-23
 * Support for `data.HEXNUM` in `note@head.shape`
 * Support for additional tablature features introduced in MEI 5.1 (@paul-bayleaf)
 * Support for `annot` as control event (@oerc-music)
