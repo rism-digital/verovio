@@ -936,7 +936,7 @@ void EditorToolkitCMN::ContextForObject(
                 // Go back to the editor tree if needed - that is necessary when going through subtree from mdiv not
                 // transformed to page-based Because GetScoreBasedChildrenFor() will have returned the original subtree,
                 // and going through it would stop with !editorTreeOnly
-                if (editorTreeOnly && !dynamic_cast<const EditorTreeObject *>(child)) {
+                if (editorTreeOnly && !dynamic_cast<const EditorTreeObject *>(child) && !child->IsEditorialElement()) {
                     const Object *editorTreeObject = m_currentContext->FindDescendantByID(child->GetID());
                     if (editorTreeObject) child = editorTreeObject;
                 }
