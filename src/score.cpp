@@ -95,6 +95,7 @@ bool Score::IsSupportedChild(ClassId classId)
 void Score::SetScoreDefSubtree(Object *substree, ScoreDef *scoreScoreDef)
 {
     assert(!m_scoreDef);
+    assert(!m_scoreDefSubtree);
 
     m_scoreDefSubtree = substree;
     m_scoreDef = scoreScoreDef;

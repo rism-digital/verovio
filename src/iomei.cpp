@@ -4431,16 +4431,19 @@ bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
     // This is a score-based MEI file
     m_readingScoreBased = true;
 
-    // This actually sets the Doc::m_scoreDef
+    // This actually sets the top-level ScoreDef for the Score
+    // Use a temporary score to read it (including the surrounding editorial markup)
     Score tmpScore;
     bool success = this->ReadScoreScoreDef(&tmpScore, score);
-
-    ScoreDef *scoreScoreDef = vrv_cast<ScoreDef *>(tmpScore.FindDescendantByType(SCOREDEF));
+    // Detach the first child
+    Object *subtree = tmpScore.DetachChild(0);
+    // This will find the one selected by xpath queries since the subtree is filtered by visibility
+    ScoreDef *scoreScoreDef = (subtree) ? vrv_cast<ScoreDef *>(subtree->FindDescendantByType(SCOREDEF)) : NULL;
     if (!scoreScoreDef) {
-        LogError("prout");
+        LogError("No top-level scoreDef could be read as child or direct descendant of score.");
         return false;
     }
-    vrvScore->SetScoreDefSubtree(tmpScore.DetachChild(0), scoreScoreDef);
+    vrvScore->SetScoreDefSubtree(subtree, scoreScoreDef);
     m_hasScoreDef = true;
 
     if (!success) return false;
@@ -4485,6 +4488,9 @@ bool MEIInput::ReadScoreScoreDef(Object *parent, pugi::xml_node parentNode)
 {
     bool success = false;
 
+    // We look only at the first child for the scoreDef or the scoreDef editorial tree.
+    // This might be problematic with comments - ideally we should loop and skip them, but then also skip the right
+    // number of nodes in ReadScore
     pugi::xml_node firstChild = parentNode.first_child();
     if (!firstChild) return false;
 

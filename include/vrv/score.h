@@ -87,13 +87,15 @@ public:
 
 private:
     /**
-     * The score/scoreDef (first child of the score)
+     * The score/scoreDef (first child of the score).
+     * A score can have either a single scoreDef, or a subtree with editorial markup and different scoreDefs.
+     * This member hold the selected scoreDef. It is set either in the constructor, by SetScoreDefSubtree (only once)
      */
     ScoreDef *m_scoreDef;
     /**
-     * A complete subtree of the scoreDefs (including editorial markup);
+     * A complete subtree of the scoreDefs (including editorial markup).
+     * The subtree is owned by the Score object. The m_scoreDef member is expected to be part of the subtree.
      */
-public:
     Object *m_scoreDefSubtree;
 
 public:
