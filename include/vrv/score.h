@@ -36,6 +36,7 @@ public:
      */
     ///@{
     Score();
+    Score(bool createScoreDef);
     virtual ~Score();
     void Reset() override;
     std::string GetClassName() const override { return "score"; }
@@ -52,8 +53,10 @@ public:
      * Getter for the score/scoreDef
      */
     ///@{
-    ScoreDef *GetScoreDef() { return &m_scoreDef; }
-    const ScoreDef *GetScoreDef() const { return &m_scoreDef; }
+    void SetScoreDefSubtree(Object *subtree, ScoreDef *scoreScoreDef);
+    ScoreDef *GetScoreDef() { return m_scoreDef; }
+    const ScoreDef *GetScoreDef() const { return m_scoreDef; }
+    Object *GetScoreDefSubtree() { return m_scoreDefSubtree; }
     ///@}
 
     /**
@@ -86,7 +89,12 @@ private:
     /**
      * The score/scoreDef (first child of the score)
      */
-    ScoreDef m_scoreDef;
+    ScoreDef *m_scoreDef;
+    /**
+     * A complete subtree of the scoreDefs (including editorial markup);
+     */
+public:
+    Object *m_scoreDefSubtree;
 
 public:
     /**

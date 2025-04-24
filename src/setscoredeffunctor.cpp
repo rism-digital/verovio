@@ -223,6 +223,7 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitPage(Page *page)
     // However, page->m_score has already been set by ScoreDefSetCurrentPageFunctor
     // This must be the first page or a new score is starting on this page
     assert(page->m_score);
+    assert(page->m_score->GetScoreDef());
     if (!m_currentScore || (m_currentScore != page->m_score)) {
         m_upcomingScoreDef = *page->m_score->GetScoreDef();
         m_upcomingScoreDef.Process(*this);

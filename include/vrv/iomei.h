@@ -627,6 +627,7 @@ private:
     bool ReadMdiv(Object *parent, pugi::xml_node parentNode, bool isVisible);
     bool ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool isVisible);
     bool ReadScore(Object *parent, pugi::xml_node parentNode);
+    bool ReadScoreScoreDef(Object *parent, pugi::xml_node parentNode);
     ///@}
 
     /**

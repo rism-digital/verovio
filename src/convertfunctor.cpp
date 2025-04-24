@@ -612,7 +612,7 @@ FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
 FunctorCode ConvertToCmnFunctor::VisitMeasureEnd(Measure *measure)
 {
     // This is the first measure in the system - we need to update the scoreDef
-    if (m_score) {
+    if (m_score && m_score->GetScoreDef()) {
         for (Object *child : m_score->GetScoreDef()->GetList()) {
             StaffDef *staffDef = vrv_cast<StaffDef *>(child);
             assert(staffDef);

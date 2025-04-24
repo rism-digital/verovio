@@ -445,6 +445,8 @@ FunctorCode FindElementInLayerStaffDefFunctor::VisitLayer(const Layer *layer)
 
 FunctorCode FindElementInLayerStaffDefFunctor::VisitScore(const Score *score)
 {
+    assert(score->GetScoreDef());
+
     if (score->GetScoreDef()->GetID() == m_id) {
         m_element = score->GetScoreDef();
     }

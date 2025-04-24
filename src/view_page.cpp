@@ -1846,10 +1846,14 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
         return;
     }
     if (element->Is(APP)) {
-        assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_TOPLEVEL));
+        assert(dynamic_cast<App *>(element));
+        EditorialLevel level = dynamic_cast<App *>(element)->GetLevel();
+        if ((level != EDITORIAL_SCORE) || (level != EDITORIAL_TOPLEVEL)) return;
     }
     else if (element->Is(CHOICE)) {
-        assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_TOPLEVEL));
+        assert(dynamic_cast<Choice *>(element));
+        EditorialLevel level = dynamic_cast<Choice *>(element)->GetLevel();
+        if ((level != EDITORIAL_SCORE) || (level != EDITORIAL_TOPLEVEL)) return;
     }
     std::string elementStart;
     if (element->IsMilestoneElement()) elementStart = "systemElementStart";

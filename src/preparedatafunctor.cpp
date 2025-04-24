@@ -112,6 +112,8 @@ FunctorCode PrepareDataInitializationFunctor::VisitRepeatMark(RepeatMark *repeat
 
 FunctorCode PrepareDataInitializationFunctor::VisitScore(Score *score)
 {
+    assert(score->GetScoreDef());
+
     // Evaluate functor on scoreDef
     score->GetScoreDef()->Process(*this);
 
@@ -354,6 +356,7 @@ FunctorCode PrepareAltSymFunctor::VisitObject(Object *object)
     if (object->Is(SCORE)) {
         Score *score = vrv_cast<Score *>(object);
         assert(score);
+        assert(score->GetScoreDef());
         m_symbolTable = vrv_cast<SymbolTable *>(score->GetScoreDef()->FindDescendantByType(SYMBOLTABLE));
     }
 
@@ -1396,6 +1399,7 @@ FunctorCode PrepareRptFunctor::VisitStaff(Staff *staff)
 
     // This is happening only for the first staff element of the staff @n
     ScoreDef *scoreDef = m_doc->GetCorrespondingScore(staff)->GetScoreDef();
+    assert(scoreDef);
     if (StaffDef *staffDef = scoreDef->GetStaffDef(staff->GetN())) {
         const bool hideNumber = (staffDef->GetMultiNumber() == BOOLEAN_false)
             || ((staffDef->GetMultiNumber() != BOOLEAN_true) && (scoreDef->GetMultiNumber() == BOOLEAN_false));

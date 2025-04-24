@@ -947,12 +947,13 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
 
     if (object->Is(SCORE)) {
         ScoreDef *scoreDef = vrv_cast<Score *>(object)->GetScoreDef();
+        assert(scoreDef);
         if (useCustomScoreDef) {
             this->WriteCustomScoreDef(scoreDef);
         }
         else {
             // Save the main scoreDef
-            scoreDef->SaveObject(this, this->GetBasic());
+            vrv_cast<Score *>(object)->GetScoreDefSubtree()->SaveObject(this, this->GetBasic());
         }
     }
 
@@ -4419,7 +4420,7 @@ bool MEIInput::ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool 
 
 bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
 {
-    Score *vrvScore = new Score();
+    Score *vrvScore = new Score(false);
     this->SetMeiID(score, vrvScore);
 
     vrvScore->ReadLabelled(score);
@@ -4430,20 +4431,23 @@ bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
     // This is a score-based MEI file
     m_readingScoreBased = true;
 
-    // We require to have s <scoreDef> as first child of <score>
-    pugi::xml_node scoreDef = score.first_child();
-    if (!scoreDef || (std::string(scoreDef.name()) != "scoreDef")) {
-        LogError("A <scoreDef> is required as first child of <score>");
+    // This actually sets the Doc::m_scoreDef
+    Score tmpScore;
+    bool success = this->ReadScoreScoreDef(&tmpScore, score);
+
+    ScoreDef *scoreScoreDef = vrv_cast<ScoreDef *>(tmpScore.FindDescendantByType(SCOREDEF));
+    if (!scoreScoreDef) {
+        LogError("prout");
         return false;
     }
-
-    // This actually sets the Doc::m_scoreDef
-    bool success = this->ReadScoreDef(vrvScore, scoreDef);
+    vrvScore->SetScoreDefSubtree(tmpScore.DetachChild(0), scoreScoreDef);
+    m_hasScoreDef = true;
 
     if (!success) return false;
 
-    pugi::xml_node current;
-    for (current = scoreDef.next_sibling(); current; current = current.next_sibling()) {
+    // We start from the second child here (first one is supposed to be the scoreDef or scoreDef within editorial markup
+    pugi::xml_node current = score.first_child();
+    for (current = current.next_sibling(); current; current = current.next_sibling()) {
         if (!success) break;
         this->NormalizeAttributes(current);
         std::string elementName = std::string(current.name());
@@ -4474,6 +4478,24 @@ bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
     }
 
     this->ReadUnsupportedAttr(score, vrvScore);
+    return success;
+}
+
+bool MEIInput::ReadScoreScoreDef(Object *parent, pugi::xml_node parentNode)
+{
+    bool success = false;
+
+    pugi::xml_node firstChild = parentNode.first_child();
+    if (!firstChild) return false;
+
+    if (this->IsEditorialElementName(firstChild.name())) {
+        success = this->ReadEditorialElement(parent, firstChild, EDITORIAL_SCORE);
+    }
+    else if (std::string(firstChild.name()) == "scoreDef") {
+        // This actually sets the Doc::m_scoreDef
+        success = this->ReadScoreDef(parent, firstChild);
+    }
+
     return success;
 }
 
@@ -4897,18 +4919,8 @@ bool MEIInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
         || dynamic_cast<EditorialElement *>(parent));
     // assert(dynamic_cast<Pages *>(parent));
 
-    ScoreDef *vrvScoreDef;
-    // We are reading the score/scoreDef
-    if (parent->Is(SCORE)) {
-        Score *score = vrv_cast<Score *>(parent);
-        assert(score);
-        vrvScoreDef = score->GetScoreDef();
-        m_hasScoreDef = true;
-    }
-    else {
-        vrvScoreDef = new ScoreDef();
-        parent->AddChild(vrvScoreDef);
-    }
+    ScoreDef *vrvScoreDef = new ScoreDef();
+    parent->AddChild(vrvScoreDef);
     this->ReadScoreDefElement(scoreDef, vrvScoreDef);
 
     if (m_meiversion < meiVersion_MEIVERSION_4_0_0) {
@@ -7742,8 +7754,7 @@ bool MEIInput::ReadAnnotScore(Object *parent, pugi::xml_node annot)
 bool MEIInput::ReadApp(Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter)
 {
     if (!m_hasScoreDef) {
-        LogError("<app> before any <scoreDef> is not supported");
-        return false;
+        assert(level == EDITORIAL_SCORE);
     }
     App *vrvApp = new App(level);
     this->ReadEditorialElement(app, vrvApp);
@@ -7811,8 +7822,7 @@ bool MEIInput::ReadAppChildren(Object *parent, pugi::xml_node parentNode, Editor
 bool MEIInput::ReadChoice(Object *parent, pugi::xml_node choice, EditorialLevel level, Object *filter)
 {
     if (!m_hasScoreDef) {
-        LogError("<choice> before any <scoreDef> is not supported");
-        return false;
+        assert(level == EDITORIAL_SCORE);
     }
     Choice *vrvChoice = new Choice(level);
     this->ReadEditorialElement(choice, vrvChoice);
@@ -8044,8 +8054,7 @@ bool MEIInput::ReadSic(Object *parent, pugi::xml_node sic, EditorialLevel level,
 bool MEIInput::ReadSubst(Object *parent, pugi::xml_node subst, EditorialLevel level, Object *filter)
 {
     if (!m_hasScoreDef) {
-        LogError("<subst> before any <scoreDef> is not supported");
-        return false;
+        assert(level == EDITORIAL_SCORE);
     }
     Subst *vrvSubst = new Subst(level);
     this->ReadEditorialElement(subst, vrvSubst);
@@ -8146,7 +8155,10 @@ bool MEIInput::ReadEditorialChildren(Object *parent, pugi::xml_node parentNode, 
 {
     assert(dynamic_cast<EditorialElement *>(parent));
 
-    if (level == EDITORIAL_TOPLEVEL) {
+    if (level == EDITORIAL_SCORE) {
+        return this->ReadScoreScoreDef(parent, parentNode);
+    }
+    else if (level == EDITORIAL_TOPLEVEL) {
         if (m_readingScoreBased) {
             return this->ReadSectionChildren(parent, parentNode);
         }

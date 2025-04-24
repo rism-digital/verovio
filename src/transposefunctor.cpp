@@ -176,6 +176,7 @@ FunctorCode TransposeFunctor::VisitRest(Rest *rest)
 FunctorCode TransposeFunctor::VisitScore(Score *score)
 {
     ScoreDef *scoreDef = score->GetScoreDef();
+    assert(scoreDef);
 
     if (m_transposer->IsValidIntervalName(m_transposition)) {
         m_transposer->SetTransposition(m_transposition);
