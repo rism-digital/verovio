@@ -75,7 +75,7 @@ protected:
     Object *GetElement(std::string &elementId);
 
     void ContextForObject(
-        const Object *object, jsonxx::Object &element, bool recursive = false, bool editorTreeOnly = false);
+        const Object *object, jsonxx::Object &element, bool recursive = false);
     void ContextForObjects(const ArrayOfConstObjects &objects, jsonxx::Array &siblings);
     void ContextForReferences(const ListOfObjectAttNamePairs &objects, jsonxx::Array &links);
 
@@ -106,7 +106,7 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    EditorTreeObject(const Object *object);
+    EditorTreeObject(const Object *object, bool ownChildren);
     virtual ~EditorTreeObject() {};
     void Reset() override;
     std::string GetClassName() const override { return m_className; }

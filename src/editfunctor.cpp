@@ -46,8 +46,13 @@ FunctorCode StructFunctor::VisitObject(Object *object)
             return FUNCTOR_CONTINUE;
         }
     }
+    
+    bool ownChildren = false;
+    if (object->Is({ DIV, MEASURE, SCOREDEF })) {
+        ownChildren = true;
+    }
 
-    EditorTreeObject *treeObject = new EditorTreeObject(object);
+    EditorTreeObject *treeObject = new EditorTreeObject(object, ownChildren);
     m_current->AddChild(treeObject);
     m_current = treeObject;
 

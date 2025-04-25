@@ -699,7 +699,7 @@ bool EditorToolkitCMN::ContextForScores(bool editInfo)
         //     return false;
         // }
 
-        m_scoreContext = new EditorTreeObject(m_doc);
+        m_scoreContext = new EditorTreeObject(m_doc, false);
         StructFunctor structFunct(m_scoreContext, true);
         m_doc->Process(structFunct);
     }
@@ -711,7 +711,7 @@ bool EditorToolkitCMN::ContextForScores(bool editInfo)
 
     // The target object
     jsonxx::Object jsonObject;
-    this->ContextForObject(m_scoreContext, jsonObject, true, true);
+    this->ContextForObject(m_scoreContext, jsonObject, true);
 
     m_editInfo = jsonObject;
 
@@ -726,7 +726,7 @@ bool EditorToolkitCMN::ContextForSections(bool editInfo)
         //     return false;
         // }
 
-        m_sectionContext = new EditorTreeObject(m_doc);
+        m_sectionContext = new EditorTreeObject(m_doc, false);
         StructFunctor structFunct(m_sectionContext, false);
         m_doc->Process(structFunct);
     }
@@ -738,7 +738,7 @@ bool EditorToolkitCMN::ContextForSections(bool editInfo)
 
     // The target object
     jsonxx::Object jsonObject;
-    this->ContextForObject(m_sectionContext, jsonObject, true, true);
+    this->ContextForObject(m_sectionContext, jsonObject, true);
 
     m_editInfo = jsonObject;
 
@@ -770,17 +770,18 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
 
     const Object *contextRoot = NULL;
 
-    // If the object parent (context root), this means it must we selected from the MEI section context tree - and so
-    // are its siblings
+    // If the object parent (context root) is a sytem, this means it must be selected from the MEI section context tree - and so must its siblings
     if (object->GetParent()->Is(SYSTEM)) {
         const Object *editorTreeObject = m_sectionContext->FindDescendantByID(object->GetID());
         if (!editorTreeObject) {
             return false;
         }
+        // If the object is a milestone, the we must look for it in the editor tree
+        if (object->IsMilestoneElement()) object = editorTreeObject;
         contextRoot = editorTreeObject->GetParent();
         siblings = this->GetScoreBasedChildrenFor(contextRoot);
         targetIt = std::find(siblings.begin(), siblings.end(), object);
-        // This should not happen
+        // It is not found in the siblings, something is wrong
         if (targetIt == siblings.end()) return false;
     }
     else {
@@ -836,7 +837,7 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
     if (hasTargetID) {
         jsonxx::Array jsonObjectChildren;
         ArrayOfConstObjects objectChildren;
-        if (object->IsMilestoneElement()) {
+        if (dynamic_cast<const EditorTreeObject *>(object)) {
             objectChildren = this->GetScoreBasedChildrenFor(object);
         }
         else {
@@ -893,7 +894,7 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
 }
 
 void EditorToolkitCMN::ContextForObject(
-    const Object *object, jsonxx::Object &element, bool recursive, bool editorTreeOnly)
+    const Object *object, jsonxx::Object &element, bool recursive)
 {
     element << "element" << object->GetClassName();
     element << "id" << object->GetID();
@@ -913,35 +914,24 @@ void EditorToolkitCMN::ContextForObject(
     }
 
     ArrayOfConstObjects children;
-    // First check that this is an EditorTreeObject bcause otherwise checking
-    // Object::IsMilestoneElement will be missing the interfaces on EditorTreeObject objects
-    if ((dynamic_cast<const EditorTreeObject *>(object)) || object->IsMilestoneElement()) {
+    // First check that this is an EditorTreeObject
+    if (dynamic_cast<const EditorTreeObject *>(object)) {
         children = this->GetScoreBasedChildrenFor(object);
     }
-    // When retrieving the scores or the sections, we don't want the complete tree
-    else if (!editorTreeOnly) {
-        children = object->GetChildren();
-        // Remove children that are added as element parts (never exist in EditorTreeObject)
-        children.erase(
-            std::remove_if(children.begin(), children.end(),
-                [](const Object *item) { return item->Is({ DOTS, FLAG, STEM, TUPLET_NUM, TUPLET_BRACKET }); }),
-            children.end());
-    }
+    children = object->GetChildren();
+    // Remove children that are added as element parts (never exist in EditorTreeObject)
+    children.erase(
+        std::remove_if(children.begin(), children.end(),
+            [](const Object *item) { return item->Is({ DOTS, FLAG, STEM, TUPLET_NUM, TUPLET_BRACKET }); }),
+        children.end());
 
     if (children.size() > 0) {
         // If we do not call it recusrively, still include an empty array
         jsonxx::Array jsonChildren;
         if (recursive) {
             for (auto child : children) {
-                // Go back to the editor tree if needed - that is necessary when going through subtree from mdiv not
-                // transformed to page-based Because GetScoreBasedChildrenFor() will have returned the original subtree,
-                // and going through it would stop with !editorTreeOnly
-                if (editorTreeOnly && !dynamic_cast<const EditorTreeObject *>(child) && !child->IsEditorialElement()) {
-                    const Object *editorTreeObject = m_currentContext->FindDescendantByID(child->GetID());
-                    if (editorTreeObject) child = editorTreeObject;
-                }
                 jsonxx::Object jsonChild;
-                this->ContextForObject(child, jsonChild, true, editorTreeOnly);
+                this->ContextForObject(child, jsonChild, true);
                 jsonChildren << jsonChild;
             }
         }
@@ -1000,20 +990,20 @@ ArrayOfConstObjects EditorToolkitCMN::GetScoreBasedChildrenFor(const Object *obj
 // EditorTreeObject
 //----------------------------------------------------------------------------
 
-EditorTreeObject::EditorTreeObject(const Object *object) : Object(object->GetClassId()), VisibilityDrawingInterface()
+EditorTreeObject::EditorTreeObject(const Object *object, bool ownChildren) : Object(object->GetClassId()), VisibilityDrawingInterface()
 {
     this->Reset();
 
     this->SetID(object->GetID());
     m_className = object->GetClassName();
     if (this->IsEditorialElement() || this->Is(MDIV) || this->IsSystemElement()) {
-        // const VisibilityDrawingInterface *interface = vrv_cast<const VisibilityDrawingInterface *>(object);
-        // assert(interface);
+        const VisibilityDrawingInterface *interface = object->GetVisibilityDrawingInterface();
+        assert(interface);
         //  If we keep them hidden, then other functors will no process them.
-        //  this->SetVisibility(interface->IsHidden() ? Hidden : Visible);
-        this->SetVisibility(Visible);
+        this->SetVisibility(interface->IsHidden() ? Hidden : Visible);
+        //this->SetVisibility(Visible);
     }
-    m_object = object;
+    m_object = (ownChildren) ? object : NULL;
 }
 
 void EditorTreeObject::Reset()
@@ -1028,7 +1018,8 @@ ArrayOfConstObjects EditorTreeObject::GetChildrenObjects() const
     childrenObjects.reserve(this->GetChildCount());
     for (auto child : this->GetChildren()) {
         const EditorTreeObject *editorTreeChild = vrv_cast<const EditorTreeObject *>(child);
-        childrenObjects.push_back(editorTreeChild->m_object);
+        
+        childrenObjects.push_back((editorTreeChild->m_object ? editorTreeChild->m_object : editorTreeChild));
     }
     return childrenObjects;
 }
