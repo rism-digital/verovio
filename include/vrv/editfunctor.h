@@ -49,20 +49,20 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ScoreTreeFunctor
+// ScoreContextFunctor
 //----------------------------------------------------------------------------
 
 /**
  * This build a tree of EditorTreeObject representing the original score-based structure.
  */
-class ScoreTreeFunctor : public Functor {
+class ScoreContextFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    ScoreTreeFunctor(Object *object, bool scoreContext);
-    virtual ~ScoreTreeFunctor() = default;
+    ScoreContextFunctor(Object *object);
+    virtual ~ScoreContextFunctor() = default;
 
     /*
      * Abstract base implementation
@@ -80,10 +80,12 @@ private:
 public:
     //
 private:
+    enum TreeLevel { NOT_IN_SCORE = 0, TO_INCLUDE, INCLUDED };
+
     /** The current object in the tree */
     Object *m_current;
     /** A flag for building a score context or a section context */
-    bool m_scoreContext;
+    TreeLevel m_inScoreLevel;
 };
 
 } // namespace vrv

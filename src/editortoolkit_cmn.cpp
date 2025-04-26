@@ -700,8 +700,8 @@ bool EditorToolkitCMN::ContextForScores(bool editInfo)
         // }
 
         m_scoreContext = new EditorTreeObject(m_doc, false);
-        ScoreTreeFunctor structFunct(m_scoreContext, true);
-        m_doc->Process(structFunct);
+        ScoreContextFunctor scoreContextFunctor(m_scoreContext);
+        m_doc->Process(scoreContextFunctor);
     }
     m_currentContext = m_scoreContext;
 
@@ -727,8 +727,8 @@ bool EditorToolkitCMN::ContextForSections(bool editInfo)
         // }
 
         m_sectionContext = new EditorTreeObject(m_doc, false);
-        SectionContextFunctor sectionContextFunct(m_sectionContext);
-        m_doc->Process(sectionContextFunct);
+        SectionContextFunctor sectionContextFunctor(m_sectionContext);
+        m_doc->Process(sectionContextFunctor);
     }
     m_currentContext = m_sectionContext;
 
@@ -918,7 +918,9 @@ void EditorToolkitCMN::ContextForObject(const Object *object, jsonxx::Object &el
     if (dynamic_cast<const EditorTreeObject *>(object)) {
         children = this->GetScoreBasedChildrenFor(object);
     }
-    children = object->GetChildren();
+    else {
+        children = object->GetChildren();
+    }
     // Remove children that are added as element parts (never exist in EditorTreeObject)
     children.erase(std::remove_if(children.begin(), children.end(),
                        [](const Object *item) { return item->Is({ DOTS, FLAG, STEM, TUPLET_NUM, TUPLET_BRACKET }); }),

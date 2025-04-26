@@ -11,6 +11,7 @@
 
 #include "editorial.h"
 #include "editortoolkit_cmn.h"
+#include "score.h"
 
 //----------------------------------------------------------------------------
 
@@ -67,73 +68,78 @@ FunctorCode SectionContextFunctor::VisitObjectEnd(Object *object)
 }
 
 //----------------------------------------------------------------------------
-// ScoreTreeFunctor
+// ScoreContextFunctor
 //----------------------------------------------------------------------------
 
-ScoreTreeFunctor::ScoreTreeFunctor(Object *object, bool scoreContext) : Functor()
+ScoreContextFunctor::ScoreContextFunctor(Object *object) : Functor()
 {
     // m_stack.push_back(node);
     m_current = object;
 
-    m_scoreContext = scoreContext;
-    this->SetVisibleOnly(!m_scoreContext);
+    m_inScoreLevel = NOT_IN_SCORE;
+    this->SetVisibleOnly(false);
 }
 
-FunctorCode ScoreTreeFunctor::VisitObject(Object *object)
+FunctorCode ScoreContextFunctor::VisitObject(Object *object)
 {
     // In any case do not go beyond these
     if (object->GetParent() && object->GetParent()->Is({ DIV, MEASURE, SCOREDEF })) {
         return FUNCTOR_SIBLINGS;
     }
-
-    if (m_scoreContext) {
-        if (!object->Is({ MDIV, SCORE })) {
-            return FUNCTOR_CONTINUE;
-        }
+    if (m_inScoreLevel == INCLUDED) {
+        // Just return here, the level will be set back in VisitObjectEnd
+        return FUNCTOR_SIBLINGS;
     }
-    else {
-        if (object->Is({ DOC, PAGE, PAGES, PAGE_MILESTONE_END, SYSTEM, SYSTEM_MILESTONE_END })) {
-            return FUNCTOR_CONTINUE;
-        }
+
+    // Do not include in the tree
+    if ((m_inScoreLevel == NOT_IN_SCORE) && !object->Is({ MDIV, SCORE })) {
+        return FUNCTOR_CONTINUE;
     }
 
     bool ownChildren = false;
-    if (object->Is({ DIV, MEASURE, SCOREDEF })) {
+    // The first one in the scoreDef subtree - simply use own children and stop
+    if (m_inScoreLevel == TO_INCLUDE) {
         ownChildren = true;
     }
 
     EditorTreeObject *treeObject = new EditorTreeObject(object, ownChildren);
+    treeObject->SetVisibility(Visible);
     m_current->AddChild(treeObject);
     m_current = treeObject;
+
+    if (object->Is(SCORE)) {
+        Score *score = vrv_cast<Score *>(object);
+        assert(score);
+        // We are now in the score an process the scoreDef subtree
+        // Include the first one in the context tree - and then own children
+        m_inScoreLevel = TO_INCLUDE;
+        score->GetScoreDef()->Process(*this);
+        m_inScoreLevel = NOT_IN_SCORE;
+    }
+
+    if (m_inScoreLevel == TO_INCLUDE) m_inScoreLevel = INCLUDED;
 
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ScoreTreeFunctor::VisitObjectEnd(Object *object)
+FunctorCode ScoreContextFunctor::VisitObjectEnd(Object *object)
 {
-    // LogInfo("%s", object->GetClassName().c_str());
     if (object->IsMilestoneElement()) {
         return FUNCTOR_CONTINUE;
     }
-
-    if (m_scoreContext) {
-        if (object->Is(PAGE_MILESTONE_END)) {
-            m_current = m_current->GetParent();
-        }
-        if (!object->Is({ MDIV, SCORE })) {
-            return FUNCTOR_CONTINUE;
-        }
+    // End milestone for mdiv or score - pop it
+    if (object->Is(PAGE_MILESTONE_END)) {
+        m_current = m_current->GetParent();
     }
-    else {
-        if (object->Is({ PAGE_MILESTONE_END, SYSTEM_MILESTONE_END })) {
-            m_current = m_current->GetParent();
-        }
-        if (object->Is({ DOC, PAGE, PAGES, PAGE_MILESTONE_END, SYSTEM, SYSTEM_MILESTONE_END })) {
-            return FUNCTOR_CONTINUE;
-        }
+    // The have not been pushed, continue
+    if ((m_inScoreLevel == NOT_IN_SCORE) && !object->Is({ MDIV, SCORE })) {
+        return FUNCTOR_CONTINUE;
     }
 
     m_current = m_current->GetParent();
+
+    // We included the first one of the scoreDef substree with its own children, we should stop adding them
+    if (m_inScoreLevel == INCLUDED) m_inScoreLevel = NOT_IN_SCORE;
 
     return FUNCTOR_CONTINUE;
 }
