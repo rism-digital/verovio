@@ -20,7 +20,57 @@ namespace vrv {
 // StructFunctor
 //----------------------------------------------------------------------------
 
-StructFunctor::StructFunctor(Object *object, bool scoreContext) : Functor()
+SectionContextFunctor::SectionContextFunctor(Object *object) : Functor()
+{
+    m_current = object;
+}
+
+FunctorCode SectionContextFunctor::VisitObject(Object *object)
+{
+    // In any case do not go beyond these
+    if (object->GetParent() && object->GetParent()->Is({ DIV, MEASURE, SCOREDEF })) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    if (object->Is({ DOC, PAGE, PAGES, PAGE_MILESTONE_END, SYSTEM, SYSTEM_MILESTONE_END })) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    bool ownChildren = false;
+    if (object->Is({ DIV, MEASURE, SCOREDEF })) {
+        ownChildren = true;
+    }
+
+    EditorTreeObject *treeObject = new EditorTreeObject(object, ownChildren);
+    m_current->AddChild(treeObject);
+    m_current = treeObject;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode SectionContextFunctor::VisitObjectEnd(Object *object)
+{
+    if (object->IsMilestoneElement()) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    if (object->Is({ PAGE_MILESTONE_END, SYSTEM_MILESTONE_END })) {
+        m_current = m_current->GetParent();
+    }
+    if (object->Is({ DOC, PAGE, PAGES, PAGE_MILESTONE_END, SYSTEM, SYSTEM_MILESTONE_END })) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    m_current = m_current->GetParent();
+
+    return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
+// ScoreTreeFunctor
+//----------------------------------------------------------------------------
+
+ScoreTreeFunctor::ScoreTreeFunctor(Object *object, bool scoreContext) : Functor()
 {
     // m_stack.push_back(node);
     m_current = object;
@@ -29,7 +79,7 @@ StructFunctor::StructFunctor(Object *object, bool scoreContext) : Functor()
     this->SetVisibleOnly(!m_scoreContext);
 }
 
-FunctorCode StructFunctor::VisitObject(Object *object)
+FunctorCode ScoreTreeFunctor::VisitObject(Object *object)
 {
     // In any case do not go beyond these
     if (object->GetParent() && object->GetParent()->Is({ DIV, MEASURE, SCOREDEF })) {
@@ -46,7 +96,7 @@ FunctorCode StructFunctor::VisitObject(Object *object)
             return FUNCTOR_CONTINUE;
         }
     }
-    
+
     bool ownChildren = false;
     if (object->Is({ DIV, MEASURE, SCOREDEF })) {
         ownChildren = true;
@@ -59,7 +109,7 @@ FunctorCode StructFunctor::VisitObject(Object *object)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode StructFunctor::VisitObjectEnd(Object *object)
+FunctorCode ScoreTreeFunctor::VisitObjectEnd(Object *object)
 {
     // LogInfo("%s", object->GetClassName().c_str());
     if (object->IsMilestoneElement()) {

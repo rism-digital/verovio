@@ -74,8 +74,7 @@ protected:
 
     Object *GetElement(std::string &elementId);
 
-    void ContextForObject(
-        const Object *object, jsonxx::Object &element, bool recursive = false);
+    void ContextForObject(const Object *object, jsonxx::Object &element, bool recursive = false);
     void ContextForObjects(const ArrayOfConstObjects &objects, jsonxx::Array &siblings);
     void ContextForReferences(const ListOfObjectAttNamePairs &objects, jsonxx::Array &links);
 

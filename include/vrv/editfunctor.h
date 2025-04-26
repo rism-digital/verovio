@@ -13,20 +13,56 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// StructFunctor
+// SectionContextFunctor
 //----------------------------------------------------------------------------
 
 /**
  * This build a tree of EditorTreeObject representing the original score-based structure.
  */
-class StructFunctor : public Functor {
+class SectionContextFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    StructFunctor(Object *object, bool scoreContext);
-    virtual ~StructFunctor() = default;
+    SectionContextFunctor(Object *object);
+    virtual ~SectionContextFunctor() = default;
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    FunctorCode VisitObject(Object *object) override;
+    FunctorCode VisitObjectEnd(Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    /** The current object in the tree */
+    Object *m_current;
+};
+
+//----------------------------------------------------------------------------
+// ScoreTreeFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This build a tree of EditorTreeObject representing the original score-based structure.
+ */
+class ScoreTreeFunctor : public Functor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    ScoreTreeFunctor(Object *object, bool scoreContext);
+    virtual ~ScoreTreeFunctor() = default;
 
     /*
      * Abstract base implementation
