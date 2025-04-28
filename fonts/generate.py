@@ -526,6 +526,7 @@ def __write_xml_glyphs(
         rt.set("id", code)
         if "d" in glyph.attrib:
             pth = Et.SubElement(rt, "path")
+            pth.set("transform", "scale(1,-1)")
             pth.set("d", glyph.attrib["d"])
 
         tr: Et.ElementTree = Et.ElementTree(rt)
