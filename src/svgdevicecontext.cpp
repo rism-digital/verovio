@@ -1133,7 +1133,7 @@ void SvgDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, b
         double scaleX = (double)m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm() * DEFINITION_FACTOR;
         double scaleY = scaleX;
         if (m_fontStack.top()->GetWidthToHeightRatio() != 1.0f) scaleX *= m_fontStack.top()->GetWidthToHeightRatio();
-        useChild.append_attribute("transform") = StringFormat("translate(%d, %d) scale(%f, %f)", x, y, scaleX, scaleY);
+        useChild.append_attribute("transform") = StringFormat("translate(%d, %d) scale(%g, %g", x, y, scaleX, scaleY);
 
         // Get the bounds of the char
         if (glyph->GetHorizAdvX() > 0)
