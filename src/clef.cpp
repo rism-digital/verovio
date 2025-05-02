@@ -79,12 +79,12 @@ void Clef::Reset()
     this->ResetVisibility();
 }
 
-int Clef::GetClefLocOffset(data_NOTATIONTYPE notationType) const
+int Clef::GetClefLocOffset() const
 {
     // Only resolve simple sameas links to avoid infinite recursion
     const Clef *sameas = dynamic_cast<const Clef *>(this->GetSameasLink());
     if (sameas && !sameas->HasSameasLink()) {
-        return sameas->GetClefLocOffset(notationType);
+        return sameas->GetClefLocOffset();
     }
 
     int offset = 0;
