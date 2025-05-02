@@ -594,6 +594,7 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
     // special case - see above
     if (currentStaffDef->DrawKeySig()) {
         m_cautionStaffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
+        m_cautionStaffDefKeySig->SetDrawingClef(currentStaffDef->GetCurrentClef());
         m_cautionStaffDefKeySig->SetParent(this);
     }
     if (currentStaffDef->DrawMensur()) {
