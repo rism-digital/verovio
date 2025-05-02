@@ -107,6 +107,14 @@ public:
 
     int GetFifthsInt() const;
 
+    /**
+     * Set/Get the drawing clef
+     */
+    ///@{
+    Clef *GetDrawingClef();
+    void SetDrawingClef(Clef *clef);
+    ///@}
+
     //----------------//
     // Static methods //
     //----------------//
@@ -162,6 +170,16 @@ public:
     static const data_PITCHNAME s_pnameForSharps[];
 
 private:
+    /**
+     * The clef used for drawing
+     * Calculated from layer if not set
+     */
+    Clef *m_drawingClef;
+
+    //----------------//
+    // Static members //
+    //----------------//
+
     static const int octave_map[2][9][7];
 };
 

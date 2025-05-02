@@ -110,6 +110,8 @@ void KeySig::Reset()
     m_skipCancellation = false;
     m_drawingCancelAccidType = ACCIDENTAL_WRITTEN_n;
     m_drawingCancelAccidCount = 0;
+
+    m_drawingClef = NULL;
 }
 
 void KeySig::FilterList(ListOfConstObjects &childList) const
@@ -250,6 +252,16 @@ int KeySig::GetFifthsInt() const
         return this->GetSig().first;
     }
     return 0;
+}
+
+Clef *KeySig::GetDrawingClef()
+{
+    return m_drawingClef;
+}
+
+void KeySig::SetDrawingClef(Clef *clef)
+{
+    m_drawingClef = clef;
 }
 
 data_KEYSIGNATURE KeySig::ConvertToSig() const
