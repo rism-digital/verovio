@@ -489,26 +489,16 @@ SetCautionaryScoreDefFunctor::SetCautionaryScoreDefFunctor(ScoreDef *currentScor
     m_currentStaffDef = NULL;
 }
 
-FunctorCode SetCautionaryScoreDefFunctor::VisitObject(Object *object)
+FunctorCode SetCautionaryScoreDefFunctor::VisitLayer(Layer *layer)
+{
+    layer->SetDrawingCautionValues(m_currentStaffDef);
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode SetCautionaryScoreDefFunctor::VisitStaff(Staff *staff)
 {
     assert(m_currentScoreDef);
-
-    // starting a new staff
-    if (object->Is(STAFF)) {
-        Staff *staff = vrv_cast<Staff *>(object);
-        assert(staff);
-        m_currentStaffDef = m_currentScoreDef->GetStaffDef(staff->GetN());
-        return FUNCTOR_CONTINUE;
-    }
-
-    // starting a new layer
-    if (object->Is(LAYER)) {
-        Layer *layer = vrv_cast<Layer *>(object);
-        assert(layer);
-        layer->SetDrawingCautionValues(m_currentStaffDef);
-        return FUNCTOR_SIBLINGS;
-    }
-
+    m_currentStaffDef = m_currentScoreDef->GetStaffDef(staff->GetN());
     return FUNCTOR_CONTINUE;
 }
 

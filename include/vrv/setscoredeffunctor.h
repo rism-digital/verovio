@@ -252,7 +252,8 @@ public:
      * Functor interface
      */
     ///@{
-    FunctorCode VisitObject(Object *object) override;
+    FunctorCode VisitLayer(Layer *layer) override;
+    FunctorCode VisitStaff(Staff *staff) override;
     ///@}
 
 protected:
