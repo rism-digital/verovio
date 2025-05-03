@@ -114,7 +114,7 @@ endif()
 
 execute_process(
     COMMAND ../tools/get_git_commit.sh
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     OUTPUT_VARIABLE GIT_COMMIT
 )
 
