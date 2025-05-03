@@ -111,7 +111,7 @@ void KeySig::Reset()
     m_drawingCancelAccidType = ACCIDENTAL_WRITTEN_n;
     m_drawingCancelAccidCount = 0;
 
-    m_drawingClef = NULL;
+    m_drawingClef.reset();
 }
 
 void KeySig::FilterList(ListOfConstObjects &childList) const
@@ -256,12 +256,18 @@ int KeySig::GetFifthsInt() const
 
 Clef *KeySig::GetDrawingClef()
 {
-    return m_drawingClef;
+    return m_drawingClef.has_value() ? &m_drawingClef.value() : NULL;
 }
 
 void KeySig::SetDrawingClef(Clef *clef)
 {
-    m_drawingClef = clef;
+    if (clef) {
+        m_drawingClef = *clef;
+        m_drawingClef->CloneReset();
+    }
+    else {
+        m_drawingClef.reset();
+    }
 }
 
 data_KEYSIGNATURE KeySig::ConvertToSig() const

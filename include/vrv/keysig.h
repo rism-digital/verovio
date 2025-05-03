@@ -16,11 +16,11 @@
 #include "atts_analytical.h"
 #include "atts_shared.h"
 #include "atts_visual.h"
+#include "clef.h"
 #include "layerelement.h"
 
 namespace vrv {
 
-class Clef;
 class ScoreDefInterface;
 
 //----------------------------------------------------------------------------
@@ -174,7 +174,7 @@ private:
      * The clef used for drawing
      * Calculated from layer if not set
      */
-    Clef *m_drawingClef;
+    std::optional<Clef> m_drawingClef;
 
     //----------------//
     // Static members //
