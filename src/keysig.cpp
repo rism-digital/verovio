@@ -14,7 +14,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "clef.h"
 #include "comparison.h"
 #include "editorial.h"
 #include "functor.h"
