@@ -37,6 +37,7 @@
 #include "surface.h"
 #include "symboldef.h"
 #include "systemelement.h"
+#include "text.h"
 #include "tie.h"
 #include "timeinterface.h"
 #include "vrv.h"
@@ -418,9 +419,15 @@ bool EditorToolkitCMN::Set(std::string &elementId, std::string const &attribute,
 {
     Object *element = this->GetElement(elementId);
     if (!element) return false;
-
+    
     bool success = false;
-    if (AttModule::SetAnalytical(element, attribute, value))
+    if (element->Is(TEXT) && (attribute == "text")) {
+        Text* text = vrv_cast<Text*>(element);
+        assert(text);
+        text->SetText(UTF8to32(value));
+        success = true;
+    }
+    else if (AttModule::SetAnalytical(element, attribute, value))
         success = true;
     else if (AttModule::SetCmn(element, attribute, value))
         success = true;
@@ -860,7 +867,6 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
 
     // Stop here without targetID, but still add empty objects or arrays to the info
     if (!hasTargetID) {
-        m_editInfo << "attributes" << jsonxx::Object();
         m_editInfo << "object" << jsonxx::Object();
         m_editInfo << "referringElements" << jsonxx::Array();
         m_editInfo << "referencedElements" << jsonxx::Array();
@@ -875,6 +881,12 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
         jsonAttributes << attribute.first << attribute.second;
     }
     jsonObject << "attributes" << jsonAttributes;
+    std::string textStr;
+    if (!dynamic_cast<const EditorTreeObject *>(object) && object->Is(TEXT)) {
+        const Text *text = vrv_cast<const Text*>(object);
+        assert(text);
+        jsonObject << "text" << UTF32to8(text->GetText());
+    }
     m_editInfo << "object" << jsonObject;
 
     // Find referring objects
