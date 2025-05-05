@@ -336,6 +336,7 @@ public:
      */
     ///@{
     FunctorCode VisitAlignmentReference(AlignmentReference *alignmentReference) override;
+    FunctorCode VisitKeySig(KeySig *keySig) override;
     FunctorCode VisitLayer(Layer *layer) override;
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitPage(Page *page) override;

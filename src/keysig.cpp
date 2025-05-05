@@ -110,7 +110,7 @@ void KeySig::Reset()
     m_drawingCancelAccidType = ACCIDENTAL_WRITTEN_n;
     m_drawingCancelAccidCount = 0;
 
-    m_drawingClef.reset();
+    this->ResetDrawingClef();
 }
 
 void KeySig::FilterList(ListOfConstObjects &childList) const
@@ -256,6 +256,11 @@ int KeySig::GetFifthsInt() const
 Clef *KeySig::GetDrawingClef()
 {
     return m_drawingClef.has_value() ? &m_drawingClef.value() : NULL;
+}
+
+void KeySig::ResetDrawingClef()
+{
+    m_drawingClef.reset();
 }
 
 void KeySig::SetDrawingClef(Clef *clef)

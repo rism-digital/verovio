@@ -112,6 +112,7 @@ public:
      */
     ///@{
     Clef *GetDrawingClef();
+    void ResetDrawingClef();
     void SetDrawingClef(Clef *clef);
     ///@}
 

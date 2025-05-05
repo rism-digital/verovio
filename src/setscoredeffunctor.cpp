@@ -595,6 +595,13 @@ FunctorCode ScoreDefUnsetCurrentFunctor::VisitAlignmentReference(AlignmentRefere
     return FUNCTOR_SIBLINGS;
 }
 
+FunctorCode ScoreDefUnsetCurrentFunctor::VisitKeySig(KeySig *keySig)
+{
+    keySig->ResetDrawingClef();
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ScoreDefUnsetCurrentFunctor::VisitLayer(Layer *layer)
 {
     layer->ResetStaffDefObjects();
