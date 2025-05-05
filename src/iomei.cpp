@@ -4438,7 +4438,9 @@ bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
     // Detach the first child
     Object *subtree = tmpScore.DetachChild(0);
     // This will find the one selected by xpath queries since the subtree is filtered by visibility
-    ScoreDef *scoreScoreDef = (subtree) ? vrv_cast<ScoreDef *>(subtree->FindDescendantByType(SCOREDEF)) : NULL;
+    ScoreDef *scoreScoreDef = (!subtree || subtree->Is(SCOREDEF))
+        ? vrv_cast<ScoreDef *>(subtree)
+        : vrv_cast<ScoreDef *>(subtree->FindDescendantByType(SCOREDEF));
     if (!scoreScoreDef) {
         LogError("No top-level scoreDef could be read as child or direct descendant of score.");
         return false;
