@@ -4492,7 +4492,9 @@ bool MEIInput::ReadScoreScoreDef(Object *parent, pugi::xml_node parentNode)
     // This might be problematic with comments - ideally we should loop and skip them, but then also skip the right
     // number of nodes in ReadScore
     pugi::xml_node firstChild = parentNode.first_child();
-    if (!firstChild) return false;
+    // We return true because we can have empty editorial markup parent, even though that will fail if that element is
+    // selected
+    if (!firstChild) return true;
 
     if (this->IsEditorialElementName(firstChild.name())) {
         success = this->ReadEditorialElement(parent, firstChild, EDITORIAL_SCORE);
