@@ -1011,8 +1011,8 @@ bool MEIOutput::WriteObjectEnd(Object *object)
         }
     }
     else {
-        // In page-based MEI, pb and sb are not written.
-        if (object->Is({ PB, SB })) {
+        // In page-based MEI, pb and sb are not written unless when serializing
+        if (object->Is({ PB, SB }) && !this->IsSerializingMEI()) {
             return true;
         }
     }
@@ -4782,6 +4782,14 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
             // we should not mix measured and unmeasured music within a system...
             assert(!unmeasured);
             success = this->ReadMeasure(parent, current);
+        }
+        else if (m_deSerializing) {
+            if (std::string(current.name()) == "pb") {
+                success = this->ReadPb(parent, current);
+            }
+            else if (std::string(current.name()) == "sb") {
+                success = this->ReadSb(parent, current);
+            }
         }
         // xml comment
         else if (std::string(current.name()) == "") {
