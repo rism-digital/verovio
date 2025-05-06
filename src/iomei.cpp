@@ -3234,6 +3234,10 @@ void MEIOutput::WriteEditorialElement(pugi::xml_node currentNode, EditorialEleme
 {
     assert(element);
 
+    if (element->IsHidden() && this->IsSerializingMEI() && element->GetParent()->Is(SYSTEM)) {
+        m_currentNode.append_attribute("verovio.serialization") = "hidden";
+    }
+
     this->WriteXmlId(currentNode, element);
     element->WriteLabelled(currentNode);
     element->WriteTyped(currentNode);
@@ -7693,6 +7697,14 @@ bool MEIInput::ReadEditorialElement(pugi::xml_node element, EditorialElement *ob
 {
     this->SetMeiID(element, object);
 
+    if (m_deSerializing) {
+        if (element.attribute("verovio.serialization")) {
+            std::string verovioSerialization = element.attribute("verovio.serialization").value();
+            if (verovioSerialization == "hidden") object->SetVisibility(Hidden);
+            element.remove_attribute("verovio.serialization");
+        }
+    }
+
     object->ReadLabelled(element);
     object->ReadTyped(element);
 
@@ -7842,7 +7854,7 @@ bool MEIInput::ReadAppChildren(Object *parent, pugi::xml_node parentNode, Editor
         if (first) {
             first->SetVisibility(Visible);
         }
-        else {
+        else if (!m_deSerializing && !parent->Is(SYSTEM)) {
             LogWarning("Could not make one <rdg> or <lem> visible");
         }
     }
@@ -7937,7 +7949,7 @@ bool MEIInput::ReadChoiceChildren(Object *parent, pugi::xml_node parentNode, Edi
         if (first) {
             first->SetVisibility(Visible);
         }
-        else {
+        else if (!m_deSerializing && !parent->Is(SYSTEM)) {
             LogWarning("Could not make one child of <choice> visible");
         }
     }

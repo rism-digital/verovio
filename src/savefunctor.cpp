@@ -47,7 +47,7 @@ FunctorCode SaveFunctor::VisitEditorialElement(EditorialElement *editorialElemen
     // When writing MEI basic, only visible elements within editorial markup are saved
     if (m_output->Skip(editorialElement)) return FUNCTOR_SIBLINGS;
 
-    return this->VisitObjectEnd(editorialElement);
+    return this->VisitObject(editorialElement);
 }
 
 FunctorCode SaveFunctor::VisitEditorialElementEnd(EditorialElement *editorialElement)
