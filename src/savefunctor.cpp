@@ -24,12 +24,11 @@ namespace vrv {
 // SaveFunctor
 //----------------------------------------------------------------------------
 
-SaveFunctor::SaveFunctor(Output *output, bool basic) : Functor()
+SaveFunctor::SaveFunctor(Output *output) : Functor()
 {
     assert(output);
 
     m_output = output;
-    m_basic = basic;
 }
 
 FunctorCode SaveFunctor::VisitDots(Dots *dots)

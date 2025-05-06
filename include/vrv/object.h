@@ -678,7 +678,7 @@ public:
     /**
      * Saves the object (and its children) using the specified output stream.
      */
-    void SaveObject(Output *output, bool basic);
+    void SaveObject(Output *output);
 
     /**
      * Sort the child elements using std::stable_sort
