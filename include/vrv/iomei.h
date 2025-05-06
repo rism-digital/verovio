@@ -634,6 +634,12 @@ public:
     virtual ~MEIInput();
 
     bool Import(const std::string &mei) override;
+    
+    /**
+     * Setter for the page-based de-serialization flag (default is false).
+     * Also set the reading score-based accordingly;
+     */
+    void SetDeSerializing(bool deSerializing) { m_deSerializing = deSerializing; }
 
 private:
     bool ReadDoc(pugi::xml_node root);
@@ -995,6 +1001,9 @@ private:
      */
     std::string m_comment;
 
+    /** A flag indicating we are de-serializing page-based MEI */
+    bool m_deSerializing;
+    
     //----------------//
     // Static members //
     //----------------//

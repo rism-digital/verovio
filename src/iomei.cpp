@@ -407,7 +407,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         }
     }
     else if (object->Is(SECTION)) {
-        const std::string name = (this->IsPageBasedMEI()) ? "secb" : "section";
+        const std::string name = (this->IsPageBasedMEI() && object->IsMilestoneElement()) ? "secb" : "section";
         m_currentNode = m_currentNode.append_child(name.c_str());
         this->WriteSection(m_currentNode, vrv_cast<Section *>(object));
     }
@@ -1609,7 +1609,7 @@ void MEIOutput::WriteMdiv(pugi::xml_node currentNode, Mdiv *mdiv)
 {
     assert(mdiv);
 
-    if (mdiv->IsHidden() && this - IsSerializingMEI()) {
+    if (mdiv->IsHidden() && this->IsSerializingMEI()) {
         m_currentNode.append_attribute("verovio.serialization") = "hidden";
     }
 
@@ -3454,6 +3454,7 @@ MEIInput::MEIInput(Doc *doc) : Input(doc)
 {
     m_hasScoreDef = false;
     m_readingScoreBased = false;
+    m_deSerializing = false;
     m_meiversion = meiVersion_MEIVERSION_NONE;
 }
 
@@ -4390,6 +4391,14 @@ bool MEIInput::ReadMdiv(Object *parent, pugi::xml_node mdiv, bool isVisible)
     vrvMdiv->ReadNNumberLike(mdiv);
 
     parent->AddChild(vrvMdiv);
+    
+    if (m_deSerializing) {
+        if (mdiv.attribute("verovio.serialization")) {
+            std::string verovioSerialization = mdiv.attribute("verovio.serialization").value();
+            isVisible = (verovioSerialization != "hidden");
+            mdiv.remove_attribute("verovio.serialization");
+        }
+    }
 
     if (isVisible) {
         vrvMdiv->MakeVisible();
@@ -4403,7 +4412,7 @@ bool MEIInput::ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool 
 {
     assert(dynamic_cast<Doc *>(parent) || dynamic_cast<Mdiv *>(parent));
 
-    if (!m_readingScoreBased) {
+    if (!m_readingScoreBased && !m_deSerializing) {
         if (parentNode.first_child()) {
             LogWarning("Unexpected <mdiv> content in page-based MEI");
         }
