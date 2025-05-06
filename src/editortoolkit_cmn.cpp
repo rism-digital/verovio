@@ -88,6 +88,9 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
         m_doc->ScoreDefSetCurrentDoc(true);
         m_doc->RefreshLayout();
         m_isCommitted = true;
+        m_editInfo.import("chainedId", m_chainedId);
+        m_editInfo.import("canUndo", true);
+        m_editInfo.import("canRedo", false);
         return true;
     }
 
@@ -284,7 +287,6 @@ bool EditorToolkitCMN::Chain(jsonxx::Array actions)
     m_chainedId = "";
     for (int i = 0; i < (int)actions.size(); ++i) {
         status = this->ParseEditorAction(actions.get<jsonxx::Object>(i).json(), !status);
-        m_editInfo.import("uuid", m_chainedId);
     }
     return status;
 }
@@ -387,7 +389,6 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     interface->SetEndid("#" + endid);
 
     m_chainedId = element->GetID();
-    m_editInfo.import("uuid", element->GetID());
 
     return true;
 }
@@ -433,7 +434,6 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     interface->SetStartid("#" + startid);
 
     m_chainedId = element->GetID();
-    m_editInfo.import("uuid", element->GetID());
 
     return true;
 }
