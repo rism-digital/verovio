@@ -188,7 +188,7 @@ bool MEIOutput::Skip(Object *object)
         VisibilityDrawingInterface *interface = object->GetVisibilityDrawingInterface();
         assert(interface);
         if (!interface->IsHidden()) return false;
-        if (!this->GetScoreBasedMEI() || this->HasFilter()) return true;
+        if (this->IsPageBasedMEI() || this->HasFilter()) return true;
     }
     else if (object->IsEditorialElement()) {
         VisibilityDrawingInterface *interface = object->GetVisibilityDrawingInterface();

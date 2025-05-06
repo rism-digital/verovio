@@ -227,7 +227,6 @@ public:
      */
     ///@{
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; }
-    bool GetScoreBasedMEI() const { return m_scoreBasedMEI; }
     ///@}
 
     /**
