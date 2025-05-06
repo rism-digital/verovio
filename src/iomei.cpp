@@ -4391,7 +4391,7 @@ bool MEIInput::ReadMdiv(Object *parent, pugi::xml_node mdiv, bool isVisible)
     vrvMdiv->ReadNNumberLike(mdiv);
 
     parent->AddChild(vrvMdiv);
-    
+
     if (m_deSerializing) {
         if (mdiv.attribute("verovio.serialization")) {
             std::string verovioSerialization = mdiv.attribute("verovio.serialization").value();

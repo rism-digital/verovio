@@ -634,7 +634,7 @@ public:
     virtual ~MEIInput();
 
     bool Import(const std::string &mei) override;
-    
+
     /**
      * Setter for the page-based de-serialization flag (default is false).
      * Also set the reading score-based accordingly;
@@ -1003,7 +1003,7 @@ private:
 
     /** A flag indicating we are de-serializing page-based MEI */
     bool m_deSerializing;
-    
+
     //----------------//
     // Static members //
     //----------------//
