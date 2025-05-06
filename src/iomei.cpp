@@ -182,6 +182,25 @@ MEIOutput::MEIOutput(Doc *doc) : Output(doc)
 
 MEIOutput::~MEIOutput() {}
 
+bool MEIOutput::Skip(Object *object)
+{
+    if (object->Is(MDIV)) {
+        VisibilityDrawingInterface *interface = object->GetVisibilityDrawingInterface();
+        assert(interface);
+        if (!interface->IsHidden()) return false;
+        if (!this->GetScoreBasedMEI() || this->HasFilter()) return true;
+    }
+    else if (object->IsEditorialElement()) {
+        VisibilityDrawingInterface *interface = object->GetVisibilityDrawingInterface();
+        assert(interface);
+        if (!interface->IsHidden()) return false;
+        // Same as above
+        if (m_basic) return true;
+    }
+
+    return false;
+}
+
 bool MEIOutput::Export()
 {
 

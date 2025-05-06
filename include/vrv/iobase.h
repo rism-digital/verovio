@@ -46,6 +46,11 @@ public:
      */
     virtual bool WriteObjectEnd(Object *object) { return true; }
 
+    /**
+     * Method for skipping under certain circumstances
+     */
+    virtual bool Skip(Object *object) { return false; }
+
 public:
     //
 protected:

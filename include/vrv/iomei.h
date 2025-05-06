@@ -200,6 +200,11 @@ public:
     ///@}
 
     /**
+     * Method for skipping under certain circumstances
+     */
+    bool Skip(Object *object) override;
+
+    /**
      * The main method for exporting the file to MEI.
      */
     bool Export();

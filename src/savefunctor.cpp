@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
-#include "iomei.h"
+#include "iobase.h"
 #include "mdiv.h"
 #include "mnum.h"
 #include "runningelement.h"
@@ -26,6 +26,8 @@ namespace vrv {
 
 SaveFunctor::SaveFunctor(Output *output, bool basic) : Functor()
 {
+    assert(output);
+
     m_output = output;
     m_basic = basic;
 }
@@ -44,23 +46,16 @@ FunctorCode SaveFunctor::VisitDotsEnd(Dots *dots)
 FunctorCode SaveFunctor::VisitEditorialElement(EditorialElement *editorialElement)
 {
     // When writing MEI basic, only visible elements within editorial markup are saved
-    if (m_basic && (editorialElement->IsHidden())) {
-        return FUNCTOR_SIBLINGS;
-    }
-    else {
-        return this->VisitObject(editorialElement);
-    }
+    if (m_output->Skip(editorialElement)) return FUNCTOR_SIBLINGS;
+
+    return this->VisitObjectEnd(editorialElement);
 }
 
 FunctorCode SaveFunctor::VisitEditorialElementEnd(EditorialElement *editorialElement)
 {
-    // Same as above
-    if (m_basic && (editorialElement->IsHidden())) {
-        return FUNCTOR_SIBLINGS;
-    }
-    else {
-        return this->VisitObjectEnd(editorialElement);
-    }
+    if (m_output->Skip(editorialElement)) return FUNCTOR_SIBLINGS;
+
+    return this->VisitObjectEnd(editorialElement);
 }
 
 FunctorCode SaveFunctor::VisitFlag(Flag *flag)
@@ -76,23 +71,17 @@ FunctorCode SaveFunctor::VisitFlagEnd(Flag *flag)
 
 FunctorCode SaveFunctor::VisitMdiv(Mdiv *mdiv)
 {
-    MEIOutput *meiOutput = dynamic_cast<MEIOutput *>(m_output);
+    // Can be skipped in MEI output
+    if (m_output->Skip(mdiv)) return FUNCTOR_SIBLINGS;
 
-    if (meiOutput && (mdiv->IsHidden())) {
-        // Do not output hidden mdivs in page-based MEI or when saving score-based MEI with filter
-        if (!meiOutput->GetScoreBasedMEI() || meiOutput->HasFilter()) return FUNCTOR_SIBLINGS;
-    }
     return this->VisitObject(mdiv);
 }
 
 FunctorCode SaveFunctor::VisitMdivEnd(Mdiv *mdiv)
 {
-    MEIOutput *meiOutput = dynamic_cast<MEIOutput *>(m_output);
+    // Can be skipped in MEI output
+    if (m_output->Skip(mdiv)) return FUNCTOR_SIBLINGS;
 
-    if (meiOutput && (mdiv->IsHidden())) {
-        // Do not output hidden mdivs in page-based MEI or when saving score-based MEI with filter
-        if (!meiOutput->GetScoreBasedMEI() || meiOutput->HasFilter()) return FUNCTOR_SIBLINGS;
-    }
     return this->VisitObjectEnd(mdiv);
 }
 
