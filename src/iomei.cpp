@@ -341,7 +341,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     }
 
     if (object->Is(MDIV)) {
-        const std::string name = (this->IsPageBasedMEI()) ? "mdivb" : "mdiv";
+        const std::string name = (this->IsPageBasedMEI() && object->IsMilestoneElement()) ? "mdivb" : "mdiv";
         m_currentNode = m_currentNode.append_child(name.c_str());
         this->WriteMdiv(m_currentNode, vrv_cast<Mdiv *>(object));
     }
@@ -389,7 +389,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         this->WriteExpansion(m_currentNode, vrv_cast<Expansion *>(object));
     }
     else if (object->Is(PB)) {
-        if (this->IsScoreBasedMEI()) {
+        if (this->IsScoreBasedMEI() || this->IsSerializingMEI()) {
             m_currentNode = m_currentNode.append_child("pb");
             this->WritePb(m_currentNode, vrv_cast<Pb *>(object));
         }
@@ -398,7 +398,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         }
     }
     else if (object->Is(SB)) {
-        if (this->IsScoreBasedMEI()) {
+        if (this->IsScoreBasedMEI() || this->IsSerializingMEI()) {
             m_currentNode = m_currentNode.append_child("sb");
             this->WriteSb(m_currentNode, vrv_cast<Sb *>(object));
         }
