@@ -52,6 +52,9 @@ protected:
     bool ParseSetAction(jsonxx::Object param, std::string &elementId, std::string &attribute, std::string &value);
     ///@}
 
+    void PrepareUndo();
+    bool ValidateUndo();
+
     /**
      * Experimental editor functions.
      */
@@ -84,6 +87,9 @@ public:
     //
 protected:
     std::string m_chainedId;
+
+    bool m_isCommitted;
+    std::string m_preparedUndo;
 
     EditorTreeObject *m_scoreContext;
     EditorTreeObject *m_sectionContext;

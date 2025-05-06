@@ -51,6 +51,7 @@ namespace vrv {
 
 EditorToolkitCMN::EditorToolkitCMN(Doc *doc, View *view) : EditorToolkit(doc, view)
 {
+    m_isCommitted = true;
     m_scoreContext = NULL;
     m_sectionContext = NULL;
     m_currentContext = NULL;
@@ -86,6 +87,7 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
         m_doc->PrepareData();
         m_doc->ScoreDefSetCurrentDoc(true);
         m_doc->RefreshLayout();
+        m_isCommitted = true;
         return true;
     }
 
@@ -125,7 +127,8 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
     else if (action == "delete") {
         std::string elementId;
         if (this->ParseDeleteAction(json.get<jsonxx::Object>("param"), elementId)) {
-            return this->Delete(elementId);
+            this->PrepareUndo();
+            return (this->Delete(elementId) && this->ValidateUndo());
         }
         LogWarning("Could not parse the delete action");
     }
@@ -133,7 +136,8 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
         std::string elementId;
         int x, y;
         if (this->ParseDragAction(json.get<jsonxx::Object>("param"), elementId, x, y)) {
-            return this->Drag(elementId, x, y);
+            this->PrepareUndo();
+            return (this->Drag(elementId, x, y) && this->ValidateUndo());
         }
         LogWarning("Could not parse the drag action");
     }
@@ -142,18 +146,20 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
         int key;
         bool shiftKey, ctrlKey;
         if (this->ParseKeyDownAction(json.get<jsonxx::Object>("param"), elementId, key, shiftKey, ctrlKey)) {
-            return this->KeyDown(elementId, key, shiftKey, ctrlKey);
+            this->PrepareUndo();
+            return (this->KeyDown(elementId, key, shiftKey, ctrlKey) && this->ValidateUndo());
         }
         LogWarning("Could not parse the keyDown action");
     }
     else if (action == "insert") {
         std::string elementType, startid, endid;
         if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), elementType, startid, endid)) {
+            this->PrepareUndo();
             if (endid == "") {
-                return this->Insert(elementType, startid);
+                return (this->Insert(elementType, startid) && this->ValidateUndo());
             }
             else {
-                return this->Insert(elementType, startid, endid);
+                return (this->Insert(elementType, startid, endid) && this->ValidateUndo());
             }
         }
         LogWarning("Could not parse the insert action");
@@ -161,7 +167,8 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
     else if (action == "set") {
         std::string elementId, attribute, value;
         if (this->ParseSetAction(json.get<jsonxx::Object>("param"), elementId, attribute, value)) {
-            return this->Set(elementId, attribute, value);
+            this->PrepareUndo();
+            return (this->Set(elementId, attribute, value) && this->ValidateUndo());
         }
         LogWarning("Could not parse the set action");
     }
@@ -252,6 +259,22 @@ bool EditorToolkitCMN::ParseSetAction(
     attribute = param.get<jsonxx::String>("attribute");
     if (!param.has<jsonxx::String>("value")) return false;
     value = param.get<jsonxx::String>("value");
+    return true;
+}
+
+void EditorToolkitCMN::PrepareUndo()
+{
+    // We already have a validated undo but have not committed yet - nothing to prepare
+    if (!m_isCommitted) return;
+    // prepare the undo and store in it m_preparedUndo;
+}
+
+bool EditorToolkitCMN::ValidateUndo()
+{
+    // We already have n validated undo but have not committed yet - nothing to validate
+    if (!m_isCommitted) return true;
+    // push the m_preparedUndo to the undo stack;
+    m_isCommitted = false;
     return true;
 }
 
@@ -419,42 +442,56 @@ bool EditorToolkitCMN::Set(std::string &elementId, std::string const &attribute,
 {
     Object *element = this->GetElement(elementId);
     if (!element) return false;
-    
+
     bool success = false;
     if (element->Is(TEXT) && (attribute == "text")) {
-        Text* text = vrv_cast<Text*>(element);
+        Text *text = vrv_cast<Text *>(element);
         assert(text);
         text->SetText(UTF8to32(value));
         success = true;
     }
-    else if (AttModule::SetAnalytical(element, attribute, value))
+    else if (AttModule::SetAnalytical(element, attribute, value)) {
         success = true;
-    else if (AttModule::SetCmn(element, attribute, value))
+    }
+    else if (AttModule::SetCmn(element, attribute, value)) {
         success = true;
-    else if (AttModule::SetCmnornaments(element, attribute, value))
+    }
+    else if (AttModule::SetCmnornaments(element, attribute, value)) {
         success = true;
-    else if (AttModule::SetCritapp(element, attribute, value))
+    }
+    else if (AttModule::SetCritapp(element, attribute, value)) {
         success = true;
-    else if (AttModule::SetExternalsymbols(element, attribute, value))
+    }
+    else if (AttModule::SetExternalsymbols(element, attribute, value)) {
         success = true;
-    else if (AttModule::SetFacsimile(element, attribute, value))
+    }
+    else if (AttModule::SetFacsimile(element, attribute, value)) {
         success = true;
-    else if (AttModule::SetGestural(element, attribute, value))
+    }
+    else if (AttModule::SetGestural(element, attribute, value)) {
         success = true;
-    else if (AttModule::SetMei(element, attribute, value))
+    }
+    else if (AttModule::SetMei(element, attribute, value)) {
         success = true;
-    else if (AttModule::SetMensural(element, attribute, value))
+    }
+    else if (AttModule::SetMensural(element, attribute, value)) {
         success = true;
-    else if (AttModule::SetMidi(element, attribute, value))
+    }
+    else if (AttModule::SetMidi(element, attribute, value)) {
         success = true;
-    else if (AttModule::SetNeumes(element, attribute, value))
+    }
+    else if (AttModule::SetNeumes(element, attribute, value)) {
         success = true;
-    else if (AttModule::SetPagebased(element, attribute, value))
+    }
+    else if (AttModule::SetPagebased(element, attribute, value)) {
         success = true;
-    else if (AttModule::SetShared(element, attribute, value))
+    }
+    else if (AttModule::SetShared(element, attribute, value)) {
         success = true;
-    else if (AttModule::SetVisual(element, attribute, value))
+    }
+    else if (AttModule::SetVisual(element, attribute, value)) {
         success = true;
+    }
     if (success) {
         return true;
     }
@@ -883,7 +920,7 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
     jsonObject << "attributes" << jsonAttributes;
     std::string textStr;
     if (!dynamic_cast<const EditorTreeObject *>(object) && object->Is(TEXT)) {
-        const Text *text = vrv_cast<const Text*>(object);
+        const Text *text = vrv_cast<const Text *>(object);
         assert(text);
         jsonObject << "text" << UTF32to8(text->GetText());
     }
