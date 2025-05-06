@@ -173,6 +173,7 @@ MEIOutput::MEIOutput(Doc *doc) : Output(doc)
     m_indent = 5;
     m_scoreBasedMEI = false;
     m_basic = false;
+    m_serializing = false;
     m_ignoreHeader = false;
     m_removeIds = false;
 
@@ -187,13 +188,13 @@ bool MEIOutput::Skip(Object *object)
     if (object->Is(MDIV)) {
         VisibilityDrawingInterface *interface = object->GetVisibilityDrawingInterface();
         assert(interface);
-        if (!interface->IsHidden()) return false;
+        if (!interface->IsHidden() || this->IsSerializingMEI()) return false;
         if (this->IsPageBasedMEI() || this->HasFilter()) return true;
     }
     else if (object->IsEditorialElement()) {
         VisibilityDrawingInterface *interface = object->GetVisibilityDrawingInterface();
         assert(interface);
-        if (!interface->IsHidden()) return false;
+        if (!interface->IsHidden() || this - IsSerializingMEI()) return false;
         // Same as above
         if (m_basic) return true;
     }
@@ -1607,6 +1608,10 @@ void MEIOutput::WriteRevisionDesc(pugi::xml_node meiHead)
 void MEIOutput::WriteMdiv(pugi::xml_node currentNode, Mdiv *mdiv)
 {
     assert(mdiv);
+
+    if (mdiv->IsHidden() && this - IsSerializingMEI()) {
+        m_currentNode.append_attribute("verovio.serialization") = "hidden";
+    }
 
     this->WriteXmlId(currentNode, mdiv);
     mdiv->WriteLabelled(currentNode);

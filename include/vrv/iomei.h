@@ -256,6 +256,7 @@ public:
     ///@{
     bool IsScoreBasedMEI() const { return m_scoreBasedMEI; }
     bool IsPageBasedMEI() const { return !m_scoreBasedMEI; }
+    bool IsSerializingMEI() const { return m_serializing; }
     ///@}
 
     /**
@@ -267,6 +268,11 @@ public:
      * Setter for ignore header flag for the MEI output (default is false)
      */
     void SetIgnoreHeader(bool ignoreHeader) { m_ignoreHeader = ignoreHeader; }
+
+    /**
+     * Setter for the page-based serialization flag (default is false)
+     */
+    void SetSerializing(bool serializing) { m_serializing = serializing; }
 
     /**
      * Setter for remove ids flag for the MEI output (default is false)
@@ -571,10 +577,16 @@ public:
     //
 private:
     std::ostringstream m_streamStringOutput;
+    /** The number of spaces for the indentation */
     int m_indent;
+    /** A flag indicating if we are writing score-based or page-based MEI */
     bool m_scoreBasedMEI;
     /** A flag indicating that we want to produce MEI basic */
     bool m_basic;
+    /** A flag indicating we are serializing page-based MEI */
+    bool m_serializing;
+
+    /** The document node */
     pugi::xml_node m_mei;
 
     /** Current xml element */
