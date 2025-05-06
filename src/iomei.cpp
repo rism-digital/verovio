@@ -215,7 +215,7 @@ bool MEIOutput::Export()
         pugi::xml_document meiDoc;
 
         if (this->HasFilter()) {
-            if (!this->IsScoreBasedMEI()) {
+            if (this->IsPageBasedMEI()) {
                 LogError("MEI output with filter is not possible in page-based MEI");
                 return false;
             }
@@ -259,7 +259,7 @@ bool MEIOutput::Export()
         decl.append_attribute("schematypens") = "http://relaxng.org/ns/structure/1.0";
 
         // schematron processing instruction - currently not working for page-based MEI
-        if (!this->IsPageBasedMEI()) {
+        if (this->IsScoreBasedMEI()) {
             decl = meiDoc.append_child(pugi::node_declaration);
             decl.set_name("xml-model");
             decl.append_attribute("href") = schema.c_str();
