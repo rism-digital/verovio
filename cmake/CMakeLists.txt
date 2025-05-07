@@ -18,6 +18,7 @@ option(NO_MUSICXML_SUPPORT      "Disable MusicXML support"                     O
 option(NO_MXL_SUPPORT           "Disable compressed MusicXML support"          OFF)
 option(NO_HUMDRUM_SUPPORT       "Disable Humdrum support"                      OFF)
 option(MUSICXML_DEFAULT_HUMDRUM "Enable MusicXML to Humdrum by default"        OFF)
+option(NO_EDIT_SUPPORT          "Disable editor code"                          OFF)
 option(NO_RUNTIME               "Disable runtime clock support"                ON)
 option(BUILD_AS_LIBRARY         "Build Verovio as library"                     OFF)
 option(BUILD_AS_ANDROID_LIBRARY "Build Verovio as library for Android"         OFF)
@@ -147,6 +148,10 @@ else()
     if (MUSICXML_DEFAULT_HUMDRUM)
         add_definitions(-DMUSICXML_DEFAULT_HUMDRUM)
     endif()
+endif()
+
+if(NO_EDIT_SUPPORT)
+    add_definitions(-DNO_EDIT_SUPPORT)
 endif()
 
 if(NO_RUNTIME)
