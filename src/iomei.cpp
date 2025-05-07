@@ -202,9 +202,21 @@ bool MEIOutput::Skip(Object *object)
     return false;
 }
 
-bool MEIOutput::Export()
+/*
+std::string MEIOutput::Export()
 {
+    this->Export();
 
+    std::string output = m_streamStringOutput.str();
+
+    this->Reset();
+
+    return output;
+}
+*/
+
+std::string MEIOutput::Export()
+{
     if (m_removeIds) {
         FindAllReferencedObjectsFunctor findAllReferencedObjects(&m_referredObjects, NULL);
         // When saving page-based MEI we also want to keep IDs for milestone elements
@@ -214,32 +226,46 @@ bool MEIOutput::Export()
 
     try {
         pugi::xml_document meiDoc;
+        std::ostringstream streamStringOutput;
 
         if (this->HasFilter()) {
             if (this->IsPageBasedMEI()) {
                 LogError("MEI output with filter is not possible in page-based MEI");
-                return false;
+                return "";
             }
             if (m_doc->IsMensuralMusicOnly()) {
                 LogError("MEI output with filter is not possible for mensural music");
-                return false;
+                return "";
             }
             if (!this->HasValidFilter()) {
                 LogError("Invalid filter, please check the input");
-                return false;
+                return "";
             }
         }
         if (this->IsPageBasedMEI() && this->GetBasic()) {
             LogError("MEI output in page-based MEI is not possible with MEI basic");
-            return false;
+            return "";
+        }
+        if (this->IsSerializingMEI() && this->IsScoreBasedMEI()) {
+            LogError("MEI serializatoin is not possible in page-based MEI");
+            return "";
+        }
+
+        pugi::xml_node decl = meiDoc.prepend_child(pugi::node_declaration);
+        decl.append_attribute("version") = "1.0";
+        decl.append_attribute("encoding") = "UTF-8";
+
+        if (this->IsSerializingMEI()) {
+            m_currentNode = meiDoc.append_child("music");
+            m_nodeStack.push_back(m_currentNode);
+            m_doc->GetPages()->SaveObject(this);
+            meiDoc.save(streamStringOutput);
+            return streamStringOutput.str();
         }
 
         // Saving the entire document
         // * With score-based MEI, all mdivs are saved
         // * With page-based MEI, only visible mdivs are saved
-        pugi::xml_node decl = meiDoc.prepend_child(pugi::node_declaration);
-        decl.append_attribute("version") = "1.0";
-        decl.append_attribute("encoding") = "UTF-8";
 
         // schema processing instruction
         std::string schema;
@@ -296,25 +322,13 @@ bool MEIOutput::Export()
         }
 
         std::string indent = (m_indent == -1) ? "\t" : std::string(m_indent, ' ');
-        meiDoc.save(m_streamStringOutput, indent.c_str(), output_flags);
+        meiDoc.save(streamStringOutput, indent.c_str(), output_flags);
+        return streamStringOutput.str();
     }
     catch (char *str) {
         LogError("%s", str);
-        return false;
+        return "";
     }
-
-    return true;
-}
-
-std::string MEIOutput::GetOutput()
-{
-    this->Export();
-
-    std::string output = m_streamStringOutput.str();
-
-    this->Reset();
-
-    return output;
 }
 
 bool MEIOutput::WriteObject(Object *object)
@@ -1098,9 +1112,6 @@ void MEIOutput::Reset()
     m_currentPage = 0;
     m_measureFilterMatchLocation = RangeMatchLocation::BeforeStart;
     m_mdivFilterMatchLocation = MatchLocation::Before;
-
-    m_streamStringOutput.str("");
-    m_streamStringOutput.clear();
 }
 
 bool MEIOutput::IsTreeObject(Object *object) const
@@ -3467,12 +3478,18 @@ MEIInput::~MEIInput() {}
 bool MEIInput::Import(const std::string &mei)
 {
     try {
-        m_doc->Reset();
-        m_doc->SetType(Raw);
         pugi::xml_document doc;
         doc.load_string(mei.c_str(), (pugi::parse_comments | pugi::parse_default) & ~pugi::parse_eol);
         pugi::xml_node root = doc.first_child();
-        return this->ReadDoc(root);
+        if (m_deSerializing) {
+            m_doc->ClearChildren();
+            return this->ReadPages(m_doc, root.first_child());
+        }
+        else {
+            m_doc->Reset();
+            m_doc->SetType(Raw);
+            return this->ReadDoc(root);
+        }
     }
     catch (char *str) {
         LogError("%s", str);

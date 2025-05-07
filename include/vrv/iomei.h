@@ -200,14 +200,14 @@ public:
     ///@}
 
     /**
+     * The main method for exporting the file to MEI.
+     */
+    std::string Export() override;
+
+    /**
      * Method for skipping under certain circumstances
      */
     bool Skip(Object *object) override;
-
-    /**
-     * The main method for exporting the file to MEI.
-     */
-    bool Export();
 
     /**
      * The main method for writing objects.
@@ -216,11 +216,6 @@ public:
     bool WriteObject(Object *object) override;
     bool WriteObjectEnd(Object *object) override;
     ///@}
-
-    /**
-     * Return the output as a string by writing it to the stringstream member.
-     */
-    std::string GetOutput();
 
     /**
      * @name Setter and getter for score-based MEI output
@@ -576,7 +571,6 @@ private:
 public:
     //
 private:
-    std::ostringstream m_streamStringOutput;
     /** The number of spaces for the indentation */
     int m_indent;
     /** A flag indicating if we are writing score-based or page-based MEI */

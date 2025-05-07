@@ -31199,7 +31199,7 @@ std::string HumdrumInput::GetMeiString()
 {
     MEIOutput meioutput(m_doc);
     meioutput.SetScoreBasedMEI(true);
-    return meioutput.GetOutput();
+    return meioutput.Export();
 }
 
 //////////////////////////////

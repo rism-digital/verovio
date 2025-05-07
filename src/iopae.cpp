@@ -61,7 +61,7 @@ PAEOutput::PAEOutput(Doc *doc) : Output(doc) {}
 
 PAEOutput::~PAEOutput() {}
 
-bool PAEOutput::Export(std::string &output)
+std::string PAEOutput::Export()
 {
     m_docScoreDef = true;
     m_mensural = false;
@@ -79,9 +79,7 @@ bool PAEOutput::Export(std::string &output)
 
     m_doc->SaveObject(this);
 
-    output = m_streamStringOutput.str();
-
-    return true;
+    return m_streamStringOutput.str();
 }
 
 bool PAEOutput::WriteObject(Object *object)

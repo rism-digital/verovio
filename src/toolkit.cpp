@@ -629,7 +629,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
 
         MEIOutput meioutput(&tempdoc);
         meioutput.SetScoreBasedMEI(true);
-        newData = meioutput.GetOutput();
+        newData = meioutput.Export();
 
         // Read embedded options from input Humdrum file:
         tempinput->parseEmbeddedOptions(&m_doc);
@@ -678,7 +678,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         }
         MEIOutput meioutput(&tempdoc);
         meioutput.SetScoreBasedMEI(true);
-        newData = meioutput.GetOutput();
+        newData = meioutput.Export();
         delete tempinput;
         input = new MEIInput(&m_doc);
     }
@@ -698,7 +698,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         }
         MEIOutput meioutput(&tempdoc);
         meioutput.SetScoreBasedMEI(true);
-        newData = meioutput.GetOutput();
+        newData = meioutput.Export();
         delete tempinput;
         input = new MEIInput(&m_doc);
     }
@@ -733,7 +733,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         }
         MEIOutput meioutput(&tempdoc);
         meioutput.SetScoreBasedMEI(true);
-        newData = meioutput.GetOutput();
+        newData = meioutput.Export();
         delete tempinput;
         input = new MEIInput(&m_doc);
     }
@@ -768,7 +768,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         }
         MEIOutput meioutput(&tempdoc);
         meioutput.SetScoreBasedMEI(true);
-        newData = meioutput.GetOutput();
+        newData = meioutput.Export();
         delete tempinput;
         input = new MEIInput(&m_doc);
     }
@@ -999,7 +999,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
         m_doc.SyncToFacsimileDoc();
     }
 
-    std::string output = meioutput.GetOutput();
+    std::string output = meioutput.Export();
 
     if (hadSelection) m_doc.ReactivateSelection(false);
 
@@ -1796,9 +1796,9 @@ std::string Toolkit::RenderToPAE()
         return "";
     }
 
-    std::string output;
     PAEOutput paeOutput(&m_doc);
-    if (!paeOutput.Export(output)) {
+    std::string output = paeOutput.Export();
+    if (output.empty()) {
         LogError("Export to PAE failed");
     }
     return output;
@@ -2142,7 +2142,7 @@ const char *Toolkit::GetHumdrumBuffer()
         // Convert from MEI to Humdrum
         MEIOutput meioutput(&m_doc);
         meioutput.SetScoreBasedMEI(true);
-        std::string meidata = meioutput.GetOutput();
+        std::string meidata = meioutput.Export();
         pugi::xml_document infile;
         infile.load_string(meidata.c_str());
         stringstream out;
