@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+* Change the SVG structure of font glyphs to avoid problems with some SVG rendering engines
+* Fix key signature display after cautionary clef (@brdvd)
 
 ## [5.2.0] – 2025-04-23
 * Support for `data.HEXNUM` in `note@head.shape`
