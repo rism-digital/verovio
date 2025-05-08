@@ -188,32 +188,19 @@ bool MEIOutput::Skip(Object *object)
     if (object->Is(MDIV)) {
         VisibilityDrawingInterface *interface = object->GetVisibilityDrawingInterface();
         assert(interface);
-        if (!interface->IsHidden() || this->IsSerializingMEI()) return false;
+        if (!interface->IsHidden() || this->IsSerializing()) return false;
         if (this->IsPageBasedMEI() || this->HasFilter()) return true;
     }
     else if (object->IsEditorialElement()) {
         VisibilityDrawingInterface *interface = object->GetVisibilityDrawingInterface();
         assert(interface);
-        if (!interface->IsHidden() || this - IsSerializingMEI()) return false;
+        if (!interface->IsHidden() || this - IsSerializing()) return false;
         // Same as above
         if (m_basic) return true;
     }
 
     return false;
 }
-
-/*
-std::string MEIOutput::Export()
-{
-    this->Export();
-
-    std::string output = m_streamStringOutput.str();
-
-    this->Reset();
-
-    return output;
-}
-*/
 
 std::string MEIOutput::Export()
 {
@@ -246,8 +233,8 @@ std::string MEIOutput::Export()
             LogError("MEI output in page-based MEI is not possible with MEI basic");
             return "";
         }
-        if (this->IsSerializingMEI() && this->IsScoreBasedMEI()) {
-            LogError("MEI serializatoin is not possible in page-based MEI");
+        if (this->IsSerializing() && this->IsScoreBasedMEI()) {
+            LogError("Serialization is not possible in page-based MEI");
             return "";
         }
 
@@ -255,7 +242,7 @@ std::string MEIOutput::Export()
         decl.append_attribute("version") = "1.0";
         decl.append_attribute("encoding") = "UTF-8";
 
-        if (this->IsSerializingMEI()) {
+        if (this->IsSerializing()) {
             m_currentNode = meiDoc.append_child("music");
             m_nodeStack.push_back(m_currentNode);
             m_doc->GetPages()->SaveObject(this);
@@ -403,7 +390,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         this->WriteExpansion(m_currentNode, vrv_cast<Expansion *>(object));
     }
     else if (object->Is(PB)) {
-        if (this->IsScoreBasedMEI() || this->IsSerializingMEI()) {
+        if (this->IsScoreBasedMEI() || this->IsSerializing()) {
             m_currentNode = m_currentNode.append_child("pb");
             this->WritePb(m_currentNode, vrv_cast<Pb *>(object));
         }
@@ -412,7 +399,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         }
     }
     else if (object->Is(SB)) {
-        if (this->IsScoreBasedMEI() || this->IsSerializingMEI()) {
+        if (this->IsScoreBasedMEI() || this->IsSerializing()) {
             m_currentNode = m_currentNode.append_child("sb");
             this->WriteSb(m_currentNode, vrv_cast<Sb *>(object));
         }
@@ -1026,7 +1013,7 @@ bool MEIOutput::WriteObjectEnd(Object *object)
     }
     else {
         // In page-based MEI, pb and sb are not written unless when serializing
-        if (object->Is({ PB, SB }) && !this->IsSerializingMEI()) {
+        if (object->Is({ PB, SB }) && !this->IsSerializing()) {
             return true;
         }
     }
@@ -1620,7 +1607,7 @@ void MEIOutput::WriteMdiv(pugi::xml_node currentNode, Mdiv *mdiv)
 {
     assert(mdiv);
 
-    if (mdiv->IsHidden() && this->IsSerializingMEI()) {
+    if (mdiv->IsHidden() && this->IsSerializing()) {
         m_currentNode.append_attribute("verovio.serialization") = "hidden";
     }
 
@@ -3245,7 +3232,7 @@ void MEIOutput::WriteEditorialElement(pugi::xml_node currentNode, EditorialEleme
 {
     assert(element);
 
-    if (element->IsHidden() && this->IsSerializingMEI() && element->GetParent()->Is(SYSTEM)) {
+    if (element->IsHidden() && this->IsSerializing() && element->GetParent()->Is(SYSTEM)) {
         m_currentNode.append_attribute("verovio.serialization") = "hidden";
     }
 

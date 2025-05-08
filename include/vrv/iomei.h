@@ -251,7 +251,7 @@ public:
     ///@{
     bool IsScoreBasedMEI() const { return m_scoreBasedMEI; }
     bool IsPageBasedMEI() const { return !m_scoreBasedMEI; }
-    bool IsSerializingMEI() const { return m_serializing; }
+    bool IsSerializing() const { return m_serializing; }
     ///@}
 
     /**
