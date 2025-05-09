@@ -183,7 +183,7 @@ MEIOutput::MEIOutput(Doc *doc) : Output(doc)
 
 MEIOutput::~MEIOutput() {}
 
-bool MEIOutput::Skip(Object *object)
+bool MEIOutput::Skip(Object *object) const
 {
     if (object->Is(MDIV)) {
         VisibilityDrawingInterface *interface = object->GetVisibilityDrawingInterface();

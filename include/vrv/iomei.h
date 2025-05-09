@@ -207,7 +207,7 @@ public:
     /**
      * Method for skipping under certain circumstances
      */
-    bool Skip(Object *object) override;
+    bool Skip(Object *object) const override;
 
     /**
      * The main method for writing objects.

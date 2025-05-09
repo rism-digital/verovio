@@ -54,7 +54,7 @@ public:
     /**
      * Method for skipping under certain circumstances
      */
-    virtual bool Skip(Object *object) { return false; }
+    virtual bool Skip(Object *object) const { return false; }
 
 public:
     //
