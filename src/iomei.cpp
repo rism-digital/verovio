@@ -194,7 +194,7 @@ bool MEIOutput::Skip(Object *object)
     else if (object->IsEditorialElement()) {
         VisibilityDrawingInterface *interface = object->GetVisibilityDrawingInterface();
         assert(interface);
-        if (!interface->IsHidden() || this - IsSerializing()) return false;
+        if (!interface->IsHidden() || this->IsSerializing()) return false;
         // Same as above
         if (m_basic) return true;
     }
