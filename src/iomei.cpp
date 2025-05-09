@@ -243,7 +243,7 @@ std::string MEIOutput::Export()
         decl.append_attribute("encoding") = "UTF-8";
 
         if (this->IsSerializing()) {
-            m_currentNode = meiDoc.append_child("music");
+            m_currentNode = meiDoc.append_child("verovio-serialization");
             m_nodeStack.push_back(m_currentNode);
             m_doc->GetPages()->SaveObject(this);
             meiDoc.save(streamStringOutput);
