@@ -159,6 +159,8 @@
 #include "vrv.h"
 #include "zone.h"
 
+#define VEROVIO_SERIALIZATION "verovio.serialization"
+
 namespace vrv {
 
 const std::vector<std::string> MEIInput::s_editorialElementNames = { "abbr", "add", "app", "annot", "choice", "corr",
@@ -1608,7 +1610,7 @@ void MEIOutput::WriteMdiv(pugi::xml_node currentNode, Mdiv *mdiv)
     assert(mdiv);
 
     if (mdiv->IsHidden() && this->IsSerializing()) {
-        m_currentNode.append_attribute("verovio.serialization") = "hidden";
+        m_currentNode.append_attribute(VEROVIO_SERIALIZATION) = "hidden";
     }
 
     this->WriteXmlId(currentNode, mdiv);
@@ -3233,7 +3235,7 @@ void MEIOutput::WriteEditorialElement(pugi::xml_node currentNode, EditorialEleme
     assert(element);
 
     if (element->IsHidden() && this->IsSerializing() && element->GetParent()->Is(SYSTEM)) {
-        m_currentNode.append_attribute("verovio.serialization") = "hidden";
+        m_currentNode.append_attribute(VEROVIO_SERIALIZATION) = "hidden";
     }
 
     this->WriteXmlId(currentNode, element);
@@ -4401,10 +4403,10 @@ bool MEIInput::ReadMdiv(Object *parent, pugi::xml_node mdiv, bool isVisible)
     parent->AddChild(vrvMdiv);
 
     if (m_deSerializing) {
-        if (mdiv.attribute("verovio.serialization")) {
-            std::string verovioSerialization = mdiv.attribute("verovio.serialization").value();
+        if (mdiv.attribute(VEROVIO_SERIALIZATION)) {
+            std::string verovioSerialization = mdiv.attribute(VEROVIO_SERIALIZATION).value();
             isVisible = (verovioSerialization != "hidden");
-            mdiv.remove_attribute("verovio.serialization");
+            mdiv.remove_attribute(VEROVIO_SERIALIZATION);
         }
     }
 
@@ -7702,10 +7704,10 @@ bool MEIInput::ReadEditorialElement(pugi::xml_node element, EditorialElement *ob
     this->SetMeiID(element, object);
 
     if (m_deSerializing) {
-        if (element.attribute("verovio.serialization")) {
-            std::string verovioSerialization = element.attribute("verovio.serialization").value();
+        if (element.attribute(VEROVIO_SERIALIZATION)) {
+            std::string verovioSerialization = element.attribute(VEROVIO_SERIALIZATION).value();
             if (verovioSerialization == "hidden") object->SetVisibility(Hidden);
-            element.remove_attribute("verovio.serialization");
+            element.remove_attribute(VEROVIO_SERIALIZATION);
         }
     }
 
