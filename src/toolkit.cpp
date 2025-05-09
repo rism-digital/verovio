@@ -672,7 +672,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     }
     else if (inputFormat == SERIALIZATION) {
         MEIInput *meiInput = new MEIInput(&m_doc);
-        meiInput->SetDeSerializing(true);
+        meiInput->SetDeserializing(true);
         input = meiInput;
     }
     else if (inputFormat == MUSICXML) {

@@ -3458,7 +3458,7 @@ MEIInput::MEIInput(Doc *doc) : Input(doc)
 {
     m_hasScoreDef = false;
     m_readingScoreBased = false;
-    m_deSerializing = false;
+    m_deserializing = false;
     m_meiversion = meiVersion_MEIVERSION_NONE;
 }
 
@@ -3470,7 +3470,7 @@ bool MEIInput::Import(const std::string &mei)
         pugi::xml_document doc;
         doc.load_string(mei.c_str(), (pugi::parse_comments | pugi::parse_default) & ~pugi::parse_eol);
         pugi::xml_node root = doc.first_child();
-        if (m_deSerializing) {
+        if (m_deserializing) {
             m_doc->ClearChildren();
             return this->ReadPages(m_doc, root.first_child());
         }
@@ -4402,7 +4402,7 @@ bool MEIInput::ReadMdiv(Object *parent, pugi::xml_node mdiv, bool isVisible)
 
     parent->AddChild(vrvMdiv);
 
-    if (m_deSerializing) {
+    if (m_deserializing) {
         if (mdiv.attribute(VEROVIO_SERIALIZATION)) {
             std::string verovioSerialization = mdiv.attribute(VEROVIO_SERIALIZATION).value();
             isVisible = (verovioSerialization != "hidden");
@@ -4422,7 +4422,7 @@ bool MEIInput::ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool 
 {
     assert(dynamic_cast<Doc *>(parent) || dynamic_cast<Mdiv *>(parent));
 
-    if (!m_readingScoreBased && !m_deSerializing) {
+    if (!m_readingScoreBased && !m_deserializing) {
         if (parentNode.first_child()) {
             LogWarning("Unexpected <mdiv> content in page-based MEI");
         }
@@ -4793,7 +4793,7 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
             assert(!unmeasured);
             success = this->ReadMeasure(parent, current);
         }
-        else if (m_deSerializing) {
+        else if (m_deserializing) {
             if (std::string(current.name()) == "pb") {
                 success = this->ReadPb(parent, current);
             }
@@ -7703,7 +7703,7 @@ bool MEIInput::ReadEditorialElement(pugi::xml_node element, EditorialElement *ob
 {
     this->SetMeiID(element, object);
 
-    if (m_deSerializing) {
+    if (m_deserializing) {
         if (element.attribute(VEROVIO_SERIALIZATION)) {
             std::string verovioSerialization = element.attribute(VEROVIO_SERIALIZATION).value();
             if (verovioSerialization == "hidden") object->SetVisibility(Hidden);
@@ -7860,7 +7860,7 @@ bool MEIInput::ReadAppChildren(Object *parent, pugi::xml_node parentNode, Editor
         if (first) {
             first->SetVisibility(Visible);
         }
-        else if (!m_deSerializing && !parent->Is(SYSTEM)) {
+        else if (!m_deserializing && !parent->Is(SYSTEM)) {
             LogWarning("Could not make one <rdg> or <lem> visible");
         }
     }
@@ -7955,7 +7955,7 @@ bool MEIInput::ReadChoiceChildren(Object *parent, pugi::xml_node parentNode, Edi
         if (first) {
             first->SetVisibility(Visible);
         }
-        else if (!m_deSerializing && !parent->Is(SYSTEM)) {
+        else if (!m_deserializing && !parent->Is(SYSTEM)) {
             LogWarning("Could not make one child of <choice> visible");
         }
     }
