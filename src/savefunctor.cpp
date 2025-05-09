@@ -96,12 +96,18 @@ FunctorCode SaveFunctor::VisitMeasureEnd(Measure *measure)
 
 FunctorCode SaveFunctor::VisitMNum(MNum *mNum)
 {
-    return (mNum->IsGenerated()) ? FUNCTOR_SIBLINGS : this->VisitObject(mNum);
+    // Can be skipped in MEI output
+    if (m_output->Skip(mNum)) return FUNCTOR_SIBLINGS;
+
+    return this->VisitObject(mNum);
 }
 
 FunctorCode SaveFunctor::VisitMNumEnd(MNum *mNum)
 {
-    return (mNum->IsGenerated()) ? FUNCTOR_SIBLINGS : this->VisitObjectEnd(mNum);
+    // Can be skipped in MEI output
+    if (m_output->Skip(mNum)) return FUNCTOR_SIBLINGS;
+
+    return this->VisitObjectEnd(mNum);
 }
 
 FunctorCode SaveFunctor::VisitObject(Object *object)

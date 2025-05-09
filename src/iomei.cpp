@@ -188,16 +188,22 @@ MEIOutput::~MEIOutput() {}
 bool MEIOutput::Skip(Object *object) const
 {
     if (object->Is(MDIV)) {
-        VisibilityDrawingInterface *interface = object->GetVisibilityDrawingInterface();
+        const VisibilityDrawingInterface *interface = object->GetVisibilityDrawingInterface();
         assert(interface);
         if (!interface->IsHidden() || this->IsSerializing()) return false;
         if (this->IsPageBasedMEI() || this->HasFilter()) return true;
     }
+    else if (object->Is(MNUM)) {
+        if (this->IsSerializing()) return false;
+        const MNum *mNum = vrv_cast<const MNum *>(object);
+        assert(mNum);
+        if (mNum->IsGenerated()) return true;
+    }
     else if (object->IsEditorialElement()) {
-        VisibilityDrawingInterface *interface = object->GetVisibilityDrawingInterface();
+        const VisibilityDrawingInterface *interface = object->GetVisibilityDrawingInterface();
         assert(interface);
         if (!interface->IsHidden() || this->IsSerializing()) return false;
-        // Same as above
+        // Skip all editorial elements in MEI basic
         if (m_basic) return true;
     }
 
@@ -2170,6 +2176,9 @@ void MEIOutput::WriteMNum(pugi::xml_node currentNode, MNum *mNum)
     this->WriteTimePointInterface(currentNode, mNum);
     mNum->WriteLang(currentNode);
     mNum->WriteTypography(currentNode);
+    if (this->IsSerializing() && mNum->IsGenerated()) {
+        m_currentNode.append_attribute(VEROVIO_SERIALIZATION) = "generated";
+    }
 }
 
 void MEIOutput::WriteMordent(pugi::xml_node currentNode, Mordent *mordent)
@@ -5948,6 +5957,14 @@ bool MEIInput::ReadMNum(Object *parent, pugi::xml_node mNum)
     this->ReadTimePointInterface(mNum, vrvMNum);
     vrvMNum->ReadLang(mNum);
     vrvMNum->ReadTypography(mNum);
+
+    if (m_deserializing) {
+        if (mNum.attribute(VEROVIO_SERIALIZATION)) {
+            std::string verovioSerialization = mNum.attribute(VEROVIO_SERIALIZATION).value();
+            if (verovioSerialization == "generated") vrvMNum->IsGenerated(true);
+            mNum.remove_attribute(VEROVIO_SERIALIZATION);
+        }
+    }
 
     parent->AddChild(vrvMNum);
     return this->ReadTextChildren(vrvMNum, mNum, vrvMNum);
