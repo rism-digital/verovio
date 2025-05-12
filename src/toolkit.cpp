@@ -299,16 +299,16 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         // <score-timewise> == root node for time-wise organization of MusicXML data
         // <opus> == root node for multi-movement/work organization of MusicXML data
 
-        if (std::regex_search(initial, std::regex("<(verovio-serialization)[\\s\\n>]"))) {
+        if (std::regex_search(initial, std::regex("<(verovio-serialization)[\\s>]"))) {
             return SERIALIZATION;
         }
-        if (std::regex_search(initial, std::regex("<(mei|music|pages)[\\s\\n>]"))) {
+        if (std::regex_search(initial, std::regex("<(mei|music|pages)[\\s>]"))) {
             return MEI;
         }
-        if (std::regex_search(initial, std::regex("<(!DOCTYPE )?(score-partwise|opus|score-timewise)[\\s\\n>]"))) {
+        if (std::regex_search(initial, std::regex("<(!DOCTYPE )?(score-partwise|opus|score-timewise)[\\s>]"))) {
             return musicxmlDefault;
         }
-        if (std::regex_search(initial, std::regex("<(Piece xmlns=\"http://www.cmme.org\")[\\s\\n>]"))) {
+        if (std::regex_search(initial, std::regex("<(Piece xmlns=\"http://www.cmme.org\")[\\s>]"))) {
             return CMME;
         }
         LogWarning("Warning: Trying to load unknown XML data which cannot be identified.");
