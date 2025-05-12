@@ -311,7 +311,7 @@ double ScoringUpFunctor::GetDurNumberValue(
     data_DURQUALITY_mensural durquality = DURQUALITY_mensural_NONE;
     data_DURATION dur = elementDurPair.second;
     Note *note = vrv_cast<Note *>(elementDurPair.first);
-    if (!note) return 0;
+    if (!note) return 0.0;
     durquality = note->GetDurQuality();
     int longaDefaultVal = m_mensInfo.modusminor * m_mensInfo.tempus * m_mensInfo.prolatio;
     int brevisDefaultVal = m_mensInfo.tempus * m_mensInfo.prolatio;
