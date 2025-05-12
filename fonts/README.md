@@ -24,8 +24,8 @@ If you are having problems, you can pass the `--debug` parameter, which will inc
 
 Included are the necessary files to install a Python poetry-managed virtual environment. If you do not wish to use
 these you may ignore them. You should make sure you have [Poetry](https://python-poetry.org) installed and then
-run `poetry install` from this directory. `poetry env activate` will then allow you to interact with the script using
-the virtual environment.
+run `poetry install` from this directory. `poetry env activate` will then show you the command to start
+the virtual environment in which you may interact with the script.
 
 ### Installing svgpathtools
 
