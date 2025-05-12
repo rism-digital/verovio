@@ -1020,7 +1020,8 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
     if (!mdiv.empty()) meioutput.SetMdiv(mdiv);
 
     if (generateFacs) {
-        if (meioutput.HasFilter() || m_doc.HasSelection()) {
+        if (meioutput.HasFilter() || !scoreBased || (m_options->m_breaks.GetValue() != BREAKS_encoded)
+            || m_doc.HasSelection()) {
             LogError("Generating facsimile is only possible with all pages, encoded breaks, score-based output and "
                      "without selection.");
             return "";
