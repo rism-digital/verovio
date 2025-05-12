@@ -44,6 +44,9 @@ jobs:
         run: |
           echo "OUTPUT_DIR=${{ github.event.pull_request.number }}/${{ env.SHORT_SHA }}" >> $GITHUB_ENV
 
+      - name: Register gcc problem matcher
+        run: echo "::add-matcher::.github/problem_matchers/gcc.json"
+  
       - name: Checkout GH_PAGES_BRANCH into GH_PAGES_DIR
         uses: actions/checkout@v4
         with:
