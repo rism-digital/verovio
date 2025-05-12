@@ -3277,7 +3277,7 @@ void PAEInput::ParseHeader(jsonxx::Object &header)
     }
 
     bool hasIncip = false;
-    for (const std::string &key : { "scoring", "key_mode", "role", "voice_intrument" }) {
+    for (const char *key : { "scoring", "key_mode", "role", "voice_intrument" }) {
         hasIncip = hasIncip || header.has<jsonxx::String>(key) || header.has<jsonxx::Array>(key);
     }
     if (hasIncip) {
