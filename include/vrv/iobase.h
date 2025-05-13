@@ -37,7 +37,7 @@ public:
     virtual ~Output();
 
     /**
-     * Main method for exporting the data and to be overridden in child class
+     * Main method for exporting the data. Overridden in child classes.
      */
     virtual std::string Export() = 0;
 
