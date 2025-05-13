@@ -36,6 +36,7 @@ public:
      */
     ///@{
     Score();
+    Score(bool createScoreDef);
     virtual ~Score();
     void Reset() override;
     std::string GetClassName() const override { return "score"; }
@@ -52,8 +53,10 @@ public:
      * Getter for the score/scoreDef
      */
     ///@{
-    ScoreDef *GetScoreDef() { return &m_scoreDef; }
-    const ScoreDef *GetScoreDef() const { return &m_scoreDef; }
+    void SetScoreDefSubtree(Object *subtree, ScoreDef *scoreScoreDef);
+    ScoreDef *GetScoreDef() { return m_scoreDef; }
+    const ScoreDef *GetScoreDef() const { return m_scoreDef; }
+    Object *GetScoreDefSubtree() { return m_scoreDefSubtree; }
     ///@}
 
     /**
@@ -84,9 +87,16 @@ public:
 
 private:
     /**
-     * The score/scoreDef (first child of the score)
+     * The score/scoreDef (first child of the score).
+     * A score can have either a single scoreDef, or a subtree with editorial markup and different scoreDefs.
+     * This member holds the selected scoreDef. It is set either in the constructor, or by SetScoreDefSubtree (only once).
      */
-    ScoreDef m_scoreDef;
+    ScoreDef *m_scoreDef;
+    /**
+     * A complete subtree of the scoreDefs (including editorial markup).
+     * The subtree is owned by the Score object. The m_scoreDef member is expected to be part of the subtree.
+     */
+    Object *m_scoreDefSubtree;
 
 public:
     /**

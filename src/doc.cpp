@@ -230,6 +230,7 @@ void Doc::GenerateFooter()
 {
     for (Score *score : this->GetVisibleScores()) {
         ScoreDef *scoreDef = score->GetScoreDef();
+        assert(scoreDef);
         if (scoreDef->FindDescendantByType(PGFOOT)) continue;
 
         PgFoot *pgFoot = new PgFoot();
@@ -253,6 +254,7 @@ void Doc::GenerateHeader()
 {
     for (Score *score : this->GetVisibleScores()) {
         ScoreDef *scoreDef = score->GetScoreDef();
+        assert(scoreDef);
         if (scoreDef->FindDescendantByType(PGHEAD)) continue;
 
         PgHead *pgHead = new PgHead();
@@ -384,6 +386,7 @@ void Doc::CalculateTimemap()
 
     // Set tempo
     ScoreDef *scoreDef = this->GetFirstVisibleScore()->GetScoreDef();
+    assert(scoreDef);
     if (scoreDef->HasMidiBpm()) {
         tempo = scoreDef->GetMidiBpm();
     }
@@ -431,6 +434,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
 
     // set MIDI tempo
     ScoreDef *scoreDef = this->GetFirstVisibleScore()->GetScoreDef();
+    assert(scoreDef);
     if (scoreDef->HasMidiBpm()) {
         tempo = scoreDef->GetMidiBpm();
         tempoEventTicks.insert(0);
@@ -916,6 +920,7 @@ void Doc::PrepareData()
 
     for (Score *score : this->GetVisibleScores()) {
         ScoreDefSetGrpSymFunctor scoreDefSetGrpSym;
+        assert(score->GetScoreDef());
         score->GetScoreDef()->Process(scoreDefSetGrpSym);
     }
 
@@ -1270,6 +1275,7 @@ void Doc::ReactivateSelection(bool resetAligners)
     System *system = vrv_cast<System *>(selectionPage->FindDescendantByType(SYSTEM));
     // Add a selection scoreDef based on the current drawing system scoreDef
     Score *selectionScore = new Score();
+    selectionScore->AddChild(new ScoreDef());
     selectionScore->GetScoreDef()->ReplaceWithCopyOf(system->GetDrawingScoreDef());
     selectionScore->SetLabel("[selectionScore]");
     // Use the drawing values as actual scoreDef

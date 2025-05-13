@@ -153,6 +153,7 @@ bool CmmeInput::Import(const std::string &cmme)
             staffDef->AddChild(mensur);
         }
 
+        assert(m_score->GetScoreDef());
         m_score->GetScoreDef()->AddChild(staffGrp);
 
         m_doc->ConvertToPageBasedDoc();

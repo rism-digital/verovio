@@ -145,6 +145,7 @@ RunningElement *Page::GetHeader()
 const RunningElement *Page::GetHeader() const
 {
     assert(m_score);
+    assert(m_score->GetScoreDef());
 
     const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_header.GetValue() == HEADER_none)) {
@@ -171,6 +172,7 @@ RunningElement *Page::GetFooter()
 const RunningElement *Page::GetFooter() const
 {
     assert(m_scoreEnd);
+    assert(m_scoreEnd->GetScoreDef());
 
     const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_footer.GetValue() == FOOTER_none)) {

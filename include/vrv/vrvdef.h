@@ -536,6 +536,7 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 // the maximum is 255 (unsigned char)
 enum EditorialLevel {
     EDITORIAL_UNDEFINED = 0,
+    EDITORIAL_SCORE,
     EDITORIAL_TOPLEVEL,
     EDITORIAL_SCOREDEF,
     EDITORIAL_STAFFGRP,

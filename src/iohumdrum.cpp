@@ -1005,6 +1005,7 @@ void HumdrumInput::addDefaultTempoDist(double distance)
 {
     data_MEASUREMENTSIGNED something;
     something.SetVu(distance);
+    assert(m_score->GetScoreDef());
     m_score->GetScoreDef()->SetTempoDist(something);
 }
 
