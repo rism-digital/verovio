@@ -200,11 +200,11 @@ bool MEIOutput::Skip(Object *object) const
         if (mNum->IsGenerated()) return true;
     }
     else if (object->IsEditorialElement()) {
+        // Skip all editorial elements in MEI basic
+        if (m_basic) return true;
         const VisibilityDrawingInterface *interface = object->GetVisibilityDrawingInterface();
         assert(interface);
         if (!interface->IsHidden() || this->IsSerializing()) return false;
-        // Skip all editorial elements in MEI basic
-        if (m_basic) return true;
     }
 
     return false;
