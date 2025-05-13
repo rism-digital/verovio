@@ -89,7 +89,7 @@ private:
     /**
      * The score/scoreDef (first child of the score).
      * A score can have either a single scoreDef, or a subtree with editorial markup and different scoreDefs.
-     * This member hold the selected scoreDef. It is set either in the constructor, by SetScoreDefSubtree (only once)
+     * This member holds the selected scoreDef. It is set either in the constructor, or by SetScoreDefSubtree (only once).
      */
     ScoreDef *m_scoreDef;
     /**
