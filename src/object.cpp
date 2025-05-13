@@ -1188,9 +1188,9 @@ bool Object::FiltersApply(const Filters *filters, Object *object) const
     return filters ? filters->Apply(object) : true;
 }
 
-void Object::SaveObject(Output *output, bool basic)
+void Object::SaveObject(Output *output)
 {
-    SaveFunctor save(output, basic);
+    SaveFunctor save(output);
     // Special case where we want to process all objects
     save.SetVisibleOnly(false);
     this->Process(save);

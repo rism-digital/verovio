@@ -291,6 +291,15 @@ bool Doc::GenerateMeasureNumbers()
     // run through all measures and generate missing mNum from attribute
     for (Object *object : measures) {
         Measure *measure = vrv_cast<Measure *>(object);
+        // First remove previously generated elements
+        ListOfObjects mNums = measure->FindAllDescendantsByType(MNUM);
+        for (Object *child : mNums) {
+            MNum *mNum = vrv_cast<MNum *>(child);
+            assert(mNum);
+            if (mNum->IsGenerated()) {
+                measure->DeleteChild(mNum);
+            }
+        }
         if (measure->HasN() && !measure->FindDescendantByType(MNUM)) {
             MNum *mnum = new MNum;
             Text *text = new Text;
