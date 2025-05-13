@@ -1481,7 +1481,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
                 // if no original element was found, try searching through scoredef in score (only for certain elements)
                 if (!origin && element->Is({ CLEF, GRPSYM, KEYSIG, MENSUR, METERSIG, METERSIGGRP })) {
                     Page *page = vrv_cast<Page *>(m_doc.FindDescendantByType(PAGE));
-                    if (page && page->m_score) {
+                    if (page && page->m_score && page->m_score->GetScoreDef()) {
                         origin = page->m_score->GetScoreDef()->FindDescendantByID(correspId);
                     }
                 }

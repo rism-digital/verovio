@@ -3514,6 +3514,19 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
         Set(firstNcId, "curve", "");
         Set(secondNcId, "curve", "");
     }
+    // Remove liquescent if needed
+    if (firstNc->GetChildCount() > 0) {
+        ListOfObjects liqChildren = firstNc->FindAllDescendantsByType(LIQUESCENT);
+        for (auto it = liqChildren.begin(); it != liqChildren.end(); ++it) {
+            firstNc->DeleteChild(*it);
+        }
+    }
+    if (secondNc->GetChildCount() > 0) {
+        ListOfObjects liqChildren = secondNc->FindAllDescendantsByType(LIQUESCENT);
+        for (auto it = liqChildren.begin(); it != liqChildren.end(); ++it) {
+            secondNc->DeleteChild(*it);
+        }
+    }
 
     Zone *firstNcZone = firstNc->GetZone();
     Zone *secondNcZone = secondNc->GetZone();

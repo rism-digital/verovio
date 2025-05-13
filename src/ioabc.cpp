@@ -870,6 +870,7 @@ void ABCInput::PrintInformationFields(Score *score)
         originRend->AddChild(origin);
         pgHead->AddChild(originRend);
     }
+    assert(score->GetScoreDef());
     score->GetScoreDef()->AddChild(pgHead);
 }
 
@@ -1021,6 +1022,7 @@ void ABCInput::InitScoreAndSection(Score *&score, Section *&section)
     staffGrp->AddChild(staffDef);
     // create page head
     this->PrintInformationFields(score);
+    assert(score->GetScoreDef());
     score->GetScoreDef()->AddChild(staffGrp);
     if (m_key) {
         score->GetScoreDef()->AddChild(m_key);
@@ -1039,6 +1041,7 @@ void ABCInput::InitScoreAndSection(Score *&score, Section *&section)
     if (m_durDefault == DURATION_NONE) {
         CalcUnitNoteLength();
     }
+    assert(score->GetScoreDef());
     score->GetScoreDef()->SetDurDefault(m_durDefault);
     m_durDefault = DURATION_NONE;
 
