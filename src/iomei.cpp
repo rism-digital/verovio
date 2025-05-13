@@ -1630,7 +1630,6 @@ void MEIOutput::WritePages(pugi::xml_node currentNode, Pages *pages)
 
     if (this->IsPageBasedMEI()) {
         m_currentNode.append_attribute("type") = DocTypeToStr(m_doc->GetType()).c_str();
-        m_currentNode.append_child(pugi::node_comment).set_value("Coordinates in MEI axis direction");
     }
 
     this->WriteXmlId(currentNode, pages);
