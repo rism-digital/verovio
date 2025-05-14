@@ -20,7 +20,7 @@ Steps to reproduce the behavior:
 A clear and concise description of what you expected to happen.
 
 **Input data**
-The smallest example (MEI unless about another input format) to reproduce the problem
+The smallest example (MEI unless about another input format) to reproduce the problem. Use [backticks code blocks](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks) for embedding the input data.
 
 **Verovio information**
  - Version of Verovio [e.g. develop, 3.4.0]

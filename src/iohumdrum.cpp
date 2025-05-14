@@ -1005,6 +1005,7 @@ void HumdrumInput::addDefaultTempoDist(double distance)
 {
     data_MEASUREMENTSIGNED something;
     something.SetVu(distance);
+    assert(m_score->GetScoreDef());
     m_score->GetScoreDef()->SetTempoDist(something);
 }
 
@@ -31199,7 +31200,7 @@ std::string HumdrumInput::GetMeiString()
 {
     MEIOutput meioutput(m_doc);
     meioutput.SetScoreBasedMEI(true);
-    return meioutput.GetOutput();
+    return meioutput.Export();
 }
 
 //////////////////////////////

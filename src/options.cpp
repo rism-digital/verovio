@@ -920,7 +920,7 @@ Options::Options()
     m_inputFrom.SetInfo("Input from",
         "Select input format from: \"abc\", \"cmme.xml\", \"darms\", \"esac\", \"humdrum\", \"mei\", \"pae\", "
         "\"volpiano\", \"xml\" "
-        "(musicxml), \"musicxml-hum\" (musicxml via humdrum)");
+        "(musicxml), \"musicxml-hum\" (musicxml via humdrum) or \"mei-pb-serialized\"");
     m_inputFrom.Init("mei");
     m_inputFrom.SetKey("inputFrom");
     m_inputFrom.SetShortOption('f', false);
@@ -958,8 +958,7 @@ Options::Options()
 
     m_outputTo.SetInfo("Output to",
         "Select output format to: \"mei\", \"mei-pb\", \"mei-facs\", \"mei-basic\", \"svg\", \"midi\", \"timemap\", "
-        "\"expansionmap\", \"humdrum\" or "
-        "\"pae\"");
+        "\"expansionmap\", \"humdrum\", \"pae\" or \"mei-pb-serialized\"");
     m_outputTo.Init("svg");
     m_outputTo.SetKey("outputTo");
     m_outputTo.SetShortOption('t', true);

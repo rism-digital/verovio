@@ -79,7 +79,7 @@ public:
     /**
      * The main method for exporting to PAE.
      */
-    bool Export(std::string &output);
+    std::string Export() override;
 
     /**
      * The main method for write objects.

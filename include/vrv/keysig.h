@@ -16,11 +16,11 @@
 #include "atts_analytical.h"
 #include "atts_shared.h"
 #include "atts_visual.h"
+#include "clef.h"
 #include "layerelement.h"
 
 namespace vrv {
 
-class Clef;
 class ScoreDefInterface;
 
 //----------------------------------------------------------------------------
@@ -107,6 +107,15 @@ public:
 
     int GetFifthsInt() const;
 
+    /**
+     * Set/Get the drawing clef
+     */
+    ///@{
+    Clef *GetDrawingClef();
+    void ResetDrawingClef();
+    void SetDrawingClef(Clef *clef);
+    ///@}
+
     //----------------//
     // Static methods //
     //----------------//
@@ -162,6 +171,16 @@ public:
     static const data_PITCHNAME s_pnameForSharps[];
 
 private:
+    /**
+     * The clef used for drawing
+     * Calculated from layer if not set
+     */
+    std::optional<Clef> m_drawingClef;
+
+    //----------------//
+    // Static members //
+    //----------------//
+
     static const int octave_map[2][9][7];
 };
 

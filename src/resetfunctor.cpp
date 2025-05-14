@@ -247,6 +247,15 @@ FunctorCode ResetDataFunctor::VisitHairpin(Hairpin *hairpin)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode ResetDataFunctor::VisitKeySig(KeySig *keySig)
+{
+    this->VisitLayerElement(keySig);
+
+    keySig->ResetDrawingClef();
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ResetDataFunctor::VisitLayer(Layer *layer)
 {
     // Call parent one too

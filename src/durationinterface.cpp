@@ -179,9 +179,9 @@ Fraction DurationInterface::DurationWithSemibrevisEquivalence(
     int ratio = 0;
     Fraction duration(DURATION_1);
     switch (noteDur) {
-        case DURATION_maxima: duration = duration * abs(currentMensur->GetModusmaior());
-        case DURATION_long: duration = duration * abs(currentMensur->GetModusminor());
-        case DURATION_breve: duration = duration * abs(currentMensur->GetTempus());
+        case DURATION_maxima: duration = duration * abs(currentMensur->GetModusmaior()); [[fallthrough]];
+        case DURATION_long: duration = duration * abs(currentMensur->GetModusminor()); [[fallthrough]];
+        case DURATION_breve: duration = duration * abs(currentMensur->GetTempus()); [[fallthrough]];
         case DURATION_1: break;
         default:
             // ratio will be 1 for DURATION_2 (minima) where we apply the prolatio
@@ -199,9 +199,9 @@ Fraction DurationInterface::DurationWithMinimaEquivalence(
     int ratio = 0;
     Fraction duration(DURATION_2);
     switch (noteDur) {
-        case DURATION_maxima: duration = duration * abs(currentMensur->GetModusmaior());
-        case DURATION_long: duration = duration * abs(currentMensur->GetModusminor());
-        case DURATION_breve: duration = duration * abs(currentMensur->GetTempus());
+        case DURATION_maxima: duration = duration * abs(currentMensur->GetModusmaior()); [[fallthrough]];
+        case DURATION_long: duration = duration * abs(currentMensur->GetModusminor()); [[fallthrough]];
+        case DURATION_breve: duration = duration * abs(currentMensur->GetTempus()); [[fallthrough]];
         case DURATION_1: duration = duration * abs(currentMensur->GetProlatio()); break;
         default:
             // ratio will be 1 for DURATION_2 (minima)

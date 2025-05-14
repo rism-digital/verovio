@@ -185,6 +185,9 @@ bool Toolkit::SetOutputTo(std::string const &outputTo)
     else if (outputTo == "pae") {
         m_outputTo = PAE;
     }
+    else if (outputTo == "mei-pb-serialized") {
+        m_outputTo = SERIALIZATION;
+    }
     else if (outputTo != "svg") {
         LogError("Output format '%s' is not supported", outputTo.c_str());
         return false;
@@ -235,6 +238,9 @@ bool Toolkit::SetInputFrom(std::string const &inputFrom)
     }
     else if (inputFrom == "esac") {
         m_inputFrom = ESAC;
+    }
+    else if (inputFrom == "mei-pb-serialized") {
+        m_inputFrom = SERIALIZATION;
     }
     else if (inputFrom == "auto") {
         m_inputFrom = AUTO;
@@ -293,13 +299,16 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         // <score-timewise> == root node for time-wise organization of MusicXML data
         // <opus> == root node for multi-movement/work organization of MusicXML data
 
-        if (std::regex_search(initial, std::regex("<(mei|music|pages)[\\s\\n>]"))) {
+        if (std::regex_search(initial, std::regex("<(verovio-serialization)[\\s>]"))) {
+            return SERIALIZATION;
+        }
+        if (std::regex_search(initial, std::regex("<(mei|music|pages)[\\s>]"))) {
             return MEI;
         }
-        if (std::regex_search(initial, std::regex("<(!DOCTYPE )?(score-partwise|opus|score-timewise)[\\s\\n>]"))) {
+        if (std::regex_search(initial, std::regex("<(!DOCTYPE )?(score-partwise|opus|score-timewise)[\\s>]"))) {
             return musicxmlDefault;
         }
-        if (std::regex_search(initial, std::regex("<(Piece xmlns=\"http://www.cmme.org\")[\\s\\n>]"))) {
+        if (std::regex_search(initial, std::regex("<(Piece xmlns=\"http://www.cmme.org\")[\\s>]"))) {
             return CMME;
         }
         LogWarning("Warning: Trying to load unknown XML data which cannot be identified.");
@@ -518,6 +527,26 @@ bool Toolkit::LoadData(const std::string &data)
     return this->LoadData(data, true);
 }
 
+void Toolkit::SetViewAndEditor()
+{
+    m_view.SetDoc(&m_doc);
+
+#if defined NO_HUMDRUM_SUPPORT
+    // Create editor toolkit based on notation type.
+    if (m_editorToolkit != NULL) {
+        delete m_editorToolkit;
+    }
+    switch (m_doc.m_notationType) {
+        case NOTATIONTYPE_neume: m_editorToolkit = new EditorToolkitNeume(&m_doc, &m_view); break;
+        case NOTATIONTYPE_mensural:
+        case NOTATIONTYPE_mensural_black:
+        case NOTATIONTYPE_mensural_white: m_editorToolkit = new EditorToolkitMensural(&m_doc, &m_view); break;
+        case NOTATIONTYPE_cmn: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view); break;
+        default: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view);
+    }
+#endif
+}
+
 bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
 {
     std::string newData;
@@ -629,7 +658,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
 
         MEIOutput meioutput(&tempdoc);
         meioutput.SetScoreBasedMEI(true);
-        newData = meioutput.GetOutput();
+        newData = meioutput.Export();
 
         // Read embedded options from input Humdrum file:
         tempinput->parseEmbeddedOptions(&m_doc);
@@ -640,6 +669,11 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
 #endif
     else if (inputFormat == MEI) {
         input = new MEIInput(&m_doc);
+    }
+    else if (inputFormat == SERIALIZATION) {
+        MEIInput *meiInput = new MEIInput(&m_doc);
+        meiInput->SetDeserializing(true);
+        input = meiInput;
     }
     else if (inputFormat == MUSICXML) {
         // This is the direct converter from MusicXML to MEI using iomusicxml:
@@ -678,7 +712,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         }
         MEIOutput meioutput(&tempdoc);
         meioutput.SetScoreBasedMEI(true);
-        newData = meioutput.GetOutput();
+        newData = meioutput.Export();
         delete tempinput;
         input = new MEIInput(&m_doc);
     }
@@ -698,7 +732,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         }
         MEIOutput meioutput(&tempdoc);
         meioutput.SetScoreBasedMEI(true);
-        newData = meioutput.GetOutput();
+        newData = meioutput.Export();
         delete tempinput;
         input = new MEIInput(&m_doc);
     }
@@ -733,7 +767,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         }
         MEIOutput meioutput(&tempdoc);
         meioutput.SetScoreBasedMEI(true);
-        newData = meioutput.GetOutput();
+        newData = meioutput.Export();
         delete tempinput;
         input = new MEIInput(&m_doc);
     }
@@ -768,7 +802,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         }
         MEIOutput meioutput(&tempdoc);
         meioutput.SetScoreBasedMEI(true);
-        newData = meioutput.GetOutput();
+        newData = meioutput.Export();
         delete tempinput;
         input = new MEIInput(&m_doc);
     }
@@ -791,6 +825,15 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
             delete input;
             return false;
         }
+    }
+
+    if (inputFormat == SERIALIZATION) {
+        input->Import(data);
+        m_doc.PrepareData();
+        m_doc.ScoreDefSetCurrentDoc(true);
+        delete input;
+        this->SetViewAndEditor();
+        return true;
     }
 
     bool adjustPageHeight = m_options->m_adjustPageHeight.GetValue();
@@ -899,22 +942,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     }
 
     delete input;
-    m_view.SetDoc(&m_doc);
-
-#if defined NO_HUMDRUM_SUPPORT
-    // Create editor toolkit based on notation type.
-    if (m_editorToolkit != NULL) {
-        delete m_editorToolkit;
-    }
-    switch (m_doc.m_notationType) {
-        case NOTATIONTYPE_neume: m_editorToolkit = new EditorToolkitNeume(&m_doc, &m_view); break;
-        case NOTATIONTYPE_mensural:
-        case NOTATIONTYPE_mensural_black:
-        case NOTATIONTYPE_mensural_white: m_editorToolkit = new EditorToolkitMensural(&m_doc, &m_view); break;
-        case NOTATIONTYPE_cmn: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view); break;
-        default: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view);
-    }
-#endif
+    this->SetViewAndEditor();
 
     return true;
 }
@@ -931,6 +959,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
     std::string lastMeasure;
     std::string mdiv;
     bool generateFacs = false;
+    bool serialized = false;
 
     jsonxx::Object json;
 
@@ -954,6 +983,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
             if (json.has<jsonxx::String>("lastMeasure")) lastMeasure = json.get<jsonxx::String>("lastMeasure");
             if (json.has<jsonxx::String>("mdiv")) mdiv = json.get<jsonxx::String>("mdiv");
             if (json.has<jsonxx::Boolean>("generateFacs")) generateFacs = json.get<jsonxx::Boolean>("generateFacs");
+            if (json.has<jsonxx::Boolean>("serialized")) serialized = json.get<jsonxx::Boolean>("serialized");
         }
     }
 
@@ -966,8 +996,8 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 
     bool hadSelection = false;
     if (m_doc.HasSelection()) {
-        if (!scoreBased) {
-            LogError("Page-based MEI output is not possible when a selection is set.");
+        if (!scoreBased || serialized) {
+            LogError("Page-based MEI or serialized output is not possible when a selection is set.");
             return "";
         }
         hadSelection = true;
@@ -999,7 +1029,18 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
         m_doc.SyncToFacsimileDoc();
     }
 
-    std::string output = meioutput.GetOutput();
+    if (serialized) {
+        if (meioutput.HasFilter()) {
+            LogError("Page-base MEI serialization is only possible with all pages.");
+            return "";
+        }
+        meioutput.SetSerializing(true);
+        // Force these flags instead of cumbersome combination checking
+        meioutput.SetBasic(false);
+        meioutput.SetScoreBasedMEI(false);
+    }
+
+    std::string output = meioutput.Export();
 
     if (hadSelection) m_doc.ReactivateSelection(false);
 
@@ -1440,7 +1481,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
                 // if no original element was found, try searching through scoredef in score (only for certain elements)
                 if (!origin && element->Is({ CLEF, GRPSYM, KEYSIG, MENSUR, METERSIG, METERSIGGRP })) {
                     Page *page = vrv_cast<Page *>(m_doc.FindDescendantByType(PAGE));
-                    if (page && page->m_score) {
+                    if (page && page->m_score && page->m_score->GetScoreDef()) {
                         origin = page->m_score->GetScoreDef()->FindDescendantByID(correspId);
                     }
                 }
@@ -1796,9 +1837,9 @@ std::string Toolkit::RenderToPAE()
         return "";
     }
 
-    std::string output;
     PAEOutput paeOutput(&m_doc);
-    if (!paeOutput.Export(output)) {
+    std::string output = paeOutput.Export();
+    if (output.empty()) {
         LogError("Export to PAE failed");
     }
     return output;
@@ -2142,7 +2183,7 @@ const char *Toolkit::GetHumdrumBuffer()
         // Convert from MEI to Humdrum
         MEIOutput meioutput(&m_doc);
         meioutput.SetScoreBasedMEI(true);
-        std::string meidata = meioutput.GetOutput();
+        std::string meidata = meioutput.Export();
         pugi::xml_document infile;
         infile.load_string(meidata.c_str());
         stringstream out;

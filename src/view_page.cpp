@@ -1507,8 +1507,7 @@ int View::CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave)
 
     Clef *clef = layer->GetClef(pelement);
     if (clef) {
-        yb += (clef->GetClefLocOffset(parentStaff->m_drawingNotationType))
-            * m_doc->GetDrawingUnit(staffSize); // UT1 reel
+        yb += (clef->GetClefLocOffset()) * m_doc->GetDrawingUnit(staffSize); // UT1 reel
     }
     yb -= 4 * m_doc->GetDrawingOctaveSize(staffSize); // UT, note la plus grave
 
@@ -1846,10 +1845,14 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
         return;
     }
     if (element->Is(APP)) {
-        assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_TOPLEVEL));
+        assert(dynamic_cast<App *>(element));
+        EditorialLevel level = dynamic_cast<App *>(element)->GetLevel();
+        if ((level != EDITORIAL_SCORE) || (level != EDITORIAL_TOPLEVEL)) return;
     }
     else if (element->Is(CHOICE)) {
-        assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_TOPLEVEL));
+        assert(dynamic_cast<Choice *>(element));
+        EditorialLevel level = dynamic_cast<Choice *>(element)->GetLevel();
+        if ((level != EDITORIAL_SCORE) || (level != EDITORIAL_TOPLEVEL)) return;
     }
     std::string elementStart;
     if (element->IsMilestoneElement()) elementStart = "systemElementStart";

@@ -800,8 +800,8 @@ int Object::DeleteChildrenByComparison(Comparison *comparison)
 
 void Object::GenerateID()
 {
-    // A random letter from a-z
-    char letter = 'a' + (std::rand() % 26);
+    // The first letter of the className - should never be an empty string
+    char letter = this->GetClassName().at(0);
     m_id = letter + Object::GenerateHashID();
 }
 
@@ -1188,9 +1188,9 @@ bool Object::FiltersApply(const Filters *filters, Object *object) const
     return filters ? filters->Apply(object) : true;
 }
 
-void Object::SaveObject(Output *output, bool basic)
+void Object::SaveObject(Output *output)
 {
-    SaveFunctor save(output, basic);
+    SaveFunctor save(output);
     // Special case where we want to process all objects
     save.SetVisibleOnly(false);
     this->Process(save);

@@ -39,7 +39,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 5
-#define VERSION_MINOR 2
+#define VERSION_MINOR 3
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -536,6 +536,7 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 // the maximum is 255 (unsigned char)
 enum EditorialLevel {
     EDITORIAL_UNDEFINED = 0,
+    EDITORIAL_SCORE,
     EDITORIAL_TOPLEVEL,
     EDITORIAL_SCOREDEF,
     EDITORIAL_STAFFGRP,
