@@ -800,8 +800,8 @@ int Object::DeleteChildrenByComparison(Comparison *comparison)
 
 void Object::GenerateID()
 {
-    // The first letter of the className - should never be an empty string
-    char letter = this->GetClassName().at(0);
+    // A random letter from a-z
+    char letter = 'a' + (std::rand() % 26);
     m_id = letter + Object::GenerateHashID();
 }
 
