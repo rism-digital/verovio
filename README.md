@@ -6,6 +6,7 @@
 [![PyPI - Downlaods](https://img.shields.io/pypi/dm/verovio?label=PyPI%20downloads)](https://pypi.org/project/verovio/)
 [![NPM - Downlaods](https://img.shields.io/npm/dm/verovio?label=NPM%20-%20downloads)](https://www.npmjs.com/package/verovio)
 [![DOI](https://zenodo.org/badge/15762693.svg)](https://zenodo.org/doi/10.5281/zenodo.10544792)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/rism-digital/verovio)
 
 Verovio is a fast, portable and lightweight library for engraving [Music Encoding Initiative (MEI)](http://www.music-encoding.org) digital scores into SVG images. Verovio also contains on-the-fly converters to render [Plaine & Easie Code](https://www.iaml.info/plaine-easie-code), [Humdrum](https://www.humdrum.org), [Musedata](https://musedata.org), [MusicXML](https://www.musicxml.com), [EsAC](http://esac-data.org), and [ABC](https://en.wikipedia.org/wiki/ABC_notation) digital scores. 
 
