@@ -1,9 +1,13 @@
 version: 2
 updates:
   # Maintain dependencies for GitHub Actions
-  - package-ecosystem: 'github-actions'
-    directory: '/'
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
-      interval: 'monthly'
+      interval: "monthly"
     labels:
-      - 'github_actions'
+      - "github_actions"
+    groups:
+      actions:
+        patterns:
+          - "*"
