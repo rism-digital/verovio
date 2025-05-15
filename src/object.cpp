@@ -801,7 +801,7 @@ int Object::DeleteChildrenByComparison(Comparison *comparison)
 void Object::GenerateID()
 {
     // A random letter from a-z
-    char letter = 'a' + (std::rand() % 26);
+    char letter = 'a' + (s_xmlIDCounter % 26);
     m_id = letter + Object::GenerateHashID();
 }
 
