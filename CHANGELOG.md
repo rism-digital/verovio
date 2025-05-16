@@ -1,7 +1,10 @@
 # Changelog
 
 ## [unreleased]
+* Support for editorial markup (`app` or `choice`) surrounding the top-level `scoreDef`
+* Support for full internal page-based MEI serialization (`mei-pb-serialization`)
 * Change the SVG structure of font glyphs to avoid problems with some SVG rendering engines
+* Fix `@xml:id` generation with `--xml-id-seed`
 * Fix key signature display after cautionary clef (@brdvd)
 
 ## [5.2.0] – 2025-04-23
