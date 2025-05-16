@@ -44,6 +44,7 @@ std::string EditorToolkitCMN::EditInfo()
 
 bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, bool commitOnly)
 {
+#ifndef NO_EDIT_SUPPORT
     jsonxx::Object json;
 
     // Read JSON actions
@@ -58,9 +59,13 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
 
     std::string action = json.get<jsonxx::String>("action");
 
+    m_doc->SetFocus();
+
     // Action without parameter
     if (action == "commit") {
         m_doc->PrepareData();
+        m_doc->ScoreDefSetCurrentDoc(true);
+        m_doc->RefreshLayout();
         return true;
     }
 
@@ -127,8 +132,13 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
         LogWarning("Unknown action type '%s'.", action.c_str());
     }
     return false;
+#else /* NO_EDIT_SUPPORT */
+    LogError("Editor functions are not supported in this build.");
+    return false;
+#endif /* NO_EDIT_SUPPORT */
 }
 
+#ifndef NO_EDIT_SUPPORT
 bool EditorToolkitCMN::ParseDeleteAction(jsonxx::Object param, std::string &elementId)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
@@ -633,5 +643,6 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
         return true;
     }
 }
+#endif /* NO_EDIT_SUPPORT */
 
 } // namespace vrv

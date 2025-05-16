@@ -27,7 +27,6 @@ class RepeatMark : public ControlElement,
                    public TextListInterface,
                    public TextDirInterface,
                    public TimePointInterface,
-                   public AttColor,
                    public AttExtSymAuth,
                    public AttExtSymNames,
                    public AttRepeatMarkLog {
@@ -41,7 +40,7 @@ public:
     virtual ~RepeatMark();
     Object *Clone() const override { return new RepeatMark(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "RepeatMark"; }
+    std::string GetClassName() const override { return "repeatMark"; }
     ///@}
 
     /**
@@ -61,7 +60,7 @@ public:
      * Add an element (text, rend. etc.) to a ornam.
      * Only supported elements will be actually added to the child list.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Get the SMuFL glyph for the repeatMark based on func or glyph.num

@@ -30,7 +30,7 @@ namespace vrv {
 static const ClassRegistrar<MeterSig> s_factory("meterSig", METERSIG);
 
 MeterSig::MeterSig()
-    : LayerElement(METERSIG, "msig-")
+    : LayerElement(METERSIG)
     , AttColor()
     , AttEnclosingChars()
     , AttExtSymNames()

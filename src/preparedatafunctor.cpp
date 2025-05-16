@@ -112,6 +112,8 @@ FunctorCode PrepareDataInitializationFunctor::VisitRepeatMark(RepeatMark *repeat
 
 FunctorCode PrepareDataInitializationFunctor::VisitScore(Score *score)
 {
+    assert(score->GetScoreDef());
+
     // Evaluate functor on scoreDef
     score->GetScoreDef()->Process(*this);
 
@@ -354,6 +356,7 @@ FunctorCode PrepareAltSymFunctor::VisitObject(Object *object)
     if (object->Is(SCORE)) {
         Score *score = vrv_cast<Score *>(object);
         assert(score);
+        assert(score->GetScoreDef());
         m_symbolTable = vrv_cast<SymbolTable *>(score->GetScoreDef()->FindDescendantByType(SYMBOLTABLE));
     }
 
@@ -494,9 +497,9 @@ void PrepareLinkingFunctor::ResolveStemSameas(Note *note)
 
 PreparePlistFunctor::PreparePlistFunctor() : Functor(), CollectAndProcess() {}
 
-void PreparePlistFunctor::InsertInterfaceIDPair(const std::string &elementID, PlistInterface *interface)
+void PreparePlistFunctor::InsertInterfaceObjectIDPair(Object *objectWithPlist, const std::string &elementID)
 {
-    m_interfaceIDPairs.push_back(std::make_pair(interface, elementID));
+    m_plistObjectIDPairs.push_back(std::make_pair(objectWithPlist, elementID));
 }
 
 FunctorCode PreparePlistFunctor::VisitObject(Object *object)
@@ -513,12 +516,18 @@ FunctorCode PreparePlistFunctor::VisitObject(Object *object)
         if (!object->IsLayerElement()) return FUNCTOR_CONTINUE;
 
         const std::string &id = object->GetID();
-        auto iter = std::find_if(m_interfaceIDPairs.begin(), m_interfaceIDPairs.end(),
-            [&id](const std::pair<PlistInterface *, std::string> &pair) { return (pair.second == id); });
-        if (iter != m_interfaceIDPairs.end()) {
+        auto iter = std::find_if(m_plistObjectIDPairs.begin(), m_plistObjectIDPairs.end(),
+            [&id](const std::pair<Object *, std::string> &pair) { return (pair.second == id); });
+        if (iter != m_plistObjectIDPairs.end()) {
             // Set reference for matched pair and erase it from the list
-            iter->first->SetRef(object);
-            m_interfaceIDPairs.erase(iter);
+            PlistInterface *interface = iter->first->GetPlistInterface();
+            assert(interface);
+            interface->SetRef(object);
+            // Add back link to the object referred in the plist - for now only for Annot
+            if (iter->first->Is(ANNOTSCORE)) {
+                object->AddPlistReference(const_cast<Object *>(iter->first));
+            }
+            m_plistObjectIDPairs.erase(iter);
         }
     }
 
@@ -723,7 +732,7 @@ FunctorCode PrepareTimeSpanningFunctor::VisitMeasureEnd(Measure *measure)
         while (iter != m_timeSpanningInterfaces.end()) {
             // At the end of the measure we remove elements for which we do not need to match the end (for now).
             // Eventually, we could consider them, for example if we want to display their spanning or for
-            // improved midi output
+            // improved MIDI output
             if (iter->second->GetClassId() == HARM) {
                 iter = m_timeSpanningInterfaces.erase(iter);
             }
@@ -1041,7 +1050,8 @@ FunctorCode PrepareLyricsFunctor::VisitSyl(Syl *syl)
 {
     Verse *verse = vrv_cast<Verse *>(syl->GetFirstAncestor(VERSE, MAX_NOTE_DEPTH));
     if (verse) {
-        syl->m_drawingVerse = std::max(verse->GetN(), 1);
+        syl->m_drawingVerseN = std::max(verse->GetN(), 1);
+        syl->m_drawingVersePlace = verse->GetPlace();
     }
 
     syl->SetStart(vrv_cast<LayerElement *>(syl->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH)));
@@ -1389,6 +1399,7 @@ FunctorCode PrepareRptFunctor::VisitStaff(Staff *staff)
 
     // This is happening only for the first staff element of the staff @n
     ScoreDef *scoreDef = m_doc->GetCorrespondingScore(staff)->GetScoreDef();
+    assert(scoreDef);
     if (StaffDef *staffDef = scoreDef->GetStaffDef(staff->GetN())) {
         const bool hideNumber = (staffDef->GetMultiNumber() == BOOLEAN_false)
             || ((staffDef->GetMultiNumber() != BOOLEAN_true) && (scoreDef->GetMultiNumber() == BOOLEAN_false));
@@ -1842,7 +1853,7 @@ PrepareRehPositionFunctor::PrepareRehPositionFunctor() : Functor() {}
 
 FunctorCode PrepareRehPositionFunctor::VisitReh(Reh *reh)
 {
-    if (!reh->HasStart() && !reh->HasTstamp()) {
+    if (!reh->HasStartid() && !reh->HasTstamp()) {
         Measure *measure = vrv_cast<Measure *>(reh->GetFirstAncestor(MEASURE));
         if (measure->GetLeftBarLine()) reh->SetStart(measure->GetLeftBarLine());
     }

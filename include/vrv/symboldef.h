@@ -27,14 +27,14 @@ public:
     SymbolDef();
     virtual ~SymbolDef();
     void Reset() override;
-    std::string GetClassName() const override { return "SymbolDef"; }
+    std::string GetClassName() const override { return "symbolDef"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
     ///@}
 
     /**

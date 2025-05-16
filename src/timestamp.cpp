@@ -21,7 +21,7 @@ namespace vrv {
 // TimestampAttr
 //----------------------------------------------------------------------------
 
-TimestampAttr::TimestampAttr() : LayerElement(TIMESTAMP_ATTR, "tstp-")
+TimestampAttr::TimestampAttr() : LayerElement(TIMESTAMP_ATTR)
 {
     this->Reset();
 }

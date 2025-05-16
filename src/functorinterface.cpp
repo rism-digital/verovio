@@ -11,6 +11,7 @@
 
 #include "accid.h"
 #include "anchoredtext.h"
+#include "annotscore.h"
 #include "arpeg.h"
 #include "artic.h"
 #include "barline.h"
@@ -24,6 +25,7 @@
 #include "chord.h"
 #include "clef.h"
 #include "course.h"
+#include "cpmark.h"
 #include "custos.h"
 #include "dir.h"
 #include "div.h"
@@ -490,6 +492,16 @@ FunctorCode FunctorInterface::VisitAnchoredTextEnd(AnchoredText *anchoredText)
     return this->VisitControlElementEnd(anchoredText);
 }
 
+FunctorCode FunctorInterface::VisitAnnotScore(AnnotScore *annotScore)
+{
+    return this->VisitControlElement(annotScore);
+}
+
+FunctorCode FunctorInterface::VisitAnnotScoreEnd(AnnotScore *annotScore)
+{
+    return this->VisitControlElementEnd(annotScore);
+}
+
 FunctorCode FunctorInterface::VisitArpeg(Arpeg *arpeg)
 {
     return this->VisitControlElement(arpeg);
@@ -548,6 +560,16 @@ FunctorCode FunctorInterface::VisitControlElement(ControlElement *controlElement
 FunctorCode FunctorInterface::VisitControlElementEnd(ControlElement *controlElement)
 {
     return this->VisitFloatingObjectEnd(controlElement);
+}
+
+FunctorCode FunctorInterface::VisitCpMark(CpMark *cpMark)
+{
+    return this->VisitControlElement(cpMark);
+}
+
+FunctorCode FunctorInterface::VisitCpMarkEnd(CpMark *cpMark)
+{
+    return this->VisitControlElementEnd(cpMark);
 }
 
 FunctorCode FunctorInterface::VisitDir(Dir *dir)
@@ -1824,6 +1846,16 @@ FunctorCode ConstFunctorInterface::VisitAnchoredTextEnd(const AnchoredText *anch
     return this->VisitControlElementEnd(anchoredText);
 }
 
+FunctorCode ConstFunctorInterface::VisitAnnotScore(const AnnotScore *annotScore)
+{
+    return this->VisitControlElement(annotScore);
+}
+
+FunctorCode ConstFunctorInterface::VisitAnnotScoreEnd(const AnnotScore *annotScore)
+{
+    return this->VisitControlElementEnd(annotScore);
+}
+
 FunctorCode ConstFunctorInterface::VisitArpeg(const Arpeg *arpeg)
 {
     return this->VisitControlElement(arpeg);
@@ -1882,6 +1914,16 @@ FunctorCode ConstFunctorInterface::VisitControlElement(const ControlElement *con
 FunctorCode ConstFunctorInterface::VisitControlElementEnd(const ControlElement *controlElement)
 {
     return this->VisitFloatingObjectEnd(controlElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitCpMark(const CpMark *cpMark)
+{
+    return this->VisitControlElement(cpMark);
+}
+
+FunctorCode ConstFunctorInterface::VisitCpMarkEnd(const CpMark *cpMark)
+{
+    return this->VisitControlElementEnd(cpMark);
 }
 
 FunctorCode ConstFunctorInterface::VisitDir(const Dir *dir)

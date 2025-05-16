@@ -832,7 +832,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 
     // the mdiv
     Mdiv *mdiv = new Mdiv();
-    mdiv->m_visibility = Visible;
+    mdiv->SetVisibility(Visible);
     m_doc->AddChild(mdiv);
     // the score
     Score *score = new Score();
@@ -888,15 +888,18 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             }
         }
         if (head) {
+            assert(score->GetScoreDef());
             score->GetScoreDef()->AddChild(head);
         }
         if (foot) {
+            assert(score->GetScoreDef());
             score->GetScoreDef()->AddChild(foot);
         }
     }
 
     std::vector<StaffGrp *> m_staffGrpStack;
     StaffGrp *staffGrp = new StaffGrp();
+    assert(score->GetScoreDef());
     score->GetScoreDef()->AddChild(staffGrp);
     m_staffGrpStack.push_back(staffGrp);
 
@@ -904,7 +907,10 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     m_octDis.push_back(0);
 
     pugi::xpath_node scoreMidiBpm = root.select_node("/score-partwise/part[1]/measure[1]/sound[@tempo][1]");
-    if (scoreMidiBpm) score->GetScoreDef()->SetMidiBpm(scoreMidiBpm.node().attribute("tempo").as_double());
+    if (scoreMidiBpm) {
+        assert(score->GetScoreDef());
+        score->GetScoreDef()->SetMidiBpm(scoreMidiBpm.node().attribute("tempo").as_double());
+    }
 
     pugi::xpath_node_set partListChildren = root.select_nodes("/score-partwise/part-list/*");
     for (pugi::xpath_node_set::const_iterator it = partListChildren.begin(); it != partListChildren.end(); ++it) {
@@ -1753,18 +1759,18 @@ void MusicXmlInput::MatchTies(bool matchLayers)
     // match open ties with close ties
     std::vector<musicxml::OpenTie>::iterator iter = m_tieStack.begin();
     while (iter != m_tieStack.end()) {
-        double lastScoreTimeOnset = 9999; // __DBL_MAX__;
+        Fraction lastScoreTimeOnset(9999); // __DBL_MAX__;
         bool tieMatched = false;
         std::vector<musicxml::CloseTie>::iterator jter;
         for (jter = m_tieStopStack.begin(); jter != m_tieStopStack.end(); ++jter) {
             // match tie stop with pitch/oct identity, with start note earlier than end note,
             // and with earliest end note.
             if ((iter->m_note->IsEnharmonicWith(jter->m_note))
-                && (iter->m_note->GetRealTimeOnsetMilliseconds() < jter->m_note->GetRealTimeOnsetMilliseconds())
-                && (jter->m_note->GetRealTimeOnsetMilliseconds() < lastScoreTimeOnset)
+                && (iter->m_note->GetScoreTimeOnset() < jter->m_note->GetScoreTimeOnset())
+                && (jter->m_note->GetScoreTimeOnset() < lastScoreTimeOnset)
                 && (!matchLayers || (iter->m_layerNum == jter->m_layerNum))) {
                 iter->m_tie->SetEndid("#" + jter->m_note->GetID());
-                lastScoreTimeOnset = jter->m_note->GetRealTimeOnsetMilliseconds();
+                lastScoreTimeOnset = jter->m_note->GetScoreTimeOnset();
                 tieMatched = true;
                 break;
             }
@@ -1796,8 +1802,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     }
 
     // read clef changes as MEI clef and add them to the stack
-    pugi::xml_node clef = node.child("clef");
-    if (clef) {
+    for (pugi::xml_node clef : node.children("clef")) {
         // check if we have a staff number
         short int staffNum = clef.attribute("number").as_int();
         staffNum = (staffNum < 1) ? 1 : staffNum;
@@ -2664,7 +2669,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     Note *note = NULL;
 
     bool nextIsChord = false;
-    double onset = m_durTotal; // keep note onsets for later
+    Fraction onset = m_durTotal; // keep note onsets for later
 
     // for measure repeats add a single <mRpt> and return
     if (m_mRpt) {
@@ -2829,7 +2834,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         if (!noteID.empty()) {
             note->SetID(noteID);
         }
-        note->SetRealTimeOnsetSeconds(onset); // remember the MIDI onset within that measure
+        note->SetScoreTimeOnset(onset); // remember the MIDI onset within that measure
         // set @staff attribute, if existing and different from parent staff number
         if (noteStaffNum > 0 && noteStaffNum + staffOffset != staff->GetN())
             note->SetStaff(
@@ -2911,7 +2916,9 @@ void MusicXmlInput::ReadMusicXmlNote(
         const pugi::xml_node notehead = node.child("notehead");
         if (notehead) {
             note->SetHeadColor(notehead.attribute("color").as_string());
-            note->SetHeadShape(ConvertNotehead(notehead.text().as_string()));
+            data_HEADSHAPE hs;
+            hs.SetHeadShapeList(ConvertNotehead(notehead.text().as_string()));
+            note->SetHeadShape(hs);
             if (notehead.attribute("parentheses").as_bool()) note->SetHeadMod(NOTEHEADMODIFIER_paren);
             note->SetGlyphName(notehead.attribute("smufl").as_string());
             auto noteHeadFill = notehead.attribute("filled");
@@ -3051,9 +3058,9 @@ void MusicXmlInput::ReadMusicXmlNote(
                     std::string textStr = childNode.text().as_string();
 
                     // convert verse numbers to labels
-                    std::regex labelSearch("^([^[:alpha:]]*\\d[^[:alpha:]]*)$");
+                    static const std::regex labelSearch("^([^[:alpha:]]*\\d[^[:alpha:]]*)$");
                     std::smatch labelSearchMatches;
-                    std::regex labelPrefixSearch("^([^[:alpha:]]*\\d[^[:alpha:]]*)[\\s\\u00A0]+");
+                    static const std::regex labelPrefixSearch("^([^[:alpha:]]*\\d[^[:alpha:]]*)[\\s\\u00A0]+");
                     std::smatch labelPrefixSearchMatches;
                     if (!textStr.empty() && std::regex_search(textStr, labelSearchMatches, labelSearch)
                         && labelSearchMatches.ready() && childNode.next_sibling("elision")) {
@@ -4264,20 +4271,20 @@ std::u32string MusicXmlInput::ConvertTypeToVerovioText(const std::string &value)
     return std::u32string();
 }
 
-data_HEADSHAPE MusicXmlInput::ConvertNotehead(const std::string &value)
+data_HEADSHAPE_list MusicXmlInput::ConvertNotehead(const std::string &value)
 {
-    static const std::map<std::string, data_HEADSHAPE> Notehead2Id{
-        { "slash", HEADSHAPE_slash }, //
-        { "triangle", HEADSHAPE_rtriangle }, //
-        { "diamond", HEADSHAPE_diamond }, //
-        { "square", HEADSHAPE_square }, //
-        { "cross", HEADSHAPE_plus }, //
-        { "x", HEADSHAPE_x }, //
-        { "circle-x", HEADSHAPE_slash }, //
-        { "inverted triangle", HEADSHAPE_slash }, //
-        { "arrow down", HEADSHAPE_slash }, //
-        { "arrow up", HEADSHAPE_slash }, //
-        { "circle dot", HEADSHAPE_circle } //
+    static const std::map<std::string, data_HEADSHAPE_list> Notehead2Id{
+        { "slash", HEADSHAPE_list_slash }, //
+        { "triangle", HEADSHAPE_list_rtriangle }, //
+        { "diamond", HEADSHAPE_list_diamond }, //
+        { "square", HEADSHAPE_list_square }, //
+        { "cross", HEADSHAPE_list_plus }, //
+        { "x", HEADSHAPE_list_x }, //
+        { "circle-x", HEADSHAPE_list_slash }, //
+        { "inverted triangle", HEADSHAPE_list_slash }, //
+        { "arrow down", HEADSHAPE_list_slash }, //
+        { "arrow up", HEADSHAPE_list_slash }, //
+        { "circle dot", HEADSHAPE_list_circle } //
     };
 
     const auto result = Notehead2Id.find(value);
@@ -4285,7 +4292,7 @@ data_HEADSHAPE MusicXmlInput::ConvertNotehead(const std::string &value)
         return result->second;
     }
 
-    return HEADSHAPE_NONE;
+    return HEADSHAPE_list_NONE;
 }
 
 data_LINESTARTENDSYMBOL MusicXmlInput::ConvertLineEndSymbol(const std::string &value)
@@ -4740,8 +4747,8 @@ std::string MusicXmlInput::GetOrnamentGlyphNumber(int attributes) const
     static std::map<int, std::string> precomposedNames = {
         { APPR_Above | FORM_Inverted, "U+E5C6" }, { APPR_Below | FORM_Inverted, "U+E5B5" },
         { APPR_Above | FORM_Normal, "U+E5C7" }, { APPR_Below | FORM_Normal, "U+E5B8" },
-        { FORM_Inverted | DEP_Above, "U+E5BB" }, { FORM_Inverted | DEP_Below, "U+E5C8" }
-        // these values need to be matched with proper SMuFL codes first
+        { FORM_Inverted | DEP_Above, "U+E5BB" },
+        { FORM_Inverted | DEP_Below, "U+E5C8" } // these values need to be matched with proper SMuFL codes first
         /*, { FORM_Normal | DEP_Above, "U+????" },
         { FORM_Normal | DEP_Below, "U+????" }, { APPR_Above | FORM_Normal | DEP_Above, "U+????" },
         { APPR_Above | FORM_Normal | DEP_Above, "U+????" }, { APPR_Above | FORM_Normal | DEP_Below, "U+????" },

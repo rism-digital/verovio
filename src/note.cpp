@@ -31,6 +31,7 @@
 #include "staff.h"
 #include "stem.h"
 #include "syl.h"
+#include "symboldef.h"
 #include "tabgrp.h"
 #include "tie.h"
 #include "tuning.h"
@@ -50,8 +51,9 @@ namespace vrv {
 static const ClassRegistrar<Note> s_factory("note", NOTE);
 
 Note::Note()
-    : LayerElement(NOTE, "note-")
+    : LayerElement(NOTE)
     , StemmedDrawingInterface()
+    , AltSymInterface()
     , DurationInterface()
     , PitchInterface()
     , PositionInterface()
@@ -63,14 +65,15 @@ Note::Note()
     , AttGraced()
     , AttHarmonicFunction()
     , AttMidiVelocity()
-    , AttNoteGesTab()
     , AttNoteHeads()
     , AttNoteVisMensural()
     , AttStems()
     , AttStemsCmn()
+    , AttStringtab()
     , AttTiePresent()
     , AttVisibility()
 {
+    this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
     this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
@@ -81,12 +84,12 @@ Note::Note()
     this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_GRACED);
     this->RegisterAttClass(ATT_HARMONICFUNCTION);
-    this->RegisterAttClass(ATT_NOTEGESTAB);
     this->RegisterAttClass(ATT_NOTEHEADS);
     this->RegisterAttClass(ATT_NOTEVISMENSURAL);
     this->RegisterAttClass(ATT_MIDIVELOCITY);
     this->RegisterAttClass(ATT_STEMS);
     this->RegisterAttClass(ATT_STEMSCMN);
+    this->RegisterAttClass(ATT_STRINGTAB);
     this->RegisterAttClass(ATT_TIEPRESENT);
     this->RegisterAttClass(ATT_VISIBILITY);
 
@@ -99,6 +102,7 @@ void Note::Reset()
 {
     LayerElement::Reset();
     StemmedDrawingInterface::Reset();
+    AltSymInterface::Reset();
     DurationInterface::Reset();
     PitchInterface::Reset();
     PositionInterface::Reset();
@@ -109,12 +113,12 @@ void Note::Reset()
     this->ResetExtSymNames();
     this->ResetGraced();
     this->ResetHarmonicFunction();
-    this->ResetNoteGesTab();
     this->ResetNoteHeads();
     this->ResetNoteVisMensural();
     this->ResetMidiVelocity();
     this->ResetStems();
     this->ResetStemsCmn();
+    this->ResetStringtab();
     this->ResetTiePresent();
     this->ResetVisibility();
 
@@ -127,53 +131,24 @@ void Note::Reset()
     m_stemSameasRole = SAMEAS_NONE;
 }
 
-bool Note::IsSupportedChild(Object *child)
+bool Note::IsSupportedChild(ClassId classId)
 {
-    // additional verification for accid and artic - this will not be raised with editorial markup, though
-    if (child->Is(ACCID)) {
-        IsAttributeComparison isAttributeComparison(ACCID);
-        if (this->FindDescendantByComparison(&isAttributeComparison))
-            LogWarning("Having both @accid or @accid.ges and <accid> child will cause problems");
-    }
-    else if (child->Is(ARTIC)) {
-        IsAttributeComparison isAttributeComparison(ARTIC);
-        if (this->FindDescendantByComparison(&isAttributeComparison))
-            LogWarning("Having both @artic and <artic> child will cause problems");
-    }
+    static const std::vector<ClassId> supported{ ACCID, ARTIC, DOTS, PLICA, STEM, SYL, VERSE };
 
-    if (child->Is(ACCID)) {
-        assert(dynamic_cast<Accid *>(child));
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(ARTIC)) {
-        assert(dynamic_cast<Artic *>(child));
-    }
-    else if (child->Is(DOTS)) {
-        assert(dynamic_cast<Dots *>(child));
-    }
-    else if (child->Is(PLICA)) {
-        assert(dynamic_cast<Plica *>(child));
-    }
-    else if (child->Is(STEM)) {
-        assert(dynamic_cast<Stem *>(child));
-    }
-    else if (child->Is(SYL)) {
-        assert(dynamic_cast<Syl *>(child));
-    }
-    else if (child->Is(VERSE)) {
-        assert(dynamic_cast<Verse *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 void Note::AddChild(Object *child)
 {
-    if (!this->IsSupportedChild(child)) {
+    if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
         return;
     }
@@ -191,6 +166,23 @@ void Note::AddChild(Object *child)
         children.push_back(child);
     }
     Modify();
+}
+
+bool Note::AddChildAdditionalCheck(Object *child)
+{
+    // Additional verification for accid and artic - this will not be raised with editorial markup, though
+    // Left as a warning for now.
+    if (child->Is(ACCID)) {
+        IsAttributeComparison isAttributeComparison(ACCID);
+        if (this->FindDescendantByComparison(&isAttributeComparison))
+            LogWarning("Having both @accid or @accid.ges and <accid> child will cause problems");
+    }
+    else if (child->Is(ARTIC)) {
+        IsAttributeComparison isAttributeComparison(ARTIC);
+        if (this->FindDescendantByComparison(&isAttributeComparison))
+            LogWarning("Having both @artic and <artic> child will cause problems");
+    }
+    return (LayerElement::AddChildAdditionalCheck(child));
 }
 
 void Note::AlignDotsShift(const Note *otherNote)
@@ -251,25 +243,78 @@ const TabGrp *Note::IsTabGrpNote() const
     return vrv_cast<const TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
 }
 
-std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType) const
+std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType, int &overline, int &strike, int &underline) const
 {
+    overline = 0;
+    strike = 0;
+    underline = 0;
+
+    // @glyph.num, @glyph.name or @altsym
+    const Resources *resources = this->GetDocResources();
+    if (resources != NULL) {
+        std::u32string fretStr;
+        // If there is @glyph.num, return glyph based on it (first priority)
+        if (this->HasGlyphNum()) {
+            const char32_t code = this->GetGlyphNum();
+            if (NULL != resources->GetGlyph(code)) fretStr.push_back(code);
+        }
+
+        // If there is @glyph.name (second priority)
+        else if (this->HasGlyphName()) {
+            const char32_t code = resources->GetGlyphCode(this->GetGlyphName());
+            if (NULL != resources->GetGlyph(code)) fretStr.push_back(code);
+        }
+
+        // If there is @altsym (third priority)
+        else if (this->HasAltsym() && this->HasAltSymbolDef()) {
+            const SymbolDef *symbolDef = this->GetAltSymbolDef();
+
+            // there may be more than one <symbol>
+            for (const Object *child : symbolDef->GetChildren()) {
+                if (child->Is(SYMBOL)) {
+                    const Symbol *symbol = vrv_cast<const Symbol *>(child);
+
+                    // If there is @glyph.num, return glyph based on it (fourth priority)
+                    if (symbol->HasGlyphNum()) {
+                        const char32_t code = symbol->GetGlyphNum();
+                        if (NULL != resources->GetGlyph(code)) fretStr.push_back(code);
+                    }
+
+                    // If there is @glyph.name (fifth priority)
+                    else if (symbol->HasGlyphName()) {
+                        const char32_t code = resources->GetGlyphCode(symbol->GetGlyphName());
+                        if (NULL != resources->GetGlyph(code)) fretStr.push_back(code);
+                    }
+                }
+            }
+        }
+
+        if (!fretStr.empty()) return fretStr;
+    }
+
     if (notationType == NOTATIONTYPE_tab_lute_italian) {
         std::u32string fretStr;
-        int fret = this->GetTabFret();
-        // Maximum allowed would be 19 (always bindly addind 1 as first figure)
-        if (fret > 9) fretStr.push_back(SMUFL_EBE1_luteItalianFret1);
-        switch (fret % 10) {
-            case 0: fretStr.push_back(SMUFL_EBE0_luteItalianFret0); break;
-            case 1: fretStr.push_back(SMUFL_EBE1_luteItalianFret1); break;
-            case 2: fretStr.push_back(SMUFL_EBE2_luteItalianFret2); break;
-            case 3: fretStr.push_back(SMUFL_EBE3_luteItalianFret3); break;
-            case 4: fretStr.push_back(SMUFL_EBE4_luteItalianFret4); break;
-            case 5: fretStr.push_back(SMUFL_EBE5_luteItalianFret5); break;
-            case 6: fretStr.push_back(SMUFL_EBE6_luteItalianFret6); break;
-            case 7: fretStr.push_back(SMUFL_EBE7_luteItalianFret7); break;
-            case 8: fretStr.push_back(SMUFL_EBE8_luteItalianFret8); break;
-            case 9: fretStr.push_back(SMUFL_EBE9_luteItalianFret9); break;
-            default: break;
+        const int fret = this->GetTabFret();
+        const int course = this->GetTabCourse();
+
+        // Italian tablature glyphs are contiguous
+        static_assert(SMUFL_EBE1_luteItalianFret1 == SMUFL_EBE0_luteItalianFret0 + 1);
+        static_assert(SMUFL_EBE2_luteItalianFret2 == SMUFL_EBE0_luteItalianFret0 + 2);
+        // ...
+        static_assert(SMUFL_EBE9_luteItalianFret9 == SMUFL_EBE0_luteItalianFret0 + 9);
+
+        if (course <= 7 || fret != 0) {
+            const auto decimal = std::div(fret, 10);
+            if (decimal.quot > 0) fretStr.push_back(SMUFL_EBE0_luteItalianFret0 + decimal.quot);
+            if (decimal.rem <= 9) fretStr.push_back(SMUFL_EBE0_luteItalianFret0 + decimal.rem);
+            if (course >= 7) strike = 1; // course 7 and fretted courses >= 8 use a ledger line
+            underline = std::max(0, course - 7); // compressed ledger lines for fretted courses >= 8
+        }
+        else {
+            // open courses >= 8 just use the number of the course on stave line 7
+            const auto decimal = std::div(course, 10);
+            if (decimal.quot > 0) fretStr.push_back(SMUFL_EBE0_luteItalianFret0 + decimal.quot);
+            if (decimal.rem <= 9) fretStr.push_back(SMUFL_EBE0_luteItalianFret0 + decimal.rem);
         }
         return fretStr;
     }
@@ -317,6 +362,75 @@ std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType) const
 
             // TODO what if fret > 12?  Some tablatures use fret p.
             if (fret >= 0 && fret < static_cast<int>(sizeof(letter) / sizeof(letter[0]))) fretStr += letter[fret];
+        }
+        return fretStr;
+    }
+    else if (notationType == NOTATIONTYPE_tab_lute_german) {
+        std::u32string fretStr;
+        const int fret = this->GetTabFret();
+        const int course = this->GetTabCourse();
+
+        // SMuFL has glyphs for German lute tablature following Hans and Melchior Newsidler's notation
+        // for the >= 6th courses.
+        // "German Renaissance lute tablature (U+EC00–U+EC2F)"
+        // https://w3c.github.io/smufl/latest/tables/german-renaissance-lute-tablature.html
+        //
+        // However, some glyphs are missing:
+        //
+        //   Digit 1 with a strike through for the open 6th course.
+        //   Digit 1 with two strike throughs for the open 7th course.
+        //   Digit 1 with three strike throughs for the open 8th course.
+        //   "et" for 2nd course 5th fret.
+        //   "con" for 1st course 5th fret.
+        //   Gothic font digits 1-5 for the open courses <= 5.
+        //   Second lowercase alphabet with an overline used for courses <= 5 frets 6 to 10.
+        //
+        // To overcome these omissions I've substituted missing glyphs from other
+        // parts of the SMuFL collection.  Overlines and strike throughs are drawn separately.
+
+        if (course >= 6 && fret >= 0 && fret <= 13) {
+            // + A B C D ...
+            if (fret == 0) {
+                fretStr = SMUFL_EA51_figbass1; // substitute for 1 with oblique stroke
+                strike = course - 5; // 6 course 1 strike, 7 course 2 strikes, ...
+            }
+            else {
+                // The German tablature uppercase letters A-N are contiguous, correctly omitting J
+                static_assert(SMUFL_EC23_luteGermanNUpper == SMUFL_EC17_luteGermanAUpper + 13 - 1);
+                fretStr = SMUFL_EC17_luteGermanAUpper + fret - 1;
+                overline = course - 6; // 6 course 0 overline, 7 course 1 overline, ...
+            }
+        }
+        else if (course >= 1 && course <= 5 && fret == 0) {
+            // Substitute for gothic digits
+            static const char32_t digit[] = { SMUFL_EA51_figbass1, SMUFL_EA52_figbass2, SMUFL_EA54_figbass3,
+                SMUFL_EA55_figbass4, SMUFL_EA57_figbass5 };
+            fretStr = digit[5 - course];
+        }
+        else if (course >= 1 && course <= 5 && fret >= 0 && fret <= 10) {
+            const int firstAlphabetFret = fret <= 5 ? fret : fret - 5; // map second alphabet to first
+
+            if (course == 2 && firstAlphabetFret == 5) {
+                // TODO replace with U+EC24, luteGermanEt when available
+                //      https://github.com/w3c/smufl/issues/274
+                fretStr = SMUFL_EA5F_figbass7Raised2; // substitute for "et"
+            }
+            else if (course == 1 && firstAlphabetFret == 5) {
+                // TODO replace with U+EC25, luteGermanCon when available
+                //      https://github.com/w3c/smufl/issues/274
+                fretStr = SMUFL_EA61_figbass9; // substitute for "con"
+            }
+            else {
+                // The German tablature lowercase letters a-z are contiguous, correctly omitting j u w
+                static_assert(SMUFL_EC16_luteGermanZLower == SMUFL_EC00_luteGermanALower + 23 - 1);
+
+                // lowercase letters run 5th to 1st course, frets 1 to 5
+                // and frets 6 to 10 with an overline
+                fretStr = SMUFL_EC00_luteGermanALower + (5 - course) + (firstAlphabetFret - 1) * 5;
+            }
+
+            // second alphabet needs an overline
+            overline = (fret >= 6) ? 1 : 0;
         }
         return fretStr;
     }
@@ -525,49 +639,58 @@ char32_t Note::GetNoteheadGlyph(const data_DURATION duration) const
         return additionalNoteheadSymbols[glyph];
     }
 
-    switch (this->GetHeadShape()) {
-        case HEADSHAPE_quarter: return SMUFL_E0A4_noteheadBlack;
-        case HEADSHAPE_half: return SMUFL_E0A3_noteheadHalf;
-        case HEADSHAPE_whole: return SMUFL_E0A2_noteheadWhole;
-        // case HEADSHAPE_backslash: return SMUFL_noteheadBackslash;
-        // case HEADSHAPE_circle: return SMUFL_E0B3_noteheadCircleX;
-        case HEADSHAPE_plus: return SMUFL_E0AF_noteheadPlusBlack;
-        case HEADSHAPE_diamond: {
-            if (duration < DURATION_4) {
-                return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0DB_noteheadDiamondBlack
-                                                           : SMUFL_E0D9_noteheadDiamondHalf;
-            }
-            else {
-                return (this->GetHeadFill() == FILL_void) ? SMUFL_E0D9_noteheadDiamondHalf
-                                                          : SMUFL_E0DB_noteheadDiamondBlack;
+    if (this->HasHeadShape()) {
+        data_HEADSHAPE *hs = (const_cast<Note *>(this))->GetHeadShapeAlternate();
+        if (hs->GetType() == HEADSHAPE_headShapeList) {
+            switch (this->GetHeadShape().GetHeadShapeList()) {
+                case HEADSHAPE_list_quarter: return SMUFL_E0A4_noteheadBlack;
+                case HEADSHAPE_list_half: return SMUFL_E0A3_noteheadHalf;
+                case HEADSHAPE_list_whole:
+                    return SMUFL_E0A2_noteheadWhole;
+                    // case HEADSHAPE_backslash: return SMUFL_noteheadBackslash;
+                    // case HEADSHAPE_circle: return SMUFL_E0B3_noteheadCircleX;
+                case HEADSHAPE_list_plus: return SMUFL_E0AF_noteheadPlusBlack;
+                case HEADSHAPE_list_diamond: {
+                    if (duration < DURATION_4) {
+                        return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0DB_noteheadDiamondBlack
+                                                                   : SMUFL_E0D9_noteheadDiamondHalf;
+                    }
+                    else {
+                        return (this->GetHeadFill() == FILL_void) ? SMUFL_E0D9_noteheadDiamondHalf
+                                                                  : SMUFL_E0DB_noteheadDiamondBlack;
+                    }
+                }
+                    // case HEADSHAPE_isotriangle: return SMUFL_E0BC_noteheadTriangleUpHalf;
+                    // case HEADSHAPE_oval: return SMUFL_noteheadOval;
+                    // case HEADSHAPE_piewedge: return SMUFL_noteheadPieWedge;
+                case HEADSHAPE_list_rectangle:
+                    if (duration < DURATION_4) {
+                        return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0B9_noteheadSquareBlack
+                                                                   : SMUFL_E0B8_noteheadSquareWhite;
+                    }
+                    else {
+                        return (this->GetHeadFill() == FILL_void) ? SMUFL_E0B8_noteheadSquareWhite
+                                                                  : SMUFL_E0B9_noteheadSquareBlack;
+                    }
+                    // case HEADSHAPE_rtriangle: return SMUFL_noteheadRTriangle;
+                    // case HEADSHAPE_semicircle: return SMUFL_noteheadSemicircle;
+                case HEADSHAPE_list_slash: {
+                    if (DURATION_1 >= duration) return SMUFL_E102_noteheadSlashWhiteWhole;
+                    if (DURATION_2 == duration) return SMUFL_E103_noteheadSlashWhiteHalf;
+                    return SMUFL_E101_noteheadSlashHorizontalEnds;
+                }
+                    // case HEADSHAPE_square: return SMUFL_noteheadSquare;
+                case HEADSHAPE_list_x: {
+                    if (DURATION_1 == duration) return SMUFL_E0B5_noteheadWholeWithX;
+                    if (DURATION_2 == duration) return SMUFL_E0B6_noteheadHalfWithX;
+                    return SMUFL_E0A9_noteheadXBlack;
+                }
+                default: break;
             }
         }
-        // case HEADSHAPE_isotriangle: return SMUFL_E0BC_noteheadTriangleUpHalf;
-        // case HEADSHAPE_oval: return SMUFL_noteheadOval;
-        // case HEADSHAPE_piewedge: return SMUFL_noteheadPieWedge;
-        case HEADSHAPE_rectangle:
-            if (duration < DURATION_4) {
-                return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0B9_noteheadSquareBlack
-                                                           : SMUFL_E0B8_noteheadSquareWhite;
-            }
-            else {
-                return (this->GetHeadFill() == FILL_void) ? SMUFL_E0B8_noteheadSquareWhite
-                                                          : SMUFL_E0B9_noteheadSquareBlack;
-            }
-        // case HEADSHAPE_rtriangle: return SMUFL_noteheadRTriangle;
-        // case HEADSHAPE_semicircle: return SMUFL_noteheadSemicircle;
-        case HEADSHAPE_slash: {
-            if (DURATION_1 >= duration) return SMUFL_E102_noteheadSlashWhiteWhole;
-            if (DURATION_2 == duration) return SMUFL_E103_noteheadSlashWhiteHalf;
-            return SMUFL_E101_noteheadSlashHorizontalEnds;
+        else if (hs->GetType() == HEADSHAPE_hexnum) {
+            return (this->GetHeadShape().GetHexnum());
         }
-        // case HEADSHAPE_square: return SMUFL_noteheadSquare;
-        case HEADSHAPE_x: {
-            if (DURATION_1 == duration) return SMUFL_E0B5_noteheadWholeWithX;
-            if (DURATION_2 == duration) return SMUFL_E0B6_noteheadHalfWithX;
-            return SMUFL_E0A9_noteheadXBlack;
-        }
-        default: break;
     }
 
     switch (this->GetHeadMod()) {
@@ -661,7 +784,7 @@ bool Note::IsEnharmonicWith(const Note *note) const
     return (this->GetMIDIPitch() == note->GetMIDIPitch());
 }
 
-int Note::GetMIDIPitch(const int shift) const
+int Note::GetMIDIPitch(const int shift, const int octaveShift) const
 {
     int pitch = 0;
 
@@ -671,7 +794,7 @@ int Note::GetMIDIPitch(const int shift) const
     else if (this->HasPname() || this->HasPnameGes()) {
         const int pclass = this->GetPitchClass();
 
-        int oct = this->GetOct();
+        int oct = this->GetOct() + octaveShift;
         if (this->HasOctGes()) oct = this->GetOctGes();
 
         pitch = pclass + (oct + 1) * 12;

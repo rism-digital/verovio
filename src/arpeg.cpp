@@ -29,14 +29,12 @@ namespace vrv {
 
 static const ClassRegistrar<Arpeg> s_factory("arpeg", ARPEG);
 
-Arpeg::Arpeg()
-    : ControlElement(ARPEG, "arpeg-"), PlistInterface(), TimePointInterface(), AttArpegLog(), AttArpegVis(), AttColor()
+Arpeg::Arpeg() : ControlElement(ARPEG), PlistInterface(), TimePointInterface(), AttArpegLog(), AttArpegVis()
 {
     this->RegisterInterface(PlistInterface::GetAttClasses(), PlistInterface::IsInterface());
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_ARPEGLOG);
     this->RegisterAttClass(ATT_ARPEGVIS);
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
 
     this->Reset();
@@ -51,7 +49,6 @@ void Arpeg::Reset()
     TimePointInterface::Reset();
     this->ResetArpegLog();
     this->ResetArpegVis();
-    this->ResetColor();
     this->ResetEnclosingChars();
 
     m_drawingXRel = 0;

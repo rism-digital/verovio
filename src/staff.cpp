@@ -42,8 +42,7 @@ namespace vrv {
 
 static const ClassRegistrar<Staff> s_factory("staff", STAFF);
 
-Staff::Staff(int n)
-    : Object(STAFF, "staff-"), FacsimileInterface(), AttCoordY1(), AttNInteger(), AttTyped(), AttVisibility()
+Staff::Staff(int n) : Object(STAFF), FacsimileInterface(), AttCoordY1(), AttNInteger(), AttTyped(), AttVisibility()
 {
     this->RegisterAttClass(ATT_COORDY1);
     this->RegisterAttClass(ATT_NINTEGER);
@@ -108,7 +107,22 @@ void Staff::ClearLedgerLines()
     m_ledgerLinesBelowCue.clear();
 }
 
-bool Staff::IsSupportedChild(Object *child)
+bool Staff::IsSupportedChild(ClassId classId)
+{
+    static const std::vector<ClassId> supported{ LAYER };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
+    }
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+bool Staff::AddChildAdditionalCheck(Object *child)
 {
     if (child->Is(LAYER)) {
         Layer *layer = vrv_cast<Layer *>(child);
@@ -119,13 +133,7 @@ bool Staff::IsSupportedChild(Object *child)
             layer->SetN(this->GetChildCount(LAYER) + 1);
         }
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
-    }
-    else {
-        return false;
-    }
-    return true;
+    return (Object::AddChildAdditionalCheck(child));
 }
 
 int Staff::GetDrawingX() const
@@ -186,6 +194,8 @@ void Staff::AdjustDrawingStaffSize()
 
 int Staff::GetDrawingStaffNotationSize() const
 {
+    if (this->IsTabLuteGerman()) return m_drawingStaffSize / GERMAN_TAB_STAFF_RATIO;
+
     return (this->IsTablature()) ? m_drawingStaffSize / TABLATURE_STAFF_RATIO : m_drawingStaffSize;
 }
 
@@ -318,9 +328,8 @@ void LedgerLine::AddDash(int left, int right, int extension, const Object *event
     iter = m_dashes.begin();
     ++iter;
     while (iter != m_dashes.end()) {
-        if (previous->m_x1 > iter->m_x1 + 1.5 * extension) {
+        if (previous->m_x2 > iter->m_x1 + 1.5 * extension) {
             previous->MergeWith(*iter);
-            previous->m_x2 = std::max(iter->m_x2, previous->m_x2);
             iter = m_dashes.erase(iter);
         }
         else {

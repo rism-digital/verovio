@@ -1,16 +1,24 @@
-[tool.poetry]
+[project] 
 name = "libmei"
 version = "0.1.0"
-description = ""
-authors = ["Andrew Hankinson <andrew.hankinson@gmail.com>"]
+dependencies = [
+    "pyyaml (>=6.0)",
+    "lxml (>=5.3.0)",
+]
+requires-python = ">=3.9"
+description = "LibMEI is a C++ library for reading and writing MEI files"
+authors = [
+    {name = "Andrew Hankinson", email="andrew.hankinson@gmail.com"},
+]
 readme = "README.md"
+license = "MIT"
 
-[tool.poetry.dependencies]
-python = "^3.9"
-pyyaml = "^6.0"
-lxml = "^5.3.0"
-
+[tool.poetry]
+package-mode = false
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=2.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 120

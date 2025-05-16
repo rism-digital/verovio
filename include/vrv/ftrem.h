@@ -33,7 +33,7 @@ public:
     virtual ~FTrem();
     Object *Clone() const override { return new FTrem(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "FTrem"; }
+    std::string GetClassName() const override { return "fTrem"; }
     ///@}
 
     /**
@@ -51,7 +51,7 @@ public:
      * Add an element (a note or a chord) to a fTrem.
      * Only Note or Chord elements will be actually added to the fTrem.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      *

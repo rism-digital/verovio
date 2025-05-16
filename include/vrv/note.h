@@ -13,12 +13,13 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
+#include "altsyminterface.h"
 #include "atts_analytical.h"
 #include "atts_externalsymbols.h"
-#include "atts_frettab.h"
 #include "atts_mensural.h"
 #include "atts_midi.h"
 #include "atts_shared.h"
+#include "atts_stringtab.h"
 #include "beam.h"
 #include "chord.h"
 #include "durationinterface.h"
@@ -45,6 +46,7 @@ class Verse;
  */
 class Note : public LayerElement,
              public StemmedDrawingInterface,
+             public AltSymInterface,
              public DurationInterface,
              public PitchInterface,
              public PositionInterface,
@@ -56,11 +58,11 @@ class Note : public LayerElement,
              public AttGraced,
              public AttHarmonicFunction,
              public AttMidiVelocity,
-             public AttNoteGesTab,
              public AttNoteHeads,
              public AttNoteVisMensural,
              public AttStems,
              public AttStemsCmn,
+             public AttStringtab,
              public AttTiePresent,
              public AttVisibility {
 public:
@@ -73,13 +75,15 @@ public:
     virtual ~Note();
     Object *Clone() const override { return new Note(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Note"; }
+    std::string GetClassName() const override { return "note"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
+    AltSymInterface *GetAltSymInterface() override { return vrv_cast<AltSymInterface *>(this); }
+    const AltSymInterface *GetAltSymInterface() const override { return vrv_cast<const AltSymInterface *>(this); }
     DurationInterface *GetDurationInterface() override { return vrv_cast<DurationInterface *>(this); }
     const DurationInterface *GetDurationInterface() const override { return vrv_cast<const DurationInterface *>(this); }
     PitchInterface *GetPitchInterface() override { return vrv_cast<PitchInterface *>(this); }
@@ -103,12 +107,17 @@ public:
      * Add an element (a verse or an accid) to a note.
      * Only Verse and Accid elements will be actually added to the note.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Overwritten method for note
      */
     void AddChild(Object *object) override;
+
+    /**
+     * Additional check when adding a child.
+     */
+    bool AddChildAdditionalCheck(Object *child) override;
 
     /**
      * Align dots shift for two notes. Should be used for unison notes to align dots positioning
@@ -145,7 +154,7 @@ public:
      * @name Return the smufl string to use for a note give the notation type
      */
     ///@{
-    std::u32string GetTabFretString(data_NOTATIONTYPE notationType) const;
+    std::u32string GetTabFretString(data_NOTATIONTYPE notationType, int &overline, int &strike, int &underline) const;
     ///@}
 
     /**
@@ -209,7 +218,7 @@ public:
     /**
      * MIDI pitch
      */
-    int GetMIDIPitch(int shift = 0) const;
+    int GetMIDIPitch(int shift = 0, int octaveShift = 0) const;
 
     /**
      * Get pitch class of the current note

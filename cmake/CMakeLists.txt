@@ -19,6 +19,7 @@ option(NO_MXL_SUPPORT           "Disable compressed MusicXML support"          O
 option(NO_HUMDRUM_SUPPORT       "Disable Humdrum support"                      OFF)
 option(NO_POINTING              "Disable pointing reference resovling"         ON)
 option(MUSICXML_DEFAULT_HUMDRUM "Enable MusicXML to Humdrum by default"        OFF)
+option(NO_EDIT_SUPPORT          "Disable editor code"                          OFF)
 option(NO_RUNTIME               "Disable runtime clock support"                ON)
 option(BUILD_AS_LIBRARY         "Build Verovio as library"                     OFF)
 option(BUILD_AS_ANDROID_LIBRARY "Build Verovio as library for Android"         OFF)
@@ -45,6 +46,7 @@ include_directories(
 )
 
 if(MSVC)
+    add_compile_options(/bigobj)
     add_definitions(/W2)
     add_definitions(/wd4244)          # suppress warning of possible loss of precision
     add_definitions(-DNO_PAE_SUPPORT) # regex is working differently under Windows so PAE is not supported (yet)
@@ -114,7 +116,7 @@ endif()
 
 execute_process(
     COMMAND ../tools/get_git_commit.sh
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     OUTPUT_VARIABLE GIT_COMMIT
 )
 
@@ -159,6 +161,10 @@ else()
     ELSE(CURL_FOUND)
         MESSAGE(FATAL_ERROR "Could not find the CURL library and development files.")
     ENDIF(CURL_FOUND)
+endif()
+
+if(NO_EDIT_SUPPORT)
+    add_definitions(-DNO_EDIT_SUPPORT)
 endif()
 
 if(NO_RUNTIME)

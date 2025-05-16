@@ -31,7 +31,7 @@ public:
     virtual ~PitchInflection();
     Object *Clone() const override { return new PitchInflection(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "PitchInflection"; }
+    std::string GetClassName() const override { return "pitchInflection"; }
     ///@}
 
     /**

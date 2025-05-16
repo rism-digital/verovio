@@ -46,7 +46,7 @@ namespace vrv {
 // ScoreDefElement
 //----------------------------------------------------------------------------
 
-ScoreDefElement::ScoreDefElement() : Object(SCOREDEF_ELEMENT, "scoredefelement-"), ScoreDefInterface(), AttTyped()
+ScoreDefElement::ScoreDefElement() : Object(SCOREDEF_ELEMENT), ScoreDefInterface(), AttTyped()
 {
     this->RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
     this->RegisterAttClass(ATT_TYPED);
@@ -54,16 +54,7 @@ ScoreDefElement::ScoreDefElement() : Object(SCOREDEF_ELEMENT, "scoredefelement-"
     this->Reset();
 }
 
-ScoreDefElement::ScoreDefElement(ClassId classId) : Object(classId, "scoredefelement-"), ScoreDefInterface(), AttTyped()
-{
-    this->RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
-    this->RegisterAttClass(ATT_TYPED);
-
-    this->Reset();
-}
-
-ScoreDefElement::ScoreDefElement(ClassId classId, const std::string &classIdStr)
-    : Object(classId, classIdStr), ScoreDefInterface(), AttTyped()
+ScoreDefElement::ScoreDefElement(ClassId classId) : Object(classId), ScoreDefInterface(), AttTyped()
 {
     this->RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
     this->RegisterAttClass(ATT_TYPED);
@@ -222,7 +213,7 @@ MeterSigGrp *ScoreDefElement::GetMeterSigGrpCopy() const
 static const ClassRegistrar<ScoreDef> s_factory("scoreDef", SCOREDEF);
 
 ScoreDef::ScoreDef()
-    : ScoreDefElement(SCOREDEF, "scoredef-")
+    : ScoreDefElement(SCOREDEF)
     , ObjectListInterface()
     , AttDistances()
     , AttEndings()
@@ -256,41 +247,33 @@ void ScoreDef::Reset()
     m_setAsDrawing = false;
 }
 
-bool ScoreDef::IsSupportedChild(Object *child)
+bool ScoreDef::IsSupportedChild(ClassId classId)
 {
-    // Clef is actually not allowed as child of scoreDef in MEI
-    if (child->Is(CLEF)) {
-        assert(dynamic_cast<Clef *>(child));
+    static const std::vector<ClassId> supported{ CLEF, GRPSYM, KEYSIG, MENSUR, METERSIG, METERSIGGRP, STAFFGRP,
+        SYMBOLTABLE };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(GRPSYM)) {
-        assert(dynamic_cast<GrpSym *>(child));
-    }
-    else if (child->Is(KEYSIG)) {
-        assert(dynamic_cast<KeySig *>(child));
-    }
-    else if (child->Is(STAFFGRP)) {
-        assert(dynamic_cast<StaffGrp *>(child));
-    }
-    // Mensur is actually not allowed as child of scoreDef in MEI
-    else if (child->Is(MENSUR)) {
-        assert(dynamic_cast<Mensur *>(child));
-    }
-    else if (child->Is(METERSIG)) {
-        assert(dynamic_cast<MeterSig *>(child));
-    }
-    else if (child->Is(METERSIGGRP)) {
-        assert(dynamic_cast<MeterSigGrp *>(child));
-    }
-    else if (child->IsRunningElement()) {
-        assert(dynamic_cast<RunningElement *>(child));
-    }
-    else if (child->Is(SYMBOLTABLE)) {
-        assert(dynamic_cast<SymbolTable *>(child));
+    else if (Object::IsRunningElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
+}
+
+bool ScoreDef::AddChildAdditionalCheck(Object *child)
+{
+    // Clef and mensur are actually not allowed as child of scoreDef in MEI.
+    // Left as a warning for now.
+    if (child->Is(CLEF) && !child->IsAttribute()) {
+        LogWarning("Having <clef> as child of <scoreDef> is not valid MEI");
+    }
+    else if (child->Is(MENSUR) && !child->IsAttribute()) {
+        LogWarning("Having <clef> as child of <scoreDef> is not valid MEI");
+    }
+    return (ScoreDefElement::AddChildAdditionalCheck(child));
 }
 
 int ScoreDef::GetInsertOrderFor(ClassId classId) const
@@ -484,21 +467,21 @@ void ScoreDef::ResetFromDrawingValues()
         assert(staffDef);
 
         Clef *clef = vrv_cast<Clef *>(staffDef->FindDescendantByType(CLEF));
-        if (clef) *clef = *staffDef->GetCurrentClef();
+        if (clef) clef->ReplaceWithCopyOf(staffDef->GetCurrentClef());
 
         KeySig *keySig = vrv_cast<KeySig *>(staffDef->FindDescendantByType(KEYSIG));
-        if (keySig) *keySig = *staffDef->GetCurrentKeySig();
+        if (keySig) keySig->ReplaceWithCopyOf(staffDef->GetCurrentKeySig());
 
         Mensur *mensur = vrv_cast<Mensur *>(staffDef->FindDescendantByType(MENSUR));
-        if (mensur) *mensur = *staffDef->GetCurrentMensur();
+        if (mensur) mensur->ReplaceWithCopyOf(staffDef->GetCurrentMensur());
 
         MeterSigGrp *meterSigGrp = vrv_cast<MeterSigGrp *>(staffDef->FindDescendantByType(METERSIGGRP));
         MeterSig *meterSig = vrv_cast<MeterSig *>(staffDef->FindDescendantByType(METERSIG));
         if (meterSigGrp) {
-            *meterSigGrp = *staffDef->GetCurrentMeterSigGrp();
+            meterSigGrp->ReplaceWithCopyOf(staffDef->GetCurrentMeterSigGrp());
         }
         else if (meterSig) {
-            *meterSig = *staffDef->GetCurrentMeterSig();
+            meterSig->ReplaceWithCopyOf(staffDef->GetCurrentMeterSig());
         }
     }
 }

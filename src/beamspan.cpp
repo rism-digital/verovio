@@ -30,19 +30,17 @@ namespace vrv {
 static const ClassRegistrar<BeamSpan> s_factory("beamSpan", BEAMSPAN);
 
 BeamSpan::BeamSpan()
-    : ControlElement(BEAMSPAN, "beamspan-")
+    : ControlElement(BEAMSPAN)
     , BeamDrawingInterface()
     , PlistInterface()
     , TimeSpanningInterface()
     , AttBeamedWith()
     , AttBeamRend()
-    , AttColor()
 {
     RegisterInterface(PlistInterface::GetAttClasses(), PlistInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_BEAMEDWITH);
     RegisterAttClass(ATT_BEAMREND);
-    RegisterAttClass(ATT_COLOR);
 
     Reset();
     InitBeamSegments();
@@ -61,7 +59,6 @@ void BeamSpan::Reset()
     TimeSpanningInterface::Reset();
     ResetBeamedWith();
     ResetBeamRend();
-    ResetColor();
 
     ClearBeamSegments();
 }

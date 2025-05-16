@@ -41,7 +41,7 @@ public:
     virtual ~KeyAccid();
     Object *Clone() const override { return new KeyAccid(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "KeyAccid"; }
+    std::string GetClassName() const override { return "keyAccid"; }
     ///@}
 
     /**

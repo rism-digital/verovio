@@ -1223,15 +1223,15 @@ public:
     int GetLry() const { return m_lry; }
     bool HasLry() const;
     //
-    void SetRotate(double rotate_) { m_rotate = rotate_; }
-    double GetRotate() const { return m_rotate; }
+    void SetRotate(data_DEGREES rotate_) { m_rotate = rotate_; }
+    data_DEGREES GetRotate() const { return m_rotate; }
     bool HasRotate() const;
     ///@}
 
 private:
     /** Indicates the lower-right corner x coordinate. **/
     int m_lrx;
-    /** Indicates the lower-left corner x coordinate. **/
+    /** Indicates the lower-right corner y coordinate. **/
     int m_lry;
     /**
      * Indicates the amount by which the contents of this element have been rotated
@@ -1239,7 +1239,7 @@ private:
      * interpreted, with respect to the normal orientation of the parent surface.
      * The orientation is expressed in arc degrees.
      **/
-    double m_rotate;
+    data_DEGREES m_rotate;
 };
 
 //----------------------------------------------------------------------------
@@ -1529,6 +1529,55 @@ class InstDataPointing : public AttDataPointing {
 public:
     InstDataPointing() = default;
     virtual ~InstDataPointing() = default;
+};
+
+//----------------------------------------------------------------------------
+// AttDataSelecting
+//----------------------------------------------------------------------------
+
+class AttDataSelecting : public Att {
+protected:
+    AttDataSelecting();
+    ~AttDataSelecting() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetDataSelecting();
+
+    /** Read the values for the attribute class **/
+    bool ReadDataSelecting(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteDataSelecting(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetSelect(std::string select_) { m_select = select_; }
+    std::string GetSelect() const { return m_select; }
+    bool HasSelect() const;
+    ///@}
+
+private:
+    /** XPath used to select data to which an element or a property applies. **/
+    std::string m_select;
+};
+
+//----------------------------------------------------------------------------
+// InstDataSelecting
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttDataSelecting
+ */
+
+class InstDataSelecting : public AttDataSelecting {
+public:
+    InstDataSelecting() = default;
+    virtual ~InstDataSelecting() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -4436,6 +4485,8 @@ public:
     void SetHeadShape(data_HEADSHAPE headShape_) { m_headShape = headShape_; }
     data_HEADSHAPE GetHeadShape() const { return m_headShape; }
     bool HasHeadShape() const;
+    /** Getter for reference (for alternate type only) */
+    data_HEADSHAPE *GetHeadShapeAlternate() { return &m_headShape; }
     //
     void SetHeadVisible(data_BOOLEAN headVisible_) { m_headVisible = headVisible_; }
     data_BOOLEAN GetHeadVisible() const { return m_headVisible; }
@@ -4681,7 +4732,7 @@ public:
 private:
     /**
      * Determines the placement of notes on a 1-line staff.
-     * A value of 'true' places all notes on the line, while a value of 'false' places
+     * A value of true places all notes on the line, while a value of false places
      * stems-up notes above the line and stems-down notes below the line.
      **/
     data_BOOLEAN m_ontheline;
@@ -4734,7 +4785,7 @@ public:
 private:
     /**
      * Indicates whether staves without notes, rests, etc.
-     * should be displayed. When the value is 'true', empty staves are displayed.
+     * should be displayed. When the value is 'true', empty staves are not displayed.
      **/
     data_BOOLEAN m_optimize;
 };
@@ -5211,7 +5262,7 @@ public:
 private:
     /**
      * Indicates the placement of the item within the staff.
-     * A value of 'true' means on the staff, and 'false' off the staff.
+     * A value of true means on the staff, and false off the staff.
      **/
     data_BOOLEAN m_onstaff;
 };
@@ -7370,6 +7421,55 @@ class InstTuning : public AttTuning {
 public:
     InstTuning() = default;
     virtual ~InstTuning() = default;
+};
+
+//----------------------------------------------------------------------------
+// AttTuningLog
+//----------------------------------------------------------------------------
+
+class AttTuningLog : public Att {
+protected:
+    AttTuningLog();
+    ~AttTuningLog() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetTuningLog();
+
+    /** Read the values for the attribute class **/
+    bool ReadTuningLog(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteTuningLog(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetTuningStandard(data_COURSETUNING tuningStandard_) { m_tuningStandard = tuningStandard_; }
+    data_COURSETUNING GetTuningStandard() const { return m_tuningStandard; }
+    bool HasTuningStandard() const;
+    ///@}
+
+private:
+    /** Describes the tuning standard used. **/
+    data_COURSETUNING m_tuningStandard;
+};
+
+//----------------------------------------------------------------------------
+// InstTuningLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttTuningLog
+ */
+
+class InstTuningLog : public AttTuningLog {
+public:
+    InstTuningLog() = default;
+    virtual ~InstTuningLog() = default;
 };
 
 //----------------------------------------------------------------------------

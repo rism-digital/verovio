@@ -176,10 +176,98 @@ public:
 private:
     //
 };
+//----------------------------------------------------------------------------
+// InitTimemapAdjustNotesFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class adjusts note duration for grace notes and arpeggios.
+ */
+class InitTimemapAdjustNotesFunctor : public Functor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    InitTimemapAdjustNotesFunctor();
+    virtual ~InitTimemapAdjustNotesFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Setter for various properties
+     */
+    ///@{
+    void SetNoCue(bool noCue) { m_noCue = noCue; }
+    ///@}
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitArpeg(Arpeg *arpeg) override;
+    FunctorCode VisitChord(Chord *chord) override;
+    FunctorCode VisitGraceGrpEnd(GraceGrp *graceGrp) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitNote(Note *note) override;
+    ///@}
+
+protected:
+    //
+private:
+    /**
+     * Helper struct to store grace note/chord sequences
+     */
+    struct Grace {
+        std::list<Note *> notes;
+        data_DURATION duration;
+        data_PERCENT time;
+    };
+
+    /**
+     * Set the grace note onset and offset times for the reference note
+     */
+    void SetGraceNotesFor(Note *refNote);
+
+    /**
+     * Set the start (and stop) time for a note (score and real times)
+     */
+    void SetNoteStartStop(Note *note, const Fraction &startTime, const Fraction &stopTime);
+    void SetNoteStart(Note *note, const Fraction &startTime);
+
+public:
+    //
+private:
+    // Indicates whether cue notes should be included
+    bool m_noCue;
+    // Grace note/chord sequence
+    std::list<Grace> m_graces;
+    // Indicates whether the last grace note/chord was accented
+    bool m_accentedGraceNote;
+    // The current tempo
+    double m_currentTempo;
+    // The last (non grace) note
+    Note *m_lastNote;
+};
 
 //----------------------------------------------------------------------------
 // InitMIDIFunctor
 //----------------------------------------------------------------------------
+
+/**
+ * Helper struct to store octave data
+ */
+struct OctaveInfo {
+    const Octave *octave;
+    int staffN;
+    int layerN;
+    int octaveShift;
+    bool isActive;
+};
 
 /**
  * This class initializes the MIDI export.
@@ -206,15 +294,15 @@ public:
      */
     ///@{
     void SetCurrentTempo(double tempo) { m_currentTempo = tempo; }
-    const std::map<const Note *, double> &GetDeferredNotes() const { return m_deferredNotes; }
+    const std::list<OctaveInfo> &GetOctaves() const { return m_octaves; }
     ///@}
 
     /*
      * Functor interface
      */
     ///@{
-    FunctorCode VisitArpeg(const Arpeg *arpeg) override;
     FunctorCode VisitMeasure(const Measure *measure) override;
+    FunctorCode VisitOctave(const Octave *octave) override;
     ///@}
 
 protected:
@@ -226,8 +314,8 @@ public:
 private:
     // The current tempo
     double m_currentTempo;
-    // Deferred notes which start slightly later
-    std::map<const Note *, double> m_deferredNotes;
+    // Octave info which is collected
+    std::list<OctaveInfo> m_octaves;
 };
 
 //----------------------------------------------------------------------------
@@ -251,16 +339,6 @@ struct MIDIHeldNote {
     int m_pitch = 0;
     double m_stopTime = 0;
 };
-
-/**
- * Helper struct to store chord sequences in MIDI output due to grace notes
- */
-struct MIDIChord {
-    std::set<int> pitches;
-    double duration;
-};
-
-using MIDIChordSequence = std::list<MIDIChord>;
 
 /**
  * This class performs the export to a MidiFile.
@@ -292,9 +370,12 @@ public:
      */
     ///@{
     void SetChannel(int channel) { m_midiChannel = channel; }
-    void SetCueExclusion(bool cueExclusion) { m_cueExclusion = cueExclusion; }
+    void SetControlEvents(bool controlEvents) { m_controlEvents = controlEvents; }
+    void SetNoCue(bool noCue) { m_noCue = noCue; }
     void SetCurrentTempo(double tempo) { m_currentTempo = tempo; }
     void SetDeferredNotes(const std::map<const Note *, double> &deferredNotes) { m_deferredNotes = deferredNotes; }
+    void SetLayerN(int layerN) { m_layerN = layerN; }
+    void SetOctaves(const std::list<OctaveInfo> &octaves) { m_octaves = octaves; }
     void SetStaffN(int staffN) { m_staffN = staffN; }
     void SetTempoEventTicks(const std::set<int> &ticks) { m_tempoEventTicks = ticks; }
     void SetTrack(int track) { m_midiTrack = track; }
@@ -309,7 +390,6 @@ public:
     FunctorCode VisitBTrem(const BTrem *bTrem) override;
     FunctorCode VisitChord(const Chord *chord) override;
     FunctorCode VisitFTrem(const FTrem *fTrem) override;
-    FunctorCode VisitGraceGrpEnd(const GraceGrp *graceGrp) override;
     FunctorCode VisitHalfmRpt(const HalfmRpt *halfmRpt) override;
     FunctorCode VisitLayer(const Layer *layer) override;
     FunctorCode VisitLayerEnd(const Layer *layer) override;
@@ -334,25 +414,34 @@ private:
     void DeferMIDINote(const Note *refNote, double shift, bool includeChordSiblings);
 
     /**
-     * Creates the MIDI output of the grace note sequence
+     * Change the octave shift at the begin/end of octaves
      */
-    void GenerateGraceNoteMIDI(const Note *refNote, double startTime, int tpq, int channel, int velocity);
+    void HandleOctave(const LayerElement *layerElement);
+
+    /**
+     * Convenience helper
+     */
+    int GetMIDIPitch(const Note *note) { return note->GetMIDIPitch(m_transSemi, m_octaveShift); }
 
 public:
     //
 private:
     // The MidiFile we are writing to
     smf::MidiFile *m_midiFile;
-    // The midi track number
+    // The MIDI track number
     int m_midiTrack;
-    // The midi channel number
+    // The MIDI channel number
     int m_midiChannel;
     // The score time from the start of the music to the start of the current measure
     double m_totalTime;
     // The current staff number
     int m_staffN;
+    // The current layer number
+    int m_layerN;
     // The semi tone transposition for the current track
     int m_transSemi;
+    // The octave shift for the current track
+    int m_octaveShift;
     // The current tempo
     double m_currentTempo;
     // Tempo events are always added on track 0
@@ -364,14 +453,14 @@ private:
     std::map<const Note *, MIDINoteSequence> m_expandedNotes;
     // Deferred notes which start slightly later
     std::map<const Note *, double> m_deferredNotes;
-    // Grace note sequence
-    MIDIChordSequence m_graceNotes;
-    // Indicates whether the last grace note/chord was accented
-    bool m_accentedGraceNote;
+    // Octave info which is used to determine the octave shift
+    std::list<OctaveInfo> m_octaves;
     // Indicates whether cue notes should be included
-    bool m_cueExclusion;
+    bool m_noCue;
     // Tablature held notes indexed by (course - 1)
     std::vector<MIDIHeldNote> m_heldNotes;
+    // A flag indicating we want to process control events
+    bool m_controlEvents;
 };
 
 //----------------------------------------------------------------------------
@@ -399,7 +488,7 @@ public:
     /*
      * Set the cue exclusion flag
      */
-    void SetCueExclusion(bool cueExclusion) { m_cueExclusion = cueExclusion; }
+    void SetNoCue(bool noCue) { m_noCue = noCue; }
 
     /*
      * Functor interface
@@ -429,7 +518,7 @@ private:
     // The current tempo
     double m_currentTempo;
     // Indicates whether cue notes should be included
-    bool m_cueExclusion;
+    bool m_noCue;
     // The timemap
     Timemap *m_timemap;
 };

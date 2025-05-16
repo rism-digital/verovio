@@ -35,7 +35,7 @@ namespace vrv {
 // SystemAligner
 //----------------------------------------------------------------------------
 
-SystemAligner::SystemAligner() : Object(SYSTEM_ALIGNER), m_bottomAlignment(NULL), m_system(NULL)
+SystemAligner::SystemAligner() : Object(SYSTEM_ALIGNER)
 {
     this->Reset();
 }
@@ -54,9 +54,9 @@ void SystemAligner::Reset()
     this->AddChild(m_bottomAlignment);
 }
 
-bool SystemAligner::IsSupportedChild(Object *child)
+bool SystemAligner::IsSupportedChild(ClassId classId)
 {
-    assert(dynamic_cast<StaffAlignment *>(child));
+    // Nothing to check here
     return true;
 }
 
@@ -103,13 +103,14 @@ void SystemAligner::ReorderBy(const std::vector<int> &staffNs)
     ArrayOfObjects &children = this->GetChildrenForModification();
 
     // Since we have a bottom alignment, the number is +1
-    if (children.size() != staffNs.size() + 1) return;
+    // The children list can be smaller with optimized systems
+    if (children.size() > staffNs.size() + 1) return;
 
     ListOfObjects orderedAlignments;
     for (auto staffN : staffNs) {
         StaffAlignment *alignment = this->GetStaffAlignmentForStaffN(staffN);
-        // Something is wrong in the data, we keep the order as it is
-        if (!alignment) return;
+        // This happens with condensed systems where some alignment for staffN are not there
+        if (!alignment) continue;
         orderedAlignments.push_back(alignment);
     }
     int i = 0;
@@ -135,7 +136,7 @@ const StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN) cons
 
         if ((alignment->GetStaff()) && (alignment->GetStaff()->GetN() == staffN)) return alignment;
     }
-    LogDebug("Staff alignment for staff %d not found", staffN);
+    // LogDebug("Staff alignment for staff %d not found", staffN);
     return NULL;
 }
 
@@ -314,7 +315,8 @@ FunctorCode SystemAligner::AcceptEnd(ConstFunctor &functor) const
 StaffAlignment::StaffAlignment() : Object(STAFF_ALIGNMENT)
 {
     m_yRel = 0;
-    m_verseNs.clear();
+    m_verseAboveNs.clear();
+    m_verseBelowNs.clear();
     m_staff = NULL;
     m_floatingPositionersSorted = true;
 
@@ -436,39 +438,73 @@ void StaffAlignment::SetRequestedSpaceBelow(int space)
     }
 }
 
-void StaffAlignment::AddVerseN(int verseN)
+void StaffAlignment::AddVerseN(int verseN, data_STAFFREL place)
 {
     // if 0, then assume 1;
     verseN = std::max(verseN, 1);
-    m_verseNs.insert(verseN);
+    (place == STAFFREL_above) ? m_verseAboveNs.insert(verseN) : m_verseBelowNs.insert(verseN);
 }
 
 int StaffAlignment::GetVerseCount(bool collapse) const
 {
-    if (m_verseNs.empty()) {
+    return (this->GetVerseCountAbove(collapse) + this->GetVerseCountBelow(collapse));
+}
+
+int StaffAlignment::GetVerseCountAbove(bool collapse) const
+{
+    if (m_verseAboveNs.empty()) {
         return 0;
     }
     else if (collapse) {
-        return (int)m_verseNs.size();
+        return (int)m_verseAboveNs.size();
     }
     else {
-        return *m_verseNs.rbegin();
+        return (*m_verseAboveNs.rbegin());
     }
 }
 
-int StaffAlignment::GetVersePosition(int verseN, bool collapse) const
+int StaffAlignment::GetVerseCountBelow(bool collapse) const
 {
-    if (m_verseNs.empty()) {
+    if (m_verseBelowNs.empty()) {
+        return 0;
+    }
+    else if (collapse) {
+        return (int)m_verseBelowNs.size();
+    }
+    else {
+        return (*m_verseBelowNs.rbegin());
+    }
+}
+
+int StaffAlignment::GetVersePositionAbove(int verseN, bool collapse) const
+{
+    if (m_verseAboveNs.empty()) {
         // Syl in neumatic notation - since verse count will be 0, position is -1
         return -1;
     }
     else if (collapse) {
-        auto it = std::find(m_verseNs.rbegin(), m_verseNs.rend(), verseN);
-        int pos = (int)std::distance(m_verseNs.rbegin(), it);
+        auto it = std::find(m_verseAboveNs.begin(), m_verseAboveNs.end(), verseN);
+        int pos = (int)std::distance(m_verseAboveNs.begin(), it);
         return pos;
     }
     else {
-        return (*m_verseNs.rbegin()) - verseN;
+        return verseN - 1;
+    }
+}
+
+int StaffAlignment::GetVersePositionBelow(int verseN, bool collapse) const
+{
+    if (m_verseBelowNs.empty()) {
+        // Syl in neumatic notation - since verse count will be 0, position is -1
+        return -1;
+    }
+    else if (collapse) {
+        auto it = std::find(m_verseBelowNs.rbegin(), m_verseBelowNs.rend(), verseN);
+        int pos = (int)std::distance(m_verseBelowNs.rbegin(), it);
+        return pos;
+    }
+    else {
+        return (*m_verseBelowNs.rbegin()) - verseN;
     }
 }
 

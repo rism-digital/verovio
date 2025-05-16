@@ -75,6 +75,8 @@ public:
         m_baseHeight = 0;
         m_pushBack = false;
         m_viewBoxFactor = (double)DEFINITION_FACTOR;
+        this->SetBrush(1.0);
+        this->SetPen(1, PEN_SOLID);
     }
     DeviceContext(ClassId classId)
     {
@@ -91,8 +93,10 @@ public:
         m_baseHeight = 0;
         m_pushBack = false;
         m_viewBoxFactor = (double)DEFINITION_FACTOR;
+        this->SetBrush(1.0);
+        this->SetPen(1, PEN_SOLID);
     }
-    virtual ~DeviceContext() {}
+    virtual ~DeviceContext();
     ClassId GetClassId() const { return m_classId; }
     bool Is(ClassId classId) const { return (m_classId == classId); }
     ///@}
@@ -141,16 +145,17 @@ public:
      * Non-virtual methods cannot be overridden and manage the Pen, Brush and FontInfo stacks
      */
     ///@{
-    void SetBrush(int color, int opacity);
-    void SetPen(
-        int color, int width, int style, int dashLength = 0, int gapLength = 0, int lineCap = 0, int lineJoin = 0);
+    void SetBrush(float opacity, int color = COLOR_NONE);
+    void SetPen(int width, PenStyle style, int dashLength = 0, int gapLength = 0,
+        LineCapStyle lineCap = LINECAP_DEFAULT, LineJoinStyle lineJoin = LINEJOIN_DEFAULT, float opacity = 1.0,
+        int color = COLOR_NONE);
     void SetFont(FontInfo *font);
     void SetPushBack() { m_pushBack = true; }
     void ResetBrush();
     void ResetPen();
     void ResetFont();
     void ResetPushBack() { m_pushBack = false; }
-    virtual void SetBackground(int color, int style = AxSOLID) = 0;
+    virtual void SetBackground(int color, int style = PEN_SOLID) = 0;
     virtual void SetBackgroundImage(void *image, double opacity = 1.0) = 0;
     virtual void SetBackgroundMode(int mode) = 0;
     virtual void SetTextForeground(int color) = 0;
@@ -188,12 +193,13 @@ public:
     virtual void DrawQuadBezierPath(Point bezier[3]) = 0;
     virtual void DrawCubicBezierPath(Point bezier[4]) = 0;
     virtual void DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2[4]) = 0;
+    virtual void DrawBentParallelogramFilled(Point side[4], int height) = 0;
     virtual void DrawCircle(int x, int y, int radius) = 0;
     virtual void DrawEllipse(int x, int y, int width, int height) = 0;
     virtual void DrawEllipticArc(int x, int y, int width, int height, double start, double end) = 0;
     virtual void DrawLine(int x1, int y1, int x2, int y2) = 0;
-    virtual void DrawPolyline(int n, Point points[], int xOffset = 0, int yOffset = 0) = 0;
-    virtual void DrawPolygon(int n, Point points[], int xOffset = 0, int yOffset = 0) = 0;
+    virtual void DrawPolyline(int n, Point points[], bool close = false) = 0;
+    virtual void DrawPolygon(int n, Point points[]) = 0;
     virtual void DrawRectangle(int x, int y, int width, int height) = 0;
     virtual void DrawRotatedText(const std::string &text, int x, int y, double angle) = 0;
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, int radius) = 0;

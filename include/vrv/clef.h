@@ -47,7 +47,7 @@ public:
     virtual ~Clef();
     Object *Clone() const override { return new Clef(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Clef"; }
+    std::string GetClassName() const override { return "clef"; }
     ///@}
 
     /** Override the method since alignment is required */
@@ -59,7 +59,7 @@ public:
     /**
      * Return the offset of the clef
      */
-    int GetClefLocOffset(data_NOTATIONTYPE notationType) const;
+    int GetClefLocOffset() const;
 
     //----------------//
     // Static methods //

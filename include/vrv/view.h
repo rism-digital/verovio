@@ -18,6 +18,7 @@
 namespace vrv {
 
 class Accid;
+class AnnotScore;
 class Arpeg;
 class BarLine;
 class Beam;
@@ -111,30 +112,6 @@ public:
     ///@}
 
     /**
-     * @name Virtual methods that are triggered when necessary but they do nothing in
-     * the View class. They can be overridden when necessary in the child classses.
-     */
-    ///@{
-    virtual void OnBeginEdition() {}
-    virtual void OnEndEdition() {}
-    virtual void OnBeginEditionClef() {}
-    virtual void OnEndEditionClef() {}
-    virtual void DoRefresh() {}
-    virtual void DoResize() {}
-    virtual void DoReset() {}
-    virtual void OnPageChange() {}
-    ///@}
-
-    /**
-     * @name Navigation methods for changing the page in the view.
-     * Navigating will check that the page exists in the document and also set it
-     * by calling SetPage (with doLayout = true);
-     */
-    void Next(bool forward);
-    bool HasNext(bool forward);
-    ///@}
-
-    /**
      * Simply returns the value of the last note-type element (mensural or neume)
      */
     bool GetNotationMode();
@@ -161,12 +138,12 @@ public:
     ///@}
 
     /**
-     * Set the current page to pageIdx.
+     * Set the current page.
      * If doLayout is true, the layout of the page will be calculated.
      * This is the default behavior, however, in some cases, we do not
      * want it. For example, when drawing the pages for getting the bounding boxes.
      */
-    void SetPage(int pageIdx, bool doLayout = true);
+    void SetPage(Page *page, bool doLayout);
 
     /**
      * Method that actually draw the current page.
@@ -232,7 +209,7 @@ protected:
     void DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff);
     void DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *system, int yOffset);
     void DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
-    void DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
+    void DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, Measure *measure, System *system);
     void DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure);
     void DrawLayerList(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure, const ClassId classId);
     void DrawLayerDefLabels(
@@ -471,6 +448,8 @@ protected:
     ///@{
     void DrawControlElementConnector(DeviceContext *dc, ControlElement *element, int x1, int x2, Staff *staff,
         char spanningType, Object *graphic = NULL);
+    void DrawAnnotScore(DeviceContext *dc, AnnotScore *annotScore, int x1, int x2, Staff *staff, char spanningType,
+        Object *graphic = NULL);
     void DrawBracketSpan(DeviceContext *dc, BracketSpan *bracketSpan, int x1, int x2, Staff *staff, char spanningType,
         Object *graphic = NULL);
     void DrawFConnector(
@@ -579,8 +558,7 @@ protected:
     //     int staffSize, bool dimin, bool setBBGlyph = false);
 
     void DrawThickBezierCurve(
-        DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, int penStyle = AxSOLID);
-    void DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
+        DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, PenStyle penStyle = PEN_SOLID);
     void DrawTextString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params);
     void DrawDirString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params);
     void DrawDynamString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params, Rend *rend);
@@ -624,7 +602,7 @@ private:
     std::u32string IntToTimeSigFigures(unsigned short number);
     std::u32string IntToSmuflFigures(unsigned short number, int offset);
     int NestedTuplets(Object *object);
-    int GetSylYRel(int verseN, Staff *staff);
+    int GetSylYRel(int verseN, Staff *staff, data_STAFFREL place);
     int GetFYRel(F *f, Staff *staff);
     ///@}
 
@@ -642,7 +620,7 @@ private:
     void CalcBrevisPoints(
         Note *note, Staff *staff, Point *topLeft, Point *bottomRight, int sides[4], int shape, bool isMensuralBlack);
     void CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point points[4], int sides[4], int shape,
-        bool isMensuralBlack, bool firstHalf);
+        bool isMensuralBlack, bool firstHalf, bool straight);
 
     /**
      * Internal methods for drawing a BeamSegment
@@ -668,8 +646,6 @@ public:
     Doc *m_doc;
     /** Options of the document */
     Options *m_options;
-    /** Index of the current page */
-    int m_pageIdx;
 
     /**
      * @name The objects currently selected.
@@ -677,11 +653,6 @@ public:
      * useful for changing the color, for example
      */
     ///@{
-    LayerElement *m_currentElement;
-    Layer *m_currentLayer;
-    Measure *m_currentMeasure;
-    Staff *m_currentStaff;
-    System *m_currentSystem;
     Page *m_currentPage;
     ///@}
 

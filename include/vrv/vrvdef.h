@@ -38,8 +38,8 @@ namespace vrv {
 // Version
 //----------------------------------------------------------------------------
 
-#define VERSION_MAJOR 4
-#define VERSION_MINOR 5
+#define VERSION_MAJOR 5
+#define VERSION_MINOR 3
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -66,13 +66,14 @@ namespace vrv {
 #endif
 
 //----------------------------------------------------------------------------
-// Default midi values
+// Default MIDI values
 //----------------------------------------------------------------------------
 
 #define MIDI_VELOCITY 90
 #define MIDI_TEMPO 120
 
 #define UNACC_GRACENOTE_DUR 27 // in milliseconds
+#define UNACC_GRACENOTE_FRACTION Fraction(1, 2048)
 
 //----------------------------------------------------------------------------
 // Object defines
@@ -176,11 +177,13 @@ enum ClassId : uint16_t {
     // Ids for ControlElement child classes
     CONTROL_ELEMENT,
     ANCHOREDTEXT,
+    ANNOTSCORE,
     ARPEG,
     BEAMSPAN,
     BRACKETSPAN,
     BREATH,
     CAESURA,
+    CPMARK,
     DIR,
     DYNAM,
     FERMATA,
@@ -341,6 +344,12 @@ typedef std::list<Object *> ListOfObjects;
 
 typedef std::list<const Object *> ListOfConstObjects;
 
+typedef std::set<Object *> SetOfObjects;
+
+typedef std::set<const Object *> SetOfConstObjects;
+
+typedef std::set<const Object *> SetOfConstObjects;
+
 typedef std::vector<Note *> ChordNoteGroup;
 
 typedef std::vector<std::tuple<Alignment *, Alignment *, int>> ArrayOfAdjustmentTuples;
@@ -355,11 +364,13 @@ typedef std::multimap<std::string, LinkingInterface *> MapOfLinkingInterfaceIDPa
 
 typedef std::map<std::string, Note *> MapOfNoteIDPairs;
 
-typedef std::vector<std::pair<PlistInterface *, std::string>> ArrayOfPlistInterfaceIDPairs;
+typedef std::vector<std::pair<Object *, std::string>> ArrayOfPlistObjectIDPairs;
 
 typedef std::vector<CurveSpannedElement *> ArrayOfCurveSpannedElements;
 
 typedef std::list<std::pair<Object *, data_MEASUREBEAT>> ListOfObjectBeatPairs;
+
+typedef std::list<std::pair<const Object *, std::string>> ListOfObjectAttNamePairs;
 
 typedef std::list<std::pair<TimePointInterface *, ClassId>> ListOfPointingInterClassIdPairs;
 
@@ -396,6 +407,8 @@ typedef std::map<std::string, ClassId> MapOfStrClassIds;
 typedef std::vector<std::pair<LayerElement *, LayerElement *>> MeasureTieEndpoints;
 
 typedef bool (*NotePredicate)(const Note *);
+
+typedef std::vector<std::pair<LayerElement *, data_DURATION>> ArrayOfElementDurPairs;
 
 /**
  * Generic int map recursive structure for storing hierachy of values
@@ -523,6 +536,7 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 // the maximum is 255 (unsigned char)
 enum EditorialLevel {
     EDITORIAL_UNDEFINED = 0,
+    EDITORIAL_SCORE,
     EDITORIAL_TOPLEVEL,
     EDITORIAL_SCOREDEF,
     EDITORIAL_STAFFGRP,
@@ -669,6 +683,12 @@ enum GraphicID { PRIMARY = 0, SPANNING, SYMBOLREF };
 enum MeasureType { MEASURED = 0, UNMEASURED, NEUMELINE };
 
 //----------------------------------------------------------------------------
+// Focus status type
+//----------------------------------------------------------------------------
+
+enum FocusStatusType { FOCUS_UNSET = 0, FOCUS_SET, FOCUS_USED };
+
+//----------------------------------------------------------------------------
 // The score time unit (quarter note)
 //----------------------------------------------------------------------------
 
@@ -695,6 +715,7 @@ enum MeasureType { MEASURED = 0, UNMEASURED, NEUMELINE };
 //----------------------------------------------------------------------------
 
 #define TABLATURE_STAFF_RATIO 1.75
+#define GERMAN_TAB_STAFF_RATIO 2.2
 
 #define SUPER_SCRIPT_FACTOR 0.58
 #define SUPER_SCRIPT_POSITION -0.20 // lowered down from the midline

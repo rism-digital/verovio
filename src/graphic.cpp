@@ -25,7 +25,7 @@ namespace vrv {
 
 static const ClassRegistrar<Graphic> s_factory("graphic", GRAPHIC);
 
-Graphic::Graphic() : Object(GRAPHIC, "graphic-"), AttPointing(), AttWidth(), AttHeight(), AttTyped()
+Graphic::Graphic() : Object(GRAPHIC), AttPointing(), AttWidth(), AttHeight(), AttTyped()
 {
     this->RegisterAttClass(ATT_POINTING);
     this->RegisterAttClass(ATT_WIDTH);

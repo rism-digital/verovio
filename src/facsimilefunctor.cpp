@@ -43,7 +43,7 @@ SyncFromFacsimileFunctor::SyncFromFacsimileFunctor(Doc *doc) : Functor()
 
 FunctorCode SyncFromFacsimileFunctor::VisitLayerElement(LayerElement *layerElement)
 {
-    if (!layerElement->Is({ ACCID, BARLINE, CLEF, CUSTOS, DIVLINE, LIQUESCENT, NC, NOTE, REST, SYL }))
+    if (!layerElement->Is({ ACCID, BARLINE, CLEF, CUSTOS, DIVLINE, DOT, LIQUESCENT, NC, NOTE, REST, SYL }))
         return FUNCTOR_CONTINUE;
 
     Zone *zone = layerElement->GetZone();
@@ -184,7 +184,7 @@ FunctorCode SyncFromFacsimileFunctor::VisitStaff(Staff *staff)
         m_staffZones[staff] = zone;
 
         // The staff slope is going up. The y left position needs to be adjusted accordingly
-        if (zone->GetRotate() < 0) {
+        if (zone->HasRotate() && zone->GetRotate() < 0) {
             staff->m_drawingFacsY = staff->m_drawingFacsY
                 + (m_currentNeumeLine->m_drawingFacsX2 - m_currentNeumeLine->m_drawingFacsX1)
                     * tan(zone->GetRotate() * M_PI / 180.0);
@@ -221,7 +221,7 @@ SyncToFacsimileFunctor::SyncToFacsimileFunctor(Doc *doc, double ppuFactor) : Fun
 
 FunctorCode SyncToFacsimileFunctor::VisitLayerElement(LayerElement *layerElement)
 {
-    if (!layerElement->Is({ ACCID, BARLINE, CLEF, CUSTOS, DIVLINE, LIQUESCENT, NC, NOTE, REST, SYL }))
+    if (!layerElement->Is({ ACCID, BARLINE, CLEF, CUSTOS, DOT, DIVLINE, LIQUESCENT, NC, NOTE, REST, SYL }))
         return FUNCTOR_CONTINUE;
 
     Zone *zone = this->GetZone(layerElement, layerElement->GetClassName());

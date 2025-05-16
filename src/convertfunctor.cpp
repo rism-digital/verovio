@@ -63,7 +63,7 @@ FunctorCode ConvertToPageBasedFunctor::VisitEditorialElement(EditorialElement *e
 
 FunctorCode ConvertToPageBasedFunctor::VisitEditorialElementEnd(EditorialElement *editorialElement)
 {
-    if (editorialElement->m_visibility == Visible) {
+    if (!editorialElement->IsHidden()) {
         editorialElement->ConvertToPageBasedMilestone(editorialElement, m_currentSystem);
     }
 
@@ -103,7 +103,7 @@ FunctorCode ConvertToPageBasedFunctor::VisitMdiv(Mdiv *mdiv)
 
 FunctorCode ConvertToPageBasedFunctor::VisitMdivEnd(Mdiv *mdiv)
 {
-    if (mdiv->m_visibility == Visible) {
+    if (!mdiv->IsHidden()) {
         mdiv->ConvertToPageBasedMilestone(mdiv, m_page);
     }
 
@@ -280,7 +280,7 @@ bool ConvertToCastOffMensuralFunctor::IsValidBreakPoint(const Alignment *alignme
         }
         // When we have more than one neume in a syllable, every neume has its own alignment.
         // Only the first one, which is shared with the syllable, is a valid break point
-        if (child->FindDescendantByType(NEUME) && !child->FindDescendantByType(SYLLABLE)) {
+        if (child->FindDescendantByType(NC) && !child->FindDescendantByType(SYLLABLE)) {
             return false;
         }
     }
@@ -612,7 +612,7 @@ FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
 FunctorCode ConvertToCmnFunctor::VisitMeasureEnd(Measure *measure)
 {
     // This is the first measure in the system - we need to update the scoreDef
-    if (m_score) {
+    if (m_score && m_score->GetScoreDef()) {
         for (Object *child : m_score->GetScoreDef()->GetList()) {
             StaffDef *staffDef = vrv_cast<StaffDef *>(child);
             assert(staffDef);
@@ -965,8 +965,8 @@ void ConvertToCmnFunctor::SplitDurationIntoCmn(
     const int semiBrevisDots = (prolatioMajor) ? 1 : 0;
     const int brevisDots = (tempusPerfectum) ? 1 : 0;
 
-    const Fraction semiBrevis = Fraction(1, 1) * abs(mensur->GetProlatio()) / 2;
-    const Fraction brevis = Fraction(1, 1) * abs(mensur->GetTempus());
+    const Fraction semiBrevis = Fraction(1) * abs(mensur->GetProlatio()) / 2;
+    const Fraction brevis = Fraction(1) * abs(mensur->GetTempus());
 
     // First see if we are expecting a breve and if the duration is long enough
     if (elementDur == DURATION_breve) {

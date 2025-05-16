@@ -25,11 +25,11 @@
 #include "attdef.h"
 #include "atttypes.h"
 #include "toolkitdef.h"
+#include "vrvdef.h"
 
 namespace vrv {
 
 class Object;
-
 /**
  * The following functions are helpers for formatting, conversion, or logging.
  * Most of them differ if they are used in the command line tool or in emscripten
@@ -55,7 +55,7 @@ LogLevel StrToLogLevel(const std::string &level);
 /**
  * Utility for comparing doubles
  */
-bool AreEqual(double dFirstVal, double dSecondVal);
+bool ApproximatelyEqual(double firstVal, double secondVal);
 
 /**
  * Utility to check if the string is a valid integer for std::stoi
@@ -76,6 +76,11 @@ bool IsDigits(const std::string &value);
  * Extract the ID from any URI
  */
 std::string ExtractIDFragment(std::string refID);
+
+/**
+ * Concatentate a list of IDs into a string of URIs
+ */
+std::string ConcatenateIDs(const ListOfConstObjects &objects);
 
 /**
  * Utility for converting UTF32 (std::u32string) to UTF-8
@@ -132,11 +137,17 @@ std::string FromCamelCase(const std::string &s);
  */
 std::string ToCamelCase(const std::string &s);
 
-/*
- * Min / Max for data_DURATION (std::min/max not possible)
+/**
+ * Min / Max for data_DURATION
  */
-data_DURATION DurationMin(data_DURATION dur1, data_DURATION dur2);
-data_DURATION DurationMax(data_DURATION dur1, data_DURATION dur2);
+inline data_DURATION DurationMin(data_DURATION dur1, data_DURATION dur2)
+{
+    return std::min(dur1, dur2);
+}
+inline data_DURATION DurationMax(data_DURATION dur1, data_DURATION dur2)
+{
+    return std::max(dur1, dur2);
+}
 
 /**
  *

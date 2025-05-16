@@ -602,8 +602,8 @@ void BeamSegment::CalcBeamInit(
         beamInterface->m_beamWidthBlack /= 2;
         beamInterface->m_beamWidthWhite /= 2;
 
-        // Adjust it further for tab.lute.french and tab.lute.italian
-        if (staff->IsTabLuteFrench() || staff->IsTabLuteItalian()) {
+        // Adjust it further for tab.lute.french, tab.lute.german and tab.lute.italian
+        if (staff->IsTabLuteFrench() || staff->IsTabLuteGerman() || staff->IsTabLuteItalian()) {
             beamInterface->m_beamWidthBlack = beamInterface->m_beamWidthBlack * 2 / 5;
             beamInterface->m_beamWidthWhite = beamInterface->m_beamWidthWhite * 3 / 5;
         }
@@ -1598,7 +1598,7 @@ void BeamSegment::RequestStaffSpace(const Doc *doc, const BeamDrawingInterface *
 
 static const ClassRegistrar<Beam> s_factory("beam", BEAM);
 
-Beam::Beam() : LayerElement(BEAM, "beam-"), BeamDrawingInterface(), AttBeamedWith(), AttBeamRend(), AttColor(), AttCue()
+Beam::Beam() : LayerElement(BEAM), BeamDrawingInterface(), AttBeamedWith(), AttBeamRend(), AttColor(), AttCue()
 {
     this->RegisterAttClass(ATT_BEAMEDWITH);
     this->RegisterAttClass(ATT_BEAMREND);
@@ -1631,48 +1631,20 @@ void Beam::CloneReset()
     LayerElement::CloneReset();
 }
 
-bool Beam::IsSupportedChild(Object *child)
+bool Beam::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(BEAM)) {
-        assert(dynamic_cast<Beam *>(child));
+    static const std::vector<ClassId> supported{ BEAM, BTREM, CHORD, CLEF, FTREM, GRACEGRP, NOTE, REST, SPACE, TABGRP,
+        TUPLET };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(BTREM)) {
-        assert(dynamic_cast<BTrem *>(child));
-    }
-    else if (child->Is(CHORD)) {
-        assert(dynamic_cast<Chord *>(child));
-    }
-    else if (child->Is(CLEF)) {
-        assert(dynamic_cast<Clef *>(child));
-    }
-    else if (child->Is(FTREM)) {
-        assert(dynamic_cast<FTrem *>(child));
-    }
-    else if (child->Is(GRACEGRP)) {
-        assert(dynamic_cast<GraceGrp *>(child));
-    }
-    else if (child->Is(NOTE)) {
-        assert(dynamic_cast<Note *>(child));
-    }
-    else if (child->Is(REST)) {
-        assert(dynamic_cast<Rest *>(child));
-    }
-    else if (child->Is(SPACE)) {
-        assert(dynamic_cast<Space *>(child));
-    }
-    else if (child->Is(TABGRP)) {
-        assert(dynamic_cast<TabGrp *>(child));
-    }
-    else if (child->Is(TUPLET)) {
-        assert(dynamic_cast<Tuplet *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 void Beam::FilterList(ListOfConstObjects &childList) const

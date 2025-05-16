@@ -40,7 +40,7 @@ public:
     virtual ~MRest();
     Object *Clone() const override { return new MRest(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "MRest"; }
+    std::string GetClassName() const override { return "mRest"; }
     ///@}
 
     /**

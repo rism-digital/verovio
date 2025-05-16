@@ -35,7 +35,7 @@ public:
     SystemMilestoneEnd(Object *start);
     virtual ~SystemMilestoneEnd();
     void Reset() override;
-    std::string GetClassName() const override { return "SystemMilestoneEnd"; }
+    std::string GetClassName() const override { return "systemMilestoneEnd"; }
     ///@}
 
     void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }

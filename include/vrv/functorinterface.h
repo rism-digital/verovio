@@ -16,6 +16,7 @@ class Accid;
 class Alignment;
 class AlignmentReference;
 class AnchoredText;
+class AnnotScore;
 class Arpeg;
 class Artic;
 class BarLine;
@@ -30,6 +31,7 @@ class Chord;
 class Clef;
 class ControlElement;
 class Course;
+class CpMark;
 class Custos;
 class Dir;
 class Div;
@@ -280,6 +282,8 @@ public:
     ///@{
     virtual FunctorCode VisitAnchoredText(AnchoredText *anchoredText);
     virtual FunctorCode VisitAnchoredTextEnd(AnchoredText *anchoredText);
+    virtual FunctorCode VisitAnnotScore(AnnotScore *annotScore);
+    virtual FunctorCode VisitAnnotScoreEnd(AnnotScore *annotScore);
     virtual FunctorCode VisitArpeg(Arpeg *arpeg);
     virtual FunctorCode VisitArpegEnd(Arpeg *arpeg);
     virtual FunctorCode VisitBeamSpan(BeamSpan *beamSpan);
@@ -292,6 +296,8 @@ public:
     virtual FunctorCode VisitCaesuraEnd(Caesura *caesura);
     virtual FunctorCode VisitControlElement(ControlElement *controlElement);
     virtual FunctorCode VisitControlElementEnd(ControlElement *controlElement);
+    virtual FunctorCode VisitCpMark(CpMark *cpMark);
+    virtual FunctorCode VisitCpMarkEnd(CpMark *cpMark);
     virtual FunctorCode VisitDir(Dir *dir);
     virtual FunctorCode VisitDirEnd(Dir *dir);
     virtual FunctorCode VisitDynam(Dynam *dynam);
@@ -653,6 +659,8 @@ public:
     ///@{
     virtual FunctorCode VisitAnchoredText(const AnchoredText *anchoredText);
     virtual FunctorCode VisitAnchoredTextEnd(const AnchoredText *anchoredText);
+    virtual FunctorCode VisitAnnotScore(const AnnotScore *annotScore);
+    virtual FunctorCode VisitAnnotScoreEnd(const AnnotScore *annotScore);
     virtual FunctorCode VisitArpeg(const Arpeg *arpeg);
     virtual FunctorCode VisitArpegEnd(const Arpeg *arpeg);
     virtual FunctorCode VisitBeamSpan(const BeamSpan *beamSpan);
@@ -665,6 +673,8 @@ public:
     virtual FunctorCode VisitCaesuraEnd(const Caesura *caesura);
     virtual FunctorCode VisitControlElement(const ControlElement *controlElement);
     virtual FunctorCode VisitControlElementEnd(const ControlElement *controlElement);
+    virtual FunctorCode VisitCpMark(const CpMark *cpMark);
+    virtual FunctorCode VisitCpMarkEnd(const CpMark *cpMark);
     virtual FunctorCode VisitDir(const Dir *dir);
     virtual FunctorCode VisitDirEnd(const Dir *dir);
     virtual FunctorCode VisitDynam(const Dynam *dynam);

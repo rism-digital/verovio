@@ -500,7 +500,8 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     }
 
     // special case where we want to replace some unicode music points to SMuFL
-    if (text->GetFirstAncestor(DIR) || text->GetFirstAncestor(ORNAM) || text->GetFirstAncestor(REPEATMARK)) {
+    if (text->GetFirstAncestor(CPMARK) || text->GetFirstAncestor(DIR) || text->GetFirstAncestor(ORNAM)
+        || text->GetFirstAncestor(REPEATMARK)) {
         this->DrawDirString(dc, text->GetText(), params);
     }
     else if (text->GetFirstAncestor(DYNAM)) {
@@ -679,13 +680,11 @@ void View::DrawTextLayoutElement(DeviceContext *dc, TextLayoutElement *textLayou
 
     textElementFont.SetPointSize(params.m_pointSize);
 
-    dc->SetBrush(m_currentColor, AxSOLID);
     dc->SetFont(&textElementFont);
 
     this->DrawRunningChildren(dc, textLayoutElement, params);
 
     dc->ResetFont();
-    dc->ResetBrush();
 
     dc->EndGraphic(textLayoutElement, this);
 }

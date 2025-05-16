@@ -24,7 +24,7 @@ namespace vrv {
 
 static const ClassRegistrar<Annot> s_factory("annot", ANNOT);
 
-Annot::Annot() : EditorialElement(ANNOT, "annot-"), TextListInterface(), AttPlist(), AttSource()
+Annot::Annot() : EditorialElement(ANNOT), TextListInterface(), AttPlist(), AttSource()
 {
     this->RegisterAttClass(ATT_PLIST);
     this->RegisterAttClass(ATT_SOURCE);
@@ -41,18 +41,19 @@ void Annot::Reset()
     this->ResetSource();
 }
 
-bool Annot::IsSupportedChild(Object *child)
+bool Annot::IsSupportedChild(ClassId classId)
 {
-    if (child->IsTextElement()) {
-        assert(dynamic_cast<TextElement *>(child));
+    static const std::vector<ClassId> supported{ ANNOT };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(ANNOT)) {
-        assert(dynamic_cast<Annot *>(child));
+    else if (Object::IsTextElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 //----------------------------------------------------------------------------

@@ -28,6 +28,7 @@ class Add;
 class AltSymInterface;
 class AnchoredText;
 class Annot;
+class AnnotScore;
 class App;
 class AreaPosInterface;
 class Arpeg;
@@ -46,6 +47,7 @@ class Clef;
 class ControlElement;
 class Corr;
 class Course;
+class CpMark;
 class Custos;
 class Damage;
 class Del;
@@ -200,7 +202,12 @@ public:
     /**
      * The main method for exporting the file to MEI.
      */
-    bool Export();
+    std::string Export() override;
+
+    /**
+     * Method for skipping under certain circumstances
+     */
+    bool Skip(Object *object) const override;
 
     /**
      * The main method for writing objects.
@@ -211,16 +218,10 @@ public:
     ///@}
 
     /**
-     * Return the output as a string by writing it to the stringstream member.
-     */
-    std::string GetOutput();
-
-    /**
      * @name Setter and getter for score-based MEI output
      */
     ///@{
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; }
-    bool GetScoreBasedMEI() const { return m_scoreBasedMEI; }
     ///@}
 
     /**
@@ -245,11 +246,12 @@ public:
     ///@}
 
     /**
-     * @name Gettersto improve code readability
+     * @name Getters to improve code readability
      */
     ///@{
     bool IsScoreBasedMEI() const { return m_scoreBasedMEI; }
     bool IsPageBasedMEI() const { return !m_scoreBasedMEI; }
+    bool IsSerializing() const { return m_serializing; }
     ///@}
 
     /**
@@ -261,6 +263,11 @@ public:
      * Setter for ignore header flag for the MEI output (default is false)
      */
     void SetIgnoreHeader(bool ignoreHeader) { m_ignoreHeader = ignoreHeader; }
+
+    /**
+     * Setter for the page-based serialization flag (default is false)
+     */
+    void SetSerializing(bool serializing) { m_serializing = serializing; }
 
     /**
      * Setter for remove ids flag for the MEI output (default is false)
@@ -432,11 +439,13 @@ private:
      */
     ///@{
     void WriteAnchoredText(pugi::xml_node currentNode, AnchoredText *anchoredText);
+    void WriteAnnotScore(pugi::xml_node currentNode, AnnotScore *annotScore);
     void WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg);
     void WriteBeamSpan(pugi::xml_node currentNode, BeamSpan *beamSpan);
     void WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracketSpan);
     void WriteBreath(pugi::xml_node currentNode, Breath *breath);
     void WriteCaesura(pugi::xml_node currentNode, Caesura *caesura);
+    void WriteCpMark(pugi::xml_node currentNode, CpMark *cpMark);
     void WriteDir(pugi::xml_node currentNode, Dir *dir);
     void WriteDynam(pugi::xml_node currentNode, Dynam *dynam);
     void WriteFermata(pugi::xml_node currentNode, Fermata *fermata);
@@ -562,11 +571,16 @@ private:
 public:
     //
 private:
-    std::ostringstream m_streamStringOutput;
+    /** The number of spaces for the indentation */
     int m_indent;
+    /** A flag indicating if we are writing score-based or page-based MEI */
     bool m_scoreBasedMEI;
     /** A flag indicating that we want to produce MEI basic */
     bool m_basic;
+    /** A flag indicating we are serializing page-based MEI */
+    bool m_serializing;
+
+    /** The document node */
     pugi::xml_node m_mei;
 
     /** Current xml element */
@@ -595,7 +609,7 @@ private:
 
     bool m_ignoreHeader;
     bool m_removeIds;
-    ListOfObjects m_referredObjects;
+    SetOfConstObjects m_referredObjects;
 };
 
 //----------------------------------------------------------------------------
@@ -615,6 +629,11 @@ public:
 
     bool Import(const std::string &mei) override;
 
+    /**
+     * Setter for the page-based deserialization flag (default is false).
+     */
+    void SetDeserializing(bool deserializing) { m_deserializing = deserializing; }
+
 private:
     bool ReadDoc(pugi::xml_node root);
     bool ReadIncipits(pugi::xml_node root);
@@ -623,6 +642,7 @@ private:
     bool ReadMdiv(Object *parent, pugi::xml_node parentNode, bool isVisible);
     bool ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool isVisible);
     bool ReadScore(Object *parent, pugi::xml_node parentNode);
+    bool ReadScoreScoreDef(Object *parent, pugi::xml_node parentNode);
     ///@}
 
     /**
@@ -753,6 +773,7 @@ private:
     bool ReadBracketSpan(Object *parent, pugi::xml_node bracketSpan);
     bool ReadBreath(Object *parent, pugi::xml_node breath);
     bool ReadCaesura(Object *parent, pugi::xml_node caesura);
+    bool ReadCpMark(Object *parent, pugi::xml_node cpMark);
     bool ReadDir(Object *parent, pugi::xml_node dir);
     bool ReadDynam(Object *parent, pugi::xml_node dynam);
     bool ReadFermata(Object *parent, pugi::xml_node fermata);
@@ -800,6 +821,7 @@ private:
     bool ReadAbbr(Object *parent, pugi::xml_node abbr, EditorialLevel level, Object *filter = NULL);
     bool ReadAdd(Object *parent, pugi::xml_node add, EditorialLevel level, Object *filter = NULL);
     bool ReadAnnot(Object *parent, pugi::xml_node annot);
+    bool ReadAnnotScore(Object *parent, pugi::xml_node annot);
     bool ReadApp(Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter = NULL);
     bool ReadAppChildren(Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter = NULL);
     bool ReadChoice(Object *parent, pugi::xml_node choice, EditorialLevel level, Object *filter = NULL);
@@ -864,6 +886,11 @@ private:
      * Write unsupported attributes and store them in Object::m_unsupported (not tested)
      */
     void ReadUnsupportedAttr(pugi::xml_node element, Object *object);
+
+    /**
+     * Returns true if the element is a 'score' annotation. Currently based on @type
+     */
+    bool IsAnnotScore(pugi::xml_node element);
 
     /**
      * Returns true if the element is name is an editorial element (e.g., "app", "supplied", etc.)
@@ -967,6 +994,9 @@ private:
      * The comment to be attached to the next Object
      */
     std::string m_comment;
+
+    /** A flag indicating we are deserializing page-based MEI */
+    bool m_deserializing;
 
     //----------------//
     // Static members //

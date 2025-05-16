@@ -819,27 +819,14 @@ enum data_GRACE : int8_t {
 };
 
 /**
- * MEI data.HEADSHAPE
+ * MEI data.HARPPEDALPOSITION
  */
-enum data_HEADSHAPE : int8_t {
-    HEADSHAPE_NONE = 0,
-    HEADSHAPE_quarter,
-    HEADSHAPE_half,
-    HEADSHAPE_whole,
-    HEADSHAPE_backslash,
-    HEADSHAPE_circle,
-    HEADSHAPE_plus,
-    HEADSHAPE_diamond,
-    HEADSHAPE_isotriangle,
-    HEADSHAPE_oval,
-    HEADSHAPE_piewedge,
-    HEADSHAPE_rectangle,
-    HEADSHAPE_rtriangle,
-    HEADSHAPE_semicircle,
-    HEADSHAPE_slash,
-    HEADSHAPE_square,
-    HEADSHAPE_x,
-    HEADSHAPE_MAX
+enum data_HARPPEDALPOSITION : int8_t {
+    HARPPEDALPOSITION_NONE = 0,
+    HARPPEDALPOSITION_f,
+    HARPPEDALPOSITION_n,
+    HARPPEDALPOSITION_s,
+    HARPPEDALPOSITION_MAX
 };
 
 /**
@@ -1350,12 +1337,12 @@ enum data_NOTATIONTYPE : int8_t {
     NOTATIONTYPE_mensural,
     NOTATIONTYPE_mensural_black,
     NOTATIONTYPE_mensural_white,
+    NOTATIONTYPE_neume,
+    NOTATIONTYPE_tab,
+    NOTATIONTYPE_tab_guitar,
     NOTATIONTYPE_tab_lute_french,
     NOTATIONTYPE_tab_lute_italian,
     NOTATIONTYPE_tab_lute_german,
-    NOTATIONTYPE_tab_guitar,
-    NOTATIONTYPE_neume,
-    NOTATIONTYPE_tab,
     NOTATIONTYPE_MAX
 };
 
@@ -2067,83 +2054,6 @@ enum harmVis_RENDGRID : int8_t {
 };
 
 /**
- * MEI att.harpPedal.log\@a
- */
-enum harpPedalLog_A : int8_t {
-    harpPedalLog_A_NONE = 0,
-    harpPedalLog_A_f,
-    harpPedalLog_A_n,
-    harpPedalLog_A_s,
-    harpPedalLog_A_MAX
-};
-
-/**
- * MEI att.harpPedal.log\@b
- */
-enum harpPedalLog_B : int8_t {
-    harpPedalLog_B_NONE = 0,
-    harpPedalLog_B_f,
-    harpPedalLog_B_n,
-    harpPedalLog_B_s,
-    harpPedalLog_B_MAX
-};
-
-/**
- * MEI att.harpPedal.log\@c
- */
-enum harpPedalLog_C : int8_t {
-    harpPedalLog_C_NONE = 0,
-    harpPedalLog_C_f,
-    harpPedalLog_C_n,
-    harpPedalLog_C_s,
-    harpPedalLog_C_MAX
-};
-
-/**
- * MEI att.harpPedal.log\@d
- */
-enum harpPedalLog_D : int8_t {
-    harpPedalLog_D_NONE = 0,
-    harpPedalLog_D_f,
-    harpPedalLog_D_n,
-    harpPedalLog_D_s,
-    harpPedalLog_D_MAX
-};
-
-/**
- * MEI att.harpPedal.log\@e
- */
-enum harpPedalLog_E : int8_t {
-    harpPedalLog_E_NONE = 0,
-    harpPedalLog_E_f,
-    harpPedalLog_E_n,
-    harpPedalLog_E_s,
-    harpPedalLog_E_MAX
-};
-
-/**
- * MEI att.harpPedal.log\@f
- */
-enum harpPedalLog_F : int8_t {
-    harpPedalLog_F_NONE = 0,
-    harpPedalLog_F_f,
-    harpPedalLog_F_n,
-    harpPedalLog_F_s,
-    harpPedalLog_F_MAX
-};
-
-/**
- * MEI att.harpPedal.log\@g
- */
-enum harpPedalLog_G : int8_t {
-    harpPedalLog_G_NONE = 0,
-    harpPedalLog_G_f,
-    harpPedalLog_G_n,
-    harpPedalLog_G_s,
-    harpPedalLog_G_MAX
-};
-
-/**
  * MEI att.line.log\@func
  */
 enum lineLog_FUNC : int8_t {
@@ -2189,10 +2099,15 @@ enum meiVersion_MEIVERSION : int8_t {
     meiVersion_MEIVERSION_4_0_0,
     meiVersion_MEIVERSION_4_0_1,
     meiVersion_MEIVERSION_5_0,
+    meiVersion_MEIVERSION_5_1,
     meiVersion_MEIVERSION_5_0plusbasic,
     meiVersion_MEIVERSION_5_0plusCMN,
     meiVersion_MEIVERSION_5_0plusMensural,
     meiVersion_MEIVERSION_5_0plusNeumes,
+    meiVersion_MEIVERSION_5_1plusbasic,
+    meiVersion_MEIVERSION_5_1plusCMN,
+    meiVersion_MEIVERSION_5_1plusMensural,
+    meiVersion_MEIVERSION_5_1plusNeumes,
     meiVersion_MEIVERSION_MAX
 };
 

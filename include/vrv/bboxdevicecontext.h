@@ -49,7 +49,7 @@ public:
      * @name Setters
      */
     ///@{
-    void SetBackground(int color, int style = AxSOLID) override;
+    void SetBackground(int color, int style = PEN_SOLID) override;
     void SetBackgroundImage(void *image, double opacity = 1.0) override {};
     void SetBackgroundMode(int mode) override;
     void SetTextForeground(int color) override;
@@ -72,12 +72,13 @@ public:
     void DrawQuadBezierPath(Point bezier[3]) override;
     void DrawCubicBezierPath(Point bezier[4]) override;
     void DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2[4]) override;
+    void DrawBentParallelogramFilled(Point side[4], int height) override;
     void DrawCircle(int x, int y, int radius) override;
     void DrawEllipse(int x, int y, int width, int height) override;
     void DrawEllipticArc(int x, int y, int width, int height, double start, double end) override;
     void DrawLine(int x1, int y1, int x2, int y2) override;
-    void DrawPolyline(int n, Point points[], int xOffset, int yOffset) override;
-    void DrawPolygon(int n, Point points[], int xOffset, int yOffset) override;
+    void DrawPolyline(int n, Point points[], bool close) override;
+    void DrawPolygon(int n, Point points[]) override;
     void DrawRectangle(int x, int y, int width, int height) override;
     void DrawRotatedText(const std::string &text, int x, int y, double angle) override;
     void DrawRoundedRectangle(int x, int y, int width, int height, int radius) override;

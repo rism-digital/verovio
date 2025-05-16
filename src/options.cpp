@@ -44,6 +44,9 @@ const std::map<int, std::string> Option::s_footer
 const std::map<int, std::string> Option::s_header
     = { { HEADER_none, "none" }, { HEADER_auto, "auto" }, { HEADER_encoded, "encoded" } };
 
+const std::map<int, std::string> Option::s_ligatureOblique
+    = { { LIGATURE_OBL_auto, "auto" }, { LIGATURE_OBL_straight, "straight" }, { LIGATURE_OBL_curved, "curved" } };
+
 const std::map<int, std::string> Option::s_multiRestStyle = { { MULTIRESTSTYLE_auto, "auto" },
     { MULTIRESTSTYLE_default, "default" }, { MULTIRESTSTYLE_block, "block" }, { MULTIRESTSTYLE_symbols, "symbols" } };
 
@@ -917,7 +920,7 @@ Options::Options()
     m_inputFrom.SetInfo("Input from",
         "Select input format from: \"abc\", \"cmme.xml\", \"darms\", \"esac\", \"humdrum\", \"mei\", \"pae\", "
         "\"volpiano\", \"xml\" "
-        "(musicxml), \"musicxml-hum\" (musicxml via humdrum)");
+        "(musicxml), \"musicxml-hum\" (musicxml via humdrum) or \"mei-pb-serialized\"");
     m_inputFrom.Init("mei");
     m_inputFrom.SetKey("inputFrom");
     m_inputFrom.SetShortOption('f', false);
@@ -955,8 +958,7 @@ Options::Options()
 
     m_outputTo.SetInfo("Output to",
         "Select output format to: \"mei\", \"mei-pb\", \"mei-facs\", \"mei-basic\", \"svg\", \"midi\", \"timemap\", "
-        "\"expansionmap\", \"humdrum\" or "
-        "\"pae\"");
+        "\"expansionmap\", \"humdrum\", \"pae\" or \"mei-pb-serialized\"");
     m_outputTo.Init("svg");
     m_outputTo.SetKey("outputTo");
     m_outputTo.SetShortOption('t', true);
@@ -1370,6 +1372,10 @@ Options::Options()
     m_lyricElision.SetInfo("Lyric elision", "The lyric elision width");
     m_lyricElision.Init(ELISION_regular, &Option::s_elision);
     this->Register(&m_lyricElision, "lyricElision", &m_generalLayout);
+
+    m_lyricHeightFactor.SetInfo("Lyric height factor", "The lyric verse line height factor");
+    m_lyricHeightFactor.Init(1.0, 1.0, 20.0);
+    this->Register(&m_lyricHeightFactor, "lyricHeightFactor", &m_generalLayout);
 
     m_lyricLineThickness.SetInfo("Lyric line thickness", "The lyric extender line thickness");
     m_lyricLineThickness.Init(0.25, 0.10, 0.50);
@@ -1828,6 +1834,10 @@ Options::Options()
     m_ligatureAsBracket.Init(false);
     this->Register(&m_ligatureAsBracket, "ligatureAsBracket", &m_mensural);
 
+    m_ligatureOblique.SetInfo("Ligature oblique", "Ligature oblique shape");
+    m_ligatureOblique.Init(LIGATURE_OBL_auto, &Option::s_ligatureOblique);
+    this->Register(&m_ligatureOblique, "ligatureOblique", &m_mensural);
+
     m_mensuralResponsiveView.SetInfo(
         "Mensural reduced view", "Convert mensural content to a more responsive view reduced to the seleceted markup");
     m_mensuralResponsiveView.Init(false);
@@ -1836,6 +1846,11 @@ Options::Options()
     m_mensuralToCmn.SetInfo("Mensural to CMN", "Convert mensural sections to CMN measure-based MEI");
     m_mensuralToCmn.Init(false);
     this->Register(&m_mensuralToCmn, "mensuralToCmn", &m_mensural);
+
+    m_mensuralScoreUp.SetInfo(
+        "Mensural scoring up", "Score up the mensural voices by providing a dur.quality to the notes");
+    m_mensuralScoreUp.Init(false);
+    this->Register(&m_mensuralScoreUp, "mensuralScoreUp", &m_mensural);
 
     /********* Method JSON options to the command-line *********/
 

@@ -44,7 +44,7 @@ public:
     virtual ~Syl();
     Object *Clone() const override { return new Syl(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Syl"; }
+    std::string GetClassName() const override { return "syl"; }
     ///@}
 
     /** Override the method since it is align to the staff */
@@ -70,7 +70,7 @@ public:
      * Add an element (text, rend. etc.) to a syl.
      * Only supported elements will be actually added to the child list.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Calculate the hyphen length using the text font
@@ -118,7 +118,9 @@ public:
      * The verse number with multiple verses
      * Value is 1 by default, set in PrepareLyrics
      */
-    int m_drawingVerse;
+    int m_drawingVerseN;
+    /** The verse place (below by default) */
+    data_STAFFREL m_drawingVersePlace;
 
     /**
      * A pointer to the next syllable of the word.

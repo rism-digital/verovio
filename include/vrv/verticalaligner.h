@@ -42,7 +42,7 @@ public:
     /**
      * Override the method of adding AlignmentReference children
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Do not copy children for HorizontalAligner
@@ -195,9 +195,12 @@ public:
      * The position is calculated from the bottom.
      */
     ///@{
-    void AddVerseN(int verseN);
+    void AddVerseN(int verseN, data_STAFFREL place);
     int GetVerseCount(bool collapse) const;
-    int GetVersePosition(int verseN, bool collapse) const;
+    int GetVerseCountAbove(bool collapse) const;
+    int GetVerseCountBelow(bool collapse) const;
+    int GetVersePositionAbove(int verseN, bool collapse) const;
+    int GetVersePositionBelow(int verseN, bool collapse) const;
     ///@}
 
     /**
@@ -402,9 +405,10 @@ private:
      */
     int m_yRel;
     /**
-     * Stores the verse@n of the staves attached to the aligner
+     * Stores the verse@n of the staves attached to the aligner (above and below)
      */
-    std::set<int> m_verseNs;
+    std::set<int> m_verseAboveNs;
+    std::set<int> m_verseBelowNs;
 
     /**
      * @name values for storing the overflow and overlap

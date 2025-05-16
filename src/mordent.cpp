@@ -27,9 +27,8 @@ namespace vrv {
 static const ClassRegistrar<Mordent> s_factory("mordent", MORDENT);
 
 Mordent::Mordent()
-    : ControlElement(MORDENT, "mordent-")
+    : ControlElement(MORDENT)
     , TimePointInterface()
-    , AttColor()
     , AttExtSymAuth()
     , AttExtSymNames()
     , AttOrnamentAccid()
@@ -37,7 +36,6 @@ Mordent::Mordent()
     , AttMordentLog()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_EXTSYMAUTH);
     this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_ORNAMENTACCID);
@@ -53,7 +51,6 @@ void Mordent::Reset()
 {
     ControlElement::Reset();
     TimePointInterface::Reset();
-    this->ResetColor();
     this->ResetExtSymAuth();
     this->ResetExtSymNames();
     this->ResetOrnamentAccid();

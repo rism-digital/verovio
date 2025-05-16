@@ -49,10 +49,10 @@ public:
     virtual ~Nc();
     Object *Clone() const override { return new Nc(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Nc"; }
+    std::string GetClassName() const override { return "nc"; }
     ///@}
 
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * @name Getter to interfaces
@@ -62,6 +62,8 @@ public:
     const DurationInterface *GetDurationInterface() const override { return vrv_cast<const DurationInterface *>(this); }
     PitchInterface *GetPitchInterface() override { return vrv_cast<PitchInterface *>(this); }
     const PitchInterface *GetPitchInterface() const override { return vrv_cast<const PitchInterface *>(this); }
+    PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
+    const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
     ///@}
 
     /**

@@ -826,6 +826,11 @@ private:
      */
     bool FetchDataRefs(const std::string &jsonString);
 
+    /**
+     * Set the doc to the view and set the editor after having loaded data
+     */
+    void SetViewAndEditor();
+
 public:
     //
 private:

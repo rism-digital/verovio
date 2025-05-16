@@ -24,11 +24,7 @@ class Note;
 /**
  * This class models the MEI <tie> element.
  */
-class Tie : public ControlElement,
-            public TimeSpanningInterface,
-            public AttColor,
-            public AttCurvature,
-            public AttLineRendBase {
+class Tie : public ControlElement, public TimeSpanningInterface, public AttCurvature, public AttLineRendBase {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -37,11 +33,10 @@ public:
     ///@{
     Tie();
     Tie(ClassId classId);
-    Tie(ClassId classId, const std::string &classIdStr);
     virtual ~Tie();
     Object *Clone() const override { return new Tie(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Tie"; }
+    std::string GetClassName() const override { return "tie"; }
     ///@}
 
     /**

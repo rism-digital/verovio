@@ -53,6 +53,7 @@
 #include "stem.h"
 #include "syl.h"
 #include "system.h"
+#include "tabgrp.h"
 #include "tie.h"
 #include "tuplet.h"
 #include "verse.h"
@@ -74,15 +75,6 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         element->SetEmptyBB();
         dc->EndGraphic(element, this);
         return;
-    }
-
-    int previousColor = m_currentColor;
-
-    if (element == m_currentElement) {
-        m_currentColor = AxRED;
-    }
-    else {
-        m_currentColor = AxNONE;
     }
 
     if (element->Is(ACCID)) {
@@ -231,8 +223,6 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         // This should never happen
         LogError("Element '%s' cannot be drawn", element->GetClassName().c_str());
     }
-
-    m_currentColor = previousColor;
 }
 
 //----------------------------------------------------------------------------
@@ -960,11 +950,13 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     KeySig *keySig = vrv_cast<KeySig *>(element);
     assert(keySig);
 
-    Clef *clef = layer->GetClef(element);
+    Clef *drawingClef = keySig->GetDrawingClef();
+    Clef *clef = drawingClef ? drawingClef : layer->GetClef(element);
     if (!clef) {
         keySig->SetEmptyBB();
         return;
     }
+    const int clefLocOffset = clef->GetClefLocOffset();
 
     // hidden key signature
     if (keySig->GetVisible() == BOOLEAN_false) {
@@ -991,8 +983,6 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int x = element->GetDrawingX();
     // HARDCODED
     const int step = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * TEMP_KEYSIG_STEP;
-
-    int clefLocOffset = layer->GetClefLocOffset(element);
 
     dc->StartGraphic(element, "", element->GetID());
 
@@ -1165,7 +1155,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     const bool drawingCueSize = mRest->GetDrawingCueSize();
     int x = mRest->GetDrawingX();
-    const bool isDouble = (measure->m_measureAligner.GetMaxTime() >= Fraction(2, 1));
+    const bool isDouble = (measure->m_measureAligner.GetMaxTime() >= Fraction(2));
     int y = isDouble ? element->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staffSize) : element->GetDrawingY();
     char32_t rest = isDouble ? SMUFL_E4E2_restDoubleWhole : SMUFL_E4E3_restWhole;
 
@@ -1174,7 +1164,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     this->DrawSmuflCode(dc, x, y, rest, staffSize, drawingCueSize);
 
     // single legder line for whole rest glyphs
-    if ((measure->m_measureAligner.GetMaxTime() < Fraction(DURATION_1))
+    if (!isDouble
         && (y > staff->GetDrawingY()
             || y < staff->GetDrawingY() - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize))) {
         const int width = m_doc->GetGlyphWidth(rest, staffSize, drawingCueSize);
@@ -1538,12 +1528,17 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     const bool drawingCueSize = rest->GetDrawingCueSize();
     const int staffSize = staff->GetDrawingStaffNotationSize();
     data_DURATION drawingDur = rest->GetActualDur();
-    if (drawingDur == DURATION_NONE) {
-        if (!dc->Is(BBOX_DEVICE_CONTEXT)) {
-            LogWarning("Missing duration for rest '%s'", rest->GetID().c_str());
-        }
+    // in tablature the @dur is in the parent TabGrp - try to get if from there
+    if ((drawingDur == DURATION_NONE) && staff->IsTablature()) {
+        TabGrp *tabGrp = vrv_cast<TabGrp *>(rest->GetFirstAncestor(TABGRP));
+        if (tabGrp != NULL) drawingDur = tabGrp->GetActualDur();
+    }
+    // Make sure we have something to draw
+    if ((drawingDur == DURATION_NONE) && !dc->Is(BBOX_DEVICE_CONTEXT)) {
+        LogWarning("Missing duration for rest '%s'", rest->GetID().c_str());
         drawingDur = DURATION_4;
     }
+
     const char32_t drawingGlyph = rest->GetRestGlyph(drawingDur);
 
     const int x = element->GetDrawingX();
@@ -1747,13 +1742,11 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     }
 
     if (!m_doc->IsFacs() && !m_doc->IsTranscription() && !m_doc->IsNeumeLines()) {
-        syl->SetDrawingYRel(this->GetSylYRel(syl->m_drawingVerse, staff));
+        syl->SetDrawingYRel(this->GetSylYRel(syl->m_drawingVerseN, staff, syl->m_drawingVersePlace));
     }
 
     dc->StartGraphic(syl, "", syl->GetID());
     dc->DeactivateGraphicY();
-
-    dc->SetBrush(m_currentColor, AxSOLID);
 
     FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
     if (syl->HasFontweight()) {
@@ -1811,7 +1804,6 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     dc->EndText();
 
     dc->ResetFont();
-    dc->ResetBrush();
 
     if (syl->GetStart() && syl->GetEnd()) {
         System *currentSystem = vrv_cast<System *>(measure->GetFirstAncestor(SYSTEM));
@@ -1865,10 +1857,9 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
         TextDrawingParams params;
         params.m_x = verse->GetDrawingX() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        params.m_y = staff->GetDrawingY() + this->GetSylYRel(std::max(1, verse->GetN()), staff);
+        params.m_y = staff->GetDrawingY() + this->GetSylYRel(std::max(1, verse->GetN()), staff, verse->GetPlace());
         params.m_pointSize = labelTxt.GetPointSize();
 
-        dc->SetBrush(m_currentColor, AxSOLID);
         dc->SetFont(&labelTxt);
 
         dc->StartGraphic(graphic, "", graphic->GetID());
@@ -1880,7 +1871,6 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         dc->EndGraphic(graphic, this);
 
         dc->ResetFont();
-        dc->ResetBrush();
     }
 
     dc->StartGraphic(verse, "", verse->GetID());
@@ -1900,8 +1890,7 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff)
     assert(stem);
     assert(staff);
 
-    dc->SetPen(AxNONE, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 1.2, AxSOLID);
-    dc->SetBrush(AxNONE, AxSOLID);
+    dc->SetPen(m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 1.2, PEN_SOLID);
 
     int positionShift = m_doc->GetCueSize(m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
     int positionShiftX1 = positionShift;
@@ -1938,7 +1927,6 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff)
     }
 
     dc->ResetPen();
-    dc->ResetBrush();
 }
 
 void View::DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, const Staff *staff, bool dimin)
@@ -2092,22 +2080,34 @@ int View::GetFYRel(F *f, Staff *staff)
     return y;
 }
 
-int View::GetSylYRel(int verseN, Staff *staff)
+int View::GetSylYRel(int verseN, Staff *staff, data_STAFFREL place)
 {
     assert(staff);
 
+    StaffAlignment *alignment = staff->GetAlignment();
+    if (!alignment) return 0;
+
     const bool verseCollapse = m_options->m_lyricVerseCollapse.GetValue();
     int y = 0;
-    StaffAlignment *alignment = staff->GetAlignment();
-    if (alignment) {
-        FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-        int descender = -m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
-        int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
-        int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-        y = -alignment->GetStaffHeight() - alignment->GetOverflowBelow()
-            + alignment->GetVersePosition(verseN, verseCollapse) * (height + descender + margin) + (descender);
+    FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+    const int descender = m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
+    const int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
+
+    int verseHeight = height - descender;
+    verseHeight *= m_doc->GetOptions()->m_lyricHeightFactor.GetValue();
+    int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+
+    // above the staff
+    if (place == STAFFREL_above) {
+        y = alignment->GetOverflowAbove()
+            - (alignment->GetVersePositionAbove(verseN, verseCollapse)) * (verseHeight + margin) - (height);
     }
+    else {
+        y = -alignment->GetStaffHeight() - alignment->GetOverflowBelow()
+            + alignment->GetVersePositionBelow(verseN, verseCollapse) * (verseHeight + margin) + verseHeight - height;
+    }
+
     return y;
 }
 

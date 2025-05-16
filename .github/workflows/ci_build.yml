@@ -45,7 +45,7 @@ env:
   # emscripten
   EM_VERSION: latest
   EM_CACHE_FOLDER: "emsdk-cache"
-  EM_CACHE_ID: 3
+  EM_CACHE_ID: 4
 
   # gh-pages
   GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org # works from rism-digital and from forks
@@ -75,10 +75,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-20.04
-            compiler: g++
-            version: "10"
-
           - os: ubuntu-22.04
             compiler: g++
             version: "11"
@@ -87,17 +83,17 @@ jobs:
             compiler: g++
             version: "12"
 
-          - os: ubuntu-20.04
-            compiler: clang
-            version: "11"
-
-          - os: ubuntu-22.04
-            compiler: clang
+          - os: ubuntu-24.04
+            compiler: g++
             version: "12"
-
-          - os: ubuntu-22.04
-            compiler: clang
-            version: "12"
+            
+          - os: ubuntu-24.04
+            compiler: g++
+            version: "13"
+            
+          - os: ubuntu-24.04
+            compiler: g++
+            version: "14"
 
           - os: ubuntu-22.04
             compiler: clang
@@ -113,11 +109,19 @@ jobs:
 
           - os: ubuntu-22.04
             compiler: clang
-            version: "11"
-
-          - os: ubuntu-22.04
-            compiler: clang
             version: "15"
+
+          - os: ubuntu-24.04
+            compiler: clang
+            version: "16"
+
+          - os: ubuntu-24.04
+            compiler: clang
+            version: "17"
+
+          - os: ubuntu-24.04
+            compiler: clang
+            version: "18"
 
           - os: macos-latest
             compiler: xcode
@@ -126,10 +130,21 @@ jobs:
           - os: macos-latest
             compiler: g++
             version: "12"
+            
+          - os: macos-latest
+            compiler: g++
+            version: "13"
+            
+          - os: macos-latest
+            compiler: g++
+            version: "14"
 
     steps:
       - name: Checkout main repo
         uses: actions/checkout@v4
+
+      - name: Register gcc problem matcher
+        run: echo "::add-matcher::.github/problem_matchers/gcc.json"
 
       # Installation step for Ubuntu
       - name: Configure Ubuntu with ${{ matrix.compiler }}-${{ matrix.version }}
@@ -203,7 +218,7 @@ jobs:
     if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
 
     name: Set up and cache emscripten
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Set up cache
@@ -216,7 +231,7 @@ jobs:
           key: ${{ runner.os }}-emsdk-${{ env.EM_VERSION }}-${{ env.EM_CACHE_ID }}
 
       - name: Set up emsdk
-        uses: mymindstorm/setup-emsdk@v11
+        uses: mymindstorm/setup-emsdk@v14
         with:
           version: ${{ env.EM_VERSION }}
           actions-cache-folder: ${{ env.EM_CACHE_FOLDER }}
@@ -229,7 +244,7 @@ jobs:
   ##################################
   build_js:
     name: Build JS toolkit
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: [setup_emscripten]
 
     # set matrix with toolkit options (runs the following steps for every target in parallel)
@@ -304,7 +319,7 @@ jobs:
   ############################
   copy_font_files:
     name: Copy the font files
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout main repo
@@ -328,7 +343,7 @@ jobs:
   ##################################
   check_deploy_settings:
     name: Check settings for deployment
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     # run deployment only after finishing the build jobs
     needs: [build_cpp, build_js]
 
@@ -363,7 +378,7 @@ jobs:
   #########################################
   deploy_toolkit:
     name: Deploy JS toolkit
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: ${{ needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'false' }}
     # run deployment only after finishing the build jobs
     needs: [build_cpp, build_js, check_deploy_settings]
@@ -456,7 +471,7 @@ jobs:
   ###################################
   build_docs:
     name: Build documentation
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     # run only after finishing other build jobs
     needs: [build_cpp, build_js]
 
@@ -492,7 +507,7 @@ jobs:
   ###############################################
   deploy_docs:
     name: Deploy documentation
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: ${{ needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'false' }}
     # run deployment only after finishing the build job
     needs: [build_docs, check_deploy_settings]
@@ -577,7 +592,7 @@ jobs:
   ###############################################
   skip_deploy:
     name: Skip deployment if set
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     # always() is needed here to meet if-condition even if earlier steps failed
     # cf. https://github.com/actions/runner/issues/491
     if: ${{ always() && needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'true' }}

@@ -34,6 +34,7 @@
 #import <VerovioFramework/altsyminterface.h>
 #import <VerovioFramework/anchoredtext.h>
 #import <VerovioFramework/annot.h>
+#import <VerovioFramework/annotscore.h>
 #import <VerovioFramework/app.h>
 #import <VerovioFramework/areaposinterface.h>
 #import <VerovioFramework/arpeg.h>
@@ -69,6 +70,7 @@
 #import <VerovioFramework/convertfunctor.h>
 #import <VerovioFramework/corr.h>
 #import <VerovioFramework/course.h>
+#import <VerovioFramework/cpmark.h>
 #import <VerovioFramework/crc.h>
 #import <VerovioFramework/custos.h>
 #import <VerovioFramework/damage.h>
@@ -209,6 +211,7 @@
 #import <VerovioFramework/score.h>
 #import <VerovioFramework/scoredef.h>
 #import <VerovioFramework/scoredefinterface.h>
+#import <VerovioFramework/scoringupfunctor.h>
 #import <VerovioFramework/section.h>
 #import <VerovioFramework/setscoredeffunctor.h>
 #import <VerovioFramework/sic.h>

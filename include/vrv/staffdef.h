@@ -11,6 +11,7 @@
 #include "atts_mei.h"
 #include "atts_midi.h"
 #include "atts_shared.h"
+#include "atts_stringtab.h"
 #include "scoredef.h"
 
 namespace vrv {
@@ -31,6 +32,7 @@ class StaffDef : public ScoreDefElement,
                  public AttScalable,
                  public AttStaffDefLog,
                  public AttStaffDefVis,
+                 public AttStaffDefVisTablature,
                  public AttTimeBase,
                  public AttTransposition {
 public:
@@ -43,14 +45,14 @@ public:
     virtual ~StaffDef();
     Object *Clone() const override { return new StaffDef(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "StaffDef"; }
+    std::string GetClassName() const override { return "staffDef"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Return an order for the given ClassId.

@@ -52,7 +52,6 @@ enum class PortatoSlurType { None, StemSide, Centered };
 
 class Slur : public ControlElement,
              public TimeSpanningInterface,
-             public AttColor,
              public AttCurvature,
              public AttLayerIdent,
              public AttLineRendBase {
@@ -64,11 +63,10 @@ public:
     ///@{
     Slur();
     Slur(ClassId classId);
-    Slur(ClassId classId, const std::string &classIdStr);
     virtual ~Slur();
     Object *Clone() const override { return new Slur(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Slur"; }
+    std::string GetClassName() const override { return "slur"; }
     ///@}
 
     /**

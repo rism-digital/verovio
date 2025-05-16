@@ -12,6 +12,7 @@
 #include "doc.h"
 #include "layer.h"
 #include "page.h"
+#include "pages.h"
 #include "score.h"
 #include "staff.h"
 #include "system.h"
@@ -222,6 +223,7 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitPage(Page *page)
     // However, page->m_score has already been set by ScoreDefSetCurrentPageFunctor
     // This must be the first page or a new score is starting on this page
     assert(page->m_score);
+    assert(page->m_score->GetScoreDef());
     if (!m_currentScore || (m_currentScore != page->m_score)) {
         m_upcomingScoreDef = *page->m_score->GetScoreDef();
         m_upcomingScoreDef.Process(*this);
@@ -488,26 +490,16 @@ SetCautionaryScoreDefFunctor::SetCautionaryScoreDefFunctor(ScoreDef *currentScor
     m_currentStaffDef = NULL;
 }
 
-FunctorCode SetCautionaryScoreDefFunctor::VisitObject(Object *object)
+FunctorCode SetCautionaryScoreDefFunctor::VisitLayer(Layer *layer)
+{
+    layer->SetDrawingCautionValues(m_currentStaffDef);
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode SetCautionaryScoreDefFunctor::VisitStaff(Staff *staff)
 {
     assert(m_currentScoreDef);
-
-    // starting a new staff
-    if (object->Is(STAFF)) {
-        Staff *staff = vrv_cast<Staff *>(object);
-        assert(staff);
-        m_currentStaffDef = m_currentScoreDef->GetStaffDef(staff->GetN());
-        return FUNCTOR_CONTINUE;
-    }
-
-    // starting a new layer
-    if (object->Is(LAYER)) {
-        Layer *layer = vrv_cast<Layer *>(object);
-        assert(layer);
-        layer->SetDrawingCautionValues(m_currentStaffDef);
-        return FUNCTOR_SIBLINGS;
-    }
-
+    m_currentStaffDef = m_currentScoreDef->GetStaffDef(staff->GetN());
     return FUNCTOR_CONTINUE;
 }
 
@@ -602,6 +594,13 @@ FunctorCode ScoreDefUnsetCurrentFunctor::VisitAlignmentReference(AlignmentRefere
     }
 
     return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode ScoreDefUnsetCurrentFunctor::VisitKeySig(KeySig *keySig)
+{
+    keySig->ResetDrawingClef();
+
+    return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ScoreDefUnsetCurrentFunctor::VisitLayer(Layer *layer)

@@ -25,7 +25,6 @@ namespace vrv {
  */
 class Trill : public ControlElement,
               public TimeSpanningInterface,
-              public AttColor,
               public AttExtender,
               public AttExtSymAuth,
               public AttExtSymNames,
@@ -43,7 +42,7 @@ public:
     virtual ~Trill();
     Object *Clone() const override { return new Trill(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Trill"; }
+    std::string GetClassName() const override { return "trill"; }
     ///@}
 
     /**

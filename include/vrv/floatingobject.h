@@ -34,7 +34,6 @@ public:
     ///@{
     FloatingObject();
     FloatingObject(ClassId classId);
-    FloatingObject(ClassId classId, const std::string &classIdStr);
     virtual ~FloatingObject();
     void Reset() override;
     void ResetDrawing();

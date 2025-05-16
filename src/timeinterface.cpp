@@ -19,6 +19,7 @@
 #include "measure.h"
 #include "preparedatafunctor.h"
 #include "staff.h"
+#include "system.h"
 #include "verticalaligner.h"
 #include "vrv.h"
 
@@ -28,8 +29,9 @@ namespace vrv {
 // TimePointInterface
 //----------------------------------------------------------------------------
 
-TimePointInterface::TimePointInterface() : Interface(), AttStaffIdent(), AttStartId(), AttTimestampLog()
+TimePointInterface::TimePointInterface() : Interface(), AttPartIdent(), AttStaffIdent(), AttStartId(), AttTimestampLog()
 {
+    this->RegisterInterfaceAttClass(ATT_PARTIDENT);
     this->RegisterInterfaceAttClass(ATT_STAFFIDENT);
     this->RegisterInterfaceAttClass(ATT_STARTID);
     this->RegisterInterfaceAttClass(ATT_TIMESTAMPLOG);
@@ -41,6 +43,7 @@ TimePointInterface::~TimePointInterface() {}
 
 void TimePointInterface::Reset()
 {
+    this->ResetPartIdent();
     this->ResetStaffIdent();
     this->ResetStartId();
     this->ResetTimestampLog();
@@ -108,26 +111,42 @@ bool TimePointInterface::IsOnStaff(int n) const
     return false;
 }
 
-std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Object *object)
+std::vector<Staff *> TimePointInterface::GetTstampStaves(const Measure *measure, const Object *object)
+{
+    std::vector<const Staff *> staves = std::as_const(*this).GetTstampStaves(measure, object);
+    std::vector<Staff *> stavesCasted;
+    std::transform(staves.begin(), staves.end(), std::back_inserter(stavesCasted),
+        [](const Staff *staff) { return const_cast<Staff *>(staff); });
+    return stavesCasted;
+}
+
+std::vector<const Staff *> TimePointInterface::GetTstampStaves(const Measure *measure, const Object *object) const
 {
     assert(measure);
     assert(object);
 
-    std::vector<Staff *> staves;
+    std::vector<const Staff *> staves;
     std::vector<int> staffList;
 
     // For <f> within <harm> without @staff we try to get the @staff from the <harm> ancestor
     if (object->Is(FIGURE) && !this->HasStaff()) {
-        Harm *harm = vrv_cast<Harm *>(object->GetFirstAncestor(HARM));
+        const Harm *harm = vrv_cast<const Harm *>(object->GetFirstAncestor(HARM));
         if (harm) {
             staffList = harm->GetStaff();
         }
+    }
+    // For control elements with `@part="%all`, use the top visible staff indenpendently from the `@staff`
+    else if (this->HasPart() && (this->GetPart() == "%all")) {
+        const System *system = vrv_cast<const System *>(measure->GetFirstAncestor(SYSTEM));
+        assert(system);
+        const Staff *staff = system->GetTopVisibleStaff();
+        if (staff) staffList.push_back(staff->GetN());
     }
     else if (this->HasStaff()) {
         bool isInBetween = false;
         // limit between support to some elements?
         if (object->Is({ DYNAM, DIR, HAIRPIN, TEMPO })) {
-            AttPlacementRelStaff *att = dynamic_cast<AttPlacementRelStaff *>(object);
+            const AttPlacementRelStaff *att = dynamic_cast<const AttPlacementRelStaff *>(object);
             assert(att);
             isInBetween = (att->GetPlace() == STAFFREL_between);
         }
@@ -141,18 +160,18 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Objec
         }
     }
     else if (m_start && !m_start->Is({ BARLINE, TIMESTAMP_ATTR })) {
-        Staff *staff = m_start->GetAncestorStaff();
+        const Staff *staff = m_start->GetAncestorStaff();
         staffList.push_back(staff->GetN());
     }
     else if (measure->GetChildCount(STAFF) == 1) {
         // If we have no @staff or startid but only one staff child assume it is the first one
-        Staff *staff = vrv_cast<Staff *>(measure->GetFirst(STAFF));
+        const Staff *staff = vrv_cast<const Staff *>(measure->GetFirst(STAFF));
         staffList.push_back(staff->GetN());
     }
 
     for (int staffN : staffList) {
         AttNIntegerComparison comparison(STAFF, staffN);
-        Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
+        const Staff *staff = vrv_cast<const Staff *>(measure->FindDescendantByComparison(&comparison, 1));
         if (!staff) {
             // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetID().c_str());
             continue;

@@ -28,7 +28,6 @@ class Arpeg : public ControlElement,
               public TimePointInterface,
               public AttArpegLog,
               public AttArpegVis,
-              public AttColor,
               public AttEnclosingChars {
 public:
     /**
@@ -40,7 +39,7 @@ public:
     virtual ~Arpeg();
     Object *Clone() const override { return new Arpeg(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Arpeg"; }
+    std::string GetClassName() const override { return "arpeg"; }
     ///@}
 
     /**

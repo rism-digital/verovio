@@ -35,7 +35,7 @@ public:
     virtual ~Stem();
     Object *Clone() const override { return new Stem(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Stem"; }
+    std::string GetClassName() const override { return "stem"; }
     ///@}
 
     /** Override the method since alignment is required */
@@ -44,7 +44,7 @@ public:
     /**
      * Add an element (only flag supported) to a stem.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Fill the attributes from the AttStems attribute of the parent note/chord

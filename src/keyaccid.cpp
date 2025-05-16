@@ -30,7 +30,7 @@ namespace vrv {
 static const ClassRegistrar<KeyAccid> s_factory("keyAccid", KEYACCID);
 
 KeyAccid::KeyAccid()
-    : LayerElement(KEYACCID, "keyaccid-")
+    : LayerElement(KEYACCID)
     , PitchInterface()
     , PositionInterface()
     , AttAccidental()

@@ -34,20 +34,34 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitStaffAlignment(StaffAlignment
 
     staffAlignment->SortPositioners();
 
-    const bool verseCollapse = m_doc->GetOptions()->m_lyricVerseCollapse.GetValue();
     if (m_classId == SYL) {
+        const bool verseCollapse = m_doc->GetOptions()->m_lyricVerseCollapse.GetValue();
         if (staffAlignment->GetVerseCount(verseCollapse) > 0) {
             FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staffAlignment->GetStaff()->m_drawingStaffSize);
-            int descender = m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
-            int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
-            int margin = m_doc->GetBottomMargin(SYL) * drawingUnit;
-            int minMargin = std::max((int)(m_doc->GetOptions()->m_lyricTopMinMargin.GetValue() * drawingUnit),
-                staffAlignment->GetOverflowBelow());
-            staffAlignment->SetOverflowBelow(
-                minMargin + staffAlignment->GetVerseCount(verseCollapse) * (height - descender + margin));
-            // For now just clear the overflowBelow, which avoids the overlap to be calculated. We could also keep them
-            // and check if they are some lyrics in order to know if the overlap needs to be calculated or not.
-            staffAlignment->ClearBBoxesBelow();
+            int verseHeight = m_doc->GetTextGlyphHeight(L'I', lyricFont, false)
+                - m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
+            verseHeight *= m_doc->GetOptions()->m_lyricHeightFactor.GetValue();
+            if (staffAlignment->GetVerseCountAbove(verseCollapse)) {
+                int margin = m_doc->GetTopMargin(SYL) * drawingUnit;
+                int minMargin = std::max((int)(m_doc->GetOptions()->m_lyricTopMinMargin.GetValue() * drawingUnit),
+                    staffAlignment->GetOverflowAbove());
+                staffAlignment->SetOverflowAbove(
+                    minMargin + staffAlignment->GetVerseCountAbove(verseCollapse) * (verseHeight + margin));
+                // For now just clear the overflowBelow, which avoids the overlap to be calculated. We could also keep
+                // them and check if they are some lyrics in order to know if the overlap needs to be calculated or not.
+                staffAlignment->ClearBBoxesAbove();
+            }
+            if (staffAlignment->GetVerseCountBelow(verseCollapse)) {
+                int margin = m_doc->GetBottomMargin(SYL) * drawingUnit;
+                int minMargin = std::max((int)(m_doc->GetOptions()->m_lyricTopMinMargin.GetValue() * drawingUnit),
+                    staffAlignment->GetOverflowBelow());
+                staffAlignment->SetOverflowBelow(
+                    minMargin + staffAlignment->GetVerseCountBelow(verseCollapse) * (verseHeight + margin));
+                // For now just clear the overflowBelow, which avoids the overlap to be calculated. We could also keep
+                // them and check if there are some lyrics in order to know if the overlap needs to be calculated or
+                // not.
+                staffAlignment->ClearBBoxesBelow();
+            }
         }
         return FUNCTOR_SIBLINGS;
     }
@@ -115,6 +129,7 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitStaffAlignment(StaffAlignment
 
         // Handle within placement (ignore collisions for certain classes)
         if (place == STAFFREL_within) {
+            if (m_classId == CPMARK) continue;
             if (m_classId == DIR) continue;
             if (m_classId == HAIRPIN) continue;
         }
@@ -214,6 +229,9 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitSystem(System *system)
     adjustFloatingPositionerGrps.SetPlace(STAFFREL_below);
     system->m_systemAligner.Process(adjustFloatingPositionerGrps);
 
+    m_classId = CPMARK;
+    system->m_systemAligner.Process(*this);
+
     m_classId = REPEATMARK;
     system->m_systemAligner.Process(*this);
 
@@ -251,6 +269,9 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitSystem(System *system)
     system->m_systemAligner.Process(*this);
 
     m_classId = CAESURA;
+    system->m_systemAligner.Process(*this);
+
+    m_classId = ANNOTSCORE;
     system->m_systemAligner.Process(*this);
 
     // SYL check if there are some lyrics and make space for them if any
@@ -430,7 +451,7 @@ FunctorCode AdjustFloatingPositionersBetweenFunctor::VisitStaffAlignment(StaffAl
 
     for (FloatingPositioner *positioner : m_previousStaffAlignment->GetFloatingPositioners()) {
         assert(positioner->GetObject());
-        if (!positioner->GetObject()->Is({ DIR, DYNAM, HAIRPIN, TEMPO })) continue;
+        if (!positioner->GetObject()->Is({ CPMARK, DIR, DYNAM, HAIRPIN, TEMPO })) continue;
 
         if (positioner->GetDrawingPlace() != STAFFREL_between) continue;
 

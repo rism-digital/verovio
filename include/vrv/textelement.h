@@ -28,7 +28,6 @@ public:
     ///@{
     TextElement();
     TextElement(ClassId classId);
-    TextElement(ClassId classId, const std::string &classIdStr);
     virtual ~TextElement();
     void Reset() override;
     ///@}

@@ -19,6 +19,7 @@
 #include "bracketspan.h"
 #include "breath.h"
 #include "caesura.h"
+#include "cpmark.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -55,17 +56,12 @@ thread_local std::vector<void *> FloatingObject::s_drawingObjectIds;
 // FloatingObject
 //----------------------------------------------------------------------------
 
-FloatingObject::FloatingObject() : Object(FLOATING_OBJECT, "fe")
+FloatingObject::FloatingObject() : Object(FLOATING_OBJECT)
 {
     this->Reset();
 }
 
-FloatingObject::FloatingObject(ClassId classId) : Object(classId, "fe")
-{
-    this->Reset();
-}
-
-FloatingObject::FloatingObject(ClassId classId, const std::string &classIdStr) : Object(classId, classIdStr)
+FloatingObject::FloatingObject(ClassId classId) : Object(classId)
 {
     this->Reset();
 }
@@ -218,7 +214,10 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
     m_alignment = alignment;
     m_spanningType = spanningType;
 
-    if (object->Is(BRACKETSPAN)) {
+    if (object->Is(ANNOTSCORE)) {
+        m_place = STAFFREL_above;
+    }
+    else if (object->Is(BRACKETSPAN)) {
         m_place = STAFFREL_above;
     }
     else if (object->Is(BREATH)) {
@@ -232,6 +231,12 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
         assert(caesura);
         // caesura within by default
         m_place = (caesura->GetPlace() != STAFFREL_NONE) ? caesura->GetPlace() : STAFFREL_within;
+    }
+    else if (object->Is(CPMARK)) {
+        CpMark *cpMark = vrv_cast<CpMark *>(object);
+        assert(cpMark);
+        // cpMark above by default
+        m_place = (cpMark->GetPlace() != STAFFREL_NONE) ? cpMark->GetPlace() : STAFFREL_above;
     }
     else if (object->Is(DIR)) {
         Dir *dir = vrv_cast<Dir *>(object);
@@ -490,7 +495,7 @@ void FloatingPositioner::CalcDrawingYRel(
                 assert(turn);
                 yRel += turn->GetTurnHeight(doc, staffSize) / 2;
             }
-            else if (!m_object->Is({ DIR, HAIRPIN })) {
+            else if (!m_object->Is({ CPMARK, DIR, HAIRPIN })) {
                 yRel += (this->GetContentY2() - this->GetContentY1()) / 2;
             }
             this->SetDrawingYRel(yRel);

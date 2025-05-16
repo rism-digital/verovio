@@ -148,6 +148,8 @@ FunctorCode AdjustLayersFunctor::VisitMeasure(Measure *measure)
 
 FunctorCode AdjustLayersFunctor::VisitScore(Score *score)
 {
+    assert(score->GetScoreDef());
+
     m_staffNs = score->GetScoreDef()->GetStaffNs();
 
     return FUNCTOR_CONTINUE;

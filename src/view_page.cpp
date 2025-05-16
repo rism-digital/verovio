@@ -64,12 +64,11 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
 {
     assert(dc);
     assert(m_doc);
+    assert(m_currentPage);
 
     // Ensure that resources are set
     const bool dcHasResources = dc->HasResources();
     if (!dcHasResources) dc->SetResources(&m_doc->GetResources());
-
-    m_currentPage = m_doc->SetDrawingPage(m_pageIdx);
 
     // Keep the width of the initial scoreDef
     SetScoreDefDrawingWidth(dc, &m_currentPage->m_drawingScoreDef);
@@ -208,6 +207,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     this->DrawSystemChildren(dc, system, system);
 
     this->DrawSystemList(dc, system, SYL);
+    this->DrawSystemList(dc, system, ANNOTSCORE);
     this->DrawSystemList(dc, system, BEAMSPAN);
     this->DrawSystemList(dc, system, BRACKETSPAN);
     this->DrawSystemList(dc, system, DYNAM);
@@ -238,6 +238,9 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
     ArrayOfObjects *drawingList = system->GetDrawingList();
 
     for (Object *object : *drawingList) {
+        if (object->Is(classId) && (classId == ANNOTSCORE)) {
+            this->DrawTimeSpanningElement(dc, object, system);
+        }
         if (object->Is(classId) && (classId == BEAMSPAN)) {
             this->DrawTimeSpanningElement(dc, object, system);
         }
@@ -519,13 +522,6 @@ void View::DrawLayerDefLabels(
         LayerDef *layerDef = vrv_cast<LayerDef *>(staffDef->GetChild(i, LAYERDEF));
         if (!layerDef) continue;
 
-        AttNIntegerComparison comparison(LAYER, layerDef->GetN());
-        Layer *layer = vrv_cast<Layer *>(staff->FindDescendantByComparison(&comparison, 1));
-        if (!layer) {
-            LogDebug("Layer or LayerDef missing in View::DrawLayerDefLabels");
-            continue;
-        }
-
         this->DrawLabels(dc, scoreDef, layerDef, x - space, initialY, abbreviations, staffSize, space);
         initialY -= pointSize;
     }
@@ -570,7 +566,6 @@ void View::DrawLabels(
     params.m_y = y;
     params.m_pointSize = labelTxt.GetPointSize();
 
-    dc->SetBrush(m_currentColor, AxSOLID);
     dc->SetFont(&labelTxt);
 
     dc->StartGraphic(graphic, "", graphic->GetID());
@@ -599,7 +594,6 @@ void View::DrawLabels(
     }
 
     dc->ResetFont();
-    dc->ResetBrush();
 }
 
 void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
@@ -694,8 +688,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     bez2[2] = points[2];
     bez2[3] = points[3];
 
-    dc->SetPen(m_currentColor, std::max(1, penWidth), AxSOLID);
-    dc->SetBrush(m_currentColor, AxSOLID);
+    dc->SetPen(std::max(1, penWidth), PEN_SOLID);
 
     dc->DrawCubicBezierPathFilled(bez1, bez2);
 
@@ -721,7 +714,6 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     dc->DrawCubicBezierPathFilled(bez1, bez2);
 
     dc->ResetPen();
-    dc->ResetBrush();
 
     return;
 }
@@ -924,7 +916,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
             lines.UpdateContentBBoxX(minX, maxX);
             lines.UpdateContentBBoxY(yTop, yBottom);
             const int margin = unit / 2;
-            system->m_systemAligner.FindAllIntersectionPoints(line, lines, { DIR, DYNAM, TEMPO }, margin);
+            system->m_systemAligner.FindAllIntersectionPoints(line, lines, { CPMARK, DIR, DYNAM, TEMPO }, margin);
         }
     }
 
@@ -1172,7 +1164,7 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
     assert(measure);
     assert(mnum);
 
-    Staff *staff = measure->GetTopVisibleStaff();
+    Staff *staff = system->GetTopVisibleStaff();
     if (staff) {
         // Only one FloatingPositioner on the top (visible) staff
         if (!system->SetCurrentFloatingPositioner(staff->GetN(), mnum, staff, staff)) {
@@ -1214,7 +1206,6 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
             mnumTxt.SetPointSize(m_doc->GetDrawingLyricFont(80)->GetPointSize());
         }
 
-        dc->SetBrush(m_currentColor, AxSOLID);
         dc->SetFont(&mnumTxt);
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
@@ -1222,7 +1213,6 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
         dc->EndText();
 
         dc->ResetFont();
-        dc->ResetBrush();
 
         this->DrawTextEnclosure(dc, params, staff->m_drawingStaffSize);
 
@@ -1253,9 +1243,7 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
         staff->SetFromFacsimile(m_doc);
     }
 
-    if (staffDef && (staffDef->GetLinesVisible() != BOOLEAN_false)) {
-        this->DrawStaffLines(dc, staff, measure, system);
-    }
+    this->DrawStaffLines(dc, staff, staffDef, measure, system);
 
     if (staffDef && (m_doc->GetType() != Facs)) {
         this->DrawStaffDef(dc, staff, measure);
@@ -1285,12 +1273,21 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
     dc->EndGraphic(staff, this);
 }
 
-void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, System *system)
+void View::DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, Measure *measure, System *system)
 {
     assert(dc);
     assert(staff);
     assert(measure);
     assert(system);
+
+    // If German lute tablature the default is @lines.visible="false", but setting @lines.visible="true"
+    // will draw the staff lines.
+    bool gltLines = (staff->IsTabLuteGerman() && staffDef->GetLinesVisible() != BOOLEAN_true);
+    // For anything other than German lute tablature the default is @lines.visible="true"
+    bool visibleLines = (staffDef->GetLinesVisible() != BOOLEAN_false);
+
+    // Nothing to do if both are false
+    if (!gltLines && !visibleLines) return;
 
     int j, x1, x2, y1, y2;
 
@@ -1305,43 +1302,57 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     }
 
     const int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
-    dc->SetPen(m_currentColor, ToDeviceContextX(lineWidth), AxSOLID);
-    dc->SetBrush(m_currentColor, AxSOLID);
+    dc->SetPen(ToDeviceContextX(lineWidth), PEN_SOLID);
 
-    for (j = 0; j < staff->m_drawingLines; ++j) {
-        // Skewed lines - with Facs (neumes) only for now
-        if (y1 != y2) {
-            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
-            // For drawing rectangles instead of lines
-            y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            y2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        }
-        else {
-            const bool isFrenchOrItalianTablature = (staff->IsTabLuteFrench() || staff->IsTabLuteItalian());
-            SegmentedLine line(x1, x2);
-            // We do not need to do this during layout calculation - and only with tablature but not for French or
-            // Italian tablature
-            if (!dc->Is(BBOX_DEVICE_CONTEXT) && staff->IsTablature() && !isFrenchOrItalianTablature) {
-                Object fullLine;
-                fullLine.SetParent(system);
-                fullLine.UpdateContentBBoxY(y1 + (lineWidth / 2), y1 - (lineWidth / 2));
-                fullLine.UpdateContentBBoxX(x1, x2);
-                int margin = m_doc->GetDrawingUnit(100) / 2;
-                ListOfObjects notes = staff->FindAllDescendantsByType(NOTE, false);
-                for (Object *note : notes) {
-                    if (note->VerticalContentOverlap(&fullLine, margin / 2)) {
-                        line.AddGap(note->GetContentLeft() - margin, note->GetContentRight() + margin);
+    // If German lute tablature the default is @lines.visible="false", but setting @lines.visible="true"
+    // will draw the staff lines.
+    // For anything other than German lute tablature the default is @lines.visible="true"
+    if (gltLines) {
+        // German tablature has no staff, just a single base line
+        // But internally we maintain the fiction of an invisible staff as a coordinate system
+        SegmentedLine line(x1, x2);
+        // Issue #3589 move base line slightly further down and reduce thickness
+        y1 -= (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * staff->m_drawingLines) * 11 / 10;
+        this->DrawHorizontalSegmentedLine(dc, y1, line, lineWidth / 2);
+    }
+    // Normal staff lines
+    else {
+        // draw staff lines
+        for (j = 0; j < staff->m_drawingLines; ++j) {
+            // Skewed lines - with Facs (neumes) only for now
+            if (y1 != y2) {
+                dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+                // For drawing rectangles instead of lines
+                y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+                y2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+            }
+            else {
+                const bool isFrenchOrGermanOrItalianTablature
+                    = (staff->IsTabLuteFrench() || staff->IsTabLuteGerman() || staff->IsTabLuteItalian());
+                SegmentedLine line(x1, x2);
+                // We do not need to do this during layout calculation - and only with guitar tablature but not for
+                // French, German or Italian lute tablature
+                if (!dc->Is(BBOX_DEVICE_CONTEXT) && staff->IsTablature() && !isFrenchOrGermanOrItalianTablature) {
+                    Object fullLine;
+                    fullLine.SetParent(system);
+                    fullLine.UpdateContentBBoxY(y1 + (lineWidth / 2), y1 - (lineWidth / 2));
+                    fullLine.UpdateContentBBoxX(x1, x2);
+                    int margin = m_doc->GetDrawingUnit(100) / 2;
+                    ListOfObjects notes = staff->FindAllDescendantsByType(NOTE, false);
+                    for (Object *note : notes) {
+                        if (note->VerticalContentOverlap(&fullLine, margin / 2)) {
+                            line.AddGap(note->GetContentLeft() - margin, note->GetContentRight() + margin);
+                        }
                     }
                 }
+                this->DrawHorizontalSegmentedLine(dc, y1, line, lineWidth);
+                y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+                y2 = y1;
             }
-            this->DrawHorizontalSegmentedLine(dc, y1, line, lineWidth);
-            y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            y2 = y1;
         }
     }
 
     dc->ResetPen();
-    dc->ResetBrush();
 
     return;
 }
@@ -1373,8 +1384,7 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerL
         = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     if (cueSize) lineWidth *= m_doc->GetOptions()->m_graceFactor.GetValue();
 
-    dc->SetPen(m_currentColor, ToDeviceContextX(lineWidth), AxSOLID);
-    dc->SetBrush(m_currentColor, AxSOLID);
+    dc->SetPen(ToDeviceContextX(lineWidth), PEN_SOLID);
 
     bool svgHtml5 = (m_doc->GetOptions()->m_svgHtml5.GetValue());
 
@@ -1383,20 +1393,7 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerL
             if (svgHtml5) {
                 // Add the custom graphic only with html5
                 dc->StartCustomGraphic("lineDash");
-                // Function to concatenate IDs from the list of Object events
-                auto concatenateIDs = [](const ListOfConstObjects &objects) {
-                    // Get a list of strings
-                    std::vector<std::string> ids;
-                    for (const auto &object : objects) {
-                        ids.push_back("#" + object->GetID() + " ");
-                    }
-                    // Concatenate IDs
-                    std::stringstream sstream;
-                    std::copy(ids.begin(), ids.end(), std::ostream_iterator<std::string>(sstream));
-                    return sstream.str();
-                };
-                std::string events = concatenateIDs(dash.m_events);
-                if (!events.empty()) events.pop_back(); // Remove extra space added by the concatenation
+                std::string events = ConcatenateIDs(dash.m_events);
                 dc->SetCustomGraphicAttributes("related", events);
             }
 
@@ -1409,7 +1406,6 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerL
     }
 
     dc->ResetPen();
-    dc->ResetBrush();
 
     dc->EndCustomGraphic();
 }
@@ -1511,8 +1507,7 @@ int View::CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave)
 
     Clef *clef = layer->GetClef(pelement);
     if (clef) {
-        yb += (clef->GetClefLocOffset(parentStaff->m_drawingNotationType))
-            * m_doc->GetDrawingUnit(staffSize); // UT1 reel
+        yb += (clef->GetClefLocOffset()) * m_doc->GetDrawingUnit(staffSize); // UT1 reel
     }
     yb -= 4 * m_doc->GetDrawingOctaveSize(staffSize); // UT, note la plus grave
 
@@ -1605,7 +1600,7 @@ void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMe
 
     if ((system->IsDrawingOptimized() || (m_options->m_systemDivider.GetValue() > SYSTEMDIVIDER_auto))) {
         int y = system->GetDrawingY();
-        Staff *staff = firstMeasure->GetTopVisibleStaff();
+        Staff *staff = system->GetTopVisibleStaff();
         if (staff) {
             // Place it in the middle of current and previous systems - in very tight layout this can collision with
             // the staff above. To be improved
@@ -1850,10 +1845,14 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
         return;
     }
     if (element->Is(APP)) {
-        assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_TOPLEVEL));
+        assert(dynamic_cast<App *>(element));
+        EditorialLevel level = dynamic_cast<App *>(element)->GetLevel();
+        if ((level != EDITORIAL_SCORE) || (level != EDITORIAL_TOPLEVEL)) return;
     }
     else if (element->Is(CHOICE)) {
-        assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_TOPLEVEL));
+        assert(dynamic_cast<Choice *>(element));
+        EditorialLevel level = dynamic_cast<Choice *>(element)->GetLevel();
+        if ((level != EDITORIAL_SCORE) || (level != EDITORIAL_TOPLEVEL)) return;
     }
     std::string elementStart;
     if (element->IsMilestoneElement()) elementStart = "systemElementStart";
@@ -1881,7 +1880,7 @@ void View::DrawMeasureEditorialElement(DeviceContext *dc, EditorialElement *elem
     }
 
     dc->StartGraphic(element, "", element->GetID());
-    if (element->m_visibility == Visible) {
+    if (!element->IsHidden()) {
         this->DrawMeasureChildren(dc, element, measure, system);
     }
     dc->EndGraphic(element, this);
@@ -1902,7 +1901,7 @@ void View::DrawStaffEditorialElement(DeviceContext *dc, EditorialElement *elemen
     }
 
     dc->StartGraphic(element, "", element->GetID());
-    if (element->m_visibility == Visible) {
+    if (!element->IsHidden()) {
         this->DrawStaffChildren(dc, element, staff, measure);
     }
     dc->EndGraphic(element, this);
@@ -1924,7 +1923,7 @@ void View::DrawLayerEditorialElement(
     }
 
     dc->StartGraphic(element, "", element->GetID());
-    if (element->m_visibility == Visible) {
+    if (!element->IsHidden()) {
         this->DrawLayerChildren(dc, element, layer, staff, measure);
     }
     dc->EndGraphic(element, this);
@@ -1945,7 +1944,7 @@ void View::DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element
     }
 
     dc->StartTextGraphic(element, "", element->GetID());
-    if (element->m_visibility == Visible) {
+    if (!element->IsHidden()) {
         this->DrawTextChildren(dc, element, params);
     }
     dc->EndTextGraphic(element, this);
@@ -1966,7 +1965,7 @@ void View::DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, 
     }
 
     dc->StartTextGraphic(element, "", element->GetID());
-    if (element->m_visibility == Visible) {
+    if (!element->IsHidden()) {
         this->DrawFbChildren(dc, element, params);
     }
     dc->EndTextGraphic(element, this);
@@ -1987,7 +1986,7 @@ void View::DrawRunningEditorialElement(DeviceContext *dc, EditorialElement *elem
     }
 
     dc->StartGraphic(element, "", element->GetID());
-    if (element->m_visibility == Visible) {
+    if (!element->IsHidden()) {
         this->DrawRunningChildren(dc, element, params);
     }
     dc->EndGraphic(element, this);

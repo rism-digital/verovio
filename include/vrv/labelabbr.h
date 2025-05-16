@@ -31,14 +31,14 @@ public:
     virtual ~LabelAbbr();
     Object *Clone() const override { return new LabelAbbr(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "LabelAbbr"; }
+    std::string GetClassName() const override { return "labelAbbr"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
     ///@}
 
     //----------//

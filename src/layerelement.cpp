@@ -75,8 +75,7 @@
 namespace vrv {
 
 // Large spacing between syllables is a quarter note space
-// MAX_DURATION / pow(2.0, (DURATION_4 - 2.0))
-#define NEUME_LARGE_SPACE 256
+#define NEUME_LARGE_SPACE Fraction(1, 4)
 // Medium spacing between neume is a 8th note space
 #define NEUME_MEDIUM_SPACE Fraction(1, 8)
 // Small spacing between neume components is a 16th note space
@@ -87,7 +86,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 LayerElement::LayerElement()
-    : Object(LAYER_ELEMENT, "le-"), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
+    : Object(LAYER_ELEMENT), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
 {
     this->RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
@@ -99,19 +98,7 @@ LayerElement::LayerElement()
 }
 
 LayerElement::LayerElement(ClassId classId)
-    : Object(classId, "le-"), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
-{
-    this->RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
-    this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
-    this->RegisterAttClass(ATT_COORDX1);
-    this->RegisterAttClass(ATT_LABELLED);
-    this->RegisterAttClass(ATT_TYPED);
-
-    this->Reset();
-}
-
-LayerElement::LayerElement(ClassId classId, const std::string &classIdStr)
-    : Object(classId, classIdStr), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
+    : Object(classId), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
 {
     this->RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
@@ -675,7 +662,7 @@ Fraction LayerElement::GetAlignmentDuration(
     const AlignMeterParams &params, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (this->IsGraceNote() && notGraceOnly) {
-        return Fraction(0, 1);
+        return Fraction(0);
     }
 
     // Mensural chords are aligned looking at the duration of the notes
@@ -776,8 +763,13 @@ Fraction LayerElement::GetAlignmentDuration(
         // Add a larger gap after the last neume of the syllable
         return (syllable->GetLast() == this) ? NEUME_MEDIUM_SPACE : NEUME_SMALL_SPACE;
     }
+    // This is called only with syallable without neume
+    // Otherwise the duration is given by the neume (or by the nc with --neume-as-note)
+    else if (this->Is(SYLLABLE) && !this->FindDescendantByType(NEUME)) {
+        return NEUME_MEDIUM_SPACE;
+    }
     else {
-        return Fraction(0, 1);
+        return Fraction(0);
     }
 }
 
@@ -791,7 +783,7 @@ Fraction LayerElement::GetSameAsContentAlignmentDuration(
     const AlignMeterParams &params, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (!this->HasSameasLink() || !this->GetSameasLink()->Is({ BEAM, FTREM, TUPLET })) {
-        return Fraction(0, 1);
+        return Fraction(0);
     }
 
     const LayerElement *sameas = vrv_cast<const LayerElement *>(this->GetSameasLink());
@@ -804,7 +796,7 @@ Fraction LayerElement::GetContentAlignmentDuration(
     const AlignMeterParams &params, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (!this->Is({ BEAM, FTREM, TUPLET })) {
-        return Fraction(0, 1);
+        return Fraction(0);
     }
 
     Fraction duration;

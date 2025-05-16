@@ -31,14 +31,15 @@ public:
     virtual ~Quilisma();
     Object *Clone() const override { return new Quilisma(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Quilisma"; }
+    std::string GetClassName() const override { return "quilisma"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    PitchInterface *GetPitchInterface() override { return dynamic_cast<PitchInterface *>(this); }
+    PitchInterface *GetPitchInterface() override { return vrv_cast<PitchInterface *>(this); }
+    const PitchInterface *GetPitchInterface() const override { return vrv_cast<const PitchInterface *>(this); }
     ///@}
 
     /** Override the method since alignment is required */

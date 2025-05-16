@@ -31,7 +31,7 @@ public:
     virtual ~Ref();
     Object *Clone() const override { return new Ref(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Ref"; }
+    std::string GetClassName() const override { return "ref"; }
     ///@}
 
     //----------//

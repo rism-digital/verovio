@@ -38,6 +38,7 @@
 #define GIT_COMMIT "[undefined]"
 #endif
 
+#include "object.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -178,16 +179,7 @@ LogLevel StrToLogLevel(const std::string &level)
 
 bool LogBufferContains(const std::string &s)
 {
-    for (const std::string &logStr : logBuffer) {
-        if (logStr == s) return true;
-    }
-    return false;
-}
-
-bool Check(Object *object)
-{
-    assert(object);
-    return (object != NULL);
+    return (std::find(logBuffer.cbegin(), logBuffer.cend(), s) != logBuffer.cend());
 }
 
 //----------------------------------------------------------------------------
@@ -227,28 +219,28 @@ std::string StringFormatVariable(const char *format, va_list arg)
     return str;
 }
 
-bool AreEqual(double dFirstVal, double dSecondVal)
+bool ApproximatelyEqual(double firstVal, double secondVal)
 {
-    return std::fabs(dFirstVal - dSecondVal) < 1E-3;
+    return std::fabs(firstVal - secondVal) < 1E-3;
 }
 
 bool IsValidInteger(const std::string &value)
 {
     // Accept "1" " 1 " "+1" "-1" "1." "1.0"
-    std::regex re(R"(^\s*[+-]?\d+\.?\d*\s*$)");
+    static const std::regex re(R"(^\s*[+-]?\d+\.?\d*\s*$)");
     return std::regex_match(value, re);
 }
 
 bool IsValidDouble(const std::string &value)
 {
     // Accept "1.0" " 1.0 " ".0"  "1." "+1.0" "-1.0"
-    std::regex re(R"(^\s*[+-]?(?:\d+\.?\d*|\.\d+)\s*$)");
+    static const std::regex re(R"(^\s*[+-]?(?:\d+\.?\d*|\.\d+)\s*$)");
     return std::regex_match(value, re);
 }
 
 bool IsDigits(const std::string &value)
 {
-    std::regex re(R"(^\d+$)");
+    static const std::regex re(R"(^\d+$)");
     return std::regex_match(value, re);
 }
 
@@ -259,6 +251,21 @@ std::string ExtractIDFragment(std::string refID)
         refID = refID.substr(pos + 1);
     }
     return refID;
+}
+
+std::string ConcatenateIDs(const ListOfConstObjects &objects)
+{
+    // Get a list of strings
+    std::vector<std::string> ids;
+    for (const auto &object : objects) {
+        ids.push_back("#" + object->GetID() + " ");
+    }
+    // Concatenate IDs
+    std::stringstream sstream;
+    std::copy(ids.begin(), ids.end(), std::ostream_iterator<std::string>(sstream));
+    std::string uris = sstream.str();
+    if (!uris.empty()) uris.pop_back(); // Remove extra space added by the concatenation
+    return uris;
 }
 
 std::string UTF32to8(const std::u32string &in)
@@ -432,8 +439,8 @@ std::string BaseEncodeInt(uint32_t value, uint8_t base)
 
 std::string FromCamelCase(const std::string &s)
 {
-    std::regex regExp1("(.)([A-Z][a-z]+)");
-    std::regex regExp2("([a-z0-9])([A-Z])");
+    static const std::regex regExp1("(.)([A-Z][a-z]+)");
+    static const std::regex regExp2("([a-z0-9])([A-Z])");
 
     std::string result = s;
     result = std::regex_replace(result, regExp1, "$1-$2");
@@ -457,16 +464,6 @@ std::string ToCamelCase(const std::string &s)
     result[0] = tolower(result[0]);
 
     return result;
-}
-
-data_DURATION DurationMin(data_DURATION dur1, data_DURATION dur2)
-{
-    return (dur1 < dur2) ? dur1 : dur2;
-}
-
-data_DURATION DurationMax(data_DURATION dur1, data_DURATION dur2)
-{
-    return (dur1 > dur2) ? dur1 : dur2;
 }
 
 //----------------------------------------------------------------------------
@@ -528,7 +525,7 @@ static const std::string base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                        "abcdefghijklmnopqrstuvwxyz"
                                        "0123456789+/";
 
-static inline bool isBase64(unsigned char c)
+static inline bool IsBase64(unsigned char c)
 {
     return (isalnum(c) || (c == '+') || (c == '/'));
 }
@@ -577,7 +574,7 @@ std::vector<unsigned char> Base64Decode(std::string const &encodedString)
     unsigned char charArray4[4], charArray3[3];
     std::vector<unsigned char> ret;
 
-    while (inLen-- && (encodedString[in_] != '=') && isBase64(encodedString[in_])) {
+    while (inLen-- && (encodedString[in_] != '=') && IsBase64(encodedString[in_])) {
         charArray4[i++] = encodedString[in_];
         in_++;
         if (i == 4) {

@@ -21,7 +21,7 @@ namespace vrv {
 /**
  * This class models the MEI <breath> element.
  */
-class Breath : public ControlElement, public TimePointInterface, public AttColor, public AttPlacementRelStaff {
+class Breath : public ControlElement, public TimePointInterface, public AttPlacementRelStaff {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -32,7 +32,7 @@ public:
     virtual ~Breath();
     Object *Clone() const override { return new Breath(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Breath"; }
+    std::string GetClassName() const override { return "breath"; }
     ///@}
 
     /**

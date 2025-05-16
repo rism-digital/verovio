@@ -27,9 +27,8 @@ namespace vrv {
 static const ClassRegistrar<Octave> s_factory("octave", OCTAVE);
 
 Octave::Octave()
-    : ControlElement(OCTAVE, "octave-")
+    : ControlElement(OCTAVE)
     , TimeSpanningInterface()
-    , AttColor()
     , AttExtender()
     , AttLineRend()
     , AttLineRendBase()
@@ -37,7 +36,6 @@ Octave::Octave()
     , AttOctaveDisplacement()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_EXTENDER);
     this->RegisterAttClass(ATT_LINEREND);
     this->RegisterAttClass(ATT_LINERENDBASE);
@@ -53,7 +51,6 @@ void Octave::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
-    this->ResetColor();
     this->ResetExtender();
     this->ResetLineRend();
     this->ResetLineRendBase();

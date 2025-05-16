@@ -61,7 +61,7 @@ PAEOutput::PAEOutput(Doc *doc) : Output(doc) {}
 
 PAEOutput::~PAEOutput() {}
 
-bool PAEOutput::Export(std::string &output)
+std::string PAEOutput::Export()
 {
     m_docScoreDef = true;
     m_mensural = false;
@@ -73,15 +73,13 @@ bool PAEOutput::Export(std::string &output)
     m_currentDots = -1;
     m_grace = false;
 
-    m_doc->GetFirstScoreDef()->SaveObject(this, false);
+    m_doc->GetFirstScoreDef()->SaveObject(this);
 
     m_docScoreDef = false;
 
-    m_doc->SaveObject(this, false);
+    m_doc->SaveObject(this);
 
-    output = m_streamStringOutput.str();
-
-    return true;
+    return m_streamStringOutput.str();
 }
 
 bool PAEOutput::WriteObject(Object *object)
@@ -1249,7 +1247,7 @@ int PAEInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
     // std::regex_constants::ECMAScript is the default syntax, so optional.
     // Previously these were extended regex syntax, but this case
     // is the same in ECMAScript syntax.
-    std::regex exp("^([^)]*[ABCDEFG-][^)]*[ABCDEFG-][^)]*)", std::regex_constants::ECMAScript);
+    static const std::regex exp("^([^)]*[ABCDEFG-][^)]*[ABCDEFG-][^)]*)", std::regex_constants::ECMAScript);
     bool is_tuplet = regex_search(incipit + i, exp);
 
     if (is_tuplet) {
@@ -2998,7 +2996,7 @@ bool PAEInput::Parse()
     if (m_isMensural) m_doc->m_notationType = NOTATIONTYPE_mensural;
     // The mdiv
     Mdiv *mdiv = new Mdiv();
-    mdiv->m_visibility = Visible;
+    mdiv->SetVisibility(Visible);
     m_doc->AddChild(mdiv);
     // The score
     Score *score = new Score();
@@ -3277,7 +3275,7 @@ void PAEInput::ParseHeader(jsonxx::Object &header)
     }
 
     bool hasIncip = false;
-    for (const std::string &key : { "scoring", "key_mode", "role", "voice_intrument" }) {
+    for (const char *key : { "scoring", "key_mode", "role", "voice_intrument" }) {
         hasIncip = hasIncip || header.has<jsonxx::String>(key) || header.has<jsonxx::Array>(key);
     }
     if (hasIncip) {
@@ -4655,7 +4653,7 @@ bool PAEInput::CheckHierarchy()
             if (token.m_object->Is({ KEYSIG, METERSIG, MENSUR })) continue;
 
             // Test is the element is supported by the current top container
-            if (!token.IsContainerEnd() && !stack.back()->m_object->IsSupportedChild(token.m_object)) {
+            if (!token.IsContainerEnd() && !stack.back()->m_object->IsSupportedChild(token.m_object->GetClassId())) {
                 LogPAE(ERR_040_HIERARCHY_INVALID, token,
                     StringFormat("%s / %s", token.GetName().c_str(), stack.back()->GetName().c_str()));
                 if (m_pedanticMode) return false;

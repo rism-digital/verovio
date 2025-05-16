@@ -26,7 +26,6 @@ class System;
  */
 class Pedal : public ControlElement,
               public TimeSpanningInterface,
-              public AttColor,
               public AttExtSymAuth,
               public AttExtSymNames,
               public AttPedalLog,
@@ -43,7 +42,7 @@ public:
     virtual ~Pedal();
     Object *Clone() const override { return new Pedal(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Pedal"; }
+    std::string GetClassName() const override { return "pedal"; }
     ///@}
 
     /**

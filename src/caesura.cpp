@@ -27,15 +27,9 @@ namespace vrv {
 static const ClassRegistrar<Caesura> s_factory("caesura", CAESURA);
 
 Caesura::Caesura()
-    : ControlElement(CAESURA, "caesura-")
-    , TimePointInterface()
-    , AttColor()
-    , AttExtSymAuth()
-    , AttExtSymNames()
-    , AttPlacementRelStaff()
+    : ControlElement(CAESURA), TimePointInterface(), AttExtSymAuth(), AttExtSymNames(), AttPlacementRelStaff()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_EXTSYMAUTH);
     this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
@@ -49,7 +43,6 @@ void Caesura::Reset()
 {
     ControlElement::Reset();
     TimePointInterface::Reset();
-    this->ResetColor();
     this->ResetPlacementRelStaff();
 }
 

@@ -1,6 +1,46 @@
 # Changelog
 
 ## [unreleased]
+* Support for editorial markup (`app` or `choice`) surrounding the top-level `scoreDef`
+* Support for full internal page-based MEI serialization (`mei-pb-serialization`)
+* Change the SVG structure of font glyphs to avoid problems with some SVG rendering engines
+* Fix `@xml:id` generation with `--xml-id-seed`
+* Fix key signature display after cautionary clef (@brdvd)
+
+## [5.2.0] – 2025-04-23
+* Support for `data.HEXNUM` in `note@head.shape`
+* Support for additional tablature features introduced in MEI 5.1 (@paul-bayleaf)
+* Support for `annot` as control event (@oerc-music)
+* Support for `@part="%all"` for displaying control events above the first staff
+* Improved support for expansion lists (@wergo)
+* Improved support for staff order diverging from order in `scoreDef`
+* Change element name logging to lowerCamelCase (MEI element name)
+* Remove non-sounding notes from MIDI output (@rettinghaus)
+* Fix lines disappearing in the SVG output with `--mm-output` option
+
+## [5.1.0] – 2025-02-27
+* Improved timemap with grace notes and arpeggios
+* CSS scoped to the specific MEI document based on `mei@xml:id`
+* Option `--ligature-oblique` for controlling ligature shape (curved or straight)
+* Fix handling of `-p` and `-a` options regarding MEI output (@brdvd)
+* Fix Cocoapods building (@rettinghaus)
+* Fix rendering of neumes rendered as notes
+
+## [5.0.0] – 2025-02-06
+* Switching to MEI 5.1
+* Implementation of mensural notation scoring up with `--mensural-score-up` (@martha-thomae)
+* Support for `cpMark` (_colla parte_)
+* Support for `verse@place` for lyrics above the staff
+* Support for MIDI octave displacement without `@oct.ges` (@brdvd)
+* Option `--lyric-height-factor` to increase the spacing of the lyrics
+* Fix `surface`, `symbolDef`, and `zone` losing `@xml:id`s with `--remove-ids` (@rettinghaus)
+
+## [4.5.1] – 2024-12-24
+* Fix bug in RedoLayout
+
+## [4.5.0] – 2024-12-22
+* Integration of tablature customization implementation
+* Optimization of regex calls (@paul-bayleaf)
 
 ## [4.4.0] – 2024-11-25
 * Support for CMME import

@@ -33,8 +33,7 @@ class BeamSpan : public ControlElement,
                  public PlistInterface,
                  public TimeSpanningInterface,
                  public AttBeamedWith,
-                 public AttBeamRend,
-                 public AttColor {
+                 public AttBeamRend {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -45,7 +44,7 @@ public:
     virtual ~BeamSpan();
     Object *Clone() const override { return new BeamSpan(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "BeamSpan"; }
+    std::string GetClassName() const override { return "beamSpan"; }
     ///@}
 
     /**

@@ -1005,7 +1005,7 @@ void AttCoordinated::ResetCoordinated()
 {
     m_lrx = MEI_UNSET;
     m_lry = MEI_UNSET;
-    m_rotate = 0.0;
+    m_rotate = MEI_UNSET;
 }
 
 bool AttCoordinated::ReadCoordinated(pugi::xml_node element, bool removeAttr)
@@ -1022,7 +1022,7 @@ bool AttCoordinated::ReadCoordinated(pugi::xml_node element, bool removeAttr)
         hasAttribute = true;
     }
     if (element.attribute("rotate")) {
-        this->SetRotate(StrToDbl(element.attribute("rotate").value()));
+        this->SetRotate(StrToDegrees(element.attribute("rotate").value()));
         if (removeAttr) element.remove_attribute("rotate");
         hasAttribute = true;
     }
@@ -1041,7 +1041,7 @@ bool AttCoordinated::WriteCoordinated(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasRotate()) {
-        element.append_attribute("rotate") = DblToStr(this->GetRotate()).c_str();
+        element.append_attribute("rotate") = DegreesToStr(this->GetRotate()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1059,7 +1059,7 @@ bool AttCoordinated::HasLry() const
 
 bool AttCoordinated::HasRotate() const
 {
-    return (m_rotate != 0.0);
+    return (m_rotate != MEI_UNSET);
 }
 
 //----------------------------------------------------------------------------
@@ -1305,6 +1305,46 @@ bool AttDataPointing::WriteDataPointing(pugi::xml_node element)
 bool AttDataPointing::HasData() const
 {
     return (m_data != "");
+}
+
+//----------------------------------------------------------------------------
+// AttDataSelecting
+//----------------------------------------------------------------------------
+
+AttDataSelecting::AttDataSelecting() : Att()
+{
+    ResetDataSelecting();
+}
+
+void AttDataSelecting::ResetDataSelecting()
+{
+    m_select = "";
+}
+
+bool AttDataSelecting::ReadDataSelecting(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("select")) {
+        this->SetSelect(StrToStr(element.attribute("select").value()));
+        if (removeAttr) element.remove_attribute("select");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttDataSelecting::WriteDataSelecting(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasSelect()) {
+        element.append_attribute("select") = StrToStr(this->GetSelect()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttDataSelecting::HasSelect() const
+{
+    return (m_select != "");
 }
 
 //----------------------------------------------------------------------------
@@ -3940,7 +3980,7 @@ void AttNoteHeads::ResetNoteHeads()
     m_headFillcolor = "";
     m_headMod = NOTEHEADMODIFIER_NONE;
     m_headRotation = ROTATION_NONE;
-    m_headShape = HEADSHAPE_NONE;
+    m_headShape = data_HEADSHAPE();
     m_headVisible = BOOLEAN_NONE;
 }
 
@@ -4074,7 +4114,7 @@ bool AttNoteHeads::HasHeadRotation() const
 
 bool AttNoteHeads::HasHeadShape() const
 {
-    return (m_headShape != HEADSHAPE_NONE);
+    return (m_headShape.HasValue());
 }
 
 bool AttNoteHeads::HasHeadVisible() const
@@ -6740,6 +6780,46 @@ bool AttTuning::HasTunePname() const
 bool AttTuning::HasTuneTemper() const
 {
     return (m_tuneTemper != TEMPERAMENT_NONE);
+}
+
+//----------------------------------------------------------------------------
+// AttTuningLog
+//----------------------------------------------------------------------------
+
+AttTuningLog::AttTuningLog() : Att()
+{
+    ResetTuningLog();
+}
+
+void AttTuningLog::ResetTuningLog()
+{
+    m_tuningStandard = COURSETUNING_NONE;
+}
+
+bool AttTuningLog::ReadTuningLog(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("tuning.standard")) {
+        this->SetTuningStandard(StrToCoursetuning(element.attribute("tuning.standard").value()));
+        if (removeAttr) element.remove_attribute("tuning.standard");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttTuningLog::WriteTuningLog(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasTuningStandard()) {
+        element.append_attribute("tuning.standard") = CoursetuningToStr(this->GetTuningStandard()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttTuningLog::HasTuningStandard() const
+{
+    return (m_tuningStandard != COURSETUNING_NONE);
 }
 
 //----------------------------------------------------------------------------

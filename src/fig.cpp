@@ -25,7 +25,7 @@ namespace vrv {
 
 static const ClassRegistrar<Fig> s_factory("fig", FIG);
 
-Fig::Fig() : TextElement(FIG, "fig-"), AreaPosInterface()
+Fig::Fig() : TextElement(FIG), AreaPosInterface()
 {
     this->RegisterInterface(AreaPosInterface::GetAttClasses(), AreaPosInterface::IsInterface());
 
@@ -40,15 +40,16 @@ void Fig::Reset()
     AreaPosInterface::Reset();
 }
 
-bool Fig::IsSupportedChild(Object *child)
+bool Fig::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(SVG)) {
-        assert(dynamic_cast<Svg *>(child));
+    static const std::vector<ClassId> supported{ SVG };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 //----------------------------------------------------------------------------

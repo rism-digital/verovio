@@ -26,7 +26,7 @@ public:
     TimestampAttr();
     virtual ~TimestampAttr();
     void Reset() override;
-    std::string GetClassName() const override { return "TimestampAttr"; }
+    std::string GetClassName() const override { return "timestampAttr"; }
     ///@}
 
     /**
