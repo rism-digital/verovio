@@ -1,8 +1,15 @@
 # Changelog
 
 ## [unreleased]
+
+## [5.3.0] – 2025-05-19
+* Support for editorial markup (`app` or `choice`) surrounding the top-level `scoreDef`
+* Support for full internal page-based MEI serialization (`mei-pb-serialization`)
+* Support for custom fonts to be passed to the JS toolkit as base64 strings instead of urls
 * Change the SVG structure of font glyphs to avoid problems with some SVG rendering engines
+* Fix `@xml:id` generation with `--xml-id-seed`
 * Fix key signature display after cautionary clef (@brdvd)
+* Fix custom fonts not loading properly in the JS toolkit
 
 ## [5.2.0] – 2025-04-23
 * Support for `data.HEXNUM` in `note@head.shape`
