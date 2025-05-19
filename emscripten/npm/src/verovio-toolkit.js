@@ -216,7 +216,6 @@ export class VerovioToolkit {
         let filesInBase64 = [];
         // Get all the files and convert them to a base64 string if necessary
         for ( const file of files ) {
-            const file = files[i];
             // The file in already passed as base64 string - nothing to do
             if (!/^https?:\/\//.test( file )) {
                 filesInBase64.push( file );
