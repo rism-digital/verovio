@@ -950,11 +950,13 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     KeySig *keySig = vrv_cast<KeySig *>(element);
     assert(keySig);
 
-    Clef *clef = layer->GetClef(element);
+    Clef *drawingClef = keySig->GetDrawingClef();
+    Clef *clef = drawingClef ? drawingClef : layer->GetClef(element);
     if (!clef) {
         keySig->SetEmptyBB();
         return;
     }
+    const int clefLocOffset = clef->GetClefLocOffset();
 
     // hidden key signature
     if (keySig->GetVisible() == BOOLEAN_false) {
@@ -981,8 +983,6 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int x = element->GetDrawingX();
     // HARDCODED
     const int step = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * TEMP_KEYSIG_STEP;
-
-    int clefLocOffset = layer->GetClefLocOffset(element);
 
     dc->StartGraphic(element, "", element->GetID());
 

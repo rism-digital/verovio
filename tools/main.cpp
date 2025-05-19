@@ -282,11 +282,11 @@ int main(int argc, char **argv)
     }
 
     const std::vector<std::string> outformats = { "mei", "mei-basic", "mei-pb", "mei-facs", "svg", "midi", "timemap",
-        "expansionmap", "humdrum", "hum", "pae" };
+        "expansionmap", "humdrum", "hum", "pae", "mei-pb-serialized" };
     if (std::find(outformats.begin(), outformats.end(), outformat) == outformats.end()) {
         std::cerr << "Output format (" << outformat
                   << ") can only be 'mei', 'mei-basic', 'mei-pb', mei-facs', 'svg', 'midi', 'timemap', 'expansionmap', "
-                     "'humdrum', 'hum', or 'pae'."
+                     "'humdrum', 'hum', 'pae', or , 'mei-pb-serialized'."
                   << std::endl;
         exit(1);
     }
@@ -549,16 +549,23 @@ int main(int argc, char **argv)
         }
     }
     else {
-        const char *scoreBased = (outformat == "mei-pb") ? "false" : "true";
-        const char *basic = (outformat == "mei-basic") ? "true" : "false";
-        const char *removeIds = (options->m_removeIds.GetValue()) ? "true" : "false";
-        const char *generateFacs = (outformat == "mei-facs") ? "true" : "false";
-        outfile += ".mei";
-        const std::string params = page
-            ? vrv::StringFormat("{'scoreBased': %s, 'basic': %s, 'pageNo': %d, 'removeIds': %s, 'generateFacs': %s}",
-                  scoreBased, basic, *page, removeIds, generateFacs)
-            : vrv::StringFormat("{'scoreBased': %s, 'basic': %s, 'removeIds': %s, 'generateFacs': %s}", scoreBased,
-                  basic, removeIds, generateFacs);
+        std::string params;
+        if (outformat == "mei-pb-serialized") {
+            params = "{'serialized': true }";
+            outfile += ".xml";
+        }
+        else {
+            const char *scoreBased = (outformat == "mei-pb") ? "false" : "true";
+            const char *basic = (outformat == "mei-basic") ? "true" : "false";
+            const char *removeIds = (options->m_removeIds.GetValue()) ? "true" : "false";
+            const char *generateFacs = (outformat == "mei-facs") ? "true" : "false";
+            outfile += ".mei";
+            params = page ? vrv::StringFormat(
+                                "{'scoreBased': %s, 'basic': %s, 'pageNo': %d, 'removeIds': %s, 'generateFacs': %s}",
+                                scoreBased, basic, *page, removeIds, generateFacs)
+                          : vrv::StringFormat("{'scoreBased': %s, 'basic': %s, 'removeIds': %s, 'generateFacs': %s}",
+                                scoreBased, basic, removeIds, generateFacs);
+        }
         if (stdOutput) {
             std::cout << toolkit.GetMEI(params);
         }

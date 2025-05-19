@@ -16,6 +16,9 @@
 			"label": "make",
 			"type": "shell",
 			"command": "make",
+			"args": [
+				"--jobs=8"
+			],
 			"options": {
 				"cwd": "${workspaceRoot}/tools"
 			},
@@ -29,6 +32,6 @@
 				"kind": "build",
 				"isDefault": true
 			}
-		}
+		},
 	]
-	}
+}

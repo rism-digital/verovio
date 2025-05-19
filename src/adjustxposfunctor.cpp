@@ -307,6 +307,8 @@ FunctorCode AdjustXPosFunctor::VisitMeasure(Measure *measure)
 
 FunctorCode AdjustXPosFunctor::VisitScore(Score *score)
 {
+    assert(score->GetScoreDef());
+
     m_staffNs = score->GetScoreDef()->GetStaffNs();
 
     return FUNCTOR_CONTINUE;

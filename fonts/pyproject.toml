@@ -1,14 +1,18 @@
-[tool.poetry]
-name = "verovio-fonts"
+[project]
+name = "Verovio-fonts"
 version = "0.1.0"
+dependencies = [
+    "svgpathtools (>=1.7.0)",
+]
+requires-python = ">=3.9"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = [
+    {name = "Andrew Hankinson", email="andrew.hankinson@gmail.com"},
+]
+readme = "README.md"
 
-[tool.poetry.dependencies]
-python = "^3.9"
-svgpathtools = "^1.6.0"
-
-[tool.poetry.dev-dependencies]
+[tool.poetry]
+package-mode = false
 
 [tool.poetry.group.dev.dependencies]
 ipython = "^8.10.0"
@@ -24,5 +28,5 @@ max-line-length = 99
 disable = ["C0103", "W1514", "C0114", "R0914", "R0913"]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=2.0"]
 build-backend = "poetry.core.masonry.api"

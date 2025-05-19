@@ -522,10 +522,8 @@ def __write_xml_glyphs(
             log.debug("Glyph code %s is not supported. Skipping", code)
             continue
 
-        rt: Et.Element = Et.Element("symbol")
+        rt: Et.Element = Et.Element("g")
         rt.set("id", code)
-        rt.set("viewBox", f"0 0 {units_per_em} {units_per_em}")
-        rt.set("overflow", "inherit")
         if "d" in glyph.attrib:
             pth = Et.SubElement(rt, "path")
             pth.set("transform", "scale(1,-1)")

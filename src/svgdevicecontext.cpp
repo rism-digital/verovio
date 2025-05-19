@@ -1130,15 +1130,10 @@ void SvgDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, b
         // Write the char in the SVG
         pugi::xml_node useChild = AddChild("use");
         useChild.append_attribute(hrefAttrib.c_str()) = StringFormat("#%s", id.c_str()).c_str();
-        useChild.append_attribute("x") = x;
-        useChild.append_attribute("y") = y;
-        useChild.append_attribute("height") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
-        useChild.append_attribute("width") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
-        if (m_fontStack.top()->GetWidthToHeightRatio() != 1.0f) {
-            useChild.append_attribute("transform") = StringFormat("matrix(%f,0,0,1,%f,0)",
-                m_fontStack.top()->GetWidthToHeightRatio(), x * (1. - m_fontStack.top()->GetWidthToHeightRatio()))
-                                                         .c_str();
-        }
+        double scaleX = (double)m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm() * DEFINITION_FACTOR;
+        double scaleY = scaleX;
+        if (m_fontStack.top()->GetWidthToHeightRatio() != 1.0f) scaleX *= m_fontStack.top()->GetWidthToHeightRatio();
+        useChild.append_attribute("transform") = StringFormat("translate(%d, %d) scale(%g, %g)", x, y, scaleX, scaleY);
 
         // Get the bounds of the char
         if (glyph->GetHorizAdvX() > 0)
