@@ -1,19 +1,6 @@
 
 import { createEmscriptenProxy } from "./emscripten-proxy.js";
 
-async function solve(options) {      
-    const res = await fetch(
-      `https://raw.githubusercontent.com/lpugin/test-font/main/GoldenAge.zip`,
-       {
-            method: "GET",
-       }
-    );
-    const data = await res.blob();
-    console.log( res );
-    console.log( options );
-    return options;
-}
-
 export class VerovioToolkit {
 
     constructor(VerovioModule) {
