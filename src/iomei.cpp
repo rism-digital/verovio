@@ -160,6 +160,11 @@
 #include "zone.h"
 
 #define VEROVIO_SERIALIZATION "verovio.serialization"
+#define MEI_ALL_SCHEMA "https://music-encoding.org/schema/5.1/mei-all.rng"
+#define MEI_BASIC_SCHEMA "https://music-encoding.org/schema/5.1/mei-basic.rng"
+#define MEI_PAGE_BASED_SCHEMA "https://www.verovio.org/schema/5.1/mei-verovio.rng"
+#define MEI_CURRENT_VERSION meiVersion_MEIVERSION_5_1
+#define MEI_CURRENT_BASIC_VERSION meiVersion_MEIVERSION_5_1plusbasic
 
 namespace vrv {
 
@@ -265,13 +270,13 @@ std::string MEIOutput::Export()
         // schema processing instruction
         std::string schema;
         if (this->IsPageBasedMEI()) {
-            schema = "https://www.verovio.org/schema/5.1/mei-verovio.rng";
+            schema = MEI_PAGE_BASED_SCHEMA;
         }
         else if (this->GetBasic()) {
-            schema = "https://music-encoding.org/schema/5.1/mei-basic.rng";
+            schema = MEI_BASIC_SCHEMA;
         }
         else {
-            schema = "https://music-encoding.org/schema/5.1/mei-all.rng";
+            schema = MEI_ALL_SCHEMA;
         }
 
         decl = meiDoc.append_child(pugi::node_declaration);
@@ -292,8 +297,8 @@ std::string MEIOutput::Export()
         m_mei = meiDoc.append_child("mei");
         m_mei.append_attribute("xmlns") = "http://www.music-encoding.org/ns/mei";
         AttConverter converter;
-        meiVersion_MEIVERSION meiVersion = meiVersion_MEIVERSION_5_1;
-        if (this->GetBasic()) meiVersion = meiVersion_MEIVERSION_5_1plusbasic;
+        meiVersion_MEIVERSION meiVersion = MEI_CURRENT_VERSION;
+        if (this->GetBasic()) meiVersion = MEI_CURRENT_BASIC_VERSION;
         m_mei.append_attribute("meiversion") = (converter.MeiVersionMeiversionToStr(meiVersion)).c_str();
 
         // If the document is mensural, we have to undo the mensural (segments) cast off
@@ -3480,6 +3485,7 @@ bool MEIInput::Import(const std::string &mei)
         doc.load_string(mei.c_str(), (pugi::parse_comments | pugi::parse_default) & ~pugi::parse_eol);
         pugi::xml_node root = doc.first_child();
         if (m_deserializing) {
+            m_meiversion = MEI_CURRENT_VERSION;
             m_doc->ClearChildren();
             return this->ReadPages(m_doc, root.first_child());
         }
