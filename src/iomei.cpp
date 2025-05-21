@@ -1970,7 +1970,6 @@ void MEIOutput::WriteMeterSigGrp(pugi::xml_node currentNode, MeterSigGrp *meterS
 {
     assert(meterSigGrp);
 
-    this->WriteXmlId(currentNode, meterSigGrp);
     this->WriteLayerElement(currentNode, meterSigGrp);
     meterSigGrp->WriteBasic(currentNode);
     meterSigGrp->WriteMeterSigGrpLog(currentNode);
@@ -5703,7 +5702,6 @@ bool MEIInput::ReadMeterSigGrp(Object *parent, pugi::xml_node meterSigGrp)
     assert(dynamic_cast<ScoreDef *>(parent) || dynamic_cast<StaffDef *>(parent) || dynamic_cast<Layer *>(parent));
 
     MeterSigGrp *vrvMeterSigGrp = new MeterSigGrp();
-    this->SetMeiID(meterSigGrp, vrvMeterSigGrp);
     this->ReadLayerElement(meterSigGrp, vrvMeterSigGrp);
     vrvMeterSigGrp->ReadBasic(meterSigGrp);
     vrvMeterSigGrp->ReadMeterSigGrpLog(meterSigGrp);
@@ -6867,7 +6865,7 @@ bool MEIInput::ReadKeySig(Object *parent, pugi::xml_node keySig)
 bool MEIInput::ReadLigature(Object *parent, pugi::xml_node ligature)
 {
     Ligature *vrvLigature = new Ligature();
-    this->SetMeiID(ligature, vrvLigature);
+    this->ReadLayerElement(ligature, vrvLigature);
 
     vrvLigature->ReadLigatureVis(ligature);
 
