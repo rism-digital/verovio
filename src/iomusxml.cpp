@@ -3500,7 +3500,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             m_trillStack.push_back({ trill, openTrill });
         }
         for (pugi::xml_node xmlAccidMark = xmlTrill.node().next_sibling("accidental-mark"); xmlAccidMark;
-             xmlAccidMark = xmlAccidMark.next_sibling("accidental-mark")) {
+            xmlAccidMark = xmlAccidMark.next_sibling("accidental-mark")) {
             if (HasAttributeWithValue(xmlAccidMark, "placement", "below")) {
                 trill->SetAccidlower(ConvertAccidentalToAccid(xmlAccidMark.text().as_string()));
             }
@@ -3538,7 +3538,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         turn->SetPlace(turn->AttPlacementRelStaff::StrToStaffrel(xmlTurn.node().attribute("placement").as_string()));
         turn->SetForm(turnLog_FORM_upper);
         for (pugi::xml_node xmlAccidMark = xmlTurn.node().next_sibling("accidental-mark"); xmlAccidMark;
-             xmlAccidMark = xmlAccidMark.next_sibling("accidental-mark")) {
+            xmlAccidMark = xmlAccidMark.next_sibling("accidental-mark")) {
             if (HasAttributeWithValue(xmlAccidMark, "placement", "above")) {
                 turn->SetAccidupper(ConvertAccidentalToAccid(xmlAccidMark.text().as_string()));
             }
@@ -4699,7 +4699,7 @@ std::pair<std::vector<int>, int> MusicXmlInput::GetMeterSigGrpValues(const pugi:
     int maxUnit = 0;
     std::vector<int> meterCounts;
     for (auto iter1 = beats.begin(), iter2 = beat_type.begin(); (iter1 != beats.end()) && (iter2 != beat_type.end());
-         ++iter1, ++iter2) {
+        ++iter1, ++iter2) {
         // Process current beat/beat-type combination and add it to the meterSigGrp
         MeterSig *meterSig = new MeterSig();
         data_METERCOUNT_pair count = meterSig->AttMeterSigLog::StrToMetercountPair(iter1->node().text().as_string());
@@ -4747,8 +4747,9 @@ std::string MusicXmlInput::GetOrnamentGlyphNumber(int attributes) const
     static std::map<int, std::string> precomposedNames = {
         { APPR_Above | FORM_Inverted, "U+E5C6" }, { APPR_Below | FORM_Inverted, "U+E5B5" },
         { APPR_Above | FORM_Normal, "U+E5C7" }, { APPR_Below | FORM_Normal, "U+E5B8" },
-        { FORM_Inverted | DEP_Above, "U+E5BB" },
-        { FORM_Inverted | DEP_Below, "U+E5C8" } // these values need to be matched with proper SMuFL codes first
+        { FORM_Inverted | DEP_Above, "U+E5BB" }, { FORM_Inverted | DEP_Below, "U+E5C8" }
+
+        // these values need to be matched with proper SMuFL codes first
         /*, { FORM_Normal | DEP_Above, "U+????" },
         { FORM_Normal | DEP_Below, "U+????" }, { APPR_Above | FORM_Normal | DEP_Above, "U+????" },
         { APPR_Above | FORM_Normal | DEP_Above, "U+????" }, { APPR_Above | FORM_Normal | DEP_Below, "U+????" },
