@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
       # Build the wheels for Linux, Windows and macOS
       matrix:
-        os: [macos-13, macos-14, windows-latest, ubuntu-latest]
+        os: [macos-13, macos-14, macos-15, windows-latest, ubuntu-latest]
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
         architecture: [x86, x64, arm64]
         include:
@@ -31,6 +31,9 @@ jobs:
             architecture: x64
             platform_id: macosx_x86_64
           - os: macos-14
+            architecture: arm64
+            platform_id: macosx_arm64
+          - os: macos-15
             architecture: arm64
             platform_id: macosx_arm64
           - os: windows-latest
@@ -50,6 +53,10 @@ jobs:
           - os: macos-14
             architecture: x86
           - os: macos-14
+            architecture: x64
+          - os: macos-15
+            architecture: x86
+          - os: macos-15
             architecture: x64
           - os: ubuntu-latest
             architecture: x86
@@ -103,7 +110,7 @@ jobs:
           CIBW_BUILD: ${{ env.CIBW_BUILD_IDENTIFIER }}
           CIBW_ARCHS_MACOS: x86_64 arm64
           CIBW_ENVIRONMENT_MACOS:
-            MACOSX_DEPLOYMENT_TARGET=11
+            MACOSX_DEPLOYMENT_TARGET=13
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_MANYLINUX_I686_IMAGE: manylinux2014
           CIBW_BEFORE_ALL_MACOS: brew update && brew install swig
