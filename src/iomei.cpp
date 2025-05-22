@@ -1496,7 +1496,8 @@ std::string MEIOutput::IDToMeiStr(Object *element)
 
 void MEIOutput::WriteXmlId(pugi::xml_node currentNode, Object *object)
 {
-    if (m_removeIds && !m_referredObjects.contains(object)) {
+    // Keep IDs for annot elements
+    if (m_removeIds && !object->Is({ANNOT, ANNOTSCORE}) && !m_referredObjects.contains(object)) {
         return;
     }
     currentNode.append_attribute("xml:id") = IDToMeiStr(object).c_str();
