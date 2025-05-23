@@ -35,7 +35,7 @@ if __name__ == '__main__':
     tk = verovio.toolkit(False)
     print(f'Verovio {tk.getVersion()}')
 
-    tk.setResourcePath('../data')
+    tk.setResourcePath('../../data')
 
     # look if we have a shortlist file and read it
     if len(args.shortlist) > 0:
