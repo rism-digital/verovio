@@ -81,7 +81,6 @@ if __name__ == '__main__':
             # filenames (input MEI/XML and output SVG)
             inputFile = os.path.join(path1, item1, item2)
             options.update({"xmlIdChecksum": True})
-            print(f'Evaluating {item2}')
             name, ext = os.path.splitext(item2)
             meiFile = os.path.join(path2, item1, name + '.mei')
 
@@ -97,6 +96,8 @@ if __name__ == '__main__':
             if toskip is not None and toskip.attrib['type'] == 'skip-round-trip':
                 print(f'Skipping {item2}')
                 continue
+
+            print(f'Evaluating {item2}')
 
             # try to get the extMeta tag and load the options if existing
             meta = root.findtext(
