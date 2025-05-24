@@ -141,7 +141,7 @@ ATTCLASS_CPP = """
 
 Att{attGroupNameUpper}::Att{attGroupNameUpper}() : Att()
 {{
-    Reset{attGroupNameUpper}();
+    this->Reset{attGroupNameUpper}();
 }}
 
 void Att{attGroupNameUpper}::Reset{attGroupNameUpper}()
