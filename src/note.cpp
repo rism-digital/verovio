@@ -165,7 +165,7 @@ void Note::AddChild(Object *child)
     else {
         children.push_back(child);
     }
-    Modify();
+    this->Modify();
 }
 
 bool Note::AddChildAdditionalCheck(Object *child)

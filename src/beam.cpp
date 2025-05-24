@@ -120,18 +120,18 @@ void BeamSegment::CalcBeam(const Layer *layer, Staff *staff, const Doc *doc, Bea
     }
 
     if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
-        CalcMixedBeamPlace(staff);
-        CalcPartialFlagPlace();
+        this->CalcMixedBeamPlace(staff);
+        this->CalcPartialFlagPlace();
     }
-    CalcBeamStemLength(staff, beamInterface->m_drawingPlace, horizontal);
+    this->CalcBeamStemLength(staff, beamInterface->m_drawingPlace, horizontal);
 
     // Set drawing stem positions
-    CalcBeamPosition(doc, staff, beamInterface, horizontal);
+    this->CalcBeamPosition(doc, staff, beamInterface, horizontal);
     if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
         if (NeedToResetPosition(staff, doc, beamInterface)) {
-            CalcBeamInit(staff, doc, beamInterface, place);
-            CalcBeamStemLength(staff, beamInterface->m_drawingPlace, horizontal);
-            CalcBeamPosition(doc, staff, beamInterface, horizontal);
+            this->CalcBeamInit(staff, doc, beamInterface, place);
+            this->CalcBeamStemLength(staff, beamInterface->m_drawingPlace, horizontal);
+            this->CalcBeamPosition(doc, staff, beamInterface, horizontal);
         }
     }
 

@@ -138,7 +138,7 @@ Object &Object::operator=(const Object &object)
 {
     // not self assignement
     if (this != &object) {
-        ClearChildren();
+        this->ClearChildren();
         this->ResetBoundingBox(); // It does not make sense to keep the values of the BBox
 
         m_classId = object.m_classId;
@@ -176,7 +176,7 @@ Object &Object::operator=(const Object &object)
 
 Object::~Object()
 {
-    ClearChildren();
+    this->ClearChildren();
 }
 
 void Object::Init(ClassId classId)
@@ -226,7 +226,7 @@ const Resources *Object::GetDocResources() const
 
 void Object::Reset()
 {
-    ClearChildren();
+    this->ClearChildren();
     this->ResetBoundingBox();
 }
 
@@ -282,7 +282,7 @@ void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChang
             idx++;
         }
         else {
-            AddChild(child);
+            this->AddChild(child);
         }
     }
 }
@@ -807,7 +807,7 @@ void Object::GenerateID()
 
 void Object::ResetID()
 {
-    GenerateID();
+    this->GenerateID();
 }
 
 void Object::SetParent(Object *parent)
@@ -849,7 +849,7 @@ void Object::AddChild(Object *child)
         i = std::min(i, (int)m_children.size());
         m_children.insert(m_children.begin() + i, child);
     }
-    Modify();
+    this->Modify();
 }
 
 int Object::GetInsertOrderForIn(ClassId classId, const std::vector<ClassId> &order) const
@@ -1248,13 +1248,13 @@ void Object::SeedID(uint32_t seed)
     }
     else {
         // Deterministic start ID
-        s_xmlIDCounter = Hash(seed);
+        s_xmlIDCounter = Object::Hash(seed);
     }
 }
 
 std::string Object::GenerateHashID()
 {
-    uint32_t nr = Hash(++s_xmlIDCounter);
+    uint32_t nr = Object::Hash(++s_xmlIDCounter);
 
     return BaseEncodeInt(nr, 36);
 }

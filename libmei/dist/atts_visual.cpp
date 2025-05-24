@@ -28,7 +28,7 @@ namespace vrv {
 
 AttAnnotVis::AttAnnotVis() : Att()
 {
-    ResetAnnotVis();
+    this->ResetAnnotVis();
 }
 
 void AttAnnotVis::ResetAnnotVis()
@@ -68,7 +68,7 @@ bool AttAnnotVis::HasPlace() const
 
 AttArpegVis::AttArpegVis() : Att()
 {
-    ResetArpegVis();
+    this->ResetArpegVis();
 }
 
 void AttArpegVis::ResetArpegVis()
@@ -168,7 +168,7 @@ bool AttArpegVis::HasArrowFillcolor() const
 
 AttBarLineVis::AttBarLineVis() : Att()
 {
-    ResetBarLineVis();
+    this->ResetBarLineVis();
 }
 
 void AttBarLineVis::ResetBarLineVis()
@@ -238,7 +238,7 @@ bool AttBarLineVis::HasPlace() const
 
 AttBeamingVis::AttBeamingVis() : Att()
 {
-    ResetBeamingVis();
+    this->ResetBeamingVis();
 }
 
 void AttBeamingVis::ResetBeamingVis()
@@ -308,7 +308,7 @@ bool AttBeamingVis::HasBeamSlope() const
 
 AttBeatRptVis::AttBeatRptVis() : Att()
 {
-    ResetBeatRptVis();
+    this->ResetBeatRptVis();
 }
 
 void AttBeatRptVis::ResetBeatRptVis()
@@ -348,7 +348,7 @@ bool AttBeatRptVis::HasSlash() const
 
 AttChordVis::AttChordVis() : Att()
 {
-    ResetChordVis();
+    this->ResetChordVis();
 }
 
 void AttChordVis::ResetChordVis()
@@ -388,7 +388,7 @@ bool AttChordVis::HasCluster() const
 
 AttCleffingVis::AttCleffingVis() : Att()
 {
-    ResetCleffingVis();
+    this->ResetCleffingVis();
 }
 
 void AttCleffingVis::ResetCleffingVis()
@@ -443,7 +443,7 @@ bool AttCleffingVis::HasClefVisible() const
 
 AttCurvatureDirection::AttCurvatureDirection() : Att()
 {
-    ResetCurvatureDirection();
+    this->ResetCurvatureDirection();
 }
 
 void AttCurvatureDirection::ResetCurvatureDirection()
@@ -483,7 +483,7 @@ bool AttCurvatureDirection::HasCurve() const
 
 AttEpisemaVis::AttEpisemaVis() : Att()
 {
-    ResetEpisemaVis();
+    this->ResetEpisemaVis();
 }
 
 void AttEpisemaVis::ResetEpisemaVis()
@@ -538,7 +538,7 @@ bool AttEpisemaVis::HasPlace() const
 
 AttFTremVis::AttFTremVis() : Att()
 {
-    ResetFTremVis();
+    this->ResetFTremVis();
 }
 
 void AttFTremVis::ResetFTremVis()
@@ -608,7 +608,7 @@ bool AttFTremVis::HasFloatGap() const
 
 AttFermataVis::AttFermataVis() : Att()
 {
-    ResetFermataVis();
+    this->ResetFermataVis();
 }
 
 void AttFermataVis::ResetFermataVis()
@@ -663,7 +663,7 @@ bool AttFermataVis::HasShape() const
 
 AttFingGrpVis::AttFingGrpVis() : Att()
 {
-    ResetFingGrpVis();
+    this->ResetFingGrpVis();
 }
 
 void AttFingGrpVis::ResetFingGrpVis()
@@ -703,7 +703,7 @@ bool AttFingGrpVis::HasOrient() const
 
 AttGuitarGridVis::AttGuitarGridVis() : Att()
 {
-    ResetGuitarGridVis();
+    this->ResetGuitarGridVis();
 }
 
 void AttGuitarGridVis::ResetGuitarGridVis()
@@ -743,7 +743,7 @@ bool AttGuitarGridVis::HasGridShow() const
 
 AttHairpinVis::AttHairpinVis() : Att()
 {
-    ResetHairpinVis();
+    this->ResetHairpinVis();
 }
 
 void AttHairpinVis::ResetHairpinVis()
@@ -828,7 +828,7 @@ bool AttHairpinVis::HasAngleOptimize() const
 
 AttHarmVis::AttHarmVis() : Att()
 {
-    ResetHarmVis();
+    this->ResetHarmVis();
 }
 
 void AttHarmVis::ResetHarmVis()
@@ -868,7 +868,7 @@ bool AttHarmVis::HasRendgrid() const
 
 AttHispanTickVis::AttHispanTickVis() : Att()
 {
-    ResetHispanTickVis();
+    this->ResetHispanTickVis();
 }
 
 void AttHispanTickVis::ResetHispanTickVis()
@@ -923,7 +923,7 @@ bool AttHispanTickVis::HasTilt() const
 
 AttKeySigVis::AttKeySigVis() : Att()
 {
-    ResetKeySigVis();
+    this->ResetKeySigVis();
 }
 
 void AttKeySigVis::ResetKeySigVis()
@@ -963,7 +963,7 @@ bool AttKeySigVis::HasCancelaccid() const
 
 AttKeySigDefaultVis::AttKeySigDefaultVis() : Att()
 {
-    ResetKeySigDefaultVis();
+    this->ResetKeySigDefaultVis();
 }
 
 void AttKeySigDefaultVis::ResetKeySigDefaultVis()
@@ -1018,7 +1018,7 @@ bool AttKeySigDefaultVis::HasKeysigVisible() const
 
 AttLigatureVis::AttLigatureVis() : Att()
 {
-    ResetLigatureVis();
+    this->ResetLigatureVis();
 }
 
 void AttLigatureVis::ResetLigatureVis()
@@ -1058,7 +1058,7 @@ bool AttLigatureVis::HasForm() const
 
 AttLineVis::AttLineVis() : Att()
 {
-    ResetLineVis();
+    this->ResetLineVis();
 }
 
 void AttLineVis::ResetLineVis()
@@ -1173,7 +1173,7 @@ bool AttLineVis::HasStartsymSize() const
 
 AttLiquescentVis::AttLiquescentVis() : Att()
 {
-    ResetLiquescentVis();
+    this->ResetLiquescentVis();
 }
 
 void AttLiquescentVis::ResetLiquescentVis()
@@ -1213,7 +1213,7 @@ bool AttLiquescentVis::HasLooped() const
 
 AttMensurVis::AttMensurVis() : Att()
 {
-    ResetMensurVis();
+    this->ResetMensurVis();
 }
 
 void AttMensurVis::ResetMensurVis()
@@ -1298,7 +1298,7 @@ bool AttMensurVis::HasSign() const
 
 AttMensuralVis::AttMensuralVis() : Att()
 {
-    ResetMensuralVis();
+    this->ResetMensuralVis();
 }
 
 void AttMensuralVis::ResetMensuralVis()
@@ -1443,7 +1443,7 @@ bool AttMensuralVis::HasMensurSlash() const
 
 AttMeterSigVis::AttMeterSigVis() : Att()
 {
-    ResetMeterSigVis();
+    this->ResetMeterSigVis();
 }
 
 void AttMeterSigVis::ResetMeterSigVis()
@@ -1483,7 +1483,7 @@ bool AttMeterSigVis::HasForm() const
 
 AttMeterSigDefaultVis::AttMeterSigDefaultVis() : Att()
 {
-    ResetMeterSigDefaultVis();
+    this->ResetMeterSigDefaultVis();
 }
 
 void AttMeterSigDefaultVis::ResetMeterSigDefaultVis()
@@ -1553,7 +1553,7 @@ bool AttMeterSigDefaultVis::HasMeterVisible() const
 
 AttMultiRestVis::AttMultiRestVis() : Att()
 {
-    ResetMultiRestVis();
+    this->ResetMultiRestVis();
 }
 
 void AttMultiRestVis::ResetMultiRestVis()
@@ -1593,7 +1593,7 @@ bool AttMultiRestVis::HasBlock() const
 
 AttPbVis::AttPbVis() : Att()
 {
-    ResetPbVis();
+    this->ResetPbVis();
 }
 
 void AttPbVis::ResetPbVis()
@@ -1633,7 +1633,7 @@ bool AttPbVis::HasFolium() const
 
 AttPedalVis::AttPedalVis() : Att()
 {
-    ResetPedalVis();
+    this->ResetPedalVis();
 }
 
 void AttPedalVis::ResetPedalVis()
@@ -1673,7 +1673,7 @@ bool AttPedalVis::HasForm() const
 
 AttPlicaVis::AttPlicaVis() : Att()
 {
-    ResetPlicaVis();
+    this->ResetPlicaVis();
 }
 
 void AttPlicaVis::ResetPlicaVis()
@@ -1728,7 +1728,7 @@ bool AttPlicaVis::HasLen() const
 
 AttQuilismaVis::AttQuilismaVis() : Att()
 {
-    ResetQuilismaVis();
+    this->ResetQuilismaVis();
 }
 
 void AttQuilismaVis::ResetQuilismaVis()
@@ -1768,7 +1768,7 @@ bool AttQuilismaVis::HasWaves() const
 
 AttSbVis::AttSbVis() : Att()
 {
-    ResetSbVis();
+    this->ResetSbVis();
 }
 
 void AttSbVis::ResetSbVis()
@@ -1808,7 +1808,7 @@ bool AttSbVis::HasForm() const
 
 AttScoreDefVis::AttScoreDefVis() : Att()
 {
-    ResetScoreDefVis();
+    this->ResetScoreDefVis();
 }
 
 void AttScoreDefVis::ResetScoreDefVis()
@@ -1848,7 +1848,7 @@ bool AttScoreDefVis::HasVuHeight() const
 
 AttSectionVis::AttSectionVis() : Att()
 {
-    ResetSectionVis();
+    this->ResetSectionVis();
 }
 
 void AttSectionVis::ResetSectionVis()
@@ -1888,7 +1888,7 @@ bool AttSectionVis::HasRestart() const
 
 AttSignifLetVis::AttSignifLetVis() : Att()
 {
-    ResetSignifLetVis();
+    this->ResetSignifLetVis();
 }
 
 void AttSignifLetVis::ResetSignifLetVis()
@@ -1928,7 +1928,7 @@ bool AttSignifLetVis::HasPlace() const
 
 AttSpaceVis::AttSpaceVis() : Att()
 {
-    ResetSpaceVis();
+    this->ResetSpaceVis();
 }
 
 void AttSpaceVis::ResetSpaceVis()
@@ -1968,7 +1968,7 @@ bool AttSpaceVis::HasCompressable() const
 
 AttStaffDefVis::AttStaffDefVis() : Att()
 {
-    ResetStaffDefVis();
+    this->ResetStaffDefVis();
 }
 
 void AttStaffDefVis::ResetStaffDefVis()
@@ -2053,7 +2053,7 @@ bool AttStaffDefVis::HasSpacing() const
 
 AttStaffGrpVis::AttStaffGrpVis() : Att()
 {
-    ResetStaffGrpVis();
+    this->ResetStaffGrpVis();
 }
 
 void AttStaffGrpVis::ResetStaffGrpVis()
@@ -2093,7 +2093,7 @@ bool AttStaffGrpVis::HasBarThru() const
 
 AttStemVis::AttStemVis() : Att()
 {
-    ResetStemVis();
+    this->ResetStemVis();
 }
 
 void AttStemVis::ResetStemVis()
@@ -2208,7 +2208,7 @@ bool AttStemVis::HasFlagForm() const
 
 AttTupletVis::AttTupletVis() : Att()
 {
-    ResetTupletVis();
+    this->ResetTupletVis();
 }
 
 void AttTupletVis::ResetTupletVis()

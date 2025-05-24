@@ -639,7 +639,7 @@ FloatingCurvePositioner::FloatingCurvePositioner(FloatingObject *object, StaffAl
 
 FloatingCurvePositioner::~FloatingCurvePositioner()
 {
-    ClearSpannedElements();
+    this->ClearSpannedElements();
 }
 
 void FloatingCurvePositioner::ResetPositioner()

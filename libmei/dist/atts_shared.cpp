@@ -28,7 +28,7 @@ namespace vrv {
 
 AttAccidLog::AttAccidLog() : Att()
 {
-    ResetAccidLog();
+    this->ResetAccidLog();
 }
 
 void AttAccidLog::ResetAccidLog()
@@ -68,7 +68,7 @@ bool AttAccidLog::HasFunc() const
 
 AttAccidental::AttAccidental() : Att()
 {
-    ResetAccidental();
+    this->ResetAccidental();
 }
 
 void AttAccidental::ResetAccidental()
@@ -108,7 +108,7 @@ bool AttAccidental::HasAccid() const
 
 AttArticulation::AttArticulation() : Att()
 {
-    ResetArticulation();
+    this->ResetArticulation();
 }
 
 void AttArticulation::ResetArticulation()
@@ -148,7 +148,7 @@ bool AttArticulation::HasArtic() const
 
 AttAttaccaLog::AttAttaccaLog() : Att()
 {
-    ResetAttaccaLog();
+    this->ResetAttaccaLog();
 }
 
 void AttAttaccaLog::ResetAttaccaLog()
@@ -188,7 +188,7 @@ bool AttAttaccaLog::HasTarget() const
 
 AttAudience::AttAudience() : Att()
 {
-    ResetAudience();
+    this->ResetAudience();
 }
 
 void AttAudience::ResetAudience()
@@ -228,7 +228,7 @@ bool AttAudience::HasAudience() const
 
 AttAugmentDots::AttAugmentDots() : Att()
 {
-    ResetAugmentDots();
+    this->ResetAugmentDots();
 }
 
 void AttAugmentDots::ResetAugmentDots()
@@ -268,7 +268,7 @@ bool AttAugmentDots::HasDots() const
 
 AttAuthorized::AttAuthorized() : Att()
 {
-    ResetAuthorized();
+    this->ResetAuthorized();
 }
 
 void AttAuthorized::ResetAuthorized()
@@ -323,7 +323,7 @@ bool AttAuthorized::HasAuthUri() const
 
 AttBarLineLog::AttBarLineLog() : Att()
 {
-    ResetBarLineLog();
+    this->ResetBarLineLog();
 }
 
 void AttBarLineLog::ResetBarLineLog()
@@ -363,7 +363,7 @@ bool AttBarLineLog::HasForm() const
 
 AttBarring::AttBarring() : Att()
 {
-    ResetBarring();
+    this->ResetBarring();
 }
 
 void AttBarring::ResetBarring()
@@ -433,7 +433,7 @@ bool AttBarring::HasBarPlace() const
 
 AttBasic::AttBasic() : Att()
 {
-    ResetBasic();
+    this->ResetBasic();
 }
 
 void AttBasic::ResetBasic()
@@ -473,7 +473,7 @@ bool AttBasic::HasBase() const
 
 AttBibl::AttBibl() : Att()
 {
-    ResetBibl();
+    this->ResetBibl();
 }
 
 void AttBibl::ResetBibl()
@@ -513,7 +513,7 @@ bool AttBibl::HasAnalog() const
 
 AttCalendared::AttCalendared() : Att()
 {
-    ResetCalendared();
+    this->ResetCalendared();
 }
 
 void AttCalendared::ResetCalendared()
@@ -553,7 +553,7 @@ bool AttCalendared::HasCalendar() const
 
 AttCanonical::AttCanonical() : Att()
 {
-    ResetCanonical();
+    this->ResetCanonical();
 }
 
 void AttCanonical::ResetCanonical()
@@ -593,7 +593,7 @@ bool AttCanonical::HasCodedval() const
 
 AttClassed::AttClassed() : Att()
 {
-    ResetClassed();
+    this->ResetClassed();
 }
 
 void AttClassed::ResetClassed()
@@ -633,7 +633,7 @@ bool AttClassed::HasClass() const
 
 AttClefLog::AttClefLog() : Att()
 {
-    ResetClefLog();
+    this->ResetClefLog();
 }
 
 void AttClefLog::ResetClefLog()
@@ -673,7 +673,7 @@ bool AttClefLog::HasCautionary() const
 
 AttClefShape::AttClefShape() : Att()
 {
-    ResetClefShape();
+    this->ResetClefShape();
 }
 
 void AttClefShape::ResetClefShape()
@@ -713,7 +713,7 @@ bool AttClefShape::HasShape() const
 
 AttCleffingLog::AttCleffingLog() : Att()
 {
-    ResetCleffingLog();
+    this->ResetCleffingLog();
 }
 
 void AttCleffingLog::ResetCleffingLog()
@@ -798,7 +798,7 @@ bool AttCleffingLog::HasClefDisPlace() const
 
 AttColor::AttColor() : Att()
 {
-    ResetColor();
+    this->ResetColor();
 }
 
 void AttColor::ResetColor()
@@ -838,7 +838,7 @@ bool AttColor::HasColor() const
 
 AttColoration::AttColoration() : Att()
 {
-    ResetColoration();
+    this->ResetColoration();
 }
 
 void AttColoration::ResetColoration()
@@ -878,7 +878,7 @@ bool AttColoration::HasColored() const
 
 AttCoordX1::AttCoordX1() : Att()
 {
-    ResetCoordX1();
+    this->ResetCoordX1();
 }
 
 void AttCoordX1::ResetCoordX1()
@@ -918,7 +918,7 @@ bool AttCoordX1::HasCoordX1() const
 
 AttCoordX2::AttCoordX2() : Att()
 {
-    ResetCoordX2();
+    this->ResetCoordX2();
 }
 
 void AttCoordX2::ResetCoordX2()
@@ -958,7 +958,7 @@ bool AttCoordX2::HasCoordX2() const
 
 AttCoordY1::AttCoordY1() : Att()
 {
-    ResetCoordY1();
+    this->ResetCoordY1();
 }
 
 void AttCoordY1::ResetCoordY1()
@@ -998,7 +998,7 @@ bool AttCoordY1::HasCoordY1() const
 
 AttCoordinated::AttCoordinated() : Att()
 {
-    ResetCoordinated();
+    this->ResetCoordinated();
 }
 
 void AttCoordinated::ResetCoordinated()
@@ -1068,7 +1068,7 @@ bool AttCoordinated::HasRotate() const
 
 AttCoordinatedUl::AttCoordinatedUl() : Att()
 {
-    ResetCoordinatedUl();
+    this->ResetCoordinatedUl();
 }
 
 void AttCoordinatedUl::ResetCoordinatedUl()
@@ -1123,7 +1123,7 @@ bool AttCoordinatedUl::HasUly() const
 
 AttCue::AttCue() : Att()
 {
-    ResetCue();
+    this->ResetCue();
 }
 
 void AttCue::ResetCue()
@@ -1163,7 +1163,7 @@ bool AttCue::HasCue() const
 
 AttCurvature::AttCurvature() : Att()
 {
-    ResetCurvature();
+    this->ResetCurvature();
 }
 
 void AttCurvature::ResetCurvature()
@@ -1233,7 +1233,7 @@ bool AttCurvature::HasCurvedir() const
 
 AttCustosLog::AttCustosLog() : Att()
 {
-    ResetCustosLog();
+    this->ResetCustosLog();
 }
 
 void AttCustosLog::ResetCustosLog()
@@ -1273,7 +1273,7 @@ bool AttCustosLog::HasTarget() const
 
 AttDataPointing::AttDataPointing() : Att()
 {
-    ResetDataPointing();
+    this->ResetDataPointing();
 }
 
 void AttDataPointing::ResetDataPointing()
@@ -1313,7 +1313,7 @@ bool AttDataPointing::HasData() const
 
 AttDataSelecting::AttDataSelecting() : Att()
 {
-    ResetDataSelecting();
+    this->ResetDataSelecting();
 }
 
 void AttDataSelecting::ResetDataSelecting()
@@ -1353,7 +1353,7 @@ bool AttDataSelecting::HasSelect() const
 
 AttDatable::AttDatable() : Att()
 {
-    ResetDatable();
+    this->ResetDatable();
 }
 
 void AttDatable::ResetDatable()
@@ -1453,7 +1453,7 @@ bool AttDatable::HasStartdate() const
 
 AttDistances::AttDistances() : Att()
 {
-    ResetDistances();
+    this->ResetDistances();
 }
 
 void AttDistances::ResetDistances()
@@ -1553,7 +1553,7 @@ bool AttDistances::HasTempoDist() const
 
 AttDotLog::AttDotLog() : Att()
 {
-    ResetDotLog();
+    this->ResetDotLog();
 }
 
 void AttDotLog::ResetDotLog()
@@ -1593,7 +1593,7 @@ bool AttDotLog::HasForm() const
 
 AttDurationAdditive::AttDurationAdditive() : Att()
 {
-    ResetDurationAdditive();
+    this->ResetDurationAdditive();
 }
 
 void AttDurationAdditive::ResetDurationAdditive()
@@ -1633,7 +1633,7 @@ bool AttDurationAdditive::HasDur() const
 
 AttDurationDefault::AttDurationDefault() : Att()
 {
-    ResetDurationDefault();
+    this->ResetDurationDefault();
 }
 
 void AttDurationDefault::ResetDurationDefault()
@@ -1703,7 +1703,7 @@ bool AttDurationDefault::HasNumbaseDefault() const
 
 AttDurationLog::AttDurationLog() : Att()
 {
-    ResetDurationLog();
+    this->ResetDurationLog();
 }
 
 void AttDurationLog::ResetDurationLog()
@@ -1743,7 +1743,7 @@ bool AttDurationLog::HasDur() const
 
 AttDurationRatio::AttDurationRatio() : Att()
 {
-    ResetDurationRatio();
+    this->ResetDurationRatio();
 }
 
 void AttDurationRatio::ResetDurationRatio()
@@ -1798,7 +1798,7 @@ bool AttDurationRatio::HasNumbase() const
 
 AttEnclosingChars::AttEnclosingChars() : Att()
 {
-    ResetEnclosingChars();
+    this->ResetEnclosingChars();
 }
 
 void AttEnclosingChars::ResetEnclosingChars()
@@ -1838,7 +1838,7 @@ bool AttEnclosingChars::HasEnclose() const
 
 AttEndings::AttEndings() : Att()
 {
-    ResetEndings();
+    this->ResetEndings();
 }
 
 void AttEndings::ResetEndings()
@@ -1878,7 +1878,7 @@ bool AttEndings::HasEndingRend() const
 
 AttEvidence::AttEvidence() : Att()
 {
-    ResetEvidence();
+    this->ResetEvidence();
 }
 
 void AttEvidence::ResetEvidence()
@@ -1933,7 +1933,7 @@ bool AttEvidence::HasEvidence() const
 
 AttExtender::AttExtender() : Att()
 {
-    ResetExtender();
+    this->ResetExtender();
 }
 
 void AttExtender::ResetExtender()
@@ -1973,7 +1973,7 @@ bool AttExtender::HasExtender() const
 
 AttExtent::AttExtent() : Att()
 {
-    ResetExtent();
+    this->ResetExtent();
 }
 
 void AttExtent::ResetExtent()
@@ -2013,7 +2013,7 @@ bool AttExtent::HasExtent() const
 
 AttFermataPresent::AttFermataPresent() : Att()
 {
-    ResetFermataPresent();
+    this->ResetFermataPresent();
 }
 
 void AttFermataPresent::ResetFermataPresent()
@@ -2053,7 +2053,7 @@ bool AttFermataPresent::HasFermata() const
 
 AttFiling::AttFiling() : Att()
 {
-    ResetFiling();
+    this->ResetFiling();
 }
 
 void AttFiling::ResetFiling()
@@ -2093,7 +2093,7 @@ bool AttFiling::HasNonfiling() const
 
 AttFormework::AttFormework() : Att()
 {
-    ResetFormework();
+    this->ResetFormework();
 }
 
 void AttFormework::ResetFormework()
@@ -2133,7 +2133,7 @@ bool AttFormework::HasFunc() const
 
 AttGrpSymLog::AttGrpSymLog() : Att()
 {
-    ResetGrpSymLog();
+    this->ResetGrpSymLog();
 }
 
 void AttGrpSymLog::ResetGrpSymLog()
@@ -2173,7 +2173,7 @@ bool AttGrpSymLog::HasLevel() const
 
 AttHandIdent::AttHandIdent() : Att()
 {
-    ResetHandIdent();
+    this->ResetHandIdent();
 }
 
 void AttHandIdent::ResetHandIdent()
@@ -2213,7 +2213,7 @@ bool AttHandIdent::HasHand() const
 
 AttHeight::AttHeight() : Att()
 {
-    ResetHeight();
+    this->ResetHeight();
 }
 
 void AttHeight::ResetHeight()
@@ -2253,7 +2253,7 @@ bool AttHeight::HasHeight() const
 
 AttHorizontalAlign::AttHorizontalAlign() : Att()
 {
-    ResetHorizontalAlign();
+    this->ResetHorizontalAlign();
 }
 
 void AttHorizontalAlign::ResetHorizontalAlign()
@@ -2293,7 +2293,7 @@ bool AttHorizontalAlign::HasHalign() const
 
 AttInternetMedia::AttInternetMedia() : Att()
 {
-    ResetInternetMedia();
+    this->ResetInternetMedia();
 }
 
 void AttInternetMedia::ResetInternetMedia()
@@ -2333,7 +2333,7 @@ bool AttInternetMedia::HasMimetype() const
 
 AttJoined::AttJoined() : Att()
 {
-    ResetJoined();
+    this->ResetJoined();
 }
 
 void AttJoined::ResetJoined()
@@ -2373,7 +2373,7 @@ bool AttJoined::HasJoin() const
 
 AttKeyMode::AttKeyMode() : Att()
 {
-    ResetKeyMode();
+    this->ResetKeyMode();
 }
 
 void AttKeyMode::ResetKeyMode()
@@ -2413,7 +2413,7 @@ bool AttKeyMode::HasMode() const
 
 AttKeySigLog::AttKeySigLog() : Att()
 {
-    ResetKeySigLog();
+    this->ResetKeySigLog();
 }
 
 void AttKeySigLog::ResetKeySigLog()
@@ -2453,7 +2453,7 @@ bool AttKeySigLog::HasSig() const
 
 AttKeySigDefaultLog::AttKeySigDefaultLog() : Att()
 {
-    ResetKeySigDefaultLog();
+    this->ResetKeySigDefaultLog();
 }
 
 void AttKeySigDefaultLog::ResetKeySigDefaultLog()
@@ -2493,7 +2493,7 @@ bool AttKeySigDefaultLog::HasKeysig() const
 
 AttLabelled::AttLabelled() : Att()
 {
-    ResetLabelled();
+    this->ResetLabelled();
 }
 
 void AttLabelled::ResetLabelled()
@@ -2533,7 +2533,7 @@ bool AttLabelled::HasLabel() const
 
 AttLang::AttLang() : Att()
 {
-    ResetLang();
+    this->ResetLang();
 }
 
 void AttLang::ResetLang()
@@ -2588,7 +2588,7 @@ bool AttLang::HasTranslit() const
 
 AttLayerLog::AttLayerLog() : Att()
 {
-    ResetLayerLog();
+    this->ResetLayerLog();
 }
 
 void AttLayerLog::ResetLayerLog()
@@ -2628,7 +2628,7 @@ bool AttLayerLog::HasDef() const
 
 AttLayerIdent::AttLayerIdent() : Att()
 {
-    ResetLayerIdent();
+    this->ResetLayerIdent();
 }
 
 void AttLayerIdent::ResetLayerIdent()
@@ -2668,7 +2668,7 @@ bool AttLayerIdent::HasLayer() const
 
 AttLineLoc::AttLineLoc() : Att()
 {
-    ResetLineLoc();
+    this->ResetLineLoc();
 }
 
 void AttLineLoc::ResetLineLoc()
@@ -2708,7 +2708,7 @@ bool AttLineLoc::HasLine() const
 
 AttLineRend::AttLineRend() : Att()
 {
-    ResetLineRend();
+    this->ResetLineRend();
 }
 
 void AttLineRend::ResetLineRend()
@@ -2793,7 +2793,7 @@ bool AttLineRend::HasLstartsymSize() const
 
 AttLineRendBase::AttLineRendBase() : Att()
 {
-    ResetLineRendBase();
+    this->ResetLineRendBase();
 }
 
 void AttLineRendBase::ResetLineRendBase()
@@ -2863,7 +2863,7 @@ bool AttLineRendBase::HasLsegs() const
 
 AttLinking::AttLinking() : Att()
 {
-    ResetLinking();
+    this->ResetLinking();
 }
 
 void AttLinking::ResetLinking()
@@ -3008,7 +3008,7 @@ bool AttLinking::HasSynch() const
 
 AttLyricStyle::AttLyricStyle() : Att()
 {
-    ResetLyricStyle();
+    this->ResetLyricStyle();
 }
 
 void AttLyricStyle::ResetLyricStyle()
@@ -3123,7 +3123,7 @@ bool AttLyricStyle::HasLyricWeight() const
 
 AttMeasureNumbers::AttMeasureNumbers() : Att()
 {
-    ResetMeasureNumbers();
+    this->ResetMeasureNumbers();
 }
 
 void AttMeasureNumbers::ResetMeasureNumbers()
@@ -3163,7 +3163,7 @@ bool AttMeasureNumbers::HasMnumVisible() const
 
 AttMeasurement::AttMeasurement() : Att()
 {
-    ResetMeasurement();
+    this->ResetMeasurement();
 }
 
 void AttMeasurement::ResetMeasurement()
@@ -3203,7 +3203,7 @@ bool AttMeasurement::HasUnit() const
 
 AttMediaBounds::AttMediaBounds() : Att()
 {
-    ResetMediaBounds();
+    this->ResetMediaBounds();
 }
 
 void AttMediaBounds::ResetMediaBounds()
@@ -3273,7 +3273,7 @@ bool AttMediaBounds::HasBetype() const
 
 AttMedium::AttMedium() : Att()
 {
-    ResetMedium();
+    this->ResetMedium();
 }
 
 void AttMedium::ResetMedium()
@@ -3313,7 +3313,7 @@ bool AttMedium::HasMedium() const
 
 AttMeiVersion::AttMeiVersion() : Att()
 {
-    ResetMeiVersion();
+    this->ResetMeiVersion();
 }
 
 void AttMeiVersion::ResetMeiVersion()
@@ -3353,7 +3353,7 @@ bool AttMeiVersion::HasMeiversion() const
 
 AttMensurLog::AttMensurLog() : Att()
 {
-    ResetMensurLog();
+    this->ResetMensurLog();
 }
 
 void AttMensurLog::ResetMensurLog()
@@ -3393,7 +3393,7 @@ bool AttMensurLog::HasLevel() const
 
 AttMetadataPointing::AttMetadataPointing() : Att()
 {
-    ResetMetadataPointing();
+    this->ResetMetadataPointing();
 }
 
 void AttMetadataPointing::ResetMetadataPointing()
@@ -3433,7 +3433,7 @@ bool AttMetadataPointing::HasDecls() const
 
 AttMeterConformance::AttMeterConformance() : Att()
 {
-    ResetMeterConformance();
+    this->ResetMeterConformance();
 }
 
 void AttMeterConformance::ResetMeterConformance()
@@ -3473,7 +3473,7 @@ bool AttMeterConformance::HasMetcon() const
 
 AttMeterConformanceBar::AttMeterConformanceBar() : Att()
 {
-    ResetMeterConformanceBar();
+    this->ResetMeterConformanceBar();
 }
 
 void AttMeterConformanceBar::ResetMeterConformanceBar()
@@ -3528,7 +3528,7 @@ bool AttMeterConformanceBar::HasControl() const
 
 AttMeterSigLog::AttMeterSigLog() : Att()
 {
-    ResetMeterSigLog();
+    this->ResetMeterSigLog();
 }
 
 void AttMeterSigLog::ResetMeterSigLog()
@@ -3598,7 +3598,7 @@ bool AttMeterSigLog::HasUnit() const
 
 AttMeterSigDefaultLog::AttMeterSigDefaultLog() : Att()
 {
-    ResetMeterSigDefaultLog();
+    this->ResetMeterSigDefaultLog();
 }
 
 void AttMeterSigDefaultLog::ResetMeterSigDefaultLog()
@@ -3668,7 +3668,7 @@ bool AttMeterSigDefaultLog::HasMeterSym() const
 
 AttMmTempo::AttMmTempo() : Att()
 {
-    ResetMmTempo();
+    this->ResetMmTempo();
 }
 
 void AttMmTempo::ResetMmTempo()
@@ -3738,7 +3738,7 @@ bool AttMmTempo::HasMmDots() const
 
 AttMultinumMeasures::AttMultinumMeasures() : Att()
 {
-    ResetMultinumMeasures();
+    this->ResetMultinumMeasures();
 }
 
 void AttMultinumMeasures::ResetMultinumMeasures()
@@ -3778,7 +3778,7 @@ bool AttMultinumMeasures::HasMultiNumber() const
 
 AttNInteger::AttNInteger() : Att()
 {
-    ResetNInteger();
+    this->ResetNInteger();
 }
 
 void AttNInteger::ResetNInteger()
@@ -3818,7 +3818,7 @@ bool AttNInteger::HasN() const
 
 AttNNumberLike::AttNNumberLike() : Att()
 {
-    ResetNNumberLike();
+    this->ResetNNumberLike();
 }
 
 void AttNNumberLike::ResetNNumberLike()
@@ -3858,7 +3858,7 @@ bool AttNNumberLike::HasN() const
 
 AttName::AttName() : Att()
 {
-    ResetName();
+    this->ResetName();
 }
 
 void AttName::ResetName()
@@ -3913,7 +3913,7 @@ bool AttName::HasRole() const
 
 AttNotationStyle::AttNotationStyle() : Att()
 {
-    ResetNotationStyle();
+    this->ResetNotationStyle();
 }
 
 void AttNotationStyle::ResetNotationStyle()
@@ -3968,7 +3968,7 @@ bool AttNotationStyle::HasMusicSize() const
 
 AttNoteHeads::AttNoteHeads() : Att()
 {
-    ResetNoteHeads();
+    this->ResetNoteHeads();
 }
 
 void AttNoteHeads::ResetNoteHeads()
@@ -4128,7 +4128,7 @@ bool AttNoteHeads::HasHeadVisible() const
 
 AttOctave::AttOctave() : Att()
 {
-    ResetOctave();
+    this->ResetOctave();
 }
 
 void AttOctave::ResetOctave()
@@ -4168,7 +4168,7 @@ bool AttOctave::HasOct() const
 
 AttOctaveDefault::AttOctaveDefault() : Att()
 {
-    ResetOctaveDefault();
+    this->ResetOctaveDefault();
 }
 
 void AttOctaveDefault::ResetOctaveDefault()
@@ -4208,7 +4208,7 @@ bool AttOctaveDefault::HasOctDefault() const
 
 AttOctaveDisplacement::AttOctaveDisplacement() : Att()
 {
-    ResetOctaveDisplacement();
+    this->ResetOctaveDisplacement();
 }
 
 void AttOctaveDisplacement::ResetOctaveDisplacement()
@@ -4263,7 +4263,7 @@ bool AttOctaveDisplacement::HasDisPlace() const
 
 AttOneLineStaff::AttOneLineStaff() : Att()
 {
-    ResetOneLineStaff();
+    this->ResetOneLineStaff();
 }
 
 void AttOneLineStaff::ResetOneLineStaff()
@@ -4303,7 +4303,7 @@ bool AttOneLineStaff::HasOntheline() const
 
 AttOptimization::AttOptimization() : Att()
 {
-    ResetOptimization();
+    this->ResetOptimization();
 }
 
 void AttOptimization::ResetOptimization()
@@ -4343,7 +4343,7 @@ bool AttOptimization::HasOptimize() const
 
 AttOriginLayerIdent::AttOriginLayerIdent() : Att()
 {
-    ResetOriginLayerIdent();
+    this->ResetOriginLayerIdent();
 }
 
 void AttOriginLayerIdent::ResetOriginLayerIdent()
@@ -4383,7 +4383,7 @@ bool AttOriginLayerIdent::HasOriginLayer() const
 
 AttOriginStaffIdent::AttOriginStaffIdent() : Att()
 {
-    ResetOriginStaffIdent();
+    this->ResetOriginStaffIdent();
 }
 
 void AttOriginStaffIdent::ResetOriginStaffIdent()
@@ -4423,7 +4423,7 @@ bool AttOriginStaffIdent::HasOriginStaff() const
 
 AttOriginStartEndId::AttOriginStartEndId() : Att()
 {
-    ResetOriginStartEndId();
+    this->ResetOriginStartEndId();
 }
 
 void AttOriginStartEndId::ResetOriginStartEndId()
@@ -4478,7 +4478,7 @@ bool AttOriginStartEndId::HasOriginEndid() const
 
 AttOriginTimestampLog::AttOriginTimestampLog() : Att()
 {
-    ResetOriginTimestampLog();
+    this->ResetOriginTimestampLog();
 }
 
 void AttOriginTimestampLog::ResetOriginTimestampLog()
@@ -4533,7 +4533,7 @@ bool AttOriginTimestampLog::HasOriginTstamp2() const
 
 AttPages::AttPages() : Att()
 {
-    ResetPages();
+    this->ResetPages();
 }
 
 void AttPages::ResetPages()
@@ -4678,7 +4678,7 @@ bool AttPages::HasPageScale() const
 
 AttPartIdent::AttPartIdent() : Att()
 {
-    ResetPartIdent();
+    this->ResetPartIdent();
 }
 
 void AttPartIdent::ResetPartIdent()
@@ -4733,7 +4733,7 @@ bool AttPartIdent::HasPartstaff() const
 
 AttPitch::AttPitch() : Att()
 {
-    ResetPitch();
+    this->ResetPitch();
 }
 
 void AttPitch::ResetPitch()
@@ -4773,7 +4773,7 @@ bool AttPitch::HasPname() const
 
 AttPlacementOnStaff::AttPlacementOnStaff() : Att()
 {
-    ResetPlacementOnStaff();
+    this->ResetPlacementOnStaff();
 }
 
 void AttPlacementOnStaff::ResetPlacementOnStaff()
@@ -4813,7 +4813,7 @@ bool AttPlacementOnStaff::HasOnstaff() const
 
 AttPlacementRelEvent::AttPlacementRelEvent() : Att()
 {
-    ResetPlacementRelEvent();
+    this->ResetPlacementRelEvent();
 }
 
 void AttPlacementRelEvent::ResetPlacementRelEvent()
@@ -4853,7 +4853,7 @@ bool AttPlacementRelEvent::HasPlace() const
 
 AttPlacementRelStaff::AttPlacementRelStaff() : Att()
 {
-    ResetPlacementRelStaff();
+    this->ResetPlacementRelStaff();
 }
 
 void AttPlacementRelStaff::ResetPlacementRelStaff()
@@ -4893,7 +4893,7 @@ bool AttPlacementRelStaff::HasPlace() const
 
 AttPlist::AttPlist() : Att()
 {
-    ResetPlist();
+    this->ResetPlist();
 }
 
 void AttPlist::ResetPlist()
@@ -4933,7 +4933,7 @@ bool AttPlist::HasPlist() const
 
 AttPointing::AttPointing() : Att()
 {
-    ResetPointing();
+    this->ResetPointing();
 }
 
 void AttPointing::ResetPointing()
@@ -5033,7 +5033,7 @@ bool AttPointing::HasTargettype() const
 
 AttQuantity::AttQuantity() : Att()
 {
-    ResetQuantity();
+    this->ResetQuantity();
 }
 
 void AttQuantity::ResetQuantity()
@@ -5073,7 +5073,7 @@ bool AttQuantity::HasQuantity() const
 
 AttRanging::AttRanging() : Att()
 {
-    ResetRanging();
+    this->ResetRanging();
 }
 
 void AttRanging::ResetRanging()
@@ -5173,7 +5173,7 @@ bool AttRanging::HasConfidence() const
 
 AttRepeatMarkLog::AttRepeatMarkLog() : Att()
 {
-    ResetRepeatMarkLog();
+    this->ResetRepeatMarkLog();
 }
 
 void AttRepeatMarkLog::ResetRepeatMarkLog()
@@ -5213,7 +5213,7 @@ bool AttRepeatMarkLog::HasFunc() const
 
 AttResponsibility::AttResponsibility() : Att()
 {
-    ResetResponsibility();
+    this->ResetResponsibility();
 }
 
 void AttResponsibility::ResetResponsibility()
@@ -5253,7 +5253,7 @@ bool AttResponsibility::HasResp() const
 
 AttRestdurationLog::AttRestdurationLog() : Att()
 {
-    ResetRestdurationLog();
+    this->ResetRestdurationLog();
 }
 
 void AttRestdurationLog::ResetRestdurationLog()
@@ -5293,7 +5293,7 @@ bool AttRestdurationLog::HasDur() const
 
 AttScalable::AttScalable() : Att()
 {
-    ResetScalable();
+    this->ResetScalable();
 }
 
 void AttScalable::ResetScalable()
@@ -5333,7 +5333,7 @@ bool AttScalable::HasScale() const
 
 AttSequence::AttSequence() : Att()
 {
-    ResetSequence();
+    this->ResetSequence();
 }
 
 void AttSequence::ResetSequence()
@@ -5373,7 +5373,7 @@ bool AttSequence::HasSeq() const
 
 AttSlashCount::AttSlashCount() : Att()
 {
-    ResetSlashCount();
+    this->ResetSlashCount();
 }
 
 void AttSlashCount::ResetSlashCount()
@@ -5413,7 +5413,7 @@ bool AttSlashCount::HasSlash() const
 
 AttSlurPresent::AttSlurPresent() : Att()
 {
-    ResetSlurPresent();
+    this->ResetSlurPresent();
 }
 
 void AttSlurPresent::ResetSlurPresent()
@@ -5453,7 +5453,7 @@ bool AttSlurPresent::HasSlur() const
 
 AttSource::AttSource() : Att()
 {
-    ResetSource();
+    this->ResetSource();
 }
 
 void AttSource::ResetSource()
@@ -5493,7 +5493,7 @@ bool AttSource::HasSource() const
 
 AttSpacing::AttSpacing() : Att()
 {
-    ResetSpacing();
+    this->ResetSpacing();
 }
 
 void AttSpacing::ResetSpacing()
@@ -5578,7 +5578,7 @@ bool AttSpacing::HasSpacingSystem() const
 
 AttStaffLog::AttStaffLog() : Att()
 {
-    ResetStaffLog();
+    this->ResetStaffLog();
 }
 
 void AttStaffLog::ResetStaffLog()
@@ -5618,7 +5618,7 @@ bool AttStaffLog::HasDef() const
 
 AttStaffDefLog::AttStaffDefLog() : Att()
 {
-    ResetStaffDefLog();
+    this->ResetStaffDefLog();
 }
 
 void AttStaffDefLog::ResetStaffDefLog()
@@ -5658,7 +5658,7 @@ bool AttStaffDefLog::HasLines() const
 
 AttStaffGroupingSym::AttStaffGroupingSym() : Att()
 {
-    ResetStaffGroupingSym();
+    this->ResetStaffGroupingSym();
 }
 
 void AttStaffGroupingSym::ResetStaffGroupingSym()
@@ -5698,7 +5698,7 @@ bool AttStaffGroupingSym::HasSymbol() const
 
 AttStaffIdent::AttStaffIdent() : Att()
 {
-    ResetStaffIdent();
+    this->ResetStaffIdent();
 }
 
 void AttStaffIdent::ResetStaffIdent()
@@ -5738,7 +5738,7 @@ bool AttStaffIdent::HasStaff() const
 
 AttStaffItems::AttStaffItems() : Att()
 {
-    ResetStaffItems();
+    this->ResetStaffItems();
 }
 
 void AttStaffItems::ResetStaffItems()
@@ -5808,7 +5808,7 @@ bool AttStaffItems::HasBetweenorder() const
 
 AttStaffLoc::AttStaffLoc() : Att()
 {
-    ResetStaffLoc();
+    this->ResetStaffLoc();
 }
 
 void AttStaffLoc::ResetStaffLoc()
@@ -5848,7 +5848,7 @@ bool AttStaffLoc::HasLoc() const
 
 AttStaffLocPitched::AttStaffLocPitched() : Att()
 {
-    ResetStaffLocPitched();
+    this->ResetStaffLocPitched();
 }
 
 void AttStaffLocPitched::ResetStaffLocPitched()
@@ -5903,7 +5903,7 @@ bool AttStaffLocPitched::HasOloc() const
 
 AttStartEndId::AttStartEndId() : Att()
 {
-    ResetStartEndId();
+    this->ResetStartEndId();
 }
 
 void AttStartEndId::ResetStartEndId()
@@ -5943,7 +5943,7 @@ bool AttStartEndId::HasEndid() const
 
 AttStartId::AttStartId() : Att()
 {
-    ResetStartId();
+    this->ResetStartId();
 }
 
 void AttStartId::ResetStartId()
@@ -5983,7 +5983,7 @@ bool AttStartId::HasStartid() const
 
 AttStems::AttStems() : Att()
 {
-    ResetStems();
+    this->ResetStems();
 }
 
 void AttStems::ResetStems()
@@ -6128,7 +6128,7 @@ bool AttStems::HasStemY() const
 
 AttSylLog::AttSylLog() : Att()
 {
-    ResetSylLog();
+    this->ResetSylLog();
 }
 
 void AttSylLog::ResetSylLog()
@@ -6183,7 +6183,7 @@ bool AttSylLog::HasWordpos() const
 
 AttSylText::AttSylText() : Att()
 {
-    ResetSylText();
+    this->ResetSylText();
 }
 
 void AttSylText::ResetSylText()
@@ -6223,7 +6223,7 @@ bool AttSylText::HasSyl() const
 
 AttSystems::AttSystems() : Att()
 {
-    ResetSystems();
+    this->ResetSystems();
 }
 
 void AttSystems::ResetSystems()
@@ -6308,7 +6308,7 @@ bool AttSystems::HasSystemTopmar() const
 
 AttTargetEval::AttTargetEval() : Att()
 {
-    ResetTargetEval();
+    this->ResetTargetEval();
 }
 
 void AttTargetEval::ResetTargetEval()
@@ -6348,7 +6348,7 @@ bool AttTargetEval::HasEvaluate() const
 
 AttTempoLog::AttTempoLog() : Att()
 {
-    ResetTempoLog();
+    this->ResetTempoLog();
 }
 
 void AttTempoLog::ResetTempoLog()
@@ -6388,7 +6388,7 @@ bool AttTempoLog::HasFunc() const
 
 AttTextRendition::AttTextRendition() : Att()
 {
-    ResetTextRendition();
+    this->ResetTextRendition();
 }
 
 void AttTextRendition::ResetTextRendition()
@@ -6443,7 +6443,7 @@ bool AttTextRendition::HasRend() const
 
 AttTextStyle::AttTextStyle() : Att()
 {
-    ResetTextStyle();
+    this->ResetTextStyle();
 }
 
 void AttTextStyle::ResetTextStyle()
@@ -6543,7 +6543,7 @@ bool AttTextStyle::HasTextWeight() const
 
 AttTiePresent::AttTiePresent() : Att()
 {
-    ResetTiePresent();
+    this->ResetTiePresent();
 }
 
 void AttTiePresent::ResetTiePresent()
@@ -6583,7 +6583,7 @@ bool AttTiePresent::HasTie() const
 
 AttTimestampLog::AttTimestampLog() : Att()
 {
-    ResetTimestampLog();
+    this->ResetTimestampLog();
 }
 
 void AttTimestampLog::ResetTimestampLog()
@@ -6623,7 +6623,7 @@ bool AttTimestampLog::HasTstamp() const
 
 AttTimestamp2Log::AttTimestamp2Log() : Att()
 {
-    ResetTimestamp2Log();
+    this->ResetTimestamp2Log();
 }
 
 void AttTimestamp2Log::ResetTimestamp2Log()
@@ -6663,7 +6663,7 @@ bool AttTimestamp2Log::HasTstamp2() const
 
 AttTransposition::AttTransposition() : Att()
 {
-    ResetTransposition();
+    this->ResetTransposition();
 }
 
 void AttTransposition::ResetTransposition()
@@ -6718,7 +6718,7 @@ bool AttTransposition::HasTransSemi() const
 
 AttTuning::AttTuning() : Att()
 {
-    ResetTuning();
+    this->ResetTuning();
 }
 
 void AttTuning::ResetTuning()
@@ -6788,7 +6788,7 @@ bool AttTuning::HasTuneTemper() const
 
 AttTuningLog::AttTuningLog() : Att()
 {
-    ResetTuningLog();
+    this->ResetTuningLog();
 }
 
 void AttTuningLog::ResetTuningLog()
@@ -6828,7 +6828,7 @@ bool AttTuningLog::HasTuningStandard() const
 
 AttTupletPresent::AttTupletPresent() : Att()
 {
-    ResetTupletPresent();
+    this->ResetTupletPresent();
 }
 
 void AttTupletPresent::ResetTupletPresent()
@@ -6868,7 +6868,7 @@ bool AttTupletPresent::HasTuplet() const
 
 AttTyped::AttTyped() : Att()
 {
-    ResetTyped();
+    this->ResetTyped();
 }
 
 void AttTyped::ResetTyped()
@@ -6908,7 +6908,7 @@ bool AttTyped::HasType() const
 
 AttTypography::AttTypography() : Att()
 {
-    ResetTypography();
+    this->ResetTypography();
 }
 
 void AttTypography::ResetTypography()
@@ -7038,7 +7038,7 @@ bool AttTypography::HasLineheight() const
 
 AttVerticalAlign::AttVerticalAlign() : Att()
 {
-    ResetVerticalAlign();
+    this->ResetVerticalAlign();
 }
 
 void AttVerticalAlign::ResetVerticalAlign()
@@ -7078,7 +7078,7 @@ bool AttVerticalAlign::HasValign() const
 
 AttVerticalGroup::AttVerticalGroup() : Att()
 {
-    ResetVerticalGroup();
+    this->ResetVerticalGroup();
 }
 
 void AttVerticalGroup::ResetVerticalGroup()
@@ -7118,7 +7118,7 @@ bool AttVerticalGroup::HasVgrp() const
 
 AttVisibility::AttVisibility() : Att()
 {
-    ResetVisibility();
+    this->ResetVisibility();
 }
 
 void AttVisibility::ResetVisibility()
@@ -7158,7 +7158,7 @@ bool AttVisibility::HasVisible() const
 
 AttVisualOffsetHo::AttVisualOffsetHo() : Att()
 {
-    ResetVisualOffsetHo();
+    this->ResetVisualOffsetHo();
 }
 
 void AttVisualOffsetHo::ResetVisualOffsetHo()
@@ -7198,7 +7198,7 @@ bool AttVisualOffsetHo::HasHo() const
 
 AttVisualOffsetTo::AttVisualOffsetTo() : Att()
 {
-    ResetVisualOffsetTo();
+    this->ResetVisualOffsetTo();
 }
 
 void AttVisualOffsetTo::ResetVisualOffsetTo()
@@ -7238,7 +7238,7 @@ bool AttVisualOffsetTo::HasTo() const
 
 AttVisualOffsetVo::AttVisualOffsetVo() : Att()
 {
-    ResetVisualOffsetVo();
+    this->ResetVisualOffsetVo();
 }
 
 void AttVisualOffsetVo::ResetVisualOffsetVo()
@@ -7278,7 +7278,7 @@ bool AttVisualOffsetVo::HasVo() const
 
 AttVisualOffset2Ho::AttVisualOffset2Ho() : Att()
 {
-    ResetVisualOffset2Ho();
+    this->ResetVisualOffset2Ho();
 }
 
 void AttVisualOffset2Ho::ResetVisualOffset2Ho()
@@ -7333,7 +7333,7 @@ bool AttVisualOffset2Ho::HasEndho() const
 
 AttVisualOffset2To::AttVisualOffset2To() : Att()
 {
-    ResetVisualOffset2To();
+    this->ResetVisualOffset2To();
 }
 
 void AttVisualOffset2To::ResetVisualOffset2To()
@@ -7388,7 +7388,7 @@ bool AttVisualOffset2To::HasEndto() const
 
 AttVisualOffset2Vo::AttVisualOffset2Vo() : Att()
 {
-    ResetVisualOffset2Vo();
+    this->ResetVisualOffset2Vo();
 }
 
 void AttVisualOffset2Vo::ResetVisualOffset2Vo()
@@ -7443,7 +7443,7 @@ bool AttVisualOffset2Vo::HasEndvo() const
 
 AttVoltaGroupingSym::AttVoltaGroupingSym() : Att()
 {
-    ResetVoltaGroupingSym();
+    this->ResetVoltaGroupingSym();
 }
 
 void AttVoltaGroupingSym::ResetVoltaGroupingSym()
@@ -7483,7 +7483,7 @@ bool AttVoltaGroupingSym::HasVoltasym() const
 
 AttWhitespace::AttWhitespace() : Att()
 {
-    ResetWhitespace();
+    this->ResetWhitespace();
 }
 
 void AttWhitespace::ResetWhitespace()
@@ -7523,7 +7523,7 @@ bool AttWhitespace::HasSpace() const
 
 AttWidth::AttWidth() : Att()
 {
-    ResetWidth();
+    this->ResetWidth();
 }
 
 void AttWidth::ResetWidth()
@@ -7563,7 +7563,7 @@ bool AttWidth::HasWidth() const
 
 AttXy::AttXy() : Att()
 {
-    ResetXy();
+    this->ResetXy();
 }
 
 void AttXy::ResetXy()
@@ -7618,7 +7618,7 @@ bool AttXy::HasY() const
 
 AttXy2::AttXy2() : Att()
 {
-    ResetXy2();
+    this->ResetXy2();
 }
 
 void AttXy2::ResetXy2()

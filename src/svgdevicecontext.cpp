@@ -256,8 +256,8 @@ void SvgDeviceContext::StartGraphic(
         m_currentNode = m_currentNode.append_child("g");
     }
     m_svgNodeStack.push_back(m_currentNode);
-    AppendIdAndClass(gId, object->GetClassName(), gClassFull, graphicID);
-    AppendAdditionalAttributes(object);
+    this->AppendIdAndClass(gId, object->GetClassName(), gClassFull, graphicID);
+    this->AppendAdditionalAttributes(object);
 
     // Add data-plist with html5 (now only for annot)
     if (m_html5 && object->HasPlistReferences()) {
@@ -351,15 +351,15 @@ void SvgDeviceContext::StartCustomGraphic(const std::string &name, std::string g
 {
     m_currentNode = m_currentNode.append_child("g");
     m_svgNodeStack.push_back(m_currentNode);
-    AppendIdAndClass(gId, name, gClass);
+    this->AppendIdAndClass(gId, name, gClass);
 }
 
 void SvgDeviceContext::StartTextGraphic(Object *object, const std::string &gClass, const std::string &gId)
 {
     m_currentNode = AddChild("tspan");
     m_svgNodeStack.push_back(m_currentNode);
-    AppendIdAndClass(gId, object->GetClassName(), gClass);
-    AppendAdditionalAttributes(object);
+    this->AppendIdAndClass(gId, object->GetClassName(), gClass);
+    this->AppendAdditionalAttributes(object);
 
     if (object->HasAttClass(ATT_COLOR)) {
         AttColor *att = dynamic_cast<AttColor *>(object);
@@ -1294,7 +1294,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
             m_currentNode = m_pageNode;
         }
 
-        StartGraphic(object, "bounding-box", "bbox-" + object->GetID(), PRIMARY, true);
+        this->StartGraphic(object, "bounding-box", "bbox-" + object->GetID(), PRIMARY, true);
 
         if (box->HasSelfBB()) {
             this->DrawSvgBoundingBoxRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX1()),
@@ -1337,7 +1337,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
             }
         }
 
-        EndGraphic(object, NULL);
+        this->EndGraphic(object, NULL);
 
         if (groupInPage) {
             m_currentNode = m_pageNode;
@@ -1355,7 +1355,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
                         view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY2())
                             - view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()));
                 }
-                EndGraphic(object, NULL);
+                this->EndGraphic(object, NULL);
             }
         }
 
