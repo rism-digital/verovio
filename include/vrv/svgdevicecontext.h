@@ -361,7 +361,7 @@ private:
         std::string m_refId;
     };
     const std::string InsertGlyphRef(const Glyph *glyph);
-    std::map<const Glyph *, GlyphRef> m_smuflGlyphs;
+    std::vector<std::pair<const Glyph *, GlyphRef>> m_smuflGlyphs;
     std::map<std::string, int> m_glyphCodeFontCounter;
 
     // pugixml data
