@@ -687,9 +687,9 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         xmlfile.load_string(data.c_str());
         stringstream conversion;
 
-        LogRedirectStart();
+        this->LogRedirectStart();
         bool status = converter.convert(conversion, xmlfile);
-        LogRedirectStop();
+        this->LogRedirectStop();
         if (!status) {
             LogWarning("Problem converting MusicXML to Humdrum (see warning above this line for possible reasons");
         }
@@ -718,7 +718,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     }
 
     else if (inputFormat == MEIHUM) {
-        ConvertMEIToHumdrum(data);
+        this->ConvertMEIToHumdrum(data);
 
         // Now convert Humdrum into MEI:
         std::string conversion = this->GetHumdrumBuffer();
@@ -742,9 +742,9 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         hum::Tool_musedata2hum converter;
         stringstream conversion;
 
-        LogRedirectStart();
+        this->LogRedirectStart();
         bool status = converter.convertString(conversion, data);
-        LogRedirectStop();
+        this->LogRedirectStop();
         if (!status) {
             LogWarning("Problem converting MuseData to Humdrum (see warning above this line for possible reasons");
         }
@@ -777,9 +777,9 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         hum::Tool_esac2hum converter;
         std::stringstream conversion;
 
-        LogRedirectStart();
+        this->LogRedirectStart();
         bool status = converter.convert(conversion, data);
-        LogRedirectStop();
+        this->LogRedirectStop();
         if (!status) {
             LogWarning("Problem converting EsAC to Humdrum (see warning above this line for possible reasons");
         }
@@ -2189,9 +2189,9 @@ const char *Toolkit::GetHumdrumBuffer()
         stringstream out;
         hum::Tool_mei2hum converter;
 
-        LogRedirectStart();
+        this->LogRedirectStart();
         bool status = converter.convert(out, infile);
-        LogRedirectStop();
+        this->LogRedirectStop();
         if (!status) {
             LogWarning("Problem converting MEI to Humdrum (see warning above this line for possible reasons");
         }
@@ -2257,9 +2257,9 @@ std::string Toolkit::ConvertMEIToHumdrum(const std::string &meiData)
     xmlfile.load_string(meiData.c_str());
     std::stringstream conversion;
 
-    LogRedirectStart();
+    this->LogRedirectStart();
     bool status = converter.convert(conversion, xmlfile);
-    LogRedirectStop();
+    this->LogRedirectStop();
 
     if (!status) {
         LogError("Error converting MEI data to Humdrum: %s", conversion.str().c_str());
