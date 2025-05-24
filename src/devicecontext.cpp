@@ -244,8 +244,8 @@ void DeviceContext::GetTextExtent(const std::u32string &string, TextExtend *exte
     extend->m_height = 0;
 
     if (typeSize) {
-        AddGlyphToTextExtend(resources->GetTextGlyph(L'p'), extend);
-        AddGlyphToTextExtend(resources->GetTextGlyph(L'M'), extend);
+        this->AddGlyphToTextExtend(resources->GetTextGlyph(L'p'), extend);
+        this->AddGlyphToTextExtend(resources->GetTextGlyph(L'M'), extend);
         extend->m_width = 0;
     }
 
@@ -267,7 +267,7 @@ void DeviceContext::GetTextExtent(const std::u32string &string, TextExtend *exte
                 glyph = unknown;
             }
         }
-        AddGlyphToTextExtend(glyph, extend);
+        this->AddGlyphToTextExtend(glyph, extend);
     }
 }
 
@@ -287,7 +287,7 @@ void DeviceContext::GetSmuflTextExtent(const std::u32string &string, TextExtend 
         if (!glyph) {
             continue;
         }
-        AddGlyphToTextExtend(glyph, extend);
+        this->AddGlyphToTextExtend(glyph, extend);
     }
 }
 
