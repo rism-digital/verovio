@@ -632,7 +632,7 @@ FunctorCode ConvertToCmnFunctor::VisitMeasureEnd(Measure *measure)
             // We must have m_clefs filled with clefs converted when processing layers
             // However, if we have a clef in the staffDef, convert and use that one
             if (clef) {
-                ConvertClef(m_clefs.back(), vrv_cast<Clef *>(clef));
+                this->ConvertClef(m_clefs.back(), vrv_cast<Clef *>(clef));
                 staffDef->DeleteChild(clef);
             }
             staffDef->AddChild(m_clefs.back());
@@ -771,7 +771,7 @@ FunctorCode ConvertToCmnFunctor::VisitStaffEnd(Staff *staff)
     }
 
     Clef *clef = new Clef();
-    ConvertClef(clef, m_layerClef);
+    this->ConvertClef(clef, m_layerClef);
     // Add to the list of clef (one per staff)
     m_clefs.push_front(clef);
 
