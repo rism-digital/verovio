@@ -201,7 +201,7 @@ void Measure::AddChildBack(Object *child)
             }
         }
     }
-    Modify();
+    this->Modify();
 }
 
 bool Measure::AddChildAdditionalCheck(Object *child)
