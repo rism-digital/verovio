@@ -100,23 +100,23 @@ const std::string SvgDeviceContext::InsertGlyphRef(const Glyph *glyph)
 {
     const std::string code = glyph->GetCodeStr();
 
-    // We have already used this glyph
-    if (m_smuflGlyphs.find(glyph) != m_smuflGlyphs.end()) {
-        return m_smuflGlyphs.at(glyph).GetRefId();
+    // Check if glyph already exists
+    for (const auto &[g, ref] : m_smuflGlyphs) {
+        if (g == glyph) {
+            return ref.GetRefId();
+        }
     }
 
-    int count;
-    // This is the first time we have a glyph with this code
-    if (m_glyphCodeFontCounter.find(code) == m_glyphCodeFontCounter.end()) {
-        count = 0;
+    int count = 0;
+    auto it = m_glyphCodeFontCounter.find(code);
+    if (it != m_glyphCodeFontCounter.end()) {
+        count = it->second;
     }
-    // We used it but with another font
-    else {
-        count = m_glyphCodeFontCounter[(code)];
-    }
+
     GlyphRef ref(glyph, count, m_glyphPostfixId);
     const std::string id = ref.GetRefId();
-    m_smuflGlyphs.insert(std::pair<const Glyph *, GlyphRef>(glyph, ref));
+
+    m_smuflGlyphs.emplace_back(glyph, ref); // preserve insertion order
     m_glyphCodeFontCounter[code] = count + 1;
 
     return id;
@@ -199,13 +199,15 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         pugi::xml_document sourceDoc;
 
         // for each needed glyph
-        for (const std::pair<const Glyph *, const SvgDeviceContext::GlyphRef &> entry : m_smuflGlyphs) {
+        for (const auto &entry : m_smuflGlyphs) {
+            const Glyph *glyph = entry.first;
+            const SvgDeviceContext::GlyphRef &ref = entry.second;
             // load the XML as a pugi::xml_document
-            sourceDoc.load_string(entry.first->GetXML().c_str());
+            sourceDoc.load_string(glyph->GetXML().c_str());
 
             // copy all the nodes inside into the master document
             for (pugi::xml_node child = sourceDoc.first_child(); child; child = child.next_sibling()) {
-                child.attribute("id").set_value(entry.second.GetRefId().c_str());
+                child.attribute("id").set_value(ref.GetRefId().c_str());
                 defs.append_copy(child);
             }
         }
