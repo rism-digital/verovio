@@ -169,7 +169,7 @@
 namespace vrv {
 
 const std::vector<std::string> MEIInput::s_editorialElementNames = { "abbr", "add", "app", "annot", "choice", "corr",
-    "damage", "del", "expan", "orig", "ref", "reg", "restore", "sic", "subst", "supplied", "unclear" };
+    "damage", "del", "expan", "lem", "orig", "rdg", "ref", "reg", "restore", "sic", "subst", "supplied", "unclear" };
 
 //----------------------------------------------------------------------------
 // MEIOutput
@@ -7709,8 +7709,14 @@ bool MEIInput::ReadEditorialElement(Object *parent, pugi::xml_node current, Edit
     else if (std::string(current.name()) == "expan") {
         return this->ReadExpan(parent, current, level, filter);
     }
+    else if (std::string(current.name()) == "lem") {
+        return this->ReadLem(parent, current, level, filter);
+    }
     else if (std::string(current.name()) == "orig") {
         return this->ReadOrig(parent, current, level, filter);
+    }
+    else if (std::string(current.name()) == "rdg") {
+        return this->ReadRdg(parent, current, level, filter);
     }
     else if (std::string(current.name()) == "ref") {
         return this->ReadRef(parent, current, level, filter);
