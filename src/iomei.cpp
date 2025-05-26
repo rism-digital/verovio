@@ -1666,8 +1666,6 @@ void MEIOutput::WritePage(pugi::xml_node currentNode, Page *page)
             = StringFormat("%d", page->m_pageMarginLeft / DEFINITION_FACTOR).c_str();
         currentNode.append_attribute("page.rightmar")
             = StringFormat("%d", page->m_pageMarginRight / DEFINITION_FACTOR).c_str();
-        currentNode.append_attribute("page.rightmar")
-            = StringFormat("%d", page->m_pageMarginRight / DEFINITION_FACTOR).c_str();
     }
     if (!page->m_surface.empty()) {
         currentNode.append_attribute("surface") = page->m_surface.c_str();
