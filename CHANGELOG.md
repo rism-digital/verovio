@@ -2,6 +2,9 @@
 
 ## [unreleased]
 
+## [5.3.1] – 2025-05-26
+* Fix bug in CMME importer
+
 ## [5.3.0] – 2025-05-19
 * Support for editorial markup (`app` or `choice`) surrounding the top-level `scoreDef`
 * Support for full internal page-based MEI serialization (`mei-pb-serialization`)
