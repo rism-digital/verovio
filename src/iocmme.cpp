@@ -71,6 +71,8 @@ CmmeInput::CmmeInput(Doc *doc) : Input(doc)
     m_currentNote = NULL;
     m_isInSyllable = false;
     m_mensInfo = NULL;
+    m_numVoices = 0;
+    m_activeTempoChange = false;
 }
 
 CmmeInput::~CmmeInput() {}
