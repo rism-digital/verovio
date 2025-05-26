@@ -82,6 +82,7 @@ if __name__ == '__main__':
             # filenames (input MEI/XML and output SVG)
             input_file = os.path.join(test_suite_fpath, test_file_directory, test_file)
             verovio_output_file = os.path.join(output_dir_fpath, test_file_directory, f"{name}.mei")
+            verovio_serialization_file = os.path.join(output_dir_fpath, test_file_directory, f"{name}.serialized.mei")
 
             # parse the MEI file
             original_xml = etree.parse(input_file).getroot()
@@ -107,8 +108,14 @@ if __name__ == '__main__':
 
             tk.setOptions(options)
             tk.loadFile(input_file)
-            # round-trip to MEI
-            verovio_output_string = tk.getMEI({})
+            # round-trip: save to page-based serialized MEI
+            verovio_output_string = tk.getMEI({ 'serialized': True })
+            verovio_xml = etree.fromstring(verovio_output_string.encode("utf-8"))
+            etree.ElementTree(verovio_xml).write(verovio_serialization_file)
+            # round-trip: load page-based serialized MEI
+            tk.loadFile( verovio_serialization_file )
+            # round-trip: save to score-based MEI for evaluation
+            verovio_output_string = tk.getMEI()
             verovio_xml = etree.fromstring(verovio_output_string.encode("utf-8"))
             etree.ElementTree(verovio_xml).write(verovio_output_file)
 
