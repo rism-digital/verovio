@@ -8056,7 +8056,12 @@ bool MEIInput::ReadExpan(Object *parent, pugi::xml_node expan, EditorialLevel le
 
 bool MEIInput::ReadLem(Object *parent, pugi::xml_node lem, EditorialLevel level, Object *filter)
 {
-    assert(dynamic_cast<App *>(parent));
+    if (m_deserializing && (level == EDITORIAL_TOPLEVEL)) {
+        assert(dynamic_cast<System *>(parent));
+    }
+    else {
+        assert(dynamic_cast<App *>(parent));
+    }
 
     Lem *vrvLem = new Lem();
     // By default make them all hidden. MEIInput::ReadAppChildren will make one visible.
@@ -8084,7 +8089,12 @@ bool MEIInput::ReadOrig(Object *parent, pugi::xml_node orig, EditorialLevel leve
 
 bool MEIInput::ReadRdg(Object *parent, pugi::xml_node rdg, EditorialLevel level, Object *filter)
 {
-    assert(dynamic_cast<App *>(parent));
+    if (m_deserializing && (level == EDITORIAL_TOPLEVEL)) {
+        assert(dynamic_cast<System *>(parent));
+    }
+    else {
+        assert(dynamic_cast<App *>(parent));
+    }
 
     Rdg *vrvRdg = new Rdg();
     // By default make them all hidden. MEIInput::ReadAppChildren will make one visible.
