@@ -568,11 +568,11 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     this->ClearHumdrumBuffer();
 #endif
 
-    auto inputFormat = m_inputFrom;
-    if (inputFormat == AUTO) {
-        inputFormat = IdentifyInputFrom(data);
+    auto inputFrom = m_inputFrom;
+    if (inputFrom == AUTO) {
+        inputFrom = IdentifyInputFrom(data);
     }
-    if (inputFormat == ABC) {
+    if (inputFrom == ABC) {
 #ifndef NO_ABC_SUPPORT
         input = new ABCInput(&m_doc);
 #else
@@ -580,7 +580,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         return false;
 #endif
     }
-    else if (inputFormat == PAE) {
+    else if (inputFrom == PAE) {
 #ifndef NO_PAE_SUPPORT
         input = new PAEInput(&m_doc);
 #else
@@ -588,7 +588,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         return false;
 #endif
     }
-    else if (inputFormat == DARMS) {
+    else if (inputFrom == DARMS) {
 #ifndef NO_DARMS_SUPPORT
         input = new DarmsInput(&m_doc);
 #else
@@ -596,10 +596,10 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         return false;
 #endif
     }
-    else if (inputFormat == VOLPIANO) {
+    else if (inputFrom == VOLPIANO) {
         input = new VolpianoInput(&m_doc);
     }
-    else if (inputFormat == CMME) {
+    else if (inputFrom == CMME) {
         if (m_options->m_durationEquivalence.GetValue() != DURATION_EQ_minima) {
             LogWarning("CMME input uses 'minima' duration equivalence, changing the option accordingly.");
             m_options->m_durationEquivalence.SetValue(DURATION_EQ_minima);
@@ -607,7 +607,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         input = new CmmeInput(&m_doc);
     }
 #ifndef NO_HUMDRUM_SUPPORT
-    else if (inputFormat == HUMDRUM) {
+    else if (inputFrom == HUMDRUM) {
         // LogInfo("Importing Humdrum data");
 
         // HumdrumInput *input = new HumdrumInput(&m_doc);
@@ -632,7 +632,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         // Read embedded options from input Humdrum file:
         ((HumdrumInput *)input)->parseEmbeddedOptions(&m_doc);
     }
-    else if (inputFormat == HUMMEI) {
+    else if (inputFrom == HUMMEI) {
         // convert first to MEI and then load MEI data via MEIInput.  This
         // allows using XPath processing.
         // LogInfo("Importing Humdrum data via MEI");
@@ -667,20 +667,20 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         input = new MEIInput(&m_doc);
     }
 #endif
-    else if (inputFormat == MEI) {
+    else if (inputFrom == MEI) {
         input = new MEIInput(&m_doc);
     }
-    else if (inputFormat == SERIALIZATION) {
+    else if (inputFrom == SERIALIZATION) {
         MEIInput *meiInput = new MEIInput(&m_doc);
         meiInput->SetDeserializing(true);
         input = meiInput;
     }
-    else if (inputFormat == MUSICXML) {
+    else if (inputFrom == MUSICXML) {
         // This is the direct converter from MusicXML to MEI using iomusicxml:
         input = new MusicXmlInput(&m_doc);
     }
 #ifndef NO_HUMDRUM_SUPPORT
-    else if (inputFormat == MUSICXMLHUM) {
+    else if (inputFrom == MUSICXMLHUM) {
         // This is the indirect converter from MusicXML to MEI using iohumdrum:
         hum::Tool_musicxml2hum converter;
         pugi::xml_document xmlfile;
@@ -717,7 +717,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         input = new MEIInput(&m_doc);
     }
 
-    else if (inputFormat == MEIHUM) {
+    else if (inputFrom == MEIHUM) {
         this->ConvertMEIToHumdrum(data);
 
         // Now convert Humdrum into MEI:
@@ -737,7 +737,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         input = new MEIInput(&m_doc);
     }
 
-    else if (inputFormat == MUSEDATAHUM) {
+    else if (inputFrom == MUSEDATAHUM) {
         // This is the indirect converter from MuseData to MEI using iohumdrum:
         hum::Tool_musedata2hum converter;
         stringstream conversion;
@@ -772,7 +772,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         input = new MEIInput(&m_doc);
     }
 
-    else if (inputFormat == ESAC) {
+    else if (inputFrom == ESAC) {
         // This is the indirect converter from EsAC to MEI using iohumdrum:
         hum::Tool_esac2hum converter;
         std::stringstream conversion;
@@ -819,7 +819,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     }
 
     // load the file
-    if (inputFormat != HUMDRUM) {
+    if (inputFrom != HUMDRUM) {
         if (!input->Import(newData.size() ? newData : data)) {
             LogError("Error importing data");
             delete input;
@@ -827,7 +827,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         }
     }
 
-    if (inputFormat == SERIALIZATION) {
+    if (inputFrom == SERIALIZATION) {
         input->Import(data);
         m_doc.PrepareData();
         m_doc.ScoreDefSetCurrentDoc(true);
