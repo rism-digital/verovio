@@ -1277,6 +1277,7 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, M
 {
     assert(dc);
     assert(staff);
+    assert(staffDef);
     assert(measure);
     assert(system);
 
