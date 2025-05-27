@@ -827,7 +827,7 @@ Fraction ConvertToCmnFunctor::CalcMeasureDuration(const Mensur &mensur)
 void ConvertToCmnFunctor::ConvertDurationInterface(DurationInterface *interface, ClassId classId)
 {
     assert(interface);
-    
+
     m_durationElements.clear();
 
     data_DURATION noteDur = interface->GetActualDur();
