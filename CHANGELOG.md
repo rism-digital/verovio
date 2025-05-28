@@ -1,5 +1,8 @@
 # Changelog
 
+## [5.3.2] – 2025-05-28
+* Fix bug in toolkit select
+
 ## [5.3.1] – 2025-05-26
 * Fix bug in CMME importer
 

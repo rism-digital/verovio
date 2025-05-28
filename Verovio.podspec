@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name           = 'Verovio'
-  s.version        = '5.3.1'
+  s.version        = '5.3.2'
   s.license        = { :type => 'LGPL', :file => 'COPYING' }
   s.homepage       = 'https://www.verovio.org/index.xhtml'
   s.authors        = { 'Contributors List' => 'https://github.com/rism-digital/verovio/graphs/contributors' }
