@@ -263,8 +263,8 @@ void SvgDeviceContext::StartGraphic(
 
     // Add data-plist with html5 (now only for annot)
     if (m_html5 && object->HasPlistReferences()) {
-        auto plist = object->GetPlistReferences();
-        std::string ids = ConcatenateIDs(**plist);
+        const auto &plist = object->GetPlistReferences();
+        std::string ids = ConcatenateIDs(plist);
         this->SetCustomGraphicAttributes("plist-referring", ids);
     }
 

@@ -12,7 +12,6 @@
 #include <functional>
 #include <iterator>
 #include <map>
-#include <optional>
 #include <string>
 
 //----------------------------------------------------------------------------
@@ -698,9 +697,9 @@ public:
      * @name Methods for managing the list of back-links from plist
      */
     ///@{
-    bool HasPlistReferences() const { return (m_plistReferences.has_value()); }
-    void ResetPlistReferences() { m_plistReferences.reset(); }
-    const std::optional<ListOfConstObjects> *GetPlistReferences() const { return &m_plistReferences; }
+    bool HasPlistReferences() const { return !m_plistReferences.empty(); }
+    void ResetPlistReferences() { m_plistReferences.clear(); }
+    const ListOfConstObjects &GetPlistReferences() const { return m_plistReferences; }
     void AddPlistReference(const Object *object);
     ///@}
 
@@ -859,9 +858,9 @@ private:
     bool m_isExpansion;
 
     /**
-     * An optional list of back-links to plist referring objects
+     * List of back-links to plist referring objects
      */
-    std::optional<ListOfConstObjects> m_plistReferences;
+    ListOfConstObjects m_plistReferences;
 
     //----------------//
     // Static members //

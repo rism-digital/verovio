@@ -1218,8 +1218,7 @@ Object *Object::FindPreviousChild(Comparison *comp, Object *start)
 
 void Object::AddPlistReference(const Object *object)
 {
-    if (!m_plistReferences) m_plistReferences.emplace();
-    m_plistReferences->push_back(object);
+    m_plistReferences.push_back(object);
 }
 
 void Object::LogDebugTree(int maxDepth, int level)
