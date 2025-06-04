@@ -1218,7 +1218,10 @@ Object *Object::FindPreviousChild(Comparison *comp, Object *start)
 
 void Object::AddPlistReference(const Object *object)
 {
-    m_plistReferences.push_back(object);
+    if (!m_plistReferences) {
+        m_plistReferences = std::make_unique<ListOfConstObjects>();
+    }
+    m_plistReferences->push_back(object);
 }
 
 void Object::LogDebugTree(int maxDepth, int level)
