@@ -8,10 +8,7 @@
 #ifndef __VRV_ANNOTSCORE_H__
 #define __VRV_ANNOTSCORE_H__
 
-#include "atts_cmn.h"
-#include "atts_shared.h"
 #include "controlelement.h"
-#include "editorial.h"
 #include "plistinterface.h"
 #include "timeinterface.h"
 
@@ -33,7 +30,7 @@ public:
     ///@{
     AnnotScore();
     virtual ~AnnotScore();
-    // Object *Clone() const override { return new AnnotScore(*this); }
+    Object *Clone() const override { return new AnnotScore(*this); }
     void Reset() override;
     std::string GetClassName() const override { return "annot"; }
     ///@}

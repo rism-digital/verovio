@@ -238,61 +238,9 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
     ArrayOfObjects *drawingList = system->GetDrawingList();
 
     for (Object *object : *drawingList) {
-        if (object->Is(classId) && (classId == ANNOTSCORE)) {
-            this->DrawTimeSpanningElement(dc, object, system);
-        }
-        if (object->Is(classId) && (classId == BEAMSPAN)) {
-            this->DrawTimeSpanningElement(dc, object, system);
-        }
-        if (object->Is(classId) && (classId == BRACKETSPAN)) {
-            this->DrawTimeSpanningElement(dc, object, system);
-        }
-        if (object->Is(classId) && (classId == DIR)) {
-            this->DrawTimeSpanningElement(dc, object, system);
-        }
-        if (object->Is(classId) && (classId == DYNAM)) {
-            this->DrawTimeSpanningElement(dc, object, system);
-        }
-        if (object->Is(classId) && (classId == FIGURE)) {
-            this->DrawTimeSpanningElement(dc, object, system);
-        }
-        if (object->Is(classId) && (classId == GLISS)) {
-            this->DrawTimeSpanningElement(dc, object, system);
-        }
-        if (object->Is(classId) && (classId == HAIRPIN)) {
-            this->DrawTimeSpanningElement(dc, object, system);
-        }
-        if (object->Is(classId) && (classId == LV)) {
-            this->DrawTimeSpanningElement(dc, object, system);
-        }
-        if (object->Is(classId) && (classId == PHRASE)) {
-            this->DrawTimeSpanningElement(dc, object, system);
-        }
-        if (object->Is(classId) && (classId == OCTAVE)) {
-            this->DrawTimeSpanningElement(dc, object, system);
-        }
-        if (object->Is(classId) && (classId == ORNAM)) {
-            this->DrawTimeSpanningElement(dc, object, system);
-        }
-        if (object->Is(classId) && (classId == PEDAL)) {
-            this->DrawTimeSpanningElement(dc, object, system);
-        }
-        if (object->Is(classId) && (classId == PITCHINFLECTION)) {
-            this->DrawTimeSpanningElement(dc, object, system);
-        }
-        if (object->Is(classId) && (classId == SYL)) {
-            this->DrawTimeSpanningElement(dc, object, system);
-        }
-        if (object->Is(classId) && (classId == TEMPO)) {
-            this->DrawTimeSpanningElement(dc, object, system);
-        }
-        if (object->Is(classId) && (classId == TIE)) {
-            this->DrawTimeSpanningElement(dc, object, system);
-        }
-        if (object->Is(classId) && (classId == TRILL)) {
-            this->DrawTimeSpanningElement(dc, object, system);
-        }
-        if (object->Is(classId) && (classId == SLUR)) {
+        static const std::set<ClassId> timeSpanningClasses = { ANNOTSCORE, BEAMSPAN, BRACKETSPAN, DIR, DYNAM, FIGURE,
+            GLISS, HAIRPIN, LV, OCTAVE, ORNAM, PEDAL, PHRASE, PITCHINFLECTION, SLUR, SYL, TEMPO, TIE, TRILL };
+        if (object->Is(classId) && timeSpanningClasses.contains(classId)) {
             this->DrawTimeSpanningElement(dc, object, system);
         }
         if (object->Is(classId) && (classId == ENDING)) {

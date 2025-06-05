@@ -329,7 +329,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         }
 
         if (element->Is(ANNOTSCORE)) {
-            // cast to AnnotScore check in DrawControlElementConnector
+            // cast to AnnotScore check in DrawAnnotScore
             this->DrawAnnotScore(dc, dynamic_cast<AnnotScore *>(element), x1, x2, staff, spanningType, graphic);
         }
         else if (element->Is(DIR)) {
