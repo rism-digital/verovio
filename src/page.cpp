@@ -155,12 +155,25 @@ const RunningElement *Page::GetHeader() const
     const Pages *pages = doc->GetPages();
     assert(pages);
 
-    // first page or use the pgHeader for all pages?
-    if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgHeaderForAll.GetValue())) {
-        return m_score->GetScoreDef()->GetPgHead(PGFUNC_first);
+    // If we have the option turned on, return the header without `@func` or with
+    // `@func="all"`
+    if (doc->GetOptions()->m_usePgHeaderForAll.GetValue()) {
+        RunningElement *header = m_score->GetScoreDef()->GetPgHead(PGFUNC_NONE);
+        if (!header) {
+            header = m_score->GetScoreDef()->GetPgHead(PGFUNC_all);
+        }
+        return header;
     }
     else {
-        return m_score->GetScoreDef()->GetPgHead(PGFUNC_all);
+        RunningElement *header = NULL;
+        if (pages->GetFirst() == this) {
+            header = m_score->GetScoreDef()->GetPgHead(PGFUNC_first);
+        }
+        // If we did not find it, or not the first page
+        if (!header) {
+            header = m_score->GetScoreDef()->GetPgHead(PGFUNC_all);
+        }
+        return header;
     }
 }
 
@@ -182,12 +195,25 @@ const RunningElement *Page::GetFooter() const
     const Pages *pages = doc->GetPages();
     assert(pages);
 
-    // first page or use the pgFooter for all pages?
-    if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgFooterForAll.GetValue())) {
-        return m_scoreEnd->GetScoreDef()->GetPgFoot(PGFUNC_first);
+    // If we have the option turned on, return the footer without `@func` or with
+    // `@func="all"`
+    if (doc->GetOptions()->m_usePgFooterForAll.GetValue()) {
+        RunningElement *footer = m_score->GetScoreDef()->GetPgFoot(PGFUNC_NONE);
+        if (!footer) {
+            footer = m_score->GetScoreDef()->GetPgFoot(PGFUNC_all);
+        }
+        return footer;
     }
     else {
-        return m_scoreEnd->GetScoreDef()->GetPgFoot(PGFUNC_all);
+        RunningElement *footer = NULL;
+        if (pages->GetFirst() == this) {
+            footer = m_score->GetScoreDef()->GetPgFoot(PGFUNC_first);
+        }
+        // If we did not find it, or not the first page
+        if (!footer) {
+            footer = m_score->GetScoreDef()->GetPgFoot(PGFUNC_all);
+        }
+        return footer;
     }
 }
 
