@@ -313,6 +313,25 @@ jobs:
           name: ${{ env.TOOLKIT_BUILD }}-${{ github.run_id }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ matrix.toolkit.filepath }}
 
+  ##################################
+  # Build the JJava toolkit        #
+  ##################################
+  build_java:
+    name: Build Java toolkit
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v4
+
+      - name: Build Java
+        working-directory: ${{ github.workspace }}/bindings/java
+        run: mvn package
+
+      - name: Build Java
+        working-directory: ${{ github.workspace }}/bindings/java
+        run: mvn package
+
 
   ############################
   # Copy the font CSS files  #
