@@ -468,7 +468,7 @@ jobs:
 
 
   ##################################
-  # Build the JJava toolkit        #
+  # Build the Java toolkit         #
   ##################################
   build_java:
     name: Build Java toolkit
