@@ -359,7 +359,6 @@ FunctorCode InitTimemapAdjustNotesFunctor::VisitChord(Chord *chord)
 {
     if (chord->IsGraceNote()) {
         std::list<Note *> notes;
-        const ListOfObjects &chordNotes = chord->GetList();
         for (Object *obj : notes) {
             Note *note = vrv_cast<Note *>(obj);
             assert(note);
