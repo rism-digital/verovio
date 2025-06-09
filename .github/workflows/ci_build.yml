@@ -492,10 +492,7 @@ jobs:
 
       - name: Build Java
         working-directory: ${{ github.workspace }}/bindings/java
-        run: mvn package
-
-      - working-directory: ${{ github.workspace }}/bindings/java
-        run: mvn package
+        run: mvn package && mvn package
 
       - name: Copy build into TEMP_DIR
         working-directory: ${{ github.workspace }}/bindings/java
