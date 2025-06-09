@@ -484,6 +484,7 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'maven'
+          cache-dependency-path: ${{ github.workspace }}/bindings/java/pom.xml
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
