@@ -466,6 +466,7 @@ jobs:
           echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
           echo "IS_DRY_RUN = ${IS_DRY_RUN}"
 
+
   ##################################
   # Build the JJava toolkit        #
   ##################################
@@ -476,6 +477,14 @@ jobs:
     steps:
       - name: Checkout main repo
         uses: actions/checkout@v4.2.2
+
+      - name: Restore cache
+        id: restore_cache
+        uses: actions/setup-java@v4.7.1
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
