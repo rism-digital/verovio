@@ -370,8 +370,8 @@ jobs:
           echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
           echo "IS_DRY_RUN = ${IS_DRY_RUN}"
 
-          echo "::set-output name=disable::${DISABLE_DEPLOY_STEPS}"
-          echo "::set-output name=dry-run::${IS_DRY_RUN}"
+          echo "name=disable=${DISABLE_DEPLOY_STEPS}" >> $GITHUB_OUTPUT
+          echo "name=dry-run=${IS_DRY_RUN}" >> $GITHUB_OUTPUT
 
   #########################################
   # Deploy the toolkit builds to gh-pages #
