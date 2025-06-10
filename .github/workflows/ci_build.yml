@@ -141,7 +141,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Register gcc problem matcher
         run: echo "::add-matcher::.github/problem_matchers/gcc.json"
@@ -271,7 +271,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
@@ -323,7 +323,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
@@ -370,8 +370,8 @@ jobs:
           echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
           echo "IS_DRY_RUN = ${IS_DRY_RUN}"
 
-          echo "::set-output name=disable::${DISABLE_DEPLOY_STEPS}"
-          echo "::set-output name=dry-run::${IS_DRY_RUN}"
+          echo "name=disable=${DISABLE_DEPLOY_STEPS}" >> $GITHUB_OUTPUT
+          echo "name=dry-run=${IS_DRY_RUN}" >> $GITHUB_OUTPUT
 
   #########################################
   # Deploy the toolkit builds to gh-pages #
@@ -385,7 +385,7 @@ jobs:
 
     steps:
       - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           # repository to check out
           repository: ${{ env.GH_PAGES_REPO }}
@@ -466,6 +466,45 @@ jobs:
           echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
           echo "IS_DRY_RUN = ${IS_DRY_RUN}"
 
+
+  ##################################
+  # Build the Java toolkit         #
+  ##################################
+  build_java:
+    name: Build Java toolkit
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v4.2.2
+
+      - name: Restore cache
+        uses: actions/setup-java@v4.7.1
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+          cache-dependency-path: ${{ github.workspace }}/bindings/java/pom.xml
+
+      - name: Create TEMP_DIR
+        working-directory: ${{ github.workspace }}
+        run: mkdir -p $TEMP_DIR/
+
+      - name: Build Java
+        working-directory: ${{ github.workspace }}/bindings/java
+        run: mvn package && mvn package
+
+      - name: Copy build into TEMP_DIR
+        working-directory: ${{ github.workspace }}/bindings/java
+        run: cp target/*.jar $GITHUB_WORKSPACE/$TEMP_DIR/
+
+      - name: Upload java build artifact (${{ matrix.toolkit.target }})
+        uses: actions/upload-artifact@v4.4.3
+        with:
+          name: java-build-${{ github.run_id }}
+          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}
+      
+
   ###################################
   # Build the doxygen documentation #
   ###################################
@@ -477,7 +516,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Install doxygen
         run: |
@@ -514,7 +553,7 @@ jobs:
 
     steps:
       - name: Checkout DOXYGEN_REPO into DOXYGEN_DIR
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           # repository to check out
           repository: ${{ env.DOXYGEN_REPO }}
