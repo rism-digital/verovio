@@ -498,7 +498,7 @@ jobs:
         working-directory: ${{ github.workspace }}/bindings/java
         run: cp target/*.jar $GITHUB_WORKSPACE/$TEMP_DIR/
 
-      - name: Upload java build artifact (${{ matrix.toolkit.target }})
+      - name: Upload java build artifact
         uses: actions/upload-artifact@v4.4.3
         with:
           name: java-build-${{ github.run_id }}
