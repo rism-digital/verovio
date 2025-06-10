@@ -318,6 +318,9 @@ jobs:
   # Copy the font CSS files  #
   ############################
   copy_font_files:
+    # skip job if commit message contains "[skip-ci]"
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
+  
     name: Copy the font files
     runs-on: ubuntu-22.04
 
@@ -471,6 +474,9 @@ jobs:
   # Build the Java toolkit         #
   ##################################
   build_java:
+    # skip job if commit message contains "[skip-ci]"
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
+  
     name: Build Java toolkit
     runs-on: ubuntu-22.04
 
