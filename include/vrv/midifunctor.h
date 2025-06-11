@@ -212,6 +212,7 @@ public:
     FunctorCode VisitArpeg(Arpeg *arpeg) override;
     FunctorCode VisitChord(Chord *chord) override;
     FunctorCode VisitGraceGrpEnd(GraceGrp *graceGrp) override;
+    FunctorCode VisitLayerEnd(Layer *layer) override;
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitNote(Note *note) override;
     ///@}

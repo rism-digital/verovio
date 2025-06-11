@@ -112,8 +112,12 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayerElement(LayerElement *layerElement
         Note *note = vrv_cast<Note *>(element);
         assert(note);
 
-        // For now just ignore grace notes
-        if (note->IsGraceNote()) return FUNCTOR_CONTINUE;
+        if (note->IsGraceNote()) {
+            // Just store the current onset - only used for grace notes at the end of the layer
+            note->SetScoreTimeOnset(m_currentScoreTime);
+            note->SetRealTimeOnsetSeconds(m_currentRealTimeSeconds);
+            return FUNCTOR_CONTINUE;
+        }
 
         Chord *chord = note->IsChordTone();
         TabGrp *tabGrp = note->IsTabGrpNote();
@@ -400,6 +404,36 @@ FunctorCode InitTimemapAdjustNotesFunctor::VisitGraceGrpEnd(GraceGrp *graceGrp)
             startTime = stopTime;
         }
 
+        m_graces.clear();
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode InitTimemapAdjustNotesFunctor::VisitLayerEnd(Layer *layer)
+{
+    // Process grace notes at the end of the layer - always treat them as "unacc"
+    if (!m_graces.empty() && !m_graces.front().notes.empty()) {
+        Fraction startTime = m_graces.front().notes.front()->GetScoreTimeOnset();
+        Fraction graceNoteDur = UNACC_GRACENOTE_FRACTION * (int)m_currentTempo;
+        const Fraction totalDur = graceNoteDur * (int)m_graces.size();
+        startTime = startTime - totalDur;
+        startTime = (startTime < 0) ? 0 : startTime;
+
+        // If we have a previous note ending after the start, correct its duration
+        if (m_lastNote && (m_lastNote->GetScoreTimeOffset() > startTime)
+            && m_lastNote->GetScoreTimeOnset() < startTime) {
+            this->SetNoteStartStop(m_lastNote, m_lastNote->GetScoreTimeOnset(), startTime);
+        }
+
+        for (const auto &grace : m_graces) {
+            const Fraction stopTime = startTime + graceNoteDur;
+            for (const auto &note : grace.notes) {
+                // Set the start (onset) and end (offset) of the grace note
+                this->SetNoteStartStop(note, startTime, stopTime);
+            }
+            startTime = stopTime;
+        }
         m_graces.clear();
     }
 
