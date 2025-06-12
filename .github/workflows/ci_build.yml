@@ -210,6 +210,48 @@ jobs:
           cmake ../cmake
           make -j8
 
+
+  ##################################
+  # Build the Java toolkit         #
+  ##################################
+  build_java:
+    # skip job if commit message contains "[skip-ci]"
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
+  
+    name: Build Java toolkit
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v4.2.2
+
+      - name: Restore cache
+        uses: actions/setup-java@v4.7.1
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+          cache-dependency-path: ${{ github.workspace }}/bindings/java/pom.xml
+
+      - name: Create TEMP_DIR
+        working-directory: ${{ github.workspace }}
+        run: mkdir -p $TEMP_DIR/
+
+      - name: Build Java
+        working-directory: ${{ github.workspace }}/bindings/java
+        run: mvn package && mvn package
+
+      - name: Copy build into TEMP_DIR
+        working-directory: ${{ github.workspace }}/bindings/java
+        run: cp target/*.jar $GITHUB_WORKSPACE/$TEMP_DIR/
+
+      - name: Upload java build artifact
+        uses: actions/upload-artifact@v4.4.3
+        with:
+          name: java-build-${{ github.run_id }}
+          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}
+
+  
   #####################################
   # Set up and cache emscripten build #
   #####################################
@@ -373,8 +415,8 @@ jobs:
           echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
           echo "IS_DRY_RUN = ${IS_DRY_RUN}"
 
-          echo "name=disable=${DISABLE_DEPLOY_STEPS}" >> $GITHUB_OUTPUT
-          echo "name=dry-run=${IS_DRY_RUN}" >> $GITHUB_OUTPUT
+          echo "disable=${DISABLE_DEPLOY_STEPS}" >> $GITHUB_OUTPUT
+          echo "dry-run=${IS_DRY_RUN}" >> $GITHUB_OUTPUT
 
   #########################################
   # Deploy the toolkit builds to gh-pages #
@@ -468,47 +510,6 @@ jobs:
 
           echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
           echo "IS_DRY_RUN = ${IS_DRY_RUN}"
-
-
-  ##################################
-  # Build the Java toolkit         #
-  ##################################
-  build_java:
-    # skip job if commit message contains "[skip-ci]"
-    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
-  
-    name: Build Java toolkit
-    runs-on: ubuntu-22.04
-
-    steps:
-      - name: Checkout main repo
-        uses: actions/checkout@v4.2.2
-
-      - name: Restore cache
-        uses: actions/setup-java@v4.7.1
-        with:
-          distribution: 'temurin'
-          java-version: '21'
-          cache: 'maven'
-          cache-dependency-path: ${{ github.workspace }}/bindings/java/pom.xml
-
-      - name: Create TEMP_DIR
-        working-directory: ${{ github.workspace }}
-        run: mkdir -p $TEMP_DIR/
-
-      - name: Build Java
-        working-directory: ${{ github.workspace }}/bindings/java
-        run: mvn package && mvn package
-
-      - name: Copy build into TEMP_DIR
-        working-directory: ${{ github.workspace }}/bindings/java
-        run: cp target/*.jar $GITHUB_WORKSPACE/$TEMP_DIR/
-
-      - name: Upload java build artifact
-        uses: actions/upload-artifact@v4.4.3
-        with:
-          name: java-build-${{ github.run_id }}
-          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}
       
 
   ###################################
