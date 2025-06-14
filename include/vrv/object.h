@@ -411,14 +411,14 @@ public:
     /**
      * Additional check when adding a child.
      */
-    virtual bool AddChildAdditionalCheck(Object *child) { return true; };
+    virtual bool AddChildAdditionalCheck([[maybe_unused]] Object *child) { return true; };
 
     /**
      * Return the child order for a the given ClassId.
      * By default, a child is added at the end, but a class can override the method to order them.
      * The overriden method specifies a static vector with the expected order of ClassIds.
      */
-    virtual int GetInsertOrderFor(ClassId classId) const { return VRV_UNSET; }
+    virtual int GetInsertOrderFor([[maybe_unused]] ClassId classId) const { return VRV_UNSET; }
 
     /**
      * Find the order from an overriden GetInsertOrderFor method.
@@ -962,7 +962,7 @@ protected:
      * Filter the list for a specific class.
      * For example, keep only notes in Beam
      */
-    virtual void FilterList(ListOfConstObjects &childList) const {};
+    virtual void FilterList([[maybe_unused]] ListOfConstObjects &childList) const {};
 
 private:
     /**

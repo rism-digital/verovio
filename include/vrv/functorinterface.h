@@ -171,8 +171,8 @@ public:
      * @name Visit object and doc
      */
     ///@{
-    virtual FunctorCode VisitObject(Object *object) { return FUNCTOR_CONTINUE; }
-    virtual FunctorCode VisitObjectEnd(Object *object) { return FUNCTOR_CONTINUE; }
+    virtual FunctorCode VisitObject([[maybe_unused]] Object *object) { return FUNCTOR_CONTINUE; }
+    virtual FunctorCode VisitObjectEnd([[maybe_unused]] Object *object) { return FUNCTOR_CONTINUE; }
     virtual FunctorCode VisitDoc(Doc *doc);
     virtual FunctorCode VisitDocEnd(Doc *doc);
     ///@}
@@ -548,8 +548,8 @@ public:
      * @name Visit object and doc
      */
     ///@{
-    virtual FunctorCode VisitObject(const Object *object) { return FUNCTOR_CONTINUE; }
-    virtual FunctorCode VisitObjectEnd(const Object *object) { return FUNCTOR_CONTINUE; }
+    virtual FunctorCode VisitObject([[maybe_unused]] const Object *object) { return FUNCTOR_CONTINUE; }
+    virtual FunctorCode VisitObjectEnd([[maybe_unused]] const Object *object) { return FUNCTOR_CONTINUE; }
     virtual FunctorCode VisitDoc(const Doc *doc);
     virtual FunctorCode VisitDocEnd(const Doc *doc);
     ///@}
