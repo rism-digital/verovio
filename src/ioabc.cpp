@@ -833,6 +833,7 @@ void ABCInput::ParseReferenceNumber(const std::string &referenceNumberString)
 void ABCInput::PrintInformationFields(Score *score)
 {
     PgHead *pgHead = new PgHead();
+    pgHead->SetFunc(PGFUNC_first);
     for (const auto &it : m_title) {
         Rend *titleRend = new Rend();
         titleRend->SetHalign(HORIZONTALALIGNMENT_center);
