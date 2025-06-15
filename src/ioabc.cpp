@@ -161,12 +161,12 @@ void ABCInput::ParseABC(std::istream &infile)
             this->ReadMusicCode(abcLine, section);
         }
     }
+    this->FlushControlElements(score, section);
 
     if (section && score && !section->GetParent()) {
         score->AddChild(section);
     }
 
-    m_controlElements.clear();
     m_composer.clear();
     m_info.clear();
     m_title.clear();
