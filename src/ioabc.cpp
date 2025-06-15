@@ -369,7 +369,7 @@ void ABCInput::AddChordSymbol(LayerElement *element)
         m_harmStack.clear();
     }
 
-    m_dynam.clear();
+    m_harmStack.clear();
 }
 
 void ABCInput::AddDynamic(LayerElement *element)
