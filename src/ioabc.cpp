@@ -161,12 +161,12 @@ void ABCInput::ParseABC(std::istream &infile)
             this->ReadMusicCode(abcLine, section);
         }
     }
+    this->FlushControlElements(score, section);
 
     if (section && score && !section->GetParent()) {
         score->AddChild(section);
     }
 
-    m_controlElements.clear();
     m_composer.clear();
     m_info.clear();
     m_title.clear();
@@ -369,7 +369,7 @@ void ABCInput::AddChordSymbol(LayerElement *element)
         m_harmStack.clear();
     }
 
-    m_dynam.clear();
+    m_harmStack.clear();
 }
 
 void ABCInput::AddDynamic(LayerElement *element)
@@ -833,6 +833,7 @@ void ABCInput::ParseReferenceNumber(const std::string &referenceNumberString)
 void ABCInput::PrintInformationFields(Score *score)
 {
     PgHead *pgHead = new PgHead();
+    pgHead->SetFunc(PGFUNC_first);
     for (const auto &it : m_title) {
         Rend *titleRend = new Rend();
         titleRend->SetHalign(HORIZONTALALIGNMENT_center);
