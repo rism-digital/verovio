@@ -351,7 +351,7 @@ protected:
     /**
      * The note locations w.r.t. each staff, implemented for note and chord
      */
-    virtual MapOfNoteLocs CalcNoteLocations(NotePredicate) const { return {}; }
+    virtual MapOfNoteLocs CalcNoteLocations(NotePredicate = NULL) const { return {}; }
 
     /**
      * The dot locations w.r.t. each staff, implemented for note and chord
