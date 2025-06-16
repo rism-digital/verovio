@@ -12,7 +12,7 @@
 		2D2A799A1A69812C000A441B /* chord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D2A79991A69812C000A441B /* chord.cpp */; };
 		35F6580F24F92B6100C99A2D /* fing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 35FDEBD024B6DC5B00AC1696 /* fing.cpp */; };
 		35FDEBCE24B6DBC100AC1696 /* fing.h in Headers */ = {isa = PBXBuildFile; fileRef = 35FDEBCD24B6DBC100AC1696 /* fing.h */; };
-		35FDEBCF24B6DBC100AC1696 /* fing.h in Headers */ = {isa = PBXBuildFile; fileRef = 35FDEBCD24B6DBC100AC1696 /* fing.h */; };
+		35FDEBCF24B6DBC100AC1696 /* fing.h in Headers */ = {isa = PBXBuildFile; fileRef = 35FDEBCD24B6DBC100AC1696 /* fing.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		35FDEBD124B6DC5B00AC1696 /* fing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 35FDEBD024B6DC5B00AC1696 /* fing.cpp */; };
 		35FDEBD224B6DC5B00AC1696 /* fing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 35FDEBD024B6DC5B00AC1696 /* fing.cpp */; };
 		35FDEBD324B6DC5B00AC1696 /* fing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 35FDEBD024B6DC5B00AC1696 /* fing.cpp */; };
@@ -24,7 +24,7 @@
 		400FEDD5206FA74D000D3233 /* gracegrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 400FEDD2206FA743000D3233 /* gracegrp.cpp */; };
 		400FEDD6206FA74D000D3233 /* gracegrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 400FEDD2206FA743000D3233 /* gracegrp.cpp */; };
 		402197941F2E09DA00182DF1 /* ioabc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 402197931F2E09DA00182DF1 /* ioabc.cpp */; };
-		402492BE232E6FCB0017BB75 /* gracegrp.h in Headers */ = {isa = PBXBuildFile; fileRef = 400FEDD1206FA742000D3233 /* gracegrp.h */; };
+		402492BE232E6FCB0017BB75 /* gracegrp.h in Headers */ = {isa = PBXBuildFile; fileRef = 400FEDD1206FA742000D3233 /* gracegrp.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		402492BF232E70000017BB75 /* gracegrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 400FEDD2206FA743000D3233 /* gracegrp.cpp */; };
 		4026FBE4203C827E0076535E /* mnum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4026FBE3203C827D0076535E /* mnum.cpp */; };
 		403B050F244F3E2900EE4F71 /* gliss.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403B050E244F3E2800EE4F71 /* gliss.cpp */; };
@@ -49,7 +49,7 @@
 		4067E4C81DDDAF0000C6E059 /* fermata.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4067E4C71DDDAF0000C6E059 /* fermata.cpp */; };
 		406916DC23833770009E6B04 /* mspace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 406916DB2383376F009E6B04 /* mspace.cpp */; };
 		406916DE23833794009E6B04 /* mspace.h in Headers */ = {isa = PBXBuildFile; fileRef = 406916DD2383378F009E6B04 /* mspace.h */; };
-		406916DF23833795009E6B04 /* mspace.h in Headers */ = {isa = PBXBuildFile; fileRef = 406916DD2383378F009E6B04 /* mspace.h */; };
+		406916DF23833795009E6B04 /* mspace.h in Headers */ = {isa = PBXBuildFile; fileRef = 406916DD2383378F009E6B04 /* mspace.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		406916E02383379A009E6B04 /* mspace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 406916DB2383376F009E6B04 /* mspace.cpp */; };
 		406916E12383379B009E6B04 /* mspace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 406916DB2383376F009E6B04 /* mspace.cpp */; };
 		406916E22383379C009E6B04 /* mspace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 406916DB2383376F009E6B04 /* mspace.cpp */; };
@@ -226,13 +226,13 @@
 		4D1EB6A32A2A40B400AF2F98 /* textlayoutelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1EB6A02A2A40B400AF2F98 /* textlayoutelement.cpp */; };
 		4D1EB6A42A2A40B400AF2F98 /* textlayoutelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1EB6A02A2A40B400AF2F98 /* textlayoutelement.cpp */; };
 		4D1EB6A62A2A40CB00AF2F98 /* textlayoutelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1EB6A52A2A40CB00AF2F98 /* textlayoutelement.h */; };
-		4D1EB6A72A2A40CB00AF2F98 /* textlayoutelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1EB6A52A2A40CB00AF2F98 /* textlayoutelement.h */; };
+		4D1EB6A72A2A40CB00AF2F98 /* textlayoutelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1EB6A52A2A40CB00AF2F98 /* textlayoutelement.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D1EB6A92A2A7C5100AF2F98 /* div.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1EB6A82A2A7C5100AF2F98 /* div.cpp */; };
 		4D1EB6AA2A2A7C5100AF2F98 /* div.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1EB6A82A2A7C5100AF2F98 /* div.cpp */; };
 		4D1EB6AB2A2A7C5100AF2F98 /* div.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1EB6A82A2A7C5100AF2F98 /* div.cpp */; };
 		4D1EB6AC2A2A7C5100AF2F98 /* div.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1EB6A82A2A7C5100AF2F98 /* div.cpp */; };
 		4D1EB6AE2A2A7C6400AF2F98 /* div.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1EB6AD2A2A7C6400AF2F98 /* div.h */; };
-		4D1EB6AF2A2A7C6400AF2F98 /* div.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1EB6AD2A2A7C6400AF2F98 /* div.h */; };
+		4D1EB6AF2A2A7C6400AF2F98 /* div.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1EB6AD2A2A7C6400AF2F98 /* div.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D2073F522A3BCE000E0765F /* tuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F222A3BCDF00E0765F /* tuning.cpp */; };
 		4D2073F622A3BCE000E0765F /* tuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F222A3BCDF00E0765F /* tuning.cpp */; };
 		4D2073F722A3BCE000E0765F /* tuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F222A3BCDF00E0765F /* tuning.cpp */; };
@@ -362,7 +362,7 @@
 		4D71BEAC2D875DF800CE0001 /* atts_stringtab.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D71BEA62D875DF800CE0001 /* atts_stringtab.h */; };
 		4D71BEAD2D875DF800CE0001 /* atts_stringtab.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D71BEA72D875DF800CE0001 /* atts_stringtab.cpp */; };
 		4D723AF425E8DB0B0062E0A2 /* zip_file.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4D723AF325E8DB0B0062E0A2 /* zip_file.hpp */; };
-		4D723AF525E8DB0B0062E0A2 /* zip_file.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4D723AF325E8DB0B0062E0A2 /* zip_file.hpp */; };
+		4D723AF525E8DB0B0062E0A2 /* zip_file.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4D723AF325E8DB0B0062E0A2 /* zip_file.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D72A5DD208A37D1009DEC1E /* mrpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403BEFEA206C00B400D022D5 /* mrpt.cpp */; };
 		4D72A5DE208A37D5009DEC1E /* mrpt2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403BEFEB206C00B400D022D5 /* mrpt2.cpp */; };
 		4D72A5DF208A37DC009DEC1E /* multirpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403BEFEC206C00B400D022D5 /* multirpt.cpp */; };
@@ -1089,7 +1089,7 @@
 		B464F4902C6D664300A778D2 /* scoringupfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B464F48E2C6D664300A778D2 /* scoringupfunctor.cpp */; };
 		B464F4912C6D664300A778D2 /* scoringupfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B464F48E2C6D664300A778D2 /* scoringupfunctor.cpp */; };
 		B464F4932C6D665300A778D2 /* scoringupfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = B464F4922C6D665300A778D2 /* scoringupfunctor.h */; };
-		B464F4942C6D665300A778D2 /* scoringupfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = B464F4922C6D665300A778D2 /* scoringupfunctor.h */; };
+		B464F4942C6D665300A778D2 /* scoringupfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = B464F4922C6D665300A778D2 /* scoringupfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4A5A22A9318B001F6AF0 /* humlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06581E351161009CFDD7 /* humlib.cpp */; };
 		BB4C4A5B22A9318E001F6AF0 /* humlib.h in Headers */ = {isa = PBXBuildFile; fileRef = 40CA064C1E351125009CFDD7 /* humlib.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4A8822A93225001F6AF0 /* c_wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD11DC22240E78B00A405D8 /* c_wrapper.cpp */; };
@@ -1402,7 +1402,7 @@
 		BBC19FC322B38C1400100F42 /* VerovioFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC19FC222B38C1400100F42 /* VerovioFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BBC19FC922B39AC400100F42 /* git_commit.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9C5F3A1ADBBBEB005D3031 /* git_commit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BD05622F2518CD12004057EB /* beamspan.h in Headers */ = {isa = PBXBuildFile; fileRef = BD05622E2518CD12004057EB /* beamspan.h */; };
-		BD0562302518CD12004057EB /* beamspan.h in Headers */ = {isa = PBXBuildFile; fileRef = BD05622E2518CD12004057EB /* beamspan.h */; };
+		BD0562302518CD12004057EB /* beamspan.h in Headers */ = {isa = PBXBuildFile; fileRef = BD05622E2518CD12004057EB /* beamspan.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BD0562362518CD20004057EB /* beamspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD0562352518CD20004057EB /* beamspan.cpp */; };
 		BD0562372518CD20004057EB /* beamspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD0562352518CD20004057EB /* beamspan.cpp */; };
 		BD0562382518CD20004057EB /* beamspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD0562352518CD20004057EB /* beamspan.cpp */; };
@@ -1411,7 +1411,7 @@
 		BD2E4D962875880500B04350 /* stem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD2E4D94287587FD00B04350 /* stem.cpp */; };
 		BD2E4D972875880500B04350 /* stem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD2E4D94287587FD00B04350 /* stem.cpp */; };
 		BD2E4D982875880600B04350 /* stem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD2E4D94287587FD00B04350 /* stem.cpp */; };
-		BD2E4D9A2875882100B04350 /* stem.h in Headers */ = {isa = PBXBuildFile; fileRef = BD2E4D992875881B00B04350 /* stem.h */; };
+		BD2E4D9A2875882100B04350 /* stem.h in Headers */ = {isa = PBXBuildFile; fileRef = BD2E4D992875881B00B04350 /* stem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BD2E4D9B2875882200B04350 /* stem.h in Headers */ = {isa = PBXBuildFile; fileRef = BD2E4D992875881B00B04350 /* stem.h */; };
 		BD6E5C3D290007C90039B0F1 /* graphic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3673E5E428E1DF0C0048BAFA /* graphic.cpp */; };
 		BD6E5C3E290007CA0039B0F1 /* graphic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3673E5E428E1DF0C0048BAFA /* graphic.cpp */; };
@@ -1423,11 +1423,11 @@
 		BD87768527CE8A1A005B97EA /* layerdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD87768227CE8A11005B97EA /* layerdef.cpp */; };
 		BD87768627CE8A1A005B97EA /* layerdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD87768227CE8A11005B97EA /* layerdef.cpp */; };
 		BD87768727CE8A21005B97EA /* layerdef.h in Headers */ = {isa = PBXBuildFile; fileRef = BD87768127CE89FA005B97EA /* layerdef.h */; };
-		BD87768827CE8A21005B97EA /* layerdef.h in Headers */ = {isa = PBXBuildFile; fileRef = BD87768127CE89FA005B97EA /* layerdef.h */; };
+		BD87768827CE8A21005B97EA /* layerdef.h in Headers */ = {isa = PBXBuildFile; fileRef = BD87768127CE89FA005B97EA /* layerdef.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BD96F7CD2C04A708001CFF6F /* quilisma.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD96F7CB2C04A708001CFF6F /* quilisma.cpp */; };
 		BD96F7D12C04B297001CFF6F /* oriscus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD96F7D02C04B297001CFF6F /* oriscus.cpp */; };
 		BD96F7D22C04B2B2001CFF6F /* quilisma.h in Headers */ = {isa = PBXBuildFile; fileRef = BD96F7CE2C04A76F001CFF6F /* quilisma.h */; };
-		BD96F7D32C04B2B3001CFF6F /* quilisma.h in Headers */ = {isa = PBXBuildFile; fileRef = BD96F7CE2C04A76F001CFF6F /* quilisma.h */; };
+		BD96F7D32C04B2B3001CFF6F /* quilisma.h in Headers */ = {isa = PBXBuildFile; fileRef = BD96F7CE2C04A76F001CFF6F /* quilisma.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BD96F7D42C04B2B6001CFF6F /* quilisma.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD96F7CB2C04A708001CFF6F /* quilisma.cpp */; };
 		BD96F7D52C04B2B6001CFF6F /* quilisma.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD96F7CB2C04A708001CFF6F /* quilisma.cpp */; };
 		BD96F7D62C04B2B7001CFF6F /* quilisma.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD96F7CB2C04A708001CFF6F /* quilisma.cpp */; };
@@ -1435,8 +1435,8 @@
 		BD96F7D82C04B2EE001CFF6F /* oriscus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD96F7D02C04B297001CFF6F /* oriscus.cpp */; };
 		BD96F7D92C04B2EF001CFF6F /* oriscus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD96F7D02C04B297001CFF6F /* oriscus.cpp */; };
 		BD96F7DA2C04B2F2001CFF6F /* oriscus.h in Headers */ = {isa = PBXBuildFile; fileRef = BD96F7CF2C04B26D001CFF6F /* oriscus.h */; };
-		BD96F7DB2C04B2F2001CFF6F /* oriscus.h in Headers */ = {isa = PBXBuildFile; fileRef = BD96F7CF2C04B26D001CFF6F /* oriscus.h */; };
-		BDA81C21268B38760065B802 /* metersiggrp.h in Headers */ = {isa = PBXBuildFile; fileRef = BDA81C20268B386C0065B802 /* metersiggrp.h */; };
+		BD96F7DB2C04B2F2001CFF6F /* oriscus.h in Headers */ = {isa = PBXBuildFile; fileRef = BD96F7CF2C04B26D001CFF6F /* oriscus.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BDA81C21268B38760065B802 /* metersiggrp.h in Headers */ = {isa = PBXBuildFile; fileRef = BDA81C20268B386C0065B802 /* metersiggrp.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BDA81C22268B38770065B802 /* metersiggrp.h in Headers */ = {isa = PBXBuildFile; fileRef = BDA81C20268B386C0065B802 /* metersiggrp.h */; };
 		BDA81C24268B38A10065B802 /* metersiggrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDA81C23268B38A10065B802 /* metersiggrp.cpp */; };
 		BDA81C25268B38A10065B802 /* metersiggrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDA81C23268B38A10065B802 /* metersiggrp.cpp */; };
@@ -1637,7 +1637,7 @@
 		E797C464298EC30700CAD67E /* calcalignmentpitchposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E797C45F298EC2C500CAD67E /* calcalignmentpitchposfunctor.cpp */; };
 		E797C465298EC30800CAD67E /* calcalignmentpitchposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E797C45F298EC2C500CAD67E /* calcalignmentpitchposfunctor.cpp */; };
 		E79ADDC426BD1AE900527E4B /* runtimeclock.h in Headers */ = {isa = PBXBuildFile; fileRef = E79ADDC326BD1AE900527E4B /* runtimeclock.h */; };
-		E79ADDC526BD1AE900527E4B /* runtimeclock.h in Headers */ = {isa = PBXBuildFile; fileRef = E79ADDC326BD1AE900527E4B /* runtimeclock.h */; };
+		E79ADDC526BD1AE900527E4B /* runtimeclock.h in Headers */ = {isa = PBXBuildFile; fileRef = E79ADDC326BD1AE900527E4B /* runtimeclock.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E79ADDC726BD645B00527E4B /* runtimeclock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E79ADDC626BD645B00527E4B /* runtimeclock.cpp */; };
 		E79ADDC826BD645B00527E4B /* runtimeclock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E79ADDC626BD645B00527E4B /* runtimeclock.cpp */; };
 		E79ADDC926BD645B00527E4B /* runtimeclock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E79ADDC626BD645B00527E4B /* runtimeclock.cpp */; };
@@ -1681,7 +1681,7 @@
 		E7BCFFB5281297980012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
 		E7BCFFB6281297980012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
 		E7BCFFB8281297C60012513D /* resources.h in Headers */ = {isa = PBXBuildFile; fileRef = E7BCFFB7281297C60012513D /* resources.h */; };
-		E7BCFFB9281297C60012513D /* resources.h in Headers */ = {isa = PBXBuildFile; fileRef = E7BCFFB7281297C60012513D /* resources.h */; };
+		E7BCFFB9281297C60012513D /* resources.h in Headers */ = {isa = PBXBuildFile; fileRef = E7BCFFB7281297C60012513D /* resources.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E7BCFFBA281298620012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
 		E7BCFFBB281298630012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
 		E7BF80E429E3374600EA38F0 /* justifyfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7BF80E329E3374600EA38F0 /* justifyfunctor.h */; };
