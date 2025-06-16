@@ -1,7 +1,7 @@
 # Changelog
 
 ## [unreleased]
-* Fix bugs in ABC import (@rettinghaus)
+* Fix title and control event bugs in ABC import (@rettinghaus)
 
 ## [5.3.2] – 2025-05-28
 * Fix bug in toolkit select
