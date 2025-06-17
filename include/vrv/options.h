@@ -846,6 +846,7 @@ public:
      */
     OptionGrp m_mensural;
 
+    OptionBool m_mensuralDisableBreaks;
     OptionIntMap m_durationEquivalence;
     OptionBool m_ligatureAsBracket;
     OptionIntMap m_ligatureOblique;

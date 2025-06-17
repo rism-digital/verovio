@@ -1338,6 +1338,9 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
     // Do not convert facs files
     if (this->IsFacs()) return;
 
+    // Do not convert when disabled
+    if (!m_options->m_mensuralDisableBreaks.GetValue()) return;
+
     // Make sure the document is not cast-off
     if (this->IsCastOff()) this->UnCastOffDoc();
 

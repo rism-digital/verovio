@@ -309,6 +309,7 @@ std::string MEIOutput::Export()
 
         // Redo the mensural segment cast of if necessary
         m_doc->ConvertToCastOffMensuralDoc(true);
+
         unsigned int output_flags = pugi::format_default;
         if (m_doc->GetOptions()->m_outputSmuflXmlEntities.GetValue()) {
             output_flags |= pugi::format_no_escapes;

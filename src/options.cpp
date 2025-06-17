@@ -1826,6 +1826,10 @@ Options::Options()
     m_mensural.SetCategory(OptionsCategory::Mensural);
     m_grps.push_back(&m_mensural);
 
+    m_mensuralDisableBreaks.SetInfo("Mensural disable breaks", "Disable system and page breaks");
+    m_mensuralDisableBreaks.Init(false);
+    this->Register(&m_mensuralDisableBreaks, "mensuralDisableBreaks", &m_mensural);
+
     m_durationEquivalence.SetInfo("Duration equivalence", "The mensural duration equivalence");
     m_durationEquivalence.Init(DURATION_EQ_brevis, &Option::s_durationEq);
     this->Register(&m_durationEquivalence, "durationEquivalence", &m_mensural);
