@@ -28,7 +28,6 @@ print <<"EOT";
 
 Options:
 -c      Chatty mode: display compiler progress
--l      Light version with no increased memory allocation
 -r DIR  Verovio root directory
 -v N    Version number (e.g., 1.0.0); no number by default
 -w      Webassembly version
@@ -52,7 +51,7 @@ die "ERROR: emscripten cmake (emcmake) not found.\n" unless $EMCMAKE;
 die "ERROR: emscripten make (emmake) not found.\n" unless $EMMAKE;
 
 # Parse command-line options
-my ($lightQ, $version, $chattyQ, $helpQ, $exclusion, $wasmQ, $makeQ, $modularizeQ, $debug);
+my ($version, $chattyQ, $helpQ, $exclusion, $wasmQ, $makeQ, $modularizeQ, $debug);
 my ($nopae, $nohumdrum, $nomusicxml, $nodarms);
 my ($FLAGS_NAME, $VERSION, $CHATTY);
 
@@ -87,12 +86,9 @@ $FLAGS .= " -DNDEBUG";
 $FLAGS .= " -std=c++$cpp";
 
 my $LFLAGS =  " -s ASM_JS=1";
-$LFLAGS .= " -s INITIAL_MEMORY=256MB";
-$LFLAGS .= " -s STACK_SIZE=128MB";
+$LFLAGS .= " -s INITIAL_MEMORY=128MB";
+$LFLAGS .= " -s STACK_SIZE=64MB";
 $LFLAGS .= " -s WASM=0";
-
-# Check that -w and -l and not enabled together
-die "ERROR: option -w cannot be enabled with -l.\n" if ($wasmQ && $lightQ);
 
 # Always wasm build with the humdrum toolkit
 if (!$nohumdrum) {
@@ -120,8 +116,6 @@ if ($wasmQ) {
 	$FLAGS .= " -s STRICT=1";
 	# Linker flags
 	$LFLAGS = " -s WASM=1";
-	$LFLAGS .= " -s INITIAL_MEMORY=512MB";
-	$LFLAGS .= " -s STACK_SIZE=256MB";
 	$LFLAGS .= " -s ALLOW_MEMORY_GROWTH";
 	$LFLAGS .= " -s SINGLE_FILE=1";
 	$LFLAGS .= " -s INCOMING_MODULE_JS_API=onRuntimeInitialized";
@@ -129,12 +123,6 @@ if ($wasmQ) {
 		$LFLAGS .= " --emit-symbol-map -sASSERTIONS";
 	}
 	$FLAGS_NAME = "-wasm";
-}
-
-if ($lightQ) {
-	print "Creating low-memory (light) toolkit version\n";
-	$LFLAGS = " -s ASM_JS=1 -s WASM=0";
-	$FLAGS_NAME = "-light";
 }
 
 if ($chattyQ) {
