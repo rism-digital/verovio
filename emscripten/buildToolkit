@@ -63,7 +63,6 @@ GetOptions (
 	'C|cpp=s'       => \$cpp,
 	'c|chatty'      => \$chattyQ,
 	'h|?|help'      => \$helpQ,
-	'l|light'       => \$lightQ,
 	'r|root=s'      => \$VEROVIO_ROOT,
 	'v|version=s'   => \$VERSION,
 	'x|exclusion=s' => \$exclusion,
