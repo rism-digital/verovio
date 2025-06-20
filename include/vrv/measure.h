@@ -310,7 +310,7 @@ public:
     int EnclosesTime(int time) const;
 
     /**
-     * Read only access to onset and offset.
+     * Read-only access to onset and offset.
      * Passing repeat unset return last one.
      */
     Fraction GetScoreTimeOnset(int repeat = VRV_UNSET) const;
