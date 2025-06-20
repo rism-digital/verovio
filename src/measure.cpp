@@ -155,6 +155,8 @@ void Measure::Reset()
     m_drawingEnding = NULL;
     m_hasAlignmentRefWithMultipleLayers = false;
 
+    m_scoreTimeOnset.clear();
+    m_realTimeOnsetMilliseconds.clear();
     m_scoreTimeOffset.clear();
     m_realTimeOffsetMilliseconds.clear();
     m_currentTempo = MIDI_TEMPO;
@@ -475,9 +477,35 @@ int Measure::EnclosesTime(int time) const
     return 0;
 }
 
+Fraction Measure::GetScoreTimeOnset(int repeat) const
+{
+    if (m_scoreTimeOnset.empty() || (repeat > (int)m_scoreTimeOnset.size())) return 0;
+    if (repeat == VRV_UNSET) return m_scoreTimeOnset.back();
+    assert(repeat > 0);
+    return m_scoreTimeOnset.at(repeat - 1);
+}
+
+double Measure::GetRealTimeOnsetMilliseconds(int repeat) const
+{
+    if (m_realTimeOnsetMilliseconds.empty() || (repeat > (int)m_realTimeOnsetMilliseconds.size())) return 0;
+    if (repeat == VRV_UNSET) return m_realTimeOnsetMilliseconds.back();
+    assert(repeat > 0);
+    return m_realTimeOnsetMilliseconds.at(repeat - 1);
+}
+
+Fraction Measure::GetScoreTimeOffset(int repeat) const
+{
+    if (m_scoreTimeOffset.empty() || (repeat > (int)m_scoreTimeOffset.size())) return 0;
+    if (repeat == VRV_UNSET) return m_scoreTimeOffset.back();
+    assert(repeat > 0);
+    return m_scoreTimeOffset.at(repeat - 1);
+}
+
 double Measure::GetRealTimeOffsetMilliseconds(int repeat) const
 {
-    if ((repeat < 1) || repeat > (int)m_realTimeOffsetMilliseconds.size()) return 0;
+    if (m_realTimeOffsetMilliseconds.empty() || (repeat > (int)m_realTimeOffsetMilliseconds.size())) return 0;
+    if (repeat == VRV_UNSET) return m_realTimeOffsetMilliseconds.back();
+    assert(repeat > 0);
     return m_realTimeOffsetMilliseconds.at(repeat - 1);
 }
 

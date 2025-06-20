@@ -21,6 +21,7 @@
 #include "ftrem.h"
 #include "gracegrp.h"
 #include "layer.h"
+#include "mrest.h"
 #include "multirest.h"
 #include "octave.h"
 #include "pedal.h"
@@ -245,11 +246,11 @@ FunctorCode InitMaxMeasureDurationFunctor::VisitLayerElement(LayerElement *layer
 
 FunctorCode InitMaxMeasureDurationFunctor::VisitMeasure(Measure *measure)
 {
-    measure->ClearScoreTimeOffset();
-    measure->AddScoreTimeOffset(m_currentScoreTime);
+    measure->ClearScoreTimeOnset();
+    measure->AddScoreTimeOnset(m_currentScoreTime);
 
-    measure->ClearRealTimeOffset();
-    measure->AddRealTimeOffset(m_currentRealTimeSeconds * 1000.0);
+    measure->ClearRealTimeOnsetMilliseconds();
+    measure->AddRealTimeOnsetMilliseconds(m_currentRealTimeSeconds * 1000.0);
 
     return FUNCTOR_CONTINUE;
 }
@@ -263,6 +264,13 @@ FunctorCode InitMaxMeasureDurationFunctor::VisitMeasureEnd(Measure *measure)
         = measure->m_measureAligner.GetRightAlignment()->GetTime() * m_multiRestFactor * SCORE_TIME_UNIT;
     m_currentScoreTime = m_currentScoreTime + scoreTimeIncrement;
     m_currentRealTimeSeconds += scoreTimeIncrement.ToDouble() * 60.0 / tempo;
+
+    measure->ClearScoreTimeOffset();
+    measure->AddScoreTimeOffset(m_currentScoreTime);
+
+    measure->ClearRealTimeOffsetMilliseconds();
+    measure->AddRealTimeOffsetMilliseconds(m_currentRealTimeSeconds * 1000.0);
+
     m_multiRestFactor = 1;
 
     return FUNCTOR_CONTINUE;
@@ -760,7 +768,7 @@ FunctorCode GenerateMIDIFunctor::VisitLayerElement(const LayerElement *layerElem
 FunctorCode GenerateMIDIFunctor::VisitMeasure(const Measure *measure)
 {
     // Here we need to update the m_totalTime from the starting time of the measure.
-    m_totalTime = measure->GetLastTimeOffset().ToDouble();
+    m_totalTime = measure->GetScoreTimeOnset().ToDouble();
 
     if (measure->GetCurrentTempo() != m_currentTempo) {
         m_currentTempo = measure->GetCurrentTempo();
@@ -922,7 +930,7 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
         const Object *next = parent->GetNext(scoreDef);
         if (next && next->Is(MEASURE)) {
             const Measure *nextMeasure = vrv_cast<const Measure *>(next);
-            totalTime = nextMeasure->GetLastTimeOffset().ToDouble();
+            totalTime = nextMeasure->GetScoreTimeOnset().ToDouble();
         }
     }
     const double currentTick = totalTime * m_midiFile->getTPQ();
@@ -1082,8 +1090,8 @@ void GenerateMIDIFunctor::HandleOctave(const LayerElement *layerElement)
 
 GenerateTimemapFunctor::GenerateTimemapFunctor(Timemap *timemap) : ConstFunctor()
 {
-    m_scoreTimeOffset = 0;
-    m_realTimeOffsetMilliseconds = 0.0;
+    m_currentScoreTime = 0;
+    m_currentRealTimeMilliseconds = 0.0;
     m_currentTempo = MIDI_TEMPO;
     m_noCue = false;
     m_timemap = timemap;
@@ -1104,13 +1112,27 @@ FunctorCode GenerateTimemapFunctor::VisitLayerElement(const LayerElement *layerE
 
 FunctorCode GenerateTimemapFunctor::VisitMeasure(const Measure *measure)
 {
-    m_scoreTimeOffset = measure->GetLastTimeOffset();
-    m_realTimeOffsetMilliseconds = measure->GetLastRealTimeOffset();
+    m_currentScoreTime = measure->GetScoreTimeOnset();
+    m_currentRealTimeMilliseconds = measure->GetRealTimeOnsetMilliseconds();
     m_currentTempo = measure->GetCurrentTempo();
 
     this->AddTimemapEntry(measure);
 
     return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateTimemapFunctor::VisitMRest(const MRest *mRest)
+{
+    this->AddTimemapEntry(mRest);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode GenerateTimemapFunctor::VisitMultiRest(const MultiRest *multiRest)
+{
+    this->AddTimemapEntry(multiRest);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode GenerateTimemapFunctor::VisitNote(const Note *note)
@@ -1143,11 +1165,11 @@ void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)
         const DurationInterface *interface = object->GetDurationInterface();
         assert(interface);
 
-        double realTimeStart = round(m_realTimeOffsetMilliseconds + interface->GetRealTimeOnsetMilliseconds());
-        Fraction scoreTimeStart = m_scoreTimeOffset + interface->GetScoreTimeOnset();
+        Fraction scoreTimeStart = m_currentScoreTime + interface->GetScoreTimeOnset();
+        double realTimeStart = round(m_currentRealTimeMilliseconds + interface->GetRealTimeOnsetMilliseconds());
 
-        double realTimeEnd = round(m_realTimeOffsetMilliseconds + interface->GetRealTimeOffsetMilliseconds());
-        Fraction scoreTimeEnd = m_scoreTimeOffset + interface->GetScoreTimeOffset();
+        Fraction scoreTimeEnd = m_currentScoreTime + interface->GetScoreTimeOffset();
+        double realTimeEnd = round(m_currentRealTimeMilliseconds + interface->GetRealTimeOffsetMilliseconds());
 
         bool isRest = (object->Is(REST));
 
@@ -1179,13 +1201,12 @@ void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)
         if (isRest) endEntry.restsOff.push_back(object->GetID());
     }
     else if (object->Is(MEASURE)) {
-
         const Measure *measure = vrv_cast<const Measure *>(object);
         assert(measure);
 
         // Deal with repeated music later, for now get the last times.
-        Fraction scoreTimeStart = m_scoreTimeOffset;
-        double realTimeStart = round(m_realTimeOffsetMilliseconds);
+        Fraction scoreTimeStart = m_currentScoreTime;
+        double realTimeStart = round(m_currentRealTimeMilliseconds);
 
         TimemapEntry &startEntry = m_timemap->GetEntry(scoreTimeStart);
 
@@ -1195,6 +1216,36 @@ void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)
 
         // Add the measureOn
         startEntry.measureOn = measure->GetID();
+    }
+    else if (object->Is({ MREST, MULTIREST })) {
+        // Get the ancestor measure
+        const Measure *measure = vrv_cast<const Measure *>(object->GetFirstAncestor(MEASURE));
+        assert(measure);
+
+        Fraction scoreTimeStart = m_currentScoreTime;
+        double realTimeStart = round(m_currentRealTimeMilliseconds);
+        Fraction scoreTimeEnd = measure->GetScoreTimeOffset();
+        double realTimeEnd = round(measure->GetRealTimeOffsetMilliseconds());
+
+        /*********** start values ***********/
+
+        TimemapEntry &startEntry = m_timemap->GetEntry(scoreTimeStart);
+
+        // Should check if a value for realTimeStart already exists and if so, then
+        // ensure that it is equal to scoreTimeStart:
+        startEntry.tstamp = realTimeStart;
+
+        // Store the element ID in list to turn on at given time
+        startEntry.restsOn.push_back(object->GetID());
+
+        /*********** end values ***********/
+
+        TimemapEntry &endEntry = m_timemap->GetEntry(scoreTimeEnd);
+
+        endEntry.tstamp = realTimeEnd;
+
+        // Store the element ID in list to turn off at given time
+        endEntry.restsOff.push_back(object->GetID());
     }
 }
 
