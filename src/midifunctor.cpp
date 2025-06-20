@@ -1231,7 +1231,7 @@ void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)
 
         TimemapEntry &startEntry = m_timemap->GetEntry(scoreTimeStart);
 
-        // Should check if value for realTimeStart already exists and if so, then
+        // Should check if a value for realTimeStart already exists and if so, then
         // ensure that it is equal to scoreTimeStart:
         startEntry.tstamp = realTimeStart;
 
