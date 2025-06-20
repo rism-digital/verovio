@@ -1,7 +1,8 @@
 # Changelog
 
 ## [unreleased]
-* Reduce JS initial memory allocation and drop JS light memory version 
+* Change timemap with `includeRests` to include also `mRest` and `multiRest`
+* Change JS initial memory allocation and drop JS light memory version 
 * Fix title and control event bugs in ABC import (@rettinghaus)
 
 ## [5.3.2] – 2025-05-28
