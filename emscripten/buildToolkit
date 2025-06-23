@@ -115,6 +115,8 @@ if ($wasmQ) {
 	$FLAGS .= " -s STRICT=1";
 	# Linker flags
 	$LFLAGS = " -s WASM=1";
+	$LFLAGS .= " -s INITIAL_MEMORY=128MB";
+	$LFLAGS .= " -s STACK_SIZE=64MB";
 	$LFLAGS .= " -s ALLOW_MEMORY_GROWTH";
 	$LFLAGS .= " -s SINGLE_FILE=1";
 	$LFLAGS .= " -s INCOMING_MODULE_JS_API=onRuntimeInitialized";
