@@ -2110,21 +2110,22 @@ std::string Toolkit::GetTimesForElement(const std::string &xmlId)
         assert(measure);
 
         // For now ignore repeats and access always the first
-        double offset = measure->GetRealTimeOffsetMilliseconds(1);
-        realTimeOffsetMilliseconds << offset + note->GetRealTimeOffsetMilliseconds();
-        realTimeOnsetMilliseconds << offset + note->GetRealTimeOnsetMilliseconds();
+        double mRealTimeOnsetMilliseconds = measure->GetRealTimeOnsetMilliseconds(1);
+        realTimeOnsetMilliseconds << mRealTimeOnsetMilliseconds + note->GetRealTimeOnsetMilliseconds();
+        realTimeOffsetMilliseconds << mRealTimeOnsetMilliseconds + note->GetRealTimeOffsetMilliseconds();
 
-        scoreTimeOnset << note->GetScoreTimeOnset();
-        scoreTimeOffset << note->GetScoreTimeOffset();
-        scoreTimeDuration << note->GetScoreTimeDuration();
-        scoreTimeTiedDuration << note->GetScoreTimeTiedDuration();
+        Fraction mScoreTimeOnset = measure->GetScoreTimeOnset(1);
+        scoreTimeOnset << jsonxx::Value(Timemap::ToArray(mScoreTimeOnset + note->GetScoreTimeOnset()));
+        scoreTimeOffset << jsonxx::Value(Timemap::ToArray(mScoreTimeOnset + note->GetScoreTimeOffset()));
+        scoreTimeDuration << jsonxx::Value(Timemap::ToArray(note->GetScoreTimeDuration()));
+        scoreTimeTiedDuration << jsonxx::Value(Timemap::ToArray(note->GetScoreTimeTiedDuration()));
 
-        o << "scoreTimeOnset" << scoreTimeOnset;
-        o << "scoreTimeOffset" << scoreTimeOffset;
-        o << "scoreTimeDuration" << scoreTimeDuration;
-        o << "scoreTimeTiedDuration" << scoreTimeTiedDuration;
-        o << "realTimeOnsetMilliseconds" << realTimeOnsetMilliseconds;
-        o << "realTimeOffsetMilliseconds" << realTimeOffsetMilliseconds;
+        o << "qfracOn" << scoreTimeOnset;
+        o << "qfracOff" << scoreTimeOffset;
+        o << "qfracDuration" << scoreTimeDuration;
+        o << "qfracTiedDuration" << scoreTimeTiedDuration;
+        o << "tstampOn" << realTimeOnsetMilliseconds;
+        o << "tstamp" << realTimeOffsetMilliseconds;
     }
     return o.json();
 }
