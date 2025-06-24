@@ -2125,7 +2125,7 @@ std::string Toolkit::GetTimesForElement(const std::string &xmlId)
         o << "qfracDuration" << scoreTimeDuration;
         o << "qfracTiedDuration" << scoreTimeTiedDuration;
         o << "tstampOn" << realTimeOnsetMilliseconds;
-        o << "tstamp" << realTimeOffsetMilliseconds;
+        o << "tstampOff" << realTimeOffsetMilliseconds;
     }
     return o.json();
 }
