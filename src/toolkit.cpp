@@ -42,6 +42,7 @@
 #include "slur.h"
 #include "staff.h"
 #include "svgdevicecontext.h"
+#include "timemap.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -1920,7 +1921,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     }
 
     int repeat = measure->EnclosesTime(millisec);
-    int measureTimeOffset = measure->GetRealTimeOffsetMilliseconds(repeat);
+    int measureTimeOffset = measure->GetRealTimeOnsetMilliseconds(repeat);
 
     // Get the pageNo from the first note (if any)
     int pageNo = -1;
@@ -2051,14 +2052,14 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
         Measure *measure = vrv_cast<Measure *>(note->GetFirstAncestor(MEASURE));
         assert(measure);
         // For now ignore repeats and access always the first
-        timeofElement = measure->GetRealTimeOffsetMilliseconds(1);
+        timeofElement = measure->GetRealTimeOnsetMilliseconds(1);
         timeofElement += note->GetRealTimeOnsetMilliseconds();
     }
     else if (element->Is(MEASURE)) {
         Measure *measure = vrv_cast<Measure *>(element);
         assert(measure);
         // For now ignore repeats and access always the first
-        timeofElement = measure->GetRealTimeOffsetMilliseconds(1);
+        timeofElement = measure->GetRealTimeOnsetMilliseconds(1);
     }
     else if (element->Is(CHORD)) {
         Chord *chord = vrv_cast<Chord *>(element);
@@ -2068,7 +2069,7 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
         Measure *measure = vrv_cast<Measure *>(note->GetFirstAncestor(MEASURE));
         assert(measure);
         // For now ignore repeats and access always the first
-        timeofElement = measure->GetRealTimeOffsetMilliseconds(1);
+        timeofElement = measure->GetRealTimeOnsetMilliseconds(1);
         timeofElement += note->GetRealTimeOnsetMilliseconds();
     }
     return timeofElement;

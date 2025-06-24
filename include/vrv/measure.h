@@ -305,7 +305,7 @@ public:
 
     /**
      * Check if the measure encloses the given time (in millisecond)
-     * Return the playing repeat time (1-based), 0 otherwise
+     * Return the playing repeat time (1-based), VRV_UNSET otherwise
      */
     int EnclosesTime(int time) const;
 

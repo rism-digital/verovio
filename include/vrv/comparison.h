@@ -489,7 +489,7 @@ public:
         if (!MatchesType(object)) return false;
         const Measure *measure = vrv_cast<const Measure *>(object);
         assert(measure);
-        return (measure->EnclosesTime(m_time) > 0);
+        return (measure->EnclosesTime(m_time) != VRV_UNSET);
     }
 
 private:
