@@ -2,8 +2,11 @@
 
 ## [unreleased]
 * Change timemap with `includeRests` to include also `mRest` and `multiRest`
-* Change JS initial memory allocation and drop JS light memory version 
+* Change JS initial memory allocation and drop JS light memory version
+* Change key names for `GetTimesForElement` to be inline with the timemap keys
+* Fix order of the SVG `defs/g` to be always the same across runs
 * Fix title and control event bugs in ABC import (@rettinghaus)
+* Fix values return by `GetTimesForElement`
 
 ## [5.3.2] – 2025-05-28
 * Fix bug in toolkit select
