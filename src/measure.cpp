@@ -470,11 +470,11 @@ int Measure::EnclosesTime(int time) const
         = m_measureAligner.GetRightAlignment()->GetTime().ToDouble() * SCORE_TIME_UNIT * 60.0 / m_currentTempo * 1000.0
         + 0.5;
     std::vector<double>::const_iterator iter;
-    for (iter = m_realTimeOffsetMilliseconds.begin(); iter != m_realTimeOffsetMilliseconds.end(); ++iter) {
+    for (iter = m_realTimeOnsetMilliseconds.begin(); iter != m_realTimeOnsetMilliseconds.end(); ++iter) {
         if ((time >= *iter) && (time <= *iter + timeDuration)) return repeat;
         repeat++;
     }
-    return 0;
+    return VRV_UNSET;
 }
 
 Fraction Measure::GetScoreTimeOnset(int repeat) const
