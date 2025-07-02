@@ -86,7 +86,7 @@ bool CmmeInput::Import(const std::string &cmme)
         m_doc->SetType(Raw);
         m_doc->SetMensuralMusicOnly(BOOLEAN_true);
 
-        // Genereate the header and add a comment to the project description
+        // Generate the header and add a comment to the project description
         m_doc->GenerateMEIHeader();
         pugi::xml_node projectDesc = m_doc->m_header.first_child().select_node("//projectDesc").node();
         if (projectDesc) {

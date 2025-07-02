@@ -244,7 +244,7 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
                     loc = locAvg;
                 }
 
-                // note: bottomAlignedLoc and topAlignedLoc are only accounting for discrepencies
+                // note: bottomAlignedLoc and topAlignedLoc are only accounting for discrepancies
                 // between 8th, 16th and 32nd notes, not 64th's and on
                 // I've described how to implement 64ths and beyond below
 
