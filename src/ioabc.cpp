@@ -177,7 +177,7 @@ void ABCInput::ParseABC(std::istream &infile)
 /**********************************
  *
  * SetBarLine
- * Translation from ABC to Verovio representaion:
+ * Translation from ABC to Verovio representation:
  *
  BARRENDITION_single     |
  BARRENDITION_end        |]
