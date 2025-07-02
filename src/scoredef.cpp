@@ -265,13 +265,13 @@ bool ScoreDef::IsSupportedChild(ClassId classId)
 
 bool ScoreDef::AddChildAdditionalCheck(Object *child)
 {
-    // Clef and mensur are actually not allowed as child of scoreDef in MEI.
+    // Clef and mensur are actually not allowed as children of scoreDef in MEI.
     // Left as a warning for now.
     if (child->Is(CLEF) && !child->IsAttribute()) {
         LogWarning("Having <clef> as child of <scoreDef> is not valid MEI");
     }
     else if (child->Is(MENSUR) && !child->IsAttribute()) {
-        LogWarning("Having <clef> as child of <scoreDef> is not valid MEI");
+        LogWarning("Having <mensur> as child of <scoreDef> is not valid MEI");
     }
     return (ScoreDefElement::AddChildAdditionalCheck(child));
 }
