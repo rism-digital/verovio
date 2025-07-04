@@ -2354,6 +2354,17 @@ void MidiMessage::makeTemperamentMeantoneCommaHalf(int referencePitchClass, int 
 
 //////////////////////////////
 //
+// MidiMessage::makeTemperamentScala -- Custom tuning based on Scala file.
+//
+
+void MidiMessage::makeTemperamentScala(std::string tuneScala, int referencePitchClass, int channelMask) {
+	std::cerr << "Error: TODO" << std::endl;
+}
+
+
+
+//////////////////////////////
+//
 // operator<<(MidiMessage) -- Print MIDI messages as text.  0x80 and above
 //    are printed as hex, below as dec (will look strange for meta messages
 //    and system exclusives which could be dealt with later).
