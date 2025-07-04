@@ -28,7 +28,9 @@
 #include "measure.h"
 #include "nc.h"
 #include "neume.h"
+#include "oriscus.h"
 #include "page.h"
+#include "quilisma.h"
 #include "rend.h"
 #include "sb.h"
 #include "score.h"
@@ -992,6 +994,16 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 }
                 Liquescent *liquescent = new Liquescent();
                 nc->AddChild(liquescent);
+            }
+            else if (it->first == "shape") {
+                if (it->second == "quilisma") {
+                    Quilisma *quilisma = new Quilisma();
+                    nc->AddChild(quilisma);
+                }
+                else if (it->second == "oriscus") {
+                    Oriscus *oriscus = new Oriscus();
+                    nc->AddChild(oriscus);
+                }
             }
         }
 
