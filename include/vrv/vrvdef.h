@@ -114,6 +114,7 @@ enum ClassId : uint16_t {
     MEASURE_ALIGNER,
     MENSUR_ATTR,
     METERSIG_ATTR,
+    OSSIA,
     PAGE,
     PAGES,
     STAFF,

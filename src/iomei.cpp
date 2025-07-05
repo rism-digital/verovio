@@ -104,6 +104,7 @@
 #include "orig.h"
 #include "oriscus.h"
 #include "ornam.h"
+#include "ossia.h"
 #include "page.h"
 #include "pagemilestone.h"
 #include "pages.h"
@@ -501,6 +502,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         m_currentNode = m_currentNode.append_child(name.c_str());
         this->WriteMeasure(m_currentNode, vrv_cast<Measure *>(object));
     }
+    else if (object->Is(OSSIA)) {
+        m_currentNode = m_currentNode.append_child("ossia");
+        this->WriteOssia(m_currentNode, vrv_cast<Ossia *>(object));
+    }
     else if (object->Is(STAFF)) {
         m_currentNode = m_currentNode.append_child("staff");
         this->WriteStaff(m_currentNode, vrv_cast<Staff *>(object));
@@ -601,7 +606,6 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         m_currentNode = m_currentNode.append_child("phrase");
         this->WritePhrase(m_currentNode, vrv_cast<Phrase *>(object));
     }
-
     else if (object->Is(PITCHINFLECTION)) {
         m_currentNode = m_currentNode.append_child("pitchInfection");
         this->WritePitchInflection(m_currentNode, vrv_cast<PitchInflection *>(object));
@@ -1975,6 +1979,13 @@ void MEIOutput::WriteMeasure(pugi::xml_node currentNode, Measure *measure)
         measure->WriteCoordX1(currentNode);
         measure->WriteCoordX2(currentNode);
     }
+}
+
+void MEIOutput::WriteOssia(pugi::xml_node currentNode, Ossia *ossia)
+{
+    assert(ossia);
+
+    this->WriteXmlId(currentNode, ossia);
 }
 
 void MEIOutput::WriteMeterSigGrp(pugi::xml_node currentNode, MeterSigGrp *meterSigGrp)
@@ -5707,6 +5718,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (currentName == "ornam") {
             success = this->ReadOrnam(parent, current);
         }
+        else if (currentName == "ossia") {
+            success = this->ReadOssia(parent, current);
+        }
         else if (currentName == "pedal") {
             success = this->ReadPedal(parent, current);
         }
@@ -5753,6 +5767,26 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
             LogWarning("Unsupported '<%s>' within <measure>", current.name());
         }
     }
+    return success;
+}
+
+bool MEIInput::ReadOssia(Object *parent, pugi::xml_node ossia)
+{
+    Ossia *vrvOssia = new Ossia();
+    this->SetMeiID(ossia, vrvOssia);
+
+    parent->AddChild(vrvOssia);
+    this->ReadUnsupportedAttr(ossia, vrvOssia);
+
+    bool success = true;
+    pugi::xml_node current;
+    for (current = ossia.first_child(); current; current = current.next_sibling()) {
+        const std::string currentName = current.name();
+        if (currentName == "staff") {
+            success = this->ReadStaff(vrvOssia, current);
+        }
+    }
+
     return success;
 }
 
