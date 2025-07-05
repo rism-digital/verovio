@@ -164,7 +164,7 @@ void Measure::Reset()
 
 bool Measure::IsSupportedChild(ClassId classId)
 {
-    static const std::vector<ClassId> supported{ STAFF };
+    static const std::vector<ClassId> supported{ OSSIA, STAFF };
 
     if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
         return true;

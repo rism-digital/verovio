@@ -178,6 +178,7 @@
 #import <VerovioFramework/orig.h>
 #import <VerovioFramework/oriscus.h>
 #import <VerovioFramework/ornam.h>
+#import <VerovioFramework/ossia.h>
 #import <VerovioFramework/page.h>
 #import <VerovioFramework/pageelement.h>
 #import <VerovioFramework/pagemilestone.h>
