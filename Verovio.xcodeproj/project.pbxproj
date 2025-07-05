@@ -1423,6 +1423,12 @@
 		BD2E4D982875880600B04350 /* stem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD2E4D94287587FD00B04350 /* stem.cpp */; };
 		BD2E4D9A2875882100B04350 /* stem.h in Headers */ = {isa = PBXBuildFile; fileRef = BD2E4D992875881B00B04350 /* stem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BD2E4D9B2875882200B04350 /* stem.h in Headers */ = {isa = PBXBuildFile; fileRef = BD2E4D992875881B00B04350 /* stem.h */; };
+		BD36AF552E491B9600A8F59E /* ossia.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD36AF542E491B9600A8F59E /* ossia.cpp */; };
+		BD36AF562E491B9600A8F59E /* ossia.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD36AF542E491B9600A8F59E /* ossia.cpp */; };
+		BD36AF572E491B9600A8F59E /* ossia.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD36AF542E491B9600A8F59E /* ossia.cpp */; };
+		BD36AF582E491B9600A8F59E /* ossia.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD36AF542E491B9600A8F59E /* ossia.cpp */; };
+		BD36AF5A2E491BAC00A8F59E /* ossia.h in Headers */ = {isa = PBXBuildFile; fileRef = BD36AF592E491BAC00A8F59E /* ossia.h */; };
+		BD36AF5B2E491BAC00A8F59E /* ossia.h in Headers */ = {isa = PBXBuildFile; fileRef = BD36AF592E491BAC00A8F59E /* ossia.h */; };
 		BD6E5C3D290007C90039B0F1 /* graphic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3673E5E428E1DF0C0048BAFA /* graphic.cpp */; };
 		BD6E5C3E290007CA0039B0F1 /* graphic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3673E5E428E1DF0C0048BAFA /* graphic.cpp */; };
 		BD6E5C3F290007CB0039B0F1 /* graphic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3673E5E428E1DF0C0048BAFA /* graphic.cpp */; };
@@ -2268,6 +2274,8 @@
 		BD0562352518CD20004057EB /* beamspan.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = beamspan.cpp; path = src/beamspan.cpp; sourceTree = "<group>"; };
 		BD2E4D94287587FD00B04350 /* stem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = stem.cpp; path = src/stem.cpp; sourceTree = "<group>"; };
 		BD2E4D992875881B00B04350 /* stem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stem.h; path = include/vrv/stem.h; sourceTree = "<group>"; };
+		BD36AF542E491B9600A8F59E /* ossia.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ossia.cpp; path = src/ossia.cpp; sourceTree = "<group>"; };
+		BD36AF592E491BAC00A8F59E /* ossia.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ossia.h; path = include/vrv/ossia.h; sourceTree = "<group>"; };
 		BD87768127CE89FA005B97EA /* layerdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = layerdef.h; path = include/vrv/layerdef.h; sourceTree = "<group>"; };
 		BD87768227CE8A11005B97EA /* layerdef.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = layerdef.cpp; path = src/layerdef.cpp; sourceTree = "<group>"; };
 		BD96F7CB2C04A708001CFF6F /* quilisma.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = quilisma.cpp; path = src/quilisma.cpp; sourceTree = "<group>"; };
@@ -2982,6 +2990,8 @@
 				BD87768127CE89FA005B97EA /* layerdef.h */,
 				8F086EC9188539540037FD8E /* measure.cpp */,
 				8F59292018854BF800FE51AD /* measure.h */,
+				BD36AF542E491B9600A8F59E /* ossia.cpp */,
+				BD36AF592E491BAC00A8F59E /* ossia.h */,
 				8F086ECE188539540037FD8E /* page.cpp */,
 				8F59292518854BF800FE51AD /* page.h */,
 				4D6413772035F58200BB630E /* pages.cpp */,
@@ -3333,6 +3343,7 @@
 				E75A699D29CCF87B00414819 /* adjustbeamsfunctor.h in Headers */,
 				403BEFF1206C00D500D022D5 /* mrpt2.h in Headers */,
 				4DC12A571F716E1C000440E9 /* pghead.h in Headers */,
+				BD36AF5A2E491BAC00A8F59E /* ossia.h in Headers */,
 				4DA0EADF22BB77AF00A7EBEB /* facsimileinterface.h in Headers */,
 				8F59294018854BF800FE51AD /* iomei.h in Headers */,
 				4DACC9A02990F29A00B55913 /* atts_gestural.h in Headers */,
@@ -3861,6 +3872,7 @@
 				BB4C4BA222A932E5001F6AF0 /* scoredefinterface.h in Headers */,
 				BB4C4AA922A932A0001F6AF0 /* devicecontext.h in Headers */,
 				BD6E5C40290007CE0039B0F1 /* graphic.h in Headers */,
+				BD36AF5B2E491BAC00A8F59E /* ossia.h in Headers */,
 				4DACC9DF2990F29A00B55913 /* atts_performance.h in Headers */,
 				4DED4F1D294733280073E504 /* altsyminterface.h in Headers */,
 				BB4C4A9D22A9328F001F6AF0 /* options.h in Headers */,
@@ -4063,6 +4075,7 @@
 				4DACC9892990F29A00B55913 /* atts_mei.cpp in Sources */,
 				4D1693FE1E3A44F300569BF4 /* doc.cpp in Sources */,
 				4D1693FF1E3A44F300569BF4 /* durationinterface.cpp in Sources */,
+				BD36AF572E491B9600A8F59E /* ossia.cpp in Sources */,
 				4DEC4D7F21C804C500D1D273 /* add.cpp in Sources */,
 				E7876F1929C07F22002147DC /* adjustsylspacingfunctor.cpp in Sources */,
 				4DB3D8BB1F83D0D100B5FC2B /* expansion.cpp in Sources */,
@@ -4353,6 +4366,7 @@
 				4DACCA022990F29A00B55913 /* atts_usersymbols.cpp in Sources */,
 				8F086EE7188539540037FD8E /* clef.cpp in Sources */,
 				E7E1698629A898C700FFF482 /* adjustlayersfunctor.cpp in Sources */,
+				BD36AF562E491B9600A8F59E /* ossia.cpp in Sources */,
 				8F086EE8188539540037FD8E /* devicecontext.cpp in Sources */,
 				4D543E221B80AACF004B823C /* view_control.cpp in Sources */,
 				4DC12A781F7400B9000440E9 /* runningelement.cpp in Sources */,
@@ -4656,6 +4670,7 @@
 				E7870359299CF07500156DC4 /* adjustarpegfunctor.cpp in Sources */,
 				E76046C028D4829000C36204 /* calcledgerlinesfunctor.cpp in Sources */,
 				4DB3D8C21F83D0E600B5FC2B /* controlelement.cpp in Sources */,
+				BD36AF552E491B9600A8F59E /* ossia.cpp in Sources */,
 				4DB3D8DF1F83D15300B5FC2B /* btrem.cpp in Sources */,
 				E7876F1A29C07F22002147DC /* adjustsylspacingfunctor.cpp in Sources */,
 				4DC12A7A1F7400B9000440E9 /* runningelement.cpp in Sources */,
@@ -4953,6 +4968,7 @@
 				E787035A299CF07700156DC4 /* adjustarpegfunctor.cpp in Sources */,
 				E76046C128D4829000C36204 /* calcledgerlinesfunctor.cpp in Sources */,
 				BB4C4BBA22A932FC001F6AF0 /* MidiEvent.cpp in Sources */,
+				BD36AF582E491B9600A8F59E /* ossia.cpp in Sources */,
 				BB4C4B8B22A932DF001F6AF0 /* rend.cpp in Sources */,
 				E7876F1B29C07F23002147DC /* adjustsylspacingfunctor.cpp in Sources */,
 				BB4C4B9522A932E5001F6AF0 /* drawinginterface.cpp in Sources */,
