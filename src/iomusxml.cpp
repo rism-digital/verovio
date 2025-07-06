@@ -1759,7 +1759,6 @@ void MusicXmlInput::MatchTies(bool matchLayers)
     // match open ties with close ties
     std::vector<musicxml::OpenTie>::iterator iter = m_tieStack.begin();
     while (iter != m_tieStack.end()) {
-        Fraction lastScoreTimeOnset(9999); // __DBL_MAX__;
         bool tieMatched = false;
         std::vector<musicxml::CloseTie>::iterator jter;
         for (jter = m_tieStopStack.begin(); jter != m_tieStopStack.end(); ++jter) {
@@ -1767,10 +1766,8 @@ void MusicXmlInput::MatchTies(bool matchLayers)
             // and with earliest end note.
             if ((iter->m_note->IsEnharmonicWith(jter->m_note))
                 && (iter->m_note->GetScoreTimeOnset() < jter->m_note->GetScoreTimeOnset())
-                && (jter->m_note->GetScoreTimeOnset() < lastScoreTimeOnset)
                 && (!matchLayers || (iter->m_layerNum == jter->m_layerNum))) {
                 iter->m_tie->SetEndid("#" + jter->m_note->GetID());
-                lastScoreTimeOnset = jter->m_note->GetScoreTimeOnset();
                 tieMatched = true;
                 break;
             }
