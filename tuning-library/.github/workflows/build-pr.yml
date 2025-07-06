@@ -1,0 +1,38 @@
+name: PR
+on:
+  pull_request:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build_plugin:
+    name: Test - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+          - os: macos-latest
+          - os: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Locales on Linux
+        if: runner.os == 'Linux'
+        run: |
+          sudo locale-gen es_ES
+          sudo locale-gen fr_FR
+          sudo locale-gen ja_JP
+          sudo locale-gen zh_CN
+          sudo update-locale
+
+      - name: Build pull request version
+        run: |
+          cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Release
+          cmake --build ./build --config Debug --target run-all-tests
+

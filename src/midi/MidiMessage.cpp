@@ -12,6 +12,7 @@
 //
 
 #include "MidiMessage.h"
+#include "Tunings.h"
 
 #include <cmath>
 #include <cstdlib>

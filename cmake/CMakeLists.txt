@@ -46,6 +46,7 @@ include_directories(
     ../include/vrv
     ../libmei/dist
     ../libmei/addons
+    ../tuning-library/include
 )
 
 if(WIN32)
