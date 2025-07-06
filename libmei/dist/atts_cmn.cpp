@@ -28,7 +28,7 @@ namespace vrv {
 
 AttArpegLog::AttArpegLog() : Att()
 {
-    ResetArpegLog();
+    this->ResetArpegLog();
 }
 
 void AttArpegLog::ResetArpegLog()
@@ -68,7 +68,7 @@ bool AttArpegLog::HasOrder() const
 
 AttBeamPresent::AttBeamPresent() : Att()
 {
-    ResetBeamPresent();
+    this->ResetBeamPresent();
 }
 
 void AttBeamPresent::ResetBeamPresent()
@@ -108,7 +108,7 @@ bool AttBeamPresent::HasBeam() const
 
 AttBeamRend::AttBeamRend() : Att()
 {
-    ResetBeamRend();
+    this->ResetBeamRend();
 }
 
 void AttBeamRend::ResetBeamRend()
@@ -193,7 +193,7 @@ bool AttBeamRend::HasSlope() const
 
 AttBeamSecondary::AttBeamSecondary() : Att()
 {
-    ResetBeamSecondary();
+    this->ResetBeamSecondary();
 }
 
 void AttBeamSecondary::ResetBeamSecondary()
@@ -233,7 +233,7 @@ bool AttBeamSecondary::HasBreaksec() const
 
 AttBeamedWith::AttBeamedWith() : Att()
 {
-    ResetBeamedWith();
+    this->ResetBeamedWith();
 }
 
 void AttBeamedWith::ResetBeamedWith()
@@ -273,7 +273,7 @@ bool AttBeamedWith::HasBeamWith() const
 
 AttBeamingLog::AttBeamingLog() : Att()
 {
-    ResetBeamingLog();
+    this->ResetBeamingLog();
 }
 
 void AttBeamingLog::ResetBeamingLog()
@@ -328,7 +328,7 @@ bool AttBeamingLog::HasBeamRests() const
 
 AttBeatRptLog::AttBeatRptLog() : Att()
 {
-    ResetBeatRptLog();
+    this->ResetBeatRptLog();
 }
 
 void AttBeatRptLog::ResetBeatRptLog()
@@ -368,7 +368,7 @@ bool AttBeatRptLog::HasBeatdef() const
 
 AttBracketSpanLog::AttBracketSpanLog() : Att()
 {
-    ResetBracketSpanLog();
+    this->ResetBracketSpanLog();
 }
 
 void AttBracketSpanLog::ResetBracketSpanLog()
@@ -408,7 +408,7 @@ bool AttBracketSpanLog::HasFunc() const
 
 AttCutout::AttCutout() : Att()
 {
-    ResetCutout();
+    this->ResetCutout();
 }
 
 void AttCutout::ResetCutout()
@@ -448,7 +448,7 @@ bool AttCutout::HasCutout() const
 
 AttExpandable::AttExpandable() : Att()
 {
-    ResetExpandable();
+    this->ResetExpandable();
 }
 
 void AttExpandable::ResetExpandable()
@@ -488,7 +488,7 @@ bool AttExpandable::HasExpand() const
 
 AttGlissPresent::AttGlissPresent() : Att()
 {
-    ResetGlissPresent();
+    this->ResetGlissPresent();
 }
 
 void AttGlissPresent::ResetGlissPresent()
@@ -528,7 +528,7 @@ bool AttGlissPresent::HasGliss() const
 
 AttGraceGrpLog::AttGraceGrpLog() : Att()
 {
-    ResetGraceGrpLog();
+    this->ResetGraceGrpLog();
 }
 
 void AttGraceGrpLog::ResetGraceGrpLog()
@@ -568,7 +568,7 @@ bool AttGraceGrpLog::HasAttach() const
 
 AttGraced::AttGraced() : Att()
 {
-    ResetGraced();
+    this->ResetGraced();
 }
 
 void AttGraced::ResetGraced()
@@ -623,7 +623,7 @@ bool AttGraced::HasGraceTime() const
 
 AttHairpinLog::AttHairpinLog() : Att()
 {
-    ResetHairpinLog();
+    this->ResetHairpinLog();
 }
 
 void AttHairpinLog::ResetHairpinLog()
@@ -678,7 +678,7 @@ bool AttHairpinLog::HasNiente() const
 
 AttHarpPedalLog::AttHarpPedalLog() : Att()
 {
-    ResetHarpPedalLog();
+    this->ResetHarpPedalLog();
 }
 
 void AttHarpPedalLog::ResetHarpPedalLog()
@@ -808,7 +808,7 @@ bool AttHarpPedalLog::HasB() const
 
 AttLvPresent::AttLvPresent() : Att()
 {
-    ResetLvPresent();
+    this->ResetLvPresent();
 }
 
 void AttLvPresent::ResetLvPresent()
@@ -848,7 +848,7 @@ bool AttLvPresent::HasLv() const
 
 AttMeasureLog::AttMeasureLog() : Att()
 {
-    ResetMeasureLog();
+    this->ResetMeasureLog();
 }
 
 void AttMeasureLog::ResetMeasureLog()
@@ -903,7 +903,7 @@ bool AttMeasureLog::HasRight() const
 
 AttMeterSigGrpLog::AttMeterSigGrpLog() : Att()
 {
-    ResetMeterSigGrpLog();
+    this->ResetMeterSigGrpLog();
 }
 
 void AttMeterSigGrpLog::ResetMeterSigGrpLog()
@@ -943,7 +943,7 @@ bool AttMeterSigGrpLog::HasFunc() const
 
 AttNumberPlacement::AttNumberPlacement() : Att()
 {
-    ResetNumberPlacement();
+    this->ResetNumberPlacement();
 }
 
 void AttNumberPlacement::ResetNumberPlacement()
@@ -998,7 +998,7 @@ bool AttNumberPlacement::HasNumVisible() const
 
 AttNumbered::AttNumbered() : Att()
 {
-    ResetNumbered();
+    this->ResetNumbered();
 }
 
 void AttNumbered::ResetNumbered()
@@ -1038,7 +1038,7 @@ bool AttNumbered::HasNum() const
 
 AttOctaveLog::AttOctaveLog() : Att()
 {
-    ResetOctaveLog();
+    this->ResetOctaveLog();
 }
 
 void AttOctaveLog::ResetOctaveLog()
@@ -1078,7 +1078,7 @@ bool AttOctaveLog::HasColl() const
 
 AttPedalLog::AttPedalLog() : Att()
 {
-    ResetPedalLog();
+    this->ResetPedalLog();
 }
 
 void AttPedalLog::ResetPedalLog()
@@ -1133,7 +1133,7 @@ bool AttPedalLog::HasFunc() const
 
 AttPianoPedals::AttPianoPedals() : Att()
 {
-    ResetPianoPedals();
+    this->ResetPianoPedals();
 }
 
 void AttPianoPedals::ResetPianoPedals()
@@ -1173,7 +1173,7 @@ bool AttPianoPedals::HasPedalStyle() const
 
 AttRehearsal::AttRehearsal() : Att()
 {
-    ResetRehearsal();
+    this->ResetRehearsal();
 }
 
 void AttRehearsal::ResetRehearsal()
@@ -1213,7 +1213,7 @@ bool AttRehearsal::HasRehEnclose() const
 
 AttSlurRend::AttSlurRend() : Att()
 {
-    ResetSlurRend();
+    this->ResetSlurRend();
 }
 
 void AttSlurRend::ResetSlurRend()
@@ -1268,7 +1268,7 @@ bool AttSlurRend::HasSlurLwidth() const
 
 AttStemsCmn::AttStemsCmn() : Att()
 {
-    ResetStemsCmn();
+    this->ResetStemsCmn();
 }
 
 void AttStemsCmn::ResetStemsCmn()
@@ -1308,7 +1308,7 @@ bool AttStemsCmn::HasStemWith() const
 
 AttTieRend::AttTieRend() : Att()
 {
-    ResetTieRend();
+    this->ResetTieRend();
 }
 
 void AttTieRend::ResetTieRend()
@@ -1363,7 +1363,7 @@ bool AttTieRend::HasTieLwidth() const
 
 AttTremForm::AttTremForm() : Att()
 {
-    ResetTremForm();
+    this->ResetTremForm();
 }
 
 void AttTremForm::ResetTremForm()
@@ -1403,7 +1403,7 @@ bool AttTremForm::HasForm() const
 
 AttTremMeasured::AttTremMeasured() : Att()
 {
-    ResetTremMeasured();
+    this->ResetTremMeasured();
 }
 
 void AttTremMeasured::ResetTremMeasured()

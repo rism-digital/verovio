@@ -1,6 +1,18 @@
 # Changelog
 
 ## [unreleased]
+* Change timemap with `includeRests` to include also `mRest` and `multiRest`
+* Change JS initial memory allocation and drop JS light memory version
+* Change key names for `GetTimesForElement` to be inline with the timemap keys
+* Fix order of the SVG `defs/g` to be always the same across runs
+* Fix title and control event bugs in ABC import (@rettinghaus)
+* Fix values returned by `GetTimesForElement`
+
+## [5.3.2] – 2025-05-28
+* Fix bug in toolkit select
+
+## [5.3.1] – 2025-05-26
+* Fix bug in CMME importer
 
 ## [5.3.0] – 2025-05-19
 * Support for editorial markup (`app` or `choice`) surrounding the top-level `scoreDef`

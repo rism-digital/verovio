@@ -101,22 +101,22 @@ int View::ToLogicalY(int i)
 
 Point View::ToDeviceContext(Point p)
 {
-    return Point(ToDeviceContextX(p.x), ToDeviceContextY(p.y));
+    return Point(this->ToDeviceContextX(p.x), this->ToDeviceContextY(p.y));
 }
 
 Point View::ToLogical(Point p)
 {
-    return Point(ToLogicalX(p.x), ToLogicalY(p.y));
+    return Point(this->ToLogicalX(p.x), this->ToLogicalY(p.y));
 }
 
 std::u32string View::IntToTupletFigures(unsigned short number)
 {
-    return IntToSmuflFigures(number, 0xE880);
+    return this->IntToSmuflFigures(number, 0xE880);
 }
 
 std::u32string View::IntToTimeSigFigures(unsigned short number)
 {
-    return IntToSmuflFigures(number, 0xE080);
+    return this->IntToSmuflFigures(number, 0xE080);
 }
 
 std::u32string View::IntToSmuflFigures(unsigned short number, int offset)

@@ -518,7 +518,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     }
     else if (object->Is(BEAMSPAN)) {
         m_currentNode = m_currentNode.append_child("beamSpan");
-        WriteBeamSpan(m_currentNode, dynamic_cast<BeamSpan *>(object));
+        this->WriteBeamSpan(m_currentNode, dynamic_cast<BeamSpan *>(object));
     }
     else if (object->Is(BRACKETSPAN)) {
         m_currentNode = m_currentNode.append_child("bracketSpan");
@@ -1970,7 +1970,6 @@ void MEIOutput::WriteMeterSigGrp(pugi::xml_node currentNode, MeterSigGrp *meterS
 {
     assert(meterSigGrp);
 
-    this->WriteXmlId(currentNode, meterSigGrp);
     this->WriteLayerElement(currentNode, meterSigGrp);
     meterSigGrp->WriteBasic(currentNode);
     meterSigGrp->WriteMeterSigGrpLog(currentNode);
@@ -2029,9 +2028,9 @@ void MEIOutput::WriteBeamSpan(pugi::xml_node currentNode, BeamSpan *beamSpan)
 {
     assert(beamSpan);
 
-    WriteControlElement(currentNode, beamSpan);
-    WritePlistInterface(currentNode, beamSpan);
-    WriteTimeSpanningInterface(currentNode, beamSpan);
+    this->WriteControlElement(currentNode, beamSpan);
+    this->WritePlistInterface(currentNode, beamSpan);
+    this->WriteTimeSpanningInterface(currentNode, beamSpan);
     beamSpan->WriteBeamedWith(currentNode);
     beamSpan->WriteBeamRend(currentNode);
 }
@@ -2391,8 +2390,8 @@ void MEIOutput::WriteAccid(pugi::xml_node currentNode, Accid *accid)
         return;
     }
 
-    WriteLayerElement(currentNode, accid);
-    WritePositionInterface(currentNode, accid);
+    this->WriteLayerElement(currentNode, accid);
+    this->WritePositionInterface(currentNode, accid);
     accid->WriteAccidental(currentNode);
     accid->WriteAccidentalGes(currentNode);
     accid->WriteAccidLog(currentNode);
@@ -2656,8 +2655,8 @@ void MEIOutput::WriteLiquescent(pugi::xml_node currentNode, Liquescent *liquesce
 {
     assert(liquescent);
 
-    WriteLayerElement(currentNode, liquescent);
-    WritePositionInterface(currentNode, liquescent);
+    this->WriteLayerElement(currentNode, liquescent);
+    this->WritePositionInterface(currentNode, liquescent);
     liquescent->WriteColor(currentNode);
 }
 
@@ -5703,7 +5702,6 @@ bool MEIInput::ReadMeterSigGrp(Object *parent, pugi::xml_node meterSigGrp)
     assert(dynamic_cast<ScoreDef *>(parent) || dynamic_cast<StaffDef *>(parent) || dynamic_cast<Layer *>(parent));
 
     MeterSigGrp *vrvMeterSigGrp = new MeterSigGrp();
-    this->SetMeiID(meterSigGrp, vrvMeterSigGrp);
     this->ReadLayerElement(meterSigGrp, vrvMeterSigGrp);
     vrvMeterSigGrp->ReadBasic(meterSigGrp);
     vrvMeterSigGrp->ReadMeterSigGrpLog(meterSigGrp);
@@ -6535,7 +6533,7 @@ bool MEIInput::ReadAccid(Object *parent, pugi::xml_node accid)
     Accid *vrvAccid = new Accid();
     this->ReadLayerElement(accid, vrvAccid);
 
-    ReadPositionInterface(accid, vrvAccid);
+    this->ReadPositionInterface(accid, vrvAccid);
     vrvAccid->ReadAccidental(accid);
     vrvAccid->ReadAccidentalGes(accid);
     vrvAccid->ReadAccidLog(accid);
@@ -6867,7 +6865,7 @@ bool MEIInput::ReadKeySig(Object *parent, pugi::xml_node keySig)
 bool MEIInput::ReadLigature(Object *parent, pugi::xml_node ligature)
 {
     Ligature *vrvLigature = new Ligature();
-    this->SetMeiID(ligature, vrvLigature);
+    this->ReadLayerElement(ligature, vrvLigature);
 
     vrvLigature->ReadLigatureVis(ligature);
 

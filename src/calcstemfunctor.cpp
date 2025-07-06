@@ -659,6 +659,7 @@ void CalcStemFunctor::AdjustFlagPlacement(
         assert(chord);
         note = chord->GetTopNote();
     }
+    assert(note);
     int ledgerAbove = 0;
     int ledgerBelow = 0;
 

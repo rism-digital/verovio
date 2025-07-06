@@ -128,7 +128,8 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
         params.m_y -= (m_doc->GetTextGlyphHeight(L'0', &fretTxt, drawingCueSize) / 2);
 
-        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_center);
+        dc->StartText(
+            this->ToDeviceContextX(params.m_x), this->ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_center);
         this->DrawTextString(dc, fret, params);
         dc->EndText();
 
@@ -175,7 +176,8 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
             int y1 = y + extend.m_ascent + lineThickness;
 
             for (int i = 0; i < overline; ++i) {
-                dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+                dc->DrawLine(this->ToDeviceContextX(x1), this->ToDeviceContextY(y1), this->ToDeviceContextX(x2),
+                    this->ToDeviceContextY(y1));
                 y1 += 2 * lineThickness;
             }
 
@@ -183,7 +185,8 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
             y1 = y + extend.m_ascent / 2 - (strike - 1) * lineThickness;
 
             for (int i = 0; i < strike; ++i) {
-                dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+                dc->DrawLine(this->ToDeviceContextX(x1), this->ToDeviceContextY(y1), this->ToDeviceContextX(x2),
+                    this->ToDeviceContextY(y1));
                 y1 += 2 * lineThickness;
             }
 
@@ -191,7 +194,8 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
             y1 = y - extend.m_descent - lineThickness;
 
             for (int i = 0; i < underline; ++i) {
-                dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+                dc->DrawLine(this->ToDeviceContextX(x1), this->ToDeviceContextY(y1), this->ToDeviceContextX(x2),
+                    this->ToDeviceContextY(y1));
                 y1 -= 2 * lineThickness;
             }
 

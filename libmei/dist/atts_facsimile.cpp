@@ -28,7 +28,7 @@ namespace vrv {
 
 AttFacsimile::AttFacsimile() : Att()
 {
-    ResetFacsimile();
+    this->ResetFacsimile();
 }
 
 void AttFacsimile::ResetFacsimile()

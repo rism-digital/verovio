@@ -33,15 +33,9 @@ The code for the attribute classes of Verovio are generated from the MEI schema 
 Versioning
 ----------
 
-As of 2025, major release cycles are increased once per year, with version 5.x.x for 2025. Verovio will independently switch to development versions of MEI, whenever appropriate. This will always correspond to a minor release and will be properly documented.
+As of 2025, major release cycles are increased once per year, with version 5.x.x for 2025. Verovio independently switches from a release version to a development version of MEI, whenever appropriate. This always corresponds to a minor Verovio release and is indicated in the release notes.
 
-Previous releases of Verovio were aligned with MEI versions as follows:
-*   Verovio 1.x.x ⇔ MEI 3.0
-*   Verovio 2.x.x ⇔ MEI 4.0
-*   Verovio 3.x.x ⇔ Development of MEI since 4.0
-*   Verovio 4.x.x ⇔ MEI 5.0
-
-Other libraries
+Embedded libraries
 ---------------
 
 The following libraries are embedded in Verovio:

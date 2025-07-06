@@ -28,7 +28,7 @@ namespace vrv {
 
 AttNotationType::AttNotationType() : Att()
 {
-    ResetNotationType();
+    this->ResetNotationType();
 }
 
 void AttNotationType::ResetNotationType()

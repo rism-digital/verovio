@@ -525,7 +525,7 @@ FunctorCode PreparePlistFunctor::VisitObject(Object *object)
             interface->SetRef(object);
             // Add back link to the object referred in the plist - for now only for Annot
             if (iter->first->Is(ANNOTSCORE)) {
-                object->AddPlistReference(const_cast<Object *>(iter->first));
+                object->AddPlistReference(iter->first);
             }
             m_plistObjectIDPairs.erase(iter);
         }

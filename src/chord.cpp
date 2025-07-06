@@ -95,7 +95,7 @@ Chord::Chord()
 
 Chord::~Chord()
 {
-    ClearNoteGroups();
+    this->ClearNoteGroups();
 }
 
 void Chord::Reset()
@@ -113,7 +113,7 @@ void Chord::Reset()
     this->ResetTiePresent();
     this->ResetVisibility();
 
-    ClearNoteGroups();
+    this->ClearNoteGroups();
 }
 
 void Chord::ClearNoteGroups() const
@@ -202,7 +202,7 @@ void Chord::AddChild(Object *child)
     else {
         children.push_back(child);
     }
-    Modify();
+    this->Modify();
 }
 
 void Chord::FilterList(ListOfConstObjects &childList) const

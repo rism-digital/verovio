@@ -101,7 +101,7 @@ void Tuplet::AddChild(Object *child)
         children.push_back(child);
     }
 
-    Modify();
+    this->Modify();
 }
 
 void Tuplet::FilterList(ListOfConstObjects &childList) const

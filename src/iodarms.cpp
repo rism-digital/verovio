@@ -231,7 +231,7 @@ int DarmsInput::do_globalSpec(int pos, const char *data)
             // next we expect a flat or sharp, - or #
             pos++;
             if (data[pos] == '-' || data[pos] == '#') {
-                UnrollKeysig(quantity, data[pos]);
+                this->UnrollKeysig(quantity, data[pos]);
             }
             else {
                 LogWarning("DARMS import: Invalid char for 'K': %c", data[pos]);

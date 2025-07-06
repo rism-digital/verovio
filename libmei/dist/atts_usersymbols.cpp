@@ -28,7 +28,7 @@ namespace vrv {
 
 AttAltSym::AttAltSym() : Att()
 {
-    ResetAltSym();
+    this->ResetAltSym();
 }
 
 void AttAltSym::ResetAltSym()
@@ -68,7 +68,7 @@ bool AttAltSym::HasAltsym() const
 
 AttAnchoredTextLog::AttAnchoredTextLog() : Att()
 {
-    ResetAnchoredTextLog();
+    this->ResetAnchoredTextLog();
 }
 
 void AttAnchoredTextLog::ResetAnchoredTextLog()
@@ -108,7 +108,7 @@ bool AttAnchoredTextLog::HasFunc() const
 
 AttCurveLog::AttCurveLog() : Att()
 {
-    ResetCurveLog();
+    this->ResetCurveLog();
 }
 
 void AttCurveLog::ResetCurveLog()
@@ -148,7 +148,7 @@ bool AttCurveLog::HasFunc() const
 
 AttLineLog::AttLineLog() : Att()
 {
-    ResetLineLog();
+    this->ResetLineLog();
 }
 
 void AttLineLog::ResetLineLog()

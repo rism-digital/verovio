@@ -83,7 +83,7 @@ void TabDurSym::AddChild(Object *child)
     else {
         children.push_back(child);
     }
-    Modify();
+    this->Modify();
 }
 
 void TabDurSym::AdjustDrawingYRel(const Staff *staff, const Doc *doc)
