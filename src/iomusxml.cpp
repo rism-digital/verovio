@@ -1719,6 +1719,13 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         }
     }
 
+    // set metcon to false for pickup measures
+    int endDuration = m_ppq;
+    for (const int &num : m_meterCount) endDuration *= num;
+    if (m_durTotal != endDuration) {
+        measure->SetMetcon(BOOLEAN_false);
+    }
+
     this->MatchTies(true);
     if (!m_tieStack.empty()) this->MatchTies(false);
     for (auto openTie : m_tieStack) {
