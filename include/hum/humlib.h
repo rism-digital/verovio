@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jul  9 13:48:18 CEST 2025
+// Last Modified: Thu Jul 10 05:31:52 CEST 2025
 // Filename:      min/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.h
 // Syntax:        C++11

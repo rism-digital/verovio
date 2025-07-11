@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jul  9 13:48:18 CEST 2025
+// Last Modified: Thu Jul 10 05:31:52 CEST 2025
 // Filename:      min/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.cpp
 // Syntax:        C++11
@@ -7885,34 +7885,6 @@ void GotScore::processUnderscoreTies(vector<string*>& pitches) {
 
 	// add terminal long marker
 	*pitches.back() += 'l';
-}
-
-
-///////////////////////////////////////////////////////////////////////////
-
-int main(int argc, char* argv[]) {
-	stringstream buffer;
-
-	if (argc > 1) {
-		ifstream file(argv[1]);
-		if (!file) {
-			cerr << "Error: Cannot open file '" << argv[1] << "'\n";
-			return 1;
-		}
-		buffer << file.rdbuf();
-	} else {
-		buffer << cin.rdbuf();
-	}
-
-	GotScore score(buffer);
-	// score.printInputFile(cout);
-	// score.printCells(cout);
-	score.prepareMeasures(cout);
-	cout << score.getKernHumdrum();
-	// cout << "\n\n\n";
-	// cout << score.getGotHumdrum();
-
-	return 0;
 }
 
 
