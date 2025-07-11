@@ -132,6 +132,10 @@ elseif(USE_PAE_OLD_PARSER)
     add_definitions(-DUSE_PAE_OLD_PARSER)
 endif()
 
+if(NO_ABC_SUPPORT)
+    add_definitions(-DNO_ABC_SUPPORT)
+endif()
+
 if(NO_MUSICXML_SUPPORT)
     add_definitions(-DNO_MUSICXML_SUPPORT)
 endif()
