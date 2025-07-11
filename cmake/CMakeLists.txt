@@ -190,7 +190,7 @@ set(all_SRC
 # Shared library #
 ##################
 
-if (BUILD_AS_LIBRARY OR  BUILD_AS_ANDROID_LIBRARY)
+if (BUILD_AS_LIBRARY OR BUILD_AS_ANDROID_LIBRARY)
     message(STATUS "***** Building Verovio as shared library *****")
     if(WIN32)
 		add_definitions(-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS)
