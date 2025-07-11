@@ -1678,7 +1678,6 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             Layer *layer = SelectLayer(1, measure);
             this->AddLayerElement(layer, multiRest);
             m_multiRests[index] = index + multiRestLength - 1;
-            break;
         }
         else if (isMRestInOtherSystem) {
             if ((multiRestStaffNumber > 1) && !IsElement(child, "backup")) continue;
