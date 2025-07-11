@@ -25,7 +25,7 @@ option(BUILD_AS_ANDROID_LIBRARY "Build Verovio as library for Android"         O
 option(USE_PAE_OLD_PARSER       "Use old PAE parser"                           OFF)
 
 if (NO_HUMDRUM_SUPPORT AND MUSICXML_DEFAULT_HUMDRUM)
-    message(SEND_ERROR "Default MusicXML to Humdrum cannot be enabled by default without Humdrum support")
+    message(FATAL_ERROR "Default MusicXML to Humdrum cannot be enabled by default without Humdrum support")
 endif()
 
 # Sets the compile-time value for the RESOURCE_DIR macro in the source code.
@@ -44,6 +44,10 @@ include_directories(
     ../libmei/addons
 )
 
+if(WIN32)
+    include_directories(../include/win32)
+endif()
+
 if(MSVC)
     add_compile_options(/bigobj)
     add_definitions(/W2)
@@ -51,16 +55,11 @@ if(MSVC)
     add_definitions(-DNO_PAE_SUPPORT) # regex is working differently under Windows so PAE is not supported (yet)
     add_definitions(-DUSE_PAE_OLD_PARSER)
     add_definitions(/std:c++20)
-    include_directories(../include/win32)
 else()
     if(CMAKE_BUILD_TYPE MATCHES Debug)
         message(STATUS "Enabling debug information")
         add_definitions(-g)
         add_definitions(-DDEBUG)
-    endif()
-
-    if(WIN32)
-        include_directories(../include/win32)
     endif()
 
     # jsonxx raises -Wdollar-in-identifier-extension
@@ -103,7 +102,7 @@ else()
     add_definitions(-Wparentheses)
     # non-gcc: add_definitions(-Wrange-loop-analysis)
     # non-gcc: add_definitions(-Wshorten-64-to-32)
-    # non-gcc (ObjC only: add_definitions(-Wstrict-prototypes)
+    # non-gcc: (ObjC only: add_definitions(-Wstrict-prototypes)
     add_definitions(-Wswitch)
     add_definitions(-Wuninitialized)
     add_definitions(-Wunreachable-code)
