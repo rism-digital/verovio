@@ -1723,7 +1723,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     // set metcon to false for pickup measures
     int endDuration = m_ppq;
     for (const int &num : m_meterCount) endDuration *= num;
-    if (m_durTotal != endDuration) {
+    if (m_durTotal && m_durTotal != endDuration) {
         measure->SetMetcon(BOOLEAN_false);
     }
 
