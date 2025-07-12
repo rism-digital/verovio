@@ -642,6 +642,8 @@ void Doc::PrepareData()
     /************ Reset and initialization ************/
 
     if (m_dataPreparationDone) {
+        // Reset the scoreDef for the entire doc
+        this->ResetToLoading();
         ResetDataFunctor resetData;
         root->Process(resetData);
     }
