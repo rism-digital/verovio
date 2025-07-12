@@ -7,6 +7,7 @@
 * Fix order of the SVG `defs/g` to be always the same across runs
 * Fix title and control event bugs in ABC import (@rettinghaus)
 * Fix bug with multi-measure rests in MusicXML import (@rettinghaus)
+* Fix spacing / duration of measure rests in measures non metrically conformed
 * Fix values returned by `GetTimesForElement`
 
 ## [5.3.2] – 2025-05-28
