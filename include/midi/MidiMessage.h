@@ -203,7 +203,7 @@ class MidiMessage : public std::vector<uchar> {
 		void           makeTemperamentMeantoneCommaQuarter(int referencePitchClass = 2, int channelMask = 0b1111111111111111);
 		void           makeTemperamentMeantoneCommaThird(int referencePitchClass = 2, int channelMask = 0b1111111111111111);
 		void           makeTemperamentMeantoneCommaHalf(int referencePitchClass = 2, int channelMask = 0b1111111111111111);
-		void           makeTemperamentScala(std::string tuneScala, int referencePitchClass = 2, int channelMask = 0b1111111111111111);
+		void           makeTemperamentScala(std::pair<std::string, std::string> tuneScala, int referencePitchClass = 2, int channelMask = 0b1111111111111111);
 
 };
 

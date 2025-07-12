@@ -86,11 +86,12 @@ inline Tone toneFromString(const std::string &t, int lineno = -1);
  */
 struct Scale
 {
-    std::string name;        // The name in the SCL file. Informational only
-    std::string description; // The description in the SCL file. Informational only
-    std::string rawText;     // The raw text of the SCL file used to create this Scale
-    int count;               // The number of tones.
-    std::vector<Tone> tones; // The tones
+    std::string name;                   // The name in the SCL file. Informational only
+    std::string description;            // The description in the SCL file. Informational only
+    std::string rawText;                // The raw text of the SCL file used to create this Scale
+    int count;                          // The number of tones
+    std::vector<Tone> tones;            // The tones
+    std::vector<std::string> comments;  // The comments
 
     Scale() : name("empty scale"), description(""), rawText(""), count(0) {}
 };
@@ -104,7 +105,6 @@ struct Scale
  *
  * Just as with Scale, the rawText member contains the text of the KBM file used.
  */
-
 struct KeyboardMapping
 {
     int count;
@@ -119,6 +119,37 @@ struct KeyboardMapping
     std::string name;
 
     KeyboardMapping();
+};
+
+/**
+ * The NotationMapping class represents Ableton's NOTE_NAMES extension in
+ * the ASCL file.
+ */
+struct NotationMapping
+{
+    int count;
+    std::vector<std::string> names;
+
+    std::string rawText;
+
+    NotationMapping() : count(0), rawText("") {}
+};
+
+/**
+ * The AbletonScale class represents Ableton's ASCL extension to the SCL file.
+ *
+ * @see https://help.ableton.com/hc/en-us/articles/10998372840220-ASCL-Specification
+ */
+struct AbletonScale {
+    Scale scale;
+    KeyboardMapping keyboardMapping;
+    NotationMapping notationMapping;
+    std::string source;
+    std::string link;
+
+    std::vector<std::string> rawTexts;
+
+    AbletonScale() {}
 };
 
 /**
@@ -205,6 +236,21 @@ KeyboardMapping tuneNoteTo(int midiNote, double freq);
 KeyboardMapping startScaleOnAndTuneNoteTo(int scaleStart, int midiNote, double freq);
 
 /**
+ * readASCLStream returns an AbletonScale from the ASCL input stream
+ */
+AbletonScale readASCLStream(std::istream &inf);
+
+/**
+ * readASCLFile returns an AbletonScale from the ASCL file in fname
+ */
+AbletonScale readASCLFile(std::string fname);
+
+/**
+ * parseASCLData returns an AbletonScale from the ASCL file contents in memory
+ */
+AbletonScale parseASCLData(const std::string &asclContents);
+
+/**
  * The Tuning class is the primary place where you will interact with this library.
  * It is constructed for a scale and mapping and then gives you the ability to
  * determine frequencies across and beyond the midi keyboard. Since modulation
@@ -230,6 +276,7 @@ class Tuning
      */
     Tuning(const Scale &s);
     Tuning(const KeyboardMapping &k);
+    Tuning(const AbletonScale &as);
     Tuning(const Scale &s, const KeyboardMapping &k, bool allowTuningCenterOnUnmapped = false);
 
     /*
@@ -280,6 +327,7 @@ class Tuning
     // For convenience, the scale and mapping used to construct this are kept as public copies
     Scale scale;
     KeyboardMapping keyboardMapping;
+    NotationMapping notationMapping;
 
   private:
     std::array<double, N> ptable, lptable;

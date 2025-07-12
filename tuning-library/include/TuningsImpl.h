@@ -21,6 +21,7 @@
 #include <sstream>
 #include <cctype>
 #include <cmath>
+#include <regex>
 
 namespace Tunings
 {
@@ -132,6 +133,7 @@ inline Scale readSCLStream(std::istream &inf)
 
         if ((state == read_note && line.empty()) || line[0] == '!')
         {
+            res.comments.push_back(line);
             continue;
         }
         switch (state)
@@ -367,7 +369,7 @@ inline KeyboardMapping readKBMStream(std::istream &inf)
             break;
         case freq:
             res.tuningFrequency = v;
-            res.tuningPitch = res.tuningFrequency / 8.17579891564371;
+            res.tuningPitch = res.tuningFrequency / MIDI_0_FREQ;
             break;
         case degree:
             res.octaveDegrees = i;
@@ -457,6 +459,10 @@ inline KeyboardMapping parseKBMData(const std::string &d)
 inline Tuning::Tuning() : Tuning(evenTemperament12NoteScale(), KeyboardMapping()) {}
 inline Tuning::Tuning(const Scale &s) : Tuning(s, KeyboardMapping()) {}
 inline Tuning::Tuning(const KeyboardMapping &k) : Tuning(evenTemperament12NoteScale(), k) {}
+inline Tuning::Tuning(const AbletonScale &as) : Tuning(as.scale, as.keyboardMapping)
+{
+    this->notationMapping = as.notationMapping;
+}
 
 inline Tuning::Tuning(const Scale &s_, const KeyboardMapping &k_, bool allowTuningCenterOnUnmapped_)
     : allowTuningCenterOnUnmapped(allowTuningCenterOnUnmapped_)
@@ -926,6 +932,105 @@ inline KeyboardMapping startScaleOnAndTuneNoteTo(int scaleStart, int midiNote, d
         << "! Mapping. This is an empty mapping so list no keys\n";
 
     return parseKBMData(oss.str());
+}
+
+inline AbletonScale readASCLStream(std::istream &inf)
+{
+    AbletonScale as;
+    NotationMapping n;
+    KeyboardMapping k;
+
+    // Parse the scale comments to detect @ABL extensions
+    as.scale = readSCLStream(inf);
+    for (const auto &comment : as.scale.comments)
+    {
+        std::smatch command;
+        if (!std::regex_match(comment, command, std::regex("!\\s+@ABL\\s+(.*?)\\s+(.*?)$"))) continue;
+        as.rawTexts.push_back(command[0]);
+        if (command[1] == "NOTE_NAMES")
+        {
+            n.rawText = command[2];
+
+            std::smatch note_names;
+            std::regex note_name_regex("\\s*(?:\"(\\S+)\"|(\\S+))\\s*");
+            std::string::const_iterator search_start(n.rawText.cbegin());
+            while (std::regex_search(search_start, n.rawText.cend(), note_names, note_name_regex))
+            {
+                n.names.push_back(note_names[1]);
+                search_start = note_names.suffix().first;
+            }
+            n.count = n.names.size();
+            if (n.count != as.scale.count)
+            {
+                std::string s = "Invalid NOTE_NAMES entry '" +
+                    n.rawText + "': Expecting " +
+                    std::to_string(as.scale.count) + " entries but received " +
+                    std::to_string(n.count);
+                throw TuningError(s);
+            }
+            as.notationMapping = n;
+        }
+        else if (command[1] == "REFERENCE_PITCH")
+        {
+            std::string rp = command[2];
+            std::smatch reference_pitch;
+            if (std::regex_match(rp, reference_pitch, std::regex("\\s*(\\d+)\\s*(\\d+)\\s*([\\d.]+)\\s*$")))
+            {
+                k.tuningConstantNote = 12 * (1 + std::stoi(reference_pitch[1])) + std::stoi(reference_pitch[2]);
+                k.tuningFrequency = std::stod(reference_pitch[3]);
+                k.tuningPitch = k.tuningFrequency / MIDI_0_FREQ;
+            }
+            else
+            {
+                std::string s = "Invalid REFERENCE_PITCH entry '" + rp + "'";
+                throw TuningError(s);
+            }
+        }
+        else if (command[1] == "NOTE_RANGE_BY_FREQUENCY")
+        {
+        }
+        else if (command[1] == "NOTE_RANGE_BY_INDEX")
+        {
+        }
+        else if (command[1] == "SOURCE")
+        {
+            as.source = command[2];
+        }
+        else if (command[1] == "LINK")
+        {
+            as.link = command[2];
+        }
+        else
+        {
+            std::string s = "Unhandled Ableton command '" + std::string(command[1]) + "'";
+            throw TuningError(s);
+        }
+    }
+
+    return as;
+}
+
+inline AbletonScale readASCLFile(std::string fname)
+{
+    std::ifstream inf;
+    inf.open(fname);
+    if (!inf.is_open())
+    {
+        std::string s = "Unable to open file '" + fname + "'";
+        throw TuningError(s);
+    }
+
+    auto res = readASCLStream(inf);
+    res.scale.name = fname;
+    return res;
+}
+
+inline AbletonScale parseASCLData(const std::string &d)
+{
+    std::istringstream iss(d);
+    auto res = readASCLStream(iss);
+    res.scale.name = "AbletonScale from patch";
+    return res;
 }
 
 } // namespace Tunings

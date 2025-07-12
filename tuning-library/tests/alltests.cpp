@@ -65,6 +65,12 @@ TEST_CASE("Loading tuning files")
 
         REQUIRE_NOTHROW(Tunings::parseKBMData(oss.str()));
     }
+
+    SECTION("Comments saved properly")
+    {
+        auto s = Tunings::readSCLFile(testFile("rast.ascl"));
+        REQUIRE(s.comments.size() == 24);
+    }
 }
 
 TEST_CASE("Identity Tuning Tests")
@@ -539,6 +545,7 @@ TEST_CASE("Scala KBMs from Issue 42")
         REQUIRE(k.count == 0);
     }
 }
+
 TEST_CASE("KBM ReOrdering")
 {
     SECTION("Non Monotonic KBM note")
@@ -1269,38 +1276,6 @@ TEST_CASE("Wrapped KBMs")
     }
 }
 
-int main(int argc, char **argv)
-{
-    if (getenv("LANG") != nullptr)
-    {
-        try
-        {
-            std::locale::global(std::locale(getenv("LANG")));
-            std::cout << "Setting LOCALE to '" << getenv("LANG") << "'. ";
-
-            time_t rawtime;
-            struct tm *timeinfo;
-            char buffer[512];
-
-            time(&rawtime);
-            timeinfo = localtime(&rawtime);
-
-            // work around a windows g++ warning error
-            const char *fmt = "%A %e %B %Y";
-            strftime(buffer, sizeof(buffer), fmt, timeinfo);
-
-            std::cout << "Date in this locale: '" << buffer << "'" << std::endl;
-            ;
-        }
-        catch (std::exception &e)
-        {
-            std::locale::global(std::locale("C"));
-        }
-    }
-    int result = Catch::Session().run(argc, argv);
-    return result;
-}
-
 TEST_CASE("Retuning API")
 {
     SECTION("12TET is retuned zero")
@@ -1366,4 +1341,56 @@ TEST_CASE("Surge 7822 non uniform mapping misses scale center")
         REQUIRE(t.frequencyForMidiNote(60) == Approx(400.0));
         REQUIRE(t.frequencyForMidiNote(61) == Approx(418.2936581199));
     }
+}
+
+TEST_CASE("Loading Ableton scales")
+{
+    SECTION("Good ASCL file")
+    {
+        auto s = Tunings::readASCLFile(testFile("rast.ascl"));
+        REQUIRE(s.scale.count == 12);
+        REQUIRE(s.source == "Inside Arabic Music, Chapter 11 (description of Tuning System); Ch 14-16 (descriptions of Ajnas); Ch 24 (Sayr diagrams)");
+        REQUIRE(s.link == "https://www.ableton.com/learn-more/tuning-systems/rast-1");
+        REQUIRE(s.rawTexts.size() == 4);
+        REQUIRE(s.rawTexts[0] == "! @ABL NOTE_NAMES C D♭ D \"E♭\" E1/2♭ F F♯ G A♭ A B♭ \"B1/2♭\"");
+        REQUIRE(s.notationMapping.count == 12);
+        REQUIRE(s.notationMapping.names[11] == "B1/2♭");
+    }
+
+    SECTION("Bad ASCL file")
+    {
+        REQUIRE_THROWS_AS(Tunings::readASCLFile(testFile("bad/bad-rast.ascl")), Tunings::TuningError);
+    }
+}
+
+int main(int argc, char **argv)
+{
+    if (getenv("LANG") != nullptr)
+    {
+        try
+        {
+            std::locale::global(std::locale(getenv("LANG")));
+            std::cout << "Setting LOCALE to '" << getenv("LANG") << "'. ";
+
+            time_t rawtime;
+            struct tm *timeinfo;
+            char buffer[512];
+
+            time(&rawtime);
+            timeinfo = localtime(&rawtime);
+
+            // work around a windows g++ warning error
+            const char *fmt = "%A %e %B %Y";
+            strftime(buffer, sizeof(buffer), fmt, timeinfo);
+
+            std::cout << "Date in this locale: '" << buffer << "'" << std::endl;
+            ;
+        }
+        catch (std::exception &e)
+        {
+            std::locale::global(std::locale("C"));
+        }
+    }
+    int result = Catch::Session().run(argc, argv);
+    return result;
 }

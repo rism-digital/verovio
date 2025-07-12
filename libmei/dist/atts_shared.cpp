@@ -6726,7 +6726,7 @@ void AttTuning::ResetTuning()
     m_tuneHz = 0.0;
     m_tunePname = PITCHNAME_NONE;
     m_tuneTemper = TEMPERAMENT_NONE;
-    m_tuneScala = "";
+    m_tuneScala = std::pair("", "");
 }
 
 bool AttTuning::ReadTuning(pugi::xml_node element, bool removeAttr)
@@ -6785,7 +6785,7 @@ bool AttTuning::HasTuneTemper() const
 
 bool AttTuning::HasTuneScala() const
 {
-    return (m_tuneScala != "");
+    return (m_tuneScala.first != "" && m_tuneScala.second != "");
 }
 
 //----------------------------------------------------------------------------

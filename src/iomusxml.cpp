@@ -1726,6 +1726,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         else if (IsElement(child, "print") && node.select_node("parent::part[not(preceding-sibling::part)]")) {
             this->ReadMusicXmlPrint(child, section);
         }
+        else if (IsElement(child, "sound")) {
+            this->ReadMusicXmlSound(child, measure);
+        }
     }
 
     // set metcon to false for pickup measures
@@ -3749,6 +3752,25 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
 
     if (std::string(node.child("measure-numbering").text().as_string()) == "none") {
         m_doc->GetFirstScoreDef()->SetMnumVisible(BOOLEAN_false);
+    }
+}
+
+void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
+{
+    assert(node);
+    assert(section);
+
+    // get Scala tuning
+    pugi::xpath_node scalaTuning = node.select_node("play/other-play[@type='scalaTuning']");
+    pugi::xpath_node keyboardMapping = node.select_node("play/other-play[@type='keyboardMapping']");
+    if (!scalaTuning != !keyboardMapping) {
+        LogError("MusicXML import: Expecting both scalaTuning and keyboardMapping.");
+    }
+    else if (scalaTuning) {
+        const std::string scl = scalaTuning.node().text().as_string();
+        const std::string kbm = keyboardMapping.node().text().as_string();
+        LogDebug("MusicXML import: \n%s\n%s", scl.c_str(), kbm.c_str());
+        m_doc->GetFirstScoreDef()->SetTuneScala(std::pair(scl, kbm));
     }
 }
 

@@ -7396,8 +7396,8 @@ public:
     data_TEMPERAMENT GetTuneTemper() const { return m_tuneTemper; }
     bool HasTuneTemper() const;
     //
-    void SetTuneScala(std::string tuneScala_) { m_tuneScala = tuneScala_; }
-    std::string GetTuneScala() const { return m_tuneScala; }
+    void SetTuneScala(std::pair<std::string, std::string> tuneScala_) { m_tuneScala = tuneScala_; }
+    std::pair<std::string, std::string> GetTuneScala() const { return m_tuneScala; }
     bool HasTuneScala() const;
     ///@}
 
@@ -7411,8 +7411,8 @@ private:
     data_PITCHNAME m_tunePname;
     /** Provides an indication of the tuning system, just, for example. **/
     data_TEMPERAMENT m_tuneTemper;
-    /** Provides a path to a Scala file for custom temperament. **/
-    std::string m_tuneScala;
+    /** Provides a Scala tuning: scale definition (.scl file) and keyboard mapping definition (.kbm file). **/
+    std::pair<std::string, std::string> m_tuneScala;
 };
 
 //----------------------------------------------------------------------------

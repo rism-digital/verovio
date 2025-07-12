@@ -2358,7 +2358,7 @@ void MidiMessage::makeTemperamentMeantoneCommaHalf(int referencePitchClass, int 
 // MidiMessage::makeTemperamentScala -- Custom tuning based on Scala file.
 //
 
-void MidiMessage::makeTemperamentScala(std::string tuneScala, int referencePitchClass, int channelMask) {
+void MidiMessage::makeTemperamentScala(std::pair<std::string, std::string> tuneScala, int referencePitchClass, int channelMask) {
 	std::cerr << "Error: TODO" << std::endl;
 }
 
