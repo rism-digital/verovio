@@ -2325,6 +2325,9 @@ int Doc::GetAdjustedDrawingPageHeight() const
     }
 
     int contentHeight = m_drawingPage->GetContentHeight();
+    if (m_options->m_scaleToPageSize.GetValue()) {
+        contentHeight = contentHeight * m_options->m_scale.GetValue() / 100;
+    }
     return (contentHeight + m_drawingPageMarginTop + m_drawingPageMarginBottom) / DEFINITION_FACTOR;
 }
 
@@ -2338,6 +2341,9 @@ int Doc::GetAdjustedDrawingPageWidth() const
     }
 
     int contentWidth = m_drawingPage->GetContentWidth();
+    if (m_options->m_scaleToPageSize.GetValue()) {
+        contentWidth = contentWidth * m_options->m_scale.GetValue() / 100;
+    }
     return (contentWidth + m_drawingPageMarginLeft + m_drawingPageMarginRight) / DEFINITION_FACTOR;
 }
 

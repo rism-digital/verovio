@@ -9,6 +9,7 @@
 * Fix bug with multi-measure rests in MusicXML import (@rettinghaus)
 * Fix spacing / duration of measure rests in measures not metrically conformant
 * Fix values returned by `GetTimesForElement`
+* Fix SVG dimensions with `--scale-to-page-size` and `-adjust-page-height` (or width)
 
 ## [5.3.2] – 2025-05-28
 * Fix bug in toolkit select
