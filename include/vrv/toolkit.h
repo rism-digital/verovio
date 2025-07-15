@@ -715,10 +715,6 @@ public:
     void ClearHumdrumBuffer();
 
     /**
-     * @ingroup nodoc
-     */
-    void SetInputFrom(FileFormat format);
-    /**
      * Get the input format.
      *
      * @return Input format enumeration

@@ -62,4 +62,6 @@ $PYTHON ../../doc/test-suite.py "$testdir" "$indir2" --shortlist "$shortlist"
 
 $PYTHON ../../doc/test-suite-diff.py "$indir2" "$indir1" "$outdir"
 
+$PYTHON ../../doc/test-suite-roundtrip.py "$testdir" "$outdir"
+
 open $outdir/index.html

@@ -105,7 +105,7 @@ public:
     /**
      * Check whether the current object must be positioned closer to the staff than the other
      */
-    virtual bool IsCloserToStaffThan(const FloatingObject *other, data_STAFFREL drawingPlace) const { return false; }
+    virtual bool IsCloserToStaffThan(const FloatingObject *, data_STAFFREL) const { return false; }
 
     /**
      * Determine the vertical content boundary.

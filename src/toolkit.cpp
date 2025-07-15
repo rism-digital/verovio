@@ -42,6 +42,7 @@
 #include "slur.h"
 #include "staff.h"
 #include "svgdevicecontext.h"
+#include "timemap.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -568,11 +569,11 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     this->ClearHumdrumBuffer();
 #endif
 
-    auto inputFormat = m_inputFrom;
-    if (inputFormat == AUTO) {
-        inputFormat = IdentifyInputFrom(data);
+    auto inputFrom = m_inputFrom;
+    if (inputFrom == AUTO) {
+        inputFrom = IdentifyInputFrom(data);
     }
-    if (inputFormat == ABC) {
+    if (inputFrom == ABC) {
 #ifndef NO_ABC_SUPPORT
         input = new ABCInput(&m_doc);
 #else
@@ -580,7 +581,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         return false;
 #endif
     }
-    else if (inputFormat == PAE) {
+    else if (inputFrom == PAE) {
 #ifndef NO_PAE_SUPPORT
         input = new PAEInput(&m_doc);
 #else
@@ -588,7 +589,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         return false;
 #endif
     }
-    else if (inputFormat == DARMS) {
+    else if (inputFrom == DARMS) {
 #ifndef NO_DARMS_SUPPORT
         input = new DarmsInput(&m_doc);
 #else
@@ -596,10 +597,10 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         return false;
 #endif
     }
-    else if (inputFormat == VOLPIANO) {
+    else if (inputFrom == VOLPIANO) {
         input = new VolpianoInput(&m_doc);
     }
-    else if (inputFormat == CMME) {
+    else if (inputFrom == CMME) {
         if (m_options->m_durationEquivalence.GetValue() != DURATION_EQ_minima) {
             LogWarning("CMME input uses 'minima' duration equivalence, changing the option accordingly.");
             m_options->m_durationEquivalence.SetValue(DURATION_EQ_minima);
@@ -607,7 +608,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         input = new CmmeInput(&m_doc);
     }
 #ifndef NO_HUMDRUM_SUPPORT
-    else if (inputFormat == HUMDRUM) {
+    else if (inputFrom == HUMDRUM) {
         // LogInfo("Importing Humdrum data");
 
         // HumdrumInput *input = new HumdrumInput(&m_doc);
@@ -632,7 +633,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         // Read embedded options from input Humdrum file:
         ((HumdrumInput *)input)->parseEmbeddedOptions(&m_doc);
     }
-    else if (inputFormat == HUMMEI) {
+    else if (inputFrom == HUMMEI) {
         // convert first to MEI and then load MEI data via MEIInput.  This
         // allows using XPath processing.
         // LogInfo("Importing Humdrum data via MEI");
@@ -667,29 +668,29 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         input = new MEIInput(&m_doc);
     }
 #endif
-    else if (inputFormat == MEI) {
+    else if (inputFrom == MEI) {
         input = new MEIInput(&m_doc);
     }
-    else if (inputFormat == SERIALIZATION) {
+    else if (inputFrom == SERIALIZATION) {
         MEIInput *meiInput = new MEIInput(&m_doc);
         meiInput->SetDeserializing(true);
         input = meiInput;
     }
-    else if (inputFormat == MUSICXML) {
+    else if (inputFrom == MUSICXML) {
         // This is the direct converter from MusicXML to MEI using iomusicxml:
         input = new MusicXmlInput(&m_doc);
     }
 #ifndef NO_HUMDRUM_SUPPORT
-    else if (inputFormat == MUSICXMLHUM) {
+    else if (inputFrom == MUSICXMLHUM) {
         // This is the indirect converter from MusicXML to MEI using iohumdrum:
         hum::Tool_musicxml2hum converter;
         pugi::xml_document xmlfile;
         xmlfile.load_string(data.c_str());
         stringstream conversion;
 
-        LogRedirectStart();
+        this->LogRedirectStart();
         bool status = converter.convert(conversion, xmlfile);
-        LogRedirectStop();
+        this->LogRedirectStop();
         if (!status) {
             LogWarning("Problem converting MusicXML to Humdrum (see warning above this line for possible reasons");
         }
@@ -717,8 +718,8 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         input = new MEIInput(&m_doc);
     }
 
-    else if (inputFormat == MEIHUM) {
-        ConvertMEIToHumdrum(data);
+    else if (inputFrom == MEIHUM) {
+        this->ConvertMEIToHumdrum(data);
 
         // Now convert Humdrum into MEI:
         std::string conversion = this->GetHumdrumBuffer();
@@ -737,14 +738,14 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         input = new MEIInput(&m_doc);
     }
 
-    else if (inputFormat == MUSEDATAHUM) {
+    else if (inputFrom == MUSEDATAHUM) {
         // This is the indirect converter from MuseData to MEI using iohumdrum:
         hum::Tool_musedata2hum converter;
         stringstream conversion;
 
-        LogRedirectStart();
+        this->LogRedirectStart();
         bool status = converter.convertString(conversion, data);
-        LogRedirectStop();
+        this->LogRedirectStop();
         if (!status) {
             LogWarning("Problem converting MuseData to Humdrum (see warning above this line for possible reasons");
         }
@@ -772,14 +773,14 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         input = new MEIInput(&m_doc);
     }
 
-    else if (inputFormat == ESAC) {
+    else if (inputFrom == ESAC) {
         // This is the indirect converter from EsAC to MEI using iohumdrum:
         hum::Tool_esac2hum converter;
         std::stringstream conversion;
 
-        LogRedirectStart();
+        this->LogRedirectStart();
         bool status = converter.convert(conversion, data);
-        LogRedirectStop();
+        this->LogRedirectStop();
         if (!status) {
             LogWarning("Problem converting EsAC to Humdrum (see warning above this line for possible reasons");
         }
@@ -819,7 +820,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     }
 
     // load the file
-    if (inputFormat != HUMDRUM) {
+    if (inputFrom != HUMDRUM) {
         if (!input->Import(newData.size() ? newData : data)) {
             LogError("Error importing data");
             delete input;
@@ -827,7 +828,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         }
     }
 
-    if (inputFormat == SERIALIZATION) {
+    if (inputFrom == SERIALIZATION) {
         input->Import(data);
         m_doc.PrepareData();
         m_doc.ScoreDefSetCurrentDoc(true);
@@ -1920,7 +1921,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     }
 
     int repeat = measure->EnclosesTime(millisec);
-    int measureTimeOffset = measure->GetRealTimeOffsetMilliseconds(repeat);
+    int measureTimeOffset = measure->GetRealTimeOnsetMilliseconds(repeat);
 
     // Get the pageNo from the first note (if any)
     int pageNo = -1;
@@ -2051,14 +2052,14 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
         Measure *measure = vrv_cast<Measure *>(note->GetFirstAncestor(MEASURE));
         assert(measure);
         // For now ignore repeats and access always the first
-        timeofElement = measure->GetRealTimeOffsetMilliseconds(1);
+        timeofElement = measure->GetRealTimeOnsetMilliseconds(1);
         timeofElement += note->GetRealTimeOnsetMilliseconds();
     }
     else if (element->Is(MEASURE)) {
         Measure *measure = vrv_cast<Measure *>(element);
         assert(measure);
         // For now ignore repeats and access always the first
-        timeofElement = measure->GetRealTimeOffsetMilliseconds(1);
+        timeofElement = measure->GetRealTimeOnsetMilliseconds(1);
     }
     else if (element->Is(CHORD)) {
         Chord *chord = vrv_cast<Chord *>(element);
@@ -2068,7 +2069,7 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
         Measure *measure = vrv_cast<Measure *>(note->GetFirstAncestor(MEASURE));
         assert(measure);
         // For now ignore repeats and access always the first
-        timeofElement = measure->GetRealTimeOffsetMilliseconds(1);
+        timeofElement = measure->GetRealTimeOnsetMilliseconds(1);
         timeofElement += note->GetRealTimeOnsetMilliseconds();
     }
     return timeofElement;
@@ -2109,21 +2110,22 @@ std::string Toolkit::GetTimesForElement(const std::string &xmlId)
         assert(measure);
 
         // For now ignore repeats and access always the first
-        double offset = measure->GetRealTimeOffsetMilliseconds(1);
-        realTimeOffsetMilliseconds << offset + note->GetRealTimeOffsetMilliseconds();
-        realTimeOnsetMilliseconds << offset + note->GetRealTimeOnsetMilliseconds();
+        double mRealTimeOnsetMilliseconds = measure->GetRealTimeOnsetMilliseconds(1);
+        realTimeOnsetMilliseconds << mRealTimeOnsetMilliseconds + note->GetRealTimeOnsetMilliseconds();
+        realTimeOffsetMilliseconds << mRealTimeOnsetMilliseconds + note->GetRealTimeOffsetMilliseconds();
 
-        scoreTimeOnset << note->GetScoreTimeOnset();
-        scoreTimeOffset << note->GetScoreTimeOffset();
-        scoreTimeDuration << note->GetScoreTimeDuration();
-        scoreTimeTiedDuration << note->GetScoreTimeTiedDuration();
+        Fraction mScoreTimeOnset = measure->GetScoreTimeOnset(1);
+        scoreTimeOnset << jsonxx::Value(Timemap::ToArray(mScoreTimeOnset + note->GetScoreTimeOnset()));
+        scoreTimeOffset << jsonxx::Value(Timemap::ToArray(mScoreTimeOnset + note->GetScoreTimeOffset()));
+        scoreTimeDuration << jsonxx::Value(Timemap::ToArray(note->GetScoreTimeDuration()));
+        scoreTimeTiedDuration << jsonxx::Value(Timemap::ToArray(note->GetScoreTimeTiedDuration()));
 
-        o << "scoreTimeOnset" << scoreTimeOnset;
-        o << "scoreTimeOffset" << scoreTimeOffset;
-        o << "scoreTimeDuration" << scoreTimeDuration;
-        o << "scoreTimeTiedDuration" << scoreTimeTiedDuration;
-        o << "realTimeOnsetMilliseconds" << realTimeOnsetMilliseconds;
-        o << "realTimeOffsetMilliseconds" << realTimeOffsetMilliseconds;
+        o << "qfracOn" << scoreTimeOnset;
+        o << "qfracOff" << scoreTimeOffset;
+        o << "qfracDuration" << scoreTimeDuration;
+        o << "qfracTiedDuration" << scoreTimeTiedDuration;
+        o << "tstampOn" << realTimeOnsetMilliseconds;
+        o << "tstampOff" << realTimeOffsetMilliseconds;
     }
     return o.json();
 }
@@ -2189,9 +2191,9 @@ const char *Toolkit::GetHumdrumBuffer()
         stringstream out;
         hum::Tool_mei2hum converter;
 
-        LogRedirectStart();
+        this->LogRedirectStart();
         bool status = converter.convert(out, infile);
-        LogRedirectStop();
+        this->LogRedirectStop();
         if (!status) {
             LogWarning("Problem converting MEI to Humdrum (see warning above this line for possible reasons");
         }
@@ -2243,12 +2245,6 @@ void Toolkit::ClearHumdrumBuffer()
 #endif
 }
 
-void Toolkit::SetInputFrom(FileFormat format)
-{
-    LogWarning("This method is deprecated. Use SetInputFormat(std::string) instead.");
-    m_inputFrom = format;
-}
-
 std::string Toolkit::ConvertMEIToHumdrum(const std::string &meiData)
 {
 #ifndef NO_HUMDRUM_SUPPORT
@@ -2257,9 +2253,9 @@ std::string Toolkit::ConvertMEIToHumdrum(const std::string &meiData)
     xmlfile.load_string(meiData.c_str());
     std::stringstream conversion;
 
-    LogRedirectStart();
+    this->LogRedirectStart();
     bool status = converter.convert(conversion, xmlfile);
-    LogRedirectStop();
+    this->LogRedirectStop();
 
     if (!status) {
         LogError("Error converting MEI data to Humdrum: %s", conversion.str().c_str());

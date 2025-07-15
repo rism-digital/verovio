@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Mar 28 11:08:41 PDT 2025
+// Last Modified: Thu Jul 10 05:31:52 CEST 2025
 // Filename:      min/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.h
 // Syntax:        C++11
@@ -123,6 +123,7 @@ class MuseRecord;
 class MuseData;
 class MuseDataSet;
 class GridVoice;
+class GotScore;
 
 
 class HumParameter : public std::string {
@@ -4348,6 +4349,190 @@ std::ostream& operator<<(std::ostream& out, PixelColor apixel);
 
 
 
+
+class GotScore {
+
+	public:
+		struct EventAtTime {
+			double timestamp;
+			std::vector<std::string> rhythms;
+			std::vector<std::string> pitches;
+		};
+
+		class Measure {
+			public:
+				Measure(void) {};
+				~Measure() {};
+				std::ostream& print(std::ostream& out);
+
+				void printKernBarline(std::ostream& out, bool textQ);
+
+				// Each rhythm+pitch pairing with computed start time and duration
+				class TimedEvent {
+					public:
+						double timestamp;
+						double duration;
+						std::string rhythm;
+						std::string pitch;
+						bool isInterpretation = false;  // true if rhythm starts with '*'
+				};
+
+			public:
+				// m_parent: A pointer to the GotScore object that the measure belongs to.
+				GotScore* m_owner = NULL;
+
+				// m_barnum: The measure number for the measure.
+				std::string m_barnum;
+
+				// m_text: the text content for the measure.
+				std::string m_text;
+
+				// m_error: Any parsing error message when converting to **kern
+				std::string m_error;
+
+				// m_rhythms: First dimension is voice (highest to lowest)
+				// Second dimension is rhythm "word" first to last in measure
+				std::vector<std::vector<std::string>> m_rhythms;
+
+				// m_pitches: First dimension is voice (highest to lowest)
+				// Second dimension is pitch "word" first to last in measure
+				std::vector<std::vector<std::string>> m_pitches;
+
+				// m_splitRhythms: First dimension is voice (highest to lowest)
+				// Second dimension is rhythm "word" first to last in measure
+				// Third dimension is rhythm "token" first to last in word
+				std::vector<std::vector<std::vector<std::string>>> m_splitRhythms;
+
+				// m_splitPitches: First dimension is voice (highest to lowest)
+				// Second dimension is pitch "word" first to last in measure
+				// Third dimension is pitch "token" first to last in word
+				std::vector<std::vector<std::vector<std::string>>> m_splitPitches;
+
+				// m_kerns: First dimension is the voice (highest to lowest),
+				// second dimension is flattening of the 2nd and 3rd dimensions
+				// of m_splitPitches.
+				std::vector<std::vector<std::string*>> m_kerns;
+
+				// m_diatonic: linearized pitch by voice for marking editorial accidentals.
+				std::vector<std::vector<int>> m_diatonic;
+
+				// m_accid: chromatic alterations of m_diatonic pitches.
+				std::vector<std::vector<int>> m_accid;
+
+				// m_accidState: The diatonic accidental state at the end of the
+				// measure.  This is used to create editorial accidentals and 
+				// cautionary natural accidentals.  First dimension is voice number,
+				// second dimension is CDEFGAB accidental states, 0 = natural 1=sharp, -1=flat.
+				std::vector<std::vector<int>> m_accidState;
+
+				// m_voiceEvents: events per voice
+				std::vector<std::vector<TimedEvent>> m_voiceEvents;
+
+		};
+
+	public:
+		         GotScore        (void);
+		         GotScore        (std::stringstream& ss);
+		         GotScore        (const std::string& s);
+		        ~GotScore        ();
+
+		void     loadLines       (std::stringstream& ss);
+		void     loadLines       (const std::string& s);
+		bool     prepareMeasures (std::ostream& out);
+		void     clear           (void);
+
+		std::ostream& printInputFile  (std::ostream& out);
+		std::ostream& printCells      (std::ostream& out);
+		std::ostream& printMeasures   (std::ostream& out);
+
+		std::string getGotHumdrum         (void);
+		std::string getGotHumdrumMeasure  (GotScore::Measure& mdata);
+
+		std::string getKernHumdrum        (void);
+		std::string getKernHumdrumMeasure (GotScore::Measure& mdata);
+
+		void        processUnderscoreTies(std::vector<std::string*>& pitches);
+		void        processRhythmTies(std::vector<std::string*>& rhythms, std::vector<std::string*>& pitches);
+		std::string mergeRhythmAndPitchIntoNote(const std::string& r, const std::string& p);
+
+		std::string getHeaderInfo(int index);
+		std::string getFooterInfo(void);
+		void        getDiatonicAccid(const std::string& pitch, int& d, int& a);
+		void        prepareAccidentals(void);
+		void        markEditorialAccidentals(GotScore::Measure& measure, int voice);
+		void        checkForCautionaryAccidentals(int mindex, int vindex);
+		void        cleanRhythmValues(std::vector<std::vector<std::string>>& rhythms);
+
+		void        setNoEditorial(void);
+		void        setCautionary(void);
+		void        setNoForcedAccidentals(void);
+
+	protected:
+		void     parse                    (void);
+		void     prepareCells             (void);
+		bool     processSystemMeasures    (int barIndex, int system, std::ostream& out);
+		void     splitMeasureTokens       (void);
+		void     splitMeasureTokens       (GotScore::Measure& mdata);
+		void     pairLeadingDots          (void);
+		void     processDotsForMeasure    (GotScore::Measure& mdata);
+		void     processPitchDotsByVoice  (std::vector<std::string*>& pitches);
+		void     processDotTiedNotes      (void);
+		void     buildVoiceEvents         (void);
+		double   durationFromRhythmToken  (const std::string& token);
+		std::vector<GotScore::EventAtTime> alignEventsByTimestamp(const GotScore::Measure& mdata);
+		std::vector<std::string> convertGotToKernPitches (std::vector<std::string>& gotpitch);
+		std::string convertGotToKernPitch (const std::string& gotpitch);
+		void     storePitchHistograms     (std::vector<std::vector<std::string*>>& P);
+		std::vector<std::string> generateVoiceClefs(void);
+		std::string chooseClef(double mean, double min, double max);
+
+		std::vector<std::string> tokenizeRhythmString (const std::string& input);
+		std::vector<std::string> tokenizePitchString  (const std::string& input);
+		std::vector<std::string> splitBySpaces        (const std::string& input);
+
+	private:
+		// m_voices == number of voices in score
+		int m_voices = 0;
+
+		// m_pitch_hist == used to calculate the clef for each voice.
+		std::vector<std::vector<int>> m_pitch_hist;
+
+		// m_textQ == true if input data has lyric text.
+		bool m_textQ = false;
+
+		// m_lines == input text lines, with whitespace removed from ends of lines.
+		std::vector<std::string> m_lines;
+
+		// m_cells == m_lines split by tab characters (i.e., TSV data):
+		std::vector<std::vector<std::string>> m_cells;
+
+		// m_measures == data organized by measure.
+		std::vector<GotScore::Measure> m_measures;
+
+		// m_debugQ == for printing debug statements
+		bool m_debugQ = false;
+
+		// m_error == for reporting errors.
+		std::stringstream m_error;
+
+		// m_got == for storing **got conversion.
+		std::string m_got;
+
+		// m_cautionary == add !!!RDF**kern: i = editorial accidental, paren
+		bool m_cautionary;
+
+		// m_kern == for storing **kern conversion.
+		std::string m_kern;
+
+		// conversion options:
+		bool m_no_editorialQ = false;
+		bool m_cautionaryQ   = false;
+		bool m_modern_accQ   = false;
+
+};
+
+
+
 // SliceType is a list of various Humdrum line types.  Groupings are
 // segmented by categories which are prefixed with an underscore.
 // For example Notes are in the _Duration group, since they have
@@ -5412,6 +5597,53 @@ class HumTool : public Options {
 
 //////////////////////////////
 //
+// TEXT_INTERFACE -- Expects one text file, either from the
+//    first command-line argument (left over after options have been
+//    parsed out), or from standard input.
+//
+// function call that the interface must implement:
+//  .run(const string& instring, ostream& out)
+//
+//
+
+#define TEXT_INTERFACE(CLASS)                          \
+int main(int argc, char** argv) {                      \
+	hum::CLASS interface;                               \
+	if (!interface.process(argc, argv)) {               \
+		interface.getError(std::cerr);                   \
+		return -1;                                       \
+	}                                                   \
+	string instring;                                    \
+	if (interface.getArgCount() > 0) {                  \
+		ifstream input(interface.getArgument(1));        \
+		if (!input) {                                    \
+			throw std::runtime_error("Could not open file: " + interface.getArgument(1)); \
+		}                                                \
+		stringstream buf;                                \
+		buf << input.rdbuf();                            \
+		instring = buf.str();                            \
+	} else {                                            \
+		stringstream buf;                                \
+		buf << cin.rdbuf();                              \
+		instring = buf.str();                            \
+	}                                                   \
+	int status = interface.run(instring, std::cout);    \
+	interface.finally();                                \
+	if (interface.hasWarning()) {                       \
+		interface.getWarning(std::cerr);                 \
+		return 0;                                        \
+	}                                                   \
+	if (interface.hasError()) {                         \
+		interface.getError(std::cerr);                   \
+		return -1;                                       \
+	}                                                   \
+	return !status;                                     \
+}
+
+
+
+//////////////////////////////
+//
 // BASIC_INTERFACE -- Expects one Humdurm file, either from the
 //    first command-line argument (left over after options have been
 //    parsed out), or from standard input.
@@ -5947,6 +6179,7 @@ class Tool_autocadence : public HumTool {
 		                                        int lindex, int vindex, int pindex);
 		void        prepareDissonances         (HumdrumFile& infile);
 		void        prepareDissonancesForLine  (HumdrumLine& iline, HumdrumLine& dline);
+		void        identifySuspensionsAndAgents(HumdrumFile& infile);
 
 	private:
 
@@ -6015,7 +6248,7 @@ class Tool_autocadence : public HumTool {
 		// options:
 		bool m_intervalsQ               = false; // -i: show counterpoint interval infomation
 		bool m_intervalsOnlyQ           = false; // -I: show counterpoint interval infomation but
-		                                         // do not do cadence analysis
+		                                         //     do not do cadence analysis
 		bool m_printRawDiatonicPitchesQ = false; // -p: display m_pitches after filling
 		int  m_sequenceLength           = 7;     // maximum regex interval sequence length
 		bool m_matchesQ                 = false; // -m: display sequences that match to cadence formula(s)
@@ -6028,11 +6261,11 @@ class Tool_autocadence : public HumTool {
 		bool m_regexQ                   = false; // -r: show table of matched regular expressions
 		bool m_popupQ                   = true;  // --pop: show popup when hoving over CFV lables (to be implemented)
 		bool m_nobackQ                  = false; // -B: don't highlight start of sustain at start of cadence definition
-		bool m_suspensionsQ             = true;  // -S: don't use suspension analysis
+		bool m_showSuspensionsQ         = true;  // !-S: show suspension/agent labels in output score
+		bool m_lowestQ                  = false; // -l: use lowest note to define suspensions instead of dissonance analysis
 		std::string m_marker = "@";
 		std::string m_suspensionMarker = "N";
 		std::string m_suspensionColor  = "crimson";
-
 };
 
 
@@ -8237,6 +8470,30 @@ class Tool_gasparize : public HumTool {
 		std::vector<std::vector<int>> m_kstates;
 		std::vector<std::vector<bool>> m_estates;
 
+};
+
+
+class Tool_got2hum : public HumTool {
+	public:
+		         Tool_got2hum      (void);
+		        ~Tool_got2hum      () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
+
+	protected:
+		void    processFile        (const std::string& instring);
+		void    initialize         (void);
+
+	private:
+		GotScore m_gotscore;
+
+		bool m_editorialQ;
+		bool m_cautionaryQ;
+		bool m_gotQ;
+		bool m_modern_accQ;
 };
 
 

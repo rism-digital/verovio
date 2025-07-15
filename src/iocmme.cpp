@@ -86,7 +86,7 @@ bool CmmeInput::Import(const std::string &cmme)
         m_doc->SetType(Raw);
         m_doc->SetMensuralMusicOnly(BOOLEAN_true);
 
-        // Genereate the header and add a comment to the project description
+        // Generate the header and add a comment to the project description
         m_doc->GenerateMEIHeader();
         pugi::xml_node projectDesc = m_doc->m_header.first_child().select_node("//projectDesc").node();
         if (projectDesc) {
@@ -124,7 +124,7 @@ bool CmmeInput::Import(const std::string &cmme)
         pugi::xpath_node_set musicSections = root.select_nodes("/Piece/MusicSection/*");
 
         for (pugi::xpath_node musicSectionNode : musicSections) {
-            CreateSection(musicSectionNode.node());
+            this->CreateSection(musicSectionNode.node());
         }
 
         // add minimal scoreDef
@@ -292,7 +292,7 @@ void CmmeInput::CreateSection(pugi::xml_node musicSectionNode)
         std::string xpath = StringFormat("./Voice[VoiceNum[text()='%d']]", i + 1);
         pugi::xpath_node voice = musicSectionNode.select_node(xpath.c_str());
         if (voice) {
-            CreateStaff(voice.node());
+            this->CreateStaff(voice.node());
         }
         else {
             Staff *staff = new Staff(i + 1);
@@ -324,7 +324,7 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
     m_currentSection->AddChild(staff);
 
     // Loop through the event lists
-    ReadEvents(voiceNode.child("EventList"));
+    this->ReadEvents(voiceNode.child("EventList"));
 }
 
 void CmmeInput::CreateApp(pugi::xml_node appNode)
@@ -385,7 +385,7 @@ void CmmeInput::CreateLemOrRdg(pugi::xml_node lemOrRdgNode, bool isFirst)
 
     m_currentContainer = lemOrRdg;
 
-    ReadEvents(lemOrRdgNode.child("Music"));
+    this->ReadEvents(lemOrRdgNode.child("Music"));
 
     m_currentContainer = m_currentContainer->GetParent();
 }
@@ -403,42 +403,42 @@ void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
         std::string name = eventNode.name();
         if (name == "Clef") {
             if (this->IsClef(eventNode)) {
-                CreateClef(eventNode);
+                this->CreateClef(eventNode);
             }
             else if (eventNode.select_node("./Signature")) {
                 keySigFound = true;
-                CreateKeySig(eventNode);
+                this->CreateKeySig(eventNode);
             }
             else {
-                CreateAccid(eventNode);
+                this->CreateAccid(eventNode);
             }
         }
         else if (name == "ColorChange") {
-            CreateColorChange(eventNode);
+            this->CreateColorChange(eventNode);
         }
         else if (name == "Custos") {
-            CreateCustos(eventNode);
+            this->CreateCustos(eventNode);
         }
         else if (name == "Dot") {
-            CreateDot(eventNode);
+            this->CreateDot(eventNode);
         }
         else if (name == "LineEnd") {
-            CreateBreak(eventNode);
+            this->CreateBreak(eventNode);
         }
         else if (name == "Mensuration") {
-            CreateMensuration(eventNode);
+            this->CreateMensuration(eventNode);
         }
         else if (name == "MiscItem") {
             /// Assuming that a MiscItem contains only one child
             if (eventNode.select_node("./Barline")) {
                 pugi::xml_node barlineNode = eventNode.select_node("./Barline").node();
-                CreateBarline(barlineNode);
+                this->CreateBarline(barlineNode);
             }
             else if (eventNode.child("Ellipsis")) {
-                CreateEllipsis();
+                this->CreateEllipsis();
             }
             else if (eventNode.child("Lacuna")) {
-                CreateLacuna(eventNode.child("Lacuna"));
+                this->CreateLacuna(eventNode.child("Lacuna"));
             }
             else {
                 LogWarning("Unsupported MiscItem content");
@@ -451,31 +451,31 @@ void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
                 pugi::xpath_node_set clefs = eventNode.select_nodes("./Clef");
                 for (pugi::xpath_node clef : clefs) {
                     pugi::xml_node clefNode = clef.node();
-                    CreateKeySig(clefNode);
+                    this->CreateKeySig(clefNode);
                 }
             }
             else if (eventNode.select_node("./Note")) {
                 // Assuming that this only contains notes (and is a chord)
-                CreateChord(eventNode);
+                this->CreateChord(eventNode);
             }
             else {
                 LogWarning("Unsupported event '%s'", name.c_str());
             }
         }
         else if (name == "Note") {
-            CreateNote(eventNode);
+            this->CreateNote(eventNode);
         }
         else if (name == "OriginalText") {
-            CreateOriginalText(eventNode);
+            this->CreateOriginalText(eventNode);
         }
         else if (name == "Proportion") {
-            CreateProport(eventNode);
+            this->CreateProport(eventNode);
         }
         else if (name == "Rest") {
-            CreateRest(eventNode);
+            this->CreateRest(eventNode);
         }
         else if (name == "VariantReadings") {
-            CreateApp(eventNode);
+            this->CreateApp(eventNode);
         }
         else {
             LogWarning("Unsupported event '%s'", name.c_str());
@@ -617,7 +617,7 @@ void CmmeInput::CreateChord(pugi::xml_node chordNode)
         pugi::xml_node eventNode = event.node();
         std::string name = eventNode.name();
         if (name == "Note") {
-            CreateNote(eventNode);
+            this->CreateNote(eventNode);
             if (inLigature) break;
         }
         else {
@@ -1005,7 +1005,7 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
 
     if (noteNode.child("ModernText")) {
         m_currentNote = note;
-        CreateVerse(noteNode.child("ModernText"));
+        this->CreateVerse(noteNode.child("ModernText"));
         m_currentNote = NULL;
     }
 

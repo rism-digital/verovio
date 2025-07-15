@@ -64,7 +64,7 @@ jobs:
           ls -alh ${{ env.OUTPUT_DIR }}
           sudo apt-get install wireguard
           sudo echo "${{ secrets.VPN_CONFIGURATION }}" > wg0.conf
-          python3 -m pip install diffimg jsondiff lxml xmldiff cairosvg==2.7.1
+          python3 -m pip install diffimg jsondiff lxml xmldiff cairosvg
 
       - name: Checkout the dev branch
         uses: actions/checkout@v4
@@ -106,6 +106,12 @@ jobs:
         working-directory: ${{ github.workspace }}/${{ env.DEV_DIR }}/doc
         run: |
           python3 ./test-suite-diff.py ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/ ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/ ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
+          ls -al
+
+      - name: Round-trip evaluation
+        working-directory: ${{ github.workspace }}/${{ env.DEV_DIR }}/bindings/python
+        run: |
+          python3 ../../doc/test-suite-roundtrip.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
           ls -al
 
       - name: Upload results as artefacts

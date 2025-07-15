@@ -131,7 +131,7 @@ void PageRange::SetAsFocus(Page *page)
     const Measure *lastMeasure
         = vrv_cast<const Measure *>(page->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
     if (lastMeasure) {
-        EvaluateSpanningElementsIn(lastMeasure);
+        this->EvaluateSpanningElementsIn(lastMeasure);
         ListOfConstObjects timeSpanningObjects;
         InterfaceComparison ic(INTERFACE_TIME_SPANNING);
         lastMeasure->FindAllDescendantsByComparison(&timeSpanningObjects, &ic);

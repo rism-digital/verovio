@@ -432,7 +432,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
 
     if (!this->HasTimemap()) {
         // generate MIDI timemap before progressing
-        CalculateTimemap();
+        this->CalculateTimemap();
     }
     if (!this->HasTimemap()) {
         LogWarning("Calculation of the timemap failed, MIDI cannot be exported.");
@@ -585,7 +585,7 @@ bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeas
 {
     if (!this->HasTimemap()) {
         // generate MIDI timemap before progressing
-        CalculateTimemap();
+        this->CalculateTimemap();
     }
     if (!this->HasTimemap()) {
         LogWarning("Calculation of the timemap failed, the timemap cannot be exported.");
@@ -616,7 +616,7 @@ bool Doc::ExportFeatures(std::string &output, const std::string &options)
 {
     if (!this->HasTimemap()) {
         // generate MIDI timemap before progressing
-        CalculateTimemap();
+        this->CalculateTimemap();
     }
     if (!this->HasTimemap()) {
         LogWarning("Calculation of the timemap failed, the features cannot be exported.");
@@ -642,6 +642,8 @@ void Doc::PrepareData()
     /************ Reset and initialization ************/
 
     if (m_dataPreparationDone) {
+        // Reset the scoreDef for the entire doc
+        this->ResetToLoading();
         ResetDataFunctor resetData;
         root->Process(resetData);
     }
@@ -2323,6 +2325,9 @@ int Doc::GetAdjustedDrawingPageHeight() const
     }
 
     int contentHeight = m_drawingPage->GetContentHeight();
+    if (m_options->m_scaleToPageSize.GetValue()) {
+        contentHeight = contentHeight * m_options->m_scale.GetValue() / 100;
+    }
     return (contentHeight + m_drawingPageMarginTop + m_drawingPageMarginBottom) / DEFINITION_FACTOR;
 }
 
@@ -2336,6 +2341,9 @@ int Doc::GetAdjustedDrawingPageWidth() const
     }
 
     int contentWidth = m_drawingPage->GetContentWidth();
+    if (m_options->m_scaleToPageSize.GetValue()) {
+        contentWidth = contentWidth * m_options->m_scale.GetValue() / 100;
+    }
     return (contentWidth + m_drawingPageMarginLeft + m_drawingPageMarginRight) / DEFINITION_FACTOR;
 }
 

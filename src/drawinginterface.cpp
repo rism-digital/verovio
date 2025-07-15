@@ -92,7 +92,7 @@ BeamDrawingInterface::BeamDrawingInterface() : ObjectListInterface()
 
 BeamDrawingInterface::~BeamDrawingInterface()
 {
-    ClearCoords();
+    this->ClearCoords();
 }
 
 void BeamDrawingInterface::Reset()
@@ -114,7 +114,7 @@ void BeamDrawingInterface::Reset()
     m_beamWidthBlack = 0;
     m_beamWidthWhite = 0;
 
-    ClearCoords();
+    this->ClearCoords();
 }
 
 int BeamDrawingInterface::GetTotalBeamWidth() const
@@ -141,7 +141,7 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
     assert(staff);
 
     BeamDrawingInterface::Reset();
-    ClearCoords();
+    this->ClearCoords();
 
     if (childList.empty()) {
         return;

@@ -28,7 +28,9 @@
 #include "measure.h"
 #include "nc.h"
 #include "neume.h"
+#include "oriscus.h"
 #include "page.h"
+#include "quilisma.h"
 #include "rend.h"
 #include "sb.h"
 #include "score.h"
@@ -150,6 +152,13 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
             return this->SetLiquescent(elementId, curve);
         }
         LogWarning("Could not parse the set liquescent action");
+    }
+    else if (action == "setAquitanianElement") {
+        std::string elementId, shape;
+        if (this->ParseSetAquitanianElementAction(json.get<jsonxx::Object>("param"), &elementId, &shape)) {
+            return this->SetAquitanianElement(elementId, shape);
+        }
+        LogWarning("Could not parse the set aquitanian element action");
     }
     else if (action == "remove") {
         std::string elementId;
@@ -580,7 +589,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool topLevel
         assert(zone);
         zone->ShiftByXY(x, -y);
 
-        AdjustPitchAfterDrag(element, y);
+        this->AdjustPitchAfterDrag(element, y);
     }
     else if (element->Is(SYLLABLE)) {
         // Check for clefs in syllable
@@ -591,7 +600,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool topLevel
         if (hasClef) {
             for (Object *obj : clefs) {
                 Clef *clef = dynamic_cast<Clef *>(obj);
-                Drag(clef->GetID(), x, y, false);
+                this->Drag(clef->GetID(), x, y, false);
             }
         }
 
@@ -599,7 +608,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool topLevel
         ClassIdComparison ncComp(NC);
         element->FindAllDescendantsByComparison(&ncs, &ncComp);
         for (auto nc = ncs.begin(); nc != ncs.end(); ++nc) {
-            Drag((*nc)->GetID(), x, y, false);
+            this->Drag((*nc)->GetID(), x, y, false);
         }
     }
     else if (element->Is(NEUME)) {
@@ -607,7 +616,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool topLevel
         ClassIdComparison ncComp(NC);
         element->FindAllDescendantsByComparison(&ncs, &ncComp);
         for (auto nc = ncs.begin(); nc != ncs.end(); ++nc) {
-            Drag((*nc)->GetID(), x, y, false);
+            this->Drag((*nc)->GetID(), x, y, false);
         }
     }
     else if (element->Is(NC)) {
@@ -628,7 +637,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool topLevel
             assert(zone);
             zone->ShiftByXY(x, -y);
         }
-        AdjustPitchAfterDrag(nc, y);
+        this->AdjustPitchAfterDrag(nc, y);
     }
     else if (element->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(element);
@@ -661,7 +670,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool topLevel
 
             // Case 1 & 2
             if (clefTarget < xRight) {
-                ClefMovementHandler(clef, x, y);
+                this->ClefMovementHandler(clef, x, y);
             }
             // Case 3
             // Move to end of syllable and then shift zone so mei position stays at end of syllable
@@ -669,7 +678,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool topLevel
                 int distanceToSyllableEnd = xRight - clefInitial + 1;
                 int distanceRemaining = clefTarget - xRight - 1;
 
-                ClefMovementHandler(clef, distanceToSyllableEnd, y);
+                this->ClefMovementHandler(clef, distanceToSyllableEnd, y);
                 if (fi->GetZone() != NULL) {
                     Zone *zone = fi->GetZone();
                     assert(zone);
@@ -679,7 +688,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool topLevel
         }
         // Not inside syllable
         else {
-            ClefMovementHandler(clef, x, y);
+            this->ClefMovementHandler(clef, x, y);
         }
         m_doc->ScoreDefSetCurrentDoc(true); // this is needed for staves without clef
     }
@@ -706,7 +715,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool topLevel
             if (zone) zone->ShiftByXY(x, -y);
         }
 
-        SortStaves();
+        this->SortStaves();
 
         if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
         m_doc->GetDrawingPage()->LayOutTranscription(true);
@@ -758,7 +767,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool topLevel
             assert(zone);
             zone->ShiftByXY(x, -y);
         }
-        ChangeStaff(elementId);
+        this->ChangeStaff(elementId);
     }
     else {
         LogWarning("Unsupported element for dragging.");
@@ -868,7 +877,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
 
         page->InsertAfter(page->GetFirst(SCORE), newSystem);
 
-        SortStaves();
+        this->SortStaves();
 
         if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
 
@@ -992,6 +1001,16 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 }
                 Liquescent *liquescent = new Liquescent();
                 nc->AddChild(liquescent);
+            }
+            else if (it->first == "shape") {
+                if (it->second == "quilisma") {
+                    Quilisma *quilisma = new Quilisma();
+                    nc->AddChild(quilisma);
+                }
+                else if (it->second == "oriscus") {
+                    Oriscus *oriscus = new Oriscus();
+                    nc->AddChild(oriscus);
+                }
             }
         }
 
@@ -1508,7 +1527,7 @@ bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId)
         Clef *clef = dynamic_cast<Clef *>(element);
         // BEFORE
         if (xElement < xLeft) {
-            ClefMovementHandler(clef, (xLeft - xElement), 0);
+            this->ClefMovementHandler(clef, (xLeft - xElement), 0);
         }
         // AFTER
         else if (xRight < xElement) {
@@ -1554,11 +1573,11 @@ bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId)
         Clef *clef = dynamic_cast<Clef *>(element);
         // BEFORE
         if (xElement < xLeft) {
-            ClefMovementHandler(clef, (xElement - xLeft), 0);
+            this->ClefMovementHandler(clef, (xElement - xLeft), 0);
         }
         // AFTER
         else if (xRight < xElement) {
-            ClefMovementHandler(clef, xElement - xRight - 1, 0);
+            this->ClefMovementHandler(clef, xElement - xRight - 1, 0);
         }
         // INSIDE do nothing
     }
@@ -2077,7 +2096,7 @@ bool EditorToolkitNeume::SetLiquescent(std::string elementId, std::string curve)
 
     Nc *nc = vrv_cast<Nc *>(m_doc->GetDrawingPage()->FindDescendantByID(elementId));
     assert(nc);
-    bool hasLiquscent = nc->GetChildCount();
+    bool hasLiquscent = nc->GetChildCount(LIQUESCENT);
 
     if (curve == "a") {
         curvatureDirection_CURVE curve = curvatureDirection_CURVE_a;
@@ -2102,6 +2121,46 @@ bool EditorToolkitNeume::SetLiquescent(std::string elementId, std::string curve)
         if (hasLiquscent) {
             Liquescent *liquescent = vrv_cast<Liquescent *>(nc->FindDescendantByType(LIQUESCENT));
             nc->DeleteChild(liquescent);
+        }
+    }
+
+    m_doc->GetDrawingPage()->LayOutTranscription(true);
+
+    m_editInfo.import("status", "OK");
+    m_editInfo.import("message", "");
+    return true;
+}
+
+bool EditorToolkitNeume::SetAquitanianElement(std::string elementId, std::string shape)
+{
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page.");
+        m_editInfo.import("status", "FAILURE");
+        m_editInfo.import("message", "Could not get the drawing page.");
+        return false;
+    }
+
+    Nc *nc = vrv_cast<Nc *>(m_doc->GetDrawingPage()->FindDescendantByID(elementId));
+    assert(nc);
+    bool hasQuilisma = nc->GetChildCount(QUILISMA);
+    bool hasOriscus = nc->GetChildCount(ORISCUS);
+
+    if (shape == "quilisma") {
+        if (!hasQuilisma && !hasOriscus) {
+            Quilisma *quisma = new Quilisma();
+            nc->AddChild(quisma);
+        }
+    }
+    else if (shape == "oriscus") {
+        if (!hasQuilisma && !hasOriscus) {
+            Oriscus *oriscus = new Oriscus();
+            nc->AddChild(oriscus);
+        }
+    }
+    else {
+        // For unset
+        if (hasQuilisma || hasOriscus) {
+            nc->DeleteChild(nc->GetFirst());
         }
     }
 
@@ -2480,7 +2539,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             Syllable *li = dynamic_cast<Syllable *>(element);
             assert(li);
             if (li->HasPrecedes() || li->HasFollows()) {
-                UnlinkSyllable(li);
+                this->UnlinkSyllable(li);
             }
             // Delete the syllable empty of neumes
             std::string syllableId = element->GetID();
@@ -2543,7 +2602,7 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
             zone->SetRotate(rotate);
         }
         zone->Modify();
-        SortStaves();
+        this->SortStaves();
 
         if (staff->HasDrawingRotation()) {
             ListOfObjects accids = staff->FindAllDescendantsByType(ACCID);
@@ -2689,8 +2748,8 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 if (linkedID.compare(0, 1, "#") == 0) linkedID.erase(0, 1);
 
                 // unlink
-                Set(parSyllable->GetID(), "follows", "");
-                Set(linkedID, "precedes", "");
+                this->Set(parSyllable->GetID(), "follows", "");
+                this->Set(linkedID, "precedes", "");
 
                 // group into two new syllables
                 int idx = static_cast<int>(std::distance(elementIds.begin(), it));
@@ -2698,7 +2757,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 std::string resultId1;
 
                 std::vector<std::string> elementIds0 = { elementIds.begin(), elementIds.begin() + idx };
-                Group("neume", elementIds0);
+                this->Group("neume", elementIds0);
                 if (m_editInfo.get<jsonxx::String>("status") == "FAILURE") {
                     resultId0 = linkedID;
                 }
@@ -2707,7 +2766,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 }
 
                 std::vector<std::string> elementIds1 = { elementIds.begin() + idx, elementIds.end() };
-                Group("neume", elementIds1);
+                this->Group("neume", elementIds1);
                 if (m_editInfo.get<jsonxx::String>("status") == "FAILURE") {
                     resultId1 = par->GetID();
                 }
@@ -2717,11 +2776,11 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 }
 
                 // link resulting syllables
-                Set(resultId0, "precedes", "#" + resultId1);
-                Set(resultId1, "follows", "#" + resultId0);
+                this->Set(resultId0, "precedes", "#" + resultId1);
+                this->Set(resultId1, "follows", "#" + resultId0);
                 Object *resultSyl1 = dynamic_cast<Object *>(par->FindDescendantByType(SYL));
                 if (resultSyl1 != NULL) {
-                    Remove(resultSyl1->GetID());
+                    this->Remove(resultSyl1->GetID());
                 }
 
                 jsonxx::Array uuidArray;
@@ -3509,10 +3568,10 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
         isLigature = true;
     }
     else {
-        Set(firstNcId, "tilt", "");
-        Set(secondNcId, "tilt", "");
-        Set(firstNcId, "curve", "");
-        Set(secondNcId, "curve", "");
+        this->Set(firstNcId, "tilt", "");
+        this->Set(secondNcId, "tilt", "");
+        this->Set(firstNcId, "curve", "");
+        this->Set(secondNcId, "curve", "");
     }
     // Remove liquescent if needed
     if (firstNc->GetChildCount() > 0) {
@@ -4134,6 +4193,22 @@ bool EditorToolkitNeume::ParseSetLiquescentAction(jsonxx::Object param, std::str
         return false;
     }
     *curve = param.get<jsonxx::String>("curve");
+    return true;
+}
+
+bool EditorToolkitNeume::ParseSetAquitanianElementAction(
+    jsonxx::Object param, std::string *elementId, std::string *shape)
+{
+    if (!param.has<jsonxx::String>("elementId")) {
+        LogWarning("Could not parse 'elementId'");
+        return false;
+    }
+    *elementId = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::String>("shape")) {
+        LogWarning("Could not parse 'shape'");
+        return false;
+    }
+    *shape = param.get<jsonxx::String>("shape");
     return true;
 }
 

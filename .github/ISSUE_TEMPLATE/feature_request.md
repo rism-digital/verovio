@@ -14,4 +14,4 @@ A clear and concise description of what the problem is. Ex. I'm always frustrate
 A clear and concise description of what you want to happen. If the feature request is about rendering, include an image or a link to one illustrating the rendering you would expect for the feature
 
 **Additional context**
-Include MEI encoding for the feature you are requesting. Make sure the example is **as minimal** and **as short** as possible. Eventually, the encoding will need to be added to the test suite.
+Include MEI encoding for the feature you are requesting. Make sure the example is **as minimal** and **as short** as possible but still a **complete** and **valid** MEI file. Eventually, the encoding will need to be added to the test suite.

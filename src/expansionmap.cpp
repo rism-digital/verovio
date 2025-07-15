@@ -68,7 +68,7 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
             }
             Expansion *currExpansion = vrv_cast<Expansion *>(currSect);
             assert(currExpansion);
-            Expand(currExpansion->GetPlist(), existingList, currSect);
+            this->Expand(currExpansion->GetPlist(), existingList, currSect);
         }
         else {
             if (std::find(existingList.begin(), existingList.end(), s)
@@ -219,7 +219,7 @@ bool ExpansionMap::UpdateIDs(Object *object)
             newIdString = this->GetExpansionIDsForElement(oldIdString).back();
             if (!newIdString.empty()) interface->SetSynch("#" + newIdString);
         }
-        UpdateIDs(o);
+        this->UpdateIDs(o);
     }
     return true;
 }

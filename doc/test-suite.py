@@ -101,8 +101,6 @@ if __name__ == '__main__':
             tk.loadFile(inputFile)
             # render to SVG
             svgString = tk.renderToSVG(1)
-            svgString = svgString.replace(
-                "overflow=\"inherit\"", "overflow=\"visible\"")
             ET.ElementTree(ET.fromstring(svgString)).write(svgFile)
             svg2png(bytestring=svgString, scale=2, write_to=pngFile)
             # create time map

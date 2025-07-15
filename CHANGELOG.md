@@ -1,5 +1,16 @@
 # Changelog
 
+## [unreleased]
+* Change timemap with `includeRests` to include also `mRest` and `multiRest`
+* Change JS initial memory allocation and drop JS light memory version
+* Change key names for `GetTimesForElement` to be inline with the timemap keys
+* Fix order of the SVG `defs/g` to be always the same across runs
+* Fix title and control event bugs in ABC import (@rettinghaus)
+* Fix bug with multi-measure rests in MusicXML import (@rettinghaus)
+* Fix spacing / duration of measure rests in measures not metrically conformant
+* Fix values returned by `GetTimesForElement`
+* Fix SVG dimensions with `--scale-to-page-size` and `-adjust-page-height` (or width)
+
 ## [5.3.2] – 2025-05-28
 * Fix bug in toolkit select
 

@@ -33,7 +33,7 @@ static const ClassRegistrar<Syllable> s_factory("syllable", SYLLABLE);
 
 Syllable::Syllable() : LayerElement(SYLLABLE), ObjectListInterface(), AttColor(), AttSlashCount()
 {
-    Init();
+    this->Init();
 }
 
 void Syllable::Init()
