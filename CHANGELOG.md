@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+
+## [5.4.0] – 2025-07-15 
 * Change timemap with `includeRests` to include also `mRest` and `multiRest`
 * Change JS initial memory allocation and drop JS light memory version
 * Change key names for `GetTimesForElement` to be inline with the timemap keys
