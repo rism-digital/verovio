@@ -1,0 +1,44 @@
+! 31-EDO.ascl
+!
+31 equal divisions of an octave. 31 proportionally equal and equal sounding semitone intervals per octave.
+!
+! default tuning: degree 23 (890.3225806 cents) 440 Hz, or degree 0 = 263.0921203 Hz
+!
+31
+!
+38.70967742 ! >C
+77.41935484 ! C♯
+116.1290323 ! D♭
+154.8387097 ! <D
+193.5483871 ! D
+232.2580645 ! >D
+270.9677419 ! D♯
+309.6774194 ! E♭
+348.3870968 ! <E
+387.0967742 ! E
+425.8064516 ! F♭
+464.516129 ! E♯
+503.2258065 ! F
+541.9354839 ! >F
+580.6451613 ! F♯
+619.3548387 ! G♭
+658.0645161 ! <G
+696.7741935 ! G
+735.483871 ! >G
+774.1935484 ! G♯
+812.9032258 ! A♭
+851.6129032 ! <A
+890.3225806 ! A
+929.0322581 ! >A
+967.7419355 ! A♯
+1006.451613 ! B♭
+1045.16129 ! <B
+1083.870968 ! B
+1122.580645 ! C♭
+1161.290323 ! B♯
+2/1 ! C
+!
+! @ABL NOTE_NAMES "C" ">C" "C♯" "D♭" "<D" "D" ">D" "D♯" "E♭" "<E" "E" "F♭" "E♯" "F" ">F" "F♯" "G♭" "<G" "G" ">G" "G♯" "A♭" "<A" "A" ">A" "A♯" "B♭" "<B" "B" "C♭" "B♯"
+! @ABL REFERENCE_PITCH 3 23 440.0
+! @ABL NOTE_RANGE_BY_INDEX 1 16 5 19
+! @ABL LINK https://www.ableton.com/learn-more/tuning-systems/31-edo

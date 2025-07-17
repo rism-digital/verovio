@@ -3760,17 +3760,12 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
     assert(node);
     assert(section);
 
-    // get Scala tuning
-    pugi::xpath_node scalaTuning = node.select_node("play/other-play[@type='scalaTuning']");
-    pugi::xpath_node keyboardMapping = node.select_node("play/other-play[@type='keyboardMapping']");
-    if (!scalaTuning != !keyboardMapping) {
-        LogError("MusicXML import: Expecting both scalaTuning and keyboardMapping.");
-    }
-    else if (scalaTuning) {
-        const std::string scl = scalaTuning.node().text().as_string();
-        const std::string kbm = keyboardMapping.node().text().as_string();
-        LogDebug("MusicXML import: \n%s\n%s", scl.c_str(), kbm.c_str());
-        m_doc->GetFirstScoreDef()->SetTuneScala(std::pair(scl, kbm));
+    // get Ableton tuning
+    pugi::xpath_node abletonTuning = node.select_node("play/other-play[@type='abletonTuning']");
+    if (abletonTuning) {
+        const std::string ascl = abletonTuning.node().text().as_string();
+        LogDebug("MusicXML import: \n%s", ascl.c_str());
+        m_doc->GetFirstScoreDef()->SetTuneAbleton(ascl);
     }
 }
 

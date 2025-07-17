@@ -1,0 +1,62 @@
+! All Maqamat 24EDO.ascl
+!
+This pitch set enables 24-EDO versions of nearly all possible maqamat from a given tonic key (in this case C, but transposable to any pitch), including those of the Rast family as well as Bayati/Saba/Kurd/Hijaz and maqamat of those families. D1/2♭, E1/2♭, A1/2♭, and B1/2♭ are added to the standard 12 pitches. Provided by Sami Abu Shumays. Visit the website to learn more.
+!
+! Jins modulations possible within this pitch set:
+! Rast C: C D E1/2♭ F G
+! Nahawand C: C D E♭ F G
+! Nikriz C: C D E♭ F♯ G
+! Sikah E1/2♭: (D♯) E1/2♭ F G A♭
+! Nahawand G: G A B♭ C
+! Upper Rast G: G A B1/2♭ C
+! Hijaz G: G A♭ B C D E♭
+! Bayati G: G A1/2♭ B♭ C D E♭
+! Saba G: G A1/2♭ B♭ C♭ D E♭
+! Kurd G: G A♭ B♭ C D E♭
+! Hijazkar G: E♭ F♯ G A♭ B♮
+! Saba Dalanshin A: A B1/2♭ C D♭ E♮ F
+! Jiharkah C: B1/2♭ C D E♮
+! Hijaz C: C D♭ E F (G)
+! Bayati C: C D1/2♭ E♭ F (G)
+! Hijaz F: F G♭ A♮ B♭
+! (Maqam) Saba C: C D1/2♭ E♭ F♭(E♮) G A♭ B♭ C♭ D♮ E♭
+! Kurd D: C D♭ E♭ F (G)
+! Nahawand F: (E♮) F G A♭ B♭ C
+! Nikriz F: F G A♭ B♮ C
+! Rast F: D♮ E1/2♭ F G A1/2♭ B♭ C
+! Sikah A1/2♭: (G♯) A1/2♭ B♭ C D♭
+! Ajam F: F G A B♭ C
+! (Maqam) Zanjaran C: C D♭ E F G A B♭ C
+! Hijazkar C: A♭ B♮ C D♭ E♮
+! Hijaz Murassaa C: C D♭ E F G♭
+! Sikah Baladi C: A1/2♭ B1/2♭ C D1/2♭ E1/2♭
+!
+! References:
+! Inside Arabic Music, Chapter 11 (description of Tuning System); Ch 14-16 (descriptions of Ajnas); Ch 24 (Sayr diagrams)
+! http://maqamworld.com/en/index.php  * Maqam World Website, including Maqam and Jins Scales
+! https://www.youtube.com/user/abushumays * "Maqam Lessons" YouTube series, teaching the melodic vocabulary of the ajnas and maqamat
+!
+16
+!
+100.    ! D♭/C♯ for Saba Dalanshin A
+150.    ! D1/2♭ for Bayati/Saba C
+200.    ! D
+300.    ! E♭/D♯
+350.    ! E1/2♭ for Rast C and Rast F
+400.    ! E♮
+500.    ! F
+600.    ! F♯
+700.    ! G
+800.    ! A♭
+850.    ! A1/2♭ for Bayati G/Saba G and Rast F
+900.    ! A
+1000.   ! B♭
+1050.   ! B1/2♭ for Rast C
+1100.   ! B♮/C♭
+1200.
+!
+! @ABL NOTE_NAMES C D♭/C♯ D1/2♭ D E♭/D♯ E1/2♭ E♮ F F♯ G A♭ A1/2♭ A B♭ B1/2♭ B♮/C♭
+! @ABL REFERENCE_PITCH 3 0 261.6256
+! @ABL NOTE_RANGE_BY_INDEX -1 4 7 3
+! @ABL SOURCE Inside Arabic Music, Chapter 11 (description of Tuning System); Ch 14-16 (descriptions of Ajnas); Ch 24 (Sayr diagrams)
+! @ABL LINK https://www.ableton.com/learn-more/tuning-systems/all-maqamat-24edo

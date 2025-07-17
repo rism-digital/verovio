@@ -7396,9 +7396,9 @@ public:
     data_TEMPERAMENT GetTuneTemper() const { return m_tuneTemper; }
     bool HasTuneTemper() const;
     //
-    void SetTuneScala(std::pair<std::string, std::string> tuneScala_) { m_tuneScala = tuneScala_; }
-    std::pair<std::string, std::string> GetTuneScala() const { return m_tuneScala; }
-    bool HasTuneScala() const;
+    void SetTuneAbleton(std::string tuneAbleton_) { m_tuneAbleton = tuneAbleton_; }
+    std::string GetTuneAbleton() const { return m_tuneAbleton; }
+    bool HasTuneAbleton() const;
     ///@}
 
 private:
@@ -7411,8 +7411,8 @@ private:
     data_PITCHNAME m_tunePname;
     /** Provides an indication of the tuning system, just, for example. **/
     data_TEMPERAMENT m_tuneTemper;
-    /** Provides a Scala tuning: scale definition (.scl file) and keyboard mapping definition (.kbm file). **/
-    std::pair<std::string, std::string> m_tuneScala;
+    /** Provides an Ableton (.ascl) tuning. **/
+    std::string m_tuneAbleton;
 };
 
 //----------------------------------------------------------------------------

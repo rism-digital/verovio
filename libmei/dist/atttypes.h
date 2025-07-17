@@ -1701,7 +1701,7 @@ enum data_TEMPERAMENT : int8_t {
     TEMPERAMENT_just,
     TEMPERAMENT_mean,
     TEMPERAMENT_pythagorean,
-    TEMPERAMENT_scala,
+    TEMPERAMENT_ableton,
     TEMPERAMENT_MAX
 };
 

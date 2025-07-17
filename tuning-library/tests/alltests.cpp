@@ -66,7 +66,7 @@ TEST_CASE("Loading tuning files")
         REQUIRE_NOTHROW(Tunings::parseKBMData(oss.str()));
     }
 
-    SECTION("Comments saved properly")
+    SECTION("Comments read properly")
     {
         auto s = Tunings::readSCLFile(testFile("rast.ascl"));
         REQUIRE(s.comments.size() == 24);
@@ -1354,12 +1354,38 @@ TEST_CASE("Loading Ableton scales")
         REQUIRE(s.rawTexts.size() == 4);
         REQUIRE(s.rawTexts[0] == "! @ABL NOTE_NAMES C D♭ D \"E♭\" E1/2♭ F F♯ G A♭ A B♭ \"B1/2♭\"");
         REQUIRE(s.notationMapping.count == 12);
-        REQUIRE(s.notationMapping.names[11] == "B1/2♭");
+        REQUIRE(s.notationMapping.names[11] == "C");
+        REQUIRE(s.keyboardMapping.count == 12);
+        REQUIRE(s.keyboardMapping.keys.size() == 12);
+        REQUIRE(s.keyboardMapping.tuningFrequency == Approx(261.6256));
+        REQUIRE(s.keyboardMapping.middleNote == 60);
+        REQUIRE(s.keyboardMapping.tuningConstantNote == 60);
+    }
+
+    SECTION("ASCL compared with Ableton-generated KBM")
+    {
+        std::string files[3] = {"maqamat", "31-edo", "liwung-tbn"};
+        for (std::string file : files) {
+            auto s = Tunings::readASCLFile(testFile(file + ".ascl"));
+            auto k = Tunings::readKBMFile(testFile(file + ".kbm"));
+            REQUIRE(s.keyboardMapping.count == k.count);
+            REQUIRE(s.keyboardMapping.tuningFrequency == k.tuningFrequency);
+            REQUIRE(s.keyboardMapping.middleNote == k.middleNote);
+            REQUIRE(s.keyboardMapping.tuningConstantNote == k.tuningConstantNote);
+        }
     }
 
     SECTION("Bad ASCL file")
     {
         REQUIRE_THROWS_AS(Tunings::readASCLFile(testFile("bad/bad-rast.ascl")), Tunings::TuningError);
+    }
+
+    SECTION("Tuning read with ASCL")
+    {
+        auto s = Tunings::readASCLFile(testFile("rast.ascl"));
+        Tunings::Tuning t(s);
+        REQUIRE(t.frequencyForMidiNote(s.keyboardMapping.tuningConstantNote) == Approx(s.referencePitchFreq));
+        REQUIRE(t.scalePositionForMidiNote(s.keyboardMapping.tuningConstantNote) == s.referencePitchIndex);
     }
 }
 
