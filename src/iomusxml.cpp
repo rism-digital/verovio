@@ -1701,6 +1701,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         if (IsElement(child, "attributes")) {
             this->ReadMusicXmlAttributes(child, section, measure, measureNum);
         }
+        else if (IsElement(child, "sound")) {
+            this->ReadMusicXmlSound(child, measure);
+        }
         else if (IsElement(child, "backup")) {
             this->ReadMusicXmlBackup(child, measure, measureNum);
         }
@@ -1725,9 +1728,6 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         // for now only check first part
         else if (IsElement(child, "print") && node.select_node("parent::part[not(preceding-sibling::part)]")) {
             this->ReadMusicXmlPrint(child, section);
-        }
-        else if (IsElement(child, "sound")) {
-            this->ReadMusicXmlSound(child, measure);
         }
     }
 
@@ -3761,10 +3761,9 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
     assert(section);
 
     // get Ableton tuning
-    pugi::xpath_node abletonTuning = node.select_node("play/other-play[@type='abletonTuning']");
+    pugi::xpath_node abletonTuning = node.select_node("play/other-play[@type='ableton-tuning']");
     if (abletonTuning) {
-        const std::string ascl = abletonTuning.node().text().as_string();
-        LogDebug("MusicXML import: \n%s", ascl.c_str());
+        const std::string ascl = std::regex_replace(abletonTuning.node().text().as_string(), std::regex{R"(^\s+|\s+$)"}, "");
         m_doc->GetFirstScoreDef()->SetTuneAbleton(ascl);
     }
 }

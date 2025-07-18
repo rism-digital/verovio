@@ -7396,7 +7396,7 @@ public:
     data_TEMPERAMENT GetTuneTemper() const { return m_tuneTemper; }
     bool HasTuneTemper() const;
     //
-    void SetTuneAbleton(std::string tuneAbleton_) { m_tuneAbleton = tuneAbleton_; }
+    void SetTuneAbleton(std::string tuneAbleton_) { m_tuneAbleton = tuneAbleton_; m_tuneTemper = TEMPERAMENT_ableton; }
     std::string GetTuneAbleton() const { return m_tuneAbleton; }
     bool HasTuneAbleton() const;
     ///@}

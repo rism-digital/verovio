@@ -12,7 +12,6 @@
 //
 
 #include "MidiMessage.h"
-#include "Tunings.h"
 
 #include <cmath>
 #include <cstdlib>
@@ -20,6 +19,7 @@
 #include <iostream>
 #include <iterator>
 
+#include "Tunings.h"
 
 namespace smf {
 
@@ -2359,7 +2359,13 @@ void MidiMessage::makeTemperamentMeantoneCommaHalf(int referencePitchClass, int 
 //
 
 void MidiMessage::makeTemperamentAbleton(std::string tuneAbleton, int referencePitchClass, int channelMask) {
-	std::cerr << "Error: TODO" << std::endl;
+	try {
+		// TODO This should be moved to MusicXmlInput::ReadMusicXmlSound() when the tuning is read.
+		Tunings::Tuning t(Tunings::parseASCLData(tuneAbleton));
+	}
+	catch (Tunings::TuningError& error) {
+		std::cerr << "Error parsing Ableton tuning: " << error.what() << std::endl;
+	}
 }
 
 
