@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mkdir -p src/main/java/org/rismch/verovio
+mkdir -p src/main/java/org/verovio/lib
 mkdir -p target
 mkdir -p target/classes/META-INF/lib
 
@@ -9,7 +9,7 @@ cd ..
 ../tools/get_git_commit.sh
 cd java
 
-swig -c++ -java -package org.rismch.verovio -outdir src/main/java/org/rismch/verovio verovio.i
+swig -c++ -java -package org.verovio.lib -outdir src/main/java/org/verovio/lib verovio.i
 
 SRCFILES=$(\ls ../../src/*.cpp ../../libmei/dist/*.cpp ../../libmei/addons/*.cpp)
 
