@@ -1,6 +1,5 @@
 framework module VerovioToolkit {
   umbrella header "VerovioToolkit-umbrella.h"
 
-  export *
-  module * { export * }
+  export c_wrapper
 }

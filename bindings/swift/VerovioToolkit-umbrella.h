@@ -14,7 +14,7 @@
   #endif
 #endif
 
-#import "veroviotoolkit/c_wrapper.h"
+#import <veroviotoolkit/c_wrapper.h>
 
 FOUNDATION_EXPORT double VerovioToolkitVersionNumber;
 FOUNDATION_EXPORT const unsigned char VerovioToolkitVersionString[];
