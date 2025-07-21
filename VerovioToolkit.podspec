@@ -6,15 +6,17 @@ Pod::Spec.new do |s|
   s.authors        = { 'Contributors List' => 'https://github.com/rism-digital/verovio/graphs/contributors' }
   s.summary        = 'VerovioToolkit'
   s.source         = { :git => 'https://github.com/rism-digital/verovio.git', :branch => 'develop-java' }
-  s.source_files   = 'src/**/*.{h,cpp,cc}',
-      'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
-      'libmei/{dist,addons}/*.{h,cpp}',
-      'tools/c_wrapper.{h,cpp}',
-      'bindings/swift/*.{h,swift}'
-  s.private_header_files = 'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
-      'libmei/{dist,addons}/*.{h}',
-      'tools/c_wrapper.h',
-      'bindings/swift/VerovioToolkit-umbrella.h'
+  s.source_files   = [
+    'src/**/*.{h,cpp,cc}',
+    'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
+    'libmei/{dist,addons}/*.{h,cpp}',
+    'tools/c_wrapper.{h,cpp}',
+    'bindings/swift/*.{h,swift}'
+  ]
+  s.private_header_files = [
+    'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
+    'libmei/{dist,addons}/*.h'
+  ]
   s.module_map = 'bindings/swift/VerovioToolkit.modulemap'
   s.resources      = 'data'
   s.ios.deployment_target = '16.0'
