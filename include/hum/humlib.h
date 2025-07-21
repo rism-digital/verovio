@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Jul 10 05:31:52 CEST 2025
+// Last Modified: Fri Jul 18 20:55:29 CEST 2025
 // Filename:      min/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.h
 // Syntax:        C++11
@@ -4366,6 +4366,7 @@ class GotScore {
 				std::ostream& print(std::ostream& out);
 
 				void printKernBarline(std::ostream& out, bool textQ);
+				void printTempoLine(std::ostream& out, const std::string& met, bool textQ);
 
 				// Each rhythm+pitch pairing with computed start time and duration
 				class TimedEvent {
@@ -4384,11 +4385,25 @@ class GotScore {
 				// m_barnum: The measure number for the measure.
 				std::string m_barnum;
 
+				// m_linebreak: The linebreak group to add to end of measure
+				// when converting to **got or **kern  There are two labels:
+				//    half = linebreak at the half-system at the binding between
+				//           physical pages (each system takes up two pages width).
+				//    original = linebreak at the end of a system.
+				//    and empty m_linebreak means that there are no breaks after
+				//    this measure.
+				// To encode half breaks, add the letter "p" to the end of the 
+				// current measure number.  This will be removed from the text of
+				// m_barline, and the "p" will convert to "half" in m_linebreak.
+				// The end of the system will be inferred from the system number in
+				// the GOT TSV data.
+				std::string m_linebreak;
+
 				// m_text: the text content for the measure.
 				std::string m_text;
 
 				// m_error: Any parsing error message when converting to **kern
-				std::string m_error;
+				std::vector<std::string> m_error;
 
 				// m_rhythms: First dimension is voice (highest to lowest)
 				// Second dimension is rhythm "word" first to last in measure
@@ -4485,6 +4500,14 @@ class GotScore {
 		void     storePitchHistograms     (std::vector<std::vector<std::string*>>& P);
 		std::vector<std::string> generateVoiceClefs(void);
 		std::string chooseClef(double mean, double min, double max);
+		void     trimSpaces(std::string& s);
+
+		static int kernToBase40PC       (const std::string& kerndata);
+		static int kernToAccidentalCount(const std::string& kerndata);
+		static int kernToBase12PC       (const std::string& kerndata);
+		static int kernToOctaveNumber   (const std::string& kerndata);
+		static int kernToMidiNoteNumber (const std::string& kerndata);
+		static int kernToDiatonicPC     (const std::string& kerndata);
 
 		std::vector<std::string> tokenizeRhythmString (const std::string& input);
 		std::vector<std::string> tokenizePitchString  (const std::string& input);
@@ -6099,6 +6122,7 @@ class Tool_autobeam : public HumTool {
 		std::vector<bool> m_tracks;
 		bool        m_includerests = false;
 		int         m_splitcount = 0;
+		HumNum      m_duration = 0;
 
 };
 
