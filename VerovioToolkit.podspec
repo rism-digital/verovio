@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
   s.homepage       = 'https://www.verovio.org/index.xhtml'
   s.authors        = { 'Contributors List' => 'https://github.com/rism-digital/verovio/graphs/contributors' }
   s.summary        = 'VerovioToolkit'
-  s.source         = { :git => 'https://github.com/rism-digital/verovio.git', :tag => 'version-' + s.version.to_s }
+  s.source         = { :git => 'https://github.com/rism-digital/verovio.git', :branch => 'develop-java' }
   s.source_files   = 'src/**/*.{h,cpp,cc}',
       'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
       'libmei/{dist,addons}/*.{h,cpp}',
@@ -33,7 +33,8 @@ Pod::Spec.new do |s|
       "MTL_FAST_MATH" => "YES",
       "SUPPORTS_UIKITFORMAC" => "NO",
       "MTL_ENABLE_DEBUG_INFO" => "NO",
-      "PRODUCT_BUNDLE_IDENTIFIER" => "digital.rism.VerovioToolkitFramework"
+      "PRODUCT_BUNDLE_IDENTIFIER" => "digital.rism.VerovioToolkitFramework",
+      "SWIFT_VERSION" => "5.0"
     }
 end
 
