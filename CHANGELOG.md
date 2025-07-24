@@ -1,7 +1,7 @@
 # Changelog
 
 ## [unreleased]
-* Fix crash with trying to load data without loaded resources
+* Fix crash when trying to load data without loaded resources
 
 ## [5.4.0] – 2025-07-15 
 * Change timemap with `includeRests` to include also `mRest` and `multiRest`
