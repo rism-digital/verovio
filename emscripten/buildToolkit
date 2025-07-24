@@ -52,7 +52,7 @@ die "ERROR: emscripten make (emmake) not found.\n" unless $EMMAKE;
 
 # Parse command-line options
 my ($version, $chattyQ, $helpQ, $exclusion, $wasmQ, $makeQ, $modularizeQ, $debug);
-my ($nopae, $nohumdrum, $nomusicxml, $nodarms);
+my ($noabc, $nodarms, $nohumdrum, $nomusicxml, $nopae);
 my ($FLAGS_NAME, $VERSION, $CHATTY);
 
 my $cpp = 20; # c++ version to compile (11, 14, 17)
@@ -67,13 +67,14 @@ GetOptions (
 	'v|version=s'   => \$VERSION,
 	'x|exclusion=s' => \$exclusion,
 	'w|wasm'        => \$wasmQ,
-	'm|modularize' => \$modularizeQ,
+	'm|modularize'  => \$modularizeQ,
+	'A|no-abc'      => \$noabc,
 	'D|no-darms'    => \$nodarms,
 	'H|no-humdrum'  => \$nohumdrum,
 	'P|no-pae'      => \$nopae,
 	'X|no-musicxml' => \$nomusicxml,
-	'M|make' => \$makeQ,
-	'd|debug' => \$debug
+	'M|make'        => \$makeQ,
+	'd|debug'       => \$debug
 );
 
 # Default compiling uses ASM and large file support.
@@ -168,10 +169,11 @@ print "Creating commit version header file...\n";
 my $defines = "-DUSE_EMSCRIPTEN";
 
 my $cmake = "-DBUILD_AS_WASM=ON";
-$cmake .= " -DNO_PAE_SUPPORT=ON" if ($nopae);
+$cmake .= " -DNO_ABC_SUPPORT=ON" if ($noabc);
 $cmake .= " -DNO_DARMS_SUPPORT=ON" if ($nodarms);
 $cmake .= " -DNO_HUMDRUM_SUPPORT=ON" if ($nohumdrum);
 $cmake .= " -DNO_MUSICXML_SUPPORT=ON" if ($nomusicxml);
+$cmake .= " -DNO_PAE_SUPPORT=ON" if ($nopae);
 
 my $embed   = "--embed-file $DATA_DIR/";
 my $output  = "-o $BUILD_DIR/verovio.js";
