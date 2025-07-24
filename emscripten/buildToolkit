@@ -80,7 +80,6 @@ GetOptions (
 # Default compiling uses ASM and large file support.
 # Memory is increased (STACK_SIZE) for processing large files (tested up to 7MB)
 # Empirically, the memory amount required is roughly 5 times the file size.
-# This can be disabled in the light version, which uses the default memory settings.
 my $FLAGS = "-O3";
 $FLAGS .= " -DNDEBUG";
 $FLAGS .= " -std=c++$cpp";
