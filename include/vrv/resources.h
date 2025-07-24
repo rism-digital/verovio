@@ -53,6 +53,9 @@ public:
     void SetPath(const std::string &path) { m_path = path; }
     ///@}
 
+    /** Status checker */
+    bool Ok() const { return (m_loadedFonts.size() > 1); }
+
     /**
      * Font initialization
      */
