@@ -2355,17 +2355,11 @@ void MidiMessage::makeTemperamentMeantoneCommaHalf(int referencePitchClass, int 
 
 //////////////////////////////
 //
-// MidiMessage::makeTemperamentAbleton -- Custom tuning based on Ableton .ascl file.
+// MidiMessage::makeTemperamentCustom -- Custom tuning
 //
 
-void MidiMessage::makeTemperamentAbleton(std::string tuneAbleton, int referencePitchClass, int channelMask) {
-	try {
-		// TODO This should be moved to MusicXmlInput::ReadMusicXmlSound() when the tuning is read.
-		Tunings::Tuning t(Tunings::parseASCLData(tuneAbleton));
-	}
-	catch (Tunings::TuningError& error) {
-		std::cerr << "Error parsing Ableton tuning: " << error.what() << std::endl;
-	}
+void MidiMessage::makeTemperamentCustom(Tunings::Tuning tuneCustom, int referencePitchClass, int channelMask) {
+	std::cout << "makeTemperamentCustom" << std::endl;
 }
 
 

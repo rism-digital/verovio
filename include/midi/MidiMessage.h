@@ -14,6 +14,8 @@
 #ifndef _MIDIMESSAGE_H_INCLUDED
 #define _MIDIMESSAGE_H_INCLUDED
 
+#include "Tunings.h"
+
 #include <iostream>
 #include <string>
 #include <utility>
@@ -203,7 +205,7 @@ class MidiMessage : public std::vector<uchar> {
 		void           makeTemperamentMeantoneCommaQuarter(int referencePitchClass = 2, int channelMask = 0b1111111111111111);
 		void           makeTemperamentMeantoneCommaThird(int referencePitchClass = 2, int channelMask = 0b1111111111111111);
 		void           makeTemperamentMeantoneCommaHalf(int referencePitchClass = 2, int channelMask = 0b1111111111111111);
-		void           makeTemperamentAbleton(std::string tuneAbleton, int referencePitchClass = 2, int channelMask = 0b1111111111111111);
+		void           makeTemperamentCustom(Tunings::Tuning tuneCustom, int referencePitchClass = 2, int channelMask = 0b1111111111111111);
 
 };
 

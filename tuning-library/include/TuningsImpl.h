@@ -24,6 +24,7 @@
 #include <regex>
 #include <numeric>
 #include <limits>
+#include <algorithm>
 
 namespace Tunings
 {
@@ -71,6 +72,14 @@ inline double locale_atof(const char *s)
     istr.imbue(std::locale("C"));
     istr >> result;
     return result;
+}
+
+inline unsigned positive_mod(int v, unsigned m)
+{
+    int mod = v % (int)m;
+    if (mod < 0)
+        mod += m;
+    return mod;
 }
 
 inline Tone toneFromString(const std::string &fullLine, int lineno)
@@ -864,6 +873,22 @@ inline bool Tuning::isMidiNoteMapped(int mn) const
     return scalepositiontable[mni] >= 0;
 }
 
+inline int Tuning::midiNoteForNoteName(std::string noteName, int octave) const
+{
+    const auto it = std::find(notationMapping.names.begin(), notationMapping.names.end(), noteName);
+    if (it == notationMapping.names.end())
+    {
+        std::string s = "Invalid note name '" + noteName + "'";
+        throw TuningError(s);
+    }
+    int scalePosition = positive_mod(it - notationMapping.names.begin() + 1, notationMapping.count);
+    int referencePitchOctave = ceil((keyboardMapping.middleNote - 21) / 12);
+    return std::min(
+        std::max(0, scalePosition + keyboardMapping.middleNote +
+                        keyboardMapping.octaveDegrees * (octave - referencePitchOctave)),
+        N - 1);
+}
+
 inline Tuning Tuning::withSkippedNotesInterpolated() const
 {
     Tuning res = *this;
@@ -936,14 +961,6 @@ inline KeyboardMapping startScaleOnAndTuneNoteTo(int scaleStart, int midiNote, d
     return parseKBMData(oss.str());
 }
 
-inline unsigned positive_mod(int v, unsigned m)
-{
-    int mod = v % (int)m;
-    if (mod < 0)
-        mod += m;
-    return mod;
-}
-
 inline AbletonScale readASCLStream(std::istream &inf)
 {
     AbletonScale as;
@@ -961,8 +978,8 @@ inline AbletonScale readASCLStream(std::istream &inf)
     as.keyboardMapping.count = as.scale.count;
     as.keyboardMapping.firstMidi = 0;
     as.keyboardMapping.lastMidi = 127;
-    as.keyboardMapping.middleNote = as.scalePositionToMidiNote(0);
-    as.keyboardMapping.tuningConstantNote = as.scalePositionToMidiNote(0);
+    as.keyboardMapping.middleNote = as.midiNoteForScalePosition(0);
+    as.keyboardMapping.tuningConstantNote = as.midiNoteForScalePosition(0);
     as.keyboardMapping.octaveDegrees = as.keyboardMapping.count;
     as.keyboardMapping.keys = std::vector<int>(as.keyboardMapping.count);
     std::iota(as.keyboardMapping.keys.begin(), as.keyboardMapping.keys.end(), 0);
@@ -971,7 +988,8 @@ inline AbletonScale readASCLStream(std::istream &inf)
     for (const auto &comment : as.scale.comments)
     {
         std::smatch command;
-        if (!std::regex_match(comment, command, std::regex("!\\s+@ABL\\s+(.*?)\\s+(.*?)$"))) continue;
+        if (!std::regex_match(comment, command, std::regex("!\\s+@ABL\\s+(.*?)\\s+(.*?)$")))
+            continue;
         as.rawTexts.push_back(command[0]);
         if (command[1] == "NOTE_NAMES")
         {
@@ -981,20 +999,21 @@ inline AbletonScale readASCLStream(std::istream &inf)
             std::string::const_iterator search_start(rawText.cbegin());
             while (std::regex_search(search_start, rawText.cend(), note_names, note_name_regex))
             {
-                as.notationMapping.names.push_back(std::string(note_names[1]) + std::string(note_names[2]));
+                as.notationMapping.names.push_back(std::string(note_names[1]) +
+                                                   std::string(note_names[2]));
                 search_start = note_names.suffix().first;
             }
 
             // Move first note to last to correspond to scale.tones
-            std::rotate(as.notationMapping.names.begin(), as.notationMapping.names.begin() + 1, as.notationMapping.names.end());
+            std::rotate(as.notationMapping.names.begin(), as.notationMapping.names.begin() + 1,
+                        as.notationMapping.names.end());
 
             as.notationMapping.count = as.notationMapping.names.size();
             if (as.notationMapping.count != as.scale.count)
             {
-                std::string s = "Invalid NOTE_NAMES entry '" +
-                    rawText + "': Expecting " +
-                    std::to_string(as.scale.count) + " entries but received " +
-                    std::to_string(as.notationMapping.count);
+                std::string s = "Invalid NOTE_NAMES entry '" + rawText + "': Expecting " +
+                                std::to_string(as.scale.count) + " entries but received " +
+                                std::to_string(as.notationMapping.count);
                 throw TuningError(s);
             }
         }
@@ -1002,15 +1021,17 @@ inline AbletonScale readASCLStream(std::istream &inf)
         {
             std::string rp = command[2];
             std::smatch reference_pitch;
-            if (std::regex_match(rp, reference_pitch, std::regex("\\s*(\\d+)\\s*(\\d+)\\s*([\\d.]+)\\s*$")))
+            if (std::regex_match(rp, reference_pitch,
+                                 std::regex("\\s*(\\d+)\\s*(\\d+)\\s*([\\d.]+)\\s*$")))
             {
                 as.referencePitchOctave = std::stoi(reference_pitch[1]);
                 as.referencePitchIndex = std::stoi(reference_pitch[2]);
-                as.referencePitchFreq = std::stod(reference_pitch[3]);
+                as.referencePitchFreq = locale_atof(reference_pitch.str(3).c_str());
                 as.keyboardMapping.tuningFrequency = as.referencePitchFreq;
                 as.keyboardMapping.tuningPitch = as.keyboardMapping.tuningFrequency / MIDI_0_FREQ;
-                as.keyboardMapping.tuningConstantNote = as.scalePositionToMidiNote(as.referencePitchIndex);
-                as.keyboardMapping.middleNote = as.scalePositionToMidiNote(0);
+                as.keyboardMapping.tuningConstantNote =
+                    as.midiNoteForScalePosition(as.referencePitchIndex);
+                as.keyboardMapping.middleNote = as.midiNoteForScalePosition(0);
             }
             else
             {
@@ -1044,17 +1065,17 @@ inline AbletonScale readASCLStream(std::istream &inf)
     return as;
 }
 
-inline int AbletonScale::scalePositionToMidiNote(int scalePosition)
+inline int AbletonScale::midiNoteForScalePosition(int scalePosition)
 {
-    auto middleFreq = 440.0 * std::pow(2, (60.0 - 69.0) / 12);
-    auto middleIndex = freqToScalePosition(middleFreq);
+    auto middleFreq = MIDI_0_FREQ * (1 << 5);
+    auto middleIndex = scalePositionForFrequency(middleFreq);
     return std::max(0, std::min(60 + (scalePosition - middleIndex), 127));
 }
 
-inline int AbletonScale::freqToScalePosition(double freq)
+inline int AbletonScale::scalePositionForFrequency(double freq)
 {
     auto n = 0;
-    auto r = scalePositionToFreq(n);
+    auto r = frequencyForScalePosition(n);
     auto o = freq - r;
     auto i = o > 0 ? 1 : -1;
     auto s = std::abs(o);
@@ -1065,7 +1086,7 @@ inline int AbletonScale::freqToScalePosition(double freq)
     while (!l)
     {
         n += i;
-        r = scalePositionToFreq(n);
+        r = frequencyForScalePosition(n);
         o = std::abs(freq - r);
         if (o < s)
         {
@@ -1080,14 +1101,14 @@ inline int AbletonScale::freqToScalePosition(double freq)
     return a;
 }
 
-inline double AbletonScale::scalePositionToFreq(int scalePosition)
+inline double AbletonScale::frequencyForScalePosition(int scalePosition)
 {
-    return referencePitchFreq * pow(2, (
-        scalePositionToCents(scalePosition) - scalePositionToCents(referencePitchIndex)
-    ) / 1200);
+    return referencePitchFreq * pow(2, (centsForScalePosition(scalePosition) -
+                                        centsForScalePosition(referencePitchIndex)) /
+                                           1200);
 }
 
-inline double AbletonScale::scalePositionToCents(int scalePosition)
+inline double AbletonScale::centsForScalePosition(int scalePosition)
 {
     auto n = scale.tones.size();
     auto t = scale.tones[positive_mod(scalePosition, n)];

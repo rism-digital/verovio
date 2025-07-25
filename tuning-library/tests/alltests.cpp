@@ -1349,7 +1349,8 @@ TEST_CASE("Loading Ableton scales")
     {
         auto s = Tunings::readASCLFile(testFile("rast.ascl"));
         REQUIRE(s.scale.count == 12);
-        REQUIRE(s.source == "Inside Arabic Music, Chapter 11 (description of Tuning System); Ch 14-16 (descriptions of Ajnas); Ch 24 (Sayr diagrams)");
+        REQUIRE(s.source == "Inside Arabic Music, Chapter 11 (description of Tuning System); Ch "
+                            "14-16 (descriptions of Ajnas); Ch 24 (Sayr diagrams)");
         REQUIRE(s.link == "https://www.ableton.com/learn-more/tuning-systems/rast-1");
         REQUIRE(s.rawTexts.size() == 4);
         REQUIRE(s.rawTexts[0] == "! @ABL NOTE_NAMES C D♭ D \"E♭\" E1/2♭ F F♯ G A♭ A B♭ \"B1/2♭\"");
@@ -1365,7 +1366,8 @@ TEST_CASE("Loading Ableton scales")
     SECTION("ASCL compared with Ableton-generated KBM")
     {
         std::string files[3] = {"maqamat", "31-edo", "liwung-tbn"};
-        for (std::string file : files) {
+        for (std::string file : files)
+        {
             auto s = Tunings::readASCLFile(testFile(file + ".ascl"));
             auto k = Tunings::readKBMFile(testFile(file + ".kbm"));
             REQUIRE(s.keyboardMapping.count == k.count);
@@ -1377,15 +1379,31 @@ TEST_CASE("Loading Ableton scales")
 
     SECTION("Bad ASCL file")
     {
-        REQUIRE_THROWS_AS(Tunings::readASCLFile(testFile("bad/bad-rast.ascl")), Tunings::TuningError);
+        REQUIRE_THROWS_AS(Tunings::readASCLFile(testFile("bad/bad-rast.ascl")),
+                          Tunings::TuningError);
     }
 
     SECTION("Tuning read with ASCL")
     {
         auto s = Tunings::readASCLFile(testFile("rast.ascl"));
         Tunings::Tuning t(s);
-        REQUIRE(t.frequencyForMidiNote(s.keyboardMapping.tuningConstantNote) == Approx(s.referencePitchFreq));
-        REQUIRE(t.scalePositionForMidiNote(s.keyboardMapping.tuningConstantNote) == s.referencePitchIndex);
+        REQUIRE(t.frequencyForMidiNote(s.keyboardMapping.tuningConstantNote) ==
+                Approx(s.referencePitchFreq));
+        REQUIRE(t.scalePositionForMidiNote(s.keyboardMapping.tuningConstantNote) ==
+                s.referencePitchIndex);
+        REQUIRE(t.midiNoteForNoteName("C", 3) == 60);
+        REQUIRE(t.midiNoteForNoteName("C", -100) == 0);
+        REQUIRE(t.midiNoteForNoteName("C", 100) == 511);
+        REQUIRE(t.midiNoteForNoteName("E1/2♭", 3) == 64);
+        REQUIRE(t.midiNoteForNoteName("E1/2♭", 2) == 64 - 12);
+        REQUIRE_THROWS_AS(t.midiNoteForNoteName("E1/3♭", 3), Tunings::TuningError);
+    }
+
+    SECTION("Tuning read without ASCL")
+    {
+        auto s = Tunings::readASCLFile(testFile("31edo.scl"));
+        Tunings::Tuning t(s);
+        REQUIRE_THROWS_AS(t.midiNoteForNoteName("E1/3♭", 3), Tunings::TuningError);
     }
 }
 

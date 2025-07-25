@@ -3760,11 +3760,17 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
     assert(node);
     assert(section);
 
-    // get Ableton tuning
+    // get custom (Ableton) tuning
     pugi::xpath_node abletonTuning = node.select_node("play/other-play[@type='ableton-tuning']");
     if (abletonTuning) {
         const std::string ascl = std::regex_replace(abletonTuning.node().text().as_string(), std::regex{R"(^\s+|\s+$)"}, "");
-        m_doc->GetFirstScoreDef()->SetTuneAbleton(ascl);
+        try {
+            Tunings::Tuning tuning(Tunings::parseASCLData(ascl));
+            m_doc->GetFirstScoreDef()->SetTuneCustom(tuning);
+        }
+        catch (Tunings::TuningError& error) {
+            LogWarning("Error parsing Ableton tuning: %s", error.what());
+        }
     }
 }
 

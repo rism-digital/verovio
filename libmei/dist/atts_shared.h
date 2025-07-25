@@ -18,6 +18,7 @@
 #include "att.h"
 #include "attdef.h"
 #include "pugixml.hpp"
+#include "Tunings.h"
 
 //----------------------------------------------------------------------------
 
@@ -7396,9 +7397,9 @@ public:
     data_TEMPERAMENT GetTuneTemper() const { return m_tuneTemper; }
     bool HasTuneTemper() const;
     //
-    void SetTuneAbleton(std::string tuneAbleton_) { m_tuneAbleton = tuneAbleton_; m_tuneTemper = TEMPERAMENT_ableton; }
-    std::string GetTuneAbleton() const { return m_tuneAbleton; }
-    bool HasTuneAbleton() const;
+    void SetTuneCustom(Tunings::Tuning tuneCustom_) { m_tuneCustom = tuneCustom_; m_tuneTemper = TEMPERAMENT_custom; }
+    Tunings::Tuning GetTuneCustom() const { return m_tuneCustom; }
+    bool HasTuneCustom() const;
     ///@}
 
 private:
@@ -7411,8 +7412,8 @@ private:
     data_PITCHNAME m_tunePname;
     /** Provides an indication of the tuning system, just, for example. **/
     data_TEMPERAMENT m_tuneTemper;
-    /** Provides an Ableton (.ascl) tuning. **/
-    std::string m_tuneAbleton;
+    /** Provides a custom tuning. **/
+    Tunings::Tuning m_tuneCustom;
 };
 
 //----------------------------------------------------------------------------

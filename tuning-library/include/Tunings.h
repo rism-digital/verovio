@@ -41,7 +41,7 @@
 
 namespace Tunings
 {
-static constexpr double MIDI_0_FREQ = 8.17579891564371; // or 440.0 * pow( 2.0, - (69.0/12.0 ) )
+static constexpr double MIDI_0_FREQ = 8.17579891564371; // or 440.0 * pow( 2.0, - ( 69.0/12.0 ) )
 
 /**
  * A Tone is a single entry in an SCL file. It is expressed either in cents or in
@@ -65,7 +65,9 @@ struct Tone
 
     int lineno; // which line of the SCL does this tone appear on?
 
-    Tone() : type(kToneRatio), cents(0), ratio_d(1), ratio_n(1), stringRep("1/1"), floatValue(1.0) {}
+    Tone() : type(kToneRatio), cents(0), ratio_d(1), ratio_n(1), stringRep("1/1"), floatValue(1.0)
+    {
+    }
 };
 
 /**
@@ -84,12 +86,12 @@ inline Tone toneFromString(const std::string &t, int lineno = -1);
  */
 struct Scale
 {
-    std::string name;                   // The name in the SCL file. Informational only
-    std::string description;            // The description in the SCL file. Informational only
-    std::string rawText;                // The raw text of the SCL file used to create this Scale
-    int count;                          // The number of tones
-    std::vector<Tone> tones;            // The tones
-    std::vector<std::string> comments;  // The comments
+    std::string name;                  // The name in the SCL file. Informational only
+    std::string description;           // The description in the SCL file. Informational only
+    std::string rawText;               // The raw text of the SCL file used to create this Scale
+    int count;                         // The number of tones
+    std::vector<Tone> tones;           // The tones
+    std::vector<std::string> comments; // The comments
 
     Scale() : name("empty scale"), description(""), rawText(""), count(0) {}
 };
@@ -136,7 +138,8 @@ struct NotationMapping
  *
  * @see https://help.ableton.com/hc/en-us/articles/10998372840220-ASCL-Specification
  */
-struct AbletonScale {
+struct AbletonScale
+{
     Scale scale;
     int referencePitchOctave;
     int referencePitchIndex;
@@ -148,12 +151,16 @@ struct AbletonScale {
 
     std::vector<std::string> rawTexts;
 
-    AbletonScale() : referencePitchOctave(3), referencePitchIndex(0), referencePitchFreq(261.6256) {}
+    AbletonScale()
+        : referencePitchOctave(3), referencePitchIndex(0),
+          referencePitchFreq(MIDI_0_FREQ * (1 << 5))
+    {
+    }
 
-    int scalePositionToMidiNote(int scalePosition);
-    int freqToScalePosition(double freq);
-    double scalePositionToFreq(int scalePosition);
-    double scalePositionToCents(int scalePosition);
+    int midiNoteForScalePosition(int scalePosition);
+    int scalePositionForFrequency(double freq);
+    double frequencyForScalePosition(int scalePosition);
+    double centsForScalePosition(int scalePosition);
 };
 
 /**
@@ -327,6 +334,8 @@ class Tuning
 
     int scalePositionForMidiNote(int mn) const;
     bool isMidiNoteMapped(int mn) const;
+
+    int midiNoteForNoteName(std::string noteName, int octave) const;
 
     // For convenience, the scale and mapping used to construct this are kept as public copies
     Scale scale;
