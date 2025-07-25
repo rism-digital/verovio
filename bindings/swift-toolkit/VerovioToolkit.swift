@@ -1,5 +1,6 @@
 
 import Foundation
+import VerovioCore
 
 public class VerovioToolkit {
     private var toolkitPtr: UnsafeMutableRawPointer?
