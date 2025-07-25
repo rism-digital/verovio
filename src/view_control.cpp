@@ -1720,7 +1720,7 @@ void View::DrawControlElementText(DeviceContext *dc, ControlElement *element, Me
 
     FontInfo dirTxt;
     if (!dc->UseGlobalStyling()) {
-        dirTxt.SetFaceName("Times");
+        dirTxt.SetFaceName(m_doc->GetResources().GetTextFont());
         dirTxt.SetStyle(FONTSTYLE_italic);
     }
 
@@ -1793,7 +1793,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
 
     FontInfo dynamTxt;
     if (!dc->UseGlobalStyling()) {
-        dynamTxt.SetFaceName("Times");
+        dynamTxt.SetFaceName(m_doc->GetResources().GetTextFont());
         dynamTxt.SetStyle(FONTSTYLE_italic);
     }
 
@@ -2047,7 +2047,7 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
 
     FontInfo fingTxt;
     if (!dc->UseGlobalStyling()) {
-        fingTxt.SetFaceName("Times");
+        fingTxt.SetFaceName(m_doc->GetResources().GetTextFont());
     }
 
     // center fingering
@@ -2236,7 +2236,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
 
     FontInfo harmTxt;
     if (!dc->UseGlobalStyling()) {
-        harmTxt.SetFaceName("Times");
+        harmTxt.SetFaceName(m_doc->GetResources().GetTextFont());
     }
 
     data_HORIZONTALALIGNMENT alignment = harm->GetChildRendAlignment();
@@ -2503,7 +2503,7 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
 
     FontInfo rehTxt;
     if (!dc->UseGlobalStyling()) {
-        rehTxt.SetFaceName("Times");
+        rehTxt.SetFaceName(m_doc->GetResources().GetTextFont());
         rehTxt.SetWeight(FONTWEIGHT_bold);
     }
 
@@ -2648,7 +2648,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
 
     FontInfo tempoTxt;
     if (!dc->UseGlobalStyling()) {
-        tempoTxt.SetFaceName("Times");
+        tempoTxt.SetFaceName(m_doc->GetResources().GetTextFont());
         tempoTxt.SetWeight(FONTWEIGHT_bold);
     }
 
