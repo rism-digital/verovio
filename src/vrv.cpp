@@ -31,6 +31,8 @@
 #ifndef _WIN32
 #ifdef COCOAPODS
 #define GIT_COMMIT "[cocoapods]"
+#elif defined(SWIFT_PACKAGE)
+#define GIT_COMMIT "[swift-package]"
 #else
 #include "git_commit.h"
 #endif
