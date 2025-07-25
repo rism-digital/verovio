@@ -6784,7 +6784,7 @@ bool AttTuning::HasTuneTemper() const
 
 bool AttTuning::HasTuneCustom() const
 {
-    return (m_tuneTemper != TEMPERAMENT_custom);
+    return (m_tuneTemper == TEMPERAMENT_custom);
 }
 
 //----------------------------------------------------------------------------
