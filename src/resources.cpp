@@ -55,6 +55,7 @@ Resources::Resources()
 {
     m_path = s_defaultPath;
     m_currentStyle = k_defaultStyle;
+    m_useLiberation = false;
 }
 
 bool Resources::InitFonts()

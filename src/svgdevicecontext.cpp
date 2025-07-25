@@ -55,6 +55,7 @@ SvgDeviceContext::SvgDeviceContext(const std::string &docId) : DeviceContext(SVG
     m_formatRaw = false;
     m_removeXlink = false;
     m_facsimile = false;
+    m_useLiberation = false;
     m_indent = 2;
 
     // create the initial SVG element
