@@ -57,6 +57,13 @@ public:
     bool Ok() const { return (m_loadedFonts.size() > 1); }
 
     /**
+     * Return the name of the text font (Times or Liberation)
+     */
+    void UseLiberationTextFont(bool useLiberation) { m_useLiberation = useLiberation; }
+    bool UseLiberationTextFont() const { return m_useLiberation; }
+    std::string GetTextFont() const { return ((m_useLiberation) ? "Liberation" : "Times"); }
+
+    /**
      * Font initialization
      */
     ///@{
@@ -168,6 +175,7 @@ private:
     const GlyphTable &GetCurrentGlyphTable() const { return m_loadedFonts.at(m_currentFontName).GetGlyphTable(); };
     const GlyphTable &GetFallbackGlyphTable() const { return m_loadedFonts.at(m_fallbackFontName).GetGlyphTable(); };
 
+    bool m_useLiberation;
     std::string m_path;
     std::string m_defaultFontName;
     std::string m_fallbackFontName;
