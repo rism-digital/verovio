@@ -6,6 +6,10 @@
 * **[Petaluma](https://github.com/steinbergmedia/petaluma)** is designed by [Steinberg](https://www.steinberg.net/).
 * **[Leland](https://github.com/MuseScoreFonts/Leland)** has been developed for [MuseScore Studio](https://musescore.org/) (3.6).
 
+## Text font
+
+* **[Liberation](http://www.ascendercorp.com/typedesigners.html)** originally designed by Steve Matteson.
+
 All fonts included in Verovio are licensed under the [SIL Open Font License](http://scripts.sil.org/cms/scripts/page.php?item_id=OFL).
 
 ## Generate Script
