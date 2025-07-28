@@ -889,6 +889,11 @@ inline int Tuning::midiNoteForNoteName(std::string noteName, int octave) const
         N - 1);
 }
 
+inline std::string Tuning::noteNameForScalePosition(int scalePosition) const
+{
+    return notationMapping.names.at(positive_mod(scalePosition - 1, notationMapping.count));
+}
+
 inline Tuning Tuning::withSkippedNotesInterpolated() const
 {
     Tuning res = *this;

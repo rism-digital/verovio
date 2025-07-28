@@ -128,7 +128,7 @@ struct KeyboardMapping
 struct NotationMapping
 {
     int count;
-    std::vector<std::string> names;
+    std::vector<std::string> names; // organized in the same order as Scale::tones
 
     NotationMapping() : count(0) {}
 };
@@ -157,6 +157,9 @@ struct AbletonScale
     {
     }
 
+    friend AbletonScale readASCLStream(std::istream &inf);
+
+  private:
     int midiNoteForScalePosition(int scalePosition);
     int scalePositionForFrequency(double freq);
     double frequencyForScalePosition(int scalePosition);
@@ -336,6 +339,7 @@ class Tuning
     bool isMidiNoteMapped(int mn) const;
 
     int midiNoteForNoteName(std::string noteName, int octave) const;
+    std::string noteNameForScalePosition(int scalePosition) const;
 
     // For convenience, the scale and mapping used to construct this are kept as public copies
     Scale scale;

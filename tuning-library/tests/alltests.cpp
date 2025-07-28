@@ -1397,6 +1397,9 @@ TEST_CASE("Loading Ableton scales")
         REQUIRE(t.midiNoteForNoteName("E1/2♭", 3) == 64);
         REQUIRE(t.midiNoteForNoteName("E1/2♭", 2) == 64 - 12);
         REQUIRE_THROWS_AS(t.midiNoteForNoteName("E1/3♭", 3), Tunings::TuningError);
+        REQUIRE(t.noteNameForScalePosition(0) == "C");
+        REQUIRE(t.noteNameForScalePosition(4) == "E1/2♭");
+        REQUIRE(t.noteNameForScalePosition(4 + t.scale.count) == "E1/2♭");
     }
 
     SECTION("Tuning read without ASCL")

@@ -2359,7 +2359,11 @@ void MidiMessage::makeTemperamentMeantoneCommaHalf(int referencePitchClass, int 
 //
 
 void MidiMessage::makeTemperamentCustom(Tunings::Tuning tuneCustom, int referencePitchClass, int channelMask) {
-	std::cout << "makeTemperamentCustom" << std::endl;
+	std::vector<std::pair<int, double>> mapping;
+	for (int i=0; i<128; i++) {
+		mapping.push_back(std::make_pair(i, tuneCustom.frequencyForMidiNote(i)));
+	}
+	this->makeMts2_KeyTuningsByFrequency(mapping);
 }
 
 
