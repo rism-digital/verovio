@@ -1,0 +1,54 @@
+! Rast 6 - modulations + variants.ascl
+!
+! Short description:
+A version of Maqam Rast with a wide range of choices of pitch variants. Because of the inclusion of versions of E♭, E1/2♭, E♮, A♭, A1/2♭, A♮, B♭, B1/2♭, and B♮, all of the common modulations within the Maqam Rast family are possible. This version of Maqam Rast was developed by Sami Abu Shumays. Visit the website to learn more.
+!
+! Long description: This represents a version of Maqam Rast with a wide range of choices of pitch variants. Four potential choices for an E1/2♭ (the 3rd scale degree of Rast) are given, ranging from a relatively low version typical of later-20th-century Egypt, to a relatively high version typical of mid-20th century Syria, and two choices in between. Two possible choices for B1/2♭ (the 7th scale degree of Rast) are included. It is typical in maqam Rast to use a B1/2♭ relatively higher than the E1/2♭. Two choices of B♭ are given, because of the preference for a very low B♭ in Jins Nahawand on G, lower than the Pythagorean B♭ used for Bayati and Saba G. In addition, because of the inclusion of versions of E♭, E1/2♭, E♮, A♭, A1/2♭, A♮, B♭, B1/2♭, and B♮, all of the common modulations within the Maqam Rast family are possible. This version of Maqam Rast was developed by Sami Abu Shumays. Visit the website to learn more.
+!
+! Jins modulations possible within this pitch set:
+! Rast C: C D E1/2♭ (pick one) F G
+! Nahawand C: C D E♭ F G
+! Nikriz C: C D E♭ F♯ G
+! Sikah E1/2♭: (D♯) E1/2♭ F G
+! Nahawand G: G A B♭ (lower) C
+! Upper Rast G: G A B1/2♭ (pick one relatively higher than the E1/2♭ choice) C
+! Hijaz G: G A♭ B♮ C D E♭
+! Bayati G: G A1/2♭ B♭ C D E♭
+! Saba G: G A1/2♭ B♭ C♭ D E♭
+! Hijazkar G: E♭ F♯ G A♭ B♮
+! Saba Dalanshin A: A B1/2♭ C D♭ E♮ F
+! Jiharkah C: B1/2♭ C D E♮ F
+!
+! References:
+! Inside Arabic Music, Chapter 11 (description of Tuning System); Ch 14-16 (descriptions of Ajnas); Ch 24 (Sayr diagrams)
+! http://maqamworld.com/en/index.php  * Maqam World Website, including Maqam and Jins Scales
+! https://www.youtube.com/user/abushumays * "Maqam Lessons" YouTube series, teaching the melodic vocabulary of the ajnas and maqamat
+!
+20
+!
+128.    ! D♭ for Saba Dalanshin A
+204.    ! D Pythagorean
+291.    ! E♭ super low for Nahawand C, could also pass for D♯ in a pinch to tonicize E1/2♭
+342.    ! E1/2♭-a- On the low end, Egyptian 1960s - reference composition "YamSaharni" by Sayyed Mekkawi for Umm Kulthum
+347.    ! E1/2♭-b- On the medium-low side
+351.    ! E1/2♭-c- On the medium side, Egyptian 1940s - reference composition "Ghannili Shwayya" by Zakaria Ahmad for Umm Kulthum
+356.    ! E1/2♭-d- On the high-ish side, for "Ya Maal ish-Shaam" and "Ya Shadi il-alhan"
+382.    ! E suitable for Jiharkah C and Hijaz C (Saba Dalanshin A)
+498.    ! F Pythagorean
+590.    ! F♯ for Nikriz C
+702.    ! G Pythagorean
+825.    ! A♭ for Hijaz G
+840.    ! A1/2♭ For Bayati G/Saba G
+911.    ! A higher than Pythagorean
+990.    ! B♭-a- Lower than Pythagorean, great for Nahawand G
+996.    ! B♭-b- Pythagorean
+1056.   ! B1/2♭-a- relatively higher than the E1/2♭
+1061.   ! B1/2♭-b- relatively higher than the E1/2♭
+1092.   ! B♮/C♭ lowish for Hijaz G as well as C♭ for Saba G
+1200.
+!
+! @ABL NOTE_NAMES "C " "D♭ " "D " "E♭ " "E1/2♭-a- " "E1/2♭-b- " "E1/2♭-c- " "E1/2♭-d- " "E " "F " "F♯ " "G " "A♭ " "A1/2♭ " "A " "B♭-a- " "B♭-b- " "B1/2♭-a- " "B1/2♭-b- " "B♮/C♭ "
+! @ABL REFERENCE_PITCH 3 0 261.6256
+! @ABL NOTE_RANGE_BY_INDEX 0 0 6 7
+! @ABL SOURCE Inside Arabic Music, Chapter 11 (description of Tuning System); Ch 14-16 (descriptions of Ajnas); Ch 24 (Sayr diagrams of Maqam Rast and Maqam Suznak)
+! @ABL LINK https://www.ableton.com/learn-more/tuning-systems/rast-6
