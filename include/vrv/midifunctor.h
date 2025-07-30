@@ -422,7 +422,7 @@ private:
     /**
      * Convenience helper
      */
-    int GetMIDIPitch(const Note *note) { return note->GetMIDIPitch(m_transSemi, m_octaveShift); }
+    int GetMIDIPitch(const Note *note);
 
 public:
     //

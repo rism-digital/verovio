@@ -891,6 +891,11 @@ inline int Tuning::midiNoteForNoteName(std::string noteName, int octave) const
 
 inline std::string Tuning::noteNameForScalePosition(int scalePosition) const
 {
+    if (notationMapping.count == 0)
+    {
+        std::string s = "No note names found in the tuning.";
+        throw TuningError(s);
+    }
     return notationMapping.names.at(positive_mod(scalePosition - 1, notationMapping.count));
 }
 
@@ -1000,7 +1005,7 @@ inline AbletonScale readASCLStream(std::istream &inf)
         {
             std::string rawText = command[2];
             std::smatch note_names;
-            std::regex note_name_regex("\\s*(?:\"(\\S+)\"|(\\S+))\\s*");
+            std::regex note_name_regex("\\s*(?:\"(.*?)\\s*\"|(\\S+))\\s*");
             std::string::const_iterator search_start(rawText.cbegin());
             while (std::regex_search(search_start, rawText.cend(), note_names, note_name_regex))
             {

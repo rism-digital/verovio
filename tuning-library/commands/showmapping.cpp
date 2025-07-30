@@ -9,7 +9,7 @@ int main(int argc, char **argv)
     if (argc == 1)
     {
         std::cout
-            << "Usage: " << argv[0] << " scl-file [kbm-file]\n\n"
+            << "Usage: " << argv[0] << " scl-file/ascl-file [kbm-file]\n\n"
             << "Will show the frequency mapping across the midi keyboard for the scl/kbm combo"
             << std::endl;
         exit(1);
@@ -17,15 +17,25 @@ int main(int argc, char **argv)
 
     try
     {
-        auto s = readSCLFile(argv[1]);
-        KeyboardMapping k;
-
-        if (argc == 3)
+        auto t = Tuning();
+        if (strstr(argv[1], ".ascl"))
         {
-            k = readKBMFile(argv[2]);
+            auto s = readASCLFile(argv[1]);
+            t = Tuning(s);
+        }
+        else
+        {
+            auto s = readSCLFile(argv[1]);
+            KeyboardMapping k;
+
+            if (argc == 3)
+            {
+                k = readKBMFile(argv[2]);
+            }
+
+            t = Tuning(s, k);
         }
 
-        auto t = Tuning(s, k);
         std::cout << "Note ,"
                   << " Freq (Hz) , "
                   << "  ScaledFrq , "

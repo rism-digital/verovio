@@ -17,6 +17,10 @@ int main(int argc, char **argv)
                 Tunings::readKBMFile(argv[i]);
                 std::cout << " PASSED";
             }
+            else if (strstr(argv[i], ".ascl")) {
+                Tunings::readASCLFile(argv[i]);
+                std::cout << " PASSED";
+            }
             else
             {
                 std::cout << " SKIPPED";
