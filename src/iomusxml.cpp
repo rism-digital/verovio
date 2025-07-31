@@ -2830,6 +2830,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 this->AddLayerElement(layer, rest, duration);
             }
         }
+        m_durTotal += duration;
     }
     else {
         note = new Note();
