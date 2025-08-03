@@ -1678,6 +1678,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             Layer *layer = SelectLayer(1, measure);
             this->AddLayerElement(layer, multiRest);
             m_multiRests[index] = index + multiRestLength - 1;
+            this->ReadMusicXmlAttributes(child, section, measure, measureNum);
             break;
         }
         else if (isMRestInOtherSystem) {
@@ -1717,6 +1718,13 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         else if (IsElement(child, "print") && node.select_node("parent::part[not(preceding-sibling::part)]")) {
             this->ReadMusicXmlPrint(child, section);
         }
+    }
+
+    // set metcon to false for pickup measures
+    int endDuration = m_ppq;
+    for (const int &num : m_meterCount) endDuration *= num;
+    if (m_durTotal && m_durTotal != endDuration) {
+        measure->SetMetcon(BOOLEAN_false);
     }
 
     this->MatchTies(true);
@@ -2738,6 +2746,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     if (m_ppq < 0 && duration && !typeStr.empty()) {
         // if divisions are missing, try to calculate
         m_ppq = (double)duration * pow(2, ConvertTypeToDur(typeStr) - 2) / 4;
+        m_durTotal += duration;
     }
 
     if (rest) {

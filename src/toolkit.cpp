@@ -550,6 +550,12 @@ void Toolkit::SetViewAndEditor()
 
 bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
 {
+    const Resources &resources = m_doc.GetResources();
+    if (!resources.Ok()) {
+        LogError("The data cannot be loaded because the font resources are not available");
+        return false;
+    }
+
     std::string newData;
     Input *input = NULL;
 

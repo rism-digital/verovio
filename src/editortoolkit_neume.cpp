@@ -28,7 +28,9 @@
 #include "measure.h"
 #include "nc.h"
 #include "neume.h"
+#include "oriscus.h"
 #include "page.h"
+#include "quilisma.h"
 #include "rend.h"
 #include "sb.h"
 #include "score.h"
@@ -150,6 +152,13 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
             return this->SetLiquescent(elementId, curve);
         }
         LogWarning("Could not parse the set liquescent action");
+    }
+    else if (action == "setAquitanianElement") {
+        std::string elementId, shape;
+        if (this->ParseSetAquitanianElementAction(json.get<jsonxx::Object>("param"), &elementId, &shape)) {
+            return this->SetAquitanianElement(elementId, shape);
+        }
+        LogWarning("Could not parse the set aquitanian element action");
     }
     else if (action == "remove") {
         std::string elementId;
@@ -992,6 +1001,16 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 }
                 Liquescent *liquescent = new Liquescent();
                 nc->AddChild(liquescent);
+            }
+            else if (it->first == "shape") {
+                if (it->second == "quilisma") {
+                    Quilisma *quilisma = new Quilisma();
+                    nc->AddChild(quilisma);
+                }
+                else if (it->second == "oriscus") {
+                    Oriscus *oriscus = new Oriscus();
+                    nc->AddChild(oriscus);
+                }
             }
         }
 
@@ -2077,7 +2096,7 @@ bool EditorToolkitNeume::SetLiquescent(std::string elementId, std::string curve)
 
     Nc *nc = vrv_cast<Nc *>(m_doc->GetDrawingPage()->FindDescendantByID(elementId));
     assert(nc);
-    bool hasLiquscent = nc->GetChildCount();
+    bool hasLiquscent = nc->GetChildCount(LIQUESCENT);
 
     if (curve == "a") {
         curvatureDirection_CURVE curve = curvatureDirection_CURVE_a;
@@ -2102,6 +2121,46 @@ bool EditorToolkitNeume::SetLiquescent(std::string elementId, std::string curve)
         if (hasLiquscent) {
             Liquescent *liquescent = vrv_cast<Liquescent *>(nc->FindDescendantByType(LIQUESCENT));
             nc->DeleteChild(liquescent);
+        }
+    }
+
+    m_doc->GetDrawingPage()->LayOutTranscription(true);
+
+    m_editInfo.import("status", "OK");
+    m_editInfo.import("message", "");
+    return true;
+}
+
+bool EditorToolkitNeume::SetAquitanianElement(std::string elementId, std::string shape)
+{
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page.");
+        m_editInfo.import("status", "FAILURE");
+        m_editInfo.import("message", "Could not get the drawing page.");
+        return false;
+    }
+
+    Nc *nc = vrv_cast<Nc *>(m_doc->GetDrawingPage()->FindDescendantByID(elementId));
+    assert(nc);
+    bool hasQuilisma = nc->GetChildCount(QUILISMA);
+    bool hasOriscus = nc->GetChildCount(ORISCUS);
+
+    if (shape == "quilisma") {
+        if (!hasQuilisma && !hasOriscus) {
+            Quilisma *quisma = new Quilisma();
+            nc->AddChild(quisma);
+        }
+    }
+    else if (shape == "oriscus") {
+        if (!hasQuilisma && !hasOriscus) {
+            Oriscus *oriscus = new Oriscus();
+            nc->AddChild(oriscus);
+        }
+    }
+    else {
+        // For unset
+        if (hasQuilisma || hasOriscus) {
+            nc->DeleteChild(nc->GetFirst());
         }
     }
 
@@ -4134,6 +4193,22 @@ bool EditorToolkitNeume::ParseSetLiquescentAction(jsonxx::Object param, std::str
         return false;
     }
     *curve = param.get<jsonxx::String>("curve");
+    return true;
+}
+
+bool EditorToolkitNeume::ParseSetAquitanianElementAction(
+    jsonxx::Object param, std::string *elementId, std::string *shape)
+{
+    if (!param.has<jsonxx::String>("elementId")) {
+        LogWarning("Could not parse 'elementId'");
+        return false;
+    }
+    *elementId = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::String>("shape")) {
+        LogWarning("Could not parse 'shape'");
+        return false;
+    }
+    *shape = param.get<jsonxx::String>("shape");
     return true;
 }
 

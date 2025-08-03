@@ -54,6 +54,7 @@ public:
     bool SetText(std::string elementId, const std::string &text);
     bool SetClef(std::string elementId, std::string shape);
     bool SetLiquescent(std::string elementId, std::string shape);
+    bool SetAquitanianElement(std::string elementId, std::string shape);
     bool SortStaves();
     bool Split(std::string elementId, int x);
     bool SplitNeume(std::string elementId, std::string ncId);
@@ -87,6 +88,7 @@ protected:
     bool ParseSetTextAction(jsonxx::Object param, std::string *elementId, std::string *text);
     bool ParseSetClefAction(jsonxx::Object param, std::string *elementId, std::string *shape);
     bool ParseSetLiquescentAction(jsonxx::Object param, std::string *elementId, std::string *shape);
+    bool ParseSetAquitanianElementAction(jsonxx::Object param, std::string *elementId, std::string *shape);
     bool ParseSplitAction(jsonxx::Object param, std::string *elementId, int *x);
     bool ParseSplitNeumeAction(jsonxx::Object param, std::string *elementId, std::string *ncId);
     bool ParseRemoveAction(jsonxx::Object param, std::string *elementId);

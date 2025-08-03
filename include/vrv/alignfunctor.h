@@ -24,6 +24,7 @@ struct AlignMeterParams {
     // Not const since we are cumulating proportion
     Proport *proport = NULL;
     data_DURATION equivalence = DURATION_brevis;
+    bool metcon = true;
 };
 
 //----------------------------------------------------------------------------
