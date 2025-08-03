@@ -579,6 +579,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             generateMIDI.SetOctaves(initMIDI.GetOctaves());
             generateMIDI.SetNoCue(this->GetOptions()->m_midiNoCue.GetValue());
             generateMIDI.SetControlEvents(controlEvents);
+            generateMIDI.SetScoreDef(scoreDef);
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
             this->Process(generateMIDI);

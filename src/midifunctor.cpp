@@ -624,6 +624,7 @@ GenerateMIDIFunctor::GenerateMIDIFunctor(smf::MidiFile *midiFile) : ConstFunctor
     m_lastNote = NULL;
     m_noCue = false;
     m_controlEvents = false;
+    m_scoreDef = NULL;
 }
 
 FunctorCode GenerateMIDIFunctor::VisitBeatRpt(const BeatRpt *beatRpt)
@@ -1108,12 +1109,33 @@ void GenerateMIDIFunctor::HandleOctave(const LayerElement *layerElement)
 
 int GenerateMIDIFunctor::GetMIDIPitch(const Note *note)
 {
-    int pitch = note->GetMIDIPitch(m_transSemi, m_octaveShift);
+    if (m_scoreDef && m_scoreDef->HasTuneCustom()) {
+        // Construct note name for tuning lookup.
+        data_PITCHNAME pname = note->GetPname();
+        if (note->HasPnameGes()) pname = note->GetPnameGes();
+        std::string noteName(1, (pname - 1 + ('C' - 'A')) % 7 + 'A');
 
-    // Map the incoming pitch accorrding to the custom tuning
-    if (scoreDef->HasTuneCustom()) {
+        const Accid *accid = note->GetDrawingAccid();
+        if (accid && accid->HasAttClass(ATT_ACCIDENTAL)) {
+            const AttAccidental *att = dynamic_cast<const AttAccidental *>(accid);
+            assert(att);
+            if (att->HasAccid()) {
+                noteName += att->AccidentalWrittenToStr(att->GetAccid());
+            }
+        }
+        int oct = note->GetOct() + m_octaveShift;
+        if (note->HasOctGes()) oct = note->GetOctGes();
 
+        // Lookup note in the tuning and map it to a MIDI key
+        try {
+            Tunings::Tuning tuning = m_scoreDef->GetTuneCustom();
+            return tuning.midiNoteForNoteName(noteName, oct);
+        }
+        catch (Tunings::TuningError &e) {
+            LogWarning("Error mapping note to tuning: %s", e.what());
+        }
     }
+    return note->GetMIDIPitch(m_transSemi, m_octaveShift);
 }
 
 //----------------------------------------------------------------------------
