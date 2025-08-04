@@ -8,7 +8,7 @@
 
 ## Text font
 
-* **[Liberation](http://www.ascendercorp.com/typedesigners.html)** originally designed by Steve Matteson.
+* **[Liberation](https://github.com/liberationfonts/liberation-fonts)** originally designed by Steve Matteson.
 
 All fonts included in Verovio are licensed under the [SIL Open Font License](http://scripts.sil.org/cms/scripts/page.php?item_id=OFL).
 
