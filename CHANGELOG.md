@@ -1,6 +1,10 @@
 # Changelog
 
 ## [unreleased]
+* Support of Swift with a new binding available through via the Swift Package Manager
+* Support for Liberation text font with the new `--font-text-liberation` option
+* Remove obsolete Qt and Android bindings
+* Remove unused Emscripten options `-DPX`
 * Fix crash when trying to load data without loaded resources
 
 ## [5.4.0] – 2025-07-15 
