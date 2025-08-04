@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+
+## [5.5.0] – 2025-08-04 
 * Support of Swift with a new binding available through via the Swift Package Manager
 * Support for Liberation text font with the new `--font-text-liberation` option
 * Remove obsolete Qt and Android bindings
