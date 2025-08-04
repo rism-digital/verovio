@@ -45,10 +45,10 @@ public:
      * German tablature: the line is based on the note's index in the note list
      * or by explicit @loc.
      *
-     * @param [in] course
-     * @param [in] notationType
-     * @param [in] lines
-     * @param [in] listSize
+     * @param [in] course - the course number
+     * @param [in] notationType - the MEI staffdef@notationtype
+     * @param [in] lines - the number of lines
+     * @param [in] listSize - the size of the list
      * @param [in] index - 0 based from the bottom of the chord
      * @param [in] loc - German tablature: note@loc if specified, 0 at the bottom in half lines, MEI_UNSET if not
      * present

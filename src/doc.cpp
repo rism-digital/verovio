@@ -578,7 +578,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             controlEvents = false;
         }
     }
-    midiFile->sortTracks();
+    midiFile->sortTracksNoteOffsBeforeOns();
 }
 
 bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeasures, bool useFractions)

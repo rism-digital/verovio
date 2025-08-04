@@ -32,10 +32,7 @@ Options:
 -v N    Version number (e.g., 1.0.0); no number by default
 -w      Webassembly version
 -x      Font exclusion list (case-sensitive)
--D      Disable DARMS importer
 -H      Disable Humdrum importer
--P      Disable PAE importer
--X      Disable MusicXML importer
 -M      Clean existing makefile
 -m      Modularize emscripten build
 -d      Debug mode (for Webassembly only)
@@ -52,7 +49,7 @@ die "ERROR: emscripten make (emmake) not found.\n" unless $EMMAKE;
 
 # Parse command-line options
 my ($version, $chattyQ, $helpQ, $exclusion, $wasmQ, $makeQ, $modularizeQ, $debug);
-my ($nopae, $nohumdrum, $nomusicxml, $nodarms);
+my ($nohumdrum);
 my ($FLAGS_NAME, $VERSION, $CHATTY);
 
 my $cpp = 20; # c++ version to compile (11, 14, 17)
@@ -67,19 +64,15 @@ GetOptions (
 	'v|version=s'   => \$VERSION,
 	'x|exclusion=s' => \$exclusion,
 	'w|wasm'        => \$wasmQ,
-	'm|modularize' => \$modularizeQ,
-	'D|no-darms'    => \$nodarms,
+	'm|modularize'  => \$modularizeQ,
 	'H|no-humdrum'  => \$nohumdrum,
-	'P|no-pae'      => \$nopae,
-	'X|no-musicxml' => \$nomusicxml,
-	'M|make' => \$makeQ,
-	'd|debug' => \$debug
+	'M|make'        => \$makeQ,
+	'd|debug'       => \$debug
 );
 
 # Default compiling uses ASM and large file support.
 # Memory is increased (STACK_SIZE) for processing large files (tested up to 7MB)
 # Empirically, the memory amount required is roughly 5 times the file size.
-# This can be disabled in the light version, which uses the default memory settings.
 my $FLAGS = "-O3";
 $FLAGS .= " -DNDEBUG";
 $FLAGS .= " -std=c++$cpp";
@@ -168,10 +161,7 @@ print "Creating commit version header file...\n";
 my $defines = "-DUSE_EMSCRIPTEN";
 
 my $cmake = "-DBUILD_AS_WASM=ON";
-$cmake .= " -DNO_PAE_SUPPORT=ON" if ($nopae);
-$cmake .= " -DNO_DARMS_SUPPORT=ON" if ($nodarms);
 $cmake .= " -DNO_HUMDRUM_SUPPORT=ON" if ($nohumdrum);
-$cmake .= " -DNO_MUSICXML_SUPPORT=ON" if ($nomusicxml);
 
 my $embed   = "--embed-file $DATA_DIR/";
 my $output  = "-o $BUILD_DIR/verovio.js";

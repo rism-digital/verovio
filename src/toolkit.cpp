@@ -133,6 +133,9 @@ bool Toolkit::SetResourcePath(const std::string &path)
     if (m_options->m_fontLoadAll.IsSet()) {
         success = success && resources.LoadAll();
     }
+    if (m_options->m_fontTextLiberation.IsSet()) {
+        resources.UseLiberationTextFont(m_options->m_fontTextLiberation.GetValue());
+    }
     return success;
 }
 
@@ -550,6 +553,12 @@ void Toolkit::SetViewAndEditor()
 
 bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
 {
+    const Resources &resources = m_doc.GetResources();
+    if (!resources.Ok()) {
+        LogError("The data cannot be loaded because the font resources are not available");
+        return false;
+    }
+
     std::string newData;
     Input *input = NULL;
 
@@ -1291,6 +1300,10 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
         Resources &resources = m_doc.GetResourcesForModification();
         resources.LoadAll();
     }
+    if (json.has<jsonxx::String>("fontTextLiberation")) {
+        Resources &resources = m_doc.GetResourcesForModification();
+        resources.UseLiberationTextFont(m_options->m_fontTextLiberation.GetValue());
+    }
 
     return true;
 }
@@ -1755,6 +1768,10 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
 
     if (m_options->m_svgViewBox.GetValue()) {
         svg.SetSvgViewBox(true);
+    }
+
+    if (m_options->m_fontTextLiberation.GetValue()) {
+        svg.SetUseLiberation(true);
     }
 
     svg.SetHtml5(m_options->m_svgHtml5.GetValue());
