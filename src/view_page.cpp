@@ -500,7 +500,7 @@ void View::DrawLabels(
 
     FontInfo labelTxt;
     if (!dc->UseGlobalStyling()) {
-        labelTxt.SetFaceName("Times");
+        labelTxt.SetFaceName(m_doc->GetResources().GetTextFont());
     }
     labelTxt.SetPointSize(m_doc->GetDrawingLyricFont(staffSize)->GetPointSize());
 
@@ -1123,7 +1123,7 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
 
         FontInfo mnumTxt;
         if (!dc->UseGlobalStyling()) {
-            mnumTxt.SetFaceName("Times");
+            mnumTxt.SetFaceName(m_doc->GetResources().GetTextFont());
             mnumTxt.SetStyle(FONTSTYLE_italic);
         }
 

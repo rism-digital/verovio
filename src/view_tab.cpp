@@ -115,7 +115,7 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
         FontInfo fretTxt;
         if (!dc->UseGlobalStyling()) {
-            fretTxt.SetFaceName("Times");
+            fretTxt.SetFaceName(m_doc->GetResources().GetTextFont());
         }
 
         TextDrawingParams params;
