@@ -6041,7 +6041,7 @@
     </constraintSpec><attList><attDef ident="meiversion" usage="req"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Specifies a generic MEI version label.</desc><valList type="closed" mode="change"><valItem xmlns:xi="http://www.w3.org/2001/XInclude" ident="5.1">
             <desc xml:lang="en">Version of MEI</desc>
           </valItem><valItem xmlns:xi="http://www.w3.org/2001/XInclude" ident="5.1+basic">
-              <desc>Version of MEI basic customization</desc>
+              <desc>Version of MEI Basic customization</desc>
           </valItem></valList></attDef></attList></classSpec><classSpec ident="att.meterConformance.bar" module="MEI.shared" type="atts" mode="replace">
                     <desc>Attributes that provide information about a measure's conformance to the prevailing
                         meter.</desc>
