@@ -1,13 +1,16 @@
 # Changelog
 
-## [5.5.0] – 2025-08-04 
+## [5.5.1] – 2025-08-05
+* Fix CocoaPods build
+
+## [5.5.0] – 2025-08-04
 * Support of Swift with a new binding available through via the Swift Package Manager
 * Support for Liberation text font with the new `--font-text-liberation` option
 * Remove obsolete Qt and Android bindings
 * Remove unused Emscripten options `-DPX`
 * Fix crash when trying to load data without loaded resources
 
-## [5.4.0] – 2025-07-15 
+## [5.4.0] – 2025-07-15
 * Change timemap with `includeRests` to include also `mRest` and `multiRest`
 * Change JS initial memory allocation and drop JS light memory version
 * Change key names for `GetTimesForElement` to be inline with the timemap keys
