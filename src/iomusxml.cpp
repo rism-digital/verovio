@@ -3765,7 +3765,8 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
     if (meiTuning) {
         const std::string value = std::regex_replace(meiTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
         data_TEMPERAMENT temperament = TEMPERAMENT_NONE;
-        if (value == "equal") temperament = TEMPERAMENT_equal;
+        if (value == "none" || value == "") temperament = TEMPERAMENT_NONE;
+        else if (value == "equal") temperament = TEMPERAMENT_equal;
         else if (value == "just") temperament = TEMPERAMENT_just;
         else if (value == "mean") temperament = TEMPERAMENT_mean;
         else if (value == "pythagorean") temperament = TEMPERAMENT_pythagorean;
