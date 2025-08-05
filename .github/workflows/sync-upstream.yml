@@ -1,0 +1,197 @@
+name: Sync with RISM Upstream
+
+on:
+  # Run automatically every Monday at 07:00 UTC (3am in Montreal)
+  schedule:
+    - cron: "0 7 * * 1"
+
+  # Allow manual triggering
+  workflow_dispatch:
+    inputs:
+      force_rebase:
+        description: "Force rebase even if no new commits detected"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  sync-upstream:
+    runs-on: ubuntu-latest
+    # Only run this workflow on the DDMAL/verovio repository
+    if: github.repository == 'DDMAL/verovio'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Fetch full history for proper rebasing
+          fetch-depth: 0
+          # Use a personal access token with repo permissions
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: develop
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Add upstream remote
+        run: |
+          # Check if upstream remote already exists
+          if git remote get-url upstream 2>/dev/null; then
+            echo "Upstream remote already exists"
+            git remote set-url upstream https://github.com/rism-digital/verovio.git
+          else
+            echo "Adding upstream remote"
+            git remote add upstream https://github.com/rism-digital/verovio.git
+          fi
+
+      - name: Fetch upstream changes
+        run: |
+          echo "Fetching upstream changes..."
+          git fetch upstream develop
+
+      - name: Check for new commits
+        id: check_commits
+        run: |
+          # Get the latest commit hash from upstream
+          UPSTREAM_COMMIT=$(git rev-parse upstream/develop)
+
+          # Get the latest commit hash from our develop branch
+          LOCAL_COMMIT=$(git rev-parse develop)
+
+          echo "Upstream commit: $UPSTREAM_COMMIT"
+          echo "Local commit: $LOCAL_COMMIT"
+
+          # Check if there are new commits to sync
+          if [ "$UPSTREAM_COMMIT" != "$LOCAL_COMMIT" ]; then
+            echo "new_commits=true" >> $GITHUB_OUTPUT
+            echo "New commits detected in upstream"
+            
+            # Count the number of commits behind
+            COMMITS_BEHIND=$(git rev-list --count develop..upstream/develop)
+            echo "commits_behind=$COMMITS_BEHIND" >> $GITHUB_OUTPUT
+            echo "Local branch is $COMMITS_BEHIND commits behind upstream"
+          else
+            echo "new_commits=false" >> $GITHUB_OUTPUT
+            echo "No new commits in upstream"
+            echo "commits_behind=0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check for local uncommitted changes
+        # It's a good practice to check if the runner is in a dirty state before running a rebase
+        if: steps.check_commits.outputs.new_commits == 'true' || github.event.inputs.force_rebase == 'true'
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Error: Working directory has uncommitted changes"
+            git status
+            exit 1
+          fi
+
+      - name: Rebase onto upstream
+        if: steps.check_commits.outputs.new_commits == 'true' || github.event.inputs.force_rebase == 'true'
+        run: |
+          echo "Starting rebase onto upstream/develop..."
+
+          # Attempt to rebase
+          if git rebase upstream/develop; then
+            echo "✅ Rebase successful!"
+          else
+            echo "❌ Rebase failed due to conflicts"
+            echo "Aborting rebase..."
+            git rebase --abort
+            
+            # Create an issue to notify about the conflict
+            echo "REBASE_FAILED=true" >> $GITHUB_ENV
+            exit 1
+          fi
+
+      - name: Push rebased changes
+        if: (steps.check_commits.outputs.new_commits == 'true' || github.event.inputs.force_rebase == 'true') && env.REBASE_FAILED != 'true'
+        # force-with-lease is used to avoid overwriting changes that have been pushed and not yet merged to upstream
+        run: |
+          echo "Pushing rebased changes to origin/develop..."
+          git push --force-with-lease origin develop
+
+      - name: Create issue on rebase failure
+        if: env.REBASE_FAILED == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `🚨 Upstream Sync Failed - Rebase Conflicts Detected`;
+            const body = `## Automatic upstream sync failed
+
+            The scheduled rebase onto \`rism-digital/verovio:develop\` failed due to merge conflicts.
+
+            **Details:**
+            - Upstream commits to sync: ${{ steps.check_commits.outputs.commits_behind }}
+            - Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            **Manual action required:**
+            1. Fetch the latest upstream changes: \`git fetch upstream develop\`
+            2. Rebase manually: \`git rebase upstream/develop\`
+            3. Resolve any conflicts
+            4. Push the rebased branch: \`git push --force-with-lease origin develop\`
+
+            This issue will be automatically closed when the next successful sync occurs.`;
+
+            // Check if an issue already exists
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['upstream-sync-failure'],
+              state: 'open'
+            });
+
+            if (existingIssues.data.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['upstream-sync-failure', 'automation']
+              });
+            }
+
+      - name: Close existing sync failure issues
+        if: (steps.check_commits.outputs.new_commits == 'true' || github.event.inputs.force_rebase == 'true') && env.REBASE_FAILED != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Close any existing upstream sync failure issues
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['upstream-sync-failure'],
+              state: 'open'
+            });
+
+            for (const issue of existingIssues.data) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: '✅ Upstream sync completed successfully. Closing this issue.'
+              });
+              
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed'
+              });
+            }
+
+      - name: Summary
+        run: |
+          if [ "${{ steps.check_commits.outputs.new_commits }}" = "true" ] || [ "${{ github.event.inputs.force_rebase }}" = "true" ]; then
+            if [ "$REBASE_FAILED" = "true" ]; then
+              echo "❌ Sync failed due to rebase conflicts"
+              echo "📝 An issue has been created for manual intervention"
+            else
+              echo "✅ Successfully synced ${{ steps.check_commits.outputs.commits_behind }} commits from upstream"
+              echo "🚀 Changes pushed to develop branch"
+            fi
+          else
+            echo "ℹ️  No new commits to sync"
+          fi
