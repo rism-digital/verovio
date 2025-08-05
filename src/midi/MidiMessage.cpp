@@ -2055,11 +2055,12 @@ void MidiMessage::makeSysExMessage(const std::vector<uchar>& data) {
 
 	this->push_back((uchar)0xf0);
 
-	int msize = endindex - startindex + 2;
-	std::vector<uchar> vlv = intToVlv(msize);
-	for (uchar item : vlv) {
-		this->push_back(item);
-	}
+	// MidiFile::write() tales care of writing the vlv for sysex.
+	// int msize = endindex - startindex + 2;
+	// std::vector<uchar> vlv = intToVlv(msize);
+	// for (uchar item : vlv) {
+	// 	this->push_back(item);
+	// }
 	for (int i=startindex; i<=endindex; i++) {
 		this->push_back(data.at(i));
 	}
@@ -2178,12 +2179,8 @@ void MidiMessage::makeMts2_KeyTuningsBySemitone(std::vector<std::pair<int, doubl
 		uchar msb = (value >> 7) & 0x7f;
 		data.push_back(msb);
 		data.push_back(lsb);
-
-		std::cout << keynum << " => [" << sint << ", "
-		          << std::hex << (unsigned int) msb << ", " << (unsigned int) lsb
-							<< "]" << std::dec << std::endl;
-    }
-    this->makeSysExMessage(data);
+	}
+	this->makeSysExMessage(data);
 }
 
 
