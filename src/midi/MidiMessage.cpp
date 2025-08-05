@@ -2054,11 +2054,7 @@ void MidiMessage::makeSysExMessage(const std::vector<uchar>& data) {
 
 	this->push_back((uchar)0xf0);
 
-	int msize = endindex - startindex + 2;
-	std::vector<uchar> vlv = intToVlv(msize);
-	for (uchar item : vlv) {
-		this->push_back(item);
-	}
+	// Don't send vlv here because MidiFile.cpp adds it.
 	for (int i=startindex; i<=endindex; i++) {
 		this->push_back(data.at(i));
 	}
