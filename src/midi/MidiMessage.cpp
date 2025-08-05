@@ -2055,7 +2055,7 @@ void MidiMessage::makeSysExMessage(const std::vector<uchar>& data) {
 
 	this->push_back((uchar)0xf0);
 
-	// MidiFile::write() tales care of writing the vlv for sysex.
+	// MidiFile::write() takes care of writing the vlv for sysex.
 	// int msize = endindex - startindex + 2;
 	// std::vector<uchar> vlv = intToVlv(msize);
 	// for (uchar item : vlv) {
