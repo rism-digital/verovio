@@ -6,18 +6,16 @@ Pod::Spec.new do |s|
   s.authors        = { 'Contributors List' => 'https://github.com/rism-digital/verovio/graphs/contributors' }
   s.summary        = 'Verovio'
   s.source         = { :git => 'https://github.com/rism-digital/verovio.git', :tag => 'version-' + s.version.to_s }
-  s.source_files   = [
-    'src/**/*.{h,cpp,cc}',
-    'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
-    'libmei/{dist,addons}/*.{h,cpp}'
-  ]
-  s.private_header_files = [
-    'include/{crc,zip}/*.{h,hpp}'
-  ]
-  s.public_header_files = [
-    'include/{hum,json,midi,pugi,utf8,vrv}/*.{h,hpp}',
-    'libmei/{dist,addons}/*.{h}'
-  ]
+  s.source_files   = 
+      'src/**/*.{cpp,cc}',
+      'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
+      'libmei/{dist,addons}/*.{h,cpp}'
+  s.public_header_files =
+      'include/{json,pugi,vrv}/*.{h,hpp}',
+      'libmei/{dist,addons}/*.{h}'
+  s.private_header_files = 
+      'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
+      'libmei/{dist,addons}/*.{h}'
   s.resources      = 'data'
   s.ios.deployment_target = '16.0'
   s.osx.deployment_target = '11.0'
