@@ -2178,6 +2178,10 @@ void MidiMessage::makeMts2_KeyTuningsBySemitone(std::vector<std::pair<int, doubl
 		uchar msb = (value >> 7) & 0x7f;
 		data.push_back(msb);
 		data.push_back(lsb);
+
+		std::cout << keynum << " => [" << sint << ", "
+		          << std::hex << (unsigned int) msb << ", " << (unsigned int) lsb
+							<< "]" << std::dec << std::endl;
     }
     this->makeSysExMessage(data);
 }

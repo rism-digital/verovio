@@ -135,7 +135,8 @@
         </print>
       <sound>
         <play>
-          <other-play type="ableton-tuning">
+          <!-- <other-play type="tuning-mei">just</other-play> -->
+          <other-play type="tuning-ableton">
             <![CDATA[
 ! All Maqamat 24EDO.ascl
 !

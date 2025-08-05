@@ -3760,12 +3760,25 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
     assert(node);
     assert(section);
 
+    // get MEI tuning.
+    pugi::xpath_node meiTuning = node.select_node("play/other-play[@type='tuning-mei']");
+    if (meiTuning) {
+        const std::string value = std::regex_replace(meiTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
+        data_TEMPERAMENT temperament = TEMPERAMENT_NONE;
+        if (value == "equal") temperament = TEMPERAMENT_equal;
+        else if (value == "just") temperament = TEMPERAMENT_just;
+        else if (value == "mean") temperament = TEMPERAMENT_mean;
+        else if (value == "pythagorean") temperament = TEMPERAMENT_pythagorean;
+        else LogWarning("Error parsing MEI temperament: %s", value);
+        m_doc->GetFirstScoreDef()->SetTuneTemper(temperament);
+    }
+
     // get custom (Ableton) tuning
-    pugi::xpath_node abletonTuning = node.select_node("play/other-play[@type='ableton-tuning']");
+    pugi::xpath_node abletonTuning = node.select_node("play/other-play[@type='tuning-ableton']");
     if (abletonTuning) {
-        const std::string ascl = std::regex_replace(abletonTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
+        const std::string value = std::regex_replace(abletonTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
         try {
-            Tunings::Tuning tuning(Tunings::parseASCLData(ascl));
+            Tunings::Tuning tuning(Tunings::parseASCLData(value));
             for (auto &note : tuning.notationMapping.names) {
                 // replace MusicXML accidentals with equivalent MEI.
                 // TODO handle enharmonics separated by /
