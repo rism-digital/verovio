@@ -259,7 +259,7 @@ std::string Resources::GetCustomFontname(const std::string &filename, const ZipF
 {
 #ifdef __EMSCRIPTEN__
     // Extracts the font name from the bounding box XML file
-    // For example, OneGlyph/OneGlpyh.xml
+    // For example, OneGlyph/OneGlyph.xml
     for (auto &s : zipFile.GetFileList()) {
         std::filesystem::path path(s);
         if (!path.has_parent_path() || (path.parent_path() == path.stem())) {
@@ -436,7 +436,7 @@ bool Resources::InitTextFont(const std::string &fontName, const StyleAttributes 
     }
     pugi::xml_node root = doc.first_child();
     if (!root.attribute("units-per-em")) {
-        LogWarning("No units-per-em attribute in bouding box file");
+        LogWarning("No units-per-em attribute in bounding box file");
         return false;
     }
     const int unitsPerEm = root.attribute("units-per-em").as_int();

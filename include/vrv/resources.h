@@ -99,7 +99,7 @@ public:
     ///@}
 
     /**
-     * Check if the text has any charachter that needs the smufl fallback font
+     * Check if the text has any character that needs the smufl fallback font
      */
     bool IsSmuflFallbackNeeded(const std::u32string &text) const;
 
