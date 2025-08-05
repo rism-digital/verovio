@@ -118,38 +118,40 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const title = `🚨 Upstream Sync Failed - Rebase Conflicts Detected`;
-            const body = `## Automatic upstream sync failed
+            const title = `🚨 Verovio Upstream Sync Failed - Rebase Conflicts Detected`;
+            const body = `## Automatic upstream sync failed in DDMAL/verovio
 
             The scheduled rebase onto \`rism-digital/verovio:develop\` failed due to merge conflicts.
 
             **Details:**
+            - Repository: ${{ github.repository }}
             - Upstream commits to sync: ${{ steps.check_commits.outputs.commits_behind }}
             - Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
             **Manual action required:**
-            1. Fetch the latest upstream changes: \`git fetch upstream develop\`
-            2. Rebase manually: \`git rebase upstream/develop\`
-            3. Resolve any conflicts
-            4. Push the rebased branch: \`git push --force-with-lease origin develop\`
+            1. Go to the DDMAL/verovio repository
+            2. Fetch the latest upstream changes: \`git fetch upstream develop\`
+            3. Rebase manually: \`git rebase upstream/develop\`
+            4. Resolve any conflicts
+            5. Push the rebased branch: \`git push --force-with-lease origin develop\`
 
             This issue will be automatically closed when the next successful sync occurs.`;
 
-            // Check if an issue already exists
+            // Check if an issue already exists in DDMAL/Neon
             const existingIssues = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: ['upstream-sync-failure'],
+              owner: 'DDMAL',
+              repo: 'Neon',
+              labels: ['verovio-upstream-sync-failure'],
               state: 'open'
             });
 
             if (existingIssues.data.length === 0) {
               await github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
+                owner: 'DDMAL',
+                repo: 'Neon',
                 title: title,
                 body: body,
-                labels: ['upstream-sync-failure', 'automation']
+                labels: ['verovio-upstream-sync-failure', 'automation']
               });
             }
 
@@ -158,25 +160,25 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            // Close any existing upstream sync failure issues
+            // Close any existing upstream sync failure issues in DDMAL/Neon
             const existingIssues = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: ['upstream-sync-failure'],
+              owner: 'DDMAL',
+              repo: 'Neon',
+              labels: ['verovio-upstream-sync-failure'],
               state: 'open'
             });
 
             for (const issue of existingIssues.data) {
               await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
+                owner: 'DDMAL',
+                repo: 'Neon',
                 issue_number: issue.number,
-                body: '✅ Upstream sync completed successfully. Closing this issue.'
+                body: '✅ Verovio upstream sync completed successfully. Closing this issue.'
               });
               
               await github.rest.issues.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
+                owner: 'DDMAL',
+                repo: 'Neon',
                 issue_number: issue.number,
                 state: 'closed'
               });
