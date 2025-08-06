@@ -194,6 +194,7 @@ class MidiMessage : public std::vector<uchar> {
 		void           makeMts2_KeyTuningBySemitone   (int key, double semitone, int program = 0);
 		void           makeMts2_KeyTuningsBySemitone  (int key, double semitone, int program = 0);
 		void           makeMts2_KeyTuningsBySemitone  (std::vector<std::pair<int, double>>& mapping, int program = 0);
+		void           makeTuningCustom(Tunings::Tuning tuneCustom, int program = 0);
 
 		// MTS type 9: Real-time octave temperaments by +/- 100 cents deviation from ET
 		// See page 7 of: https://docs.google.com/viewer?url=https://www.midi.org/component/edocman/midi-tuning-updated/fdocument?Itemid=9999
@@ -205,7 +206,6 @@ class MidiMessage : public std::vector<uchar> {
 		void           makeTemperamentMeantoneCommaQuarter(int referencePitchClass = 2, int channelMask = 0b1111111111111111);
 		void           makeTemperamentMeantoneCommaThird(int referencePitchClass = 2, int channelMask = 0b1111111111111111);
 		void           makeTemperamentMeantoneCommaHalf(int referencePitchClass = 2, int channelMask = 0b1111111111111111);
-		void           makeTemperamentCustom(Tunings::Tuning tuneCustom, int referencePitchClass = 2, int channelMask = 0b1111111111111111);
 
 };
 

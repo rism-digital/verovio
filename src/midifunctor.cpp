@@ -956,12 +956,13 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
     }
     // set temperament event if corresponding attribute present
     if (scoreDef->HasTuneTemper()) {
+        const int program = m_instrDef && m_instrDef->HasMidiInstrnum() ? m_instrDef->GetMidiInstrnum() : 0;
         switch (scoreDef->GetTuneTemper()) {
             case TEMPERAMENT_equal: midiEvent.makeTemperamentEqual(referencePitchClass); break;
             case TEMPERAMENT_just: midiEvent.makeTemperamentBad(100.0, referencePitchClass); break;
             case TEMPERAMENT_mean: midiEvent.makeTemperamentMeantone(referencePitchClass); break;
             case TEMPERAMENT_pythagorean: midiEvent.makeTemperamentPythagorean(referencePitchClass); break;
-            case TEMPERAMENT_custom: midiEvent.makeTemperamentCustom(scoreDef->GetTuneCustom(), referencePitchClass); break;
+            case TEMPERAMENT_custom: midiEvent.makeTuningCustom(scoreDef->GetTuneCustom(), program); break;
             default: break;
         }
         m_midiFile->addEvent(m_midiTrack, midiEvent);

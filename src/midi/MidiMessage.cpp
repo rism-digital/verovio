@@ -2179,6 +2179,21 @@ void MidiMessage::makeMts2_KeyTuningsBySemitone(std::vector<std::pair<int, doubl
 
 //////////////////////////////
 //
+// MidiMessage::makeTuningCustom -- Custom tuning
+//
+
+void MidiMessage::makeTuningCustom(Tunings::Tuning tuneCustom, int program) {
+	std::vector<std::pair<int, double>> mapping;
+	for (int i=0; i<128; i++) {
+		mapping.push_back(std::make_pair(i, tuneCustom.frequencyForMidiNote(i)));
+	}
+	this->makeMts2_KeyTuningsByFrequency(mapping, program);
+}
+
+
+
+//////////////////////////////
+//
 // MidiMessage::makeMts9_TemperamentByCentsDeviationFromET --
 //
 
@@ -2342,21 +2357,6 @@ void MidiMessage::makeTemperamentMeantoneCommaThird(int referencePitchClass, int
 
 void MidiMessage::makeTemperamentMeantoneCommaHalf(int referencePitchClass, int channelMask) {
 	this->makeTemperamentMeantone(1.0 / 2.0, referencePitchClass, channelMask);
-}
-
-
-
-//////////////////////////////
-//
-// MidiMessage::makeTemperamentCustom -- Custom tuning
-//
-
-void MidiMessage::makeTemperamentCustom(Tunings::Tuning tuneCustom, int referencePitchClass, int channelMask) {
-	std::vector<std::pair<int, double>> mapping;
-	for (int i=0; i<128; i++) {
-		mapping.push_back(std::make_pair(i, tuneCustom.frequencyForMidiNote(i)));
-	}
-	this->makeMts2_KeyTuningsByFrequency(mapping);
 }
 
 

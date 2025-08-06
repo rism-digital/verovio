@@ -13,6 +13,7 @@
 //----------------------------------------------------------------------------
 
 #include "alignfunctor.h"
+#include "instrdef.h"
 
 namespace smf {
 class MidiFile;
@@ -382,6 +383,7 @@ public:
     void SetTrack(int track) { m_midiTrack = track; }
     void SetTransSemi(int transSemi) { m_transSemi = transSemi; }
     void SetScoreDef(const ScoreDef *scoreDef) { m_scoreDef = scoreDef; }
+    void SetInstrDef(const InstrDef *instrDef) { m_instrDef = instrDef; }
     ///@}
 
     /*
@@ -463,8 +465,10 @@ private:
     std::vector<MIDIHeldNote> m_heldNotes;
     // A flag indicating we want to process control events
     bool m_controlEvents;
-    // First seen scoreDef
+    // Current scoreDef
     const ScoreDef *m_scoreDef;
+    // Current instrDef
+    const InstrDef *m_instrDef;
 };
 
 //----------------------------------------------------------------------------

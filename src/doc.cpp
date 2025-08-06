@@ -488,6 +488,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     Filters filters;
     for (auto &staves : layerTree.child) {
         int transSemi = 0;
+        InstrDef *instrdef = NULL;
         if (StaffDef *staffDef = scoreDef->GetStaffDef(staves.first)) {
             // get the transposition (semi-tone) value for the staff
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
@@ -496,7 +497,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                 midiFile->addTracks(midiTrack + 1 - midiFile->getTrackCount());
             }
             // set MIDI channel and instrument
-            InstrDef *instrdef = vrv_cast<InstrDef *>(staffDef->FindDescendantByType(INSTRDEF, 1));
+            instrdef = vrv_cast<InstrDef *>(staffDef->FindDescendantByType(INSTRDEF, 1));
             if (!instrdef) {
                 StaffGrp *staffGrp = vrv_cast<StaffGrp *>(staffDef->GetFirstAncestor(STAFFGRP));
                 assert(staffGrp);
@@ -553,6 +554,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         GenerateMIDIFunctor generateScoreDefMIDI(midiFile);
         generateScoreDefMIDI.SetChannel(midiChannel);
         generateScoreDefMIDI.SetTrack(midiTrack);
+        generateScoreDefMIDI.SetInstrDef(instrdef);
 
         scoreDef->Process(generateScoreDefMIDI);
 
