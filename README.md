@@ -10,8 +10,8 @@
 
 Verovio is a fast, portable and lightweight library for engraving [Music Encoding Initiative (MEI)](http://www.music-encoding.org) digital scores into SVG images. Verovio also contains on-the-fly converters to render [Plaine & Easie Code](https://www.iaml.info/plaine-easie-code), [Humdrum](https://www.humdrum.org), [Musedata](https://musedata.org), [MusicXML](https://www.musicxml.com), [EsAC](http://esac-data.org), and [ABC](https://en.wikipedia.org/wiki/ABC_notation) digital scores. 
 
-Verovio is written in standard 2020 C++20 and is available in several bindings (JavaScript, Python, Java, Swift). It
-can be compiled as a standalone command-line tool or as a compiled music-rendering library for applications.  Check out the JavaScript toolkit version of Verovio running in the [Verovio Online Editor / Viewer](http://editor.verovio.org), or the [tutorials](https://book.verovio.org/first-steps/) to know more about web integration and user interaction.
+Verovio is written in standard C++20 and is available in several bindings (JavaScript, Python, Java, Swift). It
+can be compiled as a standalone command-line tool or as a music-rendering library for applications.  Check out the JavaScript toolkit version of Verovio running in the [Verovio Online Editor / Viewer](http://editor.verovio.org), or the [tutorials](https://book.verovio.org/first-steps/) to know more about web integration and user interaction.
 
 ![Choice interaction](https://raw.githubusercontent.com/rism-digital/verovio.org/gh-pages/movies/reflow.gif)
 
@@ -31,7 +31,6 @@ Verovio is available under the LGPL license (see [COPYING](https://github.com/ri
 ## Building and use instructions by environment
 
 See the [Reference book](https://book.verovio.org/installing-or-building-from-sources/command-line.html)
-
 
 ## Libraries
 
