@@ -114,7 +114,7 @@ public:
     void GenerateMEIHeader();
 
     /**
-     * Convert the header to MEI basic by preserving only the fileDesc and its titleStmt
+     * Convert the header to MEI Basic by preserving only the fileDesc and its titleStmt
      */
     void ConvertHeaderToMEIBasic();
 

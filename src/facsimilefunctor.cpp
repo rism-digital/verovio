@@ -89,7 +89,7 @@ FunctorCode SyncFromFacsimileFunctor::VisitPageEnd(Page *page)
         m_ppuFactor = DEFINITION_FACTOR;
     }
 
-    // The staff size is calculated based on the zone height and takes into acocunt the rotation
+    // The staff size is calculated based on the zone height and takes into account the rotation
     for (auto &[staff, zone] : m_staffZones) {
         double rotate = (zone->HasRotate()) ? zone->GetRotate() : 0.0;
         int yDiff

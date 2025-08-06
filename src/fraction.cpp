@@ -139,7 +139,7 @@ std::pair<data_DURATION, Fraction> Fraction::ToDur() const
     dur = vrv::DurationMin(DURATION_2048, dur);
 
     Fraction remainder = *this - Fraction(dur);
-    // Making sure we would not be triggering an inifite loop when looping over the remainder
+    // Making sure we would not be triggering an infinite loop when looping over the remainder
     if ((remainder >= *this) || (remainder < 0)) remainder = 0;
     return { dur, remainder };
 }

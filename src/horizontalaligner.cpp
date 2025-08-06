@@ -846,7 +846,7 @@ void AlignmentReference::AddChild(Object *child)
     }
 
     // Special case where we do not set the parent because the reference will not have ownership
-    // Children will be treated as relinquished objects in the desctructor
+    // Children will be treated as relinquished objects in the destructor
     // However, we need to make sure the child has a parent (somewhere else)
     assert(child->GetParent() && this->IsReferenceObject());
     children.push_back(child);

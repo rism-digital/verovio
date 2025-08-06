@@ -636,7 +636,7 @@ int BoundingBox::Intersects(const FloatingCurvePositioner *curve, Accessor type,
     assert(curve->GetObject());
     assert(curve->GetObject()->Is({ LV, PHRASE, SLUR, TIE }));
 
-    // for lisability
+    // for readability
     Point points[4];
     curve->GetPoints(points);
     Point p1 = points[0];

@@ -1324,7 +1324,7 @@ Options::Options()
     m_graceRightAlign.Init(false);
     this->Register(&m_graceRightAlign, "graceRightAlign", &m_generalLayout);
 
-    m_hairpinSize.SetInfo("Hairpin size", "The haripin size in MEI units");
+    m_hairpinSize.SetInfo("Hairpin size", "The hairpin size in MEI units");
     m_hairpinSize.Init(3.0, 1.0, 8.0);
     this->Register(&m_hairpinSize, "hairpinSize", &m_generalLayout);
 
