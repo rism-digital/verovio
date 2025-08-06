@@ -5,19 +5,23 @@
 
 int main(int argc, char **argv)
 {
-    for (int i=1; i<argc; ++i)
+    for (int i = 1; i < argc; ++i)
     {
         std::cout << std::setw(50) << argv[i];
-        try {
-            if (strstr(argv[i], ".scl")) {
+        try
+        {
+            if (strstr(argv[i], ".scl"))
+            {
                 Tunings::readSCLFile(argv[i]);
                 std::cout << " PASSED";
             }
-            else if (strstr(argv[i], ".kbm")) {
+            else if (strstr(argv[i], ".kbm"))
+            {
                 Tunings::readKBMFile(argv[i]);
                 std::cout << " PASSED";
             }
-            else if (strstr(argv[i], ".ascl")) {
+            else if (strstr(argv[i], ".ascl"))
+            {
                 Tunings::readASCLFile(argv[i]);
                 std::cout << " PASSED";
             }
@@ -25,8 +29,8 @@ int main(int argc, char **argv)
             {
                 std::cout << " SKIPPED";
             }
-
-        } catch(Tunings::TuningError &t)
+        }
+        catch (Tunings::TuningError &t)
         {
             std::cout << " FAILED : " << t.what();
         }

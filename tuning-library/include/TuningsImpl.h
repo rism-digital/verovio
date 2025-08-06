@@ -882,10 +882,9 @@ inline int Tuning::midiNoteForNoteName(std::string noteName, int octave) const
         throw TuningError(s);
     }
     int scalePosition = positive_mod(it - notationMapping.names.begin() + 1, notationMapping.count);
-    int referencePitchOctave = ceil((keyboardMapping.middleNote - 21) / 12);
     return std::min(
         std::max(0, scalePosition + keyboardMapping.middleNote +
-                        keyboardMapping.octaveDegrees * (octave - referencePitchOctave)),
+                        keyboardMapping.octaveDegrees * (octave - keyboardMapping.tuningOctave)),
         N - 1);
 }
 
@@ -923,8 +922,8 @@ inline Tuning Tuning::withSkippedNotesInterpolated() const
 
 inline KeyboardMapping::KeyboardMapping()
     : count(0), firstMidi(0), lastMidi(127), middleNote(60), tuningConstantNote(60),
-      tuningFrequency(MIDI_0_FREQ * 32.0), tuningPitch(32.0), octaveDegrees(0), rawText(""),
-      name("")
+      tuningFrequency(MIDI_0_FREQ * 32.0), tuningPitch(32.0), tuningOctave(4), octaveDegrees(0),
+      rawText(""), name("")
 {
     std::ostringstream oss;
     oss.imbue(std::locale("C"));
@@ -1041,6 +1040,7 @@ inline AbletonScale readASCLStream(std::istream &inf)
                 as.keyboardMapping.tuningPitch = as.keyboardMapping.tuningFrequency / MIDI_0_FREQ;
                 as.keyboardMapping.tuningConstantNote =
                     as.midiNoteForScalePosition(as.referencePitchIndex);
+                as.keyboardMapping.tuningOctave = as.referencePitchOctave;
                 as.keyboardMapping.middleNote = as.midiNoteForScalePosition(0);
             }
             else

@@ -196,7 +196,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
 1200.
 !
 ! @ABL NOTE_NAMES C Dflat Dslash-flat D Eflat Eslash-flat E F Fsharp G Aflat Aslash-flat A Bflat Bslash-flat B
-! @ABL REFERENCE_PITCH 3 0 261.6256
+! @ABL REFERENCE_PITCH 4 0 261.6256
 ! @ABL NOTE_RANGE_BY_INDEX -1 4 7 3
 ! @ABL SOURCE Inside Arabic Music, Chapter 11 (description of Tuning System); Ch 14-16 (descriptions of Ajnas); Ch 24 (Sayr diagrams)
 ! @ABL LINK https://www.ableton.com/learn-more/tuning-systems/all-maqamat-24edo

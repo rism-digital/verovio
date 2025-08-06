@@ -1404,6 +1404,10 @@ TEST_CASE("Loading Ableton scales")
         REQUIRE(t.noteNameForScalePosition(0) == "C");
         REQUIRE(t.noteNameForScalePosition(4) == "E1/2♭");
         REQUIRE(t.noteNameForScalePosition(4 + t.scale.count) == "E1/2♭");
+
+        auto s2 = Tunings::readASCLFile(testFile("rast6.ascl"));
+        Tunings::Tuning t2(s2);
+        REQUIRE(t2.midiNoteForNoteName("C", 4) == 60);
     }
 
     SECTION("Tuning read without ASCL")

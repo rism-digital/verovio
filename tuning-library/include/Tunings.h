@@ -112,6 +112,7 @@ struct KeyboardMapping
     int middleNote;
     int tuningConstantNote;
     double tuningFrequency, tuningPitch; // pitch = frequency / MIDI_0_FREQ
+    int tuningOctave; // octave of the tuning reference, only used in Tuning::midiNoteForNoteName()
     int octaveDegrees;
     std::vector<int> keys; // rather than an 'x' we use a '-1' for skipped keys
 

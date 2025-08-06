@@ -36,22 +36,25 @@ int main(int argc, char **argv)
             t = Tuning(s, k);
         }
 
-        std::cout << "Note ,"
-                  << " Freq (Hz) , "
-                  << "  ScaledFrq , "
-                  << " logScaled " << std::endl;
+        std::cout << std::setw(4) << "Note," << std::setw(18) << "Freq (Hz)," << std::setw(18)
+                  << "ScaledFrq," << std::setw(18) << "logScaled," << std::setw(6) << "Pos,"
+                  << " Name" << std::endl;
 
         for (int i = 0; i < 128; ++i)
         {
             if (t.isMidiNoteMapped(i))
             {
-                std::cout << std::setw(4) << i << ", " << std::setw(10) << std::setprecision(10)
-                          << std::fixed << t.frequencyForMidiNote(i) << ", " << std::setw(10)
+                std::cout << std::setw(4) << i << ", " << std::setw(16) << std::setprecision(10)
+                          << std::fixed << t.frequencyForMidiNote(i) << ", " << std::setw(16)
                           << std::setprecision(10) << std::fixed
-                          << t.frequencyForMidiNoteScaledByMidi0(i) << ", " << std::setw(10)
+                          << t.frequencyForMidiNoteScaledByMidi0(i) << ", " << std::setw(16)
                           << std::setprecision(10) << std::fixed
-                          << t.logScaledFrequencyForMidiNote(i) << ", "
-                    << t.scalePositionForMidiNote(i) << std::endl;
+                          << t.logScaledFrequencyForMidiNote(i) << ", " << std::setw(4)
+                          << t.scalePositionForMidiNote(i) << ", "
+                          << (t.notationMapping.count
+                                  ? t.noteNameForScalePosition(t.scalePositionForMidiNote(i))
+                                  : "N/A")
+                          << std::endl;
             }
             else
             {

@@ -48,7 +48,7 @@ A version of Maqam Rast with a wide range of choices of pitch variants. Because 
 1200.
 !
 ! @ABL NOTE_NAMES "C " "D♭ " "D " "E♭ " "E1/2♭-a- " "E1/2♭-b- " "E1/2♭-c- " "E1/2♭-d- " "E " "F " "F♯ " "G " "A♭ " "A1/2♭ " "A " "B♭-a- " "B♭-b- " "B1/2♭-a- " "B1/2♭-b- " "B♮/C♭ "
-! @ABL REFERENCE_PITCH 3 0 261.6256
+! @ABL REFERENCE_PITCH 4 0 261.6256
 ! @ABL NOTE_RANGE_BY_INDEX 0 0 6 7
 ! @ABL SOURCE Inside Arabic Music, Chapter 11 (description of Tuning System); Ch 14-16 (descriptions of Ajnas); Ch 24 (Sayr diagrams of Maqam Rast and Maqam Suznak)
 ! @ABL LINK https://www.ableton.com/learn-more/tuning-systems/rast-6
