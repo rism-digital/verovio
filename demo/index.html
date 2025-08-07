@@ -2,8 +2,8 @@
   <head>
     <title>Verovio Demo</title>
     <script type="module">
-      import createVerovioModule from './npm/dist/verovio-module.mjs';
-      import { VerovioToolkit } from './npm/dist/verovio.mjs';
+      import createVerovioModule from './dist/verovio-module.mjs';
+      import { VerovioToolkit } from './dist/verovio.mjs';
       import { Synthetizer, Sequencer } from 'https://cdn.jsdelivr.net/npm/spessasynth_lib/+esm';
 
       function atoab(base64) {
@@ -31,7 +31,7 @@
           {
             const midiFile = atoab(verovioToolkit.renderToMIDI());
             const context = new AudioContext();
-            await context.audioWorklet.addModule('./worklet_processor.min.js');
+            await context.audioWorklet.addModule('./dist/worklet_processor.min.js');
             const synth = new Synthetizer(context.destination, soundFontArrayBuffer);
             const seq = new Sequencer([{ binary: midiFile }], synth);
             seq.play();
