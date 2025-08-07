@@ -1,0 +1,51 @@
+<html>
+  <head>
+    <title>Verovio Demo</title>
+    <script type="module">
+      import createVerovioModule from './npm/dist/verovio-module.mjs';
+      import { VerovioToolkit } from './npm/dist/verovio.mjs';
+      import { Synthetizer, Sequencer } from 'https://cdn.jsdelivr.net/npm/spessasynth_lib/+esm';
+
+      function atoab(base64) {
+        return Uint8Array.from(atob(base64), (c) => c.charCodeAt(0)).buffer;
+      }
+
+      createVerovioModule().then(async VerovioModule => {
+        const verovioToolkit = new VerovioToolkit(VerovioModule);
+        const score = await (await fetch('data/maqam-rast.musicxml')).text();
+        verovioToolkit.loadData(score);
+        verovioToolkit.setOptions({
+          scale: 50,
+        })
+        const data = verovioToolkit.renderToSVG(1);
+        document.getElementById('sheet').innerHTML = data;
+
+        fetch("data/GeneralUserGS.sf3").then(async response =>
+        {
+          // load the sound bank into an array buffer
+          let soundFontArrayBuffer = await response.arrayBuffer();
+          document.getElementById('message').innerHTML = 'Ready to play (with <a href="https://github.com/spessasus/SpessaSynth" target="_blank">SpessaSynth</a>) ▶️ (Refresh the page to stop playing 😂)';
+
+          // add an event listener for the file inout
+          document.getElementById('message').addEventListener('click', async event =>
+          {
+            const midiFile = atoab(verovioToolkit.renderToMIDI());
+            const context = new AudioContext();
+            await context.audioWorklet.addModule('./worklet_processor.min.js');
+            const synth = new Synthetizer(context.destination, soundFontArrayBuffer);
+            const seq = new Sequencer([{ binary: midiFile }], synth);
+            seq.play();
+          });
+        });
+      });
+    </script>
+    <style>
+      body {background-color: powderblue;}
+      #message {cursor: pointer;}
+    </style>
+  </head>
+  <body>
+    <div id="message"></div>
+    <div id="sheet"></div>
+  </body>
+</html>
