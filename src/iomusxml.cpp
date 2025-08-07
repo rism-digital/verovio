@@ -3770,7 +3770,7 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
         else if (value == "just") temperament = TEMPERAMENT_just;
         else if (value == "mean") temperament = TEMPERAMENT_mean;
         else if (value == "pythagorean") temperament = TEMPERAMENT_pythagorean;
-        else LogWarning("Error parsing MEI temperament: %s", value);
+        else LogWarning("Error parsing MEI temperament: %s", value.c_str());
         m_doc->GetFirstScoreDef()->SetTuneTemper(temperament);
     }
 
