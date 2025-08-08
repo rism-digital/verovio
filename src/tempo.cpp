@@ -119,7 +119,7 @@ double Tempo::CalcTempo(const AttMmTempo *attMmTempo)
     }
     if (attMmTempo->HasMmDots()) {
         double dotsUnit = 0.0;
-        for (int d = 0; d < attMmTempo->GetMmDots(); d++) {
+        for (int d = 0; d < attMmTempo->GetMmDots(); ++d) {
             dotsUnit += mmUnit / 4.0 / pow(2, d);
         }
         mmUnit -= dotsUnit;

@@ -80,7 +80,7 @@ int Neume::GetLigatureCount(int position)
 {
     int ligCount = 0;
     this->GetList();
-    for (int pos = 0; pos <= position; pos++) {
+    for (int pos = 0; pos <= position; ++pos) {
         Object *posObj = this->GetChild(pos);
         if (posObj != NULL) {
             Nc *posNc = dynamic_cast<Nc *>(posObj);

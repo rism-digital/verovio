@@ -83,7 +83,7 @@ bool Harm::GetRootPitch(TransPitch &pitch, unsigned int &pos) const
     if (text.length() > pos && text.at(pos) >= 'A' && text.at(pos) <= 'G') {
         int pname = (text.at(pos) - 'C' + 7) % 7;
         int accid = 0;
-        for (pos++; pos < text.length(); pos++) {
+        for (++pos; pos < text.length(); ++pos) {
             if (text.at(pos) == UNICODE_DOUBLE_FLAT) {
                 accid -= 2;
             }
@@ -128,9 +128,9 @@ bool Harm::GetBassPitch(TransPitch &pitch) const
     std::u32string text = textObject->GetText();
     if (!text.length()) return false;
 
-    for (unsigned int pos = 0; pos < text.length(); pos++) {
+    for (unsigned int pos = 0; pos < text.length(); ++pos) {
         if (text.at(pos) == U'/') {
-            pos++;
+            ++pos;
             return this->GetRootPitch(pitch, pos);
         }
     }
@@ -143,7 +143,7 @@ void Harm::SetBassPitch(const TransPitch &pitch)
     if (!textObject) return;
     std::u32string text = textObject->GetText();
     unsigned int pos;
-    for (pos = 0; pos < text.length(); pos++) {
+    for (pos = 0; pos < text.length(); ++pos) {
         if (text.at(pos) == U'/') {
             break;
         }
