@@ -1054,7 +1054,7 @@ void ABCInput::InitScoreAndSection(Score *&score, Section *&section)
 void ABCInput::ParseLyrics()
 {
     std::vector<std::pair<Syl *, int>> syllables;
-    constexpr std::string_view delimiters = "~\\-_ ";
+    constexpr std::string_view delimiters = "~-_ ";
     // skipping w:, so start from third element
     std::size_t start = 2;
     std::size_t found = abcLine.find_first_of(delimiters, 2);
@@ -1076,12 +1076,11 @@ void ABCInput::ParseLyrics()
             sylType = sylLog_CON_s;
         }
         else if (abcLine.at(found) == '-') {
-            sylType = sylLog_CON_d;
-        }
-        else if (abcLine.at(found) == '\\') {
-            if ((found + 1 < abcLine.size()) && (abcLine.at(found + 1) == '-')) {
+            if (abcLine.at(found - 1) == '\\') {
                 counter = 0;
-                ++found;
+                sylType = sylLog_CON_d;
+            }
+            else {
                 sylType = sylLog_CON_d;
             }
         }
