@@ -1147,7 +1147,7 @@ TransPitch Transposer::IntegerPitchToTransPitch(int ipitch)
         // search from B downwards
         mindiff = chroma - m_diatonicMapping.back();
         mini = (int)m_diatonicMapping.size() - 1;
-        for (int i = (int)m_diatonicMapping.size() - 2; i >= 0; i--) {
+        for (int i = (int)m_diatonicMapping.size() - 2; i >= 0; --i) {
             const int diff = chroma - m_diatonicMapping[i];
             if (abs(diff) < abs(mindiff)) {
                 mindiff = diff;

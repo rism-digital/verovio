@@ -277,7 +277,7 @@ bool EditorToolkitNeume::Chain(jsonxx::Array actions)
     // LogMessage("%s", actions.get<jsonxx::Object>(0).json().c_str());
     bool status = true;
     jsonxx::Object results;
-    for (int i = 0; i < (int)actions.size(); i++) {
+    for (int i = 0; i < (int)actions.size(); ++i) {
         if (!actions.has<jsonxx::Object>(0)) {
             LogError("Action %d was not an object", i);
             m_editInfo.reset();
