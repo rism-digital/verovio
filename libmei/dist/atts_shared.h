@@ -23,6 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include <string>
+#include <map>
 
 namespace vrv {
 
@@ -7400,6 +7401,8 @@ public:
     void SetTuneCustom(Tunings::Tuning tuneCustom_) { m_tuneCustom = tuneCustom_; m_tuneTemper = TEMPERAMENT_custom; }
     Tunings::Tuning GetTuneCustom() const { return m_tuneCustom; }
     bool HasTuneCustom() const;
+    std::map<std::string, std::string> &GetTuneCustomNoteMap() { return m_tuneCustomNoteMap; }
+    const std::map<std::string, std::string> &GetTuneCustomNoteMap() const { return m_tuneCustomNoteMap; }
     ///@}
 
 private:
@@ -7412,8 +7415,12 @@ private:
     data_PITCHNAME m_tunePname;
     /** Provides an indication of the tuning system, just, for example. **/
     data_TEMPERAMENT m_tuneTemper;
-    /** Provides a custom tuning. **/
+    /**
+     * Provides a custom tuning.
+     * A custom tuning also needs a note map from MEI notes to the custom tuning note names.
+     **/
     Tunings::Tuning m_tuneCustom;
+    std::map<std::string, std::string> m_tuneCustomNoteMap;
 };
 
 //----------------------------------------------------------------------------

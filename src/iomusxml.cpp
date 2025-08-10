@@ -3780,17 +3780,23 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
         const std::string value = std::regex_replace(abletonTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
         try {
             Tunings::Tuning tuning(Tunings::parseASCLData(value));
-            for (auto &note : tuning.notationMapping.names) {
-                // replace MusicXML accidentals with equivalent MEI.
-                // TODO handle enharmonics separated by /
-                // std::regex("([A-G])([^\\/\\s]*)(?:\\/([A-G])([^\\s]*))?")
-                // need to use a different map from separated notes into tuning notes.
-                std::smatch matches;
-                if (std::regex_match(note, matches, std::regex("([A-G])(.+?)"))) {
-                    note = matches[1].str() + AccidentalToAccidStr(matches[2].str());
+            m_doc->GetFirstScoreDef()->SetTuneCustom(tuning);
+
+            // map the tuning note names to MEI notes (including enharmonics separated by slash `/`)
+            auto &map = m_doc->GetFirstScoreDef()->GetTuneCustomNoteMap();
+            for (const auto &note : tuning.notationMapping.names) {
+                std::smatch note_names;
+                std::regex note_name_regex("(?:^|\\/)([A-G])([^\\/\\s]*)");
+                std::string::const_iterator search_start(note.cbegin());
+                while (std::regex_search(search_start, note.cend(), note_names, note_name_regex)) {
+                    std::string mei = note_names[1].str();
+                    if (!note_names[2].str().empty()) mei += AccidentalToAccidStr(note_names[2].str());
+                    map.insert({mei, note});
+
+                    // get next match
+                    search_start = note_names.suffix().first;
                 }
             }
-            m_doc->GetFirstScoreDef()->SetTuneCustom(tuning);
         }
         catch (Tunings::TuningError& error) {
             LogWarning("Error parsing Ableton tuning: %s", error.what());
@@ -4179,7 +4185,7 @@ std::string MusicXmlInput::AccidentalToAccidStr(const std::string &accidental)
         case ACCIDENTAL_WRITTEN_sx: value = "sx"; break;
         case ACCIDENTAL_WRITTEN_ts: value = "ts"; break;
         case ACCIDENTAL_WRITTEN_tf: value = "tf"; break;
-        case ACCIDENTAL_WRITTEN_n: value = "n"; break;
+        case ACCIDENTAL_WRITTEN_n: value = ""; break; // Ignore natural because we're ignoring it on output too
         case ACCIDENTAL_WRITTEN_nf: value = "nf"; break;
         case ACCIDENTAL_WRITTEN_ns: value = "ns"; break;
         case ACCIDENTAL_WRITTEN_su: value = "su"; break;

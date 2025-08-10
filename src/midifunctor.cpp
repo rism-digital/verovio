@@ -1121,7 +1121,8 @@ int GenerateMIDIFunctor::GetMIDIPitch(const Note *note)
         if (accid && accid->HasAttClass(ATT_ACCIDENTAL)) {
             const AttAccidental *att = dynamic_cast<const AttAccidental *>(accid);
             assert(att);
-            if (att->HasAccid()) {
+            // Skip natural accidental.
+            if (att->HasAccid() && att->GetAccid() != ACCIDENTAL_WRITTEN_n) {
                 noteName += att->AccidentalWrittenToStr(att->GetAccid());
             }
         }
@@ -1131,10 +1132,13 @@ int GenerateMIDIFunctor::GetMIDIPitch(const Note *note)
         // Lookup note in the tuning and map it to a MIDI key
         try {
             Tunings::Tuning tuning = m_scoreDef->GetTuneCustom();
-            return tuning.midiNoteForNoteName(noteName, oct);
+            return tuning.midiNoteForNoteName(m_scoreDef->GetTuneCustomNoteMap().at(noteName), oct);
         }
         catch (Tunings::TuningError &e) {
             LogWarning("Error mapping note to tuning: %s", e.what());
+        }
+        catch (std::out_of_range &e) {
+            LogWarning("Error mapping note to tuning: %s not mapped.", noteName.c_str());
         }
     }
     return note->GetMIDIPitch(m_transSemi, m_octaveShift);
