@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for repeat marks in ABC importer (@rettinghaus)
 * Fix `pgHead` conversion in MusicXML importer (@rettinghaus)
 * Fix lyric parsing in ABC importer (@rettinghaus)
 
