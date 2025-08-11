@@ -69,7 +69,7 @@ int Arpeg::GetDrawingX() const
     const Object *measure = this->GetFirstAncestor(MEASURE);
     assert(measure);
 
-    // This will be very arbitrary positionned...
+    // This will be very arbitrary positioned...
     return measure->GetDrawingX() + this->GetDrawingXRel();
 }
 

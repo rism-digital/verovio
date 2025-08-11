@@ -269,7 +269,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             layerElement->SetAlignment(dot->m_drawingPreviousElement->GetAlignment());
         }
         else {
-            // Create an alignment only if the dot has no resolved preceeding note
+            // Create an alignment only if the dot has no resolved preceding note
             type = ALIGNMENT_DOT;
         }
     }
