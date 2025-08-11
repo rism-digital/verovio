@@ -503,6 +503,9 @@ void ABCInput::ParseDecoration(const std::string &decorationString)
     if (!strcmp(decorationString.c_str(), ".")) {
         m_artic.push_back(ARTICULATION_stacc);
     }
+    else if (!strcmp(decorationString.c_str(), "~") || !strcmp(decorationString.c_str(), "roll")) {
+        m_ornam.push_back('S');
+    }
     else if (!strcmp(decorationString.c_str(), "trill") || !strcmp(decorationString.c_str(), "T")) {
         m_ornam.push_back('T');
     }
