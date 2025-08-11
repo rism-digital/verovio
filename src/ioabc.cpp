@@ -37,6 +37,7 @@
 #include "pb.h"
 #include "pghead.h"
 #include "rend.h"
+#include "repeatmark.h"
 #include "rest.h"
 #include "sb.h"
 #include "score.h"
@@ -439,6 +440,18 @@ void ABCInput::AddOrnaments(LayerElement *element)
     m_ornam.clear();
 }
 
+void ABCInput::AddRepeatMark(LayerElement *element)
+{
+    assert(element);
+
+    RepeatMark *rm = new RepeatMark();
+    rm->SetStartid("#" + element->GetID());
+    rm->SetFunc(m_repeatMark);
+    m_controlElements.push_back(std::make_pair(m_layer->GetID(), rm));
+
+    m_repeatMark = repeatMarkLog_FUNC_NONE;
+}
+
 void ABCInput::AddTie()
 {
     if (!m_tieStack.empty()) {
@@ -551,6 +564,18 @@ void ABCInput::ParseDecoration(const std::string &decorationString)
         || !strcmp(decorationString.c_str(), "fff") || !strcmp(decorationString.c_str(), "ffff")
         || !strcmp(decorationString.c_str(), "sfz")) {
         m_dynam.push_back(decorationString);
+    }
+    else if (!strcmp(decorationString.c_str(), "segno")) {
+        m_repeatMark = repeatMarkLog_FUNC_segno;
+    }
+    else if (!strcmp(decorationString.c_str(), "coda")) {
+        m_repeatMark = repeatMarkLog_FUNC_coda;
+    }
+    else if (!strcmp(decorationString.c_str(), "D.S.")) {
+        m_repeatMark = repeatMarkLog_FUNC_dalSegno;
+    }
+    else if (!strcmp(decorationString.c_str(), "D.C.")) {
+        m_repeatMark = repeatMarkLog_FUNC_daCapo;
     }
     else {
         LogWarning("ABC import: Decoration %s not supported", decorationString.c_str());
@@ -1319,6 +1344,11 @@ void ABCInput::ReadMusicCode(const std::string &musicCode, Section *section)
             if (m_fermata != STAFFREL_NONE) {
                 this->AddFermata(chord);
             }
+
+            // add repeat mark
+            if (m_repeatMark != repeatMarkLog_FUNC_NONE) {
+                this->AddRepeatMark(chord);
+            }
         }
         else if (i >= 1 && musicCode.at(i) == ']' && musicCode.at(i - 1) != '|') {
             // end chord
@@ -1487,6 +1517,11 @@ void ABCInput::ReadMusicCode(const std::string &musicCode, Section *section)
                 this->AddOrnaments(note);
             }
 
+            // add repeat mark
+            if (m_repeatMark != repeatMarkLog_FUNC_NONE) {
+                this->AddRepeatMark(note);
+            }
+
             if ((m_broken < 0) && (grace == GRACE_NONE)) {
                 for (int i = 0; i != -m_broken; ++i) dur = dur * 2;
             }
@@ -1616,6 +1651,11 @@ void ABCInput::ReadMusicCode(const std::string &musicCode, Section *section)
             // add fermata
             if (m_fermata != STAFFREL_NONE) {
                 this->AddFermata(rest);
+            }
+
+            // add repeat mark
+            if (m_repeatMark != repeatMarkLog_FUNC_NONE) {
+                this->AddRepeatMark(rest);
             }
 
             // set duration
