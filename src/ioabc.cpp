@@ -507,14 +507,12 @@ void ABCInput::ParseDecoration(const std::string &decorationString)
     else if (!strcmp(decorationString.c_str(), "invertedturn")) {
         m_ornam.push_back('s');
     }
-    else if (!strcmp(decorationString.c_str(), ">")) {
+    else if (!strcmp(decorationString.c_str(), ">") || !strcmp(decorationString.c_str(), "accent")
+        || !strcmp(decorationString.c_str(), "emphasis")) {
         m_artic.push_back(ARTICULATION_acc);
     }
-    else if (!strcmp(decorationString.c_str(), "accent")) {
-        m_artic.push_back(ARTICULATION_acc);
-    }
-    else if (!strcmp(decorationString.c_str(), "emphasis")) {
-        m_artic.push_back(ARTICULATION_acc);
+    else if (!strcmp(decorationString.c_str(), "^") || !strcmp(decorationString.c_str(), "marcato")) {
+        m_artic.push_back(ARTICULATION_marc);
     }
     else if (!strcmp(decorationString.c_str(), "fermata") || !strcmp(decorationString.c_str(), "H")) {
         m_fermata = STAFFREL_above;
@@ -525,14 +523,17 @@ void ABCInput::ParseDecoration(const std::string &decorationString)
     else if (!strcmp(decorationString.c_str(), "tenuto")) {
         m_artic.push_back(ARTICULATION_ten);
     }
-    else if (!strcmp(decorationString.c_str(), "+")) {
-        m_artic.push_back(ARTICULATION_stop);
-    }
-    else if (!strcmp(decorationString.c_str(), "plus")) {
+    else if (!strcmp(decorationString.c_str(), "+") || !strcmp(decorationString.c_str(), "plus")) {
         m_artic.push_back(ARTICULATION_stop);
     }
     else if (!strcmp(decorationString.c_str(), "snap")) {
         m_artic.push_back(ARTICULATION_snap);
+    }
+    else if (!strcmp(decorationString.c_str(), "slide")) {
+        m_artic.push_back(ARTICULATION_scoop);
+    }
+    else if (!strcmp(decorationString.c_str(), "wedge")) {
+        m_artic.push_back(ARTICULATION_stacciss);
     }
     else if (!strcmp(decorationString.c_str(), "upbow") || !strcmp(decorationString.c_str(), "u")) {
         m_artic.push_back(ARTICULATION_upbow);
