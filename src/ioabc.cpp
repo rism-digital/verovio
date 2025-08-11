@@ -1078,11 +1078,8 @@ void ABCInput::ParseLyrics()
         else if (abcLine.at(found) == '-') {
             if (abcLine.at(found - 1) == '\\') {
                 counter = 0;
-                sylType = sylLog_CON_d;
             }
-            else {
-                sylType = sylLog_CON_d;
-            }
+            sylType = sylLog_CON_d;
         }
         else if (abcLine.at(found) == '*') {
             // skip one note
