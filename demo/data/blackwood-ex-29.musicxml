@@ -2,10 +2,10 @@
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="4.0">
   <work>
-    <work-title>Untitled score</work-title>
+    <work-title>Harmonization of decatonic mode in 15-tET, Ex. 29</work-title>
     </work>
   <identification>
-    <creator type="composer">Composer / arranger</creator>
+    <creator type="composer">Easley Blackwood</creator>
     <encoding>
       <software>MuseScore 4.5.2</software>
       <encoding-date>2025-08-10</encoding-date>
@@ -79,8 +79,7 @@
     </credit>
   <part-list>
     <score-part id="P1">
-      <part-name>Piano</part-name>
-      <part-abbreviation>Pno.</part-abbreviation>
+      <part-name></part-name>
       <score-instrument id="P1-I1">
         <instrument-name>Piano</instrument-name>
         <instrument-sound>keyboard.piano</instrument-sound>
@@ -162,6 +161,9 @@
           </clef>
         </attributes>
       <direction placement="above" system="only-top">
+        <direction-type>
+            <words></words>
+          </direction-type>
         <sound tempo="80"/>
         </direction>
       <note default-x="87.71" default-y="-15">
