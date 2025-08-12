@@ -1722,9 +1722,10 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     }
 
     // set metcon to false for pickup measures
-    int endDuration = m_ppq;
-    for (const int &num : m_meterCount) endDuration *= num;
-    if (m_durTotal && m_durTotal != endDuration) {
+    int measureTotal = m_ppq * 4;
+    for (const int &num : m_meterCount) measureTotal *= num;
+    measureTotal /= m_meterUnit;
+    if (m_durTotal && m_durTotal != measureTotal) {
         measure->SetMetcon(BOOLEAN_false);
     }
 
@@ -2747,7 +2748,6 @@ void MusicXmlInput::ReadMusicXmlNote(
     if (m_ppq < 0 && duration && !typeStr.empty()) {
         // if divisions are missing, try to calculate
         m_ppq = (double)duration * pow(2, ConvertTypeToDur(typeStr) - 2) / 4;
-        m_durTotal += duration;
     }
 
     if (rest) {
