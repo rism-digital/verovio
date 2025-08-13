@@ -3784,13 +3784,21 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
 
             // map the tuning note names to MEI notes (including enharmonics separated by slash `/`)
             auto &map = m_doc->GetFirstScoreDef()->GetTuneCustomNoteMap();
+            map.clear();
             for (const auto &note : tuning.notationMapping.names) {
                 std::smatch note_names;
                 std::regex note_name_regex("(?:^|\\/)([A-G])([^\\/\\s]*)");
                 std::string::const_iterator search_start(note.cbegin());
                 while (std::regex_search(search_start, note.cend(), note_names, note_name_regex)) {
                     std::string mei = note_names[1].str();
-                    if (!note_names[2].str().empty()) mei += AccidentalToAccidStr(note_names[2].str());
+                    std::string accid = note_names[2].str();
+                    if (!accid.empty()) {
+                        InstAccidental accidental;
+                        accidental.SetAccid(ConvertAccidentalToAccid(accid));
+                        if (accidental.HasAccid() && accidental.GetAccid() != ACCIDENTAL_WRITTEN_n) {
+                            mei += accidental.AccidentalWrittenToStr(accidental.GetAccid());
+                        }
+                    }
                     map.insert({mei, note});
 
                     // get next match
@@ -4168,56 +4176,6 @@ data_ACCIDENTAL_WRITTEN MusicXmlInput::ConvertAccidentalToAccid(const std::strin
 
     LogWarning("MusicXML import: Unsupported accidental value '%s'", value.c_str());
     return ACCIDENTAL_WRITTEN_NONE;
-}
-
-// Lifted from AttConverterBase::AccidentalWrittenToStr because I couldn't figure out how to reuse that.
-std::string MusicXmlInput::AccidentalToAccidStr(const std::string &accidental)
-{
-    const data_ACCIDENTAL_WRITTEN data = ConvertAccidentalToAccid(accidental);
-    std::string value;
-    switch (data) {
-        case ACCIDENTAL_WRITTEN_s: value = "s"; break;
-        case ACCIDENTAL_WRITTEN_f: value = "f"; break;
-        case ACCIDENTAL_WRITTEN_ss: value = "ss"; break;
-        case ACCIDENTAL_WRITTEN_x: value = "x"; break;
-        case ACCIDENTAL_WRITTEN_ff: value = "ff"; break;
-        case ACCIDENTAL_WRITTEN_xs: value = "xs"; break;
-        case ACCIDENTAL_WRITTEN_sx: value = "sx"; break;
-        case ACCIDENTAL_WRITTEN_ts: value = "ts"; break;
-        case ACCIDENTAL_WRITTEN_tf: value = "tf"; break;
-        case ACCIDENTAL_WRITTEN_n: value = ""; break; // Ignore natural because we're ignoring it on output too
-        case ACCIDENTAL_WRITTEN_nf: value = "nf"; break;
-        case ACCIDENTAL_WRITTEN_ns: value = "ns"; break;
-        case ACCIDENTAL_WRITTEN_su: value = "su"; break;
-        case ACCIDENTAL_WRITTEN_sd: value = "sd"; break;
-        case ACCIDENTAL_WRITTEN_fu: value = "fu"; break;
-        case ACCIDENTAL_WRITTEN_fd: value = "fd"; break;
-        case ACCIDENTAL_WRITTEN_nu: value = "nu"; break;
-        case ACCIDENTAL_WRITTEN_nd: value = "nd"; break;
-        case ACCIDENTAL_WRITTEN_xu: value = "xu"; break;
-        case ACCIDENTAL_WRITTEN_xd: value = "xd"; break;
-        case ACCIDENTAL_WRITTEN_ffu: value = "ffu"; break;
-        case ACCIDENTAL_WRITTEN_ffd: value = "ffd"; break;
-        case ACCIDENTAL_WRITTEN_1qf: value = "1qf"; break;
-        case ACCIDENTAL_WRITTEN_3qf: value = "3qf"; break;
-        case ACCIDENTAL_WRITTEN_1qs: value = "1qs"; break;
-        case ACCIDENTAL_WRITTEN_3qs: value = "3qs"; break;
-        case ACCIDENTAL_WRITTEN_bms: value = "bms"; break;
-        case ACCIDENTAL_WRITTEN_kms: value = "kms"; break;
-        case ACCIDENTAL_WRITTEN_bs: value = "bs"; break;
-        case ACCIDENTAL_WRITTEN_ks: value = "ks"; break;
-        case ACCIDENTAL_WRITTEN_kf: value = "kf"; break;
-        case ACCIDENTAL_WRITTEN_bf: value = "bf"; break;
-        case ACCIDENTAL_WRITTEN_kmf: value = "kmf"; break;
-        case ACCIDENTAL_WRITTEN_bmf: value = "bmf"; break;
-        case ACCIDENTAL_WRITTEN_koron: value = "koron"; break;
-        case ACCIDENTAL_WRITTEN_sori: value = "sori"; break;
-        default:
-            LogWarning("Unknown value '%d' for data.ACCIDENTAL.WRITTEN", data);
-            value = "";
-            break;
-    }
-    return value;
 }
 
 data_ACCIDENTAL_GESTURAL MusicXmlInput::ConvertAlterToAccid(const float value)

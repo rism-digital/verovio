@@ -465,6 +465,52 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         midiFile->addTempo(0, 0, tempo);
     }
 
+    // Set overridden tuning
+    const auto midiTuning =  m_options->m_midiTuning.GetStrValue();
+    if (!midiTuning.empty()) {
+        std::ifstream f(midiTuning.c_str());
+        if (!f.good()) {
+            LogWarning("Tuning file %s not found", midiTuning.c_str());
+        }
+        else if (midiTuning.size() >= 5 && midiTuning.substr(midiTuning.size() - 5) == ".ascl") {
+            try {
+                Tunings::AbletonScale s = Tunings::readASCLStream(f);
+                Tunings::Tuning tuning(s);
+                scoreDef->SetTuneCustom(tuning);
+
+                // map the tuning note names to MEI notes (including enharmonics separated by slash `/`)
+                auto &map = scoreDef->GetTuneCustomNoteMap();
+                map.clear();
+                for (const auto &note : tuning.notationMapping.names) {
+                    std::smatch note_names;
+                    std::regex note_name_regex("(?:^|\\/)([A-G])([^\\/\\s]*)");
+                    std::string::const_iterator search_start(note.cbegin());
+                    while (std::regex_search(search_start, note.cend(), note_names, note_name_regex)) {
+                        std::string mei = note_names[1].str();
+                        std::string accid = note_names[2].str();
+                        if (!accid.empty()) {
+                            InstAccidental accidental;
+                            accidental.SetAccid(accidental.StrToAccidentalWritten(accid));
+                            if (accidental.HasAccid() && accidental.GetAccid() != ACCIDENTAL_WRITTEN_n) {
+                                mei += accidental.AccidentalWrittenToStr(accidental.GetAccid());
+                            }
+                        }
+                        map.insert({mei, note});
+
+                        // get next match
+                        search_start = note_names.suffix().first;
+                    }
+                }
+            }
+            catch (Tunings::TuningError &e) {
+                LogWarning("Tuning file %s invalid: %s", midiTuning.c_str(), e.what());
+            }
+        }
+        else {
+            LogWarning("Tuning file %s not recognized", midiTuning.c_str());
+        }
+    }
+
     // Capture information for MIDI generation, i.e. from control elements
     InitMIDIFunctor initMIDI;
     initMIDI.SetCurrentTempo(tempo);
