@@ -3806,8 +3806,8 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
                 }
             }
         }
-        catch (Tunings::TuningError& error) {
-            LogWarning("Error parsing Ableton tuning: %s", error.what());
+        catch (Tunings::TuningError &error) {
+            LogError("Error parsing Ableton tuning: %s", error.what());
         }
     }
 }

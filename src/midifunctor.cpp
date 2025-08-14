@@ -1135,10 +1135,10 @@ int GenerateMIDIFunctor::GetMIDIPitch(const Note *note)
             return tuning.midiNoteForNoteName(m_scoreDef->GetTuneCustomNoteMap().at(noteName), oct);
         }
         catch (Tunings::TuningError &e) {
-            LogWarning("Error mapping note to tuning: %s", e.what());
+            LogError("Error mapping note to tuning: %s", e.what());
         }
         catch (std::out_of_range &e) {
-            LogWarning("Error mapping note to tuning: %s not mapped.", noteName.c_str());
+            LogError("Error mapping note to tuning: %s not mapped.", noteName.c_str());
         }
     }
     return note->GetMIDIPitch(m_transSemi, m_octaveShift);
