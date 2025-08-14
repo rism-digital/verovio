@@ -42,6 +42,22 @@ jobs:
           - os: ubuntu-latest
             architecture: x64
             platform_id: manylinux_x86_64
+          - os: ubuntu-22.04-arm
+            architecture: arm64
+            platform_id: manylinux_aarch64
+            python-version: 3.12
+          - os: ubuntu-22.04-arm
+            architecture: arm64
+            platform_id: manylinux_aarch64
+            python-version: 3.13
+          - os: ubuntu-24.04-arm
+            architecture: arm64
+            platform_id: manylinux_aarch64
+            python-version: 3.12
+          - os: ubuntu-24.04-arm
+            architecture: arm64
+            platform_id: manylinux_aarch64
+            python-version: 3.13
         exclude:
           - os: macos-13
             architecture: x86
