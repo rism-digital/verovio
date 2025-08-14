@@ -454,7 +454,6 @@ private:
      */
     ///@{
     static data_ACCIDENTAL_WRITTEN ConvertAccidentalToAccid(const std::string &value);
-    static std::string AccidentalToAccidStr(const std::string &accidental);
     static data_ACCIDENTAL_GESTURAL ConvertAlterToAccid(const float value);
     static data_ARTICULATION ConvertArticulations(const std::string &value);
     static data_BARRENDITION ConvertStyleToRend(const std::string &value, const bool repeat);
