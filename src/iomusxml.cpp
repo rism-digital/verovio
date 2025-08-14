@@ -3758,7 +3758,7 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
 void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
 {
     assert(node);
-    assert(section);
+    assert(measure);
 
     // get MEI tuning.
     pugi::xpath_node meiTuning = node.select_node("play/other-play[@type='tuning-mei']");
