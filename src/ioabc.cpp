@@ -37,6 +37,7 @@
 #include "pb.h"
 #include "pghead.h"
 #include "rend.h"
+#include "repeatmark.h"
 #include "rest.h"
 #include "sb.h"
 #include "score.h"
@@ -439,6 +440,18 @@ void ABCInput::AddOrnaments(LayerElement *element)
     m_ornam.clear();
 }
 
+void ABCInput::AddRepeatMark(LayerElement *element)
+{
+    assert(element);
+
+    RepeatMark *rm = new RepeatMark();
+    rm->SetStartid("#" + element->GetID());
+    rm->SetFunc(m_repeatMark);
+    m_controlElements.push_back(std::make_pair(m_layer->GetID(), rm));
+
+    m_repeatMark = repeatMarkLog_FUNC_NONE;
+}
+
 void ABCInput::AddTie()
 {
     if (!m_tieStack.empty()) {
@@ -490,6 +503,9 @@ void ABCInput::ParseDecoration(const std::string &decorationString)
     if (!strcmp(decorationString.c_str(), ".")) {
         m_artic.push_back(ARTICULATION_stacc);
     }
+    else if (!strcmp(decorationString.c_str(), "~") || !strcmp(decorationString.c_str(), "roll")) {
+        m_ornam.push_back('S');
+    }
     else if (!strcmp(decorationString.c_str(), "trill") || !strcmp(decorationString.c_str(), "T")) {
         m_ornam.push_back('T');
     }
@@ -507,14 +523,12 @@ void ABCInput::ParseDecoration(const std::string &decorationString)
     else if (!strcmp(decorationString.c_str(), "invertedturn")) {
         m_ornam.push_back('s');
     }
-    else if (!strcmp(decorationString.c_str(), ">")) {
+    else if (!strcmp(decorationString.c_str(), ">") || !strcmp(decorationString.c_str(), "accent")
+        || !strcmp(decorationString.c_str(), "emphasis")) {
         m_artic.push_back(ARTICULATION_acc);
     }
-    else if (!strcmp(decorationString.c_str(), "accent")) {
-        m_artic.push_back(ARTICULATION_acc);
-    }
-    else if (!strcmp(decorationString.c_str(), "emphasis")) {
-        m_artic.push_back(ARTICULATION_acc);
+    else if (!strcmp(decorationString.c_str(), "^") || !strcmp(decorationString.c_str(), "marcato")) {
+        m_artic.push_back(ARTICULATION_marc);
     }
     else if (!strcmp(decorationString.c_str(), "fermata") || !strcmp(decorationString.c_str(), "H")) {
         m_fermata = STAFFREL_above;
@@ -525,14 +539,17 @@ void ABCInput::ParseDecoration(const std::string &decorationString)
     else if (!strcmp(decorationString.c_str(), "tenuto")) {
         m_artic.push_back(ARTICULATION_ten);
     }
-    else if (!strcmp(decorationString.c_str(), "+")) {
-        m_artic.push_back(ARTICULATION_stop);
-    }
-    else if (!strcmp(decorationString.c_str(), "plus")) {
+    else if (!strcmp(decorationString.c_str(), "+") || !strcmp(decorationString.c_str(), "plus")) {
         m_artic.push_back(ARTICULATION_stop);
     }
     else if (!strcmp(decorationString.c_str(), "snap")) {
         m_artic.push_back(ARTICULATION_snap);
+    }
+    else if (!strcmp(decorationString.c_str(), "slide")) {
+        m_artic.push_back(ARTICULATION_scoop);
+    }
+    else if (!strcmp(decorationString.c_str(), "wedge")) {
+        m_artic.push_back(ARTICULATION_stacciss);
     }
     else if (!strcmp(decorationString.c_str(), "upbow") || !strcmp(decorationString.c_str(), "u")) {
         m_artic.push_back(ARTICULATION_upbow);
@@ -550,6 +567,18 @@ void ABCInput::ParseDecoration(const std::string &decorationString)
         || !strcmp(decorationString.c_str(), "fff") || !strcmp(decorationString.c_str(), "ffff")
         || !strcmp(decorationString.c_str(), "sfz")) {
         m_dynam.push_back(decorationString);
+    }
+    else if (!strcmp(decorationString.c_str(), "segno")) {
+        m_repeatMark = repeatMarkLog_FUNC_segno;
+    }
+    else if (!strcmp(decorationString.c_str(), "coda")) {
+        m_repeatMark = repeatMarkLog_FUNC_coda;
+    }
+    else if (!strcmp(decorationString.c_str(), "D.S.")) {
+        m_repeatMark = repeatMarkLog_FUNC_dalSegno;
+    }
+    else if (!strcmp(decorationString.c_str(), "D.C.")) {
+        m_repeatMark = repeatMarkLog_FUNC_daCapo;
     }
     else {
         LogWarning("ABC import: Decoration %s not supported", decorationString.c_str());
@@ -1054,7 +1083,7 @@ void ABCInput::InitScoreAndSection(Score *&score, Section *&section)
 void ABCInput::ParseLyrics()
 {
     std::vector<std::pair<Syl *, int>> syllables;
-    constexpr std::string_view delimiters = "~\\-_ ";
+    constexpr std::string_view delimiters = "-_*~ ";
     // skipping w:, so start from third element
     std::size_t start = 2;
     std::size_t found = abcLine.find_first_of(delimiters, 2);
@@ -1076,14 +1105,14 @@ void ABCInput::ParseLyrics()
             sylType = sylLog_CON_s;
         }
         else if (abcLine.at(found) == '-') {
+            if (abcLine.at(found - 1) == '\\') {
+                counter = 0;
+            }
             sylType = sylLog_CON_d;
         }
-        else if (abcLine.at(found) == '\\') {
-            if ((found + 1 < abcLine.size()) && (abcLine.at(found + 1) == '-')) {
-                counter = 0;
-                ++found;
-                sylType = sylLog_CON_d;
-            }
+        else if (abcLine.at(found) == '*') {
+            // skip one note
+            ++counter;
         }
         // separate syllable from delimiters to form syl that we want to add
         syllable = abcLine.substr(start, found - start);
@@ -1318,6 +1347,11 @@ void ABCInput::ReadMusicCode(const std::string &musicCode, Section *section)
             if (m_fermata != STAFFREL_NONE) {
                 this->AddFermata(chord);
             }
+
+            // add repeat mark
+            if (m_repeatMark != repeatMarkLog_FUNC_NONE) {
+                this->AddRepeatMark(chord);
+            }
         }
         else if (i >= 1 && musicCode.at(i) == ']' && musicCode.at(i - 1) != '|') {
             // end chord
@@ -1486,6 +1520,11 @@ void ABCInput::ReadMusicCode(const std::string &musicCode, Section *section)
                 this->AddOrnaments(note);
             }
 
+            // add repeat mark
+            if (m_repeatMark != repeatMarkLog_FUNC_NONE) {
+                this->AddRepeatMark(note);
+            }
+
             if ((m_broken < 0) && (grace == GRACE_NONE)) {
                 for (int i = 0; i != -m_broken; ++i) dur = dur * 2;
             }
@@ -1615,6 +1654,11 @@ void ABCInput::ReadMusicCode(const std::string &musicCode, Section *section)
             // add fermata
             if (m_fermata != STAFFREL_NONE) {
                 this->AddFermata(rest);
+            }
+
+            // add repeat mark
+            if (m_repeatMark != repeatMarkLog_FUNC_NONE) {
+                this->AddRepeatMark(rest);
             }
 
             // set duration

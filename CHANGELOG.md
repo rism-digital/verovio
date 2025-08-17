@@ -1,6 +1,10 @@
 # Changelog
 
 ## [unreleased]
+* Support for repeat marks in ABC importer (@rettinghaus)
+* Fix `pgHead` conversion in MusicXML importer (@rettinghaus)
+* Fix lyric parsing in ABC importer (@rettinghaus)
+
 
 ## [5.5.1] – 2025-08-05
 * Fix CocoaPods build

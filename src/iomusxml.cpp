@@ -884,6 +884,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 if (!head) {
                     head = new PgHead();
                 }
+                head->SetFunc(PGFUNC_first);
                 head->AddChild(rend);
             }
         }
