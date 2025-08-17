@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
       # Build the wheels for Linux, Windows and macOS
       matrix:
-        os: [macos-13, macos-15, windows-latest, ubuntu-latest, ubuntu-24.04]
+        os: [macos-13, macos-15, windows-latest, ubuntu-latest, ubuntu-24.04-arm]
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
         architecture: [x86, x64, arm64]
         include:
