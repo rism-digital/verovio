@@ -125,19 +125,7 @@ jobs:
 
           - os: macos-latest
             compiler: xcode
-            version: "15.4"
-
-          - os: macos-latest
-            compiler: g++
-            version: "12"
-            
-          - os: macos-latest
-            compiler: g++
-            version: "13"
-            
-          - os: macos-latest
-            compiler: g++
-            version: "14"
+            version: "16.0"
 
     steps:
       - name: Checkout main repo
