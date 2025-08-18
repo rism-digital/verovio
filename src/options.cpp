@@ -1308,6 +1308,10 @@ Options::Options()
     m_fontLoadAll.Init(false);
     this->Register(&m_fontLoadAll, "fontLoadAll", &m_generalLayout);
 
+    m_fontTextLiberation.SetInfo("Font text Liberation", "Use the Liberation text font");
+    m_fontTextLiberation.Init(false);
+    this->Register(&m_fontTextLiberation, "fontTextLiberation", &m_generalLayout);
+
     m_graceFactor.SetInfo("Grace factor", "The grace size ratio numerator");
     m_graceFactor.Init(0.75, 0.5, 1.0);
     this->Register(&m_graceFactor, "graceFactor", &m_generalLayout);
@@ -1320,7 +1324,7 @@ Options::Options()
     m_graceRightAlign.Init(false);
     this->Register(&m_graceRightAlign, "graceRightAlign", &m_generalLayout);
 
-    m_hairpinSize.SetInfo("Hairpin size", "The haripin size in MEI units");
+    m_hairpinSize.SetInfo("Hairpin size", "The hairpin size in MEI units");
     m_hairpinSize.Init(3.0, 1.0, 8.0);
     this->Register(&m_hairpinSize, "hairpinSize", &m_generalLayout);
 

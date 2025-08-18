@@ -578,7 +578,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             controlEvents = false;
         }
     }
-    midiFile->sortTracks();
+    midiFile->sortTracksNoteOffsBeforeOns();
 }
 
 bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeasures, bool useFractions)
@@ -910,7 +910,7 @@ void Doc::PrepareData()
     PrepareAltSymFunctor prepareAltSym;
     root->Process(prepareAltSym);
 
-    /************ Instanciate LayerElement parts (stem, flag, dots, etc) ************/
+    /************ Instantiate LayerElement parts (stem, flag, dots, etc) ************/
 
     PrepareLayerElementPartsFunctor prepareLayerElementParts;
     root->Process(prepareLayerElementParts);
@@ -2349,7 +2349,7 @@ int Doc::GetAdjustedDrawingPageWidth() const
 
 void Doc::SetMensuralMusicOnly(data_BOOLEAN isMensuralMusicOnly)
 {
-    // Already marked as non mensural only cannoy be set back
+    // Already marked as non mensural only cannot be set back
     if (m_isMensuralMusicOnly != BOOLEAN_false) {
         m_isMensuralMusicOnly = isMensuralMusicOnly;
     }

@@ -37,7 +37,7 @@
 
 namespace vrv {
 
-// Helper template function to calculate optiomal dot locations based on note locations in the chord. Takes iterators
+// Helper template function to calculate optimal dot locations based on note locations in the chord. Takes iterators
 // for the begin/end of the range; reverse iterators should be passed if reverse order is specified
 template <typename Iterator> std::set<int> CalculateDotLocations(Iterator begin, Iterator end, bool isReverseOrder)
 {

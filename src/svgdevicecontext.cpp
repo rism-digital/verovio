@@ -55,6 +55,7 @@ SvgDeviceContext::SvgDeviceContext(const std::string &docId) : DeviceContext(SVG
     m_formatRaw = false;
     m_removeXlink = false;
     m_facsimile = false;
+    m_useLiberation = false;
     m_indent = 2;
 
     // create the initial SVG element
@@ -189,6 +190,12 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         // include the fallback font
         if (m_vrvTextFontFallback && resources) {
             this->IncludeTextFont(resources->GetFallbackFont(), resources);
+        }
+    }
+    if (m_useLiberation) {
+        const Resources *resources = this->GetResources(true);
+        if (resources) {
+            this->IncludeTextFont(resources->GetTextFont(), resources);
         }
     }
 
@@ -474,9 +481,12 @@ void SvgDeviceContext::StartPage()
     if (this->UseGlobalStyling()) {
         m_currentNode = m_currentNode.append_child("style");
         m_currentNode.append_attribute("type") = "text/css";
-        std::string css = "g.page-margin{font-family:Times,serif;} "
-                          "g.ending, g.fing, g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
-                          "g.mNum{font-style:italic;} g.label{font-weight:normal;} path{stroke:currentColor}";
+        const Resources *resources = this->GetResources();
+        assert(resources);
+        std::string css = "g.page-margin{font-family:" + resources->GetTextFont()
+            + ",serif;} "
+              "g.ending, g.fing, g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
+              "g.mNum{font-style:italic;} g.label{font-weight:normal;} path{stroke:currentColor}";
         // bounding box css - for debugging
         // css += " g.bounding-box{stroke:red; stroke-width:10} "
         //        "g.content-bounding-box{stroke:blue; stroke-width:10}";

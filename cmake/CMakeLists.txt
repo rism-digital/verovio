@@ -263,6 +263,8 @@ endif()
 
 if (BUILD_AS_ANDROID_LIBRARY)
     find_library(log-lib log)
+    # Setting for the linker to align segments at 16 KB (0x4000)
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,max-page-size=0x4000")
     target_link_libraries(verovio ${log-lib})
 endif()
 
