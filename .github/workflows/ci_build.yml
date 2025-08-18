@@ -123,6 +123,10 @@ jobs:
             compiler: clang
             version: "18"
 
+          - os: macos-14
+            compiler: xcode
+            version: "15.4"
+          
           - os: macos-latest
             compiler: xcode
             version: "16.0"
