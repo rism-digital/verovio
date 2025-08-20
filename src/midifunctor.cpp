@@ -770,7 +770,7 @@ FunctorCode GenerateMIDIFunctor::VisitMeasure(const Measure *measure)
     // Here we need to update the m_totalTime from the starting time of the measure.
     m_totalTime = measure->GetScoreTimeOnset().ToDouble();
 
-    if (measure->GetCurrentTempo() != m_currentTempo) {
+    if ((m_totalTime == 0.0) || (measure->GetCurrentTempo() != m_currentTempo)) {
         m_currentTempo = measure->GetCurrentTempo();
         const int tick = m_totalTime * m_midiFile->getTPQ();
         // Check if there was already a tempo event added for the given tick
