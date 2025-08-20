@@ -241,7 +241,7 @@ void Rest::AddChild(Object *child)
     else {
         children.push_back(child);
     }
-    Modify();
+    this->Modify();
 }
 
 char32_t Rest::GetRestGlyph() const

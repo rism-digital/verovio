@@ -12,7 +12,7 @@
 #include <functional>
 #include <iterator>
 #include <map>
-#include <optional>
+#include <memory>
 #include <string>
 #include <unordered_set>
 
@@ -413,14 +413,14 @@ public:
     /**
      * Additional check when adding a child.
      */
-    virtual bool AddChildAdditionalCheck(Object *child) { return true; };
+    virtual bool AddChildAdditionalCheck(Object *) { return true; };
 
     /**
      * Return the child order for a the given ClassId.
      * By default, a child is added at the end, but a class can override the method to order them.
      * The overriden method specifies a static vector with the expected order of ClassIds.
      */
-    virtual int GetInsertOrderFor(ClassId classId) const { return VRV_UNSET; }
+    virtual int GetInsertOrderFor(ClassId) const { return VRV_UNSET; }
 
     /**
      * Find the order from an overriden GetInsertOrderFor method.
@@ -680,7 +680,7 @@ public:
     /**
      * Saves the object (and its children) using the specified output stream.
      */
-    void SaveObject(Output *output, bool basic);
+    void SaveObject(Output *output);
 
     /**
      * Sort the child elements using std::stable_sort
@@ -700,9 +700,9 @@ public:
      * @name Methods for managing the list of back-links from plist
      */
     ///@{
-    bool HasPlistReferences() const { return (m_plistReferences.has_value()); }
+    bool HasPlistReferences() const { return static_cast<bool>(m_plistReferences); }
     void ResetPlistReferences() { m_plistReferences.reset(); }
-    const std::optional<ListOfConstObjects> *GetPlistReferences() const { return &m_plistReferences; }
+    const ListOfConstObjects *GetPlistReferences() const { return m_plistReferences.get(); }
     void AddPlistReference(const Object *object);
     ///@}
 
@@ -861,9 +861,10 @@ private:
     bool m_isExpansion;
 
     /**
-     * An optional list of back-links to plist referring objects
+     * List of back-links to plist referring objects
+     * Wrapped as unique pointer to reduce memory consumption
      */
-    std::optional<ListOfConstObjects> m_plistReferences;
+    std::unique_ptr<ListOfConstObjects> m_plistReferences;
 
     //----------------//
     // Static members //
@@ -963,7 +964,7 @@ protected:
      * Filter the list for a specific class.
      * For example, keep only notes in Beam
      */
-    virtual void FilterList(ListOfConstObjects &childList) const {};
+    virtual void FilterList(ListOfConstObjects &) const {};
 
 private:
     /**

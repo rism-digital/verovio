@@ -247,7 +247,7 @@ bool Tie::CalculatePosition(const Doc *doc, const Staff *staff, int x1, int x2, 
     curve->UpdateCurveParams(bezier, thickness, drawingCurveDir);
 
     if ((!startParentChord || isOuterChordNote) && durElement && (spanningType != SPANNING_END)) {
-        UpdateTiePositioning(curve, bezier, durElement, note1, drawingUnit, drawingCurveDir);
+        this->UpdateTiePositioning(curve, bezier, durElement, note1, drawingUnit, drawingCurveDir);
         curve->UpdateCurveParams(bezier, thickness, drawingCurveDir);
     }
     if (!startParentChord && !endParentChord && note1 && note2 && (spanningType == SPANNING_START_END)) {

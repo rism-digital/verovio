@@ -1,8 +1,8 @@
 import java.io.IOException;
 
 /* import the toolkit */
-import org.rismch.verovio.toolkit;
-import org.rismch.verovio.NativeUtils;
+import org.verovio.lib.toolkit;
+import org.verovio.lib.NativeUtils;
 
 public class main {
 	public static void main(String argv[]) {

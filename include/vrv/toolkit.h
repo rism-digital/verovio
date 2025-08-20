@@ -715,10 +715,6 @@ public:
     void ClearHumdrumBuffer();
 
     /**
-     * @ingroup nodoc
-     */
-    void SetInputFrom(FileFormat format);
-    /**
      * Get the input format.
      *
      * @return Input format enumeration
@@ -802,6 +798,11 @@ private:
      * @return A stringified JSON object
      */
     std::string GetOptions(bool defaultValues) const;
+
+    /**
+     * Set the doc to the view and set the editor after having loaded data
+     */
+    void SetViewAndEditor();
 
 public:
     //

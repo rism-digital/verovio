@@ -333,7 +333,7 @@ StaffAlignment::StaffAlignment() : Object(STAFF_ALIGNMENT)
 
 StaffAlignment::~StaffAlignment()
 {
-    ClearPositioners();
+    this->ClearPositioners();
 }
 
 void StaffAlignment::ClearPositioners()

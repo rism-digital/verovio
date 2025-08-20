@@ -1,6 +1,46 @@
 # Changelog
 
 ## [unreleased]
+* Support for repeat marks in ABC importer (@rettinghaus)
+* Fix `pgHead` conversion in MusicXML importer (@rettinghaus)
+* Fix lyric parsing in ABC importer (@rettinghaus)
+
+
+## [5.5.1] – 2025-08-05
+* Fix CocoaPods build
+
+## [5.5.0] – 2025-08-04
+* Support of Swift with a new binding available through via the Swift Package Manager
+* Support for Liberation text font with the new `--font-text-liberation` option
+* Remove obsolete Qt and Android bindings
+* Remove unused Emscripten options `-DPX`
+* Fix crash when trying to load data without loaded resources
+
+## [5.4.0] – 2025-07-15
+* Change timemap with `includeRests` to include also `mRest` and `multiRest`
+* Change JS initial memory allocation and drop JS light memory version
+* Change key names for `GetTimesForElement` to be inline with the timemap keys
+* Fix order of the SVG `defs/g` to be always the same across runs
+* Fix title and control event bugs in ABC import (@rettinghaus)
+* Fix bug with multi-measure rests in MusicXML import (@rettinghaus)
+* Fix spacing / duration of measure rests in measures not metrically conformant
+* Fix values returned by `GetTimesForElement`
+* Fix SVG dimensions with `--scale-to-page-size` and `-adjust-page-height` (or width)
+
+## [5.3.2] – 2025-05-28
+* Fix bug in toolkit select
+
+## [5.3.1] – 2025-05-26
+* Fix bug in CMME importer
+
+## [5.3.0] – 2025-05-19
+* Support for editorial markup (`app` or `choice`) surrounding the top-level `scoreDef`
+* Support for full internal page-based MEI serialization (`mei-pb-serialization`)
+* Support for custom fonts to be passed to the JS toolkit as base64 strings instead of urls
+* Change the SVG structure of font glyphs to avoid problems with some SVG rendering engines
+* Fix `@xml:id` generation with `--xml-id-seed`
+* Fix key signature display after cautionary clef (@brdvd)
+* Fix custom fonts not loading properly in the JS toolkit
 
 ## [5.2.0] – 2025-04-23
 * Support for `data.HEXNUM` in `note@head.shape`

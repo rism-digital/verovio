@@ -6,42 +6,39 @@
 [![PyPI - Downlaods](https://img.shields.io/pypi/dm/verovio?label=PyPI%20downloads)](https://pypi.org/project/verovio/)
 [![NPM - Downlaods](https://img.shields.io/npm/dm/verovio?label=NPM%20-%20downloads)](https://www.npmjs.com/package/verovio)
 [![DOI](https://zenodo.org/badge/15762693.svg)](https://zenodo.org/doi/10.5281/zenodo.10544792)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/rism-digital/verovio)
 
 Verovio is a fast, portable and lightweight library for engraving [Music Encoding Initiative (MEI)](http://www.music-encoding.org) digital scores into SVG images. Verovio also contains on-the-fly converters to render [Plaine & Easie Code](https://www.iaml.info/plaine-easie-code), [Humdrum](https://www.humdrum.org), [Musedata](https://musedata.org), [MusicXML](https://www.musicxml.com), [EsAC](http://esac-data.org), and [ABC](https://en.wikipedia.org/wiki/ABC_notation) digital scores. 
 
-Verovio is written in standard 2020 C++ and can be compiled as a standalone command-line tool, used as a compiled music-rendering library for applications (Qt, python), or compiled into Javascript using the Emscripten LLVM-to-JavaScript compiler.  Check out the JavaScript toolkit version of verovio running in the [MEI Viewer](http://www.verovio.org/mei-viewer.xhtml) as well as the [app](http://www.verovio.org/app.html) or [tutorials](https://book.verovio.org/first-steps/) for web integration and user interaction.
+Verovio is written in standard C++20 and is available in several bindings (JavaScript, Python, Java, Swift). It
+can be compiled as a standalone command-line tool or as a music-rendering library for applications.  Check out the JavaScript toolkit version of Verovio running in the [Verovio Online Editor / Viewer](http://editor.verovio.org), or the [tutorials](https://book.verovio.org/first-steps/) to know more about web integration and user interaction.
 
 ![Choice interaction](https://raw.githubusercontent.com/rism-digital/verovio.org/gh-pages/movies/reflow.gif)
 
+### Minimal sample applications
+
+| C++ with Qt | Java binding on Android | Swift binding on iOS |
+| --- | --- | --- |
+| [Code repository](https://github.com/rism-digital/verovio-qt-demo) | [Code repository](https://github.com/rism-digital/verovio-android-demo) - [GooglePlay](https://play.google.com/store/apps/details?id=org.verovio.android.demo) | [AppStore](https://apps.apple.com/app/verovio-mei-viewer/id6747756332) |
+| ![iPad](https://raw.githubusercontent.com/rism-digital/verovio.org/gh-pages/images/qt.png)| ![iPad](https://raw.githubusercontent.com/rism-digital/verovio.org/gh-pages/images/android.png) | ![iPad](https://raw.githubusercontent.com/rism-digital/verovio.org/gh-pages/images/ios.png) |
 
 Verovio uses the [Standard Music Font Layout (SMuFL)](http://www.smufl.org) specification and the font can be changed for personalizing the output.
 
-The project page is https://www.verovio.org. Verovio is available under the LGPL license (see [COPYING](https://github.com/rism-digital/verovio/blob/develop/COPYING) and [COPYING.LESSER](https://github.com/rism-digital/verovio/blob/develop/COPYING.LESSER)).
+### License
 
-Building and use instructions by environment
---------------------------------------------
+Verovio is available under the LGPL license (see [COPYING](https://github.com/rism-digital/verovio/blob/develop/COPYING) and [COPYING.LESSER](https://github.com/rism-digital/verovio/blob/develop/COPYING.LESSER)).
+
+## Building and use instructions by environment
 
 See the [Reference book](https://book.verovio.org/installing-or-building-from-sources/command-line.html)
 
-LibMEI
-------
+## Libraries
+
+### LibMEI
 
 The code for the attribute classes of Verovio are generated from the MEI schema using a modified version of LibMEI available [here](https://github.com/rism-digital/libmei). The code generated is included in the Verovio repository and the LibMEI repository does not need to be cloned for building Verovio.
 
-
-Versioning
-----------
-
-As of 2025, major release cycles are increased once per year, with version 5.x.x for 2025. Verovio will independently switch to development versions of MEI, whenever appropriate. This will always correspond to a minor release and will be properly documented.
-
-Previous releases of Verovio were aligned with MEI versions as follows:
-*   Verovio 1.x.x ⇔ MEI 3.0
-*   Verovio 2.x.x ⇔ MEI 4.0
-*   Verovio 3.x.x ⇔ Development of MEI since 4.0
-*   Verovio 4.x.x ⇔ MEI 5.0
-
-Other libraries
----------------
+### Embedded libraries
 
 The following libraries are embedded in Verovio:
 
@@ -53,14 +50,6 @@ The following libraries are embedded in Verovio:
 | [pugixml](https://pugixml.org/)                     | XML data parser            |
 | [MINIZ-CPP](https://github.com/kkzi/miniz-cpp)      | ZIP files reading/writing  |
 
-Contributing
-------------
+## Contributing
 
 See the [Reference book](https://book.verovio.org/contributing/guidelines.html)
-
-Example output
---------------
-
-The sample page of music shown below was generated with version 2.4.0-dev-2748fed
-
-![Example page](https://raw.githubusercontent.com/rism-digital/verovio.org/gh-pages/images/verovio-exp-2.4.0-dev.png)

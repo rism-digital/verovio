@@ -28,7 +28,7 @@ namespace vrv {
 
 AttStaffDefVisTablature::AttStaffDefVisTablature() : Att()
 {
-    ResetStaffDefVisTablature();
+    this->ResetStaffDefVisTablature();
 }
 
 void AttStaffDefVisTablature::ResetStaffDefVisTablature()
@@ -83,7 +83,7 @@ bool AttStaffDefVisTablature::HasTabAnchorline() const
 
 AttStringtab::AttStringtab() : Att()
 {
-    ResetStringtab();
+    this->ResetStringtab();
 }
 
 void AttStringtab::ResetStringtab()
@@ -183,7 +183,7 @@ bool AttStringtab::HasTabCourse() const
 
 AttStringtabPosition::AttStringtabPosition() : Att()
 {
-    ResetStringtabPosition();
+    this->ResetStringtabPosition();
 }
 
 void AttStringtabPosition::ResetStringtabPosition()
@@ -223,7 +223,7 @@ bool AttStringtabPosition::HasTabPos() const
 
 AttStringtabTuning::AttStringtabTuning() : Att()
 {
-    ResetStringtabTuning();
+    this->ResetStringtabTuning();
 }
 
 void AttStringtabTuning::ResetStringtabTuning()

@@ -50,8 +50,8 @@ if __name__ == '__main__':
                 shortlist.append(line.strip('\n'))
                 print('File {} added to the shortlist'.format(line))
 
-    path1 = args.test_suite_dir.replace("\ ", " ")
-    path2 = args.output_dir.replace("\ ", " ")
+    path1 = args.test_suite_dir.replace(r"\ ", " ")
+    path2 = args.output_dir.replace(r"\ ", " ")
     dir1 = sorted(os.listdir(path1))
     for item1 in dir1:
         if not (os.path.isdir(os.path.join(path1, item1))):
@@ -101,8 +101,6 @@ if __name__ == '__main__':
             tk.loadFile(inputFile)
             # render to SVG
             svgString = tk.renderToSVG(1)
-            svgString = svgString.replace(
-                "overflow=\"inherit\"", "overflow=\"visible\"")
             ET.ElementTree(ET.fromstring(svgString)).write(svgFile)
             svg2png(bytestring=svgString, scale=2, write_to=pngFile)
             # create time map

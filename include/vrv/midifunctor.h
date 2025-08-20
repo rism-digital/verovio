@@ -212,6 +212,7 @@ public:
     FunctorCode VisitArpeg(Arpeg *arpeg) override;
     FunctorCode VisitChord(Chord *chord) override;
     FunctorCode VisitGraceGrpEnd(GraceGrp *graceGrp) override;
+    FunctorCode VisitLayerEnd(Layer *layer) override;
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitNote(Note *note) override;
     ///@}
@@ -496,6 +497,8 @@ public:
     ///@{
     FunctorCode VisitLayerElement(const LayerElement *layerElement) override;
     FunctorCode VisitMeasure(const Measure *measure) override;
+    FunctorCode VisitMRest(const MRest *mRest) override;
+    FunctorCode VisitMultiRest(const MultiRest *multiRest) override;
     FunctorCode VisitNote(const Note *note) override;
     FunctorCode VisitRest(const Rest *rest) override;
     ///@}
@@ -512,9 +515,9 @@ public:
     //
 private:
     // The score time from the start of the piece to the previous barline in quarter notes
-    Fraction m_scoreTimeOffset;
+    Fraction m_currentScoreTime;
     // Real time from the start of the piece to the previous barline in ms
-    double m_realTimeOffsetMilliseconds;
+    double m_currentRealTimeMilliseconds;
     // The current tempo
     double m_currentTempo;
     // Indicates whether cue notes should be included

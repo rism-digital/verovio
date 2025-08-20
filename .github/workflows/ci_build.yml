@@ -123,25 +123,20 @@ jobs:
             compiler: clang
             version: "18"
 
-          - os: macos-latest
+          - os: macos-14
             compiler: xcode
             version: "15.4"
-
+          
           - os: macos-latest
-            compiler: g++
-            version: "12"
-            
-          - os: macos-latest
-            compiler: g++
-            version: "13"
-            
-          - os: macos-latest
-            compiler: g++
-            version: "14"
+            compiler: xcode
+            version: "16.0"
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
+
+      - name: Register gcc problem matcher
+        run: echo "::add-matcher::.github/problem_matchers/gcc.json"
 
       # Installation step for Ubuntu
       - name: Configure Ubuntu with ${{ matrix.compiler }}-${{ matrix.version }}
@@ -207,6 +202,48 @@ jobs:
           cmake ../cmake
           make -j8
 
+
+  ##################################
+  # Build the Java toolkit         #
+  ##################################
+  build_java:
+    # skip job if commit message contains "[skip-ci]"
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
+  
+    name: Build Java toolkit
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v4.2.2
+
+      - name: Restore cache
+        uses: actions/setup-java@v4.7.1
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+          cache-dependency-path: ${{ github.workspace }}/bindings/java/pom.xml
+
+      - name: Create TEMP_DIR
+        working-directory: ${{ github.workspace }}
+        run: mkdir -p $TEMP_DIR/
+
+      - name: Build Java
+        working-directory: ${{ github.workspace }}/bindings/java
+        run: mvn package && mvn package
+
+      - name: Copy build into TEMP_DIR
+        working-directory: ${{ github.workspace }}/bindings/java
+        run: cp target/*.jar $GITHUB_WORKSPACE/$TEMP_DIR/
+
+      - name: Upload java build artifact
+        uses: actions/upload-artifact@v4.4.3
+        with:
+          name: java-build-${{ github.run_id }}
+          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}
+
+  
   #####################################
   # Set up and cache emscripten build #
   #####################################
@@ -219,7 +256,7 @@ jobs:
 
     steps:
       - name: Set up cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: cache
         with:
           # path for cache
@@ -268,7 +305,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
@@ -277,7 +314,7 @@ jobs:
       # Restore system libraries from cache
       - name: Restore cache
         id: restore_cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           # path for cache
           path: ${{ env.EM_CACHE_FOLDER }}
@@ -286,7 +323,7 @@ jobs:
 
       # Install and/or activate emsdk
       - name: Set up emsdk
-        uses: mymindstorm/setup-emsdk@v11
+        uses: mymindstorm/setup-emsdk@v14
         with:
           version: ${{ env.EM_VERSION }}
           actions-cache-folder: ${{ env.EM_CACHE_FOLDER }}
@@ -315,12 +352,15 @@ jobs:
   # Copy the font CSS files  #
   ############################
   copy_font_files:
+    # skip job if commit message contains "[skip-ci]"
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
+  
     name: Copy the font files
     runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
@@ -367,8 +407,8 @@ jobs:
           echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
           echo "IS_DRY_RUN = ${IS_DRY_RUN}"
 
-          echo "::set-output name=disable::${DISABLE_DEPLOY_STEPS}"
-          echo "::set-output name=dry-run::${IS_DRY_RUN}"
+          echo "disable=${DISABLE_DEPLOY_STEPS}" >> $GITHUB_OUTPUT
+          echo "dry-run=${IS_DRY_RUN}" >> $GITHUB_OUTPUT
 
   #########################################
   # Deploy the toolkit builds to gh-pages #
@@ -382,7 +422,7 @@ jobs:
 
     steps:
       - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           # repository to check out
           repository: ${{ env.GH_PAGES_REPO }}
@@ -395,7 +435,7 @@ jobs:
           path: ${{ env.GH_PAGES_DIR }}
 
       - name: Download TOOLKIT_BUILD artifacts
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v4.3.0
         with:
           name: ${{ env.TOOLKIT_BUILD }}-${{ github.run_id }}
           path: artifacts/${{ env.TOOLKIT_BUILD }}
@@ -405,7 +445,7 @@ jobs:
           cp -r artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
 
       - name: Download FONTS artifacts
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v4.3.0
         with:
           name: ${{ env.FONTS }}-${{ github.run_id }}
           path: artifacts/${{ env.FONTS }}
@@ -462,6 +502,7 @@ jobs:
 
           echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
           echo "IS_DRY_RUN = ${IS_DRY_RUN}"
+      
 
   ###################################
   # Build the doxygen documentation #
@@ -474,7 +515,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Install doxygen
         run: |
@@ -511,7 +552,7 @@ jobs:
 
     steps:
       - name: Checkout DOXYGEN_REPO into DOXYGEN_DIR
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           # repository to check out
           repository: ${{ env.DOXYGEN_REPO }}
@@ -524,7 +565,7 @@ jobs:
           path: ${{ env.DOXYGEN_DIR }}
 
       - name: Download DOC_BUILD artifacts
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v4.3.0
         with:
           name: ${{ env.DOC_BUILD }}-${{ github.run_id }}
           path: artifacts/${{ env.DOC_BUILD }}

@@ -269,7 +269,7 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
     else if (object->Is(HAIRPIN)) {
         Hairpin *hairpin = vrv_cast<Hairpin *>(object);
         assert(hairpin);
-        // haripin below by default;
+        // hairpin below by default;
         m_place = (hairpin->GetPlace() != STAFFREL_NONE) ? hairpin->GetPlace() : STAFFREL_below;
     }
     else if (object->Is(HARM)) {
@@ -639,7 +639,7 @@ FloatingCurvePositioner::FloatingCurvePositioner(FloatingObject *object, StaffAl
 
 FloatingCurvePositioner::~FloatingCurvePositioner()
 {
-    ClearSpannedElements();
+    this->ClearSpannedElements();
 }
 
 void FloatingCurvePositioner::ResetPositioner()

@@ -28,7 +28,7 @@ namespace vrv {
 
 AttDurationQuality::AttDurationQuality() : Att()
 {
-    ResetDurationQuality();
+    this->ResetDurationQuality();
 }
 
 void AttDurationQuality::ResetDurationQuality()
@@ -68,7 +68,7 @@ bool AttDurationQuality::HasDurQuality() const
 
 AttMensuralLog::AttMensuralLog() : Att()
 {
-    ResetMensuralLog();
+    this->ResetMensuralLog();
 }
 
 void AttMensuralLog::ResetMensuralLog()
@@ -123,7 +123,7 @@ bool AttMensuralLog::HasProportNumbase() const
 
 AttMensuralShared::AttMensuralShared() : Att()
 {
-    ResetMensuralShared();
+    this->ResetMensuralShared();
 }
 
 void AttMensuralShared::ResetMensuralShared()
@@ -223,7 +223,7 @@ bool AttMensuralShared::HasDivisio() const
 
 AttNoteVisMensural::AttNoteVisMensural() : Att()
 {
-    ResetNoteVisMensural();
+    this->ResetNoteVisMensural();
 }
 
 void AttNoteVisMensural::ResetNoteVisMensural()
@@ -263,7 +263,7 @@ bool AttNoteVisMensural::HasLig() const
 
 AttRestVisMensural::AttRestVisMensural() : Att()
 {
-    ResetRestVisMensural();
+    this->ResetRestVisMensural();
 }
 
 void AttRestVisMensural::ResetRestVisMensural()
@@ -303,7 +303,7 @@ bool AttRestVisMensural::HasSpaces() const
 
 AttStemsMensural::AttStemsMensural() : Att()
 {
-    ResetStemsMensural();
+    this->ResetStemsMensural();
 }
 
 void AttStemsMensural::ResetStemsMensural()

@@ -28,15 +28,11 @@ print <<"EOT";
 
 Options:
 -c      Chatty mode: display compiler progress
--l      Light version with no increased memory allocation
 -r DIR  Verovio root directory
 -v N    Version number (e.g., 1.0.0); no number by default
 -w      Webassembly version
 -x      Font exclusion list (case-sensitive)
--D      Disable DARMS importer
 -H      Disable Humdrum importer
--P      Disable PAE importer
--X      Disable MusicXML importer
 -M      Clean existing makefile
 -m      Modularize emscripten build
 -d      Debug mode (for Webassembly only)
@@ -52,8 +48,8 @@ die "ERROR: emscripten cmake (emcmake) not found.\n" unless $EMCMAKE;
 die "ERROR: emscripten make (emmake) not found.\n" unless $EMMAKE;
 
 # Parse command-line options
-my ($lightQ, $version, $chattyQ, $helpQ, $exclusion, $wasmQ, $makeQ, $modularizeQ, $debug);
-my ($nopae, $nohumdrum, $nomusicxml, $nodarms);
+my ($version, $chattyQ, $helpQ, $exclusion, $wasmQ, $makeQ, $modularizeQ, $debug);
+my ($nohumdrum);
 my ($FLAGS_NAME, $VERSION, $CHATTY);
 
 my $cpp = 20; # c++ version to compile (11, 14, 17)
@@ -64,35 +60,27 @@ GetOptions (
 	'C|cpp=s'       => \$cpp,
 	'c|chatty'      => \$chattyQ,
 	'h|?|help'      => \$helpQ,
-	'l|light'       => \$lightQ,
 	'r|root=s'      => \$VEROVIO_ROOT,
 	'v|version=s'   => \$VERSION,
 	'x|exclusion=s' => \$exclusion,
 	'w|wasm'        => \$wasmQ,
-	'm|modularize' => \$modularizeQ,
-	'D|no-darms'    => \$nodarms,
+	'm|modularize'  => \$modularizeQ,
 	'H|no-humdrum'  => \$nohumdrum,
-	'P|no-pae'      => \$nopae,
-	'X|no-musicxml' => \$nomusicxml,
-	'M|make' => \$makeQ,
-	'd|debug' => \$debug
+	'M|make'        => \$makeQ,
+	'd|debug'       => \$debug
 );
 
 # Default compiling uses ASM and large file support.
 # Memory is increased (STACK_SIZE) for processing large files (tested up to 7MB)
 # Empirically, the memory amount required is roughly 5 times the file size.
-# This can be disabled in the light version, which uses the default memory settings.
 my $FLAGS = "-O3";
 $FLAGS .= " -DNDEBUG";
 $FLAGS .= " -std=c++$cpp";
 
 my $LFLAGS =  " -s ASM_JS=1";
-$LFLAGS .= " -s INITIAL_MEMORY=256MB";
-$LFLAGS .= " -s STACK_SIZE=128MB";
+$LFLAGS .= " -s INITIAL_MEMORY=128MB";
+$LFLAGS .= " -s STACK_SIZE=64MB";
 $LFLAGS .= " -s WASM=0";
-
-# Check that -w and -l and not enabled together
-die "ERROR: option -w cannot be enabled with -l.\n" if ($wasmQ && $lightQ);
 
 # Always wasm build with the humdrum toolkit
 if (!$nohumdrum) {
@@ -120,8 +108,8 @@ if ($wasmQ) {
 	$FLAGS .= " -s STRICT=1";
 	# Linker flags
 	$LFLAGS = " -s WASM=1";
-	$LFLAGS .= " -s INITIAL_MEMORY=512MB";
-	$LFLAGS .= " -s STACK_SIZE=256MB";
+	$LFLAGS .= " -s INITIAL_MEMORY=128MB";
+	$LFLAGS .= " -s STACK_SIZE=64MB";
 	$LFLAGS .= " -s ALLOW_MEMORY_GROWTH";
 	$LFLAGS .= " -s SINGLE_FILE=1";
 	$LFLAGS .= " -s INCOMING_MODULE_JS_API=onRuntimeInitialized";
@@ -129,12 +117,6 @@ if ($wasmQ) {
 		$LFLAGS .= " --emit-symbol-map -sASSERTIONS";
 	}
 	$FLAGS_NAME = "-wasm";
-}
-
-if ($lightQ) {
-	print "Creating low-memory (light) toolkit version\n";
-	$LFLAGS = " -s ASM_JS=1 -s WASM=0";
-	$FLAGS_NAME = "-light";
 }
 
 if ($chattyQ) {
@@ -179,10 +161,7 @@ print "Creating commit version header file...\n";
 my $defines = "-DUSE_EMSCRIPTEN";
 
 my $cmake = "-DBUILD_AS_WASM=ON";
-$cmake .= " -DNO_PAE_SUPPORT=ON" if ($nopae);
-$cmake .= " -DNO_DARMS_SUPPORT=ON" if ($nodarms);
 $cmake .= " -DNO_HUMDRUM_SUPPORT=ON" if ($nohumdrum);
-$cmake .= " -DNO_MUSICXML_SUPPORT=ON" if ($nomusicxml);
 
 my $embed   = "--embed-file $DATA_DIR/";
 my $output  = "-o $BUILD_DIR/verovio.js";

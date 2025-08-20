@@ -28,7 +28,7 @@ namespace vrv {
 
 AttHarmAnl::AttHarmAnl() : Att()
 {
-    ResetHarmAnl();
+    this->ResetHarmAnl();
 }
 
 void AttHarmAnl::ResetHarmAnl()
@@ -68,7 +68,7 @@ bool AttHarmAnl::HasForm() const
 
 AttHarmonicFunction::AttHarmonicFunction() : Att()
 {
-    ResetHarmonicFunction();
+    this->ResetHarmonicFunction();
 }
 
 void AttHarmonicFunction::ResetHarmonicFunction()
@@ -108,7 +108,7 @@ bool AttHarmonicFunction::HasDeg() const
 
 AttIntervalHarmonic::AttIntervalHarmonic() : Att()
 {
-    ResetIntervalHarmonic();
+    this->ResetIntervalHarmonic();
 }
 
 void AttIntervalHarmonic::ResetIntervalHarmonic()
@@ -148,7 +148,7 @@ bool AttIntervalHarmonic::HasInth() const
 
 AttIntervalMelodic::AttIntervalMelodic() : Att()
 {
-    ResetIntervalMelodic();
+    this->ResetIntervalMelodic();
 }
 
 void AttIntervalMelodic::ResetIntervalMelodic()
@@ -188,7 +188,7 @@ bool AttIntervalMelodic::HasIntm() const
 
 AttKeySigDefaultAnl::AttKeySigDefaultAnl() : Att()
 {
-    ResetKeySigDefaultAnl();
+    this->ResetKeySigDefaultAnl();
 }
 
 void AttKeySigDefaultAnl::ResetKeySigDefaultAnl()
@@ -258,7 +258,7 @@ bool AttKeySigDefaultAnl::HasKeyPname() const
 
 AttMelodicFunction::AttMelodicFunction() : Att()
 {
-    ResetMelodicFunction();
+    this->ResetMelodicFunction();
 }
 
 void AttMelodicFunction::ResetMelodicFunction()
@@ -298,7 +298,7 @@ bool AttMelodicFunction::HasMfunc() const
 
 AttPitchClass::AttPitchClass() : Att()
 {
-    ResetPitchClass();
+    this->ResetPitchClass();
 }
 
 void AttPitchClass::ResetPitchClass()
@@ -338,7 +338,7 @@ bool AttPitchClass::HasPclass() const
 
 AttSolfa::AttSolfa() : Att()
 {
-    ResetSolfa();
+    this->ResetSolfa();
 }
 
 void AttSolfa::ResetSolfa()

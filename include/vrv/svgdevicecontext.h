@@ -202,6 +202,11 @@ public:
     bool GetFacsimile() { return m_facsimile; }
 
     /**
+     * Setting use Liberation flag (false by default)
+     */
+    void SetUseLiberation(bool useLiberation) { m_useLiberation = useLiberation; }
+
+    /**
      * Setting m_svgBoudingBoxes flag (false by default)
      */
     void SetSvgBoundingBoxes(bool svgBoundingBoxes) { m_svgBoundingBoxes = svgBoundingBoxes; }
@@ -361,7 +366,7 @@ private:
         std::string m_refId;
     };
     const std::string InsertGlyphRef(const Glyph *glyph);
-    std::map<const Glyph *, GlyphRef> m_smuflGlyphs;
+    std::vector<std::pair<const Glyph *, GlyphRef>> m_smuflGlyphs;
     std::map<std::string, int> m_glyphCodeFontCounter;
 
     // pugixml data
@@ -374,6 +379,8 @@ private:
     // output as mm (for pdf generation with a 72 dpi)
     bool m_mmOutput;
     bool m_facsimile;
+    // use LiberationTextFont
+    bool m_useLiberation;
     // add bouding boxes in svg output
     bool m_svgBoundingBoxes;
     // use viewbox on svg root element

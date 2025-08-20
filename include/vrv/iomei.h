@@ -202,7 +202,12 @@ public:
     /**
      * The main method for exporting the file to MEI.
      */
-    bool Export();
+    std::string Export() override;
+
+    /**
+     * Method for skipping under certain circumstances
+     */
+    bool Skip(Object *object) const override;
 
     /**
      * The main method for writing objects.
@@ -213,20 +218,14 @@ public:
     ///@}
 
     /**
-     * Return the output as a string by writing it to the stringstream member.
-     */
-    std::string GetOutput();
-
-    /**
      * @name Setter and getter for score-based MEI output
      */
     ///@{
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; }
-    bool GetScoreBasedMEI() const { return m_scoreBasedMEI; }
     ///@}
 
     /**
-     * @name Setter and getter for MEI basic output
+     * @name Setter and getter for MEI Basic output
      */
     ///@{
     void SetBasic(bool basic) { m_basic = basic; }
@@ -252,6 +251,7 @@ public:
     ///@{
     bool IsScoreBasedMEI() const { return m_scoreBasedMEI; }
     bool IsPageBasedMEI() const { return !m_scoreBasedMEI; }
+    bool IsSerializing() const { return m_serializing; }
     ///@}
 
     /**
@@ -263,6 +263,11 @@ public:
      * Setter for ignore header flag for the MEI output (default is false)
      */
     void SetIgnoreHeader(bool ignoreHeader) { m_ignoreHeader = ignoreHeader; }
+
+    /**
+     * Setter for the page-based serialization flag (default is false)
+     */
+    void SetSerializing(bool serializing) { m_serializing = serializing; }
 
     /**
      * Setter for remove ids flag for the MEI output (default is false)
@@ -277,7 +282,7 @@ private:
 
     /**
      * Helper checking if the object is tree object in score-based MEI
-     * For MEI basic output, also check if objects marked as attribute need to be kept as element (e.g., accid)
+     * For MEI Basic output, also check if objects marked as attribute need to be kept as element (e.g., accid)
      * or if some need to be written as attributes (e.g. scoreDef/clef)
      */
     bool IsTreeObject(Object *object) const;
@@ -566,11 +571,16 @@ private:
 public:
     //
 private:
-    std::ostringstream m_streamStringOutput;
+    /** The number of spaces for the indentation */
     int m_indent;
+    /** A flag indicating if we are writing score-based or page-based MEI */
     bool m_scoreBasedMEI;
-    /** A flag indicating that we want to produce MEI basic */
+    /** A flag indicating that we want to produce MEI Basic */
     bool m_basic;
+    /** A flag indicating we are serializing page-based MEI */
+    bool m_serializing;
+
+    /** The document node */
     pugi::xml_node m_mei;
 
     /** Current xml element */
@@ -619,6 +629,11 @@ public:
 
     bool Import(const std::string &mei) override;
 
+    /**
+     * Setter for the page-based deserialization flag (default is false).
+     */
+    void SetDeserializing(bool deserializing) { m_deserializing = deserializing; }
+
 private:
     bool ReadDoc(pugi::xml_node root);
     bool ReadIncipits(pugi::xml_node root);
@@ -627,6 +642,7 @@ private:
     bool ReadMdiv(Object *parent, pugi::xml_node parentNode, bool isVisible);
     bool ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool isVisible);
     bool ReadScore(Object *parent, pugi::xml_node parentNode);
+    bool ReadScoreScoreDef(Object *parent, pugi::xml_node parentNode);
     ///@}
 
     /**
@@ -978,6 +994,9 @@ private:
      * The comment to be attached to the next Object
      */
     std::string m_comment;
+
+    /** A flag indicating we are deserializing page-based MEI */
+    bool m_deserializing;
 
     //----------------//
     // Static members //

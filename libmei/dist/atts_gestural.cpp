@@ -28,7 +28,7 @@ namespace vrv {
 
 AttAccidentalGes::AttAccidentalGes() : Att()
 {
-    ResetAccidentalGes();
+    this->ResetAccidentalGes();
 }
 
 void AttAccidentalGes::ResetAccidentalGes()
@@ -68,7 +68,7 @@ bool AttAccidentalGes::HasAccidGes() const
 
 AttArticulationGes::AttArticulationGes() : Att()
 {
-    ResetArticulationGes();
+    this->ResetArticulationGes();
 }
 
 void AttArticulationGes::ResetArticulationGes()
@@ -108,7 +108,7 @@ bool AttArticulationGes::HasArticGes() const
 
 AttAttacking::AttAttacking() : Att()
 {
-    ResetAttacking();
+    this->ResetAttacking();
 }
 
 void AttAttacking::ResetAttacking()
@@ -148,7 +148,7 @@ bool AttAttacking::HasAttacca() const
 
 AttBendGes::AttBendGes() : Att()
 {
-    ResetBendGes();
+    this->ResetBendGes();
 }
 
 void AttBendGes::ResetBendGes()
@@ -188,7 +188,7 @@ bool AttBendGes::HasAmount() const
 
 AttDurationGes::AttDurationGes() : Att()
 {
-    ResetDurationGes();
+    this->ResetDurationGes();
 }
 
 void AttDurationGes::ResetDurationGes()
@@ -303,7 +303,7 @@ bool AttDurationGes::HasDurRecip() const
 
 AttNoteGes::AttNoteGes() : Att()
 {
-    ResetNoteGes();
+    this->ResetNoteGes();
 }
 
 void AttNoteGes::ResetNoteGes()
@@ -343,7 +343,7 @@ bool AttNoteGes::HasExtremis() const
 
 AttOrnamentAccidGes::AttOrnamentAccidGes() : Att()
 {
-    ResetOrnamentAccidGes();
+    this->ResetOrnamentAccidGes();
 }
 
 void AttOrnamentAccidGes::ResetOrnamentAccidGes()
@@ -398,7 +398,7 @@ bool AttOrnamentAccidGes::HasAccidlowerGes() const
 
 AttPitchGes::AttPitchGes() : Att()
 {
-    ResetPitchGes();
+    this->ResetPitchGes();
 }
 
 void AttPitchGes::ResetPitchGes()
@@ -468,7 +468,7 @@ bool AttPitchGes::HasPnum() const
 
 AttSoundLocation::AttSoundLocation() : Att()
 {
-    ResetSoundLocation();
+    this->ResetSoundLocation();
 }
 
 void AttSoundLocation::ResetSoundLocation()
@@ -523,7 +523,7 @@ bool AttSoundLocation::HasElevation() const
 
 AttTimestampGes::AttTimestampGes() : Att()
 {
-    ResetTimestampGes();
+    this->ResetTimestampGes();
 }
 
 void AttTimestampGes::ResetTimestampGes()
@@ -578,7 +578,7 @@ bool AttTimestampGes::HasTstampReal() const
 
 AttTimestamp2Ges::AttTimestamp2Ges() : Att()
 {
-    ResetTimestamp2Ges();
+    this->ResetTimestamp2Ges();
 }
 
 void AttTimestamp2Ges::ResetTimestamp2Ges()

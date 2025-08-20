@@ -271,7 +271,7 @@ bool ConvertToCastOffMensuralFunctor::IsValidBreakPoint(const Alignment *alignme
             // Do not break within editorial markup
             if (refChild->GetFirstAncestorInRange(EDITORIAL_ELEMENT, EDITORIAL_ELEMENT_max)) return false;
             // Do not break within a ligature when rendered as bracket - (notes in it will have a different aligner
-            // execpt for the first one)
+            // except for the first one)
             if (ligatureAsBracket && refChild->GetFirstAncestor(LIGATURE)) {
                 const Ligature *ligature = vrv_cast<const Ligature *>(refChild->GetFirstAncestor(LIGATURE));
                 assert(ligature);
@@ -612,7 +612,7 @@ FunctorCode ConvertToCmnFunctor::VisitMeasure(Measure *measure)
 FunctorCode ConvertToCmnFunctor::VisitMeasureEnd(Measure *measure)
 {
     // This is the first measure in the system - we need to update the scoreDef
-    if (m_score) {
+    if (m_score && m_score->GetScoreDef()) {
         for (Object *child : m_score->GetScoreDef()->GetList()) {
             StaffDef *staffDef = vrv_cast<StaffDef *>(child);
             assert(staffDef);
@@ -632,7 +632,7 @@ FunctorCode ConvertToCmnFunctor::VisitMeasureEnd(Measure *measure)
             // We must have m_clefs filled with clefs converted when processing layers
             // However, if we have a clef in the staffDef, convert and use that one
             if (clef) {
-                ConvertClef(m_clefs.back(), vrv_cast<Clef *>(clef));
+                this->ConvertClef(m_clefs.back(), vrv_cast<Clef *>(clef));
                 staffDef->DeleteChild(clef);
             }
             staffDef->AddChild(m_clefs.back());
@@ -771,7 +771,7 @@ FunctorCode ConvertToCmnFunctor::VisitStaffEnd(Staff *staff)
     }
 
     Clef *clef = new Clef();
-    ConvertClef(clef, m_layerClef);
+    this->ConvertClef(clef, m_layerClef);
     // Add to the list of clef (one per staff)
     m_clefs.push_front(clef);
 
@@ -826,6 +826,8 @@ Fraction ConvertToCmnFunctor::CalcMeasureDuration(const Mensur &mensur)
 
 void ConvertToCmnFunctor::ConvertDurationInterface(DurationInterface *interface, ClassId classId)
 {
+    assert(interface);
+
     m_durationElements.clear();
 
     data_DURATION noteDur = interface->GetActualDur();

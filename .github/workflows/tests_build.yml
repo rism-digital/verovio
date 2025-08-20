@@ -108,6 +108,12 @@ jobs:
           python3 ./test-suite-diff.py ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/ ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/ ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
           ls -al
 
+      - name: Round-trip evaluation
+        working-directory: ${{ github.workspace }}/${{ env.DEV_DIR }}/bindings/python
+        run: |
+          python3 ../../doc/test-suite-roundtrip.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
+          ls -al
+
       - name: Upload results as artefacts
         uses: actions/upload-artifact@v4
         with:

@@ -86,10 +86,10 @@ const Alignment *HorizontalAligner::SearchAlignmentAtTime(const Fraction &time, 
 void HorizontalAligner::AddAlignment(Alignment *alignment, int idx)
 {
     if (idx == -1) {
-        AddChild(alignment);
+        this->AddChild(alignment);
     }
     else {
-        InsertChild(alignment, idx);
+        this->InsertChild(alignment, idx);
     }
 }
 
@@ -134,13 +134,13 @@ void MeasureAligner::Reset()
     HorizontalAligner::Reset();
     m_nonJustifiableLeftMargin = 0;
     m_leftAlignment = new Alignment(-1, ALIGNMENT_MEASURE_START);
-    AddAlignment(m_leftAlignment);
+    this->AddAlignment(m_leftAlignment);
     m_leftBarLineAlignment = new Alignment(-1, ALIGNMENT_MEASURE_LEFT_BARLINE);
-    AddAlignment(m_leftBarLineAlignment);
+    this->AddAlignment(m_leftBarLineAlignment);
     m_rightBarLineAlignment = new Alignment(0, ALIGNMENT_MEASURE_RIGHT_BARLINE);
-    AddAlignment(m_rightBarLineAlignment);
+    this->AddAlignment(m_rightBarLineAlignment);
     m_rightAlignment = new Alignment(0, ALIGNMENT_MEASURE_END);
-    AddAlignment(m_rightAlignment);
+    this->AddAlignment(m_rightAlignment);
 
     m_initialTstampDur = -1;
 }
@@ -171,7 +171,7 @@ Alignment *MeasureAligner::GetAlignmentAtTime(const Fraction &time, AlignmentTyp
         }
     }
     Alignment *newAlignment = new Alignment(time, type);
-    AddAlignment(newAlignment, idx);
+    this->AddAlignment(newAlignment, idx);
     return newAlignment;
 }
 
@@ -370,7 +370,7 @@ Alignment *GraceAligner::GetAlignmentAtTime(const Fraction &time, AlignmentType 
         idx = this->GetAlignmentCount();
     }
     Alignment *newAlignment = new Alignment(time, type);
-    AddAlignment(newAlignment, idx);
+    this->AddAlignment(newAlignment, idx);
     return newAlignment;
 }
 
@@ -846,11 +846,11 @@ void AlignmentReference::AddChild(Object *child)
     }
 
     // Special case where we do not set the parent because the reference will not have ownership
-    // Children will be treated as relinquished objects in the desctructor
+    // Children will be treated as relinquished objects in the destructor
     // However, we need to make sure the child has a parent (somewhere else)
     assert(child->GetParent() && this->IsReferenceObject());
     children.push_back(child);
-    Modify();
+    this->Modify();
 }
 
 bool AlignmentReference::HasAccidVerticalOverlap(const ArrayOfConstObjects &objects) const
@@ -952,10 +952,10 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
     timestampAttr = new TimestampAttr();
     timestampAttr->SetDrawingPos(time);
     if (idx == -1) {
-        AddChild(timestampAttr);
+        this->AddChild(timestampAttr);
     }
     else {
-        InsertChild(timestampAttr, idx);
+        this->InsertChild(timestampAttr, idx);
     }
     return timestampAttr;
 }

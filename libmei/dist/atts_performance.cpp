@@ -28,7 +28,7 @@ namespace vrv {
 
 AttAlignment::AttAlignment() : Att()
 {
-    ResetAlignment();
+    this->ResetAlignment();
 }
 
 void AttAlignment::ResetAlignment()

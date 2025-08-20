@@ -230,6 +230,8 @@ FunctorCode AdjustGraceXPosFunctor::VisitMeasure(Measure *measure)
 
 FunctorCode AdjustGraceXPosFunctor::VisitScore(Score *score)
 {
+    assert(score->GetScoreDef());
+
     m_staffNs = score->GetScoreDef()->GetStaffNs();
 
     return FUNCTOR_CONTINUE;

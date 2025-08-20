@@ -23,14 +23,14 @@ jobs:
       fail-fast: false
       # Build the wheels for Linux, Windows and macOS
       matrix:
-        os: [macos-13, macos-14, windows-latest, ubuntu-latest]
+        os: [macos-13, macos-15, windows-latest, ubuntu-latest, ubuntu-24.04-arm]
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
         architecture: [x86, x64, arm64]
         include:
           - os: macos-13
             architecture: x64
             platform_id: macosx_x86_64
-          - os: macos-14
+          - os: macos-15
             architecture: arm64
             platform_id: macosx_arm64
           - os: windows-latest
@@ -42,14 +42,17 @@ jobs:
           - os: ubuntu-latest
             architecture: x64
             platform_id: manylinux_x86_64
+          - os: ubuntu-24.04-arm
+            architecture: arm64
+            platform_id: manylinux_aarch64
         exclude:
           - os: macos-13
             architecture: x86
           - os: macos-13
             architecture: arm64
-          - os: macos-14
+          - os: macos-15
             architecture: x86
-          - os: macos-14
+          - os: macos-15
             architecture: x64
           - os: ubuntu-latest
             architecture: x86
@@ -57,6 +60,10 @@ jobs:
             architecture: arm64
           - os: windows-latest
             architecture: arm64
+          - os: ubuntu-24.04-arm
+            architecture: x86
+          - os: ubuntu-24.04-arm
+            architecture: x64
 
     steps:
       #===============================================#
@@ -65,13 +72,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: nuget/setup-nuget@a21f25cd3998bf370fde17e3f1b4c12c175172f9 # v2.0.0
+      - uses: nuget/setup-nuget@323ab0502cd38fdc493335025a96c8fdb0edc71f # v2.0.1
         if: always() && runner.os == 'Windows'
         with:
           nuget-version: "latest"
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v5.1.0
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.architecture }}
@@ -96,14 +103,14 @@ jobs:
       #===============================================#
       # wheels
       - name: Build wheels
-        uses: pypa/cibuildwheel@7940a4c0e76eb2030e473a5f864f291f63ee879b # v2.21.3
+        uses: pypa/cibuildwheel@9e4e50bd76b3190f55304387e333f6234823ea9b # v3.1.2
         with:
           output-dir: wheelhouse
         env:
           CIBW_BUILD: ${{ env.CIBW_BUILD_IDENTIFIER }}
           CIBW_ARCHS_MACOS: x86_64 arm64
           CIBW_ENVIRONMENT_MACOS:
-            MACOSX_DEPLOYMENT_TARGET=11
+            MACOSX_DEPLOYMENT_TARGET=13
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_MANYLINUX_I686_IMAGE: manylinux2014
           CIBW_BEFORE_ALL_MACOS: brew update && brew install swig
@@ -166,7 +173,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v5.1.0
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: "3.9"
 
@@ -241,7 +248,7 @@ jobs:
       - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
 
       - name: Set up Python 3.9
-        uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v5.1.0
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: "3.9"
           architecture: "x64"
@@ -256,7 +263,7 @@ jobs:
       #===============================================#
       # Prepare artifacts
       - name: Download artifacts
-        uses: actions/download-artifact@v4.1.7 # v4.1.7
+        uses: actions/download-artifact@v4.3.0 # v4.1.7
         with:
           path: bindings/python/artifacts/
 

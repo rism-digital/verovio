@@ -67,25 +67,26 @@ private:
     int ParseTuplet(const std::string &musicCode, int index);
 
     // parse information fields
-    void parseInstruction(const std::string &keyString); // I:
-    void parseKey(std::string &keyString); // K:
-    void parseUnitNoteLength(const std::string &unitNoteLength); // L:
-    void parseMeter(const std::string &meterString); // M:
-    void parseTempo(const std::string &tempoString); // Q:
-    void parseReferenceNumber(const std::string &referenceNumberString); // X:
-    void parseLyrics(); // w:
+    void ParseInstruction(const std::string &keyString); // I:
+    void ParseKey(std::string &keyString); // K:
+    void ParseUnitNoteLength(const std::string &unitNoteLength); // L:
+    void ParseMeter(const std::string &meterString); // M:
+    void ParseTempo(const std::string &tempoString); // Q:
+    void ParseReferenceNumber(const std::string &referenceNumberString); // X:
+    void ParseLyrics(); // w:
 
     // input functions
-    void readInformationField(const char &dataKey, std::string dataValue);
-    void readMusicCode(const std::string &musicCode, Section *section);
+    void ReadInformationField(const char &dataKey, std::string dataValue);
+    void ReadMusicCode(const std::string &musicCode, Section *section);
 
     // decoration functions
-    void parseDecoration(const std::string &decorationString);
+    void ParseDecoration(const std::string &decorationString);
     void AddArticulation(LayerElement *element);
     void AddChordSymbol(LayerElement *element);
     void AddDynamic(LayerElement *element);
     void AddFermata(LayerElement *element);
     void AddOrnaments(LayerElement *element);
+    void AddRepeatMark(LayerElement *element);
 
     // additional functions
     void PrintInformationFields(Score *score);
@@ -156,6 +157,7 @@ private:
     std::vector<std::string> m_dynam;
     std::string m_ornam;
     data_STAFFREL m_fermata = STAFFREL_NONE;
+    repeatMarkLog_FUNC m_repeatMark = repeatMarkLog_FUNC_NONE;
     /*
      * The stack of control elements to be added at the end of each measure
      */

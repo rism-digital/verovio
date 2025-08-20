@@ -28,7 +28,7 @@ namespace vrv {
 
 AttMargins::AttMargins() : Att()
 {
-    ResetMargins();
+    this->ResetMargins();
 }
 
 void AttMargins::ResetMargins()

@@ -37,18 +37,18 @@ BeamSpan::BeamSpan()
     , AttBeamedWith()
     , AttBeamRend()
 {
-    RegisterInterface(PlistInterface::GetAttClasses(), PlistInterface::IsInterface());
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_BEAMEDWITH);
-    RegisterAttClass(ATT_BEAMREND);
+    this->RegisterInterface(PlistInterface::GetAttClasses(), PlistInterface::IsInterface());
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_BEAMEDWITH);
+    this->RegisterAttClass(ATT_BEAMREND);
 
-    Reset();
-    InitBeamSegments();
+    this->Reset();
+    this->InitBeamSegments();
 }
 
 BeamSpan::~BeamSpan()
 {
-    ClearBeamSegments();
+    this->ClearBeamSegments();
 }
 
 void BeamSpan::Reset()
@@ -57,10 +57,10 @@ void BeamSpan::Reset()
     BeamDrawingInterface::Reset();
     PlistInterface::Reset();
     TimeSpanningInterface::Reset();
-    ResetBeamedWith();
-    ResetBeamRend();
+    this->ResetBeamedWith();
+    this->ResetBeamRend();
 
-    ClearBeamSegments();
+    this->ClearBeamSegments();
 }
 
 void BeamSpan::InitBeamSegments()

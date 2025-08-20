@@ -39,6 +39,7 @@ public:
     std::string EditInfo() override;
 
 protected:
+#ifndef NO_EDIT_SUPPORT
     /**
      * Parse JSON instructions for experimental editor functions.
      */
@@ -148,8 +149,8 @@ public:
 
 private:
     //
+#endif /* NO_EDIT_SUPPORT */
 };
-
 } // namespace vrv
 
 #endif

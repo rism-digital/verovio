@@ -154,7 +154,7 @@ FunctorCode CastOffSystemsFunctor::VisitPageElement(PageElement *pageElement)
     assert(m_page);
     pageElement->MoveItselfTo(m_page);
 
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode CastOffSystemsFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
@@ -226,7 +226,7 @@ FunctorCode CastOffSystemsFunctor::VisitSystemEnd(System *system)
 {
     if (m_pendingElements.empty()) return FUNCTOR_CONTINUE;
 
-    // Otherwise add all pendings objects
+    // Otherwise add all pending objects
     for (Object *pendingElement : m_pendingElements) {
         m_currentSystem->AddChild(pendingElement);
     }
@@ -292,7 +292,7 @@ FunctorCode CastOffPagesFunctor::VisitPageEnd(Page *page)
 {
     if (m_pendingPageElements.empty()) return FUNCTOR_CONTINUE;
 
-    // Otherwise add all pendings objects
+    // Otherwise add all pending objects
     for (Object *pendingElement : m_pendingPageElements) {
         m_currentPage->AddChild(pendingElement);
     }
@@ -308,7 +308,7 @@ FunctorCode CastOffPagesFunctor::VisitPageElement(PageElement *pageElement)
     // move as pending since we want it at the beginning of the page in case of system break coming
     m_pendingPageElements.push_back(pageElement);
 
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode CastOffPagesFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
@@ -337,7 +337,7 @@ FunctorCode CastOffPagesFunctor::VisitScore(Score *score)
     m_pgHead2Height = score->m_drawingPgHead2Height;
     m_pgFoot2Height = score->m_drawingPgFoot2Height;
 
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode CastOffPagesFunctor::VisitSystem(System *system)
@@ -409,6 +409,7 @@ CastOffEncodingFunctor::CastOffEncodingFunctor(Doc *doc, Page *currentPage, bool
 
 FunctorCode CastOffEncodingFunctor::VisitDiv(Div *div)
 {
+    assert(m_currentSystem);
     div->MoveItselfTo(m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
@@ -418,6 +419,7 @@ FunctorCode CastOffEncodingFunctor::VisitEditorialElement(EditorialElement *edit
 {
     // Only move editorial elements that are a child of the system
     if (editorialElement->GetParent() && editorialElement->GetParent()->Is(SYSTEM)) {
+        assert(m_currentSystem);
         editorialElement->MoveItselfTo(m_currentSystem);
     }
 
@@ -426,6 +428,7 @@ FunctorCode CastOffEncodingFunctor::VisitEditorialElement(EditorialElement *edit
 
 FunctorCode CastOffEncodingFunctor::VisitEnding(Ending *ending)
 {
+    assert(m_currentSystem);
     ending->MoveItselfTo(m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
@@ -433,6 +436,7 @@ FunctorCode CastOffEncodingFunctor::VisitEnding(Ending *ending)
 
 FunctorCode CastOffEncodingFunctor::VisitMeasure(Measure *measure)
 {
+    assert(m_currentSystem);
     measure->MoveItselfTo(m_currentSystem);
 
     return FUNCTOR_CONTINUE;
@@ -440,6 +444,7 @@ FunctorCode CastOffEncodingFunctor::VisitMeasure(Measure *measure)
 
 FunctorCode CastOffEncodingFunctor::VisitPageElement(PageElement *pageElement)
 {
+    assert(m_currentPage);
     pageElement->MoveItselfTo(m_currentPage);
 
     return FUNCTOR_SIBLINGS;
@@ -455,6 +460,7 @@ FunctorCode CastOffEncodingFunctor::VisitPageMilestone(PageMilestoneEnd *pageMil
         m_currentSystem = NULL;
     }
 
+    assert(m_currentPage);
     pageMilestoneEnd->MoveItselfTo(m_currentPage);
 
     return FUNCTOR_SIBLINGS;
@@ -477,6 +483,7 @@ FunctorCode CastOffEncodingFunctor::VisitPb(Pb *pb)
         }
     }
 
+    assert(m_currentSystem);
     pb->MoveItselfTo(m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
@@ -492,6 +499,7 @@ FunctorCode CastOffEncodingFunctor::VisitSb(Sb *sb)
         m_currentSystem = new System();
     }
 
+    assert(m_currentSystem);
     sb->MoveItselfTo(m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
@@ -499,6 +507,7 @@ FunctorCode CastOffEncodingFunctor::VisitSb(Sb *sb)
 
 FunctorCode CastOffEncodingFunctor::VisitScoreDef(ScoreDef *scoreDef)
 {
+    assert(m_currentSystem);
     scoreDef->MoveItselfTo(m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
@@ -525,6 +534,7 @@ FunctorCode CastOffEncodingFunctor::VisitSystem(System *system)
 
 FunctorCode CastOffEncodingFunctor::VisitSystemElement(SystemElement *systemElement)
 {
+    assert(m_currentSystem);
     systemElement->MoveItselfTo(m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
@@ -545,7 +555,7 @@ FunctorCode UnCastOffFunctor::VisitFloatingObject(FloatingObject *floatingObject
 {
     floatingObject->SetCurrentFloatingPositioner(NULL);
 
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode UnCastOffFunctor::VisitMeasure(Measure *measure)
@@ -563,7 +573,7 @@ FunctorCode UnCastOffFunctor::VisitPageElement(PageElement *pageElement)
 {
     pageElement->MoveItselfTo(m_page);
 
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode UnCastOffFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
@@ -577,7 +587,7 @@ FunctorCode UnCastOffFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestone
 
     pageMilestoneEnd->MoveItselfTo(m_page);
 
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode UnCastOffFunctor::VisitScore(Score *score)
@@ -589,7 +599,7 @@ FunctorCode UnCastOffFunctor::VisitScore(Score *score)
     m_currentSystem = system;
     m_page->AddChild(system);
 
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode UnCastOffFunctor::VisitSystem(System *system)
@@ -620,6 +630,7 @@ CastOffToSelectionFunctor::CastOffToSelectionFunctor(
 
 FunctorCode CastOffToSelectionFunctor::VisitDiv(Div *div)
 {
+    assert(m_currentSystem);
     div->MoveItselfTo(m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
@@ -627,6 +638,7 @@ FunctorCode CastOffToSelectionFunctor::VisitDiv(Div *div)
 
 FunctorCode CastOffToSelectionFunctor::VisitEditorialElement(EditorialElement *editorialElement)
 {
+    assert(m_currentSystem);
     editorialElement->MoveItselfTo(m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
@@ -646,6 +658,7 @@ FunctorCode CastOffToSelectionFunctor::VisitMeasure(Measure *measure)
 
     const bool endSelection = m_isSelection && (measure->GetID() == m_end);
 
+    assert(m_currentSystem);
     measure->MoveItselfTo(m_currentSystem);
 
     if (endSelection) {
@@ -661,6 +674,7 @@ FunctorCode CastOffToSelectionFunctor::VisitMeasure(Measure *measure)
 
 FunctorCode CastOffToSelectionFunctor::VisitPageElement(PageElement *pageElement)
 {
+    assert(m_page);
     pageElement->MoveItselfTo(m_page);
 
     return FUNCTOR_SIBLINGS;
@@ -676,6 +690,7 @@ FunctorCode CastOffToSelectionFunctor::VisitPageMilestone(PageMilestoneEnd *page
 
 FunctorCode CastOffToSelectionFunctor::VisitScoreDef(ScoreDef *scoreDef)
 {
+    assert(m_currentSystem);
     scoreDef->MoveItselfTo(m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
@@ -695,6 +710,7 @@ FunctorCode CastOffToSelectionFunctor::VisitSystem(System *system)
 
 FunctorCode CastOffToSelectionFunctor::VisitSystemElement(SystemElement *systemElement)
 {
+    assert(m_currentSystem);
     systemElement->MoveItselfTo(m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
@@ -702,6 +718,7 @@ FunctorCode CastOffToSelectionFunctor::VisitSystemElement(SystemElement *systemE
 
 FunctorCode CastOffToSelectionFunctor::VisitSystemMilestone(SystemMilestoneEnd *systemMilestoneEnd)
 {
+    assert(m_currentSystem);
     systemMilestoneEnd->MoveItselfTo(m_currentSystem);
 
     return FUNCTOR_SIBLINGS;

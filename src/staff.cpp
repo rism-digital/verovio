@@ -76,7 +76,7 @@ void Staff::Reset()
     m_drawingTuning = NULL;
     m_drawingRotation = 0.0;
 
-    ClearLedgerLines();
+    this->ClearLedgerLines();
 }
 
 void Staff::CloneReset()

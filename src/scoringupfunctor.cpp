@@ -51,16 +51,16 @@ FunctorCode ScoringUpFunctor::VisitLayerEnd(Layer *layer)
         ArrayOfElementDurPairs dursInVoiceWithSameMensur = mensurPassage.second;
         // Process each perfect mensuration passage from lowest to highest note level
         if (m_mensInfo.prolatio == 3) {
-            ProcessPerfectMensurPassage(dursInVoiceWithSameMensur, DURATION_semibrevis);
+            this->ProcessPerfectMensurPassage(dursInVoiceWithSameMensur, DURATION_semibrevis);
         }
         if (m_mensInfo.tempus == 3) {
-            ProcessPerfectMensurPassage(dursInVoiceWithSameMensur, DURATION_brevis);
+            this->ProcessPerfectMensurPassage(dursInVoiceWithSameMensur, DURATION_brevis);
         }
         if (m_mensInfo.modusminor == 3) {
-            ProcessPerfectMensurPassage(dursInVoiceWithSameMensur, DURATION_longa);
+            this->ProcessPerfectMensurPassage(dursInVoiceWithSameMensur, DURATION_longa);
         }
         if (m_mensInfo.modusmaior == 3) {
-            ProcessPerfectMensurPassage(dursInVoiceWithSameMensur, DURATION_maxima);
+            this->ProcessPerfectMensurPassage(dursInVoiceWithSameMensur, DURATION_maxima);
         }
     }
     // restart for next voice (layer)
@@ -213,7 +213,7 @@ void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &seq
     if (numberOfDots == 0) {
         sum = this->GetValueInUnit(this->GetValueInMinims(middleSeq), boundUnit);
         this->FindDurQuals(sequence, sum, boundUnit);
-        ApplyAugmentationsAndPerfections();
+        this->ApplyAugmentationsAndPerfections();
     }
     // 1. Single dot in middle sequence sequence
     else if (numberOfDots == 1) {
@@ -224,7 +224,7 @@ void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &seq
             // This is a dot of augmentation
             sum = this->GetValueInUnit(this->GetValueInMinims(middleSeq), boundUnit);
             this->FindDurQuals(sequence, sum, boundUnit);
-            ApplyAugmentationsAndPerfections();
+            this->ApplyAugmentationsAndPerfections();
         }
     }
     // 3. More than one dot in middle sequence
@@ -244,7 +244,7 @@ void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &seq
             // This is a dot of augmentation
             sum = this->GetValueInUnit(this->GetValueInMinims(middleSeq), boundUnit);
             this->FindDurQuals(sequence, sum, boundUnit);
-            ApplyAugmentationsAndPerfections();
+            this->ApplyAugmentationsAndPerfections();
         }
     }
 }
@@ -310,13 +310,9 @@ double ScoringUpFunctor::GetDurNumberValue(
 {
     data_DURQUALITY_mensural durquality = DURQUALITY_mensural_NONE;
     data_DURATION dur = elementDurPair.second;
-    LayerElement *element = elementDurPair.first;
-    Note *note;
-    if (element->Is(NOTE)) {
-        note = vrv_cast<Note *>(element);
-        assert(note);
-        durquality = note->GetDurQuality();
-    }
+    Note *note = vrv_cast<Note *>(elementDurPair.first);
+    if (!note) return 0.0;
+    durquality = note->GetDurQuality();
     int longaDefaultVal = m_mensInfo.modusminor * m_mensInfo.tempus * m_mensInfo.prolatio;
     int brevisDefaultVal = m_mensInfo.tempus * m_mensInfo.prolatio;
     int semibrevisDefaultVal = m_mensInfo.prolatio;
@@ -725,7 +721,7 @@ bool ScoringUpFunctor::EvalDotOfDiv(
             // Encode its effect on the notes preceding and following:
             this->FindDurQuals(seq1, sum1, unit);
             this->FindDurQuals(seq2, sum2, unit);
-            ApplyAugmentationsAndPerfections();
+            this->ApplyAugmentationsAndPerfections();
         }
         else {
             m_listOfAugNotesDotsPairs.clear();

@@ -138,7 +138,7 @@ Object &Object::operator=(const Object &object)
 {
     // not self assignement
     if (this != &object) {
-        ClearChildren();
+        this->ClearChildren();
         this->ResetBoundingBox(); // It does not make sense to keep the values of the BBox
 
         m_classId = object.m_classId;
@@ -176,7 +176,7 @@ Object &Object::operator=(const Object &object)
 
 Object::~Object()
 {
-    ClearChildren();
+    this->ClearChildren();
 }
 
 void Object::Init(ClassId classId)
@@ -226,7 +226,7 @@ const Resources *Object::GetDocResources() const
 
 void Object::Reset()
 {
-    ClearChildren();
+    this->ClearChildren();
     this->ResetBoundingBox();
 }
 
@@ -282,7 +282,7 @@ void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChang
             idx++;
         }
         else {
-            AddChild(child);
+            this->AddChild(child);
         }
     }
 }
@@ -801,13 +801,13 @@ int Object::DeleteChildrenByComparison(Comparison *comparison)
 void Object::GenerateID()
 {
     // A random letter from a-z
-    char letter = 'a' + (std::rand() % 26);
+    char letter = 'a' + (s_xmlIDCounter % 26);
     m_id = letter + Object::GenerateHashID();
 }
 
 void Object::ResetID()
 {
-    GenerateID();
+    this->GenerateID();
 }
 
 bool Object::CheckUniqueID(std::unordered_set<std::string> &usedIDs)
@@ -868,7 +868,7 @@ void Object::AddChild(Object *child)
         i = std::min(i, (int)m_children.size());
         m_children.insert(m_children.begin() + i, child);
     }
-    Modify();
+    this->Modify();
 }
 
 int Object::GetInsertOrderForIn(ClassId classId, const std::vector<ClassId> &order) const
@@ -1207,9 +1207,9 @@ bool Object::FiltersApply(const Filters *filters, Object *object) const
     return filters ? filters->Apply(object) : true;
 }
 
-void Object::SaveObject(Output *output, bool basic)
+void Object::SaveObject(Output *output)
 {
-    SaveFunctor save(output, basic);
+    SaveFunctor save(output);
     // Special case where we want to process all objects
     save.SetVisibleOnly(false);
     this->Process(save);
@@ -1237,7 +1237,9 @@ Object *Object::FindPreviousChild(Comparison *comp, Object *start)
 
 void Object::AddPlistReference(const Object *object)
 {
-    if (!m_plistReferences) m_plistReferences.emplace();
+    if (!m_plistReferences) {
+        m_plistReferences = std::make_unique<ListOfConstObjects>();
+    }
     m_plistReferences->push_back(object);
 }
 
@@ -1267,13 +1269,13 @@ void Object::SeedID(uint32_t seed)
     }
     else {
         // Deterministic start ID
-        s_xmlIDCounter = Hash(seed);
+        s_xmlIDCounter = Object::Hash(seed);
     }
 }
 
 std::string Object::GenerateHashID()
 {
-    uint32_t nr = Hash(++s_xmlIDCounter);
+    uint32_t nr = Object::Hash(++s_xmlIDCounter);
 
     return BaseEncodeInt(nr, 36);
 }

@@ -378,11 +378,11 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
         // First half of the oblique - checking the nextNote is there just in case, but is should
         if ((shape & LIGATURE_OBLIQUE) && nextNote) {
             // return;
-            CalcObliquePoints(note, nextNote, staff, points, sides, shape, isMensuralBlack, true, straight);
+            this->CalcObliquePoints(note, nextNote, staff, points, sides, shape, isMensuralBlack, true, straight);
         }
         // Second half of the oblique - checking the prevNote is there just in case, but is should
         else if ((prevShape & LIGATURE_OBLIQUE) && prevNote) {
-            CalcObliquePoints(prevNote, note, staff, points, sides, prevShape, isMensuralBlack, false, straight);
+            this->CalcObliquePoints(prevNote, note, staff, points, sides, prevShape, isMensuralBlack, false, straight);
         }
         else {
             assert(false);
@@ -404,8 +404,8 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
         const int thickness = topLeft->y - bottomLeft->y;
         // The curved side points (two ends and two control points)
         Point curvedSide[4];
-        curvedSide[0] = ToDeviceContext(*topLeft);
-        curvedSide[3] = ToDeviceContext(*topRight);
+        curvedSide[0] = this->ToDeviceContext(*topLeft);
+        curvedSide[3] = this->ToDeviceContext(*topRight);
         //
         const int width = (curvedSide[3].x - curvedSide[0].x);
         const int height = (curvedSide[3].y - curvedSide[0].y);
@@ -435,7 +435,8 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
             Point prevBottomRight = *bottomRight;
             int prevSides[4];
             memcpy(prevSides, sides, 4 * sizeof(int));
-            CalcBrevisPoints(prevNote, staff, &prevTopLeft, &prevBottomRight, prevSides, prevShape, isMensuralBlack);
+            this->CalcBrevisPoints(
+                prevNote, staff, &prevTopLeft, &prevBottomRight, prevSides, prevShape, isMensuralBlack);
             if (!stackedEnd) {
                 sideTop = std::max(sides[0], prevSides[2]);
                 sideBottom = std::min(sides[1], prevSides[3]);
@@ -669,7 +670,7 @@ void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point point
     Point *bottomRight = &points[3];
 
     int sides1[4];
-    CalcBrevisPoints(note1, staff, topLeft, bottomLeft, sides1, shape, isMensuralBlack);
+    this->CalcBrevisPoints(note1, staff, topLeft, bottomLeft, sides1, shape, isMensuralBlack);
     // Correct the x of bottomLeft
     bottomLeft->x = topLeft->x;
     // Copy the left sides
@@ -678,7 +679,7 @@ void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point point
 
     int sides2[4];
     // add OBLIQUE shape to make sure sides are shortened in mensural black
-    CalcBrevisPoints(note2, staff, topRight, bottomRight, sides2, LIGATURE_OBLIQUE, isMensuralBlack);
+    this->CalcBrevisPoints(note2, staff, topRight, bottomRight, sides2, LIGATURE_OBLIQUE, isMensuralBlack);
     // Correct the x of topRight;
     topRight->x = bottomRight->x;
     // Copy the right sides

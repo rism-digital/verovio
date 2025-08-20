@@ -537,8 +537,8 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         if (bTrem->GetNumPlace() == STAFFREL_basic_below) {
             yNum = yBottom - m_doc->GetDrawingUnit(staffSize) - extend.m_height;
         }
-        dc->DrawMusicText(
-            figures, ToDeviceContextX(element->GetDrawingX() + xOffset - extend.m_width / 2), ToDeviceContextY(yNum));
+        dc->DrawMusicText(figures, this->ToDeviceContextX(element->GetDrawingX() + xOffset - extend.m_width / 2),
+            this->ToDeviceContextY(yNum));
         dc->ResetFont();
     }
 
@@ -557,7 +557,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(chord);
 
     if (chord->HasCluster()) {
-        DrawChordCluster(dc, chord, layer, staff, measure);
+        this->DrawChordCluster(dc, chord, layer, staff, measure);
         return;
     }
 
@@ -620,11 +620,11 @@ void View::DrawChordCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff
 
     // Draw dots and stem
     const int dotsX = x + width + unit;
-    DrawDotsPart(dc, dotsX, topNote->GetDrawingY(), chord->GetDots(), staff, false);
+    this->DrawDotsPart(dc, dotsX, topNote->GetDrawingY(), chord->GetDots(), staff, false);
     if ((y1 - y2) > 5 * unit) DrawDotsPart(dc, dotsX, bottomNote->GetDrawingY(), chord->GetDots(), staff, false);
 
     Stem *stem = vrv_cast<Stem *>(chord->GetFirst(STEM));
-    DrawStem(dc, stem, layer, staff, measure);
+    this->DrawStem(dc, stem, layer, staff, measure);
 }
 
 void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -950,11 +950,13 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     KeySig *keySig = vrv_cast<KeySig *>(element);
     assert(keySig);
 
-    Clef *clef = layer->GetClef(element);
+    Clef *drawingClef = keySig->GetDrawingClef();
+    Clef *clef = drawingClef ? drawingClef : layer->GetClef(element);
     if (!clef) {
         keySig->SetEmptyBB();
         return;
     }
+    const int clefLocOffset = clef->GetClefLocOffset();
 
     // hidden key signature
     if (keySig->GetVisible() == BOOLEAN_false) {
@@ -981,8 +983,6 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int x = element->GetDrawingX();
     // HARDCODED
     const int step = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * TEMP_KEYSIG_STEP;
-
-    int clefLocOffset = layer->GetClefLocOffset(element);
 
     dc->StartGraphic(element, "", element->GetID());
 
@@ -1219,7 +1219,7 @@ void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             yNum -= staff->m_drawingLines * m_doc->GetDrawingDoubleUnit(staffSize) + extend.m_height + offset;
         }
         dc->DrawMusicText(
-            figures, ToDeviceContextX(element->GetDrawingX() - extend.m_width / 2), ToDeviceContextY(yNum));
+            figures, this->ToDeviceContextX(element->GetDrawingX() - extend.m_width / 2), this->ToDeviceContextY(yNum));
         dc->ResetFont();
     }
 
@@ -1598,7 +1598,7 @@ void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(measure);
 
     dc->StartGraphic(element, "", element->GetID());
-    dc->DrawPlaceholder(ToDeviceContextX(element->GetDrawingX()), ToDeviceContextY(element->GetDrawingY()));
+    dc->DrawPlaceholder(this->ToDeviceContextX(element->GetDrawingX()), this->ToDeviceContextY(element->GetDrawingY()));
     dc->EndGraphic(element, this);
 }
 
@@ -1636,7 +1636,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     dc->StartGraphic(element, "", element->GetID());
 
-    DrawVerticalLine(dc, stem->GetDrawingY(),
+    this->DrawVerticalLine(dc, stem->GetDrawingY(),
         stem->GetDrawingY() - (stem->GetDrawingStemLen() + stem->GetDrawingStemAdjust()), stem->GetDrawingX(),
         m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
 
@@ -1773,7 +1773,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     assert(dc->HasFont());
     params.m_pointSize = dc->GetFont()->GetPointSize();
 
-    dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y));
+    dc->StartText(this->ToDeviceContextX(params.m_x), this->ToDeviceContextY(params.m_y));
     this->DrawTextChildren(dc, syl, params);
 
     if (syl->GetCon() == sylLog_CON_b) {
@@ -1847,7 +1847,7 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
         FontInfo labelTxt;
         if (!dc->UseGlobalStyling()) {
-            labelTxt.SetFaceName("Times");
+            labelTxt.SetFaceName(m_doc->GetResources().GetTextFont());
         }
         int pointSize = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize();
         if (layerElement && layerElement->GetDrawingCueSize()) {
@@ -1864,7 +1864,8 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
         dc->StartGraphic(graphic, "", graphic->GetID());
 
-        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_right);
+        dc->StartText(
+            this->ToDeviceContextX(params.m_x), this->ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_right);
         this->DrawTextChildren(dc, graphic, params);
         dc->EndText();
 
@@ -1918,12 +1919,16 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff)
 
     // HARDCODED
     if (stemDir == STEMDIRECTION_up) {
-        dc->DrawLine(ToDeviceContextX(startPoint.x - positionShiftX1), ToDeviceContextY(startPoint.y + positionShiftY1),
-            ToDeviceContextX(startPoint.x + positionShiftX2), ToDeviceContextY(startPoint.y + positionShiftY2));
+        dc->DrawLine(this->ToDeviceContextX(startPoint.x - positionShiftX1),
+            this->ToDeviceContextY(startPoint.y + positionShiftY1),
+            this->ToDeviceContextX(startPoint.x + positionShiftX2),
+            this->ToDeviceContextY(startPoint.y + positionShiftY2));
     }
     else {
-        dc->DrawLine(ToDeviceContextX(startPoint.x - positionShiftX1), ToDeviceContextY(startPoint.y - positionShiftY1),
-            ToDeviceContextX(startPoint.x + positionShiftX2), ToDeviceContextY(startPoint.y - positionShiftY2));
+        dc->DrawLine(this->ToDeviceContextX(startPoint.x - positionShiftX1),
+            this->ToDeviceContextY(startPoint.y - positionShiftY1),
+            this->ToDeviceContextX(startPoint.x + positionShiftX2),
+            this->ToDeviceContextY(startPoint.y - positionShiftY2));
     }
 
     dc->ResetPen();
@@ -2040,7 +2045,8 @@ void View::DrawMRptPart(DeviceContext *dc, int xCentered, char32_t rptGlyph, int
         const int yNum = (y > ySymbol + symHeight / 2)
             ? staff->GetDrawingY() + m_doc->GetDrawingUnit(staffNotationSize) + extend.m_height / 2
             : ySymbol + 3 * m_doc->GetDrawingUnit(staffNotationSize) + extend.m_height / 2;
-        dc->DrawMusicText(figures, ToDeviceContextX(xCentered - extend.m_width / 2), ToDeviceContextY(yNum));
+        dc->DrawMusicText(
+            figures, this->ToDeviceContextX(xCentered - extend.m_width / 2), this->ToDeviceContextY(yNum));
         dc->ResetFont();
     }
 }

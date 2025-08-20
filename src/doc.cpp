@@ -230,6 +230,7 @@ void Doc::GenerateFooter()
 {
     for (Score *score : this->GetVisibleScores()) {
         ScoreDef *scoreDef = score->GetScoreDef();
+        assert(scoreDef);
         if (scoreDef->FindDescendantByType(PGFOOT)) continue;
 
         PgFoot *pgFoot = new PgFoot();
@@ -253,6 +254,7 @@ void Doc::GenerateHeader()
 {
     for (Score *score : this->GetVisibleScores()) {
         ScoreDef *scoreDef = score->GetScoreDef();
+        assert(scoreDef);
         if (scoreDef->FindDescendantByType(PGHEAD)) continue;
 
         PgHead *pgHead = new PgHead();
@@ -289,6 +291,15 @@ bool Doc::GenerateMeasureNumbers()
     // run through all measures and generate missing mNum from attribute
     for (Object *object : measures) {
         Measure *measure = vrv_cast<Measure *>(object);
+        // First remove previously generated elements
+        ListOfObjects mNums = measure->FindAllDescendantsByType(MNUM);
+        for (Object *child : mNums) {
+            MNum *mNum = vrv_cast<MNum *>(child);
+            assert(mNum);
+            if (mNum->IsGenerated()) {
+                measure->DeleteChild(mNum);
+            }
+        }
         if (measure->HasN() && !measure->FindDescendantByType(MNUM)) {
             MNum *mnum = new MNum;
             Text *text = new Text;
@@ -384,6 +395,7 @@ void Doc::CalculateTimemap()
 
     // Set tempo
     ScoreDef *scoreDef = this->GetFirstVisibleScore()->GetScoreDef();
+    assert(scoreDef);
     if (scoreDef->HasMidiBpm()) {
         tempo = scoreDef->GetMidiBpm();
     }
@@ -420,7 +432,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
 
     if (!this->HasTimemap()) {
         // generate MIDI timemap before progressing
-        CalculateTimemap();
+        this->CalculateTimemap();
     }
     if (!this->HasTimemap()) {
         LogWarning("Calculation of the timemap failed, MIDI cannot be exported.");
@@ -431,6 +443,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
 
     // set MIDI tempo
     ScoreDef *scoreDef = this->GetFirstVisibleScore()->GetScoreDef();
+    assert(scoreDef);
     if (scoreDef->HasMidiBpm()) {
         tempo = scoreDef->GetMidiBpm();
         tempoEventTicks.insert(0);
@@ -565,14 +578,14 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             controlEvents = false;
         }
     }
-    midiFile->sortTracks();
+    midiFile->sortTracksNoteOffsBeforeOns();
 }
 
 bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeasures, bool useFractions)
 {
     if (!this->HasTimemap()) {
         // generate MIDI timemap before progressing
-        CalculateTimemap();
+        this->CalculateTimemap();
     }
     if (!this->HasTimemap()) {
         LogWarning("Calculation of the timemap failed, the timemap cannot be exported.");
@@ -603,7 +616,7 @@ bool Doc::ExportFeatures(std::string &output, const std::string &options)
 {
     if (!this->HasTimemap()) {
         // generate MIDI timemap before progressing
-        CalculateTimemap();
+        this->CalculateTimemap();
     }
     if (!this->HasTimemap()) {
         LogWarning("Calculation of the timemap failed, the features cannot be exported.");
@@ -629,6 +642,8 @@ void Doc::PrepareData()
     /************ Reset and initialization ************/
 
     if (m_dataPreparationDone) {
+        // Reset the scoreDef for the entire doc
+        this->ResetToLoading();
         ResetDataFunctor resetData;
         root->Process(resetData);
     }
@@ -895,7 +910,7 @@ void Doc::PrepareData()
     PrepareAltSymFunctor prepareAltSym;
     root->Process(prepareAltSym);
 
-    /************ Instanciate LayerElement parts (stem, flag, dots, etc) ************/
+    /************ Instantiate LayerElement parts (stem, flag, dots, etc) ************/
 
     PrepareLayerElementPartsFunctor prepareLayerElementParts;
     root->Process(prepareLayerElementParts);
@@ -916,6 +931,7 @@ void Doc::PrepareData()
 
     for (Score *score : this->GetVisibleScores()) {
         ScoreDefSetGrpSymFunctor scoreDefSetGrpSym;
+        assert(score->GetScoreDef());
         score->GetScoreDef()->Process(scoreDefSetGrpSym);
     }
 
@@ -2315,6 +2331,9 @@ int Doc::GetAdjustedDrawingPageHeight() const
     }
 
     int contentHeight = m_drawingPage->GetContentHeight();
+    if (m_options->m_scaleToPageSize.GetValue()) {
+        contentHeight = contentHeight * m_options->m_scale.GetValue() / 100;
+    }
     return (contentHeight + m_drawingPageMarginTop + m_drawingPageMarginBottom) / DEFINITION_FACTOR;
 }
 
@@ -2328,12 +2347,15 @@ int Doc::GetAdjustedDrawingPageWidth() const
     }
 
     int contentWidth = m_drawingPage->GetContentWidth();
+    if (m_options->m_scaleToPageSize.GetValue()) {
+        contentWidth = contentWidth * m_options->m_scale.GetValue() / 100;
+    }
     return (contentWidth + m_drawingPageMarginLeft + m_drawingPageMarginRight) / DEFINITION_FACTOR;
 }
 
 void Doc::SetMensuralMusicOnly(data_BOOLEAN isMensuralMusicOnly)
 {
-    // Already marked as non mensural only cannoy be set back
+    // Already marked as non mensural only cannot be set back
     if (m_isMensuralMusicOnly != BOOLEAN_false) {
         m_isMensuralMusicOnly = isMensuralMusicOnly;
     }

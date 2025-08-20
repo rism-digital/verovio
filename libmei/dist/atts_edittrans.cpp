@@ -28,7 +28,7 @@ namespace vrv {
 
 AttAgentIdent::AttAgentIdent() : Att()
 {
-    ResetAgentIdent();
+    this->ResetAgentIdent();
 }
 
 void AttAgentIdent::ResetAgentIdent()
@@ -68,7 +68,7 @@ bool AttAgentIdent::HasAgent() const
 
 AttReasonIdent::AttReasonIdent() : Att()
 {
-    ResetReasonIdent();
+    this->ResetReasonIdent();
 }
 
 void AttReasonIdent::ResetReasonIdent()

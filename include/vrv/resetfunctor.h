@@ -56,6 +56,7 @@ public:
     FunctorCode VisitFloatingObject(FloatingObject *floatingObject) override;
     FunctorCode VisitFTrem(FTrem *fTrem) override;
     FunctorCode VisitHairpin(Hairpin *hairpin) override;
+    FunctorCode VisitKeySig(KeySig *keySig) override;
     FunctorCode VisitLayer(Layer *layer) override;
     FunctorCode VisitLayerElement(LayerElement *layerElement) override;
     FunctorCode VisitLigature(Ligature *ligature) override;

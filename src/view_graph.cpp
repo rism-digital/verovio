@@ -28,9 +28,10 @@ void View::DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int width
 {
     assert(dc);
 
-    dc->SetPen(std::max(1, ToDeviceContextX(width)), PEN_SOLID, dashLength, gapLength);
+    dc->SetPen(std::max(1, this->ToDeviceContextX(width)), PEN_SOLID, dashLength, gapLength);
 
-    dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x1), ToDeviceContextY(y2));
+    dc->DrawLine(
+        this->ToDeviceContextX(x1), this->ToDeviceContextY(y1), this->ToDeviceContextX(x1), this->ToDeviceContextY(y2));
 
     dc->ResetPen();
     return;
@@ -40,9 +41,10 @@ void View::DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int wid
 {
     assert(dc);
 
-    dc->SetPen(std::max(1, ToDeviceContextX(width)), PEN_SOLID, dashLength, gapLength);
+    dc->SetPen(std::max(1, this->ToDeviceContextX(width)), PEN_SOLID, dashLength, gapLength);
 
-    dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+    dc->DrawLine(
+        this->ToDeviceContextX(x1), this->ToDeviceContextY(y1), this->ToDeviceContextX(x2), this->ToDeviceContextY(y1));
 
     dc->ResetPen();
     return;
@@ -52,9 +54,10 @@ void View::DrawObliqueLine(DeviceContext *dc, int x1, int x2, int y1, int y2, in
 {
     assert(dc);
 
-    dc->SetPen(std::max(1, ToDeviceContextX(width)), PEN_SOLID, dashLength, gapLength);
+    dc->SetPen(std::max(1, this->ToDeviceContextX(width)), PEN_SOLID, dashLength, gapLength);
 
-    dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+    dc->DrawLine(
+        this->ToDeviceContextX(x1), this->ToDeviceContextY(y1), this->ToDeviceContextX(x2), this->ToDeviceContextY(y2));
 
     dc->ResetPen();
     return;
@@ -92,7 +95,7 @@ void View::DrawNotFilledEllipse(DeviceContext *dc, int x1, int y1, int x2, int y
     int width = x2 - x1;
     int height = y1 - y2;
 
-    dc->DrawEllipse(ToDeviceContextX(x1), ToDeviceContextY(y1), width, height);
+    dc->DrawEllipse(this->ToDeviceContextX(x1), this->ToDeviceContextY(y1), width, height);
 
     dc->ResetPen();
     dc->ResetBrush();
@@ -108,8 +111,8 @@ void View::DrawNotFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int
     dc->SetPen(penWidth, PEN_SOLID);
     dc->SetBrush(0.0);
 
-    dc->DrawRoundedRectangle(
-        ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1), ToDeviceContextX(y1 - y2), radius);
+    dc->DrawRoundedRectangle(this->ToDeviceContextX(x1), this->ToDeviceContextY(y1), this->ToDeviceContextX(x2 - x1),
+        this->ToDeviceContextX(y1 - y2), radius);
 
     dc->ResetPen();
     dc->ResetBrush();
@@ -135,8 +138,8 @@ void View::DrawFilledRoundedRectangle(DeviceContext *dc, int x1, int y1, int x2,
 
     dc->SetPen(0, PEN_SOLID);
 
-    dc->DrawRoundedRectangle(
-        ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1), ToDeviceContextX(y1 - y2), radius);
+    dc->DrawRoundedRectangle(this->ToDeviceContextX(x1), this->ToDeviceContextY(y1), this->ToDeviceContextX(x2 - x1),
+        this->ToDeviceContextX(y1 - y2), radius);
 
     dc->ResetPen();
 
@@ -151,11 +154,11 @@ void View::DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2,
 
     dc->SetPen(0, PEN_SOLID);
 
-    height = ToDeviceContextX(height);
-    p[0].x = ToDeviceContextX(x1);
-    p[0].y = ToDeviceContextY(y1);
-    p[1].x = ToDeviceContextX(x2);
-    p[1].y = ToDeviceContextY(y2);
+    height = this->ToDeviceContextX(height);
+    p[0].x = this->ToDeviceContextX(x1);
+    p[0].y = this->ToDeviceContextY(y1);
+    p[1].x = this->ToDeviceContextX(x2);
+    p[1].y = this->ToDeviceContextY(y2);
     p[2].x = p[1].x;
     p[2].y = p[1].y - height;
     p[3].x = p[0].x;
@@ -180,16 +183,16 @@ void View::DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width,
         dc->SetBrush(0.0);
     }
 
-    int dHeight = ToDeviceContextX(height);
-    int dWidth = ToDeviceContextX(width);
-    p[0].x = ToDeviceContextX(x1);
-    p[0].y = ToDeviceContextY(y1);
-    p[1].x = ToDeviceContextX(x1 + dWidth / 2);
-    p[1].y = ToDeviceContextY(y1 + dHeight / 2);
+    int dHeight = this->ToDeviceContextX(height);
+    int dWidth = this->ToDeviceContextX(width);
+    p[0].x = this->ToDeviceContextX(x1);
+    p[0].y = this->ToDeviceContextY(y1);
+    p[1].x = this->ToDeviceContextX(x1 + dWidth / 2);
+    p[1].y = this->ToDeviceContextY(y1 + dHeight / 2);
     p[2].x = p[0].x + dWidth;
     p[2].y = p[0].y;
-    p[3].x = ToDeviceContextX(x1 + dWidth / 2);
-    p[3].y = ToDeviceContextY(y1 - dHeight / 2);
+    p[3].x = this->ToDeviceContextX(x1 + dWidth / 2);
+    p[3].y = this->ToDeviceContextY(y1 - dHeight / 2);
 
     dc->DrawPolygon(4, p);
 
@@ -199,12 +202,12 @@ void View::DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width,
 
 void View::DrawDot(DeviceContext *dc, int x, int y, int staffSize, bool dimin)
 {
-    int r = std::max(ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize) / 5), 2);
+    int r = std::max(this->ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize) / 5), 2);
     if (dimin) r *= m_doc->GetOptions()->m_graceFactor.GetValue();
 
     dc->SetPen(0, PEN_SOLID);
 
-    dc->DrawCircle(ToDeviceContextX(x), ToDeviceContextY(y), r);
+    dc->DrawCircle(this->ToDeviceContextX(x), this->ToDeviceContextY(y), r);
 
     dc->ResetPen();
 }
@@ -220,7 +223,7 @@ void View::DrawVerticalDots(DeviceContext *dc, int x, const SegmentedLine &line,
     dc->SetPen(0, PEN_SOLID);
 
     while (drawingPosition > bottom) {
-        dc->DrawCircle(ToDeviceContextX(x), ToDeviceContextY(drawingPosition), radius);
+        dc->DrawCircle(this->ToDeviceContextX(x), this->ToDeviceContextY(drawingPosition), radius);
         drawingPosition -= interval;
     }
 
@@ -267,7 +270,7 @@ void View::DrawSmuflCodeWithCustomFont(DeviceContext *dc, const std::string &cus
 
     resources.SetCurrentFont(customFont);
 
-    DrawSmuflCode(dc, x, y, code, staffSize, dimin, setBBGlyph);
+    this->DrawSmuflCode(dc, x, y, code, staffSize, dimin, setBBGlyph);
 
     resources.SetCurrentFont(prevFont);
 }
@@ -284,7 +287,7 @@ void View::DrawSmuflCode(DeviceContext *dc, int x, int y, char32_t code, int sta
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, dimin));
 
-    dc->DrawMusicText(str, ToDeviceContextX(x), ToDeviceContextY(y), setBBGlyph);
+    dc->DrawMusicText(str, this->ToDeviceContextX(x), this->ToDeviceContextY(y), setBBGlyph);
 
     dc->ResetFont();
 
@@ -323,7 +326,7 @@ void View::DrawSmuflLine(
         str.push_back(end);
     }
 
-    dc->DrawMusicText(str, ToDeviceContextX(orig.x), ToDeviceContextY(orig.y), false);
+    dc->DrawMusicText(str, this->ToDeviceContextX(orig.x), this->ToDeviceContextY(orig.y), false);
 
     dc->ResetFont();
 }
@@ -333,7 +336,7 @@ void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::u32string s, da
 {
     assert(dc);
 
-    int xDC = ToDeviceContextX(x);
+    int xDC = this->ToDeviceContextX(x);
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, dimin));
 
@@ -348,7 +351,7 @@ void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::u32string s, da
         xDC -= extend.m_width;
     }
 
-    dc->DrawMusicText(s, xDC, ToDeviceContextY(y), setBBGlyph);
+    dc->DrawMusicText(s, xDC, this->ToDeviceContextY(y), setBBGlyph);
 
     dc->ResetFont();
 }
@@ -362,15 +365,15 @@ void View::DrawThickBezierCurve(
 
     BoundingBox::CalcThickBezier(bezier, thickness, bez1, bez2);
 
-    bez1[0] = ToDeviceContext(bez1[0]);
-    bez1[1] = ToDeviceContext(bez1[1]);
-    bez1[2] = ToDeviceContext(bez1[2]);
-    bez1[3] = ToDeviceContext(bez1[3]);
+    bez1[0] = this->ToDeviceContext(bez1[0]);
+    bez1[1] = this->ToDeviceContext(bez1[1]);
+    bez1[2] = this->ToDeviceContext(bez1[2]);
+    bez1[3] = this->ToDeviceContext(bez1[3]);
 
-    bez2[0] = ToDeviceContext(bez2[0]);
-    bez2[1] = ToDeviceContext(bez2[1]);
-    bez2[2] = ToDeviceContext(bez2[2]);
-    bez2[3] = ToDeviceContext(bez2[3]);
+    bez2[0] = this->ToDeviceContext(bez2[0]);
+    bez2[1] = this->ToDeviceContext(bez2[1]);
+    bez2[2] = this->ToDeviceContext(bez2[2]);
+    bez2[3] = this->ToDeviceContext(bez2[3]);
 
     // Actually draw it
     if (penStyle == PEN_SOLID) {

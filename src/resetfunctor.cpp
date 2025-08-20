@@ -247,6 +247,15 @@ FunctorCode ResetDataFunctor::VisitHairpin(Hairpin *hairpin)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode ResetDataFunctor::VisitKeySig(KeySig *keySig)
+{
+    this->VisitLayerElement(keySig);
+
+    keySig->ResetDrawingClef();
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ResetDataFunctor::VisitLayer(Layer *layer)
 {
     // Call parent one too
@@ -256,7 +265,6 @@ FunctorCode ResetDataFunctor::VisitLayer(Layer *layer)
 
     layer->SetCrossStaffFromAbove(false);
     layer->SetCrossStaffFromBelow(false);
-    layer->ResetStaffDefObjects();
 
     return FUNCTOR_CONTINUE;
 }
@@ -293,7 +301,6 @@ FunctorCode ResetDataFunctor::VisitMeasure(Measure *measure)
 
     measure->m_timestampAligner.Reset();
     measure->SetDrawingEnding(NULL);
-    measure->ResetDrawingScoreDef();
     return FUNCTOR_CONTINUE;
 }
 

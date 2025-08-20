@@ -28,7 +28,7 @@ namespace vrv {
 
 AttChannelized::AttChannelized() : Att()
 {
-    ResetChannelized();
+    this->ResetChannelized();
 }
 
 void AttChannelized::ResetChannelized()
@@ -113,7 +113,7 @@ bool AttChannelized::HasMidiTrack() const
 
 AttInstrumentIdent::AttInstrumentIdent() : Att()
 {
-    ResetInstrumentIdent();
+    this->ResetInstrumentIdent();
 }
 
 void AttInstrumentIdent::ResetInstrumentIdent()
@@ -153,7 +153,7 @@ bool AttInstrumentIdent::HasInstr() const
 
 AttMidiInstrument::AttMidiInstrument() : Att()
 {
-    ResetMidiInstrument();
+    this->ResetMidiInstrument();
 }
 
 void AttMidiInstrument::ResetMidiInstrument()
@@ -268,7 +268,7 @@ bool AttMidiInstrument::HasMidiVolume() const
 
 AttMidiNumber::AttMidiNumber() : Att()
 {
-    ResetMidiNumber();
+    this->ResetMidiNumber();
 }
 
 void AttMidiNumber::ResetMidiNumber()
@@ -308,7 +308,7 @@ bool AttMidiNumber::HasNum() const
 
 AttMidiTempo::AttMidiTempo() : Att()
 {
-    ResetMidiTempo();
+    this->ResetMidiTempo();
 }
 
 void AttMidiTempo::ResetMidiTempo()
@@ -363,7 +363,7 @@ bool AttMidiTempo::HasMidiMspb() const
 
 AttMidiValue::AttMidiValue() : Att()
 {
-    ResetMidiValue();
+    this->ResetMidiValue();
 }
 
 void AttMidiValue::ResetMidiValue()
@@ -403,7 +403,7 @@ bool AttMidiValue::HasVal() const
 
 AttMidiValue2::AttMidiValue2() : Att()
 {
-    ResetMidiValue2();
+    this->ResetMidiValue2();
 }
 
 void AttMidiValue2::ResetMidiValue2()
@@ -443,7 +443,7 @@ bool AttMidiValue2::HasVal2() const
 
 AttMidiVelocity::AttMidiVelocity() : Att()
 {
-    ResetMidiVelocity();
+    this->ResetMidiVelocity();
 }
 
 void AttMidiVelocity::ResetMidiVelocity()
@@ -483,7 +483,7 @@ bool AttMidiVelocity::HasVel() const
 
 AttTimeBase::AttTimeBase() : Att()
 {
-    ResetTimeBase();
+    this->ResetTimeBase();
 }
 
 void AttTimeBase::ResetTimeBase()

@@ -269,7 +269,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             layerElement->SetAlignment(dot->m_drawingPreviousElement->GetAlignment());
         }
         else {
-            // Create an alignment only if the dot has no resolved preceeding note
+            // Create an alignment only if the dot has no resolved preceding note
             type = ALIGNMENT_DOT;
         }
     }
@@ -390,6 +390,7 @@ FunctorCode AlignHorizontallyFunctor::VisitMeasure(Measure *measure)
     // point to it
     m_measureAligner = &measureAligner;
     m_hasMultipleLayer = false;
+    m_currentParams.metcon = (measure->GetMetcon() != BOOLEAN_false);
 
     if (measure->GetLeftBarLine()->SetAlignment(measureAligner.GetLeftBarLineAlignment())) m_hasMultipleLayer = true;
     if (measure->GetRightBarLine()->SetAlignment(measureAligner.GetRightBarLineAlignment())) m_hasMultipleLayer = true;

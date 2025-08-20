@@ -14,7 +14,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "clef.h"
 #include "comparison.h"
 #include "editorial.h"
 #include "functor.h"
@@ -110,6 +109,8 @@ void KeySig::Reset()
     m_skipCancellation = false;
     m_drawingCancelAccidType = ACCIDENTAL_WRITTEN_n;
     m_drawingCancelAccidCount = 0;
+
+    this->ResetDrawingClef();
 }
 
 void KeySig::FilterList(ListOfConstObjects &childList) const
@@ -250,6 +251,27 @@ int KeySig::GetFifthsInt() const
         return this->GetSig().first;
     }
     return 0;
+}
+
+Clef *KeySig::GetDrawingClef()
+{
+    return m_drawingClef.has_value() ? &m_drawingClef.value() : NULL;
+}
+
+void KeySig::ResetDrawingClef()
+{
+    m_drawingClef.reset();
+}
+
+void KeySig::SetDrawingClef(Clef *clef)
+{
+    if (clef) {
+        m_drawingClef = *clef;
+        m_drawingClef->CloneReset();
+    }
+    else {
+        m_drawingClef.reset();
+    }
 }
 
 data_KEYSIGNATURE KeySig::ConvertToSig() const
