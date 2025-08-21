@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/5.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://music-encoding.org/schema/5.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1">
+   <meiHead xml:id="m1toi3lz">
+      <fileDesc xml:id="f1qy1a71">
+         <titleStmt xml:id="t144l35i">
+            <title>A Musical Example in Sagittal Notation</title>
+            <respStmt>
+               <persName role="composer">Keenan &amp; Secor</persName>
+            </respStmt>
+         </titleStmt>
+         <pubStmt xml:id="p1c8equ2">
+            <date isodate="2025-08-18" type="encoding-date">2025-08-18</date>
+         </pubStmt>
+      </fileDesc>
+      <encodingDesc xml:id="e18nbufk">
+         <appInfo xml:id="a197mphd">
+            <application xml:id="a1gys3m8" isodate="2025-08-19T13:38:33" version="5.5.0-8c9036d">
+               <name xml:id="nfqld6n">Verovio</name>
+               <p xml:id="plzp21v">Transcoded from MusicXML</p>
+            </application>
+         </appInfo>
+      </encodingDesc>
+   </meiHead>
+   <music>
+      <body>
+         <mdiv xml:id="p1ps8boo">
+            <score xml:id="qpmjl6t">
+               <scoreDef xml:id="refvt8v">
+                  <pgHead xml:id="v1sysr35">
+                     <rend xml:id="tpollgq" halign="center" valign="top">A Musical Example in Sagittal Notation</rend>
+                     <rend xml:id="w3ew6j3" halign="right" valign="bottom">Keenan &amp; Secor</rend>
+                  </pgHead>
+                  <staffGrp xml:id="y1lxlpz0">
+                     <staffDef xml:id="P1" n="1" lines="5" ppq="1">
+                        <label xml:id="zyyrdvi">Piano</label>
+                        <labelAbbr xml:id="b10yszpa">Pno.</labelAbbr>
+                        <instrDef xml:id="d180plsy" midi.channel="0" midi.instrnum="0" midi.volume="78%" />
+                        <clef xml:id="m1j3ql0d" shape="G" line="2" />
+                        <keySig xml:id="n15gowgd" sig="0" />
+                        <meterSig xml:id="o1j1gr2z" count="4" unit="4" />
+                     </staffDef>
+                  </staffGrp>
+               </scoreDef>
+               <section xml:id="sj2wlmr">
+                  <measure xml:id="p8egf13" n="1">
+                     <staff xml:id="y1do7fil" n="1">
+                        <layer xml:id="z3hyarm" n="1">
+                           <chord xml:id="b17cd2fr" dur.ppq="2" dur="2" stem.dir="up">
+                              <verse xml:id="c16aum42" n="1">
+                                 <syl xml:id="d1b8c4ye" con="s" wordpos="s">3/2</syl>
+                              </verse>
+                              <verse xml:id="f19m7tgm" n="2">
+                                 <syl xml:id="g5lkxgm" con="s" wordpos="s">5/4</syl>
+                              </verse>
+                              <verse xml:id="i1jayw77" n="3">
+                                 <syl xml:id="j4b7s96" con="s" wordpos="s">1/1</syl>
+                              </verse>
+                              <note xml:id="a1o2s1yc" oct="4" pname="c" />
+                              <note xml:id="lizs21n" oct="4" pname="e">
+                                 <accid xml:id="mndnn7e" accid="n" glyph.name="accSagittal5CommaDown" />
+                              </note>
+                              <note xml:id="n1xbtejs" oct="4" pname="g" />
+                           </chord>
+                           <chord xml:id="p5nc763" dur.ppq="2" dur="2" stem.dir="up">
+                              <verse xml:id="q8isfvo" n="1">
+                                 <syl xml:id="r1n2zur3" con="s" wordpos="s">5/3</syl>
+                              </verse>
+                              <verse xml:id="t1vy5xne" n="2">
+                                 <syl xml:id="u1fd90lv" con="s" wordpos="s">4/3</syl>
+                              </verse>
+                              <verse xml:id="w36a4o2" n="3">
+                                 <syl xml:id="x18s4r5a" con="s" wordpos="s">1/1</syl>
+                              </verse>
+                              <note xml:id="o1aernda" oct="4" pname="c" />
+                              <note xml:id="z15whqm3" oct="4" pname="f" />
+                              <note xml:id="aa018ya" oct="4" pname="a">
+                                 <accid xml:id="b14041tx" accid="n" glyph.name="accSagittal5CommaDown" />
+                              </note>
+                           </chord>
+                        </layer>
+                     </staff>
+                  </measure>
+                  <measure xml:id="cnkoa9s" n="2">
+                     <staff xml:id="lpwi7tl" n="1">
+                        <layer xml:id="miajkbt" n="1">
+                           <chord xml:id="o1og6cbb" dur.ppq="2" dur="2" stem.dir="up">
+                              <verse xml:id="pwm7hn5" n="1">
+                                 <syl xml:id="qpvl91k" con="s" wordpos="s">7/4</syl>
+                              </verse>
+                              <verse xml:id="sn0ejiz" n="2">
+                                 <syl xml:id="t1trjxb0" con="s" wordpos="s">3/2</syl>
+                              </verse>
+                              <verse xml:id="v1e2ped9" n="3">
+                                 <syl xml:id="w1p8f963" con="s" wordpos="s">5/4</syl>
+                              </verse>
+                              <verse xml:id="yhmt9q9" n="4">
+                                 <syl xml:id="z1bok2w3" con="s" wordpos="s">1/1</syl>
+                              </verse>
+                              <note xml:id="nedmjn3" oct="4" pname="c" />
+                              <note xml:id="bb2vkdy" oct="4" pname="e">
+                                 <accid xml:id="czu320p" accid="n" glyph.name="accSagittal5CommaDown" />
+                              </note>
+                              <note xml:id="d1a2woqk" oct="4" pname="g" />
+                              <note xml:id="e1n0ptee" oct="4" pname="b">
+                                 <accid xml:id="fj9nybv" accid="n" glyph.name="accSagittalFlat7CDown" />
+                              </note>
+                           </chord>
+                           <chord xml:id="h4z5ox6" dur.ppq="2" dur="2" stem.dir="up">
+                              <verse xml:id="i1pml3ux" n="1">
+                                 <syl xml:id="j1yxi2e4" con="s" wordpos="s">9/5</syl>
+                              </verse>
+                              <verse xml:id="la8mxc1" n="2">
+                                 <syl xml:id="mprmnk7" con="s" wordpos="s">3/2</syl>
+                              </verse>
+                              <verse xml:id="otydd4r" n="3">
+                                 <syl xml:id="p152vfup" con="s" wordpos="s">6/5</syl>
+                              </verse>
+                              <verse xml:id="r1r7l173" n="4">
+                                 <syl xml:id="sy71lmm" con="s" wordpos="s">1/1</syl>
+                              </verse>
+                              <note xml:id="gpx3m3b" oct="4" pname="c" />
+                              <note xml:id="uhu0o9r" oct="4" pname="e">
+                                 <accid xml:id="v30iut" accid="n" glyph.name="accSagittalFlat5CUp" />
+                              </note>
+                              <note xml:id="w69lawa" oct="4" pname="g" />
+                              <note xml:id="x1glhg8o" oct="4" pname="b">
+                                 <accid xml:id="yobpz6j" accid="n" glyph.name="accSagittalFlat5CUp" />
+                              </note>
+                           </chord>
+                        </layer>
+                     </staff>
+                  </measure>
+                  <measure xml:id="z13touid" n="3">
+                     <staff xml:id="igcmqnb" n="1">
+                        <layer xml:id="ja2smq9" n="1">
+                           <note xml:id="k1vtwwiw" dur.ppq="1" dur="4" oct="4" pname="b" stem.dir="up">
+                              <accid xml:id="l1va06of" accid="n" glyph.name="accSagittalFlat" />
+                              <verse xml:id="m11e4lci" n="1">
+                                 <syl xml:id="n46967v" con="s" wordpos="s">16/9</syl>
+                              </verse>
+                              <verse xml:id="p1r84a86" n="2">
+                                 <syl xml:id="qobiccx" con="u" wordpos="s">4/3</syl>
+                              </verse>
+                              <verse xml:id="sasz99d" n="3">
+                                 <syl xml:id="tihtiyl" con="u" wordpos="s">1/1</syl>
+                              </verse>
+                           </note>
+                           <note xml:id="v1le2ja" dur.ppq="1" dur="4" oct="4" pname="a" stem.dir="up">
+                              <accid xml:id="whbswpg" accid="n" glyph.name="accSagittalFlat5CUp" />
+                              <verse xml:id="xqssp6k" n="1">
+                                 <syl xml:id="y1avn9zc" con="s" wordpos="s">8/5</syl>
+                              </verse>
+                           </note>
+                           <chord xml:id="bbovnue" dur.ppq="2" dur="2" stem.dir="up">
+                              <verse xml:id="c1nqbgat" n="1">
+                                 <syl xml:id="d1wh8kji" con="s" wordpos="s">3/2</syl>
+                              </verse>
+                              <verse xml:id="fb2z57r" n="2">
+                                 <syl xml:id="g1uuvdhg" con="s" wordpos="s">5/4</syl>
+                              </verse>
+                              <verse xml:id="i8l89x7" n="3">
+                                 <syl xml:id="js5j6l0" con="s" wordpos="s">1/1</syl>
+                              </verse>
+                              <note xml:id="a1y1mw8v" oct="4" pname="c" />
+                              <note xml:id="l8wyhcj" oct="4" pname="e">
+                                 <accid xml:id="mny3s0r" accid="n" glyph.name="accSagittal5CommaDown" />
+                              </note>
+                           </chord>
+                        </layer>
+                        <layer xml:id="nwhe6pe" n="2">
+                           <chord xml:id="p1je8yqp" dur.ppq="2" dur="2" stem.dir="down">
+                              <note xml:id="o6lp325" oct="4" pname="c" />
+                              <note xml:id="qk330ps" oct="4" pname="f" />
+                           </chord>
+                           <note xml:id="r9ay5iy" dur.ppq="2" dur="2" oct="4" pname="g" stem.dir="up" />
+                        </layer>
+                     </staff>
+                  </measure>
+                  <measure xml:id="s689mkm" n="4">
+                     <staff xml:id="b16wbswv" n="1">
+                        <layer xml:id="cb9kbeh" n="1">
+                           <chord xml:id="e4qyk2t" dur.ppq="1" dur="4" stem.dir="up">
+                              <verse xml:id="f1h5ho66" n="1">
+                                 <syl xml:id="gtxe2pp" con="u" wordpos="s">15/8</syl>
+                              </verse>
+                              <verse xml:id="i16qvm95" n="2">
+                                 <syl xml:id="j2appg8" con="s" wordpos="s">7/4</syl>
+                              </verse>
+                              <verse xml:id="luow60n" n="3">
+                                 <syl xml:id="m1cl6mo0" con="u" wordpos="s">11/8</syl>
+                              </verse>
+                              <verse xml:id="o10aw4s4" n="4">
+                                 <syl xml:id="p1ys8wib" con="u" wordpos="s">9/8</syl>
+                              </verse>
+                              <note xml:id="d1xljj01" oct="4" pname="d" />
+                              <note xml:id="snxmhj7" oct="4" pname="f">
+                                 <accid xml:id="tgiglcm" accid="n" glyph.name="accSagittal11MediumDiesisUp" />
+                              </note>
+                              <note xml:id="v142x3vz" oct="4" pname="b">
+                                 <accid xml:id="w1hi0e9i" accid="n" glyph.name="accSagittalFlat7CDown" />
+                              </note>
+                              <note xml:id="xp9c73b" oct="4" pname="b">
+                                 <accid xml:id="y1rh32jg" accid="n" glyph.name="accSagittal5CommaDown" />
+                              </note>
+                           </chord>
+                           <chord xml:id="b184tku7" dur.ppq="1" dur="4" stem.dir="up">
+                              <verse xml:id="c11fcfwd" n="2">
+                                 <syl xml:id="d1yis5b1" con="s" wordpos="s">13/8</syl>
+                              </verse>
+                              <note xml:id="av1v0xb" oct="4" pname="d" />
+                              <note xml:id="f1tg4xdo" oct="4" pname="f" />
+                              <note xml:id="g1o6t5fd" oct="4" pname="a">
+                                 <accid xml:id="h1o2id6m" accid="n" glyph.name="accSagittal35LargeDiesisDown" />
+                              </note>
+                              <note xml:id="i10vjync" oct="4" pname="b">
+                                 <accid xml:id="j1clwse3" func="caution" accid="n" glyph.name="accSagittal5CommaDown" />
+                              </note>
+                           </chord>
+                           <chord xml:id="l1q7vo28" dur.ppq="1" dur="4" stem.dir="up">
+                              <verse xml:id="m1b5hrtx" n="1">
+                                 <syl xml:id="ngjs0ll" con="s" wordpos="s">1/1</syl>
+                              </verse>
+                              <verse xml:id="p16d4phw" n="2">
+                                 <syl xml:id="qv3hi9j" con="s" wordpos="s">3/2</syl>
+                              </verse>
+                              <verse xml:id="s1ag5qvy" n="3">
+                                 <syl xml:id="tlunb2s" con="s" wordpos="s">5/4</syl>
+                              </verse>
+                              <verse xml:id="v1kunzym" n="4">
+                                 <syl xml:id="w1oy7671" con="s" wordpos="s">1/1</syl>
+                              </verse>
+                              <note xml:id="kg71ffu" oct="4" pname="c" />
+                              <note xml:id="ydotlzf" oct="4" pname="e">
+                                 <accid xml:id="zggem1j" accid="n" glyph.name="accSagittal5CommaDown" />
+                              </note>
+                              <note xml:id="ar1hwgr" oct="4" pname="g" />
+                              <note xml:id="b1cozpog" oct="5" pname="c" />
+                           </chord>
+                           <chord xml:id="d4zqhw4" dur.ppq="1" dur="4" stem.dir="up">
+                              <verse xml:id="e1hvh7di" n="1">
+                                 <syl xml:id="faf1iu6" con="s" wordpos="s">11/6</syl>
+                              </verse>
+                              <verse xml:id="hu2p25s" n="2">
+                                 <syl xml:id="i6tcv6z" con="s" wordpos="s">3/2</syl>
+                              </verse>
+                              <verse xml:id="ky8wby9" n="3">
+                                 <syl xml:id="l1galxmo" con="s" wordpos="s">7/6</syl>
+                              </verse>
+                              <verse xml:id="n1qc1i9g" n="4">
+                                 <syl xml:id="o1ph0b1j" con="s" wordpos="s">1/1</syl>
+                              </verse>
+                              <note xml:id="c6zomm1" oct="4" pname="c" />
+                              <note xml:id="qme54ck" oct="4" pname="e">
+                                 <accid xml:id="rtskt9j" accid="n" glyph.name="accSagittalFlat7CDown" />
+                              </note>
+                              <note xml:id="s7ftng9" oct="4" pname="g" />
+                              <note xml:id="t1kmjm1p" oct="4" pname="b">
+                                 <accid xml:id="uwdxisn" accid="n" glyph.name="accSagittal11LargeDiesisDown" />
+                              </note>
+                           </chord>
+                        </layer>
+                     </staff>
+                     <tie xml:id="rfio8e8" startid="#d1xljj01" endid="#av1v0xb" />
+                     <tie xml:id="uvdcn02" startid="#snxmhj7" endid="#f1tg4xdo" />
+                     <tie xml:id="z1y70yv9" startid="#xp9c73b" endid="#i10vjync" />
+                  </measure>
+                  <measure xml:id="vxfbxzz" n="5">
+                     <staff xml:id="ebm48nz" n="1">
+                        <layer xml:id="f1sap5ly" n="1">
+                           <note xml:id="ghceqoo" dur.ppq="1" dur="4" oct="4" pname="b" stem.dir="up">
+                              <accid xml:id="h1m1ueqo" accid="n" glyph.name="accSagittal35LargeDiesisDown" />
+                              <verse xml:id="i1pqsjm0" n="1">
+                                 <syl xml:id="jp0cykl" con="s" wordpos="s">117/64</syl>
+                              </verse>
+                              <verse xml:id="l1fucoex" n="2">
+                                 <syl xml:id="mrwr3fz" con="u" wordpos="s">45/32</syl>
+                              </verse>
+                              <verse xml:id="opxjok2" n="3">
+                                 <syl xml:id="p1a8qtpy" con="u" wordpos="s">9/8</syl>
+                              </verse>
+                           </note>
+                           <note xml:id="r19ttwzy" dur.ppq="1" dur="4" oct="4" pname="a" stem.dir="up">
+                              <verse xml:id="s1k1gi3o" n="1">
+                                 <syl xml:id="tymsbs9" con="s" wordpos="s">27/16</syl>
+                              </verse>
+                           </note>
+                           <note xml:id="vxmzvtb" dur.ppq="2" dur="2" oct="4" pname="g" stem.dir="up" />
+                        </layer>
+                        <layer xml:id="w1ldtzul" n="2">
+                           <chord xml:id="yxnhok4" dur.ppq="2" dur="2" stem.dir="down">
+                              <note xml:id="x1g7f0p9" oct="4" pname="d" />
+                              <note xml:id="zgcbn5u" oct="4" pname="f">
+                                 <accid xml:id="a1pw3kod" accid="n" glyph.name="accSagittalSharp5CDown" />
+                              </note>
+                           </chord>
+                           <chord xml:id="c12hb0oo" dur.ppq="2" dur="2" stem.dir="up">
+                              <verse xml:id="d24le25" n="1">
+                                 <syl xml:id="e1igu0gf" con="s" wordpos="s">15/8</syl>
+                              </verse>
+                              <verse xml:id="grgeral" n="2">
+                                 <syl xml:id="h1nrwby5" con="s" wordpos="s">3/2</syl>
+                              </verse>
+                              <verse xml:id="j10i5bqq" n="3">
+                                 <syl xml:id="ku3kxcr" con="s" wordpos="s">21/16</syl>
+                              </verse>
+                              <verse xml:id="m1ni9oji" n="4">
+                                 <syl xml:id="n1y5uria" con="s" wordpos="s">3/2</syl>
+                              </verse>
+                              <note xml:id="b1m9ybl7" oct="3" pname="g" />
+                              <note xml:id="p1i9jk8h" oct="4" pname="f">
+                                 <accid xml:id="qq24rfj" accid="n" glyph.name="accSagittal7CommaDown" />
+                              </note>
+                              <note xml:id="r15j9qun" oct="4" pname="b">
+                                 <accid xml:id="s1kmwo04" accid="n" glyph.name="accSagittal5CommaDown" />
+                              </note>
+                           </chord>
+                        </layer>
+                     </staff>
+                  </measure>
+                  <measure xml:id="ti9ktq1" right="end" n="6">
+                     <staff xml:id="c1vztfn1" n="1">
+                        <layer xml:id="d1909qa3" n="1">
+                           <chord xml:id="flnjj17" dur.ppq="2" dur="2" stem.dir="up">
+                              <verse xml:id="gghtn2d" n="1">
+                                 <syl xml:id="h13lojxx" con="u" wordpos="s">1/1</syl>
+                              </verse>
+                              <verse xml:id="j1wrwekk" n="2">
+                                 <syl xml:id="k1aq4yl7" con="u" wordpos="s">3/2</syl>
+                              </verse>
+                              <verse xml:id="m10ew8lq" n="3">
+                                 <syl xml:id="nofq8k6" con="s" wordpos="s">21/16</syl>
+                              </verse>
+                              <verse xml:id="p1sl1m6y" n="4">
+                                 <syl xml:id="q1v2s9os" con="u" wordpos="s">1/1</syl>
+                              </verse>
+                              <note xml:id="efura36" oct="4" pname="c" />
+                              <note xml:id="tekzcfy" oct="4" pname="f">
+                                 <accid xml:id="u15bodyw" accid="n" glyph.name="accSagittal7CommaDown" />
+                              </note>
+                              <note xml:id="vus8wak" oct="4" pname="g" />
+                              <note xml:id="x17zg5cf" oct="5" pname="c" />
+                           </chord>
+                           <chord xml:id="avsqtos" dur.ppq="2" dur="2" stem.dir="up">
+                              <verse xml:id="b1yigwhx" n="3">
+                                 <syl xml:id="c1di2h00" con="s" wordpos="s">5/4</syl>
+                              </verse>
+                              <note xml:id="z85ncmd" oct="4" pname="c" />
+                              <note xml:id="ezzf72t" oct="4" pname="e">
+                                 <accid xml:id="f1kxqdk4" accid="n" glyph.name="accSagittal5CommaDown" />
+                              </note>
+                              <note xml:id="gdndwzv" oct="4" pname="g" />
+                              <note xml:id="h54ij43" oct="5" pname="c" />
+                           </chord>
+                        </layer>
+                     </staff>
+                     <tie xml:id="sn04d05" startid="#efura36" endid="#z85ncmd" />
+                     <tie xml:id="w5ddl78" startid="#vus8wak" endid="#gdndwzv" curvedir="above" />
+                     <tie xml:id="y16iwb2q" startid="#x17zg5cf" endid="#h54ij43" />
+                  </measure>
+               </section>
+            </score>
+         </mdiv>
+      </body>
+   </music>
+</mei>

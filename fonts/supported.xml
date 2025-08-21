@@ -641,13 +641,13 @@
         <glyph glyph-code="E273" smufl-name="accidentalQuarterToneFlatNaturalArrowDown" />
         <glyph glyph-code="E274" smufl-name="accidentalThreeQuarterTonesSharpArrowUp" />
         <glyph glyph-code="E275" smufl-name="accidentalQuarterToneSharpArrowDown" />
-        <!--<glyph glyph-code="E276" smufl-name="accidentalFiveQuarterTonesSharpArrowUp" />-->
-        <!--<glyph glyph-code="E277"
-                smufl-name="accidentalThreeQuarterTonesSharpArrowDown" />-->
-        <!--<glyph glyph-code="E278" smufl-name="accidentalThreeQuarterTonesFlatArrowUp" />-->
-        <!--<glyph glyph-code="E279" smufl-name="accidentalFiveQuarterTonesFlatArrowDown" />-->
-        <!--<glyph glyph-code="E27A" smufl-name="accidentalArrowUp" />-->
-        <!--<glyph glyph-code="E27B" smufl-name="accidentalArrowDown" />-->
+        <glyph glyph-code="E276" smufl-name="accidentalFiveQuarterTonesSharpArrowUp" />
+        <glyph glyph-code="E277"
+                smufl-name="accidentalThreeQuarterTonesSharpArrowDown" />
+        <glyph glyph-code="E278" smufl-name="accidentalThreeQuarterTonesFlatArrowUp" />
+        <glyph glyph-code="E279" smufl-name="accidentalFiveQuarterTonesFlatArrowDown" />
+        <glyph glyph-code="E27A" smufl-name="accidentalArrowUp" />
+        <glyph glyph-code="E27B" smufl-name="accidentalArrowDown" />
         <range_end>U+E27F</range_end>
         <range_start>U+E270</range_start>
     </gouldArrowQuartertoneAccidentals24Edo>
@@ -657,363 +657,363 @@
         <glyph glyph-code="E281" smufl-name="accidentalThreeQuarterTonesFlatZimmermann" />
         <glyph glyph-code="E282" smufl-name="accidentalQuarterToneSharpStein" />
         <glyph glyph-code="E283" smufl-name="accidentalThreeQuarterTonesSharpStein" />
-        <!--<glyph glyph-code="E284" smufl-name="accidentalNarrowReversedFlat" />-->
-        <!--<glyph glyph-code="E285" smufl-name="accidentalNarrowReversedFlatAndFlat" />-->
+        <glyph glyph-code="E284" smufl-name="accidentalNarrowReversedFlat" />
+        <glyph glyph-code="E285" smufl-name="accidentalNarrowReversedFlatAndFlat" />
         <range_end>U+E28F</range_end>
         <range_start>U+E280</range_start>
     </steinZimmermannAccidentals24Edo>
     <extendedSteinZimmermannAccidentals>
         <description>Extended Stein-Zimmermann accidentals</description>
-        <!--<glyph glyph-code="E290" smufl-name="accidentalReversedFlatArrowUp" />-->
-        <!--<glyph glyph-code="E291" smufl-name="accidentalReversedFlatArrowDown" />-->
-        <!--<glyph glyph-code="E292" smufl-name="accidentalFilledReversedFlatArrowUp" />-->
-        <!--<glyph glyph-code="E293" smufl-name="accidentalFilledReversedFlatArrowDown" />-->
-        <!--<glyph glyph-code="E294" smufl-name="accidentalReversedFlatAndFlatArrowUp" />-->
-        <!--<glyph glyph-code="E295" smufl-name="accidentalReversedFlatAndFlatArrowDown" />-->
-        <!--<glyph glyph-code="E296" smufl-name="accidentalFilledReversedFlatAndFlat" />-->
-        <!--<glyph glyph-code="E297"
-                smufl-name="accidentalFilledReversedFlatAndFlatArrowUp" />-->
-        <!--<glyph glyph-code="E298"
-                smufl-name="accidentalFilledReversedFlatAndFlatArrowDown" />-->
-        <!--<glyph glyph-code="E299" smufl-name="accidentalHalfSharpArrowUp" />-->
-        <!--<glyph glyph-code="E29A" smufl-name="accidentalHalfSharpArrowDown" />-->
-        <!--<glyph glyph-code="E29B" smufl-name="accidentalOneAndAHalfSharpsArrowUp" />-->
-        <!--<glyph glyph-code="E29C" smufl-name="accidentalOneAndAHalfSharpsArrowDown" />-->
+        <glyph glyph-code="E290" smufl-name="accidentalReversedFlatArrowUp" />
+        <glyph glyph-code="E291" smufl-name="accidentalReversedFlatArrowDown" />
+        <glyph glyph-code="E292" smufl-name="accidentalFilledReversedFlatArrowUp" />
+        <glyph glyph-code="E293" smufl-name="accidentalFilledReversedFlatArrowDown" />
+        <glyph glyph-code="E294" smufl-name="accidentalReversedFlatAndFlatArrowUp" />
+        <glyph glyph-code="E295" smufl-name="accidentalReversedFlatAndFlatArrowDown" />
+        <glyph glyph-code="E296" smufl-name="accidentalFilledReversedFlatAndFlat" />
+        <glyph glyph-code="E297"
+                smufl-name="accidentalFilledReversedFlatAndFlatArrowUp" />
+        <glyph glyph-code="E298"
+                smufl-name="accidentalFilledReversedFlatAndFlatArrowDown" />
+        <glyph glyph-code="E299" smufl-name="accidentalHalfSharpArrowUp" />
+        <glyph glyph-code="E29A" smufl-name="accidentalHalfSharpArrowDown" />
+        <glyph glyph-code="E29B" smufl-name="accidentalOneAndAHalfSharpsArrowUp" />
+        <glyph glyph-code="E29C" smufl-name="accidentalOneAndAHalfSharpsArrowDown" />
         <range_end>U+E29F</range_end>
         <range_start>U+E290</range_start>
     </extendedSteinZimmermannAccidentals>
     <simsAccidentals72Edo>
         <description>Sims accidentals (72-EDO)</description>
-        <!--<glyph glyph-code="E2A0" smufl-name="accidentalSims12Down" />-->
-        <!--<glyph glyph-code="E2A1" smufl-name="accidentalSims6Down" />-->
-        <!--<glyph glyph-code="E2A2" smufl-name="accidentalSims4Down" />-->
-        <!--<glyph glyph-code="E2A3" smufl-name="accidentalSims12Up" />-->
-        <!--<glyph glyph-code="E2A4" smufl-name="accidentalSims6Up" />-->
-        <!--<glyph glyph-code="E2A5" smufl-name="accidentalSims4Up" />-->
+        <glyph glyph-code="E2A0" smufl-name="accidentalSims12Down" />
+        <glyph glyph-code="E2A1" smufl-name="accidentalSims6Down" />
+        <glyph glyph-code="E2A2" smufl-name="accidentalSims4Down" />
+        <glyph glyph-code="E2A3" smufl-name="accidentalSims12Up" />
+        <glyph glyph-code="E2A4" smufl-name="accidentalSims6Up" />
+        <glyph glyph-code="E2A5" smufl-name="accidentalSims4Up" />
         <range_end>U+E2AF</range_end>
         <range_start>U+E2A0</range_start>
     </simsAccidentals72Edo>
     <johnstonAccidentalsJustIntonation>
         <description>Johnston accidentals (just intonation)</description>
-        <!--<glyph glyph-code="E2B0" smufl-name="accidentalJohnstonPlus" />-->
-        <!--<glyph glyph-code="E2B1" smufl-name="accidentalJohnstonMinus" />-->
-        <!--<glyph glyph-code="E2B2" smufl-name="accidentalJohnstonEl" />-->
-        <!--<glyph glyph-code="E2B3" smufl-name="accidentalJohnstonSeven" />-->
-        <!--<glyph glyph-code="E2B4" smufl-name="accidentalJohnstonUp" />-->
-        <!--<glyph glyph-code="E2B5" smufl-name="accidentalJohnstonDown" />-->
-        <!--<glyph glyph-code="E2B6" smufl-name="accidentalJohnston13" />-->
-        <!--<glyph glyph-code="E2B7" smufl-name="accidentalJohnston31" />-->
+        <glyph glyph-code="E2B0" smufl-name="accidentalJohnstonPlus" />
+        <glyph glyph-code="E2B1" smufl-name="accidentalJohnstonMinus" />
+        <glyph glyph-code="E2B2" smufl-name="accidentalJohnstonEl" />
+        <glyph glyph-code="E2B3" smufl-name="accidentalJohnstonSeven" />
+        <glyph glyph-code="E2B4" smufl-name="accidentalJohnstonUp" />
+        <glyph glyph-code="E2B5" smufl-name="accidentalJohnstonDown" />
+        <glyph glyph-code="E2B6" smufl-name="accidentalJohnston13" />
+        <glyph glyph-code="E2B7" smufl-name="accidentalJohnston31" />
         <range_end>U+E2BF</range_end>
         <range_start>U+E2B0</range_start>
     </johnstonAccidentalsJustIntonation>
     <extendedHelmholtzEllisAccidentalsJustIntonation>
         <description>Extended Helmholtz-Ellis accidentals (just intonation)</description>
-        <!--<glyph glyph-code="E2C0" smufl-name="accidentalDoubleFlatOneArrowDown" />-->
-        <!--<glyph glyph-code="E2C1" smufl-name="accidentalFlatOneArrowDown" />-->
-        <!--<glyph glyph-code="E2C2" smufl-name="accidentalNaturalOneArrowDown" />-->
-        <!--<glyph glyph-code="E2C3" smufl-name="accidentalSharpOneArrowDown" />-->
-        <!--<glyph glyph-code="E2C4" smufl-name="accidentalDoubleSharpOneArrowDown" />-->
-        <!--<glyph glyph-code="E2C5" smufl-name="accidentalDoubleFlatOneArrowUp" />-->
-        <!--<glyph glyph-code="E2C6" smufl-name="accidentalFlatOneArrowUp" />-->
-        <!--<glyph glyph-code="E2C7" smufl-name="accidentalNaturalOneArrowUp" />-->
-        <!--<glyph glyph-code="E2C8" smufl-name="accidentalSharpOneArrowUp" />-->
-        <!--<glyph glyph-code="E2C9" smufl-name="accidentalDoubleSharpOneArrowUp" />-->
-        <!--<glyph glyph-code="E2CA" smufl-name="accidentalDoubleFlatTwoArrowsDown" />-->
-        <!--<glyph glyph-code="E2CB" smufl-name="accidentalFlatTwoArrowsDown" />-->
-        <!--<glyph glyph-code="E2CC" smufl-name="accidentalNaturalTwoArrowsDown" />-->
-        <!--<glyph glyph-code="E2CD" smufl-name="accidentalSharpTwoArrowsDown" />-->
-        <!--<glyph glyph-code="E2CE" smufl-name="accidentalDoubleSharpTwoArrowsDown" />-->
-        <!--<glyph glyph-code="E2CF" smufl-name="accidentalDoubleFlatTwoArrowsUp" />-->
-        <!--<glyph glyph-code="E2D0" smufl-name="accidentalFlatTwoArrowsUp" />-->
-        <!--<glyph glyph-code="E2D1" smufl-name="accidentalNaturalTwoArrowsUp" />-->
-        <!--<glyph glyph-code="E2D2" smufl-name="accidentalSharpTwoArrowsUp" />-->
-        <!--<glyph glyph-code="E2D3" smufl-name="accidentalDoubleSharpTwoArrowsUp" />-->
-        <!--<glyph glyph-code="E2D4" smufl-name="accidentalDoubleFlatThreeArrowsDown" />-->
-        <!--<glyph glyph-code="E2D5" smufl-name="accidentalFlatThreeArrowsDown" />-->
-        <!--<glyph glyph-code="E2D6" smufl-name="accidentalNaturalThreeArrowsDown" />-->
-        <!--<glyph glyph-code="E2D7" smufl-name="accidentalSharpThreeArrowsDown" />-->
-        <!--<glyph glyph-code="E2D8" smufl-name="accidentalDoubleSharpThreeArrowsDown" />-->
-        <!--<glyph glyph-code="E2D9" smufl-name="accidentalDoubleFlatThreeArrowsUp" />-->
-        <!--<glyph glyph-code="E2DA" smufl-name="accidentalFlatThreeArrowsUp" />-->
-        <!--<glyph glyph-code="E2DB" smufl-name="accidentalNaturalThreeArrowsUp" />-->
-        <!--<glyph glyph-code="E2DC" smufl-name="accidentalSharpThreeArrowsUp" />-->
-        <!--<glyph glyph-code="E2DD" smufl-name="accidentalDoubleSharpThreeArrowsUp" />-->
-        <!--<glyph glyph-code="E2DE" smufl-name="accidentalLowerOneSeptimalComma" />-->
-        <!--<glyph glyph-code="E2DF" smufl-name="accidentalRaiseOneSeptimalComma" />-->
-        <!--<glyph glyph-code="E2E0" smufl-name="accidentalLowerTwoSeptimalCommas" />-->
-        <!--<glyph glyph-code="E2E1" smufl-name="accidentalRaiseTwoSeptimalCommas" />-->
-        <!--<glyph glyph-code="E2E2" smufl-name="accidentalLowerOneUndecimalQuartertone" />-->
-        <!--<glyph glyph-code="E2E3" smufl-name="accidentalRaiseOneUndecimalQuartertone" />-->
-        <!--<glyph glyph-code="E2E4" smufl-name="accidentalLowerOneTridecimalQuartertone" />-->
-        <!--<glyph glyph-code="E2E5" smufl-name="accidentalRaiseOneTridecimalQuartertone" />-->
-        <!--<glyph glyph-code="E2E6" smufl-name="accidentalCombiningLower17Schisma" />-->
-        <!--<glyph glyph-code="E2E7" smufl-name="accidentalCombiningRaise17Schisma" />-->
-        <!--<glyph glyph-code="E2E8" smufl-name="accidentalCombiningLower19Schisma" />-->
-        <!--<glyph glyph-code="E2E9" smufl-name="accidentalCombiningRaise19Schisma" />-->
-        <!--<glyph glyph-code="E2EA"
-                smufl-name="accidentalCombiningLower23Limit29LimitComma" />-->
-        <!--<glyph glyph-code="E2EB"
-                smufl-name="accidentalCombiningRaise23Limit29LimitComma" />-->
-        <!--<glyph glyph-code="E2EC" smufl-name="accidentalCombiningLower31Schisma" />-->
-        <!--<glyph glyph-code="E2ED" smufl-name="accidentalCombiningRaise31Schisma" />-->
-        <!--<glyph glyph-code="E2EE" smufl-name="accidentalCombiningOpenCurlyBrace" />-->
-        <!--<glyph glyph-code="E2EF" smufl-name="accidentalCombiningCloseCurlyBrace" />-->
-        <!--<glyph glyph-code="E2F0" smufl-name="accidentalDoubleFlatEqualTempered" />-->
-        <!--<glyph glyph-code="E2F1" smufl-name="accidentalFlatEqualTempered" />-->
-        <!--<glyph glyph-code="E2F2" smufl-name="accidentalNaturalEqualTempered" />-->
-        <!--<glyph glyph-code="E2F3" smufl-name="accidentalSharpEqualTempered" />-->
-        <!--<glyph glyph-code="E2F4" smufl-name="accidentalDoubleSharpEqualTempered" />-->
+        <glyph glyph-code="E2C0" smufl-name="accidentalDoubleFlatOneArrowDown" />
+        <glyph glyph-code="E2C1" smufl-name="accidentalFlatOneArrowDown" />
+        <glyph glyph-code="E2C2" smufl-name="accidentalNaturalOneArrowDown" />
+        <glyph glyph-code="E2C3" smufl-name="accidentalSharpOneArrowDown" />
+        <glyph glyph-code="E2C4" smufl-name="accidentalDoubleSharpOneArrowDown" />
+        <glyph glyph-code="E2C5" smufl-name="accidentalDoubleFlatOneArrowUp" />
+        <glyph glyph-code="E2C6" smufl-name="accidentalFlatOneArrowUp" />
+        <glyph glyph-code="E2C7" smufl-name="accidentalNaturalOneArrowUp" />
+        <glyph glyph-code="E2C8" smufl-name="accidentalSharpOneArrowUp" />
+        <glyph glyph-code="E2C9" smufl-name="accidentalDoubleSharpOneArrowUp" />
+        <glyph glyph-code="E2CA" smufl-name="accidentalDoubleFlatTwoArrowsDown" />
+        <glyph glyph-code="E2CB" smufl-name="accidentalFlatTwoArrowsDown" />
+        <glyph glyph-code="E2CC" smufl-name="accidentalNaturalTwoArrowsDown" />
+        <glyph glyph-code="E2CD" smufl-name="accidentalSharpTwoArrowsDown" />
+        <glyph glyph-code="E2CE" smufl-name="accidentalDoubleSharpTwoArrowsDown" />
+        <glyph glyph-code="E2CF" smufl-name="accidentalDoubleFlatTwoArrowsUp" />
+        <glyph glyph-code="E2D0" smufl-name="accidentalFlatTwoArrowsUp" />
+        <glyph glyph-code="E2D1" smufl-name="accidentalNaturalTwoArrowsUp" />
+        <glyph glyph-code="E2D2" smufl-name="accidentalSharpTwoArrowsUp" />
+        <glyph glyph-code="E2D3" smufl-name="accidentalDoubleSharpTwoArrowsUp" />
+        <glyph glyph-code="E2D4" smufl-name="accidentalDoubleFlatThreeArrowsDown" />
+        <glyph glyph-code="E2D5" smufl-name="accidentalFlatThreeArrowsDown" />
+        <glyph glyph-code="E2D6" smufl-name="accidentalNaturalThreeArrowsDown" />
+        <glyph glyph-code="E2D7" smufl-name="accidentalSharpThreeArrowsDown" />
+        <glyph glyph-code="E2D8" smufl-name="accidentalDoubleSharpThreeArrowsDown" />
+        <glyph glyph-code="E2D9" smufl-name="accidentalDoubleFlatThreeArrowsUp" />
+        <glyph glyph-code="E2DA" smufl-name="accidentalFlatThreeArrowsUp" />
+        <glyph glyph-code="E2DB" smufl-name="accidentalNaturalThreeArrowsUp" />
+        <glyph glyph-code="E2DC" smufl-name="accidentalSharpThreeArrowsUp" />
+        <glyph glyph-code="E2DD" smufl-name="accidentalDoubleSharpThreeArrowsUp" />
+        <glyph glyph-code="E2DE" smufl-name="accidentalLowerOneSeptimalComma" />
+        <glyph glyph-code="E2DF" smufl-name="accidentalRaiseOneSeptimalComma" />
+        <glyph glyph-code="E2E0" smufl-name="accidentalLowerTwoSeptimalCommas" />
+        <glyph glyph-code="E2E1" smufl-name="accidentalRaiseTwoSeptimalCommas" />
+        <glyph glyph-code="E2E2" smufl-name="accidentalLowerOneUndecimalQuartertone" />
+        <glyph glyph-code="E2E3" smufl-name="accidentalRaiseOneUndecimalQuartertone" />
+        <glyph glyph-code="E2E4" smufl-name="accidentalLowerOneTridecimalQuartertone" />
+        <glyph glyph-code="E2E5" smufl-name="accidentalRaiseOneTridecimalQuartertone" />
+        <glyph glyph-code="E2E6" smufl-name="accidentalCombiningLower17Schisma" />
+        <glyph glyph-code="E2E7" smufl-name="accidentalCombiningRaise17Schisma" />
+        <glyph glyph-code="E2E8" smufl-name="accidentalCombiningLower19Schisma" />
+        <glyph glyph-code="E2E9" smufl-name="accidentalCombiningRaise19Schisma" />
+        <glyph glyph-code="E2EA"
+                smufl-name="accidentalCombiningLower23Limit29LimitComma" />
+        <glyph glyph-code="E2EB"
+                smufl-name="accidentalCombiningRaise23Limit29LimitComma" />
+        <glyph glyph-code="E2EC" smufl-name="accidentalCombiningLower31Schisma" />
+        <glyph glyph-code="E2ED" smufl-name="accidentalCombiningRaise31Schisma" />
+        <glyph glyph-code="E2EE" smufl-name="accidentalCombiningOpenCurlyBrace" />
+        <glyph glyph-code="E2EF" smufl-name="accidentalCombiningCloseCurlyBrace" />
+        <glyph glyph-code="E2F0" smufl-name="accidentalDoubleFlatEqualTempered" />
+        <glyph glyph-code="E2F1" smufl-name="accidentalFlatEqualTempered" />
+        <glyph glyph-code="E2F2" smufl-name="accidentalNaturalEqualTempered" />
+        <glyph glyph-code="E2F3" smufl-name="accidentalSharpEqualTempered" />
+        <glyph glyph-code="E2F4" smufl-name="accidentalDoubleSharpEqualTempered" />
         <range_end>U+E2FF</range_end>
         <range_start>U+E2C0</range_start>
     </extendedHelmholtzEllisAccidentalsJustIntonation>
     <spartanSagittalSingleShaftAccidentals>
         <description>Spartan Sagittal single-shaft accidentals</description>
-        <!--<glyph glyph-code="E300" smufl-name="accSagittal5v7KleismaUp" />-->
-        <!--<glyph glyph-code="E301" smufl-name="accSagittal5v7KleismaDown" />-->
-        <!--<glyph glyph-code="E302" smufl-name="accSagittal5CommaUp" />-->
-        <!--<glyph glyph-code="E303" smufl-name="accSagittal5CommaDown" />-->
-        <!--<glyph glyph-code="E304" smufl-name="accSagittal7CommaUp" />-->
-        <!--<glyph glyph-code="E305" smufl-name="accSagittal7CommaDown" />-->
-        <!--<glyph glyph-code="E306" smufl-name="accSagittal25SmallDiesisUp" />-->
-        <!--<glyph glyph-code="E307" smufl-name="accSagittal25SmallDiesisDown" />-->
-        <!--<glyph glyph-code="E308" smufl-name="accSagittal35MediumDiesisUp" />-->
-        <!--<glyph glyph-code="E309" smufl-name="accSagittal35MediumDiesisDown" />-->
-        <!--<glyph glyph-code="E30A" smufl-name="accSagittal11MediumDiesisUp" />-->
-        <!--<glyph glyph-code="E30B" smufl-name="accSagittal11MediumDiesisDown" />-->
-        <!--<glyph glyph-code="E30C" smufl-name="accSagittal11LargeDiesisUp" />-->
-        <!--<glyph glyph-code="E30D" smufl-name="accSagittal11LargeDiesisDown" />-->
-        <!--<glyph glyph-code="E30E" smufl-name="accSagittal35LargeDiesisUp" />-->
-        <!--<glyph glyph-code="E30F" smufl-name="accSagittal35LargeDiesisDown" />-->
+        <glyph glyph-code="E300" smufl-name="accSagittal5v7KleismaUp" />
+        <glyph glyph-code="E301" smufl-name="accSagittal5v7KleismaDown" />
+        <glyph glyph-code="E302" smufl-name="accSagittal5CommaUp" />
+        <glyph glyph-code="E303" smufl-name="accSagittal5CommaDown" />
+        <glyph glyph-code="E304" smufl-name="accSagittal7CommaUp" />
+        <glyph glyph-code="E305" smufl-name="accSagittal7CommaDown" />
+        <glyph glyph-code="E306" smufl-name="accSagittal25SmallDiesisUp" />
+        <glyph glyph-code="E307" smufl-name="accSagittal25SmallDiesisDown" />
+        <glyph glyph-code="E308" smufl-name="accSagittal35MediumDiesisUp" />
+        <glyph glyph-code="E309" smufl-name="accSagittal35MediumDiesisDown" />
+        <glyph glyph-code="E30A" smufl-name="accSagittal11MediumDiesisUp" />
+        <glyph glyph-code="E30B" smufl-name="accSagittal11MediumDiesisDown" />
+        <glyph glyph-code="E30C" smufl-name="accSagittal11LargeDiesisUp" />
+        <glyph glyph-code="E30D" smufl-name="accSagittal11LargeDiesisDown" />
+        <glyph glyph-code="E30E" smufl-name="accSagittal35LargeDiesisUp" />
+        <glyph glyph-code="E30F" smufl-name="accSagittal35LargeDiesisDown" />
         <range_end>U+E30F</range_end>
         <range_start>U+E300</range_start>
     </spartanSagittalSingleShaftAccidentals>
     <spartanSagittalMultiShaftAccidentals>
         <description>Spartan Sagittal multi-shaft accidentals</description>
-        <!--<glyph glyph-code="E310" smufl-name="accSagittalSharp25SDown" />-->
-        <!--<glyph glyph-code="E311" smufl-name="accSagittalFlat25SUp" />-->
-        <!--<glyph glyph-code="E312" smufl-name="accSagittalSharp7CDown" />-->
-        <!--<glyph glyph-code="E313" smufl-name="accSagittalFlat7CUp" />-->
-        <!--<glyph glyph-code="E314" smufl-name="accSagittalSharp5CDown" />-->
-        <!--<glyph glyph-code="E315" smufl-name="accSagittalFlat5CUp" />-->
-        <!--<glyph glyph-code="E316" smufl-name="accSagittalSharp5v7kDown" />-->
-        <!--<glyph glyph-code="E317" smufl-name="accSagittalFlat5v7kUp" />-->
-        <!--<glyph glyph-code="E318" smufl-name="accSagittalSharp" />-->
-        <!--<glyph glyph-code="E319" smufl-name="accSagittalFlat" />-->
-        <!--<glyph glyph-code="E31A" smufl-name="accSagittalUnused1" />-->
-        <!--<glyph glyph-code="E31B" smufl-name="accSagittalUnused2" />-->
-        <!--<glyph glyph-code="E31C" smufl-name="accSagittalSharp5v7kUp" />-->
-        <!--<glyph glyph-code="E31D" smufl-name="accSagittalFlat5v7kDown" />-->
-        <!--<glyph glyph-code="E31E" smufl-name="accSagittalSharp5CUp" />-->
-        <!--<glyph glyph-code="E31F" smufl-name="accSagittalFlat5CDown" />-->
-        <!--<glyph glyph-code="E320" smufl-name="accSagittalSharp7CUp" />-->
-        <!--<glyph glyph-code="E321" smufl-name="accSagittalFlat7CDown" />-->
-        <!--<glyph glyph-code="E322" smufl-name="accSagittalSharp25SUp" />-->
-        <!--<glyph glyph-code="E323" smufl-name="accSagittalFlat25SDown" />-->
-        <!--<glyph glyph-code="E324" smufl-name="accSagittalSharp35MUp" />-->
-        <!--<glyph glyph-code="E325" smufl-name="accSagittalFlat35MDown" />-->
-        <!--<glyph glyph-code="E326" smufl-name="accSagittalSharp11MUp" />-->
-        <!--<glyph glyph-code="E327" smufl-name="accSagittalFlat11MDown" />-->
-        <!--<glyph glyph-code="E328" smufl-name="accSagittalSharp11LUp" />-->
-        <!--<glyph glyph-code="E329" smufl-name="accSagittalFlat11LDown" />-->
-        <!--<glyph glyph-code="E32A" smufl-name="accSagittalSharp35LUp" />-->
-        <!--<glyph glyph-code="E32B" smufl-name="accSagittalFlat35LDown" />-->
-        <!--<glyph glyph-code="E32C" smufl-name="accSagittalDoubleSharp25SDown" />-->
-        <!--<glyph glyph-code="E32D" smufl-name="accSagittalDoubleFlat25SUp" />-->
-        <!--<glyph glyph-code="E32E" smufl-name="accSagittalDoubleSharp7CDown" />-->
-        <!--<glyph glyph-code="E32F" smufl-name="accSagittalDoubleFlat7CUp" />-->
-        <!--<glyph glyph-code="E330" smufl-name="accSagittalDoubleSharp5CDown" />-->
-        <!--<glyph glyph-code="E331" smufl-name="accSagittalDoubleFlat5CUp" />-->
-        <!--<glyph glyph-code="E332" smufl-name="accSagittalDoubleSharp5v7kDown" />-->
-        <!--<glyph glyph-code="E333" smufl-name="accSagittalDoubleFlat5v7kUp" />-->
-        <!--<glyph glyph-code="E334" smufl-name="accSagittalDoubleSharp" />-->
-        <!--<glyph glyph-code="E335" smufl-name="accSagittalDoubleFlat" />-->
+        <glyph glyph-code="E310" smufl-name="accSagittalSharp25SDown" />
+        <glyph glyph-code="E311" smufl-name="accSagittalFlat25SUp" />
+        <glyph glyph-code="E312" smufl-name="accSagittalSharp7CDown" />
+        <glyph glyph-code="E313" smufl-name="accSagittalFlat7CUp" />
+        <glyph glyph-code="E314" smufl-name="accSagittalSharp5CDown" />
+        <glyph glyph-code="E315" smufl-name="accSagittalFlat5CUp" />
+        <glyph glyph-code="E316" smufl-name="accSagittalSharp5v7kDown" />
+        <glyph glyph-code="E317" smufl-name="accSagittalFlat5v7kUp" />
+        <glyph glyph-code="E318" smufl-name="accSagittalSharp" />
+        <glyph glyph-code="E319" smufl-name="accSagittalFlat" />
+        <glyph glyph-code="E31A" smufl-name="accSagittalUnused1" />
+        <glyph glyph-code="E31B" smufl-name="accSagittalUnused2" />
+        <glyph glyph-code="E31C" smufl-name="accSagittalSharp5v7kUp" />
+        <glyph glyph-code="E31D" smufl-name="accSagittalFlat5v7kDown" />
+        <glyph glyph-code="E31E" smufl-name="accSagittalSharp5CUp" />
+        <glyph glyph-code="E31F" smufl-name="accSagittalFlat5CDown" />
+        <glyph glyph-code="E320" smufl-name="accSagittalSharp7CUp" />
+        <glyph glyph-code="E321" smufl-name="accSagittalFlat7CDown" />
+        <glyph glyph-code="E322" smufl-name="accSagittalSharp25SUp" />
+        <glyph glyph-code="E323" smufl-name="accSagittalFlat25SDown" />
+        <glyph glyph-code="E324" smufl-name="accSagittalSharp35MUp" />
+        <glyph glyph-code="E325" smufl-name="accSagittalFlat35MDown" />
+        <glyph glyph-code="E326" smufl-name="accSagittalSharp11MUp" />
+        <glyph glyph-code="E327" smufl-name="accSagittalFlat11MDown" />
+        <glyph glyph-code="E328" smufl-name="accSagittalSharp11LUp" />
+        <glyph glyph-code="E329" smufl-name="accSagittalFlat11LDown" />
+        <glyph glyph-code="E32A" smufl-name="accSagittalSharp35LUp" />
+        <glyph glyph-code="E32B" smufl-name="accSagittalFlat35LDown" />
+        <glyph glyph-code="E32C" smufl-name="accSagittalDoubleSharp25SDown" />
+        <glyph glyph-code="E32D" smufl-name="accSagittalDoubleFlat25SUp" />
+        <glyph glyph-code="E32E" smufl-name="accSagittalDoubleSharp7CDown" />
+        <glyph glyph-code="E32F" smufl-name="accSagittalDoubleFlat7CUp" />
+        <glyph glyph-code="E330" smufl-name="accSagittalDoubleSharp5CDown" />
+        <glyph glyph-code="E331" smufl-name="accSagittalDoubleFlat5CUp" />
+        <glyph glyph-code="E332" smufl-name="accSagittalDoubleSharp5v7kDown" />
+        <glyph glyph-code="E333" smufl-name="accSagittalDoubleFlat5v7kUp" />
+        <glyph glyph-code="E334" smufl-name="accSagittalDoubleSharp" />
+        <glyph glyph-code="E335" smufl-name="accSagittalDoubleFlat" />
         <range_end>U+E33F</range_end>
         <range_start>U+E310</range_start>
     </spartanSagittalMultiShaftAccidentals>
     <athenianSagittalExtensionMediumPrecisionAccidentals>
         <description>Athenian Sagittal extension (medium precision) accidentals</description>
-        <!--<glyph glyph-code="E340" smufl-name="accSagittal7v11KleismaUp" />-->
-        <!--<glyph glyph-code="E341" smufl-name="accSagittal7v11KleismaDown" />-->
-        <!--<glyph glyph-code="E342" smufl-name="accSagittal17CommaUp" />-->
-        <!--<glyph glyph-code="E343" smufl-name="accSagittal17CommaDown" />-->
-        <!--<glyph glyph-code="E344" smufl-name="accSagittal55CommaUp" />-->
-        <!--<glyph glyph-code="E345" smufl-name="accSagittal55CommaDown" />-->
-        <!--<glyph glyph-code="E346" smufl-name="accSagittal7v11CommaUp" />-->
-        <!--<glyph glyph-code="E347" smufl-name="accSagittal7v11CommaDown" />-->
-        <!--<glyph glyph-code="E348" smufl-name="accSagittal5v11SmallDiesisUp" />-->
-        <!--<glyph glyph-code="E349" smufl-name="accSagittal5v11SmallDiesisDown" />-->
-        <!--<glyph glyph-code="E34A" smufl-name="accSagittalSharp5v11SDown" />-->
-        <!--<glyph glyph-code="E34B" smufl-name="accSagittalFlat5v11SUp" />-->
-        <!--<glyph glyph-code="E34C" smufl-name="accSagittalSharp7v11CDown" />-->
-        <!--<glyph glyph-code="E34D" smufl-name="accSagittalFlat7v11CUp" />-->
-        <!--<glyph glyph-code="E34E" smufl-name="accSagittalSharp55CDown" />-->
-        <!--<glyph glyph-code="E34F" smufl-name="accSagittalFlat55CUp" />-->
-        <!--<glyph glyph-code="E350" smufl-name="accSagittalSharp17CDown" />-->
-        <!--<glyph glyph-code="E351" smufl-name="accSagittalFlat17CUp" />-->
-        <!--<glyph glyph-code="E352" smufl-name="accSagittalSharp7v11kDown" />-->
-        <!--<glyph glyph-code="E353" smufl-name="accSagittalFlat7v11kUp" />-->
-        <!--<glyph glyph-code="E354" smufl-name="accSagittalSharp7v11kUp" />-->
-        <!--<glyph glyph-code="E355" smufl-name="accSagittalFlat7v11kDown" />-->
-        <!--<glyph glyph-code="E356" smufl-name="accSagittalSharp17CUp" />-->
-        <!--<glyph glyph-code="E357" smufl-name="accSagittalFlat17CDown" />-->
-        <!--<glyph glyph-code="E358" smufl-name="accSagittalSharp55CUp" />-->
-        <!--<glyph glyph-code="E359" smufl-name="accSagittalFlat55CDown" />-->
-        <!--<glyph glyph-code="E35A" smufl-name="accSagittalSharp7v11CUp" />-->
-        <!--<glyph glyph-code="E35B" smufl-name="accSagittalFlat7v11CDown" />-->
-        <!--<glyph glyph-code="E35C" smufl-name="accSagittalSharp5v11SUp" />-->
-        <!--<glyph glyph-code="E35D" smufl-name="accSagittalFlat5v11SDown" />-->
-        <!--<glyph glyph-code="E35E" smufl-name="accSagittalDoubleSharp5v11SDown" />-->
-        <!--<glyph glyph-code="E35F" smufl-name="accSagittalDoubleFlat5v11SUp" />-->
-        <!--<glyph glyph-code="E360" smufl-name="accSagittalDoubleSharp7v11CDown" />-->
-        <!--<glyph glyph-code="E361" smufl-name="accSagittalDoubleFlat7v11CUp" />-->
-        <!--<glyph glyph-code="E362" smufl-name="accSagittalDoubleSharp55CDown" />-->
-        <!--<glyph glyph-code="E363" smufl-name="accSagittalDoubleFlat55CUp" />-->
-        <!--<glyph glyph-code="E364" smufl-name="accSagittalDoubleSharp17CDown" />-->
-        <!--<glyph glyph-code="E365" smufl-name="accSagittalDoubleFlat17CUp" />-->
-        <!--<glyph glyph-code="E366" smufl-name="accSagittalDoubleSharp7v11kDown" />-->
-        <!--<glyph glyph-code="E367" smufl-name="accSagittalDoubleFlat7v11kUp" />-->
+        <glyph glyph-code="E340" smufl-name="accSagittal7v11KleismaUp" />
+        <glyph glyph-code="E341" smufl-name="accSagittal7v11KleismaDown" />
+        <glyph glyph-code="E342" smufl-name="accSagittal17CommaUp" />
+        <glyph glyph-code="E343" smufl-name="accSagittal17CommaDown" />
+        <glyph glyph-code="E344" smufl-name="accSagittal55CommaUp" />
+        <glyph glyph-code="E345" smufl-name="accSagittal55CommaDown" />
+        <glyph glyph-code="E346" smufl-name="accSagittal7v11CommaUp" />
+        <glyph glyph-code="E347" smufl-name="accSagittal7v11CommaDown" />
+        <glyph glyph-code="E348" smufl-name="accSagittal5v11SmallDiesisUp" />
+        <glyph glyph-code="E349" smufl-name="accSagittal5v11SmallDiesisDown" />
+        <glyph glyph-code="E34A" smufl-name="accSagittalSharp5v11SDown" />
+        <glyph glyph-code="E34B" smufl-name="accSagittalFlat5v11SUp" />
+        <glyph glyph-code="E34C" smufl-name="accSagittalSharp7v11CDown" />
+        <glyph glyph-code="E34D" smufl-name="accSagittalFlat7v11CUp" />
+        <glyph glyph-code="E34E" smufl-name="accSagittalSharp55CDown" />
+        <glyph glyph-code="E34F" smufl-name="accSagittalFlat55CUp" />
+        <glyph glyph-code="E350" smufl-name="accSagittalSharp17CDown" />
+        <glyph glyph-code="E351" smufl-name="accSagittalFlat17CUp" />
+        <glyph glyph-code="E352" smufl-name="accSagittalSharp7v11kDown" />
+        <glyph glyph-code="E353" smufl-name="accSagittalFlat7v11kUp" />
+        <glyph glyph-code="E354" smufl-name="accSagittalSharp7v11kUp" />
+        <glyph glyph-code="E355" smufl-name="accSagittalFlat7v11kDown" />
+        <glyph glyph-code="E356" smufl-name="accSagittalSharp17CUp" />
+        <glyph glyph-code="E357" smufl-name="accSagittalFlat17CDown" />
+        <glyph glyph-code="E358" smufl-name="accSagittalSharp55CUp" />
+        <glyph glyph-code="E359" smufl-name="accSagittalFlat55CDown" />
+        <glyph glyph-code="E35A" smufl-name="accSagittalSharp7v11CUp" />
+        <glyph glyph-code="E35B" smufl-name="accSagittalFlat7v11CDown" />
+        <glyph glyph-code="E35C" smufl-name="accSagittalSharp5v11SUp" />
+        <glyph glyph-code="E35D" smufl-name="accSagittalFlat5v11SDown" />
+        <glyph glyph-code="E35E" smufl-name="accSagittalDoubleSharp5v11SDown" />
+        <glyph glyph-code="E35F" smufl-name="accSagittalDoubleFlat5v11SUp" />
+        <glyph glyph-code="E360" smufl-name="accSagittalDoubleSharp7v11CDown" />
+        <glyph glyph-code="E361" smufl-name="accSagittalDoubleFlat7v11CUp" />
+        <glyph glyph-code="E362" smufl-name="accSagittalDoubleSharp55CDown" />
+        <glyph glyph-code="E363" smufl-name="accSagittalDoubleFlat55CUp" />
+        <glyph glyph-code="E364" smufl-name="accSagittalDoubleSharp17CDown" />
+        <glyph glyph-code="E365" smufl-name="accSagittalDoubleFlat17CUp" />
+        <glyph glyph-code="E366" smufl-name="accSagittalDoubleSharp7v11kDown" />
+        <glyph glyph-code="E367" smufl-name="accSagittalDoubleFlat7v11kUp" />
         <range_end>U+E36F</range_end>
         <range_start>U+E340</range_start>
     </athenianSagittalExtensionMediumPrecisionAccidentals>
     <trojanSagittalExtension12EdoRelativeAccidentals>
         <description>Trojan Sagittal extension (12-EDO relative) accidentals</description>
-        <!--<glyph glyph-code="E370" smufl-name="accSagittal23CommaUp" />-->
-        <!--<glyph glyph-code="E371" smufl-name="accSagittal23CommaDown" />-->
-        <!--<glyph glyph-code="E372" smufl-name="accSagittal5v19CommaUp" />-->
-        <!--<glyph glyph-code="E373" smufl-name="accSagittal5v19CommaDown" />-->
-        <!--<glyph glyph-code="E374" smufl-name="accSagittal5v23SmallDiesisUp" />-->
-        <!--<glyph glyph-code="E375" smufl-name="accSagittal5v23SmallDiesisDown" />-->
-        <!--<glyph glyph-code="E376" smufl-name="accSagittalSharp5v23SDown" />-->
-        <!--<glyph glyph-code="E377" smufl-name="accSagittalFlat5v23SUp" />-->
-        <!--<glyph glyph-code="E378" smufl-name="accSagittalSharp5v19CDown" />-->
-        <!--<glyph glyph-code="E379" smufl-name="accSagittalFlat5v19CUp" />-->
-        <!--<glyph glyph-code="E37A" smufl-name="accSagittalSharp23CDown" />-->
-        <!--<glyph glyph-code="E37B" smufl-name="accSagittalFlat23CUp" />-->
-        <!--<glyph glyph-code="E37C" smufl-name="accSagittalSharp23CUp" />-->
-        <!--<glyph glyph-code="E37D" smufl-name="accSagittalFlat23CDown" />-->
-        <!--<glyph glyph-code="E37E" smufl-name="accSagittalSharp5v19CUp" />-->
-        <!--<glyph glyph-code="E37F" smufl-name="accSagittalFlat5v19CDown" />-->
-        <!--<glyph glyph-code="E380" smufl-name="accSagittalSharp5v23SUp" />-->
-        <!--<glyph glyph-code="E381" smufl-name="accSagittalFlat5v23SDown" />-->
-        <!--<glyph glyph-code="E382" smufl-name="accSagittalDoubleSharp5v23SDown" />-->
-        <!--<glyph glyph-code="E383" smufl-name="accSagittalDoubleFlat5v23SUp" />-->
-        <!--<glyph glyph-code="E384" smufl-name="accSagittalDoubleSharp5v19CDown" />-->
-        <!--<glyph glyph-code="E385" smufl-name="accSagittalDoubleFlat5v19CUp" />-->
-        <!--<glyph glyph-code="E386" smufl-name="accSagittalDoubleSharp23CDown" />-->
-        <!--<glyph glyph-code="E387" smufl-name="accSagittalDoubleFlat23CUp" />-->
+        <glyph glyph-code="E370" smufl-name="accSagittal23CommaUp" />
+        <glyph glyph-code="E371" smufl-name="accSagittal23CommaDown" />
+        <glyph glyph-code="E372" smufl-name="accSagittal5v19CommaUp" />
+        <glyph glyph-code="E373" smufl-name="accSagittal5v19CommaDown" />
+        <glyph glyph-code="E374" smufl-name="accSagittal5v23SmallDiesisUp" />
+        <glyph glyph-code="E375" smufl-name="accSagittal5v23SmallDiesisDown" />
+        <glyph glyph-code="E376" smufl-name="accSagittalSharp5v23SDown" />
+        <glyph glyph-code="E377" smufl-name="accSagittalFlat5v23SUp" />
+        <glyph glyph-code="E378" smufl-name="accSagittalSharp5v19CDown" />
+        <glyph glyph-code="E379" smufl-name="accSagittalFlat5v19CUp" />
+        <glyph glyph-code="E37A" smufl-name="accSagittalSharp23CDown" />
+        <glyph glyph-code="E37B" smufl-name="accSagittalFlat23CUp" />
+        <glyph glyph-code="E37C" smufl-name="accSagittalSharp23CUp" />
+        <glyph glyph-code="E37D" smufl-name="accSagittalFlat23CDown" />
+        <glyph glyph-code="E37E" smufl-name="accSagittalSharp5v19CUp" />
+        <glyph glyph-code="E37F" smufl-name="accSagittalFlat5v19CDown" />
+        <glyph glyph-code="E380" smufl-name="accSagittalSharp5v23SUp" />
+        <glyph glyph-code="E381" smufl-name="accSagittalFlat5v23SDown" />
+        <glyph glyph-code="E382" smufl-name="accSagittalDoubleSharp5v23SDown" />
+        <glyph glyph-code="E383" smufl-name="accSagittalDoubleFlat5v23SUp" />
+        <glyph glyph-code="E384" smufl-name="accSagittalDoubleSharp5v19CDown" />
+        <glyph glyph-code="E385" smufl-name="accSagittalDoubleFlat5v19CUp" />
+        <glyph glyph-code="E386" smufl-name="accSagittalDoubleSharp23CDown" />
+        <glyph glyph-code="E387" smufl-name="accSagittalDoubleFlat23CUp" />
         <range_end>U+E38F</range_end>
         <range_start>U+E370</range_start>
     </trojanSagittalExtension12EdoRelativeAccidentals>
     <prometheanSagittalExtensionHighPrecisionSingleShaftAccidentals>
         <description>Promethean Sagittal extension (high precision) single-shaft accidentals</description>
-        <!--<glyph glyph-code="E390" smufl-name="accSagittal19SchismaUp" />-->
-        <!--<glyph glyph-code="E391" smufl-name="accSagittal19SchismaDown" />-->
-        <!--<glyph glyph-code="E392" smufl-name="accSagittal17KleismaUp" />-->
-        <!--<glyph glyph-code="E393" smufl-name="accSagittal17KleismaDown" />-->
-        <!--<glyph glyph-code="E394" smufl-name="accSagittal143CommaUp" />-->
-        <!--<glyph glyph-code="E395" smufl-name="accSagittal143CommaDown" />-->
-        <!--<glyph glyph-code="E396" smufl-name="accSagittal11v49CommaUp" />-->
-        <!--<glyph glyph-code="E397" smufl-name="accSagittal11v49CommaDown" />-->
-        <!--<glyph glyph-code="E398" smufl-name="accSagittal19CommaUp" />-->
-        <!--<glyph glyph-code="E399" smufl-name="accSagittal19CommaDown" />-->
-        <!--<glyph glyph-code="E39A" smufl-name="accSagittal7v19CommaUp" />-->
-        <!--<glyph glyph-code="E39B" smufl-name="accSagittal7v19CommaDown" />-->
-        <!--<glyph glyph-code="E39C" smufl-name="accSagittal49SmallDiesisUp" />-->
-        <!--<glyph glyph-code="E39D" smufl-name="accSagittal49SmallDiesisDown" />-->
-        <!--<glyph glyph-code="E39E" smufl-name="accSagittal23SmallDiesisUp" />-->
-        <!--<glyph glyph-code="E39F" smufl-name="accSagittal23SmallDiesisDown" />-->
-        <!--<glyph glyph-code="E3A0" smufl-name="accSagittal5v13MediumDiesisUp" />-->
-        <!--<glyph glyph-code="E3A1" smufl-name="accSagittal5v13MediumDiesisDown" />-->
-        <!--<glyph glyph-code="E3A2" smufl-name="accSagittal11v19MediumDiesisUp" />-->
-        <!--<glyph glyph-code="E3A3" smufl-name="accSagittal11v19MediumDiesisDown" />-->
-        <!--<glyph glyph-code="E3A4" smufl-name="accSagittal49MediumDiesisUp" />-->
-        <!--<glyph glyph-code="E3A5" smufl-name="accSagittal49MediumDiesisDown" />-->
-        <!--<glyph glyph-code="E3A6" smufl-name="accSagittal5v49MediumDiesisUp" />-->
-        <!--<glyph glyph-code="E3A7" smufl-name="accSagittal5v49MediumDiesisDown" />-->
-        <!--<glyph glyph-code="E3A8" smufl-name="accSagittal49LargeDiesisUp" />-->
-        <!--<glyph glyph-code="E3A9" smufl-name="accSagittal49LargeDiesisDown" />-->
-        <!--<glyph glyph-code="E3AA" smufl-name="accSagittal11v19LargeDiesisUp" />-->
-        <!--<glyph glyph-code="E3AB" smufl-name="accSagittal11v19LargeDiesisDown" />-->
-        <!--<glyph glyph-code="E3AC" smufl-name="accSagittal5v13LargeDiesisUp" />-->
-        <!--<glyph glyph-code="E3AD" smufl-name="accSagittal5v13LargeDiesisDown" />-->
+        <glyph glyph-code="E390" smufl-name="accSagittal19SchismaUp" />
+        <glyph glyph-code="E391" smufl-name="accSagittal19SchismaDown" />
+        <glyph glyph-code="E392" smufl-name="accSagittal17KleismaUp" />
+        <glyph glyph-code="E393" smufl-name="accSagittal17KleismaDown" />
+        <glyph glyph-code="E394" smufl-name="accSagittal143CommaUp" />
+        <glyph glyph-code="E395" smufl-name="accSagittal143CommaDown" />
+        <glyph glyph-code="E396" smufl-name="accSagittal11v49CommaUp" />
+        <glyph glyph-code="E397" smufl-name="accSagittal11v49CommaDown" />
+        <glyph glyph-code="E398" smufl-name="accSagittal19CommaUp" />
+        <glyph glyph-code="E399" smufl-name="accSagittal19CommaDown" />
+        <glyph glyph-code="E39A" smufl-name="accSagittal7v19CommaUp" />
+        <glyph glyph-code="E39B" smufl-name="accSagittal7v19CommaDown" />
+        <glyph glyph-code="E39C" smufl-name="accSagittal49SmallDiesisUp" />
+        <glyph glyph-code="E39D" smufl-name="accSagittal49SmallDiesisDown" />
+        <glyph glyph-code="E39E" smufl-name="accSagittal23SmallDiesisUp" />
+        <glyph glyph-code="E39F" smufl-name="accSagittal23SmallDiesisDown" />
+        <glyph glyph-code="E3A0" smufl-name="accSagittal5v13MediumDiesisUp" />
+        <glyph glyph-code="E3A1" smufl-name="accSagittal5v13MediumDiesisDown" />
+        <glyph glyph-code="E3A2" smufl-name="accSagittal11v19MediumDiesisUp" />
+        <glyph glyph-code="E3A3" smufl-name="accSagittal11v19MediumDiesisDown" />
+        <glyph glyph-code="E3A4" smufl-name="accSagittal49MediumDiesisUp" />
+        <glyph glyph-code="E3A5" smufl-name="accSagittal49MediumDiesisDown" />
+        <glyph glyph-code="E3A6" smufl-name="accSagittal5v49MediumDiesisUp" />
+        <glyph glyph-code="E3A7" smufl-name="accSagittal5v49MediumDiesisDown" />
+        <glyph glyph-code="E3A8" smufl-name="accSagittal49LargeDiesisUp" />
+        <glyph glyph-code="E3A9" smufl-name="accSagittal49LargeDiesisDown" />
+        <glyph glyph-code="E3AA" smufl-name="accSagittal11v19LargeDiesisUp" />
+        <glyph glyph-code="E3AB" smufl-name="accSagittal11v19LargeDiesisDown" />
+        <glyph glyph-code="E3AC" smufl-name="accSagittal5v13LargeDiesisUp" />
+        <glyph glyph-code="E3AD" smufl-name="accSagittal5v13LargeDiesisDown" />
         <range_end>U+E3AF</range_end>
         <range_start>U+E390</range_start>
     </prometheanSagittalExtensionHighPrecisionSingleShaftAccidentals>
     <prometheanSagittalExtensionHighPrecisionMultiShaftAccidentals>
         <description>Promethean Sagittal extension (high precision) multi-shaft accidentals</description>
-        <!--<glyph glyph-code="E3B0" smufl-name="accSagittalSharp23SDown" />-->
-        <!--<glyph glyph-code="E3B1" smufl-name="accSagittalFlat23SUp" />-->
-        <!--<glyph glyph-code="E3B2" smufl-name="accSagittalSharp49SDown" />-->
-        <!--<glyph glyph-code="E3B3" smufl-name="accSagittalFlat49SUp" />-->
-        <!--<glyph glyph-code="E3B4" smufl-name="accSagittalSharp7v19CDown" />-->
-        <!--<glyph glyph-code="E3B5" smufl-name="accSagittalFlat7v19CUp" />-->
-        <!--<glyph glyph-code="E3B6" smufl-name="accSagittalSharp19CDown" />-->
-        <!--<glyph glyph-code="E3B7" smufl-name="accSagittalFlat19CUp" />-->
-        <!--<glyph glyph-code="E3B8" smufl-name="accSagittalSharp11v49CDown" />-->
-        <!--<glyph glyph-code="E3B9" smufl-name="accSagittalFlat11v49CUp" />-->
-        <!--<glyph glyph-code="E3BA" smufl-name="accSagittalSharp143CDown" />-->
-        <!--<glyph glyph-code="E3BB" smufl-name="accSagittalFlat143CUp" />-->
-        <!--<glyph glyph-code="E3BC" smufl-name="accSagittalSharp17kDown" />-->
-        <!--<glyph glyph-code="E3BD" smufl-name="accSagittalFlat17kUp" />-->
-        <!--<glyph glyph-code="E3BE" smufl-name="accSagittalSharp19sDown" />-->
-        <!--<glyph glyph-code="E3BF" smufl-name="accSagittalFlat19sUp" />-->
-        <!--<glyph glyph-code="E3C0" smufl-name="accSagittalSharp19sUp" />-->
-        <!--<glyph glyph-code="E3C1" smufl-name="accSagittalFlat19sDown" />-->
-        <!--<glyph glyph-code="E3C2" smufl-name="accSagittalSharp17kUp" />-->
-        <!--<glyph glyph-code="E3C3" smufl-name="accSagittalFlat17kDown" />-->
-        <!--<glyph glyph-code="E3C4" smufl-name="accSagittalSharp143CUp" />-->
-        <!--<glyph glyph-code="E3C5" smufl-name="accSagittalFlat143CDown" />-->
-        <!--<glyph glyph-code="E3C6" smufl-name="accSagittalSharp11v49CUp" />-->
-        <!--<glyph glyph-code="E3C7" smufl-name="accSagittalFlat11v49CDown" />-->
-        <!--<glyph glyph-code="E3C8" smufl-name="accSagittalSharp19CUp" />-->
-        <!--<glyph glyph-code="E3C9" smufl-name="accSagittalFlat19CDown" />-->
-        <!--<glyph glyph-code="E3CA" smufl-name="accSagittalSharp7v19CUp" />-->
-        <!--<glyph glyph-code="E3CB" smufl-name="accSagittalFlat7v19CDown" />-->
-        <!--<glyph glyph-code="E3CC" smufl-name="accSagittalSharp49SUp" />-->
-        <!--<glyph glyph-code="E3CD" smufl-name="accSagittalFlat49SDown" />-->
-        <!--<glyph glyph-code="E3CE" smufl-name="accSagittalSharp23SUp" />-->
-        <!--<glyph glyph-code="E3CF" smufl-name="accSagittalFlat23SDown" />-->
-        <!--<glyph glyph-code="E3D0" smufl-name="accSagittalSharp5v13MUp" />-->
-        <!--<glyph glyph-code="E3D1" smufl-name="accSagittalFlat5v13MDown" />-->
-        <!--<glyph glyph-code="E3D2" smufl-name="accSagittalSharp11v19MUp" />-->
-        <!--<glyph glyph-code="E3D3" smufl-name="accSagittalFlat11v19MDown" />-->
-        <!--<glyph glyph-code="E3D4" smufl-name="accSagittalSharp49MUp" />-->
-        <!--<glyph glyph-code="E3D5" smufl-name="accSagittalFlat49MDown" />-->
-        <!--<glyph glyph-code="E3D6" smufl-name="accSagittalSharp5v49MUp" />-->
-        <!--<glyph glyph-code="E3D7" smufl-name="accSagittalFlat5v49MDown" />-->
-        <!--<glyph glyph-code="E3D8" smufl-name="accSagittalSharp49LUp" />-->
-        <!--<glyph glyph-code="E3D9" smufl-name="accSagittalFlat49LDown" />-->
-        <!--<glyph glyph-code="E3DA" smufl-name="accSagittalSharp11v19LUp" />-->
-        <!--<glyph glyph-code="E3DB" smufl-name="accSagittalFlat11v19LDown" />-->
-        <!--<glyph glyph-code="E3DC" smufl-name="accSagittalSharp5v13LUp" />-->
-        <!--<glyph glyph-code="E3DD" smufl-name="accSagittalFlat5v13LDown" />-->
-        <!--<glyph glyph-code="E3DE" smufl-name="accSagittalUnused3" />-->
-        <!--<glyph glyph-code="E3DF" smufl-name="accSagittalUnused4" />-->
-        <!--<glyph glyph-code="E3E0" smufl-name="accSagittalDoubleSharp23SDown" />-->
-        <!--<glyph glyph-code="E3E1" smufl-name="accSagittalDoubleFlat23SUp" />-->
-        <!--<glyph glyph-code="E3E2" smufl-name="accSagittalDoubleSharp49SDown" />-->
-        <!--<glyph glyph-code="E3E3" smufl-name="accSagittalDoubleFlat49SUp" />-->
-        <!--<glyph glyph-code="E3E4" smufl-name="accSagittalDoubleSharp7v19CDown" />-->
-        <!--<glyph glyph-code="E3E5" smufl-name="accSagittalDoubleFlat7v19CUp" />-->
-        <!--<glyph glyph-code="E3E6" smufl-name="accSagittalDoubleSharp19CDown" />-->
-        <!--<glyph glyph-code="E3E7" smufl-name="accSagittalDoubleFlat19CUp" />-->
-        <!--<glyph glyph-code="E3E8" smufl-name="accSagittalDoubleSharp11v49CDown" />-->
-        <!--<glyph glyph-code="E3E9" smufl-name="accSagittalDoubleFlat11v49CUp" />-->
-        <!--<glyph glyph-code="E3EA" smufl-name="accSagittalDoubleSharp143CDown" />-->
-        <!--<glyph glyph-code="E3EB" smufl-name="accSagittalDoubleFlat143CUp" />-->
-        <!--<glyph glyph-code="E3EC" smufl-name="accSagittalDoubleSharp17kDown" />-->
-        <!--<glyph glyph-code="E3ED" smufl-name="accSagittalDoubleFlat17kUp" />-->
-        <!--<glyph glyph-code="E3EE" smufl-name="accSagittalDoubleSharp19sDown" />-->
-        <!--<glyph glyph-code="E3EF" smufl-name="accSagittalDoubleFlat19sUp" />-->
+        <glyph glyph-code="E3B0" smufl-name="accSagittalSharp23SDown" />
+        <glyph glyph-code="E3B1" smufl-name="accSagittalFlat23SUp" />
+        <glyph glyph-code="E3B2" smufl-name="accSagittalSharp49SDown" />
+        <glyph glyph-code="E3B3" smufl-name="accSagittalFlat49SUp" />
+        <glyph glyph-code="E3B4" smufl-name="accSagittalSharp7v19CDown" />
+        <glyph glyph-code="E3B5" smufl-name="accSagittalFlat7v19CUp" />
+        <glyph glyph-code="E3B6" smufl-name="accSagittalSharp19CDown" />
+        <glyph glyph-code="E3B7" smufl-name="accSagittalFlat19CUp" />
+        <glyph glyph-code="E3B8" smufl-name="accSagittalSharp11v49CDown" />
+        <glyph glyph-code="E3B9" smufl-name="accSagittalFlat11v49CUp" />
+        <glyph glyph-code="E3BA" smufl-name="accSagittalSharp143CDown" />
+        <glyph glyph-code="E3BB" smufl-name="accSagittalFlat143CUp" />
+        <glyph glyph-code="E3BC" smufl-name="accSagittalSharp17kDown" />
+        <glyph glyph-code="E3BD" smufl-name="accSagittalFlat17kUp" />
+        <glyph glyph-code="E3BE" smufl-name="accSagittalSharp19sDown" />
+        <glyph glyph-code="E3BF" smufl-name="accSagittalFlat19sUp" />
+        <glyph glyph-code="E3C0" smufl-name="accSagittalSharp19sUp" />
+        <glyph glyph-code="E3C1" smufl-name="accSagittalFlat19sDown" />
+        <glyph glyph-code="E3C2" smufl-name="accSagittalSharp17kUp" />
+        <glyph glyph-code="E3C3" smufl-name="accSagittalFlat17kDown" />
+        <glyph glyph-code="E3C4" smufl-name="accSagittalSharp143CUp" />
+        <glyph glyph-code="E3C5" smufl-name="accSagittalFlat143CDown" />
+        <glyph glyph-code="E3C6" smufl-name="accSagittalSharp11v49CUp" />
+        <glyph glyph-code="E3C7" smufl-name="accSagittalFlat11v49CDown" />
+        <glyph glyph-code="E3C8" smufl-name="accSagittalSharp19CUp" />
+        <glyph glyph-code="E3C9" smufl-name="accSagittalFlat19CDown" />
+        <glyph glyph-code="E3CA" smufl-name="accSagittalSharp7v19CUp" />
+        <glyph glyph-code="E3CB" smufl-name="accSagittalFlat7v19CDown" />
+        <glyph glyph-code="E3CC" smufl-name="accSagittalSharp49SUp" />
+        <glyph glyph-code="E3CD" smufl-name="accSagittalFlat49SDown" />
+        <glyph glyph-code="E3CE" smufl-name="accSagittalSharp23SUp" />
+        <glyph glyph-code="E3CF" smufl-name="accSagittalFlat23SDown" />
+        <glyph glyph-code="E3D0" smufl-name="accSagittalSharp5v13MUp" />
+        <glyph glyph-code="E3D1" smufl-name="accSagittalFlat5v13MDown" />
+        <glyph glyph-code="E3D2" smufl-name="accSagittalSharp11v19MUp" />
+        <glyph glyph-code="E3D3" smufl-name="accSagittalFlat11v19MDown" />
+        <glyph glyph-code="E3D4" smufl-name="accSagittalSharp49MUp" />
+        <glyph glyph-code="E3D5" smufl-name="accSagittalFlat49MDown" />
+        <glyph glyph-code="E3D6" smufl-name="accSagittalSharp5v49MUp" />
+        <glyph glyph-code="E3D7" smufl-name="accSagittalFlat5v49MDown" />
+        <glyph glyph-code="E3D8" smufl-name="accSagittalSharp49LUp" />
+        <glyph glyph-code="E3D9" smufl-name="accSagittalFlat49LDown" />
+        <glyph glyph-code="E3DA" smufl-name="accSagittalSharp11v19LUp" />
+        <glyph glyph-code="E3DB" smufl-name="accSagittalFlat11v19LDown" />
+        <glyph glyph-code="E3DC" smufl-name="accSagittalSharp5v13LUp" />
+        <glyph glyph-code="E3DD" smufl-name="accSagittalFlat5v13LDown" />
+        <glyph glyph-code="E3DE" smufl-name="accSagittalUnused3" />
+        <glyph glyph-code="E3DF" smufl-name="accSagittalUnused4" />
+        <glyph glyph-code="E3E0" smufl-name="accSagittalDoubleSharp23SDown" />
+        <glyph glyph-code="E3E1" smufl-name="accSagittalDoubleFlat23SUp" />
+        <glyph glyph-code="E3E2" smufl-name="accSagittalDoubleSharp49SDown" />
+        <glyph glyph-code="E3E3" smufl-name="accSagittalDoubleFlat49SUp" />
+        <glyph glyph-code="E3E4" smufl-name="accSagittalDoubleSharp7v19CDown" />
+        <glyph glyph-code="E3E5" smufl-name="accSagittalDoubleFlat7v19CUp" />
+        <glyph glyph-code="E3E6" smufl-name="accSagittalDoubleSharp19CDown" />
+        <glyph glyph-code="E3E7" smufl-name="accSagittalDoubleFlat19CUp" />
+        <glyph glyph-code="E3E8" smufl-name="accSagittalDoubleSharp11v49CDown" />
+        <glyph glyph-code="E3E9" smufl-name="accSagittalDoubleFlat11v49CUp" />
+        <glyph glyph-code="E3EA" smufl-name="accSagittalDoubleSharp143CDown" />
+        <glyph glyph-code="E3EB" smufl-name="accSagittalDoubleFlat143CUp" />
+        <glyph glyph-code="E3EC" smufl-name="accSagittalDoubleSharp17kDown" />
+        <glyph glyph-code="E3ED" smufl-name="accSagittalDoubleFlat17kUp" />
+        <glyph glyph-code="E3EE" smufl-name="accSagittalDoubleSharp19sDown" />
+        <glyph glyph-code="E3EF" smufl-name="accSagittalDoubleFlat19sUp" />
         <range_end>U+E3EF</range_end>
         <range_start>U+E3B0</range_start>
     </prometheanSagittalExtensionHighPrecisionMultiShaftAccidentals>
     <herculeanSagittalExtensionVeryHighPrecisionAccidentalDiacritics>
         <description>Herculean Sagittal extension (very high precision) accidental diacritics</description>
-        <!--<glyph glyph-code="E3F0" smufl-name="accSagittalShaftUp" />-->
-        <!--<glyph glyph-code="E3F1" smufl-name="accSagittalShaftDown" />-->
-        <!--<glyph glyph-code="E3F2" smufl-name="accSagittalAcute" />-->
-        <!--<glyph glyph-code="E3F3" smufl-name="accSagittalGrave" />-->
+        <glyph glyph-code="E3F0" smufl-name="accSagittalShaftUp" />
+        <glyph glyph-code="E3F1" smufl-name="accSagittalShaftDown" />
+        <glyph glyph-code="E3F2" smufl-name="accSagittalAcute" />
+        <glyph glyph-code="E3F3" smufl-name="accSagittalGrave" />
         <range_end>U+E3FF</range_end>
         <range_start>U+E3F0</range_start>
     </herculeanSagittalExtensionVeryHighPrecisionAccidentalDiacritics>
@@ -1029,28 +1029,28 @@
     </magratheanSagittalExtensionInsanePrecisionAccidentalDiacritics>
     <wyschnegradskyAccidentals72Edo>
         <description>Wyschnegradsky accidentals (72-EDO)</description>
-        <!--<glyph glyph-code="E420" smufl-name="accidentalWyschnegradsky1TwelfthsSharp" />-->
-        <!--<glyph glyph-code="E421" smufl-name="accidentalWyschnegradsky2TwelfthsSharp" />-->
-        <!--<glyph glyph-code="E422" smufl-name="accidentalWyschnegradsky3TwelfthsSharp" />-->
-        <!--<glyph glyph-code="E423" smufl-name="accidentalWyschnegradsky4TwelfthsSharp" />-->
-        <!--<glyph glyph-code="E424" smufl-name="accidentalWyschnegradsky5TwelfthsSharp" />-->
-        <!--<glyph glyph-code="E425" smufl-name="accidentalWyschnegradsky6TwelfthsSharp" />-->
-        <!--<glyph glyph-code="E426" smufl-name="accidentalWyschnegradsky7TwelfthsSharp" />-->
-        <!--<glyph glyph-code="E427" smufl-name="accidentalWyschnegradsky8TwelfthsSharp" />-->
-        <!--<glyph glyph-code="E428" smufl-name="accidentalWyschnegradsky9TwelfthsSharp" />-->
-        <!--<glyph glyph-code="E429" smufl-name="accidentalWyschnegradsky10TwelfthsSharp" />-->
-        <!--<glyph glyph-code="E42A" smufl-name="accidentalWyschnegradsky11TwelfthsSharp" />-->
-        <!--<glyph glyph-code="E42B" smufl-name="accidentalWyschnegradsky1TwelfthsFlat" />-->
-        <!--<glyph glyph-code="E42C" smufl-name="accidentalWyschnegradsky2TwelfthsFlat" />-->
-        <!--<glyph glyph-code="E42D" smufl-name="accidentalWyschnegradsky3TwelfthsFlat" />-->
-        <!--<glyph glyph-code="E42E" smufl-name="accidentalWyschnegradsky4TwelfthsFlat" />-->
-        <!--<glyph glyph-code="E42F" smufl-name="accidentalWyschnegradsky5TwelfthsFlat" />-->
-        <!--<glyph glyph-code="E430" smufl-name="accidentalWyschnegradsky6TwelfthsFlat" />-->
-        <!--<glyph glyph-code="E431" smufl-name="accidentalWyschnegradsky7TwelfthsFlat" />-->
-        <!--<glyph glyph-code="E432" smufl-name="accidentalWyschnegradsky8TwelfthsFlat" />-->
-        <!--<glyph glyph-code="E433" smufl-name="accidentalWyschnegradsky9TwelfthsFlat" />-->
-        <!--<glyph glyph-code="E434" smufl-name="accidentalWyschnegradsky10TwelfthsFlat" />-->
-        <!--<glyph glyph-code="E435" smufl-name="accidentalWyschnegradsky11TwelfthsFlat" />-->
+        <glyph glyph-code="E420" smufl-name="accidentalWyschnegradsky1TwelfthsSharp" />
+        <glyph glyph-code="E421" smufl-name="accidentalWyschnegradsky2TwelfthsSharp" />
+        <glyph glyph-code="E422" smufl-name="accidentalWyschnegradsky3TwelfthsSharp" />
+        <glyph glyph-code="E423" smufl-name="accidentalWyschnegradsky4TwelfthsSharp" />
+        <glyph glyph-code="E424" smufl-name="accidentalWyschnegradsky5TwelfthsSharp" />
+        <glyph glyph-code="E425" smufl-name="accidentalWyschnegradsky6TwelfthsSharp" />
+        <glyph glyph-code="E426" smufl-name="accidentalWyschnegradsky7TwelfthsSharp" />
+        <glyph glyph-code="E427" smufl-name="accidentalWyschnegradsky8TwelfthsSharp" />
+        <glyph glyph-code="E428" smufl-name="accidentalWyschnegradsky9TwelfthsSharp" />
+        <glyph glyph-code="E429" smufl-name="accidentalWyschnegradsky10TwelfthsSharp" />
+        <glyph glyph-code="E42A" smufl-name="accidentalWyschnegradsky11TwelfthsSharp" />
+        <glyph glyph-code="E42B" smufl-name="accidentalWyschnegradsky1TwelfthsFlat" />
+        <glyph glyph-code="E42C" smufl-name="accidentalWyschnegradsky2TwelfthsFlat" />
+        <glyph glyph-code="E42D" smufl-name="accidentalWyschnegradsky3TwelfthsFlat" />
+        <glyph glyph-code="E42E" smufl-name="accidentalWyschnegradsky4TwelfthsFlat" />
+        <glyph glyph-code="E42F" smufl-name="accidentalWyschnegradsky5TwelfthsFlat" />
+        <glyph glyph-code="E430" smufl-name="accidentalWyschnegradsky6TwelfthsFlat" />
+        <glyph glyph-code="E431" smufl-name="accidentalWyschnegradsky7TwelfthsFlat" />
+        <glyph glyph-code="E432" smufl-name="accidentalWyschnegradsky8TwelfthsFlat" />
+        <glyph glyph-code="E433" smufl-name="accidentalWyschnegradsky9TwelfthsFlat" />
+        <glyph glyph-code="E434" smufl-name="accidentalWyschnegradsky10TwelfthsFlat" />
+        <glyph glyph-code="E435" smufl-name="accidentalWyschnegradsky11TwelfthsFlat" />
         <range_end>U+E43F</range_end>
         <range_start>U+E420</range_start>
     </wyschnegradskyAccidentals72Edo>
@@ -1069,14 +1069,14 @@
     </arelEzgiUzdilekAeuAccidentals>
     <turkishFolkMusicAccidentals>
         <description>Turkish folk music accidentals</description>
-        <!--<glyph glyph-code="E450" smufl-name="accidental1CommaSharp" />-->
-        <!--<glyph glyph-code="E451" smufl-name="accidental2CommaSharp" />-->
-        <!--<glyph glyph-code="E452" smufl-name="accidental3CommaSharp" />-->
-        <!--<glyph glyph-code="E453" smufl-name="accidental5CommaSharp" />-->
-        <!--<glyph glyph-code="E454" smufl-name="accidental1CommaFlat" />-->
-        <!--<glyph glyph-code="E455" smufl-name="accidental2CommaFlat" />-->
-        <!--<glyph glyph-code="E456" smufl-name="accidental3CommaFlat" />-->
-        <!--<glyph glyph-code="E457" smufl-name="accidental4CommaFlat" />-->
+        <glyph glyph-code="E450" smufl-name="accidental1CommaSharp" />
+        <glyph glyph-code="E451" smufl-name="accidental2CommaSharp" />
+        <glyph glyph-code="E452" smufl-name="accidental3CommaSharp" />
+        <glyph glyph-code="E453" smufl-name="accidental5CommaSharp" />
+        <glyph glyph-code="E454" smufl-name="accidental1CommaFlat" />
+        <glyph glyph-code="E455" smufl-name="accidental2CommaFlat" />
+        <glyph glyph-code="E456" smufl-name="accidental3CommaFlat" />
+        <glyph glyph-code="E457" smufl-name="accidental4CommaFlat" />
         <range_end>U+E45F</range_end>
         <range_start>U+E450</range_start>
     </turkishFolkMusicAccidentals>
@@ -1089,36 +1089,36 @@
     </persianAccidentals>
     <otherAccidentals>
         <description>Other accidentals</description>
-        <!--<glyph glyph-code="E470" smufl-name="accidentalXenakisOneThirdToneSharp" />-->
-        <!--<glyph glyph-code="E471" smufl-name="accidentalXenakisTwoThirdTonesSharp" />-->
-        <!--<glyph glyph-code="E472" smufl-name="accidentalQuarterToneSharpBusotti" />-->
-        <!--<glyph glyph-code="E473" smufl-name="accidentalSharpOneHorizontalStroke" />-->
-        <!--<glyph glyph-code="E474" smufl-name="accidentalThreeQuarterTonesSharpBusotti" />-->
-        <!--<glyph glyph-code="E475" smufl-name="accidentalQuarterToneSharpWiggle" />-->
-        <!--<glyph glyph-code="E476" smufl-name="accidentalTavenerSharp" />-->
-        <!--<glyph glyph-code="E477" smufl-name="accidentalTavenerFlat" />-->
-        <!--<glyph glyph-code="E478" smufl-name="accidentalQuarterToneFlatPenderecki" />-->
-        <!--<glyph glyph-code="E479" smufl-name="accidentalCommaSlashUp" />-->
-        <!--<glyph glyph-code="E47A" smufl-name="accidentalCommaSlashDown" />-->
-        <!--<glyph glyph-code="E47B" smufl-name="accidentalWilsonPlus" />-->
-        <!--<glyph glyph-code="E47C" smufl-name="accidentalWilsonMinus" />-->
-        <!--<glyph glyph-code="E47D" smufl-name="accidentalLargeDoubleSharp" />-->
-        <!--<glyph glyph-code="E47E" smufl-name="accidentalQuarterToneSharp4" />-->
-        <!--<glyph glyph-code="E47F" smufl-name="accidentalQuarterToneFlat4" />-->
-        <!--<glyph glyph-code="E480" smufl-name="accidentalQuarterToneFlatFilledReversed" />-->
-        <!--<glyph glyph-code="E481" smufl-name="accidentalSharpReversed" />-->
-        <!--<glyph glyph-code="E482" smufl-name="accidentalNaturalReversed" />-->
-        <!--<glyph glyph-code="E483" smufl-name="accidentalDoubleFlatReversed" />-->
-        <!--<glyph glyph-code="E484" smufl-name="accidentalFlatTurned" />-->
-        <!--<glyph glyph-code="E485" smufl-name="accidentalDoubleFlatTurned" />-->
-        <!--<glyph glyph-code="E486" smufl-name="accidentalThreeQuarterTonesFlatGrisey" />-->
-        <!--<glyph glyph-code="E487" smufl-name="accidentalThreeQuarterTonesFlatTartini" />-->
-        <!--<glyph glyph-code="E488" smufl-name="accidentalQuarterToneFlatVanBlankenburg" />-->
-        <!--<glyph glyph-code="E489" smufl-name="accidentalThreeQuarterTonesFlatCouper" />-->
-        <!--<glyph glyph-code="E48A" smufl-name="accidentalOneThirdToneSharpFerneyhough" />-->
-        <!--<glyph glyph-code="E48B" smufl-name="accidentalOneThirdToneFlatFerneyhough" />-->
-        <!--<glyph glyph-code="E48C" smufl-name="accidentalTwoThirdTonesSharpFerneyhough" />-->
-        <!--<glyph glyph-code="E48D" smufl-name="accidentalTwoThirdTonesFlatFerneyhough" />-->
+        <glyph glyph-code="E470" smufl-name="accidentalXenakisOneThirdToneSharp" />
+        <glyph glyph-code="E471" smufl-name="accidentalXenakisTwoThirdTonesSharp" />
+        <glyph glyph-code="E472" smufl-name="accidentalQuarterToneSharpBusotti" />
+        <glyph glyph-code="E473" smufl-name="accidentalSharpOneHorizontalStroke" />
+        <glyph glyph-code="E474" smufl-name="accidentalThreeQuarterTonesSharpBusotti" />
+        <glyph glyph-code="E475" smufl-name="accidentalQuarterToneSharpWiggle" />
+        <glyph glyph-code="E476" smufl-name="accidentalTavenerSharp" />
+        <glyph glyph-code="E477" smufl-name="accidentalTavenerFlat" />
+        <glyph glyph-code="E478" smufl-name="accidentalQuarterToneFlatPenderecki" />
+        <glyph glyph-code="E479" smufl-name="accidentalCommaSlashUp" />
+        <glyph glyph-code="E47A" smufl-name="accidentalCommaSlashDown" />
+        <glyph glyph-code="E47B" smufl-name="accidentalWilsonPlus" />
+        <glyph glyph-code="E47C" smufl-name="accidentalWilsonMinus" />
+        <glyph glyph-code="E47D" smufl-name="accidentalLargeDoubleSharp" />
+        <glyph glyph-code="E47E" smufl-name="accidentalQuarterToneSharp4" />
+        <glyph glyph-code="E47F" smufl-name="accidentalQuarterToneFlat4" />
+        <glyph glyph-code="E480" smufl-name="accidentalQuarterToneFlatFilledReversed" />
+        <glyph glyph-code="E481" smufl-name="accidentalSharpReversed" />
+        <glyph glyph-code="E482" smufl-name="accidentalNaturalReversed" />
+        <glyph glyph-code="E483" smufl-name="accidentalDoubleFlatReversed" />
+        <glyph glyph-code="E484" smufl-name="accidentalFlatTurned" />
+        <glyph glyph-code="E485" smufl-name="accidentalDoubleFlatTurned" />
+        <glyph glyph-code="E486" smufl-name="accidentalThreeQuarterTonesFlatGrisey" />
+        <glyph glyph-code="E487" smufl-name="accidentalThreeQuarterTonesFlatTartini" />
+        <glyph glyph-code="E488" smufl-name="accidentalQuarterToneFlatVanBlankenburg" />
+        <glyph glyph-code="E489" smufl-name="accidentalThreeQuarterTonesFlatCouper" />
+        <glyph glyph-code="E48A" smufl-name="accidentalOneThirdToneSharpFerneyhough" />
+        <glyph glyph-code="E48B" smufl-name="accidentalOneThirdToneFlatFerneyhough" />
+        <glyph glyph-code="E48C" smufl-name="accidentalTwoThirdTonesSharpFerneyhough" />
+        <glyph glyph-code="E48D" smufl-name="accidentalTwoThirdTonesFlatFerneyhough" />
         <range_end>U+E49F</range_end>
         <range_start>U+E470</range_start>
     </otherAccidentals>
@@ -3129,15 +3129,15 @@
     </fingering>
     <arabicAccidentals>
         <description>Arabic accidentals</description>
-        <!--<glyph glyph-code="ED30" smufl-name="accidentalDoubleFlatArabic" />-->
-        <!--<glyph glyph-code="ED31" smufl-name="accidentalThreeQuarterTonesFlatArabic" />-->
-        <!--<glyph glyph-code="ED32" smufl-name="accidentalFlatArabic" />-->
-        <!--<glyph glyph-code="ED33" smufl-name="accidentalQuarterToneFlatArabic" />-->
-        <!--<glyph glyph-code="ED34" smufl-name="accidentalNaturalArabic" />-->
-        <!--<glyph glyph-code="ED35" smufl-name="accidentalQuarterToneSharpArabic" />-->
-        <!--<glyph glyph-code="ED36" smufl-name="accidentalSharpArabic" />-->
-        <!--<glyph glyph-code="ED37" smufl-name="accidentalThreeQuarterTonesSharpArabic" />-->
-        <!--<glyph glyph-code="ED38" smufl-name="accidentalDoubleSharpArabic" />-->
+        <glyph glyph-code="ED30" smufl-name="accidentalDoubleFlatArabic" />
+        <glyph glyph-code="ED31" smufl-name="accidentalThreeQuarterTonesFlatArabic" />
+        <glyph glyph-code="ED32" smufl-name="accidentalFlatArabic" />
+        <glyph glyph-code="ED33" smufl-name="accidentalQuarterToneFlatArabic" />
+        <glyph glyph-code="ED34" smufl-name="accidentalNaturalArabic" />
+        <glyph glyph-code="ED35" smufl-name="accidentalQuarterToneSharpArabic" />
+        <glyph glyph-code="ED36" smufl-name="accidentalSharpArabic" />
+        <glyph glyph-code="ED37" smufl-name="accidentalThreeQuarterTonesSharpArabic" />
+        <glyph glyph-code="ED38" smufl-name="accidentalDoubleSharpArabic" />
         <range_end>U+ED3F</range_end>
         <range_start>U+ED30</range_start>
     </arabicAccidentals>
@@ -3156,13 +3156,13 @@
     </articulationSupplement>
     <standardAccidentalsChordSymbols>
         <description>Standard accidentals for chord symbols</description>
-        <!--<glyph glyph-code="ED60" smufl-name="csymAccidentalFlat" />-->
-        <!--<glyph glyph-code="ED61" smufl-name="csymAccidentalNatural" />-->
-        <!--<glyph glyph-code="ED62" smufl-name="csymAccidentalSharp" />-->
-        <!--<glyph glyph-code="ED63" smufl-name="csymAccidentalDoubleSharp" />-->
-        <!--<glyph glyph-code="ED64" smufl-name="csymAccidentalDoubleFlat" />-->
-        <!--<glyph glyph-code="ED65" smufl-name="csymAccidentalTripleSharp" />-->
-        <!--<glyph glyph-code="ED66" smufl-name="csymAccidentalTripleFlat" />-->
+        <glyph glyph-code="ED60" smufl-name="csymAccidentalFlat" />
+        <glyph glyph-code="ED61" smufl-name="csymAccidentalNatural" />
+        <glyph glyph-code="ED62" smufl-name="csymAccidentalSharp" />
+        <glyph glyph-code="ED63" smufl-name="csymAccidentalDoubleSharp" />
+        <glyph glyph-code="ED64" smufl-name="csymAccidentalDoubleFlat" />
+        <glyph glyph-code="ED65" smufl-name="csymAccidentalTripleSharp" />
+        <glyph glyph-code="ED66" smufl-name="csymAccidentalTripleFlat" />
         <range_end>U+ED6F</range_end>
         <range_start>U+ED60</range_start>
     </standardAccidentalsChordSymbols>

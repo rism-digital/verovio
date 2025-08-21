@@ -402,6 +402,28 @@
     <a n="cutOutNW" x="0.13" y="0.61" />
     <a n="cutOutSE" x="0.86" y="-0.59" />
   </g>
+  <g c="E276" x="0.0" y="-125.0" w="296.0" h="487.0" h-a-x="248" n="accidentalFiveQuarterTonesSharpArrowUp">
+    <a n="cutOutNW" x="0.37" y="0.64" />
+  </g>
+  <g c="E277" x="-48.0" y="-365.0" w="296.0" h="487.0" h-a-x="248" n="accidentalThreeQuarterTonesSharpArrowDown">
+    <a n="cutOutSE" x="0.63" y="-0.65" />
+  </g>
+  <g c="E278" x="0.0" y="-175.0" w="411.0" h="798.0" h-a-x="411" n="accidentalThreeQuarterTonesFlatArrowUp">
+    <a n="cutOutNE" x="1.26" y="0.69" />
+    <a n="cutOutSE" x="1.3" y="-0.46" />
+  </g>
+  <g c="E279" x="-60.0" y="-418.0" w="473.0" h="860.0" h-a-x="413" n="accidentalFiveQuarterTonesFlatArrowDown">
+    <a n="cutOutNE" x="1.02" y="0.67" />
+    <a n="cutOutSE" x="0.58" y="-0.78" />
+  </g>
+  <g c="E27A" x="0.0" y="-125.0" w="185.0" h="515.0" h-a-x="185" n="accidentalArrowUp">
+    <a n="cutOutSE" x="0.53" y="0.66" />
+    <a n="cutOutSW" x="0.2" y="0.66" />
+  </g>
+  <g c="E27B" x="0.0" y="-127.0" w="185.0" h="515.0" h-a-x="185" n="accidentalArrowDown">
+    <a n="cutOutNE" x="0.51" y="0.38" />
+    <a n="cutOutNW" x="0.22" y="0.38" />
+  </g>
   <g c="E280" x="1.0" y="-175.0" w="226.0" h="614.0" h-a-x="227" n="accidentalQuarterToneFlatStein">
     <a n="cutOutNW" x="0.63" y="0.68" />
     <a n="cutOutSW" x="0.34" y="-0.43" />
@@ -421,6 +443,587 @@
     <a n="cutOutNW" x="0.14" y="0.6" />
     <a n="cutOutSE" x="1.13" y="-0.5" />
     <a n="cutOutSW" x="0.14" y="-0.9" />
+  </g>
+  <g c="E284" x="0.0" y="-194.0" w="164.0" h="615.0" h-a-x="164" n="accidentalNarrowReversedFlat">
+    <a n="cutOutNW" x="0.45" y="0.73" />
+    <a n="cutOutSW" x="0.21" y="-0.45" />
+  </g>
+  <g c="E285" x="0.0" y="-194.0" w="414.0" h="615.0" h-a-x="414" n="accidentalNarrowReversedFlatAndFlat">
+    <a n="cutOutNE" x="0.99" y="0.74" />
+    <a n="cutOutNW" x="0.44" y="0.74" />
+    <a n="cutOutSE" x="1.35" y="-0.46" />
+    <a n="cutOutSW" x="0.2" y="-0.46" />
+  </g>
+  <g c="E290" x="2.0" y="-174.0" w="310.0" h="809.0" h-a-x="312" n="accidentalReversedFlatArrowUp">
+    <a n="cutOutNW" x="0.26" y="0.68" />
+    <a n="cutOutSE" x="0.99" y="1.41" />
+    <a n="cutOutSW" x="0.36" y="-0.46" />
+  </g>
+  <g c="E291" x="2.0" y="-483.0" w="303.0" h="920.0" h-a-x="305" n="accidentalReversedFlatArrowDown">
+    <a n="cutOutNE" x="0.95" y="-0.84" />
+    <a n="cutOutNW" x="0.64" y="0.68" />
+    <a n="cutOutSW" x="0.22" y="-0.39" />
+  </g>
+  <g c="E292" x="0.0" y="-174.0" w="310.0" h="809.0" h-a-x="310" n="accidentalFilledReversedFlatArrowUp">
+    <a n="cutOutNW" x="0.23" y="0.68" />
+    <a n="cutOutSE" x="0.98" y="1.42" />
+    <a n="cutOutSW" x="0.28" y="-0.42" />
+  </g>
+  <g c="E293" x="1.0" y="-483.0" w="303.0" h="920.0" h-a-x="304" n="accidentalFilledReversedFlatArrowDown">
+    <a n="cutOutNE" x="0.97" y="-0.82" />
+    <a n="cutOutNW" x="0.63" y="0.68" />
+    <a n="cutOutSW" x="0.22" y="-0.36" />
+  </g>
+  <g c="E294" x="0.0" y="-175.0" w="385.0" h="722.0" h-a-x="385" n="accidentalReversedFlatAndFlatArrowUp">
+    <a n="cutOutNE" x="1.32" y="0.7" />
+    <a n="cutOutNW" x="0.24" y="0.7" />
+    <a n="cutOutSE" x="1.31" y="-0.46" />
+    <a n="cutOutSW" x="0.24" y="-0.44" />
+  </g>
+  <g c="E295" x="0.0" y="-553.0" w="385.0" h="990.0" h-a-x="385" n="accidentalReversedFlatAndFlatArrowDown">
+    <a n="cutOutNE" x="0.94" y="0.68" />
+    <a n="cutOutNW" x="0.59" y="0.67" />
+    <a n="cutOutSE" x="1.3" y="-0.41" />
+    <a n="cutOutSW" x="0.22" y="-0.41" />
+  </g>
+  <g c="E296" x="0.0" y="-175.0" w="365.0" h="612.0" h-a-x="365" n="accidentalFilledReversedFlatAndFlat">
+    <a n="cutOutNE" x="0.92" y="0.68" />
+    <a n="cutOutNW" x="0.58" y="0.68" />
+    <a n="cutOutSE" x="1.14" y="-0.44" />
+    <a n="cutOutSW" x="0.32" y="-0.42" />
+  </g>
+  <g c="E297" x="0.0" y="-175.0" w="365.0" h="722.0" h-a-x="365" n="accidentalFilledReversedFlatAndFlatArrowUp">
+    <a n="cutOutNE" x="1.27" y="0.65" />
+    <a n="cutOutNW" x="0.24" y="0.65" />
+    <a n="cutOutSE" x="1.12" y="-0.44" />
+    <a n="cutOutSW" x="0.37" y="-0.44" />
+  </g>
+  <g c="E298" x="0.0" y="-553.0" w="365.0" h="990.0" h-a-x="365" n="accidentalFilledReversedFlatAndFlatArrowDown">
+    <a n="cutOutNE" x="0.93" y="0.68" />
+    <a n="cutOutNW" x="0.58" y="0.68" />
+    <a n="cutOutSE" x="1.28" y="-0.37" />
+    <a n="cutOutSW" x="0.18" y="-0.37" />
+  </g>
+  <g c="E299" x="-2.0" y="-337.0" w="234.0" h="884.0" h-a-x="232" n="accidentalHalfSharpArrowUp">
+    <a n="cutOutSE" x="0.59" y="-0.75" />
+    <a n="cutOutSW" x="0.3" y="-0.91" />
+  </g>
+  <g c="E29A" x="-3.0" y="-542.0" w="234.0" h="864.0" h-a-x="231" n="accidentalHalfSharpArrowDown">
+    <a n="cutOutNE" x="0.58" y="0.86" />
+    <a n="cutOutNW" x="0.29" y="0.68" />
+  </g>
+  <g c="E29B" x="3.0" y="-347.0" w="366.0" h="955.0" h-a-x="369" n="accidentalOneAndAHalfSharpsArrowUp">
+    <a n="cutOutNW" x="0.44" y="1.33" />
+    <a n="cutOutSE" x="1.34" y="1.3" />
+  </g>
+  <g c="E29C" x="-51.0" y="-591.0" w="368.0" h="960.0" h-a-x="317" n="accidentalOneAndAHalfSharpsArrowDown">
+    <a n="cutOutNW" x="0.13" y="0.62" />
+    <a n="cutOutSE" x="0.8" y="-1.22" />
+  </g>
+  <g c="E2A0" x="0.0" y="-103.0" w="303.0" h="678.0" h-a-x="303" n="accidentalSims12Down">
+    <a n="cutOutNW" x="0.74" y="0.5" />
+    <a n="cutOutSW" x="0.36" y="-0.22" />
+  </g>
+  <g c="E2A1" x="0.0" y="-132.0" w="272.0" h="678.0" h-a-x="272" n="accidentalSims6Down">
+    <a n="cutOutNW" x="0.74" y="0.5" />
+    <a n="cutOutSW" x="0.36" y="-0.23" />
+  </g>
+  <g c="E2A2" x="0.0" y="-132.0" w="488.0" h="761.0" h-a-x="321" n="accidentalSims4Down">
+    <a n="cutOutNW" x="0.71" y="0.5" />
+    <a n="cutOutSE" x="1.19" y="1.9" />
+  </g>
+  <g c="E2A3" x="0.0" y="-546.0" w="303.0" h="678.0" h-a-x="303" n="accidentalSims12Up">
+    <a n="cutOutSE" x="0.84" y="-0.36" />
+    <a n="cutOutSW" x="0.36" y="-0.36" />
+  </g>
+  <g c="E2A4" x="0.0" y="-545.0" w="272.0" h="678.0" h-a-x="272" n="accidentalSims6Up">
+    <a n="cutOutSW" x="0.72" y="-0.5" />
+  </g>
+  <g c="E2A5" x="-121.0" y="-689.0" w="393.0" h="822.0" h-a-x="272" n="accidentalSims4Up" />
+  <g c="E2B0" x="0.0" y="-75.0" w="150.0" h="150.0" h-a-x="150" n="accidentalJohnstonPlus" />
+  <g c="E2B1" x="0.0" y="-15.0" w="150.0" h="30.0" h-a-x="150" n="accidentalJohnstonMinus" />
+  <g c="E2B2" x="0.0" y="-185.0" w="160.0" h="315.0" h-a-x="160" n="accidentalJohnstonEl" />
+  <g c="E2B3" x="0.0" y="-130.0" w="160.0" h="315.0" h-a-x="160" n="accidentalJohnstonSeven" />
+  <g c="E2B4" x="0.0" y="-125.0" w="180.0" h="305.0" h-a-x="180" n="accidentalJohnstonUp" />
+  <g c="E2B5" x="0.0" y="-180.0" w="180.0" h="305.0" h-a-x="180" n="accidentalJohnstonDown" />
+  <g c="E2B6" x="20.0" y="-97.0" w="170.0" h="191.0" h-a-x="200" n="accidentalJohnston13" />
+  <g c="E2B7" x="10.0" y="-94.0" w="170.0" h="191.0" h-a-x="200" n="accidentalJohnston31" />
+  <g c="E2C0" x="0.0" y="-352.0" w="417.0" h="789.0" h-a-x="419" n="accidentalDoubleFlatOneArrowDown">
+    <a n="cutOutNE" x="0.99" y="0.68" />
+    <a n="cutOutSE" x="1.23" y="-0.58" />
+    <a n="cutOutSW" x="0.39" y="-0.8" />
+  </g>
+  <g c="E2C1" x="-71.0" y="-352.0" w="297.0" h="789.0" h-a-x="228" n="accidentalFlatOneArrowDown">
+    <a n="cutOutNE" x="0.21" y="0.67" />
+    <a n="cutOutSE" x="0.45" y="-0.54" />
+  </g>
+  <g c="E2C2" x="0.0" y="-420.0" w="238.0" h="763.0" h-a-x="169" n="accidentalNaturalOneArrowDown">
+    <a n="cutOutNE" x="0.75" y="-1.03" />
+    <a n="cutOutSW" x="0.18" y="-0.85" />
+  </g>
+  <g c="E2C3" x="0.0" y="-514.0" w="268.0" h="864.0" h-a-x="250" n="accidentalSharpOneArrowDown">
+    <a n="cutOutNE" x="0.87" y="0.92" />
+    <a n="cutOutNW" x="0.12" y="0.6" />
+    <a n="cutOutSW" x="0.12" y="-0.92" />
+  </g>
+  <g c="E2C4" x="-1.0" y="-322.0" w="247.0" h="449.0" h-a-x="247" n="accidentalDoubleSharpOneArrowDown" />
+  <g c="E2C5" x="-70.0" y="-183.0" w="487.0" h="717.0" h-a-x="416" n="accidentalDoubleFlatOneArrowUp">
+    <a n="cutOutNE" x="0.97" y="0.65" />
+    <a n="cutOutSE" x="1.31" y="-0.44" />
+  </g>
+  <g c="E2C6" x="-71.0" y="-182.0" w="297.0" h="717.0" h-a-x="226" n="accidentalFlatOneArrowUp">
+    <a n="cutOutNE" x="0.45" y="0.67" />
+    <a n="cutOutSE" x="0.54" y="-0.45" />
+  </g>
+  <g c="E2C7" x="-70.0" y="-332.0" w="239.0" h="758.0" h-a-x="169" n="accidentalNaturalOneArrowUp">
+    <a n="cutOutNE" x="0.45" y="0.83" />
+    <a n="cutOutSW" x="0.46" y="-0.84" />
+  </g>
+  <g c="E2C8" x="-20.0" y="-348.0" w="269.0" h="857.0" h-a-x="250" n="accidentalSharpOneArrowUp">
+    <a n="cutOutNE" x="0.66" y="1.47" />
+    <a n="cutOutSE" x="0.88" y="-0.6" />
+    <a n="cutOutSW" x="0.11" y="-0.9" />
+  </g>
+  <g c="E2C9" x="-1.0" y="-124.0" w="247.0" h="455.0" h-a-x="248" n="accidentalDoubleSharpOneArrowUp" />
+  <g c="E2CA" x="0.0" y="-462.0" w="417.0" h="899.0" h-a-x="419" n="accidentalDoubleFlatTwoArrowsDown">
+    <a n="cutOutNE" x="0.96" y="0.66" />
+    <a n="cutOutSE" x="1.23" y="-0.57" />
+    <a n="cutOutSW" x="0.37" y="-0.81" />
+  </g>
+  <g c="E2CB" x="-70.0" y="-463.0" w="296.0" h="900.0" h-a-x="228" n="accidentalFlatTwoArrowsDown">
+    <a n="cutOutNE" x="0.19" y="0.68" />
+    <a n="cutOutNW" x="-0.1" y="-0.76" />
+    <a n="cutOutSE" x="0.47" y="-0.55" />
+  </g>
+  <g c="E2CC" x="0.0" y="-532.0" w="239.0" h="875.0" h-a-x="169" n="accidentalNaturalTwoArrowsDown">
+    <a n="cutOutNE" x="0.76" y="-1.01" />
+    <a n="cutOutSW" x="0.18" y="-0.84" />
+  </g>
+  <g c="E2CD" x="0.0" y="-625.0" w="269.0" h="975.0" h-a-x="250" n="accidentalSharpTwoArrowsDown">
+    <a n="cutOutNE" x="0.87" y="0.92" />
+    <a n="cutOutSW" x="0.27" y="-1.47" />
+  </g>
+  <g c="E2CE" x="-1.0" y="-433.0" w="247.0" h="560.0" h-a-x="247" n="accidentalDoubleSharpTwoArrowsDown" />
+  <g c="E2CF" x="-71.0" y="-183.0" w="488.0" h="827.0" h-a-x="416" n="accidentalDoubleFlatTwoArrowsUp">
+    <a n="cutOutNE" x="0.98" y="0.67" />
+    <a n="cutOutSE" x="1.3" y="-0.44" />
+  </g>
+  <g c="E2D0" x="-71.0" y="-182.0" w="297.0" h="826.0" h-a-x="226" n="accidentalFlatTwoArrowsUp">
+    <a n="cutOutNE" x="0.46" y="0.7" />
+    <a n="cutOutSE" x="0.57" y="-0.43" />
+  </g>
+  <g c="E2D1" x="-71.0" y="-332.0" w="240.0" h="869.0" h-a-x="169" n="accidentalNaturalTwoArrowsUp">
+    <a n="cutOutNE" x="0.48" y="0.84" />
+    <a n="cutOutSW" x="0.46" y="-0.84" />
+  </g>
+  <g c="E2D2" x="-21.0" y="-348.0" w="270.0" h="967.0" h-a-x="250" n="accidentalSharpTwoArrowsUp">
+    <a n="cutOutNE" x="0.68" y="1.48" />
+    <a n="cutOutSE" x="0.88" y="-0.59" />
+    <a n="cutOutSW" x="0.12" y="-0.91" />
+  </g>
+  <g c="E2D3" x="-1.0" y="-124.0" w="247.0" h="565.0" h-a-x="248" n="accidentalDoubleSharpTwoArrowsUp" />
+  <g c="E2D4" x="0.0" y="-573.0" w="417.0" h="1010.0" h-a-x="419" n="accidentalDoubleFlatThreeArrowsDown">
+    <a n="cutOutNE" x="0.96" y="0.66" />
+    <a n="cutOutSE" x="1.26" y="-0.58" />
+    <a n="cutOutSW" x="0.36" y="-0.81" />
+  </g>
+  <g c="E2D5" x="-70.0" y="-573.0" w="296.0" h="1010.0" h-a-x="228" n="accidentalFlatThreeArrowsDown">
+    <a n="cutOutNE" x="0.22" y="0.67" />
+    <a n="cutOutSE" x="0.48" y="-0.56" />
+  </g>
+  <g c="E2D6" x="0.0" y="-642.0" w="239.0" h="985.0" h-a-x="169" n="accidentalNaturalThreeArrowsDown">
+    <a n="cutOutNE" x="0.76" y="-1.01" />
+    <a n="cutOutSW" x="0.19" y="-0.86" />
+  </g>
+  <g c="E2D7" x="0.0" y="-736.0" w="269.0" h="1086.0" h-a-x="250" n="accidentalSharpThreeArrowsDown">
+    <a n="cutOutNE" x="0.87" y="0.92" />
+    <a n="cutOutNW" x="0.12" y="0.62" />
+    <a n="cutOutSW" x="0.3" y="-1.46" />
+  </g>
+  <g c="E2D8" x="-1.0" y="-543.0" w="247.0" h="671.0" h-a-x="247" n="accidentalDoubleSharpThreeArrowsDown" />
+  <g c="E2D9" x="-71.0" y="-183.0" w="488.0" h="937.0" h-a-x="416" n="accidentalDoubleFlatThreeArrowsUp">
+    <a n="cutOutNE" x="0.97" y="0.67" />
+    <a n="cutOutSE" x="1.29" y="-0.44" />
+  </g>
+  <g c="E2DA" x="-71.0" y="-182.0" w="297.0" h="938.0" h-a-x="226" n="accidentalFlatThreeArrowsUp">
+    <a n="cutOutNE" x="0.46" y="0.68" />
+    <a n="cutOutSE" x="0.52" y="-0.46" />
+  </g>
+  <g c="E2DB" x="-71.0" y="-332.0" w="240.0" h="978.0" h-a-x="169" n="accidentalNaturalThreeArrowsUp">
+    <a n="cutOutNE" x="0.47" y="0.83" />
+    <a n="cutOutSW" x="0.45" y="-0.84" />
+  </g>
+  <g c="E2DC" x="-21.0" y="-348.0" w="270.0" h="1077.0" h-a-x="250" n="accidentalSharpThreeArrowsUp">
+    <a n="cutOutNE" x="0.68" y="1.5" />
+    <a n="cutOutSE" x="0.88" y="-0.6" />
+    <a n="cutOutSW" x="0.12" y="-0.91" />
+  </g>
+  <g c="E2DD" x="-1.0" y="-125.0" w="247.0" h="677.0" h-a-x="247" n="accidentalDoubleSharpThreeArrowsUp" />
+  <g c="E2DE" x="0.0" y="-95.0" w="171.0" h="529.0" h-a-x="172" n="accidentalLowerOneSeptimalComma">
+    <a n="cutOutNE" x="0.21" y="0.32" />
+  </g>
+  <g c="E2DF" x="1.0" y="-421.0" w="171.0" h="529.0" h-a-x="172" n="accidentalRaiseOneSeptimalComma">
+    <a n="cutOutSE" x="0.3" y="-0.35" />
+  </g>
+  <g c="E2E0" x="0.0" y="-293.0" w="171.0" h="694.0" h-a-x="172" n="accidentalLowerTwoSeptimalCommas">
+    <a n="cutOutNE" x="0.21" y="1.06" />
+  </g>
+  <g c="E2E1" x="0.0" y="-396.0" w="171.0" h="694.0" h-a-x="172" n="accidentalRaiseTwoSeptimalCommas">
+    <a n="cutOutSE" x="0.22" y="0.76" />
+  </g>
+  <g c="E2E2" x="0.0" y="-182.0" w="226.0" h="619.0" h-a-x="227" n="accidentalLowerOneUndecimalQuartertone">
+    <a n="cutOutNW" x="0.69" y="0.68" />
+    <a n="cutOutSW" x="0.3" y="-0.42" />
+  </g>
+  <g c="E2E3" x="0.0" y="-327.0" w="270.0" h="669.0" h-a-x="271" n="accidentalRaiseOneUndecimalQuartertone">
+    <a n="cutOutNE" x="0.74" y="0.56" />
+    <a n="cutOutNW" x="0.33" y="0.3" />
+    <a n="cutOutSE" x="0.74" y="-0.28" />
+    <a n="cutOutSW" x="0.33" y="-0.5" />
+  </g>
+  <g c="E2E4" x="0.0" y="-173.08" w="215.0" h="608.08" h-a-x="215" n="accidentalLowerOneTridecimalQuartertone">
+    <a n="cutOutNW" x="0.37" y="0.7" />
+    <a n="cutOutSW" x="0.3" y="-0.42" />
+  </g>
+  <g c="E2E5" x="-1.0" y="-325.0" w="270.0" h="706.0" h-a-x="270" n="accidentalRaiseOneTridecimalQuartertone">
+    <a n="cutOutNE" x="0.89" y="0.53" />
+    <a n="cutOutNW" x="0.19" y="0.2" />
+    <a n="cutOutSE" x="0.89" y="-0.18" />
+    <a n="cutOutSW" x="0.19" y="-0.54" />
+  </g>
+  <g c="E2E6" x="0.0" y="-176.0" w="198.0" h="346.0" h-a-x="199" n="accidentalCombiningLower17Schisma" />
+  <g c="E2E7" x="0.0" y="-176.0" w="198.0" h="346.0" h-a-x="199" n="accidentalCombiningRaise17Schisma" />
+  <g c="E2E8" x="0.0" y="-97.0" w="198.0" h="189.0" h-a-x="199" n="accidentalCombiningLower19Schisma" />
+  <g c="E2E9" x="0.0" y="-97.0" w="198.0" h="189.0" h-a-x="199" n="accidentalCombiningRaise19Schisma" />
+  <g c="E2EA" x="0.0" y="-125.0" w="247.0" h="420.0" h-a-x="245" n="accidentalCombiningLower23Limit29LimitComma" />
+  <g c="E2EB" x="0.0" y="-295.0" w="247.0" h="420.0" h-a-x="245" n="accidentalCombiningRaise23Limit29LimitComma" />
+  <g c="E2EC" x="0.0" y="-437.0" w="291.0" h="841.0" h-a-x="292" n="accidentalCombiningLower31Schisma" />
+  <g c="E2ED" x="1.0" y="-310.0" w="293.12" h="916.29" h-a-x="295" n="accidentalCombiningRaise31Schisma" />
+  <g c="E2EE" x="0.0" y="-123.0" w="137.0" h="455.0" h-a-x="138" n="accidentalCombiningOpenCurlyBrace" />
+  <g c="E2EF" x="0.0" y="-123.0" w="137.0" h="455.0" h-a-x="138" n="accidentalCombiningCloseCurlyBrace" />
+  <g c="E2F0" x="-99.0" y="-182.0" w="516.0" h="634.0" h-a-x="416" n="accidentalDoubleFlatEqualTempered">
+    <a n="cutOutNE" x="0.99" y="0.73" />
+    <a n="cutOutSE" x="1.29" y="-0.45" />
+  </g>
+  <g c="E2F1" x="-97.0" y="-182.0" w="323.0" h="634.0" h-a-x="226" n="accidentalFlatEqualTempered">
+    <a n="cutOutNE" x="0.6" y="0.72" />
+    <a n="cutOutSE" x="0.57" y="-0.44" />
+  </g>
+  <g c="E2F2" x="-99.0" y="-333.0" w="267.0" h="691.0" h-a-x="168" n="accidentalNaturalEqualTempered">
+    <a n="cutOutSW" x="0.45" y="-0.86" />
+  </g>
+  <g c="E2F3" x="-48.0" y="-348.0" w="297.0" h="792.0" h-a-x="250" n="accidentalSharpEqualTempered" />
+  <g c="E2F4" x="-1.0" y="-125.0" w="247.0" h="384.0" h-a-x="246" n="accidentalDoubleSharpEqualTempered" />
+  <g c="E300" x="0.0" y="-359.0" w="156.0" h="531.0" h-a-x="156" n="accSagittal5v7KleismaUp" />
+  <g c="E301" x="0.0" y="-172.0" w="156.0" h="531.0" h-a-x="157" n="accSagittal5v7KleismaDown" />
+  <g c="E302" x="0.0" y="-359.0" w="156.0" h="531.0" h-a-x="156" n="accSagittal5CommaUp" />
+  <g c="E303" x="0.0" y="-172.0" w="156.0" h="531.0" h-a-x="156" n="accSagittal5CommaDown" />
+  <g c="E304" x="0.0" y="-359.0" w="156.0" h="531.0" h-a-x="156" n="accSagittal7CommaUp" />
+  <g c="E305" x="0.0" y="-172.0" w="156.0" h="531.0" h-a-x="156" n="accSagittal7CommaDown" />
+  <g c="E306" x="0.0" y="-359.0" w="250.0" h="531.0" h-a-x="250" n="accSagittal25SmallDiesisUp" />
+  <g c="E307" x="0.0" y="-172.0" w="250.0" h="531.0" h-a-x="250" n="accSagittal25SmallDiesisDown" />
+  <g c="E308" x="0.0" y="-359.0" w="281.0" h="531.0" h-a-x="281" n="accSagittal35MediumDiesisUp" />
+  <g c="E309" x="0.0" y="-172.0" w="281.0" h="531.0" h-a-x="281" n="accSagittal35MediumDiesisDown" />
+  <g c="E30A" x="0.0" y="-359.0" w="344.0" h="531.0" h-a-x="344" n="accSagittal11MediumDiesisUp" />
+  <g c="E30B" x="0.0" y="-172.0" w="344.0" h="531.0" h-a-x="344" n="accSagittal11MediumDiesisDown" />
+  <g c="E30C" x="0.0" y="-359.0" w="344.0" h="531.0" h-a-x="344" n="accSagittal11LargeDiesisUp" />
+  <g c="E30D" x="0.0" y="-172.0" w="344.0" h="531.0" h-a-x="344" n="accSagittal11LargeDiesisDown" />
+  <g c="E30E" x="0.0" y="-172.0" w="375.0" h="531.0" h-a-x="375" n="accSagittal35LargeDiesisUp" />
+  <g c="E30F" x="0.0" y="-172.0" w="375.0" h="531.0" h-a-x="375" n="accSagittal35LargeDiesisDown" />
+  <g c="E310" x="0.0" y="-359.0" w="344.0" h="531.0" h-a-x="344" n="accSagittalSharp25SDown" />
+  <g c="E311" x="0.0" y="-172.0" w="344.0" h="531.0" h-a-x="345" n="accSagittalFlat25SUp" />
+  <g c="E312" x="0.0" y="-359.0" w="250.0" h="531.0" h-a-x="250" n="accSagittalSharp7CDown" />
+  <g c="E313" x="0.0" y="-172.0" w="250.0" h="531.0" h-a-x="250" n="accSagittalFlat7CUp" />
+  <g c="E314" x="0.0" y="-359.0" w="281.0" h="531.0" h-a-x="281" n="accSagittalSharp5CDown" />
+  <g c="E315" x="0.0" y="-172.0" w="281.0" h="531.0" h-a-x="281" n="accSagittalFlat5CUp" />
+  <g c="E316" x="0.0" y="-359.0" w="344.0" h="531.0" h-a-x="344" n="accSagittalSharp5v7kDown" />
+  <g c="E317" x="0.0" y="-172.0" w="344.0" h="531.0" h-a-x="344" n="accSagittalFlat5v7kUp" />
+  <g c="E318" x="0.0" y="-359.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalSharp" />
+  <g c="E319" x="0.0" y="-172.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalFlat" />
+  <g c="E31C" x="0.0" y="-361.0" w="312.0" h="533.0" h-a-x="312" n="accSagittalSharp5v7kUp" />
+  <g c="E31D" x="0.0" y="-172.0" w="312.0" h="533.0" h-a-x="312" n="accSagittalFlat5v7kDown" />
+  <g c="E31E" x="0.0" y="-359.0" w="312.0" h="531.0" h-a-x="312" n="accSagittalSharp5CUp" />
+  <g c="E31F" x="0.0" y="-172.0" w="312.0" h="531.0" h-a-x="312" n="accSagittalFlat5CDown" />
+  <g c="E320" x="0.0" y="-359.0" w="312.0" h="531.0" h-a-x="312" n="accSagittalSharp7CUp" />
+  <g c="E321" x="0.0" y="-172.0" w="312.0" h="531.0" h-a-x="312" n="accSagittalFlat7CDown" />
+  <g c="E322" x="0.0" y="-359.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalSharp25SUp" />
+  <g c="E323" x="0.0" y="-172.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalFlat25SDown" />
+  <g c="E324" x="0.0" y="-359.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalSharp35MUp" />
+  <g c="E325" x="0.0" y="-172.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalFlat35MDown" />
+  <g c="E326" x="0.0" y="-359.0" w="469.0" h="531.0" h-a-x="469" n="accSagittalSharp11MUp" />
+  <g c="E327" x="0.0" y="-172.0" w="469.0" h="531.0" h-a-x="469" n="accSagittalFlat11MDown" />
+  <g c="E328" x="0.0" y="-359.0" w="469.0" h="531.0" h-a-x="469" n="accSagittalSharp11LUp" />
+  <g c="E329" x="0.0" y="-172.0" w="469.0" h="531.0" h-a-x="469" n="accSagittalFlat11LDown" />
+  <g c="E32A" x="0.0" y="-359.0" w="500.0" h="531.0" h-a-x="500" n="accSagittalSharp35LUp" />
+  <g c="E32B" x="0.0" y="-172.0" w="500.0" h="531.0" h-a-x="500" n="accSagittalFlat35LDown" />
+  <g c="E32C" x="0.0" y="-359.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalDoubleSharp25SDown" />
+  <g c="E32D" x="0.0" y="-172.0" w="406.0" h="531.0" h-a-x="405" n="accSagittalDoubleFlat25SUp" />
+  <g c="E32E" x="0.0" y="-359.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalDoubleSharp7CDown" />
+  <g c="E32F" x="0.0" y="-172.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalDoubleFlat7CUp" />
+  <g c="E330" x="0.0" y="-359.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalDoubleSharp5CDown" />
+  <g c="E331" x="0.0" y="-172.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalDoubleFlat5CUp" />
+  <g c="E332" x="0.0" y="-359.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalDoubleSharp5v7kDown" />
+  <g c="E333" x="0.0" y="-172.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalDoubleFlat5v7kUp" />
+  <g c="E334" x="0.0" y="-359.0" w="469.0" h="531.0" h-a-x="469" n="accSagittalDoubleSharp" />
+  <g c="E335" x="0.0" y="-172.0" w="469.0" h="531.0" h-a-x="469" n="accSagittalDoubleFlat" />
+  <g c="E340" x="0.0" y="-359.0" w="219.0" h="531.0" h-a-x="219" n="accSagittal7v11KleismaUp" />
+  <g c="E341" x="0.0" y="-172.0" w="219.0" h="531.0" h-a-x="220" n="accSagittal7v11KleismaDown" />
+  <g c="E342" x="0.0" y="-359.0" w="281.0" h="531.0" h-a-x="281" n="accSagittal17CommaUp" />
+  <g c="E343" x="0.0" y="-172.0" w="281.0" h="531.0" h-a-x="282" n="accSagittal17CommaDown" />
+  <g c="E344" x="0.0" y="-359.0" w="219.0" h="531.0" h-a-x="219" n="accSagittal55CommaUp" />
+  <g c="E345" x="0.0" y="-172.0" w="219.0" h="531.0" h-a-x="219" n="accSagittal55CommaDown" />
+  <g c="E346" x="0.0" y="-359.0" w="188.0" h="531.0" h-a-x="187" n="accSagittal7v11CommaUp" />
+  <g c="E347" x="0.0" y="-172.0" w="188.0" h="531.0" h-a-x="187" n="accSagittal7v11CommaDown" />
+  <g c="E348" x="0.0" y="-359.0" w="312.0" h="531.0" h-a-x="312" n="accSagittal5v11SmallDiesisUp" />
+  <g c="E349" x="0.0" y="-172.0" w="312.0" h="531.0" h-a-x="313" n="accSagittal5v11SmallDiesisDown" />
+  <g c="E34A" x="0.0" y="-359.0" w="344.0" h="531.0" h-a-x="344" n="accSagittalSharp5v11SDown" />
+  <g c="E34B" x="0.0" y="-172.0" w="344.0" h="531.0" h-a-x="344" n="accSagittalFlat5v11SUp" />
+  <g c="E34C" x="0.0" y="-359.0" w="344.0" h="531.0" h-a-x="344" n="accSagittalSharp7v11CDown" />
+  <g c="E34D" x="0.0" y="-172.0" w="344.0" h="531.0" h-a-x="344" n="accSagittalFlat7v11CUp" />
+  <g c="E34E" x="0.0" y="-359.0" w="250.0" h="531.0" h-a-x="250" n="accSagittalSharp55CDown" />
+  <g c="E34F" x="0.0" y="-172.0" w="250.0" h="531.0" h-a-x="250" n="accSagittalFlat55CUp" />
+  <g c="E350" x="0.0" y="-359.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalSharp17CDown" />
+  <g c="E351" x="0.0" y="-172.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalFlat17CUp" />
+  <g c="E352" x="0.0" y="-359.0" w="312.0" h="531.0" h-a-x="312" n="accSagittalSharp7v11kDown" />
+  <g c="E353" x="0.0" y="-172.0" w="312.0" h="531.0" h-a-x="312" n="accSagittalFlat7v11kUp" />
+  <g c="E354" x="0.0" y="-359.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalSharp7v11kUp" />
+  <g c="E355" x="0.0" y="-172.0" w="406.0" h="531.0" h-a-x="405" n="accSagittalFlat7v11kDown" />
+  <g c="E356" x="0.0" y="-359.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalSharp17CUp" />
+  <g c="E357" x="0.0" y="-172.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalFlat17CDown" />
+  <g c="E358" x="0.0" y="-359.0" w="344.0" h="531.0" h-a-x="344" n="accSagittalSharp55CUp" />
+  <g c="E359" x="0.0" y="-172.0" w="344.0" h="531.0" h-a-x="344" n="accSagittalFlat55CDown" />
+  <g c="E35A" x="0.0" y="-359.0" w="344.0" h="531.0" h-a-x="344" n="accSagittalSharp7v11CUp" />
+  <g c="E35B" x="0.0" y="-172.0" w="344.0" h="531.0" h-a-x="344" n="accSagittalFlat7v11CDown" />
+  <g c="E35C" x="0.0" y="-359.0" w="438.0" h="531.0" h-a-x="437" n="accSagittalSharp5v11SUp" />
+  <g c="E35D" x="0.0" y="-172.0" w="438.0" h="531.0" h-a-x="437" n="accSagittalFlat5v11SDown" />
+  <g c="E35E" x="0.0" y="-359.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalDoubleSharp5v11SDown" />
+  <g c="E35F" x="0.0" y="-172.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalDoubleFlat5v11SUp" />
+  <g c="E360" x="0.0" y="-359.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalDoubleSharp7v11CDown" />
+  <g c="E361" x="0.0" y="-172.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalDoubleFlat7v11CUp" />
+  <g c="E362" x="0.0" y="-359.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalDoubleSharp55CDown" />
+  <g c="E363" x="0.0" y="-172.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalDoubleFlat55CUp" />
+  <g c="E364" x="0.0" y="-359.0" w="438.0" h="531.0" h-a-x="437" n="accSagittalDoubleSharp17CDown" />
+  <g c="E365" x="0.0" y="-172.0" w="438.0" h="531.0" h-a-x="437" n="accSagittalDoubleFlat17CUp" />
+  <g c="E366" x="0.0" y="-359.0" w="438.0" h="531.0" h-a-x="437" n="accSagittalDoubleSharp7v11kDown" />
+  <g c="E367" x="0.0" y="-172.0" w="438.0" h="531.0" h-a-x="437" n="accSagittalDoubleFlat7v11kUp" />
+  <g c="E370" x="0.0" y="-359.0" w="188.0" h="531.0" h-a-x="187" n="accSagittal23CommaUp" />
+  <g c="E371" x="0.0" y="-172.0" w="188.0" h="531.0" h-a-x="187" n="accSagittal23CommaDown" />
+  <g c="E372" x="0.0" y="-359.0" w="156.0" h="531.0" h-a-x="156" n="accSagittal5v19CommaUp" />
+  <g c="E373" x="0.0" y="-172.0" w="156.0" h="531.0" h-a-x="156" n="accSagittal5v19CommaDown" />
+  <g c="E374" x="0.0" y="-359.0" w="312.0" h="531.0" h-a-x="312" n="accSagittal5v23SmallDiesisUp" />
+  <g c="E375" x="0.0" y="-172.0" w="312.0" h="531.0" h-a-x="312" n="accSagittal5v23SmallDiesisDown" />
+  <g c="E376" x="0.0" y="-359.0" w="281.0" h="531.0" h-a-x="281" n="accSagittalSharp5v23SDown" />
+  <g c="E377" x="0.0" y="-172.0" w="281.0" h="531.0" h-a-x="281" n="accSagittalFlat5v23SUp" />
+  <g c="E378" x="0.0" y="-359.0" w="312.0" h="531.0" h-a-x="312" n="accSagittalSharp5v19CDown" />
+  <g c="E379" x="0.0" y="-172.0" w="312.0" h="531.0" h-a-x="313" n="accSagittalFlat5v19CUp" />
+  <g c="E37A" x="0.0" y="-359.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalSharp23CDown" />
+  <g c="E37B" x="0.0" y="-172.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalFlat23CUp" />
+  <g c="E37C" x="0.0" y="-359.0" w="344.0" h="531.0" h-a-x="344" n="accSagittalSharp23CUp" />
+  <g c="E37D" x="0.0" y="-172.0" w="344.0" h="531.0" h-a-x="344" n="accSagittalFlat23CDown" />
+  <g c="E37E" x="0.0" y="-359.0" w="312.0" h="531.0" h-a-x="312" n="accSagittalSharp5v19CUp" />
+  <g c="E37F" x="0.0" y="-172.0" w="312.0" h="531.0" h-a-x="312" n="accSagittalFlat5v19CDown" />
+  <g c="E380" x="0.0" y="-359.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalSharp5v23SUp" />
+  <g c="E381" x="0.0" y="-172.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalFlat5v23SDown" />
+  <g c="E382" x="0.0" y="-359.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalDoubleSharp5v23SDown" />
+  <g c="E383" x="0.0" y="-172.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalDoubleFlat5v23SUp" />
+  <g c="E384" x="0.0" y="-359.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalDoubleSharp5v19CDown" />
+  <g c="E385" x="0.0" y="-172.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalDoubleFlat5v19CUp" />
+  <g c="E386" x="0.0" y="-359.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalDoubleSharp23CDown" />
+  <g c="E387" x="0.0" y="-172.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalDoubleFlat23CUp" />
+  <g c="E390" x="0.0" y="-359.0" w="125.0" h="531.0" h-a-x="125" n="accSagittal19SchismaUp" />
+  <g c="E391" x="0.0" y="-172.0" w="125.0" h="531.0" h-a-x="125" n="accSagittal19SchismaDown" />
+  <g c="E392" x="0.0" y="-359.0" w="156.0" h="531.0" h-a-x="156" n="accSagittal17KleismaUp" />
+  <g c="E393" x="0.0" y="-172.0" w="156.0" h="531.0" h-a-x="156" n="accSagittal17KleismaDown" />
+  <g c="E394" x="0.0" y="-359.0" w="156.0" h="531.0" h-a-x="156" n="accSagittal143CommaUp" />
+  <g c="E395" x="0.0" y="-172.0" w="156.0" h="531.0" h-a-x="156" n="accSagittal143CommaDown" />
+  <g c="E396" x="0.0" y="-359.0" w="188.0" h="531.0" h-a-x="187" n="accSagittal11v49CommaUp" />
+  <g c="E397" x="0.0" y="-172.0" w="188.0" h="531.0" h-a-x="187" n="accSagittal11v49CommaDown" />
+  <g c="E398" x="0.0" y="-359.0" w="281.0" h="531.0" h-a-x="281" n="accSagittal19CommaUp" />
+  <g c="E399" x="0.0" y="-172.0" w="281.0" h="531.0" h-a-x="282" n="accSagittal19CommaDown" />
+  <g c="E39A" x="0.0" y="-359.0" w="250.0" h="531.0" h-a-x="250" n="accSagittal7v19CommaUp" />
+  <g c="E39B" x="0.0" y="-172.0" w="250.0" h="531.0" h-a-x="250" n="accSagittal7v19CommaDown" />
+  <g c="E39C" x="0.0" y="-359.0" w="281.0" h="531.0" h-a-x="281" n="accSagittal49SmallDiesisUp" />
+  <g c="E39D" x="0.0" y="-172.0" w="281.0" h="531.0" h-a-x="281" n="accSagittal49SmallDiesisDown" />
+  <g c="E39E" x="0.0" y="-359.0" w="344.0" h="531.0" h-a-x="344" n="accSagittal23SmallDiesisUp" />
+  <g c="E39F" x="0.0" y="-172.0" w="344.0" h="531.0" h-a-x="344" n="accSagittal23SmallDiesisDown" />
+  <g c="E3A0" x="0.0" y="-359.0" w="250.0" h="531.0" h-a-x="250" n="accSagittal5v13MediumDiesisUp" />
+  <g c="E3A1" x="0.0" y="-172.0" w="250.0" h="531.0" h-a-x="250" n="accSagittal5v13MediumDiesisDown" />
+  <g c="E3A2" x="0.0" y="-359.0" w="344.0" h="531.0" h-a-x="344" n="accSagittal11v19MediumDiesisUp" />
+  <g c="E3A3" x="0.0" y="-172.0" w="344.0" h="531.0" h-a-x="344" n="accSagittal11v19MediumDiesisDown" />
+  <g c="E3A4" x="0.0" y="-359.0" w="250.0" h="531.0" h-a-x="250" n="accSagittal49MediumDiesisUp" />
+  <g c="E3A5" x="0.0" y="-172.0" w="250.0" h="531.0" h-a-x="250" n="accSagittal49MediumDiesisDown" />
+  <g c="E3A6" x="0.0" y="-359.0" w="344.0" h="531.0" h-a-x="344" n="accSagittal5v49MediumDiesisUp" />
+  <g c="E3A7" x="0.0" y="-172.0" w="344.0" h="531.0" h-a-x="344" n="accSagittal5v49MediumDiesisDown" />
+  <g c="E3A8" x="0.0" y="-359.0" w="281.0" h="531.0" h-a-x="281" n="accSagittal49LargeDiesisUp" />
+  <g c="E3A9" x="0.0" y="-172.0" w="281.0" h="531.0" h-a-x="281" n="accSagittal49LargeDiesisDown" />
+  <g c="E3AA" x="0.0" y="-359.0" w="312.0" h="531.0" h-a-x="312" n="accSagittal11v19LargeDiesisUp" />
+  <g c="E3AB" x="0.0" y="-172.0" w="312.0" h="531.0" h-a-x="312" n="accSagittal11v19LargeDiesisDown" />
+  <g c="E3AC" x="0.0" y="-359.0" w="438.0" h="531.0" h-a-x="437" n="accSagittal5v13LargeDiesisUp" />
+  <g c="E3AD" x="0.0" y="-172.0" w="438.0" h="531.0" h-a-x="438" n="accSagittal5v13LargeDiesisDown" />
+  <g c="E3B0" x="0.0" y="-359.0" w="250.0" h="531.0" h-a-x="250" n="accSagittalSharp23SDown" />
+  <g c="E3B1" x="0.0" y="-172.0" w="250.0" h="531.0" h-a-x="250" n="accSagittalFlat23SUp" />
+  <g c="E3B2" x="0.0" y="-359.0" w="250.0" h="531.0" h-a-x="250" n="accSagittalSharp49SDown" />
+  <g c="E3B3" x="0.0" y="-172.0" w="250.0" h="531.0" h-a-x="250" n="accSagittalFlat49SUp" />
+  <g c="E3B4" x="0.0" y="-359.0" w="250.0" h="531.0" h-a-x="250" n="accSagittalSharp7v19CDown" />
+  <g c="E3B5" x="0.0" y="-172.0" w="250.0" h="531.0" h-a-x="250" n="accSagittalFlat7v19CUp" />
+  <g c="E3B6" x="0.0" y="-359.0" w="281.0" h="531.0" h-a-x="282" n="accSagittalSharp19CDown" />
+  <g c="E3B7" x="0.0" y="-172.0" w="281.0" h="531.0" h-a-x="281" n="accSagittalFlat19CUp" />
+  <g c="E3B8" x="0.0" y="-359.0" w="344.0" h="531.0" h-a-x="344" n="accSagittalSharp11v49CDown" />
+  <g c="E3B9" x="0.0" y="-172.0" w="344.0" h="531.0" h-a-x="344" n="accSagittalFlat11v49CUp" />
+  <g c="E3BA" x="0.0" y="-359.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalSharp143CDown" />
+  <g c="E3BB" x="0.0" y="-172.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalFlat143CUp" />
+  <g c="E3BC" x="0.0" y="-359.0" w="312.0" h="531.0" h-a-x="312" n="accSagittalSharp17kDown" />
+  <g c="E3BD" x="0.0" y="-172.0" w="312.0" h="531.0" h-a-x="312" n="accSagittalFlat17kUp" />
+  <g c="E3BE" x="0.0" y="-359.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalSharp19sDown" />
+  <g c="E3BF" x="0.0" y="-172.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalFlat19sUp" />
+  <g c="E3C0" x="0.0" y="-359.0" w="281.0" h="531.0" h-a-x="281" n="accSagittalSharp19sUp" />
+  <g c="E3C1" x="0.0" y="-172.0" w="281.0" h="531.0" h-a-x="282" n="accSagittalFlat19sDown" />
+  <g c="E3C2" x="0.0" y="-359.0" w="312.0" h="531.0" h-a-x="312" n="accSagittalSharp17kUp" />
+  <g c="E3C3" x="0.0" y="-172.0" w="312.0" h="531.0" h-a-x="312" n="accSagittalFlat17kDown" />
+  <g c="E3C4" x="0.0" y="-359.0" w="312.0" h="531.0" h-a-x="312" n="accSagittalSharp143CUp" />
+  <g c="E3C5" x="0.0" y="-172.0" w="312.0" h="531.0" h-a-x="312" n="accSagittalFlat143CDown" />
+  <g c="E3C6" x="0.0" y="-359.0" w="312.0" h="531.0" h-a-x="312" n="accSagittalSharp11v49CUp" />
+  <g c="E3C7" x="0.0" y="-172.0" w="312.0" h="531.0" h-a-x="312" n="accSagittalFlat11v49CDown" />
+  <g c="E3C8" x="0.0" y="-359.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalSharp19CUp" />
+  <g c="E3C9" x="0.0" y="-172.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalFlat19CDown" />
+  <g c="E3CA" x="0.0" y="-359.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalSharp7v19CUp" />
+  <g c="E3CB" x="0.0" y="-172.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalFlat7v19CDown" />
+  <g c="E3CC" x="0.0" y="-359.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalSharp49SUp" />
+  <g c="E3CD" x="0.0" y="-172.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalFlat49SDown" />
+  <g c="E3CE" x="0.0" y="-359.0" w="469.0" h="531.0" h-a-x="469" n="accSagittalSharp23SUp" />
+  <g c="E3CF" x="0.0" y="-172.0" w="469.0" h="531.0" h-a-x="469" n="accSagittalFlat23SDown" />
+  <g c="E3D0" x="0.0" y="-359.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalSharp5v13MUp" />
+  <g c="E3D1" x="0.0" y="-172.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalFlat5v13MDown" />
+  <g c="E3D2" x="0.0" y="-359.0" w="438.0" h="531.0" h-a-x="437" n="accSagittalSharp11v19MUp" />
+  <g c="E3D3" x="0.0" y="-172.0" w="438.0" h="531.0" h-a-x="437" n="accSagittalFlat11v19MDown" />
+  <g c="E3D4" x="0.0" y="-359.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalSharp49MUp" />
+  <g c="E3D5" x="0.0" y="-172.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalFlat49MDown" />
+  <g c="E3D6" x="0.0" y="-359.0" w="469.0" h="531.0" h-a-x="469" n="accSagittalSharp5v49MUp" />
+  <g c="E3D7" x="0.0" y="-172.0" w="469.0" h="531.0" h-a-x="469" n="accSagittalFlat5v49MDown" />
+  <g c="E3D8" x="0.0" y="-359.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalSharp49LUp" />
+  <g c="E3D9" x="0.0" y="-172.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalFlat49LDown" />
+  <g c="E3DA" x="0.0" y="-359.0" w="438.0" h="531.0" h-a-x="437" n="accSagittalSharp11v19LUp" />
+  <g c="E3DB" x="0.0" y="-172.0" w="438.0" h="531.0" h-a-x="437" n="accSagittalFlat11v19LDown" />
+  <g c="E3DC" x="0.0" y="-359.0" w="500.0" h="531.0" h-a-x="500" n="accSagittalSharp5v13LUp" />
+  <g c="E3DD" x="0.0" y="-172.0" w="500.0" h="531.0" h-a-x="500" n="accSagittalFlat5v13LDown" />
+  <g c="E3E0" x="0.0" y="-359.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalDoubleSharp23SDown" />
+  <g c="E3E1" x="0.0" y="-172.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalDoubleFlat23SUp" />
+  <g c="E3E2" x="0.0" y="-359.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalDoubleSharp49SDown" />
+  <g c="E3E3" x="0.0" y="-172.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalDoubleFlat49SUp" />
+  <g c="E3E4" x="0.0" y="-359.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalDoubleSharp7v19CDown" />
+  <g c="E3E5" x="0.0" y="-172.0" w="375.0" h="531.0" h-a-x="375" n="accSagittalDoubleFlat7v19CUp" />
+  <g c="E3E6" x="0.0" y="-359.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalDoubleSharp19CDown" />
+  <g c="E3E7" x="0.0" y="-172.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalDoubleFlat19CUp" />
+  <g c="E3E8" x="0.0" y="-359.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalDoubleSharp11v49CDown" />
+  <g c="E3E9" x="0.0" y="-172.0" w="406.0" h="531.0" h-a-x="406" n="accSagittalDoubleFlat11v49CUp" />
+  <g c="E3EA" x="0.0" y="-359.0" w="469.0" h="531.0" h-a-x="469" n="accSagittalDoubleSharp143CDown" />
+  <g c="E3EB" x="0.0" y="-172.0" w="469.0" h="531.0" h-a-x="469" n="accSagittalDoubleFlat143CUp" />
+  <g c="E3EC" x="0.0" y="-359.0" w="438.0" h="531.0" h-a-x="437" n="accSagittalDoubleSharp17kDown" />
+  <g c="E3ED" x="0.0" y="-172.0" w="438.0" h="531.0" h-a-x="437" n="accSagittalDoubleFlat17kUp" />
+  <g c="E3EE" x="0.0" y="-359.0" w="438.0" h="531.0" h-a-x="437" n="accSagittalDoubleSharp19sDown" />
+  <g c="E3EF" x="0.0" y="-172.0" w="438.0" h="531.0" h-a-x="437" n="accSagittalDoubleFlat19sUp" />
+  <g c="E3F0" x="0.0" y="-359.0" w="31.0" h="531.0" h-a-x="31" n="accSagittalShaftUp" />
+  <g c="E3F1" x="0.0" y="-172.0" w="31.0" h="531.0" h-a-x="31" n="accSagittalShaftDown" />
+  <g c="E3F2" x="0.0" y="-62.0" w="125.0" h="187.0" h-a-x="187" n="accSagittalAcute" />
+  <g c="E3F3" x="0.0" y="-125.0" w="125.0" h="187.0" h-a-x="187" n="accSagittalGrave" />
+  <g c="E420" x="0.0" y="-363.0" w="163.0" h="714.0" h-a-x="162" n="accidentalWyschnegradsky1TwelfthsSharp">
+    <a n="cutOutSE" x="0.22" y="0.74" />
+  </g>
+  <g c="E421" x="0.0" y="-363.0" w="163.0" h="714.0" h-a-x="162" n="accidentalWyschnegradsky2TwelfthsSharp">
+    <a n="cutOutSE" x="0.22" y="0.16" />
+  </g>
+  <g c="E422" x="0.0" y="-347.0" w="163.0" h="654.0" h-a-x="163" n="accidentalWyschnegradsky3TwelfthsSharp">
+    <a n="cutOutNE" x="0.45" y="0.78" />
+    <a n="cutOutNW" x="0.16" y="0.62" />
+    <a n="cutOutSE" x="0.45" y="-0.81" />
+    <a n="cutOutSW" x="0.16" y="-0.92" />
+  </g>
+  <g c="E423" x="0.0" y="-347.0" w="226.0" h="713.0" h-a-x="226" n="accidentalWyschnegradsky4TwelfthsSharp">
+    <a n="cutOutNW" x="0.17" y="0.62" />
+    <a n="cutOutSE" x="0.74" y="0.88" />
+    <a n="cutOutSW" x="0.17" y="-0.93" />
+  </g>
+  <g c="E424" x="0.0" y="-347.0" w="225.0" h="858.0" h-a-x="225" n="accidentalWyschnegradsky5TwelfthsSharp">
+    <a n="cutOutNW" x="0.16" y="0.62" />
+    <a n="cutOutSE" x="0.73" y="0.87" />
+    <a n="cutOutSW" x="0.16" y="-0.93" />
+  </g>
+  <g c="E425" x="0.0" y="-348.0" w="249.0" h="698.0" h-a-x="250" n="accidentalWyschnegradsky6TwelfthsSharp">
+    <a n="cutOutNE" x="0.86" y="0.94" />
+    <a n="cutOutNW" x="0.12" y="0.6" />
+    <a n="cutOutSE" x="0.87" y="-0.61" />
+    <a n="cutOutSW" x="0.12" y="-0.92" />
+  </g>
+  <g c="E426" x="0.0" y="-348.0" w="331.0" h="850.0" h-a-x="331" n="accidentalWyschnegradsky7TwelfthsSharp">
+    <a n="cutOutNW" x="0.57" y="1.29" />
+    <a n="cutOutSE" x="1.07" y="1.42" />
+    <a n="cutOutSW" x="0.12" y="-0.93" />
+  </g>
+  <g c="E427" x="0.0" y="-348.0" w="331.0" h="995.0" h-a-x="331" n="accidentalWyschnegradsky8TwelfthsSharp">
+    <a n="cutOutNW" x="0.56" y="1.39" />
+    <a n="cutOutSE" x="1.05" y="1.39" />
+    <a n="cutOutSW" x="0.11" y="-0.92" />
+  </g>
+  <g c="E428" x="0.0" y="-347.0" w="314.0" h="716.0" h-a-x="314" n="accidentalWyschnegradsky9TwelfthsSharp">
+    <a n="cutOutNE" x="1.13" y="1.0" />
+    <a n="cutOutNW" x="0.11" y="0.62" />
+    <a n="cutOutSE" x="1.13" y="-0.56" />
+    <a n="cutOutSW" x="0.11" y="-0.92" />
+  </g>
+  <g c="E429" x="0.0" y="-347.0" w="394.0" h="844.0" h-a-x="395" n="accidentalWyschnegradsky10TwelfthsSharp">
+    <a n="cutOutNW" x="0.83" y="1.44" />
+    <a n="cutOutSE" x="1.34" y="1.39" />
+    <a n="cutOutSW" x="0.11" y="-0.92" />
+  </g>
+  <g c="E42A" x="0.0" y="-347.0" w="394.0" h="990.0" h-a-x="393" n="accidentalWyschnegradsky11TwelfthsSharp">
+    <a n="cutOutNW" x="0.83" y="1.46" />
+    <a n="cutOutSE" x="1.34" y="1.42" />
+    <a n="cutOutSW" x="0.11" y="-0.91" />
+  </g>
+  <g c="E42B" x="0.0" y="-316.0" w="213.0" h="774.0" h-a-x="213" n="accidentalWyschnegradsky1TwelfthsFlat">
+    <a n="cutOutNE" x="0.72" y="0.67" />
+    <a n="cutOutSE" x="0.22" y="-0.84" />
+  </g>
+  <g c="E42C" x="0.0" y="-316.0" w="213.0" h="774.0" h-a-x="213" n="accidentalWyschnegradsky2TwelfthsFlat">
+    <a n="cutOutNE" x="0.71" y="0.68" />
+    <a n="cutOutSE" x="0.22" y="-0.83" />
+  </g>
+  <g c="E42D" x="0.0" y="-316.0" w="213.0" h="714.0" h-a-x="213" n="accidentalWyschnegradsky3TwelfthsFlat">
+    <a n="cutOutNE" x="0.22" y="0.73" />
+    <a n="cutOutSE" x="0.22" y="-0.84" />
+  </g>
+  <g c="E42E" x="0.0" y="-175.0" w="226.0" h="668.0" h-a-x="226" n="accidentalWyschnegradsky4TwelfthsFlat">
+    <a n="cutOutNE" x="0.74" y="0.7" />
+    <a n="cutOutSE" x="0.54" y="-0.45" />
+  </g>
+  <g c="E42F" x="0.0" y="-175.0" w="226.0" h="668.0" h-a-x="226" n="accidentalWyschnegradsky5TwelfthsFlat">
+    <a n="cutOutNE" x="0.72" y="0.7" />
+    <a n="cutOutSE" x="0.63" y="-0.43" />
+  </g>
+  <g c="E430" x="0.0" y="-175.0" w="226.0" h="614.0" h-a-x="227" n="accidentalWyschnegradsky6TwelfthsFlat">
+    <a n="cutOutNE" x="0.3" y="0.72" />
+    <a n="cutOutSE" x="0.56" y="-0.44" />
+  </g>
+  <g c="E431" x="0.0" y="-297.0" w="416.0" h="774.0" h-a-x="416" n="accidentalWyschnegradsky7TwelfthsFlat">
+    <a n="cutOutNE" x="1.54" y="0.75" />
+    <a n="cutOutSE" x="1.05" y="-0.77" />
+    <a n="cutOutSW" x="0.7" y="-0.83" />
+  </g>
+  <g c="E432" x="0.0" y="-297.0" w="416.0" h="774.0" h-a-x="416" n="accidentalWyschnegradsky8TwelfthsFlat">
+    <a n="cutOutNE" x="1.52" y="0.78" />
+    <a n="cutOutSE" x="1.06" y="-0.76" />
+    <a n="cutOutSW" x="0.68" y="-0.8" />
+  </g>
+  <g c="E433" x="0.0" y="-297.0" w="416.0" h="736.0" h-a-x="416" n="accidentalWyschnegradsky9TwelfthsFlat">
+    <a n="cutOutNE" x="1.04" y="0.78" />
+    <a n="cutOutSE" x="1.04" y="-0.81" />
+    <a n="cutOutSW" x="0.7" y="-0.82" />
+  </g>
+  <g c="E434" x="0.0" y="-175.0" w="414.0" h="668.0" h-a-x="414" n="accidentalWyschnegradsky10TwelfthsFlat">
+    <a n="cutOutNE" x="1.5" y="0.68" />
+  </g>
+  <g c="E435" x="0.0" y="-175.0" w="414.0" h="668.0" h-a-x="414" n="accidentalWyschnegradsky11TwelfthsFlat">
+    <a n="cutOutNE" x="1.49" y="0.69" />
   </g>
   <g c="E440" x="1.0" y="-174.0" w="286.0" h="612.0" h-a-x="287" n="accidentalBuyukMucennebFlat">
     <a n="cutOutSE" x="0.81" y="-0.42" />
@@ -464,6 +1067,38 @@
     <a n="cutOutSE" x="1.05" y="-0.62" />
     <a n="cutOutSW" x="0.26" y="-0.96" />
   </g>
+  <g c="E450" x="0.0" y="-348.0" w="395.0" h="867.0" h-a-x="384" n="accidental1CommaSharp">
+    <a n="cutOutNW" x="0.9" y="1.51" />
+    <a n="cutOutSE" x="1.09" y="0.89" />
+    <a n="cutOutSW" x="0.11" y="-0.93" />
+  </g>
+  <g c="E451" x="0.0" y="-348.0" w="475.0" h="865.0" h-a-x="453" n="accidental2CommaSharp">
+    <a n="cutOutNW" x="0.91" y="1.52" />
+    <a n="cutOutSE" x="1.11" y="0.85" />
+    <a n="cutOutSW" x="0.1" y="-0.93" />
+  </g>
+  <g c="E452" x="0.0" y="-348.0" w="457.0" h="859.0" h-a-x="434" n="accidental3CommaSharp">
+    <a n="cutOutNW" x="0.89" y="1.52" />
+    <a n="cutOutSE" x="1.11" y="0.86" />
+    <a n="cutOutSW" x="0.11" y="-0.96" />
+  </g>
+  <g c="E453" x="0.0" y="-348.0" w="457.0" h="858.0" h-a-x="447" n="accidental5CommaSharp">
+    <a n="cutOutNW" x="0.9" y="1.5" />
+    <a n="cutOutSE" x="1.13" y="0.85" />
+    <a n="cutOutSW" x="0.11" y="-0.94" />
+  </g>
+  <g c="E454" x="0.0" y="-175.0" w="269.0" h="669.0" h-a-x="252" n="accidental1CommaFlat">
+    <a n="cutOutSE" x="0.71" y="-0.38" />
+  </g>
+  <g c="E455" x="0.0" y="-175.0" w="342.0" h="661.0" h-a-x="321" n="accidental2CommaFlat">
+    <a n="cutOutSE" x="1.0" y="0.77" />
+  </g>
+  <g c="E456" x="0.0" y="-175.0" w="319.0" h="653.0" h-a-x="302" n="accidental3CommaFlat">
+    <a n="cutOutSE" x="0.99" y="0.74" />
+  </g>
+  <g c="E457" x="0.0" y="-175.0" w="342.0" h="667.0" h-a-x="321" n="accidental4CommaFlat">
+    <a n="cutOutSE" x="1.01" y="0.8" />
+  </g>
   <g c="E460" x="0.0" y="-472.0" w="300.0" h="629.0" h-a-x="302" n="accidentalKoron">
     <a n="cutOutSE" x="0.26" y="-0.67" />
   </g>
@@ -473,6 +1108,116 @@
     <a n="cutOutSE" x="1.19" y="-0.4" />
     <a n="cutOutSW" x="0.26" y="-0.82" />
   </g>
+  <g c="E470" x="0.0" y="-334.0" w="246.0" h="680.0" h-a-x="246" n="accidentalXenakisOneThirdToneSharp">
+    <a n="cutOutNE" x="0.75" y="0.94" />
+    <a n="cutOutNW" x="0.36" y="0.76" />
+    <a n="cutOutSE" x="0.76" y="-0.72" />
+    <a n="cutOutSW" x="0.36" y="-0.89" />
+  </g>
+  <g c="E471" x="0.0" y="-334.0" w="306.0" h="680.0" h-a-x="306" n="accidentalXenakisTwoThirdTonesSharp">
+    <a n="cutOutNE" x="1.06" y="0.92" />
+    <a n="cutOutNW" x="0.34" y="0.72" />
+    <a n="cutOutSE" x="1.06" y="-0.69" />
+    <a n="cutOutSW" x="0.34" y="-0.9" />
+  </g>
+  <g c="E472" x="0.0" y="-347.0" w="167.0" h="652.0" h-a-x="167" n="accidentalQuarterToneSharpBusotti">
+    <a n="cutOutNE" x="0.48" y="0.84" />
+    <a n="cutOutNW" x="0.18" y="0.67" />
+    <a n="cutOutSE" x="0.47" y="0.12" />
+    <a n="cutOutSW" x="0.18" y="0.0" />
+  </g>
+  <g c="E473" x="0.0" y="-347.0" w="249.0" h="704.0" h-a-x="249" n="accidentalSharpOneHorizontalStroke">
+    <a n="cutOutNE" x="0.89" y="0.97" />
+    <a n="cutOutNW" x="0.13" y="0.63" />
+    <a n="cutOutSE" x="0.89" y="0.32" />
+    <a n="cutOutSW" x="0.13" y="-0.03" />
+  </g>
+  <g c="E474" x="0.0" y="-349.0" w="368.0" h="764.0" h-a-x="368" n="accidentalThreeQuarterTonesSharpBusotti">
+    <a n="cutOutNE" x="1.36" y="1.2" />
+    <a n="cutOutNW" x="0.18" y="0.63" />
+    <a n="cutOutSE" x="1.36" y="0.5" />
+    <a n="cutOutSW" x="0.18" y="0.0" />
+  </g>
+  <g c="E475" x="1.0" y="-348.0" w="549.0" h="698.0" h-a-x="550" n="accidentalQuarterToneSharpWiggle">
+    <a n="cutOutNE" x="2.08" y="0.94" />
+    <a n="cutOutSE" x="2.08" y="-0.6" />
+    <a n="cutOutSW" x="1.09" y="0.72" />
+  </g>
+  <g c="E476" x="0.0" y="-348.0" w="555.0" h="697.0" h-a-x="401" n="accidentalTavenerSharp">
+    <a n="cutOutNE" x="1.7" y="1.1" />
+    <a n="cutOutNW" x="0.54" y="-0.3" />
+    <a n="cutOutSE" x="1.71" y="0.3" />
+    <a n="cutOutSW" x="0.71" y="-1.09" />
+  </g>
+  <g c="E477" x="0.0" y="-176.0" w="613.0" h="614.0" h-a-x="475" n="accidentalTavenerFlat">
+    <a n="cutOutNW" x="0.9" y="0.5" />
+    <a n="cutOutSE" x="2.0" y="0.93" />
+  </g>
+  <g c="E478" x="2.0" y="-174.0" w="225.0" h="611.0" h-a-x="227" n="accidentalQuarterToneFlatPenderecki">
+    <a n="cutOutNE" x="0.31" y="0.72" />
+    <a n="cutOutSE" x="0.53" y="-0.44" />
+  </g>
+  <g c="E479" x="0.0" y="-127.0" w="300.0" h="255.0" h-a-x="301" n="accidentalCommaSlashUp" />
+  <g c="E47A" x="0.0" y="-127.0" w="300.0" h="255.0" h-a-x="301" n="accidentalCommaSlashDown" />
+  <g c="E47B" x="0.0" y="-203.0" w="281.0" h="406.0" h-a-x="281" n="accidentalWilsonPlus" />
+  <g c="E47C" x="0.0" y="-186.0" w="281.0" h="372.0" h-a-x="281" n="accidentalWilsonMinus" />
+  <g c="E47D" x="0.0" y="-172.0" w="344.0" h="344.0" h-a-x="344" n="accidentalLargeDoubleSharp" />
+  <g c="E47E" x="0.0" y="-351.0" w="394.0" h="955.0" h-a-x="394" n="accidentalQuarterToneSharp4">
+    <a n="cutOutNE" x="1.03" y="1.52" />
+    <a n="cutOutSE" x="1.46" y="-0.66" />
+    <a n="cutOutSW" x="0.49" y="1.05" />
+  </g>
+  <g c="E47F" x="0.0" y="-176.0" w="418.0" h="801.0" h-a-x="418" n="accidentalQuarterToneFlat4">
+    <a n="cutOutNE" x="1.22" y="0.74" />
+    <a n="cutOutSE" x="1.27" y="-0.44" />
+    <a n="cutOutSW" x="0.65" y="1.1" />
+  </g>
+  <g c="E480" x="2.0" y="-174.0" w="225.0" h="611.0" h-a-x="227" n="accidentalQuarterToneFlatFilledReversed">
+    <a n="cutOutNW" x="0.6" y="0.71" />
+    <a n="cutOutSW" x="0.38" y="-0.45" />
+  </g>
+  <g c="E481" x="0.0" y="-348.0" w="249.0" h="698.0" h-a-x="249" n="accidentalSharpReversed">
+    <a n="cutOutNE" x="0.9" y="0.64" />
+    <a n="cutOutNW" x="0.11" y="0.93" />
+    <a n="cutOutSE" x="0.9" y="-0.95" />
+    <a n="cutOutSW" x="0.11" y="-0.63" />
+  </g>
+  <g c="E482" x="0.0" y="-335.0" w="168.0" h="676.0" h-a-x="168" n="accidentalNaturalReversed">
+    <a n="cutOutNW" x="0.43" y="0.82" />
+    <a n="cutOutSE" x="0.26" y="-0.88" />
+  </g>
+  <g c="E483" x="0.0" y="-175.0" w="411.0" h="612.0" h-a-x="413" n="accidentalDoubleFlatReversed">
+    <a n="cutOutNW" x="0.6" y="0.71" />
+    <a n="cutOutSW" x="0.3" y="-0.42" />
+  </g>
+  <g c="E484" x="1.0" y="-438.0" w="226.0" h="614.0" h-a-x="229" n="accidentalFlatTurned">
+    <a n="cutOutNW" x="0.34" y="0.43" />
+    <a n="cutOutSW" x="0.59" y="-0.73" />
+  </g>
+  <g c="E485" x="0.0" y="-431.0" w="411.0" h="612.0" h-a-x="416" n="accidentalDoubleFlatTurned">
+    <a n="cutOutNW" x="0.46" y="0.54" />
+    <a n="cutOutSW" x="0.58" y="-0.7" />
+  </g>
+  <g c="E486" x="0.0" y="-174.0" w="225.0" h="611.0" h-a-x="225" n="accidentalThreeQuarterTonesFlatGrisey">
+    <a n="cutOutNE" x="0.48" y="0.72" />
+    <a n="cutOutSE" x="0.56" y="-0.43" />
+  </g>
+  <g c="E487" x="0.0" y="-175.0" w="344.0" h="614.0" h-a-x="344" n="accidentalThreeQuarterTonesFlatTartini">
+    <a n="cutOutNE" x="0.31" y="0.69" />
+  </g>
+  <g c="E488" x="0.0" y="-174.0" w="235.0" h="614.0" h-a-x="235" n="accidentalQuarterToneFlatVanBlankenburg">
+    <a n="cutOutNE" x="0.32" y="0.43" />
+  </g>
+  <g c="E489" x="0.0" y="-178.0" w="410.0" h="619.0" h-a-x="410" n="accidentalThreeQuarterTonesFlatCouper">
+    <a n="cutOutNE" x="1.05" y="0.74" />
+    <a n="cutOutNW" x="0.56" y="0.73" />
+    <a n="cutOutSE" x="1.27" y="-0.44" />
+    <a n="cutOutSW" x="0.38" y="-0.44" />
+  </g>
+  <g c="E48A" x="0.0" y="-125.0" w="191.0" h="665.0" h-a-x="191" n="accidentalOneThirdToneSharpFerneyhough" />
+  <g c="E48B" x="0.0" y="-534.0" w="188.0" h="661.0" h-a-x="188" n="accidentalOneThirdToneFlatFerneyhough" />
+  <g c="E48C" x="0.0" y="-124.0" w="196.0" h="664.0" h-a-x="193" n="accidentalTwoThirdTonesSharpFerneyhough" />
+  <g c="E48D" x="0.0" y="-537.0" w="199.0" h="663.0" h-a-x="199" n="accidentalTwoThirdTonesFlatFerneyhough" />
   <g c="E4A0" x="0.0" y="1.0" w="339.0" h="244.0" h-a-x="339" n="articAccentAbove" />
   <g c="E4A1" x="0.0" y="-244.0" w="339.0" h="244.0" h-a-x="339" n="articAccentBelow" />
   <g c="E4A2" x="0.0" y="0.0" w="84.0" h="84.0" h-a-x="84" n="articStaccatoAbove" />
@@ -953,8 +1698,24 @@
   <g c="ECB5" x="0.0" y="-141.0" w="541.0" h="1898.0" h-a-x="541" n="metNote1024thUp" />
   <g c="ECB7" x="0.0" y="-50.0" w="100.0" h="100.0" h-a-x="100" n="metAugmentationDot" />
   <g c="ECC0" x="20.0" y="0.0" w="238.0" h="245.0" h-a-x="237" n="figbass7Diminished" />
+  <g c="ED30" x="0.0" y="-175.0" w="411.0" h="612.0" h-a-x="413" n="accidentalDoubleFlatArabic" />
+  <g c="ED31" x="0.0" y="-176.0" w="282.0" h="614.0" h-a-x="282" n="accidentalThreeQuarterTonesFlatArabic" />
+  <g c="ED32" x="0.0" y="-175.0" w="226.0" h="614.0" h-a-x="226" n="accidentalFlatArabic" />
+  <g c="ED33" x="-1.0" y="-175.0" w="287.0" h="614.0" h-a-x="287" n="accidentalQuarterToneFlatArabic" />
+  <g c="ED34" x="0.0" y="-335.0" w="168.0" h="676.0" h-a-x="168" n="accidentalNaturalArabic" />
+  <g c="ED35" x="0.0" y="-347.0" w="163.0" h="654.0" h-a-x="163" n="accidentalQuarterToneSharpArabic" />
+  <g c="ED36" x="0.0" y="-348.0" w="249.0" h="698.0" h-a-x="249" n="accidentalSharpArabic" />
+  <g c="ED37" x="3.0" y="-347.0" w="314.0" h="716.0" h-a-x="317" n="accidentalThreeQuarterTonesSharpArabic" />
+  <g c="ED38" x="0.0" y="-125.0" w="247.0" h="252.0" h-a-x="250" n="accidentalDoubleSharpArabic" />
   <g c="ED40" x="0.0" y="1.0" w="708.0" h="244.0" h-a-x="708" n="articSoftAccentAbove" />
   <g c="ED41" x="0.0" y="-245.0" w="708.0" h="244.0" h-a-x="708" n="articSoftAccentBelow" />
+  <g c="ED60" x="1.0" y="-1.0" w="283.0" h="751.0" h-a-x="284" n="csymAccidentalFlat" />
+  <g c="ED61" x="0.0" y="0.0" w="184.0" h="751.0" h-a-x="184" n="csymAccidentalNatural" />
+  <g c="ED62" x="0.0" y="-13.0" w="310.0" h="775.0" h-a-x="310" n="csymAccidentalSharp" />
+  <g c="ED63" x="0.0" y="0.0" w="444.0" h="449.0" h-a-x="444" n="csymAccidentalDoubleSharp" />
+  <g c="ED64" x="1.0" y="-1.0" w="523.0" h="751.0" h-a-x="524" n="csymAccidentalDoubleFlat" />
+  <g c="ED65" x="0.0" y="-13.0" w="587.0" h="775.0" h-a-x="587" n="csymAccidentalTripleSharp" />
+  <g c="ED66" x="1.0" y="-1.0" w="763.0" h="751.0" h-a-x="764" n="csymAccidentalTripleFlat" />
   <g c="F400" x="0.0" y="0.0" w="103.0" h="997.0" h-a-x="103" n="braceSmall" />
   <g c="F401" x="0.0" y="1.0" w="67.0" h="997.0" h-a-x="67" n="braceLarge" />
   <g c="F402" x="0.0" y="0.0" w="60.0" h="997.0" h-a-x="61" n="braceLarger" />
@@ -1236,6 +1997,13 @@
   <g c="F4D4" x="10.0" y="-8.0" w="270.0" h="390.0" h-a-x="269" n="tuplet8Light" />
   <g c="F4D5" x="10.0" y="-8.0" w="265.0" h="390.0" h-a-x="265" n="tuplet9Light" />
   <g c="F4D6" x="10.0" y="-4.0" w="134.0" h="298.0" h-a-x="134" n="tupletColonLight" />
+  <g c="F4DC" x="0.0" y="0.0" w="283.0" h="751.0" h-a-x="284" n="csymAccidentalFlatSmall" />
+  <g c="F4DD" x="0.0" y="0.0" w="209.0" h="751.0" h-a-x="209" n="csymAccidentalNaturalSmall" />
+  <g c="F4DE" x="0.0" y="-13.0" w="350.0" h="775.0" h-a-x="350" n="csymAccidentalSharpSmall" />
+  <g c="F4DF" x="0.0" y="0.0" w="444.0" h="449.0" h-a-x="444" n="csymAccidentalDoubleSharpSmall" />
+  <g c="F4E0" x="0.0" y="0.0" w="496.0" h="751.0" h-a-x="284" n="csymAccidentalDoubleFlatSmall" />
+  <g c="F4E1" x="0.0" y="-13.0" w="725.0" h="775.0" h-a-x="725" n="csymAccidentalTripleSharpSmall" />
+  <g c="F4E2" x="0.0" y="0.0" w="712.0" h="751.0" h-a-x="712" n="csymAccidentalTripleFlatSmall" />
   <g c="F4E4" x="0.0" y="-300.0" w="636.0" h="600.0" h-a-x="636" n="noteheadSlashHorizontalEndsOversized">
     <a n="stemDownNW" x="0.0" y="-1.2" />
     <a n="stemUpSE" x="2.55" y="1.2" />

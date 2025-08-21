@@ -2867,6 +2867,12 @@ void MusicXmlInput::ReadMusicXmlNote(
             accid->SetAccid(ConvertAccidentalToAccid(accidental.text().as_string()));
             accid->SetColor(accidental.attribute("color").as_string());
             accid->SetGlyphName(accidental.attribute("smufl").as_string());
+            if (accid->HasGlyphName()) {
+                accid->SetGlyphAuth("smufl");
+                if (!accid->HasAccid()) {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_n);
+                }
+            }
             accid->SetPlace(accid->AttPlacementRelEvent::StrToStaffrel(accidental.attribute("placement").as_string()));
             if (accidental.attribute("id")) accid->SetID(accidental.attribute("id").as_string());
             if (HasAttributeWithValue(accidental, "cautionary", "yes")) accid->SetFunc(accidLog_FUNC_caution);
