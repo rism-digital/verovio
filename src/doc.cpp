@@ -111,7 +111,20 @@ void Doc::Reset()
     Object::Reset();
     this->ResetID();
 
+    m_header.reset();
+    m_front.reset();
+    m_back.reset();
+
+    this->ResetToSerialization();
+
+    m_isCastOff = false;
+}
+
+void Doc::ResetToSerialization()
+{
     this->ClearSelectionPages();
+
+    this->ClearChildren();
 
     m_type = Raw;
     m_notationType = NOTATIONTYPE_NONE;
@@ -138,7 +151,6 @@ void Doc::Reset()
     m_markup = MARKUP_DEFAULT;
     m_isMensuralMusicOnly = BOOLEAN_NONE;
     m_isNeumeLines = false;
-    m_isCastOff = false;
     m_visibleScores.clear();
     m_focusStatus = FOCUS_UNSET;
 
@@ -147,9 +159,7 @@ void Doc::Reset()
     m_drawingSmuflFontSize = 0;
     m_drawingLyricFontSize = 0;
 
-    m_header.reset();
-    m_front.reset();
-    m_back.reset();
+    m_isCastOff = true;
 }
 
 void Doc::ResetToLoading()

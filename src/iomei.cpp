@@ -3484,8 +3484,8 @@ bool MEIInput::Import(const std::string &mei)
         doc.load_string(mei.c_str(), (pugi::parse_comments | pugi::parse_default) & ~pugi::parse_eol);
         pugi::xml_node root = doc.first_child();
         if (m_deserializing) {
+            m_doc->ResetToSerialization();
             m_meiversion = MEI_CURRENT_VERSION;
-            m_doc->ClearChildren();
             return this->ReadPages(m_doc, root.first_child());
         }
         else {
