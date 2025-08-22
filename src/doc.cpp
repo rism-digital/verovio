@@ -506,10 +506,15 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                     std::string mei = note_names[1].str();
                     std::string accid = note_names[2].str();
                     if (!accid.empty()) {
-                        InstAccidental accidental;
-                        accidental.SetAccid(accidental.StrToAccidentalWritten(accid));
-                        if (accidental.HasAccid() && accidental.GetAccid() != ACCIDENTAL_WRITTEN_n) {
-                            mei += accidental.AccidentalWrittenToStr(accidental.GetAccid());
+                        if (this->GetResources().GetGlyphCode(accid)) {
+                            mei += accid;
+                        }
+                        else {
+                            InstAccidental accidental;
+                            accidental.SetAccid(accidental.StrToAccidentalWritten(accid));
+                            if (accidental.HasAccid() && accidental.GetAccid() != ACCIDENTAL_WRITTEN_n) {
+                                mei += accidental.AccidentalWrittenToStr(accidental.GetAccid());
+                            }
                         }
                     }
                     map.insert({mei, note});

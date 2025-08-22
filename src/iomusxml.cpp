@@ -3766,7 +3766,7 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
     assert(node);
     assert(measure);
 
-    // get MEI tuning.
+    // get MEI tuning
     pugi::xpath_node meiTuning = node.select_node("play/other-play[@type='tuning-mei']");
     if (meiTuning) {
         const std::string value = std::regex_replace(meiTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
@@ -3799,10 +3799,15 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
                     std::string mei = note_names[1].str();
                     std::string accid = note_names[2].str();
                     if (!accid.empty()) {
-                        InstAccidental accidental;
-                        accidental.SetAccid(ConvertAccidentalToAccid(accid));
-                        if (accidental.HasAccid() && accidental.GetAccid() != ACCIDENTAL_WRITTEN_n) {
-                            mei += accidental.AccidentalWrittenToStr(accidental.GetAccid());
+                        if (m_doc->GetResources().GetGlyphCode(accid)) {
+                            mei += accid;
+                        }
+                        else {
+                            InstAccidental accidental;
+                            accidental.SetAccid(ConvertAccidentalToAccid(accid));
+                            if (accidental.HasAccid() && accidental.GetAccid() != ACCIDENTAL_WRITTEN_n) {
+                                mei += accidental.AccidentalWrittenToStr(accidental.GetAccid());
+                            }
                         }
                     }
                     map.insert({mei, note});
