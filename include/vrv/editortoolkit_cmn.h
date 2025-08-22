@@ -31,6 +31,7 @@ class EditorTreeObject;
 class EditorToolkitCMN : public EditorToolkit {
 public:
     EditorToolkitCMN(Doc *doc, View *view);
+    virtual ~EditorToolkitCMN();
     bool ParseEditorAction(const std::string &json_editorAction) override
     {
         return ParseEditorAction(json_editorAction, false);
@@ -54,7 +55,13 @@ protected:
     ///@}
 
     void PrepareUndo();
-    bool ValidateUndo();
+    std::string GetCurrentState();
+    bool ReloadState(const std::string &data);
+    void TrimUndoMemory();
+    bool CanUndo() const;
+    bool CanRedo() const;
+    bool Undo();
+    bool Redo();
 
     /**
      * Experimental editor functions.
@@ -72,6 +79,7 @@ protected:
 
     bool DeleteNote(Note *note);
 
+    void ClearContext();
     bool ContextForElement(std::string &elementId);
     bool ContextForScores(bool editInfo);
     bool ContextForSections(bool editInfo);
@@ -89,8 +97,10 @@ public:
 protected:
     std::string m_chainedId;
 
-    bool m_isCommitted;
-    std::string m_preparedUndo;
+    bool m_undoPrepared;
+    std::deque<std::string> m_undoStack;
+    std::deque<std::string> m_redoStack;
+    size_t m_undoMemoryUsage = 0;
 
     EditorTreeObject *m_scoreContext;
     EditorTreeObject *m_sectionContext;

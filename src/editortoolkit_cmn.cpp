@@ -23,6 +23,7 @@
 #include "editorial.h"
 #include "findfunctor.h"
 #include "hairpin.h"
+#include "iomei.h"
 #include "layer.h"
 #include "mdiv.h"
 #include "measure.h"
@@ -47,14 +48,23 @@
 
 #define CHAINED_ID "[chained-id]"
 
+#define UNDO_MEMORY_LIMIT (256 * 1024 * 1024) // 256 MB
+
 namespace vrv {
 
 EditorToolkitCMN::EditorToolkitCMN(Doc *doc, View *view) : EditorToolkit(doc, view)
 {
-    m_isCommitted = true;
+    m_undoPrepared = false;
     m_scoreContext = NULL;
     m_sectionContext = NULL;
     m_currentContext = NULL;
+}
+
+EditorToolkitCMN::~EditorToolkitCMN()
+{
+#ifndef NO_EDIT_SUPPORT
+    this->ClearContext();
+#endif
 }
 
 std::string EditorToolkitCMN::EditInfo()
@@ -88,10 +98,30 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
         m_doc->PrepareData();
         m_doc->ScoreDefSetCurrentDoc(true);
         m_doc->RefreshLayout();
-        m_isCommitted = true;
+        m_undoPrepared = false;
+        m_editInfo.reset();
         m_editInfo.import("chainedId", m_chainedId);
-        m_editInfo.import("canUndo", true);
-        m_editInfo.import("canRedo", false);
+        m_editInfo.import("canUndo", this->CanUndo());
+        m_editInfo.import("canRedo", this->CanRedo());
+        return true;
+    }
+
+    // Undo and redo - also without parameter
+    if ((action == "undo") || (action == "redo")) {
+        this->ClearContext();
+        if (action == "undo") {
+            this->Undo();
+        }
+        else {
+            this->Redo();
+        }
+        m_doc->PrepareData();
+        m_doc->ScoreDefSetCurrentDoc(true);
+        m_undoPrepared = false;
+        m_editInfo.reset();
+        m_editInfo.import("chainedId", m_chainedId);
+        m_editInfo.import("canUndo", this->CanUndo());
+        m_editInfo.import("canRedo", this->CanRedo());
         return true;
     }
 
@@ -132,7 +162,7 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
         std::string elementId;
         if (this->ParseDeleteAction(json.get<jsonxx::Object>("param"), elementId)) {
             this->PrepareUndo();
-            return (this->Delete(elementId) && this->ValidateUndo());
+            return (this->Delete(elementId));
         }
         LogWarning("Could not parse the delete action");
     }
@@ -141,7 +171,7 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
         int x, y;
         if (this->ParseDragAction(json.get<jsonxx::Object>("param"), elementId, x, y)) {
             this->PrepareUndo();
-            return (this->Drag(elementId, x, y) && this->ValidateUndo());
+            return (this->Drag(elementId, x, y));
         }
         LogWarning("Could not parse the drag action");
     }
@@ -151,7 +181,7 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
         bool shiftKey, ctrlKey;
         if (this->ParseKeyDownAction(json.get<jsonxx::Object>("param"), elementId, key, shiftKey, ctrlKey)) {
             this->PrepareUndo();
-            return (this->KeyDown(elementId, key, shiftKey, ctrlKey) && this->ValidateUndo());
+            return (this->KeyDown(elementId, key, shiftKey, ctrlKey));
         }
         LogWarning("Could not parse the keyDown action");
     }
@@ -160,10 +190,10 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
         if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), elementType, startid, endid)) {
             this->PrepareUndo();
             if (endid == "") {
-                return (this->Insert(elementType, startid) && this->ValidateUndo());
+                return (this->Insert(elementType, startid));
             }
             else {
-                return (this->Insert(elementType, startid, endid) && this->ValidateUndo());
+                return (this->Insert(elementType, startid, endid));
             }
         }
         LogWarning("Could not parse the insert action");
@@ -172,7 +202,7 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
         std::string elementId, attribute, value;
         if (this->ParseSetAction(json.get<jsonxx::Object>("param"), elementId, attribute, value)) {
             this->PrepareUndo();
-            return (this->Set(elementId, attribute, value) && this->ValidateUndo());
+            return (this->Set(elementId, attribute, value));
         }
         LogWarning("Could not parse the set action");
     }
@@ -273,18 +303,84 @@ bool EditorToolkitCMN::ParseSetAction(
 
 void EditorToolkitCMN::PrepareUndo()
 {
-    // We already have a validated undo but have not committed yet - nothing to prepare
-    if (!m_isCommitted) return;
-    // prepare the undo and store in it m_preparedUndo;
+    // We already have a prepared undo - nothing to prepare
+    if (m_undoPrepared) return;
+
+    std::string state = this->GetCurrentState();
+    m_undoStack.push_back(state);
+    m_undoMemoryUsage += state.size();
+    // When new edit happens, redo stack is cleared
+    while (!m_redoStack.empty()) {
+        m_undoMemoryUsage -= m_redoStack.back().size();
+        m_redoStack.pop_back();
+    }
+    TrimUndoMemory();
+    // Set the flag
+    m_undoPrepared = true;
 }
 
-bool EditorToolkitCMN::ValidateUndo()
+std::string EditorToolkitCMN::GetCurrentState()
 {
-    // We already have n validated undo but have not committed yet - nothing to validate
-    if (!m_isCommitted) return true;
-    // push the m_preparedUndo to the undo stack;
-    m_isCommitted = false;
-    return true;
+    MEIOutput meioutput(m_doc);
+    meioutput.SetSerializing(true);
+    meioutput.SetBasic(false);
+    meioutput.SetScoreBasedMEI(false);
+    return meioutput.Export();
+}
+
+bool EditorToolkitCMN::ReloadState(const std::string &data)
+{
+    MEIInput meiinput(m_doc);
+    meiinput.SetDeserializing(true);
+    return meiinput.Import(data);
+}
+
+bool EditorToolkitCMN::CanUndo() const
+{
+    return (!m_undoStack.empty());
+}
+
+bool EditorToolkitCMN::CanRedo() const
+{
+    return (!m_redoStack.empty());
+}
+
+bool EditorToolkitCMN::Undo()
+{
+    if (!CanUndo()) return false;
+
+    std::string currentState = this->GetCurrentState();
+    m_redoStack.push_back(currentState);
+
+    // Pop the previous state from undo stack
+    std::string previous = m_undoStack.back();
+    m_undoStack.pop_back();
+
+    return ReloadState(previous);
+}
+
+bool EditorToolkitCMN::Redo()
+{
+    if (!CanRedo()) return false;
+
+    std::string currentState = this->GetCurrentState();
+    m_undoStack.push_back(currentState);
+
+    // Pop redo state and load it
+    std::string redoState = m_redoStack.back();
+    m_redoStack.pop_back();
+
+    return ReloadState(redoState);
+}
+
+void EditorToolkitCMN::TrimUndoMemory()
+{
+    // Drop the oldest undo entries if we exceed the limit
+    while ((m_undoMemoryUsage > UNDO_MEMORY_LIMIT) && !m_undoStack.empty()) {
+        m_undoMemoryUsage -= m_undoStack.front().size();
+        m_undoStack.pop_front();
+    }
+    LogInfo("Undo stack size: %dMB", m_undoMemoryUsage / 1024 / 1024);
 }
 
 bool EditorToolkitCMN::Chain(jsonxx::Array actions)
@@ -794,6 +890,14 @@ bool EditorToolkitCMN::ContextForSections(bool editInfo)
     m_editInfo = jsonObject;
 
     return true;
+}
+
+void EditorToolkitCMN::ClearContext()
+{
+    if (m_sectionContext) {
+        delete m_sectionContext;
+        m_sectionContext = NULL;
+    }
 }
 
 bool EditorToolkitCMN::ContextForElement(std::string &elementId)
