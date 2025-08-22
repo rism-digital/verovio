@@ -4420,7 +4420,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj)
     };
 
     // Get clef and its position
-    Clef *clef = nullptr;
+    Clef *clef = NULL;
     int clefPosY = 0;
     if (!getClefAndPosY(obj, staff, staffSize, clef, clefPosY)) {
         return false;

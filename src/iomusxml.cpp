@@ -2077,7 +2077,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             }
         }
         else if (std::strncmp(dashes.node().name(), "dashes", 6) == 0) {
-            ControlElement *controlElement = nullptr;
+            ControlElement *controlElement = NULL;
             // find last ControlElement of type dynam or dir and activate extender
             // this is bad MusicXML and shouldn't happen
             std::vector<std::pair<std::string, ControlElement *>>::reverse_iterator riter;
@@ -2105,7 +2105,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
                     }
                 }
             }
-            if (controlElement != nullptr) {
+            if (controlElement) {
                 musicxml::OpenDashes openDashes(dashesNumber, staffNum, m_measureCounts.at(measure));
                 m_openDashesStack.push_back({ controlElement, openDashes });
             }
