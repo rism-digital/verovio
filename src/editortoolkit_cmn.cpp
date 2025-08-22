@@ -841,11 +841,6 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
 bool EditorToolkitCMN::ContextForScores(bool editInfo)
 {
     if (!m_scoreContext) {
-        // if (!m_doc->CheckIDs()) {
-        //     LogError("Action cannot be performed on documents with duplicated IDs");
-        //     return false;
-        // }
-
         m_scoreContext = new EditorTreeObject(m_doc, false);
         ScoreContextFunctor scoreContextFunctor(m_scoreContext);
         m_doc->Process(scoreContextFunctor);
