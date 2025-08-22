@@ -204,6 +204,12 @@ bool MEIOutput::Skip(Object *object) const
         assert(mNum);
         if (mNum->IsGenerated()) return true;
     }
+    else if (object->IsRunningElement()) {
+        if (this->IsSerializing()) return false;
+        const RunningElement *runningElement = vrv_cast<const RunningElement *>(object);
+        assert(runningElement);
+        if (runningElement->IsGenerated()) return true;
+    }
     else if (object->IsEditorialElement()) {
         // Skip all editorial elements in MEI Basic
         if (m_basic) return true;
@@ -1809,6 +1815,10 @@ void MEIOutput::WriteRunningElement(pugi::xml_node currentNode, RunningElement *
 
     this->WriteTextLayoutElement(currentNode, runningElement);
     runningElement->WriteFormework(currentNode);
+
+    if (this->IsSerializing() && runningElement->IsGenerated()) {
+        currentNode.append_attribute(VEROVIO_SERIALIZATION) = "generated";
+    }
 }
 
 void MEIOutput::WriteGrpSym(pugi::xml_node currentNode, GrpSym *grpSym)
@@ -2181,7 +2191,7 @@ void MEIOutput::WriteMNum(pugi::xml_node currentNode, MNum *mNum)
     mNum->WriteLang(currentNode);
     mNum->WriteTypography(currentNode);
     if (this->IsSerializing() && mNum->IsGenerated()) {
-        m_currentNode.append_attribute(VEROVIO_SERIALIZATION) = "generated";
+        currentNode.append_attribute(VEROVIO_SERIALIZATION) = "generated";
     }
 }
 
@@ -5190,6 +5200,14 @@ bool MEIInput::ReadRunningElement(pugi::xml_node element, RunningElement *object
 {
     this->ReadTextLayoutElement(element, object);
     object->ReadFormework(element);
+
+    if (m_deserializing) {
+        if (element.attribute(VEROVIO_SERIALIZATION)) {
+            std::string verovioSerialization = element.attribute(VEROVIO_SERIALIZATION).value();
+            if (verovioSerialization == "generated") object->IsGenerated(true);
+            element.remove_attribute(VEROVIO_SERIALIZATION);
+        }
+    }
 
     return true;
 }
