@@ -1007,7 +1007,12 @@ FunctorCode GenerateMIDIFunctor::VisitStaffDef(const StaffDef *staffDef)
 
 FunctorCode GenerateMIDIFunctor::VisitSyl(const Syl *syl)
 {
-    const double startTime = m_totalTime + m_lastNote->GetScoreTimeOnset().ToDouble();
+    double startTime = m_totalTime;
+    const Note *note = vrv_cast<const Note *>(syl->GetFirstAncestor(NOTE));
+    if (!note) note = vrv_cast<const Note *>(syl->GetFirstAncestor(CHORD)->GetFirst(NOTE));
+    assert(note);
+
+    startTime += note->GetScoreTimeOnset().ToDouble();
     const std::string sylText = UTF32to8(syl->GetText());
 
     m_midiFile->addLyric(m_midiTrack, startTime * m_midiFile->getTPQ(), sylText);
