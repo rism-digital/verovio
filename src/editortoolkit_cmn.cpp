@@ -863,11 +863,6 @@ bool EditorToolkitCMN::ContextForScores(bool editInfo)
 bool EditorToolkitCMN::ContextForSections(bool editInfo)
 {
     if (!m_sectionContext) {
-        // if (!m_doc->CheckIDs()) {
-        //     LogWarning("Action cannot be performed on documents with duplicated IDs");
-        //     return false;
-        // }
-
         m_sectionContext = new EditorTreeObject(m_doc, false);
         SectionContextFunctor sectionContextFunctor(m_sectionContext);
         m_doc->Process(sectionContextFunctor);

@@ -543,12 +543,6 @@ public:
      */
     void SetFocus();
 
-    /**
-     * Check if the document has duplicated IDs.
-     * Currently not used and needs to be tested.
-     */
-    bool CheckIDs();
-
     //----------//
     // Functors //
     //----------//
