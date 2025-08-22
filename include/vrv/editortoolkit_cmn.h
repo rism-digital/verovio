@@ -9,6 +9,7 @@
 #define __VRV_EDITOR_TOOLKIT_CMN_H__
 
 #include <cmath>
+#include <deque>
 #include <string>
 #include <utility>
 
