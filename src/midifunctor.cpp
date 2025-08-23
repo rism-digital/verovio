@@ -1118,12 +1118,16 @@ int GenerateMIDIFunctor::GetMIDIPitch(const Note *note)
         std::string noteName(1, (pname - 1 + ('C' - 'A')) % 7 + 'A');
 
         const Accid *accid = note->GetDrawingAccid();
-        if (accid && accid->HasAttClass(ATT_ACCIDENTAL)) {
-            const AttAccidental *att = dynamic_cast<const AttAccidental *>(accid);
-            assert(att);
-            // Skip natural accidental.
-            if (att->HasAccid() && att->GetAccid() != ACCIDENTAL_WRITTEN_n) {
-                noteName += att->AccidentalWrittenToStr(att->GetAccid());
+        if (accid && accid->HasAccid()) {
+            if (accid->GetAccid() == ACCIDENTAL_WRITTEN_n) {
+                if (accid->HasGlyphName()) {
+                    noteName += accid->GetGlyphName();
+                }
+            }
+            else {
+                const AttAccidental *att = dynamic_cast<const AttAccidental *>(accid);
+                assert(att);
+                noteName += att->AccidentalWrittenToStr(accid->GetAccid());
             }
         }
         int oct = note->GetOct() + m_octaveShift;

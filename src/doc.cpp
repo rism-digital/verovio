@@ -506,15 +506,18 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                     std::string mei = note_names[1].str();
                     std::string accid = note_names[2].str();
                     if (!accid.empty()) {
+                        InstAccidental accidental;
+                        accidental.SetAccid(accidental.StrToAccidentalWritten(accid));
                         if (this->GetResources().GetGlyphCode(accid)) {
                             mei += accid;
                         }
-                        else {
-                            InstAccidental accidental;
-                            accidental.SetAccid(accidental.StrToAccidentalWritten(accid));
-                            if (accidental.HasAccid() && accidental.GetAccid() != ACCIDENTAL_WRITTEN_n) {
+                        else if (accidental.HasAccid()) {
+                            if (accidental.GetAccid() != ACCIDENTAL_WRITTEN_n) {
                                 mei += accidental.AccidentalWrittenToStr(accidental.GetAccid());
                             }
+                        }
+                        else {
+                            LogError("Tuning accidental \"%s\" is neither a MEI accidental nor a SMuFL glyph", accid.c_str());
                         }
                     }
                     map.insert({mei, note});
