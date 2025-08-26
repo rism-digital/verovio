@@ -36,27 +36,36 @@ void ExpansionMap::Reset()
     m_map.clear();
 }
 
-void ExpansionMap::Expand(const xsdAnyURI_List &expansionPlist, xsdAnyURI_List &existingList, Object *prevSect)
+void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Object *prevSect)
 {
+    assert(expansion);
+    assert(expansion->GetParent());
+
+    xsdAnyURI_List expansionPlist = expansion->GetPlist();
+    if (expansionPlist.empty()) {
+        LogWarning("ExpansionMap::Expand: Expansion element %s has empty @plist. Nothing expanded.",
+            expansion->GetID().c_str());
+        return;
+    }
+
     assert(prevSect);
     assert(prevSect->GetParent());
 
-    // when prevSect is an expansion element, check whether its parent is in existingList. 
-    // If yes, clone the parent and add it; otherwise add it to existingList
-    if (prevSect->Is(EXPANSION)) {
-        if (std::find(existingList.begin(), existingList.end(), prevSect->GetID())
-            != existingList.end()) {
-            Object *clonedObject = prevSect->GetParent()->Clone();
-            clonedObject->CloneReset();
-            this->GeneratePredictableIDs(prevSect->GetParent(), clonedObject);
-            prevSect->GetParent()->GetParent()->InsertAfter(prevSect->GetParent(), clonedObject);
-        } else {
-            existingList.push_back(prevSect->GetID());
-        }
-    }
+    // If expansion element already exists, clone it and add it after prevSect,
+    // or add it to existingList otherwise
+    // if (std::find(existingList.begin(), existingList.end(), expansion->GetParent()->GetID()) != existingList.end()) {
+    //     Object *clonedObject = expansion->GetParent()->Clone();
+    //     clonedObject->CloneReset();
+    //     this->GeneratePredictableIDs(expansion->GetParent(), clonedObject);
+    //     prevSect->GetParent()->InsertAfter(prevSect, clonedObject);
+    //     prevSect = clonedObject;
+    // }
+    // else {
+    //     existingList.push_back(expansion->GetParent()->GetID());
+    // }
 
     // find all siblings of expansion element to know what in MEI file on that level
-    const ArrayOfObjects &expansionSiblings = prevSect->GetParent()->GetChildren();
+    const ArrayOfObjects &expansionSiblings = expansion->GetParent()->GetChildren();
     std::vector<std::string> toBeDeleted;
     for (Object *object : expansionSiblings) {
         if (object->Is({ SECTION, ENDING, LEM, RDG })) toBeDeleted.push_back(object->GetID());
@@ -82,12 +91,11 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionPlist, xsdAnyURI_List &
             }
             Expansion *currExpansion = vrv_cast<Expansion *>(currSect);
             assert(currExpansion);
-            this->Expand(currExpansion->GetPlist(), existingList, currSect);
+            this->Expand(currExpansion, existingList, prevSect);
         }
         else {
             // id already in existingList, clone object, update ids, and insert it
-            if (std::find(existingList.begin(), existingList.end(), id)
-                != existingList.end()) {
+            if (std::find(existingList.begin(), existingList.end(), id) != existingList.end()) {
 
                 // clone current section/ending/rdg/lem and rename it, adding -"rend2" for the first repetition etc.
                 Object *clonedObject = currSect->Clone();
@@ -158,7 +166,7 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionPlist, xsdAnyURI_List &
         assert(currSect);
 
         int idx = currSect->GetIdx();
-        LogInfo("ExpansionMap::Expand: Removing unused section/ending/rdg/lem with id %s", del.c_str());
+        LogWarning("ExpansionMap::Expand: Removing unused section/ending/rdg/lem with id %s", del.c_str());
         prevSect->GetParent()->DetachChild(idx);
     }
 }

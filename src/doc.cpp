@@ -1599,9 +1599,8 @@ void Doc::ExpandExpansions()
         return;
     }
 
-    xsdAnyURI_List expansionPlist = startExpansion->GetPlist();
     xsdAnyURI_List existingList; // list of xml:id strings of elements already in the document
-    m_expansionMap.Expand(expansionPlist, existingList, startExpansion);
+    m_expansionMap.Expand(startExpansion, existingList, startExpansion);
 
     // save original/notated expansion as element in expanded MEI
     // Expansion *originalExpansion = new Expansion();
