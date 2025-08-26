@@ -36,31 +36,45 @@ void ExpansionMap::Reset()
     m_map.clear();
 }
 
-void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &existingList, Object *prevSect)
+void ExpansionMap::Expand(const xsdAnyURI_List &expansionPlist, xsdAnyURI_List &existingList, Object *prevSect)
 {
     assert(prevSect);
     assert(prevSect->GetParent());
 
-    // find all siblings of expansion element to know what in MEI file
-    const ArrayOfObjects &expansionSiblings = prevSect->GetParent()->GetChildren();
-    std::vector<std::string> reductionList;
-    for (Object *object : expansionSiblings) {
-        if (object->Is({ SECTION, ENDING, LEM, RDG })) reductionList.push_back(object->GetID());
+    // when prevSect is an expansion element, check whether its parent is in existingList. 
+    // If yes, clone the parent and add it; otherwise add it to existingList
+    if (prevSect->Is(EXPANSION)) {
+        if (std::find(existingList.begin(), existingList.end(), prevSect->GetID())
+            != existingList.end()) {
+            Object *clonedObject = prevSect->GetParent()->Clone();
+            clonedObject->CloneReset();
+            this->GeneratePredictableIDs(prevSect->GetParent(), clonedObject);
+            prevSect->GetParent()->GetParent()->InsertAfter(prevSect->GetParent(), clonedObject);
+        } else {
+            existingList.push_back(prevSect->GetID());
+        }
     }
 
-    for (std::string s : expansionList) {
-        if (s.rfind("#", 0) == 0) s = s.substr(1, s.size() - 1); // remove trailing hash from reference
-        Object *currSect = prevSect->GetParent()->FindDescendantByID(s); // find section pointer of reference string
-        if (!currSect) {
+    // find all siblings of expansion element to know what in MEI file on that level
+    const ArrayOfObjects &expansionSiblings = prevSect->GetParent()->GetChildren();
+    std::vector<std::string> toBeDeleted;
+    for (Object *object : expansionSiblings) {
+        if (object->Is({ SECTION, ENDING, LEM, RDG })) toBeDeleted.push_back(object->GetID());
+    }
+
+    for (std::string id : expansionPlist) {
+        if (id.rfind("#", 0) == 0) id = id.substr(1, id.size() - 1); // remove leading hash from id
+        Object *currSect = prevSect->GetParent()->FindDescendantByID(id); // find section pointer for id string
+        if (currSect == NULL) {
             // Warn about referenced element not found and continue
-            LogWarning("ExpansionMap::Expand: Element referenced in @plist not found: %s", s.c_str());
+            LogWarning("ExpansionMap::Expand: Element referenced in @plist not found: %s", id.c_str());
             continue;
         }
-        if (currSect->Is(EXPANSION)) { // if reference is itself an expansion, resolve it recursively
-            // remove parent from reductionList, if expansion
-            for (auto it = begin(reductionList); it != end(reductionList);) {
+        if (currSect->Is(EXPANSION)) { // if id is itself an expansion, resolve it recursively
+            // remove parent from toBeDeleted, if expansion
+            for (auto it = begin(toBeDeleted); it != end(toBeDeleted);) {
                 if ((*it).compare(currSect->GetParent()->GetID()) == 0) {
-                    it = reductionList.erase(it);
+                    it = toBeDeleted.erase(it);
                 }
                 else {
                     ++it;
@@ -71,8 +85,9 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
             this->Expand(currExpansion->GetPlist(), existingList, currSect);
         }
         else {
-            if (std::find(existingList.begin(), existingList.end(), s)
-                != existingList.end()) { // section exists in list
+            // id already in existingList, clone object, update ids, and insert it
+            if (std::find(existingList.begin(), existingList.end(), id)
+                != existingList.end()) {
 
                 // clone current section/ending/rdg/lem and rename it, adding -"rend2" for the first repetition etc.
                 Object *clonedObject = currSect->Clone();
@@ -122,13 +137,13 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
                 }
 
                 prevSect = currSect;
-                existingList.push_back(s);
+                existingList.push_back(id);
             }
 
-            // remove s from reductionList
-            for (auto it = begin(reductionList); it != end(reductionList);) {
-                if ((*it).compare(s) == 0) {
-                    it = reductionList.erase(it);
+            // remove id from toBeDeleted
+            for (auto it = begin(toBeDeleted); it != end(toBeDeleted);) {
+                if ((*it).compare(id) == 0) {
+                    it = toBeDeleted.erase(it);
                 }
                 else {
                     ++it;
@@ -138,11 +153,12 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
     }
 
     // remove unused sections from structure
-    for (std::string r : reductionList) {
-        Object *currSect = prevSect->GetParent()->FindDescendantByID(r);
+    for (std::string del : toBeDeleted) {
+        Object *currSect = prevSect->GetParent()->FindDescendantByID(del); // find section pointer for id string
         assert(currSect);
 
         int idx = currSect->GetIdx();
+        LogInfo("ExpansionMap::Expand: Removing unused section/ending/rdg/lem with id %s", del.c_str());
         prevSect->GetParent()->DetachChild(idx);
     }
 }

@@ -1593,15 +1593,15 @@ void Doc::ExpandExpansions()
     std::string expansionId = this->GetOptions()->m_expand.GetValue();
     if (expansionId.empty()) return;
 
-    Expansion *start = dynamic_cast<Expansion *>(this->FindDescendantByID(expansionId));
-    if (start == NULL) {
+    Expansion *startExpansion = dynamic_cast<Expansion *>(this->FindDescendantByID(expansionId));
+    if (startExpansion == NULL) {
         LogWarning("Expansion ID '%s' not found. Nothing expanded.", expansionId.c_str());
         return;
     }
 
-    xsdAnyURI_List expansionList = start->GetPlist();
-    xsdAnyURI_List existingList;
-    m_expansionMap.Expand(expansionList, existingList, start);
+    xsdAnyURI_List expansionPlist = startExpansion->GetPlist();
+    xsdAnyURI_List existingList; // list of xml:id strings of elements already in the document
+    m_expansionMap.Expand(expansionPlist, existingList, startExpansion);
 
     // save original/notated expansion as element in expanded MEI
     // Expansion *originalExpansion = new Expansion();
