@@ -836,7 +836,6 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
         return true;
     }
 }
-#endif /* NO_EDIT_SUPPORT */
 
 bool EditorToolkitCMN::ContextForScores(bool editInfo)
 {
@@ -1175,5 +1174,7 @@ ArrayOfConstObjects EditorTreeObject::GetChildObjects() const
     }
     return childObjects;
 }
+
+#endif /* NO_EDIT_SUPPORT */
 
 } // namespace vrv

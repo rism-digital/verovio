@@ -162,6 +162,7 @@ private:
     //
 #endif /* NO_EDIT_SUPPORT */
 };
+
 } // namespace vrv
 
 #endif
