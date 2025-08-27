@@ -110,7 +110,7 @@ FunctorCode ScoreContextFunctor::VisitObject(Object *object)
     if (object->Is(SCORE)) {
         Score *score = vrv_cast<Score *>(object);
         assert(score);
-        // We are now in the score an process the scoreDef subtree
+        // We are now in the score and process the scoreDef subtree
         // Include the first one in the context tree - and then own children
         m_inScoreLevel = TO_INCLUDE;
         score->GetScoreDef()->Process(*this);
