@@ -17,7 +17,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 /**
- * This build a tree of EditorTreeObject representing the original score-based structure.
+ * This builds a tree of EditorTreeObject that represent the original score-based structure.
  */
 class SectionContextFunctor : public Functor {
 public:
