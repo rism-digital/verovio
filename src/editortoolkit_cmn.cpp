@@ -1134,7 +1134,7 @@ ArrayOfConstObjects EditorToolkitCMN::GetScoreBasedChildrenFor(const Object *obj
     if (!editorTreeObject) {
         return ArrayOfConstObjects();
     }
-    return editorTreeObject->GetChildrenObjects();
+    return editorTreeObject->GetChildObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -1164,16 +1164,16 @@ void EditorTreeObject::Reset()
     VisibilityDrawingInterface::Reset();
 }
 
-ArrayOfConstObjects EditorTreeObject::GetChildrenObjects() const
+ArrayOfConstObjects EditorTreeObject::GetChildObjects() const
 {
-    ArrayOfConstObjects childrenObjects;
-    childrenObjects.reserve(this->GetChildCount());
+    ArrayOfConstObjects childObjects;
+    childObjects.reserve(this->GetChildCount());
     for (auto child : this->GetChildren()) {
         const EditorTreeObject *editorTreeChild = vrv_cast<const EditorTreeObject *>(child);
 
-        childrenObjects.push_back((editorTreeChild->m_object ? editorTreeChild->m_object : editorTreeChild));
+        childObjects.push_back((editorTreeChild->m_object ? editorTreeChild->m_object : editorTreeChild));
     }
-    return childrenObjects;
+    return childObjects;
 }
 
 } // namespace vrv

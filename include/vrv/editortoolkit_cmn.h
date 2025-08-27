@@ -150,7 +150,7 @@ public:
     }
     ///@}
 
-    ArrayOfConstObjects GetChildrenObjects() const;
+    ArrayOfConstObjects GetChildObjects() const;
 
 private:
     //
