@@ -564,13 +564,28 @@ bool EditorToolkitCMN::Set(std::string &elementId, std::string const &attribute,
     else if (AttModule::SetCritapp(element, attribute, value)) {
         success = true;
     }
+    else if (AttModule::SetEdittrans(element, attribute, value)) {
+        success = true;
+    }
     else if (AttModule::SetExternalsymbols(element, attribute, value)) {
         success = true;
     }
     else if (AttModule::SetFacsimile(element, attribute, value)) {
         success = true;
     }
+    else if (AttModule::SetFigtable(element, attribute, value)) {
+        success = true;
+    }
+    else if (AttModule::SetFingering(element, attribute, value)) {
+        success = true;
+    }
     else if (AttModule::SetGestural(element, attribute, value)) {
+        success = true;
+    }
+    else if (AttModule::SetHarmony(element, attribute, value)) {
+        success = true;
+    }
+    else if (AttModule::SetHeader(element, attribute, value)) {
         success = true;
     }
     else if (AttModule::SetMei(element, attribute, value)) {
@@ -588,16 +603,23 @@ bool EditorToolkitCMN::Set(std::string &elementId, std::string const &attribute,
     else if (AttModule::SetPagebased(element, attribute, value)) {
         success = true;
     }
+    else if (AttModule::SetPerformance(element, attribute, value)) {
+        success = true;
+    }
     else if (AttModule::SetShared(element, attribute, value)) {
+        success = true;
+    }
+    else if (AttModule::SetStringtab(element, attribute, value)) {
+        success = true;
+    }
+    else if (AttModule::SetUsersymbols(element, attribute, value)) {
         success = true;
     }
     else if (AttModule::SetVisual(element, attribute, value)) {
         success = true;
     }
-    if (success) {
-        return true;
-    }
-    return false;
+
+    return success;
 }
 
 Object *EditorToolkitCMN::GetElement(std::string &elementId)
@@ -609,18 +631,7 @@ Object *EditorToolkitCMN::GetElement(std::string &elementId)
         m_chainedId = elementId;
     }
 
-    Object *element = NULL;
-
-    // Try to get the element on the current drawing page
-    if (m_doc->GetDrawingPage()) {
-        element = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
-    }
-    // If it wasn't there, try on the whole doc
-    if (!element) {
-        element = m_doc->FindDescendantByID(elementId);
-    }
-
-    return element;
+    return this->GetElement(elementId);
 }
 
 bool EditorToolkitCMN::InsertNote(Object *object)
