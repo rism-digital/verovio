@@ -36,7 +36,7 @@ void ExpansionMap::Reset()
     m_map.clear();
 }
 
-void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Object *prevSect)
+void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Object *prevSect, xsdAnyURI_List &deletionList, bool deleteList = false)
 {
     assert(expansion);
     assert(expansion->GetParent());
@@ -66,9 +66,10 @@ void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Ob
 
     // find all siblings of expansion element to know what in MEI file on that level
     const ArrayOfObjects &expansionSiblings = expansion->GetParent()->GetChildren();
-    std::vector<std::string> toBeDeleted;
+    
+    // add all relevant element ids to deletionList
     for (Object *object : expansionSiblings) {
-        if (object->Is({ SECTION, ENDING, LEM, RDG })) toBeDeleted.push_back(object->GetID());
+        if (object->Is({ SECTION, ENDING, LEM, RDG })) deletionList.push_back(object->GetID());
     }
 
     for (std::string id : expansionPlist) {
@@ -80,10 +81,10 @@ void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Ob
             continue;
         }
         if (currSect->Is(EXPANSION)) { // if id is itself an expansion, resolve it recursively
-            // remove parent from toBeDeleted, if expansion
-            for (auto it = begin(toBeDeleted); it != end(toBeDeleted);) {
+            // remove parent from deletionList, if expansion
+            for (auto it = begin(deletionList); it != end(deletionList);) {
                 if ((*it).compare(currSect->GetParent()->GetID()) == 0) {
-                    it = toBeDeleted.erase(it);
+                    it = deletionList.erase(it);
                 }
                 else {
                     ++it;
@@ -91,7 +92,7 @@ void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Ob
             }
             Expansion *currExpansion = vrv_cast<Expansion *>(currSect);
             assert(currExpansion);
-            this->Expand(currExpansion, existingList, prevSect);
+            this->Expand(currExpansion, existingList, prevSect, deletionList);
         }
         else {
             // id already in existingList, clone object, update ids, and insert it
@@ -148,10 +149,10 @@ void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Ob
                 existingList.push_back(id);
             }
 
-            // remove id from toBeDeleted
-            for (auto it = begin(toBeDeleted); it != end(toBeDeleted);) {
+            // remove id from deletionList
+            for (auto it = begin(deletionList); it != end(deletionList);) {
                 if ((*it).compare(id) == 0) {
-                    it = toBeDeleted.erase(it);
+                    it = deletionList.erase(it);
                 }
                 else {
                     ++it;
@@ -160,14 +161,16 @@ void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Ob
         }
     }
 
-    // remove unused sections from structure
-    for (std::string del : toBeDeleted) {
-        Object *currSect = prevSect->GetParent()->FindDescendantByID(del); // find section pointer for id string
-        assert(currSect);
-
-        int idx = currSect->GetIdx();
-        LogWarning("ExpansionMap::Expand: Removing unused section/ending/rdg/lem with id %s", del.c_str());
-        prevSect->GetParent()->DetachChild(idx);
+    // at the very end, remove unused sections from structure
+    if (deleteList) {
+        for (std::string del : deletionList) {
+            Object *currSect = prevSect->GetParent()->FindDescendantByID(del); // find section pointer for id string
+            assert(currSect);
+            
+            int idx = currSect->GetIdx();
+            LogWarning("ExpansionMap::Expand: Removing unused section/ending/rdg/lem with id %s", del.c_str());
+            currSect->GetParent()->DetachChild(idx);
+        }
     }
 }
 

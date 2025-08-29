@@ -1600,7 +1600,8 @@ void Doc::ExpandExpansions()
     }
 
     xsdAnyURI_List existingList; // list of xml:id strings of elements already in the document
-    m_expansionMap.Expand(startExpansion, existingList, startExpansion);
+    xsdAnyURI_List deletionList; // list of xml:id strings of elements not cloned and to be deleted at the end
+    m_expansionMap.Expand(startExpansion, existingList, startExpansion, deletionList, true);
 
     // save original/notated expansion as element in expanded MEI
     // Expansion *originalExpansion = new Expansion();
