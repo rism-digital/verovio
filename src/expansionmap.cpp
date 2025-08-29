@@ -56,6 +56,11 @@ void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Ob
     assert(prevSect);
     assert(prevSect->GetParent());
 
+    // DEBUG
+    if (expansion->GetParent()->GetID() == "Var-XIII") {
+        LogWarning("Var XIII parent %s", expansion->GetParent()->GetID().c_str());
+    }
+
     Object *insertHere = nullptr; // cloned parent container
 
     // If expansion parent already exists, create a new empty such element
@@ -157,6 +162,8 @@ void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Ob
                 int childCount = prevSect->GetParent()->GetChildCount();
                 int currIdx = currSect->GetIdx();
 
+                // TODO: beautify reordering conditions and remove debugging content above
+
                 // If prevSect has a next element and if it is different than the currSect or has no next element,
                 // move it to after the currSect.
                 if (prevIdx < childCount - 1) {
@@ -171,7 +178,8 @@ void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Ob
                 }
 
                 // move prevSect to after currSect
-                if (moveCurrentElement && currIdx < prevIdx && prevIdx < childCount) {
+                if (moveCurrentElement && currSect->GetParent()->GetID() == prevSect->GetParent()->GetID()
+                    && currIdx < prevIdx && prevIdx < childCount) {
                     LogDebug(
                         "Re-ordering element %s to after %s", currSect->GetID().c_str(), prevSect->GetID().c_str());
                     currSect->GetParent()->RotateChildren(currIdx, currIdx + 1, prevIdx + 1);
