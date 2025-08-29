@@ -82,11 +82,13 @@ void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Ob
 
         prevSect->GetParent()->InsertAfter(prevSect, newContainer);
         GeneratePredictableIDs(expansion->GetParent(), newContainer);
-        LogDebug("Creating new container for expansion element %s", newContainer->GetID().c_str());
+        LogDebug("Creating new container <%s> for expansion element %s", newContainer->GetClassName().c_str(),
+            newContainer->GetID().c_str());
 
         insertHere = newContainer;
     }
-    else {
+    else if (std::find(existingList.begin(), existingList.end(), expansion->GetParent()->GetID())
+        == existingList.end()) {
         existingList.push_back(expansion->GetParent()->GetID());
     }
 
@@ -140,10 +142,10 @@ void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Ob
                 LogDebug("Cloning element in @plist: %s", clonedObject->GetID().c_str());
 
                 if (insertHere != NULL) {
-                    insertHere->AddChild(clonedObject); // add to new container
+                    insertHere->AddChild(clonedObject); // add to new container, if it exists
                 }
                 else {
-                    prevSect->GetParent()->InsertAfter(prevSect, clonedObject); // add after previous section
+                    prevSect->GetParent()->InsertAfter(prevSect, clonedObject); // or add after previous section
                 }
 
                 prevSect = clonedObject;
