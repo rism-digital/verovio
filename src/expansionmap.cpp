@@ -36,7 +36,8 @@ void ExpansionMap::Reset()
     m_map.clear();
 }
 
-void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Object *prevSect, xsdAnyURI_List &deletionList, bool deleteList = false)
+void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Object *prevSect,
+    xsdAnyURI_List &deletionList, bool deleteList = false)
 {
     assert(expansion);
     assert(expansion->GetParent());
@@ -66,7 +67,7 @@ void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Ob
 
     // find all siblings of expansion element to know what in MEI file on that level
     const ArrayOfObjects &expansionSiblings = expansion->GetParent()->GetChildren();
-    
+
     // add all relevant element ids to deletionList
     for (Object *object : expansionSiblings) {
         if (object->Is({ SECTION, ENDING, LEM, RDG })) deletionList.push_back(object->GetID());
@@ -148,28 +149,21 @@ void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Ob
                 prevSect = currSect;
                 existingList.push_back(id);
             }
-
-            // remove id from deletionList
-            for (auto it = begin(deletionList); it != end(deletionList);) {
-                if ((*it).compare(id) == 0) {
-                    it = deletionList.erase(it);
-                }
-                else {
-                    ++it;
-                }
-            }
         }
     }
 
-    // at the very end, remove unused sections from structure
+    // at the very end, remove unused sections from structure if not in existingList
     if (deleteList) {
         for (std::string del : deletionList) {
-            Object *currSect = prevSect->GetParent()->FindDescendantByID(del); // find section pointer for id string
-            assert(currSect);
-            
-            int idx = currSect->GetIdx();
-            LogWarning("ExpansionMap::Expand: Removing unused section/ending/rdg/lem with id %s", del.c_str());
-            currSect->GetParent()->DetachChild(idx);
+            long cnt = std::count(existingList.begin(), existingList.end(), del);
+            if (cnt == 0) {
+                Object *currSect = prevSect->GetParent()->FindDescendantByID(del); // find section pointer for id string
+                assert(currSect);
+
+                int idx = currSect->GetIdx();
+                LogWarning("ExpansionMap::Expand: Removing unused section/ending/rdg/lem with id %s", del.c_str());
+                currSect->GetParent()->DetachChild(idx);
+            }
         }
     }
 }
