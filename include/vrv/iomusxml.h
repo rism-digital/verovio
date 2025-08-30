@@ -183,6 +183,25 @@ namespace musicxml {
         int m_layerNum = 0;
     };
 
+    struct AccidGes {
+        AccidGes()
+        {
+            m_accidGes = ACCIDENTAL_GESTURAL_NONE;
+            m_glyphName = "";
+            m_glyphAuth = "";
+        }
+
+        AccidGes(data_ACCIDENTAL_GESTURAL accidGes, std::string glyphName, std::string glyphAuth)
+        {
+            m_accidGes = accidGes;
+            m_glyphName = glyphName;
+            m_glyphAuth = glyphAuth;
+        }
+
+        data_ACCIDENTAL_GESTURAL m_accidGes;
+        std::string m_glyphName;
+        std::string m_glyphAuth;
+    };
 } // namespace musicxml
 
 #endif // NO_MUSICXML_SUPPORT
@@ -438,6 +457,13 @@ private:
     ///@}
 
     /*
+     * @name Method to update the gestural accidentals for each pitch class based on key signature
+     */
+    ///@{
+    void ResetAccidGes(const KeySig *keySig = NULL);
+    ///@}
+
+    /*
      * @name Helper method for comparing written/gestural accidental attributes
      */
     ///@{
@@ -565,6 +591,10 @@ private:
     std::map<Measure *, int> m_measureCounts;
     /* measure rests */
     std::map<int, int> m_multiRests;
+    /* a map of current accidental for each pitch class */
+    std::map<data_PITCHNAME, musicxml::AccidGes> m_currentAccids;
+    /* current key signature */
+    KeySig *m_currentKeySig = NULL;
 
 #endif // NO_MUSICXML_SUPPORT
 };

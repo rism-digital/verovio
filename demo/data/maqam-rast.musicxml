@@ -255,7 +255,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>2</duration>
         <voice>1</voice>
         <type>half</type>
-        <accidental cautionary="yes" parentheses="no">slash-flat</accidental>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         <lyric number="1" default-x="6.5" default-y="-46.26" relative-y="-30">
           <syllabic>single</syllabic>
@@ -323,7 +323,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>2</duration>
         <voice>1</voice>
         <type>half</type>
-        <accidental cautionary="yes" parentheses="no">slash-flat</accidental>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         <lyric number="1" default-x="6.5" default-y="-46.26" relative-y="-30">
           <syllabic>single</syllabic>
@@ -407,7 +407,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>2</duration>
         <voice>1</voice>
         <type>half</type>
-        <accidental cautionary="yes" parentheses="no">slash-flat</accidental>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         <lyric number="1" default-x="6.5" default-y="-45.32" relative-y="-30">
           <syllabic>single</syllabic>
@@ -475,7 +475,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>2</duration>
         <voice>1</voice>
         <type>half</type>
-        <accidental cautionary="yes" parentheses="no">slash-flat</accidental>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         <lyric number="1" default-x="6.5" default-y="-45.32" relative-y="-30">
           <syllabic>single</syllabic>
@@ -559,7 +559,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>2</duration>
         <voice>1</voice>
         <type>half</type>
-        <accidental cautionary="yes" parentheses="no">slash-flat</accidental>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         <lyric number="1" default-x="6.5" default-y="-40" relative-y="-30">
           <syllabic>single</syllabic>
@@ -656,7 +656,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental cautionary="yes" parentheses="no">slash-flat</accidental>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="231.83" default-y="-35">
@@ -712,7 +712,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental cautionary="yes" parentheses="no">slash-flat</accidental>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="186.23" default-y="-15">
@@ -816,7 +816,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental cautionary="yes" parentheses="no">slash-flat</accidental>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="128.49" default-y="-45">
@@ -911,7 +911,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>4</duration>
         <voice>1</voice>
         <type>whole</type>
-        <accidental cautionary="yes" parentheses="no">slash-flat</accidental>
+        <accidental>slash-flat</accidental>
         </note>
       <barline location="right">
         <bar-style>none</bar-style>
@@ -969,7 +969,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>4</duration>
         <voice>1</voice>
         <type>whole</type>
-        <accidental cautionary="yes" parentheses="no">slash-flat</accidental>
+        <accidental>slash-flat</accidental>
         </note>
       <barline location="right">
         <bar-style>none</bar-style>
@@ -1080,7 +1080,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>4</duration>
         <voice>1</voice>
         <type>whole</type>
-        <accidental cautionary="yes" parentheses="no">slash-flat</accidental>
+        <accidental>slash-flat</accidental>
         </note>
       <barline location="right">
         <bar-style>none</bar-style>
@@ -1167,7 +1167,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>2</duration>
         <voice>1</voice>
         <type>half</type>
-        <accidental cautionary="yes" parentheses="no">slash-flat</accidental>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="68.17" default-y="-35">
@@ -1219,7 +1219,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>2</duration>
         <voice>1</voice>
         <type>half</type>
-        <accidental cautionary="yes" parentheses="no">slash-flat</accidental>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="68.17" default-y="-15">
@@ -1308,7 +1308,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>2</duration>
         <voice>1</voice>
         <type>half</type>
-        <accidental cautionary="yes" parentheses="no">slash-flat</accidental>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <barline location="right">
@@ -1388,7 +1388,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental cautionary="yes" parentheses="no">slash-flat</accidental>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="238.76" default-y="-35">
@@ -1435,7 +1435,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental cautionary="yes" parentheses="no">slash-flat</accidental>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="171.05" default-y="-15">
@@ -1519,7 +1519,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental cautionary="yes" parentheses="no">slash-flat</accidental>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="118.37" default-y="-45">
@@ -1608,6 +1608,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <barline location="right">
@@ -1699,6 +1700,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <barline location="right">
@@ -1760,6 +1762,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="55.96" default-y="-50">
@@ -1781,6 +1784,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="141.87" default-y="-45">
@@ -1816,6 +1820,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="103.61" default-y="-35">
@@ -1837,6 +1842,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="193.63" default-y="-30">
@@ -1918,6 +1924,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="103.03" default-y="-35">
@@ -2009,6 +2016,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="103.03" default-y="-30">
@@ -2107,6 +2115,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="48.18" default-y="-45">
@@ -2128,6 +2137,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="118.54" default-y="-35">
@@ -2154,6 +2164,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="48.18" default-y="-35">
@@ -2245,6 +2256,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="48.18" default-y="-35">
@@ -2266,6 +2278,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="118.54" default-y="-45">
@@ -2292,6 +2305,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="48.18" default-y="-50">
@@ -2370,6 +2384,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="128.95" default-y="-50">
@@ -2426,6 +2441,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="118.54" default-y="-30">
@@ -2452,6 +2468,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="48.18" default-y="-35">
@@ -2508,6 +2525,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="83.36" default-y="-30">
@@ -2564,6 +2582,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="118.54" default-y="-50">
@@ -2590,6 +2609,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="48.18" default-y="-45">
@@ -2611,6 +2631,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="118.54" default-y="-50">
@@ -2719,6 +2740,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="104.38" default-y="-25">
@@ -2745,6 +2767,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>up</stem>
         </note>
       <note default-x="43.46" default-y="-30">
@@ -2983,6 +3006,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <barline location="right">
@@ -3074,6 +3098,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <barline location="right">
@@ -3135,6 +3160,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="48.18" default-y="-30">
@@ -3156,6 +3182,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="118.54" default-y="-25">
@@ -3182,6 +3209,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="48.18" default-y="-15">
@@ -3203,6 +3231,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="118.54" default-y="-10">
@@ -3293,6 +3322,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="127.38" default-y="-15">
@@ -3384,6 +3414,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="127.38" default-y="-10">
@@ -3482,6 +3513,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="44.23" default-y="-25">
@@ -3503,6 +3535,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="106.68" default-y="-15">
@@ -3529,6 +3562,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="44.23" default-y="-15">
@@ -3585,6 +3619,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="75.45" default-y="-10">
@@ -3641,6 +3676,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="106.68" default-y="-15">
@@ -3667,6 +3703,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="44.23" default-y="-25">
@@ -3688,6 +3725,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="106.68" default-y="-25">
@@ -3755,6 +3793,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="121.05" default-y="-30">
@@ -3811,6 +3850,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="106.68" default-y="-10">
@@ -3837,6 +3877,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="44.23" default-y="-15">
@@ -3858,6 +3899,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="106.68" default-y="-15">
@@ -3894,6 +3936,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="75.45" default-y="-10">
@@ -3950,6 +3993,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="106.68" default-y="-30">
@@ -3976,6 +4020,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="44.23" default-y="-25">
@@ -3997,6 +4042,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="106.68" default-y="-25">
@@ -4119,6 +4165,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="117.43" default-y="-5">
@@ -4130,6 +4177,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <barline location="right">
@@ -4146,6 +4194,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="47.81" default-y="-10">
@@ -4287,6 +4336,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="47.81" default-y="-25">
@@ -4360,6 +4410,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="127.87" default-y="-10">
@@ -4655,6 +4706,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="119.61" default-y="-15">
@@ -4794,6 +4846,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="89.1" default-y="-15">
@@ -4941,6 +4994,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="99.99" default-y="-20">
@@ -5060,6 +5114,7 @@ This pitch set enables 24-EDO versions of nearly all possible maqamat from a giv
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>slash-flat</accidental>
         <stem>down</stem>
         </note>
       <note default-x="99.99" default-y="-25">
