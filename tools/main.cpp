@@ -310,7 +310,7 @@ int main(int argc, char **argv)
     }
 
     // Skip the layout for MIDI and timemap output by setting --breaks to none
-    if ((outformat == "mei" || outformat == "midi") || (outformat == "timemap") || (outformat == "expansionmap")) {
+    if ((outformat == "mei") || (outformat == "midi") || (outformat == "timemap") || (outformat == "expansionmap")) {
         toolkit.SetOptions("{'breaks': 'none'}");
     }
 
