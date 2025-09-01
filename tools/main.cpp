@@ -440,7 +440,7 @@ int main(int argc, char **argv)
         }
     }
     else if (outformat == "expansionmap") {
-        outfile += "-em.json";
+        outfile += ".json";
         if (stdOutput) {
             std::string output;
             std::cout << toolkit.RenderToExpansionMap();
