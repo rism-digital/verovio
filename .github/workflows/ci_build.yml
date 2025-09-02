@@ -133,7 +133,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5
 
       - name: Register gcc problem matcher
         run: echo "::add-matcher::.github/problem_matchers/gcc.json"
@@ -215,10 +215,10 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5
 
       - name: Restore cache
-        uses: actions/setup-java@v4.7.1
+        uses: actions/setup-java@v5.0.0
         with:
           distribution: 'temurin'
           java-version: '21'
@@ -305,7 +305,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
@@ -360,7 +360,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
@@ -422,7 +422,7 @@ jobs:
 
     steps:
       - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5
         with:
           # repository to check out
           repository: ${{ env.GH_PAGES_REPO }}
@@ -435,7 +435,7 @@ jobs:
           path: ${{ env.GH_PAGES_DIR }}
 
       - name: Download TOOLKIT_BUILD artifacts
-        uses: actions/download-artifact@v4.3.0
+        uses: actions/download-artifact@v5.0.0
         with:
           name: ${{ env.TOOLKIT_BUILD }}-${{ github.run_id }}
           path: artifacts/${{ env.TOOLKIT_BUILD }}
@@ -445,7 +445,7 @@ jobs:
           cp -r artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
 
       - name: Download FONTS artifacts
-        uses: actions/download-artifact@v4.3.0
+        uses: actions/download-artifact@v5.0.0
         with:
           name: ${{ env.FONTS }}-${{ github.run_id }}
           path: artifacts/${{ env.FONTS }}
@@ -515,7 +515,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5
 
       - name: Install doxygen
         run: |
@@ -552,7 +552,7 @@ jobs:
 
     steps:
       - name: Checkout DOXYGEN_REPO into DOXYGEN_DIR
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5
         with:
           # repository to check out
           repository: ${{ env.DOXYGEN_REPO }}
@@ -565,7 +565,7 @@ jobs:
           path: ${{ env.DOXYGEN_DIR }}
 
       - name: Download DOC_BUILD artifacts
-        uses: actions/download-artifact@v4.3.0
+        uses: actions/download-artifact@v5.0.0
         with:
           name: ${{ env.DOC_BUILD }}-${{ github.run_id }}
           path: artifacts/${{ env.DOC_BUILD }}
