@@ -24,7 +24,7 @@
         {
           // load the sound bank into an array buffer
           let soundFontArrayBuffer = await response.arrayBuffer();
-          document.getElementById('message').innerHTML = 'Ready to play (with <a href="https://github.com/spessasus/SpessaSynth" target="_blank">SpessaSynth</a>) ▶️ (Refresh the page to stop playing 😂)';
+          document.getElementById('message').innerHTML = 'Ready to play ▶️ (Refresh the page to stop playing 😂)';
 
           // add an event listener for the file inout
           document.getElementById('message').addEventListener('click', async event =>
@@ -40,11 +40,24 @@
       });
     </script>
     <style>
-      body {background-color: powderblue;}
-      #message {cursor: pointer;}
+      body {
+        background-color: powderblue;
+      }
+      #message {
+        cursor: pointer;
+      }
+      #github {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+      }
     </style>
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
   </head>
   <body>
+    <div id="github">
+      <a class="github-button" href="https://github.com/infojunkie/verovio" data-size="large" aria-label="Visit infojunkie/verovio on GitHub">Visit on GitHub</a>
+    </div>
     <div id="message"></div>
     <div id="sheet"></div>
   </body>
