@@ -689,9 +689,9 @@ void Doc::PrepareData()
     }
     const int unmatchedElements = static_cast<int>(unmatchedPairs.size());
     if (unmatchedElements > 0) {
-        LogWarning("%d time spanning element(s) with startid and endid could not be matched.", unmatchedElements);
+        LogWarning("%d time spanning element(s) with startid and endid could not be matched:", unmatchedElements);
         for (const auto &pair : unmatchedPairs) {
-            LogDebug("Unmatched %s %s: startId: %s, endId: %s", pair.second->GetClassName().c_str(),
+            LogWarning("Unmatched %s %s: @startId: %s, @endId: %s", pair.second->GetClassName().c_str(),
                 pair.second->GetID().c_str(), pair.first->GetStartid().c_str(), pair.first->GetEndid().c_str());
         }
     }
