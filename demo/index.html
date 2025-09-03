@@ -16,6 +16,7 @@
         verovioToolkit.loadData(score);
         verovioToolkit.setOptions({
           scale: 50,
+          font: 'Bravura',
         })
         const data = verovioToolkit.renderToSVG(1);
         document.getElementById('sheet').innerHTML = data;
@@ -31,7 +32,7 @@
           {
             const midiFile = atoab(verovioToolkit.renderToMIDI());
             const context = new AudioContext();
-            await context.audioWorklet.addModule('./dist/worklet_processor.min.js');
+            await context.audioWorklet.addModule('./worklet_processor.min.js');
             const synth = new Synthetizer(context.destination, soundFontArrayBuffer);
             const seq = new Sequencer([{ binary: midiFile }], synth);
             seq.play();
