@@ -681,12 +681,19 @@ void Doc::PrepareData()
     }
 
     // Display warning if some elements were not matched
-    const int unmatchedElements = (int)std::count_if(interfaceOwnerPairs.cbegin(), interfaceOwnerPairs.cend(),
-        [](const ListOfSpanningInterOwnerPairs::value_type &entry) {
-            return (entry.first->HasStartid() && entry.first->HasEndid());
-        });
+    std::vector<ListOfSpanningInterOwnerPairs::value_type> unmatchedPairs;
+    for (const auto &pair : interfaceOwnerPairs) {
+        if (pair.first->HasStartid() && pair.first->HasEndid()) {
+            unmatchedPairs.push_back(pair);
+        }
+    }
+    const int unmatchedElements = static_cast<int>(unmatchedPairs.size());
     if (unmatchedElements > 0) {
         LogWarning("%d time spanning element(s) with startid and endid could not be matched.", unmatchedElements);
+        for (const auto &pair : unmatchedPairs) {
+            LogDebug("Unmatched %s %s: startId: %s, endId: %s", pair.second->GetClassName().c_str(),
+                pair.second->GetID().c_str(), pair.first->GetStartid().c_str(), pair.first->GetEndid().c_str());
+        }
     }
 
     /************ Resolve @startid (only) ************/
