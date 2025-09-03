@@ -24,7 +24,8 @@ namespace vrv {
 
 static const ClassRegistrar<MeterSigGrp> s_factory("meterSigGrp", METERSIGGRP);
 
-MeterSigGrp::MeterSigGrp() : LayerElement(METERSIGGRP), ObjectListInterface(), AttBasic(), AttMeterSigGrpLog(), AttVisibility()
+MeterSigGrp::MeterSigGrp()
+    : LayerElement(METERSIGGRP), ObjectListInterface(), AttBasic(), AttMeterSigGrpLog(), AttVisibility()
 {
     this->RegisterAttClass(ATT_BASIC);
     this->RegisterAttClass(ATT_METERSIGGRPLOG);
