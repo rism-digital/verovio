@@ -741,7 +741,8 @@ FunctorCode GenerateMIDIFunctor::VisitLayerEnd(const Layer *layer)
     // stop all previously held notes
     for (auto &held : m_heldNotes) {
         if (held.m_pitch > 0) {
-            m_midiFile->addNoteOff(m_midiTrack, std::max(0.0, held.m_stopTime * m_midiFile->getTPQ() - 1), m_midiChannel, held.m_pitch);
+            m_midiFile->addNoteOff(
+                m_midiTrack, std::max(0.0, held.m_stopTime * m_midiFile->getTPQ() - 1), m_midiChannel, held.m_pitch);
         }
     }
 
@@ -854,7 +855,8 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
             // or if the new pitch is already sounding, on any course
             for (auto &held : m_heldNotes) {
                 if ((held.m_pitch > 0) && ((held.m_stopTime <= startTime) || (held.m_pitch == pitch))) {
-                    m_midiFile->addNoteOff(m_midiTrack, std::max(0.0, held.m_stopTime * tpq - 1), channel, held.m_pitch);
+                    m_midiFile->addNoteOff(
+                        m_midiTrack, std::max(0.0, held.m_stopTime * tpq - 1), channel, held.m_pitch);
                     held.m_pitch = 0;
                     held.m_stopTime = 0;
                 }

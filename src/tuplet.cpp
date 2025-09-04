@@ -81,11 +81,11 @@ bool Tuplet::IsSupportedChild(ClassId classId)
     }
 }
 
-void Tuplet::AddChild(Object *child)
+bool Tuplet::AddChild(Object *child)
 {
     if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        return;
+        return false;
     }
 
     child->SetParent(this);
@@ -102,6 +102,8 @@ void Tuplet::AddChild(Object *child)
     }
 
     this->Modify();
+
+    return true;
 }
 
 void Tuplet::FilterList(ListOfConstObjects &childList) const

@@ -37,7 +37,7 @@ public:
     /**
      * Lb is an empty element
      */
-    void AddChild(Object *object) override {};
+    bool AddChild(Object *object) override { return true; };
 
     /**
      * Interface for class functor visitation

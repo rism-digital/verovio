@@ -824,11 +824,11 @@ bool Object::IsSupportedChild(ClassId classId)
     return false;
 }
 
-void Object::AddChild(Object *child)
+bool Object::AddChild(Object *child)
 {
     if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        return;
+        return false;
     }
 
     if (!this->IsReferenceObject()) {
@@ -850,6 +850,8 @@ void Object::AddChild(Object *child)
         m_children.insert(m_children.begin() + i, child);
     }
     this->Modify();
+
+    return true;
 }
 
 int Object::GetInsertOrderForIn(ClassId classId, const std::vector<ClassId> &order) const

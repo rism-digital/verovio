@@ -146,11 +146,11 @@ bool Note::IsSupportedChild(ClassId classId)
     }
 }
 
-void Note::AddChild(Object *child)
+bool Note::AddChild(Object *child)
 {
     if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        return;
+        return false;
     }
 
     child->SetParent(this);
@@ -166,6 +166,8 @@ void Note::AddChild(Object *child)
         children.push_back(child);
     }
     this->Modify();
+
+    return true;
 }
 
 bool Note::AddChildAdditionalCheck(Object *child)

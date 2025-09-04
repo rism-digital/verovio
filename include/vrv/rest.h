@@ -65,7 +65,7 @@ public:
     /**
      * Overwritten method for rest
      */
-    void AddChild(Object *object) override;
+    bool AddChild(Object *object) override;
 
     /**
      * @name Getter to interfaces
