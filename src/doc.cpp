@@ -683,7 +683,7 @@ void Doc::PrepareData()
     // Display warning if some elements were not matched
     for (const auto &pair : interfaceOwnerPairs) {
         if (pair.first->HasStartid() && pair.first->HasEndid()) {
-            LogWarning("Time spanning element could not be matched: <%s xml:id='%s' startId='%s' endId='%s'>",
+            LogWarning("Time spanning element '%s' with @xml:id '%s', @startid '%s', and @endid '%s' could not be matched.",
                 pair.second->GetClassName().c_str(), pair.second->GetID().c_str(), pair.first->GetStartid().c_str(),
                 pair.first->GetEndid().c_str());
         }
@@ -751,8 +751,9 @@ void Doc::PrepareData()
     }
 
     // If some are still there, then it is probably an issue in the encoding
-    if (!preparePlist.GetInterfaceIDPairs().empty()) {
-        LogWarning("%d element(s) with a @plist could not match the target", preparePlist.GetInterfaceIDPairs().size());
+    for (const auto &pair : preparePlist.GetInterfaceIDPairs()) {
+        LogWarning("Element '%s' with @xml:id '%s' and a @plist could not match the target.",
+            pair.first->GetClassName().c_str(), pair.first->GetID().c_str());
     }
 
     /************ Resolve cross staff ************/
