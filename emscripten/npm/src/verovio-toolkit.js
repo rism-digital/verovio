@@ -231,7 +231,7 @@ VerovioToolkit.instances = [];
 // If the window object is defined (if we are not within a WebWorker)...
 if ((typeof window !== "undefined") && (window.addEventListener)) {
     // Add a listener that will delete the object (if necessary) when the page is closed
-    window.addEventListener("unload", () => {
+    window.addEventListener("pagehide", () => {
         VerovioToolkit.instances.forEach((instance) => {
             instance.destroy();
         });
