@@ -112,7 +112,7 @@ public:
     /**
      * Overwritten method for note
      */
-    void AddChild(Object *object) override;
+    bool AddChild(Object *object) override;
 
     /**
      * Additional check when adding a child.

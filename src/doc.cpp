@@ -691,12 +691,12 @@ void Doc::PrepareData()
     }
 
     // Display warning if some elements were not matched
-    const int unmatchedElements = (int)std::count_if(interfaceOwnerPairs.cbegin(), interfaceOwnerPairs.cend(),
-        [](const ListOfSpanningInterOwnerPairs::value_type &entry) {
-            return (entry.first->HasStartid() && entry.first->HasEndid());
-        });
-    if (unmatchedElements > 0) {
-        LogWarning("%d time spanning element(s) with startid and endid could not be matched.", unmatchedElements);
+    for (const auto &pair : interfaceOwnerPairs) {
+        if (pair.first->HasStartid() && pair.first->HasEndid()) {
+            LogWarning("Time spanning element could not be matched: <%s xml:id='%s' startId='%s' endId='%s'>",
+                pair.second->GetClassName().c_str(), pair.second->GetID().c_str(), pair.first->GetStartid().c_str(),
+                pair.first->GetEndid().c_str());
+        }
     }
 
     /************ Resolve @startid (only) ************/
@@ -872,9 +872,9 @@ void Doc::PrepareData()
     root->Process(prepareStaffCurrentTimeSpanning);
 
     // Something must be wrong in the encoding because a TimeSpanningInterface was left open
-    if (!prepareStaffCurrentTimeSpanning.GetTimeSpanningElements().empty()) {
-        LogDebug("%d time spanning elements could not be set as running",
-            prepareStaffCurrentTimeSpanning.GetTimeSpanningElements().size());
+    for (const auto &obj : prepareStaffCurrentTimeSpanning.GetTimeSpanningElements()) {
+        LogWarning("Time spanning element '%s' with @xml:id '%s' could not be set as running.",
+            obj->GetClassName().c_str(), obj->GetID().c_str());
     }
 
     /************ Resolve mRpt ************/
@@ -1603,15 +1603,15 @@ void Doc::ExpandExpansions()
     std::string expansionId = this->GetOptions()->m_expand.GetValue();
     if (expansionId.empty()) return;
 
-    Expansion *start = dynamic_cast<Expansion *>(this->FindDescendantByID(expansionId));
-    if (start == NULL) {
+    Expansion *startExpansion = dynamic_cast<Expansion *>(this->FindDescendantByID(expansionId));
+    if (startExpansion == NULL) {
         LogWarning("Expansion ID '%s' not found. Nothing expanded.", expansionId.c_str());
         return;
     }
 
-    xsdAnyURI_List expansionList = start->GetPlist();
-    xsdAnyURI_List existingList;
-    m_expansionMap.Expand(expansionList, existingList, start);
+    xsdAnyURI_List existingList; // list of xml:id strings of elements already in the document
+    xsdAnyURI_List deletionList; // list of xml:id strings of elements not cloned and to be deleted at the end
+    m_expansionMap.Expand(startExpansion, existingList, startExpansion, deletionList, true);
 
     // save original/notated expansion as element in expanded MEI
     // Expansion *originalExpansion = new Expansion();

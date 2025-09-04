@@ -184,11 +184,11 @@ bool Chord::IsSupportedChild(ClassId classId)
     }
 }
 
-void Chord::AddChild(Object *child)
+bool Chord::AddChild(Object *child)
 {
     if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        return;
+        return false;
     }
 
     ArrayOfObjects &children = this->GetChildrenForModification();
@@ -203,6 +203,8 @@ void Chord::AddChild(Object *child)
         children.push_back(child);
     }
     this->Modify();
+
+    return true;
 }
 
 void Chord::FilterList(ListOfConstObjects &childList) const

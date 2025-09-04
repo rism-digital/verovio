@@ -407,7 +407,7 @@ public:
      * Base method for adding children.
      * The method can be overridden.
      */
-    virtual void AddChild(Object *object);
+    virtual bool AddChild(Object *object);
 
     /**
      * Additional check when adding a child.

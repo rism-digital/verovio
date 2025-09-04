@@ -64,11 +64,11 @@ bool TabDurSym::IsSupportedChild(ClassId classId)
     }
 }
 
-void TabDurSym::AddChild(Object *child)
+bool TabDurSym::AddChild(Object *child)
 {
     if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        return;
+        return false;
     }
 
     child->SetParent(this);
@@ -84,6 +84,8 @@ void TabDurSym::AddChild(Object *child)
         children.push_back(child);
     }
     this->Modify();
+
+    return true;
 }
 
 void TabDurSym::AdjustDrawingYRel(const Staff *staff, const Doc *doc)

@@ -741,7 +741,8 @@ FunctorCode GenerateMIDIFunctor::VisitLayerEnd(const Layer *layer)
     // stop all previously held notes
     for (auto &held : m_heldNotes) {
         if (held.m_pitch > 0) {
-            m_midiFile->addNoteOff(m_midiTrack, std::max(0.0, held.m_stopTime * m_midiFile->getTPQ() - 1), m_midiChannel, held.m_pitch);
+            m_midiFile->addNoteOff(
+                m_midiTrack, std::max(0.0, held.m_stopTime * m_midiFile->getTPQ() - 1), m_midiChannel, held.m_pitch);
         }
     }
 
@@ -854,7 +855,8 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
             // or if the new pitch is already sounding, on any course
             for (auto &held : m_heldNotes) {
                 if ((held.m_pitch > 0) && ((held.m_stopTime <= startTime) || (held.m_pitch == pitch))) {
-                    m_midiFile->addNoteOff(m_midiTrack, std::max(0.0, held.m_stopTime * tpq - 1), channel, held.m_pitch);
+                    m_midiFile->addNoteOff(
+                        m_midiTrack, std::max(0.0, held.m_stopTime * tpq - 1), channel, held.m_pitch);
                     held.m_pitch = 0;
                     held.m_stopTime = 0;
                 }
@@ -1007,7 +1009,17 @@ FunctorCode GenerateMIDIFunctor::VisitStaffDef(const StaffDef *staffDef)
 
 FunctorCode GenerateMIDIFunctor::VisitSyl(const Syl *syl)
 {
-    const double startTime = m_totalTime + m_lastNote->GetScoreTimeOnset().ToDouble();
+    const Note *note = NULL;
+    if (syl->GetFirstAncestor(CHORD)) {
+        const Chord *parentChord = vrv_cast<const Chord *>(syl->GetFirstAncestor(CHORD));
+        note = vrv_cast<const Note *>(parentChord->GetFirst(NOTE));
+    }
+    else {
+        note = vrv_cast<const Note *>(syl->GetFirstAncestor(NOTE));
+    }
+    if (!note) return FUNCTOR_CONTINUE;
+
+    const double startTime = m_totalTime + note->GetScoreTimeOnset().ToDouble();
     const std::string sylText = UTF32to8(syl->GetText());
 
     m_midiFile->addLyric(m_midiTrack, startTime * m_midiFile->getTPQ(), sylText);
