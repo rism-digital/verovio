@@ -128,22 +128,18 @@ FunctorCode SaveFunctor::VisitObjectEnd(Object *object)
 
 FunctorCode SaveFunctor::VisitRunningElement(RunningElement *runningElement)
 {
-    if (runningElement->IsGenerated()) {
-        return FUNCTOR_SIBLINGS;
-    }
-    else {
-        return this->VisitTextLayoutElement(runningElement);
-    }
+    // Can be skipped in MEI output
+    if (m_output->Skip(runningElement)) return FUNCTOR_SIBLINGS;
+
+    return this->VisitTextLayoutElement(runningElement);
 }
 
 FunctorCode SaveFunctor::VisitRunningElementEnd(RunningElement *runningElement)
 {
-    if (runningElement->IsGenerated()) {
-        return FUNCTOR_SIBLINGS;
-    }
-    else {
-        return this->VisitTextLayoutElementEnd(runningElement);
-    }
+    // Can be skipped in MEI output
+    if (m_output->Skip(runningElement)) return FUNCTOR_SIBLINGS;
+
+    return this->VisitTextLayoutElementEnd(runningElement);
 }
 
 FunctorCode SaveFunctor::VisitText(Text *text)

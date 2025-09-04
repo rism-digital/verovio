@@ -1549,11 +1549,15 @@ bool Toolkit::Edit(const std::string &editorAction)
 {
     this->ResetLogBuffer();
 
+    if (!m_editorToolkit) return false;
+
     return m_editorToolkit->ParseEditorAction(editorAction);
 }
 
 std::string Toolkit::EditInfo()
 {
+    if (!m_editorToolkit) return "{}";
+
     return m_editorToolkit->EditInfo();
 }
 
