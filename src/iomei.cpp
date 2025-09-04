@@ -1983,6 +1983,7 @@ void MEIOutput::WriteMeterSigGrp(pugi::xml_node currentNode, MeterSigGrp *meterS
     this->WriteLayerElement(currentNode, meterSigGrp);
     meterSigGrp->WriteBasic(currentNode);
     meterSigGrp->WriteMeterSigGrpLog(currentNode);
+    meterSigGrp->WriteVisibility(currentNode);
 }
 
 void MEIOutput::WriteFb(pugi::xml_node currentNode, Fb *fb)
@@ -5723,6 +5724,7 @@ bool MEIInput::ReadMeterSigGrp(Object *parent, pugi::xml_node meterSigGrp)
     this->ReadLayerElement(meterSigGrp, vrvMeterSigGrp);
     vrvMeterSigGrp->ReadBasic(meterSigGrp);
     vrvMeterSigGrp->ReadMeterSigGrpLog(meterSigGrp);
+    vrvMeterSigGrp->ReadVisibility(meterSigGrp);
 
     parent->AddChild(vrvMeterSigGrp);
     this->ReadUnsupportedAttr(meterSigGrp, vrvMeterSigGrp);
