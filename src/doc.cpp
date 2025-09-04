@@ -863,7 +863,7 @@ void Doc::PrepareData()
 
     // Something must be wrong in the encoding because a TimeSpanningInterface was left open
     for (const auto &obj : prepareStaffCurrentTimeSpanning.GetTimeSpanningElements()) {
-        LogWarning("Time spanning element could not be set as running: <%s xml:id='%s' ...>",
+        LogWarning("Time spanning element '%s' with @xml:id '%s' could not be set as running.",
             obj->GetClassName().c_str(), obj->GetID().c_str());
     }
 
