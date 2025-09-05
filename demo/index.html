@@ -4,7 +4,7 @@
     <script type="module">
       import createVerovioModule from './dist/verovio-module.mjs';
       import { VerovioToolkit } from './dist/verovio.mjs';
-      import { Synthetizer, Sequencer } from 'https://cdn.jsdelivr.net/npm/spessasynth_lib/+esm';
+      import { WorkletSynthesizer as Synthetizer, Sequencer } from 'https://cdn.jsdelivr.net/npm/spessasynth_lib@latest/+esm';
 
       function atoab(base64) {
         return Uint8Array.from(atob(base64), (c) => c.charCodeAt(0)).buffer;
@@ -24,7 +24,7 @@
         fetch("data/GeneralUserGS.sf3").then(async response =>
         {
           // load the sound bank into an array buffer
-          let soundFontArrayBuffer = await response.arrayBuffer();
+          let soundfont = await response.arrayBuffer();
           document.getElementById('message').innerHTML = 'Ready to play ▶️ (Refresh the page to stop playing 😂)';
 
           // add an event listener for the file inout
@@ -32,9 +32,12 @@
           {
             const midiFile = atoab(verovioToolkit.renderToMIDI());
             const context = new AudioContext();
-            await context.audioWorklet.addModule('./worklet_processor.min.js');
-            const synth = new Synthetizer(context.destination, soundFontArrayBuffer);
-            const seq = new Sequencer([{ binary: midiFile }], synth);
+            await context.audioWorklet.addModule('./spessasynth_processor.min.js');
+            const synth = new Synthetizer(context);
+            synth.connect(context.destination);
+            synth.soundBankManager.addSoundBank(soundfont, 'main');
+            const seq = new Sequencer(synth);
+            seq.loadNewSongList([{ binary: midiFile }]);
             seq.play();
           });
         });
