@@ -27,7 +27,10 @@ bool EditorToolkit::AppendChild(const std::string &elementId, const std::string 
     Object *childElement = this->PrepareInsertion(element, elementName);
     if (!childElement) return false;
 
-    element->AddChild(childElement);
+    if (!element->AddChild(childElement)) {
+        delete childElement;
+        return false;
+    }
 
     return true;
 }
