@@ -57,6 +57,7 @@ FunctorCode ResetDataFunctor::VisitAccid(Accid *accid)
     // Call parent one too
     this->VisitLayerElement(accid);
     accid->PositionInterface::InterfaceResetData(*this, accid);
+    accid->ClearFloatingObject();
 
     return FUNCTOR_CONTINUE;
 }
