@@ -214,7 +214,14 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
     m_alignment = alignment;
     m_spanningType = spanningType;
 
-    if (object->Is(ANNOTSCORE)) {
+    if (object->Is(ACCID_FLOATING)) {
+        assert(object->GetParent());
+        Accid *accid = vrv_cast<Accid *>(object->GetParent());
+        assert(accid);
+        // accid above by default;
+        m_place = (accid->GetPlace() != STAFFREL_NONE) ? accid->GetPlace() : STAFFREL_above;
+    }
+    else if (object->Is(ANNOTSCORE)) {
         m_place = STAFFREL_above;
     }
     else if (object->Is(BRACKETSPAN)) {

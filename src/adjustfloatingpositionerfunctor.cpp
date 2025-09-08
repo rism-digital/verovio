@@ -214,6 +214,9 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitSystem(System *system)
     m_classId = OCTAVE;
     system->m_systemAligner.Process(*this);
 
+    m_classId = ACCID_FLOATING;
+    system->m_systemAligner.Process(*this);
+
     m_classId = BREATH;
     system->m_systemAligner.Process(*this);
 

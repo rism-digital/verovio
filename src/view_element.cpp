@@ -249,7 +249,13 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         return;
     }
 
-    dc->StartGraphic(element, "", element->GetID());
+    Object *drawingElement = element;
+    AccidFloatingObject *editorialAccid = accid->GetFloatingObject();
+    if (editorialAccid) {
+        drawingElement = editorialAccid;
+    }
+
+    dc->StartGraphic(drawingElement, "", element->GetID());
 
     const data_NOTATIONTYPE notationType = staff->m_drawingNotationType;
     std::u32string accidStr = accid->GetSymbolStr(notationType);
@@ -257,14 +263,24 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();
 
+    // Set with edit `@func`
+    if (editorialAccid) {
+        System *system = vrv_cast<System *>(measure->GetFirstAncestor(SYSTEM));
+        assert(system);
+        if (system->SetCurrentFloatingPositioner(staff->GetN(), editorialAccid, accid, staff)) {
+            x = editorialAccid->GetDrawingX();
+            y = editorialAccid->GetDrawingY();
+        }
+    }
+
     if (accid->HasPlace() || accid->HasOnstaff() || (accid->GetFunc() == accidLog_FUNC_edit)) {
         const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        const int staffTop = staff->GetDrawingY();
-        const int staffBottom = staffTop - (staff->m_drawingLines - 1) * unit * 2;
 
         // look at the note position and adjust it if necessary
         Note *note = vrv_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
-        if (note) {
+        if (!editorialAccid && note) {
+            const int staffTop = staff->GetDrawingY();
+            const int staffBottom = staffTop - (staff->m_drawingLines - 1) * unit * 2;
             const data_DURATION drawingDur = note->GetDrawingDur();
             int noteTop = note->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
             int noteBottom = note->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
@@ -291,9 +307,11 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             else {
                 y = ((noteTop >= staffTop) || onStaff) ? noteTop : staffTop;
             }
-            // Increase the x position of the accid
-            x += note->GetDrawingRadius(m_doc);
         }
+
+        // Increase the x position of the accid
+        if (note) x += note->GetDrawingRadius(m_doc);
+
         TextExtend extend;
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, accid->GetDrawingCueSize()));
         dc->GetSmuflTextExtent(accid->GetSymbolStr(notationType), &extend);
@@ -304,7 +322,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     this->DrawSmuflString(
         dc, x, y, accidStr, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize, accid->GetDrawingCueSize(), true);
 
-    dc->EndGraphic(element, this);
+    dc->EndGraphic(drawingElement, this);
 }
 
 void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
