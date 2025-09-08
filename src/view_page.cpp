@@ -1135,7 +1135,7 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
 
         // HARDCODED
         // we set mNum to a fixed height above the system and make it a bit smaller than other text
-        params.m_x = staff->GetDrawingX();
+        params.m_x = measure->GetDrawingX();
         params.m_y = staff->GetDrawingY() + yOffset;
         if (mnum->HasFontsize()) {
             data_FONTSIZE *fs = mnum->GetFontsizeAlternate();
