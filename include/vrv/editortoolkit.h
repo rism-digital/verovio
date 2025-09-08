@@ -43,7 +43,7 @@ public:
      * Get information on the last editor function used
      */
     virtual std::string EditInfo() { return m_editInfo.json(); }
-    
+
 #ifndef NO_EDIT_SUPPORT
 protected:
     bool AppendChild(const std::string &elementId, const std::string &elementName);
