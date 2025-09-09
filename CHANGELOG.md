@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+
+## [5.6.0] – 2025-09-09
 * Improved layout for editorial accidentals
 * Improved support for `expansion` (@wergo)
 * Improved logging for unmatched time spanning and plist elements (@wergo)
@@ -11,7 +13,7 @@
 * Fix tempo in timemap and MIDI output
 * Fix note off timings in timemap and MIDI output (@infojunkie)
 * Fix `@metcon` in MusicXML importer (@rettinghaus)
-
+* Added Python wheel for ubuntu arm64 (@dillon-labami)
 
 ## [5.5.1] – 2025-08-05
 * Fix CocoaPods build
