@@ -1,9 +1,16 @@
 # Changelog
 
 ## [unreleased]
+* Improved layout for editorial accidentals
+* Improved support for `expansion` (@wergo)
+* Improved logging for unmatched time spanning and plist elements (@wergo)
 * Support for repeat marks in ABC importer (@rettinghaus)
 * Fix `pgHead` conversion in MusicXML importer (@rettinghaus)
 * Fix lyric parsing in ABC importer (@rettinghaus)
+* Fix timemap with chords and grace notes
+* Fix tempo in timemap and MIDI output
+* Fix note off timings in timemap and MIDI output (@infojunkie)
+* Fix `@metcon` in MusicXML import (@rettinghaus)
 
 
 ## [5.5.1] – 2025-08-05
