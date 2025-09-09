@@ -154,7 +154,7 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
         m_beamElementCoords.push_back(new BeamElementCoord());
     }
 
-    // current point to the first Note in the layed out layer
+    // current point to the first Note in the laid out layer
     LayerElement *current = dynamic_cast<LayerElement *>(childList.front());
     // Beam list should contain only DurationInterface objects
     assert(current->GetDurationInterface());

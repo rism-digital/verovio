@@ -82,14 +82,14 @@
   <g c="E537" x="0.0" y="-193.0" w="807.0" h="614.0" h-a-x="840" n="dynamicSforzandoPiano">
     <a n="cutOutNE" x="2.27" y="1.07" />
     <a n="cutOutNW" x="1.28" y="1.06" />
-    <a n="cutOutSE" x="2.48" y="-0.07" />
+    <a n="cutOutSE" x="2.5" y="-0.09" />
     <a n="cutOutSW" x="0.38" y="-0.02" />
     <a n="opticalCenter" x="1.62" y="0.0" />
   </g>
   <g c="E538" x="0.0" y="-193.0" w="1131.0" h="614.0" h-a-x="1164" n="dynamicSforzandoPianissimo">
     <a n="cutOutNE" x="2.27" y="1.07" />
     <a n="cutOutNW" x="1.28" y="1.06" />
-    <a n="cutOutSE" x="3.77" y="-0.09" />
+    <a n="cutOutSE" x="3.8" y="-0.09" />
     <a n="cutOutSW" x="0.38" y="-0.02" />
     <a n="opticalCenter" x="1.62" y="0.0" />
   </g>
@@ -243,8 +243,8 @@
   <g c="E0A2" x="0.0" y="-134.0" w="373.0" h="270.0" h-a-x="373" n="noteheadWhole">
     <a n="cutOutNE" x="1.3" y="0.4" />
     <a n="cutOutNW" x="0.2" y="0.4" />
+    <a n="cutOutSE" x="1.28" y="-0.4" />
     <a n="cutOutSW" x="0.21" y="-0.4" />
-    <a n="stemUpSE" x="1.28" y="-0.4" />
   </g>
   <g c="E0A3" x="0.0" y="-133.0" w="325.0" h="265.0" h-a-x="325" n="noteheadHalf">
     <a n="cutOutNE" x="1.18" y="0.42" />
@@ -435,7 +435,6 @@
     <a n="cutOutSW" x="0.18" y="-1.6" />
   </g>
   <g c="E280" x="0.0" y="-176.0" w="193.0" h="628.0" h-a-x="193" n="accidentalQuarterToneFlatStein">
-    <a n="cutOutNE" x="0.18" y="0.64" />
     <a n="cutOutNW" x="0.62" y="0.62" />
     <a n="cutOutSE" x="0.54" y="-0.42" />
     <a n="cutOutSW" x="0.27" y="-0.42" />

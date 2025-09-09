@@ -67,7 +67,7 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
         || (!json.has<jsonxx::Object>("param") && !json.has<jsonxx::Array>("param"))) {
         LogWarning("Incorrectly formatted JSON action");
         m_editInfo.import("status", "FAILURE");
-        m_editInfo.import("message", "JSON action misformatted.");
+        m_editInfo.import("message", "JSON action incorrectly formatted.");
         return false;
     }
 
@@ -365,7 +365,7 @@ bool EditorToolkitNeume::AddSyl(std::string elementId, std::string sylText)
 //      subsequent clefs are different before and after the drag. In this case elements that were
 //      associated with this clef before the drag need to be reassociated to the clef that preceded
 //      this clef before the drag. Elements that become newly associated with the clef after the drag
-//      need to be reassociated from the clef that preceeds this clef after the drag to this clef.
+//      need to be reassociated from the clef that precedes this clef after the drag to this clef.
 //
 // Extracting the exact elements that need to have their pitch modified in each of these cases is
 // tricky, and required some dicey naming.
@@ -408,7 +408,7 @@ bool EditorToolkitNeume::AddSyl(std::string elementId, std::string sylText)
 // them, and then using std::set_difference to find the elements whose pitch values may need to change.
 // For example: in case 2 noLongerWithThisClef is found by taking the difference between
 // withOldPrecedingClefAfter and withPrecedingClefBefore, since that difference is the stuff that
-// became associated with the clef that used to preceed this clef, meaning the stuff that was associated
+// became associated with the clef that used to precede this clef, meaning the stuff that was associated
 // with clef, but no longer is.
 //
 // One other aspect that might seem confusing is exactly when clef->SetLine() gets called. The reason
@@ -650,8 +650,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool topLevel
         FacsimileInterface *fi = (*clef).GetFacsimileInterface();
         assert(fi);
         // If inside this syllable, moving a clef...
-        // Case 1: BEFORE preceeding syllable(s) -> clef becomes start of this syllable, this syllable reorders before
-        // preceeding syllable(s), preceeding and following syllables abide by this clef. Case 2: INSIDE this syllable
+        // Case 1: BEFORE preceding syllable(s) -> clef becomes start of this syllable, this syllable reorders before
+        // preceding syllable(s), preceding and following syllables abide by this clef. Case 2: INSIDE this syllable
         // -> following neumes and syllables abide by this clef. Case 3: AFTER this syllable -> clef becomes the end of
         // this syllable, following syllables abide by this clef still.
         if (element->GetParent()->Is(SYLLABLE)) {
@@ -4420,7 +4420,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj)
     };
 
     // Get clef and its position
-    Clef *clef = nullptr;
+    Clef *clef = NULL;
     int clefPosY = 0;
     if (!getClefAndPosY(obj, staff, staffSize, clef, clefPosY)) {
         return false;

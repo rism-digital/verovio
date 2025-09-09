@@ -48,6 +48,7 @@ public:
     ///@{
     Doc();
     virtual ~Doc();
+    std::string GetClassName() const override { return "body"; }
     ///@}
 
     /**
@@ -61,7 +62,12 @@ public:
     void Reset() override;
 
     /**
-     *
+     * Reset the document for loading a serialization
+     */
+    void ResetToSerialization();
+
+    /**
+     * Reset to the loading state (unset the scoreDef)
      */
     void ResetToLoading();
 
@@ -114,7 +120,7 @@ public:
     void GenerateMEIHeader();
 
     /**
-     * Convert the header to MEI basic by preserving only the fileDesc and its titleStmt
+     * Convert the header to MEI Basic by preserving only the fileDesc and its titleStmt
      */
     void ConvertHeaderToMEIBasic();
 

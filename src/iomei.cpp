@@ -204,8 +204,14 @@ bool MEIOutput::Skip(Object *object) const
         assert(mNum);
         if (mNum->IsGenerated()) return true;
     }
+    else if (object->IsRunningElement()) {
+        if (this->IsSerializing()) return false;
+        const RunningElement *runningElement = vrv_cast<const RunningElement *>(object);
+        assert(runningElement);
+        if (runningElement->IsGenerated()) return true;
+    }
     else if (object->IsEditorialElement()) {
-        // Skip all editorial elements in MEI basic
+        // Skip all editorial elements in MEI Basic
         if (m_basic) return true;
         const VisibilityDrawingInterface *interface = object->GetVisibilityDrawingInterface();
         assert(interface);
@@ -243,7 +249,7 @@ std::string MEIOutput::Export()
             }
         }
         if (this->IsPageBasedMEI() && this->GetBasic()) {
-            LogError("MEI output in page-based MEI is not possible with MEI basic");
+            LogError("MEI output in page-based MEI is not possible with MEI Basic");
             return "";
         }
         if (this->IsSerializing() && this->IsScoreBasedMEI()) {
@@ -634,13 +640,13 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->IsLayerElement()) {
         if (object->Is(ACCID)) {
             // Do not add a node for object representing an attribute
-            // Exception: always write them as element in MEI basic
+            // Exception: always write them as element in MEI Basic
             if (this->IsTreeObject(object)) m_currentNode = m_currentNode.append_child("accid");
             this->WriteAccid(m_currentNode, vrv_cast<Accid *>(object));
         }
         else if (object->Is(ARTIC)) {
             // Do not add a node for object representing an attribute
-            // Exception: always write them as element in MEI basic
+            // Exception: always write them as element in MEI Basic
             if (this->IsTreeObject(object)) m_currentNode = m_currentNode.append_child("artic");
             this->WriteArtic(m_currentNode, vrv_cast<Artic *>(object));
         }
@@ -861,7 +867,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
 
     // Editorial markup
     else if (object->IsEditorialElement()) {
-        // Editorial markup in MEI basic output is skipped and no node should be created.
+        // Editorial markup in MEI Basic output is skipped and no node should be created.
         if (this->GetBasic()) {
             return true;
         }
@@ -1013,14 +1019,14 @@ bool MEIOutput::WriteObjectEnd(Object *object)
             assert(!m_boundaries.empty() && (m_boundaries.top() == object));
             m_boundaries.pop();
             // For system milestone ends that point to editorial markup, we need to make sure
-            // we stop here when outputting MEI basic because no node has been created for them
+            // we stop here when outputting MEI Basic because no node has been created for them
             if (this->GetBasic() && object->Is(SYSTEM_MILESTONE_END)) {
                 SystemMilestoneEnd *milestoneEnd = vrv_cast<SystemMilestoneEnd *>(object);
                 assert(milestoneEnd && milestoneEnd->GetStart());
                 if (milestoneEnd->GetStart()->IsEditorialElement()) return true;
             }
         }
-        // For editorial markup in MEI basic, stop here because no node has been created
+        // For editorial markup in MEI Basic, stop here because no node has been created
         if (object->IsEditorialElement() && this->GetBasic()) {
             return true;
         }
@@ -1124,13 +1130,13 @@ bool MEIOutput::IsTreeObject(Object *object) const
     if (object->Is({ PAGES, PAGE, SYSTEM })) return false;
 
     if (this->GetBasic()) {
-        // Always elements for accid, artic, fermata and tie in MEI basic
+        // Always elements for accid, artic, fermata and tie in MEI Basic
         if (object->Is({ ACCID, ARTIC, FERMATA, TIE })) return true;
 
-        // Always attibutes for grpSym and keyAccid in MEI basic
+        // Always attibutes for grpSym and keyAccid in MEI Basic
         if (object->Is({ GRPSYM, KEYACCID })) return false;
 
-        // Always attributes for clef, keySig and meterSig in MEI basic within a scoreDef
+        // Always attributes for clef, keySig and meterSig in MEI Basic within a scoreDef
         if (object->Is({ CLEF, KEYSIG, METERSIG }) && object->GetFirstAncestor(SCOREDEF)) return false;
     }
 
@@ -1809,13 +1815,17 @@ void MEIOutput::WriteRunningElement(pugi::xml_node currentNode, RunningElement *
 
     this->WriteTextLayoutElement(currentNode, runningElement);
     runningElement->WriteFormework(currentNode);
+
+    if (this->IsSerializing() && runningElement->IsGenerated()) {
+        currentNode.append_attribute(VEROVIO_SERIALIZATION) = "generated";
+    }
 }
 
 void MEIOutput::WriteGrpSym(pugi::xml_node currentNode, GrpSym *grpSym)
 {
     assert(grpSym);
 
-    // Only write att values if representing an attribute or in MEI basic
+    // Only write att values if representing an attribute or in MEI Basic
     if (!this->IsTreeObject(grpSym)) {
         grpSym->WriteStaffGroupingSym(currentNode);
         return;
@@ -1973,6 +1983,7 @@ void MEIOutput::WriteMeterSigGrp(pugi::xml_node currentNode, MeterSigGrp *meterS
     this->WriteLayerElement(currentNode, meterSigGrp);
     meterSigGrp->WriteBasic(currentNode);
     meterSigGrp->WriteMeterSigGrpLog(currentNode);
+    meterSigGrp->WriteVisibility(currentNode);
 }
 
 void MEIOutput::WriteFb(pugi::xml_node currentNode, Fb *fb)
@@ -2181,7 +2192,7 @@ void MEIOutput::WriteMNum(pugi::xml_node currentNode, MNum *mNum)
     mNum->WriteLang(currentNode);
     mNum->WriteTypography(currentNode);
     if (this->IsSerializing() && mNum->IsGenerated()) {
-        m_currentNode.append_attribute(VEROVIO_SERIALIZATION) = "generated";
+        currentNode.append_attribute(VEROVIO_SERIALIZATION) = "generated";
     }
 }
 
@@ -2383,7 +2394,7 @@ void MEIOutput::WriteAccid(pugi::xml_node currentNode, Accid *accid)
     assert(accid);
 
     // Only write att.accidental and accidentalPerformed if representing an attribute
-    // Execption for MEI basic
+    // Exception for MEI Basic
     if (!this->IsTreeObject(accid)) {
         accid->WriteAccidental(currentNode);
         accid->WriteAccidentalGes(currentNode);
@@ -2408,7 +2419,7 @@ void MEIOutput::WriteArtic(pugi::xml_node currentNode, Artic *artic)
     assert(artic);
 
     // Only write att.articulation if representing an attribute
-    // Execption for MEI basic
+    // Exception for MEI Basic
     if (!this->IsTreeObject(artic)) {
         artic->WriteArticulation(currentNode);
         return;
@@ -2488,7 +2499,7 @@ void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
 {
     assert(clef);
 
-    // Only write att values if representing an attribute or in MEI basic
+    // Only write att values if representing an attribute or in MEI Basic
     if (!this->IsTreeObject(clef)) {
         InstCleffingLog cleffingLog;
         cleffingLog.SetClefShape(clef->GetShape());
@@ -2613,7 +2624,7 @@ void MEIOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
 {
     assert(keySig);
 
-    // Only write att values if representing an attribute or in MEI basic
+    // Only write att values if representing an attribute or in MEI Basic
     if (!this->IsTreeObject(keySig)) {
         InstKeySigDefaultAnl attKeySigDefaultAnl;
         // Broken in MEI 5.0 - waiting for a fix
@@ -2700,7 +2711,7 @@ void MEIOutput::WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
 {
     assert(meterSig);
 
-    // Only write att values if representing an attribute or in MEI basic
+    // Only write att values if representing an attribute or in MEI Basic
     if (!this->IsTreeObject(meterSig)) {
         InstMeterSigDefaultLog meterSigDefaultLog;
         meterSigDefaultLog.SetMeterCount(meterSig->GetCount());
@@ -3484,8 +3495,8 @@ bool MEIInput::Import(const std::string &mei)
         doc.load_string(mei.c_str(), (pugi::parse_comments | pugi::parse_default) & ~pugi::parse_eol);
         pugi::xml_node root = doc.first_child();
         if (m_deserializing) {
+            m_doc->ResetToSerialization();
             m_meiversion = MEI_CURRENT_VERSION;
-            m_doc->ClearChildren();
             return this->ReadPages(m_doc, root.first_child());
         }
         else {
@@ -5191,6 +5202,14 @@ bool MEIInput::ReadRunningElement(pugi::xml_node element, RunningElement *object
     this->ReadTextLayoutElement(element, object);
     object->ReadFormework(element);
 
+    if (m_deserializing) {
+        if (element.attribute(VEROVIO_SERIALIZATION)) {
+            std::string verovioSerialization = element.attribute(VEROVIO_SERIALIZATION).value();
+            if (verovioSerialization == "generated") object->IsGenerated(true);
+            element.remove_attribute(VEROVIO_SERIALIZATION);
+        }
+    }
+
     return true;
 }
 
@@ -5705,6 +5724,7 @@ bool MEIInput::ReadMeterSigGrp(Object *parent, pugi::xml_node meterSigGrp)
     this->ReadLayerElement(meterSigGrp, vrvMeterSigGrp);
     vrvMeterSigGrp->ReadBasic(meterSigGrp);
     vrvMeterSigGrp->ReadMeterSigGrpLog(meterSigGrp);
+    vrvMeterSigGrp->ReadVisibility(meterSigGrp);
 
     parent->AddChild(vrvMeterSigGrp);
     this->ReadUnsupportedAttr(meterSigGrp, vrvMeterSigGrp);

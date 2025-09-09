@@ -107,7 +107,7 @@ public:
     /**
      * Specific method for measures
      */
-    void AddChildBack(Object *object);
+    bool AddChildBack(Object *object);
 
     /**
      * Return true if the Measure has cached values for the horizontal layout

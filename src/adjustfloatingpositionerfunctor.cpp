@@ -181,6 +181,9 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitSystem(System *system)
     m_classId = PHRASE;
     system->m_systemAligner.Process(*this);
 
+    m_classId = ACCID_FLOATING;
+    system->m_systemAligner.Process(*this);
+
     m_classId = MORDENT;
     system->m_systemAligner.Process(*this);
 

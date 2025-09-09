@@ -222,11 +222,11 @@ bool Rest::IsSupportedChild(ClassId classId)
     }
 }
 
-void Rest::AddChild(Object *child)
+bool Rest::AddChild(Object *child)
 {
     if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        return;
+        return false;
     }
 
     child->SetParent(this);
@@ -242,6 +242,8 @@ void Rest::AddChild(Object *child)
         children.push_back(child);
     }
     this->Modify();
+
+    return true;
 }
 
 char32_t Rest::GetRestGlyph() const

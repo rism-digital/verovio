@@ -360,7 +360,7 @@ FunctorCode InitTimemapAdjustNotesFunctor::VisitArpeg(Arpeg *arpeg)
     Fraction startTime = sortedNotes.front()->GetScoreTimeOnset();
     const Fraction increment = UNACC_GRACENOTE_FRACTION * (int)m_currentTempo;
     for (Note *note : sortedNotes) {
-        if (shift != 0) this->SetNoteStart(note, startTime + shift);
+        if (shift != 0) this->SetNoteStartStop(note, startTime + shift);
         shift = shift + increment;
     }
 
@@ -431,7 +431,7 @@ FunctorCode InitTimemapAdjustNotesFunctor::VisitLayerEnd(Layer *layer)
         // If we have a previous note ending after the start, correct its duration
         if (m_lastNote && (m_lastNote->GetScoreTimeOffset() > startTime)
             && m_lastNote->GetScoreTimeOnset() < startTime) {
-            this->SetNoteStartStop(m_lastNote, m_lastNote->GetScoreTimeOnset(), startTime);
+            this->SetNoteOrChordStartStop(m_lastNote, m_lastNote->GetScoreTimeOnset(), startTime);
         }
 
         for (const auto &grace : m_graces) {
@@ -511,7 +511,7 @@ void InitTimemapAdjustNotesFunctor::SetGraceNotesFor(Note *refNote)
         percent = std::min(95.0, std::max(5.0, percent));
         const Fraction totalDur = refNote->GetScoreTimeDuration() * (int)percent / 100;
         // Adjust the start of the main note
-        this->SetNoteStart(refNote, startTime + totalDur);
+        this->SetNoteOrChordStartStop(refNote, startTime + totalDur);
         graceNoteDur = totalDur / (int)m_graces.size();
     }
     else {
@@ -521,10 +521,8 @@ void InitTimemapAdjustNotesFunctor::SetGraceNotesFor(Note *refNote)
             startTime = startTime - totalDur;
         }
         else {
-            // Adjust the start of the main note
-            refNote->SetScoreTimeOnset(startTime + totalDur);
-            double startRealTime = (startTime + totalDur).ToDouble() * 60.0 / m_currentTempo;
-            refNote->SetRealTimeOnsetSeconds(startRealTime);
+            // Adjust the start of the main note or chord
+            this->SetNoteOrChordStartStop(refNote, startTime + totalDur);
         }
     }
 
@@ -538,23 +536,34 @@ void InitTimemapAdjustNotesFunctor::SetGraceNotesFor(Note *refNote)
     }
 }
 
-void InitTimemapAdjustNotesFunctor::SetNoteStartStop(Note *note, const Fraction &startTime, const Fraction &stopTime)
+void InitTimemapAdjustNotesFunctor::SetNoteOrChordStartStop(
+    Note *note, const Fraction &startTime, const Fraction &stopTime)
 {
-    assert(note);
-
-    this->SetNoteStart(note, startTime);
-    note->SetScoreTimeOffset(stopTime);
-    double stopRealTimeSeconds = stopTime.ToDouble() * 60.0 / m_currentTempo;
-    note->SetRealTimeOffsetSeconds(stopRealTimeSeconds);
+    if (note->IsChordTone()) {
+        Chord *chord = note->IsChordTone();
+        ListOfObjects notes = chord->FindAllDescendantsByType(NOTE);
+        for (Object *child : notes) {
+            Note *chordNote = vrv_cast<Note *>(child);
+            this->SetNoteStartStop(chordNote, startTime, stopTime);
+        }
+    }
+    else {
+        this->SetNoteStartStop(note, startTime, stopTime);
+    }
 }
 
-void InitTimemapAdjustNotesFunctor::SetNoteStart(Note *note, const Fraction &startTime)
+void InitTimemapAdjustNotesFunctor::SetNoteStartStop(Note *note, const Fraction &startTime, const Fraction &stopTime)
 {
     assert(note);
 
     note->SetScoreTimeOnset(startTime);
     double startRealTimeSeconds = startTime.ToDouble() * 60.0 / m_currentTempo;
     note->SetRealTimeOnsetSeconds(startRealTimeSeconds);
+    if (stopTime != VRV_UNSET) {
+        note->SetScoreTimeOffset(stopTime);
+        double stopRealTimeSeconds = stopTime.ToDouble() * 60.0 / m_currentTempo;
+        note->SetRealTimeOffsetSeconds(stopRealTimeSeconds);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -741,7 +750,8 @@ FunctorCode GenerateMIDIFunctor::VisitLayerEnd(const Layer *layer)
     // stop all previously held notes
     for (auto &held : m_heldNotes) {
         if (held.m_pitch > 0) {
-            m_midiFile->addNoteOff(m_midiTrack, held.m_stopTime * m_midiFile->getTPQ(), m_midiChannel, held.m_pitch);
+            m_midiFile->addNoteOff(
+                m_midiTrack, std::max(0.0, held.m_stopTime * m_midiFile->getTPQ() - 1), m_midiChannel, held.m_pitch);
         }
     }
 
@@ -770,7 +780,7 @@ FunctorCode GenerateMIDIFunctor::VisitMeasure(const Measure *measure)
     // Here we need to update the m_totalTime from the starting time of the measure.
     m_totalTime = measure->GetScoreTimeOnset().ToDouble();
 
-    if (measure->GetCurrentTempo() != m_currentTempo) {
+    if ((m_totalTime == 0.0) || (measure->GetCurrentTempo() != m_currentTempo)) {
         m_currentTempo = measure->GetCurrentTempo();
         const int tick = m_totalTime * m_midiFile->getTPQ();
         // Check if there was already a tempo event added for the given tick
@@ -828,7 +838,7 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
             const double stopTime = startTime + midiNote.duration;
 
             m_midiFile->addNoteOn(m_midiTrack, startTime * tpq, channel, midiNote.pitch, velocity);
-            m_midiFile->addNoteOff(m_midiTrack, stopTime * tpq, channel, midiNote.pitch);
+            m_midiFile->addNoteOff(m_midiTrack, std::max(0.0, stopTime * tpq - 1), channel, midiNote.pitch);
 
             startTime = stopTime;
         }
@@ -854,7 +864,8 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
             // or if the new pitch is already sounding, on any course
             for (auto &held : m_heldNotes) {
                 if ((held.m_pitch > 0) && ((held.m_stopTime <= startTime) || (held.m_pitch == pitch))) {
-                    m_midiFile->addNoteOff(m_midiTrack, held.m_stopTime * tpq, channel, held.m_pitch);
+                    m_midiFile->addNoteOff(
+                        m_midiTrack, std::max(0.0, held.m_stopTime * tpq - 1), channel, held.m_pitch);
                     held.m_pitch = 0;
                     held.m_stopTime = 0;
                 }
@@ -876,7 +887,7 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
                 = m_totalTime + note->GetScoreTimeOffset().ToDouble() + note->GetScoreTimeTiedDuration().ToDouble();
 
             m_midiFile->addNoteOn(m_midiTrack, startTime * tpq, channel, pitch, velocity);
-            m_midiFile->addNoteOff(m_midiTrack, stopTime * tpq, channel, pitch);
+            m_midiFile->addNoteOff(m_midiTrack, std::max(0.0, stopTime * tpq - 1), channel, pitch);
         }
     }
 
@@ -1007,7 +1018,17 @@ FunctorCode GenerateMIDIFunctor::VisitStaffDef(const StaffDef *staffDef)
 
 FunctorCode GenerateMIDIFunctor::VisitSyl(const Syl *syl)
 {
-    const double startTime = m_totalTime + m_lastNote->GetScoreTimeOnset().ToDouble();
+    const Note *note = NULL;
+    if (syl->GetFirstAncestor(CHORD)) {
+        const Chord *parentChord = vrv_cast<const Chord *>(syl->GetFirstAncestor(CHORD));
+        note = vrv_cast<const Note *>(parentChord->GetFirst(NOTE));
+    }
+    else {
+        note = vrv_cast<const Note *>(syl->GetFirstAncestor(NOTE));
+    }
+    if (!note) return FUNCTOR_CONTINUE;
+
+    const double startTime = m_totalTime + note->GetScoreTimeOnset().ToDouble();
     const std::string sylText = UTF32to8(syl->GetText());
 
     m_midiFile->addLyric(m_midiTrack, startTime * m_midiFile->getTPQ(), sylText);

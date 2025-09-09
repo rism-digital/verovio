@@ -39,8 +39,8 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 5
-#define VERSION_MINOR 5
-#define VERSION_REVISION 1
+#define VERSION_MINOR 6
+#define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV false
 
@@ -94,6 +94,7 @@ enum ClassId : uint16_t {
     FLOATING_POSITIONER,
     FLOATING_CURVE_POSITIONER,
     // Ids for ungrouped objects
+    ACCID_FLOATING,
     ALIGNMENT,
     ALIGNMENT_REFERENCE,
     CLEF_ATTR,

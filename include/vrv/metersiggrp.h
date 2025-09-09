@@ -25,7 +25,11 @@ class Measure;
  * This class represents a MEI meterSigGrp.
  * It contains meterSigGrp objects.
  */
-class MeterSigGrp : public LayerElement, public ObjectListInterface, public AttBasic, public AttMeterSigGrpLog {
+class MeterSigGrp : public LayerElement,
+                    public ObjectListInterface,
+                    public AttBasic,
+                    public AttMeterSigGrpLog,
+                    public AttVisibility {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

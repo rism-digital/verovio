@@ -44,7 +44,7 @@ FunctorCode SaveFunctor::VisitDotsEnd(Dots *dots)
 
 FunctorCode SaveFunctor::VisitEditorialElement(EditorialElement *editorialElement)
 {
-    // When writing MEI basic, only visible elements within editorial markup are saved
+    // When writing MEI Basic, only visible elements within editorial markup are saved
     if (m_output->Skip(editorialElement)) return FUNCTOR_SIBLINGS;
 
     return this->VisitObject(editorialElement);
@@ -128,22 +128,18 @@ FunctorCode SaveFunctor::VisitObjectEnd(Object *object)
 
 FunctorCode SaveFunctor::VisitRunningElement(RunningElement *runningElement)
 {
-    if (runningElement->IsGenerated()) {
-        return FUNCTOR_SIBLINGS;
-    }
-    else {
-        return this->VisitTextLayoutElement(runningElement);
-    }
+    // Can be skipped in MEI output
+    if (m_output->Skip(runningElement)) return FUNCTOR_SIBLINGS;
+
+    return this->VisitTextLayoutElement(runningElement);
 }
 
 FunctorCode SaveFunctor::VisitRunningElementEnd(RunningElement *runningElement)
 {
-    if (runningElement->IsGenerated()) {
-        return FUNCTOR_SIBLINGS;
-    }
-    else {
-        return this->VisitTextLayoutElementEnd(runningElement);
-    }
+    // Can be skipped in MEI output
+    if (m_output->Skip(runningElement)) return FUNCTOR_SIBLINGS;
+
+    return this->VisitTextLayoutElementEnd(runningElement);
 }
 
 FunctorCode SaveFunctor::VisitText(Text *text)

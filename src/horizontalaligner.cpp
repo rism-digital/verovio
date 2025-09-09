@@ -826,7 +826,7 @@ bool AlignmentReference::IsSupportedChild(ClassId classId)
     return true;
 }
 
-void AlignmentReference::AddChild(Object *child)
+bool AlignmentReference::AddChild(Object *child)
 {
     LayerElement *childElement = vrv_cast<LayerElement *>(child);
     assert(childElement);
@@ -846,11 +846,13 @@ void AlignmentReference::AddChild(Object *child)
     }
 
     // Special case where we do not set the parent because the reference will not have ownership
-    // Children will be treated as relinquished objects in the desctructor
+    // Children will be treated as relinquished objects in the destructor
     // However, we need to make sure the child has a parent (somewhere else)
     assert(child->GetParent() && this->IsReferenceObject());
     children.push_back(child);
     this->Modify();
+
+    return true;
 }
 
 bool AlignmentReference::HasAccidVerticalOverlap(const ArrayOfConstObjects &objects) const
