@@ -94,6 +94,7 @@ enum ClassId : uint16_t {
     FLOATING_POSITIONER,
     FLOATING_CURVE_POSITIONER,
     // Ids for ungrouped objects
+    ACCID_FLOATING,
     ALIGNMENT,
     ALIGNMENT_REFERENCE,
     CLEF_ATTR,
