@@ -1,5 +1,19 @@
 # Changelog
 
+## [5.6.0] – 2025-09-09
+* Improved layout for editorial accidentals
+* Improved support for `expansion` (@wergo)
+* Improved logging for unmatched time spanning and plist elements (@wergo)
+* Support for repeat marks in ABC importer (@rettinghaus)
+* Fix `pgHead` conversion in MusicXML importer (@rettinghaus)
+* Fix lyric parsing in ABC importer (@rettinghaus)
+* Fix chords following grace notes in timemap and MIDI output
+* Fix tempo in timemap and MIDI output
+* Fix note off timings in timemap and MIDI output (@infojunkie)
+* Fix `@metcon` in MusicXML importer (@rettinghaus)
+* Added Python wheel for ubuntu arm64 (@dillon-labami)
+
+
 ## [5.5.1] – 2025-08-05
 * Fix CocoaPods build
 
