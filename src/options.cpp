@@ -1816,7 +1816,7 @@ Options::Options()
     m_midi.SetCategory(OptionsCategory::Midi);
     m_grps.push_back(&m_midi);
 
-    m_midiNoCue.SetInfo("MIDI playback of cue notes", "Skip cue notes in MIDI output");
+    m_midiNoCue.SetInfo("MIDI playback without cue notes", "Skip cue notes in MIDI output");
     m_midiNoCue.Init(false);
     this->Register(&m_midiNoCue, "midiNoCue", &m_midi);
 
