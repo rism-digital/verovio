@@ -12,11 +12,12 @@
 
       createVerovioModule().then(async VerovioModule => {
         const verovioToolkit = new VerovioToolkit(VerovioModule);
-        const score = await (await fetch('data/maqam-rast.musicxml')).text();
+        const score = await (await fetch('data/maqam-rast-without-tuning.musicxml')).text();
         verovioToolkit.loadData(score);
         verovioToolkit.setOptions({
           scale: 50,
           font: 'Bravura',
+          tuning: await (await fetch('data/24-edo-mei.ascl')).text()
         })
         const data = verovioToolkit.renderToSVG(1);
         document.getElementById('sheet').innerHTML = data;
