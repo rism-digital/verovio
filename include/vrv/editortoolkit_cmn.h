@@ -85,7 +85,7 @@ protected:
     bool ContextForScores(bool editInfo);
     bool ContextForSections(bool editInfo);
 
-    Object *GetElement(std::string &elementId);
+    Object *GetChainedElement(std::string &elementId);
 
     void ContextForObject(const Object *object, jsonxx::Object &element, bool recursive = false);
     void ContextForObjects(const ArrayOfConstObjects &objects, jsonxx::Array &siblings);
