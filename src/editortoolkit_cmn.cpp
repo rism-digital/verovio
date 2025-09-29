@@ -969,6 +969,15 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
             current = m_sectionContext->FindDescendantByID(current->GetID());
             if (!current || !current->GetParent()) return false;
         }
+        // For non-measured music, skip the parent measure object
+        if (current->GetParent()->Is(MEASURE)) {
+            const Measure *measure = vrv_cast<const Measure *>(current->GetParent());
+            assert(measure);
+            if (!measure->IsMeasuredMusic()) {
+                current = current->GetParent();
+                continue;
+            }
+        }
         // Top element in the score subtree
         if (current->GetParent()->Is(SCORE)) break;
         current = current->GetParent();
@@ -1180,9 +1189,19 @@ ArrayOfConstObjects EditorTreeObject::GetChildObjects() const
     childObjects.reserve(this->GetChildCount());
     for (auto child : this->GetChildren()) {
         const EditorTreeObject *editorTreeChild = vrv_cast<const EditorTreeObject *>(child);
-
+        // For non-measured music, get the measure object children
+        if (editorTreeChild->Is(MEASURE) && editorTreeChild->m_object) {
+            const Measure *measure = vrv_cast<const Measure *>(editorTreeChild->m_object);
+            assert(measure);
+            if (!measure->IsMeasuredMusic()) {
+                ArrayOfConstObjects measureChildren = measure->GetChildren();
+                std::copy(measureChildren.begin(), measureChildren.end(), std::back_inserter(childObjects));
+                return childObjects;
+            }
+        }
         childObjects.push_back((editorTreeChild->m_object ? editorTreeChild->m_object : editorTreeChild));
     }
+    
     return childObjects;
 }
 
