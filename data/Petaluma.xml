@@ -386,6 +386,19 @@
   </g>
   <g c="E2F3" x="-62.0" y="-401.0" w="412.0" h="841.0" h-a-x="350" n="accidentalSharpEqualTempered" />
   <g c="E2F4" x="-28.0" y="-157.0" w="287.0" h="475.0" h-a-x="259" n="accidentalDoubleSharpEqualTempered" />
+  <g c="E2F5" x="-6.0" y="-234.0" w="279.0" h="703.0" h-a-x="204" n="accidentalQuarterFlatEqualTempered">
+    <a n="cutOutNW" x="0.18" y="1.74" />
+    <a n="cutOutSW" x="0.45" y="0.18" />
+  </g>
+  <g c="E2F6" x="-8.0" y="-350.0" w="360.13" h="700.47" h-a-x="352" n="accidentalQuarterSharpEqualTempered">
+    <a n="cutOutSE" x="0.74" y="1.24" />
+    <a n="cutOutSW" x="0.62" y="1.06" />
+  </g>
+  <g c="E2F7" x="0.0" y="-140.0" w="213.0" h="495.0" h-a-x="213" n="accidentalCombiningLower53LimitComma" />
+  <g c="E2F8" x="0.0" y="-119.0" w="203.54" h="468.45" h-a-x="203" n="accidentalCombiningRaise53LimitComma" />
+  <g c="E2F9" x="0.0" y="-105.0" w="434.0" h="210.0" h-a-x="434" n="accidentalEnharmonicTilde" />
+  <g c="E2FA" x="0.0" y="-191.0" w="421.0" h="382.0" h-a-x="421" n="accidentalEnharmonicAlmostEqualTo" />
+  <g c="E2FB" x="0.0" y="-168.0" w="478.0" h="336.0" h-a-x="478" n="accidentalEnharmonicEquals" />
   <g c="E290" x="0.0" y="-239.0" w="240.0" h="828.0" h-a-x="240" n="accidentalReversedFlatArrowUp">
     <a n="cutOutNW" x="0.31" y="1.74" />
     <a n="cutOutSE" x="0.82" y="2.47" />

@@ -11,6 +11,7 @@
 #include "atts_gestural.h"
 #include "atts_mei.h"
 #include "atts_shared.h"
+#include "customtuning.h"
 #include "drawinginterface.h"
 #include "object.h"
 #include "scoredefinterface.h"
@@ -248,6 +249,15 @@ public:
     ///@}
 
     /**
+     * @name Set and get the custom tuning
+     */
+    ///@{
+    CustomTuning &GetTuneCustom() { return m_tuneCustom; }
+    const CustomTuning &GetTuneCustom() const { return m_tuneCustom; }
+    void SetTuneCustom(CustomTuning tuneCustom);
+    ///@}
+
+    /**
      * Return the maximum staff size in the scoreDef (100 if empty)
      */
     int GetMaxStaffSize() const;
@@ -292,6 +302,8 @@ private:
     int m_drawingWidth;
     /** Store the label drawing width of the scoreDef */
     int m_drawingLabelsWidth;
+    /** Custom tuning */
+    CustomTuning m_tuneCustom;
 };
 
 } // namespace vrv

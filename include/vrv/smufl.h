@@ -273,6 +273,13 @@ enum {
     SMUFL_E2F2_accidentalNaturalEqualTempered = 0xE2F2,
     SMUFL_E2F3_accidentalSharpEqualTempered = 0xE2F3,
     SMUFL_E2F4_accidentalDoubleSharpEqualTempered = 0xE2F4,
+    SMUFL_E2F5_accidentalQuarterFlatEqualTempered = 0xE2F5,
+    SMUFL_E2F6_accidentalQuarterSharpEqualTempered = 0xE2F6,
+    SMUFL_E2F7_accidentalCombiningLower53LimitComma = 0xE2F7,
+    SMUFL_E2F8_accidentalCombiningRaise53LimitComma = 0xE2F8,
+    SMUFL_E2F9_accidentalEnharmonicTilde = 0xE2F9,
+    SMUFL_E2FA_accidentalEnharmonicAlmostEqualTo = 0xE2FA,
+    SMUFL_E2FB_accidentalEnharmonicEquals = 0xE2FB,
     SMUFL_E300_accSagittal5v7KleismaUp = 0xE300,
     SMUFL_E301_accSagittal5v7KleismaDown = 0xE301,
     SMUFL_E302_accSagittal5CommaUp = 0xE302,
@@ -1042,6 +1049,16 @@ enum {
     SMUFL_ED64_csymAccidentalDoubleFlat = 0xED64,
     SMUFL_ED65_csymAccidentalTripleSharp = 0xED65,
     SMUFL_ED66_csymAccidentalTripleFlat = 0xED66,
+    SMUFL_EE50_accidentalCombiningLower29LimitComma = 0xEE50,
+    SMUFL_EE51_accidentalCombiningRaise29LimitComma = 0xEE51,
+    SMUFL_EE52_accidentalCombiningLower37Quartertone = 0xEE52,
+    SMUFL_EE53_accidentalCombiningRaise37Quartertone = 0xEE53,
+    SMUFL_EE54_accidentalCombiningLower41Comma = 0xEE54,
+    SMUFL_EE55_accidentalCombiningRaise41Comma = 0xEE55,
+    SMUFL_EE56_accidentalCombiningLower43Comma = 0xEE56,
+    SMUFL_EE57_accidentalCombiningRaise43Comma = 0xEE57,
+    SMUFL_EE58_accidentalCombiningLower47Quartertone = 0xEE58,
+    SMUFL_EE59_accidentalCombiningRaise47Quartertone = 0xEE59,
     SMUFL_EE90_mensuralProportion5 = 0xEE90,
     SMUFL_EE91_mensuralProportion6 = 0xEE91,
     SMUFL_EE92_mensuralProportion7 = 0xEE92,
@@ -1050,7 +1067,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 1025
+#define SMUFL_COUNT 1042
 
 } // namespace vrv
 

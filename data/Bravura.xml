@@ -714,6 +714,19 @@
   </g>
   <g c="E2F3" x="-48.0" y="-348.0" w="297.0" h="792.0" h-a-x="250" n="accidentalSharpEqualTempered" />
   <g c="E2F4" x="-1.0" y="-125.0" w="247.0" h="384.0" h-a-x="246" n="accidentalDoubleSharpEqualTempered" />
+  <g c="E2F5" x="0.0" y="-182.0" w="323.0" h="634.0" h-a-x="226" n="accidentalQuarterFlatEqualTempered">
+    <a n="cutOutNW" x="0.35" y="0.67" />
+    <a n="cutOutSW" x="0.35" y="-0.47" />
+  </g>
+  <g c="E2F6" x="0.0" y="-327.0" w="270.0" h="669.0" h-a-x="270" n="accidentalQuarterSharpEqualTempered">
+    <a n="cutOutSE" x="0.7" y="-0.26" />
+    <a n="cutOutSW" x="0.36" y="-0.46" />
+  </g>
+  <g c="E2F7" x="0.0" y="-246.0" w="198.0" h="493.0" h-a-x="198" n="accidentalCombiningLower53LimitComma" />
+  <g c="E2F8" x="0.0" y="-249.0" w="198.0" h="498.0" h-a-x="198" n="accidentalCombiningRaise53LimitComma" />
+  <g c="E2F9" x="0.0" y="-85.0" w="433.0" h="170.0" h-a-x="434" n="accidentalEnharmonicTilde" />
+  <g c="E2FA" x="0.0" y="-160.0" w="433.0" h="320.0" h-a-x="434" n="accidentalEnharmonicAlmostEqualTo" />
+  <g c="E2FB" x="0.0" y="-125.0" w="448.0" h="250.0" h-a-x="449" n="accidentalEnharmonicEquals" />
   <g c="E300" x="0.0" y="-359.0" w="156.0" h="531.0" h-a-x="156" n="accSagittal5v7KleismaUp" />
   <g c="E301" x="0.0" y="-172.0" w="156.0" h="531.0" h-a-x="157" n="accSagittal5v7KleismaDown" />
   <g c="E302" x="0.0" y="-359.0" w="156.0" h="531.0" h-a-x="156" n="accSagittal5CommaUp" />
@@ -2063,6 +2076,47 @@
   <g c="F52C" x="16.0" y="-3.0" w="136.0" h="367.0" h-a-x="168" n="figbassFlatLongerStem" />
   <g c="F52D" x="19.0" y="-80.0" w="93.0" h="373.0" h-a-x="132" n="figbassNaturalLongerStem" />
   <g c="F52E" x="20.0" y="-106.0" w="150.0" h="420.0" h-a-x="186" n="figbassSharpLongerStem" />
+  <g c="EE50" x="0.0" y="-331.0" w="355.0" h="586.0" h-a-x="356" n="accidentalCombiningLower29LimitComma">
+    <a n="cutOutNE" x="1.2" y="-0.11" />
+    <a n="cutOutNW" x="0.19" y="-0.11" />
+    <a n="cutOutSE" x="1.17" y="-1.0" />
+    <a n="cutOutSW" x="0.19" y="-1.0" />
+  </g>
+  <g c="EE52" x="0.0" y="-327.0" w="298.0" h="1000.0" h-a-x="299" n="accidentalCombiningLower37Quartertone">
+    <a n="cutOutNW" x="0.84" y="1.48" />
+    <a n="cutOutSW" x="0.84" y="-0.77" />
+  </g>
+  <g c="EE54" x="0.0" y="38.0" w="297.0" h="45.0" h-a-x="297" n="accidentalCombiningLower41Comma" />
+  <g c="EE56" x="1.0" y="-6.0" w="352.0" h="304.0" h-a-x="354" n="accidentalCombiningLower43Comma">
+    <a n="cutOutSE" x="1.07" y="0.46" />
+    <a n="cutOutSW" x="0.33" y="0.46" />
+  </g>
+  <g c="EE58" x="0.0" y="-185.0" w="239.0" h="809.0" h-a-x="240" n="accidentalCombiningLower47Quartertone">
+    <a n="cutOutNW" x="0.64" y="0.67" />
+  </g>
+  <g c="EE51" x="1.0" y="39.0" w="354.0" h="586.0" h-a-x="356" n="accidentalCombiningRaise29LimitComma">
+    <a n="cutOutNE" x="1.16" y="2.15" />
+    <a n="cutOutNW" x="0.29" y="2.15" />
+    <a n="cutOutSE" x="1.16" y="1.32" />
+    <a n="cutOutSW" x="0.28" y="1.32" />
+  </g>
+  <g c="EE53" x="0.0" y="-376.0" w="298.0" h="1000.0" h-a-x="299" n="accidentalCombiningRaise37Quartertone">
+    <a n="cutOutNW" x="0.83" y="2.0" />
+    <a n="cutOutSW" x="0.83" y="-0.32" />
+  </g>
+  <g c="EE55" x="0.0" y="-88.0" w="297.0" h="297.0" h-a-x="297" n="accidentalCombiningRaise41Comma">
+    <a n="cutOutNE" x="0.87" y="0.55" />
+    <a n="cutOutNW" x="0.29" y="0.55" />
+    <a n="cutOutSE" x="0.88" y="-0.06" />
+    <a n="cutOutSW" x="0.29" y="-0.06" />
+  </g>
+  <g c="EE57" x="1.0" y="-8.0" w="355.0" h="303.0" h-a-x="356" n="accidentalCombiningRaise43Comma">
+    <a n="cutOutNE" x="1.08" y="0.73" />
+    <a n="cutOutNW" x="0.3" y="0.73" />
+  </g>
+  <g c="EE59" x="0.0" y="-334.0" w="239.0" h="809.0" h-a-x="240" n="accidentalCombiningRaise47Quartertone">
+    <a n="cutOutSW" x="0.64" y="0.46" />
+  </g>
   <g c="F532" x="0.0" y="1.22" w="339.0" h="244.42" h-a-x="339" n="articAccentAboveRossini" />
   <g c="F533" x="0.0" y="-238.78" w="339.0" h="244.42" h-a-x="339" n="articAccentBelowRossini" />
   <g c="EE90" x="0.92" y="-260.0" w="313.08" h="519.0" h-a-x="315" n="mensuralProportion5" />

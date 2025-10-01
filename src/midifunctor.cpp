@@ -963,7 +963,11 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
             case TEMPERAMENT_just: midiEvent.makeTemperamentBad(100.0, referencePitchClass); break;
             case TEMPERAMENT_mean: midiEvent.makeTemperamentMeantone(referencePitchClass); break;
             case TEMPERAMENT_pythagorean: midiEvent.makeTemperamentPythagorean(referencePitchClass); break;
-            case TEMPERAMENT_custom: midiEvent.makeTuningCustom(scoreDef->GetTuneCustom(), program); break;
+            case TEMPERAMENT_MAX:
+                if (scoreDef->GetTuneCustom().IsValid()) {
+                    midiEvent.makeTuningCustom(scoreDef->GetTuneCustom().GetTuning(), program);
+                }
+                break;
             default: break;
         }
         m_midiFile->addEvent(m_midiTrack, midiEvent);
@@ -1111,51 +1115,8 @@ void GenerateMIDIFunctor::HandleOctave(const LayerElement *layerElement)
 
 int GenerateMIDIFunctor::GetMIDIPitch(const Note *note)
 {
-    if (m_scoreDef && m_scoreDef->HasTuneCustom()) {
-        // construct note name for tuning lookup
-        data_PITCHNAME pname = note->GetPname();
-        if (note->HasPnameGes()) pname = note->GetPnameGes();
-        std::string noteName(1, (pname - 1 + ('C' - 'A')) % 7 + 'A');
-
-        const Accid *accid = note->GetDrawingAccid();
-        if (accid) {
-            const AttAccidental *att = dynamic_cast<const AttAccidental *>(accid);
-            assert(att);
-            if (accid->GetAccid() == ACCIDENTAL_WRITTEN_n || accid->GetAccidGes() == ACCIDENTAL_GESTURAL_n) {
-                if (accid->HasGlyphName()) {
-                    noteName += accid->GetGlyphName();
-                }
-            }
-            else if (accid->HasAccid()) {
-                noteName += att->AccidentalWrittenToStr(accid->GetAccid());
-            }
-            else if (accid->HasAccidGes()) {
-                noteName += att->AccidentalGesturalToStr(accid->GetAccidGes());
-            }
-        }
-        int oct = note->GetOct() + m_octaveShift;
-        if (note->HasOctGes()) oct = note->GetOctGes();
-
-        // lookup note in the tuning and map it to a MIDI key
-        try {
-            Tunings::Tuning tuning = m_scoreDef->GetTuneCustom();
-            // FIXME special case: when we encounter a B pitch that's in scale degree 0, increment its oct by 1
-            // otherwise, it would be in the lower octave
-            const auto it = std::find(
-                tuning.notationMapping.names.begin(),
-                tuning.notationMapping.names.end(),
-                m_scoreDef->GetTuneCustomNoteMap().at(noteName)
-            );
-            int scalePosition = (it - tuning.notationMapping.names.begin() + 1) % tuning.notationMapping.count;
-            if (pname == PITCHNAME_b && scalePosition == 0) oct++;
-            return tuning.midiNoteForNoteName(m_scoreDef->GetTuneCustomNoteMap().at(noteName), oct);
-        }
-        catch (Tunings::TuningError &e) {
-            LogError("Error mapping note to tuning: %s", e.what());
-        }
-        catch (std::out_of_range &e) {
-            LogError("Error mapping note to tuning: %s not mapped.", noteName.c_str());
-        }
+    if (m_scoreDef && m_scoreDef->GetTuneCustom().IsValid()) {
+        return m_scoreDef->GetTuneCustom().GetMIDIPitch(note, m_transSemi, m_octaveShift);
     }
     return note->GetMIDIPitch(m_transSemi, m_octaveShift);
 }

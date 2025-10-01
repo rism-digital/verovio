@@ -6782,11 +6782,6 @@ bool AttTuning::HasTuneTemper() const
     return (m_tuneTemper != TEMPERAMENT_NONE);
 }
 
-bool AttTuning::HasTuneCustom() const
-{
-    return (m_tuneTemper == TEMPERAMENT_custom);
-}
-
 //----------------------------------------------------------------------------
 // AttTuningLog
 //----------------------------------------------------------------------------

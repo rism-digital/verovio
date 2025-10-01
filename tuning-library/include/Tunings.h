@@ -39,6 +39,8 @@
 #include <memory>
 #include <array>
 
+static_assert(__cplusplus >= 202002L, "Surge team libraries have moved to C++ 20");
+
 namespace Tunings
 {
 static constexpr double MIDI_0_FREQ = 8.17579891564371; // or 440.0 * pow( 2.0, - ( 69.0/12.0 ) )

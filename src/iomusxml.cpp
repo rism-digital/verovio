@@ -28,6 +28,7 @@
 #include "clef.h"
 #include "comparison.h"
 #include "course.h"
+#include "customtuning.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -2863,30 +2864,12 @@ void MusicXmlInput::ReadMusicXmlNote(
             note->SetStaff(
                 note->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(noteStaffNum + staffOffset)));
 
-        // accidental
-        pugi::xml_node accidental = node.child("accidental");
-        if (!accidental) {
-            accidental = node.select_node("notations/accidental-mark").node();
+        // accidentals
+        for (pugi::xml_node accidental : node.children("accidental")) {
+            AddAccidental(accidental, note);
         }
-        if (accidental) {
-            Accid *accid = new Accid();
-            accid->SetAccid(ConvertAccidentalToAccid(accidental.text().as_string()));
-            accid->SetColor(accidental.attribute("color").as_string());
-            accid->SetGlyphName(accidental.attribute("smufl").as_string());
-            if (accid->HasGlyphName()) {
-                accid->SetGlyphAuth("smufl");
-                if (!accid->HasAccid()) {
-                    accid->SetAccid(ACCIDENTAL_WRITTEN_n);
-                }
-            }
-            accid->SetPlace(accid->AttPlacementRelEvent::StrToStaffrel(accidental.attribute("placement").as_string()));
-            if (accidental.attribute("id")) accid->SetID(accidental.attribute("id").as_string());
-            if (HasAttributeWithValue(accidental, "cautionary", "yes")) accid->SetFunc(accidLog_FUNC_caution);
-            if (HasAttributeWithValue(accidental, "editorial", "yes")) accid->SetFunc(accidLog_FUNC_edit);
-            if (HasAttributeWithValue(accidental, "bracket", "yes")) accid->SetEnclose(ENCLOSURE_brack);
-            if (HasAttributeWithValue(accidental, "parentheses", "yes")) accid->SetEnclose(ENCLOSURE_paren);
-            if (!strcmp(accidental.name(), "accidental-mark")) accid->SetOnstaff(BOOLEAN_false);
-            note->AddChild(accid);
+        for (pugi::xpath_node accidental : node.select_nodes("notations/accidental-mark")) {
+            AddAccidental(accidental.node(), note);
         }
 
         // stem direction - taken into account below for the chord or the note
@@ -3760,6 +3743,31 @@ void MusicXmlInput::ReadMusicXmlNote(
     }
 }
 
+void MusicXmlInput::AddAccidental(pugi::xml_node accidental, Note *note)
+{
+    assert(accidental);
+    assert(note);
+
+    Accid *accid = new Accid();
+    accid->SetAccid(ConvertAccidentalToAccid(accidental.text().as_string()));
+    accid->SetColor(accidental.attribute("color").as_string());
+    accid->SetGlyphName(accidental.attribute("smufl").as_string());
+    if (accid->HasGlyphName()) {
+        accid->SetGlyphAuth("smufl");
+        if (!accid->HasAccid()) {
+            accid->SetAccid(ACCIDENTAL_WRITTEN_n);
+        }
+    }
+    accid->SetPlace(accid->AttPlacementRelEvent::StrToStaffrel(accidental.attribute("placement").as_string()));
+    if (accidental.attribute("id")) accid->SetID(accidental.attribute("id").as_string());
+    if (HasAttributeWithValue(accidental, "cautionary", "yes")) accid->SetFunc(accidLog_FUNC_caution);
+    if (HasAttributeWithValue(accidental, "editorial", "yes")) accid->SetFunc(accidLog_FUNC_edit);
+    if (HasAttributeWithValue(accidental, "bracket", "yes")) accid->SetEnclose(ENCLOSURE_brack);
+    if (HasAttributeWithValue(accidental, "parentheses", "yes")) accid->SetEnclose(ENCLOSURE_paren);
+    if (!strcmp(accidental.name(), "accidental-mark")) accid->SetOnstaff(BOOLEAN_false);
+    note->AddChild(accid);
+}
+
 void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
 {
     assert(node);
@@ -3798,57 +3806,20 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
         else if (value == "just") temperament = TEMPERAMENT_just;
         else if (value == "mean") temperament = TEMPERAMENT_mean;
         else if (value == "pythagorean") temperament = TEMPERAMENT_pythagorean;
-        else LogWarning("Error parsing MEI temperament: %s", value.c_str());
+        else LogWarning("MusicXML import: Invalid MEI temperament '%s'", value.c_str());
         m_doc->GetFirstScoreDef()->SetTuneTemper(temperament);
     }
 
     // get custom (Ableton) tuning
     pugi::xpath_node abletonTuning = node.select_node("play/other-play[@type='tuning-ableton']");
     if (abletonTuning) {
-        const std::string value = std::regex_replace(abletonTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
-        try {
-            Tunings::Tuning tuning(Tunings::parseASCLData(value));
+        const std::string tuningDef = std::regex_replace(abletonTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
+        CustomTuning tuning(tuningDef, m_doc, true);
+        if (tuning.IsValid()) {
             m_doc->GetFirstScoreDef()->SetTuneCustom(tuning);
-
-            // map the tuning note names to MEI notes (including enharmonics separated by slash `/`)
-            auto &map = m_doc->GetFirstScoreDef()->GetTuneCustomNoteMap();
-            map.clear();
-            for (const auto &note : tuning.notationMapping.names) {
-                std::smatch note_names;
-                std::regex note_name_regex("(?:^|\\/)([A-G])([^\\/\\s]*)");
-                std::string::const_iterator search_start(note.cbegin());
-                while (std::regex_search(search_start, note.cend(), note_names, note_name_regex)) {
-                    std::string mei = note_names[1].str();
-                    std::string accid = note_names[2].str();
-                    if (!accid.empty()) {
-                        bool valid = false;
-                        if (m_doc->GetResources().GetGlyphCode(accid)) {
-                            mei += accid;
-                            valid = true;
-                        }
-                        else {
-                            InstAccidental accidental;
-                            accidental.SetAccid(ConvertAccidentalToAccid(accid));
-                            if (accidental.HasAccid()) {
-                                valid = true;
-                                if (accidental.GetAccid() != ACCIDENTAL_WRITTEN_n) {
-                                    mei += accidental.AccidentalWrittenToStr(accidental.GetAccid());
-                                }
-                            }
-                        }
-                        if (!valid) {
-                            LogError("MusicXML import: Tuning accidental \"%s\" is neither a MusicXML accidental nor a SMuFL glyph", accid.c_str());
-                        }
-                    }
-                    map.insert({mei, note});
-
-                    // get next match
-                    search_start = note_names.suffix().first;
-                }
-            }
         }
-        catch (Tunings::TuningError &error) {
-            LogError("MusicXML import: Tuning is invalid: %s", error.what());
+        else {
+            LogWarning("MusicXML import: Error parsing tuning definition");
         }
     }
 }

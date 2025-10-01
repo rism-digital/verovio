@@ -226,6 +226,13 @@ private:
 public:
     bool Import(const std::string &musicxml) override;
 
+    /*
+     * @name Public methods for converting MusicXML values to MEI attributes.
+     */
+    ///@{
+    static data_ACCIDENTAL_WRITTEN ConvertAccidentalToAccid(const std::string &value);
+    ///@}
+
 private:
     /*
      * Top level method called from ImportFile or Import
@@ -311,6 +318,11 @@ private:
      * Add a Layer element to the layer or to the LayerElement at the top of m_elementStack.
      */
     void AddLayerElement(Layer *layer, LayerElement *element, int duration = 0);
+
+    /*
+     * Add an accidental to a note.
+     */
+    void AddAccidental(pugi::xml_node accidental, Note *note);
 
     /*
      * Returns the appropriate layer for a node looking at its MusicXML staff and voice elements.
@@ -479,7 +491,6 @@ private:
      * @name Methods for converting MusicXML values to MEI attributes.
      */
     ///@{
-    static data_ACCIDENTAL_WRITTEN ConvertAccidentalToAccid(const std::string &value);
     static data_ACCIDENTAL_GESTURAL ConvertAlterToAccid(const float value);
     static data_ARTICULATION ConvertArticulations(const std::string &value);
     static data_BARRENDITION ConvertStyleToRend(const std::string &value, const bool repeat);

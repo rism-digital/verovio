@@ -763,6 +763,13 @@
         <glyph glyph-code="E2F2" smufl-name="accidentalNaturalEqualTempered" />
         <glyph glyph-code="E2F3" smufl-name="accidentalSharpEqualTempered" />
         <glyph glyph-code="E2F4" smufl-name="accidentalDoubleSharpEqualTempered" />
+        <glyph glyph-code="E2F5" smufl-name="accidentalQuarterFlatEqualTempered" />
+        <glyph glyph-code="E2F6" smufl-name="accidentalQuarterSharpEqualTempered" />
+        <glyph glyph-code="E2F7" smufl-name="accidentalCombiningLower53LimitComma" />
+        <glyph glyph-code="E2F8" smufl-name="accidentalCombiningRaise53LimitComma" />
+        <glyph glyph-code="E2F9" smufl-name="accidentalEnharmonicTilde" />
+        <glyph glyph-code="E2FA" smufl-name="accidentalEnharmonicAlmostEqualTo" />
+        <glyph glyph-code="E2FB" smufl-name="accidentalEnharmonicEquals" />
         <range_end>U+E2FF</range_end>
         <range_start>U+E2C0</range_start>
     </extendedHelmholtzEllisAccidentalsJustIntonation>
@@ -3187,6 +3194,21 @@
         <range_end>U+ED9F</range_end>
         <range_start>U+ED80</range_start>
     </fingeringSupplement>
+    <extendedHelmholtzEllisAccidentalsJustIntonationSupplement>
+        <description>Extended Helmholtz-Ellis accidentals (just intonation) supplement</description>
+        <glyph glyph-code="EE50" smufl-name="accidentalCombiningLower29LimitComma" />
+        <glyph glyph-code="EE51" smufl-name="accidentalCombiningRaise29LimitComma" />
+        <glyph glyph-code="EE52" smufl-name="accidentalCombiningLower37Quartertone" />
+        <glyph glyph-code="EE53" smufl-name="accidentalCombiningRaise37Quartertone" />
+        <glyph glyph-code="EE54" smufl-name="accidentalCombiningLower41Comma" />
+        <glyph glyph-code="EE55" smufl-name="accidentalCombiningRaise41Comma" />
+        <glyph glyph-code="EE56" smufl-name="accidentalCombiningLower43Comma" />
+        <glyph glyph-code="EE57" smufl-name="accidentalCombiningRaise43Comma" />
+        <glyph glyph-code="EE58" smufl-name="accidentalCombiningLower47Quartertone" />
+        <glyph glyph-code="EE59" smufl-name="accidentalCombiningRaise47Quartertone" />
+        <range_end>U+EE59</range_end>
+        <range_start>U+EE50</range_start>
+    </extendedHelmholtzEllisAccidentalsJustIntonationSupplement>
     <medievalAndRenaissanceProlationsSupplement>
         <description>Medieval and Renaissance prolations supplement</description>
         <glyph glyph-code="EE90" smufl-name="mensuralProportion5" />

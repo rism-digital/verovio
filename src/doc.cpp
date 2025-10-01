@@ -468,68 +468,29 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     // set MIDI tuning
     const auto midiTuning =  m_options->m_midiTuning.GetStrValue();
     if (!midiTuning.empty()) {
-        Tunings::Tuning tuning;
+        std::string tuningDef;
         std::ifstream f(midiTuning.c_str());
         if (f.good()) {
             const std::string ext(".ascl");
             if (midiTuning.size() >= ext.size() && midiTuning.substr(midiTuning.size() - ext.size()) == ext) {
-                try {
-                    tuning = Tunings::Tuning(Tunings::readASCLStream(f));
-                }
-                catch (Tunings::TuningError &e) {
-                    LogError("Tuning file %s is invalid: %s", midiTuning.c_str(), e.what());
-                }
+                std::stringstream buffer;
+                buffer << f.rdbuf();
+                tuningDef = buffer.str();
             }
             else {
-                LogError("Tuning file %s is not recognized", midiTuning.c_str());
+                LogError("Tuning file '%s' is not recognized", midiTuning.c_str());
             }
         }
         else {
-            try {
-                tuning = Tunings::Tuning(Tunings::parseASCLData(midiTuning));
-            }
-            catch (Tunings::TuningError &e) {
-                LogError("Tuning is neither a valid tuning file nor a valid tuning definition: %s", e.what());
-            }
+            tuningDef = midiTuning;
         }
-        if (tuning.notationMapping.count) {
-            scoreDef->SetTuneCustom(tuning);
-
-            // map the tuning note names to MEI notes (including enharmonics separated by slash `/`)
-            auto &map = scoreDef->GetTuneCustomNoteMap();
-            map.clear();
-            for (const auto &note : tuning.notationMapping.names) {
-                std::smatch note_names;
-                std::regex note_name_regex("(?:^|\\/)([A-G])([^\\/\\s]*)");
-                std::string::const_iterator search_start(note.cbegin());
-                while (std::regex_search(search_start, note.cend(), note_names, note_name_regex)) {
-                    std::string mei = note_names[1].str();
-                    std::string accid = note_names[2].str();
-                    if (!accid.empty()) {
-                        bool valid = false;
-                        if (this->GetResources().GetGlyphCode(accid)) {
-                            mei += accid;
-                            valid = true;
-                        }
-                        else {
-                            InstAccidental accidental;
-                            accidental.SetAccid(accidental.StrToAccidentalWritten(accid));
-                            if (accidental.HasAccid()) {
-                                valid = true;
-                                if (accidental.GetAccid() != ACCIDENTAL_WRITTEN_n) {
-                                    mei += accidental.AccidentalWrittenToStr(accidental.GetAccid());
-                                }
-                            }
-                        }
-                        if (!valid) {
-                            LogError("Tuning accidental \"%s\" is neither a MEI accidental nor a SMuFL glyph", accid.c_str());
-                        }
-                    }
-                    map.insert({mei, note});
-
-                    // get next match
-                    search_start = note_names.suffix().first;
-                }
+        if (!tuningDef.empty()) {
+            CustomTuning tuning(tuningDef, this, false);
+            if (tuning.IsValid()) {
+                scoreDef->SetTuneCustom(tuning);
+            }
+            else {
+                LogWarning("Error parsing tuning %s", f.good() ? "file" : "definition");
             }
         }
     }
