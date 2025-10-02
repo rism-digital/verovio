@@ -395,7 +395,7 @@ bool EditorToolkitCMN::Chain(jsonxx::Array actions)
 
 bool EditorToolkitCMN::Delete(std::string &elementId)
 {
-    Object *element = this->GetElement(elementId);
+    Object *element = this->GetChainedElement(elementId);
     if (!element) return false;
     if (element->Is(NOTE)) {
         return this->DeleteNote(vrv_cast<Note *>(element));
@@ -405,7 +405,7 @@ bool EditorToolkitCMN::Delete(std::string &elementId)
 
 bool EditorToolkitCMN::Drag(std::string &elementId, int x, int y)
 {
-    Object *element = this->GetElement(elementId);
+    Object *element = this->GetChainedElement(elementId);
     if (!element) return false;
 
     // For elements whose y-position corresponds to a certain pitch
@@ -425,7 +425,7 @@ bool EditorToolkitCMN::Drag(std::string &elementId, int x, int y)
 
 bool EditorToolkitCMN::KeyDown(std::string &elementId, int key, bool shiftKey, bool ctrlKey)
 {
-    Object *element = this->GetElement(elementId);
+    Object *element = this->GetChainedElement(elementId);
     if (!element) return false;
 
     // For elements whose y-position corresponds to a certain pitch
@@ -542,7 +542,7 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
 
 bool EditorToolkitCMN::Set(std::string &elementId, std::string const &attribute, std::string const &value)
 {
-    Object *element = this->GetElement(elementId);
+    Object *element = this->GetChainedElement(elementId);
     if (!element) return false;
 
     bool success = false;
@@ -622,7 +622,7 @@ bool EditorToolkitCMN::Set(std::string &elementId, std::string const &attribute,
     return success;
 }
 
-Object *EditorToolkitCMN::GetElement(std::string &elementId)
+Object *EditorToolkitCMN::GetChainedElement(std::string &elementId)
 {
     if (elementId == CHAINED_ID) {
         elementId = m_chainedId;
@@ -911,7 +911,7 @@ bool EditorToolkitCMN::ContextForElement(std::string &elementId)
     bool hasTargetID = (elementId != "");
     const Object *object = NULL;
     if (hasTargetID) {
-        object = this->GetElement(elementId);
+        object = this->GetChainedElement(elementId);
     }
     // Retrieve the context from the first measure in the document
     else {
