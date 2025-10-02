@@ -18,12 +18,10 @@
 #include "att.h"
 #include "attdef.h"
 #include "pugixml.hpp"
-#include "Tunings.h"
 
 //----------------------------------------------------------------------------
 
 #include <string>
-#include <map>
 
 namespace vrv {
 
