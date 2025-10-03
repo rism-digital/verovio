@@ -2900,29 +2900,32 @@ void MusicXmlInput::ReadMusicXmlNote(
             // adjust gestural accidental (including glyph) based on carried-over accidentals
             // or update the carried-over accidentals with current gestural accidental value.
             if (note->HasPname()) {
-                Accid *accid = vrv_cast<Accid *>(note->GetFirst(ACCID));
-                if (!accid) {
-                    accid = new Accid();
-                    note->AddChild(accid);
-                    accid->IsAttribute(true);
-                }
-                if (!accid->HasAccid()) {
+                ListOfObjects accids = note->FindAllDescendantsByType(ACCID);
+                if (!accids.size()) {
                     try {
-                        auto current = m_currentAccids.at(note->GetPname());
-                        accid->SetAccidGes(current.m_accidGes);
-                        accid->SetGlyphName(current.m_glyphName);
-                        accid->SetGlyphAuth(current.m_glyphAuth);
+                        for (const auto &current : m_currentAccids.at(note->GetPname())) {
+                            Accid *accid = new Accid();
+                            note->AddChild(accid);
+                            accid->IsAttribute(true);
+                            accid->SetAccidGes(current.m_accidGes);
+                            accid->SetGlyphName(current.m_glyphName);
+                            accid->SetGlyphAuth(current.m_glyphAuth);
+                        }
                     }
                     catch (std::out_of_range &e) {
                         // unknown note, do nothing
                     }
                 }
                 else {
-                    m_currentAccids[note->GetPname()] = musicxml::AccidGes(
-                        Att::AccidentalWrittenToGestural(accid->GetAccid()),
-                        accid->GetGlyphName(),
-                        accid->GetGlyphAuth()
-                    );
+                    m_currentAccids[note->GetPname()].clear();
+                    for (const Object *object : accids) {
+                        const Accid *accid = vrv_cast<const Accid *>(object);
+                        m_currentAccids[note->GetPname()].push_back(musicxml::AccidGes(
+                            Att::AccidentalWrittenToGestural(accid->GetAccid()),
+                            accid->GetGlyphName(),
+                            accid->GetGlyphAuth()
+                        ));
+                    }
                 }
             }
         }
@@ -4109,7 +4112,7 @@ void MusicXmlInput::ResetAccidGes(const KeySig *keySig)
     // inspired by KeySig::FillMap() but without the octave repetitions
     m_currentAccids.clear();
     for (int i = PITCHNAME_c; i <= PITCHNAME_g; i++) {
-        m_currentAccids[static_cast<data_PITCHNAME>(i)] = musicxml::AccidGes();
+        m_currentAccids[static_cast<data_PITCHNAME>(i)] = {musicxml::AccidGes()};
     }
 
     if (!keySig) return;
@@ -4119,11 +4122,11 @@ void MusicXmlInput::ResetAccidGes(const KeySig *keySig)
         for (const Object *child : childList) {
             const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(child);
             assert(keyAccid);
-            m_currentAccids[keyAccid->GetPname()] = musicxml::AccidGes(
+            m_currentAccids[keyAccid->GetPname()] = {musicxml::AccidGes(
                 Att::AccidentalWrittenToGestural(keyAccid->GetAccid()),
                 keyAccid->GetGlyphName(),
                 keyAccid->GetGlyphAuth()
-            );
+            )};
         }
         return;
     }
@@ -4131,7 +4134,7 @@ void MusicXmlInput::ResetAccidGes(const KeySig *keySig)
     data_ACCIDENTAL_WRITTEN accidType = keySig->GetAccidType();
     data_ACCIDENTAL_GESTURAL accidGesType = Att::AccidentalWrittenToGestural(accidType);
     for (int i = 0; i < keySig->GetAccidCount(true); ++i) {
-        m_currentAccids[KeySig::GetAccidPnameAt(accidType, i)] = musicxml::AccidGes(accidGesType, "", "");
+        m_currentAccids[KeySig::GetAccidPnameAt(accidType, i)] = {musicxml::AccidGes(accidGesType, "", "")};
     }
 }
 

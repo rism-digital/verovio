@@ -100,6 +100,47 @@
           <top-system-distance>170</top-system-distance>
           </system-layout>
         </print>
+      <sound>
+        <play>
+          <other-play type="tuning-ableton">
+            <![CDATA[
+! sagittal.ascl
+!
+Automatically generated tuning from the score file:///home/kratib/src/infojunkie/musicxml-midi/test/data/sagittal.musicxml
+!
+! default tuning: degree 0 = 261.625565 Hz
+!
+20
+!
+200. ! D
+259.051. ! EaccSagittalFlat7CDown
+307.821. ! EaccSagittalFlat5CUp
+378.494. ! EaccSagittal5CommaDown
+472.736. ! FaccSagittal7CommaDown
+500. ! F
+553.273. ! FaccSagittal11MediumDiesisUp
+592.179. ! FaccSagittalSharp5CDown
+700. ! G
+807.821. ! AaccSagittalFlat5CUp
+835.085. ! AaccSagittal35LargeDiesisDown
+878.494. ! AaccSagittal5CommaDown
+900. ! A
+959.051. ! BaccSagittalFlat7CDown
+986.315. ! BaccSagittalFlat
+1007.821. ! BaccSagittalFlat5CUp
+1035.085. ! BaccSagittal35LargeDiesisDown
+1039.588. ! BaccSagittal11LargeDiesisDown
+1078.494. ! BaccSagittal5CommaDown
+1200. ! C
+!
+! Note names are formatted as per MusicXML/SMuFL accidentals.
+!
+! @ABL NOTE_NAMES "C" "D" "EaccSagittalFlat7CDown" "EaccSagittalFlat5CUp" "EaccSagittal5CommaDown" "FaccSagittal7CommaDown" "F" "FaccSagittal11MediumDiesisUp" "FaccSagittalSharp5CDown" "G" "AaccSagittalFlat5CUp" "AaccSagittal35LargeDiesisDown" "AaccSagittal5CommaDown" "A" "BaccSagittalFlat7CDown" "BaccSagittalFlat" "BaccSagittalFlat5CUp" "BaccSagittal35LargeDiesisDown" "BaccSagittal11LargeDiesisDown" "BaccSagittal5CommaDown"
+! @ABL REFERENCE_PITCH 4 0 261.625565
+            ]]>
+          </other-play>
+        </play>
+      </sound>
       <attributes>
         <divisions>1</divisions>
         <key>
