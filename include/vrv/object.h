@@ -313,6 +313,12 @@ public:
     ///@}
 
     /**
+     * Return reference to direct child of parent that is ancestor to descendant.
+     * If descendant is already a direct child of parent, it returns descendant.
+     */
+    Object *GetDirectChild(Object *parent, Object *descendant);
+
+    /**
      * Return the children as const reference or copy
      */
     ///@{
