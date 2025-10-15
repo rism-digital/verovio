@@ -98,20 +98,30 @@ FunctorCode AdjustAccidXFunctor::VisitAlignmentReference(AlignmentReference *ali
     }
 
     const int count = (int)accids.size();
-    // Zig-zag processing
+    // Zig-zag processing, taking into consideration multiple accidentals per note
     for (int i = 0, j = count - 1; i < count; ++i) {
         // top one - but skip if already adjusted (i.e. octaves)
         if (!m_adjustedAccids.contains(accids.at(i))) {
             this->AdjustAccidWithSpace(accids.at(i), alignmentReference, staffSize);
         }
 
-        // Don't zig-zag if the next accidental belongs to the same note as the current one
+        // top one - don't zig-zag if the next accidental belongs to current note to preserve order
         if (i < count - 1 && accids.at(i)->GetFirstAncestor(NOTE) == accids.at(i + 1)->GetFirstAncestor(NOTE)) continue;
 
-        // bottom one - but skip if already adjusted
-        if (!m_adjustedAccids.contains(accids.at(j))) {
-            this->AdjustAccidWithSpace(accids.at(j), alignmentReference, staffSize);
+        // bottom one - back up to first accidental of current note to preserve order
+        int k = j;
+        while (j > 0 && accids.at(j)->GetFirstAncestor(NOTE) == accids.at(j - 1)->GetFirstAncestor(NOTE)) {
+            --j;
         }
+
+        // bottom one - but skip if already adjusted
+        for (int l = j; l <= k; ++l) {
+            if (!m_adjustedAccids.contains(accids.at(l))) {
+                this->AdjustAccidWithSpace(accids.at(l), alignmentReference, staffSize);
+            }
+        }
+
+        // bottom one - move to previous position
         --j;
     }
 
