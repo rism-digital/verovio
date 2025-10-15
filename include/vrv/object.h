@@ -315,7 +315,7 @@ public:
     /**
      * Return reference to the object that is the ancestor of the indicated
      * descendant object and that is a direct child of the indicated
-     * parent object.  If descendant is itself a direct child of parent, 
+     * parent object.  If descendant is itself a direct child of parent,
      * it returns descendant.
      */
     Object *GetDirectChild(Object *parent, Object *descendant);
