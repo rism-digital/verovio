@@ -15,6 +15,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "ostaff.h"
 #include "staff.h"
 #include "vrv.h"
 
@@ -54,7 +55,7 @@ void Ossia::Reset()
 
 bool Ossia::IsSupportedChild(ClassId classId)
 {
-    static const std::vector<ClassId> supported{ STAFF };
+    static const std::vector<ClassId> supported{ OSTAFF, STAFF };
 
     if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
         return true;
@@ -82,6 +83,9 @@ void Ossia::AddChildBack(Object *child)
     if (children.empty()) {
         children.push_back(child);
     }
+    else if (children.back()->Is(OSTAFF)) {
+        children.push_back(child);
+    }
     else if (children.back()->Is(STAFF)) {
         children.push_back(child);
     }
@@ -98,7 +102,16 @@ void Ossia::AddChildBack(Object *child)
 
 bool Ossia::AddChildAdditionalCheck(Object *child)
 {
-    if (child->Is(STAFF)) {
+    if (child->Is(OSTAFF)) {
+        OStaff *ostaff = vrv_cast<OStaff *>(child);
+        assert(ostaff);
+        if (ostaff && (ostaff->GetN() < 1)) {
+            // This is not 100% safe if we have a <app> and <rdg> with more than
+            // one staff as a previous child.
+            // ostaff->SetN(this->GetChildCount());
+        }
+    }
+    else if (child->Is(STAFF)) {
         Staff *staff = vrv_cast<Staff *>(child);
         assert(staff);
         if (staff && (staff->GetN() < 1)) {
