@@ -111,6 +111,7 @@ class Orig;
 class Oriscus;
 class Ornam;
 class Ossia;
+class OStaff;
 class Page;
 class PageElement;
 class PageMilestoneEnd;
@@ -386,6 +387,7 @@ private:
     void WriteStaff(pugi::xml_node currentNode, Staff *staff);
     void WriteLayer(pugi::xml_node currentNode, Layer *layer);
     void WriteOssia(pugi::xml_node currentNode, Ossia *ossia);
+    void WriteOStaff(pugi::xml_node currentNode, OStaff *ostaff);
     ///@}
 
     /**
@@ -697,6 +699,7 @@ private:
     bool ReadLabelAbbr(Object *parent, pugi::xml_node labelAbbr);
     bool ReadTuning(Object *parent, pugi::xml_node tuning);
     bool ReadOssia(Object *parent, pugi::xml_node ossia);
+    bool ReadOStaff(Object *parent, pugi::xml_node oStaff);
     bool ReadTuningChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadCourse(Object *parent, pugi::xml_node course);
     bool ReadSymbolTable(Object *parent, pugi::xml_node parentNode);

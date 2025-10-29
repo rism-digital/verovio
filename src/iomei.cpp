@@ -104,6 +104,7 @@
 #include "oriscus.h"
 #include "ornam.h"
 #include "ossia.h"
+#include "ostaff.h"
 #include "page.h"
 #include "pagemilestone.h"
 #include "pages.h"
@@ -504,6 +505,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->Is(OSSIA)) {
         m_currentNode = m_currentNode.append_child("ossia");
         this->WriteOssia(m_currentNode, vrv_cast<Ossia *>(object));
+    }
+    else if (object->Is(OSTAFF)) {
+        m_currentNode = m_currentNode.append_child("oStaff");
+        this->WriteOStaff(m_currentNode, vrv_cast<OStaff *>(object));
     }
     else if (object->Is(STAFF)) {
         m_currentNode = m_currentNode.append_child("staff");
@@ -2241,6 +2246,16 @@ void MEIOutput::WriteOrnam(pugi::xml_node currentNode, Ornam *ornam)
     this->WriteTextDirInterface(currentNode, ornam);
     this->WriteTimePointInterface(currentNode, ornam);
     ornam->WriteOrnamentAccid(currentNode);
+}
+
+void MEIOutput::WriteOStaff(pugi::xml_node currentNode, OStaff *ostaff)
+{
+    assert(ostaff);
+
+    this->WriteXmlId(currentNode, ostaff);
+    ostaff->WriteNInteger(currentNode);
+    ostaff->WriteTyped(currentNode);
+    ostaff->WriteVisibility(currentNode);
 }
 
 void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
@@ -5683,6 +5698,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (currentName == "ossia") {
             success = this->ReadOssia(parent, current);
         }
+        else if (currentName == "oStaff") {
+            success = this->ReadOStaff(parent, current);
+        }
         else if (currentName == "pedal") {
             success = this->ReadPedal(parent, current);
         }
@@ -5744,7 +5762,10 @@ bool MEIInput::ReadOssia(Object *parent, pugi::xml_node ossia)
     pugi::xml_node current;
     for (current = ossia.first_child(); current; current = current.next_sibling()) {
         const std::string currentName = current.name();
-        if (currentName == "staff") {
+        if (currentName == "oStaff") {
+            success = this->ReadOStaff(vrvOssia, current);
+        }
+        else if (currentName == "staff") {
             success = this->ReadStaff(vrvOssia, current);
         }
     }
@@ -6334,7 +6355,7 @@ bool MEIInput::ReadStaff(Object *parent, pugi::xml_node staff)
 
 bool MEIInput::ReadStaffChildren(Object *parent, pugi::xml_node parentNode)
 {
-    assert(dynamic_cast<Staff *>(parent) || dynamic_cast<EditorialElement *>(parent));
+    assert(dynamic_cast<Staff *>(parent) || dynamic_cast<OStaff *>(parent) || dynamic_cast<EditorialElement *>(parent));
 
     bool success = true;
     pugi::xml_node current;
@@ -6358,6 +6379,25 @@ bool MEIInput::ReadStaffChildren(Object *parent, pugi::xml_node parentNode)
         }
     }
     return success;
+}
+
+bool MEIInput::ReadOStaff(Object *parent, pugi::xml_node oStaff)
+{
+    OStaff *vrvOStaff = new OStaff();
+    this->SetMeiID(oStaff, vrvOStaff);
+    this->ReadFacsimileInterface(oStaff, vrvOStaff);
+
+    vrvOStaff->ReadNInteger(oStaff);
+    vrvOStaff->ReadTyped(oStaff);
+    vrvOStaff->ReadVisibility(oStaff);
+
+    if (!vrvOStaff->HasN() || (vrvOStaff->GetN() == 0)) {
+        LogWarning("No @n on <oStaff> or a value of 0 might yield unpredictable results");
+    }
+
+    parent->AddChild(vrvOStaff);
+    this->ReadUnsupportedAttr(oStaff, vrvOStaff);
+    return this->ReadStaffChildren(vrvOStaff, oStaff);
 }
 
 bool MEIInput::ReadLayer(Object *parent, pugi::xml_node layer)

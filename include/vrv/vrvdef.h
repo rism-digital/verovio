@@ -115,6 +115,7 @@ enum ClassId : uint16_t {
     MENSUR_ATTR,
     METERSIG_ATTR,
     OSSIA,
+    OSTAFF,
     PAGE,
     PAGES,
     STAFF,
