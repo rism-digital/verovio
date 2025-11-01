@@ -115,7 +115,7 @@ jobs:
           ls -al
 
       - name: Upload results as artefacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: test-suite-diff
           path: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
