@@ -186,14 +186,18 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
         LogWarning("Could not parse the keyDown action");
     }
     else if (action == "insert") {
-        std::string elementType, startid, endid;
-        if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), elementType, startid, endid)) {
+        std::string elementName, elementId, insertMode;
+        if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), elementName, elementId, insertMode)) {
             this->PrepareUndo();
-            if (endid == "") {
-                return (this->Insert(elementType, startid));
+            LogInfo("%s %s %s", elementName.c_str(), elementId.c_str(), insertMode.c_str());
+            if (insertMode == "appendChild") {
+                return (this->AppendChild(elementId, elementName));
             }
-            else {
-                return (this->Insert(elementType, startid, endid));
+            else if (insertMode == "insertBefore") {
+                return (this->InsertBefore(elementId, elementName));
+            }
+            else if (insertMode == "insertAfter") {
+                return (this->InsertAfter(elementId, elementName));
             }
         }
         LogWarning("Could not parse the insert action");
@@ -252,19 +256,14 @@ bool EditorToolkitCMN::ParseDragAction(jsonxx::Object param, std::string &elemen
 }
 
 bool EditorToolkitCMN::ParseInsertAction(
-    jsonxx::Object param, std::string &elementType, std::string &startid, std::string &endid)
+    jsonxx::Object param, std::string &elementName, std::string &elementId, std::string &insertMode)
 {
-    // assign optional member
-    endid = "";
-
-    if (!param.has<jsonxx::String>("elementType")) return false;
-    elementType = param.get<jsonxx::String>("elementType");
-    if (!param.has<jsonxx::String>("startid")) return false;
-    startid = param.get<jsonxx::String>("startid");
-    // optional
-    if (param.has<jsonxx::String>("endid")) {
-        endid = param.get<jsonxx::String>("endid");
-    }
+    if (!param.has<jsonxx::String>("elementName")) return false;
+    elementName = param.get<jsonxx::String>("elementName");
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    elementId = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::String>("insertMode")) return false;
+    insertMode = param.get<jsonxx::String>("insertMode");
     return true;
 }
 
