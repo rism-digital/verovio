@@ -2254,10 +2254,7 @@ void MEIOutput::WriteOStaff(pugi::xml_node currentNode, OStaff *ostaff)
 {
     assert(ostaff);
 
-    this->WriteXmlId(currentNode, ostaff);
-    ostaff->WriteNInteger(currentNode);
-    ostaff->WriteTyped(currentNode);
-    ostaff->WriteVisibility(currentNode);
+    this->WriteStaff(currentNode, ostaff);
 }
 
 void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
@@ -6427,10 +6424,6 @@ bool MEIInput::ReadOStaff(Object *parent, pugi::xml_node oStaff)
     vrvOStaff->ReadNInteger(oStaff);
     vrvOStaff->ReadTyped(oStaff);
     vrvOStaff->ReadVisibility(oStaff);
-
-    if (!vrvOStaff->HasN() || (vrvOStaff->GetN() == 0)) {
-        LogWarning("No @n on <oStaff> or a value of 0 might yield unpredictable results");
-    }
 
     parent->AddChild(vrvOStaff);
     this->ReadUnsupportedAttr(oStaff, vrvOStaff);

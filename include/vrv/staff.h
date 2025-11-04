@@ -113,6 +113,7 @@ public:
      */
     ///@{
     Staff(int n = 1);
+    Staff(ClassId classId);
     virtual ~Staff();
     Object *Clone() const override { return new Staff(*this); }
     void Reset() override;
