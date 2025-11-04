@@ -1663,12 +1663,7 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
     }
 
     for (Object *current : parent->GetChildren()) {
-        if (current->Is(OSSIA)) {
-            Staff *realStaff = vrv_cast<Staff *>(current->GetChild(0, STAFF));
-            // cast to Staff check in DrawStaff
-            this->DrawStaff(dc, realStaff, measure, system);
-        }
-        else if (current->Is(OSTAFF)) {
+        if (current->Is(OSTAFF)) {
             continue;
         }
         else if (current->Is(STAFF)) {

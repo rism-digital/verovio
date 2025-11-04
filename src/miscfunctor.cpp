@@ -143,6 +143,9 @@ InitProcessingListsFunctor::InitProcessingListsFunctor() : ConstFunctor() {}
 FunctorCode InitProcessingListsFunctor::VisitLayer(const Layer *layer)
 {
     const Staff *staff = vrv_cast<const Staff *>(layer->GetFirstAncestor(STAFF));
+    if (!staff) {
+        staff = vrv_cast<const Staff *>(layer->GetFirstAncestor(OSTAFF));
+    }
     assert(staff);
     m_layerTree.child[staff->GetN()].child[layer->GetN()];
 

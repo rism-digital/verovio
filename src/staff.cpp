@@ -54,6 +54,18 @@ Staff::Staff(int n) : Object(STAFF), FacsimileInterface(), AttCoordY1(), AttNInt
     this->SetN(n);
 }
 
+Staff::Staff(ClassId classId)
+    : Object(classId), FacsimileInterface(), AttCoordY1(), AttNInteger(), AttTyped(), AttVisibility()
+{
+    this->RegisterAttClass(ATT_COORDY1);
+    this->RegisterAttClass(ATT_NINTEGER);
+    this->RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_VISIBILITY);
+    this->RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
+
+    this->Reset();
+}
+
 Staff::~Staff() {}
 
 void Staff::Reset()
