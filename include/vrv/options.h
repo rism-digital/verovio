@@ -664,6 +664,7 @@ public:
     OptionIntMap m_smuflTextFont;
     OptionBool m_staccatoCenter;
     OptionBool m_svgBoundingBoxes;
+    OptionBool m_svgContentBoundingBoxes;
     OptionString m_svgCss;
     OptionBool m_svgViewBox;
     OptionBool m_svgHtml5;

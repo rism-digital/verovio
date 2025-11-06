@@ -212,6 +212,14 @@ public:
     void SetSvgBoundingBoxes(bool svgBoundingBoxes) { m_svgBoundingBoxes = svgBoundingBoxes; }
 
     /**
+     * Setting m_svgContentBoundingBoxes flag (false by default)
+     */
+    void SetSvgContentBoundingBoxes(bool svgContentBoundingBoxes)
+    {
+        m_svgContentBoundingBoxes = svgContentBoundingBoxes;
+    }
+
+    /**
      * Setting m_svgViewBox flag (false by default)
      */
     void SetSvgViewBox(bool svgViewBox) { m_svgViewBox = svgViewBox; }
@@ -383,6 +391,8 @@ private:
     bool m_useLiberation;
     // add bouding boxes in svg output
     bool m_svgBoundingBoxes;
+    // add content bounding boxes in svg output
+    bool m_svgContentBoundingBoxes;
     // use viewbox on svg root element
     bool m_svgViewBox;
     // output HTML5 data-* attributes
