@@ -285,6 +285,7 @@ const Staff *LayerElement::GetAncestorStaff(const StaffSearch strategy, const bo
         staff = this->GetCrossStaff(layer);
     }
     if (!staff) staff = vrv_cast<const Staff *>(this->GetFirstAncestor(STAFF));
+    if (!staff) staff = vrv_cast<const Staff *>(this->GetFirstAncestor(OSTAFF));
     if (assertExistence) assert(staff);
     return staff;
 }
