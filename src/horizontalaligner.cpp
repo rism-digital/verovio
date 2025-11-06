@@ -639,7 +639,10 @@ bool Alignment::AddLayerElementRef(LayerElement *element)
         // Non cross staff normal case
         else {
             layerRef = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
-            if (layerRef) staffRef = vrv_cast<Staff *>(layerRef->GetFirstAncestor(STAFF));
+            if (layerRef) {
+                staffRef = vrv_cast<Staff *>(layerRef->GetFirstAncestor(STAFF));
+                if (!staffRef) staffRef = vrv_cast<Staff *>(layerRef->GetFirstAncestor(OSTAFF));
+            }
             if (staffRef && layerRef) {
                 layerN = layerRef->GetN();
                 staffN = staffRef->GetN();
