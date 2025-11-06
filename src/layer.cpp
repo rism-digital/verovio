@@ -487,6 +487,7 @@ Clef *Layer::GetCurrentClef()
 const Clef *Layer::GetCurrentClef() const
 {
     const Staff *staff = vrv_cast<const Staff *>(this->GetFirstAncestor(STAFF));
+    if (!staff) staff = vrv_cast<const Staff *>(this->GetFirstAncestor(OSTAFF));
     if (staff && staff->m_drawingStaffDef) {
         return staff->m_drawingStaffDef->GetCurrentClef();
     }
@@ -501,6 +502,7 @@ KeySig *Layer::GetCurrentKeySig()
 const KeySig *Layer::GetCurrentKeySig() const
 {
     const Staff *staff = vrv_cast<const Staff *>(this->GetFirstAncestor(STAFF));
+    if (!staff) staff = vrv_cast<const Staff *>(this->GetFirstAncestor(OSTAFF));
     assert(staff && staff->m_drawingStaffDef);
     return staff->m_drawingStaffDef->GetCurrentKeySig();
 }
@@ -513,6 +515,7 @@ Mensur *Layer::GetCurrentMensur()
 const Mensur *Layer::GetCurrentMensur() const
 {
     const Staff *staff = vrv_cast<const Staff *>(this->GetFirstAncestor(STAFF));
+    if (!staff) staff = vrv_cast<const Staff *>(this->GetFirstAncestor(OSTAFF));
     assert(staff && staff->m_drawingStaffDef);
     return staff->m_drawingStaffDef->GetCurrentMensur();
 }
@@ -525,6 +528,7 @@ MeterSig *Layer::GetCurrentMeterSig()
 const MeterSig *Layer::GetCurrentMeterSig() const
 {
     const Staff *staff = vrv_cast<const Staff *>(this->GetFirstAncestor(STAFF));
+    if (!staff) staff = vrv_cast<const Staff *>(this->GetFirstAncestor(OSTAFF));
     assert(staff && staff->m_drawingStaffDef);
     return staff->m_drawingStaffDef->GetCurrentMeterSig();
 }
@@ -537,6 +541,7 @@ Proport *Layer::GetCurrentProport()
 const Proport *Layer::GetCurrentProport() const
 {
     const Staff *staff = vrv_cast<const Staff *>(this->GetFirstAncestor(STAFF));
+    if (!staff) staff = vrv_cast<const Staff *>(this->GetFirstAncestor(OSTAFF));
     assert(staff && staff->m_drawingStaffDef);
     return staff->m_drawingStaffDef->GetCurrentProport();
 }

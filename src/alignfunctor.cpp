@@ -121,6 +121,8 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerEnd(Layer *layer)
     m_scoreDefRole = SCOREDEF_NONE;
 
     Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
+    if (!staff) return FUNCTOR_CONTINUE;
+
     assert(staff);
     int graceAlignerId = m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : staff->GetN();
 
