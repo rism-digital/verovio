@@ -203,6 +203,8 @@ public:
     bool IsTabWithStemsOutside() const;
     ///@}
 
+    virtual bool IsOssia() const { return false; };
+
     /**
      * Return the index position of the staff in its measure parent
      */

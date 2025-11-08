@@ -47,6 +47,8 @@ public:
     std::string GetClassName() const override { return "ostaff"; }
     ///@}
 
+    bool IsOssia() const override { return true; };
+
     //----------//
     // Functors //
     //----------//
