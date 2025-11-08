@@ -441,6 +441,8 @@ int LayerElement::GetDrawingY() const
     if (!object && !this->IsRelativeToStaff()) object = this->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max);
     // Otherwise get the first staff
     if (!object) object = this->GetFirstAncestor(STAFF);
+    // Otherwise get the first ostaff
+    if (!object) object = this->GetFirstAncestor(OSTAFF);
     // Otherwise the first measure (this is the case with barLineAttr)
     if (!object) object = this->GetFirstAncestor(MEASURE);
 
