@@ -302,6 +302,9 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitStaff(Staff *staff)
     if (staff->IsTablature()) {
         staff->m_drawingStaffSize *= TABLATURE_STAFF_RATIO;
     }
+    if (staff->IsOssia()) {
+        staff->m_drawingStaffSize *= OSSIA_STAFF_RATIO;
+    }
     if (MeterSigGrp *metersiggrp = m_currentStaffDef->GetCurrentMeterSigGrp();
         metersiggrp->GetFunc() == meterSigGrpLog_FUNC_alternating) {
         Measure *parentMeasure = vrv_cast<Measure *>(staff->GetFirstAncestor(MEASURE));
