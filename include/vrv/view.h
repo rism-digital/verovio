@@ -61,6 +61,8 @@ class Num;
 class Octave;
 class Options;
 class Ornam;
+class Ossia;
+class OStaff;
 class Page;
 class PageElement;
 class Pedal;
@@ -208,6 +210,8 @@ protected:
     void DrawMeasure(DeviceContext *dc, Measure *measure, System *system);
     void DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff);
     void DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *system, int yOffset);
+    void DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *system);
+    void DrawOStaff(DeviceContext *dc, OStaff *ostaff, Measure *measure, System *system);
     void DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
     void DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, Measure *measure, System *system);
     void DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure);
