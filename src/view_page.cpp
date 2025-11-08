@@ -729,7 +729,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 
         // Get the corresponding staff
         AttNIntegerComparison comparison(STAFF, staffDef->GetN());
-        Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
+        Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 2));
         if (!staff) {
             LogDebug("Could not get staff (%d) while drawing staffGrp - DrawBarLines", staffDef->GetN());
             yBottomPrevious = VRV_UNSET;
@@ -1190,7 +1190,8 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
 // View - Ossia
 //----------------------------------------------------------------------------
 
-void View::DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *system) {
+void View::DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *system)
+{
     assert(dc);
     assert(ossia);
     assert(measure);
@@ -1201,9 +1202,11 @@ void View::DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *
     for (Object *child : ossia->GetChildren()) {
         if (child->Is(OSTAFF)) {
             this->DrawOStaff(dc, vrv_cast<OStaff *>(child), measure, system);
-        } else if (child->Is(STAFF)) {
-                this->DrawStaff(dc, vrv_cast<Staff *>(child), measure, system);
-        } else {
+        }
+        else if (child->Is(STAFF)) {
+            this->DrawStaff(dc, vrv_cast<Staff *>(child), measure, system);
+        }
+        else {
             assert(false);
         }
     }
@@ -2079,4 +2082,3 @@ void View::DrawAnnot(DeviceContext *dc, EditorialElement *element, bool isTextEl
 }
 
 } // namespace vrv
-
