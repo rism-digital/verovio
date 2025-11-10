@@ -9,12 +9,6 @@
 
 //----------------------------------------------------------------------------
 
-#include <cassert>
-#include <iterator>
-#include <vector>
-
-//----------------------------------------------------------------------------
-
 #include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
