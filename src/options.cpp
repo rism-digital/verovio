@@ -1159,6 +1159,10 @@ Options::Options()
     m_svgBoundingBoxes.Init(false);
     this->Register(&m_svgBoundingBoxes, "svgBoundingBoxes", &m_general);
 
+    m_svgContentBoundingBoxes.SetInfo("Svg content bounding boxes", "Include content bounding boxes in SVG output");
+    m_svgContentBoundingBoxes.Init(false);
+    this->Register(&m_svgContentBoundingBoxes, "svgContentBoundingBoxes", &m_general);
+
     m_svgCss.SetInfo("SVG additional CSS", "CSS (as a string) to be added to the SVG output");
     m_svgCss.Init("");
     this->Register(&m_svgCss, "svgCss", &m_general);

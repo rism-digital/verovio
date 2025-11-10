@@ -50,6 +50,7 @@ SvgDeviceContext::SvgDeviceContext(const std::string &docId) : DeviceContext(SVG
 
     m_mmOutput = false;
     m_svgBoundingBoxes = false;
+    m_svgContentBoundingBoxes = false;
     m_svgViewBox = false;
     m_html5 = false;
     m_formatRaw = false;
@@ -1287,7 +1288,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
 
     bool groupInPage = false;
     bool drawAnchors = false;
-    bool drawContentBB = false;
+    bool drawContentBB = m_svgContentBoundingBoxes;
 
     if (m_svgBoundingBoxes && view) {
         BoundingBox *box = object;
