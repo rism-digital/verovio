@@ -67,6 +67,11 @@ public:
      */
     char32_t GetTrillGlyph() const;
 
+    /**
+     * Retrieve parentheses / brackets from the enclose attribute
+     */
+    std::pair<char32_t, char32_t> GetEnclosingGlyphs() const;
+
     //----------//
     // Functors //
     //----------//

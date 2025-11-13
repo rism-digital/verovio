@@ -87,6 +87,18 @@ char32_t Trill::GetTrillGlyph() const
     return SMUFL_E566_ornamentTrill;
 }
 
+std::pair<char32_t, char32_t> Trill::GetEnclosingGlyphs() const
+{
+    if (this->HasEnclose()) {
+        switch (this->GetEnclose()) {
+            case ENCLOSURE_brack: return { SMUFL_E26C_accidentalBracketLeft, SMUFL_E26D_accidentalBracketRight }; break;
+            case ENCLOSURE_paren: return { SMUFL_E26A_accidentalParensLeft, SMUFL_E26B_accidentalParensRight }; break;
+            default: break;
+        }
+    }
+    return { 0, 0 };
+}
+
 //----------------------------------------------------------------------------
 // Trill functor methods
 //----------------------------------------------------------------------------
