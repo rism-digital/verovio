@@ -690,6 +690,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 
     const bool barlineThrough = barLine->IsDrawnThrough(staffGrp);
 
+    bool checkedOssia = false;
     for (int i = 0; i < staffGrp->GetChildCount(); ++i) {
         Object *child = staffGrp->GetChild(i);
 
@@ -730,6 +731,12 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         // Get the corresponding staff
         AttNIntegerComparison comparison(STAFF, staffDef->GetN());
         Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 2));
+        if (!checkedOssia) {
+            AttNIntegerComparison comparison(OSTAFF, staffDef->GetN());
+            staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 2));
+            checkedOssia = true;
+            i -= 1;
+        }
         if (!staff) {
             LogDebug("Could not get staff (%d) while drawing staffGrp - DrawBarLines", staffDef->GetN());
             yBottomPrevious = VRV_UNSET;
