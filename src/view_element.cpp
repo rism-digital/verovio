@@ -1169,6 +1169,11 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     dc->StartGraphic(element, "", element->GetID());
 
+    if (mRest->GetCutout() == cutout_CUTOUT_cutout) {
+        dc->EndGraphic(element, this);
+        return;
+    }
+
     mRest->CenterDrawingX();
 
     const bool drawingCueSize = mRest->GetDrawingCueSize();

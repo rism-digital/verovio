@@ -41,6 +41,7 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "mnum.h"
+#include "mrest.h"
 #include "note.h"
 #include "options.h"
 #include "page.h"
@@ -1191,7 +1192,10 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
         staff->SetFromFacsimile(m_doc);
     }
 
-    this->DrawStaffLines(dc, staff, staffDef, measure, system);
+    MRest *mrest = vrv_cast<MRest *>(staff->FindDescendantByType(MREST));
+    if (!mrest || mrest->GetCutout() != cutout_CUTOUT_cutout) {
+        this->DrawStaffLines(dc, staff, staffDef, measure, system);
+    }
 
     if (staffDef && (m_doc->GetType() != Facs)) {
         this->DrawStaffDef(dc, staff, measure);

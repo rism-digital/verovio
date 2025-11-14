@@ -8,6 +8,7 @@
 #ifndef __VRV_MREST_H__
 #define __VRV_MREST_H__
 
+#include "atts_cmn.h"
 #include "atts_shared.h"
 #include "layerelement.h"
 #include "positioninterface.h"
@@ -28,6 +29,7 @@ class MRest : public LayerElement,
               public PositionInterface,
               public AttColor,
               public AttCue,
+              public AttCutout,
               public AttFermataPresent,
               public AttVisibility {
 public:

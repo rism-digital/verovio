@@ -2742,6 +2742,7 @@ void MEIOutput::WriteMRest(pugi::xml_node currentNode, MRest *mRest)
     this->WritePositionInterface(currentNode, mRest);
     mRest->WriteColor(currentNode);
     mRest->WriteCue(currentNode);
+    mRest->WriteCutout(currentNode);
     mRest->WriteFermataPresent(currentNode);
     mRest->WriteVisibility(currentNode);
 }
@@ -6973,6 +6974,7 @@ bool MEIInput::ReadMRest(Object *parent, pugi::xml_node mRest)
 
     vrvMRest->ReadColor(mRest);
     vrvMRest->ReadCue(mRest);
+    vrvMRest->ReadCutout(mRest);
     vrvMRest->ReadFermataPresent(mRest);
     vrvMRest->ReadVisibility(mRest);
 
