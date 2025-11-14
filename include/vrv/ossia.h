@@ -48,11 +48,6 @@ public:
     bool IsSupportedChild(ClassId classId) override;
 
     /**
-     * Additional check when adding a child.
-     */
-    bool AddChildAdditionalCheck(Object *child) override;
-
-    /**
      * Specific method for ossias
      */
     void AddChildBack(Object *object);
