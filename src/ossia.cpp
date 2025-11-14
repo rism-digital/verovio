@@ -58,12 +58,6 @@ bool Ossia::IsSupportedChild(ClassId classId)
     if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
         return true;
     }
-    else if (Object::IsControlElement(classId)) {
-        return true;
-    }
-    else if (Object::IsEditorialElement(classId)) {
-        return true;
-    }
     else {
         return false;
     }
@@ -96,29 +90,6 @@ void Ossia::AddChildBack(Object *child)
         }
     }
     Modify();
-}
-
-bool Ossia::AddChildAdditionalCheck(Object *child)
-{
-    if (child->Is(OSTAFF)) {
-        OStaff *ostaff = vrv_cast<OStaff *>(child);
-        assert(ostaff);
-        if (ostaff && (ostaff->GetN() < 1)) {
-            // This is not 100% safe if we have a <app> and <rdg> with more than
-            // one staff as a previous child.
-            // ostaff->SetN(this->GetChildCount());
-        }
-    }
-    else if (child->Is(STAFF)) {
-        Staff *staff = vrv_cast<Staff *>(child);
-        assert(staff);
-        if (staff && (staff->GetN() < 1)) {
-            // This is not 100% safe if we have a <app> and <rdg> with more than
-            // one staff as a previous child.
-            staff->SetN(this->GetChildCount());
-        }
-    }
-    return (Object::AddChildAdditionalCheck(child));
 }
 
 } // namespace vrv
