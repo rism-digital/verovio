@@ -1208,7 +1208,7 @@ void View::DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *
 
     for (Object *child : ossia->GetChildren()) {
         if (child->Is(OSTAFF)) {
-            this->DrawOStaff(dc, vrv_cast<OStaff *>(child), measure, system);
+            this->DrawStaff(dc, vrv_cast<OStaff *>(child), measure, system);
         }
         else if (child->Is(STAFF)) {
             this->DrawStaff(dc, vrv_cast<Staff *>(child), measure, system);
@@ -1222,60 +1222,7 @@ void View::DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *
 }
 
 //----------------------------------------------------------------------------
-// View - OStaff
-//----------------------------------------------------------------------------
-
-void View::DrawOStaff(DeviceContext *dc, OStaff *ostaff, Measure *measure, System *system)
-{
-    assert(dc);
-    assert(ostaff);
-    assert(measure);
-    assert(system);
-
-    assert(system->GetDrawingScoreDef());
-    StaffDef *staffDef = system->GetDrawingScoreDef()->GetStaffDef(ostaff->GetN());
-    if (staffDef && (staffDef->GetDrawingVisibility() == OPTIMIZATION_HIDDEN)) {
-        return;
-    }
-
-    dc->StartGraphic(ostaff, "", ostaff->GetID());
-
-    if (m_doc->IsFacs()) {
-        ostaff->SetFromFacsimile(m_doc);
-    }
-
-    this->DrawStaffLines(dc, ostaff, staffDef, measure, system);
-
-    if (staffDef && (m_doc->GetType() != Facs)) {
-        this->DrawStaffDef(dc, ostaff, measure);
-    }
-
-    if (!ostaff->GetLedgerLinesAbove().empty()) {
-        this->DrawLedgerLines(dc, ostaff, ostaff->GetLedgerLinesAbove(), false, false);
-    }
-    if (!ostaff->GetLedgerLinesBelow().empty()) {
-        this->DrawLedgerLines(dc, ostaff, ostaff->GetLedgerLinesBelow(), true, false);
-    }
-    if (!ostaff->GetLedgerLinesAboveCue().empty()) {
-        this->DrawLedgerLines(dc, ostaff, ostaff->GetLedgerLinesAboveCue(), false, true);
-    }
-    if (!ostaff->GetLedgerLinesBelowCue().empty()) {
-        this->DrawLedgerLines(dc, ostaff, ostaff->GetLedgerLinesBelowCue(), true, true);
-    }
-
-    this->DrawStaffChildren(dc, ostaff, ostaff, measure);
-
-    this->DrawStaffDefCautionary(dc, ostaff, measure);
-
-    for (Object *spanningElement : ostaff->m_timeSpanningElements) {
-        system->AddToDrawingListIfNecessary(spanningElement);
-    }
-
-    dc->EndGraphic(ostaff, this);
-}
-
-//----------------------------------------------------------------------------
-// View - Staff
+// View - Staff (OStaff)
 //----------------------------------------------------------------------------
 
 void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *system)
