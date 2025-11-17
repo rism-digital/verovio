@@ -1564,6 +1564,9 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     this->DrawSmuflCode(dc, x, y, drawingGlyph, staffSize, drawingCueSize);
 
+    /************ Draw children (dots) ************/
+    this->DrawLayerChildren(dc, rest, layer, staff, measure);
+
     if ((drawingDur == DURATION_1 || drawingDur == DURATION_2 || drawingDur == DURATION_breve)) {
         const int width = m_doc->GetGlyphWidth(drawingGlyph, staffSize, drawingCueSize);
         int ledgerLineThickness
@@ -1602,9 +1605,6 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         }
         dc->EndCustomGraphic();
     }
-
-    /************ Draw children (dots) ************/
-    this->DrawLayerChildren(dc, rest, layer, staff, measure);
 }
 
 void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
