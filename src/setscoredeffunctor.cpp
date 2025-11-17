@@ -302,7 +302,7 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitStaff(Staff *staff)
     if (staff->IsTablature()) {
         staff->m_drawingStaffSize *= TABLATURE_STAFF_RATIO;
     }
-    if (staff->IsOssia()) {
+    if (staff->Is(OSTAFF)) {
         staff->m_drawingStaffSize *= OSSIA_STAFF_RATIO;
     }
     if (MeterSigGrp *metersiggrp = m_currentStaffDef->GetCurrentMeterSigGrp();
