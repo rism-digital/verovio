@@ -177,6 +177,7 @@ Rest::Rest()
     , PositionInterface()
     , AttColor()
     , AttCue()
+    , AttEnclosingChars()
     , AttExtSymAuth()
     , AttExtSymNames()
     , AttRestVisMensural()
@@ -186,6 +187,7 @@ Rest::Rest()
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_CUE);
+    this->RegisterAttClass(ATT_ENCLOSINGCHARS);
     this->RegisterAttClass(ATT_EXTSYMAUTH);
     this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_RESTVISMENSURAL);
@@ -202,6 +204,7 @@ void Rest::Reset()
     PositionInterface::Reset();
     this->ResetColor();
     this->ResetCue();
+    this->ResetEnclosingChars();
     this->ResetExtSymAuth();
     this->ResetExtSymNames();
     this->ResetRestVisMensural();

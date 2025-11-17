@@ -11,6 +11,7 @@
 #include "altsyminterface.h"
 #include "atts_externalsymbols.h"
 #include "atts_mensural.h"
+#include "atts_visual.h"
 #include "durationinterface.h"
 #include "layerelement.h"
 #include "positioninterface.h"
@@ -40,6 +41,7 @@ class Rest : public LayerElement,
              public PositionInterface,
              public AttColor,
              public AttCue,
+             public AttEnclosingChars,
              public AttExtSymAuth,
              public AttExtSymNames,
              public AttRestVisMensural {
