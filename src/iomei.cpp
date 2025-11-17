@@ -2341,6 +2341,7 @@ void MEIOutput::WriteTrill(pugi::xml_node currentNode, Trill *trill)
 
     this->WriteControlElement(currentNode, trill);
     this->WriteTimeSpanningInterface(currentNode, trill);
+    trill->WriteEnclosingChars(currentNode);
     trill->WriteExtender(currentNode);
     trill->WriteExtSymAuth(currentNode);
     trill->WriteExtSymNames(currentNode);
@@ -6195,6 +6196,7 @@ bool MEIInput::ReadTrill(Object *parent, pugi::xml_node trill)
     this->ReadControlElement(trill, vrvTrill);
 
     this->ReadTimeSpanningInterface(trill, vrvTrill);
+    vrvTrill->ReadEnclosingChars(trill);
     vrvTrill->ReadExtender(trill);
     vrvTrill->ReadExtSymAuth(trill);
     vrvTrill->ReadExtSymNames(trill);

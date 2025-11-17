@@ -25,6 +25,7 @@ namespace vrv {
  */
 class Trill : public ControlElement,
               public TimeSpanningInterface,
+              public AttEnclosingChars,
               public AttExtender,
               public AttExtSymAuth,
               public AttExtSymNames,
@@ -65,6 +66,11 @@ public:
      * Get the SMuFL glyph for the trill based on glyph.num
      */
     char32_t GetTrillGlyph() const;
+
+    /**
+     * Retrieve parentheses / brackets from the enclose attribute
+     */
+    std::pair<char32_t, char32_t> GetEnclosingGlyphs() const;
 
     //----------//
     // Functors //
