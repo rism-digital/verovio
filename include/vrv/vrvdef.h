@@ -587,6 +587,12 @@ enum { SPANNING_START_END = 0, SPANNING_START, SPANNING_END, SPANNING_MIDDLE };
 enum ElementScoreDefRole { SCOREDEF_NONE = 0, SCOREDEF_SYSTEM, SCOREDEF_INTERMEDIATE, SCOREDEF_CAUTIONARY };
 
 //----------------------------------------------------------------------------
+// ScoreDef drawing labels
+//----------------------------------------------------------------------------
+
+enum ScoreDefDrawingLabels { DRAWING_LABEL_FULL = 0, DRAWING_LABEL_ABBR, DRAWING_LABEL_NONE };
+
+//----------------------------------------------------------------------------
 // Artic types
 //----------------------------------------------------------------------------
 

@@ -187,9 +187,9 @@ protected:
     void DrawSystem(DeviceContext *dc, System *system);
     void DrawSystemList(DeviceContext *dc, System *system, const ClassId classId);
     void DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, BarLine *barLine = NULL,
-        bool isLastMeasure = false, bool isLastSystem = false);
+        bool isLastMeasure = false, bool isLastSystem = false, bool noLabels = false);
     void DrawStaffGrp(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool topStaffGrp = false,
-        bool abbreviations = false);
+        ScoreDefDrawingLabels drawingLabels = DRAWING_LABEL_ABBR);
     void DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure);
     void DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *measure);
     void DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool abbreviations = false);
