@@ -29,6 +29,7 @@ static const ClassRegistrar<Mordent> s_factory("mordent", MORDENT);
 Mordent::Mordent()
     : ControlElement(MORDENT)
     , TimePointInterface()
+    , AttEnclosingChars()
     , AttExtSymAuth()
     , AttExtSymNames()
     , AttOrnamentAccid()
@@ -36,6 +37,7 @@ Mordent::Mordent()
     , AttMordentLog()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
+    this->RegisterAttClass(ATT_ENCLOSINGCHARS);
     this->RegisterAttClass(ATT_EXTSYMAUTH);
     this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_ORNAMENTACCID);
@@ -51,6 +53,7 @@ void Mordent::Reset()
 {
     ControlElement::Reset();
     TimePointInterface::Reset();
+    this->ResetEnclosingChars();
     this->ResetExtSymAuth();
     this->ResetExtSymNames();
     this->ResetOrnamentAccid();

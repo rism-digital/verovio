@@ -31,6 +31,7 @@ static const ClassRegistrar<Turn> s_factory("turn", TURN);
 Turn::Turn()
     : ControlElement(TURN)
     , TimePointInterface()
+    , AttEnclosingChars()
     , AttExtSymAuth()
     , AttExtSymNames()
     , AttOrnamentAccid()
@@ -38,6 +39,7 @@ Turn::Turn()
     , AttTurnLog()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
+    this->RegisterAttClass(ATT_ENCLOSINGCHARS);
     this->RegisterAttClass(ATT_EXTSYMAUTH);
     this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_ORNAMENTACCID);
@@ -53,6 +55,7 @@ void Turn::Reset()
 {
     ControlElement::Reset();
     TimePointInterface::Reset();
+    this->ResetEnclosingChars();
     this->ResetExtSymAuth();
     this->ResetExtSymNames();
     this->ResetOrnamentAccid();

@@ -25,6 +25,7 @@ namespace vrv {
  */
 class Turn : public ControlElement,
              public TimePointInterface,
+             public AttEnclosingChars,
              public AttExtSymAuth,
              public AttExtSymNames,
              public AttOrnamentAccid,
