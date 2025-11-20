@@ -1564,22 +1564,24 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     const char32_t drawingGlyph = rest->GetRestGlyph(drawingDur);
 
+    char32_t enclosingFront, enclosingBack;
+    std::tie(enclosingFront, enclosingBack) = rest->GetEnclosingGlyphs();
+
     const int x = element->GetDrawingX();
     const int y = element->GetDrawingY();
     const int drawingWidth = m_doc->GetGlyphWidth(drawingGlyph, staffSize, drawingCueSize);
 
-    if (rest->HasEnclose()) {
-        const int parenOffset = m_doc->GetGlyphWidth(SMUFL_E0F5_noteheadParenthesisLeft, staffSize, drawingCueSize);
-        this->DrawSmuflCode(dc, x - parenOffset, y, SMUFL_E0F5_noteheadParenthesisLeft, staffSize, drawingCueSize);
+    if (enclosingFront) {
+        const int parenOffset = m_doc->GetGlyphWidth(enclosingFront, staffSize, drawingCueSize);
+        this->DrawSmuflCode(dc, x - parenOffset, y, enclosingFront, staffSize, drawingCueSize);
     }
 
     this->DrawSmuflCode(dc, x, y, drawingGlyph, staffSize, drawingCueSize);
 
-    if (rest->HasEnclose()) {
-        const int parenOffset = m_doc->GetGlyphWidth(SMUFL_E0F5_noteheadParenthesisLeft, staffSize, drawingCueSize)
-            - m_doc->GetGlyphAdvX(SMUFL_E0F5_noteheadParenthesisLeft, staffSize, drawingCueSize);
-        this->DrawSmuflCode(
-            dc, x + drawingWidth + parenOffset, y, SMUFL_E0F6_noteheadParenthesisRight, staffSize, drawingCueSize);
+    if (enclosingBack) {
+        const int parenOffset = m_doc->GetGlyphWidth(enclosingBack, staffSize, drawingCueSize)
+            - m_doc->GetGlyphAdvX(enclosingBack, staffSize, drawingCueSize);
+        this->DrawSmuflCode(dc, x + drawingWidth + parenOffset, y, enclosingBack, staffSize, drawingCueSize);
     }
 
     /************ Draw children (dots) ************/

@@ -103,6 +103,11 @@ public:
      */
     void UpdateFromTransLoc(const TransPitch &tp);
 
+    /**
+     * Retrieve parentheses / brackets from the enclose attribute
+     */
+    std::pair<char32_t, char32_t> GetEnclosingGlyphs() const;
+
     //----------//
     // Functors //
     //----------//
