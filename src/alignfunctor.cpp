@@ -121,6 +121,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerEnd(Layer *layer)
     m_scoreDefRole = SCOREDEF_NONE;
 
     Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
+    if (!staff) staff = vrv_cast<Staff *>(layer->GetFirstAncestor(OSTAFF));
     if (!staff) return FUNCTOR_CONTINUE;
 
     assert(staff);
