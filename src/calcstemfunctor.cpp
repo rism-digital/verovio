@@ -53,6 +53,7 @@ FunctorCode CalcStemFunctor::VisitBeam(Beam *beam)
     Layer *layer = vrv_cast<Layer *>(beam->GetFirstAncestor(LAYER));
     assert(layer);
     Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
+    if (!staff) staff = vrv_cast<Staff *>(layer->GetFirstAncestor(OSTAFF));
     assert(staff);
 
     if (!beam->HasCoords()) {
@@ -82,7 +83,10 @@ FunctorCode CalcStemFunctor::VisitBeamSpan(BeamSpan *beamSpan)
     if (!beamSpan->GetStart() || !beamSpan->GetEnd() || beamSpan->GetBeamedElements().empty()) return FUNCTOR_CONTINUE;
 
     Layer *layer = vrv_cast<Layer *>(beamSpan->GetStart()->GetFirstAncestor(LAYER));
-    Staff *staff = vrv_cast<Staff *>(beamSpan->GetStart()->GetFirstAncestor(STAFF));
+    assert(layer);
+    Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
+    if (!staff) staff = vrv_cast<Staff *>(layer->GetFirstAncestor(OSTAFF));
+    assert(staff);
     Measure *measure = vrv_cast<Measure *>(beamSpan->GetStart()->GetFirstAncestor(MEASURE));
 
     beamSpan->InitCoords(beamSpan->GetBeamedElements(), staff, beamSpan->GetPlace());
@@ -184,6 +188,7 @@ FunctorCode CalcStemFunctor::VisitFTrem(FTrem *fTrem)
     Layer *layer = vrv_cast<Layer *>(fTrem->GetFirstAncestor(LAYER));
     assert(layer);
     Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
+    if (!staff) staff = vrv_cast<Staff *>(layer->GetFirstAncestor(OSTAFF));
     assert(staff);
 
     if (!fTrem->HasCoords()) {
