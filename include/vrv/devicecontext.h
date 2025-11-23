@@ -77,6 +77,8 @@ public:
         m_viewBoxFactor = (double)DEFINITION_FACTOR;
         this->SetBrush(1.0);
         this->SetPen(1, PEN_SOLID);
+        m_currentUnit = DEFAULT_UNIT;
+        m_currentStaffSize = 100;
     }
     DeviceContext(ClassId classId)
     {
@@ -95,6 +97,8 @@ public:
         m_viewBoxFactor = (double)DEFINITION_FACTOR;
         this->SetBrush(1.0);
         this->SetPen(1, PEN_SOLID);
+        m_currentUnit = DEFAULT_UNIT;
+        m_currentStaffSize = 100;
     }
     virtual ~DeviceContext();
     ClassId GetClassId() const { return m_classId; }
@@ -112,6 +116,17 @@ public:
     void ResetResources() { m_resources = NULL; }
     ///@}
 
+    /**
+     * @name Getter and setter for the resources
+     * Resources must be set before drawing
+     */
+    ///@{
+    void SetUnit(int unit) { m_currentUnit = unit; }
+    void ResetUnit() { m_currentUnit = DEFAULT_UNIT; }
+    void SetCurrentStaffSize(int staffSize) { m_currentStaffSize = staffSize; }
+    void ReseCurrentStaffSize() { m_currentStaffSize = 100; }
+    ///@}
+    
     /**
      * @name Getters and setters for common attributes.
      * Non-virtual methods cannot be overridden and manage the width, height and user-scale
@@ -387,6 +402,11 @@ private:
 
     /** stores the viewbox factor taking into account the DEFINTION_FACTOR and the PPU */
     double m_viewBoxFactor;
+
+    /** stores the current unit for offset calculations */
+    int m_currentUnit;
+    /** stores the current staff size for offset calculations */
+    int m_currentStaffSize;
 };
 
 } // namespace vrv
