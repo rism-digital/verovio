@@ -249,6 +249,8 @@ void SvgDeviceContext::Commit(bool xml_declaration)
 void SvgDeviceContext::StartGraphic(
     Object *object, const std::string &gClass, const std::string &gId, GraphicID graphicID, bool prepend)
 {
+    DeviceContext::StartGraphic(object, gClass, gId, graphicID, prepend);
+
     std::string gClassFull = gClass;
 
     if (object->HasAttClass(ATT_TYPED)) {
@@ -428,6 +430,8 @@ void SvgDeviceContext::ResumeGraphic(Object *object, std::string gId)
 
 void SvgDeviceContext::EndGraphic(Object *object, View *view)
 {
+    DeviceContext::EndGraphic(object, view);
+
     this->DrawSvgBoundingBox(object, view);
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
