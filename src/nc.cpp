@@ -34,6 +34,7 @@ static const ClassRegistrar<Nc> s_factory("nc", NC);
 Nc::Nc()
     : LayerElement(NC)
     , DurationInterface()
+    , OffsetInterface()
     , PitchInterface()
     , PositionInterface()
     , AttColor()
@@ -43,6 +44,7 @@ Nc::Nc()
 
 {
     this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
     this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
@@ -59,6 +61,7 @@ void Nc::Reset()
 {
     LayerElement::Reset();
     DurationInterface::Reset();
+    OffsetInterface::Reset();
     PitchInterface::Reset();
     PositionInterface::Reset();
     this->ResetColor();

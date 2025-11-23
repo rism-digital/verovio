@@ -24,8 +24,9 @@ namespace vrv {
 
 static const ClassRegistrar<Dot> s_factory("dot", DOT);
 
-Dot::Dot() : LayerElement(DOT), PositionInterface(), AttColor(), AttDotLog()
+Dot::Dot() : LayerElement(DOT), OffsetInterface(), PositionInterface(), AttColor(), AttDotLog()
 {
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_DOTLOG);
@@ -38,6 +39,7 @@ Dot::~Dot() {}
 void Dot::Reset()
 {
     LayerElement::Reset();
+    OffsetInterface::Reset();
     PositionInterface::Reset();
     this->ResetColor();
     this->ResetDotLog();
