@@ -100,6 +100,7 @@
 #include "note.h"
 #include "num.h"
 #include "octave.h"
+#include "offsetinterface.h"
 #include "orig.h"
 #include "oriscus.h"
 #include "ornam.h"
@@ -3174,6 +3175,22 @@ void MEIOutput::WriteFacsimileInterface(pugi::xml_node element, FacsimileInterfa
     assert(interface);
 
     interface->WriteFacsimile(element);
+}
+
+void MEIOutput::WriteOffsetInterface(pugi::xml_node element, OffsetInterface *interface)
+{
+    assert(interface);
+
+    interface->WriteVisualOffsetHo(element);
+    interface->WriteVisualOffsetVo(element);
+}
+
+void MEIOutput::WriteOffsetSpanningInterface(pugi::xml_node element, OffsetSpanningInterface *interface)
+{
+    assert(interface);
+
+    interface->WriteVisualOffset2Ho(element);
+    interface->WriteVisualOffset2Vo(element);
 }
 
 void MEIOutput::WritePitchInterface(pugi::xml_node element, PitchInterface *interface)
@@ -7635,6 +7652,20 @@ bool MEIInput::ReadLinkingInterface(pugi::xml_node element, LinkingInterface *in
 bool MEIInput::ReadFacsimileInterface(pugi::xml_node element, FacsimileInterface *interface)
 {
     interface->ReadFacsimile(element);
+    return true;
+}
+
+bool MEIInput::ReadOffsetInterface(pugi::xml_node element, OffsetInterface *interface)
+{
+    interface->ReadVisualOffsetHo(element);
+    interface->ReadVisualOffsetVo(element);
+    return true;
+}
+
+bool MEIInput::ReadOffsetSpanningInterface(pugi::xml_node element, OffsetSpanningInterface *interface)
+{
+    interface->ReadVisualOffset2Ho(element);
+    interface->ReadVisualOffset2Vo(element);
     return true;
 }
 
