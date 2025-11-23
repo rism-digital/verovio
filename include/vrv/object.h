@@ -175,9 +175,9 @@ public:
     virtual const LinkingInterface *GetLinkingInterface() const { return NULL; }
     virtual FacsimileInterface *GetFacsimileInterface() { return NULL; }
     virtual const FacsimileInterface *GetFacsimileInterface() const { return NULL; }
-    virtual OffsetInterface *GeOffsetInterface() { return NULL; }
+    virtual OffsetInterface *GetOffsetInterface() { return NULL; }
     virtual const OffsetInterface *GetOffsetInterface() const { return NULL; }
-    virtual OffsetSpanningInterface *GeOffsetSpanningInterface() { return NULL; }
+    virtual OffsetSpanningInterface *GetOffsetSpanningInterface() { return NULL; }
     virtual const OffsetSpanningInterface *GetOffsetSpanningInterface() const { return NULL; }
     virtual PitchInterface *GetPitchInterface() { return NULL; }
     virtual const PitchInterface *GetPitchInterface() const { return NULL; }

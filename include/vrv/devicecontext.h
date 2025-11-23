@@ -126,7 +126,7 @@ public:
     void SetCurrentStaffSize(int staffSize) { m_currentStaffSize = staffSize; }
     void ReseCurrentStaffSize() { m_currentStaffSize = 100; }
     ///@}
-    
+
     /**
      * @name Getters and setters for common attributes.
      * Non-virtual methods cannot be overridden and manage the width, height and user-scale
