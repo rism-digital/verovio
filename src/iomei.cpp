@@ -2404,6 +2404,7 @@ void MEIOutput::WriteAccid(pugi::xml_node currentNode, Accid *accid)
     }
 
     this->WriteLayerElement(currentNode, accid);
+    this->WriteOffsetInterface(currentNode, accid);
     this->WritePositionInterface(currentNode, accid);
     accid->WriteAccidental(currentNode);
     accid->WriteAccidentalGes(currentNode);
@@ -2428,6 +2429,7 @@ void MEIOutput::WriteArtic(pugi::xml_node currentNode, Artic *artic)
     }
 
     this->WriteLayerElement(currentNode, artic);
+    this->WriteOffsetInterface(currentNode, artic);
     artic->WriteArticulation(currentNode);
     artic->WriteArticulationGes(currentNode);
     artic->WriteColor(currentNode);
@@ -2517,6 +2519,7 @@ void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
     }
 
     this->WriteLayerElement(currentNode, clef);
+    this->WriteOffsetInterface(currentNode, clef);
     clef->WriteClefLog(currentNode);
     clef->WriteClefShape(currentNode);
     clef->WriteColor(currentNode);
@@ -2536,6 +2539,7 @@ void MEIOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
     assert(custos);
 
     this->WritePitchInterface(currentNode, custos);
+    this->WriteOffsetInterface(currentNode, custos);
     this->WritePositionInterface(currentNode, custos);
     this->WriteLayerElement(currentNode, custos);
     custos->WriteColor(currentNode);
@@ -2548,6 +2552,7 @@ void MEIOutput::WriteDivLine(pugi::xml_node currentNode, DivLine *divLine)
     assert(divLine);
 
     this->WriteLayerElement(currentNode, divLine);
+    this->WriteOffsetInterface(currentNode, divLine);
     divLine->WriteDivLineLog(currentNode);
     divLine->WriteColor(currentNode);
     divLine->WriteVisibility(currentNode);
@@ -2560,6 +2565,7 @@ void MEIOutput::WriteDot(pugi::xml_node currentNode, Dot *dot)
     assert(dot);
 
     this->WriteLayerElement(currentNode, dot);
+    this->WriteOffsetInterface(currentNode, dot);
     this->WritePositionInterface(currentNode, dot);
     dot->WriteColor(currentNode);
     dot->WriteDotLog(currentNode);
@@ -2605,6 +2611,7 @@ void MEIOutput::WriteHalfmRpt(pugi::xml_node currentNode, HalfmRpt *halfmRpt)
     assert(halfmRpt);
 
     this->WriteLayerElement(currentNode, halfmRpt);
+    this->WriteOffsetInterface(currentNode, halfmRpt);
     halfmRpt->WriteColor(currentNode);
 }
 
@@ -2669,6 +2676,7 @@ void MEIOutput::WriteLiquescent(pugi::xml_node currentNode, Liquescent *liquesce
     assert(liquescent);
 
     this->WriteLayerElement(currentNode, liquescent);
+    this->WriteOffsetInterface(currentNode, liquescent);
     this->WritePositionInterface(currentNode, liquescent);
     liquescent->WriteColor(currentNode);
 }
@@ -2741,6 +2749,7 @@ void MEIOutput::WriteMRest(pugi::xml_node currentNode, MRest *mRest)
     assert(mRest);
 
     this->WriteLayerElement(currentNode, mRest);
+    this->WriteOffsetInterface(currentNode, mRest);
     this->WritePositionInterface(currentNode, mRest);
     mRest->WriteColor(currentNode);
     mRest->WriteCue(currentNode);
@@ -2801,6 +2810,7 @@ void MEIOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
 
     this->WriteLayerElement(currentNode, nc);
     this->WriteDurationInterface(currentNode, nc);
+    this->WriteOffsetInterface(currentNode, nc);
     this->WritePitchInterface(currentNode, nc);
     this->WritePositionInterface(currentNode, nc);
     nc->WriteColor(currentNode);
@@ -2814,6 +2824,7 @@ void MEIOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
     assert(neume);
 
     this->WriteLayerElement(currentNode, neume);
+    this->WriteOffsetInterface(currentNode, neume);
     neume->WriteColor(currentNode);
 }
 
@@ -2824,6 +2835,7 @@ void MEIOutput::WriteNote(pugi::xml_node currentNode, Note *note)
     this->WriteLayerElement(currentNode, note);
     this->WriteAltSymInterface(currentNode, note);
     this->WriteDurationInterface(currentNode, note);
+    this->WriteOffsetInterface(currentNode, note);
     this->WritePitchInterface(currentNode, note);
     this->WritePositionInterface(currentNode, note);
     note->WriteColor(currentNode);
@@ -2848,6 +2860,7 @@ void MEIOutput::WriteOriscus(pugi::xml_node currentNode, Oriscus *oriscus)
     assert(oriscus);
 
     this->WriteLayerElement(currentNode, oriscus);
+    this->WriteOffsetInterface(currentNode, oriscus);
     this->WritePitchInterface(currentNode, oriscus);
     oriscus->WriteColor(currentNode);
 }
@@ -2874,6 +2887,7 @@ void MEIOutput::WriteQuilisma(pugi::xml_node currentNode, Quilisma *quilisma)
     assert(quilisma);
 
     this->WriteLayerElement(currentNode, quilisma);
+    this->WriteOffsetInterface(currentNode, quilisma);
     this->WritePitchInterface(currentNode, quilisma);
     quilisma->WriteColor(currentNode);
 }
@@ -2885,6 +2899,7 @@ void MEIOutput::WriteRest(pugi::xml_node currentNode, Rest *rest)
     this->WriteLayerElement(currentNode, rest);
     this->WriteAltSymInterface(currentNode, rest);
     this->WriteDurationInterface(currentNode, rest);
+    this->WriteOffsetInterface(currentNode, rest);
     this->WritePositionInterface(currentNode, rest);
     rest->WriteColor(currentNode);
     rest->WriteCue(currentNode);
@@ -2911,6 +2926,26 @@ void MEIOutput::WriteStem(pugi::xml_node currentNode, Stem *stem)
     stem->WriteVisibility(currentNode);
 }
 
+void MEIOutput::WriteSyl(pugi::xml_node currentNode, Syl *syl)
+{
+    assert(syl);
+
+    this->WriteLayerElement(currentNode, syl);
+    this->WriteOffsetInterface(currentNode, syl);
+    syl->WriteLang(currentNode);
+    syl->WriteTypography(currentNode);
+    syl->WriteSylLog(currentNode);
+}
+
+void MEIOutput::WriteSyllable(pugi::xml_node currentNode, Syllable *syllable)
+{
+    assert(syllable);
+
+    this->WriteLayerElement(currentNode, syllable);
+    syllable->WriteColor(currentNode);
+    syllable->WriteSlashCount(currentNode);
+}
+
 void MEIOutput::WriteTabDurSym(pugi::xml_node currentNode, TabDurSym *tabDurSym)
 {
     assert(tabDurSym);
@@ -2927,6 +2962,7 @@ void MEIOutput::WriteTabGrp(pugi::xml_node currentNode, TabGrp *tabGrp)
 
     this->WriteLayerElement(currentNode, tabGrp);
     this->WriteDurationInterface(currentNode, tabGrp);
+    this->WriteOffsetInterface(currentNode, tabGrp);
 }
 
 void MEIOutput::WriteTuplet(pugi::xml_node currentNode, Tuplet *tuplet)
@@ -2950,25 +2986,6 @@ void MEIOutput::WriteVerse(pugi::xml_node currentNode, Verse *verse)
     verse->WriteNInteger(currentNode);
     verse->WritePlacementRelStaff(currentNode);
     verse->WriteTypography(currentNode);
-}
-
-void MEIOutput::WriteSyl(pugi::xml_node currentNode, Syl *syl)
-{
-    assert(syl);
-
-    this->WriteLayerElement(currentNode, syl);
-    syl->WriteLang(currentNode);
-    syl->WriteTypography(currentNode);
-    syl->WriteSylLog(currentNode);
-}
-
-void MEIOutput::WriteSyllable(pugi::xml_node currentNode, Syllable *syllable)
-{
-    assert(syllable);
-
-    this->WriteLayerElement(currentNode, syllable);
-    syllable->WriteColor(currentNode);
-    syllable->WriteSlashCount(currentNode);
 }
 
 void MEIOutput::WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile)
@@ -6573,6 +6590,7 @@ bool MEIInput::ReadAccid(Object *parent, pugi::xml_node accid)
     Accid *vrvAccid = new Accid();
     this->ReadLayerElement(accid, vrvAccid);
 
+    this->ReadOffsetInterface(accid, vrvAccid);
     this->ReadPositionInterface(accid, vrvAccid);
     vrvAccid->ReadAccidental(accid);
     vrvAccid->ReadAccidentalGes(accid);
@@ -6593,7 +6611,8 @@ bool MEIInput::ReadArtic(Object *parent, pugi::xml_node artic)
 {
     Artic *vrvArtic = new Artic();
     this->ReadLayerElement(artic, vrvArtic);
-
+    
+    this->ReadOffsetInterface(artic, vrvArtic);
     vrvArtic->ReadArticulation(artic);
     vrvArtic->ReadArticulationGes(artic);
     vrvArtic->ReadColor(artic);
@@ -6719,7 +6738,8 @@ bool MEIInput::ReadClef(Object *parent, pugi::xml_node clef)
 {
     Clef *vrvClef = new Clef();
     this->ReadLayerElement(clef, vrvClef);
-
+    
+    this->ReadOffsetInterface(clef, vrvClef);
     vrvClef->ReadClefLog(clef);
     vrvClef->ReadClefShape(clef);
     vrvClef->ReadColor(clef);
@@ -6759,6 +6779,7 @@ bool MEIInput::ReadCustos(Object *parent, pugi::xml_node custos)
     this->ReadLayerElement(custos, vrvCustos);
 
     this->ReadFacsimileInterface(custos, vrvCustos);
+    this->ReadOffsetInterface(custos, vrvCustos);
     this->ReadPitchInterface(custos, vrvCustos);
     this->ReadPositionInterface(custos, vrvCustos);
     vrvCustos->ReadColor(custos);
@@ -6777,6 +6798,7 @@ bool MEIInput::ReadDivLine(Object *parent, pugi::xml_node divLine)
     DivLine *vrvDivLine = new DivLine();
     this->ReadLayerElement(divLine, vrvDivLine);
 
+    this->ReadOffsetInterface(divLine, vrvDivLine);
     vrvDivLine->ReadDivLineLog(divLine);
     vrvDivLine->ReadColor(divLine);
     vrvDivLine->ReadVisibility(divLine);
@@ -6792,7 +6814,8 @@ bool MEIInput::ReadDot(Object *parent, pugi::xml_node dot)
 {
     Dot *vrvDot = new Dot();
     this->ReadLayerElement(dot, vrvDot);
-
+    
+    this->ReadOffsetInterface(dot, vrvDot);
     this->ReadPositionInterface(dot, vrvDot);
     vrvDot->ReadColor(dot);
     vrvDot->ReadDotLog(dot);
@@ -6855,6 +6878,7 @@ bool MEIInput::ReadHalfmRpt(Object *parent, pugi::xml_node halfmRpt)
     HalfmRpt *vrvHalfmRpt = new HalfmRpt();
     this->ReadLayerElement(halfmRpt, vrvHalfmRpt);
 
+    this->ReadOffsetInterface(halfmRpt, vrvHalfmRpt);
     vrvHalfmRpt->ReadColor(halfmRpt);
 
     parent->AddChild(vrvHalfmRpt);
@@ -6918,8 +6942,9 @@ bool MEIInput::ReadLiquescent(Object *parent, pugi::xml_node liquescent)
 {
     Liquescent *vrvLiquescent = new Liquescent();
     this->ReadLayerElement(liquescent, vrvLiquescent);
+    
+    this->ReadOffsetInterface(liquescent, vrvLiquescent);
     this->ReadPositionInterface(liquescent, vrvLiquescent);
-
     vrvLiquescent->ReadColor(liquescent);
 
     parent->AddChild(vrvLiquescent);
@@ -6982,6 +7007,8 @@ bool MEIInput::ReadMRest(Object *parent, pugi::xml_node mRest)
 {
     MRest *vrvMRest = new MRest();
     this->ReadLayerElement(mRest, vrvMRest);
+    
+    this->ReadOffsetInterface(mRest, vrvMRest);
     this->ReadPositionInterface(mRest, vrvMRest);
 
     if (m_meiversion < meiVersion_MEIVERSION_4_0_0) {
@@ -7082,6 +7109,7 @@ bool MEIInput::ReadNc(Object *parent, pugi::xml_node nc)
     this->ReadLayerElement(nc, vrvNc);
 
     this->ReadDurationInterface(nc, vrvNc);
+    this->ReadOffsetInterface(nc, vrvNc);
     this->ReadPitchInterface(nc, vrvNc);
     this->ReadPositionInterface(nc, vrvNc);
     vrvNc->ReadColor(nc);
@@ -7098,6 +7126,7 @@ bool MEIInput::ReadNeume(Object *parent, pugi::xml_node neume)
     Neume *vrvNeume = new Neume();
     this->ReadLayerElement(neume, vrvNeume);
 
+    this->ReadOffsetInterface(neume, vrvNeume);
     vrvNeume->ReadColor(neume);
 
     parent->AddChild(vrvNeume);
@@ -7118,6 +7147,7 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
 
     this->ReadAltSymInterface(note, vrvNote);
     this->ReadDurationInterface(note, vrvNote);
+    this->ReadOffsetInterface(note, vrvNote);
     this->ReadPitchInterface(note, vrvNote);
     this->ReadPositionInterface(note, vrvNote);
     vrvNote->ReadColor(note);
@@ -7159,30 +7189,19 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
     return this->ReadLayerChildren(vrvNote, note, vrvNote);
 }
 
-bool MEIInput::ReadRest(Object *parent, pugi::xml_node rest)
+bool MEIInput::ReadOriscus(Object *parent, pugi::xml_node oriscus)
 {
-    Rest *vrvRest = new Rest();
-    this->ReadLayerElement(rest, vrvRest);
+    Oriscus *vrvOriscus = new Oriscus();
+    this->ReadLayerElement(oriscus, vrvOriscus);
+    
+    this->ReadOffsetInterface(oriscus, vrvOriscus);
+    this->ReadPositionInterface(oriscus, vrvOriscus);
+    vrvOriscus->ReadColor(oriscus);
 
-    if (m_meiversion < meiVersion_MEIVERSION_4_0_0) {
-        if (rest.attribute("size")) {
-            rest.remove_attribute("size");
-            rest.append_attribute("cue").set_value("true");
-        }
-    }
+    parent->AddChild(vrvOriscus);
+    this->ReadUnsupportedAttr(oriscus, vrvOriscus);
 
-    this->ReadAltSymInterface(rest, vrvRest);
-    this->ReadDurationInterface(rest, vrvRest);
-    this->ReadPositionInterface(rest, vrvRest);
-    vrvRest->ReadColor(rest);
-    vrvRest->ReadCue(rest);
-    vrvRest->ReadExtSymAuth(rest);
-    vrvRest->ReadExtSymNames(rest);
-    vrvRest->ReadRestVisMensural(rest);
-
-    parent->AddChild(vrvRest);
-    this->ReadUnsupportedAttr(rest, vrvRest);
-    return this->ReadLayerChildren(vrvRest, rest, vrvRest);
+    return true;
 }
 
 bool MEIInput::ReadPlica(Object *parent, pugi::xml_node plica)
@@ -7209,32 +7228,46 @@ bool MEIInput::ReadProport(Object *parent, pugi::xml_node proport)
     return true;
 }
 
-bool MEIInput::ReadOriscus(Object *parent, pugi::xml_node oriscus)
-{
-    Oriscus *vrvOriscus = new Oriscus();
-    this->ReadLayerElement(oriscus, vrvOriscus);
-    this->ReadPositionInterface(oriscus, vrvOriscus);
-
-    vrvOriscus->ReadColor(oriscus);
-
-    parent->AddChild(vrvOriscus);
-    this->ReadUnsupportedAttr(oriscus, vrvOriscus);
-
-    return true;
-}
-
 bool MEIInput::ReadQuilisma(Object *parent, pugi::xml_node quilisma)
 {
     Quilisma *vrvQuilisma = new Quilisma();
     this->ReadLayerElement(quilisma, vrvQuilisma);
+    
+    this->ReadOffsetInterface(quilisma, vrvQuilisma);
     this->ReadPositionInterface(quilisma, vrvQuilisma);
-
     vrvQuilisma->ReadColor(quilisma);
 
     parent->AddChild(vrvQuilisma);
     this->ReadUnsupportedAttr(quilisma, vrvQuilisma);
 
     return true;
+}
+
+bool MEIInput::ReadRest(Object *parent, pugi::xml_node rest)
+{
+    Rest *vrvRest = new Rest();
+    this->ReadLayerElement(rest, vrvRest);
+
+    if (m_meiversion < meiVersion_MEIVERSION_4_0_0) {
+        if (rest.attribute("size")) {
+            rest.remove_attribute("size");
+            rest.append_attribute("cue").set_value("true");
+        }
+    }
+
+    this->ReadAltSymInterface(rest, vrvRest);
+    this->ReadDurationInterface(rest, vrvRest);
+    this->ReadOffsetInterface(rest, vrvRest);
+    this->ReadPositionInterface(rest, vrvRest);
+    vrvRest->ReadColor(rest);
+    vrvRest->ReadCue(rest);
+    vrvRest->ReadExtSymAuth(rest);
+    vrvRest->ReadExtSymNames(rest);
+    vrvRest->ReadRestVisMensural(rest);
+
+    parent->AddChild(vrvRest);
+    this->ReadUnsupportedAttr(rest, vrvRest);
+    return this->ReadLayerChildren(vrvRest, rest, vrvRest);
 }
 
 bool MEIInput::ReadSpace(Object *parent, pugi::xml_node space)
@@ -7272,11 +7305,11 @@ bool MEIInput::ReadSyl(Object *parent, pugi::xml_node syl)
     Syl *vrvSyl = new Syl();
     this->ReadLayerElement(syl, vrvSyl);
 
+    this->ReadFacsimileInterface(syl, vrvSyl);
+    this->ReadOffsetInterface(syl, vrvSyl);
     vrvSyl->ReadLang(syl);
     vrvSyl->ReadTypography(syl);
     vrvSyl->ReadSylLog(syl);
-
-    this->ReadFacsimileInterface(syl, vrvSyl);
 
     parent->AddChild(vrvSyl);
     this->ReadUnsupportedAttr(syl, vrvSyl);
@@ -7315,7 +7348,8 @@ bool MEIInput::ReadTabGrp(Object *parent, pugi::xml_node tabGrp)
     this->ReadLayerElement(tabGrp, vrvTabGrp);
 
     this->ReadDurationInterface(tabGrp, vrvTabGrp);
-
+    this->ReadOffsetInterface(tabGrp, vrvTabGrp);
+    
     parent->AddChild(vrvTabGrp);
     this->ReadUnsupportedAttr(tabGrp, vrvTabGrp);
     return this->ReadLayerChildren(vrvTabGrp, tabGrp, vrvTabGrp);
