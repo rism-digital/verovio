@@ -444,6 +444,8 @@ typedef std::map<int, LayerN_VerserN_t> StaffN_LayerN_VerseN_t;
 
 #define DEFINITION_FACTOR 10
 
+#define DEFAULT_UNIT 9.0
+
 #define isIn(x, a, b) (((x) >= std::min((a), (b))) && ((x) <= std::max((a), (b))))
 
 /**

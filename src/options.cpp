@@ -1193,7 +1193,7 @@ Options::Options()
     this->Register(&m_svgAdditionalAttribute, "svgAdditionalAttribute", &m_general);
 
     m_unit.SetInfo("Unit", "The MEI unit (1⁄2 of the distance between the staff lines)");
-    m_unit.Init(9.0, 4.5, 12.0, true);
+    m_unit.Init(DEFAULT_UNIT, 4.5, 12.0, true);
     this->Register(&m_unit, "unit", &m_general);
 
     m_useBraceGlyph.SetInfo("Use Brace Glyph", "Use brace glyph from current font");
