@@ -9,6 +9,7 @@
 #define __VRV_DOT_H__
 
 #include "layerelement.h"
+#include "offsetinterface.h"
 #include "positioninterface.h"
 
 namespace vrv {
@@ -19,7 +20,7 @@ class Note;
 // Dot
 //----------------------------------------------------------------------------
 
-class Dot : public LayerElement, public PositionInterface, public AttColor, public AttDotLog {
+class Dot : public LayerElement, public OffsetInterface, public PositionInterface, public AttColor, public AttDotLog {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -37,6 +38,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
+    OffsetInterface *GetOffsetInterface() override { return vrv_cast<OffsetInterface *>(this); }
+    const OffsetInterface *GetOffsetInterface() const override { return vrv_cast<const OffsetInterface *>(this); }
     PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
     const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
     ///@}

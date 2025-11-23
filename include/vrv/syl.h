@@ -11,6 +11,7 @@
 #include "atts_shared.h"
 #include "facsimileinterface.h"
 #include "layerelement.h"
+#include "offsetinterface.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -30,6 +31,7 @@ class TextElement;
 
 class Syl : public LayerElement,
             public TextListInterface,
+            public OffsetInterface,
             public TimeSpanningInterface,
             public AttLang,
             public AttTypography,
@@ -54,6 +56,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
+    OffsetInterface *GetOffsetInterface() override { return vrv_cast<OffsetInterface *>(this); }
+    const OffsetInterface *GetOffsetInterface() const override { return vrv_cast<const OffsetInterface *>(this); }
     TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
     const TimePointInterface *GetTimePointInterface() const override
     {

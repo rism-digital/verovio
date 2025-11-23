@@ -12,6 +12,7 @@
 #include "atts_gestural.h"
 #include "floatingobject.h"
 #include "layerelement.h"
+#include "offsetinterface.h"
 #include "positioninterface.h"
 
 namespace vrv {
@@ -27,6 +28,7 @@ class AccidFloatingObject;
  * This class models the MEI <accid> element.
  */
 class Accid : public LayerElement,
+              public OffsetInterface,
               public PositionInterface,
               public AttAccidental,
               public AttAccidentalGes,
@@ -66,6 +68,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
+    OffsetInterface *GetOffsetInterface() override { return vrv_cast<OffsetInterface *>(this); }
+    const OffsetInterface *GetOffsetInterface() const override { return vrv_cast<const OffsetInterface *>(this); }
     PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
     const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
     ///@}

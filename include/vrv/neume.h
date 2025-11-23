@@ -19,7 +19,7 @@
 #include "chord.h"
 #include "durationinterface.h"
 #include "layerelement.h"
-#include "pitchinterface.h"
+#include "offsetinterface.h"
 
 namespace vrv {
 
@@ -57,7 +57,7 @@ enum NeumeGroup {
  * This class models the MEI <neume> element.
  */
 
-class Neume : public LayerElement, public ObjectListInterface, public AttColor {
+class Neume : public LayerElement, public ObjectListInterface, public OffsetInterface, public AttColor {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -69,6 +69,14 @@ public:
     void Reset() override;
     Object *Clone() const override { return new Neume(*this); }
     std::string GetClassName() const override { return "neume"; }
+    ///@}
+
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    OffsetInterface *GetOffsetInterface() override { return vrv_cast<OffsetInterface *>(this); }
+    const OffsetInterface *GetOffsetInterface() const override { return vrv_cast<const OffsetInterface *>(this); }
     ///@}
 
     /**
