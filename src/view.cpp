@@ -132,25 +132,23 @@ std::u32string View::IntToSmuflFigures(unsigned short number, int offset)
     return str;
 }
 
-
-void View::StartOffset(DeviceContext *dc,
-    Object *object, int staffSize)
+void View::StartOffset(DeviceContext *dc, Object *object, int staffSize)
 {
     if (!dc->ApplyOffset()) return;
-    
+
     if (!object->HasInterface(INTERFACE_OFFSET)) return;
-    
+
     const OffsetInterface *interface = object->GetOffsetInterface();
     assert(interface);
-    
+
     const int unit = m_doc->GetOptions()->m_unit.GetValue();
-    
+
     if (!interface->HasHo() && !interface->HasVo()) return;
     Offset offset;
     offset.m_ho = interface->GetHo().GetVu() * unit * staffSize / 100;
     offset.m_vo = interface->GetVo().GetVu() * unit * staffSize / 100;
     offset.m_object = object;
-    
+
     m_currentOffsets.push_front(offset);
 }
 
