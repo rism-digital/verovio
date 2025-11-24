@@ -2001,6 +2001,7 @@ void MEIOutput::WriteControlElement(pugi::xml_node currentNode, ControlElement *
     this->WriteXmlId(currentNode, controlElement);
     this->WriteAltSymInterface(currentNode, controlElement);
     this->WriteLinkingInterface(currentNode, controlElement);
+    this->WriteOffsetInterface(currentNode, controlElement);
     controlElement->WriteColor(currentNode);
     controlElement->WriteLabelled(currentNode);
     controlElement->WriteTyped(currentNode);
@@ -5795,6 +5796,7 @@ bool MEIInput::ReadControlElement(pugi::xml_node element, ControlElement *object
     this->SetMeiID(element, object);
     this->ReadAltSymInterface(element, object);
     this->ReadLinkingInterface(element, object);
+    this->ReadControlElement(element, object);
     object->ReadColor(element);
     object->ReadLabelled(element);
     object->ReadTyped(element);
