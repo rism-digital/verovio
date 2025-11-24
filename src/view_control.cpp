@@ -75,7 +75,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     assert(system);
     assert(measure);
     assert(element);
-    
+
     this->StartOffset(dc, element, 100);
 
     // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
@@ -176,7 +176,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         assert(turn);
         this->DrawTurn(dc, turn, measure, system);
     }
-    
+
     this->EndOffset(dc, element);
 }
 
@@ -1520,10 +1520,10 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     int length = top - bottom;
     // We add - substract a unit in order to have the line going to the edge
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    
+
     int x = arpeg->GetDrawingX();
     int y = bottom - unit;
-    
+
     this->SetOffsetStaffSize(arpeg, staff->m_drawingStaffSize);
     this->CalcOffset(dc, x, y);
 
@@ -1627,7 +1627,7 @@ void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, Syste
         symbolDef = breath->GetAltSymbolDef();
     }
 
-    int x = breath->GetStart()->GetDrawingX() + breath->GetStart()->GetDrawingRadius(m_doc);
+    const int drawingX = breath->GetStart()->GetDrawingX() + breath->GetStart()->GetDrawingRadius(m_doc);
 
     // use breath mark comma glyph
     int code = SMUFL_E4CE_breathMarkComma;
@@ -1647,7 +1647,11 @@ void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, Syste
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
-        const int y = breath->GetDrawingY();
+        int x = drawingX;
+        int y = breath->GetDrawingY();
+
+        this->SetOffsetStaffSize(breath, staffSize);
+        this->CalcOffset(dc, x, y);
 
         if (symbolDef) {
             this->DrawSymbolDef(dc, breath, symbolDef, x, y, staffSize, false, alignment);
