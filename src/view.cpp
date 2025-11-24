@@ -195,4 +195,23 @@ void View::CalcOffsetY(DeviceContext *dc, int &y)
     }
 }
 
+void View::CalcOffsetBezier(DeviceContext *dc, Point points[4], char spanningType)
+{
+    if (!dc->ApplyOffset() || m_currentOffsets.empty()) return;
+
+    if (spanningType == SPANNING_START_END) {
+        for (int i = 0; i < 4; i++) this->CalcOffset(dc, points[i].x, points[i].y);
+    }
+    else if (spanningType == SPANNING_START) {
+        for (int i = 2; i < 4; i++) this->CalcOffset(dc, points[i].x, points[i].y);
+        this->CalcOffsetY(dc, points[0].y);
+        this->CalcOffsetY(dc, points[1].y);
+    }
+    else if (spanningType == SPANNING_END) {
+        for (int i = 0; i < 2; i++) this->CalcOffset(dc, points[i].x, points[i].y);
+        this->CalcOffsetY(dc, points[2].y);
+        this->CalcOffsetY(dc, points[3].y);
+    }
+}
+
 } // namespace vrv

@@ -648,6 +648,7 @@ private:
     void CalcOffset(DeviceContext *dc, int &x, int &y);
     void CalcOffsetX(DeviceContext *dc, int &x);
     void CalcOffsetY(DeviceContext *dc, int &y);
+    void CalcOffsetBezier(DeviceContext *dc, Point points[4], char spanningType);
 
     class Offset {
     public:
