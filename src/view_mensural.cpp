@@ -50,9 +50,9 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
     int x = element->GetDrawingY();
     int y = element->GetDrawingX();
-    
+
     this->CalcOffset(dc, x, y);
-    
+
     const data_DURATION drawingDur = note->GetDrawingDur();
 
     /************** Noteheads: **************/

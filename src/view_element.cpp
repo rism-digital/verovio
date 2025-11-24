@@ -76,7 +76,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         dc->EndGraphic(element, this);
         return;
     }
-    
+
     this->StartOffset(dc, element, staff->m_drawingStaffSize);
 
     if (element->Is(ACCID)) {
@@ -225,7 +225,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         // This should never happen
         LogError("Element '%s' cannot be drawn", element->GetClassName().c_str());
     }
-    
+
     this->EndOffset(dc, element);
 }
 
@@ -266,7 +266,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();
-    
+
     this->CalcOffset(dc, x, y);
 
     // Set with edit `@func`
@@ -346,7 +346,7 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     int x = artic->GetDrawingX();
     int y = artic->GetDrawingY();
-    
+
     this->CalcOffset(dc, x, y);
 
     const bool drawingCueSize = artic->GetDrawingCueSize();
@@ -682,7 +682,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     int x, y;
     y = staff->GetDrawingY();
     x = element->GetDrawingX();
-    
+
     this->CalcOffset(dc, x, y);
 
     char32_t sym = clef->GetClefGlyph(staff->m_drawingNotationType);
@@ -769,9 +769,9 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
-    
+
     this->CalcOffset(dc, x, y);
-    
+
     // Because SMuFL does not have the origin correpsonding to the pitch as for notes, we need to correct it.
     // This will remain approximate
     if (staff->m_drawingNotationType != NOTATIONTYPE_neume) {
@@ -810,7 +810,7 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     else {
         int x = element->GetDrawingX();
         int y = element->GetDrawingY();
-        
+
         this->CalcOffset(dc, x, y);
 
         if (m_doc->GetType() != Transcription) {
@@ -907,7 +907,7 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     int x = flag->GetDrawingX() - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
     int y = flag->GetDrawingY();
-    
+
     this->CalcOffset(dc, x, y);
 
     dc->StartGraphic(element, "", element->GetID());
@@ -961,7 +961,7 @@ void View::DrawHalfmRpt(DeviceContext *dc, LayerElement *element, Layer *layer, 
 
     int x = halfmRpt->GetDrawingX();
     int y = staff->GetDrawingY();
-    
+
     this->CalcOffset(dc, x, y);
 
     x += m_doc->GetGlyphWidth(SMUFL_E500_repeat1Bar, staff->m_drawingStaffSize, false) / 2;
@@ -1201,9 +1201,9 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int x = mRest->GetDrawingX();
     const bool isDouble = (measure->m_measureAligner.GetMaxTime() >= Fraction(2));
     int y = isDouble ? element->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staffSize) : element->GetDrawingY();
-    
+
     this->CalcOffset(dc, x, y);
-    
+
     char32_t rest = isDouble ? SMUFL_E4E2_restDoubleWhole : SMUFL_E4E3_restWhole;
 
     x -= m_doc->GetGlyphWidth(rest, staffSize, drawingCueSize) / 2;
@@ -1445,7 +1445,8 @@ void View::DrawMultiRpt(DeviceContext *dc, LayerElement *element, Layer *layer, 
 
     dc->StartGraphic(element, "", element->GetID());
 
-    this->DrawMRptPart(dc, element->GetDrawingX(), staff->GetDrawingY(), SMUFL_E501_repeat2Bars, multiRpt->GetNum(), true, staff);
+    this->DrawMRptPart(
+        dc, element->GetDrawingX(), staff->GetDrawingY(), SMUFL_E501_repeat2Bars, multiRpt->GetNum(), true, staff);
 
     dc->EndGraphic(element, this);
 
@@ -1480,7 +1481,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     bool drawingCueSize = note->GetDrawingCueSize();
     int x = element->GetDrawingY();
     int y = element->GetDrawingX();
-    
+
     this->CalcOffset(dc, y, x);
 
     if (note->HasStemSameasNote() && note->GetFlippedNotehead()) {
@@ -1531,8 +1532,8 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             if (note->HasHeadMod()) {
                 switch (note->GetHeadMod()) {
                     case NOTEHEADMODIFIER_paren: {
-                        this->DrawSmuflCode(dc, y - note->GetDrawingRadius(m_doc), x,
-                            SMUFL_E26A_accidentalParensLeft, staff->m_drawingStaffSize, drawingCueSize, true);
+                        this->DrawSmuflCode(dc, y - note->GetDrawingRadius(m_doc), x, SMUFL_E26A_accidentalParensLeft,
+                            staff->m_drawingStaffSize, drawingCueSize, true);
                         this->DrawSmuflCode(dc, y + note->GetDrawingRadius(m_doc) * 2, x,
                             SMUFL_E26B_accidentalParensRight, staff->m_drawingStaffSize, drawingCueSize, true);
                         break;
@@ -1592,7 +1593,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
-    
+
     this->CalcOffset(dc, x, y);
 
     this->DrawSmuflCode(dc, x, y, drawingGlyph, staffSize, drawingCueSize);
@@ -1687,14 +1688,13 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     if (stem->IsVirtual()) return;
 
     dc->StartGraphic(element, "", element->GetID());
-    
+
     int x = stem->GetDrawingX();
     int y = stem->GetDrawingY();
-    
+
     this->CalcOffset(dc, x, y);
 
-    this->DrawVerticalLine(dc, y,
-        y - (stem->GetDrawingStemLen() + stem->GetDrawingStemAdjust()), x,
+    this->DrawVerticalLine(dc, y, y - (stem->GetDrawingStemLen() + stem->GetDrawingStemAdjust()), x,
         m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
 
     this->DrawStemMod(dc, element, staff);
@@ -1819,10 +1819,10 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         currentFont.SetLetterSpacing(syl->GetLetterspacing() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
     }
     dc->SetFont(&currentFont);
-    
+
     int x = syl->GetDrawingX();
     int y = syl->GetDrawingY();
-    
+
     this->CalcOffset(dc, x, y);
 
     TextDrawingParams params;

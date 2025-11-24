@@ -6611,7 +6611,7 @@ bool MEIInput::ReadArtic(Object *parent, pugi::xml_node artic)
 {
     Artic *vrvArtic = new Artic();
     this->ReadLayerElement(artic, vrvArtic);
-    
+
     this->ReadOffsetInterface(artic, vrvArtic);
     vrvArtic->ReadArticulation(artic);
     vrvArtic->ReadArticulationGes(artic);
@@ -6738,7 +6738,7 @@ bool MEIInput::ReadClef(Object *parent, pugi::xml_node clef)
 {
     Clef *vrvClef = new Clef();
     this->ReadLayerElement(clef, vrvClef);
-    
+
     this->ReadOffsetInterface(clef, vrvClef);
     vrvClef->ReadClefLog(clef);
     vrvClef->ReadClefShape(clef);
@@ -6814,7 +6814,7 @@ bool MEIInput::ReadDot(Object *parent, pugi::xml_node dot)
 {
     Dot *vrvDot = new Dot();
     this->ReadLayerElement(dot, vrvDot);
-    
+
     this->ReadOffsetInterface(dot, vrvDot);
     this->ReadPositionInterface(dot, vrvDot);
     vrvDot->ReadColor(dot);
@@ -6942,7 +6942,7 @@ bool MEIInput::ReadLiquescent(Object *parent, pugi::xml_node liquescent)
 {
     Liquescent *vrvLiquescent = new Liquescent();
     this->ReadLayerElement(liquescent, vrvLiquescent);
-    
+
     this->ReadOffsetInterface(liquescent, vrvLiquescent);
     this->ReadPositionInterface(liquescent, vrvLiquescent);
     vrvLiquescent->ReadColor(liquescent);
@@ -7007,7 +7007,7 @@ bool MEIInput::ReadMRest(Object *parent, pugi::xml_node mRest)
 {
     MRest *vrvMRest = new MRest();
     this->ReadLayerElement(mRest, vrvMRest);
-    
+
     this->ReadOffsetInterface(mRest, vrvMRest);
     this->ReadPositionInterface(mRest, vrvMRest);
 
@@ -7193,7 +7193,7 @@ bool MEIInput::ReadOriscus(Object *parent, pugi::xml_node oriscus)
 {
     Oriscus *vrvOriscus = new Oriscus();
     this->ReadLayerElement(oriscus, vrvOriscus);
-    
+
     this->ReadOffsetInterface(oriscus, vrvOriscus);
     this->ReadPositionInterface(oriscus, vrvOriscus);
     vrvOriscus->ReadColor(oriscus);
@@ -7232,7 +7232,7 @@ bool MEIInput::ReadQuilisma(Object *parent, pugi::xml_node quilisma)
 {
     Quilisma *vrvQuilisma = new Quilisma();
     this->ReadLayerElement(quilisma, vrvQuilisma);
-    
+
     this->ReadOffsetInterface(quilisma, vrvQuilisma);
     this->ReadPositionInterface(quilisma, vrvQuilisma);
     vrvQuilisma->ReadColor(quilisma);
@@ -7349,7 +7349,7 @@ bool MEIInput::ReadTabGrp(Object *parent, pugi::xml_node tabGrp)
 
     this->ReadDurationInterface(tabGrp, vrvTabGrp);
     this->ReadOffsetInterface(tabGrp, vrvTabGrp);
-    
+
     parent->AddChild(vrvTabGrp);
     this->ReadUnsupportedAttr(tabGrp, vrvTabGrp);
     return this->ReadLayerChildren(vrvTabGrp, tabGrp, vrvTabGrp);

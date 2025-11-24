@@ -124,7 +124,7 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             int x1 = first->GetDrawingX();
             int x2 = last->GetDrawingX();
             int y = staff->GetDrawingY();
-            
+
             this->CalcOffset(dc, x1, y);
             this->CalcOffsetX(dc, x2);
 
@@ -199,7 +199,7 @@ void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     int x, y;
     x = divLine->GetDrawingX();
     y = staff->GetDrawingY();
-    
+
     this->CalcOffset(dc, x, y);
 
     y -= (m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) * 3;
