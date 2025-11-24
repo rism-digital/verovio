@@ -1752,8 +1752,6 @@ void View::DrawControlElementText(DeviceContext *dc, ControlElement *element, Me
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
-
-        TextDrawingParams params;
         // If we have not timestamp
         int x = start->GetDrawingX() + start->GetDrawingRadius(m_doc);
         int y = element->GetDrawingY();
@@ -1761,6 +1759,7 @@ void View::DrawControlElementText(DeviceContext *dc, ControlElement *element, Me
         this->SetOffsetStaffSize(element, staffSize);
         this->CalcOffset(dc, x, y);
 
+        TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
@@ -1834,11 +1833,15 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
+        int x = dynam->GetStart()->GetDrawingX() + dynam->GetStart()->GetDrawingRadius(m_doc);
+        int y = dynam->GetDrawingY();
+
+        this->SetOffsetStaffSize(dynam, staffSize);
+        this->CalcOffset(dc, x, y);
 
         TextDrawingParams params;
-        // If we have not timestamp
-        params.m_x = dynam->GetStart()->GetDrawingX() + dynam->GetStart()->GetDrawingRadius(m_doc);
-        params.m_y = dynam->GetDrawingY();
+        params.m_x = x;
+        params.m_y = y;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         if (dynam->HasEnclose()) {
@@ -1988,16 +1991,19 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     char32_t enclosingFront, enclosingBack;
     std::tie(enclosingFront, enclosingBack) = fermata->GetEnclosingGlyphs();
 
-    const int x = fermata->GetStart()->GetDrawingX() + fermata->GetStart()->GetDrawingRadius(m_doc);
+    const int drawingX = fermata->GetStart()->GetDrawingX() + fermata->GetStart()->GetDrawingRadius(m_doc);
 
     std::vector<Staff *> staffList = fermata->GetTstampStaves(measure, fermata);
     for (Staff *staff : staffList) {
         if (!system->SetCurrentFloatingPositioner(staff->GetN(), fermata, fermata->GetStart(), staff)) {
             continue;
         }
-
         const int staffSize = staff->GetDrawingStaffNotationSize();
-        const int y = fermata->GetDrawingY();
+        int x = drawingX;
+        int y = fermata->GetDrawingY();
+
+        this->SetOffsetStaffSize(fermata, staffSize);
+        this->CalcOffset(dc, x, y);
 
         const int width = (symbolDef) ? symbolDef->GetSymbolWidth(m_doc, staffSize, drawingCueSize)
                                       : m_doc->GetGlyphWidth(code, staffSize, drawingCueSize);
@@ -2081,10 +2087,15 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
+        int x = fing->GetStart()->GetDrawingX() + fing->GetStart()->GetDrawingRadius(m_doc);
+        int y = fing->GetDrawingY();
+
+        this->SetOffsetStaffSize(fing, staffSize);
+        this->CalcOffset(dc, x, y);
 
         TextDrawingParams params;
-        params.m_x = fing->GetStart()->GetDrawingX() + fing->GetStart()->GetDrawingRadius(m_doc);
-        params.m_y = fing->GetDrawingY();
+        params.m_x = x;
+        params.m_y = y;
         params.m_pointSize = m_doc->GetFingeringFont(staffSize)->GetPointSize();
 
         fingTxt.SetPointSize(params.m_pointSize);
@@ -2274,11 +2285,15 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
+        int x = harm->GetStart()->GetDrawingX() + harm->GetStart()->GetDrawingRadius(m_doc);
+        int y = harm->GetDrawingY();
+
+        this->SetOffsetStaffSize(harm, staffSize);
+        this->CalcOffset(dc, x, y);
 
         TextDrawingParams params;
-        // If we have not timestamp
-        params.m_x = harm->GetStart()->GetDrawingX() + harm->GetStart()->GetDrawingRadius(m_doc);
-        params.m_y = harm->GetDrawingY();
+        params.m_x = x;
+        params.m_y = y;
 
         if (harm->GetFirst() && harm->GetFirst()->Is(FB)) {
             this->DrawFb(dc, staff, dynamic_cast<Fb *>(harm->GetFirst()), params);
@@ -2320,7 +2335,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
         symbolDef = mordent->GetAltSymbolDef();
     }
 
-    int x = mordent->GetStart()->GetDrawingX() + mordent->GetStart()->GetDrawingRadius(m_doc);
+    int drawingX = mordent->GetStart()->GetDrawingX() + mordent->GetStart()->GetDrawingRadius(m_doc);
 
     // set mordent glyph
     const int code = mordent->GetMordentGlyph();
@@ -2335,7 +2350,11 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
+        int x = drawingX;
         int y = mordent->GetDrawingY();
+
+        this->SetOffsetStaffSize(mordent, staffSize);
+        this->CalcOffset(dc, x, y);
 
         const int mordentHeight = (symbolDef) ? symbolDef->GetSymbolHeight(m_doc, staffSize, false)
                                               : m_doc->GetGlyphHeight(code, staffSize, false);
@@ -2464,7 +2483,7 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
         bool bounceStar = true;
         if (form == PEDALSTYLE_altpedstar) bounceStar = false;
 
-        int x = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
+        int drawingX = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
 
         data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
         // center the pedal only with @startid
@@ -2487,7 +2506,7 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
             // Get the staff size of the first staff
             const int staffSize
                 = (staffList.begin() != staffList.end()) ? (*staffList.begin())->m_drawingStaffSize : 100;
-            x -= m_doc->GetGlyphWidth(SMUFL_E655_keyboardPedalUp, staffSize, false);
+            drawingX -= m_doc->GetGlyphWidth(SMUFL_E655_keyboardPedalUp, staffSize, false);
         }
         if (pedal->GetDir() != pedalLog_DIR_up) {
             code = pedal->GetPedalGlyph();
@@ -2499,8 +2518,11 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
                 continue;
             }
             const int staffSize = staff->m_drawingStaffSize;
-            // Basic method that use bounding box
-            const int y = pedal->GetDrawingY();
+            int x = drawingX;
+            int y = pedal->GetDrawingY();
+
+            this->SetOffsetStaffSize(pedal, staffSize);
+            this->CalcOffset(dc, x, y);
 
             dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
             this->DrawSmuflString(dc, x, y, str, alignment, staffSize);
@@ -2529,12 +2551,10 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
         rehTxt.SetWeight(FONTWEIGHT_bold);
     }
 
-    TextDrawingParams params;
-
     // Number of units above the staff - 3 by default, 5 when above a clef
     int yMargin = 3;
 
-    params.m_x = reh->GetStart()->GetDrawingX();
+    int drawingX = reh->GetStart()->GetDrawingX();
     const bool adjustPosition = ((reh->HasTstamp() && (reh->GetTstamp() == 0.0))
         || (reh->GetStart()->Is(BARLINE)
             && vrv_cast<BarLine *>(reh->GetStart())->GetPosition() == BarLinePosition::Left));
@@ -2544,14 +2564,14 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
         assert(layer);
         if (!system->IsFirstOfMdiv()) {
             if (Clef *clef = layer->GetStaffDefClef(); clef) {
-                params.m_x = clef->GetDrawingX() + (clef->GetContentRight() - clef->GetContentLeft()) / 2;
+                drawingX = clef->GetDrawingX() + (clef->GetContentRight() - clef->GetContentLeft()) / 2;
                 // Increase the margin when above the clef
                 yMargin = 5;
             }
         }
         else {
             if (MeterSig *metersig = layer->GetStaffDefMeterSig(); metersig) {
-                params.m_x = metersig->GetDrawingX() + (metersig->GetContentRight() - metersig->GetContentLeft()) / 2;
+                drawingX = metersig->GetDrawingX() + (metersig->GetContentRight() - metersig->GetContentLeft()) / 2;
             }
         }
     }
@@ -2571,13 +2591,18 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
-
+        int x = drawingX;
         if ((system->GetFirst(MEASURE) != measure) && adjustPosition) {
-            params.m_x = staff->GetDrawingX();
+            x = staff->GetDrawingX();
         }
+        int y = reh->GetDrawingY() + yMargin * m_doc->GetDrawingUnit(staffSize);
 
-        params.m_enclosedRend.clear();
-        params.m_y = reh->GetDrawingY() + yMargin * m_doc->GetDrawingUnit(staffSize);
+        this->SetOffsetStaffSize(reh, staffSize);
+        this->CalcOffset(dc, x, y);
+
+        TextDrawingParams params;
+        params.m_x = x;
+        params.m_y = y;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         rehTxt.SetPointSize(params.m_pointSize);
@@ -2618,7 +2643,7 @@ void View::DrawRepeatMark(DeviceContext *dc, RepeatMark *repeatMark, Measure *me
         symbolDef = repeatMark->GetAltSymbolDef();
     }
 
-    const int x = repeatMark->GetStart()->GetDrawingX() + repeatMark->GetStart()->GetDrawingRadius(m_doc);
+    const int drawingX = repeatMark->GetStart()->GetDrawingX() + repeatMark->GetStart()->GetDrawingRadius(m_doc);
 
     // set norm as default
     const int code = repeatMark->GetMarkGlyph();
@@ -2638,8 +2663,11 @@ void View::DrawRepeatMark(DeviceContext *dc, RepeatMark *repeatMark, Measure *me
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
+        int x = drawingX;
+        int y = repeatMark->GetDrawingY();
 
-        const int y = repeatMark->GetDrawingY();
+        this->SetOffsetStaffSize(repeatMark, staffSize);
+        this->CalcOffset(dc, x, y);
 
         dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
 
@@ -2686,10 +2714,15 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
+        int x = tempo->GetDrawingXRelativeToStaff(staff->GetN());
+        int y = tempo->GetDrawingY();
+
+        this->SetOffsetStaffSize(tempo, staffSize);
+        this->CalcOffset(dc, x, y);
 
         TextDrawingParams params;
-        params.m_x = tempo->GetDrawingXRelativeToStaff(staff->GetN());
-        params.m_y = tempo->GetDrawingY();
+        params.m_x = x;
+        params.m_y = y;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         tempoTxt.SetPointSize(params.m_pointSize);
@@ -2732,7 +2765,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
         symbolDef = trill->GetAltSymbolDef();
     }
 
-    int x = trill->GetStart()->GetDrawingX();
+    int drawingX = trill->GetStart()->GetDrawingX();
 
     data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
     // center the trill only with @startid
@@ -2740,7 +2773,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
         alignment = HORIZONTALALIGNMENT_left;
     }
     else {
-        x += trill->GetStart()->GetDrawingRadius(m_doc);
+        drawingX += trill->GetStart()->GetDrawingRadius(m_doc);
     }
 
     // for a start always put trill up
@@ -2759,7 +2792,11 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
-        const int y = trill->GetDrawingY();
+        int x = drawingX;
+        int y = trill->GetDrawingY();
+
+        this->SetOffsetStaffSize(trill, staffSize);
+        this->CalcOffset(dc, x, y);
 
         const int trillHeight = (symbolDef) ? symbolDef->GetSymbolHeight(m_doc, staffSize, false)
                                             : m_doc->GetGlyphHeight(code, staffSize, false);
@@ -2830,7 +2867,7 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
         symbolDef = turn->GetAltSymbolDef();
     }
 
-    int x = turn->GetStart()->GetDrawingX() + turn->GetStart()->GetDrawingRadius(m_doc);
+    int drawingX = turn->GetStart()->GetDrawingX() + turn->GetStart()->GetDrawingRadius(m_doc);
 
     if (turn->m_drawingEndElement) {
         // Get the parent system of the start and end element
@@ -2839,7 +2876,7 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
         Object *parentSystem2 = end->GetFirstAncestor(SYSTEM);
         // We have a system break, use the measure right bar line instead
         if (parentSystem1 != parentSystem2) end = measure->GetRightBarLine();
-        x += ((end->GetDrawingX() - x) / 2);
+        drawingX += ((end->GetDrawingX() - drawingX) / 2);
     }
 
     // set norm as default
@@ -2860,8 +2897,11 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
+        int x = drawingX;
+        int y = turn->GetDrawingY();
 
-        const int y = turn->GetDrawingY();
+        this->SetOffsetStaffSize(turn, staffSize);
+        this->CalcOffset(dc, x, y);
 
         const int turnHeight = (symbolDef) ? symbolDef->GetSymbolHeight(m_doc, staffSize, false)
                                            : m_doc->GetGlyphHeight(code, staffSize, false);
