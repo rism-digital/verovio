@@ -1684,7 +1684,7 @@ void View::DrawCaesura(DeviceContext *dc, Caesura *caesura, Measure *measure, Sy
     }
 
     const char32_t code = caesura->GetCaesuraGlyph();
-    const int x = caesura->GetStart()->GetDrawingX() + caesura->GetStart()->GetDrawingRadius(m_doc) * 3;
+    const int drawingX = caesura->GetStart()->GetDrawingX() + caesura->GetStart()->GetDrawingRadius(m_doc) * 3;
 
     std::vector<Staff *> staffList = caesura->GetTstampStaves(measure, caesura);
     for (Staff *staff : staffList) {
@@ -1693,11 +1693,15 @@ void View::DrawCaesura(DeviceContext *dc, Caesura *caesura, Measure *measure, Sy
         }
 
         const int staffSize = staff->m_drawingStaffSize;
+        int x = drawingX;
         const int glyphHeight = (symbolDef) ? symbolDef->GetSymbolHeight(m_doc, staffSize, false)
                                             : m_doc->GetGlyphHeight(code, staffSize, false);
-        const int y = (caesura->HasPlace() && (caesura->GetPlace() != STAFFREL_within))
+        int y = (caesura->HasPlace() && (caesura->GetPlace() != STAFFREL_within))
             ? caesura->GetDrawingY()
             : staff->GetDrawingY() - glyphHeight / 2;
+
+        this->SetOffsetStaffSize(caesura, staffSize);
+        this->CalcOffset(dc, x, y);
 
         if (symbolDef) {
             this->DrawSymbolDef(dc, caesura, symbolDef, x, y, staffSize, false);
