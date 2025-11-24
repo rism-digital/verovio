@@ -11,6 +11,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <climits>
 #include <locale>
 #include <regex>
 
@@ -33,6 +34,7 @@
 #include "iopae.h"
 #include "iovolpiano.h"
 #include "layer.h"
+#include "keysig.h"
 #include "measure.h"
 #include "nc.h"
 #include "neume.h"
@@ -100,6 +102,72 @@ Fraction ScoreTimeFromDouble(double scoreTime)
     const int denom = 1000;
     return Fraction(static_cast<int>(std::round(scoreTime * denom)), denom);
 }
+
+int AccidWrittenToSemitone(data_ACCIDENTAL_WRITTEN accid)
+{
+    switch (accid) {
+        case ACCIDENTAL_WRITTEN_ff: return -2;
+        case ACCIDENTAL_WRITTEN_f: return -1;
+        case ACCIDENTAL_WRITTEN_n: return 0;
+        case ACCIDENTAL_WRITTEN_s: return 1;
+        case ACCIDENTAL_WRITTEN_ss: return 2;
+        default: return 0;
+    }
+}
+
+data_ACCIDENTAL_WRITTEN SemitoneToAccidWritten(int value)
+{
+    if (value <= -2) return ACCIDENTAL_WRITTEN_ff;
+    if (value == -1) return ACCIDENTAL_WRITTEN_f;
+    if (value == 0) return ACCIDENTAL_WRITTEN_n;
+    if (value == 1) return ACCIDENTAL_WRITTEN_s;
+    if (value >= 2) return ACCIDENTAL_WRITTEN_ss;
+    return ACCIDENTAL_WRITTEN_n;
+}
+
+struct SpelledPitch {
+    data_PITCHNAME pname;
+    int accidSemitone;
+    int oct;
+};
+
+SpelledPitch ChooseContextualSpell(
+    int midiPitch, const MapOfOctavedPitchAccid &contextAccids, bool preferSharps, bool preferFlats)
+{
+    const int targetPc = ((midiPitch % 12) + 12) % 12;
+    SpelledPitch best{ PITCHNAME_c, 0, midiPitch / 12 - 1 };
+    int bestCost = INT_MAX;
+
+    const data_PITCHNAME pnames[] = { PITCHNAME_c, PITCHNAME_d, PITCHNAME_e, PITCHNAME_f, PITCHNAME_g, PITCHNAME_a,
+        PITCHNAME_b };
+
+    for (data_PITCHNAME pname : pnames) {
+        const int basePc = Note::PnameToPclass(pname);
+        int accid = targetPc - basePc;
+        while (accid > 6) accid -= 12;
+        while (accid < -6) accid += 12;
+        const int naturalPc = basePc + accid;
+        const int oct = (midiPitch - naturalPc) / 12 - 1;
+        if ((oct < 0) || (oct > 9)) continue;
+
+        const int idx = pname + oct * 7;
+        int expected = 0;
+        auto found = contextAccids.find(idx);
+        if (found != contextAccids.end()) expected = AccidWrittenToSemitone(found->second);
+
+        int cost = std::abs(accid - expected) * 10 + std::abs(accid);
+        if (preferSharps && accid < 0) cost += 5;
+        if (preferFlats && accid > 0) cost += 5;
+
+        if (cost < bestCost) {
+            bestCost = cost;
+            best = { pname, accid, oct };
+        }
+    }
+
+    return best;
+}
+
 
 } // namespace
 
@@ -2238,12 +2306,34 @@ std::string Toolkit::GetPitchPosition(double scoreTime, int midiPitch, int staff
 
     Layer *layer = vrv_cast<Layer *>(staff->GetFirst(LAYER));
     int clefOffset = 0;
+    const KeySig *keySig = NULL;
     if (layer) {
         clefOffset = layer->GetClefLocOffset(NULL);
+        keySig = layer->GetCurrentKeySig();
     }
 
-    const PitchSpell spell = MidiToPitchSpell(midiPitch);
-    const int loc = PitchInterface::CalcLoc(spell.pname, spell.oct, clefOffset);
+    MapOfOctavedPitchAccid contextAccids;
+    if (keySig) {
+        keySig->FillMap(contextAccids);
+    }
+
+    ListOfConstObjects notes = staff->FindAllDescendantsByType(NOTE, false);
+    for (const Object *obj : notes) {
+        const Note *note = vrv_cast<const Note *>(obj);
+        assert(note);
+        if (note->GetScoreTimeOnset() > localTime) continue;
+        const Accid *accid = note->GetDrawingAccid();
+        if (!accid) continue;
+        if (!note->HasPname() || !note->HasOct()) continue;
+        const int idx = note->GetPname() + note->GetOct() * 7;
+        contextAccids[idx] = accid->GetAccid();
+    }
+
+    const bool preferSharps = (keySig && (keySig->GetAccidType() == ACCIDENTAL_WRITTEN_s));
+    const bool preferFlats = (keySig && (keySig->GetAccidType() == ACCIDENTAL_WRITTEN_f));
+    const SpelledPitch spelled = ChooseContextualSpell(midiPitch, contextAccids, preferSharps, preferFlats);
+
+    const int loc = PitchInterface::CalcLoc(spelled.pname, spelled.oct, clefOffset);
     const int y = staff->GetDrawingY() + staff->CalcPitchPosYRel(&m_doc, loc);
 
     Page *page = vrv_cast<Page *>(measure->GetFirstAncestor(PAGE));
@@ -2261,9 +2351,10 @@ std::string Toolkit::GetPitchPosition(double scoreTime, int midiPitch, int staff
     o << "system" << systemNo;
     o << "scoreTime" << scoreTime;
     o << "interpolated" << interpolated;
-    o << "pname" << static_cast<int>(spell.pname);
-    o << "accid" << spell.accid;
-    o << "oct" << spell.oct;
+    o << "pname" << static_cast<int>(spelled.pname);
+    o << "accid" << SemitoneToAccidWritten(spelled.accidSemitone);
+    o << "accidSemitone" << spelled.accidSemitone;
+    o << "oct" << spelled.oct;
 
     return o.json();
 }
