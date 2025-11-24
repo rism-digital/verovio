@@ -75,6 +75,8 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     assert(system);
     assert(measure);
     assert(element);
+    
+    this->StartOffset(dc, element, 100);
 
     // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
     if (element->Is({ ANNOTSCORE, BEAMSPAN, BRACKETSPAN, FIGURE, GLISS, HAIRPIN, LV, OCTAVE, PHRASE, PITCHINFLECTION,
@@ -174,6 +176,8 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         assert(turn);
         this->DrawTurn(dc, turn, measure, system);
     }
+    
+    this->EndOffset(dc, element);
 }
 
 void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *system)

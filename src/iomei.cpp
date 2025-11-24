@@ -5796,7 +5796,7 @@ bool MEIInput::ReadControlElement(pugi::xml_node element, ControlElement *object
     this->SetMeiID(element, object);
     this->ReadAltSymInterface(element, object);
     this->ReadLinkingInterface(element, object);
-    this->ReadControlElement(element, object);
+    this->ReadOffsetInterface(element, object);
     object->ReadColor(element);
     object->ReadLabelled(element);
     object->ReadTyped(element);
