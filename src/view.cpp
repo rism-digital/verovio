@@ -145,8 +145,8 @@ void View::StartOffset(DeviceContext *dc, Object *object, int staffSize)
 
     if (!interface->HasHo() && !interface->HasVo()) return;
     Offset offset;
-    offset.m_ho = interface->GetHo().GetVu() * unit;
-    offset.m_vo = interface->GetVo().GetVu() * unit;
+    offset.m_ho = (interface->HasHo()) ? interface->GetHo().GetVu() * unit : 0;
+    offset.m_vo = (interface->HasVo()) ? interface->GetVo().GetVu() * unit : 0;
     offset.m_object = object;
     offset.m_staffSize = staffSize;
 
