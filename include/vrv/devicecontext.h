@@ -77,8 +77,6 @@ public:
         m_viewBoxFactor = (double)DEFINITION_FACTOR;
         this->SetBrush(1.0);
         this->SetPen(1, PEN_SOLID);
-        m_currentUnit = DEFAULT_UNIT;
-        m_currentStaffSize = 100;
     }
     DeviceContext(ClassId classId)
     {
@@ -97,8 +95,6 @@ public:
         m_viewBoxFactor = (double)DEFINITION_FACTOR;
         this->SetBrush(1.0);
         this->SetPen(1, PEN_SOLID);
-        m_currentUnit = DEFAULT_UNIT;
-        m_currentStaffSize = 100;
     }
     virtual ~DeviceContext();
     ClassId GetClassId() const { return m_classId; }
@@ -114,17 +110,6 @@ public:
     bool HasResources() const { return (m_resources != NULL); }
     void SetResources(const Resources *resources) { m_resources = resources; }
     void ResetResources() { m_resources = NULL; }
-    ///@}
-
-    /**
-     * @name Getter and setter for the resources
-     * Resources must be set before drawing
-     */
-    ///@{
-    void SetUnit(int unit) { m_currentUnit = unit; }
-    void ResetUnit() { m_currentUnit = DEFAULT_UNIT; }
-    void SetCurrentStaffSize(int staffSize) { m_currentStaffSize = staffSize; }
-    void ReseCurrentStaffSize() { m_currentStaffSize = 100; }
     ///@}
 
     /**
@@ -270,7 +255,7 @@ public:
     /**
      * Indicate if offset should be applied
      */
-    virtual bool ApplyOffsets() { return false; }
+    virtual bool ApplyOffset() { return false; }
 
     /**
      * @name Method for starting and ending a graphic
@@ -278,8 +263,8 @@ public:
      */
     ///@{
     virtual void StartGraphic(Object *object, const std::string &gClass, const std::string &gId,
-        GraphicID graphicID = PRIMARY, bool preprend = false);
-    virtual void EndGraphic(Object *object, View *view);
+        GraphicID graphicID = PRIMARY, bool preprend = false) = 0;
+    virtual void EndGraphic(Object *object, View *view) = 0;
     ///@}
 
     /**
@@ -402,11 +387,6 @@ private:
 
     /** stores the viewbox factor taking into account the DEFINTION_FACTOR and the PPU */
     double m_viewBoxFactor;
-
-    /** stores the current unit for offset calculations */
-    int m_currentUnit;
-    /** stores the current staff size for offset calculations */
-    int m_currentStaffSize;
 };
 
 } // namespace vrv

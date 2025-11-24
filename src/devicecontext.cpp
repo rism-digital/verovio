@@ -200,17 +200,6 @@ void DeviceContext::ResetFont()
     m_fontStack.pop();
 }
 
-void DeviceContext::StartGraphic(
-    Object *object, const std::string &gClass, const std::string &gId, GraphicID graphicID, bool prepend)
-{
-    if (!this->ApplyOffsets()) return;
-}
-
-void DeviceContext::EndGraphic(Object *object, View *view)
-{
-    if (!this->ApplyOffsets()) return;
-}
-
 void DeviceContext::DeactivateGraphic()
 {
     assert(!m_isDeactivatedX && !m_isDeactivatedY);
