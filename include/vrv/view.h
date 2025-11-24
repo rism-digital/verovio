@@ -653,6 +653,7 @@ private:
         int m_ho = 0;
         int m_vo = 0;
         Object *m_object = NULL;
+        int m_staffSize = 100;
     };
 
 public:
