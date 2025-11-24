@@ -145,9 +145,10 @@ void View::StartOffset(DeviceContext *dc, Object *object, int staffSize)
 
     if (!interface->HasHo() && !interface->HasVo()) return;
     Offset offset;
-    offset.m_ho = interface->GetHo().GetVu() * unit * staffSize / 100;
-    offset.m_vo = interface->GetVo().GetVu() * unit * staffSize / 100;
+    offset.m_ho = interface->GetHo().GetVu() * unit;
+    offset.m_vo = interface->GetVo().GetVu() * unit;
     offset.m_object = object;
+    offset.m_staffSize = staffSize;
 
     m_currentOffsets.push_front(offset);
 }
@@ -164,8 +165,8 @@ void View::CalcOffset(DeviceContext *dc, int &x, int &y)
     if (!dc->ApplyOffset() || m_currentOffsets.empty()) return;
 
     for (Offset &offset : m_currentOffsets) {
-        x = x + offset.m_ho;
-        y = y + offset.m_vo;
+        x = x + offset.m_ho * offset.m_staffSize / 100;
+        y = y + offset.m_vo * offset.m_staffSize / 100;
     }
 }
 
@@ -174,7 +175,7 @@ void View::CalcOffsetX(DeviceContext *dc, int &x)
     if (!dc->ApplyOffset() || m_currentOffsets.empty()) return;
 
     for (Offset &offset : m_currentOffsets) {
-        x = x + offset.m_ho;
+        x = x + offset.m_ho * offset.m_staffSize / 100;
     }
 }
 
@@ -183,7 +184,7 @@ void View::CalcOffsetY(DeviceContext *dc, int &y)
     if (!dc->ApplyOffset() || m_currentOffsets.empty()) return;
 
     for (Offset &offset : m_currentOffsets) {
-        y = y + offset.m_vo;
+        y = y + offset.m_vo * offset.m_staffSize / 100;
     }
 }
 
