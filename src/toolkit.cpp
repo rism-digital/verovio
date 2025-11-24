@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <cassert>
+#include <cmath>
 #include <locale>
 #include <regex>
 
@@ -38,10 +39,12 @@
 #include "note.h"
 #include "options.h"
 #include "page.h"
+#include "pitchinterface.h"
 #include "runtimeclock.h"
+#include "staff.h"
+#include "system.h"
 #include "score.h"
 #include "slur.h"
-#include "staff.h"
 #include "svgdevicecontext.h"
 #include "timemap.h"
 #include "vrv.h"
@@ -57,6 +60,48 @@ namespace vrv {
 const char *UTF_16_BE_BOM = "\xFE\xFF";
 const char *UTF_16_LE_BOM = "\xFF\xFE";
 const char *ZIP_SIGNATURE = "\x50\x4B\x03\x04";
+
+namespace {
+
+struct PitchSpell {
+    data_PITCHNAME pname;
+    int accid;
+    int oct;
+};
+
+PitchSpell MidiToPitchSpell(int midiPitch)
+{
+    PitchSpell spell{ PITCHNAME_c, 0, 4 };
+
+    const int pclass = ((midiPitch % 12) + 12) % 12;
+    spell.oct = midiPitch / 12 - 1;
+
+    switch (pclass) {
+        case 0: spell.pname = PITCHNAME_c; spell.accid = 0; break;
+        case 1: spell.pname = PITCHNAME_c; spell.accid = 1; break;
+        case 2: spell.pname = PITCHNAME_d; spell.accid = 0; break;
+        case 3: spell.pname = PITCHNAME_e; spell.accid = -1; break;
+        case 4: spell.pname = PITCHNAME_e; spell.accid = 0; break;
+        case 5: spell.pname = PITCHNAME_f; spell.accid = 0; break;
+        case 6: spell.pname = PITCHNAME_f; spell.accid = 1; break;
+        case 7: spell.pname = PITCHNAME_g; spell.accid = 0; break;
+        case 8: spell.pname = PITCHNAME_a; spell.accid = -1; break;
+        case 9: spell.pname = PITCHNAME_a; spell.accid = 0; break;
+        case 10: spell.pname = PITCHNAME_b; spell.accid = -1; break;
+        case 11: spell.pname = PITCHNAME_b; spell.accid = 0; break;
+        default: break;
+    }
+
+    return spell;
+}
+
+Fraction ScoreTimeFromDouble(double scoreTime)
+{
+    const int denom = 1000;
+    return Fraction(static_cast<int>(std::round(scoreTime * denom)), denom);
+}
+
+} // namespace
 
 //----------------------------------------------------------------------------
 // Toolkit
@@ -2150,6 +2195,76 @@ std::string Toolkit::GetTimesForElement(const std::string &xmlId)
         o << "tstampOn" << realTimeOnsetMilliseconds;
         o << "tstampOff" << realTimeOffsetMilliseconds;
     }
+    return o.json();
+}
+
+std::string Toolkit::GetPitchPosition(double scoreTime, int midiPitch, int staffN)
+{
+    this->ResetLogBuffer();
+
+    jsonxx::Object o;
+
+    if (staffN <= 0) {
+        LogWarning("Invalid staff number '%d'", staffN);
+        return o.json();
+    }
+
+    const Fraction requestedScoreTime = ScoreTimeFromDouble(scoreTime);
+
+    MeasureScoreTimeComparison matchMeasureTime(requestedScoreTime);
+    Measure *measure = dynamic_cast<Measure *>(m_doc.FindDescendantByComparison(&matchMeasureTime));
+    if (!measure) {
+        LogWarning("No measure found at score time '%f'", scoreTime);
+        return o.json();
+    }
+
+    int repeat = measure->EnclosesScoreTime(requestedScoreTime);
+    if (repeat == VRV_UNSET) repeat = 1;
+
+    Fraction measureOnset = measure->GetScoreTimeOnset(repeat);
+    Fraction localTime = requestedScoreTime - measureOnset;
+    if (localTime < 0) localTime = 0;
+
+    bool interpolated = false;
+    const int xRel = measure->GetXAtScoreTime(localTime, interpolated);
+    const int x = measure->GetDrawingX() + xRel;
+
+    AttNIntegerComparison staffCmp(STAFF, staffN);
+    Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&staffCmp, 1));
+    if (!staff) {
+        LogWarning("Staff '%d' not found in measure '%s'", staffN, measure->GetID().c_str());
+        return o.json();
+    }
+
+    Layer *layer = vrv_cast<Layer *>(staff->GetFirst(LAYER));
+    int clefOffset = 0;
+    if (layer) {
+        clefOffset = layer->GetClefLocOffset(NULL);
+    }
+
+    const PitchSpell spell = MidiToPitchSpell(midiPitch);
+    const int loc = PitchInterface::CalcLoc(spell.pname, spell.oct, clefOffset);
+    const int y = staff->GetDrawingY() + staff->CalcPitchPosYRel(&m_doc, loc);
+
+    Page *page = vrv_cast<Page *>(measure->GetFirstAncestor(PAGE));
+    const int pageNo = (page) ? page->GetIdx() + 1 : 0;
+    System *system = vrv_cast<System *>(measure->GetFirstAncestor(SYSTEM));
+    const int systemNo = (system) ? system->GetIdx() + 1 : 0;
+
+    o << "x" << x;
+    o << "y" << y;
+    o << "loc" << loc;
+    o << "midi" << midiPitch;
+    o << "staff" << staffN;
+    o << "measureId" << measure->GetID();
+    o << "page" << pageNo;
+    o << "system" << systemNo;
+    o << "scoreTime" << scoreTime;
+    o << "interpolated" << interpolated;
+    o << "pname" << static_cast<int>(spell.pname);
+    o << "accid" << spell.accid;
+    o << "oct" << spell.oct;
+
     return o.json();
 }
 

@@ -612,6 +612,15 @@ public:
      * @return A stringified JSON object with the values
      */
     std::string GetTimesForElement(const std::string &xmlId);
+    /**
+     * Return the graphical coordinates of a pitch at a given score position and staff.
+     *
+     * @param scoreTime The score time (in quarter notes from start of the score)
+     * @param midiPitch MIDI pitch number
+     * @param staffN The staff number (1-based)
+     * @return A stringified JSON object with x / y coordinates and context information
+     */
+    std::string GetPitchPosition(double scoreTime, int midiPitch, int staffN);
 
     ///@}
 
