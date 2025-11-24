@@ -1755,8 +1755,14 @@ void View::DrawControlElementText(DeviceContext *dc, ControlElement *element, Me
 
         TextDrawingParams params;
         // If we have not timestamp
-        params.m_x = start->GetDrawingX() + start->GetDrawingRadius(m_doc);
-        params.m_y = element->GetDrawingY();
+        int x = start->GetDrawingX() + start->GetDrawingRadius(m_doc);
+        int y = element->GetDrawingY();
+
+        this->SetOffsetStaffSize(element, staffSize);
+        this->CalcOffset(dc, x, y);
+
+        params.m_x = x;
+        params.m_y = y;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         int xAdjust = 0;
