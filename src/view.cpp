@@ -132,7 +132,7 @@ std::u32string View::IntToSmuflFigures(unsigned short number, int offset)
     return str;
 }
 
-void View::StartOffset(DeviceContext *dc, Object *object, int staffSize)
+void View::StartOffset(DeviceContext *dc, const Object *object, int staffSize)
 {
     if (!dc->ApplyOffset()) return;
 
@@ -153,11 +153,18 @@ void View::StartOffset(DeviceContext *dc, Object *object, int staffSize)
     m_currentOffsets.push_front(offset);
 }
 
-void View::EndOffset(DeviceContext *dc, Object *object)
+void View::EndOffset(DeviceContext *dc, const Object *object)
 {
     if (!dc->ApplyOffset() || m_currentOffsets.empty()) return;
 
     if (m_currentOffsets.front().m_object == object) m_currentOffsets.pop_front();
+}
+
+void View::SetOffsetStaffSize(const Object *object, int staffSize)
+{
+    if (m_currentOffsets.empty()) return;
+
+    if (m_currentOffsets.front().m_object == object) m_currentOffsets.front().m_staffSize = staffSize;
 }
 
 void View::CalcOffset(DeviceContext *dc, int &x, int &y)

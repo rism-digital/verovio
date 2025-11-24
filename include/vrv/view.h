@@ -641,8 +641,9 @@ private:
      */
     data_STEMDIRECTION GetMensuralStemDir(Layer *layer, Note *note, int verticalCenter);
 
-    void StartOffset(DeviceContext *dc, Object *object, int staffSize);
-    void EndOffset(DeviceContext *dc, Object *object);
+    void StartOffset(DeviceContext *dc, const Object *object, int staffSize);
+    void EndOffset(DeviceContext *dc, const Object *object);
+    void SetOffsetStaffSize(const Object *object, int staffSize);
 
     void CalcOffset(DeviceContext *dc, int &x, int &y);
     void CalcOffsetX(DeviceContext *dc, int &x);
@@ -652,7 +653,7 @@ private:
     public:
         int m_ho = 0;
         int m_vo = 0;
-        Object *m_object = NULL;
+        const Object *m_object = NULL;
         int m_staffSize = 100;
     };
 
