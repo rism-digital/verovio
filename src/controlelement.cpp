@@ -51,6 +51,7 @@ ControlElement::ControlElement(ClassId classId)
 {
     this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
     this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_TYPED);
