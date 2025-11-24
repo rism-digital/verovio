@@ -242,7 +242,9 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
         static const std::set<ClassId> timeSpanningClasses = { ANNOTSCORE, BEAMSPAN, BRACKETSPAN, DIR, DYNAM, FIGURE,
             GLISS, HAIRPIN, LV, OCTAVE, ORNAM, PEDAL, PHRASE, PITCHINFLECTION, SLUR, SYL, TEMPO, TIE, TRILL };
         if (object->Is(classId) && timeSpanningClasses.contains(classId)) {
+            this->StartOffset(dc, object, 100);
             this->DrawTimeSpanningElement(dc, object, system);
+            this->EndOffset(dc, object);
         }
         if (object->Is(classId) && (classId == ENDING)) {
             // cast to Ending check in DrawEnding

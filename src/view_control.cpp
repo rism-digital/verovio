@@ -223,7 +223,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     System *parentSystem1 = vrv_cast<System *>(start->GetFirstAncestor(SYSTEM));
     System *parentSystem2 = vrv_cast<System *>(end->GetFirstAncestor(SYSTEM));
 
-    int x1, x2;
+    int drawingX1, drawingX2;
     Object *objectX = NULL;
     Measure *measure = NULL;
     Object *graphic = NULL;
@@ -234,9 +234,9 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         // we use the start measure
         measure = interface->GetStartMeasure();
         if (!measure) return;
-        x1 = start->GetDrawingX();
+        drawingX1 = start->GetDrawingX();
         objectX = start;
-        x2 = end->GetDrawingX();
+        drawingX2 = end->GetDrawingX();
         graphic = element;
     }
     // Only the first parent is the same, this means that the element is "open" at the end of the system
@@ -244,9 +244,9 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         // We need the last measure of the system for x2 - we also use it for getting the staves later
         measure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
         if (!measure) return;
-        x1 = start->GetDrawingX();
+        drawingX1 = start->GetDrawingX();
         objectX = start;
-        x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
+        drawingX2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
         graphic = element;
         spanningType = SPANNING_START;
     }
@@ -256,9 +256,9 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         measure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
         if (!measure) return;
         // We need the position of the first default in the first measure for x1
-        x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
+        drawingX1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
         objectX = measure->GetLeftBarLine();
-        x2 = end->GetDrawingX();
+        drawingX2 = end->GetDrawingX();
         spanningType = SPANNING_END;
     }
     // Rare case where neither the first note nor the last note are in the current system - draw the connector
@@ -268,12 +268,12 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         measure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
         if (!measure) return;
         // We need the position of the first default in the first measure for x1
-        x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
+        drawingX1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
         objectX = measure->GetLeftBarLine();
         // We need the last measure of the system for x2
         Measure *last = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
         if (!last) return;
-        x2 = last->GetDrawingX() + last->GetRightBarLineXRel();
+        drawingX2 = last->GetDrawingX() + last->GetRightBarLineXRel();
         spanningType = SPANNING_MIDDLE;
     }
     // Return otherwise: this should only happen if the time spanning element is encoded in the wrong measure
@@ -302,19 +302,36 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     /************** adjust the position according to the radius **************/
 
     if (spanningType == SPANNING_START_END) {
-        x1 += startRadius;
-        x2 += endRadius;
+        drawingX1 += startRadius;
+        drawingX2 += endRadius;
     }
     else if (spanningType == SPANNING_START) {
-        x1 += startRadius;
+        drawingX1 += startRadius;
     }
     else if (spanningType == SPANNING_END) {
-        x2 += endRadius;
+        drawingX2 += endRadius;
     }
 
     std::vector<Staff *> staffList = interface->GetTstampStaves(measure, element);
     bool isFirst = true;
     for (Staff *staff : staffList) {
+
+        const int staffSize = staff->m_drawingStaffSize;
+        int x1 = drawingX1;
+        int x2 = drawingX2;
+
+        this->SetOffsetStaffSize(element, staffSize);
+
+        if (spanningType == SPANNING_START_END) {
+            this->CalcOffsetX(dc, x1);
+            this->CalcOffsetX(dc, x2);
+        }
+        else if (spanningType == SPANNING_START) {
+            this->CalcOffsetX(dc, x1);
+        }
+        else if (spanningType == SPANNING_END) {
+            this->CalcOffsetX(dc, x2);
+        }
 
         // TimeSpanning elements are not necessary floating elements (e.g., syl) - we have a bounding box only for them
         if (element->IsControlElement()) {
@@ -464,7 +481,8 @@ void View::DrawAnnotScore(
     assert(annotScore->GetEnd());
 
     // May need to set/tweak y pos
-    const int y = annotScore->GetDrawingY();
+    int y = annotScore->GetDrawingY();
+    this->CalcOffsetY(dc, y);
 
     // This has been copied from bracketSpan and is likely to be wrong
     if (graphic) {
@@ -562,7 +580,8 @@ void View::DrawBracketSpan(
     assert(bracketSpan->GetStart());
     assert(bracketSpan->GetEnd());
 
-    const int y = bracketSpan->GetDrawingY();
+    int y = bracketSpan->GetDrawingY();
+    this->CalcOffsetY(dc, y);
 
     if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetID());
@@ -717,6 +736,7 @@ void View::DrawHairpin(
     if (form == hairpinLog_FORM_dim) std::swap(startY, endY);
 
     int y = hairpin->GetDrawingY();
+    this->CalcOffsetY(dc, y);
 
     // Improve alignment with dynamics
     if (hairpin->GetPlace() != STAFFREL_within) {
@@ -812,6 +832,8 @@ void View::DrawOctave(
     const data_STAFFREL_basic disPlace = octave->GetDisPlace();
 
     int y1 = octave->GetDrawingY();
+    this->CalcOffsetY(dc, y1);
+
     int y2 = y1;
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
@@ -960,6 +982,9 @@ void View::DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflecti
     // If the end is a note, use it y as base, otherwhise the position above the staff
     int baseY2 = (note2) ? note2->GetDrawingY() : topY;
 
+    this->CalcOffsetY(dc, baseY1);
+    this->CalcOffsetY(dc, baseY2);
+
     // If we start on a note, then going up
     bool up = note1 ? true : false;
 
@@ -1053,6 +1078,9 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     Point bezier[4];
     if (!tie->CalculatePosition(m_doc, staff, x1, x2, spanningType, bezier)) return;
 
+    // Here adjust only y because x1 and x2 have already been adjusted
+    for (Point &point : bezier) this->CalcOffsetY(dc, point.y);
+
     PenStyle penStyle = PEN_SOLID;
     switch (tie->GetLform()) {
         case LINEFORM_dashed: penStyle = PEN_SHORT_DASH; break;
@@ -1095,6 +1123,7 @@ void View::DrawPedalLine(
     assert(pedal->GetEnd());
 
     int y = pedal->GetDrawingY();
+    this->CalcOffsetY(dc, y);
 
     int startRadius = 0;
     if (!pedal->GetStart()->Is(TIMESTAMP_ATTR)) {
@@ -1171,6 +1200,7 @@ void View::DrawTrillExtension(
 
     int y
         = trill->GetDrawingY() + m_doc->GetGlyphHeight(SMUFL_E566_ornamentTrill, staff->m_drawingStaffSize, false) / 3;
+    this->CalcOffsetY(dc, y);
 
     // Adjust the x1 for the tr symbol
     if (trill->GetLstartsym() == LINESTARTENDSYMBOL_none) {
@@ -1242,7 +1272,8 @@ void View::DrawControlElementConnector(
     }
 
     const int width = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int y = element->GetDrawingY() + width / 2;
+    int y = element->GetDrawingY() + width / 2;
+    this->CalcOffsetY(dc, y);
 
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     // the length of the dash and the space between them - can be made a parameter
@@ -1314,7 +1345,8 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
     assert(f->GetStart() && f->GetEnd());
     if (!f->GetStart() || !f->GetEnd()) return;
 
-    const int y = this->GetFYRel(f, staff);
+    int y = this->GetFYRel(f, staff);
+    this->CalcOffsetY(dc, y);
 
     // The both correspond to the current system, which means no system break in-between (simple case)
     if (spanningType == SPANNING_START_END) {
@@ -1371,7 +1403,8 @@ void View::DrawSylConnector(
     assert(syl->GetStart() && syl->GetEnd());
     if (!syl->GetStart() || !syl->GetEnd()) return;
 
-    const int y = staff->GetDrawingY() + this->GetSylYRel(syl->m_drawingVerseN, staff, syl->m_drawingVersePlace);
+    int y = staff->GetDrawingY() + this->GetSylYRel(syl->m_drawingVerseN, staff, syl->m_drawingVersePlace);
+    this->CalcOffsetY(dc, y);
 
     // Invalid bounding boxes might occur for empty syllables without text child
     if (!syl->HasContentHorizontalBB()) return;
@@ -2122,6 +2155,8 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
 
     int y1 = staff->GetDrawingY();
     int y2 = staff->GetDrawingY();
+    this->CalcOffsetY(dc, y1);
+    this->CalcOffsetY(dc, y2);
 
     /************** parent layers **************/
 
