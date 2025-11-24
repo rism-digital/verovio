@@ -1520,8 +1520,12 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     int length = top - bottom;
     // We add - substract a unit in order to have the line going to the edge
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int x = arpeg->GetDrawingX();
-    const int y = bottom - unit;
+    
+    int x = arpeg->GetDrawingX();
+    int y = bottom - unit;
+    
+    this->SetOffsetStaffSize(arpeg, staff->m_drawingStaffSize);
+    this->CalcOffset(dc, x, y);
 
     const arpegLog_ORDER order = arpeg->GetOrder();
     if (order == arpegLog_ORDER_nonarp) {
