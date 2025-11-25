@@ -2155,6 +2155,7 @@ void MEIOutput::WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
     assert(hairpin);
 
     this->WriteControlElement(currentNode, hairpin);
+    this->WriteOffsetSpanningInterface(currentNode, hairpin);
     this->WriteTimeSpanningInterface(currentNode, hairpin);
     hairpin->WriteHairpinLog(currentNode);
     hairpin->WriteHairpinVis(currentNode);
@@ -5990,6 +5991,7 @@ bool MEIInput::ReadHairpin(Object *parent, pugi::xml_node hairpin)
     Hairpin *vrvHairpin = new Hairpin();
     this->ReadControlElement(hairpin, vrvHairpin);
 
+    this->ReadOffsetSpanningInterface(hairpin, vrvHairpin);
     this->ReadTimeSpanningInterface(hairpin, vrvHairpin);
     vrvHairpin->ReadHairpinLog(hairpin);
     vrvHairpin->ReadHairpinVis(hairpin);
