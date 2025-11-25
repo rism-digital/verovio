@@ -641,15 +641,31 @@ private:
      */
     data_STEMDIRECTION GetMensuralStemDir(Layer *layer, Note *note, int verticalCenter);
 
+    /**
+     * Start and end offset calculation for elements with `@vo` or `@ho`.
+     * Offset will be applied only if required by the DeviceContext.
+     * The staff size can be changed when it does for a particular element (e.g., control elements).
+     */
+    ///@{
     void StartOffset(DeviceContext *dc, const Object *object, int staffSize);
     void EndOffset(DeviceContext *dc, const Object *object);
     void SetOffsetStaffSize(const Object *object, int staffSize);
+    ///@}
 
+    /**
+     * Calculate the current offset for a point.
+     * Applies currents offsets recursively (e.g., accid within note).
+     */
+    ///@{
     void CalcOffset(DeviceContext *dc, int &x, int &y);
     void CalcOffsetX(DeviceContext *dc, int &x);
     void CalcOffsetY(DeviceContext *dc, int &y);
     void CalcOffsetBezier(DeviceContext *dc, Point points[4], char spanningType);
+    ///@}
 
+    /**
+     * Internal class for storing current offset values.
+     */
     class Offset {
     public:
         int m_ho = 0;
@@ -703,6 +719,7 @@ private:
     static thread_local bool s_drawingLigObliqua;
     ///@}
 
+    /** The list of current offset values for the element being drawn */
     std::list<Offset> m_currentOffsets;
 };
 
