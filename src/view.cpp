@@ -202,11 +202,15 @@ void View::CalcOffsetBezier(DeviceContext *dc, Point points[4], char spanningTyp
     if (spanningType == SPANNING_START_END) {
         for (int i = 0; i < 4; i++) this->CalcOffset(dc, points[i].x, points[i].y);
     }
+    // Do not apply the offset for system start or end points
+    // End points only
     else if (spanningType == SPANNING_START) {
         for (int i = 2; i < 4; i++) this->CalcOffset(dc, points[i].x, points[i].y);
+        // Vertical offset still does need to be applied
         this->CalcOffsetY(dc, points[0].y);
         this->CalcOffsetY(dc, points[1].y);
     }
+    // Start points only
     else if (spanningType == SPANNING_END) {
         for (int i = 0; i < 2; i++) this->CalcOffset(dc, points[i].x, points[i].y);
         this->CalcOffsetY(dc, points[2].y);

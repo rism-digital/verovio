@@ -276,6 +276,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         if (system->SetCurrentFloatingPositioner(staff->GetN(), editorialAccid, accid, staff)) {
             x = editorialAccid->GetDrawingX();
             y = editorialAccid->GetDrawingY();
+            this->CalcOffset(dc, x, y);
         }
     }
 
