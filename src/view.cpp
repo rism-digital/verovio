@@ -194,18 +194,12 @@ void View::CalcOffset(DeviceContext *dc, int &x, int &y)
     }
 }
 
-void View::CalcOffsetX(DeviceContext *dc, int &x, OffsetSpanning spanning)
+void View::CalcOffsetX(DeviceContext *dc, int &x)
 {
     if (!dc->ApplyOffset() || m_currentOffsets.empty()) return;
 
     for (Offset &offset : m_currentOffsets) {
         x = x + offset.m_ho * offset.m_staffSize / 100;
-        if (spanning == OffsetSpanning::Start) {
-            x = x + offset.m_startho * offset.m_staffSize / 100;
-        }
-        else if (spanning == OffsetSpanning::End) {
-            x = x + offset.m_endho * offset.m_staffSize / 100;
-        }
     }
 }
 

@@ -321,17 +321,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         int x2 = drawingX2;
 
         this->SetOffsetStaffSize(element, staffSize);
-
-        if (spanningType == SPANNING_START_END) {
-            this->CalcOffsetX(dc, x1, OffsetSpanning::Start);
-            this->CalcOffsetX(dc, x2, OffsetSpanning::End);
-        }
-        else if (spanningType == SPANNING_START) {
-            this->CalcOffsetX(dc, x1, OffsetSpanning::Start);
-        }
-        else if (spanningType == SPANNING_END) {
-            this->CalcOffsetX(dc, x2, OffsetSpanning::End);
-        }
+        this->CalcOffsetSpanningStartX(dc, x1, spanningType);
+        this->CalcOffsetSpanningEndX(dc, x2, spanningType);
 
         // TimeSpanning elements are not necessary floating elements (e.g., syl) - we have a bounding box only for them
         if (element->IsControlElement()) {

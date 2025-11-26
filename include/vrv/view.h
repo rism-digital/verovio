@@ -652,15 +652,13 @@ private:
     void SetOffsetStaffSize(const Object *object, int staffSize);
     ///@}
 
-    enum OffsetSpanning { None, Start, End };
-
     /**
      * Calculate the current offset for a point.
      * Applies currents offsets recursively (e.g., accid within note).
      */
     ///@{
     void CalcOffset(DeviceContext *dc, int &x, int &y);
-    void CalcOffsetX(DeviceContext *dc, int &x, OffsetSpanning spanning = OffsetSpanning::None);
+    void CalcOffsetX(DeviceContext *dc, int &x);
     void CalcOffsetY(DeviceContext *dc, int &y);
     void CalcOffsetSpanningStartX(DeviceContext *dc, int &x, char spanningType, double factor = 1.0);
     void CalcOffsetSpanningEndX(DeviceContext *dc, int &x, char spanningType, double factor = 1.0);
