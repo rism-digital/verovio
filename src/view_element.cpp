@@ -1569,6 +1569,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     const int x = element->GetDrawingX();
     const int y = element->GetDrawingY();
+    const int drawingUnit = m_doc->GetDrawingUnit(staffSize);
     const int drawingWidth = m_doc->GetGlyphWidth(drawingGlyph, staffSize, drawingCueSize);
 
     if (enclosingFront) {
@@ -1579,8 +1580,9 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     this->DrawSmuflCode(dc, x, y, drawingGlyph, staffSize, drawingCueSize);
 
     if (enclosingBack) {
-        const int parenOffset = m_doc->GetGlyphWidth(enclosingBack, staffSize, drawingCueSize)
+        int parenOffset = m_doc->GetGlyphWidth(enclosingBack, staffSize, drawingCueSize)
             - m_doc->GetGlyphAdvX(enclosingBack, staffSize, drawingCueSize);
+        if (rest->HasDots()) parenOffset += rest->GetDots() * drawingUnit * 3 / 2;
         this->DrawSmuflCode(dc, x + drawingWidth + parenOffset, y, enclosingBack, staffSize, drawingCueSize);
     }
 
@@ -1590,10 +1592,8 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // Draw legder lines for half, whole, and breve rests
     if ((drawingDur == DURATION_1 || drawingDur == DURATION_2 || drawingDur == DURATION_breve)) {
         const int width = m_doc->GetGlyphWidth(drawingGlyph, staffSize, drawingCueSize);
-        int ledgerLineThickness
-            = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staffSize);
-        int ledgerLineExtension
-            = m_doc->GetOptions()->m_ledgerLineExtension.GetValue() * m_doc->GetDrawingUnit(staffSize);
+        int ledgerLineThickness = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * drawingUnit;
+        int ledgerLineExtension = m_doc->GetOptions()->m_ledgerLineExtension.GetValue() * drawingUnit;
         if (drawingCueSize) {
             ledgerLineThickness *= m_doc->GetOptions()->m_graceFactor.GetValue();
             ledgerLineExtension *= m_doc->GetOptions()->m_graceFactor.GetValue();
