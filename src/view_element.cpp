@@ -1569,8 +1569,9 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     const int x = element->GetDrawingX();
     const int y = element->GetDrawingY();
-    const int drawingUnit = m_doc->GetDrawingUnit(staffSize);
     const int drawingWidth = m_doc->GetGlyphWidth(drawingGlyph, staffSize, drawingCueSize);
+    int drawingUnit = m_doc->GetDrawingUnit(staffSize);
+    if (drawingCueSize) drawingUnit *= m_doc->GetOptions()->m_graceFactor.GetValue();
 
     if (enclosingFront) {
         const int parenOffset = m_doc->GetGlyphWidth(enclosingFront, staffSize, drawingCueSize);
@@ -1592,12 +1593,8 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // Draw legder lines for half, whole, and breve rests
     if ((drawingDur == DURATION_1 || drawingDur == DURATION_2 || drawingDur == DURATION_breve)) {
         const int width = m_doc->GetGlyphWidth(drawingGlyph, staffSize, drawingCueSize);
-        int ledgerLineThickness = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * drawingUnit;
-        int ledgerLineExtension = m_doc->GetOptions()->m_ledgerLineExtension.GetValue() * drawingUnit;
-        if (drawingCueSize) {
-            ledgerLineThickness *= m_doc->GetOptions()->m_graceFactor.GetValue();
-            ledgerLineExtension *= m_doc->GetOptions()->m_graceFactor.GetValue();
-        }
+        const int ledgerLineThickness = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * drawingUnit;
+        const int ledgerLineExtension = m_doc->GetOptions()->m_ledgerLineExtension.GetValue() * drawingUnit;
         const int topMargin = staff->GetDrawingY();
         const int bottomMargin
             = staff->GetDrawingY() - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize);
