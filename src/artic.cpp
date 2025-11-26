@@ -231,17 +231,13 @@ char32_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) cons
 
 std::pair<char32_t, char32_t> Artic::GetEnclosingGlyphs() const
 {
-    std::pair<char32_t, char32_t> glyphs(0, 0);
     if (this->HasEnclose()) {
         switch (this->GetEnclose()) {
-            case ENCLOSURE_brack:
-                glyphs = { SMUFL_E26C_accidentalBracketLeft, SMUFL_E26D_accidentalBracketRight };
-                break;
-            case ENCLOSURE_paren: glyphs = { SMUFL_E26A_accidentalParensLeft, SMUFL_E26B_accidentalParensRight }; break;
-            default: break;
+            case ENCLOSURE_brack: return { SMUFL_E26C_accidentalBracketLeft, SMUFL_E26D_accidentalBracketRight }; break;
+            case ENCLOSURE_paren: return { SMUFL_E26A_accidentalParensLeft, SMUFL_E26B_accidentalParensRight }; break;
+            default: return { 0, 0 };
         }
     }
-    return glyphs;
 }
 
 //----------------------------------------------------------------------------

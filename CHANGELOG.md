@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+* Support for `@enclose` on `rest` and `trill` (@rettinghaus)
+* Support for `@cutout` on `mRest` (@rettinghaus)
 
 ## [5.6.0] – 2025-09-09
 * Improved layout for editorial accidentals
