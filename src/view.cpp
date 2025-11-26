@@ -136,21 +136,38 @@ void View::StartOffset(DeviceContext *dc, const Object *object, int staffSize)
 {
     if (!dc->ApplyOffset()) return;
 
-    if (!object->HasInterface(INTERFACE_OFFSET)) return;
-
-    const OffsetInterface *interface = object->GetOffsetInterface();
-    assert(interface);
-
     const int unit = m_doc->GetOptions()->m_unit.GetValue();
 
-    if (!interface->HasHo() && !interface->HasVo()) return;
     Offset offset;
-    offset.m_ho = (interface->HasHo()) ? interface->GetHo().GetVu() * unit : 0;
-    offset.m_vo = (interface->HasVo()) ? interface->GetVo().GetVu() * unit : 0;
-    offset.m_object = object;
-    offset.m_staffSize = staffSize;
 
-    m_currentOffsets.push_front(offset);
+    if (object->HasInterface(INTERFACE_OFFSET)) {
+        const OffsetInterface *interface = object->GetOffsetInterface();
+        assert(interface);
+
+        if (interface->HasHo() || interface->HasVo()) {
+            offset.m_ho = (interface->HasHo()) ? interface->GetHo().GetVu() * unit : 0;
+            offset.m_vo = (interface->HasVo()) ? interface->GetVo().GetVu() * unit : 0;
+            offset.m_object = object;
+            offset.m_staffSize = staffSize;
+        }
+    }
+
+    if (object->HasInterface(INTERFACE_OFFSET_SPANNING)) {
+        const OffsetSpanningInterface *interface = object->GetOffsetSpanningInterface();
+        assert(interface);
+
+        if (interface->HasStartho() || interface->HasStartvo() || interface->HasEndho() || interface->HasEndvo()) {
+            offset.m_startho = (interface->HasStartho()) ? interface->GetStartho().GetVu() * unit : 0;
+            offset.m_startvo = (interface->HasStartvo()) ? interface->GetStartvo().GetVu() * unit : 0;
+            offset.m_endho = (interface->HasEndho()) ? interface->GetEndho().GetVu() * unit : 0;
+            offset.m_endvo = (interface->HasEndvo()) ? interface->GetEndvo().GetVu() * unit : 0;
+            offset.m_object = object;
+            offset.m_staffSize = staffSize;
+        }
+    }
+
+    // This means we have at least one offset value
+    if (offset.m_object) m_currentOffsets.push_front(offset);
 }
 
 void View::EndOffset(DeviceContext *dc, const Object *object)
@@ -177,12 +194,18 @@ void View::CalcOffset(DeviceContext *dc, int &x, int &y)
     }
 }
 
-void View::CalcOffsetX(DeviceContext *dc, int &x)
+void View::CalcOffsetX(DeviceContext *dc, int &x, OffsetSpanning spanning)
 {
     if (!dc->ApplyOffset() || m_currentOffsets.empty()) return;
 
     for (Offset &offset : m_currentOffsets) {
         x = x + offset.m_ho * offset.m_staffSize / 100;
+        if (spanning == OffsetSpanning::Start) {
+            x = x + offset.m_startho * offset.m_staffSize / 100;
+        }
+        else if (spanning == OffsetSpanning::End) {
+            x = x + offset.m_endho * offset.m_staffSize / 100;
+        }
     }
 }
 
@@ -192,6 +215,48 @@ void View::CalcOffsetY(DeviceContext *dc, int &y)
 
     for (Offset &offset : m_currentOffsets) {
         y = y + offset.m_vo * offset.m_staffSize / 100;
+    }
+}
+
+void View::CalcOffsetSpanningStartY(DeviceContext *dc, int &y, char spanningType)
+{
+    if (!dc->ApplyOffset() || m_currentOffsets.empty()) return;
+
+    for (Offset &offset : m_currentOffsets) {
+        if (spanningType == SPANNING_START_END) {
+            y = y + offset.m_startvo * offset.m_staffSize / 100;
+        }
+        else if (spanningType == SPANNING_START) {
+            y = y + offset.m_startvo * offset.m_staffSize / 100;
+        }
+        else if (spanningType == SPANNING_END) {
+            y = y + (offset.m_startvo + offset.m_endvo) / 2 * offset.m_staffSize / 100;
+        }
+        else {
+            const int diff = (offset.m_startvo - offset.m_endvo) / 2;
+            y = y + ((offset.m_startvo + offset.m_endvo) / 2 + diff) * offset.m_staffSize / 100;
+        }
+    }
+}
+
+void View::CalcOffsetSpanningEndY(DeviceContext *dc, int &y, char spanningType)
+{
+    if (!dc->ApplyOffset() || m_currentOffsets.empty()) return;
+
+    for (Offset &offset : m_currentOffsets) {
+        if (spanningType == SPANNING_START_END) {
+            y = y + offset.m_endvo * offset.m_staffSize / 100;
+        }
+        else if (spanningType == SPANNING_START) {
+            y = y + (offset.m_endvo + offset.m_startvo) / 2 * offset.m_staffSize / 100;
+        }
+        else if (spanningType == SPANNING_END) {
+            y = y + offset.m_endvo * offset.m_staffSize / 100;
+        }
+        else {
+            const int diff = (offset.m_endvo - offset.m_startvo) / 2;
+            y = y + ((offset.m_startvo + offset.m_endvo) / 2 + diff) * offset.m_staffSize / 100;
+        }
     }
 }
 
@@ -213,6 +278,13 @@ void View::CalcOffsetBezier(DeviceContext *dc, Point points[4], char spanningTyp
     // Start points only
     else if (spanningType == SPANNING_END) {
         for (int i = 0; i < 2; i++) this->CalcOffset(dc, points[i].x, points[i].y);
+        this->CalcOffsetY(dc, points[2].y);
+        this->CalcOffsetY(dc, points[3].y);
+    }
+    // Middle, ony vertical offset
+    else {
+        this->CalcOffsetY(dc, points[0].y);
+        this->CalcOffsetY(dc, points[1].y);
         this->CalcOffsetY(dc, points[2].y);
         this->CalcOffsetY(dc, points[3].y);
     }

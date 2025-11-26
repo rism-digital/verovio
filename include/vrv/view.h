@@ -652,14 +652,18 @@ private:
     void SetOffsetStaffSize(const Object *object, int staffSize);
     ///@}
 
+    enum OffsetSpanning { None, Start, End };
+
     /**
      * Calculate the current offset for a point.
      * Applies currents offsets recursively (e.g., accid within note).
      */
     ///@{
     void CalcOffset(DeviceContext *dc, int &x, int &y);
-    void CalcOffsetX(DeviceContext *dc, int &x);
+    void CalcOffsetX(DeviceContext *dc, int &x, OffsetSpanning spanning = OffsetSpanning::None);
     void CalcOffsetY(DeviceContext *dc, int &y);
+    void CalcOffsetSpanningStartY(DeviceContext *dc, int &y, char spanningType);
+    void CalcOffsetSpanningEndY(DeviceContext *dc, int &y, char spanningType);
     void CalcOffsetBezier(DeviceContext *dc, Point points[4], char spanningType);
     ///@}
 
@@ -670,6 +674,10 @@ private:
     public:
         int m_ho = 0;
         int m_vo = 0;
+        int m_startho = 0;
+        int m_startvo = 0;
+        int m_endho = 0;
+        int m_endvo = 0;
         const Object *m_object = NULL;
         int m_staffSize = 100;
     };
