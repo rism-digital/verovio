@@ -67,7 +67,7 @@ private:
 
 /**
  * This class is an interface for elements having spanning visual offsets, such as slur, hairpin, etc..
- * It is not an abstract class but should not be instantiated directly.
+ * It is not an abstract class and should not be instantiated directly.
  */
 class OffsetSpanningInterface : public Interface, public AttVisualOffset2Ho, public AttVisualOffset2Vo {
 public:
