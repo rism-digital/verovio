@@ -849,6 +849,7 @@ void View::DrawDots(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Dots *dots = vrv_cast<Dots *>(element);
     assert(dots);
+    const double offsetFactor = dots->GetDrawingCueSize() ? m_doc->GetOptions()->m_graceFactor.GetValue() : 1.0;
 
     dc->StartGraphic(element, "", element->GetID());
 
@@ -856,11 +857,12 @@ void View::DrawDots(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         const Staff *dotStaff = (mapEntry.first) ? mapEntry.first : staff;
         int y = dotStaff->GetDrawingY()
             - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (dotStaff->m_drawingLines - 1);
-        int x = dots->GetDrawingX() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        int x = dots->GetDrawingX() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * offsetFactor;
         this->CalcOffset(dc, x, y);
+        
         for (int loc : mapEntry.second) {
             this->DrawDotsPart(dc, x, y + loc * m_doc->GetDrawingUnit(staff->m_drawingStaffSize), dots->GetDots(),
-                dotStaff, element->GetDrawingCueSize());
+                dotStaff, dots->GetDrawingCueSize());
         }
     }
 
@@ -1596,8 +1598,27 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     int y = element->GetDrawingY();
 
     this->CalcOffset(dc, x, y);
+    
+    char32_t enclosingFront, enclosingBack;
+    std::tie(enclosingFront, enclosingBack) = rest->GetEnclosingGlyphs();
+
+    const int drawingWidth = m_doc->GetGlyphWidth(drawingGlyph, staffSize, drawingCueSize);
+    int drawingUnit = m_doc->GetDrawingUnit(staffSize);
+    if (drawingCueSize) drawingUnit *= m_doc->GetOptions()->m_graceFactor.GetValue();
+
+    if (enclosingFront) {
+        const int parenOffset = m_doc->GetGlyphWidth(enclosingFront, staffSize, drawingCueSize);
+        this->DrawSmuflCode(dc, x - parenOffset, y, enclosingFront, staffSize, drawingCueSize);
+    }
 
     this->DrawSmuflCode(dc, x, y, drawingGlyph, staffSize, drawingCueSize);
+
+    if (enclosingBack) {
+        int parenOffset = m_doc->GetGlyphWidth(enclosingBack, staffSize, drawingCueSize)
+            - m_doc->GetGlyphAdvX(enclosingBack, staffSize, drawingCueSize);
+        if (rest->HasDots()) parenOffset += rest->GetDots() * drawingUnit * 3 / 2;
+        this->DrawSmuflCode(dc, x + drawingWidth + parenOffset, y, enclosingBack, staffSize, drawingCueSize);
+    }
 
     /************ Draw children (dots) ************/
     this->DrawLayerChildren(dc, rest, layer, staff, measure);
@@ -1605,14 +1626,8 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // Draw legder lines for half, whole, and breve rests
     if ((drawingDur == DURATION_1 || drawingDur == DURATION_2 || drawingDur == DURATION_breve)) {
         const int width = m_doc->GetGlyphWidth(drawingGlyph, staffSize, drawingCueSize);
-        int ledgerLineThickness
-            = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staffSize);
-        int ledgerLineExtension
-            = m_doc->GetOptions()->m_ledgerLineExtension.GetValue() * m_doc->GetDrawingUnit(staffSize);
-        if (drawingCueSize) {
-            ledgerLineThickness *= m_doc->GetOptions()->m_graceFactor.GetValue();
-            ledgerLineExtension *= m_doc->GetOptions()->m_graceFactor.GetValue();
-        }
+        const int ledgerLineThickness = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * drawingUnit;
+        const int ledgerLineExtension = m_doc->GetOptions()->m_ledgerLineExtension.GetValue() * drawingUnit;
         const int topMargin = staff->GetDrawingY();
         const int bottomMargin
             = staff->GetDrawingY() - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize);

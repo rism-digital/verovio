@@ -2904,6 +2904,7 @@ void MEIOutput::WriteRest(pugi::xml_node currentNode, Rest *rest)
     this->WritePositionInterface(currentNode, rest);
     rest->WriteColor(currentNode);
     rest->WriteCue(currentNode);
+    rest->WriteEnclosingChars(currentNode);
     rest->WriteExtSymAuth(currentNode);
     rest->WriteExtSymNames(currentNode);
     rest->WriteRestVisMensural(currentNode);
@@ -7263,6 +7264,7 @@ bool MEIInput::ReadRest(Object *parent, pugi::xml_node rest)
     this->ReadPositionInterface(rest, vrvRest);
     vrvRest->ReadColor(rest);
     vrvRest->ReadCue(rest);
+    vrvRest->ReadEnclosingChars(rest);
     vrvRest->ReadExtSymAuth(rest);
     vrvRest->ReadExtSymNames(rest);
     vrvRest->ReadRestVisMensural(rest);

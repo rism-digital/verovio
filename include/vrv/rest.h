@@ -11,6 +11,7 @@
 #include "altsyminterface.h"
 #include "atts_externalsymbols.h"
 #include "atts_mensural.h"
+#include "atts_visual.h"
 #include "durationinterface.h"
 #include "layerelement.h"
 #include "offsetinterface.h"
@@ -42,6 +43,7 @@ class Rest : public LayerElement,
              public PositionInterface,
              public AttColor,
              public AttCue,
+             public AttEnclosingChars,
              public AttExtSymAuth,
              public AttExtSymNames,
              public AttRestVisMensural {
@@ -104,6 +106,11 @@ public:
      * Update the rest location based on the input TransPitch
      */
     void UpdateFromTransLoc(const TransPitch &tp);
+
+    /**
+     * Retrieve parentheses / brackets from the enclose attribute
+     */
+    std::pair<char32_t, char32_t> GetEnclosingGlyphs() const;
 
     //----------//
     // Functors //
