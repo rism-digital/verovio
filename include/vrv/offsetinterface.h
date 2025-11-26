@@ -23,7 +23,7 @@ class ResetDataFunctor;
 
 /**
  * This class is an interface for elements having a single visual offset, such as arpeg, reh, etc..
- * It is not an abstract class but should not be instantiated directly.
+ * It is not an abstract class and should not be instantiated directly.
  */
 class OffsetInterface : public Interface, public AttVisualOffsetHo, public AttVisualOffsetVo {
 public:
