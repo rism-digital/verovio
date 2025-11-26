@@ -1480,15 +1480,15 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     if (note->m_crossStaff) staff = note->m_crossStaff;
 
     bool drawingCueSize = note->GetDrawingCueSize();
-    int x = element->GetDrawingY();
-    int y = element->GetDrawingX();
+    int x = element->GetDrawingX();
+    int y = element->GetDrawingY();
 
-    this->CalcOffset(dc, y, x);
+    this->CalcOffset(dc, x, y);
 
     if (note->HasStemSameasNote() && note->GetFlippedNotehead()) {
         int xShift = note->GetDrawingRadius(m_doc) * 2 - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
         xShift *= (note->GetDrawingStemDir() == STEMDIRECTION_up) ? -1 : 1;
-        y -= xShift;
+        x -= xShift;
     }
 
     if (!(note->GetHeadVisible() == BOOLEAN_false)) {
@@ -1501,7 +1501,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             drawingDur = DURATION_4;
         }
         if (drawingDur < DURATION_breve) {
-            this->DrawMaximaToBrevis(dc, x, element, layer, staff);
+            this->DrawMaximaToBrevis(dc, y, element, layer, staff);
         }
         else {
             // Whole notes
@@ -1527,15 +1527,15 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                 dc->SetCustomGraphicColor(note->GetHeadColor());
             }
 
-            this->DrawSmuflCode(dc, y, x, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
+            this->DrawSmuflCode(dc, x, y, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
 
             // handle notehead enclosure
             if (note->HasHeadMod()) {
                 switch (note->GetHeadMod()) {
                     case NOTEHEADMODIFIER_paren: {
-                        this->DrawSmuflCode(dc, y - note->GetDrawingRadius(m_doc), x, SMUFL_E26A_accidentalParensLeft,
+                        this->DrawSmuflCode(dc, x - note->GetDrawingRadius(m_doc), y, SMUFL_E26A_accidentalParensLeft,
                             staff->m_drawingStaffSize, drawingCueSize, true);
-                        this->DrawSmuflCode(dc, y + note->GetDrawingRadius(m_doc) * 2, x,
+                        this->DrawSmuflCode(dc, x + note->GetDrawingRadius(m_doc) * 2, y,
                             SMUFL_E26B_accidentalParensRight, staff->m_drawingStaffSize, drawingCueSize, true);
                         break;
                     }
