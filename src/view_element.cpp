@@ -834,17 +834,18 @@ void View::DrawDots(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Dots *dots = vrv_cast<Dots *>(element);
     assert(dots);
+    const double offsetFactor = dots->GetDrawingCueSize() ? m_doc->GetOptions()->m_graceFactor.GetValue() : 1.0;
 
     dc->StartGraphic(element, "", element->GetID());
 
     for (const auto &mapEntry : dots->GetMapOfDotLocs()) {
         const Staff *dotStaff = (mapEntry.first) ? mapEntry.first : staff;
-        int y = dotStaff->GetDrawingY()
+        const int y = dotStaff->GetDrawingY()
             - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (dotStaff->m_drawingLines - 1);
-        int x = dots->GetDrawingX() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        const int x = dots->GetDrawingX() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * offsetFactor;
         for (int loc : mapEntry.second) {
             this->DrawDotsPart(dc, x, y + loc * m_doc->GetDrawingUnit(staff->m_drawingStaffSize), dots->GetDots(),
-                dotStaff, element->GetDrawingCueSize());
+                dotStaff, dots->GetDrawingCueSize());
         }
     }
 
