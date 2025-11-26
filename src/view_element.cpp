@@ -859,7 +859,7 @@ void View::DrawDots(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (dotStaff->m_drawingLines - 1);
         int x = dots->GetDrawingX() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * offsetFactor;
         this->CalcOffset(dc, x, y);
-        
+
         for (int loc : mapEntry.second) {
             this->DrawDotsPart(dc, x, y + loc * m_doc->GetDrawingUnit(staff->m_drawingStaffSize), dots->GetDots(),
                 dotStaff, dots->GetDrawingCueSize());
@@ -1598,7 +1598,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     int y = element->GetDrawingY();
 
     this->CalcOffset(dc, x, y);
-    
+
     char32_t enclosingFront, enclosingBack;
     std::tie(enclosingFront, enclosingBack) = rest->GetEnclosingGlyphs();
 
