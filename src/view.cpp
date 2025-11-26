@@ -218,44 +218,72 @@ void View::CalcOffsetY(DeviceContext *dc, int &y)
     }
 }
 
-void View::CalcOffsetSpanningStartY(DeviceContext *dc, int &y, char spanningType)
+void View::CalcOffsetSpanningStartX(DeviceContext *dc, int &x, char spanningType, double factor)
 {
     if (!dc->ApplyOffset() || m_currentOffsets.empty()) return;
 
     for (Offset &offset : m_currentOffsets) {
         if (spanningType == SPANNING_START_END) {
-            y = y + offset.m_startvo * offset.m_staffSize / 100;
+            x = x + offset.m_startho * offset.m_staffSize / 100 * factor;
         }
         else if (spanningType == SPANNING_START) {
-            y = y + offset.m_startvo * offset.m_staffSize / 100;
-        }
-        else if (spanningType == SPANNING_END) {
-            y = y + (offset.m_startvo + offset.m_endvo) / 2 * offset.m_staffSize / 100;
-        }
-        else {
-            const int diff = (offset.m_startvo - offset.m_endvo) / 2;
-            y = y + ((offset.m_startvo + offset.m_endvo) / 2 + diff) * offset.m_staffSize / 100;
+            x = x + offset.m_startho * offset.m_staffSize / 100 * factor;
         }
     }
 }
 
-void View::CalcOffsetSpanningEndY(DeviceContext *dc, int &y, char spanningType)
+void View::CalcOffsetSpanningEndX(DeviceContext *dc, int &x, char spanningType, double factor)
 {
     if (!dc->ApplyOffset() || m_currentOffsets.empty()) return;
 
     for (Offset &offset : m_currentOffsets) {
         if (spanningType == SPANNING_START_END) {
-            y = y + offset.m_endvo * offset.m_staffSize / 100;
-        }
-        else if (spanningType == SPANNING_START) {
-            y = y + (offset.m_endvo + offset.m_startvo) / 2 * offset.m_staffSize / 100;
+            x = x + offset.m_endho * offset.m_staffSize / 100 * factor;
         }
         else if (spanningType == SPANNING_END) {
-            y = y + offset.m_endvo * offset.m_staffSize / 100;
+            x = x + offset.m_endho * offset.m_staffSize / 100 * factor;
+        }
+    }
+}
+
+void View::CalcOffsetSpanningStartY(DeviceContext *dc, int &y, char spanningType, double factor)
+{
+    if (!dc->ApplyOffset() || m_currentOffsets.empty()) return;
+
+    for (Offset &offset : m_currentOffsets) {
+        if (spanningType == SPANNING_START_END) {
+            y = y + offset.m_startvo * offset.m_staffSize / 100 * factor;
+        }
+        else if (spanningType == SPANNING_START) {
+            y = y + offset.m_startvo * offset.m_staffSize / 100 * factor;
+        }
+        else if (spanningType == SPANNING_END) {
+            y = y + (offset.m_startvo + offset.m_endvo) / 2 * offset.m_staffSize / 100 * factor;
+        }
+        else {
+            const int diff = (offset.m_startvo - offset.m_endvo) / 2;
+            y = y + ((offset.m_startvo + offset.m_endvo) / 2 + diff) * offset.m_staffSize / 100 * factor;
+        }
+    }
+}
+
+void View::CalcOffsetSpanningEndY(DeviceContext *dc, int &y, char spanningType, double factor)
+{
+    if (!dc->ApplyOffset() || m_currentOffsets.empty()) return;
+
+    for (Offset &offset : m_currentOffsets) {
+        if (spanningType == SPANNING_START_END) {
+            y = y + offset.m_endvo * offset.m_staffSize / 100 * factor;
+        }
+        else if (spanningType == SPANNING_START) {
+            y = y + (offset.m_endvo + offset.m_startvo) / 2 * offset.m_staffSize / 100 * factor;
+        }
+        else if (spanningType == SPANNING_END) {
+            y = y + offset.m_endvo * offset.m_staffSize / 100 * factor;
         }
         else {
             const int diff = (offset.m_endvo - offset.m_startvo) / 2;
-            y = y + ((offset.m_startvo + offset.m_endvo) / 2 + diff) * offset.m_staffSize / 100;
+            y = y + ((offset.m_startvo + offset.m_endvo) / 2 + diff) * offset.m_staffSize / 100 * factor;
         }
     }
 }
@@ -264,24 +292,51 @@ void View::CalcOffsetBezier(DeviceContext *dc, Point points[4], char spanningTyp
 {
     if (!dc->ApplyOffset() || m_currentOffsets.empty()) return;
 
+    double diff = double(points[3].x - points[0].x);
+    // factor for start control point
+    double factorStart = (diff != 0.0) ? double(points[3].x - points[1].x) / diff : 1.0;
+    // factor for end control point
+    double factorEnd = (diff != 0.0) ? (points[2].x - points[0].x) / diff : 1.0;
+
+    // Adjust the start point y
+    this->CalcOffsetSpanningStartY(dc, points[0].y, spanningType);
+    // Adjust the start (first) control point y considering both the startho and endho - use opposite factor for endho
+    this->CalcOffsetSpanningStartY(dc, points[1].y, spanningType, factorStart);
+    this->CalcOffsetSpanningEndY(dc, points[1].y, spanningType, abs(1.0 - factorStart));
+    // Adjust the end (second) control point y
+    this->CalcOffsetSpanningStartY(dc, points[2].y, spanningType, abs(1.0 - factorEnd));
+    this->CalcOffsetSpanningEndY(dc, points[2].y, spanningType, factorEnd);
+    // Adjsut the end point y
+    this->CalcOffsetSpanningEndY(dc, points[3].y, spanningType);
+
+    // Adjust the x
+    this->CalcOffsetSpanningStartX(dc, points[0].x, spanningType);
+    this->CalcOffsetSpanningStartX(dc, points[1].x, spanningType, factorStart);
+    this->CalcOffsetSpanningEndX(dc, points[1].x, spanningType, abs(1.0 - factorStart));
+    this->CalcOffsetSpanningStartX(dc, points[2].x, spanningType, abs(1.0 - factorEnd));
+    this->CalcOffsetSpanningEndX(dc, points[2].x, spanningType, factorEnd);
+    this->CalcOffsetSpanningEndX(dc, points[3].x, spanningType);
+
+    // Adjust considering ho and vo
     if (spanningType == SPANNING_START_END) {
         for (int i = 0; i < 4; i++) this->CalcOffset(dc, points[i].x, points[i].y);
     }
-    // Do not apply the offset for system start or end points
-    // End points only
+    // Do not apply the horizontal offset for system start or end points
     else if (spanningType == SPANNING_START) {
+        // Adjust end points (could be improved with a factor for the control point)
         for (int i = 2; i < 4; i++) this->CalcOffset(dc, points[i].x, points[i].y);
         // Vertical offset still does need to be applied
         this->CalcOffsetY(dc, points[0].y);
         this->CalcOffsetY(dc, points[1].y);
     }
-    // Start points only
     else if (spanningType == SPANNING_END) {
+        // Adjust start points
         for (int i = 0; i < 2; i++) this->CalcOffset(dc, points[i].x, points[i].y);
+        // Vertical offset for end points
         this->CalcOffsetY(dc, points[2].y);
         this->CalcOffsetY(dc, points[3].y);
     }
-    // Middle, ony vertical offset
+    // Middle, only vertical offset
     else {
         this->CalcOffsetY(dc, points[0].y);
         this->CalcOffsetY(dc, points[1].y);

@@ -662,8 +662,10 @@ private:
     void CalcOffset(DeviceContext *dc, int &x, int &y);
     void CalcOffsetX(DeviceContext *dc, int &x, OffsetSpanning spanning = OffsetSpanning::None);
     void CalcOffsetY(DeviceContext *dc, int &y);
-    void CalcOffsetSpanningStartY(DeviceContext *dc, int &y, char spanningType);
-    void CalcOffsetSpanningEndY(DeviceContext *dc, int &y, char spanningType);
+    void CalcOffsetSpanningStartX(DeviceContext *dc, int &x, char spanningType, double factor = 1.0);
+    void CalcOffsetSpanningEndX(DeviceContext *dc, int &x, char spanningType, double factor = 1.0);
+    void CalcOffsetSpanningStartY(DeviceContext *dc, int &y, char spanningType, double factor = 1.0);
+    void CalcOffsetSpanningEndY(DeviceContext *dc, int &y, char spanningType, double factor = 1.0);
     void CalcOffsetBezier(DeviceContext *dc, Point points[4], char spanningType);
     ///@}
 
