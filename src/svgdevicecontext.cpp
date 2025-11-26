@@ -487,7 +487,8 @@ void SvgDeviceContext::StartPage()
         std::string css = "g.page-margin{font-family:" + resources->GetTextFont()
             + ",serif;} "
               "g.ending, g.fing, g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
-              "g.mNum{font-style:italic;} g.label{font-weight:normal;} path{stroke:currentColor}";
+              "g.mNum{font-style:italic;} g.label{font-weight:normal;} ellipse, path, polygon, polyline, "
+              "rect{stroke:currentColor} ";
         // bounding box css - for debugging
         // css += " g.bounding-box{stroke:red; stroke-width:10} "
         //        "g.content-bounding-box{stroke:blue; stroke-width:10}";
@@ -679,6 +680,8 @@ void SvgDeviceContext::DrawQuadBezierPath(Point bezier[3])
 
     if (currentPen.GetWidth() > 0) {
         pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
+    }
+    if (currentPen.HasColor() || !this->UseGlobalStyling()) {
         pathChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
     pathChild.append_attribute("stroke-linecap") = "round";
@@ -701,6 +704,8 @@ void SvgDeviceContext::DrawCubicBezierPath(Point bezier[4])
 
     if (currentPen.GetWidth() > 0) {
         pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
+    }
+    if (currentPen.HasColor() || !this->UseGlobalStyling()) {
         pathChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
     pathChild.append_attribute("stroke-linecap") = "round";
@@ -723,6 +728,8 @@ void SvgDeviceContext::DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2
 
     if (currentPen.GetWidth() > 0) {
         pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
+    }
+    if (currentPen.HasColor() || !this->UseGlobalStyling()) {
         pathChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
     pathChild.append_attribute("stroke-linecap") = "round";
@@ -742,6 +749,8 @@ void SvgDeviceContext::DrawBentParallelogramFilled(Point side[4], int height)
 
     if (currentPen.GetWidth() > 0) {
         pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
+    }
+    if (currentPen.HasColor() || !this->UseGlobalStyling()) {
         pathChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
     pathChild.append_attribute("stroke-linecap") = "round";
@@ -775,6 +784,8 @@ void SvgDeviceContext::DrawEllipse(int x, int y, int width, int height)
     }
     if (currentPen.GetWidth() > 0) {
         ellipseChild.append_attribute("stroke-width") = currentPen.GetWidth();
+    }
+    if (currentPen.HasColor() || !this->UseGlobalStyling()) {
         ellipseChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
     if (currentPen.HasOpacity()) {
@@ -842,6 +853,8 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
     }
     if (currentPen.GetWidth() > 0) {
         pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
+    }
+    if (currentPen.HasColor() || !this->UseGlobalStyling()) {
         pathChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
     if (currentPen.HasOpacity()) {
@@ -859,6 +872,8 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 
     if (currentPen.GetWidth() > 0) {
         pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
+    }
+    if (currentPen.HasColor() || !this->UseGlobalStyling()) {
         pathChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
     if (currentPen.HasOpacity()) {
@@ -878,6 +893,8 @@ void SvgDeviceContext::DrawPolyline(int n, Point points[], bool close)
 
     if (currentPen.GetWidth() > 0) {
         polylineChild.append_attribute("stroke-width") = currentPen.GetWidth();
+    }
+    if (currentPen.HasColor() || !this->UseGlobalStyling()) {
         polylineChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
     if (currentPen.HasOpacity()) {
@@ -909,6 +926,8 @@ void SvgDeviceContext::DrawPolygon(int n, Point points[])
 
     if (currentPen.GetWidth() > 0) {
         polygonChild.append_attribute("stroke-width") = currentPen.GetWidth();
+    }
+    if (currentPen.HasColor() || !this->UseGlobalStyling()) {
         polygonChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
     if (currentPen.HasOpacity()) {
@@ -948,6 +967,8 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
 
     if (currentPen.GetWidth() > 0) {
         rectChild.append_attribute("stroke-width") = currentPen.GetWidth();
+    }
+    if (currentPen.HasColor() || !this->UseGlobalStyling()) {
         rectChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
     if (currentPen.HasOpacity()) {
