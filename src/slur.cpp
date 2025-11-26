@@ -40,8 +40,15 @@ namespace vrv {
 
 static const ClassRegistrar<Slur> s_factory("slur", SLUR);
 
-Slur::Slur() : ControlElement(SLUR), TimeSpanningInterface(), AttCurvature(), AttLayerIdent(), AttLineRendBase()
+Slur::Slur()
+    : ControlElement(SLUR)
+    , OffsetSpanningInterface()
+    , TimeSpanningInterface()
+    , AttCurvature()
+    , AttLayerIdent()
+    , AttLineRendBase()
 {
+    this->RegisterInterface(OffsetSpanningInterface::GetAttClasses(), OffsetSpanningInterface::IsInterface());
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_CURVATURE);
     this->RegisterAttClass(ATT_LAYERIDENT);
@@ -51,8 +58,14 @@ Slur::Slur() : ControlElement(SLUR), TimeSpanningInterface(), AttCurvature(), At
 }
 
 Slur::Slur(ClassId classId)
-    : ControlElement(classId), TimeSpanningInterface(), AttCurvature(), AttLayerIdent(), AttLineRendBase()
+    : ControlElement(classId)
+    , OffsetSpanningInterface()
+    , TimeSpanningInterface()
+    , AttCurvature()
+    , AttLayerIdent()
+    , AttLineRendBase()
 {
+    this->RegisterInterface(OffsetSpanningInterface::GetAttClasses(), OffsetSpanningInterface::IsInterface());
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_CURVATURE);
     this->RegisterAttClass(ATT_LAYERIDENT);
@@ -66,6 +79,7 @@ Slur::~Slur() {}
 void Slur::Reset()
 {
     ControlElement::Reset();
+    OffsetSpanningInterface::Reset();
     TimeSpanningInterface::Reset();
     this->ResetCurvature();
     this->ResetLayerIdent();

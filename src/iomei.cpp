@@ -2179,10 +2179,7 @@ void MEIOutput::WriteLv(pugi::xml_node currentNode, Lv *lv)
 {
     assert(lv);
 
-    this->WriteControlElement(currentNode, lv);
-    this->WriteTimeSpanningInterface(currentNode, lv);
-    lv->WriteCurvature(currentNode);
-    lv->WriteLineRendBase(currentNode);
+    this->WriteTie(currentNode, lv);
 }
 
 void MEIOutput::WriteMNum(pugi::xml_node currentNode, MNum *mNum)
@@ -2292,6 +2289,7 @@ void MEIOutput::WriteSlur(pugi::xml_node currentNode, Slur *slur)
     assert(slur);
 
     this->WriteControlElement(currentNode, slur);
+    this->WriteOffsetSpanningInterface(currentNode, slur);
     this->WriteTimeSpanningInterface(currentNode, slur);
     slur->WriteCurvature(currentNode);
     slur->WriteLayerIdent(currentNode);
@@ -2333,6 +2331,7 @@ void MEIOutput::WriteTie(pugi::xml_node currentNode, Tie *tie)
     assert(tie);
 
     this->WriteControlElement(currentNode, tie);
+    this->WriteOffsetSpanningInterface(currentNode, tie);
     this->WriteTimeSpanningInterface(currentNode, tie);
     tie->WriteCurvature(currentNode);
     tie->WriteLineRendBase(currentNode);
@@ -6024,6 +6023,7 @@ bool MEIInput::ReadLv(Object *parent, pugi::xml_node lv)
     Lv *vrvLv = new Lv();
     this->ReadControlElement(lv, vrvLv);
 
+    this->ReadOffsetSpanningInterface(lv, vrvLv);
     this->ReadTimeSpanningInterface(lv, vrvLv);
     vrvLv->ReadCurvature(lv);
     vrvLv->ReadLineRendBase(lv);
@@ -6130,6 +6130,7 @@ bool MEIInput::ReadPhrase(Object *parent, pugi::xml_node phrase)
     Phrase *vrvPhrase = new Phrase();
     this->ReadControlElement(phrase, vrvPhrase);
 
+    this->ReadOffsetSpanningInterface(phrase, vrvPhrase);
     this->ReadTimeSpanningInterface(phrase, vrvPhrase);
     vrvPhrase->ReadCurvature(phrase);
     vrvPhrase->ReadLayerIdent(phrase);
@@ -6188,6 +6189,7 @@ bool MEIInput::ReadSlur(Object *parent, pugi::xml_node slur)
     Slur *vrvSlur = new Slur();
     this->ReadControlElement(slur, vrvSlur);
 
+    this->ReadOffsetSpanningInterface(slur, vrvSlur);
     this->ReadTimeSpanningInterface(slur, vrvSlur);
     vrvSlur->ReadCurvature(slur);
     vrvSlur->ReadLayerIdent(slur);
@@ -6220,6 +6222,7 @@ bool MEIInput::ReadTie(Object *parent, pugi::xml_node tie)
     Tie *vrvTie = new Tie();
     this->ReadControlElement(tie, vrvTie);
 
+    this->ReadOffsetSpanningInterface(tie, vrvTie);
     this->ReadTimeSpanningInterface(tie, vrvTie);
     vrvTie->ReadCurvature(tie);
     vrvTie->ReadLineRendBase(tie);

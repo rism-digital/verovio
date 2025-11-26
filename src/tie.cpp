@@ -34,8 +34,9 @@ namespace vrv {
 
 static const ClassRegistrar<Tie> s_factory("tie", TIE);
 
-Tie::Tie() : ControlElement(TIE), TimeSpanningInterface(), AttCurvature(), AttLineRendBase()
+Tie::Tie() : ControlElement(TIE), OffsetSpanningInterface(), TimeSpanningInterface(), AttCurvature(), AttLineRendBase()
 {
+    this->RegisterInterface(OffsetSpanningInterface::GetAttClasses(), OffsetSpanningInterface::IsInterface());
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_CURVATURE);
     this->RegisterAttClass(ATT_LINERENDBASE);
@@ -43,8 +44,10 @@ Tie::Tie() : ControlElement(TIE), TimeSpanningInterface(), AttCurvature(), AttLi
     this->Reset();
 }
 
-Tie::Tie(ClassId classId) : ControlElement(classId), TimeSpanningInterface(), AttCurvature(), AttLineRendBase()
+Tie::Tie(ClassId classId)
+    : ControlElement(classId), OffsetSpanningInterface(), TimeSpanningInterface(), AttCurvature(), AttLineRendBase()
 {
+    this->RegisterInterface(OffsetSpanningInterface::GetAttClasses(), OffsetSpanningInterface::IsInterface());
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_CURVATURE);
     this->RegisterAttClass(ATT_LINERENDBASE);
@@ -57,6 +60,7 @@ Tie::~Tie() {}
 void Tie::Reset()
 {
     ControlElement::Reset();
+    OffsetSpanningInterface::Reset();
     TimeSpanningInterface::Reset();
     this->ResetCurvature();
     this->ResetLineRendBase();
