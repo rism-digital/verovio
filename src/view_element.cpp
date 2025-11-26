@@ -637,11 +637,14 @@ void View::DrawChordCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff
     }
 
     // Draw dots and stem
+    
+    dc->StartCustomGraphic("dots");
     if (chord->GetDrawingCueSize()) unit *= m_doc->GetOptions()->m_graceFactor.GetValue();
     const int dotsX = x + width + unit;
     this->DrawDotsPart(dc, dotsX, topNote->GetDrawingY(), chord->GetDots(), staff, chord->GetDrawingCueSize());
     if ((y1 - y2) > 5 * unit)
         DrawDotsPart(dc, dotsX, bottomNote->GetDrawingY(), chord->GetDots(), staff, chord->GetDrawingCueSize());
+    dc->EndCustomGraphic();
 
     Stem *stem = vrv_cast<Stem *>(chord->GetFirst(STEM));
     this->DrawStem(dc, stem, layer, staff, measure);
