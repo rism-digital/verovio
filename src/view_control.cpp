@@ -2836,8 +2836,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
         dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
 
         if (enclosingFront) {
-            const int xCorrEncl = trillWidth / 2 + m_doc->GetGlyphWidth(enclosingFront, staffSize, false)
-                + m_doc->GetDrawingUnit(staffSize) / 4;
+            const int xCorrEncl = trillWidth / 2 + m_doc->GetGlyphWidth(enclosingFront, staffSize, false);
             this->DrawSmuflCode(dc, x - xCorrEncl, y + trillHeight / 2, enclosingFront, staffSize, false);
         }
 
@@ -2870,7 +2869,8 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
         }
 
         if (enclosingBack) {
-            const int xCorrEncl = trillWidth / 2 + m_doc->GetDrawingUnit(staffSize) / 4;
+            const int xCorrEncl = trillWidth / 2 + m_doc->GetGlyphWidth(enclosingBack, staffSize, false)
+                - m_doc->GetGlyphAdvX(enclosingBack, staffSize, false);
             this->DrawSmuflCode(dc, x + xCorrEncl, y + trillHeight / 2, enclosingBack, staffSize, false);
         }
 
