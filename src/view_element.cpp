@@ -633,7 +633,9 @@ void View::DrawChordCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff
             accidY = std::min(staffBottom, y2) - unit - m_doc->GetGlyphTop(accidGlyph, staffSize, true);
         }
 
+        dc->StartCustomGraphic("accid");
         this->DrawSmuflCode(dc, accidX, accidY, accidGlyph, staffSize, true, true);
+        dc->EndCustomGraphic();
     }
 
     // Draw dots and stem
