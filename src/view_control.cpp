@@ -737,8 +737,8 @@ void View::DrawHairpin(
         y1 += shiftY;
     }
 
-    int y2 = y1;
     this->CalcOffsetY(dc, y1);
+    int y2 = y1;
     this->CalcOffsetSpanningStartY(dc, y1, spanningType);
     this->CalcOffsetSpanningEndY(dc, y2, spanningType);
 
