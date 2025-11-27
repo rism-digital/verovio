@@ -2912,6 +2912,9 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
     // set norm as default
     int code = turn->GetTurnGlyph();
 
+    char32_t enclosingFront, enclosingBack;
+    std::tie(enclosingFront, enclosingBack) = turn->GetEnclosingGlyphs();
+
     data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
     // center the turn only with @startid
     if (turn->GetStart()->Is(TIMESTAMP_ATTR)) {
@@ -2961,11 +2964,24 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
                 dc, x + accidXShift, accidY, accidStr, HORIZONTALALIGNMENT_center, staffSize / 2, false);
         }
 
+        if (enclosingFront) {
+            int xCorrEncl = m_doc->GetGlyphWidth(enclosingFront, staffSize, false);
+            if (!turn->GetStart()->Is(TIMESTAMP_ATTR)) xCorrEncl += turnWidth /2;
+            this->DrawSmuflCode(dc, x - xCorrEncl, y + turnHeight / 2, enclosingFront, staffSize, false);
+        }
+
         if (symbolDef) {
             this->DrawSymbolDef(dc, turn, symbolDef, x, y, staffSize, false, alignment);
         }
         else {
             this->DrawSmuflString(dc, x, y, str, alignment, staffSize);
+        }
+
+        if (enclosingBack) {
+            int xCorrEncl = turnWidth + m_doc->GetGlyphWidth(enclosingBack, staffSize, false)
+                - m_doc->GetGlyphAdvX(enclosingBack, staffSize, false);
+            if (!turn->GetStart()->Is(TIMESTAMP_ATTR)) xCorrEncl -= turnWidth /2;
+            this->DrawSmuflCode(dc, x + xCorrEncl, y + turnHeight / 2, enclosingBack, staffSize, false);
         }
 
         dc->ResetFont();
