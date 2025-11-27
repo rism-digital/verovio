@@ -174,6 +174,7 @@ Rest::Rest()
     : LayerElement(REST)
     , AltSymInterface()
     , DurationInterface()
+    , OffsetInterface()
     , PositionInterface()
     , AttColor()
     , AttCue()
@@ -184,6 +185,7 @@ Rest::Rest()
 {
     this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
     this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_CUE);
@@ -201,6 +203,7 @@ void Rest::Reset()
     LayerElement::Reset();
     AltSymInterface::Reset();
     DurationInterface::Reset();
+    OffsetInterface::Reset();
     PositionInterface::Reset();
     this->ResetColor();
     this->ResetCue();

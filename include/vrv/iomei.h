@@ -107,6 +107,8 @@ class Neume;
 class Note;
 class Num;
 class Octave;
+class OffsetInterface;
+class OffsetSpanningInterface;
 class Orig;
 class Oriscus;
 class Ornam;
@@ -546,6 +548,8 @@ private:
     void WriteDurationInterface(pugi::xml_node currentNode, DurationInterface *interface);
     void WriteLinkingInterface(pugi::xml_node currentNode, LinkingInterface *interface);
     void WriteFacsimileInterface(pugi::xml_node element, FacsimileInterface *interface);
+    void WriteOffsetInterface(pugi::xml_node currentNode, OffsetInterface *interface);
+    void WriteOffsetSpanningInterface(pugi::xml_node currentNode, OffsetSpanningInterface *interface);
     void WritePitchInterface(pugi::xml_node currentNode, PitchInterface *interface);
     void WritePlistInterface(pugi::xml_node currentNode, PlistInterface *interface);
     void WritePositionInterface(pugi::xml_node currentNode, PositionInterface *interface);
@@ -862,6 +866,8 @@ private:
     bool ReadDurationInterface(pugi::xml_node element, DurationInterface *interface);
     bool ReadLinkingInterface(pugi::xml_node element, LinkingInterface *interface);
     bool ReadFacsimileInterface(pugi::xml_node element, FacsimileInterface *interface);
+    bool ReadOffsetInterface(pugi::xml_node element, OffsetInterface *interface);
+    bool ReadOffsetSpanningInterface(pugi::xml_node element, OffsetSpanningInterface *interface);
     bool ReadPitchInterface(pugi::xml_node element, PitchInterface *interface);
     bool ReadPlistInterface(pugi::xml_node element, PlistInterface *interface);
     bool ReadPositionInterface(pugi::xml_node element, PositionInterface *interface);

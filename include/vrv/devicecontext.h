@@ -253,6 +253,11 @@ public:
     ///@}
 
     /**
+     * Indicate if offset should be applied
+     */
+    virtual bool ApplyOffset() { return false; }
+
+    /**
      * @name Method for starting and ending a graphic
      * For example, the method can be used for grouping shapes in <g></g> in SVG
      */

@@ -338,7 +338,7 @@ protected:
     void DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int horizOffset);
     /** Returns the width of the drawn figures */
     int DrawMeterSigFigures(DeviceContext *dc, int x, int y, MeterSig *meterSig, int den, Staff *staff);
-    void DrawMRptPart(DeviceContext *dc, int xCentered, char32_t smulfCode, int num, bool line, Staff *staff);
+    void DrawMRptPart(DeviceContext *dc, int xCentered, int y, char32_t smulfCode, int num, bool line, Staff *staff);
     ///@}
 
     /**
@@ -641,6 +641,39 @@ private:
      */
     data_STEMDIRECTION GetMensuralStemDir(Layer *layer, Note *note, int verticalCenter);
 
+    /**
+     * Start and end offset calculation for elements with `@vo` or `@ho`.
+     * Offset will be applied only if required by the DeviceContext.
+     * The staff size can be changed when it does for a particular element (e.g., control elements).
+     */
+    ///@{
+    void StartOffset(DeviceContext *dc, const Object *object, int staffSize);
+    void EndOffset(DeviceContext *dc, const Object *object);
+    void SetOffsetStaffSize(const Object *object, int staffSize);
+    ///@}
+
+    /**
+     * Calculate the current offset for a point.
+     * Applies currents offsets recursively (e.g., accid within note).
+     */
+    ///@{
+    void CalcOffset(DeviceContext *dc, int &x, int &y);
+    void CalcOffsetX(DeviceContext *dc, int &x);
+    void CalcOffsetY(DeviceContext *dc, int &y);
+    void CalcOffsetBezier(DeviceContext *dc, Point points[4], char spanningType);
+    ///@}
+
+    /**
+     * Internal class for storing current offset values.
+     */
+    class Offset {
+    public:
+        int m_ho = 0;
+        int m_vo = 0;
+        const Object *m_object = NULL;
+        int m_staffSize = 100;
+    };
+
 public:
     /** Document */
     Doc *m_doc;
@@ -685,6 +718,9 @@ private:
     static thread_local int s_drawingLigX[2], s_drawingLigY[2];
     static thread_local bool s_drawingLigObliqua;
     ///@}
+
+    /** The list of current offset values for the element being drawn */
+    std::list<Offset> m_currentOffsets;
 };
 
 } // namespace vrv

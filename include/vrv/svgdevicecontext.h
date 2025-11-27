@@ -113,6 +113,11 @@ public:
     ///@}
 
     /**
+     * Indicate if offset should be applied
+     */
+    bool ApplyOffset() override { return true; }
+
+    /**
      * @name Method for starting and ending a graphic
      */
     ///@{

@@ -37,6 +37,8 @@ class Functor;
 class ConstFunctor;
 class LinkingInterface;
 class FacsimileInterface;
+class OffsetInterface;
+class OffsetSpanningInterface;
 class PitchInterface;
 class PositionInterface;
 class Resources;
@@ -173,6 +175,10 @@ public:
     virtual const LinkingInterface *GetLinkingInterface() const { return NULL; }
     virtual FacsimileInterface *GetFacsimileInterface() { return NULL; }
     virtual const FacsimileInterface *GetFacsimileInterface() const { return NULL; }
+    virtual OffsetInterface *GetOffsetInterface() { return NULL; }
+    virtual const OffsetInterface *GetOffsetInterface() const { return NULL; }
+    virtual OffsetSpanningInterface *GetOffsetSpanningInterface() { return NULL; }
+    virtual const OffsetSpanningInterface *GetOffsetSpanningInterface() const { return NULL; }
     virtual PitchInterface *GetPitchInterface() { return NULL; }
     virtual const PitchInterface *GetPitchInterface() const { return NULL; }
     virtual PlistInterface *GetPlistInterface() { return NULL; }

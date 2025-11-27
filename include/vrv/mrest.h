@@ -11,6 +11,7 @@
 #include "atts_cmn.h"
 #include "atts_shared.h"
 #include "layerelement.h"
+#include "offsetinterface.h"
 #include "positioninterface.h"
 
 namespace vrv {
@@ -26,6 +27,7 @@ class Staff;
  * This class models the MEI <mRest> element.
  */
 class MRest : public LayerElement,
+              public OffsetInterface,
               public PositionInterface,
               public AttColor,
               public AttCue,
@@ -49,6 +51,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
+    OffsetInterface *GetOffsetInterface() override { return vrv_cast<OffsetInterface *>(this); }
+    const OffsetInterface *GetOffsetInterface() const override { return vrv_cast<const OffsetInterface *>(this); }
     PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
     const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
     ///@}

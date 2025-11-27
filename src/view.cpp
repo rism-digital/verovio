@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "devicecontext.h"
 #include "doc.h"
 #include "page.h"
 #include "vrv.h"
@@ -129,6 +130,92 @@ std::u32string View::IntToSmuflFigures(unsigned short number, int offset)
         c += offset - 48;
     }
     return str;
+}
+
+void View::StartOffset(DeviceContext *dc, const Object *object, int staffSize)
+{
+    if (!dc->ApplyOffset()) return;
+
+    if (!object->HasInterface(INTERFACE_OFFSET)) return;
+
+    const OffsetInterface *interface = object->GetOffsetInterface();
+    assert(interface);
+
+    const int unit = m_doc->GetOptions()->m_unit.GetValue();
+
+    if (!interface->HasHo() && !interface->HasVo()) return;
+    Offset offset;
+    offset.m_ho = (interface->HasHo()) ? interface->GetHo().GetVu() * unit : 0;
+    offset.m_vo = (interface->HasVo()) ? interface->GetVo().GetVu() * unit : 0;
+    offset.m_object = object;
+    offset.m_staffSize = staffSize;
+
+    m_currentOffsets.push_front(offset);
+}
+
+void View::EndOffset(DeviceContext *dc, const Object *object)
+{
+    if (!dc->ApplyOffset() || m_currentOffsets.empty()) return;
+
+    if (m_currentOffsets.front().m_object == object) m_currentOffsets.pop_front();
+}
+
+void View::SetOffsetStaffSize(const Object *object, int staffSize)
+{
+    if (m_currentOffsets.empty()) return;
+
+    if (m_currentOffsets.front().m_object == object) m_currentOffsets.front().m_staffSize = staffSize;
+}
+
+void View::CalcOffset(DeviceContext *dc, int &x, int &y)
+{
+    if (!dc->ApplyOffset() || m_currentOffsets.empty()) return;
+
+    for (Offset &offset : m_currentOffsets) {
+        x = x + offset.m_ho * offset.m_staffSize / 100;
+        y = y + offset.m_vo * offset.m_staffSize / 100;
+    }
+}
+
+void View::CalcOffsetX(DeviceContext *dc, int &x)
+{
+    if (!dc->ApplyOffset() || m_currentOffsets.empty()) return;
+
+    for (Offset &offset : m_currentOffsets) {
+        x = x + offset.m_ho * offset.m_staffSize / 100;
+    }
+}
+
+void View::CalcOffsetY(DeviceContext *dc, int &y)
+{
+    if (!dc->ApplyOffset() || m_currentOffsets.empty()) return;
+
+    for (Offset &offset : m_currentOffsets) {
+        y = y + offset.m_vo * offset.m_staffSize / 100;
+    }
+}
+
+void View::CalcOffsetBezier(DeviceContext *dc, Point points[4], char spanningType)
+{
+    if (!dc->ApplyOffset() || m_currentOffsets.empty()) return;
+
+    if (spanningType == SPANNING_START_END) {
+        for (int i = 0; i < 4; i++) this->CalcOffset(dc, points[i].x, points[i].y);
+    }
+    // Do not apply the offset for system start or end points
+    // End points only
+    else if (spanningType == SPANNING_START) {
+        for (int i = 2; i < 4; i++) this->CalcOffset(dc, points[i].x, points[i].y);
+        // Vertical offset still does need to be applied
+        this->CalcOffsetY(dc, points[0].y);
+        this->CalcOffsetY(dc, points[1].y);
+    }
+    // Start points only
+    else if (spanningType == SPANNING_END) {
+        for (int i = 0; i < 2; i++) this->CalcOffset(dc, points[i].x, points[i].y);
+        this->CalcOffsetY(dc, points[2].y);
+        this->CalcOffsetY(dc, points[3].y);
+    }
 }
 
 } // namespace vrv

@@ -55,6 +55,7 @@ Note::Note()
     , StemmedDrawingInterface()
     , AltSymInterface()
     , DurationInterface()
+    , OffsetInterface()
     , PitchInterface()
     , PositionInterface()
     , AttColor()
@@ -75,6 +76,7 @@ Note::Note()
 {
     this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
     this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
     this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
@@ -104,6 +106,7 @@ void Note::Reset()
     StemmedDrawingInterface::Reset();
     AltSymInterface::Reset();
     DurationInterface::Reset();
+    OffsetInterface::Reset();
     PitchInterface::Reset();
     PositionInterface::Reset();
     this->ResetColor();
