@@ -600,7 +600,7 @@ void View::DrawChordCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff
     Note *bottomNote = chord->GetBottomNote();
 
     const int staffSize = staff->m_drawingStaffSize;
-    int unit = m_doc->GetDrawingUnit(staffSize);
+    const int unit = m_doc->GetDrawingUnit(staffSize);
     const int x = chord->GetDrawingX();
     const int y1 = topNote->GetDrawingY() + unit;
     const int y2 = bottomNote->GetDrawingY() - unit;
@@ -637,13 +637,14 @@ void View::DrawChordCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff
     }
 
     // Draw dots and stem
-    
+
     dc->StartCustomGraphic("dots");
-    if (chord->GetDrawingCueSize()) unit *= m_doc->GetOptions()->m_graceFactor.GetValue();
-    const int dotsX = x + width + unit;
+    const double cueFactor = chord->GetDrawingCueSize() ? m_doc->GetOptions()->m_graceFactor.GetValue() : 1.0;
+    const int dotsX = x + width + unit * cueFactor;
     this->DrawDotsPart(dc, dotsX, topNote->GetDrawingY(), chord->GetDots(), staff, chord->GetDrawingCueSize());
-    if ((y1 - y2) > 5 * unit)
+    if ((y1 - y2) > 5 * unit) {
         DrawDotsPart(dc, dotsX, bottomNote->GetDrawingY(), chord->GetDots(), staff, chord->GetDrawingCueSize());
+    }
     dc->EndCustomGraphic();
 
     Stem *stem = vrv_cast<Stem *>(chord->GetFirst(STEM));
