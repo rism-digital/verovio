@@ -109,4 +109,16 @@ FunctorCode Mordent::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitMordentEnd(this);
 }
 
+std::pair<char32_t, char32_t> Mordent::GetEnclosingGlyphs() const
+{
+    if (this->HasEnclose()) {
+        switch (this->GetEnclose()) {
+            case ENCLOSURE_brack: return { SMUFL_E26C_accidentalBracketLeft, SMUFL_E26D_accidentalBracketRight };
+            case ENCLOSURE_paren: return { SMUFL_E26A_accidentalParensLeft, SMUFL_E26B_accidentalParensRight };
+            default: break;
+        }
+    }
+    return { 0, 0 };
+}
+
 } // namespace vrv

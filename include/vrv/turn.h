@@ -60,6 +60,8 @@ public:
      */
     char32_t GetTurnGlyph() const;
 
+    std::pair<char32_t, char32_t> GetEnclosingGlyphs() const;
+
     /**
      * Get the turn height ignoring slash
      */
