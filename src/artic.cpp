@@ -241,6 +241,7 @@ std::pair<char32_t, char32_t> Artic::GetEnclosingGlyphs() const
             default: return { 0, 0 };
         }
     }
+    return { 0, 0 };
 }
 
 //----------------------------------------------------------------------------
