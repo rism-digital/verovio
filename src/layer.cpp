@@ -578,11 +578,13 @@ void Layer::SetDrawingStaffDefValues(StaffDef *currentStaffDef)
     }
 
     // Don't draw on the next one
-    currentStaffDef->SetDrawClef(false);
-    currentStaffDef->SetDrawKeySig(false);
-    currentStaffDef->SetDrawMensur(false);
-    currentStaffDef->SetDrawMeterSig(false);
-    currentStaffDef->SetDrawMeterSigGrp(false);
+    if (!this->GetFirstAncestor(OSTAFF)) {
+        currentStaffDef->SetDrawClef(false);
+        currentStaffDef->SetDrawKeySig(false);
+        currentStaffDef->SetDrawMensur(false);
+        currentStaffDef->SetDrawMeterSig(false);
+        currentStaffDef->SetDrawMeterSigGrp(false);
+    }
 }
 
 void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
