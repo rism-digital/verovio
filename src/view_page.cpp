@@ -1249,7 +1249,7 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
         this->DrawStaffLines(dc, staff, staffDef, measure, system);
     }
 
-    if (staffDef && (m_doc->GetType() != Facs)) {
+    if (!staff->Is(OSTAFF) && staffDef && (m_doc->GetType() != Facs)) {
         this->DrawStaffDef(dc, staff, measure);
     }
 
