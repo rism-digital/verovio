@@ -149,6 +149,7 @@ const Staff *System::GetTopVisibleStaff() const
 {
     for (auto child : m_systemAligner.GetChildren()) {
         const StaffAlignment *alignment = vrv_cast<const StaffAlignment *>(child);
+        if (alignment->GetStaff()->Is(OSTAFF)) continue;
         if (alignment->GetStaff()) return alignment->GetStaff();
     }
     return NULL;
