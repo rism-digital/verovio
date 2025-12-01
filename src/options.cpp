@@ -1021,10 +1021,6 @@ Options::Options()
     m_evenNoteSpacing.Init(false);
     this->Register(&m_evenNoteSpacing, "evenNoteSpacing", &m_general);
 
-    m_expand.SetInfo("Expand expansion", "Expand all referenced elements in the expansion <xml:id>");
-    m_expand.Init("");
-    this->Register(&m_expand, "expand", &m_general);
-
     m_footer.SetInfo("Footer", "Control footer layout");
     m_footer.Init(FOOTER_auto, &Option::s_footer);
     this->Register(&m_footer, "footer", &m_general);
@@ -1564,7 +1560,7 @@ Options::Options()
 
     /********* selectors *********/
 
-    m_selectors.SetLabel("Element selectors and processing", "3-selectors");
+    m_selectors.SetLabel("Loading selectors and processing", "3-selectors");
     m_selectors.SetCategory(OptionsCategory::Selectors);
     m_grps.push_back(&m_selectors);
 
@@ -1580,6 +1576,10 @@ Options::Options()
         "example: \"./orig\"; by default the first child is selected");
     m_choiceXPathQuery.Init();
     this->Register(&m_choiceXPathQuery, "choiceXPathQuery", &m_selectors);
+
+    m_expand.SetInfo("Expand expansion", "Expand all referenced elements in the expansion <xml:id>");
+    m_expand.Init("");
+    this->Register(&m_expand, "expand", &m_selectors);
 
     m_loadSelectedMdivOnly.SetInfo(
         "Load selected Mdiv only", "Load only the selected mdiv; the content of the other is skipped");
