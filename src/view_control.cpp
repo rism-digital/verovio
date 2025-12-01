@@ -321,17 +321,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         int x2 = drawingX2;
 
         this->SetOffsetStaffSize(element, staffSize);
-
-        if (spanningType == SPANNING_START_END) {
-            this->CalcOffsetX(dc, x1);
-            this->CalcOffsetX(dc, x2);
-        }
-        else if (spanningType == SPANNING_START) {
-            this->CalcOffsetX(dc, x1);
-        }
-        else if (spanningType == SPANNING_END) {
-            this->CalcOffsetX(dc, x2);
-        }
+        this->CalcOffsetSpanningStartX(dc, x1, spanningType);
+        this->CalcOffsetSpanningEndX(dc, x2, spanningType);
 
         // TimeSpanning elements are not necessary floating elements (e.g., syl) - we have a bounding box only for them
         if (element->IsControlElement()) {
@@ -735,8 +726,7 @@ void View::DrawHairpin(
     // Now swap start/end for dim.
     if (form == hairpinLog_FORM_dim) std::swap(startY, endY);
 
-    int y = hairpin->GetDrawingY();
-    this->CalcOffsetY(dc, y);
+    int y1 = hairpin->GetDrawingY();
 
     // Improve alignment with dynamics
     if (hairpin->GetPlace() != STAFFREL_within) {
@@ -744,8 +734,13 @@ void View::DrawHairpin(
         if (hairpin->GetPlace() != STAFFREL_between) {
             shiftY += unit;
         }
-        y += shiftY;
+        y1 += shiftY;
     }
+
+    this->CalcOffsetY(dc, y1);
+    int y2 = y1;
+    this->CalcOffsetSpanningStartY(dc, y1, spanningType);
+    this->CalcOffsetSpanningEndY(dc, y2, spanningType);
 
     /************** draw it **************/
 
@@ -771,28 +766,28 @@ void View::DrawHairpin(
 
     if ((startY == 0) && !niente) {
         Point p[3];
-        p[0] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y - endY / 2) };
-        p[1] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y) };
-        p[2] = { p[0].x, this->ToDeviceContextY(y + endY / 2) };
+        p[0] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y2 - endY / 2) };
+        p[1] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y1) };
+        p[2] = { p[0].x, this->ToDeviceContextY(y2 + endY / 2) };
         dc->DrawPolyline(3, p);
     }
     else if ((endY == 0) && !niente) {
         Point p[3];
-        p[0] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y - startY / 2) };
-        p[1] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y) };
-        p[2] = { p[0].x, this->ToDeviceContextY(y + startY / 2) };
+        p[0] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y1 - startY / 2) };
+        p[1] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y2) };
+        p[2] = { p[0].x, this->ToDeviceContextY(y1 + startY / 2) };
         dc->DrawPolyline(3, p);
     }
     else {
         if (niente) {
             dc->SetBrush(0.0);
             if (startY == 0) {
-                dc->DrawCircle(this->ToDeviceContextX(x1), this->ToDeviceContextY(y), unit / 2);
+                dc->DrawCircle(this->ToDeviceContextX(x1), this->ToDeviceContextY(y1), unit / 2);
                 startY = unit * endY / (x2 - x1) / 2;
                 x1 += unit / 2;
             }
             else if (endY == 0) {
-                dc->DrawCircle(this->ToDeviceContextX(x2), this->ToDeviceContextY(y), unit / 2);
+                dc->DrawCircle(this->ToDeviceContextX(x2), this->ToDeviceContextY(y2), unit / 2);
                 endY = unit * startY / (x2 - x1) / 2;
                 x2 -= unit / 2;
             }
@@ -800,11 +795,11 @@ void View::DrawHairpin(
         }
 
         Point p[2];
-        p[0] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y - startY / 2) };
-        p[1] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y - endY / 2) };
+        p[0] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y1 - startY / 2) };
+        p[1] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y2 - endY / 2) };
         dc->DrawPolyline(2, p);
-        p[0].y = this->ToDeviceContextY(y + startY / 2);
-        p[1].y = this->ToDeviceContextY(y + endY / 2);
+        p[0].y = this->ToDeviceContextY(y1 + startY / 2);
+        p[1].y = this->ToDeviceContextY(y2 + endY / 2);
         dc->DrawPolyline(2, p);
     }
     dc->ResetPen();

@@ -33,12 +33,14 @@ static const ClassRegistrar<Hairpin> s_factory("hairpin", HAIRPIN);
 
 Hairpin::Hairpin()
     : ControlElement(HAIRPIN)
+    , OffsetSpanningInterface()
     , TimeSpanningInterface()
     , AttHairpinLog()
     , AttHairpinVis()
     , AttPlacementRelStaff()
     , AttVerticalGroup()
 {
+    this->RegisterInterface(OffsetSpanningInterface::GetAttClasses(), OffsetSpanningInterface::IsInterface());
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_HAIRPINLOG);
     this->RegisterAttClass(ATT_HAIRPINVIS);
@@ -54,6 +56,7 @@ Hairpin::~Hairpin() {}
 void Hairpin::Reset()
 {
     ControlElement::Reset();
+    OffsetSpanningInterface::Reset();
     TimeSpanningInterface::Reset();
     this->ResetHairpinLog();
     this->ResetHairpinVis();

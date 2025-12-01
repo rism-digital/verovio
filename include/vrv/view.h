@@ -660,6 +660,10 @@ private:
     void CalcOffset(DeviceContext *dc, int &x, int &y);
     void CalcOffsetX(DeviceContext *dc, int &x);
     void CalcOffsetY(DeviceContext *dc, int &y);
+    void CalcOffsetSpanningStartX(DeviceContext *dc, int &x, char spanningType, double factor = 1.0);
+    void CalcOffsetSpanningEndX(DeviceContext *dc, int &x, char spanningType, double factor = 1.0);
+    void CalcOffsetSpanningStartY(DeviceContext *dc, int &y, char spanningType, double factor = 1.0);
+    void CalcOffsetSpanningEndY(DeviceContext *dc, int &y, char spanningType, double factor = 1.0);
     void CalcOffsetBezier(DeviceContext *dc, Point points[4], char spanningType);
     ///@}
 
@@ -670,6 +674,10 @@ private:
     public:
         int m_ho = 0;
         int m_vo = 0;
+        int m_startho = 0;
+        int m_startvo = 0;
+        int m_endho = 0;
+        int m_endvo = 0;
         const Object *m_object = NULL;
         int m_staffSize = 100;
     };
