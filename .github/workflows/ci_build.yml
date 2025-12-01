@@ -133,7 +133,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Register gcc problem matcher
         run: echo "::add-matcher::.github/problem_matchers/gcc.json"
@@ -215,7 +215,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Restore cache
         uses: actions/setup-java@v5.0.0
@@ -305,7 +305,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
@@ -360,7 +360,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
@@ -422,7 +422,7 @@ jobs:
 
     steps:
       - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           # repository to check out
           repository: ${{ env.GH_PAGES_REPO }}
@@ -515,7 +515,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Install doxygen
         run: |
@@ -552,7 +552,7 @@ jobs:
 
     steps:
       - name: Checkout DOXYGEN_REPO into DOXYGEN_DIR
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           # repository to check out
           repository: ${{ env.DOXYGEN_REPO }}
