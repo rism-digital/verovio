@@ -2857,7 +2857,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
             this->DrawSmuflCode(dc, x - xCorrEncl, y + trillHeight / 2, enclosingFront, staffSize, false);
         }
 
-        // Upper and lower accidentals are currently exclusive, but sould both be allowed at the same time.
+        // Upper and lower accidentals are currently exclusive, but should both be allowed at the same time.
         if (trill->HasAccidlower()) {
             int accidXShift = (alignment == HORIZONTALALIGNMENT_center) ? 0 : trillWidth / 2;
             char32_t accid = Accid::GetAccidGlyph(trill->GetAccidlower());
