@@ -500,84 +500,80 @@ void ABCInput::ParseDecoration(const std::string &decorationString)
         LogWarning("ABC import: Fingering not supported", decorationString.c_str());
         return;
     }
-    if (!strcmp(decorationString.c_str(), ".")) {
+    if (decorationString == ".") {
         m_artic.push_back(ARTICULATION_stacc);
     }
-    else if (!strcmp(decorationString.c_str(), "~") || !strcmp(decorationString.c_str(), "roll")) {
+    else if ((decorationString == "~") || (decorationString == "roll")) {
         m_ornam.push_back('S');
     }
-    else if (!strcmp(decorationString.c_str(), "trill") || !strcmp(decorationString.c_str(), "T")) {
+    else if ((decorationString == "trill") || (decorationString == "T")) {
         m_ornam.push_back('T');
     }
-    else if (!strcmp(decorationString.c_str(), "mordent") || !strcmp(decorationString.c_str(), "lowermordent")
-        || !strcmp(decorationString.c_str(), "M")) {
+    else if ((decorationString == "mordent") || (decorationString == "lowermordent") || (decorationString == "M")) {
         m_ornam.push_back('m');
     }
-    else if (!strcmp(decorationString.c_str(), "pralltriller") || !strcmp(decorationString.c_str(), "uppermordent")
-        || !strcmp(decorationString.c_str(), "P")) {
+    else if ((decorationString == "pralltriller") || (decorationString == "uppermordent")
+        || (decorationString == "P")) {
         m_ornam.push_back('M');
     }
-    else if (!strcmp(decorationString.c_str(), "turn")) {
+    else if (decorationString == "turn") {
         m_ornam.push_back('S');
     }
-    else if (!strcmp(decorationString.c_str(), "invertedturn")) {
+    else if (decorationString == "invertedturn") {
         m_ornam.push_back('s');
     }
-    else if (!strcmp(decorationString.c_str(), ">") || !strcmp(decorationString.c_str(), "accent")
-        || !strcmp(decorationString.c_str(), "emphasis")) {
+    else if ((decorationString == ">") || (decorationString == "accent") || (decorationString == "emphasis")) {
         m_artic.push_back(ARTICULATION_acc);
     }
-    else if (!strcmp(decorationString.c_str(), "^") || !strcmp(decorationString.c_str(), "marcato")) {
+    else if ((decorationString == "^") || (decorationString == "marcato")) {
         m_artic.push_back(ARTICULATION_marc);
     }
-    else if (!strcmp(decorationString.c_str(), "fermata") || !strcmp(decorationString.c_str(), "H")) {
+    else if ((decorationString == "fermata") || (decorationString == "H")) {
         m_fermata = STAFFREL_above;
     }
-    else if (!strcmp(decorationString.c_str(), "invertedfermata")) {
+    else if ((decorationString == "invertedfermata")) {
         m_fermata = STAFFREL_below;
     }
-    else if (!strcmp(decorationString.c_str(), "tenuto")) {
+    else if (decorationString == "tenuto") {
         m_artic.push_back(ARTICULATION_ten);
     }
-    else if (!strcmp(decorationString.c_str(), "+") || !strcmp(decorationString.c_str(), "plus")) {
+    else if ((decorationString == "+") || (decorationString == "plus")) {
         m_artic.push_back(ARTICULATION_stop);
     }
-    else if (!strcmp(decorationString.c_str(), "snap")) {
+    else if (decorationString == "snap") {
         m_artic.push_back(ARTICULATION_snap);
     }
-    else if (!strcmp(decorationString.c_str(), "slide")) {
+    else if (decorationString == "slide") {
         m_artic.push_back(ARTICULATION_scoop);
     }
-    else if (!strcmp(decorationString.c_str(), "wedge")) {
+    else if (decorationString == "wedge") {
         m_artic.push_back(ARTICULATION_stacciss);
     }
-    else if (!strcmp(decorationString.c_str(), "upbow") || !strcmp(decorationString.c_str(), "u")) {
+    else if ((decorationString == "upbow") || (decorationString == "u")) {
         m_artic.push_back(ARTICULATION_upbow);
     }
-    else if (!strcmp(decorationString.c_str(), "downbow") || !strcmp(decorationString.c_str(), "v")) {
+    else if ((decorationString == "downbow") || (decorationString == "v")) {
         m_artic.push_back(ARTICULATION_dnbow);
     }
-    else if (!strcmp(decorationString.c_str(), "open")) {
+    else if (decorationString == "open") {
         m_artic.push_back(ARTICULATION_open);
     }
-    else if (!strcmp(decorationString.c_str(), "pppp") || !strcmp(decorationString.c_str(), "ppp")
-        || !strcmp(decorationString.c_str(), "pp") || !strcmp(decorationString.c_str(), "p")
-        || !strcmp(decorationString.c_str(), "mp") || !strcmp(decorationString.c_str(), "mf")
-        || !strcmp(decorationString.c_str(), "f") || !strcmp(decorationString.c_str(), "ff")
-        || !strcmp(decorationString.c_str(), "fff") || !strcmp(decorationString.c_str(), "ffff")
-        || !strcmp(decorationString.c_str(), "sfz")) {
+    else if ((decorationString == "pppp") || (decorationString == "ppp") || (decorationString == "pp")
+        || (decorationString == "p") || (decorationString == "mp") || (decorationString == "mf")
+        || (decorationString == "f") || (decorationString == "ff") || (decorationString == "fff")
+        || (decorationString == "ffff") || (decorationString == "sfz")) {
         m_dynam.push_back(decorationString);
     }
-    else if (!strcmp(decorationString.c_str(), "segno")) {
+    else if (decorationString == "segno") {
         m_repeatMark = repeatMarkLog_FUNC_segno;
     }
-    else if (!strcmp(decorationString.c_str(), "coda")) {
+    else if (decorationString == "coda") {
         m_repeatMark = repeatMarkLog_FUNC_coda;
     }
-    else if (!strcmp(decorationString.c_str(), "D.S.")) {
+    else if (decorationString == "D.S.") {
         m_repeatMark = repeatMarkLog_FUNC_dalSegno;
     }
-    else if (!strcmp(decorationString.c_str(), "D.C.")) {
+    else if (decorationString == "D.C.") {
         m_repeatMark = repeatMarkLog_FUNC_daCapo;
     }
     else {

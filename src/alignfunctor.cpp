@@ -53,6 +53,7 @@ AlignHorizontallyFunctor::AlignHorizontallyFunctor(Doc *doc) : DocFunctor(doc)
     m_isFirstMeasure = false;
     m_hasMultipleLayer = false;
     m_currentParams.equivalence = durationEq.at(m_doc->GetOptions()->m_durationEquivalence.GetValue());
+    m_sectionRestart = false;
 }
 
 FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
@@ -65,7 +66,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
     // We set it to -1.0 for the scoreDef attributes since they have to be aligned before any timestamp event (-1.0)
     m_time = -1;
 
-    m_scoreDefRole = m_isFirstMeasure ? SCOREDEF_SYSTEM : SCOREDEF_INTERMEDIATE;
+    m_scoreDefRole = (m_isFirstMeasure || m_sectionRestart) ? SCOREDEF_SYSTEM : SCOREDEF_INTERMEDIATE;
 
     if (layer->GetStaffDefClef()) {
         if (layer->GetStaffDefClef()->GetVisible() != BOOLEAN_false) {
@@ -415,6 +416,8 @@ FunctorCode AlignHorizontallyFunctor::VisitMeasureEnd(Measure *measure)
     // Next scoreDef will be INTERMEDIATE_SCOREDEF (See VisitLayer)
     m_isFirstMeasure = false;
 
+    m_sectionRestart = false;
+
     if (m_hasMultipleLayer) measure->HasAlignmentRefWithMultipleLayers(true);
 
     // measure->m_measureAligner.LogDebugTree(3);
@@ -425,6 +428,15 @@ FunctorCode AlignHorizontallyFunctor::VisitMeasureEnd(Measure *measure)
 FunctorCode AlignHorizontallyFunctor::VisitMeterSigGrp(MeterSigGrp *meterSigGrp)
 {
     return meterSigGrp->IsScoreDefElement() ? FUNCTOR_STOP : FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignHorizontallyFunctor::VisitSection(Section *section)
+{
+    if (section->GetRestart() == BOOLEAN_true) {
+        m_sectionRestart = true;
+    }
+
+    return FUNCTOR_CONTINUE;
 }
 
 FunctorCode AlignHorizontallyFunctor::VisitStaff(Staff *staff)

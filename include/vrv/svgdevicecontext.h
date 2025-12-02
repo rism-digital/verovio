@@ -113,6 +113,11 @@ public:
     ///@}
 
     /**
+     * Indicate if offset should be applied
+     */
+    bool ApplyOffset() override { return true; }
+
+    /**
      * @name Method for starting and ending a graphic
      */
     ///@{
@@ -210,6 +215,14 @@ public:
      * Setting m_svgBoudingBoxes flag (false by default)
      */
     void SetSvgBoundingBoxes(bool svgBoundingBoxes) { m_svgBoundingBoxes = svgBoundingBoxes; }
+
+    /**
+     * Setting m_svgContentBoundingBoxes flag (false by default)
+     */
+    void SetSvgContentBoundingBoxes(bool svgContentBoundingBoxes)
+    {
+        m_svgContentBoundingBoxes = svgContentBoundingBoxes;
+    }
 
     /**
      * Setting m_svgViewBox flag (false by default)
@@ -383,6 +396,8 @@ private:
     bool m_useLiberation;
     // add bouding boxes in svg output
     bool m_svgBoundingBoxes;
+    // add content bounding boxes in svg output
+    bool m_svgContentBoundingBoxes;
     // use viewbox on svg root element
     bool m_svgViewBox;
     // output HTML5 data-* attributes

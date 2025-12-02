@@ -30,8 +30,9 @@ namespace vrv {
 
 static const ClassRegistrar<HalfmRpt> s_factory("halfmRpt", HALFMRPT);
 
-HalfmRpt::HalfmRpt() : LayerElement(HALFMRPT)
+HalfmRpt::HalfmRpt() : LayerElement(HALFMRPT), OffsetInterface(), AttColor()
 {
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
 
     this->Reset();
@@ -42,6 +43,7 @@ HalfmRpt::~HalfmRpt() {}
 void HalfmRpt::Reset()
 {
     LayerElement::Reset();
+    OffsetInterface::Reset();
     this->ResetColor();
 }
 

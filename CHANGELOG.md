@@ -1,10 +1,28 @@
 # Changelog
 
 ## [unreleased]
+* Support for `@ho` and `@vo` on relevant layer elements and control events
+* Support for `@startho/vo` and `@endho/vo` on `hairpin`, `lv`, `phrase`, `slur` and `tie`
+* Support for `@enclose` on `rest`, `mordent`, `turn`, and `trill` (@rettinghaus)
+* Support for `@cutout` on `mRest` (@rettinghaus)
+* Support for hierarchical expansion structure (@wergo)
+* Support for multiple accidentals with correct ordering (@infojunkie)
+* Fix bug in ellipse rendering and improvements to the SVG attributes
+* Option `--svg-content-bounding-boxes` for bounding boxes on content (@fernandoherreradelasheras)
+* Option `--expand` moved to option group on loading selectors and processing
+
+## [5.6.0] – 2025-09-09
+* Improved layout for editorial accidentals
+* Improved support for `expansion` (@wergo)
+* Improved logging for unmatched time spanning and plist elements (@wergo)
 * Support for repeat marks in ABC importer (@rettinghaus)
 * Fix `pgHead` conversion in MusicXML importer (@rettinghaus)
 * Fix lyric parsing in ABC importer (@rettinghaus)
-
+* Fix chords following grace notes in timemap and MIDI output
+* Fix tempo in timemap and MIDI output
+* Fix note off timings in timemap and MIDI output (@infojunkie)
+* Fix `@metcon` in MusicXML importer (@rettinghaus)
+* Added Python wheel for ubuntu arm64 (@dillon-labami)
 
 ## [5.5.1] – 2025-08-05
 * Fix CocoaPods build

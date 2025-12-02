@@ -1549,11 +1549,15 @@ bool Toolkit::Edit(const std::string &editorAction)
 {
     this->ResetLogBuffer();
 
+    if (!m_editorToolkit) return false;
+
     return m_editorToolkit->ParseEditorAction(editorAction);
 }
 
 std::string Toolkit::EditInfo()
 {
+    if (!m_editorToolkit) return "{}";
+
     return m_editorToolkit->EditInfo();
 }
 
@@ -1759,6 +1763,10 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
     // set the option to use viewbox on svg root
     if (m_options->m_svgBoundingBoxes.GetValue()) {
         svg.SetSvgBoundingBoxes(true);
+    }
+
+    if (m_options->m_svgContentBoundingBoxes.GetValue()) {
+        svg.SetSvgContentBoundingBoxes(true);
     }
 
     // set the additional CSS if any

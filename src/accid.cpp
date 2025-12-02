@@ -30,6 +30,7 @@ static const ClassRegistrar<Accid> s_factory("accid", ACCID);
 
 Accid::Accid()
     : LayerElement(ACCID)
+    , OffsetInterface()
     , PositionInterface()
     , AttAccidental()
     , AttAccidentalGes()
@@ -42,6 +43,7 @@ Accid::Accid()
     , AttPlacementRelEvent()
 {
 
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     this->RegisterAttClass(ATT_ACCIDENTAL);
     this->RegisterAttClass(ATT_ACCIDENTALGES);
@@ -53,14 +55,20 @@ Accid::Accid()
     this->RegisterAttClass(ATT_PLACEMENTONSTAFF);
     this->RegisterAttClass(ATT_PLACEMENTRELEVENT);
 
+    m_floatingObject = NULL;
+
     this->Reset();
 }
 
-Accid::~Accid() {}
+Accid::~Accid()
+{
+    this->ClearFloatingObject();
+}
 
 void Accid::Reset()
 {
     LayerElement::Reset();
+    OffsetInterface::Reset();
     PositionInterface::Reset();
     this->ResetAccidental();
     this->ResetAccidentalGes();
@@ -74,6 +82,23 @@ void Accid::Reset()
 
     m_drawingUnison = NULL;
     m_alignedWithSameLayer = false;
+
+    this->ClearFloatingObject();
+}
+
+void Accid::ClearFloatingObject()
+{
+    if (m_floatingObject) {
+        delete m_floatingObject;
+        m_floatingObject = NULL;
+    }
+}
+
+void Accid::InitFloatingObject()
+{
+    assert(!m_floatingObject);
+    m_floatingObject = new AccidFloatingObject();
+    m_floatingObject->SetParent(this);
 }
 
 std::u32string Accid::GetSymbolStr(data_NOTATIONTYPE notationType) const
@@ -309,6 +334,20 @@ FunctorCode Accid::AcceptEnd(Functor &functor)
 FunctorCode Accid::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitAccidEnd(this);
+}
+
+//----------------------------------------------------------------------------
+// AccidFloatingObject
+//----------------------------------------------------------------------------
+
+AccidFloatingObject::AccidFloatingObject() : FloatingObject(ACCID_FLOATING)
+{
+    this->Reset();
+}
+
+void AccidFloatingObject::Reset()
+{
+    FloatingObject::Reset();
 }
 
 //----------------------------------------------------------------------------

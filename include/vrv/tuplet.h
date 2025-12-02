@@ -53,7 +53,7 @@ public:
     /**
      * Overwritten method for tuplet
      */
-    void AddChild(Object *object) override;
+    bool AddChild(Object *object) override;
 
     /**
      * @name Setter and getter for drawing elements and position

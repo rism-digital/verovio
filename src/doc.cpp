@@ -111,7 +111,20 @@ void Doc::Reset()
     Object::Reset();
     this->ResetID();
 
+    m_header.reset();
+    m_front.reset();
+    m_back.reset();
+
+    this->ResetToSerialization();
+
+    m_isCastOff = false;
+}
+
+void Doc::ResetToSerialization()
+{
     this->ClearSelectionPages();
+
+    this->ClearChildren();
 
     m_type = Raw;
     m_notationType = NOTATIONTYPE_NONE;
@@ -138,7 +151,6 @@ void Doc::Reset()
     m_markup = MARKUP_DEFAULT;
     m_isMensuralMusicOnly = BOOLEAN_NONE;
     m_isNeumeLines = false;
-    m_isCastOff = false;
     m_visibleScores.clear();
     m_focusStatus = FOCUS_UNSET;
 
@@ -147,9 +159,7 @@ void Doc::Reset()
     m_drawingSmuflFontSize = 0;
     m_drawingLyricFontSize = 0;
 
-    m_header.reset();
-    m_front.reset();
-    m_back.reset();
+    m_isCastOff = true;
 }
 
 void Doc::ResetToLoading()
@@ -681,12 +691,13 @@ void Doc::PrepareData()
     }
 
     // Display warning if some elements were not matched
-    const int unmatchedElements = (int)std::count_if(interfaceOwnerPairs.cbegin(), interfaceOwnerPairs.cend(),
-        [](const ListOfSpanningInterOwnerPairs::value_type &entry) {
-            return (entry.first->HasStartid() && entry.first->HasEndid());
-        });
-    if (unmatchedElements > 0) {
-        LogWarning("%d time spanning element(s) with startid and endid could not be matched.", unmatchedElements);
+    for (const auto &pair : interfaceOwnerPairs) {
+        if (pair.first->HasStartid() && pair.first->HasEndid()) {
+            LogWarning(
+                "Time spanning element '%s' with @xml:id '%s', @startid '%s', and @endid '%s' could not be matched.",
+                pair.second->GetClassName().c_str(), pair.second->GetID().c_str(), pair.first->GetStartid().c_str(),
+                pair.first->GetEndid().c_str());
+        }
     }
 
     /************ Resolve @startid (only) ************/
@@ -751,8 +762,9 @@ void Doc::PrepareData()
     }
 
     // If some are still there, then it is probably an issue in the encoding
-    if (!preparePlist.GetInterfaceIDPairs().empty()) {
-        LogWarning("%d element(s) with a @plist could not match the target", preparePlist.GetInterfaceIDPairs().size());
+    for (const auto &pair : preparePlist.GetInterfaceIDPairs()) {
+        LogWarning("Element '%s' with @xml:id '%s' and a @plist could not match the target '%s'.",
+            pair.first->GetClassName().c_str(), pair.first->GetID().c_str(), pair.second.c_str());
     }
 
     /************ Resolve cross staff ************/
@@ -862,9 +874,9 @@ void Doc::PrepareData()
     root->Process(prepareStaffCurrentTimeSpanning);
 
     // Something must be wrong in the encoding because a TimeSpanningInterface was left open
-    if (!prepareStaffCurrentTimeSpanning.GetTimeSpanningElements().empty()) {
-        LogDebug("%d time spanning elements could not be set as running",
-            prepareStaffCurrentTimeSpanning.GetTimeSpanningElements().size());
+    for (const auto &obj : prepareStaffCurrentTimeSpanning.GetTimeSpanningElements()) {
+        LogWarning("Time spanning element '%s' with @xml:id '%s' could not be set as running.",
+            obj->GetClassName().c_str(), obj->GetID().c_str());
     }
 
     /************ Resolve mRpt ************/
@@ -1593,15 +1605,15 @@ void Doc::ExpandExpansions()
     std::string expansionId = this->GetOptions()->m_expand.GetValue();
     if (expansionId.empty()) return;
 
-    Expansion *start = dynamic_cast<Expansion *>(this->FindDescendantByID(expansionId));
-    if (start == NULL) {
+    Expansion *startExpansion = dynamic_cast<Expansion *>(this->FindDescendantByID(expansionId));
+    if (startExpansion == NULL) {
         LogWarning("Expansion ID '%s' not found. Nothing expanded.", expansionId.c_str());
         return;
     }
 
-    xsdAnyURI_List expansionList = start->GetPlist();
-    xsdAnyURI_List existingList;
-    m_expansionMap.Expand(expansionList, existingList, start);
+    xsdAnyURI_List existingList; // list of xml:id strings of elements already in the document
+    xsdAnyURI_List deletionList; // list of xml:id strings of elements not cloned and to be deleted at the end
+    m_expansionMap.Expand(startExpansion, existingList, startExpansion, deletionList, true);
 
     // save original/notated expansion as element in expanded MEI
     // Expansion *originalExpansion = new Expansion();

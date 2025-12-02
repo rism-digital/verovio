@@ -308,7 +308,7 @@ public:
     /**
      * Overwritten method for AlignmentReference children
      */
-    void AddChild(Object *object) override;
+    bool AddChild(Object *object) override;
 
     /**
      * Return true if one of objects overlaps with accidentals from current reference (i.e. if there are accidentals)

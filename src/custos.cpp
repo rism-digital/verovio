@@ -26,8 +26,15 @@ namespace vrv {
 static const ClassRegistrar<Custos> s_factory("custos", CUSTOS);
 
 Custos::Custos()
-    : LayerElement(CUSTOS), PitchInterface(), PositionInterface(), AttColor(), AttExtSymAuth(), AttExtSymNames()
+    : LayerElement(CUSTOS)
+    , OffsetInterface()
+    , PitchInterface()
+    , PositionInterface()
+    , AttColor()
+    , AttExtSymAuth()
+    , AttExtSymNames()
 {
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
     this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
@@ -42,6 +49,7 @@ Custos::~Custos() {}
 void Custos::Reset()
 {
     LayerElement::Reset();
+    OffsetInterface::Reset();
     PitchInterface::Reset();
     PositionInterface::Reset();
     this->ResetColor();

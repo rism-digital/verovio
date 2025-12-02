@@ -826,7 +826,7 @@ bool AlignmentReference::IsSupportedChild(ClassId classId)
     return true;
 }
 
-void AlignmentReference::AddChild(Object *child)
+bool AlignmentReference::AddChild(Object *child)
 {
     LayerElement *childElement = vrv_cast<LayerElement *>(child);
     assert(childElement);
@@ -851,6 +851,8 @@ void AlignmentReference::AddChild(Object *child)
     assert(child->GetParent() && this->IsReferenceObject());
     children.push_back(child);
     this->Modify();
+
+    return true;
 }
 
 bool AlignmentReference::HasAccidVerticalOverlap(const ArrayOfConstObjects &objects) const

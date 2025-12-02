@@ -1021,10 +1021,6 @@ Options::Options()
     m_evenNoteSpacing.Init(false);
     this->Register(&m_evenNoteSpacing, "evenNoteSpacing", &m_general);
 
-    m_expand.SetInfo("Expand expansion", "Expand all referenced elements in the expansion <xml:id>");
-    m_expand.Init("");
-    this->Register(&m_expand, "expand", &m_general);
-
     m_footer.SetInfo("Footer", "Control footer layout");
     m_footer.Init(FOOTER_auto, &Option::s_footer);
     this->Register(&m_footer, "footer", &m_general);
@@ -1159,6 +1155,10 @@ Options::Options()
     m_svgBoundingBoxes.Init(false);
     this->Register(&m_svgBoundingBoxes, "svgBoundingBoxes", &m_general);
 
+    m_svgContentBoundingBoxes.SetInfo("Svg content bounding boxes", "Include content bounding boxes in SVG output");
+    m_svgContentBoundingBoxes.Init(false);
+    this->Register(&m_svgContentBoundingBoxes, "svgContentBoundingBoxes", &m_general);
+
     m_svgCss.SetInfo("SVG additional CSS", "CSS (as a string) to be added to the SVG output");
     m_svgCss.Init("");
     this->Register(&m_svgCss, "svgCss", &m_general);
@@ -1189,7 +1189,7 @@ Options::Options()
     this->Register(&m_svgAdditionalAttribute, "svgAdditionalAttribute", &m_general);
 
     m_unit.SetInfo("Unit", "The MEI unit (1⁄2 of the distance between the staff lines)");
-    m_unit.Init(9.0, 4.5, 12.0, true);
+    m_unit.Init(DEFAULT_UNIT, 4.5, 12.0, true);
     this->Register(&m_unit, "unit", &m_general);
 
     m_useBraceGlyph.SetInfo("Use Brace Glyph", "Use brace glyph from current font");
@@ -1560,7 +1560,7 @@ Options::Options()
 
     /********* selectors *********/
 
-    m_selectors.SetLabel("Element selectors and processing", "3-selectors");
+    m_selectors.SetLabel("Loading selectors and processing", "3-selectors");
     m_selectors.SetCategory(OptionsCategory::Selectors);
     m_grps.push_back(&m_selectors);
 
@@ -1576,6 +1576,10 @@ Options::Options()
         "example: \"./orig\"; by default the first child is selected");
     m_choiceXPathQuery.Init();
     this->Register(&m_choiceXPathQuery, "choiceXPathQuery", &m_selectors);
+
+    m_expand.SetInfo("Expand expansion", "Expand all referenced elements in the expansion <xml:id>");
+    m_expand.Init("");
+    this->Register(&m_expand, "expand", &m_selectors);
 
     m_loadSelectedMdivOnly.SetInfo(
         "Load selected Mdiv only", "Load only the selected mdiv; the content of the other is skipped");
@@ -1816,7 +1820,7 @@ Options::Options()
     m_midi.SetCategory(OptionsCategory::Midi);
     m_grps.push_back(&m_midi);
 
-    m_midiNoCue.SetInfo("MIDI playback of cue notes", "Skip cue notes in MIDI output");
+    m_midiNoCue.SetInfo("MIDI playback without cue notes", "Skip cue notes in MIDI output");
     m_midiNoCue.Init(false);
     this->Register(&m_midiNoCue, "midiNoCue", &m_midi);
 

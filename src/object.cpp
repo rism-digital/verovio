@@ -758,6 +758,18 @@ const Object *Object::GetChild(int idx, const ClassId classId) const
     return *it;
 }
 
+// Find the direct child of the parent that is ancestor of the descendant
+Object *Object::GetDirectChild(Object *parent, Object *descendant)
+{
+    if (!parent->HasDescendant(descendant)) {
+        return NULL;
+    }
+    while (descendant != NULL && descendant->GetParent() != parent) {
+        descendant = descendant->GetParent();
+    }
+    return descendant;
+}
+
 ArrayOfConstObjects Object::GetChildren() const
 {
     return ArrayOfConstObjects(m_children.begin(), m_children.end());
@@ -824,11 +836,11 @@ bool Object::IsSupportedChild(ClassId classId)
     return false;
 }
 
-void Object::AddChild(Object *child)
+bool Object::AddChild(Object *child)
 {
     if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        return;
+        return false;
     }
 
     if (!this->IsReferenceObject()) {
@@ -850,6 +862,8 @@ void Object::AddChild(Object *child)
         m_children.insert(m_children.begin() + i, child);
     }
     this->Modify();
+
+    return true;
 }
 
 int Object::GetInsertOrderForIn(ClassId classId, const std::vector<ClassId> &order) const

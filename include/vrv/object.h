@@ -14,6 +14,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <unordered_set>
 
 //----------------------------------------------------------------------------
 
@@ -36,6 +37,8 @@ class Functor;
 class ConstFunctor;
 class LinkingInterface;
 class FacsimileInterface;
+class OffsetInterface;
+class OffsetSpanningInterface;
 class PitchInterface;
 class PositionInterface;
 class Resources;
@@ -172,6 +175,10 @@ public:
     virtual const LinkingInterface *GetLinkingInterface() const { return NULL; }
     virtual FacsimileInterface *GetFacsimileInterface() { return NULL; }
     virtual const FacsimileInterface *GetFacsimileInterface() const { return NULL; }
+    virtual OffsetInterface *GetOffsetInterface() { return NULL; }
+    virtual const OffsetInterface *GetOffsetInterface() const { return NULL; }
+    virtual OffsetSpanningInterface *GetOffsetSpanningInterface() { return NULL; }
+    virtual const OffsetSpanningInterface *GetOffsetSpanningInterface() const { return NULL; }
     virtual PitchInterface *GetPitchInterface() { return NULL; }
     virtual const PitchInterface *GetPitchInterface() const { return NULL; }
     virtual PlistInterface *GetPlistInterface() { return NULL; }
@@ -312,6 +319,14 @@ public:
     ///@}
 
     /**
+     * Return reference to the object that is the ancestor of the indicated
+     * descendant object and that is a direct child of the indicated
+     * parent object.  If descendant is itself a direct child of parent,
+     * it returns descendant.
+     */
+    Object *GetDirectChild(Object *parent, Object *descendant);
+
+    /**
      * Return the children as const reference or copy
      */
     ///@{
@@ -406,7 +421,7 @@ public:
      * Base method for adding children.
      * The method can be overridden.
      */
-    virtual void AddChild(Object *object);
+    virtual bool AddChild(Object *object);
 
     /**
      * Additional check when adding a child.

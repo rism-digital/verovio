@@ -12,6 +12,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "expansion.h"
 #include "options.h"
 
 namespace vrv {
@@ -41,7 +42,8 @@ public:
     /**
      * Expand expansion recursively
      */
-    void Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &existingList, Object *prevSection);
+    Object *Expand(Expansion *expansion, xsdAnyURI_List &existingList, Object *prevSection,
+        xsdAnyURI_List &deletionList, bool deleteList);
 
     std::vector<std::string> GetExpansionIDsForElement(const std::string &xmlId);
 

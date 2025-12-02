@@ -1505,6 +1505,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
 
 void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *parent)
 {
+    const bool invisible = HasAttributeWithValue(time, "print-object", "no");
     if ((time.select_nodes("beats").size() > 1) || time.select_node("interchangeable")) {
         MeterSigGrp *meterSigGrp = new MeterSigGrp();
         if (time.attribute("id")) {
@@ -1516,6 +1517,9 @@ void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *par
         std::tie(m_meterCount, m_meterUnit) = this->GetMeterSigGrpValues(time, meterSigGrp);
         if (interchangeable) {
             std::tie(std::ignore, std::ignore) = this->GetMeterSigGrpValues(interchangeable.node(), meterSigGrp);
+        }
+        if (invisible) {
+            meterSigGrp->SetVisible(BOOLEAN_false);
         }
         parent->AddChild(meterSigGrp);
     }
@@ -1552,6 +1556,9 @@ void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *par
             else {
                 meterSig->SetVisible(BOOLEAN_false);
             }
+        }
+        if (invisible) {
+            meterSig->SetVisible(BOOLEAN_false);
         }
         parent->AddChild(meterSig);
     }
@@ -1722,9 +1729,10 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     }
 
     // set metcon to false for pickup measures
-    int endDuration = m_ppq;
-    for (const int &num : m_meterCount) endDuration *= num;
-    if (m_durTotal && m_durTotal != endDuration) {
+    int measureTotal = m_ppq * 4;
+    for (const int &num : m_meterCount) measureTotal *= num;
+    measureTotal /= m_meterUnit;
+    if (m_durTotal && m_durTotal != measureTotal) {
         measure->SetMetcon(BOOLEAN_false);
     }
 
@@ -2076,7 +2084,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             }
         }
         else if (std::strncmp(dashes.node().name(), "dashes", 6) == 0) {
-            ControlElement *controlElement = nullptr;
+            ControlElement *controlElement = NULL;
             // find last ControlElement of type dynam or dir and activate extender
             // this is bad MusicXML and shouldn't happen
             std::vector<std::pair<std::string, ControlElement *>>::reverse_iterator riter;
@@ -2104,7 +2112,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
                     }
                 }
             }
-            if (controlElement != nullptr) {
+            if (controlElement) {
                 musicxml::OpenDashes openDashes(dashesNumber, staffNum, m_measureCounts.at(measure));
                 m_openDashesStack.push_back({ controlElement, openDashes });
             }
@@ -2747,7 +2755,6 @@ void MusicXmlInput::ReadMusicXmlNote(
     if (m_ppq < 0 && duration && !typeStr.empty()) {
         // if divisions are missing, try to calculate
         m_ppq = (double)duration * pow(2, ConvertTypeToDur(typeStr) - 2) / 4;
-        m_durTotal += duration;
     }
 
     if (rest) {

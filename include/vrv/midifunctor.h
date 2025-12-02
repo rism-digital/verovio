@@ -237,8 +237,8 @@ private:
     /**
      * Set the start (and stop) time for a note (score and real times)
      */
-    void SetNoteStartStop(Note *note, const Fraction &startTime, const Fraction &stopTime);
-    void SetNoteStart(Note *note, const Fraction &startTime);
+    void SetNoteOrChordStartStop(Note *note, const Fraction &startTime, const Fraction &stopTime = VRV_UNSET);
+    void SetNoteStartStop(Note *note, const Fraction &startTime, const Fraction &stopTime = VRV_UNSET);
 
 public:
     //

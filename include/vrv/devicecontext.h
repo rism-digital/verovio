@@ -147,7 +147,7 @@ public:
     ///@{
     void SetBrush(float opacity, int color = COLOR_NONE);
     void SetPen(int width, PenStyle style, int dashLength = 0, int gapLength = 0,
-        LineCapStyle lineCap = LINECAP_DEFAULT, LineJoinStyle lineJoin = LINEJOIN_DEFAULT, float opacity = 1.0,
+        LineCapStyle lineCap = LINECAP_DEFAULT, LineJoinStyle lineJoin = LINEJOIN_DEFAULT, float opacity = -1.0,
         int color = COLOR_NONE);
     void SetFont(FontInfo *font);
     void SetPushBack() { m_pushBack = true; }
@@ -251,6 +251,11 @@ public:
     void DeactivateGraphicY();
     void ReactivateGraphic();
     ///@}
+
+    /**
+     * Indicate if offset should be applied
+     */
+    virtual bool ApplyOffset() { return false; }
 
     /**
      * @name Method for starting and ending a graphic

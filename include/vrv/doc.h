@@ -48,6 +48,7 @@ public:
     ///@{
     Doc();
     virtual ~Doc();
+    std::string GetClassName() const override { return "body"; }
     ///@}
 
     /**
@@ -61,7 +62,12 @@ public:
     void Reset() override;
 
     /**
-     *
+     * Reset the document for loading a serialization
+     */
+    void ResetToSerialization();
+
+    /**
+     * Reset to the loading state (unset the scoreDef)
      */
     void ResetToLoading();
 
