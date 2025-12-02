@@ -2370,6 +2370,9 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
     // set mordent glyph
     const int code = mordent->GetMordentGlyph();
 
+    char32_t enclosingFront, enclosingBack;
+    std::tie(enclosingFront, enclosingBack) = mordent->GetEnclosingGlyphs();
+
     std::u32string str;
     str.push_back(code);
 
@@ -2474,11 +2477,25 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
             this->DrawSmuflString(dc, accidX, accidY, accidStr, HORIZONTALALIGNMENT_center, staffSize / 2, false);
         }
 
+        // hardcoded vertical offset because of the slash
+        const int yCorrEncl = m_doc->GetGlyphHeight(SMUFL_E56C_ornamentShortTrill, staffSize, false) / 2;
+
+        if (enclosingFront) {
+            const int xCorrEncl = m_doc->GetGlyphWidth(enclosingFront, staffSize, false);
+            this->DrawSmuflCode(dc, x - xCorrEncl, y + yCorrEncl, enclosingFront, staffSize, false);
+        }
+
         if (symbolDef) {
             this->DrawSymbolDef(dc, mordent, symbolDef, x, y, staffSize, false);
         }
         else {
             this->DrawSmuflString(dc, x, y, str, HORIZONTALALIGNMENT_left, staffSize);
+        }
+
+        if (enclosingBack) {
+            const int xCorrEncl = mordentWidth + m_doc->GetGlyphWidth(enclosingBack, staffSize, false)
+                - m_doc->GetGlyphAdvX(enclosingBack, staffSize, false);
+            this->DrawSmuflCode(dc, x + xCorrEncl, y + yCorrEncl, enclosingBack, staffSize, false);
         }
 
         dc->ResetFont();
@@ -2836,12 +2853,11 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
         dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
 
         if (enclosingFront) {
-            const int xCorrEncl = trillWidth / 2 + m_doc->GetGlyphWidth(enclosingFront, staffSize, false)
-                + m_doc->GetDrawingUnit(staffSize) / 4;
+            const int xCorrEncl = trillWidth / 2 + m_doc->GetGlyphWidth(enclosingFront, staffSize, false);
             this->DrawSmuflCode(dc, x - xCorrEncl, y + trillHeight / 2, enclosingFront, staffSize, false);
         }
 
-        // Upper and lower accidentals are currently exclusive, but sould both be allowed at the same time.
+        // Upper and lower accidentals are currently exclusive, but should both be allowed at the same time.
         if (trill->HasAccidlower()) {
             int accidXShift = (alignment == HORIZONTALALIGNMENT_center) ? 0 : trillWidth / 2;
             char32_t accid = Accid::GetAccidGlyph(trill->GetAccidlower());
@@ -2870,7 +2886,8 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
         }
 
         if (enclosingBack) {
-            const int xCorrEncl = trillWidth / 2 + m_doc->GetDrawingUnit(staffSize) / 4;
+            const int xCorrEncl = trillWidth / 2 + m_doc->GetGlyphWidth(enclosingBack, staffSize, false)
+                - m_doc->GetGlyphAdvX(enclosingBack, staffSize, false);
             this->DrawSmuflCode(dc, x + xCorrEncl, y + trillHeight / 2, enclosingBack, staffSize, false);
         }
 
@@ -2911,6 +2928,9 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
 
     // set norm as default
     int code = turn->GetTurnGlyph();
+
+    char32_t enclosingFront, enclosingBack;
+    std::tie(enclosingFront, enclosingBack) = turn->GetEnclosingGlyphs();
 
     data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
     // center the turn only with @startid
@@ -2961,11 +2981,24 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
                 dc, x + accidXShift, accidY, accidStr, HORIZONTALALIGNMENT_center, staffSize / 2, false);
         }
 
+        if (enclosingFront) {
+            int xCorrEncl = m_doc->GetGlyphWidth(enclosingFront, staffSize, false);
+            if (!turn->GetStart()->Is(TIMESTAMP_ATTR)) xCorrEncl += turnWidth / 2;
+            this->DrawSmuflCode(dc, x - xCorrEncl, y + turnHeight / 2, enclosingFront, staffSize, false);
+        }
+
         if (symbolDef) {
             this->DrawSymbolDef(dc, turn, symbolDef, x, y, staffSize, false, alignment);
         }
         else {
             this->DrawSmuflString(dc, x, y, str, alignment, staffSize);
+        }
+
+        if (enclosingBack) {
+            int xCorrEncl = turnWidth + m_doc->GetGlyphWidth(enclosingBack, staffSize, false)
+                - m_doc->GetGlyphAdvX(enclosingBack, staffSize, false);
+            if (!turn->GetStart()->Is(TIMESTAMP_ATTR)) xCorrEncl -= turnWidth / 2;
+            this->DrawSmuflCode(dc, x + xCorrEncl, y + turnHeight / 2, enclosingBack, staffSize, false);
         }
 
         dc->ResetFont();

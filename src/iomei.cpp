@@ -2202,6 +2202,7 @@ void MEIOutput::WriteMordent(pugi::xml_node currentNode, Mordent *mordent)
 
     this->WriteControlElement(currentNode, mordent);
     this->WriteTimePointInterface(currentNode, mordent);
+    mordent->WriteEnclosingChars(currentNode);
     mordent->WriteExtSymAuth(currentNode);
     mordent->WriteExtSymNames(currentNode);
     mordent->WriteOrnamentAccid(currentNode);
@@ -2359,6 +2360,7 @@ void MEIOutput::WriteTurn(pugi::xml_node currentNode, Turn *turn)
 
     this->WriteControlElement(currentNode, turn);
     this->WriteTimePointInterface(currentNode, turn);
+    turn->WriteEnclosingChars(currentNode);
     turn->WriteExtSymAuth(currentNode);
     turn->WriteExtSymNames(currentNode);
     turn->WriteOrnamentAccid(currentNode);
@@ -6066,6 +6068,7 @@ bool MEIInput::ReadMordent(Object *parent, pugi::xml_node mordent)
     }
 
     this->ReadTimePointInterface(mordent, vrvMordent);
+    vrvMordent->ReadEnclosingChars(mordent);
     vrvMordent->ReadExtSymAuth(mordent);
     vrvMordent->ReadExtSymNames(mordent);
     vrvMordent->ReadOrnamentAccid(mordent);
@@ -6263,6 +6266,7 @@ bool MEIInput::ReadTurn(Object *parent, pugi::xml_node turn)
     }
 
     this->ReadTimePointInterface(turn, vrvTurn);
+    vrvTurn->ReadEnclosingChars(turn);
     vrvTurn->ReadExtSymAuth(turn);
     vrvTurn->ReadExtSymNames(turn);
     vrvTurn->ReadOrnamentAccid(turn);
