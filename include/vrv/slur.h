@@ -9,6 +9,7 @@
 #define __VRV_SLUR_H__
 
 #include "controlelement.h"
+#include "offsetinterface.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -51,6 +52,7 @@ enum class PortatoSlurType { None, StemSide, Centered };
 //----------------------------------------------------------------------------
 
 class Slur : public ControlElement,
+             public OffsetSpanningInterface,
              public TimeSpanningInterface,
              public AttCurvature,
              public AttLayerIdent,
@@ -73,6 +75,11 @@ public:
      * @name Getter to interfaces
      */
     ///@{
+    OffsetSpanningInterface *GetOffsetSpanningInterface() override { return vrv_cast<OffsetSpanningInterface *>(this); }
+    const OffsetSpanningInterface *GetOffsetSpanningInterface() const override
+    {
+        return vrv_cast<const OffsetSpanningInterface *>(this);
+    }
     TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
     const TimePointInterface *GetTimePointInterface() const override
     {

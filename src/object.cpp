@@ -758,6 +758,18 @@ const Object *Object::GetChild(int idx, const ClassId classId) const
     return *it;
 }
 
+// Find the direct child of the parent that is ancestor of the descendant
+Object *Object::GetDirectChild(Object *parent, Object *descendant)
+{
+    if (!parent->HasDescendant(descendant)) {
+        return NULL;
+    }
+    while (descendant != NULL && descendant->GetParent() != parent) {
+        descendant = descendant->GetParent();
+    }
+    return descendant;
+}
+
 ArrayOfConstObjects Object::GetChildren() const
 {
     return ArrayOfConstObjects(m_children.begin(), m_children.end());

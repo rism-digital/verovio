@@ -467,7 +467,8 @@ FunctorCode ScoreDefOptimizeFunctor::VisitSystem(System *system)
     }
 
     m_currentScoreDef = system->GetDrawingScoreDef();
-    assert(m_currentScoreDef);
+
+    if (!m_currentScoreDef) return FUNCTOR_SIBLINGS;
 
     return FUNCTOR_CONTINUE;
 }

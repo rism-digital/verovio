@@ -42,8 +42,8 @@ public:
     /**
      * Expand expansion recursively
      */
-    void Expand(Expansion *expansion, xsdAnyURI_List &existingList, Object *prevSection, xsdAnyURI_List &deletionList,
-        bool deleteList);
+    Object *Expand(Expansion *expansion, xsdAnyURI_List &existingList, Object *prevSection,
+        xsdAnyURI_List &deletionList, bool deleteList);
 
     std::vector<std::string> GetExpansionIDsForElement(const std::string &xmlId);
 

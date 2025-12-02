@@ -39,7 +39,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 5
-#define VERSION_MINOR 6
+#define VERSION_MINOR 7
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV false
@@ -296,6 +296,8 @@ enum InterfaceId {
     INTERFACE_DURATION,
     INTERFACE_LINKING,
     INTERFACE_FACSIMILE,
+    INTERFACE_OFFSET,
+    INTERFACE_OFFSET_SPANNING,
     INTERFACE_PITCH,
     INTERFACE_PLIST,
     INTERFACE_POSITION,
@@ -442,6 +444,8 @@ typedef std::map<int, LayerN_VerserN_t> StaffN_LayerN_VerseN_t;
 
 #define DEFINITION_FACTOR 10
 
+#define DEFAULT_UNIT 9.0
+
 #define isIn(x, a, b) (((x) >= std::min((a), (b))) && ((x) <= std::max((a), (b))))
 
 /**
@@ -585,6 +589,12 @@ enum { SPANNING_START_END = 0, SPANNING_START, SPANNING_END, SPANNING_MIDDLE };
  */
 
 enum ElementScoreDefRole { SCOREDEF_NONE = 0, SCOREDEF_SYSTEM, SCOREDEF_INTERMEDIATE, SCOREDEF_CAUTIONARY };
+
+//----------------------------------------------------------------------------
+// ScoreDef drawing labels
+//----------------------------------------------------------------------------
+
+enum ScoreDefDrawingLabels { DRAWING_LABEL_FULL = 0, DRAWING_LABEL_ABBR, DRAWING_LABEL_NONE };
 
 //----------------------------------------------------------------------------
 // Artic types

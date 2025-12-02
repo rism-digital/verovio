@@ -174,18 +174,22 @@ Rest::Rest()
     : LayerElement(REST)
     , AltSymInterface()
     , DurationInterface()
+    , OffsetInterface()
     , PositionInterface()
     , AttColor()
     , AttCue()
+    , AttEnclosingChars()
     , AttExtSymAuth()
     , AttExtSymNames()
     , AttRestVisMensural()
 {
     this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
     this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_CUE);
+    this->RegisterAttClass(ATT_ENCLOSINGCHARS);
     this->RegisterAttClass(ATT_EXTSYMAUTH);
     this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_RESTVISMENSURAL);
@@ -199,9 +203,11 @@ void Rest::Reset()
     LayerElement::Reset();
     AltSymInterface::Reset();
     DurationInterface::Reset();
+    OffsetInterface::Reset();
     PositionInterface::Reset();
     this->ResetColor();
     this->ResetCue();
+    this->ResetEnclosingChars();
     this->ResetExtSymAuth();
     this->ResetExtSymNames();
     this->ResetRestVisMensural();
@@ -317,6 +323,18 @@ char32_t Rest::GetRestGlyph(const data_DURATION duration) const
     }
 
     return 0;
+}
+
+std::pair<char32_t, char32_t> Rest::GetEnclosingGlyphs() const
+{
+    if (this->HasEnclose()) {
+        switch (this->GetEnclose()) {
+            case ENCLOSURE_brack: return { SMUFL_E26C_accidentalBracketLeft, SMUFL_E26D_accidentalBracketRight }; break;
+            case ENCLOSURE_paren: return { SMUFL_E26A_accidentalParensLeft, SMUFL_E26B_accidentalParensRight }; break;
+            default: break;
+        }
+    }
+    return { 0, 0 };
 }
 
 void Rest::UpdateFromTransLoc(const TransPitch &tp)

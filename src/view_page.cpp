@@ -41,6 +41,7 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "mnum.h"
+#include "mrest.h"
 #include "note.h"
 #include "options.h"
 #include "page.h"
@@ -241,7 +242,9 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
         static const std::set<ClassId> timeSpanningClasses = { ANNOTSCORE, BEAMSPAN, BRACKETSPAN, DIR, DYNAM, FIGURE,
             GLISS, HAIRPIN, LV, OCTAVE, ORNAM, PEDAL, PHRASE, PITCHINFLECTION, SLUR, SYL, TEMPO, TIE, TRILL };
         if (object->Is(classId) && timeSpanningClasses.contains(classId)) {
+            this->StartOffset(dc, object, 100);
             this->DrawTimeSpanningElement(dc, object, system);
+            this->EndOffset(dc, object);
         }
         if (object->Is(classId) && (classId == ENDING)) {
             // cast to Ending check in DrawEnding
@@ -251,7 +254,7 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
 }
 
 void View::DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, BarLine *barLine,
-    bool isLastMeasure, bool isLastSystem)
+    bool isLastMeasure, bool isLastSystem, bool noLabels)
 {
     assert(dc);
     assert(scoreDef);
@@ -265,7 +268,9 @@ void View::DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure,
 
     if (barLine == NULL) {
         // Draw the first staffGrp and from there its children recursively
-        this->DrawStaffGrp(dc, measure, staffGrp, x, true, !scoreDef->DrawLabels());
+        ScoreDefDrawingLabels drawingLabels = (scoreDef->DrawLabels()) ? DRAWING_LABEL_FULL : DRAWING_LABEL_ABBR;
+        if (noLabels) drawingLabels = DRAWING_LABEL_NONE;
+        this->DrawStaffGrp(dc, measure, staffGrp, x, true, drawingLabels);
     }
     else {
         dc->StartGraphic(barLine, "", barLine->GetID());
@@ -277,8 +282,8 @@ void View::DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure,
     return;
 }
 
-void View::DrawStaffGrp(
-    DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool topStaffGrp, bool abbreviations)
+void View::DrawStaffGrp(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool topStaffGrp,
+    ScoreDefDrawingLabels drawingLabels)
 {
     assert(dc);
     assert(measure);
@@ -336,17 +341,20 @@ void View::DrawStaffGrp(
     for (int i = 0; i < staffGrp->GetChildCount(); ++i) {
         childStaffGrp = dynamic_cast<StaffGrp *>(staffGrp->GetChild(i));
         if (childStaffGrp) {
-            this->DrawStaffGrp(dc, measure, childStaffGrp, x, false, abbreviations);
+            this->DrawStaffGrp(dc, measure, childStaffGrp, x, false, drawingLabels);
         }
     }
 
-    // DrawStaffGrpLabel
-    const int space = m_doc->GetDrawingDoubleUnit(staffGrp->GetMaxStaffSize());
-    const int xLabel = x - space;
-    const int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
-    this->DrawLabels(dc, scoreDef, staffGrp, xLabel, yLabel, abbreviations, 100, 2 * space + grpSymSpace);
+    if (drawingLabels != DRAWING_LABEL_NONE) {
+        bool abbreviations = (drawingLabels == DRAWING_LABEL_ABBR);
+        // DrawStaffGrpLabel
+        const int space = m_doc->GetDrawingDoubleUnit(staffGrp->GetMaxStaffSize());
+        const int xLabel = x - space;
+        const int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
+        this->DrawLabels(dc, scoreDef, staffGrp, xLabel, yLabel, abbreviations, 100, 2 * space + grpSymSpace);
 
-    this->DrawStaffDefLabels(dc, measure, staffGrp, x, abbreviations);
+        this->DrawStaffDefLabels(dc, measure, staffGrp, x, abbreviations);
+    }
 }
 
 void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool abbreviations)
@@ -1191,7 +1199,10 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
         staff->SetFromFacsimile(m_doc);
     }
 
-    this->DrawStaffLines(dc, staff, staffDef, measure, system);
+    MRest *mrest = vrv_cast<MRest *>(staff->FindDescendantByType(MREST));
+    if (!mrest || mrest->GetCutout() != cutout_CUTOUT_cutout) {
+        this->DrawStaffLines(dc, staff, staffDef, measure, system);
+    }
 
     if (staffDef && (m_doc->GetType() != Facs)) {
         this->DrawStaffDef(dc, staff, measure);
@@ -1605,7 +1616,16 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
 
             Measure *nextMeasure = vrv_cast<Measure *>(system->GetNext(scoreDef, MEASURE));
             if (nextMeasure && scoreDef->DrawLabels()) {
-                this->DrawScoreDef(dc, scoreDef, nextMeasure, nextMeasure->GetDrawingX());
+                ScoreDef *scoreDefToDraw = scoreDef;
+                bool noLabels = false;
+                // If we have an emprty scoreDef after a section with `@restart="true"`
+                // still draw the staffGrp symbols (braces, bracket) but no labels - use the system scoreDef for that
+                if (scoreDef->GetChildCount() == 0) {
+                    scoreDefToDraw = system->GetDrawingScoreDef();
+                    noLabels = true;
+                }
+                this->DrawScoreDef(
+                    dc, scoreDefToDraw, nextMeasure, nextMeasure->GetDrawingX(), NULL, false, false, noLabels);
             }
 
             this->SetScoreDefDrawingWidth(dc, scoreDef);

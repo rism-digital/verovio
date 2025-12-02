@@ -50,6 +50,7 @@ SvgDeviceContext::SvgDeviceContext(const std::string &docId) : DeviceContext(SVG
 
     m_mmOutput = false;
     m_svgBoundingBoxes = false;
+    m_svgContentBoundingBoxes = false;
     m_svgViewBox = false;
     m_html5 = false;
     m_formatRaw = false;
@@ -486,7 +487,8 @@ void SvgDeviceContext::StartPage()
         std::string css = "g.page-margin{font-family:" + resources->GetTextFont()
             + ",serif;} "
               "g.ending, g.fing, g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
-              "g.mNum{font-style:italic;} g.label{font-weight:normal;} path{stroke:currentColor}";
+              "g.mNum{font-style:italic;} g.label{font-weight:normal;} ellipse, path, polygon, polyline, "
+              "rect{stroke:currentColor} ";
         // bounding box css - for debugging
         // css += " g.bounding-box{stroke:red; stroke-width:10} "
         //        "g.content-bounding-box{stroke:blue; stroke-width:10}";
@@ -666,23 +668,32 @@ void SvgDeviceContext::PrefixCssRules(std::string &rules)
 // Drawing methods
 void SvgDeviceContext::DrawQuadBezierPath(Point bezier[3])
 {
+    assert(m_penStack.size());
+    const Pen &currentPen = m_penStack.top();
+
     pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d,%d Q%d,%d %d,%d", // Base string
         bezier[0].x, bezier[0].y, // M Command
         bezier[1].x, bezier[1].y, bezier[2].x, bezier[2].y)
                                           .c_str();
     pathChild.append_attribute("fill") = "none";
-    if (m_penStack.top().HasColor()) {
-        pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
+
+    if (currentPen.GetWidth() > 0) {
+        pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
+    }
+    if (currentPen.HasColor() || !this->UseGlobalStyling()) {
+        pathChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
     pathChild.append_attribute("stroke-linecap") = "round";
     pathChild.append_attribute("stroke-linejoin") = "round";
-    pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
-    this->AppendStrokeDashArray(pathChild, m_penStack.top());
+    this->AppendStrokeDashArray(pathChild, currentPen);
 }
 
 void SvgDeviceContext::DrawCubicBezierPath(Point bezier[4])
 {
+    assert(m_penStack.size());
+    const Pen &currentPen = m_penStack.top();
+
     pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d,%d C%d,%d %d,%d %d,%d", // Base string
         bezier[0].x, bezier[0].y, // M Command
@@ -690,17 +701,23 @@ void SvgDeviceContext::DrawCubicBezierPath(Point bezier[4])
         )
                                           .c_str();
     pathChild.append_attribute("fill") = "none";
-    if (m_penStack.top().HasColor()) {
-        pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
+
+    if (currentPen.GetWidth() > 0) {
+        pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
+    }
+    if (currentPen.HasColor() || !this->UseGlobalStyling()) {
+        pathChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
     pathChild.append_attribute("stroke-linecap") = "round";
     pathChild.append_attribute("stroke-linejoin") = "round";
-    pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
-    this->AppendStrokeDashArray(pathChild, m_penStack.top());
+    this->AppendStrokeDashArray(pathChild, currentPen);
 }
 
 void SvgDeviceContext::DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2[4])
 {
+    assert(m_penStack.size());
+    const Pen &currentPen = m_penStack.top();
+
     pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d")
         = StringFormat("M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d", bezier1[0].x, bezier1[0].y, // M command
@@ -708,28 +725,36 @@ void SvgDeviceContext::DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2
             bezier2[2].x, bezier2[2].y, bezier2[1].x, bezier2[1].y, bezier2[0].x, bezier2[0].y // Second Bezier
             )
               .c_str();
-    // pathChild.append_attribute("fill") = "currentColor";
-    // pathChild.append_attribute("fill-opacity") = "1";
-    if (m_penStack.top().HasColor()) {
-        pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
+
+    if (currentPen.GetWidth() > 0) {
+        pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
+    }
+    if (currentPen.HasColor() || !this->UseGlobalStyling()) {
+        pathChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
     pathChild.append_attribute("stroke-linecap") = "round";
     pathChild.append_attribute("stroke-linejoin") = "round";
-    // pathChild.append_attribute("stroke-opacity") = "1";
-    pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
 }
 
 void SvgDeviceContext::DrawBentParallelogramFilled(Point side[4], int height)
 {
+    assert(m_penStack.size());
+    const Pen &currentPen = m_penStack.top();
+
     pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d,%d C%d,%d %d,%d %d,%d L%d,%d C%d,%d %d,%d %d,%d Z", side[0].x,
         side[0].y, side[1].x, side[1].y, side[2].x, side[2].y, side[3].x, side[3].y, side[3].x, side[3].y + height,
         side[2].x, side[2].y + height, side[1].x, side[1].y + height, side[0].x, side[0].y + height)
                                           .c_str();
-    pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
+
+    if (currentPen.GetWidth() > 0) {
+        pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
+    }
+    if (currentPen.HasColor() || !this->UseGlobalStyling()) {
+        pathChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
+    }
     pathChild.append_attribute("stroke-linecap") = "round";
     pathChild.append_attribute("stroke-linejoin") = "round";
-    pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
 }
 
 void SvgDeviceContext::DrawCircle(int x, int y, int radius)
@@ -753,17 +778,18 @@ void SvgDeviceContext::DrawEllipse(int x, int y, int width, int height)
     ellipseChild.append_attribute("cy") = y + rh;
     ellipseChild.append_attribute("rx") = rw;
     ellipseChild.append_attribute("ry") = rh;
+
     if (currentBrush.HasOpacity()) {
         ellipseChild.append_attribute("fill-opacity") = currentBrush.GetOpacity();
-    }
-    if (currentPen.HasOpacity()) {
-        ellipseChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
     }
     if (currentPen.GetWidth() > 0) {
         ellipseChild.append_attribute("stroke-width") = currentPen.GetWidth();
     }
-    if (currentPen.HasColor()) {
+    if (currentPen.HasColor() || !this->UseGlobalStyling()) {
         ellipseChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
+    }
+    if (currentPen.HasOpacity()) {
+        ellipseChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
     }
 }
 
@@ -821,31 +847,41 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
     pathChild.append_attribute("d") = StringFormat(
         "M%d %d A%d %d 0.0 %d %d %d %d", int(xs), int(ys), abs(int(rx)), abs(int(ry)), fArc, fSweep, int(xe), int(ye))
                                           .c_str();
-    // pathChild.append_attribute("fill") = "currentColor";
+
     if (currentBrush.HasOpacity()) {
         pathChild.append_attribute("fill-opacity") = currentBrush.GetOpacity();
-    }
-    if (currentPen.HasOpacity()) {
-        pathChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
     }
     if (currentPen.GetWidth() > 0) {
         pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
     }
-    if (currentPen.HasColor()) {
+    if (currentPen.HasColor() || !this->UseGlobalStyling()) {
         pathChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
+    }
+    if (currentPen.HasOpacity()) {
+        pathChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
     }
 }
 
 void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
+    assert(m_penStack.size());
+    Pen currentPen = m_penStack.top();
+
     pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d L%d %d", x1, y1, x2, y2).c_str();
-    if (m_penStack.top().HasColor() || !this->UseGlobalStyling()) {
-        pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
+
+    if (currentPen.GetWidth() > 0) {
+        pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
     }
-    if (m_penStack.top().GetWidth() > 1) pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
-    this->AppendStrokeLineCap(pathChild, m_penStack.top());
-    this->AppendStrokeDashArray(pathChild, m_penStack.top());
+    if (currentPen.HasColor() || !this->UseGlobalStyling()) {
+        pathChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
+    }
+    if (currentPen.HasOpacity()) {
+        pathChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
+    }
+
+    this->AppendStrokeLineCap(pathChild, currentPen);
+    this->AppendStrokeDashArray(pathChild, currentPen);
 }
 
 void SvgDeviceContext::DrawPolyline(int n, Point points[], bool close)
@@ -856,10 +892,10 @@ void SvgDeviceContext::DrawPolyline(int n, Point points[], bool close)
     pugi::xml_node polylineChild = (close) ? AddChild("polygon") : AddChild("polyline");
 
     if (currentPen.GetWidth() > 0) {
-        polylineChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
-    }
-    if (currentPen.GetWidth() > 1) {
         polylineChild.append_attribute("stroke-width") = currentPen.GetWidth();
+    }
+    if (currentPen.HasColor() || !this->UseGlobalStyling()) {
+        polylineChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
     if (currentPen.HasOpacity()) {
         polylineChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
@@ -889,15 +925,14 @@ void SvgDeviceContext::DrawPolygon(int n, Point points[])
     pugi::xml_node polygonChild = AddChild("polygon");
 
     if (currentPen.GetWidth() > 0) {
-        polygonChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
-    }
-    if (currentPen.GetWidth() > 1) {
         polygonChild.append_attribute("stroke-width") = currentPen.GetWidth();
+    }
+    if (currentPen.HasColor() || !this->UseGlobalStyling()) {
+        polygonChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
     if (currentPen.HasOpacity()) {
         polygonChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
     }
-
     this->AppendStrokeLineJoin(polygonChild, currentPen);
     this->AppendStrokeDashArray(polygonChild, currentPen);
 
@@ -922,29 +957,29 @@ void SvgDeviceContext::DrawRectangle(int x, int y, int width, int height)
 
 void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height, int radius)
 {
+    assert(m_penStack.size());
+    assert(m_brushStack.size());
+
+    const Pen &currentPen = m_penStack.top();
+    const Brush &currentBrush = m_brushStack.top();
+
     pugi::xml_node rectChild = AddChild("rect");
 
-    if (m_penStack.size()) {
-        Pen currentPen = m_penStack.top();
-        if (currentPen.GetWidth() > 0) {
-            rectChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
-        }
-        if (currentPen.GetWidth() > 1) {
-            rectChild.append_attribute("stroke-width") = currentPen.GetWidth();
-        }
-        if (currentPen.HasOpacity()) {
-            rectChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
-        }
+    if (currentPen.GetWidth() > 0) {
+        rectChild.append_attribute("stroke-width") = currentPen.GetWidth();
+    }
+    if (currentPen.HasColor() || !this->UseGlobalStyling()) {
+        rectChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
+    }
+    if (currentPen.HasOpacity()) {
+        rectChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
     }
 
-    if (m_brushStack.size()) {
-        Brush currentBrush = m_brushStack.top();
-        if (currentBrush.HasColor()) {
-            rectChild.append_attribute("fill") = this->GetColor(currentBrush.GetColor()).c_str();
-        }
-        if (currentBrush.HasOpacity()) {
-            rectChild.append_attribute("fill-opacity") = currentBrush.GetOpacity();
-        }
+    if (currentBrush.HasColor()) {
+        rectChild.append_attribute("fill") = this->GetColor(currentBrush.GetColor()).c_str();
+    }
+    if (currentBrush.HasOpacity()) {
+        rectChild.append_attribute("fill-opacity") = currentBrush.GetOpacity();
     }
 
     // negative heights or widths are not allowed in SVG
@@ -1287,7 +1322,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
 
     bool groupInPage = false;
     bool drawAnchors = false;
-    bool drawContentBB = false;
+    bool drawContentBB = m_svgContentBoundingBoxes;
 
     if (m_svgBoundingBoxes && view) {
         BoundingBox *box = object;

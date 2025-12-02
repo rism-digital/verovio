@@ -43,6 +43,7 @@ static const ClassRegistrar<Artic> s_factory("artic", ARTIC);
 
 Artic::Artic()
     : LayerElement(ARTIC)
+    , OffsetInterface()
     , AttArticulation()
     , AttArticulationGes()
     , AttColor()
@@ -51,6 +52,7 @@ Artic::Artic()
     , AttExtSymNames()
     , AttPlacementRelEvent()
 {
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
     this->RegisterAttClass(ATT_ARTICULATION);
     this->RegisterAttClass(ATT_ARTICULATIONGES);
     this->RegisterAttClass(ATT_COLOR);
@@ -67,6 +69,7 @@ Artic::~Artic() {}
 void Artic::Reset()
 {
     LayerElement::Reset();
+    OffsetInterface::Reset();
     this->ResetArticulation();
     this->ResetArticulationGes();
     this->ResetColor();
@@ -231,17 +234,14 @@ char32_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) cons
 
 std::pair<char32_t, char32_t> Artic::GetEnclosingGlyphs() const
 {
-    std::pair<char32_t, char32_t> glyphs(0, 0);
     if (this->HasEnclose()) {
         switch (this->GetEnclose()) {
-            case ENCLOSURE_brack:
-                glyphs = { SMUFL_E26C_accidentalBracketLeft, SMUFL_E26D_accidentalBracketRight };
-                break;
-            case ENCLOSURE_paren: glyphs = { SMUFL_E26A_accidentalParensLeft, SMUFL_E26B_accidentalParensRight }; break;
-            default: break;
+            case ENCLOSURE_brack: return { SMUFL_E26C_accidentalBracketLeft, SMUFL_E26D_accidentalBracketRight }; break;
+            case ENCLOSURE_paren: return { SMUFL_E26A_accidentalParensLeft, SMUFL_E26B_accidentalParensRight }; break;
+            default: return { 0, 0 };
         }
     }
-    return glyphs;
+    return { 0, 0 };
 }
 
 //----------------------------------------------------------------------------

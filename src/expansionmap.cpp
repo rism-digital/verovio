@@ -40,17 +40,18 @@ void ExpansionMap::Reset()
     m_map.clear();
 }
 
-void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Object *prevSect,
+Object *ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Object *prevSect,
     xsdAnyURI_List &deletionList, bool deleteList = false)
 {
     assert(expansion);
-    assert(expansion->GetParent());
+    Object *parent = expansion->GetParent();
+    assert(parent);
 
     xsdAnyURI_List expansionPlist = expansion->GetPlist();
     if (expansionPlist.empty()) {
         LogWarning("ExpansionMap::Expand: Expansion element %s has empty @plist. Nothing expanded.",
             expansion->GetID().c_str());
-        return;
+        return prevSect;
     }
 
     assert(prevSect);
@@ -59,41 +60,43 @@ void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Ob
     Object *insertHere = nullptr; // cloned parent container
 
     // If expansion parent already exists, create a new empty such element
-    if (std::find(existingList.begin(), existingList.end(), expansion->GetParent()->GetID()) != existingList.end()) {
+    if (std::find(existingList.begin(), existingList.end(), parent->GetID()) != existingList.end()) {
         Object *newContainer;
         // check type of expansion parent
-        if (expansion->GetParent()->Is(SECTION)) {
+        if (parent->Is(SECTION)) {
             newContainer = static_cast<Object *>(new Section());
         }
-        else if (expansion->GetParent()->Is(ENDING)) {
+        else if (parent->Is(ENDING)) {
             newContainer = static_cast<Object *>(new Ending());
         }
-        else if (expansion->GetParent()->Is(LEM)) {
+        else if (parent->Is(LEM)) {
             newContainer = static_cast<Object *>(new Lem());
         }
-        else if (expansion->GetParent()->Is(RDG)) {
+        else if (parent->Is(RDG)) {
             newContainer = static_cast<Object *>(new Rdg());
         }
         else {
             LogWarning(
                 "ExpansionMap::Expand: Expansion element %s has unsupported parent type.", expansion->GetID().c_str());
-            return;
+            return prevSect;
         }
 
-        prevSect->GetParent()->InsertAfter(prevSect, newContainer);
-        GeneratePredictableIDs(expansion->GetParent(), newContainer);
+        assert(parent->GetParent());
+        Object *referenceChild = parent->GetDirectChild(parent->GetParent(), prevSect);
+        assert(referenceChild);
+        parent->GetParent()->InsertAfter(referenceChild, newContainer);
+        GeneratePredictableIDs(parent, newContainer);
         LogDebug("Creating new container <%s> for expansion element %s", newContainer->GetClassName().c_str(),
             newContainer->GetID().c_str());
 
         insertHere = newContainer;
     }
-    else if (std::find(existingList.begin(), existingList.end(), expansion->GetParent()->GetID())
-        == existingList.end()) {
-        existingList.push_back(expansion->GetParent()->GetID());
+    else if (std::find(existingList.begin(), existingList.end(), parent->GetID()) == existingList.end()) {
+        existingList.push_back(parent->GetID());
     }
 
     // find and add all relevant (and new) expansion sibling ids to deletionList
-    for (Object *siblings : expansion->GetParent()->GetChildren()) {
+    for (Object *siblings : parent->GetChildren()) {
         if (siblings->Is({ SECTION, ENDING, LEM, RDG })
             && std::count(deletionList.begin(), deletionList.end(), siblings->GetID()) == 0) {
             deletionList.push_back(siblings->GetID());
@@ -104,7 +107,7 @@ void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Ob
     for (std::string id : expansionPlist) {
         LogDebug("Looking for element in @plist: %s", id.c_str());
         if (id.rfind("#", 0) == 0) id = id.substr(1, id.size() - 1); // remove leading hash from id
-        Object *currSect = expansion->GetParent()->FindDescendantByID(id); // find section pointer for id string
+        Object *currSect = parent->FindDescendantByID(id); // find section pointer for id string
         if (currSect == NULL) {
             // Warn about referenced element not found and continue
             LogWarning("ExpansionMap::Expand: Element referenced in @plist not found: %s", id.c_str());
@@ -113,7 +116,7 @@ void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Ob
         if (currSect->Is(EXPANSION)) { // if id is itself an expansion, resolve it recursively
             Expansion *currExpansion = vrv_cast<Expansion *>(currSect);
             assert(currExpansion);
-            this->Expand(currExpansion, existingList, prevSect, deletionList);
+            prevSect = this->Expand(currExpansion, existingList, prevSect, deletionList);
         }
         else {
             // id already in existingList or currSect is not in expansion parent, clone object, update ids, insert it
@@ -149,6 +152,7 @@ void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Ob
                 }
 
                 prevSect = clonedObject;
+                existingList.push_back(clonedObject->GetID());
             }
             else { // add to existingList, remember previous element, re-order if necessary
 
@@ -194,8 +198,7 @@ void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Ob
         for (std::string del : deletionList) {
             long cnt = std::count(existingList.begin(), existingList.end(), del);
             if (cnt == 0) {
-                Object *currSect
-                    = expansion->GetParent()->FindDescendantByID(del); // find section pointer for id string
+                Object *currSect = parent->FindDescendantByID(del); // find section pointer for id string
                 assert(currSect);
 
                 int idx = currSect->GetIdx();
@@ -204,6 +207,8 @@ void ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Ob
             }
         }
     }
+
+    return prevSect;
 }
 
 bool ExpansionMap::UpdateIDs(Object *object)

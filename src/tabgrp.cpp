@@ -27,9 +27,10 @@ namespace vrv {
 
 static const ClassRegistrar<TabGrp> s_factory("tabGrp", TABGRP);
 
-TabGrp::TabGrp() : LayerElement(TABGRP), ObjectListInterface(), DurationInterface()
+TabGrp::TabGrp() : LayerElement(TABGRP), ObjectListInterface(), DurationInterface(), OffsetInterface()
 {
     this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
 
     this->Reset();
 }
@@ -40,6 +41,7 @@ void TabGrp::Reset()
 {
     LayerElement::Reset();
     DurationInterface::Reset();
+    OffsetInterface::Reset();
 }
 
 bool TabGrp::IsSupportedChild(ClassId classId)
