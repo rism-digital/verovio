@@ -174,6 +174,7 @@
 #import <VerovioFramework/num.h>
 #import <VerovioFramework/object.h>
 #import <VerovioFramework/octave.h>
+#import <VerovioFramework/offsetinterface.h>
 #import <VerovioFramework/options.h>
 #import <VerovioFramework/orig.h>
 #import <VerovioFramework/oriscus.h>

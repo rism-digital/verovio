@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+
+## [5.7.0] – 2025-12-02
 * Support for `@ho` and `@vo` on relevant layer elements and control events
 * Support for `@startho/vo` and `@endho/vo` on `hairpin`, `lv`, `phrase`, `slur` and `tie`
 * Support for `@enclose` on `rest`, `mordent`, `turn`, and `trill` (@rettinghaus)
