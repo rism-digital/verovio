@@ -507,8 +507,16 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         this->WriteOssia(m_currentNode, vrv_cast<Ossia *>(object));
     }
     else if (object->Is(STAFF)) {
-        m_currentNode = m_currentNode.append_child("staff");
-        this->WriteStaff(m_currentNode, vrv_cast<Staff *>(object));
+        Staff *staff = vrv_cast<Staff *>(object);
+        assert(staff);
+        if (staff->IsOssia()) {
+            m_currentNode = m_currentNode.append_child("oStaff");
+            this->WriteOStaff(m_currentNode, vrv_cast<Staff *>(object));
+        }
+        else {
+            m_currentNode = m_currentNode.append_child("staff");
+            this->WriteStaff(m_currentNode, vrv_cast<Staff *>(object));
+        }
     }
     else if (object->Is(LAYER)) {
         m_currentNode = m_currentNode.append_child("layer");
@@ -2323,6 +2331,23 @@ void MEIOutput::WriteStaff(pugi::xml_node currentNode, Staff *staff)
         staff->SetCoordY1(staff->m_drawingFacsY / DEFINITION_FACTOR);
         staff->WriteCoordY1(currentNode);
     }
+}
+
+void MEIOutput::WriteOStaff(pugi::xml_node currentNode, Staff *oStaff)
+{
+    assert(oStaff);
+
+    // Temporarily reset original n
+    oStaff->AttributesToExternal();
+
+    this->WriteXmlId(currentNode, oStaff);
+    this->WriteFacsimileInterface(currentNode, oStaff);
+    oStaff->WriteNInteger(currentNode);
+    oStaff->WriteTyped(currentNode);
+    oStaff->WriteVisibility(currentNode);
+
+    // Set it back
+    oStaff->AttributesToInternal();
 }
 
 void MEIOutput::WriteTempo(pugi::xml_node currentNode, Tempo *tempo)
@@ -5785,6 +5810,9 @@ bool MEIInput::ReadOssia(Object *parent, pugi::xml_node ossia)
         if (currentName == "staff") {
             success = this->ReadStaff(vrvOssia, current);
         }
+        else if (currentName == "oStaff") {
+            success = this->ReadOStaff(vrvOssia, current);
+        }
     }
 
     return success;
@@ -6360,15 +6388,6 @@ bool MEIInput::ReadStaff(Object *parent, pugi::xml_node staff)
     vrvStaff->ReadTyped(staff);
     vrvStaff->ReadVisibility(staff);
 
-    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
-        UpgradeStaffTo_5_0(staff);
-    }
-
-    if (staff.attribute("coord.y1") && m_doc->IsTranscription()) {
-        vrvStaff->ReadCoordY1(staff);
-        vrvStaff->m_drawingFacsY = vrvStaff->GetCoordY1() * DEFINITION_FACTOR;
-    }
-
     if (!vrvStaff->HasN() || (vrvStaff->GetN() == 0)) {
         LogWarning("No @n on <staff> or a value of 0 might yield unpredictable results");
     }
@@ -6376,6 +6395,28 @@ bool MEIInput::ReadStaff(Object *parent, pugi::xml_node staff)
     parent->AddChild(vrvStaff);
     this->ReadUnsupportedAttr(staff, vrvStaff);
     return this->ReadStaffChildren(vrvStaff, staff);
+}
+
+bool MEIInput::ReadOStaff(Object *parent, pugi::xml_node oStaff)
+{
+    Staff *vrvStaff = new Staff();
+    vrvStaff->SetOssia(true);
+    this->SetMeiID(oStaff, vrvStaff);
+    this->ReadFacsimileInterface(oStaff, vrvStaff);
+
+    vrvStaff->ReadNInteger(oStaff);
+    vrvStaff->ReadTyped(oStaff);
+    vrvStaff->ReadVisibility(oStaff);
+
+    if (!vrvStaff->HasN() || (vrvStaff->GetN() == 0)) {
+        LogWarning("No @n on <staff> or a value of 0 might yield unpredictable results");
+    }
+
+    vrvStaff->AttributesToInternal();
+
+    parent->AddChild(vrvStaff);
+    this->ReadUnsupportedAttr(oStaff, vrvStaff);
+    return this->ReadStaffChildren(vrvStaff, oStaff);
 }
 
 bool MEIInput::ReadStaffChildren(Object *parent, pugi::xml_node parentNode)

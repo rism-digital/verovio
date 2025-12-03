@@ -144,6 +144,14 @@ public:
     ///@}
 
     /**
+     * @name Methods for converting attributes to and from their original values.
+     */
+    ///@{
+    void AttributesToExternal() override;
+    void AttributesToInternal() override;
+    ///@}
+
+    /**
      * @name Getters and setters for the rotation.
      * Used only with facsimile rendering.
      */

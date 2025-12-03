@@ -386,6 +386,7 @@ private:
     void WriteMeterSigGrp(pugi::xml_node currentNode, MeterSigGrp *meterSigGrp);
     void WriteFb(pugi::xml_node currentNode, Fb *fb);
     void WriteStaff(pugi::xml_node currentNode, Staff *staff);
+    void WriteOStaff(pugi::xml_node currentNode, Staff *oStaff);
     void WriteLayer(pugi::xml_node currentNode, Layer *layer);
     void WriteOssia(pugi::xml_node currentNode, Ossia *ossia);
     ///@}
@@ -712,6 +713,7 @@ private:
     bool ReadFbChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadNum(Object *parent, pugi::xml_node parentNode);
     bool ReadStaff(Object *parent, pugi::xml_node staff);
+    bool ReadOStaff(Object *parent, pugi::xml_node oStaff);
     bool ReadStaffChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadLayer(Object *parent, pugi::xml_node layer);
     bool ReadLayerDef(Object *parent, pugi::xml_node layerDef);

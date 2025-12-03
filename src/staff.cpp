@@ -95,6 +95,20 @@ void Staff::CloneReset()
     m_drawingRotation = 0.0;
 }
 
+void Staff::AttributesToExternal()
+{
+    Object::AttributesToExternal();
+
+    if (this->IsOssia() && this->HasN()) this->SetN(this->GetN() - OSSIA_N_OFFSET);
+}
+
+void Staff::AttributesToInternal()
+{
+    Object::AttributesToInternal();
+
+    if (this->IsOssia() && this->HasN()) this->SetN(this->GetN() + OSSIA_N_OFFSET);
+}
+
 int Staff::GetDrawingRotationOffsetFor(int x)
 {
     int xDiff = x - this->GetDrawingX();

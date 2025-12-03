@@ -491,6 +491,12 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 #define MAX_NOTE_DEPTH -1
 
 //----------------------------------------------------------------------------
+// Ossia staff / layer @n offset (assuming we never have @n that high
+//----------------------------------------------------------------------------
+
+#define OSSIA_N_OFFSET 1000000
+
+//----------------------------------------------------------------------------
 // Unicode music codepoints
 //----------------------------------------------------------------------------
 

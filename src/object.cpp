@@ -410,10 +410,19 @@ void Object::CopyAttributesTo(Object *target) const
     target->m_unsupported = this->m_unsupported;
 }
 
-int Object::GetAttributes(ArrayOfStrAttr *attributes) const
+int Object::GetAttributes(ArrayOfStrAttr *attributes, bool convertToExternal) const
 {
     assert(attributes);
     attributes->clear();
+
+    if (convertToExternal && this->Is(STAFF)) {
+        const Staff *staff = vrv_cast<const Staff *>(this);
+        Staff copy;
+        staff->CopyAttributesTo(&copy);
+        copy.SetOssia(staff->IsOssia());
+        copy.AttributesToExternal();
+        return copy.GetAttributes(attributes, false);
+    }
 
     AttModule::GetAnalytical(this, attributes);
     AttModule::GetCmn(this, attributes);
