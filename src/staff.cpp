@@ -41,6 +41,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 static const ClassRegistrar<Staff> s_factory("staff", STAFF);
+static const ClassRegistrar<Staff> s_factoryOStaff("oStaff", STAFF);
 
 Staff::Staff(int n) : Object(STAFF), FacsimileInterface(), AttCoordY1(), AttNInteger(), AttTyped(), AttVisibility()
 {
