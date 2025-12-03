@@ -52,11 +52,6 @@ public:
      */
     bool AddChildAdditionalCheck(Object *child) override;
 
-    /**
-     * Specific method for ossias
-     */
-    void AddChildBack(Object *object);
-
 public:
 protected:
 private:

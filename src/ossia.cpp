@@ -70,32 +70,6 @@ bool Ossia::IsSupportedChild(ClassId classId)
     }
 }
 
-void Ossia::AddChildBack(Object *child)
-{
-    if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        return;
-    }
-
-    child->SetParent(this);
-    ArrayOfObjects &children = this->GetChildrenForModification();
-    if (children.empty()) {
-        children.push_back(child);
-    }
-    else if (children.back()->Is(STAFF)) {
-        children.push_back(child);
-    }
-    else {
-        for (auto it = children.begin(); it != children.end(); ++it) {
-            if (!(*it)->Is(STAFF)) {
-                children.insert(it, child);
-                break;
-            }
-        }
-    }
-    Modify();
-}
-
 bool Ossia::AddChildAdditionalCheck(Object *child)
 {
     if (child->Is(STAFF)) {
