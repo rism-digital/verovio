@@ -47,14 +47,12 @@ public:
      */
     bool IsSupportedChild(ClassId classId) override;
 
-    /**
-     * Additional check when adding a child.
-     */
-    bool AddChildAdditionalCheck(Object *child) override;
-
 public:
+    //
 protected:
+    //
 private:
+    //
 };
 
 } // namespace vrv
