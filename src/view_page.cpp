@@ -44,6 +44,7 @@
 #include "mrest.h"
 #include "note.h"
 #include "options.h"
+#include "ossia.h"
 #include "page.h"
 #include "pageelement.h"
 #include "pagemilestone.h"
@@ -1177,6 +1178,31 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
 }
 
 //----------------------------------------------------------------------------
+// View - Ossia
+//----------------------------------------------------------------------------
+
+void View::DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(ossia);
+    assert(measure);
+    assert(system);
+
+    dc->StartGraphic(ossia, "", ossia->GetID());
+
+    for (Object *child : ossia->GetChildren()) {
+        if (child->Is(STAFF)) {
+            this->DrawStaff(dc, vrv_cast<Staff *>(child), measure, system);
+        }
+        else {
+            assert(false);
+        }
+    }
+
+    dc->EndGraphic(ossia, this);
+}
+
+//----------------------------------------------------------------------------
 // View - Staff
 //----------------------------------------------------------------------------
 
@@ -1665,7 +1691,10 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
     }
 
     for (Object *current : parent->GetChildren()) {
-        if (current->Is(STAFF)) {
+        if (current->Is(OSSIA)) {
+            this->DrawOssia(dc, vrv_cast<Ossia *>(current), measure, system);
+        }
+        else if (current->Is(STAFF)) {
             // cast to Staff check in DrawStaff
             this->DrawStaff(dc, vrv_cast<Staff *>(current), measure, system);
         }
