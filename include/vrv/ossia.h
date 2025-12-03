@@ -47,12 +47,30 @@ public:
      */
     bool IsSupportedChild(ClassId classId) override;
 
+    void GetStavesAbove(MapOfOssiaStaffNs &map) const;
+    void GetStavesBelow(MapOfOssiaStaffNs &map) const;
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
+
 public:
     //
 protected:
     //
 private:
     //
+    void GetStaves(MapOfOssiaStaffNs &map, ListOfConstObjects &staves) const;
 };
 
 } // namespace vrv

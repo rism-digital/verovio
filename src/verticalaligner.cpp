@@ -69,17 +69,18 @@ StaffAlignment *SystemAligner::GetStaffAlignment(int idx, Staff *staff, const Do
     // remove it temporarily
     children.pop_back();
 
-    if (idx < this->GetChildCount()) {
+    StaffAlignment *alignment = this->GetStaffAlignmentForStaffN(staff->GetN());
+    if (alignment) {
         children.push_back(m_bottomAlignment);
-        return dynamic_cast<StaffAlignment *>(this->GetChild(idx));
+        return alignment;
     }
     // check that we are searching for the next one (not a gap)
-    assert(idx == this->GetChildCount());
+    // assert(idx == this->GetChildCount());
     // LogDebug("Creating staff alignment");
 
     // This is the first time we are looking for it (e.g., first staff)
     // We create the StaffAlignment
-    StaffAlignment *alignment = new StaffAlignment();
+    alignment = new StaffAlignment();
     alignment->SetStaff(staff, doc, this->GetAboveSpacingType(staff));
     alignment->SetParentSystem(this->GetSystem());
     this->AddChild(alignment);

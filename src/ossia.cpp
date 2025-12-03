@@ -15,6 +15,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
+#include "object.h"
 #include "staff.h"
 #include "vrv.h"
 
@@ -65,6 +67,31 @@ bool Ossia::IsSupportedChild(ClassId classId)
     else {
         return false;
     }
+}
+
+
+//----------------------------------------------------------------------------
+// Functor methods
+//----------------------------------------------------------------------------
+
+FunctorCode Ossia::Accept(Functor &functor)
+{
+    return functor.VisitOssia(this);
+}
+
+FunctorCode Ossia::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitOssia(this);
+}
+
+FunctorCode Ossia::AcceptEnd(Functor &functor)
+{
+    return functor.VisitOssiaEnd(this);
+}
+
+FunctorCode Ossia::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitOssiaEnd(this);
 }
 
 } // namespace vrv
