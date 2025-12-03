@@ -65,6 +65,8 @@ void Staff::Reset()
     this->ResetTyped();
     this->ResetVisibility();
 
+    m_isOssia = false;
+
     m_drawingFacsY = VRV_UNSET;
 
     m_drawingStaffSize = 100;

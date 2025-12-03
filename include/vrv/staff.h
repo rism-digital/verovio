@@ -136,6 +136,14 @@ public:
     ///@}
 
     /**
+     * @name Getters and setters for ossia.
+     */
+    ///@{
+    bool IsOssia() const { return (m_isOssia); }
+    void SetOssia(bool isOssia) { m_isOssia = isOssia; }
+    ///@}
+
+    /**
      * @name Getters and setters for the rotation.
      * Used only with facsimile rendering.
      */
@@ -335,6 +343,9 @@ private:
      * Used only with facsimile rendering
      */
     double m_drawingRotation;
+
+    /** ossia staff flag */
+    bool m_isOssia;
 };
 
 } // namespace vrv
