@@ -1134,7 +1134,7 @@ void Object::Process(ConstFunctor &functor, int deepness, bool skipFirst) const
         functor.SetCode(FUNCTOR_CONTINUE);
         return;
     }
-    else if (this->IsEditorialElement()) {
+    else if (this->IsEditorialElement() || this->Is(OSSIA)) {
         // since editorial object doesn't count, we increase the deepness limit
         ++deepness;
     }
