@@ -112,7 +112,7 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    Staff(int n = 1);
+    Staff(int n = 1, bool isOssia = false);
     virtual ~Staff();
     Object *Clone() const override { return new Staff(*this); }
     void Reset() override;

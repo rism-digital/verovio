@@ -56,7 +56,8 @@ void Ossia::Reset()
 
 bool Ossia::IsSupportedChild(ClassId classId)
 {
-    static const std::vector<ClassId> supported{ STAFF };
+    // Include pseudo classId for check from the object factory
+    static const std::vector<ClassId> supported{ STAFF, FACTORY_OSTAFF };
 
     if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
         return true;

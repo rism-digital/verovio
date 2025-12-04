@@ -1128,6 +1128,15 @@ public:
     {
         ObjectFactory::GetInstance()->Register(name, classId, []() -> Object * { return new T(); });
     }
+
+    /**
+     * The contructor registering the name / constructor map taking a custom factory function.
+     * Use a pseudo ClassId for correct mapping.
+     */
+    ClassRegistrar(const std::string &name, ClassId pseudoClassId, std::function<Object *()> factory)
+    {
+        ObjectFactory::GetInstance()->Register(name, pseudoClassId, factory);
+    }
 };
 
 } // namespace vrv

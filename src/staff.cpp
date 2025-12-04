@@ -41,9 +41,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 static const ClassRegistrar<Staff> s_factory("staff", STAFF);
-static const ClassRegistrar<Staff> s_factoryOStaff("oStaff", STAFF);
+static const ClassRegistrar<Staff> s_factoryOStaff(
+    "oStaff", FACTORY_OSTAFF, []() -> Object * { return new Staff(1, true); });
 
-Staff::Staff(int n) : Object(STAFF), FacsimileInterface(), AttCoordY1(), AttNInteger(), AttTyped(), AttVisibility()
+Staff::Staff(int n, bool isOssia)
+    : Object(STAFF), FacsimileInterface(), AttCoordY1(), AttNInteger(), AttTyped(), AttVisibility()
 {
     this->RegisterAttClass(ATT_COORDY1);
     this->RegisterAttClass(ATT_NINTEGER);
@@ -53,6 +55,7 @@ Staff::Staff(int n) : Object(STAFF), FacsimileInterface(), AttCoordY1(), AttNInt
 
     this->Reset();
     this->SetN(n);
+    this->SetOssia(isOssia);
 }
 
 Staff::~Staff() {}
