@@ -124,7 +124,7 @@ public:
     /*
      * Abstract base implementation
      */
-    bool ImplementsEndInterface() const override { return false; }
+    bool ImplementsEndInterface() const override { return true; }
 
     /*
      * Functor interface
@@ -135,6 +135,7 @@ public:
     FunctorCode VisitLayer(Layer *layer) override;
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitMensur(Mensur *mensur) override;
+    FunctorCode VisitOssia(Ossia *ossia) override;
     FunctorCode VisitPage(Page *page) override;
     FunctorCode VisitProport(Proport *proport) override;
     FunctorCode VisitScore(Score *score) override;
@@ -143,6 +144,7 @@ public:
     FunctorCode VisitStaffDef(StaffDef *staffDef) override;
     FunctorCode VisitStaffGrp(StaffGrp *staffGrp) override;
     FunctorCode VisitSystem(System *system) override;
+    FunctorCode VisitSystemEnd(System *system) override;
     ///@}
 
 protected:
@@ -170,6 +172,9 @@ private:
     bool m_restart;
     // Flag indicating if we already have a measure in the system
     bool m_hasMeasure;
+
+    MapOfOssiaStaffNs m_ossiasAbove;
+    MapOfOssiaStaffNs m_ossiasBelow;
 };
 
 //----------------------------------------------------------------------------

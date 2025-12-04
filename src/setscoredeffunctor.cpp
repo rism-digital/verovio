@@ -11,6 +11,7 @@
 
 #include "doc.h"
 #include "layer.h"
+#include "ossia.h"
 #include "page.h"
 #include "pages.h"
 #include "score.h"
@@ -217,6 +218,14 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitMensur(Mensur *mensur)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode ScoreDefSetCurrentFunctor::VisitOssia(Ossia *ossia)
+{
+    ossia->GetStavesAbove(this->m_ossiasAbove);
+    ossia->GetStavesBelow(this->m_ossiasBelow);
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ScoreDefSetCurrentFunctor::VisitPage(Page *page)
 {
     // This will be reached before we reach the beginning of a first Score.
@@ -330,6 +339,25 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitSystem(System *system)
     // This is the only thing we do for now - we need to wait until we reach the first measure
     m_currentSystem = system;
     m_hasMeasure = false;
+
+    m_ossiasAbove.clear();
+    m_ossiasBelow.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefSetCurrentFunctor::VisitSystemEnd(System *system)
+{
+    ScoreDef *scoreDef = system->GetDrawingScoreDef();
+    if (scoreDef) {
+        for (const auto &[key, value] : this->m_ossiasAbove) {
+            scoreDef->AddOssias(key, value, true);
+        }
+        for (const auto &[key, value] : this->m_ossiasBelow) {
+            scoreDef->AddOssias(key, value, false);
+        }
+    }
+
     return FUNCTOR_CONTINUE;
 }
 

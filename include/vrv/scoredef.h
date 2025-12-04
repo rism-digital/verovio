@@ -259,6 +259,8 @@ public:
      */
     bool HasSystemStartLine() const;
 
+    void AddOssias(int staffN, const std::list<int>, bool above);
+
     //----------//
     // Functors //
     //----------//

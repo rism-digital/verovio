@@ -616,6 +616,29 @@ bool ScoreDef::HasSystemStartLine() const
     return false;
 }
 
+void ScoreDef::AddOssias(int staffN, const std::list<int> ossias, bool above)
+{
+    StaffDef *staffDef = this->GetStaffDef(staffN);
+
+    if (!staffDef || !staffDef->GetParent() || !staffDef->GetParent()->Is(STAFFGRP)) {
+        LogDebug("The staffDef %d could not be found or not child of staffGrp", staffN);
+        return;
+    }
+
+    Object *staffGrp = staffDef->GetParent();
+
+    for (auto ossiaN : ossias) {
+        StaffDef *ossiaStaffDef = new StaffDef();
+        ossiaStaffDef->SetN(ossiaN);
+        if (above) {
+            staffGrp->InsertBefore(staffDef, ossiaStaffDef);
+        }
+        else {
+            staffGrp->InsertAfter(staffDef, ossiaStaffDef);
+        }
+    }
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
