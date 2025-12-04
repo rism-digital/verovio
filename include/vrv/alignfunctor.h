@@ -179,6 +179,7 @@ public:
     FunctorCode VisitDiv(Div *div) override;
     FunctorCode VisitFig(Fig *fig) override;
     FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitOssia(Ossia *ossia) override;
     FunctorCode VisitPageEnd(Page *page) override;
     FunctorCode VisitRend(Rend *rend) override;
     FunctorCode VisitRunningElement(RunningElement *runningElement) override;
@@ -209,6 +210,9 @@ private:
     int m_justificationSum;
     // The page width - used for setting the horizontal position of <rend> withing text layout elements
     int m_pageWidth;
+
+    MapOfOssiaStaffNs m_ossiasAbove;
+    MapOfOssiaStaffNs m_ossiasBelow;
 };
 
 //----------------------------------------------------------------------------

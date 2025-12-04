@@ -70,6 +70,43 @@ bool Ossia::IsSupportedChild(ClassId classId)
     }
 }
 
+void Ossia::GetStavesAbove(MapOfOssiaStaffNs &map) const
+{
+    ListOfConstObjects staves = this->FindAllDescendantsByType(STAFF);
+
+    ListOfConstObjects stavesReversed;
+    stavesReversed.resize(staves.size());
+    std::reverse_copy(staves.begin(), staves.end(), stavesReversed.begin());
+
+    this->GetStaves(map, stavesReversed);
+}
+
+void Ossia::GetStavesBelow(MapOfOssiaStaffNs &map) const
+{
+    ListOfConstObjects staves = this->FindAllDescendantsByType(STAFF);
+
+    this->GetStaves(map, staves);
+}
+
+void Ossia::GetStaves(MapOfOssiaStaffNs &map, ListOfConstObjects &staves) const
+{
+    int staffN = VRV_UNSET;
+    for (auto it = staves.begin(); it != staves.end(); ++it) {
+        const Staff *staff = vrv_cast<const Staff *>(*it);
+        assert(staff);
+        if (!staff->IsOssia()) {
+            staffN = staff->GetN();
+            continue;
+        }
+        if (staffN != VRV_UNSET) {
+            std::list<int> &ossias = map[staffN];
+            int ossiaN = staff->GetN();
+            auto found = std::find(ossias.begin(), ossias.end(), ossiaN);
+            // add only if not already present
+            if (found == ossias.end()) ossias.push_back(ossiaN);
+        }
+    }
+}
 
 //----------------------------------------------------------------------------
 // Functor methods

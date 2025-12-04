@@ -17,6 +17,7 @@
 #include "ligature.h"
 #include "nc.h"
 #include "neume.h"
+#include "ossia.h"
 #include "page.h"
 #include "proport.h"
 #include "rend.h"
@@ -592,6 +593,14 @@ FunctorCode AlignVerticallyFunctor::VisitMeasure(Measure *measure)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode AlignVerticallyFunctor::VisitOssia(Ossia *ossia)
+{
+    ossia->GetStavesAbove(this->m_ossiasAbove);
+    ossia->GetStavesBelow(this->m_ossiasBelow);
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode AlignVerticallyFunctor::VisitPageEnd(Page *page)
 {
     m_cumulatedShift = 0;
@@ -709,6 +718,9 @@ FunctorCode AlignVerticallyFunctor::VisitSyllable(Syllable *syllable)
 
 FunctorCode AlignVerticallyFunctor::VisitSystem(System *system)
 {
+    m_ossiasAbove.clear();
+    m_ossiasBelow.clear();
+
     m_systemAligner = &system->m_systemAligner;
 
     return FUNCTOR_CONTINUE;
