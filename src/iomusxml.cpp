@@ -397,24 +397,38 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
         m_garbage.push_back(measure);
     }
 
-    // Handle endings
-    if (contentMeasure && NotInEndingStack(contentMeasure)) {
-        if (m_currentEndingStart) {
-            // Create a new ending
-            std::vector<Measure *> measures;
-            m_endingStack.push_back({ measures, *m_currentEndingStart });
+    // Insert the measure in the section/ending structure that will be expanded at the end.
+    if (contentMeasure && !MeasureInExistingSection(contentMeasure)) {
+        // starting a new section
+        if (m_sectionStart) {
+            m_sections.push_back({ *m_sectionStart, {} });
         }
-        if (!m_endingStack.empty() && (m_endingStack.back().second.m_endingType == "start")) {
-            // Append the current measure
-            m_endingStack.back().first.push_back(contentMeasure);
+        // add current measure to current section
+        if (!m_sections.empty()) {
+            m_sections.back().second.push_back(contentMeasure);
         }
-        if (m_currentEndingStop && !m_endingStack.empty()) {
-            // Stop the last ending
-            m_endingStack.back().second.m_endingType = m_currentEndingStop->m_endingType;
+        // jump and fine info
+        if (m_jumpInfo && !m_sections.empty()) {
+            m_sections.back().first.m_jumpInfo = *m_jumpInfo;
+        }
+        if (m_fineInfo && !m_sections.empty()) {
+            m_sections.back().first.m_fineInfo = *m_fineInfo;
+        }
+        // closing a section: open a new one
+        if (m_sectionStop && !m_sections.empty()) {
+            if (m_sectionStop->m_classId == ENDING) {
+                m_sections.back().first.m_endingInfo = m_sectionStop->m_endingInfo;
+            }
+            else {
+                m_sections.back().first.m_repeatInfo = m_sectionStop->m_repeatInfo;
+            }
+            m_sections.push_back({ musicxml::SectionInfo(), {} });
         }
     }
-    m_currentEndingStart.reset();
-    m_currentEndingStop.reset();
+    m_sectionStart.reset();
+    m_sectionStop.reset();
+    m_jumpInfo.reset();
+    m_fineInfo.reset();
 }
 
 void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element, int duration)
@@ -844,6 +858,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     // the section
     Section *section = new Section();
     score->AddChild(section);
+    m_sections.push_back({ musicxml::SectionInfo(), {} });
     // initialize layout
     if (root.select_node("/score-partwise/part/measure/print[@new-system or @new-page]")) {
         m_layoutInformation = LAYOUT_ENCODED;
@@ -1118,45 +1133,58 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         measure->AddChild(iter.second);
     }
 
-    // manage endings stack: create new <ending> elements and move the corresponding measures into them
-    if (!m_endingStack.empty()) {
-        for (auto iter : m_endingStack) {
-            std::string logString = "";
-            logString = logString + "MusicXML import: Ending number='" + iter.second.m_endingNumber.c_str()
-                + "', type='" + iter.second.m_endingType.c_str() + "', text='" + iter.second.m_endingText + "' (";
-            std::vector<Measure *> measureList = iter.first;
+    // manage sections: create new <section> / <ending> elements and move the corresponding measures into them
+    for (auto iter = m_sections.begin(); iter != m_sections.end(); ) {
+        std::vector<Measure *> measures = iter->second;
+        if (measures.empty()) {
+            iter = m_sections.erase(iter);
+            continue;
+        }
+
+        Object *target = NULL;
+        if (iter->first.m_classId == ENDING) {
             Ending *ending = new Ending();
-            if (iter.second.m_endingText
-                    .empty()) { // some musicXML exporters tend to ignore the <ending> text, so take @number instead.
-                ending->SetN(iter.second.m_endingNumber);
+            // some musicXML exporters tend to ignore the <ending> text, so take @number instead.
+            if (iter->first.m_endingInfo.m_text.empty()) {
+                ending->SetN(iter->first.m_endingInfo.m_number);
             }
             else {
-                ending->SetN(iter.second.m_endingText);
+                ending->SetN(iter->first.m_endingInfo.m_text);
             }
             ending->SetLendsym(LINESTARTENDSYMBOL_angledown); // default, does not need to be written
-            if (iter.second.m_endingType == "discontinue") {
+            if (iter->first.m_endingInfo.m_type == "discontinue") {
                 ending->SetLendsym(LINESTARTENDSYMBOL_none); // no ending symbol
             }
-            // replace first <measure> with <ending> element
-            section->ReplaceChild(measureList.front(), ending);
-            // go through measureList of that ending and remove remaining measures from <section> and add them to
-            // <ending>
-            for (Measure *measure : measureList) {
-                logString = logString + measure->GetID().c_str();
-                // remove other measures from <section> that are not already removed above (first measure)
-                if (measure->GetID() != measureList.front()->GetID()) {
-                    int idx = section->GetChildIndex(measure);
-                    section->DetachChild(idx);
-                }
-                ending->AddChild(measure); // add <measure> to <ending>
-                logString = logString + ((measure == measureList.back()) ? ")." : ", ");
-            }
-            LogDebug(logString.c_str());
+            target = ending;
         }
-        m_endingStack.clear();
-    }
+        else {
+            target = new Section();
+        }
 
+        // remember the target for expansion
+        iter->first.m_target = target;
+        // replace first <measure> with <section> / <ending> element
+        section->ReplaceChild(measures.front(), target);
+        // go through measures of that ending and remove remaining measures from <section> and add them to
+        // <section> / <ending>
+        for (Measure *measure : measures) {
+            // remove other measures from <section> that are not already removed above (first measure)
+            if (measure->GetID() != measures.front()->GetID()) {
+                int idx = section->GetChildIndex(measure);
+                section->DetachChild(idx);
+            }
+            target->AddChild(measure); // add <measure> to sub-element
+        }
+
+        ++iter;
+    }
+    CreateExpansion(section);
+    m_sections.clear();
+
+    // finalize document
+    m_doc->ExpandExpansions();
     m_doc->ConvertToPageBasedDoc();
+    m_doc->ConvertMarkupDoc();
 
     // clean up stacks
     if (!m_beamspanStack.empty()) {
@@ -1197,6 +1225,138 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     }
 
     return true;
+}
+
+// vibe-coded on Claude AI using prompt:
+//
+// in C++, write a concise function to parse a string of comma separated ints with optional spaces into a list (array or vector) of ints
+//
+// verified at https://onlinegdb.com/blxCanxpAW
+std::vector<int> parseInts(const std::string& str)
+{
+    std::vector<int> result;
+    std::stringstream ss(str);
+    int num;
+    while (ss >> num) {
+        result.push_back(num);
+        if (ss.peek() == ',') ss.ignore();
+    }
+    return result;
+}
+
+void MusicXmlInput::CreateExpansion(Section *section)
+{
+    assert(section);
+
+    Expansion *expansion = new Expansion();
+    expansion->SetID("expansion-default");
+    section->InsertChild(expansion, 0);
+
+    // iterate on sections to create expansion
+    // prepopulate the labels map because there are forward jumps (tocoda)
+    bool jumpBack = false;
+    auto iter = m_sections.begin();
+    auto rptiter = iter;
+    auto seciter = iter;
+    auto enditer = iter;
+    std::map<std::string, decltype(iter)> labels;
+    for (auto it = m_sections.begin(); it != m_sections.end(); ++it) {
+        if (!it->first.m_label.empty()) {
+            labels.insert({ it->first.m_label, it });
+        }
+    }
+    while (iter != m_sections.end()) {
+        // increment visited count
+        iter->first.m_visited++;
+
+        // remember this repeat start
+        if (iter->first.m_repeatStart) rptiter = iter;
+
+        // handle section
+        if (iter->first.m_classId == SECTION) {
+            // add the section
+            std::string ref = "#" + iter->first.m_target->GetID();
+            expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
+
+            // repeat the sections, beginning with the repeat start
+            int times = (jumpBack && !iter->first.m_repeatInfo.m_afterJump) ? 1 : iter->first.m_repeatInfo.m_times;
+            for (int t = 2; t <= times; ++t) {
+                for (auto it = rptiter; it != std::next(iter); ++it) {
+                    std::string ref = "#" + it->first.m_target->GetID();
+                    expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
+                }
+            }
+
+            // remember last section
+            seciter = enditer = iter++;
+        }
+        else /* ENDING */ {
+            // gather all endings, by creating a map from ending number to ending iterator
+            std::map<int, decltype(iter)> endings;
+            while (iter != m_sections.end() && iter->first.m_classId == ENDING) {
+                auto is = parseInts(iter->first.m_endingInfo.m_number);
+                for (auto i : is) {
+                    endings.insert({ i, iter });
+                }
+                enditer = iter++;
+            }
+
+            // when jumping back, keep only last ending
+            if (jumpBack) {
+                auto last = std::prev(endings.end());
+                endings.clear();
+                endings.insert(*last);
+                enditer = last->second;
+            }
+
+            // the map is automatically sorted by key (ending number), so just add them to expansion in the same order
+            // skip section first time because it was already added in the SECTION block
+            for (auto ending = endings.begin(); ending != endings.end(); ++ending) {
+                if (ending != endings.begin()) {
+                    for (auto it = rptiter; it != std::next(seciter); ++it) {
+                        std::string ref = "#" + it->first.m_target->GetID();
+                        expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
+                    }
+                }
+                std::string endref = "#" + ending->second->first.m_target->GetID();
+                expansion->GetPlistInterface()->AddRefAllowDuplicate(endref);
+            }
+        }
+
+        // fine
+        if (jumpBack && enditer->first.m_fineInfo.m_fine) {
+            break;
+        }
+
+        // dacapo
+        if (
+            enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DACAPO &&
+            enditer->first.m_jumpInfo.m_times.end() != std::find(
+                enditer->first.m_jumpInfo.m_times.begin(),
+                enditer->first.m_jumpInfo.m_times.end(),
+                enditer->first.m_visited
+            )
+        ) {
+            iter = m_sections.begin();
+            jumpBack = true;
+        }
+
+        // dalsegno / tocoda
+        if (
+            (
+                enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DALSEGNO ||
+                enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::TOCODA
+            ) &&
+            enditer->first.m_jumpInfo.m_times.end() != std::find(
+                enditer->first.m_jumpInfo.m_times.begin(),
+                enditer->first.m_jumpInfo.m_times.end(),
+                enditer->first.m_visited
+            )
+        ) {
+            iter = labels.at(enditer->first.m_jumpInfo.m_label);
+            jumpBack = enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DALSEGNO;
+        }
+    }
 }
 
 void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
@@ -1708,9 +1868,6 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         if (IsElement(child, "attributes")) {
             this->ReadMusicXmlAttributes(child, section, measure, measureNum);
         }
-        else if (IsElement(child, "sound")) {
-            this->ReadMusicXmlSound(child, measure);
-        }
         else if (IsElement(child, "backup")) {
             this->ReadMusicXmlBackup(child, measure, measureNum);
         }
@@ -1719,6 +1876,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         }
         else if (IsElement(child, "direction")) {
             this->ReadMusicXmlDirection(child, measure, measureNum, staffOffset);
+        }
+        else if (IsElement(child, "sound")) {
+            this->ReadMusicXmlSound(child, measure);
         }
         else if (IsElement(child, "figured-bass")) {
             this->ReadMusicXmlFigures(child, measure, measureNum);
@@ -1897,6 +2057,12 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
 
     const std::string barStyle = node.child("bar-style").text().as_string();
     pugi::xpath_node repeat = node.select_node("repeat");
+    int repeatTimes = 1;
+    bool repeatAfterJump = false;
+    if (repeat) {
+        repeatTimes = repeat.node().attribute("times").as_int(2);
+        repeatAfterJump = repeat.node().attribute("after-jump").as_bool(false);
+    }
     if (!barStyle.empty()) {
         data_BARRENDITION barRendition = ConvertStyleToRend(barStyle, repeat);
         if (HasAttributeWithValue(node, "location", "left")) {
@@ -1935,6 +2101,14 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
         }
     }
 
+    // start or end section
+    if (measure->GetLeft() == BARRENDITION_rptstart) {
+        m_sectionStart = musicxml::SectionInfo(true);
+    }
+    if (measure->GetRight() == BARRENDITION_rptend) {
+        m_sectionStop = musicxml::SectionInfo(musicxml::RepeatInfo(repeatTimes, repeatAfterJump));
+    }
+
     // parse endings (prima volta, seconda volta...)
     pugi::xml_node ending = node.child("ending");
     if (ending) {
@@ -1948,15 +2122,15 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
             std::string xpath = StringFormat("following::ending[@number='%s'][@type != 'start']", endingNumber.c_str());
             pugi::xpath_node endingEnd = node.select_node(xpath.c_str());
             if (endingEnd) {
-                m_currentEndingStart = musicxml::EndingInfo(endingNumber, endingType, endingText);
+                m_sectionStart = musicxml::EndingInfo(endingNumber, endingType, endingText);
             }
         }
         else if (endingType == "stop" || endingType == "discontinue") {
-            if (m_endingStack.empty()) {
+            if (m_sections.empty()) {
                 LogWarning("MusicXML import: Dangling ending tag skipped");
             }
             else {
-                m_currentEndingStop = musicxml::EndingInfo(endingNumber, endingType, endingText);
+                m_sectionStop = musicxml::EndingInfo(endingNumber, endingType, endingText);
             }
         }
     }
@@ -2546,6 +2720,12 @@ void MusicXmlInput::ReadMusicXmlDirection(
     if (!containsDynamics && !containsTempo && !containsWords && !xmlCoda && !bracket && !lead && !xmlSegno && !xmlShift
         && !xmlPedal && wedges.empty() && !dashes && !rehearsal) {
         LogWarning("MusicXML import: Unsupported direction-type '%s'", typeNode.first_child().name());
+    }
+
+    // Sound
+    pugi::xml_node xmlSound = node.child("sound");
+    if (xmlSound) {
+        ReadMusicXmlSound(xmlSound, measure);
     }
 }
 
@@ -3825,6 +4005,53 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
             LogWarning("MusicXML import: Error parsing tuning definition");
         }
     }
+
+    // segno
+    if (node.attribute("segno")) {
+        if (!m_sectionStart) m_sectionStart = musicxml::SectionInfo();
+        m_sectionStart->m_label = node.attribute("segno").as_string();
+        if (m_sectionStart->m_label.empty()) m_sectionStart->m_label = "segno";
+    }
+
+    // coda
+    if (node.attribute("coda")) {
+        if (!m_sectionStart) m_sectionStart = musicxml::SectionInfo();
+        m_sectionStart->m_label = node.attribute("coda").as_string();
+        if (m_sectionStart->m_label.empty()) m_sectionStart->m_label = "coda";
+    }
+
+    // forward-repeat
+    if (HasAttributeWithValue(node, "forward-repeat", "yes")) {
+        if (!m_sectionStart) m_sectionStart = musicxml::SectionInfo();
+    }
+
+    // dacapo
+    if (HasAttributeWithValue(node, "dacapo", "yes")) {
+        if (!m_sectionStop) m_sectionStop = musicxml::SectionInfo();
+        m_jumpInfo = musicxml::JumpInfo(musicxml::JumpInfo::DACAPO, parseInts(node.attribute("time-only").as_string("1")));
+    }
+
+    // dalsegno
+    if (node.attribute("dalsegno")) {
+        if (!m_sectionStop) m_sectionStop = musicxml::SectionInfo();
+        std::string label = node.attribute("dalsegno").as_string();
+        if (label.empty()) label = "segno";
+        m_jumpInfo = musicxml::JumpInfo(musicxml::JumpInfo::DALSEGNO, label, parseInts(node.attribute("time-only").as_string("1")));
+    }
+
+    // tocoda
+    if (node.attribute("tocoda")) {
+        if (!m_sectionStop) m_sectionStop = musicxml::SectionInfo();
+        std::string label = node.attribute("tocoda").as_string();
+        if (label.empty()) label = "coda";
+        m_jumpInfo = musicxml::JumpInfo(musicxml::JumpInfo::TOCODA, label, parseInts(node.attribute("time-only").as_string("2")));
+    }
+
+    // fine
+    if (node.attribute("fine")) {
+        if (!m_sectionStop) m_sectionStop = musicxml::SectionInfo();
+        m_fineInfo = musicxml::FineInfo(true);
+    }
 }
 
 bool MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord)
@@ -4738,14 +4965,14 @@ std::string MusicXmlInput::ConvertFigureGlyph(const std::string &value)
     return std::string();
 }
 
-bool MusicXmlInput::NotInEndingStack(const Measure *measure) const
+bool MusicXmlInput::MeasureInExistingSection(const Measure *measure) const
 {
-    for (const auto &endingItem : m_endingStack) {
-        for (Measure *endingMeasure : endingItem.first) {
-            if (endingMeasure->GetID() == measure->GetID()) return false;
+    for (const auto &section : m_sections) {
+        for (Measure *sectionMeasure : section.second) {
+            if (sectionMeasure->GetID() == measure->GetID()) return true;
         }
     }
-    return true;
+    return false;
 }
 
 void MusicXmlInput::SetFermataExternalSymbols(Fermata *fermata, const std::string &shape)
