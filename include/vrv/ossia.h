@@ -43,6 +43,11 @@ public:
     void CloneReset() override;
 
     /**
+     * Retrieve the original staff corresponding to the ossia staff
+     */
+    const Staff *GetOriginalStaffForOssia(const Staff *ossia) const;
+
+    /**
      * Methods for adding allowed content
      */
     bool IsSupportedChild(ClassId classId) override;

@@ -70,6 +70,16 @@ bool Ossia::IsSupportedChild(ClassId classId)
     }
 }
 
+const Staff *Ossia::GetOriginalStaffForOssia(const Staff *ossia) const
+{
+    AttNIntegerComparison staffN(STAFF, ossia->GetN() - OSSIA_N_OFFSET);
+    const Staff *staff = vrv_cast<const Staff *>(this->FindDescendantByComparison(&staffN));
+    if (!staff) {
+        LogDebug("Orignal ossia staff %d could not be found", ossia->GetN() - OSSIA_N_OFFSET);
+    }
+    return staff;
+}
+
 void Ossia::GetStavesAbove(MapOfOssiaStaffNs &map) const
 {
     ListOfConstObjects staves = this->FindAllDescendantsByType(STAFF);
