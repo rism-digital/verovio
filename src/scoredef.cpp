@@ -621,21 +621,20 @@ void ScoreDef::AddOssias(int staffN, const std::list<int> ossias, bool above)
 {
     StaffDef *staffDef = this->GetStaffDef(staffN);
 
-    if (!staffDef || !staffDef->GetParent() || !staffDef->GetParent()->Is(STAFFGRP)) {
-        LogDebug("The staffDef %d could not be found or not child of staffGrp", staffN);
-        return;
-    }
-
-    Object *staffGrp = staffDef->GetParent();
-
     for (auto ossiaN : ossias) {
+        // Get the original staff
+        // It might be different from the staffDef of staffN when multiple staves in ossia
+        StaffDef *origStaffDef = this->GetStaffDef(ossiaN - OSSIA_N_OFFSET);
+        if (!origStaffDef) continue;
         StaffDef *ossiaStaffDef = new StaffDef();
+        // Copy all attributes and set `@n`
+        origStaffDef->CopyAttributesTo(ossiaStaffDef);
         ossiaStaffDef->SetN(ossiaN);
         if (above) {
-            staffGrp->InsertBefore(staffDef, ossiaStaffDef);
+            staffDef->AddOssiaAbove(ossiaStaffDef);
         }
         else {
-            staffGrp->InsertAfter(staffDef, ossiaStaffDef);
+            staffDef->AddOssiaBelow(ossiaStaffDef);
         }
     }
 }
