@@ -1280,7 +1280,7 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, M
     x1 = measure->GetDrawingX();
     x2 = x1 + measure->GetWidth();
     if (staff->IsOssia()) {
-        x1 -= staff->GetOssiaDrawingShift();
+        x1 += staff->GetOssiaDrawingShift(measure);
     }
     y1 = staff->GetDrawingY();
     if (!staff->HasDrawingRotation()) {

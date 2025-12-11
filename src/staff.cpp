@@ -24,6 +24,7 @@
 #include "layer.h"
 #include "measure.h"
 #include "note.h"
+#include "ossia.h"
 #include "page.h"
 #include "staffdef.h"
 #include "syl.h"
@@ -302,16 +303,20 @@ void Staff::SetFromFacsimile(Doc *doc)
     this->AdjustDrawingStaffSize();
 }
 
-int Staff::GetOssiaDrawingShift() const
+int Staff::GetOssiaDrawingShift(const Measure *measure) const
 {
+    const Ossia *ossia = vrv_cast<const Ossia *>(this->GetFirstAncestor(OSSIA));
     const Layer *layer = vrv_cast<const Layer *>(this->FindDescendantByType(LAYER));
-    if (!layer) return 0;
+    if (!ossia && !layer) return 0;
 
     if (layer->DrawOssiaStaffDef() && layer->GetStaffDefClef()) {
         int shift = layer->GetStaffDefClef()->GetDrawingXRel();
-        return -shift;
+        return shift;
     }
-    return 0;
+    else if (ossia->DrawScoreDef() || !ossia->IsFirst()) {
+        return 0;
+    }
+    return measure->GetLeftBarLineXRel();
 }
 
 bool Staff::IsOnStaffLine(int y, const Doc *doc) const
