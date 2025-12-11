@@ -46,12 +46,33 @@ Ossia::~Ossia()
 void Ossia::CloneReset()
 {
     Object::CloneReset();
+
+    m_isFirst = true;
+    this->ResetDrawingStaffDefs();
 }
 
 void Ossia::Reset()
 {
     Object::Reset();
     this->ResetTyped();
+
+    m_isFirst = true;
+    this->ResetDrawingStaffDefs();
+}
+
+void Ossia::ResetDrawingStaffDefs()
+{
+    for (const auto &[key, value] : m_drawingStaffDefs) {
+        delete value;
+    }
+    m_drawingStaffDefs.clear();
+}
+
+void Ossia::SetDrawingStaffDef(StaffDef *drawingStaffDef)
+{
+    assert(drawingStaffDef);
+    assert(!m_drawingStaffDefs.contains(drawingStaffDef->GetN()));
+    m_drawingStaffDefs[drawingStaffDef->GetN()] = drawingStaffDef;
 }
 
 bool Ossia::IsSupportedChild(ClassId classId)

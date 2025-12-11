@@ -14,6 +14,8 @@
 
 namespace vrv {
 
+class StaffDef;
+
 //----------------------------------------------------------------------------
 // Ossia
 //----------------------------------------------------------------------------
@@ -23,7 +25,6 @@ namespace vrv {
  */
 class Ossia : public Object, public AttTyped {
 
-private:
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -43,6 +44,24 @@ public:
     void CloneReset() override;
 
     /**
+     * @name Setter and getter of the drawing staffDefs
+     */
+    ///@{
+    // StaffDef *GetDrawingStaffDef(int staffN);
+    // const StaffDef *GetDrawingStaffDef(int staffN) const;
+    void SetDrawingStaffDef(StaffDef *drawingStaffDef);
+    void ResetDrawingStaffDefs();
+    ///@}
+
+    /**
+     * @name Setter and getter for flags
+     */
+    ///@{
+    bool IsFirst() const { return (m_isFirst); }
+    void SetFirst(bool isFirst) { m_isFirst = isFirst; }
+    ///@}
+
+    /**
      * Retrieve the original staff corresponding to the ossia staff
      */
     const Staff *GetOriginalStaffForOssia(const Staff *ossia) const;
@@ -52,8 +71,13 @@ public:
      */
     bool IsSupportedChild(ClassId classId) override;
 
+    /**
+     * @name Fill the maps with ossia staves above and below
+     */
+    ///@{
     void GetStavesAbove(MapOfOssiaStaffNs &map) const;
     void GetStavesBelow(MapOfOssiaStaffNs &map) const;
+    ///@}
 
     //----------//
     // Functors //
@@ -69,13 +93,21 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
+private:
+    /**
+     * Internal method for getting staves above or below.
+     */
+    void GetStaves(MapOfOssiaStaffNs &map, ListOfConstObjects &staves) const;
+
 public:
     //
 protected:
     //
 private:
-    //
-    void GetStaves(MapOfOssiaStaffNs &map, ListOfConstObjects &staves) const;
+    /** A map of drawing staffDefs for each ossia staff */
+    std::map<int, StaffDef *> m_drawingStaffDefs;
+
+    bool m_isFirst;
 };
 
 } // namespace vrv
