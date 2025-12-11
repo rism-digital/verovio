@@ -651,11 +651,15 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitStaff(Staff *staff)
     // Takes ownership of the StaffDef
     m_currentOssia->SetDrawingStaffDef(m_currentStaffDef);
 
-    if (firstLayer) {
-        // firstLayer->GetDrawingStaffDefValues(m_currentStaffDef);
-        //  m_currentStaffDef->SetDrawClef(firstLayer->Gets)
-        //  m_currentStaffDef->SetDrawClef(true);
-    }
+    m_currentStaffDef->SetDrawClef(true);
+    m_currentStaffDef->SetDrawKeySig(true);
+    // m_currentStaffDef->SetDrawKeySig(true);
+
+    // if (firstLayer) {
+    //  firstLayer->GetDrawingStaffDefValues(m_currentStaffDef);
+    //   m_currentStaffDef->SetDrawClef(firstLayer->Gets)
+    //   m_currentStaffDef->SetDrawClef(true);
+    //}
 
     // m_currentStaffDef->SetDrawClef(true);
 

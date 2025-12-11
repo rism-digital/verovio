@@ -12,7 +12,6 @@
 #include "doc.h"
 #include "multirest.h"
 #include "rest.h"
-#include "score.h"
 #include "staff.h"
 #include "system.h"
 
@@ -24,13 +23,12 @@ namespace vrv {
 // AdjustXPosFunctor
 //----------------------------------------------------------------------------
 
-AdjustXPosFunctor::AdjustXPosFunctor(Doc *doc, const std::vector<int> &staffNs) : DocFunctor(doc)
+AdjustXPosFunctor::AdjustXPosFunctor(Doc *doc) : DocFunctor(doc)
 {
     m_minPos = 0;
     m_upcomingMinPos = VRV_UNSET;
     m_cumulatedXShift = 0;
     m_staffN = 0;
-    m_staffNs = staffNs;
     m_staffSize = 100;
     m_rightBarLinesOnly = false;
     m_measure = NULL;
@@ -305,11 +303,11 @@ FunctorCode AdjustXPosFunctor::VisitMeasure(Measure *measure)
     return FUNCTOR_SIBLINGS;
 }
 
-FunctorCode AdjustXPosFunctor::VisitScore(Score *score)
+FunctorCode AdjustXPosFunctor::VisitSystem(System *system)
 {
-    assert(score->GetScoreDef());
+    assert(system->GetDrawingScoreDef());
 
-    m_staffNs = score->GetScoreDef()->GetStaffNs();
+    m_staffNs = system->GetDrawingScoreDef()->GetStaffNs();
 
     return FUNCTOR_CONTINUE;
 }

@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "score.h"
+#include "system.h"
 
 //----------------------------------------------------------------------------
 
@@ -20,9 +20,8 @@ namespace vrv {
 // AdjustGraceXPosFunctor
 //----------------------------------------------------------------------------
 
-AdjustGraceXPosFunctor::AdjustGraceXPosFunctor(Doc *doc, const std::vector<int> &staffNs) : DocFunctor(doc)
+AdjustGraceXPosFunctor::AdjustGraceXPosFunctor(Doc *doc) : DocFunctor(doc)
 {
-    m_staffNs = staffNs;
     m_graceMaxPos = 0;
     m_graceUpcomingMaxPos = -VRV_UNSET;
     m_graceCumulatedXShift = 0;
@@ -228,11 +227,11 @@ FunctorCode AdjustGraceXPosFunctor::VisitMeasure(Measure *measure)
     return FUNCTOR_SIBLINGS;
 }
 
-FunctorCode AdjustGraceXPosFunctor::VisitScore(Score *score)
+FunctorCode AdjustGraceXPosFunctor::VisitSystem(System *system)
 {
-    assert(score->GetScoreDef());
+    assert(system->GetDrawingScoreDef());
 
-    m_staffNs = score->GetScoreDef()->GetStaffNs();
+    m_staffNs = system->GetDrawingScoreDef()->GetStaffNs();
 
     return FUNCTOR_CONTINUE;
 }

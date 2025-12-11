@@ -11,8 +11,8 @@
 
 #include "doc.h"
 #include "elementpart.h"
-#include "score.h"
 #include "staff.h"
+#include "system.h"
 
 //----------------------------------------------------------------------------
 
@@ -22,10 +22,7 @@ namespace vrv {
 // AdjustDotsFunctor
 //----------------------------------------------------------------------------
 
-AdjustDotsFunctor::AdjustDotsFunctor(Doc *doc, const std::vector<int> &staffNs) : DocFunctor(doc)
-{
-    m_staffNs = staffNs;
-}
+AdjustDotsFunctor::AdjustDotsFunctor(Doc *doc) : DocFunctor(doc) {}
 
 FunctorCode AdjustDotsFunctor::VisitAlignmentEnd(Alignment *alignment)
 {
@@ -123,11 +120,11 @@ FunctorCode AdjustDotsFunctor::VisitMeasure(Measure *measure)
     return FUNCTOR_SIBLINGS;
 }
 
-FunctorCode AdjustDotsFunctor::VisitScore(Score *score)
+FunctorCode AdjustDotsFunctor::VisitSystem(System *system)
 {
-    assert(score->GetScoreDef());
+    assert(system->GetDrawingScoreDef());
 
-    m_staffNs = score->GetScoreDef()->GetStaffNs();
+    m_staffNs = system->GetDrawingScoreDef()->GetStaffNs();
 
     return FUNCTOR_CONTINUE;
 }
