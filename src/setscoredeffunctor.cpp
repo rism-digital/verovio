@@ -619,6 +619,11 @@ ScoreDefSetOssiaFunctor::ScoreDefSetOssiaFunctor() : Functor()
 FunctorCode ScoreDefSetOssiaFunctor::VisitLayer(Layer *layer)
 {
     layer->SetDrawingStaffDefValues(m_currentStaffDef);
+    if (this->m_layerOssiaStaffDef) {
+        layer->SetDrawOssiaStaffDef(true);
+    }
+    // Do not set it on the next layer
+    m_layerOssiaStaffDef = false;
 
     return FUNCTOR_CONTINUE;
 }
@@ -642,7 +647,6 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitStaff(Staff *staff)
     assert(m_currentOssia);
 
     const Staff *originalStaff = m_currentOssia->GetOriginalStaffForOssia(staff);
-    const Layer *firstLayer = vrv_cast<const Layer *>(originalStaff->FindDescendantByType(LAYER));
 
     m_currentStaffDef = new StaffDef();
     *m_currentStaffDef = *originalStaff->m_drawingStaffDef;
@@ -651,17 +655,18 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitStaff(Staff *staff)
     // Takes ownership of the StaffDef
     m_currentOssia->SetDrawingStaffDef(m_currentStaffDef);
 
-    m_currentStaffDef->SetDrawClef(true);
-    m_currentStaffDef->SetDrawKeySig(true);
-    // m_currentStaffDef->SetDrawKeySig(true);
-
-    // if (firstLayer) {
-    //  firstLayer->GetDrawingStaffDefValues(m_currentStaffDef);
-    //   m_currentStaffDef->SetDrawClef(firstLayer->Gets)
-    //   m_currentStaffDef->SetDrawClef(true);
-    //}
-
-    // m_currentStaffDef->SetDrawClef(true);
+    bool hasValues = false;
+    const Layer *firstLayer = vrv_cast<const Layer *>(originalStaff->FindDescendantByType(LAYER));
+    // Retrieve the drawing values from the first layer of the original staff (if any)
+    if (firstLayer) {
+        hasValues = firstLayer->GetDrawingStaffDefValues(m_currentStaffDef);
+    }
+    // If we don't have value, draw an ossia scoreDef (clef and key signature)
+    if (!hasValues) {
+        m_layerOssiaStaffDef = true;
+        m_currentStaffDef->SetDrawClef(true);
+        m_currentStaffDef->SetDrawKeySig(true);
+    }
 
     assert(m_currentStaffDef);
     assert(staff->m_drawingStaffDef == NULL);
@@ -682,6 +687,7 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitStaff(Staff *staff)
 FunctorCode ScoreDefSetOssiaFunctor::VisitSystem(System *system)
 {
     m_currentScoreDef = system->GetDrawingScoreDef();
+    m_layerOssiaStaffDef = false;
 
     return FUNCTOR_CONTINUE;
 }

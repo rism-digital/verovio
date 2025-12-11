@@ -369,6 +369,8 @@ private:
     ScoreDef *m_currentScoreDef;
     // The current staffDef
     StaffDef *m_currentStaffDef;
+    // Layer ossia staffDef
+    bool m_layerOssiaStaffDef;
 };
 
 //----------------------------------------------------------------------------
