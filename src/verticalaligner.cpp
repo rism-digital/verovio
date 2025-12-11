@@ -221,8 +221,20 @@ void SystemAligner::SetSpacing(const ScoreDef *scoreDef)
         if (!object->Is(STAFFDEF)) continue;
         const StaffDef *staffDef = vrv_cast<const StaffDef *>(object);
         assert(staffDef);
+        SpacingType spacing = CalculateSpacingAbove(staffDef);
 
-        m_spacingTypes[staffDef->GetN()] = CalculateSpacingAbove(staffDef);
+        // Get the ossias above
+        std::vector<int> ns;
+        staffDef->GetOssiaAboveNs(ns);
+        // push main staff at the end so it will get an ossia spacing if needed
+        ns.push_back(staffDef->GetN());
+        for (int n : ns) m_spacingTypes[n] = SpacingType::Ossia;
+        // Top one (ossia or main staff if no ossias) gets the main staff spacing
+        m_spacingTypes[ns.at(0)] = spacing;
+        // Clear list and add ossia below with ossia spacing
+        ns.clear();
+        staffDef->GetOssiaBelowNs(ns);
+        for (int n : ns) m_spacingTypes[n] = SpacingType::Ossia;
     }
 }
 
@@ -528,6 +540,9 @@ double StaffAlignment::GetJustificationFactor(const Doc *doc) const
             case SystemAligner::SpacingType::Bracket:
                 justificationFactor = doc->GetOptions()->m_justificationBracketGroup.GetValue();
                 break;
+            case SystemAligner::SpacingType::Ossia:
+                justificationFactor = doc->GetOptions()->m_justificationStaff.GetValue() / 3;
+                break;
             case SystemAligner::SpacingType::None: break;
             default: assert(false);
         }
@@ -562,7 +577,12 @@ int StaffAlignment::CalcOverflowBelow(const BoundingBox *box) const
 int StaffAlignment::GetMinimumStaffSpacing(const Doc *doc, const AttSpacing *attSpacing) const
 {
     const auto &option = doc->GetOptions()->m_spacingStaff;
-    int spacing = option.GetValue() * doc->GetDrawingUnit(this->GetStaffSize());
+
+    int staffSize = this->GetStaffSize();
+    // Revert ossia staff ratio for it not to impact vertical spacing
+    if (this->m_staff && this->m_staff->IsOssia()) staffSize /= OSSIA_STAFF_RATIO;
+
+    int spacing = option.GetValue() * doc->GetDrawingUnit(staffSize);
 
     if (!option.IsSet() && attSpacing->HasSpacingStaff()) {
         if (attSpacing->GetSpacingStaff().GetType() == MEASUREMENTTYPE_px) {
@@ -614,6 +634,11 @@ int StaffAlignment::GetMinimumSpacing(const Doc *doc) const
                     const auto &option = doc->GetOptions()->m_spacingBracketGroup;
                     spacing = option.IsSet() ? option.GetValue() * doc->GetDrawingUnit(this->GetStaffSize())
                                              : this->GetMinimumStaffSpacing(doc, scoreDefSpacing);
+                    break;
+                }
+                case SystemAligner::SpacingType::Ossia: {
+                    // Ossia spacing is third of a staff spacing (hard coded for now)
+                    spacing = this->GetMinimumStaffSpacing(doc, scoreDefSpacing) / 3;
                     break;
                 }
                 case SystemAligner::SpacingType::None: break;
