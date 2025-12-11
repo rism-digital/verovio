@@ -85,6 +85,20 @@ public:
     const Staff *GetOriginalStaffForOssia(const Staff *ossia) const;
 
     /**
+     * @name Setter and getter of the clef and key sig alignment
+     */
+    ///@{
+    void SetClefAlignment(Alignment *clefAlignment) { m_clefAlignment = clefAlignment; }
+    void SetKeySigAlignment(Alignment *keySigAlignment) { m_keySigAlignment = keySigAlignment; }
+    void ResetAlignments();
+    ///@}
+
+    /**
+     * Return the ossia scoreDef shift using the clef and keySig alignments
+     */
+    int GetScoreDefShift() const;
+
+    /**
      * Methods for adding allowed content
      */
     bool IsSupportedChild(ClassId classId) override;
@@ -95,6 +109,14 @@ public:
     ///@{
     void GetStavesAbove(MapOfOssiaStaffNs &map) const;
     void GetStavesBelow(MapOfOssiaStaffNs &map) const;
+    ///@}
+
+    /**
+     * @name Return the top and bottom oStaff (NULL if none).
+     */
+    ///@{
+    const Staff *GetTopOStaff() const;
+    const Staff *GetBottopOStaff() const;
     ///@}
 
     //----------//
@@ -122,10 +144,15 @@ public:
 protected:
     //
 private:
-    /** A map of drawing staffDefs for each ossia staff */
-    std::map<int, StaffDef *> m_drawingStaffDefs;
+    /** A list of drawing staffDefs for each ossia staff */
+    std::list<StaffDef *> m_drawingStaffDefs;
 
+    /** A flag indicating that the ossia is a first of a series */
     bool m_isFirst;
+
+    /** The clef and keySig alignments for access to the shift */
+    Alignment *m_clefAlignment;
+    Alignment *m_keySigAlignment;
 };
 
 } // namespace vrv

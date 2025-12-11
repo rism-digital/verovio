@@ -50,6 +50,7 @@ void Ossia::CloneReset()
 
     m_isFirst = true;
     this->ResetDrawingStaffDefs();
+    this->ResetAlignments();
 }
 
 void Ossia::Reset()
@@ -59,12 +60,13 @@ void Ossia::Reset()
 
     m_isFirst = true;
     this->ResetDrawingStaffDefs();
+    this->ResetAlignments();
 }
 
 void Ossia::ResetDrawingStaffDefs()
 {
-    for (const auto &[key, value] : m_drawingStaffDefs) {
-        delete value;
+    for (const auto staffDef : m_drawingStaffDefs) {
+        delete staffDef;
     }
     m_drawingStaffDefs.clear();
 }
@@ -72,8 +74,7 @@ void Ossia::ResetDrawingStaffDefs()
 void Ossia::SetDrawingStaffDef(StaffDef *drawingStaffDef)
 {
     assert(drawingStaffDef);
-    assert(!m_drawingStaffDefs.contains(drawingStaffDef->GetN()));
-    m_drawingStaffDefs[drawingStaffDef->GetN()] = drawingStaffDef;
+    m_drawingStaffDefs.push_back(drawingStaffDef);
 }
 
 bool Ossia::HasShowScoreDef() const
@@ -136,6 +137,12 @@ const Staff *Ossia::GetOriginalStaffForOssia(const Staff *ossia) const
     return staff;
 }
 
+void Ossia::ResetAlignments()
+{
+    m_clefAlignment = NULL;
+    m_keySigAlignment = NULL;
+}
+
 void Ossia::GetStavesAbove(MapOfOssiaStaffNs &map) const
 {
     ListOfConstObjects staves = this->FindAllDescendantsByType(STAFF);
@@ -147,11 +154,36 @@ void Ossia::GetStavesAbove(MapOfOssiaStaffNs &map) const
     this->GetStaves(map, stavesReversed);
 }
 
+int Ossia::GetScoreDefShift() const
+{
+    // The clef is the further appart
+    if (m_clefAlignment) return m_clefAlignment->GetXRel();
+    // Other wise the key signature
+    if (m_keySigAlignment) return m_keySigAlignment->GetXRel();
+    return 0;
+}
+
 void Ossia::GetStavesBelow(MapOfOssiaStaffNs &map) const
 {
     ListOfConstObjects staves = this->FindAllDescendantsByType(STAFF);
 
     this->GetStaves(map, staves);
+}
+
+const Staff *Ossia::GetTopOStaff() const
+{
+    if (m_drawingStaffDefs.empty()) return NULL;
+    const int staffN = m_drawingStaffDefs.front()->GetN();
+    AttNIntegerComparison n(STAFF, staffN);
+    return vrv_cast<const Staff *>(this->FindDescendantByComparison(&n));
+}
+
+const Staff *Ossia::GetBottopOStaff() const
+{
+    if (m_drawingStaffDefs.empty()) return NULL;
+    const int staffN = m_drawingStaffDefs.back()->GetN();
+    AttNIntegerComparison n(STAFF, staffN);
+    return vrv_cast<const Staff *>(this->FindDescendantByComparison(&n));
 }
 
 void Ossia::GetStaves(MapOfOssiaStaffNs &map, ListOfConstObjects &staves) const
