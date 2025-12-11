@@ -641,6 +641,37 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitStaff(Staff *staff)
 
     assert(m_currentOssia);
 
+    const Staff *originalStaff = m_currentOssia->GetOriginalStaffForOssia(staff);
+    const Layer *firstLayer = vrv_cast<const Layer *>(originalStaff->FindDescendantByType(LAYER));
+
+    m_currentStaffDef = new StaffDef();
+    *m_currentStaffDef = *originalStaff->m_drawingStaffDef;
+    m_currentStaffDef->SetN(staff->GetN());
+
+    // Takes ownership of the StaffDef
+    m_currentOssia->SetDrawingStaffDef(m_currentStaffDef);
+
+    if (firstLayer) {
+        // firstLayer->GetDrawingStaffDefValues(m_currentStaffDef);
+        //  m_currentStaffDef->SetDrawClef(firstLayer->Gets)
+        //  m_currentStaffDef->SetDrawClef(true);
+    }
+
+    // m_currentStaffDef->SetDrawClef(true);
+
+    assert(m_currentStaffDef);
+    assert(staff->m_drawingStaffDef == NULL);
+    staff->m_drawingStaffDef = m_currentStaffDef;
+    assert(staff->m_drawingTuning == NULL);
+    staff->m_drawingTuning = vrv_cast<Tuning *>(m_currentStaffDef->FindDescendantByType(TUNING));
+    staff->m_drawingLines = m_currentStaffDef->GetLines();
+    staff->m_drawingNotationType = m_currentStaffDef->GetNotationtype();
+    staff->m_drawingStaffSize = 100;
+    if (m_currentStaffDef->HasScale()) {
+        staff->m_drawingStaffSize = m_currentStaffDef->GetScale();
+    }
+    staff->m_drawingStaffSize *= OSSIA_STAFF_RATIO;
+
     return FUNCTOR_CONTINUE;
 }
 

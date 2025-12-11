@@ -127,6 +127,11 @@ public:
     bool ImplementsEndInterface() const override { return true; }
 
     /*
+     * Getter for ossia flag
+     */
+    bool HasOssia() const { return m_hasOssia; }
+
+    /*
      * Functor interface
      */
     ///@{
@@ -172,9 +177,12 @@ private:
     bool m_restart;
     // Flag indicating if we already have a measure in the system
     bool m_hasMeasure;
-
+    // Map of ossia above a given staffN
     MapOfOssiaStaffNs m_ossiasAbove;
+    // Map of ossia below a given staffN
     MapOfOssiaStaffNs m_ossiasBelow;
+    // Flag indicating if we need have ossias to process
+    bool m_hasOssia;
 };
 
 //----------------------------------------------------------------------------
@@ -393,6 +401,7 @@ public:
     FunctorCode VisitKeySig(KeySig *keySig) override;
     FunctorCode VisitLayer(Layer *layer) override;
     FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitOssia(Ossia *ossia) override;
     FunctorCode VisitPage(Page *page) override;
     FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitSystem(System *system) override;
