@@ -721,6 +721,18 @@ std::string MusicXmlInput::StyleLabel(pugi::xml_node display)
 void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
 {
     std::string rawText;
+
+    const Text *tempoText = vrv_cast<const Text *>(tempo->FindDescendantByType(TEXT, 1));
+    if (tempoText) {
+        // if there is a tempo text, insert a space
+        std::string tempoString = UTF32to8(tempoText->GetText());
+        if (!isspace(tempoString.back())) {
+            Text *text = new Text();
+            text->SetText(UTF8to32(" "));
+            tempo->AddChild(text);
+        }
+    }
+
     bool paren = false;
     if (metronome.attribute("parentheses").as_bool()) {
         Text *text = new Text();
