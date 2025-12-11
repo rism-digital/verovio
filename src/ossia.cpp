@@ -104,6 +104,12 @@ bool Ossia::HasMultipleOStaves() const
     return false;
 }
 
+bool Ossia::DrawScoreDef() const
+{
+    if (!this->HasShowScoreDef()) return this->HasMultipleOStaves();
+    return (this->GetShowScoreDef() == BOOLEAN_true);
+}
+
 bool Ossia::IsSupportedChild(ClassId classId)
 {
     // Include pseudo classId for check from the object factory

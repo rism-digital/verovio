@@ -75,6 +75,11 @@ public:
     bool HasMultipleOStaves() const;
 
     /**
+     * Show scoreDef at drawing depending on the number of staves and the attribute values
+     */
+    bool DrawScoreDef() const;
+
+    /**
      * Retrieve the original staff corresponding to the ossia staff
      */
     const Staff *GetOriginalStaffForOssia(const Staff *ossia) const;
