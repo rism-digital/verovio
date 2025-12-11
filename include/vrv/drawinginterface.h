@@ -20,6 +20,7 @@
 namespace vrv {
 
 class Object;
+class StaffDef;
 class Stem;
 
 //----------------------------------------------------------------------------
@@ -253,6 +254,11 @@ public:
     ///@}
 
     /**
+     * Clear the ossia staffDef lists.
+     */
+    void ResetOssiaStaffDefs();
+
+    /**
      * @name Set and get the layer drawing flags for clef, keysig and mensur.
      * This will be true when starting a new system or when a scoreDef or staffDef changes occurs
      * This will be true only for the first layer in the staff.
@@ -305,6 +311,18 @@ public:
     const Proport *GetCurrentProport() const { return &m_currentProport; }
     ///@}
 
+    /**
+     * @name Methods for adding and accessing ossia staffDefs
+     */
+    ///@{
+    void AddOssiaAbove(StaffDef *ossiaStaffDef) { m_ossiasAbove.push_back(ossiaStaffDef); }
+    void AddOssiaBelow(StaffDef *ossiaStaffDef) { m_ossiasBelow.push_back(ossiaStaffDef); }
+    void GetOssiaAboveNs(std::vector<int> &staffNs) const;
+    void GetOssiaBelowNs(std::vector<int> &staffNs) const;
+    StaffDef *GetOssiaStaffDef(int staffN);
+    const StaffDef *GetOssiaStaffDef(int staffN) const;
+    ///@}
+
     //-----------------//
     // Pseudo functors //
     //-----------------//
@@ -339,6 +357,14 @@ private:
     bool m_drawMensur;
     bool m_drawMeterSig;
     bool m_drawMeterSigGrp;
+    ///@}
+
+    /**
+     * @name List of ossias staffDefs above and below
+     */
+    ///@{
+    std::list<StaffDef *> m_ossiasAbove;
+    std::list<StaffDef *> m_ossiasBelow;
     ///@}
 };
 
