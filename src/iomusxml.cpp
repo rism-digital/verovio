@@ -773,6 +773,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
                 const short int dotCount = (short int)std::count_if(
                     iter, separator, [](const auto pair) { return pair.first == MetronomeElements::BEAT_UNIT_DOT; });
                 for (short int i = 0; i < dotCount; ++i) {
+                    verovioText += UTF8to32(" ");
                     verovioText += U"\xECB7"; // SMUFL augmentation dot
                 }
                 // set @mmUnit and @mmDots attributes only based on the first beat-unit in the sequence
