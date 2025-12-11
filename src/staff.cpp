@@ -309,8 +309,8 @@ int Staff::GetOssiaDrawingShift(const Measure *measure) const
     const Layer *layer = vrv_cast<const Layer *>(this->FindDescendantByType(LAYER));
     if (!ossia && !layer) return 0;
 
-    if (layer->DrawOssiaStaffDef() && layer->GetStaffDefClef()) {
-        int shift = layer->GetStaffDefClef()->GetDrawingXRel();
+    if (layer->DrawOssiaStaffDef()) {
+        int shift = ossia->GetScoreDefShift();
         return shift;
     }
     else if (ossia->DrawScoreDef() || !ossia->IsFirst()) {

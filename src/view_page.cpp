@@ -1190,6 +1190,21 @@ void View::DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *
 
     dc->StartGraphic(ossia, "", ossia->GetID());
 
+    if (ossia->DrawScoreDef() && ossia->HasMultipleOStaves()) {
+        const Staff *topStaff = ossia->GetTopOStaff();
+        const Staff *bottomStaff = ossia->GetBottopOStaff();
+        if (topStaff && bottomStaff) {
+            const int staffSize = bottomStaff->m_drawingStaffSize;
+            const int x = topStaff->GetDrawingX() + topStaff->GetOssiaDrawingShift(measure);
+            const int y1 = topStaff->GetDrawingY();
+            const int doubleUnit = m_doc->GetDrawingDoubleUnit(staffSize);
+            const int y2 = bottomStaff->GetDrawingY() - doubleUnit * (bottomStaff->m_drawingLines - 1);
+            const int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
+            this->DrawVerticalLine(dc, y1, y2, x, barLineWidth);
+            this->DrawBrace(dc, x, y1, y2, staffSize);
+        }
+    }
+
     for (Object *child : ossia->GetChildren()) {
         if (child->Is(STAFF)) {
             this->DrawStaff(dc, vrv_cast<Staff *>(child), measure, system);
