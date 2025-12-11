@@ -69,6 +69,12 @@ FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
 
     m_scoreDefRole = (m_isFirstMeasure || m_sectionRestart) ? SCOREDEF_SYSTEM : SCOREDEF_INTERMEDIATE;
 
+    // We know we need an ossia staffDef that has to be aligned before the measure start
+    // However only if we do not have a system start or a section restart
+    if (layer->DrawOssiaStaffDef() && (m_scoreDefRole != SCOREDEF_SYSTEM)) {
+        m_scoreDefRole = SCOREDEF_OSSIA;
+    }
+
     if (layer->GetStaffDefClef()) {
         if (layer->GetStaffDefClef()->GetVisible() != BOOLEAN_false) {
             this->VisitClef(layer->GetStaffDefClef());
@@ -202,6 +208,8 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             type = ALIGNMENT_SCOREDEF_CLEF;
         else if (layerElement->GetScoreDefRole() == SCOREDEF_CAUTIONARY)
             type = ALIGNMENT_SCOREDEF_CAUTION_CLEF;
+        else if (layerElement->GetScoreDefRole() == SCOREDEF_OSSIA)
+            type = ALIGNMENT_SCOREDEF_OSSIA_CLEF;
         else {
             type = ALIGNMENT_CLEF;
         }
@@ -212,6 +220,8 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             type = ALIGNMENT_SCOREDEF_KEYSIG;
         else if (layerElement->GetScoreDefRole() == SCOREDEF_CAUTIONARY)
             type = ALIGNMENT_SCOREDEF_CAUTION_KEYSIG;
+        else if (layerElement->GetScoreDefRole() == SCOREDEF_OSSIA)
+            type = ALIGNMENT_SCOREDEF_OSSIA_KEYSIG;
         else {
             type = ALIGNMENT_KEYSIG;
         }

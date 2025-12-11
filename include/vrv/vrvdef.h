@@ -599,7 +599,13 @@ enum { SPANNING_START_END = 0, SPANNING_START, SPANNING_END, SPANNING_MIDDLE };
  * scoreDef layer elements and cautionary scoreDef layer elements
  */
 
-enum ElementScoreDefRole { SCOREDEF_NONE = 0, SCOREDEF_SYSTEM, SCOREDEF_INTERMEDIATE, SCOREDEF_CAUTIONARY };
+enum ElementScoreDefRole {
+    SCOREDEF_NONE = 0,
+    SCOREDEF_SYSTEM,
+    SCOREDEF_INTERMEDIATE,
+    SCOREDEF_CAUTIONARY,
+    SCOREDEF_OSSIA
+};
 
 //----------------------------------------------------------------------------
 // ScoreDef drawing labels
