@@ -655,10 +655,7 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitStaff(Staff *staff)
     // Takes ownership of the StaffDef
     m_currentOssia->SetDrawingStaffDef(m_currentStaffDef);
 
-    bool showScoreDef = m_currentOssia->HasMultipleOStaves();
-    if (m_currentOssia->HasShowScoreDef()) {
-        showScoreDef = (m_currentOssia->GetShowScoreDef() == BOOLEAN_true);
-    }
+    bool showScoreDef = m_currentOssia->DrawScoreDef() && m_currentOssia->IsFirst();
     if (showScoreDef) {
         bool hasValues = false;
         const Layer *firstLayer = vrv_cast<const Layer *>(originalStaff->FindDescendantByType(LAYER));
