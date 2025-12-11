@@ -224,8 +224,9 @@ void MusicXmlInput::ProcessClefChangeQueue(Section *section)
             else {
                 // For previous measure we need to make sure that clef is set at the end, so pass high duration value
                 // (since it won't matter there) and set measureNum to empty, since it doesn't matter as well
-                int endDuration = m_ppq;
-                for (int &num : m_meterCount) endDuration *= num;
+                int steps = 1;
+                for (int &num : m_meterCount) steps += num;
+                const int endDuration = 4 * m_ppq * steps / m_meterUnit;
                 musicxml::ClefChange previousClefChange(
                     std::string(""), previousStaff, previousLayer, clefChange.m_clef, endDuration, false);
                 this->AddClefs(previousMeasure, previousClefChange);
