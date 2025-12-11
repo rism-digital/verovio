@@ -24,6 +24,7 @@
 #include "adjustharmgrpsspacingfunctor.h"
 #include "adjustlayersfunctor.h"
 #include "adjustneumexfunctor.h"
+#include "adjustossiastaffdeffunctor.h"
 #include "adjustslursfunctor.h"
 #include "adjuststaffoverlapfunctor.h"
 #include "adjustsylspacingfunctor.h"
@@ -410,6 +411,9 @@ void Page::LayOutHorizontally()
     // Do not do the layout in this view - otherwise we will loop...
     view.SetPage(this, false);
     view.DrawCurrentPage(&bBoxDC, false);
+
+    AdjustOssiaStaffDefFunctor adjustOssiaStaffDef(doc);
+    this->Process(adjustOssiaStaffDef);
 
     // Adjust the position of outside articulations
     AdjustArticFunctor adjustArtic(doc);
