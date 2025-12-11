@@ -503,6 +503,9 @@ const StaffDef *ScoreDef::GetStaffDef(int n) const
         if (staffDef->GetN() == n) {
             return staffDef;
         }
+        // Also check if we are looking for an ossia staffDef
+        const StaffDef *ossia = staffDef->GetOssiaStaffDef(n);
+        if (ossia) return ossia;
     }
 
     // Nothing found, something broken in the data...
@@ -538,8 +541,10 @@ std::vector<int> ScoreDef::GetStaffNs() const
         // It should be staffDef only, but double check.
         if (!child->Is(STAFFDEF)) continue;
         staffDef = vrv_cast<const StaffDef *>(child);
-        assert(staffDef);
+        // Include ossia staves (above and below)
+        staffDef->GetOssiaAboveNs(ns);
         ns.push_back(staffDef->GetN());
+        staffDef->GetOssiaBelowNs(ns);
     }
     return ns;
 }
