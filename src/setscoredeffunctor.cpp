@@ -101,6 +101,7 @@ ScoreDefSetCurrentFunctor::ScoreDefSetCurrentFunctor(Doc *doc) : DocFunctor(doc)
     m_drawLabels = false;
     m_restart = false;
     m_hasMeasure = false;
+    m_hasOssia = false;
 }
 
 FunctorCode ScoreDefSetCurrentFunctor::VisitClef(Clef *clef)
@@ -222,6 +223,7 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitOssia(Ossia *ossia)
 {
     ossia->GetStavesAbove(this->m_ossiasAbove);
     ossia->GetStavesBelow(this->m_ossiasBelow);
+    m_hasOssia = true;
 
     return FUNCTOR_CONTINUE;
 }
@@ -297,7 +299,10 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitScoreDef(ScoreDef *scoreDef)
 
 FunctorCode ScoreDefSetCurrentFunctor::VisitStaff(Staff *staff)
 {
+    if (staff->IsOssia()) return FUNCTOR_SIBLINGS;
+
     m_currentStaffDef = m_currentScoreDef->GetStaffDef(staff->GetN());
+    assert(m_currentStaffDef);
     assert(staff->m_drawingStaffDef == NULL);
     staff->m_drawingStaffDef = m_currentStaffDef;
     assert(staff->m_drawingTuning == NULL);
@@ -527,6 +532,8 @@ FunctorCode SetCautionaryScoreDefFunctor::VisitLayer(Layer *layer)
 
 FunctorCode SetCautionaryScoreDefFunctor::VisitStaff(Staff *staff)
 {
+    if (staff->IsOssia()) return FUNCTOR_SIBLINGS;
+
     assert(m_currentScoreDef);
     m_currentStaffDef = m_currentScoreDef->GetStaffDef(staff->GetN());
     return FUNCTOR_CONTINUE;
@@ -600,6 +607,57 @@ FunctorCode ScoreDefSetGrpSymFunctor::VisitSystem(System *system)
 }
 
 //----------------------------------------------------------------------------
+// ScoreDefSetOssiaFunctor
+//----------------------------------------------------------------------------
+
+ScoreDefSetOssiaFunctor::ScoreDefSetOssiaFunctor() : Functor()
+{
+    m_currentOssia = NULL;
+    m_currentStaffDef = NULL;
+}
+
+FunctorCode ScoreDefSetOssiaFunctor::VisitLayer(Layer *layer)
+{
+    layer->SetDrawingStaffDefValues(m_currentStaffDef);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefSetOssiaFunctor::VisitMeasure(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefSetOssiaFunctor::VisitOssia(Ossia *ossia)
+{
+    m_currentOssia = ossia;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefSetOssiaFunctor::VisitStaff(Staff *staff)
+{
+    if (!staff->IsOssia()) return FUNCTOR_SIBLINGS;
+
+    assert(m_currentOssia);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefSetOssiaFunctor::VisitSystem(System *system)
+{
+    m_currentScoreDef = system->GetDrawingScoreDef();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefSetOssiaFunctor::VisitSystemEnd(System *system)
+{
+
+    return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
 // ScoreDefUnsetCurrentFunctor
 //----------------------------------------------------------------------------
 
@@ -645,6 +703,13 @@ FunctorCode ScoreDefUnsetCurrentFunctor::VisitMeasure(Measure *measure)
 
     // We also need to remove scoreDef elements in the AlignmentReference objects
     measure->m_measureAligner.Process(*this);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefUnsetCurrentFunctor::VisitOssia(Ossia *ossia)
+{
+    ossia->ResetDrawingStaffDefs();
 
     return FUNCTOR_CONTINUE;
 }

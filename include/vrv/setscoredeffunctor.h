@@ -315,6 +315,55 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ScoreDefSetOssiaFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class prepares the group symbol starting and ending staffDefs for drawing.
+ */
+class ScoreDefSetOssiaFunctor : public Functor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    ScoreDefSetOssiaFunctor();
+    virtual ~ScoreDefSetOssiaFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitLayer(Layer *layer) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitOssia(Ossia *ossia) override;
+    FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitSystem(System *system) override;
+    FunctorCode VisitSystemEnd(System *system) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The current ossia
+    Ossia *m_currentOssia;
+    // The current scoreDef
+    ScoreDef *m_currentScoreDef;
+    // The current staffDef
+    StaffDef *m_currentStaffDef;
+};
+
+//----------------------------------------------------------------------------
 // ScoreDefUnsetCurrentFunctor
 //----------------------------------------------------------------------------
 
