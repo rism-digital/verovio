@@ -274,6 +274,12 @@
 		4D27E13827F582BB00D64FBD /* docselection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D27E13627F582BB00D64FBD /* docselection.cpp */; };
 		4D27E13927F582BB00D64FBD /* docselection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D27E13627F582BB00D64FBD /* docselection.cpp */; };
 		4D27E13A27F582BB00D64FBD /* docselection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D27E13627F582BB00D64FBD /* docselection.cpp */; };
+		4D292C1E2EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D292C1D2EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp */; };
+		4D292C1F2EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D292C1D2EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp */; };
+		4D292C202EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D292C1D2EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp */; };
+		4D292C212EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D292C1D2EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp */; };
+		4D292C232EEB0BC000C1EB5F /* adjustossiastaffdeffunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D292C222EEB0BC000C1EB5F /* adjustossiastaffdeffunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D292C242EEB0BC000C1EB5F /* adjustossiastaffdeffunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D292C222EEB0BC000C1EB5F /* adjustossiastaffdeffunctor.h */; };
 		4D2E758A22BC2B34004C51F0 /* view_tab.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20741122A708C600E0765F /* view_tab.cpp */; };
 		4D2E758B22BC2B5B004C51F0 /* tabgrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F422A3BCDF00E0765F /* tabgrp.cpp */; };
 		4D2E758C22BC2B5B004C51F0 /* tabgrp.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2073F122A3BCB700E0765F /* tabgrp.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1901,6 +1907,8 @@
 		4D2614172E6995D700CD28CF /* editortoolkit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = editortoolkit.cpp; path = src/editortoolkit.cpp; sourceTree = "<group>"; };
 		4D27E13327F582AB00D64FBD /* docselection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = docselection.h; path = include/vrv/docselection.h; sourceTree = "<group>"; };
 		4D27E13627F582BB00D64FBD /* docselection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = docselection.cpp; path = src/docselection.cpp; sourceTree = "<group>"; };
+		4D292C1D2EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = adjustossiastaffdeffunctor.cpp; path = src/adjustossiastaffdeffunctor.cpp; sourceTree = "<group>"; };
+		4D292C222EEB0BC000C1EB5F /* adjustossiastaffdeffunctor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = adjustossiastaffdeffunctor.h; path = include/vrv/adjustossiastaffdeffunctor.h; sourceTree = "<group>"; };
 		4D308100203DB69C00BC44F6 /* ref.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ref.h; path = include/vrv/ref.h; sourceTree = "<group>"; };
 		4D308103203DB6B500BC44F6 /* ref.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ref.cpp; path = src/ref.cpp; sourceTree = "<group>"; };
 		4D36C21C1EBCE14300A6DD1B /* fb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fb.h; path = include/vrv/fb.h; sourceTree = "<group>"; };
@@ -3221,6 +3229,8 @@
 				4D4CDEA42C078FF9005621E9 /* adjustneumexfunctor.cpp */,
 				4D4CDEA62C079008005621E9 /* adjustneumexfunctor.h */,
 				E7876F1729C07F16002147DC /* adjustsylspacingfunctor.cpp */,
+				4D292C1D2EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp */,
+				4D292C222EEB0BC000C1EB5F /* adjustossiastaffdeffunctor.h */,
 				E7876F1429C07EE1002147DC /* adjustsylspacingfunctor.h */,
 				E7E9C11C29B0EFB400CFCE2F /* adjusttempofunctor.cpp */,
 				E7E9C11929B0EF8A00CFCE2F /* adjusttempofunctor.h */,
@@ -3454,6 +3464,7 @@
 				4DBDD67B2939E1D7009EC466 /* symboltable.h in Headers */,
 				4DACC9402990ED2600B55913 /* libmei.h in Headers */,
 				4D89F90C201771A700A4D336 /* num.h in Headers */,
+				4D292C242EEB0BC000C1EB5F /* adjustossiastaffdeffunctor.h in Headers */,
 				4DA0EAE322BB77AF00A7EBEB /* surface.h in Headers */,
 				4DACC9E62990F29A00B55913 /* atttypes.h in Headers */,
 				4D4CDEA72C079026005621E9 /* adjustneumexfunctor.h in Headers */,
@@ -3661,6 +3672,7 @@
 				BB4C4AFA22A932BC001F6AF0 /* restore.h in Headers */,
 				BB4C4B2422A932CF001F6AF0 /* dynam.h in Headers */,
 				BB4C4AD022A932B6001F6AF0 /* score.h in Headers */,
+				4D292C232EEB0BC000C1EB5F /* adjustossiastaffdeffunctor.h in Headers */,
 				BB4C4B8E22A932DF001F6AF0 /* svg.h in Headers */,
 				BB4C4B3822A932CF001F6AF0 /* trill.h in Headers */,
 				BB4C4B6422A932D7001F6AF0 /* mrpt2.h in Headers */,
@@ -4300,6 +4312,7 @@
 				E7A03CD529D6176900C02941 /* adjusttupletsyfunctor.cpp in Sources */,
 				E71EF3C82975ED4600D36264 /* resetfunctor.cpp in Sources */,
 				40C2E4242052A6FA0003625F /* sb.cpp in Sources */,
+				4D292C1E2EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp in Sources */,
 				4D1694441E3A44F300569BF4 /* vrv.cpp in Sources */,
 				E75A69A129CCF8A600414819 /* adjustbeamsfunctor.cpp in Sources */,
 				4D1694451E3A44F300569BF4 /* mrest.cpp in Sources */,
@@ -4427,6 +4440,7 @@
 				E7870357299CF06D00156DC4 /* adjustarpegfunctor.cpp in Sources */,
 				4DEBE6E62B36E9B300B67DFB /* facsimilefunctor.cpp in Sources */,
 				4DEC4D9E21C81E9400D1D273 /* orig.cpp in Sources */,
+				4D292C1F2EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp in Sources */,
 				4DDBBB5D1C7AE45900054AFF /* hairpin.cpp in Sources */,
 				4D43C30C1A9BB22A00EA28F3 /* view_mensural.cpp in Sources */,
 				4DFB3E8523ABDFC200D688C7 /* pitchinflection.cpp in Sources */,
@@ -4897,6 +4911,7 @@
 				E7A03CD629D6176A00C02941 /* adjusttupletsyfunctor.cpp in Sources */,
 				4DB3D8BC1F83D0D200B5FC2B /* expansion.cpp in Sources */,
 				4D22C41A18890E6100D0831F /* mrest.cpp in Sources */,
+				4D292C202EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp in Sources */,
 				4DF440781D39575500152B7E /* ending.cpp in Sources */,
 				E75A69A229CCF8A800414819 /* adjustbeamsfunctor.cpp in Sources */,
 				4DEC4D9021C81DEE00D1D273 /* damage.cpp in Sources */,
@@ -5196,6 +5211,7 @@
 				E7A03CD729D6176B00C02941 /* adjusttupletsyfunctor.cpp in Sources */,
 				BB4C4B8922A932DF001F6AF0 /* mnum.cpp in Sources */,
 				BB4C4B2722A932CF001F6AF0 /* hairpin.cpp in Sources */,
+				4D292C212EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp in Sources */,
 				BB4C4B3F22A932D7001F6AF0 /* barline.cpp in Sources */,
 				E75A69A329CCF8A900414819 /* adjustbeamsfunctor.cpp in Sources */,
 				E788336B299500DD00D44B01 /* calcspanningbeamspansfunctor.cpp in Sources */,

@@ -19,6 +19,7 @@
 #import <VerovioFramework/adjustharmgrpsspacingfunctor.h>
 #import <VerovioFramework/adjustlayersfunctor.h>
 #import <VerovioFramework/adjustneumexfunctor.h>
+#import <VerovioFramework/adjustossiastaffdeffunctor.h>
 #import <VerovioFramework/adjustslursfunctor.h>
 #import <VerovioFramework/adjuststaffoverlapfunctor.h>
 #import <VerovioFramework/adjustsylspacingfunctor.h>
