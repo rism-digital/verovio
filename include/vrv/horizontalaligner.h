@@ -29,6 +29,8 @@ class TimestampAttr;
  * For example, we align notes and rests (default) together, clefs separately, etc.
  */
 enum AlignmentType {
+    ALIGNMENT_SCOREDEF_OSSIA_CLEF = -2,
+    ALIGNMENT_SCOREDEF_OSSIA_KEYSIG,
     ALIGNMENT_MEASURE_START = 0,
     // Non-justifiable
     ALIGNMENT_SCOREDEF_CLEF,
