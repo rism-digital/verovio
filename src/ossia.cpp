@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <cassert>
 #include <math.h>
+#include <regex>
 
 //----------------------------------------------------------------------------
 
@@ -73,6 +74,34 @@ void Ossia::SetDrawingStaffDef(StaffDef *drawingStaffDef)
     assert(drawingStaffDef);
     assert(!m_drawingStaffDefs.contains(drawingStaffDef->GetN()));
     m_drawingStaffDefs[drawingStaffDef->GetN()] = drawingStaffDef;
+}
+
+bool Ossia::HasShowScoreDef() const
+{
+    static const std::regex re("show.scoredef.*");
+    return (this->HasType() && std::regex_match(this->GetType(), re));
+}
+
+data_BOOLEAN Ossia::GetShowScoreDef() const
+{
+    static const std::regex reTrue("show.scoredef.true");
+    static const std::regex reFalse("show.scoredef.false");
+    if (this->HasType() && std::regex_match(this->GetType(), reTrue)) return BOOLEAN_true;
+    if (this->HasType() && std::regex_match(this->GetType(), reFalse)) return BOOLEAN_false;
+    return BOOLEAN_NONE;
+}
+
+bool Ossia::HasMultipleOStaves() const
+{
+    int count = 0;
+    ListOfConstObjects staves = this->FindAllDescendantsByType(STAFF);
+    for (auto it = staves.begin(); it != staves.end(); ++it) {
+        const Staff *staff = vrv_cast<const Staff *>(*it);
+        assert(staff);
+        if (staff->IsOssia()) count++;
+        if (count > 1) return true;
+    }
+    return false;
 }
 
 bool Ossia::IsSupportedChild(ClassId classId)

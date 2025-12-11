@@ -54,12 +54,25 @@ public:
     ///@}
 
     /**
-     * @name Setter and getter for flags
+     * @name Methods based on type to be replaced by MEI attributes if possible
+     */
+    ///@{
+    bool HasShowScoreDef() const;
+    data_BOOLEAN GetShowScoreDef() const;
+    ///@}
+
+    /**
+     * @name Setter and getters
      */
     ///@{
     bool IsFirst() const { return (m_isFirst); }
     void SetFirst(bool isFirst) { m_isFirst = isFirst; }
     ///@}
+
+    /**
+     * Return true if the ossia element as more than one oStaff
+     */
+    bool HasMultipleOStaves() const;
 
     /**
      * Retrieve the original staff corresponding to the ossia staff

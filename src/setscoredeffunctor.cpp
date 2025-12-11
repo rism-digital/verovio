@@ -655,17 +655,23 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitStaff(Staff *staff)
     // Takes ownership of the StaffDef
     m_currentOssia->SetDrawingStaffDef(m_currentStaffDef);
 
-    bool hasValues = false;
-    const Layer *firstLayer = vrv_cast<const Layer *>(originalStaff->FindDescendantByType(LAYER));
-    // Retrieve the drawing values from the first layer of the original staff (if any)
-    if (firstLayer) {
-        hasValues = firstLayer->GetDrawingStaffDefValues(m_currentStaffDef);
+    bool showScoreDef = m_currentOssia->HasMultipleOStaves();
+    if (m_currentOssia->HasShowScoreDef()) {
+        showScoreDef = (m_currentOssia->GetShowScoreDef() == BOOLEAN_true);
     }
-    // If we don't have value, draw an ossia scoreDef (clef and key signature)
-    if (!hasValues) {
-        m_layerOssiaStaffDef = true;
-        m_currentStaffDef->SetDrawClef(true);
-        m_currentStaffDef->SetDrawKeySig(true);
+    if (showScoreDef) {
+        bool hasValues = false;
+        const Layer *firstLayer = vrv_cast<const Layer *>(originalStaff->FindDescendantByType(LAYER));
+        // Retrieve the drawing values from the first layer of the original staff (if any)
+        if (firstLayer) {
+            hasValues = firstLayer->GetDrawingStaffDefValues(m_currentStaffDef);
+        }
+        // If we don't have values, draw an ossia scoreDef (clef and key signature)
+        if (!hasValues) {
+            m_layerOssiaStaffDef = true;
+            m_currentStaffDef->SetDrawClef(true);
+            m_currentStaffDef->SetDrawKeySig(true);
+        }
     }
 
     assert(m_currentStaffDef);

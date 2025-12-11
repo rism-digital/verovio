@@ -1994,6 +1994,8 @@ void MEIOutput::WriteOssia(pugi::xml_node currentNode, Ossia *ossia)
     assert(ossia);
 
     this->WriteXmlId(currentNode, ossia);
+
+    ossia->WriteTyped(currentNode);
 }
 
 void MEIOutput::WriteMeterSigGrp(pugi::xml_node currentNode, MeterSigGrp *meterSigGrp)
@@ -5799,6 +5801,8 @@ bool MEIInput::ReadOssia(Object *parent, pugi::xml_node ossia)
 {
     Ossia *vrvOssia = new Ossia();
     this->SetMeiID(ossia, vrvOssia);
+
+    vrvOssia->ReadTyped(ossia);
 
     parent->AddChild(vrvOssia);
     this->ReadUnsupportedAttr(ossia, vrvOssia);
