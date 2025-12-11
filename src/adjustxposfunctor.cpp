@@ -36,7 +36,8 @@ AdjustXPosFunctor::AdjustXPosFunctor(Doc *doc) : DocFunctor(doc)
 
 FunctorCode AdjustXPosFunctor::VisitAlignment(Alignment *alignment)
 {
-    // LogDebug("Alignment type %d", alignment->GetType());
+    // Ossia scoreDef should not be aligned because that is taken care of in the dedicated functor
+    if (alignment->GetType() < ALIGNMENT_MEASURE_START) return FUNCTOR_SIBLINGS;
 
     alignment->SetXRel(alignment->GetXRel() + m_cumulatedXShift);
 
