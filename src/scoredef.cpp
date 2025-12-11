@@ -505,7 +505,8 @@ const StaffDef *ScoreDef::GetStaffDef(int n) const
         }
     }
 
-    return staffDef;
+    // Nothing found, something broken in the data...
+    return NULL;
 }
 
 StaffGrp *ScoreDef::GetStaffGrp(const std::string &n)
