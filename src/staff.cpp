@@ -302,6 +302,18 @@ void Staff::SetFromFacsimile(Doc *doc)
     this->AdjustDrawingStaffSize();
 }
 
+int Staff::GetOssiaDrawingShift() const
+{
+    const Layer *layer = vrv_cast<const Layer *>(this->FindDescendantByType(LAYER));
+    if (!layer) return 0;
+
+    if (layer->DrawOssiaStaffDef() && layer->GetStaffDefClef()) {
+        int shift = layer->GetStaffDefClef()->GetDrawingXRel();
+        return -shift;
+    }
+    return 0;
+}
+
 bool Staff::IsOnStaffLine(int y, const Doc *doc) const
 {
     assert(doc);

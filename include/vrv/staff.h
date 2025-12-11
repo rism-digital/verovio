@@ -279,6 +279,11 @@ public:
      */
     void SetFromFacsimile(Doc *doc);
 
+    /**
+     * Get the drawing x if the staff is an ossia and has an ossia staffDef
+     */
+    int GetOssiaDrawingShift() const;
+
     //----------//
     // Functors //
     //----------//
