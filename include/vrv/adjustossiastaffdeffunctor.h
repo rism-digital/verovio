@@ -32,7 +32,7 @@ public:
     /*
      * Abstract base implementation
      */
-    bool ImplementsEndInterface() const override { return false; }
+    bool ImplementsEndInterface() const override { return true; }
 
     /*
      * Functor interface
@@ -41,6 +41,8 @@ public:
     FunctorCode VisitAlignment(Alignment *alignment) override;
     FunctorCode VisitLayerElement(LayerElement *layerElement) override;
     FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitMeasureEnd(Measure *measure) override;
+    FunctorCode VisitStaff(Staff *staff) override;
     ///@}
 
 protected:
@@ -52,8 +54,16 @@ public:
 private:
     // The key signature maxmimal width;
     int m_keySigWidth;
+    // The clef maximal width;
+    int m_clefWidth;
     // The current staff size
     int m_staffSize;
+    // The keySig alignment;
+    Alignment *m_keySigAlignment;
+    // The clef alignment;
+    Alignment *m_clefAlignment;
+    // List of ossias
+    std::list<Ossia *> m_ossias;
 };
 
 } // namespace vrv
