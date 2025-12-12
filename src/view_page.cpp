@@ -1195,12 +1195,14 @@ void View::DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *
         const Staff *bottomStaff = ossia->GetBottopOStaff();
         if (topStaff && bottomStaff) {
             const int staffSize = bottomStaff->m_drawingStaffSize;
-            const int x = topStaff->GetDrawingX() + topStaff->GetOssiaDrawingShift(measure);
+            int shift = topStaff->GetOssiaDrawingShift(measure);
+            if (shift != 0) shift -= m_doc->GetDrawingUnit(staffSize);
+            const int x = topStaff->GetDrawingX() + shift;
             const int y1 = topStaff->GetDrawingY();
             const int doubleUnit = m_doc->GetDrawingDoubleUnit(staffSize);
             const int y2 = bottomStaff->GetDrawingY() - doubleUnit * (bottomStaff->m_drawingLines - 1);
             const int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
-            this->DrawVerticalLine(dc, y1, y2, x, barLineWidth);
+            this->DrawVerticalLine(dc, y1, y2, x + barLineWidth / 2, barLineWidth);
             this->DrawBrace(dc, x, y1, y2, staffSize);
         }
     }
@@ -1295,7 +1297,9 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, M
     x1 = measure->GetDrawingX();
     x2 = x1 + measure->GetWidth();
     if (staff->IsOssia()) {
-        x1 += staff->GetOssiaDrawingShift(measure);
+        int shift = staff->GetOssiaDrawingShift(measure);
+        if (shift != 0) shift -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        x1 += shift;
     }
     y1 = staff->GetDrawingY();
     if (!staff->HasDrawingRotation()) {

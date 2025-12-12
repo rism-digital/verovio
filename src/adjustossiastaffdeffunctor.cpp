@@ -43,15 +43,15 @@ FunctorCode AdjustOssiaStaffDefFunctor::VisitLayerElement(LayerElement *layerEle
 {
     if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
+    const int unit = m_doc->GetDrawingUnit(m_staffSize);
+
     if (layerElement->Is(KEYSIG)) {
-        int width = layerElement->GetContentX1() + layerElement->GetContentX2();
-        // layerElement->SetDrawingXRel(-width - m_doc->GetDrawingUnit(m_staffSize));
+        int width = layerElement->GetContentX1() + layerElement->GetContentX2() + unit;
         m_keySigWidth = std::max(width, m_keySigWidth);
     }
     else if (layerElement->Is(CLEF)) {
-        int width = layerElement->GetContentX1() + layerElement->GetContentX2();
+        int width = layerElement->GetContentX1() + layerElement->GetContentX2() + unit;
         m_clefWidth = std::max(width, m_clefWidth);
-        // layerElement->SetDrawingXRel(-width - 2 * m_doc->GetDrawingUnit(m_staffSize) - m_keySigWidth);
     }
     Ossia *ossia = vrv_cast<Ossia *>(layerElement->GetFirstAncestor(OSSIA));
     assert(ossia);
