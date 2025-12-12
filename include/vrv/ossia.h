@@ -119,6 +119,11 @@ public:
     const Staff *GetBottopOStaff() const;
     ///@}
 
+    /**
+     * Return the staff `@n` of oStaff in the order they appear.
+     */
+    std::vector<int> GetOStaffNs() const;
+
     //----------//
     // Functors //
     //----------//

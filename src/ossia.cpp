@@ -186,6 +186,18 @@ const Staff *Ossia::GetBottopOStaff() const
     return vrv_cast<const Staff *>(this->FindDescendantByComparison(&n));
 }
 
+std::vector<int> Ossia::GetOStaffNs() const
+{
+    ListOfConstObjects staves = this->FindAllDescendantsByType(STAFF);
+    std::vector<int> ns;
+    for (auto object : staves) {
+        const Staff *staff = vrv_cast<const Staff *>(object);
+        assert(staff);
+        if (staff->IsOssia()) ns.push_back(staff->GetN());
+    }
+    return ns;
+}
+
 void Ossia::GetStaves(MapOfOssiaStaffNs &map, ListOfConstObjects &staves) const
 {
     int staffN = VRV_UNSET;

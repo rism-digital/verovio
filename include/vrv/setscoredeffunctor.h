@@ -350,6 +350,7 @@ public:
     ///@{
     FunctorCode VisitLayer(Layer *layer) override;
     FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitMeasureEnd(Measure *measure) override;
     FunctorCode VisitOssia(Ossia *ossia) override;
     FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitSystem(System *system) override;
@@ -363,8 +364,10 @@ private:
 public:
     //
 private:
-    // The current ossia
-    Ossia *m_currentOssia;
+    // The current ossias
+    std::list<Ossia *> m_currentOssias;
+    // The ossias in the previous measure
+    std::list<Ossia *> m_previousOssias;
     // The current scoreDef
     ScoreDef *m_currentScoreDef;
     // The current staffDef

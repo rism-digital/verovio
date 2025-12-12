@@ -612,7 +612,6 @@ FunctorCode ScoreDefSetGrpSymFunctor::VisitSystem(System *system)
 
 ScoreDefSetOssiaFunctor::ScoreDefSetOssiaFunctor() : Functor()
 {
-    m_currentOssia = NULL;
     m_currentStaffDef = NULL;
 }
 
@@ -630,12 +629,29 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitLayer(Layer *layer)
 
 FunctorCode ScoreDefSetOssiaFunctor::VisitMeasure(Measure *measure)
 {
+    m_currentOssias.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefSetOssiaFunctor::VisitMeasureEnd(Measure *measure)
+{
+    m_previousOssias = m_currentOssias;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ScoreDefSetOssiaFunctor::VisitOssia(Ossia *ossia)
 {
-    m_currentOssia = ossia;
+    m_currentOssias.push_front(ossia);
+
+    std::vector<int> current = ossia->GetOStaffNs();
+
+    auto it = std::find_if(m_previousOssias.begin(), m_previousOssias.end(),
+        [&](Ossia *previous) { return previous->GetOStaffNs() == current; });
+    if (it != m_previousOssias.end()) {
+        ossia->SetFirst(false);
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -644,18 +660,19 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitStaff(Staff *staff)
 {
     if (!staff->IsOssia()) return FUNCTOR_SIBLINGS;
 
-    assert(m_currentOssia);
+    assert(!m_currentOssias.empty());
+    Ossia *ossia = m_currentOssias.front();
 
-    const Staff *originalStaff = m_currentOssia->GetOriginalStaffForOssia(staff);
+    const Staff *originalStaff = ossia->GetOriginalStaffForOssia(staff);
 
     m_currentStaffDef = new StaffDef();
     *m_currentStaffDef = *originalStaff->m_drawingStaffDef;
     m_currentStaffDef->SetN(staff->GetN());
 
     // Takes ownership of the StaffDef
-    m_currentOssia->SetDrawingStaffDef(m_currentStaffDef);
+    ossia->SetDrawingStaffDef(m_currentStaffDef);
 
-    bool showScoreDef = m_currentOssia->DrawScoreDef() && m_currentOssia->IsFirst();
+    bool showScoreDef = ossia->DrawScoreDef() && ossia->IsFirst();
     if (showScoreDef) {
         bool hasValues = false;
         const Layer *firstLayer = vrv_cast<const Layer *>(originalStaff->FindDescendantByType(LAYER));
