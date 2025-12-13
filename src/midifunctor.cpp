@@ -1001,6 +1001,8 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
 
 FunctorCode GenerateMIDIFunctor::VisitStaff(const Staff *staff)
 {
+    if (staff->IsOssia()) return FUNCTOR_SIBLINGS;
+
     m_expandedNotes.clear();
 
     return FUNCTOR_CONTINUE;
@@ -1174,6 +1176,13 @@ FunctorCode GenerateTimemapFunctor::VisitNote(const Note *note)
 FunctorCode GenerateTimemapFunctor::VisitRest(const Rest *rest)
 {
     this->AddTimemapEntry(rest);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode GenerateTimemapFunctor::VisitStaff(const Staff *staff)
+{
+    if (staff->IsOssia()) return FUNCTOR_SIBLINGS;
 
     return FUNCTOR_SIBLINGS;
 }
