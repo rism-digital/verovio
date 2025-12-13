@@ -170,7 +170,7 @@ void Ossia::GetStavesBelow(MapOfOssiaStaffNs &map) const
     this->GetStaves(map, staves);
 }
 
-const Staff *Ossia::GetTopOStaff() const
+const Staff *Ossia::GetDrawingTopOStaff() const
 {
     if (m_drawingStaffDefs.empty()) return NULL;
     const int staffN = m_drawingStaffDefs.front()->GetN();
@@ -178,7 +178,7 @@ const Staff *Ossia::GetTopOStaff() const
     return vrv_cast<const Staff *>(this->FindDescendantByComparison(&n));
 }
 
-const Staff *Ossia::GetBottopOStaff() const
+const Staff *Ossia::GetDrawingBottopOStaff() const
 {
     if (m_drawingStaffDefs.empty()) return NULL;
     const int staffN = m_drawingStaffDefs.back()->GetN();

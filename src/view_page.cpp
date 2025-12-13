@@ -1191,8 +1191,8 @@ void View::DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *
     dc->StartGraphic(ossia, "", ossia->GetID());
 
     if (ossia->IsFirst() && ossia->DrawScoreDef() && ossia->HasMultipleOStaves()) {
-        const Staff *topStaff = ossia->GetTopOStaff();
-        const Staff *bottomStaff = ossia->GetBottopOStaff();
+        const Staff *topStaff = ossia->GetDrawingTopOStaff();
+        const Staff *bottomStaff = ossia->GetDrawingBottopOStaff();
         if (topStaff && bottomStaff) {
             const int staffSize = bottomStaff->m_drawingStaffSize;
             int shift = topStaff->GetOssiaDrawingShift(measure);

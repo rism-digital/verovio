@@ -115,8 +115,8 @@ public:
      * @name Return the top and bottom oStaff (NULL if none).
      */
     ///@{
-    const Staff *GetTopOStaff() const;
-    const Staff *GetBottopOStaff() const;
+    const Staff *GetDrawingTopOStaff() const;
+    const Staff *GetDrawingBottopOStaff() const;
     ///@}
 
     /**
