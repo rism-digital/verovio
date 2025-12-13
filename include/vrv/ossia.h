@@ -50,7 +50,7 @@ public:
     // StaffDef *GetDrawingStaffDef(int staffN);
     // const StaffDef *GetDrawingStaffDef(int staffN) const;
     void SetDrawingStaffDef(StaffDef *drawingStaffDef);
-    void ResetDrawingStaffDefs();
+    void ResetDrawingScoreDef();
     ///@}
 
     /**

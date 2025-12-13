@@ -48,8 +48,7 @@ void Ossia::CloneReset()
 {
     Object::CloneReset();
 
-    m_isFirst = true;
-    this->ResetDrawingStaffDefs();
+    this->ResetDrawingScoreDef();
     this->ResetAlignments();
 }
 
@@ -58,17 +57,17 @@ void Ossia::Reset()
     Object::Reset();
     this->ResetTyped();
 
-    m_isFirst = true;
-    this->ResetDrawingStaffDefs();
+    this->ResetDrawingScoreDef();
     this->ResetAlignments();
 }
 
-void Ossia::ResetDrawingStaffDefs()
+void Ossia::ResetDrawingScoreDef()
 {
     for (const auto staffDef : m_drawingStaffDefs) {
         delete staffDef;
     }
     m_drawingStaffDefs.clear();
+    m_isFirst = true;
 }
 
 void Ossia::SetDrawingStaffDef(StaffDef *drawingStaffDef)
