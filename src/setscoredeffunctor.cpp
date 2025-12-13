@@ -615,6 +615,20 @@ ScoreDefSetOssiaFunctor::ScoreDefSetOssiaFunctor() : Functor()
     m_currentStaffDef = NULL;
 }
 
+FunctorCode ScoreDefSetOssiaFunctor::VisitClef(Clef *clef)
+{
+    LayerElement *elementOrLink = clef->ThisOrSameasLink();
+    if (!elementOrLink || !elementOrLink->Is(CLEF)) return FUNCTOR_CONTINUE;
+    clef = vrv_cast<Clef *>(elementOrLink);
+    if (clef->IsScoreDefElement()) {
+        return FUNCTOR_CONTINUE;
+    }
+    // Set the clef to the upcoming ossia - stored in VisitStaffEnd
+    m_upcomingStaffDef.SetCurrentClef(clef);
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ScoreDefSetOssiaFunctor::VisitLayer(Layer *layer)
 {
     layer->SetDrawingStaffDefValues(m_currentStaffDef);
@@ -637,19 +651,23 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitMeasure(Measure *measure)
 FunctorCode ScoreDefSetOssiaFunctor::VisitMeasureEnd(Measure *measure)
 {
     m_previousOssias = m_currentOssias;
+    m_isFirstMeasure = false;
 
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ScoreDefSetOssiaFunctor::VisitOssia(Ossia *ossia)
 {
-    m_currentOssias.push_front(ossia);
+    CurrentOssia currentOssia;
+    currentOssia.m_ossia = ossia;
+    m_currentOssias.push_front(currentOssia);
 
     std::vector<int> current = ossia->GetOStaffNs();
 
+    // Check if this we have a previous ossia
     auto it = std::find_if(m_previousOssias.begin(), m_previousOssias.end(),
-        [&](Ossia *previous) { return previous->GetOStaffNs() == current; });
-    if (it != m_previousOssias.end()) {
+        [&](const CurrentOssia &previous) { return previous.m_ossia->GetOStaffNs() == current; });
+    if (it != m_previousOssias.end() && !m_isFirstMeasure) {
         ossia->SetFirst(false);
     }
 
@@ -661,18 +679,27 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitStaff(Staff *staff)
     if (!staff->IsOssia()) return FUNCTOR_SIBLINGS;
 
     assert(!m_currentOssias.empty());
-    Ossia *ossia = m_currentOssias.front();
-
-    const Staff *originalStaff = ossia->GetOriginalStaffForOssia(staff);
+    CurrentOssia *currentOssia = &m_currentOssias.front();
+    assert(currentOssia && currentOssia->m_ossia);
+    const Staff *originalStaff = currentOssia->m_ossia->GetOriginalStaffForOssia(staff);
+    assert(staff);
 
     m_currentStaffDef = new StaffDef();
-    *m_currentStaffDef = *originalStaff->m_drawingStaffDef;
-    m_currentStaffDef->SetN(staff->GetN());
+
+    const StaffDef *staffDef = this->GetPreviousStaffDef(currentOssia->m_ossia, staff->GetN());
+    if (staffDef) {
+        *m_currentStaffDef = *staffDef;
+    }
+    else {
+        *m_currentStaffDef = *originalStaff->m_drawingStaffDef;
+        m_currentStaffDef->SetN(staff->GetN());
+    }
+    m_upcomingStaffDef = *m_currentStaffDef;
 
     // Takes ownership of the StaffDef
-    ossia->SetDrawingStaffDef(m_currentStaffDef);
+    currentOssia->m_ossia->SetDrawingStaffDef(m_currentStaffDef);
 
-    bool showScoreDef = ossia->DrawScoreDef() && ossia->IsFirst();
+    bool showScoreDef = currentOssia->m_ossia->DrawScoreDef() && currentOssia->m_ossia->IsFirst();
     if (showScoreDef) {
         bool hasValues = false;
         const Layer *firstLayer = vrv_cast<const Layer *>(originalStaff->FindDescendantByType(LAYER));
@@ -704,10 +731,24 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitStaff(Staff *staff)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode ScoreDefSetOssiaFunctor::VisitStaffEnd(Staff *staff)
+{
+    if (!staff->IsOssia()) return FUNCTOR_SIBLINGS;
+
+    assert(!m_currentOssias.empty());
+    CurrentOssia *currentOssia = &m_currentOssias.front();
+    assert(currentOssia && currentOssia->m_ossia);
+
+    currentOssia->m_staffDefs[staff->GetN()] = m_upcomingStaffDef;
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ScoreDefSetOssiaFunctor::VisitSystem(System *system)
 {
     m_currentScoreDef = system->GetDrawingScoreDef();
     m_layerOssiaStaffDef = false;
+    m_isFirstMeasure = true;
 
     return FUNCTOR_CONTINUE;
 }
@@ -716,6 +757,24 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitSystemEnd(System *system)
 {
 
     return FUNCTOR_CONTINUE;
+}
+
+const StaffDef *ScoreDefSetOssiaFunctor::GetPreviousStaffDef(Ossia *ossia, int staffN)
+{
+    std::vector<int> current = ossia->GetOStaffNs();
+    auto it = std::find_if(m_previousOssias.begin(), m_previousOssias.end(),
+        [&](const CurrentOssia &previous) { return previous.m_ossia->GetOStaffNs() == current; });
+    // If we don't have the ossia, don't need to look for the staffDef
+    if (it == m_previousOssias.end()) {
+        return NULL;
+    }
+    else {
+        for (auto const &s : (*it).m_staffDefs) {
+            // This is the staffDef with the staffN we are looking for
+            if (s.first == staffN) return &s.second;
+        }
+    }
+    return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -770,7 +829,7 @@ FunctorCode ScoreDefUnsetCurrentFunctor::VisitMeasure(Measure *measure)
 
 FunctorCode ScoreDefUnsetCurrentFunctor::VisitOssia(Ossia *ossia)
 {
-    ossia->ResetDrawingStaffDefs();
+    ossia->ResetDrawingScoreDef();
 
     return FUNCTOR_CONTINUE;
 }

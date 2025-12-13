@@ -348,11 +348,13 @@ public:
      * Functor interface
      */
     ///@{
+    FunctorCode VisitClef(Clef *clef) override;
     FunctorCode VisitLayer(Layer *layer) override;
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitMeasureEnd(Measure *measure) override;
     FunctorCode VisitOssia(Ossia *ossia) override;
     FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitStaffEnd(Staff *staff) override;
     FunctorCode VisitSystem(System *system) override;
     FunctorCode VisitSystemEnd(System *system) override;
     ///@}
@@ -360,20 +362,38 @@ public:
 protected:
     //
 private:
-    //
+    /**
+     * Retrieve the upcoming staffDef from a previous ossia - if any.
+     */
+    const StaffDef *GetPreviousStaffDef(Ossia *ossia, int staffN);
+
+    /**
+     * Internal class for storing current ossias values.
+     * Includes upcomding staffDefs.
+     */
+    class CurrentOssia {
+    public:
+        Ossia *m_ossia = NULL;
+        std::map<int, StaffDef> m_staffDefs;
+    };
+
 public:
     //
 private:
     // The current ossias
-    std::list<Ossia *> m_currentOssias;
+    std::list<CurrentOssia> m_currentOssias;
     // The ossias in the previous measure
-    std::list<Ossia *> m_previousOssias;
+    std::list<CurrentOssia> m_previousOssias;
+    // The upcoming staffDef
+    StaffDef m_upcomingStaffDef;
     // The current scoreDef
     ScoreDef *m_currentScoreDef;
     // The current staffDef
     StaffDef *m_currentStaffDef;
     // Layer ossia staffDef
     bool m_layerOssiaStaffDef;
+    // Flag for first measure in the system
+    bool m_isFirstMeasure;
 };
 
 //----------------------------------------------------------------------------
