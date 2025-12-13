@@ -1794,8 +1794,8 @@ void View::DrawControlElementText(DeviceContext *dc, ControlElement *element, Me
 
         int xAdjust = 0;
         const bool isBetweenStaves = (place == STAFFREL_between)
-            || ((place == STAFFREL_below) && (staff != measure->GetLast(STAFF)))
-            || ((place == STAFFREL_above) && (staff != measure->GetFirst(STAFF)));
+            || ((place == STAFFREL_below) && (staff != measure->GetLastStaff()))
+            || ((place == STAFFREL_above) && (staff != measure->GetFirstStaff()));
         if (isBetweenStaves
             && (interface->GetStart()->GetAlignment()->GetTime()
                 == measure->m_measureAligner.GetRightBarLineAlignment()->GetTime())

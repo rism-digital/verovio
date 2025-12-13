@@ -187,12 +187,12 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitMeasure(Measure *measure)
     ListOfObjects currentObjects, previousObjects;
     AttVisibilityComparison comparison(STAFF, BOOLEAN_false);
     measure->FindAllDescendantsByComparison(&currentObjects, &comparison);
-    if ((int)currentObjects.size() == measure->GetChildCount(STAFF)) {
+    if ((int)currentObjects.size() == measure->GetStaffCount()) {
         drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT;
     }
     if (m_previousMeasure) {
         m_previousMeasure->FindAllDescendantsByComparison(&previousObjects, &comparison);
-        if ((int)previousObjects.size() == m_previousMeasure->GetChildCount(STAFF))
+        if ((int)previousObjects.size() == m_previousMeasure->GetStaffCount())
             drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS;
     }
 

@@ -465,7 +465,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
 
     // if not, take staff info of node element
     short int staffNum = (node.child("staff")) ? node.child("staff").text().as_int() : 1;
-    if ((staffNum < 1) || (staffNum > measure->GetChildCount(STAFF))) {
+    if ((staffNum < 1) || (staffNum > measure->GetStaffCount())) {
         LogWarning("MusicXML import: Staff %d cannot be found", staffNum);
         staffNum = 1;
     }
