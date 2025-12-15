@@ -697,24 +697,27 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitStaff(Staff *staff)
 
     m_currentStaffDef = new StaffDef();
 
+    // Check if we had the same ossia staffDef in the previous measure
     const StaffDef *staffDef = this->GetPreviousStaffDef(currentOssia->m_ossia, staff->GetN());
     if (staffDef) {
         *m_currentStaffDef = *staffDef;
     }
+    // Otherwise use the one of the original staff
     else {
         *m_currentStaffDef = *originalStaff->m_drawingStaffDef;
         m_currentStaffDef->SetN(staff->GetN());
     }
     m_upcomingStaffDef = *m_currentStaffDef;
 
-    // Takes ownership of the StaffDef
+    // Takes ownership of the StaffDef (add it to the drawing staffGrp)
     currentOssia->m_ossia->SetDrawingStaffDef(m_currentStaffDef);
 
+    // True by default for multi staves, false by default for single staff
     bool showScoreDef = currentOssia->m_ossia->DrawScoreDef() && currentOssia->m_ossia->IsFirst();
     if (showScoreDef) {
         bool hasValues = false;
         const Layer *firstLayer = vrv_cast<const Layer *>(originalStaff->FindDescendantByType(LAYER));
-        // Retrieve the drawing values from the first layer of the original staff (if any)
+        // Retrieve the drawing values (scoreDef start or change) from the first layer of the original staff (if any)
         if (firstLayer) {
             hasValues = firstLayer->GetDrawingStaffDefValues(m_currentStaffDef);
         }
