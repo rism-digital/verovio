@@ -683,7 +683,17 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitStaff(Staff *staff)
     CurrentOssia *currentOssia = &m_currentOssias.front();
     assert(currentOssia && currentOssia->m_ossia);
     const Staff *originalStaff = currentOssia->m_ossia->GetOriginalStaffForOssia(staff);
-    assert(staff);
+    assert(originalStaff);
+
+    // Get the `@bar.thru` from the system scoreDef
+    if (currentOssia->m_ossia->HasMultipleOStaves()) {
+        assert(m_currentScoreDef);
+        StaffDef *originalStaffDef = m_currentScoreDef->GetStaffDef(originalStaff->GetN());
+        StaffGrp *staffGrp = (originalStaffDef) ? vrv_cast<StaffGrp *>(originalStaffDef->GetParent()) : NULL;
+        if (staffGrp && staffGrp->GetBarThru() == BOOLEAN_true) {
+            currentOssia->m_ossia->GetDrawingStaffGrp()->SetBarThru(BOOLEAN_true);
+        }
+    }
 
     m_currentStaffDef = new StaffDef();
 
