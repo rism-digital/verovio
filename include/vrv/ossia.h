@@ -11,6 +11,7 @@
 #include "atts_cmn.h"
 #include "atts_shared.h"
 #include "object.h"
+#include "staffgrp.h"
 
 namespace vrv {
 
@@ -52,6 +53,11 @@ public:
     void SetDrawingStaffDef(StaffDef *drawingStaffDef);
     void ResetDrawingScoreDef();
     ///@}
+
+    /**
+     * Return the drawing staffGrp
+     */
+    StaffGrp *GetDrawingStaffGrp() { return &m_drawingStaffGrp; }
 
     /**
      * @name Methods based on type to be replaced by MEI attributes if possible
@@ -153,8 +159,8 @@ protected:
 private:
     /** A list of drawing staffDefs for each ossia staff */
     std::list<StaffDef *> m_drawingStaffDefs;
-
-    /** A flag indicating that the ossia is a first of a series */
+    /** The ossia staffGrp used for drawing */
+    StaffGrp m_drawingStaffGrp;
     /** A flag indicating that the ossia is the first of a series */
     bool m_isFirst;
     /** A flag indicating that the ossia is the last of a series */

@@ -35,6 +35,8 @@ Ossia::Ossia() : Object(OSSIA), AttTyped()
 {
     this->RegisterAttClass(ATT_TYPED);
 
+    m_drawingStaffGrp.SetParent(this);
+
     this->Reset();
 }
 
@@ -63,9 +65,10 @@ void Ossia::Reset()
 
 void Ossia::ResetDrawingScoreDef()
 {
-    for (const auto staffDef : m_drawingStaffDefs) {
-        delete staffDef;
-    }
+    m_drawingStaffGrp.Reset();
+    // for (const auto staffDef : m_drawingStaffDefs) {
+    // delete staffDef;
+    //}
     m_drawingStaffDefs.clear();
     m_isFirst = true;
     m_isLast = true;
@@ -75,6 +78,7 @@ void Ossia::SetDrawingStaffDef(StaffDef *drawingStaffDef)
 {
     assert(drawingStaffDef);
     m_drawingStaffDefs.push_back(drawingStaffDef);
+    m_drawingStaffGrp.AddChild(drawingStaffDef);
 }
 
 bool Ossia::HasShowScoreDef() const

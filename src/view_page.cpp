@@ -1216,6 +1216,23 @@ void View::DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *
         }
     }
 
+    if (!ossia->IsFirst() && (measure->GetDrawingLeftBarLine() != BARRENDITION_NONE)) {
+        int yBottomPrevious = VRV_UNSET;
+        BarLine *barLine = measure->GetLeftBarLine();
+        dc->StartGraphic(barLine, "", barLine->GetID());
+        this->DrawBarLines(dc, measure, ossia->GetDrawingStaffGrp(), barLine, measure->IsLastInSystem(),
+            system->IsLastOfMdiv(), yBottomPrevious);
+        dc->EndGraphic(barLine, this);
+    }
+    if (!ossia->IsLast() && (measure->GetDrawingRightBarLine() != BARRENDITION_NONE)) {
+        int yBottomPrevious = VRV_UNSET;
+        BarLine *barLine = measure->GetRightBarLine();
+        dc->StartGraphic(barLine, "", barLine->GetID());
+        this->DrawBarLines(dc, measure, ossia->GetDrawingStaffGrp(), barLine, measure->IsLastInSystem(),
+            system->IsLastOfMdiv(), yBottomPrevious);
+        dc->EndGraphic(barLine, this);
+    }
+
     dc->EndGraphic(ossia, this);
 }
 
