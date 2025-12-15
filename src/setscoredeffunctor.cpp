@@ -668,6 +668,7 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitOssia(Ossia *ossia)
     auto it = std::find_if(m_previousOssias.begin(), m_previousOssias.end(),
         [&](const CurrentOssia &previous) { return previous.m_ossia->GetOStaffNs() == current; });
     if (it != m_previousOssias.end() && !m_isFirstMeasure) {
+        it->m_ossia->SetLast(false);
         ossia->SetFirst(false);
     }
 

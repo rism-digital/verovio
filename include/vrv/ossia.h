@@ -67,6 +67,8 @@ public:
     ///@{
     bool IsFirst() const { return (m_isFirst); }
     void SetFirst(bool isFirst) { m_isFirst = isFirst; }
+    bool IsLast() const { return (m_isLast); }
+    void SetLast(bool isLast) { m_isLast = isLast; }
     ///@}
 
     /**
@@ -153,8 +155,10 @@ private:
     std::list<StaffDef *> m_drawingStaffDefs;
 
     /** A flag indicating that the ossia is a first of a series */
+    /** A flag indicating that the ossia is the first of a series */
     bool m_isFirst;
-
+    /** A flag indicating that the ossia is the last of a series */
+    bool m_isLast;
     /** The clef and keySig alignments for access to the shift */
     Alignment *m_clefAlignment;
     Alignment *m_keySigAlignment;

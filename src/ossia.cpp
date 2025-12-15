@@ -68,6 +68,7 @@ void Ossia::ResetDrawingScoreDef()
     }
     m_drawingStaffDefs.clear();
     m_isFirst = true;
+    m_isLast = true;
 }
 
 void Ossia::SetDrawingStaffDef(StaffDef *drawingStaffDef)
