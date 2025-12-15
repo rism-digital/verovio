@@ -142,6 +142,8 @@ public:
     ///@{
     bool IsOssia() const { return (m_isOssia); }
     void SetOssia(bool isOssia) { m_isOssia = isOssia; }
+    int GetNForOssia() const;
+    int GetNFromOssia() const;
     ///@}
 
     /**

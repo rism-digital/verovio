@@ -128,10 +128,10 @@ bool Ossia::IsSupportedChild(ClassId classId)
 
 const Staff *Ossia::GetOriginalStaffForOssia(const Staff *ossia) const
 {
-    AttNIntegerComparison staffN(STAFF, ossia->GetN() - OSSIA_N_OFFSET);
+    AttNIntegerComparison staffN(STAFF, ossia->GetNFromOssia());
     const Staff *staff = vrv_cast<const Staff *>(this->FindDescendantByComparison(&staffN));
     if (!staff) {
-        LogDebug("Orignal ossia staff %d could not be found", ossia->GetN() - OSSIA_N_OFFSET);
+        LogDebug("Orignal ossia staff %d could not be found", ossia->GetNFromOssia());
     }
     return staff;
 }

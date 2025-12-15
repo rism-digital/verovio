@@ -100,6 +100,18 @@ void Staff::CloneReset()
     m_drawingRotation = 0.0;
 }
 
+int Staff::GetNForOssia() const
+{
+    assert(!this->IsOssia());
+    return (this->GetN() + OSSIA_N_OFFSET);
+}
+
+int Staff::GetNFromOssia() const
+{
+    assert(this->IsOssia());
+    return (this->GetN() - OSSIA_N_OFFSET);
+}
+
 void Staff::AttributesToExternal()
 {
     Object::AttributesToExternal();
