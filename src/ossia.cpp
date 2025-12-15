@@ -66,10 +66,6 @@ void Ossia::Reset()
 void Ossia::ResetDrawingScoreDef()
 {
     m_drawingStaffGrp.Reset();
-    // for (const auto staffDef : m_drawingStaffDefs) {
-    // delete staffDef;
-    //}
-    m_drawingStaffDefs.clear();
     m_isFirst = true;
     m_isLast = true;
 }
@@ -77,7 +73,6 @@ void Ossia::ResetDrawingScoreDef()
 void Ossia::SetDrawingStaffDef(StaffDef *drawingStaffDef)
 {
     assert(drawingStaffDef);
-    m_drawingStaffDefs.push_back(drawingStaffDef);
     m_drawingStaffGrp.AddChild(drawingStaffDef);
 }
 
@@ -176,17 +171,17 @@ void Ossia::GetStavesBelow(MapOfOssiaStaffNs &map) const
 
 const Staff *Ossia::GetDrawingTopOStaff() const
 {
-    if (m_drawingStaffDefs.empty()) return NULL;
-    const int staffN = m_drawingStaffDefs.front()->GetN();
-    AttNIntegerComparison n(STAFF, staffN);
+    // We have only staffDef as children
+    const StaffDef *staffDef = vrv_cast<const StaffDef *>(m_drawingStaffGrp.GetFirst());
+    AttNIntegerComparison n(STAFF, staffDef->GetN());
     return vrv_cast<const Staff *>(this->FindDescendantByComparison(&n));
 }
 
 const Staff *Ossia::GetDrawingBottopOStaff() const
 {
-    if (m_drawingStaffDefs.empty()) return NULL;
-    const int staffN = m_drawingStaffDefs.back()->GetN();
-    AttNIntegerComparison n(STAFF, staffN);
+    // We have only staffDef as children
+    const StaffDef *staffDef = vrv_cast<const StaffDef *>(m_drawingStaffGrp.GetLast());
+    AttNIntegerComparison n(STAFF, staffDef->GetN());
     return vrv_cast<const Staff *>(this->FindDescendantByComparison(&n));
 }
 

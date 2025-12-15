@@ -157,8 +157,6 @@ public:
 protected:
     //
 private:
-    /** A list of drawing staffDefs for each ossia staff */
-    std::list<StaffDef *> m_drawingStaffDefs;
     /** The ossia staffGrp used for drawing */
     StaffGrp m_drawingStaffGrp;
     /** A flag indicating that the ossia is the first of a series */
