@@ -1218,15 +1218,21 @@ void View::DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *
     }
 
     // Draw bar lines
-    if (!ossia->IsFirst() && (measure->GetDrawingLeftBarLine() != BARRENDITION_NONE)) {
+    bool showBarLines = ossia->HasShowBarLines() ? (ossia->GetShowBarLines() == BOOLEAN_true) : false;
+    // Left barLine position needs to be investigated (offset)
+    bool showForceLeft = (showBarLines && ossia->IsFirst() && (measure->GetDrawingLeftBarLine() == BARRENDITION_NONE));
+    if (showForceLeft || (measure->GetDrawingLeftBarLine() != BARRENDITION_NONE)) {
         int yBottomPrevious = VRV_UNSET;
         BarLine *barLine = measure->GetLeftBarLine();
+        // Once clarified
+        // if (showForceLeft) barLine->SetForm(BARRENDITION_single);
         dc->StartGraphic(barLine, "", barLine->GetID());
         this->DrawBarLines(dc, measure, ossia->GetDrawingStaffGrp(), barLine, measure->IsLastInSystem(),
             system->IsLastOfMdiv(), yBottomPrevious);
         dc->EndGraphic(barLine, this);
+        // if (showForceLeft) barLine->SetForm(BARRENDITION_NONE);
     }
-    if (!ossia->IsLast() && (measure->GetDrawingRightBarLine() != BARRENDITION_NONE)) {
+    if ((showBarLines || !ossia->IsLast()) && (measure->GetDrawingRightBarLine() != BARRENDITION_NONE)) {
         int yBottomPrevious = VRV_UNSET;
         BarLine *barLine = measure->GetRightBarLine();
         dc->StartGraphic(barLine, "", barLine->GetID());

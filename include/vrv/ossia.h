@@ -59,6 +59,8 @@ public:
     ///@{
     bool HasShowScoreDef() const;
     data_BOOLEAN GetShowScoreDef() const;
+    bool HasShowBarLines() const;
+    data_BOOLEAN GetShowBarLines() const;
     ///@}
 
     /**

@@ -78,16 +78,31 @@ void Ossia::AddDrawingStaffDef(StaffDef *drawingStaffDef)
 
 bool Ossia::HasShowScoreDef() const
 {
-    static const std::regex re("show.scoredef.*");
-    return (this->HasType() && std::regex_match(this->GetType(), re));
+    static const std::regex re(R"(\bshow\.scoredef\.(true|false)\b)");
+    return (this->HasType() && std::regex_search(this->GetType(), re));
 }
 
 data_BOOLEAN Ossia::GetShowScoreDef() const
 {
-    static const std::regex reTrue("show.scoredef.true");
-    static const std::regex reFalse("show.scoredef.false");
-    if (this->HasType() && std::regex_match(this->GetType(), reTrue)) return BOOLEAN_true;
-    if (this->HasType() && std::regex_match(this->GetType(), reFalse)) return BOOLEAN_false;
+    static const std::regex reTrue(R"(\bshow\.scoredef\.true\b)");
+    static const std::regex reFalse(R"(\bshow\.scoredef\.false\b)");
+    if (this->HasType() && std::regex_search(this->GetType(), reTrue)) return BOOLEAN_true;
+    if (this->HasType() && std::regex_search(this->GetType(), reFalse)) return BOOLEAN_false;
+    return BOOLEAN_NONE;
+}
+
+bool Ossia::HasShowBarLines() const
+{
+    static const std::regex re(R"(\bshow\.barlines\.(true|false)\b)");
+    return (this->HasType() && std::regex_search(this->GetType(), re));
+}
+
+data_BOOLEAN Ossia::GetShowBarLines() const
+{
+    static const std::regex reTrue(R"(\bshow\.barlines\.true\b)");
+    static const std::regex reFalse(R"(\bshow\.barlines\.false\b)");
+    if (this->HasType() && std::regex_search(this->GetType(), reTrue)) return BOOLEAN_true;
+    if (this->HasType() && std::regex_search(this->GetType(), reFalse)) return BOOLEAN_false;
     return BOOLEAN_NONE;
 }
 
