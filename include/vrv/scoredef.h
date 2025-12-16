@@ -260,7 +260,7 @@ public:
     bool HasSystemStartLine() const;
 
     /**
-     * Add ossia staffDef to the staffN staffDef
+     * Add ossia staffDefs to the staffN staffDef (above or below)
      */
     void AddOssias(int staffN, const std::list<int>, bool above);
 

@@ -710,7 +710,7 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitStaff(Staff *staff)
     m_upcomingStaffDef = *m_currentStaffDef;
 
     // Takes ownership of the StaffDef (add it to the drawing staffGrp)
-    currentOssia->m_ossia->SetDrawingStaffDef(m_currentStaffDef);
+    currentOssia->m_ossia->AddDrawingStaffDef(m_currentStaffDef);
 
     // True by default for multi staves, false by default for single staff
     bool showScoreDef = currentOssia->m_ossia->DrawScoreDef() && currentOssia->m_ossia->IsFirst();
@@ -843,7 +843,7 @@ FunctorCode ScoreDefUnsetCurrentFunctor::VisitMeasure(Measure *measure)
 
 FunctorCode ScoreDefUnsetCurrentFunctor::VisitOssia(Ossia *ossia)
 {
-    ossia->ResetDrawingScoreDef();
+    ossia->ResetDrawingStaffGrp();
 
     return FUNCTOR_CONTINUE;
 }

@@ -22,7 +22,7 @@ class StaffDef;
 //----------------------------------------------------------------------------
 
 /**
- * This class represents an ossia in a page-based score (Doc).
+ * This class represents an ossia.
  */
 class Ossia : public Object, public AttTyped {
 
@@ -45,19 +45,13 @@ public:
     void CloneReset() override;
 
     /**
-     * @name Setter and getter of the drawing staffDefs
+     * @name Setter, getter and re-setter of the drawing staffDefs / staffGrp
      */
     ///@{
-    // StaffDef *GetDrawingStaffDef(int staffN);
-    // const StaffDef *GetDrawingStaffDef(int staffN) const;
-    void SetDrawingStaffDef(StaffDef *drawingStaffDef);
-    void ResetDrawingScoreDef();
-    ///@}
-
-    /**
-     * Return the drawing staffGrp
-     */
+    void AddDrawingStaffDef(StaffDef *drawingStaffDef);
+    void ResetDrawingStaffGrp();
     StaffGrp *GetDrawingStaffGrp() { return &m_drawingStaffGrp; }
+    ///@}
 
     /**
      * @name Methods based on type to be replaced by MEI attributes if possible
@@ -93,7 +87,7 @@ public:
     const Staff *GetOriginalStaffForOssia(const Staff *ossia) const;
 
     /**
-     * @name Setter and getter of the clef and key sig alignment
+     * @name Setter and getter of the clef and keySig alignment
      */
     ///@{
     void SetClefAlignment(Alignment *clefAlignment) { m_clefAlignment = clefAlignment; }
@@ -107,7 +101,7 @@ public:
     int GetScoreDefShift() const;
 
     /**
-     * Methods for adding allowed content
+     * Methods for adding allowed content.
      */
     bool IsSupportedChild(ClassId classId) override;
 
@@ -120,7 +114,7 @@ public:
     ///@}
 
     /**
-     * @name Return the top and bottom oStaff (NULL if none).
+     * @name Return the top and bottom oStaff (NULL if none)
      */
     ///@{
     const Staff *GetDrawingTopOStaff() const;
@@ -128,7 +122,7 @@ public:
     ///@}
 
     /**
-     * Return the staff `@n` of oStaff in the order they appear.
+     * Return the staff `@n` of oStaff in the order they appear
      */
     std::vector<int> GetOStaffNs() const;
 

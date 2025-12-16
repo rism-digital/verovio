@@ -327,7 +327,7 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * This class prepares the group symbol starting and ending staffDefs for drawing.
+ * This class prepares the ossia staffDefs for drawing.
  */
 class ScoreDefSetOssiaFunctor : public Functor {
 public:
@@ -369,7 +369,7 @@ private:
 
     /**
      * Internal class for storing current ossias values.
-     * Includes upcomding staffDefs.
+     * Includes the upcoming staffDefs.
      */
     class CurrentOssia {
     public:
@@ -380,7 +380,7 @@ private:
 public:
     //
 private:
-    // The current ossias
+    // The current ossias (i.e., in the current measure)
     std::list<CurrentOssia> m_currentOssias;
     // The ossias in the previous measure
     std::list<CurrentOssia> m_previousOssias;
@@ -390,7 +390,7 @@ private:
     ScoreDef *m_currentScoreDef;
     // The current staffDef
     StaffDef *m_currentStaffDef;
-    // Layer ossia staffDef
+    // A flag indicating the layer ossia staffDef will have to be drawn
     bool m_layerOssiaStaffDef;
     // Flag for first measure in the system
     bool m_isFirstMeasure;

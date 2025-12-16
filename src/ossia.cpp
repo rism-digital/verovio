@@ -50,7 +50,7 @@ void Ossia::CloneReset()
 {
     Object::CloneReset();
 
-    this->ResetDrawingScoreDef();
+    this->ResetDrawingStaffGrp();
     this->ResetAlignments();
 }
 
@@ -59,18 +59,18 @@ void Ossia::Reset()
     Object::Reset();
     this->ResetTyped();
 
-    this->ResetDrawingScoreDef();
+    this->ResetDrawingStaffGrp();
     this->ResetAlignments();
 }
 
-void Ossia::ResetDrawingScoreDef()
+void Ossia::ResetDrawingStaffGrp()
 {
     m_drawingStaffGrp.Reset();
     m_isFirst = true;
     m_isLast = true;
 }
 
-void Ossia::SetDrawingStaffDef(StaffDef *drawingStaffDef)
+void Ossia::AddDrawingStaffDef(StaffDef *drawingStaffDef)
 {
     assert(drawingStaffDef);
     m_drawingStaffGrp.AddChild(drawingStaffDef);

@@ -1190,6 +1190,7 @@ void View::DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *
 
     dc->StartGraphic(ossia, "", ossia->GetID());
 
+    // Draw scoreDef line and brace
     if (ossia->IsFirst() && ossia->DrawScoreDef() && ossia->HasMultipleOStaves()) {
         const Staff *topStaff = ossia->GetDrawingTopOStaff();
         const Staff *bottomStaff = ossia->GetDrawingBottopOStaff();
@@ -1216,6 +1217,7 @@ void View::DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *
         }
     }
 
+    // Draw bar lines
     if (!ossia->IsFirst() && (measure->GetDrawingLeftBarLine() != BARRENDITION_NONE)) {
         int yBottomPrevious = VRV_UNSET;
         BarLine *barLine = measure->GetLeftBarLine();

@@ -360,7 +360,7 @@ private:
     ///@}
 
     /**
-     * @name List of ossias staffDefs above and below
+     * @name List of ossia staffDefs above and below
      */
     ///@{
     std::list<StaffDef *> m_ossiasAbove;

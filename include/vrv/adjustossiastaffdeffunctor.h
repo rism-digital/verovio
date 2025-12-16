@@ -17,7 +17,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 /**
- * This class adjusts the position of the dots for multiple layers.
+ * This class adjusts the position of the clef and key signature for ossia staffDefs.
  */
 class AdjustOssiaStaffDefFunctor : public DocFunctor {
 public:

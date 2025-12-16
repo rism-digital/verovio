@@ -495,7 +495,7 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 #define MAX_NOTE_DEPTH -1
 
 //----------------------------------------------------------------------------
-// Ossia staff / layer @n offset (assuming we never have @n that high
+// Ossia staff / layer @n offset (assuming we never have @n that high)
 //----------------------------------------------------------------------------
 
 #define OSSIA_N_OFFSET 1000000
@@ -744,7 +744,7 @@ enum FocusStatusType { FOCUS_UNSET = 0, FOCUS_SET, FOCUS_USED };
 
 #define TABLATURE_STAFF_RATIO 1.75
 #define GERMAN_TAB_STAFF_RATIO 2.2
-#define OSSIA_STAFF_RATIO 0.6
+#define OSSIA_STAFF_RATIO 0.65
 
 #define SUPER_SCRIPT_FACTOR 0.58
 #define SUPER_SCRIPT_POSITION -0.20 // lowered down from the midline

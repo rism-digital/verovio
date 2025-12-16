@@ -304,7 +304,7 @@ public:
     ///@}
 
     /**
-     * Return the first or last staff taking into account ossias.
+     * Return the first or last staff taking into account ossias (or not).
      */
     ///@{
     int GetStaffCount(bool excludeOStaves = true) const;
