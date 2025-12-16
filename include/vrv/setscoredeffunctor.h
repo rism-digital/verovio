@@ -356,7 +356,6 @@ public:
     FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitStaffEnd(Staff *staff) override;
     FunctorCode VisitSystem(System *system) override;
-    FunctorCode VisitSystemEnd(System *system) override;
     ///@}
 
 protected:

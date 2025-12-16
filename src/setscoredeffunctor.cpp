@@ -767,12 +767,6 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitSystem(System *system)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ScoreDefSetOssiaFunctor::VisitSystemEnd(System *system)
-{
-
-    return FUNCTOR_CONTINUE;
-}
-
 const StaffDef *ScoreDefSetOssiaFunctor::GetPreviousStaffDef(Ossia *ossia, int staffN)
 {
     std::vector<int> current = ossia->GetOStaffNs();
