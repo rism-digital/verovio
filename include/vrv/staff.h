@@ -9,6 +9,7 @@
 #define __VRV_STAFF_H__
 
 #include "atts_shared.h"
+#include "drawinginterface.h"
 #include "facsimileinterface.h"
 #include "object.h"
 
@@ -101,6 +102,7 @@ private:
  * For unmeasured music, one single Measure is added for simplifying internal processing
  */
 class Staff : public Object,
+              public VisibilityDrawingInterface,
               public FacsimileInterface,
               public AttCoordY1,
               public AttNInteger,
@@ -133,6 +135,14 @@ public:
     const FacsimileInterface *GetFacsimileInterface() const override
     {
         return vrv_cast<const FacsimileInterface *>(this);
+    }
+    VisibilityDrawingInterface *GetVisibilityDrawingInterface() override
+    {
+        return vrv_cast<VisibilityDrawingInterface *>(this);
+    }
+    const VisibilityDrawingInterface *GetVisibilityDrawingInterface() const override
+    {
+        return vrv_cast<const VisibilityDrawingInterface *>(this);
     }
     ///@}
 

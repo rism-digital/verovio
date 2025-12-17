@@ -46,7 +46,13 @@ static const ClassRegistrar<Staff> s_factoryOStaff(
     "oStaff", FACTORY_OSTAFF, []() -> Object * { return new Staff(1, true); });
 
 Staff::Staff(int n, bool isOssia)
-    : Object(STAFF), FacsimileInterface(), AttCoordY1(), AttNInteger(), AttTyped(), AttVisibility()
+    : Object(STAFF)
+    , VisibilityDrawingInterface()
+    , FacsimileInterface()
+    , AttCoordY1()
+    , AttNInteger()
+    , AttTyped()
+    , AttVisibility()
 {
     this->RegisterAttClass(ATT_COORDY1);
     this->RegisterAttClass(ATT_NINTEGER);
@@ -64,6 +70,7 @@ Staff::~Staff() {}
 void Staff::Reset()
 {
     Object::Reset();
+    VisibilityDrawingInterface::Reset();
     FacsimileInterface::Reset();
     this->ResetCoordY1();
     this->ResetNInteger();
@@ -234,6 +241,8 @@ int Staff::GetDrawingStaffNotationSize() const
 
 bool Staff::DrawingIsVisible() const
 {
+    if (this->IsHidden()) return false;
+    
     const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
     assert(system);
     assert(system->GetDrawingScoreDef());
