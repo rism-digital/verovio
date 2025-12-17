@@ -441,6 +441,17 @@ FunctorCode AlignHorizontallyFunctor::VisitMeterSigGrp(MeterSigGrp *meterSigGrp)
     return meterSigGrp->IsScoreDefElement() ? FUNCTOR_STOP : FUNCTOR_CONTINUE;
 }
 
+FunctorCode AlignHorizontallyFunctor::VisitOssia(Ossia *ossia)
+{
+    Measure *measure = vrv_cast<Measure *>(ossia->GetParent());
+    if (measure) {
+        ossia->GetDrawingLeftBarLine()->SetParent(measure);
+        ossia->GetDrawingLeftBarLine()->SetAlignment(measure->GetLeftBarLine()->GetAlignment());
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode AlignHorizontallyFunctor::VisitSection(Section *section)
 {
     if (section->GetRestart() == BOOLEAN_true) {
