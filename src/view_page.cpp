@@ -1190,16 +1190,17 @@ void View::DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *
 
     dc->StartGraphic(ossia, "", ossia->GetID());
 
+    const Staff *topOStaff = ossia->GetDrawingTopOStaff();
+    const Staff *bottomOStaff = ossia->GetDrawingBottopOStaff();
+
     // Draw scoreDef line and brace
     if (ossia->IsFirst() && ossia->DrawScoreDef() && ossia->HasMultipleOStaves()) {
-        const Staff *topStaff = ossia->GetDrawingTopOStaff();
-        const Staff *bottomStaff = ossia->GetDrawingBottopOStaff();
-        if (topStaff && bottomStaff) {
-            const int staffSize = bottomStaff->m_drawingStaffSize;
-            const int x = topStaff->GetDrawingX() + topStaff->GetOssiaDrawingShift(measure, m_doc);
-            const int y1 = topStaff->GetDrawingY();
+        if (topOStaff && bottomOStaff) {
+            const int staffSize = bottomOStaff->m_drawingStaffSize;
+            const int x = topOStaff->GetDrawingX() + topOStaff->GetOssiaDrawingShift(measure, m_doc);
+            const int y1 = topOStaff->GetDrawingY();
             const int doubleUnit = m_doc->GetDrawingDoubleUnit(staffSize);
-            const int y2 = bottomStaff->GetDrawingY() - doubleUnit * (bottomStaff->m_drawingLines - 1);
+            const int y2 = bottomOStaff->GetDrawingY() - doubleUnit * (bottomOStaff->m_drawingLines - 1);
             // Bar lines always 100
             const int barLineWidth = m_doc->GetDrawingBarLineWidth(100);
             this->DrawVerticalLine(dc, y1, y2, x + barLineWidth / 2, barLineWidth);
@@ -1214,6 +1215,12 @@ void View::DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *
         else {
             assert(false);
         }
+    }
+
+    // No bar lines to draw if we have no ossia staves (e.g., all hidden)
+    if (!topOStaff || !bottomOStaff) {
+        dc->EndGraphic(ossia, this);
+        return;
     }
 
     bool showBarLines = ossia->HasShowBarLines() ? (ossia->GetShowBarLines() == BOOLEAN_true) : false;
@@ -1239,6 +1246,7 @@ void View::DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *
 
     if (showForceLeft) {
         int yBottomPrevious = VRV_UNSET;
+        // Use the ossia drawing barline it that case
         BarLine *barLine = ossia->GetDrawingLeftBarLine();
         dc->StartGraphic(barLine, "", barLine->GetID());
         this->DrawBarLines(dc, measure, ossia->GetDrawingStaffGrp(), barLine, measure->IsLastInSystem(),
@@ -1259,6 +1267,8 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
     assert(staff);
     assert(measure);
     assert(system);
+
+    if (staff->IsHidden()) return;
 
     assert(system->GetDrawingScoreDef());
     StaffDef *staffDef = system->GetDrawingScoreDef()->GetStaffDef(staff->GetN());

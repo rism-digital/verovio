@@ -242,7 +242,7 @@ int Staff::GetDrawingStaffNotationSize() const
 bool Staff::DrawingIsVisible() const
 {
     if (this->IsHidden()) return false;
-    
+
     const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
     assert(system);
     assert(system->GetDrawingScoreDef());

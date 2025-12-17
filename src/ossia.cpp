@@ -114,7 +114,7 @@ bool Ossia::HasMultipleOStaves() const
     for (auto it = staves.begin(); it != staves.end(); ++it) {
         const Staff *staff = vrv_cast<const Staff *>(*it);
         assert(staff);
-        if (staff->IsOssia()) count++;
+        if (staff->IsOssia() && !staff->IsHidden()) count++;
         if (count > 1) return true;
     }
     return false;
@@ -160,6 +160,15 @@ void Ossia::ResetAlignments()
     m_drawingLeftBarLine.ResetAlignment();
 }
 
+int Ossia::GetScoreDefShift() const
+{
+    // The clef is the further appart
+    if (m_clefAlignment) return m_clefAlignment->GetXRel();
+    // Other wise the key signature
+    if (m_keySigAlignment) return m_keySigAlignment->GetXRel();
+    return 0;
+}
+
 void Ossia::GetStavesAbove(MapOfOssiaStaffNs &map) const
 {
     ListOfConstObjects staves = this->FindAllDescendantsByType(STAFF);
@@ -169,15 +178,6 @@ void Ossia::GetStavesAbove(MapOfOssiaStaffNs &map) const
     std::reverse_copy(staves.begin(), staves.end(), stavesReversed.begin());
 
     this->GetStaves(map, stavesReversed);
-}
-
-int Ossia::GetScoreDefShift() const
-{
-    // The clef is the further appart
-    if (m_clefAlignment) return m_clefAlignment->GetXRel();
-    // Other wise the key signature
-    if (m_keySigAlignment) return m_keySigAlignment->GetXRel();
-    return 0;
 }
 
 void Ossia::GetStavesBelow(MapOfOssiaStaffNs &map) const
@@ -192,7 +192,8 @@ const Staff *Ossia::GetDrawingTopOStaff() const
     // We have only staffDef as children
     const StaffDef *staffDef = vrv_cast<const StaffDef *>(m_drawingStaffGrp.GetFirst());
     AttNIntegerComparison n(STAFF, staffDef->GetN());
-    return vrv_cast<const Staff *>(this->FindDescendantByComparison(&n));
+    const Staff *staff = vrv_cast<const Staff *>(this->FindDescendantByComparison(&n));
+    return (staff && !staff->IsHidden()) ? staff : NULL;
 }
 
 const Staff *Ossia::GetDrawingBottopOStaff() const
@@ -200,7 +201,8 @@ const Staff *Ossia::GetDrawingBottopOStaff() const
     // We have only staffDef as children
     const StaffDef *staffDef = vrv_cast<const StaffDef *>(m_drawingStaffGrp.GetLast());
     AttNIntegerComparison n(STAFF, staffDef->GetN());
-    return vrv_cast<const Staff *>(this->FindDescendantByComparison(&n));
+    const Staff *staff = vrv_cast<const Staff *>(this->FindDescendantByComparison(&n));
+    return (staff && !staff->IsHidden()) ? staff : NULL;
 }
 
 std::vector<int> Ossia::GetOStaffNs() const
@@ -210,7 +212,7 @@ std::vector<int> Ossia::GetOStaffNs() const
     for (auto object : staves) {
         const Staff *staff = vrv_cast<const Staff *>(object);
         assert(staff);
-        if (staff->IsOssia()) ns.push_back(staff->GetN());
+        if (staff->IsOssia() && !staff->IsHidden()) ns.push_back(staff->GetN());
     }
     return ns;
 }
@@ -225,6 +227,7 @@ void Ossia::GetStaves(MapOfOssiaStaffNs &map, ListOfConstObjects &staves) const
             staffN = staff->GetN();
             continue;
         }
+        if (staff->IsHidden()) continue;
         if (staffN != VRV_UNSET) {
             std::list<int> &ossias = map[staffN];
             int ossiaN = staff->GetN();

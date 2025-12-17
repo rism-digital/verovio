@@ -1195,7 +1195,7 @@ FunctorCode Object::AcceptEnd(ConstFunctor &functor) const
 bool Object::SkipChildren(bool visibleOnly) const
 {
     if (visibleOnly) {
-        if (this->IsEditorialElement() || this->Is(MDIV) || this->IsSystemElement()) {
+        if (this->IsEditorialElement() || this->Is({ MDIV, STAFF }) || this->IsSystemElement()) {
             const VisibilityDrawingInterface *interface = this->GetVisibilityDrawingInterface();
             assert(interface);
             if (interface->IsHidden()) {
