@@ -35,6 +35,7 @@ Ossia::Ossia() : Object(OSSIA), AttTyped()
 {
     this->RegisterAttClass(ATT_TYPED);
 
+    m_drawingLeftBarLine.SetForm(BARRENDITION_single);
     m_drawingStaffGrp.SetParent(this);
 
     this->Reset();
@@ -155,6 +156,8 @@ void Ossia::ResetAlignments()
 {
     m_clefAlignment = NULL;
     m_keySigAlignment = NULL;
+    m_drawingLeftBarLine.ResetParent();
+    m_drawingLeftBarLine.ResetAlignment();
 }
 
 void Ossia::GetStavesAbove(MapOfOssiaStaffNs &map) const

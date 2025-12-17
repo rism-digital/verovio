@@ -10,6 +10,7 @@
 
 #include "atts_cmn.h"
 #include "atts_shared.h"
+#include "barline.h"
 #include "object.h"
 #include "staffgrp.h"
 
@@ -124,6 +125,11 @@ public:
     ///@}
 
     /**
+     * Return the drawing left bar line
+     */
+    BarLine *GetDrawingLeftBarLine() { return &m_drawingLeftBarLine; }
+
+    /**
      * Return the staff `@n` of oStaff in the order they appear
      */
     std::vector<int> GetOStaffNs() const;
@@ -162,6 +168,8 @@ private:
     /** The clef and keySig alignments for access to the shift */
     Alignment *m_clefAlignment;
     Alignment *m_keySigAlignment;
+    /** The left bar line use for drawing with not measure left bar line */
+    BarLine m_drawingLeftBarLine;
 };
 
 } // namespace vrv
