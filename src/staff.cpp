@@ -315,7 +315,7 @@ void Staff::SetFromFacsimile(Doc *doc)
     this->AdjustDrawingStaffSize();
 }
 
-int Staff::GetOssiaDrawingShift(const Measure *measure) const
+int Staff::GetOssiaDrawingShift(const Measure *measure, Doc *doc) const
 {
     const Ossia *ossia = vrv_cast<const Ossia *>(this->GetFirstAncestor(OSSIA));
     const Layer *layer = vrv_cast<const Layer *>(this->FindDescendantByType(LAYER));
@@ -323,12 +323,21 @@ int Staff::GetOssiaDrawingShift(const Measure *measure) const
 
     if (layer->DrawOssiaStaffDef()) {
         int shift = ossia->GetScoreDefShift();
+        // The ossia scoreDef shift is the position of the clef (or key signature)
+        shift -= (1.5 * doc->GetDrawingUnit(this->m_drawingStaffSize));
         return shift;
     }
     else if (ossia->DrawScoreDef() || !ossia->IsFirst()) {
         return 0;
     }
-    return measure->GetLeftBarLineXRel();
+
+    int shift = measure->GetLeftBarLineLeft();
+    // When there is no left barline on the measure we need to adjust the position
+    if (measure->GetLeftBarLine()->GetForm() == BARRENDITION_NONE) {
+        // Measure bar lines are always 100
+        shift -= (doc->GetDrawingBarLineWidth(100) / 2);
+    }
+    return shift;
 }
 
 bool Staff::IsOnStaffLine(int y, const Doc *doc) const

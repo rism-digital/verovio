@@ -285,7 +285,7 @@ public:
     /**
      * Get the drawing x if the staff is an ossia and has an ossia staffDef
      */
-    int GetOssiaDrawingShift(const Measure *measure) const;
+    int GetOssiaDrawingShift(const Measure *measure, Doc *doc) const;
 
     //----------//
     // Functors //

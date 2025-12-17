@@ -1196,13 +1196,12 @@ void View::DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *
         const Staff *bottomStaff = ossia->GetDrawingBottopOStaff();
         if (topStaff && bottomStaff) {
             const int staffSize = bottomStaff->m_drawingStaffSize;
-            int shift = topStaff->GetOssiaDrawingShift(measure);
-            if (shift != 0) shift -= m_doc->GetDrawingUnit(staffSize);
-            const int x = topStaff->GetDrawingX() + shift;
+            const int x = topStaff->GetDrawingX() + topStaff->GetOssiaDrawingShift(measure, m_doc);
             const int y1 = topStaff->GetDrawingY();
             const int doubleUnit = m_doc->GetDrawingDoubleUnit(staffSize);
             const int y2 = bottomStaff->GetDrawingY() - doubleUnit * (bottomStaff->m_drawingLines - 1);
-            const int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
+            // Bar lines always 100
+            const int barLineWidth = m_doc->GetDrawingBarLineWidth(100);
             this->DrawVerticalLine(dc, y1, y2, x + barLineWidth / 2, barLineWidth);
             this->DrawBrace(dc, x, y1, y2, staffSize);
         }
@@ -1217,24 +1216,30 @@ void View::DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *
         }
     }
 
-    // Draw bar lines
     bool showBarLines = ossia->HasShowBarLines() ? (ossia->GetShowBarLines() == BOOLEAN_true) : false;
-    // Left barLine position needs to be investigated (offset)
     bool showForceLeft = (showBarLines && ossia->IsFirst() && (measure->GetDrawingLeftBarLine() == BARRENDITION_NONE));
-    if (showForceLeft || (measure->GetDrawingLeftBarLine() != BARRENDITION_NONE)) {
+
+    // Draw bar lines
+    if (measure->GetDrawingLeftBarLine() != BARRENDITION_NONE) {
         int yBottomPrevious = VRV_UNSET;
         BarLine *barLine = measure->GetLeftBarLine();
-        // Once clarified
-        // if (showForceLeft) barLine->SetForm(BARRENDITION_single);
         dc->StartGraphic(barLine, "", barLine->GetID());
         this->DrawBarLines(dc, measure, ossia->GetDrawingStaffGrp(), barLine, measure->IsLastInSystem(),
             system->IsLastOfMdiv(), yBottomPrevious);
         dc->EndGraphic(barLine, this);
-        // if (showForceLeft) barLine->SetForm(BARRENDITION_NONE);
     }
     if ((showBarLines || !ossia->IsLast()) && (measure->GetDrawingRightBarLine() != BARRENDITION_NONE)) {
         int yBottomPrevious = VRV_UNSET;
         BarLine *barLine = measure->GetRightBarLine();
+        dc->StartGraphic(barLine, "", barLine->GetID());
+        this->DrawBarLines(dc, measure, ossia->GetDrawingStaffGrp(), barLine, measure->IsLastInSystem(),
+            system->IsLastOfMdiv(), yBottomPrevious);
+        dc->EndGraphic(barLine, this);
+    }
+
+    if (showForceLeft) {
+        int yBottomPrevious = VRV_UNSET;
+        BarLine *barLine = ossia->GetDrawingLeftBarLine();
         dc->StartGraphic(barLine, "", barLine->GetID());
         this->DrawBarLines(dc, measure, ossia->GetDrawingStaffGrp(), barLine, measure->IsLastInSystem(),
             system->IsLastOfMdiv(), yBottomPrevious);
@@ -1322,8 +1327,7 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, M
     x1 = measure->GetDrawingX();
     x2 = x1 + measure->GetWidth();
     if (staff->IsOssia()) {
-        int shift = staff->GetOssiaDrawingShift(measure);
-        if (shift != 0) shift -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        int shift = staff->GetOssiaDrawingShift(measure, m_doc);
         x1 += shift;
     }
     y1 = staff->GetDrawingY();
