@@ -1595,6 +1595,10 @@ Options::Options()
     m_mdivXPathQuery.Init("");
     this->Register(&m_mdivXPathQuery, "mdivXPathQuery", &m_selectors);
 
+    m_ossiaHidden.SetInfo("Ossia hidden", "Hide ossias when rendering");
+    m_ossiaHidden.Init(false);
+    this->Register(&m_ossiaHidden, "ossiaHidden", &m_selectors);
+
     m_substXPathQuery.SetInfo("Subst xPath query",
         "Set the xPath query for selecting <subst> child elements, for "
         "example: \"./del\"; by default the first child is selected");

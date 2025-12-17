@@ -6418,6 +6418,10 @@ bool MEIInput::ReadOStaff(Object *parent, pugi::xml_node oStaff)
 
     vrvStaff->AttributesToInternal();
 
+    if (m_doc->GetOptions()->m_ossiaHidden.GetValue()) {
+        vrvStaff->SetVisibility(Hidden);
+    }
+
     parent->AddChild(vrvStaff);
     this->ReadUnsupportedAttr(oStaff, vrvStaff);
     return this->ReadStaffChildren(vrvStaff, oStaff);

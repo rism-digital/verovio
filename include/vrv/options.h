@@ -774,6 +774,7 @@ public:
     OptionBool m_loadSelectedMdivOnly;
     OptionBool m_mdivAll;
     OptionString m_mdivXPathQuery;
+    OptionBool m_ossiaHidden;
     OptionArray m_substXPathQuery;
     OptionString m_transpose;
     OptionJson m_transposeMdiv;
