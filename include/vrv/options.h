@@ -748,6 +748,7 @@ public:
     OptionBool m_spacingDurDetection;
     OptionDbl m_spacingLinear;
     OptionDbl m_spacingNonLinear;
+    OptionDbl m_spacingOssia;
     OptionInt m_spacingStaff;
     OptionInt m_spacingSystem;
     OptionDbl m_staffLineWidth;

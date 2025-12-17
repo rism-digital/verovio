@@ -541,7 +541,8 @@ double StaffAlignment::GetJustificationFactor(const Doc *doc) const
                 justificationFactor = doc->GetOptions()->m_justificationBracketGroup.GetValue();
                 break;
             case SystemAligner::SpacingType::Ossia:
-                justificationFactor = doc->GetOptions()->m_justificationStaff.GetValue() / 3;
+                justificationFactor
+                    = doc->GetOptions()->m_justificationStaff.GetValue() * doc->GetOptions()->m_spacingOssia.GetValue();
                 break;
             case SystemAligner::SpacingType::None: break;
             default: assert(false);
@@ -638,7 +639,8 @@ int StaffAlignment::GetMinimumSpacing(const Doc *doc) const
                 }
                 case SystemAligner::SpacingType::Ossia: {
                     // Ossia spacing is third of a staff spacing (hard coded for now)
-                    spacing = this->GetMinimumStaffSpacing(doc, scoreDefSpacing) / 3;
+                    spacing = this->GetMinimumStaffSpacing(doc, scoreDefSpacing)
+                        * doc->GetOptions()->m_spacingOssia.GetValue();
                     break;
                 }
                 case SystemAligner::SpacingType::None: break;

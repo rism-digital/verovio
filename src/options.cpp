@@ -1498,6 +1498,10 @@ Options::Options()
     m_spacingNonLinear.Init(0.6, 0.0, 1.0);
     this->Register(&m_spacingNonLinear, "spacingNonLinear", &m_generalLayout);
 
+    m_spacingOssia.SetInfo("Spacing ossia", "Specify the factor of an ossia spacing in relation to staff spacing");
+    m_spacingOssia.Init(0.35, 0.1, 1.0);
+    this->Register(&m_spacingOssia, "spacingOssia", &m_generalLayout);
+
     m_spacingStaff.SetInfo("Spacing staff", "The staff minimal spacing in MEI units");
     m_spacingStaff.Init(12, 0, 48);
     this->Register(&m_spacingStaff, "spacingStaff", &m_generalLayout);
