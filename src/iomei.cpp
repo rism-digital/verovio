@@ -5828,9 +5828,9 @@ bool MEIInput::ReadOssia(Object *parent, pugi::xml_node ossia)
             bool hide = false;
             // Hide oStaff with no n (even if n="1" is added in ReadOStaff but for the sake of completeness)
             hide = !staff->HasN();
-            // Hide oStaff for which there is no corresponding staff
-            hide = hide || !staff->FindDescendantByType(LAYER);
             // Hide oStaff with no layer
+            hide = hide || !staff->FindDescendantByType(LAYER);
+            // Hide oStaff for which there is no corresponding staff
             hide = hide || !vrvOssia->GetOriginalStaffForOssia(staff);
             if (hide) staff->SetVisibility(Hidden);
         }
