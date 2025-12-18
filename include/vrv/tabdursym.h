@@ -26,6 +26,7 @@ class TabDurSym : public LayerElement,
                   public StemmedDrawingInterface,
                   public AttNNumberLike,
                   public AttStringtab,
+                  public AttVisibility,
                   public AttVisualOffsetVo {
 public:
     /**
