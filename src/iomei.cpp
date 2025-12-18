@@ -2957,6 +2957,7 @@ void MEIOutput::WriteTabDurSym(pugi::xml_node currentNode, TabDurSym *tabDurSym)
     this->WriteLayerElement(currentNode, tabDurSym);
     tabDurSym->WriteNNumberLike(currentNode);
     tabDurSym->WriteStringtab(currentNode);
+    tabDurSym->WriteVisibility(currentNode);
     tabDurSym->WriteVisualOffsetVo(currentNode);
 }
 
@@ -7348,6 +7349,7 @@ bool MEIInput::ReadTabDurSym(Object *parent, pugi::xml_node tabRhyhtm)
 
     vrvTabDurSym->ReadNNumberLike(tabRhyhtm);
     vrvTabDurSym->ReadStringtab(tabRhyhtm);
+    vrvTabDurSym->ReadVisibility(tabRhyhtm);
     vrvTabDurSym->ReadVisualOffsetVo(tabRhyhtm);
 
     parent->AddChild(vrvTabDurSym);
