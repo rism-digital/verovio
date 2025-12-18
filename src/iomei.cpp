@@ -5819,6 +5819,23 @@ bool MEIInput::ReadOssia(Object *parent, pugi::xml_node ossia)
         }
     }
 
+    // Check that we don't have encoding that we do not support
+    if (!m_doc->GetOptions()->m_ossiaHidden.GetValue()) {
+        ListOfObjects proports = vrvOssia->FindAllDescendantsByType(STAFF);
+        for (Object *object : proports) {
+            Staff *staff = vrv_cast<Staff *>(object);
+            if (!staff->IsOssia()) continue;
+            bool hide = false;
+            // Hide oStaff with no n (even if n="1" is added in ReadOStaff but for the sake of completeness)
+            hide = !staff->HasN();
+            // Hide oStaff for which there is no corresponding staff
+            hide = hide || !staff->FindDescendantByType(LAYER);
+            // Hide oStaff with no layer
+            hide = hide || !vrvOssia->GetOriginalStaffForOssia(staff);
+            if (hide) staff->SetVisibility(Hidden);
+        }
+    }
+
     return success;
 }
 
