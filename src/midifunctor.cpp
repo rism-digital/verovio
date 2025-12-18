@@ -1184,7 +1184,7 @@ FunctorCode GenerateTimemapFunctor::VisitStaff(const Staff *staff)
 {
     if (staff->IsOssia()) return FUNCTOR_SIBLINGS;
 
-    return FUNCTOR_SIBLINGS;
+    return FUNCTOR_CONTINUE;
 }
 
 void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)
