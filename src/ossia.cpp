@@ -189,6 +189,7 @@ void Ossia::GetStavesBelow(MapOfOssiaStaffNs &map) const
 
 const Staff *Ossia::GetDrawingTopOStaff() const
 {
+    if (m_drawingStaffGrp.GetChildCount() == 0) return NULL;
     // We have only staffDef as children
     const StaffDef *staffDef = vrv_cast<const StaffDef *>(m_drawingStaffGrp.GetFirst());
     AttNIntegerComparison n(STAFF, staffDef->GetN());
@@ -198,6 +199,7 @@ const Staff *Ossia::GetDrawingTopOStaff() const
 
 const Staff *Ossia::GetDrawingBottopOStaff() const
 {
+    if (m_drawingStaffGrp.GetChildCount() == 0) return NULL;
     // We have only staffDef as children
     const StaffDef *staffDef = vrv_cast<const StaffDef *>(m_drawingStaffGrp.GetLast());
     AttNIntegerComparison n(STAFF, staffDef->GetN());

@@ -677,7 +677,7 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitOssia(Ossia *ossia)
 
 FunctorCode ScoreDefSetOssiaFunctor::VisitStaff(Staff *staff)
 {
-    if (!staff->IsOssia()) return FUNCTOR_SIBLINGS;
+    if (!staff->IsOssia() || staff->IsHidden()) return FUNCTOR_SIBLINGS;
 
     assert(!m_currentOssias.empty());
     CurrentOssia *currentOssia = &m_currentOssias.front();

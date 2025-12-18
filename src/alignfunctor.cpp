@@ -463,6 +463,8 @@ FunctorCode AlignHorizontallyFunctor::VisitSection(Section *section)
 
 FunctorCode AlignHorizontallyFunctor::VisitStaff(Staff *staff)
 {
+    if (staff->IsHidden()) return FUNCTOR_CONTINUE;
+
     StaffDef *drawingStaffDef = staff->m_drawingStaffDef;
     assert(drawingStaffDef);
 
