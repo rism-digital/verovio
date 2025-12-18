@@ -797,6 +797,8 @@ FunctorCode ScoreDefUnsetCurrentFunctor::VisitAlignmentReference(AlignmentRefere
     assert(alignment);
 
     switch (alignment->GetType()) {
+        case ALIGNMENT_SCOREDEF_OSSIA_CLEF:
+        case ALIGNMENT_SCOREDEF_OSSIA_KEYSIG:
         case ALIGNMENT_SCOREDEF_CLEF:
         case ALIGNMENT_SCOREDEF_KEYSIG:
         case ALIGNMENT_SCOREDEF_MENSUR:
