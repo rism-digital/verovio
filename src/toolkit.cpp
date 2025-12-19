@@ -2280,27 +2280,91 @@ std::string Toolkit::GetPitchPosition(double scoreTime, int midiPitch, int staff
     const Fraction requestedScoreTime = ScoreTimeFromDouble(scoreTime);
 
     MeasureScoreTimeComparison matchMeasureTime(requestedScoreTime);
-    Measure *measure = dynamic_cast<Measure *>(m_doc.FindDescendantByComparison(&matchMeasureTime));
+    Measure *measure = NULL;
+    if (m_doc.GetDrawingPage()) {
+        measure = dynamic_cast<Measure *>(m_doc.GetDrawingPage()->FindDescendantByComparison(&matchMeasureTime));
+    }
+    if (!measure) {
+        measure = dynamic_cast<Measure *>(m_doc.FindDescendantByComparison(&matchMeasureTime));
+    }
     if (!measure) {
         LogWarning("No measure found at score time '%f'", scoreTime);
         return o.json();
     }
 
+    // Score-time boundaries are inclusive, so exact measure offsets can map to the
+    // previous measure. If the query is at the offset, advance to the next measure
+    // to keep onset notes in their own bar.
     int repeat = measure->EnclosesScoreTime(requestedScoreTime);
     if (repeat == VRV_UNSET) repeat = 1;
 
+    const Fraction measureOffset = measure->GetScoreTimeOffset(repeat);
+    if (requestedScoreTime == measureOffset) {
+        Object *parent = measure->GetParent();
+        if (parent) {
+            Measure *nextMeasure = vrv_cast<Measure *>(parent->GetNext(measure, MEASURE));
+            if (nextMeasure) {
+                measure = nextMeasure;
+                repeat = measure->EnclosesScoreTime(requestedScoreTime);
+                if (repeat == VRV_UNSET) repeat = 1;
+            }
+        }
+    }
+
+    const std::string measureId = measure->GetID();
+
+    Measure *layoutMeasure = measure;
+    Page *page = vrv_cast<Page *>(measure->GetFirstAncestor(PAGE));
+    System *system = vrv_cast<System *>(measure->GetFirstAncestor(SYSTEM));
+
+    if (m_doc.GetDrawingPage()) {
+        Page *drawingPage = m_doc.GetDrawingPage();
+        for (Object *child : drawingPage->GetChildren()) {
+            if (!child->Is(SYSTEM)) continue;
+            System *candidateSystem = vrv_cast<System *>(child);
+            if (!candidateSystem) continue;
+            const ListOfObjects measures = candidateSystem->FindAllDescendantsByType(MEASURE, false);
+            for (Object *measureObj : measures) {
+                Measure *candidateMeasure = vrv_cast<Measure *>(measureObj);
+                if (!candidateMeasure) continue;
+                if (candidateMeasure->GetID() == measureId) {
+                    layoutMeasure = candidateMeasure;
+                    page = drawingPage;
+                    system = candidateSystem;
+                    break;
+                }
+                const LinkingInterface *link = candidateMeasure->GetLinkingInterface();
+                if (link && link->HasCorresp()) {
+                    const std::string correspId = ExtractIDFragment(link->GetCorresp());
+                    if (correspId == measureId) {
+                        layoutMeasure = candidateMeasure;
+                        page = drawingPage;
+                        system = candidateSystem;
+                        break;
+                    }
+                }
+            }
+            if (system == candidateSystem) break;
+        }
+    }
+
+    // Use the logical measure onset for time math, even if the layout measure is
+    // found via @corresp on the drawing page.
     Fraction measureOnset = measure->GetScoreTimeOnset(repeat);
     Fraction localTime = requestedScoreTime - measureOnset;
     if (localTime < 0) localTime = 0;
 
     bool interpolated = false;
-    const int xRel = measure->GetXAtScoreTime(localTime, interpolated);
-    const int x = measure->GetDrawingX() + xRel;
+    // Measure alignments are in quarter-note units, while Verovio score time uses
+    // SCORE_TIME_UNIT per quarter. Convert before looking up X.
+    const Fraction localTimeForX = localTime / SCORE_TIME_UNIT;
+    const int xRel = layoutMeasure->GetXAtScoreTime(localTimeForX, interpolated);
+    const int x = layoutMeasure->GetDrawingX() + xRel;
 
     AttNIntegerComparison staffCmp(STAFF, staffN);
-    Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&staffCmp, 1));
+    Staff *staff = vrv_cast<Staff *>(layoutMeasure->FindDescendantByComparison(&staffCmp, 1));
     if (!staff) {
-        LogWarning("Staff '%d' not found in measure '%s'", staffN, measure->GetID().c_str());
+        LogWarning("Staff '%d' not found in measure '%s'", staffN, measureId.c_str());
         return o.json();
     }
 
@@ -2317,7 +2381,7 @@ std::string Toolkit::GetPitchPosition(double scoreTime, int midiPitch, int staff
         keySig->FillMap(contextAccids);
     }
 
-    ListOfConstObjects notes = staff->FindAllDescendantsByType(NOTE, false);
+    const ListOfObjects notes = staff->FindAllDescendantsByType(NOTE, false);
     for (const Object *obj : notes) {
         const Note *note = vrv_cast<const Note *>(obj);
         assert(note);
@@ -2336,17 +2400,42 @@ std::string Toolkit::GetPitchPosition(double scoreTime, int midiPitch, int staff
     const int loc = PitchInterface::CalcLoc(spelled.pname, spelled.oct, clefOffset);
     const int y = staff->GetDrawingY() + staff->CalcPitchPosYRel(&m_doc, loc);
 
-    Page *page = vrv_cast<Page *>(measure->GetFirstAncestor(PAGE));
-    const int pageNo = (page) ? page->GetIdx() + 1 : 0;
-    System *system = vrv_cast<System *>(measure->GetFirstAncestor(SYSTEM));
-    const int systemNo = (system) ? system->GetIdx() + 1 : 0;
+    // Convert to SVG device coordinates: include page margins and flip Y from
+    // Verovio's logical space (origin at bottom-left of content) to SVG space
+    // (origin at top-left of the page content).
+    int xOut = x;
+    int yOut = y;
+    if (page) {
+        if (!m_doc.GetDrawingPage() || m_doc.GetDrawingPage()->GetIdx() != page->GetIdx()) {
+            m_doc.SetDrawingPage(page->GetIdx());
+        }
+        xOut = x + m_doc.m_drawingPageMarginLeft;
+        yOut = m_doc.m_drawingPageContentHeight - y + m_doc.m_drawingPageMarginTop;
+    }
 
-    o << "x" << x;
-    o << "y" << y;
+    const int pageNo = (page) ? page->GetIdx() + 1 : 0;
+    int systemNo = 0;
+    if (page && system) {
+        int systemIndex = 0;
+        for (Object *child : page->GetChildren()) {
+            if (!child->Is(SYSTEM)) continue;
+            systemIndex++;
+            if (child == system) {
+                systemNo = systemIndex;
+                break;
+            }
+        }
+    }
+    if (!systemNo && system) {
+        systemNo = system->GetIdx() + 1;
+    }
+
+    o << "x" << xOut;
+    o << "y" << yOut;
     o << "loc" << loc;
     o << "midi" << midiPitch;
     o << "staff" << staffN;
-    o << "measureId" << measure->GetID();
+    o << "measureId" << measureId;
     o << "page" << pageNo;
     o << "system" << systemNo;
     o << "scoreTime" << scoreTime;
