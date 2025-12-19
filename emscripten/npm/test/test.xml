@@ -1,0 +1,1813 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/3.1/partwise.dtd">
+<score-partwise version="3.1">
+  <movement-title>Love Me Tender</movement-title>
+  <identification>
+    <creator type="composer">Elvis Presley</creator>
+    <rights>www.antescofo.com</rights>
+    <encoding>
+      <software>Finale v27.4 for Mac</software>
+      <encoding-date>2024-09-17</encoding-date>
+      <supports attribute="new-system" element="print" type="yes" value="yes"/>
+      <supports attribute="new-page" element="print" type="yes" value="yes"/>
+      <supports element="accidental" type="yes"/>
+      <supports element="beam" type="yes"/>
+      <supports element="stem" type="yes"/>
+    </encoding>
+  </identification>
+  <defaults>
+    <scaling>
+      <millimeters>6.35</millimeters>
+      <tenths>40</tenths>
+    </scaling>
+    <page-layout>
+      <page-height>1871</page-height>
+      <page-width>1323</page-width>
+      <page-margins type="both">
+        <left-margin>94</left-margin>
+        <right-margin>94</right-margin>
+        <top-margin>94</top-margin>
+        <bottom-margin>94</bottom-margin>
+      </page-margins>
+    </page-layout>
+    <system-layout>
+      <system-margins>
+        <left-margin>0</left-margin>
+        <right-margin>0</right-margin>
+      </system-margins>
+      <system-distance>104</system-distance>
+      <top-system-distance>59</top-system-distance>
+    </system-layout>
+    <appearance>
+      <line-width type="stem">0.7487</line-width>
+      <line-width type="beam">5</line-width>
+      <line-width type="staff">0.7487</line-width>
+      <line-width type="light barline">0.7487</line-width>
+      <line-width type="heavy barline">5</line-width>
+      <line-width type="leger">0.7487</line-width>
+      <line-width type="ending">0.7487</line-width>
+      <line-width type="wedge">0.7487</line-width>
+      <line-width type="enclosure">0.7487</line-width>
+      <line-width type="tuplet bracket">0.7487</line-width>
+      <note-size type="grace">60</note-size>
+      <note-size type="cue">60</note-size>
+      <distance type="hyphen">120</distance>
+      <distance type="beam">7.5</distance>
+    </appearance>
+    <music-font font-family="Maestro,engraved" font-size="18"/>
+    <word-font font-family="Times New Roman" font-size="9"/>
+    <lyric-font font-family="Finale Lyrics" font-size="9.75"/>
+  </defaults>
+  <credit page="1">
+    <credit-type>rights</credit-type>
+    <credit-words default-x="661" default-y="63" font-size="12" font-style="italic" justify="center" valign="bottom">www.antescofo.com</credit-words>
+  </credit>
+  <credit page="1">
+    <credit-type>title</credit-type>
+    <credit-words default-x="661" default-y="1823" font-size="24" font-weight="bold" justify="center" valign="top">Love Me Tender</credit-words>
+  </credit>
+  <credit page="1">
+    <credit-type>composer</credit-type>
+    <credit-words default-x="1226" default-y="1729" font-size="14" font-weight="bold" justify="right" valign="top">Elvis Presley</credit-words>
+  </credit>
+  <part-list>
+    <score-part id="P1">
+      <part-name>Violin</part-name>
+      <part-abbreviation>Vn.</part-abbreviation>
+      <group>score</group>
+      <score-instrument id="P1-I1">
+        <instrument-name>SmartMusic SoftSynth</instrument-name>
+        <instrument-sound>strings.violin</instrument-sound>
+        <solo/>
+      </score-instrument>
+      <midi-instrument id="P1-I1">
+        <midi-channel>1</midi-channel>
+        <midi-bank>15489</midi-bank>
+        <midi-program>41</midi-program>
+        <volume>80</volume>
+        <pan>1</pan>
+      </midi-instrument>
+    </score-part>
+  </part-list>
+  <!--=========================================================-->
+  <part id="P1">
+    <measure number="1" width="245">
+      <print>
+        <system-layout>
+          <system-margins>
+            <left-margin>67</left-margin>
+            <right-margin>0</right-margin>
+          </system-margins>
+          <top-system-distance>146</top-system-distance>
+        </system-layout>
+        <measure-numbering>system</measure-numbering>
+      </print>
+      <attributes>
+        <divisions>2</divisions>
+        <key>
+          <fifths>2</fifths>
+          <mode>major</mode>
+        </key>
+        <time symbol="common">
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <sound/>
+      <direction directive="yes" placement="above">
+        <direction-type>
+          <words default-y="35" font-size="12" font-weight="bold">Tenderly</words>
+        </direction-type>
+        <sound tempo="70"/>
+      </direction>
+      <note default-x="168">
+        <rest/>
+        <duration>8</duration>
+        <voice>1</voice>
+        <type>whole</type>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="2" width="221">
+      <direction placement="below">
+        <direction-type>
+          <dynamics default-x="22" default-y="-68" halign="center">
+            <mp/>
+          </dynamics>
+        </direction-type>
+        <sound dynamics="69"/>
+      </direction>
+      <note default-x="13">
+        <pitch>
+          <step>A</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="13">up</stem>
+        <notations>
+          <technical>
+            <down-bow default-x="0" default-y="37" placement="above"/>
+            <fingering default-x="2" default-y="18" placement="above">0</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="65">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-47.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="117">
+        <pitch>
+          <step>C</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-52.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">2</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="169">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-47.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="3" width="202">
+      <note default-x="14">
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-42.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="5" placement="above">4</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="65">
+        <pitch>
+          <step>B</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-57.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">1</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="117">
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <stem default-y="-42.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="5" placement="above">4</fingering>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="4" width="222">
+      <note default-x="14">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-47.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="65">
+        <pitch>
+          <step>C</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-52.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">2</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="118">
+        <pitch>
+          <step>B</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-57.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">1</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="169">
+        <pitch>
+          <step>C</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-52.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">2</fingering>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="5" width="178">
+      <note default-x="14">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>6</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <dot/>
+        <stem default-y="-47.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="125">
+        <rest/>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="6" width="361">
+      <print new-system="yes">
+        <system-layout>
+          <system-distance>86</system-distance>
+        </system-layout>
+      </print>
+      <note default-x="89">
+        <pitch>
+          <step>A</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="13">up</stem>
+        <notations>
+          <technical>
+            <down-bow default-x="0" default-y="37" placement="above"/>
+            <fingering default-x="2" default-y="18" placement="above">0</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="157">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-48">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="225">
+        <pitch>
+          <step>C</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-53">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="1" default-y="3" placement="above">2</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="293">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-48">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="7" width="260">
+      <note default-x="14">
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-43">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="1" default-y="5" placement="above">4</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="82">
+        <pitch>
+          <step>B</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-58">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">1</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="150">
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <stem default-y="-43">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="5" placement="above">4</fingering>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="8" width="285">
+      <note default-x="14">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-48">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="1" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="82">
+        <pitch>
+          <step>C</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-53">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">2</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="149">
+        <pitch>
+          <step>B</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-58">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">1</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="217">
+        <pitch>
+          <step>C</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-53">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="1" default-y="3" placement="above">2</fingering>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="9" width="228">
+      <note default-x="14">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>6</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <dot/>
+        <stem default-y="-48">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="159">
+        <rest/>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="10" width="342">
+      <print new-system="yes">
+        <system-layout>
+          <system-distance>92</system-distance>
+        </system-layout>
+      </print>
+      <direction placement="below">
+        <direction-type>
+          <words default-x="90" default-y="-64" font-style="italic">cresc.</words>
+        </direction-type>
+      </direction>
+      <note default-x="90">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-37.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="1" default-y="10" placement="above">1</fingering>
+            <down-bow default-x="-1" default-y="29" placement="above"/>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="159">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-37.5">down</stem>
+      </note>
+      <note default-x="229">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <stem default-y="-37.5">down</stem>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="11" width="288">
+      <note default-x="14">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-37.5">down</stem>
+      </note>
+      <note default-x="89">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-37.5">down</stem>
+      </note>
+      <note default-x="165">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <stem default-y="-37.5">down</stem>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="12" width="283">
+      <direction placement="below">
+        <direction-type>
+          <wedge default-y="-70" type="crescendo"/>
+        </direction-type>
+      </direction>
+      <note default-x="14">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-37.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="1" default-y="10" placement="above">1</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="81">
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-42.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="5" placement="above">0</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="148">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-47.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="215">
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-42.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="5" placement="above">0</fingering>
+          </technical>
+        </notations>
+      </note>
+      <direction>
+        <direction-type>
+          <wedge relative-x="-5" spread="15" type="stop"/>
+        </direction-type>
+      </direction>
+    </measure>
+    <!--=======================================================-->
+    <measure number="13" width="222">
+      <note default-x="14">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>6</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <dot/>
+        <stem default-y="-37.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="10" placement="above">1</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="156">
+        <rest/>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="14" width="345">
+      <print new-system="yes">
+        <system-layout>
+          <system-distance>92</system-distance>
+        </system-layout>
+      </print>
+      <direction placement="below">
+        <direction-type>
+          <dynamics default-x="94" default-y="-64" halign="center">
+            <mf/>
+          </dynamics>
+        </direction-type>
+        <sound dynamics="83"/>
+      </direction>
+      <note default-x="90">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-38">down</stem>
+        <notations>
+          <technical>
+            <down-bow default-x="-1" default-y="29" placement="above"/>
+            <fingering default-x="1" default-y="10" placement="above">1</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="153">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-38">down</stem>
+      </note>
+      <note default-x="217">
+        <pitch>
+          <step>G</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-33">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="15" placement="above">2</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="281">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-38">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="10" placement="above">1</fingering>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="15" width="272">
+      <note default-x="14">
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-43">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="5" placement="above">0</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="85">
+        <pitch>
+          <step>B</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-58">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="1" default-y="3" placement="above">1</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="156">
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <stem default-y="-43">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="5" placement="above">4</fingering>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="16" width="285">
+      <direction placement="below">
+        <direction-type>
+          <wedge default-y="-69" spread="15" type="diminuendo"/>
+        </direction-type>
+      </direction>
+      <note default-x="14">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-48">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="82">
+        <pitch>
+          <step>C</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-53">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">2</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="149">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-38">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="10" placement="above">1</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="217">
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-43">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="5" placement="above">0</fingering>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="17" width="232">
+      <note default-x="13">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>6</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <dot/>
+        <stem default-y="-48">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+      <direction>
+        <direction-type>
+          <wedge type="stop"/>
+        </direction-type>
+      </direction>
+      <note default-x="162">
+        <rest/>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="18" width="360">
+      <print new-system="yes">
+        <system-layout>
+          <system-distance>98</system-distance>
+        </system-layout>
+      </print>
+      <direction placement="above">
+        <direction-type>
+          <rehearsal default-x="41" default-y="33" font-size="10.5" font-weight="bold">A</rehearsal>
+        </direction-type>
+      </direction>
+      <direction placement="below">
+        <direction-type>
+          <dynamics default-x="93" default-y="-64" halign="center">
+            <p/>
+          </dynamics>
+        </direction-type>
+        <sound dynamics="54"/>
+      </direction>
+      <note default-x="89">
+        <pitch>
+          <step>A</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="13">up</stem>
+        <notations>
+          <technical>
+            <down-bow default-x="0" default-y="37" placement="above"/>
+            <fingering default-x="2" default-y="18" placement="above">0</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="157">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-47.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="225">
+        <pitch>
+          <step>C</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-52.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="1" default-y="3" placement="above">2</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="292">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-47.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="19" width="260">
+      <note default-x="14">
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-42.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="5" placement="above">4</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="82">
+        <pitch>
+          <step>B</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-57.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">1</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="150">
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <stem default-y="-42.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="5" placement="above">4</fingering>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="20" width="285">
+      <note default-x="14">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-47.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="82">
+        <pitch>
+          <step>C</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-52.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">2</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="149">
+        <pitch>
+          <step>B</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-57.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">1</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="217">
+        <pitch>
+          <step>C</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-52.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">2</fingering>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="21" width="228">
+      <note default-x="14">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>6</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <dot/>
+        <stem default-y="-47.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="160">
+        <rest/>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="22" width="361">
+      <print new-system="yes">
+        <system-layout>
+          <system-distance>92</system-distance>
+        </system-layout>
+      </print>
+      <note default-x="89">
+        <pitch>
+          <step>A</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="13">up</stem>
+        <notations>
+          <technical>
+            <down-bow default-x="0" default-y="37" placement="above"/>
+            <fingering default-x="2" default-y="18" placement="above">0</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="157">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-48">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="225">
+        <pitch>
+          <step>C</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-53">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="1" default-y="3" placement="above">2</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="293">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-48">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="23" width="260">
+      <note default-x="14">
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-43">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="1" default-y="5" placement="above">4</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="82">
+        <pitch>
+          <step>B</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-58">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">1</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="150">
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <stem default-y="-43">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="5" placement="above">4</fingering>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="24" width="285">
+      <note default-x="14">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-48">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="1" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="82">
+        <pitch>
+          <step>C</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-53">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">2</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="149">
+        <pitch>
+          <step>B</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-58">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">1</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="217">
+        <pitch>
+          <step>C</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-53">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="1" default-y="3" placement="above">2</fingering>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="25" width="228">
+      <note default-x="14">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>6</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <dot/>
+        <stem default-y="-48">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="159">
+        <rest/>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="26" width="342">
+      <print new-system="yes">
+        <system-layout>
+          <system-distance>92</system-distance>
+        </system-layout>
+      </print>
+      <direction placement="below">
+        <direction-type>
+          <words default-x="89" default-y="-64" font-style="italic">cresc.</words>
+        </direction-type>
+      </direction>
+      <note default-x="89">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-38">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="10" placement="above">1</fingering>
+            <down-bow default-x="0" default-y="29" placement="above"/>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="159">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-38">down</stem>
+      </note>
+      <note default-x="228">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <stem default-y="-38">down</stem>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="27" width="266">
+      <note default-x="14">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-38">down</stem>
+      </note>
+      <note default-x="83">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-38">down</stem>
+      </note>
+      <note default-x="153">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <stem default-y="-38">down</stem>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="28" width="292">
+      <direction placement="below">
+        <direction-type>
+          <wedge default-y="-70" type="crescendo"/>
+        </direction-type>
+      </direction>
+      <note default-x="14">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-38">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="1" default-y="10" placement="above">1</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="83">
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-43">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="5" placement="above">0</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="153">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-48">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="222">
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-43">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="1" default-y="5" placement="above">0</fingering>
+          </technical>
+        </notations>
+      </note>
+      <direction>
+        <direction-type>
+          <wedge relative-x="-5" spread="15" type="stop"/>
+        </direction-type>
+      </direction>
+    </measure>
+    <!--=======================================================-->
+    <measure number="29" width="234">
+      <note default-x="14">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>6</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <dot/>
+        <stem default-y="-38">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="10" placement="above">1</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="164">
+        <rest/>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="30" width="333">
+      <print new-system="yes">
+        <system-layout>
+          <system-distance>92</system-distance>
+        </system-layout>
+      </print>
+      <direction placement="below">
+        <direction-type>
+          <dynamics default-x="94" default-y="-66" halign="center">
+            <mf/>
+          </dynamics>
+        </direction-type>
+        <sound dynamics="83"/>
+      </direction>
+      <note default-x="90">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-37.5">down</stem>
+        <notations>
+          <technical>
+            <down-bow default-x="-1" default-y="29" placement="above"/>
+            <fingering default-x="1" default-y="10" placement="above">1</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="151">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-37.5">down</stem>
+      </note>
+      <note default-x="211">
+        <pitch>
+          <step>G</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-32.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="15" placement="above">2</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="272">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-37.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="1" default-y="10" placement="above">1</fingering>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="31" width="234">
+      <note default-x="14">
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-42.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="5" placement="above">0</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="74">
+        <pitch>
+          <step>B</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-57.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">1</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="135">
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <stem default-y="-42.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="5" placement="above">4</fingering>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="32" width="257">
+      <direction placement="below">
+        <direction-type>
+          <wedge default-y="-70" spread="15" type="diminuendo"/>
+        </direction-type>
+      </direction>
+      <note default-x="14">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-47.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="75">
+        <pitch>
+          <step>C</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-52.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="1" default-y="3" placement="above">2</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="135">
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-37.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="10" placement="above">1</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note default-x="196">
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-42.5">down</stem>
+        <notations>
+          <technical>
+            <fingering default-x="2" default-y="5" placement="above">0</fingering>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="33" width="173">
+      <note default-x="13">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>8</duration>
+        <voice>1</voice>
+        <type>whole</type>
+        <notations>
+          <technical>
+            <fingering default-x="4" default-y="3" placement="above">3</fingering>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="34" width="137">
+      <note default-x="13">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>8</duration>
+        <voice>1</voice>
+        <type>whole</type>
+      </note>
+      <direction>
+        <direction-type>
+          <wedge type="stop"/>
+        </direction-type>
+      </direction>
+      <barline location="right">
+        <bar-style>light-heavy</bar-style>
+      </barline>
+    </measure>
+  </part>
+  <!--=========================================================-->
+</score-partwise>
