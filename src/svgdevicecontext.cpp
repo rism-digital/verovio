@@ -1313,6 +1313,7 @@ void SvgDeviceContext::DrawSvgBoundingBoxRectangle(int x, int y, int width, int 
     rectChild.append_attribute("width") = width;
 
     rectChild.append_attribute("fill") = "transparent";
+    rectChild.append_attribute("stroke-width") = "0";
 }
 
 void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
