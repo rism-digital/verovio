@@ -139,7 +139,7 @@ std::vector<const Staff *> TimePointInterface::GetTstampStaves(const Measure *me
     else if (this->HasPart() && (this->GetPart() == "%all")) {
         const System *system = vrv_cast<const System *>(measure->GetFirstAncestor(SYSTEM));
         assert(system);
-        const Staff *staff = system->GetTopVisibleStaff();
+        const Staff *staff = system->GetTopVisibleStaff(false);
         if (staff) staffList.push_back(staff->GetN());
     }
     else if (this->HasStaff()) {

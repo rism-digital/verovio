@@ -1121,7 +1121,7 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
     assert(measure);
     assert(mnum);
 
-    Staff *staff = system->GetTopVisibleStaff();
+    Staff *staff = system->GetTopVisibleStaff(true);
     if (staff) {
         // Only one FloatingPositioner on the top (visible) staff
         if (!system->SetCurrentFloatingPositioner(staff->GetN(), mnum, staff, staff)) {
@@ -1648,7 +1648,7 @@ void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMe
 
     if ((system->IsDrawingOptimized() || (m_options->m_systemDivider.GetValue() > SYSTEMDIVIDER_auto))) {
         int y = system->GetDrawingY();
-        Staff *staff = system->GetTopVisibleStaff();
+        Staff *staff = system->GetTopVisibleStaff(true);
         if (staff) {
             // Place it in the middle of current and previous systems - in very tight layout this can collision with
             // the staff above. To be improved
