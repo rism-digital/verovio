@@ -729,8 +729,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         // Get the corresponding staff
         AttNIntegerComparison comparison(STAFF, staffDef->GetN());
         Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
-        if (!staff) {
-            LogDebug("Could not get staff (%d) while drawing staffGrp - DrawBarLines", staffDef->GetN());
+        if (!staff || (staff->HasVisible() && (staff->GetVisible() == BOOLEAN_false))) {
             yBottomPrevious = VRV_UNSET;
             continue;
         }
