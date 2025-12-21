@@ -147,9 +147,7 @@ FunctorCode AdjustLayersFunctor::VisitMeasure(Measure *measure)
 
 FunctorCode AdjustLayersFunctor::VisitSystem(System *system)
 {
-    assert(system->GetDrawingScoreDef());
-
-    m_staffNs = system->GetDrawingScoreDef()->GetStaffNs();
+    if (system->GetDrawingScoreDef()) m_staffNs = system->GetDrawingScoreDef()->GetStaffNs();
 
     return FUNCTOR_CONTINUE;
 }

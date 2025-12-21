@@ -122,9 +122,7 @@ FunctorCode AdjustDotsFunctor::VisitMeasure(Measure *measure)
 
 FunctorCode AdjustDotsFunctor::VisitSystem(System *system)
 {
-    assert(system->GetDrawingScoreDef());
-
-    m_staffNs = system->GetDrawingScoreDef()->GetStaffNs();
+    if (system->GetDrawingScoreDef()) m_staffNs = system->GetDrawingScoreDef()->GetStaffNs();
 
     return FUNCTOR_CONTINUE;
 }
