@@ -564,6 +564,8 @@ private:
     std::map<Measure *, int> m_measureCounts;
     /* measure rests */
     std::map<int, int> m_multiRests;
+    /* A flag indicating we had a clef change */
+    bool m_clefChanged = false;
 
 #endif // NO_MUSICXML_SUPPORT
 };

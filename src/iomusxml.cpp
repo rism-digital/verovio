@@ -474,6 +474,13 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
     Staff *staff = vrv_cast<Staff *>(measure->GetChild(staffNum, STAFF));
     assert(staff);
     m_currentLayer = SelectLayer(layerNum, staff);
+
+    // If we just had a clef change, make sure it points to the correct layer
+    if (m_clefChanged && !m_clefChangeQueue.empty()) {
+        m_clefChangeQueue.front().m_layer = m_currentLayer;
+    }
+    m_clefChanged = false;
+
     m_isLayerInitialized = true;
     return m_currentLayer;
 }
@@ -1677,6 +1684,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     // reset measure time
     m_durTotal = 0;
 
+    // reset clef changed flag
+    m_clefChanged = false;
+
     const auto mrestPositonIter = m_multiRests.find(index);
     bool isMRestInOtherSystem = (mrestPositonIter != m_multiRests.end());
     int multiRestStaffNumber = 1;
@@ -1841,6 +1851,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
             const bool afterBarline = clef.attribute("after-barline").as_bool();
             m_clefChangeQueue.push(
                 musicxml::ClefChange(measureNum, staff, m_currentLayer, meiClef, m_durTotal, afterBarline));
+            m_clefChanged = true;
         }
     }
 
