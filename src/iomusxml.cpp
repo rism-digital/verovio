@@ -1152,6 +1152,14 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         m_endingStack.clear();
     }
 
+    // The top staffGrp cannot remain empty - add at least one staffDef
+    if (staffGrp->GetChildCount() == 0) {
+        StaffDef *staffDef = new StaffDef();
+        staffDef->SetN(1);
+        staffDef->SetLines(5);
+        staffGrp->AddChild(staffDef);
+    }
+
     m_doc->ConvertToPageBasedDoc();
 
     // clean up stacks
