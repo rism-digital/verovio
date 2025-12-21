@@ -562,7 +562,6 @@ void MusicXmlInput::FillSpace(Layer *layer, int dur, bool withClefs, int offset)
     }
 
     std::string durStr;
-    int totDur = dur;
     while (dur > 0) {
         double quarters = (double)dur / (double)m_ppq;
         quarters = pow(2, floor(log(quarters) / log(2)));
