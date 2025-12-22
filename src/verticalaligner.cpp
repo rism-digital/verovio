@@ -638,7 +638,7 @@ int StaffAlignment::GetMinimumSpacing(const Doc *doc) const
                     break;
                 }
                 case SystemAligner::SpacingType::Ossia: {
-                    // Ossia spacing is third of a staff spacing (hard coded for now)
+                    // Ossia spacing is third of a staff spacing
                     spacing = this->GetMinimumStaffSpacing(doc, scoreDefSpacing)
                         * doc->GetOptions()->m_spacingOssia.GetValue();
                     break;
