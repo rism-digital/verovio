@@ -971,7 +971,7 @@ void Doc::ScoreDefSetCurrentDoc(bool force)
     this->Process(scoreDefSetCurrent);
 
     if (scoreDefSetCurrent.HasOssia()) {
-        ScoreDefSetOssiaFunctor scoreDefSetOssia;
+        ScoreDefSetOssiaFunctor scoreDefSetOssia(this);
         this->Process(scoreDefSetOssia);
     }
 
