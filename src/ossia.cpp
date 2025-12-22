@@ -164,7 +164,7 @@ int Ossia::GetScoreDefShift() const
 {
     // The clef is the further appart
     if (m_clefAlignment) return m_clefAlignment->GetXRel();
-    // Other wise the key signature
+    // Otherwise the key signature
     if (m_keySigAlignment) return m_keySigAlignment->GetXRel();
     return 0;
 }
