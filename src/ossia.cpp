@@ -147,7 +147,7 @@ const Staff *Ossia::GetOriginalStaffForOssia(const Staff *ossia) const
     AttNIntegerComparison staffN(STAFF, ossia->GetNFromOssia());
     const Staff *staff = vrv_cast<const Staff *>(this->FindDescendantByComparison(&staffN));
     if (!staff) {
-        LogDebug("Orignal ossia staff %d could not be found", ossia->GetNFromOssia());
+        LogDebug("Original staff %d for ossia could not be found", ossia->GetNFromOssia());
     }
     return staff;
 }
