@@ -709,7 +709,7 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitStaff(Staff *staff)
     }
     m_upcomingStaffDef = *m_currentStaffDef;
 
-    // Takes ownership of the StaffDef (add it to the drawing staffGrp)
+    // Takes ownership of the staffDef (add it to the drawing staffGrp)
     currentOssia->m_ossia->AddDrawingStaffDef(m_currentStaffDef);
 
     // True by default for multi staves, false by default for single staff
