@@ -329,13 +329,13 @@ private:
 /**
  * This class prepares the ossia staffDefs for drawing.
  */
-class ScoreDefSetOssiaFunctor : public Functor {
+class ScoreDefSetOssiaFunctor : public DocFunctor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    ScoreDefSetOssiaFunctor();
+    ScoreDefSetOssiaFunctor(Doc *doc);
     virtual ~ScoreDefSetOssiaFunctor() = default;
     ///@}
 

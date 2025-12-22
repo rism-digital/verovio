@@ -610,7 +610,7 @@ FunctorCode ScoreDefSetGrpSymFunctor::VisitSystem(System *system)
 // ScoreDefSetOssiaFunctor
 //----------------------------------------------------------------------------
 
-ScoreDefSetOssiaFunctor::ScoreDefSetOssiaFunctor() : Functor()
+ScoreDefSetOssiaFunctor::ScoreDefSetOssiaFunctor(Doc *doc) : DocFunctor(doc)
 {
     m_currentStaffDef = NULL;
 }
