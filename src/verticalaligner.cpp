@@ -581,7 +581,7 @@ int StaffAlignment::GetMinimumStaffSpacing(const Doc *doc, const AttSpacing *att
 
     int staffSize = this->GetStaffSize();
     // Revert ossia staff ratio for it not to impact vertical spacing
-    if (this->m_staff && this->m_staff->IsOssia()) staffSize /= OSSIA_STAFF_RATIO;
+    if (this->m_staff && this->m_staff->IsOssia()) staffSize /= doc->GetOptions()->m_ossiaStaffSize.GetValue();
 
     int spacing = option.GetValue() * doc->GetDrawingUnit(staffSize);
 

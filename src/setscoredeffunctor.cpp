@@ -740,7 +740,7 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitStaff(Staff *staff)
     if (m_currentStaffDef->HasScale()) {
         staff->m_drawingStaffSize = m_currentStaffDef->GetScale();
     }
-    staff->m_drawingStaffSize *= OSSIA_STAFF_RATIO;
+    staff->m_drawingStaffSize *= m_doc->GetOptions()->m_ossiaStaffSize.GetValue();
 
     return FUNCTOR_CONTINUE;
 }
