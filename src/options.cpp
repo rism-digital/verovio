@@ -1434,6 +1434,10 @@ Options::Options()
     m_octaveNoSpanningParentheses.Init(false);
     this->Register(&m_octaveNoSpanningParentheses, "octaveNoSpanningParentheses", &m_generalLayout);
 
+    m_ossiaStaffSize.SetInfo("Ossia staff size", "The ossia staff size in relation to the staff size");
+    m_ossiaStaffSize.Init(0.5, 0.75, 1.00);
+    this->Register(&m_ossiaStaffSize, "ossiaStaffSize", &m_generalLayout);
+
     m_pedalLineThickness.SetInfo("Pedal line thickness", "The thickness of the line used for piano pedaling");
     m_pedalLineThickness.Init(0.20, 0.10, 1.00);
     this->Register(&m_pedalLineThickness, "pedalLineThickness", &m_generalLayout);
