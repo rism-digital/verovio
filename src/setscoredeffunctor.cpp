@@ -772,7 +772,7 @@ const StaffDef *ScoreDefSetOssiaFunctor::GetPreviousStaffDef(Ossia *ossia, int s
     std::vector<int> current = ossia->GetOStaffNs();
     auto it = std::find_if(m_previousOssias.begin(), m_previousOssias.end(),
         [&](const CurrentOssia &previous) { return previous.m_ossia->GetOStaffNs() == current; });
-    // If we don't have the ossia, don't need to look for the staffDef
+    // If we don't have an ossia, no need to look for the staffDef
     if (it == m_previousOssias.end()) {
         return NULL;
     }
