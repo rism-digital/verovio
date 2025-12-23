@@ -3288,15 +3288,14 @@ void MusicXmlInput::ReadMusicXmlNote(
                 else {
                     pugi::xml_node articulation = technicalChild;
                     Artic *artic = new Artic();
-                    artics.push_back(ConvertArticulations(articulation.name()));
-                    if (artics.back() != ARTICULATION_NONE) artic->SetArtic(artics);
+                    data_ARTICULATION articVal = ConvertArticulations(articulation.name());
+                    if (articVal != ARTICULATION_NONE) artic->SetArtic({ articVal });
                     artic->SetColor(articulation.attribute("color").as_string());
                     artic->SetGlyphName(articulation.attribute("smufl").as_string());
                     artic->SetPlace(
                         artic->AttPlacementRelEvent::StrToStaffrel(articulation.attribute("placement").as_string()));
                     artic->SetType("technical");
                     element->AddChild(artic);
-                    artics.clear();
                 }
             }
         }
