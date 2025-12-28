@@ -5,6 +5,8 @@
 
 # The path to the directory of tests in verovio.org
 testdir="/Users/laurent/Documents/verovio/gh-pages/_tests"
+# The path to the directory of musicxml tests
+testmusicxmldir="/Users/laurent/Documents/verovio/gh-pages/musicxmlTestSuite"
 # The path to the directory for the output of the develop (reference) branch
 indir1="/Users/laurent/tmp/test-output-dev"
 # The path to the directory for the output of the branch with the changes (PR)
@@ -49,6 +51,7 @@ if [ ! -z $build_dev ]; then
     make -j8
 
     $PYTHON ../../doc/test-suite.py "$testdir" "$indir1"
+    $PYTHON ../../doc/test-suite.py "$testmusicxmldir" "$indir1"
 
     cd $home
 fi
@@ -59,6 +62,7 @@ cd python
 make -j8
 
 $PYTHON ../../doc/test-suite.py "$testdir" "$indir2" --shortlist "$shortlist"
+$PYTHON ../../doc/test-suite.py "$testmusicxmldir" "$indir2"
 
 $PYTHON ../../doc/test-suite-diff.py "$indir2" "$indir1" "$outdir"
 

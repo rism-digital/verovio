@@ -225,8 +225,9 @@ void MusicXmlInput::ProcessClefChangeQueue(Section *section)
             else {
                 // For previous measure we need to make sure that clef is set at the end, so pass high duration value
                 // (since it won't matter there) and set measureNum to empty, since it doesn't matter as well
-                int endDuration = m_ppq;
-                for (int &num : m_meterCount) endDuration *= num;
+                int steps = 1;
+                for (int &num : m_meterCount) steps += num;
+                const int endDuration = 4 * m_ppq * steps / m_meterUnit;
                 musicxml::ClefChange previousClefChange(
                     std::string(""), previousStaff, previousLayer, clefChange.m_clef, endDuration, false);
                 this->AddClefs(previousMeasure, previousClefChange);
@@ -736,6 +737,18 @@ std::string MusicXmlInput::StyleLabel(pugi::xml_node display)
 void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
 {
     std::string rawText;
+
+    const Text *tempoText = vrv_cast<const Text *>(tempo->FindDescendantByType(TEXT, 1));
+    if (tempoText) {
+        // if there is a tempo text, insert a space
+        std::string tempoString = UTF32to8(tempoText->GetText());
+        if (!isspace(tempoString.back())) {
+            Text *text = new Text();
+            text->SetText(UTF8to32(" "));
+            tempo->AddChild(text);
+        }
+    }
+
     bool paren = false;
     if (metronome.attribute("parentheses").as_bool()) {
         Text *text = new Text();
@@ -776,7 +789,8 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
                 const short int dotCount = (short int)std::count_if(
                     iter, separator, [](const auto pair) { return pair.first == MetronomeElements::BEAT_UNIT_DOT; });
                 for (short int i = 0; i < dotCount; ++i) {
-                    verovioText += U"\xE1E7"; // SMUFL augmentation dot
+                    verovioText += UTF8to32(" ");
+                    verovioText += U"\xECB7"; // SMUFL augmentation dot
                 }
                 // set @mmUnit and @mmDots attributes only based on the first beat-unit in the sequence
                 if (start) {
@@ -4578,19 +4592,18 @@ data_TEXTRENDITION MusicXmlInput::ConvertEnclosure(const std::string &value)
 std::u32string MusicXmlInput::ConvertTypeToVerovioText(const std::string &value)
 {
     static const std::map<std::string, std::u32string> Type2VerovioText{
-        { "long", U"\xE1D0" }, // there is no matching glyph in this SMuFL range
-        { "breve", U"\xE1D1" }, //
-        { "whole", U"\xE1D2" }, //
-        { "half", U"\xE1D3" }, //
-        { "quarter", U"\xE1D5" }, //
-        { "eighth", U"\xE1D7" }, //
-        { "16th", U"\xE1D9" }, //
-        { "32nd", U"\xE1DB" }, //
-        { "64th", U"\xE1DD" }, //
-        { "128th", U"\xE1DF" }, //
-        { "256th", U"\xE1E1" }, //
-        { "512th", U"\xE1E3" }, //
-        { "1024th", U"\xE1E5" } //
+        { "breve", U"\xECA0" }, //
+        { "whole", U"\xECA2" }, //
+        { "half", U"\xECA3" }, //
+        { "quarter", U"\xECA5" }, //
+        { "eighth", U"\xECA7" }, //
+        { "16th", U"\xECA9" }, //
+        { "32nd", U"\xECAB" }, //
+        { "64th", U"\xECAD" }, //
+        { "128th", U"\xECAF" }, //
+        { "256th", U"\xECB1" }, //
+        { "512th", U"\xECB3" }, //
+        { "1024th", U"\xECB5" } //
     };
 
     const auto result = Type2VerovioText.find(value);
