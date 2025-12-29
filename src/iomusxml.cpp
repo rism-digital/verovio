@@ -3954,33 +3954,6 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
     assert(node);
     assert(measure);
 
-    // get MEI tuning
-    pugi::xpath_node meiTuning = node.select_node("play/other-play[@type='tuning-mei']");
-    if (meiTuning) {
-        const std::string value = std::regex_replace(meiTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
-        data_TEMPERAMENT temperament = TEMPERAMENT_NONE;
-        if (value == "none" || value == "") temperament = TEMPERAMENT_NONE;
-        else if (value == "equal") temperament = TEMPERAMENT_equal;
-        else if (value == "just") temperament = TEMPERAMENT_just;
-        else if (value == "mean") temperament = TEMPERAMENT_mean;
-        else if (value == "pythagorean") temperament = TEMPERAMENT_pythagorean;
-        else LogWarning("MusicXML import: Invalid MEI temperament '%s'", value.c_str());
-        m_doc->GetFirstScoreDef()->SetTuneTemper(temperament);
-    }
-
-    // get custom (Ableton) tuning
-    pugi::xpath_node abletonTuning = node.select_node("play/other-play[@type='tuning-ableton']");
-    if (abletonTuning) {
-        const std::string tuningDef = std::regex_replace(abletonTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
-        CustomTuning tuning(tuningDef, m_doc, true);
-        if (tuning.IsValid()) {
-            m_doc->GetFirstScoreDef()->SetTuneCustom(tuning);
-        }
-        else {
-            LogWarning("MusicXML import: Error parsing tuning definition");
-        }
-    }
-
     // segno
     if (node.attribute("segno")) {
         if (!m_sectionStart) m_sectionStart = musicxml::SectionInfo();
