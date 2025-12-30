@@ -1144,7 +1144,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     }
 
     // manage sections: create new <section> / <ending> elements and move the corresponding measures into them
-    for (auto iter = m_sections.begin(); iter != m_sections.end(); ) {
+    for (auto iter = m_sections.begin(); iter != m_sections.end();) {
         std::vector<Measure *> measures = iter->second;
         if (measures.empty()) {
             iter = m_sections.erase(iter);
@@ -1239,10 +1239,11 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 
 // vibe-coded on Claude AI using prompt:
 //
-// in C++, write a concise function to parse a string of comma separated ints with optional spaces into a list (array or vector) of ints
+// in C++, write a concise function to parse a string of comma separated ints with optional spaces into a list (array or
+// vector) of ints
 //
 // verified at https://onlinegdb.com/blxCanxpAW
-std::vector<int> parseInts(const std::string& str)
+std::vector<int> parseInts(const std::string &str)
 {
     std::vector<int> result;
     std::stringstream ss(str);
@@ -1343,30 +1344,20 @@ void MusicXmlInput::CreateExpansion(Section *section)
         }
 
         // dacapo
-        if (
-            enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DACAPO &&
-            enditer->first.m_jumpInfo.m_times.end() != std::find(
-                enditer->first.m_jumpInfo.m_times.begin(),
-                enditer->first.m_jumpInfo.m_times.end(),
-                enditer->first.m_visited
-            )
-        ) {
+        if (enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DACAPO
+            && enditer->first.m_jumpInfo.m_times.end()
+                != std::find(enditer->first.m_jumpInfo.m_times.begin(), enditer->first.m_jumpInfo.m_times.end(),
+                    enditer->first.m_visited)) {
             iter = m_sections.begin();
             jumpBack = true;
         }
 
         // dalsegno / tocoda
-        if (
-            (
-                enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DALSEGNO ||
-                enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::TOCODA
-            ) &&
-            enditer->first.m_jumpInfo.m_times.end() != std::find(
-                enditer->first.m_jumpInfo.m_times.begin(),
-                enditer->first.m_jumpInfo.m_times.end(),
-                enditer->first.m_visited
-            )
-        ) {
+        if ((enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DALSEGNO
+                || enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::TOCODA)
+            && enditer->first.m_jumpInfo.m_times.end()
+                != std::find(enditer->first.m_jumpInfo.m_times.begin(), enditer->first.m_jumpInfo.m_times.end(),
+                    enditer->first.m_visited)) {
             iter = labels.at(enditer->first.m_jumpInfo.m_label);
             jumpBack = enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DALSEGNO;
         }
@@ -3980,7 +3971,8 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
     // dacapo
     if (HasAttributeWithValue(node, "dacapo", "yes")) {
         if (!m_sectionStop) m_sectionStop = musicxml::SectionInfo();
-        m_jumpInfo = musicxml::JumpInfo(musicxml::JumpInfo::DACAPO, parseInts(node.attribute("time-only").as_string("1")));
+        m_jumpInfo
+            = musicxml::JumpInfo(musicxml::JumpInfo::DACAPO, parseInts(node.attribute("time-only").as_string("1")));
     }
 
     // dalsegno
@@ -3988,7 +3980,8 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
         if (!m_sectionStop) m_sectionStop = musicxml::SectionInfo();
         std::string label = node.attribute("dalsegno").as_string();
         if (label.empty()) label = "segno";
-        m_jumpInfo = musicxml::JumpInfo(musicxml::JumpInfo::DALSEGNO, label, parseInts(node.attribute("time-only").as_string("1")));
+        m_jumpInfo = musicxml::JumpInfo(
+            musicxml::JumpInfo::DALSEGNO, label, parseInts(node.attribute("time-only").as_string("1")));
     }
 
     // tocoda
@@ -3996,7 +3989,8 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
         if (!m_sectionStop) m_sectionStop = musicxml::SectionInfo();
         std::string label = node.attribute("tocoda").as_string();
         if (label.empty()) label = "coda";
-        m_jumpInfo = musicxml::JumpInfo(musicxml::JumpInfo::TOCODA, label, parseInts(node.attribute("time-only").as_string("2")));
+        m_jumpInfo = musicxml::JumpInfo(
+            musicxml::JumpInfo::TOCODA, label, parseInts(node.attribute("time-only").as_string("2")));
     }
 
     // fine

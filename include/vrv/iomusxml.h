@@ -129,12 +129,14 @@ namespace musicxml {
     };
 
     struct RepeatInfo {
-        RepeatInfo() {
+        RepeatInfo()
+        {
             m_times = 1;
             m_afterJump = false;
         }
 
-        RepeatInfo(int times, bool afterJump) {
+        RepeatInfo(int times, bool afterJump)
+        {
             m_times = times;
             m_afterJump = afterJump;
         }
@@ -144,23 +146,21 @@ namespace musicxml {
     };
 
     struct JumpInfo {
-        typedef enum { NONE=0, DALSEGNO, DACAPO, TOCODA } JUMPTYPE;
+        typedef enum { NONE = 0, DALSEGNO, DACAPO, TOCODA } JUMPTYPE;
 
-        JumpInfo() {
-            m_jump = NONE;
-        }
-        JumpInfo(JUMPTYPE jump, const std::string &label, const std::vector<int> &times) {
+        JumpInfo() { m_jump = NONE; }
+        JumpInfo(JUMPTYPE jump, const std::string &label, const std::vector<int> &times)
+        {
             m_label = label;
             m_jump = jump;
             m_times = times;
         }
-        JumpInfo(JUMPTYPE jump, const std::vector<int> &times) {
+        JumpInfo(JUMPTYPE jump, const std::vector<int> &times)
+        {
             m_jump = jump;
             m_times = times;
         }
-        JumpInfo(JUMPTYPE jump) {
-            m_jump = jump;
-        }
+        JumpInfo(JUMPTYPE jump) { m_jump = jump; }
 
         std::string m_label;
         JUMPTYPE m_jump;
@@ -168,31 +168,30 @@ namespace musicxml {
     };
 
     struct FineInfo {
-        FineInfo() {
-            m_fine = false;
-        }
-        FineInfo(bool fine) {
-            m_fine = fine;
-        }
+        FineInfo() { m_fine = false; }
+        FineInfo(bool fine) { m_fine = fine; }
 
         bool m_fine;
     };
 
     struct SectionInfo {
-        SectionInfo(bool repeatStart = false) {
+        SectionInfo(bool repeatStart = false)
+        {
             m_visited = 0;
             m_classId = SECTION;
             m_target = NULL;
             m_repeatStart = repeatStart;
         }
-        SectionInfo(EndingInfo endingInfo) {
+        SectionInfo(EndingInfo endingInfo)
+        {
             m_visited = 0;
             m_classId = ENDING;
             m_target = NULL;
             m_endingInfo = endingInfo;
             m_repeatStart = false;
         }
-        SectionInfo(RepeatInfo repeatInfo) {
+        SectionInfo(RepeatInfo repeatInfo)
+        {
             m_visited = 0;
             m_classId = SECTION;
             m_target = NULL;
