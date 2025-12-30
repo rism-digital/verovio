@@ -1307,12 +1307,16 @@ void MusicXmlInput::CreateExpansion(Section *section)
         else /* ENDING */ {
             // gather all endings, by creating a map from ending number to ending iterator
             std::map<int, decltype(iter)> endings;
+            auto begiter = iter;
             while (iter != m_sections.end() && iter->first.m_classId == ENDING) {
                 auto is = parseInts(iter->first.m_endingInfo.m_number);
                 for (auto i : is) {
                     endings.insert({ i, iter });
                 }
                 enditer = iter++;
+
+                // increment visited count of subsequent sections
+                if (enditer != begiter) enditer->first.m_visited++;
             }
 
             // when jumping back, keep only last ending
