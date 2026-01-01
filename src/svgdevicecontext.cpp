@@ -485,9 +485,10 @@ void SvgDeviceContext::StartPage()
         m_currentNode = m_currentNode.append_child("style");
         m_currentNode.append_attribute("type") = "text/css";
         assert(resources);
-        std::string css = "g.ending, g.fing, g.reh, g.tempo {font-weight:bold;} "
-                          "g.dir, g.dynam, g.mNum {font-style:italic;}"
-                          "g.label {font-weight:normal;} "
+        std::string css = "g { "
+                          ".ending, .fing, .reh, .tempo {font-weight:bold;} "
+                          ".dir, .dynam, .mNum {font-style:italic;} .label {font-weight:normal;} "
+                          "} "
                           "ellipse, path, polygon, polyline, rect {stroke:currentColor} ";
         // bounding box css - for debugging
         // css += " g.bounding-box{stroke:red; stroke-width:10} "
