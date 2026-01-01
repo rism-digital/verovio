@@ -631,38 +631,8 @@ void SvgDeviceContext::AppendStrokeDashArray(pugi::xml_node node, const Pen &pen
 
 void SvgDeviceContext::PrefixCssRules(std::string &rules)
 {
-    static std::regex selectorRegex(R"(([^{}]+)\s*\{([^}]*)\})");
-
-    std::sregex_iterator it(rules.begin(), rules.end(), selectorRegex);
-    std::sregex_iterator end;
-
-    std::string result;
-
-    while (it != end) {
-        std::string selectors = (*it)[1].str();
-        std::string properties = (*it)[2].str();
-
-        // Split by comma to handle multi-selectors
-        std::stringstream ss(selectors);
-        std::string selector;
-        std::vector<std::string> prefixedSelectors;
-
-        while (std::getline(ss, selector, ',')) {
-            // Trim whitespace
-            selector = std::regex_replace(selector, std::regex(R"(^\s+|\s+$)"), "");
-            prefixedSelectors.push_back("#" + m_docId + " " + selector);
-        }
-
-        if (prefixedSelectors.empty()) continue;
-
-        std::string finalSelector = std::accumulate(std::next(prefixedSelectors.begin()), prefixedSelectors.end(),
-            prefixedSelectors.at(0), [](std::string a, std::string b) { return a + ", " + b; });
-
-        result += finalSelector + " {" + properties + "}";
-        ++it;
-    }
-
-    rules = result;
+    // turn rules into ruleset
+    rules = "#" + m_docId + " { " + rules + "}";
 }
 
 // Drawing methods
