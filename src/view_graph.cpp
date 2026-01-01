@@ -153,6 +153,7 @@ void View::DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2,
     Point p[4];
 
     dc->SetPen(0, PEN_SOLID);
+    dc->SetBrush(-1.0);
 
     height = this->ToDeviceContextX(height);
     p[0].x = this->ToDeviceContextX(x1);
