@@ -133,7 +133,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.1
 
       - name: Register gcc problem matcher
         run: echo "::add-matcher::.github/problem_matchers/gcc.json"
@@ -215,10 +215,10 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.1
 
       - name: Restore cache
-        uses: actions/setup-java@v5.0.0
+        uses: actions/setup-java@v5.1.0
         with:
           distribution: 'temurin'
           java-version: '21'
@@ -238,7 +238,7 @@ jobs:
         run: cp target/*.jar $GITHUB_WORKSPACE/$TEMP_DIR/
 
       - name: Upload java build artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: java-build-${{ github.run_id }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}
@@ -256,7 +256,7 @@ jobs:
 
     steps:
       - name: Set up cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: cache
         with:
           # path for cache
@@ -305,7 +305,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.1
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
@@ -314,7 +314,7 @@ jobs:
       # Restore system libraries from cache
       - name: Restore cache
         id: restore_cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           # path for cache
           path: ${{ env.EM_CACHE_FOLDER }}
@@ -342,7 +342,7 @@ jobs:
 
       - name: Upload js build artifact (${{ matrix.toolkit.target }})
         if: ${{ matrix.toolkit.upload == true }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ env.TOOLKIT_BUILD }}-${{ github.run_id }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ matrix.toolkit.filepath }}
@@ -360,7 +360,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.1
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
@@ -370,7 +370,7 @@ jobs:
         run: cp data/*.css $GITHUB_WORKSPACE/$TEMP_DIR/data/
 
       - name: Upload font data artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ env.FONTS }}-${{ github.run_id }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}
@@ -422,7 +422,7 @@ jobs:
 
     steps:
       - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.1
         with:
           # repository to check out
           repository: ${{ env.GH_PAGES_REPO }}
@@ -435,7 +435,7 @@ jobs:
           path: ${{ env.GH_PAGES_DIR }}
 
       - name: Download TOOLKIT_BUILD artifacts
-        uses: actions/download-artifact@v6.0.0
+        uses: actions/download-artifact@v7.0.0
         with:
           name: ${{ env.TOOLKIT_BUILD }}-${{ github.run_id }}
           path: artifacts/${{ env.TOOLKIT_BUILD }}
@@ -445,7 +445,7 @@ jobs:
           cp -r artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
 
       - name: Download FONTS artifacts
-        uses: actions/download-artifact@v6.0.0
+        uses: actions/download-artifact@v7.0.0
         with:
           name: ${{ env.FONTS }}-${{ github.run_id }}
           path: artifacts/${{ env.FONTS }}
@@ -515,7 +515,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.1
 
       - name: Install doxygen
         run: |
@@ -535,7 +535,7 @@ jobs:
         run: (cat verovio.conf ; echo "OUTPUT_DIRECTORY = $GITHUB_WORKSPACE/$DOXYGEN_DIR") | doxygen -
 
       - name: Upload doxygen build artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ env.DOC_BUILD }}-${{ github.run_id }}
           path: ${{ github.workspace }}/${{ env.DOXYGEN_DIR }}
@@ -552,7 +552,7 @@ jobs:
 
     steps:
       - name: Checkout DOXYGEN_REPO into DOXYGEN_DIR
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.1
         with:
           # repository to check out
           repository: ${{ env.DOXYGEN_REPO }}
@@ -565,7 +565,7 @@ jobs:
           path: ${{ env.DOXYGEN_DIR }}
 
       - name: Download DOC_BUILD artifacts
-        uses: actions/download-artifact@v6.0.0
+        uses: actions/download-artifact@v7.0.0
         with:
           name: ${{ env.DOC_BUILD }}-${{ github.run_id }}
           path: artifacts/${{ env.DOC_BUILD }}
