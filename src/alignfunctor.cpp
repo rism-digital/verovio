@@ -17,6 +17,7 @@
 #include "ligature.h"
 #include "nc.h"
 #include "neume.h"
+#include "ossia.h"
 #include "page.h"
 #include "proport.h"
 #include "rend.h"
@@ -67,6 +68,12 @@ FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
     m_time = -1;
 
     m_scoreDefRole = (m_isFirstMeasure || m_sectionRestart) ? SCOREDEF_SYSTEM : SCOREDEF_INTERMEDIATE;
+
+    // We know we need an ossia staffDef that has to be aligned before the measure start
+    // However only if we do not have a system start or a section restart
+    if (layer->DrawOssiaStaffDef() && (m_scoreDefRole != SCOREDEF_SYSTEM)) {
+        m_scoreDefRole = SCOREDEF_OSSIA;
+    }
 
     if (layer->GetStaffDefClef()) {
         if (layer->GetStaffDefClef()->GetVisible() != BOOLEAN_false) {
@@ -201,6 +208,8 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             type = ALIGNMENT_SCOREDEF_CLEF;
         else if (layerElement->GetScoreDefRole() == SCOREDEF_CAUTIONARY)
             type = ALIGNMENT_SCOREDEF_CAUTION_CLEF;
+        else if (layerElement->GetScoreDefRole() == SCOREDEF_OSSIA)
+            type = ALIGNMENT_SCOREDEF_OSSIA_CLEF;
         else {
             type = ALIGNMENT_CLEF;
         }
@@ -211,6 +220,8 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             type = ALIGNMENT_SCOREDEF_KEYSIG;
         else if (layerElement->GetScoreDefRole() == SCOREDEF_CAUTIONARY)
             type = ALIGNMENT_SCOREDEF_CAUTION_KEYSIG;
+        else if (layerElement->GetScoreDefRole() == SCOREDEF_OSSIA)
+            type = ALIGNMENT_SCOREDEF_OSSIA_KEYSIG;
         else {
             type = ALIGNMENT_KEYSIG;
         }
@@ -430,6 +441,17 @@ FunctorCode AlignHorizontallyFunctor::VisitMeterSigGrp(MeterSigGrp *meterSigGrp)
     return meterSigGrp->IsScoreDefElement() ? FUNCTOR_STOP : FUNCTOR_CONTINUE;
 }
 
+FunctorCode AlignHorizontallyFunctor::VisitOssia(Ossia *ossia)
+{
+    Measure *measure = vrv_cast<Measure *>(ossia->GetParent());
+    if (measure) {
+        ossia->GetDrawingLeftBarLine()->SetParent(measure);
+        ossia->GetDrawingLeftBarLine()->SetAlignment(measure->GetLeftBarLine()->GetAlignment());
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode AlignHorizontallyFunctor::VisitSection(Section *section)
 {
     if (section->GetRestart() == BOOLEAN_true) {
@@ -441,6 +463,8 @@ FunctorCode AlignHorizontallyFunctor::VisitSection(Section *section)
 
 FunctorCode AlignHorizontallyFunctor::VisitStaff(Staff *staff)
 {
+    if (staff->IsHidden()) return FUNCTOR_CONTINUE;
+
     StaffDef *drawingStaffDef = staff->m_drawingStaffDef;
     assert(drawingStaffDef);
 

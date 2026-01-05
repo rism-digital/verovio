@@ -467,7 +467,7 @@ private:
      * @name Helper methods for filling in space elements
      */
     ///@{
-    void FillSpace(Layer *layer, int dur);
+    void FillSpace(Layer *layer, int dur, bool withClefs = false, int processed = 0);
     ///@}
 
     /*
@@ -645,13 +645,15 @@ private:
      */
     std::vector<std::pair<std::string, ControlElement *>> m_controlElements;
     /* stack of clef changes to be inserted to all layers of a given staff */
-    std::queue<musicxml::ClefChange> m_clefChangeQueue;
+    std::deque<musicxml::ClefChange> m_clefChangeQueue;
     /* stack of new arpeggios that get more notes added. */
     std::vector<std::pair<Arpeg *, musicxml::OpenArpeggio>> m_ArpeggioStack;
     /* a map for the measure counts storing the index of each measure created */
     std::map<Measure *, int> m_measureCounts;
     /* measure rests */
     std::map<int, int> m_multiRests;
+    /* A flag indicating we had a clef change */
+    int m_clefChanged = 0;
 
 #endif // NO_MUSICXML_SUPPORT
 };

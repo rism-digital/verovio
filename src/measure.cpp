@@ -164,7 +164,7 @@ void Measure::Reset()
 
 bool Measure::IsSupportedChild(ClassId classId)
 {
-    static const std::vector<ClassId> supported{ STAFF };
+    static const std::vector<ClassId> supported{ OSSIA, STAFF };
 
     if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
         return true;
@@ -463,6 +463,57 @@ const Staff *Measure::GetBottomVisibleStaff() const
         bottomStaff = staff;
     }
     return bottomStaff;
+}
+
+int Measure::GetStaffCount(bool excludeOStaves) const
+{
+    int count = 0;
+    ListOfConstObjects staves = this->FindAllDescendantsByType(STAFF, false);
+    for (const auto child : staves) {
+        const Staff *staff = vrv_cast<const Staff *>(child);
+        assert(staff);
+        if (staff->IsOssia() && excludeOStaves) continue;
+        count++;
+    }
+    return count;
+}
+
+Staff *Measure::GetFirstStaff(bool excludeOStaves)
+{
+    return const_cast<Staff *>(std::as_const(*this).GetFirstStaff(excludeOStaves));
+}
+
+const Staff *Measure::GetFirstStaff(bool excludeOStaves) const
+{
+    ListOfConstObjects staves = this->FindAllDescendantsByType(STAFF, false);
+    for (const auto child : staves) {
+        const Staff *staff = vrv_cast<const Staff *>(child);
+        assert(staff);
+        if (staff->IsOssia() && excludeOStaves) continue;
+        return staff;
+    }
+    return NULL;
+}
+
+Staff *Measure::GetLastStaff(bool excludeOStaves)
+{
+    return const_cast<Staff *>(std::as_const(*this).GetLastStaff(excludeOStaves));
+}
+
+const Staff *Measure::GetLastStaff(bool excludeOStaves) const
+{
+    ListOfConstObjects staves = this->FindAllDescendantsByType(STAFF);
+
+    ListOfConstObjects stavesReversed;
+    stavesReversed.resize(staves.size());
+    std::reverse_copy(staves.begin(), staves.end(), stavesReversed.begin());
+    for (const auto child : stavesReversed) {
+        const Staff *staff = vrv_cast<const Staff *>(child);
+        assert(staff);
+        if (staff->IsOssia() && excludeOStaves) continue;
+        return staff;
+    }
+    return NULL;
 }
 
 int Measure::EnclosesTime(int time) const

@@ -92,8 +92,8 @@ public:
      * Takes into account system optimization
      */
     ///@{
-    Staff *GetTopVisibleStaff();
-    const Staff *GetTopVisibleStaff() const;
+    Staff *GetTopVisibleStaff(bool includeOssia);
+    const Staff *GetTopVisibleStaff(bool includeOssia) const;
     ///@}
 
     /**

@@ -104,6 +104,7 @@ void Layer::CloneReset()
     m_cautionStaffDefKeySig = NULL;
     m_cautionStaffDefMensur = NULL;
     m_cautionStaffDefMeterSig = NULL;
+    m_drawOssiaStaffDef = false;
 
     m_drawingStemDir = STEMDIRECTION_NONE;
     m_crossStaffFromAbove = false;
@@ -151,6 +152,8 @@ void Layer::ResetStaffDefObjects()
         delete m_cautionStaffDefMeterSig;
         m_cautionStaffDefMeterSig = NULL;
     }
+    // ossia
+    m_drawOssiaStaffDef = false;
 }
 
 bool Layer::IsSupportedChild(ClassId classId)
@@ -578,6 +581,32 @@ void Layer::SetDrawingStaffDefValues(StaffDef *currentStaffDef)
     currentStaffDef->SetDrawMensur(false);
     currentStaffDef->SetDrawMeterSig(false);
     currentStaffDef->SetDrawMeterSigGrp(false);
+}
+
+bool Layer::GetDrawingStaffDefValues(StaffDef *staffDef) const
+{
+    bool hasValue = false;
+    if (this->m_staffDefClef) {
+        staffDef->SetDrawClef(true);
+        hasValue = true;
+    }
+    if (this->m_staffDefKeySig) {
+        staffDef->SetDrawKeySig(true);
+        hasValue = true;
+    }
+    if (this->m_staffDefMensur) {
+        staffDef->SetDrawMensur(true);
+        hasValue = true;
+    }
+    if (this->m_staffDefMeterSig) {
+        staffDef->SetDrawMeterSig(true);
+        hasValue = true;
+    }
+    if (this->m_staffDefMeterSigGrp) {
+        staffDef->SetDrawMeterSigGrp(true);
+        hasValue = true;
+    }
+    return hasValue;
 }
 
 void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
