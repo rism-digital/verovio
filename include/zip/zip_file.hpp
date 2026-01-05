@@ -24,6 +24,8 @@
 //
 // @license: http://www.opensource.org/licenses/mit-license.php
 
+// Changed 05.11.2026 - remove use of comma operator
+
 #pragma once
 
 #include <algorithm>
@@ -1502,6 +1504,7 @@ extern "C"
             return MZ_ADLER32_INIT;
         while (buf_len)
         {
+            /* Remove use of comma operator
             for (i = 0; i + 7 < block_len; i += 8, ptr += 8)
             {
                 s1 += ptr[0], s2 += s1;
@@ -1516,6 +1519,27 @@ extern "C"
             for (; i < block_len; ++i)
                 s1 += *ptr++, s2 += s1;
             s1 %= 65521U, s2 %= 65521U;
+            buf_len -= block_len;
+            block_len = 5552;
+             */
+            for (i = 0; i + 7 < block_len; i += 8, ptr += 8)
+            {
+                s1 += ptr[0]; s2 += s1;
+                s1 += ptr[1]; s2 += s1;
+                s1 += ptr[2]; s2 += s1;
+                s1 += ptr[3]; s2 += s1;
+                s1 += ptr[4]; s2 += s1;
+                s1 += ptr[5]; s2 += s1;
+                s1 += ptr[6]; s2 += s1;
+                s1 += ptr[7]; s2 += s1;
+            }
+            for (; i < block_len; ++i)
+            {
+                s1 += *ptr++;
+                s2 += s1;
+            }
+            s1 %= 65521U;
+            s2 %= 65521U;
             buf_len -= block_len;
             block_len = 5552;
         }
@@ -2716,7 +2740,11 @@ static mz_bool tdefl_compress_lz_codes(tdefl_compressor *d)
         {
             mz_uint i;
             d->m_pOutput_buf = pSaved_output_buf;
+            /* Remove use of comma operator
             d->m_bit_buffer = saved_bit_buf, d->m_bits_in = saved_bits_in;
+             */
+            d->m_bit_buffer = saved_bit_buf;
+            d->m_bits_in = saved_bits_in;
             TDEFL_PUT_BITS(0, 2);
             if (d->m_bits_in)
             {
@@ -2735,7 +2763,11 @@ static mz_bool tdefl_compress_lz_codes(tdefl_compressor *d)
         else if (!comp_block_succeeded)
         {
             d->m_pOutput_buf = pSaved_output_buf;
+            /* Remove use of comma operator
             d->m_bit_buffer = saved_bit_buf, d->m_bits_in = saved_bits_in;
+             */
+            d->m_bit_buffer = saved_bit_buf;
+            d->m_bits_in = saved_bits_in;
             tdefl_compress_block(d, MZ_TRUE);
         }
 
@@ -3986,7 +4018,11 @@ extern "C"
                     MZ_CLEAR_OBJ(pTable->m_tree);
                     for (i = 0; i < r->m_table_sizes[r->m_type]; ++i)
                         total_syms[pTable->m_code_size[i]]++;
+                    /* Remove use of comma operator
                     used_syms = 0, total = 0;
+                     */
+                    used_syms = 0;
+                    total = 0;
                     next_code[0] = next_code[1] = 0;
                     for (i = 1; i <= 15; ++i)
                     {
@@ -4297,6 +4333,7 @@ extern "C"
             size_t block_len = buf_len % 5552;
             while (buf_len)
             {
+                /* Remove use of comma operator
                 for (i = 0; i + 7 < block_len; i += 8, ptr += 8)
                 {
                     s1 += ptr[0], s2 += s1;
@@ -4311,6 +4348,27 @@ extern "C"
                 for (; i < block_len; ++i)
                     s1 += *ptr++, s2 += s1;
                 s1 %= 65521U, s2 %= 65521U;
+                buf_len -= block_len;
+                block_len = 5552;
+                 */
+                for (i = 0; i + 7 < block_len; i += 8, ptr += 8)
+                {
+                    s1 += ptr[0]; s2 += s1;
+                    s1 += ptr[1]; s2 += s1;
+                    s1 += ptr[2]; s2 += s1;
+                    s1 += ptr[3]; s2 += s1;
+                    s1 += ptr[4]; s2 += s1;
+                    s1 += ptr[5]; s2 += s1;
+                    s1 += ptr[6]; s2 += s1;
+                    s1 += ptr[7]; s2 += s1;
+                }
+                for (; i < block_len; ++i)
+                {
+                    s1 += *ptr++;
+                    s2 += s1;
+                }
+                s1 %= 65521U;
+                s2 %= 65521U;
                 buf_len -= block_len;
                 block_len = 5552;
             }
