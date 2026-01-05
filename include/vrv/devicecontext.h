@@ -75,7 +75,7 @@ public:
         m_baseHeight = 0;
         m_pushBack = false;
         m_viewBoxFactor = (double)DEFINITION_FACTOR;
-        this->SetBrush(1.0);
+        this->SetBrush(-1.0);
         this->SetPen(1, PEN_SOLID);
     }
     DeviceContext(ClassId classId)
