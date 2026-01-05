@@ -466,7 +466,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
 
     // if not, take staff info of node element
     short int staffNum = (node.child("staff")) ? node.child("staff").text().as_int() : 1;
-    if ((staffNum < 1) || (staffNum > measure->GetChildCount(STAFF))) {
+    if ((staffNum < 1) || (staffNum > measure->GetStaffCount())) {
         LogWarning("MusicXML import: Staff %d cannot be found", staffNum);
         staffNum = 1;
     }
@@ -1164,6 +1164,14 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             LogDebug(logString.c_str());
         }
         m_endingStack.clear();
+    }
+
+    // The top staffGrp cannot remain empty - add at least one staffDef
+    if (staffGrp->GetChildCount() == 0) {
+        StaffDef *staffDef = new StaffDef();
+        staffDef->SetN(1);
+        staffDef->SetLines(5);
+        staffGrp->AddChild(staffDef);
     }
 
     m_doc->ConvertToPageBasedDoc();

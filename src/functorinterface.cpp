@@ -80,6 +80,7 @@
 #include "num.h"
 #include "octave.h"
 #include "ornam.h"
+#include "ossia.h"
 #include "page.h"
 #include "pagemilestone.h"
 #include "pages.h"
@@ -220,6 +221,16 @@ FunctorCode FunctorInterface::VisitMeasure(Measure *measure)
 FunctorCode FunctorInterface::VisitMeasureEnd(Measure *measure)
 {
     return this->VisitObjectEnd(measure);
+}
+
+FunctorCode FunctorInterface::VisitOssia(Ossia *ossia)
+{
+    return this->VisitObject(ossia);
+}
+
+FunctorCode FunctorInterface::VisitOssiaEnd(Ossia *ossia)
+{
+    return this->VisitObjectEnd(ossia);
 }
 
 FunctorCode FunctorInterface::VisitPage(Page *page)
@@ -1574,6 +1585,16 @@ FunctorCode ConstFunctorInterface::VisitMeasure(const Measure *measure)
 FunctorCode ConstFunctorInterface::VisitMeasureEnd(const Measure *measure)
 {
     return this->VisitObjectEnd(measure);
+}
+
+FunctorCode ConstFunctorInterface::VisitOssia(const Ossia *ossia)
+{
+    return this->VisitObject(ossia);
+}
+
+FunctorCode ConstFunctorInterface::VisitOssiaEnd(const Ossia *ossia)
+{
+    return this->VisitObjectEnd(ossia);
 }
 
 FunctorCode ConstFunctorInterface::VisitPage(const Page *page)

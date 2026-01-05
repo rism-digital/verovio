@@ -733,6 +733,7 @@ public:
     OptionBool m_octaveAlternativeSymbols;
     OptionDbl m_octaveLineThickness;
     OptionBool m_octaveNoSpanningParentheses;
+    OptionDbl m_ossiaStaffSize;
     OptionDbl m_pedalLineThickness;
     OptionDbl m_repeatBarLineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
@@ -748,6 +749,7 @@ public:
     OptionBool m_spacingDurDetection;
     OptionDbl m_spacingLinear;
     OptionDbl m_spacingNonLinear;
+    OptionDbl m_spacingOssia;
     OptionInt m_spacingStaff;
     OptionInt m_spacingSystem;
     OptionDbl m_staffLineWidth;
@@ -774,6 +776,7 @@ public:
     OptionBool m_loadSelectedMdivOnly;
     OptionBool m_mdivAll;
     OptionString m_mdivXPathQuery;
+    OptionBool m_ossiaHidden;
     OptionArray m_substXPathQuery;
     OptionString m_transpose;
     OptionJson m_transposeMdiv;

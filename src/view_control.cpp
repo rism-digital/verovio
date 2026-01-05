@@ -1794,8 +1794,8 @@ void View::DrawControlElementText(DeviceContext *dc, ControlElement *element, Me
 
         int xAdjust = 0;
         const bool isBetweenStaves = (place == STAFFREL_between)
-            || ((place == STAFFREL_below) && (staff != measure->GetLast(STAFF)))
-            || ((place == STAFFREL_above) && (staff != measure->GetFirst(STAFF)));
+            || ((place == STAFFREL_below) && (staff != measure->GetLastStaff()))
+            || ((place == STAFFREL_above) && (staff != measure->GetFirstStaff()));
         if (isBetweenStaves
             && (interface->GetStart()->GetAlignment()->GetTime()
                 == measure->m_measureAligner.GetRightBarLineAlignment()->GetTime())
@@ -2629,7 +2629,7 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
 
     std::vector<Staff *> staffList = reh->GetTstampStaves(measure, reh);
     if (staffList.empty()) {
-        Staff *staff = system->GetTopVisibleStaff();
+        Staff *staff = system->GetTopVisibleStaff(false);
         if (staff) staffList.push_back(staff);
     }
 

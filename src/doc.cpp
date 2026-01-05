@@ -970,6 +970,11 @@ void Doc::ScoreDefSetCurrentDoc(bool force)
     ScoreDefSetCurrentFunctor scoreDefSetCurrent(this);
     this->Process(scoreDefSetCurrent);
 
+    if (scoreDefSetCurrent.HasOssia()) {
+        ScoreDefSetOssiaFunctor scoreDefSetOssia(this);
+        this->Process(scoreDefSetOssia);
+    }
+
     this->ScoreDefSetGrpSymDoc();
 
     m_currentScoreDefDone = true;

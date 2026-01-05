@@ -12,7 +12,6 @@
 #include "doc.h"
 #include "multirest.h"
 #include "rest.h"
-#include "score.h"
 #include "staff.h"
 #include "system.h"
 
@@ -24,13 +23,12 @@ namespace vrv {
 // AdjustXPosFunctor
 //----------------------------------------------------------------------------
 
-AdjustXPosFunctor::AdjustXPosFunctor(Doc *doc, const std::vector<int> &staffNs) : DocFunctor(doc)
+AdjustXPosFunctor::AdjustXPosFunctor(Doc *doc) : DocFunctor(doc)
 {
     m_minPos = 0;
     m_upcomingMinPos = VRV_UNSET;
     m_cumulatedXShift = 0;
     m_staffN = 0;
-    m_staffNs = staffNs;
     m_staffSize = 100;
     m_rightBarLinesOnly = false;
     m_measure = NULL;
@@ -38,7 +36,8 @@ AdjustXPosFunctor::AdjustXPosFunctor(Doc *doc, const std::vector<int> &staffNs) 
 
 FunctorCode AdjustXPosFunctor::VisitAlignment(Alignment *alignment)
 {
-    // LogDebug("Alignment type %d", alignment->GetType());
+    // Ossia scoreDef should not be aligned because that is taken care of in the dedicated functor
+    if (alignment->GetType() < ALIGNMENT_MEASURE_START) return FUNCTOR_SIBLINGS;
 
     alignment->SetXRel(alignment->GetXRel() + m_cumulatedXShift);
 
@@ -305,11 +304,9 @@ FunctorCode AdjustXPosFunctor::VisitMeasure(Measure *measure)
     return FUNCTOR_SIBLINGS;
 }
 
-FunctorCode AdjustXPosFunctor::VisitScore(Score *score)
+FunctorCode AdjustXPosFunctor::VisitSystem(System *system)
 {
-    assert(score->GetScoreDef());
-
-    m_staffNs = score->GetScoreDef()->GetStaffNs();
+    if (system->GetDrawingScoreDef()) m_staffNs = system->GetDrawingScoreDef()->GetStaffNs();
 
     return FUNCTOR_CONTINUE;
 }
