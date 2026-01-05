@@ -192,7 +192,7 @@ void MusicXmlInput::ProcessClefChangeQueue(Section *section)
 {
     while (!m_clefChangeQueue.empty()) {
         musicxml::ClefChange clefChange = m_clefChangeQueue.front();
-        m_clefChangeQueue.pop();
+        m_clefChangeQueue.pop_front();
         AttNNumberLikeComparison comparisonMeasure(MEASURE, clefChange.m_measureNum);
         Measure *currentMeasure = vrv_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure));
         if (!currentMeasure) {
@@ -425,7 +425,7 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element, int dur
     int currTime = 0;
     if (m_layerEndTimes.contains(layer)) currTime = m_layerEndTimes.at(layer);
     if ((layer->GetChildren().size() == 0 && m_durTotal > 0) || currTime < m_durTotal) {
-        this->FillSpace(layer, m_durTotal - currTime);
+        this->FillSpace(layer, m_durTotal - currTime, true);
     }
 
     if (m_elementStackMap.at(layer).empty()) {
@@ -474,6 +474,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
     Staff *staff = vrv_cast<Staff *>(measure->GetChild(staffNum, STAFF));
     assert(staff);
     m_currentLayer = SelectLayer(layerNum, staff);
+
     m_isLayerInitialized = true;
     return m_currentLayer;
 }
@@ -531,9 +532,34 @@ bool MusicXmlInput::IsInStack(ClassId classId, Layer *layer)
             [classId](LayerElement *element) { return element->Is(classId); }));
 }
 
-void MusicXmlInput::FillSpace(Layer *layer, int dur)
+void MusicXmlInput::FillSpace(Layer *layer, int dur, bool withClefs, int offset)
 {
     assert(layer);
+
+    // Split spaces to take into account pending clef changes in that layer
+    if (withClefs && !m_clefChangeQueue.empty()) {
+        std::list<int> durs;
+        int processed = 0;
+        for (auto &clefChange : m_clefChangeQueue) {
+            if (clefChange.m_layer != layer) continue;
+            if (clefChange.m_scoreOnset < dur) {
+                durs.push_back(clefChange.m_scoreOnset - processed);
+                processed = clefChange.m_scoreOnset;
+            }
+        }
+        if (processed > 0 && processed < dur) {
+            durs.push_back(dur - processed);
+        }
+        if (!durs.empty()) {
+            int processed = 0;
+            for (auto durList : durs) {
+                // Call it recursively with split durations and the processed offset
+                this->FillSpace(layer, durList, false, processed);
+                processed += durList;
+            }
+            return;
+        }
+    }
 
     std::string durStr;
     while (dur > 0) {
@@ -552,8 +578,9 @@ void MusicXmlInput::FillSpace(Layer *layer, int dur)
         else {
             m_elementStackMap.at(layer).back()->AddChild(space);
         }
-        m_layerTimes[layer].emplace(dur, space);
         dur -= m_ppq * quarters;
+        offset += m_ppq * quarters;
+        m_layerTimes[layer].emplace(offset, space);
     }
 }
 
@@ -1685,6 +1712,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     // reset measure time
     m_durTotal = 0;
 
+    // reset clef changed flag
+    m_clefChanged = 0;
+
     const auto mrestPositonIter = m_multiRests.find(index);
     bool isMRestInOtherSystem = (mrestPositonIter != m_multiRests.end());
     int multiRestStaffNumber = 1;
@@ -1847,8 +1877,9 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         Clef *meiClef = ConvertClef(clef);
         if (meiClef) {
             const bool afterBarline = clef.attribute("after-barline").as_bool();
-            m_clefChangeQueue.push(
+            m_clefChangeQueue.push_back(
                 musicxml::ClefChange(measureNum, staff, m_currentLayer, meiClef, m_durTotal, afterBarline));
+            m_clefChanged++;
         }
     }
 
@@ -2677,6 +2708,18 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     Layer *layer = SelectLayer(node, measure);
     assert(layer);
+
+    // If we just had a clef change, make sure it points to the correct layer
+    if (m_clefChanged && !m_clefChangeQueue.empty()) {
+        size_t limit = std::min(size_t(m_clefChanged), m_clefChangeQueue.size());
+        auto endIt = m_clefChangeQueue.begin() + limit;
+        // Adjust all clefs in the queue
+        for (auto it = m_clefChangeQueue.begin(); it != endIt; ++it) {
+            it->m_layer = layer;
+        }
+    }
+    m_clefChanged = 0;
+
     m_prevLayer = layer;
 
     Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
