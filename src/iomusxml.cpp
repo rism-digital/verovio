@@ -2814,7 +2814,13 @@ void MusicXmlInput::ReadMusicXmlNote(
     }
 
     const std::string noteID = node.attribute("id").as_string();
-    const int duration = node.child("duration").text().as_int();
+    int duration = node.child("duration").text().as_int();
+    // In chords, make sure a note does not extend first note's duration.
+    // See https://github.com/rism-digital/verovio/issues/4225
+    if (isChord && duration && m_elementStackMap.at(layer).back()->Is(CHORD)) {
+        Chord *chord = vrv_cast<Chord *>(m_elementStackMap.at(layer).back());
+        if (chord) duration = std::min(duration, chord->GetDurPpq());
+    }
     const int noteStaffNum = node.child("staff").text().as_int();
     const pugi::xml_node rest = node.child("rest");
     if (m_ppq < 0 && duration && !typeStr.empty()) {
