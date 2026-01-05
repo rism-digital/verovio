@@ -3258,34 +3258,36 @@ void MusicXmlInput::ReadMusicXmlNote(
         this->ReadMusicXmlTies(node, layer, note, measureNum);
 
         // articulation
-        std::vector<data_ARTICULATION> artics;
+        std::list<Artic *> artics;
         for (pugi::xml_node articulations : notations.node().children("articulations")) {
             for (pugi::xml_node articulation : articulations.children()) {
                 Artic *artic = new Artic();
-                artics.push_back(ConvertArticulations(articulation.name()));
+                data_ARTICULATION articVal = ConvertArticulations(articulation.name());
                 if (!std::strcmp(articulation.name(), "detached-legato")) {
                     // we need to split up this one
-                    artic->SetArtic(artics);
+                    artic->SetArtic({ articVal });
                     artic->SetColor(articulation.attribute("color").as_string());
                     artic->SetPlace(
                         artic->AttPlacementRelEvent::StrToStaffrel(articulation.attribute("placement").as_string()));
-                    element->AddChild(artic);
-                    artics.clear();
+                    artics.push_back(artic);
                     artic = new Artic();
-                    artics.push_back(ARTICULATION_ten);
+                    articVal = ARTICULATION_ten;
                 }
-                if (artics.back() == ARTICULATION_NONE) {
+                if (articVal == ARTICULATION_NONE) {
                     delete artic;
                     continue;
                 }
-                artic->SetArtic(artics);
+                artic->SetArtic({ articVal });
                 artic->SetColor(articulation.attribute("color").as_string());
                 artic->SetPlace(
                     artic->AttPlacementRelEvent::StrToStaffrel(articulation.attribute("placement").as_string()));
-                element->AddChild(artic);
-                artics.clear();
+                // Always put stacc at the front of the list
+                (artic->GetArticFirst() == ARTICULATION_stacc) ? artics.push_front(artic) : artics.push_back(artic);
             }
         }
+        for (Artic *artic : artics) element->AddChild(artic);
+        // Not strictly necessary
+        artics.clear();
 
         // technical
         for (pugi::xml_node technical : notations.node().children("technical")) {
@@ -3345,15 +3347,14 @@ void MusicXmlInput::ReadMusicXmlNote(
                 else {
                     pugi::xml_node articulation = technicalChild;
                     Artic *artic = new Artic();
-                    artics.push_back(ConvertArticulations(articulation.name()));
-                    if (artics.back() != ARTICULATION_NONE) artic->SetArtic(artics);
+                    data_ARTICULATION articVal = ConvertArticulations(articulation.name());
+                    if (articVal != ARTICULATION_NONE) artic->SetArtic({ articVal });
                     artic->SetColor(articulation.attribute("color").as_string());
                     artic->SetGlyphName(articulation.attribute("smufl").as_string());
                     artic->SetPlace(
                         artic->AttPlacementRelEvent::StrToStaffrel(articulation.attribute("placement").as_string()));
                     artic->SetType("technical");
                     element->AddChild(artic);
-                    artics.clear();
                 }
             }
         }
