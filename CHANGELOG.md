@@ -1,6 +1,12 @@
 # Changelog
 
 ## [unreleased]
+* Support for ossia staves
+* Improved MusicXML importer (articulations, spacing, clef changes, tempo spacing)
+* Improved `note@head.fill` support
+* Improved SVG styling structure
+* Option `--spacing-ossia` for adjusting the spacing of ossia staves
+* Option `--ossia-hidden` for hiding rendering of ossia staves
 
 ## [5.7.0] – 2025-12-02
 * Support for `@ho` and `@vo` on relevant layer elements and control events
