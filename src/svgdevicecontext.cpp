@@ -508,7 +508,7 @@ void SvgDeviceContext::StartPage()
     m_currentNode = m_currentNode.append_child("svg");
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("class") = "definition-scale";
-    m_currentNode.append_attribute("color") = "currentColor";
+    m_currentNode.append_attribute("color") = "black";
     m_currentNode.append_attribute("font-family") = resources->GetTextFont() + ", serif";
     if (this->GetFacsimile()) {
         m_currentNode.append_attribute("viewBox")
