@@ -1200,16 +1200,12 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 
         // remember the target for expansion
         iter->first.m_target = target;
-        // replace first <measure> with <section> / <ending> element
-        section->ReplaceChild(measures.front(), target);
-        // go through measures of that ending and remove remaining measures from <section> and add them to
-        // <section> / <ending>
+        // insert <section> / <ending> element ahead of first <measure>
+        section->InsertBefore(measures.front(), target);
+        // go through measures move them info <section> / <ending>
         for (Measure *measure : measures) {
-            // remove other measures from <section> that are not already removed above (first measure)
-            if (measure->GetID() != measures.front()->GetID()) {
-                int idx = section->GetChildIndex(measure);
-                section->DetachChild(idx);
-            }
+            int idx = section->GetChildIndex(measure);
+            section->DetachChild(idx);
             target->AddChild(measure); // add <measure> to sub-element
         }
 
@@ -1278,9 +1274,9 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 // vector) of ints
 //
 // verified at https://onlinegdb.com/blxCanxpAW
-std::vector<int> parseInts(const std::string &str)
+std::list<int> parseInts(const std::string &str)
 {
-    std::vector<int> result;
+    std::list<int> result;
     std::stringstream ss(str);
     int num;
     while (ss >> num) {
@@ -1302,9 +1298,9 @@ void MusicXmlInput::CreateExpansion(Section *section)
     // prepopulate the labels map because there are forward jumps (tocoda)
     bool jumpBack = false;
     auto iter = m_sections.begin();
-    auto rptiter = iter;
-    auto seciter = iter;
-    auto enditer = iter;
+    auto rptIter = iter;
+    auto secIter = iter;
+    auto endIter = iter;
     std::map<std::string, decltype(iter)> labels;
     for (auto it = m_sections.begin(); it != m_sections.end(); ++it) {
         if (!it->first.m_label.empty()) {
@@ -1316,7 +1312,7 @@ void MusicXmlInput::CreateExpansion(Section *section)
         iter->first.m_visited++;
 
         // remember this repeat start
-        if (iter->first.m_repeatStart) rptiter = iter;
+        if (iter->first.m_repeatStart) rptIter = iter;
 
         // handle section
         if (iter->first.m_classId == SECTION) {
@@ -1327,28 +1323,27 @@ void MusicXmlInput::CreateExpansion(Section *section)
             // repeat the sections, beginning with the repeat start
             int times = (jumpBack && !iter->first.m_repeatInfo.m_afterJump) ? 1 : iter->first.m_repeatInfo.m_times;
             for (int t = 2; t <= times; ++t) {
-                for (auto it = rptiter; it != std::next(iter); ++it) {
+                for (auto it = rptIter; it != std::next(iter); ++it) {
                     std::string ref = "#" + it->first.m_target->GetID();
                     expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
                 }
             }
 
             // remember last section
-            seciter = enditer = iter++;
+            secIter = endIter = iter++;
         }
         else /* ENDING */ {
             // gather all endings, by creating a map from ending number to ending iterator
             std::map<int, decltype(iter)> endings;
-            auto begiter = iter;
+            auto begIter = iter;
             while (iter != m_sections.end() && iter->first.m_classId == ENDING) {
-                auto is = parseInts(iter->first.m_endingInfo.m_number);
-                for (auto i : is) {
+                for (auto i : parseInts(iter->first.m_endingInfo.m_number)) {
                     endings.insert({ i, iter });
                 }
-                enditer = iter++;
+                endIter = iter++;
 
                 // increment visited count of subsequent sections
-                if (enditer != begiter) enditer->first.m_visited++;
+                if (endIter != begIter) endIter->first.m_visited++;
             }
 
             // when jumping back, keep only last ending
@@ -1356,14 +1351,14 @@ void MusicXmlInput::CreateExpansion(Section *section)
                 auto last = std::prev(endings.end());
                 endings.clear();
                 endings.insert(*last);
-                enditer = last->second;
+                endIter = last->second;
             }
 
             // the map is automatically sorted by key (ending number), so just add them to expansion in the same order
             // skip section first time because it was already added in the SECTION block
             for (auto ending = endings.begin(); ending != endings.end(); ++ending) {
                 if (ending != endings.begin()) {
-                    for (auto it = rptiter; it != std::next(seciter); ++it) {
+                    for (auto it = rptIter; it != std::next(secIter); ++it) {
                         std::string ref = "#" + it->first.m_target->GetID();
                         expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
                     }
@@ -1374,27 +1369,27 @@ void MusicXmlInput::CreateExpansion(Section *section)
         }
 
         // fine
-        if (jumpBack && enditer->first.m_fineInfo.m_fine) {
+        if (jumpBack && endIter->first.m_fineInfo.m_fine) {
             break;
         }
 
         // dacapo
-        if (enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DACAPO
-            && enditer->first.m_jumpInfo.m_times.end()
-                != std::find(enditer->first.m_jumpInfo.m_times.begin(), enditer->first.m_jumpInfo.m_times.end(),
-                    enditer->first.m_visited)) {
+        if (endIter->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DACAPO
+            && endIter->first.m_jumpInfo.m_times.end()
+                != std::find(endIter->first.m_jumpInfo.m_times.begin(), endIter->first.m_jumpInfo.m_times.end(),
+                    endIter->first.m_visited)) {
             iter = m_sections.begin();
             jumpBack = true;
         }
 
         // dalsegno / tocoda
-        if ((enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DALSEGNO
-                || enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::TOCODA)
-            && enditer->first.m_jumpInfo.m_times.end()
-                != std::find(enditer->first.m_jumpInfo.m_times.begin(), enditer->first.m_jumpInfo.m_times.end(),
-                    enditer->first.m_visited)) {
-            iter = labels.at(enditer->first.m_jumpInfo.m_label);
-            jumpBack = enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DALSEGNO;
+        if ((endIter->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DALSEGNO
+                || endIter->first.m_jumpInfo.m_jump == musicxml::JumpInfo::TOCODA)
+            && endIter->first.m_jumpInfo.m_times.end()
+                != std::find(endIter->first.m_jumpInfo.m_times.begin(), endIter->first.m_jumpInfo.m_times.end(),
+                    endIter->first.m_visited)) {
+            iter = labels.at(endIter->first.m_jumpInfo.m_label);
+            jumpBack = endIter->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DALSEGNO;
         }
     }
 }

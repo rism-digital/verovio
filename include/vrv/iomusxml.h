@@ -149,13 +149,13 @@ namespace musicxml {
         typedef enum { NONE = 0, DALSEGNO, DACAPO, TOCODA } JUMPTYPE;
 
         JumpInfo() { m_jump = NONE; }
-        JumpInfo(JUMPTYPE jump, const std::string &label, const std::vector<int> &times)
+        JumpInfo(JUMPTYPE jump, const std::string &label, const std::list<int> &times)
         {
             m_label = label;
             m_jump = jump;
             m_times = times;
         }
-        JumpInfo(JUMPTYPE jump, const std::vector<int> &times)
+        JumpInfo(JUMPTYPE jump, const std::list<int> &times)
         {
             m_jump = jump;
             m_times = times;
@@ -164,7 +164,7 @@ namespace musicxml {
 
         std::string m_label;
         JUMPTYPE m_jump;
-        std::vector<int> m_times;
+        std::list<int> m_times;
     };
 
     struct FineInfo {
@@ -182,7 +182,7 @@ namespace musicxml {
             m_target = NULL;
             m_repeatStart = repeatStart;
         }
-        SectionInfo(EndingInfo endingInfo)
+        SectionInfo(const EndingInfo &endingInfo)
         {
             m_visited = 0;
             m_classId = ENDING;
@@ -190,7 +190,7 @@ namespace musicxml {
             m_endingInfo = endingInfo;
             m_repeatStart = false;
         }
-        SectionInfo(RepeatInfo repeatInfo)
+        SectionInfo(const RepeatInfo &repeatInfo)
         {
             m_visited = 0;
             m_classId = SECTION;
