@@ -1332,7 +1332,8 @@ void MusicXmlInput::CreateExpansion(Section *section)
             // remember last section
             secIter = endIter = iter++;
         }
-        else /* ENDING */ {
+        // ending
+        else {
             // gather all endings, by creating a map from ending number to ending iterator
             std::map<int, decltype(iter)> endings;
             auto begIter = iter;
