@@ -632,6 +632,7 @@ public:
     OptionBool m_condenseTempoPages;
     OptionBool m_evenNoteSpacing;
     OptionString m_expand;
+    OptionBool m_expandFirst;
     OptionIntMap m_footer;
     OptionIntMap m_header;
     OptionBool m_humType;

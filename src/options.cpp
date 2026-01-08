@@ -1589,6 +1589,10 @@ Options::Options()
     m_expand.Init("");
     this->Register(&m_expand, "expand", &m_selectors);
 
+    m_expandFirst.SetInfo("Expand first expansion", "Expand all referenced elements in the first available expansion");
+    m_expandFirst.Init(false);
+    this->Register(&m_expandFirst, "expandFirst", &m_selectors);
+
     m_loadSelectedMdivOnly.SetInfo(
         "Load selected Mdiv only", "Load only the selected mdiv; the content of the other is skipped");
     m_loadSelectedMdivOnly.Init(false);
