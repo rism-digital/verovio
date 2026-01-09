@@ -1291,7 +1291,6 @@ void MusicXmlInput::CreateExpansion(Section *section)
     assert(section);
 
     Expansion *expansion = new Expansion();
-    expansion->SetID("expansion-default");
     section->InsertChild(expansion, 0);
 
     // iterate on sections to create expansion
