@@ -65,6 +65,7 @@
 #include "pghead.h"
 #include "reh.h"
 #include "rend.h"
+#include "repeatmark.h"
 #include "rest.h"
 #include "sb.h"
 #include "score.h"
@@ -2729,22 +2730,13 @@ void MusicXmlInput::ReadMusicXmlDirection(
     // Segno
     pugi::xml_node xmlSegno = typeNode.child("segno");
     if (xmlSegno) {
-        Dir *dir = new Dir();
-        dir->SetPlace(dir->AttPlacementRelStaff::StrToStaffrel(placeStr.c_str()));
-        dir->SetTstamp(timeStamp - 1.0);
-        dir->SetType("segno");
-        dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
-        if (xmlSegno.attribute("id")) dir->SetID(xmlSegno.attribute("id").as_string());
-        Rend *rend = new Rend;
-        rend->SetGlyphAuth("smufl");
-        rend->SetFontstyle(FONTSTYLE_normal);
-        rend->SetHalign(HORIZONTALALIGNMENT_center);
-        Text *text = new Text();
-        std::u32string segnoSign = UTF8to32("\xF0\x9D\x84\x8B");
-        text->SetText(segnoSign);
-        rend->AddChild(text);
-        dir->AddChild(rend);
-        m_controlElements.push_back({ measureNum, dir });
+        RepeatMark *segno = new RepeatMark();
+        segno->SetPlace(segno->AttPlacementRelStaff::StrToStaffrel(placeStr.c_str()));
+        segno->SetTstamp(timeStamp);
+        segno->SetFunc(repeatMarkLog_FUNC_segno);
+        segno->SetStaff(segno->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
+        if (xmlSegno.attribute("id")) segno->SetID(xmlSegno.attribute("id").as_string());
+        m_controlElements.push_back({ measureNum, segno });
     }
 
     // Tempo
