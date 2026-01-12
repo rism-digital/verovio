@@ -2279,22 +2279,13 @@ void MusicXmlInput::ReadMusicXmlDirection(
     // Coda
     pugi::xml_node xmlCoda = typeNode.child("coda");
     if (xmlCoda) {
-        Dir *dir = new Dir();
-        dir->SetPlace(dir->AttPlacementRelStaff::StrToStaffrel(placeStr.c_str()));
-        dir->SetTstamp(timeStamp - 1.0);
-        dir->SetType("coda");
-        dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
-        if (xmlCoda.attribute("id")) dir->SetID(xmlCoda.attribute("id").as_string());
-        Rend *rend = new Rend;
-        rend->SetGlyphAuth("smufl");
-        rend->SetFontstyle(FONTSTYLE_normal);
-        rend->SetHalign(HORIZONTALALIGNMENT_center);
-        Text *text = new Text();
-        std::u32string codaSign = UTF8to32("\xF0\x9D\x84\x8C");
-        text->SetText(codaSign);
-        rend->AddChild(text);
-        dir->AddChild(rend);
-        m_controlElements.push_back({ measureNum, dir });
+        RepeatMark *coda = new RepeatMark();
+        coda->SetPlace(coda->AttPlacementRelStaff::StrToStaffrel(placeStr.c_str()));
+        coda->SetTstamp(timeStamp);
+        coda->SetFunc(repeatMarkLog_FUNC_coda);
+        coda->SetStaff(coda->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
+        if (xmlCoda.attribute("id")) coda->SetID(xmlCoda.attribute("id").as_string());
+        m_controlElements.push_back({ measureNum, coda });
     }
 
     // Dashes (to be connected with previous <dir> or <dynam> as @extender and @tstamp2 attribute
