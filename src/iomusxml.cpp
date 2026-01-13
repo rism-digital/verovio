@@ -2748,8 +2748,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // other cases
-    if (!containsDynamics && !containsTempo && !containsWords && !xmlJump && !bracket && !lead && !xmlShift
-        && !xmlPedal && wedges.empty() && !dashes && !rehearsal) {
+    if (!containsDynamics && !containsTempo && !containsWords && !xmlJump && !bracket && !lead && !xmlShift && !xmlPedal
+        && wedges.empty() && !dashes && !rehearsal) {
         LogWarning("MusicXML import: Unsupported direction-type '%s'", typeNode.first_child().name());
     }
 
@@ -4534,7 +4534,8 @@ data_DURATION MusicXmlInput::ConvertTypeToDur(const std::string &value)
     return DURATION_NONE;
 }
 
-repeatMarkLog_FUNC MusicXmlInput::ConvertJumpType(const std::string &value) {
+repeatMarkLog_FUNC MusicXmlInput::ConvertJumpType(const std::string &value)
+{
     static const std::map<std::string, repeatMarkLog_FUNC> Name2Jump{
         { "coda", repeatMarkLog_FUNC_coda }, //
         { "segno", repeatMarkLog_FUNC_segno }, //
