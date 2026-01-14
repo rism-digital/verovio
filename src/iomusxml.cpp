@@ -1204,6 +1204,19 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         section->InsertBefore(measures.front(), target);
         // go through measures move them info <section> / <ending>
         for (Measure *measure : measures) {
+            // also move preceding non-measure siblings
+            // keep stacking them in reverse then detach them in score order
+            Object *sibling = measure;
+            std::list<Object *> siblings;
+            while ((sibling = section->GetPrevious(sibling))) {
+                if (sibling->GetClassId() == SECTION || sibling->GetClassId() == ENDING) break;
+                siblings.push_front(sibling);
+            }
+            for (auto s : siblings) {
+                int idx = section->GetChildIndex(s);
+                section->DetachChild(idx);
+                target->AddChild(s);
+            }
             int idx = section->GetChildIndex(measure);
             section->DetachChild(idx);
             target->AddChild(measure); // add <measure> to sub-element
