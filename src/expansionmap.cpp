@@ -398,6 +398,7 @@ void ExpansionMap::GenerateExpansionFor(Score *score)
     for (auto current = children.begin(); current != children.end(); current++) {
         if ((*current)->Is(MEASURE)) {
             Measure *measure = vrv_cast<Measure *>(*current);
+            // The current measure has a repeat end on its left
             if (ExpansionMap::IsPreviousRepeatEnd(measure)) {
                 std::string ref = "#" + this->CreateSection(section, first, last);
                 expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
@@ -406,6 +407,7 @@ void ExpansionMap::GenerateExpansionFor(Score *score)
             if (isStartFromPrevious || ExpansionMap::IsRepeatStart(measure)) {
                 first = current;
             }
+            // The current measure has a repeat start on its right
             isStartFromPrevious = ExpansionMap::IsNextRepeatStart(measure);
             last = current;
             if (ExpansionMap::IsRepeatEnd(measure)) {
