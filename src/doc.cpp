@@ -1606,7 +1606,7 @@ void Doc::TransposeDoc()
 
 void Doc::ExpandExpansions()
 {
-    {
+    if (this->GetOptions()->m_expandGenerate.GetValue()) {
         ExpansionMap expansionMap;
         ListOfObjects scores = this->FindAllDescendantsByType(SCORE);
         for (Object *object : scores) {
