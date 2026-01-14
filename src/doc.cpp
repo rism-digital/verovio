@@ -1606,6 +1606,16 @@ void Doc::TransposeDoc()
 
 void Doc::ExpandExpansions()
 {
+    {
+        ExpansionMap expansionMap;
+        ListOfObjects scores = this->FindAllDescendantsByType(SCORE);
+        for (Object *object : scores) {
+            Score *score = vrv_cast<Score *>(object);
+            assert(score);
+            expansionMap.GenerateExpansionFor(score);
+        }
+    }
+
     // Upon MEI import: use expansion ID, given by command line argument
     std::string expansionId = this->GetOptions()->m_expand.GetValue();
     if (expansionId.empty()) return;

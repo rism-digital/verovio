@@ -21,6 +21,7 @@
 #include "linkinginterface.h"
 #include "plistinterface.h"
 #include "rdg.h"
+#include "score.h"
 #include "section.h"
 #include "timeinterface.h"
 #include "vrv.h"
@@ -360,6 +361,19 @@ void ExpansionMap::ToJson(std::string &output)
         ;
     }
     output = expansionmap.json();
+}
+
+void ExpansionMap::GenerateExpansionFor(Score *score)
+{
+    if (score->FindDescendantByType(EXPANSION)) {
+        LogWarning("An expansion cannot be generated if one is already encoded");
+        return;
+    }
+
+    if (score->FindAllDescendantsByType(SECTION).size() > 1) {
+        LogWarning("An expansion cannot be generated with more than one section");
+        return;
+    }
 }
 
 } // namespace vrv

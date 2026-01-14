@@ -17,6 +17,8 @@
 
 namespace vrv {
 
+class Score;
+
 class ExpansionMap {
 
 public:
@@ -51,6 +53,11 @@ public:
      * Write the currentexpansionMap to a JSON string
      */
     void ToJson(std::string &output);
+
+    /**
+     * Generate an expan for the score analysing the repeats and endings
+     */
+    void GenerateExpansionFor(Score *score);
 
 private:
     bool UpdateIDs(Object *object);
