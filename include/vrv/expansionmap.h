@@ -18,6 +18,7 @@
 namespace vrv {
 
 class Score;
+class Section;
 
 class ExpansionMap {
 
@@ -59,6 +60,20 @@ public:
      */
     void GenerateExpansionFor(Score *score);
 
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    /**
+     * @name Methods to check if a measure yields a repeat start or end
+     */
+    ///@{
+    static bool IsRepeatStart(Measure *measure);
+    static bool IsRepeatEnd(Measure *measure);
+    static bool IsNextRepeatStart(Measure *measure);
+    static bool IsPreviousRepeatEnd(Measure *measure);
+    ///@}
+
 private:
     bool UpdateIDs(Object *object);
 
@@ -68,6 +83,9 @@ private:
 
     /** Ads an id string to an original/notated id */
     bool AddExpandedIDToExpansionMap(const std::string &origXmlId, std::string newXmlId);
+
+    std::string CreateSection(
+        Section *section, const ListOfObjects::iterator &first, const ListOfObjects::iterator &last);
 
 public:
     /** The expansion map indicates which xmlId has been repeated (expanded) elsewhere */

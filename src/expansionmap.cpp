@@ -19,6 +19,7 @@
 #include "expansion.h"
 #include "lem.h"
 #include "linkinginterface.h"
+#include "measure.h"
 #include "plistinterface.h"
 #include "rdg.h"
 #include "score.h"
@@ -370,10 +371,102 @@ void ExpansionMap::GenerateExpansionFor(Score *score)
         return;
     }
 
+    if (score->HasEditorialContent()) {
+        LogWarning("An expansion cannot be generated with editorial content");
+        return;
+    }
+
     if (score->FindAllDescendantsByType(SECTION).size() > 1) {
         LogWarning("An expansion cannot be generated with more than one section");
         return;
     }
+
+    Section *section = vrv_cast<Section *>(score->FindDescendantByType(SECTION, 1));
+    assert(section);
+
+    ArrayOfObjects childrenArray = section->GetChildrenForModification();
+    ListOfObjects children(childrenArray.begin(), childrenArray.end());
+
+    Expansion *expansion = new Expansion();
+    section->InsertChild(expansion, 0);
+
+    ListOfObjects::iterator first = children.begin();
+    ListOfObjects::iterator last = children.begin();
+
+    bool isStartFromPrevious = false;
+
+    for (auto current = children.begin(); current != children.end(); current++) {
+        if ((*current)->Is(MEASURE)) {
+            Measure *measure = vrv_cast<Measure *>(*current);
+            if (ExpansionMap::IsPreviousRepeatEnd(measure)) {
+                std::string ref = "#" + this->CreateSection(section, first, last);
+                expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
+                expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
+            }
+            if (isStartFromPrevious || ExpansionMap::IsRepeatStart(measure)) {
+                first = current;
+            }
+            isStartFromPrevious = ExpansionMap::IsNextRepeatStart(measure);
+            last = current;
+            if (ExpansionMap::IsRepeatEnd(measure)) {
+                std::string ref = "#" + this->CreateSection(section, first, last);
+                expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
+                expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
+            }
+        }
+    }
+}
+
+std::string ExpansionMap::CreateSection(
+    Section *section, const ListOfObjects::iterator &first, const ListOfObjects::iterator &last)
+{
+    Section *subSection = new Section();
+    section->InsertBefore(*first, subSection);
+    for (auto sectionCurrent = first; sectionCurrent != std::next(last); sectionCurrent++) {
+        section->DetachChild((*sectionCurrent)->GetIdx());
+        subSection->AddChild(*sectionCurrent);
+    }
+    return subSection->GetID();
+}
+
+//----------------------------------------------------------------------------
+// Static methods
+//----------------------------------------------------------------------------
+
+bool ExpansionMap::IsRepeatStart(Measure *measure)
+{
+    static const std::vector<data_BARRENDITION> match{ BARRENDITION_rptboth, BARRENDITION_rptstart };
+
+    if (!measure->HasLeft()) return false;
+
+    return (std::find(match.begin(), match.end(), measure->GetLeft()) != match.end());
+}
+
+bool ExpansionMap::IsRepeatEnd(Measure *measure)
+{
+    static const std::vector<data_BARRENDITION> match{ BARRENDITION_rptboth, BARRENDITION_rptend };
+
+    if (!measure->HasRight()) return false;
+
+    return (std::find(match.begin(), match.end(), measure->GetRight()) != match.end());
+}
+
+bool ExpansionMap::IsNextRepeatStart(Measure *measure)
+{
+    static const std::vector<data_BARRENDITION> match{ BARRENDITION_rptboth, BARRENDITION_rptstart };
+
+    if (!measure->HasRight()) return false;
+
+    return (std::find(match.begin(), match.end(), measure->GetRight()) != match.end());
+}
+
+bool ExpansionMap::IsPreviousRepeatEnd(Measure *measure)
+{
+    static const std::vector<data_BARRENDITION> match{ BARRENDITION_rptboth, BARRENDITION_rptend };
+
+    if (!measure->HasLeft()) return false;
+
+    return (std::find(match.begin(), match.end(), measure->GetLeft()) != match.end());
 }
 
 } // namespace vrv
