@@ -422,11 +422,6 @@ public:
     void SyncToFacsimileDoc();
 
     /**
-     * Expand the content of the doc.
-     */
-    void ExpandDoc();
-
-    /**
      * Transpose the content of the doc.
      */
     void TransposeDoc();
