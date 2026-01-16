@@ -11,8 +11,8 @@
 
 #include <algorithm>
 #include <cassert>
-#include <cmath>
 #include <climits>
+#include <cmath>
 #include <locale>
 #include <regex>
 
@@ -34,8 +34,8 @@
 #include "iomusxml.h"
 #include "iopae.h"
 #include "iovolpiano.h"
-#include "layer.h"
 #include "keysig.h"
+#include "layer.h"
 #include "measure.h"
 #include "nc.h"
 #include "neume.h"
@@ -44,11 +44,11 @@
 #include "page.h"
 #include "pitchinterface.h"
 #include "runtimeclock.h"
-#include "staff.h"
-#include "system.h"
 #include "score.h"
 #include "slur.h"
+#include "staff.h"
 #include "svgdevicecontext.h"
+#include "system.h"
 #include "timemap.h"
 #include "vrv.h"
 
@@ -66,134 +66,168 @@ const char *ZIP_SIGNATURE = "\x50\x4B\x03\x04";
 
 namespace {
 
-struct PitchSpell {
-    data_PITCHNAME pname;
-    int accid;
-    int oct;
-};
+    struct PitchSpell {
+        data_PITCHNAME pname;
+        int accid;
+        int oct;
+    };
 
-PitchSpell MidiToPitchSpell(int midiPitch)
-{
-    PitchSpell spell{ PITCHNAME_c, 0, 4 };
+    PitchSpell MidiToPitchSpell(int midiPitch)
+    {
+        PitchSpell spell{ PITCHNAME_c, 0, 4 };
 
-    const int pclass = ((midiPitch % 12) + 12) % 12;
-    spell.oct = midiPitch / 12 - 1;
+        const int pclass = ((midiPitch % 12) + 12) % 12;
+        spell.oct = midiPitch / 12 - 1;
 
-    switch (pclass) {
-        case 0: spell.pname = PITCHNAME_c; spell.accid = 0; break;
-        case 1: spell.pname = PITCHNAME_c; spell.accid = 1; break;
-        case 2: spell.pname = PITCHNAME_d; spell.accid = 0; break;
-        case 3: spell.pname = PITCHNAME_e; spell.accid = -1; break;
-        case 4: spell.pname = PITCHNAME_e; spell.accid = 0; break;
-        case 5: spell.pname = PITCHNAME_f; spell.accid = 0; break;
-        case 6: spell.pname = PITCHNAME_f; spell.accid = 1; break;
-        case 7: spell.pname = PITCHNAME_g; spell.accid = 0; break;
-        case 8: spell.pname = PITCHNAME_a; spell.accid = -1; break;
-        case 9: spell.pname = PITCHNAME_a; spell.accid = 0; break;
-        case 10: spell.pname = PITCHNAME_b; spell.accid = -1; break;
-        case 11: spell.pname = PITCHNAME_b; spell.accid = 0; break;
-        default: break;
+        switch (pclass) {
+            case 0:
+                spell.pname = PITCHNAME_c;
+                spell.accid = 0;
+                break;
+            case 1:
+                spell.pname = PITCHNAME_c;
+                spell.accid = 1;
+                break;
+            case 2:
+                spell.pname = PITCHNAME_d;
+                spell.accid = 0;
+                break;
+            case 3:
+                spell.pname = PITCHNAME_e;
+                spell.accid = -1;
+                break;
+            case 4:
+                spell.pname = PITCHNAME_e;
+                spell.accid = 0;
+                break;
+            case 5:
+                spell.pname = PITCHNAME_f;
+                spell.accid = 0;
+                break;
+            case 6:
+                spell.pname = PITCHNAME_f;
+                spell.accid = 1;
+                break;
+            case 7:
+                spell.pname = PITCHNAME_g;
+                spell.accid = 0;
+                break;
+            case 8:
+                spell.pname = PITCHNAME_a;
+                spell.accid = -1;
+                break;
+            case 9:
+                spell.pname = PITCHNAME_a;
+                spell.accid = 0;
+                break;
+            case 10:
+                spell.pname = PITCHNAME_b;
+                spell.accid = -1;
+                break;
+            case 11:
+                spell.pname = PITCHNAME_b;
+                spell.accid = 0;
+                break;
+            default: break;
+        }
+
+        return spell;
     }
 
-    return spell;
-}
-
-Fraction ScoreTimeFromDouble(double scoreTime)
-{
-    const int denom = 1000;
-    return Fraction(static_cast<int>(std::round(scoreTime * denom)), denom);
-}
-
-int AccidWrittenToSemitone(data_ACCIDENTAL_WRITTEN accid)
-{
-    switch (accid) {
-        case ACCIDENTAL_WRITTEN_ff: return -2;
-        case ACCIDENTAL_WRITTEN_f: return -1;
-        case ACCIDENTAL_WRITTEN_n: return 0;
-        case ACCIDENTAL_WRITTEN_s: return 1;
-        case ACCIDENTAL_WRITTEN_ss: return 2;
-        default: return 0;
+    Fraction ScoreTimeFromDouble(double scoreTime)
+    {
+        const int denom = 1000;
+        return Fraction(static_cast<int>(std::round(scoreTime * denom)), denom);
     }
-}
 
-data_ACCIDENTAL_WRITTEN SemitoneToAccidWritten(int value)
-{
-    if (value <= -2) return ACCIDENTAL_WRITTEN_ff;
-    if (value == -1) return ACCIDENTAL_WRITTEN_f;
-    if (value == 0) return ACCIDENTAL_WRITTEN_n;
-    if (value == 1) return ACCIDENTAL_WRITTEN_s;
-    if (value >= 2) return ACCIDENTAL_WRITTEN_ss;
-    return ACCIDENTAL_WRITTEN_n;
-}
-
-struct SpelledPitch {
-    data_PITCHNAME pname;
-    int accidSemitone;
-    int oct;
-};
-
-SpelledPitch ChooseContextualSpell(
-    int midiPitch, const MapOfOctavedPitchAccid &contextAccids, bool preferSharps, bool preferFlats)
-{
-    const int targetPc = ((midiPitch % 12) + 12) % 12;
-    SpelledPitch best{ PITCHNAME_c, 0, midiPitch / 12 - 1 };
-    int bestCost = INT_MAX;
-
-    const data_PITCHNAME pnames[] = { PITCHNAME_c, PITCHNAME_d, PITCHNAME_e, PITCHNAME_f, PITCHNAME_g, PITCHNAME_a,
-        PITCHNAME_b };
-
-    for (data_PITCHNAME pname : pnames) {
-        const int basePc = Note::PnameToPclass(pname);
-        int accid = targetPc - basePc;
-        while (accid > 6) accid -= 12;
-        while (accid < -6) accid += 12;
-        const int naturalPc = basePc + accid;
-        const int oct = (midiPitch - naturalPc) / 12 - 1;
-        if ((oct < 0) || (oct > 9)) continue;
-
-        const int idx = pname + oct * 7;
-        int expected = 0;
-        auto found = contextAccids.find(idx);
-        if (found != contextAccids.end()) expected = AccidWrittenToSemitone(found->second);
-
-        int cost = std::abs(accid - expected) * 10 + std::abs(accid);
-        if (preferSharps && accid < 0) cost += 5;
-        if (preferFlats && accid > 0) cost += 5;
-
-        if (cost < bestCost) {
-            bestCost = cost;
-            best = { pname, accid, oct };
+    int AccidWrittenToSemitone(data_ACCIDENTAL_WRITTEN accid)
+    {
+        switch (accid) {
+            case ACCIDENTAL_WRITTEN_ff: return -2;
+            case ACCIDENTAL_WRITTEN_f: return -1;
+            case ACCIDENTAL_WRITTEN_n: return 0;
+            case ACCIDENTAL_WRITTEN_s: return 1;
+            case ACCIDENTAL_WRITTEN_ss: return 2;
+            default: return 0;
         }
     }
 
-    return best;
-}
-
-int ContextualAccidSemitone(
-    const MapOfOctavedPitchAccid &contextAccids, data_PITCHNAME pname, int oct)
-{
-    const int idx = pname + oct * 7;
-    auto found = contextAccids.find(idx);
-    if (found == contextAccids.end()) return 0;
-    return AccidWrittenToSemitone(found->second);
-}
-
-int MidiPitchFromSpelled(data_PITCHNAME pname, int oct, int accidSemitone)
-{
-    const int basePc = Note::PnameToPclass(pname);
-    int pc = basePc + accidSemitone;
-    int octShift = 0;
-    if (pc >= 12) {
-        pc -= 12;
-        octShift = 1;
+    data_ACCIDENTAL_WRITTEN SemitoneToAccidWritten(int value)
+    {
+        if (value <= -2) return ACCIDENTAL_WRITTEN_ff;
+        if (value == -1) return ACCIDENTAL_WRITTEN_f;
+        if (value == 0) return ACCIDENTAL_WRITTEN_n;
+        if (value == 1) return ACCIDENTAL_WRITTEN_s;
+        if (value >= 2) return ACCIDENTAL_WRITTEN_ss;
+        return ACCIDENTAL_WRITTEN_n;
     }
-    else if (pc < 0) {
-        pc += 12;
-        octShift = -1;
-    }
-    return (oct + 1 + octShift) * 12 + pc;
-}
 
+    struct SpelledPitch {
+        data_PITCHNAME pname;
+        int accidSemitone;
+        int oct;
+    };
+
+    SpelledPitch ChooseContextualSpell(
+        int midiPitch, const MapOfOctavedPitchAccid &contextAccids, bool preferSharps, bool preferFlats)
+    {
+        const int targetPc = ((midiPitch % 12) + 12) % 12;
+        SpelledPitch best{ PITCHNAME_c, 0, midiPitch / 12 - 1 };
+        int bestCost = INT_MAX;
+
+        const data_PITCHNAME pnames[]
+            = { PITCHNAME_c, PITCHNAME_d, PITCHNAME_e, PITCHNAME_f, PITCHNAME_g, PITCHNAME_a, PITCHNAME_b };
+
+        for (data_PITCHNAME pname : pnames) {
+            const int basePc = Note::PnameToPclass(pname);
+            int accid = targetPc - basePc;
+            while (accid > 6) accid -= 12;
+            while (accid < -6) accid += 12;
+            const int naturalPc = basePc + accid;
+            const int oct = (midiPitch - naturalPc) / 12 - 1;
+            if ((oct < 0) || (oct > 9)) continue;
+
+            const int idx = pname + oct * 7;
+            int expected = 0;
+            auto found = contextAccids.find(idx);
+            if (found != contextAccids.end()) expected = AccidWrittenToSemitone(found->second);
+
+            int cost = std::abs(accid - expected) * 10 + std::abs(accid);
+            if (preferSharps && accid < 0) cost += 5;
+            if (preferFlats && accid > 0) cost += 5;
+
+            if (cost < bestCost) {
+                bestCost = cost;
+                best = { pname, accid, oct };
+            }
+        }
+
+        return best;
+    }
+
+    int ContextualAccidSemitone(const MapOfOctavedPitchAccid &contextAccids, data_PITCHNAME pname, int oct)
+    {
+        const int idx = pname + oct * 7;
+        auto found = contextAccids.find(idx);
+        if (found == contextAccids.end()) return 0;
+        return AccidWrittenToSemitone(found->second);
+    }
+
+    int MidiPitchFromSpelled(data_PITCHNAME pname, int oct, int accidSemitone)
+    {
+        const int basePc = Note::PnameToPclass(pname);
+        int pc = basePc + accidSemitone;
+        int octShift = 0;
+        if (pc >= 12) {
+            pc -= 12;
+            octShift = 1;
+        }
+        else if (pc < 0) {
+            pc += 12;
+            octShift = -1;
+        }
+        return (oct + 1 + octShift) * 12 + pc;
+    }
 
 } // namespace
 
@@ -2436,9 +2470,8 @@ std::string Toolkit::GetPitchPosition(double scoreTime, double midiPitch, int st
     const int yRelBase = staff->CalcPitchPosYRel(&m_doc, loc);
     double yRel = static_cast<double>(yRelBase);
     if (midiFraction > 0.0) {
-        const data_PITCHNAME stepPname = (spelled.pname == PITCHNAME_b)
-            ? PITCHNAME_c
-            : static_cast<data_PITCHNAME>(spelled.pname + 1);
+        const data_PITCHNAME stepPname
+            = (spelled.pname == PITCHNAME_b) ? PITCHNAME_c : static_cast<data_PITCHNAME>(spelled.pname + 1);
         const int stepOct = spelled.oct + (spelled.pname == PITCHNAME_b ? 1 : 0);
         const int stepLoc = PitchInterface::CalcLoc(stepPname, stepOct, clefOffset);
         const int yRelStep = staff->CalcPitchPosYRel(&m_doc, stepLoc);
