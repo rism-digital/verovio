@@ -57,10 +57,17 @@ const main = async () => {
   const result = tk.getPitchPosition(0, 60, 1);
   console.log('GetPitchPosition(0, 60, 1) ->', result);
 
+  const resultFractional = tk.getPitchPosition(0, 60.5, 1);
+  console.log('GetPitchPosition(0, 60.5, 1) ->', resultFractional);
+
   assertEqual(result.measureId, 'm1', 'measureId');
   assertEqual(result.page, 1, 'page');
   assertEqual(result.system, 1, 'system');
   assertEqual(result.staff, 1, 'staff');
+
+  if (resultFractional.y === result.y) {
+    throw new Error('expected fractional MIDI pitch to adjust y position');
+  }
 };
 
 main().catch((err) => {

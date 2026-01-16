@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <climits>
@@ -166,6 +167,31 @@ SpelledPitch ChooseContextualSpell(
     }
 
     return best;
+}
+
+int ContextualAccidSemitone(
+    const MapOfOctavedPitchAccid &contextAccids, data_PITCHNAME pname, int oct)
+{
+    const int idx = pname + oct * 7;
+    auto found = contextAccids.find(idx);
+    if (found == contextAccids.end()) return 0;
+    return AccidWrittenToSemitone(found->second);
+}
+
+int MidiPitchFromSpelled(data_PITCHNAME pname, int oct, int accidSemitone)
+{
+    const int basePc = Note::PnameToPclass(pname);
+    int pc = basePc + accidSemitone;
+    int octShift = 0;
+    if (pc >= 12) {
+        pc -= 12;
+        octShift = 1;
+    }
+    else if (pc < 0) {
+        pc += 12;
+        octShift = -1;
+    }
+    return (oct + 1 + octShift) * 12 + pc;
 }
 
 
@@ -2266,7 +2292,7 @@ std::string Toolkit::GetTimesForElement(const std::string &xmlId)
     return o.json();
 }
 
-std::string Toolkit::GetPitchPosition(double scoreTime, int midiPitch, int staffN)
+std::string Toolkit::GetPitchPosition(double scoreTime, double midiPitch, int staffN)
 {
     this->ResetLogBuffer();
 
@@ -2276,6 +2302,15 @@ std::string Toolkit::GetPitchPosition(double scoreTime, int midiPitch, int staff
         LogWarning("Invalid staff number '%d'", staffN);
         return o.json();
     }
+    if (!std::isfinite(midiPitch)) {
+        LogWarning("Invalid MIDI pitch '%f'", midiPitch);
+        return o.json();
+    }
+
+    const int midiPitchInt = static_cast<int>(std::floor(midiPitch));
+    double midiFraction = midiPitch - midiPitchInt;
+    if (midiFraction < 0.0) midiFraction = 0.0;
+    if (midiFraction > 1.0) midiFraction = 1.0;
 
     const Fraction requestedScoreTime = ScoreTimeFromDouble(scoreTime);
 
@@ -2395,16 +2430,32 @@ std::string Toolkit::GetPitchPosition(double scoreTime, int midiPitch, int staff
 
     const bool preferSharps = (keySig && (keySig->GetAccidType() == ACCIDENTAL_WRITTEN_s));
     const bool preferFlats = (keySig && (keySig->GetAccidType() == ACCIDENTAL_WRITTEN_f));
-    const SpelledPitch spelled = ChooseContextualSpell(midiPitch, contextAccids, preferSharps, preferFlats);
+    const SpelledPitch spelled = ChooseContextualSpell(midiPitchInt, contextAccids, preferSharps, preferFlats);
 
     const int loc = PitchInterface::CalcLoc(spelled.pname, spelled.oct, clefOffset);
-    const int y = staff->GetDrawingY() + staff->CalcPitchPosYRel(&m_doc, loc);
+    const int yRelBase = staff->CalcPitchPosYRel(&m_doc, loc);
+    double yRel = static_cast<double>(yRelBase);
+    if (midiFraction > 0.0) {
+        const data_PITCHNAME stepPname = (spelled.pname == PITCHNAME_b)
+            ? PITCHNAME_c
+            : static_cast<data_PITCHNAME>(spelled.pname + 1);
+        const int stepOct = spelled.oct + (spelled.pname == PITCHNAME_b ? 1 : 0);
+        const int stepLoc = PitchInterface::CalcLoc(stepPname, stepOct, clefOffset);
+        const int yRelStep = staff->CalcPitchPosYRel(&m_doc, stepLoc);
+        const int stepAccid = ContextualAccidSemitone(contextAccids, stepPname, stepOct);
+        const int stepMidi = MidiPitchFromSpelled(stepPname, stepOct, stepAccid);
+        int semitoneSpan = stepMidi - midiPitchInt;
+        if (semitoneSpan <= 0) semitoneSpan = 1;
+        const double ratio = std::min(1.0, midiFraction / static_cast<double>(semitoneSpan));
+        yRel = yRelBase + (yRelStep - yRelBase) * ratio;
+    }
+    const double y = staff->GetDrawingY() + yRel;
 
     // Convert to SVG device coordinates: include page margins and flip Y from
     // Verovio's logical space (origin at bottom-left of content) to SVG space
     // (origin at top-left of the page content).
-    int xOut = x;
-    int yOut = y;
+    double xOut = x;
+    double yOut = y;
     if (page) {
         if (!m_doc.GetDrawingPage() || m_doc.GetDrawingPage()->GetIdx() != page->GetIdx()) {
             m_doc.SetDrawingPage(page->GetIdx());

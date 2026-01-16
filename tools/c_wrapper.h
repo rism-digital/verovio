@@ -47,7 +47,7 @@ const char *vrvToolkit_getResourcePath(void *tkPtr);
 int vrvToolkit_getScale(void *tkPtr);
 double vrvToolkit_getTimeForElement(void *tkPtr, const char *xmlId);
 const char *vrvToolkit_getTimesForElement(void *tkPtr, const char *xmlId);
-const char *vrvToolkit_getPitchPosition(void *tkPtr, double scoreTime, int midiPitch, int staff);
+const char *vrvToolkit_getPitchPosition(void *tkPtr, double scoreTime, double midiPitch, int staff);
 const char *vrvToolkit_getVersion(void *tkPtr);
 bool vrvToolkit_loadData(void *tkPtr, const char *data);
 bool vrvToolkit_loadFile(void *tkPtr, const char *filename);
