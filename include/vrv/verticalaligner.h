@@ -33,7 +33,7 @@ public:
     /**
      * Declares different spacing types between staves
      */
-    enum class SpacingType { System, Staff, Brace, Bracket, None };
+    enum class SpacingType { System, Staff, Brace, Bracket, Ossia, None };
 
     // constructors and destructors
     SystemAligner();

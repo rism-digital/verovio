@@ -503,9 +503,13 @@ const StaffDef *ScoreDef::GetStaffDef(int n) const
         if (staffDef->GetN() == n) {
             return staffDef;
         }
+        // Also check if we are looking for an ossia staffDef
+        const StaffDef *ossia = staffDef->GetOssiaStaffDef(n);
+        if (ossia) return ossia;
     }
 
-    return staffDef;
+    // Nothing found, something broken in the data...
+    return NULL;
 }
 
 StaffGrp *ScoreDef::GetStaffGrp(const std::string &n)
@@ -537,8 +541,10 @@ std::vector<int> ScoreDef::GetStaffNs() const
         // It should be staffDef only, but double check.
         if (!child->Is(STAFFDEF)) continue;
         staffDef = vrv_cast<const StaffDef *>(child);
-        assert(staffDef);
+        // Include ossia staves (above and below)
+        staffDef->GetOssiaAboveNs(ns);
         ns.push_back(staffDef->GetN());
+        staffDef->GetOssiaBelowNs(ns);
     }
     return ns;
 }
@@ -620,6 +626,28 @@ bool ScoreDef::HasSystemStartLine() const
         return (this->GetSystemLeftline() == BOOLEAN_true);
     }
     return false;
+}
+
+void ScoreDef::AddOssias(int staffN, const std::list<int> ossias, bool above)
+{
+    StaffDef *staffDef = this->GetStaffDef(staffN);
+
+    for (auto ossiaN : ossias) {
+        // Get the original staff
+        // It might be different from the staffDef of staffN when multiple staves in ossia
+        StaffDef *origStaffDef = this->GetStaffDef(ossiaN - OSSIA_N_OFFSET);
+        if (!origStaffDef) continue;
+        StaffDef *ossiaStaffDef = new StaffDef();
+        // Copy all attributes and set `@n`
+        origStaffDef->CopyAttributesTo(ossiaStaffDef);
+        ossiaStaffDef->SetN(ossiaN);
+        if (above) {
+            staffDef->AddOssiaAbove(ossiaStaffDef);
+        }
+        else {
+            staffDef->AddOssiaBelow(ossiaStaffDef);
+        }
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -10,8 +10,8 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "score.h"
 #include "staff.h"
+#include "system.h"
 
 //----------------------------------------------------------------------------
 
@@ -21,9 +21,8 @@ namespace vrv {
 // AdjustLayersFunctor
 //----------------------------------------------------------------------------
 
-AdjustLayersFunctor::AdjustLayersFunctor(Doc *doc, const std::vector<int> &staffNs) : DocFunctor(doc)
+AdjustLayersFunctor::AdjustLayersFunctor(Doc *doc) : DocFunctor(doc)
 {
-    m_staffNs = staffNs;
     m_currentLayerN = VRV_UNSET;
     m_unison = false;
     m_ignoreDots = true;
@@ -146,11 +145,9 @@ FunctorCode AdjustLayersFunctor::VisitMeasure(Measure *measure)
     return FUNCTOR_SIBLINGS;
 }
 
-FunctorCode AdjustLayersFunctor::VisitScore(Score *score)
+FunctorCode AdjustLayersFunctor::VisitSystem(System *system)
 {
-    assert(score->GetScoreDef());
-
-    m_staffNs = score->GetScoreDef()->GetStaffNs();
+    if (system->GetDrawingScoreDef()) m_staffNs = system->GetDrawingScoreDef()->GetStaffNs();
 
     return FUNCTOR_CONTINUE;
 }

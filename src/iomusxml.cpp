@@ -193,7 +193,7 @@ void MusicXmlInput::ProcessClefChangeQueue(Section *section)
 {
     while (!m_clefChangeQueue.empty()) {
         musicxml::ClefChange clefChange = m_clefChangeQueue.front();
-        m_clefChangeQueue.pop();
+        m_clefChangeQueue.pop_front();
         AttNNumberLikeComparison comparisonMeasure(MEASURE, clefChange.m_measureNum);
         Measure *currentMeasure = vrv_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure));
         if (!currentMeasure) {
@@ -440,7 +440,7 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element, int dur
     int currTime = 0;
     if (m_layerEndTimes.contains(layer)) currTime = m_layerEndTimes.at(layer);
     if ((layer->GetChildren().size() == 0 && m_durTotal > 0) || currTime < m_durTotal) {
-        this->FillSpace(layer, m_durTotal - currTime);
+        this->FillSpace(layer, m_durTotal - currTime, true);
     }
 
     if (m_elementStackMap.at(layer).empty()) {
@@ -481,7 +481,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
 
     // if not, take staff info of node element
     short int staffNum = (node.child("staff")) ? node.child("staff").text().as_int() : 1;
-    if ((staffNum < 1) || (staffNum > measure->GetChildCount(STAFF))) {
+    if ((staffNum < 1) || (staffNum > measure->GetStaffCount())) {
         LogWarning("MusicXML import: Staff %d cannot be found", staffNum);
         staffNum = 1;
     }
@@ -489,6 +489,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
     Staff *staff = vrv_cast<Staff *>(measure->GetChild(staffNum, STAFF));
     assert(staff);
     m_currentLayer = SelectLayer(layerNum, staff);
+
     m_isLayerInitialized = true;
     return m_currentLayer;
 }
@@ -546,9 +547,34 @@ bool MusicXmlInput::IsInStack(ClassId classId, Layer *layer)
             [classId](LayerElement *element) { return element->Is(classId); }));
 }
 
-void MusicXmlInput::FillSpace(Layer *layer, int dur)
+void MusicXmlInput::FillSpace(Layer *layer, int dur, bool withClefs, int offset)
 {
     assert(layer);
+
+    // Split spaces to take into account pending clef changes in that layer
+    if (withClefs && !m_clefChangeQueue.empty()) {
+        std::list<int> durs;
+        int processed = 0;
+        for (auto &clefChange : m_clefChangeQueue) {
+            if (clefChange.m_layer != layer) continue;
+            if (clefChange.m_scoreOnset < dur) {
+                durs.push_back(clefChange.m_scoreOnset - processed);
+                processed = clefChange.m_scoreOnset;
+            }
+        }
+        if (processed > 0 && processed < dur) {
+            durs.push_back(dur - processed);
+        }
+        if (!durs.empty()) {
+            int processed = 0;
+            for (auto durList : durs) {
+                // Call it recursively with split durations and the processed offset
+                this->FillSpace(layer, durList, false, processed);
+                processed += durList;
+            }
+            return;
+        }
+    }
 
     std::string durStr;
     while (dur > 0) {
@@ -567,8 +593,9 @@ void MusicXmlInput::FillSpace(Layer *layer, int dur)
         else {
             m_elementStackMap.at(layer).back()->AddChild(space);
         }
-        m_layerTimes[layer].emplace(dur, space);
         dur -= m_ppq * quarters;
+        offset += m_ppq * quarters;
+        m_layerTimes[layer].emplace(offset, space);
     }
 }
 
@@ -1148,7 +1175,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     }
 
     // manage sections: create new <section> / <ending> elements and move the corresponding measures into them
-    for (auto iter = m_sections.begin(); iter != m_sections.end(); ) {
+    for (auto iter = m_sections.begin(); iter != m_sections.end();) {
         std::vector<Measure *> measures = iter->second;
         if (measures.empty()) {
             iter = m_sections.erase(iter);
@@ -1177,16 +1204,25 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 
         // remember the target for expansion
         iter->first.m_target = target;
-        // replace first <measure> with <section> / <ending> element
-        section->ReplaceChild(measures.front(), target);
-        // go through measures of that ending and remove remaining measures from <section> and add them to
-        // <section> / <ending>
+        // insert <section> / <ending> element ahead of first <measure>
+        section->InsertBefore(measures.front(), target);
+        // go through measures move them info <section> / <ending>
         for (Measure *measure : measures) {
-            // remove other measures from <section> that are not already removed above (first measure)
-            if (measure->GetID() != measures.front()->GetID()) {
-                int idx = section->GetChildIndex(measure);
-                section->DetachChild(idx);
+            // also move preceding non-measure siblings
+            // keep stacking them in reverse order then transfer them in score order
+            Object *sibling = measure;
+            std::list<Object *> siblings;
+            while ((sibling = section->GetPrevious(sibling))) {
+                if (sibling->GetClassId() == SECTION || sibling->GetClassId() == ENDING) break;
+                siblings.push_front(sibling);
             }
+            for (auto s : siblings) {
+                int idx = section->GetChildIndex(s);
+                section->DetachChild(idx);
+                target->AddChild(s);
+            }
+            int idx = section->GetChildIndex(measure);
+            section->DetachChild(idx);
             target->AddChild(measure); // add <measure> to sub-element
         }
 
@@ -1194,6 +1230,14 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     }
     CreateExpansion(section);
     m_sections.clear();
+
+    // The top staffGrp cannot remain empty - add at least one staffDef
+    if (staffGrp->GetChildCount() == 0) {
+        StaffDef *staffDef = new StaffDef();
+        staffDef->SetN(1);
+        staffDef->SetLines(5);
+        staffGrp->AddChild(staffDef);
+    }
 
     // finalize document
     m_doc->ExpandExpansions();
@@ -1243,12 +1287,13 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 
 // vibe-coded on Claude AI using prompt:
 //
-// in C++, write a concise function to parse a string of comma separated ints with optional spaces into a list (array or vector) of ints
+// in C++, write a concise function to parse a string of comma separated ints with optional spaces into a list (array or
+// vector) of ints
 //
 // verified at https://onlinegdb.com/blxCanxpAW
-std::vector<int> parseInts(const std::string& str)
+std::list<int> parseInts(const std::string &str)
 {
-    std::vector<int> result;
+    std::list<int> result;
     std::stringstream ss(str);
     int num;
     while (ss >> num) {
@@ -1263,16 +1308,15 @@ void MusicXmlInput::CreateExpansion(Section *section)
     assert(section);
 
     Expansion *expansion = new Expansion();
-    expansion->SetID("expansion-default");
     section->InsertChild(expansion, 0);
 
     // iterate on sections to create expansion
     // prepopulate the labels map because there are forward jumps (tocoda)
     bool jumpBack = false;
     auto iter = m_sections.begin();
-    auto rptiter = iter;
-    auto seciter = iter;
-    auto enditer = iter;
+    auto rptIter = iter;
+    auto secIter = iter;
+    auto endIter = iter;
     std::map<std::string, decltype(iter)> labels;
     for (auto it = m_sections.begin(); it != m_sections.end(); ++it) {
         if (!it->first.m_label.empty()) {
@@ -1284,7 +1328,7 @@ void MusicXmlInput::CreateExpansion(Section *section)
         iter->first.m_visited++;
 
         // remember this repeat start
-        if (iter->first.m_repeatStart) rptiter = iter;
+        if (iter->first.m_repeatStart) rptIter = iter;
 
         // handle section
         if (iter->first.m_classId == SECTION) {
@@ -1295,28 +1339,32 @@ void MusicXmlInput::CreateExpansion(Section *section)
             // repeat the sections, beginning with the repeat start
             int times = (jumpBack && !iter->first.m_repeatInfo.m_afterJump) ? 1 : iter->first.m_repeatInfo.m_times;
             for (int t = 2; t <= times; ++t) {
-                for (auto it = rptiter; it != std::next(iter); ++it) {
+                for (auto it = rptIter; it != std::next(iter); ++it) {
                     std::string ref = "#" + it->first.m_target->GetID();
                     expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
                 }
             }
 
             // remember last section
-            seciter = enditer = iter++;
+            secIter = endIter = iter++;
         }
-        else /* ENDING */ {
+        // ending
+        else {
             // gather all endings, by creating a map from ending number to ending iterator
             std::map<int, decltype(iter)> endings;
-            auto begiter = iter;
+            auto begIter = iter;
+            std::optional<decltype(iter)> rptNestedIter;
             while (iter != m_sections.end() && iter->first.m_classId == ENDING) {
-                auto is = parseInts(iter->first.m_endingInfo.m_number);
-                for (auto i : is) {
+                for (auto i : parseInts(iter->first.m_endingInfo.m_number)) {
                     endings.insert({ i, iter });
                 }
-                enditer = iter++;
+                endIter = iter++;
+
+                // remember a nested repeat start
+                if (endIter != begIter && endIter->first.m_repeatStart) rptNestedIter = endIter;
 
                 // increment visited count of subsequent sections
-                if (enditer != begiter) enditer->first.m_visited++;
+                if (endIter != begIter) endIter->first.m_visited++;
             }
 
             // when jumping back, keep only last ending
@@ -1324,14 +1372,14 @@ void MusicXmlInput::CreateExpansion(Section *section)
                 auto last = std::prev(endings.end());
                 endings.clear();
                 endings.insert(*last);
-                enditer = last->second;
+                endIter = last->second;
             }
 
             // the map is automatically sorted by key (ending number), so just add them to expansion in the same order
             // skip section first time because it was already added in the SECTION block
             for (auto ending = endings.begin(); ending != endings.end(); ++ending) {
                 if (ending != endings.begin()) {
-                    for (auto it = rptiter; it != std::next(seciter); ++it) {
+                    for (auto it = rptIter; it != std::next(secIter); ++it) {
                         std::string ref = "#" + it->first.m_target->GetID();
                         expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
                     }
@@ -1339,40 +1387,33 @@ void MusicXmlInput::CreateExpansion(Section *section)
                 std::string endref = "#" + ending->second->first.m_target->GetID();
                 expansion->GetPlistInterface()->AddRefAllowDuplicate(endref);
             }
+
+            // set the repetition to the (latest) nested one
+            if (rptNestedIter) rptIter = *rptNestedIter;
         }
 
         // fine
-        if (jumpBack && enditer->first.m_fineInfo.m_fine) {
+        if (jumpBack && endIter->first.m_fineInfo.m_fine) {
             break;
         }
 
         // dacapo
-        if (
-            enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DACAPO &&
-            enditer->first.m_jumpInfo.m_times.end() != std::find(
-                enditer->first.m_jumpInfo.m_times.begin(),
-                enditer->first.m_jumpInfo.m_times.end(),
-                enditer->first.m_visited
-            )
-        ) {
+        if (endIter->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DACAPO
+            && endIter->first.m_jumpInfo.m_times.end()
+                != std::find(endIter->first.m_jumpInfo.m_times.begin(), endIter->first.m_jumpInfo.m_times.end(),
+                    endIter->first.m_visited)) {
             iter = m_sections.begin();
             jumpBack = true;
         }
 
         // dalsegno / tocoda
-        if (
-            (
-                enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DALSEGNO ||
-                enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::TOCODA
-            ) &&
-            enditer->first.m_jumpInfo.m_times.end() != std::find(
-                enditer->first.m_jumpInfo.m_times.begin(),
-                enditer->first.m_jumpInfo.m_times.end(),
-                enditer->first.m_visited
-            )
-        ) {
-            iter = labels.at(enditer->first.m_jumpInfo.m_label);
-            jumpBack = enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DALSEGNO;
+        if ((endIter->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DALSEGNO
+                || endIter->first.m_jumpInfo.m_jump == musicxml::JumpInfo::TOCODA)
+            && endIter->first.m_jumpInfo.m_times.end()
+                != std::find(endIter->first.m_jumpInfo.m_times.begin(), endIter->first.m_jumpInfo.m_times.end(),
+                    endIter->first.m_visited)) {
+            iter = labels.at(endIter->first.m_jumpInfo.m_label);
+            jumpBack = endIter->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DALSEGNO;
         }
     }
 }
@@ -1848,6 +1889,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     // reset measure time
     m_durTotal = 0;
 
+    // reset clef changed flag
+    m_clefChanged = 0;
+
     const auto mrestPositonIter = m_multiRests.find(index);
     bool isMRestInOtherSystem = (mrestPositonIter != m_multiRests.end());
     int multiRestStaffNumber = 1;
@@ -2013,8 +2057,9 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         Clef *meiClef = ConvertClef(clef);
         if (meiClef) {
             const bool afterBarline = clef.attribute("after-barline").as_bool();
-            m_clefChangeQueue.push(
+            m_clefChangeQueue.push_back(
                 musicxml::ClefChange(measureNum, staff, m_currentLayer, meiClef, m_durTotal, afterBarline));
+            m_clefChanged++;
         }
     }
 
@@ -2121,7 +2166,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
 
     // start or end section
     if (measure->GetLeft() == BARRENDITION_rptstart) {
-        m_sectionStart = musicxml::SectionInfo(true);
+        if (!m_sectionStart || !m_sectionStart->m_repeatStart) m_sectionStart = musicxml::SectionInfo(true);
     }
     if (measure->GetRight() == BARRENDITION_rptend) {
         m_sectionStop = musicxml::SectionInfo(musicxml::RepeatInfo(repeatTimes, repeatAfterJump));
@@ -2133,14 +2178,13 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
         std::string endingNumber = ending.attribute("number").as_string();
         std::string endingType = ending.attribute("type").as_string();
         std::string endingText = ending.text().as_string();
-        // LogInfo("ending number/type/text: %s/%s/%s.", endingNumber.c_str(), endingType.c_str(),
-        // endingText.c_str());
         if (endingType == "start") {
             // check for corresponding stop points
             std::string xpath = StringFormat("following::ending[@number='%s'][@type != 'start']", endingNumber.c_str());
             pugi::xpath_node endingEnd = node.select_node(xpath.c_str());
             if (endingEnd) {
-                m_sectionStart = musicxml::EndingInfo(endingNumber, endingType, endingText);
+                if (!m_sectionStart) m_sectionStart = musicxml::SectionInfo();
+                m_sectionStart->merge(musicxml::EndingInfo(endingNumber, endingType, endingText));
             }
         }
         else if (endingType == "stop" || endingType == "discontinue") {
@@ -2148,7 +2192,8 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
                 LogWarning("MusicXML import: Dangling ending tag skipped");
             }
             else {
-                m_sectionStop = musicxml::EndingInfo(endingNumber, endingType, endingText);
+                if (!m_sectionStop) m_sectionStop = musicxml::SectionInfo();
+                m_sectionStop->merge(musicxml::EndingInfo(endingNumber, endingType, endingText));
             }
         }
     }
@@ -2863,6 +2908,18 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     Layer *layer = SelectLayer(node, measure);
     assert(layer);
+
+    // If we just had a clef change, make sure it points to the correct layer
+    if (m_clefChanged && !m_clefChangeQueue.empty()) {
+        size_t limit = std::min(size_t(m_clefChanged), m_clefChangeQueue.size());
+        auto endIt = m_clefChangeQueue.begin() + limit;
+        // Adjust all clefs in the queue
+        for (auto it = m_clefChangeQueue.begin(); it != endIt; ++it) {
+            it->m_layer = layer;
+        }
+    }
+    m_clefChanged = 0;
+
     m_prevLayer = layer;
 
     Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
@@ -2957,7 +3014,13 @@ void MusicXmlInput::ReadMusicXmlNote(
     }
 
     const std::string noteID = node.attribute("id").as_string();
-    const int duration = node.child("duration").text().as_int();
+    int duration = node.child("duration").text().as_int();
+    // In chords, make sure a note does not extend first note's duration.
+    // See https://github.com/rism-digital/verovio/issues/4225
+    if (isChord && duration && m_elementStackMap.at(layer).back()->Is(CHORD)) {
+        Chord *chord = vrv_cast<Chord *>(m_elementStackMap.at(layer).back());
+        if (chord) duration = std::min(duration, chord->GetDurPpq());
+    }
     const int noteStaffNum = node.child("staff").text().as_int();
     const pugi::xml_node rest = node.child("rest");
     if (m_ppq < 0 && duration && !typeStr.empty()) {
@@ -3402,34 +3465,36 @@ void MusicXmlInput::ReadMusicXmlNote(
         this->ReadMusicXmlTies(node, layer, note, measureNum);
 
         // articulation
-        std::vector<data_ARTICULATION> artics;
+        std::list<Artic *> artics;
         for (pugi::xml_node articulations : notations.node().children("articulations")) {
             for (pugi::xml_node articulation : articulations.children()) {
                 Artic *artic = new Artic();
-                artics.push_back(ConvertArticulations(articulation.name()));
+                data_ARTICULATION articVal = ConvertArticulations(articulation.name());
                 if (!std::strcmp(articulation.name(), "detached-legato")) {
                     // we need to split up this one
-                    artic->SetArtic(artics);
+                    artic->SetArtic({ articVal });
                     artic->SetColor(articulation.attribute("color").as_string());
                     artic->SetPlace(
                         artic->AttPlacementRelEvent::StrToStaffrel(articulation.attribute("placement").as_string()));
-                    element->AddChild(artic);
-                    artics.clear();
+                    artics.push_back(artic);
                     artic = new Artic();
-                    artics.push_back(ARTICULATION_ten);
+                    articVal = ARTICULATION_ten;
                 }
-                if (artics.back() == ARTICULATION_NONE) {
+                if (articVal == ARTICULATION_NONE) {
                     delete artic;
                     continue;
                 }
-                artic->SetArtic(artics);
+                artic->SetArtic({ articVal });
                 artic->SetColor(articulation.attribute("color").as_string());
                 artic->SetPlace(
                     artic->AttPlacementRelEvent::StrToStaffrel(articulation.attribute("placement").as_string()));
-                element->AddChild(artic);
-                artics.clear();
+                // Always put stacc at the front of the list
+                (artic->GetArticFirst() == ARTICULATION_stacc) ? artics.push_front(artic) : artics.push_back(artic);
             }
         }
+        for (Artic *artic : artics) element->AddChild(artic);
+        // Not strictly necessary
+        artics.clear();
 
         // technical
         for (pugi::xml_node technical : notations.node().children("technical")) {
@@ -3489,15 +3554,14 @@ void MusicXmlInput::ReadMusicXmlNote(
                 else {
                     pugi::xml_node articulation = technicalChild;
                     Artic *artic = new Artic();
-                    artics.push_back(ConvertArticulations(articulation.name()));
-                    if (artics.back() != ARTICULATION_NONE) artic->SetArtic(artics);
+                    data_ARTICULATION articVal = ConvertArticulations(articulation.name());
+                    if (articVal != ARTICULATION_NONE) artic->SetArtic({ articVal });
                     artic->SetColor(articulation.attribute("color").as_string());
                     artic->SetGlyphName(articulation.attribute("smufl").as_string());
                     artic->SetPlace(
                         artic->AttPlacementRelEvent::StrToStaffrel(articulation.attribute("placement").as_string()));
                     artic->SetType("technical");
                     element->AddChild(artic);
-                    artics.clear();
                 }
             }
         }
@@ -4046,7 +4110,8 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
     // dacapo
     if (HasAttributeWithValue(node, "dacapo", "yes")) {
         if (!m_sectionStop) m_sectionStop = musicxml::SectionInfo();
-        m_jumpInfo = musicxml::JumpInfo(musicxml::JumpInfo::DACAPO, parseInts(node.attribute("time-only").as_string("1")));
+        m_jumpInfo
+            = musicxml::JumpInfo(musicxml::JumpInfo::DACAPO, parseInts(node.attribute("time-only").as_string("1")));
     }
 
     // dalsegno
@@ -4054,7 +4119,8 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
         if (!m_sectionStop) m_sectionStop = musicxml::SectionInfo();
         std::string label = node.attribute("dalsegno").as_string();
         if (label.empty()) label = "segno";
-        m_jumpInfo = musicxml::JumpInfo(musicxml::JumpInfo::DALSEGNO, label, parseInts(node.attribute("time-only").as_string("1")));
+        m_jumpInfo = musicxml::JumpInfo(
+            musicxml::JumpInfo::DALSEGNO, label, parseInts(node.attribute("time-only").as_string("1")));
     }
 
     // tocoda
@@ -4062,7 +4128,8 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
         if (!m_sectionStop) m_sectionStop = musicxml::SectionInfo();
         std::string label = node.attribute("tocoda").as_string();
         if (label.empty()) label = "coda";
-        m_jumpInfo = musicxml::JumpInfo(musicxml::JumpInfo::TOCODA, label, parseInts(node.attribute("time-only").as_string("2")));
+        m_jumpInfo = musicxml::JumpInfo(
+            musicxml::JumpInfo::TOCODA, label, parseInts(node.attribute("time-only").as_string("2")));
     }
 
     // fine
