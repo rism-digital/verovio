@@ -1205,7 +1205,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         // go through measures move them info <section> / <ending>
         for (Measure *measure : measures) {
             // also move preceding non-measure siblings
-            // keep stacking them in reverse then detach them in score order
+            // keep stacking them in reverse order then transfer them in score order
             Object *sibling = measure;
             std::list<Object *> siblings;
             while ((sibling = section->GetPrevious(sibling))) {
@@ -1349,11 +1349,15 @@ void MusicXmlInput::CreateExpansion(Section *section)
             // gather all endings, by creating a map from ending number to ending iterator
             std::map<int, decltype(iter)> endings;
             auto begIter = iter;
+            std::optional<decltype(iter)> rptNestedIter;
             while (iter != m_sections.end() && iter->first.m_classId == ENDING) {
                 for (auto i : parseInts(iter->first.m_endingInfo.m_number)) {
                     endings.insert({ i, iter });
                 }
                 endIter = iter++;
+
+                // remember a nested repeat start
+                if (endIter != begIter && endIter->first.m_repeatStart) rptNestedIter = endIter;
 
                 // increment visited count of subsequent sections
                 if (endIter != begIter) endIter->first.m_visited++;
@@ -1379,6 +1383,9 @@ void MusicXmlInput::CreateExpansion(Section *section)
                 std::string endref = "#" + ending->second->first.m_target->GetID();
                 expansion->GetPlistInterface()->AddRefAllowDuplicate(endref);
             }
+
+            // set the repetition to the (latest) nested one
+            if (rptNestedIter) rptIter = *rptNestedIter;
         }
 
         // fine
@@ -2152,7 +2159,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
 
     // start or end section
     if (measure->GetLeft() == BARRENDITION_rptstart) {
-        m_sectionStart = musicxml::SectionInfo(true);
+        if (!m_sectionStart || !m_sectionStart->m_repeatStart) m_sectionStart = musicxml::SectionInfo(true);
     }
     if (measure->GetRight() == BARRENDITION_rptend) {
         m_sectionStop = musicxml::SectionInfo(musicxml::RepeatInfo(repeatTimes, repeatAfterJump));
@@ -2164,14 +2171,13 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
         std::string endingNumber = ending.attribute("number").as_string();
         std::string endingType = ending.attribute("type").as_string();
         std::string endingText = ending.text().as_string();
-        // LogInfo("ending number/type/text: %s/%s/%s.", endingNumber.c_str(), endingType.c_str(),
-        // endingText.c_str());
         if (endingType == "start") {
             // check for corresponding stop points
             std::string xpath = StringFormat("following::ending[@number='%s'][@type != 'start']", endingNumber.c_str());
             pugi::xpath_node endingEnd = node.select_node(xpath.c_str());
             if (endingEnd) {
-                m_sectionStart = musicxml::EndingInfo(endingNumber, endingType, endingText);
+                if (!m_sectionStart) m_sectionStart = musicxml::SectionInfo();
+                m_sectionStart->merge(musicxml::EndingInfo(endingNumber, endingType, endingText));
             }
         }
         else if (endingType == "stop" || endingType == "discontinue") {
@@ -2179,7 +2185,8 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
                 LogWarning("MusicXML import: Dangling ending tag skipped");
             }
             else {
-                m_sectionStop = musicxml::EndingInfo(endingNumber, endingType, endingText);
+                if (!m_sectionStop) m_sectionStop = musicxml::SectionInfo();
+                m_sectionStop->merge(musicxml::EndingInfo(endingNumber, endingType, endingText));
             }
         }
     }

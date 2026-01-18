@@ -199,6 +199,12 @@ namespace musicxml {
             m_repeatStart = false;
         }
 
+        void merge(const EndingInfo &endingInfo)
+        {
+            m_classId = ENDING;
+            m_endingInfo = endingInfo;
+        }
+
         ClassId m_classId;
         Object *m_target;
         std::string m_label;
