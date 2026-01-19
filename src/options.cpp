@@ -1593,6 +1593,10 @@ Options::Options()
     m_expandFirst.Init(false);
     this->Register(&m_expandFirst, "expandFirst", &m_selectors);
 
+    m_expandGenerate.SetInfo("Generate expansion", "Generate an expansion based on repeats");
+    m_expandGenerate.Init(false);
+    this->Register(&m_expandGenerate, "expandGenerate", &m_selectors);
+
     m_loadSelectedMdivOnly.SetInfo(
         "Load selected Mdiv only", "Load only the selected mdiv; the content of the other is skipped");
     m_loadSelectedMdivOnly.Init(false);

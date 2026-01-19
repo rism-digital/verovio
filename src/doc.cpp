@@ -1609,6 +1609,19 @@ void Doc::ExpandExpansions()
     // Upon MEI import: use expansion ID or boolean for first expansion, given by command line argument
     std::string expansionId = this->GetOptions()->m_expand.GetValue();
     bool expandFirst = this->GetOptions()->m_expandFirst.GetValue();
+
+    if (this->GetOptions()->m_expandGenerate.GetValue()) {
+        ExpansionMap expansionMap;
+        ListOfObjects scores = this->FindAllDescendantsByType(SCORE);
+        for (Object *object : scores) {
+            Score *score = vrv_cast<Score *>(object);
+            assert(score);
+            expansionMap.GenerateExpansionFor(score);
+        }
+        // Enable expansion of first one when generated
+        expandFirst = true;
+    }
+
     if (expansionId.empty() && !expandFirst) return;
 
     Expansion *startExpansion = NULL;
