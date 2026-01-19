@@ -66,6 +66,7 @@
 #include "pghead.h"
 #include "reh.h"
 #include "rend.h"
+#include "repeatmark.h"
 #include "rest.h"
 #include "sb.h"
 #include "score.h"
@@ -2282,27 +2283,6 @@ void MusicXmlInput::ReadMusicXmlDirection(
         }
     }
 
-    // Coda
-    pugi::xml_node xmlCoda = typeNode.child("coda");
-    if (xmlCoda) {
-        Dir *dir = new Dir();
-        dir->SetPlace(dir->AttPlacementRelStaff::StrToStaffrel(placeStr.c_str()));
-        dir->SetTstamp(timeStamp - 1.0);
-        dir->SetType("coda");
-        dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
-        if (xmlCoda.attribute("id")) dir->SetID(xmlCoda.attribute("id").as_string());
-        Rend *rend = new Rend;
-        rend->SetGlyphAuth("smufl");
-        rend->SetFontstyle(FONTSTYLE_normal);
-        rend->SetHalign(HORIZONTALALIGNMENT_center);
-        Text *text = new Text();
-        std::u32string codaSign = UTF8to32("\xF0\x9D\x84\x8C");
-        text->SetText(codaSign);
-        rend->AddChild(text);
-        dir->AddChild(rend);
-        m_controlElements.push_back({ measureNum, dir });
-    }
-
     // Dashes (to be connected with previous <dir> or <dynam> as @extender and @tstamp2 attribute
     pugi::xpath_node dashes = typeNode.select_node("bracket|dashes");
     if (dashes) {
@@ -2430,6 +2410,22 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 m_openDashesStack.push_back({ dir, openDashes });
             }
         }
+    }
+
+    // Coda & Segno
+    pugi::xpath_node xmlJump = typeNode.select_node("coda|segno");
+    if (xmlJump && !containsWords) {
+        RepeatMark *mark = new RepeatMark();
+        mark->SetPlace(mark->AttPlacementRelStaff::StrToStaffrel(placeStr.c_str()));
+        mark->SetTstamp(timeStamp);
+        mark->SetFunc(ConvertJumpType(xmlJump.node().name()));
+        mark->SetStaff(mark->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
+        if (xmlJump.node().attribute("smufl")) {
+            mark->SetGlyphAuth("smufl");
+            mark->SetGlyphName(xmlJump.node().attribute("smufl").as_string());
+        }
+        if (xmlJump.node().attribute("id")) mark->SetID(xmlJump.node().attribute("id").as_string());
+        m_controlElements.push_back({ measureNum, mark });
     }
 
     // Dynamics
@@ -2733,27 +2729,6 @@ void MusicXmlInput::ReadMusicXmlDirection(
         m_controlElements.push_back({ measureNum, reh });
     }
 
-    // Segno
-    pugi::xml_node xmlSegno = typeNode.child("segno");
-    if (xmlSegno) {
-        Dir *dir = new Dir();
-        dir->SetPlace(dir->AttPlacementRelStaff::StrToStaffrel(placeStr.c_str()));
-        dir->SetTstamp(timeStamp - 1.0);
-        dir->SetType("segno");
-        dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
-        if (xmlSegno.attribute("id")) dir->SetID(xmlSegno.attribute("id").as_string());
-        Rend *rend = new Rend;
-        rend->SetGlyphAuth("smufl");
-        rend->SetFontstyle(FONTSTYLE_normal);
-        rend->SetHalign(HORIZONTALALIGNMENT_center);
-        Text *text = new Text();
-        std::u32string segnoSign = UTF8to32("\xF0\x9D\x84\x8B");
-        text->SetText(segnoSign);
-        rend->AddChild(text);
-        dir->AddChild(rend);
-        m_controlElements.push_back({ measureNum, dir });
-    }
-
     // Tempo
     if (containsTempo) {
         Tempo *tempo = new Tempo();
@@ -2780,8 +2755,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // other cases
-    if (!containsDynamics && !containsTempo && !containsWords && !xmlCoda && !bracket && !lead && !xmlSegno && !xmlShift
-        && !xmlPedal && wedges.empty() && !dashes && !rehearsal) {
+    if (!containsDynamics && !containsTempo && !containsWords && !xmlJump && !bracket && !lead && !xmlShift && !xmlPedal
+        && wedges.empty() && !dashes && !rehearsal) {
         LogWarning("MusicXML import: Unsupported direction-type '%s'", typeNode.first_child().name());
     }
 
@@ -4638,6 +4613,21 @@ data_DURATION MusicXmlInput::ConvertTypeToDur(const std::string &value)
 
     LogWarning("MusicXML import: Unsupported note-type-value '%s'", value.c_str());
     return DURATION_NONE;
+}
+
+repeatMarkLog_FUNC MusicXmlInput::ConvertJumpType(const std::string &value)
+{
+    static const std::map<std::string, repeatMarkLog_FUNC> Name2Jump{
+        { "coda", repeatMarkLog_FUNC_coda }, //
+        { "segno", repeatMarkLog_FUNC_segno }, //
+    };
+
+    const auto result = Name2Jump.find(value);
+    if (result != Name2Jump.end()) {
+        return result->second;
+    }
+
+    return repeatMarkLog_FUNC_NONE;
 }
 
 data_TEXTRENDITION MusicXmlInput::ConvertEnclosure(const std::string &value)

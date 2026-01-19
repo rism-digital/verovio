@@ -589,6 +589,7 @@ private:
     static curvature_CURVEDIR InferCurvedir(const pugi::xml_node slurOrTie);
     static fermataVis_SHAPE ConvertFermataShape(const std::string &value);
     static pedalLog_DIR ConvertPedalTypeToDir(const std::string &value);
+    static repeatMarkLog_FUNC ConvertJumpType(const std::string &value);
     static tupletVis_NUMFORMAT ConvertTupletNumberValue(const std::string &value);
     static std::u32string ConvertTypeToVerovioText(const std::string &value);
     static std::string ConvertAlterToSymbol(const std::string &value, bool plusMinus = false);
