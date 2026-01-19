@@ -62,6 +62,7 @@ public:
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitMeasureEnd(Measure *measure) override;
     FunctorCode VisitMeterSigGrp(MeterSigGrp *meterSigGrp) override;
+    FunctorCode VisitOssia(Ossia *ossia) override;
     FunctorCode VisitSection(Section *section) override;
     FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitSystem(System *system) override;

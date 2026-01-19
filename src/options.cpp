@@ -1434,6 +1434,10 @@ Options::Options()
     m_octaveNoSpanningParentheses.Init(false);
     this->Register(&m_octaveNoSpanningParentheses, "octaveNoSpanningParentheses", &m_generalLayout);
 
+    m_ossiaStaffSize.SetInfo("Ossia staff size", "The ossia staff size in relation to the staff size");
+    m_ossiaStaffSize.Init(0.5, 0.75, 1.00);
+    this->Register(&m_ossiaStaffSize, "ossiaStaffSize", &m_generalLayout);
+
     m_pedalLineThickness.SetInfo("Pedal line thickness", "The thickness of the line used for piano pedaling");
     m_pedalLineThickness.Init(0.20, 0.10, 1.00);
     this->Register(&m_pedalLineThickness, "pedalLineThickness", &m_generalLayout);
@@ -1497,6 +1501,10 @@ Options::Options()
     m_spacingNonLinear.SetInfo("Spacing non linear", "Specify the non-linear spacing factor");
     m_spacingNonLinear.Init(0.6, 0.0, 1.0);
     this->Register(&m_spacingNonLinear, "spacingNonLinear", &m_generalLayout);
+
+    m_spacingOssia.SetInfo("Spacing ossia", "Specify the factor of an ossia spacing in relation to staff spacing");
+    m_spacingOssia.Init(0.35, 0.1, 1.0);
+    this->Register(&m_spacingOssia, "spacingOssia", &m_generalLayout);
 
     m_spacingStaff.SetInfo("Spacing staff", "The staff minimal spacing in MEI units");
     m_spacingStaff.Init(12, 0, 48);
@@ -1581,6 +1589,14 @@ Options::Options()
     m_expand.Init("");
     this->Register(&m_expand, "expand", &m_selectors);
 
+    m_expandFirst.SetInfo("Expand first expansion", "Expand all referenced elements in the first available expansion");
+    m_expandFirst.Init(false);
+    this->Register(&m_expandFirst, "expandFirst", &m_selectors);
+
+    m_expandGenerate.SetInfo("Generate expansion", "Generate an expansion based on repeats");
+    m_expandGenerate.Init(false);
+    this->Register(&m_expandGenerate, "expandGenerate", &m_selectors);
+
     m_loadSelectedMdivOnly.SetInfo(
         "Load selected Mdiv only", "Load only the selected mdiv; the content of the other is skipped");
     m_loadSelectedMdivOnly.Init(false);
@@ -1594,6 +1610,10 @@ Options::Options()
         "Set the xPath query for selecting the <mdiv> to be rendered; only one <mdiv> can be rendered");
     m_mdivXPathQuery.Init("");
     this->Register(&m_mdivXPathQuery, "mdivXPathQuery", &m_selectors);
+
+    m_ossiaHidden.SetInfo("Ossia hidden", "Hide ossias when rendering");
+    m_ossiaHidden.Init(false);
+    this->Register(&m_ossiaHidden, "ossiaHidden", &m_selectors);
 
     m_substXPathQuery.SetInfo("Subst xPath query",
         "Set the xPath query for selecting <subst> child elements, for "

@@ -304,6 +304,17 @@ public:
     ///@}
 
     /**
+     * Return the first or last staff taking into account ossias (or not).
+     */
+    ///@{
+    int GetStaffCount(bool excludeOStaves = true) const;
+    Staff *GetFirstStaff(bool excludeOStaves = true);
+    const Staff *GetFirstStaff(bool excludeOStaves = true) const;
+    Staff *GetLastStaff(bool excludeOStaves = true);
+    const Staff *GetLastStaff(bool excludeOStaves = true) const;
+    ///@}
+
+    /**
      * Check if the measure encloses the given time (in millisecond)
      * Return the playing repeat time (1-based), VRV_UNSET otherwise
      */

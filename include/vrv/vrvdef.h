@@ -39,7 +39,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 5
-#define VERSION_MINOR 7
+#define VERSION_MINOR 8
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -114,6 +114,7 @@ enum ClassId : uint16_t {
     MEASURE_ALIGNER,
     MENSUR_ATTR,
     METERSIG_ATTR,
+    OSSIA,
     PAGE,
     PAGES,
     STAFF,
@@ -280,6 +281,8 @@ enum ClassId : uint16_t {
     BBOX_DEVICE_CONTEXT,
     SVG_DEVICE_CONTEXT,
     CUSTOM_DEVICE_CONTEXT,
+    // Pseudo ids for custom factory functions
+    FACTORY_OSTAFF,
     //
     UNSPECIFIED
 };
@@ -413,6 +416,8 @@ typedef bool (*NotePredicate)(const Note *);
 
 typedef std::vector<std::pair<LayerElement *, data_DURATION>> ArrayOfElementDurPairs;
 
+typedef std::map<int, std::list<int>> MapOfOssiaStaffNs;
+
 /**
  * Generic int map recursive structure for storing hierachy of values
  * For example, we want to process all staves one by one, and within each staff
@@ -488,6 +493,12 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 
 /** Define the maximum levels between a note and its syls **/
 #define MAX_NOTE_DEPTH -1
+
+//----------------------------------------------------------------------------
+// Ossia staff / layer @n offset (assuming we never have @n that high)
+//----------------------------------------------------------------------------
+
+#define OSSIA_N_OFFSET 1000000
 
 //----------------------------------------------------------------------------
 // Unicode music codepoints
@@ -588,7 +599,13 @@ enum { SPANNING_START_END = 0, SPANNING_START, SPANNING_END, SPANNING_MIDDLE };
  * scoreDef layer elements and cautionary scoreDef layer elements
  */
 
-enum ElementScoreDefRole { SCOREDEF_NONE = 0, SCOREDEF_SYSTEM, SCOREDEF_INTERMEDIATE, SCOREDEF_CAUTIONARY };
+enum ElementScoreDefRole {
+    SCOREDEF_NONE = 0,
+    SCOREDEF_SYSTEM,
+    SCOREDEF_INTERMEDIATE,
+    SCOREDEF_CAUTIONARY,
+    SCOREDEF_OSSIA
+};
 
 //----------------------------------------------------------------------------
 // ScoreDef drawing labels

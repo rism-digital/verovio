@@ -478,17 +478,17 @@ void SvgDeviceContext::StartPage()
     m_vrvTextFont = false;
     m_vrvTextFontFallback = false;
 
+    const Resources *resources = this->GetResources();
+
     // default styles
     if (this->UseGlobalStyling()) {
         m_currentNode = m_currentNode.append_child("style");
         m_currentNode.append_attribute("type") = "text/css";
-        const Resources *resources = this->GetResources();
         assert(resources);
-        std::string css = "g.page-margin{font-family:" + resources->GetTextFont()
-            + ",serif;} "
-              "g.ending, g.fing, g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
-              "g.mNum{font-style:italic;} g.label{font-weight:normal;} ellipse, path, polygon, polyline, "
-              "rect{stroke:currentColor} ";
+        std::string css = "g.ending, g.fing, g.reh, g.tempo {font-weight:bold;} "
+                          "g.dir, g.dynam, g.mNum {font-style:italic;}"
+                          "g.label {font-weight:normal;} "
+                          "ellipse, path, polygon, polyline, rect {stroke:currentColor} ";
         // bounding box css - for debugging
         // css += " g.bounding-box{stroke:red; stroke-width:10} "
         //        "g.content-bounding-box{stroke:blue; stroke-width:10}";
@@ -509,6 +509,7 @@ void SvgDeviceContext::StartPage()
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("class") = "definition-scale";
     m_currentNode.append_attribute("color") = "black";
+    m_currentNode.append_attribute("font-family") = resources->GetTextFont() + ", serif";
     if (this->GetFacsimile()) {
         m_currentNode.append_attribute("viewBox")
             = StringFormat("0 0 %d %d", this->GetWidth(), this->GetHeight()).c_str();
@@ -1313,6 +1314,7 @@ void SvgDeviceContext::DrawSvgBoundingBoxRectangle(int x, int y, int width, int 
     rectChild.append_attribute("width") = width;
 
     rectChild.append_attribute("fill") = "transparent";
+    rectChild.append_attribute("stroke-width") = "0";
 }
 
 void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
