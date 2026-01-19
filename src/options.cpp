@@ -1589,6 +1589,10 @@ Options::Options()
     m_expand.Init("");
     this->Register(&m_expand, "expand", &m_selectors);
 
+    m_expandFirst.SetInfo("Expand first expansion", "Expand all referenced elements in the first available expansion");
+    m_expandFirst.Init(false);
+    this->Register(&m_expandFirst, "expandFirst", &m_selectors);
+
     m_expandGenerate.SetInfo("Generate expansion", "Generate an expansion based on repeats");
     m_expandGenerate.Init(false);
     this->Register(&m_expandGenerate, "expandGenerate", &m_selectors);

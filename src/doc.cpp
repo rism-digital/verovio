@@ -1606,6 +1606,10 @@ void Doc::TransposeDoc()
 
 void Doc::ExpandExpansions()
 {
+    // Upon MEI import: use expansion ID or boolean for first expansion, given by command line argument
+    std::string expansionId = this->GetOptions()->m_expand.GetValue();
+    bool expandFirst = this->GetOptions()->m_expandFirst.GetValue();
+
     if (this->GetOptions()->m_expandGenerate.GetValue()) {
         ExpansionMap expansionMap;
         ListOfObjects scores = this->FindAllDescendantsByType(SCORE);
@@ -1614,16 +1618,26 @@ void Doc::ExpandExpansions()
             assert(score);
             expansionMap.GenerateExpansionFor(score);
         }
+        // Enable expansion of first one when generated
+        expandFirst = true;
     }
 
-    // Upon MEI import: use expansion ID, given by command line argument
-    std::string expansionId = this->GetOptions()->m_expand.GetValue();
-    if (expansionId.empty()) return;
+    if (expansionId.empty() && !expandFirst) return;
 
-    Expansion *startExpansion = dynamic_cast<Expansion *>(this->FindDescendantByID(expansionId));
-    if (startExpansion == NULL) {
-        LogWarning("Expansion ID '%s' not found. Nothing expanded.", expansionId.c_str());
-        return;
+    Expansion *startExpansion = NULL;
+    if (!expansionId.empty()) {
+        startExpansion = dynamic_cast<Expansion *>(this->FindDescendantByID(expansionId));
+        if (startExpansion == NULL) {
+            LogWarning("Expansion ID '%s' not found. Nothing expanded.", expansionId.c_str());
+            return;
+        }
+    }
+    else {
+        startExpansion = dynamic_cast<Expansion *>(this->FindDescendantByType(EXPANSION));
+        if (startExpansion == NULL) {
+            LogWarning("No expansion found. Nothing expanded.");
+            return;
+        }
     }
 
     xsdAnyURI_List existingList; // list of xml:id strings of elements already in the document
