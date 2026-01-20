@@ -2428,7 +2428,7 @@ std::string Toolkit::GetPitchPosition(double scoreTime, double midiPitch, int st
     // SCORE_TIME_UNIT per quarter. Convert before looking up X.
     const Fraction localTimeForX = localTime / SCORE_TIME_UNIT;
     const int xRel = layoutMeasure->GetXAtScoreTime(localTimeForX, interpolated);
-    const int x = layoutMeasure->GetDrawingX() + xRel;
+    int x = layoutMeasure->GetDrawingX() + xRel;
 
     AttNIntegerComparison staffCmp(STAFF, staffN);
     Staff *staff = vrv_cast<Staff *>(layoutMeasure->FindDescendantByComparison(&staffCmp, 1));
@@ -2451,15 +2451,31 @@ std::string Toolkit::GetPitchPosition(double scoreTime, double midiPitch, int st
     }
 
     const ListOfObjects notes = staff->FindAllDescendantsByType(NOTE, false);
+    const Note *anchorNote = NULL;
+    Fraction anchorOnset;
+    int anchorPitchDistance = 0;
     for (const Object *obj : notes) {
         const Note *note = vrv_cast<const Note *>(obj);
         assert(note);
-        if (note->GetScoreTimeOnset() > localTime) continue;
+        const Fraction noteOnset = note->GetScoreTimeOnset();
+        if (noteOnset > localTime) continue;
         const Accid *accid = note->GetDrawingAccid();
-        if (!accid) continue;
-        if (!note->HasPname() || !note->HasOct()) continue;
-        const int idx = note->GetPname() + note->GetOct() * 7;
-        contextAccids[idx] = accid->GetAccid();
+        if (accid && note->HasPname() && note->HasOct()) {
+            const int idx = note->GetPname() + note->GetOct() * 7;
+            contextAccids[idx] = accid->GetAccid();
+        }
+
+        int distance = note->GetMIDIPitch() - midiPitchInt;
+        if (distance < 0) distance = -distance;
+        if (!anchorNote || noteOnset > anchorOnset) {
+            anchorNote = note;
+            anchorOnset = noteOnset;
+            anchorPitchDistance = distance;
+        }
+        else if (noteOnset == anchorOnset && distance < anchorPitchDistance) {
+            anchorNote = note;
+            anchorPitchDistance = distance;
+        }
     }
 
     const bool preferSharps = (keySig && (keySig->GetAccidType() == ACCIDENTAL_WRITTEN_s));
@@ -2483,6 +2499,16 @@ std::string Toolkit::GetPitchPosition(double scoreTime, double midiPitch, int st
         yRel = yRelBase + (yRelStep - yRelBase) * ratio;
     }
     const double y = staff->GetDrawingY() + yRel;
+
+    if (anchorNote) {
+        bool anchorInterpolated = false;
+        const Fraction anchorOnsetForX = anchorOnset / SCORE_TIME_UNIT;
+        const int anchorXRel = layoutMeasure->GetXAtScoreTime(anchorOnsetForX, anchorInterpolated);
+        const int anchorX = layoutMeasure->GetDrawingX() + anchorXRel;
+        const int noteHeadCenterX =
+            anchorNote->GetDrawingX() + anchorNote->GetDrawingRadius(&m_doc);
+        x += noteHeadCenterX - anchorX;
+    }
 
     // Convert to SVG device coordinates: include page margins and flip Y from
     // Verovio's logical space (origin at bottom-left of content) to SVG space
