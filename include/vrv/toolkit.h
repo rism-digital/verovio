@@ -781,6 +781,11 @@ protected:
      * Load a string data with or without resetting the log buffer
      */
     bool LoadData(const std::string &data, bool resetLogBuffer);
+    
+    /**
+     * Reset the Doc pointer used for MIDI / Timemap rendering
+     */
+    void ResetMidiDoc();
 
 private:
     bool SetFont(const std::string &fontName);
@@ -804,6 +809,12 @@ private:
      */
     void SetViewAndEditor();
 
+    /**
+     * Set the Doc pointer for MIDI / Timemap rendering.
+     * Point to the main Doc if no difference in expansion handling is needed.
+     */
+    void SetMidiDoc();
+    
 public:
     //
 private:
@@ -812,6 +823,7 @@ private:
     View m_view;
     FileFormat m_inputFrom;
     FileFormat m_outputTo;
+    Doc *m_midiDoc;
 
     Options *m_options;
 
