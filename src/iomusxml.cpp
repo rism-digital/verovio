@@ -1409,8 +1409,13 @@ void MusicXmlInput::CreateExpansion(Section *section)
             && endIter->first.m_jumpInfo.m_times.end()
                 != std::find(endIter->first.m_jumpInfo.m_times.begin(), endIter->first.m_jumpInfo.m_times.end(),
                     endIter->first.m_visited)) {
-            iter = labels.at(endIter->first.m_jumpInfo.m_label);
-            jumpBack = endIter->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DALSEGNO;
+            if (!labels.contains(endIter->first.m_jumpInfo.m_label)) {
+                LogWarning("MusicXML import: Segno/Coda label \"%s\" not found", endIter->first.m_jumpInfo.m_label.c_str());
+            }
+            else {
+                iter = labels.at(endIter->first.m_jumpInfo.m_label);
+                jumpBack = endIter->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DALSEGNO;
+            }
         }
     }
 }
