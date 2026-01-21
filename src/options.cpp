@@ -1589,13 +1589,13 @@ Options::Options()
     m_expand.Init("");
     this->Register(&m_expand, "expand", &m_selectors);
 
-    m_expandFirst.SetInfo("Expand first expansion", "Expand all referenced elements in the first available expansion");
-    m_expandFirst.Init(false);
-    this->Register(&m_expandFirst, "expandFirst", &m_selectors);
+    m_expandAlways.SetInfo("Always expand", "Expand for all outputs, using selected, first, or generated expansion");
+    m_expandAlways.Init(false);
+    this->Register(&m_expandAlways, "expandAlways", &m_selectors);
 
-    m_expandGenerate.SetInfo("Generate expansion", "Generate an expansion based on repeats");
-    m_expandGenerate.Init(false);
-    this->Register(&m_expandGenerate, "expandGenerate", &m_selectors);
+    m_expandNever.SetInfo("Never expansion", "Expand for no output, including MIDI and timemap");
+    m_expandNever.Init(false);
+    this->Register(&m_expandNever, "expandNever", &m_selectors);
 
     m_loadSelectedMdivOnly.SetInfo(
         "Load selected Mdiv only", "Load only the selected mdiv; the content of the other is skipped");

@@ -773,8 +773,8 @@ public:
     OptionArray m_appXPathQuery;
     OptionArray m_choiceXPathQuery;
     OptionString m_expand;
-    OptionBool m_expandFirst;
-    OptionBool m_expandGenerate;
+    OptionBool m_expandAlways;
+    OptionBool m_expandNever;
     OptionBool m_loadSelectedMdivOnly;
     OptionBool m_mdivAll;
     OptionString m_mdivXPathQuery;
