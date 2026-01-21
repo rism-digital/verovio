@@ -65,8 +65,6 @@ char *Toolkit::m_humdrumBuffer = NULL;
 
 Toolkit::Toolkit(bool initFont)
 {
-    m_inputFrom = AUTO;
-    m_outputTo = UNKNOWN;
     m_midiDoc = NULL;
 
     m_humdrumBuffer = NULL;
@@ -91,7 +89,7 @@ Toolkit::Toolkit(bool initFont)
 Toolkit::~Toolkit()
 {
     this->ResetLocale();
-    
+
     this->ResetMidiDoc();
 
     if (m_humdrumBuffer) {
@@ -162,101 +160,12 @@ bool Toolkit::Select(const std::string &selection)
 
 bool Toolkit::SetOutputTo(std::string const &outputTo)
 {
-    if ((outputTo == "humdrum") || (outputTo == "hum")) {
-        m_outputTo = HUMDRUM;
-    }
-    else if (outputTo == "mei") {
-        m_outputTo = MEI;
-    }
-    else if (outputTo == "mei-basic") {
-        m_outputTo = MEI;
-    }
-    else if (outputTo == "mei-pb") {
-        m_outputTo = MEI;
-    }
-    else if (outputTo == "mei-facs") {
-        m_outputTo = MEI;
-    }
-    else if (outputTo == "midi") {
-        m_outputTo = MIDI;
-    }
-    else if (outputTo == "hummidi") {
-        m_outputTo = HUMMIDI;
-    }
-    else if (outputTo == "timemap") {
-        m_outputTo = TIMEMAP;
-    }
-    else if (outputTo == "expansionmap") {
-        m_outputTo = EXPANSIONMAP;
-    }
-    else if (outputTo == "pae") {
-        m_outputTo = PAE;
-    }
-    else if (outputTo == "mei-pb-serialized") {
-        m_outputTo = SERIALIZATION;
-    }
-    else if (outputTo != "svg") {
-        LogError("Output format '%s' is not supported", outputTo.c_str());
-        return false;
-    }
-    return true;
+    return m_options->SetOutputTo(outputTo);
 }
 
 bool Toolkit::SetInputFrom(std::string const &inputFrom)
 {
-    if (inputFrom == "abc") {
-        m_inputFrom = ABC;
-    }
-    else if (inputFrom == "pae") {
-        m_inputFrom = PAE;
-    }
-    else if (inputFrom == "darms") {
-        m_inputFrom = DARMS;
-    }
-    else if (inputFrom == "volpiano") {
-        m_inputFrom = VOLPIANO;
-    }
-    else if (inputFrom == "cmme.xml") {
-        m_inputFrom = CMME;
-    }
-    else if ((inputFrom == "humdrum") || (inputFrom == "hum")) {
-        m_inputFrom = HUMDRUM;
-    }
-    else if (inputFrom == "mei") {
-        m_inputFrom = MEI;
-    }
-    else if ((inputFrom == "musicxml") || (inputFrom == "xml")) {
-        m_inputFrom = MUSICXML;
-    }
-    else if (inputFrom == "md") {
-        m_inputFrom = MUSEDATAHUM;
-    }
-    else if (inputFrom == "musedata") {
-        m_inputFrom = MUSEDATAHUM;
-    }
-    else if (inputFrom == "musedata-hum") {
-        m_inputFrom = MUSEDATAHUM;
-    }
-    else if (inputFrom == "musicxml-hum") {
-        m_inputFrom = MUSICXMLHUM;
-    }
-    else if (inputFrom == "mei-hum") {
-        m_inputFrom = MEIHUM;
-    }
-    else if (inputFrom == "esac") {
-        m_inputFrom = ESAC;
-    }
-    else if (inputFrom == "mei-pb-serialized") {
-        m_inputFrom = SERIALIZATION;
-    }
-    else if (inputFrom == "auto") {
-        m_inputFrom = AUTO;
-    }
-    else {
-        LogError("Input format '%s' is not supported", inputFrom.c_str());
-        return false;
-    }
-    return true;
+    return m_options->SetInputFrom(inputFrom);
 }
 
 FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
@@ -343,11 +252,11 @@ void Toolkit::ResetMidiDoc()
 {
     // Nothing to do
     if (!m_midiDoc) return;
-    
+
     if (m_midiDoc != &m_doc) {
         delete m_midiDoc;
     }
-    
+
     m_midiDoc = NULL;
 }
 
@@ -355,7 +264,7 @@ void Toolkit::SetMidiDoc()
 {
     // Nothing to do
     if (m_midiDoc) return;
-    
+
     if (m_doc.m_expansionMap.HasExpansionMap() || m_options->m_expandNever.GetValue()) {
         m_midiDoc = &m_doc;
     }
@@ -601,7 +510,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
 
     std::string newData;
     Input *input = NULL;
-    
+
     this->ResetMidiDoc();
     if (resetLogBuffer) {
         this->ResetLogBuffer();
@@ -619,7 +528,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     this->ClearHumdrumBuffer();
 #endif
 
-    auto inputFrom = m_inputFrom;
+    FileFormat inputFrom = m_options->GetInputFrom();
     if (inputFrom == AUTO) {
         inputFrom = IdentifyInputFrom(data);
     }

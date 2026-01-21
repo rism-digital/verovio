@@ -721,12 +721,12 @@ public:
      *
      * @ingroup nodoc
      */
-    int GetInputFrom() { return m_inputFrom; }
+    FileFormat GetInputFrom() { return m_options->GetInputFrom(); }
 
     /**
      * @ingroup nodoc
      */
-    int GetOutputTo() { return m_outputTo; }
+    FileFormat GetOutputTo() { return m_options->GetOutputTo(); }
 
     /**
      * Setting the global locale.
@@ -781,7 +781,7 @@ protected:
      * Load a string data with or without resetting the log buffer
      */
     bool LoadData(const std::string &data, bool resetLogBuffer);
-    
+
     /**
      * Reset the Doc pointer used for MIDI / Timemap rendering
      */
@@ -814,15 +814,13 @@ private:
      * Point to the main Doc if no difference in expansion handling is needed.
      */
     void SetMidiDoc();
-    
+
 public:
     //
 private:
     Doc m_doc;
     DocSelection m_docSelection;
     View m_view;
-    FileFormat m_inputFrom;
-    FileFormat m_outputTo;
     Doc *m_midiDoc;
 
     Options *m_options;
