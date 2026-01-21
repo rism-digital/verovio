@@ -366,11 +366,6 @@ void ExpansionMap::ToJson(std::string &output)
 
 void ExpansionMap::GenerateExpansionFor(Score *score)
 {
-    if (score->FindDescendantByType(EXPANSION)) {
-        LogWarning("An expansion cannot be generated if one is already encoded");
-        return;
-    }
-
     if (score->HasEditorialContent()) {
         LogWarning("An expansion cannot be generated with editorial content");
         return;
