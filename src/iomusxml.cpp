@@ -1369,11 +1369,9 @@ void MusicXmlInput::CreateExpansion(Section *section)
             }
 
             // when jumping back, keep only last ending
-            if (jumpBack) {
-                auto last = std::prev(endings.end());
-                endings.clear();
-                endings.insert(*last);
-                endIter = last->second;
+            if (jumpBack && endings.size() > 0) {
+                endings.erase(endings.begin(), std::prev(endings.end()));
+                endIter = endings.begin()->second;
             }
 
             // the map is automatically sorted by key (ending number), so just add them to expansion in the same order
@@ -1413,8 +1411,14 @@ void MusicXmlInput::CreateExpansion(Section *section)
             && endIter->first.m_jumpInfo.m_times.end()
                 != std::find(endIter->first.m_jumpInfo.m_times.begin(), endIter->first.m_jumpInfo.m_times.end(),
                     endIter->first.m_visited)) {
-            iter = labels.at(endIter->first.m_jumpInfo.m_label);
-            jumpBack = endIter->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DALSEGNO;
+            if (!labels.contains(endIter->first.m_jumpInfo.m_label)) {
+                LogWarning(
+                    "MusicXML import: Segno/Coda label '%s' not found", endIter->first.m_jumpInfo.m_label.c_str());
+            }
+            else {
+                iter = labels.at(endIter->first.m_jumpInfo.m_label);
+                jumpBack = endIter->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DALSEGNO;
+            }
         }
     }
 }
