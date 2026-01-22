@@ -33,13 +33,17 @@ namespace vrv {
 // ExpansionMap
 //----------------------------------------------------------------------------
 
-ExpansionMap::ExpansionMap() {}
+ExpansionMap::ExpansionMap()
+{
+    this->Reset();
+}
 
 ExpansionMap::~ExpansionMap() {}
 
 void ExpansionMap::Reset()
 {
     m_map.clear();
+    m_isProcessed = false;
 }
 
 Object *ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Object *prevSect,
@@ -366,6 +370,8 @@ void ExpansionMap::ToJson(std::string &output)
 
 void ExpansionMap::GenerateExpansionFor(Score *score)
 {
+    m_isProcessed = true;
+
     if (score->HasEditorialContent()) {
         LogWarning("An expansion cannot be generated with editorial content");
         return;

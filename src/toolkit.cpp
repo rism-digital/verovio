@@ -265,12 +265,11 @@ void Toolkit::SetMidiDoc()
     // Nothing to do
     if (m_midiDoc) return;
 
-    if (m_doc.m_expansionMap.HasExpansionMap() || m_options->m_expandNever.GetValue()) {
+    if (m_doc.m_expansionMap.HasExpansionMap() || m_options->m_expandNever.GetValue()
+        || m_doc.m_expansionMap.IsProcessed()) {
         m_midiDoc = &m_doc;
     }
     else {
-        m_midiDoc = &m_doc;
-        return;
         m_midiDoc = new Doc();
         m_midiDoc->SetOptions(m_doc.GetOptions());
         m_midiDoc->GetOptions()->m_expandAlways.SetValue(true);

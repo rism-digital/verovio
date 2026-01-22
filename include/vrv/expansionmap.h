@@ -60,6 +60,11 @@ public:
      */
     void GenerateExpansionFor(Score *score);
 
+    /**
+     * Getter for the generating attempt flag
+     */
+    bool IsProcessed() { return m_isProcessed; }
+
     //----------------//
     // Static methods //
     //----------------//
@@ -90,6 +95,8 @@ private:
 public:
     /** The expansion map indicates which xmlId has been repeated (expanded) elsewhere */
     std::map<std::string, std::vector<std::string>> m_map;
+    /** A flag indicating that the generation processed has been run even if the expansion map is empty  */
+    bool m_isProcessed;
 
 private:
 };

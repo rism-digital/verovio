@@ -1606,26 +1606,22 @@ void Doc::TransposeDoc()
 
 void Doc::ExpandExpansions()
 {
-    //static std::vector<FileFormat> valid = { MIDI, TIMEMAP, EXPANSIONMAP };
-    
-    //FileFormat format = m_ m_options->m_inputFrom.GetValue();
-    //bool expand = (std::find(valid.begin(), valid.end(), m_outputTo) != valid.end());
-    
-    
-    // Upon MEI import: use expansion ID or boolean for first expansion, given by command line argument
+    static std::vector<FileFormat> valid = { MIDI, TIMEMAP, EXPANSIONMAP };
+
+    bool expandInput = (std::find(valid.begin(), valid.end(), m_options->GetOutputTo()) != valid.end());
     std::string expansionId = this->GetOptions()->m_expand.GetValue();
-    bool expand = this->GetOptions()->m_expandAlways.GetValue();
+
+    bool expand = (expandInput || expansionId.empty() || this->GetOptions()->m_expandAlways.GetValue());
 
     // Check if we need to generate an expansion
-    if (expand && expansionId.empty()) {
-        ExpansionMap expansionMap;
+    if (expand) {
         ListOfObjects scores = this->FindAllDescendantsByType(SCORE);
         for (Object *object : scores) {
             Score *score = vrv_cast<Score *>(object);
             assert(score);
             // Do not generate one if there is already one
             if (!score->FindDescendantByType(EXPANSION)) {
-                expansionMap.GenerateExpansionFor(score);
+                m_expansionMap.GenerateExpansionFor(score);
             }
         }
     }
