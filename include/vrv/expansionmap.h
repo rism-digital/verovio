@@ -61,9 +61,12 @@ public:
     void GenerateExpansionFor(Score *score);
 
     /**
-     * Getter for the generating attempt flag
+     * @name Setter and getter for the generating attempt flag
      */
+    ///@{
+    void SetProcessed(bool isProcessed) { m_isProcessed = isProcessed; }
     bool IsProcessed() { return m_isProcessed; }
+    ///@}
 
     //----------------//
     // Static methods //
@@ -95,10 +98,10 @@ private:
 public:
     /** The expansion map indicates which xmlId has been repeated (expanded) elsewhere */
     std::map<std::string, std::vector<std::string>> m_map;
-    /** A flag indicating that the generation processed has been run even if the expansion map is empty  */
-    bool m_isProcessed;
 
 private:
+    /** A flag indicating that the generation processed has been run even if the expansion map is empty  */
+    bool m_isProcessed;
 };
 
 } // namespace vrv

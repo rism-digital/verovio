@@ -1606,8 +1606,14 @@ void Doc::TransposeDoc()
 
 void Doc::ExpandExpansions()
 {
-    // nothing to do it that case
+    // nothing to do with this option
     if (this->GetOptions()->m_expandNever.GetValue()) return;
+
+    // nothing to do in these cases - marked the map as processed
+    if (this->IsMensuralMusicOnly() || this->IsTranscription()) {
+        m_expansionMap.SetProcessed(true);
+        return;
+    }
 
     // The list of output format we always expand - and generated an expansion if none
     static std::vector<FileFormat> valid = { MIDI, TIMEMAP, EXPANSIONMAP };
