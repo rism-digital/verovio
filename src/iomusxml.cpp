@@ -1365,11 +1365,9 @@ void MusicXmlInput::CreateExpansion(Section *section)
             }
 
             // when jumping back, keep only last ending
-            if (jumpBack) {
-                auto last = std::prev(endings.end());
-                endings.clear();
-                endings.insert(*last);
-                endIter = last->second;
+            if (jumpBack && endings.size() > 0) {
+                endings.erase(endings.begin(), std::prev(endings.end()));
+                endIter = endings.begin()->second;
             }
 
             // the map is automatically sorted by key (ending number), so just add them to expansion in the same order
