@@ -1606,15 +1606,22 @@ void Doc::TransposeDoc()
 
 void Doc::ExpandExpansions()
 {
+    // nothing to do it that case
+    if (this->GetOptions()->m_expandNever.GetValue()) return;
+
+    // The list of output format we always expand - and generated an expansion if none
     static std::vector<FileFormat> valid = { MIDI, TIMEMAP, EXPANSIONMAP };
 
     bool expandInput = (std::find(valid.begin(), valid.end(), m_options->GetOutputTo()) != valid.end());
-    std::string expansionId = this->GetOptions()->m_expand.GetValue();
+    // Generate an expansion if the format requires it or the option forces it
+    bool generateExpansion = (expandInput || this->GetOptions()->m_expandAlways.GetValue());
 
-    bool generateExpansion = (expandInput || expansionId.empty() || this->GetOptions()->m_expandAlways.GetValue());
+    std::string expansionId = this->GetOptions()->m_expand.GetValue();
+    // Nothing to do if there is no specific expansion selected, and none to be generated
+    if (expansionId.empty() && !generateExpansion) return;
 
     // Check if we need to generate an expansion
-    if (generateExpansion) {
+    if (generateExpansion && expansionId.empty()) {
         ListOfObjects scores = this->FindAllDescendantsByType(SCORE);
         for (Object *object : scores) {
             Score *score = vrv_cast<Score *>(object);
@@ -1625,8 +1632,6 @@ void Doc::ExpandExpansions()
             }
         }
     }
-
-    if (expansionId.empty() && !generateExpansion) return;
 
     Expansion *startExpansion = NULL;
     if (!expansionId.empty()) {
