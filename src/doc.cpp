@@ -1611,10 +1611,10 @@ void Doc::ExpandExpansions()
     bool expandInput = (std::find(valid.begin(), valid.end(), m_options->GetOutputTo()) != valid.end());
     std::string expansionId = this->GetOptions()->m_expand.GetValue();
 
-    bool expand = (expandInput || expansionId.empty() || this->GetOptions()->m_expandAlways.GetValue());
+    bool generateExpansion = (expandInput || expansionId.empty() || this->GetOptions()->m_expandAlways.GetValue());
 
     // Check if we need to generate an expansion
-    if (expand) {
+    if (generateExpansion) {
         ListOfObjects scores = this->FindAllDescendantsByType(SCORE);
         for (Object *object : scores) {
             Score *score = vrv_cast<Score *>(object);
@@ -1626,7 +1626,7 @@ void Doc::ExpandExpansions()
         }
     }
 
-    if (expansionId.empty() && !expand) return;
+    if (expansionId.empty() && !generateExpansion) return;
 
     Expansion *startExpansion = NULL;
     if (!expansionId.empty()) {
