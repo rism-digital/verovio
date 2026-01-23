@@ -274,16 +274,12 @@ bool ExpansionMap::UpdateIDs(Object *object)
             if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);
             newIdString = this->GetExpansionIDsForElement(oldIdString).back();
             if (!newIdString.empty()) interface->SetCopyof("#" + newIdString);
-            // @corresp
-            oldIdString = interface->GetCorresp();
-            if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);
-            newIdString = this->GetExpansionIDsForElement(oldIdString).back();
-            if (!newIdString.empty()) interface->SetCorresp("#" + newIdString);
             // @synch
             oldIdString = interface->GetSynch();
             if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);
             newIdString = this->GetExpansionIDsForElement(oldIdString).back();
             if (!newIdString.empty()) interface->SetSynch("#" + newIdString);
+            // @corresp is already handle by the Object::Clone and LinkingInterface::AddBackLink
         }
         this->UpdateIDs(o);
     }
