@@ -265,6 +265,7 @@ void Toolkit::SetMidiDoc()
     // Nothing to do
     if (m_midiDoc) return;
 
+    // The doc has been expanded, or the midi file must not or cannot be expanded, use the main doc
     if (m_doc.m_expansionMap.HasExpansionMap() || m_options->m_expandNever.GetValue()
         || m_doc.m_expansionMap.IsProcessed()) {
         m_midiDoc = &m_doc;
@@ -1472,8 +1473,11 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
 
 std::string Toolkit::GetNotatedIdForElement(const std::string &xmlId)
 {
-    if (m_doc.m_expansionMap.HasExpansionMap()) {
-        return m_doc.m_expansionMap.GetExpansionIDsForElement(xmlId).front();
+    this->SetMidiDoc();
+
+    assert(m_midiDoc);
+    if (m_midiDoc->m_expansionMap.HasExpansionMap()) {
+        return m_midiDoc->m_expansionMap.GetExpansionIDsForElement(xmlId).front();
     }
     else {
         return xmlId;
@@ -1482,9 +1486,12 @@ std::string Toolkit::GetNotatedIdForElement(const std::string &xmlId)
 
 std::string Toolkit::GetExpansionIdsForElement(const std::string &xmlId)
 {
+    this->SetMidiDoc();
+
+    assert(m_midiDoc);
     jsonxx::Array a;
-    if (m_doc.m_expansionMap.HasExpansionMap()) {
-        for (std::string id : m_doc.m_expansionMap.GetExpansionIDsForElement(xmlId)) {
+    if (m_midiDoc->m_expansionMap.HasExpansionMap()) {
+        for (std::string id : m_midiDoc->m_expansionMap.GetExpansionIDsForElement(xmlId)) {
             a << id;
         }
     }
