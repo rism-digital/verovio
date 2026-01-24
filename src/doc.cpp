@@ -1606,10 +1606,10 @@ void Doc::TransposeDoc()
 
 void Doc::ExpandExpansions()
 {
-    // nothing to do with this option
+    // Nothing to do with this option
     if (this->GetOptions()->m_expandNever.GetValue()) return;
 
-    // nothing to do in these cases - marked the map as processed
+    // Nothing to do in these cases - marked the map as processed
     if (this->IsMensuralMusicOnly() || this->IsTranscription()) {
         m_expansionMap.SetProcessed(true);
         return;
@@ -1617,22 +1617,21 @@ void Doc::ExpandExpansions()
 
     // The list of output format we always expand - and generated an expansion if none
     static std::vector<FileFormat> valid = { MIDI, TIMEMAP, EXPANSIONMAP };
+    bool expandInputFormat = (std::find(valid.begin(), valid.end(), m_options->GetOutputTo()) != valid.end());
 
-    bool expandInput = (std::find(valid.begin(), valid.end(), m_options->GetOutputTo()) != valid.end());
-    // Generate an expansion if the format requires it or the option forces it
-    bool generateExpansion = (expandInput || this->GetOptions()->m_expandAlways.GetValue());
+    // Nothing to expand if the input format does not requires it and it is not forced
+    if (!expandInputFormat && !this->GetOptions()->m_expandAlways.GetValue()) return;
 
     std::string expansionId = this->GetOptions()->m_expand.GetValue();
-    // Nothing to do if there is no specific expansion selected, and none to be generated
-    if (expansionId.empty() && !generateExpansion) return;
+    bool expandSelected = (!expansionId.empty());
 
-    // Check if we need to generate an expansion
-    if (generateExpansion && expansionId.empty()) {
+    // We have no --expand xml:id, so generate an expansion or use the first one (generation will be skipped)
+    if (!expandSelected) {
         ListOfObjects scores = this->FindAllDescendantsByType(SCORE);
         for (Object *object : scores) {
             Score *score = vrv_cast<Score *>(object);
             assert(score);
-            // Do not generate one if there is already one
+            // Do not generate an expansion if there is already one
             if (!score->FindDescendantByType(EXPANSION)) {
                 m_expansionMap.GenerateExpansionFor(score);
             }
@@ -1640,13 +1639,14 @@ void Doc::ExpandExpansions()
     }
 
     Expansion *startExpansion = NULL;
-    if (!expansionId.empty()) {
+    if (expandSelected) {
         startExpansion = dynamic_cast<Expansion *>(this->FindDescendantByID(expansionId));
         if (startExpansion == NULL) {
             LogWarning("Expansion ID '%s' not found. Nothing expanded.", expansionId.c_str());
             return;
         }
     }
+    // Use the first one (encoded or generated)
     else {
         startExpansion = dynamic_cast<Expansion *>(this->FindDescendantByType(EXPANSION));
         if (startExpansion == NULL) {
