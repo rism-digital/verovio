@@ -1615,7 +1615,7 @@ void Doc::ExpandExpansions()
         return;
     }
 
-    // The list of output format we always expand - and generated an expansion if none
+    // The list of output formats that we always expand, and generate an expansion if there isn't one
     static std::vector<FileFormat> valid = { MIDI, TIMEMAP, EXPANSIONMAP };
     bool expandInputFormat = (std::find(valid.begin(), valid.end(), m_options->GetOutputTo()) != valid.end());
 
