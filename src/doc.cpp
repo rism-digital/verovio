@@ -1606,7 +1606,7 @@ void Doc::TransposeDoc()
 
 void Doc::ExpandExpansions()
 {
-    // Nothing to do with this option
+    // Passing this argument does not do anything
     if (this->GetOptions()->m_expandNever.GetValue()) return;
 
     // Nothing to do in these cases - marked the map as processed
