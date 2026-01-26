@@ -1625,7 +1625,7 @@ void Doc::ExpandExpansions()
     std::string expansionId = this->GetOptions()->m_expand.GetValue();
     bool expandSelected = (!expansionId.empty());
 
-    // We have no --expand xml:id, so generate an expansion or use the first one (generation will be skipped)
+    // We have no --expand xmlid, so generate an expansion or use the first one (generation will be skipped)
     if (!expandSelected) {
         ListOfObjects scores = this->FindAllDescendantsByType(SCORE);
         for (Object *object : scores) {
