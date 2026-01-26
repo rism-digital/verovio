@@ -1200,7 +1200,7 @@ ArrayOfConstObjects EditorTreeObject::GetChildObjects() const
         }
         childObjects.push_back((editorTreeChild->m_object ? editorTreeChild->m_object : editorTreeChild));
     }
-    
+
     return childObjects;
 }
 

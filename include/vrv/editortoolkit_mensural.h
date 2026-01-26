@@ -29,7 +29,7 @@ namespace vrv {
 class EditorToolkitMensural : public EditorToolkitCMN {
 public:
     EditorToolkitMensural(Doc *doc, View *view) : EditorToolkitCMN(doc, view) {}
-    //bool ParseEditorAction(const std::string &json_editorAction) override { return false; }
+    // bool ParseEditorAction(const std::string &json_editorAction) override { return false; }
 
     /**
      * Get information on the last editor function used
