@@ -1190,7 +1190,7 @@
         <glyph glyph-code="E4D3"
             smufl-name="caesuraShort" />
         <glyph glyph-code="E4D4" smufl-name="caesuraCurved" />
-        <!--<glyph glyph-code="E4D5" smufl-name="breathMarkSalzedo" />-->
+        <glyph glyph-code="E4D5" smufl-name="breathMarkSalzedo" />
         <!--<glyph glyph-code="E4D6" smufl-name="curlewSign" />-->
         <glyph
             glyph-code="E4D7" smufl-name="caesuraSingleStroke" />

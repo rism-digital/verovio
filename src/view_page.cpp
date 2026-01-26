@@ -41,8 +41,10 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "mnum.h"
+#include "mrest.h"
 #include "note.h"
 #include "options.h"
+#include "ossia.h"
 #include "page.h"
 #include "pageelement.h"
 #include "pagemilestone.h"
@@ -241,7 +243,9 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
         static const std::set<ClassId> timeSpanningClasses = { ANNOTSCORE, BEAMSPAN, BRACKETSPAN, DIR, DYNAM, FIGURE,
             GLISS, HAIRPIN, LV, OCTAVE, ORNAM, PEDAL, PHRASE, PITCHINFLECTION, SLUR, SYL, TEMPO, TIE, TRILL };
         if (object->Is(classId) && timeSpanningClasses.contains(classId)) {
+            this->StartOffset(dc, object, 100);
             this->DrawTimeSpanningElement(dc, object, system);
+            this->EndOffset(dc, object);
         }
         if (object->Is(classId) && (classId == ENDING)) {
             // cast to Ending check in DrawEnding
@@ -251,7 +255,7 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
 }
 
 void View::DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, BarLine *barLine,
-    bool isLastMeasure, bool isLastSystem)
+    bool isLastMeasure, bool isLastSystem, bool noLabels)
 {
     assert(dc);
     assert(scoreDef);
@@ -265,7 +269,9 @@ void View::DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure,
 
     if (barLine == NULL) {
         // Draw the first staffGrp and from there its children recursively
-        this->DrawStaffGrp(dc, measure, staffGrp, x, true, !scoreDef->DrawLabels());
+        ScoreDefDrawingLabels drawingLabels = (scoreDef->DrawLabels()) ? DRAWING_LABEL_FULL : DRAWING_LABEL_ABBR;
+        if (noLabels) drawingLabels = DRAWING_LABEL_NONE;
+        this->DrawStaffGrp(dc, measure, staffGrp, x, true, drawingLabels);
     }
     else {
         dc->StartGraphic(barLine, "", barLine->GetID());
@@ -277,8 +283,8 @@ void View::DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure,
     return;
 }
 
-void View::DrawStaffGrp(
-    DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool topStaffGrp, bool abbreviations)
+void View::DrawStaffGrp(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool topStaffGrp,
+    ScoreDefDrawingLabels drawingLabels)
 {
     assert(dc);
     assert(measure);
@@ -336,17 +342,20 @@ void View::DrawStaffGrp(
     for (int i = 0; i < staffGrp->GetChildCount(); ++i) {
         childStaffGrp = dynamic_cast<StaffGrp *>(staffGrp->GetChild(i));
         if (childStaffGrp) {
-            this->DrawStaffGrp(dc, measure, childStaffGrp, x, false, abbreviations);
+            this->DrawStaffGrp(dc, measure, childStaffGrp, x, false, drawingLabels);
         }
     }
 
-    // DrawStaffGrpLabel
-    const int space = m_doc->GetDrawingDoubleUnit(staffGrp->GetMaxStaffSize());
-    const int xLabel = x - space;
-    const int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
-    this->DrawLabels(dc, scoreDef, staffGrp, xLabel, yLabel, abbreviations, 100, 2 * space + grpSymSpace);
+    if (drawingLabels != DRAWING_LABEL_NONE) {
+        bool abbreviations = (drawingLabels == DRAWING_LABEL_ABBR);
+        // DrawStaffGrpLabel
+        const int space = m_doc->GetDrawingDoubleUnit(staffGrp->GetMaxStaffSize());
+        const int xLabel = x - space;
+        const int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
+        this->DrawLabels(dc, scoreDef, staffGrp, xLabel, yLabel, abbreviations, 100, 2 * space + grpSymSpace);
 
-    this->DrawStaffDefLabels(dc, measure, staffGrp, x, abbreviations);
+        this->DrawStaffDefLabels(dc, measure, staffGrp, x, abbreviations);
+    }
 }
 
 void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool abbreviations)
@@ -720,8 +729,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         // Get the corresponding staff
         AttNIntegerComparison comparison(STAFF, staffDef->GetN());
         Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
-        if (!staff) {
-            LogDebug("Could not get staff (%d) while drawing staffGrp - DrawBarLines", staffDef->GetN());
+        if (!staff || (staff->HasVisible() && (staff->GetVisible() == BOOLEAN_false))) {
             yBottomPrevious = VRV_UNSET;
             continue;
         }
@@ -1112,7 +1120,7 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
     assert(measure);
     assert(mnum);
 
-    Staff *staff = system->GetTopVisibleStaff();
+    Staff *staff = system->GetTopVisibleStaff(true);
     if (staff) {
         // Only one FloatingPositioner on the top (visible) staff
         if (!system->SetCurrentFloatingPositioner(staff->GetN(), mnum, staff, staff)) {
@@ -1135,7 +1143,7 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
 
         // HARDCODED
         // we set mNum to a fixed height above the system and make it a bit smaller than other text
-        params.m_x = staff->GetDrawingX();
+        params.m_x = measure->GetDrawingX();
         params.m_y = staff->GetDrawingY() + yOffset;
         if (mnum->HasFontsize()) {
             data_FONTSIZE *fs = mnum->GetFontsizeAlternate();
@@ -1169,6 +1177,86 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
 }
 
 //----------------------------------------------------------------------------
+// View - Ossia
+//----------------------------------------------------------------------------
+
+void View::DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(ossia);
+    assert(measure);
+    assert(system);
+
+    dc->StartGraphic(ossia, "", ossia->GetID());
+
+    const Staff *topOStaff = ossia->GetDrawingTopOStaff();
+    const Staff *bottomOStaff = ossia->GetDrawingBottopOStaff();
+
+    // Draw scoreDef line and brace
+    if (ossia->IsFirst() && ossia->DrawScoreDef() && ossia->HasMultipleOStaves()) {
+        if (topOStaff && bottomOStaff) {
+            const int staffSize = bottomOStaff->m_drawingStaffSize;
+            const int x = topOStaff->GetDrawingX() + topOStaff->GetOssiaDrawingShift(measure, m_doc);
+            const int y1 = topOStaff->GetDrawingY();
+            const int doubleUnit = m_doc->GetDrawingDoubleUnit(staffSize);
+            const int y2 = bottomOStaff->GetDrawingY() - doubleUnit * (bottomOStaff->m_drawingLines - 1);
+            // Bar lines always 100
+            const int barLineWidth = m_doc->GetDrawingBarLineWidth(100);
+            this->DrawVerticalLine(dc, y1, y2, x + barLineWidth / 2, barLineWidth);
+            this->DrawBrace(dc, x, y1, y2, staffSize);
+        }
+    }
+
+    for (Object *child : ossia->GetChildren()) {
+        if (child->Is(STAFF)) {
+            this->DrawStaff(dc, vrv_cast<Staff *>(child), measure, system);
+        }
+        else {
+            assert(false);
+        }
+    }
+
+    // No bar lines to draw if we have no ossia staves (e.g., all hidden)
+    if (!topOStaff || !bottomOStaff) {
+        dc->EndGraphic(ossia, this);
+        return;
+    }
+
+    bool showBarLines = ossia->HasShowBarLines() ? (ossia->GetShowBarLines() == BOOLEAN_true) : false;
+    bool showForceLeft = (showBarLines && ossia->IsFirst() && (measure->GetDrawingLeftBarLine() == BARRENDITION_NONE));
+
+    // Draw bar lines
+    if (measure->GetDrawingLeftBarLine() != BARRENDITION_NONE) {
+        int yBottomPrevious = VRV_UNSET;
+        BarLine *barLine = measure->GetLeftBarLine();
+        dc->StartGraphic(barLine, "", barLine->GetID());
+        this->DrawBarLines(dc, measure, ossia->GetDrawingStaffGrp(), barLine, measure->IsLastInSystem(),
+            system->IsLastOfMdiv(), yBottomPrevious);
+        dc->EndGraphic(barLine, this);
+    }
+    if ((showBarLines || !ossia->IsLast()) && (measure->GetDrawingRightBarLine() != BARRENDITION_NONE)) {
+        int yBottomPrevious = VRV_UNSET;
+        BarLine *barLine = measure->GetRightBarLine();
+        dc->StartGraphic(barLine, "", barLine->GetID());
+        this->DrawBarLines(dc, measure, ossia->GetDrawingStaffGrp(), barLine, measure->IsLastInSystem(),
+            system->IsLastOfMdiv(), yBottomPrevious);
+        dc->EndGraphic(barLine, this);
+    }
+
+    if (showForceLeft) {
+        int yBottomPrevious = VRV_UNSET;
+        // Use the ossia drawing barline it that case
+        BarLine *barLine = ossia->GetDrawingLeftBarLine();
+        dc->StartGraphic(barLine, "", barLine->GetID());
+        this->DrawBarLines(dc, measure, ossia->GetDrawingStaffGrp(), barLine, measure->IsLastInSystem(),
+            system->IsLastOfMdiv(), yBottomPrevious);
+        dc->EndGraphic(barLine, this);
+    }
+
+    dc->EndGraphic(ossia, this);
+}
+
+//----------------------------------------------------------------------------
 // View - Staff
 //----------------------------------------------------------------------------
 
@@ -1178,6 +1266,8 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
     assert(staff);
     assert(measure);
     assert(system);
+
+    if (staff->IsHidden()) return;
 
     assert(system->GetDrawingScoreDef());
     StaffDef *staffDef = system->GetDrawingScoreDef()->GetStaffDef(staff->GetN());
@@ -1191,7 +1281,10 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
         staff->SetFromFacsimile(m_doc);
     }
 
-    this->DrawStaffLines(dc, staff, staffDef, measure, system);
+    MRest *mrest = vrv_cast<MRest *>(staff->FindDescendantByType(MREST));
+    if (!mrest || mrest->GetCutout() != cutout_CUTOUT_cutout) {
+        this->DrawStaffLines(dc, staff, staffDef, measure, system);
+    }
 
     if (staffDef && (m_doc->GetType() != Facs)) {
         this->DrawStaffDef(dc, staff, measure);
@@ -1242,6 +1335,10 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, M
 
     x1 = measure->GetDrawingX();
     x2 = x1 + measure->GetWidth();
+    if (staff->IsOssia()) {
+        int shift = staff->GetOssiaDrawingShift(measure, m_doc);
+        x1 += shift;
+    }
     y1 = staff->GetDrawingY();
     if (!staff->HasDrawingRotation()) {
         y2 = y1;
@@ -1550,7 +1647,7 @@ void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMe
 
     if ((system->IsDrawingOptimized() || (m_options->m_systemDivider.GetValue() > SYSTEMDIVIDER_auto))) {
         int y = system->GetDrawingY();
-        Staff *staff = system->GetTopVisibleStaff();
+        Staff *staff = system->GetTopVisibleStaff(true);
         if (staff) {
             // Place it in the middle of current and previous systems - in very tight layout this can collision with
             // the staff above. To be improved
@@ -1605,7 +1702,16 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
 
             Measure *nextMeasure = vrv_cast<Measure *>(system->GetNext(scoreDef, MEASURE));
             if (nextMeasure && scoreDef->DrawLabels()) {
-                this->DrawScoreDef(dc, scoreDef, nextMeasure, nextMeasure->GetDrawingX());
+                ScoreDef *scoreDefToDraw = scoreDef;
+                bool noLabels = false;
+                // If we have an emprty scoreDef after a section with `@restart="true"`
+                // still draw the staffGrp symbols (braces, bracket) but no labels - use the system scoreDef for that
+                if (scoreDef->GetChildCount() == 0) {
+                    scoreDefToDraw = system->GetDrawingScoreDef();
+                    noLabels = true;
+                }
+                this->DrawScoreDef(
+                    dc, scoreDefToDraw, nextMeasure, nextMeasure->GetDrawingX(), NULL, false, false, noLabels);
             }
 
             this->SetScoreDefDrawingWidth(dc, scoreDef);
@@ -1645,7 +1751,10 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
     }
 
     for (Object *current : parent->GetChildren()) {
-        if (current->Is(STAFF)) {
+        if (current->Is(OSSIA)) {
+            this->DrawOssia(dc, vrv_cast<Ossia *>(current), measure, system);
+        }
+        else if (current->Is(STAFF)) {
             // cast to Staff check in DrawStaff
             this->DrawStaff(dc, vrv_cast<Staff *>(current), measure, system);
         }

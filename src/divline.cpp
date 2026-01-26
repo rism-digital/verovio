@@ -28,6 +28,7 @@ namespace vrv {
 
 DivLine::DivLine()
     : LayerElement(DIVLINE)
+    , OffsetInterface()
     , AttColor()
     , AttDivLineLog()
     , AttExtSymAuth()
@@ -35,6 +36,7 @@ DivLine::DivLine()
     , AttNNumberLike()
     , AttVisibility()
 {
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_DIVLINELOG);
     this->RegisterAttClass(ATT_EXTSYMAUTH);
@@ -49,7 +51,7 @@ DivLine::~DivLine() {}
 void DivLine::Reset()
 {
     LayerElement::Reset();
-
+    OffsetInterface::Reset();
     this->ResetColor();
     this->ResetDivLineLog();
     this->ResetExtSymAuth();

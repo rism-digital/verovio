@@ -93,6 +93,7 @@ class Num;
 class Object;
 class Octave;
 class Ornam;
+class Ossia;
 class Page;
 class PageElement;
 class PageMilestoneEnd;
@@ -197,6 +198,8 @@ public:
     virtual FunctorCode VisitLayerDefEnd(LayerDef *layerDef);
     virtual FunctorCode VisitMeasure(Measure *measure);
     virtual FunctorCode VisitMeasureEnd(Measure *measure);
+    virtual FunctorCode VisitOssia(Ossia *ossia);
+    virtual FunctorCode VisitOssiaEnd(Ossia *ossia);
     virtual FunctorCode VisitPage(Page *page);
     virtual FunctorCode VisitPageEnd(Page *page);
     virtual FunctorCode VisitPages(Pages *pages);
@@ -574,6 +577,8 @@ public:
     virtual FunctorCode VisitLayerDefEnd(const LayerDef *layerDef);
     virtual FunctorCode VisitMeasure(const Measure *measure);
     virtual FunctorCode VisitMeasureEnd(const Measure *measure);
+    virtual FunctorCode VisitOssia(const Ossia *ossia);
+    virtual FunctorCode VisitOssiaEnd(const Ossia *ossia);
     virtual FunctorCode VisitPage(const Page *page);
     virtual FunctorCode VisitPageEnd(const Page *page);
     virtual FunctorCode VisitPages(const Pages *pages);

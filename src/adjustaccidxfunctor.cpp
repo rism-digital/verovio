@@ -98,21 +98,31 @@ FunctorCode AdjustAccidXFunctor::VisitAlignmentReference(AlignmentReference *ali
     }
 
     const int count = (int)accids.size();
-    const int middle = (count / 2) + (count % 2);
-    // Zig-zag processing
-    for (int i = 0, j = count - 1; i < middle; ++i, --j) {
+    // Zig-zag processing, taking into consideration multiple accidentals per note
+    for (int i = 0, j = count - 1; i < count; ++i) {
         // top one - but skip if already adjusted (i.e. octaves)
         if (!m_adjustedAccids.contains(accids.at(i))) {
             this->AdjustAccidWithSpace(accids.at(i), alignmentReference, staffSize);
         }
 
-        // Break with odd number of elements once the middle is reached
-        if (i == j) break;
+        // top one - don't zig-zag if the next accidental belongs to current note to preserve order
+        if (i < count - 1 && accids.at(i)->GetFirstAncestor(NOTE) == accids.at(i + 1)->GetFirstAncestor(NOTE)) continue;
+
+        // bottom one - back up to first accidental of current note to preserve order
+        int k = j;
+        while (j > 0 && accids.at(j)->GetFirstAncestor(NOTE) == accids.at(j - 1)->GetFirstAncestor(NOTE)) {
+            --j;
+        }
 
         // bottom one - but skip if already adjusted
-        if (!m_adjustedAccids.contains(accids.at(j))) {
-            this->AdjustAccidWithSpace(accids.at(j), alignmentReference, staffSize);
+        for (int l = j; l <= k; ++l) {
+            if (!m_adjustedAccids.contains(accids.at(l))) {
+                this->AdjustAccidWithSpace(accids.at(l), alignmentReference, staffSize);
+            }
         }
+
+        // bottom one - move to previous position
+        --j;
     }
 
     return FUNCTOR_SIBLINGS;

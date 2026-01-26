@@ -9,6 +9,7 @@
 #define __VRV_TIE_H__
 
 #include "controlelement.h"
+#include "offsetinterface.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -24,7 +25,11 @@ class Note;
 /**
  * This class models the MEI <tie> element.
  */
-class Tie : public ControlElement, public TimeSpanningInterface, public AttCurvature, public AttLineRendBase {
+class Tie : public ControlElement,
+            public OffsetSpanningInterface,
+            public TimeSpanningInterface,
+            public AttCurvature,
+            public AttLineRendBase {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -43,6 +48,11 @@ public:
      * @name Getter to interfaces
      */
     ///@{
+    OffsetSpanningInterface *GetOffsetSpanningInterface() override { return vrv_cast<OffsetSpanningInterface *>(this); }
+    const OffsetSpanningInterface *GetOffsetSpanningInterface() const override
+    {
+        return vrv_cast<const OffsetSpanningInterface *>(this);
+    }
     TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
     const TimePointInterface *GetTimePointInterface() const override
     {

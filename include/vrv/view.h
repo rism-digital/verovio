@@ -61,6 +61,7 @@ class Num;
 class Octave;
 class Options;
 class Ornam;
+class Ossia;
 class Page;
 class PageElement;
 class Pedal;
@@ -187,9 +188,9 @@ protected:
     void DrawSystem(DeviceContext *dc, System *system);
     void DrawSystemList(DeviceContext *dc, System *system, const ClassId classId);
     void DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, BarLine *barLine = NULL,
-        bool isLastMeasure = false, bool isLastSystem = false);
+        bool isLastMeasure = false, bool isLastSystem = false, bool noLabels = false);
     void DrawStaffGrp(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool topStaffGrp = false,
-        bool abbreviations = false);
+        ScoreDefDrawingLabels drawingLabels = DRAWING_LABEL_ABBR);
     void DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure);
     void DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *measure);
     void DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool abbreviations = false);
@@ -208,6 +209,7 @@ protected:
     void DrawMeasure(DeviceContext *dc, Measure *measure, System *system);
     void DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff);
     void DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *system, int yOffset);
+    void DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *system);
     void DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
     void DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, Measure *measure, System *system);
     void DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure);
@@ -338,7 +340,7 @@ protected:
     void DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int horizOffset);
     /** Returns the width of the drawn figures */
     int DrawMeterSigFigures(DeviceContext *dc, int x, int y, MeterSig *meterSig, int den, Staff *staff);
-    void DrawMRptPart(DeviceContext *dc, int xCentered, char32_t smulfCode, int num, bool line, Staff *staff);
+    void DrawMRptPart(DeviceContext *dc, int xCentered, int y, char32_t smulfCode, int num, bool line, Staff *staff);
     ///@}
 
     /**
@@ -641,6 +643,47 @@ private:
      */
     data_STEMDIRECTION GetMensuralStemDir(Layer *layer, Note *note, int verticalCenter);
 
+    /**
+     * Start and end offset calculation for elements with `@vo` or `@ho`.
+     * Offset will be applied only if required by the DeviceContext.
+     * The staff size can be changed when it does for a particular element (e.g., control elements).
+     */
+    ///@{
+    void StartOffset(DeviceContext *dc, const Object *object, int staffSize);
+    void EndOffset(DeviceContext *dc, const Object *object);
+    void SetOffsetStaffSize(const Object *object, int staffSize);
+    ///@}
+
+    /**
+     * Calculate the current offset for a point.
+     * Applies currents offsets recursively (e.g., accid within note).
+     */
+    ///@{
+    void CalcOffset(DeviceContext *dc, int &x, int &y);
+    void CalcOffsetX(DeviceContext *dc, int &x);
+    void CalcOffsetY(DeviceContext *dc, int &y);
+    void CalcOffsetSpanningStartX(DeviceContext *dc, int &x, char spanningType, double factor = 1.0);
+    void CalcOffsetSpanningEndX(DeviceContext *dc, int &x, char spanningType, double factor = 1.0);
+    void CalcOffsetSpanningStartY(DeviceContext *dc, int &y, char spanningType, double factor = 1.0);
+    void CalcOffsetSpanningEndY(DeviceContext *dc, int &y, char spanningType, double factor = 1.0);
+    void CalcOffsetBezier(DeviceContext *dc, Point points[4], char spanningType);
+    ///@}
+
+    /**
+     * Internal class for storing current offset values.
+     */
+    class Offset {
+    public:
+        int m_ho = 0;
+        int m_vo = 0;
+        int m_startho = 0;
+        int m_startvo = 0;
+        int m_endho = 0;
+        int m_endvo = 0;
+        const Object *m_object = NULL;
+        int m_staffSize = 100;
+    };
+
 public:
     /** Document */
     Doc *m_doc;
@@ -685,6 +728,9 @@ private:
     static thread_local int s_drawingLigX[2], s_drawingLigY[2];
     static thread_local bool s_drawingLigObliqua;
     ///@}
+
+    /** The list of current offset values for the element being drawn */
+    std::list<Offset> m_currentOffsets;
 };
 
 } // namespace vrv

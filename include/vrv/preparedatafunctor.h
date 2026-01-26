@@ -42,6 +42,7 @@ public:
      * Functor interface
      */
     ///@{
+    FunctorCode VisitAccid(Accid *accid) override;
     FunctorCode VisitDiv(Div *div) override;
     FunctorCode VisitChord(Chord *chord) override;
     FunctorCode VisitFloatingObject(FloatingObject *floatingObject) override;

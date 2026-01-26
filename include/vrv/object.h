@@ -37,6 +37,8 @@ class Functor;
 class ConstFunctor;
 class LinkingInterface;
 class FacsimileInterface;
+class OffsetInterface;
+class OffsetSpanningInterface;
 class PitchInterface;
 class PositionInterface;
 class Resources;
@@ -173,6 +175,10 @@ public:
     virtual const LinkingInterface *GetLinkingInterface() const { return NULL; }
     virtual FacsimileInterface *GetFacsimileInterface() { return NULL; }
     virtual const FacsimileInterface *GetFacsimileInterface() const { return NULL; }
+    virtual OffsetInterface *GetOffsetInterface() { return NULL; }
+    virtual const OffsetInterface *GetOffsetInterface() const { return NULL; }
+    virtual OffsetSpanningInterface *GetOffsetSpanningInterface() { return NULL; }
+    virtual const OffsetSpanningInterface *GetOffsetSpanningInterface() const { return NULL; }
     virtual PitchInterface *GetPitchInterface() { return NULL; }
     virtual const PitchInterface *GetPitchInterface() const { return NULL; }
     virtual PlistInterface *GetPlistInterface() { return NULL; }
@@ -281,6 +287,14 @@ public:
     void ResetID();
 
     /**
+     * @name Methods for converting attributes to and from their original values (i.e, external / internal).
+     */
+    ///@{
+    virtual void AttributesToExternal() {};
+    virtual void AttributesToInternal() {};
+    ///@}
+
+    /**
      * Methods for setting / getting comments
      */
     std::string GetComment() const { return m_comment; }
@@ -313,6 +327,14 @@ public:
     ///@}
 
     /**
+     * Return reference to the object that is the ancestor of the indicated
+     * descendant object and that is a direct child of the indicated
+     * parent object.  If descendant is itself a direct child of parent,
+     * it returns descendant.
+     */
+    Object *GetDirectChild(Object *parent, Object *descendant);
+
+    /**
      * Return the children as const reference or copy
      */
     ///@{
@@ -337,7 +359,7 @@ public:
      * Fill an array of pairs with all attributes and their values.
      * Return the number of attributes found.
      */
-    int GetAttributes(ArrayOfStrAttr *attributes) const;
+    int GetAttributes(ArrayOfStrAttr *attributes, bool convertToExternal = true) const;
 
     /**
      * Check if an Object has an attribute with the specified value
@@ -1105,6 +1127,15 @@ public:
     ClassRegistrar(std::string name, ClassId classId)
     {
         ObjectFactory::GetInstance()->Register(name, classId, []() -> Object * { return new T(); });
+    }
+
+    /**
+     * The contructor registering the name / constructor map taking a custom factory function.
+     * Use a pseudo ClassId for correct mapping.
+     */
+    ClassRegistrar(const std::string &name, ClassId pseudoClassId, std::function<Object *()> factory)
+    {
+        ObjectFactory::GetInstance()->Register(name, pseudoClassId, factory);
     }
 };
 

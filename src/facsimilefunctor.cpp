@@ -43,7 +43,7 @@ SyncFromFacsimileFunctor::SyncFromFacsimileFunctor(Doc *doc) : Functor()
 
 FunctorCode SyncFromFacsimileFunctor::VisitLayerElement(LayerElement *layerElement)
 {
-    if (!layerElement->Is({ ACCID, BARLINE, CLEF, CUSTOS, DIVLINE, DOT, LIQUESCENT, NC, NOTE, REST, SYL }))
+    if (!layerElement->Is({ ACCID, BARLINE, CHORD, CLEF, CUSTOS, DIVLINE, DOT, LIQUESCENT, NC, NOTE, REST, SYL }))
         return FUNCTOR_CONTINUE;
 
     Zone *zone = layerElement->GetZone();
@@ -221,7 +221,7 @@ SyncToFacsimileFunctor::SyncToFacsimileFunctor(Doc *doc, double ppuFactor) : Fun
 
 FunctorCode SyncToFacsimileFunctor::VisitLayerElement(LayerElement *layerElement)
 {
-    if (!layerElement->Is({ ACCID, BARLINE, CLEF, CUSTOS, DOT, DIVLINE, LIQUESCENT, NC, NOTE, REST, SYL }))
+    if (!layerElement->Is({ ACCID, BARLINE, CHORD, CLEF, CUSTOS, DOT, DIVLINE, LIQUESCENT, NC, NOTE, REST, SYL }))
         return FUNCTOR_CONTINUE;
 
     Zone *zone = this->GetZone(layerElement, layerElement->GetClassName());

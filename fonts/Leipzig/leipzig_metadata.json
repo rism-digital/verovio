@@ -30,7 +30,7 @@
         "tupletBracketThickness": 0.16
     },
     "fontName": "Leipzig",
-    "fontVersion": "5.2.94",
+    "fontVersion": "5.2.97",
     "glyphBBoxes": {
         "4stringTabClef": {
             "bBoxNE": [
@@ -930,6 +930,16 @@
             "bBoxSW": [
                 0.0,
                 0.0
+            ]
+        },
+        "breathMarkSalzedo": {
+            "bBoxNE": [
+                2.4,
+                1.28
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.768
             ]
         },
         "buzzRoll": {

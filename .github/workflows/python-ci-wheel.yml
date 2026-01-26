@@ -23,14 +23,14 @@ jobs:
       fail-fast: false
       # Build the wheels for Linux, Windows and macOS
       matrix:
-        os: [macos-13, macos-15, windows-latest, ubuntu-latest, ubuntu-24.04-arm]
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        os: [macos-15-intel, macos-latest, windows-latest, ubuntu-latest, ubuntu-24.04-arm]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
         architecture: [x86, x64, arm64]
         include:
-          - os: macos-13
+          - os: macos-15-intel
             architecture: x64
             platform_id: macosx_x86_64
-          - os: macos-15
+          - os: macos-latest
             architecture: arm64
             platform_id: macosx_arm64
           - os: windows-latest
@@ -46,13 +46,13 @@ jobs:
             architecture: arm64
             platform_id: manylinux_aarch64
         exclude:
-          - os: macos-13
+          - os: macos-15-intel
             architecture: x86
-          - os: macos-13
+          - os: macos-15-intel
             architecture: arm64
-          - os: macos-15
+          - os: macos-latest
             architecture: x86
-          - os: macos-15
+          - os: macos-latest
             architecture: x64
           - os: ubuntu-latest
             architecture: x86
@@ -68,7 +68,7 @@ jobs:
     steps:
       #===============================================#
       # Set up
-      - uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v4.1.4
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.4
         with:
           fetch-depth: 0
 
@@ -78,7 +78,7 @@ jobs:
           nuget-version: "latest"
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
         with:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.architecture }}
@@ -103,7 +103,7 @@ jobs:
       #===============================================#
       # wheels
       - name: Build wheels
-        uses: pypa/cibuildwheel@c923d83ad9c1bc00211c5041d0c3f73294ff88f6 # v3.1.4
+        uses: pypa/cibuildwheel@63fd63b352a9a8bdcc24791c9dbee952ee9a8abc # v3.3.0
         with:
           output-dir: wheelhouse
         env:
@@ -153,7 +153,7 @@ jobs:
 
       #===============================================#
       # Upload artifacts
-      - uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: cibuildwheel-${{ runner.os }}-python-${{ matrix.python-version }}-${{ matrix.architecture }}
           path: ./wheelhouse/*.whl
@@ -168,14 +168,14 @@ jobs:
     steps:
       #===============================================#
       # Set up
-      - uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v4.1.4
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.4
         with:
           fetch-depth: 0
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
         with:
-          python-version: "3.9"
+          python-version: "3.10"
 
       #===============================================#
       # Swig
@@ -229,9 +229,9 @@ jobs:
 
       #===============================================#
       # Upload artifact
-      - uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
-          name: sdist-${{ runner.os }}-python-3.9
+          name: sdist-${{ runner.os }}-python-3.10
           path: dist/*.tar.gz
 
   #===============================================#
@@ -245,12 +245,12 @@ jobs:
     steps:
       #===============================================#
       # Set up
-      - uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v4.1.4
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.4
 
-      - name: Set up Python 3.9
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+      - name: Set up Python 3.10
+        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
         with:
-          python-version: "3.9"
+          python-version: "3.10"
           architecture: "x64"
 
       #===============================================#
@@ -263,7 +263,7 @@ jobs:
       #===============================================#
       # Prepare artifacts
       - name: Download artifacts
-        uses: actions/download-artifact@v5.0.0 # v4.1.7
+        uses: actions/download-artifact@v7.0.0 # v4.1.7
         with:
           path: bindings/python/artifacts/
 

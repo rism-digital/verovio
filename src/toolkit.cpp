@@ -65,8 +65,7 @@ char *Toolkit::m_humdrumBuffer = NULL;
 
 Toolkit::Toolkit(bool initFont)
 {
-    m_inputFrom = AUTO;
-    m_outputTo = UNKNOWN;
+    m_midiDoc = NULL;
 
     m_humdrumBuffer = NULL;
     m_cString = NULL;
@@ -90,6 +89,8 @@ Toolkit::Toolkit(bool initFont)
 Toolkit::~Toolkit()
 {
     this->ResetLocale();
+
+    this->ResetMidiDoc();
 
     if (m_humdrumBuffer) {
         free(m_humdrumBuffer);
@@ -159,101 +160,12 @@ bool Toolkit::Select(const std::string &selection)
 
 bool Toolkit::SetOutputTo(std::string const &outputTo)
 {
-    if ((outputTo == "humdrum") || (outputTo == "hum")) {
-        m_outputTo = HUMDRUM;
-    }
-    else if (outputTo == "mei") {
-        m_outputTo = MEI;
-    }
-    else if (outputTo == "mei-basic") {
-        m_outputTo = MEI;
-    }
-    else if (outputTo == "mei-pb") {
-        m_outputTo = MEI;
-    }
-    else if (outputTo == "mei-facs") {
-        m_outputTo = MEI;
-    }
-    else if (outputTo == "midi") {
-        m_outputTo = MIDI;
-    }
-    else if (outputTo == "hummidi") {
-        m_outputTo = HUMMIDI;
-    }
-    else if (outputTo == "timemap") {
-        m_outputTo = TIMEMAP;
-    }
-    else if (outputTo == "expansionmap") {
-        m_outputTo = EXPANSIONMAP;
-    }
-    else if (outputTo == "pae") {
-        m_outputTo = PAE;
-    }
-    else if (outputTo == "mei-pb-serialized") {
-        m_outputTo = SERIALIZATION;
-    }
-    else if (outputTo != "svg") {
-        LogError("Output format '%s' is not supported", outputTo.c_str());
-        return false;
-    }
-    return true;
+    return m_options->SetOutputTo(outputTo);
 }
 
 bool Toolkit::SetInputFrom(std::string const &inputFrom)
 {
-    if (inputFrom == "abc") {
-        m_inputFrom = ABC;
-    }
-    else if (inputFrom == "pae") {
-        m_inputFrom = PAE;
-    }
-    else if (inputFrom == "darms") {
-        m_inputFrom = DARMS;
-    }
-    else if (inputFrom == "volpiano") {
-        m_inputFrom = VOLPIANO;
-    }
-    else if (inputFrom == "cmme.xml") {
-        m_inputFrom = CMME;
-    }
-    else if ((inputFrom == "humdrum") || (inputFrom == "hum")) {
-        m_inputFrom = HUMDRUM;
-    }
-    else if (inputFrom == "mei") {
-        m_inputFrom = MEI;
-    }
-    else if ((inputFrom == "musicxml") || (inputFrom == "xml")) {
-        m_inputFrom = MUSICXML;
-    }
-    else if (inputFrom == "md") {
-        m_inputFrom = MUSEDATAHUM;
-    }
-    else if (inputFrom == "musedata") {
-        m_inputFrom = MUSEDATAHUM;
-    }
-    else if (inputFrom == "musedata-hum") {
-        m_inputFrom = MUSEDATAHUM;
-    }
-    else if (inputFrom == "musicxml-hum") {
-        m_inputFrom = MUSICXMLHUM;
-    }
-    else if (inputFrom == "mei-hum") {
-        m_inputFrom = MEIHUM;
-    }
-    else if (inputFrom == "esac") {
-        m_inputFrom = ESAC;
-    }
-    else if (inputFrom == "mei-pb-serialized") {
-        m_inputFrom = SERIALIZATION;
-    }
-    else if (inputFrom == "auto") {
-        m_inputFrom = AUTO;
-    }
-    else {
-        LogError("Input format '%s' is not supported", inputFrom.c_str());
-        return false;
-    }
-    return true;
+    return m_options->SetInputFrom(inputFrom);
 }
 
 FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
@@ -336,8 +248,44 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
     return MEI;
 }
 
+void Toolkit::ResetMidiDoc()
+{
+    // Nothing to do
+    if (!m_midiDoc) return;
+
+    if (m_midiDoc != &m_doc) {
+        delete m_midiDoc;
+    }
+
+    m_midiDoc = NULL;
+}
+
+void Toolkit::SetMidiDoc()
+{
+    // Nothing to do
+    if (m_midiDoc) return;
+
+    // The doc has been expanded, or the midi file must not or cannot be expanded, use the main doc
+    if (m_doc.m_expansionMap.HasExpansionMap() || m_options->m_expandNever.GetValue()
+        || m_doc.m_expansionMap.IsProcessed()) {
+        m_midiDoc = &m_doc;
+    }
+    else {
+        m_midiDoc = new Doc();
+        m_midiDoc->SetOptions(m_doc.GetOptions());
+        m_midiDoc->GetOptions()->m_expandAlways.SetValue(true);
+        Resources &resources = m_midiDoc->GetResourcesForModification();
+        resources.SetPath(m_doc.GetResources().GetPath());
+        resources.InitFonts();
+        MEIInput midiInput(m_midiDoc);
+        midiInput.Import(this->GetMEI());
+        m_midiDoc->PrepareData();
+    }
+}
+
 bool Toolkit::LoadFile(const std::string &filename)
 {
+    this->ResetMidiDoc();
     this->ResetLogBuffer();
 
     if (this->IsUTF16(filename)) {
@@ -483,6 +431,7 @@ bool Toolkit::LoadZipFile(const std::string &filename)
 
 bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
 {
+    this->ResetMidiDoc();
     this->ResetLogBuffer();
 #ifndef NO_MXL_SUPPORT
     ZipFileReader zipFileReader;
@@ -562,6 +511,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     std::string newData;
     Input *input = NULL;
 
+    this->ResetMidiDoc();
     if (resetLogBuffer) {
         this->ResetLogBuffer();
     }
@@ -578,7 +528,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     this->ClearHumdrumBuffer();
 #endif
 
-    auto inputFrom = m_inputFrom;
+    FileFormat inputFrom = m_options->GetInputFrom();
     if (inputFrom == AUTO) {
         inputFrom = IdentifyInputFrom(data);
     }
@@ -1523,8 +1473,11 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
 
 std::string Toolkit::GetNotatedIdForElement(const std::string &xmlId)
 {
-    if (m_doc.m_expansionMap.HasExpansionMap()) {
-        return m_doc.m_expansionMap.GetExpansionIDsForElement(xmlId).front();
+    this->SetMidiDoc();
+
+    assert(m_midiDoc);
+    if (m_midiDoc->m_expansionMap.HasExpansionMap()) {
+        return m_midiDoc->m_expansionMap.GetExpansionIDsForElement(xmlId).front();
     }
     else {
         return xmlId;
@@ -1533,9 +1486,12 @@ std::string Toolkit::GetNotatedIdForElement(const std::string &xmlId)
 
 std::string Toolkit::GetExpansionIdsForElement(const std::string &xmlId)
 {
+    this->SetMidiDoc();
+
+    assert(m_midiDoc);
     jsonxx::Array a;
-    if (m_doc.m_expansionMap.HasExpansionMap()) {
-        for (std::string id : m_doc.m_expansionMap.GetExpansionIDsForElement(xmlId)) {
+    if (m_midiDoc->m_expansionMap.HasExpansionMap()) {
+        for (std::string id : m_midiDoc->m_expansionMap.GetExpansionIDsForElement(xmlId)) {
             a << id;
         }
     }
@@ -1765,6 +1721,10 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
         svg.SetSvgBoundingBoxes(true);
     }
 
+    if (m_options->m_svgContentBoundingBoxes.GetValue()) {
+        svg.SetSvgContentBoundingBoxes(true);
+    }
+
     // set the additional CSS if any
     if (!m_options->m_svgCss.GetValue().empty()) {
         svg.SetCss(m_options->m_svgCss.GetValue());
@@ -1837,10 +1797,12 @@ void Toolkit::GetHumdrum(std::ostream &output)
 
 std::string Toolkit::RenderToMIDI()
 {
+    this->SetMidiDoc();
     this->ResetLogBuffer();
 
     smf::MidiFile outputfile;
-    m_doc.ExportMIDI(&outputfile);
+    assert(m_midiDoc);
+    m_midiDoc->ExportMIDI(&outputfile);
 
     std::stringstream stream;
     outputfile.write(stream);
@@ -1903,24 +1865,29 @@ std::string Toolkit::RenderToTimemap(const std::string &jsonOptions)
         }
     }
 
+    this->SetMidiDoc();
     this->ResetLogBuffer();
 
     std::string output;
-    m_doc.ExportTimemap(output, includeRests, includeMeasures, useFractions);
+    assert(m_midiDoc);
+    m_midiDoc->ExportTimemap(output, includeRests, includeMeasures, useFractions);
     return output;
 }
 
 std::string Toolkit::RenderToExpansionMap()
 {
+    this->SetMidiDoc();
     this->ResetLogBuffer();
 
     std::string output;
-    m_doc.ExportExpansionMap(output);
+    assert(m_midiDoc);
+    m_midiDoc->ExportExpansionMap(output);
     return output;
 }
 
 std::string Toolkit::GetElementsAtTime(int millisec)
 {
+    this->SetMidiDoc();
     this->ResetLogBuffer();
 
     jsonxx::Object o;
@@ -1928,14 +1895,15 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     jsonxx::Array chordArray;
     jsonxx::Array restArray;
 
+    assert(m_midiDoc);
     // Here we need to check that the MIDI timemap is done
-    if (!m_doc.HasTimemap()) {
+    if (!m_midiDoc->HasTimemap()) {
         // generate MIDI timemap before progressing
-        m_doc.CalculateTimemap();
+        m_midiDoc->CalculateTimemap();
     }
 
     MeasureOnsetOffsetComparison matchMeasureTime(millisec);
-    Measure *measure = dynamic_cast<Measure *>(m_doc.FindDescendantByComparison(&matchMeasureTime));
+    Measure *measure = dynamic_cast<Measure *>(m_midiDoc->FindDescendantByComparison(&matchMeasureTime));
 
     if (!measure) {
         return o.json();
@@ -1986,10 +1954,12 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
 bool Toolkit::RenderToMIDIFile(const std::string &filename)
 {
+    this->SetMidiDoc();
     this->ResetLogBuffer();
 
     smf::MidiFile outputfile;
-    m_doc.ExportMIDI(&outputfile);
+    assert(m_midiDoc);
+    m_midiDoc->ExportMIDI(&outputfile);
     outputfile.write(filename);
 
     return true;
@@ -2050,9 +2020,11 @@ int Toolkit::GetPageWithElement(const std::string &xmlId)
 
 int Toolkit::GetTimeForElement(const std::string &xmlId)
 {
+    this->SetMidiDoc();
     this->ResetLogBuffer();
 
-    Object *element = m_doc.FindDescendantByID(xmlId);
+    assert(m_midiDoc);
+    Object *element = m_midiDoc->FindDescendantByID(xmlId);
 
     if (!element) {
         LogWarning("Element '%s' not found", xmlId.c_str());
@@ -2060,11 +2032,11 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
     }
 
     int timeofElement = 0;
-    if (!m_doc.HasTimemap()) {
+    if (!m_midiDoc->HasTimemap()) {
         // generate MIDI timemap before progressing
-        m_doc.CalculateTimemap();
+        m_midiDoc->CalculateTimemap();
     }
-    if (!m_doc.HasTimemap()) {
+    if (!m_midiDoc->HasTimemap()) {
         LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
     }
     if (element->Is(NOTE)) {
@@ -2098,6 +2070,7 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
 
 std::string Toolkit::GetTimesForElement(const std::string &xmlId)
 {
+    this->SetMidiDoc();
     this->ResetLogBuffer();
 
     Object *element = m_doc.FindDescendantByID(xmlId);
@@ -2115,11 +2088,12 @@ std::string Toolkit::GetTimesForElement(const std::string &xmlId)
     jsonxx::Array realTimeOnsetMilliseconds;
     jsonxx::Array realTimeOffsetMilliseconds;
 
-    if (!m_doc.HasTimemap()) {
+    assert(m_midiDoc);
+    if (!m_midiDoc->HasTimemap()) {
         // generate MIDI timemap before progressing
-        m_doc.CalculateTimemap();
+        m_midiDoc->CalculateTimemap();
     }
-    if (!m_doc.HasTimemap()) {
+    if (!m_midiDoc->HasTimemap()) {
         LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
         return o.json();
     }
@@ -2153,9 +2127,11 @@ std::string Toolkit::GetTimesForElement(const std::string &xmlId)
 
 std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
 {
+    this->SetMidiDoc();
     this->ResetLogBuffer();
 
-    Object *element = m_doc.FindDescendantByID(xmlId);
+    assert(m_midiDoc);
+    Object *element = m_midiDoc->FindDescendantByID(xmlId);
     jsonxx::Object o;
 
     if (!element) {
@@ -2164,11 +2140,11 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
     }
 
     if (element->Is(NOTE)) {
-        if (!m_doc.HasTimemap()) {
+        if (!m_midiDoc->HasTimemap()) {
             // generate MIDI timemap before progressing
             m_doc.CalculateTimemap();
         }
-        if (!m_doc.HasTimemap()) {
+        if (!m_midiDoc->HasTimemap()) {
             LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
             return o.json();
         }

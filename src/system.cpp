@@ -140,16 +140,21 @@ int System::GetHeight() const
     return 0;
 }
 
-Staff *System::GetTopVisibleStaff()
+Staff *System::GetTopVisibleStaff(bool includeOssia)
 {
-    return const_cast<Staff *>(std::as_const(*this).GetTopVisibleStaff());
+    return const_cast<Staff *>(std::as_const(*this).GetTopVisibleStaff(includeOssia));
 }
 
-const Staff *System::GetTopVisibleStaff() const
+const Staff *System::GetTopVisibleStaff(bool includeOssia) const
 {
     for (auto child : m_systemAligner.GetChildren()) {
         const StaffAlignment *alignment = vrv_cast<const StaffAlignment *>(child);
-        if (alignment->GetStaff()) return alignment->GetStaff();
+        if (!alignment->GetStaff()) continue;
+        const Staff *staff = alignment->GetStaff();
+        if (!staff->IsOssia()) return staff;
+        if (!includeOssia) continue;
+        // Return the ossia staff only if requested and the ossia in on the first measure
+        if (staff->GetFirstAncestor(MEASURE) == this->FindDescendantByType(MEASURE)) return staff;
     }
     return NULL;
 }

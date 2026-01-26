@@ -360,7 +360,7 @@ FunctorCode InitTimemapAdjustNotesFunctor::VisitArpeg(Arpeg *arpeg)
     Fraction startTime = sortedNotes.front()->GetScoreTimeOnset();
     const Fraction increment = UNACC_GRACENOTE_FRACTION * (int)m_currentTempo;
     for (Note *note : sortedNotes) {
-        if (shift != 0) this->SetNoteStart(note, startTime + shift);
+        if (shift != 0) this->SetNoteStartStop(note, startTime + shift);
         shift = shift + increment;
     }
 
@@ -431,7 +431,7 @@ FunctorCode InitTimemapAdjustNotesFunctor::VisitLayerEnd(Layer *layer)
         // If we have a previous note ending after the start, correct its duration
         if (m_lastNote && (m_lastNote->GetScoreTimeOffset() > startTime)
             && m_lastNote->GetScoreTimeOnset() < startTime) {
-            this->SetNoteStartStop(m_lastNote, m_lastNote->GetScoreTimeOnset(), startTime);
+            this->SetNoteOrChordStartStop(m_lastNote, m_lastNote->GetScoreTimeOnset(), startTime);
         }
 
         for (const auto &grace : m_graces) {
@@ -511,7 +511,7 @@ void InitTimemapAdjustNotesFunctor::SetGraceNotesFor(Note *refNote)
         percent = std::min(95.0, std::max(5.0, percent));
         const Fraction totalDur = refNote->GetScoreTimeDuration() * (int)percent / 100;
         // Adjust the start of the main note
-        this->SetNoteStart(refNote, startTime + totalDur);
+        this->SetNoteOrChordStartStop(refNote, startTime + totalDur);
         graceNoteDur = totalDur / (int)m_graces.size();
     }
     else {
@@ -521,10 +521,8 @@ void InitTimemapAdjustNotesFunctor::SetGraceNotesFor(Note *refNote)
             startTime = startTime - totalDur;
         }
         else {
-            // Adjust the start of the main note
-            refNote->SetScoreTimeOnset(startTime + totalDur);
-            double startRealTime = (startTime + totalDur).ToDouble() * 60.0 / m_currentTempo;
-            refNote->SetRealTimeOnsetSeconds(startRealTime);
+            // Adjust the start of the main note or chord
+            this->SetNoteOrChordStartStop(refNote, startTime + totalDur);
         }
     }
 
@@ -538,23 +536,34 @@ void InitTimemapAdjustNotesFunctor::SetGraceNotesFor(Note *refNote)
     }
 }
 
-void InitTimemapAdjustNotesFunctor::SetNoteStartStop(Note *note, const Fraction &startTime, const Fraction &stopTime)
+void InitTimemapAdjustNotesFunctor::SetNoteOrChordStartStop(
+    Note *note, const Fraction &startTime, const Fraction &stopTime)
 {
-    assert(note);
-
-    this->SetNoteStart(note, startTime);
-    note->SetScoreTimeOffset(stopTime);
-    double stopRealTimeSeconds = stopTime.ToDouble() * 60.0 / m_currentTempo;
-    note->SetRealTimeOffsetSeconds(stopRealTimeSeconds);
+    if (note->IsChordTone()) {
+        Chord *chord = note->IsChordTone();
+        ListOfObjects notes = chord->FindAllDescendantsByType(NOTE);
+        for (Object *child : notes) {
+            Note *chordNote = vrv_cast<Note *>(child);
+            this->SetNoteStartStop(chordNote, startTime, stopTime);
+        }
+    }
+    else {
+        this->SetNoteStartStop(note, startTime, stopTime);
+    }
 }
 
-void InitTimemapAdjustNotesFunctor::SetNoteStart(Note *note, const Fraction &startTime)
+void InitTimemapAdjustNotesFunctor::SetNoteStartStop(Note *note, const Fraction &startTime, const Fraction &stopTime)
 {
     assert(note);
 
     note->SetScoreTimeOnset(startTime);
     double startRealTimeSeconds = startTime.ToDouble() * 60.0 / m_currentTempo;
     note->SetRealTimeOnsetSeconds(startRealTimeSeconds);
+    if (stopTime != VRV_UNSET) {
+        note->SetScoreTimeOffset(stopTime);
+        double stopRealTimeSeconds = stopTime.ToDouble() * 60.0 / m_currentTempo;
+        note->SetRealTimeOffsetSeconds(stopRealTimeSeconds);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -992,6 +1001,8 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
 
 FunctorCode GenerateMIDIFunctor::VisitStaff(const Staff *staff)
 {
+    if (staff->IsOssia()) return FUNCTOR_SIBLINGS;
+
     m_expandedNotes.clear();
 
     return FUNCTOR_CONTINUE;
@@ -1167,6 +1178,13 @@ FunctorCode GenerateTimemapFunctor::VisitRest(const Rest *rest)
     this->AddTimemapEntry(rest);
 
     return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode GenerateTimemapFunctor::VisitStaff(const Staff *staff)
+{
+    if (staff->IsOssia()) return FUNCTOR_SIBLINGS;
+
+    return FUNCTOR_CONTINUE;
 }
 
 void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)

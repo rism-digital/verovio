@@ -44,8 +44,9 @@ const std::map<std::string, NeumeGroup> Neume::s_neumes
 
 static const ClassRegistrar<Neume> s_factory("neume", NEUME);
 
-Neume::Neume() : LayerElement(NEUME), ObjectListInterface(), AttColor()
+Neume::Neume() : LayerElement(NEUME), ObjectListInterface(), OffsetInterface(), AttColor()
 {
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
     this->Reset();
 }
@@ -55,6 +56,7 @@ Neume::~Neume() {}
 void Neume::Reset()
 {
     LayerElement::Reset();
+    OffsetInterface::Reset();
     this->ResetColor();
 }
 

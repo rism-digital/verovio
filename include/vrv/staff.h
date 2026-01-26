@@ -9,6 +9,7 @@
 #define __VRV_STAFF_H__
 
 #include "atts_shared.h"
+#include "drawinginterface.h"
 #include "facsimileinterface.h"
 #include "object.h"
 
@@ -17,6 +18,7 @@ namespace vrv {
 class DeviceContext;
 class Layer;
 class LedgerLine;
+class Measure;
 class StaffAlignment;
 class StaffDef;
 class Syl;
@@ -100,6 +102,7 @@ private:
  * For unmeasured music, one single Measure is added for simplifying internal processing
  */
 class Staff : public Object,
+              public VisibilityDrawingInterface,
               public FacsimileInterface,
               public AttCoordY1,
               public AttNInteger,
@@ -112,11 +115,11 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    Staff(int n = 1);
+    Staff(int n = 1, bool isOssia = false);
     virtual ~Staff();
     Object *Clone() const override { return new Staff(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "staff"; }
+    std::string GetClassName() const override { return (this->IsOssia() ? "oStaff" : "staff"); }
     ///@}
 
     /**
@@ -133,6 +136,32 @@ public:
     {
         return vrv_cast<const FacsimileInterface *>(this);
     }
+    VisibilityDrawingInterface *GetVisibilityDrawingInterface() override
+    {
+        return vrv_cast<VisibilityDrawingInterface *>(this);
+    }
+    const VisibilityDrawingInterface *GetVisibilityDrawingInterface() const override
+    {
+        return vrv_cast<const VisibilityDrawingInterface *>(this);
+    }
+    ///@}
+
+    /**
+     * @name Getters and setters for ossia.
+     */
+    ///@{
+    bool IsOssia() const { return (m_isOssia); }
+    void SetOssia(bool isOssia) { m_isOssia = isOssia; }
+    int GetNForOssia() const;
+    int GetNFromOssia() const;
+    ///@}
+
+    /**
+     * @name Methods for converting attributes to and from their original values.
+     */
+    ///@{
+    void AttributesToExternal() override;
+    void AttributesToInternal() override;
     ///@}
 
     /**
@@ -263,6 +292,11 @@ public:
      */
     void SetFromFacsimile(Doc *doc);
 
+    /**
+     * Get the drawing x if the staff is an ossia and has an ossia staffDef
+     */
+    int GetOssiaDrawingShift(const Measure *measure, Doc *doc) const;
+
     //----------//
     // Functors //
     //----------//
@@ -335,6 +369,9 @@ private:
      * Used only with facsimile rendering
      */
     double m_drawingRotation;
+
+    /** ossia staff flag */
+    bool m_isOssia;
 };
 
 } // namespace vrv

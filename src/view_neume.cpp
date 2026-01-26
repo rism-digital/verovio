@@ -125,6 +125,9 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             int x2 = last->GetDrawingX();
             int y = staff->GetDrawingY();
 
+            this->CalcOffset(dc, x1, y);
+            this->CalcOffsetX(dc, x2);
+
             const int maxNcY = std::max(first->GetDrawingY(), last->GetDrawingY());
             y = std::max(y, maxNcY + unit);
             y += 2 * unit;
@@ -196,6 +199,8 @@ void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     int x, y;
     x = divLine->GetDrawingX();
     y = staff->GetDrawingY();
+
+    this->CalcOffset(dc, x, y);
 
     y -= (m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) * 3;
 

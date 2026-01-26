@@ -25,6 +25,7 @@ namespace vrv {
  */
 class Turn : public ControlElement,
              public TimePointInterface,
+             public AttEnclosingChars,
              public AttExtSymAuth,
              public AttExtSymNames,
              public AttOrnamentAccid,
@@ -58,6 +59,8 @@ public:
      * Get the SMuFL glyph for the turn based on form or glyph.num
      */
     char32_t GetTurnGlyph() const;
+
+    std::pair<char32_t, char32_t> GetEnclosingGlyphs() const;
 
     /**
      * Get the turn height ignoring slash

@@ -75,7 +75,7 @@ public:
         m_baseHeight = 0;
         m_pushBack = false;
         m_viewBoxFactor = (double)DEFINITION_FACTOR;
-        this->SetBrush(1.0);
+        this->SetBrush(-1.0);
         this->SetPen(1, PEN_SOLID);
     }
     DeviceContext(ClassId classId)
@@ -93,7 +93,7 @@ public:
         m_baseHeight = 0;
         m_pushBack = false;
         m_viewBoxFactor = (double)DEFINITION_FACTOR;
-        this->SetBrush(1.0);
+        this->SetBrush(-1.0);
         this->SetPen(1, PEN_SOLID);
     }
     virtual ~DeviceContext();
@@ -147,7 +147,7 @@ public:
     ///@{
     void SetBrush(float opacity, int color = COLOR_NONE);
     void SetPen(int width, PenStyle style, int dashLength = 0, int gapLength = 0,
-        LineCapStyle lineCap = LINECAP_DEFAULT, LineJoinStyle lineJoin = LINEJOIN_DEFAULT, float opacity = 1.0,
+        LineCapStyle lineCap = LINECAP_DEFAULT, LineJoinStyle lineJoin = LINEJOIN_DEFAULT, float opacity = -1.0,
         int color = COLOR_NONE);
     void SetFont(FontInfo *font);
     void SetPushBack() { m_pushBack = true; }
@@ -251,6 +251,11 @@ public:
     void DeactivateGraphicY();
     void ReactivateGraphic();
     ///@}
+
+    /**
+     * Indicate if offset should be applied
+     */
+    virtual bool ApplyOffset() { return false; }
 
     /**
      * @name Method for starting and ending a graphic

@@ -21,6 +21,7 @@
 #include "attalternates.h"
 #include "atttypes.h"
 #include "smufl.h"
+#include "toolkitdef.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -582,6 +583,11 @@ public:
     Options(const Options &options);
     Options &operator=(const Options &options);
 
+    bool SetInputFrom(std::string const &inputFrom);
+    bool SetOutputTo(std::string const &outputTo);
+    FileFormat GetInputFrom() const { return m_inputFromFormat; }
+    FileFormat GetOutputTo() const { return m_outputToFormat; }
+
     const MapOfStrOptions *GetItems() const { return &m_items; }
 
     const std::vector<OptionGrp *> *GetGrps() const { return &m_grps; }
@@ -617,6 +623,9 @@ public:
     OptionBool m_version;
     OptionInt m_xmlIdSeed;
 
+    FileFormat m_inputFromFormat;
+    FileFormat m_outputToFormat;
+
     /**
      * General
      */
@@ -631,7 +640,6 @@ public:
     OptionBool m_condenseNotLastSystem;
     OptionBool m_condenseTempoPages;
     OptionBool m_evenNoteSpacing;
-    OptionString m_expand;
     OptionIntMap m_footer;
     OptionIntMap m_header;
     OptionBool m_humType;
@@ -664,6 +672,7 @@ public:
     OptionIntMap m_smuflTextFont;
     OptionBool m_staccatoCenter;
     OptionBool m_svgBoundingBoxes;
+    OptionBool m_svgContentBoundingBoxes;
     OptionString m_svgCss;
     OptionBool m_svgViewBox;
     OptionBool m_svgHtml5;
@@ -732,6 +741,7 @@ public:
     OptionBool m_octaveAlternativeSymbols;
     OptionDbl m_octaveLineThickness;
     OptionBool m_octaveNoSpanningParentheses;
+    OptionDbl m_ossiaStaffSize;
     OptionDbl m_pedalLineThickness;
     OptionDbl m_repeatBarLineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
@@ -747,6 +757,7 @@ public:
     OptionBool m_spacingDurDetection;
     OptionDbl m_spacingLinear;
     OptionDbl m_spacingNonLinear;
+    OptionDbl m_spacingOssia;
     OptionInt m_spacingStaff;
     OptionInt m_spacingSystem;
     OptionDbl m_staffLineWidth;
@@ -770,9 +781,13 @@ public:
 
     OptionArray m_appXPathQuery;
     OptionArray m_choiceXPathQuery;
+    OptionString m_expand;
+    OptionBool m_expandAlways;
+    OptionBool m_expandNever;
     OptionBool m_loadSelectedMdivOnly;
     OptionBool m_mdivAll;
     OptionString m_mdivXPathQuery;
+    OptionBool m_ossiaHidden;
     OptionArray m_substXPathQuery;
     OptionString m_transpose;
     OptionJson m_transposeMdiv;
