@@ -40,6 +40,7 @@
 //----------------------------------------------------------------------------
 
 #include "MidiFile.h"
+#include "Tunings.h"
 
 namespace vrv {
 
@@ -955,19 +956,26 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
     if (scoreDef->HasTunePname()) {
         referencePitchClass = Note::PnameToPclass(scoreDef->GetTunePname());
     }
-    // set temperament event if corresponding attribute present
-    if (scoreDef->HasTuneTemper()) {
+    // set custom tuning if available
+    if (scoreDef->GetTuneCustom().IsValid()) {
         const int program = m_instrDef && m_instrDef->HasMidiInstrnum() ? m_instrDef->GetMidiInstrnum() : 0;
+        const Tunings::Tuning &tuneCustom = scoreDef->GetTuneCustom().GetTuning();
+        std::vector<std::pair<int, double>> mapping;
+        // sysex messages should not have the high bit (0x80) set, which means that the full 128 MIDI notes
+        // cannot be retuned in the same sysex message. For now, we skip MIDI key 0.
+        for (int i = 1; i < 128; i++) {
+            mapping.push_back(std::make_pair(i, tuneCustom.frequencyForMidiNote(i)));
+        }
+        midiEvent.makeMts2_KeyTuningsByFrequency(mapping, program);
+        m_midiFile->addEvent(m_midiTrack, midiEvent);
+    }
+    // set temperament event if corresponding attribute present
+    else if (scoreDef->HasTuneTemper()) {
         switch (scoreDef->GetTuneTemper()) {
             case TEMPERAMENT_equal: midiEvent.makeTemperamentEqual(referencePitchClass); break;
             case TEMPERAMENT_just: midiEvent.makeTemperamentBad(100.0, referencePitchClass); break;
             case TEMPERAMENT_mean: midiEvent.makeTemperamentMeantone(referencePitchClass); break;
             case TEMPERAMENT_pythagorean: midiEvent.makeTemperamentPythagorean(referencePitchClass); break;
-            case TEMPERAMENT_MAX:
-                if (scoreDef->GetTuneCustom().IsValid()) {
-                    midiEvent.makeTuningCustom(scoreDef->GetTuneCustom().GetTuning(), program);
-                }
-                break;
             default: break;
         }
         m_midiFile->addEvent(m_midiTrack, midiEvent);

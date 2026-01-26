@@ -466,7 +466,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     }
 
     // set MIDI tuning
-    const auto midiTuning =  m_options->m_midiTuning.GetStrValue();
+    const auto midiTuning = m_options->m_midiTuning.GetStrValue();
     if (!midiTuning.empty()) {
         std::string tuningDef;
         std::ifstream f(midiTuning.c_str());

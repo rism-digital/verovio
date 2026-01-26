@@ -19,8 +19,6 @@
 #include <iostream>
 #include <iterator>
 
-#include "Tunings.h"
-
 namespace smf {
 
 //////////////////////////////
@@ -2173,23 +2171,6 @@ void MidiMessage::makeMts2_KeyTuningsBySemitone(std::vector<std::pair<int, doubl
 		data.push_back(lsb);
 	}
 	this->makeSysExMessage(data);
-}
-
-
-
-//////////////////////////////
-//
-// MidiMessage::makeTuningCustom -- Custom tuning
-//
-
-void MidiMessage::makeTuningCustom(const Tunings::Tuning &tuneCustom, int program) {
-	std::vector<std::pair<int, double>> mapping;
-	// sysex messages should not have the high bit (0x80) set, which means that the full 128 MIDI notes
-	// cannot be retuned in the same sysex message. For now, we skip MIDI key 0.
-	for (int i=1; i<128; i++) {
-		mapping.push_back(std::make_pair(i, tuneCustom.frequencyForMidiNote(i)));
-	}
-	this->makeMts2_KeyTuningsByFrequency(mapping, program);
 }
 
 

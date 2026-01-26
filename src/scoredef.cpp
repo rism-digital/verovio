@@ -592,12 +592,6 @@ const PgHead *ScoreDef::GetPgHead(data_PGFUNC func) const
     return vrv_cast<const PgHead *>(this->FindDescendantByComparison(&comparison));
 }
 
-void ScoreDef::SetTuneCustom(CustomTuning tuneCustom)
-{
-    m_tuneCustom = tuneCustom;
-    SetTuneTemper(TEMPERAMENT_MAX);
-}
-
 int ScoreDef::GetMaxStaffSize() const
 {
     const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(this->FindDescendantByType(STAFFGRP));

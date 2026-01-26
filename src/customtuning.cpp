@@ -10,8 +10,8 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "note.h"
 #include "iomusxml.h"
+#include "note.h"
 
 //----------------------------------------------------------------------------
 
@@ -21,11 +21,8 @@ namespace vrv {
 // CustomTuning
 //----------------------------------------------------------------------------
 
-CustomTuning::CustomTuning(
-    const std::string &tuningDef,
-    Doc *doc,
-    bool useMusicXmlAccidentals
-) {
+CustomTuning::CustomTuning(const std::string &tuningDef, Doc *doc, bool useMusicXmlAccidentals)
+{
     try {
         m_tuning = Tunings::Tuning(Tunings::parseASCLData(tuningDef));
         CreateNoteMapping(doc, useMusicXmlAccidentals);
@@ -42,10 +39,8 @@ CustomTuning::CustomTuning(
  * - Detect enharmonics separated by `/`
  * - Detect multiple accidentals separated by `+`
  */
-void CustomTuning::CreateNoteMapping(
-    Doc *doc,
-    bool useMusicXmlAccidentals
-) {
+void CustomTuning::CreateNoteMapping(Doc *doc, bool useMusicXmlAccidentals)
+{
     m_noteMap.clear();
     for (const auto &note : m_tuning.notationMapping.names) {
         std::smatch note_names;
@@ -67,10 +62,8 @@ void CustomTuning::CreateNoteMapping(
                 }
                 else {
                     InstAccidental accidental;
-                    accidental.SetAccid(useMusicXmlAccidentals
-                        ? MusicXmlInput::ConvertAccidentalToAccid(accid)
-                        : accidental.StrToAccidentalWritten(accid)
-                    );
+                    accidental.SetAccid(useMusicXmlAccidentals ? MusicXmlInput::ConvertAccidentalToAccid(accid)
+                                                               : accidental.StrToAccidentalWritten(accid));
                     if (accidental.HasAccid()) {
                         valid = true;
                         if (accidental.GetAccid() != ACCIDENTAL_WRITTEN_n) {
@@ -80,11 +73,12 @@ void CustomTuning::CreateNoteMapping(
                     }
                 }
                 if (!valid) {
-                    LogError("Tuning accidental \"%s\" is neither a %s accidental nor a SMuFL glyph", accid.c_str(), useMusicXmlAccidentals ? "MusicXML" : "MEI");
+                    LogError("Tuning accidental \"%s\" is neither a %s accidental nor a SMuFL glyph", accid.c_str(),
+                        useMusicXmlAccidentals ? "MusicXML" : "MEI");
                 }
                 accid_start = accid_names.suffix().first;
             }
-            m_noteMap.insert({mei, note});
+            m_noteMap.insert({ mei, note });
 
             // get next match
             search_start = note_names.suffix().first;
@@ -98,18 +92,15 @@ void CustomTuning::CreateNoteMapping(
  * Uses the constructed note map to look up the tuning note names.
  * Falls back to the standard note MIDI pitch calculation if lookup fails.
  */
-int CustomTuning::GetMIDIPitch(
-    const Note *note,
-    const int shift,
-    const int octaveShift
-) const {
+int CustomTuning::GetMIDIPitch(const Note *note, const int shift, const int octaveShift) const
+{
     // construct note name for tuning lookup
     data_PITCHNAME pname = note->GetPname();
     if (note->HasPnameGes()) pname = note->GetPnameGes();
     std::string noteName(1, (pname - 1 + ('C' - 'A')) % 7 + 'A');
 
     int accs = 0;
-    for (const Object *object: note->FindAllDescendantsByType(ACCID)) {
+    for (const Object *object : note->FindAllDescendantsByType(ACCID)) {
         const Accid *accid = vrv_cast<const Accid *>(object);
         const AttAccidental *att = dynamic_cast<const AttAccidental *>(accid);
         assert(att);
@@ -136,10 +127,7 @@ int CustomTuning::GetMIDIPitch(
         // FIXME! Special case: when we encounter a B pitch that's in scale degree 0, increment its oct by 1
         // otherwise, it would be in the lower octave
         const auto it = std::find(
-            m_tuning.notationMapping.names.begin(),
-            m_tuning.notationMapping.names.end(),
-            m_noteMap.at(noteName)
-        );
+            m_tuning.notationMapping.names.begin(), m_tuning.notationMapping.names.end(), m_noteMap.at(noteName));
         int scalePosition = (it - m_tuning.notationMapping.names.begin() + 1) % m_tuning.notationMapping.count;
         if (pname == PITCHNAME_b && scalePosition == 0) oct++;
         return m_tuning.midiNoteForNoteName(m_noteMap.at(noteName), oct);

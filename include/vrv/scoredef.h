@@ -254,7 +254,7 @@ public:
     ///@{
     CustomTuning &GetTuneCustom() { return m_tuneCustom; }
     const CustomTuning &GetTuneCustom() const { return m_tuneCustom; }
-    void SetTuneCustom(CustomTuning tuneCustom);
+    void SetTuneCustom(CustomTuning tuneCustom) { m_tuneCustom = tuneCustom; }
     ///@}
 
     /**

@@ -3160,11 +3160,9 @@ void MusicXmlInput::ReadMusicXmlNote(
                     m_currentAccids[note->GetPname()].clear();
                     for (const Object *object : accids) {
                         const Accid *accid = vrv_cast<const Accid *>(object);
-                        m_currentAccids[note->GetPname()].push_back(musicxml::AccidGes(
-                            Att::AccidentalWrittenToGestural(accid->GetAccid()),
-                            accid->GetGlyphName(),
-                            accid->GetGlyphAuth()
-                        ));
+                        m_currentAccids[note->GetPname()].push_back(
+                            musicxml::AccidGes(Att::AccidentalWrittenToGestural(accid->GetAccid()),
+                                accid->GetGlyphName(), accid->GetGlyphAuth()));
                     }
                 }
             }
@@ -4043,21 +4041,29 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
     // get MEI tuning
     pugi::xpath_node meiTuning = node.select_node("play/other-play[@type='tuning-mei']");
     if (meiTuning) {
-        const std::string value = std::regex_replace(meiTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
+        const std::string value
+            = std::regex_replace(meiTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
         data_TEMPERAMENT temperament = TEMPERAMENT_NONE;
-        if (value == "none" || value == "") temperament = TEMPERAMENT_NONE;
-        else if (value == "equal") temperament = TEMPERAMENT_equal;
-        else if (value == "just") temperament = TEMPERAMENT_just;
-        else if (value == "mean") temperament = TEMPERAMENT_mean;
-        else if (value == "pythagorean") temperament = TEMPERAMENT_pythagorean;
-        else LogWarning("MusicXML import: Invalid MEI temperament '%s'", value.c_str());
+        if (value == "none" || value == "")
+            temperament = TEMPERAMENT_NONE;
+        else if (value == "equal")
+            temperament = TEMPERAMENT_equal;
+        else if (value == "just")
+            temperament = TEMPERAMENT_just;
+        else if (value == "mean")
+            temperament = TEMPERAMENT_mean;
+        else if (value == "pythagorean")
+            temperament = TEMPERAMENT_pythagorean;
+        else
+            LogWarning("MusicXML import: Invalid MEI temperament '%s'", value.c_str());
         m_doc->GetFirstScoreDef()->SetTuneTemper(temperament);
     }
 
     // get custom (Ableton) tuning
     pugi::xpath_node abletonTuning = node.select_node("play/other-play[@type='tuning-ableton']");
     if (abletonTuning) {
-        const std::string tuningDef = std::regex_replace(abletonTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
+        const std::string tuningDef
+            = std::regex_replace(abletonTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
         CustomTuning tuning(tuningDef, m_doc, true);
         if (tuning.IsValid()) {
             m_doc->GetFirstScoreDef()->SetTuneCustom(tuning);
@@ -4403,7 +4409,7 @@ void MusicXmlInput::ResetAccidGes(const KeySig *keySig)
     // inspired by KeySig::FillMap() but without the octave repetitions
     m_currentAccids.clear();
     for (int i = PITCHNAME_c; i <= PITCHNAME_g; i++) {
-        m_currentAccids[static_cast<data_PITCHNAME>(i)] = {musicxml::AccidGes()};
+        m_currentAccids[static_cast<data_PITCHNAME>(i)] = { musicxml::AccidGes() };
     }
 
     if (!keySig) return;
@@ -4413,11 +4419,9 @@ void MusicXmlInput::ResetAccidGes(const KeySig *keySig)
         for (const Object *child : childList) {
             const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(child);
             assert(keyAccid);
-            m_currentAccids[keyAccid->GetPname()] = {musicxml::AccidGes(
-                Att::AccidentalWrittenToGestural(keyAccid->GetAccid()),
-                keyAccid->GetGlyphName(),
-                keyAccid->GetGlyphAuth()
-            )};
+            m_currentAccids[keyAccid->GetPname()]
+                = { musicxml::AccidGes(Att::AccidentalWrittenToGestural(keyAccid->GetAccid()), keyAccid->GetGlyphName(),
+                    keyAccid->GetGlyphAuth()) };
         }
         return;
     }
@@ -4425,7 +4429,7 @@ void MusicXmlInput::ResetAccidGes(const KeySig *keySig)
     data_ACCIDENTAL_WRITTEN accidType = keySig->GetAccidType();
     data_ACCIDENTAL_GESTURAL accidGesType = Att::AccidentalWrittenToGestural(accidType);
     for (int i = 0; i < keySig->GetAccidCount(true); ++i) {
-        m_currentAccids[KeySig::GetAccidPnameAt(accidType, i)] = {musicxml::AccidGes(accidGesType, "", "")};
+        m_currentAccids[KeySig::GetAccidPnameAt(accidType, i)] = { musicxml::AccidGes(accidGesType, "", "") };
     }
 }
 
