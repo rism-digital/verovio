@@ -51,8 +51,9 @@ protected:
     bool ParseDeleteAction(jsonxx::Object param, std::string &elementId);
     bool ParseDragAction(jsonxx::Object param, std::string &elementId, int &x, int &y);
     bool ParseKeyDownAction(jsonxx::Object param, std::string &elementid, int &key, bool &shiftKey, bool &ctrlKey);
-    bool ParseInsertAction(jsonxx::Object param, std::string &elementName, std::string &elementId, std::string &insertMode);
-    //bool ParseInsertAction(jsonxx::Object param, std::string &elementType, std::string &startid, std::string &endid);
+    bool ParseInsertAction(
+        jsonxx::Object param, std::string &elementName, std::string &elementId, std::string &insertMode);
+    // bool ParseInsertAction(jsonxx::Object param, std::string &elementType, std::string &startid, std::string &endid);
     bool ParseSetAction(jsonxx::Object param, std::string &elementId, std::string &attribute, std::string &value);
     ///@}
 
