@@ -21,6 +21,7 @@
 #include "attalternates.h"
 #include "atttypes.h"
 #include "smufl.h"
+#include "toolkitdef.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -582,6 +583,11 @@ public:
     Options(const Options &options);
     Options &operator=(const Options &options);
 
+    bool SetInputFrom(std::string const &inputFrom);
+    bool SetOutputTo(std::string const &outputTo);
+    FileFormat GetInputFrom() const { return m_inputFromFormat; }
+    FileFormat GetOutputTo() const { return m_outputToFormat; }
+
     const MapOfStrOptions *GetItems() const { return &m_items; }
 
     const std::vector<OptionGrp *> *GetGrps() const { return &m_grps; }
@@ -616,6 +622,9 @@ public:
     OptionString m_outputTo;
     OptionBool m_version;
     OptionInt m_xmlIdSeed;
+
+    FileFormat m_inputFromFormat;
+    FileFormat m_outputToFormat;
 
     /**
      * General
@@ -773,8 +782,8 @@ public:
     OptionArray m_appXPathQuery;
     OptionArray m_choiceXPathQuery;
     OptionString m_expand;
-    OptionBool m_expandFirst;
-    OptionBool m_expandGenerate;
+    OptionBool m_expandAlways;
+    OptionBool m_expandNever;
     OptionBool m_loadSelectedMdivOnly;
     OptionBool m_mdivAll;
     OptionString m_mdivXPathQuery;
