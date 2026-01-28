@@ -29,6 +29,7 @@ static const ClassRegistrar<Mordent> s_factory("mordent", MORDENT);
 Mordent::Mordent()
     : ControlElement(MORDENT)
     , TimePointInterface()
+    , AttEnclosingChars()
     , AttExtSymAuth()
     , AttExtSymNames()
     , AttOrnamentAccid()
@@ -36,6 +37,7 @@ Mordent::Mordent()
     , AttMordentLog()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
+    this->RegisterAttClass(ATT_ENCLOSINGCHARS);
     this->RegisterAttClass(ATT_EXTSYMAUTH);
     this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_ORNAMENTACCID);
@@ -51,6 +53,7 @@ void Mordent::Reset()
 {
     ControlElement::Reset();
     TimePointInterface::Reset();
+    this->ResetEnclosingChars();
     this->ResetExtSymAuth();
     this->ResetExtSymNames();
     this->ResetOrnamentAccid();
@@ -104,6 +107,18 @@ FunctorCode Mordent::AcceptEnd(Functor &functor)
 FunctorCode Mordent::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitMordentEnd(this);
+}
+
+std::pair<char32_t, char32_t> Mordent::GetEnclosingGlyphs() const
+{
+    if (this->HasEnclose()) {
+        switch (this->GetEnclose()) {
+            case ENCLOSURE_brack: return { SMUFL_E26C_accidentalBracketLeft, SMUFL_E26D_accidentalBracketRight };
+            case ENCLOSURE_paren: return { SMUFL_E26A_accidentalParensLeft, SMUFL_E26B_accidentalParensRight };
+            default: break;
+        }
+    }
+    return { 0, 0 };
 }
 
 } // namespace vrv

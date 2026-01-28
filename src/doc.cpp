@@ -111,7 +111,20 @@ void Doc::Reset()
     Object::Reset();
     this->ResetID();
 
+    m_header.reset();
+    m_front.reset();
+    m_back.reset();
+
+    this->ResetToSerialization();
+
+    m_isCastOff = false;
+}
+
+void Doc::ResetToSerialization()
+{
     this->ClearSelectionPages();
+
+    this->ClearChildren();
 
     m_type = Raw;
     m_notationType = NOTATIONTYPE_NONE;
@@ -138,7 +151,6 @@ void Doc::Reset()
     m_markup = MARKUP_DEFAULT;
     m_isMensuralMusicOnly = BOOLEAN_NONE;
     m_isNeumeLines = false;
-    m_isCastOff = false;
     m_visibleScores.clear();
     m_focusStatus = FOCUS_UNSET;
 
@@ -147,9 +159,7 @@ void Doc::Reset()
     m_drawingSmuflFontSize = 0;
     m_drawingLyricFontSize = 0;
 
-    m_header.reset();
-    m_front.reset();
-    m_back.reset();
+    m_isCastOff = true;
 }
 
 void Doc::ResetToLoading()
@@ -578,7 +588,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             controlEvents = false;
         }
     }
-    midiFile->sortTracks();
+    midiFile->sortTracksNoteOffsBeforeOns();
 }
 
 bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeasures, bool useFractions)
@@ -681,12 +691,13 @@ void Doc::PrepareData()
     }
 
     // Display warning if some elements were not matched
-    const int unmatchedElements = (int)std::count_if(interfaceOwnerPairs.cbegin(), interfaceOwnerPairs.cend(),
-        [](const ListOfSpanningInterOwnerPairs::value_type &entry) {
-            return (entry.first->HasStartid() && entry.first->HasEndid());
-        });
-    if (unmatchedElements > 0) {
-        LogWarning("%d time spanning element(s) with startid and endid could not be matched.", unmatchedElements);
+    for (const auto &pair : interfaceOwnerPairs) {
+        if (pair.first->HasStartid() && pair.first->HasEndid()) {
+            LogWarning(
+                "Time spanning element '%s' with @xml:id '%s', @startid '%s', and @endid '%s' could not be matched.",
+                pair.second->GetClassName().c_str(), pair.second->GetID().c_str(), pair.first->GetStartid().c_str(),
+                pair.first->GetEndid().c_str());
+        }
     }
 
     /************ Resolve @startid (only) ************/
@@ -751,8 +762,9 @@ void Doc::PrepareData()
     }
 
     // If some are still there, then it is probably an issue in the encoding
-    if (!preparePlist.GetInterfaceIDPairs().empty()) {
-        LogWarning("%d element(s) with a @plist could not match the target", preparePlist.GetInterfaceIDPairs().size());
+    for (const auto &pair : preparePlist.GetInterfaceIDPairs()) {
+        LogWarning("Element '%s' with @xml:id '%s' and a @plist could not match the target '%s'.",
+            pair.first->GetClassName().c_str(), pair.first->GetID().c_str(), pair.second.c_str());
     }
 
     /************ Resolve cross staff ************/
@@ -862,9 +874,9 @@ void Doc::PrepareData()
     root->Process(prepareStaffCurrentTimeSpanning);
 
     // Something must be wrong in the encoding because a TimeSpanningInterface was left open
-    if (!prepareStaffCurrentTimeSpanning.GetTimeSpanningElements().empty()) {
-        LogDebug("%d time spanning elements could not be set as running",
-            prepareStaffCurrentTimeSpanning.GetTimeSpanningElements().size());
+    for (const auto &obj : prepareStaffCurrentTimeSpanning.GetTimeSpanningElements()) {
+        LogWarning("Time spanning element '%s' with @xml:id '%s' could not be set as running.",
+            obj->GetClassName().c_str(), obj->GetID().c_str());
     }
 
     /************ Resolve mRpt ************/
@@ -910,7 +922,7 @@ void Doc::PrepareData()
     PrepareAltSymFunctor prepareAltSym;
     root->Process(prepareAltSym);
 
-    /************ Instanciate LayerElement parts (stem, flag, dots, etc) ************/
+    /************ Instantiate LayerElement parts (stem, flag, dots, etc) ************/
 
     PrepareLayerElementPartsFunctor prepareLayerElementParts;
     root->Process(prepareLayerElementParts);
@@ -957,6 +969,11 @@ void Doc::ScoreDefSetCurrentDoc(bool force)
 
     ScoreDefSetCurrentFunctor scoreDefSetCurrent(this);
     this->Process(scoreDefSetCurrent);
+
+    if (scoreDefSetCurrent.HasOssia()) {
+        ScoreDefSetOssiaFunctor scoreDefSetOssia(this);
+        this->Process(scoreDefSetOssia);
+    }
 
     this->ScoreDefSetGrpSymDoc();
 
@@ -1589,19 +1606,58 @@ void Doc::TransposeDoc()
 
 void Doc::ExpandExpansions()
 {
-    // Upon MEI import: use expansion ID, given by command line argument
-    std::string expansionId = this->GetOptions()->m_expand.GetValue();
-    if (expansionId.empty()) return;
+    // Passing this argument does not do anything
+    if (this->GetOptions()->m_expandNever.GetValue()) return;
 
-    Expansion *start = dynamic_cast<Expansion *>(this->FindDescendantByID(expansionId));
-    if (start == NULL) {
-        LogWarning("Expansion ID '%s' not found. Nothing expanded.", expansionId.c_str());
+    // Nothing to do in these cases - marked the map as processed
+    if (this->IsMensuralMusicOnly() || this->IsTranscription()) {
+        m_expansionMap.SetProcessed(true);
         return;
     }
 
-    xsdAnyURI_List expansionList = start->GetPlist();
-    xsdAnyURI_List existingList;
-    m_expansionMap.Expand(expansionList, existingList, start);
+    // The list of output formats that we always expand, and generate an expansion if there isn't one
+    static std::vector<FileFormat> valid = { MIDI, TIMEMAP, EXPANSIONMAP };
+    bool expandInputFormat = (std::find(valid.begin(), valid.end(), m_options->GetOutputTo()) != valid.end());
+
+    // Nothing to expand if the input format does not requires it and it is not forced
+    if (!expandInputFormat && !this->GetOptions()->m_expandAlways.GetValue()) return;
+
+    std::string expansionId = this->GetOptions()->m_expand.GetValue();
+    bool expandSelected = (!expansionId.empty());
+
+    // We have no --expand xmlid, so generate an expansion or use the first one (generation will be skipped)
+    if (!expandSelected) {
+        ListOfObjects scores = this->FindAllDescendantsByType(SCORE);
+        for (Object *object : scores) {
+            Score *score = vrv_cast<Score *>(object);
+            assert(score);
+            // Do not generate an expansion if there is already one
+            if (!score->FindDescendantByType(EXPANSION)) {
+                m_expansionMap.GenerateExpansionFor(score);
+            }
+        }
+    }
+
+    Expansion *startExpansion = NULL;
+    if (expandSelected) {
+        startExpansion = dynamic_cast<Expansion *>(this->FindDescendantByID(expansionId));
+        if (startExpansion == NULL) {
+            LogWarning("Expansion ID '%s' not found. Nothing expanded.", expansionId.c_str());
+            return;
+        }
+    }
+    // Use the first one (encoded or generated)
+    else {
+        startExpansion = dynamic_cast<Expansion *>(this->FindDescendantByType(EXPANSION));
+        if (startExpansion == NULL) {
+            LogWarning("No expansion found. Nothing expanded.");
+            return;
+        }
+    }
+
+    xsdAnyURI_List existingList; // list of xml:id strings of elements already in the document
+    xsdAnyURI_List deletionList; // list of xml:id strings of elements not cloned and to be deleted at the end
+    m_expansionMap.Expand(startExpansion, existingList, startExpansion, deletionList, true);
 
     // save original/notated expansion as element in expanded MEI
     // Expansion *originalExpansion = new Expansion();
@@ -2349,7 +2405,7 @@ int Doc::GetAdjustedDrawingPageWidth() const
 
 void Doc::SetMensuralMusicOnly(data_BOOLEAN isMensuralMusicOnly)
 {
-    // Already marked as non mensural only cannoy be set back
+    // Already marked as non mensural only cannot be set back
     if (m_isMensuralMusicOnly != BOOLEAN_false) {
         m_isMensuralMusicOnly = isMensuralMusicOnly;
     }

@@ -107,7 +107,7 @@ public:
     /**
      * Specific method for measures
      */
-    void AddChildBack(Object *object);
+    bool AddChildBack(Object *object);
 
     /**
      * Return true if the Measure has cached values for the horizontal layout
@@ -301,6 +301,17 @@ public:
     ///@{
     Staff *GetBottomVisibleStaff();
     const Staff *GetBottomVisibleStaff() const;
+    ///@}
+
+    /**
+     * Return the first or last staff taking into account ossias (or not).
+     */
+    ///@{
+    int GetStaffCount(bool excludeOStaves = true) const;
+    Staff *GetFirstStaff(bool excludeOStaves = true);
+    const Staff *GetFirstStaff(bool excludeOStaves = true) const;
+    Staff *GetLastStaff(bool excludeOStaves = true);
+    const Staff *GetLastStaff(bool excludeOStaves = true) const;
     ///@}
 
     /**

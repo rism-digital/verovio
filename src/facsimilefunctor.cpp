@@ -43,7 +43,7 @@ SyncFromFacsimileFunctor::SyncFromFacsimileFunctor(Doc *doc) : Functor()
 
 FunctorCode SyncFromFacsimileFunctor::VisitLayerElement(LayerElement *layerElement)
 {
-    if (!layerElement->Is({ ACCID, BARLINE, CLEF, CUSTOS, DIVLINE, DOT, LIQUESCENT, NC, NOTE, REST, SYL }))
+    if (!layerElement->Is({ ACCID, BARLINE, CHORD, CLEF, CUSTOS, DIVLINE, DOT, LIQUESCENT, NC, NOTE, REST, SYL }))
         return FUNCTOR_CONTINUE;
 
     Zone *zone = layerElement->GetZone();
@@ -89,7 +89,7 @@ FunctorCode SyncFromFacsimileFunctor::VisitPageEnd(Page *page)
         m_ppuFactor = DEFINITION_FACTOR;
     }
 
-    // The staff size is calculated based on the zone height and takes into acocunt the rotation
+    // The staff size is calculated based on the zone height and takes into account the rotation
     for (auto &[staff, zone] : m_staffZones) {
         double rotate = (zone->HasRotate()) ? zone->GetRotate() : 0.0;
         int yDiff
@@ -221,7 +221,7 @@ SyncToFacsimileFunctor::SyncToFacsimileFunctor(Doc *doc, double ppuFactor) : Fun
 
 FunctorCode SyncToFacsimileFunctor::VisitLayerElement(LayerElement *layerElement)
 {
-    if (!layerElement->Is({ ACCID, BARLINE, CLEF, CUSTOS, DOT, DIVLINE, LIQUESCENT, NC, NOTE, REST, SYL }))
+    if (!layerElement->Is({ ACCID, BARLINE, CHORD, CLEF, CUSTOS, DOT, DIVLINE, LIQUESCENT, NC, NOTE, REST, SYL }))
         return FUNCTOR_CONTINUE;
 
     Zone *zone = this->GetZone(layerElement, layerElement->GetClassName());

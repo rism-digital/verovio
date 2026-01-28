@@ -15,9 +15,15 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "ending.h"
 #include "expansion.h"
+#include "lem.h"
 #include "linkinginterface.h"
+#include "measure.h"
 #include "plistinterface.h"
+#include "rdg.h"
+#include "score.h"
+#include "section.h"
 #include "timeinterface.h"
 #include "vrv.h"
 
@@ -27,52 +33,101 @@ namespace vrv {
 // ExpansionMap
 //----------------------------------------------------------------------------
 
-ExpansionMap::ExpansionMap() {}
+ExpansionMap::ExpansionMap()
+{
+    this->Reset();
+}
 
 ExpansionMap::~ExpansionMap() {}
 
 void ExpansionMap::Reset()
 {
     m_map.clear();
+    m_isProcessed = false;
 }
 
-void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &existingList, Object *prevSect)
+Object *ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Object *prevSect,
+    xsdAnyURI_List &deletionList, bool deleteList = false)
 {
+    assert(expansion);
+    Object *parent = expansion->GetParent();
+    assert(parent);
+
+    xsdAnyURI_List expansionPlist = expansion->GetPlist();
+    if (expansionPlist.empty()) {
+        LogWarning("ExpansionMap::Expand: Expansion element %s has empty @plist. Nothing expanded.",
+            expansion->GetID().c_str());
+        return prevSect;
+    }
+
     assert(prevSect);
     assert(prevSect->GetParent());
 
-    // find all siblings of expansion element to know what in MEI file
-    const ArrayOfObjects &expansionSiblings = prevSect->GetParent()->GetChildren();
-    std::vector<std::string> reductionList;
-    for (Object *object : expansionSiblings) {
-        if (object->Is({ SECTION, ENDING, LEM, RDG })) reductionList.push_back(object->GetID());
-    }
+    Object *insertHere = nullptr; // cloned parent container
 
-    for (std::string s : expansionList) {
-        if (s.rfind("#", 0) == 0) s = s.substr(1, s.size() - 1); // remove trailing hash from reference
-        Object *currSect = prevSect->GetParent()->FindDescendantByID(s); // find section pointer of reference string
-        if (!currSect) {
-            // Warn about referenced element not found and continue
-            LogWarning("ExpansionMap::Expand: Element referenced in @plist not found: %s", s.c_str());
-            continue;
+    // If expansion parent already exists, create a new empty such element
+    if (std::find(existingList.begin(), existingList.end(), parent->GetID()) != existingList.end()) {
+        Object *newContainer;
+        // check type of expansion parent
+        if (parent->Is(SECTION)) {
+            newContainer = static_cast<Object *>(new Section());
         }
-        if (currSect->Is(EXPANSION)) { // if reference is itself an expansion, resolve it recursively
-            // remove parent from reductionList, if expansion
-            for (auto it = begin(reductionList); it != end(reductionList);) {
-                if ((*it).compare(currSect->GetParent()->GetID()) == 0) {
-                    it = reductionList.erase(it);
-                }
-                else {
-                    ++it;
-                }
-            }
-            Expansion *currExpansion = vrv_cast<Expansion *>(currSect);
-            assert(currExpansion);
-            this->Expand(currExpansion->GetPlist(), existingList, currSect);
+        else if (parent->Is(ENDING)) {
+            newContainer = static_cast<Object *>(new Ending());
+        }
+        else if (parent->Is(LEM)) {
+            newContainer = static_cast<Object *>(new Lem());
+        }
+        else if (parent->Is(RDG)) {
+            newContainer = static_cast<Object *>(new Rdg());
         }
         else {
-            if (std::find(existingList.begin(), existingList.end(), s)
-                != existingList.end()) { // section exists in list
+            LogWarning(
+                "ExpansionMap::Expand: Expansion element %s has unsupported parent type.", expansion->GetID().c_str());
+            return prevSect;
+        }
+
+        assert(parent->GetParent());
+        Object *referenceChild = parent->GetDirectChild(parent->GetParent(), prevSect);
+        assert(referenceChild);
+        parent->GetParent()->InsertAfter(referenceChild, newContainer);
+        GeneratePredictableIDs(parent, newContainer);
+        LogDebug("Creating new container <%s> for expansion element %s", newContainer->GetClassName().c_str(),
+            newContainer->GetID().c_str());
+
+        insertHere = newContainer;
+    }
+    else if (std::find(existingList.begin(), existingList.end(), parent->GetID()) == existingList.end()) {
+        existingList.push_back(parent->GetID());
+    }
+
+    // find and add all relevant (and new) expansion sibling ids to deletionList
+    for (Object *siblings : parent->GetChildren()) {
+        if (siblings->Is({ SECTION, ENDING, LEM, RDG })
+            && std::count(deletionList.begin(), deletionList.end(), siblings->GetID()) == 0) {
+            deletionList.push_back(siblings->GetID());
+        }
+    }
+
+    // iterate over expansion plist
+    for (std::string id : expansionPlist) {
+        LogDebug("Looking for element in @plist: %s", id.c_str());
+        if (id.rfind("#", 0) == 0) id = id.substr(1, id.size() - 1); // remove leading hash from id
+        Object *currSect = parent->FindDescendantByID(id); // find section pointer for id string
+        if (currSect == NULL) {
+            // Warn about referenced element not found and continue
+            LogWarning("ExpansionMap::Expand: Element referenced in @plist not found: %s", id.c_str());
+            continue;
+        }
+        if (currSect->Is(EXPANSION)) { // if id is itself an expansion, resolve it recursively
+            Expansion *currExpansion = vrv_cast<Expansion *>(currSect);
+            assert(currExpansion);
+            prevSect = this->Expand(currExpansion, existingList, prevSect, deletionList);
+        }
+        else {
+            // id already in existingList or currSect is not in expansion parent, clone object, update ids, insert it
+            if (std::find(existingList.begin(), existingList.end(), id) != existingList.end()
+                || (insertHere != NULL && currSect->GetParent() != insertHere)) {
 
                 // clone current section/ending/rdg/lem and rename it, adding -"rend2" for the first repetition etc.
                 Object *clonedObject = currSect->Clone();
@@ -93,8 +148,17 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
                 // go through cloned objects, find TimePointing/SpanningInterface, PListInterface, LinkingInterface
                 this->UpdateIDs(clonedObject);
 
-                prevSect->GetParent()->InsertAfter(prevSect, clonedObject);
+                LogDebug("Cloning element in @plist: %s", clonedObject->GetID().c_str());
+
+                if (insertHere != NULL) {
+                    insertHere->AddChild(clonedObject); // add to new container, if it exists
+                }
+                else {
+                    prevSect->GetParent()->InsertAfter(prevSect, clonedObject); // or add after previous section
+                }
+
                 prevSect = clonedObject;
+                existingList.push_back(clonedObject->GetID());
             }
             else { // add to existingList, remember previous element, re-order if necessary
 
@@ -103,48 +167,54 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
                 int childCount = prevSect->GetParent()->GetChildCount();
                 int currIdx = currSect->GetIdx();
 
-                // If prevSect has a next element and if it is different than the currSect or has no next element,
-                // move it to after the currSect.
-                if (prevIdx < childCount - 1) {
-                    Object *nextElement = prevSect->GetParent()->GetChild(prevIdx + 1);
-                    assert(nextElement);
-                    if (nextElement->Is({ SECTION, ENDING, LEM, RDG }) && nextElement != currSect) {
+                // check re-order when within same parent
+                if (currSect->GetParent()->GetID() == prevSect->GetParent()->GetID()) {
+                    // If prevSect has a next element and if it is different than the currSect or has no next element,
+                    // move it to after the currSect.
+                    if (prevIdx < childCount - 1) {
+                        Object *nextElement = prevSect->GetParent()->GetChild(prevIdx + 1);
+                        assert(nextElement);
+                        if (nextElement->Is({ SECTION, ENDING, LEM, RDG }) && nextElement != currSect) {
+                            moveCurrentElement = true;
+                        }
+                    }
+                    else {
                         moveCurrentElement = true;
                     }
-                }
-                else {
-                    moveCurrentElement = true;
                 }
 
                 // move prevSect to after currSect
                 if (moveCurrentElement && currIdx < prevIdx && prevIdx < childCount) {
+                    LogDebug(
+                        "Re-ordering element %s to after %s", currSect->GetID().c_str(), prevSect->GetID().c_str());
                     currSect->GetParent()->RotateChildren(currIdx, currIdx + 1, prevIdx + 1);
+                }
+                else {
+                    LogDebug("Leaving existing element %s", currSect->GetID().c_str());
                 }
 
                 prevSect = currSect;
-                existingList.push_back(s);
-            }
-
-            // remove s from reductionList
-            for (auto it = begin(reductionList); it != end(reductionList);) {
-                if ((*it).compare(s) == 0) {
-                    it = reductionList.erase(it);
-                }
-                else {
-                    ++it;
-                }
+                existingList.push_back(id);
             }
         }
     }
 
-    // remove unused sections from structure
-    for (std::string r : reductionList) {
-        Object *currSect = prevSect->GetParent()->FindDescendantByID(r);
-        assert(currSect);
+    // at the very end, remove unused sections from structure if not in existingList
+    if (deleteList) {
+        for (std::string del : deletionList) {
+            long cnt = std::count(existingList.begin(), existingList.end(), del);
+            if (cnt == 0) {
+                Object *currSect = parent->FindDescendantByID(del); // find section pointer for id string
+                assert(currSect);
 
-        int idx = currSect->GetIdx();
-        prevSect->GetParent()->DetachChild(idx);
+                int idx = currSect->GetIdx();
+                LogDebug("ExpansionMap::Expand: Removing unused section/ending/rdg/lem with id %s", del.c_str());
+                currSect->GetParent()->DetachChild(idx);
+            }
+        }
     }
+
+    return prevSect;
 }
 
 bool ExpansionMap::UpdateIDs(Object *object)
@@ -208,16 +278,12 @@ bool ExpansionMap::UpdateIDs(Object *object)
             if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);
             newIdString = this->GetExpansionIDsForElement(oldIdString).back();
             if (!newIdString.empty()) interface->SetCopyof("#" + newIdString);
-            // @corresp
-            oldIdString = interface->GetCorresp();
-            if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);
-            newIdString = this->GetExpansionIDsForElement(oldIdString).back();
-            if (!newIdString.empty()) interface->SetCorresp("#" + newIdString);
             // @synch
             oldIdString = interface->GetSynch();
             if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);
             newIdString = this->GetExpansionIDsForElement(oldIdString).back();
             if (!newIdString.empty()) interface->SetSynch("#" + newIdString);
+            // @corresp is already handle by the Object::Clone and LinkingInterface::AddBackLink
         }
         this->UpdateIDs(o);
     }
@@ -296,6 +362,110 @@ void ExpansionMap::ToJson(std::string &output)
         ;
     }
     output = expansionmap.json();
+}
+
+void ExpansionMap::GenerateExpansionFor(Score *score)
+{
+    m_isProcessed = true;
+
+    if (score->HasEditorialContent()) {
+        LogWarning("An expansion cannot be generated with editorial content");
+        return;
+    }
+
+    if (score->FindAllDescendantsByType(SECTION).size() > 1) {
+        LogWarning("An expansion cannot be generated with more than one section");
+        return;
+    }
+
+    Section *section = vrv_cast<Section *>(score->FindDescendantByType(SECTION, 1));
+    assert(section);
+
+    ArrayOfObjects childrenArray = section->GetChildrenForModification();
+    ListOfObjects children(childrenArray.begin(), childrenArray.end());
+
+    Expansion *expansion = new Expansion();
+    section->InsertChild(expansion, 0);
+
+    ListOfObjects::iterator first = children.begin();
+    ListOfObjects::iterator last = children.begin();
+
+    bool isStartFromPrevious = false;
+
+    for (auto current = children.begin(); current != children.end(); current++) {
+        if ((*current)->Is(MEASURE)) {
+            Measure *measure = vrv_cast<Measure *>(*current);
+            // The current measure has a repeat end on its left
+            if (ExpansionMap::IsPreviousRepeatEnd(measure)) {
+                std::string ref = "#" + this->CreateSection(section, first, last);
+                expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
+                expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
+            }
+            if (isStartFromPrevious || ExpansionMap::IsRepeatStart(measure)) {
+                first = current;
+            }
+            // The current measure has a repeat start on its right
+            isStartFromPrevious = ExpansionMap::IsNextRepeatStart(measure);
+            last = current;
+            if (ExpansionMap::IsRepeatEnd(measure)) {
+                std::string ref = "#" + this->CreateSection(section, first, last);
+                expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
+                expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
+            }
+        }
+    }
+}
+
+std::string ExpansionMap::CreateSection(
+    Section *section, const ListOfObjects::iterator &first, const ListOfObjects::iterator &last)
+{
+    Section *subSection = new Section();
+    section->InsertBefore(*first, subSection);
+    for (auto sectionCurrent = first; sectionCurrent != std::next(last); sectionCurrent++) {
+        section->DetachChild((*sectionCurrent)->GetIdx());
+        subSection->AddChild(*sectionCurrent);
+    }
+    return subSection->GetID();
+}
+
+//----------------------------------------------------------------------------
+// Static methods
+//----------------------------------------------------------------------------
+
+bool ExpansionMap::IsRepeatStart(Measure *measure)
+{
+    static const std::vector<data_BARRENDITION> match{ BARRENDITION_rptboth, BARRENDITION_rptstart };
+
+    if (!measure->HasLeft()) return false;
+
+    return (std::find(match.begin(), match.end(), measure->GetLeft()) != match.end());
+}
+
+bool ExpansionMap::IsRepeatEnd(Measure *measure)
+{
+    static const std::vector<data_BARRENDITION> match{ BARRENDITION_rptboth, BARRENDITION_rptend };
+
+    if (!measure->HasRight()) return false;
+
+    return (std::find(match.begin(), match.end(), measure->GetRight()) != match.end());
+}
+
+bool ExpansionMap::IsNextRepeatStart(Measure *measure)
+{
+    static const std::vector<data_BARRENDITION> match{ BARRENDITION_rptboth, BARRENDITION_rptstart };
+
+    if (!measure->HasRight()) return false;
+
+    return (std::find(match.begin(), match.end(), measure->GetRight()) != match.end());
+}
+
+bool ExpansionMap::IsPreviousRepeatEnd(Measure *measure)
+{
+    static const std::vector<data_BARRENDITION> match{ BARRENDITION_rptboth, BARRENDITION_rptend };
+
+    if (!measure->HasLeft()) return false;
+
+    return (std::find(match.begin(), match.end(), measure->GetLeft()) != match.end());
 }
 
 } // namespace vrv

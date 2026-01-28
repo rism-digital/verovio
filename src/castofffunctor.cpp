@@ -226,7 +226,7 @@ FunctorCode CastOffSystemsFunctor::VisitSystemEnd(System *system)
 {
     if (m_pendingElements.empty()) return FUNCTOR_CONTINUE;
 
-    // Otherwise add all pendings objects
+    // Otherwise add all pending objects
     for (Object *pendingElement : m_pendingElements) {
         m_currentSystem->AddChild(pendingElement);
     }
@@ -292,7 +292,7 @@ FunctorCode CastOffPagesFunctor::VisitPageEnd(Page *page)
 {
     if (m_pendingPageElements.empty()) return FUNCTOR_CONTINUE;
 
-    // Otherwise add all pendings objects
+    // Otherwise add all pending objects
     for (Object *pendingElement : m_pendingPageElements) {
         m_currentPage->AddChild(pendingElement);
     }

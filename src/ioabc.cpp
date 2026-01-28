@@ -37,6 +37,7 @@
 #include "pb.h"
 #include "pghead.h"
 #include "rend.h"
+#include "repeatmark.h"
 #include "rest.h"
 #include "sb.h"
 #include "score.h"
@@ -439,6 +440,18 @@ void ABCInput::AddOrnaments(LayerElement *element)
     m_ornam.clear();
 }
 
+void ABCInput::AddRepeatMark(LayerElement *element)
+{
+    assert(element);
+
+    RepeatMark *rm = new RepeatMark();
+    rm->SetStartid("#" + element->GetID());
+    rm->SetFunc(m_repeatMark);
+    m_controlElements.push_back(std::make_pair(m_layer->GetID(), rm));
+
+    m_repeatMark = repeatMarkLog_FUNC_NONE;
+}
+
 void ABCInput::AddTie()
 {
     if (!m_tieStack.empty()) {
@@ -487,69 +500,81 @@ void ABCInput::ParseDecoration(const std::string &decorationString)
         LogWarning("ABC import: Fingering not supported", decorationString.c_str());
         return;
     }
-    if (!strcmp(decorationString.c_str(), ".")) {
+    if (decorationString == ".") {
         m_artic.push_back(ARTICULATION_stacc);
     }
-    else if (!strcmp(decorationString.c_str(), "trill") || !strcmp(decorationString.c_str(), "T")) {
-        m_ornam.push_back('T');
-    }
-    else if (!strcmp(decorationString.c_str(), "mordent") || !strcmp(decorationString.c_str(), "lowermordent")
-        || !strcmp(decorationString.c_str(), "M")) {
-        m_ornam.push_back('m');
-    }
-    else if (!strcmp(decorationString.c_str(), "pralltriller") || !strcmp(decorationString.c_str(), "uppermordent")
-        || !strcmp(decorationString.c_str(), "P")) {
-        m_ornam.push_back('M');
-    }
-    else if (!strcmp(decorationString.c_str(), "turn")) {
+    else if ((decorationString == "~") || (decorationString == "roll")) {
         m_ornam.push_back('S');
     }
-    else if (!strcmp(decorationString.c_str(), "invertedturn")) {
+    else if ((decorationString == "trill") || (decorationString == "T")) {
+        m_ornam.push_back('T');
+    }
+    else if ((decorationString == "mordent") || (decorationString == "lowermordent") || (decorationString == "M")) {
+        m_ornam.push_back('m');
+    }
+    else if ((decorationString == "pralltriller") || (decorationString == "uppermordent")
+        || (decorationString == "P")) {
+        m_ornam.push_back('M');
+    }
+    else if (decorationString == "turn") {
+        m_ornam.push_back('S');
+    }
+    else if (decorationString == "invertedturn") {
         m_ornam.push_back('s');
     }
-    else if (!strcmp(decorationString.c_str(), ">")) {
+    else if ((decorationString == ">") || (decorationString == "accent") || (decorationString == "emphasis")) {
         m_artic.push_back(ARTICULATION_acc);
     }
-    else if (!strcmp(decorationString.c_str(), "accent")) {
-        m_artic.push_back(ARTICULATION_acc);
+    else if ((decorationString == "^") || (decorationString == "marcato")) {
+        m_artic.push_back(ARTICULATION_marc);
     }
-    else if (!strcmp(decorationString.c_str(), "emphasis")) {
-        m_artic.push_back(ARTICULATION_acc);
-    }
-    else if (!strcmp(decorationString.c_str(), "fermata") || !strcmp(decorationString.c_str(), "H")) {
+    else if ((decorationString == "fermata") || (decorationString == "H")) {
         m_fermata = STAFFREL_above;
     }
-    else if (!strcmp(decorationString.c_str(), "invertedfermata")) {
+    else if ((decorationString == "invertedfermata")) {
         m_fermata = STAFFREL_below;
     }
-    else if (!strcmp(decorationString.c_str(), "tenuto")) {
+    else if (decorationString == "tenuto") {
         m_artic.push_back(ARTICULATION_ten);
     }
-    else if (!strcmp(decorationString.c_str(), "+")) {
+    else if ((decorationString == "+") || (decorationString == "plus")) {
         m_artic.push_back(ARTICULATION_stop);
     }
-    else if (!strcmp(decorationString.c_str(), "plus")) {
-        m_artic.push_back(ARTICULATION_stop);
-    }
-    else if (!strcmp(decorationString.c_str(), "snap")) {
+    else if (decorationString == "snap") {
         m_artic.push_back(ARTICULATION_snap);
     }
-    else if (!strcmp(decorationString.c_str(), "upbow") || !strcmp(decorationString.c_str(), "u")) {
+    else if (decorationString == "slide") {
+        m_artic.push_back(ARTICULATION_scoop);
+    }
+    else if (decorationString == "wedge") {
+        m_artic.push_back(ARTICULATION_stacciss);
+    }
+    else if ((decorationString == "upbow") || (decorationString == "u")) {
         m_artic.push_back(ARTICULATION_upbow);
     }
-    else if (!strcmp(decorationString.c_str(), "downbow") || !strcmp(decorationString.c_str(), "v")) {
+    else if ((decorationString == "downbow") || (decorationString == "v")) {
         m_artic.push_back(ARTICULATION_dnbow);
     }
-    else if (!strcmp(decorationString.c_str(), "open")) {
+    else if (decorationString == "open") {
         m_artic.push_back(ARTICULATION_open);
     }
-    else if (!strcmp(decorationString.c_str(), "pppp") || !strcmp(decorationString.c_str(), "ppp")
-        || !strcmp(decorationString.c_str(), "pp") || !strcmp(decorationString.c_str(), "p")
-        || !strcmp(decorationString.c_str(), "mp") || !strcmp(decorationString.c_str(), "mf")
-        || !strcmp(decorationString.c_str(), "f") || !strcmp(decorationString.c_str(), "ff")
-        || !strcmp(decorationString.c_str(), "fff") || !strcmp(decorationString.c_str(), "ffff")
-        || !strcmp(decorationString.c_str(), "sfz")) {
+    else if ((decorationString == "pppp") || (decorationString == "ppp") || (decorationString == "pp")
+        || (decorationString == "p") || (decorationString == "mp") || (decorationString == "mf")
+        || (decorationString == "f") || (decorationString == "ff") || (decorationString == "fff")
+        || (decorationString == "ffff") || (decorationString == "sfz")) {
         m_dynam.push_back(decorationString);
+    }
+    else if (decorationString == "segno") {
+        m_repeatMark = repeatMarkLog_FUNC_segno;
+    }
+    else if (decorationString == "coda") {
+        m_repeatMark = repeatMarkLog_FUNC_coda;
+    }
+    else if (decorationString == "D.S.") {
+        m_repeatMark = repeatMarkLog_FUNC_dalSegno;
+    }
+    else if (decorationString == "D.C.") {
+        m_repeatMark = repeatMarkLog_FUNC_daCapo;
     }
     else {
         LogWarning("ABC import: Decoration %s not supported", decorationString.c_str());
@@ -1054,7 +1079,7 @@ void ABCInput::InitScoreAndSection(Score *&score, Section *&section)
 void ABCInput::ParseLyrics()
 {
     std::vector<std::pair<Syl *, int>> syllables;
-    constexpr std::string_view delimiters = "~\\-_ ";
+    constexpr std::string_view delimiters = "-_*~ ";
     // skipping w:, so start from third element
     std::size_t start = 2;
     std::size_t found = abcLine.find_first_of(delimiters, 2);
@@ -1076,14 +1101,14 @@ void ABCInput::ParseLyrics()
             sylType = sylLog_CON_s;
         }
         else if (abcLine.at(found) == '-') {
+            if (abcLine.at(found - 1) == '\\') {
+                counter = 0;
+            }
             sylType = sylLog_CON_d;
         }
-        else if (abcLine.at(found) == '\\') {
-            if ((found + 1 < abcLine.size()) && (abcLine.at(found + 1) == '-')) {
-                counter = 0;
-                ++found;
-                sylType = sylLog_CON_d;
-            }
+        else if (abcLine.at(found) == '*') {
+            // skip one note
+            ++counter;
         }
         // separate syllable from delimiters to form syl that we want to add
         syllable = abcLine.substr(start, found - start);
@@ -1318,6 +1343,11 @@ void ABCInput::ReadMusicCode(const std::string &musicCode, Section *section)
             if (m_fermata != STAFFREL_NONE) {
                 this->AddFermata(chord);
             }
+
+            // add repeat mark
+            if (m_repeatMark != repeatMarkLog_FUNC_NONE) {
+                this->AddRepeatMark(chord);
+            }
         }
         else if (i >= 1 && musicCode.at(i) == ']' && musicCode.at(i - 1) != '|') {
             // end chord
@@ -1486,6 +1516,11 @@ void ABCInput::ReadMusicCode(const std::string &musicCode, Section *section)
                 this->AddOrnaments(note);
             }
 
+            // add repeat mark
+            if (m_repeatMark != repeatMarkLog_FUNC_NONE) {
+                this->AddRepeatMark(note);
+            }
+
             if ((m_broken < 0) && (grace == GRACE_NONE)) {
                 for (int i = 0; i != -m_broken; ++i) dur = dur * 2;
             }
@@ -1615,6 +1650,11 @@ void ABCInput::ReadMusicCode(const std::string &musicCode, Section *section)
             // add fermata
             if (m_fermata != STAFFREL_NONE) {
                 this->AddFermata(rest);
+            }
+
+            // add repeat mark
+            if (m_repeatMark != repeatMarkLog_FUNC_NONE) {
+                this->AddRepeatMark(rest);
             }
 
             // set duration

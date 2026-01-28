@@ -57,8 +57,22 @@ namespace vrv {
 
 PrepareDataInitializationFunctor::PrepareDataInitializationFunctor(Doc *doc) : DocFunctor(doc) {}
 
+FunctorCode PrepareDataInitializationFunctor::VisitAccid(Accid *accid)
+{
+    // Call parent one too
+    this->VisitObject(accid);
+
+    if (accid->GetFunc() == accidLog_FUNC_edit) {
+        accid->InitFloatingObject();
+    }
+    accid->Modify();
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode PrepareDataInitializationFunctor::VisitDiv(Div *div)
 {
+    // Call parent one too
     this->VisitTextLayoutElement(div);
 
     if (m_doc->GetOptions()->m_breaks.GetValue() == BREAKS_none) {
@@ -70,6 +84,9 @@ FunctorCode PrepareDataInitializationFunctor::VisitDiv(Div *div)
 
 FunctorCode PrepareDataInitializationFunctor::VisitChord(Chord *chord)
 {
+    // Call parent one too
+    this->VisitObject(chord);
+
     if (chord->HasEmptyList()) {
         LogWarning("Chord '%s' has no child note - a default note is added", chord->GetID().c_str());
         Note *rescueNote = new Note();
@@ -82,6 +99,9 @@ FunctorCode PrepareDataInitializationFunctor::VisitChord(Chord *chord)
 
 FunctorCode PrepareDataInitializationFunctor::VisitFloatingObject(FloatingObject *floatingObject)
 {
+    // Call parent one too
+    this->VisitObject(floatingObject);
+
     floatingObject->ResetDrawingObjectIDs();
 
     return FUNCTOR_CONTINUE;
@@ -89,6 +109,9 @@ FunctorCode PrepareDataInitializationFunctor::VisitFloatingObject(FloatingObject
 
 FunctorCode PrepareDataInitializationFunctor::VisitKeySig(KeySig *keySig)
 {
+    // Call parent one too
+    this->VisitObject(keySig);
+
     // Clear and regenerate attribute children
     keySig->GenerateKeyAccidAttribChildren();
 
@@ -112,6 +135,9 @@ FunctorCode PrepareDataInitializationFunctor::VisitRepeatMark(RepeatMark *repeat
 
 FunctorCode PrepareDataInitializationFunctor::VisitScore(Score *score)
 {
+    // Call parent one too
+    this->VisitPageElement(score);
+
     assert(score->GetScoreDef());
 
     // Evaluate functor on scoreDef
@@ -122,6 +148,9 @@ FunctorCode PrepareDataInitializationFunctor::VisitScore(Score *score)
 
 FunctorCode PrepareDataInitializationFunctor::VisitTextLayoutElement(TextLayoutElement *textLayoutElement)
 {
+    // Call parent one too
+    this->VisitObject(textLayoutElement);
+
     textLayoutElement->ResetCells();
     textLayoutElement->ResetDrawingScaling();
 

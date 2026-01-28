@@ -410,10 +410,19 @@ void Object::CopyAttributesTo(Object *target) const
     target->m_unsupported = this->m_unsupported;
 }
 
-int Object::GetAttributes(ArrayOfStrAttr *attributes) const
+int Object::GetAttributes(ArrayOfStrAttr *attributes, bool convertToExternal) const
 {
     assert(attributes);
     attributes->clear();
+
+    if (convertToExternal && this->Is(STAFF)) {
+        const Staff *staff = vrv_cast<const Staff *>(this);
+        Staff copy;
+        staff->CopyAttributesTo(&copy);
+        copy.SetOssia(staff->IsOssia());
+        copy.AttributesToExternal();
+        return copy.GetAttributes(attributes, false);
+    }
 
     AttModule::GetAnalytical(this, attributes);
     AttModule::GetCmn(this, attributes);
@@ -758,6 +767,18 @@ const Object *Object::GetChild(int idx, const ClassId classId) const
     return *it;
 }
 
+// Find the direct child of the parent that is ancestor of the descendant
+Object *Object::GetDirectChild(Object *parent, Object *descendant)
+{
+    if (!parent->HasDescendant(descendant)) {
+        return NULL;
+    }
+    while (descendant != NULL && descendant->GetParent() != parent) {
+        descendant = descendant->GetParent();
+    }
+    return descendant;
+}
+
 ArrayOfConstObjects Object::GetChildren() const
 {
     return ArrayOfConstObjects(m_children.begin(), m_children.end());
@@ -824,11 +845,11 @@ bool Object::IsSupportedChild(ClassId classId)
     return false;
 }
 
-void Object::AddChild(Object *child)
+bool Object::AddChild(Object *child)
 {
     if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        return;
+        return false;
     }
 
     if (!this->IsReferenceObject()) {
@@ -850,6 +871,8 @@ void Object::AddChild(Object *child)
         m_children.insert(m_children.begin() + i, child);
     }
     this->Modify();
+
+    return true;
 }
 
 int Object::GetInsertOrderForIn(ClassId classId, const std::vector<ClassId> &order) const
@@ -1111,7 +1134,7 @@ void Object::Process(ConstFunctor &functor, int deepness, bool skipFirst) const
         functor.SetCode(FUNCTOR_CONTINUE);
         return;
     }
-    else if (this->IsEditorialElement()) {
+    else if (this->IsEditorialElement() || this->Is(OSSIA)) {
         // since editorial object doesn't count, we increase the deepness limit
         ++deepness;
     }
@@ -1172,7 +1195,7 @@ FunctorCode Object::AcceptEnd(ConstFunctor &functor) const
 bool Object::SkipChildren(bool visibleOnly) const
 {
     if (visibleOnly) {
-        if (this->IsEditorialElement() || this->Is(MDIV) || this->IsSystemElement()) {
+        if (this->IsEditorialElement() || this->Is({ MDIV, STAFF }) || this->IsSystemElement()) {
             const VisibilityDrawingInterface *interface = this->GetVisibilityDrawingInterface();
             assert(interface);
             if (interface->IsHidden()) {

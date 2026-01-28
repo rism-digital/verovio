@@ -107,9 +107,12 @@ class Neume;
 class Note;
 class Num;
 class Octave;
+class OffsetInterface;
+class OffsetSpanningInterface;
 class Orig;
 class Oriscus;
 class Ornam;
+class Ossia;
 class Page;
 class PageElement;
 class PageMilestoneEnd;
@@ -225,7 +228,7 @@ public:
     ///@}
 
     /**
-     * @name Setter and getter for MEI basic output
+     * @name Setter and getter for MEI Basic output
      */
     ///@{
     void SetBasic(bool basic) { m_basic = basic; }
@@ -282,7 +285,7 @@ private:
 
     /**
      * Helper checking if the object is tree object in score-based MEI
-     * For MEI basic output, also check if objects marked as attribute need to be kept as element (e.g., accid)
+     * For MEI Basic output, also check if objects marked as attribute need to be kept as element (e.g., accid)
      * or if some need to be written as attributes (e.g. scoreDef/clef)
      */
     bool IsTreeObject(Object *object) const;
@@ -383,7 +386,9 @@ private:
     void WriteMeterSigGrp(pugi::xml_node currentNode, MeterSigGrp *meterSigGrp);
     void WriteFb(pugi::xml_node currentNode, Fb *fb);
     void WriteStaff(pugi::xml_node currentNode, Staff *staff);
+    void WriteOStaff(pugi::xml_node currentNode, Staff *oStaff);
     void WriteLayer(pugi::xml_node currentNode, Layer *layer);
+    void WriteOssia(pugi::xml_node currentNode, Ossia *ossia);
     ///@}
 
     /**
@@ -546,6 +551,8 @@ private:
     void WriteDurationInterface(pugi::xml_node currentNode, DurationInterface *interface);
     void WriteLinkingInterface(pugi::xml_node currentNode, LinkingInterface *interface);
     void WriteFacsimileInterface(pugi::xml_node element, FacsimileInterface *interface);
+    void WriteOffsetInterface(pugi::xml_node currentNode, OffsetInterface *interface);
+    void WriteOffsetSpanningInterface(pugi::xml_node currentNode, OffsetSpanningInterface *interface);
     void WritePitchInterface(pugi::xml_node currentNode, PitchInterface *interface);
     void WritePlistInterface(pugi::xml_node currentNode, PlistInterface *interface);
     void WritePositionInterface(pugi::xml_node currentNode, PositionInterface *interface);
@@ -575,7 +582,7 @@ private:
     int m_indent;
     /** A flag indicating if we are writing score-based or page-based MEI */
     bool m_scoreBasedMEI;
-    /** A flag indicating that we want to produce MEI basic */
+    /** A flag indicating that we want to produce MEI Basic */
     bool m_basic;
     /** A flag indicating we are serializing page-based MEI */
     bool m_serializing;
@@ -694,6 +701,7 @@ private:
     bool ReadLabel(Object *parent, pugi::xml_node label);
     bool ReadLabelAbbr(Object *parent, pugi::xml_node labelAbbr);
     bool ReadTuning(Object *parent, pugi::xml_node tuning);
+    bool ReadOssia(Object *parent, pugi::xml_node ossia);
     bool ReadTuningChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadCourse(Object *parent, pugi::xml_node course);
     bool ReadSymbolTable(Object *parent, pugi::xml_node parentNode);
@@ -705,6 +713,7 @@ private:
     bool ReadFbChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadNum(Object *parent, pugi::xml_node parentNode);
     bool ReadStaff(Object *parent, pugi::xml_node staff);
+    bool ReadOStaff(Object *parent, pugi::xml_node oStaff);
     bool ReadStaffChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadLayer(Object *parent, pugi::xml_node layer);
     bool ReadLayerDef(Object *parent, pugi::xml_node layerDef);
@@ -862,6 +871,8 @@ private:
     bool ReadDurationInterface(pugi::xml_node element, DurationInterface *interface);
     bool ReadLinkingInterface(pugi::xml_node element, LinkingInterface *interface);
     bool ReadFacsimileInterface(pugi::xml_node element, FacsimileInterface *interface);
+    bool ReadOffsetInterface(pugi::xml_node element, OffsetInterface *interface);
+    bool ReadOffsetSpanningInterface(pugi::xml_node element, OffsetSpanningInterface *interface);
     bool ReadPitchInterface(pugi::xml_node element, PitchInterface *interface);
     bool ReadPlistInterface(pugi::xml_node element, PlistInterface *interface);
     bool ReadPositionInterface(pugi::xml_node element, PositionInterface *interface);

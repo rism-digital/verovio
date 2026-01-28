@@ -55,6 +55,7 @@ Note::Note()
     , StemmedDrawingInterface()
     , AltSymInterface()
     , DurationInterface()
+    , OffsetInterface()
     , PitchInterface()
     , PositionInterface()
     , AttColor()
@@ -75,6 +76,7 @@ Note::Note()
 {
     this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
     this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
     this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
@@ -104,6 +106,7 @@ void Note::Reset()
     StemmedDrawingInterface::Reset();
     AltSymInterface::Reset();
     DurationInterface::Reset();
+    OffsetInterface::Reset();
     PitchInterface::Reset();
     PositionInterface::Reset();
     this->ResetColor();
@@ -146,11 +149,11 @@ bool Note::IsSupportedChild(ClassId classId)
     }
 }
 
-void Note::AddChild(Object *child)
+bool Note::AddChild(Object *child)
 {
     if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        return;
+        return false;
     }
 
     child->SetParent(this);
@@ -166,6 +169,8 @@ void Note::AddChild(Object *child)
         children.push_back(child);
     }
     this->Modify();
+
+    return true;
 }
 
 bool Note::AddChildAdditionalCheck(Object *child)
@@ -699,10 +704,12 @@ char32_t Note::GetNoteheadGlyph(const data_DURATION duration) const
     }
 
     if (DURATION_breve == duration) return SMUFL_E0A1_noteheadDoubleWholeSquare;
-    if (DURATION_1 == duration) return SMUFL_E0A2_noteheadWhole;
-    // We support solid on half notes or void on quarter and shorter notes
+    // We support solid on whole and half notes or void on quarter and shorter notes
+    if (DURATION_1 == duration)
+        return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0FA_noteheadWholeFilled : SMUFL_E0A2_noteheadWhole;
+    ;
     if (DURATION_2 == duration) {
-        return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0A4_noteheadBlack : SMUFL_E0A3_noteheadHalf;
+        return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0FB_noteheadHalfFilled : SMUFL_E0A3_noteheadHalf;
     }
     else {
         return (this->GetHeadFill() == FILL_void) ? SMUFL_E0A3_noteheadHalf : SMUFL_E0A4_noteheadBlack;

@@ -25,6 +25,8 @@
 #include "mrest.h"
 #include "nc.h"
 #include "octave.h"
+#include "offsetinterface.h"
+#include "ossia.h"
 #include "page.h"
 #include "repeatmark.h"
 #include "rest.h"
@@ -57,6 +59,7 @@ FunctorCode ResetDataFunctor::VisitAccid(Accid *accid)
     // Call parent one too
     this->VisitLayerElement(accid);
     accid->PositionInterface::InterfaceResetData(*this, accid);
+    accid->ClearFloatingObject();
 
     return FUNCTOR_CONTINUE;
 }
@@ -352,6 +355,16 @@ FunctorCode ResetDataFunctor::VisitObject(Object *object)
     }
     if (object->HasInterface(INTERFACE_LINKING)) {
         LinkingInterface *interface = object->GetLinkingInterface();
+        assert(interface);
+        interface->InterfaceResetData(*this, object);
+    }
+    if (object->HasInterface(INTERFACE_OFFSET)) {
+        OffsetInterface *interface = object->GetOffsetInterface();
+        assert(interface);
+        interface->InterfaceResetData(*this, object);
+    }
+    if (object->HasInterface(INTERFACE_OFFSET_SPANNING)) {
+        OffsetSpanningInterface *interface = object->GetOffsetSpanningInterface();
         assert(interface);
         interface->InterfaceResetData(*this, object);
     }
@@ -710,6 +723,13 @@ FunctorCode ResetHorizontalAlignmentFunctor::VisitNote(Note *note)
     note->SetFlippedNotehead(false);
     // Re-mark the role as unsed if we have a shared stem
     if (note->HasStemSameasNote()) note->SetStemSameasRole(SAMEAS_UNSET);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitOssia(Ossia *ossia)
+{
+    ossia->ResetAlignments();
 
     return FUNCTOR_CONTINUE;
 }

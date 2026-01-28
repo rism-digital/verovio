@@ -2,7 +2,55 @@
 
 ## [unreleased]
 
-## [5.4.0] – 2025-07-15 
+## [6.0.0] – 2026-01-28
+* Support for ossia staves
+* Support for expansion generation in MusicXML importer
+* Support for expansion generation based on measure repeats (basic implementation)
+* Support for default expansion (generated or first one encoded) in MIDI and timemap output
+* Improved MusicXML importer (articulations, spacing, clef changes, tempo spacing, coda, segno)
+* Improved `note@head.fill` support
+* Improved SVG styling structure
+* Option `--spacing-ossia` for adjusting the spacing of ossia staves
+* Option `--ossia-hidden` for hiding rendering of ossia staves
+* Option `--expand-always` to enable expansion in SVG and MEI output
+* Option `--expand-never` to disable expansion in MIDI and timemap output
+* Remove default css scoping
+
+## [5.7.0] – 2025-12-02
+* Support for `@ho` and `@vo` on relevant layer elements and control events
+* Support for `@startho/vo` and `@endho/vo` on `hairpin`, `lv`, `phrase`, `slur` and `tie`
+* Support for `@enclose` on `rest`, `mordent`, `turn`, and `trill` (@rettinghaus)
+* Support for `@cutout` on `mRest` (@rettinghaus)
+* Support for hierarchical expansion structure (@wergo)
+* Support for multiple accidentals with correct ordering (@infojunkie)
+* Fix bug in ellipse rendering and improvements to the SVG attributes
+* Option `--svg-content-bounding-boxes` for bounding boxes on content (@fernandoherreradelasheras)
+* Option `--expand` moved to option group on loading selectors and processing
+
+## [5.6.0] – 2025-09-09
+* Improved layout for editorial accidentals
+* Improved support for `expansion` (@wergo)
+* Improved logging for unmatched time spanning and plist elements (@wergo)
+* Support for repeat marks in ABC importer (@rettinghaus)
+* Fix `pgHead` conversion in MusicXML importer (@rettinghaus)
+* Fix lyric parsing in ABC importer (@rettinghaus)
+* Fix chords following grace notes in timemap and MIDI output
+* Fix tempo in timemap and MIDI output
+* Fix note off timings in timemap and MIDI output (@infojunkie)
+* Fix `@metcon` in MusicXML importer (@rettinghaus)
+* Added Python wheel for ubuntu arm64 (@dillon-labami)
+
+## [5.5.1] – 2025-08-05
+* Fix CocoaPods build
+
+## [5.5.0] – 2025-08-04
+* Support of Swift with a new binding available through via the Swift Package Manager
+* Support for Liberation text font with the new `--font-text-liberation` option
+* Remove obsolete Qt and Android bindings
+* Remove unused Emscripten options `-DPX`
+* Fix crash when trying to load data without loaded resources
+
+## [5.4.0] – 2025-07-15
 * Change timemap with `includeRests` to include also `mRest` and `multiRest`
 * Change JS initial memory allocation and drop JS light memory version
 * Change key names for `GetTimesForElement` to be inline with the timemap keys

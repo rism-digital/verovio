@@ -669,7 +669,7 @@ void View::DrawTextLayoutElement(DeviceContext *dc, TextLayoutElement *textLayou
 
     FontInfo textElementFont;
     if (!dc->UseGlobalStyling()) {
-        textElementFont.SetFaceName("Times");
+        textElementFont.SetFaceName(m_doc->GetResources().GetTextFont());
     }
 
     TextDrawingParams params;

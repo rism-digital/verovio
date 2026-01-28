@@ -29,6 +29,8 @@ class TimestampAttr;
  * For example, we align notes and rests (default) together, clefs separately, etc.
  */
 enum AlignmentType {
+    ALIGNMENT_SCOREDEF_OSSIA_CLEF = -2,
+    ALIGNMENT_SCOREDEF_OSSIA_KEYSIG,
     ALIGNMENT_MEASURE_START = 0,
     // Non-justifiable
     ALIGNMENT_SCOREDEF_CLEF,
@@ -308,7 +310,7 @@ public:
     /**
      * Overwritten method for AlignmentReference children
      */
-    void AddChild(Object *object) override;
+    bool AddChild(Object *object) override;
 
     /**
      * Return true if one of objects overlaps with accidentals from current reference (i.e. if there are accidentals)

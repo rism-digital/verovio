@@ -37,7 +37,7 @@
 
 namespace vrv {
 
-// Helper template function to calculate optiomal dot locations based on note locations in the chord. Takes iterators
+// Helper template function to calculate optimal dot locations based on note locations in the chord. Takes iterators
 // for the begin/end of the range; reverse iterators should be passed if reverse order is specified
 template <typename Iterator> std::set<int> CalculateDotLocations(Iterator begin, Iterator end, bool isReverseOrder)
 {
@@ -184,11 +184,11 @@ bool Chord::IsSupportedChild(ClassId classId)
     }
 }
 
-void Chord::AddChild(Object *child)
+bool Chord::AddChild(Object *child)
 {
     if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        return;
+        return false;
     }
 
     ArrayOfObjects &children = this->GetChildrenForModification();
@@ -203,6 +203,8 @@ void Chord::AddChild(Object *child)
         children.push_back(child);
     }
     this->Modify();
+
+    return true;
 }
 
 void Chord::FilterList(ListOfConstObjects &childList) const

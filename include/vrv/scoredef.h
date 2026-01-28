@@ -259,6 +259,11 @@ public:
      */
     bool HasSystemStartLine() const;
 
+    /**
+     * Add ossia staffDefs to the staffN staffDef (above or below)
+     */
+    void AddOssias(int staffN, const std::list<int>, bool above);
+
     //----------//
     // Functors //
     //----------//

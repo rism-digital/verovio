@@ -38,8 +38,8 @@ namespace vrv {
 // Version
 //----------------------------------------------------------------------------
 
-#define VERSION_MAJOR 5
-#define VERSION_MINOR 5
+#define VERSION_MAJOR 6
+#define VERSION_MINOR 1
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -94,6 +94,7 @@ enum ClassId : uint16_t {
     FLOATING_POSITIONER,
     FLOATING_CURVE_POSITIONER,
     // Ids for ungrouped objects
+    ACCID_FLOATING,
     ALIGNMENT,
     ALIGNMENT_REFERENCE,
     CLEF_ATTR,
@@ -113,6 +114,7 @@ enum ClassId : uint16_t {
     MEASURE_ALIGNER,
     MENSUR_ATTR,
     METERSIG_ATTR,
+    OSSIA,
     PAGE,
     PAGES,
     STAFF,
@@ -279,6 +281,8 @@ enum ClassId : uint16_t {
     BBOX_DEVICE_CONTEXT,
     SVG_DEVICE_CONTEXT,
     CUSTOM_DEVICE_CONTEXT,
+    // Pseudo ids for custom factory functions
+    FACTORY_OSTAFF,
     //
     UNSPECIFIED
 };
@@ -295,6 +299,8 @@ enum InterfaceId {
     INTERFACE_DURATION,
     INTERFACE_LINKING,
     INTERFACE_FACSIMILE,
+    INTERFACE_OFFSET,
+    INTERFACE_OFFSET_SPANNING,
     INTERFACE_PITCH,
     INTERFACE_PLIST,
     INTERFACE_POSITION,
@@ -410,6 +416,8 @@ typedef bool (*NotePredicate)(const Note *);
 
 typedef std::vector<std::pair<LayerElement *, data_DURATION>> ArrayOfElementDurPairs;
 
+typedef std::map<int, std::list<int>> MapOfOssiaStaffNs;
+
 /**
  * Generic int map recursive structure for storing hierachy of values
  * For example, we want to process all staves one by one, and within each staff
@@ -440,6 +448,8 @@ typedef std::map<int, LayerN_VerserN_t> StaffN_LayerN_VerseN_t;
 //----------------------------------------------------------------------------
 
 #define DEFINITION_FACTOR 10
+
+#define DEFAULT_UNIT 9.0
 
 #define isIn(x, a, b) (((x) >= std::min((a), (b))) && ((x) <= std::max((a), (b))))
 
@@ -483,6 +493,12 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 
 /** Define the maximum levels between a note and its syls **/
 #define MAX_NOTE_DEPTH -1
+
+//----------------------------------------------------------------------------
+// Ossia staff / layer @n offset (assuming we never have @n that high)
+//----------------------------------------------------------------------------
+
+#define OSSIA_N_OFFSET 1000000
 
 //----------------------------------------------------------------------------
 // Unicode music codepoints
@@ -583,7 +599,19 @@ enum { SPANNING_START_END = 0, SPANNING_START, SPANNING_END, SPANNING_MIDDLE };
  * scoreDef layer elements and cautionary scoreDef layer elements
  */
 
-enum ElementScoreDefRole { SCOREDEF_NONE = 0, SCOREDEF_SYSTEM, SCOREDEF_INTERMEDIATE, SCOREDEF_CAUTIONARY };
+enum ElementScoreDefRole {
+    SCOREDEF_NONE = 0,
+    SCOREDEF_SYSTEM,
+    SCOREDEF_INTERMEDIATE,
+    SCOREDEF_CAUTIONARY,
+    SCOREDEF_OSSIA
+};
+
+//----------------------------------------------------------------------------
+// ScoreDef drawing labels
+//----------------------------------------------------------------------------
+
+enum ScoreDefDrawingLabels { DRAWING_LABEL_FULL = 0, DRAWING_LABEL_ABBR, DRAWING_LABEL_NONE };
 
 //----------------------------------------------------------------------------
 // Artic types

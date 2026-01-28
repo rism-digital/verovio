@@ -55,6 +55,7 @@ Resources::Resources()
 {
     m_path = s_defaultPath;
     m_currentStyle = k_defaultStyle;
+    m_useLiberation = false;
 }
 
 bool Resources::InitFonts()
@@ -238,6 +239,14 @@ bool Resources::FontHasGlyphAvailable(const std::string &fontName, char32_t smuf
 
 std::string Resources::GetCSSFontFor(const std::string &fontName) const
 {
+    if (fontName == this->GetTextFont()) {
+        const std::string cssFontPath = StringFormat("%s/%s.css", m_path.c_str(), this->GetTextFont().c_str());
+        std::ifstream fstream(cssFontPath);
+        std::stringstream sstream;
+        sstream << fstream.rdbuf();
+        return sstream.str();
+    }
+
     if (!IsFontLoaded(fontName)) {
         return "";
     }
@@ -250,7 +259,7 @@ std::string Resources::GetCustomFontname(const std::string &filename, const ZipF
 {
 #ifdef __EMSCRIPTEN__
     // Extracts the font name from the bounding box XML file
-    // For example, OneGlyph/OneGlpyh.xml
+    // For example, OneGlyph/OneGlyph.xml
     for (auto &s : zipFile.GetFileList()) {
         std::filesystem::path path(s);
         if (!path.has_parent_path() || (path.parent_path() == path.stem())) {
@@ -427,7 +436,7 @@ bool Resources::InitTextFont(const std::string &fontName, const StyleAttributes 
     }
     pugi::xml_node root = doc.first_child();
     if (!root.attribute("units-per-em")) {
-        LogWarning("No units-per-em attribute in bouding box file");
+        LogWarning("No units-per-em attribute in bounding box file");
         return false;
     }
     const int unitsPerEm = root.attribute("units-per-em").as_int();

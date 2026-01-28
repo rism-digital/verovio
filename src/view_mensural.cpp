@@ -48,8 +48,11 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     Note *note = vrv_cast<Note *>(element);
     assert(note);
 
-    const int yNote = element->GetDrawingY();
-    const int xNote = element->GetDrawingX();
+    int x = element->GetDrawingX();
+    int y = element->GetDrawingY();
+
+    this->CalcOffset(dc, x, y);
+
     const data_DURATION drawingDur = note->GetDrawingDur();
 
     /************** Noteheads: **************/
@@ -59,13 +62,13 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         this->DrawLigatureNote(dc, element, layer, staff);
     }
     else if (drawingDur < DURATION_1) {
-        this->DrawMaximaToBrevis(dc, yNote, element, layer, staff);
+        this->DrawMaximaToBrevis(dc, y, element, layer, staff);
     }
     // Semibrevis and shorter
     else {
         char32_t code = note->GetMensuralNoteheadGlyph();
         dc->StartCustomGraphic("notehead");
-        this->DrawSmuflCode(dc, xNote, yNote, code, staff->m_drawingStaffSize, false);
+        this->DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, false);
         dc->EndCustomGraphic();
     }
 

@@ -271,7 +271,7 @@ bool ConvertToCastOffMensuralFunctor::IsValidBreakPoint(const Alignment *alignme
             // Do not break within editorial markup
             if (refChild->GetFirstAncestorInRange(EDITORIAL_ELEMENT, EDITORIAL_ELEMENT_max)) return false;
             // Do not break within a ligature when rendered as bracket - (notes in it will have a different aligner
-            // execpt for the first one)
+            // except for the first one)
             if (ligatureAsBracket && refChild->GetFirstAncestor(LIGATURE)) {
                 const Ligature *ligature = vrv_cast<const Ligature *>(refChild->GetFirstAncestor(LIGATURE));
                 assert(ligature);

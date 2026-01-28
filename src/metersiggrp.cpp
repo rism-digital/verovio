@@ -24,10 +24,12 @@ namespace vrv {
 
 static const ClassRegistrar<MeterSigGrp> s_factory("meterSigGrp", METERSIGGRP);
 
-MeterSigGrp::MeterSigGrp() : LayerElement(METERSIGGRP), ObjectListInterface(), AttBasic(), AttMeterSigGrpLog()
+MeterSigGrp::MeterSigGrp()
+    : LayerElement(METERSIGGRP), ObjectListInterface(), AttBasic(), AttMeterSigGrpLog(), AttVisibility()
 {
     this->RegisterAttClass(ATT_BASIC);
     this->RegisterAttClass(ATT_METERSIGGRPLOG);
+    this->RegisterAttClass(ATT_VISIBILITY);
 
     this->Reset();
 }
@@ -39,6 +41,7 @@ void MeterSigGrp::Reset()
     LayerElement::Reset();
     this->ResetBasic();
     this->ResetMeterSigGrpLog();
+    this->ResetVisibility();
 }
 
 bool MeterSigGrp::IsSupportedChild(ClassId classId)

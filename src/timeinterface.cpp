@@ -139,7 +139,7 @@ std::vector<const Staff *> TimePointInterface::GetTstampStaves(const Measure *me
     else if (this->HasPart() && (this->GetPart() == "%all")) {
         const System *system = vrv_cast<const System *>(measure->GetFirstAncestor(SYSTEM));
         assert(system);
-        const Staff *staff = system->GetTopVisibleStaff();
+        const Staff *staff = system->GetTopVisibleStaff(false);
         if (staff) staffList.push_back(staff->GetN());
     }
     else if (this->HasStaff()) {
@@ -163,9 +163,9 @@ std::vector<const Staff *> TimePointInterface::GetTstampStaves(const Measure *me
         const Staff *staff = m_start->GetAncestorStaff();
         staffList.push_back(staff->GetN());
     }
-    else if (measure->GetChildCount(STAFF) == 1) {
+    else if (measure->GetStaffCount() == 1) {
         // If we have no @staff or startid but only one staff child assume it is the first one
-        const Staff *staff = vrv_cast<const Staff *>(measure->GetFirst(STAFF));
+        const Staff *staff = vrv_cast<const Staff *>(measure->GetFirstStaff());
         staffList.push_back(staff->GetN());
     }
 

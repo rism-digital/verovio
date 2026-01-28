@@ -86,6 +86,7 @@ private:
     void AddDynamic(LayerElement *element);
     void AddFermata(LayerElement *element);
     void AddOrnaments(LayerElement *element);
+    void AddRepeatMark(LayerElement *element);
 
     // additional functions
     void PrintInformationFields(Score *score);
@@ -156,6 +157,7 @@ private:
     std::vector<std::string> m_dynam;
     std::string m_ornam;
     data_STAFFREL m_fermata = STAFFREL_NONE;
+    repeatMarkLog_FUNC m_repeatMark = repeatMarkLog_FUNC_NONE;
     /*
      * The stack of control elements to be added at the end of each measure
      */

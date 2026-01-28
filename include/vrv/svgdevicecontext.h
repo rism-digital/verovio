@@ -113,6 +113,11 @@ public:
     ///@}
 
     /**
+     * Indicate if offset should be applied
+     */
+    bool ApplyOffset() override { return true; }
+
+    /**
      * @name Method for starting and ending a graphic
      */
     ///@{
@@ -202,9 +207,22 @@ public:
     bool GetFacsimile() { return m_facsimile; }
 
     /**
+     * Setting use Liberation flag (false by default)
+     */
+    void SetUseLiberation(bool useLiberation) { m_useLiberation = useLiberation; }
+
+    /**
      * Setting m_svgBoudingBoxes flag (false by default)
      */
     void SetSvgBoundingBoxes(bool svgBoundingBoxes) { m_svgBoundingBoxes = svgBoundingBoxes; }
+
+    /**
+     * Setting m_svgContentBoundingBoxes flag (false by default)
+     */
+    void SetSvgContentBoundingBoxes(bool svgContentBoundingBoxes)
+    {
+        m_svgContentBoundingBoxes = svgContentBoundingBoxes;
+    }
 
     /**
      * Setting m_svgViewBox flag (false by default)
@@ -374,8 +392,12 @@ private:
     // output as mm (for pdf generation with a 72 dpi)
     bool m_mmOutput;
     bool m_facsimile;
+    // use LiberationTextFont
+    bool m_useLiberation;
     // add bouding boxes in svg output
     bool m_svgBoundingBoxes;
+    // add content bounding boxes in svg output
+    bool m_svgContentBoundingBoxes;
     // use viewbox on svg root element
     bool m_svgViewBox;
     // output HTML5 data-* attributes

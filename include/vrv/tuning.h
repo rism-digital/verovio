@@ -40,6 +40,21 @@ public:
     bool IsSupportedChild(ClassId classId) override;
 
     /**
+     * Calculate the MIDI note number for course/fret
+     *
+     * @param [in] course The course number
+     * @param [in] fret The fret number
+     * @param [in] notationType The notationType used to default tuning if not otherwise specified
+     *
+     * @return MIDI note number
+     */
+    int CalcPitchNumber(int course, int fret, data_NOTATIONTYPE notationType) const;
+
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    /**
      * Return the line for a note according to tablature type.
      * Guitar, french and italian tablature: the line is based on the course.
      * German tablature: the line is based on the note's index in the note list
@@ -58,19 +73,8 @@ public:
      * @param [in] topAlign - German tablature: true => align at the top, false => align at the bottom
      * @return position in staff half lines
      */
-    int CalcPitchPos(int course, data_NOTATIONTYPE notationType, int lines, int listSize, int index, int loc,
-        int tabLine, int tabAnchorline, bool topAlign) const;
-
-    /**
-     * Calculate the MIDI note number for course/fret
-     *
-     * @param [in] course The course number
-     * @param [in] fret The fret number
-     * @param [in] notationType The notationType used to default tuning if not otherwise specified
-     *
-     * @return MIDI note number
-     */
-    int CalcPitchNumber(int course, int fret, data_NOTATIONTYPE notationType) const;
+    static int CalcPitchPos(int course, data_NOTATIONTYPE notationType, int lines, int listSize, int index, int loc,
+        int tabLine, int tabAnchorline, bool topAlign);
 
     //----------//
     // Functors //

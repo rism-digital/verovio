@@ -180,6 +180,7 @@ public:
      */
     ///@{
     void SetDrawingStaffDefValues(StaffDef *currentStaffDef);
+    bool GetDrawingStaffDefValues(StaffDef *staffDef) const;
 
     bool DrawKeySigCancellation() const { return m_drawKeySigCancellation; }
     void SetDrawKeySigCancellation(bool drawKeySigCancellation) { m_drawKeySigCancellation = drawKeySigCancellation; }
@@ -199,6 +200,9 @@ public:
     {
         return (m_staffDefClef || m_staffDefKeySig || m_staffDefMensur || m_staffDefMeterSig || m_staffDefMeterSigGrp);
     }
+
+    bool DrawOssiaStaffDef() const { return m_drawOssiaStaffDef; }
+    void SetDrawOssiaStaffDef(bool drawOssiaStaffDef) { m_drawOssiaStaffDef = drawOssiaStaffDef; }
     ///@}
 
     /**
@@ -273,6 +277,7 @@ private:
     MeterSig *m_staffDefMeterSig;
     MeterSigGrp *m_staffDefMeterSigGrp;
     bool m_drawKeySigCancellation;
+    bool m_drawOssiaStaffDef;
 
     /** */
     Clef *m_cautionStaffDefClef;

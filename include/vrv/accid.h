@@ -10,12 +10,15 @@
 
 #include "atts_externalsymbols.h"
 #include "atts_gestural.h"
+#include "floatingobject.h"
 #include "layerelement.h"
+#include "offsetinterface.h"
 #include "positioninterface.h"
 
 namespace vrv {
 
 class AlignmentReference;
+class AccidFloatingObject;
 
 //----------------------------------------------------------------------------
 // Accid
@@ -25,6 +28,7 @@ class AlignmentReference;
  * This class models the MEI <accid> element.
  */
 class Accid : public LayerElement,
+              public OffsetInterface,
               public PositionInterface,
               public AttAccidental,
               public AttAccidentalGes,
@@ -48,6 +52,15 @@ public:
     std::string GetClassName() const override { return "accid"; }
     ///@}
 
+    /**  Delete the floating object (editorial accidental) on reset or deletion */
+    void ClearFloatingObject();
+
+    /** Init the accid floating object for editorial accidentals */
+    void InitFloatingObject();
+
+    /** Return the floating object (NULL if not set) */
+    AccidFloatingObject *GetFloatingObject() { return m_floatingObject; }
+
     /** Override the method since it is align to the staff */
     bool IsRelativeToStaff() const override { return (this->HasLoc() || (this->HasOloc() && this->HasPloc())); }
 
@@ -55,6 +68,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
+    OffsetInterface *GetOffsetInterface() override { return vrv_cast<OffsetInterface *>(this); }
+    const OffsetInterface *GetOffsetInterface() const override { return vrv_cast<const OffsetInterface *>(this); }
     PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
     const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
     ///@}
@@ -133,6 +148,37 @@ public:
 private:
     Accid *m_drawingUnison;
     bool m_alignedWithSameLayer;
+
+    /** Floating object for rendering the editorial accidental */
+    AccidFloatingObject *m_floatingObject;
+};
+
+//----------------------------------------------------------------------------
+// AccidFloatingObject
+//----------------------------------------------------------------------------
+
+/**
+ * This class is used for editorial accidentals to be laid out as floating objects
+ */
+class AccidFloatingObject : public FloatingObject {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * No Reset() method is required.
+     */
+    ///@{
+    AccidFloatingObject();
+    virtual ~AccidFloatingObject() {}
+    std::string GetClassName() const override { return "accid"; }
+    void Reset() override;
+    ///@}
+
+private:
+    //
+public:
+    //
+private:
+    //
 };
 
 //----------------------------------------------------------------------------

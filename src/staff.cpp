@@ -24,6 +24,7 @@
 #include "layer.h"
 #include "measure.h"
 #include "note.h"
+#include "ossia.h"
 #include "page.h"
 #include "staffdef.h"
 #include "syl.h"
@@ -41,8 +42,17 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 static const ClassRegistrar<Staff> s_factory("staff", STAFF);
+static const ClassRegistrar<Staff> s_factoryOStaff(
+    "oStaff", FACTORY_OSTAFF, []() -> Object * { return new Staff(1, true); });
 
-Staff::Staff(int n) : Object(STAFF), FacsimileInterface(), AttCoordY1(), AttNInteger(), AttTyped(), AttVisibility()
+Staff::Staff(int n, bool isOssia)
+    : Object(STAFF)
+    , VisibilityDrawingInterface()
+    , FacsimileInterface()
+    , AttCoordY1()
+    , AttNInteger()
+    , AttTyped()
+    , AttVisibility()
 {
     this->RegisterAttClass(ATT_COORDY1);
     this->RegisterAttClass(ATT_NINTEGER);
@@ -52,6 +62,7 @@ Staff::Staff(int n) : Object(STAFF), FacsimileInterface(), AttCoordY1(), AttNInt
 
     this->Reset();
     this->SetN(n);
+    this->SetOssia(isOssia);
 }
 
 Staff::~Staff() {}
@@ -59,11 +70,14 @@ Staff::~Staff() {}
 void Staff::Reset()
 {
     Object::Reset();
+    VisibilityDrawingInterface::Reset();
     FacsimileInterface::Reset();
     this->ResetCoordY1();
     this->ResetNInteger();
     this->ResetTyped();
     this->ResetVisibility();
+
+    m_isOssia = false;
 
     m_drawingFacsY = VRV_UNSET;
 
@@ -91,6 +105,32 @@ void Staff::CloneReset()
     m_drawingStaffDef = NULL;
     m_drawingTuning = NULL;
     m_drawingRotation = 0.0;
+}
+
+int Staff::GetNForOssia() const
+{
+    assert(!this->IsOssia());
+    return (this->GetN() + OSSIA_N_OFFSET);
+}
+
+int Staff::GetNFromOssia() const
+{
+    assert(this->IsOssia());
+    return (this->GetN() - OSSIA_N_OFFSET);
+}
+
+void Staff::AttributesToExternal()
+{
+    Object::AttributesToExternal();
+
+    if (this->IsOssia() && this->HasN()) this->SetN(this->GetN() - OSSIA_N_OFFSET);
+}
+
+void Staff::AttributesToInternal()
+{
+    Object::AttributesToInternal();
+
+    if (this->IsOssia() && this->HasN()) this->SetN(this->GetN() + OSSIA_N_OFFSET);
 }
 
 int Staff::GetDrawingRotationOffsetFor(int x)
@@ -201,6 +241,8 @@ int Staff::GetDrawingStaffNotationSize() const
 
 bool Staff::DrawingIsVisible() const
 {
+    if (this->IsHidden()) return false;
+
     const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
     assert(system);
     assert(system->GetDrawingScoreDef());
@@ -280,6 +322,31 @@ void Staff::SetFromFacsimile(Doc *doc)
         this->AttachZone(zone);
     }
     this->AdjustDrawingStaffSize();
+}
+
+int Staff::GetOssiaDrawingShift(const Measure *measure, Doc *doc) const
+{
+    const Ossia *ossia = vrv_cast<const Ossia *>(this->GetFirstAncestor(OSSIA));
+    const Layer *layer = vrv_cast<const Layer *>(this->FindDescendantByType(LAYER));
+    if (!ossia && !layer) return 0;
+
+    if (layer->DrawOssiaStaffDef()) {
+        int shift = ossia->GetScoreDefShift();
+        // The ossia scoreDef shift is the position of the clef (or key signature)
+        shift -= (1.5 * doc->GetDrawingUnit(this->m_drawingStaffSize));
+        return shift;
+    }
+    else if (ossia->DrawScoreDef() || !ossia->IsFirst()) {
+        return 0;
+    }
+
+    int shift = measure->GetLeftBarLineLeft();
+    // When there is no left barline on the measure we need to adjust the position
+    if (measure->GetLeftBarLine()->GetForm() == BARRENDITION_NONE) {
+        // Measure bar lines are always 100
+        shift -= (doc->GetDrawingBarLineWidth(100) / 2);
+    }
+    return shift;
 }
 
 bool Staff::IsOnStaffLine(int y, const Doc *doc) const

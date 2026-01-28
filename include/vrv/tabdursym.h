@@ -62,7 +62,7 @@ public:
     /**
      * Overwritten method for note
      */
-    void AddChild(Object *object) override;
+    bool AddChild(Object *object) override;
 
     /**
      * Get the stem up / stem down attachment point.

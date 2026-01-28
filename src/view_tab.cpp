@@ -103,6 +103,8 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
+    this->CalcOffset(dc, x, y);
+
     int glyphSize = staff->GetDrawingStaffNotationSize();
     bool drawingCueSize = false;
     int overline = 0;
@@ -115,7 +117,7 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
         FontInfo fretTxt;
         if (!dc->UseGlobalStyling()) {
-            fretTxt.SetFaceName("Times");
+            fretTxt.SetFaceName(m_doc->GetResources().GetTextFont());
         }
 
         TextDrawingParams params;

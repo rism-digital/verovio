@@ -58,7 +58,7 @@ bool Tuning::IsSupportedChild(ClassId classId)
 }
 
 int Tuning::CalcPitchPos(int course, data_NOTATIONTYPE notationType, int lines, int listSize, int index, int loc,
-    int tabLine, int tabAnchorline, bool topAlign) const
+    int tabLine, int tabAnchorline, bool topAlign)
 {
     switch (notationType) {
         case NOTATIONTYPE_tab_lute_french:
@@ -159,7 +159,7 @@ int Tuning::CalcPitchNumber(int course, int fret, data_NOTATIONTYPE notationType
     // baroque lute D minor                  F4  D4  A3  F3  D3  A2  G2  F2  E2  D2  C2  B1  A1
     static const int luteBaroqueDMinor[] = { 65, 62, 57, 53, 50, 45, 43, 41, 40, 38, 36, 35, 33 };
 
-    const int *pitch = nullptr;
+    const int *pitch = NULL;
     int pitchSize = 0;
 
     switch (this->GetTuningStandard()) {

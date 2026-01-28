@@ -12,9 +12,13 @@
 
 //----------------------------------------------------------------------------
 
+#include "expansion.h"
 #include "options.h"
 
 namespace vrv {
+
+class Score;
+class Section;
 
 class ExpansionMap {
 
@@ -41,7 +45,8 @@ public:
     /**
      * Expand expansion recursively
      */
-    void Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &existingList, Object *prevSection);
+    Object *Expand(Expansion *expansion, xsdAnyURI_List &existingList, Object *prevSection,
+        xsdAnyURI_List &deletionList, bool deleteList);
 
     std::vector<std::string> GetExpansionIDsForElement(const std::string &xmlId);
 
@@ -49,6 +54,33 @@ public:
      * Write the currentexpansionMap to a JSON string
      */
     void ToJson(std::string &output);
+
+    /**
+     * Generate an expan for the score analysing the repeats and endings
+     */
+    void GenerateExpansionFor(Score *score);
+
+    /**
+     * @name Setter and getter for the generating attempt flag
+     */
+    ///@{
+    void SetProcessed(bool isProcessed) { m_isProcessed = isProcessed; }
+    bool IsProcessed() { return m_isProcessed; }
+    ///@}
+
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    /**
+     * @name Methods to check if a measure yields a repeat start or end
+     */
+    ///@{
+    static bool IsRepeatStart(Measure *measure);
+    static bool IsRepeatEnd(Measure *measure);
+    static bool IsNextRepeatStart(Measure *measure);
+    static bool IsPreviousRepeatEnd(Measure *measure);
+    ///@}
 
 private:
     bool UpdateIDs(Object *object);
@@ -60,11 +92,16 @@ private:
     /** Ads an id string to an original/notated id */
     bool AddExpandedIDToExpansionMap(const std::string &origXmlId, std::string newXmlId);
 
+    std::string CreateSection(
+        Section *section, const ListOfObjects::iterator &first, const ListOfObjects::iterator &last);
+
 public:
     /** The expansion map indicates which xmlId has been repeated (expanded) elsewhere */
     std::map<std::string, std::vector<std::string>> m_map;
 
 private:
+    /** A flag indicating that the generation processed has been run even if the expansion map is empty  */
+    bool m_isProcessed;
 };
 
 } // namespace vrv

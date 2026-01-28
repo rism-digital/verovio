@@ -10,6 +10,7 @@
 
 #include "durationinterface.h"
 #include "layerelement.h"
+#include "offsetinterface.h"
 
 namespace vrv {
 
@@ -20,7 +21,7 @@ namespace vrv {
 /**
  * This class models the MEI <tabGrp> element.
  */
-class TabGrp : public LayerElement, public ObjectListInterface, public DurationInterface {
+class TabGrp : public LayerElement, public ObjectListInterface, public DurationInterface, public OffsetInterface {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -40,6 +41,8 @@ public:
     ///@{
     DurationInterface *GetDurationInterface() override { return vrv_cast<DurationInterface *>(this); }
     const DurationInterface *GetDurationInterface() const override { return vrv_cast<const DurationInterface *>(this); }
+    OffsetInterface *GetOffsetInterface() override { return vrv_cast<OffsetInterface *>(this); }
+    const OffsetInterface *GetOffsetInterface() const override { return vrv_cast<const OffsetInterface *>(this); }
     ///@}
 
     /**

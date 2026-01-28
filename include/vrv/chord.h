@@ -79,7 +79,7 @@ public:
     /**
      * Overwritten method for chord
      */
-    void AddChild(Object *object) override;
+    bool AddChild(Object *object) override;
 
     /**
      * Return the maximum and minimum Y positions of the notes in the chord

@@ -18,6 +18,7 @@
 #include "note.h"
 #include "object.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "stem.h"
 #include "vrv.h"
 
@@ -154,7 +155,7 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
         m_beamElementCoords.push_back(new BeamElementCoord());
     }
 
-    // current point to the first Note in the layed out layer
+    // current point to the first Note in the laid out layer
     LayerElement *current = dynamic_cast<LayerElement *>(childList.front());
     // Beam list should contain only DurationInterface objects
     assert(current->GetDurationInterface());
@@ -585,7 +586,10 @@ StaffDefDrawingInterface::StaffDefDrawingInterface()
     this->Reset();
 }
 
-StaffDefDrawingInterface::~StaffDefDrawingInterface() {}
+StaffDefDrawingInterface::~StaffDefDrawingInterface()
+{
+    this->ResetOssiaStaffDefs();
+}
 
 void StaffDefDrawingInterface::Reset()
 {
@@ -600,6 +604,16 @@ void StaffDefDrawingInterface::Reset()
     m_drawMensur = false;
     m_drawMeterSig = false;
     m_drawMeterSigGrp = false;
+
+    this->ResetOssiaStaffDefs();
+}
+
+void StaffDefDrawingInterface::ResetOssiaStaffDefs()
+{
+    for (const auto ossia : m_ossiasAbove) delete ossia;
+    m_ossiasAbove.clear();
+    for (const auto ossia : m_ossiasBelow) delete ossia;
+    m_ossiasBelow.clear();
 }
 
 void StaffDefDrawingInterface::SetCurrentClef(const Clef *clef)
@@ -678,6 +692,36 @@ void StaffDefDrawingInterface::SetCurrentProport(const Proport *proport)
     if (proport) {
         m_currentProport = *proport;
         m_currentProport.CloneReset();
+    }
+}
+
+StaffDef *StaffDefDrawingInterface::GetOssiaStaffDef(int staffN)
+{
+    return const_cast<StaffDef *>(std::as_const(*this).GetOssiaStaffDef(staffN));
+}
+
+const StaffDef *StaffDefDrawingInterface::GetOssiaStaffDef(int staffN) const
+{
+    for (StaffDef *ossia : m_ossiasAbove) {
+        if (ossia->GetN() == staffN) return ossia;
+    }
+    for (StaffDef *ossia : m_ossiasBelow) {
+        if (ossia->GetN() == staffN) return ossia;
+    }
+    return NULL;
+}
+
+void StaffDefDrawingInterface::GetOssiaAboveNs(std::vector<int> &staffNs) const
+{
+    for (StaffDef *ossia : m_ossiasAbove) {
+        staffNs.push_back(ossia->GetN());
+    }
+}
+
+void StaffDefDrawingInterface::GetOssiaBelowNs(std::vector<int> &staffNs) const
+{
+    for (StaffDef *ossia : m_ossiasBelow) {
+        staffNs.push_back(ossia->GetN());
     }
 }
 

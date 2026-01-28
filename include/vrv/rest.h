@@ -11,8 +11,10 @@
 #include "altsyminterface.h"
 #include "atts_externalsymbols.h"
 #include "atts_mensural.h"
+#include "atts_visual.h"
 #include "durationinterface.h"
 #include "layerelement.h"
+#include "offsetinterface.h"
 #include "positioninterface.h"
 
 namespace vrv {
@@ -37,9 +39,11 @@ enum RestNotePlace { RNP_UNSET = -1, RNP_noteInSpace, RNP_noteOnLine };
 class Rest : public LayerElement,
              public AltSymInterface,
              public DurationInterface,
+             public OffsetInterface,
              public PositionInterface,
              public AttColor,
              public AttCue,
+             public AttEnclosingChars,
              public AttExtSymAuth,
              public AttExtSymNames,
              public AttRestVisMensural {
@@ -65,7 +69,7 @@ public:
     /**
      * Overwritten method for rest
      */
-    void AddChild(Object *object) override;
+    bool AddChild(Object *object) override;
 
     /**
      * @name Getter to interfaces
@@ -73,6 +77,8 @@ public:
     ///@{
     AltSymInterface *GetAltSymInterface() override { return vrv_cast<AltSymInterface *>(this); }
     const AltSymInterface *GetAltSymInterface() const override { return vrv_cast<const AltSymInterface *>(this); }
+    OffsetInterface *GetOffsetInterface() override { return vrv_cast<OffsetInterface *>(this); }
+    const OffsetInterface *GetOffsetInterface() const override { return vrv_cast<const OffsetInterface *>(this); }
     PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
     const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
     DurationInterface *GetDurationInterface() override { return vrv_cast<DurationInterface *>(this); }
@@ -100,6 +106,11 @@ public:
      * Update the rest location based on the input TransPitch
      */
     void UpdateFromTransLoc(const TransPitch &tp);
+
+    /**
+     * Retrieve parentheses / brackets from the enclose attribute
+     */
+    std::pair<char32_t, char32_t> GetEnclosingGlyphs() const;
 
     //----------//
     // Functors //
