@@ -1438,7 +1438,7 @@ Options::Options()
     this->Register(&m_octaveNoSpanningParentheses, "octaveNoSpanningParentheses", &m_generalLayout);
 
     m_ossiaStaffSize.SetInfo("Ossia staff size", "The ossia staff size in relation to the staff size");
-    m_ossiaStaffSize.Init(0.5, 0.75, 1.00);
+    m_ossiaStaffSize.Init(0.75, 0.5, 1.00);
     this->Register(&m_ossiaStaffSize, "ossiaStaffSize", &m_generalLayout);
 
     m_pedalLineThickness.SetInfo("Pedal line thickness", "The thickness of the line used for piano pedaling");
