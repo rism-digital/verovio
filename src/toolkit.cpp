@@ -40,6 +40,7 @@
 #include "nc.h"
 #include "neume.h"
 #include "note.h"
+#include "octave.h"
 #include "options.h"
 #include "page.h"
 #include "pitchinterface.h"
@@ -2340,12 +2341,6 @@ std::string Toolkit::GetPitchPosition(double scoreTime, double midiPitch, int st
         LogWarning("Invalid MIDI pitch '%f'", midiPitch);
         return o.json();
     }
-
-    const int midiPitchInt = static_cast<int>(std::floor(midiPitch));
-    double midiFraction = midiPitch - midiPitchInt;
-    if (midiFraction < 0.0) midiFraction = 0.0;
-    if (midiFraction > 1.0) midiFraction = 1.0;
-
     const Fraction requestedScoreTime = ScoreTimeFromDouble(scoreTime);
 
     MeasureScoreTimeComparison matchMeasureTime(requestedScoreTime);
@@ -2429,6 +2424,67 @@ std::string Toolkit::GetPitchPosition(double scoreTime, double midiPitch, int st
     const Fraction localTimeForX = localTime / SCORE_TIME_UNIT;
     const int xRel = layoutMeasure->GetXAtScoreTime(localTimeForX, interpolated);
     int x = layoutMeasure->GetDrawingX() + xRel;
+
+    int octaveShift = 0;
+    const ListOfObjects octaves = m_doc.FindAllDescendantsByType(OCTAVE, false);
+    if (!octaves.empty()) {
+        const int currentMeasureIndex = measure->GetIndex();
+        for (const Object *obj : octaves) {
+            const Octave *octave = vrv_cast<const Octave *>(obj);
+            if (!octave) continue;
+            if (!octave->HasStartAndEnd() || !octave->IsOrdered()) continue;
+            if (!octave->IsOnStaff(staffN)) continue;
+
+            const Measure *startMeasure = octave->GetStartMeasure();
+            const Measure *endMeasure = octave->GetEndMeasure();
+            if (!startMeasure || !endMeasure) continue;
+
+            const int startIndex = startMeasure->GetIndex();
+            const int endIndex = endMeasure->GetIndex();
+            if (currentMeasureIndex < startIndex || currentMeasureIndex > endIndex) continue;
+
+            bool active = false;
+            const Alignment *startAlignment = octave->GetStart()->GetAlignment();
+            const Alignment *endAlignment = octave->GetEnd()->GetAlignment();
+            if (startIndex == endIndex) {
+                if (!startAlignment || !endAlignment) {
+                    active = true;
+                }
+                else {
+                    active = (localTimeForX >= startAlignment->GetTime())
+                        && (localTimeForX <= endAlignment->GetTime());
+                }
+            }
+            else if (currentMeasureIndex == startIndex) {
+                active = (!startAlignment) || (localTimeForX >= startAlignment->GetTime());
+            }
+            else if (currentMeasureIndex == endIndex) {
+                active = (!endAlignment) || (localTimeForX <= endAlignment->GetTime());
+            }
+            else {
+                active = true;
+            }
+
+            if (!active) continue;
+
+            int shift = 0;
+            switch (octave->GetDis()) {
+                case OCTAVE_DIS_8: shift = 1; break;
+                case OCTAVE_DIS_15: shift = 2; break;
+                case OCTAVE_DIS_22: shift = 3; break;
+                default: break;
+            }
+            if (!shift) continue;
+            const bool raisePitch = (octave->GetDisPlace() != STAFFREL_basic_below);
+            octaveShift += raisePitch ? shift : -shift;
+        }
+    }
+
+    const double adjustedMidiPitch = midiPitch - static_cast<double>(octaveShift) * 12.0;
+    const int midiPitchInt = static_cast<int>(std::floor(adjustedMidiPitch));
+    double midiFraction = adjustedMidiPitch - midiPitchInt;
+    if (midiFraction < 0.0) midiFraction = 0.0;
+    if (midiFraction > 1.0) midiFraction = 1.0;
 
     AttNIntegerComparison staffCmp(STAFF, staffN);
     Staff *staff = vrv_cast<Staff *>(layoutMeasure->FindDescendantByComparison(&staffCmp, 1));
