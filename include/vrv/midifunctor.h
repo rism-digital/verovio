@@ -501,6 +501,7 @@ public:
     FunctorCode VisitMultiRest(const MultiRest *multiRest) override;
     FunctorCode VisitNote(const Note *note) override;
     FunctorCode VisitRest(const Rest *rest) override;
+    FunctorCode VisitStaff(const Staff *staff) override;
     ///@}
 
 protected:

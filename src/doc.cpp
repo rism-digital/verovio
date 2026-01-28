@@ -970,6 +970,11 @@ void Doc::ScoreDefSetCurrentDoc(bool force)
     ScoreDefSetCurrentFunctor scoreDefSetCurrent(this);
     this->Process(scoreDefSetCurrent);
 
+    if (scoreDefSetCurrent.HasOssia()) {
+        ScoreDefSetOssiaFunctor scoreDefSetOssia(this);
+        this->Process(scoreDefSetOssia);
+    }
+
     this->ScoreDefSetGrpSymDoc();
 
     m_currentScoreDefDone = true;
@@ -1601,14 +1606,53 @@ void Doc::TransposeDoc()
 
 void Doc::ExpandExpansions()
 {
-    // Upon MEI import: use expansion ID, given by command line argument
-    std::string expansionId = this->GetOptions()->m_expand.GetValue();
-    if (expansionId.empty()) return;
+    // Passing this argument does not do anything
+    if (this->GetOptions()->m_expandNever.GetValue()) return;
 
-    Expansion *startExpansion = dynamic_cast<Expansion *>(this->FindDescendantByID(expansionId));
-    if (startExpansion == NULL) {
-        LogWarning("Expansion ID '%s' not found. Nothing expanded.", expansionId.c_str());
+    // Nothing to do in these cases - marked the map as processed
+    if (this->IsMensuralMusicOnly() || this->IsTranscription()) {
+        m_expansionMap.SetProcessed(true);
         return;
+    }
+
+    // The list of output formats that we always expand, and generate an expansion if there isn't one
+    static std::vector<FileFormat> valid = { MIDI, TIMEMAP, EXPANSIONMAP };
+    bool expandInputFormat = (std::find(valid.begin(), valid.end(), m_options->GetOutputTo()) != valid.end());
+
+    // Nothing to expand if the input format does not requires it and it is not forced
+    if (!expandInputFormat && !this->GetOptions()->m_expandAlways.GetValue()) return;
+
+    std::string expansionId = this->GetOptions()->m_expand.GetValue();
+    bool expandSelected = (!expansionId.empty());
+
+    // We have no --expand xmlid, so generate an expansion or use the first one (generation will be skipped)
+    if (!expandSelected) {
+        ListOfObjects scores = this->FindAllDescendantsByType(SCORE);
+        for (Object *object : scores) {
+            Score *score = vrv_cast<Score *>(object);
+            assert(score);
+            // Do not generate an expansion if there is already one
+            if (!score->FindDescendantByType(EXPANSION)) {
+                m_expansionMap.GenerateExpansionFor(score);
+            }
+        }
+    }
+
+    Expansion *startExpansion = NULL;
+    if (expandSelected) {
+        startExpansion = dynamic_cast<Expansion *>(this->FindDescendantByID(expansionId));
+        if (startExpansion == NULL) {
+            LogWarning("Expansion ID '%s' not found. Nothing expanded.", expansionId.c_str());
+            return;
+        }
+    }
+    // Use the first one (encoded or generated)
+    else {
+        startExpansion = dynamic_cast<Expansion *>(this->FindDescendantByType(EXPANSION));
+        if (startExpansion == NULL) {
+            LogWarning("No expansion found. Nothing expanded.");
+            return;
+        }
     }
 
     xsdAnyURI_List existingList; // list of xml:id strings of elements already in the document

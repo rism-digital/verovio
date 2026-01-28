@@ -104,6 +104,7 @@
 #include "orig.h"
 #include "oriscus.h"
 #include "ornam.h"
+#include "ossia.h"
 #include "page.h"
 #include "pagemilestone.h"
 #include "pages.h"
@@ -501,9 +502,21 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         m_currentNode = m_currentNode.append_child(name.c_str());
         this->WriteMeasure(m_currentNode, vrv_cast<Measure *>(object));
     }
+    else if (object->Is(OSSIA)) {
+        m_currentNode = m_currentNode.append_child("ossia");
+        this->WriteOssia(m_currentNode, vrv_cast<Ossia *>(object));
+    }
     else if (object->Is(STAFF)) {
-        m_currentNode = m_currentNode.append_child("staff");
-        this->WriteStaff(m_currentNode, vrv_cast<Staff *>(object));
+        Staff *staff = vrv_cast<Staff *>(object);
+        assert(staff);
+        if (staff->IsOssia()) {
+            m_currentNode = m_currentNode.append_child("oStaff");
+            this->WriteOStaff(m_currentNode, vrv_cast<Staff *>(object));
+        }
+        else {
+            m_currentNode = m_currentNode.append_child("staff");
+            this->WriteStaff(m_currentNode, vrv_cast<Staff *>(object));
+        }
     }
     else if (object->Is(LAYER)) {
         m_currentNode = m_currentNode.append_child("layer");
@@ -601,7 +614,6 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         m_currentNode = m_currentNode.append_child("phrase");
         this->WritePhrase(m_currentNode, vrv_cast<Phrase *>(object));
     }
-
     else if (object->Is(PITCHINFLECTION)) {
         m_currentNode = m_currentNode.append_child("pitchInfection");
         this->WritePitchInflection(m_currentNode, vrv_cast<PitchInflection *>(object));
@@ -1977,6 +1989,15 @@ void MEIOutput::WriteMeasure(pugi::xml_node currentNode, Measure *measure)
     }
 }
 
+void MEIOutput::WriteOssia(pugi::xml_node currentNode, Ossia *ossia)
+{
+    assert(ossia);
+
+    this->WriteXmlId(currentNode, ossia);
+
+    ossia->WriteTyped(currentNode);
+}
+
 void MEIOutput::WriteMeterSigGrp(pugi::xml_node currentNode, MeterSigGrp *meterSigGrp)
 {
     assert(meterSigGrp);
@@ -2312,6 +2333,23 @@ void MEIOutput::WriteStaff(pugi::xml_node currentNode, Staff *staff)
         staff->SetCoordY1(staff->m_drawingFacsY / DEFINITION_FACTOR);
         staff->WriteCoordY1(currentNode);
     }
+}
+
+void MEIOutput::WriteOStaff(pugi::xml_node currentNode, Staff *oStaff)
+{
+    assert(oStaff);
+
+    // Temporarily reset original n
+    oStaff->AttributesToExternal();
+
+    this->WriteXmlId(currentNode, oStaff);
+    this->WriteFacsimileInterface(currentNode, oStaff);
+    oStaff->WriteNInteger(currentNode);
+    oStaff->WriteTyped(currentNode);
+    oStaff->WriteVisibility(currentNode);
+
+    // Set it back
+    oStaff->AttributesToInternal();
 }
 
 void MEIOutput::WriteTempo(pugi::xml_node currentNode, Tempo *tempo)
@@ -5707,6 +5745,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (currentName == "ornam") {
             success = this->ReadOrnam(parent, current);
         }
+        else if (currentName == "ossia") {
+            success = this->ReadOssia(parent, current);
+        }
         else if (currentName == "pedal") {
             success = this->ReadPedal(parent, current);
         }
@@ -5753,6 +5794,48 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
             LogWarning("Unsupported '<%s>' within <measure>", current.name());
         }
     }
+    return success;
+}
+
+bool MEIInput::ReadOssia(Object *parent, pugi::xml_node ossia)
+{
+    Ossia *vrvOssia = new Ossia();
+    this->SetMeiID(ossia, vrvOssia);
+
+    vrvOssia->ReadTyped(ossia);
+
+    parent->AddChild(vrvOssia);
+    this->ReadUnsupportedAttr(ossia, vrvOssia);
+
+    bool success = true;
+    pugi::xml_node current;
+    for (current = ossia.first_child(); current; current = current.next_sibling()) {
+        const std::string currentName = current.name();
+        if (currentName == "staff") {
+            success = this->ReadStaff(vrvOssia, current);
+        }
+        else if (currentName == "oStaff") {
+            success = this->ReadOStaff(vrvOssia, current);
+        }
+    }
+
+    // Check that we don't have encoding that we do not support
+    if (!m_doc->GetOptions()->m_ossiaHidden.GetValue()) {
+        ListOfObjects proports = vrvOssia->FindAllDescendantsByType(STAFF);
+        for (Object *object : proports) {
+            Staff *staff = vrv_cast<Staff *>(object);
+            if (!staff->IsOssia()) continue;
+            bool hide = false;
+            // Hide oStaff with no n (even if n="1" is added in ReadOStaff but for the sake of completeness)
+            hide = !staff->HasN();
+            // Hide oStaff with no layer
+            hide = hide || !staff->FindDescendantByType(LAYER);
+            // Hide oStaff for which there is no corresponding staff
+            hide = hide || !vrvOssia->GetOriginalStaffForOssia(staff);
+            if (hide) staff->SetVisibility(Hidden);
+        }
+    }
+
     return success;
 }
 
@@ -6326,15 +6409,6 @@ bool MEIInput::ReadStaff(Object *parent, pugi::xml_node staff)
     vrvStaff->ReadTyped(staff);
     vrvStaff->ReadVisibility(staff);
 
-    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
-        UpgradeStaffTo_5_0(staff);
-    }
-
-    if (staff.attribute("coord.y1") && m_doc->IsTranscription()) {
-        vrvStaff->ReadCoordY1(staff);
-        vrvStaff->m_drawingFacsY = vrvStaff->GetCoordY1() * DEFINITION_FACTOR;
-    }
-
     if (!vrvStaff->HasN() || (vrvStaff->GetN() == 0)) {
         LogWarning("No @n on <staff> or a value of 0 might yield unpredictable results");
     }
@@ -6342,6 +6416,32 @@ bool MEIInput::ReadStaff(Object *parent, pugi::xml_node staff)
     parent->AddChild(vrvStaff);
     this->ReadUnsupportedAttr(staff, vrvStaff);
     return this->ReadStaffChildren(vrvStaff, staff);
+}
+
+bool MEIInput::ReadOStaff(Object *parent, pugi::xml_node oStaff)
+{
+    Staff *vrvStaff = new Staff();
+    vrvStaff->SetOssia(true);
+    this->SetMeiID(oStaff, vrvStaff);
+    this->ReadFacsimileInterface(oStaff, vrvStaff);
+
+    vrvStaff->ReadNInteger(oStaff);
+    vrvStaff->ReadTyped(oStaff);
+    vrvStaff->ReadVisibility(oStaff);
+
+    if (!vrvStaff->HasN() || (vrvStaff->GetN() == 0)) {
+        LogWarning("No @n on <staff> or a value of 0 might yield unpredictable results");
+    }
+
+    vrvStaff->AttributesToInternal();
+
+    if (m_doc->GetOptions()->m_ossiaHidden.GetValue()) {
+        vrvStaff->SetVisibility(Hidden);
+    }
+
+    parent->AddChild(vrvStaff);
+    this->ReadUnsupportedAttr(oStaff, vrvStaff);
+    return this->ReadStaffChildren(vrvStaff, oStaff);
 }
 
 bool MEIInput::ReadStaffChildren(Object *parent, pugi::xml_node parentNode)

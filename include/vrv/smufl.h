@@ -240,6 +240,7 @@ enum {
     SMUFL_E4D2_caesuraThick = 0xE4D2,
     SMUFL_E4D3_caesuraShort = 0xE4D3,
     SMUFL_E4D4_caesuraCurved = 0xE4D4,
+    SMUFL_E4D5_breathMarkSalzedo = 0xE4D5,
     SMUFL_E4D7_caesuraSingleStroke = 0xE4D7,
     SMUFL_E4E0_restMaxima = 0xE4E0,
     SMUFL_E4E1_restLonga = 0xE4E1,
@@ -670,7 +671,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 645
+#define SMUFL_COUNT 646
 
 } // namespace vrv
 

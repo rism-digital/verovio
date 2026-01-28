@@ -25,7 +25,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    AdjustDotsFunctor(Doc *doc, const std::vector<int> &staffNs);
+    AdjustDotsFunctor(Doc *doc);
     virtual ~AdjustDotsFunctor() = default;
     ///@}
 
@@ -41,7 +41,7 @@ public:
     FunctorCode VisitAlignmentEnd(Alignment *alignment) override;
     FunctorCode VisitLayerElement(LayerElement *layerElement) override;
     FunctorCode VisitMeasure(Measure *measure) override;
-    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitSystem(System *system) override;
     ///@}
 
 protected:

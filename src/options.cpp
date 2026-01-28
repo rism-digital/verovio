@@ -895,6 +895,9 @@ Options::Options()
     // These are not registered in a group and not listed in Toolkit::GetOptions
     // There are listed in Toolkit::GetAvailableOptions through Options::GetBaseOptGrp
 
+    m_inputFromFormat = AUTO;
+    m_outputToFormat = UNKNOWN;
+
     m_baseOptions.SetLabel("Base short options", "0-base");
     m_baseOptions.SetCategory(OptionsCategory::Base);
 
@@ -1434,6 +1437,10 @@ Options::Options()
     m_octaveNoSpanningParentheses.Init(false);
     this->Register(&m_octaveNoSpanningParentheses, "octaveNoSpanningParentheses", &m_generalLayout);
 
+    m_ossiaStaffSize.SetInfo("Ossia staff size", "The ossia staff size in relation to the staff size");
+    m_ossiaStaffSize.Init(0.5, 0.75, 1.00);
+    this->Register(&m_ossiaStaffSize, "ossiaStaffSize", &m_generalLayout);
+
     m_pedalLineThickness.SetInfo("Pedal line thickness", "The thickness of the line used for piano pedaling");
     m_pedalLineThickness.Init(0.20, 0.10, 1.00);
     this->Register(&m_pedalLineThickness, "pedalLineThickness", &m_generalLayout);
@@ -1497,6 +1504,10 @@ Options::Options()
     m_spacingNonLinear.SetInfo("Spacing non linear", "Specify the non-linear spacing factor");
     m_spacingNonLinear.Init(0.6, 0.0, 1.0);
     this->Register(&m_spacingNonLinear, "spacingNonLinear", &m_generalLayout);
+
+    m_spacingOssia.SetInfo("Spacing ossia", "Specify the factor of an ossia spacing in relation to staff spacing");
+    m_spacingOssia.Init(0.35, 0.1, 1.0);
+    this->Register(&m_spacingOssia, "spacingOssia", &m_generalLayout);
 
     m_spacingStaff.SetInfo("Spacing staff", "The staff minimal spacing in MEI units");
     m_spacingStaff.Init(12, 0, 48);
@@ -1581,6 +1592,14 @@ Options::Options()
     m_expand.Init("");
     this->Register(&m_expand, "expand", &m_selectors);
 
+    m_expandAlways.SetInfo("Always expand", "Expand for all outputs, using selected, first, or generated expansion");
+    m_expandAlways.Init(false);
+    this->Register(&m_expandAlways, "expandAlways", &m_selectors);
+
+    m_expandNever.SetInfo("Never expansion", "Expand for no output, including MIDI and timemap");
+    m_expandNever.Init(false);
+    this->Register(&m_expandNever, "expandNever", &m_selectors);
+
     m_loadSelectedMdivOnly.SetInfo(
         "Load selected Mdiv only", "Load only the selected mdiv; the content of the other is skipped");
     m_loadSelectedMdivOnly.Init(false);
@@ -1594,6 +1613,10 @@ Options::Options()
         "Set the xPath query for selecting the <mdiv> to be rendered; only one <mdiv> can be rendered");
     m_mdivXPathQuery.Init("");
     this->Register(&m_mdivXPathQuery, "mdivXPathQuery", &m_selectors);
+
+    m_ossiaHidden.SetInfo("Ossia hidden", "Hide ossias when rendering");
+    m_ossiaHidden.Init(false);
+    this->Register(&m_ossiaHidden, "ossiaHidden", &m_selectors);
 
     m_substXPathQuery.SetInfo("Subst xPath query",
         "Set the xPath query for selecting <subst> child elements, for "
@@ -1919,6 +1942,105 @@ Options &Options::operator=(const Options &options)
 }
 
 Options::~Options() {}
+
+bool Options::SetOutputTo(std::string const &outputTo)
+{
+    if ((outputTo == "humdrum") || (outputTo == "hum")) {
+        m_outputToFormat = HUMDRUM;
+    }
+    else if (outputTo == "mei") {
+        m_outputToFormat = MEI;
+    }
+    else if (outputTo == "mei-basic") {
+        m_outputToFormat = MEI;
+    }
+    else if (outputTo == "mei-pb") {
+        m_outputToFormat = MEI;
+    }
+    else if (outputTo == "mei-facs") {
+        m_outputToFormat = MEI;
+    }
+    else if (outputTo == "midi") {
+        m_outputToFormat = MIDI;
+    }
+    else if (outputTo == "hummidi") {
+        m_outputToFormat = HUMMIDI;
+    }
+    else if (outputTo == "timemap") {
+        m_outputToFormat = TIMEMAP;
+    }
+    else if (outputTo == "expansionmap") {
+        m_outputToFormat = EXPANSIONMAP;
+    }
+    else if (outputTo == "pae") {
+        m_outputToFormat = PAE;
+    }
+    else if (outputTo == "mei-pb-serialized") {
+        m_outputToFormat = SERIALIZATION;
+    }
+    else if (outputTo != "svg") {
+        LogError("Output format '%s' is not supported", outputTo.c_str());
+        return false;
+    }
+    return true;
+}
+
+bool Options::SetInputFrom(std::string const &inputFrom)
+{
+    if (inputFrom == "abc") {
+        m_inputFromFormat = ABC;
+    }
+    else if (inputFrom == "pae") {
+        m_inputFromFormat = PAE;
+    }
+    else if (inputFrom == "darms") {
+        m_inputFromFormat = DARMS;
+    }
+    else if (inputFrom == "volpiano") {
+        m_inputFromFormat = VOLPIANO;
+    }
+    else if (inputFrom == "cmme.xml") {
+        m_inputFromFormat = CMME;
+    }
+    else if ((inputFrom == "humdrum") || (inputFrom == "hum")) {
+        m_inputFromFormat = HUMDRUM;
+    }
+    else if (inputFrom == "mei") {
+        m_inputFromFormat = MEI;
+    }
+    else if ((inputFrom == "musicxml") || (inputFrom == "xml")) {
+        m_inputFromFormat = MUSICXML;
+    }
+    else if (inputFrom == "md") {
+        m_inputFromFormat = MUSEDATAHUM;
+    }
+    else if (inputFrom == "musedata") {
+        m_inputFromFormat = MUSEDATAHUM;
+    }
+    else if (inputFrom == "musedata-hum") {
+        m_inputFromFormat = MUSEDATAHUM;
+    }
+    else if (inputFrom == "musicxml-hum") {
+        m_inputFromFormat = MUSICXMLHUM;
+    }
+    else if (inputFrom == "mei-hum") {
+        m_inputFromFormat = MEIHUM;
+    }
+    else if (inputFrom == "esac") {
+        m_inputFromFormat = ESAC;
+    }
+    else if (inputFrom == "mei-pb-serialized") {
+        m_inputFromFormat = SERIALIZATION;
+    }
+    else if (inputFrom == "auto") {
+        m_inputFromFormat = AUTO;
+    }
+    else {
+        LogError("Input format '%s' is not supported", inputFrom.c_str());
+        return false;
+    }
+    return true;
+}
 
 void Options::Sync()
 {

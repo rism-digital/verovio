@@ -112,6 +112,7 @@ class OffsetSpanningInterface;
 class Orig;
 class Oriscus;
 class Ornam;
+class Ossia;
 class Page;
 class PageElement;
 class PageMilestoneEnd;
@@ -385,7 +386,9 @@ private:
     void WriteMeterSigGrp(pugi::xml_node currentNode, MeterSigGrp *meterSigGrp);
     void WriteFb(pugi::xml_node currentNode, Fb *fb);
     void WriteStaff(pugi::xml_node currentNode, Staff *staff);
+    void WriteOStaff(pugi::xml_node currentNode, Staff *oStaff);
     void WriteLayer(pugi::xml_node currentNode, Layer *layer);
+    void WriteOssia(pugi::xml_node currentNode, Ossia *ossia);
     ///@}
 
     /**
@@ -698,6 +701,7 @@ private:
     bool ReadLabel(Object *parent, pugi::xml_node label);
     bool ReadLabelAbbr(Object *parent, pugi::xml_node labelAbbr);
     bool ReadTuning(Object *parent, pugi::xml_node tuning);
+    bool ReadOssia(Object *parent, pugi::xml_node ossia);
     bool ReadTuningChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadCourse(Object *parent, pugi::xml_node course);
     bool ReadSymbolTable(Object *parent, pugi::xml_node parentNode);
@@ -709,6 +713,7 @@ private:
     bool ReadFbChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadNum(Object *parent, pugi::xml_node parentNode);
     bool ReadStaff(Object *parent, pugi::xml_node staff);
+    bool ReadOStaff(Object *parent, pugi::xml_node oStaff);
     bool ReadStaffChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadLayer(Object *parent, pugi::xml_node layer);
     bool ReadLayerDef(Object *parent, pugi::xml_node layerDef);

@@ -58,7 +58,7 @@ bool Tuning::IsSupportedChild(ClassId classId)
 }
 
 int Tuning::CalcPitchPos(int course, data_NOTATIONTYPE notationType, int lines, int listSize, int index, int loc,
-    int tabLine, int tabAnchorline, bool topAlign) const
+    int tabLine, int tabAnchorline, bool topAlign)
 {
     switch (notationType) {
         case NOTATIONTYPE_tab_lute_french:

@@ -287,6 +287,14 @@ public:
     void ResetID();
 
     /**
+     * @name Methods for converting attributes to and from their original values (i.e, external / internal).
+     */
+    ///@{
+    virtual void AttributesToExternal() {};
+    virtual void AttributesToInternal() {};
+    ///@}
+
+    /**
      * Methods for setting / getting comments
      */
     std::string GetComment() const { return m_comment; }
@@ -351,7 +359,7 @@ public:
      * Fill an array of pairs with all attributes and their values.
      * Return the number of attributes found.
      */
-    int GetAttributes(ArrayOfStrAttr *attributes) const;
+    int GetAttributes(ArrayOfStrAttr *attributes, bool convertToExternal = true) const;
 
     /**
      * Check if an Object has an attribute with the specified value
@@ -1119,6 +1127,15 @@ public:
     ClassRegistrar(std::string name, ClassId classId)
     {
         ObjectFactory::GetInstance()->Register(name, classId, []() -> Object * { return new T(); });
+    }
+
+    /**
+     * The contructor registering the name / constructor map taking a custom factory function.
+     * Use a pseudo ClassId for correct mapping.
+     */
+    ClassRegistrar(const std::string &name, ClassId pseudoClassId, std::function<Object *()> factory)
+    {
+        ObjectFactory::GetInstance()->Register(name, pseudoClassId, factory);
     }
 };
 

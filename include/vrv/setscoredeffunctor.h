@@ -124,7 +124,12 @@ public:
     /*
      * Abstract base implementation
      */
-    bool ImplementsEndInterface() const override { return false; }
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Getter for ossia flag
+     */
+    bool HasOssia() const { return m_hasOssia; }
 
     /*
      * Functor interface
@@ -135,6 +140,7 @@ public:
     FunctorCode VisitLayer(Layer *layer) override;
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitMensur(Mensur *mensur) override;
+    FunctorCode VisitOssia(Ossia *ossia) override;
     FunctorCode VisitPage(Page *page) override;
     FunctorCode VisitProport(Proport *proport) override;
     FunctorCode VisitScore(Score *score) override;
@@ -143,6 +149,7 @@ public:
     FunctorCode VisitStaffDef(StaffDef *staffDef) override;
     FunctorCode VisitStaffGrp(StaffGrp *staffGrp) override;
     FunctorCode VisitSystem(System *system) override;
+    FunctorCode VisitSystemEnd(System *system) override;
     ///@}
 
 protected:
@@ -170,6 +177,12 @@ private:
     bool m_restart;
     // Flag indicating if we already have a measure in the system
     bool m_hasMeasure;
+    // Map of ossia above a given staffN
+    MapOfOssiaStaffNs m_ossiasAbove;
+    // Map of ossia below a given staffN
+    MapOfOssiaStaffNs m_ossiasBelow;
+    // Flag indicating if we need have ossias to process
+    bool m_hasOssia;
 };
 
 //----------------------------------------------------------------------------
@@ -310,6 +323,79 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ScoreDefSetOssiaFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class prepares the ossia staffDefs for drawing.
+ */
+class ScoreDefSetOssiaFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    ScoreDefSetOssiaFunctor(Doc *doc);
+    virtual ~ScoreDefSetOssiaFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitClef(Clef *clef) override;
+    FunctorCode VisitLayer(Layer *layer) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitMeasureEnd(Measure *measure) override;
+    FunctorCode VisitOssia(Ossia *ossia) override;
+    FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitStaffEnd(Staff *staff) override;
+    FunctorCode VisitSystem(System *system) override;
+    ///@}
+
+protected:
+    //
+private:
+    /**
+     * Retrieve the upcoming staffDef from a previous ossia - if any.
+     */
+    const StaffDef *GetPreviousStaffDef(Ossia *ossia, int staffN);
+
+    /**
+     * Internal class for storing current ossias values.
+     * Includes the upcoming staffDefs.
+     */
+    class CurrentOssia {
+    public:
+        Ossia *m_ossia = NULL;
+        std::map<int, StaffDef> m_staffDefs;
+    };
+
+public:
+    //
+private:
+    // The current ossias (i.e., in the current measure)
+    std::list<CurrentOssia> m_currentOssias;
+    // The ossias in the previous measure
+    std::list<CurrentOssia> m_previousOssias;
+    // The upcoming staffDef
+    StaffDef m_upcomingStaffDef;
+    // The current scoreDef
+    ScoreDef *m_currentScoreDef;
+    // The current staffDef
+    StaffDef *m_currentStaffDef;
+    // A flag indicating the layer ossia staffDef will have to be drawn
+    bool m_layerOssiaStaffDef;
+    // Flag for first measure in the system
+    bool m_isFirstMeasure;
+};
+
+//----------------------------------------------------------------------------
 // ScoreDefUnsetCurrentFunctor
 //----------------------------------------------------------------------------
 
@@ -339,6 +425,7 @@ public:
     FunctorCode VisitKeySig(KeySig *keySig) override;
     FunctorCode VisitLayer(Layer *layer) override;
     FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitOssia(Ossia *ossia) override;
     FunctorCode VisitPage(Page *page) override;
     FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitSystem(System *system) override;
