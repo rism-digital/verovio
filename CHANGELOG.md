@@ -2,6 +2,10 @@
 
 ## [unreleased]
 
+## [6.0.1] – 2026-01-29
+* Fix ossia staff size option values
+* Revert default css scoping removal
+
 ## [6.0.0] – 2026-01-28
 * Support for ossia staves
 * Support for expansion generation in MusicXML importer
