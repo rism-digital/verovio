@@ -280,6 +280,8 @@ void Toolkit::SetMidiDoc()
         MEIInput midiInput(m_midiDoc);
         midiInput.Import(this->GetMEI());
         m_midiDoc->PrepareData();
+        m_midiDoc->GetFirstVisibleScore()->GetScoreDef()->SetTuneCustom(
+            m_doc.GetFirstVisibleScore()->GetScoreDef()->GetTuneCustom());
     }
 }
 
