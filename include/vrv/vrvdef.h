@@ -38,8 +38,8 @@ namespace vrv {
 // Version
 //----------------------------------------------------------------------------
 
-#define VERSION_MAJOR 5
-#define VERSION_MINOR 8
+#define VERSION_MAJOR 6
+#define VERSION_MINOR 1
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true

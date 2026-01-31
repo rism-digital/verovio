@@ -1,15 +1,24 @@
 # Changelog
 
 ## [unreleased]
+
+## [6.0.1] – 2026-01-29
+* Fix ossia staff size option values
+* Revert default css scoping removal
+
+## [6.0.0] – 2026-01-28
 * Support for ossia staves
 * Support for expansion generation in MusicXML importer
+* Support for expansion generation based on measure repeats (basic implementation)
+* Support for default expansion (generated or first one encoded) in MIDI and timemap output
 * Improved MusicXML importer (articulations, spacing, clef changes, tempo spacing, coda, segno)
 * Improved `note@head.fill` support
 * Improved SVG styling structure
 * Option `--spacing-ossia` for adjusting the spacing of ossia staves
 * Option `--ossia-hidden` for hiding rendering of ossia staves
-* Option `--expand-first` to expand first `expansion` in the score
-* Option `--expand-generate` to generate `expansion` from measure repeats
+* Option `--expand-always` to enable expansion in SVG and MEI output
+* Option `--expand-never` to disable expansion in MIDI and timemap output
+* Remove default css scoping
 
 ## [5.7.0] – 2025-12-02
 * Support for `@ho` and `@vo` on relevant layer elements and control events
