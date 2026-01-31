@@ -273,22 +273,22 @@ namespace musicxml {
         int m_layerNum = 0;
     };
 
-    struct AccidGes {
-        AccidGes()
+    struct Accidental {
+        Accidental()
         {
-            m_accidGes = ACCIDENTAL_GESTURAL_NONE;
+            m_accid = ACCIDENTAL_WRITTEN_NONE;
             m_glyphName = "";
             m_glyphAuth = "";
         }
 
-        AccidGes(data_ACCIDENTAL_GESTURAL accidGes, std::string glyphName, std::string glyphAuth)
+        Accidental(data_ACCIDENTAL_WRITTEN accid, std::string glyphName, std::string glyphAuth)
         {
-            m_accidGes = accidGes;
+            m_accid = accid;
             m_glyphName = glyphName;
             m_glyphAuth = glyphAuth;
         }
 
-        data_ACCIDENTAL_GESTURAL m_accidGes;
+        data_ACCIDENTAL_WRITTEN m_accid;
         std::string m_glyphName;
         std::string m_glyphAuth;
     };
@@ -563,7 +563,7 @@ private:
      * @name Method to update the gestural accidentals for each pitch class based on key signature
      */
     ///@{
-    void ResetAccidGes(const KeySig *keySig = NULL);
+    void ResetAccidental(const KeySig *keySig = NULL);
     ///@}
 
     /*
@@ -690,7 +690,7 @@ private:
     /* measure rests */
     std::map<int, int> m_multiRests;
     /* a map of current accidental for each pitch class */
-    std::map<data_PITCHNAME, std::vector<musicxml::AccidGes>> m_currentAccids;
+    std::map<data_PITCHNAME, std::vector<musicxml::Accidental>> m_currentAccids;
     /* current key signature */
     KeySig *m_currentKeySig = NULL;
     /* A flag indicating we had a clef change */

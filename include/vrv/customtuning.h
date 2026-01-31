@@ -58,12 +58,21 @@ private:
     /**
      * Create the note mapping.
      */
-    void CreateNoteMapping(Doc *doc, bool useMusicXmlAccidentals);
+    void CreateNoteMapping(bool useMusicXmlAccidentals);
+
+    /*
+     * @name Helper functions for SMuFL glyphs
+     */
+    ///@{
+    char32_t GetAccidGlyph(std::string accid, bool useMusicXmlAccidentals) const;
+    std::string GetGlyphName(char32_t accidental) const;
+    ///@}
 
 public:
     //
 
 private:
+    const Doc *m_doc;
     Tunings::Tuning m_tuning;
     TuningNoteMap m_noteMap;
 };
