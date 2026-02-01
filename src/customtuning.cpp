@@ -143,19 +143,19 @@ int CustomTuning::GetMIDIPitch(const Note *note, const int shift, const int octa
             }
         }
         else {
-            char32_t glyph;
-            std::string glyphName;
+            char32_t glyph = 0;
             if (accid->HasAccid()) {
                 glyph = GetAccidGlyph(att->AccidentalWrittenToStr(accid->GetAccid()), false);
-                if (glyph) glyphName = GetGlyphName(glyph);
             }
             else if (accid->HasAccidGes()) {
                 glyph = GetAccidGlyph(att->AccidentalGesturalToStr(accid->GetAccidGes()), false);
-                if (glyph) glyphName = GetGlyphName(glyph);
             }
-            if (!glyphName.empty()) {
-                if (accs++) noteName += "+";
-                noteName += glyphName;
+            if (glyph) {
+                std::string glyphName = GetGlyphName(glyph);
+                if (!glyphName.empty()) {
+                    if (accs++) noteName += "+";
+                    noteName += glyphName;
+                }
             }
         }
     }

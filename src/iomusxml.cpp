@@ -3147,9 +3147,25 @@ void MusicXmlInput::ReadMusicXmlNote(
                             Accid *accid = new Accid();
                             note->AddChild(accid);
                             accid->IsAttribute(true);
-                            accid->SetAccid(current.m_accid);
-                            accid->SetGlyphName(current.m_glyphName);
-                            accid->SetGlyphAuth(current.m_glyphAuth);
+
+                            // to make sure the new *gestural* accidental conforms to the carried-over *written* accidental,
+                            // we translate the latter to a SMuFL glyph and set the gestural accidental to a natural.
+                            accid->SetAccidGes(ACCIDENTAL_GESTURAL_n);
+                            if (!current.m_glyphName.empty()) {
+                                accid->SetGlyphName(current.m_glyphName);
+                                accid->SetGlyphAuth(current.m_glyphAuth);
+                            }
+                            else if (current.m_accid != ACCIDENTAL_WRITTEN_NONE) {
+                                char32_t smufl = Accid::GetAccidGlyph(current.m_accid);
+                                const Glyph *glyph = m_doc->GetResources().GetGlyph(smufl);
+                                if (glyph) {
+                                    accid->SetGlyphName(glyph->GetCodeStr());
+                                    accid->SetGlyphAuth("smufl");
+                                }
+                                else {
+                                    LogError("MusicXML import: SMuFL glyph U+%04X not found in glyph table", smufl);
+                                }
+                            }
                         }
                     }
                     catch (std::out_of_range &e) {
