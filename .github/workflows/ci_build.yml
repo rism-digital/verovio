@@ -133,7 +133,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
 
       - name: Register gcc problem matcher
         run: echo "::add-matcher::.github/problem_matchers/gcc.json"
@@ -215,10 +215,10 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
 
       - name: Restore cache
-        uses: actions/setup-java@v5.1.0
+        uses: actions/setup-java@v5.2.0
         with:
           distribution: 'temurin'
           java-version: '21'
@@ -305,7 +305,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
@@ -360,7 +360,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
@@ -422,7 +422,7 @@ jobs:
 
     steps:
       - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
         with:
           # repository to check out
           repository: ${{ env.GH_PAGES_REPO }}
@@ -515,7 +515,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
 
       - name: Install doxygen
         run: |
@@ -552,7 +552,7 @@ jobs:
 
     steps:
       - name: Checkout DOXYGEN_REPO into DOXYGEN_DIR
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
         with:
           # repository to check out
           repository: ${{ env.DOXYGEN_REPO }}
