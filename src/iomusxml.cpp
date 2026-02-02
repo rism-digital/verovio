@@ -879,7 +879,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     assert(root);
 
     // initialize accidentals map
-    this->ResetAccidental();
+    this->ResetAccidentals();
 
     // check for multimetric music
     bool multiMetric = root.select_node("/score-partwise/part/measure[@non-controlling='yes']");
@@ -1863,7 +1863,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     assert(measure);
 
     // re-initialize the accidentals to the current key signature.
-    this->ResetAccidental(m_currentKeySig);
+    this->ResetAccidentals(m_currentKeySig);
 
     const std::string measureNum = node.attribute("number").as_string();
     if (node.attribute("id")) measure->SetID(node.attribute("id").as_string());
@@ -3148,8 +3148,9 @@ void MusicXmlInput::ReadMusicXmlNote(
                             note->AddChild(accid);
                             accid->IsAttribute(true);
 
-                            // to make sure the new *gestural* accidental conforms to the carried-over *written* accidental,
-                            // we translate the latter to a SMuFL glyph and set the gestural accidental to a natural.
+                            // to make sure the new *gestural* accidental conforms to the carried-over *written*
+                            // accidental, we translate the latter to a SMuFL glyph and set the gestural accidental to a
+                            // natural.
                             accid->SetAccidGes(ACCIDENTAL_GESTURAL_n);
                             if (!current.m_glyphName.empty()) {
                                 accid->SetGlyphName(current.m_glyphName);
@@ -4413,13 +4414,13 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
     }
 
     // adjust the accidentals map to this key signature
-    this->ResetAccidental(keySig);
+    this->ResetAccidentals(keySig);
     m_currentKeySig = keySig;
 
     return keySig;
 }
 
-void MusicXmlInput::ResetAccidental(const KeySig *keySig)
+void MusicXmlInput::ResetAccidentals(const KeySig *keySig)
 {
     // inspired by KeySig::FillMap() but without the octave repetitions
     m_currentAccids.clear();

@@ -560,10 +560,10 @@ private:
     ///@}
 
     /*
-     * @name Method to update the gestural accidentals for each pitch class based on key signature
+     * @name Update the carried-over accidentals for each pitch class based on key signature
      */
     ///@{
-    void ResetAccidental(const KeySig *keySig = NULL);
+    void ResetAccidentals(const KeySig *keySig = NULL);
     ///@}
 
     /*

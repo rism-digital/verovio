@@ -37,12 +37,15 @@ CustomTuning::CustomTuning(const std::string &tuningDef, Doc *doc, bool useMusic
 /**
  * Map the tuning note names to MEI notes.
  *
- * - Convert accidentals from MusicXML or MEI to SMuFL accidentals
+ * - Convert accidentals from MusicXML or MEI to SMuFL
  * - Detect enharmonics separated by `/`
  * - Detect multiple accidentals separated by `+`
+ * - Ignore natural accidental
  */
 void CustomTuning::CreateNoteMapping(bool useMusicXmlAccidentals)
 {
+    assert(m_doc);
+
     m_noteMap.clear();
     for (const auto &note : m_tuning.notationMapping.names) {
         std::smatch note_names;
@@ -57,14 +60,13 @@ void CustomTuning::CreateNoteMapping(bool useMusicXmlAccidentals)
             while (std::regex_search(accid_start, accids.cend(), accid_names, accid_name_regex)) {
                 std::string accid = accid_names[1].str();
                 bool valid = false;
-                assert(m_doc);
                 if (m_doc->GetResources().GetGlyphCode(accid)) {
                     if (accid_start != accids.cbegin()) mei += "+";
                     mei += accid;
                     valid = true;
                 }
                 else {
-                    char32_t accidental = CustomTuning::GetAccidGlyph(accid, useMusicXmlAccidentals);
+                    char32_t accidental = GetAccidGlyph(accid, useMusicXmlAccidentals);
                     if (accidental) {
                         valid = true;
                         if (accidental != SMUFL_E261_accidentalNatural) {
