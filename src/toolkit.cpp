@@ -2521,7 +2521,6 @@ std::string Toolkit::GetPitchPosition(double scoreTime, double midiPitch, int st
     int clefOffset = 0;
     const KeySig *keySig = NULL;
     if (layer) {
-        clefOffset = layer->GetClefLocOffset(NULL);
         keySig = layer->GetCurrentKeySig();
     }
 
@@ -2556,6 +2555,10 @@ std::string Toolkit::GetPitchPosition(double scoreTime, double midiPitch, int st
             anchorNote = note;
             anchorPitchDistance = distance;
         }
+    }
+
+    if (layer) {
+        clefOffset = layer->GetClefLocOffset(anchorNote);
     }
 
     const bool preferSharps = (keySig && (keySig->GetAccidType() == ACCIDENTAL_WRITTEN_s));
