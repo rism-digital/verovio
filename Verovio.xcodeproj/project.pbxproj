@@ -976,6 +976,12 @@
 		4DF440771D39575500152B7E /* ending.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF440761D39575500152B7E /* ending.cpp */; };
 		4DF440781D39575500152B7E /* ending.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF440761D39575500152B7E /* ending.cpp */; };
 		4DF4407D1D511D0200152B7E /* systemmilestone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF4407C1D511D0200152B7E /* systemmilestone.cpp */; };
+		4DF9DB2E2F32319C0003112D /* editortoolkit_shared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9DB2D2F32319C0003112D /* editortoolkit_shared.cpp */; };
+		4DF9DB2F2F32319C0003112D /* editortoolkit_shared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9DB2D2F32319C0003112D /* editortoolkit_shared.cpp */; };
+		4DF9DB302F32319C0003112D /* editortoolkit_shared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9DB2D2F32319C0003112D /* editortoolkit_shared.cpp */; };
+		4DF9DB312F32319C0003112D /* editortoolkit_shared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9DB2D2F32319C0003112D /* editortoolkit_shared.cpp */; };
+		4DF9DB332F3231B50003112D /* editortoolkit_shared.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF9DB322F3231B50003112D /* editortoolkit_shared.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4DF9DB342F3231B50003112D /* editortoolkit_shared.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF9DB322F3231B50003112D /* editortoolkit_shared.h */; };
 		4DFB3E8523ABDFC200D688C7 /* pitchinflection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB3E8423ABDFC200D688C7 /* pitchinflection.cpp */; };
 		4DFB3E8623ABDFC200D688C7 /* pitchinflection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB3E8423ABDFC200D688C7 /* pitchinflection.cpp */; };
 		4DFB3E8723ABDFC200D688C7 /* pitchinflection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB3E8423ABDFC200D688C7 /* pitchinflection.cpp */; };
@@ -2196,6 +2202,8 @@
 		4DF440761D39575500152B7E /* ending.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ending.cpp; path = src/ending.cpp; sourceTree = "<group>"; };
 		4DF4407B1D511CEE00152B7E /* systemmilestone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = systemmilestone.h; path = include/vrv/systemmilestone.h; sourceTree = "<group>"; };
 		4DF4407C1D511D0200152B7E /* systemmilestone.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = systemmilestone.cpp; path = src/systemmilestone.cpp; sourceTree = "<group>"; };
+		4DF9DB2D2F32319C0003112D /* editortoolkit_shared.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = editortoolkit_shared.cpp; path = src/editortoolkit_shared.cpp; sourceTree = "<group>"; };
+		4DF9DB322F3231B50003112D /* editortoolkit_shared.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = editortoolkit_shared.h; path = include/vrv/editortoolkit_shared.h; sourceTree = "<group>"; };
 		4DFB3E8423ABDFC200D688C7 /* pitchinflection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pitchinflection.cpp; path = src/pitchinflection.cpp; sourceTree = "<group>"; };
 		4DFB3E8923ABDFDA00D688C7 /* pitchinflection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pitchinflection.h; path = include/vrv/pitchinflection.h; sourceTree = "<group>"; };
 		4DFD82FA2A38398200A3E20B /* repeatmark.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = repeatmark.cpp; path = src/repeatmark.cpp; sourceTree = "<group>"; };
@@ -2607,6 +2615,8 @@
 				4DA0EAE722BB77C300A7EBEB /* editortoolkit_neume.cpp */,
 				4DA0EAD122BB77AF00A7EBEB /* editortoolkit_neume.h */,
 				4DA0EAD422BB77AF00A7EBEB /* editortoolkit_mensural.h */,
+				4DF9DB2D2F32319C0003112D /* editortoolkit_shared.cpp */,
+				4DF9DB322F3231B50003112D /* editortoolkit_shared.h */,
 				4DA0EAD622BB77AF00A7EBEB /* editortoolkit.h */,
 				4D2614172E6995D700CD28CF /* editortoolkit.cpp */,
 			);
@@ -3437,6 +3447,7 @@
 				4D1BE7831C69434C0086DC0E /* MidiMessage.h in Headers */,
 				E7F39C5E29A62B260055DBE0 /* adjustclefchangesfunctor.h in Headers */,
 				E74A806628BC97D5005274E7 /* findfunctor.h in Headers */,
+				4DF9DB342F3231B50003112D /* editortoolkit_shared.h in Headers */,
 				4DB3D8BF1F83D0DC00B5FC2B /* section.h in Headers */,
 				8F59294C18854BF800FE51AD /* page.h in Headers */,
 				BD87768727CE8A21005B97EA /* layerdef.h in Headers */,
@@ -3760,6 +3771,7 @@
 				4D94E0E32995411100F49F89 /* meibasic.h in Headers */,
 				4DA0EAD822BB77AF00A7EBEB /* editortoolkit_cmn.h in Headers */,
 				4DACCA102990F2E600B55913 /* att.h in Headers */,
+				4DF9DB332F3231B50003112D /* editortoolkit_shared.h in Headers */,
 				BB4C4AD822A932B6001F6AF0 /* staff.h in Headers */,
 				BB4C4AF222A932BC001F6AF0 /* orig.h in Headers */,
 				E7A03CD229D6172D00C02941 /* adjusttupletsyfunctor.h in Headers */,
@@ -4293,6 +4305,7 @@
 				4D6479412C9C0F4200CD9539 /* genericlayerelement.cpp in Sources */,
 				4D16943D1E3A44F300569BF4 /* view_element.cpp in Sources */,
 				4DACC9AB2990F29A00B55913 /* attmodule.cpp in Sources */,
+				4DF9DB302F32319C0003112D /* editortoolkit_shared.cpp in Sources */,
 				4D16943E1E3A44F300569BF4 /* view_graph.cpp in Sources */,
 				4D16943F1E3A44F300569BF4 /* view_page.cpp in Sources */,
 				4D1694401E3A44F300569BF4 /* view_tuplet.cpp in Sources */,
@@ -4377,6 +4390,7 @@
 				4D508C3026D4E64C00020F35 /* crc.cpp in Sources */,
 				8F086EE4188539540037FD8E /* barline.cpp in Sources */,
 				E7E9C11529B0A1FF00CFCE2F /* adjustaccidxfunctor.cpp in Sources */,
+				4DF9DB312F32319C0003112D /* editortoolkit_shared.cpp in Sources */,
 				4DACC9A62990F29A00B55913 /* atts_externalsymbols.cpp in Sources */,
 				8F086EE5188539540037FD8E /* bboxdevicecontext.cpp in Sources */,
 				4DB3D8961F7C2B0E00B5FC2B /* lb.cpp in Sources */,
@@ -4892,6 +4906,7 @@
 				E7BCFFB5281297980012513D /* resources.cpp in Sources */,
 				4D6479422C9C0F4300CD9539 /* genericlayerelement.cpp in Sources */,
 				4DACC9EE2990F29A00B55913 /* atts_shared.cpp in Sources */,
+				4DF9DB2F2F32319C0003112D /* editortoolkit_shared.cpp in Sources */,
 				8F3DD32018854AFB0051330C /* devicecontext.cpp in Sources */,
 				4DACC9AC2990F29A00B55913 /* attmodule.cpp in Sources */,
 				8F3DD32218854AFB0051330C /* svgdevicecontext.cpp in Sources */,
@@ -5192,6 +5207,7 @@
 				BB4C4BC322A9330D001F6AF0 /* pugixml.cpp in Sources */,
 				4D6479432C9C0F4400CD9539 /* genericlayerelement.cpp in Sources */,
 				4DACC9AD2990F29A00B55913 /* attmodule.cpp in Sources */,
+				4DF9DB2E2F32319C0003112D /* editortoolkit_shared.cpp in Sources */,
 				4D2E758B22BC2B5B004C51F0 /* tabgrp.cpp in Sources */,
 				4D2E758D22BC2B5B004C51F0 /* tabdursym.cpp in Sources */,
 				BDA81C27268B38A10065B802 /* metersiggrp.cpp in Sources */,

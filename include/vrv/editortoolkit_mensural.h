@@ -15,7 +15,7 @@
 //--------------------------------------------------------------------------------
 
 #include "doc.h"
-#include "editortoolkit_cmn.h"
+#include "editortoolkit_shared.h"
 #include "view.h"
 
 #include "jsonxx.h"
@@ -26,14 +26,9 @@ namespace vrv {
 // EditorToolkitMensural
 //--------------------------------------------------------------------------------
 
-class EditorToolkitMensural : public EditorToolkitCMN {
+class EditorToolkitMensural : public EditorToolkitShared {
 public:
-    EditorToolkitMensural(Doc *doc, View *view) : EditorToolkitCMN(doc, view) {}
-    // bool ParseEditorAction(const std::string &json_editorAction) override { return false; }
-
-    /**
-     * Get information on the last editor function used
-     */
+    EditorToolkitMensural(Doc *doc, View *view) : EditorToolkitShared(doc, view) {}
 };
 } // namespace vrv
 
