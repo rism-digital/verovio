@@ -65,7 +65,7 @@ private:
      */
     ///@{
     char32_t GetAccidGlyph(std::string accid, bool useMusicXmlAccidentals) const;
-    std::string GetGlyphName(char32_t accidental) const;
+    std::string GetGlyphName(char32_t smufl) const;
     ///@}
 
 public:

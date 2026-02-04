@@ -376,6 +376,7 @@ bool Resources::LoadFont(const std::string &fontName, ZipFileReader *zipFile)
         Glyph glyph;
         glyph.SetUnitsPerEm(unitsPerEm * 10);
         glyph.SetCodeStr(c_attribute.value());
+        glyph.SetName(n_attribute.value());
         float x = 0.0, y = 0.0, width = 0.0, height = 0.0;
         if (current.attribute("x")) x = current.attribute("x").as_float();
         if (current.attribute("y")) y = current.attribute("y").as_float();

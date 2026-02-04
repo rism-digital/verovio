@@ -67,6 +67,14 @@ public:
     ///@}
 
     /**
+     * @name Setter and getter for the name
+     */
+    ///@{
+    std::string GetName() const { return m_name; }
+    void SetName(const std::string &name) { m_name = name; }
+    ///@}
+
+    /**
      * @name Setter and getter for the path
      */
     ///@{
@@ -134,6 +142,8 @@ private:
     int m_unitsPerEm;
     /** The Unicode code in hexa as string */
     std::string m_codeStr;
+    /** The glyph name */
+    std::string m_name;
     /** Path to the glyph XML file */
     std::string m_path;
     /** XML of the content for files loaded from zip archive custom font */

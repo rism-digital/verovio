@@ -3146,12 +3146,13 @@ void MusicXmlInput::ReadMusicXmlNote(
                         for (const auto &current : m_currentAccids.at(note->GetPname())) {
                             Accid *accid = new Accid();
                             note->AddChild(accid);
-                            accid->IsAttribute(true);
+                            accid->IsAttribute(false);
 
                             // to make sure the new *gestural* accidental conforms to the carried-over *written*
-                            // accidental, we translate the latter to a SMuFL glyph and set the gestural accidental to a
-                            // natural.
-                            accid->SetAccidGes(ACCIDENTAL_GESTURAL_n);
+                            // accidental, we translate the latter to a SMuFL glyph and set the gestural accidental to
+                            // the MEI equivalent of the written accidental. The custom tuning will always choose
+                            // the SMuFL glyph over the gestural or written accidentals.
+                            accid->SetAccidGes(Att::AccidentalWrittenToGestural(current.m_accid));
                             if (!current.m_glyphName.empty()) {
                                 accid->SetGlyphName(current.m_glyphName);
                                 accid->SetGlyphAuth(current.m_glyphAuth);
@@ -3160,7 +3161,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                                 char32_t smufl = Accid::GetAccidGlyph(current.m_accid);
                                 const Glyph *glyph = m_doc->GetResources().GetGlyph(smufl);
                                 if (glyph) {
-                                    accid->SetGlyphName(glyph->GetCodeStr());
+                                    accid->SetGlyphName(glyph->GetName());
                                     accid->SetGlyphAuth("smufl");
                                 }
                                 else {
@@ -3175,8 +3176,9 @@ void MusicXmlInput::ReadMusicXmlNote(
                 }
                 else {
                     m_currentAccids[note->GetPname()].clear();
-                    for (const Object *object : accids) {
-                        const Accid *accid = vrv_cast<const Accid *>(object);
+                    for (Object *object : accids) {
+                        Accid *accid = vrv_cast<Accid *>(object);
+                        accid->SetAccidGes(Att::AccidentalWrittenToGestural(accid->GetAccid()));
                         m_currentAccids[note->GetPname()].push_back(
                             musicxml::Accidental(accid->GetAccid(), accid->GetGlyphName(), accid->GetGlyphAuth()));
                     }
@@ -4082,7 +4084,7 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
             = std::regex_replace(abletonTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
         CustomTuning tuning(tuningDef, m_doc, true);
         if (tuning.IsValid()) {
-            m_doc->GetFirstScoreDef()->SetTuneCustom(tuning);
+            m_doc->GetFirstScoreDef()->SetCustomTuning(tuning);
         }
         else {
             LogWarning("MusicXML import: Error parsing tuning definition");

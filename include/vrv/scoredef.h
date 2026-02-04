@@ -252,9 +252,9 @@ public:
      * @name Set and get the custom tuning
      */
     ///@{
-    CustomTuning &GetTuneCustom() { return m_tuneCustom; }
-    const CustomTuning &GetTuneCustom() const { return m_tuneCustom; }
-    void SetTuneCustom(CustomTuning tuneCustom) { m_tuneCustom = tuneCustom; }
+    CustomTuning &GetCustomTuning() { return m_customTuning; }
+    const CustomTuning &GetCustomTuning() const { return m_customTuning; }
+    void SetCustomTuning(CustomTuning customTuning) { m_customTuning = customTuning; }
     ///@}
 
     /**
@@ -308,7 +308,7 @@ private:
     /** Store the label drawing width of the scoreDef */
     int m_drawingLabelsWidth;
     /** Custom tuning */
-    CustomTuning m_tuneCustom;
+    CustomTuning m_customTuning;
 };
 
 } // namespace vrv

@@ -487,7 +487,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         if (!tuningDef.empty()) {
             CustomTuning tuning(tuningDef, this, false);
             if (tuning.IsValid()) {
-                scoreDef->SetTuneCustom(tuning);
+                scoreDef->SetCustomTuning(tuning);
             }
             else {
                 LogWarning("Error parsing tuning %s", f.good() ? "file" : "definition");

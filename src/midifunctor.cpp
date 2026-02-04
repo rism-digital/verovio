@@ -957,9 +957,9 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
         referencePitchClass = Note::PnameToPclass(scoreDef->GetTunePname());
     }
     // set custom tuning if available
-    if (scoreDef->GetTuneCustom().IsValid()) {
+    if (scoreDef->GetCustomTuning().IsValid()) {
         const int program = m_instrDef && m_instrDef->HasMidiInstrnum() ? m_instrDef->GetMidiInstrnum() : 0;
-        const Tunings::Tuning &tuneCustom = scoreDef->GetTuneCustom().GetTuning();
+        const Tunings::Tuning &tuneCustom = scoreDef->GetCustomTuning().GetTuning();
         std::vector<std::pair<int, double>> mapping;
         // sysex messages should not have the high bit (0x80) set, which means that the full 128 MIDI notes
         // cannot be retuned in the same sysex message. For now, we skip MIDI key 0.
@@ -1125,8 +1125,8 @@ void GenerateMIDIFunctor::HandleOctave(const LayerElement *layerElement)
 
 int GenerateMIDIFunctor::GetMIDIPitch(const Note *note)
 {
-    if (m_scoreDef && m_scoreDef->GetTuneCustom().IsValid()) {
-        return m_scoreDef->GetTuneCustom().GetMIDIPitch(note, m_transSemi, m_octaveShift);
+    if (m_scoreDef && m_scoreDef->GetCustomTuning().IsValid()) {
+        return m_scoreDef->GetCustomTuning().GetMIDIPitch(note, m_transSemi, m_octaveShift);
     }
     return note->GetMIDIPitch(m_transSemi, m_octaveShift);
 }

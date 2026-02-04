@@ -30,7 +30,7 @@ CustomTuning::CustomTuning(const std::string &tuningDef, Doc *doc, bool useMusic
         CreateNoteMapping(useMusicXmlAccidentals);
     }
     catch (Tunings::TuningError &e) {
-        LogError("Custom Tuning: Invalid tuning definition: %s", e.what());
+        LogError("Custom tuning: Invalid tuning definition: %s", e.what());
     }
 }
 
@@ -59,28 +59,21 @@ void CustomTuning::CreateNoteMapping(bool useMusicXmlAccidentals)
             std::string::const_iterator accid_start(accids.cbegin());
             while (std::regex_search(accid_start, accids.cend(), accid_names, accid_name_regex)) {
                 std::string accid = accid_names[1].str();
-                bool valid = false;
-                if (m_doc->GetResources().GetGlyphCode(accid)) {
-                    if (accid_start != accids.cbegin()) mei += "+";
-                    mei += accid;
-                    valid = true;
+                std::string glyphName;
+                char32_t glyph = 0;
+                if ((glyph = m_doc->GetResources().GetGlyphCode(accid))) {
+                    glyphName = accid;
                 }
-                else {
-                    char32_t accidental = GetAccidGlyph(accid, useMusicXmlAccidentals);
-                    if (accidental) {
-                        valid = true;
-                        if (accidental != SMUFL_E261_accidentalNatural) {
-                            std::string glyphName = GetGlyphName(accidental);
-                            if (!glyphName.empty()) {
-                                if (accid_start != accids.cbegin()) mei += "+";
-                                mei += glyphName;
-                            }
-                        }
-                    }
+                else if ((glyph = GetAccidGlyph(accid, useMusicXmlAccidentals))) {
+                    glyphName = GetGlyphName(glyph);
                 }
-                if (!valid) {
-                    LogError("Custom Tuning: Tuning accidental \"%s\" is neither a %s accidental nor a SMuFL glyph",
+                if (!glyph) {
+                    LogError("Custom tuning: Tuning accidental \"%s\" is neither a %s accidental nor a SMuFL glyph",
                         accid.c_str(), useMusicXmlAccidentals ? "MusicXML" : "MEI");
+                }
+                else if (glyph != SMUFL_E261_accidentalNatural && !glyphName.empty()) {
+                    if (accid_start != accids.cbegin()) mei += "+";
+                    mei += glyphName;
                 }
                 accid_start = accid_names.suffix().first;
             }
@@ -109,14 +102,14 @@ char32_t CustomTuning::GetAccidGlyph(std::string accid, bool useMusicXmlAccident
 /**
  * Get a SMuFL glyph name.
  */
-std::string CustomTuning::GetGlyphName(char32_t accidental) const
+std::string CustomTuning::GetGlyphName(char32_t smufl) const
 {
     assert(m_doc);
-    const Glyph *glyph = m_doc->GetResources().GetGlyph(accidental);
+    const Glyph *glyph = m_doc->GetResources().GetGlyph(smufl);
     if (glyph) {
-        return glyph->GetCodeStr();
+        return glyph->GetName();
     }
-    LogError("Custom Tuning: SMuFL glyph U+%04X not found in glyph table", accidental);
+    LogError("Custom tuning: SMuFL glyph U+%04X not found in glyph table", smufl);
     return "";
 }
 
@@ -138,27 +131,24 @@ int CustomTuning::GetMIDIPitch(const Note *note, const int shift, const int octa
         const Accid *accid = vrv_cast<const Accid *>(object);
         const AttAccidental *att = dynamic_cast<const AttAccidental *>(accid);
         assert(att);
-        if (accid->GetAccid() == ACCIDENTAL_WRITTEN_n || accid->GetAccidGes() == ACCIDENTAL_GESTURAL_n) {
-            if (accid->HasGlyphName()) {
-                if (accs++) noteName += "+";
-                noteName += accid->GetGlyphName();
-            }
+
+        char32_t glyph = 0;
+        std::string glyphName;
+        if (accid->HasGlyphName()) {
+            glyph = m_doc->GetResources().GetGlyphCode(accid->GetGlyphName());
         }
-        else {
-            char32_t glyph = 0;
-            if (accid->HasAccid()) {
-                glyph = GetAccidGlyph(att->AccidentalWrittenToStr(accid->GetAccid()), false);
-            }
-            else if (accid->HasAccidGes()) {
-                glyph = GetAccidGlyph(att->AccidentalGesturalToStr(accid->GetAccidGes()), false);
-            }
-            if (glyph) {
-                std::string glyphName = GetGlyphName(glyph);
-                if (!glyphName.empty()) {
-                    if (accs++) noteName += "+";
-                    noteName += glyphName;
-                }
-            }
+        else if (accid->HasAccid()) {
+            glyph = GetAccidGlyph(att->AccidentalWrittenToStr(accid->GetAccid()), false);
+        }
+        else if (accid->HasAccidGes()) {
+            glyph = GetAccidGlyph(att->AccidentalGesturalToStr(accid->GetAccidGes()), false);
+        }
+        if (glyph) {
+            glyphName = GetGlyphName(glyph);
+        }
+        if (glyph != SMUFL_E261_accidentalNatural && !glyphName.empty()) {
+            if (accs++) noteName += "+";
+            noteName += glyphName;
         }
     }
     int oct = note->GetOct() + octaveShift;
@@ -175,10 +165,10 @@ int CustomTuning::GetMIDIPitch(const Note *note, const int shift, const int octa
         return m_tuning.midiNoteForNoteName(m_noteMap.at(noteName), oct);
     }
     catch (Tunings::TuningError &e) {
-        LogError("Custom Tuning: Error mapping note to tuning: %s", e.what());
+        LogError("Custom tuning: Error mapping note to tuning: %s", e.what());
     }
     catch (std::out_of_range &e) {
-        LogError("Custom Tuning: Error mapping note to tuning: %s not mapped.", noteName.c_str());
+        LogError("Custom tuning: Error mapping note to tuning: %s not mapped", noteName.c_str());
     }
     return note->GetMIDIPitch(shift, octaveShift);
 }
