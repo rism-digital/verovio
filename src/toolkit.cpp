@@ -67,74 +67,6 @@ const char *ZIP_SIGNATURE = "\x50\x4B\x03\x04";
 
 namespace {
 
-    struct PitchSpell {
-        data_PITCHNAME pname;
-        int accid;
-        int oct;
-    };
-
-    PitchSpell MidiToPitchSpell(int midiPitch)
-    {
-        PitchSpell spell{ PITCHNAME_c, 0, 4 };
-
-        const int pclass = ((midiPitch % 12) + 12) % 12;
-        spell.oct = midiPitch / 12 - 1;
-
-        switch (pclass) {
-            case 0:
-                spell.pname = PITCHNAME_c;
-                spell.accid = 0;
-                break;
-            case 1:
-                spell.pname = PITCHNAME_c;
-                spell.accid = 1;
-                break;
-            case 2:
-                spell.pname = PITCHNAME_d;
-                spell.accid = 0;
-                break;
-            case 3:
-                spell.pname = PITCHNAME_e;
-                spell.accid = -1;
-                break;
-            case 4:
-                spell.pname = PITCHNAME_e;
-                spell.accid = 0;
-                break;
-            case 5:
-                spell.pname = PITCHNAME_f;
-                spell.accid = 0;
-                break;
-            case 6:
-                spell.pname = PITCHNAME_f;
-                spell.accid = 1;
-                break;
-            case 7:
-                spell.pname = PITCHNAME_g;
-                spell.accid = 0;
-                break;
-            case 8:
-                spell.pname = PITCHNAME_a;
-                spell.accid = -1;
-                break;
-            case 9:
-                spell.pname = PITCHNAME_a;
-                spell.accid = 0;
-                break;
-            case 10:
-                spell.pname = PITCHNAME_b;
-                spell.accid = -1;
-                break;
-            case 11:
-                spell.pname = PITCHNAME_b;
-                spell.accid = 0;
-                break;
-            default: break;
-        }
-
-        return spell;
-    }
-
     Fraction ScoreTimeFromDouble(double scoreTime)
     {
         const int denom = 1000;
@@ -2341,6 +2273,15 @@ std::string Toolkit::GetPitchPosition(double scoreTime, double midiPitch, int st
         LogWarning("Invalid MIDI pitch '%f'", midiPitch);
         return o.json();
     }
+
+    if (!m_doc.HasTimemap()) {
+        // Ensure measure score-time boundaries exist for comparisons.
+        m_doc.CalculateTimemap();
+    }
+    if (!m_doc.HasTimemap()) {
+        LogWarning("Calculation of the timemap failed, pitch position is invalid.");
+        return o.json();
+    }
     const Fraction requestedScoreTime = ScoreTimeFromDouble(scoreTime);
 
     MeasureScoreTimeComparison matchMeasureTime(requestedScoreTime);
@@ -2451,8 +2392,7 @@ std::string Toolkit::GetPitchPosition(double scoreTime, double midiPitch, int st
                     active = true;
                 }
                 else {
-                    active = (localTimeForX >= startAlignment->GetTime())
-                        && (localTimeForX <= endAlignment->GetTime());
+                    active = (localTimeForX >= startAlignment->GetTime()) && (localTimeForX <= endAlignment->GetTime());
                 }
             }
             else if (currentMeasureIndex == startIndex) {
@@ -2564,8 +2504,7 @@ std::string Toolkit::GetPitchPosition(double scoreTime, double midiPitch, int st
         const Fraction anchorOnsetForX = anchorOnset / SCORE_TIME_UNIT;
         const int anchorXRel = layoutMeasure->GetXAtScoreTime(anchorOnsetForX, anchorInterpolated);
         const int anchorX = layoutMeasure->GetDrawingX() + anchorXRel;
-        const int noteHeadCenterX =
-            anchorNote->GetDrawingX() + anchorNote->GetDrawingRadius(&m_doc);
+        const int noteHeadCenterX = anchorNote->GetDrawingX() + anchorNote->GetDrawingRadius(&m_doc);
         x += noteHeadCenterX - anchorX;
     }
 
