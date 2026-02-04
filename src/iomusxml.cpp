@@ -3296,6 +3296,7 @@ void MusicXmlInput::ReadMusicXmlNote(
 
         // verse / syl
         for (pugi::xml_node lyric : node.children("lyric")) {
+            if (!lyric.child("text")) continue; // Dorico exports non-valid MusicXML
             short int lyricNumber = lyric.attribute("number").as_int();
             lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
             Verse *verse = new Verse();
