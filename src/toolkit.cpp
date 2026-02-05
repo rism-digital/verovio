@@ -825,11 +825,11 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     m_doc.InitSelectionDoc(m_docSelection, true);
 
     // Convert pseudo-measures into distinct segments based on barLine elements
-    if (m_doc.IsMensuralMusicOnly()) {
+    if (m_doc.IsMensuralMusicOnly() && (m_options->m_mensuralResponsiveView.GetValue() != MENSURAL_RESP_none)) {
         if (m_options->m_mensuralScoreUp.GetValue()) {
             m_doc.ScoringUpDoc();
         }
-        if (m_options->m_mensuralResponsiveView.GetValue()) {
+        if (m_options->m_mensuralResponsiveView.GetValue() == MENSURAL_RESP_selection) {
             m_doc.ConvertToMensuralViewDoc();
         }
         else if (m_options->m_mensuralToCmn.GetValue()) {
