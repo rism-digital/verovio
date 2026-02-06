@@ -8,23 +8,12 @@
 [![DOI](https://zenodo.org/badge/15762693.svg)](https://zenodo.org/doi/10.5281/zenodo.10544792)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/rism-digital/verovio)
 
-Verovio is a fast, portable and lightweight library for engraving [Music Encoding Initiative (MEI)](http://www.music-encoding.org) digital scores into SVG images. Verovio also contains on-the-fly converters to render [Plaine & Easie Code](https://www.iaml.info/plaine-easie-code), [Humdrum](https://www.humdrum.org), [Musedata](https://musedata.org), [MusicXML](https://www.musicxml.com), [EsAC](http://esac-data.org), and [ABC](https://en.wikipedia.org/wiki/ABC_notation) digital scores.
+Verovio is a fast, portable and lightweight library for engraving [Music Encoding Initiative (MEI)](http://www.music-encoding.org) digital scores into SVG images. Verovio also contains on-the-fly converters to render [Plaine & Easie Code](https://www.iaml.info/plaine-easie-code), [Humdrum](https://www.humdrum.org), [Musedata](https://musedata.org), [MusicXML](https://www.musicxml.com), [EsAC](http://esac-data.org), and [ABC](https://en.wikipedia.org/wiki/ABC_notation) digital scores. 
 
 Verovio is written in standard C++20 and is available in several bindings (JavaScript, Python, Java, Swift). It
 can be compiled as a standalone command-line tool or as a music-rendering library for applications.  Check out the JavaScript toolkit version of Verovio running in the [Verovio Online Editor / Viewer](http://editor.verovio.org), or the [tutorials](https://book.verovio.org/first-steps/) to know more about web integration and user interaction.
 
 ![Choice interaction](https://raw.githubusercontent.com/rism-digital/verovio.org/gh-pages/movies/reflow.gif)
-
-### This fork
-
-This fork is about adding full support for ["music-i18n" (music internationalization)](https://blog.karimratib.me/2018/01/05/music-l10n.html) to Verovio. This includes:
-
-- Supporting micro-tonality in MusicXML import, MIDI export, etc.
-- Supporting SMuFL more fully
-- Supporting multiple languages
-- Experimenting with extending musical concepts (accidentals, key signatures, nomenclature, etc.)
-
-I would [appreciate your support](https://github.com/sponsors/infojunkie) to continue working on these topics!
 
 ### Minimal sample applications
 

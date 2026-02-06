@@ -1,7 +1,7 @@
 {
-  "name": "@music-i18n/verovio",
-  "version": "1.1.0",
-  "description": "Forked version of Verovio with music-i18n support.",
+  "name": "verovio",
+  "version": "6.1.0-alpha",
+  "description": "This is the stable version of the verovio package",
   "main": "dist/verovio-toolkit-wasm.js",
   "exports": {
     ".": "./dist/verovio-toolkit-wasm.js",
@@ -27,14 +27,14 @@
     "music encoding",
     "svg"
   ],
-  "author": "Karim Ratib <karim.ratib@gmail.com>, Laurent Pugin and others",
+  "author": "Laurent Pugin and others",
   "license": "LGPL-3.0-or-later",
   "repository": {
     "type": "git",
-    "url": "https://github.com/infojunkie/verovio.git"
+    "url": "https://github.com/rism-digital/verovio.git"
   },
   "bugs": {
-    "url": "https://github.com/infojunkie/verovio/issues"
+    "url": "https://github.com/rism-digital/verovio/issues"
   },
   "homepage": "https://www.verovio.org",
   "engines": {

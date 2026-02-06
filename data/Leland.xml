@@ -434,34 +434,6 @@
     <a n="cutOutSE" x="0.8" y="-1.12" />
     <a n="cutOutSW" x="0.18" y="-1.6" />
   </g>
-  <g c="E276" x="0.0" y="-137.0" w="331.0" h="593.0" h-a-x="331" n="accidentalFiveQuarterTonesSharpArrowUp">
-    <a n="cutOutNE" x="1.13" y="1.64" />
-    <a n="cutOutNW" x="0.53" y="0.57" />
-    <a n="cutOutSE" x="1.12" y="1.22" />
-  </g>
-  <g c="E277" x="1.0" y="-455.0" w="331.0" h="593.0" h-a-x="332" n="accidentalThreeQuarterTonesSharpArrowDown">
-    <a n="cutOutNW" x="0.21" y="-1.22" />
-    <a n="cutOutSE" x="0.8" y="-0.57" />
-    <a n="cutOutSW" x="0.17" y="-1.6" />
-  </g>
-  <g c="E278" x="0.0" y="-176.0" w="372.0" h="633.0" h-a-x="372" n="accidentalThreeQuarterTonesFlatArrowUp">
-    <a n="cutOutNE" x="1.17" y="0.64" />
-    <a n="cutOutSE" x="1.21" y="-0.42" />
-  </g>
-  <g c="E279" x="0.0" y="-450.0" w="449.0" h="904.0" h-a-x="449" n="accidentalFiveQuarterTonesFlatArrowDown">
-    <a n="cutOutNE" x="1.15" y="0.64" />
-    <a n="cutOutNW" x="0.3" y="-1.2" />
-    <a n="cutOutSE" x="0.8" y="-0.72" />
-    <a n="cutOutSW" x="0.18" y="-1.6" />
-  </g>
-  <g c="E27A" x="0.0" y="-124.0" w="195.0" h="449.0" h-a-x="195" n="accidentalArrowUp">
-    <a n="cutOutNE" x="0.58" y="1.12" />
-    <a n="cutOutNW" x="0.2" y="1.12" />
-  </g>
-  <g c="E27B" x="0.0" y="-74.0" w="194.0" h="462.0" h-a-x="194" n="accidentalArrowDown">
-    <a n="cutOutSE" x="0.58" y="-0.12" />
-    <a n="cutOutSW" x="0.2" y="-0.12" />
-  </g>
   <g c="E280" x="0.0" y="-176.0" w="193.0" h="628.0" h-a-x="193" n="accidentalQuarterToneFlatStein">
     <a n="cutOutNW" x="0.62" y="0.62" />
     <a n="cutOutSE" x="0.54" y="-0.42" />
@@ -484,16 +456,6 @@
     <a n="cutOutNW" x="0.17" y="0.62" />
     <a n="cutOutSE" x="0.99" y="-0.62" />
     <a n="cutOutSW" x="0.17" y="-0.78" />
-  </g>
-  <g c="E284" x="0.0" y="-176.0" w="160.0" h="628.0" h-a-x="160" n="accidentalNarrowReversedFlat">
-    <a n="cutOutNW" x="0.49" y="0.62" />
-    <a n="cutOutSW" x="0.24" y="-0.42" />
-  </g>
-  <g c="E285" x="0.0" y="-176.0" w="416.0" h="628.0" h-a-x="416" n="accidentalNarrowReversedFlatAndFlat">
-    <a n="cutOutNE" x="0.94" y="0.62" />
-    <a n="cutOutNW" x="0.48" y="0.62" />
-    <a n="cutOutSE" x="1.37" y="-0.42" />
-    <a n="cutOutSW" x="0.24" y="-0.42" />
   </g>
   <g c="E440" x="0.0" y="-176.0" w="277.0" h="630.0" h-a-x="277" n="accidentalBuyukMucennebFlat">
     <a n="cutOutNE" x="0.95" y="0.64" />

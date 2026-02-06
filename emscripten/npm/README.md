@@ -1,9 +1,8 @@
-# @music-i18n/verovio
-Forked version of Verovio that includes music-i18n fixes. Music internationalization refers to the process of adapting music software to work with non-Western Common Practice structures, such as microtonality.
+This is an NPM of the stable version of the Verovio JavaScript toolkit.
 
 Verovio is a fast, portable and lightweight library for engraving [Music Encoding Initiative (MEI)](http://www.music-encoding.org) music scores into SVG.
 
-See it running in the [browser](https://blog.karimratib.me/demos/musicxml/) and check out the [tutorial](http://www.verovio.org/tutorial.xhtml) for its web integration and for enabling user interaction.
+See it running in the [MEI Viewer](http://www.verovio.org/mei-viewer.xhtml) and check out the [tutorial](http://www.verovio.org/tutorial.xhtml) for its web integration and for enabling user interaction.
 
 ## Basic usage
 
