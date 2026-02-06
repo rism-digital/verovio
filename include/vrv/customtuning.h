@@ -56,25 +56,30 @@ public:
 
 private:
     /**
-     * Create the note mapping.
+     * @name Helpers to create various needed mappings.
      */
+    ///@{
+    void CreateGlyphMapping(Doc *doc);
     void CreateNoteMapping(bool useMusicXmlAccidentals);
+    ///@}
 
     /*
      * @name Helper functions for SMuFL glyphs
      */
     ///@{
-    char32_t GetAccidGlyph(std::string accid, bool useMusicXmlAccidentals) const;
-    std::string GetGlyphName(char32_t smufl) const;
+    char32_t GetGlyphCode(const std::string &glyphName) const;
+    std::string GetGlyphName(char32_t glyphCode) const;
+    char32_t GetAccidGlyph(const std::string &accid, bool useMusicXmlAccidentals) const;
     ///@}
 
 public:
     //
 
 private:
-    const Doc *m_doc;
     Tunings::Tuning m_tuning;
     TuningNoteMap m_noteMap;
+    std::map<std::string, char32_t> m_glyphNames;
+    std::map<char32_t, std::string> m_glyphCodes;
 };
 
 } // namespace vrv
