@@ -277,7 +277,6 @@ void Toolkit::SetMidiDoc()
         Resources &resources = m_midiDoc->GetResourcesForModification();
         resources.SetPath(m_doc.GetResources().GetPath());
         resources.InitFonts();
-        resources.SetFont(m_doc.GetResources().GetCurrentFont());
         MEIInput midiInput(m_midiDoc);
         midiInput.Import(this->GetMEI());
         m_midiDoc->PrepareData();

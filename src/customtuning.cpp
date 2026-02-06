@@ -20,6 +20,13 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// Static members
+//----------------------------------------------------------------------------
+
+std::map<std::string, char32_t> CustomTuning::s_glyphNames;
+std::map<char32_t, std::string> CustomTuning::s_glyphCodes;
+
+//----------------------------------------------------------------------------
 // CustomTuning
 //----------------------------------------------------------------------------
 
@@ -43,6 +50,8 @@ CustomTuning::CustomTuning(const std::string &tuningDef, Doc *doc, bool useMusic
  */
 void CustomTuning::CreateGlyphMapping(Doc *doc)
 {
+    if (s_glyphNames.size() > 0 && s_glyphCodes.size() > 0) return;
+
     std::ifstream glyphnames(doc->GetResources().GetPath() + "/glyphnames.json");
     std::string json((std::istreambuf_iterator<char>(glyphnames)), std::istreambuf_iterator<char>());
     jsonxx::Object glyphs;
@@ -60,8 +69,8 @@ void CustomTuning::CreateGlyphMapping(Doc *doc)
             continue;
         }
         char32_t code = static_cast<char32_t>(std::stoul(codepoint.c_str() + 2, nullptr, 16));
-        m_glyphNames.insert({ glyph.first, code });
-        m_glyphCodes.insert({ code, glyph.first });
+        s_glyphNames.insert({ glyph.first, code });
+        s_glyphCodes.insert({ code, glyph.first });
     }
 }
 
@@ -117,31 +126,39 @@ void CustomTuning::CreateNoteMapping(bool useMusicXmlAccidentals)
 /**
  * Get a SMuFL code given a glyph name.
  */
-char32_t CustomTuning::GetGlyphCode(const std::string &glyphName) const
+char32_t CustomTuning::GetGlyphCode(const std::string &glyphName, Doc *doc)
 {
-    if (!m_glyphNames.count(glyphName)) {
+    if (s_glyphNames.empty()) {
+        assert(doc);
+        CreateGlyphMapping(doc);
+    }
+    if (!s_glyphNames.count(glyphName)) {
         LogDebug("Custom tuning: SMuFL glyph '%s' not found in glyph table", glyphName.c_str());
         return 0;
     }
-    return m_glyphNames.at(glyphName);
+    return s_glyphNames.at(glyphName);
 }
 
 /**
  * Get a SMuFL glyph name given a code.
  */
-std::string CustomTuning::GetGlyphName(char32_t glyphCode) const
+std::string CustomTuning::GetGlyphName(char32_t glyphCode, Doc *doc)
 {
-    if (!m_glyphCodes.count(glyphCode)) {
+    if (s_glyphCodes.empty()) {
+        assert(doc);
+        CreateGlyphMapping(doc);
+    }
+    if (!s_glyphCodes.count(glyphCode)) {
         LogError("Custom tuning: SMuFL glyph U+%04X not found in glyph table", glyphCode);
         return "";
     }
-    return m_glyphCodes.at(glyphCode);
+    return s_glyphCodes.at(glyphCode);
 }
 
 /**
  * Convert an accidental (MEI or MusicXML) to a SMuFL glyph.
  */
-char32_t CustomTuning::GetAccidGlyph(const std::string &accid, bool useMusicXmlAccidentals) const
+char32_t CustomTuning::GetAccidGlyph(const std::string &accid, bool useMusicXmlAccidentals)
 {
     if (useMusicXmlAccidentals) {
         data_ACCIDENTAL_WRITTEN accidental = MusicXmlInput::ConvertAccidentalToAccid(accid);

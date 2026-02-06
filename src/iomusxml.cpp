@@ -3158,15 +3158,9 @@ void MusicXmlInput::ReadMusicXmlNote(
                                 accid->SetGlyphAuth(current.m_glyphAuth);
                             }
                             else if (current.m_accid != ACCIDENTAL_WRITTEN_NONE) {
-                                char32_t smufl = Accid::GetAccidGlyph(current.m_accid);
-                                const Glyph *glyph = m_doc->GetResources().GetGlyph(smufl);
-                                if (glyph) {
-                                    accid->SetGlyphName(glyph->GetName());
-                                    accid->SetGlyphAuth("smufl");
-                                }
-                                else {
-                                    LogError("MusicXML import: SMuFL glyph U+%04X not found in glyph table", smufl);
-                                }
+                                char32_t glyph = Accid::GetAccidGlyph(current.m_accid);
+                                accid->SetGlyphName(CustomTuning::GetGlyphName(glyph, m_doc));
+                                accid->SetGlyphAuth("smufl");
                             }
                         }
                     }
