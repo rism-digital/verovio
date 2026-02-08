@@ -50,6 +50,7 @@ class Measure;
 class MeterSigGrp;
 class Octave;
 class Pedal;
+class ScoreDef;
 class Section;
 class Slur;
 class StaffGrp;
@@ -273,6 +274,25 @@ namespace musicxml {
         int m_layerNum = 0;
     };
 
+    struct Accidental {
+        Accidental()
+        {
+            m_accid = ACCIDENTAL_WRITTEN_NONE;
+            m_glyphName = "";
+            m_glyphAuth = "";
+        }
+
+        Accidental(data_ACCIDENTAL_WRITTEN accid, std::string glyphName, std::string glyphAuth)
+        {
+            m_accid = accid;
+            m_glyphName = glyphName;
+            m_glyphAuth = glyphAuth;
+        }
+
+        data_ACCIDENTAL_WRITTEN m_accid;
+        std::string m_glyphName;
+        std::string m_glyphAuth;
+    };
 } // namespace musicxml
 
 #endif // NO_MUSICXML_SUPPORT
@@ -296,6 +316,13 @@ private:
 #ifndef NO_MUSICXML_SUPPORT
 public:
     bool Import(const std::string &musicxml) override;
+
+    /*
+     * @name Public methods for converting MusicXML values to MEI attributes.
+     */
+    ///@{
+    static data_ACCIDENTAL_WRITTEN ConvertAccidentalToAccid(const std::string &value);
+    ///@}
 
 private:
     /*
@@ -332,14 +359,14 @@ private:
     void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlDirection(
-        pugi::xml_node, Measure *measure, const std::string &measureNum, const short int staffOffset);
+        pugi::xml_node, Measure *measure, const std::string &measureNum, const short int staffOffset, Section *section);
     void ReadMusicXmlFigures(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlNote(
         pugi::xml_node, Measure *measure, const std::string &measureNum, const short int staffOffset, Section *section);
     void ReadMusicXmlPrint(pugi::xml_node, Section *section);
-    void ReadMusicXmlSound(pugi::xml_node, Measure *measure);
+    void ReadMusicXmlSound(pugi::xml_node, Measure *measure, Section *section);
     bool ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord);
     void ReadMusicXmlTupletStart(const pugi::xml_node &node, const pugi::xml_node &tupletStart, Layer *layer);
     void ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi::xml_node &beamStart, Layer *layer);
@@ -382,6 +409,11 @@ private:
      * Add a Layer element to the layer or to the LayerElement at the top of m_elementStack.
      */
     void AddLayerElement(Layer *layer, LayerElement *element, int duration = 0);
+
+    /*
+     * Add an accidental to a note.
+     */
+    void AddAccidental(pugi::xml_node accidental, Note *note);
 
     /*
      * Returns the appropriate layer for a node looking at its MusicXML staff and voice elements.
@@ -529,10 +561,17 @@ private:
     ///@}
 
     /*
-     * @name Helper method for comparing written/gestural accidental attributes
+     * @name Update the carried-over accidentals for each pitch class based on key signature
      */
     ///@{
-    static bool IsSameAccidWrittenGestural(data_ACCIDENTAL_WRITTEN written, data_ACCIDENTAL_GESTURAL gestural);
+    void ResetAccidentals(const KeySig *keySig = NULL);
+    ///@}
+
+    /**
+     * @name Find or create a ScoreDef before the given measure
+     */
+    ///@{
+    ScoreDef *GetOrCreateLastScoreDef(Section *section);
     ///@}
 
     /*
@@ -544,7 +583,6 @@ private:
      * @name Methods for converting MusicXML values to MEI attributes.
      */
     ///@{
-    static data_ACCIDENTAL_WRITTEN ConvertAccidentalToAccid(const std::string &value);
     static data_ACCIDENTAL_GESTURAL ConvertAlterToAccid(const float value);
     static data_ARTICULATION ConvertArticulations(const std::string &value);
     static data_BARRENDITION ConvertStyleToRend(const std::string &value, const bool repeat);
@@ -659,6 +697,10 @@ private:
     std::map<Measure *, int> m_measureCounts;
     /* measure rests */
     std::map<int, int> m_multiRests;
+    /* a map of current accidental for each pitch class */
+    std::map<data_PITCHNAME, std::vector<musicxml::Accidental>> m_currentAccids;
+    /* current key signature */
+    KeySig *m_currentKeySig = NULL;
     /* A flag indicating we had a clef change */
     int m_clefChanged = 0;
 

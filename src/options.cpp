@@ -1854,6 +1854,10 @@ Options::Options()
     m_midiTempoAdjustment.Init(1.0, 0.2, 4.0);
     this->Register(&m_midiTempoAdjustment, "midiTempoAdjustment", &m_midi);
 
+    m_midiTuning.SetInfo("MIDI tuning", "A custom tuning definition or filepath to apply to the MIDI output");
+    m_midiTuning.Init("");
+    this->Register(&m_midiTuning, "tuning", &m_midi);
+
     /********* Mensural *********/
 
     m_mensural.SetLabel("Mensural notation options", "6-mensural");

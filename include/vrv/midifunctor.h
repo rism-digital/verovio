@@ -13,6 +13,7 @@
 //----------------------------------------------------------------------------
 
 #include "alignfunctor.h"
+#include "instrdef.h"
 
 namespace smf {
 class MidiFile;
@@ -381,6 +382,8 @@ public:
     void SetTempoEventTicks(const std::set<int> &ticks) { m_tempoEventTicks = ticks; }
     void SetTrack(int track) { m_midiTrack = track; }
     void SetTransSemi(int transSemi) { m_transSemi = transSemi; }
+    void SetScoreDef(const ScoreDef *scoreDef) { m_scoreDef = scoreDef; }
+    void SetInstrDef(const InstrDef *instrDef) { m_instrDef = instrDef; }
     ///@}
 
     /*
@@ -422,7 +425,7 @@ private:
     /**
      * Convenience helper
      */
-    int GetMIDIPitch(const Note *note) { return note->GetMIDIPitch(m_transSemi, m_octaveShift); }
+    int GetMIDIPitch(const Note *note);
 
 public:
     //
@@ -462,6 +465,10 @@ private:
     std::vector<MIDIHeldNote> m_heldNotes;
     // A flag indicating we want to process control events
     bool m_controlEvents;
+    // Current scoreDef
+    const ScoreDef *m_scoreDef;
+    // Current instrDef
+    const InstrDef *m_instrDef;
 };
 
 //----------------------------------------------------------------------------

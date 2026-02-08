@@ -40,6 +40,7 @@
 //----------------------------------------------------------------------------
 
 #include "MidiFile.h"
+#include "Tunings.h"
 
 namespace vrv {
 
@@ -624,6 +625,8 @@ GenerateMIDIFunctor::GenerateMIDIFunctor(smf::MidiFile *midiFile) : ConstFunctor
     m_lastNote = NULL;
     m_noCue = false;
     m_controlEvents = false;
+    m_scoreDef = NULL;
+    m_instrDef = NULL;
 }
 
 FunctorCode GenerateMIDIFunctor::VisitBeatRpt(const BeatRpt *beatRpt)
@@ -953,8 +956,21 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
     if (scoreDef->HasTunePname()) {
         referencePitchClass = Note::PnameToPclass(scoreDef->GetTunePname());
     }
+    // set custom tuning if available
+    if (scoreDef->GetCustomTuning().IsValid()) {
+        const int program = m_instrDef && m_instrDef->HasMidiInstrnum() ? m_instrDef->GetMidiInstrnum() : 0;
+        const Tunings::Tuning &tuneCustom = scoreDef->GetCustomTuning().GetTuning();
+        std::vector<std::pair<int, double>> mapping;
+        // sysex messages should not have the high bit (0x80) set, which means that the full 128 MIDI notes
+        // cannot be retuned in the same sysex message. For now, we skip MIDI key 0.
+        for (int i = 1; i < 128; i++) {
+            mapping.push_back(std::make_pair(i, tuneCustom.frequencyForMidiNote(i)));
+        }
+        midiEvent.makeMts2_KeyTuningsByFrequency(mapping, program);
+        m_midiFile->addEvent(m_midiTrack, midiEvent);
+    }
     // set temperament event if corresponding attribute present
-    if (scoreDef->HasTuneTemper()) {
+    else if (scoreDef->HasTuneTemper()) {
         switch (scoreDef->GetTuneTemper()) {
             case TEMPERAMENT_equal: midiEvent.makeTemperamentEqual(referencePitchClass); break;
             case TEMPERAMENT_just: midiEvent.makeTemperamentBad(100.0, referencePitchClass); break;
@@ -1105,6 +1121,14 @@ void GenerateMIDIFunctor::HandleOctave(const LayerElement *layerElement)
         m_octaveShift += octaveIter->octaveShift;
         octaveIter->isActive = true;
     }
+}
+
+int GenerateMIDIFunctor::GetMIDIPitch(const Note *note)
+{
+    if (m_scoreDef && m_scoreDef->GetCustomTuning().IsValid()) {
+        return m_scoreDef->GetCustomTuning().GetMIDIPitch(note, m_transSemi, m_octaveShift);
+    }
+    return note->GetMIDIPitch(m_transSemi, m_octaveShift);
 }
 
 //----------------------------------------------------------------------------

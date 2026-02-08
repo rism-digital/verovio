@@ -1,0 +1,49 @@
+! Size of map. The pattern repeats every so many keys:
+31
+! First MIDI note number to retune:
+0
+! Last MIDI note number to retune:
+127
+! Middle note where the first entry of the mapping is mapped to:
+60
+! Reference note for which frequency is given:
+83
+! Frequency to tune the above note to (floating point e.g. 440.0):
+440.0000
+! Scale degree to consider as formal octave (determines difference in pitch
+! between adjacent mapping patterns):
+31
+! Mapping.
+! The numbers represent scale degrees mapped to keys. The first entry is for
+! the given middle note, the next for subsequent higher keys.
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30

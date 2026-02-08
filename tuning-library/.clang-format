@@ -1,0 +1,21 @@
+---
+BasedOnStyle: LLVM
+IndentWidth: 4
+---
+Language: Cpp
+BasedOnStyle: LLVM
+IndentWidth: 4
+AlignAfterOpenBracket: Align
+BreakBeforeBraces: Allman
+ColumnLimit: 100
+SortIncludes: false
+---
+Language: ObjC
+BasedOnStyle: LLVM
+IndentWidth: 4
+AlignAfterOpenBracket: Align
+BreakBeforeBraces: Allman
+ColumnLimit: 100
+SortIncludes: false
+---
+

@@ -1,0 +1,15 @@
+! Liwung-TBN.ascl
+!
+The pelog Liwung scale has five notes taken from the seven-tone Pelog scale. This version is based on the tuning of a to-be-named gamelan tuned in a Javanese style. This scale is referred to as Pelog Da = Galimer with the pitch order: S-G-U-L-T. If using a MIDI piano controller, we recommend setting "Black Keys Only" in the Track Tuning MIDI Controller Layout.
+ 5
+!
+ 140.00000 cents ! Galimer
+ 559.00000 cents ! Bungur
+ 704.00000 cents ! Loloran
+ 814.00000 cents ! Tugu
+ 2/1             ! Singgul
+! S=Singgul, G=Galimer, B=Bungur, L=Loloran, and T=Tugu
+! @ABL REFERENCE_PITCH 3 0 295.029
+! @ABL NOTE_RANGE_BY_INDEX -9 0
+! @ABL NOTE_NAMES "S" "G" "U" "L" "T"
+! @ABL LINK https://www.ableton.com/learn-more/tuning-systems/liwung-tbn

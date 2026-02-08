@@ -46,6 +46,7 @@ include_directories(
     ../include/vrv
     ../libmei/dist
     ../libmei/addons
+    ../tuning-library/include
 )
 
 if(WIN32)
@@ -197,7 +198,7 @@ if (BUILD_AS_LIBRARY OR BUILD_AS_ANDROID_LIBRARY)
     endif()
     add_library(verovio SHARED "../tools/c_wrapper.cpp" ${all_SRC})
     # list all headers to be copied for all installation
-    file(GLOB_RECURSE all_HEADERS "../include/*/*.h*" "../libmei/*/*.h*" "../tools/c_wrapper.h")
+    file(GLOB_RECURSE all_HEADERS "../include/*/*.h*" "../libmei/*/*.h*" "../tuning-library/include/*.h" "../tools/c_wrapper.h")
 
 ###########
 # WASM BC #

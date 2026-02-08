@@ -28,6 +28,7 @@
 #include "clef.h"
 #include "comparison.h"
 #include "course.h"
+#include "customtuning.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -876,6 +877,9 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
 bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 {
     assert(root);
+
+    // initialize accidentals map
+    this->ResetAccidentals();
 
     // check for multimetric music
     bool multiMetric = root.select_node("/score-partwise/part/measure[@non-controlling='yes']");
@@ -1858,6 +1862,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     assert(node);
     assert(measure);
 
+    // re-initialize the accidentals to the current key signature.
+    this->ResetAccidentals(m_currentKeySig);
+
     const std::string measureNum = node.attribute("number").as_string();
     if (node.attribute("id")) measure->SetID(node.attribute("id").as_string());
     if (measure != NULL) measure->SetN(measureNum);
@@ -1935,10 +1942,10 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             this->ReadMusicXmlBarLine(child, measure, measureNum);
         }
         else if (IsElement(child, "direction")) {
-            this->ReadMusicXmlDirection(child, measure, measureNum, staffOffset);
+            this->ReadMusicXmlDirection(child, measure, measureNum, staffOffset, section);
         }
         else if (IsElement(child, "sound")) {
-            this->ReadMusicXmlSound(child, measure);
+            this->ReadMusicXmlSound(child, measure, section);
         }
         else if (IsElement(child, "figured-bass")) {
             this->ReadMusicXmlFigures(child, measure, measureNum);
@@ -2068,7 +2075,8 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     // for now only read first key change in first part and update scoreDef
     if ((key || time || divisionChange) && node.select_node("ancestor::part[not(preceding-sibling::part)]")
         && !node.select_node("preceding-sibling::attributes/key")) {
-        ScoreDef *scoreDef = new ScoreDef();
+        ScoreDef *scoreDef = GetOrCreateLastScoreDef(section);
+        assert(scoreDef);
         if (key) {
             KeySig *meiKey = ConvertKey(key);
             scoreDef->AddChild(meiKey);
@@ -2081,8 +2089,6 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         if (divisions) {
             scoreDef->SetPpq(divisions.text().as_int());
         }
-
-        section->AddChild(scoreDef);
     }
     else if (time && node.select_node("ancestor::part[(preceding-sibling::part)]")) {
         m_meterUnit = time.child("beat-type").text().as_int();
@@ -2227,7 +2233,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
 }
 
 void MusicXmlInput::ReadMusicXmlDirection(
-    pugi::xml_node node, Measure *measure, const std::string &measureNum, const short int staffOffset)
+    pugi::xml_node node, Measure *measure, const std::string &measureNum, const short int staffOffset, Section *section)
 {
     assert(node);
     assert(measure);
@@ -2760,7 +2766,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     // Sound
     pugi::xml_node xmlSound = node.child("sound");
     if (xmlSound) {
-        ReadMusicXmlSound(xmlSound, measure);
+        ReadMusicXmlSound(xmlSound, measure, section);
     }
 }
 
@@ -3097,24 +3103,12 @@ void MusicXmlInput::ReadMusicXmlNote(
             note->SetStaff(
                 note->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(noteStaffNum + staffOffset)));
 
-        // accidental
-        pugi::xml_node accidental = node.child("accidental");
-        if (!accidental) {
-            accidental = node.select_node("notations/accidental-mark").node();
+        // accidentals
+        for (pugi::xml_node accidental : node.children("accidental")) {
+            AddAccidental(accidental, note);
         }
-        if (accidental) {
-            Accid *accid = new Accid();
-            accid->SetAccid(ConvertAccidentalToAccid(accidental.text().as_string()));
-            accid->SetColor(accidental.attribute("color").as_string());
-            accid->SetGlyphName(accidental.attribute("smufl").as_string());
-            accid->SetPlace(accid->AttPlacementRelEvent::StrToStaffrel(accidental.attribute("placement").as_string()));
-            if (accidental.attribute("id")) accid->SetID(accidental.attribute("id").as_string());
-            if (HasAttributeWithValue(accidental, "cautionary", "yes")) accid->SetFunc(accidLog_FUNC_caution);
-            if (HasAttributeWithValue(accidental, "editorial", "yes")) accid->SetFunc(accidLog_FUNC_edit);
-            if (HasAttributeWithValue(accidental, "bracket", "yes")) accid->SetEnclose(ENCLOSURE_brack);
-            if (HasAttributeWithValue(accidental, "parentheses", "yes")) accid->SetEnclose(ENCLOSURE_paren);
-            if (!strcmp(accidental.name(), "accidental-mark")) accid->SetOnstaff(BOOLEAN_false);
-            note->AddChild(accid);
+        for (pugi::xpath_node accidental : node.select_nodes("notations/accidental-mark")) {
+            AddAccidental(accidental.node(), note);
         }
 
         // stem direction - taken into account below for the chord or the note
@@ -3132,27 +3126,56 @@ void MusicXmlInput::ReadMusicXmlNote(
         pugi::xml_node pitch = node.child("pitch");
         if (pitch && !isTablature) {
             const std::string stepStr = pitch.child("step").text().as_string();
-            const float alterVal = pitch.child("alter").text().as_float();
             const int octaveNum = pitch.child("octave").text().as_int();
             if (!stepStr.empty()) note->SetPname(ConvertStepToPitchName(stepStr));
-            if (pitch.child("alter")) {
-                Accid *accid = vrv_cast<Accid *>(note->GetFirst(ACCID));
-                if (!accid) {
-                    accid = new Accid();
-                    note->AddChild(accid);
-                    accid->IsAttribute(true);
-                }
-                const data_ACCIDENTAL_GESTURAL accidGes = ConvertAlterToAccid(alterVal);
-                if (!IsSameAccidWrittenGestural(accid->GetAccid(), accidGes)) {
-                    accid->SetAccidGes(accidGes);
-                }
-            }
             if (m_octDis[staff->GetN()] != 0) {
                 note->SetOct(octaveNum - m_octDis[staff->GetN()]);
                 note->SetOctGes(octaveNum);
             }
             else {
                 note->SetOct(octaveNum);
+            }
+
+            // adjust accidental (including glyph) based on carried-over accidentals
+            // or update the carried-over accidentals with current accidental value.
+            if (note->HasPname()) {
+                ListOfObjects accids = note->FindAllDescendantsByType(ACCID);
+                if (!accids.size()) {
+                    try {
+                        for (const auto &current : m_currentAccids.at(note->GetPname())) {
+                            Accid *accid = new Accid();
+                            note->AddChild(accid);
+                            accid->IsAttribute(false);
+
+                            // to make sure the new *gestural* accidental conforms to the carried-over *written*
+                            // accidental, we translate the latter to a SMuFL glyph and set the gestural accidental to
+                            // the MEI equivalent of the written accidental. The custom tuning will always choose
+                            // the SMuFL glyph over the gestural or written accidentals.
+                            accid->SetAccidGes(Att::AccidentalWrittenToGestural(current.m_accid));
+                            if (!current.m_glyphName.empty()) {
+                                accid->SetGlyphName(current.m_glyphName);
+                                accid->SetGlyphAuth(current.m_glyphAuth);
+                            }
+                            else if (current.m_accid != ACCIDENTAL_WRITTEN_NONE) {
+                                char32_t glyph = Accid::GetAccidGlyph(current.m_accid);
+                                accid->SetGlyphName(CustomTuning::GetGlyphName(glyph, m_doc));
+                                accid->SetGlyphAuth("smufl");
+                            }
+                        }
+                    }
+                    catch (std::out_of_range &e) {
+                        LogWarning("MusicXML import: Unexpected pitch %d", note->GetPname());
+                    }
+                }
+                else {
+                    m_currentAccids[note->GetPname()].clear();
+                    for (Object *object : accids) {
+                        Accid *accid = vrv_cast<Accid *>(object);
+                        accid->SetAccidGes(Att::AccidentalWrittenToGestural(accid->GetAccid()));
+                        m_currentAccids[note->GetPname()].push_back(
+                            musicxml::Accidental(accid->GetAccid(), accid->GetGlyphName(), accid->GetGlyphAuth()));
+                    }
+                }
             }
         }
         else if (node.child("unpitched")) {
@@ -3974,6 +3997,31 @@ void MusicXmlInput::ReadMusicXmlNote(
     }
 }
 
+void MusicXmlInput::AddAccidental(pugi::xml_node accidental, Note *note)
+{
+    assert(accidental);
+    assert(note);
+
+    Accid *accid = new Accid();
+    accid->SetAccid(ConvertAccidentalToAccid(accidental.text().as_string()));
+    accid->SetColor(accidental.attribute("color").as_string());
+    accid->SetGlyphName(accidental.attribute("smufl").as_string());
+    if (accid->HasGlyphName()) {
+        accid->SetGlyphAuth("smufl");
+        if (!accid->HasAccid()) {
+            accid->SetAccid(ACCIDENTAL_WRITTEN_n);
+        }
+    }
+    accid->SetPlace(accid->AttPlacementRelEvent::StrToStaffrel(accidental.attribute("placement").as_string()));
+    if (accidental.attribute("id")) accid->SetID(accidental.attribute("id").as_string());
+    if (HasAttributeWithValue(accidental, "cautionary", "yes")) accid->SetFunc(accidLog_FUNC_caution);
+    if (HasAttributeWithValue(accidental, "editorial", "yes")) accid->SetFunc(accidLog_FUNC_edit);
+    if (HasAttributeWithValue(accidental, "bracket", "yes")) accid->SetEnclose(ENCLOSURE_brack);
+    if (HasAttributeWithValue(accidental, "parentheses", "yes")) accid->SetEnclose(ENCLOSURE_paren);
+    if (!strcmp(accidental.name(), "accidental-mark")) accid->SetOnstaff(BOOLEAN_false);
+    note->AddChild(accid);
+}
+
 void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
 {
     assert(node);
@@ -3997,10 +4045,50 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
     }
 }
 
-void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
+void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure, Section *section)
 {
     assert(node);
     assert(measure);
+    assert(section);
+
+    // get MEI tuning
+    pugi::xpath_node meiTuning = node.select_node("play/other-play[@type='tuning-mei']");
+    if (meiTuning) {
+        const std::string value
+            = std::regex_replace(meiTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
+        data_TEMPERAMENT temperament = TEMPERAMENT_NONE;
+        if (value == "none" || value == "")
+            temperament = TEMPERAMENT_NONE;
+        else if (value == "equal")
+            temperament = TEMPERAMENT_equal;
+        else if (value == "just")
+            temperament = TEMPERAMENT_just;
+        else if (value == "mean")
+            temperament = TEMPERAMENT_mean;
+        else if (value == "pythagorean")
+            temperament = TEMPERAMENT_pythagorean;
+        else
+            LogWarning("MusicXML import: Invalid MEI temperament '%s'", value.c_str());
+        ScoreDef *scoreDef = GetOrCreateLastScoreDef(section);
+        assert(scoreDef);
+        scoreDef->SetTuneTemper(temperament);
+    }
+
+    // get custom (Ableton) tuning
+    pugi::xpath_node abletonTuning = node.select_node("play/other-play[@type='tuning-ableton']");
+    if (abletonTuning) {
+        const std::string tuningDef
+            = std::regex_replace(abletonTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
+        CustomTuning tuning(tuningDef, m_doc, true);
+        if (tuning.IsValid()) {
+            ScoreDef *scoreDef = GetOrCreateLastScoreDef(section);
+            assert(scoreDef);
+            scoreDef->SetCustomTuning(tuning);
+        }
+        else {
+            LogWarning("MusicXML import: Error parsing tuning definition");
+        }
+    }
 
     // segno
     if (node.attribute("segno")) {
@@ -4312,7 +4400,7 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
             keyAccid->SetPname(ConvertStepToPitchName(keyStep.text().as_string()));
             if (std::strncmp(keyStep.next_sibling().name(), "key-alter", 9) == 0) {
                 data_ACCIDENTAL_GESTURAL accidValue = ConvertAlterToAccid(keyStep.next_sibling().text().as_float());
-                keyAccid->SetAccid(AreaPosInterface::AccidentalGesturalToWritten(accidValue));
+                keyAccid->SetAccid(Att::AccidentalGesturalToWritten(accidValue));
                 if (std::strncmp(keyStep.next_sibling().next_sibling().name(), "key-accidental", 14) == 0) {
                     keyAccid->SetAccid(
                         this->ConvertAccidentalToAccid(keyStep.next_sibling().next_sibling().text().as_string()));
@@ -4326,27 +4414,53 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
         }
     }
 
+    // adjust the accidentals map to this key signature
+    this->ResetAccidentals(keySig);
+    m_currentKeySig = keySig;
+
     return keySig;
 }
 
-bool MusicXmlInput::IsSameAccidWrittenGestural(data_ACCIDENTAL_WRITTEN written, data_ACCIDENTAL_GESTURAL gestural)
+ScoreDef *MusicXmlInput::GetOrCreateLastScoreDef(Section *section)
 {
-    const std::map<data_ACCIDENTAL_WRITTEN, data_ACCIDENTAL_GESTURAL> writtenToGesturalMap{
-        { ACCIDENTAL_WRITTEN_tf, ACCIDENTAL_GESTURAL_tf }, //
-        { ACCIDENTAL_WRITTEN_ff, ACCIDENTAL_GESTURAL_ff }, //
-        { ACCIDENTAL_WRITTEN_fd, ACCIDENTAL_GESTURAL_fd }, //
-        { ACCIDENTAL_WRITTEN_f, ACCIDENTAL_GESTURAL_f }, //
-        { ACCIDENTAL_WRITTEN_fu, ACCIDENTAL_GESTURAL_fu }, //
-        { ACCIDENTAL_WRITTEN_n, ACCIDENTAL_GESTURAL_n }, //
-        { ACCIDENTAL_WRITTEN_sd, ACCIDENTAL_GESTURAL_sd }, //
-        { ACCIDENTAL_WRITTEN_s, ACCIDENTAL_GESTURAL_s }, //
-        { ACCIDENTAL_WRITTEN_su, ACCIDENTAL_GESTURAL_su }, //
-        { ACCIDENTAL_WRITTEN_ss, ACCIDENTAL_GESTURAL_ss }, //
-        { ACCIDENTAL_WRITTEN_ts, ACCIDENTAL_GESTURAL_ts }
-    };
+    assert(section);
 
-    const auto result = writtenToGesturalMap.find(written);
-    return ((result != writtenToGesturalMap.end()) && (result->second == gestural));
+    // return the ScoreDef that's after last measure in the section
+    // if not found, create it
+    ScoreDef *scoreDef = vrv_cast<ScoreDef *>(section->GetLast(SCOREDEF));
+    Measure *measure = vrv_cast<Measure *>(section->GetLast(MEASURE));
+    if (!measure || !scoreDef || scoreDef->GetIdx() < measure->GetIdx()) {
+        scoreDef = new ScoreDef();
+        section->AddChild(scoreDef);
+    }
+    return scoreDef;
+}
+
+void MusicXmlInput::ResetAccidentals(const KeySig *keySig)
+{
+    // inspired by KeySig::FillMap() but without the octave repetitions
+    m_currentAccids.clear();
+    for (int i = PITCHNAME_c; i <= PITCHNAME_b; i++) {
+        m_currentAccids[static_cast<data_PITCHNAME>(i)] = { musicxml::Accidental() };
+    }
+
+    if (!keySig) return;
+
+    const ListOfConstObjects &childList = keySig->GetList(); // make sure it's initialized
+    if (!childList.empty()) {
+        for (const Object *child : childList) {
+            const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(child);
+            assert(keyAccid);
+            m_currentAccids[keyAccid->GetPname()]
+                = { musicxml::Accidental(keyAccid->GetAccid(), keyAccid->GetGlyphName(), keyAccid->GetGlyphAuth()) };
+        }
+        return;
+    }
+
+    data_ACCIDENTAL_WRITTEN accidType = keySig->GetAccidType();
+    for (int i = 0; i < keySig->GetAccidCount(true); ++i) {
+        m_currentAccids[KeySig::GetAccidPnameAt(accidType, i)] = { musicxml::Accidental(accidType, "", "") };
+    }
 }
 
 beamRend_FORM MusicXmlInput::ConvertBeamFanToForm(const std::string &value)
