@@ -1,13 +1,9 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.15)
 project(tuning-library VERSION 1.0 LANGUAGES C CXX)
 
-set(CMAKE_CXX_STANDARD 20)
-
 add_library(${PROJECT_NAME} INTERFACE)
+target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_20)
 target_include_directories(${PROJECT_NAME} INTERFACE include)
-if (MSVC)
-    target_compile_options(${PROJECT_NAME} INTERFACE /Zc:__cplusplus)
-endif()
 
 get_directory_property(parent_dir PARENT_DIRECTORY)
 if("${parent_dir}" STREQUAL "")

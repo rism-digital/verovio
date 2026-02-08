@@ -20,7 +20,7 @@ Surge microtuning implementation (and only that implementation) were happy to re
 
 ## Using the library in your C++ project
 
-The C++ library is a standalone header only C++-11 library. There are a variety of ways
+The C++ library is a standalone header only C++20 library. There are a variety of ways
 to use it in your project but our approach is generally:
 
 1. Make this github repo a submodule of your project
