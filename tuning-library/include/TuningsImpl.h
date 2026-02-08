@@ -137,10 +137,39 @@ inline Scale readSCLStream(std::istream &inf)
     Scale res;
     std::ostringstream rawOSS;
     int lineno = 0;
+    bool declaredNameSet = false;
+
     while (getlineEndingIndependent(inf, line))
     {
         rawOSS << line << "\n";
         lineno++;
+
+        if (!declaredNameSet && !line.empty() && line[0] == '!')
+        {
+            std::string_view nameCandidate(line);
+            nameCandidate.remove_prefix(1);
+
+            while (!nameCandidate.empty() &&
+                   (nameCandidate.front() == ' ' || nameCandidate.front() == '\t'))
+            {
+                nameCandidate.remove_prefix(1);
+            }
+
+            while (!nameCandidate.empty() &&
+                   (nameCandidate.back() == ' ' || nameCandidate.back() == '\t'))
+            {
+                nameCandidate.remove_suffix(1);
+            }
+
+            if (!nameCandidate.empty())
+            {
+                res.name = std::string(nameCandidate);
+            }
+
+            declaredNameSet = true;
+            res.comments.push_back(line);
+            continue;
+        }
 
         if ((state == read_note && line.empty()) || line[0] == '!')
         {
@@ -202,18 +231,62 @@ inline Scale readSCLStream(std::istream &inf)
     return res;
 }
 
-inline Scale readSCLFile(std::string fname)
+inline Scale readSCLFile(const std::string &path) { return readSCLFile<std::string>(path); }
+
+inline Scale readSCLFile(const char *path) { return readSCLFile<std::string>(std::string(path)); }
+
+inline Scale readSCLFile(const StreamablePath auto &path)
 {
-    std::ifstream inf;
-    inf.open(fname);
-    if (!inf.is_open())
+    using P = std::remove_cvref_t<decltype(path)>;
+
+    auto inf = std::ifstream(path);
+
+    if (!inf)
     {
-        std::string s = "Unable to open file '" + fname + "'";
-        throw TuningError(s);
+        std::string errMsg = "Unable to open file '";
+
+        if constexpr (PathWithU8<P>)
+        {
+#if defined(__cpp_char8_t)
+            const auto &s = path.u8string();
+            errMsg.append(reinterpret_cast<const char *>(s.data()), s.size());
+#else
+            errMsg += path.u8string();
+#endif
+        }
+        else
+        {
+            errMsg += std::string(path);
+        }
+
+        errMsg += "'";
+        throw TuningError(errMsg);
     }
 
     auto res = readSCLStream(inf);
-    res.name = fname;
+
+    if (res.name.empty())
+    {
+        if constexpr (PathWithStemU8<P>)
+        {
+#if defined(__cpp_char8_t)
+            const auto &s = path.filename().stem().u8string();
+            res.name.assign(reinterpret_cast<const char *>(s.data()), s.size());
+#else
+            res.name = path.filename().stem().u8string();
+#endif
+        }
+        else
+        {
+            std::string s(path);
+            auto sep = s.find_last_of("/\\");
+            if (sep != std::string::npos)
+                s = s.substr(sep + 1);
+            auto dot = s.find_last_of('.');
+            res.name = (dot == std::string::npos) ? s : s.substr(0, dot);
+        }
+    }
+
     return res;
 }
 
@@ -444,18 +517,68 @@ inline KeyboardMapping readKBMStream(std::istream &inf)
     return res;
 }
 
-inline KeyboardMapping readKBMFile(std::string fname)
+inline KeyboardMapping readKBMFile(const std::string &path)
 {
-    std::ifstream inf;
-    inf.open(fname);
-    if (!inf.is_open())
+    return readKBMFile<std::string>(path);
+}
+
+inline KeyboardMapping readKBMFile(const char *path)
+{
+    return readKBMFile<std::string>(std::string(path));
+}
+
+inline KeyboardMapping readKBMFile(const StreamablePath auto &path)
+{
+    using P = std::remove_cvref_t<decltype(path)>;
+
+    auto inf = std::ifstream(path);
+
+    if (!inf)
     {
-        std::string s = "Unable to open file '" + fname + "'";
-        throw TuningError(s);
+        std::string errMsg = "Unable to open file '";
+
+        if constexpr (PathWithU8<P>)
+        {
+#if defined(__cpp_char8_t)
+            const auto &s = path.u8string();
+            errMsg.append(reinterpret_cast<const char *>(s.data()), s.size());
+#else
+            errMsg += path.u8string();
+#endif
+        }
+        else
+        {
+            errMsg += std::string(path);
+        }
+
+        errMsg += "'";
+        throw TuningError(errMsg);
     }
 
     auto res = readKBMStream(inf);
-    res.name = fname;
+
+    if (res.name.empty())
+    {
+        if constexpr (PathWithStemU8<P>)
+        {
+#if defined(__cpp_char8_t)
+            const auto &s = path.filename().stem().u8string();
+            res.name.assign(reinterpret_cast<const char *>(s.data()), s.size());
+#else
+            res.name = path.filename().stem().u8string();
+#endif
+        }
+        else
+        {
+            std::string s(path);
+            auto sep = s.find_last_of("/\\");
+            if (sep != std::string::npos)
+                s = s.substr(sep + 1);
+            auto dot = s.find_last_of('.');
+            res.name = (dot == std::string::npos) ? s : s.substr(0, dot);
+        }
+    }
+
     return res;
 }
 

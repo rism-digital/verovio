@@ -1,5 +1,4 @@
 // -*-c++-*-
-
 /**
  * Tunings.h
  * Copyright Paul Walker, 2019-2020
@@ -33,13 +32,14 @@
 #ifndef __INCLUDE_TUNINGS_H
 #define __INCLUDE_TUNINGS_H
 
+#include "TuningsConcepts.h"
+
 #include <string>
+#include <string_view>
 #include <vector>
 #include <iostream>
 #include <memory>
 #include <array>
-
-static_assert(__cplusplus >= 202002L, "Surge team libraries have moved to C++ 20");
 
 namespace Tunings
 {
@@ -91,11 +91,9 @@ struct Scale
     std::string name;                  // The name in the SCL file. Informational only
     std::string description;           // The description in the SCL file. Informational only
     std::string rawText;               // The raw text of the SCL file used to create this Scale
-    int count;                         // The number of tones
+    int count{0};                      // The number of tones
     std::vector<Tone> tones;           // The tones
     std::vector<std::string> comments; // The comments
-
-    Scale() : name("empty scale"), description(""), rawText(""), count(0) {}
 };
 
 /**
@@ -176,7 +174,7 @@ struct AbletonScale
 class TuningError : public std::exception
 {
   public:
-    TuningError(std::string m) : whatv(m) {}
+    explicit TuningError(std::string_view m) : whatv(m) {}
     virtual const char *what() const noexcept override { return whatv.c_str(); }
 
   private:
@@ -184,14 +182,24 @@ class TuningError : public std::exception
 };
 
 /**
+ * makeStream returns a stream from a path
+ */
+std::ifstream makeStream(const StreamablePath auto &path);
+
+/**
  * readSCLStream returns a Scale from the SCL input stream
  */
 Scale readSCLStream(std::istream &inf);
 
 /**
- * readSCLFile returns a Scale from the SCL File in fname
+ * readSCLFile returns a Scale from the SCL File in path
  */
-Scale readSCLFile(std::string fname);
+Scale readSCLFile(const StreamablePath auto &path);
+
+[[deprecated("readSCLFile(const std::string&) is unsafe, use path type instead")]]
+Scale readSCLFile(const std::string &path);
+[[deprecated("readSCLFile(const char*) is unsafe, use path type instead")]]
+Scale readSCLFile(const char *path);
 
 /**
  * parseSCLData returns a scale from the SCL file contents in memory
@@ -227,7 +235,12 @@ KeyboardMapping readKBMStream(std::istream &inf);
 /**
  * readKBMFile returns a KeyboardMapping from a KBM file name
  */
-KeyboardMapping readKBMFile(std::string fname);
+KeyboardMapping readKBMFile(const StreamablePath auto &path);
+
+[[deprecated("readKBMFile(const std::string&) is unsafe, use path type instead")]]
+KeyboardMapping readKBMFile(const std::string &path);
+[[deprecated("readKBMFile(const char*) is unsafe, use path type instead")]]
+KeyboardMapping readKBMFile(const char *path);
 
 /**
  * parseKBMData returns a KeyboardMapping from a KBM data in memory
