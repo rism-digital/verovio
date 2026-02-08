@@ -1942,10 +1942,10 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             this->ReadMusicXmlBarLine(child, measure, measureNum);
         }
         else if (IsElement(child, "direction")) {
-            this->ReadMusicXmlDirection(child, measure, measureNum, staffOffset);
+            this->ReadMusicXmlDirection(child, measure, measureNum, staffOffset, section);
         }
         else if (IsElement(child, "sound")) {
-            this->ReadMusicXmlSound(child, measure);
+            this->ReadMusicXmlSound(child, measure, section);
         }
         else if (IsElement(child, "figured-bass")) {
             this->ReadMusicXmlFigures(child, measure, measureNum);
@@ -2075,7 +2075,8 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     // for now only read first key change in first part and update scoreDef
     if ((key || time || divisionChange) && node.select_node("ancestor::part[not(preceding-sibling::part)]")
         && !node.select_node("preceding-sibling::attributes/key")) {
-        ScoreDef *scoreDef = new ScoreDef();
+        ScoreDef *scoreDef = GetOrCreateLastScoreDef(section);
+        assert(scoreDef);
         if (key) {
             KeySig *meiKey = ConvertKey(key);
             scoreDef->AddChild(meiKey);
@@ -2088,8 +2089,6 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         if (divisions) {
             scoreDef->SetPpq(divisions.text().as_int());
         }
-
-        section->AddChild(scoreDef);
     }
     else if (time && node.select_node("ancestor::part[(preceding-sibling::part)]")) {
         m_meterUnit = time.child("beat-type").text().as_int();
@@ -2234,7 +2233,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
 }
 
 void MusicXmlInput::ReadMusicXmlDirection(
-    pugi::xml_node node, Measure *measure, const std::string &measureNum, const short int staffOffset)
+    pugi::xml_node node, Measure *measure, const std::string &measureNum, const short int staffOffset, Section *section)
 {
     assert(node);
     assert(measure);
@@ -2767,7 +2766,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     // Sound
     pugi::xml_node xmlSound = node.child("sound");
     if (xmlSound) {
-        ReadMusicXmlSound(xmlSound, measure);
+        ReadMusicXmlSound(xmlSound, measure, section);
     }
 }
 
@@ -4046,10 +4045,11 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
     }
 }
 
-void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
+void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure, Section *section)
 {
     assert(node);
     assert(measure);
+    assert(section);
 
     // get MEI tuning
     pugi::xpath_node meiTuning = node.select_node("play/other-play[@type='tuning-mei']");
@@ -4069,7 +4069,9 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
             temperament = TEMPERAMENT_pythagorean;
         else
             LogWarning("MusicXML import: Invalid MEI temperament '%s'", value.c_str());
-        m_doc->GetFirstScoreDef()->SetTuneTemper(temperament);
+        ScoreDef *scoreDef = GetOrCreateLastScoreDef(section);
+        assert(scoreDef);
+        scoreDef->SetTuneTemper(temperament);
     }
 
     // get custom (Ableton) tuning
@@ -4079,7 +4081,9 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
             = std::regex_replace(abletonTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
         CustomTuning tuning(tuningDef, m_doc, true);
         if (tuning.IsValid()) {
-            m_doc->GetFirstScoreDef()->SetCustomTuning(tuning);
+            ScoreDef *scoreDef = GetOrCreateLastScoreDef(section);
+            assert(scoreDef);
+            scoreDef->SetCustomTuning(tuning);
         }
         else {
             LogWarning("MusicXML import: Error parsing tuning definition");
@@ -4415,6 +4419,21 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
     m_currentKeySig = keySig;
 
     return keySig;
+}
+
+ScoreDef *MusicXmlInput::GetOrCreateLastScoreDef(Section *section)
+{
+    assert(section);
+
+    // return the ScoreDef that's after last measure in the section
+    // if not found, create it
+    ScoreDef *scoreDef = vrv_cast<ScoreDef *>(section->GetLast(SCOREDEF));
+    Measure *measure = vrv_cast<Measure *>(section->GetLast(MEASURE));
+    if (!measure || !scoreDef || scoreDef->GetIdx() < measure->GetIdx()) {
+        scoreDef = new ScoreDef();
+        section->AddChild(scoreDef);
+    }
+    return scoreDef;
 }
 
 void MusicXmlInput::ResetAccidentals(const KeySig *keySig)

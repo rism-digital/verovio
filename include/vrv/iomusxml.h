@@ -50,6 +50,7 @@ class Measure;
 class MeterSigGrp;
 class Octave;
 class Pedal;
+class ScoreDef;
 class Section;
 class Slur;
 class StaffGrp;
@@ -358,14 +359,14 @@ private:
     void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlDirection(
-        pugi::xml_node, Measure *measure, const std::string &measureNum, const short int staffOffset);
+        pugi::xml_node, Measure *measure, const std::string &measureNum, const short int staffOffset, Section *section);
     void ReadMusicXmlFigures(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlNote(
         pugi::xml_node, Measure *measure, const std::string &measureNum, const short int staffOffset, Section *section);
     void ReadMusicXmlPrint(pugi::xml_node, Section *section);
-    void ReadMusicXmlSound(pugi::xml_node, Measure *measure);
+    void ReadMusicXmlSound(pugi::xml_node, Measure *measure, Section *section);
     bool ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord);
     void ReadMusicXmlTupletStart(const pugi::xml_node &node, const pugi::xml_node &tupletStart, Layer *layer);
     void ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi::xml_node &beamStart, Layer *layer);
@@ -564,6 +565,13 @@ private:
      */
     ///@{
     void ResetAccidentals(const KeySig *keySig = NULL);
+    ///@}
+
+    /**
+     * @name Find or create a ScoreDef before the given measure
+     */
+    ///@{
+    ScoreDef *GetOrCreateLastScoreDef(Section *section);
     ///@}
 
     /*
