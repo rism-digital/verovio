@@ -625,8 +625,8 @@ GenerateMIDIFunctor::GenerateMIDIFunctor(smf::MidiFile *midiFile) : ConstFunctor
     m_lastNote = NULL;
     m_noCue = false;
     m_controlEvents = false;
-    m_scoreDef = NULL;
     m_instrDef = NULL;
+    m_customTuning = NULL;
 }
 
 FunctorCode GenerateMIDIFunctor::VisitBeatRpt(const BeatRpt *beatRpt)
@@ -937,9 +937,6 @@ FunctorCode GenerateMIDIFunctor::VisitPedal(const Pedal *pedal)
 
 FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
 {
-    // remember the scoreDef for the notes
-    m_scoreDef = scoreDef;
-
     double totalTime = m_totalTime;
     // check next measure for the time offset
     const Object *parent = scoreDef->GetParent();
@@ -959,8 +956,9 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
     if (scoreDef->HasTunePname()) {
         referencePitchClass = Note::PnameToPclass(scoreDef->GetTunePname());
     }
-    // set custom tuning if available
+    // set and remember custom tuning if available
     if (scoreDef->GetCustomTuning().IsValid()) {
+        m_customTuning = &scoreDef->GetCustomTuning();
         const int program = m_instrDef && m_instrDef->HasMidiInstrnum() ? m_instrDef->GetMidiInstrnum() : 0;
         const Tunings::Tuning &tuneCustom = scoreDef->GetCustomTuning().GetTuning();
         std::vector<std::pair<int, double>> mapping;
@@ -1128,8 +1126,8 @@ void GenerateMIDIFunctor::HandleOctave(const LayerElement *layerElement)
 
 int GenerateMIDIFunctor::GetMIDIPitch(const Note *note)
 {
-    if (m_scoreDef && m_scoreDef->GetCustomTuning().IsValid()) {
-        return m_scoreDef->GetCustomTuning().GetMIDIPitch(note, m_transSemi, m_octaveShift);
+    if (m_customTuning && m_customTuning->IsValid()) {
+        return m_customTuning->GetMIDIPitch(note, m_transSemi, m_octaveShift);
     }
     return note->GetMIDIPitch(m_transSemi, m_octaveShift);
 }

@@ -21,6 +21,7 @@ class MidiFile;
 
 namespace vrv {
 
+class CustomTuning;
 class FeatureExtractor;
 class Timemap;
 
@@ -382,8 +383,8 @@ public:
     void SetTempoEventTicks(const std::set<int> &ticks) { m_tempoEventTicks = ticks; }
     void SetTrack(int track) { m_midiTrack = track; }
     void SetTransSemi(int transSemi) { m_transSemi = transSemi; }
-    void SetScoreDef(const ScoreDef *scoreDef) { m_scoreDef = scoreDef; }
     void SetInstrDef(const InstrDef *instrDef) { m_instrDef = instrDef; }
+    void SetCustomTuning(const CustomTuning *customTuning) { m_customTuning = customTuning; }
     ///@}
 
     /*
@@ -465,10 +466,10 @@ private:
     std::vector<MIDIHeldNote> m_heldNotes;
     // A flag indicating we want to process control events
     bool m_controlEvents;
-    // Current scoreDef
-    const ScoreDef *m_scoreDef;
-    // Current instrDef
+    // Current instrument definition
     const InstrDef *m_instrDef;
+    // Current custom tuning
+    const CustomTuning *m_customTuning;
 };
 
 //----------------------------------------------------------------------------
