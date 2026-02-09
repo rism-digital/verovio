@@ -937,6 +937,9 @@ FunctorCode GenerateMIDIFunctor::VisitPedal(const Pedal *pedal)
 
 FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
 {
+    // remember the scoreDef for the notes
+    m_scoreDef = scoreDef;
+
     double totalTime = m_totalTime;
     // check next measure for the time offset
     const Object *parent = scoreDef->GetParent();

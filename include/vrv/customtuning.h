@@ -57,6 +57,11 @@ public:
     static char32_t GetAccidGlyph(const std::string &accid, bool useMusicXmlAccidentals);
     ///@}
 
+    /**
+     * @name Helper to copy all custom tunings to a new doc.
+     */
+    static void CopyCustomTunings(const Doc *src, Doc *dst);
+
 private:
     /**
      * @name Helpers to create various needed mappings.

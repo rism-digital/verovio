@@ -229,4 +229,27 @@ int CustomTuning::GetMIDIPitch(const Note *note, const int shift, const int octa
     return note->GetMIDIPitch(shift, octaveShift);
 }
 
+/**
+ * Copy all custom tunings from source doc to destination doc.
+ * Iterate on all ScoreDefs to locate the tunings.
+ */
+void CustomTuning::CopyCustomTunings(const Doc *src, Doc *dst)
+{
+    ListOfConstObjects srcScoreDefs = src->FindAllDescendantsByType(SCOREDEF);
+    ListOfObjects dstScoreDefs = dst->FindAllDescendantsByType(SCOREDEF);
+    if (srcScoreDefs.size() != dstScoreDefs.size()) {
+        LogError("Custom tuning: Cannot reliably copy custom tunings from original doc to MIDI doc, because ScoreDef "
+                 "counts don't match");
+    }
+    auto srcIt = srcScoreDefs.begin();
+    auto dstIt = dstScoreDefs.begin();
+    for (; srcIt != srcScoreDefs.end() && dstIt != dstScoreDefs.end(); srcIt++, dstIt++) {
+        const ScoreDef *srcScoreDef = vrv_cast<const ScoreDef *>(*srcIt);
+        ScoreDef *dstScoreDef = vrv_cast<ScoreDef *>(*dstIt);
+        if (srcScoreDef->GetCustomTuning().IsValid()) {
+            dstScoreDef->SetCustomTuning(srcScoreDef->GetCustomTuning());
+        }
+    }
+}
+
 } // namespace vrv
