@@ -13,7 +13,6 @@
 //----------------------------------------------------------------------------
 
 #include "alignfunctor.h"
-#include "instrdef.h"
 
 namespace smf {
 class MidiFile;
@@ -23,6 +22,7 @@ namespace vrv {
 
 class CustomTuning;
 class FeatureExtractor;
+class InstrDef;
 class Timemap;
 
 //----------------------------------------------------------------------------

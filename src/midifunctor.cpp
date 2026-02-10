@@ -20,6 +20,7 @@
 #include "featureextractor.h"
 #include "ftrem.h"
 #include "gracegrp.h"
+#include "instrdef.h"
 #include "layer.h"
 #include "mrest.h"
 #include "multirest.h"
