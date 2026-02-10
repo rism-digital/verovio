@@ -60,10 +60,7 @@ void CustomTuning::CreateGlyphMapping(Doc *doc)
         return;
     }
     for (const auto &glyph : glyphs.kv_map()) {
-        if (!glyph.second->is<jsonxx::Object>()) continue;
-        std::string codepoint = glyph.second->get<jsonxx::Object>().has<jsonxx::String>("codepoint")
-            ? glyph.second->get<jsonxx::Object>().get<jsonxx::String>("codepoint")
-            : "";
+        std::string codepoint = glyph.second->get<jsonxx::String>();
         if (!codepoint.starts_with("U+")) {
             LogError("Custom tuning: SMuFL glyph '%s' has invalid codepoint in glyph table", glyph.first.c_str());
             continue;
