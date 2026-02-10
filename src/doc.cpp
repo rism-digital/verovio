@@ -518,7 +518,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     Filters filters;
     for (auto &staves : layerTree.child) {
         int transSemi = 0;
-        InstrDef *instrdef = NULL;
+        InstrDef *instrDef = NULL;
         if (StaffDef *staffDef = scoreDef->GetStaffDef(staves.first)) {
             // get the transposition (semi-tone) value for the staff
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
@@ -527,16 +527,16 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                 midiFile->addTracks(midiTrack + 1 - midiFile->getTrackCount());
             }
             // set MIDI channel and instrument
-            instrdef = vrv_cast<InstrDef *>(staffDef->FindDescendantByType(INSTRDEF, 1));
-            if (!instrdef) {
+            instrDef = vrv_cast<InstrDef *>(staffDef->FindDescendantByType(INSTRDEF, 1));
+            if (!instrDef) {
                 StaffGrp *staffGrp = vrv_cast<StaffGrp *>(staffDef->GetFirstAncestor(STAFFGRP));
                 assert(staffGrp);
-                instrdef = vrv_cast<InstrDef *>(staffGrp->FindDescendantByType(INSTRDEF, 1));
+                instrDef = vrv_cast<InstrDef *>(staffGrp->FindDescendantByType(INSTRDEF, 1));
             }
-            if (instrdef) {
-                if (instrdef->HasMidiChannel()) midiChannel = instrdef->GetMidiChannel();
-                if (instrdef->HasMidiTrack()) {
-                    midiTrack = instrdef->GetMidiTrack();
+            if (instrDef) {
+                if (instrDef->HasMidiChannel()) midiChannel = instrDef->GetMidiChannel();
+                if (instrDef->HasMidiTrack()) {
+                    midiTrack = instrDef->GetMidiTrack();
                     if (midiFile->getTrackCount() < (midiTrack + 1)) {
                         midiFile->addTracks(midiTrack + 1 - midiFile->getTrackCount());
                     }
@@ -544,8 +544,8 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                         LogWarning("A high MIDI track number was assigned to staff %d", staffDef->GetN());
                     }
                 }
-                if (instrdef->HasMidiInstrnum()) {
-                    midiFile->addPatchChange(midiTrack, 0, midiChannel, instrdef->GetMidiInstrnum());
+                if (instrDef->HasMidiInstrnum()) {
+                    midiFile->addPatchChange(midiTrack, 0, midiChannel, instrDef->GetMidiInstrnum());
                 }
             }
             // set MIDI track name
@@ -584,7 +584,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         GenerateMIDIFunctor generateScoreDefMIDI(midiFile);
         generateScoreDefMIDI.SetChannel(midiChannel);
         generateScoreDefMIDI.SetTrack(midiTrack);
-        generateScoreDefMIDI.SetInstrDef(instrdef);
+        generateScoreDefMIDI.SetInstrDef(instrDef);
 
         scoreDef->Process(generateScoreDefMIDI);
 
@@ -611,7 +611,8 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             generateMIDI.SetOctaves(initMIDI.GetOctaves());
             generateMIDI.SetNoCue(this->GetOptions()->m_midiNoCue.GetValue());
             generateMIDI.SetControlEvents(controlEvents);
-            generateMIDI.SetScoreDef(scoreDef);
+            generateMIDI.SetInstrDef(instrDef);
+            generateMIDI.SetCustomTuning(&scoreDef->GetCustomTuning());
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
             this->Process(generateMIDI);

@@ -254,7 +254,7 @@ public:
     ///@{
     CustomTuning &GetCustomTuning() { return m_customTuning; }
     const CustomTuning &GetCustomTuning() const { return m_customTuning; }
-    void SetCustomTuning(CustomTuning customTuning) { m_customTuning = customTuning; }
+    void SetCustomTuning(const CustomTuning &customTuning) { m_customTuning = customTuning; }
     ///@}
 
     /**
