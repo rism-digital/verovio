@@ -1856,7 +1856,7 @@ Options::Options()
 
     m_midiTuning.SetInfo("MIDI tuning", "A custom tuning definition or filepath to apply to the MIDI output");
     m_midiTuning.Init("");
-    this->Register(&m_midiTuning, "tuning", &m_midi);
+    this->Register(&m_midiTuning, "tuningFile", &m_midi);
 
     /********* Mensural *********/
 
