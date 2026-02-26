@@ -324,7 +324,7 @@ void SvgDeviceContext::StartGraphic(
         AttLang *att = dynamic_cast<AttLang *>(object);
         assert(att);
         if (att->HasLang()) {
-            m_currentNode.append_attribute("xml:lang") = att->GetLang().c_str();
+            m_currentNode.append_attribute("lang") = att->GetLang().c_str();
         }
     }
 
