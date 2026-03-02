@@ -472,7 +472,8 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         std::ifstream f(midiTuningFile.c_str());
         if (f.good()) {
             const std::string ext(".ascl");
-            if (midiTuningFile.size() >= ext.size() && midiTuningFile.substr(midiTuningFile.size() - ext.size()) == ext) {
+            if (midiTuningFile.size() >= ext.size()
+                && midiTuningFile.substr(midiTuningFile.size() - ext.size()) == ext) {
                 std::stringstream buffer;
                 buffer << f.rdbuf();
                 tuningDef = buffer.str();
