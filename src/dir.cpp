@@ -28,8 +28,10 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 static const ClassRegistrar<Dir> s_factory("dir", DIR);
+static const ClassRegistrar<Dir> s_factoryStageDir(
+    "stageDir", FACTORY_STAGEDIR, []() -> Object * { return new Dir(true); });
 
-Dir::Dir()
+Dir::Dir(bool isStageDir)
     : ControlElement(DIR)
     , TextListInterface()
     , TextDirInterface()
@@ -47,6 +49,7 @@ Dir::Dir()
     this->RegisterAttClass(ATT_VERTICALGROUP);
 
     this->Reset();
+    this->SetStageDir(isStageDir);
 }
 
 Dir::~Dir() {}
@@ -60,6 +63,8 @@ void Dir::Reset()
     this->ResetLang();
     this->ResetLineRendBase();
     this->ResetVerticalGroup();
+
+    m_isStageDir = false;
 }
 
 bool Dir::IsSupportedChild(ClassId classId)

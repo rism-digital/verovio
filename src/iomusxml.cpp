@@ -3490,11 +3490,27 @@ void MusicXmlInput::ReadMusicXmlNote(
             for (pugi::xml_node technicalChild : technical.children()) {
                 const std::string technicalChildName = technicalChild.name();
 
-                // fingering is handled on the same level as breath marks, dynamics, etc. so we skip it here
-                if ((technicalChildName == "fingering") || (technicalChildName == "thumb-position")) continue;
-                if (technicalChildName == "string") continue; // handled with fret
-
-                if (technicalChildName == "fret") {
+                // fingering
+                if (technicalChildName == "fingering") {
+                    const std::string fingText = technicalChild.text().as_string();
+                    Fing *fing = new Fing();
+                    Text *text = new Text();
+                    text->SetText(UTF8to32(fingText));
+                    m_controlElements.push_back({ measureNum, fing });
+                    const std::string startID = note ? ("#" + note->GetID()) : m_ID;
+                    fing->SetStartid(startID);
+                    fing->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+                    fing->SetPlace(
+                        fing->AttPlacementRelStaff::StrToStaffrel(technicalChild.attribute("placement").as_string()));
+                    fing->AddChild(text);
+                }
+                else if (technicalChildName == "thumb-position") {
+                    continue;
+                }
+                else if (technicalChildName == "string") {
+                    continue; // handled with fret
+                }
+                else if (technicalChildName == "fret") {
                     assert(isTablature);
 
                     // set @tab.string and @tab.fret
@@ -3636,21 +3652,6 @@ void MusicXmlInput::ReadMusicXmlNote(
         fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         if (xmlFermata.attribute("id")) fermata->SetID(xmlFermata.attribute("id").as_string());
         this->ShapeFermata(fermata, xmlFermata);
-    }
-
-    // fingering
-    auto xmlFing = notations.node().select_node("technical/fingering");
-    if (xmlFing) {
-        const std::string fingText = xmlFing.node().text().as_string();
-        Fing *fing = new Fing();
-        Text *text = new Text();
-        text->SetText(UTF8to32(fingText));
-        m_controlElements.push_back({ measureNum, fing });
-        const std::string startID = note ? ("#" + note->GetID()) : m_ID;
-        fing->SetStartid(startID);
-        fing->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-        fing->SetPlace(fing->AttPlacementRelStaff::StrToStaffrel(xmlFing.node().attribute("placement").as_string()));
-        fing->AddChild(text);
     }
 
     // glissando and slide

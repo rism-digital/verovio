@@ -557,7 +557,14 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         this->WriteCpMark(m_currentNode, vrv_cast<CpMark *>(object));
     }
     else if (object->Is(DIR)) {
-        m_currentNode = m_currentNode.append_child("dir");
+        Dir *dir = vrv_cast<Dir *>(object);
+        assert(dir);
+        if (dir->IsStageDir()) {
+            m_currentNode = m_currentNode.append_child("stageDir");
+        }
+        else {
+            m_currentNode = m_currentNode.append_child("dir");
+        }
         this->WriteDir(m_currentNode, vrv_cast<Dir *>(object));
     }
     else if (object->Is(DYNAM)) {
@@ -5769,6 +5776,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (currentName == "staff") {
             success = this->ReadStaff(parent, current);
         }
+        else if (currentName == "stageDir") {
+            success = this->ReadDir(parent, current, true);
+        }
         else if (currentName == "tempo") {
             success = this->ReadTempo(parent, current);
         }
@@ -5989,9 +5999,9 @@ bool MEIInput::ReadCpMark(Object *parent, pugi::xml_node cpMark)
     return this->ReadTextChildren(vrvCpMark, cpMark, vrvCpMark);
 }
 
-bool MEIInput::ReadDir(Object *parent, pugi::xml_node dir)
+bool MEIInput::ReadDir(Object *parent, pugi::xml_node dir, bool isStageDir)
 {
-    Dir *vrvDir = new Dir();
+    Dir *vrvDir = new Dir(isStageDir);
     this->ReadControlElement(dir, vrvDir);
 
     this->ReadTextDirInterface(dir, vrvDir);

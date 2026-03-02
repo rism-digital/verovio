@@ -153,7 +153,7 @@ jobs:
 
       #===============================================#
       # Upload artifacts
-      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: cibuildwheel-${{ runner.os }}-python-${{ matrix.python-version }}-${{ matrix.architecture }}
           path: ./wheelhouse/*.whl
@@ -229,7 +229,7 @@ jobs:
 
       #===============================================#
       # Upload artifact
-      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: sdist-${{ runner.os }}-python-3.10
           path: dist/*.tar.gz
@@ -263,7 +263,7 @@ jobs:
       #===============================================#
       # Prepare artifacts
       - name: Download artifacts
-        uses: actions/download-artifact@v7.0.0 # v4.1.7
+        uses: actions/download-artifact@v8.0.0 # v4.1.7
         with:
           path: bindings/python/artifacts/
 

@@ -37,11 +37,11 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    Dir();
+    Dir(bool isStageDir = false);
     virtual ~Dir();
     Object *Clone() const override { return new Dir(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "dir"; }
+    std::string GetClassName() const override { return (this->IsStageDir() ? "stageDir" : "dir"); }
     ///@}
 
     /**
@@ -60,6 +60,14 @@ public:
     {
         return vrv_cast<const TimeSpanningInterface *>(this);
     }
+    ///@}
+
+    /**
+     * @name Getters and setters for stageDir.
+     */
+    ///@{
+    bool IsStageDir() const { return (m_isStageDir); }
+    void SetStageDir(bool isStageDir) { m_isStageDir = isStageDir; }
     ///@}
 
     /**
@@ -94,7 +102,8 @@ private:
 public:
     //
 private:
-    //
+    /** stageDir flag */
+    bool m_isStageDir;
 };
 
 } // namespace vrv

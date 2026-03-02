@@ -783,7 +783,7 @@ private:
     bool ReadBreath(Object *parent, pugi::xml_node breath);
     bool ReadCaesura(Object *parent, pugi::xml_node caesura);
     bool ReadCpMark(Object *parent, pugi::xml_node cpMark);
-    bool ReadDir(Object *parent, pugi::xml_node dir);
+    bool ReadDir(Object *parent, pugi::xml_node dir, bool isStageDir = false);
     bool ReadDynam(Object *parent, pugi::xml_node dynam);
     bool ReadFermata(Object *parent, pugi::xml_node fermata);
     bool ReadFing(Object *parent, pugi::xml_node fing);

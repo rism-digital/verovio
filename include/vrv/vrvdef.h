@@ -282,6 +282,7 @@ enum ClassId : uint16_t {
     SVG_DEVICE_CONTEXT,
     CUSTOM_DEVICE_CONTEXT,
     // Pseudo ids for custom factory functions
+    FACTORY_STAGEDIR,
     FACTORY_OSTAFF,
     //
     UNSPECIFIED
