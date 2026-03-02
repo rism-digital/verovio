@@ -52,7 +52,7 @@ void CustomTuning::CreateGlyphMapping(Doc *doc)
 {
     if (s_glyphNames.size() > 0 && s_glyphCodes.size() > 0) return;
 
-    std::ifstream glyphnames(doc->GetResources().GetPath() + "/glyphnames.json");
+    std::ifstream glyphnames(doc->GetResources().GetPath() + "/tuning-glyphnames.json");
     std::string json((std::istreambuf_iterator<char>(glyphnames)), std::istreambuf_iterator<char>());
     jsonxx::Object glyphs;
     if (!glyphs.parse(json)) {

@@ -466,23 +466,23 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     }
 
     // set MIDI tuning
-    const auto midiTuning = m_options->m_midiTuning.GetStrValue();
-    if (!midiTuning.empty()) {
+    const auto midiTuningFile = m_options->m_midiTuningFile.GetStrValue();
+    if (!midiTuningFile.empty()) {
         std::string tuningDef;
-        std::ifstream f(midiTuning.c_str());
+        std::ifstream f(midiTuningFile.c_str());
         if (f.good()) {
             const std::string ext(".ascl");
-            if (midiTuning.size() >= ext.size() && midiTuning.substr(midiTuning.size() - ext.size()) == ext) {
+            if (midiTuningFile.size() >= ext.size() && midiTuningFile.substr(midiTuningFile.size() - ext.size()) == ext) {
                 std::stringstream buffer;
                 buffer << f.rdbuf();
                 tuningDef = buffer.str();
             }
             else {
-                LogError("Tuning file '%s' is not recognized", midiTuning.c_str());
+                LogError("Tuning file '%s' is not recognized", midiTuningFile.c_str());
             }
         }
         else {
-            tuningDef = midiTuning;
+            tuningDef = midiTuningFile;
         }
         if (!tuningDef.empty()) {
             CustomTuning tuning(tuningDef, this, false);

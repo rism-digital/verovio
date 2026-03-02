@@ -1854,9 +1854,9 @@ Options::Options()
     m_midiTempoAdjustment.Init(1.0, 0.2, 4.0);
     this->Register(&m_midiTempoAdjustment, "midiTempoAdjustment", &m_midi);
 
-    m_midiTuning.SetInfo("MIDI tuning", "A custom tuning definition or filepath to apply to the MIDI output");
-    m_midiTuning.Init("");
-    this->Register(&m_midiTuning, "tuningFile", &m_midi);
+    m_midiTuningFile.SetInfo("MIDI tuning", "A custom tuning definition or filepath to apply to the MIDI output");
+    m_midiTuningFile.Init("");
+    this->Register(&m_midiTuningFile, "tuningFile", &m_midi);
 
     /********* Mensural *********/
 

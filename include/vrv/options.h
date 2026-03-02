@@ -859,7 +859,7 @@ public:
 
     OptionBool m_midiNoCue;
     OptionDbl m_midiTempoAdjustment;
-    OptionString m_midiTuning;
+    OptionString m_midiTuningFile;
 
     /**
      * Mensural
