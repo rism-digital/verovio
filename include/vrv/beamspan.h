@@ -77,8 +77,8 @@ public:
      * Access the beam segments
      */
     ///@{
-    BeamSpanSegment *GetSegment(int index) { return m_beamSegments.at(index); }
-    const BeamSpanSegment *GetSegment(int index) const { return m_beamSegments.at(index); }
+    BeamSpanSegment *GetSegment(int index) { return m_beamSegments.at(index).get(); }
+    const BeamSpanSegment *GetSegment(int index) const { return m_beamSegments.at(index).get(); }
     BeamSpanSegment *GetSegmentForSystem(const System *system);
     const BeamSpanSegment *GetSegmentForSystem(const System *system) const;
     ///@}
@@ -122,7 +122,7 @@ private:
     /**
      * Array of beam segments
      */
-    std::vector<BeamSpanSegment *> m_beamSegments;
+    std::vector<std::shared_ptr<BeamSpanSegment>> m_beamSegments;
     /**
      * Array of beamed elements
      */

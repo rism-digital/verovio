@@ -66,16 +66,13 @@ void BeamSpan::Reset()
 void BeamSpan::InitBeamSegments()
 {
     // BeamSpan should have at least one segment to begin with
-    m_beamSegments.emplace_back(new BeamSpanSegment());
+    m_beamSegments.emplace_back(std::make_shared<BeamSpanSegment>());
 
     m_isSpanningElement = true;
 }
 
 void BeamSpan::ClearBeamSegments()
 {
-    for (BeamSpanSegment *segment : m_beamSegments) {
-        delete segment;
-    }
     m_beamSegments.clear();
 }
 
@@ -88,11 +85,11 @@ const BeamSpanSegment *BeamSpan::GetSegmentForSystem(const System *system) const
 {
     assert(system);
 
-    for (BeamSpanSegment *segment : m_beamSegments) {
+    for (std::shared_ptr<BeamSpanSegment> segment : m_beamSegments) {
         // make sure to process only segments for current system
         const Measure *segmentSystem = segment->GetMeasure();
         if (segmentSystem && vrv_cast<const System *>(segmentSystem->GetFirstAncestor(SYSTEM)) == system)
-            return segment;
+            return segment.get();
     }
     return NULL;
 }
@@ -110,9 +107,9 @@ bool BeamSpan::AddSpanningSegment(const Doc *doc, const SpanIndexVector &element
         [&](BeamElementCoord *coord) { return coord->m_element == *(elements.at(index + 1).first - 1); });
     if ((coordsFirst == m_beamElementCoords.end()) || (coordsLast == m_beamElementCoords.end())) return false;
 
-    BeamSpanSegment *segment = NULL;
+    std::shared_ptr<BeamSpanSegment> segment;
     if (newSegment) {
-        segment = new BeamSpanSegment();
+        segment = std::make_shared<BeamSpanSegment>();
     }
     else {
         segment = m_beamSegments.at(0);
