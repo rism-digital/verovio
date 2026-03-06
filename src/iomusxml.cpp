@@ -691,12 +691,6 @@ std::string MusicXmlInput::GetWordsOrDynamicsText(const pugi::xml_node node) con
         }
         return dynamStr;
     }
-    if (IsElement(node, "coda")) {
-        return "\xF0\x9D\x84\x8C";
-    }
-    if (IsElement(node, "segno")) {
-        return "\xF0\x9D\x84\x8B";
-    }
     return std::string();
 }
 
@@ -713,6 +707,15 @@ void MusicXmlInput::TextRendition(const pugi::xpath_node_set words, ControlEleme
             symbol->SetGlyphAuth("smufl");
             symbol->SetColor(textColor);
             symbol->SetGlyphName(textNode.text().as_string());
+            element->AddChild(symbol);
+            continue;
+        }
+        else if (!std::strncmp(textNode.name(), "coda", 4) || !std::strncmp(textNode.name(), "segno", 5)) {
+            // for cases we have coda/segno and text in one direction
+            Symbol *symbol = new Symbol();
+            symbol->SetGlyphAuth("smufl");
+            symbol->SetColor(textColor);
+            symbol->SetGlyphName(textNode.name());
             element->AddChild(symbol);
             continue;
         }
