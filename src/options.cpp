@@ -924,8 +924,8 @@ Options::Options()
     m_baseOptions.AddOption(&m_allPages);
 
     m_inputFrom.SetInfo("Input from",
-        "Select input format from: \"abc\", \"cmme.xml\", \"darms\", \"esac\", \"humdrum\", \"mei\", \"pae\", "
-        "\"volpiano\", \"xml\" "
+        "Select input format from: \"abc\", \"cmme.xml\", \"darms\", \"esac\", \"gabc\", \"humdrum\", "
+        "\"mei\", \"pae\", ""\"volpiano\", \"xml\" "
         "(musicxml), \"musicxml-hum\" (musicxml via humdrum) or \"mei-pb-serialized\"");
     m_inputFrom.Init("mei");
     m_inputFrom.SetKey("inputFrom");
@@ -2009,6 +2009,12 @@ bool Options::SetInputFrom(std::string const &inputFrom)
     else if (inputFrom == "cmme.xml") {
         m_inputFromFormat = CMME;
     }
+    else if (inputFrom == "esac") {
+        m_inputFromFormat = ESAC;
+    }
+    else if (inputFrom == "gabc") {
+        m_inputFromFormat = GABC;
+    }
     else if ((inputFrom == "humdrum") || (inputFrom == "hum")) {
         m_inputFromFormat = HUMDRUM;
     }
@@ -2032,9 +2038,6 @@ bool Options::SetInputFrom(std::string const &inputFrom)
     }
     else if (inputFrom == "mei-hum") {
         m_inputFromFormat = MEIHUM;
-    }
-    else if (inputFrom == "esac") {
-        m_inputFromFormat = ESAC;
     }
     else if (inputFrom == "mei-pb-serialized") {
         m_inputFromFormat = SERIALIZATION;

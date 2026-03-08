@@ -25,6 +25,7 @@
 #include "ioabc.h"
 #include "iocmme.h"
 #include "iodarms.h"
+#include "iogabc.h"
 #include "iohumdrum.h"
 #include "iomei.h"
 #include "iomusxml.h"
@@ -242,6 +243,7 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         // Title record for a melody in EsAC format.
         return ESAC;
     }
+    //TODO drizo - Add specific checks for GABC
 
     // Assume that the input is MEI if other input types were not detected.
     // This means that DARMS cannot be auto-detected.
@@ -530,6 +532,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
 #endif
 
     FileFormat inputFrom = m_options->GetInputFrom();
+
     if (inputFrom == AUTO) {
         inputFrom = IdentifyInputFrom(data);
     }
@@ -538,6 +541,14 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         input = new ABCInput(&m_doc);
 #else
         LogError("ABC import is not supported in this build.");
+        return false;
+#endif
+    }
+    else if (inputFrom == GABC) {
+#ifndef NO_GABC_SUPPORT
+        input = new GABCInput(&m_doc);
+#else
+        LogError("GABC import is not supported in this build.");
         return false;
 #endif
     }
