@@ -1065,9 +1065,9 @@ public:
     ///@}
 
 private:
-    /** States where the tuplet number will be placed in relation to the note heads. **/
+    /** States where the number will be placed in relation to the notational feature. **/
     data_STAFFREL_basic m_numPlace;
-    /** Determines if the tuplet number is visible. **/
+    /** Determines if the number is visible. **/
     data_BOOLEAN m_numVisible;
 };
 

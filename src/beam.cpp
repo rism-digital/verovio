@@ -101,7 +101,7 @@ void BeamSegment::CalcBeam(const Layer *layer, Staff *staff, const Doc *doc, Bea
     }
 
     bool horizontal = true;
-    if (staff->IsTablature()) {
+    if (staff->IsTablature() || staff->IsTabStaffLike()) {
         int glyphSize = staff->GetDrawingStaffNotationSize();
         beamInterface->m_fractionSize = glyphSize * 2 / 3;
 
@@ -138,7 +138,7 @@ void BeamSegment::CalcBeam(const Layer *layer, Staff *staff, const Doc *doc, Bea
     /******************************************************************/
     // Set the stem lengths to stem objects
 
-    if (staff->IsTablature()) {
+    if (staff->IsTablature() || staff->IsTabStaffLike()) {
         this->CalcSetStemValuesTab(staff, doc, beamInterface);
     }
     else {
@@ -392,8 +392,8 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, const Doc *doc, BeamDrawingI
     const int staffTop = staff->GetDrawingY();
     const int staffBottom
         = staffTop - doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
-    const int topBorder = staffTop - topOffset - unit;
-    const int bottomBorder = staffBottom + bottomOffset + unit;
+    const int topBorder = staffTop + topOffset + unit;
+    const int bottomBorder = staffBottom - bottomOffset - unit;
 
     // Check if the beam is admissible
     if (!this->DoesBeamOverlap(beamInterface, topBorder, bottomBorder, minStemLength)) {
@@ -597,13 +597,14 @@ void BeamSegment::CalcBeamInit(
         beamInterface->m_beamWidthWhite /= 3;
     }
 
-    if (staff->IsTablature()) {
+    if (staff->IsTablature() || staff->IsTabStaffLike()) {
         // Adjust the height and spacing of the beams
         beamInterface->m_beamWidthBlack /= 2;
         beamInterface->m_beamWidthWhite /= 2;
 
-        // Adjust it further for tab.lute.french, tab.lute.german and tab.lute.italian
-        if (staff->IsTabLuteFrench() || staff->IsTabLuteGerman() || staff->IsTabLuteItalian()) {
+        // Adjust it further for tab.staff-like, tab.lute.french, tab.lute.german and tab.lute.italian
+        if (staff->IsTabLuteFrench() || staff->IsTabLuteGerman() || staff->IsTabLuteItalian()
+            || staff->IsTabStaffLike()) {
             beamInterface->m_beamWidthBlack = beamInterface->m_beamWidthBlack * 2 / 5;
             beamInterface->m_beamWidthWhite = beamInterface->m_beamWidthWhite * 3 / 5;
         }
@@ -642,7 +643,6 @@ void BeamSegment::CalcBeamInit(
 
         int chordYMax = 0;
         int chordYMin = 0;
-
         if (coord->m_element->Is(CHORD)) {
             Chord *chord = vrv_cast<Chord *>(coord->m_element);
             assert(chord);
@@ -674,7 +674,6 @@ void BeamSegment::CalcBeamInit(
             }
         }
     }
-
     m_weightedPlace = ((m_verticalCenter - yMin) > (yMax - m_verticalCenter)) ? BEAMPLACE_above : BEAMPLACE_below;
 }
 
@@ -939,6 +938,7 @@ void BeamSegment::CalcBeamPosition(
     }
 
     // Nothing else to do with tab beams outside the staff
+    // unless tab.staff-like, which may need to raise the beams for ledger lines
     if (staff->IsTablature() && staff->IsTabWithStemsOutside()) return;
 
     /******************************************************************/

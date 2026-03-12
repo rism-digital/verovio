@@ -534,29 +534,30 @@ void PreparePlistFunctor::InsertInterfaceObjectIDPair(Object *objectWithPlist, c
 FunctorCode PreparePlistFunctor::VisitObject(Object *object)
 {
     if (this->IsCollectingData()) {
-        // Skip expansion elements because these are handled in Doc::ExpandExpansions
-        if (object->HasInterface(INTERFACE_PLIST) && !object->Is(EXPANSION)) {
+        if (object->HasInterface(INTERFACE_PLIST)) {
             PlistInterface *interface = object->GetPlistInterface();
             assert(interface);
             return interface->InterfacePreparePlist(*this, object);
         }
     }
     else {
-        if (!object->IsLayerElement()) return FUNCTOR_CONTINUE;
+        if (!object->IsLayerElement() && !object->Is({ ENDING, EXPANSION, SECTION })) return FUNCTOR_CONTINUE;
 
         const std::string &id = object->GetID();
-        auto iter = std::find_if(m_plistObjectIDPairs.begin(), m_plistObjectIDPairs.end(),
-            [&id](const std::pair<Object *, std::string> &pair) { return (pair.second == id); });
-        if (iter != m_plistObjectIDPairs.end()) {
-            // Set reference for matched pair and erase it from the list
-            PlistInterface *interface = iter->first->GetPlistInterface();
-            assert(interface);
-            interface->SetRef(object);
-            // Add back link to the object referred in the plist - for now only for Annot
-            if (iter->first->Is(ANNOTSCORE)) {
-                object->AddPlistReference(iter->first);
+        for (auto it = m_plistObjectIDPairs.begin(); it != m_plistObjectIDPairs.end();) {
+            if (it->second == id) {
+                PlistInterface *interface = it->first->GetPlistInterface();
+                assert(interface);
+                interface->SetRef(object);
+                // Add back link to the object referred in the plist - for now only for Annot
+                if (it->first->Is(ANNOTSCORE)) {
+                    object->AddPlistReference(it->first);
+                }
+                it = m_plistObjectIDPairs.erase(it); // returns next valid iterator
             }
-            m_plistObjectIDPairs.erase(iter);
+            else {
+                ++it;
+            }
         }
     }
 

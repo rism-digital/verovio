@@ -21,6 +21,7 @@
 #include "attalternates.h"
 #include "atttypes.h"
 #include "smufl.h"
+#include "toolkitdef.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -76,6 +77,8 @@ enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded, FOOTER_always
 enum option_HEADER { HEADER_none = 0, HEADER_auto, HEADER_encoded };
 
 enum option_LIGATURE_OBL { LIGATURE_OBL_auto = 0, LIGATURE_OBL_straight, LIGATURE_OBL_curved };
+
+enum option_MENSURAL_RESP { MENSURAL_RESP_none = 0, MENSURAL_RESP_auto, MENSURAL_RESP_selection };
 
 enum option_MULTIRESTSTYLE {
     MULTIRESTSTYLE_auto = 0,
@@ -151,6 +154,7 @@ public:
     static const std::map<int, std::string> s_footer;
     static const std::map<int, std::string> s_header;
     static const std::map<int, std::string> s_ligatureOblique;
+    static const std::map<int, std::string> s_mensuralResponsiveness;
     static const std::map<int, std::string> s_multiRestStyle;
     static const std::map<int, std::string> s_pedalStyle;
     static const std::map<int, std::string> s_systemDivider;
@@ -582,6 +586,11 @@ public:
     Options(const Options &options);
     Options &operator=(const Options &options);
 
+    bool SetInputFrom(std::string const &inputFrom);
+    bool SetOutputTo(std::string const &outputTo);
+    FileFormat GetInputFrom() const { return m_inputFromFormat; }
+    FileFormat GetOutputTo() const { return m_outputToFormat; }
+
     const MapOfStrOptions *GetItems() const { return &m_items; }
 
     const std::vector<OptionGrp *> *GetGrps() const { return &m_grps; }
@@ -616,6 +625,9 @@ public:
     OptionString m_outputTo;
     OptionBool m_version;
     OptionInt m_xmlIdSeed;
+
+    FileFormat m_inputFromFormat;
+    FileFormat m_outputToFormat;
 
     /**
      * General
@@ -773,8 +785,8 @@ public:
     OptionArray m_appXPathQuery;
     OptionArray m_choiceXPathQuery;
     OptionString m_expand;
-    OptionBool m_expandFirst;
-    OptionBool m_expandGenerate;
+    OptionBool m_expandAlways;
+    OptionBool m_expandNever;
     OptionBool m_loadSelectedMdivOnly;
     OptionBool m_mdivAll;
     OptionString m_mdivXPathQuery;
@@ -847,6 +859,7 @@ public:
 
     OptionBool m_midiNoCue;
     OptionDbl m_midiTempoAdjustment;
+    OptionString m_midiTuningFile;
 
     /**
      * Mensural
@@ -857,7 +870,7 @@ public:
     OptionBool m_ligatureAsBracket;
     OptionIntMap m_ligatureOblique;
     OptionBool m_mensuralScoreUp;
-    OptionBool m_mensuralResponsiveView;
+    OptionIntMap m_mensuralResponsiveView;
     OptionBool m_mensuralToCmn;
 
     /**

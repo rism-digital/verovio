@@ -77,10 +77,10 @@ FunctorCode TransposeFunctor::VisitKeySig(KeySig *keySig)
 
     // Also convert pname and accid attributes
     if (keySig->HasPname()) {
-        TransPitch pitch = TransPitch(keySig->GetPname(), ACCIDENTAL_GESTURAL_NONE, keySig->GetAccid(), 4);
+        TransPitch pitch = TransPitch(keySig->GetPname(), keySig->GetAccid(), ACCIDENTAL_WRITTEN_NONE, 4);
         m_transposer->Transpose(pitch);
         keySig->SetPname(pitch.GetPitchName());
-        keySig->SetAccid(pitch.GetAccidW());
+        keySig->SetAccid(pitch.GetAccidGesBasic());
     }
 
     return FUNCTOR_SIBLINGS;
@@ -189,7 +189,7 @@ FunctorCode TransposeFunctor::VisitScore(Score *score)
         // If there is no keysignature, assume it is C.
         TransPitch currentKey = TransPitch(0, 0, 0);
         if (keySig && keySig->HasPname()) {
-            currentKey = TransPitch(keySig->GetPname(), ACCIDENTAL_GESTURAL_NONE, keySig->GetAccid(), 0);
+            currentKey = TransPitch(keySig->GetPname(), keySig->GetAccid(), ACCIDENTAL_WRITTEN_NONE, 0);
         }
         else if (keySig) {
             // No tonic pitch in key signature, so infer from key signature.

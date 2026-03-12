@@ -280,6 +280,18 @@
 		4D292C212EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D292C1D2EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp */; };
 		4D292C232EEB0BC000C1EB5F /* adjustossiastaffdeffunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D292C222EEB0BC000C1EB5F /* adjustossiastaffdeffunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D292C242EEB0BC000C1EB5F /* adjustossiastaffdeffunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D292C222EEB0BC000C1EB5F /* adjustossiastaffdeffunctor.h */; };
+		4D2B23F42F56E7980088C6F4 /* TuningsImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2B23F22F56E7980088C6F4 /* TuningsImpl.h */; };
+		4D2B23F52F56E7980088C6F4 /* Tunings.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2B23F02F56E7980088C6F4 /* Tunings.h */; };
+		4D2B23F62F56E7980088C6F4 /* TuningsConcepts.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2B23F12F56E7980088C6F4 /* TuningsConcepts.h */; };
+		4D2B23F72F56E7980088C6F4 /* TuningsImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2B23F22F56E7980088C6F4 /* TuningsImpl.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D2B23F82F56E7980088C6F4 /* Tunings.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2B23F02F56E7980088C6F4 /* Tunings.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D2B23F92F56E7980088C6F4 /* TuningsConcepts.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2B23F12F56E7980088C6F4 /* TuningsConcepts.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D2B23FD2F56E8F40088C6F4 /* customtuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2B23FC2F56E8F40088C6F4 /* customtuning.cpp */; };
+		4D2B23FE2F56E8F40088C6F4 /* customtuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2B23FC2F56E8F40088C6F4 /* customtuning.cpp */; };
+		4D2B23FF2F56E8F40088C6F4 /* customtuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2B23FC2F56E8F40088C6F4 /* customtuning.cpp */; };
+		4D2B24002F56E8F40088C6F4 /* customtuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2B23FC2F56E8F40088C6F4 /* customtuning.cpp */; };
+		4D2B24022F56E9090088C6F4 /* customtuning.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2B24012F56E9090088C6F4 /* customtuning.h */; };
+		4D2B24032F56E9090088C6F4 /* customtuning.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2B24012F56E9090088C6F4 /* customtuning.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D2E758A22BC2B34004C51F0 /* view_tab.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20741122A708C600E0765F /* view_tab.cpp */; };
 		4D2E758B22BC2B5B004C51F0 /* tabgrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F422A3BCDF00E0765F /* tabgrp.cpp */; };
 		4D2E758C22BC2B5B004C51F0 /* tabgrp.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2073F122A3BCB700E0765F /* tabgrp.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1909,6 +1921,11 @@
 		4D27E13627F582BB00D64FBD /* docselection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = docselection.cpp; path = src/docselection.cpp; sourceTree = "<group>"; };
 		4D292C1D2EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = adjustossiastaffdeffunctor.cpp; path = src/adjustossiastaffdeffunctor.cpp; sourceTree = "<group>"; };
 		4D292C222EEB0BC000C1EB5F /* adjustossiastaffdeffunctor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = adjustossiastaffdeffunctor.h; path = include/vrv/adjustossiastaffdeffunctor.h; sourceTree = "<group>"; };
+		4D2B23F02F56E7980088C6F4 /* Tunings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Tunings.h; sourceTree = "<group>"; };
+		4D2B23F12F56E7980088C6F4 /* TuningsConcepts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TuningsConcepts.h; sourceTree = "<group>"; };
+		4D2B23F22F56E7980088C6F4 /* TuningsImpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TuningsImpl.h; sourceTree = "<group>"; };
+		4D2B23FC2F56E8F40088C6F4 /* customtuning.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = customtuning.cpp; path = src/customtuning.cpp; sourceTree = "<group>"; };
+		4D2B24012F56E9090088C6F4 /* customtuning.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = customtuning.h; path = include/vrv/customtuning.h; sourceTree = "<group>"; };
 		4D308100203DB69C00BC44F6 /* ref.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ref.h; path = include/vrv/ref.h; sourceTree = "<group>"; };
 		4D308103203DB6B500BC44F6 /* ref.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ref.cpp; path = src/ref.cpp; sourceTree = "<group>"; };
 		4D36C21C1EBCE14300A6DD1B /* fb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fb.h; path = include/vrv/fb.h; sourceTree = "<group>"; };
@@ -2473,6 +2490,17 @@
 			name = pugixml;
 			sourceTree = "<group>";
 		};
+		4D2B23F32F56E7980088C6F4 /* tuning-library */ = {
+			isa = PBXGroup;
+			children = (
+				4D2B23F02F56E7980088C6F4 /* Tunings.h */,
+				4D2B23F12F56E7980088C6F4 /* TuningsConcepts.h */,
+				4D2B23F22F56E7980088C6F4 /* TuningsImpl.h */,
+			);
+			name = "tuning-library";
+			path = "include/tuning-library";
+			sourceTree = "<group>";
+		};
 		4D3080F9203DA03600BC44F6 /* editorialelements */ = {
 			isa = PBXGroup;
 			children = (
@@ -2869,6 +2897,7 @@
 				4DB787602022EFA700394520 /* json */,
 				4D1BE7751C688F6F0086DC0E /* midi */,
 				4D22C42118891D7300D0831F /* pugixml */,
+				4D2B23F32F56E7980088C6F4 /* tuning-library */,
 				4D723AF225E8DAB40062E0A2 /* zip */,
 				BB4C4A5322A930A3001F6AF0 /* VerovioFramework */,
 				8F086EAA188534680037FD8E /* Products */,
@@ -2908,6 +2937,8 @@
 				4D5FA9101E16A93F00F3B919 /* boundingbox.cpp */,
 				4D5FA90F1E16A85800F3B919 /* boundingbox.h */,
 				4D9234F11A586AE100763251 /* comparison.h */,
+				4D2B23FC2F56E8F40088C6F4 /* customtuning.cpp */,
+				4D2B24012F56E9090088C6F4 /* customtuning.h */,
 				8F086EBD188539540037FD8E /* doc.cpp */,
 				8F59291418854BF800FE51AD /* doc.h */,
 				4D27E13627F582BB00D64FBD /* docselection.cpp */,
@@ -3418,6 +3449,7 @@
 				E7B17DA629F6657B0076E75F /* midifunctor.h in Headers */,
 				8F59294818854BF800FE51AD /* mensur.h in Headers */,
 				4D79641D26C152400026288B /* pageelement.h in Headers */,
+				4D2B24022F56E9090088C6F4 /* customtuning.h in Headers */,
 				4DB3D8B81F83D0B100B5FC2B /* score.h in Headers */,
 				E738715D29CAFA7800982DE5 /* calcligatureorneumeposfunctor.h in Headers */,
 				4DA0EAD922BB77AF00A7EBEB /* facsimile.h in Headers */,
@@ -3529,6 +3561,9 @@
 				8F59295A18854BF800FE51AD /* vrvdef.h in Headers */,
 				E7E1698329A8988E00FFF482 /* adjustlayersfunctor.h in Headers */,
 				4DB3D89B1F7C326A00B5FC2B /* lb.h in Headers */,
+				4D2B23F42F56E7980088C6F4 /* TuningsImpl.h in Headers */,
+				4D2B23F52F56E7980088C6F4 /* Tunings.h in Headers */,
+				4D2B23F62F56E7980088C6F4 /* TuningsConcepts.h in Headers */,
 				4D22C41C18890E9900D0831F /* mrest.h in Headers */,
 				4DB3D8FF1F83D20800B5FC2B /* options.h in Headers */,
 				E797C461298EC2E600CAD67E /* calcalignmentpitchposfunctor.h in Headers */,
@@ -3669,6 +3704,9 @@
 				E7F1C36529F033FC007E12C1 /* savefunctor.h in Headers */,
 				BDC366DB2576AFA400E4D826 /* grpsym.h in Headers */,
 				BB4C4B0622A932C3001F6AF0 /* pgfoot.h in Headers */,
+				4D2B23F72F56E7980088C6F4 /* TuningsImpl.h in Headers */,
+				4D2B23F82F56E7980088C6F4 /* Tunings.h in Headers */,
+				4D2B23F92F56E7980088C6F4 /* TuningsConcepts.h in Headers */,
 				BB4C4AFA22A932BC001F6AF0 /* restore.h in Headers */,
 				BB4C4B2422A932CF001F6AF0 /* dynam.h in Headers */,
 				BB4C4AD022A932B6001F6AF0 /* score.h in Headers */,
@@ -3837,6 +3875,7 @@
 				BB4C4B3622A932CF001F6AF0 /* tie.h in Headers */,
 				BB4C4B7C22A932D7001F6AF0 /* tuplet.h in Headers */,
 				BB4C4B4422A932D7001F6AF0 /* beatrpt.h in Headers */,
+				4D2B24032F56E9090088C6F4 /* customtuning.h in Headers */,
 				BB4C4AB022A932A6001F6AF0 /* ioabc.h in Headers */,
 				4D4992502926B4E9007E3431 /* toolkitdef.h in Headers */,
 				BB4C4AA422A9328F001F6AF0 /* vrv.h in Headers */,
@@ -3990,7 +4029,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 2610;
+				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					BB4C4A5122A930A3001F6AF0 = {
 						CreatedOnToolsVersion = 10.2.1;
@@ -4240,6 +4279,7 @@
 				4DC12A5A1F716E27000440E9 /* pghead.cpp in Sources */,
 				4DACC9A72990F29A00B55913 /* atts_externalsymbols.cpp in Sources */,
 				4DACC9F92990F29A00B55913 /* atts_figtable.cpp in Sources */,
+				4D2B24002F56E8F40088C6F4 /* customtuning.cpp in Sources */,
 				4D2614182E6995D700CD28CF /* editortoolkit.cpp in Sources */,
 				4DB3D8A81F828EA900B5FC2B /* areaposinterface.cpp in Sources */,
 				4DACC9E32990F29A00B55913 /* atts_midi.cpp in Sources */,
@@ -4528,6 +4568,7 @@
 				E741AD02299A3D5B00854426 /* calcslurdirectionfunctor.cpp in Sources */,
 				E7231E0529B64B2D000A2BF3 /* adjustxoverflowfunctor.cpp in Sources */,
 				E708AA6529D2B985001F937A /* adjustfloatingpositionerfunctor.cpp in Sources */,
+				4D2B23FD2F56E8F40088C6F4 /* customtuning.cpp in Sources */,
 				E7C3AEDC295501CA002DE5AB /* preparedatafunctor.cpp in Sources */,
 				8F086F01188539540037FD8E /* svgdevicecontext.cpp in Sources */,
 				4DBDD6722939E1AE009EC466 /* symboldef.cpp in Sources */,
@@ -4839,6 +4880,7 @@
 				4D1EB6AB2A2A7C5100AF2F98 /* div.cpp in Sources */,
 				8F3DD33218854B250051330C /* page.cpp in Sources */,
 				4DACC9A82990F29A00B55913 /* atts_externalsymbols.cpp in Sources */,
+				4D2B23FE2F56E8F40088C6F4 /* customtuning.cpp in Sources */,
 				4D26141A2E6995D700CD28CF /* editortoolkit.cpp in Sources */,
 				4DACC9FA2990F29A00B55913 /* atts_figtable.cpp in Sources */,
 				403BEFF6206C00F000D022D5 /* mrpt.cpp in Sources */,
@@ -5139,6 +5181,7 @@
 				4D1EB6AC2A2A7C5100AF2F98 /* div.cpp in Sources */,
 				4DACC9A92990F29A00B55913 /* atts_externalsymbols.cpp in Sources */,
 				4DACC9FB2990F29A00B55913 /* atts_figtable.cpp in Sources */,
+				4D2B23FF2F56E8F40088C6F4 /* customtuning.cpp in Sources */,
 				4D26141B2E6995D700CD28CF /* editortoolkit.cpp in Sources */,
 				E797C465298EC30800CAD67E /* calcalignmentpitchposfunctor.cpp in Sources */,
 				406916E22383379C009E6B04 /* mspace.cpp in Sources */,

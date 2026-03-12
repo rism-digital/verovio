@@ -2215,7 +2215,6 @@ void AttTupletVis::ResetTupletVis()
 {
     m_bracketPlace = STAFFREL_basic_NONE;
     m_bracketVisible = BOOLEAN_NONE;
-    m_durVisible = BOOLEAN_NONE;
     m_numFormat = tupletVis_NUMFORMAT_NONE;
 }
 
@@ -2230,11 +2229,6 @@ bool AttTupletVis::ReadTupletVis(pugi::xml_node element, bool removeAttr)
     if (element.attribute("bracket.visible")) {
         this->SetBracketVisible(StrToBoolean(element.attribute("bracket.visible").value()));
         if (removeAttr) element.remove_attribute("bracket.visible");
-        hasAttribute = true;
-    }
-    if (element.attribute("dur.visible")) {
-        this->SetDurVisible(StrToBoolean(element.attribute("dur.visible").value()));
-        if (removeAttr) element.remove_attribute("dur.visible");
         hasAttribute = true;
     }
     if (element.attribute("num.format")) {
@@ -2256,10 +2250,6 @@ bool AttTupletVis::WriteTupletVis(pugi::xml_node element)
         element.append_attribute("bracket.visible") = BooleanToStr(this->GetBracketVisible()).c_str();
         wroteAttribute = true;
     }
-    if (this->HasDurVisible()) {
-        element.append_attribute("dur.visible") = BooleanToStr(this->GetDurVisible()).c_str();
-        wroteAttribute = true;
-    }
     if (this->HasNumFormat()) {
         element.append_attribute("num.format") = TupletVisNumformatToStr(this->GetNumFormat()).c_str();
         wroteAttribute = true;
@@ -2275,11 +2265,6 @@ bool AttTupletVis::HasBracketPlace() const
 bool AttTupletVis::HasBracketVisible() const
 {
     return (m_bracketVisible != BOOLEAN_NONE);
-}
-
-bool AttTupletVis::HasDurVisible() const
-{
-    return (m_durVisible != BOOLEAN_NONE);
 }
 
 bool AttTupletVis::HasNumFormat() const

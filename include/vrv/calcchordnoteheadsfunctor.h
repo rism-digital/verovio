@@ -40,6 +40,8 @@ public:
     ///@{
     FunctorCode VisitChord(Chord *chord) override;
     FunctorCode VisitNote(Note *note) override;
+    FunctorCode VisitTabDurSym(TabDurSym *tabDurSym) override;
+    FunctorCode VisitTabGrp(TabGrp *tabGrp) override;
     ///@}
 
 protected:

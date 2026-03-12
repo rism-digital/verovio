@@ -103,6 +103,46 @@ bool AttAccidental::HasAccid() const
 }
 
 //----------------------------------------------------------------------------
+// AttAnnotLog
+//----------------------------------------------------------------------------
+
+AttAnnotLog::AttAnnotLog() : Att()
+{
+    this->ResetAnnotLog();
+}
+
+void AttAnnotLog::ResetAnnotLog()
+{
+    m_func = "";
+}
+
+bool AttAnnotLog::ReadAnnotLog(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("func")) {
+        this->SetFunc(StrToStr(element.attribute("func").value()));
+        if (removeAttr) element.remove_attribute("func");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttAnnotLog::WriteAnnotLog(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasFunc()) {
+        element.append_attribute("func") = StrToStr(this->GetFunc()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttAnnotLog::HasFunc() const
+{
+    return (m_func != "");
+}
+
+//----------------------------------------------------------------------------
 // AttArticulation
 //----------------------------------------------------------------------------
 
@@ -1548,6 +1588,46 @@ bool AttDistances::HasTempoDist() const
 }
 
 //----------------------------------------------------------------------------
+// AttDocStatus
+//----------------------------------------------------------------------------
+
+AttDocStatus::AttDocStatus() : Att()
+{
+    this->ResetDocStatus();
+}
+
+void AttDocStatus::ResetDocStatus()
+{
+    m_status = "";
+}
+
+bool AttDocStatus::ReadDocStatus(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("status")) {
+        this->SetStatus(StrToStr(element.attribute("status").value()));
+        if (removeAttr) element.remove_attribute("status");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttDocStatus::WriteDocStatus(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasStatus()) {
+        element.append_attribute("status") = StrToStr(this->GetStatus()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttDocStatus::HasStatus() const
+{
+    return (m_status != "");
+}
+
+//----------------------------------------------------------------------------
 // AttDotLog
 //----------------------------------------------------------------------------
 
@@ -2365,46 +2445,6 @@ bool AttJoined::WriteJoined(pugi::xml_node element)
 bool AttJoined::HasJoin() const
 {
     return (m_join != "");
-}
-
-//----------------------------------------------------------------------------
-// AttKeyMode
-//----------------------------------------------------------------------------
-
-AttKeyMode::AttKeyMode() : Att()
-{
-    this->ResetKeyMode();
-}
-
-void AttKeyMode::ResetKeyMode()
-{
-    m_mode = MODE_NONE;
-}
-
-bool AttKeyMode::ReadKeyMode(pugi::xml_node element, bool removeAttr)
-{
-    bool hasAttribute = false;
-    if (element.attribute("mode")) {
-        this->SetMode(StrToMode(element.attribute("mode").value()));
-        if (removeAttr) element.remove_attribute("mode");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttKeyMode::WriteKeyMode(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasMode()) {
-        element.append_attribute("mode") = ModeToStr(this->GetMode()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttKeyMode::HasMode() const
-{
-    return (m_mode != MODE_NONE);
 }
 
 //----------------------------------------------------------------------------
@@ -3864,7 +3904,7 @@ AttName::AttName() : Att()
 void AttName::ResetName()
 {
     m_nymref = "";
-    m_role = "";
+    m_role = RELATORS_NONE;
 }
 
 bool AttName::ReadName(pugi::xml_node element, bool removeAttr)
@@ -3876,7 +3916,7 @@ bool AttName::ReadName(pugi::xml_node element, bool removeAttr)
         hasAttribute = true;
     }
     if (element.attribute("role")) {
-        this->SetRole(StrToStr(element.attribute("role").value()));
+        this->SetRole(StrToRelators(element.attribute("role").value()));
         if (removeAttr) element.remove_attribute("role");
         hasAttribute = true;
     }
@@ -3891,7 +3931,7 @@ bool AttName::WriteName(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasRole()) {
-        element.append_attribute("role") = StrToStr(this->GetRole()).c_str();
+        element.append_attribute("role") = RelatorsToStr(this->GetRole()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -3904,7 +3944,7 @@ bool AttName::HasNymref() const
 
 bool AttName::HasRole() const
 {
-    return (m_role != "");
+    return (m_role != RELATORS_NONE);
 }
 
 //----------------------------------------------------------------------------

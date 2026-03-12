@@ -60,6 +60,14 @@ public:
      */
     void GenerateExpansionFor(Score *score);
 
+    /**
+     * @name Setter and getter for the generating attempt flag
+     */
+    ///@{
+    void SetProcessed(bool isProcessed) { m_isProcessed = isProcessed; }
+    bool IsProcessed() { return m_isProcessed; }
+    ///@}
+
     //----------------//
     // Static methods //
     //----------------//
@@ -92,6 +100,8 @@ public:
     std::map<std::string, std::vector<std::string>> m_map;
 
 private:
+    /** A flag indicating that the generation processed has been run even if the expansion map is empty  */
+    bool m_isProcessed;
 };
 
 } // namespace vrv

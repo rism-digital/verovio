@@ -79,7 +79,8 @@ TransPitch::TransPitch(int aPname, int anAccid, int anOct)
     this->SetPitch(aPname, anAccid, anOct);
 }
 
-TransPitch::TransPitch(data_PITCHNAME pname, data_ACCIDENTAL_GESTURAL accidG, data_ACCIDENTAL_WRITTEN accidW, int oct)
+TransPitch::TransPitch(
+    data_PITCHNAME pname, data_ACCIDENTAL_GESTURAL_basic accidG, data_ACCIDENTAL_WRITTEN accidW, int oct)
 {
     this->SetPitch(pname - PITCHNAME_c, this->GetChromaticAlteration(accidG, accidW), oct);
 }
@@ -135,7 +136,63 @@ int TransPitch::GetChromaticAlteration(data_ACCIDENTAL_GESTURAL accidG, data_ACC
     return 0;
 }
 
-data_ACCIDENTAL_GESTURAL TransPitch::GetAccidG() const
+int TransPitch::GetChromaticAlteration(data_ACCIDENTAL_GESTURAL_basic accidG, data_ACCIDENTAL_WRITTEN accidW)
+{
+    switch (accidG) {
+        case ACCIDENTAL_GESTURAL_basic_tf: return -3;
+        case ACCIDENTAL_GESTURAL_basic_ff: return -2;
+        case ACCIDENTAL_GESTURAL_basic_f: return -1;
+        case ACCIDENTAL_GESTURAL_basic_n: return 0;
+        case ACCIDENTAL_GESTURAL_basic_s: return 1;
+        case ACCIDENTAL_GESTURAL_basic_ss: return 2;
+        case ACCIDENTAL_GESTURAL_basic_ts: return 3;
+        default: break;
+    }
+    switch (accidW) {
+        case ACCIDENTAL_WRITTEN_tf: return -3;
+        case ACCIDENTAL_WRITTEN_ff: return -2;
+        // case ACCIDENTAL_WRITTEN_3qf: return -1.5;
+        // case ACCIDENTAL_WRITTEN_fd: return -1.5;
+        case ACCIDENTAL_WRITTEN_f: return -1;
+        case ACCIDENTAL_WRITTEN_nf: return -1;
+        // case ACCIDENTAL_WRITTEN_fu: return -0.5;
+        // case ACCIDENTAL_WRITTEN_1qf: return -0.5;
+        // case ACCIDENTAL_WRITTEN_nd: return -0.5;
+        case ACCIDENTAL_WRITTEN_n: return 0;
+        // case ACCIDENTAL_WRITTEN_nu: return 0.5;
+        // case ACCIDENTAL_WRITTEN_1qs: return 0.5;
+        // case ACCIDENTAL_WRITTEN_sd: return 0.5;
+        case ACCIDENTAL_WRITTEN_ns: return 1;
+        case ACCIDENTAL_WRITTEN_s: return 1;
+        // case ACCIDENTAL_WRITTEN_su: return 1.5;
+        // case ACCIDENTAL_WRITTEN_3qs: return 1.5;
+        case ACCIDENTAL_WRITTEN_ss: return 2;
+        case ACCIDENTAL_WRITTEN_x: return 2;
+        case ACCIDENTAL_WRITTEN_xs: return 3;
+        case ACCIDENTAL_WRITTEN_sx: return 3;
+        case ACCIDENTAL_WRITTEN_ts: return 3;
+        default: break;
+    }
+    return 0;
+}
+
+data_ACCIDENTAL_GESTURAL_basic TransPitch::GetAccidGesBasic() const
+{
+    switch (m_accid) {
+        case -3: return ACCIDENTAL_GESTURAL_basic_tf;
+        case -2: return ACCIDENTAL_GESTURAL_basic_ff;
+        case -1: return ACCIDENTAL_GESTURAL_basic_f;
+        case 0: return ACCIDENTAL_GESTURAL_basic_n;
+        case 1: return ACCIDENTAL_GESTURAL_basic_s;
+        case 2: return ACCIDENTAL_GESTURAL_basic_ss;
+        case 3: return ACCIDENTAL_GESTURAL_basic_ts;
+        default: break;
+    }
+    LogWarning("Transposition: Could not get Gestural Basic Accidental for %i", m_accid);
+    return ACCIDENTAL_GESTURAL_basic_NONE;
+}
+
+data_ACCIDENTAL_GESTURAL TransPitch::GetAccidGes() const
 {
     switch (m_accid) {
         case -3: return ACCIDENTAL_GESTURAL_tf;
@@ -151,7 +208,7 @@ data_ACCIDENTAL_GESTURAL TransPitch::GetAccidG() const
     return ACCIDENTAL_GESTURAL_NONE;
 }
 
-data_ACCIDENTAL_WRITTEN TransPitch::GetAccidW() const
+data_ACCIDENTAL_WRITTEN TransPitch::GetAccidWritten() const
 {
     switch (m_accid) {
         case -3: return ACCIDENTAL_WRITTEN_tf;

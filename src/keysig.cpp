@@ -73,17 +73,15 @@ static const ClassRegistrar<KeySig> s_factory("keySig", KEYSIG);
 KeySig::KeySig()
     : LayerElement(KEYSIG)
     , ObjectListInterface()
-    , AttAccidental()
     , AttColor()
-    , AttKeyMode()
+    , AttKeySigAnl()
     , AttKeySigLog()
     , AttKeySigVis()
     , AttPitch()
     , AttVisibility()
 {
-    this->RegisterAttClass(ATT_ACCIDENTAL);
     this->RegisterAttClass(ATT_COLOR);
-    this->RegisterAttClass(ATT_KEYMODE);
+    this->RegisterAttClass(ATT_KEYSIGANL);
     this->RegisterAttClass(ATT_KEYSIGLOG);
     this->RegisterAttClass(ATT_KEYSIGVIS);
     this->RegisterAttClass(ATT_PITCH);
@@ -97,9 +95,8 @@ KeySig::~KeySig() {}
 void KeySig::Reset()
 {
     LayerElement::Reset();
-    this->ResetAccidental();
     this->ResetColor();
-    this->ResetKeyMode();
+    this->ResetKeySigAnl();
     this->ResetKeySigLog();
     this->ResetKeySigVis();
     this->ResetPitch();

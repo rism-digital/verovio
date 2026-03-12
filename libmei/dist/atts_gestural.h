@@ -279,7 +279,11 @@ public:
     ///@}
 
 private:
-    /** Records performed duration information that differs from the written duration. **/
+    /**
+     * Records performed duration information that differs from the written duration;
+     * @dur.ges allows the same datatypes as @dur.
+     * Values of @dur.ges that require dots should also use @dots.ges.
+     **/
     data_DURATION m_durGes;
     /**
      * Number of dots required for a gestural duration when different from that of the

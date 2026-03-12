@@ -5,7 +5,7 @@
 
   <groupId>digital.rism.verovio</groupId>
   <artifactId>VerovioToolkit</artifactId>
-  <version>5.8.0-SNAPSHOT</version>
+  <version>6.1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>VerovioToolkit</name>

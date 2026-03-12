@@ -5,6 +5,9 @@
 #import <VerovioFramework/MidiEventList.h>
 #import <VerovioFramework/MidiFile.h>
 #import <VerovioFramework/MidiMessage.h>
+#import <VerovioFramework/Tunings.h>
+#import <VerovioFramework/TuningsConcepts.h>
+#import <VerovioFramework/TuningsImpl.h>
 #import <VerovioFramework/abbr.h>
 #import <VerovioFramework/accid.h>
 #import <VerovioFramework/add.h>
@@ -73,6 +76,7 @@
 #import <VerovioFramework/course.h>
 #import <VerovioFramework/cpmark.h>
 #import <VerovioFramework/crc.h>
+#import <VerovioFramework/customtuning.h>
 #import <VerovioFramework/custos.h>
 #import <VerovioFramework/damage.h>
 #import <VerovioFramework/del.h>

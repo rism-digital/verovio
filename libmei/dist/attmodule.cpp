@@ -118,11 +118,23 @@ bool AttModule::SetAnalytical(Object *element, const std::string &attrType, cons
             return true;
         }
     }
+    if (element->HasAttClass(ATT_KEYSIGANL)) {
+        AttKeySigAnl *att = dynamic_cast<AttKeySigAnl *>(element);
+        assert(att);
+        if (attrType == "accid") {
+            att->SetAccid(att->StrToAccidentalGesturalBasic(attrValue));
+            return true;
+        }
+        if (attrType == "mode") {
+            att->SetMode(att->StrToMode(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_KEYSIGDEFAULTANL)) {
         AttKeySigDefaultAnl *att = dynamic_cast<AttKeySigDefaultAnl *>(element);
         assert(att);
         if (attrType == "key.accid") {
-            att->SetKeyAccid(att->StrToAccidentalGestural(attrValue));
+            att->SetKeyAccid(att->StrToAccidentalGesturalBasic(attrValue));
             return true;
         }
         if (attrType == "key.mode") {
@@ -192,11 +204,21 @@ void AttModule::GetAnalytical(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "intm", att->StrToStr(att->GetIntm()) });
         }
     }
+    if (element->HasAttClass(ATT_KEYSIGANL)) {
+        const AttKeySigAnl *att = dynamic_cast<const AttKeySigAnl *>(element);
+        assert(att);
+        if (att->HasAccid()) {
+            attributes->push_back({ "accid", att->AccidentalGesturalBasicToStr(att->GetAccid()) });
+        }
+        if (att->HasMode()) {
+            attributes->push_back({ "mode", att->ModeToStr(att->GetMode()) });
+        }
+    }
     if (element->HasAttClass(ATT_KEYSIGDEFAULTANL)) {
         const AttKeySigDefaultAnl *att = dynamic_cast<const AttKeySigDefaultAnl *>(element);
         assert(att);
         if (att->HasKeyAccid()) {
-            attributes->push_back({ "key.accid", att->AccidentalGesturalToStr(att->GetKeyAccid()) });
+            attributes->push_back({ "key.accid", att->AccidentalGesturalBasicToStr(att->GetKeyAccid()) });
         }
         if (att->HasKeyMode()) {
             attributes->push_back({ "key.mode", att->ModeToStr(att->GetKeyMode()) });
@@ -257,6 +279,14 @@ void AttModule::CopyAnalytical(const Object *element, Object *target)
         AttIntervalMelodic *attTarget = dynamic_cast<AttIntervalMelodic *>(target);
         assert(attTarget);
         attTarget->SetIntm(att->GetIntm());
+    }
+    if (element->HasAttClass(ATT_KEYSIGANL)) {
+        const AttKeySigAnl *att = dynamic_cast<const AttKeySigAnl *>(element);
+        assert(att);
+        AttKeySigAnl *attTarget = dynamic_cast<AttKeySigAnl *>(target);
+        assert(attTarget);
+        attTarget->SetAccid(att->GetAccid());
+        attTarget->SetMode(att->GetMode());
     }
     if (element->HasAttClass(ATT_KEYSIGDEFAULTANL)) {
         const AttKeySigDefaultAnl *att = dynamic_cast<const AttKeySigDefaultAnl *>(element);
@@ -2980,6 +3010,14 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
             return true;
         }
     }
+    if (element->HasAttClass(ATT_ANNOTLOG)) {
+        AttAnnotLog *att = dynamic_cast<AttAnnotLog *>(element);
+        assert(att);
+        if (attrType == "func") {
+            att->SetFunc(att->StrToStr(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_ARTICULATION)) {
         AttArticulation *att = dynamic_cast<AttArticulation *>(element);
         assert(att);
@@ -3288,6 +3326,14 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
             return true;
         }
     }
+    if (element->HasAttClass(ATT_DOCSTATUS)) {
+        AttDocStatus *att = dynamic_cast<AttDocStatus *>(element);
+        assert(att);
+        if (attrType == "status") {
+            att->SetStatus(att->StrToStr(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_DOTLOG)) {
         AttDotLog *att = dynamic_cast<AttDotLog *>(element);
         assert(att);
@@ -3453,14 +3499,6 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
         assert(att);
         if (attrType == "join") {
             att->SetJoin(att->StrToStr(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_KEYMODE)) {
-        AttKeyMode *att = dynamic_cast<AttKeyMode *>(element);
-        assert(att);
-        if (attrType == "mode") {
-            att->SetMode(att->StrToMode(attrValue));
             return true;
         }
     }
@@ -3788,7 +3826,7 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
             return true;
         }
         if (attrType == "role") {
-            att->SetRole(att->StrToStr(attrValue));
+            att->SetRole(att->StrToRelators(attrValue));
             return true;
         }
     }
@@ -4628,6 +4666,13 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "accid", att->AccidentalWrittenToStr(att->GetAccid()) });
         }
     }
+    if (element->HasAttClass(ATT_ANNOTLOG)) {
+        const AttAnnotLog *att = dynamic_cast<const AttAnnotLog *>(element);
+        assert(att);
+        if (att->HasFunc()) {
+            attributes->push_back({ "func", att->StrToStr(att->GetFunc()) });
+        }
+    }
     if (element->HasAttClass(ATT_ARTICULATION)) {
         const AttArticulation *att = dynamic_cast<const AttArticulation *>(element);
         assert(att);
@@ -4888,6 +4933,13 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "tempo.dist", att->MeasurementsignedToStr(att->GetTempoDist()) });
         }
     }
+    if (element->HasAttClass(ATT_DOCSTATUS)) {
+        const AttDocStatus *att = dynamic_cast<const AttDocStatus *>(element);
+        assert(att);
+        if (att->HasStatus()) {
+            attributes->push_back({ "status", att->StrToStr(att->GetStatus()) });
+        }
+    }
     if (element->HasAttClass(ATT_DOTLOG)) {
         const AttDotLog *att = dynamic_cast<const AttDotLog *>(element);
         assert(att);
@@ -5031,13 +5083,6 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasJoin()) {
             attributes->push_back({ "join", att->StrToStr(att->GetJoin()) });
-        }
-    }
-    if (element->HasAttClass(ATT_KEYMODE)) {
-        const AttKeyMode *att = dynamic_cast<const AttKeyMode *>(element);
-        assert(att);
-        if (att->HasMode()) {
-            attributes->push_back({ "mode", att->ModeToStr(att->GetMode()) });
         }
     }
     if (element->HasAttClass(ATT_KEYSIGLOG)) {
@@ -5310,7 +5355,7 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "nymref", att->StrToStr(att->GetNymref()) });
         }
         if (att->HasRole()) {
-            attributes->push_back({ "role", att->StrToStr(att->GetRole()) });
+            attributes->push_back({ "role", att->RelatorsToStr(att->GetRole()) });
         }
     }
     if (element->HasAttClass(ATT_NOTATIONSTYLE)) {
@@ -6013,6 +6058,13 @@ void AttModule::CopyShared(const Object *element, Object *target)
         assert(attTarget);
         attTarget->SetAccid(att->GetAccid());
     }
+    if (element->HasAttClass(ATT_ANNOTLOG)) {
+        const AttAnnotLog *att = dynamic_cast<const AttAnnotLog *>(element);
+        assert(att);
+        AttAnnotLog *attTarget = dynamic_cast<AttAnnotLog *>(target);
+        assert(attTarget);
+        attTarget->SetFunc(att->GetFunc());
+    }
     if (element->HasAttClass(ATT_ARTICULATION)) {
         const AttArticulation *att = dynamic_cast<const AttArticulation *>(element);
         assert(att);
@@ -6235,6 +6287,13 @@ void AttModule::CopyShared(const Object *element, Object *target)
         attTarget->SetRehDist(att->GetRehDist());
         attTarget->SetTempoDist(att->GetTempoDist());
     }
+    if (element->HasAttClass(ATT_DOCSTATUS)) {
+        const AttDocStatus *att = dynamic_cast<const AttDocStatus *>(element);
+        assert(att);
+        AttDocStatus *attTarget = dynamic_cast<AttDocStatus *>(target);
+        assert(attTarget);
+        attTarget->SetStatus(att->GetStatus());
+    }
     if (element->HasAttClass(ATT_DOTLOG)) {
         const AttDotLog *att = dynamic_cast<const AttDotLog *>(element);
         assert(att);
@@ -6371,13 +6430,6 @@ void AttModule::CopyShared(const Object *element, Object *target)
         AttJoined *attTarget = dynamic_cast<AttJoined *>(target);
         assert(attTarget);
         attTarget->SetJoin(att->GetJoin());
-    }
-    if (element->HasAttClass(ATT_KEYMODE)) {
-        const AttKeyMode *att = dynamic_cast<const AttKeyMode *>(element);
-        assert(att);
-        AttKeyMode *attTarget = dynamic_cast<AttKeyMode *>(target);
-        assert(attTarget);
-        attTarget->SetMode(att->GetMode());
     }
     if (element->HasAttClass(ATT_KEYSIGLOG)) {
         const AttKeySigLog *att = dynamic_cast<const AttKeySigLog *>(element);
@@ -7927,10 +7979,6 @@ bool AttModule::SetVisual(Object *element, const std::string &attrType, const st
             att->SetBracketVisible(att->StrToBoolean(attrValue));
             return true;
         }
-        if (attrType == "dur.visible") {
-            att->SetDurVisible(att->StrToBoolean(attrValue));
-            return true;
-        }
         if (attrType == "num.format") {
             att->SetNumFormat(att->StrToTupletVisNumformat(attrValue));
             return true;
@@ -8349,9 +8397,6 @@ void AttModule::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         if (att->HasBracketVisible()) {
             attributes->push_back({ "bracket.visible", att->BooleanToStr(att->GetBracketVisible()) });
         }
-        if (att->HasDurVisible()) {
-            attributes->push_back({ "dur.visible", att->BooleanToStr(att->GetDurVisible()) });
-        }
         if (att->HasNumFormat()) {
             attributes->push_back({ "num.format", att->TupletVisNumformatToStr(att->GetNumFormat()) });
         }
@@ -8677,7 +8722,6 @@ void AttModule::CopyVisual(const Object *element, Object *target)
         assert(attTarget);
         attTarget->SetBracketPlace(att->GetBracketPlace());
         attTarget->SetBracketVisible(att->GetBracketVisible());
-        attTarget->SetDurVisible(att->GetDurVisible());
         attTarget->SetNumFormat(att->GetNumFormat());
     }
 }

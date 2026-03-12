@@ -47,6 +47,9 @@ const std::map<int, std::string> Option::s_header
 const std::map<int, std::string> Option::s_ligatureOblique
     = { { LIGATURE_OBL_auto, "auto" }, { LIGATURE_OBL_straight, "straight" }, { LIGATURE_OBL_curved, "curved" } };
 
+const std::map<int, std::string> Option::s_mensuralResponsiveness
+    = { { MENSURAL_RESP_none, "none" }, { MENSURAL_RESP_auto, "auto" }, { MENSURAL_RESP_selection, "selection" } };
+
 const std::map<int, std::string> Option::s_multiRestStyle = { { MULTIRESTSTYLE_auto, "auto" },
     { MULTIRESTSTYLE_default, "default" }, { MULTIRESTSTYLE_block, "block" }, { MULTIRESTSTYLE_symbols, "symbols" } };
 
@@ -895,6 +898,9 @@ Options::Options()
     // These are not registered in a group and not listed in Toolkit::GetOptions
     // There are listed in Toolkit::GetAvailableOptions through Options::GetBaseOptGrp
 
+    m_inputFromFormat = AUTO;
+    m_outputToFormat = UNKNOWN;
+
     m_baseOptions.SetLabel("Base short options", "0-base");
     m_baseOptions.SetCategory(OptionsCategory::Base);
 
@@ -1435,7 +1441,7 @@ Options::Options()
     this->Register(&m_octaveNoSpanningParentheses, "octaveNoSpanningParentheses", &m_generalLayout);
 
     m_ossiaStaffSize.SetInfo("Ossia staff size", "The ossia staff size in relation to the staff size");
-    m_ossiaStaffSize.Init(0.5, 0.75, 1.00);
+    m_ossiaStaffSize.Init(0.75, 0.5, 1.00);
     this->Register(&m_ossiaStaffSize, "ossiaStaffSize", &m_generalLayout);
 
     m_pedalLineThickness.SetInfo("Pedal line thickness", "The thickness of the line used for piano pedaling");
@@ -1589,13 +1595,13 @@ Options::Options()
     m_expand.Init("");
     this->Register(&m_expand, "expand", &m_selectors);
 
-    m_expandFirst.SetInfo("Expand first expansion", "Expand all referenced elements in the first available expansion");
-    m_expandFirst.Init(false);
-    this->Register(&m_expandFirst, "expandFirst", &m_selectors);
+    m_expandAlways.SetInfo("Always expand", "Expand for all outputs, using selected, first, or generated expansion");
+    m_expandAlways.Init(false);
+    this->Register(&m_expandAlways, "expandAlways", &m_selectors);
 
-    m_expandGenerate.SetInfo("Generate expansion", "Generate an expansion based on repeats");
-    m_expandGenerate.Init(false);
-    this->Register(&m_expandGenerate, "expandGenerate", &m_selectors);
+    m_expandNever.SetInfo("Never expansion", "Expand for no output, including MIDI and timemap");
+    m_expandNever.Init(false);
+    this->Register(&m_expandNever, "expandNever", &m_selectors);
 
     m_loadSelectedMdivOnly.SetInfo(
         "Load selected Mdiv only", "Load only the selected mdiv; the content of the other is skipped");
@@ -1848,6 +1854,10 @@ Options::Options()
     m_midiTempoAdjustment.Init(1.0, 0.2, 4.0);
     this->Register(&m_midiTempoAdjustment, "midiTempoAdjustment", &m_midi);
 
+    m_midiTuningFile.SetInfo("MIDI tuning", "A custom tuning definition or filepath to apply to the MIDI output");
+    m_midiTuningFile.Init("");
+    this->Register(&m_midiTuningFile, "tuningFile", &m_midi);
+
     /********* Mensural *********/
 
     m_mensural.SetLabel("Mensural notation options", "6-mensural");
@@ -1866,9 +1876,9 @@ Options::Options()
     m_ligatureOblique.Init(LIGATURE_OBL_auto, &Option::s_ligatureOblique);
     this->Register(&m_ligatureOblique, "ligatureOblique", &m_mensural);
 
-    m_mensuralResponsiveView.SetInfo(
-        "Mensural reduced view", "Convert mensural content to a more responsive view reduced to the seleceted markup");
-    m_mensuralResponsiveView.Init(false);
+    m_mensuralResponsiveView.SetInfo("Mensural responsive view",
+        "Make mensural content responsive (selection discards ligatures and editorial markup)");
+    m_mensuralResponsiveView.Init(MENSURAL_RESP_auto, &Option::s_mensuralResponsiveness);
     this->Register(&m_mensuralResponsiveView, "mensuralResponsiveView", &m_mensural);
 
     m_mensuralToCmn.SetInfo("Mensural to CMN", "Convert mensural sections to CMN measure-based MEI");
@@ -1939,6 +1949,105 @@ Options &Options::operator=(const Options &options)
 }
 
 Options::~Options() {}
+
+bool Options::SetOutputTo(std::string const &outputTo)
+{
+    if ((outputTo == "humdrum") || (outputTo == "hum")) {
+        m_outputToFormat = HUMDRUM;
+    }
+    else if (outputTo == "mei") {
+        m_outputToFormat = MEI;
+    }
+    else if (outputTo == "mei-basic") {
+        m_outputToFormat = MEI;
+    }
+    else if (outputTo == "mei-pb") {
+        m_outputToFormat = MEI;
+    }
+    else if (outputTo == "mei-facs") {
+        m_outputToFormat = MEI;
+    }
+    else if (outputTo == "midi") {
+        m_outputToFormat = MIDI;
+    }
+    else if (outputTo == "hummidi") {
+        m_outputToFormat = HUMMIDI;
+    }
+    else if (outputTo == "timemap") {
+        m_outputToFormat = TIMEMAP;
+    }
+    else if (outputTo == "expansionmap") {
+        m_outputToFormat = EXPANSIONMAP;
+    }
+    else if (outputTo == "pae") {
+        m_outputToFormat = PAE;
+    }
+    else if (outputTo == "mei-pb-serialized") {
+        m_outputToFormat = SERIALIZATION;
+    }
+    else if (outputTo != "svg") {
+        LogError("Output format '%s' is not supported", outputTo.c_str());
+        return false;
+    }
+    return true;
+}
+
+bool Options::SetInputFrom(std::string const &inputFrom)
+{
+    if (inputFrom == "abc") {
+        m_inputFromFormat = ABC;
+    }
+    else if (inputFrom == "pae") {
+        m_inputFromFormat = PAE;
+    }
+    else if (inputFrom == "darms") {
+        m_inputFromFormat = DARMS;
+    }
+    else if (inputFrom == "volpiano") {
+        m_inputFromFormat = VOLPIANO;
+    }
+    else if (inputFrom == "cmme.xml") {
+        m_inputFromFormat = CMME;
+    }
+    else if ((inputFrom == "humdrum") || (inputFrom == "hum")) {
+        m_inputFromFormat = HUMDRUM;
+    }
+    else if (inputFrom == "mei") {
+        m_inputFromFormat = MEI;
+    }
+    else if ((inputFrom == "musicxml") || (inputFrom == "xml")) {
+        m_inputFromFormat = MUSICXML;
+    }
+    else if (inputFrom == "md") {
+        m_inputFromFormat = MUSEDATAHUM;
+    }
+    else if (inputFrom == "musedata") {
+        m_inputFromFormat = MUSEDATAHUM;
+    }
+    else if (inputFrom == "musedata-hum") {
+        m_inputFromFormat = MUSEDATAHUM;
+    }
+    else if (inputFrom == "musicxml-hum") {
+        m_inputFromFormat = MUSICXMLHUM;
+    }
+    else if (inputFrom == "mei-hum") {
+        m_inputFromFormat = MEIHUM;
+    }
+    else if (inputFrom == "esac") {
+        m_inputFromFormat = ESAC;
+    }
+    else if (inputFrom == "mei-pb-serialized") {
+        m_inputFromFormat = SERIALIZATION;
+    }
+    else if (inputFrom == "auto") {
+        m_inputFromFormat = AUTO;
+    }
+    else {
+        LogError("Input format '%s' is not supported", inputFrom.c_str());
+        return false;
+    }
+    return true;
+}
 
 void Options::Sync()
 {

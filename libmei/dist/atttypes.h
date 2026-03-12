@@ -940,6 +940,56 @@ enum data_LINEWIDTHTERM : int8_t {
 };
 
 /**
+ * MEI data.MARCRELATORS.basic
+ */
+enum data_MARCRELATORS_basic : int8_t {
+    MARCRELATORS_basic_NONE = 0,
+    MARCRELATORS_basic_arr,
+    MARCRELATORS_basic_aut,
+    MARCRELATORS_basic_cmp,
+    MARCRELATORS_basic_dte,
+    MARCRELATORS_basic_edt,
+    MARCRELATORS_basic_lbt,
+    MARCRELATORS_basic_lyr,
+    MARCRELATORS_basic_MAX
+};
+
+/**
+ * MEI data.MARCRELATORS.extended
+ */
+enum data_MARCRELATORS_extended : int8_t {
+    MARCRELATORS_extended_NONE = 0,
+    MARCRELATORS_extended_act,
+    MARCRELATORS_extended_ard,
+    MARCRELATORS_extended_art,
+    MARCRELATORS_extended_aus,
+    MARCRELATORS_extended_chr,
+    MARCRELATORS_extended_cnd,
+    MARCRELATORS_extended_crp,
+    MARCRELATORS_extended_cst,
+    MARCRELATORS_extended_drt,
+    MARCRELATORS_extended_egr,
+    MARCRELATORS_extended_flm,
+    MARCRELATORS_extended_fmd,
+    MARCRELATORS_extended_fmp,
+    MARCRELATORS_extended_itr,
+    MARCRELATORS_extended_mcp,
+    MARCRELATORS_extended_mus,
+    MARCRELATORS_extended_msd,
+    MARCRELATORS_extended_pdr,
+    MARCRELATORS_extended_pmn,
+    MARCRELATORS_extended_prn,
+    MARCRELATORS_extended_pro,
+    MARCRELATORS_extended_rce,
+    MARCRELATORS_extended_scr,
+    MARCRELATORS_extended_sng,
+    MARCRELATORS_extended_std,
+    MARCRELATORS_extended_trc,
+    MARCRELATORS_extended_trl,
+    MARCRELATORS_extended_MAX
+};
+
+/**
  * MEI data.MELODICFUNCTION
  */
 enum data_MELODICFUNCTION : int8_t {
@@ -1339,6 +1389,7 @@ enum data_NOTATIONTYPE : int8_t {
     NOTATIONTYPE_mensural_white,
     NOTATIONTYPE_neume,
     NOTATIONTYPE_tab,
+    NOTATIONTYPE_tab_staff_like,
     NOTATIONTYPE_tab_guitar,
     NOTATIONTYPE_tab_lute_french,
     NOTATIONTYPE_tab_lute_italian,
@@ -1458,6 +1509,48 @@ enum data_RELATIONSHIP : int8_t {
     RELATIONSHIP_isReferencedBy,
     RELATIONSHIP_references,
     RELATIONSHIP_MAX
+};
+
+/**
+ * MEI data.RELATORS
+ */
+enum data_RELATORS : int8_t {
+    RELATORS_NONE = 0,
+    RELATORS_arr,
+    RELATORS_aut,
+    RELATORS_cmp,
+    RELATORS_dte,
+    RELATORS_edt,
+    RELATORS_lbt,
+    RELATORS_lyr,
+    RELATORS_act,
+    RELATORS_ard,
+    RELATORS_art,
+    RELATORS_aus,
+    RELATORS_chr,
+    RELATORS_cnd,
+    RELATORS_crp,
+    RELATORS_cst,
+    RELATORS_drt,
+    RELATORS_egr,
+    RELATORS_flm,
+    RELATORS_fmd,
+    RELATORS_fmp,
+    RELATORS_itr,
+    RELATORS_mcp,
+    RELATORS_mus,
+    RELATORS_msd,
+    RELATORS_pdr,
+    RELATORS_pmn,
+    RELATORS_prn,
+    RELATORS_pro,
+    RELATORS_rce,
+    RELATORS_scr,
+    RELATORS_sng,
+    RELATORS_std,
+    RELATORS_trc,
+    RELATORS_trl,
+    RELATORS_MAX
 };
 
 /**
@@ -1808,6 +1901,15 @@ enum anchoredTextLog_FUNC : int8_t {
 };
 
 /**
+ * MEI att.annot.log\@func
+ */
+enum annotLog_FUNC : int8_t {
+    annotLog_FUNC_NONE = 0,
+    annotLog_FUNC_display,
+    annotLog_FUNC_MAX
+};
+
+/**
  * MEI att.arpeg.log\@order
  */
 enum arpegLog_ORDER : int8_t {
@@ -1916,6 +2018,21 @@ enum divLineLog_FORM : int8_t {
     divLineLog_FORM_minima,
     divLineLog_FORM_virgula,
     divLineLog_FORM_MAX
+};
+
+/**
+ * MEI att.docStatus\@status
+ */
+enum docStatus_STATUS : int8_t {
+    docStatus_STATUS_NONE = 0,
+    docStatus_STATUS_draft,
+    docStatus_STATUS_in_process,
+    docStatus_STATUS_candidate,
+    docStatus_STATUS_approved,
+    docStatus_STATUS_published,
+    docStatus_STATUS_withdrawn,
+    docStatus_STATUS_embargoed,
+    docStatus_STATUS_MAX
 };
 
 /**
@@ -2108,6 +2225,8 @@ enum meiVersion_MEIVERSION : int8_t {
     meiVersion_MEIVERSION_5_1plusCMN,
     meiVersion_MEIVERSION_5_1plusMensural,
     meiVersion_MEIVERSION_5_1plusNeumes,
+    meiVersion_MEIVERSION_6_0_dev,
+    meiVersion_MEIVERSION_6_0_devplusbasic,
     meiVersion_MEIVERSION_MAX
 };
 
@@ -2192,8 +2311,10 @@ enum neumeType_TYPE : int8_t {
     neumeType_TYPE_NONE = 0,
     neumeType_TYPE_apostropha,
     neumeType_TYPE_bistropha,
+    neumeType_TYPE_cephalicus,
     neumeType_TYPE_climacus,
     neumeType_TYPE_clivis,
+    neumeType_TYPE_epiphonus,
     neumeType_TYPE_oriscus,
     neumeType_TYPE_pes,
     neumeType_TYPE_pessubpunctis,
@@ -2328,7 +2449,7 @@ enum recordType_RECORDTYPE : int8_t {
 enum regularMethod_METHOD : int8_t {
     regularMethod_METHOD_NONE = 0,
     regularMethod_METHOD_silent,
-    regularMethod_METHOD_tags,
+    regularMethod_METHOD_markup,
     regularMethod_METHOD_MAX
 };
 
@@ -2353,6 +2474,13 @@ enum repeatMarkLog_FUNC : int8_t {
     repeatMarkLog_FUNC_dalSegno,
     repeatMarkLog_FUNC_daCapo,
     repeatMarkLog_FUNC_fine,
+    repeatMarkLog_FUNC_daCapoAlFine,
+    repeatMarkLog_FUNC_dalSegnoAlFine,
+    repeatMarkLog_FUNC_daCapoAlCoda,
+    repeatMarkLog_FUNC_dalSegnoAlCoda,
+    repeatMarkLog_FUNC_repeatLeft,
+    repeatMarkLog_FUNC_repeatRight,
+    repeatMarkLog_FUNC_repeatRightLeft,
     repeatMarkLog_FUNC_MAX
 };
 

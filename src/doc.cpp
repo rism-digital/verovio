@@ -465,6 +465,37 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         midiFile->addTempo(0, 0, tempo);
     }
 
+    // set MIDI tuning
+    const auto midiTuningFile = m_options->m_midiTuningFile.GetStrValue();
+    if (!midiTuningFile.empty()) {
+        std::string tuningDef;
+        std::ifstream f(midiTuningFile.c_str());
+        if (f.good()) {
+            const std::string ext(".ascl");
+            if (midiTuningFile.size() >= ext.size()
+                && midiTuningFile.substr(midiTuningFile.size() - ext.size()) == ext) {
+                std::stringstream buffer;
+                buffer << f.rdbuf();
+                tuningDef = buffer.str();
+            }
+            else {
+                LogError("Tuning file '%s' is not recognized", midiTuningFile.c_str());
+            }
+        }
+        else {
+            tuningDef = midiTuningFile;
+        }
+        if (!tuningDef.empty()) {
+            CustomTuning tuning(tuningDef, this, false);
+            if (tuning.IsValid()) {
+                scoreDef->SetCustomTuning(tuning);
+            }
+            else {
+                LogWarning("Error parsing tuning %s", f.good() ? "file" : "definition");
+            }
+        }
+    }
+
     // Capture information for MIDI generation, i.e. from control elements
     InitMIDIFunctor initMIDI;
     initMIDI.SetCurrentTempo(tempo);
@@ -488,6 +519,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     Filters filters;
     for (auto &staves : layerTree.child) {
         int transSemi = 0;
+        InstrDef *instrDef = NULL;
         if (StaffDef *staffDef = scoreDef->GetStaffDef(staves.first)) {
             // get the transposition (semi-tone) value for the staff
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
@@ -496,16 +528,16 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                 midiFile->addTracks(midiTrack + 1 - midiFile->getTrackCount());
             }
             // set MIDI channel and instrument
-            InstrDef *instrdef = vrv_cast<InstrDef *>(staffDef->FindDescendantByType(INSTRDEF, 1));
-            if (!instrdef) {
+            instrDef = vrv_cast<InstrDef *>(staffDef->FindDescendantByType(INSTRDEF, 1));
+            if (!instrDef) {
                 StaffGrp *staffGrp = vrv_cast<StaffGrp *>(staffDef->GetFirstAncestor(STAFFGRP));
                 assert(staffGrp);
-                instrdef = vrv_cast<InstrDef *>(staffGrp->FindDescendantByType(INSTRDEF, 1));
+                instrDef = vrv_cast<InstrDef *>(staffGrp->FindDescendantByType(INSTRDEF, 1));
             }
-            if (instrdef) {
-                if (instrdef->HasMidiChannel()) midiChannel = instrdef->GetMidiChannel();
-                if (instrdef->HasMidiTrack()) {
-                    midiTrack = instrdef->GetMidiTrack();
+            if (instrDef) {
+                if (instrDef->HasMidiChannel()) midiChannel = instrDef->GetMidiChannel();
+                if (instrDef->HasMidiTrack()) {
+                    midiTrack = instrDef->GetMidiTrack();
                     if (midiFile->getTrackCount() < (midiTrack + 1)) {
                         midiFile->addTracks(midiTrack + 1 - midiFile->getTrackCount());
                     }
@@ -513,8 +545,8 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                         LogWarning("A high MIDI track number was assigned to staff %d", staffDef->GetN());
                     }
                 }
-                if (instrdef->HasMidiInstrnum()) {
-                    midiFile->addPatchChange(midiTrack, 0, midiChannel, instrdef->GetMidiInstrnum());
+                if (instrDef->HasMidiInstrnum()) {
+                    midiFile->addPatchChange(midiTrack, 0, midiChannel, instrDef->GetMidiInstrnum());
                 }
             }
             // set MIDI track name
@@ -553,6 +585,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         GenerateMIDIFunctor generateScoreDefMIDI(midiFile);
         generateScoreDefMIDI.SetChannel(midiChannel);
         generateScoreDefMIDI.SetTrack(midiTrack);
+        generateScoreDefMIDI.SetInstrDef(instrDef);
 
         scoreDef->Process(generateScoreDefMIDI);
 
@@ -579,6 +612,8 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             generateMIDI.SetOctaves(initMIDI.GetOctaves());
             generateMIDI.SetNoCue(this->GetOptions()->m_midiNoCue.GetValue());
             generateMIDI.SetControlEvents(controlEvents);
+            generateMIDI.SetInstrDef(instrDef);
+            generateMIDI.SetCustomTuning(&scoreDef->GetCustomTuning());
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
             this->Process(generateMIDI);
@@ -1606,36 +1641,50 @@ void Doc::TransposeDoc()
 
 void Doc::ExpandExpansions()
 {
-    // Upon MEI import: use expansion ID or boolean for first expansion, given by command line argument
-    std::string expansionId = this->GetOptions()->m_expand.GetValue();
-    bool expandFirst = this->GetOptions()->m_expandFirst.GetValue();
+    // Passing this argument does not do anything
+    if (this->GetOptions()->m_expandNever.GetValue()) return;
 
-    if (this->GetOptions()->m_expandGenerate.GetValue()) {
-        ExpansionMap expansionMap;
+    // Nothing to do in these cases - marked the map as processed
+    if (this->IsMensuralMusicOnly() || this->IsTranscription()) {
+        m_expansionMap.SetProcessed(true);
+        return;
+    }
+
+    // The list of output formats that we always expand, and generate an expansion if there isn't one
+    static std::vector<FileFormat> valid = { MIDI, TIMEMAP, EXPANSIONMAP };
+    bool expandInputFormat = (std::find(valid.begin(), valid.end(), m_options->GetOutputTo()) != valid.end());
+
+    // Nothing to expand if the input format does not requires it and it is not forced
+    if (!expandInputFormat && !this->GetOptions()->m_expandAlways.GetValue()) return;
+
+    std::string expansionId = this->GetOptions()->m_expand.GetValue();
+    bool expandSelected = (!expansionId.empty());
+
+    // We have no --expand xmlid, so generate an expansion or use the first one (generation will be skipped)
+    if (!expandSelected) {
         ListOfObjects scores = this->FindAllDescendantsByType(SCORE);
         for (Object *object : scores) {
             Score *score = vrv_cast<Score *>(object);
             assert(score);
-            expansionMap.GenerateExpansionFor(score);
+            // Do not generate an expansion if there is already one
+            if (!score->FindDescendantByType(EXPANSION)) {
+                m_expansionMap.GenerateExpansionFor(score);
+            }
         }
-        // Enable expansion of first one when generated
-        expandFirst = true;
     }
 
-    if (expansionId.empty() && !expandFirst) return;
-
     Expansion *startExpansion = NULL;
-    if (!expansionId.empty()) {
+    if (expandSelected) {
         startExpansion = dynamic_cast<Expansion *>(this->FindDescendantByID(expansionId));
         if (startExpansion == NULL) {
             LogWarning("Expansion ID '%s' not found. Nothing expanded.", expansionId.c_str());
             return;
         }
     }
+    // Use the first one (encoded or generated)
     else {
         startExpansion = dynamic_cast<Expansion *>(this->FindDescendantByType(EXPANSION));
         if (startExpansion == NULL) {
-            LogWarning("No expansion found. Nothing expanded.");
             return;
         }
     }

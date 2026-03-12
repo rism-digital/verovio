@@ -268,6 +268,8 @@ bool Staff::IsNeume() const
 
 bool Staff::IsTablature() const
 {
+    // NOTATIONTYPE_tab_staff_like is excluded as it is neither tablature nor CMN, a hybrid.
+    // So is always tested for explicitly
     bool isTablature = (m_drawingNotationType == NOTATIONTYPE_tab || m_drawingNotationType == NOTATIONTYPE_tab_guitar
         || m_drawingNotationType == NOTATIONTYPE_tab_lute_italian
         || m_drawingNotationType == NOTATIONTYPE_tab_lute_french

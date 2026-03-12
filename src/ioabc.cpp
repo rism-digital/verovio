@@ -630,12 +630,12 @@ void ABCInput::ParseKey(std::string &keyString)
     // set key.accid
     switch (keyString[i]) {
         case '#':
-            m_key->SetAccid(ACCIDENTAL_WRITTEN_s);
+            m_key->SetAccid(ACCIDENTAL_GESTURAL_basic_s);
             accidNum += 7;
             ++i;
             break;
         case 'b':
-            m_key->SetAccid(ACCIDENTAL_WRITTEN_f);
+            m_key->SetAccid(ACCIDENTAL_GESTURAL_basic_f);
             accidNum -= 7;
             ++i;
             break;

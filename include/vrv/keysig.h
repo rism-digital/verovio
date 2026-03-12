@@ -43,9 +43,8 @@ struct KeyAccidInfo {
  */
 class KeySig : public LayerElement,
                public ObjectListInterface,
-               public AttAccidental,
                public AttColor,
-               public AttKeyMode,
+               public AttKeySigAnl,
                public AttKeySigLog,
                public AttKeySigVis,
                public AttPitch,

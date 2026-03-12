@@ -162,11 +162,11 @@
 #include "zone.h"
 
 #define VEROVIO_SERIALIZATION "verovio.serialization"
-#define MEI_ALL_SCHEMA "https://music-encoding.org/schema/5.1/mei-all.rng"
-#define MEI_BASIC_SCHEMA "https://music-encoding.org/schema/5.1/mei-basic.rng"
-#define MEI_PAGE_BASED_SCHEMA "https://www.verovio.org/schema/5.1/mei-verovio.rng"
-#define MEI_CURRENT_VERSION meiVersion_MEIVERSION_5_1
-#define MEI_CURRENT_BASIC_VERSION meiVersion_MEIVERSION_5_1plusbasic
+#define MEI_ALL_SCHEMA "https://music-encoding.org/schema/dev/mei-all.rng"
+#define MEI_BASIC_SCHEMA "https://music-encoding.org/schema/dev/mei-basic.rng"
+#define MEI_PAGE_BASED_SCHEMA "https://www.verovio.org/schema/dev/mei-verovio.rng"
+#define MEI_CURRENT_VERSION meiVersion_MEIVERSION_6_0_dev
+#define MEI_CURRENT_BASIC_VERSION meiVersion_MEIVERSION_6_0_devplusbasic
 
 namespace vrv {
 
@@ -557,7 +557,14 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         this->WriteCpMark(m_currentNode, vrv_cast<CpMark *>(object));
     }
     else if (object->Is(DIR)) {
-        m_currentNode = m_currentNode.append_child("dir");
+        Dir *dir = vrv_cast<Dir *>(object);
+        assert(dir);
+        if (dir->IsStageDir()) {
+            m_currentNode = m_currentNode.append_child("stageDir");
+        }
+        else {
+            m_currentNode = m_currentNode.append_child("dir");
+        }
         this->WriteDir(m_currentNode, vrv_cast<Dir *>(object));
     }
     else if (object->Is(DYNAM)) {
@@ -2695,9 +2702,8 @@ void MEIOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
     }
 
     this->WriteLayerElement(currentNode, keySig);
-    keySig->WriteAccidental(currentNode);
     keySig->WriteColor(currentNode);
-    keySig->WriteKeyMode(currentNode);
+    keySig->WriteKeySigAnl(currentNode);
     keySig->WriteKeySigLog(currentNode);
     keySig->WriteKeySigVis(currentNode);
     keySig->WritePitch(currentNode);
@@ -4083,10 +4089,10 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
         AttConverter converter;
         m_meiversion = converter.StrToMeiVersionMeiversion(version);
     }
-    // Default to MEI 5.1
+    // Default to MEI 6.0-dev
     if (m_meiversion == meiVersion_MEIVERSION_NONE) {
-        LogWarning("MEI version found or not known, falling back to MEI 5.1");
-        m_meiversion = meiVersion_MEIVERSION_5_1;
+        LogWarning("MEI version found or not known, falling back to MEI 6.0-dev");
+        m_meiversion = meiVersion_MEIVERSION_6_0_dev;
     }
 
     // only try to handle meiHead if we have a full MEI document
@@ -5769,6 +5775,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (currentName == "staff") {
             success = this->ReadStaff(parent, current);
         }
+        else if (currentName == "stageDir") {
+            success = this->ReadDir(parent, current, true);
+        }
         else if (currentName == "tempo") {
             success = this->ReadTempo(parent, current);
         }
@@ -5989,9 +5998,9 @@ bool MEIInput::ReadCpMark(Object *parent, pugi::xml_node cpMark)
     return this->ReadTextChildren(vrvCpMark, cpMark, vrvCpMark);
 }
 
-bool MEIInput::ReadDir(Object *parent, pugi::xml_node dir)
+bool MEIInput::ReadDir(Object *parent, pugi::xml_node dir, bool isStageDir)
 {
-    Dir *vrvDir = new Dir();
+    Dir *vrvDir = new Dir(isStageDir);
     this->ReadControlElement(dir, vrvDir);
 
     this->ReadTextDirInterface(dir, vrvDir);
@@ -7025,9 +7034,8 @@ bool MEIInput::ReadKeySig(Object *parent, pugi::xml_node keySig)
         UpgradeKeySigTo_5_0(keySig);
     }
 
-    vrvKeySig->ReadAccidental(keySig);
     vrvKeySig->ReadColor(keySig);
-    vrvKeySig->ReadKeyMode(keySig);
+    vrvKeySig->ReadKeySigAnl(keySig);
     vrvKeySig->ReadKeySigLog(keySig);
     vrvKeySig->ReadKeySigVis(keySig);
     vrvKeySig->ReadPitch(keySig);

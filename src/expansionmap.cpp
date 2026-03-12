@@ -33,13 +33,17 @@ namespace vrv {
 // ExpansionMap
 //----------------------------------------------------------------------------
 
-ExpansionMap::ExpansionMap() {}
+ExpansionMap::ExpansionMap()
+{
+    this->Reset();
+}
 
 ExpansionMap::~ExpansionMap() {}
 
 void ExpansionMap::Reset()
 {
     m_map.clear();
+    m_isProcessed = false;
 }
 
 Object *ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList, Object *prevSect,
@@ -274,16 +278,12 @@ bool ExpansionMap::UpdateIDs(Object *object)
             if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);
             newIdString = this->GetExpansionIDsForElement(oldIdString).back();
             if (!newIdString.empty()) interface->SetCopyof("#" + newIdString);
-            // @corresp
-            oldIdString = interface->GetCorresp();
-            if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);
-            newIdString = this->GetExpansionIDsForElement(oldIdString).back();
-            if (!newIdString.empty()) interface->SetCorresp("#" + newIdString);
             // @synch
             oldIdString = interface->GetSynch();
             if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);
             newIdString = this->GetExpansionIDsForElement(oldIdString).back();
             if (!newIdString.empty()) interface->SetSynch("#" + newIdString);
+            // @corresp is already handle by the Object::Clone and LinkingInterface::AddBackLink
         }
         this->UpdateIDs(o);
     }
@@ -366,10 +366,7 @@ void ExpansionMap::ToJson(std::string &output)
 
 void ExpansionMap::GenerateExpansionFor(Score *score)
 {
-    if (score->FindDescendantByType(EXPANSION)) {
-        LogWarning("An expansion cannot be generated if one is already encoded");
-        return;
-    }
+    m_isProcessed = true;
 
     if (score->HasEditorialContent()) {
         LogWarning("An expansion cannot be generated with editorial content");
@@ -388,7 +385,6 @@ void ExpansionMap::GenerateExpansionFor(Score *score)
     ListOfObjects children(childrenArray.begin(), childrenArray.end());
 
     Expansion *expansion = new Expansion();
-    section->InsertChild(expansion, 0);
 
     ListOfObjects::iterator first = children.begin();
     ListOfObjects::iterator last = children.begin();
@@ -416,6 +412,13 @@ void ExpansionMap::GenerateExpansionFor(Score *score)
                 expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
             }
         }
+    }
+
+    if (expansion->GetPlist().empty()) {
+        delete expansion;
+    }
+    else {
+        section->InsertChild(expansion, 0);
     }
 }
 

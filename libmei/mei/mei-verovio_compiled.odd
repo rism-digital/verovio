@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:rng="http://relaxng.org/ns/structure/1.0" xmlns:sch="http://purl.oclc.org/dsdl/schematron" xml:base="file:/home/paul/Documents/github/verovio/libmei/mei/mei-verovio.xml"><?TEIVERSION MEI 5.1?>
-	<teiHeader>
-		<fileDesc>
+<?xml version="1.0" encoding="utf-8"?><TEI xmlns:rng="http://relaxng.org/ns/structure/1.0" xmlns:sch="http://purl.oclc.org/dsdl/schematron" xmlns="http://www.tei-c.org/ns/1.0" xml:base="file:/Users/laurent/projects/verovio_develop/libmei/mei/mei-verovio.xml"><?TEIVERSION MEI 6.0-dev?>
+	<teiHeader><fileDesc>
 			<titleStmt>
 				<title>Music Encoding Initiative Guidelines – Verovio customization</title>
 				<respStmt>
@@ -17,8 +16,7 @@
 			<sourceDesc>
 				<p/>
 			</sourceDesc>
-		</fileDesc>
-		<revisionDesc>
+		</fileDesc><revisionDesc>
 			<change n="6" when="2025-03-01">
 				<desc xml:lang="en">Replaced MEI.frettab with MEI.stringtab for MEI 5.1 tablature</desc>
 			</change>
@@ -46,14 +44,13 @@
 			<change n="1" when="2013-08-29">
 				<desc xml:lang="en">Initial setup of the customization.</desc>
 			</change>
-		</revisionDesc>
-	</teiHeader>
+		</revisionDesc></teiHeader>
 	<text>
 		<front>
 			<divGen type="toc"/>
 		</front>
 		<body>
-			<schemaSpec ident="mei-verovio" start="mei meiHead meiCorpus music" ns="http://www.music-encoding.org/ns/mei" source="/home/paul/Documents/github/music-encoding/build/mei-source_canonicalized_v5.1.xml"><macroSpec rend="add" ident="data.ACCIDENTAL.WRITTEN" module="MEI" type="dt">
+			<schemaSpec ident="mei-verovio" start="mei meiHead meiCorpus music" ns="http://www.music-encoding.org/ns/mei" source="/Users/laurent/libs/mei_official/build/mei-source_canonicalized_v6.0-dev.xml"><macroSpec rend="add" ident="data.ACCIDENTAL.WRITTEN" module="MEI" type="dt">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Written accidental values.</desc>
     <content xmlns:xi="http://www.w3.org/2001/XInclude">
       <alternate minOccurs="1" maxOccurs="1"><macroRef key="data.ACCIDENTAL.WRITTEN.basic"/><macroRef key="data.ACCIDENTAL.WRITTEN.extended"/><macroRef key="data.ACCIDENTAL.aeu"/><macroRef key="data.ACCIDENTAL.persian"/></alternate>
@@ -1531,9 +1528,9 @@
   </macroSpec><macroSpec rend="add" ident="data.INTERVAL.HARMONIC" module="MEI" type="dt">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">A token indicating diatonic interval quality and size in shorthand notation.</desc>
     <content xmlns:xi="http://www.w3.org/2001/XInclude">
-      <choice xmlns="http://relaxng.org/ns/structure/1.0"><rng:data xmlns="http://www.tei-c.org/ns/1.0" type="token">
-          <rng:param name="pattern">[AdMmP][1-9][0-9]*</rng:param>
-        </rng:data></choice>
+      <rng:data type="token">
+        <rng:param name="pattern">[AdMmP][1-9][0-9]*</rng:param>
+      </rng:data>
     </content>
     <remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>
@@ -2811,6 +2808,9 @@
         <valItem ident="tab">
           <desc xml:lang="en">Tablature notation.</desc>
         </valItem>
+        <valItem ident="tab.staff-like">
+          <desc xml:lang="en">"Notehead" notation: a hybrid between staff and tablature notation consisting of solid, stemless noteheads on a CMN staff with tablature rhythm flags placed above the staff.</desc>
+        </valItem>
         <valItem ident="tab.guitar">
           <desc xml:lang="en">Tablature notation for guitars (includes "spanish" lute tablature). Frets are indicated using numbers. Courses closest to the player's feet are at the top of the staff.</desc>
         </valItem>
@@ -2989,7 +2989,7 @@
   </macroSpec><macroSpec rend="add" ident="data.PGSCALE" module="MEI" type="dt">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Page scale factor; a percentage of the values in page.height and page.width.</desc>
     <content xmlns:xi="http://www.w3.org/2001/XInclude">
-      <choice xmlns="http://relaxng.org/ns/structure/1.0"><ref name="data.PERCENT"/></choice>
+      <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.PERCENT"/>
     </content>
   </macroSpec><macroSpec rend="add" ident="data.PITCHCLASS" module="MEI" type="dt">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Pclass (pitch class) attribute values.</desc>
@@ -3675,10 +3675,24 @@
   </classSpec><classSpec rend="add" ident="att.keySig.anl" module="MEI.analytical" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Analytical domain attributes.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.accidental"/>
-      <memberOf key="att.keyMode"/>
       <memberOf key="att.pitch"/>
     </classes>
+    <attList xmlns:xi="http://www.w3.org/2001/XInclude">
+      <attDef ident="accid" usage="opt">
+        <gloss xml:lang="en">accidental</gloss>
+        <desc xml:lang="en">Contains an accidental for the tonic key, if one is required, <abbr>e.g.</abbr>, if <att>pname</att>
+          equals <val>c</val> and <att>accid</att> equals <val>s</val>, then a tonic of C# is indicated.</desc>
+        <datatype>
+          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.ACCIDENTAL.GESTURAL.basic"/>
+        </datatype>
+      </attDef>
+      <attDef ident="mode" usage="opt">
+        <desc xml:lang="en">Indicates major, minor, or other tonality.</desc>
+        <datatype>
+          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.MODE"/>
+        </datatype>
+      </attDef>
+    </attList>
   </classSpec><classSpec rend="add" ident="att.keySigDefault.anl" module="MEI.analytical" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Used by staffDef and scoreDef to provide default values for attributes in the analytical
       domain that are related to key signatures.</desc>
@@ -3687,7 +3701,7 @@
         <desc xml:lang="en">Contains an accidental for the tonic key, if one is required, <abbr>e.g.</abbr>, if <att>key.pname</att>
           equals <val>c</val> and <att>key.accid</att> equals <val>s</val>, then a tonic of C# is indicated.</desc>
         <datatype>
-          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.ACCIDENTAL.GESTURAL"/>
+          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.ACCIDENTAL.GESTURAL.basic"/>
         </datatype>
       </attDef>
       <attDef ident="key.mode" usage="opt">
@@ -4318,7 +4332,11 @@
         <desc xml:lang="en">"Cut-out" style.</desc>
         <valList type="closed">
           <valItem ident="cutout">
-            <desc xml:lang="en">The staff lines should not be drawn.</desc>
+            <desc xml:lang="en">Means that the staff lines "behind" the element are hidden for the
+              entire duration of the element, based on <att scheme="MEI">dur</att> and <att scheme="MEI">dots</att>. <att scheme="MEI">cutout</att> does not imply that any
+              other elements are hidden. Only barlines directly adjacent to the cut-out area may be
+              hidden or shortened. When rendering, barline handling is up to the rendering
+              application.</desc>
           </valItem>
         </valList>
       </attDef>
@@ -4652,18 +4670,17 @@
       </attDef>
     </attList>
   </classSpec><classSpec rend="add" ident="att.numberPlacement" module="MEI.cmn" type="atts">
-    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Attributes that record the placement and visibility of numbers that accompany a bowed
-      tremolo or tuplet.</desc>
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Attributes that record the placement and visibility of numbers that accompany a bowed notational feature.</desc>
     <attList xmlns:xi="http://www.w3.org/2001/XInclude">
       <attDef ident="num.place" usage="opt">
         <gloss xml:lang="en">number placement</gloss>
-        <desc xml:lang="en">States where the tuplet number will be placed in relation to the note heads.</desc>
+        <desc xml:lang="en">States where the number will be placed in relation to the notational feature.</desc>
         <datatype>
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.STAFFREL.basic"/>
         </datatype>
       </attDef>
       <attDef ident="num.visible" usage="opt">
-        <desc xml:lang="en">Determines if the tuplet number is visible.</desc>
+        <desc xml:lang="en">Determines if the number is visible.</desc>
         <datatype>
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.BOOLEAN"/>
         </datatype>
@@ -5970,6 +5987,7 @@
       <memberOf key="att.common"/>
       <memberOf key="att.meiVersion"/>
       
+      <memberOf key="att.docStatus"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <ref xmlns="http://relaxng.org/ns/structure/1.0" name="meiHead"/>
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="mei"/></zeroOrMore>
@@ -6252,7 +6270,7 @@
       <memberOf key="model.editorialLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.divLike"/><ref name="model.editLike"/><ref name="model.editTransPart"/><ref name="model.fLike"/><ref name="model.graphicPrimitiveLike"/><ref name="model.layerPart"/><ref name="model.milestoneLike.music"/><ref name="model.neumeComponentModifierLike"/><ref name="model.neumeModifierLike"/><ref name="model.neumePart"/><ref name="model.sectionPart"/><ref name="model.staffGrpLike"/><ref name="model.transcriptionLike"/></choice></zeroOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="expan" usage="opt">
+    </content><attList><attDef ident="expan" usage="opt">
         <desc xml:lang="en">Records the expansion of a text abbreviation.</desc>
         <datatype>
           <rng:data type="string"/>
@@ -6273,7 +6291,7 @@
       <memberOf key="model.transcriptionLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.divLike"/><ref name="model.editLike"/><ref name="model.editTransPart"/><ref name="model.fLike"/><ref name="model.graphicPrimitiveLike"/><ref name="model.keyAccidLike"/><ref name="model.layerPart"/><ref name="model.milestoneLike.music"/><ref name="model.sectionPart"/><ref name="model.staffGrpLike"/><ref name="model.transcriptionLike"/></choice></zeroOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="place" usage="opt">
+    </content><attList><attDef ident="place" usage="opt">
         <desc xml:lang="en">Location of the addition.</desc>
         <datatype maxOccurs="unbounded">
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.PLACEMENT"/>
@@ -6296,7 +6314,7 @@
       <memberOf key="att.common"/>
       <memberOf key="model.editLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
-      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="model.choicePart"/></choice></zeroOrMore>
+      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.choicePart"/></zeroOrMore>
     </content><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>Because the children of a <gi scheme="MEI">choice</gi> element all represent alternative
         ways of encoding the same sequence, it is natural to think of them as mutually exclusive.
@@ -6384,7 +6402,7 @@
       <memberOf key="model.transcriptionLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.divLike"/><ref name="model.editLike"/><ref name="model.editTransPart"/><ref name="model.fLike"/><ref name="model.graphicPrimitiveLike"/><ref name="model.keyAccidLike"/><ref name="model.layerPart"/><ref name="model.milestoneLike.music"/><ref name="model.neumeComponentModifierLike"/><ref name="model.neumeModifierLike"/><ref name="model.neumePart"/><ref name="model.sectionPart"/><ref name="model.staffGrpLike"/><ref name="model.transcriptionLike"/></choice></zeroOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="degree" usage="opt">
+    </content><attList><attDef ident="degree" usage="opt">
         <desc xml:lang="en">Records the degree of damage.</desc>
         <datatype>
           <rng:data type="string"/>
@@ -6428,7 +6446,7 @@
       <memberOf key="model.editorialLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.divLike"/><ref name="model.editLike"/><ref name="model.editTransPart"/><ref name="model.fLike"/><ref name="model.graphicPrimitiveLike"/><ref name="model.layerPart"/><ref name="model.milestoneLike.music"/><ref name="model.neumeComponentModifierLike"/><ref name="model.neumeModifierLike"/><ref name="model.neumePart"/><ref name="model.sectionPart"/><ref name="model.staffGrpLike"/><ref name="model.transcriptionLike"/></choice></zeroOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="abbr" usage="opt">
+    </content><attList><attDef ident="abbr" usage="opt">
         <gloss xml:lang="en">abbreviation</gloss>
         <desc xml:lang="en">Captures the abbreviated form of the text.</desc>
         <datatype>
@@ -6475,12 +6493,12 @@
       <memberOf key="model.transcriptionLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <empty/>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="character" usage="opt">
+    </content><attList><attDef ident="character" usage="opt">
         <desc xml:lang="en">Describes the character of the new hand.</desc>
         <datatype>
           <rng:text/>
         </datatype>
-      </attDef><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="new" usage="opt">
+      </attDef><attDef ident="new" usage="opt">
         <desc xml:lang="en">Identifies the new hand. The value must contain the ID of a hand element given
           elsewhere in the document.</desc>
         <datatype>
@@ -6496,7 +6514,7 @@
             </sch:rule>
           </constraint>
         </constraintSpec>
-      </attDef><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="old" usage="opt">
+      </attDef><attDef ident="old" usage="opt">
         <desc xml:lang="en">Identifies the old hand. The value must contain the ID of a hand element given
           elsewhere in the document.</desc>
         <datatype>
@@ -6544,7 +6562,7 @@
             attributes: startid, tstamp, tstamp.ges or tstamp.real</sch:assert>
         </sch:rule>
       </constraint>
-    </constraintSpec><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="function" usage="opt">
+    </constraintSpec><attList><attDef ident="func" usage="opt">
         <desc xml:lang="en">Describes the purpose of the metaMark.</desc>
         <datatype>
           <rng:data type="NMTOKEN"/>
@@ -6640,7 +6658,7 @@
       <memberOf key="model.transcriptionLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.divLike"/><ref name="model.editLike"/><ref name="model.editTransPart"/><ref name="model.fLike"/><ref name="model.graphicPrimitiveLike"/><ref name="model.keyAccidLike"/><ref name="model.layerPart"/><ref name="model.milestoneLike.music"/><ref name="model.neumeComponentModifierLike"/><ref name="model.neumeModifierLike"/><ref name="model.neumePart"/><ref name="model.sectionPart"/><ref name="model.staffGrpLike"/><ref name="model.transcriptionLike"/></choice></zeroOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="desc" usage="opt">
+    </content><attList><attDef ident="desc" usage="opt">
         <gloss xml:lang="en">description</gloss>
         <desc xml:lang="en">Provides a description of the means of restoration, <val>stet</val> or <val>strike-down</val>, 
           for example.</desc>
@@ -6888,7 +6906,7 @@
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups elements representing or containing graphic information such as an illustration or
       figure.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="model.textPhraseLike.limited"/>
+      <memberOf key="model.textPhraseLike.basic"/>
     </classes>
   </classSpec><classSpec rend="add" predeclare="true" ident="model.graphicLike" module="MEI.figtable" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups elements that indicate the location of an inline graphic, illustration, or
@@ -6917,7 +6935,7 @@
       <memberOf key="att.lang"/>
       <memberOf key="model.figDescLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
-      <choice xmlns="http://relaxng.org/ns/structure/1.0"><zeroOrMore><choice><ref name="model.textComponentLike"/></choice></zeroOrMore><zeroOrMore><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore></choice>
+      <choice xmlns="http://relaxng.org/ns/structure/1.0"><zeroOrMore><ref name="model.textComponentLike"/></zeroOrMore><zeroOrMore><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore></choice>
     </content><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>Best practice suggests the use of controlled vocabulary for figure descriptions. Don't
         confuse this entity with a figure caption. A caption is text primarily intended for display
@@ -7244,7 +7262,8 @@
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.headLike"/></zeroOrMore>
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.identifierLike"/></zeroOrMore>
       <oneOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.titleLike"/></oneOrMore>
-      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.respLikePart"/></zeroOrMore>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="respStmt"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="dedication"/></optional>
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.workIdent"/></zeroOrMore>
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="otherChar"/></zeroOrMore>
       <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="creation"/></optional>
@@ -7282,6 +7301,7 @@
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.headLike"/></zeroOrMore>
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.identifierLike"/></zeroOrMore>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="dedication"/></optional>
       <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="availability"/></optional>
       <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="physDesc"/></optional>
       <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="physLoc"/></optional>
@@ -7311,6 +7331,7 @@
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="locus"/><ref name="locusGrp"/></choice></zeroOrMore>
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.identifierLike"/></zeroOrMore>
       <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="titleStmt"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="dedication"/></optional>
       <ref xmlns="http://relaxng.org/ns/structure/1.0" name="macro.bibldescPart"/>
       <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="creation"/></optional>
       <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="history"/></optional>
@@ -7336,7 +7357,7 @@
           <sch:assert test="not(mei:availability)">Availability is only permitted when @singleton equals "true".</sch:assert>
         </sch:rule>
       </constraint>
-    </constraintSpec><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="singleton" usage="opt">
+    </constraintSpec><attList><attDef ident="singleton" usage="opt">
         <desc xml:lang="en">Indicates the manifestation is a unique physical object.</desc>
         <datatype>
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.BOOLEAN"/>
@@ -7515,7 +7536,7 @@
       duration.</desc>
     <attList xmlns:xi="http://www.w3.org/2001/XInclude">
       <attDef ident="dur.ges" usage="opt">
-        <desc xml:lang="en">Records performed duration information that differs from the written duration.</desc>
+        <desc xml:lang="en">Records performed duration information that differs from the written duration; @dur.ges allows the same datatypes as @dur. Values of @dur.ges that require dots should also use @dots.ges.</desc>
         <datatype>
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.DURATION.GESTURAL"/>
         </datatype>
@@ -8068,7 +8089,6 @@
   </classSpec><classSpec rend="add" ident="att.f.log" module="MEI.harmony" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Logical domain attributes.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.controlEvent"/>
       <memberOf key="att.duration.additive"/>
       <memberOf key="att.startEndId"/>
       <memberOf key="att.timestamp2.log"/>
@@ -8432,7 +8452,8 @@
       </p>
     </remarks>
   </classSpec><classSpec rend="add" ident="att.regularMethod" module="MEI.header" type="atts">
-    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Attributes that describe correction and normalization methods.</desc>
+    <gloss xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en" versionDate="2024-07-22">regularization method</gloss>
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en" versionDate="2024-07-22">Attributes that describe correction and normalization methods.</desc>
     <attList xmlns:xi="http://www.w3.org/2001/XInclude">
       <attDef ident="method" usage="opt">
         <desc xml:lang="en">Indicates the method employed to mark corrections and normalizations.</desc>
@@ -8440,8 +8461,8 @@
           <valItem ident="silent">
             <desc xml:lang="en">Corrections and normalizations made silently.</desc>
           </valItem>
-          <valItem ident="tags">
-            <desc xml:lang="en">Corrections and normalizations indicated using elements.</desc>
+          <valItem ident="markup">
+            <desc xml:lang="en">Corrections and normalizations represented using markup.</desc>
           </valItem>
         </valList>
       </attDef>
@@ -8520,7 +8541,7 @@
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <oneOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="name"/></oneOrMore>
       <choice xmlns="http://relaxng.org/ns/structure/1.0"><zeroOrMore><ref name="model.locrefLike"/></zeroOrMore><zeroOrMore><ref name="model.pLike"/></zeroOrMore></choice>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="version" usage="opt">
+    </content><attList><attDef ident="version" usage="opt">
         <desc xml:lang="en">Supplies a version number for an application, independent of its identifier or display
           name.</desc>
         <datatype>
@@ -8540,12 +8561,12 @@
             contain an XPath expression.</sch:assert>
         </sch:rule>
       </constraint>
-    </constraintSpec><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="name" usage="req">
+    </constraintSpec><attList><attDef ident="name" usage="req">
         <desc xml:lang="en">Name of the attribute.</desc>
         <datatype>
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.NMTOKEN"/>
         </datatype>
-      </attDef><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="context" usage="opt">
+      </attDef><attDef ident="context" usage="opt">
         <desc xml:lang="en">Circumstances in which the attribute appears, an XPath expression.</desc>
         <datatype>
           <rng:data type="string"/>
@@ -8640,7 +8661,7 @@
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="label"/></zeroOrMore>
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="desc"/></zeroOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="type" usage="req">
+    </content><attList><attDef ident="type" usage="req">
         <desc xml:lang="en">Provides a description of the relationship between the current and the target
           categories.</desc>
         <valList type="closed">
@@ -8663,6 +8684,7 @@
       <memberOf key="att.common"/>
       <memberOf key="att.bibl"/>
       <memberOf key="att.datable"/>
+      <memberOf key="att.docStatus"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="respStmt"/></optional>
       <ref xmlns="http://relaxng.org/ns/structure/1.0" name="changeDesc"/>
@@ -8710,7 +8732,7 @@
       <memberOf key="att.dataPointing"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.headLike"/></zeroOrMore>
-      <oneOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="termList"/></choice></oneOrMore>
+      <oneOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="termList"/></oneOrMore>
     </content><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>Although the use of names and terms from locally controlled vocabularies is possible, best
         practice suggests that terms should come from standard national or international
@@ -8827,7 +8849,7 @@
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.headLike"/></zeroOrMore>
       <oneOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.pLike"/></oneOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="corrlevel" usage="opt">
+    </content><attList><attDef ident="corrlevel" usage="opt">
         <desc xml:lang="en">Indicates the degree of correction applied to the text.</desc>
         <valList type="closed">
           <valItem ident="high">
@@ -8855,7 +8877,7 @@
       <memberOf key="model.paperModLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="model.foliumLike"/><ref name="model.bifoliumLike"/></choice></zeroOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="removed.from" usage="req">
+    </content><attList><attDef ident="removed.from" usage="req">
         <desc xml:lang="en">Describes the position of the cutout on the parent folium / bifolium.</desc>
         <valList type="closed">
           <valItem ident="outer.recto">
@@ -8877,7 +8899,7 @@
             <desc xml:lang="en">removed from verso side of folium.</desc>
           </valItem>
         </valList>
-      </attDef><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="removed.by" usage="opt">
+      </attDef><attDef ident="removed.by" usage="opt">
         <desc xml:lang="en">Describes the method of removing the cutout.</desc>
         <datatype>
           <rng:data type="NMTOKEN"/>
@@ -8918,15 +8940,15 @@
     </remarks></elementSpec><elementSpec rend="add" ident="domainsDecl" module="MEI.header"><gloss xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">domains declaration</gloss><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Indicates which domains are included in the encoding.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="att.bibl"/>
-    </classes><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="anl" usage="req">
+    </classes><attList><attDef ident="anl" usage="req">
         <datatype>
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.BOOLEAN"/>
         </datatype>
-      </attDef><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="ges" usage="req">
+      </attDef><attDef ident="ges" usage="req">
         <datatype>
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.BOOLEAN"/>
         </datatype>
-      </attDef><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="vis" usage="req">
+      </attDef><attDef ident="vis" usage="req">
         <datatype>
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.BOOLEAN"/>
         </datatype>
@@ -9010,8 +9032,7 @@
       <p>Extent in this context represents file size.</p>
       <p>The model of this element is based on the <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-fileDesc.html">fileDesc</ref> element of the Text Encoding Initiative (TEI) and the <ref target="https://www.loc.gov/ead/EAD3taglib/EAD3-TL-eng.html#elem-filedesc">filedesc</ref> element of the Encoded
         Archival Description (EAD).</p>
-    </remarks></elementSpec><elementSpec rend="add" ident="foliaDesc" module="MEI.header"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Describes the order of folia and bifolia making up the text block of a manuscript or
-      print.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
+    </remarks></elementSpec><elementSpec rend="add" ident="foliaDesc" module="MEI.header"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Describes the arrangement of folia and bifolia making up the text block of a manuscript or printed item.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="model.physDescPart"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -9039,7 +9060,7 @@
       <memberOf key="att.medium"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="initial" usage="opt">
+    </content><attList><attDef ident="initial" usage="opt">
         <desc xml:lang="en">Marks this hand as the first one of the document.</desc>
         <datatype>
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.BOOLEAN"/>
@@ -9103,7 +9124,7 @@
             attribute.</sch:assert>
         </sch:rule>
       </constraint>
-    </constraintSpec><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="form" usage="opt">
+    </constraintSpec><attList><attDef ident="form" usage="opt">
         <desc xml:lang="en">Form of the encoded incipit.</desc>
         <datatype>
           <rng:data type="NMTOKEN"/>
@@ -9116,7 +9137,22 @@
             <desc xml:lang="en">**kern representation of the Humdrum format.</desc>
           </valItem>
           <valItem ident="parsons">
-            <desc xml:lang="en">Parsons code.</desc>
+            <desc xml:lang="en">Parsons code containing intervallic direction only
+              (e.g., "sususddsdsdsd"). Permitted values are composed of a series of tokens, which may 
+              be "u" (Up), "d" (Down) or "s" (Same). Tokens should not be separated by spaces.</desc>
+          </valItem>
+          <valItem ident="intervals">
+            <desc xml:lang="en">Representation of interval quality and direction
+              (e.g., "P1 +P5 P1 +M2 P1 -M2"). Values must be composed of a series of space-separated tokens, where each token
+              is comprised of three components: a direction indicator ("+" for "up" and "-" for "down"); an interval quality, being one of 
+              "P" (Perfect), "M" (Major), "m" (Minor), "A" (Augmented), or "d" (Diminished); and finally an integer indicating 
+              interval size, where "1" is a Unison. (For a Perfect Unison, P1, the direction indicator may be omitted). 
+            </desc>
+          </valItem>
+          <valItem ident="semitones">
+            <desc xml:lang="en">Representation of intervallic direction and size in half steps (semitones)
+              (e.g., "0 +7 0 +2 0 -2"). Values must be composed of a series of space-separated positive or negative 
+              integers indicating the number of semitones to ascend or descend, respectively.</desc>
           </valItem>
         </valList>
       </attDef></attList></elementSpec><elementSpec rend="add" ident="incipText" module="MEI.header"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Opening words of a musical composition.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -9150,10 +9186,8 @@
       <p>The model of this element is based on the <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-interpretation.html">interpretation</ref> element of the Text Encoding Initiative (TEI).</p>
     </remarks></elementSpec><elementSpec rend="add" ident="key" module="MEI.header"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Key captures information about tonal center and mode.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
-      <memberOf key="att.accidental"/>
       <memberOf key="att.bibl"/>
-      <memberOf key="att.keyMode"/>
-      <memberOf key="att.pitch"/>
+      <memberOf key="att.keySig.anl"/>
       <memberOf key="model.workIdent"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <rng:text/>
@@ -9195,6 +9229,7 @@
       <memberOf key="att.meiVersion"/>
       <memberOf key="att.responsibility"/>
       
+      <memberOf key="att.docStatus"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="altId"/></zeroOrMore>
       <ref xmlns="http://relaxng.org/ns/structure/1.0" name="fileDesc"/>
@@ -9218,7 +9253,7 @@
             'independent' only when the document element is "meiHead".</sch:assert>
         </sch:rule>
       </constraint>
-    </constraintSpec><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="type" usage="opt">
+    </constraintSpec><attList><attDef ident="type" usage="opt">
         <desc xml:lang="en">Specifies the kind of document to which the header is attached, for example whether it
           is a corpus or individual text.</desc>
         <valList type="closed">
@@ -9270,12 +9305,12 @@
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="desc"/></optional>
       <choice xmlns="http://relaxng.org/ns/structure/1.0"><oneOrMore><ref name="tagUsage"/></oneOrMore><oneOrMore><ref name="attUsage"/></oneOrMore></choice>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="name" usage="req">
+    </content><attList><attDef ident="name" usage="req">
         <desc xml:lang="en">Formal namespace identifier; that is, a uniform resource identifier (URI).</desc>
         <datatype>
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.URI"/>
         </datatype>
-      </attDef><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="prefix" usage="opt">
+      </attDef><attDef ident="prefix" usage="opt">
         <desc xml:lang="en">Prefix associated with the formal identifier.</desc>
         <datatype>
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.NMTOKEN"/>
@@ -9328,7 +9363,7 @@
             or a bifolium element.</sch:assert>
         </sch:rule>
       </constraint>
-    </constraintSpec><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="attached.to" usage="req">
+    </constraintSpec><attList><attDef ident="attached.to" usage="req">
         <desc xml:lang="en">Describes the position of the patch on the parent folium / bifolium.</desc>
         <valList type="closed">
           <valItem ident="outer.recto">
@@ -9350,7 +9385,7 @@
             <desc xml:lang="en">patch attached to verso side of folium.</desc>
           </valItem>
         </valList>
-      </attDef><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="attached.by" usage="opt">
+      </attDef><attDef ident="attached.by" usage="opt">
         <desc xml:lang="en">Describes the method of attachment of the patch.</desc>
         <datatype>
           <rng:data type="NMTOKEN"/>
@@ -9387,7 +9422,7 @@
       <memberOf key="model.titlePagePart"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <ref xmlns="http://relaxng.org/ns/structure/1.0" name="macro.struc-unstrucContent"/>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="isodur" usage="opt">
+    </content><attList><attDef ident="isodur" usage="opt">
         <desc xml:lang="en">Holds a W3C duration value, <abbr>e.g.</abbr>, "PT2H34M45.67S".</desc>
         <datatype>
           <rng:data type="duration"/>
@@ -9492,7 +9527,7 @@
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.headLike"/></zeroOrMore>
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="amount" usage="opt">
+    </content><attList><attDef ident="amount" usage="opt">
         <desc xml:lang="en">Numeric value capturing a cost. Can only be interpreted in combination with the
           currency attribute.</desc>
         <datatype>
@@ -9500,7 +9535,7 @@
             <rng:param name="pattern">[0-9]+\.[0-9]{2}</rng:param>
           </rng:data>
         </datatype>
-      </attDef><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="currency" usage="opt">
+      </attDef><attDef ident="currency" usage="opt">
         <desc xml:lang="en">Monetary unit.</desc>
         <datatype>
           <rng:data type="NMTOKEN"/>
@@ -9609,7 +9644,7 @@
       <memberOf key="model.physDescPart"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="num" usage="opt">
+    </content><attList><attDef ident="num" usage="opt">
         <desc xml:lang="en">Records the channel configuration in numeric form.</desc>
         <datatype>
           <rng:data type="positiveInteger"/>
@@ -9632,7 +9667,7 @@
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.headLike"/></zeroOrMore>
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="locus"/><ref name="locusGrp"/></choice></zeroOrMore>
-      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="model.biblLike"/></choice></zeroOrMore>
+      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.biblLike"/></zeroOrMore>
     </content><constraintSpec xmlns:xi="http://www.w3.org/2001/XInclude" ident="check_source_target" scheme="schematron">
       <constraint>
         <sch:rule context="mei:source/@target">
@@ -9711,22 +9746,22 @@
             contain an XPath expression.</sch:assert>
         </sch:rule>
       </constraint>
-    </constraintSpec><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="name" usage="req">
+    </constraintSpec><attList><attDef ident="name" usage="req">
         <desc xml:lang="en">Name of the element.</desc>
         <datatype>
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.NMTOKEN"/>
         </datatype>
-      </attDef><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="context" usage="opt">
+      </attDef><attDef ident="context" usage="opt">
         <desc xml:lang="en">Circumstances in which the element appears, an XPath expression.</desc>
         <datatype>
           <rng:data type="string"/>
         </datatype>
-      </attDef><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="occurs" usage="opt">
+      </attDef><attDef ident="occurs" usage="opt">
         <desc xml:lang="en">Number of occurrences in the defined context.</desc>
         <datatype>
           <rng:data type="nonNegativeInteger"/>
         </datatype>
-      </attDef><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="withid" usage="opt">
+      </attDef><attDef ident="withid" usage="opt">
         <desc xml:lang="en">Number of occurrences in the defined context that have an <att>xml:id</att>
           attribute.</desc>
         <datatype>
@@ -9766,7 +9801,7 @@
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.headLike"/></zeroOrMore>
       <oneOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.titleLike"/></oneOrMore>
-      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="model.respLike"/></choice></zeroOrMore>
+      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.respLike"/></zeroOrMore>
     </content><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>The model of this element is based on the <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-titleStmt.html">titleStmt</ref> element of the Text Encoding Initiative (TEI).</p>
     </remarks></elementSpec><elementSpec rend="add" ident="trackConfig" module="MEI.header"><gloss xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">track configuration</gloss><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Number of physical/input tracks on a sound medium (<abbr>e.g.</abbr>, eight
@@ -9778,7 +9813,7 @@
       <memberOf key="model.physDescPart"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <ref xmlns="http://relaxng.org/ns/structure/1.0" name="macro.struc-unstrucContent"/>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="num" usage="opt">
+    </content><attList><attDef ident="num" usage="opt">
         <desc xml:lang="en">Records the track configuration in numeric form.</desc>
         <datatype>
           <rng:data type="positiveInteger"/>
@@ -9840,15 +9875,29 @@
         the <gi scheme="MEI">accessRestrict</gi> element, which holds information about conditions
         affecting the availability of the material.</p>
       <p>The model of this element is based on the <ref target="https://www.loc.gov/ead/EAD3taglib/EAD3-TL-eng.html#elem-userestrict">userestrict</ref> element of the Encoded Archival Description (EAD).</p>
-    </remarks></elementSpec><elementSpec rend="add" ident="watermark" module="MEI.header"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Contains a description of a watermark or similar device.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
+    </remarks></elementSpec><elementSpec rend="add" ident="watermarkDesc" module="MEI.header"><gloss xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">watermark description</gloss><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Contains a description of the watermark(s) of an item.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
+      <memberOf key="att.common"/>
+      <memberOf key="att.bibl"/>
+      <memberOf key="att.lang"/>
+      <memberOf key="model.physDescPart"/>
+    </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
+      <choice xmlns="http://relaxng.org/ns/structure/1.0"><group><zeroOrMore><ref name="head"/></zeroOrMore><zeroOrMore><choice><ref name="watermarkList"/><ref name="watermark"/><ref name="p"/></choice></zeroOrMore></group></choice>
+    </content></elementSpec><elementSpec rend="add" ident="watermarkList" module="MEI.header"><gloss xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">list of watermarks</gloss><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Grouping several watermarks.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
+      <memberOf key="att.common"/>
+      <memberOf key="att.authorized"/>
+      <memberOf key="att.bibl"/>
+      <memberOf key="att.edit"/>
+      <memberOf key="att.lang"/>
+    </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
+      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.headLike"/></zeroOrMore>
+      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="annot"/><ref name="watermark"/></choice></zeroOrMore>
+    </content></elementSpec><elementSpec rend="add" ident="watermark" module="MEI.header"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Contains a description of a watermark or similar device.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="att.bibl"/>
       <memberOf key="att.facsimile"/>
       <memberOf key="att.lang"/>
-      
-      <memberOf key="model.physDescPart"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
-      <ref xmlns="http://relaxng.org/ns/structure/1.0" name="macro.struc-unstrucContent"/>
+      <oneOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="macro.watermark"/><rng:text xmlns="http://www.tei-c.org/ns/1.0"/></choice></oneOrMore>
     </content><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>The <att>facs</att> attribute may be used to record the location of the watermark in a
         facsimile image.</p>
@@ -9867,7 +9916,8 @@
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.headLike"/></zeroOrMore>
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.identifierLike"/></zeroOrMore>
       <oneOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.titleLike"/></oneOrMore>
-      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.respLikePart"/></zeroOrMore>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="respStmt"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="dedication"/></optional>
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.workIdent"/></zeroOrMore>
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="otherChar"/></zeroOrMore>
       <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="creation"/></optional>
@@ -10616,7 +10666,7 @@
       <memberOf key="att.midi.event"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <empty/>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="num" usage="req">
+    </content><attList><attDef ident="num" usage="req">
         <desc xml:lang="en">MIDI number in the range set by data.MIDICHANNEL.</desc>
         <datatype>
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.MIDICHANNEL"/>
@@ -10717,7 +10767,7 @@
       <memberOf key="att.midi.event"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <empty/>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="num" usage="req">
+    </content><attList><attDef ident="num" usage="req">
         <desc xml:lang="en">Number in the range 0-65535.</desc>
         <datatype>
           <rng:data type="nonNegativeInteger">
@@ -10736,7 +10786,7 @@
       <memberOf key="att.midiNumber"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <empty/>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="form" usage="req">
+    </content><attList><attDef ident="form" usage="req">
         <desc xml:lang="en">Indicates whether this is note-on or note-off velocity data.</desc>
         <valList type="closed">
           <valItem ident="on">
@@ -10761,6 +10811,7 @@
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="model.eventPart"/>
       <memberOf key="model.nameLike"/>
+      <memberOf key="model.textPhraseLike.limited"/>
     </classes>
   </classSpec><classSpec rend="add" predeclare="true" ident="model.nameLike.geogName" module="MEI.namesdates" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups geographic name elements.</desc>
@@ -10771,12 +10822,14 @@
   </classSpec><classSpec rend="add" predeclare="true" ident="model.nameLike.label" module="MEI.namesdates" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups elements that serve as stylistic labels.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
+      <memberOf key="model.nameLike"/>
       <memberOf key="model.textPhraseLike.limited"/>
     </classes>
   </classSpec><classSpec rend="add" predeclare="true" ident="model.nameLike.place" module="MEI.namesdates" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups place name elements.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="model.nameLike"/>
+      <memberOf key="model.textPhraseLike.limited"/>
     </classes>
   </classSpec><classSpec rend="add" predeclare="true" ident="model.persNamePart" module="MEI.namesdates" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups elements which form part of a personal name.</desc>
@@ -10960,11 +11013,15 @@
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike"/><ref name="model.editLike"/><ref name="model.transcriptionLike"/><ref name="model.persNamePart"/></choice></zeroOrMore>
     </content><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
-      <p>Parts of a personal name may be captured using <gi scheme="MEI">persName</gi> sub-elements.
-        For greater specificity, however, use foreName, famName, genName, addName, genName,
-        nameLink, and roleName elements. The name of the list from which a controlled value for
-        persName is taken may be recorded using the <att>auth</att> attribute.</p>
-      <p>The model of this element is based on the <ref target="https://www.loc.gov/ead/EAD3taglib/EAD3-TL-eng.html#elem-persname">persname</ref> element of the Encoded Archival Description (EAD).</p>
+      <p>Parts of a personal name may be captured using <gi scheme="MEI">name</gi> or 
+        <gi scheme="MEI">persName</gi> sub-elements. For greater specificity, however, the use
+        of <gi scheme="MEI">foreName</gi>, <gi scheme="MEI">famName</gi>, <gi scheme="MEI">genName</gi>, 
+        <gi scheme="MEI">addName</gi>, <gi scheme="MEI">nameLink</gi>, and 
+        <gi scheme="MEI">roleName</gi> elements is recommended. The name of the list from which a controlled
+        value for persName is taken may be recorded using the <att>auth</att> attribute.</p>
+      <p>The model of this element is based on the 
+        <ref target="https://www.loc.gov/ead/EAD3taglib/EAD3-TL-eng.html#elem-persname">persname</ref> element
+        of the Encoded Archival Description (EAD).</p>
     </remarks></elementSpec><elementSpec rend="add" ident="postBox" module="MEI.namesdates"><gloss xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">postal box or post office box</gloss><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Contains a number or other identifier for some postal
       delivery point other than a street address.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
@@ -11219,8 +11276,10 @@
         <valList type="semi">
           <valItem ident="apostropha"/>
           <valItem ident="bistropha"/>
+          <valItem ident="cephalicus"/>
           <valItem ident="climacus"/>
           <valItem ident="clivis"/>
+          <valItem ident="epiphonus"/>
           <valItem ident="oriscus"/>
           <valItem ident="pes"/>
           <valItem ident="pessubpunctis"/>
@@ -11538,12 +11597,12 @@
             ancestor.</sch:assert>
         </sch:rule>
       </constraint>
-    </constraintSpec><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="absolute" usage="opt">
+    </constraintSpec><attList><attDef ident="absolute" usage="opt">
         <desc xml:lang="en">Provides an absolute value for the time point.</desc>
         <datatype>
           <rng:text/>
         </datatype>
-      </attDef><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="interval" usage="opt">
+      </attDef><attDef ident="interval" usage="opt">
         <desc xml:lang="en">Specifies the time interval between this time point and the one designated by the
           since attribute. This attribute can only be interpreted meaningfully in conjunction with
           the inttype attribute.</desc>
@@ -11555,17 +11614,17 @@
             <rng:data type="time"/>
           </rng:choice>
         </datatype>
-      </attDef><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="abstype" usage="opt">
+      </attDef><attDef ident="abstype" usage="opt">
         <desc xml:lang="en">Specifies the kind of values used in the absolute attribute.</desc>
         <datatype>
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.BETYPE"/>
         </datatype>
-      </attDef><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="inttype" usage="opt">
+      </attDef><attDef ident="inttype" usage="opt">
         <desc xml:lang="en">Specifies the kind of values used in the interval attribute.</desc>
         <datatype>
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.BETYPE"/>
         </datatype>
-      </attDef><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="since" usage="opt">
+      </attDef><attDef ident="since" usage="opt">
         <desc xml:lang="en">Identifies the reference point for determining the time of the current when element,
           which is obtained by adding the interval to the time of the reference point. The value
           should be the ID of another when element within the same parent element. If the since
@@ -11592,7 +11651,7 @@
     </remarks></elementSpec><classSpec rend="add" predeclare="true" ident="model.locrefLike" module="MEI.ptrref" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups elements used for purposes of location and reference.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="model.textPhraseLike.limited"/>
+      <memberOf key="model.textPhraseLike.bare"/>
     </classes>
   </classSpec><elementSpec rend="add" ident="ptr" module="MEI.ptrref"><gloss xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">pointer</gloss><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Defines a traversible pointer to another location, using only attributes to
       describe the destination.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -11665,6 +11724,32 @@
     <content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="model.addressLike"/><ref name="model.addressPart"/><ref name="model.annotLike"/><ref name="model.biblLike"/><ref name="model.dateLike"/><ref name="model.editorialLike"/><ref name="model.figureLike"/><ref name="model.identifierLike"/><ref name="model.lbLike"/><ref name="model.locrefLike"/><ref name="model.measurementLike"/><ref name="model.nameLike"/><ref name="model.nameLike.label"/><ref name="model.pbLike"/><ref name="model.rendLike"/><ref name="symbol"/></choice></zeroOrMore>
     </content>
+  </macroSpec><macroSpec rend="add" ident="macro.watermark" module="MEI.shared" type="pe">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups elements that contain meta-data about a watermark.</desc>
+    <content xmlns:xi="http://www.w3.org/2001/XInclude">
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.addressLike"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.annotLike"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.biblLike"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.dateLike"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.dimLike"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.figureLike"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.geogNamePart"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.identifierLike"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.locrefLike"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.measurementLike"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.nameLike.geogName"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.qLike"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.relationLike"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.rendLike"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.titleLike"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="biblList"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="dimensions"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="extent"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="heraldry"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="locus"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="locusGrp"/></optional>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="term"/></optional>
+    </content>
   </macroSpec><macroSpec rend="add" ident="data.BETYPE" module="MEI.shared" type="dt">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Datatypes for values in begin, end, abstype and inttype attributes.</desc>
     <content xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -11709,6 +11794,159 @@
           <desc xml:lang="en">ISO 24-hour time format: HH:MM:SS.ss.</desc>
         </valItem>
       </valList>
+    </content>
+  </macroSpec><macroSpec rend="add" ident="data.MARCRELATORS.basic" module="MEI.shared" type="dt">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" versionDate="2025-05-25" xml:lang="en">Relators [MARC]. Values and definitions taken from <ref target="https://id.loc.gov/vocabulary/relators.html">http://id.loc.gov/vocabulary/relators</ref>.</desc>
+    <content xmlns:xi="http://www.w3.org/2001/XInclude">
+        <valList type="semi">
+          <valItem ident="arr">
+            <gloss versionDate="2025-05-25" xml:lang="en">arranger</gloss>
+            <desc versionDate="2025-05-25" xml:lang="en">A person, family, or organization contributing to a musical work by rewriting the composition for a medium of performance different from that for which the work was originally intended, or modifying the work for the same medium of performance, etc., such that the musical substance of the original composition remains essentially unchanged. For extensive modification that effectively results in the creation of a new musical work, see composer. [<ref target="https://id.loc.gov/vocabulary/relators/arr.html">MARC</ref>]</desc>
+          </valItem>
+          <valItem ident="aut">
+            <gloss versionDate="2025-05-25" xml:lang="en">author</gloss>
+            <desc versionDate="2025-05-25" xml:lang="en">A person, family, or organization responsible for creating a work that is primarily textual in content, regardless of media type (e.g., printed text, spoken word, electronic text, tactile text) or genre (e.g., poems, novels, screenplays, blogs). Use also for persons, etc., creating a new work by paraphrasing, rewriting, or adapting works by another creator such that the modification has substantially changed the nature and content of the original or changed the medium of expression. [<ref target="https://id.loc.gov/vocabulary/relators/aut.html">MARC</ref>]</desc>
+          </valItem>
+          <valItem ident="cmp">
+            <gloss versionDate="2025-05-25" xml:lang="en">composer</gloss>
+            <desc versionDate="2025-05-25" xml:lang="en">A person, family, or organization responsible for creating or contributing to a musical resource by adding music to a work that originally lacked it or supplements it. [<ref target="https://id.loc.gov/vocabulary/relators/cmp.html">MARC</ref>]</desc>
+          </valItem>
+          <valItem ident="dte">
+            <gloss versionDate="2025-05-25" xml:lang="en">dedicatee</gloss>
+            <desc versionDate="2025-05-25" xml:lang="en">A person, family, or organization to whom a resource is dedicated. [<ref target="https://id.loc.gov/vocabulary/relators/dte.html">MARC</ref>]</desc>
+          </valItem>
+          <valItem ident="edt">
+            <gloss versionDate="2025-05-25" xml:lang="en">editor</gloss>
+            <desc versionDate="2025-05-25" xml:lang="en">A person, family, or organization contributing to a resource by revising or elucidating the content, e.g., adding an introduction, notes, or other critical matter. An editor may also prepare a resource for production, publication, or distribution. For major revisions, adaptations, etc., that substantially change the nature and content of the original work, resulting in a new work, see author. [<ref target="https://id.loc.gov/vocabulary/relators/edt.html">MARC</ref>]</desc>
+          </valItem>
+          <valItem ident="lbt">
+            <gloss versionDate="2025-05-25" xml:lang="en">librettist</gloss>
+            <desc versionDate="2025-05-25" xml:lang="en">An author of a libretto of an opera or other stage work, or an oratorio. [<ref target="https://id.loc.gov/vocabulary/relators/lbt.html">MARC</ref>]</desc>
+          </valItem>
+          <valItem ident="lyr">
+            <gloss versionDate="2025-05-25" xml:lang="en">lyricist</gloss>
+            <desc versionDate="2025-05-25" xml:lang="en">An author of the words of a non-dramatic musical work (e.g. the text of a song), except for oratorios. [<ref target="https://id.loc.gov/vocabulary/relators/lyr.html">MARC</ref>]</desc>
+          </valItem>
+        </valList>
+    </content>
+  </macroSpec><macroSpec rend="add" ident="data.MARCRELATORS.extended" module="MEI.shared" type="dt">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" versionDate="2025-02-05" xml:lang="en">Relators [MARC]. Values and definitions taken from <ref target="https://id.loc.gov/vocabulary/relators.html">http://id.loc.gov/vocabulary/relators</ref>.</desc>
+    <content xmlns:xi="http://www.w3.org/2001/XInclude">
+      <valList type="semi">
+        <valItem ident="act">
+          <gloss versionDate="2025-05-25" xml:lang="en">actor</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A performer contributing to an expression of a work by acting as a cast member or player in a musical or dramatic presentation, etc. [<ref target="http://id.loc.gov/vocabulary/relators/act.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="ard">
+          <gloss versionDate="2025-05-25" xml:lang="en">artistic director</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A person responsible for controlling the development of the artistic style of an entire production, including the choice of works to be presented and selection of senior production staff. [<ref target="http://id.loc.gov/vocabulary/relators/ard.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="art">
+          <gloss versionDate="2025-05-25" xml:lang="en">artist</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A person, family, or organization responsible for creating a work by conceiving, and implementing, an original graphic design, drawing, painting, etc. For book illustrators, prefer Illustrator. [<ref target="http://id.loc.gov/vocabulary/relators/art.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="aus">
+          <gloss versionDate="2025-05-25" xml:lang="en">screenwriter</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">An author of a screenplay, script, or scene. [<ref target="http://id.loc.gov/vocabulary/relators/aus.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="chr">
+          <gloss versionDate="2025-05-25" xml:lang="en">choreographer</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A person responsible for creating or contributing to a work of movement. [<ref target="http://id.loc.gov/vocabulary/relators/chr.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="cnd">
+          <gloss versionDate="2025-05-25" xml:lang="en">conductor</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A performer contributing to a musical resource by leading a performing group (orchestra, chorus, opera, etc.) in a musical or dramatic presentation. [<ref target="http://id.loc.gov/vocabulary/relators/cnd.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="crp">
+          <gloss versionDate="2025-05-25" xml:lang="en">correspondent</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A person or organization who was either the writer or recipient of a letter or other communication. [<ref target="http://id.loc.gov/vocabulary/relators/crp.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="cst">
+          <gloss versionDate="2025-05-25" xml:lang="en">costume designer</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A person, family, or organization that designs the costumes for a moving image production or for a musical or dramatic presentation or entertainment. [<ref target="http://id.loc.gov/vocabulary/relators/cst.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="drt">
+          <gloss versionDate="2025-05-25" xml:lang="en">director</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A person responsible for the general management and supervision of a filmed performance, a radio or television program, etc. [<ref target="http://id.loc.gov/vocabulary/relators/drt.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="egr">
+          <gloss versionDate="2025-05-25" xml:lang="en">engraver</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A person or organization who cuts letters, figures, etc. on a surface, such as a wooden or metal plate used for printing. [<ref target="http://id.loc.gov/vocabulary/relators/egr.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="flm">
+          <gloss versionDate="2025-05-25" xml:lang="en">film editor</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A person who, following the script and in creative cooperation with the Director, selects, arranges, and assembles the filmed material, controls the synchronization of picture and sound, and participates in other post-production tasks such as sound mixing and visual effects processing. Today, picture editing is often performed digitally. [<ref target="http://id.loc.gov/vocabulary/relators/flm.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="fmd">
+          <gloss versionDate="2025-05-25" xml:lang="en">film director</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A director responsible for the general management and supervision of a filmed performance. [<ref target="http://id.loc.gov/vocabulary/relators/fmd.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="fmp">
+          <gloss versionDate="2025-05-25" xml:lang="en">film producer</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A producer responsible for most of the business aspects of a film. [<ref target="http://id.loc.gov/vocabulary/relators/fmp.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="itr">
+          <gloss versionDate="2025-05-25" xml:lang="en">instrumentalist</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A performer contributing to a resource by playing a musical instrument. [<ref target="http://id.loc.gov/vocabulary/relators/itr.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="mcp">
+          <gloss versionDate="2025-05-25" xml:lang="en">music copyist</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A person who transcribes or copies musical notation. [<ref target="http://id.loc.gov/vocabulary/relators/mcp.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="mus">
+          <gloss versionDate="2025-05-25" xml:lang="en">musician</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A person or organization who performs music or contributes to the musical content of a work when it is not possible or desirable to identify the function more precisely. [<ref target="http://id.loc.gov/vocabulary/relators/mus.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="msd">
+          <gloss versionDate="2025-05-25" xml:lang="en">musical director</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A person who coordinates the activities of the composer, the sound editor, and sound mixers for a moving image production or for a musical or dramatic presentation or entertainment. [<ref target="http://id.loc.gov/vocabulary/relators/msd.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="pdr">
+          <gloss versionDate="2025-05-25" xml:lang="en">project director</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A person or organization with primary responsibility for all essential aspects of a project, has overall responsibility for managing projects, or provides overall direction to a project manager. [<ref target="http://id.loc.gov/vocabulary/relators/pdr.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="pmn">
+          <gloss versionDate="2025-05-25" xml:lang="en">production manager</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A person responsible for all technical and business matters in a production. [<ref target="http://id.loc.gov/vocabulary/relators/pmn.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="prn">
+          <gloss versionDate="2025-05-25" xml:lang="en">production company</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">An organization that is responsible for financial, technical, and organizational management of a production for stage, screen, audio recording, television, webcast, etc. [<ref target="http://id.loc.gov/vocabulary/relators/prn.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="pro">
+          <gloss versionDate="2025-05-25" xml:lang="en">producer</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A person, family, or organization responsible for most of the business aspects of a production for screen, audio recording, television, webcast, etc. The producer is generally responsible for fund raising, managing the production, hiring key personnel, arranging for distributors, etc. [<ref target="http://id.loc.gov/vocabulary/relators/pro.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="rce">
+          <gloss versionDate="2025-05-25" xml:lang="en">recording engineer</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A person contributing to a resource by supervising the technical aspects of a sound or video recording session. [<ref target="http://id.loc.gov/vocabulary/relators/rce.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="scr">
+          <gloss versionDate="2025-05-25" xml:lang="en">scribe</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A person who is an amanuensis and for a writer of manuscripts proper. For a person who makes pen-facsimiles, use facsimilist. [<ref target="http://id.loc.gov/vocabulary/relators/scr.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="sng">
+          <gloss versionDate="2025-05-25" xml:lang="en">singer</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A performer contributing to a resource by using his/her/their voice, with or without instrumental accompaniment, to produce music. A singer's performance may or may not include actual words. [<ref target="http://id.loc.gov/vocabulary/relators/sng.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="std">
+          <gloss versionDate="2025-05-25" xml:lang="en">set designer</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A person who translates the rough sketches of the art director into actual architectural structures for a theatrical presentatio.n, entertainment, motion picture, etc. Set designers draw the detailed guides and specifications for building the set. [<ref target="http://id.loc.gov/vocabulary/relators/std.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="trc">
+          <gloss versionDate="2025-05-25" xml:lang="en">transcriber</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A person, family, or organization contributing to a resource by changing it from one system of notation to another. For a work transcribed for a different instrument or performing group, see arranger [arr]. For makers of pen-facsimiles, use facsimilist. [<ref target="http://id.loc.gov/vocabulary/relators/trc.html">MARC</ref>]</desc>
+        </valItem>
+        <valItem ident="trl">
+          <gloss versionDate="2025-05-25" xml:lang="en">translator</gloss>
+          <desc versionDate="2025-05-25" xml:lang="en">A person or organization who renders a text from one language into another, or from an older form of a language into the modern form. [<ref target="http://id.loc.gov/vocabulary/relators/trl.html">MARC</ref>]</desc>
+        </valItem>
+      </valList>
+    </content>
+  </macroSpec><macroSpec rend="add" ident="data.RELATORS" module="MEI.shared" type="dt">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" versionDate="2025-02-05" xml:lang="en">Datatypes for values to specify roles.</desc>
+    <content xmlns:xi="http://www.w3.org/2001/XInclude">
+      <alternate minOccurs="1" maxOccurs="1"><macroRef key="data.MARCRELATORS.basic"/><macroRef key="data.MARCRELATORS.extended"/><macroRef key="data.NMTOKEN"/></alternate>
     </content>
   </macroSpec><classSpec rend="add" ident="att.accid.log" module="MEI.shared" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Logical domain attributes.</desc>
@@ -11764,6 +12002,19 @@
       <memberOf key="att.timestamp.log"/>
       <memberOf key="att.timestamp2.log"/>
     </classes>
+    <attList xmlns:xi="http://www.w3.org/2001/XInclude">
+      <attDef ident="func" usage="opt">
+        <desc xml:lang="en">Indicates the function intended for this annotation. In particular,
+          to distinguish annotations suitable for display (e.g. via an engraving tool), the value 
+          "display" may be used.</desc>
+        <valList type="semi">
+          <valItem ident="display">
+            <desc xml:lang="en">Indicates that the annotation is suitable for display 
+              (e.g. via an engraving tool)</desc>
+          </valItem>
+        </valList>
+      </attDef>
+    </attList>
   </classSpec><classSpec rend="add" ident="att.artic.log" module="MEI.shared" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Logical domain attributes.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -12344,6 +12595,68 @@
         </datatype>
       </attDef>
     </attList>
+  </classSpec><classSpec rend="add" ident="att.docStatus" module="MEI.shared" type="atts">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" versionDate="2025-11-27" xml:lang="en">Attributes for describing the status of a document.</desc>
+    <attList xmlns:xi="http://www.w3.org/2001/XInclude">
+      <attDef ident="status" usage="opt">
+        <desc versionDate="2025-11-27" xml:lang="en">Used to describe the status of a document (currently or at the time indicated by a date).</desc>
+        <datatype>
+            <rng:data type="NMTOKEN"/>
+        </datatype>
+        <valList type="semi">
+          <valItem ident="draft">
+            <desc>Initial or preliminary version of the document.</desc>
+          </valItem>
+          <valItem ident="in-process">
+            <desc>Document is under development.</desc>
+          </valItem>
+          <valItem ident="candidate">
+            <desc>Content of the document is ready for review.</desc>
+          </valItem>
+          <valItem ident="approved">
+            <desc>Content of the document is reviewed and ready to be published.</desc>
+          </valItem>
+          <valItem ident="published">
+            <desc>Document is published.</desc>
+          </valItem>
+          <valItem ident="withdrawn">
+            <desc>Publication of the document has been reversed.</desc>
+          </valItem>
+          <valItem ident="embargoed">
+            <desc>Document cannot be published (in full or in part) due to an embargo.</desc>
+          </valItem>
+        </valList>
+      </attDef>
+    </attList>
+    <exemplum xmlns:xi="http://www.w3.org/2001/XInclude">
+      <egXML xmlns="http://www.tei-c.org/ns/Examples" xml:space="preserve" valid="true">
+        <revisionDesc>
+          <change isodate="2025-11-27" resp="#DR" status="embargoed">
+            <changeDesc>
+              <p>The rightholder didn't gave publishing permission. This document has embargoed access until 2027-01-01.</p>
+            </changeDesc>
+          </change>
+          <change isodate="2025-10-16" resp="#CG" status="approved">
+            <changeDesc>
+              <p>The document has been proofread. It's ready for publishing</p>
+            </changeDesc>
+          </change>
+          <change isodate="2025-10-05" resp="#DR" status="candidate">
+            <changeDesc>
+              <p>The content of the document is elaborated and the document is now a candidate for publishing. It can be proofread.</p>
+            </changeDesc>
+          </change>
+          <change isodate="2025-10-01" resp="#DR" status="draft">
+            <changeDesc>
+              <p>Creation of the document.</p>
+            </changeDesc>
+          </change>
+        </revisionDesc>
+      </egXML>
+    </exemplum>
+    <remarks xmlns:xi="http://www.w3.org/2001/XInclude">
+      <p>The model of this attribute class is based on the <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.docStatus.html">att.docStatus</ref> class of the Text Encoding Initiative (TEI).</p>
+    </remarks>
   </classSpec><classSpec rend="add" ident="att.mdiv.log" module="MEI.shared" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Logical domain attributes.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -12775,16 +13088,6 @@
       <memberOf key="att.accidental"/>
       <memberOf key="att.pitched"/>
     </classes>
-  </classSpec><classSpec rend="add" ident="att.keyMode" module="MEI.shared" type="atts">
-    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Attributes for describing key mode.</desc>
-    <attList xmlns:xi="http://www.w3.org/2001/XInclude">
-      <attDef ident="mode" usage="opt">
-        <desc xml:lang="en">Indicates major, minor, or other tonality.</desc>
-        <datatype>
-          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.MODE"/>
-        </datatype>
-      </attDef>
-    </attList>
   </classSpec><classSpec rend="add" ident="att.keySig.log" module="MEI.shared" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Logical domain attributes.</desc>
     <attList xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -13340,6 +13643,12 @@
 								<valItem ident="5.1+Neumes">
 									<desc>MEI 5.1+Neumes</desc>
 								</valItem>
+								<valItem ident="6.0-dev">
+									<desc xml:lang="en">MEI 6.0-dev</desc>
+								</valItem>
+								<valItem ident="6.0-dev+basic">
+									<desc>MEI 6.0-dev+basic</desc>
+								</valItem>
 							</valList>
 						</attDef>
 					</attList>
@@ -13526,8 +13835,8 @@
       <attDef ident="role" usage="opt">
         <desc xml:lang="en">Used to specify further information about the entity referenced by this name, for
           example, the occupation of a person or the status of a place.</desc>
-        <datatype>
-          <rng:text/>
+        <datatype minOccurs="1" maxOccurs="unbounded">
+          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.RELATORS"/>
         </datatype>
         <remarks xml:lang="en">
           <p>When applicable, values from the <abbr>MARC</abbr> relator term list (<ref target="http://www.loc.gov/marc/relators/relaterm.html">http://www.loc.gov/marc/relators/relaterm.html</ref>) or code list (<ref target="http://www.loc.gov/marc/relators/relacode.html">http://www.loc.gov/marc/relators/relacode.html</ref>) are recommended for
@@ -14164,6 +14473,27 @@
           </valItem>
           <valItem ident="fine">
             <desc xml:lang="en">Fine. (text)</desc>
+          </valItem>
+          <valItem ident="daCapoAlFine">
+            <desc xml:lang="en">D.C. al Fine. (text)</desc>
+          </valItem>
+          <valItem ident="dalSegnoAlFine">
+            <desc xml:lang="en">D.S. al Fine. (text)</desc>
+          </valItem>
+          <valItem ident="daCapoAlCoda">
+            <desc xml:lang="en">D.C. al Coda. (text)</desc>
+          </valItem>
+          <valItem ident="dalSegnoAlCoda">
+            <desc xml:lang="en">D.S. al Coda. (text)</desc>
+          </valItem>
+          <valItem ident="repeatLeft">
+            <desc xml:lang="en">Left repeat barline as a separate symbol disconnected from staff lines (SMuFL E04C or Unicode 1D106)</desc>
+          </valItem>
+          <valItem ident="repeatRight">
+            <desc xml:lang="en">Right repeat barline as a separate symbol disconnected from staff lines (SMuFL E04D or Unicode 1D107)</desc>
+          </valItem>
+          <valItem ident="repeatRightLeft">
+            <desc xml:lang="en">Right and left repeat barline as a separate symbol disconnected from staff lines (SMuFL E042)</desc>
           </valItem>
         </valList>
       </attDef>
@@ -15226,19 +15556,19 @@
   </classSpec><classSpec rend="add" predeclare="true" ident="model.addressLike" module="MEI.shared" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups elements used to represent a postal address.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="model.textPhraseLike.limited"/>
+      <memberOf key="model.textPhraseLike.basic"/>
       <memberOf key="model.pubStmtPart"/>
       <memberOf key="model.eventPart"/>
     </classes>
   </classSpec><classSpec rend="add" predeclare="true" ident="model.annotLike" module="MEI.shared" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups annotation-like elements.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="model.textPhraseLike.limited"/>
+      <memberOf key="model.textPhraseLike.basic"/>
     </classes>
   </classSpec><classSpec rend="add" predeclare="true" ident="model.biblLike" module="MEI.shared" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups elements containing a bibliographic description.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="model.textPhraseLike.limited"/>
+      <memberOf key="model.textPhraseLike.basic"/>
     </classes>
   </classSpec><classSpec rend="add" predeclare="true" ident="model.biblPart" module="MEI.shared" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups elements that may appear as part of a bibliographic description.</desc>
@@ -15260,7 +15590,7 @@
   </classSpec><classSpec rend="add" predeclare="true" ident="model.dateLike" module="MEI.shared" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups elements containing date expressions.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="model.textPhraseLike.limited"/>
+      <memberOf key="model.textPhraseLike.basic"/>
       <memberOf key="model.pubStmtPart"/>
       <memberOf key="model.eventPart"/>
       <memberOf key="model.titlePagePart"/>
@@ -15280,7 +15610,7 @@
   </classSpec><classSpec rend="add" predeclare="true" ident="model.editorialLike" module="MEI.shared" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups editorial intervention elements.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="model.textPhraseLike.limited"/>
+      <memberOf key="model.textPhraseLike.basic"/>
       <memberOf key="model.choicePart"/>
     </classes>
   </classSpec><classSpec rend="add" predeclare="true" ident="model.endingLike" module="MEI.shared" type="model">
@@ -15300,7 +15630,7 @@
   </classSpec><classSpec rend="add" predeclare="true" ident="model.identifierLike" module="MEI.shared" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups identifier-like elements.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="model.textPhraseLike.limited"/>
+      <memberOf key="model.textPhraseLike.basic"/>
       <memberOf key="model.pubStmtPart"/>
       <memberOf key="model.titlePagePart"/>
     </classes>
@@ -15345,14 +15675,14 @@
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups elements that function like line beginnings.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="model.milestoneLike.text"/>
-      <memberOf key="model.textPhraseLike.limited"/>
+      <memberOf key="model.textPhraseLike.bare"/>
     </classes>
   </classSpec><classSpec rend="add" predeclare="true" ident="model.mdivLike" module="MEI.shared" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups elements used to represent generic structural divisions of music notation.</desc>
   </classSpec><classSpec rend="add" predeclare="true" ident="model.measurementLike" module="MEI.shared" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups elements that represent a measurement.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="model.textPhraseLike.limited"/>
+      <memberOf key="model.textPhraseLike.basic"/>
     </classes>
   </classSpec><classSpec rend="add" predeclare="true" ident="model.meterSigLike" module="MEI.shared" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups elements that represent a meter signature.</desc>
@@ -15406,7 +15736,7 @@
   </classSpec><classSpec rend="add" predeclare="true" ident="model.rendLike" module="MEI.shared" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups elements that mark typographical features.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="model.textPhraseLike.limited"/>
+      <memberOf key="model.textPhraseLike.bare"/>
     </classes>
   </classSpec><classSpec rend="add" predeclare="true" ident="model.repositoryLike" module="MEI.shared" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups elements that denote a corporate entity that holds a bibliographic item.</desc>
@@ -15492,6 +15822,18 @@
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="model.paracontentPart"/>
     </classes>
+  </classSpec><classSpec rend="add" predeclare="true" ident="model.textPhraseLike.bare" module="MEI.shared" type="model">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups rudimentary textual elements that occur at the level of individual words or
+      phrases.</desc>
+    <classes xmlns:xi="http://www.w3.org/2001/XInclude">
+      <memberOf key="model.textPhraseLike.basic"/>
+    </classes>
+  </classSpec><classSpec rend="add" predeclare="true" ident="model.textPhraseLike.basic" module="MEI.shared" type="model">
+    <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups basic textual elements that occur at the level of individual words or
+      phrases.</desc>
+    <classes xmlns:xi="http://www.w3.org/2001/XInclude">
+      <memberOf key="model.textPhraseLike.limited"/>
+    </classes>
   </classSpec><classSpec rend="add" predeclare="true" ident="model.textPhraseLike.limited" module="MEI.shared" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups textual elements that occur at the level of individual words or phrases. This class
       is equivalent to the model.textPhraseLike class without the pb element.</desc>
@@ -15503,7 +15845,7 @@
   </classSpec><classSpec rend="add" predeclare="true" ident="model.titleLike" module="MEI.shared" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups elements that denote the name of a bibliographic item.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="model.textPhraseLike.limited"/>
+      <memberOf key="model.textPhraseLike.basic"/>
       <memberOf key="model.titlePagePart"/>
     </classes>
   </classSpec><classSpec rend="add" predeclare="true" ident="model.titlePagePart" module="MEI.shared" type="model">
@@ -15544,7 +15886,7 @@
       <memberOf key="att.lang"/>
       <memberOf key="model.addressLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
-      <choice xmlns="http://relaxng.org/ns/structure/1.0"><oneOrMore><ref name="addrLine"/></oneOrMore><oneOrMore><choice><ref name="model.addressPart"/></choice></oneOrMore></choice>
+      <choice xmlns="http://relaxng.org/ns/structure/1.0"><oneOrMore><ref name="addrLine"/></oneOrMore><oneOrMore><ref name="model.addressPart"/></oneOrMore></choice>
     </content><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>The model of this element is based on the <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-address.html">address</ref> element of the Text Encoding Initiative (TEI) and the <ref target="https://www.loc.gov/ead/EAD3taglib/EAD3-TL-eng.html#elem-address">address</ref> element of the Encoded
         Archival Description (EAD).</p>
@@ -15593,8 +15935,7 @@
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="model.respLikePart"/><ref name="respStmt"/><ref name="title"/></choice></zeroOrMore>
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="biblScope"/></zeroOrMore>
       <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="identifier"/></optional>
-    </content></elementSpec><elementSpec rend="add" ident="annot" module="MEI.shared"><gloss xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">annotation</gloss><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Provides a statement explaining the text or indicating the basis for an
-      assertion.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
+    </content></elementSpec><elementSpec rend="add" ident="annot" module="MEI.shared"><gloss xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">annotation</gloss><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Associates a statement or other information with a part of the encoding.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="att.audience"/>
       <memberOf key="att.bibl"/>
@@ -15619,29 +15960,14 @@
         </sch:rule>
       </constraint>
     </constraintSpec><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
-      <p>The <gi scheme="MEI">annot</gi> element can be used for both general comments and for
-        annotations of the musical text. It provides a way to group participating *events* and/or
-        *control events*, for example, the notes that form a descending bass line, and provide a
-        label for and comment regarding the group. Participating entities may be identified in the
-        <att>plist</att> attribute. An editorial or analytical comment or observation may be
-        included directly within the <gi scheme="MEI">annot</gi> element. The starting point of the
-        annotation may be indicated by either a <att>tstamp</att>, <att>tstamp.ges</att>,
-        <att>tstamp.real</att> or <att>startid</att> attribute, while the ending point may be
-        recorded by either a <att>dur</att>, <att>dur.ges</att> or <att>endid</att> attribute. The
-        <att>resp</att> attribute records the editor(s) responsible for identifying or creating the
-        annotation.</p>
-    </remarks></elementSpec><elementSpec rend="add" ident="arranger" module="MEI.shared"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">A person or organization who transcribes a musical composition, usually for a different
-      medium from that of the original; in an arrangement the musical substance remains essentially
-      unchanged.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.common"/>
-      <memberOf key="att.bibl"/>
-      <memberOf key="att.evidence"/>
-      <memberOf key="att.facsimile"/>
-      <memberOf key="att.lang"/>
-      <memberOf key="model.respLikePart"/>
-    </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
-      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore>
-    </content></elementSpec><elementSpec rend="add" ident="artic" module="MEI.shared"><gloss xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">articulation</gloss><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">An indication of how to play a note or chord.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
+      <p>The <gi scheme="MEI">annot</gi> element associates elements or regions in an encoding with
+        additional information. Its meaning depends on the context in which it appears. The region
+        of the score to which it applies can be specified in the same way as for *control events*.
+        The <att>resp</att> attribute records the editor(s) responsible for identifying or creating 
+        the annotation. <att>func</att> and <att>type</att> attributes can be used to clarify the
+        nature and interpretation of the annotation.
+      </p>
+    </remarks></elementSpec><elementSpec rend="add" ident="artic" module="MEI.shared"><gloss xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">articulation</gloss><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">An indication of how to play a note or chord.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="att.facsimile"/>
       <memberOf key="att.artic.anl"/>
@@ -15658,19 +15984,6 @@
         the <gi scheme="MEI">note</gi> and <gi scheme="MEI">chord</gi> elements. It may be used when
         specific display info, such as size or color, needs to be recorded for the articulation or
         when multiple articulation marks occur on a single note or chord.</p>
-    </remarks></elementSpec><elementSpec rend="add" ident="author" module="MEI.shared"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">The name of the creator of the intellectual content of a non-musical, literary
-      work.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.common"/>
-      <memberOf key="att.bibl"/>
-      <memberOf key="att.evidence"/>
-      <memberOf key="att.facsimile"/>
-      <memberOf key="att.lang"/>
-      <memberOf key="model.respLikePart"/>
-    </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
-      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore>
-    </content><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
-      <p>The model of this element is based on the <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-author.html">author</ref> element of the Text Encoding Initiative (TEI) and the <ref target="https://www.loc.gov/ead/EAD3taglib/EAD3-TL-eng.html#elem-author">author</ref> element of the Encoded
-        Archival Description (EAD).</p>
     </remarks></elementSpec><elementSpec rend="add" ident="barLine" module="MEI.shared"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Vertical line drawn through one or more staves that divides musical notation into metrical
       units.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
@@ -15736,11 +16049,11 @@
       <memberOf key="model.biblPart"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="from" usage="opt">
+    </content><attList><attDef ident="from" usage="opt">
         <datatype>
           <rng:data type="token"/>
         </datatype>
-      </attDef><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="to" usage="opt">
+      </attDef><attDef ident="to" usage="opt">
         <datatype>
           <rng:data type="token"/>
         </datatype>
@@ -15849,7 +16162,7 @@
       <memberOf key="model.milestoneLike.text"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <empty/>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="n" usage="req">
+    </content><attList><attDef ident="n" usage="req">
         <desc xml:lang="en">Records the column number.</desc>
         <datatype>
           <rng:data type="positiveInteger"/>
@@ -15935,21 +16248,12 @@
       <memberOf key="model.milestoneLike.text"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <empty/>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="cols" usage="req">
+    </content><attList><attDef ident="cols" usage="req">
         <desc xml:lang="en">Records the number of columns.</desc>
         <datatype>
           <rng:data type="positiveInteger"/>
         </datatype>
-      </attDef></attList></elementSpec><elementSpec rend="add" ident="composer" module="MEI.shared"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">The name of the creator of the intellectual content of a musical work.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.common"/>
-      <memberOf key="att.bibl"/>
-      <memberOf key="att.evidence"/>
-      <memberOf key="att.facsimile"/>
-      <memberOf key="att.lang"/>
-      <memberOf key="model.respLikePart"/>
-    </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
-      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore>
-    </content></elementSpec><elementSpec rend="add" ident="contributor" module="MEI.shared"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Names of individuals, institutions, or organizations responsible for contributions to the
+      </attDef></attList></elementSpec><elementSpec rend="add" ident="contributor" module="MEI.shared"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Names of individuals, institutions, or organizations responsible for contributions to the
       intellectual content of a work, where the specialized elements for authors, editors, etc. do
       not suffice or do not apply.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
@@ -15957,26 +16261,11 @@
       <memberOf key="att.evidence"/>
       <memberOf key="att.facsimile"/>
       <memberOf key="att.lang"/>
+      <memberOf key="att.name"/>
       <memberOf key="model.respLikePart"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore>
-    </content><constraintSpec xmlns:xi="http://www.w3.org/2001/XInclude" ident="check_contributor_role" scheme="schematron">
-      <constraint>
-        <sch:rule context="mei:contributor">
-          <sch:assert test="not(matches(normalize-space(lower-case(@role)), '(arranger|author|composer|contributor|editor|funder|librettist|lyricist|sponsor)'))">The value of @role must not contain the name of another element available in this
-            context.</sch:assert>
-        </sch:rule>
-      </constraint>
-    </constraintSpec><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="role" usage="rec">
-        <desc xml:lang="en">Used to specify the contributor’s function.</desc>
-        <datatype>
-          <rng:text/>
-        </datatype>
-        <remarks xml:lang="en">
-          <p>When applicable, values from the <abbr>MARC</abbr> relator term list (<ref target="http://www.loc.gov/marc/relators/relaterm.html">http://www.loc.gov/marc/relators/relaterm.html</ref>) or code list (<ref target="http://www.loc.gov/marc/relators/relacode.html">http://www.loc.gov/marc/relators/relacode.html</ref>) are recommended for
-            <att>role</att>.</p>
-        </remarks>
-      </attDef></attList></elementSpec><elementSpec rend="add" ident="creation" module="MEI.shared"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Non-bibliographic details of the creation of an intellectual entity, in narrative form,
+    </content><attList><attDef ident="nymref" mode="delete"/></attList></elementSpec><elementSpec rend="add" ident="creation" module="MEI.shared"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Non-bibliographic details of the creation of an intellectual entity, in narrative form,
       such as the date, place, and circumstances of its composition. More detailed information may
       be captured within the history element.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
@@ -15987,10 +16276,21 @@
       <memberOf key="model.biblPart"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.headLike"/></zeroOrMore>
-      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="dedication"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore>
+      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore>
     </content><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>The model of this element is based on the <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-creation.html">creation</ref> element of the Text Encoding Initiative (TEI).</p>
-    </remarks></elementSpec><elementSpec rend="add" ident="custos" module="MEI.shared"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Symbol placed at the end of a line of music to indicate the first note of the next line.
+    </remarks></elementSpec><elementSpec rend="add" ident="creator" module="MEI.shared"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Names of individuals, institutions, or organizations responsible for the creation of the
+      intellectual content of a work, e.g., authors, composers, etc. (context based also lyricists and librettist).</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
+      <memberOf key="att.common"/>
+      <memberOf key="att.bibl"/>
+      <memberOf key="att.evidence"/>
+      <memberOf key="att.facsimile"/>
+      <memberOf key="att.lang"/>
+      <memberOf key="att.name"/>
+      <memberOf key="model.respLikePart"/>
+    </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
+      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.nameLike.agent"/><ref name="name"/></choice></zeroOrMore>
+    </content><attList><attDef ident="nymref" mode="delete"/></attList></elementSpec><elementSpec rend="add" ident="custos" module="MEI.shared"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Symbol placed at the end of a line of music to indicate the first note of the next line.
       Sometimes called a "direct".</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="att.facsimile"/>
@@ -16020,22 +16320,7 @@
     </content><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>The model of this element is based on the <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-date.html">date</ref> element of the Text Encoding Initiative (TEI) and the <ref target="https://www.loc.gov/ead/EAD3taglib/EAD3-TL-eng.html#elem-date">date</ref> element of the Encoded
         Archival Description (EAD).</p>
-    </remarks></elementSpec><elementSpec rend="add" ident="dedicatee" module="MEI.shared"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Entity to whom a creative work is formally offered.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.common"/>
-      <memberOf key="att.bibl"/>
-      <memberOf key="att.facsimile"/>
-      <memberOf key="att.lang"/>
-      <memberOf key="model.textPhraseLike.limited"/>
-    </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
-      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore>
-    </content><constraintSpec xmlns:xi="http://www.w3.org/2001/XInclude" ident="check_dedicatee" scheme="schematron">
-      <constraint>
-        <sch:rule context="mei:dedicatee">
-          <sch:assert test="not(ancestor::mei:dedicatee)">The dedicatee element may not be
-            recursively nested.</sch:assert>
-        </sch:rule>
-      </constraint>
-    </constraintSpec></elementSpec><elementSpec rend="add" ident="depth" module="MEI.shared"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Description of a measurement taken through a three-dimensional object.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
+    </remarks></elementSpec><elementSpec rend="add" ident="depth" module="MEI.shared"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Description of a measurement taken through a three-dimensional object.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="att.bibl"/>
       <memberOf key="att.lang"/>
@@ -16063,7 +16348,7 @@
       <memberOf key="model.dimLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="form" usage="req">
+    </content><attList><attDef ident="form" usage="req">
         <desc xml:lang="en">Aspect of the object being measured.</desc>
         <datatype>
           <rng:data type="NMTOKEN"/>
@@ -16119,7 +16404,7 @@
       <memberOf key="att.lang"/>
       <memberOf key="att.measurement"/>
       <memberOf key="model.physDescPart"/>
-      <memberOf key="model.textPhraseLike.limited"/>
+      <memberOf key="model.textPhraseLike.basic"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <ref xmlns="http://relaxng.org/ns/structure/1.0" name="macro.struc-unstrucContent"/>
     </content><constraintSpec xmlns:xi="http://www.w3.org/2001/XInclude" ident="check_dimensions" scheme="schematron">
@@ -16195,7 +16480,7 @@
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="model.headLike"/><ref name="model.milestoneLike.text"/></choice></zeroOrMore>
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="model.divLike"/><ref name="model.figureLike"/><ref name="model.textComponentLike"/><ref name="sp"/></choice><zeroOrMore><ref name="model.milestoneLike.text"/></zeroOrMore></zeroOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="type" usage="opt">
+    </content><attList><attDef ident="type" usage="opt">
         <desc xml:lang="en">Characterizes the textual division in some sense, using any convenient classification
           scheme or typology that employs single-token labels.</desc>
         <datatype>
@@ -16325,7 +16610,7 @@
       <memberOf key="att.lang"/>
       <memberOf key="model.respLikePart"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
-      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore>
+     <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.nameLike.agent"/><ref name="name"/></choice></zeroOrMore>
     </content><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>The model of this element is based on the <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-editor.html">editor</ref> element of the Text Encoding Initiative (TEI).</p>
     </remarks></elementSpec><elementSpec rend="add" ident="ending" module="MEI.shared"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Alternative ending for a repeated passage of music; <abbr>i.e.</abbr>, prima volta, seconda volta,
@@ -16401,7 +16686,7 @@
       <memberOf key="att.lang"/>
       <memberOf key="att.quantity"/>
       <memberOf key="model.physDescPart"/>
-      <memberOf key="model.textPhraseLike.limited"/>
+      <memberOf key="model.textPhraseLike.basic"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore>
     </content><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
@@ -16569,7 +16854,7 @@
             @y attribute pair, @pname attribute, or @loc attribute. </sch:assert>
         </sch:rule>
       </constraint>
-    </constraintSpec><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="form" usage="opt">
+    </constraintSpec><attList><attDef ident="form" usage="opt">
         <desc xml:lang="en">Specifies whether enharmonic (written) values or implicit ("perform-able") values are
           allowed.</desc>
         <valList type="closed">
@@ -16708,25 +16993,7 @@
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="model.lLike"/><ref name="model.lgLike"/></choice></zeroOrMore>
     </content><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>The model of this element is based on the <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lg.html">lg</ref> element of the Text Encoding Initiative (TEI).</p>
-    </remarks></elementSpec><elementSpec rend="add" ident="librettist" module="MEI.shared"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Person or organization who is a writer of the text of an opera, oratorio, etc.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.common"/>
-      <memberOf key="att.bibl"/>
-      <memberOf key="att.evidence"/>
-      <memberOf key="att.facsimile"/>
-      <memberOf key="att.lang"/>
-      <memberOf key="model.respLikePart"/>
-    </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
-      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore>
-    </content></elementSpec><elementSpec rend="add" ident="lyricist" module="MEI.shared"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Person or organization who is a writer of the text of a song.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.common"/>
-      <memberOf key="att.bibl"/>
-      <memberOf key="att.evidence"/>
-      <memberOf key="att.facsimile"/>
-      <memberOf key="att.lang"/>
-      <memberOf key="model.respLikePart"/>
-    </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
-      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore>
-    </content></elementSpec><elementSpec rend="add" ident="mdiv" module="MEI.shared"><gloss xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">musical division</gloss><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Contains a subdivision of the body of a musical text.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
+    </remarks></elementSpec><elementSpec rend="add" ident="mdiv" module="MEI.shared"><gloss xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">musical division</gloss><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Contains a subdivision of the body of a musical text.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="att.facsimile"/>
       <memberOf key="att.metadataPointing"/>
@@ -16753,6 +17020,7 @@
       <memberOf key="att.id"/>
       <memberOf key="att.meiVersion"/>
       <memberOf key="att.responsibility"/>
+      <memberOf key="att.docStatus"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <ref xmlns="http://relaxng.org/ns/structure/1.0" name="meiHead"/>
       <ref xmlns="http://relaxng.org/ns/structure/1.0" name="music"/>
@@ -16777,12 +17045,13 @@
       <memberOf key="att.recordType"/>
       <memberOf key="att.targetEval"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
-      <group xmlns="http://relaxng.org/ns/structure/1.0"><optional><choice><group><choice><ref name="model.respLikePart"/><ref name="respStmt"/></choice><zeroOrMore><choice><ref name="model.respLikePart"/><ref name="respStmt"/></choice></zeroOrMore><oneOrMore><ref name="model.titleLike"/></oneOrMore><zeroOrMore><choice><ref name="editor"/><ref name="model.identifierLike"/><ref name="respStmt"/></choice></zeroOrMore></group><group><oneOrMore><ref name="model.titleLike"/></oneOrMore><zeroOrMore><choice><ref name="model.respLikePart"/><ref name="model.identifierLike"/><ref name="respStmt"/></choice></zeroOrMore></group></choice></optional><zeroOrMore><choice><ref name="model.annotLike"/><ref name="corpName"/></choice></zeroOrMore><zeroOrMore><ref name="model.editionLike"/><zeroOrMore><choice><ref name="model.identifierLike"/><ref name="editor"/><ref name="respStmt"/></choice></zeroOrMore></zeroOrMore><ref name="imprint"/><zeroOrMore><choice><ref name="imprint"/><ref name="extent"/><ref name="biblScope"/></choice></zeroOrMore></group>
+      <group xmlns="http://relaxng.org/ns/structure/1.0"><optional><choice><group><choice><ref name="model.respLikePart"/><ref name="respStmt"/></choice><zeroOrMore><choice><ref name="model.respLikePart"/><ref name="respStmt"/></choice></zeroOrMore><oneOrMore><ref name="model.titleLike"/></oneOrMore><zeroOrMore><choice><ref name="editor"/><ref name="model.identifierLike"/><ref name="respStmt"/></choice></zeroOrMore></group><group><oneOrMore><ref name="model.titleLike"/></oneOrMore><zeroOrMore><choice><ref name="model.respLikePart"/><ref name="model.identifierLike"/></choice></zeroOrMore></group></choice></optional><zeroOrMore><choice><ref name="model.annotLike"/><ref name="corpName"/></choice></zeroOrMore><zeroOrMore><ref name="model.editionLike"/><zeroOrMore><choice><ref name="model.identifierLike"/><ref name="editor"/><ref name="respStmt"/></choice></zeroOrMore></zeroOrMore><ref name="imprint"/><zeroOrMore><choice><ref name="imprint"/><ref name="extent"/></choice></zeroOrMore></group>
     </content></elementSpec><elementSpec rend="add" ident="music" module="MEI.shared"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Contains a single musical text of any kind, whether unitary or composite, for example, an
       etude, opera, song cycle, symphony, or anthology of piano solos.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="att.meiVersion"/>
       <memberOf key="att.metadataPointing"/>
+      <memberOf key="att.docStatus"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.resourceLike"/></zeroOrMore>
       <ref xmlns="http://relaxng.org/ns/structure/1.0" name="macro.musicPart"/>
@@ -16800,6 +17069,7 @@
       <memberOf key="att.responsibility"/>
       <memberOf key="model.eventPart"/>
       <memberOf key="model.nameLike"/>
+      <memberOf key="model.textPhraseLike.basic"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike"/><ref name="model.editLike"/><ref name="model.transcriptionLike"/></choice></zeroOrMore>
     </content><constraintSpec xmlns:xi="http://www.w3.org/2001/XInclude" ident="nameParts" scheme="schematron">
@@ -16809,7 +17079,7 @@
             name.</sch:assert>
         </sch:rule>
       </constraint>
-    </constraintSpec><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="type" usage="opt">
+    </constraintSpec><attList><attDef ident="type" usage="opt">
         <desc xml:lang="en">Characterizes the name in some sense, using any convenient classification scheme or
           typology that employs single-token labels.</desc>
         <datatype>
@@ -16885,7 +17155,7 @@
       <memberOf key="model.numLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike"/><ref name="model.editLike"/><ref name="model.transcriptionLike"/></choice></zeroOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="value" usage="opt">
+    </content><attList><attDef ident="value" usage="opt">
         <desc xml:lang="en">Numeric value capturing a measurement or count. Can only be interpreted in combination
           with the unit attribute.</desc>
         <datatype>
@@ -17127,8 +17397,8 @@
       <memberOf key="att.targetEval"/>
       <memberOf key="model.biblPart"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
-      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="model.biblLike"/></choice></zeroOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="rel" usage="req">
+      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.biblLike"/></zeroOrMore>
+    </content><attList><attDef ident="rel" usage="req">
         <desc xml:lang="en">Describes the relationship between the entity identified by the <gi scheme="MEI">relatedItem</gi> element and the resource described in the parent element, <abbr>i.e.</abbr>, <gi scheme="MEI">bibl</gi>, <gi scheme="MEI">source</gi> or <gi scheme="MEI">relatedItem</gi>.</desc>
         <datatype>
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.MODSRELATIONSHIP"/>
@@ -17162,7 +17432,7 @@
             must be present.</sch:assert>
         </sch:rule>
       </constraint>
-    </constraintSpec><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="rel" usage="req">
+    </constraintSpec><attList><attDef ident="rel" usage="req">
         <desc xml:lang="en">Describes the relationship between the entities identified by the plist and target
           attributes.</desc>
         <datatype>
@@ -17197,7 +17467,7 @@
       <memberOf key="model.rendLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike"/><ref name="model.editLike"/><ref name="model.transcriptionLike"/></choice></zeroOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="rotation" usage="opt">
+    </content><attList><attDef ident="rotation" usage="opt">
         <desc xml:lang="en">A positive value for rotation rotates the text in a counter-clockwise fashion, while
           negative values produce clockwise rotation.</desc>
         <datatype>
@@ -17237,7 +17507,7 @@
         <att>auth</att> attribute.</p>
     </remarks><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>The model of this element is based on the <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-resp.html">resp</ref> element of the Text Encoding Initiative (TEI).</p>
-    </remarks></elementSpec><elementSpec rend="add" ident="respStmt" module="MEI.shared"><gloss xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">responsibility statement</gloss><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Transcription of text that names one or more individuals,
+    </remarks></elementSpec><elementSpec rend="add" ident="respStmt" module="MEI.shared"><gloss xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">responsibility statement</gloss><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Names one or more individuals,
       groups, or in rare cases, mechanical processes, responsible for creation, realization,
       production, funding, or distribution of the intellectual or artistic content.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
@@ -17247,13 +17517,18 @@
       <memberOf key="model.respLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.headLike"/></zeroOrMore>
-      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="name"/><ref name="resp"/><ref name="model.nameLike.agent"/></choice></zeroOrMore>
+      <choice xmlns="http://relaxng.org/ns/structure/1.0"><group><oneOrMore><oneOrMore><ref name="resp"/></oneOrMore><oneOrMore><choice><ref name="model.nameLike.agent"/><ref name="name"/></choice></oneOrMore></oneOrMore></group><group><oneOrMore><oneOrMore><choice><ref name="model.nameLike.agent"/><ref name="name"/></choice></oneOrMore><oneOrMore><ref name="resp"/></oneOrMore></oneOrMore></group><oneOrMore><choice><ref name="model.nameLike.agent"/><ref name="name"/></choice></oneOrMore></choice>
+      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="annot"/></zeroOrMore>
     </content><constraintSpec xmlns:xi="http://www.w3.org/2001/XInclude" ident="check_respStmt" scheme="schematron">
       <constraint>
-        <sch:rule context="mei:respStmt[not(ancestor::mei:change)]">
+        <sch:rule context="mei:respStmt[not(ancestor::mei:change) and not(ancestor::mei:work)]">
           <sch:assert test="(mei:resp and (mei:name or mei:corpName or mei:persName)) or             count(mei:*[@role]) = count(mei:*) and count(mei:*) &gt; 0" role="warning">At least one element pair (a resp element and a name-like element) is
             recommended. Alternatively, each name-like element may have a @role
             attribute.</sch:assert>
+        </sch:rule>
+        <sch:rule context="mei:respStmt[ancestor::mei:work]">
+          <sch:report test="count(mei:*[@role]) &lt; count(mei:*) or count(mei:*) = 0" role="warning">Name-like elements with a @role are recommended here.</sch:report>
+          <sch:report test="mei:resp" role="warning">Name-like elements with a @role are recommended here (instead of resp).</sch:report>
         </sch:rule>
       </constraint>
     </constraintSpec><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
@@ -17268,15 +17543,7 @@
       <memberOf key="model.eventLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="dot"/><ref name="model.appLike"/><ref name="model.editLike"/><ref name="model.transcriptionLike"/></choice></zeroOrMore>
-    </content><constraintSpec xmlns:xi="http://www.w3.org/2001/XInclude" ident="Check_restline" scheme="schematron">
-      <constraint>
-        <sch:rule context="mei:rest[@line]">
-          <sch:let name="thisstaff" value="ancestor::mei:staff/@n"/>
-          <sch:assert test="number(@line) &lt;= number(preceding::mei:staffDef[@n=$thisstaff and @lines][1]/@lines)">The value of @line must be less than or equal to the number of lines on the
-            staff.</sch:assert>
-        </sch:rule>
-      </constraint>
-    </constraintSpec><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
+    </content><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>See (Read, p. 96-102). Do not confuse this element with the <gi scheme="MEI">space</gi>
         element, which is used as an aid for visual alignment.</p>
     </remarks></elementSpec><elementSpec rend="add" ident="role" module="MEI.shared"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Name of a dramatic role, as given in a cast list.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -17339,7 +17606,7 @@
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="pgHead"/></zeroOrMore>
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="pgFoot"/></zeroOrMore>
       <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="instrGrp"/></optional>
-      <choice xmlns="http://relaxng.org/ns/structure/1.0"><optional><ref name="model.staffGrpLike"/></optional></choice>
+      <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.staffGrpLike"/></optional>
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="grpSym"/></zeroOrMore>
       <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="ambitus"/></optional>
     </content></elementSpec><elementSpec rend="add" ident="section" module="MEI.shared"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Segment of music data.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -17422,13 +17689,13 @@
       <memberOf key="model.rendLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="delim" usage="opt">
+    </content><attList><attDef ident="delim" usage="opt">
         <desc xml:lang="en">Indicates the delimiter used to mark the portions of text that are to be
           stacked.</desc>
         <datatype>
           <rng:data type="string"/>
         </datatype>
-      </attDef><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="align" usage="opt">
+      </attDef><attDef ident="align" usage="opt">
         <desc xml:lang="en">Specifies how the stacked text components should be aligned.</desc>
         <valList type="closed">
           <valItem ident="left">
@@ -17629,7 +17896,7 @@
       <memberOf key="att.symbol.ges"/>
       <memberOf key="att.symbol.log"/>
       <memberOf key="att.symbol.vis"/>
-      <memberOf key="model.textPhraseLike.limited"/>
+      <memberOf key="model.textPhraseLike.bare"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <empty/>
     </content><constraintSpec xmlns:xi="http://www.w3.org/2001/XInclude" ident="symbolDef_symbol_attributes_required" scheme="schematron">
@@ -17684,7 +17951,7 @@
       <memberOf key="att.bibl"/>
       <memberOf key="att.dataPointing"/>
       <memberOf key="att.lang"/>
-      <memberOf key="model.textPhraseLike.limited"/>
+      <memberOf key="model.textPhraseLike.basic"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore>
     </content><constraintSpec xmlns:xi="http://www.w3.org/2001/XInclude" ident="Check_term_dataTarget" scheme="schematron">
@@ -17713,13 +17980,13 @@
       <memberOf key="model.biblPart"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike.limited"/></choice></zeroOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="lang.main" usage="opt">
+    </content><attList><attDef ident="lang.main" usage="opt">
         <desc xml:lang="en">(main language) supplies a code which identifies the chief language used in the
           bibliographic work.</desc>
         <datatype>
           <rng:data type="language"/>
         </datatype>
-      </attDef><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="lang.other" usage="opt">
+      </attDef><attDef ident="lang.other" usage="opt">
         <desc xml:lang="en">(other languages) one or more codes identifying any other languages used in the
           bibliographic work.</desc>
         <datatype maxOccurs="unbounded">
@@ -17740,7 +18007,7 @@
       <memberOf key="model.titleLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="macro.titlePart"/><ref name="model.editLike"/><ref name="model.transcriptionLike"/><ref name="titlePart"/></choice></zeroOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="level" usage="opt">
+    </content><attList><attDef ident="level" usage="opt">
         <desc xml:lang="en">Indicates the bibliographic level of the title.</desc>
         <valList type="closed">
           <valItem ident="a">
@@ -17773,7 +18040,7 @@
               press).</desc>
           </valItem>
         </valList>
-      </attDef><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="type" usage="opt">
+      </attDef><attDef ident="type" usage="opt">
         <desc xml:lang="en">Characterizes the title in some sense, using any convenient classification scheme or
           typology that employs single-token labels.</desc>
         <datatype>
@@ -17846,7 +18113,7 @@
       <memberOf key="model.titlePagePart"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="macro.titlePart"/><ref name="model.editLike"/><ref name="model.titleLike"/><ref name="model.transcriptionLike"/></choice></zeroOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="type" usage="opt">
+    </content><attList><attDef ident="type" usage="opt">
         <desc xml:lang="en">Characterizes this title component in some sense, using any convenient classification
           scheme or typology that employs single-token labels.</desc>
         <datatype>
@@ -18051,6 +18318,8 @@
   </classSpec><classSpec rend="add" ident="att.tabDurSym.log" module="MEI.stringtab" type="atts">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Logical domain attributes.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
+      <memberOf key="att.augmentDots"/>
+      <memberOf key="att.duration.log"/>
       <memberOf key="att.layerIdent"/>
       <memberOf key="att.partIdent"/>
     </classes>
@@ -18067,7 +18336,7 @@
       <memberOf key="att.startEndId"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <empty/>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="fret" usage="opt">
+    </content><attList><attDef ident="fret" usage="opt">
         <desc xml:lang="en">This attribute is deprecated in favor of <att>tab.fret</att>, and will be removed in a future version. Records the location at which the strings should be stopped against a fret in a fretboard diagram. This may or may not be the same as the actual location on the fretboard of the instrument in performance.</desc>
         <datatype>
           <rng:data type="positiveInteger">
@@ -18104,10 +18373,11 @@
       <memberOf key="att.tabDurSym.vis"/>
       <memberOf key="att.tabDurSym.ges"/>
       <memberOf key="att.tabDurSym.anl"/>
+      <memberOf key="model.eventLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <empty/>
     </content><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
-      <p>The presence of a <gi scheme="MEI">tabDurSym</gi> indicates that there is a symbol rendered for the parent <gi scheme="MEI">tabGrp</gi>. If no additional attributes like <att>altsym</att>are given, a default symbol conforming to the current notation style or font is to be used. The absence of this elements indicates that the last provided duration symbol equally applies to the current tab group.</p>
+      <p>The presence of a <gi scheme="MEI">tabDurSym</gi> indicates that there is a symbol rendered for the parent <gi scheme="MEI">tabGrp</gi>. If no additional attributes like <att>altsym</att> are given, a default symbol conforming to the current notation style or font is to be used. The absence of this elements indicates that the last provided duration symbol equally applies to the current tab group.</p>
     </remarks></elementSpec><elementSpec rend="add" ident="tabGrp" module="MEI.stringtab"><desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">A group of simultaneous tab notes, comparable to a <gi scheme="MEI">chord</gi> in CMN. Rarely, may also contain rests, as in some "German" lute tablatures.</desc><classes xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="att.facsimile"/>
@@ -18118,8 +18388,17 @@
       <memberOf key="model.eventLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <optional xmlns="http://relaxng.org/ns/structure/1.0"><ref name="tabDurSym"/></optional>
-      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="note"/><ref name="model.transcriptionLike"/><ref name="model.editLike"/><ref name="model.appLike"/><ref name="rest"/></choice></zeroOrMore>
-    </content></elementSpec><classSpec rend="add" predeclare="true" ident="model.backLike" module="MEI.text" type="model">
+      <rng:interleave>
+        <choice xmlns="http://relaxng.org/ns/structure/1.0"><zeroOrMore><ref name="note"/></zeroOrMore><optional><ref name="rest"/></optional></choice>
+        <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="model.transcriptionLike"/><ref name="model.editLike"/><ref name="model.appLike"/></choice></zeroOrMore>
+      </rng:interleave>
+    </content><constraintSpec xmlns:xi="http://www.w3.org/2001/XInclude" ident="check_tabGrp_in_beam" scheme="schematron">
+      <constraint>
+        <sch:rule context="mei:tabGrp[ancestor::mei:beam]">
+          <sch:assert test="count(mei:tabDurSym) = 1" role="warning">A tabGrp inside of a beam must contain one tabDurSym.</sch:assert>
+        </sch:rule>
+      </constraint>
+    </constraintSpec></elementSpec><classSpec rend="add" predeclare="true" ident="model.backLike" module="MEI.text" type="model">
     <desc xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Groups elements that may contain back matter.</desc>
     <classes xmlns:xi="http://www.w3.org/2001/XInclude">
       
@@ -18219,8 +18498,8 @@
       <memberOf key="att.lang"/>
       <memberOf key="model.lLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
-      <choice xmlns="http://relaxng.org/ns/structure/1.0"><zeroOrMore><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.editLike"/><ref name="model.sylLike"/><ref name="model.textPhraseLike"/><ref name="model.transcriptionLike"/></choice></zeroOrMore></choice>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="rhythm" usage="opt">
+        <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.editLike"/><ref name="model.sylLike"/><ref name="model.textPhraseLike"/><ref name="model.transcriptionLike"/></choice></zeroOrMore>
+    </content><attList><attDef ident="rhythm" usage="opt">
         <desc xml:lang="en">Used to specify a rhythm for the lyric syllables that differs from that of the notes
           on the staff, <abbr>e.g.</abbr>, '4,4,4,4' when the rhythm of the notes is '4.,8,4.,8'.</desc>
         <datatype>
@@ -18261,7 +18540,7 @@
             must be immediately preceded by a label.</sch:assert>
         </sch:rule>
       </constraint>
-    </constraintSpec><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="form" usage="opt">
+    </constraintSpec><attList><attDef ident="form" usage="opt">
         <desc xml:lang="en">Used to indicate the format of a list. In a <val>simple</val> list, <gi scheme="MEI">li</gi>
           elements are not numbered or bulleted. In a <val>marked</val> list, the sequence of the list items
           is not critical, and a bullet, box, dash, or other character is displayed at the start of
@@ -18279,7 +18558,7 @@
             <desc xml:lang="en">Each item is numbered or lettered.</desc>
           </valItem>
         </valList>
-      </attDef><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="type" usage="opt">
+      </attDef><attDef ident="type" usage="opt">
         <desc xml:lang="en">Captures the nature of the content of a list.</desc>
         <datatype>
           <rng:data type="NMTOKENS"/>
@@ -18326,7 +18605,7 @@
       <memberOf key="model.qLike"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textPhraseLike"/></choice></zeroOrMore>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="type" usage="opt">
+    </content><attList><attDef ident="type" usage="opt">
         <datatype maxOccurs="unbounded">
           <rng:data type="NMTOKEN"/>
         </datatype>
@@ -18384,7 +18663,7 @@
       <memberOf key="att.common"/>
       <memberOf key="att.facsimile"/>
       <memberOf key="att.lang"/>
-      <memberOf key="model.textPhraseLike.limited"/>
+      <memberOf key="model.textPhraseLike.bare"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.editLike"/><ref name="model.sylLike"/><ref name="model.textPhraseLike"/><ref name="model.transcriptionLike"/></choice></zeroOrMore>
     </content><remarks xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
@@ -18588,7 +18867,7 @@
       <memberOf key="att.responsibility"/>
     </classes><content xmlns:xi="http://www.w3.org/2001/XInclude">
       <rng:text/>
-    </content><attList><attDef xmlns:xi="http://www.w3.org/2001/XInclude" ident="type" usage="req">
+    </content><attList><attDef ident="type" usage="req">
         <desc xml:lang="en">Characterizes the property name.</desc>
         <valList type="closed">
           <valItem ident="unicode">
@@ -19120,7 +19399,6 @@
       <memberOf key="att.altSym"/>
       <memberOf key="att.color"/>
       <memberOf key="att.extender"/>
-      <memberOf key="att.placementRelStaff"/>
       <memberOf key="att.visualOffset"/>
       <memberOf key="att.xy"/>
     </classes>
@@ -20456,12 +20734,6 @@
       </attDef>
       <attDef ident="bracket.visible" usage="opt">
         <desc xml:lang="en">States whether a bracket should be rendered with a tuplet.</desc>
-        <datatype>
-          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.BOOLEAN"/>
-        </datatype>
-      </attDef>
-      <attDef ident="dur.visible" usage="opt">
-        <desc xml:lang="en">Determines if the tuplet duration is visible.</desc>
         <datatype>
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.BOOLEAN"/>
         </datatype>

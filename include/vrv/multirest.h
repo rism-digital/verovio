@@ -44,6 +44,14 @@ public:
     ///@}
 
     /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
+    const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
+    ///@}
+
+    /**
      * True if block style rendering applies
      */
     bool UseBlockStyle(const Doc *doc) const;

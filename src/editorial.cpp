@@ -65,7 +65,8 @@ EditorialElement::~EditorialElement() {}
 
 bool EditorialElement::IsSupportedChild(ClassId classId)
 {
-    static const std::vector<ClassId> supported{ LAYER, MEASURE, SCOREDEF, STAFF, STAFFDEF, STAFFGRP };
+    static const std::vector<ClassId> supported{ LAYER, MEASURE, SCOREDEF, STAFF, STAFFDEF, STAFFGRP,
+        FACTORY_STAGEDIR };
 
     if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
         return true;

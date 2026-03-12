@@ -137,6 +137,12 @@
 								<valItem ident="5.1+Neumes">
 									<desc>MEI 5.1+Neumes</desc>
 								</valItem>
+								<valItem ident="6.0-dev">
+									<desc xml:lang="en">MEI 6.0-dev</desc>
+								</valItem>
+								<valItem ident="6.0-dev+basic">
+									<desc>MEI 6.0-dev+basic</desc>
+								</valItem>
 							</valList>
 						</attDef>
 					</attList>

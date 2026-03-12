@@ -63,6 +63,13 @@ void BeamSpan::Reset()
     this->ClearBeamSegments();
 }
 
+void BeamSpan::CloneReset()
+{
+    m_beamSegments.clear();
+
+    ControlElement::CloneReset();
+}
+
 void BeamSpan::InitBeamSegments()
 {
     // BeamSpan should have at least one segment to begin with
