@@ -47,6 +47,9 @@ const std::map<int, std::string> Option::s_header
 const std::map<int, std::string> Option::s_ligatureOblique
     = { { LIGATURE_OBL_auto, "auto" }, { LIGATURE_OBL_straight, "straight" }, { LIGATURE_OBL_curved, "curved" } };
 
+const std::map<int, std::string> Option::s_mensuralResponsiveness
+    = { { MENSURAL_RESP_none, "none" }, { MENSURAL_RESP_auto, "auto" }, { MENSURAL_RESP_selection, "selection" } };
+
 const std::map<int, std::string> Option::s_multiRestStyle = { { MULTIRESTSTYLE_auto, "auto" },
     { MULTIRESTSTYLE_default, "default" }, { MULTIRESTSTYLE_block, "block" }, { MULTIRESTSTYLE_symbols, "symbols" } };
 
@@ -1438,7 +1441,7 @@ Options::Options()
     this->Register(&m_octaveNoSpanningParentheses, "octaveNoSpanningParentheses", &m_generalLayout);
 
     m_ossiaStaffSize.SetInfo("Ossia staff size", "The ossia staff size in relation to the staff size");
-    m_ossiaStaffSize.Init(0.5, 0.75, 1.00);
+    m_ossiaStaffSize.Init(0.75, 0.5, 1.00);
     this->Register(&m_ossiaStaffSize, "ossiaStaffSize", &m_generalLayout);
 
     m_pedalLineThickness.SetInfo("Pedal line thickness", "The thickness of the line used for piano pedaling");
@@ -1851,6 +1854,10 @@ Options::Options()
     m_midiTempoAdjustment.Init(1.0, 0.2, 4.0);
     this->Register(&m_midiTempoAdjustment, "midiTempoAdjustment", &m_midi);
 
+    m_midiTuningFile.SetInfo("MIDI tuning", "A custom tuning definition or filepath to apply to the MIDI output");
+    m_midiTuningFile.Init("");
+    this->Register(&m_midiTuningFile, "tuningFile", &m_midi);
+
     /********* Mensural *********/
 
     m_mensural.SetLabel("Mensural notation options", "6-mensural");
@@ -1869,9 +1876,9 @@ Options::Options()
     m_ligatureOblique.Init(LIGATURE_OBL_auto, &Option::s_ligatureOblique);
     this->Register(&m_ligatureOblique, "ligatureOblique", &m_mensural);
 
-    m_mensuralResponsiveView.SetInfo(
-        "Mensural reduced view", "Convert mensural content to a more responsive view reduced to the seleceted markup");
-    m_mensuralResponsiveView.Init(false);
+    m_mensuralResponsiveView.SetInfo("Mensural responsive view",
+        "Make mensural content responsive (selection discards ligatures and editorial markup)");
+    m_mensuralResponsiveView.Init(MENSURAL_RESP_auto, &Option::s_mensuralResponsiveness);
     this->Register(&m_mensuralResponsiveView, "mensuralResponsiveView", &m_mensural);
 
     m_mensuralToCmn.SetInfo("Mensural to CMN", "Convert mensural sections to CMN measure-based MEI");

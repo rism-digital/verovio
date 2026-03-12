@@ -48,6 +48,11 @@ public:
     ///@}
 
     /**
+     * Overriding CloneReset() method to be called after copy / assignment calls.
+     */
+    void CloneReset() override;
+
+    /**
      * @name Getter to interfaces
      */
     ///@{

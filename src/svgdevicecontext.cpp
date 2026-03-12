@@ -492,6 +492,7 @@ void SvgDeviceContext::StartPage()
         // bounding box css - for debugging
         // css += " g.bounding-box{stroke:red; stroke-width:10} "
         //        "g.content-bounding-box{stroke:blue; stroke-width:10}";
+        this->PrefixCssRules(css);
         m_currentNode.text().set(css);
         m_currentNode = m_svgNodeStack.back();
     }

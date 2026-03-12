@@ -174,6 +174,12 @@ public:
     std::string LinewidthtermToStr(data_LINEWIDTHTERM data) const;
     data_LINEWIDTHTERM StrToLinewidthterm(const std::string &value, bool logWarning = true) const;
 
+    std::string MarcrelatorsBasicToStr(data_MARCRELATORS_basic data) const;
+    data_MARCRELATORS_basic StrToMarcrelatorsBasic(const std::string &value, bool logWarning = true) const;
+
+    std::string MarcrelatorsExtendedToStr(data_MARCRELATORS_extended data) const;
+    data_MARCRELATORS_extended StrToMarcrelatorsExtended(const std::string &value, bool logWarning = true) const;
+
     std::string MelodicfunctionToStr(data_MELODICFUNCTION data) const;
     data_MELODICFUNCTION StrToMelodicfunction(const std::string &value, bool logWarning = true) const;
 
@@ -230,6 +236,9 @@ public:
 
     std::string RelationshipToStr(data_RELATIONSHIP data) const;
     data_RELATIONSHIP StrToRelationship(const std::string &value, bool logWarning = true) const;
+
+    std::string RelatorsToStr(data_RELATORS data) const;
+    data_RELATORS StrToRelators(const std::string &value, bool logWarning = true) const;
 
     std::string RotationToStr(data_ROTATION data) const;
     data_ROTATION StrToRotation(const std::string &value, bool logWarning = true) const;
@@ -294,6 +303,9 @@ public:
     std::string AnchoredTextLogFuncToStr(anchoredTextLog_FUNC data) const;
     anchoredTextLog_FUNC StrToAnchoredTextLogFunc(const std::string &value, bool logWarning = true) const;
 
+    std::string AnnotLogFuncToStr(annotLog_FUNC data) const;
+    annotLog_FUNC StrToAnnotLogFunc(const std::string &value, bool logWarning = true) const;
+
     std::string ArpegLogOrderToStr(arpegLog_ORDER data) const;
     arpegLog_ORDER StrToArpegLogOrder(const std::string &value, bool logWarning = true) const;
 
@@ -323,6 +335,9 @@ public:
 
     std::string DivLineLogFormToStr(divLineLog_FORM data) const;
     divLineLog_FORM StrToDivLineLogForm(const std::string &value, bool logWarning = true) const;
+
+    std::string DocStatusStatusToStr(docStatus_STATUS data) const;
+    docStatus_STATUS StrToDocStatusStatus(const std::string &value, bool logWarning = true) const;
 
     std::string DotLogFormToStr(dotLog_FORM data) const;
     dotLog_FORM StrToDotLogForm(const std::string &value, bool logWarning = true) const;

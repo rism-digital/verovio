@@ -339,6 +339,8 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     Ligature *ligature = vrv_cast<Ligature *>(note->GetFirstAncestor(LIGATURE));
     assert(ligature);
 
+    if (ligature->m_drawingShapes.size() < 2) return;
+
     Note *prevNote = dynamic_cast<Note *>(ligature->GetListPrevious(note));
     Note *nextNote = dynamic_cast<Note *>(ligature->GetListNext(note));
 

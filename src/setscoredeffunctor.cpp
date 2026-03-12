@@ -29,22 +29,40 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 ReplaceDrawingValuesInStaffDefFunctor::ReplaceDrawingValuesInStaffDefFunctor(const Clef *clef, const KeySig *keySig,
-    const Mensur *mensur, const MeterSig *meterSig, const MeterSigGrp *meterSigGrp)
+    const Mensur *mensur, const MeterSig *meterSig, const MeterSigGrp *meterSigGrp, const ScoreDef *newScoreDef,
+    int &redrawFlags)
     : Functor()
 {
+    assert(newScoreDef);
+
     m_clef = clef;
     m_keySig = keySig;
     m_mensur = mensur;
     m_meterSig = meterSig;
     m_meterSigGrp = meterSigGrp;
+    m_newScoreDef = newScoreDef;
+    m_redrawFlags = &redrawFlags;
 }
 
 FunctorCode ReplaceDrawingValuesInStaffDefFunctor::VisitStaffDef(StaffDef *staffDef)
 {
+    // Look at the values in the staffDef or the new ScoreDef
+    // We take into account only the keySig (see below)
+    const StaffDef *newStaffDef = m_newScoreDef->GetStaffDef(staffDef->GetN());
+
     if (m_clef) {
         staffDef->SetCurrentClef(m_clef);
     }
-    if (m_keySig) {
+    // Look at staffDef only for keySig
+    if (newStaffDef && newStaffDef->HasKeySigInfo()) {
+        const KeySig *keySig = newStaffDef->GetKeySig();
+        assert(keySig);
+        if (!keySig->HasCancelaccid() || (keySig->GetCancelaccid() != CANCELACCID_none)) {
+            staffDef->SetCurrentKeySig(newStaffDef->GetKeySig());
+            (*m_redrawFlags) |= StaffDefRedrawFlags::REDRAW_KEYSIG;
+        }
+    }
+    else if (m_keySig) {
         staffDef->SetCurrentKeySig(m_keySig);
     }
     if (m_mensur) {

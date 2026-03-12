@@ -222,13 +222,21 @@ const Chord *Note::IsChordTone() const
 
 data_DURATION Note::GetDrawingDur() const
 {
-    const Chord *chordParent = vrv_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
-    if (chordParent && !this->HasDur()) {
-        return chordParent->GetActualDur();
+    const Staff *staff = this->GetAncestorStaff();
+    if (staff->IsTabStaffLike()) {
+        const TabGrp *tabGrpParent = vrv_cast<const TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
+        if (tabGrpParent && !this->HasDur()) {
+            return tabGrpParent->GetActualDur();
+        }
     }
     else {
-        return this->GetActualDur();
+        const Chord *chordParent = vrv_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+        if (chordParent && !this->HasDur()) {
+            return chordParent->GetActualDur();
+        }
     }
+
+    return this->GetActualDur();
 }
 
 bool Note::IsNoteGroupExtreme() const
@@ -556,7 +564,7 @@ int Note::CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir
         return 0;
     }
 
-    int baseStem = (staff->IsTablature()) ? STANDARD_STEMLENGTH_TAB : STANDARD_STEMLENGTH;
+    int baseStem = (staff->IsTablature() || staff->IsTabStaffLike()) ? STANDARD_STEMLENGTH_TAB : STANDARD_STEMLENGTH;
     baseStem *= 3;
 
     int shortening = 0;
@@ -703,11 +711,20 @@ char32_t Note::GetNoteheadGlyph(const data_DURATION duration) const
         default: break;
     }
 
+    // tab.staff-like uses solid note heads, unless overridden by @head.fill,
+    // regardless of the note's duration
+    if (!this->HasHeadFill()) {
+        const Staff *staff = this->GetAncestorStaff();
+        if (staff->IsTabStaffLike()) {
+            return SMUFL_E0A4_noteheadBlack;
+        }
+    }
+
     if (DURATION_breve == duration) return SMUFL_E0A1_noteheadDoubleWholeSquare;
     // We support solid on whole and half notes or void on quarter and shorter notes
     if (DURATION_1 == duration)
         return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0FA_noteheadWholeFilled : SMUFL_E0A2_noteheadWhole;
-    ;
+
     if (DURATION_2 == duration) {
         return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0FB_noteheadHalfFilled : SMUFL_E0A3_noteheadHalf;
     }
@@ -874,10 +891,10 @@ void Note::UpdateFromTransPitch(const TransPitch &tp, bool hasKeySig)
     }
 
     if (transposeGesturalAccid) {
-        accid->SetAccidGes(tp.GetAccidG());
+        accid->SetAccidGes(tp.GetAccidGes());
     }
     if (transposeWrittenAccid) {
-        accid->SetAccid(tp.GetAccidW());
+        accid->SetAccid(tp.GetAccidWritten());
     }
 
     if (this->GetOct() != tp.m_oct) {

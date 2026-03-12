@@ -101,7 +101,7 @@ if __name__ == '__main__':
             meta = original_xml.findtext(
                 ".//mei:meiHead/mei:extMeta", namespaces=ns)
             if meta is not None and meta != '':
-                print(meta)
+                # print(meta)
                 metaOptions = json.loads(meta)
                 options |= metaOptions
 

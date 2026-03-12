@@ -385,7 +385,6 @@ void ExpansionMap::GenerateExpansionFor(Score *score)
     ListOfObjects children(childrenArray.begin(), childrenArray.end());
 
     Expansion *expansion = new Expansion();
-    section->InsertChild(expansion, 0);
 
     ListOfObjects::iterator first = children.begin();
     ListOfObjects::iterator last = children.begin();
@@ -413,6 +412,13 @@ void ExpansionMap::GenerateExpansionFor(Score *score)
                 expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
             }
         }
+    }
+
+    if (expansion->GetPlist().empty()) {
+        delete expansion;
+    }
+    else {
+        section->InsertChild(expansion, 0);
     }
 }
 

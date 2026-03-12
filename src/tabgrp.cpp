@@ -17,6 +17,7 @@
 #include "functor.h"
 #include "note.h"
 #include "rest.h"
+#include "staff.h"
 #include "tabdursym.h"
 
 namespace vrv {
@@ -73,7 +74,14 @@ void TabGrp::FilterList(ListOfConstObjects &childList) const
         }
     }
 
-    childList.sort(TabCourseSort());
+    const Staff *staff = this->GetAncestorStaff();
+    assert(staff);
+    if (staff->IsTabStaffLike()) {
+        childList.sort(DiatonicSort());
+    }
+    else {
+        childList.sort(TabCourseSort());
+    }
 }
 
 int TabGrp::GetYTop() const

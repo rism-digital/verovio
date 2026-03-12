@@ -106,6 +106,7 @@ if ($wasmQ) {
 	#$FLAGS .= " -mnontrapping-fptoint";
 
 	$FLAGS .= " -s STRICT=1";
+	$FLAGS .= " -fwasm-exceptions";
 	# Linker flags
 	$LFLAGS = " -s WASM=1";
 	$LFLAGS .= " -s INITIAL_MEMORY=128MB";
@@ -113,6 +114,7 @@ if ($wasmQ) {
 	$LFLAGS .= " -s ALLOW_MEMORY_GROWTH";
 	$LFLAGS .= " -s SINGLE_FILE=1";
 	$LFLAGS .= " -s INCOMING_MODULE_JS_API=onRuntimeInitialized";
+	$LFLAGS .= " -fwasm-exceptions";
 	if ($debug) {
 		$LFLAGS .= " --emit-symbol-map -sASSERTIONS";
 	}

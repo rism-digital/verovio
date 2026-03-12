@@ -233,6 +233,64 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AttKeySigAnl
+//----------------------------------------------------------------------------
+
+class AttKeySigAnl : public Att {
+protected:
+    AttKeySigAnl();
+    ~AttKeySigAnl() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetKeySigAnl();
+
+    /** Read the values for the attribute class **/
+    bool ReadKeySigAnl(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteKeySigAnl(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetAccid(data_ACCIDENTAL_GESTURAL_basic accid_) { m_accid = accid_; }
+    data_ACCIDENTAL_GESTURAL_basic GetAccid() const { return m_accid; }
+    bool HasAccid() const;
+    //
+    void SetMode(data_MODE mode_) { m_mode = mode_; }
+    data_MODE GetMode() const { return m_mode; }
+    bool HasMode() const;
+    ///@}
+
+private:
+    /**
+     * Contains an accidental for the tonic key, if one is required, e.g., if pname
+     * equals c and accid equals s, then a tonic of C# is indicated.
+     **/
+    data_ACCIDENTAL_GESTURAL_basic m_accid;
+    /** Indicates major, minor, or other tonality. **/
+    data_MODE m_mode;
+};
+
+//----------------------------------------------------------------------------
+// InstKeySigAnl
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttKeySigAnl
+ */
+
+class InstKeySigAnl : public AttKeySigAnl {
+public:
+    InstKeySigAnl() = default;
+    virtual ~InstKeySigAnl() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttKeySigDefaultAnl
 //----------------------------------------------------------------------------
 
@@ -257,8 +315,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetKeyAccid(data_ACCIDENTAL_GESTURAL keyAccid_) { m_keyAccid = keyAccid_; }
-    data_ACCIDENTAL_GESTURAL GetKeyAccid() const { return m_keyAccid; }
+    void SetKeyAccid(data_ACCIDENTAL_GESTURAL_basic keyAccid_) { m_keyAccid = keyAccid_; }
+    data_ACCIDENTAL_GESTURAL_basic GetKeyAccid() const { return m_keyAccid; }
     bool HasKeyAccid() const;
     //
     void SetKeyMode(data_MODE keyMode_) { m_keyMode = keyMode_; }
@@ -275,7 +333,7 @@ private:
      * Contains an accidental for the tonic key, if one is required, e.g., if key.pname
      * equals c and key.accid equals s, then a tonic of C# is indicated.
      **/
-    data_ACCIDENTAL_GESTURAL m_keyAccid;
+    data_ACCIDENTAL_GESTURAL_basic m_keyAccid;
     /** Indicates major, minor, or other tonality. **/
     data_MODE m_keyMode;
     /** Holds the pitch name of the tonic key, e.g., c for the key of C. **/

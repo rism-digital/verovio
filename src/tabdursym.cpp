@@ -126,8 +126,8 @@ int TabDurSym::CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION st
 
     // Shorter for german lute tablature to match ryhthm glyphs
     if (staff->IsTabLuteGerman()) baseStem -= 3;
-    // One unit longer for guitar tablature
-    else if (staff->IsTabGuitar())
+    // One unit longer for guitar or staff-like tablature
+    else if (staff->IsTabGuitar() || staff->IsTabStaffLike())
         baseStem += 3;
 
     // One unit longer for stems inside the staff

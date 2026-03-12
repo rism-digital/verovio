@@ -2,6 +2,25 @@
 
 ## [unreleased]
 
+## [6.1.1] – 2026-03-12
+* Fix cocoapods headers
+
+## [6.1.0] – 2026-03-12
+* Update MEI schema to 6.0-dev (6da4dd5071303ac53d73d7b5ea0399f9cfe7bdba)
+* Support for `stageDir`
+* Support for ASCL custom tuning (MusicXML import and MIDI output)
+* Support (initial) for `notationtype@tab.staff-like`
+* Improved key signature changes in sections with restart
+* Improved MusicXML importer (`@vgrp`, `fingering`, `symbol`)
+* Improve mixed beams with stems up and down
+* Option `--mensural-responsive-view` multi-valued ("auto|none|selection")
+* Fix bugs in the CMME importer
+* Fix `--remove-ids` option invaliding expansions
+
+## [6.0.1] – 2026-01-29
+* Fix ossia staff size option values
+* Revert default css scoping removal
+
 ## [6.0.0] – 2026-01-28
 * Support for ossia staves
 * Support for expansion generation in MusicXML importer

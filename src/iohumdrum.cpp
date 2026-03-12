@@ -9527,10 +9527,10 @@ void HumdrumInput::setKeySig(
             case 'b': vrvkeysig->SetPname(PITCHNAME_b); break;
         }
         if (accidental == "-") {
-            vrvkeysig->SetAccid(ACCIDENTAL_WRITTEN_f);
+            vrvkeysig->SetAccid(ACCIDENTAL_GESTURAL_basic_f);
         }
         else if (accidental == "#") {
-            vrvkeysig->SetAccid(ACCIDENTAL_WRITTEN_s);
+            vrvkeysig->SetAccid(ACCIDENTAL_GESTURAL_basic_s);
         }
     }
 }
