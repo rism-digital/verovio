@@ -18,21 +18,16 @@
 #include "vrvdef.h"
 
 namespace vrv {
-    class Layer;
-    class Syllable;
+class Layer;
+class Syllable;
 
 //----------------------------------------------------------------------------
 // GABCInput
 //----------------------------------------------------------------------------
 
-enum Prefixes {
-    NO_SPACE,
-    REMOVE_FIRST_STEM,
-    NEUMATIC_CUT,
-    OBLIQUE_LIGATURE
-};
+enum Prefixes { NO_SPACE, REMOVE_FIRST_STEM, NEUMATIC_CUT, OBLIQUE_LIGATURE };
 
-//TODO Comentarios estilo Verovio
+// TODO Comentarios estilo Verovio
 class GABCInput : public Input {
 public:
     // constructors and destructors
@@ -48,27 +43,26 @@ private:
     // By default, if clef not present, we use G2 as reference
     int currentClefPitchOffset;
 
-    Layer* layer;
+    Layer *layer;
 
     void addAccidental(Syllable *syllable, data_ACCIDENTAL_WRITTEN accid, data_PITCHNAME pname, data_OCTAVE oct);
-    void addEpisema(Nc *nc, const std::string form);    
+    void addEpisema(Nc *nc, const std::string form);
     void addLiquescent(Nc *nc, curvatureDirection_CURVE curve);
 
     // It returns a prefix and advances the index or NONE if not found.
-    std::optional<Prefixes> findPrefix(const std::string& music, int& currentIndex);
+    std::optional<Prefixes> findPrefix(const std::string &music, int &currentIndex);
 
     // It returns the number of processed chars
-    int processBarline(const std::string& music, int currentIndex, Layer* layer);
+    int processBarline(const std::string &music, int currentIndex, Layer *layer);
     // It returns true if processed
-    bool processClef(const std::string& word);
-    void processInput(const std::string& gabc);
+    bool processClef(const std::string &word);
+    void processInput(const std::string &gabc);
     // It returns the number of processed chars
-    int processCustos(const std::string& word);
-    void processNeume(const std::string& music, Syllable* syllable);
-    void processWord(const std::string& lyrics, const std::string& music, sylLog_WORDPOS wordpos, sylLog_CON con);
-        // it returns the consumed characters, 0 if it's not a suffix
-    int processSuffix(const std::string& music, int currentIndex, Nc* nc, Nc* previousNC);
-
+    int processCustos(const std::string &word);
+    void processNeume(const std::string &music, Syllable *syllable);
+    void processWord(const std::string &lyrics, const std::string &music, sylLog_WORDPOS wordpos, sylLog_CON con);
+    // it returns the consumed characters, 0 if it's not a suffix
+    int processSuffix(const std::string &music, int currentIndex, Nc *nc, Nc *previousNC);
 
 public:
 };
