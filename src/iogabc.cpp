@@ -93,14 +93,9 @@ using ClefPitchOffsetType = std::tuple<data_CLEFSHAPE, int, int>;
 //   c2: a..m = e3 f3 g3 a3 b3 c4 d4 e4 f4 g4 a4 b4 c5
 // Other clefs are expressed as diatonic offsets from that c2 mapping.
 static const std::map<std::string, ClefPitchOffsetType> GABC_CLEFS{
-    { "c1", { CLEFSHAPE_C, 1, 2 } },
-    { "c2", { CLEFSHAPE_C, 2, 0 } },
-    { "c3", { CLEFSHAPE_C, 3, -2 } },
-    { "c4", { CLEFSHAPE_C, 4, -4 } },
-    { "f2", { CLEFSHAPE_F, 2, -4 } },
-    { "f3", { CLEFSHAPE_F, 3, -6 } },
-    { "f4", { CLEFSHAPE_F, 4, -8 } },
-    { "cb3", { CLEFSHAPE_C, 3, -2 } }, // TODO add the flat sign itself
+    { "c1", { CLEFSHAPE_C, 1, 2 } }, { "c2", { CLEFSHAPE_C, 2, 0 } }, { "c3", { CLEFSHAPE_C, 3, -2 } },
+    { "c4", { CLEFSHAPE_C, 4, -4 } }, { "f2", { CLEFSHAPE_F, 2, -4 } }, { "f3", { CLEFSHAPE_F, 3, -6 } },
+    { "f4", { CLEFSHAPE_F, 4, -8 } }, { "cb3", { CLEFSHAPE_C, 3, -2 } }, // TODO add the flat sign itself
 };
 
 bool GABCInput::processClef(const std::string &word)
