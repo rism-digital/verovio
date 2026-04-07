@@ -19,6 +19,7 @@
 
 namespace vrv {
     class Layer;
+    class Syllable;
 
 //----------------------------------------------------------------------------
 // GABCInput
@@ -27,7 +28,8 @@ namespace vrv {
 enum Prefixes {
     NO_SPACE,
     REMOVE_FIRST_STEM,
-    NEUMATIC_CUT
+    NEUMATIC_CUT,
+    OBLIQUE_LIGATURE
 };
 
 //TODO Comentarios estilo Verovio
@@ -48,7 +50,7 @@ private:
 
     Layer* layer;
 
-    void addAccidental(Nc *nc, data_ACCIDENTAL_WRITTEN accid);
+    void addAccidental(Syllable *syllable, data_ACCIDENTAL_WRITTEN accid, data_PITCHNAME pname, data_OCTAVE oct);
     void addEpisema(Nc *nc, const std::string form);    
     void addLiquescent(Nc *nc, curvatureDirection_CURVE curve);
 
@@ -62,8 +64,8 @@ private:
     void processInput(const std::string& gabc);
     // It returns the number of processed chars
     int processCustos(const std::string& word);
-    Neume* processNeume(const std::string& music);
-    void processWord(const std::string& lyrics, const std::string& music);
+    void processNeume(const std::string& music, Syllable* syllable);
+    void processWord(const std::string& lyrics, const std::string& music, sylLog_WORDPOS wordpos, sylLog_CON con);
         // it returns the consumed characters, 0 if it's not a suffix
     int processSuffix(const std::string& music, int currentIndex, Nc* nc, Nc* previousNC);
 

@@ -15,7 +15,7 @@
         <glyph glyph-code="E003" smufl-name="bracketTop" />
         <glyph glyph-code="E004" smufl-name="bracketBottom" />
         <!--<glyph glyph-code="E005" smufl-name="reversedBracketTop" />-->
-        <!--<glyph glyph-code="E006" smufl-name="reversedBracketBottom" />-->
+        <!--<glyph glyph-code="E006" smufl-name="reversedBracketBottom" />-->EA29
         <!--<glyph glyph-code="E007" smufl-name="systemDivider" />-->
         <!--<glyph glyph-code="E008" smufl-name="systemDividerLong" />-->
         <!--<glyph glyph-code="E009" smufl-name="systemDividerExtraLong" />-->
@@ -2466,7 +2466,7 @@
         <!--<glyph glyph-code="EA26" smufl-name="medRenLiquescentAscCMN" />-->
         <!--<glyph glyph-code="EA27" smufl-name="medRenLiquescentDescCMN" />-->
         <!--<glyph glyph-code="EA28" smufl-name="medRenQuilismaCMN" />-->
-        <!--<glyph glyph-code="EA29" smufl-name="medRenStrophicusCMN" />-->
+        <glyph glyph-code="EA29" smufl-name="medRenStrophicusCMN" />
         <glyph glyph-code="EA2A" smufl-name="medRenOriscusCMN" />
         <range_end>U+EA2F</range_end>
         <range_start>U+EA20</range_start>

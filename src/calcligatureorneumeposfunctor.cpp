@@ -248,6 +248,7 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
         const bool hasLiquescent = (nc->FindDescendantByType(LIQUESCENT));
         const bool hasOriscus = (nc->FindDescendantByType(ORISCUS));
         const bool hasQuilisma = (nc->FindDescendantByType(QUILISMA));
+        const bool hasStrophicus = (nc->FindDescendantByType(STROPHICUS));
 
         const int lineWidth = m_doc->GetGlyphWidth(SMUFL_E9BE_chantConnectingLineAsc3rd, staffSize, false);
 
@@ -287,6 +288,9 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
         }
         else if (hasQuilisma) {
             nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E99B_chantQuilisma;
+        }
+        else if (hasStrophicus) {
+            nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_EA29_medRenStrophicusCMN;
         }
         else {
             nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E990_chantPunctum;
