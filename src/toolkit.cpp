@@ -243,7 +243,7 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         // Title record for a melody in EsAC format.
         return ESAC;
     }
-    //TODO drizo - Add specific checks for GABC
+    // TODO drizo - Add specific checks for GABC
 
     // Assume that the input is MEI if other input types were not detected.
     // This means that DARMS cannot be auto-detected.
