@@ -4,7 +4,7 @@ version = "0.1.0"
 dependencies = [
     "svgpathtools (>=1.7.0)",
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 description = ""
 authors = [
     {name = "Andrew Hankinson", email="andrew.hankinson@gmail.com"},
