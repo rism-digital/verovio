@@ -1,13 +1,13 @@
 # -- coding: utf-8 --
-from re import Pattern
-from typing import Optional
 
-import yaml
 import logging
 import re
 import textwrap
 from pathlib import Path
+from re import Pattern
+from typing import Optional
 
+import yaml
 from schema import MeiSchema
 
 lg = logging.getLogger("schemaparser")
