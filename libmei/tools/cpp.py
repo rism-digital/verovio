@@ -615,7 +615,7 @@ def vrv_get_type_default(datatype: str) -> str:
     if datatype in DATATYPES["defaults"]:
         return DATATYPES["defaults"][datatype]
 
-    tname: str = re.sub(r"^data_", "", datatype)
+    tname: str = datatype.removeprefix("data_")
     return f"{tname}_NONE"
 
 
