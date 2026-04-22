@@ -594,6 +594,7 @@ def vrv_member_cc(name: str, pascal: bool = False) -> str:
 
 
 def vrv_converter_cc(name: str) -> str:
+    """Create a converter class name portion from a type identifier."""
     left, right = name.split("_", 1)
     rest = "".join([n[0].upper() + n[1:].lower() for n in right.split("_")])
     if left == "data":
@@ -602,6 +603,7 @@ def vrv_converter_cc(name: str) -> str:
 
 
 def vrv_get_att_config(module, gp, att) -> Optional[dict]:
+    """Return the configuration dict for a given module/group/attribute, if any."""
     if module not in DATATYPES["modules"] or gp not in DATATYPES["modules"][module]:
         return None
     if att not in DATATYPES["modules"][module][gp]:
@@ -610,6 +612,7 @@ def vrv_get_att_config(module, gp, att) -> Optional[dict]:
 
 
 def vrv_get_type_default(datatype: str) -> str:
+    """Return the default enum value name for a datatype identifier."""
     if datatype in DATATYPES["defaults"]:
         return DATATYPES["defaults"][datatype]
 
@@ -618,15 +621,17 @@ def vrv_get_type_default(datatype: str) -> str:
 
 
 def vrv_is_excluded_type(datatype: str) -> bool:
+    """Return True if a datatype is marked as excluded in DATATYPES."""
     return datatype in DATATYPES["excludes"]
 
 
 def vrv_is_alternate_type(datatype: str) -> bool:
+    """Return True if a datatype is defined as an alternate compound type."""
     return datatype in DATATYPES["alternates"]
 
 
 def vrv_get_att_config_type(module: str, gp: str, att: str) -> Optional[str]:
-    """Get the att type."""
+    """Return the configured attribute type for a module/group/attribute."""
     att_config = vrv_get_att_config(module, gp, att)
     if not att_config or "type" not in att_config:
         return None
@@ -634,7 +639,7 @@ def vrv_get_att_config_type(module: str, gp: str, att: str) -> Optional[str]:
 
 
 def vrv_get_att_config_default(module: str, gp: str, att: str) -> Optional[str]:
-    """Get the att default value."""
+    """Return the configured default value for an attribute, if any."""
     att_config = vrv_get_att_config(module, gp, att)
     # nothing in the module/att
     if att_config is None or "default" not in att_config:
@@ -643,22 +648,22 @@ def vrv_get_att_config_default(module: str, gp: str, att: str) -> Optional[str]:
     return att_config["default"]
 
 
-def vrv_get_formatted_type(datatype: str) -> str:
-    """Get the formatted datatype."""
+def vrv_getformattedtype(datatype: str) -> str:
+    """Return a generator-friendly type name for a datatype ident."""
     if datatype in DATATYPES["mapped"]:
         return DATATYPES["mapped"][datatype]
     return datatype.replace(".", "_")
 
 
-def vrv_get_formatted_vallist(att: str, vallist: str) -> str:
-    """Get the formatted vallist."""
+def vrv_getformattedvallist(att: str, vallist: str) -> str:
+    """Format a value-list name for use as an enum identifier."""
     pfx: str = vrv_member_cc(att.replace("att.", ""))
     sfx: str = vallist.upper().replace(".", "").replace(":", "")
     return f"{pfx}_{sfx}"
 
 
-def vrv_get_att_type(schema, module: str, gp: str, aname: str) -> str:
-    """Return the attribute type for element name, or string if not detectable."""
+def vrv_getatttype(schema, module: str, gp: str, aname: str) -> str:
+    """Determine the C++ type for an attribute by inspecting schema and config."""
     # Look up if there is an override for this type in the current module, and return it
     # Note that we do not honor pseudo-hungarian notation
     attype: Optional[str] = vrv_get_att_config_type(module, gp, aname)
@@ -701,9 +706,9 @@ def vrv_get_att_type(schema, module: str, gp: str, aname: str) -> str:
     return "std::string"
 
 
-def vrv_get_att_default(schema, module: str, gp: str, aname: str) -> tuple:
-    """Return the attribute default value for element name, or string if not detectable."""
-    attype = vrv_get_att_type(schema, module, gp, aname)
+def vrv_getattdefault(schema, module: str, gp: str, aname: str) -> tuple:
+    """Return the default value and converter names for an attribute."""
+    attype = vrv_getatttype(schema, module, gp, aname)
     default = vrv_get_att_config_default(module, gp, aname)
 
     if attype == "int":
@@ -729,11 +734,7 @@ def vrv_get_att_default(schema, module: str, gp: str, aname: str) -> tuple:
 
 
 def create_docstr(text: str, indent: int = 0) -> str:
-    """
-    Format a docstring. Take the first sentence (. followed by a space)
-    and use it for the brief. Then put the rest of the text after a blank
-    line if there is text there
-    """
+    """Format and wrap a C++-style doc comment from the given text."""
     text = text.strip()
     dotpos = text.find(". ")
 
