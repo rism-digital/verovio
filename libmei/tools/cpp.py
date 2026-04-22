@@ -584,13 +584,13 @@ DATATYPES: dict
 TEI_RNG_NS = {"tei": "http://www.tei-c.org/ns/1.0", "rng": "http://relaxng.org/ns/structure/1.0"}
 
 
-def vrv_member_cc(name: str) -> str:
+def vrv_member_cc(name: str, pascal: bool = False) -> str:
+    """Return a camel case member name for an attribute name."""
     cc = "".join([n[0].upper() + n[1:] for n in name.split(".")])
+    if pascal:
+        return cc
     return cc[0].lower() + cc[1:]
 
-
-def vrv_member_cc_upper(name: str) -> str:
-    return "".join([n[0].upper() + n[1:] for n in name.split(".")])
 
 
 def vrv_converter_cc(name: str) -> str:
