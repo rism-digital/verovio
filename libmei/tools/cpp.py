@@ -592,7 +592,6 @@ def vrv_member_cc(name: str, pascal: bool = False) -> str:
     return cc[0].lower() + cc[1:]
 
 
-
 def vrv_converter_cc(name: str) -> str:
     """Create a converter class name portion from a type identifier."""
     left, right = name.split("_", 1)
