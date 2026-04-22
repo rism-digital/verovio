@@ -647,21 +647,21 @@ def vrv_get_att_config_default(module: str, gp: str, att: str) -> Optional[str]:
     return att_config["default"]
 
 
-def vrv_getformattedtype(datatype: str) -> str:
+def vrv_get_formatted_type(datatype: str) -> str:
     """Return a generator-friendly type name for a datatype ident."""
     if datatype in DATATYPES["mapped"]:
         return DATATYPES["mapped"][datatype]
     return datatype.replace(".", "_")
 
 
-def vrv_getformattedvallist(att: str, vallist: str) -> str:
+def vrv_get_formatted_vallist(att: str, vallist: str) -> str:
     """Format a value-list name for use as an enum identifier."""
     pfx: str = vrv_member_cc(att.replace("att.", ""))
     sfx: str = vallist.upper().replace(".", "").replace(":", "")
     return f"{pfx}_{sfx}"
 
 
-def vrv_getatttype(schema, module: str, gp: str, aname: str) -> str:
+def vrv_get_att_type(schema, module: str, gp: str, aname: str) -> str:
     """Determine the C++ type for an attribute by inspecting schema and config."""
     # Look up if there is an override for this type in the current module, and return it
     # Note that we do not honor pseudo-hungarian notation
@@ -705,9 +705,9 @@ def vrv_getatttype(schema, module: str, gp: str, aname: str) -> str:
     return "std::string"
 
 
-def vrv_getattdefault(schema, module: str, gp: str, aname: str) -> tuple:
+def vrv_get_att_default(schema, module: str, gp: str, aname: str) -> tuple:
     """Return the default value and converter names for an attribute."""
-    attype = vrv_getatttype(schema, module, gp, aname)
+    attype = vrv_get_att_type(schema, module, gp, aname)
     default = vrv_get_att_config_default(module, gp, aname)
 
     if attype == "int":
