@@ -190,7 +190,7 @@ set(all_SRC
     ${midi_SRC}
     ../src/json/jsonxx.cc
     ../src/pugi/pugixml.cpp
-        ../include/vrv/iogabc.h
+    ../include/vrv/iogabc.h
 )
 
 ##################

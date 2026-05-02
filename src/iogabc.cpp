@@ -53,25 +53,6 @@
 // we've avoided here formal parsing techniques or regular expressions.
 // Following other importers, this parser suposes the input is valid.
 //////////////////////////////////////////////////////////////////////////
-// Helper functions
-// It returns '\0' if the index is out of bounds,
-inline char getCharAt(std::string input, int index)
-{
-    assert(index >= 0); // TODO Ver cómo lo hacen ellos
-
-    auto idx = static_cast<std::size_t>(index);
-    if (idx < 0 || idx >= input.size()) {
-        return '\0';
-    }
-    return input[idx];
-}
-
-inline void debug(std::string message)
-{
-    std::cerr << "DEBUG: " << message << "\n";
-}
-
-//----------------------------------------------------------------------------
 
 namespace vrv {
 
@@ -83,6 +64,22 @@ GABCInput::GABCInput(Doc *doc) : Input(doc) {}
 
 GABCInput::~GABCInput() {}
 
+char GABCInput::GetCharAt(const std::string &input, int index)
+{
+    assert(index >= 0);
+
+    auto idx = static_cast<std::size_t>(index);
+    if (idx >= input.size()) {
+        return '\0';
+    }
+    return input[idx];
+}
+
+void GABCInput::Debug(const std::string &message)
+{
+    std::cerr << "DEBUG: " << message << "\n";
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Clefs
 // Tuple = <Clef shape, clef line, diatonic pitch deviation from C2>
@@ -93,16 +90,21 @@ using ClefPitchOffsetType = std::tuple<data_CLEFSHAPE, int, int>;
 //   c2: a..m = e3 f3 g3 a3 b3 c4 d4 e4 f4 g4 a4 b4 c5
 // Other clefs are expressed as diatonic offsets from that c2 mapping.
 static const std::map<std::string, ClefPitchOffsetType> GABC_CLEFS{
-    { "c1", { CLEFSHAPE_C, 1, 2 } }, { "c2", { CLEFSHAPE_C, 2, 0 } }, { "c3", { CLEFSHAPE_C, 3, -2 } },
-    { "c4", { CLEFSHAPE_C, 4, -4 } }, { "f2", { CLEFSHAPE_F, 2, -4 } }, { "f3", { CLEFSHAPE_F, 3, -6 } },
-    { "f4", { CLEFSHAPE_F, 4, -8 } }, { "cb3", { CLEFSHAPE_C, 3, -2 } }, // TODO add the flat sign itself
+    { "c1", { CLEFSHAPE_C, 1, 2 } },
+    { "c2", { CLEFSHAPE_C, 2, 0 } },
+    { "c3", { CLEFSHAPE_C, 3, -2 } },
+    { "c4", { CLEFSHAPE_C, 4, -4 } },
+    { "f2", { CLEFSHAPE_F, 2, -4 } },
+    { "f3", { CLEFSHAPE_F, 3, -6 } },
+    { "f4", { CLEFSHAPE_F, 4, -8 } },
+    { "cb3", { CLEFSHAPE_C, 3, -2 } }, // TODO add the flat sign itself
 };
 
-bool GABCInput::processClef(const std::string &word)
+bool GABCInput::ProcessClef(const std::string &word)
 {
     auto it = GABC_CLEFS.find(word);
     if (it == GABC_CLEFS.end()) {
-        debug("Not a clef");
+        Debug("Not a clef");
         return false; // not a clef
     }
 
@@ -114,14 +116,14 @@ bool GABCInput::processClef(const std::string &word)
     layer->AddChild(clef); // TODO: "bajo" con staffDef
 
     this->currentClefPitchOffset = offset;
-    debug("Clef found " + word);
+    Debug("Clef found " + word);
     return true;
     // TODO: several clefs c1@c4, f3@f4
 }
 
-int GABCInput::processCustos(const std::string &word)
+int GABCInput::ProcessCustos(const std::string &word)
 {
-    char firstChar = getCharAt(word, 0);
+    char firstChar = GetCharAt(word, 0);
     int processedChars = 0;
     if (firstChar == 'Z') {
         Custos *custos = new Custos(); // TODO posición?
@@ -133,32 +135,32 @@ int GABCInput::processCustos(const std::string &word)
         Custos *custos = new Custos(); // TODO posición? -- función con el caso Z
         layer->AddChild(custos);
         processedChars = 1;
-        char nextChar = getCharAt(word, 1);
+        char nextChar = GetCharAt(word, 1);
         if (nextChar == '0') {
             processedChars = 2;
         } // TODO Qué hacemos con el 0?
     }
 
     if (processedChars > 0) {
-        debug("Custos found " + word);
+        Debug("Custos found " + word);
     }
     return processedChars;
 }
 
 // It returns a prefix and advances the index or NONE if not found.
-std::optional<Prefixes> GABCInput::findPrefix(const std::string &music, int &currentIndex)
+std::optional<Prefixes> GABCInput::FindPrefix(const std::string &music, int &currentIndex)
 {
     int nextCurrentIndex = currentIndex;
     std::optional<Prefixes> result = std::nullopt;
     // º = U+00BA = UTF-8 bytes 0xC2 0xBA: oblique ligature prefix
-    if (static_cast<unsigned char>(getCharAt(music, currentIndex)) == 0xC2
-        && static_cast<unsigned char>(getCharAt(music, currentIndex + 1)) == 0xBA) {
+    if (static_cast<unsigned char>(GetCharAt(music, currentIndex)) == 0xC2
+        && static_cast<unsigned char>(GetCharAt(music, currentIndex + 1)) == 0xBA) {
         currentIndex += 2;
-        debug("Prefix found: oblique ligature");
+        Debug("Prefix found: oblique ligature");
         return OBLIQUE_LIGATURE;
     }
 
-    switch (getCharAt(music, currentIndex)) {
+    switch (GetCharAt(music, currentIndex)) {
         case '!':
             nextCurrentIndex++;
             result = NO_SPACE;
@@ -169,7 +171,7 @@ std::optional<Prefixes> GABCInput::findPrefix(const std::string &music, int &cur
             break;
         case '/':
             nextCurrentIndex++;
-            char char2 = getCharAt(music, nextCurrentIndex);
+            char char2 = GetCharAt(music, nextCurrentIndex);
             if (char2 == '/') {
                 // Prefix: "//"
                 result = NEUMATIC_CUT; // TODO Tipo
@@ -182,11 +184,11 @@ std::optional<Prefixes> GABCInput::findPrefix(const std::string &music, int &cur
             else if (char2 == '[') {
                 // Prefix: '[' '-'? [1-6] ']'
                 nextCurrentIndex++;
-                char next = getCharAt(music, nextCurrentIndex);
+                char next = GetCharAt(music, nextCurrentIndex);
                 bool negative = false;
                 if (next == '-') {
                     nextCurrentIndex++;
-                    next = getCharAt(music, nextCurrentIndex);
+                    next = GetCharAt(music, nextCurrentIndex);
                     negative = true;
                 }
                 if (next >= '1' && next <= '6') {
@@ -201,18 +203,18 @@ std::optional<Prefixes> GABCInput::findPrefix(const std::string &music, int &cur
             break;
     }
     if (result.has_value()) {
-        debug("Prefix found");
+        Debug("Prefix found");
         currentIndex = nextCurrentIndex;
     }
     else {
-        debug("No prefix found");
+        Debug("No prefix found");
     }
     return result;
 }
 
-void GABCInput::addAccidental(Syllable *syllable, data_ACCIDENTAL_WRITTEN accid, data_PITCHNAME pname, data_OCTAVE oct)
+void GABCInput::AddAccidental(Syllable *syllable, data_ACCIDENTAL_WRITTEN accid, data_PITCHNAME pname, data_OCTAVE oct)
 {
-    debug("Accidental found: " + std::to_string(accid));
+    Debug("Accidental found: " + std::to_string(accid));
     Accid *accidElem = new Accid();
     accidElem->SetAccid(accid);
     accidElem->SetPloc(pname);
@@ -220,7 +222,7 @@ void GABCInput::addAccidental(Syllable *syllable, data_ACCIDENTAL_WRITTEN accid,
     syllable->AddChild(accidElem);
 }
 
-void GABCInput::addEpisema(Nc *nc, const std::string form)
+void GABCInput::AddEpisema(Nc *nc, const std::string &form)
 {
     /*TODO no existe ?? Episema *episema = new Episema();
     episema->SetForm(form);
@@ -228,14 +230,14 @@ void GABCInput::addEpisema(Nc *nc, const std::string form)
 }
 
 // TODO curva anterior - depende del pitch NC anterior - Rising - Falling melody en DLFM
-void GABCInput::addLiquescent(Nc *nc, curvatureDirection_CURVE curve)
+void GABCInput::AddLiquescent(Nc *nc, curvatureDirection_CURVE curve)
 {
     Liquescent *liquescent = new Liquescent();
     nc->AddChild(liquescent);
     nc->SetCurve(curve);
 }
 
-static int pitchToDiatonicNumber(data_PITCHNAME pname, int oct)
+int GABCInput::PitchToDiatonicNumber(data_PITCHNAME pname, int oct)
 {
     int diatonic = 0;
     switch (pname) {
@@ -251,14 +253,14 @@ static int pitchToDiatonicNumber(data_PITCHNAME pname, int oct)
     return oct * 7 + diatonic;
 }
 
-static curvatureDirection_CURVE inferLiquescentCurve(const Nc *previousNC, const Nc *currentNC)
+curvatureDirection_CURVE GABCInput::InferLiquescentCurve(const Nc *previousNC, const Nc *currentNC)
 {
     if (previousNC == nullptr || currentNC == nullptr) {
         return curvatureDirection_CURVE_NONE;
     }
 
-    int prevPitch = pitchToDiatonicNumber(previousNC->GetPname(), previousNC->GetOct());
-    int currPitch = pitchToDiatonicNumber(currentNC->GetPname(), currentNC->GetOct());
+    int prevPitch = PitchToDiatonicNumber(previousNC->GetPname(), previousNC->GetOct());
+    int currPitch = PitchToDiatonicNumber(currentNC->GetPname(), currentNC->GetOct());
 
     if (currPitch > prevPitch) {
         return curvatureDirection_CURVE_a; // rising melody
@@ -269,10 +271,10 @@ static curvatureDirection_CURVE inferLiquescentCurve(const Nc *previousNC, const
     return curvatureDirection_CURVE_NONE;
 }
 
-int GABCInput::processSuffix(const std::string &music, int currentIndex, Nc *nc, Nc *previousNC)
+int GABCInput::ProcessSuffix(const std::string &music, int currentIndex, Nc *nc, Nc *previousNC)
 {
     int processedChars = 0;
-    char nextChar = getCharAt(music, currentIndex);
+    char nextChar = GetCharAt(music, currentIndex);
 
     switch (nextChar) {
         case 'V':
@@ -285,7 +287,7 @@ int GABCInput::processSuffix(const std::string &music, int currentIndex, Nc *nc,
             nc->SetTilt(COMPASSDIRECTION_s);
             break;
 
-        case 's': // strophicus — handled before the suffix loop in processNeume
+        case 's': // strophicus — handled before the suffix loop in ProcessNeume
             break;
 
         case 'w': // quilisma
@@ -302,21 +304,21 @@ int GABCInput::processSuffix(const std::string &music, int currentIndex, Nc *nc,
 
         case '~': // liquescent depending on melodic contour
             processedChars++;
-            addLiquescent(nc, inferLiquescentCurve(previousNC, nc));
+            AddLiquescent(nc, InferLiquescentCurve(previousNC, nc));
             break;
 
         case '>': // liquescent two tails down
             processedChars++;
-            addLiquescent(nc, curvatureDirection_CURVE_c);
+            AddLiquescent(nc, curvatureDirection_CURVE_c);
             // Cephalicus only when there is no explicit virga following
-            if (getCharAt(music, currentIndex + processedChars) != 'V') {
+            if (GetCharAt(music, currentIndex + processedChars) != 'V') {
                 nc->SetType("cephalicus");
             }
             break;
 
         case '<': // liquescent two tails up
             processedChars++;
-            addLiquescent(nc, curvatureDirection_CURVE_a);
+            AddLiquescent(nc, curvatureDirection_CURVE_a);
             break;
 
         case '\'': // episema_vertical
@@ -325,7 +327,7 @@ int GABCInput::processSuffix(const std::string &music, int currentIndex, Nc *nc,
 
         case '_': // episema_horizontal
             processedChars++;
-            nextChar = getCharAt(music, currentIndex + processedChars);
+            nextChar = GetCharAt(music, currentIndex + processedChars);
             if (nextChar >= '0' && nextChar <= '5') {
                 processedChars++;
                 // TODO horizontal episema subtype if needed
@@ -334,7 +336,7 @@ int GABCInput::processSuffix(const std::string &music, int currentIndex, Nc *nc,
 
         case '.': // punctum_mora
             processedChars++;
-            nextChar = getCharAt(music, currentIndex + processedChars);
+            nextChar = GetCharAt(music, currentIndex + processedChars);
             if (nextChar == '.') {
                 processedChars++;
                 nc->SetDots(2);
@@ -350,12 +352,12 @@ int GABCInput::processSuffix(const std::string &music, int currentIndex, Nc *nc,
     return processedChars;
 }
 
-int GABCInput::processBarline(const std::string &music, int currentIndex, Layer *layer)
+int GABCInput::ProcessBarline(const std::string &music, int currentIndex, Layer *layer)
 {
     int processedChars = 0;
-    switch (getCharAt(music, currentIndex)) {
+    switch (GetCharAt(music, currentIndex)) {
         case ':':
-            debug("Barline found: single");
+            Debug("Barline found: single");
             processedChars++; // TODO
             BarLine *barline = new BarLine();
             barline->SetForm(BARRENDITION_single);
@@ -366,8 +368,6 @@ int GABCInput::processBarline(const std::string &music, int currentIndex, Layer 
 }
 
 // (pitch, octave)
-using PitchOctaveType = std::pair<data_PITCHNAME, int>;
-
 static constexpr std::array<data_PITCHNAME, 7> kDiatonicPitchNames = { {
     PITCHNAME_c,
     PITCHNAME_d,
@@ -378,7 +378,7 @@ static constexpr std::array<data_PITCHNAME, 7> kDiatonicPitchNames = { {
     PITCHNAME_b,
 } };
 
-static PitchOctaveType makePitchFromDiatonicIndex(int absoluteDiatonicIndex)
+GABCInput::PitchOctaveType GABCInput::MakePitchFromDiatonicIndex(int absoluteDiatonicIndex)
 {
     // absoluteDiatonicIndex is counted from C0 = 0.
     int octave = absoluteDiatonicIndex / 7;
@@ -390,7 +390,7 @@ static PitchOctaveType makePitchFromDiatonicIndex(int absoluteDiatonicIndex)
     return { kDiatonicPitchNames[static_cast<std::size_t>(pitchClass)], octave };
 }
 
-std::optional<PitchOctaveType> findPitch(char ch, int currentClefPitchOffset)
+std::optional<GABCInput::PitchOctaveType> GABCInput::FindPitch(char ch, int clefPitchOffset)
 {
     if (ch < 'a' || ch > 'm') {
         return std::nullopt;
@@ -399,14 +399,14 @@ std::optional<PitchOctaveType> findPitch(char ch, int currentClefPitchOffset)
     // Base c2 mapping: a..m = e3..c5.
     constexpr int c2BaseDiatonicIndexForA = 3 * 7 + 2; // E3
     int letterIndex = ch - 'a';
-    int absoluteDiatonicIndex = c2BaseDiatonicIndexForA + letterIndex + currentClefPitchOffset;
+    int absoluteDiatonicIndex = c2BaseDiatonicIndexForA + letterIndex + clefPitchOffset;
 
-    return makePitchFromDiatonicIndex(absoluteDiatonicIndex);
+    return MakePitchFromDiatonicIndex(absoluteDiatonicIndex);
 }
 
-void GABCInput::processNeume(const std::string &music, Syllable *syllable)
+void GABCInput::ProcessNeume(const std::string &music, Syllable *syllable)
 {
-    debug("Processing neume");
+    Debug("Processing neume");
 
     Neume *neume = new Neume();
     Nc *previousNC = nullptr;
@@ -418,15 +418,15 @@ void GABCInput::processNeume(const std::string &music, Syllable *syllable)
     int currentIndex = 0;
     while (static_cast<std::size_t>(currentIndex) < music.size()) {
 
-        char ch = getCharAt(music, currentIndex);
+        char ch = GetCharAt(music, currentIndex);
 
         // Check for simple '/' neume separator (not '//', '/0', '/[')
         if (ch == '/') {
-            char next = getCharAt(music, currentIndex + 1);
+            char next = GetCharAt(music, currentIndex + 1);
             if (next != '/' && next != '0' && next != '[') {
                 if (lastWasStrophicus) {
                     // Only skip the separator if the next note is also a strophicus (pitch + 's')
-                    bool nextIsStrophicus = (next >= 'a' && next <= 'm') && (getCharAt(music, currentIndex + 2) == 's');
+                    bool nextIsStrophicus = (next >= 'a' && next <= 'm') && (GetCharAt(music, currentIndex + 2) == 's');
                     if (nextIsStrophicus) {
                         currentIndex++;
                         continue;
@@ -457,9 +457,9 @@ void GABCInput::processNeume(const std::string &music, Syllable *syllable)
         // Any other character ends the strophicus group
         lastWasStrophicus = false;
 
-        std::optional<Prefixes> prefixOpt = findPrefix(music, currentIndex);
+        std::optional<Prefixes> prefixOpt = FindPrefix(music, currentIndex);
 
-        ch = getCharAt(music, currentIndex); // re-read after prefix may have consumed chars
+        ch = GetCharAt(music, currentIndex); // re-read after prefix may have consumed chars
         bool diamond = false;
 
         if (ch >= 'A' && ch <= 'M') {
@@ -468,7 +468,7 @@ void GABCInput::processNeume(const std::string &music, Syllable *syllable)
             diamond = true;
         }
 
-        auto pitchOctOpt = findPitch(ch, this->currentClefPitchOffset);
+        auto pitchOctOpt = FindPitch(ch, this->currentClefPitchOffset);
 
         if (pitchOctOpt.has_value()) {
             currentIndex++;
@@ -495,22 +495,22 @@ void GABCInput::processNeume(const std::string &music, Syllable *syllable)
             }
 
             // Check for accidental suffix first — it goes to syllable before the neume
-            char nextChar = getCharAt(music, currentIndex);
+            char nextChar = GetCharAt(music, currentIndex);
             if (nextChar == 'x') {
                 currentIndex++;
-                addAccidental(syllable, ACCIDENTAL_WRITTEN_f, pname, oct);
+                AddAccidental(syllable, ACCIDENTAL_WRITTEN_f, pname, oct);
             }
             else if (nextChar == '#') {
                 currentIndex++;
-                addAccidental(syllable, ACCIDENTAL_WRITTEN_s, pname, oct);
+                AddAccidental(syllable, ACCIDENTAL_WRITTEN_s, pname, oct);
             }
             else if (nextChar == 'y') {
                 currentIndex++;
-                addAccidental(syllable, ACCIDENTAL_WRITTEN_n, pname, oct);
+                AddAccidental(syllable, ACCIDENTAL_WRITTEN_n, pname, oct);
             }
 
             // Strophicus: consume 's' before the general suffix loop
-            nextChar = getCharAt(music, currentIndex);
+            nextChar = GetCharAt(music, currentIndex);
             if (nextChar == 's') {
                 currentIndex++;
                 currentNC->AddChild(new Strophicus());
@@ -521,8 +521,8 @@ void GABCInput::processNeume(const std::string &music, Syllable *syllable)
 
             // A liquescent note always starts its own neume.
             // If the current neume already has ncs, finalize it first.
-            // previousNC is kept so inferLiquescentCurve can use it across the neume boundary.
-            nextChar = getCharAt(music, currentIndex);
+            // previousNC is kept so InferLiquescentCurve can use it across the neume boundary.
+            nextChar = GetCharAt(music, currentIndex);
             if ((nextChar == '~' || nextChar == '>' || nextChar == '<') && neume->GetChildCount() > 0) {
                 syllable->AddChild(neume);
                 neume = new Neume();
@@ -532,7 +532,7 @@ void GABCInput::processNeume(const std::string &music, Syllable *syllable)
 
             // Process remaining suffixes attached to this note
             while (static_cast<std::size_t>(currentIndex) < music.size()) {
-                int suffixChars = processSuffix(music, currentIndex, currentNC, previousNC);
+                int suffixChars = ProcessSuffix(music, currentIndex, currentNC, previousNC);
                 if (suffixChars == 0) {
                     break;
                 }
@@ -542,12 +542,12 @@ void GABCInput::processNeume(const std::string &music, Syllable *syllable)
             previousNC = currentNC;
         }
         else {
-            int processedChars = processBarline(music, currentIndex, layer);
+            int processedChars = ProcessBarline(music, currentIndex, layer);
             if (processedChars > 0) {
                 currentIndex += processedChars;
             }
             else {
-                debug(std::string("Unknown neume character: ") + static_cast<char>(ch));
+                Debug(std::string("Unknown neume character: ") + static_cast<char>(ch));
                 currentIndex++;
             }
         }
@@ -556,13 +556,13 @@ void GABCInput::processNeume(const std::string &music, Syllable *syllable)
     syllable->AddChild(neume);
 }
 
-void GABCInput::processWord(const std::string &lyrics, const std::string &music, sylLog_WORDPOS wordpos, sylLog_CON con)
+void GABCInput::ProcessWord(const std::string &lyrics, const std::string &music, sylLog_WORDPOS wordpos, sylLog_CON con)
 {
     Syllable *syllable = new Syllable();
     layer->AddChild(syllable);
 
     if (!lyrics.empty()) {
-        debug("Processing lyrics: " + lyrics);
+        Debug("Processing lyrics: " + lyrics);
         Syl *syl = new Syl();
         if (wordpos != sylLog_WORDPOS_NONE) syl->SetWordpos(wordpos);
         if (con != sylLog_CON_NONE) syl->SetCon(con);
@@ -573,18 +573,18 @@ void GABCInput::processWord(const std::string &lyrics, const std::string &music,
     }
 
     if (!music.empty()) {
-        debug("Processing music: " + music);
-        bool isClef = processClef(music);
+        Debug("Processing music: " + music);
+        bool isClef = ProcessClef(music);
         if (!isClef) {
-            bool isCustos = processCustos(music);
+            bool isCustos = ProcessCustos(music);
             if (!isCustos) {
-                processNeume(music, syllable);
+                ProcessNeume(music, syllable);
             }
         }
     }
 }
 
-void GABCInput::processInput(const std::string &gabc)
+void GABCInput::ProcessInput(const std::string &gabc)
 {
     // Parse tokens preserving word-boundary information.
     // A "word boundary" exists when whitespace appears between syllables in the original input.
@@ -629,7 +629,7 @@ void GABCInput::processInput(const std::string &gabc)
             pendingBoundary = false;
         }
 
-        debug("Processing token: lyrics='" + lyrics + "' music='" + music + "'");
+        Debug("Processing token: lyrics='" + lyrics + "' music='" + music + "'");
         tokens.push_back({ lyrics, music, boundary });
     }
 
@@ -665,7 +665,7 @@ void GABCInput::processInput(const std::string &gabc)
             }
         }
 
-        processWord(tokens[ti].lyrics, tokens[ti].music, wordpos, con);
+        ProcessWord(tokens[ti].lyrics, tokens[ti].music, wordpos, con);
     }
 }
 
@@ -691,7 +691,7 @@ bool GABCInput::Import(const std::string &gabc)
     measure->AddChild(staff);
     section->AddChild(measure);
 
-    processInput(gabc);
+    ProcessInput(gabc);
 
     // add minimal scoreDef
     StaffGrp *staffGrp = new StaffGrp();
