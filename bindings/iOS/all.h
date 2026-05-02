@@ -137,6 +137,7 @@
 #import <VerovioFramework/iobase.h>
 #import <VerovioFramework/iocmme.h>
 #import <VerovioFramework/iodarms.h>
+#import <VerovioFramework/iogabc.h>
 #import <VerovioFramework/iohumdrum.h>
 #import <VerovioFramework/iomei.h>
 #import <VerovioFramework/iomusxml.h>
@@ -230,6 +231,7 @@
 #import <VerovioFramework/staffdef.h>
 #import <VerovioFramework/staffgrp.h>
 #import <VerovioFramework/stem.h>
+#import <VerovioFramework/strophicus.h>
 #import <VerovioFramework/subst.h>
 #import <VerovioFramework/supplied.h>
 #import <VerovioFramework/surface.h>
