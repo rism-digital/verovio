@@ -1001,7 +1001,7 @@
 		4DFD83002A38399C00A3E20B /* repeatmark.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DFD82FF2A38399C00A3E20B /* repeatmark.h */; };
 		4DFD83012A38399C00A3E20B /* repeatmark.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DFD82FF2A38399C00A3E20B /* repeatmark.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6D76479F2FA66BDD004F9EDA /* iogabc.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D76479E2FA66BDD004F9EDA /* iogabc.h */; };
-		6D7647A02FA66BDD004F9EDA /* iogabc.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D76479E2FA66BDD004F9EDA /* iogabc.h */; };
+		6D7647A02FA66BDD004F9EDA /* iogabc.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D76479E2FA66BDD004F9EDA /* iogabc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6D7647A22FA66C68004F9EDA /* iogabc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D7647A12FA66C68004F9EDA /* iogabc.cpp */; };
 		6D7647A32FA66C68004F9EDA /* iogabc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D7647A12FA66C68004F9EDA /* iogabc.cpp */; };
 		6D7647A42FA66C68004F9EDA /* iogabc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D7647A12FA66C68004F9EDA /* iogabc.cpp */; };
@@ -1009,7 +1009,7 @@
 		6D7647A72FA66CE8004F9EDA /* strophicus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D7647A52FA66CE8004F9EDA /* strophicus.cpp */; };
 		6D7647A82FA66CE8004F9EDA /* strophicus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D7647A52FA66CE8004F9EDA /* strophicus.cpp */; };
 		6D7647AA2FA66D0A004F9EDA /* strophicus.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D7647A92FA66D0A004F9EDA /* strophicus.h */; };
-		6D7647AB2FA66D0A004F9EDA /* strophicus.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D7647A92FA66D0A004F9EDA /* strophicus.h */; };
+		6D7647AB2FA66D0A004F9EDA /* strophicus.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D7647A92FA66D0A004F9EDA /* strophicus.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8F086EE2188539540037FD8E /* verticalaligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* verticalaligner.cpp */; };
 		8F086EE4188539540037FD8E /* barline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB8188539540037FD8E /* barline.cpp */; };
 		8F086EE5188539540037FD8E /* bboxdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB9188539540037FD8E /* bboxdevicecontext.cpp */; };
