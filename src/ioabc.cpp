@@ -813,7 +813,7 @@ void ABCInput::ParseTempo(const std::string &tempoString)
     Tempo *tempo = new Tempo();
     if (tempoString.find('=') != std::string::npos) {
         const int numStart = int(tempoString.find('=') + 1);
-        tempo->SetMm(std::atof(tempoString.substr(numStart).c_str()));
+        tempo->SetMm(std::stof(tempoString.substr(numStart)));
     }
     if (tempoString.find('\"') != std::string::npos) {
         std::string tempoWord = tempoString.substr(tempoString.find('\"') + 1);
