@@ -68,7 +68,7 @@ data_VU Att::StrToVU(const std::string &value, bool logWarning) const
         }
         return MEI_UNSET;
     }
-    return atof(value.substr(0, value.find("vu")).c_str());
+    return atof(value.c_str());
 }
 
 // Converters for writing and reading
@@ -377,7 +377,7 @@ data_FONTSIZENUMERIC Att::StrToFontsizenumeric(const std::string &value, bool lo
         }
         return MEI_UNSET;
     }
-    return atof(value.substr(0, value.find("pt")).c_str());
+    return atof(value.c_str());
 }
 
 std::string Att::KeysignatureToStr(data_KEYSIGNATURE data) const
@@ -468,11 +468,12 @@ data_MEASUREMENTSIGNED Att::StrToMeasurementsigned(const std::string &value, boo
 {
     data_MEASUREMENTSIGNED data;
 
-    static const std::regex px(".*px$");
+    static const std::regex px("[+-]?[0-9]*(\\.[0-9]+)?px");
+    static const std::regex vu("[+-]?[0-9]*(\\.[0-9]+)?(vu)?");
     if (std::regex_match(value, px)) {
-        data.SetPx(atoi(value.substr(0, value.find("px")).c_str()) * DEFINITION_FACTOR);
+        data.SetPx(atoi(value.c_str()) * DEFINITION_FACTOR);
     }
-    else {
+    else if (std::regex_match(value, vu)) {
         data.SetVu(atof(value.c_str()));
     }
 
@@ -700,7 +701,7 @@ data_PERCENT Att::StrToPercent(const std::string &value, bool logWarning) const
         if (logWarning) LogWarning("Unsupported data.PERCENT '%s'", value.c_str());
         return 0;
     }
-    return atof(value.substr(0, value.find("%")).c_str());
+    return atof(value.c_str());
 }
 
 data_PERCENT_LIMITED Att::StrToPercentLimited(const std::string &value, bool logWarning) const
@@ -710,7 +711,7 @@ data_PERCENT_LIMITED Att::StrToPercentLimited(const std::string &value, bool log
         if (logWarning) LogWarning("Unsupported data.PERCENT.LIMITED '%s'", value.c_str());
         return 0;
     }
-    return atof(value.substr(0, value.find("%")).c_str());
+    return atof(value.c_str());
 }
 
 data_PERCENT_LIMITED_SIGNED Att::StrToPercentLimitedSigned(const std::string &value, bool logWarning) const
@@ -722,7 +723,7 @@ data_PERCENT_LIMITED_SIGNED Att::StrToPercentLimitedSigned(const std::string &va
         }
         return 0;
     }
-    return atof(value.substr(0, value.find("%")).c_str());
+    return atof(value.c_str());
 }
 
 std::string Att::PitchnameToStr(data_PITCHNAME data) const
