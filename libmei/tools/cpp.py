@@ -1,13 +1,13 @@
 # -- coding: utf-8 --
-from re import Pattern
-from typing import Optional
 
-import yaml
 import logging
 import re
 import textwrap
 from pathlib import Path
+from re import Pattern
+from typing import Optional
 
+import yaml
 from schema import MeiSchema
 
 lg = logging.getLogger("schemaparser")
@@ -584,16 +584,16 @@ DATATYPES: dict
 TEI_RNG_NS = {"tei": "http://www.tei-c.org/ns/1.0", "rng": "http://relaxng.org/ns/structure/1.0"}
 
 
-def vrv_member_cc(name: str) -> str:
+def vrv_member_cc(name: str, pascal: bool = False) -> str:
+    """Return a camel case member name for an attribute name."""
     cc = "".join([n[0].upper() + n[1:] for n in name.split(".")])
+    if pascal:
+        return cc
     return cc[0].lower() + cc[1:]
 
 
-def vrv_member_cc_upper(name: str) -> str:
-    return "".join([n[0].upper() + n[1:] for n in name.split(".")])
-
-
 def vrv_converter_cc(name: str) -> str:
+    """Create a converter class name portion from a type identifier."""
     left, right = name.split("_", 1)
     rest = "".join([n[0].upper() + n[1:].lower() for n in right.split("_")])
     if left == "data":
@@ -602,6 +602,7 @@ def vrv_converter_cc(name: str) -> str:
 
 
 def vrv_get_att_config(module, gp, att) -> Optional[dict]:
+    """Return the configuration dict for a given module/group/attribute, if any."""
     if module not in DATATYPES["modules"] or gp not in DATATYPES["modules"][module]:
         return None
     if att not in DATATYPES["modules"][module][gp]:
@@ -610,23 +611,26 @@ def vrv_get_att_config(module, gp, att) -> Optional[dict]:
 
 
 def vrv_get_type_default(datatype: str) -> str:
+    """Return the default enum value name for a datatype identifier."""
     if datatype in DATATYPES["defaults"]:
         return DATATYPES["defaults"][datatype]
 
-    tname: str = re.sub(r"^data_", "", datatype)
+    tname: str = datatype.removeprefix("data_")
     return f"{tname}_NONE"
 
 
 def vrv_is_excluded_type(datatype: str) -> bool:
+    """Return True if a datatype is marked as excluded in DATATYPES."""
     return datatype in DATATYPES["excludes"]
 
 
 def vrv_is_alternate_type(datatype: str) -> bool:
+    """Return True if a datatype is defined as an alternate compound type."""
     return datatype in DATATYPES["alternates"]
 
 
 def vrv_get_att_config_type(module: str, gp: str, att: str) -> Optional[str]:
-    """Get the att type."""
+    """Return the configured attribute type for a module/group/attribute."""
     att_config = vrv_get_att_config(module, gp, att)
     if not att_config or "type" not in att_config:
         return None
@@ -634,7 +638,7 @@ def vrv_get_att_config_type(module: str, gp: str, att: str) -> Optional[str]:
 
 
 def vrv_get_att_config_default(module: str, gp: str, att: str) -> Optional[str]:
-    """Get the att default value."""
+    """Return the configured default value for an attribute, if any."""
     att_config = vrv_get_att_config(module, gp, att)
     # nothing in the module/att
     if att_config is None or "default" not in att_config:
@@ -643,20 +647,22 @@ def vrv_get_att_config_default(module: str, gp: str, att: str) -> Optional[str]:
     return att_config["default"]
 
 
-def vrv_getformattedtype(datatype: str) -> str:
+def vrv_get_formatted_type(datatype: str) -> str:
+    """Return a generator-friendly type name for a datatype ident."""
     if datatype in DATATYPES["mapped"]:
         return DATATYPES["mapped"][datatype]
     return datatype.replace(".", "_")
 
 
-def vrv_getformattedvallist(att: str, vallist: str) -> str:
+def vrv_get_formatted_vallist(att: str, vallist: str) -> str:
+    """Format a value-list name for use as an enum identifier."""
     pfx: str = vrv_member_cc(att.replace("att.", ""))
     sfx: str = vallist.upper().replace(".", "").replace(":", "")
     return f"{pfx}_{sfx}"
 
 
-def vrv_getatttype(schema, module: str, gp: str, aname: str) -> str:
-    """Returns the attribute type for element name, or string if not detectable."""
+def vrv_get_att_type(schema, module: str, gp: str, aname: str) -> str:
+    """Determine the C++ type for an attribute by inspecting schema and config."""
     # Look up if there is an override for this type in the current module, and return it
     # Note that we do not honor pseudo-hungarian notation
     attype: Optional[str] = vrv_get_att_config_type(module, gp, aname)
@@ -685,7 +691,7 @@ def vrv_getatttype(schema, module: str, gp: str, aname: str) -> str:
         "tei:datatype/tei:dataRef/@key|tei:datatype/rng:ref/@name", gp=gp, name=aname, namespaces=TEI_RNG_NS
     )
     if ref:
-        return vrv_getformattedtype(f"{ref[0]}")
+        return vrv_get_formatted_type(f"{ref[0]}")
 
     # Finally from val lists
     vl = definition[0].find("tei:valList[@type='closed']", namespaces=TEI_RNG_NS)
@@ -693,15 +699,15 @@ def vrv_getatttype(schema, module: str, gp: str, aname: str) -> str:
         element = vl.xpath("./ancestor::tei:classSpec", namespaces=TEI_RNG_NS)
         att_name = vl.xpath("./parent::tei:attDef/@ident", namespaces=TEI_RNG_NS)
         if element:
-            return vrv_getformattedvallist(element[0].get("ident"), att_name[0])
+            return vrv_get_formatted_vallist(element[0].get("ident"), att_name[0])
 
     # Otherwise as string
     return "std::string"
 
 
-def vrv_getattdefault(schema, module: str, gp: str, aname: str) -> tuple:
-    """Returns the attribute default value for element name, or string if not detectable."""
-    attype = vrv_getatttype(schema, module, gp, aname)
+def vrv_get_att_default(schema, module: str, gp: str, aname: str) -> tuple:
+    """Return the default value and converter names for an attribute."""
+    attype = vrv_get_att_type(schema, module, gp, aname)
     default = vrv_get_att_config_default(module, gp, aname)
 
     if attype == "int":
@@ -727,11 +733,7 @@ def vrv_getattdefault(schema, module: str, gp: str, aname: str) -> tuple:
 
 
 def create_docstr(text: str, indent: int = 0) -> str:
-    """
-    Format a docstring. Take the first sentence (. followed by a space)
-    and use it for the brief. Then put the rest of the text after a blank
-    line if there is text there
-    """
+    """Format and wrap a C++-style doc comment from the given text."""
     text = text.strip()
     dotpos = text.find(". ")
 
@@ -770,6 +772,7 @@ def create_docstr(text: str, indent: int = 0) -> str:
 
 
 def create_att_classes(cpp_ns: str, schema, outdir: Path):
+    """Create the attribute classes."""
     enums: list = []
 
     for module, atgroup in sorted(schema.attribute_group_structure.items()):
@@ -799,9 +802,9 @@ def create_att_classes(cpp_ns: str, schema, outdir: Path):
                 else:
                     att_lower_name = att
 
-                att_type = vrv_getatttype(schema.schema, module, gp, att)
+                att_type = vrv_get_att_type(schema.schema, module, gp, att)
                 doc_str = create_docstr(schema.get_att_desc(att), indent=4)
-                attdefault, converters = vrv_getattdefault(schema.schema, module, gp, att)
+                attdefault, converters = vrv_get_att_default(schema.schema, module, gp, att)
 
                 substrings = {
                     "attGroupNameUpper": schema.cc(schema.strpatt(gp)),
@@ -879,7 +882,7 @@ def create_att_classes(cpp_ns: str, schema, outdir: Path):
 
 
 def create_att_datatypes(cpp_ns: str, schema, outdir: Path):
-    # data types
+    """Create the data types."""
     att_type_data_types: list = []
     att_converter_header_data_types: list = []
     att_converter_impl_data_types: list = []
@@ -895,16 +898,16 @@ def create_att_datatypes(cpp_ns: str, schema, outdir: Path):
             lg.debug("Skipping alternate %s", data_type)
             continue
 
-        val_prefix = vrv_getformattedtype(data_type).replace("data_", "")
+        val_prefix = vrv_get_formatted_type(data_type).replace("data_", "")
         type_start_fmt = {
             "meitype": data_type,
-            "vrvtype": vrv_getformattedtype(data_type),
+            "vrvtype": vrv_get_formatted_type(data_type),
             "enumtype": " : int8_t" if len(values) < 64 else "",
             "val_prefix": val_prefix,
         }
         att_type_data_types.append(TYPE_START.format_map(type_start_fmt))
 
-        vrv_type = vrv_getformattedtype(data_type)
+        vrv_type = vrv_get_formatted_type(data_type)
         vrv_fname = vrv_converter_cc(vrv_type)
         converter_start_fmt = {"type": vrv_type, "fname": vrv_fname}
 
@@ -941,7 +944,7 @@ def create_att_datatypes(cpp_ns: str, schema, outdir: Path):
             lg.debug("Skipping %s", list_type)
             continue
 
-        val_prefix = vrv_getformattedvallist(list_type.rsplit("@")[0], list_type.rsplit("@")[1])
+        val_prefix = vrv_get_formatted_vallist(list_type.rsplit("@")[0], list_type.rsplit("@")[1])
         type_start_fmt = {
             "meitype": list_type.replace("@", r"\@"),
             "vrvtype": val_prefix,
@@ -997,6 +1000,7 @@ def create_att_datatypes(cpp_ns: str, schema, outdir: Path):
 
 
 def create_element_classes(cpp_ns: str, schema, outdir: Path):
+    """Create the element classes."""
     lg.debug("Creating Element Headers")
     ###########################################################################
     # Header
@@ -1143,7 +1147,7 @@ def create_att_module(cpp_ns: str, schema, outdir: Path):
                 else:
                     att_name_lower = att
 
-                _, converters = vrv_getattdefault(schema.schema, module, gp, att)
+                _, converters = vrv_get_att_default(schema.schema, module, gp, att)
                 attsubstr = {
                     "attGroupNameUpper": schema.cc(schema.strpatt(gp)),
                     "attNameUpper": schema.cc(att),

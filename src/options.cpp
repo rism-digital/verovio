@@ -1600,7 +1600,7 @@ Options::Options()
     m_expandAlways.Init(false);
     this->Register(&m_expandAlways, "expandAlways", &m_selectors);
 
-    m_expandNever.SetInfo("Never expansion", "Expand for no output, including MIDI and timemap");
+    m_expandNever.SetInfo("Never expand", "Expand for no output, including MIDI and timemap");
     m_expandNever.Init(false);
     this->Register(&m_expandNever, "expandNever", &m_selectors);
 

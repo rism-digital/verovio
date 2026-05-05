@@ -7,37 +7,41 @@
   "softwareVersion": "6.2.0-dev",
   "datePublished": "2026-03-12",
   "license": "https://www.gnu.org/licenses/lgpl-3.0",
-  "programmingLanguage": [{
-    "@type": "ComputerLanguage",
-    "identifier": "c++",
-    "name": "C++"
-  },
-  {
-    "@type": "ComputerLanguage",
-    "identifier": "js",
-    "name": "JavaScript"
-  },
-  {
-    "@type": "ComputerLanguage",
-    "identifier": "python",
-    "name": "Python"
-  },
-  {
-    "@type": "ComputerLanguage",
-    "identifier": "java",
-    "name": "Java"
-  }
+  "programmingLanguage": [
+    {
+      "@type": "ComputerLanguage",
+      "identifier": "c++",
+      "name": "C++"
+    },
+    {
+      "@type": "ComputerLanguage",
+      "identifier": "js",
+      "name": "JavaScript"
+    },
+    {
+      "@type": "ComputerLanguage",
+      "identifier": "python",
+      "name": "Python"
+    },
+    {
+      "@type": "ComputerLanguage",
+      "identifier": "java",
+      "name": "Java"
+    }
   ],
   "codeRepository": "https://github.com/rism-digital/verovio",
   "issueTracker": "https://github.com/rism-digital/verovio/issues",
   "dateCreated": "2014-01-09T09:44:10Z",
-  "author": [{
-    "@id": "https://orcid.org/0000-0002-9525-4331",
-    "@type": "Person",
-    "givenName": "Laurent",
-    "familyName": "Pugin"
-  }],
-  "contributor": [{
+  "author": [
+    {
+      "@id": "https://orcid.org/0000-0002-9525-4331",
+      "@type": "Person",
+      "givenName": "Laurent",
+      "familyName": "Pugin"
+    }
+  ],
+  "contributor": [
+    {
       "@id": "https://orcid.org/0000-0003-1898-2543",
       "@type": "Person",
       "givenName": "Klaus",

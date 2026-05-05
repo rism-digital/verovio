@@ -1,6 +1,17 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(Verovio)
+file(READ "../include/vrv/vrvdef.h" VRVDEF_H)
+
+string(REGEX MATCH "#define VERSION_MAJOR ([0-9]+)" _ ${VRVDEF_H})
+set(VRV_VERSION_MAJOR ${CMAKE_MATCH_1})
+
+string(REGEX MATCH "#define VERSION_MINOR ([0-9]+)" _ ${VRVDEF_H})
+set(VRV_VERSION_MINOR ${CMAKE_MATCH_1})
+
+string(REGEX MATCH "#define VERSION_REVISION ([0-9]+)" _ ${VRVDEF_H})
+set(VRV_VERSION_REVISION ${CMAKE_MATCH_1})
+
+project(Verovio VERSION ${VRV_VERSION_MAJOR}.${VRV_VERSION_MINOR}.${VRV_VERSION_REVISION})
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -205,6 +216,7 @@ if (BUILD_AS_LIBRARY OR BUILD_AS_ANDROID_LIBRARY)
     add_library(verovio SHARED "../tools/c_wrapper.cpp" ${all_SRC})
     # list all headers to be copied for all installation
     file(GLOB_RECURSE all_HEADERS "../include/*/*.h*" "../libmei/*/*.h*" "../tools/c_wrapper.h")
+    configure_file(verovio.pc.in verovio.pc @ONLY)
 
 ###########
 # WASM BC #
@@ -293,4 +305,5 @@ install(
 # install all headers in /usr/local/include/verovio
 if (BUILD_AS_LIBRARY)
     install(FILES ${all_HEADERS} DESTINATION include/verovio)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/verovio.pc DESTINATION lib/pkgconfig)
 endif()

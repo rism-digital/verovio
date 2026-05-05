@@ -817,10 +817,12 @@ private:
 
 public:
     //
-private:
+protected:
     Doc m_doc;
     DocSelection m_docSelection;
     View m_view;
+
+private:
     Doc *m_midiDoc;
 
     Options *m_options;

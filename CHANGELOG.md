@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for `keyAccid@oct`
 
 ## [6.1.1] – 2026-03-12
 * Fix cocoapods headers

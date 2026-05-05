@@ -652,7 +652,7 @@ void ABCInput::ParseKey(std::string &keyString)
             std::string modeString(&keyString[i]);
             // capitalization is ignored for the modes
             // and in fact only the first three letters of each mode are parsed
-            modeString = modeString.substr(0, 3);
+            modeString.resize(3);
             for (char &c : modeString) {
                 c = tolower(c);
             }
@@ -817,7 +817,7 @@ void ABCInput::ParseTempo(const std::string &tempoString)
     }
     if (tempoString.find('\"') != std::string::npos) {
         std::string tempoWord = tempoString.substr(tempoString.find('\"') + 1);
-        tempoWord = tempoWord.substr(0, tempoWord.find('\"'));
+        tempoWord.resize(tempoWord.find('\"'));
         if (!tempoWord.empty()) {
             Text *text = new Text();
             text->SetText(UTF8to32(tempoWord));
@@ -1183,7 +1183,7 @@ void ABCInput::ReadInformationField(const char &dataKey, std::string value)
     if (dataKey == '%' || dataKey == '\0')
         return;
     else if (value.find('%') != std::string::npos) {
-        value = value.substr(0, value.find('%'));
+        value.resize(value.find('%'));
     }
     while (isspace(value[value.length() - 1])) value.pop_back();
     if (value.empty()) return;

@@ -160,6 +160,7 @@ void Doc::ResetToSerialization()
     m_drawingLyricFontSize = 0;
 
     m_isCastOff = true;
+    m_mensuralCastOff = false;
 }
 
 void Doc::ResetToLoading()
@@ -1382,15 +1383,24 @@ void Doc::ConvertToPageBasedDoc()
     this->ResetDataPage();
 }
 
-void Doc::ConvertToCastOffMensuralDoc(bool castOff)
+void Doc::ConvertToCastOffMensuralDoc(MensuralCastOffType castOff)
 {
     if (!this->IsMensuralMusicOnly()) return;
+
+    // Do not convert if not an init call and mensural cast was not performed
+    if ((castOff != MENSURAL_CAST_OFF_INIT) && !m_mensuralCastOff) return;
 
     // Do not convert transcription files
     if (this->IsTranscription()) return;
 
     // Do not convert facs files
     if (this->IsFacs()) return;
+
+    // Flag it as performed
+    m_mensuralCastOff = true;
+
+    // With init and reset we are converting to cast off
+    bool convertToCastOff = (castOff != MENSURAL_CAST_OFF_UNSET);
 
     // Make sure the document is not cast-off
     if (this->IsCastOff()) this->UnCastOffDoc();
@@ -1406,7 +1416,7 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
     for (const auto item : systems) {
         System *system = vrv_cast<System *>(item);
         assert(system);
-        if (castOff) {
+        if (convertToCastOff) {
             System *convertedSystem = new System();
             ConvertToCastOffMensuralFunctor convertToCastOffMensural(this, convertedSystem);
             // Convert the system and replace it

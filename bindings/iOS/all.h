@@ -97,6 +97,7 @@
 #import <VerovioFramework/editortoolkit_cmn.h>
 #import <VerovioFramework/editortoolkit_mensural.h>
 #import <VerovioFramework/editortoolkit_neume.h>
+#import <VerovioFramework/editortoolkit_shared.h>
 #import <VerovioFramework/elementpart.h>
 #import <VerovioFramework/ending.h>
 #import <VerovioFramework/expan.h>

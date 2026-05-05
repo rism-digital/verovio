@@ -32620,7 +32620,7 @@ void HumdrumInput::finalizeDocument(Doc *doc)
         doc->PrepareData();
         doc->SetMensuralMusicOnly(BOOLEAN_true);
         doc->m_notationType = NOTATIONTYPE_mensural;
-        doc->ConvertToCastOffMensuralDoc(true);
+        doc->ConvertToCastOffMensuralDoc(MENSURAL_CAST_OFF_INIT);
     }
 }
 

@@ -719,6 +719,12 @@ enum MeasureType { MEASURED = 0, UNMEASURED, NEUMELINE };
 enum FocusStatusType { FOCUS_UNSET = 0, FOCUS_SET, FOCUS_USED };
 
 //----------------------------------------------------------------------------
+// Mensural cast-off type
+//----------------------------------------------------------------------------
+
+enum MensuralCastOffType { MENSURAL_CAST_OFF_INIT = 0, MENSURAL_CAST_OFF_UNSET, MENSURAL_CAST_OFF_RESET };
+
+//----------------------------------------------------------------------------
 // The score time unit (quarter note)
 //----------------------------------------------------------------------------
 

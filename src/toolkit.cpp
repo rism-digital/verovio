@@ -845,7 +845,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
             m_doc.ConvertToCmnDoc();
         }
         else {
-            m_doc.ConvertToCastOffMensuralDoc(true);
+            m_doc.ConvertToCastOffMensuralDoc(MENSURAL_CAST_OFF_INIT);
         }
     }
 
