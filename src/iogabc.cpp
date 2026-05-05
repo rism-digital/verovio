@@ -99,7 +99,7 @@ bool GABCInput::ProcessClef(const std::string &word)
     clef->SetShape(shape);
     m_layer->AddChild(clef); // TODO: "bajo" con staffDef
 
-    this->m_currentClefPitchOffset = offset;
+    m_currentClefPitchOffset = offset;
     LogDebug("Clef found %s", word.c_str());
     return true;
     // TODO: several clefs c1@c4, f3@f4
@@ -254,12 +254,12 @@ int GABCInput::ProcessSuffix(const std::string &music, int currentIndex, Nc *nc,
 
         case '~': // liquescent depending on melodic contour
             processedChars++;
-            AddLiquescent(nc, InferLiquescentCurve(previousNC, nc));
+            this->AddLiquescent(nc, InferLiquescentCurve(previousNC, nc));
             break;
 
         case '>': // liquescent two tails down
             processedChars++;
-            AddLiquescent(nc, curvatureDirection_CURVE_c);
+            this->AddLiquescent(nc, curvatureDirection_CURVE_c);
             // Cephalicus only when there is no explicit virga following
             if (GetCharAt(music, currentIndex + processedChars) != 'V') {
                 nc->SetType("cephalicus");
@@ -268,7 +268,7 @@ int GABCInput::ProcessSuffix(const std::string &music, int currentIndex, Nc *nc,
 
         case '<': // liquescent two tails up
             processedChars++;
-            AddLiquescent(nc, curvatureDirection_CURVE_a);
+            this->AddLiquescent(nc, curvatureDirection_CURVE_a);
             break;
 
         case '\'': // episema_vertical
@@ -381,7 +381,7 @@ void GABCInput::ProcessNeume(const std::string &music, Syllable *syllable)
         // Any other character ends the strophicus group
         lastWasStrophicus = false;
 
-        std::optional<GABCPrefixes> prefixOpt = FindPrefix(music, currentIndex);
+        std::optional<GABCPrefixes> prefixOpt = this->FindPrefix(music, currentIndex);
 
         ch = GetCharAt(music, currentIndex); // re-read after prefix may have consumed chars
         bool diamond = false;
@@ -392,7 +392,7 @@ void GABCInput::ProcessNeume(const std::string &music, Syllable *syllable)
             diamond = true;
         }
 
-        auto pitchOctOpt = FindPitch(ch, this->m_currentClefPitchOffset);
+        auto pitchOctOpt = FindPitch(ch, m_currentClefPitchOffset);
 
         if (pitchOctOpt.has_value()) {
             currentIndex++;
@@ -456,7 +456,7 @@ void GABCInput::ProcessNeume(const std::string &music, Syllable *syllable)
 
             // Process remaining suffixes attached to this note
             while (static_cast<std::size_t>(currentIndex) < music.size()) {
-                int suffixChars = ProcessSuffix(music, currentIndex, currentNC, previousNC);
+                int suffixChars = this->ProcessSuffix(music, currentIndex, currentNC, previousNC);
                 if (suffixChars == 0) {
                     break;
                 }
@@ -466,7 +466,7 @@ void GABCInput::ProcessNeume(const std::string &music, Syllable *syllable)
             previousNC = currentNC;
         }
         else {
-            int processedChars = ProcessBarline(music, currentIndex, m_layer);
+            int processedChars = this->ProcessBarline(music, currentIndex, m_layer);
             if (processedChars > 0) {
                 currentIndex += processedChars;
             }
@@ -498,11 +498,11 @@ void GABCInput::ProcessWord(const std::string &lyrics, const std::string &music,
 
     if (!music.empty()) {
         LogDebug("Processing music: %s", music.c_str());
-        bool isClef = ProcessClef(music);
+        bool isClef = this->ProcessClef(music);
         if (!isClef) {
-            bool isCustos = ProcessCustos(music);
+            bool isCustos = this->ProcessCustos(music);
             if (!isCustos) {
-                ProcessNeume(music, syllable);
+                this->ProcessNeume(music, syllable);
             }
         }
     }
@@ -589,7 +589,7 @@ void GABCInput::ProcessInput(const std::string &gabc)
             }
         }
 
-        ProcessWord(tokens[ti].lyrics, tokens[ti].music, wordpos, con);
+        this->ProcessWord(tokens[ti].lyrics, tokens[ti].music, wordpos, con);
     }
 }
 
@@ -609,13 +609,13 @@ bool GABCInput::Import(const std::string &gabc)
     score->AddChild(section);
     Staff *staff = new Staff(1);
     Measure *measure = new Measure(UNMEASURED, 1);
-    this->m_layer = new Layer();
-    this->m_layer->SetN(1);
-    staff->AddChild(this->m_layer);
+    m_layer = new Layer();
+    m_layer->SetN(1);
+    staff->AddChild(m_layer);
     measure->AddChild(staff);
     section->AddChild(measure);
 
-    ProcessInput(gabc);
+    this->ProcessInput(gabc);
 
     // add minimal scoreDef
     StaffGrp *staffGrp = new StaffGrp();
