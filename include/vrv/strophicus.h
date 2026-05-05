@@ -1,14 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        quilisma.h
-// Author:      Klaus Rettinghaus
-// Created:     2024
+// Name:        strophicus.h
+// Author:      David Rizo
+// Created:     2025
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_quilisma_H__
-#define __VRV_quilisma_H__
+#ifndef __VRV_STROPHICUS_H__
+#define __VRV_STROPHICUS_H__
 
-#include "atts_analytical.h"
 #include "atts_shared.h"
 #include "layerelement.h"
 #include "offsetinterface.h"
@@ -18,25 +17,25 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// quilisma
+// Strophicus
 //----------------------------------------------------------------------------
 
-class Quilisma : public LayerElement,
-                 public OffsetInterface,
-                 public PitchInterface,
-                 public PositionInterface,
-                 public AttColor {
+class Strophicus : public LayerElement,
+                   public OffsetInterface,
+                   public PitchInterface,
+                   public PositionInterface,
+                   public AttColor {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      * Reset method resets all attribute classes
      */
     ///@{
-    Quilisma();
-    virtual ~Quilisma();
-    Object *Clone() const override { return new Quilisma(*this); }
+    Strophicus();
+    virtual ~Strophicus();
+    Object *Clone() const override { return new Strophicus(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "quilisma"; }
+    std::string GetClassName() const override { return "strophicus"; }
     ///@}
 
     /**

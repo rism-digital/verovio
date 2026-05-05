@@ -25,6 +25,7 @@
 #include "nc.h"
 #include "neume.h"
 #include "note.h"
+#include "resources.h"
 #include "smufl.h"
 #include "staff.h"
 #include "syllable.h"
@@ -226,6 +227,18 @@ void View::DrawOriscus(DeviceContext *dc, LayerElement *element, Layer *layer, S
 }
 
 void View::DrawQuilisma(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    dc->StartGraphic(element, "", element->GetID());
+
+    dc->EndGraphic(element, this);
+}
+
+void View::DrawStrophicus(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
     assert(layer);

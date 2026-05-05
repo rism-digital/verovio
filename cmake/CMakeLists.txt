@@ -18,6 +18,7 @@ option(VRV_DYNAMIC_CAST         "Enable <dynamic_cast>"                        O
 option(NO_DARMS_SUPPORT         "Disable DARMS support"                        ON)
 option(NO_PAE_SUPPORT           "Disable Plaine & Easie support"               OFF)
 option(NO_ABC_SUPPORT           "Disable ABC support"                          OFF)
+option(NO_GABC_SUPPORT          "Disable GABC support"                         OFF)
 option(NO_MUSICXML_SUPPORT      "Disable MusicXML support"                     OFF)
 option(NO_MXL_SUPPORT           "Disable compressed MusicXML support"          OFF)
 option(NO_HUMDRUM_SUPPORT       "Disable Humdrum support"                      OFF)
@@ -141,6 +142,10 @@ if(NO_ABC_SUPPORT)
     add_definitions(-DNO_ABC_SUPPORT)
 endif()
 
+if(NO_GABC_SUPPORT)
+    add_definitions(-DNO_GABC_SUPPORT)
+endif()
+
 if(NO_MUSICXML_SUPPORT)
     add_definitions(-DNO_MUSICXML_SUPPORT)
 endif()
@@ -185,6 +190,7 @@ set(all_SRC
     ${midi_SRC}
     ../src/json/jsonxx.cc
     ../src/pugi/pugixml.cpp
+    ../include/vrv/iogabc.h
 )
 
 ##################

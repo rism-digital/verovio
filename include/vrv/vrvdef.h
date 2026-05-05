@@ -248,6 +248,7 @@ enum ClassId : uint16_t {
     PLICA,
     PROPORT,
     QUILISMA,
+    STROPHICUS,
     REST,
     SPACE,
     STEM,

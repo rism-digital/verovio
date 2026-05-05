@@ -1000,6 +1000,16 @@
 		4DFD82FE2A38398200A3E20B /* repeatmark.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DFD82FA2A38398200A3E20B /* repeatmark.cpp */; };
 		4DFD83002A38399C00A3E20B /* repeatmark.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DFD82FF2A38399C00A3E20B /* repeatmark.h */; };
 		4DFD83012A38399C00A3E20B /* repeatmark.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DFD82FF2A38399C00A3E20B /* repeatmark.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6D76479F2FA66BDD004F9EDA /* iogabc.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D76479E2FA66BDD004F9EDA /* iogabc.h */; };
+		6D7647A02FA66BDD004F9EDA /* iogabc.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D76479E2FA66BDD004F9EDA /* iogabc.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6D7647A22FA66C68004F9EDA /* iogabc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D7647A12FA66C68004F9EDA /* iogabc.cpp */; };
+		6D7647A32FA66C68004F9EDA /* iogabc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D7647A12FA66C68004F9EDA /* iogabc.cpp */; };
+		6D7647A42FA66C68004F9EDA /* iogabc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D7647A12FA66C68004F9EDA /* iogabc.cpp */; };
+		6D7647A62FA66CE8004F9EDA /* strophicus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D7647A52FA66CE8004F9EDA /* strophicus.cpp */; };
+		6D7647A72FA66CE8004F9EDA /* strophicus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D7647A52FA66CE8004F9EDA /* strophicus.cpp */; };
+		6D7647A82FA66CE8004F9EDA /* strophicus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D7647A52FA66CE8004F9EDA /* strophicus.cpp */; };
+		6D7647AA2FA66D0A004F9EDA /* strophicus.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D7647A92FA66D0A004F9EDA /* strophicus.h */; };
+		6D7647AB2FA66D0A004F9EDA /* strophicus.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D7647A92FA66D0A004F9EDA /* strophicus.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8F086EE2188539540037FD8E /* verticalaligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* verticalaligner.cpp */; };
 		8F086EE4188539540037FD8E /* barline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB8188539540037FD8E /* barline.cpp */; };
 		8F086EE5188539540037FD8E /* bboxdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB9188539540037FD8E /* bboxdevicecontext.cpp */; };
@@ -2217,6 +2227,10 @@
 		4DFB3E8923ABDFDA00D688C7 /* pitchinflection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pitchinflection.h; path = include/vrv/pitchinflection.h; sourceTree = "<group>"; };
 		4DFD82FA2A38398200A3E20B /* repeatmark.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = repeatmark.cpp; path = src/repeatmark.cpp; sourceTree = "<group>"; };
 		4DFD82FF2A38399C00A3E20B /* repeatmark.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = repeatmark.h; path = include/vrv/repeatmark.h; sourceTree = "<group>"; };
+		6D76479E2FA66BDD004F9EDA /* iogabc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = iogabc.h; path = include/vrv/iogabc.h; sourceTree = "<group>"; };
+		6D7647A12FA66C68004F9EDA /* iogabc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = iogabc.cpp; path = src/iogabc.cpp; sourceTree = "<group>"; };
+		6D7647A52FA66CE8004F9EDA /* strophicus.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = strophicus.cpp; path = src/strophicus.cpp; sourceTree = "<group>"; };
+		6D7647A92FA66D0A004F9EDA /* strophicus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = strophicus.h; path = include/vrv/strophicus.h; sourceTree = "<group>"; };
 		8F086EA9188534680037FD8E /* Verovio */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Verovio; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F086EB6188539540037FD8E /* verticalaligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = verticalaligner.cpp; path = src/verticalaligner.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		8F086EB8188539540037FD8E /* barline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = barline.cpp; path = src/barline.cpp; sourceTree = "<group>"; };
@@ -3016,6 +3030,8 @@
 				8F59291B18854BF800FE51AD /* iopae.h */,
 				4DE0198B2C495DB800B5B6BF /* iovolpiano.cpp */,
 				4DE0198A2C495D1F00B5B6BF /* iovolpiano.h */,
+				6D76479E2FA66BDD004F9EDA /* iogabc.h */,
+				6D7647A12FA66C68004F9EDA /* iogabc.cpp */,
 			);
 			name = io;
 			sourceTree = "<group>";
@@ -3180,6 +3196,8 @@
 				8F59293018854BF800FE51AD /* tuplet.h */,
 				4D9A9C18199F561200028D93 /* verse.cpp */,
 				4D9A9C16199F560200028D93 /* verse.h */,
+				6D7647A92FA66D0A004F9EDA /* strophicus.h */,
+				6D7647A52FA66CE8004F9EDA /* strophicus.cpp */,
 			);
 			name = layerelements;
 			sourceTree = "<group>";
@@ -3501,6 +3519,7 @@
 				4DACC9E62990F29A00B55913 /* atttypes.h in Headers */,
 				4D4CDEA72C079026005621E9 /* adjustneumexfunctor.h in Headers */,
 				4DB3D8FE1F83D20100B5FC2B /* horizontalaligner.h in Headers */,
+				6D76479F2FA66BDD004F9EDA /* iogabc.h in Headers */,
 				4DB3D8F21F83D1B100B5FC2B /* svg.h in Headers */,
 				4DACC9DC2990F29A00B55913 /* atts_header.h in Headers */,
 				4D2073FE22A3BCEC00E0765F /* tabdursym.h in Headers */,
@@ -3592,6 +3611,7 @@
 				E73E86252A069C640089DF74 /* transposefunctor.h in Headers */,
 				4DEC4DD921C8295700D1D273 /* rdg.h in Headers */,
 				4DB3D8D01F83D11800B5FC2B /* mordent.h in Headers */,
+				6D7647AA2FA66D0A004F9EDA /* strophicus.h in Headers */,
 				4DACC9F02990F29A00B55913 /* atts_critapp.h in Headers */,
 				4DC3B9EA239E2B22007F185E /* transposition.h in Headers */,
 				4D1BE7821C69434C0086DC0E /* MidiFile.h in Headers */,
@@ -3866,6 +3886,7 @@
 				BB4C4AE422A932BC001F6AF0 /* choice.h in Headers */,
 				BB4C4AB822A932A6001F6AF0 /* iomusxml.h in Headers */,
 				BB4C4B6622A932D7001F6AF0 /* multirest.h in Headers */,
+				6D7647AB2FA66D0A004F9EDA /* strophicus.h in Headers */,
 				4DACC9C52990F29A00B55913 /* atts_analytical.h in Headers */,
 				E778BDAF29D5BD3D00672D51 /* adjuststaffoverlapfunctor.h in Headers */,
 				BB4C4AC222A932B6001F6AF0 /* layer.h in Headers */,
@@ -3897,6 +3918,7 @@
 				BB4C4B6E22A932D7001F6AF0 /* note.h in Headers */,
 				4DACCA012990F29A00B55913 /* atts_facsimile.h in Headers */,
 				BB4C4BA422A932E5001F6AF0 /* textdirinterface.h in Headers */,
+				6D7647A02FA66BDD004F9EDA /* iogabc.h in Headers */,
 				4DE0B9A22988070C00D4C939 /* interface.h in Headers */,
 				4DC3B9EB239E2B23007F185E /* transposition.h in Headers */,
 				BB4C4BC122A932FC001F6AF0 /* MidiMessage.h in Headers */,
@@ -4167,6 +4189,7 @@
 				4D81351F2322C41800F59C01 /* keyaccid.cpp in Sources */,
 				4D00A28B2ED2E32700EFA853 /* offsetinterface.cpp in Sources */,
 				4D1EB6A22A2A40B400AF2F98 /* textlayoutelement.cpp in Sources */,
+				6D7647A82FA66CE8004F9EDA /* strophicus.cpp in Sources */,
 				4D79642226C167100026288B /* pagemilestone.cpp in Sources */,
 				4DB3D8E31F83D16300B5FC2B /* elementpart.cpp in Sources */,
 				E741AD03299A3D6300854426 /* calcslurdirectionfunctor.cpp in Sources */,
@@ -4489,6 +4512,7 @@
 				E7E9C11D29B0EFB400CFCE2F /* adjusttempofunctor.cpp in Sources */,
 				4D2073F822A3BCE000E0765F /* tabdursym.cpp in Sources */,
 				4DE644F51EDBEA01002FBE6C /* breath.cpp in Sources */,
+				6D7647A42FA66C68004F9EDA /* iogabc.cpp in Sources */,
 				4DEC4D9A21C81E6600D1D273 /* lem.cpp in Sources */,
 				1579B3431B15033100B16F5C /* proport.cpp in Sources */,
 				8F086EF3188539540037FD8E /* layerelement.cpp in Sources */,
@@ -4710,6 +4734,7 @@
 				4DEF8A6621B7AAF90093A76B /* f.cpp in Sources */,
 				4D7AFDC92A5554A100835ED1 /* divline.cpp in Sources */,
 				4DB3D8F01F83D1A700B5FC2B /* fig.cpp in Sources */,
+				6D7647A72FA66CE8004F9EDA /* strophicus.cpp in Sources */,
 				E790165F298BCB27008FDB4E /* calcalignmentxposfunctor.cpp in Sources */,
 				8F3DD36718854B410051330C /* verticalaligner.cpp in Sources */,
 				4DE019902C495E7600B5B6BF /* iovolpiano.cpp in Sources */,
@@ -4860,6 +4885,7 @@
 				4D64137A2035F58200BB630E /* pages.cpp in Sources */,
 				4D64793A2C98825A00CD9539 /* iocmme.cpp in Sources */,
 				4D1694741E3A455200569BF4 /* humlib.cpp in Sources */,
+				6D7647A32FA66C68004F9EDA /* iogabc.cpp in Sources */,
 				4DB3D8C31F83D0EF00B5FC2B /* anchoredtext.cpp in Sources */,
 				4DB3D8E71F83D16A00B5FC2B /* ftrem.cpp in Sources */,
 				4DA0EAF422BB77C300A7EBEB /* facsimileinterface.cpp in Sources */,
@@ -5011,6 +5037,7 @@
 				BB4C4AF522A932BC001F6AF0 /* ref.cpp in Sources */,
 				4D7AFDCA2A5554A100835ED1 /* divline.cpp in Sources */,
 				BB4C4B9322A932E5001F6AF0 /* areaposinterface.cpp in Sources */,
+				6D7647A62FA66CE8004F9EDA /* strophicus.cpp in Sources */,
 				E7901660298BCB27008FDB4E /* calcalignmentxposfunctor.cpp in Sources */,
 				BB4C4AA122A9328F001F6AF0 /* verticalaligner.cpp in Sources */,
 				4DE019912C495E7700B5B6BF /* iovolpiano.cpp in Sources */,
@@ -5161,6 +5188,7 @@
 				4DA0EACA22BB779400A7EBEB /* facsimile.cpp in Sources */,
 				4D64793B2C98825A00CD9539 /* iocmme.cpp in Sources */,
 				BB4C4B4B22A932D7001F6AF0 /* custos.cpp in Sources */,
+				6D7647A22FA66C68004F9EDA /* iogabc.cpp in Sources */,
 				BB4C4BB822A932FC001F6AF0 /* Binasc.cpp in Sources */,
 				BB4C4B7B22A932D7001F6AF0 /* tuplet.cpp in Sources */,
 				4DBDD6752939E1BD009EC466 /* symboldef.cpp in Sources */,

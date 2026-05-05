@@ -184,6 +184,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(QUILISMA)) {
         this->DrawQuilisma(dc, element, layer, staff, measure);
     }
+    else if (element->Is(STROPHICUS)) {
+        this->DrawStrophicus(dc, element, layer, staff, measure);
+    }
     else if (element->Is(REST)) {
         this->DrawDurationElement(dc, element, layer, staff, measure);
     }

@@ -515,6 +515,7 @@ enum {
     SMUFL_E9F8_mensuralRestSemifusa = 0xE9F8,
     SMUFL_EA02_mensuralCustosUp = 0xEA02,
     SMUFL_EA06_chantCustosStemUpPosMiddle = 0xEA06,
+    SMUFL_EA29_medRenStrophicusCMN = 0xEA29,
     SMUFL_EA2A_medRenOriscusCMN = 0xEA2A,
     SMUFL_EA50_figbass0 = 0xEA50,
     SMUFL_EA51_figbass1 = 0xEA51,
@@ -671,7 +672,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 646
+#define SMUFL_COUNT 647
 
 } // namespace vrv
 
