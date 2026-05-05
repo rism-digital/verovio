@@ -64,17 +64,6 @@ GABCInput::GABCInput(Doc *doc) : Input(doc) {}
 
 GABCInput::~GABCInput() {}
 
-char GABCInput::GetCharAt(const std::string &input, int index)
-{
-    assert(index >= 0);
-
-    auto idx = static_cast<std::size_t>(index);
-    if (idx >= input.size()) {
-        return '\0';
-    }
-    return input[idx];
-}
-
 //////////////////////////////////////////////////////////////////////////
 // Clefs
 // Tuple = <Clef shape, clef line, diatonic pitch deviation from C2>
@@ -232,40 +221,6 @@ void GABCInput::AddLiquescent(Nc *nc, curvatureDirection_CURVE curve)
     nc->SetCurve(curve);
 }
 
-int GABCInput::PitchToDiatonicNumber(data_PITCHNAME pname, int oct)
-{
-    int diatonic = 0;
-    switch (pname) {
-        case PITCHNAME_c: diatonic = 0; break;
-        case PITCHNAME_d: diatonic = 1; break;
-        case PITCHNAME_e: diatonic = 2; break;
-        case PITCHNAME_f: diatonic = 3; break;
-        case PITCHNAME_g: diatonic = 4; break;
-        case PITCHNAME_a: diatonic = 5; break;
-        case PITCHNAME_b: diatonic = 6; break;
-        default: diatonic = 0; break;
-    }
-    return oct * 7 + diatonic;
-}
-
-curvatureDirection_CURVE GABCInput::InferLiquescentCurve(const Nc *previousNC, const Nc *currentNC)
-{
-    if (previousNC == nullptr || currentNC == nullptr) {
-        return curvatureDirection_CURVE_NONE;
-    }
-
-    int prevPitch = PitchToDiatonicNumber(previousNC->GetPname(), previousNC->GetOct());
-    int currPitch = PitchToDiatonicNumber(currentNC->GetPname(), currentNC->GetOct());
-
-    if (currPitch > prevPitch) {
-        return curvatureDirection_CURVE_a; // rising melody
-    }
-    if (currPitch < prevPitch) {
-        return curvatureDirection_CURVE_c; // falling melody
-    }
-    return curvatureDirection_CURVE_NONE;
-}
-
 int GABCInput::ProcessSuffix(const std::string &music, int currentIndex, Nc *nc, Nc *previousNC)
 {
     int processedChars = 0;
@@ -372,32 +327,6 @@ static constexpr std::array<data_PITCHNAME, 7> kDiatonicPitchNames = { {
     PITCHNAME_a,
     PITCHNAME_b,
 } };
-
-GABCInput::PitchOctaveType GABCInput::MakePitchFromDiatonicIndex(int absoluteDiatonicIndex)
-{
-    // absoluteDiatonicIndex is counted from C0 = 0.
-    int octave = absoluteDiatonicIndex / 7;
-    int pitchClass = absoluteDiatonicIndex % 7;
-    if (pitchClass < 0) {
-        pitchClass += 7;
-        octave -= 1;
-    }
-    return { kDiatonicPitchNames[static_cast<std::size_t>(pitchClass)], octave };
-}
-
-std::optional<GABCInput::PitchOctaveType> GABCInput::FindPitch(char ch, int clefPitchOffset)
-{
-    if (ch < 'a' || ch > 'm') {
-        return std::nullopt;
-    }
-
-    // Base c2 mapping: a..m = e3..c5.
-    constexpr int c2BaseDiatonicIndexForA = 3 * 7 + 2; // E3
-    int letterIndex = ch - 'a';
-    int absoluteDiatonicIndex = c2BaseDiatonicIndexForA + letterIndex + clefPitchOffset;
-
-    return MakePitchFromDiatonicIndex(absoluteDiatonicIndex);
-}
 
 void GABCInput::ProcessNeume(const std::string &music, Syllable *syllable)
 {
@@ -700,6 +629,81 @@ bool GABCInput::Import(const std::string &gabc)
     m_doc->ConvertToPageBasedDoc();
 
     return true;
+}
+
+//----------------------------------------------------------------------------
+// Static methods
+//----------------------------------------------------------------------------
+
+char GABCInput::GetCharAt(const std::string &input, int index)
+{
+    assert(index >= 0);
+
+    auto idx = static_cast<std::size_t>(index);
+    if (idx >= input.size()) {
+        return '\0';
+    }
+    return input[idx];
+}
+
+int GABCInput::PitchToDiatonicNumber(data_PITCHNAME pname, int oct)
+{
+    int diatonic = 0;
+    switch (pname) {
+        case PITCHNAME_c: diatonic = 0; break;
+        case PITCHNAME_d: diatonic = 1; break;
+        case PITCHNAME_e: diatonic = 2; break;
+        case PITCHNAME_f: diatonic = 3; break;
+        case PITCHNAME_g: diatonic = 4; break;
+        case PITCHNAME_a: diatonic = 5; break;
+        case PITCHNAME_b: diatonic = 6; break;
+        default: diatonic = 0; break;
+    }
+    return oct * 7 + diatonic;
+}
+
+curvatureDirection_CURVE GABCInput::InferLiquescentCurve(const Nc *previousNC, const Nc *currentNC)
+{
+    if (previousNC == nullptr || currentNC == nullptr) {
+        return curvatureDirection_CURVE_NONE;
+    }
+
+    int prevPitch = PitchToDiatonicNumber(previousNC->GetPname(), previousNC->GetOct());
+    int currPitch = PitchToDiatonicNumber(currentNC->GetPname(), currentNC->GetOct());
+
+    if (currPitch > prevPitch) {
+        return curvatureDirection_CURVE_a; // rising melody
+    }
+    if (currPitch < prevPitch) {
+        return curvatureDirection_CURVE_c; // falling melody
+    }
+    return curvatureDirection_CURVE_NONE;
+}
+
+GABCInput::PitchOctaveType GABCInput::MakePitchFromDiatonicIndex(int absoluteDiatonicIndex)
+{
+    // absoluteDiatonicIndex is counted from C0 = 0.
+    int octave = absoluteDiatonicIndex / 7;
+    int pitchClass = absoluteDiatonicIndex % 7;
+    if (pitchClass < 0) {
+        pitchClass += 7;
+        octave -= 1;
+    }
+    return { kDiatonicPitchNames[static_cast<std::size_t>(pitchClass)], octave };
+}
+
+std::optional<GABCInput::PitchOctaveType> GABCInput::FindPitch(char ch, int clefPitchOffset)
+{
+    if (ch < 'a' || ch > 'm') {
+        return std::nullopt;
+    }
+
+    // Base c2 mapping: a..m = e3..c5.
+    constexpr int c2BaseDiatonicIndexForA = 3 * 7 + 2; // E3
+    int letterIndex = ch - 'a';
+    int absoluteDiatonicIndex = c2BaseDiatonicIndexForA + letterIndex + clefPitchOffset;
+
+    return MakePitchFromDiatonicIndex(absoluteDiatonicIndex);
 }
 
 } // namespace vrv
