@@ -27,7 +27,7 @@ class Syllable;
 // GABCInput
 //----------------------------------------------------------------------------
 
-enum Prefixes { NO_SPACE, REMOVE_FIRST_STEM, NEUMATIC_CUT, OBLIQUE_LIGATURE };
+enum GABCPrefixes { GABC_NO_SPACE, GABC_REMOVE_FIRST_STEM, GABC_NEUMATIC_CUT, GABC_OBLIQUE_LIGATURE };
 
 class GABCInput : public Input {
 public:
@@ -42,7 +42,7 @@ private:
     void AddAccidental(Syllable *syllable, data_ACCIDENTAL_WRITTEN accid, data_PITCHNAME pname, data_OCTAVE oct);
     void AddEpisema(Nc *nc, const std::string &form);
     void AddLiquescent(Nc *nc, curvatureDirection_CURVE curve);
-    std::optional<Prefixes> FindPrefix(const std::string &music, int &currentIndex);
+    std::optional<GABCPrefixes> FindPrefix(const std::string &music, int &currentIndex);
     int ProcessBarline(const std::string &music, int currentIndex, Layer *layer);
     bool ProcessClef(const std::string &word);
     int ProcessCustos(const std::string &word);

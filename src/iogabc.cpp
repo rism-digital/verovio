@@ -143,37 +143,37 @@ int GABCInput::ProcessCustos(const std::string &word)
 }
 
 // It returns a prefix and advances the index or NONE if not found.
-std::optional<Prefixes> GABCInput::FindPrefix(const std::string &music, int &currentIndex)
+std::optional<GABCPrefixes> GABCInput::FindPrefix(const std::string &music, int &currentIndex)
 {
     int nextCurrentIndex = currentIndex;
-    std::optional<Prefixes> result = std::nullopt;
+    std::optional<GABCPrefixes> result = std::nullopt;
     // º = U+00BA = UTF-8 bytes 0xC2 0xBA: oblique ligature prefix
     if (static_cast<unsigned char>(GetCharAt(music, currentIndex)) == 0xC2
         && static_cast<unsigned char>(GetCharAt(music, currentIndex + 1)) == 0xBA) {
         currentIndex += 2;
         LogDebug("Prefix found: oblique ligature");
-        return OBLIQUE_LIGATURE;
+        return GABC_OBLIQUE_LIGATURE;
     }
 
     switch (GetCharAt(music, currentIndex)) {
         case '!':
             nextCurrentIndex++;
-            result = NO_SPACE;
+            result = GABC_NO_SPACE;
             break;
         case '@':
             nextCurrentIndex++;
-            result = REMOVE_FIRST_STEM;
+            result = GABC_REMOVE_FIRST_STEM;
             break;
         case '/':
             nextCurrentIndex++;
             char char2 = GetCharAt(music, nextCurrentIndex);
             if (char2 == '/') {
                 // Prefix: "//"
-                result = NEUMATIC_CUT; // TODO Tipo
+                result = GABC_NEUMATIC_CUT; // TODO Tipo
             }
             else if (char2 == '0') {
                 // Prefix: "/0"
-                result = NEUMATIC_CUT;
+                result = GABC_NEUMATIC_CUT;
                 // TODO Tipo
             }
             else if (char2 == '[') {
@@ -191,7 +191,7 @@ std::optional<Prefixes> GABCInput::FindPrefix(const std::string &music, int &cur
                     if (negative) {
                         value = -value;
                     }
-                    result = NEUMATIC_CUT;
+                    result = GABC_NEUMATIC_CUT;
                     // TODO Tipo
                 }
             }
@@ -452,7 +452,7 @@ void GABCInput::ProcessNeume(const std::string &music, Syllable *syllable)
         // Any other character ends the strophicus group
         lastWasStrophicus = false;
 
-        std::optional<Prefixes> prefixOpt = FindPrefix(music, currentIndex);
+        std::optional<GABCPrefixes> prefixOpt = FindPrefix(music, currentIndex);
 
         ch = GetCharAt(music, currentIndex); // re-read after prefix may have consumed chars
         bool diamond = false;
@@ -477,7 +477,7 @@ void GABCInput::ProcessNeume(const std::string &music, Syllable *syllable)
                 currentNC->SetTilt(COMPASSDIRECTION_se);
             }
 
-            if (prefixOpt.has_value() && prefixOpt.value() == OBLIQUE_LIGATURE) {
+            if (prefixOpt.has_value() && prefixOpt.value() == GABC_OBLIQUE_LIGATURE) {
                 // Oblique ligature: this nc gets the oblique tilt and starts the ligature
                 currentNC->SetTilt(COMPASSDIRECTION_n);
                 currentNC->SetLigated(BOOLEAN_true);
