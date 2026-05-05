@@ -19,6 +19,7 @@
 #include "vrvdef.h"
 
 namespace vrv {
+
 class Layer;
 class Nc;
 class Syllable;
