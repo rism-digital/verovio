@@ -51,17 +51,21 @@ private:
     int ProcessSuffix(const std::string &music, int currentIndex, Nc *nc, Nc *previousNC);
     void ProcessWord(const std::string &lyrics, const std::string &music, sylLog_WORDPOS wordpos, sylLog_CON con);
 
-    // static helper methods
+    //----------------//
+    // Static methods //
+    //----------------//
+
     static char GetCharAt(const std::string &input, int index);
-    static void Debug(const std::string &message);
     static int PitchToDiatonicNumber(data_PITCHNAME pname, int oct);
     static curvatureDirection_CURVE InferLiquescentCurve(const Nc *previousNC, const Nc *currentNC);
     static PitchOctaveType MakePitchFromDiatonicIndex(int absoluteDiatonicIndex);
     static std::optional<PitchOctaveType> FindPitch(char ch, int clefPitchOffset);
 
-    // member variables
-    int currentClefPitchOffset;
-    Layer *layer;
+public:
+    //
+private:
+    int m_currentClefPitchOffset;
+    Layer *m_layer;
 };
 
 } // namespace vrv

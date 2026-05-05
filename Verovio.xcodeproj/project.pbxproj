@@ -3030,8 +3030,8 @@
 				8F59291B18854BF800FE51AD /* iopae.h */,
 				4DE0198B2C495DB800B5B6BF /* iovolpiano.cpp */,
 				4DE0198A2C495D1F00B5B6BF /* iovolpiano.h */,
-				6D76479E2FA66BDD004F9EDA /* iogabc.h */,
 				6D7647A12FA66C68004F9EDA /* iogabc.cpp */,
+				6D76479E2FA66BDD004F9EDA /* iogabc.h */,
 			);
 			name = io;
 			sourceTree = "<group>";
