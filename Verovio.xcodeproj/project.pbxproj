@@ -492,6 +492,7 @@
 		4D9A9C1C199F576100028D93 /* syl.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9A9C1B199F576100028D93 /* syl.h */; };
 		4D9A9C1E19A1DE2000028D93 /* syl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C1D19A1DE2000028D93 /* syl.cpp */; };
 		4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C1D19A1DE2000028D93 /* syl.cpp */; };
+		4DA0867D2FA9DAB400A45751 /* strophicus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D7647A52FA66CE8004F9EDA /* strophicus.cpp */; };
 		4DA0EAC322BB779400A7EBEB /* surface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA0EAC022BB779300A7EBEB /* surface.cpp */; };
 		4DA0EAC422BB779400A7EBEB /* surface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA0EAC022BB779300A7EBEB /* surface.cpp */; };
 		4DA0EAC522BB779400A7EBEB /* surface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA0EAC022BB779300A7EBEB /* surface.cpp */; };
@@ -3182,6 +3183,8 @@
 				4DB3072D1AC9ED1800EE0982 /* space.h */,
 				BD2E4D94287587FD00B04350 /* stem.cpp */,
 				BD2E4D992875881B00B04350 /* stem.h */,
+				6D7647A52FA66CE8004F9EDA /* strophicus.cpp */,
+				6D7647A92FA66D0A004F9EDA /* strophicus.h */,
 				4D9A9C1D19A1DE2000028D93 /* syl.cpp */,
 				4D9A9C1B199F576100028D93 /* syl.h */,
 				4D766EF620ACAD61006875D8 /* syllable.cpp */,
@@ -3196,8 +3199,6 @@
 				8F59293018854BF800FE51AD /* tuplet.h */,
 				4D9A9C18199F561200028D93 /* verse.cpp */,
 				4D9A9C16199F560200028D93 /* verse.h */,
-				6D7647A92FA66D0A004F9EDA /* strophicus.h */,
-				6D7647A52FA66CE8004F9EDA /* strophicus.cpp */,
 			);
 			name = layerelements;
 			sourceTree = "<group>";
@@ -4491,6 +4492,7 @@
 				8F086EED188539540037FD8E /* iodarms.cpp in Sources */,
 				8F086EEE188539540037FD8E /* iomei.cpp in Sources */,
 				8F086EEF188539540037FD8E /* iomusxml.cpp in Sources */,
+				4DA0867D2FA9DAB400A45751 /* strophicus.cpp in Sources */,
 				8F086EF0188539540037FD8E /* iopae.cpp in Sources */,
 				4DACC9D42990F29A00B55913 /* atts_pagebased.cpp in Sources */,
 				BD0562362518CD20004057EB /* beamspan.cpp in Sources */,
