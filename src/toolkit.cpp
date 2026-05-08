@@ -843,6 +843,10 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     // might have been ignored because of the --breaks auto option.
     // Regardless, we won't do layout if the --breaks none option was set.
     int breaks = m_options->m_breaks.GetValue();
+    if (inputFrom == PAE) {
+        // PAE loading intentionally skips cast-off/layout for faster incipit processing.
+        breaks = BREAKS_none;
+    }
 
     // When loading page-based MEI, the layout is marked as done
     // In this case, we do not cast-off the document (breaks is expected to be not set)
