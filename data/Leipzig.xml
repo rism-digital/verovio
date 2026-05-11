@@ -115,7 +115,7 @@
   <g c="E56C" x="0.0" y="-2.0" w="605.0" h="242.0" h-a-x="605" n="ornamentShortTrill" />
   <g c="E56D" x="0.0" y="-90.0" w="586.0" h="399.0" h-a-x="587" n="ornamentMordent" />
   <g c="E004" x="0.0" y="-282.11" w="399.0" h="282.11" h-a-x="399" n="bracketBottom" />
-  <g c="E003" x="0.0" y="0.0" w="399.0" h="282.11" h-a-x="399" n="bracketTop" />
+  <g c="E003" x="0.0" y="-0.0" w="399.0" h="282.11" h-a-x="399" n="bracketTop" />
   <g c="E88A" x="17.0" y="50.0" w="110.0" h="194.0" h-a-x="144" n="tupletColon" />
   <g c="E522" x="-143.0" y="-223.0" w="448.0" h="665.0" h-a-x="232" n="dynamicForte" />
   <g c="E521" x="-44.0" y="-18.0" w="472.0" h="280.0" h-a-x="405" n="dynamicMezzo" />
@@ -857,4 +857,5 @@
   <g c="E0D5" x="0.0" y="-170.0" w="545.0" h="340.0" h-a-x="545" n="noteheadSlashedDoubleWhole1" />
   <g c="E0D6" x="0.0" y="-170.0" w="545.0" h="340.0" h-a-x="545" n="noteheadSlashedDoubleWhole2" />
   <g c="E4D5" x="0.0" y="-192.0" w="600.0" h="512.0" h-a-x="600" n="breathMarkSalzedo" />
+  <g c="EA29" x="-0.62" y="-138.38" w="184.82" h="274.66" h-a-x="184" n="medRenStrophicusCMN" />
 </bounding-boxes>

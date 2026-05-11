@@ -813,7 +813,7 @@ void ABCInput::ParseTempo(const std::string &tempoString)
     Tempo *tempo = new Tempo();
     if (tempoString.find('=') != std::string::npos) {
         const int numStart = int(tempoString.find('=') + 1);
-        tempo->SetMm(std::atof(tempoString.substr(numStart).c_str()));
+        tempo->SetMm(std::stof(tempoString.substr(numStart)));
     }
     if (tempoString.find('\"') != std::string::npos) {
         std::string tempoWord = tempoString.substr(tempoString.find('\"') + 1);
@@ -1180,14 +1180,16 @@ void ABCInput::ParseLyrics()
 void ABCInput::ReadInformationField(const char &dataKey, std::string value)
 {
     // remove comments and trim
-    if (dataKey == '%' || dataKey == '\0')
+    if (dataKey == '%' || dataKey == '\0') {
         return;
-    else if (value.find('%') != std::string::npos) {
-        value.resize(value.find('%'));
+    }
+    std::size_t comment = value.find('%');
+    if (comment != std::string::npos) {
+        value.resize(comment);
     }
     while (isspace(value[value.length() - 1])) value.pop_back();
     if (value.empty()) return;
-    while (isspace(value[0])) value = value.substr(1);
+    while (isspace(value.front())) value.erase(0, 1);
 
     if (dataKey == '+') {
         LogWarning("ABC import: Field continuation (+) is not supported");
