@@ -260,6 +260,7 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
 
         if (hasLiquescent) {
             nc->m_drawingGlyphs.resize(3);
+
             const int ncWidth = m_doc->GetGlyphWidth(SMUFL_E995_chantAuctumDesc, staffSize, false);
             const int lineWidth = m_doc->GetGlyphWidth(SMUFL_E9BE_chantConnectingLineAsc3rd, staffSize, false);
 

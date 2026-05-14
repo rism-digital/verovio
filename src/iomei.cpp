@@ -135,6 +135,7 @@
 #include "staffdef.h"
 #include "staffgrp.h"
 #include "stem.h"
+#include "strophicus.h"
 #include "subst.h"
 #include "supplied.h"
 #include "surface.h"
@@ -804,6 +805,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         else if (object->Is(QUILISMA)) {
             m_currentNode = m_currentNode.append_child("quilisma");
             this->WriteQuilisma(m_currentNode, vrv_cast<Quilisma *>(object));
+        }
+        else if (object->Is(STROPHICUS)) {
+            m_currentNode = m_currentNode.append_child("strophicus");
+            this->WriteStrophicus(m_currentNode, vrv_cast<Strophicus *>(object));
         }
         else if (object->Is(REST)) {
             m_currentNode = m_currentNode.append_child("rest");
@@ -2940,6 +2945,16 @@ void MEIOutput::WriteQuilisma(pugi::xml_node currentNode, Quilisma *quilisma)
     quilisma->WriteColor(currentNode);
 }
 
+void MEIOutput::WriteStrophicus(pugi::xml_node currentNode, Strophicus *strophicus)
+{
+    assert(strophicus);
+
+    this->WriteLayerElement(currentNode, strophicus);
+    this->WriteOffsetInterface(currentNode, strophicus);
+    this->WritePitchInterface(currentNode, strophicus);
+    strophicus->WriteColor(currentNode);
+}
+
 void MEIOutput::WriteRest(pugi::xml_node currentNode, Rest *rest)
 {
     assert(rest);
@@ -3926,6 +3941,9 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
             return true;
         }
         else if (element == "quilisma") {
+            return true;
+        }
+        else if (element == "strophicus") {
             return true;
         }
         else {
@@ -6612,15 +6630,6 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "note") {
             success = this->ReadNote(parent, xmlElement);
         }
-        else if (elementName == "oriscus") {
-            success = this->ReadOriscus(parent, xmlElement);
-        }
-        else if (elementName == "quilisma") {
-            success = this->ReadQuilisma(parent, xmlElement);
-        }
-        else if (elementName == "rest") {
-            success = this->ReadRest(parent, xmlElement);
-        }
         else if (elementName == "mRest") {
             success = this->ReadMRest(parent, xmlElement);
         }
@@ -6639,6 +6648,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "multiRpt") {
             success = this->ReadMultiRpt(parent, xmlElement);
         }
+        else if (elementName == "oriscus") {
+            success = this->ReadOriscus(parent, xmlElement);
+        }
         else if (elementName == "pb") {
             success = this->ReadGenericLayerElement(parent, xmlElement);
         }
@@ -6648,6 +6660,12 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "proport") {
             success = this->ReadProport(parent, xmlElement);
         }
+        else if (elementName == "quilisma") {
+            success = this->ReadQuilisma(parent, xmlElement);
+        }
+        else if (elementName == "rest") {
+            success = this->ReadRest(parent, xmlElement);
+        }
         else if (elementName == "sb") {
             success = this->ReadGenericLayerElement(parent, xmlElement);
         }
@@ -6656,6 +6674,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         }
         else if (elementName == "stem") {
             success = this->ReadStem(parent, xmlElement);
+        }
+        else if (elementName == "strophicus") {
+            success = this->ReadStrophicus(parent, xmlElement);
         }
         else if (elementName == "syl") {
             success = this->ReadSyl(parent, xmlElement);
@@ -7415,6 +7436,21 @@ bool MEIInput::ReadStem(Object *parent, pugi::xml_node stem)
 
     parent->AddChild(vrvStem);
     this->ReadUnsupportedAttr(stem, vrvStem);
+    return true;
+}
+
+bool MEIInput::ReadStrophicus(Object *parent, pugi::xml_node strophicus)
+{
+    Strophicus *vrvStrophicus = new Strophicus();
+    this->ReadLayerElement(strophicus, vrvStrophicus);
+
+    this->ReadOffsetInterface(strophicus, vrvStrophicus);
+    this->ReadPositionInterface(strophicus, vrvStrophicus);
+    vrvStrophicus->ReadColor(strophicus);
+
+    parent->AddChild(vrvStrophicus);
+    this->ReadUnsupportedAttr(strophicus, vrvStrophicus);
+
     return true;
 }
 

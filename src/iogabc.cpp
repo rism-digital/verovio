@@ -225,7 +225,7 @@ int GABCInput::ProcessSuffix(const std::string &music, int currentIndex, Nc *nc,
 {
     int processedChars = 0;
     char nextChar = GetCharAt(music, currentIndex);
-
+    char nextChar2 = '\0';
     switch (nextChar) {
         case 'V':
             processedChars++;
@@ -260,8 +260,9 @@ int GABCInput::ProcessSuffix(const std::string &music, int currentIndex, Nc *nc,
         case '>': // liquescent two tails down
             processedChars++;
             this->AddLiquescent(nc, curvatureDirection_CURVE_c);
-            // Cephalicus only when there is no explicit virga following
-            if (GetCharAt(music, currentIndex + processedChars) != 'V') {
+            // Cephalicus only when there is no explicit virga following (nextChar2) or preceeding (nc->get...)
+            nextChar2 = GetCharAt(music, currentIndex + processedChars);
+            if (nextChar != 'v' && nextChar2 != 'V' && !nc->GetTilt()) {
                 nc->SetType("cephalicus");
             }
             break;
@@ -269,6 +270,7 @@ int GABCInput::ProcessSuffix(const std::string &music, int currentIndex, Nc *nc,
         case '<': // liquescent two tails up
             processedChars++;
             this->AddLiquescent(nc, curvatureDirection_CURVE_a);
+            nc->SetType("epiphonus");
             break;
 
         case '\'': // episema_vertical
@@ -332,8 +334,8 @@ void GABCInput::ProcessNeume(const std::string &music, Syllable *syllable)
 {
     LogDebug("Processing neume");
 
-    Neume *neume = new Neume();
-    Nc *previousNC = nullptr;
+    Neume *neume = NULL;
+    Nc *previousNC = NULL;
     bool ligateNext = false; // set after OBLIQUE_LIGATURE to mark the following nc as ligated
     bool lastWasStrophicus = false; // true when last nc was a strophicus
     data_PITCHNAME strophicusPname = PITCHNAME_NONE;
@@ -349,8 +351,10 @@ void GABCInput::ProcessNeume(const std::string &music, Syllable *syllable)
             char next = GetCharAt(music, currentIndex + 1);
             if (next != '/' && next != '0' && next != '[') {
                 if (lastWasStrophicus) {
-                    // Only skip the separator if the next note is also a strophicus (pitch + 's')
-                    bool nextIsStrophicus = (next >= 'a' && next <= 'm') && (GetCharAt(music, currentIndex + 2) == 's');
+                    // Skip the separator if the next element is another strophicus:
+                    // either explicit 'pitch + s' form or bare 's' repetition form
+                    bool nextIsStrophicus = ((next >= 'a' && next <= 'm') && (GetCharAt(music, currentIndex + 2) == 's'))
+                        || (next == 's');
                     if (nextIsStrophicus) {
                         currentIndex++;
                         continue;
@@ -359,8 +363,8 @@ void GABCInput::ProcessNeume(const std::string &music, Syllable *syllable)
                 // Finalize current neume and start a new one.
                 // previousNC is kept for potential curve inference in the next neume.
                 lastWasStrophicus = false;
-                syllable->AddChild(neume);
-                neume = new Neume();
+                if (neume) syllable->AddChild(neume);
+                neume = NULL;
                 currentIndex++;
                 continue;
             }
@@ -372,6 +376,7 @@ void GABCInput::ProcessNeume(const std::string &music, Syllable *syllable)
             strophNC->SetPname(strophicusPname);
             strophNC->SetOct(static_cast<data_OCTAVE>(strophicusOct));
             strophNC->AddChild(new Strophicus());
+            if (!neume) neume = new Neume();
             neume->AddChild(strophNC);
             previousNC = strophNC;
             currentIndex++;
@@ -418,22 +423,32 @@ void GABCInput::ProcessNeume(const std::string &music, Syllable *syllable)
                 ligateNext = false;
             }
 
-            // Check for accidental suffix first — it goes to syllable before the neume
+            // An accidental suffix (x/#/y) means the pitch letter only marks position —
+            // no note is produced. The Nc is discarded; only the Accid goes to the syllable.
             char nextChar = GetCharAt(music, currentIndex);
             if (nextChar == 'x') {
                 currentIndex++;
                 AddAccidental(syllable, ACCIDENTAL_WRITTEN_f, pname, oct);
+                delete currentNC;
+                continue;
             }
             else if (nextChar == '#') {
                 currentIndex++;
                 AddAccidental(syllable, ACCIDENTAL_WRITTEN_s, pname, oct);
+                delete currentNC;
+                continue;
             }
             else if (nextChar == 'y') {
                 currentIndex++;
                 AddAccidental(syllable, ACCIDENTAL_WRITTEN_n, pname, oct);
+                delete currentNC;
+                continue;
             }
 
-            // Strophicus: consume 's' before the general suffix loop
+            // Strophicus: consume 's' before the general suffix loop.
+            // Also handle the anchor form: pitch letter followed by '/s' (e.g. i/sss),
+            // which is equivalent to is/ss — the pitch letter sets the strophicus pitch
+            // but produces no note itself; the bare 's' handler emits all strophicus ncs.
             nextChar = GetCharAt(music, currentIndex);
             if (nextChar == 's') {
                 currentIndex++;
@@ -442,16 +457,24 @@ void GABCInput::ProcessNeume(const std::string &music, Syllable *syllable)
                 strophicusPname = pname;
                 strophicusOct = oct;
             }
+            else if (nextChar == '/' && GetCharAt(music, currentIndex + 1) == 's') {
+                lastWasStrophicus = true;
+                strophicusPname = pname;
+                strophicusOct = oct;
+                delete currentNC;
+                continue;
+            }
 
             // A liquescent note always starts its own neume.
             // If the current neume already has ncs, finalize it first.
             // previousNC is kept so InferLiquescentCurve can use it across the neume boundary.
             nextChar = GetCharAt(music, currentIndex);
-            if ((nextChar == '~' || nextChar == '>' || nextChar == '<') && neume->GetChildCount() > 0) {
+            if ((nextChar == '~' || nextChar == '>' || nextChar == '<') && neume) {
                 syllable->AddChild(neume);
-                neume = new Neume();
+                neume = NULL;
             }
 
+            if (!neume) neume = new Neume();
             neume->AddChild(currentNC);
 
             // Process remaining suffixes attached to this note
@@ -477,7 +500,7 @@ void GABCInput::ProcessNeume(const std::string &music, Syllable *syllable)
         }
     }
 
-    syllable->AddChild(neume);
+    if (neume) syllable->AddChild(neume);
 }
 
 void GABCInput::ProcessWord(const std::string &lyrics, const std::string &music, sylLog_WORDPOS wordpos, sylLog_CON con)
@@ -664,7 +687,7 @@ int GABCInput::PitchToDiatonicNumber(data_PITCHNAME pname, int oct)
 
 curvatureDirection_CURVE GABCInput::InferLiquescentCurve(const Nc *previousNC, const Nc *currentNC)
 {
-    if (previousNC == nullptr || currentNC == nullptr) {
+    if (previousNC == NULL || currentNC == NULL) {
         return curvatureDirection_CURVE_NONE;
     }
 

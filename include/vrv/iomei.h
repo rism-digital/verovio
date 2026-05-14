@@ -149,6 +149,7 @@ class Slur;
 class Space;
 class Staff;
 class Stem;
+class Strophicus;
 class Subst;
 class Supplied;
 class Surface;
@@ -430,6 +431,7 @@ private:
     void WritePlica(pugi::xml_node currentNode, Plica *plica);
     void WriteProport(pugi::xml_node currentNode, Proport *proport);
     void WriteQuilisma(pugi::xml_node currentNode, Quilisma *quilisma);
+    void WriteStrophicus(pugi::xml_node currentNode, Strophicus *strophicus);
     void WriteRest(pugi::xml_node currentNode, Rest *rest);
     void WriteSpace(pugi::xml_node currentNode, Space *space);
     void WriteStem(pugi::xml_node currentNode, Stem *stem);
@@ -764,6 +766,7 @@ private:
     bool ReadRest(Object *parent, pugi::xml_node rest);
     bool ReadSpace(Object *parent, pugi::xml_node space);
     bool ReadStem(Object *parent, pugi::xml_node stem);
+    bool ReadStrophicus(Object *parent, pugi::xml_node strophicus);
     bool ReadSyl(Object *parent, pugi::xml_node syl);
     bool ReadSyllable(Object *parent, pugi::xml_node syllable);
     bool ReadTabDurSym(Object *parent, pugi::xml_node tabDurSym);
