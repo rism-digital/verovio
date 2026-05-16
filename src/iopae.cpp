@@ -5112,7 +5112,7 @@ bool PAEInput::ParseKeySigV2(KeySig *keySig, const std::string &paeStr, pae::Tok
         this->LogPAE(ERR_073_KEYSIG_SUPPLIED_STRUCT, token);
         if (m_pedanticMode) return false;
     }
-    
+
     if (this->IsNeume()) {
         if (key.size() != 1 || key.at(0).first != PITCHNAME_b || alterationType != ACCIDENTAL_WRITTEN_f) {
             this->LogPAE(ERR_069_KEYSIG_NEUME, token);
