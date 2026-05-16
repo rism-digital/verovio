@@ -2311,6 +2311,13 @@ enum {
     ERR_065_MREST_INVALID_MEASURE,
     ERR_066_EMPTY_CONTAINER,
     ERR_067_SPACE_IN_SCOREDEF,
+    ERR_068_KEYSIG_SUPPLIED_WITHIN,
+    ERR_069_KEYSIG_NEUME,
+    ERR_070_KEYSIG_SUPPLIED,
+    ERR_071_KEYSIG_NATURAL,
+    ERR_072_KEYSIG_REPEATED_ACCID,
+    ERR_073_KEYSIG_SUPPLIED_STRUCT,
+    ERR_074_KEYSIG_INVALID
 };
 
 // clang-format off
@@ -2381,8 +2388,16 @@ const std::map<int, std::string> PAEInput::s_errCodes{
     { ERR_064_LIGATURE_DURATION, "The duration in a ligature cannot be shorter than a semibreve." },
     { ERR_065_MREST_INVALID_MEASURE, "A measure with a measure rest cannot include anything else." },
     { ERR_066_EMPTY_CONTAINER, "A grace group or a beam cannot be empty." },
-    { ERR_067_SPACE_IN_SCOREDEF, "Single-line input should have no space within the score definition."}
+    { ERR_067_SPACE_IN_SCOREDEF, "Single-line input should have no space within the score definition."},
+    { ERR_068_KEYSIG_SUPPLIED_WITHIN, "Consecutive supplied accidentals in a key signature must be in the same [] group."},
+    { ERR_069_KEYSIG_NEUME, "A key signature in neume notation can only be 'bB'." },
+    { ERR_070_KEYSIG_SUPPLIED, "A supplied key signature must be coded within a single [] block." },
+    { ERR_071_KEYSIG_NATURAL, "A key signature with 'n' must not have note names." },
+    { ERR_072_KEYSIG_REPEATED_ACCID, "A key signature must not have repeated note names." },
+    { ERR_073_KEYSIG_SUPPLIED_STRUCT, "Key signature supplied block is empty, open, or in wrong sequence." },
+    { ERR_074_KEYSIG_INVALID, "Invalid or incomplete key signature structure." }
 };
+
 // clang-format on
 
 //----------------------------------------------------------------------------
@@ -2920,7 +2935,14 @@ bool PAEInput::Import(const std::string &input)
     if (!keySigStr.empty()) {
         pae::Token staffDefToken(0, pae::KEYSIG_POS);
         m_hasKeySig = true;
-        if (success) success = this->ParseKeySig(&m_keySig, keySigStr, staffDefToken);
+        if (success) {
+            if (m_v2) {
+                success = this->ParseKeySigV2(&m_keySig, keySigStr, staffDefToken);
+            }
+            else {
+                success = this->ParseKeySigV1(&m_keySig, keySigStr, staffDefToken);
+            }
+        }
     }
 
     if (!clefStr.empty()) {
@@ -3280,7 +3302,12 @@ bool PAEInput::ConvertKeySig()
             KeySig *keySig = new KeySig();
             keySigToken->m_object = keySig;
             // Will fail in pedantic mode
-            if (!this->ParseKeySig(keySig, paeStr, *keySigToken)) return false;
+            if (m_v2) {
+                if (!this->ParseKeySigV2(keySig, paeStr, *keySigToken)) return false;
+            }
+            else {
+                if (!this->ParseKeySigV1(keySig, paeStr, *keySigToken)) return false;
+            }
             keySigToken = NULL;
         }
     }
@@ -3386,6 +3413,7 @@ bool PAEInput::ConvertClef()
 {
     pae::Token *clefToken = NULL;
     std::string paeStr;
+    const std::string clefChars = (m_v2) ? pae::CLEFv2 : pae::CLEFv1;
 
     for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
@@ -3395,7 +3423,7 @@ bool PAEInput::ConvertClef()
             paeStr.clear();
         }
         else if (clefToken) {
-            if (this->Is(token, pae::CLEFv1)) {
+            if (this->Is(token, clefChars)) {
                 paeStr.push_back(token.m_char);
                 token.m_char = 0;
                 continue;
@@ -5009,7 +5037,7 @@ pae::Token *PAEInput::GetTokenForTreeObject(Object *object)
     return NULL;
 }
 
-bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token &token)
+bool PAEInput::ParseKeySigV1(KeySig *keySig, const std::string &paeStr, pae::Token &token)
 {
     assert(keySig);
 
@@ -5092,6 +5120,193 @@ bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token
     else {
         keySig->SetSig({ 0, ACCIDENTAL_WRITTEN_n });
     }
+    return true;
+}
+
+bool PAEInput::ParseKeySigV2(KeySig *keySig, const std::string &paeStr, pae::Token &token)
+{
+    assert(keySig && !paeStr.empty());
+
+    keySig->Reset();
+
+    std::string invalidChars;
+    if (!this->CheckPAEChars(paeStr, invalidChars, pae::KEYSIG)) {
+        this->LogPAE(ERR_050_INVALID_CHAR, token, invalidChars);
+        if (m_pedanticMode) return false;
+    }
+
+    if (paeStr.find("][") != std::string::npos) {
+        this->LogPAE(ERR_068_KEYSIG_SUPPLIED_WITHIN, token);
+        if (m_pedanticMode) return false;
+    }
+    if (paeStr.find("[]") != std::string::npos) {
+        this->LogPAE(ERR_073_KEYSIG_SUPPLIED_STRUCT, token);
+        if (m_pedanticMode) return false;
+    }
+
+    bool fullySupplied = false;
+    if (paeStr.at(0) == '[') {
+        if (paeStr.back() != ']') {
+            this->LogPAE(ERR_070_KEYSIG_SUPPLIED, token);
+            if (m_pedanticMode) return false;
+        }
+        fullySupplied = true;
+    }
+
+    std::vector<std::pair<data_PITCHNAME, bool>> key;
+    key.reserve(7);
+
+    bool enclosed = false;
+    bool hasEnclosed = false;
+    data_ACCIDENTAL_WRITTEN alterationType = ACCIDENTAL_WRITTEN_NONE;
+    size_t pos = 0;
+    for (char c : paeStr) {
+        pos++;
+        if (c == '[') {
+            if (fullySupplied) {
+                if (alterationType != ACCIDENTAL_WRITTEN_NONE) {
+                    this->LogPAE(ERR_070_KEYSIG_SUPPLIED, token);
+                    if (m_pedanticMode) return false;
+                }
+                continue;
+            }
+            else if (enclosed) {
+                this->LogPAE(ERR_073_KEYSIG_SUPPLIED_STRUCT, token);
+                if (m_pedanticMode) return false;
+            }
+            else {
+                enclosed = true;
+                hasEnclosed = true;
+            }
+            continue;
+        }
+        else if (c == ']') {
+            if (fullySupplied) {
+                if (pos != paeStr.size()) {
+                    this->LogPAE(ERR_070_KEYSIG_SUPPLIED, token);
+                    if (m_pedanticMode) return false;
+                }
+            }
+            else if (!enclosed) {
+                this->LogPAE(ERR_073_KEYSIG_SUPPLIED_STRUCT, token);
+                if (m_pedanticMode) return false;
+            }
+            else {
+                enclosed = false;
+            }
+            continue;
+        }
+        else if (alterationType == ACCIDENTAL_WRITTEN_NONE) {
+            switch (c) {
+                case 'b': alterationType = ACCIDENTAL_WRITTEN_f; break;
+                case 'x': alterationType = ACCIDENTAL_WRITTEN_s; break;
+                case 'n': alterationType = ACCIDENTAL_WRITTEN_n; break;
+                default:
+                    this->LogPAE(ERR_074_KEYSIG_INVALID, token);
+                    if (m_pedanticMode) return false;
+                    break;
+            }
+            continue;
+        }
+        else {
+            data_PITCHNAME pitch = PITCHNAME_NONE;
+            switch (c) {
+                case 'F': pitch = PITCHNAME_f; break;
+                case 'C': pitch = PITCHNAME_c; break;
+                case 'G': pitch = PITCHNAME_g; break;
+                case 'D': pitch = PITCHNAME_d; break;
+                case 'A': pitch = PITCHNAME_a; break;
+                case 'E': pitch = PITCHNAME_e; break;
+                case 'B': pitch = PITCHNAME_b; break;
+                default:
+                    this->LogPAE(ERR_074_KEYSIG_INVALID, token);
+                    if (m_pedanticMode) return false;
+                    break;
+            }
+            if (pitch != PITCHNAME_NONE) {
+                auto it = std::find_if(key.begin(), key.end(),
+                    [pitch](const std::pair<data_PITCHNAME, bool> &p) { return p.first == pitch; });
+                if (it != key.end()) {
+                    this->LogPAE(ERR_072_KEYSIG_REPEATED_ACCID, token);
+                    if (m_pedanticMode) return false;
+                }
+                else {
+                    key.push_back(std::make_pair(pitch, (enclosed || fullySupplied)));
+                }
+            }
+        }
+    }
+
+    if (enclosed) {
+        this->LogPAE(ERR_073_KEYSIG_SUPPLIED_STRUCT, token);
+        if (m_pedanticMode) return false;
+    }
+
+    if (this->IsNeume()) {
+        if (key.size() != 1 || key.at(0).first != PITCHNAME_b || alterationType != ACCIDENTAL_WRITTEN_f) {
+            this->LogPAE(ERR_069_KEYSIG_NEUME, token);
+            if (m_pedanticMode) return false;
+        }
+    }
+
+    if (alterationType == ACCIDENTAL_WRITTEN_n) {
+        if (!key.empty()) {
+            // No note names with natural
+            this->LogPAE(ERR_071_KEYSIG_NATURAL, token);
+            if (m_pedanticMode) return false;
+        }
+        // The enclose information is lost
+        keySig->SetSig({ 0, ACCIDENTAL_WRITTEN_n });
+    }
+    else {
+        bool regular = true;
+        if (key.empty()) {
+            this->LogPAE(ERR_074_KEYSIG_INVALID, token);
+            if (m_pedanticMode) return false;
+        }
+        else if (hasEnclosed) {
+            auto it = std::find_if(
+                key.begin(), key.end(), [](const std::pair<data_PITCHNAME, bool> &p) { return p.second == false; });
+            if (it == key.end()) {
+                // The full key signature should be enclosed
+                this->LogPAE(ERR_070_KEYSIG_SUPPLIED, token);
+                if (m_pedanticMode) return false;
+            }
+            regular = false;
+        }
+        else if (!hasEnclosed) {
+            int i = 0;
+            for (const auto &accid : key) {
+                if (i >= 7) {
+                    regular = false;
+                    break;
+                }
+                data_PITCHNAME regularAccid = (alterationType == ACCIDENTAL_WRITTEN_f) ? KeySig::s_pnameForFlats[i]
+                                                                                       : KeySig::s_pnameForSharps[i];
+                if (regularAccid != accid.first) {
+                    regular = false;
+                    break;
+                }
+                i++;
+            }
+        }
+        if (regular) {
+            keySig->SetSig({ (int)key.size(), alterationType });
+        }
+        else {
+            for (const auto &accid : key) {
+                KeyAccid *keyAccid = new KeyAccid();
+                data_PITCHNAME pname = accid.first;
+                keyAccid->SetPname(pname);
+                keyAccid->SetAccid(alterationType);
+                keySig->AddChild(keyAccid);
+                if (accid.second) {
+                    keyAccid->SetEnclose(ENCLOSURE_brack);
+                }
+            }
+        }
+    }
+
     return true;
 }
 

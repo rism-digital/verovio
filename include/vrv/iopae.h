@@ -628,7 +628,8 @@ private:
      * @name Methods that parse sub string instantiate corresponding objects
      */
     ///@{
-    bool ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token &token);
+    bool ParseKeySigV1(KeySig *keySig, const std::string &paeStr, pae::Token &token);
+    bool ParseKeySigV2(KeySig *keySig, const std::string &paeStr, pae::Token &token);
     bool ParseClef(Clef *clef, const std::string &paeStr, pae::Token &token, bool scoreDef = false);
     bool ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, pae::Token &token);
     bool ParseMensur(Mensur *mensur, const std::string &paeStr, pae::Token &token);
