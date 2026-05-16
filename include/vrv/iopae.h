@@ -600,7 +600,8 @@ private:
     bool ConvertFermata();
     bool ConvertAccidental();
     bool ConvertRest();
-    bool ConvertChord();
+    bool ConvertChordV1();
+    bool ConvertChordV2();
     bool ConvertBeam();
     bool ConvertGrace();
     bool ConvertGraceGrp();

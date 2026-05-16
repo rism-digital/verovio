@@ -2310,7 +2310,7 @@ enum {
     ERR_064_LIGATURE_DURATION,
     ERR_065_MREST_INVALID_MEASURE,
     ERR_066_EMPTY_CONTAINER,
-    ERR_067_SPACE_IN_SCOREDEF
+    ERR_067_SPACE_IN_SCOREDEF,
 };
 
 // clang-format off
@@ -3027,14 +3027,16 @@ bool PAEInput::Parse()
     if (success) success = this->ConvertPitch();
 
     if (success) success = this->ConvertOctave();
+    
+    if (success && m_v2) success = this->ConvertChordV2();
 
     if (success) success = this->ConvertTrill();
 
     if (success) success = this->ConvertFermata();
 
     if (success) success = this->ConvertAccidental();
-
-    if (success) success = this->ConvertChord();
+    
+    if (success && !m_v2) success = this->ConvertChordV1();
 
     if (success) success = this->ConvertBeam();
 
@@ -3941,7 +3943,7 @@ bool PAEInput::ConvertRest()
     return true;
 }
 
-bool PAEInput::ConvertChord()
+bool PAEInput::ConvertChordV1()
 {
     if (!this->HasInput('^')) return true;
 
@@ -4012,6 +4014,133 @@ bool PAEInput::ConvertChord()
     }
 
     return true;
+}
+
+bool PAEInput::ConvertChordV2()
+{
+    if (!this->HasInput('^')) return true;
+    
+
+    Chord *chord = NULL;
+
+    // Here we need an iterator because we might have to add a missing closing tag
+    std::list<pae::Token>::iterator token = m_pae.begin();
+    while (token != m_pae.end()) {
+        if (token->IsVoid()) {
+            ++token;
+            continue;
+        }
+
+        if (token->m_char == '^') {
+            token->m_char = 0;
+            if (chord) {
+                this->LogPAE(ERR_032_TUPLET_NESTED, *token);
+                if (m_pedanticMode) return false;
+                ++token;
+                continue;
+            }
+            chord = new Chord();
+            token->m_object = chord;
+        }
+        else if (token->m_char == '>') {
+            token->m_char = 0;
+            if (!chord) {
+                this->LogPAE(ERR_033_TUPLET_CLOSING, *token);
+                if (m_pedanticMode) return false;
+                ++token;
+                continue;
+            }
+            token->m_object = chord;
+            token->m_char = pae::CONTAINER_END;
+            chord = NULL;
+        }
+        else if (this->Is(*token, pae::DURATION)) {
+            //this->LogPAE(ERR_033_TUPLET_CLOSING, *token);
+            //if (m_pedanticMode) return false;
+        }
+        else if (token->IsEnd() || token->Is(MEASURE)) {
+            if (chord) {
+                this->LogPAE(ERR_035_TUPLET_OPEN, *token);
+                if (m_pedanticMode) return false;
+                token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, pae::UNKOWN_POS, chord));
+                //chord->SetNum(GetNum(tupletNumStr));
+                chord = NULL;
+            }
+        }
+        ++token;
+    }
+
+    return true;
+
+    /*
+    // A flag for the chord status NONE|MARKER|NOTE
+    pae::status_CHORD status = pae::CHORD_NONE;
+    // The iterator of the last note that can become the first note of a chord
+    std::list<pae::Token>::iterator note = m_pae.end();
+
+    std::list<pae::Token>::iterator token = m_pae.begin();
+    while (token != m_pae.end()) {
+        if (token->IsVoid()) {
+            ++token;
+            continue;
+        }
+
+        // We encounter a chord marker - change the status if we have a note previously
+        if (token->m_char == '^') {
+            token->m_char = 0;
+            if (note == m_pae.end()) {
+                this->LogPAE(ERR_020_CHORD_NOTE_BEFORE, *token);
+                if (m_pedanticMode) return false;
+            }
+            else {
+                status = pae::CHORD_MARKER;
+            }
+            ++token;
+            continue;
+        }
+
+        // We expect a note
+        if (status == pae::CHORD_MARKER) {
+            // If we have a note, we change the status - we will be able to decide to close the chord on the next token
+            if (token->Is(NOTE)) {
+                status = pae::CHORD_NOTE;
+            }
+            // After a marker, we should allow octave or accidental markers, but nothing else
+            else if (!this->Was(*token, pae::ACCIDENTAL_INTERNAL) && !this->Was(*token, pae::OCTAVE)) {
+                this->LogPAE(ERR_021_CHORD_NOTE_AFTER, *token);
+                if (m_pedanticMode) return false;
+                status = pae::CHORD_NONE;
+                note = m_pae.end();
+            }
+            ++token;
+            continue;
+        }
+
+        // We passed the last note of the chord - create it
+        if (status == pae::CHORD_NOTE) {
+            Chord *chord = new Chord();
+            m_pae.insert(note, pae::Token(0, pae::UNKOWN_POS, chord));
+            m_pae.insert(token, pae::Token(pae::CONTAINER_END, pae::UNKOWN_POS, chord));
+        }
+
+        status = pae::CHORD_NONE;
+        if (token->Is(NOTE)) {
+            note = token;
+        }
+        // Previous token was already a note - we allow fermata or trill on the first note of a chord
+        else if (note != m_pae.end() && ((token->m_char == 0 && token->m_inputChar == ')') || token->Is(TRILL))) {
+            ++token;
+            continue;
+        }
+        else {
+            note = m_pae.end();
+        }
+
+        ++token;
+    }
+
+    return true;
+     */
 }
 
 bool PAEInput::ConvertBeam()
