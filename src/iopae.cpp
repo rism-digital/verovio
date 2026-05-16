@@ -4087,7 +4087,7 @@ bool PAEInput::ConvertBeam()
             }
         }
         // Flag the beginning of a grace group
-        else if (token->m_char == 'Q') {
+        else if ((token->m_char == 'Q' && !m_v2) || (token->m_char == 'y' && m_v2)) {
             withinGrace = true;
         }
         // Flag the end
@@ -4151,7 +4151,7 @@ bool PAEInput::ConvertGraceGrp()
             continue;
         }
 
-        if (token->m_char == 'Q') {
+        if ((token->m_char == 'Q' && !m_v2) || (token->m_char == 'y' && m_v2)) {
             token->m_char = 0;
             if (graceGrp) {
                 this->LogPAE(ERR_026_GRACE_NESTED, *token);
