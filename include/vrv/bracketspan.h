@@ -24,7 +24,6 @@ namespace vrv {
 class BracketSpan : public ControlElement,
                     public TimeSpanningInterface,
                     public AttBracketSpanLog,
-                    public AttColor,
                     public AttLineRend,
                     public AttLineRendBase {
 public:
@@ -37,7 +36,7 @@ public:
     virtual ~BracketSpan();
     Object *Clone() const override { return new BracketSpan(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "BracketSpan"; }
+    std::string GetClassName() const override { return "bracketSpan"; }
     ///@}
 
     /**

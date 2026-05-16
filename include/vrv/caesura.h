@@ -24,7 +24,6 @@ namespace vrv {
  */
 class Caesura : public ControlElement,
                 public TimePointInterface,
-                public AttColor,
                 public AttExtSymAuth,
                 public AttExtSymNames,
                 public AttPlacementRelStaff {
@@ -38,7 +37,7 @@ public:
     virtual ~Caesura();
     Object *Clone() const override { return new Caesura(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Caesura"; }
+    std::string GetClassName() const override { return "caesura"; }
     ///@}
 
     /**

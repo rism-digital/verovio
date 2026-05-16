@@ -29,6 +29,9 @@ const std::map<int, std::string> Option::s_breaks = { { BREAKS_none, "none" }, {
 const std::map<int, std::string> Option::s_condense
     = { { CONDENSE_none, "none" }, { CONDENSE_auto, "auto" }, { CONDENSE_encoded, "encoded" } };
 
+const std::map<int, std::string> Option::s_durationEq
+    = { { DURATION_EQ_brevis, "brevis" }, { DURATION_EQ_semibrevis, "semibrevis" }, { DURATION_EQ_minima, "minima" } };
+
 const std::map<int, std::string> Option::s_elision = { { ELISION_regular, "regular" }, { ELISION_narrow, "narrow" },
     { ELISION_wide, "wide" }, { ELISION_unicode, "unicode" } };
 
@@ -40,6 +43,12 @@ const std::map<int, std::string> Option::s_footer
 
 const std::map<int, std::string> Option::s_header
     = { { HEADER_none, "none" }, { HEADER_auto, "auto" }, { HEADER_encoded, "encoded" } };
+
+const std::map<int, std::string> Option::s_ligatureOblique
+    = { { LIGATURE_OBL_auto, "auto" }, { LIGATURE_OBL_straight, "straight" }, { LIGATURE_OBL_curved, "curved" } };
+
+const std::map<int, std::string> Option::s_mensuralResponsiveness
+    = { { MENSURAL_RESP_none, "none" }, { MENSURAL_RESP_auto, "auto" }, { MENSURAL_RESP_selection, "selection" } };
 
 const std::map<int, std::string> Option::s_multiRestStyle = { { MULTIRESTSTYLE_auto, "auto" },
     { MULTIRESTSTYLE_default, "default" }, { MULTIRESTSTYLE_block, "block" }, { MULTIRESTSTYLE_symbols, "symbols" } };
@@ -139,10 +148,9 @@ jsonxx::Object Option::ToJson() const
     else if (optArray) {
         opt << "type" << "array";
         std::vector<std::string> strValues = optArray->GetDefault();
-        std::vector<std::string>::iterator strIter;
         jsonxx::Array values;
-        for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
-            values << (*strIter);
+        for (const std::string &value : strValues) {
+            values << value;
         }
         opt << "default" << values;
     }
@@ -150,10 +158,9 @@ jsonxx::Object Option::ToJson() const
         opt << "type" << "std::string-list";
         opt << "default" << optIntMap->GetDefaultStrValue();
         std::vector<std::string> strValues = optIntMap->GetStrValues(false);
-        std::vector<std::string>::iterator strIter;
         jsonxx::Array values;
-        for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
-            values << (*strIter);
+        for (const std::string &value : strValues) {
+            values << value;
         }
         opt << "values" << values;
     }
@@ -891,6 +898,9 @@ Options::Options()
     // These are not registered in a group and not listed in Toolkit::GetOptions
     // There are listed in Toolkit::GetAvailableOptions through Options::GetBaseOptGrp
 
+    m_inputFromFormat = AUTO;
+    m_outputToFormat = UNKNOWN;
+
     m_baseOptions.SetLabel("Base short options", "0-base");
     m_baseOptions.SetCategory(OptionsCategory::Base);
 
@@ -914,8 +924,9 @@ Options::Options()
     m_baseOptions.AddOption(&m_allPages);
 
     m_inputFrom.SetInfo("Input from",
-        "Select input format from: \"abc\", \"darms\", \"esac\", \"humdrum\", \"mei\", \"pae\", \"volpiano\", \"xml\" "
-        "(musicxml), \"musicxml-hum\" (musicxml via humdrum)");
+        "Select input format from: \"abc\", \"cmme.xml\", \"darms\", \"esac\", \"humdrum\", \"mei\", \"pae\", "
+        "\"volpiano\", \"xml\" "
+        "(musicxml), \"musicxml-hum\" (musicxml via humdrum) or \"mei-pb-serialized\"");
     m_inputFrom.Init("mei");
     m_inputFrom.SetKey("inputFrom");
     m_inputFrom.SetShortOption('f', false);
@@ -953,8 +964,7 @@ Options::Options()
 
     m_outputTo.SetInfo("Output to",
         "Select output format to: \"mei\", \"mei-pb\", \"mei-facs\", \"mei-basic\", \"svg\", \"midi\", \"timemap\", "
-        "\"expansionmap\", \"humdrum\" or "
-        "\"pae\"");
+        "\"expansionmap\", \"humdrum\", \"pae\" or \"mei-pb-serialized\"");
     m_outputTo.Init("svg");
     m_outputTo.SetKey("outputTo");
     m_outputTo.SetShortOption('t', true);
@@ -1016,10 +1026,6 @@ Options::Options()
     m_evenNoteSpacing.SetInfo("Even note spacing", "Align notes and rests without adding duration based space");
     m_evenNoteSpacing.Init(false);
     this->Register(&m_evenNoteSpacing, "evenNoteSpacing", &m_general);
-
-    m_expand.SetInfo("Expand expansion", "Expand all referenced elements in the expansion <xml:id>");
-    m_expand.Init("");
-    this->Register(&m_expand, "expand", &m_general);
 
     m_footer.SetInfo("Footer", "Control footer layout");
     m_footer.Init(FOOTER_auto, &Option::s_footer);
@@ -1155,6 +1161,10 @@ Options::Options()
     m_svgBoundingBoxes.Init(false);
     this->Register(&m_svgBoundingBoxes, "svgBoundingBoxes", &m_general);
 
+    m_svgContentBoundingBoxes.SetInfo("Svg content bounding boxes", "Include content bounding boxes in SVG output");
+    m_svgContentBoundingBoxes.Init(false);
+    this->Register(&m_svgContentBoundingBoxes, "svgContentBoundingBoxes", &m_general);
+
     m_svgCss.SetInfo("SVG additional CSS", "CSS (as a string) to be added to the SVG output");
     m_svgCss.Init("");
     this->Register(&m_svgCss, "svgCss", &m_general);
@@ -1185,7 +1195,7 @@ Options::Options()
     this->Register(&m_svgAdditionalAttribute, "svgAdditionalAttribute", &m_general);
 
     m_unit.SetInfo("Unit", "The MEI unit (1⁄2 of the distance between the staff lines)");
-    m_unit.Init(9.0, 4.5, 12.0, true);
+    m_unit.Init(DEFAULT_UNIT, 4.5, 12.0, true);
     this->Register(&m_unit, "unit", &m_general);
 
     m_useBraceGlyph.SetInfo("Use Brace Glyph", "Use brace glyph from current font");
@@ -1304,6 +1314,10 @@ Options::Options()
     m_fontLoadAll.Init(false);
     this->Register(&m_fontLoadAll, "fontLoadAll", &m_generalLayout);
 
+    m_fontTextLiberation.SetInfo("Font text Liberation", "Use the Liberation text font");
+    m_fontTextLiberation.Init(false);
+    this->Register(&m_fontTextLiberation, "fontTextLiberation", &m_generalLayout);
+
     m_graceFactor.SetInfo("Grace factor", "The grace size ratio numerator");
     m_graceFactor.Init(0.75, 0.5, 1.0);
     this->Register(&m_graceFactor, "graceFactor", &m_generalLayout);
@@ -1316,7 +1330,7 @@ Options::Options()
     m_graceRightAlign.Init(false);
     this->Register(&m_graceRightAlign, "graceRightAlign", &m_generalLayout);
 
-    m_hairpinSize.SetInfo("Hairpin size", "The haripin size in MEI units");
+    m_hairpinSize.SetInfo("Hairpin size", "The hairpin size in MEI units");
     m_hairpinSize.Init(3.0, 1.0, 8.0);
     this->Register(&m_hairpinSize, "hairpinSize", &m_generalLayout);
 
@@ -1353,7 +1367,7 @@ Options::Options()
 
     m_justificationMaxVertical.SetInfo("Maximum ratio of justifiable height for page",
         "Maximum ratio of justifiable height to page height that can be used for the vertical justification");
-    m_justificationMaxVertical.Init(0.3, 0.0, 1.0);
+    m_justificationMaxVertical.Init(0.2, 0.0, 1.0);
     this->Register(&m_justificationMaxVertical, "justificationMaxVertical", &m_generalLayout);
 
     m_ledgerLineThickness.SetInfo("Ledger line thickness", "The thickness of the ledger lines");
@@ -1368,6 +1382,10 @@ Options::Options()
     m_lyricElision.SetInfo("Lyric elision", "The lyric elision width");
     m_lyricElision.Init(ELISION_regular, &Option::s_elision);
     this->Register(&m_lyricElision, "lyricElision", &m_generalLayout);
+
+    m_lyricHeightFactor.SetInfo("Lyric height factor", "The lyric verse line height factor");
+    m_lyricHeightFactor.Init(1.0, 1.0, 20.0);
+    this->Register(&m_lyricHeightFactor, "lyricHeightFactor", &m_generalLayout);
 
     m_lyricLineThickness.SetInfo("Lyric line thickness", "The lyric extender line thickness");
     m_lyricLineThickness.Init(0.25, 0.10, 0.50);
@@ -1421,6 +1439,10 @@ Options::Options()
         "Do not enclose octaves that are spanning over systems with parentheses.");
     m_octaveNoSpanningParentheses.Init(false);
     this->Register(&m_octaveNoSpanningParentheses, "octaveNoSpanningParentheses", &m_generalLayout);
+
+    m_ossiaStaffSize.SetInfo("Ossia staff size", "The ossia staff size in relation to the staff size");
+    m_ossiaStaffSize.Init(0.75, 0.5, 1.00);
+    this->Register(&m_ossiaStaffSize, "ossiaStaffSize", &m_generalLayout);
 
     m_pedalLineThickness.SetInfo("Pedal line thickness", "The thickness of the line used for piano pedaling");
     m_pedalLineThickness.Init(0.20, 0.10, 1.00);
@@ -1486,6 +1508,10 @@ Options::Options()
     m_spacingNonLinear.Init(0.6, 0.0, 1.0);
     this->Register(&m_spacingNonLinear, "spacingNonLinear", &m_generalLayout);
 
+    m_spacingOssia.SetInfo("Spacing ossia", "Specify the factor of an ossia spacing in relation to staff spacing");
+    m_spacingOssia.Init(0.35, 0.1, 1.0);
+    this->Register(&m_spacingOssia, "spacingOssia", &m_generalLayout);
+
     m_spacingStaff.SetInfo("Spacing staff", "The staff minimal spacing in MEI units");
     m_spacingStaff.Init(12, 0, 48);
     this->Register(&m_spacingStaff, "spacingStaff", &m_generalLayout);
@@ -1548,7 +1574,7 @@ Options::Options()
 
     /********* selectors *********/
 
-    m_selectors.SetLabel("Element selectors and processing", "3-selectors");
+    m_selectors.SetLabel("Loading selectors and processing", "3-selectors");
     m_selectors.SetCategory(OptionsCategory::Selectors);
     m_grps.push_back(&m_selectors);
 
@@ -1565,6 +1591,18 @@ Options::Options()
     m_choiceXPathQuery.Init();
     this->Register(&m_choiceXPathQuery, "choiceXPathQuery", &m_selectors);
 
+    m_expand.SetInfo("Expand expansion", "Expand all referenced elements in the expansion <xml:id>");
+    m_expand.Init("");
+    this->Register(&m_expand, "expand", &m_selectors);
+
+    m_expandAlways.SetInfo("Always expand", "Expand for all outputs, using selected, first, or generated expansion");
+    m_expandAlways.Init(false);
+    this->Register(&m_expandAlways, "expandAlways", &m_selectors);
+
+    m_expandNever.SetInfo("Never expand", "Expand for no output, including MIDI and timemap");
+    m_expandNever.Init(false);
+    this->Register(&m_expandNever, "expandNever", &m_selectors);
+
     m_loadSelectedMdivOnly.SetInfo(
         "Load selected Mdiv only", "Load only the selected mdiv; the content of the other is skipped");
     m_loadSelectedMdivOnly.Init(false);
@@ -1578,6 +1616,10 @@ Options::Options()
         "Set the xPath query for selecting the <mdiv> to be rendered; only one <mdiv> can be rendered");
     m_mdivXPathQuery.Init("");
     this->Register(&m_mdivXPathQuery, "mdivXPathQuery", &m_selectors);
+
+    m_ossiaHidden.SetInfo("Ossia hidden", "Hide ossias when rendering");
+    m_ossiaHidden.Init(false);
+    this->Register(&m_ossiaHidden, "ossiaHidden", &m_selectors);
 
     m_substXPathQuery.SetInfo("Subst xPath query",
         "Set the xPath query for selecting <subst> child elements, for "
@@ -1804,7 +1846,7 @@ Options::Options()
     m_midi.SetCategory(OptionsCategory::Midi);
     m_grps.push_back(&m_midi);
 
-    m_midiNoCue.SetInfo("MIDI playback of cue notes", "Skip cue notes in MIDI output");
+    m_midiNoCue.SetInfo("MIDI playback without cue notes", "Skip cue notes in MIDI output");
     m_midiNoCue.Init(false);
     this->Register(&m_midiNoCue, "midiNoCue", &m_midi);
 
@@ -1812,19 +1854,41 @@ Options::Options()
     m_midiTempoAdjustment.Init(1.0, 0.2, 4.0);
     this->Register(&m_midiTempoAdjustment, "midiTempoAdjustment", &m_midi);
 
+    m_midiTuningFile.SetInfo("MIDI tuning", "A custom tuning definition or filepath to apply to the MIDI output");
+    m_midiTuningFile.Init("");
+    this->Register(&m_midiTuningFile, "tuningFile", &m_midi);
+
     /********* Mensural *********/
 
     m_mensural.SetLabel("Mensural notation options", "6-mensural");
     m_mensural.SetCategory(OptionsCategory::Mensural);
     m_grps.push_back(&m_mensural);
 
+    m_durationEquivalence.SetInfo("Duration equivalence", "The mensural duration equivalence");
+    m_durationEquivalence.Init(DURATION_EQ_brevis, &Option::s_durationEq);
+    this->Register(&m_durationEquivalence, "durationEquivalence", &m_mensural);
+
     m_ligatureAsBracket.SetInfo("Ligature as bracket", "Render ligatures as bracket instead of original notation");
     m_ligatureAsBracket.Init(false);
     this->Register(&m_ligatureAsBracket, "ligatureAsBracket", &m_mensural);
 
-    m_mensuralToMeasure.SetInfo("Mensural to measure", "Convert mensural sections to measure-based MEI");
-    m_mensuralToMeasure.Init(false);
-    this->Register(&m_mensuralToMeasure, "mensuralToMeasure", &m_mensural);
+    m_ligatureOblique.SetInfo("Ligature oblique", "Ligature oblique shape");
+    m_ligatureOblique.Init(LIGATURE_OBL_auto, &Option::s_ligatureOblique);
+    this->Register(&m_ligatureOblique, "ligatureOblique", &m_mensural);
+
+    m_mensuralResponsiveView.SetInfo("Mensural responsive view",
+        "Make mensural content responsive (selection discards ligatures and editorial markup)");
+    m_mensuralResponsiveView.Init(MENSURAL_RESP_auto, &Option::s_mensuralResponsiveness);
+    this->Register(&m_mensuralResponsiveView, "mensuralResponsiveView", &m_mensural);
+
+    m_mensuralToCmn.SetInfo("Mensural to CMN", "Convert mensural sections to CMN measure-based MEI");
+    m_mensuralToCmn.Init(false);
+    this->Register(&m_mensuralToCmn, "mensuralToCmn", &m_mensural);
+
+    m_mensuralScoreUp.SetInfo(
+        "Mensural scoring up", "Score up the mensural voices by providing a dur.quality to the notes");
+    m_mensuralScoreUp.Init(false);
+    this->Register(&m_mensuralScoreUp, "mensuralScoreUp", &m_mensural);
 
     /********* Method JSON options to the command-line *********/
 
@@ -1885,6 +1949,105 @@ Options &Options::operator=(const Options &options)
 }
 
 Options::~Options() {}
+
+bool Options::SetOutputTo(std::string const &outputTo)
+{
+    if ((outputTo == "humdrum") || (outputTo == "hum")) {
+        m_outputToFormat = HUMDRUM;
+    }
+    else if (outputTo == "mei") {
+        m_outputToFormat = MEI;
+    }
+    else if (outputTo == "mei-basic") {
+        m_outputToFormat = MEI;
+    }
+    else if (outputTo == "mei-pb") {
+        m_outputToFormat = MEI;
+    }
+    else if (outputTo == "mei-facs") {
+        m_outputToFormat = MEI;
+    }
+    else if (outputTo == "midi") {
+        m_outputToFormat = MIDI;
+    }
+    else if (outputTo == "hummidi") {
+        m_outputToFormat = HUMMIDI;
+    }
+    else if (outputTo == "timemap") {
+        m_outputToFormat = TIMEMAP;
+    }
+    else if (outputTo == "expansionmap") {
+        m_outputToFormat = EXPANSIONMAP;
+    }
+    else if (outputTo == "pae") {
+        m_outputToFormat = PAE;
+    }
+    else if (outputTo == "mei-pb-serialized") {
+        m_outputToFormat = SERIALIZATION;
+    }
+    else if (outputTo != "svg") {
+        LogError("Output format '%s' is not supported", outputTo.c_str());
+        return false;
+    }
+    return true;
+}
+
+bool Options::SetInputFrom(std::string const &inputFrom)
+{
+    if (inputFrom == "abc") {
+        m_inputFromFormat = ABC;
+    }
+    else if (inputFrom == "pae") {
+        m_inputFromFormat = PAE;
+    }
+    else if (inputFrom == "darms") {
+        m_inputFromFormat = DARMS;
+    }
+    else if (inputFrom == "volpiano") {
+        m_inputFromFormat = VOLPIANO;
+    }
+    else if (inputFrom == "cmme.xml") {
+        m_inputFromFormat = CMME;
+    }
+    else if ((inputFrom == "humdrum") || (inputFrom == "hum")) {
+        m_inputFromFormat = HUMDRUM;
+    }
+    else if (inputFrom == "mei") {
+        m_inputFromFormat = MEI;
+    }
+    else if ((inputFrom == "musicxml") || (inputFrom == "xml")) {
+        m_inputFromFormat = MUSICXML;
+    }
+    else if (inputFrom == "md") {
+        m_inputFromFormat = MUSEDATAHUM;
+    }
+    else if (inputFrom == "musedata") {
+        m_inputFromFormat = MUSEDATAHUM;
+    }
+    else if (inputFrom == "musedata-hum") {
+        m_inputFromFormat = MUSEDATAHUM;
+    }
+    else if (inputFrom == "musicxml-hum") {
+        m_inputFromFormat = MUSICXMLHUM;
+    }
+    else if (inputFrom == "mei-hum") {
+        m_inputFromFormat = MEIHUM;
+    }
+    else if (inputFrom == "esac") {
+        m_inputFromFormat = ESAC;
+    }
+    else if (inputFrom == "mei-pb-serialized") {
+        m_inputFromFormat = SERIALIZATION;
+    }
+    else if (inputFrom == "auto") {
+        m_inputFromFormat = AUTO;
+    }
+    else {
+        LogError("Input format '%s' is not supported", inputFrom.c_str());
+        return false;
+    }
+    return true;
+}
 
 void Options::Sync()
 {

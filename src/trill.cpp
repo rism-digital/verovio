@@ -27,9 +27,9 @@ namespace vrv {
 static const ClassRegistrar<Trill> s_factory("trill", TRILL);
 
 Trill::Trill()
-    : ControlElement(TRILL, "trill-")
+    : ControlElement(TRILL)
     , TimeSpanningInterface()
-    , AttColor()
+    , AttEnclosingChars()
     , AttExtender()
     , AttExtSymAuth()
     , AttExtSymNames()
@@ -39,7 +39,7 @@ Trill::Trill()
     , AttPlacementRelStaff()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_ENCLOSINGCHARS);
     this->RegisterAttClass(ATT_EXTENDER);
     this->RegisterAttClass(ATT_EXTSYMAUTH);
     this->RegisterAttClass(ATT_EXTSYMNAMES);
@@ -57,7 +57,7 @@ void Trill::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
-    this->ResetColor();
+    this->ResetEnclosingChars();
     this->ResetExtender();
     this->ResetExtSymAuth();
     this->ResetExtSymNames();
@@ -85,6 +85,18 @@ char32_t Trill::GetTrillGlyph() const
 
     // return default glyph for trill
     return SMUFL_E566_ornamentTrill;
+}
+
+std::pair<char32_t, char32_t> Trill::GetEnclosingGlyphs() const
+{
+    if (this->HasEnclose()) {
+        switch (this->GetEnclose()) {
+            case ENCLOSURE_brack: return { SMUFL_E26C_accidentalBracketLeft, SMUFL_E26D_accidentalBracketRight }; break;
+            case ENCLOSURE_paren: return { SMUFL_E26A_accidentalParensLeft, SMUFL_E26B_accidentalParensRight }; break;
+            default: break;
+        }
+    }
+    return { 0, 0 };
 }
 
 //----------------------------------------------------------------------------

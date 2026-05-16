@@ -43,7 +43,7 @@ function getToolkitFunction(VerovioModule, method) {
     mapping.getExpansionIdsForElement = VerovioModule.cwrap("vrvToolkit_getExpansionIdsForElement", "string", ["number", "string"]);
 
     // char *getHumdrum(Toolkit *ic)
-    mapping.getHumdrum = VerovioModule.cwrap("vrvToolkit_getHumdrum", "string");
+    mapping.getHumdrum = VerovioModule.cwrap("vrvToolkit_getHumdrum", "string", ["number"]);
 
     // char *convertMEIToHumdrum(Toolkit *ic, const char *meiData)
     mapping.convertMEIToHumdrum = VerovioModule.cwrap("vrvToolkit_convertMEIToHumdrum", "string", ["number", "string"]);

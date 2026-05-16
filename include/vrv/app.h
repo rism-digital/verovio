@@ -28,7 +28,7 @@ public:
     virtual ~App();
     Object *Clone() const override { return new App(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "App"; }
+    std::string GetClassName() const override { return "app"; }
     ///@}
 
     /** Getter for level **/
@@ -37,7 +37,7 @@ public:
     /**
      * Add children to a apparatus.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
 protected:
     /** We store the level of the <app> for integrity check */

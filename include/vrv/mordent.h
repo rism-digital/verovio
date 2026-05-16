@@ -25,7 +25,7 @@ namespace vrv {
  */
 class Mordent : public ControlElement,
                 public TimePointInterface,
-                public AttColor,
+                public AttEnclosingChars,
                 public AttExtSymAuth,
                 public AttExtSymNames,
                 public AttOrnamentAccid,
@@ -41,7 +41,7 @@ public:
     virtual ~Mordent();
     Object *Clone() const override { return new Mordent(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Mordent"; }
+    std::string GetClassName() const override { return "mordent"; }
     ///@}
 
     /**
@@ -59,6 +59,7 @@ public:
      * Get the SMuFL glyph for the mordent based on type, long attribute or glyph.num
      */
     char32_t GetMordentGlyph() const;
+    std::pair<char32_t, char32_t> GetEnclosingGlyphs() const;
 
     //----------//
     // Functors //

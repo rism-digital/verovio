@@ -48,8 +48,11 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     Note *note = vrv_cast<Note *>(element);
     assert(note);
 
-    const int yNote = element->GetDrawingY();
-    const int xNote = element->GetDrawingX();
+    int x = element->GetDrawingX();
+    int y = element->GetDrawingY();
+
+    this->CalcOffset(dc, x, y);
+
     const data_DURATION drawingDur = note->GetDrawingDur();
 
     /************** Noteheads: **************/
@@ -59,13 +62,13 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         this->DrawLigatureNote(dc, element, layer, staff);
     }
     else if (drawingDur < DURATION_1) {
-        this->DrawMaximaToBrevis(dc, yNote, element, layer, staff);
+        this->DrawMaximaToBrevis(dc, y, element, layer, staff);
     }
     // Semibrevis and shorter
     else {
         char32_t code = note->GetMensuralNoteheadGlyph();
         dc->StartCustomGraphic("notehead");
-        this->DrawSmuflCode(dc, xNote, yNote, code, staff->m_drawingStaffSize, false);
+        this->DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, false);
         dc->EndCustomGraphic();
     }
 
@@ -85,7 +88,7 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
     Mensur *mensur = vrv_cast<Mensur *>(element);
     assert(mensur);
 
-    if (!mensur->HasSign()) {
+    if (!mensur->HasSign() && !mensur->HasNum()) {
         // only react to visual attributes
         return;
     }
@@ -229,8 +232,8 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
             || staff->m_drawingNotationType == NOTATIONTYPE_cmn) {
             up = (note->GetDrawingStemDir() == STEMDIRECTION_up);
         }
-        // For mensural just calculate it here
-        else {
+        // For mensural white, just calculate it here - keep it down for mensural black
+        else if (staff->m_drawingNotationType != NOTATIONTYPE_mensural_black) {
             int verticalCenter = staff->GetDrawingY() - m_doc->GetDrawingUnit(staffSize) * (staff->m_drawingLines - 1);
             up = (note->GetDrawingY() < verticalCenter);
         }
@@ -336,6 +339,8 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     Ligature *ligature = vrv_cast<Ligature *>(note->GetFirstAncestor(LIGATURE));
     assert(ligature);
 
+    if (ligature->m_drawingShapes.size() < 2) return;
+
     Note *prevNote = dynamic_cast<Note *>(ligature->GetListPrevious(note));
     Note *nextNote = dynamic_cast<Note *>(ligature->GetListNext(note));
 
@@ -350,10 +355,16 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     bool oblique = ((shape & LIGATURE_OBLIQUE) || (prevShape & LIGATURE_OBLIQUE));
     bool obliqueEnd = (prevShape & LIGATURE_OBLIQUE);
     bool stackedEnd = (shape & LIGATURE_STACKED);
-
     int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     int strokeWidth = 2.8 * stemWidth;
     /** end code duplicated */
+
+    bool straight = true;
+    switch (m_doc->GetOptions()->m_ligatureOblique.GetValue()) {
+        case LIGATURE_OBL_auto: straight = !isMensuralBlack; break;
+        case LIGATURE_OBL_straight: straight = true; break;
+        case LIGATURE_OBL_curved: straight = false; break;
+    }
 
     Point points[4];
     Point *topLeft = &points[0];
@@ -372,24 +383,52 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
         // First half of the oblique - checking the nextNote is there just in case, but is should
         if ((shape & LIGATURE_OBLIQUE) && nextNote) {
             // return;
-            CalcObliquePoints(note, nextNote, staff, points, sides, shape, isMensuralBlack, true);
+            this->CalcObliquePoints(note, nextNote, staff, points, sides, shape, isMensuralBlack, true, straight);
         }
         // Second half of the oblique - checking the prevNote is there just in case, but is should
         else if ((prevShape & LIGATURE_OBLIQUE) && prevNote) {
-            CalcObliquePoints(prevNote, note, staff, points, sides, prevShape, isMensuralBlack, false);
+            this->CalcObliquePoints(prevNote, note, staff, points, sides, prevShape, isMensuralBlack, false, straight);
         }
         else {
             assert(false);
         }
     }
 
-    if (!fillNotehead) {
-        // double the bases of rectangles
-        this->DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, -strokeWidth);
-        this->DrawObliquePolygon(dc, bottomLeft->x, bottomLeft->y, bottomRight->x, bottomRight->y, strokeWidth);
+    // Oblique polygons
+    if (straight) {
+        if (!fillNotehead) {
+            this->DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, -strokeWidth);
+            this->DrawObliquePolygon(dc, bottomLeft->x, bottomLeft->y, bottomRight->x, bottomRight->y, strokeWidth);
+        }
+        else {
+            this->DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, bottomLeft->y - topLeft->y);
+        }
     }
+    // Bent parallelograms
     else {
-        this->DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, bottomLeft->y - topLeft->y);
+        const int thickness = topLeft->y - bottomLeft->y;
+        // The curved side points (two ends and two control points)
+        Point curvedSide[4];
+        curvedSide[0] = this->ToDeviceContext(*topLeft);
+        curvedSide[3] = this->ToDeviceContext(*topRight);
+        //
+        const int width = (curvedSide[3].x - curvedSide[0].x);
+        const int height = (curvedSide[3].y - curvedSide[0].y);
+        curvedSide[1] = curvedSide[3];
+        curvedSide[1].x -= (width * 0.7);
+        curvedSide[1].y -= (height * 0.7) + (height * 0.07);
+        curvedSide[2] = curvedSide[3];
+        curvedSide[2].x -= (width * 0.3);
+        curvedSide[2].y -= (height * 0.3) + (height * 0.07);
+
+        if (!fillNotehead) {
+            dc->DrawBentParallelogramFilled(curvedSide, strokeWidth);
+            for (Point &point : curvedSide) point.y += thickness - strokeWidth;
+            dc->DrawBentParallelogramFilled(curvedSide, strokeWidth);
+        }
+        else {
+            dc->DrawBentParallelogramFilled(curvedSide, thickness);
+        }
     }
 
     // Do not draw a left connector with obliques
@@ -401,7 +440,8 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
             Point prevBottomRight = *bottomRight;
             int prevSides[4];
             memcpy(prevSides, sides, 4 * sizeof(int));
-            CalcBrevisPoints(prevNote, staff, &prevTopLeft, &prevBottomRight, prevSides, prevShape, isMensuralBlack);
+            this->CalcBrevisPoints(
+                prevNote, staff, &prevTopLeft, &prevBottomRight, prevSides, prevShape, isMensuralBlack);
             if (!stackedEnd) {
                 sideTop = std::max(sides[0], prevSides[2]);
                 sideBottom = std::min(sides[1], prevSides[3]);
@@ -562,38 +602,11 @@ void View::DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numB
 
 void View::DrawProport(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
+    assert(element);
     assert(layer);
     assert(staff);
-    assert(dynamic_cast<Proport *>(element)); // Element must be a Proport"
-
-    int x1, x2, y1, y2;
-
-    Proport *proport = dynamic_cast<Proport *>(element);
 
     dc->StartGraphic(element, "", element->GetID());
-
-    int y = staff->GetDrawingY() - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4);
-    int x = element->GetDrawingX();
-
-    x1 = x + 120;
-    x2 = x1 + 150; // ??TEST: JUST DRAW AN ARBITRARY RECTANGLE
-    y1 = y;
-    y2 = y + 50 + (50 * proport->GetNum());
-    // DrawFilledRectangle(dc,x1,y1,x2,y2);
-    this->DrawPartFilledRectangle(dc, x1, y1, x2, y2, 0);
-
-    if (proport->HasNum()) {
-        x = element->GetDrawingX();
-        // if (proport->GetSign() || proport->HasTempus())           // ??WHAT SHOULD THIS BE?
-        {
-            x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
-                * 5; // step forward because we have a sign or a meter symbol
-        }
-        int numbase = proport->HasNumbase() ? proport->GetNumbase() : 0;
-        this->DrawProportFigures(dc, x,
-            staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1),
-            proport->GetNum(), numbase, staff);
-    }
 
     dc->EndGraphic(element, this);
 }
@@ -644,13 +657,17 @@ void View::CalcBrevisPoints(
 }
 
 void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point points[4], int sides[4], int shape,
-    bool isMensuralBlack, bool firstHalf)
+    bool isMensuralBlack, bool firstHalf, bool straight)
 {
     assert(note1);
     assert(note2);
     assert(staff);
 
     const int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    const int noteDiff = note1->PitchDifferenceTo(note2);
+
+    // Adjustment for end points according to the note diff
+    const int yAdjust = noteDiff * stemWidth / 5;
 
     Point *topLeft = &points[0];
     Point *bottomLeft = &points[1];
@@ -658,7 +675,7 @@ void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point point
     Point *bottomRight = &points[3];
 
     int sides1[4];
-    CalcBrevisPoints(note1, staff, topLeft, bottomLeft, sides1, shape, isMensuralBlack);
+    this->CalcBrevisPoints(note1, staff, topLeft, bottomLeft, sides1, shape, isMensuralBlack);
     // Correct the x of bottomLeft
     bottomLeft->x = topLeft->x;
     // Copy the left sides
@@ -667,7 +684,7 @@ void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point point
 
     int sides2[4];
     // add OBLIQUE shape to make sure sides are shortened in mensural black
-    CalcBrevisPoints(note2, staff, topRight, bottomRight, sides2, LIGATURE_OBLIQUE, isMensuralBlack);
+    this->CalcBrevisPoints(note2, staff, topRight, bottomRight, sides2, LIGATURE_OBLIQUE, isMensuralBlack);
     // Correct the x of topRight;
     topRight->x = bottomRight->x;
     // Copy the right sides
@@ -675,35 +692,33 @@ void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point point
     sides[3] = sides2[3];
 
     // With oblique it is best visually to move them up / down - more with (white) ligatures with serif
-    double adjustmentFactor = (isMensuralBlack) ? 0.5 : 1.8;
+    // double adjustmentFactor = (isMensuralBlack) ? 2.5 : 1.8;
     double slope = 0.0;
     if (bottomRight->x != bottomLeft->x)
         slope = (double)(bottomRight->y - bottomLeft->y) / (double)(bottomRight->x - bottomLeft->x);
-    int adjustment = (int)(slope * stemWidth) * adjustmentFactor;
-    topLeft->y -= adjustment;
-    bottomLeft->y -= adjustment;
-    topRight->y += adjustment;
-    bottomRight->y += adjustment;
 
-    slope = 0.0;
-    // recalculate slope after adjustment
-    if (bottomRight->x != bottomLeft->x)
-        slope = (double)(bottomRight->y - bottomLeft->y) / (double)(bottomRight->x - bottomLeft->x);
     int length = (bottomRight->x - bottomLeft->x) / 2;
+    if (!straight) slope *= 0.85;
 
     if (firstHalf) {
-        // make sure there are some pixels of overlap
-        length += 10;
+        // make sure there is one pixel of overlap
+        length += 1;
         bottomRight->x = bottomLeft->x + length;
         topRight->x = bottomRight->x;
         bottomRight->y = bottomLeft->y + (int)(length * slope);
         topRight->y = topLeft->y + (int)(length * slope);
+        //
+        topLeft->y += yAdjust;
+        bottomLeft->y += yAdjust;
     }
     else {
         bottomLeft->x = bottomLeft->x + length;
         topLeft->x = bottomLeft->x;
         bottomLeft->y = bottomLeft->y + (int)(length * slope);
         topLeft->y = topLeft->y + (int)(length * slope);
+        //
+        topRight->y -= yAdjust;
+        bottomRight->y -= yAdjust;
     }
 }
 

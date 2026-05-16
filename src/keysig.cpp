@@ -14,7 +14,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "clef.h"
 #include "comparison.h"
 #include "editorial.h"
 #include "functor.h"
@@ -72,19 +71,17 @@ const int KeySig::octave_map[2][9][7] = {
 static const ClassRegistrar<KeySig> s_factory("keySig", KEYSIG);
 
 KeySig::KeySig()
-    : LayerElement(KEYSIG, "keysig-")
+    : LayerElement(KEYSIG)
     , ObjectListInterface()
-    , AttAccidental()
     , AttColor()
-    , AttKeyMode()
+    , AttKeySigAnl()
     , AttKeySigLog()
     , AttKeySigVis()
     , AttPitch()
     , AttVisibility()
 {
-    this->RegisterAttClass(ATT_ACCIDENTAL);
     this->RegisterAttClass(ATT_COLOR);
-    this->RegisterAttClass(ATT_KEYMODE);
+    this->RegisterAttClass(ATT_KEYSIGANL);
     this->RegisterAttClass(ATT_KEYSIGLOG);
     this->RegisterAttClass(ATT_KEYSIGVIS);
     this->RegisterAttClass(ATT_PITCH);
@@ -98,9 +95,8 @@ KeySig::~KeySig() {}
 void KeySig::Reset()
 {
     LayerElement::Reset();
-    this->ResetAccidental();
     this->ResetColor();
-    this->ResetKeyMode();
+    this->ResetKeySigAnl();
     this->ResetKeySigLog();
     this->ResetKeySigVis();
     this->ResetPitch();
@@ -110,6 +106,8 @@ void KeySig::Reset()
     m_skipCancellation = false;
     m_drawingCancelAccidType = ACCIDENTAL_WRITTEN_n;
     m_drawingCancelAccidCount = 0;
+
+    this->ResetDrawingClef();
 }
 
 void KeySig::FilterList(ListOfConstObjects &childList) const
@@ -125,22 +123,28 @@ void KeySig::FilterList(ListOfConstObjects &childList) const
     }
 }
 
-bool KeySig::IsSupportedChild(Object *child)
+bool KeySig::IsSupportedChild(ClassId classId)
 {
-    if (this->IsAttribute() && !child->IsAttribute()) {
-        LogError("Adding a non-attribute child to an attribute is not allowed");
-        assert(false);
+    static const std::vector<ClassId> supported{ KEYACCID };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(KEYACCID)) {
-        assert(dynamic_cast<KeyAccid *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
+}
+
+bool KeySig::AddChildAdditionalCheck(Object *child)
+{
+    if (this->IsAttribute() && !child->IsAttribute()) {
+        LogError("Adding a non-attribute child to an attribute is not allowed");
+        return false;
+    }
+    return (LayerElement::AddChildAdditionalCheck(child));
 }
 
 int KeySig::GetAccidCount(bool fromAttribute) const
@@ -244,6 +248,27 @@ int KeySig::GetFifthsInt() const
         return this->GetSig().first;
     }
     return 0;
+}
+
+Clef *KeySig::GetDrawingClef()
+{
+    return m_drawingClef.has_value() ? &m_drawingClef.value() : NULL;
+}
+
+void KeySig::ResetDrawingClef()
+{
+    m_drawingClef.reset();
+}
+
+void KeySig::SetDrawingClef(Clef *clef)
+{
+    if (clef) {
+        m_drawingClef = *clef;
+        m_drawingClef->CloneReset();
+    }
+    else {
+        m_drawingClef.reset();
+    }
 }
 
 data_KEYSIGNATURE KeySig::ConvertToSig() const

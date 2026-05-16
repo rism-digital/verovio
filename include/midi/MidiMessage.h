@@ -173,7 +173,7 @@ class MidiMessage : public std::vector<uchar> {
 		bool           isKeySignature       (void) const;
 		bool           isEndOfTrack         (void) const;
 
-		std::string    getMetaContent       (void);
+		std::string    getMetaContent       (void) const;
 		void           setMetaContent       (const std::string& content);
 		void           setTempo             (double tempo);
 		void           setTempoMicroseconds (int microseconds);

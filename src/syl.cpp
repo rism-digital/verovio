@@ -39,8 +39,15 @@ namespace vrv {
 static const ClassRegistrar<Syl> s_factory("syl", SYL);
 
 Syl::Syl()
-    : LayerElement(SYL, "syl-"), TextListInterface(), TimeSpanningInterface(), AttLang(), AttTypography(), AttSylLog()
+    : LayerElement(SYL)
+    , TextListInterface()
+    , OffsetInterface()
+    , TimeSpanningInterface()
+    , AttLang()
+    , AttTypography()
+    , AttSylLog()
 {
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_LANG);
     this->RegisterAttClass(ATT_TYPOGRAPHY);
@@ -54,30 +61,30 @@ Syl::~Syl() {}
 void Syl::Reset()
 {
     LayerElement::Reset();
+    OffsetInterface::Reset();
     TimeSpanningInterface::Reset();
     this->ResetLang();
     this->ResetTypography();
     this->ResetSylLog();
 
-    m_drawingVerse = 1;
+    m_drawingVerseN = 1;
+    m_drawingVersePlace = STAFFREL_below;
     m_nextWordSyl = NULL;
 }
 
-bool Syl::IsSupportedChild(Object *child)
+bool Syl::IsSupportedChild(ClassId classId)
 {
-    if (child->Is({ REND, TEXT })) {
-        assert(dynamic_cast<TextElement *>(child));
+    static const std::vector<ClassId> supported{ REND, TEXT };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
-    }
-    else if (child->Is(REND)) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 int Syl::CalcHyphenLength(Doc *doc, int staffSize)

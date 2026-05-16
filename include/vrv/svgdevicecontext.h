@@ -42,7 +42,7 @@ public:
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    SvgDeviceContext();
+    SvgDeviceContext(const std::string &docId);
     virtual ~SvgDeviceContext();
     ///@}
 
@@ -50,7 +50,7 @@ public:
      * @name Setters
      */
     ///@{
-    void SetBackground(int color, int style = AxSOLID) override;
+    void SetBackground(int color, int style = PEN_SOLID) override;
     void SetBackgroundImage(void *image, double opacity = 1.0) override;
     void SetBackgroundMode(int mode) override;
     void SetTextForeground(int color) override;
@@ -78,12 +78,13 @@ public:
     void DrawQuadBezierPath(Point bezier[3]) override;
     void DrawCubicBezierPath(Point bezier[4]) override;
     void DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2[4]) override;
+    void DrawBentParallelogramFilled(Point side[4], int height) override;
     void DrawCircle(int x, int y, int radius) override;
     void DrawEllipse(int x, int y, int width, int height) override;
     void DrawEllipticArc(int x, int y, int width, int height, double start, double end) override;
     void DrawLine(int x1, int y1, int x2, int y2) override;
-    void DrawPolyline(int n, Point points[], int xOffset, int yOffset) override;
-    void DrawPolygon(int n, Point points[], int xOffset, int yOffset) override;
+    void DrawPolyline(int n, Point points[], bool close) override;
+    void DrawPolygon(int n, Point points[]) override;
     void DrawRectangle(int x, int y, int width, int height) override;
     void DrawRotatedText(const std::string &text, int x, int y, double angle) override;
     void DrawRoundedRectangle(int x, int y, int width, int height, int radius) override;
@@ -112,6 +113,11 @@ public:
     ///@}
 
     /**
+     * Indicate if offset should be applied
+     */
+    bool ApplyOffset() override { return true; }
+
+    /**
      * @name Method for starting and ending a graphic
      */
     ///@{
@@ -131,7 +137,12 @@ public:
     /**
      * Method for changing the color of a custom graphic
      */
-    virtual void SetCustomGraphicColor(const std::string &color) override;
+    void SetCustomGraphicColor(const std::string &color) override;
+
+    /**
+     * Method for adding custom graphic data-* attributes
+     */
+    void SetCustomGraphicAttributes(const std::string &data, const std::string &value) override;
 
     /**
      * @name Methods for re-starting and ending a graphic for objects drawn in separate steps
@@ -196,9 +207,22 @@ public:
     bool GetFacsimile() { return m_facsimile; }
 
     /**
+     * Setting use Liberation flag (false by default)
+     */
+    void SetUseLiberation(bool useLiberation) { m_useLiberation = useLiberation; }
+
+    /**
      * Setting m_svgBoudingBoxes flag (false by default)
      */
     void SetSvgBoundingBoxes(bool svgBoundingBoxes) { m_svgBoundingBoxes = svgBoundingBoxes; }
+
+    /**
+     * Setting m_svgContentBoundingBoxes flag (false by default)
+     */
+    void SetSvgContentBoundingBoxes(bool svgContentBoundingBoxes)
+    {
+        m_svgContentBoundingBoxes = svgContentBoundingBoxes;
+    }
 
     /**
      * Setting m_svgViewBox flag (false by default)
@@ -228,7 +252,11 @@ public:
     /**
      * Setter for an additional CSS
      */
-    void SetCss(const std::string &css) { m_css = css; }
+    void SetCss(const std::string &css)
+    {
+        m_css = css;
+        this->PrefixCssRules(m_css);
+    }
 
     /**
      *  Copies additional attributes of defined elements to the SVG, each string in the form "elementName@attribute"
@@ -289,7 +317,7 @@ private:
 
     void WriteLine(std::string);
 
-    std::string GetColor(int color);
+    std::string GetColor(int color) const;
 
     pugi::xml_node AddChild(std::string name);
 
@@ -301,6 +329,11 @@ private:
     void AppendStrokeLineJoin(pugi::xml_node node, const Pen &pen);
     void AppendStrokeDashArray(pugi::xml_node node, const Pen &pen);
     ///@}
+
+    /**
+     * Prefix the CSS rules with a #docId for scoping them to the SVG
+     */
+    void PrefixCssRules(std::string &rules);
 
 public:
     //
@@ -346,7 +379,7 @@ private:
         std::string m_refId;
     };
     const std::string InsertGlyphRef(const Glyph *glyph);
-    std::map<const Glyph *, GlyphRef> m_smuflGlyphs;
+    std::vector<std::pair<const Glyph *, GlyphRef>> m_smuflGlyphs;
     std::map<std::string, int> m_glyphCodeFontCounter;
 
     // pugixml data
@@ -359,8 +392,12 @@ private:
     // output as mm (for pdf generation with a 72 dpi)
     bool m_mmOutput;
     bool m_facsimile;
+    // use LiberationTextFont
+    bool m_useLiberation;
     // add bouding boxes in svg output
     bool m_svgBoundingBoxes;
+    // add content bounding boxes in svg output
+    bool m_svgContentBoundingBoxes;
     // use viewbox on svg root element
     bool m_svgViewBox;
     // output HTML5 data-* attributes
@@ -379,6 +416,8 @@ private:
     std::string m_glyphPostfixId;
     // embedding of the smufl text font
     option_SMUFLTEXTFONT m_smuflTextFont;
+    // the document id
+    std::string m_docId;
 };
 
 } // namespace vrv

@@ -31,7 +31,7 @@ public:
     virtual ~Subst();
     Object *Clone() const override { return new Subst(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Subst"; }
+    std::string GetClassName() const override { return "subst"; }
     ///@}
 
     /** Getter for level **/
@@ -40,7 +40,7 @@ public:
     /**
      * Add children to a apparatus.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
 protected:
     /** We store the level of the <subst> for integrity check */

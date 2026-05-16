@@ -59,7 +59,10 @@ FunctorCode AdjustAccidXFunctor::VisitAlignmentReference(AlignmentReference *ali
     // Align the octaves
     for (Accid *accid : accids) {
         // Skip any accid that was already adjusted
-        if (m_adjustedAccids.count(accid) > 0) continue;
+        if (m_adjustedAccids.contains(accid)) continue;
+        // Skip accid not descendant of a note (e.g., mensural)
+        if (!accid->GetFirstAncestor(NOTE)) continue;
+
         auto range = octaveEquivalence.equal_range(accid);
         // Handle at least two octave accids without unisons
         int octaveAccidCount = 0;
@@ -95,21 +98,31 @@ FunctorCode AdjustAccidXFunctor::VisitAlignmentReference(AlignmentReference *ali
     }
 
     const int count = (int)accids.size();
-    const int middle = (count / 2) + (count % 2);
-    // Zig-zag processing
-    for (int i = 0, j = count - 1; i < middle; ++i, --j) {
+    // Zig-zag processing, taking into consideration multiple accidentals per note
+    for (int i = 0, j = count - 1; i < count; ++i) {
         // top one - but skip if already adjusted (i.e. octaves)
-        if (m_adjustedAccids.count(accids.at(i)) == 0) {
+        if (!m_adjustedAccids.contains(accids.at(i))) {
             this->AdjustAccidWithSpace(accids.at(i), alignmentReference, staffSize);
         }
 
-        // Break with odd number of elements once the middle is reached
-        if (i == j) break;
+        // top one - don't zig-zag if the next accidental belongs to current note to preserve order
+        if (i < count - 1 && accids.at(i)->GetFirstAncestor(NOTE) == accids.at(i + 1)->GetFirstAncestor(NOTE)) continue;
+
+        // bottom one - back up to first accidental of current note to preserve order
+        int k = j;
+        while (j > 0 && accids.at(j)->GetFirstAncestor(NOTE) == accids.at(j - 1)->GetFirstAncestor(NOTE)) {
+            --j;
+        }
 
         // bottom one - but skip if already adjusted
-        if (m_adjustedAccids.count(accids.at(j)) == 0) {
-            this->AdjustAccidWithSpace(accids.at(j), alignmentReference, staffSize);
+        for (int l = j; l <= k; ++l) {
+            if (!m_adjustedAccids.contains(accids.at(l))) {
+                this->AdjustAccidWithSpace(accids.at(l), alignmentReference, staffSize);
+            }
         }
+
+        // bottom one - move to previous position
+        --j;
     }
 
     return FUNCTOR_SIBLINGS;
@@ -130,7 +143,7 @@ std::vector<Accid *> AdjustAccidXFunctor::GetAccidentalsForAdjustment(AlignmentR
     for (Object *child : alignmentReference->GetChildren()) {
         if (child->Is(ACCID)) {
             Accid *accid = vrv_cast<Accid *>(child);
-            if (accid->HasAccid()) accidentals.push_back(accid);
+            if (accid->HasAccid() && accid->GetFirstAncestor(NOTE)) accidentals.push_back(accid);
         }
     }
     return accidentals;

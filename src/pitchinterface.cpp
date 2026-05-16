@@ -109,13 +109,13 @@ void PitchInterface::AdjustPitchForNewClef(const Clef *oldClef, const Clef *newC
 
     int pitchDiff = -2 * (newClef->GetLine() - oldClef->GetLine());
     if (oldClef->GetShape() == CLEFSHAPE_F) {
-        pitchDiff -= 3;
+        pitchDiff += 4;
     }
     else if (oldClef->GetShape() == CLEFSHAPE_G) {
         pitchDiff -= 4;
     }
     if (newClef->GetShape() == CLEFSHAPE_F) {
-        pitchDiff += 3;
+        pitchDiff -= 4;
     }
     else if (newClef->GetShape() == CLEFSHAPE_G) {
         pitchDiff += 4;

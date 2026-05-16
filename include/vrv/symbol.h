@@ -33,13 +33,13 @@ public:
     virtual ~Symbol();
     Object *Clone() const override { return new Symbol(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Symbol"; }
+    std::string GetClassName() const override { return "symbol"; }
     ///@}
 
     /**
      * Only supported elements will be actually added to the child list.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Get the SMuFL glyph for the symbol based on glyph.num or glyph.name

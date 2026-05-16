@@ -35,7 +35,7 @@ namespace vrv {
 // SystemAligner
 //----------------------------------------------------------------------------
 
-SystemAligner::SystemAligner() : Object(SYSTEM_ALIGNER), m_bottomAlignment(NULL), m_system(NULL)
+SystemAligner::SystemAligner() : Object(SYSTEM_ALIGNER)
 {
     this->Reset();
 }
@@ -54,9 +54,9 @@ void SystemAligner::Reset()
     this->AddChild(m_bottomAlignment);
 }
 
-bool SystemAligner::IsSupportedChild(Object *child)
+bool SystemAligner::IsSupportedChild(ClassId classId)
 {
-    assert(dynamic_cast<StaffAlignment *>(child));
+    // Nothing to check here
     return true;
 }
 
@@ -69,17 +69,18 @@ StaffAlignment *SystemAligner::GetStaffAlignment(int idx, Staff *staff, const Do
     // remove it temporarily
     children.pop_back();
 
-    if (idx < this->GetChildCount()) {
+    StaffAlignment *alignment = this->GetStaffAlignmentForStaffN(staff->GetN());
+    if (alignment) {
         children.push_back(m_bottomAlignment);
-        return dynamic_cast<StaffAlignment *>(this->GetChild(idx));
+        return alignment;
     }
     // check that we are searching for the next one (not a gap)
-    assert(idx == this->GetChildCount());
+    // assert(idx == this->GetChildCount());
     // LogDebug("Creating staff alignment");
 
     // This is the first time we are looking for it (e.g., first staff)
     // We create the StaffAlignment
-    StaffAlignment *alignment = new StaffAlignment();
+    alignment = new StaffAlignment();
     alignment->SetStaff(staff, doc, this->GetAboveSpacingType(staff));
     alignment->SetParentSystem(this->GetSystem());
     this->AddChild(alignment);
@@ -103,13 +104,14 @@ void SystemAligner::ReorderBy(const std::vector<int> &staffNs)
     ArrayOfObjects &children = this->GetChildrenForModification();
 
     // Since we have a bottom alignment, the number is +1
-    if (children.size() != staffNs.size() + 1) return;
+    // The children list can be smaller with optimized systems
+    if (children.size() > staffNs.size() + 1) return;
 
     ListOfObjects orderedAlignments;
     for (auto staffN : staffNs) {
         StaffAlignment *alignment = this->GetStaffAlignmentForStaffN(staffN);
-        // Something is wrong in the data, we keep the order as it is
-        if (!alignment) return;
+        // This happens with condensed systems where some alignment for staffN are not there
+        if (!alignment) continue;
         orderedAlignments.push_back(alignment);
     }
     int i = 0;
@@ -135,7 +137,7 @@ const StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN) cons
 
         if ((alignment->GetStaff()) && (alignment->GetStaff()->GetN() == staffN)) return alignment;
     }
-    LogDebug("Staff alignment for staff %d not found", staffN);
+    // LogDebug("Staff alignment for staff %d not found", staffN);
     return NULL;
 }
 
@@ -219,8 +221,20 @@ void SystemAligner::SetSpacing(const ScoreDef *scoreDef)
         if (!object->Is(STAFFDEF)) continue;
         const StaffDef *staffDef = vrv_cast<const StaffDef *>(object);
         assert(staffDef);
+        SpacingType spacing = CalculateSpacingAbove(staffDef);
 
-        m_spacingTypes[staffDef->GetN()] = CalculateSpacingAbove(staffDef);
+        // Get the ossias above
+        std::vector<int> ns;
+        staffDef->GetOssiaAboveNs(ns);
+        // push main staff at the end so it will get an ossia spacing if needed
+        ns.push_back(staffDef->GetN());
+        for (int n : ns) m_spacingTypes[n] = SpacingType::Ossia;
+        // Top one (ossia or main staff if no ossias) gets the main staff spacing
+        m_spacingTypes[ns.at(0)] = spacing;
+        // Clear list and add ossia below with ossia spacing
+        ns.clear();
+        staffDef->GetOssiaBelowNs(ns);
+        for (int n : ns) m_spacingTypes[n] = SpacingType::Ossia;
     }
 }
 
@@ -314,7 +328,8 @@ FunctorCode SystemAligner::AcceptEnd(ConstFunctor &functor) const
 StaffAlignment::StaffAlignment() : Object(STAFF_ALIGNMENT)
 {
     m_yRel = 0;
-    m_verseNs.clear();
+    m_verseAboveNs.clear();
+    m_verseBelowNs.clear();
     m_staff = NULL;
     m_floatingPositionersSorted = true;
 
@@ -331,14 +346,13 @@ StaffAlignment::StaffAlignment() : Object(STAFF_ALIGNMENT)
 
 StaffAlignment::~StaffAlignment()
 {
-    ClearPositioners();
+    this->ClearPositioners();
 }
 
 void StaffAlignment::ClearPositioners()
 {
-    ArrayOfFloatingPositioners::iterator iter;
-    for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
-        delete *iter;
+    for (FloatingPositioner *positioner : m_floatingPositioners) {
+        delete positioner;
     }
     m_floatingPositioners.clear();
 
@@ -437,39 +451,73 @@ void StaffAlignment::SetRequestedSpaceBelow(int space)
     }
 }
 
-void StaffAlignment::AddVerseN(int verseN)
+void StaffAlignment::AddVerseN(int verseN, data_STAFFREL place)
 {
     // if 0, then assume 1;
     verseN = std::max(verseN, 1);
-    m_verseNs.insert(verseN);
+    (place == STAFFREL_above) ? m_verseAboveNs.insert(verseN) : m_verseBelowNs.insert(verseN);
 }
 
 int StaffAlignment::GetVerseCount(bool collapse) const
 {
-    if (m_verseNs.empty()) {
+    return (this->GetVerseCountAbove(collapse) + this->GetVerseCountBelow(collapse));
+}
+
+int StaffAlignment::GetVerseCountAbove(bool collapse) const
+{
+    if (m_verseAboveNs.empty()) {
         return 0;
     }
     else if (collapse) {
-        return (int)m_verseNs.size();
+        return (int)m_verseAboveNs.size();
     }
     else {
-        return *m_verseNs.rbegin();
+        return (*m_verseAboveNs.rbegin());
     }
 }
 
-int StaffAlignment::GetVersePosition(int verseN, bool collapse) const
+int StaffAlignment::GetVerseCountBelow(bool collapse) const
 {
-    if (m_verseNs.empty()) {
+    if (m_verseBelowNs.empty()) {
+        return 0;
+    }
+    else if (collapse) {
+        return (int)m_verseBelowNs.size();
+    }
+    else {
+        return (*m_verseBelowNs.rbegin());
+    }
+}
+
+int StaffAlignment::GetVersePositionAbove(int verseN, bool collapse) const
+{
+    if (m_verseAboveNs.empty()) {
         // Syl in neumatic notation - since verse count will be 0, position is -1
         return -1;
     }
     else if (collapse) {
-        auto it = std::find(m_verseNs.rbegin(), m_verseNs.rend(), verseN);
-        int pos = (int)std::distance(m_verseNs.rbegin(), it);
+        auto it = std::find(m_verseAboveNs.begin(), m_verseAboveNs.end(), verseN);
+        int pos = (int)std::distance(m_verseAboveNs.begin(), it);
         return pos;
     }
     else {
-        return (*m_verseNs.rbegin()) - verseN;
+        return verseN - 1;
+    }
+}
+
+int StaffAlignment::GetVersePositionBelow(int verseN, bool collapse) const
+{
+    if (m_verseBelowNs.empty()) {
+        // Syl in neumatic notation - since verse count will be 0, position is -1
+        return -1;
+    }
+    else if (collapse) {
+        auto it = std::find(m_verseBelowNs.rbegin(), m_verseBelowNs.rend(), verseN);
+        int pos = (int)std::distance(m_verseBelowNs.rbegin(), it);
+        return pos;
+    }
+    else {
+        return (*m_verseBelowNs.rbegin()) - verseN;
     }
 }
 
@@ -491,6 +539,10 @@ double StaffAlignment::GetJustificationFactor(const Doc *doc) const
                 break;
             case SystemAligner::SpacingType::Bracket:
                 justificationFactor = doc->GetOptions()->m_justificationBracketGroup.GetValue();
+                break;
+            case SystemAligner::SpacingType::Ossia:
+                justificationFactor
+                    = doc->GetOptions()->m_justificationStaff.GetValue() * doc->GetOptions()->m_spacingOssia.GetValue();
                 break;
             case SystemAligner::SpacingType::None: break;
             default: assert(false);
@@ -526,7 +578,12 @@ int StaffAlignment::CalcOverflowBelow(const BoundingBox *box) const
 int StaffAlignment::GetMinimumStaffSpacing(const Doc *doc, const AttSpacing *attSpacing) const
 {
     const auto &option = doc->GetOptions()->m_spacingStaff;
-    int spacing = option.GetValue() * doc->GetDrawingUnit(this->GetStaffSize());
+
+    int staffSize = this->GetStaffSize();
+    // Revert ossia staff ratio for it not to impact vertical spacing
+    if (this->m_staff && this->m_staff->IsOssia()) staffSize /= doc->GetOptions()->m_ossiaStaffSize.GetValue();
+
+    int spacing = option.GetValue() * doc->GetDrawingUnit(staffSize);
 
     if (!option.IsSet() && attSpacing->HasSpacingStaff()) {
         if (attSpacing->GetSpacingStaff().GetType() == MEASUREMENTTYPE_px) {
@@ -578,6 +635,12 @@ int StaffAlignment::GetMinimumSpacing(const Doc *doc) const
                     const auto &option = doc->GetOptions()->m_spacingBracketGroup;
                     spacing = option.IsSet() ? option.GetValue() * doc->GetDrawingUnit(this->GetStaffSize())
                                              : this->GetMinimumStaffSpacing(doc, scoreDefSpacing);
+                    break;
+                }
+                case SystemAligner::SpacingType::Ossia: {
+                    // Ossia spacing is third of a staff spacing
+                    spacing = this->GetMinimumStaffSpacing(doc, scoreDefSpacing)
+                        * doc->GetOptions()->m_spacingOssia.GetValue();
                     break;
                 }
                 case SystemAligner::SpacingType::None: break;
@@ -665,7 +728,7 @@ bool StaffAlignment::IsInBracketGroup(bool isFirst) const
             });
 
             const int currentN = this->m_staff->GetN();
-            if (staffNs.count(currentN)) {
+            if (staffNs.contains(currentN)) {
                 if ((isFirst && (*staffNs.begin() == currentN)) || (!isFirst && (*staffNs.rbegin() == currentN)))
                     return true;
             }

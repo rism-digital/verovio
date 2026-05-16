@@ -24,14 +24,14 @@ namespace vrv {
 
 // static const ClassRegistrar<GenericLayerElement> s_factory("generic", GENERIC_ELEMENT);
 
-GenericLayerElement::GenericLayerElement() : LayerElement(GENERIC_ELEMENT, "generic-")
+GenericLayerElement::GenericLayerElement() : LayerElement(GENERIC_ELEMENT)
 {
     LogError("Creating generic element without name");
     m_className = "[unspecified]";
     this->Reset();
 }
 
-GenericLayerElement::GenericLayerElement(const std::string &name) : LayerElement(GENERIC_ELEMENT, name + "-")
+GenericLayerElement::GenericLayerElement(const std::string &name) : LayerElement(GENERIC_ELEMENT)
 {
     m_meiName = name;
     m_className = name;

@@ -25,6 +25,8 @@
 #include "mrest.h"
 #include "nc.h"
 #include "octave.h"
+#include "offsetinterface.h"
+#include "ossia.h"
 #include "page.h"
 #include "repeatmark.h"
 #include "rest.h"
@@ -35,6 +37,7 @@
 #include "stem.h"
 #include "syl.h"
 #include "system.h"
+#include "tabdursym.h"
 #include "tempo.h"
 #include "textlayoutelement.h"
 #include "tuplet.h"
@@ -56,6 +59,7 @@ FunctorCode ResetDataFunctor::VisitAccid(Accid *accid)
     // Call parent one too
     this->VisitLayerElement(accid);
     accid->PositionInterface::InterfaceResetData(*this, accid);
+    accid->ClearFloatingObject();
 
     return FUNCTOR_CONTINUE;
 }
@@ -83,7 +87,8 @@ FunctorCode ResetDataFunctor::VisitBeam(Beam *beam)
 {
     // Call parent one too
     this->VisitLayerElement(beam);
-    beam->BeamDrawingInterface::Reset();
+    // Drawing interface functor to be called explicitly
+    beam->BeamDrawingInterface::InterfaceResetData(*this);
 
     beam->m_beamSegment.Reset();
     beam->SetStemSameasBeam(NULL);
@@ -98,8 +103,8 @@ FunctorCode ResetDataFunctor::VisitBeamSpan(BeamSpan *beamSpan)
 {
     // Call parent one too
     this->VisitControlElement(beamSpan);
-    beamSpan->BeamDrawingInterface::Reset();
-    beamSpan->PlistInterface::InterfaceResetData(*this, beamSpan);
+    // Drawing interface functor to be called explicitly
+    beamSpan->BeamDrawingInterface::InterfaceResetData(*this);
 
     beamSpan->ResetBeamedElements();
     beamSpan->ClearBeamSegments();
@@ -112,6 +117,9 @@ FunctorCode ResetDataFunctor::VisitChord(Chord *chord)
 {
     // Call parent one too
     this->VisitLayerElement(chord);
+    // Drawing interface functor to be called explicitly
+    chord->DrawingListInterface::InterfaceResetData(*this);
+    chord->StemmedDrawingInterface::InterfaceResetData(*this);
 
     // We want the list of the ObjectListInterface to be regenerated
     chord->Modify();
@@ -122,18 +130,6 @@ FunctorCode ResetDataFunctor::VisitControlElement(ControlElement *controlElement
 {
     // Call parent one too
     this->VisitFloatingObject(controlElement);
-
-    // Pass it to the pseudo functor of the interface
-    if (controlElement->HasInterface(INTERFACE_ALT_SYM)) {
-        AltSymInterface *interface = controlElement->GetAltSymInterface();
-        assert(interface);
-        interface->InterfaceResetData(*this, controlElement);
-    }
-    if (controlElement->HasInterface(INTERFACE_LINKING)) {
-        LinkingInterface *interface = controlElement->GetLinkingInterface();
-        assert(interface);
-        interface->InterfaceResetData(*this, controlElement);
-    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -225,23 +221,6 @@ FunctorCode ResetDataFunctor::VisitFloatingObject(FloatingObject *floatingObject
     floatingObject->ResetDrawing();
     floatingObject->SetDrawingGrpId(0);
 
-    // Pass it to the pseudo functor of the interface
-    if (floatingObject->HasInterface(INTERFACE_FACSIMILE)) {
-        FacsimileInterface *interface = floatingObject->GetFacsimileInterface();
-        assert(interface);
-        interface->InterfaceResetData(*this, floatingObject);
-    }
-    // else / else if because TimpeSpanningInterface::InterfaceResetData resets TimePointingInterface
-    if (floatingObject->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimeSpanningInterface *interface = floatingObject->GetTimeSpanningInterface();
-        assert(interface);
-        interface->InterfaceResetData(*this, floatingObject);
-    }
-    else if (floatingObject->HasInterface(INTERFACE_TIME_POINT)) {
-        TimePointInterface *interface = floatingObject->GetTimePointInterface();
-        assert(interface);
-        interface->InterfaceResetData(*this, floatingObject);
-    }
     return FUNCTOR_CONTINUE;
 }
 
@@ -249,6 +228,8 @@ FunctorCode ResetDataFunctor::VisitFTrem(FTrem *fTrem)
 {
     // Call parent one too
     this->VisitLayerElement(fTrem);
+    // Drawing interface functor to be called explicitly
+    fTrem->BeamDrawingInterface::InterfaceResetData(*this);
 
     fTrem->m_beamSegment.Reset();
 
@@ -269,13 +250,25 @@ FunctorCode ResetDataFunctor::VisitHairpin(Hairpin *hairpin)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode ResetDataFunctor::VisitKeySig(KeySig *keySig)
+{
+    this->VisitLayerElement(keySig);
+
+    keySig->ResetDrawingClef();
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ResetDataFunctor::VisitLayer(Layer *layer)
 {
     // Call parent one too
     this->VisitObject(layer);
+    // Drawing interface functor to be called explicitly
+    layer->DrawingListInterface::InterfaceResetData(*this);
 
     layer->SetCrossStaffFromAbove(false);
     layer->SetCrossStaffFromBelow(false);
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -283,17 +276,11 @@ FunctorCode ResetDataFunctor::VisitLayerElement(LayerElement *layerElement)
 {
     // Call parent one too
     this->VisitObject(layerElement);
-    layerElement->FacsimileInterface::InterfaceResetData(*this, layerElement);
 
     layerElement->SetIsInBeamSpan(false);
     layerElement->SetDrawingCueSize(false);
     layerElement->m_crossStaff = NULL;
     layerElement->m_crossLayer = NULL;
-
-    // Pass it to the pseudo functor of the interface
-    LinkingInterface *interface = layerElement->GetLinkingInterface();
-    assert(interface);
-    interface->InterfaceResetData(*this, layerElement);
 
     return FUNCTOR_CONTINUE;
 }
@@ -314,7 +301,6 @@ FunctorCode ResetDataFunctor::VisitMeasure(Measure *measure)
 {
     // Call parent one too
     this->VisitObject(measure);
-    measure->FacsimileInterface::InterfaceResetData(*this, measure);
 
     measure->m_timestampAligner.Reset();
     measure->SetDrawingEnding(NULL);
@@ -325,7 +311,6 @@ FunctorCode ResetDataFunctor::VisitMRest(MRest *mRest)
 {
     // Call parent one too
     this->VisitLayerElement(mRest);
-    mRest->PositionInterface::InterfaceResetData(*this, mRest);
 
     return FUNCTOR_CONTINUE;
 }
@@ -334,7 +319,8 @@ FunctorCode ResetDataFunctor::VisitNote(Note *note)
 {
     // Call parent one too
     this->VisitLayerElement(note);
-    note->PositionInterface::InterfaceResetData(*this, note);
+    // Drawing interface functor to be called explicitly
+    note->StemmedDrawingInterface::InterfaceResetData(*this);
 
     note->SetDrawingLoc(0);
     note->SetFlippedNotehead(false);
@@ -358,6 +344,62 @@ FunctorCode ResetDataFunctor::VisitNc(Nc *nc)
 
 FunctorCode ResetDataFunctor::VisitObject(Object *object)
 {
+    if (object->HasInterface(INTERFACE_ALT_SYM)) {
+        AltSymInterface *interface = object->GetAltSymInterface();
+        assert(interface);
+        interface->InterfaceResetData(*this, object);
+    }
+    if (object->HasInterface(INTERFACE_FACSIMILE)) {
+        FacsimileInterface *interface = object->GetFacsimileInterface();
+        interface->InterfaceResetData(*this, object);
+    }
+    if (object->HasInterface(INTERFACE_LINKING)) {
+        LinkingInterface *interface = object->GetLinkingInterface();
+        assert(interface);
+        interface->InterfaceResetData(*this, object);
+    }
+    if (object->HasInterface(INTERFACE_OFFSET)) {
+        OffsetInterface *interface = object->GetOffsetInterface();
+        assert(interface);
+        interface->InterfaceResetData(*this, object);
+    }
+    if (object->HasInterface(INTERFACE_OFFSET_SPANNING)) {
+        OffsetSpanningInterface *interface = object->GetOffsetSpanningInterface();
+        assert(interface);
+        interface->InterfaceResetData(*this, object);
+    }
+    if (object->HasInterface(INTERFACE_PLIST)) {
+        PlistInterface *interface = object->GetPlistInterface();
+        assert(interface);
+        interface->InterfaceResetData(*this, object);
+    }
+    if (object->HasInterface(INTERFACE_POSITION)) {
+        PositionInterface *interface = object->GetPositionInterface();
+        assert(interface);
+        interface->InterfaceResetData(*this, object);
+    }
+    if (object->HasInterface(INTERFACE_TIME_POINT)) {
+        TimePointInterface *interface = object->GetTimePointInterface();
+        assert(interface);
+        interface->InterfaceResetData(*this, object);
+    }
+    if (object->HasInterface(INTERFACE_TIME_SPANNING)) {
+        TimeSpanningInterface *interface = object->GetTimeSpanningInterface();
+        assert(interface);
+        interface->InterfaceResetData(*this, object);
+    }
+    if (object->HasPlistReferences()) object->ResetPlistReferences();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetDataFunctor::VisitPage(Page *page)
+{
+    // Call parent one too
+    this->VisitObject(page);
+
+    page->DeprecateLayout();
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -375,7 +417,6 @@ FunctorCode ResetDataFunctor::VisitRest(Rest *rest)
 {
     // Call parent one too
     this->VisitLayerElement(rest);
-    rest->PositionInterface::InterfaceResetData(*this, rest);
 
     return FUNCTOR_CONTINUE;
 }
@@ -406,10 +447,19 @@ FunctorCode ResetDataFunctor::VisitStaff(Staff *staff)
 {
     // Call parent one too
     this->VisitObject(staff);
-    staff->FacsimileInterface::InterfaceResetData(*this, staff);
 
     staff->m_timeSpanningElements.clear();
     staff->ClearLedgerLines();
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetDataFunctor::VisitStaffDef(StaffDef *staffDef)
+{
+    // Call parent one too
+    this->VisitObject(staffDef);
+    // Drawing interface functor to be called explicitly
+    staffDef->StaffDefDrawingInterface::InterfaceResetData(*this);
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -428,9 +478,18 @@ FunctorCode ResetDataFunctor::VisitSyl(Syl *syl)
 {
     // Call parent one too
     this->VisitLayerElement(syl);
-    syl->TimeSpanningInterface::InterfaceResetData(*this, syl);
 
     syl->m_nextWordSyl = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetDataFunctor::VisitSystem(System *system)
+{
+    // Call parent one too
+    this->VisitObject(system);
+    // Drawing interface functor to be called explicitly
+    system->DrawingListInterface::InterfaceResetData(*this);
 
     return FUNCTOR_CONTINUE;
 }
@@ -440,6 +499,16 @@ FunctorCode ResetDataFunctor::VisitSystemMilestone(SystemMilestoneEnd *systemMil
     this->VisitFloatingObject(systemMilestoneEnd);
 
     systemMilestoneEnd->SetMeasure(NULL);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetDataFunctor::VisitTabDurSym(TabDurSym *tabDurSym)
+{
+    // Call parent one too
+    this->VisitLayerElement(tabDurSym);
+    // Drawing interface functor to be called explicitly
+    tabDurSym->StemmedDrawingInterface::InterfaceResetData(*this);
 
     return FUNCTOR_CONTINUE;
 }
@@ -654,6 +723,21 @@ FunctorCode ResetHorizontalAlignmentFunctor::VisitNote(Note *note)
     note->SetFlippedNotehead(false);
     // Re-mark the role as unsed if we have a shared stem
     if (note->HasStemSameasNote()) note->SetStemSameasRole(SAMEAS_UNSET);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitOssia(Ossia *ossia)
+{
+    ossia->ResetAlignments();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitProport(Proport *proport)
+{
+    this->VisitLayerElement(proport);
+    proport->ResetCumulate();
 
     return FUNCTOR_CONTINUE;
 }

@@ -9,6 +9,7 @@
 #define __VRV_HORIZONTAL_ALIGNER_H__
 
 #include "atts_shared.h"
+#include "fraction.h"
 #include "object.h"
 #include "vrv.h"
 
@@ -28,6 +29,8 @@ class TimestampAttr;
  * For example, we align notes and rests (default) together, clefs separately, etc.
  */
 enum AlignmentType {
+    ALIGNMENT_SCOREDEF_OSSIA_CLEF = -2,
+    ALIGNMENT_SCOREDEF_OSSIA_KEYSIG,
     ALIGNMENT_MEASURE_START = 0,
     // Non-justifiable
     ALIGNMENT_SCOREDEF_CLEF,
@@ -42,7 +45,9 @@ enum AlignmentType {
     ALIGNMENT_KEYSIG,
     ALIGNMENT_MENSUR,
     ALIGNMENT_METERSIG,
+    ALIGNMENT_PROPORT,
     ALIGNMENT_DOT,
+    ALIGNMENT_CUSTOS,
     ALIGNMENT_ACCID,
     ALIGNMENT_GRACENOTE,
     ALIGNMENT_BARLINE,
@@ -59,74 +64,6 @@ enum AlignmentType {
 
 #define BARLINE_REFERENCES -1
 #define TSTAMP_REFERENCES -2
-
-//----------------------------------------------------------------------------
-// Fraction
-//----------------------------------------------------------------------------
-
-class Fraction {
-
-public:
-    // Constructors - make them explicit to avoid type conversion
-    explicit Fraction(int num = 0, int denom = 1);
-    explicit Fraction(data_DURATION duration);
-
-    // Enable implicit conversion constructor for `int`
-    template <typename T, typename = std::enable_if_t<std::is_same_v<T, int>>>
-    Fraction(T num) : m_numerator(num), m_denominator(1)
-    {
-    }
-
-    /** Addition operator */
-    Fraction operator+(const Fraction &other) const;
-    /** Subtraction operator */
-    Fraction operator-(const Fraction &other) const;
-    /** Multiplication operator */
-    Fraction operator*(const Fraction &other) const;
-    /** Division operator */
-    Fraction operator/(const Fraction &other) const;
-
-    /** Equality operator */
-    bool operator==(const Fraction &other) const;
-    /** Less than operator */
-    bool operator<(const Fraction &other) const;
-    /** Less than or equal operator */
-    bool operator<=(const Fraction &other) const;
-    /** Greater than operator */
-    bool operator>(const Fraction &other) const;
-    /** Greater than or equal operator */
-    bool operator>=(const Fraction &other) const;
-
-    /** Getters */
-    int GetNumerator() const { return m_numerator; }
-    int GetDenominator() const { return m_denominator; }
-
-    /** Convert fraction to a double */
-    double ToDouble() const;
-
-    /** Convert fraction to a string */
-    std::string ToString() const;
-
-    /** Convert to data_DURATION and the remaining Fraction */
-    std::pair<data_DURATION, Fraction> ToDur() const;
-
-    //----------------//
-    // Static methods //
-    //----------------//
-
-    /** Reduce the faction represented by the two numbers */
-    static void Reduce(int &numerator, int &denominator);
-
-private:
-    /** Reduce the fraction */
-    void Reduce();
-
-public:
-    //
-private:
-    int m_numerator;
-    int m_denominator;
-};
 
 //----------------------------------------------------------------------------
 // Alignment
@@ -156,7 +93,7 @@ public:
     /**
      * Override the method of adding AlignmentReference children
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * @name Set and get the xRel value of the alignment
@@ -172,6 +109,14 @@ public:
     ///@{
     void SetTime(const Fraction &time) { m_time = time; }
     Fraction GetTime() const { return m_time; }
+    ///@}
+
+    /**
+     * @name Weak ordering: for alignments in the same measure it is based on time, otherwise on the measure order
+     */
+    ///@{
+    bool operator==(const Alignment &other) const;
+    std::weak_ordering operator<=>(const Alignment &other) const;
     ///@}
 
     /**
@@ -258,7 +203,7 @@ public:
      */
     std::string LogDebugTreeMsg() override
     {
-        return StringFormat("%d %s", this->GetXRel(), this->GetTime().ToString().c_str());
+        return StringFormat("%d %f", this->GetXRel(), this->GetTime().ToDouble());
     }
 
     //----------------//
@@ -360,12 +305,12 @@ public:
     /**
      * Override the method of adding Alignment children
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Overwritten method for AlignmentReference children
      */
-    void AddChild(Object *object) override;
+    bool AddChild(Object *object) override;
 
     /**
      * Return true if one of objects overlaps with accidentals from current reference (i.e. if there are accidentals)
@@ -494,7 +439,7 @@ public:
     /**
      * Override the method of adding AlignmentReference children
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Retrieve the alignmnet of the type at that time.
@@ -732,7 +677,7 @@ public:
     /**
      * Override the method of adding TimestampAttr children
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Look for an existing TimestampAttr at a certain time.

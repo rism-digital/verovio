@@ -21,6 +21,7 @@
 #include "attalternates.h"
 #include "atttypes.h"
 #include "smufl.h"
+#include "toolkitdef.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -60,6 +61,8 @@ enum option_BREAKS { BREAKS_none = 0, BREAKS_auto, BREAKS_line, BREAKS_smart, BR
 
 enum option_CONDENSE { CONDENSE_none = 0, CONDENSE_auto, CONDENSE_all, CONDENSE_encoded };
 
+enum option_DURATION_EQ { DURATION_EQ_brevis = 0, DURATION_EQ_semibrevis, DURATION_EQ_minima };
+
 enum option_ELISION {
     ELISION_regular = SMUFL_E551_lyricsElision,
     ELISION_narrow = SMUFL_E550_lyricsElisionNarrow,
@@ -72,6 +75,10 @@ enum option_FONT_FALLBACK { FONT_FALLBACK_Leipzig = 0, FONT_FALLBACK_Bravura };
 enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded, FOOTER_always };
 
 enum option_HEADER { HEADER_none = 0, HEADER_auto, HEADER_encoded };
+
+enum option_LIGATURE_OBL { LIGATURE_OBL_auto = 0, LIGATURE_OBL_straight, LIGATURE_OBL_curved };
+
+enum option_MENSURAL_RESP { MENSURAL_RESP_none = 0, MENSURAL_RESP_auto, MENSURAL_RESP_selection };
 
 enum option_MULTIRESTSTYLE {
     MULTIRESTSTYLE_auto = 0,
@@ -141,10 +148,13 @@ public:
      */
     static const std::map<int, std::string> s_breaks;
     static const std::map<int, std::string> s_condense;
+    static const std::map<int, std::string> s_durationEq;
     static const std::map<int, std::string> s_elision;
     static const std::map<int, std::string> s_fontFallback;
     static const std::map<int, std::string> s_footer;
     static const std::map<int, std::string> s_header;
+    static const std::map<int, std::string> s_ligatureOblique;
+    static const std::map<int, std::string> s_mensuralResponsiveness;
     static const std::map<int, std::string> s_multiRestStyle;
     static const std::map<int, std::string> s_pedalStyle;
     static const std::map<int, std::string> s_systemDivider;
@@ -576,6 +586,11 @@ public:
     Options(const Options &options);
     Options &operator=(const Options &options);
 
+    bool SetInputFrom(std::string const &inputFrom);
+    bool SetOutputTo(std::string const &outputTo);
+    FileFormat GetInputFrom() const { return m_inputFromFormat; }
+    FileFormat GetOutputTo() const { return m_outputToFormat; }
+
     const MapOfStrOptions *GetItems() const { return &m_items; }
 
     const std::vector<OptionGrp *> *GetGrps() const { return &m_grps; }
@@ -611,6 +626,9 @@ public:
     OptionBool m_version;
     OptionInt m_xmlIdSeed;
 
+    FileFormat m_inputFromFormat;
+    FileFormat m_outputToFormat;
+
     /**
      * General
      */
@@ -625,7 +643,6 @@ public:
     OptionBool m_condenseNotLastSystem;
     OptionBool m_condenseTempoPages;
     OptionBool m_evenNoteSpacing;
-    OptionString m_expand;
     OptionIntMap m_footer;
     OptionIntMap m_header;
     OptionBool m_humType;
@@ -658,6 +675,7 @@ public:
     OptionIntMap m_smuflTextFont;
     OptionBool m_staccatoCenter;
     OptionBool m_svgBoundingBoxes;
+    OptionBool m_svgContentBoundingBoxes;
     OptionString m_svgCss;
     OptionBool m_svgViewBox;
     OptionBool m_svgHtml5;
@@ -696,6 +714,7 @@ public:
     OptionArray m_fontAddCustom;
     OptionIntMap m_fontFallback;
     OptionBool m_fontLoadAll;
+    OptionBool m_fontTextLiberation;
     OptionDbl m_graceFactor;
     OptionBool m_graceRhythmAlign;
     OptionBool m_graceRightAlign;
@@ -711,6 +730,7 @@ public:
     OptionDbl m_ledgerLineThickness;
     OptionDbl m_ledgerLineExtension;
     OptionIntMap m_lyricElision;
+    OptionDbl m_lyricHeightFactor;
     OptionDbl m_lyricLineThickness;
     OptionBool m_lyricNoStartHyphen;
     OptionDbl m_lyricSize;
@@ -724,6 +744,7 @@ public:
     OptionBool m_octaveAlternativeSymbols;
     OptionDbl m_octaveLineThickness;
     OptionBool m_octaveNoSpanningParentheses;
+    OptionDbl m_ossiaStaffSize;
     OptionDbl m_pedalLineThickness;
     OptionDbl m_repeatBarLineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
@@ -739,6 +760,7 @@ public:
     OptionBool m_spacingDurDetection;
     OptionDbl m_spacingLinear;
     OptionDbl m_spacingNonLinear;
+    OptionDbl m_spacingOssia;
     OptionInt m_spacingStaff;
     OptionInt m_spacingSystem;
     OptionDbl m_staffLineWidth;
@@ -762,9 +784,13 @@ public:
 
     OptionArray m_appXPathQuery;
     OptionArray m_choiceXPathQuery;
+    OptionString m_expand;
+    OptionBool m_expandAlways;
+    OptionBool m_expandNever;
     OptionBool m_loadSelectedMdivOnly;
     OptionBool m_mdivAll;
     OptionString m_mdivXPathQuery;
+    OptionBool m_ossiaHidden;
     OptionArray m_substXPathQuery;
     OptionString m_transpose;
     OptionJson m_transposeMdiv;
@@ -833,14 +859,19 @@ public:
 
     OptionBool m_midiNoCue;
     OptionDbl m_midiTempoAdjustment;
+    OptionString m_midiTuningFile;
 
     /**
      * Mensural
      */
     OptionGrp m_mensural;
 
+    OptionIntMap m_durationEquivalence;
     OptionBool m_ligatureAsBracket;
-    OptionBool m_mensuralToMeasure;
+    OptionIntMap m_ligatureOblique;
+    OptionBool m_mensuralScoreUp;
+    OptionIntMap m_mensuralResponsiveView;
+    OptionBool m_mensuralToCmn;
 
     /**
      * Additional options for passing method JSON options to the command-line

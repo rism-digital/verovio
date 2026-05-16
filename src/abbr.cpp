@@ -23,7 +23,7 @@ namespace vrv {
 
 static const ClassRegistrar<Abbr> s_factory("abbr", ABBR);
 
-Abbr::Abbr() : EditorialElement(ABBR, "abbr-"), AttSource()
+Abbr::Abbr() : EditorialElement(ABBR), AttSource()
 {
     this->RegisterAttClass(ATT_SOURCE);
 

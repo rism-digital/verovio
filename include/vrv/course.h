@@ -31,13 +31,13 @@ public:
     virtual ~Course();
     Object *Clone() const override { return new Course(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Course"; }
+    std::string GetClassName() const override { return "course"; }
     ///@}
 
     /**
      * Add an element to a element.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     //----------//
     // Functors //

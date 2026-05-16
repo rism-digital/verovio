@@ -28,7 +28,7 @@ namespace vrv {
 
 AttExtSymAuth::AttExtSymAuth() : Att()
 {
-    ResetExtSymAuth();
+    this->ResetExtSymAuth();
 }
 
 void AttExtSymAuth::ResetExtSymAuth()
@@ -83,7 +83,7 @@ bool AttExtSymAuth::HasGlyphUri() const
 
 AttExtSymNames::AttExtSymNames() : Att()
 {
-    ResetExtSymNames();
+    this->ResetExtSymNames();
 }
 
 void AttExtSymNames::ResetExtSymNames()

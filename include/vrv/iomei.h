@@ -28,6 +28,7 @@ class Add;
 class AltSymInterface;
 class AnchoredText;
 class Annot;
+class AnnotScore;
 class App;
 class AreaPosInterface;
 class Arpeg;
@@ -46,6 +47,7 @@ class Clef;
 class ControlElement;
 class Corr;
 class Course;
+class CpMark;
 class Custos;
 class Damage;
 class Del;
@@ -105,9 +107,12 @@ class Neume;
 class Note;
 class Num;
 class Octave;
+class OffsetInterface;
+class OffsetSpanningInterface;
 class Orig;
 class Oriscus;
 class Ornam;
+class Ossia;
 class Page;
 class PageElement;
 class PageMilestoneEnd;
@@ -200,7 +205,12 @@ public:
     /**
      * The main method for exporting the file to MEI.
      */
-    bool Export();
+    std::string Export() override;
+
+    /**
+     * Method for skipping under certain circumstances
+     */
+    bool Skip(Object *object) const override;
 
     /**
      * The main method for writing objects.
@@ -211,20 +221,14 @@ public:
     ///@}
 
     /**
-     * Return the output as a string by writing it to the stringstream member.
-     */
-    std::string GetOutput();
-
-    /**
      * @name Setter and getter for score-based MEI output
      */
     ///@{
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; }
-    bool GetScoreBasedMEI() const { return m_scoreBasedMEI; }
     ///@}
 
     /**
-     * @name Setter and getter for MEI basic output
+     * @name Setter and getter for MEI Basic output
      */
     ///@{
     void SetBasic(bool basic) { m_basic = basic; }
@@ -245,11 +249,12 @@ public:
     ///@}
 
     /**
-     * @name Gettersto improve code readability
+     * @name Getters to improve code readability
      */
     ///@{
     bool IsScoreBasedMEI() const { return m_scoreBasedMEI; }
     bool IsPageBasedMEI() const { return !m_scoreBasedMEI; }
+    bool IsSerializing() const { return m_serializing; }
     ///@}
 
     /**
@@ -261,6 +266,11 @@ public:
      * Setter for ignore header flag for the MEI output (default is false)
      */
     void SetIgnoreHeader(bool ignoreHeader) { m_ignoreHeader = ignoreHeader; }
+
+    /**
+     * Setter for the page-based serialization flag (default is false)
+     */
+    void SetSerializing(bool serializing) { m_serializing = serializing; }
 
     /**
      * Setter for remove ids flag for the MEI output (default is false)
@@ -275,7 +285,7 @@ private:
 
     /**
      * Helper checking if the object is tree object in score-based MEI
-     * For MEI basic output, also check if objects marked as attribute need to be kept as element (e.g., accid)
+     * For MEI Basic output, also check if objects marked as attribute need to be kept as element (e.g., accid)
      * or if some need to be written as attributes (e.g. scoreDef/clef)
      */
     bool IsTreeObject(Object *object) const;
@@ -376,7 +386,9 @@ private:
     void WriteMeterSigGrp(pugi::xml_node currentNode, MeterSigGrp *meterSigGrp);
     void WriteFb(pugi::xml_node currentNode, Fb *fb);
     void WriteStaff(pugi::xml_node currentNode, Staff *staff);
+    void WriteOStaff(pugi::xml_node currentNode, Staff *oStaff);
     void WriteLayer(pugi::xml_node currentNode, Layer *layer);
+    void WriteOssia(pugi::xml_node currentNode, Ossia *ossia);
     ///@}
 
     /**
@@ -432,11 +444,13 @@ private:
      */
     ///@{
     void WriteAnchoredText(pugi::xml_node currentNode, AnchoredText *anchoredText);
+    void WriteAnnotScore(pugi::xml_node currentNode, AnnotScore *annotScore);
     void WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg);
     void WriteBeamSpan(pugi::xml_node currentNode, BeamSpan *beamSpan);
     void WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracketSpan);
     void WriteBreath(pugi::xml_node currentNode, Breath *breath);
     void WriteCaesura(pugi::xml_node currentNode, Caesura *caesura);
+    void WriteCpMark(pugi::xml_node currentNode, CpMark *cpMark);
     void WriteDir(pugi::xml_node currentNode, Dir *dir);
     void WriteDynam(pugi::xml_node currentNode, Dynam *dynam);
     void WriteFermata(pugi::xml_node currentNode, Fermata *fermata);
@@ -537,6 +551,8 @@ private:
     void WriteDurationInterface(pugi::xml_node currentNode, DurationInterface *interface);
     void WriteLinkingInterface(pugi::xml_node currentNode, LinkingInterface *interface);
     void WriteFacsimileInterface(pugi::xml_node element, FacsimileInterface *interface);
+    void WriteOffsetInterface(pugi::xml_node currentNode, OffsetInterface *interface);
+    void WriteOffsetSpanningInterface(pugi::xml_node currentNode, OffsetSpanningInterface *interface);
     void WritePitchInterface(pugi::xml_node currentNode, PitchInterface *interface);
     void WritePlistInterface(pugi::xml_node currentNode, PlistInterface *interface);
     void WritePositionInterface(pugi::xml_node currentNode, PositionInterface *interface);
@@ -562,11 +578,16 @@ private:
 public:
     //
 private:
-    std::ostringstream m_streamStringOutput;
+    /** The number of spaces for the indentation */
     int m_indent;
+    /** A flag indicating if we are writing score-based or page-based MEI */
     bool m_scoreBasedMEI;
-    /** A flag indicating that we want to produce MEI basic */
+    /** A flag indicating that we want to produce MEI Basic */
     bool m_basic;
+    /** A flag indicating we are serializing page-based MEI */
+    bool m_serializing;
+
+    /** The document node */
     pugi::xml_node m_mei;
 
     /** Current xml element */
@@ -595,7 +616,7 @@ private:
 
     bool m_ignoreHeader;
     bool m_removeIds;
-    ListOfObjects m_referredObjects;
+    SetOfConstObjects m_referredObjects;
 };
 
 //----------------------------------------------------------------------------
@@ -615,6 +636,11 @@ public:
 
     bool Import(const std::string &mei) override;
 
+    /**
+     * Setter for the page-based deserialization flag (default is false).
+     */
+    void SetDeserializing(bool deserializing) { m_deserializing = deserializing; }
+
 private:
     bool ReadDoc(pugi::xml_node root);
     bool ReadIncipits(pugi::xml_node root);
@@ -623,6 +649,7 @@ private:
     bool ReadMdiv(Object *parent, pugi::xml_node parentNode, bool isVisible);
     bool ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool isVisible);
     bool ReadScore(Object *parent, pugi::xml_node parentNode);
+    bool ReadScoreScoreDef(Object *parent, pugi::xml_node parentNode);
     ///@}
 
     /**
@@ -674,6 +701,7 @@ private:
     bool ReadLabel(Object *parent, pugi::xml_node label);
     bool ReadLabelAbbr(Object *parent, pugi::xml_node labelAbbr);
     bool ReadTuning(Object *parent, pugi::xml_node tuning);
+    bool ReadOssia(Object *parent, pugi::xml_node ossia);
     bool ReadTuningChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadCourse(Object *parent, pugi::xml_node course);
     bool ReadSymbolTable(Object *parent, pugi::xml_node parentNode);
@@ -685,6 +713,7 @@ private:
     bool ReadFbChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadNum(Object *parent, pugi::xml_node parentNode);
     bool ReadStaff(Object *parent, pugi::xml_node staff);
+    bool ReadOStaff(Object *parent, pugi::xml_node oStaff);
     bool ReadStaffChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadLayer(Object *parent, pugi::xml_node layer);
     bool ReadLayerDef(Object *parent, pugi::xml_node layerDef);
@@ -753,7 +782,8 @@ private:
     bool ReadBracketSpan(Object *parent, pugi::xml_node bracketSpan);
     bool ReadBreath(Object *parent, pugi::xml_node breath);
     bool ReadCaesura(Object *parent, pugi::xml_node caesura);
-    bool ReadDir(Object *parent, pugi::xml_node dir);
+    bool ReadCpMark(Object *parent, pugi::xml_node cpMark);
+    bool ReadDir(Object *parent, pugi::xml_node dir, bool isStageDir = false);
     bool ReadDynam(Object *parent, pugi::xml_node dynam);
     bool ReadFermata(Object *parent, pugi::xml_node fermata);
     bool ReadFing(Object *parent, pugi::xml_node fing);
@@ -800,6 +830,7 @@ private:
     bool ReadAbbr(Object *parent, pugi::xml_node abbr, EditorialLevel level, Object *filter = NULL);
     bool ReadAdd(Object *parent, pugi::xml_node add, EditorialLevel level, Object *filter = NULL);
     bool ReadAnnot(Object *parent, pugi::xml_node annot);
+    bool ReadAnnotScore(Object *parent, pugi::xml_node annot);
     bool ReadApp(Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter = NULL);
     bool ReadAppChildren(Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter = NULL);
     bool ReadChoice(Object *parent, pugi::xml_node choice, EditorialLevel level, Object *filter = NULL);
@@ -840,6 +871,8 @@ private:
     bool ReadDurationInterface(pugi::xml_node element, DurationInterface *interface);
     bool ReadLinkingInterface(pugi::xml_node element, LinkingInterface *interface);
     bool ReadFacsimileInterface(pugi::xml_node element, FacsimileInterface *interface);
+    bool ReadOffsetInterface(pugi::xml_node element, OffsetInterface *interface);
+    bool ReadOffsetSpanningInterface(pugi::xml_node element, OffsetSpanningInterface *interface);
     bool ReadPitchInterface(pugi::xml_node element, PitchInterface *interface);
     bool ReadPlistInterface(pugi::xml_node element, PlistInterface *interface);
     bool ReadPositionInterface(pugi::xml_node element, PositionInterface *interface);
@@ -864,6 +897,11 @@ private:
      * Write unsupported attributes and store them in Object::m_unsupported (not tested)
      */
     void ReadUnsupportedAttr(pugi::xml_node element, Object *object);
+
+    /**
+     * Returns true if the element is a 'score' annotation. Currently based on @type
+     */
+    bool IsAnnotScore(pugi::xml_node element);
 
     /**
      * Returns true if the element is name is an editorial element (e.g., "app", "supplied", etc.)
@@ -967,6 +1005,9 @@ private:
      * The comment to be attached to the next Object
      */
     std::string m_comment;
+
+    /** A flag indicating we are deserializing page-based MEI */
+    bool m_deserializing;
 
     //----------------//
     // Static members //

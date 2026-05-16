@@ -61,7 +61,7 @@ PAEOutput::PAEOutput(Doc *doc) : Output(doc) {}
 
 PAEOutput::~PAEOutput() {}
 
-bool PAEOutput::Export(std::string &output)
+std::string PAEOutput::Export()
 {
     m_docScoreDef = true;
     m_mensural = false;
@@ -73,15 +73,13 @@ bool PAEOutput::Export(std::string &output)
     m_currentDots = -1;
     m_grace = false;
 
-    m_doc->GetFirstScoreDef()->SaveObject(this, false);
+    m_doc->GetFirstScoreDef()->SaveObject(this);
 
     m_docScoreDef = false;
 
-    m_doc->SaveObject(this, false);
+    m_doc->SaveObject(this);
 
-    output = m_streamStringOutput.str();
-
-    return true;
+    return m_streamStringOutput.str();
 }
 
 bool PAEOutput::WriteObject(Object *object)
@@ -1249,7 +1247,7 @@ int PAEInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
     // std::regex_constants::ECMAScript is the default syntax, so optional.
     // Previously these were extended regex syntax, but this case
     // is the same in ECMAScript syntax.
-    std::regex exp("^([^)]*[ABCDEFG-][^)]*[ABCDEFG-][^)]*)", std::regex_constants::ECMAScript);
+    static const std::regex exp("^([^)]*[ABCDEFG-][^)]*[ABCDEFG-][^)]*)", std::regex_constants::ECMAScript);
     bool is_tuplet = regex_search(incipit + i, exp);
 
     if (is_tuplet) {
@@ -2855,7 +2853,7 @@ bool PAEInput::Import(const std::string &input)
 
     if (input.size() == 0) {
         pae::Token inputToken(0, pae::INPUT_POS);
-        LogPAE(ERR_001_EMPTY, inputToken);
+        this->LogPAE(ERR_001_EMPTY, inputToken);
         return false;
     }
 
@@ -2888,7 +2886,7 @@ bool PAEInput::Import(const std::string &input)
     m_doc->SetType(Raw);
 
     // Genereate the header and add a comment to the project description
-    m_doc->GenerateMEIHeader(false);
+    m_doc->GenerateMEIHeader();
     pugi::xml_node projectDesc = m_doc->m_header.first_child().select_node("//projectDesc").node();
     if (projectDesc) {
         pugi::xml_node p1 = projectDesc.append_child("p");
@@ -2900,7 +2898,7 @@ bool PAEInput::Import(const std::string &input)
     jsonxx::Object header;
     if (jsonInput.has<jsonxx::Object>("x-header")) {
         header = jsonInput.get<jsonxx::Object>("x-header");
-        ParseHeader(header);
+        this->ParseHeader(header);
     }
 
     std::string versionStr;
@@ -2932,7 +2930,7 @@ bool PAEInput::Import(const std::string &input)
     }
     else {
         pae::Token staffDefToken(0, pae::CLEF_POS);
-        LogPAE(ERR_060_CLEF_MISSING, staffDefToken);
+        this->LogPAE(ERR_060_CLEF_MISSING, staffDefToken);
         if (m_pedanticMode) {
             success = false;
         }
@@ -2962,7 +2960,7 @@ bool PAEInput::Import(const std::string &input)
     // No data - we can stop here
     if (!jsonInput.has<jsonxx::String>("data")) {
         pae::Token inputToken(0, pae::INPUT_POS);
-        LogPAE(ERR_003_JSON_KEY, inputToken);
+        this->LogPAE(ERR_003_JSON_KEY, inputToken);
         return false;
     }
 
@@ -2971,7 +2969,7 @@ bool PAEInput::Import(const std::string &input)
     std::string invalidChars;
     if (!this->CheckPAEChars(data, invalidChars)) {
         pae::Token inputToken(0, pae::UNKOWN_POS);
-        LogPAE(ERR_050_INVALID_CHAR, inputToken, invalidChars);
+        this->LogPAE(ERR_050_INVALID_CHAR, inputToken, invalidChars);
         if (m_pedanticMode) return false;
     }
 
@@ -3067,7 +3065,7 @@ bool PAEInput::Parse()
     if (this->IsMensural()) m_doc->m_notationType = NOTATIONTYPE_mensural;
     // The mdiv
     Mdiv *mdiv = new Mdiv();
-    mdiv->m_visibility = Visible;
+    mdiv->SetVisibility(Visible);
     m_doc->AddChild(mdiv);
     // The score
     Score *score = new Score();
@@ -3238,9 +3236,9 @@ bool PAEInput::Parse()
         }
     }
 
-    CheckContentPostBuild();
+    this->CheckContentPostBuild();
 
-    LogDebugTokens();
+    this->LogDebugTokens();
 
     // We should have no object left, just in case they need to be delete.
     this->ClearTokenObjects();
@@ -3269,7 +3267,7 @@ bool PAEInput::ConvertKeySig()
                 continue;
             }
             if (!token.IsEnd() && !token.IsSpace()) {
-                LogPAE(ERR_004_KEY_SPACE, token);
+                this->LogPAE(ERR_004_KEY_SPACE, token);
                 if (m_pedanticMode) return false;
             }
             else {
@@ -3346,7 +3344,7 @@ void PAEInput::ParseHeader(jsonxx::Object &header)
     }
 
     bool hasIncip = false;
-    for (const std::string &key : { "scoring", "key_mode", "role", "voice_intrument" }) {
+    for (const char *key : { "scoring", "key_mode", "role", "voice_intrument" }) {
         hasIncip = hasIncip || header.has<jsonxx::String>(key) || header.has<jsonxx::Array>(key);
     }
     if (hasIncip) {
@@ -3401,7 +3399,7 @@ bool PAEInput::ConvertClef()
                 continue;
             }
             if (!token.IsEnd() && !token.IsSpace()) {
-                LogPAE(ERR_005_CLEF_SPACE, token);
+                this->LogPAE(ERR_005_CLEF_SPACE, token);
                 if (m_pedanticMode) return false;
             }
             else {
@@ -3531,7 +3529,7 @@ bool PAEInput::ConvertRepeatedFigure()
             if (token->m_char == '!') {
                 // The list should not be empty
                 if (figure.empty()) {
-                    LogPAE(ERR_007_REP_EMPTY, *token);
+                    this->LogPAE(ERR_007_REP_EMPTY, *token);
                     if (m_pedanticMode) return false;
                 }
                 token->m_char = 0;
@@ -3539,13 +3537,13 @@ bool PAEInput::ConvertRepeatedFigure()
             }
             // We should not have a repeat sign before the end
             else if (token->m_char == 'f') {
-                LogPAE(ERR_008_REP_MARKER, *token);
+                this->LogPAE(ERR_008_REP_MARKER, *token);
                 if (m_pedanticMode) return false;
                 token->m_char = 0;
             }
             // We should not reach the end or the end of a measure
             else if (token->IsEnd() || token->Is(MEASURE)) {
-                LogPAE(ERR_009_REP_OPEN, *token);
+                this->LogPAE(ERR_009_REP_OPEN, *token);
                 if (m_pedanticMode) return false;
                 figure.clear();
                 status = pae::FIGURE_NONE;
@@ -3571,7 +3569,7 @@ bool PAEInput::ConvertRepeatedFigure()
                 // Make a copy of the original figure in case it is inserted more than one time
                 std::list<pae::Token> figureToInsert = figure;
                 // Set position and clone objects
-                PrepareInsertion(token->m_position, figureToInsert);
+                this->PrepareInsertion(token->m_position, figureToInsert);
                 // Move to the next token because we insert before it
                 ++token;
                 m_pae.insert(token, figureToInsert.begin(), figureToInsert.end());
@@ -3583,7 +3581,7 @@ bool PAEInput::ConvertRepeatedFigure()
             else {
                 // Make sure we repeated the figure at least once (is this too pedantic?)
                 if (status == pae::FIGURE_END) {
-                    LogPAE(ERR_010_REP_UNUSED, *figureToken);
+                    this->LogPAE(ERR_010_REP_UNUSED, *figureToken);
                     if (m_pedanticMode) return false;
                 }
                 status = pae::FIGURE_NONE;
@@ -3593,7 +3591,7 @@ bool PAEInput::ConvertRepeatedFigure()
         }
         // We should not have a repeat sign not after a figure end
         else if (token->m_char == 'f') {
-            LogPAE(ERR_011_REP_NO_FIGURE, *token);
+            this->LogPAE(ERR_011_REP_NO_FIGURE, *token);
             if (m_pedanticMode) return false;
             // ignore it
             token->m_char = 0;
@@ -3627,18 +3625,18 @@ bool PAEInput::ConvertRepeatedMeasure()
         else if (token->m_char == 'i') {
             token->m_char = 0;
             if (!measureStart) {
-                LogPAE(ERR_012_REP_NOT_BEGIN, *token);
+                this->LogPAE(ERR_012_REP_NOT_BEGIN, *token);
                 if (m_pedanticMode) return false;
             }
             else if (measure.empty()) {
-                LogPAE(ERR_013_REP_NO_CONTENT, *token);
+                this->LogPAE(ERR_013_REP_NO_CONTENT, *token);
                 if (m_pedanticMode) return false;
             }
             else {
                 // Make a copy of the original measure in case it is inserted more than one time
                 std::list<pae::Token> measureToInsert = measure;
                 // Set position and clone objects
-                PrepareInsertion(token->m_position, measureToInsert);
+                this->PrepareInsertion(token->m_position, measureToInsert);
                 // Move to the next token because we insert before it
                 ++token;
                 m_pae.insert(token, measureToInsert.begin(), measureToInsert.end());
@@ -3651,7 +3649,7 @@ bool PAEInput::ConvertRepeatedMeasure()
         else if (!this->Was(*token, pae::MEASURE) && !token->IsEnd()) {
             // We had a i in the current measure, we should have nothing else
             if (repeat) {
-                LogPAE(ERR_014_REP_NO_BARLINE, *token);
+                this->LogPAE(ERR_014_REP_NO_BARLINE, *token);
                 if (m_pedanticMode) return false;
             }
             // We did not, this is content that will potentially be repeated
@@ -3678,7 +3676,7 @@ bool PAEInput::ConvertMRestOrMultiRest()
 
         if (token.m_char == '=') {
             if (mRestOrMultiRestToken) {
-                LogPAE(ERR_015_MREST_INVALID, token);
+                this->LogPAE(ERR_015_MREST_INVALID, token);
                 if (m_pedanticMode) return false;
             }
             mRestOrMultiRestToken = &token;
@@ -3691,7 +3689,7 @@ bool PAEInput::ConvertMRestOrMultiRest()
             }
             else {
                 if (!paeStr.empty() && paeStr.at(0) == '0') {
-                    LogPAE(ERR_016_MREST_NUMBER, token);
+                    this->LogPAE(ERR_016_MREST_NUMBER, token);
                     if (m_pedanticMode) return false;
                     paeStr.erase(0, paeStr.find_first_not_of('0'));
                 }
@@ -3805,7 +3803,7 @@ bool PAEInput::ConvertTrill()
                 token.m_object = trill;
             }
             else {
-                LogPAE(ERR_017_TRILL_INVALID, token);
+                this->LogPAE(ERR_017_TRILL_INVALID, token);
                 if (m_pedanticMode) return false;
             }
             note = NULL;
@@ -3835,7 +3833,7 @@ bool PAEInput::ConvertFermata()
         if (token.m_char == '(') {
             // Weird case - could be a
             if (fermataToken) {
-                LogPAE(ERR_018_FERMATA_NESTED, token);
+                this->LogPAE(ERR_018_FERMATA_NESTED, token);
                 if (m_pedanticMode) return false;
             }
             fermataToken = &token;
@@ -3872,7 +3870,7 @@ bool PAEInput::ConvertFermata()
                 // PAE guidelines are ambiguous because they say fermata should contain only a single rest sign (=)
                 // but at the same time allow =1 for a mrest - in non pendantic mode we want to support (=1)
                 else if (fermataTarget->Is(MREST) && isdigit(token.m_inputChar)) {
-                    LogPAE(ERR_058_FERMATA_MREST, token, StringFormat("%c", token.m_inputChar));
+                    this->LogPAE(ERR_058_FERMATA_MREST, token, StringFormat("%c", token.m_inputChar));
                     if (m_pedanticMode) return false;
                     continue;
                 }
@@ -3920,7 +3918,7 @@ bool PAEInput::ConvertAccidental()
                 continue;
             }
             else {
-                LogPAE(ERR_019_ACCID_NO_NOTE, token);
+                this->LogPAE(ERR_019_ACCID_NO_NOTE, token);
                 if (m_pedanticMode) return false;
                 accidental = ACCIDENTAL_WRITTEN_NONE;
             }
@@ -3963,7 +3961,7 @@ bool PAEInput::ConvertChord()
         if (token->m_char == '^') {
             token->m_char = 0;
             if (note == m_pae.end()) {
-                LogPAE(ERR_020_CHORD_NOTE_BEFORE, *token);
+                this->LogPAE(ERR_020_CHORD_NOTE_BEFORE, *token);
                 if (m_pedanticMode) return false;
             }
             else {
@@ -3981,7 +3979,7 @@ bool PAEInput::ConvertChord()
             }
             // After a marker, we should allow octave or accidental markers, but nothing else
             else if (!this->Was(*token, pae::ACCIDENTAL_INTERNAL) && !this->Was(*token, pae::OCTAVE)) {
-                LogPAE(ERR_021_CHORD_NOTE_AFTER, *token);
+                this->LogPAE(ERR_021_CHORD_NOTE_AFTER, *token);
                 if (m_pedanticMode) return false;
                 status = pae::CHORD_NONE;
                 note = m_pae.end();
@@ -4033,7 +4031,7 @@ bool PAEInput::ConvertBeam()
         if (token->m_char == '{') {
             token->m_char = 0;
             if (this->IsMensural()) {
-                LogPAE(ERR_022_BEAM_MENSURAL, *token);
+                this->LogPAE(ERR_022_BEAM_MENSURAL, *token);
                 if (m_pedanticMode) return false;
                 ++token;
                 continue;
@@ -4041,14 +4039,14 @@ bool PAEInput::ConvertBeam()
             if (beam) {
                 // Nested beams only allowed if the second one is in a grace group
                 if (!withinGrace) {
-                    LogPAE(ERR_023_BEAM_NESTED, *token);
+                    this->LogPAE(ERR_023_BEAM_NESTED, *token);
                     if (m_pedanticMode) return false;
                     ++token;
                     continue;
                 }
                 // No nested beams within a grace group
                 else if (graceBeam) {
-                    LogPAE(ERR_023_BEAM_NESTED, *token);
+                    this->LogPAE(ERR_023_BEAM_NESTED, *token);
                     if (m_pedanticMode) return false;
                     ++token;
                     continue;
@@ -4072,7 +4070,7 @@ bool PAEInput::ConvertBeam()
             }
             // Closing while no beam or grace beam have been open
             if (!beam && !graceBeam) {
-                LogPAE(ERR_024_BEAM_CLOSING, *token);
+                this->LogPAE(ERR_024_BEAM_CLOSING, *token);
                 if (m_pedanticMode) return false;
                 ++token;
                 continue;
@@ -4099,13 +4097,13 @@ bool PAEInput::ConvertBeam()
         // Close beams left open
         else if (token->IsEnd() || token->Is(MEASURE)) {
             if (graceBeam) {
-                LogPAE(ERR_025_BEAM_OPEN, *token);
+                this->LogPAE(ERR_025_BEAM_OPEN, *token);
                 if (m_pedanticMode) return false;
                 token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, pae::UNKOWN_POS, graceBeam));
                 graceBeam = NULL;
             }
             if (beam) {
-                LogPAE(ERR_025_BEAM_OPEN, *token);
+                this->LogPAE(ERR_025_BEAM_OPEN, *token);
                 if (m_pedanticMode) return false;
                 token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, pae::UNKOWN_POS, beam));
                 beam = NULL;
@@ -4156,7 +4154,7 @@ bool PAEInput::ConvertGraceGrp()
         if (token->m_char == 'Q') {
             token->m_char = 0;
             if (graceGrp) {
-                LogPAE(ERR_026_GRACE_NESTED, *token);
+                this->LogPAE(ERR_026_GRACE_NESTED, *token);
                 if (m_pedanticMode) return false;
                 ++token;
                 continue;
@@ -4167,7 +4165,7 @@ bool PAEInput::ConvertGraceGrp()
         else if (token->m_char == 'r') {
             token->m_char = 0;
             if (!graceGrp) {
-                LogPAE(ERR_027_GRACE_CLOSING, *token);
+                this->LogPAE(ERR_027_GRACE_CLOSING, *token);
                 if (m_pedanticMode) return false;
                 ++token;
                 continue;
@@ -4178,14 +4176,14 @@ bool PAEInput::ConvertGraceGrp()
         }
         else if (this->Is(*token, pae::GRACE)) {
             if (graceGrp) {
-                LogPAE(ERR_026_GRACE_NESTED, *token);
+                this->LogPAE(ERR_026_GRACE_NESTED, *token);
                 if (m_pedanticMode) return false;
                 token->m_char = 0;
             }
         }
         else if (token->IsEnd() || token->Is(MEASURE)) {
             if (graceGrp) {
-                LogPAE(ERR_028_GRACE_OPEN, *token);
+                this->LogPAE(ERR_028_GRACE_OPEN, *token);
                 if (m_pedanticMode) return false;
                 token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, pae::UNKOWN_POS, graceGrp));
                 graceGrp = NULL;
@@ -4209,7 +4207,7 @@ bool PAEInput::ConvertGrace()
             // Keep a flag for distinguishing them
             isAcciaccatura = (token.m_char == 'g');
             if (graceToken) {
-                LogPAE(ERR_029_GRACE_UNRESOLVED, token);
+                this->LogPAE(ERR_029_GRACE_UNRESOLVED, token);
                 if (m_pedanticMode) return false;
             }
             graceToken = &token;
@@ -4228,7 +4226,7 @@ bool PAEInput::ConvertGrace()
             if (this->Is(token, pae::DURATION)) {
                 // For acciaccature, not in pedantic mode
                 if (isAcciaccatura) {
-                    LogPAE(ERR_030_GRACE_DURATION, token);
+                    this->LogPAE(ERR_030_GRACE_DURATION, token);
                     if (m_pedanticMode) return false;
                 }
                 continue;
@@ -4246,7 +4244,7 @@ bool PAEInput::ConvertGrace()
                 note->SetStemDir(STEMDIRECTION_up);
             }
             else {
-                LogPAE(ERR_031_GRACE_NO_NOTE, token);
+                this->LogPAE(ERR_031_GRACE_NO_NOTE, token);
                 if (m_pedanticMode) return false;
             }
             graceToken = NULL;
@@ -4278,7 +4276,7 @@ bool PAEInput::ConvertTuplet()
         if (token->m_char == '(') {
             token->m_char = 0;
             if (tuplet) {
-                LogPAE(ERR_032_TUPLET_NESTED, *token);
+                this->LogPAE(ERR_032_TUPLET_NESTED, *token);
                 if (m_pedanticMode) return false;
                 ++token;
                 continue;
@@ -4291,7 +4289,7 @@ bool PAEInput::ConvertTuplet()
         else if (token->m_char == ')') {
             token->m_char = 0;
             if (!tuplet) {
-                LogPAE(ERR_033_TUPLET_CLOSING, *token);
+                this->LogPAE(ERR_033_TUPLET_CLOSING, *token);
                 if (m_pedanticMode) return false;
                 ++token;
                 continue;
@@ -4305,7 +4303,7 @@ bool PAEInput::ConvertTuplet()
         else if (token->m_char == ';') {
             token->m_char = 0;
             if (!tuplet || isNumPart) {
-                LogPAE(ERR_034_TUPLET_NUM, *token);
+                this->LogPAE(ERR_034_TUPLET_NUM, *token);
                 if (m_pedanticMode) return false;
                 ++token;
                 continue;
@@ -4315,7 +4313,7 @@ bool PAEInput::ConvertTuplet()
         }
         else if (token->IsEnd() || token->Is(MEASURE)) {
             if (tuplet) {
-                LogPAE(ERR_035_TUPLET_OPEN, *token);
+                this->LogPAE(ERR_035_TUPLET_OPEN, *token);
                 if (m_pedanticMode) return false;
                 token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, pae::UNKOWN_POS, tuplet));
                 tuplet->SetNum(GetNum(tupletNumStr));
@@ -4325,7 +4323,7 @@ bool PAEInput::ConvertTuplet()
         }
         else if (isNumPart) {
             if (token->m_char && !isdigit(token->m_char)) {
-                LogPAE(ERR_036_TUPLET_NUM_NUMBER, *token);
+                this->LogPAE(ERR_036_TUPLET_NUM_NUMBER, *token);
                 if (m_pedanticMode) return false;
                 ++token;
                 continue;
@@ -4415,7 +4413,7 @@ bool PAEInput::ConvertDuration()
                 }
                 else if (this->IsMensural()) {
                     if (currentDur->second > 1) {
-                        LogPAE(ERR_059_DOUBLE_DOTS_MENS, *token);
+                        this->LogPAE(ERR_059_DOUBLE_DOTS_MENS, *token);
                         if (m_pedanticMode) return false;
                     }
                     Dot *dot = new Dot();
@@ -4468,7 +4466,7 @@ bool PAEInput::ConvertTie()
                         tieToken->m_char = '+';
                     }
                     else {
-                        LogPAE(ERR_037_TIE_PITCH, token);
+                        this->LogPAE(ERR_037_TIE_PITCH, token);
                         if (m_pedanticMode) return false;
                     }
                     delete tie;
@@ -4488,7 +4486,7 @@ bool PAEInput::ConvertTie()
         if (token.m_char == '+') {
             token.m_char = 0;
             if (tie) {
-                LogPAE(ERR_038_TIE_OPEN, token);
+                this->LogPAE(ERR_038_TIE_OPEN, token);
                 if (m_pedanticMode) return false;
                 continue;
             }
@@ -4500,7 +4498,7 @@ bool PAEInput::ConvertTie()
                 token.m_object = tie;
             }
             else {
-                LogPAE(ERR_039_TIE_NO_NOTE, token);
+                this->LogPAE(ERR_039_TIE_NO_NOTE, token);
                 if (m_pedanticMode) return false;
             }
             continue;
@@ -4544,7 +4542,7 @@ bool PAEInput::ConvertLigature()
         if (token->m_char == '+') {
             token->m_char = 0;
             if (note == m_pae.end()) {
-                LogPAE(ERR_061_LIGATURE_NOTE_BEFORE, *token);
+                this->LogPAE(ERR_061_LIGATURE_NOTE_BEFORE, *token);
                 if (m_pedanticMode) return false;
             }
             else {
@@ -4566,7 +4564,7 @@ bool PAEInput::ConvertLigature()
                 // Check we don't have two consecutive notes with the same pitch
                 if (previousNote->GetOct() == tokenNote->GetOct()
                     && previousNote->GetPname() == tokenNote->GetPname()) {
-                    LogPAE(ERR_063_LIGATURE_PITCH, *token);
+                    this->LogPAE(ERR_063_LIGATURE_PITCH, *token);
                     if (m_pedanticMode) return false;
                     status = pae::LIGATURE_NONE;
                     note = m_pae.end();
@@ -4574,7 +4572,7 @@ bool PAEInput::ConvertLigature()
                 }
                 // Check the duration is valid for a ligature
                 else if (tokenNote->GetDur() > DURATION_semibrevis) {
-                    LogPAE(ERR_064_LIGATURE_DURATION, *token);
+                    this->LogPAE(ERR_064_LIGATURE_DURATION, *token);
                     if (m_pedanticMode) return false;
                     status = pae::LIGATURE_NONE;
                     note = m_pae.end();
@@ -4588,7 +4586,7 @@ bool PAEInput::ConvertLigature()
             // After a marker, we should allow accidentals, octave, duration or fermata markers but nothing else
             else if (!this->Was(*token, pae::ACCIDENTAL_INTERNAL) && !this->Was(*token, pae::OCTAVE)
                 && !this->Was(*token, pae::DURATION) && token->m_inputChar != '(') {
-                LogPAE(ERR_062_LIGATURE_NOTE_AFTER, *token);
+                this->LogPAE(ERR_062_LIGATURE_NOTE_AFTER, *token);
                 if (m_pedanticMode) return false;
                 status = pae::LIGATURE_NONE;
                 note = m_pae.end();
@@ -4649,14 +4647,14 @@ bool PAEInput::ConvertAccidGes()
             std::string noteID = note->GetID();
             if (!accid) {
                 // Tied note with a previous note with an accidental
-                if (ties.count(noteID)) {
+                if (ties.contains(noteID)) {
                     Accid *tieAccid = new Accid();
                     note->AddChild(tieAccid);
                     tieAccid->SetAccidGes(Att::AccidentalWrittenToGestural(ties[noteID]));
                     ties.erase(noteID);
                 }
                 // Nothing in front of the note, but something in the list - make it an accid.ges
-                else if ((currentAccids.count(octavedPitch) != 0)) {
+                else if (currentAccids.contains(octavedPitch)) {
                     Accid *gesAccid = new Accid();
                     note->AddChild(gesAccid);
                     data_ACCIDENTAL_WRITTEN accidWritten = currentAccids.at(octavedPitch);
@@ -4667,7 +4665,7 @@ bool PAEInput::ConvertAccidGes()
                 data_ACCIDENTAL_WRITTEN noteAccid = accid->GetAccid();
                 // Natural in front of the note, remove it from the current list
                 if (noteAccid == ACCIDENTAL_WRITTEN_n) {
-                    if (currentAccids.count(octavedPitch) != 0) {
+                    if (currentAccids.contains(octavedPitch)) {
                         currentAccids[octavedPitch] = ACCIDENTAL_WRITTEN_n;
                     }
                 }
@@ -4732,8 +4730,8 @@ bool PAEInput::CheckHierarchy()
             if (token.m_object->Is({ KEYSIG, METERSIG, MENSUR })) continue;
 
             // Test is the element is supported by the current top container
-            if (!token.IsContainerEnd() && !stack.back()->m_object->IsSupportedChild(token.m_object)) {
-                LogPAE(ERR_040_HIERARCHY_INVALID, token,
+            if (!token.IsContainerEnd() && !stack.back()->m_object->IsSupportedChild(token.m_object->GetClassId())) {
+                this->LogPAE(ERR_040_HIERARCHY_INVALID, token,
                     StringFormat("%s / %s", token.GetName().c_str(), stack.back()->GetName().c_str()));
                 if (m_pedanticMode) return false;
                 // Indicate that the data was not valid in this pass so we will check it again
@@ -4754,7 +4752,7 @@ bool PAEInput::CheckHierarchy()
                     // The object is not the same on top of the stack and the one we are popping
                     // This means that the hierarchy is invalid
                     if (stack.back()->m_object != token.m_object) {
-                        LogPAE(ERR_041_NESTING_INVALID, token,
+                        this->LogPAE(ERR_041_NESTING_INVALID, token,
                             StringFormat("%s / %s", token.GetName().c_str(), stack.back()->GetName().c_str()));
                         if (m_pedanticMode) return false;
                         // Indicate that the data was not valid in this pass so we will check it again
@@ -4797,7 +4795,7 @@ bool PAEInput::CheckContentPreBuild()
         // Check that the measure rest is at the beginning of a measure
         if (token->Is(MULTIREST) && previousToken && !previousToken->Is(MEASURE) && !previousToken->Is(KEYSIG)
             && !previousToken->Is(METERSIG) && !previousToken->Is(METERSIGGRP)) {
-            LogPAE(ERR_065_MREST_INVALID_MEASURE, *token);
+            this->LogPAE(ERR_065_MREST_INVALID_MEASURE, *token);
             if (m_pedanticMode) return false;
             Measure *measure = new Measure();
             measure->SetRight(BARRENDITION_invis);
@@ -4805,7 +4803,7 @@ bool PAEInput::CheckContentPreBuild()
         }
         // Check that the measure rest is at the end of a measure
         else if (previousToken && previousToken->Is(MULTIREST) && !token->Is(MEASURE)) {
-            LogPAE(ERR_065_MREST_INVALID_MEASURE, *previousToken);
+            this->LogPAE(ERR_065_MREST_INVALID_MEASURE, *previousToken);
             if (m_pedanticMode) return false;
             Measure *measure = new Measure();
             measure->SetRight(BARRENDITION_invis);
@@ -4832,13 +4830,13 @@ bool PAEInput::CheckContentPostBuild()
     ClassIdsComparison noteOrRest({ NOTE, REST });
     ListOfObjects containers;
     m_doc->FindAllDescendantsByComparison(&containers, &comparison);
-    for (auto &container : containers) {
+    for (const auto &container : containers) {
         ListOfObjects notesOrRests;
         container->FindAllDescendantsByComparison(&notesOrRests, &noteOrRest);
         if ((int)notesOrRests.size() < 1) {
             pae::Token *token = this->GetTokenForTreeObject(container);
             if (token) {
-                LogPAE(ERR_066_EMPTY_CONTAINER, *token);
+                this->LogPAE(ERR_066_EMPTY_CONTAINER, *token);
                 if (m_pedanticMode) return false;
             }
         }
@@ -4890,7 +4888,7 @@ bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token
 
     std::string invalidChars;
     if (!this->CheckPAEChars(paeStr, invalidChars, pae::KEYSIG)) {
-        LogPAE(ERR_050_INVALID_CHAR, token, invalidChars);
+        this->LogPAE(ERR_050_INVALID_CHAR, token, invalidChars);
         if (m_pedanticMode) return false;
     }
 
@@ -4977,12 +4975,12 @@ bool PAEInput::ParseClef(Clef *clef, const std::string &paeStr, pae::Token &toke
     std::string invalidChars;
     std::string clefChars = (m_v2) ? pae::CLEFv2 : pae::CLEFv1;
     if (!this->CheckPAEChars(paeStr, invalidChars, clefChars)) {
-        LogPAE(ERR_050_INVALID_CHAR, token, invalidChars);
+        this->LogPAE(ERR_050_INVALID_CHAR, token, invalidChars);
         if (m_pedanticMode) return false;
     }
 
     if (paeStr.size() < 3) {
-        LogPAE(ERR_042_CLEF_INCOMPLETE, token);
+        this->LogPAE(ERR_042_CLEF_INCOMPLETE, token);
         if (m_pedanticMode) return false;
         clef->SetLine(2);
         clef->SetShape(CLEFSHAPE_G);
@@ -4991,7 +4989,7 @@ bool PAEInput::ParseClef(Clef *clef, const std::string &paeStr, pae::Token &toke
     }
 
     if (paeStr.size() > 3) {
-        LogPAE(ERR_046_CLEF_INVALID, token, paeStr);
+        this->LogPAE(ERR_046_CLEF_INVALID, token, paeStr);
         if (m_pedanticMode) return false;
     }
 
@@ -4999,7 +4997,7 @@ bool PAEInput::ParseClef(Clef *clef, const std::string &paeStr, pae::Token &toke
 
     // Second character - or +
     if (paeStr.at(1) != '+' && paeStr.at(1) != '-') {
-        LogPAE(ERR_043_CLEF_INVALID_2ND, token);
+        this->LogPAE(ERR_043_CLEF_INVALID_2ND, token);
         if (m_pedanticMode) return false;
     }
     bool isMensural = (paeStr.at(1) == '+');
@@ -5008,13 +5006,13 @@ bool PAEInput::ParseClef(Clef *clef, const std::string &paeStr, pae::Token &toke
         m_notationType = (isMensural) ? pae::MENSURAL : pae::CMN;
     }
     else if (this->IsMensural() != isMensural) {
-        LogPAE(ERR_044_CLEF_MENS, token);
+        this->LogPAE(ERR_044_CLEF_MENS, token);
         if (m_pedanticMode) return false;
     }
 
     // Third character a digit
     if (!isdigit(paeStr.at(2))) {
-        LogPAE(ERR_045_CLEF_INVALID_3RD, token);
+        this->LogPAE(ERR_045_CLEF_INVALID_3RD, token);
         if (m_pedanticMode) return false;
     }
     char clefLine = paeStr.at(2);
@@ -5039,7 +5037,7 @@ bool PAEInput::ParseClef(Clef *clef, const std::string &paeStr, pae::Token &toke
         clef->SetDisPlace(STAFFREL_basic_below);
     }
     else {
-        LogPAE(ERR_046_CLEF_INVALID, token, paeStr);
+        this->LogPAE(ERR_046_CLEF_INVALID, token, paeStr);
         if (m_pedanticMode) return false;
     }
     return true;
@@ -5053,12 +5051,12 @@ bool PAEInput::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, pae:
 
     std::string invalidChars;
     if (!this->CheckPAEChars(paeStr, invalidChars, pae::METERSIG)) {
-        LogPAE(ERR_050_INVALID_CHAR, token, invalidChars);
+        this->LogPAE(ERR_050_INVALID_CHAR, token, invalidChars);
         if (m_pedanticMode) return false;
     }
 
     if (paeStr.size() < 1) {
-        LogPAE(ERR_047_TIMESIG_INCOMPLETE, token);
+        this->LogPAE(ERR_047_TIMESIG_INCOMPLETE, token);
         if (m_pedanticMode) return false;
         meterSig->SetCount({ { 4 }, MeterCountSign::None });
         meterSig->SetUnit(4);
@@ -5095,7 +5093,7 @@ bool PAEInput::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, pae:
         meterSig->SetUnit(2);
     }
     else {
-        LogPAE(ERR_048_TIMESIG_INVALID, token, paeStr);
+        this->LogPAE(ERR_048_TIMESIG_INVALID, token, paeStr);
         if (m_pedanticMode) return false;
     }
     return true;
@@ -5109,12 +5107,12 @@ bool PAEInput::ParseMensur(Mensur *mensur, const std::string &paeStr, pae::Token
 
     std::string invalidChars;
     if (!this->CheckPAEChars(paeStr, invalidChars, pae::METERSIG)) {
-        LogPAE(ERR_050_INVALID_CHAR, token, invalidChars);
+        this->LogPAE(ERR_050_INVALID_CHAR, token, invalidChars);
         if (m_pedanticMode) return false;
     }
 
     if (paeStr.size() < 1) {
-        LogPAE(ERR_049_TIMESIG_MENS, token);
+        this->LogPAE(ERR_049_TIMESIG_MENS, token);
         if (m_pedanticMode) return false;
         mensur->SetSign(MENSURATIONSIGN_O);
         return true;
@@ -5155,7 +5153,7 @@ bool PAEInput::ParseMensur(Mensur *mensur, const std::string &paeStr, pae::Token
         }
     }
     else {
-        LogPAE(ERR_048_TIMESIG_INVALID, token, paeStr);
+        this->LogPAE(ERR_048_TIMESIG_INVALID, token, paeStr);
         if (m_pedanticMode) return false;
     }
     return true;
@@ -5181,7 +5179,7 @@ bool PAEInput::ParseMeasure(Measure *measure, const std::string &paeStr, pae::To
         measure->SetRight(BARRENDITION_rptboth);
     }
     else {
-        LogPAE(ERR_051_BARLINE, token, paeStr);
+        this->LogPAE(ERR_051_BARLINE, token, paeStr);
         if (m_pedanticMode) return false;
         // Put a single line by default in non pedantic mode
         measure->SetRight(BARRENDITION_single);
@@ -5196,7 +5194,7 @@ bool PAEInput::ParseDuration(
     durations.clear();
 
     if (paeStr.size() < 1 || paeStr.at(0) == '.') {
-        LogPAE(ERR_052_DURATION, token);
+        this->LogPAE(ERR_052_DURATION, token);
         // Default to quarter note
         if (m_pedanticMode) return false;
         durations.push_back({ DURATION_4, 0 });
@@ -5215,13 +5213,13 @@ bool PAEInput::ParseDuration(
                         duration = DURATION_breve;
                         // Ideally we should pass an offset toe LogPAE because this is going to show the position in
                         // token However, using rythmic pattern in mensural notation is probably not very common...
-                        LogPAE(ERR_053_DURATION_MENS3, token);
+                        this->LogPAE(ERR_053_DURATION_MENS3, token);
                         if (m_pedanticMode) return false;
                         break;
                     case '4': duration = DURATION_semiminima; break;
                     case '5':
                         duration = DURATION_breve;
-                        LogPAE(ERR_054_DURATION_MENS5, token);
+                        this->LogPAE(ERR_054_DURATION_MENS5, token);
                         if (m_pedanticMode) return false;
                         break;
                     case '6': duration = DURATION_semifusa; break;

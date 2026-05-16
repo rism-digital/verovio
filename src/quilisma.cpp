@@ -24,13 +24,14 @@ namespace vrv {
 // Quilisma
 //----------------------------------------------------------------------------
 
-Quilisma::Quilisma() : LayerElement(QUILISMA, "quilisma-"), PitchInterface(), PositionInterface(), AttColor()
+Quilisma::Quilisma() : LayerElement(QUILISMA), OffsetInterface(), PitchInterface(), PositionInterface(), AttColor()
 {
-    RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
-    RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
+    this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
+    this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
 
-    Reset();
+    this->Reset();
 }
 
 Quilisma::~Quilisma() {}
@@ -38,9 +39,10 @@ Quilisma::~Quilisma() {}
 void Quilisma::Reset()
 {
     LayerElement::Reset();
+    OffsetInterface::Reset();
     PitchInterface::Reset();
     PositionInterface::Reset();
-    ResetColor();
+    this->ResetColor();
 }
 
 } // namespace vrv

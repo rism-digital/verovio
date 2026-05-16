@@ -47,7 +47,7 @@ public:
     virtual ~Layer();
     Object *Clone() const override { return new Layer(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Layer"; }
+    std::string GetClassName() const override { return "layer"; }
     ///@}
 
     /**
@@ -59,7 +59,7 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
     ///@}
 
     /**
@@ -169,6 +169,8 @@ public:
     const Mensur *GetCurrentMensur() const;
     MeterSig *GetCurrentMeterSig();
     const MeterSig *GetCurrentMeterSig() const;
+    Proport *GetCurrentProport();
+    const Proport *GetCurrentProport() const;
     ///@}
 
     void ResetStaffDefObjects();
@@ -178,6 +180,7 @@ public:
      */
     ///@{
     void SetDrawingStaffDefValues(StaffDef *currentStaffDef);
+    bool GetDrawingStaffDefValues(StaffDef *staffDef) const;
 
     bool DrawKeySigCancellation() const { return m_drawKeySigCancellation; }
     void SetDrawKeySigCancellation(bool drawKeySigCancellation) { m_drawKeySigCancellation = drawKeySigCancellation; }
@@ -197,6 +200,9 @@ public:
     {
         return (m_staffDefClef || m_staffDefKeySig || m_staffDefMensur || m_staffDefMeterSig || m_staffDefMeterSigGrp);
     }
+
+    bool DrawOssiaStaffDef() const { return m_drawOssiaStaffDef; }
+    void SetDrawOssiaStaffDef(bool drawOssiaStaffDef) { m_drawOssiaStaffDef = drawOssiaStaffDef; }
     ///@}
 
     /**
@@ -271,6 +277,7 @@ private:
     MeterSig *m_staffDefMeterSig;
     MeterSigGrp *m_staffDefMeterSigGrp;
     bool m_drawKeySigCancellation;
+    bool m_drawOssiaStaffDef;
 
     /** */
     Clef *m_cautionStaffDefClef;

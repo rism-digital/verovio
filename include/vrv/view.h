@@ -18,6 +18,7 @@
 namespace vrv {
 
 class Accid;
+class AnnotScore;
 class Arpeg;
 class BarLine;
 class Beam;
@@ -60,6 +61,7 @@ class Num;
 class Octave;
 class Options;
 class Ornam;
+class Ossia;
 class Page;
 class PageElement;
 class Pedal;
@@ -111,30 +113,6 @@ public:
     ///@}
 
     /**
-     * @name Virtual methods that are triggered when necessary but they do nothing in
-     * the View class. They can be overridden when necessary in the child classses.
-     */
-    ///@{
-    virtual void OnBeginEdition() {}
-    virtual void OnEndEdition() {}
-    virtual void OnBeginEditionClef() {}
-    virtual void OnEndEditionClef() {}
-    virtual void DoRefresh() {}
-    virtual void DoResize() {}
-    virtual void DoReset() {}
-    virtual void OnPageChange() {}
-    ///@}
-
-    /**
-     * @name Navigation methods for changing the page in the view.
-     * Navigating will check that the page exists in the document and also set it
-     * by calling SetPage (with doLayout = true);
-     */
-    void Next(bool forward);
-    bool HasNext(bool forward);
-    ///@}
-
-    /**
      * Simply returns the value of the last note-type element (mensural or neume)
      */
     bool GetNotationMode();
@@ -161,12 +139,12 @@ public:
     ///@}
 
     /**
-     * Set the current page to pageIdx.
+     * Set the current page.
      * If doLayout is true, the layout of the page will be calculated.
      * This is the default behavior, however, in some cases, we do not
      * want it. For example, when drawing the pages for getting the bounding boxes.
      */
-    void SetPage(int pageIdx, bool doLayout = true);
+    void SetPage(Page *page, bool doLayout);
 
     /**
      * Method that actually draw the current page.
@@ -210,9 +188,9 @@ protected:
     void DrawSystem(DeviceContext *dc, System *system);
     void DrawSystemList(DeviceContext *dc, System *system, const ClassId classId);
     void DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, BarLine *barLine = NULL,
-        bool isLastMeasure = false, bool isLastSystem = false);
+        bool isLastMeasure = false, bool isLastSystem = false, bool noLabels = false);
     void DrawStaffGrp(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool topStaffGrp = false,
-        bool abbreviations = false);
+        ScoreDefDrawingLabels drawingLabels = DRAWING_LABEL_ABBR);
     void DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure);
     void DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *measure);
     void DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool abbreviations = false);
@@ -231,8 +209,9 @@ protected:
     void DrawMeasure(DeviceContext *dc, Measure *measure, System *system);
     void DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff);
     void DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *system, int yOffset);
+    void DrawOssia(DeviceContext *dc, Ossia *ossia, Measure *measure, System *system);
     void DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
-    void DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
+    void DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, Measure *measure, System *system);
     void DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure);
     void DrawLayerList(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure, const ClassId classId);
     void DrawLayerDefLabels(
@@ -361,7 +340,7 @@ protected:
     void DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int horizOffset);
     /** Returns the width of the drawn figures */
     int DrawMeterSigFigures(DeviceContext *dc, int x, int y, MeterSig *meterSig, int den, Staff *staff);
-    void DrawMRptPart(DeviceContext *dc, int xCentered, char32_t smulfCode, int num, bool line, Staff *staff);
+    void DrawMRptPart(DeviceContext *dc, int xCentered, int y, char32_t smulfCode, int num, bool line, Staff *staff);
     ///@}
 
     /**
@@ -471,6 +450,8 @@ protected:
     ///@{
     void DrawControlElementConnector(DeviceContext *dc, ControlElement *element, int x1, int x2, Staff *staff,
         char spanningType, Object *graphic = NULL);
+    void DrawAnnotScore(DeviceContext *dc, AnnotScore *annotScore, int x1, int x2, Staff *staff, char spanningType,
+        Object *graphic = NULL);
     void DrawBracketSpan(DeviceContext *dc, BracketSpan *bracketSpan, int x1, int x2, Staff *staff, char spanningType,
         Object *graphic = NULL);
     void DrawFConnector(
@@ -579,8 +560,7 @@ protected:
     //     int staffSize, bool dimin, bool setBBGlyph = false);
 
     void DrawThickBezierCurve(
-        DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, int penStyle = AxSOLID);
-    void DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
+        DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, PenStyle penStyle = PEN_SOLID);
     void DrawTextString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params);
     void DrawDirString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params);
     void DrawDynamString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params, Rend *rend);
@@ -624,7 +604,7 @@ private:
     std::u32string IntToTimeSigFigures(unsigned short number);
     std::u32string IntToSmuflFigures(unsigned short number, int offset);
     int NestedTuplets(Object *object);
-    int GetSylYRel(int verseN, Staff *staff);
+    int GetSylYRel(int verseN, Staff *staff, data_STAFFREL place);
     int GetFYRel(F *f, Staff *staff);
     ///@}
 
@@ -642,7 +622,7 @@ private:
     void CalcBrevisPoints(
         Note *note, Staff *staff, Point *topLeft, Point *bottomRight, int sides[4], int shape, bool isMensuralBlack);
     void CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point points[4], int sides[4], int shape,
-        bool isMensuralBlack, bool firstHalf);
+        bool isMensuralBlack, bool firstHalf, bool straight);
 
     /**
      * Internal methods for drawing a BeamSegment
@@ -663,13 +643,52 @@ private:
      */
     data_STEMDIRECTION GetMensuralStemDir(Layer *layer, Note *note, int verticalCenter);
 
+    /**
+     * Start and end offset calculation for elements with `@vo` or `@ho`.
+     * Offset will be applied only if required by the DeviceContext.
+     * The staff size can be changed when it does for a particular element (e.g., control elements).
+     */
+    ///@{
+    void StartOffset(DeviceContext *dc, const Object *object, int staffSize);
+    void EndOffset(DeviceContext *dc, const Object *object);
+    void SetOffsetStaffSize(const Object *object, int staffSize);
+    ///@}
+
+    /**
+     * Calculate the current offset for a point.
+     * Applies currents offsets recursively (e.g., accid within note).
+     */
+    ///@{
+    void CalcOffset(DeviceContext *dc, int &x, int &y);
+    void CalcOffsetX(DeviceContext *dc, int &x);
+    void CalcOffsetY(DeviceContext *dc, int &y);
+    void CalcOffsetSpanningStartX(DeviceContext *dc, int &x, char spanningType, double factor = 1.0);
+    void CalcOffsetSpanningEndX(DeviceContext *dc, int &x, char spanningType, double factor = 1.0);
+    void CalcOffsetSpanningStartY(DeviceContext *dc, int &y, char spanningType, double factor = 1.0);
+    void CalcOffsetSpanningEndY(DeviceContext *dc, int &y, char spanningType, double factor = 1.0);
+    void CalcOffsetBezier(DeviceContext *dc, Point points[4], char spanningType);
+    ///@}
+
+    /**
+     * Internal class for storing current offset values.
+     */
+    class Offset {
+    public:
+        int m_ho = 0;
+        int m_vo = 0;
+        int m_startho = 0;
+        int m_startvo = 0;
+        int m_endho = 0;
+        int m_endvo = 0;
+        const Object *m_object = NULL;
+        int m_staffSize = 100;
+    };
+
 public:
     /** Document */
     Doc *m_doc;
     /** Options of the document */
     Options *m_options;
-    /** Index of the current page */
-    int m_pageIdx;
 
     /**
      * @name The objects currently selected.
@@ -677,11 +696,6 @@ public:
      * useful for changing the color, for example
      */
     ///@{
-    LayerElement *m_currentElement;
-    Layer *m_currentLayer;
-    Measure *m_currentMeasure;
-    Staff *m_currentStaff;
-    System *m_currentSystem;
     Page *m_currentPage;
     ///@}
 
@@ -714,6 +728,9 @@ private:
     static thread_local int s_drawingLigX[2], s_drawingLigY[2];
     static thread_local bool s_drawingLigObliqua;
     ///@}
+
+    /** The list of current offset values for the element being drawn */
+    std::list<Offset> m_currentOffsets;
 };
 
 } // namespace vrv

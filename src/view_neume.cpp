@@ -79,7 +79,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     assert(nc);
 
     if (m_options->m_neumeAsNote.GetValue()) {
-        DrawNcAsNotehead(dc, nc, layer, staff, measure);
+        this->DrawNcAsNotehead(dc, nc, layer, staff, measure);
         return;
     }
 
@@ -125,6 +125,9 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             int x2 = last->GetDrawingX();
             int y = staff->GetDrawingY();
 
+            this->CalcOffset(dc, x1, y);
+            this->CalcOffsetX(dc, x2);
+
             const int maxNcY = std::max(first->GetDrawingY(), last->GetDrawingY());
             y = std::max(y, maxNcY + unit);
             y += 2 * unit;
@@ -132,13 +135,14 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             x1 += lineWidth / 2;
             x2 += 2 * last->GetDrawingRadius(m_doc) - lineWidth / 2;
 
-            dc->SetPen(m_currentColor, lineWidth, AxSOLID, 0, 0, AxCAP_BUTT, AxJOIN_MITER);
+            dc->SetPen(lineWidth, PEN_SOLID, 0, 0, LINECAP_BUTT, LINEJOIN_MITER);
 
-            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
-            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y + lineWidth / 2), ToDeviceContextX(x1),
-                ToDeviceContextY(y - unit));
-            dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y + lineWidth / 2), ToDeviceContextX(x2),
-                ToDeviceContextY(y - unit));
+            dc->DrawLine(this->ToDeviceContextX(x1), this->ToDeviceContextY(y), this->ToDeviceContextX(x2),
+                this->ToDeviceContextY(y));
+            dc->DrawLine(this->ToDeviceContextX(x1), this->ToDeviceContextY(y + lineWidth / 2),
+                this->ToDeviceContextX(x1), this->ToDeviceContextY(y - unit));
+            dc->DrawLine(this->ToDeviceContextX(x2), this->ToDeviceContextY(y + lineWidth / 2),
+                this->ToDeviceContextX(x2), this->ToDeviceContextY(y - unit));
 
             dc->ResetPen();
         }
@@ -196,13 +200,15 @@ void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     x = divLine->GetDrawingX();
     y = staff->GetDrawingY();
 
+    this->CalcOffset(dc, x, y);
+
     y -= (m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) * 3;
 
     if (staff->HasDrawingRotation()) {
         y -= staff->GetDrawingRotationOffsetFor(x);
     }
 
-    DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
+    this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
 
     dc->EndGraphic(element, this);
 }
@@ -245,7 +251,7 @@ void View::DrawNcGlyphs(DeviceContext *dc, Nc *nc, Staff *staff)
     }
 
     for (auto &glyph : nc->m_drawingGlyphs) {
-        DrawSmuflCode(
+        this->DrawSmuflCode(
             dc, ncX + glyph.m_xOffset, ncY + glyph.m_yOffset, glyph.m_fontNo, staff->m_drawingStaffSize, false, true);
     }
 }

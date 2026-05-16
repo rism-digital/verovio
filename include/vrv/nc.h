@@ -18,6 +18,7 @@
 #include "atts_visual.h"
 #include "durationinterface.h"
 #include "layerelement.h"
+#include "offsetinterface.h"
 #include "pitchinterface.h"
 #include "positioninterface.h"
 
@@ -33,6 +34,7 @@ namespace vrv {
 
 class Nc : public LayerElement,
            public DurationInterface,
+           public OffsetInterface,
            public PitchInterface,
            public PositionInterface,
            public AttColor,
@@ -49,10 +51,10 @@ public:
     virtual ~Nc();
     Object *Clone() const override { return new Nc(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Nc"; }
+    std::string GetClassName() const override { return "nc"; }
     ///@}
 
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * @name Getter to interfaces
@@ -60,8 +62,12 @@ public:
     ///@{
     DurationInterface *GetDurationInterface() override { return vrv_cast<DurationInterface *>(this); }
     const DurationInterface *GetDurationInterface() const override { return vrv_cast<const DurationInterface *>(this); }
+    OffsetInterface *GetOffsetInterface() override { return vrv_cast<OffsetInterface *>(this); }
+    const OffsetInterface *GetOffsetInterface() const override { return vrv_cast<const OffsetInterface *>(this); }
     PitchInterface *GetPitchInterface() override { return vrv_cast<PitchInterface *>(this); }
     const PitchInterface *GetPitchInterface() const override { return vrv_cast<const PitchInterface *>(this); }
+    PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
+    const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
     ///@}
 
     /**

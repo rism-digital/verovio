@@ -71,7 +71,7 @@ if __name__ == "__main__":
     parser.add_argument('input_dir2')
     parser.add_argument('output_dir')
     parser.add_argument('-t', '--threshold', required=False, type=float,
-                        default=0.1, help='Threshold for visual difference in percent')
+                        default=0.001, help='Threshold for visual difference in percent')
     args = parser.parse_args()
 
     html, body = start_webpage()

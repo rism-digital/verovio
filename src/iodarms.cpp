@@ -231,7 +231,7 @@ int DarmsInput::do_globalSpec(int pos, const char *data)
             // next we expect a flat or sharp, - or #
             pos++;
             if (data[pos] == '-' || data[pos] == '#') {
-                UnrollKeysig(quantity, data[pos]);
+                this->UnrollKeysig(quantity, data[pos]);
             }
             else {
                 LogWarning("DARMS import: Invalid char for 'K': %c", data[pos]);
@@ -463,7 +463,7 @@ bool DarmsInput::Import(const std::string &data_str)
     m_doc->SetType(Raw);
     // The mDiv
     Mdiv *mdiv = new Mdiv();
-    mdiv->m_visibility = Visible;
+    mdiv->SetVisibility(Visible);
     m_doc->AddChild(mdiv);
     // The score
     Score *score = new Score();

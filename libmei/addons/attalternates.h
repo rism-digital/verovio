@@ -46,21 +46,21 @@ public:
     data_FONTSIZENUMERIC GetFontSizeNumeric() const { return m_fontSizeNumeric; }
     void SetFontSizeNumeric(data_FONTSIZENUMERIC value)
     {
-        Reset(FONTSIZE_fontSizeNumeric);
+        this->Reset(FONTSIZE_fontSizeNumeric);
         m_fontSizeNumeric = value;
     }
 
     data_FONTSIZETERM GetTerm() const { return m_term; }
     void SetTerm(data_FONTSIZETERM value)
     {
-        Reset(FONTSIZE_term);
+        this->Reset(FONTSIZE_term);
         m_term = value;
     }
 
     data_PERCENT GetPercent() const { return m_percent; }
     void SetPercent(data_PERCENT value)
     {
-        Reset(FONTSIZE_percent);
+        this->Reset(FONTSIZE_percent);
         m_percent = value;
     }
 
@@ -106,6 +106,64 @@ protected:
 };
 
 /**
+ * MEI data.HEADSHAPE
+ * Since it can contain different subtype we need a dedicated class for it.
+ */
+
+enum HeadShapeType { HEADSHAPE_NONE = 0, HEADSHAPE_headShapeList, HEADSHAPE_hexnum };
+
+class data_HEADSHAPE {
+public:
+    data_HEADSHAPE() { Reset(HEADSHAPE_NONE); }
+    virtual ~data_HEADSHAPE() {}
+
+    void Reset(HeadShapeType type)
+    {
+        m_type = type;
+        m_headShapeList = HEADSHAPE_list_NONE;
+        m_hexnum = 0;
+    }
+
+    HeadShapeType GetType() const { return m_type; }
+
+    data_HEADSHAPE_list GetHeadShapeList() const { return m_headShapeList; }
+    void SetHeadShapeList(data_HEADSHAPE_list value)
+    {
+        this->Reset(HEADSHAPE_headShapeList);
+        m_headShapeList = value;
+    }
+
+    data_HEXNUM GetHexnum() const { return m_hexnum; }
+    void SetHexnum(data_HEXNUM value)
+    {
+        this->Reset(HEADSHAPE_hexnum);
+        m_hexnum = value;
+    }
+
+    bool HasValue() const
+    {
+        if (m_headShapeList != HEADSHAPE_list_NONE) return true;
+        if (m_hexnum != 0) return true;
+        return false;
+    }
+
+    // comparison
+    bool operator==(const data_HEADSHAPE &val) const
+    {
+        if (m_type != val.GetType()) return false;
+        if (m_headShapeList != val.GetHeadShapeList()) return false;
+        if (m_hexnum != val.GetHexnum()) return false;
+        return true;
+    }
+    bool operator!=(const data_HEADSHAPE &val) const { return !(*this == val); }
+
+protected:
+    HeadShapeType m_type;
+    data_HEADSHAPE_list m_headShapeList;
+    data_HEXNUM m_hexnum;
+};
+
+/**
  * MEI data.MEASUREMENTSIGNED
  * Since it can contain different subtype we need a dedicated class for it.
  */
@@ -129,14 +187,14 @@ public:
     int GetPx() const { return m_px; }
     void SetPx(int px)
     {
-        Reset(MEASUREMENTTYPE_px);
+        this->Reset(MEASUREMENTTYPE_px);
         m_px = px;
     }
 
     double GetVu() const { return m_vu; }
     void SetVu(double vu)
     {
-        Reset(MEASUREMENTTYPE_vu);
+        this->Reset(MEASUREMENTTYPE_vu);
         m_vu = vu;
     }
 
@@ -189,14 +247,14 @@ public:
     data_LINEWIDTHTERM GetLineWithTerm() const { return m_lineWidthTerm; }
     void SetLineWidthTerm(data_LINEWIDTHTERM value)
     {
-        Reset(LINEWIDTHTYPE_lineWidthTerm);
+        this->Reset(LINEWIDTHTYPE_lineWidthTerm);
         m_lineWidthTerm = value;
     }
 
     data_MEASUREMENTUNSIGNED GetMeasurementunsigned() const { return m_measurementunsigned; }
     void SetMeasurementunsigned(data_MEASUREMENTUNSIGNED value)
     {
-        Reset(LINEWIDTHTYPE_measurementunsigned);
+        this->Reset(LINEWIDTHTYPE_measurementunsigned);
         m_measurementunsigned = value;
     }
 
@@ -247,14 +305,14 @@ public:
     data_MIDIVALUE GetMidivalue() const { return m_midivalue; }
     void SetMidivalue(data_MIDIVALUE value)
     {
-        Reset(MIDIVALUENAMETYPE_midivalue);
+        this->Reset(MIDIVALUENAMETYPE_midivalue);
         m_midivalue = value;
     }
 
     data_NCNAME GetNcname() const { return m_ncname; }
     void SetNcname(data_NCNAME value)
     {
-        Reset(MIDIVALUENAMETYPE_mcname);
+        this->Reset(MIDIVALUENAMETYPE_mcname);
         m_ncname = value;
     }
 
@@ -305,14 +363,14 @@ public:
     data_MIDIVALUE GetMidivalue() const { return m_midivalue; }
     void SetMidivalue(data_MIDIVALUE value)
     {
-        Reset(MIDIVALUEPANTYPE_midivalue);
+        this->Reset(MIDIVALUEPANTYPE_midivalue);
         m_midivalue = value;
     }
 
     data_PERCENT_LIMITED_SIGNED GetPercentLimitedSigned() const { return m_percentLimitedSigned; }
     void SetPercentLimitedSigned(data_PERCENT_LIMITED_SIGNED value)
     {
-        Reset(MIDIVALUEPANTYPE_percentLimitedSigned);
+        this->Reset(MIDIVALUEPANTYPE_percentLimitedSigned);
         m_percentLimitedSigned = value;
     }
 
@@ -368,7 +426,7 @@ public:
     data_STAFFREL GetStaffRel() const { return m_staffRel; }
     void SetStaffRel(data_STAFFREL value)
     {
-        Reset(PLACEMENT_staffRel);
+        this->Reset(PLACEMENT_staffRel);
         m_staffRel = value;
     }
     data_STAFFREL *GetStaffRelAtlernate() { return &m_staffRel; }
@@ -376,14 +434,14 @@ public:
     data_NONSTAFFPLACE GetNonStaffPlace() const { return m_nonStaffPlace; }
     void SetNonStaffPlace(data_NONSTAFFPLACE value)
     {
-        Reset(PLACEMENT_nonStaffPlace);
+        this->Reset(PLACEMENT_nonStaffPlace);
         m_nonStaffPlace = value;
     }
 
     std::string GetNMToken() const { return m_nmtoken; }
     void SetNMToken(std::string value)
     {
-        Reset(PLACEMENT_nmtoken);
+        this->Reset(PLACEMENT_nmtoken);
         m_nmtoken = value;
     }
 

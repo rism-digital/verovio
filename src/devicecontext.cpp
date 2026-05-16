@@ -123,6 +123,13 @@ std::pair<double, double> BezierCurve::EstimateCurveParamForControlPoints() cons
 // DeviceContext
 //----------------------------------------------------------------------------
 
+DeviceContext::~DeviceContext()
+{
+    if (m_penStack.size() != 1) LogDebug("Pen stack should have only one pen");
+    if (m_brushStack.size() != 1) LogDebug("Brush stack should have only one brush");
+    if (!m_fontStack.empty()) LogDebug("Font stack should be empty");
+}
+
 const Resources *DeviceContext::GetResources(bool showWarning) const
 {
     if (!m_resources && showWarning) LogWarning("Requested resources unavailable.");
@@ -134,45 +141,32 @@ void DeviceContext::SetViewBoxFactor(double ppuFactor)
     m_viewBoxFactor = double(DEFINITION_FACTOR) / ppuFactor;
 }
 
-void DeviceContext::SetPen(int color, int width, int style, int dashLength, int gapLength, int lineCap, int lineJoin)
+void DeviceContext::SetPen(int width, PenStyle style, int dashLength, int gapLength, LineCapStyle lineCap,
+    LineJoinStyle lineJoin, float opacity, int color)
 {
-    float opacityValue;
-
     switch (style) {
-        case AxSOLID: opacityValue = 1.0; break;
-        case AxDOT:
+        case PEN_SOLID: break;
+        case PEN_DOT:
             dashLength = dashLength ? dashLength : 1;
             gapLength = gapLength ? gapLength : width * 3;
-            opacityValue = 1.0;
             break;
-        case AxLONG_DASH:
+        case PEN_LONG_DASH:
             dashLength = dashLength ? dashLength : width * 4;
             gapLength = gapLength ? gapLength : width * 3;
-            opacityValue = 1.0;
             break;
-        case AxSHORT_DASH:
+        case PEN_SHORT_DASH:
             dashLength = dashLength ? dashLength : width * 2;
             gapLength = gapLength ? gapLength : width * 3;
-            opacityValue = 1.0;
             break;
-        case AxTRANSPARENT: opacityValue = 0.0; break;
-        default: opacityValue = 1.0; // solid brush by default
+        default: break; // solid brush by default
     }
 
-    m_penStack.push(Pen(color, width, opacityValue, dashLength, gapLength, lineCap, lineJoin));
+    m_penStack.push(Pen(width, style, dashLength, gapLength, lineCap, lineJoin, opacity, color));
 }
 
-void DeviceContext::SetBrush(int color, int opacity)
+void DeviceContext::SetBrush(float opacity, int color)
 {
-    float opacityValue;
-
-    switch (opacity) {
-        case AxSOLID: opacityValue = 1.0; break;
-        case AxTRANSPARENT: opacityValue = 0.0; break;
-        default: opacityValue = 1.0; // solid brush by default
-    }
-
-    m_brushStack.push(Brush(color, opacityValue));
+    m_brushStack.push(Brush(opacity, color));
 }
 
 void DeviceContext::SetFont(FontInfo *font)
@@ -250,8 +244,8 @@ void DeviceContext::GetTextExtent(const std::u32string &string, TextExtend *exte
     extend->m_height = 0;
 
     if (typeSize) {
-        AddGlyphToTextExtend(resources->GetTextGlyph(L'p'), extend);
-        AddGlyphToTextExtend(resources->GetTextGlyph(L'M'), extend);
+        this->AddGlyphToTextExtend(resources->GetTextGlyph(L'p'), extend);
+        this->AddGlyphToTextExtend(resources->GetTextGlyph(L'M'), extend);
         extend->m_width = 0;
     }
 
@@ -273,7 +267,7 @@ void DeviceContext::GetTextExtent(const std::u32string &string, TextExtend *exte
                 glyph = unknown;
             }
         }
-        AddGlyphToTextExtend(glyph, extend);
+        this->AddGlyphToTextExtend(glyph, extend);
     }
 }
 
@@ -293,7 +287,7 @@ void DeviceContext::GetSmuflTextExtent(const std::u32string &string, TextExtend 
         if (!glyph) {
             continue;
         }
-        AddGlyphToTextExtend(glyph, extend);
+        this->AddGlyphToTextExtend(glyph, extend);
     }
 }
 

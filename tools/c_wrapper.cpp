@@ -42,6 +42,11 @@ void *vrvToolkit_constructorResourcePath(const char *resourcePath)
     return new Toolkit();
 }
 
+void *vrvToolkit_constructorNoResource()
+{
+    return new Toolkit(false);
+}
+
 void vrvToolkit_destructor(void *tkPtr)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);

@@ -25,7 +25,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    AdjustLayersFunctor(Doc *doc, const std::vector<int> &staffNs);
+    AdjustLayersFunctor(Doc *doc);
     virtual ~AdjustLayersFunctor() = default;
     ///@}
 
@@ -47,7 +47,7 @@ public:
     FunctorCode VisitAlignmentReferenceEnd(AlignmentReference *alignmentReference) override;
     FunctorCode VisitLayerElement(LayerElement *layerElement) override;
     FunctorCode VisitMeasure(Measure *measure) override;
-    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitSystem(System *system) override;
     ///@}
 
 protected:

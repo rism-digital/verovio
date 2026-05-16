@@ -30,11 +30,20 @@ namespace vrv {
 static const ClassRegistrar<MRest> s_factory("mRest", MREST);
 
 MRest::MRest()
-    : LayerElement(MREST, "mrest-"), PositionInterface(), AttColor(), AttCue(), AttFermataPresent(), AttVisibility()
+    : LayerElement(MREST)
+    , OffsetInterface()
+    , PositionInterface()
+    , AttColor()
+    , AttCue()
+    , AttCutout()
+    , AttFermataPresent()
+    , AttVisibility()
 {
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_CUE);
+    this->RegisterAttClass(ATT_CUTOUT);
     this->RegisterAttClass(ATT_FERMATAPRESENT);
     this->RegisterAttClass(ATT_VISIBILITY);
 
@@ -46,9 +55,11 @@ MRest::~MRest() {}
 void MRest::Reset()
 {
     LayerElement::Reset();
+    OffsetInterface::Reset();
     PositionInterface::Reset();
     this->ResetColor();
     this->ResetCue();
+    this->ResetCutout();
     this->ResetFermataPresent();
     this->ResetVisibility();
 }

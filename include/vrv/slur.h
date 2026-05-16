@@ -9,6 +9,7 @@
 #define __VRV_SLUR_H__
 
 #include "controlelement.h"
+#include "offsetinterface.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -51,8 +52,8 @@ enum class PortatoSlurType { None, StemSide, Centered };
 //----------------------------------------------------------------------------
 
 class Slur : public ControlElement,
+             public OffsetSpanningInterface,
              public TimeSpanningInterface,
-             public AttColor,
              public AttCurvature,
              public AttLayerIdent,
              public AttLineRendBase {
@@ -64,17 +65,21 @@ public:
     ///@{
     Slur();
     Slur(ClassId classId);
-    Slur(ClassId classId, const std::string &classIdStr);
     virtual ~Slur();
     Object *Clone() const override { return new Slur(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Slur"; }
+    std::string GetClassName() const override { return "slur"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
+    OffsetSpanningInterface *GetOffsetSpanningInterface() override { return vrv_cast<OffsetSpanningInterface *>(this); }
+    const OffsetSpanningInterface *GetOffsetSpanningInterface() const override
+    {
+        return vrv_cast<const OffsetSpanningInterface *>(this);
+    }
     TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
     const TimePointInterface *GetTimePointInterface() const override
     {
@@ -152,8 +157,8 @@ public:
      * Calculate the staff where the slur's floating curve positioner lives
      */
     ///@{
-    Staff *CalculateExtremalStaff(const Staff *staff, int xMin, int xMax);
-    const Staff *CalculateExtremalStaff(const Staff *staff, int xMin, int xMax) const;
+    Staff *CalculatePrincipalStaff(const Staff *staff, int xMin, int xMax);
+    const Staff *CalculatePrincipalStaff(const Staff *staff, int xMin, int xMax) const;
     ///@}
 
     /**

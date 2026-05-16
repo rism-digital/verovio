@@ -27,9 +27,9 @@ namespace vrv {
 
 static const ClassRegistrar<Tuning> s_factory("tuning", TUNING);
 
-Tuning::Tuning() : Object(TUNING, "tuning-"), AttCourseLog()
+Tuning::Tuning() : Object(TUNING), AttTuningLog()
 {
-    this->RegisterAttClass(ATT_COURSELOG);
+    this->RegisterAttClass(ATT_TUNINGLOG);
 
     this->Reset();
 }
@@ -39,30 +39,55 @@ Tuning::~Tuning() {}
 void Tuning::Reset()
 {
     Object::Reset();
-    this->ResetCourseLog();
+    this->ResetTuningLog();
 }
 
-bool Tuning::IsSupportedChild(Object *child)
+bool Tuning::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(COURSE)) {
-        assert(dynamic_cast<Course *>(child));
+    static const std::vector<ClassId> supported{ COURSE };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
-int Tuning::CalcPitchPos(int course, data_NOTATIONTYPE notationType, int lines) const
+int Tuning::CalcPitchPos(int course, data_NOTATIONTYPE notationType, int lines, int listSize, int index, int loc,
+    int tabLine, int tabAnchorline, bool topAlign)
 {
     switch (notationType) {
         case NOTATIONTYPE_tab_lute_french:
             // all courses >= 7 are positioned above line 0
             return (lines - std::min(course, 7)) * 2 + 1; // above the line
-        case NOTATIONTYPE_tab_lute_italian: return (course - 1) * 2;
+        case NOTATIONTYPE_tab_lute_italian:
+            // all courses >= 7 are positioned on line 7
+            return (std::min(course, 7) - 1) * 2;
+        case NOTATIONTYPE_tab_lute_german:
+            if (tabLine != 0) {
+                // explicit position, 1st priority
+                return (tabLine - 1) * 2;
+            }
+            else if (loc != MEI_UNSET) {
+                // explicit position, 2nd priority
+                return loc;
+            }
+            else if (tabAnchorline != 0) {
+                // align bottom note to given anchor line, but don't extend chord above the top line, 3rd priority
+                return (std::min(tabAnchorline - 1, lines - listSize) + index) * 2;
+            }
+            else if (topAlign) {
+                // align top note with top line, joint 4th priority (default positioning)
+                return (lines - listSize + index) * 2;
+            }
+            else {
+                // align bottom note with bottom line, joint 4th priority
+                return index * 2;
+            }
         case NOTATIONTYPE_tab_guitar: [[fallthrough]];
         default: return abs(course - lines) * 2;
     }
@@ -134,7 +159,7 @@ int Tuning::CalcPitchNumber(int course, int fret, data_NOTATIONTYPE notationType
     // baroque lute D minor                  F4  D4  A3  F3  D3  A2  G2  F2  E2  D2  C2  B1  A1
     static const int luteBaroqueDMinor[] = { 65, 62, 57, 53, 50, 45, 43, 41, 40, 38, 36, 35, 33 };
 
-    const int *pitch = nullptr;
+    const int *pitch = NULL;
     int pitchSize = 0;
 
     switch (this->GetTuningStandard()) {

@@ -42,7 +42,7 @@ public:
     virtual ~MeterSig();
     Object *Clone() const override { return new MeterSig(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "MeterSig"; }
+    std::string GetClassName() const override { return "meterSig"; }
     ///@}
 
     /** Override the method since alignment is required */
@@ -53,6 +53,9 @@ public:
 
     /** Evaluate additive meter counts */
     int GetTotalCount() const;
+
+    /** Return the implicit unit according to the sym (if any, return 0 otherwise) */
+    int GetSymImplicitUnit() const;
 
     /**
      * Return the unit (int) as data_DURATION (up to 32).

@@ -9,14 +9,22 @@
 
 //----------------------------------------------------------------------------
 
+#include <algorithm>
+
+//----------------------------------------------------------------------------
+
 #include "arpeg.h"
 #include "beatrpt.h"
 #include "btrem.h"
+#include "doc.h"
 #include "featureextractor.h"
 #include "ftrem.h"
 #include "gracegrp.h"
+#include "instrdef.h"
 #include "layer.h"
+#include "mrest.h"
 #include "multirest.h"
+#include "octave.h"
 #include "pedal.h"
 #include "rest.h"
 #include "staff.h"
@@ -33,6 +41,7 @@
 //----------------------------------------------------------------------------
 
 #include "MidiFile.h"
+#include "Tunings.h"
 
 namespace vrv {
 
@@ -40,14 +49,19 @@ namespace vrv {
 // InitOnsetOffsetFunctor
 //----------------------------------------------------------------------------
 
-InitOnsetOffsetFunctor::InitOnsetOffsetFunctor() : Functor()
+InitOnsetOffsetFunctor::InitOnsetOffsetFunctor(Doc *doc) : DocFunctor(doc)
 {
+    static const std::map<int, data_DURATION> durationEq{
+        { DURATION_EQ_brevis, DURATION_brevis }, //
+        { DURATION_EQ_semibrevis, DURATION_semibrevis }, //
+        { DURATION_EQ_minima, DURATION_minima }, //
+    };
+
     m_currentScoreTime = 0;
     m_currentRealTimeSeconds = 0.0;
-    m_meterParams.mensur = NULL;
-    m_meterParams.meterSig = NULL;
     m_notationType = NOTATIONTYPE_cmn;
     m_currentTempo = MIDI_TEMPO;
+    m_meterParams.equivalence = durationEq.at(m_doc->GetOptions()->m_durationEquivalence.GetValue());
 }
 
 FunctorCode InitOnsetOffsetFunctor::VisitChordEnd(Chord *chord)
@@ -70,6 +84,7 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayer(Layer *layer)
 
     m_meterParams.mensur = layer->GetCurrentMensur();
     m_meterParams.meterSig = layer->GetCurrentMeterSig();
+    m_meterParams.proport = layer->GetCurrentProport();
 
     return FUNCTOR_CONTINUE;
 }
@@ -100,8 +115,12 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayerElement(LayerElement *layerElement
         Note *note = vrv_cast<Note *>(element);
         assert(note);
 
-        // For now just ignore grace notes
-        if (note->IsGraceNote()) return FUNCTOR_CONTINUE;
+        if (note->IsGraceNote()) {
+            // Just store the current onset - only used for grace notes at the end of the layer
+            note->SetScoreTimeOnset(m_currentScoreTime);
+            note->SetRealTimeOnsetSeconds(m_currentRealTimeSeconds);
+            return FUNCTOR_CONTINUE;
+        }
 
         Chord *chord = note->IsChordTone();
         TabGrp *tabGrp = note->IsTabGrpNote();
@@ -158,6 +177,16 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayerElement(LayerElement *layerElement
     }
     else if (layerElement->Is(METERSIG)) {
         this->m_meterParams.meterSig = vrv_cast<MeterSig *>(layerElement);
+    }
+    else if (layerElement->Is(PROPORT)) {
+        if (layerElement->GetType() == "cmme_tempo_change") return FUNCTOR_SIBLINGS;
+        // replace the current proport
+        const Proport *previous = (m_meterParams.proport) ? (m_meterParams.proport) : NULL;
+        m_meterParams.proport = vrv_cast<Proport *>(layerElement);
+        assert(m_meterParams.proport);
+        if (previous) {
+            m_meterParams.proport->Cumulate(previous);
+        }
     }
 
     return FUNCTOR_CONTINUE;
@@ -219,11 +248,11 @@ FunctorCode InitMaxMeasureDurationFunctor::VisitLayerElement(LayerElement *layer
 
 FunctorCode InitMaxMeasureDurationFunctor::VisitMeasure(Measure *measure)
 {
-    measure->ClearScoreTimeOffset();
-    measure->AddScoreTimeOffset(m_currentScoreTime);
+    measure->ClearScoreTimeOnset();
+    measure->AddScoreTimeOnset(m_currentScoreTime);
 
-    measure->ClearRealTimeOffset();
-    measure->AddRealTimeOffset(m_currentRealTimeSeconds * 1000.0);
+    measure->ClearRealTimeOnsetMilliseconds();
+    measure->AddRealTimeOnsetMilliseconds(m_currentRealTimeSeconds * 1000.0);
 
     return FUNCTOR_CONTINUE;
 }
@@ -237,6 +266,13 @@ FunctorCode InitMaxMeasureDurationFunctor::VisitMeasureEnd(Measure *measure)
         = measure->m_measureAligner.GetRightAlignment()->GetTime() * m_multiRestFactor * SCORE_TIME_UNIT;
     m_currentScoreTime = m_currentScoreTime + scoreTimeIncrement;
     m_currentRealTimeSeconds += scoreTimeIncrement.ToDouble() * 60.0 / tempo;
+
+    measure->ClearScoreTimeOffset();
+    measure->AddScoreTimeOffset(m_currentScoreTime);
+
+    measure->ClearRealTimeOffsetMilliseconds();
+    measure->AddRealTimeOffsetMilliseconds(m_currentRealTimeSeconds * 1000.0);
+
     m_multiRestFactor = 1;
 
     return FUNCTOR_CONTINUE;
@@ -296,20 +332,24 @@ FunctorCode InitTimemapTiesFunctor::VisitTie(Tie *tie)
 }
 
 //----------------------------------------------------------------------------
-// InitMidiFunctor
+// InitTimemapAdjustNotesFunctor
 //----------------------------------------------------------------------------
 
-InitMIDIFunctor::InitMIDIFunctor() : ConstFunctor()
+InitTimemapAdjustNotesFunctor::InitTimemapAdjustNotesFunctor() : Functor()
 {
+    m_noCue = false;
+    m_lastNote = NULL;
     m_currentTempo = MIDI_TEMPO;
 }
 
-FunctorCode InitMIDIFunctor::VisitArpeg(const Arpeg *arpeg)
+FunctorCode InitTimemapAdjustNotesFunctor::VisitArpeg(Arpeg *arpeg)
 {
     // Sort the involved notes by playing order
     const bool playTopDown = (arpeg->GetOrder() == arpegLog_ORDER_down);
-    std::set<const Note *> notes = arpeg->GetNotes();
-    std::vector<const Note *> sortedNotes;
+    std::set<Note *> notes = arpeg->GetNotes();
+    if (notes.empty()) return FUNCTOR_CONTINUE;
+
+    std::vector<Note *> sortedNotes;
     std::copy(notes.begin(), notes.end(), std::back_inserter(sortedNotes));
     std::sort(sortedNotes.begin(), sortedNotes.end(), [playTopDown](const Note *note1, const Note *note2) {
         const int pitch1 = note1->GetMIDIPitch();
@@ -318,19 +358,253 @@ FunctorCode InitMIDIFunctor::VisitArpeg(const Arpeg *arpeg)
     });
 
     // Defer the notes in playing order
-    double shift = 0.0;
-    const double increment = UNACC_GRACENOTE_DUR * m_currentTempo / 60000.0;
-    for (const Note *note : sortedNotes) {
-        if (shift > 0.0) m_deferredNotes[note] = shift;
-        shift += increment;
+    Fraction shift = 0;
+    Fraction startTime = sortedNotes.front()->GetScoreTimeOnset();
+    const Fraction increment = UNACC_GRACENOTE_FRACTION * (int)m_currentTempo;
+    for (Note *note : sortedNotes) {
+        if (shift != 0) this->SetNoteStartStop(note, startTime + shift);
+        shift = shift + increment;
     }
 
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode InitTimemapAdjustNotesFunctor::VisitChord(Chord *chord)
+{
+    if (chord->IsGraceNote()) {
+        std::list<Note *> notes;
+        const ListOfObjects &chordNotes = chord->GetList();
+        for (Object *obj : chordNotes) {
+            Note *note = vrv_cast<Note *>(obj);
+            assert(note);
+            notes.push_back(note);
+        }
+
+        m_accentedGraceNote = (chord->GetGrace() == GRACE_acc);
+        double time = chord->HasGraceTime() ? chord->GetGraceTime() : 50.0;
+        const GraceGrp *graceGrp = vrv_cast<const GraceGrp *>(chord->GetFirstAncestor(GRACEGRP));
+        if (graceGrp) {
+            if (graceGrp->GetGrace() == GRACE_acc) m_accentedGraceNote = true;
+            time = (graceGrp->HasGraceTime()) ? graceGrp->GetGraceTime() : 50.0;
+        }
+        m_graces.push_back({ notes, chord->GetActualDur(), time });
+
+        return FUNCTOR_SIBLINGS;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode InitTimemapAdjustNotesFunctor::VisitGraceGrpEnd(GraceGrp *graceGrp)
+{
+    // Handling of Nachschlag
+    if (!m_graces.empty() && (graceGrp->GetAttach() == graceGrpLog_ATTACH_pre) && !m_accentedGraceNote && m_lastNote) {
+        Fraction startTime = m_lastNote->GetScoreTimeOffset();
+        const Fraction graceNoteDur = UNACC_GRACENOTE_FRACTION * (int)m_currentTempo;
+        const Fraction totalDur = graceNoteDur * (int)m_graces.size();
+        startTime = startTime - totalDur;
+        startTime = (startTime < 0) ? 0 : startTime;
+
+        for (const auto &grace : m_graces) {
+            const Fraction stopTime = startTime + graceNoteDur;
+            for (const auto &note : grace.notes) {
+                // Set the start (onset) and end (offset) of the grace note
+                this->SetNoteStartStop(note, startTime, stopTime);
+            }
+            startTime = stopTime;
+        }
+
+        m_graces.clear();
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode InitTimemapAdjustNotesFunctor::VisitLayerEnd(Layer *layer)
+{
+    // Process grace notes at the end of the layer - always treat them as "unacc"
+    if (!m_graces.empty() && !m_graces.front().notes.empty()) {
+        Fraction startTime = m_graces.front().notes.front()->GetScoreTimeOnset();
+        Fraction graceNoteDur = UNACC_GRACENOTE_FRACTION * (int)m_currentTempo;
+        const Fraction totalDur = graceNoteDur * (int)m_graces.size();
+        startTime = startTime - totalDur;
+        startTime = (startTime < 0) ? 0 : startTime;
+
+        // If we have a previous note ending after the start, correct its duration
+        if (m_lastNote && (m_lastNote->GetScoreTimeOffset() > startTime)
+            && m_lastNote->GetScoreTimeOnset() < startTime) {
+            this->SetNoteOrChordStartStop(m_lastNote, m_lastNote->GetScoreTimeOnset(), startTime);
+        }
+
+        for (const auto &grace : m_graces) {
+            const Fraction stopTime = startTime + graceNoteDur;
+            for (const auto &note : grace.notes) {
+                // Set the start (onset) and end (offset) of the grace note
+                this->SetNoteStartStop(note, startTime, stopTime);
+            }
+            startTime = stopTime;
+        }
+        m_graces.clear();
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode InitTimemapAdjustNotesFunctor::VisitMeasure(Measure *measure)
+{
+    // Update the current tempo
+    m_currentTempo = measure->GetCurrentTempo();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode InitTimemapAdjustNotesFunctor::VisitNote(Note *note)
+{
+    // Skip linked notes
+    if (note->HasSameasLink()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    // Skip cue notes when midiNoCue is activated
+    if ((note->GetCue() == BOOLEAN_true) && m_noCue) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    // If the note is a secondary tied note, then ignore it
+    if (note->GetScoreTimeTiedDuration() < 0) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    // Handle grace notes
+    if (note->IsGraceNote()) {
+        m_accentedGraceNote = (note->GetGrace() == GRACE_acc);
+        double time = note->HasGraceTime() ? note->GetGraceTime() : 50.0;
+        const GraceGrp *graceGrp = vrv_cast<const GraceGrp *>(note->GetFirstAncestor(GRACEGRP));
+        if (graceGrp) {
+            if (graceGrp->GetGrace() == GRACE_acc) m_accentedGraceNote = true;
+            time = (graceGrp->HasGraceTime()) ? graceGrp->GetGraceTime() : 50.0;
+        }
+        m_graces.push_back({ { note }, note->GetDur(), time });
+
+        return FUNCTOR_SIBLINGS;
+    }
+
+    // Check if some grace notes must be performed
+    if (!m_graces.empty()) {
+        this->SetGraceNotesFor(note);
+        m_graces.clear();
+    }
+
+    // Store reference, i.e. for Nachschlag
+    m_lastNote = note;
+
+    return FUNCTOR_SIBLINGS;
+}
+
+void InitTimemapAdjustNotesFunctor::SetGraceNotesFor(Note *refNote)
+{
+    Fraction startTime = refNote->GetScoreTimeOnset();
+
+    Fraction graceNoteDur = 0;
+    if (m_accentedGraceNote && !m_graces.empty()) {
+        // Arbitrarily looks at the first note, not sure what to do if we have contradictory values
+        double percent = m_graces.front().time;
+        // Arbitrarily constraint the time between 5% and 95%
+        percent = std::min(95.0, std::max(5.0, percent));
+        const Fraction totalDur = refNote->GetScoreTimeDuration() * (int)percent / 100;
+        // Adjust the start of the main note
+        this->SetNoteOrChordStartStop(refNote, startTime + totalDur);
+        graceNoteDur = totalDur / (int)m_graces.size();
+    }
+    else {
+        graceNoteDur = UNACC_GRACENOTE_FRACTION * (int)m_currentTempo;
+        const Fraction totalDur = graceNoteDur * (int)m_graces.size();
+        if (startTime >= totalDur) {
+            startTime = startTime - totalDur;
+        }
+        else {
+            // Adjust the start of the main note or chord
+            this->SetNoteOrChordStartStop(refNote, startTime + totalDur);
+        }
+    }
+
+    for (const auto &grace : m_graces) {
+        const Fraction stopTime = startTime + graceNoteDur;
+        for (const auto &note : grace.notes) {
+            // Set the start (onset) and end (offset) of the grace note
+            this->SetNoteStartStop(note, startTime, stopTime);
+        }
+        startTime = stopTime;
+    }
+}
+
+void InitTimemapAdjustNotesFunctor::SetNoteOrChordStartStop(
+    Note *note, const Fraction &startTime, const Fraction &stopTime)
+{
+    if (note->IsChordTone()) {
+        Chord *chord = note->IsChordTone();
+        ListOfObjects notes = chord->FindAllDescendantsByType(NOTE);
+        for (Object *child : notes) {
+            Note *chordNote = vrv_cast<Note *>(child);
+            this->SetNoteStartStop(chordNote, startTime, stopTime);
+        }
+    }
+    else {
+        this->SetNoteStartStop(note, startTime, stopTime);
+    }
+}
+
+void InitTimemapAdjustNotesFunctor::SetNoteStartStop(Note *note, const Fraction &startTime, const Fraction &stopTime)
+{
+    assert(note);
+
+    note->SetScoreTimeOnset(startTime);
+    double startRealTimeSeconds = startTime.ToDouble() * 60.0 / m_currentTempo;
+    note->SetRealTimeOnsetSeconds(startRealTimeSeconds);
+    if (stopTime != VRV_UNSET) {
+        note->SetScoreTimeOffset(stopTime);
+        double stopRealTimeSeconds = stopTime.ToDouble() * 60.0 / m_currentTempo;
+        note->SetRealTimeOffsetSeconds(stopRealTimeSeconds);
+    }
+}
+
+//----------------------------------------------------------------------------
+// InitMIDIFunctor
+//----------------------------------------------------------------------------
+
+InitMIDIFunctor::InitMIDIFunctor() : ConstFunctor()
+{
+    m_currentTempo = MIDI_TEMPO;
+}
+
 FunctorCode InitMIDIFunctor::VisitMeasure(const Measure *measure)
 {
     m_currentTempo = measure->GetCurrentTempo();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode InitMIDIFunctor::VisitOctave(const Octave *octave)
+{
+    const Measure *measure = vrv_cast<const Measure *>(octave->GetFirstAncestor(MEASURE));
+    assert(measure);
+    std::vector<const Staff *> staffList = octave->GetTstampStaves(measure, octave);
+    if (staffList.size() != 1) return FUNCTOR_CONTINUE;
+    const Staff *staff = staffList[0];
+
+    const bool raisePitch = (octave->GetDisPlace() != STAFFREL_basic_below);
+    int shift = 0;
+    switch (octave->GetDis()) {
+        case OCTAVE_DIS_8: shift = 1; break;
+        case OCTAVE_DIS_15: shift = 2; break;
+        case OCTAVE_DIS_22: shift = 3; break;
+        default: break;
+    }
+
+    const Layer *layer = vrv_cast<const Layer *>(raisePitch ? staff->GetFirst(LAYER) : staff->GetLast(LAYER));
+    assert(layer);
+
+    m_octaves.push_back({ octave, staff->GetN(), layer->GetN(), (raisePitch ? shift : -shift), false });
 
     return FUNCTOR_CONTINUE;
 }
@@ -347,10 +621,13 @@ GenerateMIDIFunctor::GenerateMIDIFunctor(smf::MidiFile *midiFile) : ConstFunctor
     m_totalTime = 0.0;
     m_staffN = 0;
     m_transSemi = 0;
+    m_octaveShift = 0;
     m_currentTempo = MIDI_TEMPO;
     m_lastNote = NULL;
-    m_accentedGraceNote = false;
-    m_cueExclusion = false;
+    m_noCue = false;
+    m_controlEvents = false;
+    m_instrDef = NULL;
+    m_customTuning = NULL;
 }
 
 FunctorCode GenerateMIDIFunctor::VisitBeatRpt(const BeatRpt *beatRpt)
@@ -411,7 +688,7 @@ FunctorCode GenerateMIDIFunctor::VisitBTrem(const BTrem *bTrem)
     auto expandNote = [this, noteInQuarterDur, num](const Object *obj) {
         const Note *note = vrv_cast<const Note *>(obj);
         assert(note);
-        const int pitch = note->GetMIDIPitch(m_transSemi);
+        const int pitch = this->GetMIDIPitch(note);
         const double totalInQuarterDur
             = note->GetScoreTimeDuration().ToDouble() + note->GetScoreTimeTiedDuration().ToDouble();
         int multiplicity = totalInQuarterDur / noteInQuarterDur;
@@ -442,69 +719,17 @@ FunctorCode GenerateMIDIFunctor::VisitBTrem(const BTrem *bTrem)
 
 FunctorCode GenerateMIDIFunctor::VisitChord(const Chord *chord)
 {
-    // Handle grace chords
-    if (chord->IsGraceNote()) {
-        std::set<int> pitches;
-        const ListOfConstObjects &notes = chord->GetList();
-        for (const Object *obj : notes) {
-            const Note *note = vrv_cast<const Note *>(obj);
-            assert(note);
-            pitches.insert(note->GetMIDIPitch(m_transSemi));
-        }
-
-        double quarterDuration = 0.0;
-        const data_DURATION dur = chord->GetDur();
-        if ((dur >= DURATION_long) && (dur <= DURATION_1024)) {
-            quarterDuration = pow(2.0, (DURATION_4 - dur));
-        }
-
-        m_graceNotes.push_back({ pitches, quarterDuration });
-
-        bool accented = (chord->GetGrace() == GRACE_acc);
-        const GraceGrp *graceGrp = vrv_cast<const GraceGrp *>(chord->GetFirstAncestor(GRACEGRP));
-        if (graceGrp && (graceGrp->GetGrace() == GRACE_acc)) accented = true;
-        m_accentedGraceNote = accented;
-
-        return FUNCTOR_SIBLINGS;
-    }
+    this->HandleOctave(chord);
 
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode GenerateMIDIFunctor::VisitFTrem(const FTrem *fTrem)
 {
+    this->HandleOctave(fTrem);
+
     if (fTrem->HasUnitdur()) {
         LogWarning("FTrem produces incorrect MIDI output");
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-FunctorCode GenerateMIDIFunctor::VisitGraceGrpEnd(const GraceGrp *graceGrp)
-{
-    // Handling of Nachschlag
-    if (!m_graceNotes.empty() && (graceGrp->GetAttach() == graceGrpLog_ATTACH_pre) && !m_accentedGraceNote
-        && m_lastNote) {
-        double startTime = m_totalTime + m_lastNote->GetScoreTimeOffset().ToDouble();
-        const double graceNoteDur = UNACC_GRACENOTE_DUR * m_currentTempo / 60000.0;
-        const double totalDur = graceNoteDur * m_graceNotes.size();
-        startTime -= totalDur;
-        startTime = std::max(startTime, 0.0);
-
-        int velocity = MIDI_VELOCITY;
-        if (m_lastNote->HasVel()) velocity = m_lastNote->GetVel();
-        const int tpq = m_midiFile->getTPQ();
-
-        for (const MIDIChord &chord : m_graceNotes) {
-            const double stopTime = startTime + graceNoteDur;
-            for (int pitch : chord.pitches) {
-                m_midiFile->addNoteOn(m_midiTrack, startTime * tpq, m_midiChannel, pitch, velocity);
-                m_midiFile->addNoteOff(m_midiTrack, stopTime * tpq, m_midiChannel, pitch);
-            }
-            startTime = stopTime;
-        }
-
-        m_graceNotes.clear();
     }
 
     return FUNCTOR_CONTINUE;
@@ -519,7 +744,7 @@ FunctorCode GenerateMIDIFunctor::VisitHalfmRpt(const HalfmRpt *halfmRpt)
 
 FunctorCode GenerateMIDIFunctor::VisitLayer(const Layer *layer)
 {
-    if ((layer->GetCue() == BOOLEAN_true) && m_cueExclusion) return FUNCTOR_SIBLINGS;
+    if ((layer->GetCue() == BOOLEAN_true) && m_noCue) return FUNCTOR_SIBLINGS;
 
     return FUNCTOR_CONTINUE;
 }
@@ -529,7 +754,8 @@ FunctorCode GenerateMIDIFunctor::VisitLayerEnd(const Layer *layer)
     // stop all previously held notes
     for (auto &held : m_heldNotes) {
         if (held.m_pitch > 0) {
-            m_midiFile->addNoteOff(m_midiTrack, held.m_stopTime * m_midiFile->getTPQ(), m_midiChannel, held.m_pitch);
+            m_midiFile->addNoteOff(
+                m_midiTrack, std::max(0.0, held.m_stopTime * m_midiFile->getTPQ() - 1), m_midiChannel, held.m_pitch);
         }
     }
 
@@ -541,6 +767,8 @@ FunctorCode GenerateMIDIFunctor::VisitLayerEnd(const Layer *layer)
 FunctorCode GenerateMIDIFunctor::VisitLayerElement(const LayerElement *layerElement)
 {
     if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
+    this->HandleOctave(layerElement);
 
     // Only resolve simple sameas links to avoid infinite recursion
     const LayerElement *sameas = dynamic_cast<const LayerElement *>(layerElement->GetSameasLink());
@@ -554,9 +782,9 @@ FunctorCode GenerateMIDIFunctor::VisitLayerElement(const LayerElement *layerElem
 FunctorCode GenerateMIDIFunctor::VisitMeasure(const Measure *measure)
 {
     // Here we need to update the m_totalTime from the starting time of the measure.
-    m_totalTime = measure->GetLastTimeOffset().ToDouble();
+    m_totalTime = measure->GetScoreTimeOnset().ToDouble();
 
-    if (measure->GetCurrentTempo() != m_currentTempo) {
+    if ((m_totalTime == 0.0) || (measure->GetCurrentTempo() != m_currentTempo)) {
         m_currentTempo = measure->GetCurrentTempo();
         const int tick = m_totalTime * m_midiFile->getTPQ();
         // Check if there was already a tempo event added for the given tick
@@ -577,13 +805,15 @@ FunctorCode GenerateMIDIFunctor::VisitMRpt(const MRpt *mRpt)
 
 FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
 {
+    this->HandleOctave(note);
+
     // Skip linked notes
     if (note->HasSameasLink()) {
         return FUNCTOR_SIBLINGS;
     }
 
     // Skip cue notes when midiNoCue is activated
-    if ((note->GetCue() == BOOLEAN_true) && m_cueExclusion) {
+    if ((note->GetCue() == BOOLEAN_true) && m_noCue) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -592,38 +822,12 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
         return FUNCTOR_SIBLINGS;
     }
 
-    // Handle grace notes
-    if (note->IsGraceNote()) {
-        const int pitch = note->GetMIDIPitch(m_transSemi);
-
-        double quarterDuration = 0.0;
-        const data_DURATION dur = note->GetDur();
-        if ((dur >= DURATION_long) && (dur <= DURATION_1024)) {
-            quarterDuration = pow(2.0, (DURATION_4 - dur));
-        }
-
-        m_graceNotes.push_back({ { pitch }, quarterDuration });
-
-        bool accented = (note->GetGrace() == GRACE_acc);
-        const GraceGrp *graceGrp = vrv_cast<const GraceGrp *>(note->GetFirstAncestor(GRACEGRP));
-        if (graceGrp && (graceGrp->GetGrace() == GRACE_acc)) accented = true;
-        m_accentedGraceNote = accented;
-
-        return FUNCTOR_SIBLINGS;
-    }
+    const int velocity = (note->HasVel()) ? note->GetVel() : MIDI_VELOCITY;
+    if (!velocity) return FUNCTOR_SIBLINGS;
 
     const int channel = m_midiChannel;
-    int velocity = MIDI_VELOCITY;
-    if (note->HasVel()) velocity = note->GetVel();
-
-    double startTime = m_totalTime + note->GetScoreTimeOnset().ToDouble();
     const int tpq = m_midiFile->getTPQ();
-
-    // Check if some grace notes must be performed
-    if (!m_graceNotes.empty()) {
-        this->GenerateGraceNoteMIDI(note, startTime, tpq, channel, velocity);
-        m_graceNotes.clear();
-    }
+    double startTime = m_totalTime + note->GetScoreTimeOnset().ToDouble();
 
     // Check if note is deferred
     if (m_deferredNotes.find(note) != m_deferredNotes.end()) {
@@ -638,13 +842,13 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
             const double stopTime = startTime + midiNote.duration;
 
             m_midiFile->addNoteOn(m_midiTrack, startTime * tpq, channel, midiNote.pitch, velocity);
-            m_midiFile->addNoteOff(m_midiTrack, stopTime * tpq, channel, midiNote.pitch);
+            m_midiFile->addNoteOff(m_midiTrack, std::max(0.0, stopTime * tpq - 1), channel, midiNote.pitch);
 
             startTime = stopTime;
         }
     }
     else {
-        const int pitch = note->GetMIDIPitch(m_transSemi);
+        const int pitch = this->GetMIDIPitch(note);
 
         if (note->HasTabCourse() && (note->GetTabCourse() >= 1)) {
             // Tablature 'rule of holds'.  A note on a course is held until the next note
@@ -664,7 +868,8 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
             // or if the new pitch is already sounding, on any course
             for (auto &held : m_heldNotes) {
                 if ((held.m_pitch > 0) && ((held.m_stopTime <= startTime) || (held.m_pitch == pitch))) {
-                    m_midiFile->addNoteOff(m_midiTrack, held.m_stopTime * tpq, channel, held.m_pitch);
+                    m_midiFile->addNoteOff(
+                        m_midiTrack, std::max(0.0, held.m_stopTime * tpq - 1), channel, held.m_pitch);
                     held.m_pitch = 0;
                     held.m_stopTime = 0;
                 }
@@ -686,7 +891,7 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
                 = m_totalTime + note->GetScoreTimeOffset().ToDouble() + note->GetScoreTimeTiedDuration().ToDouble();
 
             m_midiFile->addNoteOn(m_midiTrack, startTime * tpq, channel, pitch, velocity);
-            m_midiFile->addNoteOff(m_midiTrack, stopTime * tpq, channel, pitch);
+            m_midiFile->addNoteOff(m_midiTrack, std::max(0.0, stopTime * tpq - 1), channel, pitch);
         }
     }
 
@@ -699,6 +904,19 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
 FunctorCode GenerateMIDIFunctor::VisitPedal(const Pedal *pedal)
 {
     if (!pedal->HasDir()) return FUNCTOR_CONTINUE;
+
+    // Check the functor flag - filters should always be there, but just in case we change how it is called
+    if (!m_controlEvents || !this->GetFilters()) return FUNCTOR_CONTINUE;
+
+    // Check if the pedal applies to the staff filtered
+    const Measure *measure = vrv_cast<const Measure *>(pedal->GetFirstAncestor(MEASURE));
+    assert(measure);
+    std::vector<const Staff *> staffList = pedal->GetTstampStaves(measure, pedal);
+    bool applies = false;
+    for (const Staff *staff : staffList) {
+        applies = (applies || this->GetFilters()->Apply(staff));
+    }
+    if (!applies) return FUNCTOR_CONTINUE;
 
     double pedalTime = pedal->GetStart()->GetAlignment()->GetTime().ToDouble() * SCORE_TIME_UNIT;
     double startTime = m_totalTime + pedalTime;
@@ -727,7 +945,7 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
         const Object *next = parent->GetNext(scoreDef);
         if (next && next->Is(MEASURE)) {
             const Measure *nextMeasure = vrv_cast<const Measure *>(next);
-            totalTime = nextMeasure->GetLastTimeOffset().ToDouble();
+            totalTime = nextMeasure->GetScoreTimeOnset().ToDouble();
         }
     }
     const double currentTick = totalTime * m_midiFile->getTPQ();
@@ -739,8 +957,22 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
     if (scoreDef->HasTunePname()) {
         referencePitchClass = Note::PnameToPclass(scoreDef->GetTunePname());
     }
+    // set and remember custom tuning if available
+    if (scoreDef->GetCustomTuning().IsValid()) {
+        m_customTuning = &scoreDef->GetCustomTuning();
+        const int program = m_instrDef && m_instrDef->HasMidiInstrnum() ? m_instrDef->GetMidiInstrnum() : 0;
+        const Tunings::Tuning &tuneCustom = scoreDef->GetCustomTuning().GetTuning();
+        std::vector<std::pair<int, double>> mapping;
+        // sysex messages should not have the high bit (0x80) set, which means that the full 128 MIDI notes
+        // cannot be retuned in the same sysex message. For now, we skip MIDI key 0.
+        for (int i = 1; i < 128; i++) {
+            mapping.push_back(std::make_pair(i, tuneCustom.frequencyForMidiNote(i)));
+        }
+        midiEvent.makeMts2_KeyTuningsByFrequency(mapping, program);
+        m_midiFile->addEvent(m_midiTrack, midiEvent);
+    }
     // set temperament event if corresponding attribute present
-    if (scoreDef->HasTuneTemper()) {
+    else if (scoreDef->HasTuneTemper()) {
         switch (scoreDef->GetTuneTemper()) {
             case TEMPERAMENT_equal: midiEvent.makeTemperamentEqual(referencePitchClass); break;
             case TEMPERAMENT_just: midiEvent.makeTemperamentBad(100.0, referencePitchClass); break;
@@ -776,6 +1008,10 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
         if (meterSig && meterSig->HasCount() && meterSig->HasUnit()) {
             m_midiFile->addTimeSignature(m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetUnit());
         }
+        else if (meterSig && meterSig->HasUnit()) {
+            m_midiFile->addTimeSignature(
+                m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetSymImplicitUnit());
+        }
     }
 
     return FUNCTOR_CONTINUE;
@@ -783,6 +1019,8 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
 
 FunctorCode GenerateMIDIFunctor::VisitStaff(const Staff *staff)
 {
+    if (staff->IsOssia()) return FUNCTOR_SIBLINGS;
+
     m_expandedNotes.clear();
 
     return FUNCTOR_CONTINUE;
@@ -800,7 +1038,17 @@ FunctorCode GenerateMIDIFunctor::VisitStaffDef(const StaffDef *staffDef)
 
 FunctorCode GenerateMIDIFunctor::VisitSyl(const Syl *syl)
 {
-    const double startTime = m_totalTime + m_lastNote->GetScoreTimeOnset().ToDouble();
+    const Note *note = NULL;
+    if (syl->GetFirstAncestor(CHORD)) {
+        const Chord *parentChord = vrv_cast<const Chord *>(syl->GetFirstAncestor(CHORD));
+        note = vrv_cast<const Note *>(parentChord->GetFirst(NOTE));
+    }
+    else {
+        note = vrv_cast<const Note *>(syl->GetFirstAncestor(NOTE));
+    }
+    if (!note) return FUNCTOR_CONTINUE;
+
+    const double startTime = m_totalTime + note->GetScoreTimeOnset().ToDouble();
     const std::string sylText = UTF32to8(syl->GetText());
 
     m_midiFile->addLyric(m_midiTrack, startTime * m_midiFile->getTPQ(), sylText);
@@ -842,34 +1090,47 @@ void GenerateMIDIFunctor::DeferMIDINote(const Note *refNote, double shift, bool 
     }
 }
 
-void GenerateMIDIFunctor::GenerateGraceNoteMIDI(
-    const Note *refNote, double startTime, int tpq, int channel, int velocity)
+void GenerateMIDIFunctor::HandleOctave(const LayerElement *layerElement)
 {
-    double graceNoteDur = 0.0;
-    if (m_accentedGraceNote && !m_graceNotes.empty()) {
-        const double totalDur = refNote->GetScoreTimeDuration().ToDouble() / 2.0;
-        this->DeferMIDINote(refNote, totalDur, true);
-        graceNoteDur = totalDur / m_graceNotes.size();
-    }
-    else {
-        graceNoteDur = UNACC_GRACENOTE_DUR * m_currentTempo / 60000.0;
-        const double totalDur = graceNoteDur * m_graceNotes.size();
-        if (startTime >= totalDur) {
-            startTime -= totalDur;
+    // Handle octave end
+    auto octaveIter = std::find_if(m_octaves.begin(), m_octaves.end(), [this, layerElement](const OctaveInfo &octave) {
+        if (octave.isActive && (octave.staffN == m_staffN) && (octave.layerN == m_layerN)) {
+            const Alignment *endAlignment = octave.octave->GetEnd()->GetAlignment();
+            const Alignment *alignment = layerElement->GetAlignment();
+            if (endAlignment && alignment) {
+                return *endAlignment < *alignment;
+            }
         }
-        else {
-            this->DeferMIDINote(refNote, totalDur, true);
-        }
+        return false;
+    });
+    if (octaveIter != m_octaves.end()) {
+        m_octaveShift -= octaveIter->octaveShift;
+        m_octaves.erase(octaveIter);
     }
 
-    for (const MIDIChord &chord : m_graceNotes) {
-        const double stopTime = startTime + graceNoteDur;
-        for (int pitch : chord.pitches) {
-            m_midiFile->addNoteOn(m_midiTrack, startTime * tpq, channel, pitch, velocity);
-            m_midiFile->addNoteOff(m_midiTrack, stopTime * tpq, channel, pitch);
+    // Handle octave begin
+    octaveIter = std::find_if(m_octaves.begin(), m_octaves.end(), [this, layerElement](const OctaveInfo &octave) {
+        if (!octave.isActive && (octave.staffN == m_staffN) && (octave.layerN == m_layerN)) {
+            const Alignment *startAlignment = octave.octave->GetStart()->GetAlignment();
+            const Alignment *alignment = layerElement->GetAlignment();
+            if (startAlignment && alignment) {
+                return *startAlignment <= *alignment;
+            }
         }
-        startTime = stopTime;
+        return false;
+    });
+    if (octaveIter != m_octaves.end()) {
+        m_octaveShift += octaveIter->octaveShift;
+        octaveIter->isActive = true;
     }
+}
+
+int GenerateMIDIFunctor::GetMIDIPitch(const Note *note)
+{
+    if (m_customTuning && m_customTuning->IsValid()) {
+        return m_customTuning->GetMIDIPitch(note, m_transSemi, m_octaveShift);
+    }
+    return note->GetMIDIPitch(m_transSemi, m_octaveShift);
 }
 
 //----------------------------------------------------------------------------
@@ -878,10 +1139,10 @@ void GenerateMIDIFunctor::GenerateGraceNoteMIDI(
 
 GenerateTimemapFunctor::GenerateTimemapFunctor(Timemap *timemap) : ConstFunctor()
 {
-    m_scoreTimeOffset = 0;
-    m_realTimeOffsetMilliseconds = 0.0;
+    m_currentScoreTime = 0;
+    m_currentRealTimeMilliseconds = 0.0;
     m_currentTempo = MIDI_TEMPO;
-    m_cueExclusion = false;
+    m_noCue = false;
     m_timemap = timemap;
 }
 
@@ -900,8 +1161,8 @@ FunctorCode GenerateTimemapFunctor::VisitLayerElement(const LayerElement *layerE
 
 FunctorCode GenerateTimemapFunctor::VisitMeasure(const Measure *measure)
 {
-    m_scoreTimeOffset = measure->GetLastTimeOffset();
-    m_realTimeOffsetMilliseconds = measure->GetLastRealTimeOffset();
+    m_currentScoreTime = measure->GetScoreTimeOnset();
+    m_currentRealTimeMilliseconds = measure->GetRealTimeOnsetMilliseconds();
     m_currentTempo = measure->GetCurrentTempo();
 
     this->AddTimemapEntry(measure);
@@ -909,12 +1170,24 @@ FunctorCode GenerateTimemapFunctor::VisitMeasure(const Measure *measure)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode GenerateTimemapFunctor::VisitMRest(const MRest *mRest)
+{
+    this->AddTimemapEntry(mRest);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode GenerateTimemapFunctor::VisitMultiRest(const MultiRest *multiRest)
+{
+    this->AddTimemapEntry(multiRest);
+
+    return FUNCTOR_SIBLINGS;
+}
+
 FunctorCode GenerateTimemapFunctor::VisitNote(const Note *note)
 {
-    if (note->HasGrace()) return FUNCTOR_SIBLINGS;
-
     // Skip cue notes when midiNoCue is activated
-    if ((note->GetCue() == BOOLEAN_true) && m_cueExclusion) {
+    if ((note->GetCue() == BOOLEAN_true) && m_noCue) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -933,6 +1206,13 @@ FunctorCode GenerateTimemapFunctor::VisitRest(const Rest *rest)
     return FUNCTOR_SIBLINGS;
 }
 
+FunctorCode GenerateTimemapFunctor::VisitStaff(const Staff *staff)
+{
+    if (staff->IsOssia()) return FUNCTOR_SIBLINGS;
+
+    return FUNCTOR_CONTINUE;
+}
+
 void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)
 {
     assert(object);
@@ -941,21 +1221,21 @@ void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)
         const DurationInterface *interface = object->GetDurationInterface();
         assert(interface);
 
-        double realTimeStart = round(m_realTimeOffsetMilliseconds + interface->GetRealTimeOnsetMilliseconds());
-        Fraction scoreTimeStart = m_scoreTimeOffset + interface->GetScoreTimeOnset();
+        Fraction scoreTimeStart = m_currentScoreTime + interface->GetScoreTimeOnset();
+        double realTimeStart = round(m_currentRealTimeMilliseconds + interface->GetRealTimeOnsetMilliseconds());
 
-        double realTimeEnd = round(m_realTimeOffsetMilliseconds + interface->GetRealTimeOffsetMilliseconds());
-        Fraction scoreTimeEnd = m_scoreTimeOffset + interface->GetScoreTimeOffset();
+        Fraction scoreTimeEnd = m_currentScoreTime + interface->GetScoreTimeOffset();
+        double realTimeEnd = round(m_currentRealTimeMilliseconds + interface->GetRealTimeOffsetMilliseconds());
 
         bool isRest = (object->Is(REST));
 
         /*********** start values ***********/
 
-        TimemapEntry &startEntry = m_timemap->GetEntry(realTimeStart);
+        TimemapEntry &startEntry = m_timemap->GetEntry(scoreTimeStart);
 
         // Should check if value for realTimeStart already exists and if so, then
         // ensure that it is equal to scoreTimeStart:
-        startEntry.qstamp = scoreTimeStart.ToDouble();
+        startEntry.tstamp = realTimeStart;
 
         // Store the element ID in list to turn on at given time - note or rest
         if (!isRest) startEntry.notesOn.push_back(object->GetID());
@@ -966,33 +1246,62 @@ void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)
 
         /*********** end values ***********/
 
-        TimemapEntry &endEntry = m_timemap->GetEntry(realTimeEnd);
+        TimemapEntry &endEntry = m_timemap->GetEntry(scoreTimeEnd);
 
         // Should check if value for realTimeEnd already exists and if so, then
         // ensure that it is equal to scoreTimeEnd:
-        endEntry.qstamp = scoreTimeEnd.ToDouble();
+        endEntry.tstamp = realTimeEnd;
 
         // Store the element ID in list to turn off at given time - notes or rest
         if (!isRest) endEntry.notesOff.push_back(object->GetID());
         if (isRest) endEntry.restsOff.push_back(object->GetID());
     }
     else if (object->Is(MEASURE)) {
-
         const Measure *measure = vrv_cast<const Measure *>(object);
         assert(measure);
 
         // Deal with repeated music later, for now get the last times.
-        Fraction scoreTimeStart = m_scoreTimeOffset;
-        double realTimeStart = round(m_realTimeOffsetMilliseconds);
+        Fraction scoreTimeStart = m_currentScoreTime;
+        double realTimeStart = round(m_currentRealTimeMilliseconds);
 
-        TimemapEntry &startEntry = m_timemap->GetEntry(realTimeStart);
+        TimemapEntry &startEntry = m_timemap->GetEntry(scoreTimeStart);
 
         // Should check if value for realTimeStart already exists and if so, then
         // ensure that it is equal to scoreTimeStart:
-        startEntry.qstamp = scoreTimeStart.ToDouble();
+        startEntry.tstamp = realTimeStart;
 
         // Add the measureOn
         startEntry.measureOn = measure->GetID();
+    }
+    else if (object->Is({ MREST, MULTIREST })) {
+        // Get the ancestor measure
+        const Measure *measure = vrv_cast<const Measure *>(object->GetFirstAncestor(MEASURE));
+        assert(measure);
+
+        Fraction scoreTimeStart = m_currentScoreTime;
+        double realTimeStart = round(m_currentRealTimeMilliseconds);
+        Fraction scoreTimeEnd = measure->GetScoreTimeOffset();
+        double realTimeEnd = round(measure->GetRealTimeOffsetMilliseconds());
+
+        /*********** start values ***********/
+
+        TimemapEntry &startEntry = m_timemap->GetEntry(scoreTimeStart);
+
+        // Should check if a value for realTimeStart already exists and if so, then
+        // ensure that it is equal to scoreTimeStart:
+        startEntry.tstamp = realTimeStart;
+
+        // Store the element ID in list to turn on at given time
+        startEntry.restsOn.push_back(object->GetID());
+
+        /*********** end values ***********/
+
+        TimemapEntry &endEntry = m_timemap->GetEntry(scoreTimeEnd);
+
+        endEntry.tstamp = realTimeEnd;
+
+        // Store the element ID in list to turn off at given time
+        endEntry.restsOff.push_back(object->GetID());
     }
 }
 

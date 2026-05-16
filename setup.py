@@ -91,7 +91,7 @@ else:
 
 verovio_module = Extension('verovio._verovio',
                            sources=
-                                glob('./src/*.cpp') + 
+                                glob('./src/*.cpp') +
                                 glob('./src/hum/*.cpp') +
                                 glob('./libmei/dist/*.cpp') +
                                 glob('./libmei/addons/*.cpp') +
@@ -105,14 +105,15 @@ verovio_module = Extension('verovio._verovio',
                                './src/midi/MidiFile.cpp',
                                './src/midi/MidiMessage.cpp',
                                './bindings/python/verovio.i'],
-                           swig_opts=['-c++', '-outdir',
-                                      './bindings/python', '-doxygen'],
+                           swig_opts=['-c++', '-fastproxy', '-olddefs',
+                                      '-outdir', './bindings/python', '-doxygen'],
                            include_dirs=['./include/vrv',
                                          './include/crc',
                                          './include/json',
                                          './include/midi',
                                          './include/hum',
                                          './include/pugi',
+                                         './include/tuning-library',
                                          './include/win32',
                                          './include/zip',
                                          './libmei/dist',
@@ -148,6 +149,7 @@ setup(name='verovio',
       package_dir={'verovio': './bindings/python',
                    'verovio.data': './data'},
       package_data={
+          'verovio': ['py.typed'],
           'verovio.data': [f for f in os.listdir('./data') if (f.endswith('.xml') or f.endswith(".css") or f.endswith(".svg"))],
           'verovio.data.Bravura': os.listdir('./data/Bravura'),
           'verovio.data.Gootville': os.listdir('./data/Gootville'),
@@ -156,7 +158,7 @@ setup(name='verovio',
           'verovio.data.Petaluma': os.listdir('./data/Petaluma'),
           'verovio.data.text': os.listdir('./data/text'),
       },
-      python_requires='>=3.7',
+      python_requires='>=3.9',
       project_urls={
           'Bug Reports': 'https://github.com/rism-digital/verovio/issues',
           'Source': 'https://github.com/rism-digital/verovio',

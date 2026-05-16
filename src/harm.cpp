@@ -33,7 +33,7 @@ namespace vrv {
 static const ClassRegistrar<Harm> s_factory("harm", HARM);
 
 Harm::Harm()
-    : ControlElement(HARM, "harm-")
+    : ControlElement(HARM)
     , TextListInterface()
     , TextDirInterface()
     , TimeSpanningInterface()
@@ -59,21 +59,19 @@ void Harm::Reset()
     this->ResetNNumberLike();
 }
 
-bool Harm::IsSupportedChild(Object *child)
+bool Harm::IsSupportedChild(ClassId classId)
 {
-    if (child->Is({ LB, REND, TEXT })) {
-        assert(dynamic_cast<TextElement *>(child));
+    static const std::vector<ClassId> supported{ FB, LB, REND, TEXT };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(FB)) {
-        assert(dynamic_cast<Fb *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 bool Harm::GetRootPitch(TransPitch &pitch, unsigned int &pos) const

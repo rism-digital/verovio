@@ -37,12 +37,26 @@ public:
     virtual ~Surface();
     Object *Clone() const override { return new Surface(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Surface"; }
+    std::string GetClassName() const override { return "surface"; }
     ///@}
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     int GetMaxX() const;
     int GetMaxY() const;
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 protected:
     //

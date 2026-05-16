@@ -35,14 +35,14 @@ public:
     virtual ~BTrem();
     Object *Clone() const override { return new BTrem(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "BTrem"; }
+    std::string GetClassName() const override { return "bTrem"; }
     ///@}
 
     /**
      * Add an element (a note or a chord) to a fTrem.
      * Only Note or Chord elements will be actually added to the fTrem.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Get stem mod if encoded explicitly, or determine based on duration of bTrem and underlying elements

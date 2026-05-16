@@ -25,7 +25,6 @@ namespace vrv {
  */
 class Fermata : public ControlElement,
                 public TimePointInterface,
-                public AttColor,
                 public AttEnclosingChars,
                 public AttExtSymAuth,
                 public AttExtSymNames,
@@ -41,7 +40,7 @@ public:
     virtual ~Fermata();
     Object *Clone() const override { return new Fermata(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Fermata"; }
+    std::string GetClassName() const override { return "fermata"; }
     ///@}
 
     /**

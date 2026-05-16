@@ -12,6 +12,7 @@
 #include "atts_neumes.h"
 #include "atts_shared.h"
 #include "layerelement.h"
+#include "offsetinterface.h"
 
 namespace vrv {
 
@@ -23,6 +24,7 @@ namespace vrv {
  * This class models the MEI <divLine> element.
  */
 class DivLine : public LayerElement,
+                public OffsetInterface,
                 public AttColor,
                 public AttDivLineLog,
                 public AttExtSymAuth,
@@ -39,7 +41,15 @@ public:
     virtual ~DivLine();
     Object *Clone() const override { return new DivLine(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "DivLine"; }
+    std::string GetClassName() const override { return "divLine"; }
+    ///@}
+
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    OffsetInterface *GetOffsetInterface() override { return vrv_cast<OffsetInterface *>(this); }
+    const OffsetInterface *GetOffsetInterface() const override { return vrv_cast<const OffsetInterface *>(this); }
     ///@}
 
     /** Override the method since alignment is required */
@@ -85,7 +95,7 @@ public:
     DivLineAttr();
     virtual ~DivLineAttr();
     Object *Clone() const override { return new DivLineAttr(*this); }
-    std::string GetClassName() const override { return "DivLineAttr"; }
+    std::string GetClassName() const override { return "divLineAttr"; }
     ///@}
 
     // void SetLeft() { m_isLeft = true; }

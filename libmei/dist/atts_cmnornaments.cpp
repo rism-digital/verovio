@@ -28,7 +28,7 @@ namespace vrv {
 
 AttMordentLog::AttMordentLog() : Att()
 {
-    ResetMordentLog();
+    this->ResetMordentLog();
 }
 
 void AttMordentLog::ResetMordentLog()
@@ -83,7 +83,7 @@ bool AttMordentLog::HasLong() const
 
 AttOrnamPresent::AttOrnamPresent() : Att()
 {
-    ResetOrnamPresent();
+    this->ResetOrnamPresent();
 }
 
 void AttOrnamPresent::ResetOrnamPresent()
@@ -123,7 +123,7 @@ bool AttOrnamPresent::HasOrnam() const
 
 AttOrnamentAccid::AttOrnamentAccid() : Att()
 {
-    ResetOrnamentAccid();
+    this->ResetOrnamentAccid();
 }
 
 void AttOrnamentAccid::ResetOrnamentAccid()
@@ -178,7 +178,7 @@ bool AttOrnamentAccid::HasAccidlower() const
 
 AttTurnLog::AttTurnLog() : Att()
 {
-    ResetTurnLog();
+    this->ResetTurnLog();
 }
 
 void AttTurnLog::ResetTurnLog()

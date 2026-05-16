@@ -45,7 +45,7 @@ FunctorCode AdjustArpegFunctor::VisitAlignment(Alignment *alignment)
             ++iter;
             continue;
         }
-        // We are now in an alignment preceeding an arpeg - check for overlap
+        // We are now in an alignment preceding an arpeg - check for overlap
         int minLeft, maxRight;
         alignment->GetLeftRight(std::get<2>(*iter), minLeft, maxRight);
 

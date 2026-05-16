@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
+#include "functor.h"
 #include "surface.h"
 #include "vrv.h"
 #include "zone.h"
@@ -26,22 +27,22 @@ namespace vrv {
 
 static const ClassRegistrar<Facsimile> s_factory("facsimile", FACSIMILE);
 
-Facsimile::Facsimile() : Object(FACSIMILE, "facsimile-"), AttTyped() {}
+Facsimile::Facsimile() : Object(FACSIMILE), AttTyped() {}
 
 Facsimile::~Facsimile() {}
 
 void Facsimile::Reset() {}
 
-bool Facsimile::IsSupportedChild(Object *object)
+bool Facsimile::IsSupportedChild(ClassId classId)
 {
-    if (object->Is(SURFACE)) {
-        assert(dynamic_cast<Surface *>(object));
+    static const std::vector<ClassId> supported{ SURFACE };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
-        LogError("Unsupported child '%s' of facsimile", object->GetClassName().c_str());
         return false;
     }
-    return true;
 }
 
 Zone *Facsimile::FindZoneByID(const std::string &zoneId)
@@ -78,6 +79,30 @@ int Facsimile::GetMaxY() const
         max = (surface->GetMaxY() > max) ? surface->GetMaxY() : max;
     }
     return max;
+}
+
+//----------------------------------------------------------------------------
+// Functor methods
+//----------------------------------------------------------------------------
+
+FunctorCode Facsimile::Accept(Functor &functor)
+{
+    return functor.VisitFacsimile(this);
+}
+
+FunctorCode Facsimile::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitFacsimile(this);
+}
+
+FunctorCode Facsimile::AcceptEnd(Functor &functor)
+{
+    return functor.VisitFacsimileEnd(this);
+}
+
+FunctorCode Facsimile::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitFacsimileEnd(this);
 }
 
 } // namespace vrv

@@ -94,11 +94,20 @@ enum {
     SMUFL_E0A5_noteheadNull = 0xE0A5,
     SMUFL_E0A9_noteheadXBlack = 0xE0A9,
     SMUFL_E0AF_noteheadPlusBlack = 0xE0AF,
+    SMUFL_E0B3_noteheadCircleX = 0xE0B3,
     SMUFL_E0B5_noteheadWholeWithX = 0xE0B5,
     SMUFL_E0B6_noteheadHalfWithX = 0xE0B6,
     SMUFL_E0B7_noteheadVoidWithX = 0xE0B7,
     SMUFL_E0B8_noteheadSquareWhite = 0xE0B8,
     SMUFL_E0B9_noteheadSquareBlack = 0xE0B9,
+    SMUFL_E0CF_noteheadSlashedBlack1 = 0xE0CF,
+    SMUFL_E0D0_noteheadSlashedBlack2 = 0xE0D0,
+    SMUFL_E0D1_noteheadSlashedHalf1 = 0xE0D1,
+    SMUFL_E0D2_noteheadSlashedHalf2 = 0xE0D2,
+    SMUFL_E0D3_noteheadSlashedWhole1 = 0xE0D3,
+    SMUFL_E0D4_noteheadSlashedWhole2 = 0xE0D4,
+    SMUFL_E0D5_noteheadSlashedDoubleWhole1 = 0xE0D5,
+    SMUFL_E0D6_noteheadSlashedDoubleWhole2 = 0xE0D6,
     SMUFL_E0D9_noteheadDiamondHalf = 0xE0D9,
     SMUFL_E0DA_noteheadDiamondHalfWide = 0xE0DA,
     SMUFL_E0DB_noteheadDiamondBlack = 0xE0DB,
@@ -231,6 +240,7 @@ enum {
     SMUFL_E4D2_caesuraThick = 0xE4D2,
     SMUFL_E4D3_caesuraShort = 0xE4D3,
     SMUFL_E4D4_caesuraCurved = 0xE4D4,
+    SMUFL_E4D5_breathMarkSalzedo = 0xE4D5,
     SMUFL_E4D7_caesuraSingleStroke = 0xE4D7,
     SMUFL_E4E0_restMaxima = 0xE4E0,
     SMUFL_E4E1_restLonga = 0xE4E1,
@@ -403,6 +413,7 @@ enum {
     SMUFL_E8F6_chantDivisioFinalis = 0xE8F6,
     SMUFL_E8F7_chantVirgula = 0xE8F7,
     SMUFL_E8F8_chantCaesura = 0xE8F8,
+    SMUFL_E900_mensuralGclef = 0xE900,
     SMUFL_E901_mensuralGclefPetrucci = 0xE901,
     SMUFL_E902_chantFclef = 0xE902,
     SMUFL_E903_mensuralFclef = 0xE903,
@@ -504,6 +515,7 @@ enum {
     SMUFL_E9F8_mensuralRestSemifusa = 0xE9F8,
     SMUFL_EA02_mensuralCustosUp = 0xEA02,
     SMUFL_EA06_chantCustosStemUpPosMiddle = 0xEA06,
+    SMUFL_EA29_medRenStrophicusCMN = 0xEA29,
     SMUFL_EA2A_medRenOriscusCMN = 0xEA2A,
     SMUFL_EA50_figbass0 = 0xEA50,
     SMUFL_EA51_figbass1 = 0xEA51,
@@ -660,7 +672,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 635
+#define SMUFL_COUNT 647
 
 } // namespace vrv
 

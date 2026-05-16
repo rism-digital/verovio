@@ -25,7 +25,11 @@ class Measure;
  * This class represents a MEI meterSigGrp.
  * It contains meterSigGrp objects.
  */
-class MeterSigGrp : public LayerElement, public ObjectListInterface, public AttBasic, public AttMeterSigGrpLog {
+class MeterSigGrp : public LayerElement,
+                    public ObjectListInterface,
+                    public AttBasic,
+                    public AttMeterSigGrpLog,
+                    public AttVisibility {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -36,14 +40,14 @@ public:
     virtual ~MeterSigGrp();
     Object *Clone() const override { return new MeterSigGrp(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "MeterSigGrp"; }
+    std::string GetClassName() const override { return "meterSigGrp"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
     ///@}
 
     /** Override the method since check is required */

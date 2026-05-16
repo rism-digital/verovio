@@ -28,7 +28,7 @@ namespace vrv {
 
 AttHarmAnl::AttHarmAnl() : Att()
 {
-    ResetHarmAnl();
+    this->ResetHarmAnl();
 }
 
 void AttHarmAnl::ResetHarmAnl()
@@ -68,7 +68,7 @@ bool AttHarmAnl::HasForm() const
 
 AttHarmonicFunction::AttHarmonicFunction() : Att()
 {
-    ResetHarmonicFunction();
+    this->ResetHarmonicFunction();
 }
 
 void AttHarmonicFunction::ResetHarmonicFunction()
@@ -108,7 +108,7 @@ bool AttHarmonicFunction::HasDeg() const
 
 AttIntervalHarmonic::AttIntervalHarmonic() : Att()
 {
-    ResetIntervalHarmonic();
+    this->ResetIntervalHarmonic();
 }
 
 void AttIntervalHarmonic::ResetIntervalHarmonic()
@@ -148,7 +148,7 @@ bool AttIntervalHarmonic::HasInth() const
 
 AttIntervalMelodic::AttIntervalMelodic() : Att()
 {
-    ResetIntervalMelodic();
+    this->ResetIntervalMelodic();
 }
 
 void AttIntervalMelodic::ResetIntervalMelodic()
@@ -183,17 +183,72 @@ bool AttIntervalMelodic::HasIntm() const
 }
 
 //----------------------------------------------------------------------------
+// AttKeySigAnl
+//----------------------------------------------------------------------------
+
+AttKeySigAnl::AttKeySigAnl() : Att()
+{
+    this->ResetKeySigAnl();
+}
+
+void AttKeySigAnl::ResetKeySigAnl()
+{
+    m_accid = ACCIDENTAL_GESTURAL_basic_NONE;
+    m_mode = MODE_NONE;
+}
+
+bool AttKeySigAnl::ReadKeySigAnl(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("accid")) {
+        this->SetAccid(StrToAccidentalGesturalBasic(element.attribute("accid").value()));
+        if (removeAttr) element.remove_attribute("accid");
+        hasAttribute = true;
+    }
+    if (element.attribute("mode")) {
+        this->SetMode(StrToMode(element.attribute("mode").value()));
+        if (removeAttr) element.remove_attribute("mode");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttKeySigAnl::WriteKeySigAnl(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasAccid()) {
+        element.append_attribute("accid") = AccidentalGesturalBasicToStr(this->GetAccid()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasMode()) {
+        element.append_attribute("mode") = ModeToStr(this->GetMode()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttKeySigAnl::HasAccid() const
+{
+    return (m_accid != ACCIDENTAL_GESTURAL_basic_NONE);
+}
+
+bool AttKeySigAnl::HasMode() const
+{
+    return (m_mode != MODE_NONE);
+}
+
+//----------------------------------------------------------------------------
 // AttKeySigDefaultAnl
 //----------------------------------------------------------------------------
 
 AttKeySigDefaultAnl::AttKeySigDefaultAnl() : Att()
 {
-    ResetKeySigDefaultAnl();
+    this->ResetKeySigDefaultAnl();
 }
 
 void AttKeySigDefaultAnl::ResetKeySigDefaultAnl()
 {
-    m_keyAccid = ACCIDENTAL_GESTURAL_NONE;
+    m_keyAccid = ACCIDENTAL_GESTURAL_basic_NONE;
     m_keyMode = MODE_NONE;
     m_keyPname = PITCHNAME_NONE;
 }
@@ -202,7 +257,7 @@ bool AttKeySigDefaultAnl::ReadKeySigDefaultAnl(pugi::xml_node element, bool remo
 {
     bool hasAttribute = false;
     if (element.attribute("key.accid")) {
-        this->SetKeyAccid(StrToAccidentalGestural(element.attribute("key.accid").value()));
+        this->SetKeyAccid(StrToAccidentalGesturalBasic(element.attribute("key.accid").value()));
         if (removeAttr) element.remove_attribute("key.accid");
         hasAttribute = true;
     }
@@ -223,7 +278,7 @@ bool AttKeySigDefaultAnl::WriteKeySigDefaultAnl(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasKeyAccid()) {
-        element.append_attribute("key.accid") = AccidentalGesturalToStr(this->GetKeyAccid()).c_str();
+        element.append_attribute("key.accid") = AccidentalGesturalBasicToStr(this->GetKeyAccid()).c_str();
         wroteAttribute = true;
     }
     if (this->HasKeyMode()) {
@@ -239,7 +294,7 @@ bool AttKeySigDefaultAnl::WriteKeySigDefaultAnl(pugi::xml_node element)
 
 bool AttKeySigDefaultAnl::HasKeyAccid() const
 {
-    return (m_keyAccid != ACCIDENTAL_GESTURAL_NONE);
+    return (m_keyAccid != ACCIDENTAL_GESTURAL_basic_NONE);
 }
 
 bool AttKeySigDefaultAnl::HasKeyMode() const
@@ -258,7 +313,7 @@ bool AttKeySigDefaultAnl::HasKeyPname() const
 
 AttMelodicFunction::AttMelodicFunction() : Att()
 {
-    ResetMelodicFunction();
+    this->ResetMelodicFunction();
 }
 
 void AttMelodicFunction::ResetMelodicFunction()
@@ -298,7 +353,7 @@ bool AttMelodicFunction::HasMfunc() const
 
 AttPitchClass::AttPitchClass() : Att()
 {
-    ResetPitchClass();
+    this->ResetPitchClass();
 }
 
 void AttPitchClass::ResetPitchClass()
@@ -338,7 +393,7 @@ bool AttPitchClass::HasPclass() const
 
 AttSolfa::AttSolfa() : Att()
 {
-    ResetSolfa();
+    this->ResetSolfa();
 }
 
 void AttSolfa::ResetSolfa()

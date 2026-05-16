@@ -35,131 +35,6 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Fraction
-//----------------------------------------------------------------------------
-
-Fraction::Fraction(int num, int denom) : m_numerator(num), m_denominator(denom)
-{
-    if (denom == 0) {
-        LogDebug("Denominator cannot be zero.");
-        denom = 1;
-    }
-    Reduce();
-}
-
-Fraction::Fraction(data_DURATION duration)
-{
-    duration = vrv::DurationMin(duration, DURATION_2048);
-    duration = vrv::DurationMax(duration, DURATION_maxima);
-    int den = pow(2, (duration + 1));
-    m_numerator = 8;
-    m_denominator = den;
-    Reduce();
-}
-
-Fraction Fraction::operator+(const Fraction &other) const
-{
-    int num = m_numerator * other.m_denominator + other.m_numerator * m_denominator;
-    int denom = m_denominator * other.m_denominator;
-    return Fraction(num, denom);
-}
-
-Fraction Fraction::operator-(const Fraction &other) const
-{
-    int num = m_numerator * other.m_denominator - other.m_numerator * m_denominator;
-    int denom = m_denominator * other.m_denominator;
-    return Fraction(num, denom);
-}
-
-Fraction Fraction::operator*(const Fraction &other) const
-{
-    int num = m_numerator * other.m_numerator;
-    int denom = m_denominator * other.m_denominator;
-    return Fraction(num, denom);
-}
-
-Fraction Fraction::operator/(const Fraction &other) const
-{
-    if (other.m_numerator == 0) {
-        LogDebug("Cannot divide by zero.");
-        return *this;
-    }
-    int num = m_numerator * other.m_denominator;
-    int denom = m_denominator * other.m_numerator;
-    return Fraction(num, denom);
-}
-
-bool Fraction::operator==(const Fraction &other) const
-{
-    return m_numerator * other.m_denominator == other.m_numerator * m_denominator;
-}
-
-bool Fraction::operator<(const Fraction &other) const
-{
-    return m_numerator * other.m_denominator < other.m_numerator * m_denominator;
-}
-
-bool Fraction::operator<=(const Fraction &other) const
-{
-    return m_numerator * other.m_denominator <= other.m_numerator * m_denominator;
-}
-
-bool Fraction::operator>(const Fraction &other) const
-{
-    return m_numerator * other.m_denominator > other.m_numerator * m_denominator;
-}
-
-bool Fraction::operator>=(const Fraction &other) const
-{
-    return m_numerator * other.m_denominator >= other.m_numerator * m_denominator;
-}
-
-double Fraction::ToDouble() const
-{
-    return static_cast<double>(m_numerator) / m_denominator;
-}
-
-std::string Fraction::ToString() const
-{
-    return StringFormat("%d/%d", m_numerator, m_denominator);
-}
-
-void Fraction::Reduce()
-{
-    if (m_denominator < 0) { // Keep the denominator positive
-        m_numerator = -m_numerator;
-        m_denominator = -m_denominator;
-    }
-    int gcdVal = std::gcd(abs(m_numerator), abs(m_denominator));
-    if (gcdVal != 1) {
-        m_numerator /= gcdVal;
-        m_denominator /= gcdVal;
-    }
-}
-
-std::pair<data_DURATION, Fraction> Fraction::ToDur() const
-{
-    if (m_numerator == 0) return { DURATION_NONE, 0 };
-
-    int value = ceil(log2((double)m_denominator / (double)m_numerator * 8)) - 1;
-    data_DURATION dur = static_cast<data_DURATION>(value);
-    dur = vrv::DurationMax(DURATION_maxima, dur);
-    dur = vrv::DurationMin(DURATION_2048, dur);
-
-    Fraction remainder = *this - Fraction(dur);
-    // Making sure we would not be trigger an inifite loop when looping over the remainder
-    if ((remainder >= *this) || (remainder < 0)) remainder = 0;
-    return { dur, remainder };
-}
-
-void Fraction::Reduce(int &numerator, int &denominator)
-{
-    Fraction fraction(numerator, denominator);
-    numerator = fraction.GetNumerator();
-    denominator = fraction.GetDenominator();
-}
-
-//----------------------------------------------------------------------------
 // HorizontalAligner
 //----------------------------------------------------------------------------
 
@@ -211,10 +86,10 @@ const Alignment *HorizontalAligner::SearchAlignmentAtTime(const Fraction &time, 
 void HorizontalAligner::AddAlignment(Alignment *alignment, int idx)
 {
     if (idx == -1) {
-        AddChild(alignment);
+        this->AddChild(alignment);
     }
     else {
-        InsertChild(alignment, idx);
+        this->InsertChild(alignment, idx);
     }
 }
 
@@ -259,20 +134,20 @@ void MeasureAligner::Reset()
     HorizontalAligner::Reset();
     m_nonJustifiableLeftMargin = 0;
     m_leftAlignment = new Alignment(-1, ALIGNMENT_MEASURE_START);
-    AddAlignment(m_leftAlignment);
+    this->AddAlignment(m_leftAlignment);
     m_leftBarLineAlignment = new Alignment(-1, ALIGNMENT_MEASURE_LEFT_BARLINE);
-    AddAlignment(m_leftBarLineAlignment);
+    this->AddAlignment(m_leftBarLineAlignment);
     m_rightBarLineAlignment = new Alignment(0, ALIGNMENT_MEASURE_RIGHT_BARLINE);
-    AddAlignment(m_rightBarLineAlignment);
+    this->AddAlignment(m_rightBarLineAlignment);
     m_rightAlignment = new Alignment(0, ALIGNMENT_MEASURE_END);
-    AddAlignment(m_rightAlignment);
+    this->AddAlignment(m_rightAlignment);
 
     m_initialTstampDur = -1;
 }
 
-bool MeasureAligner::IsSupportedChild(Object *child)
+bool MeasureAligner::IsSupportedChild(ClassId classId)
 {
-    assert(dynamic_cast<Alignment *>(child));
+    // Nothing to check here
     return true;
 }
 
@@ -296,7 +171,7 @@ Alignment *MeasureAligner::GetAlignmentAtTime(const Fraction &time, AlignmentTyp
         }
     }
     Alignment *newAlignment = new Alignment(time, type);
-    AddAlignment(newAlignment, idx);
+    this->AddAlignment(newAlignment, idx);
     return newAlignment;
 }
 
@@ -495,7 +370,7 @@ Alignment *GraceAligner::GetAlignmentAtTime(const Fraction &time, AlignmentType 
         idx = this->GetAlignmentCount();
     }
     Alignment *newAlignment = new Alignment(time, type);
-    AddAlignment(newAlignment, idx);
+    this->AddAlignment(newAlignment, idx);
     return newAlignment;
 }
 
@@ -641,15 +516,15 @@ void Alignment::Reset()
     Object::Reset();
 
     m_xRel = 0;
-    m_time = Fraction(0, 1);
+    m_time = Fraction(0);
     m_type = ALIGNMENT_DEFAULT;
 
-    ClearGraceAligners();
+    this->ClearGraceAligners();
 }
 
 Alignment::~Alignment()
 {
-    ClearGraceAligners();
+    this->ClearGraceAligners();
 }
 
 void Alignment::ClearGraceAligners()
@@ -661,10 +536,33 @@ void Alignment::ClearGraceAligners()
     m_graceAligners.clear();
 }
 
-bool Alignment::IsSupportedChild(Object *child)
+bool Alignment::IsSupportedChild(ClassId classId)
 {
-    assert(dynamic_cast<AlignmentReference *>(child));
+    // Nothing to check here
     return true;
+}
+
+bool Alignment::operator==(const Alignment &other) const
+{
+    const Measure *measure = vrv_cast<const Measure *>(this->GetFirstAncestor(MEASURE));
+    const Measure *otherMeasure = vrv_cast<const Measure *>(other.GetFirstAncestor(MEASURE));
+    assert(measure && otherMeasure);
+
+    return (measure == otherMeasure) && (this->GetTime() == other.GetTime());
+}
+
+std::weak_ordering Alignment::operator<=>(const Alignment &other) const
+{
+    const Measure *measure = vrv_cast<const Measure *>(this->GetFirstAncestor(MEASURE));
+    const Measure *otherMeasure = vrv_cast<const Measure *>(other.GetFirstAncestor(MEASURE));
+    assert(measure && otherMeasure);
+
+    if (measure == otherMeasure) {
+        return this->GetTime() <=> other.GetTime();
+    }
+    else {
+        return Object::IsPreOrdered(measure, otherMeasure) ? std::weak_ordering::less : std::weak_ordering::greater;
+    }
 }
 
 bool Alignment::HasAccidVerticalOverlap(const Alignment *otherAlignment, int staffN) const
@@ -800,7 +698,7 @@ void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight, const std:
 
 GraceAligner *Alignment::GetGraceAligner(int id)
 {
-    if (m_graceAligners.count(id) == 0) {
+    if (!m_graceAligners.contains(id)) {
         m_graceAligners[id] = new GraceAligner();
     }
     return m_graceAligners[id];
@@ -922,13 +820,13 @@ void AlignmentReference::Reset()
     m_layerCount = 0;
 }
 
-bool AlignmentReference::IsSupportedChild(Object *child)
+bool AlignmentReference::IsSupportedChild(ClassId classId)
 {
-    assert(dynamic_cast<LayerElement *>(child));
+    // Nothing to check here
     return true;
 }
 
-void AlignmentReference::AddChild(Object *child)
+bool AlignmentReference::AddChild(Object *child)
 {
     LayerElement *childElement = vrv_cast<LayerElement *>(child);
     assert(childElement);
@@ -948,11 +846,13 @@ void AlignmentReference::AddChild(Object *child)
     }
 
     // Special case where we do not set the parent because the reference will not have ownership
-    // Children will be treated as relinquished objects in the desctructor
+    // Children will be treated as relinquished objects in the destructor
     // However, we need to make sure the child has a parent (somewhere else)
     assert(child->GetParent() && this->IsReferenceObject());
     children.push_back(child);
-    Modify();
+    this->Modify();
+
+    return true;
 }
 
 bool AlignmentReference::HasAccidVerticalOverlap(const ArrayOfConstObjects &objects) const
@@ -1018,9 +918,9 @@ void TimestampAligner::Reset()
     Object::Reset();
 }
 
-bool TimestampAligner::IsSupportedChild(Object *child)
+bool TimestampAligner::IsSupportedChild(ClassId classId)
 {
-    assert(dynamic_cast<TimestampAttr *>(child));
+    // Nothing to check here
     return true;
 }
 
@@ -1040,7 +940,7 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
         assert(timestampAttr);
 
         double alignmentTime = timestampAttr->GetActualDurPos();
-        if (AreEqual(alignmentTime, time)) {
+        if (ApproximatelyEqual(alignmentTime, time)) {
             return timestampAttr;
         }
         // nothing found, do not go any further but keep the index
@@ -1054,10 +954,10 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
     timestampAttr = new TimestampAttr();
     timestampAttr->SetDrawingPos(time);
     if (idx == -1) {
-        AddChild(timestampAttr);
+        this->AddChild(timestampAttr);
     }
     else {
-        InsertChild(timestampAttr, idx);
+        this->InsertChild(timestampAttr, idx);
     }
     return timestampAttr;
 }

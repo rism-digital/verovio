@@ -1739,55 +1739,29 @@ data_GRACE AttConverterBase::StrToGrace(const std::string &value, bool logWarnin
     return GRACE_NONE;
 }
 
-std::string AttConverterBase::HeadshapeToStr(data_HEADSHAPE data) const
+std::string AttConverterBase::HarppedalpositionToStr(data_HARPPEDALPOSITION data) const
 {
     std::string value;
     switch (data) {
-        case HEADSHAPE_quarter: value = "quarter"; break;
-        case HEADSHAPE_half: value = "half"; break;
-        case HEADSHAPE_whole: value = "whole"; break;
-        case HEADSHAPE_backslash: value = "backslash"; break;
-        case HEADSHAPE_circle: value = "circle"; break;
-        case HEADSHAPE_plus: value = "+"; break;
-        case HEADSHAPE_diamond: value = "diamond"; break;
-        case HEADSHAPE_isotriangle: value = "isotriangle"; break;
-        case HEADSHAPE_oval: value = "oval"; break;
-        case HEADSHAPE_piewedge: value = "piewedge"; break;
-        case HEADSHAPE_rectangle: value = "rectangle"; break;
-        case HEADSHAPE_rtriangle: value = "rtriangle"; break;
-        case HEADSHAPE_semicircle: value = "semicircle"; break;
-        case HEADSHAPE_slash: value = "slash"; break;
-        case HEADSHAPE_square: value = "square"; break;
-        case HEADSHAPE_x: value = "x"; break;
+        case HARPPEDALPOSITION_f: value = "f"; break;
+        case HARPPEDALPOSITION_n: value = "n"; break;
+        case HARPPEDALPOSITION_s: value = "s"; break;
         default:
-            LogWarning("Unknown value '%d' for data.HEADSHAPE", data);
+            LogWarning("Unknown value '%d' for data.HARPPEDALPOSITION", data);
             value = "";
             break;
     }
     return value;
 }
 
-data_HEADSHAPE AttConverterBase::StrToHeadshape(const std::string &value, bool logWarning) const
+data_HARPPEDALPOSITION AttConverterBase::StrToHarppedalposition(const std::string &value, bool logWarning) const
 {
-    if (value == "quarter") return HEADSHAPE_quarter;
-    if (value == "half") return HEADSHAPE_half;
-    if (value == "whole") return HEADSHAPE_whole;
-    if (value == "backslash") return HEADSHAPE_backslash;
-    if (value == "circle") return HEADSHAPE_circle;
-    if (value == "+") return HEADSHAPE_plus;
-    if (value == "diamond") return HEADSHAPE_diamond;
-    if (value == "isotriangle") return HEADSHAPE_isotriangle;
-    if (value == "oval") return HEADSHAPE_oval;
-    if (value == "piewedge") return HEADSHAPE_piewedge;
-    if (value == "rectangle") return HEADSHAPE_rectangle;
-    if (value == "rtriangle") return HEADSHAPE_rtriangle;
-    if (value == "semicircle") return HEADSHAPE_semicircle;
-    if (value == "slash") return HEADSHAPE_slash;
-    if (value == "square") return HEADSHAPE_square;
-    if (value == "x") return HEADSHAPE_x;
+    if (value == "f") return HARPPEDALPOSITION_f;
+    if (value == "n") return HARPPEDALPOSITION_n;
+    if (value == "s") return HARPPEDALPOSITION_s;
     if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for data.HEADSHAPE", value.c_str());
-    return HEADSHAPE_NONE;
+        LogWarning("Unsupported value '%s' for data.HARPPEDALPOSITION", value.c_str());
+    return HARPPEDALPOSITION_NONE;
 }
 
 std::string AttConverterBase::HeadshapeListToStr(data_HEADSHAPE_list data) const
@@ -2029,6 +2003,112 @@ data_LINEWIDTHTERM AttConverterBase::StrToLinewidthterm(const std::string &value
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.LINEWIDTHTERM", value.c_str());
     return LINEWIDTHTERM_NONE;
+}
+
+std::string AttConverterBase::MarcrelatorsBasicToStr(data_MARCRELATORS_basic data) const
+{
+    std::string value;
+    switch (data) {
+        case MARCRELATORS_basic_arr: value = "arr"; break;
+        case MARCRELATORS_basic_aut: value = "aut"; break;
+        case MARCRELATORS_basic_cmp: value = "cmp"; break;
+        case MARCRELATORS_basic_dte: value = "dte"; break;
+        case MARCRELATORS_basic_edt: value = "edt"; break;
+        case MARCRELATORS_basic_lbt: value = "lbt"; break;
+        case MARCRELATORS_basic_lyr: value = "lyr"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.MARCRELATORS.basic", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_MARCRELATORS_basic AttConverterBase::StrToMarcrelatorsBasic(const std::string &value, bool logWarning) const
+{
+    if (value == "arr") return MARCRELATORS_basic_arr;
+    if (value == "aut") return MARCRELATORS_basic_aut;
+    if (value == "cmp") return MARCRELATORS_basic_cmp;
+    if (value == "dte") return MARCRELATORS_basic_dte;
+    if (value == "edt") return MARCRELATORS_basic_edt;
+    if (value == "lbt") return MARCRELATORS_basic_lbt;
+    if (value == "lyr") return MARCRELATORS_basic_lyr;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.MARCRELATORS.basic", value.c_str());
+    return MARCRELATORS_basic_NONE;
+}
+
+std::string AttConverterBase::MarcrelatorsExtendedToStr(data_MARCRELATORS_extended data) const
+{
+    std::string value;
+    switch (data) {
+        case MARCRELATORS_extended_act: value = "act"; break;
+        case MARCRELATORS_extended_ard: value = "ard"; break;
+        case MARCRELATORS_extended_art: value = "art"; break;
+        case MARCRELATORS_extended_aus: value = "aus"; break;
+        case MARCRELATORS_extended_chr: value = "chr"; break;
+        case MARCRELATORS_extended_cnd: value = "cnd"; break;
+        case MARCRELATORS_extended_crp: value = "crp"; break;
+        case MARCRELATORS_extended_cst: value = "cst"; break;
+        case MARCRELATORS_extended_drt: value = "drt"; break;
+        case MARCRELATORS_extended_egr: value = "egr"; break;
+        case MARCRELATORS_extended_flm: value = "flm"; break;
+        case MARCRELATORS_extended_fmd: value = "fmd"; break;
+        case MARCRELATORS_extended_fmp: value = "fmp"; break;
+        case MARCRELATORS_extended_itr: value = "itr"; break;
+        case MARCRELATORS_extended_mcp: value = "mcp"; break;
+        case MARCRELATORS_extended_mus: value = "mus"; break;
+        case MARCRELATORS_extended_msd: value = "msd"; break;
+        case MARCRELATORS_extended_pdr: value = "pdr"; break;
+        case MARCRELATORS_extended_pmn: value = "pmn"; break;
+        case MARCRELATORS_extended_prn: value = "prn"; break;
+        case MARCRELATORS_extended_pro: value = "pro"; break;
+        case MARCRELATORS_extended_rce: value = "rce"; break;
+        case MARCRELATORS_extended_scr: value = "scr"; break;
+        case MARCRELATORS_extended_sng: value = "sng"; break;
+        case MARCRELATORS_extended_std: value = "std"; break;
+        case MARCRELATORS_extended_trc: value = "trc"; break;
+        case MARCRELATORS_extended_trl: value = "trl"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.MARCRELATORS.extended", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_MARCRELATORS_extended AttConverterBase::StrToMarcrelatorsExtended(const std::string &value, bool logWarning) const
+{
+    if (value == "act") return MARCRELATORS_extended_act;
+    if (value == "ard") return MARCRELATORS_extended_ard;
+    if (value == "art") return MARCRELATORS_extended_art;
+    if (value == "aus") return MARCRELATORS_extended_aus;
+    if (value == "chr") return MARCRELATORS_extended_chr;
+    if (value == "cnd") return MARCRELATORS_extended_cnd;
+    if (value == "crp") return MARCRELATORS_extended_crp;
+    if (value == "cst") return MARCRELATORS_extended_cst;
+    if (value == "drt") return MARCRELATORS_extended_drt;
+    if (value == "egr") return MARCRELATORS_extended_egr;
+    if (value == "flm") return MARCRELATORS_extended_flm;
+    if (value == "fmd") return MARCRELATORS_extended_fmd;
+    if (value == "fmp") return MARCRELATORS_extended_fmp;
+    if (value == "itr") return MARCRELATORS_extended_itr;
+    if (value == "mcp") return MARCRELATORS_extended_mcp;
+    if (value == "mus") return MARCRELATORS_extended_mus;
+    if (value == "msd") return MARCRELATORS_extended_msd;
+    if (value == "pdr") return MARCRELATORS_extended_pdr;
+    if (value == "pmn") return MARCRELATORS_extended_pmn;
+    if (value == "prn") return MARCRELATORS_extended_prn;
+    if (value == "pro") return MARCRELATORS_extended_pro;
+    if (value == "rce") return MARCRELATORS_extended_rce;
+    if (value == "scr") return MARCRELATORS_extended_scr;
+    if (value == "sng") return MARCRELATORS_extended_sng;
+    if (value == "std") return MARCRELATORS_extended_std;
+    if (value == "trc") return MARCRELATORS_extended_trc;
+    if (value == "trl") return MARCRELATORS_extended_trl;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.MARCRELATORS.extended", value.c_str());
+    return MARCRELATORS_extended_NONE;
 }
 
 std::string AttConverterBase::MelodicfunctionToStr(data_MELODICFUNCTION data) const
@@ -2856,12 +2936,13 @@ std::string AttConverterBase::NotationtypeToStr(data_NOTATIONTYPE data) const
         case NOTATIONTYPE_mensural: value = "mensural"; break;
         case NOTATIONTYPE_mensural_black: value = "mensural.black"; break;
         case NOTATIONTYPE_mensural_white: value = "mensural.white"; break;
+        case NOTATIONTYPE_neume: value = "neume"; break;
+        case NOTATIONTYPE_tab: value = "tab"; break;
+        case NOTATIONTYPE_tab_staff_like: value = "tab.staff-like"; break;
+        case NOTATIONTYPE_tab_guitar: value = "tab.guitar"; break;
         case NOTATIONTYPE_tab_lute_french: value = "tab.lute.french"; break;
         case NOTATIONTYPE_tab_lute_italian: value = "tab.lute.italian"; break;
         case NOTATIONTYPE_tab_lute_german: value = "tab.lute.german"; break;
-        case NOTATIONTYPE_tab_guitar: value = "tab.guitar"; break;
-        case NOTATIONTYPE_neume: value = "neume"; break;
-        case NOTATIONTYPE_tab: value = "tab"; break;
         default:
             LogWarning("Unknown value '%d' for data.NOTATIONTYPE", data);
             value = "";
@@ -2876,12 +2957,13 @@ data_NOTATIONTYPE AttConverterBase::StrToNotationtype(const std::string &value, 
     if (value == "mensural") return NOTATIONTYPE_mensural;
     if (value == "mensural.black") return NOTATIONTYPE_mensural_black;
     if (value == "mensural.white") return NOTATIONTYPE_mensural_white;
+    if (value == "neume") return NOTATIONTYPE_neume;
+    if (value == "tab") return NOTATIONTYPE_tab;
+    if (value == "tab.staff-like") return NOTATIONTYPE_tab_staff_like;
+    if (value == "tab.guitar") return NOTATIONTYPE_tab_guitar;
     if (value == "tab.lute.french") return NOTATIONTYPE_tab_lute_french;
     if (value == "tab.lute.italian") return NOTATIONTYPE_tab_lute_italian;
     if (value == "tab.lute.german") return NOTATIONTYPE_tab_lute_german;
-    if (value == "tab.guitar") return NOTATIONTYPE_tab_guitar;
-    if (value == "neume") return NOTATIONTYPE_neume;
-    if (value == "tab") return NOTATIONTYPE_tab;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.NOTATIONTYPE", value.c_str());
     return NOTATIONTYPE_NONE;
@@ -3128,6 +3210,93 @@ data_RELATIONSHIP AttConverterBase::StrToRelationship(const std::string &value, 
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.RELATIONSHIP", value.c_str());
     return RELATIONSHIP_NONE;
+}
+
+std::string AttConverterBase::RelatorsToStr(data_RELATORS data) const
+{
+    std::string value;
+    switch (data) {
+        case RELATORS_arr: value = "arr"; break;
+        case RELATORS_aut: value = "aut"; break;
+        case RELATORS_cmp: value = "cmp"; break;
+        case RELATORS_dte: value = "dte"; break;
+        case RELATORS_edt: value = "edt"; break;
+        case RELATORS_lbt: value = "lbt"; break;
+        case RELATORS_lyr: value = "lyr"; break;
+        case RELATORS_act: value = "act"; break;
+        case RELATORS_ard: value = "ard"; break;
+        case RELATORS_art: value = "art"; break;
+        case RELATORS_aus: value = "aus"; break;
+        case RELATORS_chr: value = "chr"; break;
+        case RELATORS_cnd: value = "cnd"; break;
+        case RELATORS_crp: value = "crp"; break;
+        case RELATORS_cst: value = "cst"; break;
+        case RELATORS_drt: value = "drt"; break;
+        case RELATORS_egr: value = "egr"; break;
+        case RELATORS_flm: value = "flm"; break;
+        case RELATORS_fmd: value = "fmd"; break;
+        case RELATORS_fmp: value = "fmp"; break;
+        case RELATORS_itr: value = "itr"; break;
+        case RELATORS_mcp: value = "mcp"; break;
+        case RELATORS_mus: value = "mus"; break;
+        case RELATORS_msd: value = "msd"; break;
+        case RELATORS_pdr: value = "pdr"; break;
+        case RELATORS_pmn: value = "pmn"; break;
+        case RELATORS_prn: value = "prn"; break;
+        case RELATORS_pro: value = "pro"; break;
+        case RELATORS_rce: value = "rce"; break;
+        case RELATORS_scr: value = "scr"; break;
+        case RELATORS_sng: value = "sng"; break;
+        case RELATORS_std: value = "std"; break;
+        case RELATORS_trc: value = "trc"; break;
+        case RELATORS_trl: value = "trl"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.RELATORS", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_RELATORS AttConverterBase::StrToRelators(const std::string &value, bool logWarning) const
+{
+    if (value == "arr") return RELATORS_arr;
+    if (value == "aut") return RELATORS_aut;
+    if (value == "cmp") return RELATORS_cmp;
+    if (value == "dte") return RELATORS_dte;
+    if (value == "edt") return RELATORS_edt;
+    if (value == "lbt") return RELATORS_lbt;
+    if (value == "lyr") return RELATORS_lyr;
+    if (value == "act") return RELATORS_act;
+    if (value == "ard") return RELATORS_ard;
+    if (value == "art") return RELATORS_art;
+    if (value == "aus") return RELATORS_aus;
+    if (value == "chr") return RELATORS_chr;
+    if (value == "cnd") return RELATORS_cnd;
+    if (value == "crp") return RELATORS_crp;
+    if (value == "cst") return RELATORS_cst;
+    if (value == "drt") return RELATORS_drt;
+    if (value == "egr") return RELATORS_egr;
+    if (value == "flm") return RELATORS_flm;
+    if (value == "fmd") return RELATORS_fmd;
+    if (value == "fmp") return RELATORS_fmp;
+    if (value == "itr") return RELATORS_itr;
+    if (value == "mcp") return RELATORS_mcp;
+    if (value == "mus") return RELATORS_mus;
+    if (value == "msd") return RELATORS_msd;
+    if (value == "pdr") return RELATORS_pdr;
+    if (value == "pmn") return RELATORS_pmn;
+    if (value == "prn") return RELATORS_prn;
+    if (value == "pro") return RELATORS_pro;
+    if (value == "rce") return RELATORS_rce;
+    if (value == "scr") return RELATORS_scr;
+    if (value == "sng") return RELATORS_sng;
+    if (value == "std") return RELATORS_std;
+    if (value == "trc") return RELATORS_trc;
+    if (value == "trl") return RELATORS_trl;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.RELATORS", value.c_str());
+    return RELATORS_NONE;
 }
 
 std::string AttConverterBase::RotationToStr(data_ROTATION data) const
@@ -3887,6 +4056,27 @@ anchoredTextLog_FUNC AttConverterBase::StrToAnchoredTextLogFunc(const std::strin
     return anchoredTextLog_FUNC_NONE;
 }
 
+std::string AttConverterBase::AnnotLogFuncToStr(annotLog_FUNC data) const
+{
+    std::string value;
+    switch (data) {
+        case annotLog_FUNC_display: value = "display"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.annot.log@func", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+annotLog_FUNC AttConverterBase::StrToAnnotLogFunc(const std::string &value, bool logWarning) const
+{
+    if (value == "display") return annotLog_FUNC_display;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.annot.log@func", value.c_str());
+    return annotLog_FUNC_NONE;
+}
+
 std::string AttConverterBase::ArpegLogOrderToStr(arpegLog_ORDER data) const
 {
     std::string value;
@@ -3994,6 +4184,9 @@ std::string AttConverterBase::BracketSpanLogFuncToStr(bracketSpanLog_FUNC data) 
         case bracketSpanLog_FUNC_coloration: value = "coloration"; break;
         case bracketSpanLog_FUNC_cross_rhythm: value = "cross-rhythm"; break;
         case bracketSpanLog_FUNC_ligature: value = "ligature"; break;
+        case bracketSpanLog_FUNC_analytical: value = "analytical"; break;
+        case bracketSpanLog_FUNC_phrase: value = "phrase"; break;
+        case bracketSpanLog_FUNC_uspecified: value = "uspecified"; break;
         default:
             LogWarning("Unknown value '%d' for att.bracketSpan.log@func", data);
             value = "";
@@ -4007,6 +4200,9 @@ bracketSpanLog_FUNC AttConverterBase::StrToBracketSpanLogFunc(const std::string 
     if (value == "coloration") return bracketSpanLog_FUNC_coloration;
     if (value == "cross-rhythm") return bracketSpanLog_FUNC_cross_rhythm;
     if (value == "ligature") return bracketSpanLog_FUNC_ligature;
+    if (value == "analytical") return bracketSpanLog_FUNC_analytical;
+    if (value == "phrase") return bracketSpanLog_FUNC_phrase;
+    if (value == "uspecified") return bracketSpanLog_FUNC_uspecified;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.bracketSpan.log@func", value.c_str());
     return bracketSpanLog_FUNC_NONE;
@@ -4131,6 +4327,39 @@ divLineLog_FORM AttConverterBase::StrToDivLineLogForm(const std::string &value, 
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.divLine.log@form", value.c_str());
     return divLineLog_FORM_NONE;
+}
+
+std::string AttConverterBase::DocStatusStatusToStr(docStatus_STATUS data) const
+{
+    std::string value;
+    switch (data) {
+        case docStatus_STATUS_draft: value = "draft"; break;
+        case docStatus_STATUS_in_process: value = "in-process"; break;
+        case docStatus_STATUS_candidate: value = "candidate"; break;
+        case docStatus_STATUS_approved: value = "approved"; break;
+        case docStatus_STATUS_published: value = "published"; break;
+        case docStatus_STATUS_withdrawn: value = "withdrawn"; break;
+        case docStatus_STATUS_embargoed: value = "embargoed"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.docStatus@status", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+docStatus_STATUS AttConverterBase::StrToDocStatusStatus(const std::string &value, bool logWarning) const
+{
+    if (value == "draft") return docStatus_STATUS_draft;
+    if (value == "in-process") return docStatus_STATUS_in_process;
+    if (value == "candidate") return docStatus_STATUS_candidate;
+    if (value == "approved") return docStatus_STATUS_approved;
+    if (value == "published") return docStatus_STATUS_published;
+    if (value == "withdrawn") return docStatus_STATUS_withdrawn;
+    if (value == "embargoed") return docStatus_STATUS_embargoed;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.docStatus@status", value.c_str());
+    return docStatus_STATUS_NONE;
 }
 
 std::string AttConverterBase::DotLogFormToStr(dotLog_FORM data) const
@@ -4442,181 +4671,6 @@ harmVis_RENDGRID AttConverterBase::StrToHarmVisRendgrid(const std::string &value
     return harmVis_RENDGRID_NONE;
 }
 
-std::string AttConverterBase::HarpPedalLogAToStr(harpPedalLog_A data) const
-{
-    std::string value;
-    switch (data) {
-        case harpPedalLog_A_f: value = "f"; break;
-        case harpPedalLog_A_n: value = "n"; break;
-        case harpPedalLog_A_s: value = "s"; break;
-        default:
-            LogWarning("Unknown value '%d' for att.harpPedal.log@a", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-harpPedalLog_A AttConverterBase::StrToHarpPedalLogA(const std::string &value, bool logWarning) const
-{
-    if (value == "f") return harpPedalLog_A_f;
-    if (value == "n") return harpPedalLog_A_n;
-    if (value == "s") return harpPedalLog_A_s;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for att.harpPedal.log@a", value.c_str());
-    return harpPedalLog_A_NONE;
-}
-
-std::string AttConverterBase::HarpPedalLogBToStr(harpPedalLog_B data) const
-{
-    std::string value;
-    switch (data) {
-        case harpPedalLog_B_f: value = "f"; break;
-        case harpPedalLog_B_n: value = "n"; break;
-        case harpPedalLog_B_s: value = "s"; break;
-        default:
-            LogWarning("Unknown value '%d' for att.harpPedal.log@b", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-harpPedalLog_B AttConverterBase::StrToHarpPedalLogB(const std::string &value, bool logWarning) const
-{
-    if (value == "f") return harpPedalLog_B_f;
-    if (value == "n") return harpPedalLog_B_n;
-    if (value == "s") return harpPedalLog_B_s;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for att.harpPedal.log@b", value.c_str());
-    return harpPedalLog_B_NONE;
-}
-
-std::string AttConverterBase::HarpPedalLogCToStr(harpPedalLog_C data) const
-{
-    std::string value;
-    switch (data) {
-        case harpPedalLog_C_f: value = "f"; break;
-        case harpPedalLog_C_n: value = "n"; break;
-        case harpPedalLog_C_s: value = "s"; break;
-        default:
-            LogWarning("Unknown value '%d' for att.harpPedal.log@c", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-harpPedalLog_C AttConverterBase::StrToHarpPedalLogC(const std::string &value, bool logWarning) const
-{
-    if (value == "f") return harpPedalLog_C_f;
-    if (value == "n") return harpPedalLog_C_n;
-    if (value == "s") return harpPedalLog_C_s;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for att.harpPedal.log@c", value.c_str());
-    return harpPedalLog_C_NONE;
-}
-
-std::string AttConverterBase::HarpPedalLogDToStr(harpPedalLog_D data) const
-{
-    std::string value;
-    switch (data) {
-        case harpPedalLog_D_f: value = "f"; break;
-        case harpPedalLog_D_n: value = "n"; break;
-        case harpPedalLog_D_s: value = "s"; break;
-        default:
-            LogWarning("Unknown value '%d' for att.harpPedal.log@d", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-harpPedalLog_D AttConverterBase::StrToHarpPedalLogD(const std::string &value, bool logWarning) const
-{
-    if (value == "f") return harpPedalLog_D_f;
-    if (value == "n") return harpPedalLog_D_n;
-    if (value == "s") return harpPedalLog_D_s;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for att.harpPedal.log@d", value.c_str());
-    return harpPedalLog_D_NONE;
-}
-
-std::string AttConverterBase::HarpPedalLogEToStr(harpPedalLog_E data) const
-{
-    std::string value;
-    switch (data) {
-        case harpPedalLog_E_f: value = "f"; break;
-        case harpPedalLog_E_n: value = "n"; break;
-        case harpPedalLog_E_s: value = "s"; break;
-        default:
-            LogWarning("Unknown value '%d' for att.harpPedal.log@e", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-harpPedalLog_E AttConverterBase::StrToHarpPedalLogE(const std::string &value, bool logWarning) const
-{
-    if (value == "f") return harpPedalLog_E_f;
-    if (value == "n") return harpPedalLog_E_n;
-    if (value == "s") return harpPedalLog_E_s;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for att.harpPedal.log@e", value.c_str());
-    return harpPedalLog_E_NONE;
-}
-
-std::string AttConverterBase::HarpPedalLogFToStr(harpPedalLog_F data) const
-{
-    std::string value;
-    switch (data) {
-        case harpPedalLog_F_f: value = "f"; break;
-        case harpPedalLog_F_n: value = "n"; break;
-        case harpPedalLog_F_s: value = "s"; break;
-        default:
-            LogWarning("Unknown value '%d' for att.harpPedal.log@f", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-harpPedalLog_F AttConverterBase::StrToHarpPedalLogF(const std::string &value, bool logWarning) const
-{
-    if (value == "f") return harpPedalLog_F_f;
-    if (value == "n") return harpPedalLog_F_n;
-    if (value == "s") return harpPedalLog_F_s;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for att.harpPedal.log@f", value.c_str());
-    return harpPedalLog_F_NONE;
-}
-
-std::string AttConverterBase::HarpPedalLogGToStr(harpPedalLog_G data) const
-{
-    std::string value;
-    switch (data) {
-        case harpPedalLog_G_f: value = "f"; break;
-        case harpPedalLog_G_n: value = "n"; break;
-        case harpPedalLog_G_s: value = "s"; break;
-        default:
-            LogWarning("Unknown value '%d' for att.harpPedal.log@g", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-harpPedalLog_G AttConverterBase::StrToHarpPedalLogG(const std::string &value, bool logWarning) const
-{
-    if (value == "f") return harpPedalLog_G_f;
-    if (value == "n") return harpPedalLog_G_n;
-    if (value == "s") return harpPedalLog_G_s;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for att.harpPedal.log@g", value.c_str());
-    return harpPedalLog_G_NONE;
-}
-
 std::string AttConverterBase::LineLogFuncToStr(lineLog_FUNC data) const
 {
     std::string value;
@@ -4704,10 +4758,17 @@ std::string AttConverterBase::MeiVersionMeiversionToStr(meiVersion_MEIVERSION da
         case meiVersion_MEIVERSION_4_0_0: value = "4.0.0"; break;
         case meiVersion_MEIVERSION_4_0_1: value = "4.0.1"; break;
         case meiVersion_MEIVERSION_5_0: value = "5.0"; break;
+        case meiVersion_MEIVERSION_5_1: value = "5.1"; break;
         case meiVersion_MEIVERSION_5_0plusbasic: value = "5.0+basic"; break;
         case meiVersion_MEIVERSION_5_0plusCMN: value = "5.0+CMN"; break;
         case meiVersion_MEIVERSION_5_0plusMensural: value = "5.0+Mensural"; break;
         case meiVersion_MEIVERSION_5_0plusNeumes: value = "5.0+Neumes"; break;
+        case meiVersion_MEIVERSION_5_1plusbasic: value = "5.1+basic"; break;
+        case meiVersion_MEIVERSION_5_1plusCMN: value = "5.1+CMN"; break;
+        case meiVersion_MEIVERSION_5_1plusMensural: value = "5.1+Mensural"; break;
+        case meiVersion_MEIVERSION_5_1plusNeumes: value = "5.1+Neumes"; break;
+        case meiVersion_MEIVERSION_6_0_dev: value = "6.0-dev"; break;
+        case meiVersion_MEIVERSION_6_0_devplusbasic: value = "6.0-dev+basic"; break;
         default:
             LogWarning("Unknown value '%d' for att.meiVersion@meiversion", data);
             value = "";
@@ -4723,10 +4784,17 @@ meiVersion_MEIVERSION AttConverterBase::StrToMeiVersionMeiversion(const std::str
     if (value == "4.0.0") return meiVersion_MEIVERSION_4_0_0;
     if (value == "4.0.1") return meiVersion_MEIVERSION_4_0_1;
     if (value == "5.0") return meiVersion_MEIVERSION_5_0;
+    if (value == "5.1") return meiVersion_MEIVERSION_5_1;
     if (value == "5.0+basic") return meiVersion_MEIVERSION_5_0plusbasic;
     if (value == "5.0+CMN") return meiVersion_MEIVERSION_5_0plusCMN;
     if (value == "5.0+Mensural") return meiVersion_MEIVERSION_5_0plusMensural;
     if (value == "5.0+Neumes") return meiVersion_MEIVERSION_5_0plusNeumes;
+    if (value == "5.1+basic") return meiVersion_MEIVERSION_5_1plusbasic;
+    if (value == "5.1+CMN") return meiVersion_MEIVERSION_5_1plusCMN;
+    if (value == "5.1+Mensural") return meiVersion_MEIVERSION_5_1plusMensural;
+    if (value == "5.1+Neumes") return meiVersion_MEIVERSION_5_1plusNeumes;
+    if (value == "6.0-dev") return meiVersion_MEIVERSION_6_0_dev;
+    if (value == "6.0-dev+basic") return meiVersion_MEIVERSION_6_0_devplusbasic;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.meiVersion@meiversion", value.c_str());
     return meiVersion_MEIVERSION_NONE;
@@ -4907,8 +4975,10 @@ std::string AttConverterBase::NeumeTypeTypeToStr(neumeType_TYPE data) const
     switch (data) {
         case neumeType_TYPE_apostropha: value = "apostropha"; break;
         case neumeType_TYPE_bistropha: value = "bistropha"; break;
+        case neumeType_TYPE_cephalicus: value = "cephalicus"; break;
         case neumeType_TYPE_climacus: value = "climacus"; break;
         case neumeType_TYPE_clivis: value = "clivis"; break;
+        case neumeType_TYPE_epiphonus: value = "epiphonus"; break;
         case neumeType_TYPE_oriscus: value = "oriscus"; break;
         case neumeType_TYPE_pes: value = "pes"; break;
         case neumeType_TYPE_pessubpunctis: value = "pessubpunctis"; break;
@@ -4937,8 +5007,10 @@ neumeType_TYPE AttConverterBase::StrToNeumeTypeType(const std::string &value, bo
 {
     if (value == "apostropha") return neumeType_TYPE_apostropha;
     if (value == "bistropha") return neumeType_TYPE_bistropha;
+    if (value == "cephalicus") return neumeType_TYPE_cephalicus;
     if (value == "climacus") return neumeType_TYPE_climacus;
     if (value == "clivis") return neumeType_TYPE_clivis;
+    if (value == "epiphonus") return neumeType_TYPE_epiphonus;
     if (value == "oriscus") return neumeType_TYPE_oriscus;
     if (value == "pes") return neumeType_TYPE_pes;
     if (value == "pessubpunctis") return neumeType_TYPE_pessubpunctis;
@@ -5210,7 +5282,7 @@ std::string AttConverterBase::RegularMethodMethodToStr(regularMethod_METHOD data
     std::string value;
     switch (data) {
         case regularMethod_METHOD_silent: value = "silent"; break;
-        case regularMethod_METHOD_tags: value = "tags"; break;
+        case regularMethod_METHOD_markup: value = "markup"; break;
         default:
             LogWarning("Unknown value '%d' for att.regularMethod@method", data);
             value = "";
@@ -5222,7 +5294,7 @@ std::string AttConverterBase::RegularMethodMethodToStr(regularMethod_METHOD data
 regularMethod_METHOD AttConverterBase::StrToRegularMethodMethod(const std::string &value, bool logWarning) const
 {
     if (value == "silent") return regularMethod_METHOD_silent;
-    if (value == "tags") return regularMethod_METHOD_tags;
+    if (value == "markup") return regularMethod_METHOD_markup;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.regularMethod@method", value.c_str());
     return regularMethod_METHOD_NONE;
@@ -5262,6 +5334,13 @@ std::string AttConverterBase::RepeatMarkLogFuncToStr(repeatMarkLog_FUNC data) co
         case repeatMarkLog_FUNC_dalSegno: value = "dalSegno"; break;
         case repeatMarkLog_FUNC_daCapo: value = "daCapo"; break;
         case repeatMarkLog_FUNC_fine: value = "fine"; break;
+        case repeatMarkLog_FUNC_daCapoAlFine: value = "daCapoAlFine"; break;
+        case repeatMarkLog_FUNC_dalSegnoAlFine: value = "dalSegnoAlFine"; break;
+        case repeatMarkLog_FUNC_daCapoAlCoda: value = "daCapoAlCoda"; break;
+        case repeatMarkLog_FUNC_dalSegnoAlCoda: value = "dalSegnoAlCoda"; break;
+        case repeatMarkLog_FUNC_repeatLeft: value = "repeatLeft"; break;
+        case repeatMarkLog_FUNC_repeatRight: value = "repeatRight"; break;
+        case repeatMarkLog_FUNC_repeatRightLeft: value = "repeatRightLeft"; break;
         default:
             LogWarning("Unknown value '%d' for att.repeatMark.log@func", data);
             value = "";
@@ -5277,6 +5356,13 @@ repeatMarkLog_FUNC AttConverterBase::StrToRepeatMarkLogFunc(const std::string &v
     if (value == "dalSegno") return repeatMarkLog_FUNC_dalSegno;
     if (value == "daCapo") return repeatMarkLog_FUNC_daCapo;
     if (value == "fine") return repeatMarkLog_FUNC_fine;
+    if (value == "daCapoAlFine") return repeatMarkLog_FUNC_daCapoAlFine;
+    if (value == "dalSegnoAlFine") return repeatMarkLog_FUNC_dalSegnoAlFine;
+    if (value == "daCapoAlCoda") return repeatMarkLog_FUNC_daCapoAlCoda;
+    if (value == "dalSegnoAlCoda") return repeatMarkLog_FUNC_dalSegnoAlCoda;
+    if (value == "repeatLeft") return repeatMarkLog_FUNC_repeatLeft;
+    if (value == "repeatRight") return repeatMarkLog_FUNC_repeatRight;
+    if (value == "repeatRightLeft") return repeatMarkLog_FUNC_repeatRightLeft;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.repeatMark.log@func", value.c_str());
     return repeatMarkLog_FUNC_NONE;

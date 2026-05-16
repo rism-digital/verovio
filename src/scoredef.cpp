@@ -46,7 +46,7 @@ namespace vrv {
 // ScoreDefElement
 //----------------------------------------------------------------------------
 
-ScoreDefElement::ScoreDefElement() : Object(SCOREDEF_ELEMENT, "scoredefelement-"), ScoreDefInterface(), AttTyped()
+ScoreDefElement::ScoreDefElement() : Object(SCOREDEF_ELEMENT), ScoreDefInterface(), AttTyped()
 {
     this->RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
     this->RegisterAttClass(ATT_TYPED);
@@ -54,16 +54,7 @@ ScoreDefElement::ScoreDefElement() : Object(SCOREDEF_ELEMENT, "scoredefelement-"
     this->Reset();
 }
 
-ScoreDefElement::ScoreDefElement(ClassId classId) : Object(classId, "scoredefelement-"), ScoreDefInterface(), AttTyped()
-{
-    this->RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
-    this->RegisterAttClass(ATT_TYPED);
-
-    this->Reset();
-}
-
-ScoreDefElement::ScoreDefElement(ClassId classId, const std::string &classIdStr)
-    : Object(classId, classIdStr), ScoreDefInterface(), AttTyped()
+ScoreDefElement::ScoreDefElement(ClassId classId) : Object(classId), ScoreDefInterface(), AttTyped()
 {
     this->RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
     this->RegisterAttClass(ATT_TYPED);
@@ -222,7 +213,7 @@ MeterSigGrp *ScoreDefElement::GetMeterSigGrpCopy() const
 static const ClassRegistrar<ScoreDef> s_factory("scoreDef", SCOREDEF);
 
 ScoreDef::ScoreDef()
-    : ScoreDefElement(SCOREDEF, "scoredef-")
+    : ScoreDefElement(SCOREDEF)
     , ObjectListInterface()
     , AttDistances()
     , AttEndings()
@@ -256,41 +247,33 @@ void ScoreDef::Reset()
     m_setAsDrawing = false;
 }
 
-bool ScoreDef::IsSupportedChild(Object *child)
+bool ScoreDef::IsSupportedChild(ClassId classId)
 {
-    // Clef is actually not allowed as child of scoreDef in MEI
-    if (child->Is(CLEF)) {
-        assert(dynamic_cast<Clef *>(child));
+    static const std::vector<ClassId> supported{ CLEF, GRPSYM, KEYSIG, MENSUR, METERSIG, METERSIGGRP, STAFFGRP,
+        SYMBOLTABLE };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(GRPSYM)) {
-        assert(dynamic_cast<GrpSym *>(child));
-    }
-    else if (child->Is(KEYSIG)) {
-        assert(dynamic_cast<KeySig *>(child));
-    }
-    else if (child->Is(STAFFGRP)) {
-        assert(dynamic_cast<StaffGrp *>(child));
-    }
-    // Mensur is actually not allowed as child of scoreDef in MEI
-    else if (child->Is(MENSUR)) {
-        assert(dynamic_cast<Mensur *>(child));
-    }
-    else if (child->Is(METERSIG)) {
-        assert(dynamic_cast<MeterSig *>(child));
-    }
-    else if (child->Is(METERSIGGRP)) {
-        assert(dynamic_cast<MeterSigGrp *>(child));
-    }
-    else if (child->IsRunningElement()) {
-        assert(dynamic_cast<RunningElement *>(child));
-    }
-    else if (child->Is(SYMBOLTABLE)) {
-        assert(dynamic_cast<SymbolTable *>(child));
+    else if (Object::IsRunningElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
+}
+
+bool ScoreDef::AddChildAdditionalCheck(Object *child)
+{
+    // Clef and mensur are actually not allowed as children of scoreDef in MEI.
+    // Left as a warning for now.
+    if (child->Is(CLEF) && !child->IsAttribute()) {
+        LogWarning("Having <clef> as child of <scoreDef> is not valid MEI");
+    }
+    else if (child->Is(MENSUR) && !child->IsAttribute()) {
+        LogWarning("Having <mensur> as child of <scoreDef> is not valid MEI");
+    }
+    return (ScoreDefElement::AddChildAdditionalCheck(child));
 }
 
 int ScoreDef::GetInsertOrderFor(ClassId classId) const
@@ -320,8 +303,12 @@ void ScoreDef::ReplaceDrawingValues(const ScoreDef *newScoreDef)
         clef = newScoreDef->GetClef();
     }
     if (newScoreDef->HasKeySigInfo()) {
-        redrawFlags |= StaffDefRedrawFlags::REDRAW_KEYSIG;
-        keySig = newScoreDef->GetKeySig();
+        const KeySig *newKeySig = newScoreDef->GetKeySig();
+        assert(newKeySig);
+        if (!newKeySig->HasCancelaccid() || (newKeySig->GetCancelaccid() != CANCELACCID_none)) {
+            keySig = newKeySig;
+            redrawFlags |= StaffDefRedrawFlags::REDRAW_KEYSIG;
+        }
     }
     if (newScoreDef->HasMensurInfo()) {
         redrawFlags |= StaffDefRedrawFlags::REDRAW_MENSUR;
@@ -338,7 +325,8 @@ void ScoreDef::ReplaceDrawingValues(const ScoreDef *newScoreDef)
         meterSig = newScoreDef->GetMeterSigCopy();
     }
 
-    ReplaceDrawingValuesInStaffDefFunctor replaceDrawingValuesInStaffDef(clef, keySig, mensur, meterSig, meterSigGrp);
+    ReplaceDrawingValuesInStaffDefFunctor replaceDrawingValuesInStaffDef(
+        clef, keySig, mensur, meterSig, meterSigGrp, newScoreDef, redrawFlags);
     this->Process(replaceDrawingValuesInStaffDef);
 
     if (mensur) delete mensur;
@@ -484,21 +472,21 @@ void ScoreDef::ResetFromDrawingValues()
         assert(staffDef);
 
         Clef *clef = vrv_cast<Clef *>(staffDef->FindDescendantByType(CLEF));
-        if (clef) *clef = *staffDef->GetCurrentClef();
+        if (clef) clef->ReplaceWithCopyOf(staffDef->GetCurrentClef());
 
         KeySig *keySig = vrv_cast<KeySig *>(staffDef->FindDescendantByType(KEYSIG));
-        if (keySig) *keySig = *staffDef->GetCurrentKeySig();
+        if (keySig) keySig->ReplaceWithCopyOf(staffDef->GetCurrentKeySig());
 
         Mensur *mensur = vrv_cast<Mensur *>(staffDef->FindDescendantByType(MENSUR));
-        if (mensur) *mensur = *staffDef->GetCurrentMensur();
+        if (mensur) mensur->ReplaceWithCopyOf(staffDef->GetCurrentMensur());
 
         MeterSigGrp *meterSigGrp = vrv_cast<MeterSigGrp *>(staffDef->FindDescendantByType(METERSIGGRP));
         MeterSig *meterSig = vrv_cast<MeterSig *>(staffDef->FindDescendantByType(METERSIG));
         if (meterSigGrp) {
-            *meterSigGrp = *staffDef->GetCurrentMeterSigGrp();
+            meterSigGrp->ReplaceWithCopyOf(staffDef->GetCurrentMeterSigGrp());
         }
         else if (meterSig) {
-            *meterSig = *staffDef->GetCurrentMeterSig();
+            meterSig->ReplaceWithCopyOf(staffDef->GetCurrentMeterSig());
         }
     }
 }
@@ -520,9 +508,13 @@ const StaffDef *ScoreDef::GetStaffDef(int n) const
         if (staffDef->GetN() == n) {
             return staffDef;
         }
+        // Also check if we are looking for an ossia staffDef
+        const StaffDef *ossia = staffDef->GetOssiaStaffDef(n);
+        if (ossia) return ossia;
     }
 
-    return staffDef;
+    // Nothing found, something broken in the data...
+    return NULL;
 }
 
 StaffGrp *ScoreDef::GetStaffGrp(const std::string &n)
@@ -554,8 +546,10 @@ std::vector<int> ScoreDef::GetStaffNs() const
         // It should be staffDef only, but double check.
         if (!child->Is(STAFFDEF)) continue;
         staffDef = vrv_cast<const StaffDef *>(child);
-        assert(staffDef);
+        // Include ossia staves (above and below)
+        staffDef->GetOssiaAboveNs(ns);
         ns.push_back(staffDef->GetN());
+        staffDef->GetOssiaBelowNs(ns);
     }
     return ns;
 }
@@ -631,6 +625,28 @@ bool ScoreDef::HasSystemStartLine() const
         return (this->GetSystemLeftline() == BOOLEAN_true);
     }
     return false;
+}
+
+void ScoreDef::AddOssias(int staffN, const std::list<int> ossias, bool above)
+{
+    StaffDef *staffDef = this->GetStaffDef(staffN);
+
+    for (auto ossiaN : ossias) {
+        // Get the original staff
+        // It might be different from the staffDef of staffN when multiple staves in ossia
+        StaffDef *origStaffDef = this->GetStaffDef(ossiaN - OSSIA_N_OFFSET);
+        if (!origStaffDef) continue;
+        StaffDef *ossiaStaffDef = new StaffDef();
+        // Copy all attributes and set `@n`
+        origStaffDef->CopyAttributesTo(ossiaStaffDef);
+        ossiaStaffDef->SetN(ossiaN);
+        if (above) {
+            staffDef->AddOssiaAbove(ossiaStaffDef);
+        }
+        else {
+            staffDef->AddOssiaBelow(ossiaStaffDef);
+        }
+    }
 }
 
 //----------------------------------------------------------------------------

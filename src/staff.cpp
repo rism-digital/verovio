@@ -24,6 +24,7 @@
 #include "layer.h"
 #include "measure.h"
 #include "note.h"
+#include "ossia.h"
 #include "page.h"
 #include "staffdef.h"
 #include "syl.h"
@@ -41,9 +42,17 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 static const ClassRegistrar<Staff> s_factory("staff", STAFF);
+static const ClassRegistrar<Staff> s_factoryOStaff(
+    "oStaff", FACTORY_OSTAFF, []() -> Object * { return new Staff(1, true); });
 
-Staff::Staff(int n)
-    : Object(STAFF, "staff-"), FacsimileInterface(), AttCoordY1(), AttNInteger(), AttTyped(), AttVisibility()
+Staff::Staff(int n, bool isOssia)
+    : Object(STAFF)
+    , VisibilityDrawingInterface()
+    , FacsimileInterface()
+    , AttCoordY1()
+    , AttNInteger()
+    , AttTyped()
+    , AttVisibility()
 {
     this->RegisterAttClass(ATT_COORDY1);
     this->RegisterAttClass(ATT_NINTEGER);
@@ -53,6 +62,7 @@ Staff::Staff(int n)
 
     this->Reset();
     this->SetN(n);
+    this->SetOssia(isOssia);
 }
 
 Staff::~Staff() {}
@@ -60,11 +70,14 @@ Staff::~Staff() {}
 void Staff::Reset()
 {
     Object::Reset();
+    VisibilityDrawingInterface::Reset();
     FacsimileInterface::Reset();
     this->ResetCoordY1();
     this->ResetNInteger();
     this->ResetTyped();
     this->ResetVisibility();
+
+    m_isOssia = false;
 
     m_drawingFacsY = VRV_UNSET;
 
@@ -77,7 +90,7 @@ void Staff::Reset()
     m_drawingTuning = NULL;
     m_drawingRotation = 0.0;
 
-    ClearLedgerLines();
+    this->ClearLedgerLines();
 }
 
 void Staff::CloneReset()
@@ -94,6 +107,32 @@ void Staff::CloneReset()
     m_drawingRotation = 0.0;
 }
 
+int Staff::GetNForOssia() const
+{
+    assert(!this->IsOssia());
+    return (this->GetN() + OSSIA_N_OFFSET);
+}
+
+int Staff::GetNFromOssia() const
+{
+    assert(this->IsOssia());
+    return (this->GetN() - OSSIA_N_OFFSET);
+}
+
+void Staff::AttributesToExternal()
+{
+    Object::AttributesToExternal();
+
+    if (this->IsOssia() && this->HasN()) this->SetN(this->GetN() - OSSIA_N_OFFSET);
+}
+
+void Staff::AttributesToInternal()
+{
+    Object::AttributesToInternal();
+
+    if (this->IsOssia() && this->HasN()) this->SetN(this->GetN() + OSSIA_N_OFFSET);
+}
+
 int Staff::GetDrawingRotationOffsetFor(int x)
 {
     int xDiff = x - this->GetDrawingX();
@@ -108,7 +147,22 @@ void Staff::ClearLedgerLines()
     m_ledgerLinesBelowCue.clear();
 }
 
-bool Staff::IsSupportedChild(Object *child)
+bool Staff::IsSupportedChild(ClassId classId)
+{
+    static const std::vector<ClassId> supported{ LAYER };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
+    }
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+bool Staff::AddChildAdditionalCheck(Object *child)
 {
     if (child->Is(LAYER)) {
         Layer *layer = vrv_cast<Layer *>(child);
@@ -119,13 +173,7 @@ bool Staff::IsSupportedChild(Object *child)
             layer->SetN(this->GetChildCount(LAYER) + 1);
         }
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
-    }
-    else {
-        return false;
-    }
-    return true;
+    return (Object::AddChildAdditionalCheck(child));
 }
 
 int Staff::GetDrawingX() const
@@ -186,11 +234,15 @@ void Staff::AdjustDrawingStaffSize()
 
 int Staff::GetDrawingStaffNotationSize() const
 {
+    if (this->IsTabLuteGerman()) return m_drawingStaffSize / GERMAN_TAB_STAFF_RATIO;
+
     return (this->IsTablature()) ? m_drawingStaffSize / TABLATURE_STAFF_RATIO : m_drawingStaffSize;
 }
 
 bool Staff::DrawingIsVisible() const
 {
+    if (this->IsHidden()) return false;
+
     const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
     assert(system);
     assert(system->GetDrawingScoreDef());
@@ -216,6 +268,8 @@ bool Staff::IsNeume() const
 
 bool Staff::IsTablature() const
 {
+    // NOTATIONTYPE_tab_staff_like is excluded as it is neither tablature nor CMN, a hybrid.
+    // So is always tested for explicitly
     bool isTablature = (m_drawingNotationType == NOTATIONTYPE_tab || m_drawingNotationType == NOTATIONTYPE_tab_guitar
         || m_drawingNotationType == NOTATIONTYPE_tab_lute_italian
         || m_drawingNotationType == NOTATIONTYPE_tab_lute_french
@@ -239,23 +293,24 @@ int Staff::CalcPitchPosYRel(const Doc *doc, int loc) const
     return (loc - staffLocOffset) * doc->GetDrawingUnit(m_drawingStaffSize);
 }
 
-void Staff::AddLedgerLineAbove(int count, int left, int right, int extension, bool cueSize)
+void Staff::AddLedgerLineAbove(int count, int left, int right, int extension, bool cueSize, const Object *event)
 {
-    this->AddLedgerLines(cueSize ? m_ledgerLinesAboveCue : m_ledgerLinesAbove, count, left, right, extension);
+    this->AddLedgerLines(cueSize ? m_ledgerLinesAboveCue : m_ledgerLinesAbove, count, left, right, extension, event);
 }
 
-void Staff::AddLedgerLineBelow(int count, int left, int right, int extension, bool cueSize)
+void Staff::AddLedgerLineBelow(int count, int left, int right, int extension, bool cueSize, const Object *event)
 {
-    this->AddLedgerLines(cueSize ? m_ledgerLinesBelowCue : m_ledgerLinesBelow, count, left, right, extension);
+    this->AddLedgerLines(cueSize ? m_ledgerLinesBelowCue : m_ledgerLinesBelow, count, left, right, extension, event);
 }
 
-void Staff::AddLedgerLines(ArrayOfLedgerLines &lines, int count, int left, int right, int extension)
+void Staff::AddLedgerLines(
+    ArrayOfLedgerLines &lines, int count, int left, int right, int extension, const Object *event)
 {
     assert(left < right);
 
     if ((int)lines.size() < count) lines.resize(count);
     for (int i = 0; i < count; ++i) {
-        lines.at(i).AddDash(left, right, extension);
+        lines.at(i).AddDash(left, right, extension, event);
     }
 }
 
@@ -269,6 +324,31 @@ void Staff::SetFromFacsimile(Doc *doc)
         this->AttachZone(zone);
     }
     this->AdjustDrawingStaffSize();
+}
+
+int Staff::GetOssiaDrawingShift(const Measure *measure, Doc *doc) const
+{
+    const Ossia *ossia = vrv_cast<const Ossia *>(this->GetFirstAncestor(OSSIA));
+    const Layer *layer = vrv_cast<const Layer *>(this->FindDescendantByType(LAYER));
+    if (!ossia && !layer) return 0;
+
+    if (layer->DrawOssiaStaffDef()) {
+        int shift = ossia->GetScoreDefShift();
+        // The ossia scoreDef shift is the position of the clef (or key signature)
+        shift -= (1.5 * doc->GetDrawingUnit(this->m_drawingStaffSize));
+        return shift;
+    }
+    else if (ossia->DrawScoreDef() || !ossia->IsFirst()) {
+        return 0;
+    }
+
+    int shift = measure->GetLeftBarLineLeft();
+    // When there is no left barline on the measure we need to adjust the position
+    if (measure->GetLeftBarLine()->GetForm() == BARRENDITION_NONE) {
+        // Measure bar lines are always 100
+        shift -= (doc->GetDrawingBarLineWidth(100) / 2);
+    }
+    return shift;
 }
 
 bool Staff::IsOnStaffLine(int y, const Doc *doc) const
@@ -298,27 +378,27 @@ int Staff::GetNearestInterStaffPosition(int y, const Doc *doc, data_STAFFREL pla
 // LedgerLine
 //----------------------------------------------------------------------------
 
-void LedgerLine::AddDash(int left, int right, int extension)
+void LedgerLine::AddDash(int left, int right, int extension, const Object *event)
 {
     assert(left < right);
 
-    std::list<std::pair<int, int>>::iterator iter;
+    std::list<LedgerLine::Dash>::iterator iter;
 
     // First add the dash
     for (iter = m_dashes.begin(); iter != m_dashes.end(); ++iter) {
-        if (iter->first > left) break;
+        if (iter->m_x1 > left) break;
     }
-    m_dashes.insert(iter, { left, right });
+    m_dashes.insert(iter, LedgerLine::Dash(left, right, event));
 
     // Merge dashes which overlap by more than 1.5 extensions
     // => Dashes belonging to the same chord overlap at least by two extensions and will get merged
     // => Overlapping dashes of adjacent notes will not get merged
-    std::list<std::pair<int, int>>::iterator previous = m_dashes.begin();
+    std::list<LedgerLine::Dash>::iterator previous = m_dashes.begin();
     iter = m_dashes.begin();
     ++iter;
     while (iter != m_dashes.end()) {
-        if (previous->second > iter->first + 1.5 * extension) {
-            previous->second = std::max(iter->second, previous->second);
+        if (previous->m_x2 > iter->m_x1 + 1.5 * extension) {
+            previous->MergeWith(*iter);
             iter = m_dashes.erase(iter);
         }
         else {

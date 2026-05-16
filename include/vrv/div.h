@@ -31,7 +31,7 @@ public:
     Div();
     virtual ~Div();
     void Reset() override;
-    std::string GetClassName() const override { return "Div"; }
+    std::string GetClassName() const override { return "div"; }
     ///@}
 
     /**

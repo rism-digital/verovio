@@ -22,6 +22,7 @@
 #include "layer.h"
 #include "smufl.h"
 #include "staff.h"
+#include "symboldef.h"
 #include "system.h"
 #include "transposition.h"
 #include "vrv.h"
@@ -170,19 +171,25 @@ RestAccidental MeiAccidentalToRestAccidental(data_ACCIDENTAL_WRITTEN accidental)
 static const ClassRegistrar<Rest> s_factory("rest", REST);
 
 Rest::Rest()
-    : LayerElement(REST, "rest-")
+    : LayerElement(REST)
+    , AltSymInterface()
     , DurationInterface()
+    , OffsetInterface()
     , PositionInterface()
     , AttColor()
     , AttCue()
+    , AttEnclosingChars()
     , AttExtSymAuth()
     , AttExtSymNames()
     , AttRestVisMensural()
 {
+    this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
     this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_CUE);
+    this->RegisterAttClass(ATT_ENCLOSINGCHARS);
     this->RegisterAttClass(ATT_EXTSYMAUTH);
     this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_RESTVISMENSURAL);
@@ -194,34 +201,38 @@ Rest::~Rest() {}
 void Rest::Reset()
 {
     LayerElement::Reset();
+    AltSymInterface::Reset();
     DurationInterface::Reset();
+    OffsetInterface::Reset();
     PositionInterface::Reset();
     this->ResetColor();
     this->ResetCue();
+    this->ResetEnclosingChars();
     this->ResetExtSymAuth();
     this->ResetExtSymNames();
     this->ResetRestVisMensural();
 }
 
-bool Rest::IsSupportedChild(Object *child)
+bool Rest::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(DOTS)) {
-        assert(dynamic_cast<Dots *>(child));
+    static const std::vector<ClassId> supported{ DOTS };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
-void Rest::AddChild(Object *child)
+bool Rest::AddChild(Object *child)
 {
-    if (!this->IsSupportedChild(child)) {
+    if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        return;
+        return false;
     }
 
     child->SetParent(this);
@@ -236,7 +247,9 @@ void Rest::AddChild(Object *child)
     else {
         children.push_back(child);
     }
-    Modify();
+    this->Modify();
+
+    return true;
 }
 
 char32_t Rest::GetRestGlyph() const
@@ -258,6 +271,23 @@ char32_t Rest::GetRestGlyph(const data_DURATION duration) const
     else if (this->HasGlyphName()) {
         char32_t code = resources->GetGlyphCode(this->GetGlyphName());
         if (NULL != resources->GetGlyph(code)) return code;
+    }
+    // If there is @altsym (third priority)
+    else if (this->HasAltsym() && this->HasAltSymbolDef()) {
+        const SymbolDef *symbolDef = this->GetAltSymbolDef();
+        const Symbol *symbol = vrv_cast<const Symbol *>(symbolDef->GetFirst(SYMBOL));
+        if (symbol != NULL) {
+            // If there is @glyph.num, return glyph based on it (fourth priority)
+            if (symbol->HasGlyphNum()) {
+                const char32_t code = symbol->GetGlyphNum();
+                if (NULL != resources->GetGlyph(code)) return code;
+            }
+            // If there is @glyph.name (fifth priority)
+            else if (symbol->HasGlyphName()) {
+                const char32_t code = resources->GetGlyphCode(symbol->GetGlyphName());
+                if (NULL != resources->GetGlyph(code)) return code;
+            }
+        }
     }
 
     if (this->IsMensuralDur()) {
@@ -293,6 +323,18 @@ char32_t Rest::GetRestGlyph(const data_DURATION duration) const
     }
 
     return 0;
+}
+
+std::pair<char32_t, char32_t> Rest::GetEnclosingGlyphs() const
+{
+    if (this->HasEnclose()) {
+        switch (this->GetEnclose()) {
+            case ENCLOSURE_brack: return { SMUFL_E26C_accidentalBracketLeft, SMUFL_E26D_accidentalBracketRight }; break;
+            case ENCLOSURE_paren: return { SMUFL_E26A_accidentalParensLeft, SMUFL_E26B_accidentalParensRight }; break;
+            default: break;
+        }
+    }
+    return { 0, 0 };
 }
 
 void Rest::UpdateFromTransLoc(const TransPitch &tp)

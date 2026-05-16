@@ -36,13 +36,13 @@ public:
     virtual ~Section();
     Object *Clone() const override { return new Section(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Section"; }
+    std::string GetClassName() const override { return "section"; }
     ///@}
 
     /**
      * Method for adding allowed content
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     //----------//
     // Functors //

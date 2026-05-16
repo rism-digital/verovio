@@ -30,7 +30,7 @@ namespace vrv {
 static const ClassRegistrar<KeyAccid> s_factory("keyAccid", KEYACCID);
 
 KeyAccid::KeyAccid()
-    : LayerElement(KEYACCID, "keyaccid-")
+    : LayerElement(KEYACCID)
     , PitchInterface()
     , PositionInterface()
     , AttAccidental()
@@ -79,7 +79,8 @@ int KeyAccid::CalcStaffLoc(Clef *clef, int clefLocOffset) const
     else {
         const data_ACCIDENTAL_WRITTEN accid = this->GetAccid();
         const data_PITCHNAME pname = this->GetPname();
-        return PitchInterface::CalcLoc(pname, KeySig::GetOctave(accid, pname, clef), clefLocOffset);
+        const int oct = (this->HasOct()) ? this->GetOct() : KeySig::GetOctave(accid, pname, clef);
+        return PitchInterface::CalcLoc(pname, oct, clefLocOffset);
     }
 }
 

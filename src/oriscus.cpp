@@ -24,13 +24,14 @@ namespace vrv {
 // Oriscus
 //----------------------------------------------------------------------------
 
-Oriscus::Oriscus() : LayerElement(ORISCUS, "oriscus-"), PitchInterface(), PositionInterface(), AttColor()
+Oriscus::Oriscus() : LayerElement(ORISCUS), OffsetInterface(), PitchInterface(), PositionInterface(), AttColor()
 {
-    RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
-    RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
+    this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
+    this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
 
-    Reset();
+    this->Reset();
 }
 
 Oriscus::~Oriscus() {}
@@ -38,9 +39,10 @@ Oriscus::~Oriscus() {}
 void Oriscus::Reset()
 {
     LayerElement::Reset();
+    OffsetInterface::Reset();
     PitchInterface::Reset();
     PositionInterface::Reset();
-    ResetColor();
+    this->ResetColor();
 }
 
 } // namespace vrv

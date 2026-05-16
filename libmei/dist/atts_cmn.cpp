@@ -28,7 +28,7 @@ namespace vrv {
 
 AttArpegLog::AttArpegLog() : Att()
 {
-    ResetArpegLog();
+    this->ResetArpegLog();
 }
 
 void AttArpegLog::ResetArpegLog()
@@ -68,7 +68,7 @@ bool AttArpegLog::HasOrder() const
 
 AttBeamPresent::AttBeamPresent() : Att()
 {
-    ResetBeamPresent();
+    this->ResetBeamPresent();
 }
 
 void AttBeamPresent::ResetBeamPresent()
@@ -108,7 +108,7 @@ bool AttBeamPresent::HasBeam() const
 
 AttBeamRend::AttBeamRend() : Att()
 {
-    ResetBeamRend();
+    this->ResetBeamRend();
 }
 
 void AttBeamRend::ResetBeamRend()
@@ -193,7 +193,7 @@ bool AttBeamRend::HasSlope() const
 
 AttBeamSecondary::AttBeamSecondary() : Att()
 {
-    ResetBeamSecondary();
+    this->ResetBeamSecondary();
 }
 
 void AttBeamSecondary::ResetBeamSecondary()
@@ -233,7 +233,7 @@ bool AttBeamSecondary::HasBreaksec() const
 
 AttBeamedWith::AttBeamedWith() : Att()
 {
-    ResetBeamedWith();
+    this->ResetBeamedWith();
 }
 
 void AttBeamedWith::ResetBeamedWith()
@@ -273,7 +273,7 @@ bool AttBeamedWith::HasBeamWith() const
 
 AttBeamingLog::AttBeamingLog() : Att()
 {
-    ResetBeamingLog();
+    this->ResetBeamingLog();
 }
 
 void AttBeamingLog::ResetBeamingLog()
@@ -328,7 +328,7 @@ bool AttBeamingLog::HasBeamRests() const
 
 AttBeatRptLog::AttBeatRptLog() : Att()
 {
-    ResetBeatRptLog();
+    this->ResetBeatRptLog();
 }
 
 void AttBeatRptLog::ResetBeatRptLog()
@@ -368,19 +368,19 @@ bool AttBeatRptLog::HasBeatdef() const
 
 AttBracketSpanLog::AttBracketSpanLog() : Att()
 {
-    ResetBracketSpanLog();
+    this->ResetBracketSpanLog();
 }
 
 void AttBracketSpanLog::ResetBracketSpanLog()
 {
-    m_func = "";
+    m_func = bracketSpanLog_FUNC_NONE;
 }
 
 bool AttBracketSpanLog::ReadBracketSpanLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("func")) {
-        this->SetFunc(StrToStr(element.attribute("func").value()));
+        this->SetFunc(StrToBracketSpanLogFunc(element.attribute("func").value()));
         if (removeAttr) element.remove_attribute("func");
         hasAttribute = true;
     }
@@ -391,7 +391,7 @@ bool AttBracketSpanLog::WriteBracketSpanLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasFunc()) {
-        element.append_attribute("func") = StrToStr(this->GetFunc()).c_str();
+        element.append_attribute("func") = BracketSpanLogFuncToStr(this->GetFunc()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -399,7 +399,7 @@ bool AttBracketSpanLog::WriteBracketSpanLog(pugi::xml_node element)
 
 bool AttBracketSpanLog::HasFunc() const
 {
-    return (m_func != "");
+    return (m_func != bracketSpanLog_FUNC_NONE);
 }
 
 //----------------------------------------------------------------------------
@@ -408,7 +408,7 @@ bool AttBracketSpanLog::HasFunc() const
 
 AttCutout::AttCutout() : Att()
 {
-    ResetCutout();
+    this->ResetCutout();
 }
 
 void AttCutout::ResetCutout()
@@ -448,7 +448,7 @@ bool AttCutout::HasCutout() const
 
 AttExpandable::AttExpandable() : Att()
 {
-    ResetExpandable();
+    this->ResetExpandable();
 }
 
 void AttExpandable::ResetExpandable()
@@ -488,7 +488,7 @@ bool AttExpandable::HasExpand() const
 
 AttGlissPresent::AttGlissPresent() : Att()
 {
-    ResetGlissPresent();
+    this->ResetGlissPresent();
 }
 
 void AttGlissPresent::ResetGlissPresent()
@@ -528,7 +528,7 @@ bool AttGlissPresent::HasGliss() const
 
 AttGraceGrpLog::AttGraceGrpLog() : Att()
 {
-    ResetGraceGrpLog();
+    this->ResetGraceGrpLog();
 }
 
 void AttGraceGrpLog::ResetGraceGrpLog()
@@ -568,7 +568,7 @@ bool AttGraceGrpLog::HasAttach() const
 
 AttGraced::AttGraced() : Att()
 {
-    ResetGraced();
+    this->ResetGraced();
 }
 
 void AttGraced::ResetGraced()
@@ -623,7 +623,7 @@ bool AttGraced::HasGraceTime() const
 
 AttHairpinLog::AttHairpinLog() : Att()
 {
-    ResetHairpinLog();
+    this->ResetHairpinLog();
 }
 
 void AttHairpinLog::ResetHairpinLog()
@@ -678,55 +678,55 @@ bool AttHairpinLog::HasNiente() const
 
 AttHarpPedalLog::AttHarpPedalLog() : Att()
 {
-    ResetHarpPedalLog();
+    this->ResetHarpPedalLog();
 }
 
 void AttHarpPedalLog::ResetHarpPedalLog()
 {
-    m_c = harpPedalLog_C_NONE;
-    m_d = harpPedalLog_D_NONE;
-    m_e = harpPedalLog_E_NONE;
-    m_f = harpPedalLog_F_NONE;
-    m_g = harpPedalLog_G_NONE;
-    m_a = harpPedalLog_A_NONE;
-    m_b = harpPedalLog_B_NONE;
+    m_c = HARPPEDALPOSITION_NONE;
+    m_d = HARPPEDALPOSITION_NONE;
+    m_e = HARPPEDALPOSITION_NONE;
+    m_f = HARPPEDALPOSITION_NONE;
+    m_g = HARPPEDALPOSITION_NONE;
+    m_a = HARPPEDALPOSITION_NONE;
+    m_b = HARPPEDALPOSITION_NONE;
 }
 
 bool AttHarpPedalLog::ReadHarpPedalLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("c")) {
-        this->SetC(StrToHarpPedalLogC(element.attribute("c").value()));
+        this->SetC(StrToHarppedalposition(element.attribute("c").value()));
         if (removeAttr) element.remove_attribute("c");
         hasAttribute = true;
     }
     if (element.attribute("d")) {
-        this->SetD(StrToHarpPedalLogD(element.attribute("d").value()));
+        this->SetD(StrToHarppedalposition(element.attribute("d").value()));
         if (removeAttr) element.remove_attribute("d");
         hasAttribute = true;
     }
     if (element.attribute("e")) {
-        this->SetE(StrToHarpPedalLogE(element.attribute("e").value()));
+        this->SetE(StrToHarppedalposition(element.attribute("e").value()));
         if (removeAttr) element.remove_attribute("e");
         hasAttribute = true;
     }
     if (element.attribute("f")) {
-        this->SetF(StrToHarpPedalLogF(element.attribute("f").value()));
+        this->SetF(StrToHarppedalposition(element.attribute("f").value()));
         if (removeAttr) element.remove_attribute("f");
         hasAttribute = true;
     }
     if (element.attribute("g")) {
-        this->SetG(StrToHarpPedalLogG(element.attribute("g").value()));
+        this->SetG(StrToHarppedalposition(element.attribute("g").value()));
         if (removeAttr) element.remove_attribute("g");
         hasAttribute = true;
     }
     if (element.attribute("a")) {
-        this->SetA(StrToHarpPedalLogA(element.attribute("a").value()));
+        this->SetA(StrToHarppedalposition(element.attribute("a").value()));
         if (removeAttr) element.remove_attribute("a");
         hasAttribute = true;
     }
     if (element.attribute("b")) {
-        this->SetB(StrToHarpPedalLogB(element.attribute("b").value()));
+        this->SetB(StrToHarppedalposition(element.attribute("b").value()));
         if (removeAttr) element.remove_attribute("b");
         hasAttribute = true;
     }
@@ -737,31 +737,31 @@ bool AttHarpPedalLog::WriteHarpPedalLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasC()) {
-        element.append_attribute("c") = HarpPedalLogCToStr(this->GetC()).c_str();
+        element.append_attribute("c") = HarppedalpositionToStr(this->GetC()).c_str();
         wroteAttribute = true;
     }
     if (this->HasD()) {
-        element.append_attribute("d") = HarpPedalLogDToStr(this->GetD()).c_str();
+        element.append_attribute("d") = HarppedalpositionToStr(this->GetD()).c_str();
         wroteAttribute = true;
     }
     if (this->HasE()) {
-        element.append_attribute("e") = HarpPedalLogEToStr(this->GetE()).c_str();
+        element.append_attribute("e") = HarppedalpositionToStr(this->GetE()).c_str();
         wroteAttribute = true;
     }
     if (this->HasF()) {
-        element.append_attribute("f") = HarpPedalLogFToStr(this->GetF()).c_str();
+        element.append_attribute("f") = HarppedalpositionToStr(this->GetF()).c_str();
         wroteAttribute = true;
     }
     if (this->HasG()) {
-        element.append_attribute("g") = HarpPedalLogGToStr(this->GetG()).c_str();
+        element.append_attribute("g") = HarppedalpositionToStr(this->GetG()).c_str();
         wroteAttribute = true;
     }
     if (this->HasA()) {
-        element.append_attribute("a") = HarpPedalLogAToStr(this->GetA()).c_str();
+        element.append_attribute("a") = HarppedalpositionToStr(this->GetA()).c_str();
         wroteAttribute = true;
     }
     if (this->HasB()) {
-        element.append_attribute("b") = HarpPedalLogBToStr(this->GetB()).c_str();
+        element.append_attribute("b") = HarppedalpositionToStr(this->GetB()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -769,37 +769,37 @@ bool AttHarpPedalLog::WriteHarpPedalLog(pugi::xml_node element)
 
 bool AttHarpPedalLog::HasC() const
 {
-    return (m_c != harpPedalLog_C_NONE);
+    return (m_c != HARPPEDALPOSITION_NONE);
 }
 
 bool AttHarpPedalLog::HasD() const
 {
-    return (m_d != harpPedalLog_D_NONE);
+    return (m_d != HARPPEDALPOSITION_NONE);
 }
 
 bool AttHarpPedalLog::HasE() const
 {
-    return (m_e != harpPedalLog_E_NONE);
+    return (m_e != HARPPEDALPOSITION_NONE);
 }
 
 bool AttHarpPedalLog::HasF() const
 {
-    return (m_f != harpPedalLog_F_NONE);
+    return (m_f != HARPPEDALPOSITION_NONE);
 }
 
 bool AttHarpPedalLog::HasG() const
 {
-    return (m_g != harpPedalLog_G_NONE);
+    return (m_g != HARPPEDALPOSITION_NONE);
 }
 
 bool AttHarpPedalLog::HasA() const
 {
-    return (m_a != harpPedalLog_A_NONE);
+    return (m_a != HARPPEDALPOSITION_NONE);
 }
 
 bool AttHarpPedalLog::HasB() const
 {
-    return (m_b != harpPedalLog_B_NONE);
+    return (m_b != HARPPEDALPOSITION_NONE);
 }
 
 //----------------------------------------------------------------------------
@@ -808,7 +808,7 @@ bool AttHarpPedalLog::HasB() const
 
 AttLvPresent::AttLvPresent() : Att()
 {
-    ResetLvPresent();
+    this->ResetLvPresent();
 }
 
 void AttLvPresent::ResetLvPresent()
@@ -848,7 +848,7 @@ bool AttLvPresent::HasLv() const
 
 AttMeasureLog::AttMeasureLog() : Att()
 {
-    ResetMeasureLog();
+    this->ResetMeasureLog();
 }
 
 void AttMeasureLog::ResetMeasureLog()
@@ -903,7 +903,7 @@ bool AttMeasureLog::HasRight() const
 
 AttMeterSigGrpLog::AttMeterSigGrpLog() : Att()
 {
-    ResetMeterSigGrpLog();
+    this->ResetMeterSigGrpLog();
 }
 
 void AttMeterSigGrpLog::ResetMeterSigGrpLog()
@@ -943,7 +943,7 @@ bool AttMeterSigGrpLog::HasFunc() const
 
 AttNumberPlacement::AttNumberPlacement() : Att()
 {
-    ResetNumberPlacement();
+    this->ResetNumberPlacement();
 }
 
 void AttNumberPlacement::ResetNumberPlacement()
@@ -998,7 +998,7 @@ bool AttNumberPlacement::HasNumVisible() const
 
 AttNumbered::AttNumbered() : Att()
 {
-    ResetNumbered();
+    this->ResetNumbered();
 }
 
 void AttNumbered::ResetNumbered()
@@ -1038,7 +1038,7 @@ bool AttNumbered::HasNum() const
 
 AttOctaveLog::AttOctaveLog() : Att()
 {
-    ResetOctaveLog();
+    this->ResetOctaveLog();
 }
 
 void AttOctaveLog::ResetOctaveLog()
@@ -1078,7 +1078,7 @@ bool AttOctaveLog::HasColl() const
 
 AttPedalLog::AttPedalLog() : Att()
 {
-    ResetPedalLog();
+    this->ResetPedalLog();
 }
 
 void AttPedalLog::ResetPedalLog()
@@ -1133,7 +1133,7 @@ bool AttPedalLog::HasFunc() const
 
 AttPianoPedals::AttPianoPedals() : Att()
 {
-    ResetPianoPedals();
+    this->ResetPianoPedals();
 }
 
 void AttPianoPedals::ResetPianoPedals()
@@ -1173,7 +1173,7 @@ bool AttPianoPedals::HasPedalStyle() const
 
 AttRehearsal::AttRehearsal() : Att()
 {
-    ResetRehearsal();
+    this->ResetRehearsal();
 }
 
 void AttRehearsal::ResetRehearsal()
@@ -1213,7 +1213,7 @@ bool AttRehearsal::HasRehEnclose() const
 
 AttSlurRend::AttSlurRend() : Att()
 {
-    ResetSlurRend();
+    this->ResetSlurRend();
 }
 
 void AttSlurRend::ResetSlurRend()
@@ -1268,7 +1268,7 @@ bool AttSlurRend::HasSlurLwidth() const
 
 AttStemsCmn::AttStemsCmn() : Att()
 {
-    ResetStemsCmn();
+    this->ResetStemsCmn();
 }
 
 void AttStemsCmn::ResetStemsCmn()
@@ -1308,7 +1308,7 @@ bool AttStemsCmn::HasStemWith() const
 
 AttTieRend::AttTieRend() : Att()
 {
-    ResetTieRend();
+    this->ResetTieRend();
 }
 
 void AttTieRend::ResetTieRend()
@@ -1363,7 +1363,7 @@ bool AttTieRend::HasTieLwidth() const
 
 AttTremForm::AttTremForm() : Att()
 {
-    ResetTremForm();
+    this->ResetTremForm();
 }
 
 void AttTremForm::ResetTremForm()
@@ -1403,7 +1403,7 @@ bool AttTremForm::HasForm() const
 
 AttTremMeasured::AttTremMeasured() : Att()
 {
-    ResetTremMeasured();
+    this->ResetTremMeasured();
 }
 
 void AttTremMeasured::ResetTremMeasured()

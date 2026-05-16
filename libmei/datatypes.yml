@@ -19,6 +19,7 @@ excludes:
     # string
     data.URI,
     # alternates but with .
+    data.HEADSHAPE,
     data.FONTSIZE,
     data.LINEWIDTH,
     data.PLACEMENT
@@ -26,6 +27,7 @@ excludes:
 
 alternates:
     [
+    data_HEADSHAPE,
     data_FONTSIZE,
     data_LINEWIDTH,
     data_PLACEMENT
@@ -43,8 +45,6 @@ mapped:
     data.COLOR:
         std::string
     data.CONFIDENCE:
-        double
-    data.DEGREES:
         double
     data.CLEFLINE:
         char
@@ -124,7 +124,7 @@ mapped:
     data.FINGER.FRET:
         std::string
     data.FRETNUMBER:
-        std::string
+        int
     data.STRINGNUMBER:
         std::string
 
@@ -135,12 +135,18 @@ defaults:
         std::vector<std::pair<double, double>>()
     data_COMPASSDIRECTION:
         data_COMPASSDIRECTION()
+    data_DEGREES:
+        MEI_UNSET
     data_EVENTREL:
         data_EVENTREL()
+    data_HEADSHAPE:
+        data_HEADSHAPE()
     data_HEXNUM:
         0
     data_FONTSIZE:
         data_FONTSIZE()
+    data_FRETNUMBER:
+        MEI_UNSET
     data_KEYSIGNATURE:
         std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE)
     data_LINEWIDTH:
@@ -253,12 +259,6 @@ modules:
             tstamp:
                 default: -1.0
 
-    frettab:
-        att.note.ges.tab:
-            tab.fret:
-                type: int
-                default: -1
-    
     visual:
         att.mensural.vis:
             mensur.slash:

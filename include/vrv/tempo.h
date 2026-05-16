@@ -41,7 +41,7 @@ public:
     virtual ~Tempo();
     Object *Clone() const override { return new Tempo(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Tempo"; }
+    std::string GetClassName() const override { return "tempo"; }
     ///@}
 
     /**
@@ -66,7 +66,7 @@ public:
      * Add an element (text, rend. etc.) to a tempo.
      * Only supported elements will be actually added to the child list.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * @name Getter and setter for the X drawing position

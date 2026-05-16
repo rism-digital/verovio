@@ -24,6 +24,7 @@
 #include "adjustharmgrpsspacingfunctor.h"
 #include "adjustlayersfunctor.h"
 #include "adjustneumexfunctor.h"
+#include "adjustossiastaffdeffunctor.h"
 #include "adjustslursfunctor.h"
 #include "adjuststaffoverlapfunctor.h"
 #include "adjustsylspacingfunctor.h"
@@ -72,7 +73,7 @@ namespace vrv {
 // Page
 //----------------------------------------------------------------------------
 
-Page::Page() : Object(PAGE, "page-")
+Page::Page() : Object(PAGE)
 {
     this->Reset();
 }
@@ -102,18 +103,19 @@ void Page::Reset()
     m_justificationSum = 0.;
 }
 
-bool Page::IsSupportedChild(Object *child)
+bool Page::IsSupportedChild(ClassId classId)
 {
-    if (child->IsPageElement()) {
-        assert(dynamic_cast<PageElement *>(child));
+    static const std::vector<ClassId> supported{ SYSTEM };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(SYSTEM)) {
-        assert(dynamic_cast<System *>(child));
+    else if (Object::IsPageElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 bool Page::IsFirstOfSelection() const
@@ -144,6 +146,7 @@ RunningElement *Page::GetHeader()
 const RunningElement *Page::GetHeader() const
 {
     assert(m_score);
+    assert(m_score->GetScoreDef());
 
     const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_header.GetValue() == HEADER_none)) {
@@ -153,12 +156,25 @@ const RunningElement *Page::GetHeader() const
     const Pages *pages = doc->GetPages();
     assert(pages);
 
-    // first page or use the pgHeader for all pages?
-    if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgHeaderForAll.GetValue())) {
-        return m_score->GetScoreDef()->GetPgHead(PGFUNC_first);
+    // If we have the option turned on, return the header without `@func` or with
+    // `@func="all"`
+    if (doc->GetOptions()->m_usePgHeaderForAll.GetValue()) {
+        RunningElement *header = m_score->GetScoreDef()->GetPgHead(PGFUNC_NONE);
+        if (!header) {
+            header = m_score->GetScoreDef()->GetPgHead(PGFUNC_all);
+        }
+        return header;
     }
     else {
-        return m_score->GetScoreDef()->GetPgHead(PGFUNC_all);
+        RunningElement *header = NULL;
+        if (pages->GetFirst() == this) {
+            header = m_score->GetScoreDef()->GetPgHead(PGFUNC_first);
+        }
+        // If we did not find it, or not the first page
+        if (!header) {
+            header = m_score->GetScoreDef()->GetPgHead(PGFUNC_all);
+        }
+        return header;
     }
 }
 
@@ -170,6 +186,7 @@ RunningElement *Page::GetFooter()
 const RunningElement *Page::GetFooter() const
 {
     assert(m_scoreEnd);
+    assert(m_scoreEnd->GetScoreDef());
 
     const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_footer.GetValue() == FOOTER_none)) {
@@ -179,18 +196,31 @@ const RunningElement *Page::GetFooter() const
     const Pages *pages = doc->GetPages();
     assert(pages);
 
-    // first page or use the pgFooter for all pages?
-    if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgFooterForAll.GetValue())) {
-        return m_scoreEnd->GetScoreDef()->GetPgFoot(PGFUNC_first);
+    // If we have the option turned on, return the footer without `@func` or with
+    // `@func="all"`
+    if (doc->GetOptions()->m_usePgFooterForAll.GetValue()) {
+        RunningElement *footer = m_score->GetScoreDef()->GetPgFoot(PGFUNC_NONE);
+        if (!footer) {
+            footer = m_score->GetScoreDef()->GetPgFoot(PGFUNC_all);
+        }
+        return footer;
     }
     else {
-        return m_scoreEnd->GetScoreDef()->GetPgFoot(PGFUNC_all);
+        RunningElement *footer = NULL;
+        if (pages->GetFirst() == this) {
+            footer = m_score->GetScoreDef()->GetPgFoot(PGFUNC_first);
+        }
+        // If we did not find it, or not the first page
+        if (!footer) {
+            footer = m_score->GetScoreDef()->GetPgFoot(PGFUNC_all);
+        }
+        return footer;
     }
 }
 
-void Page::LayOut(bool force)
+void Page::LayOut()
 {
-    if (m_layoutDone && !force) {
+    if (m_layoutDone) {
         // We only need to reset the header - this will adjust the page number if necessary
         if (this->GetHeader()) this->GetHeader()->SetDrawingPage(this);
         if (this->GetFooter()) this->GetFooter()->SetDrawingPage(this);
@@ -209,7 +239,7 @@ void Page::LayOut(bool force)
         view.SetDoc(doc);
         BBoxDeviceContext bBoxDC(&view, 0, 0);
         // Do not do the layout in this view - otherwise we will loop...
-        view.SetPage(this->GetIdx(), false);
+        view.SetPage(this, false);
         view.DrawCurrentPage(&bBoxDC, false);
     }
 
@@ -225,9 +255,8 @@ void Page::LayOutTranscription(bool force)
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    // Doc::SetDrawingPage should have been called before
-    // Make sure we have the correct page
-    assert(this == doc->GetDrawingPage());
+    // Make sure we have the correct page size
+    assert(doc->CheckPageSize(this));
 
     // Reset the horizontal alignment
     ResetHorizontalAlignmentFunctor resetHorizontalAlignment;
@@ -271,7 +300,7 @@ void Page::LayOutTranscription(bool force)
         view.SetDoc(doc);
         BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
         // Do not do the layout in this view - otherwise we will loop...
-        view.SetPage(this->GetIdx(), false);
+        view.SetPage(this, false);
         view.DrawCurrentPage(&bBoxDC, false);
     }
 
@@ -291,9 +320,8 @@ void Page::ResetAligners()
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    // Doc::SetDrawingPage should have been called before
-    // Make sure we have the correct page
-    assert(this == doc->GetDrawingPage());
+    // Make sure we have the correct page size
+    assert(doc->CheckPageSize(this));
 
     // Reset the horizontal alignment
     ResetHorizontalAlignmentFunctor resetHorizontalAlignment;
@@ -370,9 +398,8 @@ void Page::LayOutHorizontally()
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    // Doc::SetDrawingPage should have been called before
-    // Make sure we have the correct page
-    assert(this == doc->GetDrawingPage());
+    // Make sure we have the correct page size
+    assert(doc->CheckPageSize(this));
 
     this->ResetAligners();
 
@@ -382,11 +409,11 @@ void Page::LayOutHorizontally()
     view.SetSlurHandling(SlurHandling::Ignore);
     BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
     // Do not do the layout in this view - otherwise we will loop...
-    view.SetPage(this->GetIdx(), false);
+    view.SetPage(this, false);
     view.DrawCurrentPage(&bBoxDC, false);
 
-    // Get the scoreDef at the beginning of the page
-    ScoreDef *scoreDef = m_score->GetScoreDef();
+    AdjustOssiaStaffDefFunctor adjustOssiaStaffDef(doc);
+    this->Process(adjustOssiaStaffDef);
 
     // Adjust the position of outside articulations
     AdjustArticFunctor adjustArtic(doc);
@@ -395,12 +422,12 @@ void Page::LayOutHorizontally()
     // Adjust the x position of the LayerElement where multiple layers collide
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     // For the first iteration align elements without taking dots into consideration
-    AdjustLayersFunctor adjustLayers(doc, scoreDef->GetStaffNs());
+    AdjustLayersFunctor adjustLayers(doc);
     this->Process(adjustLayers);
 
     // Adjust dots for the multiple layers. Try to align dots that can be grouped together when layers collide,
     // otherwise keep their relative positioning
-    AdjustDotsFunctor adjustDots(doc, scoreDef->GetStaffNs());
+    AdjustDotsFunctor adjustDots(doc);
     this->Process(adjustDots);
 
     // Adjust the X position of the neume and syllables
@@ -408,7 +435,7 @@ void Page::LayOutHorizontally()
     this->Process(adjustNeumeX);
 
     // Adjust layers again, this time including dots positioning
-    AdjustLayersFunctor adjustLayersWithDots(doc, scoreDef->GetStaffNs());
+    AdjustLayersFunctor adjustLayersWithDots(doc);
     adjustLayersWithDots.IgnoreDots(false);
     this->Process(adjustLayersWithDots);
 
@@ -418,7 +445,7 @@ void Page::LayOutHorizontally()
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
-    AdjustXPosFunctor adjustXPos(doc, scoreDef->GetStaffNs());
+    AdjustXPosFunctor adjustXPos(doc);
     adjustXPos.SetExcluded({ TABDURSYM });
     this->Process(adjustXPos);
 
@@ -430,7 +457,7 @@ void Page::LayOutHorizontally()
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
-    AdjustGraceXPosFunctor adjustGraceXPos(doc, scoreDef->GetStaffNs());
+    AdjustGraceXPosFunctor adjustGraceXPos(doc);
     this->Process(adjustGraceXPos);
 
     // Adjust the spacing of clef changes since they are skipped in AdjustXPos
@@ -484,9 +511,8 @@ void Page::LayOutVertically()
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    // Doc::SetDrawingPage should have been called before
-    // Make sure we have the correct page
-    assert(this == doc->GetDrawingPage());
+    // Make sure we have the correct page size
+    assert(doc->CheckPageSize(this));
 
     // Reset the vertical alignment
     ResetVerticalAlignmentFunctor resetVerticalAlignment;
@@ -506,7 +532,7 @@ void Page::LayOutVertically()
     BBoxDeviceContext bBoxDC(&view, 0, 0);
     view.SetDoc(doc);
     // Do not do the layout in this view - otherwise we will loop...
-    view.SetPage(this->GetIdx(), false);
+    view.SetPage(this, false);
     view.DrawCurrentPage(&bBoxDC, false);
 
     // Adjust the position of outside articulations with slurs end and start positions
@@ -527,7 +553,7 @@ void Page::LayOutVertically()
 
     // At this point slurs must not be reinitialized, otherwise the adjustment we just did was in vain
     view.SetSlurHandling(SlurHandling::Drawing);
-    view.SetPage(this->GetIdx(), false);
+    view.SetPage(this, false);
     view.DrawCurrentPage(&bBoxDC, false);
 
     // Adjust the position of tuplets by slurs
@@ -561,7 +587,7 @@ void Page::LayOutVertically()
     // Redraw are re-adjust the position of the slurs when we have cross-staff ones
     if (adjustSlurs.HasCrossStaffSlurs()) {
         view.SetSlurHandling(SlurHandling::Initialize);
-        view.SetPage(this->GetIdx(), false);
+        view.SetPage(this, false);
         view.DrawCurrentPage(&bBoxDC, false);
         this->Process(adjustSlurs);
     }
@@ -590,9 +616,8 @@ void Page::JustifyHorizontally()
         return;
     }
 
-    // Doc::SetDrawingPage should have been called before
-    // Make sure we have the correct page
-    assert(this == doc->GetDrawingPage());
+    // Make sure we have the correct page size
+    assert(doc->CheckPageSize(this));
 
     if ((doc->GetOptions()->m_adjustPageWidth.GetValue())) {
         doc->m_drawingPageContentWidth = this->GetContentWidth();
@@ -612,9 +637,8 @@ void Page::JustifyVertically()
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    // Doc::SetDrawingPage should have been called before
-    // Make sure we have the correct page
-    assert(this == doc->GetDrawingPage());
+    // Make sure we have the correct page size
+    assert(doc->CheckPageSize(this));
 
     // Nothing to justify
     if (m_drawingJustifiableHeight <= 0 || m_justificationSum <= 0) {
@@ -626,8 +650,7 @@ void Page::JustifyVertically()
         return;
     }
 
-    // Ignore vertical justification if it's not required
-    if (!this->IsJustificationRequired(doc)) return;
+    this->ReduceJustifiableHeight(doc);
 
     // Justify Y position
     JustifyYFunctor justifyY(doc);
@@ -643,42 +666,24 @@ void Page::JustifyVertically()
     }
 }
 
-bool Page::IsJustificationRequired(const Doc *doc)
+void Page::ReduceJustifiableHeight(const Doc *doc)
 {
     const Pages *pages = doc->GetPages();
     assert(pages);
 
-    const int childSystems = this->GetChildCount(SYSTEM);
-    // Last page and justification of last page is not enabled
+    double maxRatio = doc->GetOptions()->m_justificationMaxVertical.GetValue();
+    // Special handling for justification of last page
     if (pages->GetLast() == this) {
-        const int idx = this->GetIdx();
-        if (idx > 0) {
-            const Page *previousPage = dynamic_cast<const Page *>(pages->GetPrevious(this));
-            assert(previousPage);
-            const int previousJustifiableHeight = previousPage->m_drawingJustifiableHeight;
-            const int previousJustificationSum = previousPage->m_justificationSum;
-
-            if (previousJustifiableHeight < m_drawingJustifiableHeight) {
-                m_drawingJustifiableHeight = previousJustifiableHeight;
-            }
-
-            const int maxSystemsPerPage = doc->GetOptions()->m_systemMaxPerPage.GetValue();
-            if ((childSystems <= 2) || (childSystems < maxSystemsPerPage)) {
-                m_justificationSum = previousJustificationSum;
-            }
-        }
-        else {
-            const int stavesPerSystem = m_drawingScoreDef.GetDescendantCount(STAFFDEF);
-            if (childSystems * stavesPerSystem < 8) return false;
+        const System *firstSystem = vrv_cast<const System *>(this->GetFirst(SYSTEM));
+        const System *lastSystem = vrv_cast<const System *>(this->GetLast(SYSTEM));
+        if (firstSystem && lastSystem) {
+            const int usedDrawingHeight
+                = firstSystem->GetDrawingY() - lastSystem->GetDrawingY() + lastSystem->GetHeight();
+            maxRatio *= (double)usedDrawingHeight / (double)doc->m_drawingPageHeight;
         }
     }
-    const double ratio = (double)m_drawingJustifiableHeight / (double)doc->m_drawingPageHeight;
-    if (ratio > doc->GetOptions()->m_justificationMaxVertical.GetValue()) {
-        m_drawingJustifiableHeight
-            = doc->m_drawingPageHeight * doc->GetOptions()->m_justificationMaxVertical.GetValue();
-    }
 
-    return true;
+    m_drawingJustifiableHeight = std::min<int>(doc->m_drawingPageHeight * maxRatio, m_drawingJustifiableHeight);
 }
 
 void Page::LayOutPitchPos()
@@ -686,9 +691,8 @@ void Page::LayOutPitchPos()
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    // Doc::SetDrawingPage should have been called before
-    // Make sure we have the correct page
-    assert(this == doc->GetDrawingPage());
+    // Make sure we have the correct page size
+    assert(doc->CheckPageSize(this));
 
     // Set the pitch / pos alignment
     CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(doc);
@@ -696,6 +700,9 @@ void Page::LayOutPitchPos()
 
     CalcStemFunctor calcStem(doc);
     this->Process(calcStem);
+
+    CalcLedgerLinesFunctor calcLedgerLines(doc);
+    this->Process(calcLedgerLines);
 }
 
 int Page::GetContentHeight() const
@@ -703,9 +710,8 @@ int Page::GetContentHeight() const
     const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    // Doc::SetDrawingPage should have been called before
-    // Make sure we have the correct page
-    assert(this == doc->GetDrawingPage());
+    // Make sure we have the correct page size
+    assert(doc->CheckPageSize(this));
 
     if (!this->GetChildCount()) {
         return 0;
@@ -729,9 +735,8 @@ int Page::GetContentWidth() const
     // in non debug
     if (!doc) return 0;
 
-    // Doc::SetDrawingPage should have been called before
-    // Make sure we have the correct page
-    assert(this == doc->GetDrawingPage());
+    // Make sure we have the correct page size
+    assert(doc->CheckPageSize(this));
 
     int maxWidth = 0;
     for (const Object *child : this->GetChildren()) {

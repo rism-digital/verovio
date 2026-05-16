@@ -24,7 +24,7 @@ namespace vrv {
 
 static const ClassRegistrar<Phrase> s_factory("phrase", PHRASE);
 
-Phrase::Phrase() : Slur(PHRASE, "phrase-")
+Phrase::Phrase() : Slur(PHRASE)
 {
     this->Reset();
 }

@@ -27,13 +27,12 @@ import sys
 from argparse import ArgumentParser
 from pathlib import Path
 
-import yaml
-
 import cpp
+import yaml
 from schema import MeiSchema
 
 logging.basicConfig(format="[%(asctime)s] [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)")
-log = logging.getLogger('schemaparser')
+log = logging.getLogger("schemaparser")
 
 
 def main(configure: dict) -> bool:
@@ -53,7 +52,7 @@ def main(configure: dict) -> bool:
 
 
 if __name__ == "__main__":
-    p = ArgumentParser(usage='%(prog)s [-c config path] [compiled odd path]')
+    p = ArgumentParser(usage="%(prog)s [-c config path] [compiled odd path]")
 
     p.add_argument("compiled", help="A compiled ODD file", type=Path)
     p.add_argument("-c", "--config", default="./config.yml", help="Path to a config file", type=Path)

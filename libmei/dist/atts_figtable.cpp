@@ -28,7 +28,7 @@ namespace vrv {
 
 AttTabular::AttTabular() : Att()
 {
-    ResetTabular();
+    this->ResetTabular();
 }
 
 void AttTabular::ResetTabular()

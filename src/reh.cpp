@@ -28,12 +28,10 @@ namespace vrv {
 
 static const ClassRegistrar<Reh> s_factory("reh", REH);
 
-Reh::Reh()
-    : ControlElement(REH, "reh-"), TextDirInterface(), TimePointInterface(), AttColor(), AttLang(), AttVerticalGroup()
+Reh::Reh() : ControlElement(REH), TextDirInterface(), TimePointInterface(), AttLang(), AttVerticalGroup()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_LANG);
     this->RegisterAttClass(ATT_VERTICALGROUP);
 
@@ -47,23 +45,23 @@ void Reh::Reset()
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimePointInterface::Reset();
-    this->ResetColor();
     this->ResetLang();
     this->ResetVerticalGroup();
 }
 
-bool Reh::IsSupportedChild(Object *child)
+bool Reh::IsSupportedChild(ClassId classId)
 {
-    if (child->Is({ LB, REND, TEXT })) {
-        assert(dynamic_cast<TextElement *>(child));
+    static const std::vector<ClassId> supported{ LB, REND, TEXT };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 //----------------------------------------------------------------------------

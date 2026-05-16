@@ -41,13 +41,13 @@ public:
     virtual ~Ending();
     Object *Clone() const override { return new Ending(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Ending"; }
+    std::string GetClassName() const override { return "ending"; }
     ///@}
 
     /**
      * Method for adding allowed content
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     //----------//
     // Functors //

@@ -5,26 +5,40 @@ from re import Pattern
 from lxml import etree
 
 logging.basicConfig(format="[%(asctime)s] [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)")
-log = logging.getLogger('schemaparser')
+log = logging.getLogger("schemaparser")
 
 
 # globals
 TEI_NS = {"tei": "http://www.tei-c.org/ns/1.0"}
-TEI_RNG_NS = {"tei": "http://www.tei-c.org/ns/1.0",
-              "rng": "http://relaxng.org/ns/structure/1.0"}
-NAMESPACES = {'xml': 'http://www.w3.org/XML/1998/namespace',
-              'xlink': 'http://www.w3.org/1999/xlink'}
+TEI_RNG_NS = {"tei": "http://www.tei-c.org/ns/1.0", "rng": "http://relaxng.org/ns/structure/1.0"}
+NAMESPACES = {"xml": "http://www.w3.org/XML/1998/namespace", "xlink": "http://www.w3.org/1999/xlink"}
 WHITESPACE_REGEX: Pattern = re.compile(r"[\s\t]+")
 
 
 class MeiSchema(object):
+    """Representation of a parsed MEI/ODD schema.
+
+    The `MeiSchema` object parses the provided ODD XML and exposes
+    structures used by the generator: `element_structure`,
+    `attribute_group_structure`, `data_types` and `data_lists`.
+
+    Parameters
+    ----------
+    oddfile : file-like or path
+        Open file or path to the compiled ODD XML file to parse.
+    resolve_elements : bool, optional
+        If True, element details are resolved during initialization
+        (this can be slower); otherwise elements are resolved on demand.
+    """
+
     def __init__(self, oddfile, resolve_elements=False):
         parser = etree.XMLParser(resolve_entities=True)
+
         self.schema = etree.parse(oddfile, parser)
         # self.customization = etree.parse(customization_file)
 
         self.active_modules = []  # the modules active in the resulting output
-        self.element_structure = {}  # the element structure.
+        self.element_structure = {}  # the element structure
 
         self.attribute_group_structure = {}  # the attribute group structure
         # inverted, so we can map attgroups to modules
@@ -86,8 +100,7 @@ class MeiSchema(object):
         """
         Retrieve all defined attribute classes from the schema.
         """
-        attribute_groups: list[etree.Element] = self.schema.xpath(".//tei:classSpec[@type='atts']",
-                                                                  namespaces=TEI_NS)
+        attribute_groups: list[etree.Element] = self.schema.xpath(".//tei:classSpec[@type='atts']", namespaces=TEI_NS)
         for group in attribute_groups:
             group_name: str = group.get("ident")
 
@@ -113,40 +126,50 @@ class MeiSchema(object):
         """
         Parse data types from the schema.
         """
-        compound_alternate = self.schema.xpath(".//tei:macroSpec[@type='dt' and .//tei:alternate[@minOccurs='1' and @maxOccurs='1']]",
-                                               namespaces=TEI_RNG_NS)
+        compound_alternate = self.schema.xpath(
+            ".//tei:macroSpec[@type='dt' and .//tei:alternate[@minOccurs='1' and @maxOccurs='1']]",
+            namespaces=TEI_RNG_NS,
+        )
 
         for ct in compound_alternate:
             data_type = ct.get("ident")
             subtypes = ct.findall(".//tei:alternate/tei:macroRef", namespaces=TEI_RNG_NS)
 
             for st in subtypes:
-                subtype = self.schema.xpath(".//tei:macroSpec[@ident=$st_ident]//tei:valList/tei:valItem",
-                                            st_ident=st.get("key"),
-                                            namespaces=TEI_RNG_NS)
+                subtype = self.schema.xpath(
+                    ".//tei:macroSpec[@ident=$st_ident]//tei:valList/tei:valItem",
+                    st_ident=st.get("key"),
+                    namespaces=TEI_RNG_NS,
+                )
                 for v in subtype:
                     if data_type not in self.data_types:
                         self.data_types[data_type] = []
                     self.data_types[data_type].append(v.get("ident"))
 
-        compound_choice = self.schema.xpath(".//tei:macroSpec[@type='dt' and .//rng:choice]|//tei:dataSpec[.//rng:choice]",
-                                            namespaces=TEI_RNG_NS)
+        compound_choice = self.schema.xpath(
+            ".//tei:macroSpec[@type='dt' and .//rng:choice]|//tei:dataSpec[.//rng:choice]", namespaces=TEI_RNG_NS
+        )
 
         for ct in compound_choice:
             data_type = ct.get("ident")
             subtypes = ct.xpath(".//rng:choice/rng:ref", namespaces=TEI_RNG_NS)
 
             for st in subtypes:
-                subtype = st.xpath("//tei:macroSpec[@ident=$st_ident]//tei:valList/tei:valItem|//tei:dataSpec[@ident=$st_ident]//tei:valList/tei:valItem",
-                                   st_ident=st.get("name"),
-                                   namespaces=TEI_RNG_NS)
+                subtype = st.xpath(
+                    "//tei:macroSpec[@ident=$st_ident]//tei:valList/tei:valItem|//tei:dataSpec[@ident=$st_ident]//tei:valList/tei:valItem",
+                    st_ident=st.get("name"),
+                    namespaces=TEI_RNG_NS,
+                )
 
                 for v in subtype:
                     if data_type not in self.data_types:
                         self.data_types[data_type] = []
                     self.data_types[data_type].append(v.get("ident"))
 
-        types = self.schema.xpath(".//tei:macroSpec[.//tei:valList[@type='closed' or @type='semi']]|//tei:dataSpec[.//tei:valList[@type='closed' or @type='semi']]", namespaces=TEI_RNG_NS)
+        types = self.schema.xpath(
+            ".//tei:macroSpec[.//tei:valList[@type='closed' or @type='semi']]|//tei:dataSpec[.//tei:valList[@type='closed' or @type='semi']]",
+            namespaces=TEI_RNG_NS,
+        )
         for t in types:
             data_type = t.get("ident")
             values = t.findall(".//tei:valList/tei:valItem", namespaces=TEI_RNG_NS)
@@ -201,7 +224,9 @@ class MeiSchema(object):
         """
         Get attribute groups.
         """
-        member_attgroup = self.schema.xpath(".//tei:classSpec[@type='atts'][@ident=$nm]", nm=member.get("key"), namespaces=TEI_NS)
+        member_attgroup = self.schema.xpath(
+            ".//tei:classSpec[@type='atts'][@ident=$nm]", nm=member.get("key"), namespaces=TEI_NS
+        )
 
         if member_attgroup is None:
             return None
@@ -237,9 +262,9 @@ class MeiSchema(object):
 
     def get_att_desc(self, att_name: str) -> str:
         """
-        Returns the documentation string for an attribute by name.
+        Return the documentation string for an attribute by name.
         """
-        desc = self.schema.find(f"//tei:attDef[@ident='{att_name}']/tei:desc", namespaces=TEI_NS)
+        desc = self.schema.find(f".//tei:attDef[@ident='{att_name}']/tei:desc", namespaces=TEI_NS)
         if desc is None:
             return ""
 

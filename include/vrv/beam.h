@@ -292,7 +292,7 @@ public:
     virtual ~Beam();
     Object *Clone() const override { return new Beam(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Beam"; }
+    std::string GetClassName() const override { return "beam"; }
     ///@}
 
     /**
@@ -317,7 +317,7 @@ public:
      * Add an element (a note or a rest) to a beam.
      * Only Note or Rest elements will be actually added to the beam.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      *
@@ -375,11 +375,6 @@ protected:
      */
     void FilterList(ListOfConstObjects &childList) const override;
 
-    /**
-     * See LayerElement::SetElementShortening
-     */
-    void SetElementShortening(int shortening) override;
-
 private:
     /**
      * A pointer to the beam with which stems are shared.
@@ -410,7 +405,6 @@ public:
         m_tabDurSym = NULL;
         m_stem = NULL;
         m_overlapMargin = 0;
-        m_maxShortening = -1;
         m_beamRelativePlace = BEAMPLACE_NONE;
         m_partialFlagPlace = BEAMPLACE_NONE;
     }
@@ -458,7 +452,6 @@ public:
     data_DURATION m_dur; // drawing duration
     int m_breaksec;
     int m_overlapMargin;
-    int m_maxShortening; // maximum allowed shortening in half units
     bool m_centered; // beam is centered on the line
     data_BEAMPLACE m_beamRelativePlace;
     char m_partialFlags[MAX_DURATION_PARTIALS];

@@ -36,7 +36,7 @@ public:
     virtual ~Ligature();
     Object *Clone() const override { return new Ligature(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Ligature"; }
+    std::string GetClassName() const override { return "ligature"; }
     ///@}
 
     /** Override the method since alignment is required */
@@ -45,7 +45,7 @@ public:
     /**
      * Add children (notes or editorial markup)
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Return the first or last note

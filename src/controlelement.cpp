@@ -28,10 +28,18 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 ControlElement::ControlElement()
-    : FloatingObject(CONTROL_ELEMENT, "ce"), AltSymInterface(), LinkingInterface(), AttLabelled(), AttTyped()
+    : FloatingObject(CONTROL_ELEMENT)
+    , AltSymInterface()
+    , LinkingInterface()
+    , OffsetInterface()
+    , AttColor()
+    , AttLabelled()
+    , AttTyped()
 {
     this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
     this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_TYPED);
 
@@ -39,21 +47,12 @@ ControlElement::ControlElement()
 }
 
 ControlElement::ControlElement(ClassId classId)
-    : FloatingObject(classId, "ce"), AltSymInterface(), LinkingInterface(), AttLabelled(), AttTyped()
+    : FloatingObject(classId), AltSymInterface(), LinkingInterface(), AttLabelled(), AttTyped()
 {
     this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
     this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
-    this->RegisterAttClass(ATT_LABELLED);
-    this->RegisterAttClass(ATT_TYPED);
-
-    this->Reset();
-}
-
-ControlElement::ControlElement(ClassId classId, const std::string &classIdStr)
-    : FloatingObject(classId, classIdStr), AltSymInterface(), LinkingInterface(), AttLabelled(), AttTyped()
-{
-    this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
-    this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_TYPED);
 
@@ -67,6 +66,8 @@ void ControlElement::Reset()
     FloatingObject::Reset();
     AltSymInterface::Reset();
     LinkingInterface::Reset();
+    OffsetInterface::Reset();
+    this->ResetColor();
     this->ResetLabelled();
     this->ResetTyped();
 }

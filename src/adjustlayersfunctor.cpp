@@ -10,8 +10,8 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "score.h"
 #include "staff.h"
+#include "system.h"
 
 //----------------------------------------------------------------------------
 
@@ -21,9 +21,8 @@ namespace vrv {
 // AdjustLayersFunctor
 //----------------------------------------------------------------------------
 
-AdjustLayersFunctor::AdjustLayersFunctor(Doc *doc, const std::vector<int> &staffNs) : DocFunctor(doc)
+AdjustLayersFunctor::AdjustLayersFunctor(Doc *doc) : DocFunctor(doc)
 {
-    m_staffNs = staffNs;
     m_currentLayerN = VRV_UNSET;
     m_unison = false;
     m_ignoreDots = true;
@@ -127,14 +126,13 @@ FunctorCode AdjustLayersFunctor::VisitMeasure(Measure *measure)
     Filters filters;
     Filters *previousFilters = this->SetFilters(&filters);
 
-    std::vector<int>::iterator iter;
-    for (iter = m_staffNs.begin(); iter != m_staffNs.end(); ++iter) {
+    for (int &n : m_staffNs) {
         filters.Clear();
         // Create ad comparison object for each type / @n
         std::vector<int> ns;
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(BARLINE_REFERENCES);
-        ns.push_back(*iter);
+        ns.push_back(n);
         AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.Add(&matchStaff);
 
@@ -147,9 +145,9 @@ FunctorCode AdjustLayersFunctor::VisitMeasure(Measure *measure)
     return FUNCTOR_SIBLINGS;
 }
 
-FunctorCode AdjustLayersFunctor::VisitScore(Score *score)
+FunctorCode AdjustLayersFunctor::VisitSystem(System *system)
 {
-    m_staffNs = score->GetScoreDef()->GetStaffNs();
+    if (system->GetDrawingScoreDef()) m_staffNs = system->GetDrawingScoreDef()->GetStaffNs();
 
     return FUNCTOR_CONTINUE;
 }

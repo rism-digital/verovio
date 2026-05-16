@@ -117,6 +117,24 @@ protected:
 };
 
 //----------------------------------------------------------------------------
+// ChildOfClassIdComparison
+//----------------------------------------------------------------------------
+
+class ChildOfClassIdComparison : public Comparison {
+
+public:
+    ChildOfClassIdComparison(ClassId classId) { m_classId = classId; }
+
+    bool operator()(const Object *object) override
+    {
+        return (object->GetParent() && object->GetParent()->GetClassId() == m_classId);
+    }
+
+protected:
+    ClassId m_classId;
+};
+
+//----------------------------------------------------------------------------
 // PointingToComparison
 //----------------------------------------------------------------------------
 
@@ -471,7 +489,7 @@ public:
         if (!MatchesType(object)) return false;
         const Measure *measure = vrv_cast<const Measure *>(object);
         assert(measure);
-        return (measure->EnclosesTime(m_time) > 0);
+        return (measure->EnclosesTime(m_time) != VRV_UNSET);
     }
 
 private:

@@ -150,8 +150,8 @@ public:
     std::string GraceToStr(data_GRACE data) const;
     data_GRACE StrToGrace(const std::string &value, bool logWarning = true) const;
 
-    std::string HeadshapeToStr(data_HEADSHAPE data) const;
-    data_HEADSHAPE StrToHeadshape(const std::string &value, bool logWarning = true) const;
+    std::string HarppedalpositionToStr(data_HARPPEDALPOSITION data) const;
+    data_HARPPEDALPOSITION StrToHarppedalposition(const std::string &value, bool logWarning = true) const;
 
     std::string HeadshapeListToStr(data_HEADSHAPE_list data) const;
     data_HEADSHAPE_list StrToHeadshapeList(const std::string &value, bool logWarning = true) const;
@@ -173,6 +173,12 @@ public:
 
     std::string LinewidthtermToStr(data_LINEWIDTHTERM data) const;
     data_LINEWIDTHTERM StrToLinewidthterm(const std::string &value, bool logWarning = true) const;
+
+    std::string MarcrelatorsBasicToStr(data_MARCRELATORS_basic data) const;
+    data_MARCRELATORS_basic StrToMarcrelatorsBasic(const std::string &value, bool logWarning = true) const;
+
+    std::string MarcrelatorsExtendedToStr(data_MARCRELATORS_extended data) const;
+    data_MARCRELATORS_extended StrToMarcrelatorsExtended(const std::string &value, bool logWarning = true) const;
 
     std::string MelodicfunctionToStr(data_MELODICFUNCTION data) const;
     data_MELODICFUNCTION StrToMelodicfunction(const std::string &value, bool logWarning = true) const;
@@ -230,6 +236,9 @@ public:
 
     std::string RelationshipToStr(data_RELATIONSHIP data) const;
     data_RELATIONSHIP StrToRelationship(const std::string &value, bool logWarning = true) const;
+
+    std::string RelatorsToStr(data_RELATORS data) const;
+    data_RELATORS StrToRelators(const std::string &value, bool logWarning = true) const;
 
     std::string RotationToStr(data_ROTATION data) const;
     data_ROTATION StrToRotation(const std::string &value, bool logWarning = true) const;
@@ -294,6 +303,9 @@ public:
     std::string AnchoredTextLogFuncToStr(anchoredTextLog_FUNC data) const;
     anchoredTextLog_FUNC StrToAnchoredTextLogFunc(const std::string &value, bool logWarning = true) const;
 
+    std::string AnnotLogFuncToStr(annotLog_FUNC data) const;
+    annotLog_FUNC StrToAnnotLogFunc(const std::string &value, bool logWarning = true) const;
+
     std::string ArpegLogOrderToStr(arpegLog_ORDER data) const;
     arpegLog_ORDER StrToArpegLogOrder(const std::string &value, bool logWarning = true) const;
 
@@ -323,6 +335,9 @@ public:
 
     std::string DivLineLogFormToStr(divLineLog_FORM data) const;
     divLineLog_FORM StrToDivLineLogForm(const std::string &value, bool logWarning = true) const;
+
+    std::string DocStatusStatusToStr(docStatus_STATUS data) const;
+    docStatus_STATUS StrToDocStatusStatus(const std::string &value, bool logWarning = true) const;
 
     std::string DotLogFormToStr(dotLog_FORM data) const;
     dotLog_FORM StrToDotLogForm(const std::string &value, bool logWarning = true) const;
@@ -362,27 +377,6 @@ public:
 
     std::string HarmVisRendgridToStr(harmVis_RENDGRID data) const;
     harmVis_RENDGRID StrToHarmVisRendgrid(const std::string &value, bool logWarning = true) const;
-
-    std::string HarpPedalLogAToStr(harpPedalLog_A data) const;
-    harpPedalLog_A StrToHarpPedalLogA(const std::string &value, bool logWarning = true) const;
-
-    std::string HarpPedalLogBToStr(harpPedalLog_B data) const;
-    harpPedalLog_B StrToHarpPedalLogB(const std::string &value, bool logWarning = true) const;
-
-    std::string HarpPedalLogCToStr(harpPedalLog_C data) const;
-    harpPedalLog_C StrToHarpPedalLogC(const std::string &value, bool logWarning = true) const;
-
-    std::string HarpPedalLogDToStr(harpPedalLog_D data) const;
-    harpPedalLog_D StrToHarpPedalLogD(const std::string &value, bool logWarning = true) const;
-
-    std::string HarpPedalLogEToStr(harpPedalLog_E data) const;
-    harpPedalLog_E StrToHarpPedalLogE(const std::string &value, bool logWarning = true) const;
-
-    std::string HarpPedalLogFToStr(harpPedalLog_F data) const;
-    harpPedalLog_F StrToHarpPedalLogF(const std::string &value, bool logWarning = true) const;
-
-    std::string HarpPedalLogGToStr(harpPedalLog_G data) const;
-    harpPedalLog_G StrToHarpPedalLogG(const std::string &value, bool logWarning = true) const;
 
     std::string LineLogFuncToStr(lineLog_FUNC data) const;
     lineLog_FUNC StrToLineLogFunc(const std::string &value, bool logWarning = true) const;

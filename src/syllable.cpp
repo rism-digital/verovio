@@ -31,9 +31,9 @@ namespace vrv {
 
 static const ClassRegistrar<Syllable> s_factory("syllable", SYLLABLE);
 
-Syllable::Syllable() : LayerElement(SYLLABLE, "syllable-"), ObjectListInterface(), AttColor(), AttSlashCount()
+Syllable::Syllable() : LayerElement(SYLLABLE), ObjectListInterface(), AttColor(), AttSlashCount()
 {
-    Init();
+    this->Init();
 }
 
 void Syllable::Init()
@@ -44,27 +44,22 @@ void Syllable::Init()
     this->Reset();
 }
 
-bool Syllable::IsSupportedChild(Object *child)
+bool Syllable::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(SYL)) {
-        assert(dynamic_cast<Syl *>(child));
-    }
-    else if (child->Is(NEUME)) {
-        assert(dynamic_cast<Neume *>(child));
-    }
-    else if (child->Is(DIVLINE)) {
-        assert(dynamic_cast<DivLine *>(child));
-    }
-    else if (child->Is(ACCID)) {
-        assert(dynamic_cast<Accid *>(child));
-    }
-    else if (child->Is(CLEF)) {
-        assert(dynamic_cast<Clef *>(child));
+    static const std::vector<ClassId> supported{
+        ACCID,
+        CLEF,
+        DIVLINE,
+        NEUME,
+        SYL,
+    };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 Syllable::~Syllable() {}

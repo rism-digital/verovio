@@ -39,14 +39,33 @@ public:
     virtual ~Facsimile();
     Object *Clone() const override { return new Facsimile(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Facsimile"; }
+    std::string GetClassName() const override { return "facsimile"; }
     ///@}
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     Zone *FindZoneByID(const std::string &zoneId);
     const Zone *FindZoneByID(const std::string &zoneId) const;
     int GetMaxX() const;
     int GetMaxY() const;
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
+
+protected:
+    //
+private:
+    //
 };
 
 } // namespace vrv

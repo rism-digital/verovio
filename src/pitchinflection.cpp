@@ -24,7 +24,7 @@ namespace vrv {
 
 static const ClassRegistrar<PitchInflection> s_factory("pitchInflection", PITCHINFLECTION);
 
-PitchInflection::PitchInflection() : ControlElement(PITCHINFLECTION, "pinflexion-"), TimeSpanningInterface()
+PitchInflection::PitchInflection() : ControlElement(PITCHINFLECTION), TimeSpanningInterface()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
 

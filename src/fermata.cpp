@@ -27,16 +27,14 @@ namespace vrv {
 static const ClassRegistrar<Fermata> s_factory("fermata", FERMATA);
 
 Fermata::Fermata()
-    : ControlElement(FERMATA, "fermata-")
+    : ControlElement(FERMATA)
     , TimePointInterface()
-    , AttColor()
     , AttExtSymAuth()
     , AttExtSymNames()
     , AttFermataVis()
     , AttPlacementRelStaff()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
     this->RegisterAttClass(ATT_EXTSYMAUTH);
     this->RegisterAttClass(ATT_EXTSYMNAMES);
@@ -53,7 +51,6 @@ void Fermata::Reset()
     ControlElement::Reset();
     AltSymInterface::Reset();
     TimePointInterface::Reset();
-    this->ResetColor();
     this->ResetEnclosingChars();
     this->ResetExtSymAuth();
     this->ResetExtSymNames();
@@ -100,17 +97,14 @@ char32_t Fermata::GetFermataGlyph() const
 
 std::pair<char32_t, char32_t> Fermata::GetEnclosingGlyphs() const
 {
-    std::pair<char32_t, char32_t> glyphs(0, 0);
     if (this->HasEnclose()) {
         switch (this->GetEnclose()) {
-            case ENCLOSURE_brack:
-                glyphs = { SMUFL_E26C_accidentalBracketLeft, SMUFL_E26D_accidentalBracketRight };
-                break;
-            case ENCLOSURE_paren: glyphs = { SMUFL_E26A_accidentalParensLeft, SMUFL_E26B_accidentalParensRight }; break;
+            case ENCLOSURE_brack: return { SMUFL_E26C_accidentalBracketLeft, SMUFL_E26D_accidentalBracketRight }; break;
+            case ENCLOSURE_paren: return { SMUFL_E26A_accidentalParensLeft, SMUFL_E26B_accidentalParensRight }; break;
             default: break;
         }
     }
-    return glyphs;
+    return { 0, 0 };
 }
 
 //----------------------------------------------------------------------------

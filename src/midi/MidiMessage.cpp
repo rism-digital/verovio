@@ -1008,7 +1008,7 @@ void MidiMessage::setP3(int value) {
 
 void MidiMessage::setKeyNumber(int value) {
 	if (isNote() || isAftertouch()) {
-		setP1(value & 0xff);
+		setP1(value & 0x7f);
 	} else {
 		// don't do anything since this is not a note-related message.
 	}
@@ -1025,7 +1025,7 @@ void MidiMessage::setKeyNumber(int value) {
 
 void MidiMessage::setVelocity(int value) {
 	if (isNote()) {
-		setP2(value & 0xff);
+		setP2(value & 0x7f);
 	} else {
 		// don't do anything since this is not a note-related message.
 	}
@@ -1495,7 +1495,7 @@ void MidiMessage::getSpelling(int& base7, int& accidental) {
 //   message after the length (which is a variable-length-value).
 //
 
-std::string MidiMessage::getMetaContent(void) {
+std::string MidiMessage::getMetaContent(void) const {
 	std::string output;
 	if (!isMetaMessage()) {
 		return output;
@@ -2054,11 +2054,7 @@ void MidiMessage::makeSysExMessage(const std::vector<uchar>& data) {
 
 	this->push_back((uchar)0xf0);
 
-	int msize = endindex - startindex + 2;
-	std::vector<uchar> vlv = intToVlv(msize);
-	for (uchar item : vlv) {
-		this->push_back(item);
-	}
+	// MidiFile::write() takes care of writing the vlv for sysex.
 	for (int i=startindex; i<=endindex; i++) {
 		this->push_back(data.at(i));
 	}
@@ -2151,10 +2147,7 @@ void MidiMessage::makeMts2_KeyTuningsBySemitone(std::vector<std::pair<int, doubl
 	data.push_back((uchar)0x08);  // sub-ID#1 (MIDI Tuning)
 	data.push_back((uchar)0x02);  // sub-ID#2 (note change)
 	data.push_back((uchar)program);  // tuning program number (0 - 127)
-	std::vector<uchar> vlv = intToVlv((int)mapping.size());
-	for (uchar item : vlv) {
-		data.push_back(item);
-	}
+	data.push_back((int)mapping.size()); // number of changes
 	for (auto &item : mapping) {
 		int keynum = item.first;
 		if (keynum < 0) {
@@ -2177,8 +2170,8 @@ void MidiMessage::makeMts2_KeyTuningsBySemitone(std::vector<std::pair<int, doubl
 		uchar msb = (value >> 7) & 0x7f;
 		data.push_back(msb);
 		data.push_back(lsb);
-    }
-    this->makeSysExMessage(data);
+	}
+	this->makeSysExMessage(data);
 }
 
 

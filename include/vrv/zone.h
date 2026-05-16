@@ -37,11 +37,25 @@ public:
     virtual ~Zone();
     Object *Clone() const override { return new Zone(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Zone"; }
+    std::string GetClassName() const override { return "zone"; }
     ///@}
     void ShiftByXY(int xDiff, int yDiff);
     int GetLogicalUly() const;
     int GetLogicalLry() const;
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 protected:
     //

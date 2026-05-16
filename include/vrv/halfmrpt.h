@@ -13,6 +13,7 @@
 #include "atts_visual.h"
 #include "beam.h"
 #include "layerelement.h"
+#include "offsetinterface.h"
 
 namespace vrv {
 
@@ -23,7 +24,7 @@ namespace vrv {
 /**
  * This class models the MEI <halfmRpt> element.
  */
-class HalfmRpt : public LayerElement, public AttColor {
+class HalfmRpt : public LayerElement, public OffsetInterface, public AttColor {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -34,7 +35,15 @@ public:
     virtual ~HalfmRpt();
     Object *Clone() const override { return new HalfmRpt(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "HalfmRpt"; }
+    std::string GetClassName() const override { return "halfmRpt"; }
+    ///@}
+
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    OffsetInterface *GetOffsetInterface() override { return vrv_cast<OffsetInterface *>(this); }
+    const OffsetInterface *GetOffsetInterface() const override { return vrv_cast<const OffsetInterface *>(this); }
     ///@}
 
     /** Override the method since alignment is required */

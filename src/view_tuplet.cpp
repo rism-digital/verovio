@@ -107,7 +107,7 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
     const int yRight = tupletBracket->GetDrawingYRight();
     int bracketHeight = (tuplet->GetDrawingBracketPos() == STAFFREL_basic_above) ? -1 : 1;
 
-    dc->SetPen(m_currentColor, lineWidth, AxSOLID, 0, 0, AxCAP_BUTT, AxJOIN_MITER);
+    dc->SetPen(lineWidth, PEN_SOLID, 0, 0, LINECAP_BUTT, LINEJOIN_MITER);
 
     // Draw a bracket with a gap
     if (tupletBracket->GetAlignedNum() && tupletBracket->GetAlignedNum()->HasSelfBB()) {
@@ -120,13 +120,13 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
             *= abs(tupletBracket->GetAlignedNum()->GetSelfTop() - tupletBracket->GetAlignedNum()->GetSelfBottom()) / 2;
 
         Point bracketLeft[3];
-        bracketLeft[0] = { ToDeviceContextX(xLeft), ToDeviceContextY(yLeft + bracketHeight) };
-        bracketLeft[1] = { ToDeviceContextX(xLeft), ToDeviceContextY(yLeft) };
-        bracketLeft[2] = { ToDeviceContextX(xNumLeft), ToDeviceContextY(yNumLeft) };
+        bracketLeft[0] = { this->ToDeviceContextX(xLeft), this->ToDeviceContextY(yLeft + bracketHeight) };
+        bracketLeft[1] = { this->ToDeviceContextX(xLeft), this->ToDeviceContextY(yLeft) };
+        bracketLeft[2] = { this->ToDeviceContextX(xNumLeft), this->ToDeviceContextY(yNumLeft) };
         Point bracketRight[3];
-        bracketRight[0] = { ToDeviceContextX(xRight), ToDeviceContextY(yRight + bracketHeight) };
-        bracketRight[1] = { ToDeviceContextX(xRight), ToDeviceContextY(yRight) };
-        bracketRight[2] = { ToDeviceContextX(xNumRight), ToDeviceContextY(yNumRight) };
+        bracketRight[0] = { this->ToDeviceContextX(xRight), this->ToDeviceContextY(yRight + bracketHeight) };
+        bracketRight[1] = { this->ToDeviceContextX(xRight), this->ToDeviceContextY(yRight) };
+        bracketRight[2] = { this->ToDeviceContextX(xNumRight), this->ToDeviceContextY(yNumRight) };
 
         dc->DrawPolyline(3, bracketLeft);
         dc->DrawPolyline(3, bracketRight);
@@ -135,10 +135,10 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
         bracketHeight *= unit + lineWidth;
 
         Point bracket[4];
-        bracket[0] = { ToDeviceContextX(xLeft), ToDeviceContextY(yLeft + bracketHeight) };
-        bracket[1] = { ToDeviceContextX(xLeft), ToDeviceContextY(yLeft) };
-        bracket[2] = { ToDeviceContextX(xRight), ToDeviceContextY(yRight) };
-        bracket[3] = { ToDeviceContextX(xRight), ToDeviceContextY(yRight + bracketHeight) };
+        bracket[0] = { this->ToDeviceContextX(xLeft), this->ToDeviceContextY(yLeft + bracketHeight) };
+        bracket[1] = { this->ToDeviceContextX(xLeft), this->ToDeviceContextY(yLeft) };
+        bracket[2] = { this->ToDeviceContextX(xRight), this->ToDeviceContextY(yRight) };
+        bracket[3] = { this->ToDeviceContextX(xRight), this->ToDeviceContextY(yRight + bracketHeight) };
 
         dc->DrawPolyline(4, bracket);
     }
@@ -182,8 +182,10 @@ void View::DrawTupletNum(DeviceContext *dc, LayerElement *element, Layer *layer,
     dc->SetFont(m_doc->GetDrawingSmuflFont(glyphSize, drawingCueSize));
     notes = IntToTupletFigures((short int)tuplet->GetNum());
     if (tuplet->GetNumFormat() == tupletVis_NUMFORMAT_ratio) {
-        notes.push_back(SMUFL_E88A_tupletColon);
-        notes += IntToTupletFigures((short int)tuplet->GetNumbase());
+        if (tuplet->HasNumbase()) {
+            notes.push_back(SMUFL_E88A_tupletColon);
+            notes += IntToTupletFigures((short int)tuplet->GetNumbase());
+        }
     }
     dc->GetSmuflTextExtent(notes, &extend);
 

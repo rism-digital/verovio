@@ -38,7 +38,7 @@ FunctorCode LayersInTimeSpanFunctor::VisitLayerElement(const LayerElement *layer
 
     // For mRest we do not look at the time span
     if (layerElement->Is(MREST)) {
-        // Add the layerN to the list of layers occuring in this time frame
+        // Add the layerN to the list of layers occurring in this time frame
         m_layers.insert(layerElement->GetAlignmentLayerN());
 
         return FUNCTOR_SIBLINGS;
@@ -61,7 +61,7 @@ FunctorCode LayersInTimeSpanFunctor::VisitLayerElement(const LayerElement *layer
         return FUNCTOR_STOP;
     }
 
-    // Add the layerN to the list of layers occuring in this time frame
+    // Add the layerN to the list of layers occurring in this time frame
     m_layers.insert(layerElement->GetAlignmentLayerN());
 
     // Not need to recurse for chords? Not quite sure about it.
@@ -107,7 +107,7 @@ void LayerElementsInTimeSpanFunctor::SetEvent(const Fraction &time, const Fracti
 FunctorCode LayerElementsInTimeSpanFunctor::VisitLayerElement(const LayerElement *layerElement)
 {
     const Layer *currentLayer = vrv_cast<const Layer *>(layerElement->GetFirstAncestor(LAYER));
-    // Either get layer refernced by @m_layer or all layers but it, depending on the @m_allLayersButCurrent flag
+    // Either get layer referenced by @m_layer or all layers but it, depending on the @m_allLayersButCurrent flag
     if ((!m_allLayersButCurrent && (currentLayer != m_layer)) || (m_allLayersButCurrent && (currentLayer == m_layer))) {
         return FUNCTOR_SIBLINGS;
     }

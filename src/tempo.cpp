@@ -31,7 +31,7 @@ namespace vrv {
 static const ClassRegistrar<Tempo> s_factory("tempo", TEMPO);
 
 Tempo::Tempo()
-    : ControlElement(TEMPO, "tempo-")
+    : ControlElement(TEMPO)
     , TextDirInterface()
     , TimeSpanningInterface()
     , AttExtender()
@@ -62,18 +62,19 @@ void Tempo::Reset()
     this->ResetMmTempo();
 }
 
-bool Tempo::IsSupportedChild(Object *child)
+bool Tempo::IsSupportedChild(ClassId classId)
 {
-    if (child->Is({ LB, REND, SYMBOL, TEXT })) {
-        assert(dynamic_cast<TextElement *>(child));
+    static const std::vector<ClassId> supported{ LB, REND, SYMBOL, TEXT };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 int Tempo::GetDrawingXRelativeToStaff(int staffN) const

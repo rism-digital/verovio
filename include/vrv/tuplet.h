@@ -41,19 +41,19 @@ public:
     virtual ~Tuplet();
     Object *Clone() const override { return new Tuplet(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Tuplet"; }
+    std::string GetClassName() const override { return "tuplet"; }
     ///@}
 
     /**
      * Add an element (a note or a rest) to a tuplet.
      * Only Note or Rest elements will be actually added to the beam.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Overwritten method for tuplet
      */
-    void AddChild(Object *object) override;
+    bool AddChild(Object *object) override;
 
     /**
      * @name Setter and getter for drawing elements and position

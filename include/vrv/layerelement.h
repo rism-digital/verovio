@@ -14,7 +14,7 @@
 
 #include "atts_shared.h"
 #include "facsimileinterface.h"
-#include "horizontalaligner.h"
+#include "fraction.h"
 #include "linkinginterface.h"
 #include "object.h"
 
@@ -57,7 +57,6 @@ public:
     ///@{
     LayerElement();
     LayerElement(ClassId classId);
-    LayerElement(ClassId classId, const std::string &classIdStr);
     virtual ~LayerElement();
     void Reset() override;
     ///@}
@@ -305,11 +304,6 @@ public:
         bool areDotsAdjusted, bool isChordElement, bool isLowerElement = false, bool unison = true);
 
     /**
-     * Helper function to set shortening for elements with beam interface
-     */
-    virtual void SetElementShortening(int shortening) {}
-
-    /**
      * Get the stem mod for the element (if any)
      */
     virtual data_STEMMODIFIER GetDrawingStemMod() const;
@@ -329,12 +323,6 @@ public:
      * Takes two layers into account in order to avoid collisions of dots between corresponding notes/chords
      */
     MapOfDotLocs CalcOptimalDotLocations();
-
-    /**
-     * Calculate the overlap with other layer elements that
-     * are placed within the duration of the element
-     */
-    int CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2);
 
     //----------//
     // Functors //
@@ -363,14 +351,14 @@ protected:
     /**
      * The note locations w.r.t. each staff, implemented for note and chord
      */
-    virtual MapOfNoteLocs CalcNoteLocations(NotePredicate predicate = NULL) const { return {}; }
+    virtual MapOfNoteLocs CalcNoteLocations(NotePredicate = NULL) const { return {}; }
 
     /**
      * The dot locations w.r.t. each staff, implemented for note and chord
      * Since dots for notes on staff lines can be shifted upwards or downwards, there are two choices: primary and
      * secondary
      */
-    virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary) const { return {}; }
+    virtual MapOfDotLocs CalcDotLocations(int, bool) const { return {}; }
 
     //----------------//
     // Static methods //

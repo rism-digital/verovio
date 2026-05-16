@@ -31,7 +31,7 @@ public:
     virtual ~Space();
     Object *Clone() const override { return new Space(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Space"; }
+    std::string GetClassName() const override { return "space"; }
     ///@}
 
     /**

@@ -28,7 +28,7 @@ public:
     virtual ~Supplied();
     Object *Clone() const override { return new Supplied(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Supplied"; }
+    std::string GetClassName() const override { return "supplied"; }
     ///@}
 
 private:

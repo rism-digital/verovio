@@ -101,7 +101,7 @@ void BeamSegment::CalcBeam(const Layer *layer, Staff *staff, const Doc *doc, Bea
     }
 
     bool horizontal = true;
-    if (staff->IsTablature()) {
+    if (staff->IsTablature() || staff->IsTabStaffLike()) {
         int glyphSize = staff->GetDrawingStaffNotationSize();
         beamInterface->m_fractionSize = glyphSize * 2 / 3;
 
@@ -120,25 +120,25 @@ void BeamSegment::CalcBeam(const Layer *layer, Staff *staff, const Doc *doc, Bea
     }
 
     if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
-        CalcMixedBeamPlace(staff);
-        CalcPartialFlagPlace();
+        this->CalcMixedBeamPlace(staff);
+        this->CalcPartialFlagPlace();
     }
-    CalcBeamStemLength(staff, beamInterface->m_drawingPlace, horizontal);
+    this->CalcBeamStemLength(staff, beamInterface->m_drawingPlace, horizontal);
 
     // Set drawing stem positions
-    CalcBeamPosition(doc, staff, beamInterface, horizontal);
+    this->CalcBeamPosition(doc, staff, beamInterface, horizontal);
     if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
         if (NeedToResetPosition(staff, doc, beamInterface)) {
-            CalcBeamInit(staff, doc, beamInterface, place);
-            CalcBeamStemLength(staff, beamInterface->m_drawingPlace, horizontal);
-            CalcBeamPosition(doc, staff, beamInterface, horizontal);
+            this->CalcBeamInit(staff, doc, beamInterface, place);
+            this->CalcBeamStemLength(staff, beamInterface->m_drawingPlace, horizontal);
+            this->CalcBeamPosition(doc, staff, beamInterface, horizontal);
         }
     }
 
     /******************************************************************/
     // Set the stem lengths to stem objects
 
-    if (staff->IsTablature()) {
+    if (staff->IsTablature() || staff->IsTabStaffLike()) {
         this->CalcSetStemValuesTab(staff, doc, beamInterface);
     }
     else {
@@ -336,21 +336,20 @@ std::pair<int, int> BeamSegment::GetMinimalStemLength(const BeamDrawingInterface
     const auto isNoteOrChord
         = [](BeamElementCoord *coord) { return (coord->m_element && coord->m_element->Is({ CHORD, NOTE })); };
 
-    using CoordIt = ArrayOfBeamElementCoords::const_iterator;
-    for (CoordIt it = m_beamElementCoordRefs.begin(); it != m_beamElementCoordRefs.end(); ++it) {
-        if (!isNoteOrChord(*it)) continue;
+    for (BeamElementCoord *coord : m_beamElementCoordRefs) {
+        if (!isNoteOrChord(coord)) continue;
 
         // Get the stem direction
-        const StemmedDrawingInterface *stemmedInterface = (*it)->GetStemHolderInterface();
+        const StemmedDrawingInterface *stemmedInterface = coord->GetStemHolderInterface();
         if (!stemmedInterface) continue;
         const Stem *stem = stemmedInterface->GetDrawingStem();
         const bool isStemUp = (stem->GetDrawingStemDir() == STEMDIRECTION_up);
 
         if (isStemUp) {
-            currentLength = (*it)->m_yBeam - bottomOffset - (*it)->m_closestNote->GetDrawingY();
+            currentLength = coord->m_yBeam - bottomOffset - coord->m_closestNote->GetDrawingY();
         }
         else {
-            currentLength = (*it)->m_closestNote->GetDrawingY() - (*it)->m_yBeam - topOffset;
+            currentLength = coord->m_closestNote->GetDrawingY() - coord->m_yBeam - topOffset;
         }
 
         // Update the min length
@@ -393,8 +392,8 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, const Doc *doc, BeamDrawingI
     const int staffTop = staff->GetDrawingY();
     const int staffBottom
         = staffTop - doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
-    const int topBorder = staffTop - topOffset - unit;
-    const int bottomBorder = staffBottom + bottomOffset + unit;
+    const int topBorder = staffTop + topOffset + unit;
+    const int bottomBorder = staffBottom - bottomOffset - unit;
 
     // Check if the beam is admissible
     if (!this->DoesBeamOverlap(beamInterface, topBorder, bottomBorder, minStemLength)) {
@@ -598,13 +597,14 @@ void BeamSegment::CalcBeamInit(
         beamInterface->m_beamWidthWhite /= 3;
     }
 
-    if (staff->IsTablature()) {
+    if (staff->IsTablature() || staff->IsTabStaffLike()) {
         // Adjust the height and spacing of the beams
         beamInterface->m_beamWidthBlack /= 2;
         beamInterface->m_beamWidthWhite /= 2;
 
-        // Adjust it further for tab.lute.french and tab.lute.italian
-        if (staff->IsTabLuteFrench() || staff->IsTabLuteItalian()) {
+        // Adjust it further for tab.staff-like, tab.lute.french, tab.lute.german and tab.lute.italian
+        if (staff->IsTabLuteFrench() || staff->IsTabLuteGerman() || staff->IsTabLuteItalian()
+            || staff->IsTabStaffLike()) {
             beamInterface->m_beamWidthBlack = beamInterface->m_beamWidthBlack * 2 / 5;
             beamInterface->m_beamWidthWhite = beamInterface->m_beamWidthWhite * 3 / 5;
         }
@@ -643,7 +643,6 @@ void BeamSegment::CalcBeamInit(
 
         int chordYMax = 0;
         int chordYMin = 0;
-
         if (coord->m_element->Is(CHORD)) {
             Chord *chord = vrv_cast<Chord *>(coord->m_element);
             assert(chord);
@@ -675,7 +674,6 @@ void BeamSegment::CalcBeamInit(
             }
         }
     }
-
     m_weightedPlace = ((m_verticalCenter - yMin) > (yMax - m_verticalCenter)) ? BEAMPLACE_above : BEAMPLACE_below;
 }
 
@@ -940,6 +938,7 @@ void BeamSegment::CalcBeamPosition(
     }
 
     // Nothing else to do with tab beams outside the staff
+    // unless tab.staff-like, which may need to raise the beams for ledger lines
     if (staff->IsTablature() && staff->IsTabWithStemsOutside()) return;
 
     /******************************************************************/
@@ -1599,7 +1598,7 @@ void BeamSegment::RequestStaffSpace(const Doc *doc, const BeamDrawingInterface *
 
 static const ClassRegistrar<Beam> s_factory("beam", BEAM);
 
-Beam::Beam() : LayerElement(BEAM, "beam-"), BeamDrawingInterface(), AttBeamedWith(), AttBeamRend(), AttColor(), AttCue()
+Beam::Beam() : LayerElement(BEAM), BeamDrawingInterface(), AttBeamedWith(), AttBeamRend(), AttColor(), AttCue()
 {
     this->RegisterAttClass(ATT_BEAMEDWITH);
     this->RegisterAttClass(ATT_BEAMREND);
@@ -1632,48 +1631,20 @@ void Beam::CloneReset()
     LayerElement::CloneReset();
 }
 
-bool Beam::IsSupportedChild(Object *child)
+bool Beam::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(BEAM)) {
-        assert(dynamic_cast<Beam *>(child));
+    static const std::vector<ClassId> supported{ BEAM, BTREM, CHORD, CLEF, FTREM, GRACEGRP, NOTE, REST, SPACE, TABGRP,
+        TUPLET };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(BTREM)) {
-        assert(dynamic_cast<BTrem *>(child));
-    }
-    else if (child->Is(CHORD)) {
-        assert(dynamic_cast<Chord *>(child));
-    }
-    else if (child->Is(CLEF)) {
-        assert(dynamic_cast<Clef *>(child));
-    }
-    else if (child->Is(FTREM)) {
-        assert(dynamic_cast<FTrem *>(child));
-    }
-    else if (child->Is(GRACEGRP)) {
-        assert(dynamic_cast<GraceGrp *>(child));
-    }
-    else if (child->Is(NOTE)) {
-        assert(dynamic_cast<Note *>(child));
-    }
-    else if (child->Is(REST)) {
-        assert(dynamic_cast<Rest *>(child));
-    }
-    else if (child->Is(SPACE)) {
-        assert(dynamic_cast<Space *>(child));
-    }
-    else if (child->Is(TABGRP)) {
-        assert(dynamic_cast<TabGrp *>(child));
-    }
-    else if (child->Is(TUPLET)) {
-        assert(dynamic_cast<Tuplet *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 void Beam::FilterList(ListOfConstObjects &childList) const
@@ -1951,13 +1922,9 @@ int BeamElementCoord::CalculateStemLength(
     const int standardStemLen = STANDARD_STEMLENGTH * 2;
     // Check if the stem has to be shortened because outside the staff
     // In this case, Note::CalcStemLenInThirdUnits will return a value shorter than 2 * STANDARD_STEMLENGTH
-    int stemLenInHalfUnits
-        = !m_maxShortening ? standardStemLen : m_closestNote->CalcStemLenInThirdUnits(staff, stemDir) * 2 / 3;
+    const int stemLenInHalfUnits = m_closestNote->CalcStemLenInThirdUnits(staff, stemDir) * 2 / 3;
     // Do not extend when not on the staff line
     if (stemLenInHalfUnits != standardStemLen) {
-        if ((m_maxShortening > 0) && ((stemLenInHalfUnits - standardStemLen) > m_maxShortening)) {
-            stemLenInHalfUnits = standardStemLen - m_maxShortening;
-        }
         extend = false;
     }
 
@@ -2096,12 +2063,6 @@ std::pair<int, int> Beam::GetAdditionalBeamCount() const
     });
 
     return { topShortestDur - DURATION_8, bottomShortestDur - DURATION_8 };
-}
-
-void Beam::SetElementShortening(int shortening)
-{
-    std::for_each(m_beamSegment.m_beamElementCoordRefs.begin(), m_beamSegment.m_beamElementCoordRefs.end(),
-        [shortening](BeamElementCoord *coord) { coord->m_maxShortening = shortening; });
 }
 
 int Beam::GetBeamPartDuration(int x, bool includeRests) const

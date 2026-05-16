@@ -31,7 +31,7 @@ namespace vrv {
 
 static const ClassRegistrar<Note> s_factory("stem", STEM);
 
-Stem::Stem() : LayerElement(STEM, "stem-"), AttGraced(), AttStemVis(), AttVisibility()
+Stem::Stem() : LayerElement(STEM), AttGraced(), AttStemVis(), AttVisibility()
 {
     this->RegisterAttClass(ATT_GRACED);
     this->RegisterAttClass(ATT_STEMVIS);
@@ -57,15 +57,16 @@ void Stem::Reset()
     m_stemModRelY = 0;
 }
 
-bool Stem::IsSupportedChild(Object *child)
+bool Stem::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(FLAG)) {
-        assert(dynamic_cast<Flag *>(child));
+    static const std::vector<ClassId> supported{ FLAG };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 void Stem::FillAttributes(const AttStems &attSource)

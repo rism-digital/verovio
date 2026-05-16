@@ -43,14 +43,14 @@ public:
     System();
     virtual ~System();
     void Reset() override;
-    std::string GetClassName() const override { return "System"; }
+    std::string GetClassName() const override { return "system"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
     ///@}
 
     /**
@@ -86,6 +86,15 @@ public:
      * Return the height of the system
      */
     int GetHeight() const;
+
+    /**
+     * Return the top (first) visible staff in the measure (if any).
+     * Takes into account system optimization
+     */
+    ///@{
+    Staff *GetTopVisibleStaff(bool includeOssia);
+    const Staff *GetTopVisibleStaff(bool includeOssia) const;
+    ///@}
 
     /**
      * Return the minimus system spacing
@@ -153,12 +162,6 @@ public:
      * Estimate the justification ratio from the castoff system widths and the desired page width
      */
     double EstimateJustificationRatio(const Doc *doc) const;
-
-    /**
-     * Convert mensural MEI into cast-off (measure) segments looking at the barLine objects.
-     * Segment positions occur where a barLine is set on all staves.
-     */
-    void ConvertToCastOffMensuralSystem(Doc *doc, System *targetSystem);
 
     /**
      * Reverse of ConvertToCastOffMensural()

@@ -10,6 +10,7 @@
 
 #include "atts_shared.h"
 #include "devicecontextbase.h"
+#include "drawinginterface.h"
 #include "floatingobject.h"
 
 namespace vrv {
@@ -22,7 +23,7 @@ namespace vrv {
  * This class represents elements appearing within a measure.
  * It is not an abstract class but should not be instanciated directly.
  */
-class SystemElement : public FloatingObject, public AttTyped {
+class SystemElement : public FloatingObject, public VisibilityDrawingInterface, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, reset methods
@@ -31,9 +32,22 @@ public:
     ///@{
     SystemElement();
     SystemElement(ClassId classId);
-    SystemElement(ClassId classId, const std::string &classIdStr);
     virtual ~SystemElement();
     void Reset() override;
+    ///@}
+
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    VisibilityDrawingInterface *GetVisibilityDrawingInterface() override
+    {
+        return vrv_cast<VisibilityDrawingInterface *>(this);
+    }
+    const VisibilityDrawingInterface *GetVisibilityDrawingInterface() const override
+    {
+        return vrv_cast<const VisibilityDrawingInterface *>(this);
+    }
     ///@}
 
     //----------//
@@ -53,12 +67,7 @@ public:
 private:
     //
 public:
-    /**
-     * Holds the visibility (hidden or visible) for an system element.
-     * By default, a system element is visible. It can be hidden when expansion are processed.
-     */
-    VisibilityType m_visibility;
-
+    //
 private:
     //
 };

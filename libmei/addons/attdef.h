@@ -74,6 +74,11 @@ enum data_BEATRPT_REND {
 typedef std::vector<std::pair<double, double>> data_BULGE;
 
 /**
+ * MEI data.DEGREES
+ */
+typedef double data_DEGREES;
+
+/**
  * MEI data.DURATION
  */
 enum data_DURATION {

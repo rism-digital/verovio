@@ -23,8 +23,8 @@ namespace vrv {
  * This class models the MEI <hairpin> element.
  */
 class Hairpin : public ControlElement,
+                public OffsetSpanningInterface,
                 public TimeSpanningInterface,
-                public AttColor,
                 public AttHairpinLog,
                 public AttHairpinVis,
                 public AttLineRendBase,
@@ -40,13 +40,18 @@ public:
     virtual ~Hairpin();
     Object *Clone() const override { return new Hairpin(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Hairpin"; }
+    std::string GetClassName() const override { return "hairpin"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
+    OffsetSpanningInterface *GetOffsetSpanningInterface() override { return vrv_cast<OffsetSpanningInterface *>(this); }
+    const OffsetSpanningInterface *GetOffsetSpanningInterface() const override
+    {
+        return vrv_cast<const OffsetSpanningInterface *>(this);
+    }
     TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
     const TimePointInterface *GetTimePointInterface() const override
     {

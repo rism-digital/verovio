@@ -16,11 +16,11 @@
 #include "atts_analytical.h"
 #include "atts_shared.h"
 #include "atts_visual.h"
+#include "clef.h"
 #include "layerelement.h"
 
 namespace vrv {
 
-class Clef;
 class ScoreDefInterface;
 
 //----------------------------------------------------------------------------
@@ -43,9 +43,8 @@ struct KeyAccidInfo {
  */
 class KeySig : public LayerElement,
                public ObjectListInterface,
-               public AttAccidental,
                public AttColor,
-               public AttKeyMode,
+               public AttKeySigAnl,
                public AttKeySigLog,
                public AttKeySigVis,
                public AttPitch,
@@ -60,7 +59,7 @@ public:
     virtual ~KeySig();
     Object *Clone() const override { return new KeySig(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "KeySig"; }
+    std::string GetClassName() const override { return "keySig"; }
     ///@}
 
     /** Override the method since alignment is required */
@@ -72,7 +71,12 @@ public:
     /**
      * Add an element (a keyAccid) to a keySig.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
+
+    /**
+     * Additional check when adding a child.
+     */
+    bool AddChildAdditionalCheck(Object *child) override;
 
     /** Accid number getter */
     int GetAccidCount(bool fromAttribute = false) const;
@@ -101,6 +105,15 @@ public:
     void FillMap(MapOfOctavedPitchAccid &mapOfPitchAccid) const;
 
     int GetFifthsInt() const;
+
+    /**
+     * Set/Get the drawing clef
+     */
+    ///@{
+    Clef *GetDrawingClef();
+    void ResetDrawingClef();
+    void SetDrawingClef(Clef *clef);
+    ///@}
 
     //----------------//
     // Static methods //
@@ -157,6 +170,16 @@ public:
     static const data_PITCHNAME s_pnameForSharps[];
 
 private:
+    /**
+     * The clef used for drawing
+     * Calculated from layer if not set
+     */
+    std::optional<Clef> m_drawingClef;
+
+    //----------------//
+    // Static members //
+    //----------------//
+
     static const int octave_map[2][9][7];
 };
 

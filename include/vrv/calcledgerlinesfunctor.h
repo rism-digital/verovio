@@ -38,6 +38,7 @@ public:
      * Functor interface
      */
     ///@{
+    FunctorCode VisitAccid(Accid *accid) override;
     FunctorCode VisitNote(Note *note) override;
     FunctorCode VisitStaffEnd(Staff *staff) override;
     ///@}
@@ -45,6 +46,10 @@ public:
 protected:
     //
 private:
+    /**
+     *
+     */
+    void CalcForLayerElement(LayerElement *layerElement, int width, data_HORIZONTALALIGNMENT alignment);
     /**
      * Shorten ledger lines which overlap with neighbors
      */

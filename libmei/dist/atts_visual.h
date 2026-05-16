@@ -2258,10 +2258,6 @@ public:
     data_BOOLEAN GetBracketVisible() const { return m_bracketVisible; }
     bool HasBracketVisible() const;
     //
-    void SetDurVisible(data_BOOLEAN durVisible_) { m_durVisible = durVisible_; }
-    data_BOOLEAN GetDurVisible() const { return m_durVisible; }
-    bool HasDurVisible() const;
-    //
     void SetNumFormat(tupletVis_NUMFORMAT numFormat_) { m_numFormat = numFormat_; }
     tupletVis_NUMFORMAT GetNumFormat() const { return m_numFormat; }
     bool HasNumFormat() const;
@@ -2275,8 +2271,6 @@ private:
     data_STAFFREL_basic m_bracketPlace;
     /** States whether a bracket should be rendered with a tuplet. **/
     data_BOOLEAN m_bracketVisible;
-    /** Determines if the tuplet duration is visible. **/
-    data_BOOLEAN m_durVisible;
     /** Controls how the num:numbase ratio is to be displayed. **/
     tupletVis_NUMFORMAT m_numFormat;
 };

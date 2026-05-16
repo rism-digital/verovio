@@ -50,6 +50,7 @@ class Measure;
 class MeterSigGrp;
 class Octave;
 class Pedal;
+class ScoreDef;
 class Section;
 class Slur;
 class StaffGrp;
@@ -103,27 +104,117 @@ namespace musicxml {
     };
 
     struct OpenArpeggio {
-        OpenArpeggio(const int &arpegN, const int &timeStamp)
+        OpenArpeggio(const int &arpegN, const Fraction &timeStamp)
         {
             m_arpegN = arpegN;
             m_timeStamp = timeStamp;
         }
 
         int m_arpegN;
-        int m_timeStamp;
+        Fraction m_timeStamp;
     };
 
     struct EndingInfo {
-        EndingInfo(const std::string &endingNumber, const std::string &endingType, const std::string &endingText)
+        EndingInfo() {}
+
+        EndingInfo(const std::string &number, const std::string &type, const std::string &text)
         {
-            m_endingNumber = endingNumber;
-            m_endingType = endingType;
-            m_endingText = endingText;
+            m_number = number;
+            m_type = type;
+            m_text = text;
         }
 
-        std::string m_endingNumber;
-        std::string m_endingType;
-        std::string m_endingText;
+        std::string m_number;
+        std::string m_type;
+        std::string m_text;
+    };
+
+    struct RepeatInfo {
+        RepeatInfo()
+        {
+            m_times = 1;
+            m_afterJump = false;
+        }
+
+        RepeatInfo(int times, bool afterJump)
+        {
+            m_times = times;
+            m_afterJump = afterJump;
+        }
+
+        int m_times;
+        bool m_afterJump;
+    };
+
+    struct JumpInfo {
+        typedef enum { NONE = 0, DALSEGNO, DACAPO, TOCODA } JUMPTYPE;
+
+        JumpInfo() { m_jump = NONE; }
+        JumpInfo(JUMPTYPE jump, const std::string &label, const std::list<int> &times)
+        {
+            m_label = label;
+            m_jump = jump;
+            m_times = times;
+        }
+        JumpInfo(JUMPTYPE jump, const std::list<int> &times)
+        {
+            m_jump = jump;
+            m_times = times;
+        }
+        JumpInfo(JUMPTYPE jump) { m_jump = jump; }
+
+        std::string m_label;
+        JUMPTYPE m_jump;
+        std::list<int> m_times;
+    };
+
+    struct FineInfo {
+        FineInfo() { m_fine = false; }
+        FineInfo(bool fine) { m_fine = fine; }
+
+        bool m_fine;
+    };
+
+    struct SectionInfo {
+        SectionInfo(bool repeatStart = false)
+        {
+            m_visited = 0;
+            m_classId = SECTION;
+            m_target = NULL;
+            m_repeatStart = repeatStart;
+        }
+        SectionInfo(const EndingInfo &endingInfo)
+        {
+            m_visited = 0;
+            m_classId = ENDING;
+            m_target = NULL;
+            m_endingInfo = endingInfo;
+            m_repeatStart = false;
+        }
+        SectionInfo(const RepeatInfo &repeatInfo)
+        {
+            m_visited = 0;
+            m_classId = SECTION;
+            m_target = NULL;
+            m_repeatInfo = repeatInfo;
+            m_repeatStart = false;
+        }
+
+        void merge(const EndingInfo &endingInfo)
+        {
+            m_classId = ENDING;
+            m_endingInfo = endingInfo;
+        }
+
+        ClassId m_classId;
+        Object *m_target;
+        std::string m_label;
+        EndingInfo m_endingInfo;
+        RepeatInfo m_repeatInfo;
+        bool m_repeatStart;
+        JumpInfo m_jumpInfo;
+        FineInfo m_fineInfo;
+        int m_visited;
     };
 
     struct ClefChange {
@@ -183,6 +274,25 @@ namespace musicxml {
         int m_layerNum = 0;
     };
 
+    struct Accidental {
+        Accidental()
+        {
+            m_accid = ACCIDENTAL_WRITTEN_NONE;
+            m_glyphName = "";
+            m_glyphAuth = "";
+        }
+
+        Accidental(data_ACCIDENTAL_WRITTEN accid, std::string glyphName, std::string glyphAuth)
+        {
+            m_accid = accid;
+            m_glyphName = glyphName;
+            m_glyphAuth = glyphAuth;
+        }
+
+        data_ACCIDENTAL_WRITTEN m_accid;
+        std::string m_glyphName;
+        std::string m_glyphAuth;
+    };
 } // namespace musicxml
 
 #endif // NO_MUSICXML_SUPPORT
@@ -206,6 +316,13 @@ private:
 #ifndef NO_MUSICXML_SUPPORT
 public:
     bool Import(const std::string &musicxml) override;
+
+    /*
+     * @name Public methods for converting MusicXML values to MEI attributes.
+     */
+    ///@{
+    static data_ACCIDENTAL_WRITTEN ConvertAccidentalToAccid(const std::string &value);
+    ///@}
 
 private:
     /*
@@ -242,13 +359,14 @@ private:
     void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlDirection(
-        pugi::xml_node, Measure *measure, const std::string &measureNum, const short int staffOffset);
+        pugi::xml_node, Measure *measure, const std::string &measureNum, const short int staffOffset, Section *section);
     void ReadMusicXmlFigures(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlNote(
         pugi::xml_node, Measure *measure, const std::string &measureNum, const short int staffOffset, Section *section);
     void ReadMusicXmlPrint(pugi::xml_node, Section *section);
+    void ReadMusicXmlSound(pugi::xml_node, Measure *measure, Section *section);
     bool ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord);
     void ReadMusicXmlTupletStart(const pugi::xml_node &node, const pugi::xml_node &tupletStart, Layer *layer);
     void ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi::xml_node &beamStart, Layer *layer);
@@ -291,6 +409,11 @@ private:
      * Add a Layer element to the layer or to the LayerElement at the top of m_elementStack.
      */
     void AddLayerElement(Layer *layer, LayerElement *element, int duration = 0);
+
+    /*
+     * Add an accidental to a note.
+     */
+    void AddAccidental(pugi::xml_node accidental, Note *note);
 
     /*
      * Returns the appropriate layer for a node looking at its MusicXML staff and voice elements.
@@ -338,10 +461,11 @@ private:
     ///@}
 
     /*
-     * @name Helper method to check whether an ending measure is already present in m_endingStack.
+     * @name Helper methods to work with sections and expansions.
      */
     ///@{
-    bool NotInEndingStack(const Measure *measure) const;
+    bool MeasureInExistingSection(const Measure *measure) const;
+    void CreateExpansion(Section *section);
     ///@}
 
     /*
@@ -371,25 +495,25 @@ private:
      * @name Helper methods for rendering text elements
      */
     ///@{
-    ///@}
     std::string GetWordsOrDynamicsText(const pugi::xml_node node) const;
     void TextRendition(const pugi::xpath_node_set words, ControlElement *element) const;
     std::string StyleLabel(pugi::xml_node display);
     void PrintMetronome(pugi::xml_node metronome, Tempo *tempo);
+    ///@}
 
     /*
      * @name Helper methods for filling in space elements
      */
     ///@{
+    void FillSpace(Layer *layer, int dur, bool withClefs = false, int processed = 0);
     ///@}
-    void FillSpace(Layer *layer, int dur);
 
     /*
      * @name Helper method for generating additional IDs
      */
     ///@{
-    ///@}
     void GenerateID(pugi::xml_node node);
+    ///@}
 
     /*
      * @name Helper method for meterSigGrp. Separates beat/beat-type into MeterSig and adds them to the MeterSigGrp.
@@ -437,10 +561,17 @@ private:
     ///@}
 
     /*
-     * @name Helper method for comparing written/gestural accidental attributes
+     * @name Update the carried-over accidentals for each pitch class based on key signature
      */
     ///@{
-    static bool IsSameAccidWrittenGestural(data_ACCIDENTAL_WRITTEN written, data_ACCIDENTAL_GESTURAL gestural);
+    void ResetAccidentals(const KeySig *keySig = NULL);
+    ///@}
+
+    /**
+     * @name Find or create a ScoreDef before the given measure
+     */
+    ///@{
+    ScoreDef *GetOrCreateLastScoreDef(Section *section);
     ///@}
 
     /*
@@ -452,13 +583,12 @@ private:
      * @name Methods for converting MusicXML values to MEI attributes.
      */
     ///@{
-    static data_ACCIDENTAL_WRITTEN ConvertAccidentalToAccid(const std::string &value);
     static data_ACCIDENTAL_GESTURAL ConvertAlterToAccid(const float value);
     static data_ARTICULATION ConvertArticulations(const std::string &value);
     static data_BARRENDITION ConvertStyleToRend(const std::string &value, const bool repeat);
     static data_BOOLEAN ConvertWordToBool(const std::string &value);
     static data_DURATION ConvertTypeToDur(const std::string &value);
-    static data_HEADSHAPE ConvertNotehead(const std::string &value);
+    static data_HEADSHAPE_list ConvertNotehead(const std::string &value);
     static data_LINESTARTENDSYMBOL ConvertLineEndSymbol(const std::string &value);
     static data_MIDIVALUE ConvertDynamicsToMidiVal(const float dynamics);
     static data_PITCHNAME ConvertStepToPitchName(const std::string &value);
@@ -467,6 +597,7 @@ private:
     static curvature_CURVEDIR InferCurvedir(const pugi::xml_node slurOrTie);
     static fermataVis_SHAPE ConvertFermataShape(const std::string &value);
     static pedalLog_DIR ConvertPedalTypeToDir(const std::string &value);
+    static repeatMarkLog_FUNC ConvertJumpType(const std::string &value);
     static tupletVis_NUMFORMAT ConvertTupletNumberValue(const std::string &value);
     static std::u32string ConvertTypeToVerovioText(const std::string &value);
     static std::string ConvertAlterToSymbol(const std::string &value, bool plusMinus = false);
@@ -536,11 +667,13 @@ private:
     std::vector<std::pair<BeamSpan *, std::pair<int, int>>> m_beamspanStack;
     std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner>> m_bracketStack;
     std::vector<std::pair<Trill *, musicxml::OpenSpanner>> m_trillStack;
-    /* Current ending info for start/stop */
-    std::optional<musicxml::EndingInfo> m_currentEndingStart;
-    std::optional<musicxml::EndingInfo> m_currentEndingStop;
-    /* The stack of endings to be inserted at the end of XML import */
-    std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo>> m_endingStack;
+    /* Current section/ending info for start/stop */
+    std::optional<musicxml::SectionInfo> m_sectionStart;
+    std::optional<musicxml::SectionInfo> m_sectionStop;
+    std::optional<musicxml::JumpInfo> m_jumpInfo;
+    std::optional<musicxml::FineInfo> m_fineInfo;
+    /* The list of sections/endings to be inserted at the end of XML import */
+    std::vector<std::pair<musicxml::SectionInfo, std::vector<Measure *>>> m_sections;
     /* The stack of open dashes (direction-type) containing *ControlElement, OpenDashes */
     std::vector<std::pair<ControlElement *, musicxml::OpenDashes>> m_openDashesStack;
     /* The stacks for ControlElements */
@@ -557,13 +690,19 @@ private:
      */
     std::vector<std::pair<std::string, ControlElement *>> m_controlElements;
     /* stack of clef changes to be inserted to all layers of a given staff */
-    std::queue<musicxml::ClefChange> m_clefChangeQueue;
+    std::deque<musicxml::ClefChange> m_clefChangeQueue;
     /* stack of new arpeggios that get more notes added. */
     std::vector<std::pair<Arpeg *, musicxml::OpenArpeggio>> m_ArpeggioStack;
     /* a map for the measure counts storing the index of each measure created */
     std::map<Measure *, int> m_measureCounts;
     /* measure rests */
     std::map<int, int> m_multiRests;
+    /* a map of current accidental for each pitch class */
+    std::map<data_PITCHNAME, std::vector<musicxml::Accidental>> m_currentAccids;
+    /* current key signature */
+    KeySig *m_currentKeySig = NULL;
+    /* A flag indicating we had a clef change */
+    int m_clefChanged = 0;
 
 #endif // NO_MUSICXML_SUPPORT
 };

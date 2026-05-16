@@ -9,6 +9,7 @@
 #define __VRV_STAFF_H__
 
 #include "atts_shared.h"
+#include "drawinginterface.h"
 #include "facsimileinterface.h"
 #include "object.h"
 
@@ -17,6 +18,7 @@ namespace vrv {
 class DeviceContext;
 class Layer;
 class LedgerLine;
+class Measure;
 class StaffAlignment;
 class StaffDef;
 class Syl;
@@ -43,7 +45,34 @@ public:
      * Add a dash to the ledger line object.
      * If necessary merges overlapping dashes.
      */
-    void AddDash(int left, int right, int extension);
+    void AddDash(int left, int right, int extension, const Object *event);
+
+    class Dash {
+    public:
+        int m_x1;
+        int m_x2;
+        ListOfConstObjects m_events;
+
+        // Constructor
+        Dash(int x1, int x2, const Object *object)
+        {
+            m_x1 = x1;
+            m_x2 = x2;
+            m_events.push_back(object);
+        }
+
+        // Merge function to merge another Dash object into this one
+        void MergeWith(const Dash &other)
+        {
+            // Keep the first int from this Dash object, and the second int from the other
+            this->m_x1 = std::min(other.m_x1, this->m_x1);
+            this->m_x2 = std::max(other.m_x2, this->m_x2);
+            // Append the list from other to this
+            if (!other.m_events.empty()) {
+                this->m_events.insert(this->m_events.end(), other.m_events.begin(), other.m_events.end());
+            }
+        }
+    };
 
 protected:
     //
@@ -53,7 +82,8 @@ public:
     /**
      * A list of dashes relative to the staff position.
      */
-    std::list<std::pair<int, int>> m_dashes;
+    // std::list<std::pair<int, int>> m_dashes;
+    std::list<Dash> m_dashes;
 
 protected:
     //
@@ -72,6 +102,7 @@ private:
  * For unmeasured music, one single Measure is added for simplifying internal processing
  */
 class Staff : public Object,
+              public VisibilityDrawingInterface,
               public FacsimileInterface,
               public AttCoordY1,
               public AttNInteger,
@@ -84,11 +115,11 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    Staff(int n = 1);
+    Staff(int n = 1, bool isOssia = false);
     virtual ~Staff();
     Object *Clone() const override { return new Staff(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Staff"; }
+    std::string GetClassName() const override { return (this->IsOssia() ? "oStaff" : "staff"); }
     ///@}
 
     /**
@@ -105,6 +136,32 @@ public:
     {
         return vrv_cast<const FacsimileInterface *>(this);
     }
+    VisibilityDrawingInterface *GetVisibilityDrawingInterface() override
+    {
+        return vrv_cast<VisibilityDrawingInterface *>(this);
+    }
+    const VisibilityDrawingInterface *GetVisibilityDrawingInterface() const override
+    {
+        return vrv_cast<const VisibilityDrawingInterface *>(this);
+    }
+    ///@}
+
+    /**
+     * @name Getters and setters for ossia.
+     */
+    ///@{
+    bool IsOssia() const { return (m_isOssia); }
+    void SetOssia(bool isOssia) { m_isOssia = isOssia; }
+    int GetNForOssia() const;
+    int GetNFromOssia() const;
+    ///@}
+
+    /**
+     * @name Methods for converting attributes to and from their original values.
+     */
+    ///@{
+    void AttributesToExternal() override;
+    void AttributesToInternal() override;
     ///@}
 
     /**
@@ -127,8 +184,13 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
     ///@}
+
+    /**
+     * Additional check when adding a child.
+     */
+    bool AddChildAdditionalCheck(Object *child) override;
 
     /**
      * @name Get the X, Y, and angle of drawing position
@@ -162,11 +224,13 @@ public:
     bool IsMensural() const;
     bool IsNeume() const;
     bool IsTablature() const;
+    bool IsTabStaffLike() const { return m_drawingNotationType == NOTATIONTYPE_tab_staff_like; }
     bool IsTabGuitar() const { return m_drawingNotationType == NOTATIONTYPE_tab_guitar; }
     bool IsTabLuteFrench() const { return m_drawingNotationType == NOTATIONTYPE_tab_lute_french; }
     bool IsTabLuteGerman() const { return m_drawingNotationType == NOTATIONTYPE_tab_lute_german; }
     bool IsTabLuteItalian() const { return m_drawingNotationType == NOTATIONTYPE_tab_lute_italian; }
     bool IsTabWithStemsOutside() const;
+
     ///@}
 
     /**
@@ -207,8 +271,8 @@ public:
      * If necessary creates the ledger line array.
      */
     ///@{
-    void AddLedgerLineAbove(int count, int left, int right, int extension, bool cueSize);
-    void AddLedgerLineBelow(int count, int left, int right, int extension, bool cueSize);
+    void AddLedgerLineAbove(int count, int left, int right, int extension, bool cueSize, const Object *event);
+    void AddLedgerLineBelow(int count, int left, int right, int extension, bool cueSize, const Object *event);
     ///@}
 
     /**
@@ -230,6 +294,11 @@ public:
      */
     void SetFromFacsimile(Doc *doc);
 
+    /**
+     * Get the drawing x if the staff is an ossia and has an ossia staffDef
+     */
+    int GetOssiaDrawingShift(const Measure *measure, Doc *doc) const;
+
     //----------//
     // Functors //
     //----------//
@@ -248,7 +317,7 @@ private:
     /**
      * Add the ledger line dashes to the legderline array.
      */
-    void AddLedgerLines(ArrayOfLedgerLines &lines, int count, int left, int right, int extension);
+    void AddLedgerLines(ArrayOfLedgerLines &lines, int count, int left, int right, int extension, const Object *event);
 
 public:
     /**
@@ -302,6 +371,9 @@ private:
      * Used only with facsimile rendering
      */
     double m_drawingRotation;
+
+    /** ossia staff flag */
+    bool m_isOssia;
 };
 
 } // namespace vrv

@@ -36,6 +36,7 @@ env:
   # build artifacts
   DOC_BUILD: doc-build
   TOOLKIT_BUILD: toolkit-build
+  FONTS: fonts
 
   # doxygen
   DOXYGEN_REPO: ${{ github.repository_owner }}/verovio-doxygen # works from rism-digital and from forks
@@ -44,7 +45,7 @@ env:
   # emscripten
   EM_VERSION: latest
   EM_CACHE_FOLDER: "emsdk-cache"
-  EM_CACHE_ID: 3
+  EM_CACHE_ID: 4
 
   # gh-pages
   GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org # works from rism-digital and from forks
@@ -74,10 +75,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-20.04
-            compiler: g++
-            version: "10"
-
           - os: ubuntu-22.04
             compiler: g++
             version: "11"
@@ -86,33 +83,60 @@ jobs:
             compiler: g++
             version: "12"
 
-          - os: ubuntu-20.04
-            compiler: clang
-            version: "10"
-
-          - os: ubuntu-20.04
-            compiler: clang
-            version: "11"
-
-          - os: ubuntu-20.04
-            compiler: clang
-            version: "12"
-
-          - os: macos-latest
-            compiler: xcode
-            version: "14.3"
-
-          - os: macos-latest
-            compiler: xcode
-            version: "15.3"
-
-          - os: macos-latest
+          - os: ubuntu-24.04
             compiler: g++
             version: "12"
+            
+          - os: ubuntu-24.04
+            compiler: g++
+            version: "13"
+            
+          - os: ubuntu-24.04
+            compiler: g++
+            version: "14"
+
+          - os: ubuntu-22.04
+            compiler: clang
+            version: "12"
+
+          - os: ubuntu-22.04
+            compiler: clang
+            version: "13"
+
+          - os: ubuntu-22.04
+            compiler: clang
+            version: "14"
+
+          - os: ubuntu-22.04
+            compiler: clang
+            version: "15"
+
+          - os: ubuntu-24.04
+            compiler: clang
+            version: "16"
+
+          - os: ubuntu-24.04
+            compiler: clang
+            version: "17"
+
+          - os: ubuntu-24.04
+            compiler: clang
+            version: "18"
+
+          - os: macos-14
+            compiler: xcode
+            version: "15.4"
+          
+          - os: macos-latest
+            compiler: xcode
+            version: "16.0"
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
+
+      - name: Register gcc problem matcher
+        run: echo "::add-matcher::.github/problem_matchers/gcc.json"
 
       # Installation step for Ubuntu
       - name: Configure Ubuntu with ${{ matrix.compiler }}-${{ matrix.version }}
@@ -178,6 +202,85 @@ jobs:
           cmake ../cmake
           make -j8
 
+
+  ##################################
+  # Build the Java toolkit         #
+  ##################################
+  build_java:
+    # skip job if commit message contains "[skip-ci]"
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
+  
+    name: Build Java toolkit
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v6.0.2
+
+      - name: Restore cache
+        uses: actions/setup-java@v5.2.0
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+          cache-dependency-path: ${{ github.workspace }}/bindings/java/pom.xml
+
+      - name: Create TEMP_DIR
+        working-directory: ${{ github.workspace }}
+        run: mkdir -p $TEMP_DIR/
+
+      - name: Build Java
+        working-directory: ${{ github.workspace }}/bindings/java
+        run: mvn package && mvn package
+
+      - name: Copy build into TEMP_DIR
+        working-directory: ${{ github.workspace }}/bindings/java
+        run: cp target/*.jar $GITHUB_WORKSPACE/$TEMP_DIR/
+
+      - name: Upload java build artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: java-build-${{ github.run_id }}
+          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}
+
+
+  ##################################
+  # Build and test the Go bindings #
+  ##################################
+  build_go:
+    # skip job if commit message contains "[skip-ci]"
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
+
+    name: Build Go bindings
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: ${{ github.workspace }}/bindings/go/go.mod
+          cache-dependency-path: ${{ github.workspace }}/bindings/go/go.mod
+
+      - name: Build and install Verovio shared library
+        working-directory: ${{ github.workspace }}
+        run: |
+          cmake -S cmake -B build/go -DBUILD_AS_LIBRARY=ON -DCMAKE_INSTALL_PREFIX="$PWD/build/go/install"
+          cmake --build build/go -j8
+          cmake --install build/go
+
+      - name: Run Go tests
+        working-directory: ${{ github.workspace }}/bindings/go
+        env:
+          PKG_CONFIG_PATH: ${{ github.workspace }}/build/go
+          LD_LIBRARY_PATH: ${{ github.workspace }}/build/go/install/lib
+          VEROVIO_RESOURCE_PATH: ${{ github.workspace }}/build/go/install/share/verovio
+          GOCACHE: ${{ github.workspace }}/.gocache
+        run: go test ./...
+
+  
   #####################################
   # Set up and cache emscripten build #
   #####################################
@@ -186,11 +289,11 @@ jobs:
     if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
 
     name: Set up and cache emscripten
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Set up cache
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         id: cache
         with:
           # path for cache
@@ -199,7 +302,7 @@ jobs:
           key: ${{ runner.os }}-emsdk-${{ env.EM_VERSION }}-${{ env.EM_CACHE_ID }}
 
       - name: Set up emsdk
-        uses: mymindstorm/setup-emsdk@v11
+        uses: mymindstorm/setup-emsdk@v16
         with:
           version: ${{ env.EM_VERSION }}
           actions-cache-folder: ${{ env.EM_CACHE_FOLDER }}
@@ -212,7 +315,7 @@ jobs:
   ##################################
   build_js:
     name: Build JS toolkit
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: [setup_emscripten]
 
     # set matrix with toolkit options (runs the following steps for every target in parallel)
@@ -223,10 +326,6 @@ jobs:
             message: "Building toolkit without humdrum"
             options: "-c -H -M"
             filepath: "verovio-toolkit.js*"
-          - target: light
-            message: "Building toolkit without humdrum as light version"
-            options: "-c -H -l -M"
-            filepath: "verovio-toolkit-light.js*"
           - target: wasm
             message: "Building toolkit without humdrum as wasm"
             options: "-c -H -w -M"
@@ -239,7 +338,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
@@ -248,7 +347,7 @@ jobs:
       # Restore system libraries from cache
       - name: Restore cache
         id: restore_cache
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           # path for cache
           path: ${{ env.EM_CACHE_FOLDER }}
@@ -257,7 +356,7 @@ jobs:
 
       # Install and/or activate emsdk
       - name: Set up emsdk
-        uses: mymindstorm/setup-emsdk@v11
+        uses: mymindstorm/setup-emsdk@v16
         with:
           version: ${{ env.EM_VERSION }}
           actions-cache-folder: ${{ env.EM_CACHE_FOLDER }}
@@ -276,9 +375,9 @@ jobs:
 
       - name: Upload js build artifact (${{ matrix.toolkit.target }})
         if: ${{ matrix.toolkit.upload == true }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v7
         with:
-          name: ${{ env.TOOLKIT_BUILD }}
+          name: ${{ env.TOOLKIT_BUILD }}-${{ github.run_id }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ matrix.toolkit.filepath }}
 
 
@@ -286,12 +385,15 @@ jobs:
   # Copy the font CSS files  #
   ############################
   copy_font_files:
+    # skip job if commit message contains "[skip-ci]"
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
+  
     name: Copy the font files
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
@@ -301,9 +403,9 @@ jobs:
         run: cp data/*.css $GITHUB_WORKSPACE/$TEMP_DIR/data/
 
       - name: Upload font data artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v7
         with:
-          name: ${{ env.TOOLKIT_BUILD }}
+          name: ${{ env.FONTS }}-${{ github.run_id }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}
 
   ##################################
@@ -311,7 +413,7 @@ jobs:
   ##################################
   check_deploy_settings:
     name: Check settings for deployment
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     # run deployment only after finishing the build jobs
     needs: [build_cpp, build_js]
 
@@ -338,22 +440,22 @@ jobs:
           echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
           echo "IS_DRY_RUN = ${IS_DRY_RUN}"
 
-          echo "::set-output name=disable::${DISABLE_DEPLOY_STEPS}"
-          echo "::set-output name=dry-run::${IS_DRY_RUN}"
+          echo "disable=${DISABLE_DEPLOY_STEPS}" >> $GITHUB_OUTPUT
+          echo "dry-run=${IS_DRY_RUN}" >> $GITHUB_OUTPUT
 
   #########################################
   # Deploy the toolkit builds to gh-pages #
   #########################################
   deploy_toolkit:
     name: Deploy JS toolkit
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: ${{ needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'false' }}
     # run deployment only after finishing the build jobs
     needs: [build_cpp, build_js, check_deploy_settings]
 
     steps:
       - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
         with:
           # repository to check out
           repository: ${{ env.GH_PAGES_REPO }}
@@ -366,14 +468,24 @@ jobs:
           path: ${{ env.GH_PAGES_DIR }}
 
       - name: Download TOOLKIT_BUILD artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v8.0.1
         with:
-          name: ${{ env.TOOLKIT_BUILD }}
+          name: ${{ env.TOOLKIT_BUILD }}-${{ github.run_id }}
           path: artifacts/${{ env.TOOLKIT_BUILD }}
 
-      - name: Copy artifacts to gh-pages
+      - name: Copy the toolkit artifacts to gh-pages
         run: |
           cp -r artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
+
+      - name: Download FONTS artifacts
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: ${{ env.FONTS }}-${{ github.run_id }}
+          path: artifacts/${{ env.FONTS }}
+
+      - name: Copy the fonts artifacts to gh-pages
+        run: |
+          cp -r artifacts/$FONTS/* $GH_PAGES_DIR/javascript/develop/
 
       - name: Check git status before commit
         working-directory: ${{ env.GH_PAGES_DIR }}
@@ -423,19 +535,20 @@ jobs:
 
           echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
           echo "IS_DRY_RUN = ${IS_DRY_RUN}"
+      
 
   ###################################
   # Build the doxygen documentation #
   ###################################
   build_docs:
     name: Build documentation
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     # run only after finishing other build jobs
     needs: [build_cpp, build_js]
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
 
       - name: Install doxygen
         run: |
@@ -455,9 +568,9 @@ jobs:
         run: (cat verovio.conf ; echo "OUTPUT_DIRECTORY = $GITHUB_WORKSPACE/$DOXYGEN_DIR") | doxygen -
 
       - name: Upload doxygen build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v7
         with:
-          name: ${{ env.DOC_BUILD }}
+          name: ${{ env.DOC_BUILD }}-${{ github.run_id }}
           path: ${{ github.workspace }}/${{ env.DOXYGEN_DIR }}
 
   ###############################################
@@ -465,14 +578,14 @@ jobs:
   ###############################################
   deploy_docs:
     name: Deploy documentation
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: ${{ needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'false' }}
     # run deployment only after finishing the build job
     needs: [build_docs, check_deploy_settings]
 
     steps:
       - name: Checkout DOXYGEN_REPO into DOXYGEN_DIR
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
         with:
           # repository to check out
           repository: ${{ env.DOXYGEN_REPO }}
@@ -485,9 +598,9 @@ jobs:
           path: ${{ env.DOXYGEN_DIR }}
 
       - name: Download DOC_BUILD artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v8.0.1
         with:
-          name: ${{ env.DOC_BUILD }}
+          name: ${{ env.DOC_BUILD }}-${{ github.run_id }}
           path: artifacts/${{ env.DOC_BUILD }}
 
       - name: Remove old doc and copy build artifacts to DOXYGEN_DIR
@@ -550,7 +663,7 @@ jobs:
   ###############################################
   skip_deploy:
     name: Skip deployment if set
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     # always() is needed here to meet if-condition even if earlier steps failed
     # cf. https://github.com/actions/runner/issues/491
     if: ${{ always() && needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'true' }}

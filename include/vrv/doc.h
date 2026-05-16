@@ -22,6 +22,7 @@ class MidiFile;
 namespace vrv {
 
 class DocSelection;
+class PageRange;
 class FontInfo;
 class Glyph;
 class Pages;
@@ -47,17 +48,28 @@ public:
     ///@{
     Doc();
     virtual ~Doc();
+    std::string GetClassName() const override { return "body"; }
     ///@}
 
     /**
      * Add a page to the document
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * Clear the content of the document.
      */
     void Reset() override;
+
+    /**
+     * Reset the document for loading a serialization
+     */
+    void ResetToSerialization();
+
+    /**
+     * Reset to the loading state (unset the scoreDef)
+     */
+    void ResetToLoading();
 
     /**
      * Clear the selection pages.
@@ -103,9 +115,14 @@ public:
     bool GenerateMeasureNumbers();
 
     /**
-     * Generate an MEI header
+     * Generate a minimal MEI header
      */
-    void GenerateMEIHeader(bool meiBasic);
+    void GenerateMEIHeader();
+
+    /**
+     * Convert the header to MEI Basic by preserving only the fileDesc and its titleStmt
+     */
+    void ConvertHeaderToMEIBasic();
 
     /**
      * Getter and setter for the DocType.
@@ -268,7 +285,7 @@ public:
 
     /**
      * Export the document to a MIDI file.
-     * Run trough all the layers and fill the midi file content.
+     * Run trough all the layers and fill the MIDI file content.
      */
     void ExportMIDI(smf::MidiFile *midiFile);
 
@@ -276,7 +293,7 @@ public:
      * Extract a timemap from the document to a JSON string.
      * Run trough all the layers and fill the timemap file content.
      */
-    bool ExportTimemap(std::string &output, bool includeRests, bool includeMeasures);
+    bool ExportTimemap(std::string &output, bool includeRests, bool includeMeasures, bool useFractions);
 
     /**
      *  Extract expansionMap from the document to JSON string.
@@ -363,7 +380,12 @@ public:
      * Segment positions occur where a barLine is set on all staves.
      * castOff parameters indicates if we perform cast off (true) or un-cast off
      */
-    void ConvertToCastOffMensuralDoc(bool castOff);
+    void ConvertToCastOffMensuralDoc(MensuralCastOffType castOff);
+
+    /**
+     * Convert mensural MEI into CMN measure-based MEI.
+     */
+    void ConvertToCmnDoc();
 
     /**
      * Convert analytical encoding (@fermata, @tie) to correpsonding elements
@@ -371,6 +393,21 @@ public:
      * Permanent conversion discard analytical markup and elements will be preserved in the MEI output.
      */
     void ConvertMarkupDoc(bool permanent = true);
+
+    /**
+     * Calls the scoringUpFunctor and applies it.
+     */
+    void ScoringUpDoc();
+
+    /*
+     * Convert the doc from mensural to a flattened version with no ligatures and the selected editorial markup.
+     */
+    void ConvertToMensuralViewDoc();
+
+    /**
+     * Convert the doc from mensural to CMN.
+     */
+    void ConvertMensuralToCmnDoc();
 
     /**
      * Sync the coordinate provided trought <facsimile> to m_drawingFacsX/Y.
@@ -398,8 +435,9 @@ public:
      * Set drawing values (page size, etc) when drawing a page.
      * By default, the page size of the document is taken.
      * If a page is given, the size of the page is taken.
+     * The withPageRange parameter trigger layout of pages in the appropriate range.
      */
-    Page *SetDrawingPage(int pageIdx);
+    Page *SetDrawingPage(int pageIdx, bool withPageRange = false);
 
     /**
      * Update the drawing page sizes when a page is set as drawing page.
@@ -425,6 +463,11 @@ public:
     ///@}
 
     /**
+     * Check that the page is the drawing page or that they have no given dimensions
+     */
+    bool CheckPageSize(const Page *page) const;
+
+    /**
      * Return the width adjusted to the content of the current drawing page.
      * This includes the appropriate left and right margins.
      */
@@ -447,8 +490,8 @@ public:
      * @name Setter for and getter for mensural only flag
      */
     ///@{
-    void SetMensuralMusicOnly(bool isMensuralMusicOnly) { m_isMensuralMusicOnly = isMensuralMusicOnly; }
-    bool IsMensuralMusicOnly() const { return m_isMensuralMusicOnly; }
+    void SetMensuralMusicOnly(data_BOOLEAN isMensuralMusicOnly);
+    bool IsMensuralMusicOnly() const { return (m_isMensuralMusicOnly == BOOLEAN_true); }
     ///@}
 
     /**
@@ -490,6 +533,16 @@ public:
     void ReactivateSelection(bool resetAligners);
     ///@}
 
+    /**
+     * Refresh the layout of all pages in the doc.
+     */
+    void RefreshLayout();
+
+    /**
+     * Reset the document focus
+     */
+    void SetFocus();
+
     //----------//
     // Functors //
     //----------//
@@ -520,11 +573,21 @@ private:
      */
     void CollectVisibleScores();
 
+    /**
+     * Reset the document focus
+     */
+    void ResetFocus();
+
 public:
     Page *m_selectionPreceding;
     Page *m_selectionFollowing;
     std::string m_selectionStart;
     std::string m_selectionEnd;
+
+    /**
+     * A page range (owned object) with focus in the document.
+     */
+    PageRange *m_focusRange;
 
     /**
      * A copy of the header tree stored as pugi::xml_document
@@ -604,6 +667,11 @@ private:
      */
     bool m_isCastOff;
 
+    /**
+     * A flag indicating the focus status (unset, set, used)
+     */
+    FocusStatusType m_focusStatus;
+
     /*
      * The following values are set in the Doc::SetDrawingPage.
      * They are all current values to be used when drawing a page in a View and
@@ -663,10 +731,16 @@ private:
     int m_markup;
 
     /**
-     * A flag to indicate whereas to document contains only mensural music.
-     * Mensural only music will be converted to cast-off segments by Doc::ConvertToCastOffMensuralDoc
+     * A flag to indicate if the document contains only mensural music.
+     * Mensural only music will be converted to cast-off segments by Doc::ConvertToCastOffMensuralDoc.
+     * It can be disabled with the --mensural-responsive-view "none" option.
      */
-    bool m_isMensuralMusicOnly;
+    data_BOOLEAN m_isMensuralMusicOnly;
+
+    /**
+     * A flag to indicate if mensural cast off has been performed.
+     */
+    bool m_mensuralCastOff;
 
     /**
      * A flag to indicate that the document contains neume lines.

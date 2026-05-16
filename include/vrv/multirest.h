@@ -40,7 +40,15 @@ public:
     virtual ~MultiRest();
     Object *Clone() const override { return new MultiRest(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "MultiRest"; }
+    std::string GetClassName() const override { return "multiRest"; }
+    ///@}
+
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
+    const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
     ///@}
 
     /**

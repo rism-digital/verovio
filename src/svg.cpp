@@ -25,7 +25,7 @@ namespace vrv {
 
 static const ClassRegistrar<Svg> s_factory("svg", SVG);
 
-Svg::Svg() : Object(SVG, "svg-")
+Svg::Svg() : Object(SVG)
 {
     this->Reset();
 }

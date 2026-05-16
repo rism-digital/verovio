@@ -22,22 +22,14 @@ namespace vrv {
 // SystemElement
 //----------------------------------------------------------------------------
 
-SystemElement::SystemElement() : FloatingObject(SYSTEM_ELEMENT, "se"), AttTyped()
+SystemElement::SystemElement() : FloatingObject(SYSTEM_ELEMENT), VisibilityDrawingInterface(), AttTyped()
 {
     this->RegisterAttClass(ATT_TYPED);
 
     this->Reset();
 }
 
-SystemElement::SystemElement(ClassId classId) : FloatingObject(classId, "se"), AttTyped()
-{
-    this->RegisterAttClass(ATT_TYPED);
-
-    this->Reset();
-}
-
-SystemElement::SystemElement(ClassId classId, const std::string &classIdStr)
-    : FloatingObject(classId, classIdStr), AttTyped()
+SystemElement::SystemElement(ClassId classId) : FloatingObject(classId), VisibilityDrawingInterface(), AttTyped()
 {
     this->RegisterAttClass(ATT_TYPED);
 
@@ -49,9 +41,8 @@ SystemElement::~SystemElement() {}
 void SystemElement::Reset()
 {
     FloatingObject::Reset();
+    VisibilityDrawingInterface::Reset();
     this->ResetTyped();
-
-    m_visibility = Visible;
 }
 
 //----------------------------------------------------------------------------

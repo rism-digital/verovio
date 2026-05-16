@@ -1,19 +1,6 @@
 
 import { createEmscriptenProxy } from "./emscripten-proxy.js";
 
-async function solve(options) {      
-    const res = await fetch(
-      `https://raw.githubusercontent.com/lpugin/test-font/main/GoldenAge.zip`,
-       {
-            method: "GET",
-       }
-    );
-    const data = await res.blob();
-    console.log( res );
-    console.log( options );
-    return options;
-}
-
 export class VerovioToolkit {
 
     constructor(VerovioModule) {
@@ -212,37 +199,30 @@ export class VerovioToolkit {
         if (!options.hasOwnProperty('fontAddCustom')) {
             return options;
         }
-        const filenames = options['fontAddCustom'];
+        const files = options['fontAddCustom'];
         let filesInBase64 = [];
-        // Get all the files and convert them to a base64 string
-        for (let i = 0; i < filenames.length; i++ ) {
+        // Get all the files and convert them to a base64 string if necessary
+        for ( const file of files ) {
+            // The file is already passed as base64 string - nothing to do
+            if (!/^https?:\/\//.test( file )) {
+                filesInBase64.push( file );
+                continue;
+            }
             const request = new XMLHttpRequest();
-            request.open("GET", filenames[i], false); // `false` makes the request synchronous
+            request.open("GET", file, false); // `false` makes the request synchronous
             request.send(null);
 
             if (request.status === 200) {
                 filesInBase64.push(request.responseText);
             }
             else {
-                console.error(`${filenames[i]} could not be retrieved`);
+                console.error(`${file} could not be retrieved`);
             }
         }
         options["fontAddCustom"] = filesInBase64;
-        //console.log( options );
         return options;
     }
 }
 
 // A pointer to the object - only one instance can be created for now
 VerovioToolkit.instances = [];
-
-
-// If the window object is defined (if we are not within a WebWorker)...
-if ((typeof window !== "undefined") && (window.addEventListener)) {
-    // Add a listener that will delete the object (if necessary) when the page is closed
-    window.addEventListener("unload", () => {
-        VerovioToolkit.instances.forEach((instance) => {
-            instance.destroy();
-        });
-    });
-}

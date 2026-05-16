@@ -30,16 +30,10 @@ namespace vrv {
 static const ClassRegistrar<Ornam> s_factory("ornam", ORNAM);
 
 Ornam::Ornam()
-    : ControlElement(ORNAM, "ornam-")
-    , TextListInterface()
-    , TextDirInterface()
-    , TimePointInterface()
-    , AttColor()
-    , AttOrnamentAccid()
+    : ControlElement(ORNAM), TextListInterface(), TextDirInterface(), TimePointInterface(), AttOrnamentAccid()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
-    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ORNAMENTACCID);
 
     this->Reset();
@@ -52,22 +46,22 @@ void Ornam::Reset()
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimePointInterface::Reset();
-    this->ResetColor();
     this->ResetOrnamentAccid();
 }
 
-bool Ornam::IsSupportedChild(Object *child)
+bool Ornam::IsSupportedChild(ClassId classId)
 {
-    if (child->Is({ LB, REND, SYMBOL, TEXT })) {
-        assert(dynamic_cast<TextElement *>(child));
+    static const std::vector<ClassId> supported{ LB, REND, SYMBOL, TEXT };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 //----------------------------------------------------------------------------

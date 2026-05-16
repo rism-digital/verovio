@@ -27,7 +27,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    AdjustGraceXPosFunctor(Doc *doc, const std::vector<int> &staffNs);
+    AdjustGraceXPosFunctor(Doc *doc);
     virtual ~AdjustGraceXPosFunctor() = default;
     ///@}
 
@@ -45,7 +45,7 @@ public:
     FunctorCode VisitAlignmentReference(AlignmentReference *alignmentReference) override;
     FunctorCode VisitLayerElement(LayerElement *layerElement) override;
     FunctorCode VisitMeasure(Measure *measure) override;
-    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitSystem(System *system) override;
     ///@}
 
 protected:

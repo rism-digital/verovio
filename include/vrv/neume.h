@@ -19,7 +19,7 @@
 #include "chord.h"
 #include "durationinterface.h"
 #include "layerelement.h"
-#include "pitchinterface.h"
+#include "offsetinterface.h"
 
 namespace vrv {
 
@@ -57,7 +57,7 @@ enum NeumeGroup {
  * This class models the MEI <neume> element.
  */
 
-class Neume : public LayerElement, public ObjectListInterface, public AttColor {
+class Neume : public LayerElement, public ObjectListInterface, public OffsetInterface, public AttColor {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -68,14 +68,22 @@ public:
     virtual ~Neume();
     void Reset() override;
     Object *Clone() const override { return new Neume(*this); }
-    std::string GetClassName() const override { return "Neume"; }
+    std::string GetClassName() const override { return "neume"; }
+    ///@}
+
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    OffsetInterface *GetOffsetInterface() override { return vrv_cast<OffsetInterface *>(this); }
+    const OffsetInterface *GetOffsetInterface() const override { return vrv_cast<const OffsetInterface *>(this); }
     ///@}
 
     /**
      * Add an element (a note or a rest) to a syllable.
      * Only syl or neume will be added.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     int GetLigatureCount(int position);
     bool IsLastInNeume(const LayerElement *element) const;

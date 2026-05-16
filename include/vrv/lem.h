@@ -28,7 +28,7 @@ public:
     virtual ~Lem();
     Object *Clone() const override { return new Lem(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Lem"; }
+    std::string GetClassName() const override { return "lem"; }
     ///@}
 
 private:

@@ -25,7 +25,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    SaveFunctor(Output *output, bool basic);
+    SaveFunctor(Output *output);
     virtual ~SaveFunctor() = default;
     ///@}
 
@@ -71,8 +71,6 @@ public:
 private:
     // The output stream
     Output *m_output;
-    // Indicates MEI basic output i.e. filtering out editorial markup
-    bool m_basic;
 };
 
 } // namespace vrv

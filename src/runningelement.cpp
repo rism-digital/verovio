@@ -47,8 +47,7 @@ RunningElement::RunningElement(ClassId classId) : TextLayoutElement(classId, "re
 }
 */
 
-RunningElement::RunningElement(ClassId classId, const std::string &classIdStr)
-    : TextLayoutElement(classId, classIdStr), AttFormework()
+RunningElement::RunningElement(ClassId classId) : TextLayoutElement(classId), AttFormework()
 {
     this->RegisterAttClass(ATT_FORMEWORK);
 

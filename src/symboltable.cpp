@@ -24,7 +24,7 @@ namespace vrv {
 
 static const ClassRegistrar<SymbolTable> s_factory("symbolTable", SYMBOLTABLE);
 
-SymbolTable::SymbolTable() : Object(SYMBOLTABLE, "symtable-")
+SymbolTable::SymbolTable() : Object(SYMBOLTABLE)
 {
     this->Reset();
 }
@@ -36,15 +36,16 @@ void SymbolTable::Reset()
     Object::Reset();
 }
 
-bool SymbolTable::IsSupportedChild(Object *child)
+bool SymbolTable::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(SYMBOLDEF)) {
-        assert(dynamic_cast<SymbolDef *>(child));
+    static const std::vector<ClassId> supported{ SYMBOLDEF };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 } // namespace vrv

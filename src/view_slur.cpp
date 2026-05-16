@@ -40,6 +40,9 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     Point points[4];
     curve->GetPoints(points);
 
+    // Points are cached in the FloatingCurvePositioner, we also need to adjust x1 and x2
+    this->CalcOffsetBezier(dc, points, spanningType);
+
     if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetID());
     }
@@ -47,10 +50,10 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         dc->StartGraphic(slur, "", slur->GetID(), SPANNING);
     }
 
-    int penStyle = AxSOLID;
+    PenStyle penStyle = PEN_SOLID;
     switch (slur->GetLform()) {
-        case LINEFORM_dashed: penStyle = AxSHORT_DASH; break;
-        case LINEFORM_dotted: penStyle = AxDOT; break;
+        case LINEFORM_dashed: penStyle = PEN_SHORT_DASH; break;
+        case LINEFORM_dotted: penStyle = PEN_DOT; break;
         case LINEFORM_wavy:
         // TODO: Implement wavy slur.
         default: break;

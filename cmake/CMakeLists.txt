@@ -1,6 +1,21 @@
-cmake_minimum_required(VERSION 2.8...3.19)
+cmake_minimum_required(VERSION 3.15)
 
-project(Verovio)
+file(READ "../include/vrv/vrvdef.h" VRVDEF_H)
+
+string(REGEX MATCH "#define VERSION_MAJOR ([0-9]+)" _ ${VRVDEF_H})
+set(VRV_VERSION_MAJOR ${CMAKE_MATCH_1})
+
+string(REGEX MATCH "#define VERSION_MINOR ([0-9]+)" _ ${VRVDEF_H})
+set(VRV_VERSION_MINOR ${CMAKE_MATCH_1})
+
+string(REGEX MATCH "#define VERSION_REVISION ([0-9]+)" _ ${VRVDEF_H})
+set(VRV_VERSION_REVISION ${CMAKE_MATCH_1})
+
+project(Verovio VERSION ${VRV_VERSION_MAJOR}.${VRV_VERSION_MINOR}.${VRV_VERSION_REVISION})
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
@@ -18,13 +33,14 @@ option(NO_MUSICXML_SUPPORT      "Disable MusicXML support"                     O
 option(NO_MXL_SUPPORT           "Disable compressed MusicXML support"          OFF)
 option(NO_HUMDRUM_SUPPORT       "Disable Humdrum support"                      OFF)
 option(MUSICXML_DEFAULT_HUMDRUM "Enable MusicXML to Humdrum by default"        OFF)
+option(NO_EDIT_SUPPORT          "Disable editor code"                          OFF)
 option(NO_RUNTIME               "Disable runtime clock support"                ON)
 option(BUILD_AS_LIBRARY         "Build Verovio as library"                     OFF)
 option(BUILD_AS_ANDROID_LIBRARY "Build Verovio as library for Android"         OFF)
 option(USE_PAE_OLD_PARSER       "Use old PAE parser"                           OFF)
 
 if (NO_HUMDRUM_SUPPORT AND MUSICXML_DEFAULT_HUMDRUM)
-    message(SEND_ERROR "Default MusicXML to Humdrum cannot be enabled by default without Humdrum support")
+    message(FATAL_ERROR "Default MusicXML to Humdrum cannot be enabled by default without Humdrum support")
 endif()
 
 # Sets the compile-time value for the RESOURCE_DIR macro in the source code.
@@ -37,28 +53,29 @@ include_directories(
     ../include/hum
     ../include/json
     ../include/pugi
+    ../include/tuning-library
     ../include/zip
     ../include/vrv
     ../libmei/dist
     ../libmei/addons
 )
 
+if(WIN32)
+    include_directories(../include/win32)
+endif()
+
 if(MSVC)
+    add_compile_options(/bigobj)
     add_definitions(/W2)
     add_definitions(/wd4244)          # suppress warning of possible loss of precision
     add_definitions(-DNO_PAE_SUPPORT) # regex is working differently under Windows so PAE is not supported (yet)
     add_definitions(-DUSE_PAE_OLD_PARSER)
     add_definitions(/std:c++20)
-    include_directories(../include/win32)
 else()
     if(CMAKE_BUILD_TYPE MATCHES Debug)
         message(STATUS "Enabling debug information")
         add_definitions(-g)
         add_definitions(-DDEBUG)
-    endif()
-
-    if(WIN32)
-        include_directories(../include/win32)
     endif()
 
     # jsonxx raises -Wdollar-in-identifier-extension
@@ -101,7 +118,7 @@ else()
     add_definitions(-Wparentheses)
     # non-gcc: add_definitions(-Wrange-loop-analysis)
     # non-gcc: add_definitions(-Wshorten-64-to-32)
-    # non-gcc (ObjC only: add_definitions(-Wstrict-prototypes)
+    # non-gcc: (ObjC only: add_definitions(-Wstrict-prototypes)
     add_definitions(-Wswitch)
     add_definitions(-Wuninitialized)
     add_definitions(-Wunreachable-code)
@@ -113,7 +130,7 @@ endif()
 
 execute_process(
     COMMAND ../tools/get_git_commit.sh
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     OUTPUT_VARIABLE GIT_COMMIT
 )
 
@@ -131,6 +148,10 @@ elseif(USE_PAE_OLD_PARSER)
     add_definitions(-DUSE_PAE_OLD_PARSER)
 endif()
 
+if(NO_ABC_SUPPORT)
+    add_definitions(-DNO_ABC_SUPPORT)
+endif()
+
 if(NO_MUSICXML_SUPPORT)
     add_definitions(-DNO_MUSICXML_SUPPORT)
 endif()
@@ -146,6 +167,10 @@ else()
     if (MUSICXML_DEFAULT_HUMDRUM)
         add_definitions(-DMUSICXML_DEFAULT_HUMDRUM)
     endif()
+endif()
+
+if(NO_EDIT_SUPPORT)
+    add_definitions(-DNO_EDIT_SUPPORT)
 endif()
 
 if(NO_RUNTIME)
@@ -177,7 +202,7 @@ set(all_SRC
 # Shared library #
 ##################
 
-if (BUILD_AS_LIBRARY OR  BUILD_AS_ANDROID_LIBRARY)
+if (BUILD_AS_LIBRARY OR BUILD_AS_ANDROID_LIBRARY)
     message(STATUS "***** Building Verovio as shared library *****")
     if(WIN32)
 		add_definitions(-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS)
@@ -185,6 +210,7 @@ if (BUILD_AS_LIBRARY OR  BUILD_AS_ANDROID_LIBRARY)
     add_library(verovio SHARED "../tools/c_wrapper.cpp" ${all_SRC})
     # list all headers to be copied for all installation
     file(GLOB_RECURSE all_HEADERS "../include/*/*.h*" "../libmei/*/*.h*" "../tools/c_wrapper.h")
+    configure_file(verovio.pc.in verovio.pc @ONLY)
 
 ###########
 # WASM BC #
@@ -217,6 +243,8 @@ elseif (BUILD_AS_PYTHON)
 
     if(${SWIG_VERSION} VERSION_GREATER_EQUAL "4.1.0")
         list(APPEND CMAKE_SWIG_FLAGS "-doxygen")
+        list(APPEND CMAKE_SWIG_FLAGS "-fastproxy")
+        list(APPEND CMAKE_SWIG_FLAGS "-olddefs")
     else()
         list(APPEND CMAKE_SWIG_FLAGS "-py3;-DPY3")
     endif()
@@ -234,7 +262,7 @@ elseif (BUILD_AS_PYTHON)
     swig_add_library(verovio_module_${OUTPUT_VERSION_STRING} LANGUAGE python TYPE MODULE SOURCES ../bindings/python/verovio.i)
     swig_link_libraries(verovio_module_${OUTPUT_VERSION_STRING} verovio ${Python_LIBRARIES})
 
-    add_library(verovio STATIC ../tools/c_wrapper.cpp ${all_SRC})
+    add_library(verovio STATIC ${all_SRC})
 
 #####################
 # Command-line tool #
@@ -248,6 +276,8 @@ endif()
 
 if (BUILD_AS_ANDROID_LIBRARY)
     find_library(log-lib log)
+    # Setting for the linker to align segments at 16 KB (0x4000)
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,max-page-size=0x4000")
     target_link_libraries(verovio ${log-lib})
 endif()
 
@@ -269,4 +299,5 @@ install(
 # install all headers in /usr/local/include/verovio
 if (BUILD_AS_LIBRARY)
     install(FILES ${all_HEADERS} DESTINATION include/verovio)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/verovio.pc DESTINATION lib/pkgconfig)
 endif()

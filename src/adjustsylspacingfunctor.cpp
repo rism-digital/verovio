@@ -77,7 +77,9 @@ FunctorCode AdjustSylSpacingFunctor::VisitSystemEnd(System *system)
         int overlap = m_lastSyl->GetContentRight() - m_previousMeasure->GetRightBarLine()->GetAlignment()->GetXRel();
         m_previousVerse->AdjustPosition(overlap, m_freeSpace, m_doc);
 
-        if (overlap > 0) {
+        // If the previous verse was not in the previous measure (but before), ignore the overlap because it is
+        // not likely to go over the whole following measure
+        if ((m_previousMeasure == m_previousVerse->GetFirstAncestor(MEASURE)) && (overlap > 0)) {
             m_overlappingSyl.push_back(std::make_tuple(
                 m_previousVerse->GetAlignment(), m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
         }

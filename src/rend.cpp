@@ -30,7 +30,7 @@ namespace vrv {
 static const ClassRegistrar<Rend> s_factory("rend", REND);
 
 Rend::Rend()
-    : TextElement(REND, "rend-")
+    : TextElement(REND)
     , AreaPosInterface()
     , AttColor()
     , AttExtSymAuth()
@@ -67,30 +67,19 @@ void Rend::Reset()
     this->ResetWhitespace();
 }
 
-bool Rend::IsSupportedChild(Object *child)
+bool Rend::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(LB)) {
-        assert(dynamic_cast<Lb *>(child));
+    static const std::vector<ClassId> supported{ LB, NUM, REND, SYMBOL, TEXT };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(NUM)) {
-        assert(dynamic_cast<Num *>(child));
-    }
-    else if (child->Is(REND)) {
-        assert(dynamic_cast<Rend *>(child));
-    }
-    else if (child->Is(SYMBOL)) {
-        assert(dynamic_cast<Symbol *>(child));
-    }
-    else if (child->Is(TEXT)) {
-        assert(dynamic_cast<Text *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 bool Rend::HasEnclosure() const

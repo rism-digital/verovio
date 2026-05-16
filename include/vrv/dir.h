@@ -37,11 +37,11 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    Dir();
+    Dir(bool isStageDir = false);
     virtual ~Dir();
     Object *Clone() const override { return new Dir(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Dir"; }
+    std::string GetClassName() const override { return (this->IsStageDir() ? "stageDir" : "dir"); }
     ///@}
 
     /**
@@ -63,10 +63,18 @@ public:
     ///@}
 
     /**
+     * @name Getters and setters for stageDir.
+     */
+    ///@{
+    bool IsStageDir() const { return (m_isStageDir); }
+    void SetStageDir(bool isStageDir) { m_isStageDir = isStageDir; }
+    ///@}
+
+    /**
      * Add an element (text, rend. etc.) to a dir.
      * Only supported elements will be actually added to the child list.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     /**
      * See FloatingObject::IsExtenderElement
@@ -94,7 +102,8 @@ private:
 public:
     //
 private:
-    //
+    /** stageDir flag */
+    bool m_isStageDir;
 };
 
 } // namespace vrv

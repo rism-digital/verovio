@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "annotscore.h"
 #include "arpeg.h"
 #include "bboxdevicecontext.h"
 #include "beamspan.h"
@@ -22,6 +23,7 @@
 #include "caesura.h"
 #include "clef.h"
 #include "comparison.h"
+#include "cpmark.h"
 #include "devicecontext.h"
 #include "dir.h"
 #include "doc.h"
@@ -74,9 +76,11 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     assert(measure);
     assert(element);
 
+    this->StartOffset(dc, element, 100);
+
     // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
-    if (element->Is(
-            { BEAMSPAN, BRACKETSPAN, FIGURE, GLISS, HAIRPIN, LV, OCTAVE, PHRASE, PITCHINFLECTION, SLUR, TIE })) {
+    if (element->Is({ ANNOTSCORE, BEAMSPAN, BRACKETSPAN, FIGURE, GLISS, HAIRPIN, LV, OCTAVE, PHRASE, PITCHINFLECTION,
+            SLUR, TIE })) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetID());
         dc->EndGraphic(element, this);
@@ -96,6 +100,11 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Caesura *caesura = vrv_cast<Caesura *>(element);
         assert(caesura);
         this->DrawCaesura(dc, caesura, measure, system);
+    }
+    else if (element->Is(CPMARK)) {
+        CpMark *cpMark = vrv_cast<CpMark *>(element);
+        assert(cpMark);
+        this->DrawControlElementText(dc, cpMark, measure, system);
     }
     else if (element->Is(DIR)) {
         Dir *dir = vrv_cast<Dir *>(element);
@@ -167,6 +176,8 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         assert(turn);
         this->DrawTurn(dc, turn, measure, system);
     }
+
+    this->EndOffset(dc, element);
 }
 
 void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *system)
@@ -179,7 +190,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         BBoxDeviceContext *bBoxDC = vrv_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {
-            if (element->Is({ BRACKETSPAN, HAIRPIN, OCTAVE, PITCHINFLECTION })) return;
+            if (element->Is({ ANNOTSCORE, BRACKETSPAN, HAIRPIN, OCTAVE, PITCHINFLECTION })) return;
         }
     }
 
@@ -212,7 +223,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     System *parentSystem1 = vrv_cast<System *>(start->GetFirstAncestor(SYSTEM));
     System *parentSystem2 = vrv_cast<System *>(end->GetFirstAncestor(SYSTEM));
 
-    int x1, x2;
+    int drawingX1, drawingX2;
     Object *objectX = NULL;
     Measure *measure = NULL;
     Object *graphic = NULL;
@@ -223,9 +234,9 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         // we use the start measure
         measure = interface->GetStartMeasure();
         if (!measure) return;
-        x1 = start->GetDrawingX();
+        drawingX1 = start->GetDrawingX();
         objectX = start;
-        x2 = end->GetDrawingX();
+        drawingX2 = end->GetDrawingX();
         graphic = element;
     }
     // Only the first parent is the same, this means that the element is "open" at the end of the system
@@ -233,9 +244,9 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         // We need the last measure of the system for x2 - we also use it for getting the staves later
         measure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
         if (!measure) return;
-        x1 = start->GetDrawingX();
+        drawingX1 = start->GetDrawingX();
         objectX = start;
-        x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
+        drawingX2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
         graphic = element;
         spanningType = SPANNING_START;
     }
@@ -245,9 +256,9 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         measure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
         if (!measure) return;
         // We need the position of the first default in the first measure for x1
-        x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
+        drawingX1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
         objectX = measure->GetLeftBarLine();
-        x2 = end->GetDrawingX();
+        drawingX2 = end->GetDrawingX();
         spanningType = SPANNING_END;
     }
     // Rare case where neither the first note nor the last note are in the current system - draw the connector
@@ -257,12 +268,12 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         measure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
         if (!measure) return;
         // We need the position of the first default in the first measure for x1
-        x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
+        drawingX1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
         objectX = measure->GetLeftBarLine();
         // We need the last measure of the system for x2
         Measure *last = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
         if (!last) return;
-        x2 = last->GetDrawingX() + last->GetRightBarLineXRel();
+        drawingX2 = last->GetDrawingX() + last->GetRightBarLineXRel();
         spanningType = SPANNING_MIDDLE;
     }
     // Return otherwise: this should only happen if the time spanning element is encoded in the wrong measure
@@ -291,27 +302,35 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     /************** adjust the position according to the radius **************/
 
     if (spanningType == SPANNING_START_END) {
-        x1 += startRadius;
-        x2 += endRadius;
+        drawingX1 += startRadius;
+        drawingX2 += endRadius;
     }
     else if (spanningType == SPANNING_START) {
-        x1 += startRadius;
+        drawingX1 += startRadius;
     }
     else if (spanningType == SPANNING_END) {
-        x2 += endRadius;
+        drawingX2 += endRadius;
     }
 
     std::vector<Staff *> staffList = interface->GetTstampStaves(measure, element);
     bool isFirst = true;
     for (Staff *staff : staffList) {
 
-        // TimeSpanning element are not necessary floating elements (e.g., syl) - we have a bounding box only for them
+        const int staffSize = staff->m_drawingStaffSize;
+        int x1 = drawingX1;
+        int x2 = drawingX2;
+
+        this->SetOffsetStaffSize(element, staffSize);
+        this->CalcOffsetSpanningStartX(dc, x1, spanningType);
+        this->CalcOffsetSpanningEndX(dc, x2, spanningType);
+
+        // TimeSpanning elements are not necessary floating elements (e.g., syl) - we have a bounding box only for them
         if (element->IsControlElement()) {
             if (element->Is({ PHRASE, SLUR })) {
                 if (this->GetSlurHandling() == SlurHandling::Ignore) break;
                 Slur *slur = vrv_cast<Slur *>(element);
                 assert(slur);
-                staff = slur->CalculateExtremalStaff(staff, x1, x2);
+                staff = slur->CalculatePrincipalStaff(staff, x1, x2);
             }
 
             // Create the floating positioner
@@ -321,7 +340,11 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             }
         }
 
-        if (element->Is(DIR)) {
+        if (element->Is(ANNOTSCORE)) {
+            // cast to AnnotScore check in DrawAnnotScore
+            this->DrawAnnotScore(dc, dynamic_cast<AnnotScore *>(element), x1, x2, staff, spanningType, graphic);
+        }
+        else if (element->Is(DIR)) {
             // cast to Dir check in DrawControlElementConnector
             this->DrawControlElementConnector(dc, dynamic_cast<Dir *>(element), x1, x2, staff, spanningType, graphic);
         }
@@ -438,6 +461,106 @@ bool View::HasValidTimeSpanningOrder(DeviceContext *dc, Object *element, LayerEl
     return true;
 }
 
+void View::DrawAnnotScore(
+    DeviceContext *dc, AnnotScore *annotScore, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+{
+    assert(dc);
+    assert(annotScore);
+    assert(staff);
+
+    assert(annotScore->GetStart());
+    assert(annotScore->GetEnd());
+
+    // May need to set/tweak y pos
+    int y = annotScore->GetDrawingY();
+    this->CalcOffsetY(dc, y);
+
+    // This has been copied from bracketSpan and is likely to be wrong
+    if (graphic) {
+        dc->ResumeGraphic(graphic, graphic->GetID());
+    }
+    else {
+        dc->StartGraphic(annotScore, "", annotScore->GetID(), SPANNING);
+    }
+
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int boxHeight = annotScore->GetBoxHeight(m_doc, unit);
+    const int lineWidth = annotScore->GetLineWidth(m_doc, unit);
+    const int halfLineWidth = lineWidth / 2;
+
+    dc->SetPen(lineWidth, PEN_SOLID, 0, 0, LINECAP_BUTT, LINEJOIN_MITER);
+    Point boxOutline[4];
+    switch (spanningType) {
+        case SPANNING_START:
+            // Draw a box with an open right-hand side (to show it continues)
+            if (!annotScore->GetStart()->Is(TIMESTAMP_ATTR)) {
+                x1 -= annotScore->GetStart()->GetDrawingRadius(m_doc);
+            }
+            boxOutline[0] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y) };
+            boxOutline[1] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y) };
+            boxOutline[2] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y + boxHeight) };
+            boxOutline[3] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y + boxHeight) };
+            dc->DrawPolyline(4, boxOutline);
+            dc->SetBrush(0.5, COLOR_RED);
+            this->DrawFilledRectangle(dc, x1 + halfLineWidth, y + halfLineWidth, x2, y + boxHeight - halfLineWidth);
+            dc->ResetBrush();
+            break;
+        case SPANNING_MIDDLE:
+            // Draw a box with  both sides open (to show it continues)
+            if (!annotScore->GetStart()->Is(TIMESTAMP_ATTR)) {
+                x1 -= annotScore->GetStart()->GetDrawingRadius(m_doc);
+            }
+            dc->DrawLine(this->ToDeviceContextX(x1), this->ToDeviceContextY(y), this->ToDeviceContextX(x2),
+                this->ToDeviceContextY(y));
+            dc->DrawLine(this->ToDeviceContextX(x1), this->ToDeviceContextY(y + boxHeight), this->ToDeviceContextX(x2),
+                this->ToDeviceContextY(y + boxHeight));
+            dc->SetBrush(0.5, COLOR_RED);
+            this->DrawFilledRectangle(dc, x1, y + halfLineWidth, x2, y + boxHeight - halfLineWidth);
+            dc->ResetBrush();
+            break;
+        case SPANNING_START_END:
+            // Draw a closed box
+            if (!annotScore->GetStart()->Is(TIMESTAMP_ATTR)) {
+                x1 -= annotScore->GetStart()->GetDrawingRadius(m_doc);
+            }
+            if (!annotScore->GetEnd()->Is(TIMESTAMP_ATTR)) {
+                x2 += annotScore->GetEnd()->GetDrawingRadius(m_doc);
+            }
+            boxOutline[0] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y) };
+            boxOutline[1] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y) };
+            boxOutline[2] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y + boxHeight) };
+            boxOutline[3] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y + boxHeight) };
+            dc->DrawPolyline(4, boxOutline, true);
+            dc->SetBrush(0.5, COLOR_RED);
+            this->DrawFilledRectangle(
+                dc, x1 + halfLineWidth, y + halfLineWidth, x2 - halfLineWidth, y + boxHeight - halfLineWidth);
+            dc->ResetBrush();
+            break;
+        case SPANNING_END:
+            // Draw a box with the left side open to show it continues from previous system
+            if (!annotScore->GetEnd()->Is(TIMESTAMP_ATTR)) {
+                x2 += annotScore->GetEnd()->GetDrawingRadius(m_doc);
+            }
+            boxOutline[0] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y) };
+            boxOutline[1] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y) };
+            boxOutline[2] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y + boxHeight) };
+            boxOutline[3] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y + boxHeight) };
+            dc->DrawPolyline(4, boxOutline);
+            dc->SetBrush(0.5, COLOR_RED);
+            this->DrawFilledRectangle(dc, x1, y + halfLineWidth, x2 - halfLineWidth, y + boxHeight - halfLineWidth);
+            dc->ResetBrush();
+            break;
+    }
+    dc->ResetPen();
+
+    if (graphic) {
+        dc->EndResumedGraphic(graphic, this);
+    }
+    else {
+        dc->EndGraphic(annotScore, this);
+    }
+}
+
 void View::DrawBracketSpan(
     DeviceContext *dc, BracketSpan *bracketSpan, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
@@ -448,12 +571,8 @@ void View::DrawBracketSpan(
     assert(bracketSpan->GetStart());
     assert(bracketSpan->GetEnd());
 
-    if (!bracketSpan->HasFunc()) {
-        // we cannot draw a bracketSpan that has no func
-        return;
-    }
-
-    const int y = bracketSpan->GetDrawingY();
+    int y = bracketSpan->GetDrawingY();
+    this->CalcOffsetY(dc, y);
 
     if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetID());
@@ -468,8 +587,7 @@ void View::DrawBracketSpan(
     x1 += lineWidth / 2;
     x2 -= lineWidth / 2;
 
-    dc->SetPen(m_currentColor, lineWidth, AxSOLID, 0, 0, AxCAP_BUTT, AxJOIN_MITER);
-    dc->SetBrush(m_currentColor, AxSOLID);
+    dc->SetPen(lineWidth, PEN_SOLID, 0, 0, LINECAP_BUTT, LINEJOIN_MITER);
 
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         if (!bracketSpan->GetStart()->Is(TIMESTAMP_ATTR)) {
@@ -478,9 +596,9 @@ void View::DrawBracketSpan(
         if (bracketSpan->GetLstartsym() != LINESTARTENDSYMBOL_none) {
             // Left hook
             Point hookLeft[3];
-            hookLeft[0] = { ToDeviceContextX(x1), ToDeviceContextY(y - unit * 2) };
-            hookLeft[1] = { ToDeviceContextX(x1), ToDeviceContextY(y) };
-            hookLeft[2] = { ToDeviceContextX(x1 + unit), ToDeviceContextY(y) };
+            hookLeft[0] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y - unit * 2) };
+            hookLeft[1] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y) };
+            hookLeft[2] = { this->ToDeviceContextX(x1 + unit), this->ToDeviceContextY(y) };
             dc->DrawPolyline(3, hookLeft);
         }
     }
@@ -491,30 +609,36 @@ void View::DrawBracketSpan(
         if (bracketSpan->GetLendsym() != LINESTARTENDSYMBOL_none) {
             // Right hook
             Point hookRight[3];
-            hookRight[0] = { ToDeviceContextX(x2), ToDeviceContextY(y - unit * 2) };
-            hookRight[1] = { ToDeviceContextX(x2), ToDeviceContextY(y) };
-            hookRight[2] = { ToDeviceContextX(x2 - unit), ToDeviceContextY(y) };
+            hookRight[0] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y - unit * 2) };
+            hookRight[1] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y) };
+            hookRight[2] = { this->ToDeviceContextX(x2 - unit), this->ToDeviceContextY(y) };
             dc->DrawPolyline(3, hookRight);
         }
     }
     // We have a @lform - draw a full line
     if (bracketSpan->HasLform()) {
+        PenStyle penStyle = PEN_SOLID;
+        LineCapStyle lineCapStyle = LINECAP_BUTT;
         if (bracketSpan->GetLform() == LINEFORM_dashed) {
-            dc->SetPen(m_currentColor, lineWidth, AxLONG_DASH, 0, 0, AxCAP_SQUARE);
+            penStyle = PEN_LONG_DASH;
+            lineCapStyle = LINECAP_SQUARE;
         }
         else if (bracketSpan->GetLform() == LINEFORM_dotted) {
+            penStyle = PEN_DOT;
+            lineCapStyle = LINECAP_ROUND;
             // Adjust start and end
-            dc->SetPen(m_currentColor, lineWidth, AxDOT, 0, 0, AxCAP_ROUND);
             x1 += unit + lineWidth * 2;
             x2 -= unit + lineWidth * 2;
             const int diff = (x2 - x1) % (lineWidth * 3 + 1);
             x1 += diff / 2;
         }
-        dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
+        dc->SetPen(lineWidth, penStyle, 0, 0, lineCapStyle);
+        dc->DrawLine(this->ToDeviceContextX(x1), this->ToDeviceContextY(y), this->ToDeviceContextX(x2),
+            this->ToDeviceContextY(y));
+        dc->ResetPen();
     }
 
     dc->ResetPen();
-    dc->ResetBrush();
 
     if (graphic) {
         dc->EndResumedGraphic(graphic, this);
@@ -602,7 +726,7 @@ void View::DrawHairpin(
     // Now swap start/end for dim.
     if (form == hairpinLog_FORM_dim) std::swap(startY, endY);
 
-    int y = hairpin->GetDrawingY();
+    int y1 = hairpin->GetDrawingY();
 
     // Improve alignment with dynamics
     if (hairpin->GetPlace() != STAFFREL_within) {
@@ -610,8 +734,13 @@ void View::DrawHairpin(
         if (hairpin->GetPlace() != STAFFREL_between) {
             shiftY += unit;
         }
-        y += shiftY;
+        y1 += shiftY;
     }
+
+    this->CalcOffsetY(dc, y1);
+    int y2 = y1;
+    this->CalcOffsetSpanningStartY(dc, y1, spanningType);
+    this->CalcOffsetSpanningEndY(dc, y2, spanningType);
 
     /************** draw it **************/
 
@@ -624,41 +753,41 @@ void View::DrawHairpin(
 
     const double hairpinThickness = m_options->m_hairpinThickness.GetValue() * unit;
 
-    int style;
+    PenStyle style;
     switch (hairpin->GetLform()) {
-        case LINEFORM_dashed: style = AxLONG_DASH; break;
-        case LINEFORM_dotted: style = AxDOT; break;
-        default: style = AxSOLID; break;
+        case LINEFORM_dashed: style = PEN_LONG_DASH; break;
+        case LINEFORM_dotted: style = PEN_DOT; break;
+        default: style = PEN_SOLID; break;
     }
 
-    const int cap = (style == AxDOT) ? AxCAP_ROUND : AxCAP_SQUARE;
+    const LineCapStyle cap = (style == PEN_DOT) ? LINECAP_ROUND : LINECAP_SQUARE;
 
-    dc->SetPen(m_currentColor, hairpinThickness, style, 0, 0, cap, AxJOIN_MITER);
+    dc->SetPen(hairpinThickness, style, 0, 0, cap, LINEJOIN_MITER);
 
     if ((startY == 0) && !niente) {
         Point p[3];
-        p[0] = { ToDeviceContextX(x2), ToDeviceContextY(y - endY / 2) };
-        p[1] = { ToDeviceContextX(x1), ToDeviceContextY(y) };
-        p[2] = { p[0].x, ToDeviceContextY(y + endY / 2) };
+        p[0] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y2 - endY / 2) };
+        p[1] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y1) };
+        p[2] = { p[0].x, this->ToDeviceContextY(y2 + endY / 2) };
         dc->DrawPolyline(3, p);
     }
     else if ((endY == 0) && !niente) {
         Point p[3];
-        p[0] = { ToDeviceContextX(x1), ToDeviceContextY(y - startY / 2) };
-        p[1] = { ToDeviceContextX(x2), ToDeviceContextY(y) };
-        p[2] = { p[0].x, ToDeviceContextY(y + startY / 2) };
+        p[0] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y1 - startY / 2) };
+        p[1] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y2) };
+        p[2] = { p[0].x, this->ToDeviceContextY(y1 + startY / 2) };
         dc->DrawPolyline(3, p);
     }
     else {
         if (niente) {
-            dc->SetBrush(m_currentColor, AxTRANSPARENT);
+            dc->SetBrush(0.0);
             if (startY == 0) {
-                dc->DrawCircle(ToDeviceContextX(x1), ToDeviceContextY(y), unit / 2);
+                dc->DrawCircle(this->ToDeviceContextX(x1), this->ToDeviceContextY(y1), unit / 2);
                 startY = unit * endY / (x2 - x1) / 2;
                 x1 += unit / 2;
             }
             else if (endY == 0) {
-                dc->DrawCircle(ToDeviceContextX(x2), ToDeviceContextY(y), unit / 2);
+                dc->DrawCircle(this->ToDeviceContextX(x2), this->ToDeviceContextY(y2), unit / 2);
                 endY = unit * startY / (x2 - x1) / 2;
                 x2 -= unit / 2;
             }
@@ -666,11 +795,11 @@ void View::DrawHairpin(
         }
 
         Point p[2];
-        p[0] = { ToDeviceContextX(x1), ToDeviceContextY(y - startY / 2) };
-        p[1] = { ToDeviceContextX(x2), ToDeviceContextY(y - endY / 2) };
+        p[0] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y1 - startY / 2) };
+        p[1] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y2 - endY / 2) };
         dc->DrawPolyline(2, p);
-        p[0].y = ToDeviceContextY(y + startY / 2);
-        p[1].y = ToDeviceContextY(y + endY / 2);
+        p[0].y = this->ToDeviceContextY(y1 + startY / 2);
+        p[1].y = this->ToDeviceContextY(y2 + endY / 2);
         dc->DrawPolyline(2, p);
     }
     dc->ResetPen();
@@ -698,6 +827,8 @@ void View::DrawOctave(
     const data_STAFFREL_basic disPlace = octave->GetDisPlace();
 
     int y1 = octave->GetDrawingY();
+    this->CalcOffsetY(dc, y1);
+
     int y2 = y1;
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
@@ -759,12 +890,15 @@ void View::DrawOctave(
         x1 += lineWidth;
         if (altSymbols) x1 += extend.m_width / 2;
 
-        dc->SetPen(m_currentColor, lineWidth, AxSHORT_DASH, 0, gap, AxCAP_SQUARE);
-        dc->SetBrush(m_currentColor, AxSOLID);
+        PenStyle penStyle = PEN_SHORT_DASH;
+        LineCapStyle lineCapStyle = LINECAP_SQUARE;
+        int actualGap = gap;
+        int actualLineWidth = lineWidth;
+
         if (octave->HasLform()) {
             if (octave->GetLform() == LINEFORM_solid) {
-                dc->SetPen(m_currentColor, lineWidth, AxSOLID, 0, 0, AxCAP_SQUARE);
-                dc->SetBrush(m_currentColor, AxSOLID);
+                penStyle = PEN_SOLID;
+                actualGap = 0;
             }
             else if (octave->GetLform() == LINEFORM_dotted) {
                 if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
@@ -772,10 +906,12 @@ void View::DrawOctave(
                     const int diff = (x2 - x1) % (gap + 1);
                     x2 += (gap - diff < diff) ? gap - diff : -diff;
                 }
-                dc->SetPen(m_currentColor, lineWidth * 3 / 2, AxDOT, 0, gap, AxCAP_ROUND);
-                dc->SetBrush(m_currentColor, AxSOLID);
+                penStyle = PEN_SOLID;
+                lineCapStyle = LINECAP_ROUND;
+                actualLineWidth = lineWidth * 3 / 2;
             }
         }
+        dc->SetPen(actualLineWidth, penStyle, 0, actualGap, lineCapStyle);
 
         // adjust vertical ends
         y1 += (disPlace == STAFFREL_basic_above) ? -lineWidth / 2 : lineWidth / 2;
@@ -786,7 +922,8 @@ void View::DrawOctave(
             x2 = x1 + unit - lineWidth / 2;
         }
         else {
-            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+            dc->DrawLine(this->ToDeviceContextX(x1), this->ToDeviceContextY(y1), this->ToDeviceContextX(x2),
+                this->ToDeviceContextY(y1));
         }
 
         octave->SetDrawingExtenderX(x1, x2);
@@ -795,22 +932,25 @@ void View::DrawOctave(
             if (spanningType == SPANNING_END || spanningType == SPANNING_START_END) {
                 if (octave->GetLform() == LINEFORM_dotted) {
                     // make sure we have at least two dots for the dotted hook
-                    dc->SetPen(
-                        m_currentColor, lineWidth * 3 / 2, AxDOT, 0, std::min(gap, unit * 2 - lineWidth), AxCAP_ROUND);
-                    dc->DrawLine(
-                        ToDeviceContextX(x2), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+                    dc->SetPen(lineWidth * 3 / 2, PEN_DOT, 0, std::min(gap, unit * 2 - lineWidth), LINECAP_ROUND);
+                    dc->DrawLine(this->ToDeviceContextX(x2), this->ToDeviceContextY(y1), this->ToDeviceContextX(x2),
+                        this->ToDeviceContextY(y2));
+                    dc->ResetPen();
                 }
                 else {
-                    dc->SetPen(m_currentColor, lineWidth, AxSOLID);
+                    dc->SetPen(lineWidth, PEN_SOLID);
                     // Right hook
                     Point hookRight[3];
-                    hookRight[0] = { ToDeviceContextX(x2), ToDeviceContextY(y2) };
-                    hookRight[1] = { ToDeviceContextX(x2), ToDeviceContextY(y1) };
-                    hookRight[2] = { ToDeviceContextX(x2 - unit), ToDeviceContextY(y1) };
+                    hookRight[0] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y2) };
+                    hookRight[1] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y1) };
+                    hookRight[2] = { this->ToDeviceContextX(x2 - unit), this->ToDeviceContextY(y1) };
                     dc->DrawPolyline(3, hookRight);
+                    dc->ResetPen();
                 }
             }
         }
+
+        dc->ResetPen();
     }
 
     if (graphic) {
@@ -836,6 +976,9 @@ void View::DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflecti
     Note *note2 = dynamic_cast<Note *>(pitchInflection->GetEnd());
     // If the end is a note, use it y as base, otherwhise the position above the staff
     int baseY2 = (note2) ? note2->GetDrawingY() : topY;
+
+    this->CalcOffsetY(dc, baseY1);
+    this->CalcOffsetY(dc, baseY2);
 
     // If we start on a note, then going up
     bool up = note1 ? true : false;
@@ -877,23 +1020,23 @@ void View::DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflecti
     }
 
     Point points[3];
-    points[0].x = ToDeviceContextX(x1);
-    points[0].y = ToDeviceContextY(y1);
-    points[1].x = ToDeviceContextX(xControl);
-    points[1].y = ToDeviceContextY(yControl);
-    points[2].x = ToDeviceContextX(x2);
-    points[2].y = ToDeviceContextY(y2);
+    points[0].x = this->ToDeviceContextX(x1);
+    points[0].y = this->ToDeviceContextY(y1);
+    points[1].x = this->ToDeviceContextX(xControl);
+    points[1].y = this->ToDeviceContextY(yControl);
+    points[2].x = this->ToDeviceContextX(x2);
+    points[2].y = this->ToDeviceContextY(y2);
 
     int arrowWidth = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
     int arrowHeight = arrowWidth * 3 / 2;
     arrowHeight = (up) ? arrowHeight : -arrowHeight;
     Point arrow[3];
-    arrow[0].x = ToDeviceContextX(x2 - arrowWidth);
-    arrow[0].y = ToDeviceContextY(y2);
-    arrow[1].x = ToDeviceContextX(x2 + arrowWidth);
-    arrow[1].y = ToDeviceContextY(y2);
-    arrow[2].x = ToDeviceContextX(x2);
-    arrow[2].y = ToDeviceContextY(y2 + arrowHeight);
+    arrow[0].x = this->ToDeviceContextX(x2 - arrowWidth);
+    arrow[0].y = this->ToDeviceContextY(y2);
+    arrow[1].x = this->ToDeviceContextX(x2 + arrowWidth);
+    arrow[1].y = this->ToDeviceContextY(y2);
+    arrow[2].x = this->ToDeviceContextX(x2);
+    arrow[2].y = this->ToDeviceContextY(y2 + arrowHeight);
 
     /************** draw it **************/
 
@@ -904,8 +1047,7 @@ void View::DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflecti
         dc->StartGraphic(pitchInflection, "spanning-pinflection", "");
     }
 
-    dc->SetPen(m_currentColor, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
-    dc->SetBrush(m_currentColor, AxSOLID);
+    dc->SetPen(m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), PEN_SOLID);
 
     dc->DrawQuadBezierPath(points);
     if (drawArrow) {
@@ -913,7 +1055,6 @@ void View::DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflecti
     }
 
     dc->ResetPen();
-    dc->ResetBrush();
 
     if (graphic) {
         dc->EndResumedGraphic(graphic, this);
@@ -932,10 +1073,13 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     Point bezier[4];
     if (!tie->CalculatePosition(m_doc, staff, x1, x2, spanningType, bezier)) return;
 
-    int penStyle = AxSOLID;
+    // Here adjust only y because x1 and x2 have already been adjusted
+    for (Point &point : bezier) this->CalcOffsetY(dc, point.y);
+
+    PenStyle penStyle = PEN_SOLID;
     switch (tie->GetLform()) {
-        case LINEFORM_dashed: penStyle = AxSHORT_DASH; break;
-        case LINEFORM_dotted: penStyle = AxDOT; break;
+        case LINEFORM_dashed: penStyle = PEN_SHORT_DASH; break;
+        case LINEFORM_dotted: penStyle = PEN_DOT; break;
         default: break;
     }
 
@@ -974,6 +1118,7 @@ void View::DrawPedalLine(
     assert(pedal->GetEnd());
 
     int y = pedal->GetDrawingY();
+    this->CalcOffsetY(dc, y);
 
     int startRadius = 0;
     if (!pedal->GetStart()->Is(TIMESTAMP_ATTR)) {
@@ -1050,6 +1195,7 @@ void View::DrawTrillExtension(
 
     int y
         = trill->GetDrawingY() + m_doc->GetGlyphHeight(SMUFL_E566_ornamentTrill, staff->m_drawingStaffSize, false) / 3;
+    this->CalcOffsetY(dc, y);
 
     // Adjust the x1 for the tr symbol
     if (trill->GetLstartsym() == LINESTARTENDSYMBOL_none) {
@@ -1121,7 +1267,8 @@ void View::DrawControlElementConnector(
     }
 
     const int width = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int y = element->GetDrawingY() + width / 2;
+    int y = element->GetDrawingY() + width / 2;
+    this->CalcOffsetY(dc, y);
 
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     // the length of the dash and the space between them - can be made a parameter
@@ -1193,7 +1340,8 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
     assert(f->GetStart() && f->GetEnd());
     if (!f->GetStart() || !f->GetEnd()) return;
 
-    const int y = this->GetFYRel(f, staff);
+    int y = this->GetFYRel(f, staff);
+    this->CalcOffsetY(dc, y);
 
     // The both correspond to the current system, which means no system break in-between (simple case)
     if (spanningType == SPANNING_START_END) {
@@ -1250,7 +1398,8 @@ void View::DrawSylConnector(
     assert(syl->GetStart() && syl->GetEnd());
     if (!syl->GetStart() || !syl->GetEnd()) return;
 
-    const int y = staff->GetDrawingY() + this->GetSylYRel(syl->m_drawingVerse, staff);
+    int y = staff->GetDrawingY() + this->GetSylYRel(syl->m_drawingVerseN, staff, syl->m_drawingVersePlace);
+    this->CalcOffsetY(dc, y);
 
     // Invalid bounding boxes might occur for empty syllables without text child
     if (!syl->HasContentHorizontalBB()) return;
@@ -1399,8 +1548,12 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     int length = top - bottom;
     // We add - substract a unit in order to have the line going to the edge
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int x = arpeg->GetDrawingX();
-    const int y = bottom - unit;
+
+    int x = arpeg->GetDrawingX();
+    int y = bottom - unit;
+
+    this->SetOffsetStaffSize(arpeg, staff->m_drawingStaffSize);
+    this->CalcOffset(dc, x, y);
 
     const arpegLog_ORDER order = arpeg->GetOrder();
     if (order == arpegLog_ORDER_nonarp) {
@@ -1430,7 +1583,7 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
 
         // Smufl glyphs are horizontal - Rotate them counter clockwise
         const int angle = -90;
-        dc->RotateGraphic(Point(ToDeviceContextX(x), ToDeviceContextY(y)), angle);
+        dc->RotateGraphic(Point(this->ToDeviceContextX(x), this->ToDeviceContextY(y)), angle);
 
         this->DrawSmuflLine(
             dc, orig, length, staff->m_drawingStaffSize, drawingCueSize, fillGlyph, startGlyph, endGlyph);
@@ -1502,7 +1655,7 @@ void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, Syste
         symbolDef = breath->GetAltSymbolDef();
     }
 
-    int x = breath->GetStart()->GetDrawingX() + breath->GetStart()->GetDrawingRadius(m_doc);
+    const int drawingX = breath->GetStart()->GetDrawingX() + breath->GetStart()->GetDrawingRadius(m_doc);
 
     // use breath mark comma glyph
     int code = SMUFL_E4CE_breathMarkComma;
@@ -1522,7 +1675,11 @@ void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, Syste
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
-        const int y = breath->GetDrawingY();
+        int x = drawingX;
+        int y = breath->GetDrawingY();
+
+        this->SetOffsetStaffSize(breath, staffSize);
+        this->CalcOffset(dc, x, y);
 
         if (symbolDef) {
             this->DrawSymbolDef(dc, breath, symbolDef, x, y, staffSize, false, alignment);
@@ -1555,7 +1712,7 @@ void View::DrawCaesura(DeviceContext *dc, Caesura *caesura, Measure *measure, Sy
     }
 
     const char32_t code = caesura->GetCaesuraGlyph();
-    const int x = caesura->GetStart()->GetDrawingX() + caesura->GetStart()->GetDrawingRadius(m_doc) * 3;
+    const int drawingX = caesura->GetStart()->GetDrawingX() + caesura->GetStart()->GetDrawingRadius(m_doc) * 3;
 
     std::vector<Staff *> staffList = caesura->GetTstampStaves(measure, caesura);
     for (Staff *staff : staffList) {
@@ -1564,11 +1721,15 @@ void View::DrawCaesura(DeviceContext *dc, Caesura *caesura, Measure *measure, Sy
         }
 
         const int staffSize = staff->m_drawingStaffSize;
+        int x = drawingX;
         const int glyphHeight = (symbolDef) ? symbolDef->GetSymbolHeight(m_doc, staffSize, false)
                                             : m_doc->GetGlyphHeight(code, staffSize, false);
-        const int y = (caesura->HasPlace() && (caesura->GetPlace() != STAFFREL_within))
+        int y = (caesura->HasPlace() && (caesura->GetPlace() != STAFFREL_within))
             ? caesura->GetDrawingY()
             : staff->GetDrawingY() - glyphHeight / 2;
+
+        this->SetOffsetStaffSize(caesura, staffSize);
+        this->CalcOffset(dc, x, y);
 
         if (symbolDef) {
             this->DrawSymbolDef(dc, caesura, symbolDef, x, y, staffSize, false);
@@ -1603,7 +1764,7 @@ void View::DrawControlElementText(DeviceContext *dc, ControlElement *element, Me
 
     FontInfo dirTxt;
     if (!dc->UseGlobalStyling()) {
-        dirTxt.SetFaceName("Times");
+        dirTxt.SetFaceName(m_doc->GetResources().GetTextFont());
         dirTxt.SetStyle(FONTSTYLE_italic);
     }
 
@@ -1619,17 +1780,22 @@ void View::DrawControlElementText(DeviceContext *dc, ControlElement *element, Me
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
+        // If we have not timestamp
+        int x = start->GetDrawingX() + start->GetDrawingRadius(m_doc);
+        int y = element->GetDrawingY();
+
+        this->SetOffsetStaffSize(element, staffSize);
+        this->CalcOffset(dc, x, y);
 
         TextDrawingParams params;
-        // If we have not timestamp
-        params.m_x = start->GetDrawingX() + start->GetDrawingRadius(m_doc);
-        params.m_y = element->GetDrawingY();
+        params.m_x = x;
+        params.m_y = y;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         int xAdjust = 0;
         const bool isBetweenStaves = (place == STAFFREL_between)
-            || ((place == STAFFREL_below) && (staff != measure->GetLast(STAFF)))
-            || ((place == STAFFREL_above) && (staff != measure->GetFirst(STAFF)));
+            || ((place == STAFFREL_below) && (staff != measure->GetLastStaff()))
+            || ((place == STAFFREL_above) && (staff != measure->GetFirstStaff()));
         if (isBetweenStaves
             && (interface->GetStart()->GetAlignment()->GetTime()
                 == measure->m_measureAligner.GetRightBarLineAlignment()->GetTime())
@@ -1646,15 +1812,13 @@ void View::DrawControlElementText(DeviceContext *dc, ControlElement *element, Me
             params.m_y -= m_doc->GetTextXHeight(&dirTxt, false) / 2;
         }
 
-        dc->SetBrush(m_currentColor, AxSOLID);
         dc->SetFont(&dirTxt);
 
-        dc->StartText(ToDeviceContextX(params.m_x - xAdjust), ToDeviceContextY(params.m_y), alignment);
+        dc->StartText(this->ToDeviceContextX(params.m_x - xAdjust), this->ToDeviceContextY(params.m_y), alignment);
         DrawTextChildren(dc, element, params);
         dc->EndText();
 
         dc->ResetFont();
-        dc->ResetBrush();
 
         this->DrawTextEnclosure(dc, params, staffSize);
     }
@@ -1678,7 +1842,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
 
     FontInfo dynamTxt;
     if (!dc->UseGlobalStyling()) {
-        dynamTxt.SetFaceName("Times");
+        dynamTxt.SetFaceName(m_doc->GetResources().GetTextFont());
         dynamTxt.SetStyle(FONTSTYLE_italic);
     }
 
@@ -1697,11 +1861,15 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
+        int x = dynam->GetStart()->GetDrawingX() + dynam->GetStart()->GetDrawingRadius(m_doc);
+        int y = dynam->GetDrawingY();
+
+        this->SetOffsetStaffSize(dynam, staffSize);
+        this->CalcOffset(dc, x, y);
 
         TextDrawingParams params;
-        // If we have not timestamp
-        params.m_x = dynam->GetStart()->GetDrawingX() + dynam->GetStart()->GetDrawingRadius(m_doc);
-        params.m_y = dynam->GetDrawingY();
+        params.m_x = x;
+        params.m_y = y;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         if (dynam->HasEnclose()) {
@@ -1725,15 +1893,13 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
             this->DrawDynamSymbolOnly(dc, staff, dynam, dynamSymbol, alignment, params);
         }
         else {
-            dc->SetBrush(m_currentColor, AxSOLID);
             dc->SetFont(&dynamTxt);
 
-            dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
+            dc->StartText(this->ToDeviceContextX(params.m_x), this->ToDeviceContextY(params.m_y), alignment);
             this->DrawTextChildren(dc, dynam, params);
             dc->EndText();
 
             dc->ResetFont();
-            dc->ResetBrush();
         }
         this->DrawTextEnclosure(dc, params, staffSize);
     }
@@ -1804,11 +1970,10 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, TextDrawingParams &pa
 
     fontDim->SetPointSize(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize());
 
-    dc->SetBrush(m_currentColor, AxSOLID);
     dc->SetFont(fontDim);
 
     for (Object *current : fb->GetChildren()) {
-        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_left);
+        dc->StartText(this->ToDeviceContextX(params.m_x), this->ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_left);
         if (current->Is(FIGURE)) {
             // dynamic_cast assert in DrawF
             this->DrawF(dc, dynamic_cast<F *>(current), params);
@@ -1827,7 +1992,6 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, TextDrawingParams &pa
     }
 
     dc->ResetFont();
-    dc->ResetBrush();
 
     dc->EndGraphic(fb, this);
 }
@@ -1855,16 +2019,19 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     char32_t enclosingFront, enclosingBack;
     std::tie(enclosingFront, enclosingBack) = fermata->GetEnclosingGlyphs();
 
-    const int x = fermata->GetStart()->GetDrawingX() + fermata->GetStart()->GetDrawingRadius(m_doc);
+    const int drawingX = fermata->GetStart()->GetDrawingX() + fermata->GetStart()->GetDrawingRadius(m_doc);
 
     std::vector<Staff *> staffList = fermata->GetTstampStaves(measure, fermata);
     for (Staff *staff : staffList) {
         if (!system->SetCurrentFloatingPositioner(staff->GetN(), fermata, fermata->GetStart(), staff)) {
             continue;
         }
-
         const int staffSize = staff->GetDrawingStaffNotationSize();
-        const int y = fermata->GetDrawingY();
+        int x = drawingX;
+        int y = fermata->GetDrawingY();
+
+        this->SetOffsetStaffSize(fermata, staffSize);
+        this->CalcOffset(dc, x, y);
 
         const int width = (symbolDef) ? symbolDef->GetSymbolWidth(m_doc, staffSize, drawingCueSize)
                                       : m_doc->GetGlyphWidth(code, staffSize, drawingCueSize);
@@ -1936,7 +2103,7 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
 
     FontInfo fingTxt;
     if (!dc->UseGlobalStyling()) {
-        fingTxt.SetFaceName("Times");
+        fingTxt.SetFaceName(m_doc->GetResources().GetTextFont());
     }
 
     // center fingering
@@ -1948,23 +2115,26 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
+        int x = fing->GetStart()->GetDrawingX() + fing->GetStart()->GetDrawingRadius(m_doc);
+        int y = fing->GetDrawingY();
+
+        this->SetOffsetStaffSize(fing, staffSize);
+        this->CalcOffset(dc, x, y);
 
         TextDrawingParams params;
-        params.m_x = fing->GetStart()->GetDrawingX() + fing->GetStart()->GetDrawingRadius(m_doc);
-        params.m_y = fing->GetDrawingY();
+        params.m_x = x;
+        params.m_y = y;
         params.m_pointSize = m_doc->GetFingeringFont(staffSize)->GetPointSize();
 
         fingTxt.SetPointSize(params.m_pointSize);
 
-        dc->SetBrush(m_currentColor, AxSOLID);
         dc->SetFont(&fingTxt);
 
-        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
+        dc->StartText(this->ToDeviceContextX(params.m_x), this->ToDeviceContextY(params.m_y), alignment);
         this->DrawTextChildren(dc, fing, params);
         dc->EndText();
 
         dc->ResetFont();
-        dc->ResetBrush();
 
         this->DrawTextEnclosure(dc, params, staffSize);
     }
@@ -1980,6 +2150,8 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
 
     int y1 = staff->GetDrawingY();
     int y2 = staff->GetDrawingY();
+    this->CalcOffsetY(dc, y1);
+    this->CalcOffsetY(dc, y2);
 
     /************** parent layers **************/
 
@@ -2075,7 +2247,7 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
             const int length = static_cast<int>(hypot(x2 - x1, y2 - y1));
             const double angle = RadToDeg(atan2(y1 - y2, x2 - x1));
             // Smufl glyphs are horizontal - Rotate them counter clockwise
-            dc->RotateGraphic(Point(ToDeviceContextX(x1), ToDeviceContextY(y1)), angle);
+            dc->RotateGraphic(Point(this->ToDeviceContextX(x1), this->ToDeviceContextY(y1)), angle);
 
             const char32_t glissGlyph = SMUFL_EAAF_wiggleGlissando;
             const int height = m_doc->GetGlyphHeight(glissGlyph, staff->m_drawingStaffSize, false);
@@ -2084,22 +2256,22 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
             break;
         }
         case LINEFORM_dashed:
-            dc->SetPen(m_currentColor, lineWidth, AxSHORT_DASH, 0, 0, AxCAP_ROUND);
-            dc->SetBrush(m_currentColor, AxSOLID);
-            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+            dc->SetPen(lineWidth, PEN_SHORT_DASH, 0, 0, LINECAP_ROUND);
+            dc->DrawLine(this->ToDeviceContextX(x1), this->ToDeviceContextY(y1), this->ToDeviceContextX(x2),
+                this->ToDeviceContextY(y2));
             dc->ResetPen();
             break;
         case LINEFORM_dotted:
-            dc->SetPen(m_currentColor, lineWidth * 3 / 2, AxDOT, 0, 0, AxCAP_ROUND);
-            dc->SetBrush(m_currentColor, AxSOLID);
-            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+            dc->SetPen(lineWidth * 3 / 2, PEN_DOT, 0, 0, LINECAP_ROUND);
+            dc->DrawLine(this->ToDeviceContextX(x1), this->ToDeviceContextY(y1), this->ToDeviceContextX(x2),
+                this->ToDeviceContextY(y2));
             dc->ResetPen();
             break;
         case LINEFORM_solid: [[fallthrough]];
         default: {
-            dc->SetPen(m_currentColor, lineWidth, AxSOLID, 0, 0, AxCAP_ROUND);
-            dc->SetBrush(m_currentColor, AxSOLID);
-            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+            dc->SetPen(lineWidth, PEN_SOLID, 0, 0, LINECAP_ROUND);
+            dc->DrawLine(this->ToDeviceContextX(x1), this->ToDeviceContextY(y1), this->ToDeviceContextX(x2),
+                this->ToDeviceContextY(y2));
             dc->ResetPen();
             break;
         }
@@ -2127,7 +2299,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
 
     FontInfo harmTxt;
     if (!dc->UseGlobalStyling()) {
-        harmTxt.SetFaceName("Times");
+        harmTxt.SetFaceName(m_doc->GetResources().GetTextFont());
     }
 
     data_HORIZONTALALIGNMENT alignment = harm->GetChildRendAlignment();
@@ -2143,11 +2315,15 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
+        int x = harm->GetStart()->GetDrawingX() + harm->GetStart()->GetDrawingRadius(m_doc);
+        int y = harm->GetDrawingY();
+
+        this->SetOffsetStaffSize(harm, staffSize);
+        this->CalcOffset(dc, x, y);
 
         TextDrawingParams params;
-        // If we have not timestamp
-        params.m_x = harm->GetStart()->GetDrawingX() + harm->GetStart()->GetDrawingRadius(m_doc);
-        params.m_y = harm->GetDrawingY();
+        params.m_x = x;
+        params.m_y = y;
 
         if (harm->GetFirst() && harm->GetFirst()->Is(FB)) {
             this->DrawFb(dc, staff, dynamic_cast<Fb *>(harm->GetFirst()), params);
@@ -2157,15 +2333,13 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
 
             harmTxt.SetPointSize(params.m_pointSize);
 
-            dc->SetBrush(m_currentColor, AxSOLID);
             dc->SetFont(&harmTxt);
 
-            dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
+            dc->StartText(this->ToDeviceContextX(params.m_x), this->ToDeviceContextY(params.m_y), alignment);
             this->DrawTextChildren(dc, harm, params);
             dc->EndText();
 
             dc->ResetFont();
-            dc->ResetBrush();
 
             this->DrawTextEnclosure(dc, params, staffSize);
         }
@@ -2191,10 +2365,13 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
         symbolDef = mordent->GetAltSymbolDef();
     }
 
-    int x = mordent->GetStart()->GetDrawingX() + mordent->GetStart()->GetDrawingRadius(m_doc);
+    int drawingX = mordent->GetStart()->GetDrawingX() + mordent->GetStart()->GetDrawingRadius(m_doc);
 
     // set mordent glyph
     const int code = mordent->GetMordentGlyph();
+
+    char32_t enclosingFront, enclosingBack;
+    std::tie(enclosingFront, enclosingBack) = mordent->GetEnclosingGlyphs();
 
     std::u32string str;
     str.push_back(code);
@@ -2206,7 +2383,11 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
+        int x = drawingX;
         int y = mordent->GetDrawingY();
+
+        this->SetOffsetStaffSize(mordent, staffSize);
+        this->CalcOffset(dc, x, y);
 
         const int mordentHeight = (symbolDef) ? symbolDef->GetSymbolHeight(m_doc, staffSize, false)
                                               : m_doc->GetGlyphHeight(code, staffSize, false);
@@ -2296,11 +2477,25 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
             this->DrawSmuflString(dc, accidX, accidY, accidStr, HORIZONTALALIGNMENT_center, staffSize / 2, false);
         }
 
+        // hardcoded vertical offset because of the slash
+        const int yCorrEncl = m_doc->GetGlyphHeight(SMUFL_E56C_ornamentShortTrill, staffSize, false) / 2;
+
+        if (enclosingFront) {
+            const int xCorrEncl = m_doc->GetGlyphWidth(enclosingFront, staffSize, false);
+            this->DrawSmuflCode(dc, x - xCorrEncl, y + yCorrEncl, enclosingFront, staffSize, false);
+        }
+
         if (symbolDef) {
             this->DrawSymbolDef(dc, mordent, symbolDef, x, y, staffSize, false);
         }
         else {
             this->DrawSmuflString(dc, x, y, str, HORIZONTALALIGNMENT_left, staffSize);
+        }
+
+        if (enclosingBack) {
+            const int xCorrEncl = mordentWidth + m_doc->GetGlyphWidth(enclosingBack, staffSize, false)
+                - m_doc->GetGlyphAdvX(enclosingBack, staffSize, false);
+            this->DrawSmuflCode(dc, x + xCorrEncl, y + yCorrEncl, enclosingBack, staffSize, false);
         }
 
         dc->ResetFont();
@@ -2335,7 +2530,7 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
         bool bounceStar = true;
         if (form == PEDALSTYLE_altpedstar) bounceStar = false;
 
-        int x = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
+        int drawingX = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
 
         data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
         // center the pedal only with @startid
@@ -2358,7 +2553,7 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
             // Get the staff size of the first staff
             const int staffSize
                 = (staffList.begin() != staffList.end()) ? (*staffList.begin())->m_drawingStaffSize : 100;
-            x -= m_doc->GetGlyphWidth(SMUFL_E655_keyboardPedalUp, staffSize, false);
+            drawingX -= m_doc->GetGlyphWidth(SMUFL_E655_keyboardPedalUp, staffSize, false);
         }
         if (pedal->GetDir() != pedalLog_DIR_up) {
             code = pedal->GetPedalGlyph();
@@ -2370,8 +2565,11 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
                 continue;
             }
             const int staffSize = staff->m_drawingStaffSize;
-            // Basic method that use bounding box
-            const int y = pedal->GetDrawingY();
+            int x = drawingX;
+            int y = pedal->GetDrawingY();
+
+            this->SetOffsetStaffSize(pedal, staffSize);
+            this->CalcOffset(dc, x, y);
 
             dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
             this->DrawSmuflString(dc, x, y, str, alignment, staffSize);
@@ -2396,16 +2594,14 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
 
     FontInfo rehTxt;
     if (!dc->UseGlobalStyling()) {
-        rehTxt.SetFaceName("Times");
+        rehTxt.SetFaceName(m_doc->GetResources().GetTextFont());
         rehTxt.SetWeight(FONTWEIGHT_bold);
     }
-
-    TextDrawingParams params;
 
     // Number of units above the staff - 3 by default, 5 when above a clef
     int yMargin = 3;
 
-    params.m_x = reh->GetStart()->GetDrawingX();
+    int drawingX = reh->GetStart()->GetDrawingX();
     const bool adjustPosition = ((reh->HasTstamp() && (reh->GetTstamp() == 0.0))
         || (reh->GetStart()->Is(BARLINE)
             && vrv_cast<BarLine *>(reh->GetStart())->GetPosition() == BarLinePosition::Left));
@@ -2415,14 +2611,14 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
         assert(layer);
         if (!system->IsFirstOfMdiv()) {
             if (Clef *clef = layer->GetStaffDefClef(); clef) {
-                params.m_x = clef->GetDrawingX() + (clef->GetContentRight() - clef->GetContentLeft()) / 2;
+                drawingX = clef->GetDrawingX() + (clef->GetContentRight() - clef->GetContentLeft()) / 2;
                 // Increase the margin when above the clef
                 yMargin = 5;
             }
         }
         else {
             if (MeterSig *metersig = layer->GetStaffDefMeterSig(); metersig) {
-                params.m_x = metersig->GetDrawingX() + (metersig->GetContentRight() - metersig->GetContentLeft()) / 2;
+                drawingX = metersig->GetDrawingX() + (metersig->GetContentRight() - metersig->GetContentLeft()) / 2;
             }
         }
     }
@@ -2433,7 +2629,7 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
 
     std::vector<Staff *> staffList = reh->GetTstampStaves(measure, reh);
     if (staffList.empty()) {
-        Staff *staff = measure->GetTopVisibleStaff();
+        Staff *staff = system->GetTopVisibleStaff(false);
         if (staff) staffList.push_back(staff);
     }
 
@@ -2442,26 +2638,29 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
-
+        int x = drawingX;
         if ((system->GetFirst(MEASURE) != measure) && adjustPosition) {
-            params.m_x = staff->GetDrawingX();
+            x = staff->GetDrawingX();
         }
+        int y = reh->GetDrawingY() + yMargin * m_doc->GetDrawingUnit(staffSize);
 
-        params.m_enclosedRend.clear();
-        params.m_y = reh->GetDrawingY() + yMargin * m_doc->GetDrawingUnit(staffSize);
+        this->SetOffsetStaffSize(reh, staffSize);
+        this->CalcOffset(dc, x, y);
+
+        TextDrawingParams params;
+        params.m_x = x;
+        params.m_y = y;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         rehTxt.SetPointSize(params.m_pointSize);
 
-        dc->SetBrush(m_currentColor, AxSOLID);
         dc->SetFont(&rehTxt);
 
-        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
+        dc->StartText(this->ToDeviceContextX(params.m_x), this->ToDeviceContextY(params.m_y), alignment);
         this->DrawTextChildren(dc, reh, params);
         dc->EndText();
 
         dc->ResetFont();
-        dc->ResetBrush();
 
         this->DrawTextEnclosure(dc, params, staffSize);
     }
@@ -2491,7 +2690,7 @@ void View::DrawRepeatMark(DeviceContext *dc, RepeatMark *repeatMark, Measure *me
         symbolDef = repeatMark->GetAltSymbolDef();
     }
 
-    const int x = repeatMark->GetStart()->GetDrawingX() + repeatMark->GetStart()->GetDrawingRadius(m_doc);
+    const int drawingX = repeatMark->GetStart()->GetDrawingX() + repeatMark->GetStart()->GetDrawingRadius(m_doc);
 
     // set norm as default
     const int code = repeatMark->GetMarkGlyph();
@@ -2511,8 +2710,11 @@ void View::DrawRepeatMark(DeviceContext *dc, RepeatMark *repeatMark, Measure *me
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
+        int x = drawingX;
+        int y = repeatMark->GetDrawingY();
 
-        const int y = repeatMark->GetDrawingY();
+        this->SetOffsetStaffSize(repeatMark, staffSize);
+        this->CalcOffset(dc, x, y);
 
         dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
 
@@ -2543,7 +2745,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
 
     FontInfo tempoTxt;
     if (!dc->UseGlobalStyling()) {
-        tempoTxt.SetFaceName("Times");
+        tempoTxt.SetFaceName(m_doc->GetResources().GetTextFont());
         tempoTxt.SetWeight(FONTWEIGHT_bold);
     }
 
@@ -2559,10 +2761,15 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
+        int x = tempo->GetDrawingXRelativeToStaff(staff->GetN());
+        int y = tempo->GetDrawingY();
+
+        this->SetOffsetStaffSize(tempo, staffSize);
+        this->CalcOffset(dc, x, y);
 
         TextDrawingParams params;
-        params.m_x = tempo->GetDrawingXRelativeToStaff(staff->GetN());
-        params.m_y = tempo->GetDrawingY();
+        params.m_x = x;
+        params.m_y = y;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         tempoTxt.SetPointSize(params.m_pointSize);
@@ -2574,15 +2781,13 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
             params.m_y -= m_doc->GetTextXHeight(&tempoTxt, false) / 2;
         }
 
-        dc->SetBrush(m_currentColor, AxSOLID);
         dc->SetFont(&tempoTxt);
 
-        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
+        dc->StartText(this->ToDeviceContextX(params.m_x), this->ToDeviceContextY(params.m_y), alignment);
         this->DrawTextChildren(dc, tempo, params);
         dc->EndText();
 
         dc->ResetFont();
-        dc->ResetBrush();
 
         this->DrawTextEnclosure(dc, params, staffSize);
     }
@@ -2607,7 +2812,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
         symbolDef = trill->GetAltSymbolDef();
     }
 
-    int x = trill->GetStart()->GetDrawingX();
+    int drawingX = trill->GetStart()->GetDrawingX();
 
     data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
     // center the trill only with @startid
@@ -2615,11 +2820,13 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
         alignment = HORIZONTALALIGNMENT_left;
     }
     else {
-        x += trill->GetStart()->GetDrawingRadius(m_doc);
+        drawingX += trill->GetStart()->GetDrawingRadius(m_doc);
     }
 
     // for a start always put trill up
     int code = trill->GetTrillGlyph();
+    char32_t enclosingFront, enclosingBack;
+    std::tie(enclosingFront, enclosingBack) = trill->GetEnclosingGlyphs();
     std::u32string str;
 
     if (trill->GetLstartsym() != LINESTARTENDSYMBOL_none) {
@@ -2632,7 +2839,11 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
-        const int y = trill->GetDrawingY();
+        int x = drawingX;
+        int y = trill->GetDrawingY();
+
+        this->SetOffsetStaffSize(trill, staffSize);
+        this->CalcOffset(dc, x, y);
 
         const int trillHeight = (symbolDef) ? symbolDef->GetSymbolHeight(m_doc, staffSize, false)
                                             : m_doc->GetGlyphHeight(code, staffSize, false);
@@ -2641,7 +2852,12 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
 
         dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
 
-        // Upper and lower accidentals are currently exclusive, but sould both be allowed at the same time.
+        if (enclosingFront) {
+            const int xCorrEncl = trillWidth / 2 + m_doc->GetGlyphWidth(enclosingFront, staffSize, false);
+            this->DrawSmuflCode(dc, x - xCorrEncl, y + trillHeight / 2, enclosingFront, staffSize, false);
+        }
+
+        // Upper and lower accidentals are currently exclusive, but should both be allowed at the same time.
         if (trill->HasAccidlower()) {
             int accidXShift = (alignment == HORIZONTALALIGNMENT_center) ? 0 : trillWidth / 2;
             char32_t accid = Accid::GetAccidGlyph(trill->GetAccidlower());
@@ -2669,6 +2885,12 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
             this->DrawSmuflString(dc, x, y, str, alignment, staffSize);
         }
 
+        if (enclosingBack) {
+            const int xCorrEncl = trillWidth / 2 + m_doc->GetGlyphWidth(enclosingBack, staffSize, false)
+                - m_doc->GetGlyphAdvX(enclosingBack, staffSize, false);
+            this->DrawSmuflCode(dc, x + xCorrEncl, y + trillHeight / 2, enclosingBack, staffSize, false);
+        }
+
         dc->ResetFont();
     }
 
@@ -2692,7 +2914,7 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
         symbolDef = turn->GetAltSymbolDef();
     }
 
-    int x = turn->GetStart()->GetDrawingX() + turn->GetStart()->GetDrawingRadius(m_doc);
+    int drawingX = turn->GetStart()->GetDrawingX() + turn->GetStart()->GetDrawingRadius(m_doc);
 
     if (turn->m_drawingEndElement) {
         // Get the parent system of the start and end element
@@ -2701,11 +2923,14 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
         Object *parentSystem2 = end->GetFirstAncestor(SYSTEM);
         // We have a system break, use the measure right bar line instead
         if (parentSystem1 != parentSystem2) end = measure->GetRightBarLine();
-        x += ((end->GetDrawingX() - x) / 2);
+        drawingX += ((end->GetDrawingX() - drawingX) / 2);
     }
 
     // set norm as default
     int code = turn->GetTurnGlyph();
+
+    char32_t enclosingFront, enclosingBack;
+    std::tie(enclosingFront, enclosingBack) = turn->GetEnclosingGlyphs();
 
     data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
     // center the turn only with @startid
@@ -2722,8 +2947,11 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
             continue;
         }
         const int staffSize = staff->m_drawingStaffSize;
+        int x = drawingX;
+        int y = turn->GetDrawingY();
 
-        const int y = turn->GetDrawingY();
+        this->SetOffsetStaffSize(turn, staffSize);
+        this->CalcOffset(dc, x, y);
 
         const int turnHeight = (symbolDef) ? symbolDef->GetSymbolHeight(m_doc, staffSize, false)
                                            : m_doc->GetGlyphHeight(code, staffSize, false);
@@ -2753,11 +2981,24 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
                 dc, x + accidXShift, accidY, accidStr, HORIZONTALALIGNMENT_center, staffSize / 2, false);
         }
 
+        if (enclosingFront) {
+            int xCorrEncl = m_doc->GetGlyphWidth(enclosingFront, staffSize, false);
+            if (!turn->GetStart()->Is(TIMESTAMP_ATTR)) xCorrEncl += turnWidth / 2;
+            this->DrawSmuflCode(dc, x - xCorrEncl, y + turnHeight / 2, enclosingFront, staffSize, false);
+        }
+
         if (symbolDef) {
             this->DrawSymbolDef(dc, turn, symbolDef, x, y, staffSize, false, alignment);
         }
         else {
             this->DrawSmuflString(dc, x, y, str, alignment, staffSize);
+        }
+
+        if (enclosingBack) {
+            int xCorrEncl = turnWidth + m_doc->GetGlyphWidth(enclosingBack, staffSize, false)
+                - m_doc->GetGlyphAdvX(enclosingBack, staffSize, false);
+            if (!turn->GetStart()->Is(TIMESTAMP_ATTR)) xCorrEncl -= turnWidth / 2;
+            this->DrawSmuflCode(dc, x + xCorrEncl, y + turnHeight / 2, enclosingBack, staffSize, false);
         }
 
         dc->ResetFont();
@@ -2957,7 +3198,8 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
             params.m_y = y1;
             params.m_pointSize = currentFont.GetPointSize();
 
-            dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_left);
+            dc->StartText(
+                this->ToDeviceContextX(params.m_x), this->ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_left);
             this->DrawTextElement(dc, &text, params);
             dc->EndText();
         }
@@ -2982,27 +3224,29 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
             endX -= std::max(lineWidth + unit / 2 - rightBarLineWidth, 0);
         }
 
-        int penStyle = AxSOLID;
-        int capStyle = AxCAP_SQUARE;
+        PenStyle penStyle = PEN_SOLID;
+        LineCapStyle capStyle = LINECAP_SQUARE;
         switch (ending->GetLform()) {
-            case (LINEFORM_dashed): penStyle = AxLONG_DASH; break;
+            case (LINEFORM_dashed): penStyle = PEN_LONG_DASH; break;
             case (LINEFORM_dotted):
-                penStyle = AxDOT;
-                capStyle = AxCAP_ROUND;
+                penStyle = PEN_DOT;
+                capStyle = LINECAP_ROUND;
                 break;
-            default: penStyle = AxSOLID;
+            default: penStyle = PEN_SOLID;
         }
 
-        dc->SetPen(m_currentColor, lineWidth, penStyle, 0, 0, capStyle);
-        dc->DrawLine(ToDeviceContextX(startX), ToDeviceContextY(y2), ToDeviceContextX(endX), ToDeviceContextY(y2));
+        dc->SetPen(lineWidth, penStyle, 0, 0, capStyle);
+        dc->DrawLine(this->ToDeviceContextX(startX), this->ToDeviceContextY(y2), this->ToDeviceContextX(endX),
+            this->ToDeviceContextY(y2));
         if ((spanningType != SPANNING_END) && (spanningType != SPANNING_MIDDLE)
             && (ending->GetLstartsym() != LINESTARTENDSYMBOL_none)) {
-            dc->DrawLine(
-                ToDeviceContextX(startX), ToDeviceContextY(y2), ToDeviceContextX(startX), ToDeviceContextY(y1));
+            dc->DrawLine(this->ToDeviceContextX(startX), this->ToDeviceContextY(y2), this->ToDeviceContextX(startX),
+                this->ToDeviceContextY(y1));
         }
         if ((spanningType != SPANNING_START) && (spanningType != SPANNING_MIDDLE)
             && (ending->GetLendsym() != LINESTARTENDSYMBOL_none)) {
-            dc->DrawLine(ToDeviceContextX(endX), ToDeviceContextY(y2), ToDeviceContextX(endX), ToDeviceContextY(y1));
+            dc->DrawLine(this->ToDeviceContextX(endX), this->ToDeviceContextY(y2), this->ToDeviceContextX(endX),
+                this->ToDeviceContextY(y1));
         }
 
         dc->ResetPen();

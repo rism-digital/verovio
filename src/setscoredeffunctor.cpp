@@ -11,7 +11,9 @@
 
 #include "doc.h"
 #include "layer.h"
+#include "ossia.h"
 #include "page.h"
+#include "pages.h"
 #include "score.h"
 #include "staff.h"
 #include "system.h"
@@ -27,22 +29,40 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 ReplaceDrawingValuesInStaffDefFunctor::ReplaceDrawingValuesInStaffDefFunctor(const Clef *clef, const KeySig *keySig,
-    const Mensur *mensur, const MeterSig *meterSig, const MeterSigGrp *meterSigGrp)
+    const Mensur *mensur, const MeterSig *meterSig, const MeterSigGrp *meterSigGrp, const ScoreDef *newScoreDef,
+    int &redrawFlags)
     : Functor()
 {
+    assert(newScoreDef);
+
     m_clef = clef;
     m_keySig = keySig;
     m_mensur = mensur;
     m_meterSig = meterSig;
     m_meterSigGrp = meterSigGrp;
+    m_newScoreDef = newScoreDef;
+    m_redrawFlags = &redrawFlags;
 }
 
 FunctorCode ReplaceDrawingValuesInStaffDefFunctor::VisitStaffDef(StaffDef *staffDef)
 {
+    // Look at the values in the staffDef or the new ScoreDef
+    // We take into account only the keySig (see below)
+    const StaffDef *newStaffDef = m_newScoreDef->GetStaffDef(staffDef->GetN());
+
     if (m_clef) {
         staffDef->SetCurrentClef(m_clef);
     }
-    if (m_keySig) {
+    // Look at staffDef only for keySig
+    if (newStaffDef && newStaffDef->HasKeySigInfo()) {
+        const KeySig *keySig = newStaffDef->GetKeySig();
+        assert(keySig);
+        if (!keySig->HasCancelaccid() || (keySig->GetCancelaccid() != CANCELACCID_none)) {
+            staffDef->SetCurrentKeySig(newStaffDef->GetKeySig());
+            (*m_redrawFlags) |= StaffDefRedrawFlags::REDRAW_KEYSIG;
+        }
+    }
+    else if (m_keySig) {
         staffDef->SetCurrentKeySig(m_keySig);
     }
     if (m_mensur) {
@@ -99,6 +119,7 @@ ScoreDefSetCurrentFunctor::ScoreDefSetCurrentFunctor(Doc *doc) : DocFunctor(doc)
     m_drawLabels = false;
     m_restart = false;
     m_hasMeasure = false;
+    m_hasOssia = false;
 }
 
 FunctorCode ScoreDefSetCurrentFunctor::VisitClef(Clef *clef)
@@ -184,12 +205,12 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitMeasure(Measure *measure)
     ListOfObjects currentObjects, previousObjects;
     AttVisibilityComparison comparison(STAFF, BOOLEAN_false);
     measure->FindAllDescendantsByComparison(&currentObjects, &comparison);
-    if ((int)currentObjects.size() == measure->GetChildCount(STAFF)) {
+    if ((int)currentObjects.size() == measure->GetStaffCount()) {
         drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT;
     }
     if (m_previousMeasure) {
         m_previousMeasure->FindAllDescendantsByComparison(&previousObjects, &comparison);
-        if ((int)previousObjects.size() == m_previousMeasure->GetChildCount(STAFF))
+        if ((int)previousObjects.size() == m_previousMeasure->GetStaffCount())
             drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS;
     }
 
@@ -216,17 +237,37 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitMensur(Mensur *mensur)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode ScoreDefSetCurrentFunctor::VisitOssia(Ossia *ossia)
+{
+    ossia->GetStavesAbove(this->m_ossiasAbove);
+    ossia->GetStavesBelow(this->m_ossiasBelow);
+    m_hasOssia = true;
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ScoreDefSetCurrentFunctor::VisitPage(Page *page)
 {
     // This will be reached before we reach the beginning of a first Score.
     // However, page->m_score has already been set by ScoreDefSetCurrentPageFunctor
     // This must be the first page or a new score is starting on this page
     assert(page->m_score);
+    assert(page->m_score->GetScoreDef());
     if (!m_currentScore || (m_currentScore != page->m_score)) {
         m_upcomingScoreDef = *page->m_score->GetScoreDef();
         m_upcomingScoreDef.Process(*this);
     }
     page->m_drawingScoreDef = m_upcomingScoreDef;
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefSetCurrentFunctor::VisitProport(Proport *proport)
+{
+    if (proport->GetType() == "cmme_tempo_change") return FUNCTOR_SIBLINGS;
+    assert(m_currentStaffDef);
+    StaffDef *upcomingStaffDef = m_upcomingScoreDef.GetStaffDef(m_currentStaffDef->GetN());
+    assert(upcomingStaffDef);
+    upcomingStaffDef->SetCurrentProport(proport);
     return FUNCTOR_CONTINUE;
 }
 
@@ -276,7 +317,10 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitScoreDef(ScoreDef *scoreDef)
 
 FunctorCode ScoreDefSetCurrentFunctor::VisitStaff(Staff *staff)
 {
+    if (staff->IsOssia()) return FUNCTOR_SIBLINGS;
+
     m_currentStaffDef = m_currentScoreDef->GetStaffDef(staff->GetN());
+    assert(m_currentStaffDef);
     assert(staff->m_drawingStaffDef == NULL);
     staff->m_drawingStaffDef = m_currentStaffDef;
     assert(staff->m_drawingTuning == NULL);
@@ -318,6 +362,25 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitSystem(System *system)
     // This is the only thing we do for now - we need to wait until we reach the first measure
     m_currentSystem = system;
     m_hasMeasure = false;
+
+    m_ossiasAbove.clear();
+    m_ossiasBelow.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefSetCurrentFunctor::VisitSystemEnd(System *system)
+{
+    ScoreDef *scoreDef = system->GetDrawingScoreDef();
+    if (scoreDef) {
+        for (const auto &[key, value] : this->m_ossiasAbove) {
+            scoreDef->AddOssias(key, value, true);
+        }
+        for (const auto &[key, value] : this->m_ossiasBelow) {
+            scoreDef->AddOssias(key, value, false);
+        }
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -455,7 +518,8 @@ FunctorCode ScoreDefOptimizeFunctor::VisitSystem(System *system)
     }
 
     m_currentScoreDef = system->GetDrawingScoreDef();
-    assert(m_currentScoreDef);
+
+    if (!m_currentScoreDef) return FUNCTOR_SIBLINGS;
 
     return FUNCTOR_CONTINUE;
 }
@@ -478,26 +542,18 @@ SetCautionaryScoreDefFunctor::SetCautionaryScoreDefFunctor(ScoreDef *currentScor
     m_currentStaffDef = NULL;
 }
 
-FunctorCode SetCautionaryScoreDefFunctor::VisitObject(Object *object)
+FunctorCode SetCautionaryScoreDefFunctor::VisitLayer(Layer *layer)
 {
+    layer->SetDrawingCautionValues(m_currentStaffDef);
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode SetCautionaryScoreDefFunctor::VisitStaff(Staff *staff)
+{
+    if (staff->IsOssia()) return FUNCTOR_SIBLINGS;
+
     assert(m_currentScoreDef);
-
-    // starting a new staff
-    if (object->Is(STAFF)) {
-        Staff *staff = vrv_cast<Staff *>(object);
-        assert(staff);
-        m_currentStaffDef = m_currentScoreDef->GetStaffDef(staff->GetN());
-        return FUNCTOR_CONTINUE;
-    }
-
-    // starting a new layer
-    if (object->Is(LAYER)) {
-        Layer *layer = vrv_cast<Layer *>(object);
-        assert(layer);
-        layer->SetDrawingCautionValues(m_currentStaffDef);
-        return FUNCTOR_SIBLINGS;
-    }
-
+    m_currentStaffDef = m_currentScoreDef->GetStaffDef(staff->GetN());
     return FUNCTOR_CONTINUE;
 }
 
@@ -539,12 +595,12 @@ FunctorCode ScoreDefSetGrpSymFunctor::VisitGrpSym(GrpSym *grpSym)
         StaffDef *end = vrv_cast<StaffDef *>(scoreDef->FindDescendantByComparison(&compare, level));
 
         if (!start || !end) {
-            LogWarning("Could not find startid/endid on level %d for <'%s'>", level, grpSym->GetID().c_str());
+            LogWarning("Could not find startid/endid on level %d for '%s'", level, grpSym->GetID().c_str());
             return FUNCTOR_CONTINUE;
         }
 
         if (start->GetParent() != end->GetParent()) {
-            LogWarning("<'%s'> has mismatching parents for startid:<'%s'> and endid:<'%s'>", grpSym->GetID().c_str(),
+            LogWarning("'%s' has mismatching parents for startid:%s and endid:%s", grpSym->GetID().c_str(),
                 startId.c_str(), endId.c_str());
             return FUNCTOR_CONTINUE;
         }
@@ -569,6 +625,185 @@ FunctorCode ScoreDefSetGrpSymFunctor::VisitSystem(System *system)
 }
 
 //----------------------------------------------------------------------------
+// ScoreDefSetOssiaFunctor
+//----------------------------------------------------------------------------
+
+ScoreDefSetOssiaFunctor::ScoreDefSetOssiaFunctor(Doc *doc) : DocFunctor(doc)
+{
+    m_currentStaffDef = NULL;
+}
+
+FunctorCode ScoreDefSetOssiaFunctor::VisitClef(Clef *clef)
+{
+    LayerElement *elementOrLink = clef->ThisOrSameasLink();
+    if (!elementOrLink || !elementOrLink->Is(CLEF)) return FUNCTOR_CONTINUE;
+    clef = vrv_cast<Clef *>(elementOrLink);
+    if (clef->IsScoreDefElement()) {
+        return FUNCTOR_CONTINUE;
+    }
+    // Set the clef to the upcoming ossia - stored in VisitStaffEnd
+    m_upcomingStaffDef.SetCurrentClef(clef);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefSetOssiaFunctor::VisitLayer(Layer *layer)
+{
+    layer->SetDrawingStaffDefValues(m_currentStaffDef);
+    if (this->m_layerOssiaStaffDef) {
+        layer->SetDrawOssiaStaffDef(true);
+    }
+    // Do not set it on the next layer
+    m_layerOssiaStaffDef = false;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefSetOssiaFunctor::VisitMeasure(Measure *measure)
+{
+    m_currentOssias.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefSetOssiaFunctor::VisitMeasureEnd(Measure *measure)
+{
+    m_previousOssias = m_currentOssias;
+    m_isFirstMeasure = false;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefSetOssiaFunctor::VisitOssia(Ossia *ossia)
+{
+    CurrentOssia currentOssia;
+    currentOssia.m_ossia = ossia;
+    m_currentOssias.push_front(currentOssia);
+
+    std::vector<int> current = ossia->GetOStaffNs();
+
+    // Check if this we have a previous ossia
+    auto it = std::find_if(m_previousOssias.begin(), m_previousOssias.end(),
+        [&](const CurrentOssia &previous) { return previous.m_ossia->GetOStaffNs() == current; });
+    if (it != m_previousOssias.end() && !m_isFirstMeasure) {
+        it->m_ossia->SetLast(false);
+        ossia->SetFirst(false);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefSetOssiaFunctor::VisitStaff(Staff *staff)
+{
+    if (!staff->IsOssia() || staff->IsHidden()) return FUNCTOR_SIBLINGS;
+
+    assert(!m_currentOssias.empty());
+    CurrentOssia *currentOssia = &m_currentOssias.front();
+    assert(currentOssia && currentOssia->m_ossia);
+    const Staff *originalStaff = currentOssia->m_ossia->GetOriginalStaffForOssia(staff);
+    assert(originalStaff);
+
+    // Get the `@bar.thru` from the system scoreDef
+    if (currentOssia->m_ossia->HasMultipleOStaves()) {
+        assert(m_currentScoreDef);
+        StaffDef *originalStaffDef = m_currentScoreDef->GetStaffDef(originalStaff->GetN());
+        StaffGrp *staffGrp = (originalStaffDef) ? vrv_cast<StaffGrp *>(originalStaffDef->GetParent()) : NULL;
+        if (staffGrp && staffGrp->GetBarThru() == BOOLEAN_true) {
+            currentOssia->m_ossia->GetDrawingStaffGrp()->SetBarThru(BOOLEAN_true);
+        }
+    }
+
+    m_currentStaffDef = new StaffDef();
+
+    // Check if we had the same ossia staffDef in the previous measure
+    const StaffDef *staffDef = this->GetPreviousStaffDef(currentOssia->m_ossia, staff->GetN());
+    if (staffDef) {
+        *m_currentStaffDef = *staffDef;
+    }
+    // Otherwise use the one of the original staff
+    else {
+        *m_currentStaffDef = *originalStaff->m_drawingStaffDef;
+        m_currentStaffDef->SetN(staff->GetN());
+    }
+    m_upcomingStaffDef = *m_currentStaffDef;
+
+    // Takes ownership of the staffDef (add it to the drawing staffGrp)
+    currentOssia->m_ossia->AddDrawingStaffDef(m_currentStaffDef);
+
+    // True by default for multi staves, false by default for single staff
+    bool showScoreDef = currentOssia->m_ossia->DrawScoreDef() && currentOssia->m_ossia->IsFirst();
+    if (showScoreDef) {
+        bool hasValues = false;
+        const Layer *firstLayer = vrv_cast<const Layer *>(originalStaff->FindDescendantByType(LAYER));
+        // Retrieve the drawing values (scoreDef start or change) from the first layer of the original staff (if any)
+        if (firstLayer) {
+            hasValues = firstLayer->GetDrawingStaffDefValues(m_currentStaffDef);
+        }
+        // If we don't have values, draw an ossia scoreDef (clef and key signature)
+        if (!hasValues) {
+            m_layerOssiaStaffDef = true;
+            m_currentStaffDef->SetDrawClef(true);
+            m_currentStaffDef->SetDrawKeySig(true);
+        }
+    }
+
+    assert(m_currentStaffDef);
+    assert(staff->m_drawingStaffDef == NULL);
+    staff->m_drawingStaffDef = m_currentStaffDef;
+    assert(staff->m_drawingTuning == NULL);
+    staff->m_drawingTuning = vrv_cast<Tuning *>(m_currentStaffDef->FindDescendantByType(TUNING));
+    staff->m_drawingLines = m_currentStaffDef->GetLines();
+    staff->m_drawingNotationType = m_currentStaffDef->GetNotationtype();
+    staff->m_drawingStaffSize = 100;
+    if (m_currentStaffDef->HasScale()) {
+        staff->m_drawingStaffSize = m_currentStaffDef->GetScale();
+    }
+    staff->m_drawingStaffSize *= m_doc->GetOptions()->m_ossiaStaffSize.GetValue();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefSetOssiaFunctor::VisitStaffEnd(Staff *staff)
+{
+    if (!staff->IsOssia()) return FUNCTOR_SIBLINGS;
+
+    assert(!m_currentOssias.empty());
+    CurrentOssia *currentOssia = &m_currentOssias.front();
+    assert(currentOssia && currentOssia->m_ossia);
+
+    currentOssia->m_staffDefs[staff->GetN()] = m_upcomingStaffDef;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefSetOssiaFunctor::VisitSystem(System *system)
+{
+    m_currentScoreDef = system->GetDrawingScoreDef();
+    m_layerOssiaStaffDef = false;
+    m_isFirstMeasure = true;
+
+    return FUNCTOR_CONTINUE;
+}
+
+const StaffDef *ScoreDefSetOssiaFunctor::GetPreviousStaffDef(Ossia *ossia, int staffN)
+{
+    std::vector<int> current = ossia->GetOStaffNs();
+    auto it = std::find_if(m_previousOssias.begin(), m_previousOssias.end(),
+        [&](const CurrentOssia &previous) { return previous.m_ossia->GetOStaffNs() == current; });
+    // If we don't have an ossia, no need to look for the staffDef
+    if (it == m_previousOssias.end()) {
+        return NULL;
+    }
+    else {
+        for (auto const &s : (*it).m_staffDefs) {
+            // This is the staffDef with the staffN we are looking for
+            if (s.first == staffN) return &s.second;
+        }
+    }
+    return NULL;
+}
+
+//----------------------------------------------------------------------------
 // ScoreDefUnsetCurrentFunctor
 //----------------------------------------------------------------------------
 
@@ -580,6 +815,8 @@ FunctorCode ScoreDefUnsetCurrentFunctor::VisitAlignmentReference(AlignmentRefere
     assert(alignment);
 
     switch (alignment->GetType()) {
+        case ALIGNMENT_SCOREDEF_OSSIA_CLEF:
+        case ALIGNMENT_SCOREDEF_OSSIA_KEYSIG:
         case ALIGNMENT_SCOREDEF_CLEF:
         case ALIGNMENT_SCOREDEF_KEYSIG:
         case ALIGNMENT_SCOREDEF_MENSUR:
@@ -592,6 +829,13 @@ FunctorCode ScoreDefUnsetCurrentFunctor::VisitAlignmentReference(AlignmentRefere
     }
 
     return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode ScoreDefUnsetCurrentFunctor::VisitKeySig(KeySig *keySig)
+{
+    keySig->ResetDrawingClef();
+
+    return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ScoreDefUnsetCurrentFunctor::VisitLayer(Layer *layer)
@@ -607,6 +851,13 @@ FunctorCode ScoreDefUnsetCurrentFunctor::VisitMeasure(Measure *measure)
 
     // We also need to remove scoreDef elements in the AlignmentReference objects
     measure->m_measureAligner.Process(*this);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefUnsetCurrentFunctor::VisitOssia(Ossia *ossia)
+{
+    ossia->ResetDrawingStaffGrp();
 
     return FUNCTOR_CONTINUE;
 }

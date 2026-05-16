@@ -31,13 +31,13 @@ public:
     virtual ~Lb();
     Object *Clone() const override { return new Lb(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Lb"; }
+    std::string GetClassName() const override { return "lb"; }
     ///@}
 
     /**
      * Lb is an empty element
      */
-    void AddChild(Object *object) override {};
+    bool AddChild(Object *object) override { return true; };
 
     /**
      * Interface for class functor visitation

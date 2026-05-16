@@ -51,7 +51,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    AdjustXPosFunctor(Doc *doc, const std::vector<int> &staffNs);
+    AdjustXPosFunctor(Doc *doc);
     virtual ~AdjustXPosFunctor() = default;
     ///@}
 
@@ -83,7 +83,7 @@ public:
     FunctorCode VisitAlignmentEnd(Alignment *alignment) override;
     FunctorCode VisitLayerElement(LayerElement *layerElement) override;
     FunctorCode VisitMeasure(Measure *measure) override;
-    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitSystem(System *system) override;
     ///@}
 
 protected:

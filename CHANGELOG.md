@@ -1,5 +1,150 @@
 # Changelog
 
+## [unreleased]
+* Support for `keyAccid@oct`
+
+## [6.1.1] – 2026-03-12
+* Fix cocoapods headers
+
+## [6.1.0] – 2026-03-12
+* Update MEI schema to 6.0-dev (6da4dd5071303ac53d73d7b5ea0399f9cfe7bdba)
+* Support for `stageDir`
+* Support for ASCL custom tuning (MusicXML import and MIDI output)
+* Support (initial) for `notationtype@tab.staff-like`
+* Improved key signature changes in sections with restart
+* Improved MusicXML importer (`@vgrp`, `fingering`, `symbol`)
+* Improve mixed beams with stems up and down
+* Option `--mensural-responsive-view` multi-valued ("auto|none|selection")
+* Fix bugs in the CMME importer
+* Fix `--remove-ids` option invaliding expansions
+
+## [6.0.1] – 2026-01-29
+* Fix ossia staff size option values
+* Revert default css scoping removal
+
+## [6.0.0] – 2026-01-28
+* Support for ossia staves
+* Support for expansion generation in MusicXML importer
+* Support for expansion generation based on measure repeats (basic implementation)
+* Support for default expansion (generated or first one encoded) in MIDI and timemap output
+* Improved MusicXML importer (articulations, spacing, clef changes, tempo spacing, coda, segno)
+* Improved `note@head.fill` support
+* Improved SVG styling structure
+* Option `--spacing-ossia` for adjusting the spacing of ossia staves
+* Option `--ossia-hidden` for hiding rendering of ossia staves
+* Option `--expand-always` to enable expansion in SVG and MEI output
+* Option `--expand-never` to disable expansion in MIDI and timemap output
+* Remove default css scoping
+
+## [5.7.0] – 2025-12-02
+* Support for `@ho` and `@vo` on relevant layer elements and control events
+* Support for `@startho/vo` and `@endho/vo` on `hairpin`, `lv`, `phrase`, `slur` and `tie`
+* Support for `@enclose` on `rest`, `mordent`, `turn`, and `trill` (@rettinghaus)
+* Support for `@cutout` on `mRest` (@rettinghaus)
+* Support for hierarchical expansion structure (@wergo)
+* Support for multiple accidentals with correct ordering (@infojunkie)
+* Fix bug in ellipse rendering and improvements to the SVG attributes
+* Option `--svg-content-bounding-boxes` for bounding boxes on content (@fernandoherreradelasheras)
+* Option `--expand` moved to option group on loading selectors and processing
+
+## [5.6.0] – 2025-09-09
+* Improved layout for editorial accidentals
+* Improved support for `expansion` (@wergo)
+* Improved logging for unmatched time spanning and plist elements (@wergo)
+* Support for repeat marks in ABC importer (@rettinghaus)
+* Fix `pgHead` conversion in MusicXML importer (@rettinghaus)
+* Fix lyric parsing in ABC importer (@rettinghaus)
+* Fix chords following grace notes in timemap and MIDI output
+* Fix tempo in timemap and MIDI output
+* Fix note off timings in timemap and MIDI output (@infojunkie)
+* Fix `@metcon` in MusicXML importer (@rettinghaus)
+* Added Python wheel for ubuntu arm64 (@dillon-labami)
+
+## [5.5.1] – 2025-08-05
+* Fix CocoaPods build
+
+## [5.5.0] – 2025-08-04
+* Support of Swift with a new binding available through via the Swift Package Manager
+* Support for Liberation text font with the new `--font-text-liberation` option
+* Remove obsolete Qt and Android bindings
+* Remove unused Emscripten options `-DPX`
+* Fix crash when trying to load data without loaded resources
+
+## [5.4.0] – 2025-07-15
+* Change timemap with `includeRests` to include also `mRest` and `multiRest`
+* Change JS initial memory allocation and drop JS light memory version
+* Change key names for `GetTimesForElement` to be inline with the timemap keys
+* Fix order of the SVG `defs/g` to be always the same across runs
+* Fix title and control event bugs in ABC import (@rettinghaus)
+* Fix bug with multi-measure rests in MusicXML import (@rettinghaus)
+* Fix spacing / duration of measure rests in measures not metrically conformant
+* Fix values returned by `GetTimesForElement`
+* Fix SVG dimensions with `--scale-to-page-size` and `-adjust-page-height` (or width)
+
+## [5.3.2] – 2025-05-28
+* Fix bug in toolkit select
+
+## [5.3.1] – 2025-05-26
+* Fix bug in CMME importer
+
+## [5.3.0] – 2025-05-19
+* Support for editorial markup (`app` or `choice`) surrounding the top-level `scoreDef`
+* Support for full internal page-based MEI serialization (`mei-pb-serialization`)
+* Support for custom fonts to be passed to the JS toolkit as base64 strings instead of urls
+* Change the SVG structure of font glyphs to avoid problems with some SVG rendering engines
+* Fix `@xml:id` generation with `--xml-id-seed`
+* Fix key signature display after cautionary clef (@brdvd)
+* Fix custom fonts not loading properly in the JS toolkit
+
+## [5.2.0] – 2025-04-23
+* Support for `data.HEXNUM` in `note@head.shape`
+* Support for additional tablature features introduced in MEI 5.1 (@paul-bayleaf)
+* Support for `annot` as control event (@oerc-music)
+* Support for `@part="%all"` for displaying control events above the first staff
+* Improved support for expansion lists (@wergo)
+* Improved support for staff order diverging from order in `scoreDef`
+* Change element name logging to lowerCamelCase (MEI element name)
+* Remove non-sounding notes from MIDI output (@rettinghaus)
+* Fix lines disappearing in the SVG output with `--mm-output` option
+
+## [5.1.0] – 2025-02-27
+* Improved timemap with grace notes and arpeggios
+* CSS scoped to the specific MEI document based on `mei@xml:id`
+* Option `--ligature-oblique` for controlling ligature shape (curved or straight)
+* Fix handling of `-p` and `-a` options regarding MEI output (@brdvd)
+* Fix Cocoapods building (@rettinghaus)
+* Fix rendering of neumes rendered as notes
+
+## [5.0.0] – 2025-02-06
+* Switching to MEI 5.1
+* Implementation of mensural notation scoring up with `--mensural-score-up` (@martha-thomae)
+* Support for `cpMark` (_colla parte_)
+* Support for `verse@place` for lyrics above the staff
+* Support for MIDI octave displacement without `@oct.ges` (@brdvd)
+* Option `--lyric-height-factor` to increase the spacing of the lyrics
+* Fix `surface`, `symbolDef`, and `zone` losing `@xml:id`s with `--remove-ids` (@rettinghaus)
+
+## [4.5.1] – 2024-12-24
+* Fix bug in RedoLayout
+
+## [4.5.0] – 2024-12-22
+* Integration of tablature customization implementation
+* Optimization of regex calls (@paul-bayleaf)
+
+## [4.4.0] – 2024-11-25
+* Support for CMME import
+* Support for conversion from mensural to CMN (with `--mensural-to-cmn`)
+* Improved mensural cast-off (without `barLine`)
+* Improved justification of last / single pages (@brdvd)
+* Improved performance by optimizing glyph lookup (@brdvd)
+* Improved facsimile rendering
+* Connection of ledger lines to notes or accidentals with `--svg-html5`
+* Refactoring of internal time alignment using fraction instead of double
+* Option `--timemap` for controlling the time map from the command-line
+* Option `--mensural-to-measure` renamed `--mensural-to-cmn`
+* Option `--duration-equivalence` (`brevis`, `semibrevis` or `minima`) for mensural alignment
+* Option `--mensural-responsive-view` for cast-off on simplified encoding
+
 ## [4.3.1] - 2024-09-10
 * Fix JS builds (JavaScript release only)
 

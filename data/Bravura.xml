@@ -170,6 +170,10 @@
     <a n="stemDownNW" x="-0.0" y="0.0" />
     <a n="stemUpSE" x="1.0" y="0.0" />
   </g>
+  <g c="E0B3" x="0.0" y="-125.0" w="249.0" h="250.0" h-a-x="249" n="noteheadCircleX">
+    <a n="stemDownNW" x="0.0" y="0.0" />
+    <a n="stemUpSE" x="1.0" y="0.0" />
+  </g>
   <g c="E0B5" x="0.0" y="-125.0" w="420.0" h="250.0" h-a-x="420" n="noteheadWholeWithX" />
   <g c="E0B6" x="0.0" y="-125.0" w="294.0" h="250.0" h-a-x="294" n="noteheadHalfWithX">
     <a n="stemDownNW" x="0.0" y="-0.17" />
@@ -186,6 +190,30 @@
   <g c="E0B9" x="0.0" y="-125.0" w="313.0" h="250.0" h-a-x="313" n="noteheadSquareBlack">
     <a n="stemDownNW" x="0.0" y="-0.5" />
     <a n="stemUpSE" x="1.25" y="0.5" />
+  </g>
+  <g c="E0CF" x="-80.0" y="-165.0" w="455.0" h="332.0" h-a-x="295" n="noteheadSlashedBlack1">
+    <a n="stemDownNW" x="0.0" y="-0.17" />
+    <a n="stemUpSE" x="1.18" y="0.16" />
+  </g>
+  <g c="E0D0" x="-79.0" y="-164.0" w="455.0" h="332.0" h-a-x="295" n="noteheadSlashedBlack2">
+    <a n="stemDownNW" x="0.0" y="-0.17" />
+    <a n="stemUpSE" x="1.18" y="0.16" />
+  </g>
+  <g c="E0D1" x="-67.0" y="-142.0" w="453.0" h="302.0" h-a-x="292" n="noteheadSlashedHalf1">
+    <a n="stemDownNW" x="0.0" y="-0.17" />
+    <a n="stemUpSE" x="1.17" y="0.16" />
+  </g>
+  <g c="E0D2" x="-73.0" y="-134.0" w="453.0" h="302.0" h-a-x="293" n="noteheadSlashedHalf2">
+    <a n="stemDownNW" x="0.0" y="-0.16" />
+    <a n="stemUpSE" x="1.17" y="0.17" />
+  </g>
+  <g c="E0D3" x="-22.0" y="-157.0" w="455.0" h="305.0" h-a-x="418" n="noteheadSlashedWhole1" />
+  <g c="E0D4" x="-18.0" y="-154.0" w="454.0" h="305.0" h-a-x="418" n="noteheadSlashedWhole2" />
+  <g c="E0D5" x="0.0" y="-179.0" w="596.0" h="347.0" h-a-x="596" n="noteheadSlashedDoubleWhole1">
+    <a n="noteheadOrigin" x="0.36" y="0.0" />
+  </g>
+  <g c="E0D6" x="0.0" y="-178.0" w="596.0" h="347.0" h-a-x="596" n="noteheadSlashedDoubleWhole2">
+    <a n="noteheadOrigin" x="0.36" y="0.0" />
   </g>
   <g c="E0D9" x="0.0" y="-125.0" w="251.0" h="250.0" h-a-x="251" n="noteheadDiamondHalf">
     <a n="stemDownNW" x="0.0" y="0.0" />
@@ -490,6 +518,7 @@
   <g c="E4D2" x="0.0" y="0.0" w="663.0" h="532.0" h-a-x="663" n="caesuraThick" />
   <g c="E4D3" x="0.0" y="0.0" w="186.0" h="533.0" h-a-x="185" n="caesuraShort" />
   <g c="E4D4" x="0.0" y="0.0" w="373.0" h="530.0" h-a-x="373" n="caesuraCurved" />
+  <g c="E4D5" x="0.0" y="2.0" w="528.0" h="431.0" h-a-x="525" n="breathMarkSalzedo" />
   <g c="E4E0" x="0.0" y="-249.0" w="381.0" h="499.0" h-a-x="381" n="restMaxima" />
   <g c="E4E1" x="0.0" y="-249.0" w="125.0" h="499.0" h-a-x="125" n="restLonga" />
   <g c="E4E2" x="0.0" y="0.0" w="125.0" h="250.0" h-a-x="126" n="restDoubleWhole" />
@@ -660,6 +689,7 @@
   <g c="E8F6" x="0.0" y="-375.0" w="120.0" h="750.0" h-a-x="119" n="chantDivisioFinalis" />
   <g c="E8F7" x="0.0" y="255.0" w="91.0" h="245.0" h-a-x="91" n="chantVirgula" />
   <g c="E8F8" x="0.0" y="260.0" w="143.0" h="240.0" h-a-x="143" n="chantCaesura" />
+  <g c="E900" x="0.0" y="-232.0" w="396.0" h="463.0" h-a-x="396" n="mensuralGclef" />
   <g c="E901" x="0.0" y="-169.0" w="339.0" h="1091.0" h-a-x="339" n="mensuralGclefPetrucci" />
   <g c="E902" x="0.0" y="-231.0" w="264.0" h="452.0" h-a-x="264" n="chantFclef" />
   <g c="E903" x="0.0" y="-172.0" w="297.0" h="344.0" h-a-x="298" n="mensuralFclef" />
@@ -764,6 +794,7 @@
   <g c="E9F8" x="0.0" y="0.0" w="138.0" h="165.0" h-a-x="138" n="mensuralRestSemifusa" />
   <g c="EA02" x="1.0" y="0.0" w="613.0" h="411.0" h-a-x="615" n="mensuralCustosUp" />
   <g c="EA06" x="0.0" y="-101.0" w="60.0" h="416.0" h-a-x="60" n="chantCustosStemUpPosMiddle" />
+  <g c="EA29" x="0.0" y="-136.0" w="184.0" h="272.0" h-a-x="184" n="medRenStrophicusCMN" />
   <g c="EA2A" x="0.0" y="-131.0" w="319.0" h="263.0" h-a-x="319" n="medRenOriscusCMN" />
   <g c="EA50" x="20.0" y="-1.0" w="215.0" h="252.0" h-a-x="255" n="figbass0" />
   <g c="EA51" x="20.0" y="0.0" w="117.0" h="254.0" h-a-x="157" n="figbass1" />

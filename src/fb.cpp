@@ -26,7 +26,7 @@ namespace vrv {
 
 static const ClassRegistrar<Fb> s_factory("fb", FB);
 
-Fb::Fb() : Object(FB, "fb-")
+Fb::Fb() : Object(FB)
 {
 
     this->Reset();
@@ -39,18 +39,19 @@ void Fb::Reset()
     Object::Reset();
 }
 
-bool Fb::IsSupportedChild(Object *child)
+bool Fb::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(FIGURE)) {
-        assert(dynamic_cast<F *>(child));
+    static const std::vector<ClassId> supported{ FIGURE };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 FunctorCode Fb::Accept(Functor &functor)

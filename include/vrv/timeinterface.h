@@ -32,7 +32,11 @@ class StaffAlignment;
  * This class is an interface for elements having a single time point, such as tempo, reh, etc..
  * It is not an abstract class but should not be instantiated directly.
  */
-class TimePointInterface : public Interface, public AttStaffIdent, public AttStartId, public AttTimestampLog {
+class TimePointInterface : public Interface,
+                           public AttPartIdent,
+                           public AttStaffIdent,
+                           public AttStartId,
+                           public AttTimestampLog {
 public:
     /**
      * @name Constructors, destructors, reset methods
@@ -85,9 +89,12 @@ public:
     bool IsOnStaff(int n) const;
 
     /**
-     * Return a vector of staves looking at the @staff attribute or at the parent staff or the @startid
+     * Return a vector of staves looking at the @staff attribute or at the parent staff of the @startid
      */
-    std::vector<Staff *> GetTstampStaves(Measure *measure, Object *object);
+    ///@{
+    std::vector<const Staff *> GetTstampStaves(const Measure *measure, const Object *object) const;
+    std::vector<Staff *> GetTstampStaves(const Measure *measure, const Object *object);
+    ///@}
 
     /**
      * Return true if the interface owner is encoded in the measure of its start element

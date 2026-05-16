@@ -18,6 +18,7 @@
 #include "note.h"
 #include "object.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "stem.h"
 #include "vrv.h"
 
@@ -71,6 +72,17 @@ void DrawingListInterface::ResetDrawingList()
 }
 
 //----------------------------------------------------------------------------
+// Interface pseudo functor (redirected)
+//----------------------------------------------------------------------------
+
+FunctorCode DrawingListInterface::InterfaceResetData(ResetDataFunctor &functor)
+{
+    this->DrawingListInterface::Reset();
+
+    return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
 // BeamDrawingInterface
 //----------------------------------------------------------------------------
 
@@ -81,7 +93,7 @@ BeamDrawingInterface::BeamDrawingInterface() : ObjectListInterface()
 
 BeamDrawingInterface::~BeamDrawingInterface()
 {
-    ClearCoords();
+    this->ClearCoords();
 }
 
 void BeamDrawingInterface::Reset()
@@ -103,7 +115,7 @@ void BeamDrawingInterface::Reset()
     m_beamWidthBlack = 0;
     m_beamWidthWhite = 0;
 
-    ClearCoords();
+    this->ClearCoords();
 }
 
 int BeamDrawingInterface::GetTotalBeamWidth() const
@@ -130,7 +142,7 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
     assert(staff);
 
     BeamDrawingInterface::Reset();
-    ClearCoords();
+    this->ClearCoords();
 
     if (childList.empty()) {
         return;
@@ -143,7 +155,7 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
         m_beamElementCoords.push_back(new BeamElementCoord());
     }
 
-    // current point to the first Note in the layed out layer
+    // current point to the first Note in the laid out layer
     LayerElement *current = dynamic_cast<LayerElement *>(childList.front());
     // Beam list should contain only DurationInterface objects
     assert(current->GetDurationInterface());
@@ -555,6 +567,17 @@ void BeamDrawingInterface::GetBeamChildOverflow(StaffAlignment *&above, StaffAli
 }
 
 //----------------------------------------------------------------------------
+// Interface pseudo functor (redirected)
+//----------------------------------------------------------------------------
+
+FunctorCode BeamDrawingInterface::InterfaceResetData(ResetDataFunctor &functor)
+{
+    this->BeamDrawingInterface::Reset();
+
+    return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
 // StaffDefDrawingInterface
 //----------------------------------------------------------------------------
 
@@ -563,7 +586,10 @@ StaffDefDrawingInterface::StaffDefDrawingInterface()
     this->Reset();
 }
 
-StaffDefDrawingInterface::~StaffDefDrawingInterface() {}
+StaffDefDrawingInterface::~StaffDefDrawingInterface()
+{
+    this->ResetOssiaStaffDefs();
+}
 
 void StaffDefDrawingInterface::Reset()
 {
@@ -578,6 +604,16 @@ void StaffDefDrawingInterface::Reset()
     m_drawMensur = false;
     m_drawMeterSig = false;
     m_drawMeterSigGrp = false;
+
+    this->ResetOssiaStaffDefs();
+}
+
+void StaffDefDrawingInterface::ResetOssiaStaffDefs()
+{
+    for (const auto ossia : m_ossiasAbove) delete ossia;
+    m_ossiasAbove.clear();
+    for (const auto ossia : m_ossiasBelow) delete ossia;
+    m_ossiasBelow.clear();
 }
 
 void StaffDefDrawingInterface::SetCurrentClef(const Clef *clef)
@@ -649,6 +685,57 @@ void StaffDefDrawingInterface::AlternateCurrentMeterSig(const Measure *measure)
         this->SetCurrentMeterSig(meter);
         delete meter;
     }
+}
+
+void StaffDefDrawingInterface::SetCurrentProport(const Proport *proport)
+{
+    if (proport) {
+        m_currentProport = *proport;
+        m_currentProport.CloneReset();
+    }
+}
+
+StaffDef *StaffDefDrawingInterface::GetOssiaStaffDef(int staffN)
+{
+    return const_cast<StaffDef *>(std::as_const(*this).GetOssiaStaffDef(staffN));
+}
+
+const StaffDef *StaffDefDrawingInterface::GetOssiaStaffDef(int staffN) const
+{
+    for (StaffDef *ossia : m_ossiasAbove) {
+        if (ossia->GetN() == staffN) return ossia;
+    }
+    for (StaffDef *ossia : m_ossiasBelow) {
+        if (ossia->GetN() == staffN) return ossia;
+    }
+    return NULL;
+}
+
+void StaffDefDrawingInterface::GetOssiaAboveNs(std::vector<int> &staffNs) const
+{
+    for (StaffDef *ossia : m_ossiasAbove) {
+        staffNs.push_back(ossia->GetN());
+    }
+}
+
+void StaffDefDrawingInterface::GetOssiaBelowNs(std::vector<int> &staffNs) const
+{
+    for (StaffDef *ossia : m_ossiasBelow) {
+        staffNs.push_back(ossia->GetN());
+    }
+}
+
+//----------------------------------------------------------------------------
+// Interface pseudo functor (redirected)
+//----------------------------------------------------------------------------
+
+FunctorCode StaffDefDrawingInterface::InterfaceResetData(ResetDataFunctor &functor)
+{
+    // ScoreDefSetCurrent expect the interface content to be preserved
+    // Since CloneReset call the ResetData functor, this need to be disabled
+    // this->StaffDefDrawingInterface::Reset();
+
+    return FUNCTOR_CONTINUE;
 }
 
 //----------------------------------------------------------------------------
@@ -726,6 +813,33 @@ Point StemmedDrawingInterface::GetDrawingStemEnd(const Object *object) const
         }
     }
     return Point(m_drawingStem->GetDrawingX(), m_drawingStem->GetDrawingY() - this->GetDrawingStemLen());
+}
+
+//----------------------------------------------------------------------------
+// Interface pseudo functor (redirected)
+//----------------------------------------------------------------------------
+
+FunctorCode StemmedDrawingInterface::InterfaceResetData(ResetDataFunctor &functor)
+{
+    this->StemmedDrawingInterface::Reset();
+
+    return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
+// VisibilityDrawingInterface
+//----------------------------------------------------------------------------
+
+VisibilityDrawingInterface::VisibilityDrawingInterface()
+{
+    this->Reset();
+}
+
+VisibilityDrawingInterface::~VisibilityDrawingInterface() {}
+
+void VisibilityDrawingInterface::Reset()
+{
+    m_visibility = Visible;
 }
 
 } // namespace vrv

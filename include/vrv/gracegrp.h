@@ -28,13 +28,13 @@ public:
     virtual ~GraceGrp();
     Object *Clone() const override { return new GraceGrp(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "GraceGrp"; }
+    std::string GetClassName() const override { return "graceGrp"; }
     ///@}
 
     /**
      * Add childElement to a element.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
 
     //----------//
     // Functors //

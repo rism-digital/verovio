@@ -30,7 +30,7 @@ namespace vrv {
 
 static const ClassRegistrar<MRpt> s_factory("mRpt", MRPT);
 
-MRpt::MRpt() : LayerElement(MRPT, "mrpt-"), AttColor(), AttNumbered(), AttNumberPlacement()
+MRpt::MRpt() : LayerElement(MRPT), AttColor(), AttNumbered(), AttNumberPlacement()
 {
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_NUMBERED);

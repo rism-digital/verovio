@@ -8,6 +8,7 @@
 #ifndef __VRV_DC_BASE_H__
 #define __VRV_DC_BASE_H__
 
+#include <algorithm>
 #include <string>
 
 //----------------------------------------------------------------------------
@@ -19,44 +20,29 @@ namespace vrv {
 
 class Doc;
 
-#define AxNONE -1
-#define AxWHITE 255 << 16 | 255 << 8 | 255
-#define AxBLACK 0
-#define AxRED 255 << 16
-#define AxBLUE 255
-#define AxGREEN 255 << 8
-#define AxCYAN 255 << 8 | 255
-#define AxLIGHT_GREY 127 << 16 | 127 << 8 | 127
+#define COLOR_NONE -1
+#define COLOR_WHITE 255 << 16 | 255 << 8 | 255
+#define COLOR_BLACK 0
+#define COLOR_RED 255 << 16
+#define COLOR_BLUE 255
+#define COLOR_GREEN 255 << 8
+#define COLOR_CYAN 255 << 8 | 255
+#define COLOR_LIGHT_GREY 127 << 16 | 127 << 8 | 127
+
 #undef max
 #undef min
 
-enum {
-    /*  Pen styles */
-    AxSOLID = 100,
-    AxDOT,
-    AxLONG_DASH,
-    AxSHORT_DASH,
-    AxDOT_DASH,
-    AxUSER_DASH,
-    AxTRANSPARENT
-};
+enum PenStyle : int8_t { PEN_SOLID = 0, PEN_DOT, PEN_LONG_DASH, PEN_SHORT_DASH, PEN_DOT_DASH };
 
-enum {
-    /* Line cap styles */
-    AxCAP_UNKNOWN = 0,
-    AxCAP_BUTT,
-    AxCAP_ROUND,
-    AxCAP_SQUARE
-};
+enum LineCapStyle : int8_t { LINECAP_DEFAULT = 0, LINECAP_BUTT, LINECAP_ROUND, LINECAP_SQUARE };
 
-enum {
-    /* Line join styles */
-    AxJOIN_UNKNOWN = 0,
-    AxJOIN_ARCS,
-    AxJOIN_BEVEL,
-    AxJOIN_MITER,
-    AxJOIN_MITER_CLIP,
-    AxJOIN_ROUND
+enum LineJoinStyle : int8_t {
+    LINEJOIN_DEFAULT = 0,
+    LINEJOIN_ARCS,
+    LINEJOIN_BEVEL,
+    LINEJOIN_MITER,
+    LINEJOIN_MITER_CLIP,
+    LINEJOIN_ROUND
 };
 
 // ---------------------------------------------------------------------------
@@ -71,53 +57,73 @@ enum {
 class Pen {
 public:
     Pen()
-        : m_penColor(0), m_penWidth(0), m_dashLength(0), m_gapLength(0), m_lineCap(0), m_lineJoin(0), m_penOpacity(0.0)
+        : m_width(0)
+        , m_style(PEN_SOLID)
+        , m_dashLength(0)
+        , m_gapLength(0)
+        , m_lineCap(LINECAP_DEFAULT)
+        , m_lineJoin(LINEJOIN_DEFAULT)
+        , m_opacity(-1.0)
+        , m_color(COLOR_NONE)
     {
     }
-    Pen(int color, int width, float opacity, int dashLength, int gapLength, int lineCap, int lineJoin)
-        : m_penColor(color)
-        , m_penWidth(width)
+    Pen(int width, PenStyle style, int dashLength, int gapLength, LineCapStyle lineCap, LineJoinStyle lineJoin,
+        float opacity, int color)
+        : m_width(width)
+        , m_style(style)
         , m_dashLength(dashLength)
         , m_gapLength(gapLength)
         , m_lineCap(lineCap)
         , m_lineJoin(lineJoin)
-        , m_penOpacity(opacity)
+        , m_opacity(opacity)
+        , m_color(color)
     {
     }
 
-    int GetColor() const { return m_penColor; }
-    void SetColor(int color) { m_penColor = color; }
-    int GetWidth() const { return m_penWidth; }
-    void SetWidth(int width) { m_penWidth = width; }
+    int GetColor() const { return m_color; }
+    void SetColor(int color) { m_color = color; }
+    bool HasColor() const { return (m_color != COLOR_NONE); }
+    int GetWidth() const { return m_width; }
+    void SetWidth(int width) { m_width = width; }
     int GetDashLength() const { return m_dashLength; }
     void SetDashLength(int dashLength) { m_dashLength = dashLength; }
     int GetGapLength() const { return m_gapLength; }
     void SetGapLength(int gapLength) { m_gapLength = gapLength; }
-    int GetLineCap() const { return m_lineCap; }
-    void SetLineCap(int lineCap) { m_lineCap = lineCap; }
-    int GetLineJoin() const { return m_lineJoin; }
-    void SetLineJoin(int lineJoin) { m_lineJoin = lineJoin; }
-    float GetOpacity() const { return m_penOpacity; }
-    void SetOpacity(float opacity) { m_penOpacity = opacity; }
+    LineCapStyle GetLineCap() const { return m_lineCap; }
+    void SetLineCap(LineCapStyle lineCap) { m_lineCap = lineCap; }
+    LineJoinStyle GetLineJoin() const { return m_lineJoin; }
+    void SetLineJoin(LineJoinStyle lineJoin) { m_lineJoin = lineJoin; }
+    PenStyle GetStyle() const { return m_style; }
+    void SetStyle(PenStyle style) { m_style = style; }
+    float GetOpacity() const { return m_opacity; }
+    void SetOpacity(float opacity) { m_opacity = opacity; }
+    bool HasOpacity() const { return (m_opacity != -1.0); }
 
 private:
-    int m_penColor, m_penWidth, m_dashLength, m_gapLength, m_lineCap, m_lineJoin;
-    float m_penOpacity;
+    int m_width;
+    PenStyle m_style;
+    int m_dashLength, m_gapLength;
+    LineCapStyle m_lineCap;
+    LineJoinStyle m_lineJoin;
+    float m_opacity;
+    int m_color;
 };
 
 class Brush {
 public:
-    Brush() : m_brushColor(0), m_brushOpacity(0.0) {}
-    Brush(int color, float opacity) : m_brushColor(color), m_brushOpacity(opacity) {}
+    Brush() : m_opacity(-1.0), m_color(COLOR_NONE) {}
+    Brush(float opacity, int color) : m_opacity(opacity), m_color(color) {}
 
-    int GetColor() const { return m_brushColor; }
-    void SetColor(int color) { m_brushColor = color; }
-    float GetOpacity() const { return m_brushOpacity; }
-    void SetOpacity(float opacity) { m_brushOpacity = opacity; }
+    int GetColor() const { return m_color; }
+    void SetColor(int color) { m_color = color; }
+    bool HasColor() const { return (m_color != COLOR_NONE); }
+    float GetOpacity() const { return m_opacity; }
+    void SetOpacity(float opacity) { m_opacity = opacity; }
+    bool HasOpacity() const { return (m_opacity != -1.0); }
 
 private:
-    int m_brushColor;
-    float m_brushOpacity;
+    float m_opacity;
+    int m_color;
 };
 
 // ---------------------------------------------------------------------------
@@ -226,17 +232,17 @@ public:
 
     Point operator-() const { return { -x, -y }; }
 
-    Point min(const Point &p) const
+    static Point Min(const Point &p1, const Point &p2)
     {
-        int x = std::min(this->x, p.x);
-        int y = std::min(this->y, p.y);
+        int x = std::min(p1.x, p2.x);
+        int y = std::min(p1.y, p2.y);
         return { x, y };
     }
 
-    Point max(const Point &p) const
+    static Point Max(const Point &p1, const Point &p2)
     {
-        int x = std::max(this->x, p.x);
-        int y = std::max(this->y, p.y);
+        int x = std::max(p1.x, p2.x);
+        int y = std::max(p1.y, p2.y);
         return { x, y };
     }
 };

@@ -23,7 +23,6 @@ namespace vrv {
  */
 class Gliss : public ControlElement,
               public TimeSpanningInterface,
-              public AttColor,
               public AttLineRend,
               public AttLineRendBase,
               public AttNNumberLike {
@@ -37,7 +36,7 @@ public:
     virtual ~Gliss();
     Object *Clone() const override { return new Gliss(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Gliss"; }
+    std::string GetClassName() const override { return "gliss"; }
     ///@}
 
     /**

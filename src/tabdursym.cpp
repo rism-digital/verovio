@@ -31,9 +31,12 @@ namespace vrv {
 
 static const ClassRegistrar<TabDurSym> s_factory("tabDurSym", TABDURSYM);
 
-TabDurSym::TabDurSym() : LayerElement(TABDURSYM, "tabdursym-"), StemmedDrawingInterface(), AttNNumberLike()
+TabDurSym::TabDurSym()
+    : LayerElement(TABDURSYM), StemmedDrawingInterface(), AttNNumberLike(), AttStringtab(), AttVisualOffsetVo()
 {
     this->RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterAttClass(ATT_STRINGTAB);
+    this->RegisterAttClass(ATT_VISUALOFFSETVO);
 
     this->Reset();
 }
@@ -45,24 +48,27 @@ void TabDurSym::Reset()
     LayerElement::Reset();
     StemmedDrawingInterface::Reset();
     this->ResetNNumberLike();
+    this->ResetStringtab();
+    this->ResetVisualOffsetVo();
 }
 
-bool TabDurSym::IsSupportedChild(Object *child)
+bool TabDurSym::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(STEM)) {
-        assert(dynamic_cast<Stem *>(child));
+    static const std::vector<ClassId> supported{ STEM };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
-void TabDurSym::AddChild(Object *child)
+bool TabDurSym::AddChild(Object *child)
 {
-    if (!this->IsSupportedChild(child)) {
+    if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        return;
+        return false;
     }
 
     child->SetParent(this);
@@ -77,7 +83,9 @@ void TabDurSym::AddChild(Object *child)
     else {
         children.push_back(child);
     }
-    Modify();
+    this->Modify();
+
+    return true;
 }
 
 void TabDurSym::AdjustDrawingYRel(const Staff *staff, const Doc *doc)
@@ -89,7 +97,7 @@ void TabDurSym::AdjustDrawingYRel(const Staff *staff, const Doc *doc)
 
     // For stems outside add a margin to the tabDurSym - otherwise attached to the staff line
     if (staff->IsTabWithStemsOutside()) {
-        double spacingRatio = (staff->IsTabLuteFrench()) ? 2.0 : 1.0;
+        double spacingRatio = (staff->IsTabLuteFrench() || staff->IsTabLuteGerman()) ? 2.0 : 1.0;
         yRel += doc->GetDrawingUnit(staff->m_drawingStaffSize) * spacingRatio;
     }
 
@@ -116,8 +124,11 @@ int TabDurSym::CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION st
 
     int baseStem = STANDARD_STEMLENGTH_TAB * 3;
 
-    // One unit longer for guitar tablature
-    if (staff->IsTabGuitar()) baseStem += 3;
+    // Shorter for german lute tablature to match ryhthm glyphs
+    if (staff->IsTabLuteGerman()) baseStem -= 3;
+    // One unit longer for guitar or staff-like tablature
+    else if (staff->IsTabGuitar() || staff->IsTabStaffLike())
+        baseStem += 3;
 
     // One unit longer for stems inside the staff
     if (!staff->IsTabWithStemsOutside()) baseStem += 3;

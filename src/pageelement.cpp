@@ -22,21 +22,14 @@ namespace vrv {
 // PageElement
 //----------------------------------------------------------------------------
 
-PageElement::PageElement() : Object(PAGE_ELEMENT, "pe"), AttTyped()
+PageElement::PageElement() : Object(PAGE_ELEMENT), AttTyped()
 {
     this->RegisterAttClass(ATT_TYPED);
 
     this->Reset();
 }
 
-PageElement::PageElement(ClassId classId) : Object(classId, "pe"), AttTyped()
-{
-    this->RegisterAttClass(ATT_TYPED);
-
-    this->Reset();
-}
-
-PageElement::PageElement(ClassId classId, const std::string &classIdStr) : Object(classId, classIdStr), AttTyped()
+PageElement::PageElement(ClassId classId) : Object(classId), AttTyped()
 {
     this->RegisterAttClass(ATT_TYPED);
 

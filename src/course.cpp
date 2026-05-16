@@ -23,7 +23,7 @@ namespace vrv {
 
 static const ClassRegistrar<Course> s_factory("course", COURSE);
 
-Course::Course() : Object(COURSE, "course-"), AttAccidental(), AttNNumberLike(), AttOctave(), AttPitch()
+Course::Course() : Object(COURSE), AttAccidental(), AttNNumberLike(), AttOctave(), AttPitch()
 {
     this->RegisterAttClass(ATT_ACCIDENTAL);
     this->RegisterAttClass(ATT_NNUMBERLIKE);
@@ -44,7 +44,7 @@ void Course::Reset()
     this->ResetPitch();
 }
 
-bool Course::IsSupportedChild(Object *child)
+bool Course::IsSupportedChild(ClassId classId)
 {
     // Nothing for now
     return false;

@@ -34,11 +34,11 @@ FunctorCode AdjustArticFunctor::VisitArtic(Artic *artic)
     int yIn, yOut, yRel;
 
     Staff *staff = artic->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-    Beam *beam = vrv_cast<Beam *>(artic->GetFirstAncestor(BEAM));
+    const Beam *beam = artic->GetAncestorBeam();
     const int staffHeight = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
 
-    Stem *stem = vrv_cast<Stem *>(m_parent->FindDescendantByType(STEM));
-    Flag *flag = vrv_cast<Flag *>(m_parent->FindDescendantByType(FLAG));
+    const Stem *stem = vrv_cast<const Stem *>(m_parent->FindDescendantByType(STEM));
+    const Flag *flag = vrv_cast<const Flag *>(m_parent->FindDescendantByType(FLAG));
     // Avoid artic to be in ledger lines
     if (artic->GetDrawingPlace() == STAFFREL_above) {
         int yAboveStem = m_parent->GetDrawingTop(m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY();

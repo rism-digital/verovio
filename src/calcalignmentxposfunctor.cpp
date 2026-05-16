@@ -54,10 +54,9 @@ FunctorCode CalcAlignmentXPosFunctor::VisitAlignment(Alignment *alignment)
         // LogDebug("CalcAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
 
-    MapOfIntGraceAligners::const_iterator iter;
     const MapOfIntGraceAligners &graceAligners = alignment->GetGraceAligners();
-    for (iter = graceAligners.begin(); iter != graceAligners.end(); ++iter) {
-        iter->second->SetGraceAlignmentXPos(m_doc);
+    for (const auto &[key, value] : graceAligners) {
+        value->SetGraceAlignmentXPos(m_doc);
     }
 
     alignment->SetXRel(m_previousXRel + intervalXRel * DEFINITION_FACTOR * m_estimatedJustificationRatio);

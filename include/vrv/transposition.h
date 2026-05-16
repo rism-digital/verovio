@@ -45,7 +45,7 @@ public:
 
     TransPitch() {}
     TransPitch(int aPname, int anAccid, int anOct);
-    TransPitch(data_PITCHNAME pname, data_ACCIDENTAL_GESTURAL accidG, data_ACCIDENTAL_WRITTEN accidW, int oct);
+    TransPitch(data_PITCHNAME pname, data_ACCIDENTAL_GESTURAL_basic accidG, data_ACCIDENTAL_WRITTEN accidW, int oct);
     TransPitch(const TransPitch &pitch);
 
     // TransPitch operators
@@ -59,8 +59,9 @@ public:
     TransPitch &operator--();
     TransPitch operator--(int);
 
-    data_ACCIDENTAL_GESTURAL GetAccidG() const;
-    data_ACCIDENTAL_WRITTEN GetAccidW() const;
+    data_ACCIDENTAL_GESTURAL_basic GetAccidGesBasic() const;
+    data_ACCIDENTAL_GESTURAL GetAccidGes() const;
+    data_ACCIDENTAL_WRITTEN GetAccidWritten() const;
     data_PITCHNAME GetPitchName() const;
     std::u32string GetPitchString() const;
     std::string GetSimplePitchString() const;
@@ -72,6 +73,7 @@ public:
     //----------------//
 
     static int GetChromaticAlteration(data_ACCIDENTAL_GESTURAL accidG, data_ACCIDENTAL_WRITTEN accidW);
+    static int GetChromaticAlteration(data_ACCIDENTAL_GESTURAL_basic accidG, data_ACCIDENTAL_WRITTEN accidW);
 };
 
 std::ostream &operator<<(std::ostream &out, const TransPitch &pitch);

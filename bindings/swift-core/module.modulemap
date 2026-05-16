@@ -1,0 +1,4 @@
+module VerovioCore {
+    header "swift_c_wrapper.h"
+    export *
+}

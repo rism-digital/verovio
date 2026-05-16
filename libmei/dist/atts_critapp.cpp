@@ -28,7 +28,7 @@ namespace vrv {
 
 AttCrit::AttCrit() : Att()
 {
-    ResetCrit();
+    this->ResetCrit();
 }
 
 void AttCrit::ResetCrit()

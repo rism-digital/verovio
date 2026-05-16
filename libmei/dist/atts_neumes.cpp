@@ -28,7 +28,7 @@ namespace vrv {
 
 AttDivLineLog::AttDivLineLog() : Att()
 {
-    ResetDivLineLog();
+    this->ResetDivLineLog();
 }
 
 void AttDivLineLog::ResetDivLineLog()
@@ -68,7 +68,7 @@ bool AttDivLineLog::HasForm() const
 
 AttNcLog::AttNcLog() : Att()
 {
-    ResetNcLog();
+    this->ResetNcLog();
 }
 
 void AttNcLog::ResetNcLog()
@@ -123,7 +123,7 @@ bool AttNcLog::HasPname() const
 
 AttNcForm::AttNcForm() : Att()
 {
-    ResetNcForm();
+    this->ResetNcForm();
 }
 
 void AttNcForm::ResetNcForm()
@@ -253,7 +253,7 @@ bool AttNcForm::HasTilt() const
 
 AttNeumeType::AttNeumeType() : Att()
 {
-    ResetNeumeType();
+    this->ResetNeumeType();
 }
 
 void AttNeumeType::ResetNeumeType()

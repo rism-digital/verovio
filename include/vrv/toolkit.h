@@ -286,7 +286,7 @@ public:
      *
      * @remark nojs
      *
-     * @param outputTo the output to value as string
+     * @param outputTo the value to output as string
      * @return True if the option was successfully set
      */
     bool SetOutputTo(std::string const &outputTo);
@@ -313,7 +313,7 @@ public:
     ///@{
 
     /**
-     * Edit the MEI data.
+     * Edit the MEI data - experimental code not to rely on.
      *
      * @param editorAction The editor actions as a stringified JSON object
      * @return True if the edit action was successfully applied
@@ -321,7 +321,7 @@ public:
     bool Edit(const std::string &editorAction);
 
     /**
-     * Return the editor status.
+     * Return the editor status - experimental code not to rely on.
      *
      * @return The editor status as a string
      **/
@@ -715,22 +715,18 @@ public:
     void ClearHumdrumBuffer();
 
     /**
-     * @ingroup nodoc
-     */
-    void SetInputFrom(FileFormat format);
-    /**
      * Get the input format.
      *
      * @return Input format enumeration
      *
      * @ingroup nodoc
      */
-    int GetInputFrom() { return m_inputFrom; }
+    FileFormat GetInputFrom() { return m_options->GetInputFrom(); }
 
     /**
      * @ingroup nodoc
      */
-    int GetOutputTo() { return m_outputTo; }
+    FileFormat GetOutputTo() { return m_options->GetOutputTo(); }
 
     /**
      * Setting the global locale.
@@ -786,6 +782,11 @@ protected:
      */
     bool LoadData(const std::string &data, bool resetLogBuffer);
 
+    /**
+     * Reset the Doc pointer used for MIDI / Timemap rendering
+     */
+    void ResetMidiDoc();
+
 private:
     bool SetFont(const std::string &fontName);
     bool IsUTF16(const std::string &filename);
@@ -803,14 +804,26 @@ private:
      */
     std::string GetOptions(bool defaultValues) const;
 
+    /**
+     * Set the doc to the view and set the editor after having loaded data
+     */
+    void SetViewAndEditor();
+
+    /**
+     * Set the Doc pointer for MIDI / Timemap rendering.
+     * Point to the main Doc if no difference in expansion handling is needed.
+     */
+    void SetMidiDoc();
+
 public:
     //
-private:
+protected:
     Doc m_doc;
     DocSelection m_docSelection;
     View m_view;
-    FileFormat m_inputFrom;
-    FileFormat m_outputTo;
+
+private:
+    Doc *m_midiDoc;
 
     Options *m_options;
 

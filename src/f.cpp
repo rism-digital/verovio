@@ -26,7 +26,7 @@ namespace vrv {
 
 static const ClassRegistrar<F> s_factory("f", FIGURE);
 
-F::F() : TextElement(FIGURE, "f-"), TimeSpanningInterface(), AttExtender()
+F::F() : TextElement(FIGURE), TimeSpanningInterface(), AttExtender()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_EXTENDER);
@@ -43,18 +43,19 @@ void F::Reset()
     this->ResetExtender();
 }
 
-bool F::IsSupportedChild(Object *child)
+bool F::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(TEXT)) {
-        assert(dynamic_cast<Text *>(child));
+    static const std::vector<ClassId> supported{ TEXT };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 //----------------------------------------------------------------------------

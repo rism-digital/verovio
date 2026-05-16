@@ -26,7 +26,7 @@ namespace vrv {
 
 static const ClassRegistrar<LayerDef> s_factory("layerDef", LAYERDEF);
 
-LayerDef::LayerDef() : Object(LAYERDEF, "layerdef-"), AttLabelled(), AttNInteger(), AttTyped()
+LayerDef::LayerDef() : Object(LAYERDEF), AttLabelled(), AttNInteger(), AttTyped()
 {
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_NINTEGER);
@@ -45,21 +45,16 @@ void LayerDef::Reset()
     this->ResetTyped();
 }
 
-bool LayerDef::IsSupportedChild(Object *child)
+bool LayerDef::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(INSTRDEF)) {
-        assert(dynamic_cast<InstrDef *>(child));
-    }
-    else if (child->Is(LABEL)) {
-        assert(dynamic_cast<Label *>(child));
-    }
-    else if (child->Is(LABELABBR)) {
-        assert(dynamic_cast<LabelAbbr *>(child));
+    static const std::vector<ClassId> supported{ INSTRDEF, LABEL, LABELABBR };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 FunctorCode LayerDef::Accept(Functor &functor)

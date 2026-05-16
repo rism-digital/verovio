@@ -25,7 +25,7 @@ namespace vrv {
  */
 class Turn : public ControlElement,
              public TimePointInterface,
-             public AttColor,
+             public AttEnclosingChars,
              public AttExtSymAuth,
              public AttExtSymNames,
              public AttOrnamentAccid,
@@ -41,7 +41,7 @@ public:
     virtual ~Turn();
     Object *Clone() const override { return new Turn(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Turn"; }
+    std::string GetClassName() const override { return "turn"; }
     ///@}
 
     /**
@@ -59,6 +59,8 @@ public:
      * Get the SMuFL glyph for the turn based on form or glyph.num
      */
     char32_t GetTurnGlyph() const;
+
+    std::pair<char32_t, char32_t> GetEnclosingGlyphs() const;
 
     /**
      * Get the turn height ignoring slash

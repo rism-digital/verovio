@@ -14,11 +14,13 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "metersiggrp.h"
+#include "proport.h"
 #include "vrvdef.h"
 
 namespace vrv {
 
 class Object;
+class StaffDef;
 class Stem;
 
 //----------------------------------------------------------------------------
@@ -60,6 +62,17 @@ public:
      * Clears the list - called when the layer starts to be drawn
      */
     void ResetDrawingList();
+
+    //-----------------//
+    // Pseudo functors //
+    //-----------------//
+
+    /**
+     * Called explicitly from ResetDataFunctor
+     */
+    ///@{
+    FunctorCode InterfaceResetData(ResetDataFunctor &functor);
+    ///@}
 
 private:
     //
@@ -162,6 +175,17 @@ public:
      */
     void GetBeamChildOverflow(StaffAlignment *&above, StaffAlignment *&below) const;
 
+    //-----------------//
+    // Pseudo functors //
+    //-----------------//
+
+    /**
+     * Called explicitly from ResetDataFunctor
+     */
+    ///@{
+    FunctorCode InterfaceResetData(ResetDataFunctor &functor);
+    ///@}
+
 protected:
     /**
      * Return the position of the element in the beam.
@@ -230,6 +254,11 @@ public:
     ///@}
 
     /**
+     * Clear the ossia staffDef lists.
+     */
+    void ResetOssiaStaffDefs();
+
+    /**
      * @name Set and get the layer drawing flags for clef, keysig and mensur.
      * This will be true when starting a new system or when a scoreDef or staffDef changes occurs
      * This will be true only for the first layer in the staff.
@@ -239,7 +268,7 @@ public:
     void SetDrawClef(bool drawClef) { m_drawClef = drawClef; }
     bool DrawKeySig() const { return (m_drawKeySig); }
     void SetDrawKeySig(bool drawKeySig) { m_drawKeySig = drawKeySig; }
-    bool DrawMensur() const { return (m_drawMensur && m_currentMensur.HasSign()); }
+    bool DrawMensur() const { return (m_drawMensur && (m_currentMensur.HasSign() || m_currentMensur.HasNum())); }
     void SetDrawMensur(bool drawMensur) { m_drawMensur = drawMensur; }
     bool DrawMeterSig() const
     {
@@ -260,6 +289,7 @@ public:
     void SetCurrentMeterSig(const MeterSig *meterSig);
     void SetCurrentMeterSigGrp(const MeterSigGrp *meterSigGrp);
     void AlternateCurrentMeterSig(const Measure *measure);
+    void SetCurrentProport(const Proport *proport);
     ///@}
 
     /**
@@ -277,6 +307,31 @@ public:
     const MeterSig *GetCurrentMeterSig() const { return &m_currentMeterSig; }
     MeterSigGrp *GetCurrentMeterSigGrp() { return &m_currentMeterSigGrp; }
     const MeterSigGrp *GetCurrentMeterSigGrp() const { return &m_currentMeterSigGrp; }
+    Proport *GetCurrentProport() { return &m_currentProport; }
+    const Proport *GetCurrentProport() const { return &m_currentProport; }
+    ///@}
+
+    /**
+     * @name Methods for adding and accessing ossia staffDefs
+     */
+    ///@{
+    void AddOssiaAbove(StaffDef *ossiaStaffDef) { m_ossiasAbove.push_back(ossiaStaffDef); }
+    void AddOssiaBelow(StaffDef *ossiaStaffDef) { m_ossiasBelow.push_back(ossiaStaffDef); }
+    void GetOssiaAboveNs(std::vector<int> &staffNs) const;
+    void GetOssiaBelowNs(std::vector<int> &staffNs) const;
+    StaffDef *GetOssiaStaffDef(int staffN);
+    const StaffDef *GetOssiaStaffDef(int staffN) const;
+    ///@}
+
+    //-----------------//
+    // Pseudo functors //
+    //-----------------//
+
+    /**
+     * Called explicitly from ResetDataFunctor
+     */
+    ///@{
+    FunctorCode InterfaceResetData(ResetDataFunctor &functor);
     ///@}
 
 private:
@@ -290,6 +345,8 @@ private:
     MeterSig m_currentMeterSig;
     /** The meter signature group */
     MeterSigGrp m_currentMeterSigGrp;
+    /** The proport */
+    Proport m_currentProport;
 
     /**
      *  @name Flags for indicating whether the clef, keysig and mensur needs to be drawn or not
@@ -300,6 +357,14 @@ private:
     bool m_drawMensur;
     bool m_drawMeterSig;
     bool m_drawMeterSigGrp;
+    ///@}
+
+    /**
+     * @name List of ossia staffDefs above and below
+     */
+    ///@{
+    std::list<StaffDef *> m_ossiasAbove;
+    std::list<StaffDef *> m_ossiasBelow;
     ///@}
 };
 
@@ -355,11 +420,61 @@ public:
     virtual int CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir) const = 0;
     ///@}
 
+    //-----------------//
+    // Pseudo functors //
+    //-----------------//
+
+    /**
+     * Called explicitly from ResetDataFunctor
+     */
+    ///@{
+    FunctorCode InterfaceResetData(ResetDataFunctor &functor);
+    ///@}
+
 protected:
     /**
      * A pointer to the child Stem set by PrepareLayerElementParts
      */
     Stem *m_drawingStem;
+};
+
+//----------------------------------------------------------------------------
+// VisibilityDrawingInterface
+//----------------------------------------------------------------------------
+
+/**
+ * This class is an interface for MEI element that can be hidden during drawing.
+ */
+class VisibilityDrawingInterface {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     */
+    ///@{
+    VisibilityDrawingInterface();
+    virtual ~VisibilityDrawingInterface();
+    virtual void Reset();
+    ///@}
+
+    /**
+     * @name Set and get the visibility
+     */
+    ///@{
+    void SetVisibility(VisibilityType visibility) { m_visibility = visibility; }
+    bool IsHidden() const { return (m_visibility == Hidden); }
+    ///@}
+
+    //-----------------//
+    // Pseudo functors //
+    //-----------------//
+
+private:
+    /**
+     * Holds the visibility (hidden or visible) for an element implementing the interface.
+     * By default, all editorial elements are visible. However, in an <app>, only one <rdg> is visible at the time. When
+     * loading the file, the first <rdg> (or the <lem>) is made visible.
+     */
+    VisibilityType m_visibility;
 };
 
 } // namespace vrv

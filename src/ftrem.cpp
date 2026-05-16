@@ -34,7 +34,7 @@ namespace vrv {
 
 static const ClassRegistrar<FTrem> s_factory("fTrem", FTREM);
 
-FTrem::FTrem() : LayerElement(FTREM, "ftrem-"), BeamDrawingInterface(), AttFTremVis(), AttTremMeasured()
+FTrem::FTrem() : LayerElement(FTREM), BeamDrawingInterface(), AttFTremVis(), AttTremMeasured()
 {
     this->RegisterAttClass(ATT_FTREMVIS);
     this->RegisterAttClass(ATT_TREMMEASURED);
@@ -52,24 +52,19 @@ void FTrem::Reset()
     this->ResetTremMeasured();
 }
 
-bool FTrem::IsSupportedChild(Object *child)
+bool FTrem::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(CHORD)) {
-        assert(dynamic_cast<Chord *>(child));
+    static const std::vector<ClassId> supported{ CHORD, CLEF, NOTE };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(CLEF)) {
-        assert(dynamic_cast<Clef *>(child));
-    }
-    else if (child->Is(NOTE)) {
-        assert(dynamic_cast<Note *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 const ArrayOfBeamElementCoords *FTrem::GetElementCoords()
@@ -110,12 +105,6 @@ std::pair<int, int> FTrem::GetAdditionalBeamCount() const
 std::pair<int, int> FTrem::GetFloatingBeamCount() const
 {
     return { this->GetBeams(), this->GetBeamsFloat() };
-}
-
-void FTrem::SetElementShortening(int shortening)
-{
-    std::for_each(m_beamSegment.m_beamElementCoordRefs.begin(), m_beamSegment.m_beamElementCoordRefs.end(),
-        [shortening](BeamElementCoord *coord) { coord->m_maxShortening = shortening; });
 }
 
 //----------------------------------------------------------------------------

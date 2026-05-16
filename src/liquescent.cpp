@@ -24,13 +24,15 @@ namespace vrv {
 // Liquescent
 //----------------------------------------------------------------------------
 
-Liquescent::Liquescent() : LayerElement(LIQUESCENT, "liquescent-"), PitchInterface(), PositionInterface(), AttColor()
+Liquescent::Liquescent()
+    : LayerElement(LIQUESCENT), OffsetInterface(), PitchInterface(), PositionInterface(), AttColor()
 {
-    RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
-    RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
+    this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
+    this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
+    this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
 
-    Reset();
+    this->Reset();
 }
 
 Liquescent::~Liquescent() {}
@@ -38,9 +40,10 @@ Liquescent::~Liquescent() {}
 void Liquescent::Reset()
 {
     LayerElement::Reset();
+    OffsetInterface::Reset();
     PitchInterface::Reset();
     PositionInterface::Reset();
-    ResetColor();
+    this->ResetColor();
 }
 
 } // namespace vrv

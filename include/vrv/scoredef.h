@@ -11,6 +11,7 @@
 #include "atts_gestural.h"
 #include "atts_mei.h"
 #include "atts_shared.h"
+#include "customtuning.h"
 #include "drawinginterface.h"
 #include "object.h"
 #include "scoredefinterface.h"
@@ -47,7 +48,6 @@ public:
     ///@{
     ScoreDefElement();
     ScoreDefElement(ClassId classId);
-    ScoreDefElement(ClassId classId, const std::string &classIdStr);
     virtual ~ScoreDefElement();
     void Reset() override;
     ///@}
@@ -144,13 +144,18 @@ public:
     virtual ~ScoreDef();
     Object *Clone() const override { return new ScoreDef(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "ScoreDef"; }
+    std::string GetClassName() const override { return "scoreDef"; }
     ///@}
 
     /**
      * Check if a object is allowed as child.
      */
-    bool IsSupportedChild(Object *object) override;
+    bool IsSupportedChild(ClassId classId) override;
+
+    /**
+     * Additional check when adding a child.
+     */
+    bool AddChildAdditionalCheck(Object *child) override;
 
     /**
      * Return an order for the given ClassId.
@@ -244,6 +249,15 @@ public:
     ///@}
 
     /**
+     * @name Set and get the custom tuning
+     */
+    ///@{
+    CustomTuning &GetCustomTuning() { return m_customTuning; }
+    const CustomTuning &GetCustomTuning() const { return m_customTuning; }
+    void SetCustomTuning(const CustomTuning &customTuning) { m_customTuning = customTuning; }
+    ///@}
+
+    /**
      * Return the maximum staff size in the scoreDef (100 if empty)
      */
     int GetMaxStaffSize() const;
@@ -254,6 +268,11 @@ public:
      * @return True if a system start line will be drawn
      */
     bool HasSystemStartLine() const;
+
+    /**
+     * Add ossia staffDefs to the staffN staffDef (above or below)
+     */
+    void AddOssias(int staffN, const std::list<int>, bool above);
 
     //----------//
     // Functors //
@@ -288,6 +307,8 @@ private:
     int m_drawingWidth;
     /** Store the label drawing width of the scoreDef */
     int m_drawingLabelsWidth;
+    /** Custom tuning */
+    CustomTuning m_customTuning;
 };
 
 } // namespace vrv

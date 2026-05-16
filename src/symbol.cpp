@@ -26,7 +26,7 @@ namespace vrv {
 
 static const ClassRegistrar<Symbol> s_factory("symbol", SYMBOL);
 
-Symbol::Symbol() : TextElement(SYMBOL, "symbol-"), AttColor(), AttExtSymAuth(), AttExtSymNames(), AttTypography()
+Symbol::Symbol() : TextElement(SYMBOL), AttColor(), AttExtSymAuth(), AttExtSymNames(), AttTypography()
 {
     this->Reset();
 
@@ -48,7 +48,7 @@ void Symbol::Reset()
     this->ResetTypography();
 }
 
-bool Symbol::IsSupportedChild(Object *child)
+bool Symbol::IsSupportedChild(ClassId classId)
 {
     return false;
 }

@@ -37,6 +37,11 @@ public:
     virtual ~Output();
 
     /**
+     * Main method for exporting the data. Overridden in child classes.
+     */
+    virtual std::string Export() = 0;
+
+    /**
      * Dummy object method that must be overridden in child class.
      */
     virtual bool WriteObject(Object *object) { return true; }
@@ -45,6 +50,11 @@ public:
      * Dummy object method that must be overridden in child class.
      */
     virtual bool WriteObjectEnd(Object *object) { return true; }
+
+    /**
+     * Method for skipping under certain circumstances
+     */
+    virtual bool Skip(Object *object) const { return false; }
 
 public:
     //

@@ -31,7 +31,6 @@ public:
     ///@{
     PageElement();
     PageElement(ClassId classId);
-    PageElement(ClassId classId, const std::string &classIdStr);
     virtual ~PageElement();
     void Reset() override;
     ///@}

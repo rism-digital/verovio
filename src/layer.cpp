@@ -46,13 +46,7 @@ namespace vrv {
 static const ClassRegistrar<Layer> s_factory("layer", LAYER);
 
 Layer::Layer()
-    : Object(LAYER, "layer-")
-    , DrawingListInterface()
-    , ObjectListInterface()
-    , AttCue()
-    , AttNInteger()
-    , AttTyped()
-    , AttVisibility()
+    : Object(LAYER), DrawingListInterface(), ObjectListInterface(), AttCue(), AttNInteger(), AttTyped(), AttVisibility()
 {
     this->RegisterAttClass(ATT_CUE);
     this->RegisterAttClass(ATT_NINTEGER);
@@ -110,6 +104,7 @@ void Layer::CloneReset()
     m_cautionStaffDefKeySig = NULL;
     m_cautionStaffDefMensur = NULL;
     m_cautionStaffDefMeterSig = NULL;
+    m_drawOssiaStaffDef = false;
 
     m_drawingStemDir = STEMDIRECTION_NONE;
     m_crossStaffFromAbove = false;
@@ -157,23 +152,21 @@ void Layer::ResetStaffDefObjects()
         delete m_cautionStaffDefMeterSig;
         m_cautionStaffDefMeterSig = NULL;
     }
+    // ossia
+    m_drawOssiaStaffDef = false;
 }
 
-bool Layer::IsSupportedChild(Object *child)
+bool Layer::IsSupportedChild(ClassId classId)
 {
-    if (child->IsLayerElement()) {
-        assert(dynamic_cast<LayerElement *>(child));
+    if (Object::IsLayerElement(classId)) {
+        return true;
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
-    }
-    else if (child->Is(METERSIGGRP)) {
-        assert(dynamic_cast<MeterSigGrp *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 LayerElement *Layer::GetPrevious(const LayerElement *element)
@@ -288,9 +281,7 @@ int Layer::GetClefLocOffset(const LayerElement *test) const
 {
     const Clef *clef = this->GetClef(test);
     if (!clef) return 0;
-    const Staff *staff = vrv_cast<const Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
-    return clef->GetClefLocOffset(staff->m_drawingNotationType);
+    return clef->GetClefLocOffset();
 }
 
 int Layer::GetCrossStaffClefLocOffset(const LayerElement *element, int currentOffset) const
@@ -300,11 +291,10 @@ int Layer::GetCrossStaffClefLocOffset(const LayerElement *element, int currentOf
         if (!element->Is(CLEF)) {
             const Clef *clef = vrv_cast<const Clef *>(GetListFirstBackward(element, CLEF));
             if (clef && clef->m_crossStaff) {
-                return clef->GetClefLocOffset(element->m_crossStaff->m_drawingNotationType);
+                return clef->GetClefLocOffset();
             }
         }
     }
-
     return currentOffset;
 }
 
@@ -542,6 +532,18 @@ const MeterSig *Layer::GetCurrentMeterSig() const
     return staff->m_drawingStaffDef->GetCurrentMeterSig();
 }
 
+Proport *Layer::GetCurrentProport()
+{
+    return const_cast<Proport *>(std::as_const(*this).GetCurrentProport());
+}
+
+const Proport *Layer::GetCurrentProport() const
+{
+    const Staff *staff = vrv_cast<const Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff && staff->m_drawingStaffDef);
+    return staff->m_drawingStaffDef->GetCurrentProport();
+}
+
 void Layer::SetDrawingStaffDefValues(StaffDef *currentStaffDef)
 {
     if (!currentStaffDef) {
@@ -581,6 +583,32 @@ void Layer::SetDrawingStaffDefValues(StaffDef *currentStaffDef)
     currentStaffDef->SetDrawMeterSigGrp(false);
 }
 
+bool Layer::GetDrawingStaffDefValues(StaffDef *staffDef) const
+{
+    bool hasValue = false;
+    if (this->m_staffDefClef) {
+        staffDef->SetDrawClef(true);
+        hasValue = true;
+    }
+    if (this->m_staffDefKeySig) {
+        staffDef->SetDrawKeySig(true);
+        hasValue = true;
+    }
+    if (this->m_staffDefMensur) {
+        staffDef->SetDrawMensur(true);
+        hasValue = true;
+    }
+    if (this->m_staffDefMeterSig) {
+        staffDef->SetDrawMeterSig(true);
+        hasValue = true;
+    }
+    if (this->m_staffDefMeterSigGrp) {
+        staffDef->SetDrawMeterSigGrp(true);
+        hasValue = true;
+    }
+    return hasValue;
+}
+
 void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
 {
     if (!currentStaffDef) {
@@ -595,6 +623,7 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
     // special case - see above
     if (currentStaffDef->DrawKeySig()) {
         m_cautionStaffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
+        m_cautionStaffDefKeySig->SetDrawingClef(currentStaffDef->GetCurrentClef());
         m_cautionStaffDefKeySig->SetParent(this);
     }
     if (currentStaffDef->DrawMensur()) {

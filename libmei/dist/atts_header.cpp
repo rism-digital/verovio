@@ -28,7 +28,7 @@ namespace vrv {
 
 AttAdlibitum::AttAdlibitum() : Att()
 {
-    ResetAdlibitum();
+    this->ResetAdlibitum();
 }
 
 void AttAdlibitum::ResetAdlibitum()
@@ -68,7 +68,7 @@ bool AttAdlibitum::HasAdlib() const
 
 AttBifoliumSurfaces::AttBifoliumSurfaces() : Att()
 {
-    ResetBifoliumSurfaces();
+    this->ResetBifoliumSurfaces();
 }
 
 void AttBifoliumSurfaces::ResetBifoliumSurfaces()
@@ -153,7 +153,7 @@ bool AttBifoliumSurfaces::HasOuterVerso() const
 
 AttFoliumSurfaces::AttFoliumSurfaces() : Att()
 {
-    ResetFoliumSurfaces();
+    this->ResetFoliumSurfaces();
 }
 
 void AttFoliumSurfaces::ResetFoliumSurfaces()
@@ -208,7 +208,7 @@ bool AttFoliumSurfaces::HasVerso() const
 
 AttPerfRes::AttPerfRes() : Att()
 {
-    ResetPerfRes();
+    this->ResetPerfRes();
 }
 
 void AttPerfRes::ResetPerfRes()
@@ -248,7 +248,7 @@ bool AttPerfRes::HasSolo() const
 
 AttPerfResBasic::AttPerfResBasic() : Att()
 {
-    ResetPerfResBasic();
+    this->ResetPerfResBasic();
 }
 
 void AttPerfResBasic::ResetPerfResBasic()
@@ -288,7 +288,7 @@ bool AttPerfResBasic::HasCount() const
 
 AttRecordType::AttRecordType() : Att()
 {
-    ResetRecordType();
+    this->ResetRecordType();
 }
 
 void AttRecordType::ResetRecordType()
@@ -328,7 +328,7 @@ bool AttRecordType::HasRecordtype() const
 
 AttRegularMethod::AttRegularMethod() : Att()
 {
-    ResetRegularMethod();
+    this->ResetRegularMethod();
 }
 
 void AttRegularMethod::ResetRegularMethod()

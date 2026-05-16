@@ -28,9 +28,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 static const ClassRegistrar<Dir> s_factory("dir", DIR);
+static const ClassRegistrar<Dir> s_factoryStageDir(
+    "stageDir", FACTORY_STAGEDIR, []() -> Object * { return new Dir(true); });
 
-Dir::Dir()
-    : ControlElement(DIR, "dir-")
+Dir::Dir(bool isStageDir)
+    : ControlElement(DIR)
     , TextListInterface()
     , TextDirInterface()
     , TimeSpanningInterface()
@@ -47,6 +49,7 @@ Dir::Dir()
     this->RegisterAttClass(ATT_VERTICALGROUP);
 
     this->Reset();
+    this->SetStageDir(isStageDir);
 }
 
 Dir::~Dir() {}
@@ -60,20 +63,23 @@ void Dir::Reset()
     this->ResetLang();
     this->ResetLineRendBase();
     this->ResetVerticalGroup();
+
+    m_isStageDir = false;
 }
 
-bool Dir::IsSupportedChild(Object *child)
+bool Dir::IsSupportedChild(ClassId classId)
 {
-    if (child->Is({ LB, REND, SYMBOL, TEXT })) {
-        assert(dynamic_cast<TextElement *>(child));
+    static const std::vector<ClassId> supported{ LB, REND, SYMBOL, TEXT };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 //----------------------------------------------------------------------------

@@ -25,8 +25,7 @@ namespace vrv {
 // TextLayoutElement
 //----------------------------------------------------------------------------
 
-TextLayoutElement::TextLayoutElement(ClassId classId, const std::string &classIdStr)
-    : Object(classId, classIdStr), ObjectListInterface(), AttTyped()
+TextLayoutElement::TextLayoutElement(ClassId classId) : Object(classId), ObjectListInterface(), AttTyped()
 {
     this->RegisterAttClass(ATT_TYPED);
 
@@ -41,18 +40,17 @@ void TextLayoutElement::Reset()
     this->ResetTyped();
 }
 
-bool TextLayoutElement::IsSupportedChild(Object *child)
+bool TextLayoutElement::IsSupportedChild(ClassId classId)
 {
-    if (child->IsTextElement()) {
-        assert(dynamic_cast<TextElement *>(child));
+    if (Object::IsTextElement(classId)) {
+        return true;
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 void TextLayoutElement::FilterList(ListOfConstObjects &childList) const

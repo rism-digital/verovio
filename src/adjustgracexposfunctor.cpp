@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "score.h"
+#include "system.h"
 
 //----------------------------------------------------------------------------
 
@@ -20,9 +20,8 @@ namespace vrv {
 // AdjustGraceXPosFunctor
 //----------------------------------------------------------------------------
 
-AdjustGraceXPosFunctor::AdjustGraceXPosFunctor(Doc *doc, const std::vector<int> &staffNs) : DocFunctor(doc)
+AdjustGraceXPosFunctor::AdjustGraceXPosFunctor(Doc *doc) : DocFunctor(doc)
 {
-    m_staffNs = staffNs;
     m_graceMaxPos = 0;
     m_graceUpcomingMaxPos = -VRV_UNSET;
     m_graceCumulatedXShift = 0;
@@ -53,9 +52,8 @@ FunctorCode AdjustGraceXPosFunctor::VisitAlignment(Alignment *alignment)
         Filters filters;
         Filters *previousFilters = this->SetFilters(&filters);
 
-        std::vector<int>::iterator iter;
-        for (iter = m_staffNs.begin(); iter != m_staffNs.end(); ++iter) {
-            const int graceAlignerId = m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : *iter;
+        for (int &n : m_staffNs) {
+            const int graceAlignerId = m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : n;
 
             std::vector<ClassId> exclude;
             if (alignment->HasGraceAligner(graceAlignerId) && m_rightDefaultAlignment) {
@@ -74,7 +72,7 @@ FunctorCode AdjustGraceXPosFunctor::VisitAlignment(Alignment *alignment)
             // Get its minimum left and make it the max right position of the grace group
             if (m_rightDefaultAlignment) {
                 int minLeft, maxRight;
-                m_rightDefaultAlignment->GetLeftRight(*iter, minLeft, maxRight, exclude);
+                m_rightDefaultAlignment->GetLeftRight(n, minLeft, maxRight, exclude);
                 if (minLeft != -VRV_UNSET)
                     graceMaxPos = minLeft - m_doc->GetLeftMargin(NOTE) * m_doc->GetDrawingUnit(75);
             }
@@ -94,7 +92,7 @@ FunctorCode AdjustGraceXPosFunctor::VisitAlignment(Alignment *alignment)
             m_graceCumulatedXShift = VRV_UNSET;
             filters.Clear();
             // Create ad comparison object for each type / @n
-            AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
+            AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, n);
             filters.Add(&matchStaff);
 
             if (alignment->HasGraceAligner(graceAlignerId)) {
@@ -105,7 +103,7 @@ FunctorCode AdjustGraceXPosFunctor::VisitAlignment(Alignment *alignment)
                 if (m_graceCumulatedXShift == VRV_UNSET) continue;
 
                 // Now we need to adjust the space for the grace note group
-                measureAligner->AdjustGraceNoteSpacing(m_doc, alignment, (*iter));
+                measureAligner->AdjustGraceNoteSpacing(m_doc, alignment, n);
             }
         }
 
@@ -229,9 +227,9 @@ FunctorCode AdjustGraceXPosFunctor::VisitMeasure(Measure *measure)
     return FUNCTOR_SIBLINGS;
 }
 
-FunctorCode AdjustGraceXPosFunctor::VisitScore(Score *score)
+FunctorCode AdjustGraceXPosFunctor::VisitSystem(System *system)
 {
-    m_staffNs = score->GetScoreDef()->GetStaffNs();
+    if (system->GetDrawingScoreDef()) m_staffNs = system->GetDrawingScoreDef()->GetStaffNs();
 
     return FUNCTOR_CONTINUE;
 }

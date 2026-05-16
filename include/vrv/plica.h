@@ -28,7 +28,7 @@ public:
     virtual ~Plica();
     Object *Clone() const override { return new Plica(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Plica"; }
+    std::string GetClassName() const override { return "plica"; }
 
     //----------//
     // Functors //

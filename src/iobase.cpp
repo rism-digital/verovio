@@ -33,7 +33,7 @@ Input::Input(Doc *doc)
 {
     assert(doc);
     m_doc = doc;
-    Init();
+    this->Init();
 }
 
 void Input::Init()

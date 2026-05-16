@@ -10,9 +10,11 @@
 
 #include "altsyminterface.h"
 #include "atts_shared.h"
+#include "atts_visual.h"
 #include "devicecontextbase.h"
 #include "floatingobject.h"
 #include "linkinginterface.h"
+#include "offsetinterface.h"
 
 namespace vrv {
 
@@ -27,6 +29,8 @@ namespace vrv {
 class ControlElement : public FloatingObject,
                        public AltSymInterface,
                        public LinkingInterface,
+                       public OffsetInterface,
+                       public AttColor,
                        public AttLabelled,
                        public AttTyped {
 public:
@@ -37,7 +41,6 @@ public:
     ///@{
     ControlElement();
     ControlElement(ClassId classId);
-    ControlElement(ClassId classId, const std::string &classIdStr);
     virtual ~ControlElement();
     void Reset() override;
     ///@}
@@ -50,6 +53,8 @@ public:
     const AltSymInterface *GetAltSymInterface() const override { return vrv_cast<const AltSymInterface *>(this); }
     LinkingInterface *GetLinkingInterface() override { return vrv_cast<LinkingInterface *>(this); }
     const LinkingInterface *GetLinkingInterface() const override { return vrv_cast<const LinkingInterface *>(this); }
+    OffsetInterface *GetOffsetInterface() override { return vrv_cast<OffsetInterface *>(this); }
+    const OffsetInterface *GetOffsetInterface() const override { return vrv_cast<const OffsetInterface *>(this); }
     ///@}
 
     /**

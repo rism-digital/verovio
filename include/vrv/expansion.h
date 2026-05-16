@@ -34,7 +34,7 @@ public:
     virtual ~Expansion();
     Object *Clone() const override { return new Expansion(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Expansion"; }
+    std::string GetClassName() const override { return "expansion"; }
     ///@}
 
     /**

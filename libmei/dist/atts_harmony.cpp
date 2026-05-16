@@ -28,7 +28,7 @@ namespace vrv {
 
 AttHarmLog::AttHarmLog() : Att()
 {
-    ResetHarmLog();
+    this->ResetHarmLog();
 }
 
 void AttHarmLog::ResetHarmLog()

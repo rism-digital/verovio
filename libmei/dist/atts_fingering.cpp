@@ -28,7 +28,7 @@ namespace vrv {
 
 AttFingGrpLog::AttFingGrpLog() : Att()
 {
-    ResetFingGrpLog();
+    this->ResetFingGrpLog();
 }
 
 void AttFingGrpLog::ResetFingGrpLog()

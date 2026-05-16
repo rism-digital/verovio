@@ -36,23 +36,40 @@ namespace vrv {
 
 static const ClassRegistrar<Score> s_factory("score", SCORE);
 
-Score::Score() : PageElement(SCORE, "score-"), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
+Score::Score() : Score(true) {}
+
+Score::Score(bool createScoreDef) : PageElement(SCORE), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
 {
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_NNUMBERLIKE);
 
+    if (createScoreDef) {
+        m_scoreDef = new ScoreDef();
+        m_scoreDefSubtree = m_scoreDef;
+    }
+    else {
+        m_scoreDef = NULL;
+        m_scoreDefSubtree = NULL;
+    }
+
     this->Reset();
 }
 
-Score::~Score() {}
+Score::~Score()
+{
+    if (m_scoreDefSubtree) {
+        delete m_scoreDefSubtree;
+        m_scoreDefSubtree = NULL;
+        m_scoreDef = NULL;
+    }
+}
 
 void Score::Reset()
 {
     Object::Reset();
+    PageMilestoneInterface::Reset();
     this->ResetLabelled();
     this->ResetNNumberLike();
-
-    m_scoreDef.Reset();
 
     m_drawingPgHeadHeight = 0;
     m_drawingPgFootHeight = 0;
@@ -60,30 +77,28 @@ void Score::Reset()
     m_drawingPgFoot2Height = 0;
 }
 
-bool Score::IsSupportedChild(Object *child)
+bool Score::IsSupportedChild(ClassId classId)
 {
-    if (child->Is(SCOREDEF)) {
-        assert(dynamic_cast<ScoreDef *>(child));
+    static const std::vector<ClassId> supported{ ENDING, PB, SCOREDEF, SB, SECTION };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
-    else if (child->Is(SB)) {
-        assert(dynamic_cast<Sb *>(child));
-    }
-    else if (child->Is(SECTION)) {
-        assert(dynamic_cast<Section *>(child));
-    }
-    else if (child->Is(ENDING)) {
-        assert(dynamic_cast<Ending *>(child));
-    }
-    else if (child->Is(PB)) {
-        assert(dynamic_cast<Pb *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (Object::IsEditorialElement(classId)) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
+}
+
+void Score::SetScoreDefSubtree(Object *substree, ScoreDef *scoreScoreDef)
+{
+    assert(!m_scoreDef);
+    assert(!m_scoreDefSubtree);
+
+    m_scoreDefSubtree = substree;
+    m_scoreDef = scoreScoreDef;
 }
 
 void Score::CalcRunningElementHeight(Doc *doc)
@@ -128,12 +143,14 @@ void Score::CalcRunningElementHeight(Doc *doc)
 
 bool Score::ScoreDefNeedsOptimization(int optionCondense) const
 {
+    assert(m_scoreDef);
+
     if (optionCondense == CONDENSE_none) return false;
     // optimize scores only if encoded
-    bool optimize = (m_scoreDef.HasOptimize() && m_scoreDef.GetOptimize() == BOOLEAN_true);
+    bool optimize = (m_scoreDef->HasOptimize() && m_scoreDef->GetOptimize() == BOOLEAN_true);
     // if nothing specified, do not if there is only one grpSym
-    if ((optionCondense == CONDENSE_auto) && !m_scoreDef.HasOptimize()) {
-        ListOfConstObjects symbols = m_scoreDef.FindAllDescendantsByType(GRPSYM);
+    if ((optionCondense == CONDENSE_auto) && !m_scoreDef->HasOptimize()) {
+        ListOfObjects symbols = m_scoreDef->FindAllDescendantsByType(GRPSYM);
         optimize = (symbols.size() > 1);
     }
 

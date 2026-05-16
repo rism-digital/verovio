@@ -1,9 +1,9 @@
 LibMEI
 ------
 
-LibMEI is a C++ library for reading and writing [MEI](http://music-encoding.org) files
+LibMEI is a C++ library for reading and writing [MEI](https://music-encoding.org/) files
 
-It was originally developed by the [Distributed Digital Music Archives and Libraries Lab](http://ddmal.music.mcgill.ca/) at the Schulich School of Music at McGill University, Montréal, Canada
+It was originally developed by the [Distributed Digital Music Archives and Libraries Lab](https://ddmal.music.mcgill.ca/) at the Schulich School of Music at McGill University, Montréal, Canada
 
 This is a modified version that is used for generating C++ code for Verovio.
 
@@ -22,17 +22,29 @@ Compilation & Usage
 To install you can use Python `poetry` which will create a virtual environment and automatically
 install the necessary dependencies. The first time you get things set up, from the `libmei` directory run:
 
-    $> poetry install 
+```shell
+poetry install
+```
 
 This will set up a virtual environment for you. When you want to activate the environment, run
 
-    $> poetry shell
+```shell
+poetry env activate
+```
 
-This allows you to run Python with all the necessary dependencies for running the libmei scripts.
+This will show you the command to activate the virtual environment.
 
 To generate the code, activate the poetry environment and, from the `libmei` directory, run:
 
-    $> python3 tools/parseschema2.py ./mei/mei-verovio_compiled.odd
+```shell
+python3 tools/parseschema2.py ./mei/mei-verovio_compiled.odd
+```
+
+If you don't want to activate the virtual environment manually, use:
+
+```shell
+poetry run python3 tools/parseschema2.py ./mei/mei-verovio_compiled.odd
+```
 
 Where the positional argument points to an ODD file for which you wish to generate code.
 

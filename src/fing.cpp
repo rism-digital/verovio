@@ -25,7 +25,7 @@ namespace vrv {
 
 static const ClassRegistrar<Fing> s_factory("fing", FING);
 
-Fing::Fing() : ControlElement(FING, "fing-"), TimePointInterface(), TextDirInterface(), AttNNumberLike()
+Fing::Fing() : ControlElement(FING), TimePointInterface(), TextDirInterface(), AttNNumberLike()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
@@ -44,15 +44,16 @@ void Fing::Reset()
     this->ResetNNumberLike();
 }
 
-bool Fing::IsSupportedChild(Object *child)
+bool Fing::IsSupportedChild(ClassId classId)
 {
-    if (child->Is({ LB, REND, TEXT })) {
-        assert(dynamic_cast<TextElement *>(child));
+    static const std::vector<ClassId> supported{ LB, REND, TEXT };
+
+    if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 bool Fing::IsCloserToStaffThan(const FloatingObject *other, data_STAFFREL drawingPlace) const
