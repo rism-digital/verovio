@@ -644,6 +644,11 @@ public:
     OptionBool m_condenseTempoPages;
     OptionBool m_evenNoteSpacing;
     OptionIntMap m_footer;
+    // 17-may-2026 GABC options for features not directly representable in MEI Neume module
+    // (grammar rules: clef, virga_left, marking of uncertain readings, S-GABC section 6.5).
+    OptionBool m_gabcAquitanianContext;
+    OptionBool m_gabcExtendedSymbols;
+    OptionInt m_gabcStaffLines;
     OptionIntMap m_header;
     OptionBool m_humType;
     OptionBool m_incip;

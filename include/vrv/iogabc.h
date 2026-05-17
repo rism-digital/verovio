@@ -67,6 +67,8 @@ public:
 private:
     int m_currentClefPitchOffset;
     Layer *m_layer;
+    // 17-may-2026 set when a `cb<n>` clef is parsed so Import() can add a KeySig to the StaffDef.
+    bool m_pendingFlatOnClef = false;
 };
 
 } // namespace vrv

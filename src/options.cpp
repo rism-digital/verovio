@@ -1032,6 +1032,26 @@ Options::Options()
     m_footer.Init(FOOTER_auto, &Option::s_footer);
     this->Register(&m_footer, "footer", &m_general);
 
+    // 17-may-2026 GABC options — cover features of the GABC grammar that have no direct MEI Neume
+    // counterpart. They are registered in the general group, alongside m_neumeAsNote.
+    m_gabcAquitanianContext.SetInfo("GABC Aquitanian context",
+        "Render the GABC `V` left-stem (grule virga_left) using tilt=\"ne\" instead of the default "
+        "tilt=\"n\" used for square notation (see S-GABC paper, Table mei1).");
+    m_gabcAquitanianContext.Init(false);
+    this->Register(&m_gabcAquitanianContext, "gabcAquitanianContext", &m_general);
+
+    m_gabcExtendedSymbols.SetInfo("GABC extended (S-GABC) symbols",
+        "Enable the S-GABC proposed symbols: `r` for uncertain reading (S-GABC sec. 6.5) and `\"` "
+        "for clarifying lines (S-GABC sec. 6.3).");
+    m_gabcExtendedSymbols.Init(false);
+    this->Register(&m_gabcExtendedSymbols, "gabcExtendedSymbols", &m_general);
+
+    m_gabcStaffLines.SetInfo("GABC staff lines",
+        "Number of staff lines for GABC import (the GABC `staff-lines:` header value); accepted "
+        "values are 4 (default) and 5 — see Inconsistencies table, feature 2.");
+    m_gabcStaffLines.Init(4, 4, 5);
+    this->Register(&m_gabcStaffLines, "gabcStaffLines", &m_general);
+
     m_header.SetInfo("Header", "Control header layout");
     m_header.Init(HEADER_auto, &Option::s_header);
     this->Register(&m_header, "header", &m_general);

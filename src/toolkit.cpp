@@ -243,7 +243,17 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         // Title record for a melody in EsAC format.
         return ESAC;
     }
-    // TODO drizo - Add specific checks for GABC
+    // 17-may-2026 GABC auto-detection. A GABC file always carries a header block — a sequence of
+    // `name:value;` attributes — terminated by `%%` on its own line before the body. The body in
+    // turn uses the `lyric(music)` syntax where the music is enclosed in parentheses and the pitch
+    // letters are restricted to a..p, plus prefix/suffix punctuation (see S-GABC grammar, grule
+    // body / grule syllable / grule syl_musical_symbols, in the .tex referenced from CLAUDE.md
+    // section "GABC / S-GABC Specification Reference"). The `%%` separator is the most reliable
+    // marker because it cannot legally appear inside MEI, ABC (which starts with `X:`), or PAE.
+    // We only look at the prefix to avoid scanning very large files.
+    if (initial.find("\n%%") != std::string::npos || initial.compare(0, 3, "%%\n") == 0) {
+        return GABC;
+    }
 
     // Assume that the input is MEI if other input types were not detected.
     // This means that DARMS cannot be auto-detected.

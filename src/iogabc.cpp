@@ -3,6 +3,15 @@
 // Author:      David Rizo
 // Created:     2025
 // Copyright (c) Authors and others. All rights reserved.
+//
+// The grammar implemented here follows the S-GABC paper:
+//   Rizo et al., "A Preliminary Proposal for a Systematic GABC Encoding of
+//   Gregorian Chant", DLfM 2024.
+// LaTeX source (master copy used while iterating on this branch):
+//   /Users/drizo/cmg/investigacion/congresos/2024/dlfm2024/DLfM[2024] - S-GABC/
+//     sample-authordraft.tex
+// `grule <name>` mentions in the inline 17-may-2026 comments map to
+// \label{<name>} inside that .tex (the GABC grammar figure).
 /////////////////////////////////////////////////////////////////////////////
 
 #include "iogabc.h"
@@ -28,12 +37,15 @@
 #include "clef.h"
 #include "custos.h"
 #include "doc.h"
+#include "keyaccid.h"
+#include "keysig.h"
 #include "layer.h"
 #include "liquescent.h"
 #include "mdiv.h"
 #include "measure.h"
 #include "nc.h"
 #include "neume.h"
+#include "options.h"
 #include "oriscus.h"
 #include "quilisma.h"
 #include "score.h"
@@ -73,36 +85,68 @@ using ClefPitchOffsetType = std::tuple<data_CLEFSHAPE, int, int>;
 // base table on c2, following the older reference converter:
 //   c2: a..m = e3 f3 g3 a3 b3 c4 d4 e4 f4 g4 a4 b4 c5
 // Other clefs are expressed as diatonic offsets from that c2 mapping.
+// 17-may-2026 added c5 / f5 (grule clef, grule clef_number num_5; only valid on a 5-line staff,
+// see Inconsistencies table feature 3) and cb3 (grule clef_flat, see paper section "Brief intro
+// to GABC"). The flat sign for cb3 is materialised below as a KeySig attached to the StaffDef.
 static const std::map<std::string, ClefPitchOffsetType> GABC_CLEFS{
     { "c1", { CLEFSHAPE_C, 1, 2 } },
     { "c2", { CLEFSHAPE_C, 2, 0 } },
     { "c3", { CLEFSHAPE_C, 3, -2 } },
     { "c4", { CLEFSHAPE_C, 4, -4 } },
+    { "c5", { CLEFSHAPE_C, 5, -6 } },
     { "f2", { CLEFSHAPE_F, 2, -4 } },
     { "f3", { CLEFSHAPE_F, 3, -6 } },
     { "f4", { CLEFSHAPE_F, 4, -8 } },
-    { "cb3", { CLEFSHAPE_C, 3, -2 } }, // TODO add the flat sign itself
+    { "f5", { CLEFSHAPE_F, 5, -10 } },
+    { "cb1", { CLEFSHAPE_C, 1, 2 } },
+    { "cb2", { CLEFSHAPE_C, 2, 0 } },
+    { "cb3", { CLEFSHAPE_C, 3, -2 } },
+    { "cb4", { CLEFSHAPE_C, 4, -4 } },
 };
 
 bool GABCInput::ProcessClef(const std::string &word)
 {
+    // 17-may-2026 handle the GABC multi-clef syntax `c2@c4` / `f3@f4` (paper section "Inconsistencies
+    // between engraving software", Inconsistencies table feature 1). Only the first clef carries the
+    // pitch reference; following clefs are added so that they appear on the staff but do not shift
+    // the GABC letter-to-pitch mapping for the remainder of the input.
+    std::string::size_type at = word.find('@');
+    if (at != std::string::npos) {
+        const std::string first = word.substr(0, at);
+        const std::string second = word.substr(at + 1);
+        if (GABC_CLEFS.find(first) == GABC_CLEFS.end() || GABC_CLEFS.find(second) == GABC_CLEFS.end()) {
+            return false;
+        }
+        this->ProcessClef(first);
+        const int savedOffset = m_currentClefPitchOffset;
+        this->ProcessClef(second);
+        m_currentClefPitchOffset = savedOffset;
+        return true;
+    }
+
     auto it = GABC_CLEFS.find(word);
     if (it == GABC_CLEFS.end()) {
         LogDebug("Not a clef");
-        return false; // not a clef
+        return false;
     }
 
-    const auto &[shape, line, offset] = it->second; // tuple = {shape, line, offset}
+    const auto &[shape, line, offset] = it->second;
 
     Clef *clef = new Clef();
     clef->SetLine(line);
     clef->SetShape(shape);
-    m_layer->AddChild(clef); // TODO: "bajo" con staffDef
+    m_layer->AddChild(clef);
+
+    // 17-may-2026 grule clef_flat (`cb<n>`). The flat sign attached to the clef is rendered by
+    // emitting a KeySig with a single b-flat KeyAccid on the staff line that holds `b` for the
+    // chosen clef. We keep a flag so Import() can attach the KeySig to the StaffDef.
+    if (!word.empty() && word.length() >= 2 && word[1] == 'b') {
+        m_pendingFlatOnClef = true;
+    }
 
     m_currentClefPitchOffset = offset;
     LogDebug("Clef found %s", word.c_str());
     return true;
-    // TODO: several clefs c1@c4, f3@f4
 }
 
 int GABCInput::ProcessCustos(const std::string &word)
@@ -208,9 +252,15 @@ void GABCInput::AddAccidental(Syllable *syllable, data_ACCIDENTAL_WRITTEN accid,
 
 void GABCInput::AddEpisema(Nc *nc, const std::string &form)
 {
-    /*TODO no existe ?? Episema *episema = new Episema();
-    episema->SetForm(form);
-    nc->AddChild(episema);*/
+    // 17-may-2026 No MEI <episema> element class exists in Verovio yet. We expose the parsed
+    // form ("v", "h", "h0".."h5") as Nc/@type so the information is preserved on round-trip
+    // until the schema is implemented. Multiple suffix episemas on the same nc are concatenated
+    // with a space, matching MEI's att.typed convention. See paper Table mei2.
+    std::string current = nc->HasType() ? nc->GetType() : std::string();
+    const std::string tag = "episema-" + form;
+    if (!current.empty()) current += " ";
+    current += tag;
+    nc->SetType(current);
 }
 
 // TODO curva anterior - depende del pitch NC anterior - Rising - Falling melody en DLFM
@@ -228,8 +278,12 @@ int GABCInput::ProcessSuffix(const std::string &music, int currentIndex, Nc *nc,
     char nextChar2 = '\0';
     switch (nextChar) {
         case 'V':
+            // 17-may-2026 grule virga_left. Aquitanian sources use a north-east tilt instead of
+            // the north tilt used for square notation (S-GABC paper, Table mei1, second-row note
+            // "with tilt='ne' for Aquitanian"). The choice is exposed as a CLI option.
             processedChars++;
-            nc->SetTilt(COMPASSDIRECTION_n);
+            nc->SetTilt(
+                m_doc->GetOptions()->m_gabcAquitanianContext.GetValue() ? COMPASSDIRECTION_ne : COMPASSDIRECTION_n);
             break;
 
         case 'v':
@@ -273,16 +327,29 @@ int GABCInput::ProcessSuffix(const std::string &music, int currentIndex, Nc *nc,
             nc->SetType("epiphonus");
             break;
 
-        case '\'': // episema_vertical
+        case '\'':
+            // 17-may-2026 grule episema_vertical (vertical episema / ictus). MEI 5.x Neume module
+            // exposes <episema form="v"/> but Verovio does not yet model that element. We carry the
+            // information through Nc/@type so the round-trip is preserved and downstream tools can
+            // pick it up. See paper Table mei2 row "Vertical episema (ictus)".
             processedChars++;
+            this->AddEpisema(nc, "v");
             break;
 
-        case '_': // episema_horizontal
+        case '_':
+            // 17-may-2026 grule episema_horizontal — with optional grule position_horizontal_episema
+            // (digit 0-5). Same MEI-class limitation as the vertical case; we store form + position
+            // in Nc/@type as a single tag (`h`, `h0`..`h5`). See paper Table mei2.
             processedChars++;
             nextChar = GetCharAt(music, currentIndex + processedChars);
             if (nextChar >= '0' && nextChar <= '5') {
                 processedChars++;
-                // TODO horizontal episema subtype if needed
+                std::string form = "h";
+                form += nextChar;
+                this->AddEpisema(nc, form);
+            }
+            else {
+                this->AddEpisema(nc, "h");
             }
             break;
 
@@ -353,7 +420,8 @@ void GABCInput::ProcessNeume(const std::string &music, Syllable *syllable)
                 if (lastWasStrophicus) {
                     // Skip the separator if the next element is another strophicus:
                     // either explicit 'pitch + s' form or bare 's' repetition form
-                    bool nextIsStrophicus = ((next >= 'a' && next <= 'm') && (GetCharAt(music, currentIndex + 2) == 's'))
+                    bool nextIsStrophicus
+                        = ((next >= 'a' && next <= 'm') && (GetCharAt(music, currentIndex + 2) == 's'))
                         || (next == 's');
                     if (nextIsStrophicus) {
                         currentIndex++;
@@ -385,6 +453,37 @@ void GABCInput::ProcessNeume(const std::string &music, Syllable *syllable)
 
         // Any other character ends the strophicus group
         lastWasStrophicus = false;
+
+        // 17-may-2026 S-GABC proposed symbols (paper section "Missing Features and Proposal",
+        // Table "Summary of Proposed Missing Symbols"). They are only honored when the
+        // gabcExtendedSymbols option is enabled, otherwise they fall through to the
+        // "unknown character" branch and are skipped.
+        if (m_doc->GetOptions()->m_gabcExtendedSymbols.GetValue()) {
+            if (ch == 'r') {
+                // S-GABC proposal #3 — uncertain reading. Emit an empty Nc tagged @type="uncertain"
+                // so the position in the neume is preserved but no pitch is committed.
+                Nc *uncertainNc = new Nc();
+                uncertainNc->SetType("uncertain");
+                if (!neume) neume = new Neume();
+                neume->AddChild(uncertainNc);
+                previousNC = uncertainNc;
+                currentIndex++;
+                continue;
+            }
+            if (ch == '"') {
+                // S-GABC proposal #1 — clarifying line. MEI has no neume-internal divider element
+                // in this Verovio build, so we record it as @type="clarifying-line" on the *next*
+                // Nc by re-using the strophicus-anchor strategy: tag the previous Nc and consume.
+                if (previousNC) {
+                    std::string current = previousNC->HasType() ? previousNC->GetType() : std::string();
+                    if (!current.empty()) current += " ";
+                    current += "clarifying-line";
+                    previousNC->SetType(current);
+                }
+                currentIndex++;
+                continue;
+            }
+        }
 
         std::optional<GABCPrefixes> prefixOpt = this->FindPrefix(music, currentIndex);
 
@@ -619,6 +718,7 @@ void GABCInput::ProcessInput(const std::string &gabc)
 bool GABCInput::Import(const std::string &gabc)
 {
     m_currentClefPitchOffset = 0;
+    m_pendingFlatOnClef = false;
     m_doc->Reset();
     m_doc->SetType(Raw);
     m_doc->SetMensuralMusicOnly(BOOLEAN_true); // no measures
@@ -645,7 +745,22 @@ bool GABCInput::Import(const std::string &gabc)
     StaffDef *staffDef = new StaffDef();
     staffDef->SetNotationtype(NOTATIONTYPE_neume);
     staffDef->SetN(1);
-    staffDef->SetLines(4); // TODO code for lines
+    // 17-may-2026 The number of staff lines comes from the gabcStaffLines CLI option, which mirrors
+    // the GABC `staff-lines:` header (paper Inconsistencies table, feature 2). The default is 4.
+    staffDef->SetLines(m_doc->GetOptions()->m_gabcStaffLines.GetValue());
+
+    // 17-may-2026 grule clef_flat — attach a one-accidental KeySig to the StaffDef when a `cb<n>`
+    // clef was seen in the input. The flat is on `b` (B-flat), which is the only flat allowed in
+    // GABC. See paper section "Brief introduction to GABC".
+    if (m_pendingFlatOnClef) {
+        KeySig *keySig = new KeySig();
+        KeyAccid *keyAccid = new KeyAccid();
+        keyAccid->SetAccid(ACCIDENTAL_WRITTEN_f);
+        keyAccid->SetPname(PITCHNAME_b);
+        keySig->AddChild(keyAccid);
+        staffDef->AddChild(keySig);
+    }
+
     staffGrp->AddChild(staffDef);
     m_doc->GetFirstScoreDef()->AddChild(staffGrp);
 
@@ -717,13 +832,18 @@ GABCInput::PitchOctaveType GABCInput::MakePitchFromDiatonicIndex(int absoluteDia
 
 std::optional<GABCInput::PitchOctaveType> GABCInput::FindPitch(char ch, int clefPitchOffset)
 {
-    if (ch < 'a' || ch > 'm') {
+    // 17-may-2026 grule square_pitch extended past `m` with `n` and `p` (the letter `o` is reserved
+    // for the oriscus suffix, see grule oriscus). The paper notes these characters are necessary
+    // when a c5 clef is in use because `m` only reaches the space above the fifth line — see
+    // Inconsistencies table, feature 4.
+    if (ch < 'a' || ch > 'p' || ch == 'o') {
         return std::nullopt;
     }
 
     // Base c2 mapping: a..m = e3..c5.
     constexpr int c2BaseDiatonicIndexForA = 3 * 7 + 2; // E3
     int letterIndex = ch - 'a';
+    if (ch == 'p') letterIndex = 14; // collapse the gap left by skipping `o`
     int absoluteDiatonicIndex = c2BaseDiatonicIndexForA + letterIndex + clefPitchOffset;
 
     return MakePitchFromDiatonicIndex(absoluteDiatonicIndex);
