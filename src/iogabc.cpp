@@ -36,6 +36,7 @@
 #include "barline.h"
 #include "clef.h"
 #include "custos.h"
+#include "divline.h" // 18-may-2026 for GABC divisio barlines (`,` `;` `::`)
 #include "doc.h"
 #include "keyaccid.h"
 #include "keysig.h"
@@ -151,22 +152,37 @@ bool GABCInput::ProcessClef(const std::string &word)
 
 int GABCInput::ProcessCustos(const std::string &word)
 {
+    // 18-may-2026 GABC custos grammar (grule custos): three lexical variants exist and the
+    // distinction is musicologically meaningful, so we preserve it via Custos/@type instead of
+    // collapsing all three to the same MEI element.
+    //   `Z`  → manual / forced custos placed at the explicit GABC position.
+    //   `z`  → automatic end-of-line custos (the engraver inserts it implicitly).
+    //   `z0` → automatic custos with the "no-clef-change-follows" annotation; some engravers
+    //          (e.g. Gregorio) suppress its rendering, others draw it greyed out. We keep the
+    //          element so the round-trip is lossless; downstream tooling / a future render
+    //          option can choose to hide it.
+    // The exact horizontal position relative to the next clef change is a render-time concern
+    // and is left to the layout pass — we only set the type tag here.
     char firstChar = GetCharAt(word, 0);
     int processedChars = 0;
     if (firstChar == 'Z') {
-        Custos *custos = new Custos(); // TODO posición?
+        Custos *custos = new Custos();
+        custos->SetType("manual");
         m_layer->AddChild(custos);
         processedChars = 1;
     }
     else if (firstChar == 'z') {
-        // TODO Qué hace el 0?
-        Custos *custos = new Custos(); // TODO posición? -- función con el caso Z
-        m_layer->AddChild(custos);
+        Custos *custos = new Custos();
         processedChars = 1;
         char nextChar = GetCharAt(word, 1);
         if (nextChar == '0') {
+            custos->SetType("auto-suppressed");
             processedChars = 2;
-        } // TODO Qué hacemos con el 0?
+        }
+        else {
+            custos->SetType("auto");
+        }
+        m_layer->AddChild(custos);
     }
 
     if (processedChars > 0) {
@@ -176,6 +192,11 @@ int GABCInput::ProcessCustos(const std::string &word)
 }
 
 // It returns a prefix and advances the index or NONE if not found.
+// 18-may-2026 Side effect: when a prefix carries variant information that we want to preserve
+// across to the next Nc (cut size, no-space, deprecated remove-first-stem), the tag is appended
+// to m_pendingNcType. ProcessNeume drains the accumulator into the next Nc's @type and clears it.
+// The oblique-ligature prefix continues to be communicated via the return value because it
+// triggers structural (tilt/ligated) attribute changes, not a free-form @type tag.
 std::optional<GABCPrefixes> GABCInput::FindPrefix(const std::string &music, int &currentIndex)
 {
     int nextCurrentIndex = currentIndex;
@@ -188,30 +209,59 @@ std::optional<GABCPrefixes> GABCInput::FindPrefix(const std::string &music, int 
         return GABC_OBLIQUE_LIGATURE;
     }
 
+    // Helper: append a token to m_pendingNcType using the space-separated MEI att.typed convention.
+    auto appendPendingType = [this](const std::string &tag) {
+        if (!m_pendingNcType.empty()) m_pendingNcType += " ";
+        m_pendingNcType += tag;
+    };
+
     switch (GetCharAt(music, currentIndex)) {
         case '!':
+            // 18-may-2026 grule no_space (`!`). No dedicated MEI element; tag the next Nc so
+            // engravers wanting GABC-faithful spacing can pick it up. Paper table mei1.
             nextCurrentIndex++;
+            appendPendingType("no-space");
             result = GABC_NO_SPACE;
             break;
         case '@':
+            // 18-may-2026 grule remove_first_stem (`@`). S-GABC §6.1 proposes removing this
+            // rule from the grammar. We continue to parse it for backward compatibility with
+            // existing GABC files, but (a) emit a deprecation warning to stderr/log and
+            // (b) tag the next Nc with @type="remove-first-stem" so curated editions can
+            // locate and migrate these occurrences automatically.
             nextCurrentIndex++;
+            LogWarning("GABC '@' (remove_first_stem) prefix is deprecated per S-GABC §6.1; "
+                       "the next Nc will be tagged @type=\"remove-first-stem\" for round-trip.");
+            appendPendingType("remove-first-stem");
             result = GABC_REMOVE_FIRST_STEM;
             break;
         case '/':
+            // 18-may-2026 grule neumatic_cut. We now preserve the *flavor* of the cut on the
+            // next Nc's @type. MEI has no element for the cut itself in this Verovio build,
+            // and the cut also acts as a neume separator (handled in ProcessNeume); the @type
+            // captures the visual width hint so round-trip is non-lossy.
+            //   `//`   → "neumatic-cut-double"   (wider neumatic spacing)
+            //   `/0`   → "neumatic-cut-zero"     (no space — tight neumatic group)
+            //   `/[n]` → "neumatic-cut-n<n>"     (size 1..6; negative form "n--<n>" for squashing)
+            // A bare `/` (the standard neume separator) is *not* a cut and is handled outside
+            // this function in ProcessNeume — it does not even enter this switch's `/` branch
+            // because the inner lookahead simply leaves `result` unset.
             nextCurrentIndex++;
             char char2 = GetCharAt(music, nextCurrentIndex);
             if (char2 == '/') {
-                // Prefix: "//"
-                result = GABC_NEUMATIC_CUT; // TODO Tipo
+                appendPendingType("neumatic-cut-double");
+                result = GABC_NEUMATIC_CUT;
             }
             else if (char2 == '0') {
-                // Prefix: "/0"
+                appendPendingType("neumatic-cut-zero");
                 result = GABC_NEUMATIC_CUT;
-                // TODO Tipo
             }
             else if (char2 == '[') {
-                // Prefix: '[' '-'? [1-6] ']'
-                nextCurrentIndex++;
+                // Prefix: '[' '-'? [1-6] ']' (the closing ']' is accepted but tolerated if absent
+                // — some GABC sources in the wild omit it). On match we advance past the digit so
+                // the caller resumes after the size token; the optional ']' is also consumed when
+                // present.
+                nextCurrentIndex++; // past '['
                 char next = GetCharAt(music, nextCurrentIndex);
                 bool negative = false;
                 if (next == '-') {
@@ -224,8 +274,20 @@ std::optional<GABCPrefixes> GABCInput::FindPrefix(const std::string &music, int 
                     if (negative) {
                         value = -value;
                     }
+                    nextCurrentIndex++; // past the digit
+                    if (GetCharAt(music, nextCurrentIndex) == ']') {
+                        nextCurrentIndex++; // past the closing ']'
+                    }
+                    std::string tag = "neumatic-cut-n";
+                    if (value < 0) {
+                        tag += "-";
+                        tag += static_cast<char>('0' + (-value));
+                    }
+                    else {
+                        tag += static_cast<char>('0' + value);
+                    }
+                    appendPendingType(tag);
                     result = GABC_NEUMATIC_CUT;
-                    // TODO Tipo
                 }
             }
             break;
@@ -263,9 +325,9 @@ void GABCInput::AddEpisema(Nc *nc, const std::string &form)
     nc->SetType(current);
 }
 
-// TODO curva anterior - depende del pitch NC anterior - Rising - Falling melody en DLFM
 void GABCInput::AddLiquescent(Nc *nc, curvatureDirection_CURVE curve)
 {
+    //const bool gabcNoTailsOption = m_doc->GetOptions()->m_liquescentWithoutTails.GetValue();
     Liquescent *liquescent = new Liquescent();
     nc->AddChild(liquescent);
     nc->SetCurve(curve);
@@ -373,16 +435,46 @@ int GABCInput::ProcessSuffix(const std::string &music, int currentIndex, Nc *nc,
 
 int GABCInput::ProcessBarline(const std::string &music, int currentIndex, Layer *layer)
 {
+    // 18-may-2026 GABC divisio grammar (paper "Brief introduction to GABC", table mei1 row
+    // "Divisions"). Four lexical variants exist; previously only `:` was handled and was emitted
+    // as a generic CMN BarLine. The MEI neume module provides <divLine> with a `form` enum that
+    // maps cleanly to the GABC distinctions:
+    //   `,`   divisio minima   → DivLine @form="virgula"
+    //   `;`   divisio minor    → DivLine @form="minima"
+    //   `:`   divisio maior    → DivLine @form="maior"
+    //   `::`  divisio finalis  → DivLine @form="finalis"
+    // The double-colon must be tested before the single colon (longest-match). DivLine inherits
+    // from LayerElement so it is accepted by Layer::IsSupportedChild. We no longer emit a CMN
+    // BarLine for these — the neume module's element is the semantically correct choice.
     int processedChars = 0;
-    switch (GetCharAt(music, currentIndex)) {
-        case ':':
-            LogDebug("Barline found: single");
-            processedChars++; // TODO
-            BarLine *barline = new BarLine();
-            barline->SetForm(BARRENDITION_single);
-            layer->AddChild(barline);
-            break;
+    char ch = GetCharAt(music, currentIndex);
+    char next = GetCharAt(music, currentIndex + 1);
+
+    std::optional<divLineLog_FORM> form;
+    if (ch == ':' && next == ':') {
+        form = divLineLog_FORM_finalis;
+        processedChars = 2;
     }
+    else if (ch == ':') {
+        form = divLineLog_FORM_maior;
+        processedChars = 1;
+    }
+    else if (ch == ';') {
+        form = divLineLog_FORM_minima;
+        processedChars = 1;
+    }
+    else if (ch == ',') {
+        form = divLineLog_FORM_virgula;
+        processedChars = 1;
+    }
+
+    if (form.has_value()) {
+        LogDebug("Divisio found: %c (form=%d)", ch, static_cast<int>(form.value()));
+        DivLine *divLine = new DivLine();
+        divLine->SetForm(form.value());
+        layer->AddChild(divLine);
+    }
+
     return processedChars;
 }
 
@@ -576,6 +668,21 @@ void GABCInput::ProcessNeume(const std::string &music, Syllable *syllable)
             if (!neume) neume = new Neume();
             neume->AddChild(currentNC);
 
+            // 18-may-2026 drain any pending @type tokens accumulated by FindPrefix (cut size,
+            // no-space, remove-first-stem) into this Nc and clear the accumulator. Placed AFTER
+            // the accidental / `/s` discard branches above so the prefix info isn't lost on an
+            // Nc that is about to be deleted (e.g. `!gx` would otherwise drop the no-space tag
+            // when `gx` resolves to just an Accid). Done before the suffix loop so that
+            // suffix-driven @type writes (episema-*, cephalicus, etc.) are appended after the
+            // prefix tokens, preserving paper-order of attributes.
+            if (!m_pendingNcType.empty()) {
+                std::string current = currentNC->HasType() ? currentNC->GetType() : std::string();
+                if (!current.empty()) current += " ";
+                current += m_pendingNcType;
+                currentNC->SetType(current);
+                m_pendingNcType.clear();
+            }
+
             // Process remaining suffixes attached to this note
             while (static_cast<std::size_t>(currentIndex) < music.size()) {
                 int suffixChars = this->ProcessSuffix(music, currentIndex, currentNC, previousNC);
@@ -719,6 +826,7 @@ bool GABCInput::Import(const std::string &gabc)
 {
     m_currentClefPitchOffset = 0;
     m_pendingFlatOnClef = false;
+    m_pendingNcType.clear(); // 18-may-2026 reset cross-token accumulator from any prior Import call
     m_doc->Reset();
     m_doc->SetType(Raw);
     m_doc->SetMensuralMusicOnly(BOOLEAN_true); // no measures

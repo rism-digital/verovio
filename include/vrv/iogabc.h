@@ -69,6 +69,11 @@ private:
     Layer *m_layer;
     // 17-may-2026 set when a `cb<n>` clef is parsed so Import() can add a KeySig to the StaffDef.
     bool m_pendingFlatOnClef = false;
+    // 18-may-2026 accumulator of MEI @type tokens to apply to the *next* Nc created by ProcessNeume.
+    // Used by prefix handlers (FindPrefix) for variants that have no dedicated MEI element in this
+    // build: the neumatic-cut size flavors (`//`, `/0`, `/[n]`), the no-space prefix (`!`), and the
+    // deprecated remove-first-stem prefix (`@`, S-GABC §6.1). Cleared after each Nc is created.
+    std::string m_pendingNcType;
 };
 
 } // namespace vrv

@@ -1363,7 +1363,8 @@ void Toolkit::PrintOptionUsage(const std::string &category, std::ostream &output
         { vrv::OptionsCategory::General, "general" }, { vrv::OptionsCategory::Json, "json" },
         { vrv::OptionsCategory::Layout, "layout" }, { vrv::OptionsCategory::Margins, "margins" },
         { vrv::OptionsCategory::Mensural, "mensural" }, { vrv::OptionsCategory::Midi, "midi" },
-        { vrv::OptionsCategory::Selectors, "selectors" }, { vrv::OptionsCategory::Full, "full" } };
+        { vrv::OptionsCategory::Neume, "neume" }, { vrv::OptionsCategory::Selectors, "selectors" },
+        { vrv::OptionsCategory::Full, "full" } };
 
     output.precision(2);
     // display_version();

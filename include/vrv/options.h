@@ -95,7 +95,7 @@ enum option_SMUFLTEXTFONT { SMUFLTEXTFONT_embedded = 0, SMUFLTEXTFONT_linked, SM
 // Option
 //----------------------------------------------------------------------------
 
-enum class OptionsCategory { None, Base, General, Json, Layout, Mensural, Margins, Midi, Selectors, Full };
+enum class OptionsCategory { None, Base, General, Json, Layout, Mensural, Margins, Midi, Neume, Selectors, Full };
 
 /**
  * This class is a base class of each styling parameter
@@ -644,11 +644,6 @@ public:
     OptionBool m_condenseTempoPages;
     OptionBool m_evenNoteSpacing;
     OptionIntMap m_footer;
-    // 17-may-2026 GABC options for features not directly representable in MEI Neume module
-    // (grammar rules: clef, virga_left, marking of uncertain readings, S-GABC section 6.5).
-    OptionBool m_gabcAquitanianContext;
-    OptionBool m_gabcExtendedSymbols;
-    OptionInt m_gabcStaffLines;
     OptionIntMap m_header;
     OptionBool m_humType;
     OptionBool m_incip;
@@ -877,6 +872,19 @@ public:
     OptionBool m_mensuralScoreUp;
     OptionIntMap m_mensuralResponsiveView;
     OptionBool m_mensuralToCmn;
+
+    /**
+     * Neume
+     */
+    OptionGrp m_neume;
+
+    // 18-may-2026 Neume options. Cover GABC import features that have no direct MEI Neume module
+    // counterpart (grammar rules: clef, virga_left, S-GABC sec. 6.3/6.5) plus rendering tweaks
+    // for chant notation.
+    OptionBool m_gabcAquitanianContext;
+    OptionBool m_gabcExtendedSymbols;
+    OptionInt m_gabcStaffLines;
+    OptionBool m_liquescentWithoutTails;
 
     /**
      * Additional options for passing method JSON options to the command-line
