@@ -2317,7 +2317,11 @@ enum {
     ERR_071_KEYSIG_NATURAL,
     ERR_072_KEYSIG_REPEATED_ACCID,
     ERR_073_KEYSIG_SUPPLIED_STRUCT,
-    ERR_074_KEYSIG_INVALID
+    ERR_074_KEYSIG_INVALID,
+    ERR_075_CHORD_NESTED,
+    ERR_076_CHORD_CLOSING,
+    ERR_077_CHORD_INVALID,
+    ERR_078_CHORD_OPEN,
 };
 
 // clang-format off
@@ -2395,7 +2399,11 @@ const std::map<int, std::string> PAEInput::s_errCodes{
     { ERR_071_KEYSIG_NATURAL, "A key signature with 'n' must not have note names." },
     { ERR_072_KEYSIG_REPEATED_ACCID, "A key signature must not have repeated note names." },
     { ERR_073_KEYSIG_SUPPLIED_STRUCT, "Key signature supplied block is empty, open, or in wrong sequence." },
-    { ERR_074_KEYSIG_INVALID, "Invalid or incomplete key signature structure." }
+    { ERR_074_KEYSIG_INVALID, "The key siganture structure is invalid or incomplete." },
+    { ERR_075_CHORD_NESTED, "A chord cannot be started with '^' before closing the previous one." },
+    { ERR_076_CHORD_CLOSING, "An extra '>' to close a chord is present." },
+    { ERR_077_CHORD_INVALID, "An invalid charater is present in the chord." },
+    { ERR_078_CHORD_OPEN, "The chord must be closed with '>' before the end of the measure." },
 };
 
 // clang-format on
@@ -4047,7 +4055,8 @@ bool PAEInput::ConvertChordV1()
 bool PAEInput::ConvertChordV2()
 {
     if (!this->HasInput('^')) return true;
-    
+
+    const std::string valid = pae::NOTENAME + pae::OCTAVE + pae::ACCIDENTAL_INTERNAL;
 
     Chord *chord = NULL;
 
@@ -4062,7 +4071,7 @@ bool PAEInput::ConvertChordV2()
         if (token->m_char == '^') {
             token->m_char = 0;
             if (chord) {
-                this->LogPAE(ERR_032_TUPLET_NESTED, *token);
+                this->LogPAE(ERR_075_CHORD_NESTED, *token);
                 if (m_pedanticMode) return false;
                 ++token;
                 continue;
@@ -4073,7 +4082,7 @@ bool PAEInput::ConvertChordV2()
         else if (token->m_char == '>') {
             token->m_char = 0;
             if (!chord) {
-                this->LogPAE(ERR_033_TUPLET_CLOSING, *token);
+                this->LogPAE(ERR_076_CHORD_CLOSING, *token);
                 if (m_pedanticMode) return false;
                 ++token;
                 continue;
@@ -4082,16 +4091,17 @@ bool PAEInput::ConvertChordV2()
             token->m_char = pae::CONTAINER_END;
             chord = NULL;
         }
-        else if (this->Is(*token, pae::DURATION)) {
-            //this->LogPAE(ERR_033_TUPLET_CLOSING, *token);
-            //if (m_pedanticMode) return false;
+        else if (!this->Is(*token, valid) && !this->Was(*token, valid)) {
+            if (chord) {
+                this->LogPAE(ERR_077_CHORD_INVALID, *token);
+                if (m_pedanticMode) return false;
+            }
         }
         else if (token->IsEnd() || token->Is(MEASURE)) {
             if (chord) {
-                this->LogPAE(ERR_035_TUPLET_OPEN, *token);
+                this->LogPAE(ERR_078_CHORD_OPEN, *token);
                 if (m_pedanticMode) return false;
                 token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, pae::UNKOWN_POS, chord));
-                //chord->SetNum(GetNum(tupletNumStr));
                 chord = NULL;
             }
         }
@@ -4099,76 +4109,6 @@ bool PAEInput::ConvertChordV2()
     }
 
     return true;
-
-    /*
-    // A flag for the chord status NONE|MARKER|NOTE
-    pae::status_CHORD status = pae::CHORD_NONE;
-    // The iterator of the last note that can become the first note of a chord
-    std::list<pae::Token>::iterator note = m_pae.end();
-
-    std::list<pae::Token>::iterator token = m_pae.begin();
-    while (token != m_pae.end()) {
-        if (token->IsVoid()) {
-            ++token;
-            continue;
-        }
-
-        // We encounter a chord marker - change the status if we have a note previously
-        if (token->m_char == '^') {
-            token->m_char = 0;
-            if (note == m_pae.end()) {
-                this->LogPAE(ERR_020_CHORD_NOTE_BEFORE, *token);
-                if (m_pedanticMode) return false;
-            }
-            else {
-                status = pae::CHORD_MARKER;
-            }
-            ++token;
-            continue;
-        }
-
-        // We expect a note
-        if (status == pae::CHORD_MARKER) {
-            // If we have a note, we change the status - we will be able to decide to close the chord on the next token
-            if (token->Is(NOTE)) {
-                status = pae::CHORD_NOTE;
-            }
-            // After a marker, we should allow octave or accidental markers, but nothing else
-            else if (!this->Was(*token, pae::ACCIDENTAL_INTERNAL) && !this->Was(*token, pae::OCTAVE)) {
-                this->LogPAE(ERR_021_CHORD_NOTE_AFTER, *token);
-                if (m_pedanticMode) return false;
-                status = pae::CHORD_NONE;
-                note = m_pae.end();
-            }
-            ++token;
-            continue;
-        }
-
-        // We passed the last note of the chord - create it
-        if (status == pae::CHORD_NOTE) {
-            Chord *chord = new Chord();
-            m_pae.insert(note, pae::Token(0, pae::UNKOWN_POS, chord));
-            m_pae.insert(token, pae::Token(pae::CONTAINER_END, pae::UNKOWN_POS, chord));
-        }
-
-        status = pae::CHORD_NONE;
-        if (token->Is(NOTE)) {
-            note = token;
-        }
-        // Previous token was already a note - we allow fermata or trill on the first note of a chord
-        else if (note != m_pae.end() && ((token->m_char == 0 && token->m_inputChar == ')') || token->Is(TRILL))) {
-            ++token;
-            continue;
-        }
-        else {
-            note = m_pae.end();
-        }
-
-        ++token;
-    }
-
-    return true;
-     */
 }
 
 bool PAEInput::ConvertBeam()
@@ -5255,7 +5195,6 @@ bool PAEInput::ParseKeySigV2(KeySig *keySig, const std::string &paeStr, pae::Tok
             this->LogPAE(ERR_071_KEYSIG_NATURAL, token);
             if (m_pedanticMode) return false;
         }
-        // The enclose information is lost
         keySig->SetSig({ 0, ACCIDENTAL_WRITTEN_n });
     }
     else {
