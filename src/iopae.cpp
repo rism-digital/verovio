@@ -3049,7 +3049,7 @@ bool PAEInput::Parse()
     if (success) success = this->ConvertPitch();
 
     if (success) success = this->ConvertOctave();
-    
+
     if (success && m_v2) success = this->ConvertChordV2();
 
     if (success) success = this->ConvertTrill();
@@ -3057,7 +3057,7 @@ bool PAEInput::Parse()
     if (success) success = this->ConvertFermata();
 
     if (success) success = this->ConvertAccidental();
-    
+
     if (success && !m_v2) success = this->ConvertChordV1();
 
     if (success) success = this->ConvertBeam();
@@ -5231,7 +5231,7 @@ bool PAEInput::ParseKeySigV2(KeySig *keySig, const std::string &paeStr, pae::Tok
                     if (m_pedanticMode) return false;
                 }
                 else {
-                    key.push_back(std::make_pair(pitch, (enclosed || fullySupplied)));
+                    key.push_back(std::make_pair(pitch, enclosed));
                 }
             }
         }
@@ -5305,6 +5305,11 @@ bool PAEInput::ParseKeySigV2(KeySig *keySig, const std::string &paeStr, pae::Tok
                 }
             }
         }
+    }
+
+    // This can be changed to keSig@enclose if that becomes possible in MEI
+    if (fullySupplied) {
+        keySig->SetType("pae-v2-supplied");
     }
 
     return true;
