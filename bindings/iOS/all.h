@@ -100,6 +100,7 @@
 #import <VerovioFramework/editortoolkit_shared.h>
 #import <VerovioFramework/elementpart.h>
 #import <VerovioFramework/ending.h>
+#import <VerovioFramework/episema.h>
 #import <VerovioFramework/expan.h>
 #import <VerovioFramework/expansion.h>
 #import <VerovioFramework/expansionmap.h>
