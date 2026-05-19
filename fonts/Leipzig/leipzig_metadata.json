@@ -30,7 +30,7 @@
         "tupletBracketThickness": 0.16
     },
     "fontName": "Leipzig",
-    "fontVersion": "5.2.98",
+    "fontVersion": "5.2.100",
     "glyphBBoxes": {
         "4stringTabClef": {
             "bBoxNE": [
@@ -1322,6 +1322,16 @@
                 -0.6
             ]
         },
+        "chantEpisema": {
+            "bBoxNE": [
+                0.68,
+                0.58
+            ],
+            "bBoxSW": [
+                -0.024,
+                0.5
+            ]
+        },
         "chantFclef": {
             "bBoxNE": [
                 0.724,
@@ -1330,6 +1340,26 @@
             "bBoxSW": [
                 -0.756,
                 -1.072
+            ]
+        },
+        "chantIctusAbove": {
+            "bBoxNE": [
+                0.128,
+                0.532
+            ],
+            "bBoxSW": [
+                0.0,
+                0.12
+            ]
+        },
+        "chantIctusBelow": {
+            "bBoxNE": [
+                0.128,
+                -0.116
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.532
             ]
         },
         "chantLigaturaDesc2nd": {

@@ -47,6 +47,7 @@
 #include "divline.h"
 #include "dot.h"
 #include "dynam.h"
+#include "episema.h"
 #include "editorial.h"
 #include "ending.h"
 #include "expan.h"
@@ -777,6 +778,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         else if (object->Is(MULTIRPT)) {
             m_currentNode = m_currentNode.append_child("multiRpt");
             this->WriteMultiRpt(m_currentNode, vrv_cast<MultiRpt *>(object));
+        }
+        else if (object->Is(EPISEMA)) {
+            m_currentNode = m_currentNode.append_child("episema");
+            this->WriteEpisema(m_currentNode, vrv_cast<Episema *>(object));
         }
         else if (object->Is(NC)) {
             m_currentNode = m_currentNode.append_child("nc");
@@ -2857,6 +2862,18 @@ void MEIOutput::WriteMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt)
     multiRpt->WriteNumbered(currentNode);
 }
 
+void MEIOutput::WriteEpisema(pugi::xml_node currentNode, Episema *episema)
+{
+    assert(episema);
+
+    this->WriteLayerElement(currentNode, episema);
+    this->WriteOffsetInterface(currentNode, episema);
+    this->WritePitchInterface(currentNode, episema);
+    this->WritePositionInterface(currentNode, episema);
+    episema->WriteColor(currentNode);
+    episema->WriteEpisemaVis(currentNode);
+}
+
 void MEIOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
 {
     assert(nc);
@@ -3934,7 +3951,10 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
     }
     // filter for nc
     else if (filterParent->Is(NC)) {
-        if (element == "liquescent") {
+        if (element == "episema") {
+            return true;
+        }
+        else if (element == "liquescent") {
             return true;
         }
         else if (element == "oriscus") {
@@ -6582,6 +6602,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "dot") {
             success = this->ReadDot(parent, xmlElement);
         }
+        else if (elementName == "episema") {
+            success = this->ReadEpisema(parent, xmlElement);
+        }
         else if (elementName == "fTrem") {
             success = this->ReadFTrem(parent, xmlElement);
         }
@@ -7243,6 +7266,21 @@ bool MEIInput::ReadMultiRpt(Object *parent, pugi::xml_node multiRpt)
     parent->AddChild(vrvMultiRpt);
     this->ReadUnsupportedAttr(multiRpt, vrvMultiRpt);
     return true;
+}
+
+bool MEIInput::ReadEpisema(Object *parent, pugi::xml_node episema)
+{
+    Episema *vrvEpisema = new Episema();
+    this->ReadLayerElement(episema, vrvEpisema);
+
+    this->ReadOffsetInterface(episema, vrvEpisema);
+    this->ReadPitchInterface(episema, vrvEpisema);
+    this->ReadPositionInterface(episema, vrvEpisema);
+    vrvEpisema->ReadColor(episema);
+    vrvEpisema->ReadEpisemaVis(episema);
+
+    parent->AddChild(vrvEpisema);
+    return this->ReadLayerChildren(vrvEpisema, episema, vrvEpisema);
 }
 
 bool MEIInput::ReadNc(Object *parent, pugi::xml_node nc)

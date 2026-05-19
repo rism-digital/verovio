@@ -58,6 +58,7 @@ class DivLine;
 class DurationInterface;
 class Dynam;
 class Ending;
+class Episema;
 class Expan;
 class Expansion;
 class F;
@@ -408,6 +409,7 @@ private:
     void WriteCustos(pugi::xml_node currentNode, Custos *custos);
     void WriteDivLine(pugi::xml_node currentNode, DivLine *divLine);
     void WriteDot(pugi::xml_node currentNode, Dot *dot);
+    void WriteEpisema(pugi::xml_node currentNode, Episema *episema);
     void WriteFTrem(pugi::xml_node currentNode, FTrem *fTrem);
     void WriteGenericLayerElement(pugi::xml_node currentNode, GenericLayerElement *element);
     void WriteGraceGrp(pugi::xml_node currentNode, GraceGrp *graceGrp);
@@ -740,6 +742,7 @@ private:
     bool ReadCustos(Object *parent, pugi::xml_node custos);
     bool ReadDivLine(Object *parent, pugi::xml_node divLine);
     bool ReadDot(Object *parent, pugi::xml_node dot);
+    bool ReadEpisema(Object *parent, pugi::xml_node episema);
     bool ReadFTrem(Object *parent, pugi::xml_node fTrem);
     bool ReadGenericLayerElement(Object *parent, pugi::xml_node element);
     bool ReadGraceGrp(Object *parent, pugi::xml_node graceGrp);

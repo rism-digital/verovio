@@ -493,6 +493,7 @@
 		4D9A9C1E19A1DE2000028D93 /* syl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C1D19A1DE2000028D93 /* syl.cpp */; };
 		4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C1D19A1DE2000028D93 /* syl.cpp */; };
 		4DA0867D2FA9DAB400A45751 /* strophicus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D7647A52FA66CE8004F9EDA /* strophicus.cpp */; };
+		4DE9150200000000004F9EDA /* episema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE9150000000000004F9EDA /* episema.cpp */; };
 		4DA0EAC322BB779400A7EBEB /* surface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA0EAC022BB779300A7EBEB /* surface.cpp */; };
 		4DA0EAC422BB779400A7EBEB /* surface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA0EAC022BB779300A7EBEB /* surface.cpp */; };
 		4DA0EAC522BB779400A7EBEB /* surface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA0EAC022BB779300A7EBEB /* surface.cpp */; };
@@ -1017,6 +1018,11 @@
 		6D7647A82FA66CE8004F9EDA /* strophicus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D7647A52FA66CE8004F9EDA /* strophicus.cpp */; };
 		6D7647AA2FA66D0A004F9EDA /* strophicus.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D7647A92FA66D0A004F9EDA /* strophicus.h */; };
 		6D7647AB2FA66D0A004F9EDA /* strophicus.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D7647A92FA66D0A004F9EDA /* strophicus.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4DE9150300000000004F9EDA /* episema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE9150000000000004F9EDA /* episema.cpp */; };
+		4DE9150400000000004F9EDA /* episema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE9150000000000004F9EDA /* episema.cpp */; };
+		4DE9150500000000004F9EDA /* episema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE9150000000000004F9EDA /* episema.cpp */; };
+		4DE9150600000000004F9EDA /* episema.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DE9150100000000004F9EDA /* episema.h */; };
+		4DE9150700000000004F9EDA /* episema.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DE9150100000000004F9EDA /* episema.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8F086EE2188539540037FD8E /* verticalaligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* verticalaligner.cpp */; };
 		8F086EE4188539540037FD8E /* barline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB8188539540037FD8E /* barline.cpp */; };
 		8F086EE5188539540037FD8E /* bboxdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB9188539540037FD8E /* bboxdevicecontext.cpp */; };
@@ -2240,6 +2246,8 @@
 		6D7647A12FA66C68004F9EDA /* iogabc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = iogabc.cpp; path = src/iogabc.cpp; sourceTree = "<group>"; };
 		6D7647A52FA66CE8004F9EDA /* strophicus.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = strophicus.cpp; path = src/strophicus.cpp; sourceTree = "<group>"; };
 		6D7647A92FA66D0A004F9EDA /* strophicus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = strophicus.h; path = include/vrv/strophicus.h; sourceTree = "<group>"; };
+		4DE9150000000000004F9EDA /* episema.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = episema.cpp; path = src/episema.cpp; sourceTree = "<group>"; };
+		4DE9150100000000004F9EDA /* episema.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = episema.h; path = include/vrv/episema.h; sourceTree = "<group>"; };
 		8F086EA9188534680037FD8E /* Verovio */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Verovio; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F086EB6188539540037FD8E /* verticalaligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = verticalaligner.cpp; path = src/verticalaligner.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		8F086EB8188539540037FD8E /* barline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = barline.cpp; path = src/barline.cpp; sourceTree = "<group>"; };
@@ -3137,6 +3145,8 @@
 				4DC34BA119BC4A70006175CD /* dot.h */,
 				4DEEDE631E617C930087E8BC /* elementpart.cpp */,
 				4DEEDE621E617C880087E8BC /* elementpart.h */,
+				4DE9150000000000004F9EDA /* episema.cpp */,
+				4DE9150100000000004F9EDA /* episema.h */,
 				409B3DD81F2D1C2A0098A265 /* ftrem.cpp */,
 				409B3DD71F2D1C0C0098A265 /* ftrem.h */,
 				4D64793E2C9C0F1C00CD9539 /* genericlayerelement.cpp */,
@@ -3624,6 +3634,7 @@
 				4DEC4DD921C8295700D1D273 /* rdg.h in Headers */,
 				4DB3D8D01F83D11800B5FC2B /* mordent.h in Headers */,
 				6D7647AA2FA66D0A004F9EDA /* strophicus.h in Headers */,
+				4DE9150600000000004F9EDA /* episema.h in Headers */,
 				4DACC9F02990F29A00B55913 /* atts_critapp.h in Headers */,
 				4DC3B9EA239E2B22007F185E /* transposition.h in Headers */,
 				4D1BE7821C69434C0086DC0E /* MidiFile.h in Headers */,
@@ -3900,6 +3911,7 @@
 				BB4C4AB822A932A6001F6AF0 /* iomusxml.h in Headers */,
 				BB4C4B6622A932D7001F6AF0 /* multirest.h in Headers */,
 				6D7647AB2FA66D0A004F9EDA /* strophicus.h in Headers */,
+				4DE9150700000000004F9EDA /* episema.h in Headers */,
 				4DACC9C52990F29A00B55913 /* atts_analytical.h in Headers */,
 				E778BDAF29D5BD3D00672D51 /* adjuststaffoverlapfunctor.h in Headers */,
 				BB4C4AC222A932B6001F6AF0 /* layer.h in Headers */,
@@ -4203,6 +4215,7 @@
 				4D00A28B2ED2E32700EFA853 /* offsetinterface.cpp in Sources */,
 				4D1EB6A22A2A40B400AF2F98 /* textlayoutelement.cpp in Sources */,
 				6D7647A82FA66CE8004F9EDA /* strophicus.cpp in Sources */,
+				4DE9150500000000004F9EDA /* episema.cpp in Sources */,
 				4D79642226C167100026288B /* pagemilestone.cpp in Sources */,
 				4DB3D8E31F83D16300B5FC2B /* elementpart.cpp in Sources */,
 				E741AD03299A3D6300854426 /* calcslurdirectionfunctor.cpp in Sources */,
@@ -4507,6 +4520,7 @@
 				8F086EEE188539540037FD8E /* iomei.cpp in Sources */,
 				8F086EEF188539540037FD8E /* iomusxml.cpp in Sources */,
 				4DA0867D2FA9DAB400A45751 /* strophicus.cpp in Sources */,
+				4DE9150200000000004F9EDA /* episema.cpp in Sources */,
 				8F086EF0188539540037FD8E /* iopae.cpp in Sources */,
 				4DACC9D42990F29A00B55913 /* atts_pagebased.cpp in Sources */,
 				BD0562362518CD20004057EB /* beamspan.cpp in Sources */,
@@ -4751,6 +4765,7 @@
 				4D7AFDC92A5554A100835ED1 /* divline.cpp in Sources */,
 				4DB3D8F01F83D1A700B5FC2B /* fig.cpp in Sources */,
 				6D7647A72FA66CE8004F9EDA /* strophicus.cpp in Sources */,
+				4DE9150400000000004F9EDA /* episema.cpp in Sources */,
 				E790165F298BCB27008FDB4E /* calcalignmentxposfunctor.cpp in Sources */,
 				8F3DD36718854B410051330C /* verticalaligner.cpp in Sources */,
 				4DE019902C495E7600B5B6BF /* iovolpiano.cpp in Sources */,
@@ -5055,6 +5070,7 @@
 				4D7AFDCA2A5554A100835ED1 /* divline.cpp in Sources */,
 				BB4C4B9322A932E5001F6AF0 /* areaposinterface.cpp in Sources */,
 				6D7647A62FA66CE8004F9EDA /* strophicus.cpp in Sources */,
+				4DE9150300000000004F9EDA /* episema.cpp in Sources */,
 				E7901660298BCB27008FDB4E /* calcalignmentxposfunctor.cpp in Sources */,
 				BB4C4AA122A9328F001F6AF0 /* verticalaligner.cpp in Sources */,
 				4DE019912C495E7700B5B6BF /* iovolpiano.cpp in Sources */,

@@ -41,7 +41,7 @@ private:
 
     // parsing methods
     void AddAccidental(Syllable *syllable, data_ACCIDENTAL_WRITTEN accid, data_PITCHNAME pname, data_OCTAVE oct);
-    void AddEpisema(Nc *nc, const std::string &form);
+    void AddEpisema(Nc *nc, episemaVis_FORM form, data_EVENTREL place);
     void AddLiquescent(Nc *nc, curvatureDirection_CURVE curve);
     std::optional<GABCPrefixes> FindPrefix(const std::string &music, int &currentIndex);
     int ProcessBarline(const std::string &music, int currentIndex, Layer *layer);

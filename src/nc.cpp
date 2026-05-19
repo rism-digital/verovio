@@ -101,7 +101,7 @@ FunctorCode Nc::AcceptEnd(ConstFunctor &functor) const
 
 bool Nc::IsSupportedChild(ClassId classId)
 {
-    static const std::vector<ClassId> supported{ LIQUESCENT, ORISCUS, QUILISMA, STROPHICUS };
+    static const std::vector<ClassId> supported{ EPISEMA, LIQUESCENT, ORISCUS, QUILISMA, STROPHICUS };
 
     if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
         return true;

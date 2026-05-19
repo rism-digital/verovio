@@ -18,10 +18,9 @@
 #include "devicecontext.h"
 #include "divline.h"
 #include "doc.h"
+#include "episema.h"
 #include "layer.h"
 #include "layerelement.h"
-#include "liquescent.h"
-#include "mrpt.h"
 #include "nc.h"
 #include "neume.h"
 #include "note.h"
@@ -29,7 +28,6 @@
 #include "smufl.h"
 #include "staff.h"
 #include "syllable.h"
-#include "vrv.h"
 #include "zone.h"
 
 namespace vrv {
@@ -210,6 +208,58 @@ void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     }
 
     this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
+
+    dc->EndGraphic(element, this);
+}
+
+void View::DrawEpisema(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    Episema *episema = vrv_cast<Episema *>(element);
+    assert(episema);
+
+    dc->StartGraphic(element, "", element->GetID());
+
+    Nc *nc = vrv_cast<Nc *>(episema->GetFirstAncestor(NC));
+    if (nc) {
+        int x = nc->GetDrawingX();
+        int y = nc->GetDrawingY();
+
+        if (!nc->m_drawingGlyphs.empty()) {
+            x += m_doc->GetGlyphWidth(nc->m_drawingGlyphs.at(0).m_fontNo, staff->m_drawingStaffSize, false) / 2;
+        }
+
+        if (staff->HasDrawingRotation()) {
+            y -= staff->GetDrawingRotationOffsetFor(x);
+        }
+
+        this->CalcOffset(dc, x, y);
+
+        const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        const bool above = (episema->GetPlace() != EVENTREL_below);
+        // The SMuFL glyphs place their mark ~1 unit from the anchor (e.g. chantEpisema bar
+        // is at +125 font units = +1 drawing unit above the anchor). This naturally lands
+        // on the adjacent space when the anchor is on a line. When the anchor is on a space
+        // the inherent +1 unit would land on the intermediate line instead, so shift the
+        // anchor by 1 unit toward the target direction first.
+        if (!staff->IsOnStaffLine(y, m_doc)) {
+            y += above ? unit : -unit;
+        }
+
+        int sym = 0;
+        if (episema->GetForm() == episemaVis_FORM_h) {
+            sym = SMUFL_E9D8_chantEpisema;
+        }
+        else {
+            sym = above ? SMUFL_E9D0_chantIctusAbove : SMUFL_E9D1_chantIctusBelow;
+        }
+
+        this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
+    }
 
     dc->EndGraphic(element, this);
 }

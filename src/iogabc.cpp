@@ -36,8 +36,9 @@
 #include "barline.h"
 #include "clef.h"
 #include "custos.h"
-#include "divline.h" // 18-may-2026 for GABC divisio barlines (`,` `;` `::`)
+#include "divline.h"
 #include "doc.h"
+#include "episema.h"
 #include "keyaccid.h"
 #include "keysig.h"
 #include "layer.h"
@@ -107,10 +108,11 @@ static const std::map<std::string, ClefPitchOffsetType> GABC_CLEFS{
 
 bool GABCInput::ProcessClef(const std::string &word)
 {
-    // 17-may-2026 handle the GABC multi-clef syntax `c2@c4` / `f3@f4` (paper section "Inconsistencies
-    // between engraving software", Inconsistencies table feature 1). Only the first clef carries the
-    // pitch reference; following clefs are added so that they appear on the staff but do not shift
-    // the GABC letter-to-pitch mapping for the remainder of the input.
+    // Handle the GABC multi-clef syntax `c2@c4` / `f3@f4` (paper section "Inconsistencies
+    // between engraving software", Inconsistencies table feature 1). The first clef is the
+    // pitch reference; the second clef appears on the staff for visual context only.
+    // Secondary is emitted first so the primary ends up last in the MEI layer — Verovio uses
+    // the last clef before notes to determine visual staff position.
     std::string::size_type at = word.find('@');
     if (at != std::string::npos) {
         const std::string first = word.substr(0, at);
@@ -118,10 +120,12 @@ bool GABCInput::ProcessClef(const std::string &word)
         if (GABC_CLEFS.find(first) == GABC_CLEFS.end() || GABC_CLEFS.find(second) == GABC_CLEFS.end()) {
             return false;
         }
-        this->ProcessClef(first);
-        const int savedOffset = m_currentClefPitchOffset;
+        // Add secondary clef to the layer first, then primary last so that the
+        // primary is the active rendering clef (Verovio uses the last clef before
+        // notes to determine visual position). m_currentClefPitchOffset ends up
+        // holding the primary (first) clef's offset — correct for pitch mapping.
         this->ProcessClef(second);
-        m_currentClefPitchOffset = savedOffset;
+        this->ProcessClef(first);
         return true;
     }
 
@@ -138,7 +142,7 @@ bool GABCInput::ProcessClef(const std::string &word)
     clef->SetShape(shape);
     m_layer->AddChild(clef);
 
-    // 17-may-2026 grule clef_flat (`cb<n>`). The flat sign attached to the clef is rendered by
+    // grule clef_flat (`cb<n>`). The flat sign attached to the clef is rendered by
     // emitting a KeySig with a single b-flat KeyAccid on the staff line that holds `b` for the
     // chosen clef. We keep a flag so Import() can attach the KeySig to the StaffDef.
     if (!word.empty() && word.length() >= 2 && word[1] == 'b') {
@@ -312,17 +316,12 @@ void GABCInput::AddAccidental(Syllable *syllable, data_ACCIDENTAL_WRITTEN accid,
     syllable->AddChild(accidElem);
 }
 
-void GABCInput::AddEpisema(Nc *nc, const std::string &form)
+void GABCInput::AddEpisema(Nc *nc, episemaVis_FORM form, data_EVENTREL place)
 {
-    // 17-may-2026 No MEI <episema> element class exists in Verovio yet. We expose the parsed
-    // form ("v", "h", "h0".."h5") as Nc/@type so the information is preserved on round-trip
-    // until the schema is implemented. Multiple suffix episemas on the same nc are concatenated
-    // with a space, matching MEI's att.typed convention. See paper Table mei2.
-    std::string current = nc->HasType() ? nc->GetType() : std::string();
-    const std::string tag = "episema-" + form;
-    if (!current.empty()) current += " ";
-    current += tag;
-    nc->SetType(current);
+    Episema *episema = new Episema();
+    episema->SetForm(form);
+    episema->SetPlace(place);
+    nc->AddChild(episema);
 }
 
 void GABCInput::AddLiquescent(Nc *nc, curvatureDirection_CURVE curve)
@@ -390,29 +389,13 @@ int GABCInput::ProcessSuffix(const std::string &music, int currentIndex, Nc *nc,
             break;
 
         case '\'':
-            // 17-may-2026 grule episema_vertical (vertical episema / ictus). MEI 5.x Neume module
-            // exposes <episema form="v"/> but Verovio does not yet model that element. We carry the
-            // information through Nc/@type so the round-trip is preserved and downstream tools can
-            // pick it up. See paper Table mei2 row "Vertical episema (ictus)".
             processedChars++;
-            this->AddEpisema(nc, "v");
+            this->AddEpisema(nc, episemaVis_FORM_v, EVENTREL_below);
             break;
 
         case '_':
-            // 17-may-2026 grule episema_horizontal — with optional grule position_horizontal_episema
-            // (digit 0-5). Same MEI-class limitation as the vertical case; we store form + position
-            // in Nc/@type as a single tag (`h`, `h0`..`h5`). See paper Table mei2.
             processedChars++;
-            nextChar = GetCharAt(music, currentIndex + processedChars);
-            if (nextChar >= '0' && nextChar <= '5') {
-                processedChars++;
-                std::string form = "h";
-                form += nextChar;
-                this->AddEpisema(nc, form);
-            }
-            else {
-                this->AddEpisema(nc, "h");
-            }
+            this->AddEpisema(nc, episemaVis_FORM_h, EVENTREL_above);
             break;
 
         case '.': // punctum_mora

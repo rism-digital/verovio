@@ -223,6 +223,7 @@ enum ClassId : uint16_t {
     DIVLINE,
     DOT,
     DOTS,
+    EPISEMA,
     FLAG,
     FTREM,
     GENERIC_ELEMENT,
