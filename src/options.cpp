@@ -1917,8 +1917,7 @@ Options::Options()
     m_gabcStaffLines.Init(4, 4, 5);
     this->Register(&m_gabcStaffLines, "gabcStaffLines", &m_neume);
 
-    m_liquescentWithoutTails.SetInfo(
-        "Liquescent without tails", "Render liquescent head without tails");
+    m_liquescentWithoutTails.SetInfo("Liquescent without tails", "Render liquescent head without tails");
     m_liquescentWithoutTails.Init(false);
     this->Register(&m_liquescentWithoutTails, "liquescentWithoutTails", &m_neume);
 

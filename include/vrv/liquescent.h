@@ -40,14 +40,13 @@ public:
     ///@}
 
     /**
-    * @name Getter and setter for liquescent options
-    */
+     * @name Getter and setter for liquescent options
+     */
     ///@{
     bool HasNoTails() const { return (m_noTails); }
     void SetNoTails(bool noTails) { m_noTails = noTails; }
     ///@}
-    //
-    ///
+
     /**
      * @name Getter to interfaces
      */
@@ -66,9 +65,6 @@ public:
 private:
     // Used for enabling the command-line option: --liquescent-no-tails
     bool m_noTails = false;
-public:
-    //
-private:
 };
 
 } // namespace vrv

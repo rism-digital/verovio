@@ -804,7 +804,7 @@ void GABCInput::AddEpisema(Nc *nc, episemaVis_FORM form, data_EVENTREL place)
 
 void GABCInput::AddLiquescent(Nc *nc, curvatureDirection_CURVE curve)
 {
-    //const bool gabcNoTailsOption = m_doc->GetOptions()->m_liquescentWithoutTails.GetValue();
+    // const bool gabcNoTailsOption = m_doc->GetOptions()->m_liquescentWithoutTails.GetValue();
     Liquescent *liquescent = new Liquescent();
     nc->AddChild(liquescent);
     nc->SetCurve(curve);

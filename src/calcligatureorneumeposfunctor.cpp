@@ -264,7 +264,8 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
                 nc->m_drawingGlyphs.resize(3);
             }
 
-            const int ncWidth = m_doc->GetGlyphWidth(SMUFL_E995_chantAuctumDesc, staffSize, false); // actually, this not used when gabcNoTailsOption, it could be removed
+            const int ncWidth = m_doc->GetGlyphWidth(SMUFL_E995_chantAuctumDesc, staffSize,
+                false); // actually, this not used when gabcNoTailsOption, it could be removed
             const int lineWidth = m_doc->GetGlyphWidth(SMUFL_E9BE_chantConnectingLineAsc3rd, staffSize, false);
 
             if (nc->GetCurve() == curvatureDirection_CURVE_c) {
