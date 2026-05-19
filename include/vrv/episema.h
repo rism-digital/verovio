@@ -1,15 +1,15 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        liquescent.h
-// Author:      Gabby Halpin
-// Created:     2021
+// Name:        episema.h
+// Author:      David Rizo
+// Created:     2026
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_LIQUESCENT_H__
-#define __VRV_LIQUESCENT_H__
+#ifndef __VRV_EPISEMA_H__
+#define __VRV_EPISEMA_H__
 
-#include "atts_analytical.h"
 #include "atts_shared.h"
+#include "atts_visual.h"
 #include "layerelement.h"
 #include "offsetinterface.h"
 #include "pitchinterface.h"
@@ -18,36 +18,28 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Liquescent
+// Episema
 //----------------------------------------------------------------------------
 
-class Liquescent : public LayerElement,
-                   public OffsetInterface,
-                   public PitchInterface,
-                   public PositionInterface,
-                   public AttColor {
+class Episema : public LayerElement,
+                public OffsetInterface,
+                public PitchInterface,
+                public PositionInterface,
+                public AttColor,
+                public AttEpisemaVis {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      * Reset method resets all attribute classes
      */
     ///@{
-    Liquescent();
-    virtual ~Liquescent();
-    Object *Clone() const override { return new Liquescent(*this); }
+    Episema();
+    virtual ~Episema();
+    Object *Clone() const override { return new Episema(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "liquescent"; }
+    std::string GetClassName() const override { return "episema"; }
     ///@}
 
-    /**
-    * @name Getter and setter for liquescent options
-    */
-    ///@{
-    bool HasNoTails() const { return (m_noTails); }
-    void SetNoTails(bool noTails) { m_noTails = noTails; }
-    ///@}
-    //
-    ///
     /**
      * @name Getter to interfaces
      */
@@ -64,8 +56,7 @@ public:
     bool HasToBeAligned() const override { return true; }
 
 private:
-    // Used for enabling the command-line option: --liquescent-no-tails
-    bool m_noTails = false;
+    //
 public:
     //
 private:

@@ -2403,7 +2403,7 @@
         <!--<glyph glyph-code="E9D5" smufl-name="chantSemicirculusBelow" />-->
         <!--<glyph glyph-code="E9D6" smufl-name="chantAccentusAbove" />-->
         <!--<glyph glyph-code="E9D7" smufl-name="chantAccentusBelow" />-->
-        <!--<glyph glyph-code="E9D8" smufl-name="chantEpisema" />-->
+        <glyph glyph-code="E9D8" smufl-name="chantEpisema" />
         <!--<glyph glyph-code="E9D9" smufl-name="chantAugmentum" />-->
         <range_end>U+E9DF</range_end>
         <range_start>U+E9D0</range_start>

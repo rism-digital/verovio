@@ -280,6 +280,7 @@ std::u32string Accid::CreateSymbolStr(data_ACCIDENTAL_WRITTEN accid, data_ENCLOS
         if (accid == ACCIDENTAL_WRITTEN_NONE) return U"";
 
         switch (notationType) {
+            case NOTATIONTYPE_neume:
             case NOTATIONTYPE_mensural:
             case NOTATIONTYPE_mensural_black:
             case NOTATIONTYPE_mensural_white:

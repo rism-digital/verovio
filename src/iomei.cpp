@@ -47,6 +47,7 @@
 #include "divline.h"
 #include "dot.h"
 #include "dynam.h"
+#include "episema.h"
 #include "editorial.h"
 #include "ending.h"
 #include "expan.h"
@@ -135,6 +136,7 @@
 #include "staffdef.h"
 #include "staffgrp.h"
 #include "stem.h"
+#include "strophicus.h"
 #include "subst.h"
 #include "supplied.h"
 #include "surface.h"
@@ -777,6 +779,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
             m_currentNode = m_currentNode.append_child("multiRpt");
             this->WriteMultiRpt(m_currentNode, vrv_cast<MultiRpt *>(object));
         }
+        else if (object->Is(EPISEMA)) {
+            m_currentNode = m_currentNode.append_child("episema");
+            this->WriteEpisema(m_currentNode, vrv_cast<Episema *>(object));
+        }
         else if (object->Is(NC)) {
             m_currentNode = m_currentNode.append_child("nc");
             this->WriteNc(m_currentNode, vrv_cast<Nc *>(object));
@@ -804,6 +810,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         else if (object->Is(QUILISMA)) {
             m_currentNode = m_currentNode.append_child("quilisma");
             this->WriteQuilisma(m_currentNode, vrv_cast<Quilisma *>(object));
+        }
+        else if (object->Is(STROPHICUS)) {
+            m_currentNode = m_currentNode.append_child("strophicus");
+            this->WriteStrophicus(m_currentNode, vrv_cast<Strophicus *>(object));
         }
         else if (object->Is(REST)) {
             m_currentNode = m_currentNode.append_child("rest");
@@ -2852,6 +2862,18 @@ void MEIOutput::WriteMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt)
     multiRpt->WriteNumbered(currentNode);
 }
 
+void MEIOutput::WriteEpisema(pugi::xml_node currentNode, Episema *episema)
+{
+    assert(episema);
+
+    this->WriteLayerElement(currentNode, episema);
+    this->WriteOffsetInterface(currentNode, episema);
+    this->WritePitchInterface(currentNode, episema);
+    this->WritePositionInterface(currentNode, episema);
+    episema->WriteColor(currentNode);
+    episema->WriteEpisemaVis(currentNode);
+}
+
 void MEIOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
 {
     assert(nc);
@@ -2938,6 +2960,16 @@ void MEIOutput::WriteQuilisma(pugi::xml_node currentNode, Quilisma *quilisma)
     this->WriteOffsetInterface(currentNode, quilisma);
     this->WritePitchInterface(currentNode, quilisma);
     quilisma->WriteColor(currentNode);
+}
+
+void MEIOutput::WriteStrophicus(pugi::xml_node currentNode, Strophicus *strophicus)
+{
+    assert(strophicus);
+
+    this->WriteLayerElement(currentNode, strophicus);
+    this->WriteOffsetInterface(currentNode, strophicus);
+    this->WritePitchInterface(currentNode, strophicus);
+    strophicus->WriteColor(currentNode);
 }
 
 void MEIOutput::WriteRest(pugi::xml_node currentNode, Rest *rest)
@@ -3919,13 +3951,19 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
     }
     // filter for nc
     else if (filterParent->Is(NC)) {
-        if (element == "liquescent") {
+        if (element == "episema") {
+            return true;
+        }
+        else if (element == "liquescent") {
             return true;
         }
         else if (element == "oriscus") {
             return true;
         }
         else if (element == "quilisma") {
+            return true;
+        }
+        else if (element == "strophicus") {
             return true;
         }
         else {
@@ -6564,6 +6602,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "dot") {
             success = this->ReadDot(parent, xmlElement);
         }
+        else if (elementName == "episema") {
+            success = this->ReadEpisema(parent, xmlElement);
+        }
         else if (elementName == "fTrem") {
             success = this->ReadFTrem(parent, xmlElement);
         }
@@ -6612,15 +6653,6 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "note") {
             success = this->ReadNote(parent, xmlElement);
         }
-        else if (elementName == "oriscus") {
-            success = this->ReadOriscus(parent, xmlElement);
-        }
-        else if (elementName == "quilisma") {
-            success = this->ReadQuilisma(parent, xmlElement);
-        }
-        else if (elementName == "rest") {
-            success = this->ReadRest(parent, xmlElement);
-        }
         else if (elementName == "mRest") {
             success = this->ReadMRest(parent, xmlElement);
         }
@@ -6639,6 +6671,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "multiRpt") {
             success = this->ReadMultiRpt(parent, xmlElement);
         }
+        else if (elementName == "oriscus") {
+            success = this->ReadOriscus(parent, xmlElement);
+        }
         else if (elementName == "pb") {
             success = this->ReadGenericLayerElement(parent, xmlElement);
         }
@@ -6648,6 +6683,12 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "proport") {
             success = this->ReadProport(parent, xmlElement);
         }
+        else if (elementName == "quilisma") {
+            success = this->ReadQuilisma(parent, xmlElement);
+        }
+        else if (elementName == "rest") {
+            success = this->ReadRest(parent, xmlElement);
+        }
         else if (elementName == "sb") {
             success = this->ReadGenericLayerElement(parent, xmlElement);
         }
@@ -6656,6 +6697,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         }
         else if (elementName == "stem") {
             success = this->ReadStem(parent, xmlElement);
+        }
+        else if (elementName == "strophicus") {
+            success = this->ReadStrophicus(parent, xmlElement);
         }
         else if (elementName == "syl") {
             success = this->ReadSyl(parent, xmlElement);
@@ -7224,6 +7268,21 @@ bool MEIInput::ReadMultiRpt(Object *parent, pugi::xml_node multiRpt)
     return true;
 }
 
+bool MEIInput::ReadEpisema(Object *parent, pugi::xml_node episema)
+{
+    Episema *vrvEpisema = new Episema();
+    this->ReadLayerElement(episema, vrvEpisema);
+
+    this->ReadOffsetInterface(episema, vrvEpisema);
+    this->ReadPitchInterface(episema, vrvEpisema);
+    this->ReadPositionInterface(episema, vrvEpisema);
+    vrvEpisema->ReadColor(episema);
+    vrvEpisema->ReadEpisemaVis(episema);
+
+    parent->AddChild(vrvEpisema);
+    return this->ReadLayerChildren(vrvEpisema, episema, vrvEpisema);
+}
+
 bool MEIInput::ReadNc(Object *parent, pugi::xml_node nc)
 {
     Nc *vrvNc = new Nc();
@@ -7415,6 +7474,21 @@ bool MEIInput::ReadStem(Object *parent, pugi::xml_node stem)
 
     parent->AddChild(vrvStem);
     this->ReadUnsupportedAttr(stem, vrvStem);
+    return true;
+}
+
+bool MEIInput::ReadStrophicus(Object *parent, pugi::xml_node strophicus)
+{
+    Strophicus *vrvStrophicus = new Strophicus();
+    this->ReadLayerElement(strophicus, vrvStrophicus);
+
+    this->ReadOffsetInterface(strophicus, vrvStrophicus);
+    this->ReadPositionInterface(strophicus, vrvStrophicus);
+    vrvStrophicus->ReadColor(strophicus);
+
+    parent->AddChild(vrvStrophicus);
+    this->ReadUnsupportedAttr(strophicus, vrvStrophicus);
+
     return true;
 }
 

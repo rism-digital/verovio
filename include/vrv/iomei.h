@@ -58,6 +58,7 @@ class DivLine;
 class DurationInterface;
 class Dynam;
 class Ending;
+class Episema;
 class Expan;
 class Expansion;
 class F;
@@ -149,6 +150,7 @@ class Slur;
 class Space;
 class Staff;
 class Stem;
+class Strophicus;
 class Subst;
 class Supplied;
 class Surface;
@@ -407,6 +409,7 @@ private:
     void WriteCustos(pugi::xml_node currentNode, Custos *custos);
     void WriteDivLine(pugi::xml_node currentNode, DivLine *divLine);
     void WriteDot(pugi::xml_node currentNode, Dot *dot);
+    void WriteEpisema(pugi::xml_node currentNode, Episema *episema);
     void WriteFTrem(pugi::xml_node currentNode, FTrem *fTrem);
     void WriteGenericLayerElement(pugi::xml_node currentNode, GenericLayerElement *element);
     void WriteGraceGrp(pugi::xml_node currentNode, GraceGrp *graceGrp);
@@ -430,6 +433,7 @@ private:
     void WritePlica(pugi::xml_node currentNode, Plica *plica);
     void WriteProport(pugi::xml_node currentNode, Proport *proport);
     void WriteQuilisma(pugi::xml_node currentNode, Quilisma *quilisma);
+    void WriteStrophicus(pugi::xml_node currentNode, Strophicus *strophicus);
     void WriteRest(pugi::xml_node currentNode, Rest *rest);
     void WriteSpace(pugi::xml_node currentNode, Space *space);
     void WriteStem(pugi::xml_node currentNode, Stem *stem);
@@ -738,6 +742,7 @@ private:
     bool ReadCustos(Object *parent, pugi::xml_node custos);
     bool ReadDivLine(Object *parent, pugi::xml_node divLine);
     bool ReadDot(Object *parent, pugi::xml_node dot);
+    bool ReadEpisema(Object *parent, pugi::xml_node episema);
     bool ReadFTrem(Object *parent, pugi::xml_node fTrem);
     bool ReadGenericLayerElement(Object *parent, pugi::xml_node element);
     bool ReadGraceGrp(Object *parent, pugi::xml_node graceGrp);
@@ -764,6 +769,7 @@ private:
     bool ReadRest(Object *parent, pugi::xml_node rest);
     bool ReadSpace(Object *parent, pugi::xml_node space);
     bool ReadStem(Object *parent, pugi::xml_node stem);
+    bool ReadStrophicus(Object *parent, pugi::xml_node strophicus);
     bool ReadSyl(Object *parent, pugi::xml_node syl);
     bool ReadSyllable(Object *parent, pugi::xml_node syllable);
     bool ReadTabDurSym(Object *parent, pugi::xml_node tabDurSym);
