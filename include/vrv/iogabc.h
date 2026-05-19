@@ -40,11 +40,7 @@ private:
     using PitchOctaveType = std::pair<data_PITCHNAME, int>;
 
     // parsing methods
-    void AddAccidental(Syllable *syllable, data_ACCIDENTAL_WRITTEN accid, data_PITCHNAME pname, data_OCTAVE oct);
-    void AddEpisema(Nc *nc, episemaVis_FORM form, data_EVENTREL place);
-    void AddLiquescent(Nc *nc, curvatureDirection_CURVE curve);
     std::optional<GABCPrefixes> FindPrefix(const std::string &music, int &currentIndex);
-    int ProcessBarline(const std::string &music, int currentIndex, Layer *layer);
     bool ProcessClef(const std::string &word);
     int ProcessCustos(const std::string &word);
     void ProcessInput(const std::string &gabc);
@@ -56,11 +52,15 @@ private:
     // Static methods //
     //----------------//
 
+    static void AddAccidental(Syllable *syllable, data_ACCIDENTAL_WRITTEN accid, data_PITCHNAME pname, data_OCTAVE oct);
+    static void AddEpisema(Nc *nc, episemaVis_FORM form, data_EVENTREL place);
+    static void AddLiquescent(Nc *nc, curvatureDirection_CURVE curve);
+    static std::optional<PitchOctaveType> FindPitch(char ch, int clefPitchOffset);
     static char GetCharAt(const std::string &input, int index);
-    static int PitchToDiatonicNumber(data_PITCHNAME pname, int oct);
     static curvatureDirection_CURVE InferLiquescentCurve(const Nc *previousNC, const Nc *currentNC);
     static PitchOctaveType MakePitchFromDiatonicIndex(int absoluteDiatonicIndex);
-    static std::optional<PitchOctaveType> FindPitch(char ch, int clefPitchOffset);
+    static int PitchToDiatonicNumber(data_PITCHNAME pname, int oct);
+    static int ProcessBarline(const std::string &music, int currentIndex, Layer *layer);
 
 public:
     //
