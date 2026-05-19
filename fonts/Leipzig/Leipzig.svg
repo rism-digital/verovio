@@ -2,11 +2,11 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20220308 at Tue May 19 10:21:53 2026
+Created by FontForge 20220308 at Tue May 19 11:08:11 2026
  By David Rizo Valero
 Created by Etienne Darbellay, Jean-Francois Marti, Laurent Pugin, and Klaus Rettinghaus.
 This font is licensed under the SIL Open Font License \(https://openfontlicense.org/\).
-Version 5.2.99
+Version 5.2.100
 </metadata>
 <defs>
 <font id="Leipzig" horiz-adv-x="624" >
@@ -2525,5 +2525,7 @@ c0 4.80006 -1.53916 8.46603 -5.05849 10.5776c-15 9 -66 45 -74 61c-0.419363 0.838
 d="M0 122c-1.22465e-16 2 9 11 16 11s16 -9 16 -11v-82s-9 -10 -16 -10s-16 8 -16 10v82z" />
     <glyph glyph-name="uniE9D1" unicode="&#xe9d1;" horiz-adv-x="32" 
 d="M0 -40c-6.12323e-17 1 9 11 16 11s16 -10 16 -11v-82s-9 -11 -16 -11s-16 11 -16 11v82z" />
+    <glyph glyph-name="uniE9D8" unicode="&#xe9d8;" horiz-adv-x="164" 
+d="M164 125h-164s-6 4 -6 8v4c0 5 6 8 6 8h164s6 -3 6 -8v-4c0 -4 -6 -8 -6 -8z" />
   </font>
 </defs></svg>
