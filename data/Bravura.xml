@@ -779,6 +779,8 @@
   <g c="E9BF" x="0.0" y="-150.0" w="14.0" h="600.0" h-a-x="14" n="chantConnectingLineAsc4th" />
   <g c="E9C0" x="0.0" y="-150.0" w="14.0" h="750.0" h-a-x="14" n="chantConnectingLineAsc5th" />
   <g c="E9C1" x="0.0" y="-150.0" w="14.0" h="900.0" h-a-x="14" n="chantConnectingLineAsc6th" />
+  <g c="E9D0" x="0.0" y="28.0" w="32.0" h="106.0" h-a-x="32" n="chantIctusAbove" />
+  <g c="E9D1" x="0.0" y="-134.0" w="32.0" h="106.0" h-a-x="32" n="chantIctusBelow" />
   <g c="E9E0" x="0.0" y="-151.0" w="205.0" h="564.0" h-a-x="205" n="medRenFlatSoftB" />
   <g c="E9E1" x="0.0" y="-141.0" w="186.0" h="561.0" h-a-x="186" n="medRenFlatHardB" />
   <g c="E9E2" x="0.0" y="-254.0" w="102.0" h="507.0" h-a-x="102" n="medRenNatural" />

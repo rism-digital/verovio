@@ -2,11 +2,11 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20251009 at Thu May  7 19:25:37 2026
- By Marina Maciá
+Created by FontForge 20220308 at Tue May 19 10:21:53 2026
+ By David Rizo Valero
 Created by Etienne Darbellay, Jean-Francois Marti, Laurent Pugin, and Klaus Rettinghaus.
 This font is licensed under the SIL Open Font License \(https://openfontlicense.org/\).
-Version 5.2.97
+Version 5.2.99
 </metadata>
 <defs>
 <font id="Leipzig" horiz-adv-x="624" >
@@ -2521,5 +2521,9 @@ c0 0 40 320 300 320s300 -320 300 -320h-32s-38 227 -268 227s-268 -227 -268 -227h-
     <glyph glyph-name="uniEA29" unicode="&#xea29;" horiz-adv-x="184" 
 d="M86 136c1.17945 -0.453636 98.202 -50.4438 98.202 -79.532c0 -66.1338 -124.14 -166.406 -145.202 -187.468c-11 -11 -14 -7 -18 -5c-5.36656 2.68328 -8 4 -11 6c-0.83205 0.5547 -0.38557 2.24495 1 4c18.5715 23.5237 68.0585 87.2047 68.0585 114.422
 c0 4.80006 -1.53916 8.46603 -5.05849 10.5776c-15 9 -66 45 -74 61c-0.419363 0.838725 -0.619517 1.79196 -0.619517 2.84576c0 19.4995 68.5322 73.4317 84.8815 73.4317c0.669643 0 1.25174 -0.0904765 1.73801 -0.277501z" />
+    <glyph glyph-name="uniE9D0" unicode="&#xe9d0;" horiz-adv-x="32" 
+d="M0 122c-1.22465e-16 2 9 11 16 11s16 -9 16 -11v-82s-9 -10 -16 -10s-16 8 -16 10v82z" />
+    <glyph glyph-name="uniE9D1" unicode="&#xe9d1;" horiz-adv-x="32" 
+d="M0 -40c-6.12323e-17 1 9 11 16 11s16 -10 16 -11v-82s-9 -11 -16 -11s-16 11 -16 11v82z" />
   </font>
 </defs></svg>
