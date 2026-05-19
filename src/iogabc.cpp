@@ -7,11 +7,7 @@
 // The grammar implemented here follows the S-GABC paper:
 //   Rizo et al., "A Preliminary Proposal for a Systematic GABC Encoding of
 //   Gregorian Chant", DLfM 2024.
-// LaTeX source (master copy used while iterating on this branch):
-//   /Users/drizo/cmg/investigacion/congresos/2024/dlfm2024/DLfM[2024] - S-GABC/
-//     sample-authordraft.tex
-// `grule <name>` mentions in the inline 17-may-2026 comments map to
-// \label{<name>} inside that .tex (the GABC grammar figure).
+// In the comments below, then "grule" is used, it refers to a syntax rule in the DLfM'24 paper
 /////////////////////////////////////////////////////////////////////////////
 
 #include "iogabc.h"
@@ -20,11 +16,9 @@
 
 #include <array>
 #include <cassert>
-#include <cctype>
 #include <fstream>
 #include <map>
 #include <optional>
-#include <sstream>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -59,13 +53,14 @@
 #include "syl.h"
 #include "syllable.h"
 #include "text.h"
+#include "unclear.h"
 #include "vrv.h"
 
 //////////////////////////////////////////////////////////////////////////
 // Note: we've developed this parser thinking of the speed and the ease for others to understand.
 // For easiness to maintain, and due to the simplicity of the encoding,
 // we've avoided here formal parsing techniques or regular expressions.
-// Following other importers, this parser suposes the input is valid.
+// Following other importers, this parser supposes the input is valid.
 //////////////////////////////////////////////////////////////////////////
 
 namespace vrv {
@@ -87,7 +82,7 @@ using ClefPitchOffsetType = std::tuple<data_CLEFSHAPE, int, int>;
 // base table on c2, following the older reference converter:
 //   c2: a..m = e3 f3 g3 a3 b3 c4 d4 e4 f4 g4 a4 b4 c5
 // Other clefs are expressed as diatonic offsets from that c2 mapping.
-// 17-may-2026 added c5 / f5 (grule clef, grule clef_number num_5; only valid on a 5-line staff,
+// Added c5 / f5 (grule clef, grule clef_number num_5; only valid on a 5-line staff,
 // see Inconsistencies table feature 3) and cb3 (grule clef_flat, see paper section "Brief intro
 // to GABC"). The flat sign for cb3 is materialised below as a KeySig attached to the StaffDef.
 static const std::map<std::string, ClefPitchOffsetType> GABC_CLEFS{
@@ -156,7 +151,7 @@ bool GABCInput::ProcessClef(const std::string &word)
 
 int GABCInput::ProcessCustos(const std::string &word)
 {
-    // 18-may-2026 GABC custos grammar (grule custos): three lexical variants exist and the
+    // GABC custos grammar (grule custos): three lexical variants exist and the
     // distinction is musicologically meaningful, so we preserve it via Custos/@type instead of
     // collapsing all three to the same MEI element.
     //   `Z`  → manual / forced custos placed at the explicit GABC position.
@@ -196,7 +191,7 @@ int GABCInput::ProcessCustos(const std::string &word)
 }
 
 // It returns a prefix and advances the index or NONE if not found.
-// 18-may-2026 Side effect: when a prefix carries variant information that we want to preserve
+// Side effect: when a prefix carries variant information that we want to preserve
 // across to the next Nc (cut size, no-space, deprecated remove-first-stem), the tag is appended
 // to m_pendingNcType. ProcessNeume drains the accumulator into the next Nc's @type and clears it.
 // The oblique-ligature prefix continues to be communicated via the return value because it
@@ -221,18 +216,19 @@ std::optional<GABCPrefixes> GABCInput::FindPrefix(const std::string &music, int 
 
     switch (GetCharAt(music, currentIndex)) {
         case '!':
-            // 18-may-2026 grule no_space (`!`). No dedicated MEI element; tag the next Nc so
+            // grule no_space (`!`). No dedicated MEI element; tag the next Nc so
             // engravers wanting GABC-faithful spacing can pick it up. Paper table mei1.
             nextCurrentIndex++;
             appendPendingType("no-space");
             result = GABC_NO_SPACE;
             break;
         case '@':
-            // 18-may-2026 grule remove_first_stem (`@`). S-GABC §6.1 proposes removing this
+            // grule remove_first_stem (`@`). S-GABC §6.1 proposes removing this
             // rule from the grammar. We continue to parse it for backward compatibility with
             // existing GABC files, but (a) emit a deprecation warning to stderr/log and
             // (b) tag the next Nc with @type="remove-first-stem" so curated editions can
             // locate and migrate these occurrences automatically.
+            // We may use it as explained in §6.1, but using the --aquitanian-context parameter
             nextCurrentIndex++;
             LogWarning("GABC '@' (remove_first_stem) prefix is deprecated per S-GABC §6.1; "
                        "the next Nc will be tagged @type=\"remove-first-stem\" for round-trip.");
@@ -240,7 +236,7 @@ std::optional<GABCPrefixes> GABCInput::FindPrefix(const std::string &music, int 
             result = GABC_REMOVE_FIRST_STEM;
             break;
         case '/':
-            // 18-may-2026 grule neumatic_cut. We now preserve the *flavor* of the cut on the
+            // grule neumatic_cut. We now preserve the *flavor* of the cut on the
             // next Nc's @type. MEI has no element for the cut itself in this Verovio build,
             // and the cut also acts as a neume separator (handled in ProcessNeume); the @type
             // captures the visual width hint so round-trip is non-lossy.
@@ -418,7 +414,7 @@ int GABCInput::ProcessSuffix(const std::string &music, int currentIndex, Nc *nc,
 
 int GABCInput::ProcessBarline(const std::string &music, int currentIndex, Layer *layer)
 {
-    // 18-may-2026 GABC divisio grammar (paper "Brief introduction to GABC", table mei1 row
+    // GABC divisio grammar (paper "Brief introduction to GABC", table mei1 row
     // "Divisions"). Four lexical variants exist; previously only `:` was handled and was emitted
     // as a generic CMN BarLine. The MEI neume module provides <divLine> with a `form` enum that
     // maps cleanly to the GABC distinctions:
@@ -529,19 +525,21 @@ void GABCInput::ProcessNeume(const std::string &music, Syllable *syllable)
         // Any other character ends the strophicus group
         lastWasStrophicus = false;
 
-        // 17-may-2026 S-GABC proposed symbols (paper section "Missing Features and Proposal",
-        // Table "Summary of Proposed Missing Symbols"). They are only honored when the
+        // S-GABC proposed symbols (paper section "Missing Features and Proposal",
+        // Table "Summary of Proposed Missing Symbols"). They are only used when the
         // gabcExtendedSymbols option is enabled, otherwise they fall through to the
         // "unknown character" branch and are skipped.
         if (m_doc->GetOptions()->m_gabcExtendedSymbols.GetValue()) {
             if (ch == 'r') {
-                // S-GABC proposal #3 — uncertain reading. Emit an empty Nc tagged @type="uncertain"
+                // S-GABC proposal #3 — uncertain reading. Add an <unclear/> child.
                 // so the position in the neume is preserved but no pitch is committed.
-                Nc *uncertainNc = new Nc();
-                uncertainNc->SetType("uncertain");
-                if (!neume) neume = new Neume();
-                neume->AddChild(uncertainNc);
-                previousNC = uncertainNc;
+                if (!previousNC) {
+                    previousNC = new Nc(); // an empty one
+                    if (!neume) neume = new Neume();
+                    neume->AddChild(previousNC);
+                }
+                Unclear *unclear = new Unclear();
+                previousNC->AddChild(unclear);
                 currentIndex++;
                 continue;
             }
@@ -651,7 +649,7 @@ void GABCInput::ProcessNeume(const std::string &music, Syllable *syllable)
             if (!neume) neume = new Neume();
             neume->AddChild(currentNC);
 
-            // 18-may-2026 drain any pending @type tokens accumulated by FindPrefix (cut size,
+            // Clear any pending @type tokens accumulated by FindPrefix (cut size,
             // no-space, remove-first-stem) into this Nc and clear the accumulator. Placed AFTER
             // the accidental / `/s` discard branches above so the prefix info isn't lost on an
             // Nc that is about to be deleted (e.g. `!gx` would otherwise drop the no-space tag
@@ -923,7 +921,7 @@ GABCInput::PitchOctaveType GABCInput::MakePitchFromDiatonicIndex(int absoluteDia
 
 std::optional<GABCInput::PitchOctaveType> GABCInput::FindPitch(char ch, int clefPitchOffset)
 {
-    // 17-may-2026 grule square_pitch extended past `m` with `n` and `p` (the letter `o` is reserved
+    // grule square_pitch extended past `m` with `n` and `p` (the letter `o` is reserved
     // for the oriscus suffix, see grule oriscus). The paper notes these characters are necessary
     // when a c5 clef is in use because `m` only reaches the space above the fifth line — see
     // Inconsistencies table, feature 4.
