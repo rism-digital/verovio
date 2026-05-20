@@ -16,8 +16,24 @@ WHITESPACE_REGEX: Pattern = re.compile(r"[\s\t]+")
 
 
 class MeiSchema(object):
+    """Representation of a parsed MEI/ODD schema.
+
+    The `MeiSchema` object parses the provided ODD XML and exposes
+    structures used by the generator: `element_structure`,
+    `attribute_group_structure`, `data_types` and `data_lists`.
+
+    Parameters
+    ----------
+    oddfile : file-like or path
+        Open file or path to the compiled ODD XML file to parse.
+    resolve_elements : bool, optional
+        If True, element details are resolved during initialization
+        (this can be slower); otherwise elements are resolved on demand.
+    """
+
     def __init__(self, oddfile, resolve_elements=False):
         parser = etree.XMLParser(resolve_entities=True)
+
         self.schema = etree.parse(oddfile, parser)
         # self.customization = etree.parse(customization_file)
 

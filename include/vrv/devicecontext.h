@@ -204,8 +204,7 @@ public:
     virtual void DrawRotatedText(const std::string &text, int x, int y, double angle) = 0;
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, int radius) = 0;
     virtual void DrawText(const std::string &text, const std::u32string &wtext = U"", int x = VRV_UNSET,
-        int y = VRV_UNSET, int width = VRV_UNSET, int height = VRV_UNSET)
-        = 0;
+        int y = VRV_UNSET, int width = VRV_UNSET, int height = VRV_UNSET) = 0;
     virtual void DrawMusicText(const std::u32string &text, int x, int y, bool setSmuflGlyph = false) = 0;
     virtual void DrawSpline(int n, Point points[]) = 0;
     virtual void DrawGraphicUri(int x, int y, int width, int height, const std::string &uri) = 0;
@@ -263,8 +262,7 @@ public:
      */
     ///@{
     virtual void StartGraphic(Object *object, const std::string &gClass, const std::string &gId,
-        GraphicID graphicID = PRIMARY, bool preprend = false)
-        = 0;
+        GraphicID graphicID = PRIMARY, bool preprend = false) = 0;
     virtual void EndGraphic(Object *object, View *view) = 0;
     ///@}
 

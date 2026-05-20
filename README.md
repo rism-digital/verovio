@@ -10,7 +10,7 @@
 
 Verovio is a fast, portable and lightweight library for engraving [Music Encoding Initiative (MEI)](http://www.music-encoding.org) digital scores into SVG images. Verovio also contains on-the-fly converters to render [Plaine & Easie Code](https://www.iaml.info/plaine-easie-code), [Humdrum](https://www.humdrum.org), [Musedata](https://musedata.org), [MusicXML](https://www.musicxml.com), [EsAC](http://esac-data.org), and [ABC](https://en.wikipedia.org/wiki/ABC_notation) digital scores. 
 
-Verovio is written in standard C++20 and is available in several bindings (JavaScript, Python, Java, Swift). It
+Verovio is written in standard C++20 and is available in several bindings (JavaScript, Python, Java, Swift, Go). It
 can be compiled as a standalone command-line tool or as a music-rendering library for applications.  Check out the JavaScript toolkit version of Verovio running in the [Verovio Online Editor / Viewer](http://editor.verovio.org), or the [tutorials](https://book.verovio.org/first-steps/) to know more about web integration and user interaction.
 
 ![Choice interaction](https://raw.githubusercontent.com/rism-digital/verovio.org/gh-pages/movies/reflow.gif)
@@ -44,11 +44,12 @@ The following libraries are embedded in Verovio:
 
 | library | purpose |
 | ------- | ------- |
-| [humlib](https://github.com/craigsapp/humlib)       | Humdrum file import/export |
-| [JSON++](https://github.com/hjiang/jsonxx)          | JSON data parser           |
-| [MidiFile](https://github.com/craigsapp/midifile)   | Standard MIDI file export  |
-| [pugixml](https://pugixml.org/)                     | XML data parser            |
-| [MINIZ-CPP](https://github.com/kkzi/miniz-cpp)      | ZIP files reading/writing  |
+| [humlib](https://github.com/craigsapp/humlib)                         | Humdrum file import/export      |
+| [JSON++](https://github.com/hjiang/jsonxx)                            | JSON data parser                |
+| [MidiFile](https://github.com/craigsapp/midifile)                     | Standard MIDI file export       |
+| [pugixml](https://pugixml.org/)                                       | XML data parser                 |
+| [MINIZ-CPP](https://github.com/kkzi/miniz-cpp)                        | ZIP files reading/writing       |
+| [tuning-library](https://github.com/surge-synthesizer/tuning-library) | Surge Synth Team Tuning Library |
 
 ## Contributing
 

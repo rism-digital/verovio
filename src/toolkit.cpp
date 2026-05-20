@@ -25,6 +25,7 @@
 #include "ioabc.h"
 #include "iocmme.h"
 #include "iodarms.h"
+#include "iogabc.h"
 #include "iohumdrum.h"
 #include "iomei.h"
 #include "iomusxml.h"
@@ -241,6 +242,17 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
     if (initial.find("\nCUT[") != std::string::npos) {
         // Title record for a melody in EsAC format.
         return ESAC;
+    }
+    // 17-may-2026 GABC auto-detection. A GABC file always carries a header block — a sequence of
+    // `name:value;` attributes — terminated by `%%` on its own line before the body. The body in
+    // turn uses the `lyric(music)` syntax where the music is enclosed in parentheses and the pitch
+    // letters are restricted to a..p, plus prefix/suffix punctuation (see S-GABC grammar, grule
+    // body / grule syllable / grule syl_musical_symbols, in the .tex referenced from CLAUDE.md
+    // section "GABC / S-GABC Specification Reference"). The `%%` separator is the most reliable
+    // marker because it cannot legally appear inside MEI, ABC (which starts with `X:`), or PAE.
+    // We only look at the prefix to avoid scanning very large files.
+    if (initial.find("\n%%") != std::string::npos || initial.compare(0, 3, "%%\n") == 0) {
+        return GABC;
     }
 
     // Assume that the input is MEI if other input types were not detected.
@@ -530,6 +542,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
 #endif
 
     FileFormat inputFrom = m_options->GetInputFrom();
+
     if (inputFrom == AUTO) {
         inputFrom = IdentifyInputFrom(data);
     }
@@ -538,6 +551,14 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         input = new ABCInput(&m_doc);
 #else
         LogError("ABC import is not supported in this build.");
+        return false;
+#endif
+    }
+    else if (inputFrom == GABC) {
+#ifndef NO_GABC_SUPPORT
+        input = new GABCInput(&m_doc);
+#else
+        LogError("GABC import is not supported in this build.");
         return false;
 #endif
     }
@@ -834,7 +855,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
             m_doc.ConvertToCmnDoc();
         }
         else {
-            m_doc.ConvertToCastOffMensuralDoc(true);
+            m_doc.ConvertToCastOffMensuralDoc(MENSURAL_CAST_OFF_INIT);
         }
     }
 
@@ -1256,6 +1277,11 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
         resources.UseLiberationTextFont(m_options->m_fontTextLiberation.GetValue());
     }
 
+    // If changing midi options, reset the MIDI doc
+    if (json.has<jsonxx::Number>("midiTempoAdjustment") || json.has<jsonxx::Boolean>("midiNoCue")) {
+        this->ResetMidiDoc();
+    }
+
     return true;
 }
 
@@ -1338,11 +1364,12 @@ void Toolkit::PrintOptionUsageOutput(const vrv::Option *option, std::ostream &ou
 void Toolkit::PrintOptionUsage(const std::string &category, std::ostream &output) const
 {
     // map of all categories and expected string arguments for them
-    const std::map<vrv::OptionsCategory, std::string> categories = { { vrv::OptionsCategory::Base, "base" },
-        { vrv::OptionsCategory::General, "general" }, { vrv::OptionsCategory::Json, "json" },
-        { vrv::OptionsCategory::Layout, "layout" }, { vrv::OptionsCategory::Margins, "margins" },
-        { vrv::OptionsCategory::Mensural, "mensural" }, { vrv::OptionsCategory::Midi, "midi" },
-        { vrv::OptionsCategory::Selectors, "selectors" }, { vrv::OptionsCategory::Full, "full" } };
+    const std::map<vrv::OptionsCategory, std::string> categories
+        = { { vrv::OptionsCategory::Base, "base" }, { vrv::OptionsCategory::General, "general" },
+              { vrv::OptionsCategory::Json, "json" }, { vrv::OptionsCategory::Layout, "layout" },
+              { vrv::OptionsCategory::Margins, "margins" }, { vrv::OptionsCategory::Mensural, "mensural" },
+              { vrv::OptionsCategory::Midi, "midi" }, { vrv::OptionsCategory::Neume, "neume" },
+              { vrv::OptionsCategory::Selectors, "selectors" }, { vrv::OptionsCategory::Full, "full" } };
 
     output.precision(2);
     // display_version();

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name           = 'Verovio'
-  s.version        = '6.1.0-dev'
+  s.version        = '6.2.0-dev'
   s.license        = { :type => 'LGPL', :file => 'COPYING' }
   s.homepage       = 'https://www.verovio.org/index.xhtml'
   s.authors        = { 'Contributors List' => 'https://github.com/rism-digital/verovio/graphs/contributors' }
@@ -8,13 +8,13 @@ Pod::Spec.new do |s|
   s.source         = { :git => 'https://github.com/rism-digital/verovio.git', :tag => 'version-' + s.version.to_s }
   s.source_files   = 
       'src/**/*.{cpp,cc}',
-      'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
+      'include/{crc,hum,json,midi,pugi,tuning-library,vrv,zip}/*.{h,hpp}',
       'libmei/{dist,addons}/*.{h,cpp}'
   s.public_header_files =
       'include/{json,pugi,vrv}/*.{h,hpp}',
       'libmei/{dist,addons}/*.{h}'
   s.private_header_files = 
-      'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
+      'include/{crc,hum,json,midi,pugi,tuning-library,vrv,zip}/*.{h,hpp}',
       'libmei/{dist,addons}/*.{h}'
   s.resources      = 'data'
   s.ios.deployment_target = '16.0'

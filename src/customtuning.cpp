@@ -233,6 +233,13 @@ int CustomTuning::GetMIDIPitch(const Note *note, const int shift, const int octa
 void CustomTuning::CopyCustomTunings(const Doc *src, Doc *dst)
 {
     ListOfConstObjects srcScoreDefs = src->FindAllDescendantsByType(SCOREDEF);
+    const bool hasValidCustomTuning = std::any_of(srcScoreDefs.begin(), srcScoreDefs.end(), [](auto object) {
+        const ScoreDef *scoreDef = vrv_cast<const ScoreDef *>(object);
+        assert(scoreDef);
+        return scoreDef->GetCustomTuning().IsValid();
+    });
+    if (!hasValidCustomTuning) return;
+
     ListOfObjects dstScoreDefs = dst->FindAllDescendantsByType(SCOREDEF);
     if (srcScoreDefs.size() != dstScoreDefs.size()) {
         LogError("Custom tuning: Cannot reliably copy custom tunings from original doc to MIDI doc, because ScoreDef "

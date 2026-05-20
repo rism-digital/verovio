@@ -91,7 +91,7 @@ public:
     ///@}
 
     /**
-     * A Structure holding a glyph paramter for the nc.
+     * A Structure holding a glyph parameter for the nc.
      * One single nc might need more than one glyph (e.g., liquescent).
      * Set in CalcLigatureOrNeumePosFunctor::VisitNeume
      */

@@ -924,7 +924,8 @@ Options::Options()
     m_baseOptions.AddOption(&m_allPages);
 
     m_inputFrom.SetInfo("Input from",
-        "Select input format from: \"abc\", \"cmme.xml\", \"darms\", \"esac\", \"humdrum\", \"mei\", \"pae\", "
+        "Select input format from: \"abc\", \"cmme.xml\", \"darms\", \"esac\", \"gabc\", \"humdrum\", "
+        "\"mei\", \"pae\", "
         "\"volpiano\", \"xml\" "
         "(musicxml), \"musicxml-hum\" (musicxml via humdrum) or \"mei-pb-serialized\"");
     m_inputFrom.Init("mei");
@@ -1599,7 +1600,7 @@ Options::Options()
     m_expandAlways.Init(false);
     this->Register(&m_expandAlways, "expandAlways", &m_selectors);
 
-    m_expandNever.SetInfo("Never expansion", "Expand for no output, including MIDI and timemap");
+    m_expandNever.SetInfo("Never expand", "Expand for no output, including MIDI and timemap");
     m_expandNever.Init(false);
     this->Register(&m_expandNever, "expandNever", &m_selectors);
 
@@ -1890,6 +1891,35 @@ Options::Options()
     m_mensuralScoreUp.Init(false);
     this->Register(&m_mensuralScoreUp, "mensuralScoreUp", &m_mensural);
 
+    /********* Neume *********/
+
+    m_neume.SetLabel("Neumatic notation options", "7-neume");
+    m_neume.SetCategory(OptionsCategory::Neume);
+    m_grps.push_back(&m_neume);
+
+    // 18-may-2026 GABC options — cover features of the GABC grammar that have no direct MEI Neume
+    // counterpart (S-GABC paper, Table mei1; sec. 6.3/6.5).
+    m_gabcAquitanianContext.SetInfo("GABC Aquitanian context",
+        "Render the GABC `V` left-stem (grule virga_left) using tilt=\"ne\" instead of the default "
+        "tilt=\"n\" used for square notation.");
+    m_gabcAquitanianContext.Init(false);
+    this->Register(&m_gabcAquitanianContext, "gabcAquitanianContext", &m_neume);
+
+    m_gabcExtendedSymbols.SetInfo("GABC extended (S-GABC) symbols",
+        "Enable the S-GABC proposed symbols: `r` for uncertain reading and `\"` "
+        "for clarifying lines");
+    m_gabcExtendedSymbols.Init(false);
+    this->Register(&m_gabcExtendedSymbols, "gabcExtendedSymbols", &m_neume);
+
+    m_gabcStaffLines.SetInfo(
+        "GABC staff lines", "Number of staff lines for GABC import (the GABC `staff-lines:` header value)");
+    m_gabcStaffLines.Init(4, 4, 5);
+    this->Register(&m_gabcStaffLines, "gabcStaffLines", &m_neume);
+
+    m_liquescentWithoutTails.SetInfo("Liquescent without tails", "Render liquescent head without tails");
+    m_liquescentWithoutTails.Init(false);
+    this->Register(&m_liquescentWithoutTails, "liquescentWithoutTails", &m_neume);
+
     /********* Method JSON options to the command-line *********/
 
     m_jsonCmdLineOptions.SetLabel("Method JSON options for the command-line", "7-methodJson");
@@ -2009,6 +2039,12 @@ bool Options::SetInputFrom(std::string const &inputFrom)
     else if (inputFrom == "cmme.xml") {
         m_inputFromFormat = CMME;
     }
+    else if (inputFrom == "esac") {
+        m_inputFromFormat = ESAC;
+    }
+    else if (inputFrom == "gabc") {
+        m_inputFromFormat = GABC;
+    }
     else if ((inputFrom == "humdrum") || (inputFrom == "hum")) {
         m_inputFromFormat = HUMDRUM;
     }
@@ -2032,9 +2068,6 @@ bool Options::SetInputFrom(std::string const &inputFrom)
     }
     else if (inputFrom == "mei-hum") {
         m_inputFromFormat = MEIHUM;
-    }
-    else if (inputFrom == "esac") {
-        m_inputFromFormat = ESAC;
     }
     else if (inputFrom == "mei-pb-serialized") {
         m_inputFromFormat = SERIALIZATION;

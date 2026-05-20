@@ -30,6 +30,7 @@ let package = Package(
                 .headerSearchPath("include/json"),
                 .headerSearchPath("include/midi"),
                 .headerSearchPath("include/pugi"),
+                .headerSearchPath("include/tuning-library"),
                 .headerSearchPath("include/utf8"),
                 .headerSearchPath("include/vrv"),
                 .headerSearchPath("include/zip"),

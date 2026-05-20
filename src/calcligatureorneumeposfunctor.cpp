@@ -248,6 +248,7 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
         const bool hasLiquescent = (nc->FindDescendantByType(LIQUESCENT));
         const bool hasOriscus = (nc->FindDescendantByType(ORISCUS));
         const bool hasQuilisma = (nc->FindDescendantByType(QUILISMA));
+        const bool hasStrophicus = (nc->FindDescendantByType(STROPHICUS));
 
         const int lineWidth = m_doc->GetGlyphWidth(SMUFL_E9BE_chantConnectingLineAsc3rd, staffSize, false);
 
@@ -258,25 +259,34 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
         bool overlapWithPrevious = (pitchDifference == 0) ? false : true;
 
         if (hasLiquescent) {
-            nc->m_drawingGlyphs.resize(3);
-            const int ncWidth = m_doc->GetGlyphWidth(SMUFL_E995_chantAuctumDesc, staffSize, false);
+            const bool gabcNoTailsOption = m_doc->GetOptions()->m_liquescentWithoutTails.GetValue();
+            if (!gabcNoTailsOption) {
+                nc->m_drawingGlyphs.resize(3);
+            }
+
+            const int ncWidth = m_doc->GetGlyphWidth(SMUFL_E995_chantAuctumDesc, staffSize,
+                false); // actually, this not used when gabcNoTailsOption, it could be removed
             const int lineWidth = m_doc->GetGlyphWidth(SMUFL_E9BE_chantConnectingLineAsc3rd, staffSize, false);
 
             if (nc->GetCurve() == curvatureDirection_CURVE_c) {
                 nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E995_chantAuctumDesc;
-                nc->m_drawingGlyphs.at(1).m_fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
-                nc->m_drawingGlyphs.at(2).m_fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
-                nc->m_drawingGlyphs.at(2).m_xOffset = ncWidth - lineWidth;
-                nc->m_drawingGlyphs.at(1).m_yOffset = -1.75 * unit;
-                nc->m_drawingGlyphs.at(2).m_yOffset = -1.9 * unit;
+                if (!gabcNoTailsOption) {
+                    nc->m_drawingGlyphs.at(1).m_fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+                    nc->m_drawingGlyphs.at(2).m_fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+                    nc->m_drawingGlyphs.at(2).m_xOffset = ncWidth - lineWidth;
+                    nc->m_drawingGlyphs.at(1).m_yOffset = -1.75 * unit;
+                    nc->m_drawingGlyphs.at(2).m_yOffset = -1.9 * unit;
+                }
             }
             else if (nc->GetCurve() == curvatureDirection_CURVE_a) {
                 nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E994_chantAuctumAsc;
-                nc->m_drawingGlyphs.at(1).m_fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
-                nc->m_drawingGlyphs.at(2).m_fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
-                nc->m_drawingGlyphs.at(2).m_xOffset = ncWidth - lineWidth;
-                nc->m_drawingGlyphs.at(1).m_yOffset = 0.5 * unit;
-                nc->m_drawingGlyphs.at(2).m_yOffset = 0.75 * unit;
+                if (!gabcNoTailsOption) {
+                    nc->m_drawingGlyphs.at(1).m_fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+                    nc->m_drawingGlyphs.at(2).m_fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+                    nc->m_drawingGlyphs.at(2).m_xOffset = ncWidth - lineWidth;
+                    nc->m_drawingGlyphs.at(1).m_yOffset = 0.5 * unit;
+                    nc->m_drawingGlyphs.at(2).m_yOffset = 0.75 * unit;
+                }
             }
             else {
                 nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9A1_chantPunctumDeminutum;
@@ -287,6 +297,9 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
         }
         else if (hasQuilisma) {
             nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E99B_chantQuilisma;
+        }
+        else if (hasStrophicus) {
+            nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_EA29_medRenStrophicusCMN;
         }
         else {
             nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E990_chantPunctum;

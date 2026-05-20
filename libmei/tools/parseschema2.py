@@ -27,9 +27,8 @@ import sys
 from argparse import ArgumentParser
 from pathlib import Path
 
-import yaml
-
 import cpp
+import yaml
 from schema import MeiSchema
 
 logging.basicConfig(format="[%(asctime)s] [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)")

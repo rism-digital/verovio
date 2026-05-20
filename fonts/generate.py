@@ -220,8 +220,13 @@ def generate_css(opts: Namespace) -> bool:
         font_el.remove(hkern)
 
     for glyph in font_el.findall(".//svg:glyph", SVG_NS):
-        gname: Optional[str] = glyph.get("glyph-name")
-        if gname and gname != "space" and gname[-4:] not in supported_glyphs:
+        glyph_name: Optional[str] = glyph.get("glyph-name")
+        if not glyph_name.startswith("uni"):
+           for codepoint, name in supported_glyphs.items():
+                if name == glyph_name:
+                    glyph_name = f"uni{codepoint}"
+                    break
+        if glyph_name and glyph_name != "space" and glyph_name[-4:] not in supported_glyphs:
             font_el.remove(glyph)
 
     log.debug("Shortening metadata entry to the essentials.")
@@ -516,6 +521,14 @@ def __write_xml_glyphs(
             log.debug("Could not find a glyph name. Skipping")
             continue
 
+        if not glyph_name.startswith("uni"):
+            # if the font uses SMuFL names instead of unicode codepoints,
+            # we need to find the corresponding codepoint for the glyph name
+            for codepoint, name in supported_glyphs.items():
+                if name == glyph_name:
+                    glyph_name = f"uni{codepoint}"
+                    break
+
         # special treatment for space
         code: str = "0020" if glyph_name == "space" else glyph_name[-4:]
         if code not in supported_glyphs:
@@ -555,6 +568,14 @@ def __write_bb_xml(
         if not glyph_name:
             log.debug("Could not find a glyph name. Skipping")
             continue
+
+        if not glyph_name.startswith("uni"):
+            # if the font uses SMuFL names instead of unicode codepoints,
+            # we need to find the corresponding codepoint for the glyph name
+            for codepoint, name in supported_glyphs.items():
+                if name == glyph_name:
+                    glyph_name = f"uni{codepoint}"
+                    break
 
         # special treatment for space
         code: str = "0020" if glyph_name == "space" else glyph_name[-4:]

@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: FranzDiebold/github-env-vars-action@v2.8.0
+      - uses: FranzDiebold/github-env-vars-action@v2.9.0
       - name: Get Short SHA
         run: |
           echo "SHORT_SHA=`echo ${{ github.event.pull_request.head.sha }} | cut -c1-7`" >> $GITHUB_ENV
