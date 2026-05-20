@@ -779,6 +779,9 @@
   <g c="E9BF" x="0.0" y="-150.0" w="14.0" h="600.0" h-a-x="14" n="chantConnectingLineAsc4th" />
   <g c="E9C0" x="0.0" y="-150.0" w="14.0" h="750.0" h-a-x="14" n="chantConnectingLineAsc5th" />
   <g c="E9C1" x="0.0" y="-150.0" w="14.0" h="900.0" h-a-x="14" n="chantConnectingLineAsc6th" />
+  <g c="E9D0" x="0.0" y="28.0" w="32.0" h="106.0" h-a-x="32" n="chantIctusAbove" />
+  <g c="E9D1" x="0.0" y="-134.0" w="32.0" h="106.0" h-a-x="32" n="chantIctusBelow" />
+  <g c="E9D8" x="-6.0" y="125.0" w="176.0" h="20.0" h-a-x="164" n="chantEpisema" />
   <g c="E9E0" x="0.0" y="-151.0" w="205.0" h="564.0" h-a-x="205" n="medRenFlatSoftB" />
   <g c="E9E1" x="0.0" y="-141.0" w="186.0" h="561.0" h-a-x="186" n="medRenFlatHardB" />
   <g c="E9E2" x="0.0" y="-254.0" w="102.0" h="507.0" h-a-x="102" n="medRenNatural" />
@@ -794,6 +797,7 @@
   <g c="E9F8" x="0.0" y="0.0" w="138.0" h="165.0" h-a-x="138" n="mensuralRestSemifusa" />
   <g c="EA02" x="1.0" y="0.0" w="613.0" h="411.0" h-a-x="615" n="mensuralCustosUp" />
   <g c="EA06" x="0.0" y="-101.0" w="60.0" h="416.0" h-a-x="60" n="chantCustosStemUpPosMiddle" />
+  <g c="EA29" x="0.0" y="-136.0" w="184.0" h="272.0" h-a-x="184" n="medRenStrophicusCMN" />
   <g c="EA2A" x="0.0" y="-131.0" w="319.0" h="263.0" h-a-x="319" n="medRenOriscusCMN" />
   <g c="EA50" x="20.0" y="-1.0" w="215.0" h="252.0" h-a-x="255" n="figbass0" />
   <g c="EA51" x="20.0" y="0.0" w="117.0" h="254.0" h-a-x="157" n="figbass1" />

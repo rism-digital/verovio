@@ -3,9 +3,9 @@ name = "libmei"
 version = "0.1.0"
 dependencies = [
     "pyyaml (>=6.0)",
-    "lxml (>=5.3.0)",
+    "lxml (>=6.1.0)",
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 description = "LibMEI is a C++ library for reading and writing MEI files"
 authors = [
     {name = "Andrew Hankinson", email="andrew.hankinson@gmail.com"},

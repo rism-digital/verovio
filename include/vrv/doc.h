@@ -380,7 +380,7 @@ public:
      * Segment positions occur where a barLine is set on all staves.
      * castOff parameters indicates if we perform cast off (true) or un-cast off
      */
-    void ConvertToCastOffMensuralDoc(bool castOff);
+    void ConvertToCastOffMensuralDoc(MensuralCastOffType castOff);
 
     /**
      * Convert mensural MEI into CMN measure-based MEI.
@@ -731,10 +731,16 @@ private:
     int m_markup;
 
     /**
-     * A flag to indicate whereas to document contains only mensural music.
-     * Mensural only music will be converted to cast-off segments by Doc::ConvertToCastOffMensuralDoc
+     * A flag to indicate if the document contains only mensural music.
+     * Mensural only music will be converted to cast-off segments by Doc::ConvertToCastOffMensuralDoc.
+     * It can be disabled with the --mensural-responsive-view "none" option.
      */
     data_BOOLEAN m_isMensuralMusicOnly;
+
+    /**
+     * A flag to indicate if mensural cast off has been performed.
+     */
+    bool m_mensuralCastOff;
 
     /**
      * A flag to indicate that the document contains neume lines.

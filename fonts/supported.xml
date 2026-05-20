@@ -2395,15 +2395,15 @@
     </medievalAndRenaissancePlainchantMultipleNoteForms>
     <medievalAndRenaissancePlainchantArticulations>
         <description>Medieval and Renaissance plainchant articulations</description>
-        <!--<glyph glyph-code="E9D0" smufl-name="chantIctusAbove" />-->
-        <!--<glyph glyph-code="E9D1" smufl-name="chantIctusBelow" />-->
+        <glyph glyph-code="E9D0" smufl-name="chantIctusAbove" />
+        <glyph glyph-code="E9D1" smufl-name="chantIctusBelow" />
         <!--<glyph glyph-code="E9D2" smufl-name="chantCirculusAbove" />-->
         <!--<glyph glyph-code="E9D3" smufl-name="chantCirculusBelow" />-->
         <!--<glyph glyph-code="E9D4" smufl-name="chantSemicirculusAbove" />-->
         <!--<glyph glyph-code="E9D5" smufl-name="chantSemicirculusBelow" />-->
         <!--<glyph glyph-code="E9D6" smufl-name="chantAccentusAbove" />-->
         <!--<glyph glyph-code="E9D7" smufl-name="chantAccentusBelow" />-->
-        <!--<glyph glyph-code="E9D8" smufl-name="chantEpisema" />-->
+        <glyph glyph-code="E9D8" smufl-name="chantEpisema" />
         <!--<glyph glyph-code="E9D9" smufl-name="chantAugmentum" />-->
         <range_end>U+E9DF</range_end>
         <range_start>U+E9D0</range_start>
@@ -2466,7 +2466,7 @@
         <!--<glyph glyph-code="EA26" smufl-name="medRenLiquescentAscCMN" />-->
         <!--<glyph glyph-code="EA27" smufl-name="medRenLiquescentDescCMN" />-->
         <!--<glyph glyph-code="EA28" smufl-name="medRenQuilismaCMN" />-->
-        <!--<glyph glyph-code="EA29" smufl-name="medRenStrophicusCMN" />-->
+        <glyph glyph-code="EA29" smufl-name="medRenStrophicusCMN" />
         <glyph glyph-code="EA2A" smufl-name="medRenOriscusCMN" />
         <range_end>U+EA2F</range_end>
         <range_start>U+EA20</range_start>

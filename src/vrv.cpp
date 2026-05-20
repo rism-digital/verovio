@@ -404,7 +404,7 @@ std::string GetFilename(std::string &fullpath)
     std::string name = fullpath;
     size_t lastdot = name.find_last_of(".");
     if (lastdot != std::string::npos) {
-        name = name.substr(0, lastdot);
+        name.resize(lastdot);
     }
     size_t lastslash = name.find_last_of("/");
     if (lastslash != std::string::npos) {

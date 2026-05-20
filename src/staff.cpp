@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <cassert>
+#include <cmath>
 #include <iterator>
 #include <vector>
 
@@ -234,9 +235,9 @@ void Staff::AdjustDrawingStaffSize()
 
 int Staff::GetDrawingStaffNotationSize() const
 {
-    if (this->IsTabLuteGerman()) return m_drawingStaffSize / GERMAN_TAB_STAFF_RATIO;
+    if (this->IsTabLuteGerman()) return std::round(m_drawingStaffSize / GERMAN_TAB_STAFF_RATIO);
 
-    return (this->IsTablature()) ? m_drawingStaffSize / TABLATURE_STAFF_RATIO : m_drawingStaffSize;
+    return (this->IsTablature()) ? std::round(m_drawingStaffSize / TABLATURE_STAFF_RATIO) : m_drawingStaffSize;
 }
 
 bool Staff::DrawingIsVisible() const

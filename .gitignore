@@ -100,3 +100,9 @@ Release/
 fonts/**/tmp
 libmei/tools/__pycache__
 doc/.venv
+
+# Golang files
+bindings/go/CMakeFiles
+bindings/go/CMakeCache.txt
+bindings/go/libverovio.dylib
+bindings/go/install_manifest.txt
