@@ -299,7 +299,7 @@ install(TARGETS verovio
 install(
     DIRECTORY ../data/
     DESTINATION share/verovio
-    FILES_MATCHING PATTERN "*.xml" PATTERN "*.svg" PATTERN "*.css"
+    FILES_MATCHING PATTERN "*.xml" PATTERN "*.svg" PATTERN "*.css" PATTERN "*.json"
 )
 # install all headers in /usr/local/include/verovio
 if (BUILD_AS_LIBRARY)
