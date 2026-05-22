@@ -607,7 +607,8 @@ private:
     bool ConvertGraceGrp();
     bool ConvertTuplet();
     bool ConvertDuration();
-    bool ConvertTie();
+    bool ConvertTieV1();
+    bool ConvertTieV2();
     bool ConvertLigature();
     bool ConvertAccidGes();
     ///@}

@@ -2322,6 +2322,7 @@ enum {
     ERR_076_CHORD_CLOSING,
     ERR_077_CHORD_INVALID,
     ERR_078_CHORD_OPEN,
+    ERR_079_TIE_NO_NOTE_CHORD
 };
 
 // clang-format off
@@ -2404,6 +2405,8 @@ const std::map<int, std::string> PAEInput::s_errCodes{
     { ERR_076_CHORD_CLOSING, "An extra '>' to close a chord is present." },
     { ERR_077_CHORD_INVALID, "An invalid charater is present in the chord." },
     { ERR_078_CHORD_OPEN, "The chord must be closed with '>' before the end of the measure." },
+    { ERR_079_TIE_NO_NOTE_CHORD, "A tie '_' must follow a note or a chord." },
+
 };
 
 // clang-format on
@@ -2459,6 +2462,7 @@ namespace pae {
     enum status_FIGURE { FIGURE_NONE = 0, FIGURE_START, FIGURE_END, FIGURE_REPEAT };
     enum status_CHORD { CHORD_NONE = 0, CHORD_MARKER, CHORD_NOTE };
     enum status_LIGATURE { LIGATURE_NONE = 0, LIGATURE_MARKER, LIGATURE_NOTE };
+    enum status_TIE { TIE_NONE, TIE_CHORD, TIE_NOTE };
 
     // specific positions with negative numbers
     enum { UNKOWN_POS = -1, KEYSIG_POS = -2, CLEF_POS = -3, TIMESIG_POS = -4, INPUT_POS = -5 };
@@ -3060,6 +3064,8 @@ bool PAEInput::Parse()
 
     if (success && m_v2) success = this->ConvertChordV2();
 
+    if (success && m_v2) success = this->ConvertTieV2();
+
     if (success) success = this->ConvertTrill();
 
     if (success) success = this->ConvertFermata();
@@ -3078,7 +3084,7 @@ bool PAEInput::Parse()
 
     if (success) success = this->ConvertDuration();
 
-    if (success) success = this->ConvertTie();
+    if (success && !m_v2) success = this->ConvertTieV1();
 
     if (success) success = this->ConvertLigature();
 
@@ -4539,7 +4545,7 @@ bool PAEInput::ConvertDuration()
     return true;
 }
 
-bool PAEInput::ConvertTie()
+bool PAEInput::ConvertTieV1()
 {
     // No ties in mensural
     // Since now we use the same symbol just return - eventually we want to check them in pedantic mode
@@ -4607,6 +4613,106 @@ bool PAEInput::ConvertTie()
         else if (!tie) {
             note = NULL;
         }
+    }
+
+    return true;
+}
+
+bool PAEInput::ConvertTieV2()
+{
+    if (!this->HasInput('_')) return true;
+
+    // A status flag indicating that we are in chord
+    pae::status_TIE status = pae::TIE_NONE;
+    // The list that will be repeated (a single note, or a chord start / and and its notes)
+    std::list<pae::Token> tieList;
+    // A pointer to the beginning of the tie
+    pae::Token *tieToken = NULL;
+
+    // Reset a tie when finding a rest, multirest, grace groups start / end, or score definition
+    const std::string tieReset = "-=rgqyr%$@ ";
+
+    std::list<pae::Token>::iterator token = m_pae.begin();
+    while (token != m_pae.end()) {
+        if (token->IsVoid()) {
+            ++token;
+            continue;
+        }
+
+        // We are within a chord
+        if (status == pae::TIE_CHORD) {
+            // This is the end of the chord
+            if (token->m_object && token->m_object->Is(CHORD)) {
+                tieList.push_back(*token);
+                status = pae::TIE_NONE;
+                // The list should not be empty ? To be checked when parsing the chord
+            }
+            // Otherwise, just add the notes to the tieList (accidentals should not be included)
+            else if (token->m_object && token->m_object->Is(NOTE)) {
+                tieList.push_back(*token);
+            }
+        }
+        // We are starting a new chord
+        else if (token->Is(CHORD)) {
+            tieList.clear();
+            tieList.push_back(*token);
+            tieToken = &(*token);
+            status = pae::TIE_CHORD;
+        }
+        // We have a note (oustide a chord)
+        else if (token->Is(NOTE)) {
+            tieList.clear();
+            tieList.push_back(*token);
+            tieToken = &(*token);
+            status = pae::TIE_NOTE;
+        }
+        else if (this->Is(*token, tieReset) || this->Was(*token, tieReset)) {
+            tieList.clear();
+            status = pae::TIE_NONE;
+        }
+        // We have tie and will be repeating the tieList
+        else if (token->m_char == '_') {
+            if (tieList.empty()) {
+                this->LogPAE(ERR_079_TIE_NO_NOTE_CHORD, *token);
+                if (m_pedanticMode) return false;
+                ++token;
+                continue;
+            }
+            token->m_char = 0;
+            // Make a copy of the original tieList in case it is inserted more than one time
+            std::list<pae::Token> tiedNoteChordToInsert = tieList;
+            // Set position and clone objects
+            for (pae::Token &tiedToken : tiedNoteChordToInsert) {
+                tiedToken.m_position = token->m_position;
+                // Do not clone the end container (see below)
+                if (tiedToken.m_object && !tiedToken.IsContainerEnd()) {
+                    tiedToken.m_object = tiedToken.m_object->Clone();
+                }
+            }
+            // Correct the end container object in the tied chord
+            if (pae::TIE_CHORD) {
+                tiedNoteChordToInsert.back().m_object = tiedNoteChordToInsert.front().m_object;
+            }
+
+            Tie *tie = new Tie();
+            tie->SetStartid("#" + tieToken->m_object->GetID());
+            tie->SetStart(vrv_cast<LayerElement *>(tieToken->m_object));
+            token->m_object = tie;
+
+            // Move to the next token because we insert before it
+            ++token;
+
+            // Insert the list of tokens
+            m_pae.insert(token, tiedNoteChordToInsert.begin(), tiedNoteChordToInsert.end());
+            // Move back to the previous token
+
+            --token;
+            tieToken = &(*token);
+            tie->SetEndid("#" + tieToken->m_object->GetID());
+            // Only for chords, flag used to detect tied chords in PAEInput::CheckContentPostBuild()
+            if (pae::TIE_CHORD) tie->SetEnd(vrv_cast<LayerElement *>(tieToken->m_object));
+        }
+        ++token;
     }
 
     return true;
@@ -4935,6 +5041,57 @@ bool PAEInput::CheckContentPostBuild()
             if (token) {
                 this->LogPAE(ERR_066_EMPTY_CONTAINER, *token);
                 if (m_pedanticMode) return false;
+            }
+        }
+    }
+
+    if (!m_v2) return true;
+
+    // Tie post-processing
+    ListOfObjects ties = m_doc->FindAllDescendantsByType(TIE);
+    // More all ties to the measure the start note / chord it
+    for (auto &object : ties) {
+        Tie *tie = vrv_cast<Tie *>(object);
+        assert(tie);
+        if (!tie->GetStart()) continue;
+        Object *measure = tie->GetParent();
+        if (measure != tie->GetStart()->GetParent()) {
+            measure->DetachChild(tie->GetIdx());
+            Object *startMeasure = tie->GetStart()->GetFirstAncestor(MEASURE);
+            assert(startMeasure);
+            startMeasure->AddChild(tie);
+        }
+    }
+    // For chords, move the tie to the notes and add a tie for each note
+    for (auto &object : ties) {
+        Tie *tie = vrv_cast<Tie *>(object);
+        assert(tie);
+        if (tie->GetStart() && tie->GetEnd()) {
+            const Chord *start = dynamic_cast<const Chord *>(tie->GetStart());
+            const Chord *end = dynamic_cast<const Chord *>(tie->GetEnd());
+            if (!start || !end) continue;
+            ListOfConstObjects startNotes = start->FindAllDescendantsByType(NOTE);
+            ListOfConstObjects endNotes = end->FindAllDescendantsByType(NOTE);
+            // No note, or not the same number of notes, which should never happen because tied chords are copied
+            if (startNotes.empty() || (startNotes.size() != endNotes.size())) continue;
+            Measure *measure = vrv_cast<Measure *>(tie->GetParent());
+            assert(measure);
+            ListOfConstObjects::const_iterator startIter, endIter;
+            Tie *noteTie = NULL;
+            for (startIter = startNotes.begin(), endIter = endNotes.begin(); startIter != startNotes.end();
+                ++startIter, ++endIter) {
+                // First note, replace the chord tie
+                if (!noteTie) {
+                    noteTie = tie;
+                    tie->TimeSpanningInterface::Reset();
+                }
+                else {
+                    Tie *newTie = new Tie();
+                    measure->InsertAfter(noteTie, newTie);
+                    noteTie = newTie;
+                }
+                noteTie->SetStartid("#" + (*startIter)->GetID());
+                noteTie->SetEndid("#" + (*endIter)->GetID());
             }
         }
     }
