@@ -3158,23 +3158,26 @@ void MusicXmlInput::ReadMusicXmlNote(
                     try {
                         for (const auto &current : m_currentAccids.at(note->GetPname())) {
                             Accid *accid = new Accid();
-                            note->AddChild(accid);
-                            accid->IsAttribute(false);
+                            accid->IsAttribute(true);
 
                             // to make sure the new *gestural* accidental conforms to the carried-over *written*
                             // accidental, we translate the latter to a SMuFL glyph and set the gestural accidental to
                             // the MEI equivalent of the written accidental. The custom tuning will always choose
                             // the SMuFL glyph over the gestural or written accidentals.
                             accid->SetAccidGes(Att::AccidentalWrittenToGestural(current.m_accid));
-                            if (!current.m_glyphName.empty()) {
-                                accid->SetGlyphName(current.m_glyphName);
-                                accid->SetGlyphAuth(current.m_glyphAuth);
+                            if (accid->HasAccid()) {
+                                accid->IsAttribute(false);
+                                if (!current.m_glyphName.empty()) {
+                                    accid->SetGlyphName(current.m_glyphName);
+                                    accid->SetGlyphAuth(current.m_glyphAuth);
+                                }
+                                else if (current.m_accid != ACCIDENTAL_WRITTEN_NONE) {
+                                    char32_t glyph = Accid::GetAccidGlyph(current.m_accid);
+                                    accid->SetGlyphName(CustomTuning::GetGlyphName(glyph, m_doc));
+                                    accid->SetGlyphAuth("smufl");
+                                }
                             }
-                            else if (current.m_accid != ACCIDENTAL_WRITTEN_NONE) {
-                                char32_t glyph = Accid::GetAccidGlyph(current.m_accid);
-                                accid->SetGlyphName(CustomTuning::GetGlyphName(glyph, m_doc));
-                                accid->SetGlyphAuth("smufl");
-                            }
+                            note->AddChild(accid);
                         }
                     }
                     catch (std::out_of_range &e) {
