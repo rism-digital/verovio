@@ -1,5 +1,8 @@
 # Changelog
 
+## [6.2.1] – 2026-05-22
+* Fix missing file in the resources (Python and cmd-line installation)
+
 ## [6.2.0] – 2026-05-20
 * Golang binding
 * Support for G-ABC (Gregorian music notation) import
