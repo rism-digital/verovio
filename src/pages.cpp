@@ -15,6 +15,7 @@
 
 #include "doc.h"
 #include "functor.h"
+#include "measure.h"
 #include "page.h"
 #include "score.h"
 #include "staff.h"
@@ -22,6 +23,32 @@
 #include "vrv.h"
 
 namespace vrv {
+
+namespace {
+
+    const Measure *GetPageBoundaryMeasure(Page *page, bool last)
+    {
+        const ArrayOfObjects &children = page->GetChildren();
+        if (!last) {
+            for (Object *child : children) {
+                if (!child->Is(SYSTEM)) continue;
+                if (const Measure *measure = vrv_cast<const Measure *>(child->GetFirst(MEASURE)); measure)
+                    return measure;
+            }
+        }
+        else {
+            for (auto iter = children.rbegin(); iter != children.rend(); ++iter) {
+                Object *child = *iter;
+                if (!child->Is(SYSTEM)) continue;
+                if (const Measure *measure = vrv_cast<const Measure *>(child->GetLast(MEASURE)); measure)
+                    return measure;
+            }
+        }
+
+        return NULL;
+    }
+
+} // namespace
 
 //----------------------------------------------------------------------------
 // Pages
@@ -125,11 +152,10 @@ void PageRange::SetAsFocus(Page *page)
 
     m_focusPage = page;
 
-    const Object *firstMeasure = page->FindDescendantByType(MEASURE);
+    const Object *firstMeasure = GetPageBoundaryMeasure(page, false);
     if (firstMeasure) EvaluateSpanningElementsIn(firstMeasure);
 
-    const Measure *lastMeasure
-        = vrv_cast<const Measure *>(page->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
+    const Measure *lastMeasure = GetPageBoundaryMeasure(page, true);
     if (lastMeasure) {
         this->EvaluateSpanningElementsIn(lastMeasure);
         ListOfConstObjects timeSpanningObjects;
