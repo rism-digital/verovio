@@ -65,6 +65,41 @@
 
 namespace vrv {
 
+namespace {
+
+    bool IsPostponedTimeSpanningControlElement(ClassId classId)
+    {
+        switch (classId) {
+            case ANNOTSCORE:
+            case BEAMSPAN:
+            case BRACKETSPAN:
+            case FIGURE:
+            case GLISS:
+            case HAIRPIN:
+            case LV:
+            case OCTAVE:
+            case PHRASE:
+            case PITCHINFLECTION:
+            case SLUR:
+            case TIE: return true;
+            default: return false;
+        }
+    }
+
+    bool SkipsHorizontalOnlyBBox(ClassId classId)
+    {
+        switch (classId) {
+            case ANNOTSCORE:
+            case BRACKETSPAN:
+            case HAIRPIN:
+            case OCTAVE:
+            case PITCHINFLECTION: return true;
+            default: return false;
+        }
+    }
+
+} // namespace
+
 //----------------------------------------------------------------------------
 // View - FloatingObject - ControlElement
 //----------------------------------------------------------------------------
@@ -79,8 +114,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     this->StartOffset(dc, element, 100);
 
     // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
-    if (element->Is({ ANNOTSCORE, BEAMSPAN, BRACKETSPAN, FIGURE, GLISS, HAIRPIN, LV, OCTAVE, PHRASE, PITCHINFLECTION,
-            SLUR, TIE })) {
+    if (IsPostponedTimeSpanningControlElement(element->GetClassId())) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetID());
         dc->EndGraphic(element, this);
@@ -186,11 +220,13 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     assert(element);
     assert(system);
 
+    const ClassId classId = element->GetClassId();
+
     if (dc->Is(BBOX_DEVICE_CONTEXT)) {
         BBoxDeviceContext *bBoxDC = vrv_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {
-            if (element->Is({ ANNOTSCORE, BRACKETSPAN, HAIRPIN, OCTAVE, PITCHINFLECTION })) return;
+            if (SkipsHorizontalOnlyBBox(classId)) return;
         }
     }
 
@@ -198,11 +234,11 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     assert(interface);
 
     // The start is given by the TimePointInterface
-    LayerElement *start = dynamic_cast<LayerElement *>(interface->GetStart());
+    LayerElement *start = interface->GetStart();
     // The end is given either by the TimeSpanningInterface (end) or by the LinkingInterface (next)
     LayerElement *end = NULL;
     if (interface->GetEnd()) {
-        end = dynamic_cast<LayerElement *>(interface->GetEnd());
+        end = interface->GetEnd();
     }
     else if (element->HasInterface(INTERFACE_LINKING)) {
         LinkingInterface *linkingInterface = element->GetLinkingInterface();
@@ -242,7 +278,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     // Only the first parent is the same, this means that the element is "open" at the end of the system
     else if (system == parentSystem1) {
         // We need the last measure of the system for x2 - we also use it for getting the staves later
-        measure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
+        measure = vrv_cast<Measure *>(system->GetLast(MEASURE));
         if (!measure) return;
         drawingX1 = start->GetDrawingX();
         objectX = start;
@@ -253,7 +289,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     // We are in the system of the last note - draw the element from the beginning of the system
     else if (system == parentSystem2) {
         // We need the first measure of the system for x1 - we also use it for getting the staves later
-        measure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
+        measure = vrv_cast<Measure *>(system->GetFirst(MEASURE));
         if (!measure) return;
         // We need the position of the first default in the first measure for x1
         drawingX1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
@@ -265,13 +301,13 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     // throughout the system => recheck that the systems are in correct order
     else if (Object::IsPreOrdered(parentSystem1, system) && Object::IsPreOrdered(system, parentSystem2)) {
         // We need the first measure of the system for x1 - we also use it for getting the staves later
-        measure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
+        measure = vrv_cast<Measure *>(system->GetFirst(MEASURE));
         if (!measure) return;
         // We need the position of the first default in the first measure for x1
         drawingX1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
         objectX = measure->GetLeftBarLine();
         // We need the last measure of the system for x2
-        Measure *last = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
+        Measure *last = vrv_cast<Measure *>(system->GetLast(MEASURE));
         if (!last) return;
         drawingX2 = last->GetDrawingX() + last->GetRightBarLineXRel();
         spanningType = SPANNING_MIDDLE;
@@ -326,7 +362,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
 
         // TimeSpanning elements are not necessary floating elements (e.g., syl) - we have a bounding box only for them
         if (element->IsControlElement()) {
-            if (element->Is({ PHRASE, SLUR })) {
+            if ((classId == PHRASE) || (classId == SLUR)) {
                 if (this->GetSlurHandling() == SlurHandling::Ignore) break;
                 Slur *slur = vrv_cast<Slur *>(element);
                 assert(slur);
@@ -335,98 +371,78 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
 
             // Create the floating positioner
             if (!system->SetCurrentFloatingPositioner(
-                    staff->GetN(), dynamic_cast<ControlElement *>(element), objectX, staff, spanningType)) {
+                    staff->GetN(), vrv_cast<ControlElement *>(element), objectX, staff, spanningType)) {
                 continue;
             }
         }
 
-        if (element->Is(ANNOTSCORE)) {
-            // cast to AnnotScore check in DrawAnnotScore
-            this->DrawAnnotScore(dc, dynamic_cast<AnnotScore *>(element), x1, x2, staff, spanningType, graphic);
-        }
-        else if (element->Is(DIR)) {
-            // cast to Dir check in DrawControlElementConnector
-            this->DrawControlElementConnector(dc, dynamic_cast<Dir *>(element), x1, x2, staff, spanningType, graphic);
-        }
-        else if (element->Is(DYNAM)) {
-            // cast to Dynam check in DrawControlElementConnector
-            this->DrawControlElementConnector(dc, dynamic_cast<Dynam *>(element), x1, x2, staff, spanningType, graphic);
-        }
-        else if (element->Is(FIGURE)) {
-            // cast to F check in DrawFConnector
-            this->DrawFConnector(dc, dynamic_cast<F *>(element), x1, x2, staff, spanningType, graphic);
-        }
-        else if (element->Is(BEAMSPAN)) {
-            // cast to BeamSpan check in DrawBeamSpan
-            this->DrawBeamSpan(dc, vrv_cast<BeamSpan *>(element), system, graphic);
-        }
-        else if (element->Is(BRACKETSPAN)) {
-            // cast to BracketSpan check in DrawBracketSpan
-            this->DrawBracketSpan(dc, dynamic_cast<BracketSpan *>(element), x1, x2, staff, spanningType, graphic);
-        }
-        else if (element->Is(GLISS)) {
-            // For gliss we limit support to one value in @staff
-            if (!isFirst) continue;
-            // cast to Gliss check in DrawGliss
-            this->DrawGliss(dc, dynamic_cast<Gliss *>(element), x1, x2, staff, spanningType, graphic);
-        }
-        else if (element->Is(HAIRPIN)) {
-            // cast to Hairpin check in DrawHairpin
-            this->DrawHairpin(dc, dynamic_cast<Hairpin *>(element), x1, x2, staff, spanningType, graphic);
-        }
-        else if (element->Is(LV)) {
-            // For ties we limit support to one value in @staff
-            if (!isFirst) continue;
-            // cast to Tie check in DrawTie
-            this->DrawTie(dc, dynamic_cast<Tie *>(element), x1, x2, staff, spanningType, graphic);
-        }
-        else if (element->Is(PHRASE)) {
-            // Check if slurs should be ignored
-            if (this->GetSlurHandling() == SlurHandling::Ignore) continue;
-            // For phrases (slurs) we limit support to one value in @staff
-            if (!isFirst) continue;
-            // cast to Slur check in DrawSlur
-            this->DrawSlur(dc, dynamic_cast<Slur *>(element), x1, x2, staff, spanningType, graphic);
-        }
-        else if (element->Is(OCTAVE)) {
-            // cast to Slur check in DrawOctave
-            this->DrawOctave(dc, dynamic_cast<Octave *>(element), x1, x2, staff, spanningType, graphic);
-        }
-        else if (element->Is(PEDAL)) {
-            this->DrawPedalLine(dc, dynamic_cast<Pedal *>(element), x1, x2, staff, spanningType, graphic);
-        }
-        else if (element->Is(PITCHINFLECTION)) {
-            // cast to PitchInflection check in DrawPitchInflection
-            this->DrawPitchInflection(
-                dc, dynamic_cast<PitchInflection *>(element), x1, x2, staff, spanningType, graphic);
-        }
-        else if (element->Is(SLUR)) {
-            // Check if slurs should be ignored
-            if (this->GetSlurHandling() == SlurHandling::Ignore) continue;
-            // For slurs we limit support to one value in @staff
-            if (!isFirst) continue;
-            // cast to Slur check in DrawSlur
-            this->DrawSlur(dc, dynamic_cast<Slur *>(element), x1, x2, staff, spanningType, graphic);
-        }
-        else if (element->Is(SYL)) {
-            // prolong to the end of the notehead
-            x2 += endRadius;
-            // cast to Syl check in DrawSylConnector
-            this->DrawSylConnector(dc, dynamic_cast<Syl *>(element), x1, x2, staff, spanningType, graphic);
-        }
-        else if (element->Is(TEMPO)) {
-            // cast to Tempo check in DrawControlElementConnector
-            this->DrawControlElementConnector(dc, dynamic_cast<Tempo *>(element), x1, x2, staff, spanningType, graphic);
-        }
-        else if (element->Is(TIE)) {
-            // For ties we limit support to one value in @staff
-            if (!isFirst) continue;
-            // cast to Slur check in DrawTie
-            this->DrawTie(dc, dynamic_cast<Tie *>(element), x1, x2, staff, spanningType, graphic);
-        }
-        else if (element->Is(TRILL)) {
-            // cast to Trill check in DrawTrill
-            this->DrawTrillExtension(dc, dynamic_cast<Trill *>(element), x1, x2, staff, spanningType, graphic);
+        switch (classId) {
+            case ANNOTSCORE:
+                this->DrawAnnotScore(dc, vrv_cast<AnnotScore *>(element), x1, x2, staff, spanningType, graphic);
+                break;
+            case DIR:
+                this->DrawControlElementConnector(dc, vrv_cast<Dir *>(element), x1, x2, staff, spanningType, graphic);
+                break;
+            case DYNAM:
+                this->DrawControlElementConnector(dc, vrv_cast<Dynam *>(element), x1, x2, staff, spanningType, graphic);
+                break;
+            case FIGURE: this->DrawFConnector(dc, vrv_cast<F *>(element), x1, x2, staff, spanningType, graphic); break;
+            case BEAMSPAN: this->DrawBeamSpan(dc, vrv_cast<BeamSpan *>(element), system, graphic); break;
+            case BRACKETSPAN:
+                this->DrawBracketSpan(dc, vrv_cast<BracketSpan *>(element), x1, x2, staff, spanningType, graphic);
+                break;
+            case GLISS:
+                // For gliss we limit support to one value in @staff
+                if (!isFirst) continue;
+                this->DrawGliss(dc, vrv_cast<Gliss *>(element), x1, x2, staff, spanningType, graphic);
+                break;
+            case HAIRPIN:
+                this->DrawHairpin(dc, vrv_cast<Hairpin *>(element), x1, x2, staff, spanningType, graphic);
+                break;
+            case LV:
+                // For ties we limit support to one value in @staff
+                if (!isFirst) continue;
+                this->DrawTie(dc, vrv_cast<Tie *>(element), x1, x2, staff, spanningType, graphic);
+                break;
+            case PHRASE:
+                // Check if slurs should be ignored
+                if (this->GetSlurHandling() == SlurHandling::Ignore) continue;
+                // For phrases (slurs) we limit support to one value in @staff
+                if (!isFirst) continue;
+                this->DrawSlur(dc, vrv_cast<Slur *>(element), x1, x2, staff, spanningType, graphic);
+                break;
+            case OCTAVE: this->DrawOctave(dc, vrv_cast<Octave *>(element), x1, x2, staff, spanningType, graphic); break;
+            case PEDAL:
+                this->DrawPedalLine(dc, vrv_cast<Pedal *>(element), x1, x2, staff, spanningType, graphic);
+                break;
+            case PITCHINFLECTION:
+                this->DrawPitchInflection(
+                    dc, vrv_cast<PitchInflection *>(element), x1, x2, staff, spanningType, graphic);
+                break;
+            case SLUR:
+                // Check if slurs should be ignored
+                if (this->GetSlurHandling() == SlurHandling::Ignore) continue;
+                // For slurs we limit support to one value in @staff
+                if (!isFirst) continue;
+                this->DrawSlur(dc, vrv_cast<Slur *>(element), x1, x2, staff, spanningType, graphic);
+                break;
+            case SYL:
+                // prolong to the end of the notehead
+                x2 += endRadius;
+                this->DrawSylConnector(dc, vrv_cast<Syl *>(element), x1, x2, staff, spanningType, graphic);
+                break;
+            case TEMPO:
+                this->DrawControlElementConnector(dc, vrv_cast<Tempo *>(element), x1, x2, staff, spanningType, graphic);
+                break;
+            case TIE:
+                // For ties we limit support to one value in @staff
+                if (!isFirst) continue;
+                this->DrawTie(dc, vrv_cast<Tie *>(element), x1, x2, staff, spanningType, graphic);
+                break;
+            case TRILL:
+                this->DrawTrillExtension(dc, vrv_cast<Trill *>(element), x1, x2, staff, spanningType, graphic);
+                break;
+            default: break;
         }
         isFirst = false;
     }
@@ -1425,7 +1441,7 @@ void View::DrawSylConnector(
             assert(measure);
             System *system = vrv_cast<System *>(measure->GetFirstAncestor(SYSTEM));
             assert(system);
-            if (measure == vrv_cast<Measure *>(system->FindDescendantByType(MEASURE))) {
+            if (measure == system->GetFirst(MEASURE)) {
                 return;
             }
         }
@@ -3095,7 +3111,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     // Only the first parent is the same, this means that the ending is "open" at the end of the system
     else if (system == parentSystem1) {
         // We need the last measure of the system for x2 - we also use it for getting the staves later
-        measure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
+        measure = vrv_cast<Measure *>(system->GetLast(MEASURE));
         if (!measure) return;
         x1 = ending->GetMeasure()->GetDrawingX();
         objectX = measure;
@@ -3108,7 +3124,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     // We are in the system where the ending ends - draw it from the beginning of the system
     else if (system == parentSystem2) {
         // We need the last measure of the system for x2
-        measure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
+        measure = vrv_cast<Measure *>(system->GetFirst(MEASURE));
         if (!measure) return;
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
         objectX = measure->GetLeftBarLine();
@@ -3120,13 +3136,13 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     // throughout the system
     else {
         // We need the first measure of the system for x1 - we also use it for getting the staves later
-        measure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
+        measure = vrv_cast<Measure *>(system->GetFirst(MEASURE));
         if (!measure) return;
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
         objectX = measure->GetLeftBarLine();
         endingMeasure = measure;
         // We need the last measure of the system for x2
-        measure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
+        measure = vrv_cast<Measure *>(system->GetLast(MEASURE));
         if (!measure) return;
         x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
         spanningType = SPANNING_MIDDLE;
@@ -3215,7 +3231,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         const int rightBarLineWidth = endingMeasure->CalculateRightBarLineWidth(m_doc, staffSize);
         int endX = x2;
         if ((spanningType == SPANNING_START) || (spanningType == SPANNING_MIDDLE)
-            || (endingMeasure == system->FindDescendantByType(MEASURE, 1, BACKWARD))) {
+            || (endingMeasure == system->GetLast(MEASURE))) {
             // Right align the ending in the last measure of the system
             endX += rightBarLineWidth - lineWidth / 2 - staffLineWidth;
         }

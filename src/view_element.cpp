@@ -79,7 +79,10 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
 
     this->StartOffset(dc, element, staff->m_drawingStaffSize);
 
-    if (element->Is(ACCID)) {
+    if (element->Is(NOTE) || element->Is(CHORD) || element->Is(REST)) {
+        this->DrawDurationElement(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(ACCID)) {
         this->DrawAccid(dc, element, layer, staff, measure);
     }
     else if (element->Is(ARTIC)) {
@@ -96,9 +99,6 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     else if (element->Is(BTREM)) {
         this->DrawBTrem(dc, element, layer, staff, measure);
-    }
-    else if (element->Is(CHORD)) {
-        this->DrawDurationElement(dc, element, layer, staff, measure);
     }
     else if (element->Is(CLEF)) {
         this->DrawClef(dc, element, layer, staff, measure);
@@ -169,9 +169,6 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(NC)) {
         this->DrawNc(dc, element, layer, staff, measure);
     }
-    else if (element->Is(NOTE)) {
-        this->DrawDurationElement(dc, element, layer, staff, measure);
-    }
     else if (element->Is(NEUME)) {
         this->DrawNeume(dc, element, layer, staff, measure);
     }
@@ -189,9 +186,6 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     else if (element->Is(STROPHICUS)) {
         this->DrawStrophicus(dc, element, layer, staff, measure);
-    }
-    else if (element->Is(REST)) {
-        this->DrawDurationElement(dc, element, layer, staff, measure);
     }
     else if (element->Is(SPACE)) {
         this->DrawSpace(dc, element, layer, staff, measure);
@@ -891,20 +885,23 @@ void View::DrawDurationElement(DeviceContext *dc, LayerElement *element, Layer *
     assert(staff);
     assert(measure);
 
-    if (dynamic_cast<Chord *>(element)) {
-        dc->StartGraphic(element, "", element->GetID());
-        this->DrawChord(dc, element, layer, staff, measure);
-        dc->EndGraphic(element, this);
-    }
-    else if (dynamic_cast<Note *>(element)) {
-        dc->StartGraphic(element, "", element->GetID());
-        this->DrawNote(dc, element, layer, staff, measure);
-        dc->EndGraphic(element, this);
-    }
-    else if (dynamic_cast<Rest *>(element)) {
-        dc->StartGraphic(element, "", element->GetID());
-        this->DrawRest(dc, element, layer, staff, measure);
-        dc->EndGraphic(element, this);
+    switch (element->GetClassId()) {
+        case CHORD:
+            dc->StartGraphic(element, "", element->GetID());
+            this->DrawChord(dc, element, layer, staff, measure);
+            dc->EndGraphic(element, this);
+            break;
+        case NOTE:
+            dc->StartGraphic(element, "", element->GetID());
+            this->DrawNote(dc, element, layer, staff, measure);
+            dc->EndGraphic(element, this);
+            break;
+        case REST:
+            dc->StartGraphic(element, "", element->GetID());
+            this->DrawRest(dc, element, layer, staff, measure);
+            dc->EndGraphic(element, this);
+            break;
+        default: assert(false); break;
     }
 }
 
