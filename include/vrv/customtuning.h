@@ -12,7 +12,9 @@
 
 //----------------------------------------------------------------------------
 
+#include <cassert>
 #include <map>
+#include <memory>
 
 //----------------------------------------------------------------------------
 
@@ -29,14 +31,26 @@ class CustomTuning {
 public:
     CustomTuning() {}
     CustomTuning(const std::string &tuningDef, Doc *doc, bool useMusicXmlAccidentals);
+    CustomTuning(const CustomTuning &other);
+    CustomTuning(CustomTuning &&other) noexcept = default;
+    CustomTuning &operator=(const CustomTuning &other);
+    CustomTuning &operator=(CustomTuning &&other) noexcept = default;
 
     /**
      * @name Getters and validity checkers
      */
     ///@{
-    bool IsValid() const { return m_tuning.notationMapping.count > 0; }
-    Tunings::Tuning &GetTuning() { return m_tuning; }
-    const Tunings::Tuning &GetTuning() const { return m_tuning; }
+    bool IsValid() const { return m_tuning && m_tuning->notationMapping.count > 0; }
+    Tunings::Tuning &GetTuning()
+    {
+        assert(m_tuning);
+        return *m_tuning;
+    }
+    const Tunings::Tuning &GetTuning() const
+    {
+        assert(m_tuning);
+        return *m_tuning;
+    }
     std::map<std::string, std::string> &GetNoteMap() { return m_noteMap; }
     const std::map<std::string, std::string> &GetNoteMap() const { return m_noteMap; }
     ///@}
@@ -75,7 +89,7 @@ public:
     //
 
 private:
-    Tunings::Tuning m_tuning;
+    std::unique_ptr<Tunings::Tuning> m_tuning;
     std::map<std::string, std::string> m_noteMap;
 
     //----------------//

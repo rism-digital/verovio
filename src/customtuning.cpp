@@ -30,13 +30,35 @@ std::map<char32_t, std::string> CustomTuning::s_glyphCodes;
 // CustomTuning
 //----------------------------------------------------------------------------
 
+CustomTuning::CustomTuning(const CustomTuning &other) : m_noteMap(other.m_noteMap)
+{
+    if (other.m_tuning) {
+        m_tuning = std::make_unique<Tunings::Tuning>(*other.m_tuning);
+    }
+}
+
+CustomTuning &CustomTuning::operator=(const CustomTuning &other)
+{
+    if (this == &other) return *this;
+
+    m_noteMap = other.m_noteMap;
+    if (other.m_tuning) {
+        m_tuning = std::make_unique<Tunings::Tuning>(*other.m_tuning);
+    }
+    else {
+        m_tuning.reset();
+    }
+
+    return *this;
+}
+
 CustomTuning::CustomTuning(const std::string &tuningDef, Doc *doc, bool useMusicXmlAccidentals)
 {
     assert(doc);
 
     // Parse the tuning and create the mappings
     try {
-        m_tuning = Tunings::Tuning(Tunings::parseASCLData(tuningDef));
+        m_tuning = std::make_unique<Tunings::Tuning>(Tunings::parseASCLData(tuningDef));
         CreateGlyphMapping(doc);
         CreateNoteMapping(useMusicXmlAccidentals);
     }
@@ -82,7 +104,8 @@ void CustomTuning::CreateGlyphMapping(Doc *doc)
 void CustomTuning::CreateNoteMapping(bool useMusicXmlAccidentals)
 {
     m_noteMap.clear();
-    for (const auto &note : m_tuning.notationMapping.names) {
+    assert(m_tuning);
+    for (const auto &note : m_tuning->notationMapping.names) {
         std::smatch note_names;
         std::regex note_name_regex("(?:^|\\/)([A-G])([^\\/\\s]*)");
         std::string::const_iterator search_start(note.cbegin());
@@ -212,10 +235,10 @@ int CustomTuning::GetMIDIPitch(const Note *note, const int shift, const int octa
         // FIXME! Special case: when we encounter a B pitch that's in scale degree 0, increment its oct by 1
         // otherwise, it would be in the lower octave
         const auto it = std::find(
-            m_tuning.notationMapping.names.begin(), m_tuning.notationMapping.names.end(), m_noteMap.at(noteName));
-        int scalePosition = (it - m_tuning.notationMapping.names.begin() + 1) % m_tuning.notationMapping.count;
+            m_tuning->notationMapping.names.begin(), m_tuning->notationMapping.names.end(), m_noteMap.at(noteName));
+        int scalePosition = (it - m_tuning->notationMapping.names.begin() + 1) % m_tuning->notationMapping.count;
         if (pname == PITCHNAME_b && scalePosition == 0) oct++;
-        return m_tuning.midiNoteForNoteName(m_noteMap.at(noteName), oct);
+        return m_tuning->midiNoteForNoteName(m_noteMap.at(noteName), oct);
     }
     catch (Tunings::TuningError &e) {
         LogError("Custom tuning: Error mapping note to tuning: %s", e.what());
