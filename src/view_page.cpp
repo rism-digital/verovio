@@ -9,9 +9,11 @@
 
 //----------------------------------------------------------------------------
 
+#include <array>
 #include <cassert>
 #include <math.h>
 #include <sstream>
+#include <vector>
 
 //----------------------------------------------------------------------------
 
@@ -58,6 +60,99 @@
 
 namespace vrv {
 
+namespace {
+
+    constexpr std::array<ClassId, 20> SYSTEM_DRAWING_LIST_ORDER = { SYL, ANNOTSCORE, BEAMSPAN, BRACKETSPAN, DYNAM, DIR,
+        GLISS, HAIRPIN, TRILL, FIGURE, LV, PHRASE, OCTAVE, ORNAM, PEDAL, PITCHINFLECTION, TEMPO, TIE, SLUR, ENDING };
+
+    int GetSystemDrawingListIndex(ClassId classId)
+    {
+        switch (classId) {
+            case SYL: return 0;
+            case ANNOTSCORE: return 1;
+            case BEAMSPAN: return 2;
+            case BRACKETSPAN: return 3;
+            case DYNAM: return 4;
+            case DIR: return 5;
+            case GLISS: return 6;
+            case HAIRPIN: return 7;
+            case TRILL: return 8;
+            case FIGURE: return 9;
+            case LV: return 10;
+            case PHRASE: return 11;
+            case OCTAVE: return 12;
+            case ORNAM: return 13;
+            case PEDAL: return 14;
+            case PITCHINFLECTION: return 15;
+            case TEMPO: return 16;
+            case TIE: return 17;
+            case SLUR: return 18;
+            case ENDING: return 19;
+            default: return -1;
+        }
+    }
+
+    MRest *FindMRestInStaff(Staff *staff)
+    {
+        for (Object *staffChild : staff->GetChildren()) {
+            if (staffChild->Is(LAYER)) {
+                for (Object *layerChild : staffChild->GetChildren()) {
+                    if (layerChild->Is(MREST)) return vrv_cast<MRest *>(layerChild);
+                    if (layerChild->IsEditorialElement()) {
+                        MRest *mrest = vrv_cast<MRest *>(layerChild->FindDescendantByType(MREST));
+                        if (mrest) return mrest;
+                    }
+                }
+            }
+            else if (staffChild->IsEditorialElement()) {
+                MRest *mrest = vrv_cast<MRest *>(staffChild->FindDescendantByType(MREST));
+                if (mrest) return mrest;
+            }
+        }
+
+        return NULL;
+    }
+
+    Object *FindDirectOrEditorialDescendant(Object *parent, ClassId classId)
+    {
+        for (Object *child : parent->GetChildren()) {
+            if (child->Is(classId)) return child;
+            if (child->IsEditorialElement()) {
+                Object *descendant = child->FindDescendantByType(classId);
+                if (descendant) return descendant;
+            }
+        }
+
+        return NULL;
+    }
+
+    void CalcBeamSpanSegmentsForSystem(Doc *doc, Object *parent, System *system)
+    {
+        for (Object *current : parent->GetChildren()) {
+            if (current->Is(BEAMSPAN)) {
+                BeamSpan *beamSpan = vrv_cast<BeamSpan *>(current);
+                BeamSpanSegment *segment = beamSpan->GetSegmentForSystem(system);
+                if (segment) {
+                    segment->CalcBeam(
+                        segment->GetLayer(), segment->GetStaff(), doc, beamSpan, beamSpan->m_drawingPlace);
+                }
+            }
+            else if (current->IsEditorialElement()) {
+                ListOfObjects objects = current->FindAllDescendantsByType(BEAMSPAN, false);
+                for (Object *element : objects) {
+                    BeamSpan *beamSpan = vrv_cast<BeamSpan *>(element);
+                    BeamSpanSegment *segment = beamSpan->GetSegmentForSystem(system);
+                    if (segment) {
+                        segment->CalcBeam(
+                            segment->GetLayer(), segment->GetStaff(), doc, beamSpan, beamSpan->m_drawingPlace);
+                    }
+                }
+            }
+        }
+    }
+
+} // namespace
+
 //----------------------------------------------------------------------------
 // View - Page
 //----------------------------------------------------------------------------
@@ -97,10 +192,10 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     for (Object *child : m_currentPage->GetChildren()) {
         if (child->IsPageElement()) {
             // cast to PageElement check in DrawSystemEditorial element
-            this->DrawPageElement(dc, dynamic_cast<PageElement *>(child));
+            this->DrawPageElement(dc, vrv_cast<PageElement *>(child));
         }
         else if (child->Is(SYSTEM)) {
-            System *system = dynamic_cast<System *>(child);
+            System *system = vrv_cast<System *>(child);
             this->DrawSystem(dc, system);
         }
         else {
@@ -195,7 +290,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
 
     dc->StartGraphic(system, "", system->GetID());
 
-    Measure *firstMeasure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1));
+    Measure *firstMeasure = vrv_cast<Measure *>(system->GetFirst(MEASURE));
 
     this->DrawSystemDivider(dc, system, firstMeasure);
 
@@ -208,26 +303,28 @@ void View::DrawSystem(DeviceContext *dc, System *system)
 
     this->DrawSystemChildren(dc, system, system);
 
-    this->DrawSystemList(dc, system, SYL);
-    this->DrawSystemList(dc, system, ANNOTSCORE);
-    this->DrawSystemList(dc, system, BEAMSPAN);
-    this->DrawSystemList(dc, system, BRACKETSPAN);
-    this->DrawSystemList(dc, system, DYNAM);
-    this->DrawSystemList(dc, system, DIR);
-    this->DrawSystemList(dc, system, GLISS);
-    this->DrawSystemList(dc, system, HAIRPIN);
-    this->DrawSystemList(dc, system, TRILL);
-    this->DrawSystemList(dc, system, FIGURE);
-    this->DrawSystemList(dc, system, LV);
-    this->DrawSystemList(dc, system, PHRASE);
-    this->DrawSystemList(dc, system, OCTAVE);
-    this->DrawSystemList(dc, system, ORNAM);
-    this->DrawSystemList(dc, system, PEDAL);
-    this->DrawSystemList(dc, system, PITCHINFLECTION);
-    this->DrawSystemList(dc, system, TEMPO);
-    this->DrawSystemList(dc, system, TIE);
-    this->DrawSystemList(dc, system, SLUR);
-    this->DrawSystemList(dc, system, ENDING);
+    {
+        std::array<ArrayOfObjects, SYSTEM_DRAWING_LIST_ORDER.size()> drawingListsByClass;
+        for (Object *object : *system->GetDrawingList()) {
+            const int index = GetSystemDrawingListIndex(object->GetClassId());
+            if (index >= 0) drawingListsByClass[index].push_back(object);
+        }
+
+        for (size_t i = 0; i < SYSTEM_DRAWING_LIST_ORDER.size(); ++i) {
+            const ClassId classId = SYSTEM_DRAWING_LIST_ORDER[i];
+            for (Object *object : drawingListsByClass[i]) {
+                if (classId == ENDING) {
+                    // cast to Ending check in DrawEnding
+                    this->DrawEnding(dc, vrv_cast<Ending *>(object), system);
+                }
+                else {
+                    this->StartOffset(dc, object, 100);
+                    this->DrawTimeSpanningElement(dc, object, system);
+                    this->EndOffset(dc, object);
+                }
+            }
+        }
+    }
 
     dc->EndGraphic(system, this);
 }
@@ -249,7 +346,7 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
         }
         if (object->Is(classId) && (classId == ENDING)) {
             // cast to Ending check in DrawEnding
-            this->DrawEnding(dc, dynamic_cast<Ending *>(object), system);
+            this->DrawEnding(dc, vrv_cast<Ending *>(object), system);
         }
     }
 }
@@ -262,7 +359,7 @@ void View::DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure,
     // we need at least one measure to be able to draw the groups - we need access to the staff elements,
     assert(measure);
 
-    StaffGrp *staffGrp = vrv_cast<StaffGrp *>(scoreDef->FindDescendantByType(STAFFGRP));
+    StaffGrp *staffGrp = vrv_cast<StaffGrp *>(scoreDef->GetFirst(STAFFGRP));
     if (!staffGrp) {
         return;
     }
@@ -1002,21 +1099,18 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     }
 
     if (m_drawingScoreDef.GetMnumVisible() != BOOLEAN_false) {
-        MNum *mnum = vrv_cast<MNum *>(measure->FindDescendantByType(MNUM));
-        Reh *reh = vrv_cast<Reh *>(measure->FindDescendantByType(REH));
+        MNum *mnum = vrv_cast<MNum *>(measure->GetFirst(MNUM));
+        Reh *reh = vrv_cast<Reh *>(FindDirectOrEditorialDescendant(measure, REH));
         const bool hasRehearsal = reh
             && ((reh->HasTstamp() && (reh->GetTstamp() == 0.0))
                 || (reh->GetStart()->Is(BARLINE)
                     && vrv_cast<BarLine *>(reh->GetStart())->GetPosition() == BarLinePosition::Left));
         if (mnum && !hasRehearsal) {
-            // this should be an option
-            Measure *systemStart = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE));
-
             // Draw non-generated measure numbers
             // If mnumInterval is 0, draw system starting measure numbers > 1,
             // otherwise, draw every (mnumInterval)th measure number.
             int mnumInterval = m_options->m_mnumInterval.GetValue();
-            if ((mnumInterval == 0 && measure == systemStart && measure->GetN() != "0" && measure->GetN() != "1")
+            if ((mnumInterval == 0 && measure->IsFirstInSystem() && measure->GetN() != "0" && measure->GetN() != "1")
                 || !mnum->IsGenerated()
                 || (mnumInterval >= 1 && (std::atoi(measure->GetN().c_str()) % mnumInterval == 0))) {
                 int symbolOffset = m_doc->GetDrawingUnit(100);
@@ -1037,8 +1131,6 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
 
     // Draw the barlines only with measured music
     if (measure->IsMeasuredMusic()) {
-        System *system = vrv_cast<System *>(measure->GetFirstAncestor(SYSTEM));
-        assert(system);
         if ((measure->GetDrawingLeftBarLine() != BARRENDITION_NONE) || measure->HasInvisibleStaffBarlines()) {
             this->DrawScoreDef(dc, system->GetDrawingScoreDef(), measure, measure->GetLeftBarLine()->GetDrawingX(),
                 measure->GetLeftBarLine());
@@ -1281,7 +1373,7 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
         staff->SetFromFacsimile(m_doc);
     }
 
-    MRest *mrest = vrv_cast<MRest *>(staff->FindDescendantByType(MREST));
+    MRest *mrest = FindMRestInStaff(staff);
     if (!mrest || mrest->GetCutout() != cutout_CUTOUT_cutout) {
         this->DrawStaffLines(dc, staff, staffDef, measure, system);
     }
@@ -1464,7 +1556,7 @@ void View::DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure)
     assert(measure);
 
     // StaffDef information is always in the first layer
-    Layer *layer = vrv_cast<Layer *>(staff->FindDescendantByType(LAYER));
+    Layer *layer = vrv_cast<Layer *>(FindDirectOrEditorialDescendant(staff, LAYER));
     if (!layer || !layer->HasStaffDef()) return;
 
     // StaffDef staffDef;
@@ -1497,7 +1589,7 @@ void View::DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *meas
     assert(measure);
 
     // StaffDef cautionary information is always in the first layer
-    Layer *layer = vrv_cast<Layer *>(staff->FindDescendantByType(LAYER));
+    Layer *layer = vrv_cast<Layer *>(FindDirectOrEditorialDescendant(staff, LAYER));
     if (!layer || !layer->HasCautionStaffDef()) return;
 
     // StaffDef staffDef;
@@ -1606,10 +1698,10 @@ void View::DrawLayerList(DeviceContext *dc, Layer *layer, Staff *staff, Measure 
 
     for (Object *object : *drawingList) {
         if (object->Is(classId) && (classId == TUPLET_BRACKET)) {
-            this->DrawTupletBracket(dc, dynamic_cast<LayerElement *>(object), layer, staff, measure);
+            this->DrawTupletBracket(dc, vrv_cast<LayerElement *>(object), layer, staff, measure);
         }
         if (object->Is(classId) && (classId == TUPLET_NUM)) {
-            this->DrawTupletNum(dc, dynamic_cast<LayerElement *>(object), layer, staff, measure);
+            this->DrawTupletNum(dc, vrv_cast<LayerElement *>(object), layer, staff, measure);
         }
     }
 }
@@ -1630,7 +1722,7 @@ void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMe
     if (currentPage) {
         Object *previousSystem = currentPage->GetPrevious(system);
         if (previousSystem) {
-            Measure *previousSystemMeasure = vrv_cast<Measure *>(previousSystem->FindDescendantByType(MEASURE, 1));
+            Measure *previousSystemMeasure = vrv_cast<Measure *>(previousSystem->GetFirst(MEASURE));
             if (previousSystemMeasure) {
                 Staff *bottomStaff = previousSystemMeasure->GetBottomVisibleStaff();
                 // set Y position to that of lowest (bottom) staff, substact space taken by staff lines and
@@ -1667,7 +1759,7 @@ void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMe
         if (m_options->m_systemDivider.GetValue() == SYSTEMDIVIDER_left_right) {
             // Right divider is not taken into account in the layout calculation and can collision with the music
             // content
-            Measure *lastMeasure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
+            Measure *lastMeasure = vrv_cast<Measure *>(system->GetLast(MEASURE));
             assert(lastMeasure);
             int x4 = lastMeasure->GetDrawingX() + lastMeasure->GetRightBarLineRight();
             int x3 = x4 - m_doc->GetDrawingUnit(100) * 6;
@@ -1718,15 +1810,15 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
         }
         else if (current->IsSystemElement()) {
             // cast to SystemElement check in DrawSystemEditorial element
-            this->DrawSystemElement(dc, dynamic_cast<SystemElement *>(current), system);
+            this->DrawSystemElement(dc, vrv_cast<SystemElement *>(current), system);
         }
         else if (current->Is(DIV)) {
             // cast to Div check in DrawDiv element
-            this->DrawDiv(dc, dynamic_cast<Div *>(current), system);
+            this->DrawDiv(dc, vrv_cast<Div *>(current), system);
         }
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawSystemEditorial element
-            this->DrawSystemEditorialElement(dc, dynamic_cast<EditorialElement *>(current), system);
+            this->DrawSystemEditorialElement(dc, vrv_cast<EditorialElement *>(current), system);
         }
         else {
             assert(false);
@@ -1741,14 +1833,7 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
     assert(measure);
     assert(system);
 
-    ListOfObjects objects = parent->FindAllDescendantsByType(BEAMSPAN, false);
-    for (Object *element : objects) {
-        BeamSpan *beamSpan = vrv_cast<BeamSpan *>(element);
-        BeamSpanSegment *segment = beamSpan->GetSegmentForSystem(system);
-        if (segment) {
-            segment->CalcBeam(segment->GetLayer(), segment->GetStaff(), m_doc, beamSpan, beamSpan->m_drawingPlace);
-        }
-    }
+    CalcBeamSpanSegmentsForSystem(m_doc, parent, system);
 
     for (Object *current : parent->GetChildren()) {
         if (current->Is(OSSIA)) {
@@ -1760,11 +1845,11 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
         }
         else if (current->IsControlElement()) {
             // cast to ControlElement check in DrawControlElement
-            this->DrawControlElement(dc, dynamic_cast<ControlElement *>(current), measure, system);
+            this->DrawControlElement(dc, vrv_cast<ControlElement *>(current), measure, system);
         }
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawMeasureEditorialElement
-            this->DrawMeasureEditorialElement(dc, dynamic_cast<EditorialElement *>(current), measure, system);
+            this->DrawMeasureEditorialElement(dc, vrv_cast<EditorialElement *>(current), measure, system);
         }
         else {
             LogDebug("Current is %s", current->GetClassName().c_str());
@@ -1787,7 +1872,7 @@ void View::DrawStaffChildren(DeviceContext *dc, Object *parent, Staff *staff, Me
         }
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawStaffEditorialElement
-            this->DrawStaffEditorialElement(dc, dynamic_cast<EditorialElement *>(current), staff, measure);
+            this->DrawStaffEditorialElement(dc, vrv_cast<EditorialElement *>(current), staff, measure);
         }
         else {
             assert(false);
@@ -1805,11 +1890,11 @@ void View::DrawLayerChildren(DeviceContext *dc, Object *parent, Layer *layer, St
 
     for (Object *current : parent->GetChildren()) {
         if (current->IsLayerElement()) {
-            this->DrawLayerElement(dc, dynamic_cast<LayerElement *>(current), layer, staff, measure);
+            this->DrawLayerElement(dc, vrv_cast<LayerElement *>(current), layer, staff, measure);
         }
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawLayerEditorialElement
-            this->DrawLayerEditorialElement(dc, dynamic_cast<EditorialElement *>(current), layer, staff, measure);
+            this->DrawLayerEditorialElement(dc, vrv_cast<EditorialElement *>(current), layer, staff, measure);
         }
         else if (!current->Is({ LABEL, LABELABBR })) {
             assert(false);
