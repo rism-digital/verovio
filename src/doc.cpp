@@ -242,7 +242,7 @@ void Doc::GenerateFooter()
     for (Score *score : this->GetVisibleScores()) {
         ScoreDef *scoreDef = score->GetScoreDef();
         assert(scoreDef);
-        if (scoreDef->FindDescendantByType(PGFOOT)) continue;
+        if (scoreDef->GetFirst(PGFOOT)) continue;
 
         PgFoot *pgFoot = new PgFoot();
         pgFoot->SetFunc(PGFUNC_first);
@@ -266,7 +266,7 @@ void Doc::GenerateHeader()
     for (Score *score : this->GetVisibleScores()) {
         ScoreDef *scoreDef = score->GetScoreDef();
         assert(scoreDef);
-        if (scoreDef->FindDescendantByType(PGHEAD)) continue;
+        if (scoreDef->GetFirst(PGHEAD)) continue;
 
         PgHead *pgHead = new PgHead();
         pgHead->SetFunc(PGFUNC_first);
@@ -303,15 +303,16 @@ bool Doc::GenerateMeasureNumbers()
     for (Object *object : measures) {
         Measure *measure = vrv_cast<Measure *>(object);
         // First remove previously generated elements
-        ListOfObjects mNums = measure->FindAllDescendantsByType(MNUM);
-        for (Object *child : mNums) {
+        for (int i = measure->GetChildCount() - 1; i >= 0; --i) {
+            Object *child = measure->GetChild(i);
+            if (!child->Is(MNUM)) continue;
             MNum *mNum = vrv_cast<MNum *>(child);
             assert(mNum);
             if (mNum->IsGenerated()) {
                 measure->DeleteChild(mNum);
             }
         }
-        if (measure->HasN() && !measure->FindDescendantByType(MNUM)) {
+        if (measure->HasN() && !measure->GetFirst(MNUM)) {
             MNum *mnum = new MNum;
             Text *text = new Text;
             text->SetText(UTF8to32(measure->GetN()));
