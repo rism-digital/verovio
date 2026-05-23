@@ -66,8 +66,13 @@ public:
     ///@{
     void SetIncluded(const std::vector<ClassId> &classIDs) { m_includes = classIDs; }
     void ClearIncluded() { m_includes.clear(); }
-    void SetExcluded(const std::vector<ClassId> &classIDs) { m_excludes = classIDs; }
+    void SetExcluded(const std::vector<ClassId> &classIDs)
+    {
+        m_excludes = classIDs;
+        m_hasExcludedElements = false;
+    }
     void ClearExcluded() { m_excludes.clear(); }
+    bool HasExcludedElements() const { return m_hasExcludedElements; }
     ///@}
 
     /*
@@ -119,6 +124,8 @@ private:
     std::vector<ClassId> m_includes;
     // The list of types to exclude
     std::vector<ClassId> m_excludes;
+    // Indicates whether the last pass saw an excluded element
+    bool m_hasExcludedElements;
     // Indicates whether only right bar line positions should be considered
     bool m_rightBarLinesOnly;
     // The list of tie endpoints for the current measure

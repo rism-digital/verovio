@@ -450,10 +450,12 @@ void Page::LayOutHorizontally()
     this->Process(adjustXPos);
 
     // Adjust tabRhythm separately
-    adjustXPos.ClearExcluded();
-    adjustXPos.SetIncluded({ BARLINE, KEYSIG, METERSIG, TABDURSYM });
-    adjustXPos.SetRightBarLinesOnly(true);
-    this->Process(adjustXPos);
+    if (adjustXPos.HasExcludedElements()) {
+        adjustXPos.ClearExcluded();
+        adjustXPos.SetIncluded({ BARLINE, KEYSIG, METERSIG, TABDURSYM });
+        adjustXPos.SetRightBarLinesOnly(true);
+        this->Process(adjustXPos);
+    }
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping

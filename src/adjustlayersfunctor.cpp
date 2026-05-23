@@ -102,7 +102,7 @@ FunctorCode AdjustLayersFunctor::VisitLayerElement(LayerElement *layerElement)
 
     // These are the only ones we want to keep for further collision detection
     if (layerElement->HasSelfBB()) {
-        if (layerElement->Is({ NOTE, STEM })) {
+        if (layerElement->Is(NOTE) || layerElement->Is(STEM)) {
             m_current.push_back(layerElement);
         }
         else if (!m_ignoreDots && layerElement->Is(DOTS)) {

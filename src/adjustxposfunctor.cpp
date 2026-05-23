@@ -30,6 +30,7 @@ AdjustXPosFunctor::AdjustXPosFunctor(Doc *doc) : DocFunctor(doc)
     m_cumulatedXShift = 0;
     m_staffN = 0;
     m_staffSize = 100;
+    m_hasExcludedElements = false;
     m_rightBarLinesOnly = false;
     m_measure = NULL;
 }
@@ -94,6 +95,12 @@ FunctorCode AdjustXPosFunctor::VisitLayerElement(LayerElement *layerElement)
 {
     if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
+    // Track excluded elements while we are already traversing the page so the caller can avoid a separate scan.
+    if (!m_excludes.empty() && layerElement->Is(m_excludes)) {
+        m_hasExcludedElements = true;
+        return FUNCTOR_CONTINUE;
+    }
+
     // we should have processed aligned before
     assert(layerElement->GetAlignment());
 
@@ -101,11 +108,6 @@ FunctorCode AdjustXPosFunctor::VisitLayerElement(LayerElement *layerElement)
         // if nothing to do with this type of element
         // this happens for example with Artic where only ArticPart children are aligned
         return FUNCTOR_SIBLINGS;
-    }
-
-    // If we have a list of types to exclude and it is one of them, stop it
-    if (!m_excludes.empty() && layerElement->Is(m_excludes)) {
-        return FUNCTOR_CONTINUE;
     }
 
     // If we have a list of types to include and it is not one of them, stop it
@@ -160,7 +162,7 @@ FunctorCode AdjustXPosFunctor::VisitLayerElement(LayerElement *layerElement)
     Alignment *nextAlignment = vrv_cast<Alignment *>(
         layerElement->GetAlignment()->GetParent()->GetNext(layerElement->GetAlignment(), ALIGNMENT));
     AlignmentType next = nextAlignment ? nextAlignment->GetType() : ALIGNMENT_DEFAULT;
-    if (layerElement->Is({ DOTS, FLAG }) && currentReference->HasMultipleLayer()
+    if ((layerElement->Is(DOTS) || layerElement->Is(FLAG)) && currentReference->HasMultipleLayer()
         && (next != ALIGNMENT_MEASURE_RIGHT_BARLINE)) {
         const int additionalOffset = selfRight - m_upcomingMinPos;
         if (additionalOffset > m_currentAlignment.m_offset) {
@@ -221,6 +223,8 @@ FunctorCode AdjustXPosFunctor::VisitMeasure(Measure *measure)
     Filters filters;
     Filters *previousFilters = this->SetFilters(&filters);
 
+    m_measureTieEndpoints = measure->GetInternalTieEndpoints();
+
     for (auto staffN : m_staffNs) {
         m_minPos = 0;
         m_upcomingMinPos = VRV_UNSET;
@@ -248,7 +252,6 @@ FunctorCode AdjustXPosFunctor::VisitMeasure(Measure *measure)
         filters.SetType(Filters::Type::AnyOf);
         filters = { &matchStaff, &matchCrossStaff };
 
-        m_measureTieEndpoints = measure->GetInternalTieEndpoints();
         measure->m_measureAligner.Process(*this);
     }
 
@@ -402,8 +405,8 @@ std::pair<int, int> AdjustXPosFunctor::CalculateXPosOffset(LayerElement *layerEl
         if (!overlap) {
             // if last element of the tuplet is rest, make sure there is sufficient distance between it and next
             // note/chord (for ledger lines)
-            if (layerElement->Is({ NOTE, CHORD }) && !layerElement->GetFirstAncestor(TUPLET) && bboxElement->Is(REST)
-                && bboxElement->GetFirstAncestor(TUPLET)) {
+            if ((layerElement->Is(NOTE) || layerElement->Is(CHORD)) && !layerElement->GetFirstAncestor(TUPLET)
+                && bboxElement->Is(REST) && bboxElement->GetFirstAncestor(TUPLET)) {
                 Rest *rest = vrv_cast<Rest *>(bboxElement);
                 if (rest->GetDur() > DURATION_8) {
                     overlap = 1.5 * (rest->GetDur() - DURATION_8) * drawingUnit;
