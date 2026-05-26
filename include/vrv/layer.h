@@ -68,8 +68,10 @@ public:
      */
     int GetLayerIdx() const { return Object::GetIdx(); }
 
-    LayerElement *GetPrevious(const LayerElement *element);
-    const LayerElement *GetPrevious(const LayerElement *element) const;
+    LayerElement *GetPreviousInLayer(const LayerElement *element);
+    const LayerElement *GetPreviousInLayer(const LayerElement *element) const;
+    LayerElement *GetNextInLayer(const LayerElement *element);
+    const LayerElement *GetNextInLayer(const LayerElement *element) const;
     LayerElement *GetAtPos(int x);
     const LayerElement *GetAtPos(int x) const;
 

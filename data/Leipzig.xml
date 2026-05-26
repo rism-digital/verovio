@@ -520,7 +520,7 @@
   <g c="E06D" x="-3.0" y="-750.0" w="411.0" h="1500.0" h-a-x="409" n="6stringTabClef" />
   <g c="E06E" x="-3.0" y="-500.0" w="275.0" h="1000.0" h-a-x="271" n="4stringTabClef" />
   <g c="E055" x="-1.0" y="-655.0" w="1039.0" h="1738.0" h-a-x="646" n="gClef8vbOld" />
-  <g c="E056" x="-1.0" y="-655.0" w="764.0" h="1738.0" h-a-x="750" n="gClef8vbCClef" />
+  <g c="E056" x="-1.0" y="-655.0" w="804.0" h="1738.0" h-a-x="800" n="gClef8vbCClef" />
   <g c="E51A" x="0.0" y="-25.0" w="115.0" h="350.44" h-a-x="115" n="octaveParensLeft" />
   <g c="E51B" x="0.0" y="-25.0" w="115.0" h="350.0" h-a-x="115" n="octaveParensRight" />
   <g c="E0F5" x="0.0" y="-240.0" w="153.0" h="480.0" h-a-x="100" n="noteheadParenthesisLeft" />

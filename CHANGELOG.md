@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+
+## [6.2.0] – 2026-05-20
 * Golang binding
 * Support for G-ABC (Gregorian music notation) import
 * Support for `keyAccid@oct`

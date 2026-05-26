@@ -1550,7 +1550,7 @@ int View::CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave)
 
     LayerElement *previous = NULL;
     LayerElement *pelement = layer->GetAtPos(x_pos);
-    if ((previous = layer->GetPrevious(pelement))) pelement = previous;
+    if ((previous = layer->GetPreviousInLayer(pelement))) pelement = previous;
 
     Clef *clef = layer->GetClef(pelement);
     if (clef) {

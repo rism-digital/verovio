@@ -169,17 +169,30 @@ bool Layer::IsSupportedChild(ClassId classId)
     }
 }
 
-LayerElement *Layer::GetPrevious(const LayerElement *element)
+LayerElement *Layer::GetPreviousInLayer(const LayerElement *element)
 {
-    return const_cast<LayerElement *>(std::as_const(*this).GetPrevious(element));
+    return const_cast<LayerElement *>(std::as_const(*this).GetPreviousInLayer(element));
 }
 
-const LayerElement *Layer::GetPrevious(const LayerElement *element) const
+const LayerElement *Layer::GetPreviousInLayer(const LayerElement *element) const
 {
     this->ResetList();
     if (!element || this->HasEmptyList()) return NULL;
 
     return dynamic_cast<const LayerElement *>(this->GetListPrevious(element));
+}
+
+LayerElement *Layer::GetNextInLayer(const LayerElement *element)
+{
+    return const_cast<LayerElement *>(std::as_const(*this).GetNextInLayer(element));
+}
+
+const LayerElement *Layer::GetNextInLayer(const LayerElement *element) const
+{
+    this->ResetList();
+    if (!element || this->HasEmptyList()) return NULL;
+
+    return dynamic_cast<const LayerElement *>(this->GetListNext(element));
 }
 
 LayerElement *Layer::GetAtPos(int x)

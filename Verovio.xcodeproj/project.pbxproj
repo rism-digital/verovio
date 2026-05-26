@@ -2668,8 +2668,8 @@
 				4DA0EAD422BB77AF00A7EBEB /* editortoolkit_mensural.h */,
 				4DF9DB2D2F32319C0003112D /* editortoolkit_shared.cpp */,
 				4DF9DB322F3231B50003112D /* editortoolkit_shared.h */,
-				4DA0EAD622BB77AF00A7EBEB /* editortoolkit.h */,
 				4D2614172E6995D700CD28CF /* editortoolkit.cpp */,
+				4DA0EAD622BB77AF00A7EBEB /* editortoolkit.h */,
 			);
 			name = editor;
 			sourceTree = "<group>";

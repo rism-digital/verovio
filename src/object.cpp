@@ -974,6 +974,16 @@ ListOfConstObjects Object::GetAncestors() const
     return ancestors;
 }
 
+bool Object::IsAncestorOf(const Object *object) const
+{
+    const Object *parent = object->GetParent();
+    while (parent) {
+        if (this == parent) return true;
+        parent = parent->GetParent();
+    }
+    return false;
+}
+
 Object *Object::GetFirstAncestor(const ClassId classId, int maxDepth)
 {
     return const_cast<Object *>(std::as_const(*this).GetFirstAncestor(classId, maxDepth));

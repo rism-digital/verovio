@@ -56,7 +56,7 @@ void CustomTuning::CreateGlyphMapping(Doc *doc)
     std::string json((std::istreambuf_iterator<char>(glyphnames)), std::istreambuf_iterator<char>());
     jsonxx::Object glyphs;
     if (!glyphs.parse(json)) {
-        LogError("Custom tuning: Invalid or missing file glyphnames.json");
+        LogError("Custom tuning: Invalid or missing file tuning-glyphnames.json");
         return;
     }
     for (const auto &glyph : glyphs.kv_map()) {

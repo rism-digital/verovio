@@ -121,6 +121,12 @@ FunctorCode ResetDataFunctor::VisitChord(Chord *chord)
     chord->DrawingListInterface::InterfaceResetData(*this);
     chord->StemmedDrawingInterface::InterfaceResetData(*this);
 
+    Stem *currentStem = vrv_cast<Stem *>(chord->FindDescendantByType(STEM, 1));
+    if (currentStem) chord->DeleteChild(currentStem);
+
+    Dots *currentDots = vrv_cast<Dots *>(chord->FindDescendantByType(DOTS, 1));
+    if (currentDots) chord->DeleteChild(currentDots);
+
     // We want the list of the ObjectListInterface to be regenerated
     chord->Modify();
     return FUNCTOR_CONTINUE;
@@ -327,6 +333,12 @@ FunctorCode ResetDataFunctor::VisitNote(Note *note)
     note->SetStemSameasNote(NULL);
     note->SetStemSameasRole(SAMEAS_NONE);
 
+    Stem *currentStem = vrv_cast<Stem *>(note->FindDescendantByType(STEM, 1));
+    if (currentStem) note->DeleteChild(currentStem);
+
+    Dots *currentDots = vrv_cast<Dots *>(note->FindDescendantByType(DOTS, 1));
+    if (currentDots) note->DeleteChild(currentDots);
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -417,6 +429,9 @@ FunctorCode ResetDataFunctor::VisitRest(Rest *rest)
 {
     // Call parent one too
     this->VisitLayerElement(rest);
+
+    Dots *currentDots = vrv_cast<Dots *>(rest->FindDescendantByType(DOTS, 1));
+    if (currentDots) rest->DeleteChild(currentDots);
 
     return FUNCTOR_CONTINUE;
 }

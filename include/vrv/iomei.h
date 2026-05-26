@@ -581,6 +581,12 @@ private:
 
 public:
     //
+protected:
+    /** Current xml element */
+    pugi::xml_node m_currentNode;
+    /** Xml node stack */
+    std::list<pugi::xml_node> m_nodeStack;
+
 private:
     /** The number of spaces for the indentation */
     int m_indent;
@@ -593,11 +599,6 @@ private:
 
     /** The document node */
     pugi::xml_node m_mei;
-
-    /** Current xml element */
-    pugi::xml_node m_currentNode;
-    /** Xml node stack */
-    std::list<pugi::xml_node> m_nodeStack;
     /** Boundary objects which are merged into one xml element */
     std::stack<Object *> m_boundaries;
     /** The object stack */
@@ -621,6 +622,26 @@ private:
     bool m_ignoreHeader;
     bool m_removeIds;
     SetOfConstObjects m_referredObjects;
+};
+
+//----------------------------------------------------------------------------
+// MEIOutputExtended
+//----------------------------------------------------------------------------
+
+/**
+ * Extended MEIOutput for partial exports.
+ */
+class MEIOutputExtended : public MEIOutput {
+public:
+    /** @name Constructors and destructor */
+    ///@{
+    MEIOutputExtended(Doc *doc);
+    ///@}
+
+    jsonxx::Object ExportScoreDef();
+
+private:
+    jsonxx::Object ToJson(const pugi::xml_document &doc);
 };
 
 //----------------------------------------------------------------------------
@@ -1023,6 +1044,26 @@ private:
      * A static array for storing the implemented editorial elements
      */
     static const std::vector<std::string> s_editorialElementNames;
+};
+
+//----------------------------------------------------------------------------
+// MEIInputExtended
+//----------------------------------------------------------------------------
+
+/**
+ * Extended MEIInput for partial import.
+ */
+class MEIInputExtended : public MEIInput {
+public:
+    /** @name Constructors and destructor */
+    ///@{
+    MEIInputExtended(Doc *doc);
+    ///@}
+
+    void ImportScoreDef(const jsonxx::Object &scoreDef);
+
+private:
+    pugi::xml_document FromJson(const jsonxx::Object &json);
 };
 
 } // namespace vrv

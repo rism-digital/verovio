@@ -19,10 +19,22 @@ namespace vrv {
 
 #ifndef NO_EDIT_SUPPORT
 
-bool EditorToolkit::AppendChild(const std::string &elementId, const std::string &elementName)
+#define CHAINED_ID "[chained-id]"
+
+bool EditorToolkit::AppendChild(std::string &elementId, const std::string &elementName, bool noDuplicate)
 {
-    Object *element = this->GetElement(elementId);
+    Object *element = this->GetChainedElement(elementId);
     if (!element) return false;
+
+    if (noDuplicate) {
+        ClassId classId = ObjectFactory::GetInstance()->GetClassId(elementName);
+        Object *existingChildElement = element->FindDescendantByType(classId, 1);
+        if (existingChildElement) {
+            existingChildElement->Reset();
+            m_chainedId = existingChildElement->GetID();
+            return true;
+        }
+    }
 
     Object *childElement = this->PrepareInsertion(element, elementName);
     if (!childElement) return false;
@@ -35,9 +47,9 @@ bool EditorToolkit::AppendChild(const std::string &elementId, const std::string 
     return true;
 }
 
-bool EditorToolkit::InsertBefore(const std::string &elementId, const std::string &elementName)
+bool EditorToolkit::InsertBefore(std::string &elementId, const std::string &elementName)
 {
-    Object *element = this->GetElement(elementId);
+    Object *element = this->GetChainedElement(elementId);
     if (!element) return false;
 
     Object *parent = element->GetParent();
@@ -51,9 +63,9 @@ bool EditorToolkit::InsertBefore(const std::string &elementId, const std::string
     return true;
 }
 
-bool EditorToolkit::InsertAfter(const std::string &elementId, const std::string &elementName)
+bool EditorToolkit::InsertAfter(std::string &elementId, const std::string &elementName)
 {
-    Object *element = this->GetElement(elementId);
+    Object *element = this->GetChainedElement(elementId);
     if (!element) return false;
 
     Object *parent = element->GetParent();
@@ -101,8 +113,23 @@ Object *EditorToolkit::PrepareInsertion(Object *parent, const std::string &eleme
     if (!childElement) {
         LogError("Creating a '%s' object failed", elementName.c_str());
     }
+    else {
+        m_chainedId = childElement->GetID();
+    }
 
     return childElement;
+}
+
+Object *EditorToolkit::GetChainedElement(std::string &elementId)
+{
+    if (elementId == CHAINED_ID) {
+        elementId = m_chainedId;
+    }
+    else {
+        m_chainedId = elementId;
+    }
+
+    return this->GetElement(elementId);
 }
 
 #endif /* NO_EDIT_SUPPORT */

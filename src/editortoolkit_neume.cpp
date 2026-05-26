@@ -45,10 +45,6 @@
 //--------------------------------------------------------------------------------
 
 namespace vrv {
-std::string EditorToolkitNeume::EditInfo()
-{
-    return m_editInfo.json();
-}
 
 bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
 {

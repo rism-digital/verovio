@@ -626,6 +626,11 @@ public:
     ///@}
 
     /**
+     * Check if the object is the ancestor of the other one.
+     */
+    bool IsAncestorOf(const Object *object) const;
+
+    /**
      * Return the first ancestor of the specified type.
      * The maxSteps parameter limits the search to a certain number of level if not -1.
      */
