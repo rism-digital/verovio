@@ -497,7 +497,7 @@ void Toolkit::SetViewAndEditor()
 {
     m_view.SetDoc(&m_doc);
 
-#if defined NO_HUMDRUM_SUPPORT
+#if defined NO_EDIT_SUPPORT
     // Create editor toolkit based on notation type.
     if (m_editorToolkit != NULL) {
         delete m_editorToolkit;
