@@ -21,6 +21,7 @@
 #include "dynam.h"
 #include "editfunctor.h"
 #include "editorial.h"
+#include "editortoolkit_cmn.h"
 #include "findfunctor.h"
 #include "hairpin.h"
 #include "iomei.h"
@@ -194,6 +195,13 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
             return (this->InsertControl(elementName, startId, endId));
         }
         LogWarning("Could not parse the insertControl action");
+    }
+    else if (action == "insertNote") {
+        EditorToolkitCMN *editorToolkitCMN = dynamic_cast<EditorToolkitCMN *>(this);
+        if (editorToolkitCMN) {
+            return editorToolkitCMN->ParseEditorCMNAction(json);
+        }
+        LogWarning("Action insertControl available in CMN only");
     }
     else if (action == "keyDown") {
         std::string elementId;
