@@ -15,7 +15,10 @@
 //--------------------------------------------------------------------------------
 
 #include "comparison.h"
+#include "layer.h"
+#include "miscfunctor.h"
 #include "note.h"
+#include "staff.h"
 
 namespace vrv {
 
@@ -28,16 +31,25 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
     std::string action = json.get<jsonxx::String>("action");
 
 #ifndef NO_EDIT_SUPPORT
-    if (action == "insertNote") {
-        std::string contextId;
+    if (action == "insertMeasure") {
+        std::string targetId;
+        int number;
+        std::string insertMode;
+        if (this->ParseInsertMeasureAction(json.get<jsonxx::Object>("param"), targetId, number, insertMode)) {
+            this->PrepareUndo();
+            return (this->InsertMeasure(targetId, number, insertMode));
+        }
+        LogWarning("Could not parse the insertMeasure action");
+    }
+    else if (action == "insertNote") {
+        std::string targetId;
         data_PITCHNAME pname;
         int oct;
         data_DURATION dur;
         bool chordMode;
-        if (this->ParseInsertNoteAction(json.get<jsonxx::Object>("param"), contextId, pname, oct, dur, chordMode)) {
+        if (this->ParseInsertNoteAction(json.get<jsonxx::Object>("param"), targetId, pname, oct, dur, chordMode)) {
             this->PrepareUndo();
-            // LogInfo("%s %s %s", elementName.c_str(), elementId.c_str(), insertMode.c_str());
-            return (this->InsertNote(contextId, pname, oct, dur, chordMode));
+            return (this->InsertNote(targetId, pname, oct, dur, chordMode));
         }
         LogWarning("Could not parse the insertNote action");
     }
@@ -45,6 +57,20 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
 
 #endif
     return false;
+}
+
+#ifndef NO_EDIT_SUPPORT
+bool EditorToolkitCMN::ParseInsertMeasureAction(jsonxx::Object param, std::string &targetId, int &number, std::string &insertMode)
+{
+    number = 0;
+    if (!param.has<jsonxx::String>("targetId")) return false;
+    targetId = param.get<jsonxx::String>("targetId");
+    if (!param.has<jsonxx::Number>("number")) return false;
+    number = param.get<jsonxx::Number>("number");
+    if (!param.has<jsonxx::String>("insertMode")) return false;
+    insertMode = param.get<jsonxx::String>("insertMode");
+       
+    return true;
 }
 
 bool EditorToolkitCMN::ParseInsertNoteAction(
@@ -68,6 +94,31 @@ bool EditorToolkitCMN::ParseInsertNoteAction(
 
     if (param.has<jsonxx::Boolean>("chordMode")) chordMode = param.get<jsonxx::Boolean>("chordMode");
 
+    return true;
+}
+
+bool EditorToolkitCMN::InsertMeasure(const std::string &targetId, int number, const std::string &insertMode)
+{
+    Measure *measure = NULL;
+    if (targetId.empty()) {
+        measure = vrv_cast<Measure *>(m_doc->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
+    }
+    
+    Measure *copy = vrv_cast<Measure *>(measure->Clone());
+    
+    InitProcessingListsFunctor initProcessingLists;
+    measure->Process(initProcessingLists);
+    const IntTree &layerTree = initProcessingLists.GetLayerTree();
+    
+    // Now we can process by layer and move their content to (measure) segments
+    for (const auto &staves : layerTree.child) {
+        Staff *staff = new Staff(staves.first);
+        for (const auto &layers : staves.second.child) {
+            Layer *layer = new Layer();
+            layer->SetN(layers.first);
+        }
+    }
+    
     return true;
 }
 
@@ -191,5 +242,7 @@ bool EditorToolkitCMN::InsertNoteInChordMode(const std::string &targetId, data_P
 
     return true;
 }
+
+#endif
 
 } // namespace vrv

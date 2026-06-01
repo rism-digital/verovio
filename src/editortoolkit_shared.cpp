@@ -196,12 +196,19 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         }
         LogWarning("Could not parse the insertControl action");
     }
+    else if (action == "insertMeasure") {
+        EditorToolkitCMN *editorToolkitCMN = dynamic_cast<EditorToolkitCMN *>(this);
+        if (editorToolkitCMN) {
+            return editorToolkitCMN->ParseEditorCMNAction(json);
+        }
+        LogWarning("Action insertMeasure available in CMN only");
+    }
     else if (action == "insertNote") {
         EditorToolkitCMN *editorToolkitCMN = dynamic_cast<EditorToolkitCMN *>(this);
         if (editorToolkitCMN) {
             return editorToolkitCMN->ParseEditorCMNAction(json);
         }
-        LogWarning("Action insertControl available in CMN only");
+        LogWarning("Action insertNote available in CMN only");
     }
     else if (action == "keyDown") {
         std::string elementId;
