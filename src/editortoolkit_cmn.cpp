@@ -60,7 +60,8 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
 }
 
 #ifndef NO_EDIT_SUPPORT
-bool EditorToolkitCMN::ParseInsertMeasureAction(jsonxx::Object param, std::string &targetId, int &number, std::string &insertMode)
+bool EditorToolkitCMN::ParseInsertMeasureAction(
+    jsonxx::Object param, std::string &targetId, int &number, std::string &insertMode)
 {
     number = 0;
     if (!param.has<jsonxx::String>("targetId")) return false;
@@ -69,7 +70,7 @@ bool EditorToolkitCMN::ParseInsertMeasureAction(jsonxx::Object param, std::strin
     number = param.get<jsonxx::Number>("number");
     if (!param.has<jsonxx::String>("insertMode")) return false;
     insertMode = param.get<jsonxx::String>("insertMode");
-       
+
     return true;
 }
 
@@ -103,22 +104,27 @@ bool EditorToolkitCMN::InsertMeasure(const std::string &targetId, int number, co
     if (targetId.empty()) {
         measure = vrv_cast<Measure *>(m_doc->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
     }
-    
-    Measure *copy = vrv_cast<Measure *>(measure->Clone());
-    
+
     InitProcessingListsFunctor initProcessingLists;
     measure->Process(initProcessingLists);
     const IntTree &layerTree = initProcessingLists.GetLayerTree();
-    
-    // Now we can process by layer and move their content to (measure) segments
-    for (const auto &staves : layerTree.child) {
-        Staff *staff = new Staff(staves.first);
-        for (const auto &layers : staves.second.child) {
-            Layer *layer = new Layer();
-            layer->SetN(layers.first);
+
+    for (int i = 0; i < number; i++) {
+        Measure *newMeasure = new Measure();
+        // Now we can process by layer and move their content to (measure) segments
+        for (const auto &staves : layerTree.child) {
+            Staff *staff = new Staff(staves.first);
+            newMeasure->AddChildBack(staff);
+            for (const auto &layers : staves.second.child) {
+                Layer *layer = new Layer();
+                layer->SetN(layers.first);
+                staff->AddChild(layer);
+            }
         }
+        measure->GetParent()->InsertAfter(measure, newMeasure);
+        m_chainedId = newMeasure->GetID();
     }
-    
+
     return true;
 }
 
