@@ -39,6 +39,7 @@ public:
      */
     ///@{
     FunctorCode VisitDiv(Div *div) override;
+    FunctorCode VisitLayer(Layer *layer) override;
     FunctorCode VisitStaffAlignment(StaffAlignment *staffAlignment) override;
     FunctorCode VisitSystem(System *system) override;
     ///@}

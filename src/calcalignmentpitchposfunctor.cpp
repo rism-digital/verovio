@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "cursor.h"
 #include "custos.h"
 #include "doc.h"
 #include "layer.h"
@@ -110,6 +111,11 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
                 tabGrp->GetListSize(), tabGrp->GetListIndex(note), note->GetLoc(), note->GetTabLine(),
                 staffY->m_drawingStaffDef->GetTabAnchorline(),
                 staffY->m_drawingStaffDef->GetTabAlign() != VERTICALALIGNMENT_bottom);
+        }
+        else if (note->IsCursor()) {
+            Cursor *cursor = vrv_cast<Cursor *>(note);
+            int offset = layerY->GetClefLocOffset((cursor->HasPosition() ? cursor->GetPosition() : cursor));
+            loc = PitchInterface::CalcLoc(cursor->GetPname(), cursor->GetOct(), offset);
         }
         else if ((note->HasPname() && (note->HasOct() || note->HasOctDefault())) || note->HasLoc()) {
             loc = PitchInterface::CalcLoc(note, layerY, layerElementY);
@@ -328,6 +334,15 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
         int yRel = staffY->CalcPitchPosYRel(m_doc, loc);
         nc->SetDrawingLoc(loc);
         nc->SetDrawingYRel(yRel);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CalcAlignmentPitchPosFunctor::VisitLayer(Layer *layer)
+{
+    if (layer->HasCursor()) {
+        this->VisitCursor(layer->GetCursor());
     }
 
     return FUNCTOR_CONTINUE;

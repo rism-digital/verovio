@@ -12,7 +12,9 @@
 #include "beamspan.h"
 #include "calcalignmentpitchposfunctor.h"
 #include "calcstemfunctor.h"
+#include "cursor.h"
 #include "div.h"
+#include "layer.h"
 #include "system.h"
 
 //----------------------------------------------------------------------------
@@ -31,6 +33,16 @@ AdjustYPosFunctor::AdjustYPosFunctor(Doc *doc) : DocFunctor(doc)
 FunctorCode AdjustYPosFunctor::VisitDiv(Div *div)
 {
     div->AdjustRunningElementYPos();
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode AdjustYPosFunctor::VisitLayer(Layer *layer)
+{
+    // Necessary because cursor is not reset by VisitSytem call to ResetCachedDrawingY
+    if (layer->HasCursor()) {
+        layer->GetCursor()->ResetCachedDrawingY();
+    }
 
     return FUNCTOR_SIBLINGS;
 }

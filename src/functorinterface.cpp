@@ -26,6 +26,7 @@
 #include "clef.h"
 #include "course.h"
 #include "cpmark.h"
+#include "cursor.h"
 #include "custos.h"
 #include "dir.h"
 #include "div.h"
@@ -871,6 +872,16 @@ FunctorCode FunctorInterface::VisitClef(Clef *clef)
 FunctorCode FunctorInterface::VisitClefEnd(Clef *clef)
 {
     return this->VisitLayerElementEnd(clef);
+}
+
+FunctorCode FunctorInterface::VisitCursor(Cursor *cursor)
+{
+    return this->VisitLayerElement(cursor);
+}
+
+FunctorCode FunctorInterface::VisitCursorEnd(Cursor *cursor)
+{
+    return this->VisitLayerElementEnd(cursor);
 }
 
 FunctorCode FunctorInterface::VisitCustos(Custos *custos)
@@ -2235,6 +2246,16 @@ FunctorCode ConstFunctorInterface::VisitClef(const Clef *clef)
 FunctorCode ConstFunctorInterface::VisitClefEnd(const Clef *clef)
 {
     return this->VisitLayerElementEnd(clef);
+}
+
+FunctorCode ConstFunctorInterface::VisitCursor(const Cursor *cursor)
+{
+    return this->VisitLayerElement(cursor);
+}
+
+FunctorCode ConstFunctorInterface::VisitCursorEnd(const Cursor *cursor)
+{
+    return this->VisitLayerElementEnd(cursor);
 }
 
 FunctorCode ConstFunctorInterface::VisitCustos(const Custos *custos)

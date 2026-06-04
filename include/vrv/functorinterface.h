@@ -32,6 +32,7 @@ class Clef;
 class ControlElement;
 class Course;
 class CpMark;
+class Cursor;
 class Custos;
 class Dir;
 class Div;
@@ -365,6 +366,8 @@ public:
     virtual FunctorCode VisitChordEnd(Chord *chord);
     virtual FunctorCode VisitClef(Clef *clef);
     virtual FunctorCode VisitClefEnd(Clef *clef);
+    virtual FunctorCode VisitCursor(Cursor *cursor);
+    virtual FunctorCode VisitCursorEnd(Cursor *cursor);
     virtual FunctorCode VisitCustos(Custos *custos);
     virtual FunctorCode VisitCustosEnd(Custos *custos);
     virtual FunctorCode VisitDot(Dot *dot);
@@ -744,6 +747,8 @@ public:
     virtual FunctorCode VisitChordEnd(const Chord *chord);
     virtual FunctorCode VisitClef(const Clef *clef);
     virtual FunctorCode VisitClefEnd(const Clef *clef);
+    virtual FunctorCode VisitCursor(const Cursor *cursor);
+    virtual FunctorCode VisitCursorEnd(const Cursor *cursor);
     virtual FunctorCode VisitCustos(const Custos *custos);
     virtual FunctorCode VisitCustosEnd(const Custos *custos);
     virtual FunctorCode VisitDot(const Dot *dot);

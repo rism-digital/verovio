@@ -15,6 +15,7 @@
 namespace vrv {
 
 class Clef;
+class Cursor;
 class DeviceContext;
 class LayerElement;
 class Measure;
@@ -242,6 +243,16 @@ public:
     bool HasCrossStaffFromBelow() const { return m_crossStaffFromBelow; }
     ///@}
 
+    /**
+     * @name Setter and getter for cursor
+     */
+    //@{
+    bool HasCursor() const { return (m_cursor.has_value()); }
+    Cursor *GetCursor() const { return m_cursor.value(); }
+    void SetCursor(Cursor *cursor) { m_cursor = cursor; }
+    void ResetCursor() { m_cursor.reset(); }
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -287,6 +298,9 @@ private:
     Mensur *m_cautionStaffDefMensur;
     MeterSig *m_cautionStaffDefMeterSig;
     bool m_drawCautionKeySigCancel;
+
+    /** An optional cursor for the layer that has it */
+    std::optional<Cursor *> m_cursor;
 };
 
 } // namespace vrv

@@ -262,6 +262,11 @@ public:
      */
     void CalcNoteHeadShiftForSameasNote(Note *stemSameas, data_STEMDIRECTION stemDir);
 
+    /**
+     * Flag indicator if or Cursor instance.
+     */
+    virtual bool IsCursor() const { return false; }
+
 public:
     //----------------//
     // Static methods //

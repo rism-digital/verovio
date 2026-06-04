@@ -56,6 +56,10 @@ FunctorCode AdjustXPosFunctor::VisitAlignmentEnd(Alignment *alignment)
         m_upcomingMinPos = VRV_UNSET;
     }
 
+    if ((alignment->GetType() == ALIGNMENT_CURSOR)) {
+        m_minPos += m_doc->GetDrawingUnit(100) * 4;
+    }
+
     // No upcoming bounding boxes, we keep the previous ones (e.g., the alignment has nothing for this staff)
     // Eventually we might want to have a more sophisticated pruning algorithm
     if (m_upcomingBoundingBoxes.empty()) return FUNCTOR_CONTINUE;
