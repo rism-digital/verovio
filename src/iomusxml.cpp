@@ -3165,7 +3165,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                             // the MEI equivalent of the written accidental. The custom tuning will always choose
                             // the SMuFL glyph over the gestural or written accidentals.
                             accid->SetAccidGes(Att::AccidentalWrittenToGestural(current.m_accid));
-                            if (accid->HasAccid()) {
+                            if (!current.m_glyphName.empty()) {
                                 accid->IsAttribute(false);
                                 if (!current.m_glyphName.empty()) {
                                     accid->SetGlyphName(current.m_glyphName);
