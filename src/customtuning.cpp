@@ -17,6 +17,10 @@
 
 #include "jsonxx.h"
 
+//----------------------------------------------------------------------------
+
+#include <utility>
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -33,21 +37,41 @@ std::map<char32_t, std::string> CustomTuning::s_glyphCodes;
 CustomTuning::CustomTuning(const CustomTuning &other) : m_noteMap(other.m_noteMap)
 {
     if (other.m_tuning) {
-        m_tuning = std::make_unique<Tunings::Tuning>(*other.m_tuning);
+        m_tuning = new Tunings::Tuning(*other.m_tuning);
     }
+}
+
+CustomTuning::CustomTuning(CustomTuning &&other) noexcept
+    : m_tuning(other.m_tuning), m_noteMap(std::move(other.m_noteMap))
+{
+    other.m_tuning = NULL;
+}
+
+CustomTuning::~CustomTuning()
+{
+    delete m_tuning;
 }
 
 CustomTuning &CustomTuning::operator=(const CustomTuning &other)
 {
     if (this == &other) return *this;
 
+    Tunings::Tuning *tuning = other.m_tuning ? new Tunings::Tuning(*other.m_tuning) : NULL;
+    delete m_tuning;
+    m_tuning = tuning;
     m_noteMap = other.m_noteMap;
-    if (other.m_tuning) {
-        m_tuning = std::make_unique<Tunings::Tuning>(*other.m_tuning);
-    }
-    else {
-        m_tuning.reset();
-    }
+
+    return *this;
+}
+
+CustomTuning &CustomTuning::operator=(CustomTuning &&other) noexcept
+{
+    if (this == &other) return *this;
+
+    delete m_tuning;
+    m_tuning = other.m_tuning;
+    m_noteMap = std::move(other.m_noteMap);
+    other.m_tuning = NULL;
 
     return *this;
 }
@@ -58,12 +82,19 @@ CustomTuning::CustomTuning(const std::string &tuningDef, Doc *doc, bool useMusic
 
     // Parse the tuning and create the mappings
     try {
-        m_tuning = std::make_unique<Tunings::Tuning>(Tunings::parseASCLData(tuningDef));
+        m_tuning = new Tunings::Tuning(Tunings::parseASCLData(tuningDef));
         CreateGlyphMapping(doc);
         CreateNoteMapping(useMusicXmlAccidentals);
     }
     catch (Tunings::TuningError &e) {
+        delete m_tuning;
+        m_tuning = NULL;
         LogError("Custom tuning: Invalid tuning definition: %s", e.what());
+    }
+    catch (...) {
+        delete m_tuning;
+        m_tuning = NULL;
+        throw;
     }
 }
 

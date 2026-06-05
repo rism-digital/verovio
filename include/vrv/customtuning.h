@@ -14,7 +14,6 @@
 
 #include <cassert>
 #include <map>
-#include <memory>
 
 //----------------------------------------------------------------------------
 
@@ -31,10 +30,11 @@ class CustomTuning {
 public:
     CustomTuning() {}
     CustomTuning(const std::string &tuningDef, Doc *doc, bool useMusicXmlAccidentals);
+    ~CustomTuning();
     CustomTuning(const CustomTuning &other);
-    CustomTuning(CustomTuning &&other) noexcept = default;
+    CustomTuning(CustomTuning &&other) noexcept;
     CustomTuning &operator=(const CustomTuning &other);
-    CustomTuning &operator=(CustomTuning &&other) noexcept = default;
+    CustomTuning &operator=(CustomTuning &&other) noexcept;
 
     /**
      * @name Getters and validity checkers
@@ -89,7 +89,7 @@ public:
     //
 
 private:
-    std::unique_ptr<Tunings::Tuning> m_tuning;
+    Tunings::Tuning *m_tuning = NULL;
     std::map<std::string, std::string> m_noteMap;
 
     //----------------//
