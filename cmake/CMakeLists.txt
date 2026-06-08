@@ -243,8 +243,7 @@ elseif (BUILD_AS_PYTHON)
     include(${SWIG_USE_FILE})
     set(CMAKE_SWIG_FLAGS "")
 
-    set(PYTHON_VERSION "3" CACHE STRING "Python Version to use")
-    find_package(Python EXACT ${PYTHON_VERSION} MODULE REQUIRED)
+    find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
 
     if(${SWIG_VERSION} VERSION_GREATER_EQUAL "4.1.0")
         list(APPEND CMAKE_SWIG_FLAGS "-doxygen")
@@ -255,19 +254,27 @@ elseif (BUILD_AS_PYTHON)
     endif()
 
     set_source_files_properties(../bindings/python/verovio.i PROPERTIES CPLUSPLUS ON)
+    file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/verovio")
+    set(CMAKE_SWIG_OUTDIR "${CMAKE_CURRENT_BINARY_DIR}/verovio")
 
     # needed for static build on linux
     add_definitions(-fPIC)
 
-    ### For building for found version of Python (comment when specific version is set)
-    find_package(Python COMPONENTS Interpreter Development)
     include_directories(${Python_INCLUDE_DIRS})
     message(STATUS "***** Building for Python ${Python_VERSION} *****")
-    string(REPLACE "." "_" OUTPUT_VERSION_STRING ${Python_VERSION})
-    swig_add_library(verovio_module_${OUTPUT_VERSION_STRING} LANGUAGE python TYPE MODULE SOURCES ../bindings/python/verovio.i)
-    swig_link_libraries(verovio_module_${OUTPUT_VERSION_STRING} verovio ${Python_LIBRARIES})
-
     add_library(verovio STATIC ${all_SRC})
+    swig_add_library(_verovio LANGUAGE python TYPE MODULE SOURCES ../bindings/python/verovio.i)
+    target_link_libraries(_verovio PRIVATE verovio Python::Module)
+    set_target_properties(_verovio PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/verovio"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/verovio"
+        PREFIX ""
+    )
+    if(WIN32)
+        set_target_properties(_verovio PROPERTIES SUFFIX ".pyd")
+    elseif(DEFINED Python_SOABI)
+        set_target_properties(_verovio PROPERTIES SUFFIX ".${Python_SOABI}${CMAKE_SHARED_MODULE_SUFFIX}")
+    endif()
 
 #####################
 # Command-line tool #
@@ -286,21 +293,41 @@ if (BUILD_AS_ANDROID_LIBRARY)
     target_link_libraries(verovio ${log-lib})
 endif()
 
-install(TARGETS verovio
-        # for executables and dll on Win
-        RUNTIME DESTINATION bin
-        # shared libraries
-        LIBRARY DESTINATION lib
-        # for static libraries
-        ARCHIVE DESTINATION lib
-        # public headers
-        INCLUDES DESTINATION include
-)
-install(
-    DIRECTORY ../data/
-    DESTINATION share/verovio
-    FILES_MATCHING PATTERN "*.xml" PATTERN "*.svg" PATTERN "*.css" PATTERN "*.json"
-)
+if (BUILD_AS_PYTHON)
+    install(TARGETS _verovio
+            RUNTIME DESTINATION verovio
+            LIBRARY DESTINATION verovio
+    )
+    install(FILES
+            "${CMAKE_CURRENT_BINARY_DIR}/verovio/verovio.py"
+            "../bindings/python/__init__.py"
+            "../bindings/python/py.typed"
+            "../bindings/python/verovio.pyi"
+            DESTINATION verovio
+    )
+    install(
+        DIRECTORY ../data/
+        DESTINATION verovio/data
+        FILES_MATCHING PATTERN "*.xml" PATTERN "*.svg" PATTERN "*.css" PATTERN "*.json"
+    )
+else()
+    install(TARGETS verovio
+            # for executables and dll on Win
+            RUNTIME DESTINATION bin
+            # shared libraries
+            LIBRARY DESTINATION lib
+            # for static libraries
+            ARCHIVE DESTINATION lib
+            # public headers
+            INCLUDES DESTINATION include
+    )
+    install(
+        DIRECTORY ../data/
+        DESTINATION share/verovio
+        FILES_MATCHING PATTERN "*.xml" PATTERN "*.svg" PATTERN "*.css" PATTERN "*.json"
+    )
+endif()
+
 # install all headers in /usr/local/include/verovio
 if (BUILD_AS_LIBRARY)
     install(FILES ${all_HEADERS} DESTINATION include/verovio)

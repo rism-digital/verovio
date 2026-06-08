@@ -147,6 +147,11 @@ int Syl::GetDrawingHeight() const
     return 0;
 }
 
+bool Syl::IsEmpty() const
+{
+    return this->GetText().empty();
+}
+
 void Syl::AdjustToLyricSize(const Doc *doc, int &value)
 {
     const OptionDbl &lyricSize = doc->GetOptions()->m_lyricSize;

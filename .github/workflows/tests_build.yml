@@ -44,6 +44,10 @@ jobs:
         run: |
           echo "OUTPUT_DIR=${{ github.event.pull_request.number }}/${{ env.SHORT_SHA }}" >> $GITHUB_ENV
 
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
       - name: Checkout GH_PAGES_BRANCH into GH_PAGES_DIR
         uses: actions/checkout@v6.0.2
         with:
@@ -64,7 +68,7 @@ jobs:
           ls -alh ${{ env.OUTPUT_DIR }}
           sudo apt-get install wireguard
           sudo echo "${{ secrets.VPN_CONFIGURATION }}" > wg0.conf
-          python3 -m pip install diffimg jsondiff lxml xmldiff cairosvg
+          python3 -m pip install build diffimg jsondiff lxml xmldiff cairosvg
 
       - name: Checkout the dev branch
         uses: actions/checkout@v6.0.2
@@ -94,13 +98,12 @@ jobs:
           path: ${{ env.PR_DIR }}/
 
       - name: Build Python toolkit and run the tests for the PR
-        working-directory: ${{ github.workspace }}/${{ env.PR_DIR }}/bindings
+        working-directory: ${{ github.workspace }}/${{ env.PR_DIR }}
         run: |
-          cmake ../cmake -DNO_HUMDRUM_SUPPORT=ON -DNO_ABC_SUPPORT=ON -DNO_PAE_SUPPORT=ON -DBUILD_AS_PYTHON=ON  -DVRV_DYNAMIC_CAST=ON -B python
-          cd python
-          make -j8
-          python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/
-          python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/musicxmlTestSuite ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/
+          python3 -m build --wheel
+          python3 -m pip install --force-reinstall dist/*.whl
+          python3 doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/
+          python3 doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/musicxmlTestSuite ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/
 
       - name: Compare the tests
         working-directory: ${{ github.workspace }}/${{ env.DEV_DIR }}/doc
@@ -109,9 +112,9 @@ jobs:
           ls -al
 
       - name: Round-trip evaluation
-        working-directory: ${{ github.workspace }}/${{ env.DEV_DIR }}/bindings/python
+        working-directory: ${{ github.workspace }}/${{ env.PR_DIR }}
         run: |
-          python3 ../../doc/test-suite-roundtrip.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
+          python3 doc/test-suite-roundtrip.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/_tests ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
           ls -al
 
       - name: Upload results as artefacts

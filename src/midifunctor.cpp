@@ -1038,6 +1038,8 @@ FunctorCode GenerateMIDIFunctor::VisitStaffDef(const StaffDef *staffDef)
 
 FunctorCode GenerateMIDIFunctor::VisitSyl(const Syl *syl)
 {
+    if (syl->IsEmpty()) return FUNCTOR_CONTINUE;
+
     const Note *note = NULL;
     if (syl->GetFirstAncestor(CHORD)) {
         const Chord *parentChord = vrv_cast<const Chord *>(syl->GetFirstAncestor(CHORD));

@@ -89,6 +89,11 @@ public:
     int GetDrawingWidth() const;
     int GetDrawingHeight() const;
 
+    /**
+     * Return true when the syl has no textual content.
+     */
+    bool IsEmpty() const;
+
     //----------------//
     // Static methods //
     //----------------//

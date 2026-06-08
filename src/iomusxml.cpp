@@ -3260,7 +3260,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 element = chord;
                 if (cue) chord->SetCue(BOOLEAN_true);
                 if (grace) {
-                    if (grace.attribute("slash")) {
+                    if (grace.attribute("slash").as_bool()) {
                         chord->SetGrace(GRACE_unacc);
                         chord->SetStemMod(STEMMODIFIER_1slash);
                     }
@@ -3293,7 +3293,7 @@ void MusicXmlInput::ReadMusicXmlNote(
 
         // single grace note
         if (grace) {
-            if (grace.attribute("slash")) {
+            if (grace.attribute("slash").as_bool()) {
                 note->SetGrace(GRACE_unacc);
                 note->SetStemMod(STEMMODIFIER_1slash);
             }
@@ -3333,7 +3333,17 @@ void MusicXmlInput::ReadMusicXmlNote(
 
         // verse / syl
         for (pugi::xml_node lyric : node.children("lyric")) {
-            if (!lyric.child("text")) continue; // Dorico exports non-valid MusicXML
+            pugi::xml_node extendStop;
+            bool hasStartingExtend = false;
+            for (pugi::xml_node extend : lyric.children("extend")) {
+                if (HasAttributeWithValue(extend, "type", "stop")) {
+                    extendStop = extend;
+                }
+                else {
+                    hasStartingExtend = true;
+                }
+            }
+            if (!lyric.child("text") && !extendStop) continue; // Dorico exports non-valid MusicXML
             short int lyricNumber = lyric.attribute("number").as_int();
             lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
             Verse *verse = new Verse();
@@ -3341,6 +3351,11 @@ void MusicXmlInput::ReadMusicXmlNote(
             // verse->SetPlace(verse->AttPlacementRelStaff::StrToStaffrelBasic(lyric.attribute("placement").as_string()));
             verse->SetLabel(lyric.attribute("name").as_string());
             verse->SetN(lyricNumber);
+            // MusicXML represents melisma endpoints as textless <lyric><extend type="stop"/></lyric>.
+            // Keep this as a schema-valid empty syl anchor so lyric preparation can close the previous extender here.
+            if (extendStop) {
+                verse->AddChild(new Syl());
+            }
             std::string syllabic = "single";
             for (pugi::xml_node childNode : lyric.children()) {
                 if (!strcmp(childNode.name(), "syllabic")) syllabic = GetContent(childNode);
@@ -3408,7 +3423,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                     if (childNode.next_sibling("elision")) {
                         syl->SetCon(sylLog_CON_b);
                     }
-                    else if (lyric.child("extend")) {
+                    else if (hasStartingExtend) {
                         syl->SetCon(sylLog_CON_u);
                     }
 
