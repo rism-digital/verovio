@@ -32,7 +32,7 @@ jobs:
           import re
           from pathlib import Path
 
-          text = Path("include/vrv/vrvdef.h").read_text()
+          text = Path("include/vrv/vrvdef.h").read_text(encoding="utf-8")
           values = dict(re.findall(r"#define (VERSION_(?:MAJOR|MINOR|REVISION)) ([0-9]+)", text))
           version = f"{values['VERSION_MAJOR']}.{values['VERSION_MINOR']}.{values['VERSION_REVISION']}.dev{os.environ['GITHUB_RUN_NUMBER']}"
           print(f"VEROVIO_BUILD_VERSION={version}")
@@ -95,7 +95,7 @@ jobs:
           import re
           from pathlib import Path
 
-          text = Path("include/vrv/vrvdef.h").read_text()
+          text = Path("include/vrv/vrvdef.h").read_text(encoding="utf-8")
           values = dict(re.findall(r"#define (VERSION_(?:MAJOR|MINOR|REVISION)) ([0-9]+)", text))
           version = f"{values['VERSION_MAJOR']}.{values['VERSION_MINOR']}.{values['VERSION_REVISION']}.dev{os.environ['GITHUB_RUN_NUMBER']}"
           print(f"VEROVIO_BUILD_VERSION={version}")
@@ -184,7 +184,7 @@ jobs:
 
           tag = os.environ["GITHUB_REF_NAME"]
           tag_version = re.sub(r"^(?:v|version-)", "", tag)
-          text = Path("include/vrv/vrvdef.h").read_text()
+          text = Path("include/vrv/vrvdef.h").read_text(encoding="utf-8")
           values = dict(re.findall(r"#define (VERSION_(?:MAJOR|MINOR|REVISION|DEV)) ([A-Za-z0-9]+)", text))
           header_version = f"{values['VERSION_MAJOR']}.{values['VERSION_MINOR']}.{values['VERSION_REVISION']}"
           if tag_version != header_version:
