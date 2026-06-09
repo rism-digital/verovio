@@ -31,6 +31,7 @@ Source = "https://github.com/rism-digital/verovio"
 experimental = true
 cmake.source-dir = "cmake"
 cmake.define.BUILD_AS_PYTHON = true
+wheel.py-api = "cp310"
 wheel.packages = []
 sdist.include = [
     "bindings/python",
@@ -61,9 +62,6 @@ build = "cp310-*"
 skip = "*-musllinux* *-manylinux_i686 *-win_arm64 *-macosx_universal2"
 test-command = "python {project}/tools/python_smoke_test.py"
 test-skip = "*-macosx_arm64 *-manylinux_aarch64"
-
-[tool.cibuildwheel.config-settings]
-"wheel.py-api" = "cp310"
 
 [tool.cibuildwheel.linux]
 manylinux-x86_64-image = "manylinux2014"

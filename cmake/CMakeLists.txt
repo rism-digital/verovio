@@ -242,23 +242,11 @@ elseif (BUILD_AS_PYTHON)
     find_package(SWIG REQUIRED)
     include(${SWIG_USE_FILE})
     set(CMAKE_SWIG_FLAGS "")
-    set(verovio_python_use_sabi FALSE)
-    if(NOT "${SKBUILD_SABI_VERSION}" STREQUAL "")
-        set(verovio_python_use_sabi TRUE)
-    endif()
-
-    set(verovio_python_components Interpreter Development.Module)
-    if(NOT "${SKBUILD_SABI_COMPONENT}" STREQUAL "")
-        list(APPEND verovio_python_components ${SKBUILD_SABI_COMPONENT})
-    endif()
-    find_package(Python COMPONENTS ${verovio_python_components} REQUIRED)
+    set(verovio_python_sabi_version "3.10")
+    find_package(Python COMPONENTS Interpreter Development.Module Development.SABIModule REQUIRED)
 
     if(${SWIG_VERSION} VERSION_GREATER_EQUAL "4.1.0")
         list(APPEND CMAKE_SWIG_FLAGS "-doxygen")
-        if(NOT verovio_python_use_sabi)
-            list(APPEND CMAKE_SWIG_FLAGS "-fastproxy")
-            list(APPEND CMAKE_SWIG_FLAGS "-olddefs")
-        endif()
     else()
         list(APPEND CMAKE_SWIG_FLAGS "-py3;-DPY3")
     endif()
@@ -272,52 +260,33 @@ elseif (BUILD_AS_PYTHON)
 
     include_directories(${Python_INCLUDE_DIRS})
     message(STATUS "***** Building for Python ${Python_VERSION} *****")
-    set(verovio_python_abi_mode "version-specific")
-    set(verovio_python_module_target Python::Module)
-    unset(verovio_python_module_suffix)
-    unset(verovio_python_limited_api_hex)
-
-    if(verovio_python_use_sabi AND Python_INTERPRETER_ID STREQUAL "Python")
-        string(REPLACE "." ";" verovio_python_sabi_version "${SKBUILD_SABI_VERSION}")
-        list(GET verovio_python_sabi_version 0 verovio_python_sabi_major)
-        list(LENGTH verovio_python_sabi_version verovio_python_sabi_len)
-        if(verovio_python_sabi_len GREATER 1)
-            list(GET verovio_python_sabi_version 1 verovio_python_sabi_minor)
-        else()
-            set(verovio_python_sabi_minor 2)
-        endif()
-
-        math(EXPR verovio_python_limited_api_hex
-             "(${verovio_python_sabi_major} << 24) + (${verovio_python_sabi_minor} << 16)"
-             OUTPUT_FORMAT HEXADECIMAL)
-        set(verovio_python_abi_mode "stable ABI ${SKBUILD_SABI_VERSION}+")
-        set(verovio_python_module_target Python::SABIModule)
-        if(DEFINED Python_SOSABI AND NOT "${Python_SOSABI}" STREQUAL "")
-            set(verovio_python_module_suffix ".${Python_SOSABI}${CMAKE_SHARED_MODULE_SUFFIX}")
-        endif()
+    string(REPLACE "." ";" verovio_python_sabi_version_list "${verovio_python_sabi_version}")
+    list(GET verovio_python_sabi_version_list 0 verovio_python_sabi_major)
+    list(GET verovio_python_sabi_version_list 1 verovio_python_sabi_minor)
+    math(EXPR verovio_python_limited_api_hex
+         "(${verovio_python_sabi_major} << 24) + (${verovio_python_sabi_minor} << 16)"
+         OUTPUT_FORMAT HEXADECIMAL)
+    if(DEFINED Python_SOSABI AND NOT "${Python_SOSABI}" STREQUAL "")
+        set(verovio_python_module_suffix ".${Python_SOSABI}${CMAKE_SHARED_MODULE_SUFFIX}")
+    elseif(WIN32)
+        set(verovio_python_module_suffix ".pyd")
+    else()
+        set(verovio_python_module_suffix ".abi3${CMAKE_SHARED_MODULE_SUFFIX}")
     endif()
-    message(STATUS "***** Python extension ABI mode: ${verovio_python_abi_mode} *****")
+    message(STATUS "***** Python extension ABI mode: stable ABI ${verovio_python_sabi_version}+ *****")
 
     add_library(verovio STATIC ${all_SRC})
     swig_add_library(_verovio LANGUAGE python TYPE MODULE SOURCES ../bindings/python/verovio.i)
-    target_link_libraries(_verovio PRIVATE verovio ${verovio_python_module_target})
-    if(DEFINED verovio_python_limited_api_hex)
-        target_compile_definitions(_verovio PRIVATE Py_LIMITED_API=${verovio_python_limited_api_hex})
-        set_property(TARGET _verovio APPEND PROPERTY SWIG_COMPILE_DEFINITIONS
-                     Py_LIMITED_API=${verovio_python_limited_api_hex})
-    endif()
+    target_link_libraries(_verovio PRIVATE verovio Python::SABIModule)
+    target_compile_definitions(_verovio PRIVATE Py_LIMITED_API=${verovio_python_limited_api_hex})
+    set_property(TARGET _verovio APPEND PROPERTY SWIG_COMPILE_DEFINITIONS
+                 Py_LIMITED_API=${verovio_python_limited_api_hex})
     set_target_properties(_verovio PROPERTIES
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/verovio"
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/verovio"
         PREFIX ""
+        SUFFIX "${verovio_python_module_suffix}"
     )
-    if(DEFINED verovio_python_module_suffix)
-        set_target_properties(_verovio PROPERTIES SUFFIX "${verovio_python_module_suffix}")
-    elseif(WIN32)
-        set_target_properties(_verovio PROPERTIES SUFFIX ".pyd")
-    elseif(DEFINED Python_SOABI)
-        set_target_properties(_verovio PROPERTIES SUFFIX ".${Python_SOABI}${CMAKE_SHARED_MODULE_SUFFIX}")
-    endif()
 
 #####################
 # Command-line tool #
