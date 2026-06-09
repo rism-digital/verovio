@@ -23,7 +23,16 @@ export class VerovioToolkit {
     }
 
     editInfo() {
-        return JSON.parse(this.proxy.editInfo(this.ptr));
+        console.warn( "This function is deprecated. Use editStatus instead." );
+        return JSON.parse(this.proxy.editStatus(this.ptr));
+    }
+
+    editResponse() {
+        return JSON.parse(this.proxy.editResponse(this.ptr));
+    }
+
+    editStatus() {
+        return JSON.parse(this.proxy.editStatus(this.ptr));
     }
 
     getAvailableOptions() {

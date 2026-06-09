@@ -59,8 +59,11 @@ EditorToolkitShared::EditorToolkitShared(Doc *doc, View *view) : EditorToolkit(d
     m_scoreContext = NULL;
     m_sectionContext = NULL;
     m_currentContext = NULL;
+    
+    m_selectionId = "";
+    m_selectionClassId = UNSPECIFIED;
 
-    this->SetEditInfo();
+    this->SetEditStatus();
 }
 
 EditorToolkitShared::~EditorToolkitShared()
@@ -97,7 +100,7 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         m_doc->ScoreDefSetCurrentDoc(true);
         m_doc->RefreshLayout();
         m_undoPrepared = false;
-        this->SetEditInfo();
+        this->SetEditStatus();
         return true;
     }
 
@@ -113,7 +116,7 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         m_doc->PrepareData();
         m_doc->ScoreDefSetCurrentDoc(true);
         m_undoPrepared = false;
-        this->SetEditInfo();
+        this->SetEditStatus();
         return true;
     }
 
@@ -239,6 +242,12 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
             }
         }
     }
+    else if (action == "select") {
+        std::string elementId;
+        if (this->ParseSelectAction(json.get<jsonxx::Object>("param"), elementId)) {
+            return this->Select(elementId);
+        }
+    }
     else if (action == "set") {
         std::string elementId, attribute, value;
         if (this->ParseSetAction(json.get<jsonxx::Object>("param"), elementId, attribute, value)) {
@@ -356,6 +365,14 @@ bool EditorToolkitShared::ParsePropertiesAction(jsonxx::Object param, std::strin
     return true;
 }
 
+bool EditorToolkitShared::ParseSelectAction(
+    jsonxx::Object param, std::string &elementId)
+{
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    elementId = param.get<jsonxx::String>("elementId");
+    return true;
+}
+
 bool EditorToolkitShared::ParseSetAction(
     jsonxx::Object param, std::string &elementId, std::string &attribute, std::string &value)
 {
@@ -386,13 +403,13 @@ void EditorToolkitShared::PrepareUndo()
     m_undoPrepared = true;
 }
 
-void EditorToolkitShared::SetEditInfo()
+void EditorToolkitShared::SetEditStatus()
 {
-    m_editInfo.reset();
-    m_editInfo.import("chainedId", m_chainedId);
-    m_editInfo.import("canUndo", this->CanUndo());
-    m_editInfo.import("canRedo", this->CanRedo());
-    m_editInfo.import("isMensuralMusicOnly", m_doc->IsMensuralMusicOnly());
+    m_editStatus.reset();
+    m_editStatus.import("chainedId", m_chainedId);
+    m_editStatus.import("canUndo", this->CanUndo());
+    m_editStatus.import("canRedo", this->CanRedo());
+    m_editStatus.import("isMensuralMusicOnly", m_doc->IsMensuralMusicOnly());
 }
 
 std::string EditorToolkitShared::GetCurrentState()
@@ -491,7 +508,7 @@ bool EditorToolkitShared::Delete(std::string &elementId)
     if (!m_chainedId.empty() && !m_doc->FindDescendantByID(m_chainedId)) m_chainedId = "";
 
     this->ClearContext();
-    this->SetEditInfo();
+    this->SetEditStatus();
     return true;
 }
 
@@ -602,7 +619,7 @@ bool EditorToolkitShared::Navigate(std::string &elementId, const int &direction)
     const bool forward = (direction == 39);
 
     m_chainedId = "";
-    this->SetEditInfo();
+    this->SetEditStatus();
 
     const Object *element = this->GetElement(elementId);
     if (!element) return false;
@@ -705,7 +722,21 @@ bool EditorToolkitShared::Navigate(std::string &elementId, const int &direction)
 
     if (result) m_chainedId = result->GetID();
 
-    this->SetEditInfo();
+    this->SetEditStatus();
+    return true;
+}
+
+bool EditorToolkitShared::Select(std::string &elementId)
+{
+    m_selectionId = "";
+    m_selectionClassId = UNSPECIFIED;
+    
+    Object *element = this->GetElement(elementId);
+    if (!element) return false;
+    
+    m_selectionId = elementId;
+    m_selectionClassId = element->GetClassId();
+    
     return true;
 }
 
@@ -791,7 +822,7 @@ bool EditorToolkitShared::Set(std::string &elementId, std::string const &attribu
     return success;
 }
 
-bool EditorToolkitShared::ContextForScores(bool editInfo)
+bool EditorToolkitShared::ContextForScores(bool updateResponse)
 {
     if (!m_scoreContext) {
         m_scoreContext = new EditorTreeObject(m_doc, false);
@@ -800,20 +831,20 @@ bool EditorToolkitShared::ContextForScores(bool editInfo)
     }
     m_currentContext = m_scoreContext;
 
-    if (!editInfo) return true;
+    if (!updateResponse) return true;
 
-    m_editInfo.reset();
+    m_editResponse.reset();
 
     // The target object
     jsonxx::Object jsonObject;
     this->ContextForObject(m_scoreContext, jsonObject, true);
 
-    m_editInfo = jsonObject;
+    m_editResponse = jsonObject;
 
     return true;
 }
 
-bool EditorToolkitShared::ContextForSections(bool editInfo)
+bool EditorToolkitShared::ContextForSections(bool updateResponse)
 {
     if (!m_sectionContext) {
         m_sectionContext = new EditorTreeObject(m_doc, false);
@@ -822,15 +853,15 @@ bool EditorToolkitShared::ContextForSections(bool editInfo)
     }
     m_currentContext = m_sectionContext;
 
-    if (!editInfo) return true;
+    if (!updateResponse) return true;
 
-    m_editInfo.reset();
+    m_editResponse.reset();
 
     // The target object
     jsonxx::Object jsonObject;
     this->ContextForObject(m_sectionContext, jsonObject, true);
 
-    m_editInfo = jsonObject;
+    m_editResponse = jsonObject;
 
     return true;
 }
@@ -845,7 +876,7 @@ void EditorToolkitShared::ClearContext()
 
 bool EditorToolkitShared::ContextForElement(std::string &elementId)
 {
-    m_editInfo.reset();
+    m_editResponse.reset();
 
     // Make sure we have a section tree - this also sets m_currentContext
     this->ContextForSections(false);
@@ -929,7 +960,7 @@ bool EditorToolkitShared::ContextForElement(std::string &elementId)
         ancestors.push_back(current);
     }
     this->ContextForObjects(ancestors, jsonAncestors);
-    m_editInfo << "ancestors" << jsonAncestors;
+    m_editResponse << "ancestors" << jsonAncestors;
 
     jsonxx::Object jsonContextRoot;
     this->ContextForObject(contextRoot, jsonContextRoot);
@@ -965,13 +996,13 @@ bool EditorToolkitShared::ContextForElement(std::string &elementId)
 
     // Add all children of to context (include target and surrounding siblings)
     jsonContextRoot << "children" << jsonContext;
-    m_editInfo << "context" << jsonContextRoot;
+    m_editResponse << "context" << jsonContextRoot;
 
     // Stop here without targetID, but still add empty objects or arrays to the info
     if (!hasTargetID) {
-        m_editInfo << "object" << jsonxx::Object();
-        m_editInfo << "referringElements" << jsonxx::Array();
-        m_editInfo << "referencedElements" << jsonxx::Array();
+        m_editResponse << "object" << jsonxx::Object();
+        m_editResponse << "referringElements" << jsonxx::Array();
+        m_editResponse << "referencedElements" << jsonxx::Array();
         return true;
     }
 
@@ -989,21 +1020,21 @@ bool EditorToolkitShared::ContextForElement(std::string &elementId)
         assert(text);
         jsonObject << "text" << UTF32to8(text->GetText());
     }
-    m_editInfo << "object" << jsonObject;
+    m_editResponse << "object" << jsonObject;
 
     // Find referring objects
     ListOfObjectAttNamePairs referringObjects;
     FindAllReferringObjectsFunctor findAllReferringObjects(object, &referringObjects);
     m_doc->Process(findAllReferringObjects);
     this->ContextForReferences(referringObjects, elements);
-    m_editInfo << "referringElements" << elements;
+    m_editResponse << "referringElements" << elements;
 
     // Find referenced objects
     ListOfObjectAttNamePairs referencedObjects;
     FindAllReferencedObjectsFunctor findAllReferencedObjects(NULL, &referencedObjects);
     object->Process(findAllReferencedObjects, 0);
     this->ContextForReferences(referencedObjects, elements);
-    m_editInfo << "referencedElements" << elements;
+    m_editResponse << "referencedElements" << elements;
 
     return true;
 }
@@ -1104,11 +1135,11 @@ ArrayOfConstObjects EditorToolkitShared::GetScoreBasedChildrenFor(const Object *
 
 bool EditorToolkitShared::GetScoreDef()
 {
-    m_editInfo.reset();
+    m_editResponse.reset();
 
     MEIOutputExtended output(m_doc);
 
-    m_editInfo = output.ExportScoreDef();
+    m_editResponse = output.ExportScoreDef();
 
     return true;
 }

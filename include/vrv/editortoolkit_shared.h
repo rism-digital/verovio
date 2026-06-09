@@ -57,9 +57,10 @@ protected:
     bool ParseNavigate(jsonxx::Object param, std::string &elementId, int &direction);
     bool ParsePropertiesAction(jsonxx::Object param, std::string &scoreDef);
     bool ParseSetAction(jsonxx::Object param, std::string &elementId, std::string &attribute, std::string &value);
+    bool ParseSelectAction(jsonxx::Object param, std::string &elementId);
     ///@}
 
-    void SetEditInfo();
+    void SetEditStatus();
     void PrepareUndo();
     std::string GetCurrentState();
     bool ReloadState(const std::string &data);
@@ -79,12 +80,13 @@ protected:
     bool KeyDown(std::string &elementId, int key, bool shiftKey, bool ctrlKey);
     bool Navigate(std::string &elementId, const int &direction);
     bool Set(std::string &elementId, std::string const &attribute, std::string const &value);
+    bool Select(std::string &elementId);
     ///@}
 
     void ClearContext();
     bool ContextForElement(std::string &elementId);
-    bool ContextForScores(bool editInfo);
-    bool ContextForSections(bool editInfo);
+    bool ContextForScores(bool updateResponse);
+    bool ContextForSections(bool updateResponse);
 
     bool GetScoreDef();
     bool SetScoreDef(const std::string scoreDef);
@@ -105,6 +107,9 @@ protected:
     std::deque<std::string> m_undoStack;
     std::deque<std::string> m_redoStack;
     size_t m_undoMemoryUsage = 0;
+    
+    std::string m_selectionId;
+    ClassId m_selectionClassId;
 
     EditorTreeObject *m_scoreContext;
     EditorTreeObject *m_sectionContext;

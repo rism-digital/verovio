@@ -1538,11 +1538,18 @@ bool Toolkit::Edit(const std::string &editorAction)
     return m_editorToolkit->ParseEditorAction(editorAction);
 }
 
-std::string Toolkit::EditInfo()
+std::string Toolkit::EditResponse()
 {
     if (!m_editorToolkit) return "{}";
 
-    return m_editorToolkit->EditInfo();
+    return m_editorToolkit->EditResponse();
+}
+
+std::string Toolkit::EditStatus()
+{
+    if (!m_editorToolkit) return "{}";
+
+    return m_editorToolkit->EditStatus();
 }
 
 std::string Toolkit::GetLog()

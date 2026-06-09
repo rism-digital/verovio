@@ -31,7 +31,7 @@ public:
     {
         m_doc = doc;
         m_view = view;
-        m_editInfo.reset();
+        m_editStatus.reset();
     }
     virtual ~EditorToolkit() {}
 
@@ -40,9 +40,13 @@ public:
      */
     virtual bool ParseEditorAction(const std::string &json_editorAction) = 0;
     /**
-     * Get information on the last editor function used
+     * Get status of the editor (undo, selection, etc.)
      */
-    virtual std::string EditInfo() { return m_editInfo.json(); }
+    virtual std::string EditStatus() { return m_editStatus.json(); }
+    /**
+     * Get response on the last editor function used
+     */
+    virtual std::string EditResponse() { return m_editResponse.json(); }
 
 #ifndef NO_EDIT_SUPPORT
 protected:
@@ -58,7 +62,8 @@ protected:
     std::string m_chainedId;
     Doc *m_doc;
     View *m_view;
-    jsonxx::Object m_editInfo;
+    jsonxx::Object m_editStatus;
+    jsonxx::Object m_editResponse;
 };
 } // namespace vrv
 
