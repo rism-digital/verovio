@@ -57,10 +57,13 @@ provider = "tools.python_metadata"
 provider-path = "."
 
 [tool.cibuildwheel]
-build = "cp310-* cp311-* cp312-* cp313-* cp314-*"
+build = "cp310-*"
 skip = "*-musllinux* *-manylinux_i686 *-win_arm64 *-macosx_universal2"
-test-command = "python -c \"import importlib.resources as r; import verovio; tk = verovio.toolkit(); print(tk.getVersion()); assert (r.files('verovio') / 'py.typed').is_file(); assert (r.files('verovio') / 'data').is_dir()\""
+test-command = "python {project}/tools/python_smoke_test.py"
 test-skip = "*-macosx_arm64 *-manylinux_aarch64"
+
+[tool.cibuildwheel.config-settings]
+"wheel.py-api" = "cp310"
 
 [tool.cibuildwheel.linux]
 manylinux-x86_64-image = "manylinux2014"
