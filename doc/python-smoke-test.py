@@ -9,12 +9,21 @@ import importlib.resources as resources
 import verovio
 
 
-def main() -> None:
+def run_smoke_test() -> None:
     toolkit = verovio.toolkit()
+    print(toolkit.getVersion())
     toolkit.setResourcePath(str(resources.files("verovio") / "data"))
     toolkit.loadData(
         """<?xml version="1.0" encoding="UTF-8"?>
-<mei xmlns="http://www.music-encoding.org/ns/mei">
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1">
+  <meiHead>
+    <fileDesc>
+      <titleStmt>
+        <title>Verovio Python smoke test</title>
+      </titleStmt>
+      <pubStmt/>
+    </fileDesc>
+  </meiHead>
   <music>
     <body>
       <mdiv>
@@ -42,7 +51,16 @@ def main() -> None:
     )
     svg = toolkit.renderToSVG(1)
     assert "<svg" in svg, "renderToSVG did not return SVG output"
-    print(toolkit.getVersion())
+
+
+def main() -> None:
+    try:
+        run_smoke_test()
+    except Exception as exc:
+        print(f"SMOKE TEST FAIL: {exc}")
+        raise
+
+    print("SMOKE TEST PASS")
 
 
 if __name__ == "__main__":
