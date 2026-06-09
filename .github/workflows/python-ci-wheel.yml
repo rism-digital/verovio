@@ -107,6 +107,7 @@ jobs:
           output-dir: wheelhouse
         env:
           CIBW_ARCHS: ${{ matrix.archs }}
+          CIBW_ENVIRONMENT_PASS_LINUX: VEROVIO_BUILD_VERSION
 
       - uses: actions/upload-artifact@v7
         with:
