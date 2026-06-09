@@ -163,48 +163,73 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install wheelhouse/*.whl
-          python - <<'PY'
-          import importlib.resources as resources
-          import verovio
+          python doc/python-smoke-test.py
 
-          toolkit = verovio.toolkit()
-          toolkit.setResourcePath(str(resources.files("verovio") / "data"))
-          toolkit.loadData(
-              """<?xml version="1.0" encoding="UTF-8"?>
-          <mei xmlns="http://www.music-encoding.org/ns/mei">
-            <music>
-              <body>
-                <mdiv>
-                  <score>
-                    <scoreDef meter.count="4" meter.unit="4">
-                      <staffGrp>
-                        <staffDef n="1" lines="5" clef.shape="G" clef.line="2"/>
-                      </staffGrp>
-                    </scoreDef>
-                    <section>
-                      <measure n="1">
-                        <staff n="1">
-                          <layer n="1">
-                            <note pname="c" oct="4" dur="4"/>
-                          </layer>
-                        </staff>
-                      </measure>
-                    </section>
-                  </score>
-                </mdiv>
-              </body>
-            </music>
-          </mei>
-          """
-          )
-          svg = toolkit.renderToSVG(1)
-          assert "<svg" in svg
-          print(toolkit.getVersion())
-          PY
+  validate_macos_arm64_abi3_runtime:
+    name: Validate macOS arm64 abi3 runtime (${{ matrix.python-version }})
+    needs: [wheels]
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: wheels-macos-arm64
+          path: wheelhouse
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install macOS arm64 abi3 wheel and run smoke test
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install wheelhouse/*.whl
+          python doc/python-smoke-test.py
+
+  validate_windows_abi3_runtime:
+    name: Validate Windows amd64 abi3 runtime (${{ matrix.python-version }})
+    needs: [wheels]
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: wheels-windows
+          path: wheelhouse
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+
+      - name: Install Windows amd64 abi3 wheel
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          $wheels = @(Get-ChildItem wheelhouse -Filter *win_amd64.whl)
+          if ($wheels.Count -ne 1) {
+            throw "Expected exactly one win_amd64 wheel, found $($wheels.Count)"
+          }
+          python -m pip install $wheels[0].FullName
+
+      - name: Run smoke test
+        run: python doc/python-smoke-test.py
 
   publish_testpypi:
     name: Publish to TestPyPI
-    needs: [validate, validate_linux_abi3_runtime]
+    needs: [validate, validate_linux_abi3_runtime, validate_macos_arm64_abi3_runtime, validate_windows_abi3_runtime]
     if: github.ref == 'refs/heads/develop-pypi'
     runs-on: ubuntu-latest
     environment: test-pypi
@@ -224,10 +249,11 @@ jobs:
           repository-url: https://test.pypi.org/legacy/
           packages-dir: dist/
           skip-existing: true
+          attestations: false
 
   publish_pypi:
     name: Publish to PyPI
-    needs: [validate, validate_linux_abi3_runtime]
+    needs: [validate, validate_linux_abi3_runtime, validate_macos_arm64_abi3_runtime, validate_windows_abi3_runtime]
     if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/version-')
     runs-on: ubuntu-latest
     environment: pypi

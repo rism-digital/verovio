@@ -60,7 +60,7 @@ provider-path = "."
 [tool.cibuildwheel]
 build = "cp310-*"
 skip = "*-musllinux* *-manylinux_i686 *-win_arm64 *-macosx_universal2"
-test-command = "python {project}/tools/python_smoke_test.py"
+test-command = "python {project}/doc/python-smoke-test.py"
 test-skip = "*-macosx_arm64 *-manylinux_aarch64"
 
 [tool.cibuildwheel.linux]
