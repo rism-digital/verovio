@@ -1471,7 +1471,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
                 const std::string correspId = ExtractIDFragment(link->GetCorresp());
                 Object *origin = m_doc.FindDescendantByID(correspId);
                 // if no original element was found, try searching through scoredef in score (only for certain elements)
-                if (!origin && element->Is({ CLEF, GRPSYM, KEYSIG, MENSUR, METERSIG, METERSIGGRP })) {
+                if (!origin && element->IsAnyOf(std::array{ CLEF, GRPSYM, KEYSIG, MENSUR, METERSIG, METERSIGGRP })) {
                     Page *page = vrv_cast<Page *>(m_doc.FindDescendantByType(PAGE));
                     if (page && page->m_score && page->m_score->GetScoreDef()) {
                         origin = page->m_score->GetScoreDef()->FindDescendantByID(correspId);
@@ -1962,7 +1962,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
             Chord *chord = note->IsChordTone();
             if (chord) chords.push_back(chord);
         }
-        else if (object->Is({ MREST, MULTIREST, REST })) {
+        else if (object->IsAnyOf(std::array{ MREST, MULTIREST, REST })) {
             restArray << object->GetID();
         }
     }

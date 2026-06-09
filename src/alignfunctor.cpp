@@ -172,7 +172,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
     else if (tabGrpParent) {
         layerElement->SetAlignment(tabGrpParent->GetAlignment());
     }
-    else if (layerElement->Is({ DOTS, FLAG, STEM })) {
+    else if (layerElement->IsAnyOf(std::array{ DOTS, FLAG, STEM })) {
         assert(false);
     }
     else if (ligatureParent && layerElement->Is(NOTE) && !ligatureAsBracket) {
@@ -194,7 +194,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         // Nothing to do
     }
     // We do not align these (container). Any other?
-    else if (layerElement->Is({ BEAM, FTREM, TUPLET })) {
+    else if (layerElement->IsAnyOf(std::array{ BEAM, FTREM, TUPLET })) {
         Fraction duration = layerElement->GetSameAsContentAlignmentDuration(m_currentParams, true, m_notationType);
         m_time = m_time + duration;
         return FUNCTOR_CONTINUE;
@@ -268,10 +268,10 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         }
         type = ALIGNMENT_PROPORT;
     }
-    else if (layerElement->Is({ MULTIREST, MREST, MRPT })) {
+    else if (layerElement->IsAnyOf(std::array{ MULTIREST, MREST, MRPT })) {
         type = ALIGNMENT_FULLMEASURE;
     }
-    else if (layerElement->Is({ MRPT2, MULTIRPT })) {
+    else if (layerElement->IsAnyOf(std::array{ MRPT2, MULTIRPT })) {
         type = ALIGNMENT_FULLMEASURE2;
     }
     else if (layerElement->Is(DOT)) {

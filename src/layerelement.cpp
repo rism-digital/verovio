@@ -216,7 +216,7 @@ FTrem *LayerElement::GetAncestorFTrem()
 
 const FTrem *LayerElement::GetAncestorFTrem() const
 {
-    if (!this->Is({ CHORD, NOTE })) return NULL;
+    if (!this->IsAnyOf(std::array{ CHORD, NOTE })) return NULL;
     return vrv_cast<const FTrem *>(this->GetFirstAncestor(FTREM, MAX_FTREM_DEPTH));
 }
 
@@ -227,7 +227,7 @@ Beam *LayerElement::GetAncestorBeam()
 
 const Beam *LayerElement::GetAncestorBeam() const
 {
-    if (!this->Is({ CHORD, NOTE, REST, TABGRP, TABDURSYM, STEM })) return NULL;
+    if (!this->IsAnyOf(std::array{ CHORD, NOTE, REST, TABGRP, TABDURSYM, STEM })) return NULL;
     const Beam *beamParent = vrv_cast<const Beam *>(this->GetFirstAncestor(BEAM));
     if (this->Is(REST)) return beamParent;
 
@@ -263,7 +263,7 @@ int LayerElement::GetOriginalLayerN() const
 
 void LayerElement::SetIsInBeamSpan(bool isInBeamSpan)
 {
-    if (!this->Is({ CHORD, NOTE, REST })) return;
+    if (!this->IsAnyOf(std::array{ CHORD, NOTE, REST })) return;
     m_isInBeamspan = isInBeamSpan;
 }
 
@@ -334,7 +334,7 @@ void LayerElement::GetOverflowStaffAlignments(StaffAlignment *&above, StaffAlign
     this->GetChordOverflow(above, below, staff->GetN());
 
     // Stems cross-staff beam need special treatment but only if the beam itself is not cross-staff
-    if (this->Is({ ARTIC, STEM })) {
+    if (this->IsAnyOf(std::array{ ARTIC, STEM })) {
         if (this->GetFirstAncestor(BEAM)) {
             Beam *beam = vrv_cast<Beam *>(this->GetFirstAncestor(BEAM));
             if (!beam->m_crossStaff) beam->GetBeamChildOverflow(above, below);
@@ -345,7 +345,7 @@ void LayerElement::GetOverflowStaffAlignments(StaffAlignment *&above, StaffAlign
         }
     }
     // Beams in cross-staff situation need special treatment
-    else if (this->Is({ BEAM, FTREM }) && !m_crossStaff) {
+    else if (this->IsAnyOf(std::array{ BEAM, FTREM }) && !m_crossStaff) {
         BeamDrawingInterface *interface = this->GetBeamDrawingInterface();
         assert(interface);
         interface->GetBeamOverflow(above, below);
@@ -356,7 +356,7 @@ void LayerElement::GetChordOverflow(StaffAlignment *&above, StaffAlignment *&bel
 {
     Chord *chord = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
     // Dots, flags and stems with cross-staff chords need special treatment
-    if (this->Is({ DOTS, FLAG, STEM }) && chord && chord->HasCrossStaff()) {
+    if (this->IsAnyOf(std::array{ DOTS, FLAG, STEM }) && chord && chord->HasCrossStaff()) {
         Staff *staffAbove = NULL;
         Staff *staffBelow = NULL;
         chord->GetCrossStaffExtremes(staffAbove, staffBelow);
@@ -452,7 +452,7 @@ int LayerElement::GetDrawingY() const
 int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticType type) const
 {
     // It would not crash otherwise but there is not reason to call it
-    assert(this->Is({ NOTE, CHORD }));
+    assert(this->IsAnyOf(std::array{ NOTE, CHORD }));
 
     ClassIdComparison isArtic(ARTIC);
     ListOfConstObjects artics;
@@ -522,7 +522,7 @@ void LayerElement::CenterDrawingX()
 
 int LayerElement::GetDrawingTop(const Doc *doc, int staffSize, bool withArtic, ArticType type) const
 {
-    if (this->Is({ NOTE, CHORD }) && withArtic) {
+    if (this->IsAnyOf(std::array{ NOTE, CHORD }) && withArtic) {
         int articY = this->GetDrawingArticulationTopOrBottom(STAFFREL_above, type);
         if (articY != VRV_UNSET) return articY;
     }
@@ -560,7 +560,7 @@ int LayerElement::GetDrawingTop(const Doc *doc, int staffSize, bool withArtic, A
 
 int LayerElement::GetDrawingBottom(const Doc *doc, int staffSize, bool withArtic, ArticType type) const
 {
-    if (this->Is({ NOTE, CHORD }) && withArtic) {
+    if (this->IsAnyOf(std::array{ NOTE, CHORD }) && withArtic) {
         int articY = this->GetDrawingArticulationTopOrBottom(STAFFREL_below, type);
         if (articY != -VRV_UNSET) return articY;
     }
@@ -600,7 +600,7 @@ int LayerElement::GetDrawingRadius(const Doc *doc, bool isInLigature) const
 {
     assert(doc);
 
-    if (!this->Is({ CHORD, NC, NOTE, REST })) return 0;
+    if (!this->IsAnyOf(std::array{ CHORD, NC, NOTE, REST })) return 0;
 
     char32_t code = 0;
     data_DURATION dur = DURATION_4;
@@ -636,7 +636,7 @@ int LayerElement::GetDrawingRadius(const Doc *doc, bool isInLigature) const
             code = SMUFL_E0A4_noteheadBlack;
         }
     }
-    else if (this->Is({ REST, NC })) {
+    else if (this->IsAnyOf(std::array{ REST, NC })) {
         code = SMUFL_E0A4_noteheadBlack;
     }
 
@@ -749,7 +749,7 @@ Fraction LayerElement::GetAlignmentDuration(
     }
     // We align all full measure element to the current time signature, even the ones that last longer than one measure
     // If metcon is false, then the duration will remain 0 because it cannot be determined
-    else if (params.metcon && this->Is({ HALFMRPT, MREST, MULTIREST, MRPT, MRPT2, MULTIRPT })) {
+    else if (params.metcon && this->IsAnyOf(std::array{ HALFMRPT, MREST, MULTIREST, MRPT, MRPT2, MULTIRPT })) {
         data_DURATION meterUnit = DURATION_4;
         int meterCount = 4;
         if (params.meterSig && params.meterSig->HasUnit()) meterUnit = params.meterSig->GetUnitAsDur();
@@ -783,7 +783,7 @@ Fraction LayerElement::GetAlignmentDuration(bool notGraceOnly, data_NOTATIONTYPE
 Fraction LayerElement::GetSameAsContentAlignmentDuration(
     const AlignMeterParams &params, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
-    if (!this->HasSameasLink() || !this->GetSameasLink()->Is({ BEAM, FTREM, TUPLET })) {
+    if (!this->HasSameasLink() || !this->GetSameasLink()->IsAnyOf(std::array{ BEAM, FTREM, TUPLET })) {
         return Fraction(0);
     }
 
@@ -796,7 +796,7 @@ Fraction LayerElement::GetSameAsContentAlignmentDuration(
 Fraction LayerElement::GetContentAlignmentDuration(
     const AlignMeterParams &params, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
-    if (!this->Is({ BEAM, FTREM, TUPLET })) {
+    if (!this->IsAnyOf(std::array{ BEAM, FTREM, TUPLET })) {
         return Fraction(0);
     }
 
@@ -908,7 +908,7 @@ std::vector<int> LayerElement::GetElementsInUnison(
 
 MapOfDotLocs LayerElement::CalcOptimalDotLocations()
 {
-    if (!this->Is({ NOTE, CHORD })) {
+    if (!this->IsAnyOf(std::array{ NOTE, CHORD })) {
         return {};
     }
 
@@ -1086,7 +1086,7 @@ int LayerElement::AdjustOverlappingLayers(const Doc *doc, const std::vector<Laye
         if (stemSameas) return 0;
     }
 
-    if (this->Is({ ACCID, DOTS, STEM })) {
+    if (this->IsAnyOf(std::array{ ACCID, DOTS, STEM })) {
         LayerElement *parent
             = vrv_cast<LayerElement *>(this->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
         assert(parent);
@@ -1212,7 +1212,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
             Dots *dot = vrv_cast<Dots *>(this);
             if (dot->IsAdjusted() || !HorizontalSelfOverlap(otherElements.at(i), horizontalMargin)) continue;
 
-            if (otherElements.at(i)->Is({ NOTE, STEM })) {
+            if (otherElements.at(i)->IsAnyOf(std::array{ NOTE, STEM })) {
                 shift -= otherElements.at(i)->HorizontalLeftOverlap(this, doc, shift + horizontalMargin / 2, 0);
             }
             else {

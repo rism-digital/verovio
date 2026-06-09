@@ -329,7 +329,7 @@ void MusicXmlInput::InsertClefIntoObject(
     }
     else {
         Object *parent = layerElement->GetParent();
-        if (parent->Is({ CHORD, FTREM, TABGRP })) {
+        if (parent->IsAnyOf(std::array{ CHORD, FTREM, TABGRP })) {
             this->InsertClefIntoObject(parent->GetParent(), clef, parent, insertAfter);
         }
         else {
@@ -454,7 +454,7 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element, int dur
     if (!element->GetParent()) return;
 
     m_layerEndTimes[layer] = m_durTotal + duration;
-    if (!element->Is({ BEAM, TUPLET })) {
+    if (!element->IsAnyOf(std::array{ BEAM, TUPLET })) {
         m_layerTimes[layer].emplace(m_durTotal + duration, element);
     }
 }

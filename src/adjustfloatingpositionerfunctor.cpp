@@ -90,7 +90,7 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitStaffAlignment(StaffAlignment
             bool skipAbove = false;
             bool skipBelow = false;
 
-            if (positioner->GetObject()->Is({ LV, PHRASE, SLUR, TIE })) {
+            if (positioner->GetObject()->IsAnyOf(std::array{ LV, PHRASE, SLUR, TIE })) {
                 TimeSpanningInterface *interface = positioner->GetObject()->GetTimeSpanningInterface();
                 assert(interface);
                 interface->GetCrossStaffOverflows(staffAlignment, curve->GetDir(), skipAbove, skipBelow);
@@ -454,7 +454,7 @@ FunctorCode AdjustFloatingPositionersBetweenFunctor::VisitStaffAlignment(StaffAl
 
     for (FloatingPositioner *positioner : m_previousStaffAlignment->GetFloatingPositioners()) {
         assert(positioner->GetObject());
-        if (!positioner->GetObject()->Is({ CPMARK, DIR, DYNAM, HAIRPIN, TEMPO })) continue;
+        if (!positioner->GetObject()->IsAnyOf(std::array{ CPMARK, DIR, DYNAM, HAIRPIN, TEMPO })) continue;
 
         if (positioner->GetDrawingPlace() != STAFFREL_between) continue;
 

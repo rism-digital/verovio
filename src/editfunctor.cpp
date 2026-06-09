@@ -29,16 +29,16 @@ SectionContextFunctor::SectionContextFunctor(Object *object) : Functor()
 FunctorCode SectionContextFunctor::VisitObject(Object *object)
 {
     // In any case do not go beyond these
-    if (object->GetParent() && object->GetParent()->Is({ DIV, MEASURE, SCOREDEF })) {
+    if (object->GetParent() && object->GetParent()->IsAnyOf(std::array{ DIV, MEASURE, SCOREDEF })) {
         return FUNCTOR_SIBLINGS;
     }
 
-    if (object->Is({ DOC, PAGE, PAGES, PAGE_MILESTONE_END, SYSTEM, SYSTEM_MILESTONE_END })) {
+    if (object->IsAnyOf(std::array{ DOC, PAGE, PAGES, PAGE_MILESTONE_END, SYSTEM, SYSTEM_MILESTONE_END })) {
         return FUNCTOR_CONTINUE;
     }
 
     bool ownChildren = false;
-    if (object->Is({ DIV, MEASURE, SCOREDEF })) {
+    if (object->IsAnyOf(std::array{ DIV, MEASURE, SCOREDEF })) {
         ownChildren = true;
     }
 
@@ -55,10 +55,10 @@ FunctorCode SectionContextFunctor::VisitObjectEnd(Object *object)
         return FUNCTOR_CONTINUE;
     }
 
-    if (object->Is({ PAGE_MILESTONE_END, SYSTEM_MILESTONE_END })) {
+    if (object->IsAnyOf(std::array{ PAGE_MILESTONE_END, SYSTEM_MILESTONE_END })) {
         m_current = m_current->GetParent();
     }
-    if (object->Is({ DOC, PAGE, PAGES, PAGE_MILESTONE_END, SYSTEM, SYSTEM_MILESTONE_END })) {
+    if (object->IsAnyOf(std::array{ DOC, PAGE, PAGES, PAGE_MILESTONE_END, SYSTEM, SYSTEM_MILESTONE_END })) {
         return FUNCTOR_CONTINUE;
     }
 
@@ -83,7 +83,7 @@ ScoreContextFunctor::ScoreContextFunctor(Object *object) : Functor()
 FunctorCode ScoreContextFunctor::VisitObject(Object *object)
 {
     // In any case do not go beyond these
-    if (object->GetParent() && object->GetParent()->Is({ DIV, MEASURE, SCOREDEF })) {
+    if (object->GetParent() && object->GetParent()->IsAnyOf(std::array{ DIV, MEASURE, SCOREDEF })) {
         return FUNCTOR_SIBLINGS;
     }
     if (m_inScoreLevel == INCLUDED) {
@@ -92,7 +92,7 @@ FunctorCode ScoreContextFunctor::VisitObject(Object *object)
     }
 
     // Do not include in the tree
-    if ((m_inScoreLevel == NOT_IN_SCORE) && !object->Is({ MDIV, SCORE })) {
+    if ((m_inScoreLevel == NOT_IN_SCORE) && !object->IsAnyOf(std::array{ MDIV, SCORE })) {
         return FUNCTOR_CONTINUE;
     }
 
@@ -132,7 +132,7 @@ FunctorCode ScoreContextFunctor::VisitObjectEnd(Object *object)
         m_current = m_current->GetParent();
     }
     // The have not been pushed, continue
-    if ((m_inScoreLevel == NOT_IN_SCORE) && !object->Is({ MDIV, SCORE })) {
+    if ((m_inScoreLevel == NOT_IN_SCORE) && !object->IsAnyOf(std::array{ MDIV, SCORE })) {
         return FUNCTOR_CONTINUE;
     }
 

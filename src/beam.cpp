@@ -156,7 +156,7 @@ void BeamSegment::CalcSetStemValues(const Staff *staff, const Doc *doc, const Be
     for (BeamElementCoord *coord : m_beamElementCoordRefs) {
         // All notes and chords get their stem value stored
         LayerElement *el = coord->m_element;
-        if (!el->Is({ CHORD, NOTE })) continue;
+        if (!el->IsAnyOf(std::array{ CHORD, NOTE })) continue;
 
         // Get the interface for the chord or note
         StemmedDrawingInterface *stemmedInterface = coord->GetStemHolderInterface();
@@ -333,8 +333,9 @@ std::pair<int, int> BeamSegment::GetMinimalStemLength(const BeamDrawingInterface
     const auto [topOffset, bottomOffset] = this->GetVerticalOffset(beamInterface);
 
     // lambda check whether coord has element set and whether that element is CHORD or NOTE
-    const auto isNoteOrChord
-        = [](BeamElementCoord *coord) { return (coord->m_element && coord->m_element->Is({ CHORD, NOTE })); };
+    const auto isNoteOrChord = [](BeamElementCoord *coord) {
+        return (coord->m_element && coord->m_element->IsAnyOf(std::array{ CHORD, NOTE }));
+    };
 
     for (BeamElementCoord *coord : m_beamElementCoordRefs) {
         if (!isNoteOrChord(coord)) continue;
@@ -458,8 +459,9 @@ void BeamSegment::AdjustBeamToFrenchStyle(const BeamDrawingInterface *beamInterf
     // set to store durations of relevant notes (it's ordered, so min duration is going to be first)
     std::set<data_DURATION> noteDurations;
     // lambda check whether coord has element set and whether that element is CHORD or NOTE
-    const auto isNoteOrChord
-        = [](BeamElementCoord *coord) { return (coord->m_element && coord->m_element->Is({ CHORD, NOTE })); };
+    const auto isNoteOrChord = [](BeamElementCoord *coord) {
+        return (coord->m_element && coord->m_element->IsAnyOf(std::array{ CHORD, NOTE }));
+    };
     // iterators
     using CoordIt = ArrayOfBeamElementCoords::iterator;
     using CoordReverseIt = ArrayOfBeamElementCoords::reverse_iterator;
@@ -635,7 +637,7 @@ void BeamSegment::CalcBeamInit(
         BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
         coord->m_yBeam = 0;
 
-        if (coord->m_element->Is({ CHORD, NOTE, TABGRP })) {
+        if (coord->m_element->IsAnyOf(std::array{ CHORD, NOTE, TABGRP })) {
             if (!m_firstNoteOrChord) m_firstNoteOrChord = coord;
             m_lastNoteOrChord = coord;
             m_nbNotesOrChords++;
@@ -1849,7 +1851,7 @@ void BeamElementCoord::SetDrawingStemDir(data_STEMDIRECTION stemDir, const Staff
     }
     m_centered = (segment->m_uniformStemLength % 2) || (m_element->IsGraceNote());
 
-    if (m_element->Is({ REST, SPACE })) {
+    if (m_element->IsAnyOf(std::array{ REST, SPACE })) {
         m_x += m_element->GetDrawingRadius(doc);
         m_yBeam = m_element->GetDrawingY();
         m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
@@ -1987,9 +1989,9 @@ int BeamElementCoord::CalculateStemModAdjustment(int stemLength, int directionBi
 
 StemmedDrawingInterface *BeamElementCoord::GetStemHolderInterface()
 {
-    if (!m_element || !m_element->Is({ CHORD, NOTE, TABGRP })) return NULL;
+    if (!m_element || !m_element->IsAnyOf(std::array{ CHORD, NOTE, TABGRP })) return NULL;
 
-    if (m_element->Is({ CHORD, NOTE })) return m_element->GetStemmedDrawingInterface();
+    if (m_element->IsAnyOf(std::array{ CHORD, NOTE })) return m_element->GetStemmedDrawingInterface();
 
     TabGrp *tabGrp = vrv_cast<TabGrp *>(m_element);
     assert(tabGrp);

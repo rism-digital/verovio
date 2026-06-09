@@ -743,7 +743,7 @@ void StaffAlignment::SetCurrentFloatingPositioner(
 {
     FloatingPositioner *positioner = this->GetCorrespFloatingPositioner(object);
     if (positioner == NULL) {
-        if (object->Is({ LV, PHRASE, SLUR, TIE })) {
+        if (object->IsAnyOf(std::array{ LV, PHRASE, SLUR, TIE })) {
             positioner = new FloatingCurvePositioner(object, this, spanningType);
             m_floatingPositioners.push_back(positioner);
         }
@@ -801,7 +801,7 @@ void StaffAlignment::FindAllIntersectionPoints(
 {
     for (const auto positioner : m_floatingPositioners) {
         assert(positioner->GetObject());
-        if (!positioner->GetObject()->Is(classIds)) {
+        if (!positioner->GetObject()->IsAnyOf(classIds)) {
             continue;
         }
         if (positioner->HorizontalContentOverlap(&boundingBox, margin / 2)) {
