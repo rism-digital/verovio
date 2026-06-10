@@ -17,6 +17,7 @@
 #include "chord.h"
 #include "clef.h"
 #include "comparison.h"
+#include "cursor.h"
 #include "dir.h"
 #include "dynam.h"
 #include "editfunctor.h"
@@ -409,6 +410,8 @@ bool EditorToolkitShared::ParseSetAction(
 
 void EditorToolkitShared::PrepareUndo()
 {
+    if (this->InsertMode()) return;
+
     // We already have a prepared undo - nothing to prepare
     if (m_undoPrepared) return;
 
@@ -432,6 +435,7 @@ void EditorToolkitShared::SetEditStatus()
     m_editStatus.import("canUndo", this->CanUndo());
     m_editStatus.import("canRedo", this->CanRedo());
     m_editStatus.import("isMensuralMusicOnly", m_doc->IsMensuralMusicOnly());
+    m_editStatus.import("insertMode", this->InsertMode());
     if (!m_selectionId.empty()) {
         jsonxx::Object selection;
         selection.import("id", m_selectionId);
@@ -541,11 +545,15 @@ bool EditorToolkitShared::Cursor(bool setCursor, std::string &elementId)
         m_cursor = NULL;
     }
 
+    this->SetEditStatus();
+
     return true;
 }
 
 bool EditorToolkitShared::Delete(std::string &elementId)
 {
+    if (this->InsertMode()) return true;
+
     Object *element = this->ResolveElement(elementId);
 
     if (!element) return false;
@@ -605,6 +613,8 @@ void EditorToolkitShared::CollectReferringObjects(
 
 bool EditorToolkitShared::Drag(std::string &elementId, int x, int y)
 {
+    if (this->InsertMode()) return true;
+
     Object *element = this->ResolveElement(elementId);
     if (!element) return false;
 
@@ -625,6 +635,8 @@ bool EditorToolkitShared::Drag(std::string &elementId, int x, int y)
 
 bool EditorToolkitShared::InsertControl(std::string &elementName, std::string &startId, std::string &endId)
 {
+    if (this->InsertMode()) return true;
+
     Object *start = this->ResolveElement(startId, false);
     if (!start) return false;
 
@@ -655,7 +667,7 @@ bool EditorToolkitShared::InsertControl(std::string &elementName, std::string &s
 
 bool EditorToolkitShared::KeyDown(std::string &elementId, int key, bool shiftKey, bool ctrlKey)
 {
-    Object *element = this->ResolveElement(elementId);
+    Object *element = (m_cursor) ? m_cursor : this->ResolveElement(elementId);
     if (!element) return false;
 
     // For elements whose y-position corresponds to a certain pitch
@@ -678,6 +690,8 @@ bool EditorToolkitShared::KeyDown(std::string &elementId, int key, bool shiftKey
 bool EditorToolkitShared::Navigate(std::string &elementId, const int &direction)
 {
     static auto classIds = { CHORD, MREST, NOTE, REST };
+
+    if (this->InsertMode()) return true;
 
     const bool forward = (direction == 39);
 
@@ -791,6 +805,8 @@ bool EditorToolkitShared::Navigate(std::string &elementId, const int &direction)
 
 bool EditorToolkitShared::Select(std::string &elementId, bool secondary)
 {
+    if (this->InsertMode()) return true;
+
     if (secondary) {
         m_selectionSecondaryId = "";
         if (!m_selectionId.empty() && Object::IsLayerElement(m_selectionClassId)) {
@@ -818,6 +834,8 @@ bool EditorToolkitShared::Select(std::string &elementId, bool secondary)
 
 bool EditorToolkitShared::Set(std::string &elementId, const std::string &attribute, const std::string &value)
 {
+    if (this->InsertMode()) return true;
+
     Object *element = this->ResolveElement(elementId);
     if (!element) return false;
 

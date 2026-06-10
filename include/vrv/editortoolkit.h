@@ -63,6 +63,7 @@ protected:
     Object *GetElement(const std::string &elementId);
     Object *PrepareInsertion(Object *parent, const std::string &elementName);
     Object *ResolveElement(std::string &elementId, bool chain = true);
+    bool InsertMode() const { return (m_cursor); }
 #endif
 
 protected:

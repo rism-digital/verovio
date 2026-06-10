@@ -64,6 +64,11 @@ public:
     ///@}
 
     /**
+     * Reset cursor drawing Y
+     */
+    void ResetCachedDrawingY() const override;
+
+    /**
      * Return the index position of the layer in its staff parent.
      * The index position is 0-based.
      */
@@ -247,8 +252,8 @@ public:
      * @name Setter and getter for cursor
      */
     //@{
-    bool HasCursor() const { return (m_cursor.has_value()); }
-    Cursor *GetCursor() const { return m_cursor.value(); }
+    bool HasCursor() const { return (m_cursor); }
+    Cursor *GetCursor() const { return m_cursor; }
     void SetCursor(Cursor *cursor);
     void ResetCursor();
     ///@}
@@ -300,7 +305,7 @@ private:
     bool m_drawCautionKeySigCancel;
 
     /** An optional cursor for the layer that has it */
-    std::optional<Cursor *> m_cursor;
+    Cursor *m_cursor;
 };
 
 } // namespace vrv

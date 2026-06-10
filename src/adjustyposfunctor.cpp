@@ -37,16 +37,6 @@ FunctorCode AdjustYPosFunctor::VisitDiv(Div *div)
     return FUNCTOR_SIBLINGS;
 }
 
-FunctorCode AdjustYPosFunctor::VisitLayer(Layer *layer)
-{
-    // Necessary because cursor is not reset by VisitSytem call to ResetCachedDrawingY
-    if (layer->HasCursor()) {
-        layer->GetCursor()->ResetCachedDrawingY();
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
 FunctorCode AdjustYPosFunctor::VisitStaffAlignment(StaffAlignment *staffAlignment)
 {
     const int defaultSpacing = staffAlignment->GetMinimumSpacing(m_doc);

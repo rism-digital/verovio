@@ -9,6 +9,7 @@
 
 //--------------------------------------------------------------------------------
 
+#include "cursor.h"
 #include "object.h"
 #include "page.h"
 #include "vrv.h"

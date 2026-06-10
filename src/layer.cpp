@@ -65,6 +65,8 @@ Layer::Layer()
     m_cautionStaffDefMensur = NULL;
     m_cautionStaffDefMeterSig = NULL;
 
+    m_cursor = NULL;
+
     this->Reset();
 }
 
@@ -72,7 +74,6 @@ Layer::~Layer()
 {
     // We need to delete own objects
     this->Reset();
-    this->ResetCursor();
 }
 
 void Layer::Reset()
@@ -85,6 +86,8 @@ void Layer::Reset()
     this->ResetVisibility();
 
     this->ResetStaffDefObjects();
+
+    this->ResetCursor();
 
     m_drawingStemDir = STEMDIRECTION_NONE;
     m_crossStaffFromAbove = false;
@@ -169,6 +172,13 @@ bool Layer::IsSupportedChild(ClassId classId)
     else {
         return false;
     }
+}
+
+void Layer::ResetCachedDrawingY() const
+{
+    if (m_cursor) m_cursor->ResetCachedDrawingY();
+
+    Object::ResetCachedDrawingY();
 }
 
 LayerElement *Layer::GetPreviousInLayer(const LayerElement *element)
@@ -662,13 +672,13 @@ void Layer::SetCursor(Cursor *cursor)
     if (m_cursor) this->ResetCursor();
 
     m_cursor = cursor;
-    m_cursor.value()->SetParent(this);
+    m_cursor->SetParent(this);
 }
 
 void Layer::ResetCursor()
 {
-    if (m_cursor) delete m_cursor.value();
-    m_cursor.reset();
+    if (m_cursor) delete m_cursor;
+    m_cursor = NULL;
 }
 
 //----------------------------------------------------------------------------

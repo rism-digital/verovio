@@ -112,7 +112,6 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerEnd(Layer *layer)
 {
     if (layer->HasCursor()) {
         Cursor *cursor = layer->GetCursor();
-        cursor->SetPosition(vrv_cast<LayerElement *>(layer->GetFirst(NOTE)));
         Fraction position = 0;
         if (cursor->HasPosition()) {
             LayerElement *positionElement = cursor->GetPosition();
