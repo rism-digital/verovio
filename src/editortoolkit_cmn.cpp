@@ -34,10 +34,10 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
     if (action == "insertMeasure") {
         std::string targetId;
         int number;
-        std::string insertMode;
-        if (this->ParseInsertMeasureAction(json.get<jsonxx::Object>("param"), targetId, number, insertMode)) {
+        bool insertBefore;
+        if (this->ParseInsertMeasureAction(json.get<jsonxx::Object>("param"), targetId, number, insertBefore)) {
             this->PrepareUndo();
-            return (this->InsertMeasure(targetId, number, insertMode));
+            return (this->InsertMeasure(targetId, number, insertBefore));
         }
         LogWarning("Could not parse the insertMeasure action");
     }
@@ -61,15 +61,16 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
 
 #ifndef NO_EDIT_SUPPORT
 bool EditorToolkitCMN::ParseInsertMeasureAction(
-    jsonxx::Object param, std::string &targetId, int &number, std::string &insertMode)
+    jsonxx::Object param, std::string &targetId, int &number, bool &insertBefore)
 {
     number = 0;
-    if (!param.has<jsonxx::String>("targetId")) return false;
-    targetId = param.get<jsonxx::String>("targetId");
+    targetId = "";
+    insertBefore = false;
+
+    if (param.has<jsonxx::String>("targetId")) targetId = param.get<jsonxx::String>("targetId");
     if (!param.has<jsonxx::Number>("number")) return false;
     number = param.get<jsonxx::Number>("number");
-    if (!param.has<jsonxx::String>("insertMode")) return false;
-    insertMode = param.get<jsonxx::String>("insertMode");
+    if (param.has<jsonxx::Boolean>("insertBefore")) insertBefore = param.get<jsonxx::Boolean>("insertBefore");
 
     return true;
 }
@@ -98,12 +99,22 @@ bool EditorToolkitCMN::ParseInsertNoteAction(
     return true;
 }
 
-bool EditorToolkitCMN::InsertMeasure(const std::string &targetId, int number, const std::string &insertMode)
+bool EditorToolkitCMN::InsertMeasure(std::string &targetId, int number, bool insertBefore)
 {
+    bool endInsert = (targetId.empty());
     Measure *measure = NULL;
-    if (targetId.empty()) {
+
+    int measureN = VRV_UNSET;
+    if (endInsert) {
         measure = vrv_cast<Measure *>(m_doc->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
     }
+    else {
+        measure = vrv_cast<Measure *>(this->ResolveElement(targetId, false));
+    }
+
+    if (!measure) return false;
+
+    if (endInsert && IsValidInteger(measure->GetN())) measureN = std::stoi(measure->GetN());
 
     InitProcessingListsFunctor initProcessingLists;
     measure->Process(initProcessingLists);
@@ -111,6 +122,14 @@ bool EditorToolkitCMN::InsertMeasure(const std::string &targetId, int number, co
 
     for (int i = 0; i < number; i++) {
         Measure *newMeasure = new Measure();
+        if (endInsert && (i == 0) && measure->HasRight()) {
+            newMeasure->SetRight(measure->GetRight());
+            measure->SetRight(BARRENDITION_NONE);
+        }
+        if (measureN != VRV_UNSET) {
+            newMeasure->SetN(StringFormat("%d", measureN + number - i));
+        }
+
         // Now we can process by layer and move their content to (measure) segments
         for (const auto &staves : layerTree.child) {
             Staff *staff = new Staff(staves.first);
@@ -121,9 +140,16 @@ bool EditorToolkitCMN::InsertMeasure(const std::string &targetId, int number, co
                 staff->AddChild(layer);
             }
         }
-        measure->GetParent()->InsertAfter(measure, newMeasure);
+        if (insertBefore) {
+            measure->GetParent()->InsertBefore(measure, newMeasure);
+        }
+        else {
+            measure->GetParent()->InsertAfter(measure, newMeasure);
+        }
         m_chainedId = newMeasure->GetID();
     }
+
+    this->ClearContext();
 
     return true;
 }

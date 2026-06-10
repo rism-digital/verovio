@@ -326,7 +326,7 @@ public:
      * @return The editor response as a string
      **/
     std::string EditResponse();
-    
+
     /**
      * Return the editor status - experimental code not to rely on.
      *

@@ -20,10 +20,12 @@ namespace vrv {
 #ifndef NO_EDIT_SUPPORT
 
 #define CHAINED_ID "[chained-id]"
+#define SELECTION_ID "[selection-id]"
+#define SELECTION_SECONDARY_ID "[selection-secondary-id]"
 
 bool EditorToolkit::AppendChild(std::string &elementId, const std::string &elementName, bool noDuplicate)
 {
-    Object *element = this->GetChainedElement(elementId);
+    Object *element = this->ResolveElement(elementId);
     if (!element) return false;
 
     if (noDuplicate) {

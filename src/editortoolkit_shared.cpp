@@ -59,9 +59,6 @@ EditorToolkitShared::EditorToolkitShared(Doc *doc, View *view) : EditorToolkit(d
     m_scoreContext = NULL;
     m_sectionContext = NULL;
     m_currentContext = NULL;
-    
-    m_selectionId = "";
-    m_selectionClassId = UNSPECIFIED;
 
     this->SetEditStatus();
 }
@@ -244,8 +241,9 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
     }
     else if (action == "select") {
         std::string elementId;
-        if (this->ParseSelectAction(json.get<jsonxx::Object>("param"), elementId)) {
-            return this->Select(elementId);
+        bool secondary;
+        if (this->ParseSelectAction(json.get<jsonxx::Object>("param"), elementId, secondary)) {
+            return this->Select(elementId, secondary);
         }
     }
     else if (action == "set") {
@@ -365,11 +363,14 @@ bool EditorToolkitShared::ParsePropertiesAction(jsonxx::Object param, std::strin
     return true;
 }
 
-bool EditorToolkitShared::ParseSelectAction(
-    jsonxx::Object param, std::string &elementId)
+bool EditorToolkitShared::ParseSelectAction(jsonxx::Object param, std::string &elementId, bool &secondary)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
     elementId = param.get<jsonxx::String>("elementId");
+    secondary = false;
+    if (param.has<jsonxx::Boolean>("secondary")) {
+        secondary = param.get<jsonxx::Boolean>("secondary");
+    }
     return true;
 }
 
@@ -410,6 +411,13 @@ void EditorToolkitShared::SetEditStatus()
     m_editStatus.import("canUndo", this->CanUndo());
     m_editStatus.import("canRedo", this->CanRedo());
     m_editStatus.import("isMensuralMusicOnly", m_doc->IsMensuralMusicOnly());
+    if (!m_selectionId.empty()) {
+        jsonxx::Object selection;
+        selection.import("id", m_selectionId);
+        selection.import("element", ObjectFactory::GetInstance()->GetClassName(m_selectionClassId));
+        if (!m_selectionSecondaryId.empty()) selection.import("secondaryId", m_selectionSecondaryId);
+        m_editStatus << "selection" << selection;
+    }
 }
 
 std::string EditorToolkitShared::GetCurrentState()
@@ -488,7 +496,7 @@ bool EditorToolkitShared::Chain(jsonxx::Array actions)
 
 bool EditorToolkitShared::Delete(std::string &elementId)
 {
-    Object *element = this->GetChainedElement(elementId);
+    Object *element = this->ResolveElement(elementId);
 
     if (!element) return false;
 
@@ -547,7 +555,7 @@ void EditorToolkitShared::CollectReferringObjects(
 
 bool EditorToolkitShared::Drag(std::string &elementId, int x, int y)
 {
-    Object *element = this->GetChainedElement(elementId);
+    Object *element = this->ResolveElement(elementId);
     if (!element) return false;
 
     // For elements whose y-position corresponds to a certain pitch
@@ -565,10 +573,9 @@ bool EditorToolkitShared::Drag(std::string &elementId, int x, int y)
     return false;
 }
 
-bool EditorToolkitShared::InsertControl(
-    const std::string &elementName, const std::string startId, const std::string endId)
+bool EditorToolkitShared::InsertControl(std::string &elementName, std::string &startId, std::string &endId)
 {
-    Object *start = this->GetElement(startId);
+    Object *start = this->ResolveElement(startId, false);
     if (!start) return false;
 
     Measure *measure = vrv_cast<Measure *>(start->GetFirstAncestor(MEASURE));
@@ -585,15 +592,20 @@ bool EditorToolkitShared::InsertControl(
     TimePointInterface *timePointInterface = childElement->GetTimePointInterface();
     if (timePointInterface) timePointInterface->SetStartid("#" + startId);
 
-    TimeSpanningInterface *timeSpanningInterface = childElement->GetTimeSpanningInterface();
-    if (timeSpanningInterface && !endId.empty()) timeSpanningInterface->SetEndid("#" + endId);
+    if (!endId.empty()) {
+        Object *end = this->ResolveElement(endId, false);
+        if (!end) return false;
+
+        TimeSpanningInterface *timeSpanningInterface = childElement->GetTimeSpanningInterface();
+        if (timeSpanningInterface && !endId.empty()) timeSpanningInterface->SetEndid("#" + endId);
+    }
 
     return true;
 }
 
 bool EditorToolkitShared::KeyDown(std::string &elementId, int key, bool shiftKey, bool ctrlKey)
 {
-    Object *element = this->GetChainedElement(elementId);
+    Object *element = this->ResolveElement(elementId);
     if (!element) return false;
 
     // For elements whose y-position corresponds to a certain pitch
@@ -606,10 +618,11 @@ bool EditorToolkitShared::KeyDown(std::string &elementId, int key, bool shiftKey
             case KEY_DOWN: step = -1; break;
             default: step = 0;
         }
+        if (ctrlKey) step *= 7;
         interface->AdjustPitchByOffset(step);
         return true;
     }
-    return false;
+    return true;
 }
 
 bool EditorToolkitShared::Navigate(std::string &elementId, const int &direction)
@@ -726,23 +739,36 @@ bool EditorToolkitShared::Navigate(std::string &elementId, const int &direction)
     return true;
 }
 
-bool EditorToolkitShared::Select(std::string &elementId)
+bool EditorToolkitShared::Select(std::string &elementId, bool secondary)
 {
-    m_selectionId = "";
-    m_selectionClassId = UNSPECIFIED;
-    
-    Object *element = this->GetElement(elementId);
-    if (!element) return false;
-    
-    m_selectionId = elementId;
-    m_selectionClassId = element->GetClassId();
-    
+    if (secondary) {
+        m_selectionSecondaryId = "";
+        if (!m_selectionId.empty() && Object::IsLayerElement(m_selectionClassId)) {
+            Object *element = this->GetElement(elementId);
+            if (!element) return false;
+            m_selectionSecondaryId = elementId;
+        }
+    }
+    else {
+        m_selectionId = "";
+        m_selectionClassId = UNSPECIFIED;
+        m_selectionSecondaryId = "";
+
+        Object *element = this->GetElement(elementId);
+        if (!element) return false;
+
+        m_selectionId = elementId;
+        m_selectionClassId = element->GetClassId();
+    }
+
+    this->SetEditStatus();
+
     return true;
 }
 
-bool EditorToolkitShared::Set(std::string &elementId, std::string const &attribute, std::string const &value)
+bool EditorToolkitShared::Set(std::string &elementId, const std::string &attribute, const std::string &value)
 {
-    Object *element = this->GetChainedElement(elementId);
+    Object *element = this->ResolveElement(elementId);
     if (!element) return false;
 
     bool success = false;
@@ -885,7 +911,7 @@ bool EditorToolkitShared::ContextForElement(std::string &elementId)
     bool hasTargetID = (elementId != "");
     const Object *object = NULL;
     if (hasTargetID) {
-        object = this->GetChainedElement(elementId);
+        object = this->ResolveElement(elementId);
     }
     // Retrieve the context from the first measure in the document
     else {

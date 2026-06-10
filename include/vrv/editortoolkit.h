@@ -32,6 +32,10 @@ public:
         m_doc = doc;
         m_view = view;
         m_editStatus.reset();
+
+        m_selectionId = "";
+        m_selectionClassId = UNSPECIFIED;
+        m_selectionSecondaryId = "";
     }
     virtual ~EditorToolkit() {}
 
@@ -55,11 +59,15 @@ protected:
     bool InsertAfter(std::string &elementId, const std::string &elementName);
     Object *GetElement(const std::string &elementId);
     Object *PrepareInsertion(Object *parent, const std::string &elementName);
-    Object *GetChainedElement(std::string &elementId);
+    Object *ResolveElement(std::string &elementId, bool chain = true);
 #endif
 
 protected:
     std::string m_chainedId;
+    std::string m_selectionId;
+    ClassId m_selectionClassId;
+    std::string m_selectionSecondaryId;
+
     Doc *m_doc;
     View *m_view;
     jsonxx::Object m_editStatus;
