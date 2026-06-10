@@ -51,7 +51,7 @@ bool EditorToolkit::AppendChild(std::string &elementId, const std::string &eleme
 
 bool EditorToolkit::InsertBefore(std::string &elementId, const std::string &elementName)
 {
-    Object *element = this->GetChainedElement(elementId);
+    Object *element = this->ResolveElement(elementId);
     if (!element) return false;
 
     Object *parent = element->GetParent();
@@ -67,7 +67,7 @@ bool EditorToolkit::InsertBefore(std::string &elementId, const std::string &elem
 
 bool EditorToolkit::InsertAfter(std::string &elementId, const std::string &elementName)
 {
-    Object *element = this->GetChainedElement(elementId);
+    Object *element = this->ResolveElement(elementId);
     if (!element) return false;
 
     Object *parent = element->GetParent();
@@ -122,10 +122,21 @@ Object *EditorToolkit::PrepareInsertion(Object *parent, const std::string &eleme
     return childElement;
 }
 
-Object *EditorToolkit::GetChainedElement(std::string &elementId)
+Object *EditorToolkit::ResolveElement(std::string &elementId, bool chain)
 {
     if (elementId == CHAINED_ID) {
+        if (m_chainedId.empty()) LogWarning("Chained id not set");
         elementId = m_chainedId;
+    }
+    else if (elementId == SELECTION_ID) {
+        if (m_selectionId.empty()) LogWarning("Selection id not set");
+        elementId = m_selectionId;
+        if (chain) m_chainedId = elementId;
+    }
+    else if (elementId == SELECTION_SECONDARY_ID) {
+        if (m_selectionSecondaryId.empty()) LogWarning("Selection secondary id not set");
+        elementId = m_selectionSecondaryId;
+        if (chain) m_chainedId = elementId;
     }
     else {
         m_chainedId = elementId;

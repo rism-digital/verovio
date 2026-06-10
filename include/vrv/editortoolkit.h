@@ -21,6 +21,8 @@
 
 namespace vrv {
 
+class Cursor;
+
 //--------------------------------------------------------------------------------
 // EditorToolkit
 //--------------------------------------------------------------------------------
@@ -36,6 +38,7 @@ public:
         m_selectionId = "";
         m_selectionClassId = UNSPECIFIED;
         m_selectionSecondaryId = "";
+        m_cursor = NULL;
     }
     virtual ~EditorToolkit() {}
 
@@ -67,6 +70,7 @@ protected:
     std::string m_selectionId;
     ClassId m_selectionClassId;
     std::string m_selectionSecondaryId;
+    Cursor *m_cursor;
 
     Doc *m_doc;
     View *m_view;

@@ -150,6 +150,15 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         }
         LogWarning("Could not parse the context action");
     }
+    else if (action == "cursor") {
+        bool setCursor;
+        std::string elementId;
+        if (this->ParseCursorAction(json.get<jsonxx::Object>("param"), setCursor, elementId)) {
+            this->PrepareUndo();
+            return (this->Cursor(setCursor, elementId));
+        }
+        LogWarning("Could not parse the delete action");
+    }
     else if (action == "delete") {
         std::string elementId;
         if (this->ParseDeleteAction(json.get<jsonxx::Object>("param"), elementId)) {
@@ -265,6 +274,18 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
 }
 
 #ifndef NO_EDIT_SUPPORT
+bool EditorToolkitShared::ParseCursorAction(jsonxx::Object param, bool &setCursor, std::string &elementId)
+{
+    setCursor = false;
+    elementId = "";
+
+    if (!param.has<jsonxx::Boolean>("setCursor")) return false;
+    setCursor = param.get<jsonxx::Boolean>("setCursor");
+    if (param.has<jsonxx::String>("elementId")) elementId = param.get<jsonxx::String>("elementId");
+
+    return true;
+}
+
 bool EditorToolkitShared::ParseContextAction(jsonxx::Object param, std::string &elementId, bool &scores, bool &sections)
 {
     scores = false;
@@ -492,6 +513,35 @@ bool EditorToolkitShared::Chain(jsonxx::Array actions)
         status = this->ParseEditorAction(actions.get<jsonxx::Object>(i).json(), !status);
     }
     return status;
+}
+
+bool EditorToolkitShared::Cursor(bool setCursor, std::string &elementId)
+{
+    if (setCursor) {
+        Layer *layer = NULL;
+        LayerElement *position = NULL;
+        Object *element = this->ResolveElement(elementId);
+        if (element->Is(STAFF)) {
+            layer = vrv_cast<Layer *>(element->FindDescendantByType(LAYER));
+        }
+        else if (element->Is(LAYER)) {
+            layer = vrv_cast<Layer *>(element);
+        }
+        else if (element->IsLayerElement()) {
+            layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
+            position = vrv_cast<LayerElement *>(element);
+        }
+        CursorFunctor cursorFunctor(layer, position);
+        m_doc->Process(cursorFunctor);
+        m_cursor = cursorFunctor.GetCursor();
+    }
+    else {
+        CursorFunctor cursorFunctor(NULL, NULL);
+        m_doc->Process(cursorFunctor);
+        m_cursor = NULL;
+    }
+
+    return true;
 }
 
 bool EditorToolkitShared::Delete(std::string &elementId)

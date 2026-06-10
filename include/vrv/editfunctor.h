@@ -13,6 +13,44 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// CursorFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This set or reset the editor cursor.
+ */
+class CursorFunctor : public Functor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    CursorFunctor(Layer *layer, LayerElement *position);
+    virtual ~CursorFunctor() = default;
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    FunctorCode VisitLayer(Layer *layer) override;
+    ///@}
+
+    Cursor *GetCursor() { return m_cursor; }
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    Layer *m_layer;
+    LayerElement *m_position;
+    Cursor *m_cursor;
+};
+
+//----------------------------------------------------------------------------
 // SectionContextFunctor
 //----------------------------------------------------------------------------
 

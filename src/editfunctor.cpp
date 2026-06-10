@@ -9,8 +9,10 @@
 
 //----------------------------------------------------------------------------
 
+#include "cursor.h"
 #include "editorial.h"
 #include "editortoolkit_cmn.h"
+#include "layer.h"
 #include "score.h"
 
 //----------------------------------------------------------------------------
@@ -19,6 +21,35 @@ namespace vrv {
 
 //----------------------------------------------------------------------------
 // StructFunctor
+//----------------------------------------------------------------------------
+
+CursorFunctor::CursorFunctor(Layer *layer, LayerElement *position) : Functor()
+{
+    m_layer = layer;
+    m_position = position;
+    m_cursor = NULL;
+}
+
+FunctorCode CursorFunctor::VisitLayer(Layer *layer)
+{
+    if (layer != m_layer) {
+        layer->ResetCursor();
+    }
+    else {
+        m_cursor = new Cursor();
+        if (m_position) {
+            m_cursor->SetPosition(m_position);
+        }
+        m_cursor->SetPname(PITCHNAME_c);
+        m_cursor->SetOct(5);
+        layer->SetCursor(m_cursor);
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
+//----------------------------------------------------------------------------
+// SectionContextFunctor
 //----------------------------------------------------------------------------
 
 SectionContextFunctor::SectionContextFunctor(Object *object) : Functor()

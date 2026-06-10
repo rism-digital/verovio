@@ -18,6 +18,7 @@
 #include "beam.h"
 #include "clef.h"
 #include "comparison.h"
+#include "cursor.h"
 #include "custos.h"
 #include "divline.h"
 #include "doc.h"
@@ -71,6 +72,7 @@ Layer::~Layer()
 {
     // We need to delete own objects
     this->Reset();
+    this->ResetCursor();
 }
 
 void Layer::Reset()
@@ -653,6 +655,20 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
     currentStaffDef->SetDrawKeySig(false);
     currentStaffDef->SetDrawMensur(false);
     currentStaffDef->SetDrawMeterSig(false);
+}
+
+void Layer::SetCursor(Cursor *cursor)
+{
+    if (m_cursor) this->ResetCursor();
+
+    m_cursor = cursor;
+    m_cursor.value()->SetParent(this);
+}
+
+void Layer::ResetCursor()
+{
+    if (m_cursor) delete m_cursor.value();
+    m_cursor.reset();
 }
 
 //----------------------------------------------------------------------------

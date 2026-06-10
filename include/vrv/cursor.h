@@ -34,11 +34,11 @@ public:
     ///@}
 
     bool IsCursor() const override { return true; }
-    
+
     void SetPosition(LayerElement *position) { m_position = position; }
     LayerElement *GetPosition() const { return m_position; }
     bool HasPosition() const { return (m_position); }
-    
+
     //----------//
     // Functors //
     //----------//

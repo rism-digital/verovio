@@ -249,8 +249,8 @@ public:
     //@{
     bool HasCursor() const { return (m_cursor.has_value()); }
     Cursor *GetCursor() const { return m_cursor.value(); }
-    void SetCursor(Cursor *cursor) { m_cursor = cursor; }
-    void ResetCursor() { m_cursor.reset(); }
+    void SetCursor(Cursor *cursor);
+    void ResetCursor();
     ///@}
 
     //----------//
