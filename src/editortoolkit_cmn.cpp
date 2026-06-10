@@ -15,6 +15,7 @@
 //--------------------------------------------------------------------------------
 
 #include "comparison.h"
+#include "cursor.h"
 #include "layer.h"
 #include "miscfunctor.h"
 #include "note.h"
@@ -159,8 +160,16 @@ bool EditorToolkitCMN::InsertNote(
 {
     if (chordMode) return this->InsertNoteInChordMode(targetId, pname, oct);
 
-    Object *target = this->GetElement(targetId);
-    if (!target || !target->Is({ CHORD, LAYER, NOTE })) return false;
+    Object *target = NULL;
+    if (this->InsertMode()) {
+        target = (m_cursor->HasPosition()) ? m_cursor->GetPosition() : m_cursor->GetParent();
+        oct = m_cursor->GetOct();
+        pname = m_cursor->GetPname();
+    }
+    else {
+        target = this->GetElement(targetId);
+    }
+    if (!target || !target->Is({ CHORD, LAYER, NOTE, REST })) return false;
 
     if (target->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(target);
@@ -205,6 +214,9 @@ bool EditorToolkitCMN::InsertNote(
     if (note->IsInBeam()) {
         note->SetDur(std::max(DURATION_8, dur));
     }
+
+    this->ClearContext();
+    this->SetEditStatus();
 
     return true;
 }
@@ -271,6 +283,9 @@ bool EditorToolkitCMN::InsertNoteInChordMode(const std::string &targetId, data_P
     note->SetOct(oct);
 
     chord->AddChild(note);
+
+    this->ClearContext();
+    this->SetEditStatus();
 
     return true;
 }

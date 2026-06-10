@@ -162,9 +162,10 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
     }
     else if (action == "delete") {
         std::string elementId;
-        if (this->ParseDeleteAction(json.get<jsonxx::Object>("param"), elementId)) {
+        bool backspace;
+        if (this->ParseDeleteAction(json.get<jsonxx::Object>("param"), elementId, backspace)) {
             this->PrepareUndo();
-            return (this->Delete(elementId));
+            return (this->Delete(elementId, backspace));
         }
         LogWarning("Could not parse the delete action");
     }
@@ -303,10 +304,12 @@ bool EditorToolkitShared::ParseContextAction(jsonxx::Object param, std::string &
     return false;
 }
 
-bool EditorToolkitShared::ParseDeleteAction(jsonxx::Object param, std::string &elementId)
+bool EditorToolkitShared::ParseDeleteAction(jsonxx::Object param, std::string &elementId, bool &backspace)
 {
+    backspace = false;
     if (!param.has<jsonxx::String>("elementId")) return false;
     elementId = param.get<jsonxx::String>("elementId");
+    if (param.has<jsonxx::Boolean>("backspace")) backspace = param.get<jsonxx::Boolean>("backspace");
     return true;
 }
 
@@ -550,7 +553,7 @@ bool EditorToolkitShared::Cursor(bool setCursor, std::string &elementId)
     return true;
 }
 
-bool EditorToolkitShared::Delete(std::string &elementId)
+bool EditorToolkitShared::Delete(std::string &elementId, bool backspace)
 {
     if (this->InsertMode()) return true;
 
@@ -558,7 +561,8 @@ bool EditorToolkitShared::Delete(std::string &elementId)
 
     if (!element) return false;
 
-    this->Navigate(elementId, 37);
+    int direction = (backspace) ? 37 : 39;
+    this->Navigate(elementId, direction);
     if (m_chainedId.empty() && element->GetParent()) m_chainedId = element->GetParent()->GetID();
 
     // Find referring objects

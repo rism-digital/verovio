@@ -48,7 +48,7 @@ protected:
     bool Chain(jsonxx::Array actions);
     bool ParseCursorAction(jsonxx::Object param, bool &setCursor, std::string &elementId);
     bool ParseContextAction(jsonxx::Object param, std::string &elementId, bool &scores, bool &sections);
-    bool ParseDeleteAction(jsonxx::Object param, std::string &elementId);
+    bool ParseDeleteAction(jsonxx::Object param, std::string &elementId, bool &backspace);
     bool ParseDragAction(jsonxx::Object param, std::string &elementId, int &x, int &y);
     bool ParseKeyDownAction(jsonxx::Object param, std::string &elementid, int &key, bool &shiftKey, bool &ctrlKey);
     bool ParseInsertAction(
@@ -76,7 +76,7 @@ protected:
      */
     ///@{
     bool Cursor(bool setCursor, std::string &elementId);
-    bool Delete(std::string &elementId);
+    bool Delete(std::string &elementId, bool backspace);
     bool Drag(std::string &elementId, int x, int y);
     bool InsertControl(std::string &elementName, std::string &startId, std::string &endId);
     bool KeyDown(std::string &elementId, int key, bool shiftKey, bool ctrlKey);

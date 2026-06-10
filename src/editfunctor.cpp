@@ -37,11 +37,17 @@ FunctorCode CursorFunctor::VisitLayer(Layer *layer)
     }
     else {
         m_cursor = new Cursor();
+        m_cursor->SetPname(PITCHNAME_c);
+        m_cursor->SetOct(4);
         if (m_position) {
             m_cursor->SetPosition(m_position);
+            if (m_position->Is(NOTE)) {
+                Note *note = vrv_cast<Note *>(m_position);
+                assert(note);
+                m_cursor->SetPname(note->GetPname());
+                m_cursor->SetOct(note->GetOct());
+            }
         }
-        m_cursor->SetPname(PITCHNAME_c);
-        m_cursor->SetOct(5);
         layer->SetCursor(m_cursor);
     }
 
