@@ -1673,6 +1673,16 @@ ClassId ObjectFactory::GetClassId(std::string name)
     return classId;
 }
 
+std::string ObjectFactory::GetClassName(ClassId classId)
+{
+    for (const auto &[name, id] : s_classIdsRegistry) {
+        if (id == classId) return name;
+    }
+
+    LogError("Class name for '%d' not found", static_cast<int>(classId));
+    return "[unspecified]";
+}
+
 void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
 {
     for (const std::string &str : classStrings) {
