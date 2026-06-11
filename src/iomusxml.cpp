@@ -3154,12 +3154,14 @@ void MusicXmlInput::ReadMusicXmlNote(
             // or update the carried-over accidentals with current accidental value.
             if (note->HasPname()) {
                 ListOfObjects accids = note->FindAllDescendantsByType(ACCID);
-                if (!accids.size()) {
+                if (accids.empty()) {
                     try {
                         for (const auto &current : m_currentAccids.at(note->GetPname())) {
+                            // Avoid adding empty accidentals
+                            if (current.m_accid == ACCIDENTAL_WRITTEN_NONE && current.m_glyphName.empty()) continue;
+
                             Accid *accid = new Accid();
                             note->AddChild(accid);
-                            accid->IsAttribute(false);
 
                             // to make sure the new *gestural* accidental conforms to the carried-over *written*
                             // accidental, we translate the latter to a SMuFL glyph and set the gestural accidental to
@@ -3170,7 +3172,8 @@ void MusicXmlInput::ReadMusicXmlNote(
                                 accid->SetGlyphName(current.m_glyphName);
                                 accid->SetGlyphAuth(current.m_glyphAuth);
                             }
-                            else if (current.m_accid != ACCIDENTAL_WRITTEN_NONE) {
+                            // We have a current.m_accid
+                            else {
                                 char32_t glyph = Accid::GetAccidGlyph(current.m_accid);
                                 accid->SetGlyphName(CustomTuning::GetGlyphName(glyph, m_doc));
                                 accid->SetGlyphAuth("smufl");

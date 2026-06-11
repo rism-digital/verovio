@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun May 24 18:00:04 JST 2026
+// Last Modified: Mon Jun  8 21:10:33 PDT 2026
 // Filename:      min/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.cpp
 // Syntax:        C++11
@@ -140725,6 +140725,7 @@ Tool_text::Tool_text(void) {
 	define("verse|ver|plint=b",   "Show pline only");
 	define("v|show-verse=b",      "Force display of verse/refrain labels (if output is raw)");
 	define("R|norep|repeats|no-repeats=b", "Suppress repeated plines ending in r");
+	define("B|no-bis=b",           "don't extract *bis/*Xbis");
 }
 
 
@@ -140789,7 +140790,7 @@ void Tool_text::initialize(void) {
 	m_removeAllQ   =  getBoolean("remove-all");
 	m_rawQ         =  getBoolean("raw");
 	m_refrainOnlyQ =  getBoolean("refrain");
-cerr << "REFRAIN " << m_refrainOnlyQ << endl;
+// cerr << "REFRAIN " << m_refrainOnlyQ << endl;
 	m_verseOnlyQ   =  getBoolean("verse");
 	m_repeatsQ     =  getBoolean("no-repeats");
 	m_countQ       = !getBoolean("no-count");
@@ -140798,6 +140799,7 @@ cerr << "REFRAIN " << m_refrainOnlyQ << endl;
 		m_showVerseQ = false;
 		m_showVerseQ = getBoolean("show-verse");
 	}
+	m_noBisQ         =  getBoolean("no-bis");
 }
 
 
@@ -140889,6 +140891,9 @@ void Tool_text::removeText(HumdrumFile& infile) {
 			}
 
 			// Extract text / plines
+			if (m_noBisQ) {
+				markBis(spine);
+			}
 			removePartText(spine, j, (int)part.size());
 
 			// Handle removal options
@@ -140904,7 +140909,48 @@ void Tool_text::removeText(HumdrumFile& infile) {
 }
 
 
-////////////////////////////
+
+//////////////////////////////
+//
+// Tool_text::markBis --
+//
+
+void Tool_text::markBis(HTp spine) {
+cerr << "CHECKING BIS FOR " << spine << endl;
+	HTp current = spine;
+	current = current->getNextToken();
+	HumRegex hre;
+	bool bis = false;
+	while (current) {
+		if (hre.search(current, "^\\*bis\\b")) {
+cerr << "TURNING ON BIS" << endl;
+			bis = true;
+			current = current->getNextToken();
+			continue;
+		}
+		if (hre.search(current, "^\\*Xbis\\b")) {
+cerr << "TURNING OFF BIS" << endl;
+			bis = false;
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isInterpretation()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (!bis) {
+			current = current->getNextToken();
+			continue;
+		}
+		current->setValue("auto", "bis", 1);
+		current = current->getNextToken();
+		continue;
+	}
+}
+
+
+
+//////////////////////////////
 //
 // Tool_text::removePartText --
 //
@@ -141326,9 +141372,33 @@ void Tool_text::fillPlines(vector<vector<HTp>>& plines,
 	int index = -1;
 
 	while (current) {
+		// Attach metadata to current pline
+		if (hre.search(current, "^\\*rp:")) {
+			if (index >= 0) {
+				plines[index].push_back(current);
+			}
+		}
+		else if (hre.search(current, "^\\*rf:")) {
+			if (index >= 0) {
+				plines[index].push_back(current);
+			}
+		}
+		else if (hre.search(current, "^\\*rs:")) {
+			if (index >= 0) {
+				plines[index].push_back(current);
+			}
+		}
+
+		if (m_noBisQ) {
+			bool bis = current->getValueInt("auto", "bis");
+			if (bis) {
+cerr << "======================== BIS SUPPRESS " << current << endl;
+				current = current->getNextToken();
+				continue;
+			}
+		}
 
 		if (current->isInterpretation()) {
-
 			// Store verse metadata globally
 			if (current->compare(0, 3, "*v:") == 0) {
 				plines[0].push_back(current);
@@ -141336,54 +141406,26 @@ void Tool_text::fillPlines(vector<vector<HTp>>& plines,
 
 			// Start a NEW pline entry
 			else if (hre.search(current, "^\\*pline:")) {
-
 				if (m_refrainOnlyQ) {
 					current = current->getNextToken();
 					continue;
 				}
-
 				plines.push_back(vector<HTp>());
-
 				index = (int)plines.size() - 1;
-
 				plines[index].push_back(current);
 			}
 
 			// Start a NEW rline entry
 			else if (hre.search(current, "^\\*rline:")) {
-
 				if (m_verseOnlyQ) {
 					current = current->getNextToken();
 					continue;
 				}
-
 				plines.push_back(vector<HTp>());
-
 				index = (int)plines.size() - 1;
-
 				plines[index].push_back(current);
 			}
-
-			// Attach metadata to current pline
-			else if (hre.search(current, "^\\*rp:")) {
-				if (index >= 0) {
-					plines[index].push_back(current);
-				}
-			}
-
-			else if (hre.search(current, "^\\*rf:")) {
-				if (index >= 0) {
-					plines[index].push_back(current);
-				}
-			}
-
-			else if (hre.search(current, "^\\*rs:")) {
-				if (index >= 0) {
-					plines[index].push_back(current);
-				}
-			}
 		}
-
 		current = current->getNextToken();
 	}
 }
@@ -141397,12 +141439,12 @@ void Tool_text::fillPlines(vector<vector<HTp>>& plines,
 
 void Tool_text::printPline(vector<vector<HTp>>& p, const char* description) {
 	return;
-	for (int i=0; i<(int)p.size(); i++) {
-		for (int j=0; j<(int)p[i].size(); j++) {
-			cerr << "===(" << i <<"," << j << ") = "
-			     << p.at(i).at(j) << endl;
-		}
-	}
+//	for (int i=0; i<(int)p.size(); i++) {
+//		for (int j=0; j<(int)p[i].size(); j++) {
+//			cerr << "===(" << i <<"," << j << ") = "
+//			     << p.at(i).at(j) << endl;
+//		}
+//	}
 }
 
 
@@ -141426,6 +141468,15 @@ void Tool_text::processTextSpine(HTp tspine, int vth, int vsize) {
 
 	while (current) {
 		if (!current->isData()) {
+
+			if (m_noBisQ) {
+				bool bis = current->getValueInt("auto", "bis");
+				if (bis) {
+cerr << "======================== BIS SUPPRESS " << current << endl;
+					current = current->getNextToken();
+					continue;
+				}
+			}
 			current = current->getNextToken();
 			continue;
 		} else if (current->isNull()) {

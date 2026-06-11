@@ -42,6 +42,7 @@ bindings/python/_verovio*.so
 bindings/python/__pycache__/*
 bindings/python/CMakeCache.txt
 bindings/python/CMakeFiles/
+bindings/python/verovio/*
 build
 verovio.egg-info
 /dist
