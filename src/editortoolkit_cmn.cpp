@@ -62,7 +62,7 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
 
 #ifndef NO_EDIT_SUPPORT
 bool EditorToolkitCMN::ParseInsertMeasureAction(
-    jsonxx::Object param, std::string &targetId, int &number, bool &insertBefore)
+    const jsonxx::Object &param, std::string &targetId, int &number, bool &insertBefore)
 {
     number = 0;
     targetId = "";
@@ -76,8 +76,8 @@ bool EditorToolkitCMN::ParseInsertMeasureAction(
     return true;
 }
 
-bool EditorToolkitCMN::ParseInsertNoteAction(
-    jsonxx::Object param, std::string &targetId, data_PITCHNAME &pname, int &oct, data_DURATION &dur, bool &chordMode)
+bool EditorToolkitCMN::ParseInsertNoteAction(const jsonxx::Object &param, std::string &targetId, data_PITCHNAME &pname,
+    int &oct, data_DURATION &dur, bool &chordMode)
 {
     chordMode = false;
     pname = PITCHNAME_NONE;

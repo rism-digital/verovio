@@ -276,7 +276,7 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
 }
 
 #ifndef NO_EDIT_SUPPORT
-bool EditorToolkitShared::ParseCursorAction(jsonxx::Object param, bool &setCursor, std::string &elementId)
+bool EditorToolkitShared::ParseCursorAction(const jsonxx::Object &param, bool &setCursor, std::string &elementId)
 {
     setCursor = false;
     elementId = "";
@@ -288,7 +288,8 @@ bool EditorToolkitShared::ParseCursorAction(jsonxx::Object param, bool &setCurso
     return true;
 }
 
-bool EditorToolkitShared::ParseContextAction(jsonxx::Object param, std::string &elementId, bool &scores, bool &sections)
+bool EditorToolkitShared::ParseContextAction(
+    const jsonxx::Object &param, std::string &elementId, bool &scores, bool &sections)
 {
     scores = false;
     sections = false;
@@ -304,7 +305,7 @@ bool EditorToolkitShared::ParseContextAction(jsonxx::Object param, std::string &
     return false;
 }
 
-bool EditorToolkitShared::ParseDeleteAction(jsonxx::Object param, std::string &elementId, bool &backspace)
+bool EditorToolkitShared::ParseDeleteAction(const jsonxx::Object &param, std::string &elementId, bool &backspace)
 {
     backspace = false;
     if (!param.has<jsonxx::String>("elementId")) return false;
@@ -313,7 +314,7 @@ bool EditorToolkitShared::ParseDeleteAction(jsonxx::Object param, std::string &e
     return true;
 }
 
-bool EditorToolkitShared::ParseDragAction(jsonxx::Object param, std::string &elementId, int &x, int &y)
+bool EditorToolkitShared::ParseDragAction(const jsonxx::Object &param, std::string &elementId, int &x, int &y)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
     elementId = param.get<jsonxx::String>("elementId");
@@ -325,7 +326,7 @@ bool EditorToolkitShared::ParseDragAction(jsonxx::Object param, std::string &ele
 }
 
 bool EditorToolkitShared::ParseInsertAction(
-    jsonxx::Object param, std::string &elementName, std::string &elementId, std::string &insertMode)
+    const jsonxx::Object &param, std::string &elementName, std::string &elementId, std::string &insertMode)
 {
     if (!param.has<jsonxx::String>("elementName")) return false;
     elementName = param.get<jsonxx::String>("elementName");
@@ -337,7 +338,7 @@ bool EditorToolkitShared::ParseInsertAction(
 }
 
 bool EditorToolkitShared::ParseInsertControlAction(
-    jsonxx::Object param, std::string &elementName, std::string &startId, std::string &endId)
+    const jsonxx::Object &param, std::string &elementName, std::string &startId, std::string &endId)
 {
     if (!param.has<jsonxx::String>("elementName")) return false;
     elementName = param.get<jsonxx::String>("elementName");
@@ -349,7 +350,7 @@ bool EditorToolkitShared::ParseInsertControlAction(
 }
 
 bool EditorToolkitShared::ParseKeyDownAction(
-    jsonxx::Object param, std::string &elementId, int &key, bool &shiftKey, bool &ctrlKey)
+    const jsonxx::Object &param, std::string &elementId, int &key, bool &shiftKey, bool &ctrlKey)
 {
     // assign optional member
     shiftKey = false;
@@ -369,7 +370,7 @@ bool EditorToolkitShared::ParseKeyDownAction(
     return true;
 }
 
-bool EditorToolkitShared::ParseNavigate(jsonxx::Object param, std::string &elementId, int &direction)
+bool EditorToolkitShared::ParseNavigate(const jsonxx::Object &param, std::string &elementId, int &direction)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
     elementId = param.get<jsonxx::String>("elementId");
@@ -378,7 +379,7 @@ bool EditorToolkitShared::ParseNavigate(jsonxx::Object param, std::string &eleme
     return true;
 }
 
-bool EditorToolkitShared::ParsePropertiesAction(jsonxx::Object param, std::string &scoreDef)
+bool EditorToolkitShared::ParsePropertiesAction(const jsonxx::Object &param, std::string &scoreDef)
 {
     scoreDef = "";
     if (param.has<jsonxx::String>("scoreDef")) {
@@ -388,7 +389,7 @@ bool EditorToolkitShared::ParsePropertiesAction(jsonxx::Object param, std::strin
     return true;
 }
 
-bool EditorToolkitShared::ParseSelectAction(jsonxx::Object param, std::string &elementId, bool &secondary)
+bool EditorToolkitShared::ParseSelectAction(const jsonxx::Object &param, std::string &elementId, bool &secondary)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
     elementId = param.get<jsonxx::String>("elementId");
@@ -400,7 +401,7 @@ bool EditorToolkitShared::ParseSelectAction(jsonxx::Object param, std::string &e
 }
 
 bool EditorToolkitShared::ParseSetAction(
-    jsonxx::Object param, std::string &elementId, std::string &attribute, std::string &value)
+    const jsonxx::Object &param, std::string &elementId, std::string &attribute, std::string &value)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
     elementId = param.get<jsonxx::String>("elementId");
@@ -512,7 +513,7 @@ void EditorToolkitShared::TrimUndoMemory()
     LogInfo("Undo stack size: %dMB", m_undoMemoryUsage / 1024 / 1024);
 }
 
-bool EditorToolkitShared::Chain(jsonxx::Array actions)
+bool EditorToolkitShared::Chain(const jsonxx::Array &actions)
 {
     bool status = true;
     m_chainedId = "";

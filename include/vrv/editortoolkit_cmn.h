@@ -41,8 +41,8 @@ protected:
      * Parse JSON instructions for experimental editor functions.
      */
     ///@{
-    bool ParseInsertMeasureAction(jsonxx::Object param, std::string &targetId, int &number, bool &insertBefore);
-    bool ParseInsertNoteAction(jsonxx::Object param, std::string &targetId, data_PITCHNAME &pname, int &oct,
+    bool ParseInsertMeasureAction(const jsonxx::Object &param, std::string &targetId, int &number, bool &insertBefore);
+    bool ParseInsertNoteAction(const jsonxx::Object &param, std::string &targetId, data_PITCHNAME &pname, int &oct,
         data_DURATION &dur, bool &chordMode);
 
     bool InsertMeasure(std::string &targetId, int number, bool insertBefore);

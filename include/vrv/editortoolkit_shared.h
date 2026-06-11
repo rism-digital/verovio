@@ -45,20 +45,22 @@ protected:
      * Parse JSON instructions for experimental editor functions.
      */
     ///@{
-    bool Chain(jsonxx::Array actions);
-    bool ParseCursorAction(jsonxx::Object param, bool &setCursor, std::string &elementId);
-    bool ParseContextAction(jsonxx::Object param, std::string &elementId, bool &scores, bool &sections);
-    bool ParseDeleteAction(jsonxx::Object param, std::string &elementId, bool &backspace);
-    bool ParseDragAction(jsonxx::Object param, std::string &elementId, int &x, int &y);
-    bool ParseKeyDownAction(jsonxx::Object param, std::string &elementid, int &key, bool &shiftKey, bool &ctrlKey);
+    bool Chain(const jsonxx::Array &actions);
+    bool ParseCursorAction(const jsonxx::Object &param, bool &setCursor, std::string &elementId);
+    bool ParseContextAction(const jsonxx::Object &param, std::string &elementId, bool &scores, bool &sections);
+    bool ParseDeleteAction(const jsonxx::Object &param, std::string &elementId, bool &backspace);
+    bool ParseDragAction(const jsonxx::Object &param, std::string &elementId, int &x, int &y);
+    bool ParseKeyDownAction(
+        const jsonxx::Object &param, std::string &elementid, int &key, bool &shiftKey, bool &ctrlKey);
     bool ParseInsertAction(
-        jsonxx::Object param, std::string &elementName, std::string &elementId, std::string &insertMode);
+        const jsonxx::Object &param, std::string &elementName, std::string &elementId, std::string &insertMode);
     bool ParseInsertControlAction(
-        jsonxx::Object param, std::string &elementName, std::string &startId, std::string &endId);
-    bool ParseNavigate(jsonxx::Object param, std::string &elementId, int &direction);
-    bool ParsePropertiesAction(jsonxx::Object param, std::string &scoreDef);
-    bool ParseSelectAction(jsonxx::Object param, std::string &elementId, bool &secondary);
-    bool ParseSetAction(jsonxx::Object param, std::string &elementId, std::string &attribute, std::string &value);
+        const jsonxx::Object &param, std::string &elementName, std::string &startId, std::string &endId);
+    bool ParseNavigate(const jsonxx::Object &param, std::string &elementId, int &direction);
+    bool ParsePropertiesAction(const jsonxx::Object &param, std::string &scoreDef);
+    bool ParseSelectAction(const jsonxx::Object &param, std::string &elementId, bool &secondary);
+    bool ParseSetAction(
+        const jsonxx::Object &param, std::string &elementId, std::string &attribute, std::string &value);
     ///@}
 
     void SetEditStatus();
