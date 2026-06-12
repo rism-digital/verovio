@@ -1214,17 +1214,20 @@ void EditorToolkitShared::MoveCursor(Note *note)
         Fraction duration = note->GetAlignmentDuration(params, true, NOTATIONTYPE_cmn);
         Fraction measureDuration = Fraction(params.meterSig->GetUnitAsDur()) * params.meterSig->GetTotalCount();
         if ((position + duration) >= measureDuration) {
-            const Layer *next = this->GetNextLayer(layer);
-            if (next) object = next;
+            object = this->GetNextLayer(layer);
         }
     }
 
-    
-
-    m_selectionId = object->GetID();
-    m_chainedId = m_selectionId;
-    m_selectionClassId = object->GetClassId();
-    this->Cursor(true, m_selectionId);
+    if (object) {
+        m_selectionId = object->GetID();
+        m_chainedId = m_selectionId;
+        m_selectionClassId = object->GetClassId();
+        this->Cursor(true, m_selectionId);
+    }
+    else {
+        std::string placeholder;
+        this->Cursor(false, placeholder);
+    }
 }
 
 const Measure *EditorToolkitShared::GetPreviousMeasure(const Measure *measure)
