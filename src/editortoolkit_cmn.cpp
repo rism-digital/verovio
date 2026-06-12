@@ -217,6 +217,8 @@ bool EditorToolkitCMN::InsertNote(
 
     this->ClearContext();
     this->SetEditStatus();
+    
+    if (InsertMode()) this->MoveCursor(note);
 
     return true;
 }

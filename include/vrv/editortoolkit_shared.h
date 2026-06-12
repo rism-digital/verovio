@@ -104,6 +104,8 @@ protected:
     void CollectReferringObjects(
         const Object *element, std::set<std::string> &toDelete, std::set<const Object *> &visited);
 
+    void MoveCursor(Note *note);
+    
 public:
     //
 protected:

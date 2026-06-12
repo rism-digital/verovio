@@ -1248,6 +1248,16 @@ bool EditorToolkitShared::SetScoreDef(const std::string scoreDef)
     return true;
 }
 
+void EditorToolkitShared::MoveCursor(Note *note)
+{
+    Object *object = note;
+
+    m_selectionId = object->GetID();
+    m_chainedId = m_selectionId;
+    m_selectionClassId = object->GetClassId();
+    this->Cursor(true, m_selectionId);
+}
+
 //----------------------------------------------------------------------------
 // EditorTreeObject
 //----------------------------------------------------------------------------
