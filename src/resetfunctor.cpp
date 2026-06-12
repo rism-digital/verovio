@@ -614,6 +614,15 @@ FunctorCode ResetHorizontalAlignmentFunctor::VisitBeamSpan(BeamSpan *beamSpan)
     return this->VisitControlElement(beamSpan);
 }
 
+FunctorCode ResetHorizontalAlignmentFunctor::VisitCursor(Cursor *cursor)
+{
+    this->VisitNote(cursor);
+
+    cursor->ResetCursorAlignment();
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ResetHorizontalAlignmentFunctor::VisitCustos(Custos *custos)
 {
     this->VisitLayerElement(custos);

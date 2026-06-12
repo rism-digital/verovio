@@ -1202,10 +1202,10 @@ void EditorToolkitShared::MoveCursor(Note *note)
 {
     assert(note);
     assert(m_cursor);
-    
+
     const Object *object = note;
-    
-    Layer *layer = vrv_cast<Layer*>(note->GetFirstAncestor(LAYER));
+
+    Layer *layer = vrv_cast<Layer *>(note->GetFirstAncestor(LAYER));
     assert(layer);
     if (note == layer->GetLast(NOTE)) {
         AlignMeterParams params;
@@ -1281,13 +1281,13 @@ const Measure *EditorToolkitShared::GetNextMeasure(const Measure *measure)
 {
     const System *system = vrv_cast<const System *>(measure->GetFirstAncestor(SYSTEM));
     assert(system);
-    
+
     const Measure *nextMeasure = vrv_cast<const Measure *>(system->GetNext(measure, MEASURE));
     if (nextMeasure) return nextMeasure;
-    
+
     const Page *page = vrv_cast<const Page *>(system->GetFirstAncestor(PAGE));
     assert(page);
-    
+
     const System *nextSystem = vrv_cast<const System *>(page->GetNext(system, SYSTEM));
     if (!nextSystem) {
         const Page *nextPage = vrv_cast<const Page *>(m_doc->GetPages()->GetNext(page, PAGE));
@@ -1303,10 +1303,10 @@ const Staff *EditorToolkitShared::GetNextStaff(const Staff *staff)
 {
     const Measure *measure = vrv_cast<const Measure *>(staff->GetFirstAncestor(MEASURE));
     assert(measure);
-    
+
     const Measure *nextMeasure = GetNextMeasure(measure);
     if (!nextMeasure) return NULL;
-    
+
     AttNIntegerComparison staffNComparison(STAFF, staff->GetN());
     return vrv_cast<const Staff *>(nextMeasure->FindDescendantByComparison(&staffNComparison));
 }
@@ -1315,10 +1315,10 @@ const Layer *EditorToolkitShared::GetNextLayer(const Layer *layer)
 {
     const Staff *staff = vrv_cast<const Staff *>(layer->GetFirstAncestor(STAFF));
     assert(staff);
-    
+
     const Staff *nextStaff = GetNextStaff(staff);
     if (!nextStaff) return NULL;
-    
+
     AttNIntegerComparison layerNComparison(LAYER, layer->GetN());
     return vrv_cast<const Layer *>(nextStaff->FindDescendantByComparison(&layerNComparison));
 }

@@ -50,6 +50,7 @@
 #include "pageelement.h"
 #include "pagemilestone.h"
 #include "reh.h"
+#include "rest.h"
 #include "smufl.h"
 #include "staff.h"
 #include "system.h"
@@ -1059,14 +1060,14 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     }
 
     /*
-    //Debug code for displaying aligner positions
-    for (auto &child : measure->m_measureAligner.GetChildren()) {
-        Alignment *alignment = vrv_cast<Alignment *>(child);
-        int x = alignment->GetXRel() + measure->GetDrawingX();
-        int y = system->GetDrawingY() - m_doc->GetDrawingStaffSize(100);
-        this->DrawVerticalLine(dc, y, y + m_doc->GetDrawingUnit(100), x, 20);
-    }
-    */
+     //Debug code for displaying aligner positions
+     for (auto &child : measure->m_measureAligner.GetChildren()) {
+     Alignment *alignment = vrv_cast<Alignment *>(child);
+     int x = alignment->GetXRel() + measure->GetDrawingX();
+     int y = system->GetDrawingY() - m_doc->GetDrawingStaffSize(100);
+     this->DrawVerticalLine(dc, y, y + m_doc->GetDrawingUnit(100), x, 20);
+     }
+     */
 }
 
 void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
@@ -1590,9 +1591,7 @@ void View::DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *mea
     this->DrawLayerChildren(dc, layer, layer, staff, measure);
 
     if (layer->HasCursor()) {
-        dc->StartCustomGraphic("cursor");
-        DrawNote(dc, layer->GetCursor(), layer, staff, measure);
-        dc->EndCustomGraphic();
+        this->DrawCursor(dc, layer->GetCursor(), layer, staff, measure);
     }
 
     dc->EndGraphic(layer, this);
@@ -1600,6 +1599,70 @@ void View::DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *mea
     // first draw the postponed tuplets
     this->DrawLayerList(dc, layer, staff, measure, TUPLET_BRACKET);
     this->DrawLayerList(dc, layer, staff, measure, TUPLET_NUM);
+}
+
+void View::DrawCursor(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    Cursor *cursor = vrv_cast<Cursor *>(element);
+    assert(cursor);
+
+    const int staffSize = staff->m_drawingStaffSize;
+    const int unit = m_doc->GetDrawingUnit(staffSize);
+
+    bool isNote = false;
+
+    dc->StartCustomGraphic("cursor");
+
+    const int x = cursor->GetDrawingX();
+    const int y = (isNote) ? cursor->GetDrawingY() : staff->GetDrawingY() + 3 * unit;
+
+    if (isNote) {
+        this->DrawNote(dc, layer->GetCursor(), layer, staff, measure);
+
+        if (cursor->HasAccid()) {
+            this->DrawAccid(dc, cursor->GetAccidElement(), layer, staff, measure);
+        }
+
+        if (cursor->HasDots()) {
+            int dotsX = x + 2.8 * cursor->GetDrawingRadius(m_doc);
+            this->DrawDotsPart(dc, dotsX, y, 2, staff);
+        }
+    }
+    else {
+        const data_DURATION dur = (cursor->HasDur()) ? cursor->GetDur() : DURATION_4;
+        Rest rest;
+        // Needed for finding resources
+        rest.SetParent(measure);
+        const char32_t drawingGlyph = rest.GetRestGlyph(dur);
+
+        int width = m_doc->GetGlyphWidth(drawingGlyph, staffSize, true);
+
+        this->DrawSmuflCode(dc, x, y, drawingGlyph, staffSize, true);
+        if (dur == DURATION_1 || dur == DURATION_2) {
+            const int lineWidth = m_doc->GetOptions()->m_ledgerLineThickness.GetValue()
+                * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetOptions()->m_graceFactor.GetValue();
+
+            dc->SetPen(this->ToDeviceContextX(lineWidth), PEN_SOLID);
+            dc->DrawLine(this->ToDeviceContextX(x - unit * .5), this->ToDeviceContextY(y),
+                this->ToDeviceContextX(x + width + unit * .5), this->ToDeviceContextY(y));
+            dc->ResetPen();
+
+            width += .5 * unit;
+        }
+
+        if (cursor->HasDots()) {
+            int dotsX = x + .5 * unit + width;
+            this->DrawDotsPart(dc, dotsX, y, cursor->GetDots(), staff, true);
+        }
+    }
+
+    dc->EndCustomGraphic();
 }
 
 void View::DrawLayerList(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure, const ClassId classId)

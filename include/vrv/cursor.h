@@ -8,6 +8,7 @@
 #ifndef __VRV_CURSOR_H__
 #define __VRV_CURSOR_H__
 
+#include "elementpart.h"
 #include "note.h"
 
 namespace vrv {
@@ -35,9 +36,20 @@ public:
 
     bool IsCursor() const override { return true; }
 
+    void SetCursorAlignment(Alignment *alignment);
+    void ResetCursorAlignment();
+
     void SetPosition(LayerElement *position) { m_position = position; }
     LayerElement *GetPosition() const { return m_position; }
     bool HasPosition() const { return (m_position); }
+
+    bool HasAccid() const { return m_accid.HasAccid(); }
+    data_ACCIDENTAL_WRITTEN GetAccid() const { return m_accid.GetAccid(); }
+    void SetAccid(data_ACCIDENTAL_WRITTEN accid);
+    bool IsAccidImplicit() const { return m_isAccidImplicit; }
+    void SetAccidImplicit(bool isAccidImplicit);
+
+    Accid *GetAccidElement() { return &m_accid; }
 
     //----------//
     // Functors //
@@ -60,6 +72,10 @@ public:
 private:
     /** The reference postion */
     LayerElement *m_position;
+    /** Accidentals and dots */
+    Accid m_accid;
+    /** A flag indicating if the accidental is implicit */
+    bool m_isAccidImplicit;
 };
 
 } // namespace vrv
