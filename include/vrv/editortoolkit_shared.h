@@ -106,6 +106,15 @@ protected:
 
     void MoveCursor(Note *note);
     
+    
+    const Measure *GetPreviousMeasure(const Measure *measure);
+    const Staff *GetPreviousStaff(const Staff *staff);
+    const Layer *GetPreviousLayer(const Layer *layer);
+    const Measure *GetNextMeasure(const Measure *measure);
+    const Staff *GetNextStaff(const Staff *staff);
+    const Layer *GetNextLayer(const Layer *layer);
+    
+    
 public:
     //
 protected:

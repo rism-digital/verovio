@@ -726,63 +726,12 @@ bool EditorToolkitShared::Navigate(std::string &elementId, const int &direction)
     if (!result) {
         ClassIdsComparison matches(classIds);
         if (forward) {
-            const Staff *staff = vrv_cast<const Staff *>(layer->GetFirstAncestor(STAFF));
-            assert(staff);
-            const Measure *measure = vrv_cast<const Measure *>(staff->GetFirstAncestor(MEASURE));
-            assert(measure);
-            const System *system = vrv_cast<const System *>(measure->GetFirstAncestor(SYSTEM));
-            assert(system);
-            const Measure *nextMeasure = vrv_cast<const Measure *>(system->GetNext(measure, MEASURE));
-            if (!nextMeasure) {
-                const Page *page = vrv_cast<const Page *>(system->GetFirstAncestor(PAGE));
-                assert(page);
-                const System *nextSystem = vrv_cast<const System *>(page->GetNext(system, SYSTEM));
-                if (!nextSystem) {
-                    const Page *nextPage = vrv_cast<const Page *>(m_doc->GetPages()->GetNext(page, PAGE));
-                    if (!nextPage) return true;
-                    nextSystem = vrv_cast<const System *>(nextPage->GetFirst(SYSTEM));
-                    if (!nextSystem) return true;
-                }
-                nextMeasure = vrv_cast<const Measure *>(nextSystem->GetFirst(MEASURE));
-                if (!nextMeasure) return true;
-            }
-            AttNIntegerComparison staffNComparison(STAFF, staff->GetN());
-            const Staff *nextStaff
-                = vrv_cast<const Staff *>(nextMeasure->FindDescendantByComparison(&staffNComparison));
-            if (!nextStaff) return true;
-            AttNIntegerComparison layerNComparison(LAYER, layer->GetN());
-            layer = vrv_cast<const Layer *>(nextStaff->FindDescendantByComparison(&layerNComparison));
+            layer = this->GetNextLayer(layer);
             if (!layer) return true;
             result = vrv_cast<const LayerElement *>(layer->FindDescendantByComparison(&matches));
         }
         else {
-            const Staff *staff = vrv_cast<const Staff *>(layer->GetFirstAncestor(STAFF));
-            assert(staff);
-            const Measure *measure = vrv_cast<const Measure *>(staff->GetFirstAncestor(MEASURE));
-            assert(measure);
-            const System *system = vrv_cast<const System *>(measure->GetFirstAncestor(SYSTEM));
-            assert(system);
-            const Measure *previousMeasure = vrv_cast<const Measure *>(system->GetPrevious(measure, MEASURE));
-            if (!previousMeasure) {
-                const Page *page = vrv_cast<const Page *>(system->GetFirstAncestor(PAGE));
-                assert(page);
-                const System *previousSystem = vrv_cast<const System *>(page->GetPrevious(system, SYSTEM));
-                if (!previousSystem) {
-                    const Page *previousPage = vrv_cast<const Page *>(m_doc->GetPages()->GetPrevious(page, PAGE));
-                    if (!previousPage) return true;
-
-                    previousSystem = vrv_cast<const System *>(previousPage->GetLast(SYSTEM));
-                    if (!previousSystem) return true;
-                }
-                previousMeasure = vrv_cast<const Measure *>(previousSystem->GetLast(MEASURE));
-                if (!previousMeasure) return true;
-            }
-            AttNIntegerComparison staffNComparison(STAFF, staff->GetN());
-            const Staff *previousStaff
-                = vrv_cast<const Staff *>(previousMeasure->FindDescendantByComparison(&staffNComparison));
-            if (!previousStaff) return true;
-            AttNIntegerComparison layerNComparison(LAYER, layer->GetN());
-            layer = vrv_cast<const Layer *>(previousStaff->FindDescendantByComparison(&layerNComparison));
+            layer = this->GetPreviousLayer(layer);
             if (!layer) return true;
             result = vrv_cast<const LayerElement *>(
                 layer->FindDescendantByComparison(&matches, UNLIMITED_DEPTH, BACKWARD));
@@ -1256,6 +1205,99 @@ void EditorToolkitShared::MoveCursor(Note *note)
     m_chainedId = m_selectionId;
     m_selectionClassId = object->GetClassId();
     this->Cursor(true, m_selectionId);
+}
+
+const Measure *EditorToolkitShared::GetPreviousMeasure(const Measure *measure)
+{
+    const System *system = vrv_cast<const System *>(measure->GetFirstAncestor(SYSTEM));
+    assert(system);
+
+    const Measure *previousMeasure = vrv_cast<const Measure *>(system->GetPrevious(measure, MEASURE));
+    if (previousMeasure) return previousMeasure;
+
+    const Page *page = vrv_cast<const Page *>(system->GetFirstAncestor(PAGE));
+    assert(page);
+
+    const System *previousSystem = vrv_cast<const System *>(page->GetPrevious(system, SYSTEM));
+    if (!previousSystem) {
+        const Page *previousPage = vrv_cast<const Page *>(m_doc->GetPages()->GetPrevious(page, PAGE));
+        if (!previousPage) return NULL;
+
+        previousSystem = vrv_cast<const System *>(previousPage->GetLast(SYSTEM));
+        if (!previousSystem) return NULL;
+    }
+
+    return vrv_cast<const Measure *>(previousSystem->GetLast(MEASURE));
+}
+
+const Staff *EditorToolkitShared::GetPreviousStaff(const Staff *staff)
+{
+    const Measure *measure = vrv_cast<const Measure *>(staff->GetFirstAncestor(MEASURE));
+    assert(measure);
+
+    const Measure *previousMeasure = GetPreviousMeasure(measure);
+    if (!previousMeasure) return NULL;
+
+    AttNIntegerComparison staffNComparison(STAFF, staff->GetN());
+    return vrv_cast<const Staff *>(previousMeasure->FindDescendantByComparison(&staffNComparison));
+}
+
+const Layer *EditorToolkitShared::GetPreviousLayer(const Layer *layer)
+{
+    const Staff *staff = vrv_cast<const Staff *>(layer->GetFirstAncestor(STAFF));
+    assert(staff);
+
+    const Staff *previousStaff = GetPreviousStaff(staff);
+    if (!previousStaff) return NULL;
+
+    AttNIntegerComparison layerNComparison(LAYER, layer->GetN());
+    return vrv_cast<const Layer *>(previousStaff->FindDescendantByComparison(&layerNComparison));
+}
+
+const Measure *EditorToolkitShared::GetNextMeasure(const Measure *measure)
+{
+    const System *system = vrv_cast<const System *>(measure->GetFirstAncestor(SYSTEM));
+    assert(system);
+    
+    const Measure *nextMeasure = vrv_cast<const Measure *>(system->GetNext(measure, MEASURE));
+    if (nextMeasure) return nextMeasure;
+    
+    const Page *page = vrv_cast<const Page *>(system->GetFirstAncestor(PAGE));
+    assert(page);
+    
+    const System *nextSystem = vrv_cast<const System *>(page->GetNext(system, SYSTEM));
+    if (!nextSystem) {
+        const Page *nextPage = vrv_cast<const Page *>(m_doc->GetPages()->GetNext(page, PAGE));
+        if (!nextPage) return NULL;
+
+        nextSystem = vrv_cast<const System *>(nextPage->GetFirst(SYSTEM));
+        if (!nextSystem) return NULL;
+    }
+    return vrv_cast<const Measure *>(nextSystem->GetFirst(MEASURE));
+}
+
+const Staff *EditorToolkitShared::GetNextStaff(const Staff *staff)
+{
+    const Measure *measure = vrv_cast<const Measure *>(staff->GetFirstAncestor(MEASURE));
+    assert(measure);
+    
+    const Measure *nextMeasure = GetNextMeasure(measure);
+    if (!nextMeasure) return NULL;
+    
+    AttNIntegerComparison staffNComparison(STAFF, staff->GetN());
+    return vrv_cast<const Staff *>(nextMeasure->FindDescendantByComparison(&staffNComparison));
+}
+
+const Layer *EditorToolkitShared::GetNextLayer(const Layer *layer)
+{
+    const Staff *staff = vrv_cast<const Staff *>(layer->GetFirstAncestor(STAFF));
+    assert(staff);
+    
+    const Staff *nextStaff = GetNextStaff(staff);
+    if (!nextStaff) return NULL;
+    
+    AttNIntegerComparison layerNComparison(LAYER, layer->GetN());
+    return vrv_cast<const Layer *>(nextStaff->FindDescendantByComparison(&layerNComparison));
 }
 
 //----------------------------------------------------------------------------
