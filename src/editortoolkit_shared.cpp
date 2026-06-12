@@ -14,6 +14,7 @@
 
 //--------------------------------------------------------------------------------
 
+#include "alignfunctor.h"
 #include "chord.h"
 #include "clef.h"
 #include "comparison.h"
@@ -158,7 +159,7 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
             this->PrepareUndo();
             return (this->Cursor(setCursor, elementId));
         }
-        LogWarning("Could not parse the delete action");
+        LogWarning("Could not parse the cursor action");
     }
     else if (action == "delete") {
         std::string elementId;
@@ -1199,7 +1200,26 @@ bool EditorToolkitShared::SetScoreDef(const std::string scoreDef)
 
 void EditorToolkitShared::MoveCursor(Note *note)
 {
-    Object *object = note;
+    assert(note);
+    assert(m_cursor);
+    
+    const Object *object = note;
+    
+    Layer *layer = vrv_cast<Layer*>(note->GetFirstAncestor(LAYER));
+    assert(layer);
+    if (note == layer->GetLast(NOTE)) {
+        AlignMeterParams params;
+        params.meterSig = layer->GetCurrentMeterSig();
+        Fraction position = (m_cursor->GetAlignment()) ? m_cursor->GetAlignment()->GetTime() : 0;
+        Fraction duration = note->GetAlignmentDuration(params, true, NOTATIONTYPE_cmn);
+        Fraction measureDuration = Fraction(params.meterSig->GetUnitAsDur()) * params.meterSig->GetTotalCount();
+        if ((position + duration) >= measureDuration) {
+            const Layer *next = this->GetNextLayer(layer);
+            if (next) object = next;
+        }
+    }
+
+    
 
     m_selectionId = object->GetID();
     m_chainedId = m_selectionId;

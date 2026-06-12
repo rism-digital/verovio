@@ -208,7 +208,7 @@ bool EditorToolkitCMN::InsertNote(
         targetContainer->InsertAfter(previousElement, note);
     }
     else {
-        targetContainer->AddChild(note);
+        targetContainer->InsertChild(note, 0);
     }
 
     if (note->IsInBeam()) {
