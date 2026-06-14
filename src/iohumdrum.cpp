@@ -26587,9 +26587,11 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
     // int accidCount = hum::Convert::kernToAccidentalCount(tstring);
     bool showInAccid = token->hasVisibleAccidental(stindex);
+    bool showInAccidGes = !showInAccid;
     // always show mensural accidentals
-    // bool showInAccid = true;
-    bool showInAccidGes = false;
+    if (m_mens && token->isMensLike()) {
+        showInAccidGes = false;
+    }
     bool brackQ = hasLayoutParameter(token, "ACC", "brack");
     bool parenQ = hasLayoutParameter(token, "ACC", "paren");
     std::string loaccid = token->getLayoutParameter("N", "acc", subtoken);

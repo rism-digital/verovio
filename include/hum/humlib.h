@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Jun  8 21:10:33 PDT 2026
+// Last Modified: Sat Jun 13 20:46:28 PDT 2026
 // Filename:      min/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.h
 // Syntax:        C++11
@@ -11962,7 +11962,7 @@ class Tool_text : public HumTool {
 		std::string getParmTimestamp(HTp token, const std::string& target);
 		void     removePartText    (HTp startspine, int vth, int vsize);
 		void     removeText        (HumdrumFile& infile);
-		std::string getSyllable    (const std::string& token);
+		std::string getSyllable    (HTp token);
 		void     fillPlines        (std::vector<std::vector<HTp>>& plines, HTp tspine,
 		                            int vth, int vsize);
 		void     addSyllables      (std::vector<HTp>& syllables);
@@ -12300,16 +12300,20 @@ class Tool_triad : public HumTool {
 		void     initialize        (void);
 
 	private:
-		bool m_appendQ  = false; // -a
-		bool m_classQ   = false; // -c
-		bool m_lowQ     = false; // -l
-		bool m_pitchesQ = false; // -p
-		bool m_qualityQ = false; // -q
-		bool m_restQ    = false; // -R
-		bool m_rootQ    = false; // -r
-		bool m_summaryQ = false; // not implemented
-		bool m_unisonQ  = false; // -U
-		std::string m_color = "salmon"; // --color
+		bool m_appendQ  = false;        // -a
+		bool m_classQ   = false;        // -c
+		bool m_lowQ     = false;        // -l
+		bool m_pitchesQ = false;        // -p
+		bool m_qualityQ = false;        // -q
+		bool m_restQ    = false;        // -R
+		bool m_rootQ    = false;        // -r
+		bool m_noInversionQ = true;     // -I
+		bool m_asciiQ   = false;        // --ascii
+		bool m_rootColorQ = true;       // --no-color
+		bool m_summaryQ = false;        // not implemented
+		bool m_unisonQ  = false;        // -U
+		std::vector<std::string>        m_pcColor; 
+		std::string m_color = "salmon"; // color of analysis text
 
 };
 
