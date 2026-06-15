@@ -24,6 +24,7 @@
 #include "rest.h"
 #include "runningelement.h"
 #include "section.h"
+#include "space.h"
 #include "staff.h"
 #include "svg.h"
 #include "syllable.h"
@@ -156,6 +157,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
     Ligature *ligatureParent = vrv_cast<Ligature *>(layerElement->GetFirstAncestor(LIGATURE, MAX_LIGATURE_DEPTH));
     Note *noteParent = vrv_cast<Note *>(layerElement->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH));
     Rest *restParent = vrv_cast<Rest *>(layerElement->GetFirstAncestor(REST, MAX_NOTE_DEPTH));
+    Space *spaceParent = vrv_cast<Space *>(layerElement->GetFirstAncestor(SPACE, 1));
     TabGrp *tabGrpParent = vrv_cast<TabGrp *>(layerElement->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
     const bool ligatureAsBracket = m_doc->GetOptions()->m_ligatureAsBracket.GetValue();
     const bool neumeAsNote = m_doc->GetOptions()->m_neumeAsNote.GetValue();
@@ -168,6 +170,9 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
     }
     else if (restParent) {
         layerElement->SetAlignment(restParent->GetAlignment());
+    }
+    else if (spaceParent) {
+        layerElement->SetAlignment(spaceParent->GetAlignment());
     }
     else if (tabGrpParent) {
         layerElement->SetAlignment(tabGrpParent->GetAlignment());
