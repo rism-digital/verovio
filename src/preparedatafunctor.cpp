@@ -25,6 +25,7 @@
 #include "harm.h"
 #include "layer.h"
 #include "mrpt.h"
+#include "mspace.h"
 #include "pedal.h"
 #include "plistinterface.h"
 #include "reh.h"
@@ -33,6 +34,7 @@
 #include "runningelement.h"
 #include "score.h"
 #include "section.h"
+#include "space.h"
 #include "staff.h"
 #include "stem.h"
 #include "syl.h"
@@ -64,6 +66,9 @@ FunctorCode PrepareDataInitializationFunctor::VisitAccid(Accid *accid)
 
     if (accid->GetFunc() == accidLog_FUNC_edit) {
         accid->InitFloatingObject();
+    }
+    if (accid->HasAccidGes() && m_doc->GetOptions()->m_showHidden.GetValue()) {
+        accid->InitShowAccidGes();
     }
     accid->Modify();
 
@@ -118,6 +123,19 @@ FunctorCode PrepareDataInitializationFunctor::VisitKeySig(KeySig *keySig)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode PrepareDataInitializationFunctor::VisitMSpace(MSpace *mSpace)
+{
+    // Call parent one too
+    this->VisitLayerElement(mSpace);
+
+    if (m_doc->GetOptions()->m_showHidden.GetValue()) {
+        mSpace->InitShowMSpace();
+    }
+    mSpace->Modify();
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode PrepareDataInitializationFunctor::VisitRepeatMark(RepeatMark *repeatMark)
 {
     // Call parent one too
@@ -142,6 +160,19 @@ FunctorCode PrepareDataInitializationFunctor::VisitScore(Score *score)
 
     // Evaluate functor on scoreDef
     score->GetScoreDef()->Process(*this);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareDataInitializationFunctor::VisitSpace(Space *space)
+{
+    // Call parent one too
+    this->VisitLayerElement(space);
+
+    if (m_doc->GetOptions()->m_showHidden.GetValue()) {
+        space->InitShowSpace();
+    }
+    space->Modify();
 
     return FUNCTOR_CONTINUE;
 }

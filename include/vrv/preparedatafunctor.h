@@ -47,8 +47,10 @@ public:
     FunctorCode VisitChord(Chord *chord) override;
     FunctorCode VisitFloatingObject(FloatingObject *floatingObject) override;
     FunctorCode VisitKeySig(KeySig *keySig) override;
+    FunctorCode VisitMSpace(MSpace *mSpace) override;
     FunctorCode VisitRepeatMark(RepeatMark *repeatMark) override;
     FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitSpace(Space *space) override;
     FunctorCode VisitTextLayoutElement(TextLayoutElement *textLayoutElement) override;
     ///@}
 
