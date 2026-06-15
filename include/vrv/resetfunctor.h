@@ -62,6 +62,7 @@ public:
     FunctorCode VisitLigature(Ligature *ligature) override;
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitMRest(MRest *mRest) override;
+    FunctorCode VisitMSpace(MSpace *mSpace) override;
     FunctorCode VisitNote(Note *note) override;
     FunctorCode VisitNc(Nc *nc) override;
     FunctorCode VisitObject(Object *object) override;
@@ -70,6 +71,7 @@ public:
     FunctorCode VisitRest(Rest *rest) override;
     FunctorCode VisitSection(Section *section) override;
     FunctorCode VisitSlur(Slur *slur) override;
+    FunctorCode VisitSpace(Space *space) override;
     FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitStaffDef(StaffDef *staffDef) override;
     FunctorCode VisitStem(Stem *stem) override;
