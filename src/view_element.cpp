@@ -250,11 +250,14 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     Accid *accid = vrv_cast<Accid *>(element);
     assert(accid);
 
+    bool showAccidGes = m_doc->GetOptions()->m_showHidden.GetValue();
+
     // This can happen with accid within note with only accid.ges
     // We still create an graphic in the output
     if (!accid->HasAccid() || staff->IsTablature()) {
         dc->StartGraphic(element, "", element->GetID());
         accid->SetEmptyBB();
+        if (showAccidGes) this->DrawLayerChildren(dc, accid, layer, staff, measure);
         dc->EndGraphic(element, this);
         return;
     }
@@ -334,6 +337,8 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     this->DrawSmuflString(
         dc, x, y, accidStr, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize, accid->GetDrawingCueSize(), true);
+
+    if (showAccidGes) this->DrawLayerChildren(dc, accid, layer, staff, measure);
 
     dc->EndGraphic(drawingElement, this);
 }
@@ -1318,11 +1323,14 @@ void View::DrawMSpace(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    // MSpace *mSpace = vrv_cast<MSpace *>(element);
-    // assert(mSpace);
+    bool showMSpace = m_doc->GetOptions()->m_showHidden.GetValue();
 
     dc->StartGraphic(element, "", element->GetID());
-    // nothing to draw here
+
+    dc->DrawPlaceholder(this->ToDeviceContextX(element->GetDrawingX()), this->ToDeviceContextY(element->GetDrawingY()));
+
+    if (showMSpace) this->DrawLayerChildren(dc, element, layer, staff, measure);
+
     dc->EndGraphic(element, this);
 }
 
@@ -1681,8 +1689,14 @@ void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff);
     assert(measure);
 
+    bool showSpace = m_doc->GetOptions()->m_showHidden.GetValue();
+
     dc->StartGraphic(element, "", element->GetID());
+
     dc->DrawPlaceholder(this->ToDeviceContextX(element->GetDrawingX()), this->ToDeviceContextY(element->GetDrawingY()));
+
+    if (showSpace) this->DrawLayerChildren(dc, element, layer, staff, measure);
+
     dc->EndGraphic(element, this);
 }
 
