@@ -1141,6 +1141,10 @@ Options::Options()
     m_setLocale.Init(false);
     this->Register(&m_setLocale, "setLocale", &m_general);
 
+    m_showHidden.SetInfo("Show hidden elements", "Display <space>, <mSpace> and invisible or gestural elements");
+    m_showHidden.Init(false);
+    this->Register(&m_showHidden, "showHidden", &m_general);
+
     m_showRuntime.SetInfo("Show runtime on CLI", "Display the total runtime on command-line");
     m_showRuntime.Init(false);
     this->Register(&m_showRuntime, "showRuntime", &m_general);
