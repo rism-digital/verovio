@@ -62,7 +62,7 @@ PrepareDataInitializationFunctor::PrepareDataInitializationFunctor(Doc *doc) : D
 FunctorCode PrepareDataInitializationFunctor::VisitAccid(Accid *accid)
 {
     // Call parent one too
-    this->VisitObject(accid);
+    this->VisitLayerElement(accid);
 
     if (accid->GetFunc() == accidLog_FUNC_edit) {
         accid->InitFloatingObject();
@@ -90,7 +90,7 @@ FunctorCode PrepareDataInitializationFunctor::VisitDiv(Div *div)
 FunctorCode PrepareDataInitializationFunctor::VisitChord(Chord *chord)
 {
     // Call parent one too
-    this->VisitObject(chord);
+    this->VisitLayerElement(chord);
 
     if (chord->HasEmptyList()) {
         LogWarning("Chord '%s' has no child note - a default note is added", chord->GetID().c_str());
@@ -115,7 +115,7 @@ FunctorCode PrepareDataInitializationFunctor::VisitFloatingObject(FloatingObject
 FunctorCode PrepareDataInitializationFunctor::VisitKeySig(KeySig *keySig)
 {
     // Call parent one too
-    this->VisitObject(keySig);
+    this->Visit(keySig);
 
     // Clear and regenerate attribute children
     keySig->GenerateKeyAccidAttribChildren();
@@ -250,7 +250,7 @@ FunctorCode PrepareCueSizeFunctor::VisitLayerElement(LayerElement *layerElement)
             if (note) accid->SetDrawingCueSize(note->GetDrawingCueSize());
         }
     }
-    else if (layerElement->Is({ ARTIC, DOTS, FLAG, STEM })) {
+    else if (layerElement->IsAnyOf(std::array{ ARTIC, DOTS, FLAG, STEM })) {
         Note *note = vrv_cast<Note *>(layerElement->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH));
         if (note)
             layerElement->SetDrawingCueSize(note->GetDrawingCueSize());
@@ -364,7 +364,7 @@ FunctorCode PrepareCrossStaffFunctor::VisitLayerElementEnd(LayerElement *layerEl
             m_currentCrossLayer = NULL;
         }
     }
-    else if (layerElement->Is({ BEAM, BTREM, FTREM, TUPLET })) {
+    else if (layerElement->IsAnyOf(std::array{ BEAM, BTREM, FTREM, TUPLET })) {
         // For other elements (e.g., beams, tuplets) check if all their child duration elements are cross-staff
         // If yes, make them cross-staff themselves.
         ListOfObjects durations;
@@ -572,7 +572,8 @@ FunctorCode PreparePlistFunctor::VisitObject(Object *object)
         }
     }
     else {
-        if (!object->IsLayerElement() && !object->Is({ ENDING, EXPANSION, SECTION })) return FUNCTOR_CONTINUE;
+        if (!object->IsLayerElement() && !object->IsAnyOf(std::array{ ENDING, EXPANSION, SECTION }))
+            return FUNCTOR_CONTINUE;
 
         const std::string &id = object->GetID();
         for (auto it = m_plistObjectIDPairs.begin(); it != m_plistObjectIDPairs.end();) {
@@ -687,7 +688,7 @@ FunctorCode PrepareTimePointingFunctor::VisitLayerElement(LayerElement *layerEle
     if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     // Do not look for tstamp pointing to these
-    if (layerElement->Is({ ARTIC, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
+    if (layerElement->IsAnyOf(std::array{ ARTIC, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
 
     ListOfPointingInterClassIdPairs::iterator iter = m_timePointingInterfaces.begin();
     while (iter != m_timePointingInterfaces.end()) {
@@ -753,7 +754,7 @@ FunctorCode PrepareTimeSpanningFunctor::VisitLayerElement(LayerElement *layerEle
     if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     // Do not look for tstamp pointing to these
-    if (layerElement->Is({ ARTIC, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
+    if (layerElement->IsAnyOf(std::array{ ARTIC, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
 
     ListOfSpanningInterOwnerPairs::iterator iter = m_timeSpanningInterfaces.begin();
     while (iter != m_timeSpanningInterfaces.end()) {
@@ -1041,7 +1042,7 @@ FunctorCode PreparePointersByLayerFunctor::VisitLayerElement(LayerElement *layer
         // Do not attach a note when a barline is passed
         m_currentElement = NULL;
     }
-    else if (layerElement->Is({ NOTE, REST })) {
+    else if (layerElement->IsAnyOf(std::array{ NOTE, REST })) {
         m_currentElement = layerElement;
     }
 

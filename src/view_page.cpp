@@ -489,7 +489,7 @@ void View::DrawLabels(
 {
     assert(dc);
     assert(scoreDef);
-    assert(object->Is({ LAYERDEF, STAFFDEF, STAFFGRP }));
+    assert(object->IsAnyOf(std::array{ LAYERDEF, STAFFDEF, STAFFGRP }));
 
     Label *label = vrv_cast<Label *>(object->FindDescendantByType(LABEL, 1));
     LabelAbbr *labelAbbr = vrv_cast<LabelAbbr *>(object->FindDescendantByType(LABELABBR, 1));
@@ -1811,7 +1811,7 @@ void View::DrawLayerChildren(DeviceContext *dc, Object *parent, Layer *layer, St
             // cast to EditorialElement check in DrawLayerEditorialElement
             this->DrawLayerEditorialElement(dc, dynamic_cast<EditorialElement *>(current), layer, staff, measure);
         }
-        else if (!current->Is({ LABEL, LABELABBR })) {
+        else if (!current->IsAnyOf(std::array{ LABEL, LABELABBR })) {
             assert(false);
         }
     }

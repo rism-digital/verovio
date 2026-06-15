@@ -112,7 +112,7 @@ FunctorCode LinkingInterface::InterfacePrepareStaffCurrentTimeSpanning(
     PrepareStaffCurrentTimeSpanningFunctor &functor, Object *object)
 {
     // Only dir and dynam can be spanning with @next (extender)
-    if (!object->Is({ DIR, DYNAM })) {
+    if (!object->IsAnyOf(std::array{ DIR, DYNAM })) {
         return FUNCTOR_CONTINUE;
     }
 

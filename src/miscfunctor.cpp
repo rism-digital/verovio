@@ -126,7 +126,7 @@ FunctorCode GetAlignmentLeftRightFunctor::VisitObject(const Object *object)
 
     if (!object->HasSelfBB() || object->HasEmptyBB()) return FUNCTOR_CONTINUE;
 
-    if (object->Is(m_excludeClasses)) return FUNCTOR_CONTINUE;
+    if (object->IsAnyOf(m_excludeClasses)) return FUNCTOR_CONTINUE;
 
     m_minLeft = std::min(m_minLeft, object->GetSelfLeft());
     m_maxRight = std::max(m_maxRight, object->GetSelfRight());

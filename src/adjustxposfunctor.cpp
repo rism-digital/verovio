@@ -104,12 +104,12 @@ FunctorCode AdjustXPosFunctor::VisitLayerElement(LayerElement *layerElement)
     }
 
     // If we have a list of types to exclude and it is one of them, stop it
-    if (!m_excludes.empty() && layerElement->Is(m_excludes)) {
+    if (!m_excludes.empty() && layerElement->IsAnyOf(m_excludes)) {
         return FUNCTOR_CONTINUE;
     }
 
     // If we have a list of types to include and it is not one of them, stop it
-    if (!m_includes.empty() && !layerElement->Is(m_includes)) {
+    if (!m_includes.empty() && !layerElement->IsAnyOf(m_includes)) {
         return FUNCTOR_CONTINUE;
     }
 
@@ -160,7 +160,7 @@ FunctorCode AdjustXPosFunctor::VisitLayerElement(LayerElement *layerElement)
     Alignment *nextAlignment = vrv_cast<Alignment *>(
         layerElement->GetAlignment()->GetParent()->GetNext(layerElement->GetAlignment(), ALIGNMENT));
     AlignmentType next = nextAlignment ? nextAlignment->GetType() : ALIGNMENT_DEFAULT;
-    if (layerElement->Is({ DOTS, FLAG }) && currentReference->HasMultipleLayer()
+    if (layerElement->IsAnyOf(std::array{ DOTS, FLAG }) && currentReference->HasMultipleLayer()
         && (next != ALIGNMENT_MEASURE_RIGHT_BARLINE)) {
         const int additionalOffset = selfRight - m_upcomingMinPos;
         if (additionalOffset > m_currentAlignment.m_offset) {
@@ -402,8 +402,8 @@ std::pair<int, int> AdjustXPosFunctor::CalculateXPosOffset(LayerElement *layerEl
         if (!overlap) {
             // if last element of the tuplet is rest, make sure there is sufficient distance between it and next
             // note/chord (for ledger lines)
-            if (layerElement->Is({ NOTE, CHORD }) && !layerElement->GetFirstAncestor(TUPLET) && bboxElement->Is(REST)
-                && bboxElement->GetFirstAncestor(TUPLET)) {
+            if (layerElement->IsAnyOf(std::array{ NOTE, CHORD }) && !layerElement->GetFirstAncestor(TUPLET)
+                && bboxElement->Is(REST) && bboxElement->GetFirstAncestor(TUPLET)) {
                 Rest *rest = vrv_cast<Rest *>(bboxElement);
                 if (rest->GetDur() > DURATION_8) {
                     overlap = 1.5 * (rest->GetDur() - DURATION_8) * drawingUnit;

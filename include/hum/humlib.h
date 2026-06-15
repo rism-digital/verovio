@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun May 24 18:00:04 JST 2026
+// Last Modified: Mon Jun  8 21:10:33 PDT 2026
 // Filename:      min/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.h
 // Syntax:        C++11
@@ -11974,6 +11974,7 @@ class Tool_text : public HumTool {
 		void        makeTextArray  (std::vector<std::vector<HTp>>& texts, std::vector<HTp> spines);
 		std::string makeStyle      (void);
 		int countSyllables         (std::vector<HTp>& tokens);
+		void markBis               (HTp spine);
 
 	private:
 		bool     m_onlyQ      = false;
@@ -11989,6 +11990,7 @@ class Tool_text : public HumTool {
 		bool     m_countQ     =  true;
 		bool     m_refrainOnlyQ = false;
 		bool     m_verseOnlyQ   = false;
+		bool     m_noBisQ       = false;
 
 		std::vector<std::vector<std::string>> m_text;
 		std::stringstream m_output;

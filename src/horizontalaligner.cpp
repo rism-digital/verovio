@@ -377,7 +377,7 @@ Alignment *GraceAligner::GetAlignmentAtTime(const Fraction &time, AlignmentType 
 void GraceAligner::StackGraceElement(LayerElement *element)
 {
     // Nespresso: What else?
-    assert(element->Is({ NOTE, CHORD }));
+    assert(element->IsAnyOf(std::array{ NOTE, CHORD }));
 
     if (element->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(element);
@@ -646,7 +646,7 @@ bool Alignment::AddLayerElementRef(LayerElement *element)
             }
             // staffN and layerN remain unused for barLine attributes and timestamps
             else {
-                assert(element->Is({ BARLINE, TIMESTAMP_ATTR }));
+                assert(element->IsAnyOf(std::array{ BARLINE, TIMESTAMP_ATTR }));
             }
         }
     }

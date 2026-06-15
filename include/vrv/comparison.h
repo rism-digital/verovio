@@ -89,7 +89,7 @@ public:
 
     bool operator()(const Object *object) override { return Result(this->MatchesType(object)); }
 
-    bool MatchesType(const Object *object) { return (object->Is(m_classIds)); }
+    bool MatchesType(const Object *object) { return (object->IsAnyOf(m_classIds)); }
 
 protected:
     std::vector<ClassId> m_classIds;

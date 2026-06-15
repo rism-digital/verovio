@@ -1037,7 +1037,7 @@ bool MEIOutput::WriteObjectEnd(Object *object)
 {
     if (this->IsScoreBasedMEI()) {
         // In score-based MEI, page, pages and system are not written.
-        if (object->Is({ PAGE, PAGES, SYSTEM })) {
+        if (object->IsAnyOf(std::array{ PAGE, PAGES, SYSTEM })) {
             return true;
         }
 
@@ -1046,7 +1046,7 @@ bool MEIOutput::WriteObjectEnd(Object *object)
             m_boundaries.push(object->GetMilestoneEnd());
             return true;
         }
-        if (object->Is({ PAGE_MILESTONE_END, SYSTEM_MILESTONE_END })) {
+        if (object->IsAnyOf(std::array{ PAGE_MILESTONE_END, SYSTEM_MILESTONE_END })) {
             assert(!m_boundaries.empty() && (m_boundaries.top() == object));
             m_boundaries.pop();
             // For system milestone ends that point to editorial markup, we need to make sure
@@ -1064,7 +1064,7 @@ bool MEIOutput::WriteObjectEnd(Object *object)
     }
     else {
         // In page-based MEI, pb and sb are not written unless when serializing
-        if (object->Is({ PB, SB }) && !this->IsSerializing()) {
+        if (object->IsAnyOf(std::array{ PB, SB }) && !this->IsSerializing()) {
             return true;
         }
     }
@@ -1158,17 +1158,17 @@ bool MEIOutput::IsTreeObject(Object *object) const
     if (this->IsPageBasedMEI()) return !object->IsAttribute();
 
     // These are not tree objects in score-based MEI
-    if (object->Is({ PAGES, PAGE, SYSTEM })) return false;
+    if (object->IsAnyOf(std::array{ PAGES, PAGE, SYSTEM })) return false;
 
     if (this->GetBasic()) {
         // Always elements for accid, artic, fermata and tie in MEI Basic
-        if (object->Is({ ACCID, ARTIC, FERMATA, TIE })) return true;
+        if (object->IsAnyOf(std::array{ ACCID, ARTIC, FERMATA, TIE })) return true;
 
         // Always attibutes for grpSym and keyAccid in MEI Basic
-        if (object->Is({ GRPSYM, KEYACCID })) return false;
+        if (object->IsAnyOf(std::array{ GRPSYM, KEYACCID })) return false;
 
         // Always attributes for clef, keySig and meterSig in MEI Basic within a scoreDef
-        if (object->Is({ CLEF, KEYSIG, METERSIG }) && object->GetFirstAncestor(SCOREDEF)) return false;
+        if (object->IsAnyOf(std::array{ CLEF, KEYSIG, METERSIG }) && object->GetFirstAncestor(SCOREDEF)) return false;
     }
 
     return !object->IsAttribute();
@@ -1329,7 +1329,7 @@ bool MEIOutput::ProcessScoreBasedFilter(Object *object)
         }
     }
 
-    if (this->IsTreeObject(object) && !object->Is({ SYSTEM_MILESTONE_END, PAGE_MILESTONE_END })) {
+    if (this->IsTreeObject(object) && !object->IsAnyOf(std::array{ SYSTEM_MILESTONE_END, PAGE_MILESTONE_END })) {
         m_objectStack.push_back(object);
     }
 
@@ -3759,7 +3759,7 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
         }
     }
     // filter for dir or tempo
-    else if (filterParent->Is({ DIR, ORNAM, REPEATMARK, TEMPO })) {
+    else if (filterParent->IsAnyOf(std::array{ DIR, ORNAM, REPEATMARK, TEMPO })) {
         if (element == "") {
             return true;
         }

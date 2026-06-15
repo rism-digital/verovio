@@ -481,7 +481,7 @@ FunctorCode ConvertToCmnFunctor::VisitLayerElement(LayerElement *layerElement)
         // Reset the tuplet since we expect the num / numbase to be different
         m_proportTuplet = NULL;
     }
-    else if (layerElement->Is({ ACCID, BARLINE, DOT })) {
+    else if (layerElement->IsAnyOf(std::array{ ACCID, BARLINE, DOT })) {
         // can be ignored
     }
     else {

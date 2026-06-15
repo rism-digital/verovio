@@ -2,302 +2,299 @@ name: Python Wheel Build
 
 on:
   push:
-    # Trigger the workflow on push, but only for the develop-pypi and master branch
     branches: [develop-pypi, master]
+    tags: ["v*", "version-*"]
+  workflow_dispatch:
 
-# globals
 env:
   PACKAGE_NAME: verovio
-  CHECK_INSTALL_DIR: check_install_dir
-  CIBW_BUILD_IDENTIFIER: ""
 
 jobs:
-  #===============================================#
-  #         BUILD WHEEL DISTRIBUTION              #
-  #===============================================#
-  build_wheels:
-    name: Build wheels (${{ matrix.python-version }}, ${{ matrix.os }}-${{ matrix.architecture }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      # Ensure that a wheel builder finishes even if another fails
-      fail-fast: false
-      # Build the wheels for Linux, Windows and macOS
-      matrix:
-        os: [macos-15-intel, macos-latest, windows-latest, ubuntu-latest, ubuntu-24.04-arm]
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
-        architecture: [x86, x64, arm64]
-        include:
-          - os: macos-15-intel
-            architecture: x64
-            platform_id: macosx_x86_64
-          - os: macos-latest
-            architecture: arm64
-            platform_id: macosx_arm64
-          - os: windows-latest
-            architecture: x64
-            platform_id: win_amd64
-          - os: windows-latest
-            architecture: x86
-            platform_id: win32
-          - os: ubuntu-latest
-            architecture: x64
-            platform_id: manylinux_x86_64
-          - os: ubuntu-24.04-arm
-            architecture: arm64
-            platform_id: manylinux_aarch64
-        exclude:
-          - os: macos-15-intel
-            architecture: x86
-          - os: macos-15-intel
-            architecture: arm64
-          - os: macos-latest
-            architecture: x86
-          - os: macos-latest
-            architecture: x64
-          - os: ubuntu-latest
-            architecture: x86
-          - os: ubuntu-latest
-            architecture: arm64
-          - os: windows-latest
-            architecture: arm64
-          - os: ubuntu-24.04-arm
-            architecture: x86
-          - os: ubuntu-24.04-arm
-            architecture: x64
+  sdist:
+    name: Build sdist
+    runs-on: ubuntu-latest
 
     steps:
-      #===============================================#
-      # Set up
-      - uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98 # v4.1.4
+      - uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
 
-      - uses: nuget/setup-nuget@fd55a6f3b34392fa83fde1454582407d8c714123 # v4.0
-        if: always() && runner.os == 'Windows'
+      - uses: actions/setup-python@v6
         with:
-          nuget-version: "latest"
+          python-version: "3.12"
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
-        with:
-          python-version: ${{ matrix.python-version }}
-          architecture: ${{ matrix.architecture }}
-
-      #===============================================#
-      # Dependencies
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install importlib_resources twine
-
-      #===============================================#
-      # Prepare identifier
-      - name: Set CIBW_BUILD_IDENTIFIER
+      - name: Set TestPyPI development version
+        if: github.ref == 'refs/heads/develop-pypi'
         shell: bash
         run: |
-          # Remove dot from python-version for CIBW and prefix with cp
-          id=cp$(echo ${{ matrix.python-version }} | sed -e 's/\.//g')-${{ matrix.platform_id }}
-          echo CIBW_BUILD_IDENTIFIER=$id >> $GITHUB_ENV
-          echo $id
+          python - <<'PY' >> "$GITHUB_ENV"
+          import os
+          import re
+          from pathlib import Path
 
-      #===============================================#
-      # wheels
+          text = Path("include/vrv/vrvdef.h").read_text(encoding="utf-8")
+          values = dict(re.findall(r"#define (VERSION_(?:MAJOR|MINOR|REVISION)) ([0-9]+)", text))
+          version = f"{values['VERSION_MAJOR']}.{values['VERSION_MINOR']}.{values['VERSION_REVISION']}.dev{os.environ['GITHUB_RUN_NUMBER']}"
+          print(f"VEROVIO_BUILD_VERSION={version}")
+          PY
+
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build twine
+
+      - name: Build source distribution
+        run: python -m build --sdist
+
+      - name: Check source distribution
+        run: twine check dist/*.tar.gz
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+
+  wheels:
+    name: Build wheels (${{ matrix.name }})
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-x86_64
+            runs-on: ubuntu-latest
+            archs: x86_64
+          - name: linux-aarch64
+            runs-on: ubuntu-24.04-arm
+            archs: aarch64
+          - name: macos-x86_64
+            runs-on: macos-15-intel
+            archs: x86_64
+          - name: macos-arm64
+            runs-on: macos-latest
+            archs: arm64
+          - name: windows
+            runs-on: windows-latest
+            archs: AMD64 x86
+
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Set TestPyPI development version
+        if: github.ref == 'refs/heads/develop-pypi'
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_ENV"
+          import os
+          import re
+          from pathlib import Path
+
+          text = Path("include/vrv/vrvdef.h").read_text(encoding="utf-8")
+          values = dict(re.findall(r"#define (VERSION_(?:MAJOR|MINOR|REVISION)) ([0-9]+)", text))
+          version = f"{values['VERSION_MAJOR']}.{values['VERSION_MINOR']}.{values['VERSION_REVISION']}.dev{os.environ['GITHUB_RUN_NUMBER']}"
+          print(f"VEROVIO_BUILD_VERSION={version}")
+          PY
+
       - name: Build wheels
-        uses: pypa/cibuildwheel@8d2b08b68458a16aeb24b64e68a09ab1c8e82084 # v3.4.1
+        uses: pypa/cibuildwheel@v3.4.1
         with:
           output-dir: wheelhouse
         env:
-          CIBW_BUILD: ${{ env.CIBW_BUILD_IDENTIFIER }}
-          CIBW_ARCHS_MACOS: x86_64 arm64
-          CIBW_ENVIRONMENT_MACOS:
-            MACOSX_DEPLOYMENT_TARGET=13
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
-          CIBW_MANYLINUX_I686_IMAGE: manylinux2014
-          CIBW_BEFORE_ALL_MACOS: brew update && brew install swig
-          CIBW_BEFORE_ALL_WINDOWS: choco install swig -f -y
-          CIBW_BEFORE_BUILD: swig -version && bash -c 'cd tools; ./get_git_commit.sh' && swig -c++ -python -py3 -fastproxy -olddefs ./bindings/python/verovio.i
+          CIBW_ARCHS: ${{ matrix.archs }}
+          CIBW_ENVIRONMENT_PASS_LINUX: VEROVIO_BUILD_VERSION
 
-      #===============================================#
-      # Check build
-
-      # TODO: Can be removed when everything is set up
-      - name: "List result"
-        working-directory: wheelhouse
-        run: ls -R
-
-      - name: Check with Twine
-        working-directory: wheelhouse
-        run: twine check *.whl
-
-      - name: Install from wheel on Linux
-        if: always() && runner.os == 'Linux'
-        working-directory: wheelhouse
-        run: python -m pip install ./*.whl
-
-      # Install only the x86_64 wheel on macOS
-      - name: Install from wheel on macOS
-        working-directory: wheelhouse
-        if: always() && runner.os == 'macOS'
-        run: python -m pip install ./*.whl
-
-      # Wildcard use is different with PowerShell
-      # cf. https://stackoverflow.com/a/43900040
-      - name: Install from wheel on Windows
-        working-directory: wheelhouse
-        if: always() && runner.os == 'Windows'
-        run: python -m pip install (get-item .\*.whl).FullName
-
-      - name: Check wheel installation
-        working-directory: wheelhouse
-        run: python -c "import verovio; tk = verovio.toolkit(); v = tk.getVersion(); print('verovio.toolkit.getVersion():', v)"
-
-      #===============================================#
-      # Upload artifacts
-      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+      - uses: actions/upload-artifact@v7
         with:
-          name: cibuildwheel-${{ runner.os }}-python-${{ matrix.python-version }}-${{ matrix.architecture }}
-          path: ./wheelhouse/*.whl
+          name: wheels-${{ matrix.name }}
+          path: wheelhouse/*.whl
 
-  #===============================================#
-  #         BUILD SOURCE DISTRIBUTION             #
-  #===============================================#
-  build_sdist:
-    name: Build sdist
-    runs-on: [ubuntu-latest]
+  validate:
+    name: Validate distributions
+    needs: [sdist, wheels]
+    runs-on: ubuntu-latest
 
     steps:
-      #===============================================#
-      # Set up
-      - uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98 # v4.1.4
+      - uses: actions/download-artifact@v8.0.1
         with:
-          fetch-depth: 0
+          path: artifacts
+          merge-multiple: true
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+      - uses: actions/setup-python@v6
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
-      #===============================================#
-      # Swig
-      - name: Install swig
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt update -q
-          sudo apt install swig
-
-      - name: Verify swig
-        run: swig -version
-
-      #===============================================#
-      # Dependencies
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install setuptools wheel twine
-
-      #===============================================#
-      # sdist
-      - name: Build ext
-        run: python setup.py build_ext
-
-      - name: Build source distribution
-        run: python setup.py sdist
-
-      #===============================================#
-      # Check build
-
-      # TODO: Can be removed when everything is set up
-      - name: List result
-        working-directory: dist
-        run: ls -R
-
-      - name: Check with Twine
-        working-directory: dist
-        run: twine check *.tar.gz
-
-      - name: Create install dir
-        shell: bash
-        run: mkdir - p ${{ env.CHECK_INSTALL_DIR }}
-
-      - name: Install from source
-        working-directory: ${{ env.CHECK_INSTALL_DIR }}
-        run: python -m pip install ../dist/*.tar.gz
-
-      - name: Check source installation
-        working-directory: ${{ env.CHECK_INSTALL_DIR }}
-        run: python -c "import verovio; tk = verovio.toolkit(); v = tk.getVersion(); print('verovio.toolkit.getVersion():', v)"
-
-      #===============================================#
-      # Upload artifact
-      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
-        with:
-          name: sdist-${{ runner.os }}-python-3.10
-          path: dist/*.tar.gz
-
-  #===============================================#
-  #         UPLOAD TO PACKAGE INDEX               #
-  #===============================================#
-  upload_testpypi:
-    name: Upload to TestPyPi
-    needs: [build_wheels, build_sdist]
-    runs-on: [ubuntu-latest]
-
-    steps:
-      #===============================================#
-      # Set up
-      - uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98 # v4.1.4
-
-      - name: Set up Python 3.10
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
-        with:
-          python-version: "3.10"
-          architecture: "x64"
-
-      #===============================================#
-      # Dependencies
-      - name: Install dependencies
+      - name: Check distributions
         run: |
           python -m pip install --upgrade pip
           python -m pip install twine
+          twine check artifacts/*
 
-      #===============================================#
-      # Prepare artifacts
-      - name: Download artifacts
-        uses: actions/download-artifact@v8.0.1 # v4.1.7
-        with:
-          path: bindings/python/artifacts/
-
-      # TODO: Can be removed when everything is set up
-      - name: Display structure of downloaded files
-        working-directory: bindings/python/artifacts/
-        run: ls -R
-
-      - name: Copy artifacts to dist folder
-        working-directory: bindings/python/
+      - name: Check abi3 wheel compatibility
         run: |
-          mkdir -p ./dist
-          cp artifacts/*/* dist/
+          python -m pip install abi3audit
+          python -m abi3audit --report artifacts/*.whl
 
-      # TODO: Can be removed when everything is set up
-      - name: Verify dist folder
-        working-directory: bindings/python/dist/
-        run: ls -R
+  validate_linux_abi3_runtime:
+    name: Validate Linux abi3 runtime (${{ matrix.python-version }})
+    needs: [wheels]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
 
-      #===============================================#
-      # Upload to package test index
-      - name: Upload to TestPyPi
-        working-directory: bindings/python
-        env:
-          TWINE_USERNAME: ${{ secrets.TESTPYPI_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.TESTPYPI_TOKEN }}
-        run: twine upload --repository testpypi dist/*
+    steps:
+      - uses: actions/checkout@v6.0.2
 
-      #===============================================#
-      # Check test build
-      - name: Create install dir
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: wheels-linux-x86_64
+          path: wheelhouse
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Linux abi3 wheel and run smoke test
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install wheelhouse/*.whl
+          python doc/python-smoke-test.py
+
+  validate_macos_arm64_abi3_runtime:
+    name: Validate macOS arm64 abi3 runtime (${{ matrix.python-version }})
+    needs: [wheels]
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: wheels-macos-arm64
+          path: wheelhouse
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install macOS arm64 abi3 wheel and run smoke test
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install wheelhouse/*.whl
+          python doc/python-smoke-test.py
+
+  validate_windows_abi3_runtime:
+    name: Validate Windows amd64 abi3 runtime (${{ matrix.python-version }})
+    needs: [wheels]
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: wheels-windows
+          path: wheelhouse
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+
+      - name: Install Windows amd64 abi3 wheel
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          $wheels = @(Get-ChildItem wheelhouse -Filter *win_amd64.whl)
+          if ($wheels.Count -ne 1) {
+            throw "Expected exactly one win_amd64 wheel, found $($wheels.Count)"
+          }
+          python -m pip install $wheels[0].FullName
+
+      - name: Run smoke test
+        run: python doc/python-smoke-test.py
+
+  publish_testpypi:
+    name: Publish to TestPyPI
+    needs: [validate, validate_linux_abi3_runtime, validate_macos_arm64_abi3_runtime, validate_windows_abi3_runtime]
+    if: github.ref == 'refs/heads/develop-pypi'
+    runs-on: ubuntu-latest
+    environment: test-pypi
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Publish package distributions to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          packages-dir: dist/
+          skip-existing: true
+          attestations: false
+
+  publish_pypi:
+    name: Publish to PyPI
+    needs: [validate, validate_linux_abi3_runtime, validate_macos_arm64_abi3_runtime, validate_windows_abi3_runtime]
+    if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/version-')
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Verify release tag
         shell: bash
         run: |
-          mkdir - p ${{ env.CHECK_INSTALL_DIR }}
-          cd ${{ env.CHECK_INSTALL_DIR }}
-          python -m pip install --index-url https://test.pypi.org/simple/ --pre ${{ env.PACKAGE_NAME }}
-          python -c "import verovio; tk = verovio.toolkit(); v = tk.getVersion(); print('verovio.toolkit.getVersion():', v)"
+          git fetch origin master:refs/remotes/origin/master
+          git branch -r --contains "$GITHUB_SHA" | grep -q 'origin/master'
+          python - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          tag = os.environ["GITHUB_REF_NAME"]
+          tag_version = re.sub(r"^(?:v|version-)", "", tag)
+          text = Path("include/vrv/vrvdef.h").read_text(encoding="utf-8")
+          values = dict(re.findall(r"#define (VERSION_(?:MAJOR|MINOR|REVISION|DEV)) ([A-Za-z0-9]+)", text))
+          header_version = f"{values['VERSION_MAJOR']}.{values['VERSION_MINOR']}.{values['VERSION_REVISION']}"
+          if tag_version != header_version:
+              raise SystemExit(f"Tag version {tag_version} does not match header version {header_version}")
+          if values["VERSION_DEV"] != "false":
+              raise SystemExit("VERSION_DEV must be false for PyPI releases")
+          PY
+
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/

@@ -542,7 +542,7 @@ int Rest::GetFirstRelativeElementLocation(
     (*layerIter)->Process(getRelativeLayerElement);
 
     const Object *lastLayerElement = getRelativeLayerElement.GetRelativeElement();
-    if (lastLayerElement && lastLayerElement->Is({ NOTE, CHORD, FTREM })) {
+    if (lastLayerElement && lastLayerElement->IsAnyOf(std::array{ NOTE, CHORD, FTREM })) {
         return this->GetElementLocation(lastLayerElement, vrv_cast<const Layer *>(*layerIter), !isTopLayer).first;
     }
 

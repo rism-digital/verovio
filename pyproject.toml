@@ -1,0 +1,76 @@
+[build-system]
+requires = ["scikit-build-core>=0.12", "swig"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "verovio"
+dynamic = ["version"]
+description = "A library and toolkit for engraving MEI music notation into SVG"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "LGPL-3.0-only"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: C++",
+    "Operating System :: OS Independent",
+]
+
+[project.optional-dependencies]
+dev = [
+    "build>=1.2",
+    "cibuildwheel>=3.4; python_version >= '3.11'",
+    "twine>=5",
+]
+
+[project.urls]
+Homepage = "https://www.verovio.org"
+"Bug Reports" = "https://github.com/rism-digital/verovio/issues"
+Source = "https://github.com/rism-digital/verovio"
+
+[tool.scikit-build]
+experimental = true
+cmake.source-dir = "cmake"
+cmake.define.BUILD_AS_PYTHON = true
+wheel.py-api = "cp310"
+wheel.packages = []
+sdist.include = [
+    "bindings/python",
+    "cmake",
+    "data",
+    "include",
+    "libmei",
+    "src",
+    "tools",
+]
+sdist.exclude = [
+    "bindings/python/CMakeCache.txt",
+    "bindings/python/CMakeFiles",
+    "bindings/python/Makefile",
+    "bindings/python/_verovio*.so",
+    "bindings/python/cmake_install.cmake",
+    "bindings/python/libverovio.a",
+    "bindings/python/verovio.py",
+    "bindings/python/verovio_wrap.cpp",
+]
+
+[tool.scikit-build.metadata.version]
+provider = "tools.python_metadata"
+provider-path = "."
+
+[tool.cibuildwheel]
+build = "cp310-*"
+skip = "*-musllinux* *-manylinux_i686 *-win_arm64 *-macosx_universal2"
+test-command = "python {project}/doc/python-smoke-test.py"
+test-skip = "*-macosx_arm64 *-manylinux_aarch64"
+
+[tool.cibuildwheel.linux]
+manylinux-x86_64-image = "manylinux2014"
+manylinux-aarch64-image = "manylinux2014"
+before-all = "yum install -y swig"
+
+[tool.cibuildwheel.macos]
+before-all = "brew update && brew install swig"
+environment = { MACOSX_DEPLOYMENT_TARGET = "13" }
+
+[tool.cibuildwheel.windows]
+before-all = "choco install swig -f -y"
