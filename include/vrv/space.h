@@ -35,6 +35,15 @@ public:
     ///@}
 
     /**
+     * Add an element (accid) to a accid.
+     * Only supported elements will be actually added to the child list.
+     */
+    bool IsSupportedChild(ClassId classId) override;
+
+    /** Init the display of space when the option is set */
+    void InitShowSpace();
+
+    /**
      * @name Getter to interfaces
      */
     ///@{

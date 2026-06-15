@@ -15,6 +15,7 @@
 
 #include "functor.h"
 #include "horizontalaligner.h"
+#include "rest.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -38,6 +39,20 @@ void Space::Reset()
 {
     LayerElement::Reset();
     DurationInterface::Reset();
+}
+
+bool Space::IsSupportedChild(ClassId classId)
+{
+    return (classId == REST);
+}
+
+void Space::InitShowSpace()
+{
+    this->ClearChildren();
+    Rest *rest = new Rest();
+    rest->SetDur(this->GetDur());
+    rest->SetDots(this->GetDots());
+    if (!this->AddChild(rest)) delete rest;
 }
 
 //----------------------------------------------------------------------------
