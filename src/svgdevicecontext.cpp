@@ -488,7 +488,10 @@ void SvgDeviceContext::StartPage()
         std::string css = "g.ending, g.fing, g.reh, g.tempo {font-weight:bold;} "
                           "g.dir, g.dynam, g.mNum {font-style:italic;}"
                           "g.label {font-weight:normal;} "
-                          "ellipse, path, polygon, polyline, rect {stroke:currentColor} ";
+                          "ellipse, path, polygon, polyline, rect {stroke:currentColor} "
+                          "g.accid g.accid {fill: silver; color:silver;} "
+                          "g.space g.rest {fill: silver; color:silver;} "
+                          "g.mSpace g.mRest {fill: silver; color:silver;}";
         // bounding box css - for debugging
         // css += " g.bounding-box{stroke:red; stroke-width:10} "
         //        "g.content-bounding-box{stroke:blue; stroke-width:10}";
