@@ -61,6 +61,29 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
 }
 
 #ifndef NO_EDIT_SUPPORT
+
+EditorToolkitCMN::MidiSpelling EditorToolkitCMN::SpellMidi(int midi, const data_KEYSIGNATURE &keySig)
+{
+    static constexpr EditorToolkitCMN::MidiSpelling sharpTable[12]
+        = { { 'c', ACCIDENTAL_WRITTEN_NONE }, { 'c', ACCIDENTAL_WRITTEN_s }, { 'd', ACCIDENTAL_WRITTEN_NONE },
+              { 'd', ACCIDENTAL_WRITTEN_s }, { 'e', ACCIDENTAL_WRITTEN_NONE }, { 'f', ACCIDENTAL_WRITTEN_NONE },
+              { 'f', ACCIDENTAL_WRITTEN_s }, { 'g', ACCIDENTAL_WRITTEN_NONE }, { 'g', ACCIDENTAL_WRITTEN_s },
+              { 'a', ACCIDENTAL_WRITTEN_NONE }, { 'a', ACCIDENTAL_WRITTEN_s }, { 'b', ACCIDENTAL_WRITTEN_NONE } };
+
+    static constexpr EditorToolkitCMN::MidiSpelling flatTable[12]
+        = { { 'c', ACCIDENTAL_WRITTEN_NONE }, { 'd', ACCIDENTAL_WRITTEN_f }, { 'd', ACCIDENTAL_WRITTEN_NONE },
+              { 'e', ACCIDENTAL_WRITTEN_f }, { 'e', ACCIDENTAL_WRITTEN_NONE }, { 'f', ACCIDENTAL_WRITTEN_NONE },
+              { 'f', ACCIDENTAL_WRITTEN_s }, { 'g', ACCIDENTAL_WRITTEN_NONE }, { 'a', ACCIDENTAL_WRITTEN_f },
+              { 'a', ACCIDENTAL_WRITTEN_NONE }, { 'b', ACCIDENTAL_WRITTEN_f }, { 'b', ACCIDENTAL_WRITTEN_NONE } };
+
+    int pc = ((midi % 12) + 12) % 12;
+    assert(pc >= 0 && pc > 12);
+
+    bool flatKey = keySig.second == ACCIDENTAL_WRITTEN_f;
+
+    return flatKey ? flatTable[pc] : sharpTable[pc];
+}
+
 bool EditorToolkitCMN::ParseInsertMeasureAction(
     const jsonxx::Object &param, std::string &targetId, int &number, bool &insertBefore)
 {

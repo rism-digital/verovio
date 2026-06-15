@@ -49,6 +49,14 @@ protected:
     bool InsertNote(const std::string &targetId, data_PITCHNAME pname, int oct, data_DURATION dur, bool chordMode);
     bool InsertNoteInChordMode(const std::string &targetId, data_PITCHNAME pname, int oct);
 
+private:
+    struct MidiSpelling {
+        char pname;
+        data_ACCIDENTAL_WRITTEN accid;
+    };
+
+    MidiSpelling SpellMidi(int midi, const data_KEYSIGNATURE &keySig);
+
 public:
     //
 protected:
