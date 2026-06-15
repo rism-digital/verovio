@@ -150,7 +150,7 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
         mRest->SetDrawingLoc(loc);
         mRest->SetDrawingYRel(staffY->CalcPitchPosYRel(m_doc, loc));
     }
-    else if (layerElement->Is({ REST, SPACE })) {
+    else if (layerElement->Is(REST)) {
         DurationInterface *durInterface = layerElement->GetDurationInterface();
         assert(durInterface);
         Rest *rest = NULL;
