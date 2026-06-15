@@ -32,8 +32,10 @@ CalcDotsFunctor::CalcDotsFunctor(Doc *doc) : DocFunctor(doc)
 
 FunctorCode CalcDotsFunctor::VisitChord(Chord *chord)
 {
+    bool showInvisible = (m_doc->GetOptions()->m_showHidden.GetValue());
+    
     // if the chord isn't visible, stop here
-    if (!chord->IsVisible()) {
+    if (!showInvisible && !chord->IsVisible()) {
         return FUNCTOR_SIBLINGS;
     }
     // if there aren't dot, stop here but only if no note has a dot
@@ -60,7 +62,9 @@ FunctorCode CalcDotsFunctor::VisitChord(Chord *chord)
 
 FunctorCode CalcDotsFunctor::VisitNote(Note *note)
 {
-    if (!note->IsVisible()) {
+    bool showInvisible = (m_doc->GetOptions()->m_showHidden.GetValue());
+    
+    if (!showInvisible && !note->IsVisible()) {
         return FUNCTOR_SIBLINGS;
     }
 

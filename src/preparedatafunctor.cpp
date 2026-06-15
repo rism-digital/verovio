@@ -115,7 +115,7 @@ FunctorCode PrepareDataInitializationFunctor::VisitFloatingObject(FloatingObject
 FunctorCode PrepareDataInitializationFunctor::VisitKeySig(KeySig *keySig)
 {
     // Call parent one too
-    this->Visit(keySig);
+    this->VisitLayerElement(keySig);
 
     // Clear and regenerate attribute children
     keySig->GenerateKeyAccidAttribChildren();

@@ -102,6 +102,8 @@ FunctorCode CalcStemFunctor::VisitBeamSpan(BeamSpan *beamSpan)
 
 FunctorCode CalcStemFunctor::VisitChord(Chord *chord)
 {
+    bool showInvisible = (m_doc->GetOptions()->m_showHidden.GetValue());
+    
     // Set them to NULL in any case
     m_interface = NULL;
 
@@ -112,7 +114,7 @@ FunctorCode CalcStemFunctor::VisitChord(Chord *chord)
     }
 
     // if the chord isn't visible, carry on
-    if (!chord->IsVisible() || (chord->GetStemVisible() == BOOLEAN_false)) {
+    if (!showInvisible && (!chord->IsVisible() || (chord->GetStemVisible() == BOOLEAN_false))) {
         return FUNCTOR_SIBLINGS;
     }
 
