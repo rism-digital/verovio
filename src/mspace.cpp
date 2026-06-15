@@ -13,6 +13,7 @@
 //----------------------------------------------------------------------------
 
 #include "functor.h"
+#include "mrest.h"
 
 namespace vrv {
 
@@ -32,6 +33,18 @@ MSpace::~MSpace() {}
 void MSpace::Reset()
 {
     LayerElement::Reset();
+}
+
+bool MSpace::IsSupportedChild(ClassId classId)
+{
+    return (classId == MREST);
+}
+
+void MSpace::InitShowMSpace()
+{
+    this->ClearChildren();
+    MRest *mRest = new MRest();
+    if (!this->AddChild(mRest)) delete mRest;
 }
 
 //----------------------------------------------------------------------------
