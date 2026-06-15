@@ -52,11 +52,20 @@ public:
     std::string GetClassName() const override { return "accid"; }
     ///@}
 
+    /**
+     * Add an element (accid) to a accid.
+     * Only supported elements will be actually added to the child list.
+     */
+    bool IsSupportedChild(ClassId classId) override;
+
     /**  Delete the floating object (editorial accidental) on reset or deletion */
     void ClearFloatingObject();
 
     /** Init the accid floating object for editorial accidentals */
     void InitFloatingObject();
+
+    /** Init the display of accid.ges when the option is set */
+    void InitShowAccidGes();
 
     /** Return the floating object (NULL if not set) */
     AccidFloatingObject *GetFloatingObject() { return m_floatingObject; }
