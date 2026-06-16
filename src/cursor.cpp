@@ -45,6 +45,20 @@ void Cursor::Reset()
     m_restMode = false;
     m_inputMode = InputMode::PITCH_FIRST;
     m_chordMode = ChordMode::NONE;
+
+    // Default position
+    this->SetPname(PITCHNAME_c);
+    this->SetOct(4);
+}
+
+void Cursor::CloneReset()
+{
+    Note::CloneReset();
+
+    this->ResetCursorAlignment();
+    m_position = NULL;
+
+    m_accid.SetParent(this);
 }
 
 void Cursor::SetAccidImplicit(bool isAccidImplicit)

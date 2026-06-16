@@ -8,6 +8,7 @@
 #ifndef __VRV_EDITFUNCTOR_H__
 #define __VRV_EDITFUNCTOR_H__
 
+#include "cursor.h"
 #include "functor.h"
 
 namespace vrv {
@@ -48,6 +49,7 @@ private:
     Layer *m_layer;
     LayerElement *m_position;
     Cursor *m_cursor;
+    Cursor m_previous;
 };
 
 //----------------------------------------------------------------------------

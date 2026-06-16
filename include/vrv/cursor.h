@@ -34,6 +34,11 @@ public:
     std::string GetClassName() const override { return "cursor"; }
     ///@}
 
+    /**
+     * Overriding CloneReset() method to be called after copy / assignment calls.
+     */
+    void CloneReset() override;
+
     bool IsCursor() const override { return true; }
 
     void SetCursorAlignment(Alignment *alignment);

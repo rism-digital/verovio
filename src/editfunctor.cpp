@@ -32,13 +32,18 @@ CursorFunctor::CursorFunctor(Layer *layer, LayerElement *position) : Functor()
 
 FunctorCode CursorFunctor::VisitLayer(Layer *layer)
 {
+    if (layer->HasCursor()) {
+        // Store the values for when moving to the next layer
+        m_previous = *layer->GetCursor();
+        m_previous.CloneReset();
+    }
+
     if (layer != m_layer) {
         layer->ResetCursor();
     }
     else {
         m_cursor = new Cursor();
-        m_cursor->SetPname(PITCHNAME_c);
-        m_cursor->SetOct(4);
+        (*m_cursor) = m_previous;
         if (m_position) {
             m_cursor->SetPosition(m_position);
             if (m_position->Is(NOTE)) {
