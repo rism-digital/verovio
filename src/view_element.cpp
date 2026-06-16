@@ -251,6 +251,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(accid);
 
     bool showAccidGes = m_doc->GetOptions()->m_showHidden.GetValue();
+    const bool showHidden = (showAccidGes && accid->GetParent()->Is(ACCID));
 
     // This can happen with accid within note with only accid.ges
     // We still create an graphic in the output
@@ -268,7 +269,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         drawingElement = editorialAccid;
     }
 
-    dc->StartGraphic(drawingElement, "", element->GetID());
+    dc->StartGraphic(drawingElement, (showHidden ? CSS_SHOW_HIDDEN : ""), element->GetID());
 
     const data_NOTATIONTYPE notationType = staff->m_drawingNotationType;
     std::u32string accidStr = accid->GetSymbolStr(notationType);
@@ -594,6 +595,8 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     Chord *chord = vrv_cast<Chord *>(element);
     assert(chord);
 
+    dc->StartGraphic(chord, "", chord->GetID());
+
     if (chord->HasCluster()) {
         this->DrawChordCluster(dc, chord, layer, staff, measure);
         return;
@@ -606,6 +609,8 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /************ Draw children (notes, accidentals, etc) ************/
 
     this->DrawLayerChildren(dc, chord, layer, staff, measure);
+
+    dc->EndGraphic(chord, this);
 }
 
 void View::DrawChordCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff *staff, Measure *measure)
@@ -899,19 +904,13 @@ void View::DrawDurationElement(DeviceContext *dc, LayerElement *element, Layer *
     assert(measure);
 
     if (dynamic_cast<Chord *>(element)) {
-        dc->StartGraphic(element, "", element->GetID());
         this->DrawChord(dc, element, layer, staff, measure);
-        dc->EndGraphic(element, this);
     }
     else if (dynamic_cast<Note *>(element)) {
-        dc->StartGraphic(element, "", element->GetID());
         this->DrawNote(dc, element, layer, staff, measure);
-        dc->EndGraphic(element, this);
     }
     else if (dynamic_cast<Rest *>(element)) {
-        dc->StartGraphic(element, "", element->GetID());
         this->DrawRest(dc, element, layer, staff, measure);
-        dc->EndGraphic(element, this);
     }
 }
 
@@ -1210,13 +1209,15 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(layer);
     assert(staff);
     assert(measure);
+    assert(element->GetParent());
 
     MRest *mRest = vrv_cast<MRest *>(element);
     assert(mRest);
 
     const int staffSize = staff->GetDrawingStaffNotationSize();
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue() && mRest->GetParent()->Is(MSPACE));
 
-    dc->StartGraphic(element, "", element->GetID());
+    dc->StartGraphic(element, (showHidden ? CSS_SHOW_HIDDEN : ""), element->GetID());
 
     if (mRest->GetCutout() == cutout_CUTOUT_cutout) {
         dc->EndGraphic(element, this);
@@ -1510,6 +1511,8 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     if (note->m_crossStaff) staff = note->m_crossStaff;
 
+    dc->StartGraphic(note, "", note->GetID());
+
     bool drawingCueSize = note->GetDrawingCueSize();
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
@@ -1592,6 +1595,8 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     /************ Draw children (accidentals, etc) ************/
 
     this->DrawLayerChildren(dc, note, layer, staff, measure);
+
+    dc->EndGraphic(note, this);
 }
 
 void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -1601,6 +1606,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(layer);
     assert(staff);
     assert(measure);
+    assert(element->GetParent());
 
     Rest *rest = vrv_cast<Rest *>(element);
     assert(rest);
@@ -1609,6 +1615,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     const bool drawingCueSize = rest->GetDrawingCueSize();
     const int staffSize = staff->GetDrawingStaffNotationSize();
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue() && rest->GetParent()->Is(SPACE));
     data_DURATION drawingDur = rest->GetActualDur();
     // in tablature the @dur is in the parent TabGrp - try to get if from there
     if ((drawingDur == DURATION_NONE) && (staff->IsTablature() || staff->IsTabStaffLike())) {
@@ -1620,6 +1627,8 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         LogWarning("Missing duration for rest '%s'", rest->GetID().c_str());
         drawingDur = DURATION_4;
     }
+
+    dc->StartGraphic(rest, (showHidden ? CSS_SHOW_HIDDEN : ""), rest->GetID());
 
     const char32_t drawingGlyph = rest->GetRestGlyph(drawingDur);
 
@@ -1685,6 +1694,8 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         }
         dc->EndCustomGraphic();
     }
+
+    dc->EndGraphic(rest, this);
 }
 
 void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
