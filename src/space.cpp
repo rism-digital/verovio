@@ -50,6 +50,7 @@ void Space::InitShowSpace()
 {
     this->ClearChildren();
     Rest *rest = new Rest();
+    rest->IsAttribute(true);
     rest->SetDur(this->GetDur());
     rest->SetDots(this->GetDots());
     if (!this->AddChild(rest)) delete rest;

@@ -44,6 +44,7 @@ void MSpace::InitShowMSpace()
 {
     this->ClearChildren();
     MRest *mRest = new MRest();
+    mRest->IsAttribute(true);
     if (!this->AddChild(mRest)) delete mRest;
 }
 

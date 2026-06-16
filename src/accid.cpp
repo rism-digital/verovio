@@ -119,6 +119,7 @@ void Accid::InitShowAccidGes()
 
     this->ClearChildren();
     Accid *accid = new Accid();
+    accid->IsAttribute(true);
     accid->SetAccid(Att::AccidentalGesturalToWritten(this->GetAccidGes()));
     if (!this->AddChild(accid)) delete accid;
 }
