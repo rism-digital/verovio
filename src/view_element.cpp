@@ -681,13 +681,15 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(staff);
     assert(measure);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     Clef *clef = vrv_cast<Clef *>(element);
     assert(clef);
 
     if (clef->m_crossStaff) staff = clef->m_crossStaff;
 
     // hidden clef
-    if (clef->GetVisible() == BOOLEAN_false) {
+    if (!showHidden && (clef->GetVisible() == BOOLEAN_false)) {
         dc->StartGraphic(element, "", element->GetID());
         clef->SetEmptyBB();
         dc->EndGraphic(element, this);
@@ -1003,6 +1005,8 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     if (staff->IsTablature()) {
         // Encoded keySig will not be shown on tablature
         return;
@@ -1020,7 +1024,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     const int clefLocOffset = clef->GetClefLocOffset();
 
     // hidden key signature
-    if (keySig->GetVisible() == BOOLEAN_false) {
+    if (!showHidden && (keySig->GetVisible() == BOOLEAN_false)) {
         dc->StartGraphic(element, "", element->GetID());
         keySig->SetEmptyBB();
         dc->EndGraphic(element, this);
@@ -1095,11 +1099,13 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(staff);
     assert(measure);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     MeterSig *meterSig = vrv_cast<MeterSig *>(element);
     assert(meterSig);
 
     // hidden time signature
-    if (meterSig->GetVisible() == BOOLEAN_false) {
+    if (!showHidden && (meterSig->GetVisible() == BOOLEAN_false)) {
         dc->StartGraphic(element, "", element->GetID());
         meterSig->SetEmptyBB();
         dc->EndGraphic(element, this);
