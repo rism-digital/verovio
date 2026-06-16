@@ -41,6 +41,10 @@ void Cursor::Reset()
 
     m_position = NULL;
     m_isAccidImplicit = false;
+
+    m_restMode = false;
+    m_inputMode = InputMode::PITCH_FIRST;
+    m_chordMode = ChordMode::NONE;
 }
 
 void Cursor::SetAccidImplicit(bool isAccidImplicit)
@@ -65,6 +69,23 @@ void Cursor::SetCursorAlignment(Alignment *alignment)
 void Cursor::ResetCursorAlignment()
 {
     m_accid.SetAlignment(NULL);
+}
+
+void Cursor::SetRestMode(bool restMode)
+{
+    m_chordMode = ChordMode::NONE;
+    m_restMode = restMode;
+}
+
+void Cursor::SetChordMode(ChordMode chordMode)
+{
+    m_chordMode = chordMode;
+    m_restMode = false;
+}
+
+void Cursor::SetInputMode(InputMode intpuMode)
+{
+    m_inputMode = intpuMode;
 }
 
 //----------------------------------------------------------------------------

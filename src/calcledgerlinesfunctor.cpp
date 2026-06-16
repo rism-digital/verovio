@@ -41,6 +41,8 @@ FunctorCode CalcLedgerLinesFunctor::VisitAccid(Accid *accid)
 
 FunctorCode CalcLedgerLinesFunctor::VisitCursor(Cursor *cursor)
 {
+    if (cursor->IsRestMode() || (cursor->GetInputMode() == Cursor::InputMode::DURATION_FIRST)) return FUNCTOR_CONTINUE;
+
     return this->VisitNote(cursor);
 }
 

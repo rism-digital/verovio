@@ -1615,7 +1615,7 @@ void View::DrawCursor(DeviceContext *dc, LayerElement *element, Layer *layer, St
     const int staffSize = staff->m_drawingStaffSize;
     const int unit = m_doc->GetDrawingUnit(staffSize);
 
-    bool isNote = false;
+    bool isNote = !cursor->IsRestMode();
 
     dc->StartCustomGraphic("cursor");
 

@@ -699,6 +699,9 @@ bool EditorToolkitShared::Navigate(std::string &elementId, const int &direction)
 
     if (this->InsertMode()) return true;
 
+    // disable horizontal navigation for now
+    if (direction != 37 && direction != 39) return true;
+
     const bool forward = (direction == 39);
 
     m_chainedId = "";
@@ -1213,6 +1216,8 @@ void EditorToolkitShared::MoveCursor(Note *note)
         Fraction position = (m_cursor->GetAlignment()) ? m_cursor->GetAlignment()->GetTime() : 0;
         Fraction duration = note->GetAlignmentDuration(params, true, NOTATIONTYPE_cmn);
         Fraction measureDuration = Fraction(params.meterSig->GetUnitAsDur()) * params.meterSig->GetTotalCount();
+        // Assume 4/4 by default
+        if (measureDuration == 0) measureDuration = 4;
         if ((position + duration) >= measureDuration) {
             object = this->GetNextLayer(layer);
         }

@@ -51,6 +51,19 @@ public:
 
     Accid *GetAccidElement() { return &m_accid; }
 
+    bool IsRestMode() const { return m_restMode; }
+    void SetRestMode(bool restMode);
+
+    enum ChordMode : int8_t { NONE = 0, NEW, EDIT_NEW, EDIT_EXISTING };
+
+    ChordMode GetChordMode() const { return m_chordMode; }
+    void SetChordMode(ChordMode chordMode);
+
+    enum InputMode : int8_t { PITCH_FIRST = 0, DURATION_FIRST };
+
+    InputMode GetInputMode() const { return m_inputMode; }
+    void SetInputMode(InputMode inputMode);
+
     //----------//
     // Functors //
     //----------//
@@ -76,6 +89,12 @@ private:
     Accid m_accid;
     /** A flag indicating if the accidental is implicit */
     bool m_isAccidImplicit;
+    /** A flag indicating it is in restMode */
+    bool m_restMode;
+    /** A field indicating the chordMode status */
+    ChordMode m_chordMode;
+    /** A field indicating the inputMode */
+    InputMode m_inputMode;
 };
 
 } // namespace vrv
