@@ -688,8 +688,17 @@ bool EditorToolkitShared::KeyDown(std::string &elementId, int key, bool shiftKey
         }
         if (ctrlKey) step *= 7;
         interface->AdjustPitchByOffset(step);
-        return true;
     }
+    if (element->HasInterface(INTERFACE_DURATION)) {
+        DurationInterface *interface = element->GetDurationInterface();
+        assert(interface);
+        switch (key) {
+            case KEY_LEFT: interface->DecreaseCMNDuration(); break;
+            case KEY_RIGHT: interface->IncreaseCMNDuration(); break;
+            default: break;
+        }
+    }
+
     return true;
 }
 
