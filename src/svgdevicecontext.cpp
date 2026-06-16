@@ -49,6 +49,7 @@ SvgDeviceContext::SvgDeviceContext(const std::string &docId) : DeviceContext(SVG
     m_vrvTextFontFallback = false;
 
     m_mmOutput = false;
+    m_showHidden = false;
     m_svgBoundingBoxes = false;
     m_svgContentBoundingBoxes = false;
     m_svgViewBox = false;
