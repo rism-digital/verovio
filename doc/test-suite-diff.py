@@ -43,7 +43,7 @@ def start_webpage():
 
 def end_webpage(html, body, htmlOutFile):
     js = """
-    $(document).ready(function(){ 
+    $(document).ready(function(){
         $(".nav-tabs a").click(function(e){
             e.preventDefault();
             $(this).tab('show');
@@ -130,6 +130,8 @@ if __name__ == "__main__":
             pngFile2 = os.path.join(path_in2, item1, name + '.png')
             jsonFile1 = os.path.join(path_in1, item1, name + '.json')
             jsonFile2 = os.path.join(path_in2, item1, name + '.json')
+            midiFile1 = os.path.join(path_in1, item1, name + '.mid')
+            midiFile2 = os.path.join(path_in2, item1, name + '.mid')
             pngFileOut = os.path.join(path_out, item1, name + '.png')
             pngFile1Out = os.path.join(path_out, item1, name + '.after.png')
             pngFile2Out = os.path.join(path_out, item1, name + '.before.png')
@@ -139,6 +141,11 @@ if __name__ == "__main__":
             timeMap2 = json.load(open(jsonFile2, 'r'))
             if jsondiff(timeMap1, timeMap2) != 1:
                 print(f'::warning title=changes in time map detected::{name} produced a different time map')
+
+            midi1 = open(midiFile1, 'rb').read()
+            midi2 = open(midiFile2, 'rb').read()
+            if (midi1 != midi2):
+                print(f'::warning title=changes in MIDI detected::{name} produced a different MIDI file')
 
             diffValue = pngdiff(pngFile1, pngFile2, delete_diff_file=True)
             if (diffValue > (args.threshold / 100.0)):

@@ -108,6 +108,7 @@ if __name__ == '__main__':
             svgFile = os.path.join(path2, item1, name + '.svg')
             pngFile = os.path.join(path2, item1, name + '.png')
             timeMapFile = os.path.join(path2, item1, name + '.json')
+            midiFile = os.path.join(path2, item1, name + '.mid')
 
             # parse the MEI file
             if ext == '.mei':
@@ -129,5 +130,7 @@ if __name__ == '__main__':
             svg2png(bytestring=svgString, scale=2, write_to=pngFile)
             # create time map
             tk.renderToTimemapFile(timeMapFile)
+            # create MIDI file
+            tk.renderToMIDIFile(midiFile)
             tk.resetOptions()
             options.clear()
