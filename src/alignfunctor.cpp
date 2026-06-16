@@ -60,6 +60,8 @@ AlignHorizontallyFunctor::AlignHorizontallyFunctor(Doc *doc) : DocFunctor(doc)
 
 FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
 {
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     m_currentParams.mensur = layer->GetCurrentMensur();
     m_currentParams.meterSig = layer->GetCurrentMeterSig();
     m_currentParams.proport = layer->GetCurrentProport();
@@ -77,12 +79,12 @@ FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
     }
 
     if (layer->GetStaffDefClef()) {
-        if (layer->GetStaffDefClef()->GetVisible() != BOOLEAN_false) {
+        if (showHidden || layer->GetStaffDefClef()->GetVisible() != BOOLEAN_false) {
             this->VisitClef(layer->GetStaffDefClef());
         }
     }
     if (layer->GetStaffDefKeySig()) {
-        if (layer->GetStaffDefKeySig()->GetVisible() != BOOLEAN_false) {
+        if (showHidden || layer->GetStaffDefKeySig()->GetVisible() != BOOLEAN_false) {
             this->VisitKeySig(layer->GetStaffDefKeySig());
         }
     }
@@ -95,7 +97,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
         this->ResetCode();
     }
     else if (layer->GetStaffDefMeterSig()) {
-        if (layer->GetStaffDefMeterSig()->GetVisible() != BOOLEAN_false) {
+        if (showHidden || layer->GetStaffDefMeterSig()->GetVisible() != BOOLEAN_false) {
             this->VisitMeterSig(layer->GetStaffDefMeterSig());
         }
     }
