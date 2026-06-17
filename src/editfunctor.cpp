@@ -28,14 +28,20 @@ CursorFunctor::CursorFunctor(Layer *layer, LayerElement *position) : Functor()
     m_layer = layer;
     m_position = position;
     m_cursor = NULL;
+    m_previous = NULL;
+}
+
+CursorFunctor::~CursorFunctor()
+{
+    if (m_previous) delete m_previous;
 }
 
 FunctorCode CursorFunctor::VisitLayer(Layer *layer)
 {
     if (layer->HasCursor()) {
         // Store the values for when moving to the next layer
-        m_previous = *layer->GetCursor();
-        m_previous.CloneReset();
+        m_previous = vrv_cast<Cursor *>(layer->GetCursor()->Clone());
+        m_previous->CloneReset();
     }
 
     if (layer != m_layer) {
@@ -43,7 +49,17 @@ FunctorCode CursorFunctor::VisitLayer(Layer *layer)
     }
     else {
         m_cursor = new Cursor();
-        (*m_cursor) = m_previous;
+        if (m_previous) {
+            (*m_cursor) = (*m_previous);
+        }
+        else {
+            // Default it G2 clef
+            int clefLocOffset = (layer->GetCurrentClef()) ? layer->GetCurrentClef()->GetClefLocOffset() : -4;
+            // Place it on loc 4 (middle line assuming five lines for now)
+            auto [pname, oct] = PitchInterface::CalcPitch(4, clefLocOffset);
+            m_cursor->SetPname(pname);
+            m_cursor->SetOct(oct);
+        }
         if (m_position) {
             m_cursor->SetPosition(m_position);
             if (m_position->Is(NOTE)) {

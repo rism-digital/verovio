@@ -27,7 +27,7 @@ public:
      */
     ///@{
     CursorFunctor(Layer *layer, LayerElement *position);
-    virtual ~CursorFunctor() = default;
+    virtual ~CursorFunctor();
 
     /*
      * Abstract base implementation
@@ -49,7 +49,7 @@ private:
     Layer *m_layer;
     LayerElement *m_position;
     Cursor *m_cursor;
-    Cursor m_previous;
+    Cursor *m_previous;
 };
 
 //----------------------------------------------------------------------------
