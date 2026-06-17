@@ -6,6 +6,11 @@ on:
     tags: ["v*", "version-*"]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  actions: read
+  packages: read
+
 env:
   PACKAGE_NAME: verovio
 
