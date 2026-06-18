@@ -1,4 +1,6 @@
 import argparse
+import difflib
+import filecmp
 import json
 import os
 
@@ -6,6 +8,7 @@ import lxml.etree as etree
 import PIL.Image as Image
 import PIL.ImageChops as ImageChops
 import PIL.ImageOps as ImageOps
+import py_midicsv as pm
 from diffimg import diff as pngdiff
 from jsondiff import similarity as jsondiff
 from xmldiff.main import diff_trees as xmldiff
@@ -87,6 +90,7 @@ if __name__ == "__main__":
     totalChanges = 0
     categoryChanges = 0
     log = []
+    log_midi = []
 
     path_in1 = args.input_dir1
     path_in2 = args.input_dir2
@@ -142,10 +146,12 @@ if __name__ == "__main__":
             if jsondiff(timeMap1, timeMap2) != 1:
                 print(f'::warning title=changes in time map detected::{name} produced a different time map')
 
-            midi1 = open(midiFile1, 'rb').read()
-            midi2 = open(midiFile2, 'rb').read()
-            if (midi1 != midi2):
+            if not filecmp.cmp(midiFile1, midiFile2, shallow=False):
                 print(f'::warning title=changes in MIDI detected::{name} produced a different MIDI file')
+                csv1 = pm.midi_to_csv(midiFile1)
+                csv2 = pm.midi_to_csv(midiFile2)
+                diff = difflib.unified_diff(csv1, csv2, fromfile=midiFile1, tofile=midiFile2)
+                log_midi.append("****** {}:\n{}".format(item1, '\n'.join(list(diff))))
 
             diffValue = pngdiff(pngFile1, pngFile2, delete_diff_file=True)
             if (diffValue > (args.threshold / 100.0)):
@@ -237,4 +243,10 @@ if __name__ == "__main__":
         with open(logFileOut, 'w') as f:
             f.write("\n%s\n" % text2.text)
             for item in log:
+                f.write("%s\n" % item)
+
+    if log_midi:
+        logMidiFileOut = os.path.join(path_out, 'log_midi.md')
+        with open(logMidiFileOut, 'w') as f:
+            for item in log_midi:
                 f.write("%s\n" % item)
