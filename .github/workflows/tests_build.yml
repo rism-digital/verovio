@@ -110,7 +110,7 @@ jobs:
           ${{ github.workspace }}/.venv-pr/bin/python doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/musicxmlTestSuite ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/
 
       - name: Compare the tests
-        working-directory: ${{ github.workspace }}/${{ env.DEV_DIR }}/doc
+        working-directory: ${{ github.workspace }}/${{ env.PR_DIR }}/doc
         run: |
           ${{ github.workspace }}/.venv-pr/bin/python ./test-suite-diff.py ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/ ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/ ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
           ls -al
