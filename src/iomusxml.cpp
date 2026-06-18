@@ -3631,7 +3631,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         breath->SetPlace(
             breath->AttPlacementRelStaff::StrToStaffrel(xmlBreath.node().attribute("placement").as_string()));
         breath->SetColor(xmlBreath.node().attribute("color").as_string());
-        breath->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 0.5);
+        breath->SetTstamp((double)(m_durTotal + duration) * (double)m_meterUnit / (double)(4 * m_ppq) - 0.1);
     }
 
     // caesura
