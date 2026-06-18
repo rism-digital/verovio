@@ -982,6 +982,8 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
         }
         m_midiFile->addEvent(m_midiTrack, midiEvent);
     }
+    midiEvent.makeTemperamentPythagorean(referencePitchClass);
+    m_midiFile->addEvent(m_midiTrack, midiEvent);
     // set tuning
     if (scoreDef->HasTuneHz()) {
         const double tuneHz = scoreDef->GetTuneHz();
