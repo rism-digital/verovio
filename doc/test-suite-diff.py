@@ -69,7 +69,7 @@ def end_webpage(html, body, htmlOutFile):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description='Examine diffrences in renderings of MEI scores')
+        description='Examine differences in renderings of MEI scores')
     parser.add_argument('input_dir1')
     parser.add_argument('input_dir2')
     parser.add_argument('output_dir')
@@ -150,7 +150,7 @@ if __name__ == "__main__":
                 print(f'::warning title=changes in MIDI detected::{name} produced a different MIDI file')
                 csv1 = pm.midi_to_csv(midiFile1)
                 csv2 = pm.midi_to_csv(midiFile2)
-                diff = difflib.unified_diff(csv1, csv2, fromfile=midiFile1, tofile=midiFile2)
+                diff = difflib.unified_diff(csv1, csv2, fromfile=midiFile1, tofile=midiFile2, n=0)
                 log_midi.append("****** {}:\n{}".format(item1, '\n'.join(list(diff))))
 
             diffValue = pngdiff(pngFile1, pngFile2, delete_diff_file=True)

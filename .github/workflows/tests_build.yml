@@ -127,14 +127,16 @@ jobs:
           name: test-suite-diff
           path: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
 
-      - name: Check existence of the log.md file
+      - name: Check existence of the log*.md files
         id: check_files
         uses: andstor/file-existence-action@v3
         with:
-          files: "${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md"
+          files: "${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md, ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log_midi.md"
 
       - name: Show the list of changes detected
         if: steps.check_files.outputs.files_exists == 'true'
         run: |
-          echo "This is the list of tests for which a change has been detected:"
+          echo "This is the list of tests for which a PNG change has been detected:"
           cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md
+          echo "This is the list of tests for which a MIDI change has been detected:"
+          cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log_midi.md
