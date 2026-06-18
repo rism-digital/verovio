@@ -112,7 +112,7 @@ jobs:
       - name: Compare the tests
         working-directory: ${{ github.workspace }}/${{ env.DEV_DIR }}/doc
         run: |
-          ${{ github.workspace }}/.venv-dev/bin/python ./test-suite-diff.py ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/ ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/ ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
+          ${{ github.workspace }}/.venv-pr/bin/python ./test-suite-diff.py ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/ ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/ ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
           ls -al
 
       - name: Round-trip evaluation

@@ -982,7 +982,6 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
         }
         m_midiFile->addEvent(m_midiTrack, midiEvent);
     }
-    LogWarning("Injecting Pythagorean Temperament...");
     midiEvent.makeTemperamentPythagorean(referencePitchClass);
     m_midiFile->addEvent(m_midiTrack, midiEvent);
     // set tuning

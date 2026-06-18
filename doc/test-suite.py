@@ -131,7 +131,6 @@ if __name__ == '__main__':
             # create time map
             tk.renderToTimemapFile(timeMapFile)
             # create MIDI file
-            print('Rendering to MIDI')
             tk.renderToMIDIFile(midiFile)
             tk.resetOptions()
             options.clear()
