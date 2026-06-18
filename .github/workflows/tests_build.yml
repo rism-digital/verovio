@@ -136,7 +136,13 @@ jobs:
       - name: Show the list of changes detected
         if: steps.check_files.outputs.files_exists == 'true'
         run: |
-          echo "This is the list of tests for which a PNG change has been detected:"
-          cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md
-          echo "This is the list of tests for which a MIDI change has been detected:"
-          cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log_midi.md
+          if [ -e ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md ]
+          then
+            echo "This is the list of tests for which a PNG change has been detected:"
+            cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md
+          fi
+          if [ -e ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log_midi.md ]
+          then
+            echo "This is the list of tests for which a MIDI change has been detected:"
+            cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log_midi.md
+          fi
