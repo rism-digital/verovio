@@ -110,9 +110,9 @@ jobs:
           ${{ github.workspace }}/.venv-pr/bin/python doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/musicxmlTestSuite ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/
 
       - name: Compare the tests
-        working-directory: ${{ github.workspace }}/${{ env.PR_DIR }}/doc
+        working-directory: ${{ github.workspace }}/${{ env.DEV_DIR }}/doc
         run: |
-          ${{ github.workspace }}/.venv-pr/bin/python ./test-suite-diff.py ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/ ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/ ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
+          ${{ github.workspace }}/.venv-dev/bin/python ./test-suite-diff.py ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/ ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/ ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
           ls -al
 
       - name: Round-trip evaluation
@@ -127,14 +127,7 @@ jobs:
           name: test-suite-diff
           path: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
 
-      - name: Check existence of the log*.md files
-        id: check_files
-        uses: andstor/file-existence-action@v3
-        with:
-          files: "${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log*.md"
-
       - name: Show the list of changes detected
-        if: steps.check_files.outputs.files_exists == 'true'
         run: |
           if [ -e ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md ]
           then
