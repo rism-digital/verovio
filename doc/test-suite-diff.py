@@ -151,7 +151,8 @@ if __name__ == "__main__":
                 csv1 = pm.midi_to_csv(midiFile1)
                 csv2 = pm.midi_to_csv(midiFile2)
                 diff = difflib.unified_diff(csv1, csv2, fromfile=midiFile1, tofile=midiFile2, n=0)
-                log_midi.append("****** {}:\n{}".format(item1, ''.join(list(diff))))
+                diff_str = ''.join(diff)
+                log_midi.append(f'****** {item1}:\n{diff_str}')
 
             diffValue = pngdiff(pngFile1, pngFile2, delete_diff_file=True)
             if (diffValue > (args.threshold / 100.0)):
