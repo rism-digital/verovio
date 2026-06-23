@@ -48,11 +48,12 @@ FunctorCode CursorFunctor::VisitLayer(Layer *layer)
         layer->ResetCursor();
     }
     else {
-        m_cursor = new Cursor();
         if (m_previous) {
-            (*m_cursor) = (*m_previous);
+            m_cursor = vrv_cast<Cursor *>(m_previous->Clone());
+            m_cursor->CloneReset();
         }
         else {
+            m_cursor = new Cursor();
             // Default it G2 clef
             int clefLocOffset = (layer->GetCurrentClef()) ? layer->GetCurrentClef()->GetClefLocOffset() : -4;
             // Place it on loc 4 (middle line assuming five lines for now)
@@ -60,6 +61,7 @@ FunctorCode CursorFunctor::VisitLayer(Layer *layer)
             m_cursor->SetPname(pname);
             m_cursor->SetOct(oct);
         }
+        assert(m_cursor);
         if (m_position) {
             m_cursor->SetPosition(m_position);
             if (m_position->Is(NOTE)) {
