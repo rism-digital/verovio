@@ -448,6 +448,19 @@ void EditorToolkitShared::SetEditStatus()
         if (!m_selectionSecondaryId.empty()) selection.import("secondaryId", m_selectionSecondaryId);
         m_editStatus << "selection" << selection;
     }
+    if (this->InsertMode()) {
+        jsonxx::Object insertion;
+        insertion.import("oct", (m_cursor->HasOct() ? static_cast<int>(m_cursor->GetOct()) : 4));
+        insertion.import("pname", (m_cursor->HasPname() ? m_cursor->AttPitch::PitchnameToStr(m_cursor->GetPname()): "c"));
+        insertion.import("dur", (m_cursor->HasDur() ? m_cursor->AttDurationLog::DurationToStr(m_cursor->GetDur()): "4"));
+        insertion.import("dots", (m_cursor->HasDots()) ? m_cursor->GetDots() : 0);
+        insertion.import("dotLock", false);
+        insertion.import("chordMode", false);
+        insertion.import("restMode", false);
+        insertion.import("accid", (m_cursor->HasAccid() ? m_cursor->GetAccidElement()->AttAccidental::AccidentalWrittenToStr(m_cursor->GetAccid()) : ""));
+        insertion.import("accidImplicit", m_cursor->IsAccidImplicit());
+        m_editStatus << "insertion" << insertion;
+    }
 }
 
 std::string EditorToolkitShared::GetCurrentState()
@@ -698,6 +711,8 @@ bool EditorToolkitShared::KeyDown(std::string &elementId, int key, bool shiftKey
             default: break;
         }
     }
+    
+    this->SetEditStatus();
 
     return true;
 }
@@ -801,10 +816,17 @@ bool EditorToolkitShared::Select(std::string &elementId, bool secondary)
 
 bool EditorToolkitShared::Set(std::string &elementId, const std::string &attribute, const std::string &value)
 {
-    if (this->InsertMode()) return true;
+    static const std::array<const char *, 4> allowCursor = {"oct", "pname", "dur", "accid"};
+    
+    // Restrict set action on cursor
+    if (this->InsertMode() && (std::find(allowCursor.begin(), allowCursor.end(), attribute) == allowCursor.end())) return true;
 
-    Object *element = this->ResolveElement(elementId);
+    Object *element = (m_cursor) ? m_cursor : this->ResolveElement(elementId);
     if (!element) return false;
+    
+    if (m_cursor && attribute == "accid") {
+        element = m_cursor->GetAccidElement();
+    }
 
     bool success = false;
     if (element->Is(TEXT) && (attribute == "text")) {
@@ -879,6 +901,8 @@ bool EditorToolkitShared::Set(std::string &elementId, const std::string &attribu
     else if (AttModule::SetVisual(element, attribute, value)) {
         success = true;
     }
+    
+    this->SetEditStatus();
 
     return success;
 }
