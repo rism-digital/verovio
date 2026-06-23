@@ -33,10 +33,14 @@ class EditorToolkitCMN : public EditorToolkitShared {
 public:
     EditorToolkitCMN(Doc *doc, View *view);
     virtual ~EditorToolkitCMN();
+
+public:
+#ifndef NO_EDIT_SUPPORT
     bool ParseEditorCMNAction(const jsonxx::Object &json_editorAction);
 
+    bool UpdateCursor(int midi);
+
 protected:
-#ifndef NO_EDIT_SUPPORT
     /**
      * Parse JSON instructions for experimental editor functions.
      */
@@ -51,7 +55,7 @@ protected:
 
 private:
     struct MidiSpelling {
-        char pname;
+        data_PITCHNAME pname;
         data_ACCIDENTAL_WRITTEN accid;
     };
 

@@ -27,11 +27,11 @@ EditorToolkitCMN::EditorToolkitCMN(Doc *doc, View *view) : EditorToolkitShared(d
 
 EditorToolkitCMN::~EditorToolkitCMN() {}
 
+#ifndef NO_EDIT_SUPPORT
 bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
 {
     std::string action = json.get<jsonxx::String>("action");
-
-#ifndef NO_EDIT_SUPPORT
+    
     if (action == "insertMeasure") {
         std::string targetId;
         int number;
@@ -55,26 +55,25 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
         LogWarning("Could not parse the insertNote action");
     }
     return false;
-
-#endif
-    return false;
 }
-
-#ifndef NO_EDIT_SUPPORT
 
 EditorToolkitCMN::MidiSpelling EditorToolkitCMN::SpellMidi(int midi, const data_KEYSIGNATURE &keySig)
 {
     static constexpr EditorToolkitCMN::MidiSpelling sharpTable[12]
-        = { { 'c', ACCIDENTAL_WRITTEN_NONE }, { 'c', ACCIDENTAL_WRITTEN_s }, { 'd', ACCIDENTAL_WRITTEN_NONE },
-              { 'd', ACCIDENTAL_WRITTEN_s }, { 'e', ACCIDENTAL_WRITTEN_NONE }, { 'f', ACCIDENTAL_WRITTEN_NONE },
-              { 'f', ACCIDENTAL_WRITTEN_s }, { 'g', ACCIDENTAL_WRITTEN_NONE }, { 'g', ACCIDENTAL_WRITTEN_s },
-              { 'a', ACCIDENTAL_WRITTEN_NONE }, { 'a', ACCIDENTAL_WRITTEN_s }, { 'b', ACCIDENTAL_WRITTEN_NONE } };
+        = { { PITCHNAME_c, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_c, ACCIDENTAL_WRITTEN_s },
+              { PITCHNAME_d, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_d, ACCIDENTAL_WRITTEN_s },
+              { PITCHNAME_e, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_f, ACCIDENTAL_WRITTEN_NONE },
+              { PITCHNAME_f, ACCIDENTAL_WRITTEN_s }, { PITCHNAME_g, ACCIDENTAL_WRITTEN_NONE },
+              { PITCHNAME_g, ACCIDENTAL_WRITTEN_s }, { PITCHNAME_a, ACCIDENTAL_WRITTEN_NONE },
+              { PITCHNAME_a, ACCIDENTAL_WRITTEN_s }, { PITCHNAME_b, ACCIDENTAL_WRITTEN_NONE } };
 
     static constexpr EditorToolkitCMN::MidiSpelling flatTable[12]
-        = { { 'c', ACCIDENTAL_WRITTEN_NONE }, { 'd', ACCIDENTAL_WRITTEN_f }, { 'd', ACCIDENTAL_WRITTEN_NONE },
-              { 'e', ACCIDENTAL_WRITTEN_f }, { 'e', ACCIDENTAL_WRITTEN_NONE }, { 'f', ACCIDENTAL_WRITTEN_NONE },
-              { 'f', ACCIDENTAL_WRITTEN_s }, { 'g', ACCIDENTAL_WRITTEN_NONE }, { 'a', ACCIDENTAL_WRITTEN_f },
-              { 'a', ACCIDENTAL_WRITTEN_NONE }, { 'b', ACCIDENTAL_WRITTEN_f }, { 'b', ACCIDENTAL_WRITTEN_NONE } };
+        = { { PITCHNAME_c, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_d, ACCIDENTAL_WRITTEN_f },
+              { PITCHNAME_d, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_e, ACCIDENTAL_WRITTEN_f },
+              { PITCHNAME_e, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_f, ACCIDENTAL_WRITTEN_NONE },
+              { PITCHNAME_f, ACCIDENTAL_WRITTEN_s }, { PITCHNAME_g, ACCIDENTAL_WRITTEN_NONE },
+              { PITCHNAME_a, ACCIDENTAL_WRITTEN_f }, { PITCHNAME_a, ACCIDENTAL_WRITTEN_NONE },
+              { PITCHNAME_b, ACCIDENTAL_WRITTEN_f }, { PITCHNAME_b, ACCIDENTAL_WRITTEN_NONE } };
 
     int pc = ((midi % 12) + 12) % 12;
     assert(pc >= 0 && pc > 12);
@@ -311,6 +310,21 @@ bool EditorToolkitCMN::InsertNoteInChordMode(const std::string &targetId, data_P
 
     this->ClearContext();
     this->SetEditStatus();
+
+    return true;
+}
+
+bool EditorToolkitCMN::UpdateCursor(int midi)
+{
+    assert(this->InsertMode() && midi != VRV_UNSET);
+
+    const Layer *layer = vrv_cast<Layer *>(m_cursor->GetParent());
+    data_KEYSIGNATURE keySig;
+    if (layer && layer->GetCurrentKeySig()) keySig = layer->GetCurrentKeySig()->ConvertToSig();
+    MidiSpelling spelling = this->SpellMidi(midi, keySig);
+    m_cursor->SetPname(spelling.pname);
+    m_cursor->SetAccid(spelling.accid);
+    m_cursor->SetOct(midi / 12 - 1);
 
     return true;
 }

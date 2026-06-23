@@ -152,15 +152,6 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         }
         LogWarning("Could not parse the context action");
     }
-    else if (action == "cursor") {
-        bool setCursor;
-        std::string elementId;
-        if (this->ParseCursorAction(json.get<jsonxx::Object>("param"), setCursor, elementId)) {
-            this->PrepareUndo();
-            return (this->Cursor(setCursor, elementId));
-        }
-        LogWarning("Could not parse the cursor action");
-    }
     else if (action == "delete") {
         std::string elementId;
         bool backspace;
@@ -251,6 +242,14 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
             }
         }
     }
+    else if (action == "resetCursor") {
+        bool maintainChordInput;
+        if (this->ParseResetCursorAction(json.get<jsonxx::Object>("param"), maintainChordInput)) {
+            this->PrepareUndo();
+            return (this->ResetCursor(maintainChordInput));
+        }
+        LogWarning("Could not parse the resetCursor action");
+    }
     else if (action == "select") {
         std::string elementId;
         bool secondary;
@@ -266,6 +265,28 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         }
         LogWarning("Could not parse the set action");
     }
+    else if (action == "setCursor") {
+        std::string elementId;
+        Cursor::InputMode inputMode;
+        bool chordInput;
+        if (this->ParseSetCursorAction(json.get<jsonxx::Object>("param"), elementId, inputMode, chordInput)) {
+            this->PrepareUndo();
+            return (this->SetCursor(elementId, inputMode, chordInput));
+        }
+        LogWarning("Could not parse the setCursor action");
+    }
+    else if (action == "updateCursor") {
+        data_PITCHNAME pname;
+        int oct;
+        data_ACCIDENTAL_WRITTEN accid;
+        data_DURATION dur;
+        int midi;
+        if (this->ParseUpdateCursorAction(json.get<jsonxx::Object>("param"), pname, oct, accid, dur, midi)) {
+            this->PrepareUndo();
+            return (this->UpdateCursor(pname, oct, accid, dur, midi));
+        }
+        LogWarning("Could not parse the updateCursor action");
+    }
     else {
         LogWarning("Unknown action type '%s'.", action.c_str());
     }
@@ -277,18 +298,6 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
 }
 
 #ifndef NO_EDIT_SUPPORT
-bool EditorToolkitShared::ParseCursorAction(const jsonxx::Object &param, bool &setCursor, std::string &elementId)
-{
-    setCursor = false;
-    elementId = "";
-
-    if (!param.has<jsonxx::Boolean>("setCursor")) return false;
-    setCursor = param.get<jsonxx::Boolean>("setCursor");
-    if (param.has<jsonxx::String>("elementId")) elementId = param.get<jsonxx::String>("elementId");
-
-    return true;
-}
-
 bool EditorToolkitShared::ParseContextAction(
     const jsonxx::Object &param, std::string &elementId, bool &scores, bool &sections)
 {
@@ -390,6 +399,16 @@ bool EditorToolkitShared::ParsePropertiesAction(const jsonxx::Object &param, std
     return true;
 }
 
+bool EditorToolkitShared::ParseResetCursorAction(const jsonxx::Object &param, bool &maintainChordInput)
+{
+    maintainChordInput = false;
+
+    if (!param.has<jsonxx::Boolean>("maintainChordInput")) return false;
+    maintainChordInput = param.get<jsonxx::Boolean>("maintainChordInput");
+
+    return true;
+}
+
 bool EditorToolkitShared::ParseSelectAction(const jsonxx::Object &param, std::string &elementId, bool &secondary)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
@@ -410,6 +429,52 @@ bool EditorToolkitShared::ParseSetAction(
     attribute = param.get<jsonxx::String>("attribute");
     if (!param.has<jsonxx::String>("value")) return false;
     value = param.get<jsonxx::String>("value");
+    return true;
+}
+
+bool EditorToolkitShared::ParseSetCursorAction(
+    const jsonxx::Object &param, std::string &elementId, Cursor::InputMode &inputMode, bool &chordInput)
+{
+    elementId = "";
+    inputMode = Cursor::PITCH_FIRST;
+    chordInput = false;
+
+    if (param.has<jsonxx::String>("elementId")) elementId = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::String>("inputMode")) return false;
+    inputMode = (param.get<jsonxx::String>("inputMode") == "pitchFirst") ? Cursor::PITCH_FIRST : Cursor::DURATION_FIRST;
+    if (!param.has<jsonxx::Boolean>("chordInput")) return false;
+    chordInput = param.get<jsonxx::Boolean>("chordInput");
+
+    return true;
+}
+
+bool EditorToolkitShared::ParseUpdateCursorAction(const jsonxx::Object &param, data_PITCHNAME &pname, int &oct,
+    data_ACCIDENTAL_WRITTEN &accid, data_DURATION &dur, int &midi)
+{
+    pname = PITCHNAME_NONE;
+    oct = VRV_UNSET;
+    accid = ACCIDENTAL_WRITTEN_NONE;
+    dur = DURATION_NONE;
+    midi = VRV_UNSET;
+    Note noteConverter;
+    Accid accidConverter;
+
+    if (!this->InsertMode()) return true;
+
+    if (m_cursor->GetInputMode() == Cursor::PITCH_FIRST) {
+        if (param.has<jsonxx::String>("pname"))
+            pname = noteConverter.AttPitch::StrToPitchname(param.get<jsonxx::String>("pname"));
+        if (param.has<jsonxx::Number>("oct")) oct = param.get<jsonxx::Number>("oct");
+        if (param.has<jsonxx::Number>("midi")) midi = param.get<jsonxx::Number>("midi");
+        LogInfo("%c %d %d", pname, oct, midi);
+    }
+    else {
+        if (param.has<jsonxx::String>("dur"))
+            dur = noteConverter.AttPitch::StrToDuration(param.get<jsonxx::String>("dur"));
+    }
+    if (param.has<jsonxx::String>("accid"))
+        accid = accidConverter.AttAccidental::StrToAccidentalWritten(param.get<jsonxx::String>("accid"));
+
     return true;
 }
 
@@ -451,13 +516,18 @@ void EditorToolkitShared::SetEditStatus()
     if (this->InsertMode()) {
         jsonxx::Object insertion;
         insertion.import("oct", (m_cursor->HasOct() ? static_cast<int>(m_cursor->GetOct()) : 4));
-        insertion.import("pname", (m_cursor->HasPname() ? m_cursor->AttPitch::PitchnameToStr(m_cursor->GetPname()): "c"));
-        insertion.import("dur", (m_cursor->HasDur() ? m_cursor->AttDurationLog::DurationToStr(m_cursor->GetDur()): "4"));
+        insertion.import(
+            "pname", (m_cursor->HasPname() ? m_cursor->AttPitch::PitchnameToStr(m_cursor->GetPname()) : "c"));
+        insertion.import(
+            "dur", (m_cursor->HasDur() ? m_cursor->AttDurationLog::DurationToStr(m_cursor->GetDur()) : "4"));
         insertion.import("dots", (m_cursor->HasDots()) ? m_cursor->GetDots() : 0);
         insertion.import("dotLock", false);
         insertion.import("chordMode", false);
         insertion.import("restMode", false);
-        insertion.import("accid", (m_cursor->HasAccid() ? m_cursor->GetAccidElement()->AttAccidental::AccidentalWrittenToStr(m_cursor->GetAccid()) : ""));
+        insertion.import("accid",
+            (m_cursor->HasAccid()
+                    ? m_cursor->GetAccidElement()->AttAccidental::AccidentalWrittenToStr(m_cursor->GetAccid())
+                    : ""));
         insertion.import("accidImplicit", m_cursor->IsAccidImplicit());
         m_editStatus << "insertion" << insertion;
     }
@@ -537,31 +607,57 @@ bool EditorToolkitShared::Chain(const jsonxx::Array &actions)
     return status;
 }
 
-bool EditorToolkitShared::Cursor(bool setCursor, std::string &elementId)
+bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode inputMode, bool chordInput)
 {
-    if (setCursor) {
-        Layer *layer = NULL;
-        LayerElement *position = NULL;
-        Object *element = this->ResolveElement(elementId);
-        if (element->Is(STAFF)) {
-            layer = vrv_cast<Layer *>(element->FindDescendantByType(LAYER));
-        }
-        else if (element->Is(LAYER)) {
-            layer = vrv_cast<Layer *>(element);
-        }
-        else if (element->IsLayerElement()) {
-            layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
-            position = vrv_cast<LayerElement *>(element);
-        }
-        CursorFunctor cursorFunctor(layer, position);
-        m_doc->Process(cursorFunctor);
-        m_cursor = cursorFunctor.GetCursor();
+    Layer *layer = NULL;
+    LayerElement *position = NULL;
+    Object *element = this->ResolveElement(elementId);
+    if (element->Is(STAFF)) {
+        layer = vrv_cast<Layer *>(element->FindDescendantByType(LAYER));
     }
-    else {
-        CursorFunctor cursorFunctor(NULL, NULL);
-        m_doc->Process(cursorFunctor);
-        m_cursor = NULL;
+    else if (element->Is(LAYER)) {
+        layer = vrv_cast<Layer *>(element);
     }
+    else if (element->IsLayerElement()) {
+        layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
+        position = vrv_cast<LayerElement *>(element);
+    }
+    CursorFunctor cursorFunctor(layer, position);
+    m_doc->Process(cursorFunctor);
+    m_cursor = cursorFunctor.GetCursor();
+
+    this->SetEditStatus();
+
+    return true;
+}
+
+bool EditorToolkitShared::UpdateCursor(
+    data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid, data_DURATION dur, int midi)
+{
+    if (!this->InsertMode()) return true;
+
+    if (pname != PITCHNAME_NONE && oct != VRV_UNSET) {
+        m_cursor->SetPname(pname);
+        m_cursor->SetOct(oct);
+        m_cursor->SetAccid(accid);
+    }
+    else if (dur != DURATION_NONE) {
+        m_cursor->SetDur(dur);
+    }
+    else if (midi != VRV_UNSET) {
+        EditorToolkitCMN *editorToolkitCMN = dynamic_cast<EditorToolkitCMN *>(this);
+        if (editorToolkitCMN) {
+            return editorToolkitCMN->UpdateCursor(midi);
+        }
+    }
+    return true;
+}
+
+bool EditorToolkitShared::ResetCursor(bool maintainChordInput)
+{
+    CursorFunctor cursorFunctor(NULL, NULL);
+    m_doc->Process(cursorFunctor);
+    m_cursor = NULL;
 
     this->SetEditStatus();
 
@@ -711,7 +807,7 @@ bool EditorToolkitShared::KeyDown(std::string &elementId, int key, bool shiftKey
             default: break;
         }
     }
-    
+
     this->SetEditStatus();
 
     return true;
@@ -816,14 +912,15 @@ bool EditorToolkitShared::Select(std::string &elementId, bool secondary)
 
 bool EditorToolkitShared::Set(std::string &elementId, const std::string &attribute, const std::string &value)
 {
-    static const std::array<const char *, 4> allowCursor = {"oct", "pname", "dur", "accid"};
-    
+    static const std::array<const char *, 4> allowCursor = { "oct", "pname", "dur", "accid" };
+
     // Restrict set action on cursor
-    if (this->InsertMode() && (std::find(allowCursor.begin(), allowCursor.end(), attribute) == allowCursor.end())) return true;
+    if (this->InsertMode() && (std::find(allowCursor.begin(), allowCursor.end(), attribute) == allowCursor.end()))
+        return true;
 
     Object *element = (m_cursor) ? m_cursor : this->ResolveElement(elementId);
     if (!element) return false;
-    
+
     if (m_cursor && attribute == "accid") {
         element = m_cursor->GetAccidElement();
     }
@@ -901,7 +998,7 @@ bool EditorToolkitShared::Set(std::string &elementId, const std::string &attribu
     else if (AttModule::SetVisual(element, attribute, value)) {
         success = true;
     }
-    
+
     this->SetEditStatus();
 
     return success;
@@ -1260,11 +1357,10 @@ void EditorToolkitShared::MoveCursor(Note *note)
         m_selectionId = object->GetID();
         m_chainedId = m_selectionId;
         m_selectionClassId = object->GetClassId();
-        this->Cursor(true, m_selectionId);
+        this->SetCursor(m_selectionId, m_cursor->GetInputMode(), false);
     }
     else {
-        std::string placeholder;
-        this->Cursor(false, placeholder);
+        this->ResetCursor(false);
     }
 }
 

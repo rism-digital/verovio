@@ -15,6 +15,7 @@
 
 //--------------------------------------------------------------------------------
 
+#include "cursor.h"
 #include "doc.h"
 #include "editortoolkit.h"
 #include "view.h"
@@ -46,7 +47,6 @@ protected:
      */
     ///@{
     bool Chain(const jsonxx::Array &actions);
-    bool ParseCursorAction(const jsonxx::Object &param, bool &setCursor, std::string &elementId);
     bool ParseContextAction(const jsonxx::Object &param, std::string &elementId, bool &scores, bool &sections);
     bool ParseDeleteAction(const jsonxx::Object &param, std::string &elementId, bool &backspace);
     bool ParseDragAction(const jsonxx::Object &param, std::string &elementId, int &x, int &y);
@@ -58,9 +58,15 @@ protected:
         const jsonxx::Object &param, std::string &elementName, std::string &startId, std::string &endId);
     bool ParseNavigate(const jsonxx::Object &param, std::string &elementId, int &direction);
     bool ParsePropertiesAction(const jsonxx::Object &param, std::string &scoreDef);
+    bool ParseResetCursorAction(const jsonxx::Object &param, bool &advance);
     bool ParseSelectAction(const jsonxx::Object &param, std::string &elementId, bool &secondary);
     bool ParseSetAction(
         const jsonxx::Object &param, std::string &elementId, std::string &attribute, std::string &value);
+    bool ParseSetCursorAction(
+        const jsonxx::Object &param, std::string &elementId, Cursor::InputMode &inputMode, bool &chordInput);
+    bool ParseUpdateCursorAction(const jsonxx::Object &param, data_PITCHNAME &pname, int &oct,
+        data_ACCIDENTAL_WRITTEN &accid, data_DURATION &dur, int &midi);
+
     ///@}
 
     void SetEditStatus();
@@ -77,7 +83,9 @@ protected:
      * Experimental editor functions.
      */
     ///@{
-    bool Cursor(bool setCursor, std::string &elementId);
+    bool SetCursor(std::string &elementId, Cursor::InputMode inputMode, bool chordInput);
+    bool UpdateCursor(data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid, data_DURATION dur, int midi);
+    bool ResetCursor(bool maintainChordInput);
     bool Delete(std::string &elementId, bool backspace);
     bool Drag(std::string &elementId, int x, int y);
     bool InsertControl(std::string &elementName, std::string &startId, std::string &endId);
