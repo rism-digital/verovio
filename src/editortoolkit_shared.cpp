@@ -895,7 +895,7 @@ bool EditorToolkitShared::Select(std::string &elementId, bool secondary)
 
 bool EditorToolkitShared::Set(std::string &elementId, const std::string &attribute, const std::string &value)
 {
-    static const std::array<const char *, 4> allowCursor = { "oct", "pname", "dur", "accid" };
+    static const std::array<const char *, 5> allowCursor = { "oct", "pname", "dots", "dur", "accid" };
 
     // Restrict set action on cursor
     if (this->InsertMode() && (std::find(allowCursor.begin(), allowCursor.end(), attribute) == allowCursor.end()))
