@@ -53,6 +53,8 @@ public:
     void SetAccid(data_ACCIDENTAL_WRITTEN accid);
     bool IsAccidImplicit() const { return m_isAccidImplicit; }
     void SetAccidImplicit(bool isAccidImplicit);
+    void SetAccidValue(const Accid *accid);
+    void GetAccidValue(Accid *accid);
 
     Accid *GetAccidElement() { return &m_accid; }
 

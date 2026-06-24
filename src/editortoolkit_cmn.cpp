@@ -200,6 +200,12 @@ bool EditorToolkitCMN::InsertNote(
     note->SetOct(oct);
     note->SetDur(dur);
 
+    if (m_cursor && m_cursor->HasAccid()) {
+        Accid *accid = new Accid();
+        m_cursor->GetAccidValue(accid);
+        note->AddChild(accid);
+    }
+
     if (previousElement) {
         targetContainer->InsertAfter(previousElement, note);
     }

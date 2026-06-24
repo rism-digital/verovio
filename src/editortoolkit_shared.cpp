@@ -769,6 +769,8 @@ bool EditorToolkitShared::KeyDown(std::string &elementId, int key, bool shiftKey
         }
         if (ctrlKey) step *= 7;
         interface->AdjustPitchByOffset(step);
+        // This will reset the accidental also for octave shifts
+        this->UpdatePitch(elementId, interface->GetPname(), interface->GetOct(), ACCIDENTAL_WRITTEN_NONE, VRV_UNSET);
     }
     if (element->HasInterface(INTERFACE_DURATION)) {
         DurationInterface *interface = element->GetDurationInterface();
@@ -985,6 +987,9 @@ bool EditorToolkitShared::UpdatePitch(
     // For elements whose y-position corresponds to a certain pitch
     if (!element->HasInterface(INTERFACE_PITCH)) return true;
 
+    const Layer *layer = vrv_cast<const Layer *>(element->GetFirstAncestor(LAYER));
+    assert(layer);
+
     PitchInterface *interface = element->GetPitchInterface();
 
     if (pname != PITCHNAME_NONE) {
@@ -993,18 +998,98 @@ bool EditorToolkitShared::UpdatePitch(
         if (m_cursor) m_cursor->SetAccid(accid);
     }
     else if (midi != VRV_UNSET) {
-        const Layer *layer = vrv_cast<Layer *>(m_cursor->GetParent());
         data_KEYSIGNATURE keySig;
-        if (layer && layer->GetCurrentKeySig()) keySig = layer->GetCurrentKeySig()->ConvertToSig();
+        if (layer->GetCurrentKeySig()) keySig = layer->GetCurrentKeySig()->ConvertToSig();
         MidiSpelling spelling = this->SpellMidi(midi, keySig);
         interface->SetPname(spelling.pname);
-        // m_cursor->SetAccid(spelling.accid);
+        accid = spelling.accid;
+        if (accid == ACCIDENTAL_WRITTEN_NONE) accid = ACCIDENTAL_WRITTEN_n;
         interface->SetOct(midi / 12 - 1);
+    }
+
+    if (!m_cursor) {
+        Accid *accid = vrv_cast<Accid *>(element->FindDescendantByType(ACCID, 1));
+        element->DeleteChild(accid);
+    }
+    else {
+        m_cursor->SetAccid(ACCIDENTAL_WRITTEN_NONE);
+        m_cursor->SetAccidImplicit(false);
+    }
+
+    const LayerElement *reference = vrv_cast<const LayerElement *>(element);
+    assert(reference);
+    data_ACCIDENTAL_WRITTEN previousAccid = this->GetAccidBefore(
+        (m_cursor ? m_cursor->GetPosition() : reference), interface->GetPname(), interface->GetOct());
+
+    if (previousAccid == ACCIDENTAL_WRITTEN_NONE) {
+        MapOfOctavedPitchAccid currentAccids;
+        if (layer->GetCurrentKeySig()) layer->GetCurrentKeySig()->FillMap(currentAccids);
+        const int octavedPitch = interface->GetPname() + interface->GetOct() * 7;
+        previousAccid = currentAccids.contains(octavedPitch) ? currentAccids.at(octavedPitch) : ACCIDENTAL_WRITTEN_NONE;
+    }
+
+    data_ACCIDENTAL_WRITTEN actualAccid = ACCIDENTAL_WRITTEN_NONE;
+    bool isImplicit = true;
+    if (accid != ACCIDENTAL_WRITTEN_NONE) {
+        if (accid != ACCIDENTAL_WRITTEN_n || previousAccid != ACCIDENTAL_WRITTEN_NONE) {
+            actualAccid = accid;
+            isImplicit = (accid == previousAccid);
+        }
+    }
+    else if (previousAccid != ACCIDENTAL_WRITTEN_NONE) {
+        actualAccid = previousAccid;
+    }
+    if (actualAccid != ACCIDENTAL_WRITTEN_NONE) {
+        if (m_cursor) {
+            m_cursor->SetAccid(actualAccid);
+            m_cursor->SetAccidImplicit(isImplicit);
+        }
+        else if (element->IsSupportedChild(ACCID)) {
+            Accid *accidElement = new Accid();
+            if (isImplicit) {
+                accidElement->SetAccidGes(Att::AccidentalWrittenToGestural(actualAccid));
+            }
+            else {
+                accidElement->SetAccid(actualAccid);
+            }
+            element->AddChild(accidElement);
+            this->ClearContext();
+        }
     }
 
     this->SetEditStatus();
 
     return true;
+}
+
+data_ACCIDENTAL_WRITTEN EditorToolkitShared::GetAccidBefore(const LayerElement *element, data_PITCHNAME pname, int oct)
+{
+    if (!element) return ACCIDENTAL_WRITTEN_NONE;
+
+    const Layer *layer = vrv_cast<const Layer *>(element->GetFirstAncestor(LAYER));
+    assert(layer);
+    ListOfConstObjects notes = layer->FindAllDescendantsByType(NOTE);
+    bool breakAtNext = false;
+    data_ACCIDENTAL_WRITTEN previous = ACCIDENTAL_WRITTEN_NONE;
+    for (auto &object : notes) {
+        const Note *note = vrv_cast<const Note *>(object);
+        assert(note);
+        // Still go through all the notes because it might be a chord
+        if (element->GetAlignment() == note->GetAlignment()) {
+            breakAtNext = true;
+        }
+        else if (breakAtNext) {
+            break;
+        }
+        if (note->GetPname() != pname || note->GetOct() != oct) continue;
+        const Accid *accid = note->GetDrawingAccid();
+        if (accid) {
+            previous
+                = (accid->HasAccidGes()) ? Att::AccidentalGesturalToWritten(accid->GetAccidGes()) : accid->GetAccid();
+        }
+    }
+
+    return previous;
 }
 
 bool EditorToolkitShared::ContextForScores(bool updateResponse)

@@ -115,6 +115,8 @@ protected:
 
     void MoveCursor(Note *note);
 
+    data_ACCIDENTAL_WRITTEN GetAccidBefore(const LayerElement *element, data_PITCHNAME pname, int oct);
+
     const Measure *GetPreviousMeasure(const Measure *measure);
     const Staff *GetPreviousStaff(const Staff *staff);
     const Layer *GetPreviousLayer(const Layer *layer);

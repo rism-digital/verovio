@@ -74,6 +74,31 @@ void Cursor::SetAccid(data_ACCIDENTAL_WRITTEN accid)
     this->SetAccidImplicit(false);
 }
 
+void Cursor::SetAccidValue(const Accid *accid)
+{
+    if (!accid) return;
+
+    if (accid->HasAccidGes()) {
+        this->SetAccid(Att::AccidentalGesturalToWritten(accid->GetAccidGes()));
+        this->SetAccidImplicit(true);
+    }
+    else if (accid->HasAccid()) {
+        this->SetAccid(accid->GetAccid());
+    }
+}
+
+void Cursor::GetAccidValue(Accid *accid)
+{
+    if (!accid || !this->HasAccid()) return;
+
+    if (this->IsAccidImplicit()) {
+        accid->SetAccidGes(Att::AccidentalWrittenToGestural(this->GetAccid()));
+    }
+    else {
+        accid->SetAccid(this->GetAccid());
+    }
+}
+
 void Cursor::SetCursorAlignment(Alignment *alignment)
 {
     this->SetAlignment(alignment);

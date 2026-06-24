@@ -65,10 +65,11 @@ FunctorCode CursorFunctor::VisitLayer(Layer *layer)
         if (m_position) {
             m_cursor->SetPosition(m_position);
             if (m_position->Is(NOTE)) {
-                Note *note = vrv_cast<Note *>(m_position);
+                const Note *note = vrv_cast<const Note *>(m_position);
                 assert(note);
                 m_cursor->SetPname(note->GetPname());
                 m_cursor->SetOct(note->GetOct());
+                m_cursor->SetAccidValue(note->GetDrawingAccid());
             }
         }
         layer->SetCursor(m_cursor);
