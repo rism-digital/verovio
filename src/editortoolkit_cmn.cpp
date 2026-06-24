@@ -31,7 +31,7 @@ EditorToolkitCMN::~EditorToolkitCMN() {}
 bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
 {
     std::string action = json.get<jsonxx::String>("action");
-    
+
     if (action == "insertMeasure") {
         std::string targetId;
         int number;
@@ -55,32 +55,6 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
         LogWarning("Could not parse the insertNote action");
     }
     return false;
-}
-
-EditorToolkitCMN::MidiSpelling EditorToolkitCMN::SpellMidi(int midi, const data_KEYSIGNATURE &keySig)
-{
-    static constexpr EditorToolkitCMN::MidiSpelling sharpTable[12]
-        = { { PITCHNAME_c, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_c, ACCIDENTAL_WRITTEN_s },
-              { PITCHNAME_d, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_d, ACCIDENTAL_WRITTEN_s },
-              { PITCHNAME_e, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_f, ACCIDENTAL_WRITTEN_NONE },
-              { PITCHNAME_f, ACCIDENTAL_WRITTEN_s }, { PITCHNAME_g, ACCIDENTAL_WRITTEN_NONE },
-              { PITCHNAME_g, ACCIDENTAL_WRITTEN_s }, { PITCHNAME_a, ACCIDENTAL_WRITTEN_NONE },
-              { PITCHNAME_a, ACCIDENTAL_WRITTEN_s }, { PITCHNAME_b, ACCIDENTAL_WRITTEN_NONE } };
-
-    static constexpr EditorToolkitCMN::MidiSpelling flatTable[12]
-        = { { PITCHNAME_c, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_d, ACCIDENTAL_WRITTEN_f },
-              { PITCHNAME_d, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_e, ACCIDENTAL_WRITTEN_f },
-              { PITCHNAME_e, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_f, ACCIDENTAL_WRITTEN_NONE },
-              { PITCHNAME_f, ACCIDENTAL_WRITTEN_s }, { PITCHNAME_g, ACCIDENTAL_WRITTEN_NONE },
-              { PITCHNAME_a, ACCIDENTAL_WRITTEN_f }, { PITCHNAME_a, ACCIDENTAL_WRITTEN_NONE },
-              { PITCHNAME_b, ACCIDENTAL_WRITTEN_f }, { PITCHNAME_b, ACCIDENTAL_WRITTEN_NONE } };
-
-    int pc = ((midi % 12) + 12) % 12;
-    assert(pc >= 0 && pc > 12);
-
-    bool flatKey = keySig.second == ACCIDENTAL_WRITTEN_f;
-
-    return flatKey ? flatTable[pc] : sharpTable[pc];
 }
 
 bool EditorToolkitCMN::ParseInsertMeasureAction(
@@ -310,21 +284,6 @@ bool EditorToolkitCMN::InsertNoteInChordMode(const std::string &targetId, data_P
 
     this->ClearContext();
     this->SetEditStatus();
-
-    return true;
-}
-
-bool EditorToolkitCMN::UpdateCursor(int midi)
-{
-    assert(this->InsertMode() && midi != VRV_UNSET);
-
-    const Layer *layer = vrv_cast<Layer *>(m_cursor->GetParent());
-    data_KEYSIGNATURE keySig;
-    if (layer && layer->GetCurrentKeySig()) keySig = layer->GetCurrentKeySig()->ConvertToSig();
-    MidiSpelling spelling = this->SpellMidi(midi, keySig);
-    m_cursor->SetPname(spelling.pname);
-    m_cursor->SetAccid(spelling.accid);
-    m_cursor->SetOct(midi / 12 - 1);
 
     return true;
 }

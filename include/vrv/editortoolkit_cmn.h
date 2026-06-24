@@ -38,8 +38,6 @@ public:
 #ifndef NO_EDIT_SUPPORT
     bool ParseEditorCMNAction(const jsonxx::Object &json_editorAction);
 
-    bool UpdateCursor(int midi);
-
 protected:
     /**
      * Parse JSON instructions for experimental editor functions.
@@ -52,14 +50,6 @@ protected:
     bool InsertMeasure(std::string &targetId, int number, bool insertBefore);
     bool InsertNote(const std::string &targetId, data_PITCHNAME pname, int oct, data_DURATION dur, bool chordMode);
     bool InsertNoteInChordMode(const std::string &targetId, data_PITCHNAME pname, int oct);
-
-private:
-    struct MidiSpelling {
-        data_PITCHNAME pname;
-        data_ACCIDENTAL_WRITTEN accid;
-    };
-
-    MidiSpelling SpellMidi(int midi, const data_KEYSIGNATURE &keySig);
 
 public:
     //

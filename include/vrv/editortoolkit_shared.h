@@ -64,8 +64,8 @@ protected:
         const jsonxx::Object &param, std::string &elementId, std::string &attribute, std::string &value);
     bool ParseSetCursorAction(
         const jsonxx::Object &param, std::string &elementId, Cursor::InputMode &inputMode, bool &chordInput);
-    bool ParseUpdateCursorAction(const jsonxx::Object &param, data_PITCHNAME &pname, int &oct,
-        data_ACCIDENTAL_WRITTEN &accid, data_DURATION &dur, int &midi);
+    bool ParseUpdatePitchAction(const jsonxx::Object &param, std::string &elementId, data_PITCHNAME &pname, int &oct,
+        data_ACCIDENTAL_WRITTEN &accid, int &midi);
 
     ///@}
 
@@ -84,7 +84,6 @@ protected:
      */
     ///@{
     bool SetCursor(std::string &elementId, Cursor::InputMode inputMode, bool chordInput);
-    bool UpdateCursor(data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid, data_DURATION dur, int midi);
     bool ResetCursor(bool maintainChordInput);
     bool Delete(std::string &elementId, bool backspace);
     bool Drag(std::string &elementId, int x, int y);
@@ -93,6 +92,8 @@ protected:
     bool Navigate(std::string &elementId, const int &direction);
     bool Select(std::string &elementId, bool secondary);
     bool Set(std::string &elementId, const std::string &attribute, const std::string &value);
+    bool UpdatePitch(std::string &elementId, data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid, int midi);
+
     ///@}
 
     void ClearContext();
@@ -132,6 +133,14 @@ protected:
     EditorTreeObject *m_scoreContext;
     EditorTreeObject *m_sectionContext;
     EditorTreeObject *m_currentContext;
+
+private:
+    struct MidiSpelling {
+        data_PITCHNAME pname;
+        data_ACCIDENTAL_WRITTEN accid;
+    };
+
+    MidiSpelling SpellMidi(int midi, const data_KEYSIGNATURE &keySig);
 };
 
 //----------------------------------------------------------------------------

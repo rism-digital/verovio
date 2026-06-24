@@ -275,17 +275,17 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         }
         LogWarning("Could not parse the setCursor action");
     }
-    else if (action == "updateCursor") {
+    else if (action == "updatePitch") {
+        std::string elementId;
         data_PITCHNAME pname;
         int oct;
         data_ACCIDENTAL_WRITTEN accid;
-        data_DURATION dur;
         int midi;
-        if (this->ParseUpdateCursorAction(json.get<jsonxx::Object>("param"), pname, oct, accid, dur, midi)) {
+        if (this->ParseUpdatePitchAction(json.get<jsonxx::Object>("param"), elementId, pname, oct, accid, midi)) {
             this->PrepareUndo();
-            return (this->UpdateCursor(pname, oct, accid, dur, midi));
+            return (this->UpdatePitch(elementId, pname, oct, accid, midi));
         }
-        LogWarning("Could not parse the updateCursor action");
+        LogWarning("Could not parse the updatePitch action");
     }
     else {
         LogWarning("Unknown action type '%s'.", action.c_str());
@@ -448,32 +448,26 @@ bool EditorToolkitShared::ParseSetCursorAction(
     return true;
 }
 
-bool EditorToolkitShared::ParseUpdateCursorAction(const jsonxx::Object &param, data_PITCHNAME &pname, int &oct,
-    data_ACCIDENTAL_WRITTEN &accid, data_DURATION &dur, int &midi)
+bool EditorToolkitShared::ParseUpdatePitchAction(const jsonxx::Object &param, std::string &elementId,
+    data_PITCHNAME &pname, int &oct, data_ACCIDENTAL_WRITTEN &accid, int &midi)
 {
     pname = PITCHNAME_NONE;
     oct = VRV_UNSET;
     accid = ACCIDENTAL_WRITTEN_NONE;
-    dur = DURATION_NONE;
     midi = VRV_UNSET;
     Note noteConverter;
     Accid accidConverter;
 
-    if (!this->InsertMode()) return true;
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    elementId = param.get<jsonxx::String>("elementId");
 
-    if (m_cursor->GetInputMode() == Cursor::PITCH_FIRST) {
-        if (param.has<jsonxx::String>("pname"))
-            pname = noteConverter.AttPitch::StrToPitchname(param.get<jsonxx::String>("pname"));
-        if (param.has<jsonxx::Number>("oct")) oct = param.get<jsonxx::Number>("oct");
-        if (param.has<jsonxx::Number>("midi")) midi = param.get<jsonxx::Number>("midi");
-        LogInfo("%c %d %d", pname, oct, midi);
-    }
-    else {
-        if (param.has<jsonxx::String>("dur"))
-            dur = noteConverter.AttPitch::StrToDuration(param.get<jsonxx::String>("dur"));
-    }
+    if (param.has<jsonxx::String>("pname"))
+        pname = noteConverter.AttPitch::StrToPitchname(param.get<jsonxx::String>("pname"));
+    if (param.has<jsonxx::Number>("oct")) oct = param.get<jsonxx::Number>("oct");
     if (param.has<jsonxx::String>("accid"))
         accid = accidConverter.AttAccidental::StrToAccidentalWritten(param.get<jsonxx::String>("accid"));
+    if (param.has<jsonxx::Number>("midi")) midi = param.get<jsonxx::Number>("midi");
+    LogInfo("%c %d %d", pname, oct, midi);
 
     return true;
 }
@@ -628,28 +622,6 @@ bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode in
 
     this->SetEditStatus();
 
-    return true;
-}
-
-bool EditorToolkitShared::UpdateCursor(
-    data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid, data_DURATION dur, int midi)
-{
-    if (!this->InsertMode()) return true;
-
-    if (pname != PITCHNAME_NONE && oct != VRV_UNSET) {
-        m_cursor->SetPname(pname);
-        m_cursor->SetOct(oct);
-        m_cursor->SetAccid(accid);
-    }
-    else if (dur != DURATION_NONE) {
-        m_cursor->SetDur(dur);
-    }
-    else if (midi != VRV_UNSET) {
-        EditorToolkitCMN *editorToolkitCMN = dynamic_cast<EditorToolkitCMN *>(this);
-        if (editorToolkitCMN) {
-            return editorToolkitCMN->UpdateCursor(midi);
-        }
-    }
     return true;
 }
 
@@ -1002,6 +974,37 @@ bool EditorToolkitShared::Set(std::string &elementId, const std::string &attribu
     this->SetEditStatus();
 
     return success;
+}
+
+bool EditorToolkitShared::UpdatePitch(
+    std::string &elementId, data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid, int midi)
+{
+    Object *element = (m_cursor) ? m_cursor : this->ResolveElement(elementId);
+    if (!element) return false;
+
+    // For elements whose y-position corresponds to a certain pitch
+    if (!element->HasInterface(INTERFACE_PITCH)) return true;
+
+    PitchInterface *interface = element->GetPitchInterface();
+
+    if (pname != PITCHNAME_NONE) {
+        interface->SetPname(pname);
+        if (oct != VRV_UNSET) interface->SetOct(oct);
+        if (m_cursor) m_cursor->SetAccid(accid);
+    }
+    else if (midi != VRV_UNSET) {
+        const Layer *layer = vrv_cast<Layer *>(m_cursor->GetParent());
+        data_KEYSIGNATURE keySig;
+        if (layer && layer->GetCurrentKeySig()) keySig = layer->GetCurrentKeySig()->ConvertToSig();
+        MidiSpelling spelling = this->SpellMidi(midi, keySig);
+        interface->SetPname(spelling.pname);
+        // m_cursor->SetAccid(spelling.accid);
+        interface->SetOct(midi / 12 - 1);
+    }
+
+    this->SetEditStatus();
+
+    return true;
 }
 
 bool EditorToolkitShared::ContextForScores(bool updateResponse)
@@ -1455,6 +1458,32 @@ const Layer *EditorToolkitShared::GetNextLayer(const Layer *layer)
 
     AttNIntegerComparison layerNComparison(LAYER, layer->GetN());
     return vrv_cast<const Layer *>(nextStaff->FindDescendantByComparison(&layerNComparison));
+}
+
+EditorToolkitShared::MidiSpelling EditorToolkitShared::SpellMidi(int midi, const data_KEYSIGNATURE &keySig)
+{
+    static constexpr EditorToolkitShared::MidiSpelling sharpTable[12]
+        = { { PITCHNAME_c, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_c, ACCIDENTAL_WRITTEN_s },
+              { PITCHNAME_d, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_d, ACCIDENTAL_WRITTEN_s },
+              { PITCHNAME_e, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_f, ACCIDENTAL_WRITTEN_NONE },
+              { PITCHNAME_f, ACCIDENTAL_WRITTEN_s }, { PITCHNAME_g, ACCIDENTAL_WRITTEN_NONE },
+              { PITCHNAME_g, ACCIDENTAL_WRITTEN_s }, { PITCHNAME_a, ACCIDENTAL_WRITTEN_NONE },
+              { PITCHNAME_a, ACCIDENTAL_WRITTEN_s }, { PITCHNAME_b, ACCIDENTAL_WRITTEN_NONE } };
+
+    static constexpr EditorToolkitShared::MidiSpelling flatTable[12]
+        = { { PITCHNAME_c, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_d, ACCIDENTAL_WRITTEN_f },
+              { PITCHNAME_d, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_e, ACCIDENTAL_WRITTEN_f },
+              { PITCHNAME_e, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_f, ACCIDENTAL_WRITTEN_NONE },
+              { PITCHNAME_f, ACCIDENTAL_WRITTEN_s }, { PITCHNAME_g, ACCIDENTAL_WRITTEN_NONE },
+              { PITCHNAME_a, ACCIDENTAL_WRITTEN_f }, { PITCHNAME_a, ACCIDENTAL_WRITTEN_NONE },
+              { PITCHNAME_b, ACCIDENTAL_WRITTEN_f }, { PITCHNAME_b, ACCIDENTAL_WRITTEN_NONE } };
+
+    int pc = ((midi % 12) + 12) % 12;
+    assert(pc >= 0 && pc > 12);
+
+    bool flatKey = keySig.second == ACCIDENTAL_WRITTEN_f;
+
+    return flatKey ? flatTable[pc] : sharpTable[pc];
 }
 
 //----------------------------------------------------------------------------
