@@ -787,6 +787,8 @@ bool EditorToolkitShared::KeyDown(std::string &elementId, int key, bool shiftKey
         switch (key) {
             case KEY_LEFT: interface->DecreaseCMNDuration(); break;
             case KEY_RIGHT: interface->IncreaseCMNDuration(); break;
+            case KEY_DOT:
+                interface->HasDots() ? interface->ResetAugmentDots() : interface->SetDots(1);
             default: break;
         }
     }

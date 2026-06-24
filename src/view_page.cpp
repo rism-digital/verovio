@@ -1631,7 +1631,7 @@ void View::DrawCursor(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
         if (cursor->HasDots()) {
             int dotsX = x + 2.8 * cursor->GetDrawingRadius(m_doc);
-            this->DrawDotsPart(dc, dotsX, y, 2, staff);
+            this->DrawDotsPart(dc, dotsX, y, cursor->HasDots(), staff);
         }
     }
     else {

@@ -206,6 +206,9 @@ bool EditorToolkitCMN::InsertNote(
         note->AddChild(accid);
         m_cursor->SetAccid(ACCIDENTAL_WRITTEN_NONE);
     }
+    if (m_cursor && m_cursor->HasDots()) {
+        note->SetDots(m_cursor->GetDots());
+    }
 
     if (previousElement) {
         targetContainer->InsertAfter(previousElement, note);
