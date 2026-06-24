@@ -606,10 +606,13 @@ bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode in
     Layer *layer = NULL;
     LayerElement *position = NULL;
     Object *element = this->ResolveElement(elementId);
+    bool updateAccid = false;
     if (element->Is(STAFF)) {
+        updateAccid = true;
         layer = vrv_cast<Layer *>(element->FindDescendantByType(LAYER));
     }
     else if (element->Is(LAYER)) {
+        updateAccid = true;
         layer = vrv_cast<Layer *>(element);
     }
     else if (element->IsLayerElement()) {
@@ -619,6 +622,12 @@ bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode in
     CursorFunctor cursorFunctor(layer, position);
     m_doc->Process(cursorFunctor);
     m_cursor = cursorFunctor.GetCursor();
+
+    // Get the accid from the layer key signature
+    if (m_cursor && updateAccid) {
+        std::string placeholder;
+        this->UpdatePitch(placeholder, m_cursor->GetPname(), m_cursor->GetOct(), ACCIDENTAL_WRITTEN_NONE, VRV_UNSET);
+    }
 
     this->SetEditStatus();
 
@@ -1013,7 +1022,6 @@ bool EditorToolkitShared::UpdatePitch(
     }
     else {
         m_cursor->SetAccid(ACCIDENTAL_WRITTEN_NONE);
-        m_cursor->SetAccidImplicit(false);
     }
 
     const LayerElement *reference = vrv_cast<const LayerElement *>(element);
@@ -1438,6 +1446,7 @@ void EditorToolkitShared::MoveCursor(Note *note)
         if (measureDuration == 0) measureDuration = 4;
         if ((position + duration) >= measureDuration) {
             object = this->GetNextLayer(layer);
+            m_cursor->SetAccidImplicit(false);
         }
     }
 

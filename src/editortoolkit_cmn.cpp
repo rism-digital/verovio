@@ -204,6 +204,7 @@ bool EditorToolkitCMN::InsertNote(
         Accid *accid = new Accid();
         m_cursor->GetAccidValue(accid);
         note->AddChild(accid);
+        m_cursor->SetAccid(ACCIDENTAL_WRITTEN_NONE);
     }
 
     if (previousElement) {

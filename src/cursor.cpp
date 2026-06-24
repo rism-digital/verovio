@@ -80,11 +80,11 @@ void Cursor::SetAccidValue(const Accid *accid)
 
     if (accid->HasAccidGes()) {
         this->SetAccid(Att::AccidentalGesturalToWritten(accid->GetAccidGes()));
-        this->SetAccidImplicit(true);
     }
     else if (accid->HasAccid()) {
         this->SetAccid(accid->GetAccid());
     }
+    this->SetAccidImplicit(true);
 }
 
 void Cursor::GetAccidValue(Accid *accid)
