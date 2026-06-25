@@ -33,24 +33,24 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
     std::string action = json.get<jsonxx::String>("action");
 
     if (action == "insertMeasure") {
-        std::string targetId;
+        std::string elementId;
         int number;
         bool insertBefore;
-        if (this->ParseInsertMeasureAction(json.get<jsonxx::Object>("param"), targetId, number, insertBefore)) {
+        if (this->ParseInsertMeasureAction(json.get<jsonxx::Object>("param"), elementId, number, insertBefore)) {
             this->PrepareUndo();
-            return (this->InsertMeasure(targetId, number, insertBefore));
+            return (this->InsertMeasure(elementId, number, insertBefore));
         }
         LogWarning("Could not parse the insertMeasure action");
     }
     else if (action == "insertNote") {
-        std::string targetId;
+        std::string elementId;
         data_PITCHNAME pname;
         int oct;
         data_DURATION dur;
         bool chordMode;
-        if (this->ParseInsertNoteAction(json.get<jsonxx::Object>("param"), targetId, pname, oct, dur, chordMode)) {
+        if (this->ParseInsertNoteAction(json.get<jsonxx::Object>("param"), elementId, pname, oct, dur, chordMode)) {
             this->PrepareUndo();
-            return (this->InsertNote(targetId, pname, oct, dur, chordMode));
+            return (this->InsertNote(elementId, pname, oct, dur, chordMode));
         }
         LogWarning("Could not parse the insertNote action");
     }
@@ -58,13 +58,13 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
 }
 
 bool EditorToolkitCMN::ParseInsertMeasureAction(
-    const jsonxx::Object &param, std::string &targetId, int &number, bool &insertBefore)
+    const jsonxx::Object &param, std::string &elementId, int &number, bool &insertBefore)
 {
     number = 0;
-    targetId = "";
+    elementId = "";
     insertBefore = false;
 
-    if (param.has<jsonxx::String>("targetId")) targetId = param.get<jsonxx::String>("targetId");
+    if (param.has<jsonxx::String>("elementId")) elementId = param.get<jsonxx::String>("elementId");
     if (!param.has<jsonxx::Number>("number")) return false;
     number = param.get<jsonxx::Number>("number");
     if (param.has<jsonxx::Boolean>("insertBefore")) insertBefore = param.get<jsonxx::Boolean>("insertBefore");
@@ -72,7 +72,7 @@ bool EditorToolkitCMN::ParseInsertMeasureAction(
     return true;
 }
 
-bool EditorToolkitCMN::ParseInsertNoteAction(const jsonxx::Object &param, std::string &targetId, data_PITCHNAME &pname,
+bool EditorToolkitCMN::ParseInsertNoteAction(const jsonxx::Object &param, std::string &elementId, data_PITCHNAME &pname,
     int &oct, data_DURATION &dur, bool &chordMode)
 {
     chordMode = false;
@@ -80,8 +80,8 @@ bool EditorToolkitCMN::ParseInsertNoteAction(const jsonxx::Object &param, std::s
     oct = VRV_UNSET;
     dur = DURATION_NONE;
     Note note;
-    if (!param.has<jsonxx::String>("targetId")) return false;
-    targetId = param.get<jsonxx::String>("targetId");
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    elementId = param.get<jsonxx::String>("elementId");
     if (!param.has<jsonxx::String>("pname")) return false;
     pname = note.AttPitch::StrToPitchname(param.get<jsonxx::String>("pname"));
     if (!param.has<jsonxx::Number>("oct")) return false;
@@ -96,9 +96,9 @@ bool EditorToolkitCMN::ParseInsertNoteAction(const jsonxx::Object &param, std::s
     return true;
 }
 
-bool EditorToolkitCMN::InsertMeasure(std::string &targetId, int number, bool insertBefore)
+bool EditorToolkitCMN::InsertMeasure(std::string &elementId, int number, bool insertBefore)
 {
-    bool endInsert = (targetId.empty());
+    bool endInsert = (elementId.empty());
     Measure *measure = NULL;
 
     int measureN = VRV_UNSET;
@@ -106,7 +106,7 @@ bool EditorToolkitCMN::InsertMeasure(std::string &targetId, int number, bool ins
         measure = vrv_cast<Measure *>(m_doc->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
     }
     else {
-        measure = vrv_cast<Measure *>(this->ResolveElement(targetId, false));
+        measure = vrv_cast<Measure *>(this->ResolveElement(elementId, false));
     }
 
     if (!measure) return false;
@@ -152,9 +152,9 @@ bool EditorToolkitCMN::InsertMeasure(std::string &targetId, int number, bool ins
 }
 
 bool EditorToolkitCMN::InsertNote(
-    const std::string &targetId, data_PITCHNAME pname, int oct, data_DURATION dur, bool chordMode)
+    const std::string &elementId, data_PITCHNAME pname, int oct, data_DURATION dur, bool chordMode)
 {
-    if (chordMode) return this->InsertNoteInChordMode(targetId, pname, oct);
+    if (chordMode) return this->InsertNoteInChordMode(elementId, pname, oct);
 
     Object *target = NULL;
     if (this->InsertMode()) {
@@ -163,7 +163,7 @@ bool EditorToolkitCMN::InsertNote(
         pname = m_cursor->GetPname();
     }
     else {
-        target = this->GetElement(targetId);
+        target = this->GetElement(elementId);
     }
     if (!target || !target->Is({ CHORD, LAYER, NOTE, REST })) return false;
 
@@ -229,9 +229,9 @@ bool EditorToolkitCMN::InsertNote(
     return true;
 }
 
-bool EditorToolkitCMN::InsertNoteInChordMode(const std::string &targetId, data_PITCHNAME pname, int oct)
+bool EditorToolkitCMN::InsertNoteInChordMode(const std::string &elementId, data_PITCHNAME pname, int oct)
 {
-    Object *target = this->GetElement(targetId);
+    Object *target = this->GetElement(elementId);
     if (!target) return false;
 
     Chord *chord = NULL;

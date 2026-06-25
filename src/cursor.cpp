@@ -114,6 +114,7 @@ void Cursor::SetRestMode(bool restMode)
 {
     m_chordMode = ChordMode::NONE;
     m_restMode = restMode;
+    //if (restMode) this->SetAccid(ACCIDENTAL_WRITTEN_NONE);
 }
 
 void Cursor::SetChordMode(ChordMode chordMode)

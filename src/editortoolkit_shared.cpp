@@ -268,10 +268,19 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
     else if (action == "setCursor") {
         std::string elementId;
         Cursor::InputMode inputMode;
-        bool chordInput;
-        if (this->ParseSetCursorAction(json.get<jsonxx::Object>("param"), elementId, inputMode, chordInput)) {
+        bool chordMode;
+        if (this->ParseSetCursorAction(json.get<jsonxx::Object>("param"), elementId, inputMode, chordMode)) {
             this->PrepareUndo();
-            return (this->SetCursor(elementId, inputMode, chordInput));
+            return (this->SetCursor(elementId, inputMode, chordMode));
+        }
+        LogWarning("Could not parse the setCursor action");
+    }
+    else if (action == "updateCursor") {
+        bool restMode;
+        bool chordMode;
+        if (this->ParseUpdateCursorAction(json.get<jsonxx::Object>("param"), restMode, chordMode)) {
+            this->PrepareUndo();
+            return (this->UpdateCursor(restMode, chordMode));
         }
         LogWarning("Could not parse the setCursor action");
     }
@@ -433,17 +442,29 @@ bool EditorToolkitShared::ParseSetAction(
 }
 
 bool EditorToolkitShared::ParseSetCursorAction(
-    const jsonxx::Object &param, std::string &elementId, Cursor::InputMode &inputMode, bool &chordInput)
+    const jsonxx::Object &param, std::string &elementId, Cursor::InputMode &inputMode, bool &chordMode)
 {
     elementId = "";
     inputMode = Cursor::PITCH_FIRST;
-    chordInput = false;
+    chordMode = false;
 
     if (param.has<jsonxx::String>("elementId")) elementId = param.get<jsonxx::String>("elementId");
     if (!param.has<jsonxx::String>("inputMode")) return false;
     inputMode = (param.get<jsonxx::String>("inputMode") == "pitchFirst") ? Cursor::PITCH_FIRST : Cursor::DURATION_FIRST;
-    if (!param.has<jsonxx::Boolean>("chordInput")) return false;
-    chordInput = param.get<jsonxx::Boolean>("chordInput");
+    if (!param.has<jsonxx::Boolean>("chordMode")) return false;
+    chordMode = param.get<jsonxx::Boolean>("chordMode");
+
+    return true;
+}
+
+bool EditorToolkitShared::ParseUpdateCursorAction(
+    const jsonxx::Object &param, bool &restMode, bool &chordMode)
+{
+    chordMode = false;
+    restMode = false;
+
+    if (param.has<jsonxx::Boolean>("chordMode")) chordMode = param.get<jsonxx::Boolean>("chordMode");
+    if (param.has<jsonxx::Boolean>("restMode")) restMode = param.get<jsonxx::Boolean>("restMode");
 
     return true;
 }
@@ -601,7 +622,7 @@ bool EditorToolkitShared::Chain(const jsonxx::Array &actions)
     return status;
 }
 
-bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode inputMode, bool chordInput)
+bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode inputMode, bool chordMode)
 {
     Layer *layer = NULL;
     LayerElement *position = NULL;
@@ -624,15 +645,31 @@ bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode in
     m_cursor = cursorFunctor.GetCursor();
 
     // Get the accid from the layer key signature
-    if (m_cursor && updateAccid) {
+    if (m_cursor) {
+        if (updateAccid) {
         std::string placeholder;
         this->UpdatePitch(placeholder, m_cursor->GetPname(), m_cursor->GetOct(), ACCIDENTAL_WRITTEN_NONE, VRV_UNSET);
+        }
     }
 
     this->SetEditStatus();
 
     return true;
 }
+
+bool EditorToolkitShared::UpdateCursor(bool restMode, bool chordMode)
+{
+    if (!InsertMode()) return true;
+    
+    if (m_cursor->GetInputMode() == Cursor::PITCH_FIRST) {
+        m_cursor->SetRestMode(restMode);
+    }
+
+    this->SetEditStatus();
+
+    return true;
+}
+
 
 bool EditorToolkitShared::ResetCursor(bool maintainChordInput)
 {
