@@ -199,6 +199,20 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         }
         LogWarning("Could not parse the insertControl action");
     }
+    else if (action == "insertCursorByDur") {
+        EditorToolkitCMN *editorToolkitCMN = dynamic_cast<EditorToolkitCMN *>(this);
+        if (editorToolkitCMN) {
+            return editorToolkitCMN->ParseEditorCMNAction(json);
+        }
+        LogWarning("Action insertCursorByDur available in CMN only");
+    }
+    else if (action == "insertCursorByPitch") {
+        EditorToolkitCMN *editorToolkitCMN = dynamic_cast<EditorToolkitCMN *>(this);
+        if (editorToolkitCMN) {
+            return editorToolkitCMN->ParseEditorCMNAction(json);
+        }
+        LogWarning("Action insertCursorByPitch available in CMN only");
+    }
     else if (action == "insertMeasure") {
         EditorToolkitCMN *editorToolkitCMN = dynamic_cast<EditorToolkitCMN *>(this);
         if (editorToolkitCMN) {
@@ -212,6 +226,13 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
             return editorToolkitCMN->ParseEditorCMNAction(json);
         }
         LogWarning("Action insertNote available in CMN only");
+    }
+    else if (action == "insertRest") {
+        EditorToolkitCMN *editorToolkitCMN = dynamic_cast<EditorToolkitCMN *>(this);
+        if (editorToolkitCMN) {
+            return editorToolkitCMN->ParseEditorCMNAction(json);
+        }
+        LogWarning("Action insertRest available in CMN only");
     }
     else if (action == "keyDown") {
         std::string elementId;
@@ -457,8 +478,7 @@ bool EditorToolkitShared::ParseSetCursorAction(
     return true;
 }
 
-bool EditorToolkitShared::ParseUpdateCursorAction(
-    const jsonxx::Object &param, bool &restMode, bool &chordMode)
+bool EditorToolkitShared::ParseUpdateCursorAction(const jsonxx::Object &param, bool &restMode, bool &chordMode)
 {
     chordMode = false;
     restMode = false;
@@ -647,8 +667,9 @@ bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode in
     // Get the accid from the layer key signature
     if (m_cursor) {
         if (updateAccid) {
-        std::string placeholder;
-        this->UpdatePitch(placeholder, m_cursor->GetPname(), m_cursor->GetOct(), ACCIDENTAL_WRITTEN_NONE, VRV_UNSET);
+            std::string placeholder;
+            this->UpdatePitch(
+                placeholder, m_cursor->GetPname(), m_cursor->GetOct(), ACCIDENTAL_WRITTEN_NONE, VRV_UNSET);
         }
     }
 
@@ -660,7 +681,7 @@ bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode in
 bool EditorToolkitShared::UpdateCursor(bool restMode, bool chordMode)
 {
     if (!InsertMode()) return true;
-    
+
     if (m_cursor->GetInputMode() == Cursor::PITCH_FIRST) {
         m_cursor->SetRestMode(restMode);
     }
@@ -669,7 +690,6 @@ bool EditorToolkitShared::UpdateCursor(bool restMode, bool chordMode)
 
     return true;
 }
-
 
 bool EditorToolkitShared::ResetCursor(bool maintainChordInput)
 {
@@ -824,8 +844,7 @@ bool EditorToolkitShared::KeyDown(std::string &elementId, int key, bool shiftKey
         switch (key) {
             case KEY_LEFT: interface->DecreaseCMNDuration(); break;
             case KEY_RIGHT: interface->IncreaseCMNDuration(); break;
-            case KEY_DOT:
-                interface->HasDots() ? interface->ResetAugmentDots() : interface->SetDots(1);
+            case KEY_DOT: interface->HasDots() ? interface->ResetAugmentDots() : interface->SetDots(1);
             default: break;
         }
     }
@@ -1466,20 +1485,20 @@ bool EditorToolkitShared::SetScoreDef(const std::string scoreDef)
     return true;
 }
 
-void EditorToolkitShared::MoveCursor(Note *note)
+void EditorToolkitShared::MoveCursor(LayerElement *element)
 {
-    assert(note);
+    assert(element);
     assert(m_cursor);
 
-    const Object *object = note;
+    const Object *object = element;
 
-    Layer *layer = vrv_cast<Layer *>(note->GetFirstAncestor(LAYER));
+    Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
     assert(layer);
-    if (note == layer->GetLast(NOTE)) {
+    if (element == layer->GetLast(NOTE) || element == layer->GetLast(REST)) {
         AlignMeterParams params;
         params.meterSig = layer->GetCurrentMeterSig();
         Fraction position = (m_cursor->GetAlignment()) ? m_cursor->GetAlignment()->GetTime() : 0;
-        Fraction duration = note->GetAlignmentDuration(params, true, NOTATIONTYPE_cmn);
+        Fraction duration = element->GetAlignmentDuration(params, true, NOTATIONTYPE_cmn);
         Fraction measureDuration = Fraction(params.meterSig->GetUnitAsDur()) * params.meterSig->GetTotalCount();
         // Assume 4/4 by default
         if (measureDuration == 0) measureDuration = 4;

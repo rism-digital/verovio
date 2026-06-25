@@ -19,6 +19,7 @@
 #include "layer.h"
 #include "miscfunctor.h"
 #include "note.h"
+#include "rest.h"
 #include "staff.h"
 
 namespace vrv {
@@ -32,7 +33,16 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
 {
     std::string action = json.get<jsonxx::String>("action");
 
-    if (action == "insertMeasure") {
+    if (action == "insertCursorByDur") {
+        data_DURATION dur;
+        int dots;
+        if (this->ParseInsertCursorByDurAction(json.get<jsonxx::Object>("param"), dur, dots)) {
+            this->PrepareUndo();
+            return (this->InsertCursorByDur(dur, dots));
+        }
+        LogWarning("Could not parse the insertCursorByDur action");
+    }
+    else if (action == "insertMeasure") {
         std::string elementId;
         int number;
         bool insertBefore;
@@ -46,15 +56,62 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
         std::string elementId;
         data_PITCHNAME pname;
         int oct;
+        data_ACCIDENTAL_WRITTEN accid;
+        data_ACCIDENTAL_GESTURAL accidGes;
         data_DURATION dur;
+        int dots;
         bool chordMode;
-        if (this->ParseInsertNoteAction(json.get<jsonxx::Object>("param"), elementId, pname, oct, dur, chordMode)) {
+        if (this->ParseInsertNoteAction(
+                json.get<jsonxx::Object>("param"), elementId, pname, oct, accid, accidGes, dur, dots, chordMode)) {
             this->PrepareUndo();
-            return (this->InsertNote(elementId, pname, oct, dur, chordMode));
+            return (this->InsertNote(elementId, pname, oct, accid, accidGes, dur, dots, chordMode));
         }
         LogWarning("Could not parse the insertNote action");
     }
+    else if (action == "insertRest") {
+        std::string elementId;
+        data_DURATION dur;
+        int dots;
+        if (this->ParseInsertRestAction(json.get<jsonxx::Object>("param"), elementId, dur, dots)) {
+            this->PrepareUndo();
+            return (this->InsertRest(elementId, dur, dots));
+        }
+        LogWarning("Could not parse the insertRest action");
+    }
     return false;
+}
+
+bool EditorToolkitCMN::ParseInsertCursorByDurAction(const jsonxx::Object &param, data_DURATION &dur, int &dots)
+{
+    dur = DURATION_NONE;
+    dots = VRV_UNSET;
+    Note noteConverter;
+
+    if (!param.has<jsonxx::String>("dur")) return false;
+    dur = noteConverter.AttDurationLog::StrToDuration(param.get<jsonxx::String>("dur"));
+
+    if (param.has<jsonxx::Number>("dots")) dots = param.get<jsonxx::Number>("dots");
+
+    return true;
+}
+
+bool EditorToolkitCMN::ParseInsertCursorByPitchAction(
+    const jsonxx::Object &param, data_PITCHNAME &pname, int &oct, data_ACCIDENTAL_WRITTEN &accid)
+{
+    pname = PITCHNAME_NONE;
+    oct = VRV_UNSET;
+    accid = ACCIDENTAL_WRITTEN_NONE;
+    Note noteConverter;
+    Accid accidConverter;
+
+    if (!param.has<jsonxx::String>("pname")) return false;
+    pname = noteConverter.AttPitch::StrToPitchname(param.get<jsonxx::String>("pname"));
+
+    if (param.has<jsonxx::Number>("oct")) oct = param.get<jsonxx::Number>("oct");
+    if (param.has<jsonxx::String>("accid"))
+        accid = accidConverter.AttAccidental::StrToAccidentalWritten(param.get<jsonxx::String>("accid"));
+
+    return true;
 }
 
 bool EditorToolkitCMN::ParseInsertMeasureAction(
@@ -73,27 +130,101 @@ bool EditorToolkitCMN::ParseInsertMeasureAction(
 }
 
 bool EditorToolkitCMN::ParseInsertNoteAction(const jsonxx::Object &param, std::string &elementId, data_PITCHNAME &pname,
-    int &oct, data_DURATION &dur, bool &chordMode)
+    int &oct, data_ACCIDENTAL_WRITTEN &accid, data_ACCIDENTAL_GESTURAL &accidGes, data_DURATION &dur, int &dots,
+    bool &chordMode)
 {
     chordMode = false;
     pname = PITCHNAME_NONE;
     oct = VRV_UNSET;
+    accid = ACCIDENTAL_WRITTEN_NONE;
+    accidGes = ACCIDENTAL_GESTURAL_NONE;
     dur = DURATION_NONE;
-    Note note;
+    dots = VRV_UNSET;
+    Note noteConverter;
+    Accid accidConverter;
+
     if (!param.has<jsonxx::String>("elementId")) return false;
     elementId = param.get<jsonxx::String>("elementId");
     if (!param.has<jsonxx::String>("pname")) return false;
-    pname = note.AttPitch::StrToPitchname(param.get<jsonxx::String>("pname"));
+    pname = noteConverter.AttPitch::StrToPitchname(param.get<jsonxx::String>("pname"));
     if (!param.has<jsonxx::Number>("oct")) return false;
     oct = param.get<jsonxx::Number>("oct");
+
+    if (param.has<jsonxx::String>("accid"))
+        accid = accidConverter.AttAccidental::StrToAccidentalWritten(param.get<jsonxx::String>("accid"));
+    if (param.has<jsonxx::String>("accidGes"))
+        accidGes = accidConverter.AttAccidentalGes::StrToAccidentalGestural(param.get<jsonxx::String>("accidGes"));
+
     // At least one of the two
     if (!param.has<jsonxx::String>("dur") && !param.has<jsonxx::Boolean>("chordMode")) return false;
 
-    if (param.has<jsonxx::String>("dur")) dur = note.AttPitch::StrToDuration(param.get<jsonxx::String>("dur"));
+    if (param.has<jsonxx::String>("dur")) dur = noteConverter.AttPitch::StrToDuration(param.get<jsonxx::String>("dur"));
+
+    if (param.has<jsonxx::Number>("dots")) dots = param.get<jsonxx::Number>("dots");
 
     if (param.has<jsonxx::Boolean>("chordMode")) chordMode = param.get<jsonxx::Boolean>("chordMode");
 
     return true;
+}
+
+bool EditorToolkitCMN::ParseInsertRestAction(
+    const jsonxx::Object &param, std::string &elementId, data_DURATION &dur, int &dots)
+{
+    dur = DURATION_NONE;
+    dots = VRV_UNSET;
+    Note noteConverter;
+
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    elementId = param.get<jsonxx::String>("elementId");
+
+    if (!param.has<jsonxx::String>("dur")) return false;
+    dur = noteConverter.AttPitch::StrToDuration(param.get<jsonxx::String>("dur"));
+
+    if (param.has<jsonxx::Number>("dots")) dots = param.get<jsonxx::Number>("dots");
+
+    return true;
+}
+
+bool EditorToolkitCMN::InsertCursorByDur(data_DURATION dur, int dots)
+{
+    if (!this->InsertMode()) return false;
+
+    data_PITCHNAME pname = (m_cursor->HasPname()) ? m_cursor->GetPname() : PITCHNAME_c;
+    int oct = (m_cursor->HasOct()) ? m_cursor->GetOct() : 3;
+    auto [accid, accidGes] = m_cursor->GetAccidValue();
+
+    if (dots == VRV_UNSET && m_cursor->HasDots()) dots = m_cursor->GetDots();
+
+    std::string id = m_cursor->GetID();
+
+    if (m_cursor->IsRestMode()) {
+        return this->InsertRest(id, dur, dots);
+    }
+    else {
+        bool chordMode = (m_cursor->GetChordMode() != Cursor::ChordMode::NONE);
+        return this->InsertNote(id, pname, oct, accid, accidGes, dur, dots, chordMode);
+    }
+}
+
+bool EditorToolkitCMN::InsertCursorByPitch(data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid)
+{
+    if (!this->InsertMode()) return false;
+
+    if (oct == VRV_UNSET) oct = m_cursor->GetOct();
+
+    data_ACCIDENTAL_GESTURAL accidGes = ACCIDENTAL_GESTURAL_NONE;
+    if (accid == ACCIDENTAL_WRITTEN_NONE) {
+        const auto value = m_cursor->GetAccidValue();
+        accid = value.first;
+        accidGes = value.second;
+    }
+
+    data_DURATION dur = (m_cursor->HasDur()) ? m_cursor->GetDur() : DURATION_4;
+    int dots = (m_cursor->HasDots()) ? m_cursor->GetDots() : VRV_UNSET;
+
+    std::string id = m_cursor->GetID();
+    bool chordMode = (m_cursor->GetChordMode() != Cursor::ChordMode::NONE);
+    return this->InsertNote(id, pname, oct, accid, accidGes, dur, dots, chordMode);
 }
 
 bool EditorToolkitCMN::InsertMeasure(std::string &elementId, int number, bool insertBefore)
@@ -151,16 +282,14 @@ bool EditorToolkitCMN::InsertMeasure(std::string &elementId, int number, bool in
     return true;
 }
 
-bool EditorToolkitCMN::InsertNote(
-    const std::string &elementId, data_PITCHNAME pname, int oct, data_DURATION dur, bool chordMode)
+bool EditorToolkitCMN::InsertNote(const std::string &elementId, data_PITCHNAME pname, int oct,
+    data_ACCIDENTAL_WRITTEN accid, data_ACCIDENTAL_GESTURAL accidGes, data_DURATION dur, int dots, bool chordMode)
 {
-    if (chordMode) return this->InsertNoteInChordMode(elementId, pname, oct);
+    if (chordMode) return this->InsertNoteInChordMode(elementId, pname, oct, accid);
 
     Object *target = NULL;
     if (this->InsertMode()) {
         target = (m_cursor->HasPosition()) ? m_cursor->GetPosition() : m_cursor->GetParent();
-        oct = m_cursor->GetOct();
-        pname = m_cursor->GetPname();
     }
     else {
         target = this->GetElement(elementId);
@@ -200,14 +329,19 @@ bool EditorToolkitCMN::InsertNote(
     note->SetOct(oct);
     note->SetDur(dur);
 
-    if (m_cursor && m_cursor->HasAccid()) {
-        Accid *accid = new Accid();
-        m_cursor->GetAccidValue(accid);
-        note->AddChild(accid);
-        m_cursor->SetAccid(ACCIDENTAL_WRITTEN_NONE);
+    if (accid != ACCIDENTAL_WRITTEN_NONE) {
+        Accid *accidElement = new Accid();
+        accidElement->SetAccid(accid);
+        note->AddChild(accidElement);
     }
-    if (m_cursor && m_cursor->HasDots()) {
-        note->SetDots(m_cursor->GetDots());
+    else if (accidGes != ACCIDENTAL_GESTURAL_NONE) {
+        Accid *accidElement = new Accid();
+        accidElement->SetAccidGes(accidGes);
+        note->AddChild(accidElement);
+    }
+
+    if (dots != VRV_UNSET) {
+        note->SetDots(dots);
     }
 
     if (previousElement) {
@@ -229,7 +363,8 @@ bool EditorToolkitCMN::InsertNote(
     return true;
 }
 
-bool EditorToolkitCMN::InsertNoteInChordMode(const std::string &elementId, data_PITCHNAME pname, int oct)
+bool EditorToolkitCMN::InsertNoteInChordMode(
+    const std::string &elementId, data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid)
 {
     Object *target = this->GetElement(elementId);
     if (!target) return false;
@@ -294,6 +429,71 @@ bool EditorToolkitCMN::InsertNoteInChordMode(const std::string &elementId, data_
 
     this->ClearContext();
     this->SetEditStatus();
+
+    return true;
+}
+
+bool EditorToolkitCMN::InsertRest(const std::string &elementId, data_DURATION dur, int dots)
+{
+    Object *target = NULL;
+    if (this->InsertMode()) {
+        target = (m_cursor->HasPosition()) ? m_cursor->GetPosition() : m_cursor->GetParent();
+    }
+    else {
+        target = this->GetElement(elementId);
+    }
+    if (!target || !target->Is({ CHORD, LAYER, NOTE, REST })) return false;
+
+    if (target->Is(NOTE)) {
+        Note *note = vrv_cast<Note *>(target);
+        if (note->IsChordTone()) target = note->IsChordTone();
+    }
+
+    Object *previousElement = NULL;
+    Object *targetContainer = NULL;
+    if (!target->Is(LAYER)) {
+        Object *targetParent = target->GetParent();
+        // Inserting a note within a tuplet or a beam
+        if (targetParent && targetParent->Is({ BEAM, TUPLET }) && targetParent->GetLast() != target) {
+            previousElement = target;
+            targetContainer = targetParent;
+        }
+        // Otherwise always insert in the layer
+        else {
+            previousElement = target->GetLastAncestorNot(LAYER);
+            if (!previousElement) return false;
+            targetContainer = previousElement->GetParent();
+            assert(targetContainer && targetContainer->Is(LAYER));
+        }
+    }
+    else {
+        targetContainer = target;
+    }
+
+    Rest *rest = vrv_cast<Rest *>(this->PrepareInsertion(targetContainer, "rest"));
+    if (!rest) return false;
+
+    rest->SetDur(dur);
+
+    if (dots != VRV_UNSET) {
+        rest->SetDots(dots);
+    }
+
+    if (previousElement) {
+        targetContainer->InsertAfter(previousElement, rest);
+    }
+    else {
+        targetContainer->InsertChild(rest, 0);
+    }
+
+    if (rest->IsInBeam()) {
+        rest->SetDur(std::max(DURATION_8, dur));
+    }
+
+    this->ClearContext();
+    this->SetEditStatus();
+
+    if (InsertMode()) this->MoveCursor(rest);
 
     return true;
 }

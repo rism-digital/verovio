@@ -64,8 +64,7 @@ protected:
         const jsonxx::Object &param, std::string &elementId, std::string &attribute, std::string &value);
     bool ParseSetCursorAction(
         const jsonxx::Object &param, std::string &elementId, Cursor::InputMode &inputMode, bool &chordMode);
-    bool ParseUpdateCursorAction(
-                                 const jsonxx::Object &param, bool &restMode, bool &chordMode);
+    bool ParseUpdateCursorAction(const jsonxx::Object &param, bool &restMode, bool &chordMode);
     bool ParseUpdatePitchAction(const jsonxx::Object &param, std::string &elementId, data_PITCHNAME &pname, int &oct,
         data_ACCIDENTAL_WRITTEN &accid, int &midi);
 
@@ -116,7 +115,7 @@ protected:
     void CollectReferringObjects(
         const Object *element, std::set<std::string> &toDelete, std::set<const Object *> &visited);
 
-    void MoveCursor(Note *note);
+    void MoveCursor(LayerElement *element);
 
     data_ACCIDENTAL_WRITTEN GetAccidBefore(const LayerElement *element, data_PITCHNAME pname, int oct);
 

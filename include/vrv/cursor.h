@@ -54,7 +54,7 @@ public:
     bool IsAccidImplicit() const { return m_isAccidImplicit; }
     void SetAccidImplicit(bool isAccidImplicit);
     void SetAccidValue(const Accid *accid);
-    void GetAccidValue(Accid *accid);
+    std::pair<data_ACCIDENTAL_WRITTEN, data_ACCIDENTAL_GESTURAL> GetAccidValue();
 
     Accid *GetAccidElement() { return &m_accid; }
 

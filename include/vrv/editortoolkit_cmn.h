@@ -43,13 +43,23 @@ protected:
      * Parse JSON instructions for experimental editor functions.
      */
     ///@{
+    bool ParseInsertCursorByDurAction(const jsonxx::Object &param, data_DURATION &dur, int &dots);
+    bool ParseInsertCursorByPitchAction(
+        const jsonxx::Object &param, data_PITCHNAME &pname, int &oct, data_ACCIDENTAL_WRITTEN &accid);
     bool ParseInsertMeasureAction(const jsonxx::Object &param, std::string &elementId, int &number, bool &insertBefore);
     bool ParseInsertNoteAction(const jsonxx::Object &param, std::string &elementId, data_PITCHNAME &pname, int &oct,
-        data_DURATION &dur, bool &chordMode);
+        data_ACCIDENTAL_WRITTEN &accid, data_ACCIDENTAL_GESTURAL &accidGes, data_DURATION &dur, int &dots,
+        bool &chordMode);
+    bool ParseInsertRestAction(const jsonxx::Object &param, std::string &elementId, data_DURATION &dur, int &dots);
 
+    bool InsertCursorByDur(data_DURATION dur, int dots);
+    bool InsertCursorByPitch(data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid);
     bool InsertMeasure(std::string &elementId, int number, bool insertBefore);
-    bool InsertNote(const std::string &elementId, data_PITCHNAME pname, int oct, data_DURATION dur, bool chordMode);
-    bool InsertNoteInChordMode(const std::string &elementId, data_PITCHNAME pname, int oct);
+    bool InsertNote(const std::string &elementId, data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid,
+        data_ACCIDENTAL_GESTURAL accidGes, data_DURATION dur, int dots, bool chordMode);
+    bool InsertNoteInChordMode(
+        const std::string &elementId, data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid);
+    bool InsertRest(const std::string &elementId, data_DURATION dur, int dots);
 
 public:
     //

@@ -87,16 +87,20 @@ void Cursor::SetAccidValue(const Accid *accid)
     this->SetAccidImplicit(true);
 }
 
-void Cursor::GetAccidValue(Accid *accid)
+std::pair<data_ACCIDENTAL_WRITTEN, data_ACCIDENTAL_GESTURAL> Cursor::GetAccidValue()
 {
-    if (!accid || !this->HasAccid()) return;
+    if (!this->HasAccid()) return { ACCIDENTAL_WRITTEN_NONE, ACCIDENTAL_GESTURAL_NONE };
 
+    data_ACCIDENTAL_WRITTEN accid = ACCIDENTAL_WRITTEN_NONE;
+    data_ACCIDENTAL_GESTURAL accidGes = ACCIDENTAL_GESTURAL_NONE;
     if (this->IsAccidImplicit()) {
-        accid->SetAccidGes(Att::AccidentalWrittenToGestural(this->GetAccid()));
+        accidGes = Att::AccidentalWrittenToGestural(this->GetAccid());
     }
     else {
-        accid->SetAccid(this->GetAccid());
+        accid = this->GetAccid();
     }
+
+    return { accid, accidGes };
 }
 
 void Cursor::SetCursorAlignment(Alignment *alignment)
@@ -114,7 +118,7 @@ void Cursor::SetRestMode(bool restMode)
 {
     m_chordMode = ChordMode::NONE;
     m_restMode = restMode;
-    //if (restMode) this->SetAccid(ACCIDENTAL_WRITTEN_NONE);
+    // if (restMode) this->SetAccid(ACCIDENTAL_WRITTEN_NONE);
 }
 
 void Cursor::SetChordMode(ChordMode chordMode)
