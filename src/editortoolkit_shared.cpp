@@ -484,7 +484,7 @@ bool EditorToolkitShared::ParseUpdateCursorAction(const jsonxx::Object &param, b
     restMode = false;
 
     if (param.has<jsonxx::Boolean>("chordMode")) chordMode = param.get<jsonxx::Boolean>("chordMode");
-    if (param.has<jsonxx::Boolean>("restMode")) restMode = param.get<jsonxx::Boolean>("restMode");
+    else if (param.has<jsonxx::Boolean>("restMode")) restMode = param.get<jsonxx::Boolean>("restMode");
 
     return true;
 }
@@ -682,7 +682,11 @@ bool EditorToolkitShared::UpdateCursor(bool restMode, bool chordMode)
 {
     if (!InsertMode()) return true;
 
-    if (m_cursor->GetInputMode() == Cursor::PITCH_FIRST) {
+    if (chordMode) {
+        m_cursor->SetRestMode(false);
+        m_cursor->SetChordMode(Cursor::ChordMode::NEW);
+    }
+    else if (m_cursor->GetInputMode() == Cursor::PITCH_FIRST) {
         m_cursor->SetRestMode(restMode);
     }
 
