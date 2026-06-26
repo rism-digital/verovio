@@ -94,7 +94,7 @@ std::pair<data_ACCIDENTAL_WRITTEN, data_ACCIDENTAL_GESTURAL> Cursor::GetAccidVal
     data_ACCIDENTAL_WRITTEN accid = ACCIDENTAL_WRITTEN_NONE;
     data_ACCIDENTAL_GESTURAL accidGes = ACCIDENTAL_GESTURAL_NONE;
     if (this->IsAccidImplicit()) {
-        accidGes = Att::AccidentalWrittenToGestural(this->GetAccid());
+        if (this->GetAccid() != ACCIDENTAL_WRITTEN_n) accidGes = Att::AccidentalWrittenToGestural(this->GetAccid());
     }
     else {
         accid = this->GetAccid();
