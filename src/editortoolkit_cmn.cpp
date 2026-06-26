@@ -201,8 +201,7 @@ bool EditorToolkitCMN::InsertCursorByDur(data_DURATION dur, int dots)
         return this->InsertRest(id, dur, dots);
     }
     else {
-        bool chordMode = (m_cursor->GetChordMode() != Cursor::ChordMode::NONE);
-        return this->InsertNote(id, pname, oct, accid, accidGes, dur, dots, chordMode);
+        return this->InsertNote(id, pname, oct, accid, accidGes, dur, dots, m_cursor->IsChordMode());
     }
 }
 
@@ -223,8 +222,7 @@ bool EditorToolkitCMN::InsertCursorByPitch(data_PITCHNAME pname, int oct, data_A
     int dots = (m_cursor->HasDots()) ? m_cursor->GetDots() : VRV_UNSET;
 
     std::string id = m_cursor->GetID();
-    bool chordMode = (m_cursor->GetChordMode() != Cursor::ChordMode::NONE);
-    return this->InsertNote(id, pname, oct, accid, accidGes, dur, dots, chordMode);
+    return this->InsertNote(id, pname, oct, accid, accidGes, dur, dots, m_cursor->IsChordMode());
 }
 
 bool EditorToolkitCMN::InsertMeasure(std::string &elementId, int number, bool insertBefore)
@@ -285,7 +283,9 @@ bool EditorToolkitCMN::InsertMeasure(std::string &elementId, int number, bool in
 bool EditorToolkitCMN::InsertNote(const std::string &elementId, data_PITCHNAME pname, int oct,
     data_ACCIDENTAL_WRITTEN accid, data_ACCIDENTAL_GESTURAL accidGes, data_DURATION dur, int dots, bool chordMode)
 {
-    if (chordMode) return this->InsertNoteInChordMode(elementId, pname, oct, accid);
+    if (chordMode && (!this->InsertMode() || m_cursor->GetChordMode() != Cursor::ChordMode::NEW)) {
+        return this->InsertNoteInChordMode(elementId, pname, oct, accid, accidGes);
+    }
 
     Object *target = NULL;
     if (this->InsertMode()) {
@@ -325,21 +325,9 @@ bool EditorToolkitCMN::InsertNote(const std::string &elementId, data_PITCHNAME p
     Note *note = vrv_cast<Note *>(this->PrepareInsertion(targetContainer, "note"));
     if (!note) return false;
 
-    note->SetPname(pname);
-    note->SetOct(oct);
+    this->SetNoteAttributes(note, pname, oct, accid, accidGes);
+
     note->SetDur(dur);
-
-    if (accid != ACCIDENTAL_WRITTEN_NONE) {
-        Accid *accidElement = new Accid();
-        accidElement->SetAccid(accid);
-        note->AddChild(accidElement);
-    }
-    else if (accidGes != ACCIDENTAL_GESTURAL_NONE) {
-        Accid *accidElement = new Accid();
-        accidElement->SetAccidGes(accidGes);
-        note->AddChild(accidElement);
-    }
-
     if (dots != VRV_UNSET) {
         note->SetDots(dots);
     }
@@ -363,10 +351,16 @@ bool EditorToolkitCMN::InsertNote(const std::string &elementId, data_PITCHNAME p
     return true;
 }
 
-bool EditorToolkitCMN::InsertNoteInChordMode(
-    const std::string &elementId, data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid)
+bool EditorToolkitCMN::InsertNoteInChordMode(const std::string &elementId, data_PITCHNAME pname, int oct,
+    data_ACCIDENTAL_WRITTEN accid, data_ACCIDENTAL_GESTURAL accidGes)
 {
-    Object *target = this->GetElement(elementId);
+    Object *target = NULL;
+    if (this->InsertMode()) {
+        target = (m_cursor->HasPosition()) ? m_cursor->GetPosition() : m_cursor->GetParent();
+    }
+    else {
+        target = this->GetElement(elementId);
+    }
     if (!target) return false;
 
     Chord *chord = NULL;
@@ -420,10 +414,9 @@ bool EditorToolkitCMN::InsertNoteInChordMode(
     }
 
     Note *note = vrv_cast<Note *>(this->PrepareInsertion(chord, "note"));
-    if (!note) return false;
+    if (!note) return NULL;
 
-    note->SetPname(pname);
-    note->SetOct(oct);
+    this->SetNoteAttributes(note, pname, oct, accid, accidGes);
 
     chord->AddChild(note);
 
@@ -431,6 +424,26 @@ bool EditorToolkitCMN::InsertNoteInChordMode(
     this->SetEditStatus();
 
     return true;
+}
+
+void EditorToolkitCMN::SetNoteAttributes(
+    Note *note, data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid, data_ACCIDENTAL_GESTURAL accidGes)
+{
+    assert(note);
+
+    note->SetPname(pname);
+    note->SetOct(oct);
+
+    if (accid != ACCIDENTAL_WRITTEN_NONE) {
+        Accid *accidElement = new Accid();
+        accidElement->SetAccid(accid);
+        note->AddChild(accidElement);
+    }
+    else if (accidGes != ACCIDENTAL_GESTURAL_NONE) {
+        Accid *accidElement = new Accid();
+        accidElement->SetAccidGes(accidGes);
+        note->AddChild(accidElement);
+    }
 }
 
 bool EditorToolkitCMN::InsertRest(const std::string &elementId, data_DURATION dur, int dots)

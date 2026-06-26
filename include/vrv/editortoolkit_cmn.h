@@ -57,9 +57,13 @@ protected:
     bool InsertMeasure(std::string &elementId, int number, bool insertBefore);
     bool InsertNote(const std::string &elementId, data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid,
         data_ACCIDENTAL_GESTURAL accidGes, data_DURATION dur, int dots, bool chordMode);
-    bool InsertNoteInChordMode(
-        const std::string &elementId, data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid);
     bool InsertRest(const std::string &elementId, data_DURATION dur, int dots);
+
+private:
+    bool InsertNoteInChordMode(const std::string &elementId, data_PITCHNAME pname, int oct,
+        data_ACCIDENTAL_WRITTEN accid, data_ACCIDENTAL_GESTURAL accidGes);
+    void SetNoteAttributes(
+        Note *note, data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid, data_ACCIDENTAL_GESTURAL accidGes);
 
 public:
     //

@@ -483,8 +483,10 @@ bool EditorToolkitShared::ParseUpdateCursorAction(const jsonxx::Object &param, b
     chordMode = false;
     restMode = false;
 
-    if (param.has<jsonxx::Boolean>("chordMode")) chordMode = param.get<jsonxx::Boolean>("chordMode");
-    else if (param.has<jsonxx::Boolean>("restMode")) restMode = param.get<jsonxx::Boolean>("restMode");
+    if (param.has<jsonxx::Boolean>("chordMode"))
+        chordMode = param.get<jsonxx::Boolean>("chordMode");
+    else if (param.has<jsonxx::Boolean>("restMode"))
+        restMode = param.get<jsonxx::Boolean>("restMode");
 
     return true;
 }
@@ -1498,7 +1500,11 @@ void EditorToolkitShared::MoveCursor(LayerElement *element)
 
     Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
     assert(layer);
-    if (element == layer->GetLast(NOTE) || element == layer->GetLast(REST)) {
+
+    if (m_cursor->GetChordMode() == Cursor::ChordMode::NEW) {
+        m_cursor->SetChordMode(Cursor::ChordMode::EDIT_NEW);
+    }
+    else if (element == layer->GetLast(NOTE) || element == layer->GetLast(REST)) {
         AlignMeterParams params;
         params.meterSig = layer->GetCurrentMeterSig();
         Fraction position = (m_cursor->GetAlignment()) ? m_cursor->GetAlignment()->GetTime() : 0;
@@ -1516,7 +1522,7 @@ void EditorToolkitShared::MoveCursor(LayerElement *element)
         m_selectionId = object->GetID();
         m_chainedId = m_selectionId;
         m_selectionClassId = object->GetClassId();
-        this->SetCursor(m_selectionId, m_cursor->GetInputMode(), false);
+        this->SetCursor(m_selectionId, m_cursor->GetInputMode(), m_cursor->IsChordMode());
     }
     else {
         this->ResetCursor(false);

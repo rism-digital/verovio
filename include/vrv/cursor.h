@@ -65,6 +65,7 @@ public:
 
     ChordMode GetChordMode() const { return m_chordMode; }
     void SetChordMode(ChordMode chordMode);
+    bool IsChordMode() const { return (m_chordMode != ChordMode::NONE); }
 
     enum InputMode : int8_t { PITCH_FIRST = 0, DURATION_FIRST };
 
