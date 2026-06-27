@@ -58,7 +58,7 @@ protected:
         const jsonxx::Object &param, std::string &elementName, std::string &startId, std::string &endId);
     bool ParseNavigate(const jsonxx::Object &param, std::string &elementId, int &direction);
     bool ParsePropertiesAction(const jsonxx::Object &param, std::string &scoreDef);
-    bool ParseResetCursorAction(const jsonxx::Object &param, bool &advance);
+    bool ParseResetCursorAction(const jsonxx::Object &param, bool &maintainChordMode);
     bool ParseSelectAction(const jsonxx::Object &param, std::string &elementId, bool &secondary);
     bool ParseSetAction(
         const jsonxx::Object &param, std::string &elementId, std::string &attribute, std::string &value);
@@ -86,7 +86,7 @@ protected:
     ///@{
     bool SetCursor(std::string &elementId, Cursor::InputMode inputMode, bool chordMode);
     bool UpdateCursor(bool restMode, bool chordMode);
-    bool ResetCursor(bool maintainChordInput);
+    bool ResetCursor(bool maintainChordMode);
     bool Delete(std::string &elementId, bool backspace);
     bool Drag(std::string &elementId, int x, int y);
     bool InsertControl(std::string &elementName, std::string &startId, std::string &endId);
@@ -115,7 +115,7 @@ protected:
     void CollectReferringObjects(
         const Object *element, std::set<std::string> &toDelete, std::set<const Object *> &visited);
 
-    void MoveCursor(LayerElement *element);
+    void MoveCursor(LayerElement *element, bool maintainChordMode = false);
 
     data_ACCIDENTAL_WRITTEN GetAccidBefore(const LayerElement *element, data_PITCHNAME pname, int oct);
 

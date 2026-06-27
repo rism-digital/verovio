@@ -346,7 +346,15 @@ bool EditorToolkitCMN::InsertNote(const std::string &elementId, data_PITCHNAME p
     this->ClearContext();
     this->SetEditStatus();
 
-    if (InsertMode()) this->MoveCursor(note);
+    if (InsertMode()) {
+        this->MoveCursor(note);
+        if (chordMode) {
+            m_cursor->AdjustPitchByOffset(2);
+            std::string placeholder = m_cursor->GetID();
+            this->UpdatePitch(
+                placeholder, m_cursor->GetPname(), m_cursor->GetOct(), ACCIDENTAL_WRITTEN_NONE, VRV_UNSET);
+        }
+    }
 
     return true;
 }
@@ -411,6 +419,8 @@ bool EditorToolkitCMN::InsertNoteInChordMode(const std::string &elementId, data_
             artic->MoveItselfTo(chord);
         }
         targetNote->ClearRelinquishedChildren();
+
+        if (this->InsertMode()) m_cursor->SetPosition(chord);
     }
 
     Note *note = vrv_cast<Note *>(this->PrepareInsertion(chord, "note"));
@@ -419,6 +429,12 @@ bool EditorToolkitCMN::InsertNoteInChordMode(const std::string &elementId, data_
     this->SetNoteAttributes(note, pname, oct, accid, accidGes);
 
     chord->AddChild(note);
+
+    if (this->InsertMode()) {
+        m_cursor->AdjustPitchByOffset(2);
+        std::string placeholder = m_cursor->GetID();
+        this->UpdatePitch(placeholder, m_cursor->GetPname(), m_cursor->GetOct(), ACCIDENTAL_WRITTEN_NONE, VRV_UNSET);
+    }
 
     this->ClearContext();
     this->SetEditStatus();

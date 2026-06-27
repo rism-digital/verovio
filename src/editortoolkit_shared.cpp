@@ -264,10 +264,10 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         }
     }
     else if (action == "resetCursor") {
-        bool maintainChordInput;
-        if (this->ParseResetCursorAction(json.get<jsonxx::Object>("param"), maintainChordInput)) {
+        bool maintainChordMode;
+        if (this->ParseResetCursorAction(json.get<jsonxx::Object>("param"), maintainChordMode)) {
             this->PrepareUndo();
-            return (this->ResetCursor(maintainChordInput));
+            return (this->ResetCursor(maintainChordMode));
         }
         LogWarning("Could not parse the resetCursor action");
     }
@@ -429,12 +429,12 @@ bool EditorToolkitShared::ParsePropertiesAction(const jsonxx::Object &param, std
     return true;
 }
 
-bool EditorToolkitShared::ParseResetCursorAction(const jsonxx::Object &param, bool &maintainChordInput)
+bool EditorToolkitShared::ParseResetCursorAction(const jsonxx::Object &param, bool &maintainChordMode)
 {
-    maintainChordInput = false;
+    maintainChordMode = false;
 
-    if (!param.has<jsonxx::Boolean>("maintainChordInput")) return false;
-    maintainChordInput = param.get<jsonxx::Boolean>("maintainChordInput");
+    if (param.has<jsonxx::Boolean>("maintainChordMode"))
+        maintainChordMode = param.get<jsonxx::Boolean>("maintainChordMode");
 
     return true;
 }
@@ -558,9 +558,8 @@ void EditorToolkitShared::SetEditStatus()
         insertion.import(
             "dur", (m_cursor->HasDur() ? m_cursor->AttDurationLog::DurationToStr(m_cursor->GetDur()) : "4"));
         insertion.import("dots", (m_cursor->HasDots()) ? m_cursor->GetDots() : 0);
-        insertion.import("dotLock", false);
-        insertion.import("chordMode", false);
-        insertion.import("restMode", false);
+        insertion.import("chordMode", (m_cursor->IsChordMode()));
+        insertion.import("restMode", (m_cursor->IsRestMode()));
         insertion.import("accid",
             (m_cursor->HasAccid()
                     ? m_cursor->GetAccidElement()->AttAccidental::AccidentalWrittenToStr(m_cursor->GetAccid())
@@ -697,8 +696,21 @@ bool EditorToolkitShared::UpdateCursor(bool restMode, bool chordMode)
     return true;
 }
 
-bool EditorToolkitShared::ResetCursor(bool maintainChordInput)
+bool EditorToolkitShared::ResetCursor(bool maintainChordMode)
 {
+    if (this->InsertMode() && m_cursor->IsChordMode()) {
+        this->MoveCursor(m_cursor->GetPosition(), maintainChordMode);
+        if (m_cursor) {
+            if (maintainChordMode) {
+                this->UpdateCursor(false, true);
+            }
+            else {
+                m_cursor->SetChordMode(Cursor::ChordMode::NONE);
+            }
+        }
+        return true;
+    }
+
     CursorFunctor cursorFunctor(NULL, NULL);
     m_doc->Process(cursorFunctor);
     m_cursor = NULL;
@@ -1491,7 +1503,7 @@ bool EditorToolkitShared::SetScoreDef(const std::string scoreDef)
     return true;
 }
 
-void EditorToolkitShared::MoveCursor(LayerElement *element)
+void EditorToolkitShared::MoveCursor(LayerElement *element, bool maintainChordMode)
 {
     assert(element);
     assert(m_cursor);
@@ -1504,11 +1516,12 @@ void EditorToolkitShared::MoveCursor(LayerElement *element)
     if (m_cursor->GetChordMode() == Cursor::ChordMode::NEW) {
         m_cursor->SetChordMode(Cursor::ChordMode::EDIT_NEW);
     }
-    else if (element == layer->GetLast(NOTE) || element == layer->GetLast(REST)) {
+    else if (element == layer->GetLast(NOTE) || element == layer->GetLast(REST) || element == layer->GetLast(CHORD)) {
         AlignMeterParams params;
         params.meterSig = layer->GetCurrentMeterSig();
         Fraction position = (m_cursor->GetAlignment()) ? m_cursor->GetAlignment()->GetTime() : 0;
-        Fraction duration = element->GetAlignmentDuration(params, true, NOTATIONTYPE_cmn);
+        // Duration of the chord in chord editing mode is already included in the alignment
+        Fraction duration = (m_cursor->IsChordEditMode()) ? 0 : element->GetAlignmentDuration(params, true, NOTATIONTYPE_cmn);
         Fraction measureDuration = Fraction(params.meterSig->GetUnitAsDur()) * params.meterSig->GetTotalCount();
         // Assume 4/4 by default
         if (measureDuration == 0) measureDuration = 4;
@@ -1522,9 +1535,11 @@ void EditorToolkitShared::MoveCursor(LayerElement *element)
         m_selectionId = object->GetID();
         m_chainedId = m_selectionId;
         m_selectionClassId = object->GetClassId();
-        this->SetCursor(m_selectionId, m_cursor->GetInputMode(), m_cursor->IsChordMode());
+        this->SetCursor(m_selectionId, m_cursor->GetInputMode(), false);
     }
     else {
+        // Exit inputMode
+        m_cursor->SetChordMode(Cursor::ChordMode::NONE);
         this->ResetCursor(false);
     }
 }
