@@ -40,6 +40,8 @@ public:
     void CloneReset() override;
 
     bool IsCursor() const override { return true; }
+    
+    int GetDrawingX() const override;
 
     void SetCursorAlignment(Alignment *alignment);
     void ResetCursorAlignment();

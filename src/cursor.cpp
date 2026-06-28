@@ -103,6 +103,13 @@ std::pair<data_ACCIDENTAL_WRITTEN, data_ACCIDENTAL_GESTURAL> Cursor::GetAccidVal
     return { accid, accidGes };
 }
 
+int Cursor::GetDrawingX() const
+{
+    if (this->IsChordEditMode()) return m_position->GetDrawingX();
+    
+    return Note::GetDrawingX();
+}
+
 void Cursor::SetCursorAlignment(Alignment *alignment)
 {
     this->SetAlignment(alignment);
