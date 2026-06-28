@@ -162,7 +162,7 @@ bool Note::AddChild(Object *child)
 
     // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
-    if (child->Is({ DOTS, STEM })) {
+    if (child->IsAnyOf(std::array{ DOTS, STEM })) {
         children.insert(children.begin(), child);
     }
     else {

@@ -96,7 +96,7 @@ SvgDeviceContext::GlyphRef::GlyphRef(const Glyph *glyph, int count, const std::s
     else {
         m_refId = StringFormat("%s-%d-%s", glyph->GetCodeStr().c_str(), count, postfix.c_str());
     }
-};
+}
 
 const std::string SvgDeviceContext::InsertGlyphRef(const Glyph *glyph)
 {

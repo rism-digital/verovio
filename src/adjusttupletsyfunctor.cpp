@@ -337,10 +337,11 @@ AdjustTupletNumOverlapFunctor::AdjustTupletNumOverlapFunctor(
 
 FunctorCode AdjustTupletNumOverlapFunctor::VisitLayerElement(const LayerElement *layerElement)
 {
-    if (!layerElement->Is({ ACCID, ARTIC, CHORD, DOT, FLAG, NOTE, REST, STEM }) || !layerElement->HasSelfBB())
+    if (!layerElement->IsAnyOf(std::array{ ACCID, ARTIC, CHORD, DOT, FLAG, NOTE, REST, STEM })
+        || !layerElement->HasSelfBB())
         return FUNCTOR_CONTINUE;
 
-    if (layerElement->Is({ CHORD, NOTE, REST })
+    if (layerElement->IsAnyOf(std::array{ CHORD, NOTE, REST })
         && ((layerElement->m_crossStaff || (layerElement->GetFirstAncestor(STAFF) != m_staff))
             && (layerElement->m_crossStaff != m_staff)))
         return FUNCTOR_SIBLINGS;

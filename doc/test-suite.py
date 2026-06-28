@@ -1,5 +1,7 @@
-# This script it expected to be run from ./bindings/python
+# This script can be run with an installed verovio package or from a CMake
+# build directory such as ./bindings/python.
 import argparse
+import importlib.resources as resources
 import json
 import os
 import sys
@@ -38,9 +40,31 @@ if __name__ == '__main__':
 
     # version of the toolkit
     tk = verovio.toolkit(False)
-    print(f'Verovio {tk.getVersion()}')
+    print(f"Verovio {tk.getVersion()}")
 
-    tk.setResourcePath('../../data')
+    resource_path = None
+    source_tree_data = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "..", "data"
+    )
+    package_data = resources.files(verovio) / "data"
+
+    # 1. Allow setting the resource path directly
+    if p := os.environ.get("VEROVIO_RESOURCE_PATH"):
+        resource_path = p
+    # 2. Try to auto-discover it from the package
+    elif package_data.is_dir():
+        resource_path = str(package_data)
+    # 3. Try to discover it from the external source tree.
+    elif os.path.isdir(source_tree_data):
+        resource_path = source_tree_data
+
+    # If no resource path is found, exit with an error.
+    if resource_path is None:
+        print("Could not discover resources path. Exiting.")
+        sys.exit(-1)
+
+    print(f"Setting resource path to {resource_path}")
+    tk.setResourcePath(resource_path)
 
     # look if we have a shortlist file and read it
     if len(args.shortlist) > 0:
@@ -84,6 +108,7 @@ if __name__ == '__main__':
             svgFile = os.path.join(path2, item1, name + '.svg')
             pngFile = os.path.join(path2, item1, name + '.png')
             timeMapFile = os.path.join(path2, item1, name + '.json')
+            midiFile = os.path.join(path2, item1, name + '.mid')
 
             # parse the MEI file
             if ext == '.mei':
@@ -105,5 +130,7 @@ if __name__ == '__main__':
             svg2png(bytestring=svgString, scale=2, write_to=pngFile)
             # create time map
             tk.renderToTimemapFile(timeMapFile)
+            # create MIDI file
+            tk.renderToMIDIFile(midiFile)
             tk.resetOptions()
             options.clear()

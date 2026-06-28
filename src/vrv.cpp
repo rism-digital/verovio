@@ -27,15 +27,13 @@
 
 //----------------------------------------------------------------------------
 
-// Windows has no Bourne shell (sh), therefore no "git_commit.h" is created.
-#ifndef _WIN32
+// Use the generated git commit header when it is available.
 #ifdef COCOAPODS
 #define GIT_COMMIT "[cocoapods]"
 #elif defined(SWIFT_PACKAGE)
 #define GIT_COMMIT "[swift-package]"
-#else
+#elif __has_include("git_commit.h")
 #include "git_commit.h"
-#endif
 #else
 #define GIT_COMMIT "[undefined]"
 #endif

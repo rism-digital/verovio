@@ -1205,7 +1205,7 @@ FunctorCode Object::AcceptEnd(ConstFunctor &functor) const
 bool Object::SkipChildren(bool visibleOnly) const
 {
     if (visibleOnly) {
-        if (this->IsEditorialElement() || this->Is({ MDIV, STAFF }) || this->IsSystemElement()) {
+        if (this->IsEditorialElement() || this->IsAnyOf(std::array{ MDIV, STAFF }) || this->IsSystemElement()) {
             const VisibilityDrawingInterface *interface = this->GetVisibilityDrawingInterface();
             assert(interface);
             if (interface->IsHidden()) {
@@ -1612,7 +1612,7 @@ void TextListInterface::FilterList(ListOfConstObjects &childList) const
 {
     ListOfConstObjects::iterator iter = childList.begin();
     while (iter != childList.end()) {
-        if (!(*iter)->Is({ LB, TEXT })) {
+        if (!(*iter)->IsAnyOf(std::array{ LB, TEXT })) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc. but keep Lb)
             iter = childList.erase(iter);
             continue;

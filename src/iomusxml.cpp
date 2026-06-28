@@ -329,7 +329,7 @@ void MusicXmlInput::InsertClefIntoObject(
     }
     else {
         Object *parent = layerElement->GetParent();
-        if (parent->Is({ CHORD, FTREM, TABGRP })) {
+        if (parent->IsAnyOf(std::array{ CHORD, FTREM, TABGRP })) {
             this->InsertClefIntoObject(parent->GetParent(), clef, parent, insertAfter);
         }
         else {
@@ -454,7 +454,7 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element, int dur
     if (!element->GetParent()) return;
 
     m_layerEndTimes[layer] = m_durTotal + duration;
-    if (!element->Is({ BEAM, TUPLET })) {
+    if (!element->IsAnyOf(std::array{ BEAM, TUPLET })) {
         m_layerTimes[layer].emplace(m_durTotal + duration, element);
     }
 }
@@ -3154,12 +3154,14 @@ void MusicXmlInput::ReadMusicXmlNote(
             // or update the carried-over accidentals with current accidental value.
             if (note->HasPname()) {
                 ListOfObjects accids = note->FindAllDescendantsByType(ACCID);
-                if (!accids.size()) {
+                if (accids.empty()) {
                     try {
                         for (const auto &current : m_currentAccids.at(note->GetPname())) {
+                            // Avoid adding empty accidentals
+                            if (current.m_accid == ACCIDENTAL_WRITTEN_NONE && current.m_glyphName.empty()) continue;
+
                             Accid *accid = new Accid();
                             note->AddChild(accid);
-                            accid->IsAttribute(false);
 
                             // to make sure the new *gestural* accidental conforms to the carried-over *written*
                             // accidental, we translate the latter to a SMuFL glyph and set the gestural accidental to
@@ -3170,7 +3172,8 @@ void MusicXmlInput::ReadMusicXmlNote(
                                 accid->SetGlyphName(current.m_glyphName);
                                 accid->SetGlyphAuth(current.m_glyphAuth);
                             }
-                            else if (current.m_accid != ACCIDENTAL_WRITTEN_NONE) {
+                            // We have a current.m_accid
+                            else {
                                 char32_t glyph = Accid::GetAccidGlyph(current.m_accid);
                                 accid->SetGlyphName(CustomTuning::GetGlyphName(glyph, m_doc));
                                 accid->SetGlyphAuth("smufl");
@@ -3628,7 +3631,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         breath->SetPlace(
             breath->AttPlacementRelStaff::StrToStaffrel(xmlBreath.node().attribute("placement").as_string()));
         breath->SetColor(xmlBreath.node().attribute("color").as_string());
-        breath->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 0.5);
+        breath->SetTstamp((double)(m_durTotal + duration) * (double)m_meterUnit / (double)(4 * m_ppq) - 0.1);
     }
 
     // caesura

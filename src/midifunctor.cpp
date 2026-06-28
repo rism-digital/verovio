@@ -166,7 +166,7 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayerElement(LayerElement *layerElement
         m_currentScoreTime = m_currentScoreTime + incrementScoreTime;
         m_currentRealTimeSeconds += incrementScoreTime.ToDouble() * 60.0 / m_currentTempo;
     }
-    else if (layerElement->Is({ BEAM, LIGATURE, FTREM, TUPLET }) && layerElement->HasSameasLink()) {
+    else if (layerElement->IsAnyOf(std::array{ BEAM, LIGATURE, FTREM, TUPLET }) && layerElement->HasSameasLink()) {
         incrementScoreTime
             = layerElement->GetSameAsContentAlignmentDuration(m_meterParams, true, m_notationType) * SCORE_TIME_UNIT;
         m_currentScoreTime = m_currentScoreTime + incrementScoreTime;
@@ -1219,7 +1219,7 @@ void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)
 {
     assert(object);
 
-    if (object->Is({ NOTE, REST })) {
+    if (object->IsAnyOf(std::array{ NOTE, REST })) {
         const DurationInterface *interface = object->GetDurationInterface();
         assert(interface);
 
@@ -1275,7 +1275,7 @@ void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)
         // Add the measureOn
         startEntry.measureOn = measure->GetID();
     }
-    else if (object->Is({ MREST, MULTIREST })) {
+    else if (object->IsAnyOf(std::array{ MREST, MULTIREST })) {
         // Get the ancestor measure
         const Measure *measure = vrv_cast<const Measure *>(object->GetFirstAncestor(MEASURE));
         assert(measure);
