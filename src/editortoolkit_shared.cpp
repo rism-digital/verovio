@@ -667,7 +667,7 @@ bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode in
 
     // Get the accid from the layer key signature
     if (m_cursor) {
-        if (chordMode && m_cursor->GetPosition() && m_cursor->GetPosition()->Is({ NOTE, CHORD })) {
+        if (chordMode && m_cursor->GetPosition() && m_cursor->GetPosition()->IsAnyOf(std::array{ NOTE, CHORD })) {
             m_cursor->SetRestMode(false);
             m_cursor->SetChordMode(Cursor::ChordMode::EDIT_EXISTING);
         }

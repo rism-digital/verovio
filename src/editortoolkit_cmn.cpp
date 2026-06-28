@@ -294,7 +294,7 @@ bool EditorToolkitCMN::InsertNote(const std::string &elementId, data_PITCHNAME p
     else {
         target = this->GetElement(elementId);
     }
-    if (!target || !target->Is({ CHORD, LAYER, NOTE, REST })) return false;
+    if (!target || !target->IsAnyOf(std::array{ CHORD, LAYER, NOTE, REST })) return false;
 
     if (target->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(target);
@@ -306,7 +306,7 @@ bool EditorToolkitCMN::InsertNote(const std::string &elementId, data_PITCHNAME p
     if (!target->Is(LAYER)) {
         Object *targetParent = target->GetParent();
         // Inserting a note within a tuplet or a beam
-        if (targetParent && targetParent->Is({ BEAM, TUPLET }) && targetParent->GetLast() != target) {
+        if (targetParent && targetParent->IsAnyOf(std::array{ BEAM, TUPLET }) && targetParent->GetLast() != target) {
             previousElement = target;
             targetContainer = targetParent;
         }
@@ -471,7 +471,7 @@ bool EditorToolkitCMN::InsertRest(const std::string &elementId, data_DURATION du
     else {
         target = this->GetElement(elementId);
     }
-    if (!target || !target->Is({ CHORD, LAYER, NOTE, REST })) return false;
+    if (!target || !target->IsAnyOf(std::array{ CHORD, LAYER, NOTE, REST })) return false;
 
     if (target->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(target);
@@ -483,7 +483,7 @@ bool EditorToolkitCMN::InsertRest(const std::string &elementId, data_DURATION du
     if (!target->Is(LAYER)) {
         Object *targetParent = target->GetParent();
         // Inserting a note within a tuplet or a beam
-        if (targetParent && targetParent->Is({ BEAM, TUPLET }) && targetParent->GetLast() != target) {
+        if (targetParent && targetParent->IsAnyOf(std::array{ BEAM, TUPLET }) && targetParent->GetLast() != target) {
             previousElement = target;
             targetContainer = targetParent;
         }
