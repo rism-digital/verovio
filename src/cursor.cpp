@@ -41,6 +41,7 @@ void Cursor::Reset()
 
     m_position = NULL;
     m_isAccidImplicit = false;
+    m_yRelPitchC = 0;
 
     m_restMode = false;
     m_inputMode = InputMode::PITCH_FIRST;
@@ -106,7 +107,7 @@ std::pair<data_ACCIDENTAL_WRITTEN, data_ACCIDENTAL_GESTURAL> Cursor::GetAccidVal
 int Cursor::GetDrawingX() const
 {
     if (this->IsChordEditMode()) return m_position->GetDrawingX();
-    
+
     return Note::GetDrawingX();
 }
 
@@ -119,6 +120,7 @@ void Cursor::SetCursorAlignment(Alignment *alignment)
 void Cursor::ResetCursorAlignment()
 {
     m_accid.SetAlignment(NULL);
+    // m_yRelPitchC = 0;
 }
 
 void Cursor::SetRestMode(bool restMode)
@@ -132,6 +134,10 @@ void Cursor::SetChordMode(ChordMode chordMode)
 {
     m_chordMode = chordMode;
     m_restMode = false;
+    if (m_alignment) {
+        AlignmentType type = (this->IsChordEditMode()) ? ALIGNMENT_CURSOR_CHORD : ALIGNMENT_CURSOR;
+        m_alignment->SetType(type);
+    }
 }
 
 void Cursor::SetInputMode(InputMode intpuMode)

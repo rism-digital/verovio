@@ -489,7 +489,8 @@ void SvgDeviceContext::StartPage()
                           "g.dir, g.dynam, g.mNum {font-style:italic;}"
                           "g.label {font-weight:normal;} "
                           "ellipse, path, polygon, polyline, rect {stroke:currentColor} "
-                          "g.cursor {fill:dodgerblue; color:dodgerblue;}";
+                          "g.cursor {fill:dodgerblue; color:dodgerblue;} "
+                          "g.cursor.chord {fill:limegreen; color:limegreen;} ";
         // bounding box css - for debugging
         // css += " g.bounding-box{stroke:red; stroke-width:10} "
         //        "g.content-bounding-box{stroke:blue; stroke-width:10}";

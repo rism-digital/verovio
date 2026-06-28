@@ -40,7 +40,7 @@ public:
     void CloneReset() override;
 
     bool IsCursor() const override { return true; }
-    
+
     int GetDrawingX() const override;
 
     void SetCursorAlignment(Alignment *alignment);
@@ -68,12 +68,18 @@ public:
     ChordMode GetChordMode() const { return m_chordMode; }
     void SetChordMode(ChordMode chordMode);
     bool IsChordMode() const { return (m_chordMode != ChordMode::NONE); }
-    bool IsChordEditMode() const { return (m_chordMode == ChordMode::EDIT_NEW) || (m_chordMode == ChordMode::EDIT_EXISTING); }
+    bool IsChordEditMode() const
+    {
+        return (m_chordMode == ChordMode::EDIT_NEW) || (m_chordMode == ChordMode::EDIT_EXISTING);
+    }
 
     enum InputMode : int8_t { PITCH_FIRST = 0, DURATION_FIRST };
 
     InputMode GetInputMode() const { return m_inputMode; }
     void SetInputMode(InputMode inputMode);
+
+    int GetYRelPitchC() const { return m_yRelPitchC; }
+    void SetYRelPitchC(int yRelPitchC) { m_yRelPitchC = yRelPitchC; }
 
     //----------//
     // Functors //
@@ -106,6 +112,8 @@ private:
     ChordMode m_chordMode;
     /** A field indicating the inputMode */
     InputMode m_inputMode;
+    /** yRel for pitch C */
+    int m_yRelPitchC;
 };
 
 } // namespace vrv

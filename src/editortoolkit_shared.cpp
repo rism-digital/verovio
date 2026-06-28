@@ -667,6 +667,10 @@ bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode in
 
     // Get the accid from the layer key signature
     if (m_cursor) {
+        if (chordMode && m_cursor->GetPosition() && m_cursor->GetPosition()->Is({ NOTE, CHORD })) {
+            m_cursor->SetRestMode(false);
+            m_cursor->SetChordMode(Cursor::ChordMode::EDIT_EXISTING);
+        }
         if (updateAccid) {
             std::string placeholder;
             this->UpdatePitch(
@@ -699,7 +703,17 @@ bool EditorToolkitShared::UpdateCursor(bool restMode, bool chordMode)
 bool EditorToolkitShared::ResetCursor(bool maintainChordMode)
 {
     if (this->InsertMode() && m_cursor->IsChordMode()) {
-        this->MoveCursor(m_cursor->GetPosition(), maintainChordMode);
+        if (m_cursor->GetPosition()) {
+            // Use the bottom pitch
+            if (m_cursor->GetPosition()->Is(CHORD)) {
+                Chord *chord = vrv_cast<Chord *>(m_cursor->GetPosition());
+                assert(chord);
+                Note *note = chord->GetBottomNote();
+                std::string placeholder;
+                this->UpdatePitch(placeholder, note->GetPname(), note->GetOct(), ACCIDENTAL_WRITTEN_NONE, VRV_UNSET);
+            }
+            this->MoveCursor(m_cursor->GetPosition(), maintainChordMode);
+        }
         if (m_cursor) {
             if (maintainChordMode) {
                 this->UpdateCursor(false, true);
@@ -1505,23 +1519,28 @@ bool EditorToolkitShared::SetScoreDef(const std::string scoreDef)
 
 void EditorToolkitShared::MoveCursor(LayerElement *element, bool maintainChordMode)
 {
-    assert(element);
     assert(m_cursor);
+
+    if (!element) return;
 
     const Object *object = element;
 
     Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
     assert(layer);
 
+    ClassIdsComparison comparison({ CHORD, NOTE, REST });
+
     if (m_cursor->GetChordMode() == Cursor::ChordMode::NEW) {
         m_cursor->SetChordMode(Cursor::ChordMode::EDIT_NEW);
     }
-    else if (element == layer->GetLast(NOTE) || element == layer->GetLast(REST) || element == layer->GetLast(CHORD)) {
+    // Last element in the layer, check if we need to move to the next measure (or exit inputMode)
+    else if (element == layer->FindDescendantByComparison(&comparison, UNLIMITED_DEPTH, BACKWARD)) {
         AlignMeterParams params;
         params.meterSig = layer->GetCurrentMeterSig();
         Fraction position = (m_cursor->GetAlignment()) ? m_cursor->GetAlignment()->GetTime() : 0;
         // Duration of the chord in chord editing mode is already included in the alignment
-        Fraction duration = (m_cursor->IsChordEditMode()) ? 0 : element->GetAlignmentDuration(params, true, NOTATIONTYPE_cmn);
+        Fraction duration
+            = (m_cursor->IsChordEditMode()) ? 0 : element->GetAlignmentDuration(params, true, NOTATIONTYPE_cmn);
         Fraction measureDuration = Fraction(params.meterSig->GetUnitAsDur()) * params.meterSig->GetTotalCount();
         // Assume 4/4 by default
         if (measureDuration == 0) measureDuration = 4;

@@ -118,7 +118,8 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerEnd(Layer *layer)
             if (positionElement->GetAlignment()) position = positionElement->GetAlignment()->GetTime();
             position = position + positionElement->GetAlignmentDuration(m_currentParams, true, m_notationType);
         }
-        Alignment *alignment = m_measureAligner->GetAlignmentAtTime(position, ALIGNMENT_CURSOR);
+        AlignmentType type = (cursor->IsChordEditMode()) ? ALIGNMENT_CURSOR_CHORD : ALIGNMENT_CURSOR;
+        Alignment *alignment = m_measureAligner->GetAlignmentAtTime(position, type);
         cursor->SetCursorAlignment(alignment);
         alignment->AddLayerElementRef(cursor);
     }

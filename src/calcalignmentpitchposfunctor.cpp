@@ -116,6 +116,9 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
             Cursor *cursor = vrv_cast<Cursor *>(note);
             int offset = layerY->GetClefLocOffset((cursor->HasPosition() ? cursor->GetPosition() : cursor));
             loc = PitchInterface::CalcLoc(cursor->GetPname(), cursor->GetOct(), offset);
+            int locPitchC = PitchInterface::CalcLoc(PITCHNAME_c, cursor->GetOct(), offset);
+            int yRelPitchC = staffY->CalcPitchPosYRel(m_doc, locPitchC);
+            cursor->SetYRelPitchC(yRelPitchC);
         }
         else if ((note->HasPname() && (note->HasOct() || note->HasOctDefault())) || note->HasLoc()) {
             loc = PitchInterface::CalcLoc(note, layerY, layerElementY);

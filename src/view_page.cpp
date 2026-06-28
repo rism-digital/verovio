@@ -1617,13 +1617,23 @@ void View::DrawCursor(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     bool isNote = !cursor->IsRestMode();
 
-    dc->StartCustomGraphic("cursor");
+    std::string chordCss = (cursor->IsChordMode()) ? "chord" : "";
+    dc->StartCustomGraphic("cursor", chordCss);
 
     const int x = cursor->GetDrawingX();
     const int y = (isNote) ? cursor->GetDrawingY() : staff->GetDrawingY() + 3 * unit;
 
     if (isNote) {
         this->DrawNote(dc, layer->GetCursor(), layer, staff, measure);
+
+        const int yC1 = staff->GetDrawingY() + cursor->GetYRelPitchC();
+        const int yC2 = yC1 + 6 * unit;
+        const int octX = x - .5 * unit;
+        const int octSize = staffSize * .8;
+        int width = m_doc->GetDrawingStemWidth(octSize);
+        this->DrawVerticalLine(dc, yC1, yC2, octX, width);
+        this->DrawDot(dc, octX, yC1, octSize);
+        this->DrawDot(dc, octX, yC2, octSize);
 
         if (cursor->HasAccid()) {
             this->DrawAccid(dc, cursor->GetAccidElement(), layer, staff, measure);

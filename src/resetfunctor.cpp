@@ -619,6 +619,7 @@ FunctorCode ResetHorizontalAlignmentFunctor::VisitCursor(Cursor *cursor)
     this->VisitNote(cursor);
 
     cursor->ResetCursorAlignment();
+    cursor->SetYRelPitchC(0);
 
     return FUNCTOR_CONTINUE;
 }
