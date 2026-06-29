@@ -1622,12 +1622,13 @@ void View::DrawCursor(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     const int x = cursor->GetDrawingX();
     const int y = (isNote) ? cursor->GetDrawingY() : staff->GetDrawingY() + 3 * unit;
-
+    
+    const int yC1 = staff->GetDrawingY() + cursor->GetYRelPitchC();
+    const int yC2 = yC1 + 6 * unit;
+  
     if (isNote) {
         this->DrawNote(dc, layer->GetCursor(), layer, staff, measure);
 
-        const int yC1 = staff->GetDrawingY() + cursor->GetYRelPitchC();
-        const int yC2 = yC1 + 6 * unit;
         const int octX = x - .5 * unit;
         const int octSize = staffSize * .8;
         int width = m_doc->GetDrawingStemWidth(octSize);

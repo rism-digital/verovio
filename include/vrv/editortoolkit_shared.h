@@ -42,6 +42,9 @@ public:
 
 protected:
 #ifndef NO_EDIT_SUPPORT
+
+    enum SelectCustom : int8_t { SELECT_NONE = 0, SELECT_NOTE };
+
     /**
      * Parse JSON instructions for experimental editor functions.
      */
@@ -59,7 +62,7 @@ protected:
     bool ParseNavigate(const jsonxx::Object &param, std::string &elementId, int &direction);
     bool ParsePropertiesAction(const jsonxx::Object &param, std::string &scoreDef);
     bool ParseResetCursorAction(const jsonxx::Object &param, bool &maintainChordMode);
-    bool ParseSelectAction(const jsonxx::Object &param, std::string &elementId, bool &secondary);
+    bool ParseSelectAction(const jsonxx::Object &param, std::string &elementId, bool &secondary, SelectCustom &custom);
     bool ParseSetAction(
         const jsonxx::Object &param, std::string &elementId, std::string &attribute, std::string &value);
     bool ParseSetCursorAction(
@@ -92,7 +95,7 @@ protected:
     bool InsertControl(std::string &elementName, std::string &startId, std::string &endId);
     bool KeyDown(std::string &elementId, int key, bool shiftKey, bool ctrlKey);
     bool Navigate(std::string &elementId, const int &direction);
-    bool Select(std::string &elementId, bool secondary);
+    bool Select(std::string &elementId, bool secondary, SelectCustom custom);
     bool Set(std::string &elementId, const std::string &attribute, const std::string &value);
     bool UpdatePitch(std::string &elementId, data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid, int midi);
 

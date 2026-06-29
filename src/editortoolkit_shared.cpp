@@ -274,8 +274,9 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
     else if (action == "select") {
         std::string elementId;
         bool secondary;
-        if (this->ParseSelectAction(json.get<jsonxx::Object>("param"), elementId, secondary)) {
-            return this->Select(elementId, secondary);
+        SelectCustom custom;
+        if (this->ParseSelectAction(json.get<jsonxx::Object>("param"), elementId, secondary, custom)) {
+            return this->Select(elementId, secondary, custom);
         }
     }
     else if (action == "set") {
@@ -439,13 +440,22 @@ bool EditorToolkitShared::ParseResetCursorAction(const jsonxx::Object &param, bo
     return true;
 }
 
-bool EditorToolkitShared::ParseSelectAction(const jsonxx::Object &param, std::string &elementId, bool &secondary)
+bool EditorToolkitShared::ParseSelectAction(
+    const jsonxx::Object &param, std::string &elementId, bool &secondary, SelectCustom &custom)
 {
+    custom = SELECT_NONE;
+
     if (!param.has<jsonxx::String>("elementId")) return false;
     elementId = param.get<jsonxx::String>("elementId");
     secondary = false;
     if (param.has<jsonxx::Boolean>("secondary")) {
         secondary = param.get<jsonxx::Boolean>("secondary");
+    }
+    else if (param.has<jsonxx::String>("custom")) {
+        const auto customStr = param.get<jsonxx::String>("custom");
+        if (customStr == "note") {
+            custom = SELECT_NOTE;
+        }
     }
     return true;
 }
@@ -954,7 +964,7 @@ bool EditorToolkitShared::Navigate(std::string &elementId, const int &direction)
     return true;
 }
 
-bool EditorToolkitShared::Select(std::string &elementId, bool secondary)
+bool EditorToolkitShared::Select(std::string &elementId, bool secondary, SelectCustom custom)
 {
     if (this->InsertMode()) return true;
 
@@ -964,6 +974,19 @@ bool EditorToolkitShared::Select(std::string &elementId, bool secondary)
             Object *element = this->GetElement(elementId);
             if (!element) return false;
             m_selectionSecondaryId = elementId;
+        }
+    }
+    else if (custom == SELECT_NOTE) {
+        m_selectionSecondaryId = "";
+        if (!m_selectionId.empty()) {
+            Object *element = this->GetElement(elementId);
+            if (!element || !element->Is(NOTE)) return false;
+            Note *note = vrv_cast<Note *>(element);
+            if (note && note->IsChordTone()) {
+                Chord *chord = note->IsChordTone();
+                m_selectionId = chord->GetID();
+                m_selectionClassId = chord->GetClassId();
+            }
         }
     }
     else {
