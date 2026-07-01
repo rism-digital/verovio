@@ -3214,7 +3214,10 @@ void MusicXmlInput::ReadMusicXmlNote(
                     m_alterAccids[pitchAlter].clear();
                     for (Object *object : accids) {
                         Accid *accid = vrv_cast<Accid *>(object);
-                        accid->SetAccidGes(Att::AccidentalWrittenToGestural(accid->GetAccid()));
+                        data_ACCIDENTAL_GESTURAL ges = Att::AccidentalWrittenToGestural(accid->GetAccid());
+                        if (Att::AccidentalGesturalToWritten(ges) != accid->GetAccid()) {
+                            accid->SetAccidGes(ges);
+                        }
                         m_currentAccids[note->GetPname()].push_back(
                             musicxml::Accidental(accid->GetAccid(), accid->GetGlyphName(), accid->GetGlyphAuth()));
                         m_alterAccids[pitchAlter].push_back(
