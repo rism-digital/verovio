@@ -23,8 +23,8 @@ namespace vrv {
 // Static members
 //----------------------------------------------------------------------------
 
-std::map<std::string, char32_t> CustomTuning::s_glyphNames;
-std::map<char32_t, std::string> CustomTuning::s_glyphCodes;
+thread_local std::map<std::string, char32_t> CustomTuning::s_glyphNames;
+thread_local std::map<char32_t, std::string> CustomTuning::s_glyphCodes;
 
 //----------------------------------------------------------------------------
 // CustomTuning
