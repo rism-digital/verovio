@@ -472,7 +472,17 @@ void ScoreDef::ResetFromDrawingValues()
         assert(staffDef);
 
         Clef *clef = vrv_cast<Clef *>(staffDef->FindDescendantByType(CLEF));
-        if (clef) clef->ReplaceWithCopyOf(staffDef->GetCurrentClef());
+        if (clef) {
+            // ReplaceWithCopyOf assigns through Object::operator=, which copies
+            // the base members and cloned children but no derived attribute
+            // values, so the clef child kept its old shape and line - copy the
+            // clef-identity attributes explicitly.
+            const Clef *currentClef = staffDef->GetCurrentClef();
+            clef->SetShape(currentClef->GetShape());
+            clef->SetLine(currentClef->GetLine());
+            clef->SetDis(currentClef->GetDis());
+            clef->SetDisPlace(currentClef->GetDisPlace());
+        }
 
         KeySig *keySig = vrv_cast<KeySig *>(staffDef->FindDescendantByType(KEYSIG));
         if (keySig) keySig->ReplaceWithCopyOf(staffDef->GetCurrentKeySig());
