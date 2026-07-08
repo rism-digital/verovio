@@ -488,7 +488,18 @@ void ScoreDef::ResetFromDrawingValues()
         if (keySig) keySig->ReplaceWithCopyOf(staffDef->GetCurrentKeySig());
 
         Mensur *mensur = vrv_cast<Mensur *>(staffDef->FindDescendantByType(MENSUR));
-        if (mensur) mensur->ReplaceWithCopyOf(staffDef->GetCurrentMensur());
+        if (mensur) {
+            // Same slicing as the clef above: copy the mensuration-sign
+            // attributes that View::DrawMensur reads, instead of through
+            // ReplaceWithCopyOf.
+            const Mensur *currentMensur = staffDef->GetCurrentMensur();
+            mensur->SetSign(currentMensur->GetSign());
+            mensur->SetSlash(currentMensur->GetSlash());
+            mensur->SetDot(currentMensur->GetDot());
+            mensur->SetOrient(currentMensur->GetOrient());
+            mensur->SetNum(currentMensur->GetNum());
+            mensur->SetNumbase(currentMensur->GetNumbase());
+        }
 
         MeterSigGrp *meterSigGrp = vrv_cast<MeterSigGrp *>(staffDef->FindDescendantByType(METERSIGGRP));
         MeterSig *meterSig = vrv_cast<MeterSig *>(staffDef->FindDescendantByType(METERSIG));
