@@ -789,7 +789,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     // Because SMuFL does not have the origin correpsonding to the pitch as for notes, we need to correct it.
     // This will remain approximate
-    if (staff->m_drawingNotationType != NOTATIONTYPE_neume) {
+    if (!IsNeumeType(staff->m_drawingNotationType)) {
         y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
@@ -1824,7 +1824,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     Syl *syl = vrv_cast<Syl *>(element);
     assert(syl);
 
-    if (!syl->GetStart() && !(staff->m_drawingNotationType == NOTATIONTYPE_neume)) {
+    if (!syl->GetStart() && !IsNeumeType(staff->m_drawingNotationType)) {
         LogWarning("Parent note for <syl> was not found");
         return;
     }
