@@ -47,9 +47,10 @@ void Cursor::Reset()
     m_inputMode = InputMode::PITCH_FIRST;
     m_chordMode = ChordMode::NONE;
 
-    // Default position
+    // Default pitch and duration
     this->SetPname(PITCHNAME_c);
     this->SetOct(4);
+    this->SetDur(DURATION_4);
 }
 
 void Cursor::CloneReset()

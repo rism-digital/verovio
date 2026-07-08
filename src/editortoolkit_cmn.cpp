@@ -42,6 +42,17 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
         }
         LogWarning("Could not parse the insertCursorByDur action");
     }
+    else if (action == "insertCursorByPitch") {
+        data_PITCHNAME pname;
+        int oct;
+        data_ACCIDENTAL_WRITTEN accid;
+        int midi;
+        if (this->ParseInsertCursorByPitchAction(json.get<jsonxx::Object>("param"), pname, oct, accid, midi)) {
+            this->PrepareUndo();
+            return (this->InsertCursorByPitch(pname, oct, accid, midi));
+        }
+        LogWarning("Could not parse the insertCursorByPitch action");
+    }
     else if (action == "insertMeasure") {
         std::string elementId;
         int number;
@@ -96,16 +107,25 @@ bool EditorToolkitCMN::ParseInsertCursorByDurAction(const jsonxx::Object &param,
 }
 
 bool EditorToolkitCMN::ParseInsertCursorByPitchAction(
-    const jsonxx::Object &param, data_PITCHNAME &pname, int &oct, data_ACCIDENTAL_WRITTEN &accid)
+    const jsonxx::Object &param, data_PITCHNAME &pname, int &oct, data_ACCIDENTAL_WRITTEN &accid, int &midi)
 {
     pname = PITCHNAME_NONE;
     oct = VRV_UNSET;
     accid = ACCIDENTAL_WRITTEN_NONE;
+    midi = VRV_UNSET;
     Note noteConverter;
     Accid accidConverter;
 
-    if (!param.has<jsonxx::String>("pname")) return false;
-    pname = noteConverter.AttPitch::StrToPitchname(param.get<jsonxx::String>("pname"));
+    // At least one of the two
+    if (param.has<jsonxx::String>("pname")) {
+        pname = noteConverter.AttPitch::StrToPitchname(param.get<jsonxx::String>("pname"));
+    }
+    else if (param.has<jsonxx::Number>("midi")) {
+        midi = param.get<jsonxx::Number>("midi");
+    }
+    else {
+        return false;
+    }
 
     if (param.has<jsonxx::Number>("oct")) oct = param.get<jsonxx::Number>("oct");
     if (param.has<jsonxx::String>("accid"))
@@ -205,9 +225,17 @@ bool EditorToolkitCMN::InsertCursorByDur(data_DURATION dur, int dots)
     }
 }
 
-bool EditorToolkitCMN::InsertCursorByPitch(data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid)
+bool EditorToolkitCMN::InsertCursorByPitch(data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid, int midi)
 {
     if (!this->InsertMode()) return false;
+    
+    if (midi != VRV_UNSET) {
+        std::string placeholder = m_cursor->GetID();
+        this->UpdatePitch(placeholder, PITCHNAME_NONE, VRV_UNSET, ACCIDENTAL_WRITTEN_NONE, midi);
+        pname = m_cursor->GetPname();
+        oct = VRV_UNSET;
+        accid = ACCIDENTAL_WRITTEN_NONE;
+    }
 
     if (oct == VRV_UNSET) oct = m_cursor->GetOct();
 

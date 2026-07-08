@@ -677,6 +677,7 @@ bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode in
 
     // Get the accid from the layer key signature
     if (m_cursor) {
+        m_cursor->SetInputMode(inputMode);
         if (chordMode && m_cursor->GetPosition() && m_cursor->GetPosition()->IsAnyOf(std::array{ NOTE, CHORD })) {
             m_cursor->SetRestMode(false);
             m_cursor->SetChordMode(Cursor::ChordMode::EDIT_EXISTING);
@@ -1700,7 +1701,7 @@ EditorToolkitShared::MidiSpelling EditorToolkitShared::SpellMidi(int midi, const
               { PITCHNAME_b, ACCIDENTAL_WRITTEN_f }, { PITCHNAME_b, ACCIDENTAL_WRITTEN_NONE } };
 
     int pc = ((midi % 12) + 12) % 12;
-    assert(pc >= 0 && pc > 12);
+    assert(pc >= 0 && pc < 12);
 
     bool flatKey = keySig.second == ACCIDENTAL_WRITTEN_f;
 

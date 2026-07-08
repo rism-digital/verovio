@@ -1621,55 +1621,114 @@ void View::DrawCursor(DeviceContext *dc, LayerElement *element, Layer *layer, St
     dc->StartCustomGraphic("cursor", chordCss);
 
     const int x = cursor->GetDrawingX();
-    const int y = (isNote) ? cursor->GetDrawingY() : staff->GetDrawingY() + 3 * unit;
     
     const int yC1 = staff->GetDrawingY() + cursor->GetYRelPitchC();
     const int yC2 = yC1 + 6 * unit;
-  
-    if (isNote) {
-        this->DrawNote(dc, layer->GetCursor(), layer, staff, measure);
 
-        const int octX = x - .5 * unit;
+    if (cursor->GetInputMode() == Cursor::DURATION_FIRST) {
+        const int octX = x + unit;
         const int octSize = staffSize * .8;
         int width = m_doc->GetDrawingStemWidth(octSize);
         this->DrawVerticalLine(dc, yC1, yC2, octX, width);
         this->DrawDot(dc, octX, yC1, octSize);
         this->DrawDot(dc, octX, yC2, octSize);
-
-        if (cursor->HasAccid()) {
-            this->DrawAccid(dc, cursor->GetAccidElement(), layer, staff, measure);
+                
+        const int y = std::max(yC2, staff->GetDrawingY()) + 2 * unit;
+        const int cursorSize = staffSize * .7;
+        
+        dc->SetFont(m_doc->GetDrawingSmuflFont(cursorSize, false));
+        
+        std::u32string str;
+        int sym = SMUFL_ECA5_metNoteQuarterUp;
+        switch (cursor->GetDur()) {
+            case (DURATION_breve): sym = SMUFL_ECA1_metNoteDoubleWholeSquare; break;
+            case (DURATION_1): sym = SMUFL_ECA2_metNoteWhole; break;
+            case (DURATION_2): sym = SMUFL_ECA3_metNoteHalfUp; break;
+            case (DURATION_4): sym = SMUFL_ECA5_metNoteQuarterUp; break;
+            case (DURATION_8): sym = SMUFL_ECA7_metNote8thUp; break;
+            case (DURATION_16): sym = SMUFL_ECA9_metNote16thUp; break;
+            case (DURATION_32): sym = SMUFL_ECAB_metNote32ndUp; break;
+            case (DURATION_64): sym = SMUFL_ECAD_metNote64thUp; break;
+                default: break;
         }
-
+        str.push_back(sym);
+        
         if (cursor->HasDots()) {
-            int dotsX = x + 2.8 * cursor->GetDrawingRadius(m_doc);
-            this->DrawDotsPart(dc, dotsX, y, cursor->HasDots(), staff);
+            str.push_back(SMUFL_0020_space);
+            str.push_back(SMUFL_ECB7_metAugmentationDot);
         }
+
+            
+        data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
+        this->DrawSmuflString(dc, octX, y, str, alignment, cursorSize);
+        TextExtend extend;
+        dc->GetSmuflTextExtent(str, &extend);
+        
+        if (cursor->HasAccid() && !cursor->IsAccidImplicit()) {
+            std::u32string strAccid;
+            int sym = SMUFL_EA65_figbassNatural;
+            switch (cursor->GetAccid()) {
+                case (ACCIDENTAL_WRITTEN_f): sym = SMUFL_EA64_figbassFlat ; break;
+                case (ACCIDENTAL_WRITTEN_n): sym = SMUFL_EA65_figbassNatural; break;
+                case (ACCIDENTAL_WRITTEN_s): sym = SMUFL_EA66_figbassSharp; break;
+                case (ACCIDENTAL_WRITTEN_ff): sym = SMUFL_EA63_figbassDoubleFlat; break;
+                case (ACCIDENTAL_WRITTEN_x): sym = SMUFL_EA67_figbassDoubleSharp; break;
+                    default: break;
+            }
+            
+            strAccid.push_back(sym);
+            this->DrawSmuflString(dc, octX, y + extend.m_height, strAccid, alignment, cursorSize);
+        }
+        
+        dc->ResetFont();
     }
     else {
-        const data_DURATION dur = (cursor->HasDur()) ? cursor->GetDur() : DURATION_4;
-        Rest rest;
-        // Needed for finding resources
-        rest.SetParent(measure);
-        const char32_t drawingGlyph = rest.GetRestGlyph(dur);
-
-        int width = m_doc->GetGlyphWidth(drawingGlyph, staffSize, true);
-
-        this->DrawSmuflCode(dc, x, y, drawingGlyph, staffSize, true);
-        if (dur == DURATION_1 || dur == DURATION_2) {
-            const int lineWidth = m_doc->GetOptions()->m_ledgerLineThickness.GetValue()
-                * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetOptions()->m_graceFactor.GetValue();
-
-            dc->SetPen(this->ToDeviceContextX(lineWidth), PEN_SOLID);
-            dc->DrawLine(this->ToDeviceContextX(x - unit * .5), this->ToDeviceContextY(y),
-                this->ToDeviceContextX(x + width + unit * .5), this->ToDeviceContextY(y));
-            dc->ResetPen();
-
-            width += .5 * unit;
+        const int y = (isNote) ? cursor->GetDrawingY() : staff->GetDrawingY() + 3 * unit;
+        if (isNote) {
+            this->DrawNote(dc, layer->GetCursor(), layer, staff, measure);
+            
+            const int octX = x - .5 * unit;
+            const int octSize = staffSize * .8;
+            int width = m_doc->GetDrawingStemWidth(octSize);
+            this->DrawVerticalLine(dc, yC1, yC2, octX, width);
+            this->DrawDot(dc, octX, yC1, octSize);
+            this->DrawDot(dc, octX, yC2, octSize);
+            
+            if (cursor->HasAccid()) {
+                this->DrawAccid(dc, cursor->GetAccidElement(), layer, staff, measure);
+            }
+            
+            if (cursor->HasDots()) {
+                int dotsX = x + 2.8 * cursor->GetDrawingRadius(m_doc);
+                this->DrawDotsPart(dc, dotsX, y, cursor->HasDots(), staff);
+            }
         }
-
-        if (cursor->HasDots()) {
-            int dotsX = x + .5 * unit + width;
-            this->DrawDotsPart(dc, dotsX, y, cursor->GetDots(), staff, true);
+        else {
+            const data_DURATION dur = (cursor->HasDur()) ? cursor->GetDur() : DURATION_4;
+            Rest rest;
+            // Needed for finding resources
+            rest.SetParent(measure);
+            const char32_t drawingGlyph = rest.GetRestGlyph(dur);
+            
+            int width = m_doc->GetGlyphWidth(drawingGlyph, staffSize, true);
+            
+            this->DrawSmuflCode(dc, x, y, drawingGlyph, staffSize, true);
+            if (dur == DURATION_1 || dur == DURATION_2) {
+                const int lineWidth = m_doc->GetOptions()->m_ledgerLineThickness.GetValue()
+                * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetOptions()->m_graceFactor.GetValue();
+                
+                dc->SetPen(this->ToDeviceContextX(lineWidth), PEN_SOLID);
+                dc->DrawLine(this->ToDeviceContextX(x - unit * .5), this->ToDeviceContextY(y),
+                             this->ToDeviceContextX(x + width + unit * .5), this->ToDeviceContextY(y));
+                dc->ResetPen();
+                
+                width += .5 * unit;
+            }
+            
+            if (cursor->HasDots()) {
+                int dotsX = x + .5 * unit + width;
+                this->DrawDotsPart(dc, dotsX, y, cursor->GetDots(), staff, true);
+            }
         }
     }
 
