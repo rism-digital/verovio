@@ -496,7 +496,14 @@ void ScoreDef::ResetFromDrawingValues()
             meterSigGrp->ReplaceWithCopyOf(staffDef->GetCurrentMeterSigGrp());
         }
         else if (meterSig) {
-            meterSig->ReplaceWithCopyOf(staffDef->GetCurrentMeterSig());
+            // Same slicing as the clef above: ReplaceWithCopyOf drops the
+            // derived attribute values, so the meter child kept its old
+            // count / unit / sym - copy the meter-identity attributes
+            // explicitly.
+            const MeterSig *currentMeterSig = staffDef->GetCurrentMeterSig();
+            meterSig->SetCount(currentMeterSig->GetCount());
+            meterSig->SetUnit(currentMeterSig->GetUnit());
+            meterSig->SetSym(currentMeterSig->GetSym());
         }
     }
 }
