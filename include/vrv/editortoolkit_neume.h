@@ -64,6 +64,7 @@ public:
     bool Ungroup(std::string groupType, std::vector<std::string> elementIds);
     bool ChangeGroup(std::string elementId, std::string contour);
     bool ToggleLigature(std::vector<std::string> elementIds);
+    bool ToggleNeumeConnection(std::vector<std::string> elementIds);
     bool ChangeStaff(std::string elementId);
     bool ChangeStaffTo(std::string elementId, std::string staffId);
     bool ClefMovementHandler(Clef *clef, int x, int y);
@@ -98,6 +99,7 @@ protected:
     bool ParseUngroupAction(jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds);
     bool ParseChangeGroupAction(jsonxx::Object param, std::string *elementId, std::string *contour);
     bool ParseToggleLigatureAction(jsonxx::Object param, std::vector<std::string> *elementIds);
+    bool ParseToggleNeumeConnectionAction(jsonxx::Object param, std::vector<std::string> *elementIds);
     bool ParseChangeStaffAction(jsonxx::Object param, std::string *elementId);
     bool ParseChangeStaffToAction(jsonxx::Object param, std::string *elementId, std::string *staffId);
     ///@}

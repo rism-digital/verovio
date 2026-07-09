@@ -19,6 +19,36 @@
 
 namespace vrv {
 
+static void SetChantLigatureGlyphs(Nc *nc, Nc *previousNc, int pitchDifference, int unit)
+{
+    assert(nc);
+    assert(previousNc);
+
+    nc->m_drawingGlyphs.at(0).m_yOffset = -pitchDifference * unit;
+    previousNc->m_drawingGlyphs.at(0).m_yOffset = pitchDifference * unit;
+
+    // set the glyph for both the current and previous nc
+    switch (pitchDifference) {
+        case -1:
+            nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B9_chantLigaturaDesc2nd;
+            previousNc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B4_chantEntryLineAsc2nd;
+            break;
+        case -2:
+            nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9BA_chantLigaturaDesc3rd;
+            previousNc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B5_chantEntryLineAsc3rd;
+            break;
+        case -3:
+            nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9BB_chantLigaturaDesc4th;
+            previousNc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B6_chantEntryLineAsc4th;
+            break;
+        case -4:
+            nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9BC_chantLigaturaDesc5th;
+            previousNc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B7_chantEntryLineAsc5th;
+            break;
+        default: break;
+    }
+}
+
 //----------------------------------------------------------------------------
 // CalcLigatureOrNeumePosFunctor
 //----------------------------------------------------------------------------
@@ -239,11 +269,16 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
     int xRel = 0;
     Nc *previousNc = NULL;
     bool previousLig = false;
+    const bool isHufnagel = (staff->m_drawingNotationType == NOTATIONTYPE_neume_hufnagel);
 
-    for (Object *object : ncs) {
+    for (ListOfObjects::const_iterator iter = ncs.begin(); iter != ncs.end(); ++iter) {
 
-        Nc *nc = vrv_cast<Nc *>(object);
+        Nc *nc = vrv_cast<Nc *>(*iter);
         assert(nc);
+
+        ListOfObjects::const_iterator nextIter = iter;
+        ++nextIter;
+        Nc *nextNc = (nextIter != ncs.end()) ? vrv_cast<Nc *>(*nextIter) : NULL;
 
         const bool hasLiquescent = (nc->FindDescendantByType(LIQUESCENT));
         const bool hasOriscus = (nc->FindDescendantByType(ORISCUS));
@@ -257,6 +292,8 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
 
         int pitchDifference = (previousNc) ? nc->PitchOrLocDifferenceTo(previousNc) : 0;
         bool overlapWithPrevious = (pitchDifference == 0) ? false : true;
+        const bool connectsToPrevious = (isHufnagel && previousNc && (nc->GetCon() == ncForm_CON_e));
+        const bool startsConnection = (isHufnagel && nextNc && (nextNc->GetCon() == ncForm_CON_e));
 
         if (hasLiquescent) {
             const bool gabcNoTailsOption = m_doc->GetOptions()->m_liquescentWithoutTails.GetValue();
@@ -304,7 +341,14 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
         else {
             nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E990_chantPunctum;
 
-            if (nc->GetLigated() == BOOLEAN_true) {
+            if (startsConnection) {
+                nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B4_chantEntryLineAsc2nd;
+            }
+            else if (connectsToPrevious) {
+                overlapWithPrevious = false;
+                SetChantLigatureGlyphs(nc, previousNc, pitchDifference, unit);
+            }
+            else if (nc->GetLigated() == BOOLEAN_true) {
                 // This is the first nc of a ligature
                 if (!previousLig) {
                     // Temporarily set a second line glyph
@@ -317,29 +361,7 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
                     overlapWithPrevious = false;
                     assert(previousNc);
                     previousLig = false;
-                    nc->m_drawingGlyphs.at(0).m_yOffset = -pitchDifference * unit;
-                    previousNc->m_drawingGlyphs.at(0).m_yOffset = pitchDifference * unit;
-
-                    // set the glyph for both the current and previous nc
-                    switch (pitchDifference) {
-                        case -1:
-                            nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B9_chantLigaturaDesc2nd;
-                            previousNc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B4_chantEntryLineAsc2nd;
-                            break;
-                        case -2:
-                            nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9BA_chantLigaturaDesc3rd;
-                            previousNc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B5_chantEntryLineAsc3rd;
-                            break;
-                        case -3:
-                            nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9BB_chantLigaturaDesc4th;
-                            previousNc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B6_chantEntryLineAsc4th;
-                            break;
-                        case -4:
-                            nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9BC_chantLigaturaDesc5th;
-                            previousNc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B7_chantEntryLineAsc5th;
-                            break;
-                        default: break;
-                    }
+                    SetChantLigatureGlyphs(nc, previousNc, pitchDifference, unit);
                 }
             }
             // Check if nc is part of a ligature or is an inclinatum
@@ -370,7 +392,7 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
             nc->SetDrawingXRel(xRel);
             // The first glyph set the spacing - unless we are starting a ligature, in which case no spacing should be
             // added between the two nc
-            if (!previousLig) {
+            if (!previousLig && !startsConnection) {
                 xRel += m_doc->GetGlyphWidth(nc->m_drawingGlyphs.at(0).m_fontNo, staffSize, false);
             }
         }

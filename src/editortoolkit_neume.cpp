@@ -246,6 +246,13 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
         }
         LogWarning("Could not parse toggle ligature action");
     }
+    else if (action == "toggleNeumeConnection") {
+        std::vector<std::string> elementIds;
+        if (this->ParseToggleNeumeConnectionAction(json.get<jsonxx::Object>("param"), &elementIds)) {
+            return this->ToggleNeumeConnection(elementIds);
+        }
+        LogWarning("Could not parse toggle neume connection action");
+    }
     else if (action == "changeStaff") {
         std::string elementId;
         if (this->ParseChangeStaffAction(json.get<jsonxx::Object>("param"), &elementId)) {
@@ -3636,6 +3643,60 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
     return success1 && success2;
 }
 
+bool EditorToolkitNeume::ToggleNeumeConnection(std::vector<std::string> elementIds)
+{
+    assert(elementIds.size() == 2);
+    std::string firstNcId = elementIds[0];
+    std::string secondNcId = elementIds[1];
+
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page.");
+        m_editInfo.import("status", "FAILURE");
+        m_editInfo.import("message", "Could not get the drawing page.");
+        return false;
+    }
+
+    Nc *firstNc = vrv_cast<Nc *>(m_doc->GetDrawingPage()->FindDescendantByID(firstNcId));
+    assert(firstNc);
+    Nc *secondNc = vrv_cast<Nc *>(m_doc->GetDrawingPage()->FindDescendantByID(secondNcId));
+    assert(secondNc);
+
+    if (firstNc->GetParent() != secondNc->GetParent()) {
+        LogError("The selected ncs are not in the same neume.");
+        m_editInfo.import("status", "FAILURE");
+        m_editInfo.import("message", "The selected ncs are not in the same neume.");
+        return false;
+    }
+
+    int firstIdx = firstNc->GetIdx();
+    int secondIdx = secondNc->GetIdx();
+    if (std::abs(firstIdx - secondIdx) != 1) {
+        LogError("The selected ncs are not adjacent.");
+        m_editInfo.import("status", "FAILURE");
+        m_editInfo.import("message", "The selected ncs are not adjacent.");
+        return false;
+    }
+
+    Nc *currentNc = (firstIdx > secondIdx) ? firstNc : secondNc;
+    Staff *staff = vrv_cast<Staff *>(currentNc->GetFirstAncestor(STAFF));
+    assert(staff);
+    if (staff->m_drawingNotationType != NOTATIONTYPE_neume_hufnagel) {
+        LogError("Neume connections are supported only for Hufnagel notation.");
+        m_editInfo.import("status", "FAILURE");
+        m_editInfo.import("message", "Neume connections are supported only for Hufnagel notation.");
+        return false;
+    }
+
+    currentNc->SetCon((currentNc->GetCon() == ncForm_CON_e) ? ncForm_CON_NONE : ncForm_CON_e);
+
+    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    m_doc->GetDrawingPage()->LayOutTranscription(true);
+
+    m_editInfo.import("status", "OK");
+    m_editInfo.import("message", "");
+    return true;
+}
+
 bool EditorToolkitNeume::ChangeStaff(std::string elementId)
 {
     if (!m_doc->GetDrawingPage()) {
@@ -4304,6 +4365,16 @@ bool EditorToolkitNeume::ParseChangeGroupAction(jsonxx::Object param, std::strin
 }
 
 bool EditorToolkitNeume::ParseToggleLigatureAction(jsonxx::Object param, std::vector<std::string> *elementIds)
+{
+    if (!param.has<jsonxx::Array>("elementIds")) return false;
+    jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
+    for (int i = 0; i < (int)array.size(); ++i) {
+        elementIds->push_back(array.get<jsonxx::String>(i));
+    }
+    return true;
+}
+
+bool EditorToolkitNeume::ParseToggleNeumeConnectionAction(jsonxx::Object param, std::vector<std::string> *elementIds)
 {
     if (!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
