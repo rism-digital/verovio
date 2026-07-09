@@ -151,6 +151,8 @@ Object &Object::operator=(const Object &object)
         // Also copy attribute classes
         m_attClasses = object.m_attClasses;
         m_interfaces = object.m_interfaces;
+        // Copy attribute values (necessary because assignment operator is not virtual)
+        object.CopyAttributesTo(this);
         // New id
         this->GenerateID();
         // For now do now copy them
