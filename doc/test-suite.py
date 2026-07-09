@@ -10,7 +10,7 @@ import xml.etree.ElementTree as ET
 from cairosvg import svg2png
 
 # Add path for toolkit built in-place
-sys.path.append('.')
+sys.path.append('./verovio')
 import verovio
 
 ns = {'mei': 'http://www.music-encoding.org/ns/mei'}
