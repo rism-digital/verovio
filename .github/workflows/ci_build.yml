@@ -127,9 +127,9 @@ jobs:
             compiler: xcode
             version: "15.4"
           
-          - os: macos-latest
+          - os: macos-15
             compiler: xcode
-            version: "16.0"
+            version: "16.2"
 
     steps:
       - name: Checkout main repo
