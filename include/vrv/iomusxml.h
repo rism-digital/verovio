@@ -615,6 +615,11 @@ private:
     static void MidiToPitch(int midi, std::string &step, int &alter, int &octave);
     ///@}
 
+    /*
+     * @name Helper to create a string from pitch/alter values.
+     */
+    static std::string PitchAlterToString(data_PITCHNAME pname, float alter);
+
 public:
     //
 private:
@@ -697,8 +702,10 @@ private:
     std::map<Measure *, int> m_measureCounts;
     /* measure rests */
     std::map<int, int> m_multiRests;
-    /* a map of current accidental for each pitch class */
+    /* a map of pitch classes to their current accidental(s) */
     std::map<data_PITCHNAME, std::vector<musicxml::Accidental>> m_currentAccids;
+    /* a map of pitch/alter values to their corresponding accidental(s) */
+    std::map<std::string, std::vector<musicxml::Accidental>> m_alterAccids;
     /* current key signature */
     KeySig *m_currentKeySig = NULL;
     /* A flag indicating we had a clef change */

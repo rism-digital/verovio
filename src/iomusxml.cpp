@@ -3140,6 +3140,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         pugi::xml_node pitch = node.child("pitch");
         if (pitch && !isTablature) {
             const std::string stepStr = pitch.child("step").text().as_string();
+            const float alterVal = pitch.child("alter").text().as_float();
             const int octaveNum = pitch.child("octave").text().as_int();
             if (!stepStr.empty()) note->SetPname(ConvertStepToPitchName(stepStr));
             if (m_octDis[staff->GetN()] != 0) {
@@ -3153,8 +3154,24 @@ void MusicXmlInput::ReadMusicXmlNote(
             // adjust accidental (including glyph) based on carried-over accidentals
             // or update the carried-over accidentals with current accidental value.
             if (note->HasPname()) {
+                std::string pitchAlter = PitchAlterToString(note->GetPname(), alterVal);
                 ListOfObjects accids = note->FindAllDescendantsByType(ACCID);
                 if (accids.empty()) {
+                    // It can happen that the doc encodes the accidentals in the pitch/alter element only,
+                    // regardless of key signature or bar lines. Handle this case here.
+                    if (alterVal != 0.0) {
+                        // In case this alter value is already associated with an accidental, use it here.
+                        if (m_alterAccids.contains(pitchAlter)) {
+                            m_currentAccids[note->GetPname()] = m_alterAccids.at(pitchAlter);
+                        }
+                        // Otherwise, deduce the generic accidental from this alter value.
+                        else {
+                            m_currentAccids[note->GetPname()].clear();
+                            m_currentAccids[note->GetPname()].push_back(musicxml::Accidental(
+                                Att::AccidentalGesturalToWritten(ConvertAlterToAccid(alterVal)), "", ""));
+                        }
+                    }
+
                     try {
                         for (const auto &current : m_currentAccids.at(note->GetPname())) {
                             // Avoid adding empty accidentals
@@ -3162,21 +3179,29 @@ void MusicXmlInput::ReadMusicXmlNote(
 
                             Accid *accid = new Accid();
                             note->AddChild(accid);
-
-                            // to make sure the new *gestural* accidental conforms to the carried-over *written*
-                            // accidental, we translate the latter to a SMuFL glyph and set the gestural accidental to
-                            // the MEI equivalent of the written accidental. The custom tuning will always choose
-                            // the SMuFL glyph over the gestural or written accidentals.
                             accid->SetAccidGes(Att::AccidentalWrittenToGestural(current.m_accid));
-                            if (!current.m_glyphName.empty()) {
-                                accid->SetGlyphName(current.m_glyphName);
-                                accid->SetGlyphAuth(current.m_glyphAuth);
-                            }
-                            // We have a current.m_accid
-                            else {
-                                char32_t glyph = Accid::GetAccidGlyph(current.m_accid);
-                                accid->SetGlyphName(CustomTuning::GetGlyphName(glyph, m_doc));
-                                accid->SetGlyphAuth("smufl");
+
+                            // Because gestural accidentals do not map 1:1 to written accidentals, we may be losing
+                            // information if we rely only on gestural accidentals to look up tuning tones.
+                            // Instead, we set the accidental's SMuFL glyph name to whatever was carried over. The
+                            // custom tuning will always choose the SMuFL glyph over the written or gestural
+                            // accidentals. SPECIAL CASE: When the gestural accidental is the same as the written
+                            // accidental (and not NONE), we are sure that the gestural accidental will not lose
+                            // information, and therefore we don't need to explicitly set the SMuFL glyph. This ensures
+                            // that scores that only feature "regular" accidentals will never have redundant SMuFL
+                            // glyphs.
+                            if (current.m_accid == ACCIDENTAL_WRITTEN_NONE
+                                || Att::AccidentalGesturalToWritten(accid->GetAccidGes()) != current.m_accid) {
+                                if (!current.m_glyphName.empty()) {
+                                    accid->SetGlyphName(current.m_glyphName);
+                                    accid->SetGlyphAuth(current.m_glyphAuth);
+                                }
+                                // We have a current.m_accid
+                                else {
+                                    char32_t glyph = Accid::GetAccidGlyph(current.m_accid);
+                                    accid->SetGlyphName(CustomTuning::GetGlyphName(glyph, m_doc));
+                                    accid->SetGlyphAuth("smufl");
+                                }
                             }
                         }
                     }
@@ -3186,10 +3211,16 @@ void MusicXmlInput::ReadMusicXmlNote(
                 }
                 else {
                     m_currentAccids[note->GetPname()].clear();
+                    m_alterAccids[pitchAlter].clear();
                     for (Object *object : accids) {
                         Accid *accid = vrv_cast<Accid *>(object);
-                        accid->SetAccidGes(Att::AccidentalWrittenToGestural(accid->GetAccid()));
+                        data_ACCIDENTAL_GESTURAL ges = Att::AccidentalWrittenToGestural(accid->GetAccid());
+                        if (Att::AccidentalGesturalToWritten(ges) != accid->GetAccid()) {
+                            accid->SetAccidGes(ges);
+                        }
                         m_currentAccids[note->GetPname()].push_back(
+                            musicxml::Accidental(accid->GetAccid(), accid->GetGlyphName(), accid->GetGlyphAuth()));
+                        m_alterAccids[pitchAlter].push_back(
                             musicxml::Accidental(accid->GetAccid(), accid->GetGlyphName(), accid->GetGlyphAuth()));
                     }
                 }
@@ -4520,6 +4551,13 @@ curvature_CURVEDIR MusicXmlInput::CombineCurvedir(curvature_CURVEDIR startDir, c
 
 //////////////////////////////////////////////////////////////////////////////
 // String to attribute converters
+
+std::string MusicXmlInput::PitchAlterToString(data_PITCHNAME pname, float alter)
+{
+    std::string noteName(1, (pname - 1 + ('C' - 'A')) % 7 + 'A');
+    std::string pitchAlter = noteName + std::to_string(alter);
+    return pitchAlter;
+}
 
 data_ACCIDENTAL_WRITTEN MusicXmlInput::ConvertAccidentalToAccid(const std::string &value)
 {
