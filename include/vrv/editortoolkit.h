@@ -39,6 +39,8 @@ public:
         m_selectionClassId = UNSPECIFIED;
         m_selectionSecondaryId = "";
         m_cursor = NULL;
+
+        m_options = 0;
     }
     virtual ~EditorToolkit() {}
 
@@ -54,6 +56,11 @@ public:
      * Get response on the last editor function used
      */
     virtual std::string EditResponse() { return m_editResponse.json(); }
+
+    /**
+     * Increase the option change count
+     */
+    void OptionsChanged() { m_options++; }
 
 #ifndef NO_EDIT_SUPPORT
 protected:
@@ -77,6 +84,9 @@ protected:
     View *m_view;
     jsonxx::Object m_editStatus;
     jsonxx::Object m_editResponse;
+
+    /** Record option changes  */
+    int m_options;
 };
 } // namespace vrv
 

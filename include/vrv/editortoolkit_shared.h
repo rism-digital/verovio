@@ -48,6 +48,7 @@ protected:
     struct State {
         std::string data;
         std::string status;
+        int options;
     };
 
     /**
@@ -79,8 +80,8 @@ protected:
     ///@}
 
     void SetEditStatus();
-    void ReadEditStatus(const std::string &statusStr, bool insertMode);
-    void PrepareUndo();
+    void ReloadEditStatus(const std::string &statusStr, bool insertMode);
+    void PrepareUndo(bool ignoreInsertMode = false);
     std::string GetCurrentState();
     bool ReloadState(const State &state);
     void TrimUndoMemory();

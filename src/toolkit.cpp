@@ -1282,6 +1282,8 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
         this->ResetMidiDoc();
     }
 
+    m_editorToolkit->OptionsChanged();
+
     return true;
 }
 

@@ -105,17 +105,13 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
 
     // Undo and redo - also without parameter
     if ((action == "undo") || (action == "redo")) {
-        this->ClearContext();
         if (action == "undo") {
             this->Undo();
         }
         else {
             this->Redo();
         }
-        m_doc->PrepareData();
-        m_doc->ScoreDefSetCurrentDoc(true);
         m_undoPrepared = false;
-        this->SetEditStatus();
         return true;
     }
 
@@ -239,7 +235,7 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         int key;
         bool shiftKey, ctrlKey;
         if (this->ParseKeyDownAction(json.get<jsonxx::Object>("param"), elementId, key, shiftKey, ctrlKey)) {
-            this->PrepareUndo();
+            this->PrepareUndo(this->InsertMode());
             return (this->KeyDown(elementId, key, shiftKey, ctrlKey));
         }
         LogWarning("Could not parse the keyDown action");
@@ -266,7 +262,6 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
     else if (action == "resetCursor") {
         bool maintainChordMode;
         if (this->ParseResetCursorAction(json.get<jsonxx::Object>("param"), maintainChordMode)) {
-            this->PrepareUndo();
             return (this->ResetCursor(maintainChordMode));
         }
         LogWarning("Could not parse the resetCursor action");
@@ -282,7 +277,7 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
     else if (action == "set") {
         std::string elementId, attribute, value;
         if (this->ParseSetAction(json.get<jsonxx::Object>("param"), elementId, attribute, value)) {
-            this->PrepareUndo();
+            this->PrepareUndo(this->InsertMode());
             return (this->Set(elementId, attribute, value));
         }
         LogWarning("Could not parse the set action");
@@ -292,7 +287,6 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         Cursor::InputMode inputMode;
         bool chordMode;
         if (this->ParseSetCursorAction(json.get<jsonxx::Object>("param"), elementId, inputMode, chordMode)) {
-            this->PrepareUndo();
             return (this->SetCursor(elementId, inputMode, chordMode));
         }
         LogWarning("Could not parse the setCursor action");
@@ -301,7 +295,6 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         bool restMode;
         bool chordMode;
         if (this->ParseUpdateCursorAction(json.get<jsonxx::Object>("param"), restMode, chordMode)) {
-            this->PrepareUndo();
             return (this->UpdateCursor(restMode, chordMode));
         }
         LogWarning("Could not parse the setCursor action");
@@ -313,7 +306,7 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         data_ACCIDENTAL_WRITTEN accid;
         int midi;
         if (this->ParseUpdatePitchAction(json.get<jsonxx::Object>("param"), elementId, pname, oct, accid, midi)) {
-            this->PrepareUndo();
+            this->PrepareUndo(this->InsertMode());
             return (this->UpdatePitch(elementId, pname, oct, accid, midi));
         }
         LogWarning("Could not parse the updatePitch action");
@@ -525,15 +518,17 @@ bool EditorToolkitShared::ParseUpdatePitchAction(const jsonxx::Object &param, st
     return true;
 }
 
-void EditorToolkitShared::PrepareUndo()
+void EditorToolkitShared::PrepareUndo(bool ignoreInsertMode)
 {
-    // if (this->InsertMode()) return;
+    if (ignoreInsertMode && this->InsertMode()) return;
 
     // We already have a prepared undo - nothing to prepare
     if (m_undoPrepared) return;
 
     State state;
     state.data = this->GetCurrentState();
+    state.status = this->EditStatus();
+    state.options = m_options;
     m_undoStack.push_back(state);
     m_undoMemoryUsage += state.data.size();
     // When new edit happens, redo stack is cleared
@@ -582,41 +577,17 @@ void EditorToolkitShared::SetEditStatus()
     }
 }
 
-void EditorToolkitShared::ReadEditStatus(const std::string &statusStr, bool insertMode)
+void EditorToolkitShared::ReloadEditStatus(const std::string &statusStr, bool insertMode)
 {
     jsonxx::Object status;
     if (!status.parse(statusStr)) {
         return;
     }
 
+    if (!insertMode) m_chainedId = "";
     m_selectionId = "";
     m_selectionClassId = UNSPECIFIED;
     m_selectionSecondaryId = "";
-
-    // Top-level fields
-    if (status.has<jsonxx::String>("chainedId")) {
-        // m_chainedId = status.get<jsonxx::String>("chainedId");
-    }
-
-    if (status.has<jsonxx::Boolean>("canUndo")) {
-        // bool canUndo = status.get<jsonxx::Boolean>("canUndo");
-        //  Use or store canUndo
-    }
-
-    if (status.has<jsonxx::Boolean>("canRedo")) {
-        // bool canRedo = status.get<jsonxx::Boolean>("canRedo");
-        //  Use or store canRedo
-    }
-
-    if (status.has<jsonxx::Boolean>("isMensuralMusicOnly")) {
-        // bool isMensuralMusicOnly = status.get<jsonxx::Boolean>("isMensuralMusicOnly");
-        //  Use or store
-    }
-
-    if (status.has<jsonxx::Boolean>("insertMode")) {
-        // bool insertMode = status.get<jsonxx::Boolean>("insertMode");
-        //  Use or store
-    }
 
     // Selection object
     if (status.has<jsonxx::Object>("selection")) {
@@ -625,12 +596,10 @@ void EditorToolkitShared::ReadEditStatus(const std::string &statusStr, bool inse
         if (selection.has<jsonxx::String>("id")) {
             m_selectionId = selection.get<jsonxx::String>("id");
         }
-
         if (selection.has<jsonxx::String>("element")) {
             jsonxx::String element = selection.get<jsonxx::String>("element");
             m_selectionClassId = ObjectFactory::GetInstance()->GetClassId(element);
         }
-
         if (selection.has<jsonxx::String>("secondaryId")) {
             m_selectionSecondaryId = selection.get<jsonxx::String>("secondaryId");
         }
@@ -660,40 +629,34 @@ void EditorToolkitShared::ReadEditStatus(const std::string &statusStr, bool inse
             int oct = insertion.get<jsonxx::Number>("oct");
             m_cursor->SetOct(oct);
         }
-
         if (insertion.has<jsonxx::String>("pname")) {
             data_PITCHNAME pname = m_cursor->AttPitch::StrToPitchname(insertion.get<jsonxx::String>("pname"));
             m_cursor->SetPname(pname);
         }
-
         if (insertion.has<jsonxx::String>("dur")) {
             data_DURATION dur = m_cursor->AttDurationLog::StrToDuration(insertion.get<jsonxx::String>("dur"));
             m_cursor->SetDur(dur);
         }
-
         if (insertion.has<jsonxx::Number>("dots")) {
             int dots = insertion.get<jsonxx::Number>("dots");
-            m_cursor->SetDots(dots);
+            if (dots != 0) m_cursor->SetDots(dots);
         }
-
         if (insertion.has<jsonxx::Boolean>("restMode")) {
             bool restMode = insertion.get<jsonxx::Boolean>("restMode");
             m_cursor->SetRestMode(restMode);
         }
-
         if (insertion.has<jsonxx::String>("accid")) {
             data_ACCIDENTAL_WRITTEN accid = m_cursor->GetAccidElement()->AttAccidental::StrToAccidentalWritten(
                 insertion.get<jsonxx::String>("accid"));
             m_cursor->SetAccid(accid);
         }
-
         if (insertion.has<jsonxx::Boolean>("accidImplicit")) {
             bool implicit = insertion.get<jsonxx::Boolean>("accidImplicit");
             m_cursor->SetAccidImplicit(implicit);
         }
-
-        this->SetEditStatus();
     }
+
+    this->SetEditStatus();
 }
 
 std::string EditorToolkitShared::GetCurrentState()
@@ -715,7 +678,10 @@ bool EditorToolkitShared::ReloadState(const State &state)
     meiinput.SetDeserializing(true);
     bool success = meiinput.Import(state.data);
     if (success) {
-        this->ReadEditStatus(state.status, insertMode);
+        m_doc->PrepareData();
+        m_doc->ScoreDefSetCurrentDoc(true);
+        this->ReloadEditStatus(state.status, insertMode);
+        if (state.options != m_options) m_editStatus.import("invalidLayout", true);
     }
     else {
         this->SetEditStatus();
@@ -740,6 +706,7 @@ bool EditorToolkitShared::Undo()
     State currentState;
     currentState.data = this->GetCurrentState();
     currentState.status = this->EditStatus();
+    currentState.options = m_options;
     m_redoStack.push_back(currentState);
 
     // Pop the previous state from undo stack
@@ -756,6 +723,7 @@ bool EditorToolkitShared::Redo()
     State currentState;
     currentState.data = this->GetCurrentState();
     currentState.status = this->EditStatus();
+    currentState.options = m_options;
     m_undoStack.push_back(currentState);
 
     // Pop redo state and load it
