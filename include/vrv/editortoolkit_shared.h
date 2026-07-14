@@ -45,6 +45,11 @@ protected:
 
     enum SelectCustom : int8_t { SELECT_NONE = 0, SELECT_NOTE };
 
+    struct State {
+        std::string data;
+        std::string status;
+    };
+
     /**
      * Parse JSON instructions for experimental editor functions.
      */
@@ -74,9 +79,10 @@ protected:
     ///@}
 
     void SetEditStatus();
+    void ReadEditStatus(const std::string &statusStr, bool insertMode);
     void PrepareUndo();
     std::string GetCurrentState();
-    bool ReloadState(const std::string &data);
+    bool ReloadState(const State &state);
     void TrimUndoMemory();
     bool CanUndo() const;
     bool CanRedo() const;
@@ -133,8 +139,9 @@ public:
     //
 protected:
     bool m_undoPrepared;
-    std::deque<std::string> m_undoStack;
-    std::deque<std::string> m_redoStack;
+
+    std::deque<State> m_undoStack;
+    std::deque<State> m_redoStack;
     size_t m_undoMemoryUsage = 0;
 
     EditorTreeObject *m_scoreContext;

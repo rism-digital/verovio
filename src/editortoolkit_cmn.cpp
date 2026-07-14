@@ -228,7 +228,7 @@ bool EditorToolkitCMN::InsertCursorByDur(data_DURATION dur, int dots)
 bool EditorToolkitCMN::InsertCursorByPitch(data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid, int midi)
 {
     if (!this->InsertMode()) return false;
-    
+
     if (midi != VRV_UNSET) {
         std::string placeholder = m_cursor->GetID();
         this->UpdatePitch(placeholder, PITCHNAME_NONE, VRV_UNSET, ACCIDENTAL_WRITTEN_NONE, midi);
@@ -459,7 +459,7 @@ bool EditorToolkitCMN::InsertNoteInChordMode(const std::string &elementId, data_
     chord->AddChild(note);
 
     if (this->InsertMode()) {
-        m_cursor->AdjustPitchByOffset(4);
+        if (m_cursor->GetInputMode() == Cursor::PITCH_FIRST) m_cursor->AdjustPitchByOffset(4);
         std::string placeholder = m_cursor->GetID();
         this->UpdatePitch(placeholder, m_cursor->GetPname(), m_cursor->GetOct(), ACCIDENTAL_WRITTEN_NONE, VRV_UNSET);
     }

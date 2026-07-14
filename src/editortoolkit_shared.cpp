@@ -527,17 +527,18 @@ bool EditorToolkitShared::ParseUpdatePitchAction(const jsonxx::Object &param, st
 
 void EditorToolkitShared::PrepareUndo()
 {
-    if (this->InsertMode()) return;
+    // if (this->InsertMode()) return;
 
     // We already have a prepared undo - nothing to prepare
     if (m_undoPrepared) return;
 
-    std::string state = this->GetCurrentState();
+    State state;
+    state.data = this->GetCurrentState();
     m_undoStack.push_back(state);
-    m_undoMemoryUsage += state.size();
+    m_undoMemoryUsage += state.data.size();
     // When new edit happens, redo stack is cleared
     while (!m_redoStack.empty()) {
-        m_undoMemoryUsage -= m_redoStack.back().size();
+        m_undoMemoryUsage -= m_redoStack.back().data.size();
         m_redoStack.pop_back();
     }
     TrimUndoMemory();
@@ -568,6 +569,8 @@ void EditorToolkitShared::SetEditStatus()
         insertion.import(
             "dur", (m_cursor->HasDur() ? m_cursor->AttDurationLog::DurationToStr(m_cursor->GetDur()) : "4"));
         insertion.import("dots", (m_cursor->HasDots()) ? m_cursor->GetDots() : 0);
+        insertion.import(
+            "inputMode", (m_cursor->GetInputMode() == Cursor::PITCH_FIRST ? "pitchFirst" : "durationFirst"));
         insertion.import("chordMode", (m_cursor->IsChordMode()));
         insertion.import("restMode", (m_cursor->IsRestMode()));
         insertion.import("accid",
@@ -576,6 +579,120 @@ void EditorToolkitShared::SetEditStatus()
                     : ""));
         insertion.import("accidImplicit", m_cursor->IsAccidImplicit());
         m_editStatus << "insertion" << insertion;
+    }
+}
+
+void EditorToolkitShared::ReadEditStatus(const std::string &statusStr, bool insertMode)
+{
+    jsonxx::Object status;
+    if (!status.parse(statusStr)) {
+        return;
+    }
+
+    m_selectionId = "";
+    m_selectionClassId = UNSPECIFIED;
+    m_selectionSecondaryId = "";
+
+    // Top-level fields
+    if (status.has<jsonxx::String>("chainedId")) {
+        // m_chainedId = status.get<jsonxx::String>("chainedId");
+    }
+
+    if (status.has<jsonxx::Boolean>("canUndo")) {
+        // bool canUndo = status.get<jsonxx::Boolean>("canUndo");
+        //  Use or store canUndo
+    }
+
+    if (status.has<jsonxx::Boolean>("canRedo")) {
+        // bool canRedo = status.get<jsonxx::Boolean>("canRedo");
+        //  Use or store canRedo
+    }
+
+    if (status.has<jsonxx::Boolean>("isMensuralMusicOnly")) {
+        // bool isMensuralMusicOnly = status.get<jsonxx::Boolean>("isMensuralMusicOnly");
+        //  Use or store
+    }
+
+    if (status.has<jsonxx::Boolean>("insertMode")) {
+        // bool insertMode = status.get<jsonxx::Boolean>("insertMode");
+        //  Use or store
+    }
+
+    // Selection object
+    if (status.has<jsonxx::Object>("selection")) {
+        const jsonxx::Object &selection = status.get<jsonxx::Object>("selection");
+
+        if (selection.has<jsonxx::String>("id")) {
+            m_selectionId = selection.get<jsonxx::String>("id");
+        }
+
+        if (selection.has<jsonxx::String>("element")) {
+            jsonxx::String element = selection.get<jsonxx::String>("element");
+            m_selectionClassId = ObjectFactory::GetInstance()->GetClassId(element);
+        }
+
+        if (selection.has<jsonxx::String>("secondaryId")) {
+            m_selectionSecondaryId = selection.get<jsonxx::String>("secondaryId");
+        }
+        else {
+            m_selectionSecondaryId.clear();
+        }
+    }
+
+    // Insertion object
+    if (status.has<jsonxx::Object>("insertion") && insertMode) {
+        const jsonxx::Object &insertion = status.get<jsonxx::Object>("insertion");
+
+        Cursor::InputMode inputMode = Cursor::PITCH_FIRST;
+        if (insertion.has<jsonxx::String>("inputMode")) {
+            std::string inputModeStr = insertion.get<jsonxx::String>("inputMode");
+            inputMode = (inputModeStr == "pitchFirst") ? Cursor::PITCH_FIRST : Cursor::DURATION_FIRST;
+        }
+
+        bool chordMode = false;
+        if (insertion.has<jsonxx::Boolean>("chordMode")) {
+            chordMode = insertion.get<jsonxx::Boolean>("chordMode");
+        }
+
+        this->SetCursor(m_selectionId, inputMode, chordMode);
+
+        if (insertion.has<jsonxx::Number>("oct")) {
+            int oct = insertion.get<jsonxx::Number>("oct");
+            m_cursor->SetOct(oct);
+        }
+
+        if (insertion.has<jsonxx::String>("pname")) {
+            data_PITCHNAME pname = m_cursor->AttPitch::StrToPitchname(insertion.get<jsonxx::String>("pname"));
+            m_cursor->SetPname(pname);
+        }
+
+        if (insertion.has<jsonxx::String>("dur")) {
+            data_DURATION dur = m_cursor->AttDurationLog::StrToDuration(insertion.get<jsonxx::String>("dur"));
+            m_cursor->SetDur(dur);
+        }
+
+        if (insertion.has<jsonxx::Number>("dots")) {
+            int dots = insertion.get<jsonxx::Number>("dots");
+            m_cursor->SetDots(dots);
+        }
+
+        if (insertion.has<jsonxx::Boolean>("restMode")) {
+            bool restMode = insertion.get<jsonxx::Boolean>("restMode");
+            m_cursor->SetRestMode(restMode);
+        }
+
+        if (insertion.has<jsonxx::String>("accid")) {
+            data_ACCIDENTAL_WRITTEN accid = m_cursor->GetAccidElement()->AttAccidental::StrToAccidentalWritten(
+                insertion.get<jsonxx::String>("accid"));
+            m_cursor->SetAccid(accid);
+        }
+
+        if (insertion.has<jsonxx::Boolean>("accidImplicit")) {
+            bool implicit = insertion.get<jsonxx::Boolean>("accidImplicit");
+            m_cursor->SetAccidImplicit(implicit);
+        }
+
+        this->SetEditStatus();
     }
 }
 
@@ -588,11 +705,22 @@ std::string EditorToolkitShared::GetCurrentState()
     return meioutput.Export();
 }
 
-bool EditorToolkitShared::ReloadState(const std::string &data)
+bool EditorToolkitShared::ReloadState(const State &state)
 {
+    this->ClearContext();
+    const bool insertMode = this->InsertMode();
+    m_cursor = NULL;
+
     MEIInput meiinput(m_doc);
     meiinput.SetDeserializing(true);
-    return meiinput.Import(data);
+    bool success = meiinput.Import(state.data);
+    if (success) {
+        this->ReadEditStatus(state.status, insertMode);
+    }
+    else {
+        this->SetEditStatus();
+    }
+    return success;
 }
 
 bool EditorToolkitShared::CanUndo() const
@@ -609,11 +737,13 @@ bool EditorToolkitShared::Undo()
 {
     if (!CanUndo()) return false;
 
-    std::string currentState = this->GetCurrentState();
+    State currentState;
+    currentState.data = this->GetCurrentState();
+    currentState.status = this->EditStatus();
     m_redoStack.push_back(currentState);
 
     // Pop the previous state from undo stack
-    std::string previous = m_undoStack.back();
+    State previous = m_undoStack.back();
     m_undoStack.pop_back();
 
     return ReloadState(previous);
@@ -623,11 +753,13 @@ bool EditorToolkitShared::Redo()
 {
     if (!CanRedo()) return false;
 
-    std::string currentState = this->GetCurrentState();
+    State currentState;
+    currentState.data = this->GetCurrentState();
+    currentState.status = this->EditStatus();
     m_undoStack.push_back(currentState);
 
     // Pop redo state and load it
-    std::string redoState = m_redoStack.back();
+    State redoState = m_redoStack.back();
     m_redoStack.pop_back();
 
     return ReloadState(redoState);
@@ -637,7 +769,7 @@ void EditorToolkitShared::TrimUndoMemory()
 {
     // Drop the oldest undo entries if we exceed the limit
     while ((m_undoMemoryUsage > UNDO_MEMORY_LIMIT) && !m_undoStack.empty()) {
-        m_undoMemoryUsage -= m_undoStack.front().size();
+        m_undoMemoryUsage -= m_undoStack.front().data.size();
         m_undoStack.pop_front();
     }
     LogInfo("Undo stack size: %dMB", m_undoMemoryUsage / 1024 / 1024);
