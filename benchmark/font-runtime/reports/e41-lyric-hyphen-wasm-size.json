@@ -1,0 +1,22 @@
+{
+  "artifact": "production no-Humdrum WASM delivery after font-shaped lyric connectors",
+  "checkpoint": { "raw": 4430506, "gzip": 2237954, "brotli": 1958859 },
+  "head": { "raw": 4431485, "gzip": 2237721, "brotli": 1958890 },
+  "head_files": [
+    { "path": "emscripten/build/verovio.js", "raw": 3224939, "gzip": 1108259, "brotli": 837898 },
+    { "path": "emscripten/build/verovio.data", "raw": 1206546, "gzip": 1129462, "brotli": 1120992 }
+  ],
+  "checkpoint_delta_percent": {
+    "raw": 0.0220967989,
+    "gzip": -0.0104112953,
+    "brotli": 0.0015825539
+  },
+  "origin_develop_baseline": { "raw": 7013380, "gzip": 2274929, "brotli": 1768938 },
+  "origin_develop_delta_percent": {
+    "raw": -36.8138472463,
+    "gzip": -1.6355675276,
+    "brotli": 10.7381943290
+  },
+  "gzip_gate_percent": 5.0,
+  "pass": true
+}

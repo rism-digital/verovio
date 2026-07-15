@@ -364,8 +364,10 @@ void BBoxDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, 
     char32_t smuflGlyph = 0;
     if (setSmuflGlyph && (text.length() == 1)) smuflGlyph = text.at(0);
 
+    const std::string family
+        = m_fontStack.top()->GetFaceName().empty() ? resources->GetCurrentFont() : m_fontStack.top()->GetFaceName();
     for (char32_t c : text) {
-        const Glyph *glyph = resources->GetGlyph(c);
+        const Glyph *glyph = resources->GetGlyph(c, family);
         if (!glyph) {
             continue;
         }

@@ -1,0 +1,44 @@
+{
+  "artifact": "production no-Humdrum WASM delivery after runtime font aliases",
+  "pre_alias": {
+    "raw": 4421900,
+    "gzip": 2234388,
+    "brotli": 1957617
+  },
+  "post_alias": {
+    "raw": 4431082,
+    "gzip": 2237693,
+    "brotli": 1958376
+  },
+  "post_alias_files": [
+    {
+      "path": "/private/tmp/verovio-alias-classic-artifact/verovio.js",
+      "raw": 3224536,
+      "gzip": 1108231,
+      "brotli": 837384
+    },
+    {
+      "path": "/private/tmp/verovio-alias-classic-artifact/verovio.data",
+      "raw": 1206546,
+      "gzip": 1129462,
+      "brotli": 1120992
+    }
+  ],
+  "alias_delta_percent": {
+    "raw": 0.20764829598136636,
+    "gzip": 0.14791522331842888,
+    "brotli": 0.038771628975431405
+  },
+  "origin_develop_baseline": {
+    "raw": 7013380,
+    "gzip": 2274929,
+    "brotli": 1768938
+  },
+  "origin_develop_delta_percent": {
+    "raw": -36.8195934057473,
+    "gzip": -1.636798335244749,
+    "brotli": 10.709137346814867
+  },
+  "gzip_gate_percent": 5.0,
+  "pass": true
+}

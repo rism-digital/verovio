@@ -18,6 +18,7 @@ cp ./build/verovio.js ./npm/dist/verovio-module-hum.mjs
 # build modularized emscripten module without humdrum
 ./buildToolkit -c -w -M -H -m
 cp ./build/verovio.js ./npm/dist/verovio-module.mjs
+cp ./build/verovio.data ./npm/dist/verovio.data
 
 # build CommonJS and ESM code for verovio toolkit
 npm --prefix npm run build

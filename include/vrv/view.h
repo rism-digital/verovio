@@ -332,14 +332,16 @@ protected:
     ///@{
     void DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff);
     void DrawChordCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff *staff, Measure *measure);
-    void DrawClefEnclosing(DeviceContext *dc, Clef *clef, Staff *staff, char32_t glyph, int x, int y);
+    void DrawClefEnclosing(
+        DeviceContext *dc, Clef *clef, Staff *staff, char32_t glyph, int x, int y, const std::string &fontName = "");
     void DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, const Staff *staff, bool dimin = false);
     void DrawKeySigCancellation(
         DeviceContext *dc, KeySig *keySig, Staff *staff, Clef *clef, int clefLocOffset, int beginCancel, int &x);
     void DrawKeyAccid(DeviceContext *dc, KeyAccid *keyAccid, Staff *staff, Clef *clef, int clefLocOffset, int &x);
     void DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int horizOffset);
     /** Returns the width of the drawn figures */
-    int DrawMeterSigFigures(DeviceContext *dc, int x, int y, MeterSig *meterSig, int den, Staff *staff);
+    int DrawMeterSigFigures(
+        DeviceContext *dc, int x, int y, MeterSig *meterSig, int den, Staff *staff, const std::string &fontName = "");
     void DrawMRptPart(DeviceContext *dc, int xCentered, int y, char32_t smulfCode, int num, bool line, Staff *staff);
     ///@}
 
@@ -556,11 +558,8 @@ protected:
         DeviceContext *dc, int x1, SegmentedLine &line, int width, int dashLength = 0, int gapLength = 0);
     void DrawHorizontalSegmentedLine(
         DeviceContext *dc, int y1, SegmentedLine &line, int width, int dashLength = 0, int gapLength = 0);
-    void DrawSmuflCode(
-        DeviceContext *dc, int x, int y, char32_t code, int staffSize, bool dimin, bool setBBGlyph = false);
-    // void DrawSmuflCodeWithCustomFont(DeviceContext *dc, const std::string &customFont, int x, int y, char32_t code,
-    //     int staffSize, bool dimin, bool setBBGlyph = false);
-
+    void DrawSmuflCode(DeviceContext *dc, int x, int y, char32_t code, int staffSize, bool dimin,
+        bool setBBGlyph = false, const std::string &fontName = "");
     void DrawThickBezierCurve(
         DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, PenStyle penStyle = PEN_SOLID);
     void DrawTextString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params);
@@ -570,7 +569,7 @@ protected:
     void DrawSmuflLine(DeviceContext *dc, Point orig, int length, int staffSize, bool dimin, char32_t fill,
         char32_t start = 0, char32_t end = 0);
     void DrawSmuflString(DeviceContext *dc, int x, int y, std::u32string s, data_HORIZONTALALIGNMENT alignment,
-        int staffSize = 100, bool dimin = false, bool setBBGlyph = false);
+        int staffSize = 100, bool dimin = false, bool setBBGlyph = false, const std::string &fontName = "");
     void DrawLyricString(DeviceContext *dc, const std::u32string &str, int staffSize = 100,
         std::optional<TextDrawingParams> params = std::nullopt);
     void DrawNotFilledEllipse(DeviceContext *dc, int x1, int y1, int x2, int y2, int lineThinkness);

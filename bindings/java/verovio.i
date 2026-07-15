@@ -21,6 +21,8 @@
 
 %module verovio
 %include "std_string.i"
+%include "cdata.i"
+%apply (const void *BYTES, size_t LENGTH) { (const unsigned char *data, int length) };
 %include "../../include/vrv/toolkit.h"
 %include "../../include/vrv/toolkitdef.h"
 

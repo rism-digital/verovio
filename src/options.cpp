@@ -1300,22 +1300,46 @@ Options::Options()
     this->Register(&m_fingeringScale, "fingeringScale", &m_generalLayout);
 
     m_font.SetInfo("Font", "Set the music font");
-    m_font.Init("Leipzig");
+    m_font.Init("Bravura");
     this->Register(&m_font, "font", &m_generalLayout);
 
-    m_fontAddCustom.SetInfo("Add custom font", "Add a custom music font as zip file");
+    m_fontAddCustom.SetInfo("Add custom font (deprecated)",
+        "Compatibility adapter for a custom music-font ZIP; register the font file directly instead");
     m_fontAddCustom.Init();
     this->Register(&m_fontAddCustom, "fontAddCustom", &m_generalLayout);
 
+    m_fontAddMusic.SetInfo("Add music font", "Register a static SMuFL OTF, TTF, WOFF, or WOFF2 font file");
+    m_fontAddMusic.Init();
+    this->Register(&m_fontAddMusic, "fontAddMusic", &m_generalLayout);
+
+    m_fontAddMusicAs.SetInfo(
+        "Add music font with alias", "Register a static SMuFL font using an ALIAS=FILE specification");
+    m_fontAddMusicAs.Init();
+    this->Register(&m_fontAddMusicAs, "fontAddMusicAs", &m_generalLayout);
+
+    m_fontAddText.SetInfo("Add text font", "Register a static text OTF, TTF, WOFF, or WOFF2 font file");
+    m_fontAddText.Init();
+    this->Register(&m_fontAddText, "fontAddText", &m_generalLayout);
+
+    m_fontAddTextAs.SetInfo(
+        "Add text font with alias", "Register a static text font using an ALIAS=FILE specification");
+    m_fontAddTextAs.Init();
+    this->Register(&m_fontAddTextAs, "fontAddTextAs", &m_generalLayout);
+
     m_fontFallback.SetInfo("Font fallback", "The music font fallback for missing glyphs");
-    m_fontFallback.Init(FONT_FALLBACK_Leipzig, &Option::s_fontFallback);
+    m_fontFallback.Init("Bravura");
     this->Register(&m_fontFallback, "fontFallback", &m_generalLayout);
 
     m_fontLoadAll.SetInfo("Font init all", "Load all music fonts");
     m_fontLoadAll.Init(false);
     this->Register(&m_fontLoadAll, "fontLoadAll", &m_generalLayout);
 
-    m_fontTextLiberation.SetInfo("Font text Liberation", "Use the Liberation text font");
+    m_fontText.SetInfo("Text font", "Set the default registered text font family");
+    m_fontText.Init("Tinos");
+    this->Register(&m_fontText, "fontText", &m_generalLayout);
+
+    m_fontTextLiberation.SetInfo(
+        "Font text Liberation (deprecated)", "Use Liberation as the text font for compatibility");
     m_fontTextLiberation.Init(false);
     this->Register(&m_fontTextLiberation, "fontTextLiberation", &m_generalLayout);
 

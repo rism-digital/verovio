@@ -43,9 +43,11 @@ EOT
 chomp (my $EMCC = `which em++`);
 chomp (my $EMCMAKE = `which emcmake`);
 chomp (my $EMMAKE = `which emmake`);
+chomp (my $NODE = `which node`);
 die "ERROR: emscripten compiler (emcc) not found.\n" unless $EMCC;
 die "ERROR: emscripten cmake (emcmake) not found.\n" unless $EMCMAKE;
 die "ERROR: emscripten make (emmake) not found.\n" unless $EMMAKE;
+die "ERROR: node not found.\n" unless $NODE;
 
 # Parse command-line options
 my ($version, $chattyQ, $helpQ, $exclusion, $wasmQ, $makeQ, $modularizeQ, $debug);
@@ -90,6 +92,7 @@ if (!$nohumdrum) {
 # Process command-line options:
 if ($wasmQ) {
 	print "Creating WASM toolkit version\n";
+	$FLAGS =~ s/^-O3/-Oz/;
 
 	# Debugging flags, see:
 	#    https://emscripten.org/docs/porting/Debugging.html
@@ -167,7 +170,7 @@ my $defines = "-DUSE_EMSCRIPTEN";
 my $cmake = "-DBUILD_AS_WASM=ON";
 $cmake .= " -DNO_HUMDRUM_SUPPORT=ON" if ($nohumdrum);
 
-my $embed   = "--embed-file $DATA_DIR/";
+my $preload = "--preload-file $DATA_DIR/";
 my $output  = "-o $BUILD_DIR/verovio.js";
 
 my $exports = "-s EXPORTED_FUNCTIONS=\@exports.txt";
@@ -194,21 +197,27 @@ print "$makeCmd\n" if $CHATTY;
 system($makeCmd);
 
 print "*************\nLinking...\n";
-my $ccCmd = "$EMCC $CHATTY libverovio.a $LFLAGS $FLAGS $embed $exports $extra_exports $output $modularize";
+my $ccCmd = "$EMCC $CHATTY libverovio.a $LFLAGS $FLAGS $preload $exports $extra_exports $output $modularize";
 print "$ccCmd\n" if $CHATTY;
 system($ccCmd);
 
 if ($? == 0) {
+	my $locatorMode = $modularizeQ ? "module" : "classic";
+	system($NODE, "patch-font-data-locator.mjs", "$BUILD_DIR/verovio.js", $locatorMode) == 0
+		or die "font data locator patch failed: $?";
 	print " Done.\n";
 
     # skip prebundled wasm module with verovio toolkit for modularized builds
     if(!$modularizeQ) {
         `npm --prefix npm install`;
         `npm --prefix npm run prebundle -- -o "\$(pwd)/$OUTPUT_DIR/$FILENAME"`;
+		`cp $BUILD_DIR/verovio.data $OUTPUT_DIR/verovio.data` if $OUTPUT_DIR ne $BUILD_DIR;
 
         # create a gzip version
         `(cd $OUTPUT_DIR && gzip -c $FILENAME > $FILENAME.gz)`;
+        `(cd $OUTPUT_DIR && gzip -c verovio.data > verovio.data.gz)`;
         print "$OUTPUT_DIR/$FILENAME.gz was created\n";
+        print "$OUTPUT_DIR/verovio.data.gz was created\n";
 
         # all good
         print "$OUTPUT_DIR/$FILENAME was created\n";

@@ -223,6 +223,128 @@ func (t *Toolkit) LoadZipDataBuffer(data []byte) bool {
 	))
 }
 
+func (t *Toolkit) RegisterTextFont(data []byte) string {
+	if len(data) == 0 || len(data) > 32*1024*1024 {
+		return goString(C.vrvToolkit_registerTextFont(t.ptr, nil, 0))
+	}
+	return goString(C.vrvToolkit_registerTextFont(
+		t.ptr,
+		(*C.uchar)(unsafe.Pointer(&data[0])),
+		C.int(len(data)),
+	))
+}
+
+func (t *Toolkit) RegisterTextFontWithAlias(data []byte, alias string) string {
+	cAlias := C.CString(alias)
+	defer C.free(unsafe.Pointer(cAlias))
+	if len(data) == 0 || len(data) > 32*1024*1024 {
+		return goString(C.vrvToolkit_registerTextFontWithAlias(t.ptr, nil, 0, cAlias))
+	}
+	return goString(C.vrvToolkit_registerTextFontWithAlias(
+		t.ptr,
+		(*C.uchar)(unsafe.Pointer(&data[0])),
+		C.int(len(data)),
+		cAlias,
+	))
+}
+
+func (t *Toolkit) RegisterMusicFont(data []byte, smuflMetadataJSON string) string {
+	cMetadata := C.CString(smuflMetadataJSON)
+	defer C.free(unsafe.Pointer(cMetadata))
+	if len(data) == 0 || len(data) > 32*1024*1024 {
+		return goString(C.vrvToolkit_registerMusicFont(t.ptr, nil, 0, cMetadata))
+	}
+	return goString(C.vrvToolkit_registerMusicFont(
+		t.ptr,
+		(*C.uchar)(unsafe.Pointer(&data[0])),
+		C.int(len(data)),
+		cMetadata,
+	))
+}
+
+func (t *Toolkit) RegisterMusicFontWithAlias(data []byte, smuflMetadataJSON string, alias string) string {
+	cMetadata := C.CString(smuflMetadataJSON)
+	defer C.free(unsafe.Pointer(cMetadata))
+	cAlias := C.CString(alias)
+	defer C.free(unsafe.Pointer(cAlias))
+	if len(data) == 0 || len(data) > 32*1024*1024 {
+		return goString(C.vrvToolkit_registerMusicFontWithAlias(t.ptr, nil, 0, cMetadata, cAlias))
+	}
+	return goString(C.vrvToolkit_registerMusicFontWithAlias(
+		t.ptr,
+		(*C.uchar)(unsafe.Pointer(&data[0])),
+		C.int(len(data)),
+		cMetadata,
+		cAlias,
+	))
+}
+
+func (t *Toolkit) RegisterTextFontBase64(data string) string {
+	cData := C.CString(data)
+	defer C.free(unsafe.Pointer(cData))
+	return goString(C.vrvToolkit_registerTextFontBase64(t.ptr, cData))
+}
+
+func (t *Toolkit) RegisterTextFontBase64WithAlias(data string, alias string) string {
+	cData := C.CString(data)
+	defer C.free(unsafe.Pointer(cData))
+	cAlias := C.CString(alias)
+	defer C.free(unsafe.Pointer(cAlias))
+	return goString(C.vrvToolkit_registerTextFontBase64WithAlias(t.ptr, cData, cAlias))
+}
+
+func (t *Toolkit) RegisterMusicFontBase64(data string, smuflMetadataJSON string) string {
+	cData := C.CString(data)
+	defer C.free(unsafe.Pointer(cData))
+	cMetadata := C.CString(smuflMetadataJSON)
+	defer C.free(unsafe.Pointer(cMetadata))
+	return goString(C.vrvToolkit_registerMusicFontBase64(t.ptr, cData, cMetadata))
+}
+
+func (t *Toolkit) RegisterMusicFontBase64WithAlias(data string, smuflMetadataJSON string, alias string) string {
+	cData := C.CString(data)
+	defer C.free(unsafe.Pointer(cData))
+	cMetadata := C.CString(smuflMetadataJSON)
+	defer C.free(unsafe.Pointer(cMetadata))
+	cAlias := C.CString(alias)
+	defer C.free(unsafe.Pointer(cAlias))
+	return goString(C.vrvToolkit_registerMusicFontBase64WithAlias(t.ptr, cData, cMetadata, cAlias))
+}
+
+func (t *Toolkit) RegisterTextFontFile(filename string) string {
+	cFilename := C.CString(filename)
+	defer C.free(unsafe.Pointer(cFilename))
+	return goString(C.vrvToolkit_registerTextFontFile(t.ptr, cFilename))
+}
+
+func (t *Toolkit) RegisterTextFontFileWithAlias(filename string, alias string) string {
+	cFilename := C.CString(filename)
+	defer C.free(unsafe.Pointer(cFilename))
+	cAlias := C.CString(alias)
+	defer C.free(unsafe.Pointer(cAlias))
+	return goString(C.vrvToolkit_registerTextFontFileWithAlias(t.ptr, cFilename, cAlias))
+}
+
+func (t *Toolkit) RegisterMusicFontFile(filename string, smuflMetadataFilename string) string {
+	cFilename := C.CString(filename)
+	defer C.free(unsafe.Pointer(cFilename))
+	cMetadataFilename := C.CString(smuflMetadataFilename)
+	defer C.free(unsafe.Pointer(cMetadataFilename))
+	return goString(C.vrvToolkit_registerMusicFontFile(t.ptr, cFilename, cMetadataFilename))
+}
+
+func (t *Toolkit) RegisterMusicFontFileWithAlias(
+	filename string, smuflMetadataFilename string, alias string,
+) string {
+	cFilename := C.CString(filename)
+	defer C.free(unsafe.Pointer(cFilename))
+	cMetadataFilename := C.CString(smuflMetadataFilename)
+	defer C.free(unsafe.Pointer(cMetadataFilename))
+	cAlias := C.CString(alias)
+	defer C.free(unsafe.Pointer(cAlias))
+	return goString(C.vrvToolkit_registerMusicFontFileWithAlias(t.ptr, cFilename, cMetadataFilename, cAlias))
+}
+
 func (t *Toolkit) RedoLayout(options string) {
 	cOptions := C.CString(options)
 	defer C.free(unsafe.Pointer(cOptions))

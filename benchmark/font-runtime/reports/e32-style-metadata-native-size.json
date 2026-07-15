@@ -1,0 +1,23 @@
+{
+  "artifact": "native runtime-font delivery after OpenType style-metadata fix",
+  "pre_style_fix": {
+    "cli": { "raw": 6308488, "gzip": 2355959, "brotli": 1684694 },
+    "installed_bundle": { "raw": 8611840, "gzip": 3628750, "brotli": 2904592 }
+  },
+  "post_style_fix": {
+    "cli": { "raw": 6308488, "gzip": 2356809, "brotli": 1684414 },
+    "installed_bundle": { "raw": 8611840, "gzip": 3629792, "brotli": 2904463 },
+    "resources_raw": 1206546,
+    "source_vendor_raw": 5336091
+  },
+  "style_fix_delta_percent": {
+    "cli": { "raw": 0.0, "gzip": 0.03607872632758191, "brotli": -0.016620228955521732 },
+    "installed_bundle": { "raw": 0.0, "gzip": 0.02871512228728168, "brotli": -0.004441243382891091 }
+  },
+  "origin_develop_delta_percent": {
+    "cli": { "raw": -3.7618457745748346, "gzip": 0.9302004892320914, "brotli": 1.7080211843656823 },
+    "installed_bundle": { "raw": -29.446308724832214, "gzip": 3.080025921994345, "brotli": 9.213946623800261 }
+  },
+  "raw_and_gzip_gate_percent": 5.0,
+  "pass": true
+}

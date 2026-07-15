@@ -89,12 +89,28 @@ bool Syl::IsSupportedChild(ClassId classId)
 
 int Syl::CalcHyphenLength(Doc *doc, int staffSize)
 {
-    FontInfo *lyricFont = doc->GetDrawingLyricFont(staffSize);
-    int dashLength = doc->GetTextGlyphWidth(L'-', lyricFont, false);
-
-    Syl::AdjustToLyricSize(doc, dashLength);
+    const FontInfo lyricFont = this->GetDrawingFont(doc, staffSize);
+    const Resources &resources = doc->GetResources();
+    const std::optional<FontStore::ShapedRun> hyphen = resources.ShapeText(lyricFont, U"-");
+    int dashLength = hyphen ? resources.GetTextAdvance(lyricFont, *hyphen) : 0;
+    if (!dashLength) dashLength = doc->GetTextGlyphWidth(L'-', &lyricFont, false);
 
     return dashLength;
+}
+
+FontInfo Syl::GetDrawingFont(Doc *doc, int staffSize) const
+{
+    FontInfo font = *doc->GetDrawingLyricFont(staffSize);
+    if (this->HasFontname()) font.SetFaceName(this->GetFontname());
+    if (this->HasFontweight()) font.SetWeight(this->GetFontweight());
+    if (this->HasFontstyle()) font.SetStyle(this->GetFontstyle());
+    if (this->HasLetterspacing()) {
+        font.SetLetterSpacing(this->GetLetterspacing() * doc->GetDrawingUnit(staffSize));
+    }
+    if (this->GetStart() && this->GetStart()->GetDrawingCueSize()) {
+        font.SetPointSize(doc->GetCueSize(font.GetPointSize()));
+    }
+    return font;
 }
 
 int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)

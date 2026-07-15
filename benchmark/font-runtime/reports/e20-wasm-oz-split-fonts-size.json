@@ -1,0 +1,42 @@
+{
+  "artifact": "production no-Humdrum WASM delivery before npm prebundle",
+  "baseline": {
+    "raw": 7013380,
+    "gzip": 2274929,
+    "brotli": 1768938
+  },
+  "baseline_files": [
+    {
+      "path": "/tmp/verovio-custom-fonts-wasm-baseline-full.js",
+      "raw": 7013380,
+      "gzip": 2274929,
+      "brotli": 1768938
+    }
+  ],
+  "head": {
+    "raw": 4421634,
+    "gzip": 2234305,
+    "brotli": 1957292
+  },
+  "head_files": [
+    {
+      "path": "/tmp/verovio-wasm-head-oz/split-fonts/verovio.js",
+      "raw": 3215088,
+      "gzip": 1104843,
+      "brotli": 836300
+    },
+    {
+      "path": "/tmp/verovio-wasm-head-oz/split-fonts/verovio.data",
+      "raw": 1206546,
+      "gzip": 1129462,
+      "brotli": 1120992
+    }
+  ],
+  "delta_percent": {
+    "raw": -36.95430733825915,
+    "gzip": -1.785726060022097,
+    "brotli": 10.647857641138359
+  },
+  "gzip_gate_percent": 5.0,
+  "pass": true
+}

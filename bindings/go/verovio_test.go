@@ -82,3 +82,40 @@ func TestLoadDataAndRenderSVG(t *testing.T) {
 		t.Fatal("expected SVG output")
 	}
 }
+
+func TestRegisterFontsWithAliases(t *testing.T) {
+	tk := NewToolkitWithResourcePath("../../data")
+	defer tk.Close()
+
+	textFont, err := os.ReadFile("../../tests/font-runtime/VerovioTestLigature.ttf")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := tk.RegisterTextFontWithAlias(textFont, "QS"); got != "Verovio Test Ligature" {
+		t.Fatalf("expected canonical text family, got %q", got)
+	}
+
+	musicFont, err := os.ReadFile("../../tests/font-runtime/VerovioTestMusic.ttf")
+	if err != nil {
+		t.Fatal(err)
+	}
+	metadata, err := os.ReadFile("../../tests/font-runtime/VerovioTestMusic_metadata.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := tk.RegisterMusicFontWithAlias(musicFont, string(metadata), "VM"); got != "Verovio Test Music" {
+		t.Fatalf("expected canonical music family, got %q", got)
+	}
+
+	if !tk.LoadData(`<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1"><music><body><mdiv><score>
+<scoreDef><staffGrp><staffDef n="1" lines="5" clef.shape="G" clef.line="2"/></staffGrp></scoreDef>
+<section><measure n="1"><staff n="1"><layer n="1"><note xml:id="n1" pname="c" oct="4" dur="4"/>
+</layer></staff><dir startid="#n1"><rend fontname="QS">ffi</rend></dir></measure></section>
+</score></mdiv></body></music></mei>`) {
+		t.Fatal("expected aliased-font MEI to load")
+	}
+	if svg := tk.RenderToSVG(1, false); !strings.Contains(svg, "text-8BFEB250B0FDDA0E-4-") {
+		t.Fatal("expected QS to render with the registered ligature face")
+	}
+}

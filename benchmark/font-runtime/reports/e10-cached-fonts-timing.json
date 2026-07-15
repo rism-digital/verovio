@@ -1,0 +1,56 @@
+{
+  "fixtures": [
+    {
+      "fixture": "benchmark/font-runtime/fixtures/music-only.mei",
+      "attempts": 1,
+      "cold_ms": {
+        "baseline": 5.807917,
+        "head": 5.171041499999999,
+        "delta_percent": -10.965643964953365,
+        "pass": true
+      },
+      "warm_ms": {
+        "baseline": 0.317562,
+        "head": 0.24327100000000002,
+        "delta_percent": -23.394171846757484,
+        "pass": true
+      }
+    },
+    {
+      "fixture": "benchmark/font-runtime/fixtures/text-heavy.mei",
+      "attempts": 2,
+      "cold_ms": {
+        "baseline": 5.115667,
+        "head": 4.9062505000000005,
+        "delta_percent": -4.093630410267124,
+        "pass": true
+      },
+      "warm_ms": {
+        "baseline": 0.1509165,
+        "head": 0.296125,
+        "delta_percent": 96.2177760549708,
+        "pass": false
+      }
+    },
+    {
+      "fixture": "benchmark/font-runtime/fixtures/mixed-pages.mei",
+      "attempts": 1,
+      "cold_ms": {
+        "baseline": 6.730917,
+        "head": 6.4173124999999995,
+        "delta_percent": -4.659164568512731,
+        "pass": true
+      },
+      "warm_ms": {
+        "baseline": 0.157958,
+        "head": 0.1439165,
+        "delta_percent": -8.889388318413749,
+        "pass": true
+      }
+    }
+  ],
+  "gates": {
+    "cold_percent": 5.0,
+    "warm_percent": 3.0
+  }
+}

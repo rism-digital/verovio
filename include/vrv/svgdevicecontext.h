@@ -305,11 +305,6 @@ private:
     void VrvTextFontFallback() { m_vrvTextFontFallback = true; }
 
     /**
-     * Include the smufl text font either embedded or linked depending on m_smuflTextFont
-     */
-    void IncludeTextFont(const std::string &fontname, const Resources *resources);
-
-    /**
      * Flush the data to the internal buffer.
      * Adds the xml tag if necessary and the <defs> from m_smuflGlyphs
      */
@@ -334,6 +329,7 @@ private:
      * Prefix the CSS rules with a #docId for scoping them to the SVG
      */
     void PrefixCssRules(std::string &rules);
+    void FinishTextLine();
 
 public:
     //
@@ -358,6 +354,11 @@ private:
 
     bool m_committed; // did we flushed the file?
     int m_originX, m_originY;
+    double m_textCursorX;
+    int m_textCursorY;
+    double m_textLineWidth;
+    data_HORIZONTALALIGNMENT m_textAlignment;
+    pugi::xml_node m_textLineNode;
 
     // Here we hold references to all different glyphs used so far,
     // including any glyph for the same code but from different fonts.
@@ -378,8 +379,9 @@ private:
         const Glyph *m_glyph;
         std::string m_refId;
     };
-    const std::string InsertGlyphRef(const Glyph *glyph);
+    const std::string &InsertGlyphRef(const Glyph *glyph);
     std::vector<std::pair<const Glyph *, GlyphRef>> m_smuflGlyphs;
+    std::unordered_map<const Glyph *, size_t> m_glyphRefs;
     std::map<std::string, int> m_glyphCodeFontCounter;
 
     // pugixml data

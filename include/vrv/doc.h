@@ -193,13 +193,13 @@ public:
      * @name Get the height or width for a glyph taking into account the staff and grace sizes
      */
     ///@{
-    int GetGlyphHeight(char32_t code, int staffSize, bool graceSize) const;
-    int GetGlyphWidth(char32_t code, int staffSize, bool graceSize) const;
-    int GetGlyphLeft(char32_t code, int staffSize, bool graceSize) const;
-    int GetGlyphRight(char32_t code, int staffSize, bool graceSize) const;
-    int GetGlyphBottom(char32_t code, int staffSize, bool graceSize) const;
-    int GetGlyphTop(char32_t code, int staffSize, bool graceSize) const;
-    int GetGlyphAdvX(char32_t code, int staffSize, bool graceSize) const;
+    int GetGlyphHeight(char32_t code, int staffSize, bool graceSize, const std::string &fontName = "") const;
+    int GetGlyphWidth(char32_t code, int staffSize, bool graceSize, const std::string &fontName = "") const;
+    int GetGlyphLeft(char32_t code, int staffSize, bool graceSize, const std::string &fontName = "") const;
+    int GetGlyphRight(char32_t code, int staffSize, bool graceSize, const std::string &fontName = "") const;
+    int GetGlyphBottom(char32_t code, int staffSize, bool graceSize, const std::string &fontName = "") const;
+    int GetGlyphTop(char32_t code, int staffSize, bool graceSize, const std::string &fontName = "") const;
+    int GetGlyphAdvX(char32_t code, int staffSize, bool graceSize, const std::string &fontName = "") const;
     int GetDrawingUnit(int staffSize) const;
     int GetDrawingDoubleUnit(int staffSize) const;
     int GetDrawingStaffSize(int staffSize) const;
@@ -239,7 +239,7 @@ public:
      * (no const because the size of the member font is changed)
      */
     ///@{
-    FontInfo *GetDrawingSmuflFont(int staffSize, bool graceSize);
+    FontInfo *GetDrawingSmuflFont(int staffSize, bool graceSize, const std::string &fontName = "");
     FontInfo *GetDrawingLyricFont(int staffSize);
     FontInfo *GetFingeringFont(int staffSize);
     ///@}

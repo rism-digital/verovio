@@ -1471,16 +1471,9 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         return;
     }
 
-    int thickness = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    Syl::AdjustToLyricSize(m_doc, thickness);
-
     if (syl->GetCon() == sylLog_CON_d) {
-
-        y += (m_options->m_lyricSize.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 5);
-
         // the length of the dash and the space between them
         const int dashLength = syl->CalcHyphenLength(m_doc, staff->m_drawingStaffSize);
-        const int halfDashLength = dashLength / 2;
 
         const int dashSpace = m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) * 5 / 3;
         const int dist = x2 - x1;
@@ -1499,15 +1492,21 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
             margin = (dist - ((nbDashes - 1) * dashSpace)) / 2;
         }
 
+        FontInfo hyphenFont = syl->GetDrawingFont(m_doc, staff->m_drawingStaffSize);
+        dc->SetFont(&hyphenFont);
         for (int i = 0; i < nbDashes; ++i) {
             int x = x1 + margin + (i * dashSpace);
             x = std::max(x, x1);
 
-            this->DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + thickness);
+            dc->StartText(this->ToDeviceContextX(x), this->ToDeviceContextY(y), HORIZONTALALIGNMENT_center);
+            dc->DrawText("-", U"-");
+            dc->EndText();
         }
-        // this->DrawFilledRectangle(dc, x1, y, x2, y + width);
+        dc->ResetFont();
     }
     else if (syl->GetCon() == sylLog_CON_u) {
+        int thickness = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        Syl::AdjustToLyricSize(m_doc, thickness);
         x1 += (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
         if (x2 > x1) {
             this->DrawFilledRectangle(dc, x1, y, x2, y + thickness);

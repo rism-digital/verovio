@@ -61,10 +61,11 @@ void View::DrawTabClef(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     dc->StartGraphic(element, "", element->GetID());
 
-    this->DrawSmuflCode(dc, x, y, sym, glyphSize, false);
+    const std::string fontName = clef->HasFontname() ? clef->GetFontname() : "";
+    this->DrawSmuflCode(dc, x, y, sym, glyphSize, false, false, fontName);
 
     // Possibly draw enclosing brackets
-    this->DrawClefEnclosing(dc, clef, staff, sym, x, y);
+    this->DrawClefEnclosing(dc, clef, staff, sym, x, y, fontName);
 
     dc->EndGraphic(element, this);
 }
