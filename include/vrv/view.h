@@ -721,9 +721,15 @@ protected:
     ScoreDef m_drawingScoreDef;
 
 private:
+    /** Convert a numeric MEI font size to Verovio drawing units. */
+    int ConvertFontSizeNumeric(const data_FONTSIZE &fontSize, int staffSize) const;
+
     //----------------//
     // Static members //
     //----------------//
+
+    /** Convert a font size in printer points to Verovio drawing units. */
+    static int ConvertFontPointSize(double pointSize);
 
     /** @name Internal values for storing temporary values for ligatures */
     ///@{
