@@ -146,6 +146,13 @@ void Cursor::SetInputMode(InputMode intpuMode)
     m_inputMode = intpuMode;
 }
 
+bool Cursor::Veto(const std::string &attribute) const
+{
+    if (this->IsChordEditMode() && (attribute == "dur" || attribute == "dots")) return true;
+    
+    return false;
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------

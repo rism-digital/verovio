@@ -229,7 +229,7 @@ bool EditorToolkitCMN::InsertCursorByPitch(data_PITCHNAME pname, int oct, data_A
 {
     if (!this->InsertMode()) return false;
 
-    if (midi != VRV_UNSET) {
+    if (midi != VRV_UNSET && midi != -1) {
         std::string placeholder = m_cursor->GetID();
         this->UpdatePitch(placeholder, PITCHNAME_NONE, VRV_UNSET, ACCIDENTAL_WRITTEN_NONE, midi);
         pname = m_cursor->GetPname();
@@ -250,7 +250,14 @@ bool EditorToolkitCMN::InsertCursorByPitch(data_PITCHNAME pname, int oct, data_A
     int dots = (m_cursor->HasDots()) ? m_cursor->GetDots() : VRV_UNSET;
 
     std::string id = m_cursor->GetID();
-    return this->InsertNote(id, pname, oct, accid, accidGes, dur, dots, m_cursor->IsChordMode());
+    
+    if (midi == -1) {
+        m_cursor->SetChordMode(Cursor::ChordMode::NONE);
+        return this->InsertRest(id, dur, dots);
+    }
+    else {
+        return this->InsertNote(id, pname, oct, accid, accidGes, dur, dots, m_cursor->IsChordMode());
+    }
 }
 
 bool EditorToolkitCMN::InsertMeasure(std::string &elementId, int number, bool insertBefore)

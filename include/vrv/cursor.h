@@ -80,6 +80,8 @@ public:
 
     int GetYRelPitchC() const { return m_yRelPitchC; }
     void SetYRelPitchC(int yRelPitchC) { m_yRelPitchC = yRelPitchC; }
+    
+    bool Veto(const std::string &attribute) const;
 
     //----------//
     // Functors //

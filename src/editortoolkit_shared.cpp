@@ -981,7 +981,7 @@ bool EditorToolkitShared::KeyDown(std::string &elementId, int key, bool shiftKey
         // This will reset the accidental also for octave shifts
         this->UpdatePitch(elementId, interface->GetPname(), interface->GetOct(), ACCIDENTAL_WRITTEN_NONE, VRV_UNSET);
     }
-    if (element->HasInterface(INTERFACE_DURATION)) {
+    if (element->HasInterface(INTERFACE_DURATION) && (!m_cursor || !m_cursor->Veto("dur"))) {
         DurationInterface *interface = element->GetDurationInterface();
         assert(interface);
         switch (key) {
@@ -1112,8 +1112,10 @@ bool EditorToolkitShared::Set(std::string &elementId, const std::string &attribu
     static const std::array<const char *, 5> allowCursor = { "oct", "pname", "dots", "dur", "accid" };
 
     // Restrict set action on cursor
-    if (this->InsertMode() && (std::find(allowCursor.begin(), allowCursor.end(), attribute) == allowCursor.end()))
-        return true;
+    if (this->InsertMode()) {
+        if (std::find(allowCursor.begin(), allowCursor.end(), attribute) == allowCursor.end()) return true;
+        if (m_cursor->Veto(attribute)) return true;
+    }
 
     Object *element = (m_cursor) ? m_cursor : this->ResolveElement(elementId);
     if (!element) return false;
