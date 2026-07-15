@@ -643,7 +643,7 @@ void EditorToolkitShared::ReloadEditStatus(const std::string &statusStr, bool in
         }
         if (insertion.has<jsonxx::Boolean>("restMode")) {
             bool restMode = insertion.get<jsonxx::Boolean>("restMode");
-            m_cursor->SetRestMode(restMode);
+            if (restMode) m_cursor->SetRestMode(restMode);
         }
         if (insertion.has<jsonxx::String>("accid")) {
             data_ACCIDENTAL_WRITTEN accid = m_cursor->GetAccidElement()->AttAccidental::StrToAccidentalWritten(
