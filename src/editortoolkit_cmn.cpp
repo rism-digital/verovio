@@ -14,6 +14,7 @@
 
 //--------------------------------------------------------------------------------
 
+#include "alignfunctor.h"
 #include "comparison.h"
 #include "cursor.h"
 #include "layer.h"
@@ -377,11 +378,14 @@ bool EditorToolkitCMN::InsertNote(const std::string &elementId, data_PITCHNAME p
     if (note->IsInBeam()) {
         note->SetDur(std::max(DURATION_8, dur));
     }
+    else if (this->InsertMode() && (note->GetDur() > DURATION_4)) {
+        this->AutoBeam(note);
+    }
 
     this->ClearContext();
     this->SetEditStatus();
 
-    if (InsertMode()) {
+    if (this->InsertMode()) {
         this->MoveCursor(note);
         if (chordMode) {
             m_cursor->AdjustPitchByOffset(4);
@@ -553,6 +557,9 @@ bool EditorToolkitCMN::InsertRest(const std::string &elementId, data_DURATION du
     if (rest->IsInBeam()) {
         rest->SetDur(std::max(DURATION_8, dur));
     }
+    else if (this->InsertMode() && (rest->GetDur() > DURATION_4)) {
+        this->AutoBeam(rest);
+    }
 
     this->ClearContext();
     this->SetEditStatus();
@@ -560,6 +567,86 @@ bool EditorToolkitCMN::InsertRest(const std::string &elementId, data_DURATION du
     if (InsertMode()) this->MoveCursor(rest);
 
     return true;
+}
+
+void EditorToolkitCMN::AutoBeam(LayerElement *noteOrRest)
+{
+    assert(m_cursor);
+
+    // Not sure we actually want to autobeam rest - disabled for now
+    // if (!noteOrRest->IsAnyOf(std::array{NOTE, REST})) return;
+    if (!noteOrRest->Is(NOTE)) return;
+
+    Layer *layer = vrv_cast<Layer *>(noteOrRest->GetFirstAncestor(LAYER));
+    assert(layer);
+
+    // Auto-beam with chord and notes only - rests could be added
+    static auto classIds = { CHORD, NOTE };
+
+    LayerElement *result = noteOrRest;
+
+    while (result) {
+        result = layer->GetPreviousInLayer(result);
+
+        if (!result || (noteOrRest->GetAlignment() == result->GetAlignment())) continue;
+
+        if (result->IsAnyOf(classIds)) break;
+    }
+
+    if (!result) return;
+
+    if (result->Is(NOTE)) {
+        Note *previousNote = vrv_cast<Note *>(result);
+        assert(noteOrRest);
+        LayerElement *chord = previousNote->IsChordTone();
+        if (chord) result = chord;
+    }
+
+    DurationInterface *interface = result->GetDurationInterface();
+    assert(interface);
+
+    if (interface->GetDur() < DURATION_8) return;
+
+    AlignMeterParams params;
+    params.meterSig = layer->GetCurrentMeterSig();
+    assert(params.meterSig);
+    const int meterCount = (params.meterSig->GetTotalCount() == 0) ? 4 : params.meterSig->GetTotalCount();
+    const int meterUnit = (params.meterSig->GetUnit() == VRV_UNSET) ? meterCount : params.meterSig->GetUnit();
+
+    Fraction position = (m_cursor->GetAlignment()) ? m_cursor->GetAlignment()->GetTime() : 0;
+    // Use compound-meter grouping for meters such as 6/8, 9/8 and 12/8.
+    // Simple meters use one denominator unit per beat:
+    //   4/4 -> 4 groups of 1/4
+    // Compound meters use groups of three denominator units:
+    //   6/8 -> 2 groups of 3/8
+
+    const bool isCompoundMeter = ((meterCount % 3 == 0) && params.meterSig->GetUnit() == 8);
+
+    Fraction beatDuration = Fraction(1, meterUnit);
+    if (isCompoundMeter) beatDuration = beatDuration * 3;
+
+    // A note beginning on a new beat must not be joined to the preceding
+    // beam. Do not apply this at the beginning of the measure.
+    if (position > 0) {
+        const Fraction beatPosition = position / beatDuration;
+        if (beatPosition.GetDenominator() == 1) return;
+    }
+
+    if (result->IsInBeam()) {
+        Object *previousParent = noteOrRest->GetParent();
+        Beam *beam = result->GetAncestorBeam();
+        noteOrRest->MoveItselfTo(beam);
+        previousParent->ClearRelinquishedChildren();
+    }
+    else {
+        Object *previousParent = result->GetParent();
+        assert(previousParent);
+        Beam *beam = new Beam();
+        previousParent->AddChild(beam);
+        result->MoveItselfTo(beam);
+        noteOrRest->MoveItselfTo(beam);
+        previousParent->ClearRelinquishedChildren();
+    }
 }
 
 #endif

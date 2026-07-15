@@ -64,6 +64,7 @@ private:
         data_ACCIDENTAL_WRITTEN accid, data_ACCIDENTAL_GESTURAL accidGes);
     void SetNoteAttributes(
         Note *note, data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid, data_ACCIDENTAL_GESTURAL accidGes);
+    void AutoBeam(LayerElement *noteOrRest);
 
 public:
     //

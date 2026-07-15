@@ -993,7 +993,7 @@ bool EditorToolkitShared::KeyDown(std::string &elementId, int key, bool shiftKey
         //
         if (m_cursor && (key == KEY_LEFT || key == KEY_RIGHT)) m_cursor->OnSet("dur");
     }
-    
+
     this->SetEditStatus();
 
     return true;
@@ -1668,11 +1668,16 @@ void EditorToolkitShared::MoveCursor(LayerElement *element, bool maintainChordMo
     else if (element == layer->FindDescendantByComparison(&comparison, UNLIMITED_DEPTH, BACKWARD)) {
         AlignMeterParams params;
         params.meterSig = layer->GetCurrentMeterSig();
+        assert(params.meterSig);
+        const int meterCount = (params.meterSig->GetTotalCount() == 0) ? 4 : params.meterSig->GetTotalCount();
+        const int meterUnit = (params.meterSig->GetUnit() == VRV_UNSET) ? meterCount : params.meterSig->GetUnit();
+        assert(meterUnit);
+
         Fraction position = (m_cursor->GetAlignment()) ? m_cursor->GetAlignment()->GetTime() : 0;
         // Duration of the chord in chord editing mode is already included in the alignment
         Fraction duration
             = (m_cursor->IsChordEditMode()) ? 0 : element->GetAlignmentDuration(params, true, NOTATIONTYPE_cmn);
-        Fraction measureDuration = Fraction(params.meterSig->GetUnitAsDur()) * params.meterSig->GetTotalCount();
+        Fraction measureDuration = Fraction(meterCount, meterUnit);
         // Assume 4/4 by default
         if (measureDuration == 0) measureDuration = 4;
         if ((position + duration) >= measureDuration) {
