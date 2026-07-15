@@ -82,6 +82,7 @@ public:
     void SetYRelPitchC(int yRelPitchC) { m_yRelPitchC = yRelPitchC; }
 
     bool Veto(const std::string &attribute) const;
+    void OnSet(const std::string &attribute);
 
     //----------//
     // Functors //

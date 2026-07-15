@@ -990,8 +990,10 @@ bool EditorToolkitShared::KeyDown(std::string &elementId, int key, bool shiftKey
             case KEY_DOT: interface->HasDots() ? interface->ResetAugmentDots() : interface->SetDots(1);
             default: break;
         }
+        //
+        if (m_cursor && (key == KEY_LEFT || key == KEY_RIGHT)) m_cursor->OnSet("dur");
     }
-
+    
     this->SetEditStatus();
 
     return true;
@@ -1115,6 +1117,7 @@ bool EditorToolkitShared::Set(std::string &elementId, const std::string &attribu
     if (this->InsertMode()) {
         if (std::find(allowCursor.begin(), allowCursor.end(), attribute) == allowCursor.end()) return true;
         if (m_cursor->Veto(attribute)) return true;
+        m_cursor->OnSet(attribute);
     }
 
     Object *element = (m_cursor) ? m_cursor : this->ResolveElement(elementId);

@@ -149,8 +149,13 @@ void Cursor::SetInputMode(InputMode intpuMode)
 bool Cursor::Veto(const std::string &attribute) const
 {
     if (this->IsChordEditMode() && (attribute == "dur" || attribute == "dots")) return true;
-
+    
     return false;
+}
+
+void Cursor::OnSet(const std::string &attribute)
+{
+    if (attribute == "dur") this->ResetAugmentDots();
 }
 
 //----------------------------------------------------------------------------
