@@ -250,7 +250,7 @@ bool EditorToolkitCMN::InsertCursorByPitch(data_PITCHNAME pname, int oct, data_A
     int dots = (m_cursor->HasDots()) ? m_cursor->GetDots() : VRV_UNSET;
 
     std::string id = m_cursor->GetID();
-    
+
     if (midi == -1) {
         m_cursor->SetChordMode(Cursor::ChordMode::NONE);
         return this->InsertRest(id, dur, dots);
