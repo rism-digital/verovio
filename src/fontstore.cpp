@@ -133,6 +133,16 @@ namespace {
         return hash ? hash : 1;
     }
 
+    uint64_t HashSyntheticIdentity(uint64_t baseIdentity, bool bold, bool italic)
+    {
+        unsigned char data[9] = { static_cast<unsigned char>(baseIdentity >> 56),
+            static_cast<unsigned char>(baseIdentity >> 48), static_cast<unsigned char>(baseIdentity >> 40),
+            static_cast<unsigned char>(baseIdentity >> 32), static_cast<unsigned char>(baseIdentity >> 24),
+            static_cast<unsigned char>(baseIdentity >> 16), static_cast<unsigned char>(baseIdentity >> 8),
+            static_cast<unsigned char>(baseIdentity), static_cast<unsigned char>((bold ? 2 : 0) | (italic ? 1 : 0)) };
+        return HashBytes(data, sizeof(data));
+    }
+
     bool IsSfnt(const unsigned char *data, size_t length)
     {
         if (length < 12) return false;
@@ -448,6 +458,18 @@ namespace {
             identity = HashFontIdentity(face);
         }
 
+        FaceData(const std::shared_ptr<FaceData> &source, bool bold, bool italic)
+            : byteHash(source->byteHash)
+            , identity(HashSyntheticIdentity(source->identity, bold, italic))
+            , blob(hb_blob_reference(source->blob))
+            , face(hb_face_reference(source->face))
+            , font(hb_font_create_sub_font(source->font))
+            , unitsPerEm(source->unitsPerEm)
+        {
+            if (bold) hb_font_set_synthetic_bold(font, 0.03F, 0.03F, false);
+            if (italic) hb_font_set_synthetic_slant(font, 0.2F);
+        }
+
         ~FaceData()
         {
             hb_font_destroy(font);
@@ -470,6 +492,23 @@ namespace {
     std::mutex g_sharedFacesMutex;
     std::unordered_multimap<uint64_t, std::weak_ptr<FaceData>> g_sharedFaces;
 
+    struct SyntheticFaceKey {
+        uint64_t identity;
+        bool bold;
+        bool italic;
+
+        bool operator==(const SyntheticFaceKey &) const = default;
+    };
+
+    struct SyntheticFaceKeyHash {
+        size_t operator()(const SyntheticFaceKey &key) const
+        {
+            return static_cast<size_t>(HashSyntheticIdentity(key.identity, key.bold, key.italic));
+        }
+    };
+
+    std::unordered_map<SyntheticFaceKey, std::weak_ptr<FaceData>, SyntheticFaceKeyHash> g_sharedSyntheticFaces;
+
     std::shared_ptr<FaceData> FindOrCreateFace(const unsigned char *data, size_t length, uint64_t hash)
     {
         std::lock_guard<std::mutex> lock(g_sharedFacesMutex);
@@ -482,6 +521,18 @@ namespace {
         std::vector<unsigned char> bytes(data, data + length);
         std::shared_ptr<FaceData> face = std::make_shared<FaceData>(std::move(bytes), hash);
         g_sharedFaces.emplace(hash, face);
+        return face;
+    }
+
+    std::shared_ptr<FaceData> FindOrCreateSyntheticFace(const std::shared_ptr<FaceData> &source, bool bold, bool italic)
+    {
+        const SyntheticFaceKey key{ source->identity, bold, italic };
+        std::lock_guard<std::mutex> lock(g_sharedFacesMutex);
+        if (const auto existing = g_sharedSyntheticFaces.find(key); existing != g_sharedSyntheticFaces.end()) {
+            if (std::shared_ptr<FaceData> face = existing->second.lock()) return face;
+        }
+        std::shared_ptr<FaceData> face = std::make_shared<FaceData>(source, bold, italic);
+        g_sharedSyntheticFaces[key] = face;
         return face;
     }
 
@@ -711,8 +762,37 @@ public:
     std::shared_ptr<FaceData> Find(Kind kind, const std::string &family, Weight weight, Style style) const
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        const auto iterator = m_faces.find({ kind, ResolveFamilyLocked(kind, family), weight, style });
-        return (iterator == m_faces.end()) ? NULL : iterator->second;
+        const std::string &resolvedFamily = ResolveFamilyLocked(kind, family);
+        const FaceKey requested{ kind, resolvedFamily, weight, style };
+        if (const auto exact = m_faces.find(requested); exact != m_faces.end()) return exact->second;
+        if (kind != Kind::Text) return NULL;
+        if (const auto synthetic = m_syntheticFaces.find(requested); synthetic != m_syntheticFaces.end()) {
+            return synthetic->second;
+        }
+
+        struct Candidate {
+            Weight weight;
+            Style style;
+            bool syntheticBold;
+            bool syntheticItalic;
+        };
+        std::array<Candidate, 3> candidates{};
+        size_t candidateCount = 0;
+        if (style == Style::Italic) candidates[candidateCount++] = { weight, Style::Normal, false, true };
+        if (weight == Weight::Bold) candidates[candidateCount++] = { Weight::Normal, style, true, false };
+        if ((weight == Weight::Bold) && (style == Style::Italic)) {
+            candidates[candidateCount++] = { Weight::Normal, Style::Normal, true, true };
+        }
+        for (size_t i = 0; i < candidateCount; ++i) {
+            const Candidate &candidate = candidates[i];
+            const auto source = m_faces.find({ kind, resolvedFamily, candidate.weight, candidate.style });
+            if (source == m_faces.end()) continue;
+            std::shared_ptr<FaceData> synthetic
+                = FindOrCreateSyntheticFace(source->second, candidate.syntheticBold, candidate.syntheticItalic);
+            m_syntheticFaces.emplace(requested, synthetic);
+            return synthetic;
+        }
+        return NULL;
     }
 
     const std::string &ResolveFamilyLocked(Kind kind, const std::string &family) const
@@ -728,11 +808,15 @@ public:
         for (const auto &[key, face] : m_faces) {
             if (face->identity == identity.value) return face;
         }
+        for (const auto &[key, face] : m_syntheticFaces) {
+            if (face->identity == identity.value) return face;
+        }
         return NULL;
     }
 
     mutable std::mutex m_mutex;
     std::unordered_map<FaceKey, std::shared_ptr<FaceData>, FaceKeyHash> m_faces;
+    mutable std::unordered_map<FaceKey, std::shared_ptr<FaceData>, FaceKeyHash> m_syntheticFaces;
     std::unordered_map<FaceKey, std::shared_ptr<const MusicAnchorMap>, FaceKeyHash> m_musicAnchors;
     std::unordered_set<FamilyKey, FamilyKeyHash> m_families;
     std::unordered_map<FamilyKey, std::string, FamilyKeyHash> m_aliases;

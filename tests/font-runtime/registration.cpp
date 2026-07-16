@@ -147,6 +147,21 @@ int main(int argc, char **argv)
         "localized style regular-face setup failed");
     const auto localizedRegularRun
         = localizedStyleStore.ShapeText("Verovio Test Ligature", U"ffi", vrv::FontStore::Weight::Normal);
+    const auto localizedSyntheticItalicRun = localizedStyleStore.ShapeText(
+        "Verovio Test Ligature", U"ffi", vrv::FontStore::Weight::Normal, vrv::FontStore::Style::Italic);
+    ok &= Expect(localizedRegularRun && localizedSyntheticItalicRun && !localizedRegularRun->glyphs.empty()
+            && !localizedSyntheticItalicRun->glyphs.empty()
+            && (localizedRegularRun->glyphs.front().face != localizedSyntheticItalicRun->glyphs.front().face),
+        "missing italic face did not synthesize a distinct style within the requested family");
+    if (localizedRegularRun && localizedSyntheticItalicRun && !localizedRegularRun->glyphs.empty()
+        && !localizedSyntheticItalicRun->glyphs.empty()) {
+        const auto regularOutline = localizedStyleStore.GetGlyphOutline(
+            localizedRegularRun->glyphs.front().face, localizedRegularRun->glyphs.front().glyphId);
+        const auto syntheticItalicOutline = localizedStyleStore.GetGlyphOutline(
+            localizedSyntheticItalicRun->glyphs.front().face, localizedSyntheticItalicRun->glyphs.front().glyphId);
+        ok &= Expect(regularOutline && syntheticItalicOutline && (*regularOutline != *syntheticItalicOutline),
+            "synthetic italic face did not slant the emitted glyph outline");
+    }
     ok &= Expect(
         localizedStyleStore.RegisterTextFont(localizedBold.data(), localizedBold.size()) == "Verovio Test Ligature",
         "localized bold subfamily was not classified from OpenType style metadata");
@@ -166,6 +181,7 @@ int main(int argc, char **argv)
 <scoreDef><staffGrp><staffDef n="1" lines="5" clef.shape="G" clef.line="2"/></staffGrp></scoreDef>
 <section><measure n="1"><staff n="1"><layer n="1"><note xml:id="style-note" pname="c" oct="4" dur="1"/>
 </layer></staff><dir startid="#style-note"><rend fontname="Verovio Test Ligature" fontweight="bold">ffi</rend></dir>
+<dir startid="#style-note"><rend fontname="Verovio Test Ligature" fontstyle="italic">ffi</rend></dir>
 </measure></section></score></mdiv></body></music></mei>)mei";
     ok &= Expect(localizedStyleRendering.LoadData(localizedStyleMei), "localized bold render MEI could not be loaded");
     const std::string localizedStyleSvg = localizedStyleRendering.RenderToSVG(1);
@@ -174,10 +190,19 @@ int main(int argc, char **argv)
         localizedBoldPrefix << "text-" << std::uppercase << std::hex << localizedBoldRun->glyphs.front().face.value
                             << "-";
     }
+    std::ostringstream localizedSyntheticItalicPrefix;
+    if (localizedSyntheticItalicRun && !localizedSyntheticItalicRun->glyphs.empty()) {
+        localizedSyntheticItalicPrefix << "text-" << std::uppercase << std::hex
+                                       << localizedSyntheticItalicRun->glyphs.front().face.value << "-";
+    }
     ok &= Expect(!localizedBoldPrefix.str().empty()
             && (localizedStyleSvg.find(localizedBoldPrefix.str()) != std::string::npos)
             && (localizedStyleSvg.find("font-weight=\"bold\"") != std::string::npos),
         "MEI rend with bold weight did not render with the localized bold face");
+    ok &= Expect(!localizedSyntheticItalicPrefix.str().empty()
+            && (localizedStyleSvg.find(localizedSyntheticItalicPrefix.str()) != std::string::npos)
+            && (localizedStyleSvg.find("font-style=\"italic\"") != std::string::npos),
+        "MEI rend with an unavailable italic face did not stay within the requested family");
 
     vrv::Toolkit scoreTextStyleRendering(false);
     ok &= Expect(scoreTextStyleRendering.SetResourcePath(argv[9])

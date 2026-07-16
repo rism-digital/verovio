@@ -702,3 +702,33 @@ glyphs. The MEI-to-SVG regression compares `Intro` and `Strophen` and reduces
 their Tinos box-height difference from the content-dependent failure to two
 device units (rounding tolerance: four). These lookups populate only the lazy
 metrics cache and do not extract outlines.
+
+### E46 — Missing text-style faces stay in the requested family
+
+Checkpoint commit: `1c0df0456`. The test score explicitly encodes
+`tänzerisch` as Quicksand Italic, but the installed static Quicksand family has
+no italic face. Exact face lookup therefore failed and the shaping wrapper
+silently switched the complete run to Tinos Italic. The MEI encoding was not
+at fault.
+
+Text face matching now prefers an exact face, then synthesizes a missing
+italic or bold style from the nearest registered face in the same family.
+HarfBuzz applies the synthetic style to shaping metrics, extents, and the
+lazily requested outline. Synthetic variants have stable identities and share
+a process-wide weak cache; repeated lookup returns the cached variant before
+considering fallback candidates. A regression proves that an italic `rend`
+uses a distinct, actually slanted outline from its requested family rather
+than the matching Tinos face. Rendering the real score with only Quicksand
+Regular and Bold registered produces a Quicksand-derived synthetic face for
+`tänzerisch`.
+
+The same-build native CLI changed from 7,259,208 to 7,260,600 bytes (+0.019%);
+gzip changed from 2,437,809 to 2,441,144 bytes (+0.137%). Cold timing passed
+for music-only (-2.49%), text-heavy (+0.95%), and mixed-page (+3.33%) fixtures.
+Warm timing passed for music-only (0.00%) and mixed-page (+1.46%). The standard
+1,000-render text-heavy batch reported 0.808 versus 0.962 microseconds per
+cached render (+19.07%) after its automatic rerun, so the failed gate is
+preserved in `reports/e46-synthetic-style-native-timing.json`. A diagnostic
+100,000-render batch measured 0.717 versus 0.730 microseconds (+1.81%), within
+the 3% gate; the absolute discrepancy is sub-microsecond benchmark noise, not
+a meaningful render-time accumulation. No threshold was relaxed.
