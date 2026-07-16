@@ -61,32 +61,6 @@ const findNoteheadTranslate = (chunk) => {
   };
 };
 
-const parseStaffLineBounds = (measureChunk) => {
-  if (!measureChunk) return null;
-  const matches = [
-    ...measureChunk.matchAll(/M([\d.]+)\s+([\d.]+)\s+L([\d.]+)\s+([\d.]+)/g),
-  ];
-  if (!matches.length) return null;
-  const points = matches.flatMap((match) => [
-    {
-      x: Number.parseFloat(match[1]),
-      y: Number.parseFloat(match[2]),
-    },
-    {
-      x: Number.parseFloat(match[3]),
-      y: Number.parseFloat(match[4]),
-    },
-  ]);
-  const xs = points.map((p) => p.x);
-  const ys = points.map((p) => p.y);
-  return {
-    minX: Math.min(...xs),
-    maxX: Math.max(...xs),
-    minY: Math.min(...ys),
-    maxY: Math.max(...ys),
-  };
-};
-
 const main = async () => {
   const xml = readFile(TEST_XML_URL);
   const module = await createVerovioModule();
@@ -147,10 +121,6 @@ const main = async () => {
   const contentHeight = viewBoxHeight !== null ? viewBoxHeight - marginY : null;
   const pitchAbs = { x: pitchPosition.x, y: pitchPosition.y };
 
-  const measureId = pitchPosition.measureId;
-  const measureChunk = measureId ? findSnippet(svg, measureId, 6000) : null;
-  const staffBounds = parseStaffLineBounds(measureChunk);
-
   console.log('Timemap notes (first 8):');
   console.log(
     noteEntries.slice(0, 8).map((entry) => ({
@@ -182,14 +152,6 @@ const main = async () => {
       dy: Math.round(pitchAbs.y - noteAbs.y),
     });
     console.log('');
-  }
-  if (staffBounds) {
-    console.log('Staff line bounds (measure):');
-    console.log(staffBounds);
-    console.log('Pitch inside staff bounds:', {
-      x: pitchAbs.x >= staffBounds.minX && pitchAbs.x <= staffBounds.maxX,
-      y: pitchAbs.y >= staffBounds.minY && pitchAbs.y <= staffBounds.maxY,
-    });
   }
 };
 

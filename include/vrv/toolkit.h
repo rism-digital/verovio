@@ -618,7 +618,7 @@ public:
      * @param scoreTime The score time (in quarter notes from start of the score)
      * @param midiPitch MIDI pitch number (fractional values allowed)
      * @param staffN The staff number (1-based)
-     * @return A stringified JSON object with x / y coordinates and context information
+     * @return A stringified JSON object with x / y coordinates and page / system numbers
      */
     std::string GetPitchPosition(double scoreTime, double midiPitch, int staffN);
 

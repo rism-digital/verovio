@@ -85,16 +85,6 @@ namespace {
         }
     }
 
-    data_ACCIDENTAL_WRITTEN SemitoneToAccidWritten(int value)
-    {
-        if (value <= -2) return ACCIDENTAL_WRITTEN_ff;
-        if (value == -1) return ACCIDENTAL_WRITTEN_f;
-        if (value == 0) return ACCIDENTAL_WRITTEN_n;
-        if (value == 1) return ACCIDENTAL_WRITTEN_s;
-        if (value >= 2) return ACCIDENTAL_WRITTEN_ss;
-        return ACCIDENTAL_WRITTEN_n;
-    }
-
     struct SpelledPitch {
         data_PITCHNAME pname;
         int accidSemitone;
@@ -2540,18 +2530,8 @@ std::string Toolkit::GetPitchPosition(double scoreTime, double midiPitch, int st
 
     o << "x" << xOut;
     o << "y" << yOut;
-    o << "loc" << loc;
-    o << "midi" << midiPitch;
-    o << "staff" << staffN;
-    o << "measureId" << measureId;
     o << "page" << pageNo;
     o << "system" << systemNo;
-    o << "scoreTime" << scoreTime;
-    o << "interpolated" << interpolated;
-    o << "pname" << static_cast<int>(spelled.pname);
-    o << "accid" << SemitoneToAccidWritten(spelled.accidSemitone);
-    o << "accidSemitone" << spelled.accidSemitone;
-    o << "oct" << spelled.oct;
 
     return o.json();
 }

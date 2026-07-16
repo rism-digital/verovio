@@ -1,7 +1,7 @@
 // Quick harness to exercise GetPitchPosition in the Verovio toolkit.
 // Usage: run after building the npm package (./buildNpmPackage) from the repo root:
 //   node emscripten/npm/test/get-pitch-position.mjs
-// It loads a tiny MEI with a single measure and asserts the returned measure/page/system.
+// It loads a tiny MEI with a single measure and checks the returned coordinates.
 
 import createVerovioModule from '../dist/verovio-module.mjs';
 import { VerovioToolkit } from '../dist/verovio.mjs';
@@ -38,6 +38,11 @@ const assertEqual = (actual, expected, msg) => {
   }
 };
 
+const assertResultShape = (result) => {
+  const keys = Object.keys(result).sort().join(',');
+  assertEqual(keys, 'page,system,x,y', 'result keys');
+};
+
 const main = async () => {
   const module = await createVerovioModule();
   const tk = new VerovioToolkit(module);
@@ -60,10 +65,14 @@ const main = async () => {
   const resultFractional = tk.getPitchPosition(0, 60.5, 1);
   console.log('GetPitchPosition(0, 60.5, 1) ->', resultFractional);
 
-  assertEqual(result.measureId, 'm1', 'measureId');
+  assertResultShape(result);
+  assertResultShape(resultFractional);
   assertEqual(result.page, 1, 'page');
   assertEqual(result.system, 1, 'system');
-  assertEqual(result.staff, 1, 'staff');
+
+  if (!Number.isFinite(result.x) || !Number.isFinite(result.y)) {
+    throw new Error('expected finite x and y coordinates');
+  }
 
   if (resultFractional.y === result.y) {
     throw new Error('expected fractional MIDI pitch to adjust y position');
