@@ -411,6 +411,10 @@ namespace {
 
     struct ShapeKey {
         const void *face = NULL;
+        const void *textFallback = NULL;
+        const void *musicFace = NULL;
+        const void *musicFallback = NULL;
+        const void *bravura = NULL;
         std::u32string text;
         bool operator==(const ShapeKey &) const = default;
     };
@@ -419,6 +423,11 @@ namespace {
         size_t operator()(const ShapeKey &key) const
         {
             size_t hash = std::hash<const void *>()(key.face);
+            const std::array<const void *, 4> fallbacks
+                = { key.textFallback, key.musicFace, key.musicFallback, key.bravura };
+            for (const void *fallback : fallbacks) {
+                hash ^= std::hash<const void *>()(fallback) + 0x9e3779b9U + (hash << 6) + (hash >> 2);
+            }
             for (char32_t character : key.text) {
                 hash ^= static_cast<size_t>(character) + 0x9e3779b9U + (hash << 6) + (hash >> 2);
             }
@@ -876,15 +885,23 @@ std::vector<FontStore::GlyphAnchor> FontStore::GetMusicGlyphAnchors(
     return (glyph == face->second->end()) ? std::vector<GlyphAnchor>() : glyph->second;
 }
 
-std::optional<FontStore::ShapedRun> FontStore::ShapeText(
-    const std::string &family, const std::u32string &text, Weight weight, Style style) const
+std::optional<FontStore::ShapedRun> FontStore::ShapeText(const std::string &family, const std::u32string &text,
+    Weight weight, Style style, const std::string &musicFamily, const std::string &musicFallbackFamily) const
 {
     const std::shared_ptr<FaceData> face = m_impl->Find(Kind::Text, family, weight, style);
     if (!face) return std::nullopt;
-    const std::shared_ptr<FaceData> fallback
+    const std::shared_ptr<FaceData> textFallback
         = (family == "Tinos") ? face : m_impl->Find(Kind::Text, "Tinos", weight, style);
+    const std::shared_ptr<FaceData> musicFace
+        = musicFamily.empty() ? nullptr : m_impl->Find(Kind::Music, musicFamily, Weight::Normal, Style::Normal);
+    const std::shared_ptr<FaceData> musicFallback = musicFallbackFamily.empty()
+        ? nullptr
+        : m_impl->Find(Kind::Music, musicFallbackFamily, Weight::Normal, Style::Normal);
+    const std::shared_ptr<FaceData> bravura = (musicFamily == "Bravura") || (musicFallbackFamily == "Bravura")
+        ? nullptr
+        : m_impl->Find(Kind::Music, "Bravura", Weight::Normal, Style::Normal);
     std::lock_guard<std::mutex> cacheLock(m_impl->m_mutex);
-    const ShapeKey key{ face.get(), text };
+    const ShapeKey key = { face.get(), textFallback.get(), musicFace.get(), musicFallback.get(), bravura.get(), text };
     const auto cached = m_impl->m_shapeCache.find(key);
     if (cached != m_impl->m_shapeCache.end()) return cached->second;
 
@@ -920,7 +937,8 @@ std::optional<FontStore::ShapedRun> FontStore::ShapeText(
     }
 
     ShapedRun run{ { face->identity }, face->unitsPerEm, shape(face, text) };
-    if (fallback && (fallback != face)) {
+    auto replaceMissingClusters = [&](const std::shared_ptr<FaceData> &fallback) {
+        if (!fallback || (fallback == face)) return;
         for (size_t begin = 0; begin < run.glyphs.size();) {
             size_t end = begin + 1;
             while ((end < run.glyphs.size()) && (run.glyphs[end].cluster == run.glyphs[begin].cluster)) ++end;
@@ -938,10 +956,17 @@ std::optional<FontStore::ShapedRun> FontStore::ShapeText(
             }
             begin = end;
         }
+    };
+    std::vector<std::shared_ptr<FaceData>> fallbacks;
+    for (const std::shared_ptr<FaceData> &fallback : { textFallback, musicFace, musicFallback, bravura }) {
+        if (fallback && (std::find(fallbacks.begin(), fallbacks.end(), fallback) == fallbacks.end())) {
+            fallbacks.push_back(fallback);
+        }
     }
+    for (const std::shared_ptr<FaceData> &fallback : fallbacks) replaceMissingClusters(fallback);
     if (!m_impl->m_warnedMissingText
         && std::ranges::any_of(run.glyphs, [](const GlyphPlacement &glyph) { return glyph.glyphId == 0; })) {
-        LogWarning("A text cluster is missing from both the requested font and Tinos; using .notdef.");
+        LogWarning("A text cluster is missing from the requested text and SMuFL fonts; using .notdef.");
         m_impl->m_warnedMissingText = true;
     }
     m_impl->m_shapeCache.emplace(key, run);

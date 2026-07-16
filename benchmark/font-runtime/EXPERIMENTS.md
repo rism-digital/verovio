@@ -668,3 +668,20 @@ outside this experiment; the corrected copy was rendered with registered
 Quicksand and Arial Narrow faces for visual verification. Both configured CTest
 tests pass, and the current native CLI is 7,258,328 bytes versus 7,393,896 bytes
 for the checkpoint build with the same local toolchain (no size regression).
+
+### E44 — SMuFL fallback for missing text clusters
+
+Checkpoint commit: `5c2f12157`. The `In dir ist Freude` test score contains
+the Unicode quarter-note character `U+2669` in ordinary tempo text. Quicksand
+and Tinos do not map that character, while bundled Bravura maps it directly.
+The previous shaping path stopped after the Tinos fallback, retained glyph ID
+zero, and emitted a `.notdef` square.
+
+Text shaping now tries the requested text face, matching Tinos face, active
+SMuFL face, configured music fallback, and finally Bravura. The shape-cache key
+includes every participating face, so changing the active or fallback music
+font cannot return a stale mixed-font run. Regression coverage proves both an
+active custom SMuFL fallback and the final Bravura fallback, using their actual
+face identities and glyph IDs. Both configured CTest tests pass. No outlines
+are extracted until the resolved music glyph is drawn, and repeated rendering
+continues to reuse the shaped run.

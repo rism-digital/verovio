@@ -426,8 +426,11 @@ std::optional<FontStore::ShapedRun> Resources::ShapeText(const FontInfo &font, c
     const std::string family = font.GetFaceName().empty() ? m_textFontName : font.GetFaceName();
     const FontStore::Weight weight = ToRuntimeWeight(font.GetWeight());
     const FontStore::Style style = ToRuntimeStyle(font.GetStyle());
-    std::optional<FontStore::ShapedRun> run = m_fontStore.ShapeText(family, text, weight, style);
-    if (!run && (family != TINOS)) run = m_fontStore.ShapeText(TINOS, text, weight, style);
+    std::optional<FontStore::ShapedRun> run
+        = m_fontStore.ShapeText(family, text, weight, style, m_currentFontName, m_fallbackFontName);
+    if (!run && (family != TINOS)) {
+        run = m_fontStore.ShapeText(TINOS, text, weight, style, m_currentFontName, m_fallbackFontName);
+    }
     return run;
 }
 

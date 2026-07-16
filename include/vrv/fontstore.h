@@ -93,7 +93,8 @@ public:
     std::optional<std::string> GetGlyphOutline(FaceIdentity face, uint32_t glyphId) const;
     std::vector<GlyphAnchor> GetMusicGlyphAnchors(const std::string &family, const std::string &glyphName) const;
     std::optional<ShapedRun> ShapeText(const std::string &family, const std::u32string &text,
-        Weight weight = Weight::Normal, Style style = Style::Normal) const;
+        Weight weight = Weight::Normal, Style style = Style::Normal, const std::string &musicFamily = "",
+        const std::string &musicFallbackFamily = "") const;
 
     uint64_t GetGeneration() const;
     /** Pin the currently registered bundled faces in the bounded process cache. */

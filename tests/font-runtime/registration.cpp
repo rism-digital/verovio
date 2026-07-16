@@ -648,6 +648,20 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
         "custom music font could not be registered in Resources");
     ok &= Expect(
         fallbackResources.GetGlyph(U'\uE050', "Verovio Test Music") != nullptr, "custom music glyph lookup failed");
+    ok &= Expect(fallbackResources.SetCurrentFont("Verovio Test Music"), "custom music font could not be selected");
+    vrv::FontInfo textWithMusicFallback;
+    textWithMusicFallback.SetFaceName("Tinos");
+    const auto activeMusicTextFallback = fallbackResources.ShapeText(textWithMusicFallback, U"\uE050");
+    ok &= Expect(activeMusicTextFallback && customClef && !activeMusicTextFallback->glyphs.empty()
+            && (activeMusicTextFallback->glyphs.front().face == customClef->face),
+        "text glyph missing from Tinos did not fall back to the active SMuFL font");
+    const auto bravuraQuarter
+        = fallbackResources.GetFontStore().GetGlyphMetrics(vrv::FontStore::Kind::Music, "Bravura", U'\u2669');
+    const auto bravuraTextFallback = fallbackResources.ShapeText(textWithMusicFallback, U"\u2669");
+    ok &= Expect(bravuraTextFallback && bravuraQuarter && !bravuraTextFallback->glyphs.empty()
+            && (bravuraTextFallback->glyphs.front().face == bravuraQuarter->face)
+            && (bravuraTextFallback->glyphs.front().glyphId == bravuraQuarter->glyphId),
+        "text glyph missing from the active SMuFL font did not fall back to Bravura");
     const auto fallbackBravuraMetrics
         = fallbackResources.GetFontStore().GetGlyphMetrics(vrv::FontStore::Kind::Music, "Bravura", U'\uE0A2');
     ok &= Expect(fallbackBravuraMetrics.has_value(), "Bravura metrics disappeared after custom music registration");
