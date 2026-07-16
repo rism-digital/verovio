@@ -128,6 +128,7 @@ protected:
     void MoveCursor(LayerElement *element, bool maintainChordMode = false);
 
     data_ACCIDENTAL_WRITTEN GetAccidBefore(const LayerElement *element, data_PITCHNAME pname, int oct);
+    std::pair<data_ACCIDENTAL_WRITTEN, bool> GetActualAccid(Object *element, data_ACCIDENTAL_WRITTEN accid);
 
     const Measure *GetPreviousMeasure(const Measure *measure);
     const Staff *GetPreviousStaff(const Staff *staff);

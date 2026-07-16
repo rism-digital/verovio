@@ -242,6 +242,12 @@ bool EditorToolkitCMN::InsertCursorByPitch(data_PITCHNAME pname, int oct, data_A
 
     data_ACCIDENTAL_GESTURAL accidGes = ACCIDENTAL_GESTURAL_NONE;
     if (accid == ACCIDENTAL_WRITTEN_NONE) {
+        // Since we did not know the pitch yet we need to calculate that actual accid
+        if (m_cursor->GetInputMode() == Cursor::InputMode::DURATION_FIRST) {
+            auto [actualAccid, isImplicit] = this->GetActualAccid(m_cursor, m_cursor->GetAccid());
+            m_cursor->SetAccid(actualAccid);
+            m_cursor->SetAccidImplicit(isImplicit);
+        }
         const auto value = m_cursor->GetAccidValue();
         accid = value.first;
         accidGes = value.second;

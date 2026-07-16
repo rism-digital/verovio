@@ -513,7 +513,6 @@ bool EditorToolkitShared::ParseUpdatePitchAction(const jsonxx::Object &param, st
     if (param.has<jsonxx::String>("accid"))
         accid = accidConverter.AttAccidental::StrToAccidentalWritten(param.get<jsonxx::String>("accid"));
     if (param.has<jsonxx::Number>("midi")) midi = param.get<jsonxx::Number>("midi");
-    LogInfo("%c %d %d", pname, oct, midi);
 
     return true;
 }
@@ -1243,6 +1242,49 @@ bool EditorToolkitShared::UpdatePitch(
         m_cursor->SetAccid(ACCIDENTAL_WRITTEN_NONE);
     }
 
+    data_ACCIDENTAL_WRITTEN actualAccid;
+    bool isImplicit;
+    // Since we do not know the pitch yet just set it to the cursor
+    if (m_cursor && m_cursor->GetInputMode() == Cursor::InputMode::DURATION_FIRST) {
+        actualAccid = accid;
+        isImplicit = false;
+    }
+    else {
+        std::tie(actualAccid, isImplicit) = this->GetActualAccid(element, accid);
+    }
+
+    if (actualAccid != ACCIDENTAL_WRITTEN_NONE) {
+        if (m_cursor) {
+            m_cursor->SetAccid(actualAccid);
+            m_cursor->SetAccidImplicit(isImplicit);
+        }
+        else if (element->IsSupportedChild(ACCID)) {
+            Accid *accidElement = new Accid();
+            if (isImplicit) {
+                accidElement->SetAccidGes(Att::AccidentalWrittenToGestural(actualAccid));
+            }
+            else {
+                accidElement->SetAccid(actualAccid);
+            }
+            element->AddChild(accidElement);
+            this->ClearContext();
+        }
+    }
+
+    this->SetEditStatus();
+
+    return true;
+}
+
+std::pair<data_ACCIDENTAL_WRITTEN, bool> EditorToolkitShared::GetActualAccid(
+    Object *element, data_ACCIDENTAL_WRITTEN accid)
+{
+    PitchInterface *interface = element->GetPitchInterface();
+    assert(interface);
+
+    const Layer *layer = vrv_cast<const Layer *>(element->GetFirstAncestor(LAYER));
+    assert(layer);
+
     const LayerElement *reference = vrv_cast<const LayerElement *>(element);
     assert(reference);
     data_ACCIDENTAL_WRITTEN previousAccid = this->GetAccidBefore(
@@ -1266,27 +1308,8 @@ bool EditorToolkitShared::UpdatePitch(
     else if (previousAccid != ACCIDENTAL_WRITTEN_NONE) {
         actualAccid = previousAccid;
     }
-    if (actualAccid != ACCIDENTAL_WRITTEN_NONE) {
-        if (m_cursor) {
-            m_cursor->SetAccid(actualAccid);
-            m_cursor->SetAccidImplicit(isImplicit);
-        }
-        else if (element->IsSupportedChild(ACCID)) {
-            Accid *accidElement = new Accid();
-            if (isImplicit) {
-                accidElement->SetAccidGes(Att::AccidentalWrittenToGestural(actualAccid));
-            }
-            else {
-                accidElement->SetAccid(actualAccid);
-            }
-            element->AddChild(accidElement);
-            this->ClearContext();
-        }
-    }
 
-    this->SetEditStatus();
-
-    return true;
+    return { actualAccid, isImplicit };
 }
 
 data_ACCIDENTAL_WRITTEN EditorToolkitShared::GetAccidBefore(const LayerElement *element, data_PITCHNAME pname, int oct)
