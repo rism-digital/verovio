@@ -162,6 +162,127 @@ int main(int argc, char **argv)
             && (localizedStyleSvg.find("font-weight=\"bold\"") != std::string::npos),
         "MEI rend with bold weight did not render with the localized bold face");
 
+    vrv::Toolkit scoreTextStyleRendering(false);
+    ok &= Expect(scoreTextStyleRendering.SetResourcePath(argv[9])
+            && (scoreTextStyleRendering.RegisterTextFontFile(argv[11]) == "Verovio Test Ligature"),
+        "score text-style rendering setup failed");
+    const std::string scoreTextStyleMei = R"mei(<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="6.0-dev"><music><body><mdiv><score>
+<scoreDef text.fam="Verovio Test Ligature" text.style="normal"><staffGrp><staffDef n="1" lines="5" clef.shape="G"
+clef.line="2"/></staffGrp></scoreDef><section><measure n="1"><staff n="1"><layer n="1">
+<note xml:id="score-text-note" pname="c" oct="4" dur="1"/></layer></staff>
+<harm startid="#score-text-note">ffi</harm></measure></section></score></mdiv></body></music></mei>)mei";
+    ok &= Expect(scoreTextStyleRendering.LoadData(scoreTextStyleMei), "score text-style MEI could not be loaded");
+    const std::string scoreTextStyleSvg = scoreTextStyleRendering.RenderToSVG(1);
+    std::ostringstream localizedRegularPrefix;
+    if (localizedRegularRun && !localizedRegularRun->glyphs.empty()) {
+        localizedRegularPrefix << "text-" << std::uppercase << std::hex
+                               << localizedRegularRun->glyphs.front().face.value << "-";
+    }
+    ok &= Expect(!localizedRegularPrefix.str().empty()
+            && (scoreTextStyleSvg.find(localizedRegularPrefix.str()) != std::string::npos),
+        "scoreDef text.fam did not select the registered face for harmony text");
+
+    vrv::Toolkit scoreTextDirRendering(false);
+    ok &= Expect(scoreTextDirRendering.SetResourcePath(argv[9])
+            && (scoreTextDirRendering.RegisterTextFontFile(argv[11]) == "Verovio Test Ligature"),
+        "score text-style direction rendering setup failed");
+    std::string scoreTextDirMei = scoreTextStyleMei;
+    ReplaceAll(scoreTextDirMei, "<harm startid=\"#score-text-note\">ffi</harm>",
+        "<dir startid=\"#score-text-note\">ffi</dir>");
+    ok &= Expect(scoreTextDirRendering.LoadData(scoreTextDirMei), "score text-style direction MEI could not be loaded");
+    const std::string scoreTextDirSvg = scoreTextDirRendering.RenderToSVG(1);
+    ok &= Expect(!localizedRegularPrefix.str().empty()
+            && (scoreTextDirSvg.find(localizedRegularPrefix.str()) != std::string::npos),
+        "scoreDef text.fam did not select the registered face for direction text");
+
+    vrv::Toolkit scoreTextHeaderRendering(false);
+    ok &= Expect(scoreTextHeaderRendering.SetResourcePath(argv[9])
+            && (scoreTextHeaderRendering.RegisterTextFontFile(argv[11]) == "Verovio Test Ligature"),
+        "score text-style page-header rendering setup failed");
+    std::string scoreTextHeaderMei = scoreTextStyleMei;
+    ReplaceAll(scoreTextHeaderMei, "<staffGrp>", "<pgHead func=\"first\"><rend>ffi</rend></pgHead><staffGrp>");
+    ReplaceAll(scoreTextHeaderMei, "<harm startid=\"#score-text-note\">ffi</harm>", "");
+    ok &= Expect(scoreTextHeaderRendering.LoadData(scoreTextHeaderMei), "score text-style page-header MEI failed");
+    const std::string scoreTextHeaderSvg = scoreTextHeaderRendering.RenderToSVG(1);
+    ok &= Expect(!localizedRegularPrefix.str().empty()
+            && (scoreTextHeaderSvg.find(localizedRegularPrefix.str()) != std::string::npos),
+        "scoreDef text.fam did not select the registered face for page-header text");
+
+    vrv::Toolkit inheritedRendRendering(false);
+    ok &= Expect(inheritedRendRendering.SetResourcePath(argv[9])
+            && (inheritedRendRendering.RegisterTextFontFile(argv[11]) == "Verovio Test Ligature")
+            && (inheritedRendRendering.RegisterTextFontFile(argv[15]) == "Verovio Test Ligature"),
+        "inherited rend rendering setup failed");
+    std::string inheritedRendMei = scoreTextStyleMei;
+    ReplaceAll(inheritedRendMei, ">ffi</harm>", ">ffi<rend fontweight=\"bold\">ffi</rend></harm>");
+    ok &= Expect(inheritedRendRendering.LoadData(inheritedRendMei), "inherited rend MEI could not be loaded");
+    const std::string inheritedRendSvg = inheritedRendRendering.RenderToSVG(1);
+    ok &= Expect(
+        !localizedBoldPrefix.str().empty() && (inheritedRendSvg.find(localizedBoldPrefix.str()) != std::string::npos),
+        "nested rend style did not retain its inherited runtime family");
+
+    vrv::Toolkit scoreLyricStyleRendering(false);
+    ok &= Expect(scoreLyricStyleRendering.SetResourcePath(argv[9])
+            && (scoreLyricStyleRendering.RegisterTextFontFile(argv[11]) == "Verovio Test Ligature"),
+        "score lyric-style rendering setup failed");
+    const std::string scoreLyricStyleMei = R"mei(<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="6.0-dev"><music><body><mdiv><score>
+<scoreDef lyric.fam="Verovio Test Ligature"><staffGrp><staffDef n="1" lines="5" clef.shape="G"
+clef.line="2"/></staffGrp></scoreDef><section><measure n="1"><staff n="1"><layer n="1">
+<note xml:id="score-lyric-note" pname="c" oct="4" dur="1"><verse n="1"><syl>ffi</syl></verse></note>
+</layer></staff></measure></section></score></mdiv></body></music></mei>)mei";
+    ok &= Expect(scoreLyricStyleRendering.LoadData(scoreLyricStyleMei), "score lyric-style MEI could not be loaded");
+    const std::string scoreLyricStyleSvg = scoreLyricStyleRendering.RenderToSVG(1);
+    ok &= Expect(!localizedRegularPrefix.str().empty()
+            && (scoreLyricStyleSvg.find(localizedRegularPrefix.str()) != std::string::npos),
+        "scoreDef lyric.fam did not select the registered face for lyric text");
+
+    vrv::Toolkit rendFamilyRendering(false);
+    ok &= Expect(rendFamilyRendering.SetResourcePath(argv[9])
+            && (rendFamilyRendering.RegisterTextFontFile(argv[11]) == "Verovio Test Ligature"),
+        "rend font-family rendering setup failed");
+    const std::string rendFamilyMei = R"mei(<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="6.0-dev"><music><body><mdiv><score>
+<scoreDef><staffGrp><staffDef n="1" lines="5" clef.shape="G" clef.line="2"/></staffGrp></scoreDef>
+<section><measure n="1"><staff n="1"><layer n="1"><note xml:id="rend-family-note" pname="c"
+oct="4" dur="1"/></layer></staff><dir startid="#rend-family-note"><rend
+fontfam="Verovio Test Ligature">ffi</rend></dir></measure></section></score></mdiv></body></music></mei>)mei";
+    ok &= Expect(rendFamilyRendering.LoadData(rendFamilyMei), "rend font-family MEI could not be loaded");
+    const std::string rendFamilySvg = rendFamilyRendering.RenderToSVG(1);
+    ok &= Expect(!localizedRegularPrefix.str().empty()
+            && (rendFamilySvg.find(localizedRegularPrefix.str()) != std::string::npos),
+        "rend fontfam did not select the registered face");
+
+    vrv::Toolkit verseFontRendering(false);
+    ok &= Expect(verseFontRendering.SetResourcePath(argv[9])
+            && (verseFontRendering.RegisterTextFontFile(argv[11]) == "Verovio Test Ligature"),
+        "verse font rendering setup failed");
+    const std::string verseFontMei = R"mei(<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="6.0-dev"><music><body><mdiv><score>
+<scoreDef><staffGrp><staffDef n="1" lines="5" clef.shape="G" clef.line="2"/></staffGrp></scoreDef>
+<section><measure n="1"><staff n="1"><layer n="1"><note xml:id="verse-font-note" pname="c"
+oct="4" dur="1"><verse n="1" fontname="Verovio Test Ligature"><syl>ffi</syl></verse></note>
+</layer></staff></measure></section></score></mdiv></body></music></mei>)mei";
+    ok &= Expect(verseFontRendering.LoadData(verseFontMei), "verse font MEI could not be loaded");
+    const std::string verseFontSvg = verseFontRendering.RenderToSVG(1);
+    ok &= Expect(
+        !localizedRegularPrefix.str().empty() && (verseFontSvg.find(localizedRegularPrefix.str()) != std::string::npos),
+        "verse fontname was not inherited by its syllable");
+
+    vrv::Toolkit syllableFamilyRendering(false);
+    ok &= Expect(syllableFamilyRendering.SetResourcePath(argv[9])
+            && (syllableFamilyRendering.RegisterTextFontFile(argv[11]) == "Verovio Test Ligature"),
+        "syllable font-family rendering setup failed");
+    std::string syllableFamilyMei = verseFontMei;
+    ReplaceAll(syllableFamilyMei, " fontname=\"Verovio Test Ligature\"", "");
+    ReplaceAll(syllableFamilyMei, "<syl>", "<syl fontfam=\"Verovio Test Ligature\">");
+    ok &= Expect(syllableFamilyRendering.LoadData(syllableFamilyMei), "syllable font-family MEI could not be loaded");
+    const std::string syllableFamilySvg = syllableFamilyRendering.RenderToSVG(1);
+    ok &= Expect(!localizedRegularPrefix.str().empty()
+            && (syllableFamilySvg.find(localizedRegularPrefix.str()) != std::string::npos),
+        "syl fontfam did not select the registered face");
+
     const std::vector<unsigned char> woff = ReadFile(argv[4]);
     const std::vector<unsigned char> ttf = ReadFile(argv[1]);
     const std::vector<unsigned char> bravura = ReadFile(argv[2]);
@@ -414,6 +535,21 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
             && (lyricHyphenSvg.find("class=\"syl id-fallback-start spanning\"") != std::string::npos)
             && (lyricHyphenSvg.find("<rect") == std::string::npos),
         "system-spanning lyric hyphens used rectangle geometry");
+
+    vrv::Toolkit scoreLyricConnectorRendering(false);
+    ok &= Expect(scoreLyricConnectorRendering.SetOptions("{\"breaks\":\"encoded\",\"lyricSize\":8.0}")
+            && scoreLyricConnectorRendering.SetResourcePath(argv[9])
+            && (scoreLyricConnectorRendering.RegisterTextFontFile(argv[16]) == "Verovio Test Hyphen"),
+        "score lyric connector rendering setup failed");
+    std::string scoreLyricConnectorMei = lyricHyphenMei;
+    ReplaceAll(scoreLyricConnectorMei, "<scoreDef>", "<scoreDef lyric.fam=\"Verovio Test Hyphen\">");
+    ReplaceAll(scoreLyricConnectorMei, " fontname=\"VH\"", "");
+    ReplaceAll(scoreLyricConnectorMei, " fontname=\"NoHyphen\"", "");
+    ok &= Expect(
+        scoreLyricConnectorRendering.LoadData(scoreLyricConnectorMei), "score lyric connector MEI could not be loaded");
+    const std::string scoreLyricConnectorSvg = scoreLyricConnectorRendering.RenderToSVG(1);
+    ok &= Expect(!customHyphenPrefix.empty() && (CountOccurrences(scoreLyricConnectorSvg, customHyphenPrefix) >= 6),
+        "scoreDef lyric.fam did not select the registered face for syllables and their connectors");
     const auto lyricCountersBeforeRepeat = lyricHyphenRendering.GetFontStoreCountersForTesting();
     ok &= Expect(lyricHyphenRendering.RenderToSVG(1) == lyricHyphenSvg, "repeated lyric hyphen render changed SVG");
     const auto lyricCountersAfterRepeat = lyricHyphenRendering.GetFontStoreCountersForTesting();

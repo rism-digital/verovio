@@ -468,6 +468,20 @@ const Glyph *Resources::GetTextGlyph(char32_t code) const
     return &currentTable.at(code);
 }
 
+const Glyph *Resources::GetTextGlyph(char32_t code, const FontInfo &font) const
+{
+    const std::string family = font.GetFaceName().empty() ? m_textFontName : font.GetFaceName();
+    const FontStore::Weight weight = ToRuntimeWeight(font.GetWeight());
+    const FontStore::Style style = ToRuntimeStyle(font.GetStyle());
+    std::optional<FontStore::GlyphMetrics> metrics
+        = m_fontStore.GetGlyphMetrics(FontStore::Kind::Text, family, code, weight, style);
+    if (!metrics && (family != TINOS)) {
+        metrics = m_fontStore.GetGlyphMetrics(FontStore::Kind::Text, TINOS, code, weight, style);
+    }
+    if (!metrics) return nullptr;
+    return this->GetRuntimeGlyph(metrics->face, metrics->glyphId, StringFormat("%04X", code));
+}
+
 const Glyph *Resources::GetRuntimeGlyph(FontStore::FaceIdentity face, uint32_t glyphId, const std::string &code) const
 {
     auto &glyphs = m_runtimeGlyphs[face.value];

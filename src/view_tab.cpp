@@ -116,10 +116,7 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
         std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType, overline, strike, underline);
 
-        FontInfo fretTxt;
-        if (!dc->UseGlobalStyling()) {
-            fretTxt.SetFaceName(m_doc->GetResources().GetTextFont());
-        }
+        FontInfo fretTxt = m_doc->GetDrawingTextFont(glyphSize, staff->m_drawingStaffDef);
 
         TextDrawingParams params;
         params.m_x = x;

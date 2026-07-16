@@ -632,3 +632,39 @@ installed bundle from the exact checkpoint, as recorded in
 font glyph implementation. It passes the prescribed standard timing and size
 gates, and the isolated lyric microfixture documents the bounded output-copy
 cost instead of treating it as a general render regression.
+
+### E43 — MEI text-style inheritance checkpoint
+
+Checkpoint commit: `f5fcc6c63` (`feat/custom-fonts` before this experiment).
+The unmodified `Gott gab uns Atem_Prototyp01_Gitarrenbuch.mei` is XML-well-formed
+and validates against the CMN RELAX NG schema generated from the official
+`music-encoding/music-encoding` `develop` source at
+`29bea8f978bf1304eea693d7eb2d14253c6c147e` for MEI `6.0-dev` on 2026-07-16.
+The validation command was
+`xmllint --noout --relaxng /tmp/music-encoding/dist/schemata/mei-cmn.rng FILE`.
+Its relevant declarations are score-level
+`text.fam="Quicksand"` and `lyric.fam="Quicksand"`, plus six `rend` overrides:
+five Quicksand faces and one Arial Narrow Bold face.
+
+At this checkpoint Verovio reads `lyric.fam` into `ScoreDefInterface` but does
+not use it for lyric shaping or metrics. The valid `text.fam` is retained only
+as an unsupported attribute because `ScoreDefInterface` does not implement
+`AttTextStyle`. Runtime `rend` selection reads `fontname` but ignores
+`fontfam`, and `Syl::GetDrawingFont` does not inherit typography from its
+`verse` parent. Consequently explicit `rend@fontname` works, while harmonies,
+lyrics, lyric connectors, and other score-default text continue to use the
+Toolkit default face. The public rendering seam (registered fonts + MEI input
+to SVG path/use output) is the regression-test boundary for this experiment.
+
+Result: `ScoreDefInterface` now retains `AttTextStyle`, score and staff drawing
+definitions propagate text and lyric family/style/weight, and text renderers
+resolve an explicit runtime face for matching metrics, shaping, and outlines.
+`rend@fontfam`, nested `rend` inheritance, `verse`/`syl` typography, lyric
+connectors, harmonies, directions, labels, running text, and other staff text
+are covered by the registration regression test. Headers and footers use the
+page-boundary drawing score definition rather than whichever system happens to
+be found first. The original decimal point-size issue remains deliberately
+outside this experiment; the corrected copy was rendered with registered
+Quicksand and Arial Narrow faces for visual verification. Both configured CTest
+tests pass, and the current native CLI is 7,258,328 bytes versus 7,393,896 bytes
+for the checkpoint build with the same local toolchain (no size regression).

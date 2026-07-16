@@ -39,6 +39,7 @@ class ScoreDefInterface : public Interface,
                           public AttOctaveDefault,
                           public AttPianoPedals,
                           public AttSpacing,
+                          public AttTextStyle,
                           public AttSystems {
 public:
     /**

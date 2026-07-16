@@ -241,6 +241,7 @@ public:
     ///@{
     FontInfo *GetDrawingSmuflFont(int staffSize, bool graceSize, const std::string &fontName = "");
     FontInfo *GetDrawingLyricFont(int staffSize);
+    FontInfo GetDrawingTextFont(int staffSize, const ScoreDefInterface *style, bool lyric = false);
     FontInfo *GetFingeringFont(int staffSize);
     ///@}
 

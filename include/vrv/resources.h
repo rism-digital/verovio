@@ -126,6 +126,8 @@ public:
     int GetTextAdvance(const FontInfo &font, const FontStore::ShapedRun &run) const;
     /** Returns a glyph from the selected runtime text face. */
     const Glyph *GetTextGlyph(char32_t code) const;
+    /** Returns a glyph from the runtime face selected by a drawing font. */
+    const Glyph *GetTextGlyph(char32_t code, const FontInfo &font) const;
     /** Returns a cached runtime glyph by immutable face identity and glyph ID. */
     const Glyph *GetRuntimeGlyph(
         FontStore::FaceIdentity face, uint32_t glyphId, const std::string &code = std::string()) const;

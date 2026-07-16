@@ -1761,12 +1761,6 @@ void View::DrawControlElementText(DeviceContext *dc, ControlElement *element, Me
 
     const data_STAFFREL place = interfaceTextDir->GetPlace();
 
-    FontInfo dirTxt;
-    if (!dc->UseGlobalStyling()) {
-        dirTxt.SetFaceName(m_doc->GetResources().GetTextFont());
-        dirTxt.SetStyle(FONTSTYLE_italic);
-    }
-
     const int lineCount = interfaceTextDir->GetNumberOfLines(element);
 
     data_HORIZONTALALIGNMENT alignment = element->GetChildRendAlignment();
@@ -1790,6 +1784,12 @@ void View::DrawControlElementText(DeviceContext *dc, ControlElement *element, Me
         params.m_x = x;
         params.m_y = y;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
+
+        const ScoreDefInterface *textStyle = staff->m_drawingStaffDef;
+        FontInfo dirTxt = m_doc->GetDrawingTextFont(staffSize, textStyle);
+        if (!dc->UseGlobalStyling() && (!textStyle || !textStyle->HasTextStyle())) {
+            dirTxt.SetStyle(FONTSTYLE_italic);
+        }
 
         int xAdjust = 0;
         const bool isBetweenStaves = (place == STAFFREL_between)
@@ -1839,12 +1839,6 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
 
     bool isSymbolOnly = dynam->IsSymbolOnly();
 
-    FontInfo dynamTxt;
-    if (!dc->UseGlobalStyling()) {
-        dynamTxt.SetFaceName(m_doc->GetResources().GetTextFont());
-        dynamTxt.SetStyle(FONTSTYLE_italic);
-    }
-
     const int lineCount = dynam->GetNumberOfLines(dynam);
 
     data_HORIZONTALALIGNMENT alignment = dynam->GetChildRendAlignment();
@@ -1870,6 +1864,12 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         params.m_x = x;
         params.m_y = y;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
+
+        const ScoreDefInterface *textStyle = staff->m_drawingStaffDef;
+        FontInfo dynamTxt = m_doc->GetDrawingTextFont(staffSize, textStyle);
+        if (!dc->UseGlobalStyling() && (!textStyle || !textStyle->HasTextStyle())) {
+            dynamTxt.SetStyle(FONTSTYLE_italic);
+        }
 
         if (dynam->HasEnclose()) {
             params.m_textEnclose = dynam->GetEnclose();
@@ -1963,13 +1963,13 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, TextDrawingParams &pa
 
     dc->StartGraphic(fb, "", fb->GetID());
 
-    FontInfo *fontDim = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-    const int lineHeight = m_doc->GetTextLineHeight(fontDim, false);
+    FontInfo fontDim = m_doc->GetDrawingTextFont(staff->m_drawingStaffSize, staff->m_drawingStaffDef);
+    const int lineHeight = m_doc->GetTextLineHeight(&fontDim, false);
     const int startX = params.m_x;
 
-    fontDim->SetPointSize(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize());
+    fontDim.SetPointSize(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize());
 
-    dc->SetFont(fontDim);
+    dc->SetFont(&fontDim);
 
     for (Object *current : fb->GetChildren()) {
         dc->StartText(this->ToDeviceContextX(params.m_x), this->ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_left);
@@ -2100,11 +2100,6 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
 
     dc->StartGraphic(fing, "", fing->GetID());
 
-    FontInfo fingTxt;
-    if (!dc->UseGlobalStyling()) {
-        fingTxt.SetFaceName(m_doc->GetResources().GetTextFont());
-    }
-
     // center fingering
     data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
 
@@ -2125,6 +2120,7 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
         params.m_y = y;
         params.m_pointSize = m_doc->GetFingeringFont(staffSize)->GetPointSize();
 
+        FontInfo fingTxt = m_doc->GetDrawingTextFont(staffSize, staff->m_drawingStaffDef);
         fingTxt.SetPointSize(params.m_pointSize);
 
         dc->SetFont(&fingTxt);
@@ -2296,11 +2292,6 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
 
     dc->StartGraphic(harm, "", harm->GetID());
 
-    FontInfo harmTxt;
-    if (!dc->UseGlobalStyling()) {
-        harmTxt.SetFaceName(m_doc->GetResources().GetTextFont());
-    }
-
     data_HORIZONTALALIGNMENT alignment = harm->GetChildRendAlignment();
     // harm are centered aligned by default;
     if (alignment == 0) {
@@ -2330,6 +2321,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
         else {
             params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
+            FontInfo harmTxt = m_doc->GetDrawingTextFont(staffSize, staff->m_drawingStaffDef);
             harmTxt.SetPointSize(params.m_pointSize);
 
             dc->SetFont(&harmTxt);
@@ -2591,12 +2583,6 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
 
     dc->StartGraphic(reh, "", reh->GetID());
 
-    FontInfo rehTxt;
-    if (!dc->UseGlobalStyling()) {
-        rehTxt.SetFaceName(m_doc->GetResources().GetTextFont());
-        rehTxt.SetWeight(FONTWEIGHT_bold);
-    }
-
     // Number of units above the staff - 3 by default, 5 when above a clef
     int yMargin = 3;
 
@@ -2651,6 +2637,11 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
         params.m_y = y;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
+        const ScoreDefInterface *textStyle = staff->m_drawingStaffDef;
+        FontInfo rehTxt = m_doc->GetDrawingTextFont(staffSize, textStyle);
+        if (!dc->UseGlobalStyling() && (!textStyle || !textStyle->HasTextWeight())) {
+            rehTxt.SetWeight(FONTWEIGHT_bold);
+        }
         rehTxt.SetPointSize(params.m_pointSize);
 
         dc->SetFont(&rehTxt);
@@ -2742,12 +2733,6 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
 
     dc->StartGraphic(tempo, "", tempo->GetID());
 
-    FontInfo tempoTxt;
-    if (!dc->UseGlobalStyling()) {
-        tempoTxt.SetFaceName(m_doc->GetResources().GetTextFont());
-        tempoTxt.SetWeight(FONTWEIGHT_bold);
-    }
-
     int lineCount = tempo->GetNumberOfLines(tempo);
 
     data_HORIZONTALALIGNMENT alignment = tempo->GetChildRendAlignment();
@@ -2771,6 +2756,11 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         params.m_y = y;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
+        const ScoreDefInterface *textStyle = staff->m_drawingStaffDef;
+        FontInfo tempoTxt = m_doc->GetDrawingTextFont(staffSize, textStyle);
+        if (!dc->UseGlobalStyling() && (!textStyle || !textStyle->HasTextWeight())) {
+            tempoTxt.SetWeight(FONTWEIGHT_bold);
+        }
         tempoTxt.SetPointSize(params.m_pointSize);
 
         if (tempo->GetPlace() == STAFFREL_between) {
@@ -3166,7 +3156,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
         dc->StartCustomGraphic("voltaBracket");
 
-        FontInfo currentFont = *m_doc->GetDrawingLyricFont(staffSize);
+        FontInfo currentFont = m_doc->GetDrawingTextFont(staffSize, staff->m_drawingStaffDef);
         // currentFont.SetWeight(FONTWEIGHT_bold);
         // currentFont.SetPointSize(currentFont.GetPointSize() * 2 / 3);
         dc->SetFont(&currentFont);

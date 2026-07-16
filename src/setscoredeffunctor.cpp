@@ -75,6 +75,42 @@ FunctorCode ReplaceDrawingValuesInStaffDefFunctor::VisitStaffDef(StaffDef *staff
         staffDef->SetCurrentMeterSigGrp(m_meterSigGrp);
     }
 
+    const ScoreDefInterface *textStyle = newStaffDef ? static_cast<const ScoreDefInterface *>(newStaffDef)
+                                                     : static_cast<const ScoreDefInterface *>(m_newScoreDef);
+    const ScoreDefInterface *fallbackStyle = m_newScoreDef;
+    if (textStyle->HasLyricFam())
+        staffDef->SetLyricFam(textStyle->GetLyricFam());
+    else if (fallbackStyle->HasLyricFam())
+        staffDef->SetLyricFam(fallbackStyle->GetLyricFam());
+    if (textStyle->HasLyricName())
+        staffDef->SetLyricName(textStyle->GetLyricName());
+    else if (fallbackStyle->HasLyricName())
+        staffDef->SetLyricName(fallbackStyle->GetLyricName());
+    if (textStyle->HasLyricStyle())
+        staffDef->SetLyricStyle(textStyle->GetLyricStyle());
+    else if (fallbackStyle->HasLyricStyle())
+        staffDef->SetLyricStyle(fallbackStyle->GetLyricStyle());
+    if (textStyle->HasLyricWeight())
+        staffDef->SetLyricWeight(textStyle->GetLyricWeight());
+    else if (fallbackStyle->HasLyricWeight())
+        staffDef->SetLyricWeight(fallbackStyle->GetLyricWeight());
+    if (textStyle->HasTextFam())
+        staffDef->SetTextFam(textStyle->GetTextFam());
+    else if (fallbackStyle->HasTextFam())
+        staffDef->SetTextFam(fallbackStyle->GetTextFam());
+    if (textStyle->HasTextName())
+        staffDef->SetTextName(textStyle->GetTextName());
+    else if (fallbackStyle->HasTextName())
+        staffDef->SetTextName(fallbackStyle->GetTextName());
+    if (textStyle->HasTextStyle())
+        staffDef->SetTextStyle(textStyle->GetTextStyle());
+    else if (fallbackStyle->HasTextStyle())
+        staffDef->SetTextStyle(fallbackStyle->GetTextStyle());
+    if (textStyle->HasTextWeight())
+        staffDef->SetTextWeight(textStyle->GetTextWeight());
+    else if (fallbackStyle->HasTextWeight())
+        staffDef->SetTextWeight(fallbackStyle->GetTextWeight());
+
     return FUNCTOR_CONTINUE;
 }
 

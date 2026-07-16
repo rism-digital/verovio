@@ -50,6 +50,7 @@
 #include "rest.h"
 #include "smufl.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "stem.h"
 #include "syl.h"
 #include "system.h"
@@ -1907,9 +1908,15 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         LayerElement *layerElement
             = vrv_cast<LayerElement *>(element->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
 
-        FontInfo labelTxt;
-        if (!dc->UseGlobalStyling()) {
-            labelTxt.SetFaceName(m_doc->GetResources().GetTextFont());
+        FontInfo labelTxt = m_doc->GetDrawingTextFont(staff->m_drawingStaffSize, staff->m_drawingStaffDef, true);
+        if (verse->HasFontname())
+            labelTxt.SetFaceName(verse->GetFontname());
+        else if (verse->HasFontfam())
+            labelTxt.SetFaceName(verse->GetFontfam());
+        if (verse->HasFontstyle()) labelTxt.SetStyle(verse->GetFontstyle());
+        if (verse->HasFontweight()) labelTxt.SetWeight(verse->GetFontweight());
+        if (verse->HasLetterspacing()) {
+            labelTxt.SetLetterSpacing(verse->GetLetterspacing() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
         }
         int pointSize = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize();
         if (layerElement && layerElement->GetDrawingCueSize()) {
@@ -2143,8 +2150,8 @@ int View::GetFYRel(F *f, Staff *staff)
     int line = fb->GetDescendantIndex(f, FIGURE, UNLIMITED_DEPTH);
 
     if (line > 0) {
-        FontInfo *fFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-        int lineHeight = m_doc->GetTextLineHeight(fFont, false);
+        FontInfo fFont = m_doc->GetDrawingTextFont(staff->m_drawingStaffSize, staff->m_drawingStaffDef);
+        int lineHeight = m_doc->GetTextLineHeight(&fFont, false);
         y -= (line * lineHeight);
     }
 
@@ -2161,9 +2168,9 @@ int View::GetSylYRel(int verseN, Staff *staff, data_STAFFREL place)
     const bool verseCollapse = m_options->m_lyricVerseCollapse.GetValue();
     int y = 0;
 
-    FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-    const int descender = m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
-    const int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
+    FontInfo lyricFont = m_doc->GetDrawingTextFont(staff->m_drawingStaffSize, staff->m_drawingStaffDef, true);
+    const int descender = m_doc->GetTextGlyphDescender(L'q', &lyricFont, false);
+    const int height = m_doc->GetTextGlyphHeight(L'I', &lyricFont, false);
 
     int verseHeight = height - descender;
     verseHeight *= m_doc->GetOptions()->m_lyricHeightFactor.GetValue();

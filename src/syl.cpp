@@ -18,8 +18,10 @@
 #include "functor.h"
 #include "measure.h"
 #include "note.h"
+#include "scoredef.h"
 #include "smufl.h"
 #include "staff.h"
+#include "system.h"
 #include "text.h"
 #include "textelement.h"
 #include "verse.h"
@@ -100,8 +102,36 @@ int Syl::CalcHyphenLength(Doc *doc, int staffSize)
 
 FontInfo Syl::GetDrawingFont(Doc *doc, int staffSize) const
 {
-    FontInfo font = *doc->GetDrawingLyricFont(staffSize);
-    if (this->HasFontname()) font.SetFaceName(this->GetFontname());
+    const ScoreDefInterface *scoreDef = nullptr;
+    if (this->GetStart()) {
+        const Staff *staff = vrv_cast<const Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
+        if (staff) scoreDef = staff->m_drawingStaffDef;
+        if (!scoreDef) {
+            const System *system = vrv_cast<const System *>(this->GetStart()->GetFirstAncestor(SYSTEM));
+            scoreDef = system ? system->GetDrawingScoreDef() : nullptr;
+        }
+    }
+    FontInfo font = doc->GetDrawingTextFont(staffSize, scoreDef, true);
+    const Verse *verse = vrv_cast<const Verse *>(this->GetFirstAncestor(VERSE));
+    if (verse) {
+        if (verse->HasFontname()) {
+            font.SetFaceName(verse->GetFontname());
+        }
+        else if (verse->HasFontfam()) {
+            font.SetFaceName(verse->GetFontfam());
+        }
+        if (verse->HasFontweight()) font.SetWeight(verse->GetFontweight());
+        if (verse->HasFontstyle()) font.SetStyle(verse->GetFontstyle());
+        if (verse->HasLetterspacing()) {
+            font.SetLetterSpacing(verse->GetLetterspacing() * doc->GetDrawingUnit(staffSize));
+        }
+    }
+    if (this->HasFontname()) {
+        font.SetFaceName(this->GetFontname());
+    }
+    else if (this->HasFontfam()) {
+        font.SetFaceName(this->GetFontfam());
+    }
     if (this->HasFontweight()) font.SetWeight(this->GetFontweight());
     if (this->HasFontstyle()) font.SetStyle(this->GetFontstyle());
     if (this->HasLetterspacing()) {

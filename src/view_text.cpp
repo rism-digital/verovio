@@ -382,10 +382,14 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         }
     }
 
-    FontInfo rendFont;
+    FontInfo rendFont = dc->HasFont() ? *dc->GetFont() : FontInfo();
     bool customFont = false;
     if (rend->HasFontname()) {
         rendFont.SetFaceName(rend->GetFontname().c_str());
+        customFont = true;
+    }
+    else if (rend->HasFontfam()) {
+        rendFont.SetFaceName(rend->GetFontfam().c_str());
         customFont = true;
     }
     if (rend->HasFontsize()) {
@@ -651,26 +655,25 @@ void View::DrawRunningElements(DeviceContext *dc, Page *page)
     }
 
     RunningElement *header = page->GetHeader();
+    const ScoreDefInterface *textStyle = &page->m_drawingScoreDef;
     if (header) {
-        this->DrawTextLayoutElement(dc, header);
+        this->DrawTextLayoutElement(dc, header, textStyle);
     }
     RunningElement *footer = page->GetFooter();
     if (footer) {
-        this->DrawTextLayoutElement(dc, footer);
+        this->DrawTextLayoutElement(dc, footer, textStyle);
     }
 }
 
-void View::DrawTextLayoutElement(DeviceContext *dc, TextLayoutElement *textLayoutElement)
+void View::DrawTextLayoutElement(
+    DeviceContext *dc, TextLayoutElement *textLayoutElement, const ScoreDefInterface *textStyle)
 {
     assert(dc);
     assert(textLayoutElement);
 
     dc->StartGraphic(textLayoutElement, "", textLayoutElement->GetID());
 
-    FontInfo textElementFont;
-    if (!dc->UseGlobalStyling()) {
-        textElementFont.SetFaceName(m_doc->GetResources().GetTextFont());
-    }
+    FontInfo textElementFont = m_doc->GetDrawingTextFont(100, textStyle);
 
     TextDrawingParams params;
 
@@ -695,7 +698,7 @@ void View::DrawTextLayoutElement(DeviceContext *dc, TextLayoutElement *textLayou
 
 void View::DrawDiv(DeviceContext *dc, Div *div, System *system)
 {
-    this->DrawTextLayoutElement(dc, div);
+    this->DrawTextLayoutElement(dc, div, system ? system->GetDrawingScoreDef() : nullptr);
 }
 
 } // namespace vrv
