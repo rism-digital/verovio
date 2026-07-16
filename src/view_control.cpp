@@ -1783,6 +1783,7 @@ void View::DrawControlElementText(DeviceContext *dc, ControlElement *element, Me
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         const ScoreDefInterface *textStyle = staff->m_drawingStaffDef;
@@ -1863,6 +1864,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         const ScoreDefInterface *textStyle = staff->m_drawingStaffDef;
@@ -2118,6 +2120,7 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetFingeringFont(staffSize)->GetPointSize();
 
         FontInfo fingTxt = m_doc->GetDrawingTextFont(staffSize, staff->m_drawingStaffDef);
@@ -2314,6 +2317,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
 
         if (harm->GetFirst() && harm->GetFirst()->Is(FB)) {
             this->DrawFb(dc, staff, dynamic_cast<Fb *>(harm->GetFirst()), params);
@@ -2635,6 +2639,7 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         const ScoreDefInterface *textStyle = staff->m_drawingStaffDef;
@@ -2754,6 +2759,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         const ScoreDefInterface *textStyle = staff->m_drawingStaffDef;
