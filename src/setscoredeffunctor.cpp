@@ -308,7 +308,9 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitScoreDef(ScoreDef *scoreDef)
         // presence of a system break
         if (m_previousMeasure) {
             ScoreDef cautionaryScoreDef = m_upcomingScoreDef;
-            SetCautionaryScoreDefFunctor setCautionaryScoreDef(&cautionaryScoreDef);
+            std::vector<int> restartStaffNs = scoreDef->GetStaffNs();
+            SetCautionaryScoreDefFunctor setCautionaryScoreDef(&cautionaryScoreDef, true);
+            setCautionaryScoreDef.SetRestartStaffNs(restartStaffNs);
             m_previousMeasure->Process(setCautionaryScoreDef);
         }
     }
@@ -539,10 +541,11 @@ FunctorCode ScoreDefOptimizeFunctor::VisitSystemEnd(System *system)
 // SetCautionaryScoreDefFunctor
 //----------------------------------------------------------------------------
 
-SetCautionaryScoreDefFunctor::SetCautionaryScoreDefFunctor(ScoreDef *currentScoreDef) : Functor()
+SetCautionaryScoreDefFunctor::SetCautionaryScoreDefFunctor(ScoreDef *currentScoreDef, bool restart) : Functor()
 {
     m_currentScoreDef = currentScoreDef;
     m_currentStaffDef = NULL;
+    m_restart = restart;
 }
 
 FunctorCode SetCautionaryScoreDefFunctor::VisitLayer(Layer *layer)
@@ -557,6 +560,13 @@ FunctorCode SetCautionaryScoreDefFunctor::VisitStaff(Staff *staff)
 
     assert(m_currentScoreDef);
     m_currentStaffDef = m_currentScoreDef->GetStaffDef(staff->GetN());
+
+    if (m_restart) {
+        if (std::find(m_staffNs.begin(), m_staffNs.end(), staff->GetN()) == m_staffNs.end()) {
+            m_currentStaffDef->SetDrawKeySig(false);
+        }
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
