@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <iostream>
 #include <iterator>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -18,6 +19,22 @@ bool Expect(bool condition, const std::string &message)
     if (condition) return true;
     std::cerr << message << '\n';
     return false;
+}
+
+std::optional<int> FindRectAttribute(const std::string &svg, const std::string &id, const std::string &attribute)
+{
+    const size_t group = svg.find("id=\"" + id + "\"");
+    if (group == std::string::npos) return std::nullopt;
+    const size_t rect = svg.find("<rect", group);
+    if (rect == std::string::npos) return std::nullopt;
+    const size_t rectEnd = svg.find('>', rect);
+    const std::string needle = attribute + "=\"";
+    const size_t value = svg.find(needle, rect);
+    if ((value == std::string::npos) || (value > rectEnd)) return std::nullopt;
+    const size_t begin = value + needle.size();
+    const size_t end = svg.find('"', begin);
+    if ((end == std::string::npos) || (end > rectEnd)) return std::nullopt;
+    return std::stoi(svg.substr(begin, end - begin));
 }
 
 void WriteU16(std::vector<unsigned char> &bytes, size_t offset, uint16_t value)
@@ -208,6 +225,27 @@ clef.line="2"/></staffGrp></scoreDef><section><measure n="1"><staff n="1"><layer
     ok &= Expect(!localizedRegularPrefix.str().empty()
             && (scoreTextHeaderSvg.find(localizedRegularPrefix.str()) != std::string::npos),
         "scoreDef text.fam did not select the registered face for page-header text");
+
+    vrv::Toolkit textEnclosureRendering(false);
+    ok &= Expect(textEnclosureRendering.SetResourcePath(argv[9]), "text-enclosure rendering setup failed");
+    const std::string textEnclosureMei = R"mei(<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.0"><music><body><mdiv><score>
+<scoreDef text.style="normal"><staffGrp><staffDef n="1" lines="5"/></staffGrp></scoreDef>
+<section><measure><staff n="1"><layer n="1">
+<note xml:id="box-note-1" pname="c" oct="4" dur="4"/>
+<note xml:id="box-note-2" pname="d" oct="4" dur="4"/>
+</layer></staff>
+<dir xml:id="box-intro" startid="#box-note-1"><rend rend="box">Intro</rend></dir>
+<dir xml:id="box-strophen" startid="#box-note-2"><rend rend="box">Strophen</rend></dir>
+</measure></section></score></mdiv></body></music></mei>)mei";
+    ok &= Expect(textEnclosureRendering.LoadData(textEnclosureMei), "text-enclosure MEI could not be loaded");
+    const std::string textEnclosureSvg = textEnclosureRendering.RenderToSVG(1);
+    const std::optional<int> introBoxHeight = FindRectAttribute(textEnclosureSvg, "box-intro", "height");
+    const std::optional<int> strophenBoxHeight = FindRectAttribute(textEnclosureSvg, "box-strophen", "height");
+    ok &= Expect(introBoxHeight && strophenBoxHeight && (std::abs(*introBoxHeight - *strophenBoxHeight) <= 4),
+        "boxed text without a descender did not reserve the font descender height (Intro "
+            + std::to_string(introBoxHeight.value_or(-1)) + ", Strophen "
+            + std::to_string(strophenBoxHeight.value_or(-1)) + ")");
 
     vrv::Toolkit inheritedRendRendering(false);
     ok &= Expect(inheritedRendRendering.SetResourcePath(argv[9])

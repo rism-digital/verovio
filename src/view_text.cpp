@@ -464,7 +464,12 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
 
     // Do not render enclosings if the content is empty
     if (rend->HasEnclosure()) {
-        params.m_enclosedRend.push_back(rend);
+        const FontInfo *font = dc->GetFont();
+        const int fontBottom = params.m_y + m_doc->GetTextGlyphDescender(U'p', font, false);
+        const int hTop = m_doc->GetTextGlyphDescender(U'h', font, false) + m_doc->GetTextGlyphHeight(U'h', font, false);
+        const int tTop = m_doc->GetTextGlyphDescender(U't', font, false) + m_doc->GetTextGlyphHeight(U't', font, false);
+        const int fontTop = params.m_y + std::max(hTop, tTop);
+        params.m_enclosedRend.push_back({ rend, fontBottom, fontTop });
         params.m_x = rend->GetContentRight() + m_doc->GetDrawingUnit(100);
         params.m_explicitPosition = true;
         params.m_enclose = rend->GetRend();

@@ -685,3 +685,20 @@ active custom SMuFL fallback and the final Bravura fallback, using their actual
 face identities and glyph IDs. Both configured CTest tests pass. No outlines
 are extracted until the resolved music glyph is drawn, and repeated rendering
 continues to reuse the shaped run.
+
+### E45 — Stable boxed-text vertical metrics
+
+Checkpoint commit: `1ffcba223`. In the `In dir ist Freude` render, the boxed
+Quicksand word `Intro` produced a 367-unit rectangle while `Strophen` produced
+441 units. The enclosure used only each `rend` element's content bounds, so the
+`p` descender enlarged one box while a word without descenders looked crushed
+against its baseline.
+
+Each enclosed `rend` now records a font-specific minimum vertical span while
+its resolved runtime font and baseline are active. The lower bound uses the
+`p` descender and the upper bound uses the larger of the `h` and `t` ascender
+profiles; actual content still expands the enclosure for accents or unusual
+glyphs. The MEI-to-SVG regression compares `Intro` and `Strophen` and reduces
+their Tinos box-height difference from the content-dependent failure to two
+device units (rounding tolerance: four). These lookups populate only the lazy
+metrics cache and do not extract outlines.
