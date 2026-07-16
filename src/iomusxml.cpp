@@ -889,9 +889,6 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 {
     assert(root);
 
-    // initialize accidentals map
-    this->ResetAccidentals();
-
     // check for multimetric music
     bool multiMetric = root.select_node("/score-partwise/part/measure[@non-controlling='yes']");
     if (multiMetric) {
@@ -1872,9 +1869,6 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
 {
     assert(node);
     assert(measure);
-
-    // re-initialize the accidentals to the current key signature.
-    this->ResetAccidentals(m_currentKeySig);
 
     const std::string measureNum = node.attribute("number").as_string();
     if (node.attribute("id")) measure->SetID(node.attribute("id").as_string());
@@ -3157,23 +3151,21 @@ void MusicXmlInput::ReadMusicXmlNote(
                 std::string pitchAlter = PitchAlterToString(note->GetPname(), alterVal);
                 ListOfObjects accids = note->FindAllDescendantsByType(ACCID);
                 if (accids.empty()) {
-                    // It can happen that the doc encodes the accidentals in the pitch/alter element only,
-                    // regardless of key signature or bar lines. Handle this case here.
-                    if (alterVal != 0.0) {
-                        // In case this alter value is already associated with an accidental, use it here.
-                        if (m_alterAccids.contains(pitchAlter)) {
-                            m_currentAccids[note->GetPname()] = m_alterAccids.at(pitchAlter);
-                        }
-                        // Otherwise, deduce the generic accidental from this alter value.
-                        else {
-                            m_currentAccids[note->GetPname()].clear();
-                            m_currentAccids[note->GetPname()].push_back(musicxml::Accidental(
-                                Att::AccidentalGesturalToWritten(ConvertAlterToAccid(alterVal)), "", ""));
-                        }
+                    std::vector<musicxml::Accidental> currentAccids;
+
+                    // Use the alter value as key to the accidentals.
+                    // In case this alter value is already associated with an accidental, use it here.
+                    if (m_alterAccids.contains(pitchAlter)) {
+                        currentAccids = m_alterAccids.at(pitchAlter);
+                    }
+                    // Otherwise, deduce the generic accidental from this alter value.
+                    else {
+                        currentAccids.push_back(musicxml::Accidental(
+                            Att::AccidentalGesturalToWritten(ConvertAlterToAccid(alterVal)), "", ""));
                     }
 
                     try {
-                        for (const auto &current : m_currentAccids.at(note->GetPname())) {
+                        for (const auto &current : currentAccids) {
                             // Avoid adding empty accidentals
                             if (current.m_accid == ACCIDENTAL_WRITTEN_NONE && current.m_glyphName.empty()) continue;
 
@@ -3210,7 +3202,6 @@ void MusicXmlInput::ReadMusicXmlNote(
                     }
                 }
                 else {
-                    m_currentAccids[note->GetPname()].clear();
                     m_alterAccids[pitchAlter].clear();
                     for (Object *object : accids) {
                         Accid *accid = vrv_cast<Accid *>(object);
@@ -3218,8 +3209,6 @@ void MusicXmlInput::ReadMusicXmlNote(
                         if (Att::AccidentalGesturalToWritten(ges) != accid->GetAccid()) {
                             accid->SetAccidGes(ges);
                         }
-                        m_currentAccids[note->GetPname()].push_back(
-                            musicxml::Accidental(accid->GetAccid(), accid->GetGlyphName(), accid->GetGlyphAuth()));
                         m_alterAccids[pitchAlter].push_back(
                             musicxml::Accidental(accid->GetAccid(), accid->GetGlyphName(), accid->GetGlyphAuth()));
                     }
@@ -4478,10 +4467,6 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
         }
     }
 
-    // adjust the accidentals map to this key signature
-    this->ResetAccidentals(keySig);
-    m_currentKeySig = keySig;
-
     return keySig;
 }
 
@@ -4498,33 +4483,6 @@ ScoreDef *MusicXmlInput::GetOrCreateLastScoreDef(Section *section)
         section->AddChild(scoreDef);
     }
     return scoreDef;
-}
-
-void MusicXmlInput::ResetAccidentals(const KeySig *keySig)
-{
-    // inspired by KeySig::FillMap() but without the octave repetitions
-    m_currentAccids.clear();
-    for (int i = PITCHNAME_c; i <= PITCHNAME_b; i++) {
-        m_currentAccids[static_cast<data_PITCHNAME>(i)] = { musicxml::Accidental() };
-    }
-
-    if (!keySig) return;
-
-    const ListOfConstObjects &childList = keySig->GetList(); // make sure it's initialized
-    if (!childList.empty()) {
-        for (const Object *child : childList) {
-            const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(child);
-            assert(keyAccid);
-            m_currentAccids[keyAccid->GetPname()]
-                = { musicxml::Accidental(keyAccid->GetAccid(), keyAccid->GetGlyphName(), keyAccid->GetGlyphAuth()) };
-        }
-        return;
-    }
-
-    data_ACCIDENTAL_WRITTEN accidType = keySig->GetAccidType();
-    for (int i = 0; i < keySig->GetAccidCount(true); ++i) {
-        m_currentAccids[KeySig::GetAccidPnameAt(accidType, i)] = { musicxml::Accidental(accidType, "", "") };
-    }
 }
 
 beamRend_FORM MusicXmlInput::ConvertBeamFanToForm(const std::string &value)
