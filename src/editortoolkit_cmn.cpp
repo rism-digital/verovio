@@ -244,6 +244,7 @@ bool EditorToolkitCMN::InsertCursorByPitch(data_PITCHNAME pname, int oct, data_A
     if (accid == ACCIDENTAL_WRITTEN_NONE) {
         // Since we did not know the pitch yet we need to calculate that actual accid
         if (m_cursor->GetInputMode() == Cursor::InputMode::DURATION_FIRST) {
+            if (pname != PITCHNAME_NONE) m_cursor->SetPname(pname);
             auto [actualAccid, isImplicit] = this->GetActualAccid(m_cursor, m_cursor->GetAccid());
             m_cursor->SetAccid(actualAccid);
             m_cursor->SetAccidImplicit(isImplicit);
@@ -398,6 +399,10 @@ bool EditorToolkitCMN::InsertNote(const std::string &elementId, data_PITCHNAME p
             std::string placeholder = m_cursor->GetID();
             this->UpdatePitch(
                 placeholder, m_cursor->GetPname(), m_cursor->GetOct(), ACCIDENTAL_WRITTEN_NONE, VRV_UNSET);
+        }
+        if (m_cursor->GetInputMode() == Cursor::InputMode::DURATION_FIRST) {
+            m_cursor->SetAccid(ACCIDENTAL_WRITTEN_NONE);
+            m_cursor->SetAccidImplicit(false);
         }
     }
 
