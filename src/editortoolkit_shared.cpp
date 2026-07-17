@@ -449,6 +449,9 @@ bool EditorToolkitShared::ParseSelectAction(
         if (customStr == "note") {
             custom = SELECT_NOTE;
         }
+        else if (customStr == "textParent") {
+            custom = SELECT_TEXT_PARENT;
+        }
     }
     return true;
 }
@@ -1088,6 +1091,18 @@ bool EditorToolkitShared::Select(std::string &elementId, bool secondary, SelectC
                 Chord *chord = note->IsChordTone();
                 m_selectionId = chord->GetID();
                 m_selectionClassId = chord->GetClassId();
+            }
+        }
+    }
+    else if (custom == SELECT_TEXT_PARENT) {
+        m_selectionSecondaryId = "";
+        if (!m_selectionId.empty()) {
+            Object *element = this->GetElement(elementId);
+            if (!element || !element->IsAnyOf(std::array{ DIR, DYNAM, FING, SYL })) return false;
+            Object *text = element->FindDescendantByType(TEXT);
+            if (text) {
+                m_selectionId = text->GetID();
+                m_selectionClassId = text->GetClassId();
             }
         }
     }
