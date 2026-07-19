@@ -161,6 +161,7 @@
 #import <VerovioFramework/linkinginterface.h>
 #import <VerovioFramework/liquescent.h>
 #import <VerovioFramework/lv.h>
+#import <VerovioFramework/lyricelement.h>
 #import <VerovioFramework/mdiv.h>
 #import <VerovioFramework/measure.h>
 #import <VerovioFramework/mensur.h>
@@ -207,6 +208,7 @@
 #import <VerovioFramework/quilisma.h>
 #import <VerovioFramework/rdg.h>
 #import <VerovioFramework/ref.h>
+#import <VerovioFramework/refrain.h>
 #import <VerovioFramework/reg.h>
 #import <VerovioFramework/reh.h>
 #import <VerovioFramework/rend.h>
@@ -270,6 +272,7 @@
 #import <VerovioFramework/verse.h>
 #import <VerovioFramework/verticalaligner.h>
 #import <VerovioFramework/view.h>
+#import <VerovioFramework/volta.h>
 #import <VerovioFramework/vrv.h>
 #import <VerovioFramework/vrvdef.h>
 #import <VerovioFramework/zone.h>

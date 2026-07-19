@@ -37,6 +37,7 @@
 #include "label.h"
 #include "labelabbr.h"
 #include "layer.h"
+#include "lyricelement.h"
 #include "measure.h"
 #include "mensur.h"
 #include "mrest.h"
@@ -47,6 +48,7 @@
 #include "multirpt.h"
 #include "note.h"
 #include "options.h"
+#include "refrain.h"
 #include "rest.h"
 #include "smufl.h"
 #include "staff.h"
@@ -57,6 +59,7 @@
 #include "tie.h"
 #include "tuplet.h"
 #include "verse.h"
+#include "volta.h"
 #include "vrv.h"
 #include "zone.h"
 
@@ -224,8 +227,11 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         dc->EndGraphic(element, this);
         layer->AddToDrawingList(element);
     }
-    else if (element->Is(VERSE)) {
-        this->DrawVerse(dc, element, layer, staff, measure);
+    else if (element->Is(VOLTA)) {
+        this->DrawVolta(dc, element, layer, staff, measure);
+    }
+    else if (element->IsAnyOf(std::array{ REFRAIN, VERSE })) {
+        this->DrawLyricElement(dc, element, layer, staff, measure);
     }
     else {
         // This should never happen
@@ -1830,19 +1836,47 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     }
 
     if (!m_doc->IsFacs() && !m_doc->IsTranscription() && !m_doc->IsNeumeLines()) {
-        syl->SetDrawingYRel(this->GetSylYRel(syl->m_drawingVerseN, staff, syl->m_drawingVersePlace));
+        syl->SetDrawingYRel(
+            this->GetSylYRel(syl->m_drawingVerseN, staff, syl->m_drawingVersePlace, syl->m_drawingVoltaN));
     }
 
     dc->StartGraphic(syl, "", syl->GetID());
     dc->DeactivateGraphicY();
 
     FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-    if (syl->HasFontweight()) {
-        currentFont.SetWeight(syl->GetFontweight());
-    }
-    if (syl->HasFontstyle()) {
-        currentFont.SetStyle(syl->GetFontstyle());
-    }
+    const auto applyTypography = [this, staff](FontInfo &font, const AttTypography *typography) {
+        if (!typography) return;
+        if (typography->HasFontname()) {
+            font.SetFaceName(typography->GetFontname());
+        }
+        else if (typography->HasFontfam()) {
+            font.SetFaceName(typography->GetFontfam());
+        }
+        if (typography->HasFontsize()) {
+            const data_FONTSIZE fontSize = typography->GetFontsize();
+            if (fontSize.GetType() == FONTSIZE_fontSizeNumeric) {
+                font.SetPointSize(fontSize.GetFontSizeNumeric());
+            }
+            else if (fontSize.GetType() == FONTSIZE_term) {
+                font.SetPointSize(font.GetPointSize() * fontSize.GetPercentForTerm() / 100);
+            }
+            else if (fontSize.GetType() == FONTSIZE_percent) {
+                font.SetPointSize(font.GetPointSize() * fontSize.GetPercent() / 100);
+            }
+        }
+        if (typography->HasFontweight()) font.SetWeight(typography->GetFontweight());
+        if (typography->HasFontstyle()) font.SetStyle(typography->GetFontstyle());
+        if (typography->HasLetterspacing()) {
+            font.SetLetterSpacing(typography->GetLetterspacing() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+        }
+    };
+
+    const LyricElement *lyricElement
+        = vrv_cast<const LyricElement *>(syl->GetFirstAncestorInRange(LYRIC_ELEMENT, LYRIC_ELEMENT_max));
+    const Volta *volta = vrv_cast<const Volta *>(syl->GetFirstAncestor(VOLTA));
+    applyTypography(currentFont, lyricElement);
+    applyTypography(currentFont, volta);
+    applyTypography(currentFont, syl);
     if (syl->GetStart() && syl->GetStart()->GetDrawingCueSize()) {
         currentFont.SetPointSize(m_doc->GetCueSize(currentFont.GetPointSize()));
     }
@@ -1855,6 +1889,14 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     int y = syl->GetDrawingY();
 
     this->CalcOffset(dc, x, y);
+
+    syl->ResetDrawingTextInkBounds();
+    const std::u32string sylText = syl->GetText();
+    if (!sylText.empty()) {
+        TextExtend inkExtent;
+        dc->GetTextExtent(sylText, &inkExtent, false);
+        syl->SetDrawingTextInkBounds(y + inkExtent.m_ascent, y - inkExtent.m_descent);
+    }
 
     TextDrawingParams params;
     params.m_x = x;
@@ -1912,7 +1954,19 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     dc->EndGraphic(syl, this);
 }
 
-void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+void View::DrawVolta(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    Volta *volta = vrv_cast<Volta *>(element);
+    assert(volta);
+
+    dc->StartGraphic(volta, "", volta->GetID());
+    this->DrawLayerChildren(dc, volta, layer, staff, measure);
+    dc->EndGraphic(volta, this);
+}
+
+void View::DrawLyricElement(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
     assert(element);
@@ -1920,11 +1974,13 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff);
     assert(measure);
 
-    Verse *verse = vrv_cast<Verse *>(element);
-    assert(verse);
+    assert((element->GetClassId() > LYRIC_ELEMENT) && (element->GetClassId() < LYRIC_ELEMENT_max));
+    LyricElement *lyricElement = vrv_cast<LyricElement *>(element);
+    assert(lyricElement);
+    Verse *verse = lyricElement->Is(VERSE) ? vrv_cast<Verse *>(lyricElement) : NULL;
 
-    Label *label = vrv_cast<Label *>(verse->FindDescendantByType(LABEL, 1));
-    LabelAbbr *labelAbbr = verse->GetDrawingLabelAbbr();
+    Label *label = verse ? vrv_cast<Label *>(verse->FindDescendantByType(LABEL, 1)) : NULL;
+    LabelAbbr *labelAbbr = verse ? verse->GetDrawingLabelAbbr() : NULL;
 
     if (label || labelAbbr) {
 
@@ -1950,8 +2006,9 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         labelTxt.SetPointSize(pointSize);
 
         TextDrawingParams params;
-        params.m_x = verse->GetDrawingX() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        params.m_y = staff->GetDrawingY() + this->GetSylYRel(std::max(1, verse->GetN()), staff, verse->GetPlace());
+        params.m_x = lyricElement->GetDrawingX() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        params.m_y = staff->GetDrawingY()
+            + this->GetSylYRel(lyricElement->GetDrawingVerseN(), staff, lyricElement->GetPlace());
         params.m_staffSize = staff->m_drawingStaffSize;
         params.m_pointSize = labelTxt.GetPointSize();
 
@@ -1969,11 +2026,72 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         dc->ResetFont();
     }
 
-    dc->StartGraphic(verse, "", verse->GetID());
+    dc->StartGraphic(lyricElement, "", lyricElement->GetID());
+    this->DrawLayerChildren(dc, lyricElement, layer, staff, measure);
 
-    this->DrawLayerChildren(dc, verse, layer, staff, measure);
+    if ((lyricElement->GetVoltaCount() > 1) && lyricElement->HasVoltasym()
+        && (lyricElement->GetVoltasym() != voltaGroupingSym_VOLTASYM_none)) {
+        bool hasContentBounds = false;
+        int yTop = 0;
+        int yBottom = 0;
+        for (Object *object : lyricElement->FindAllDescendantsByType(VOLTA)) {
+            for (Object *sylObject : object->FindAllDescendantsByType(SYL)) {
+                Syl *syl = vrv_cast<Syl *>(sylObject);
+                assert(syl);
+                if (!syl->HasDrawingTextInkBounds()) continue;
+                if (!hasContentBounds) {
+                    yTop = syl->GetDrawingTextInkTop();
+                    yBottom = syl->GetDrawingTextInkBottom();
+                    hasContentBounds = true;
+                }
+                else {
+                    yTop = std::max(yTop, syl->GetDrawingTextInkTop());
+                    yBottom = std::min(yBottom, syl->GetDrawingTextInkBottom());
+                }
+            }
+        }
+        if (!hasContentBounds) {
+            const int verseN = lyricElement->GetDrawingVerseN();
+            const auto [firstVoltaTrack, lastVoltaTrack] = lyricElement->GetVoltaDrawingRange();
+            const int directTrackOffset = lyricElement->HasDrawingDirectSylTrack() ? 1 : 0;
+            const int firstVoltaLine = firstVoltaTrack + directTrackOffset;
+            const int lastVoltaLine = lastVoltaTrack + directTrackOffset;
+            const auto getLineY = [this, staff, lyricElement, verseN](int line) {
+                if (lyricElement->Is(REFRAIN)) {
+                    return staff->GetDrawingY() + this->GetSylYRel(verseN + line - 1, staff, lyricElement->GetPlace());
+                }
+                return staff->GetDrawingY() + this->GetSylYRel(verseN, staff, lyricElement->GetPlace(), line);
+            };
+            const int firstY = getLineY(firstVoltaLine);
+            const int lastY = getLineY(lastVoltaLine);
+            FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+            yTop = std::max(firstY, lastY) + m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
+            yBottom = std::min(firstY, lastY) + m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
+        }
+        const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        const int x = lyricElement->GetDrawingX() - unit;
 
-    dc->EndGraphic(verse, this);
+        dc->StartCustomGraphic("voltaGroupingSym");
+        switch (lyricElement->GetVoltasym()) {
+            case voltaGroupingSym_VOLTASYM_brace:
+                this->DrawBrace(dc, x, yTop, yBottom, staff->m_drawingStaffSize, true);
+                break;
+            case voltaGroupingSym_VOLTASYM_bracket:
+                this->DrawBracket(dc, x, yTop, yBottom, staff->m_drawingStaffSize);
+                break;
+            case voltaGroupingSym_VOLTASYM_bracketsq:
+                this->DrawBracketSq(dc, x - unit, yTop, yBottom, staff->m_drawingStaffSize);
+                break;
+            case voltaGroupingSym_VOLTASYM_line:
+                this->DrawVerticalLine(
+                    dc, yTop, yBottom, x - unit, m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize));
+                break;
+            default: break;
+        }
+        dc->EndCustomGraphic();
+    }
+
+    dc->EndGraphic(lyricElement, this);
 }
 
 //----------------------------------------------------------------------------
@@ -2180,7 +2298,7 @@ int View::GetFYRel(F *f, Staff *staff)
     return y;
 }
 
-int View::GetSylYRel(int verseN, Staff *staff, data_STAFFREL place)
+int View::GetSylYRel(int verseN, Staff *staff, data_STAFFREL place, int voltaN)
 {
     assert(staff);
 
@@ -2201,11 +2319,12 @@ int View::GetSylYRel(int verseN, Staff *staff, data_STAFFREL place)
     // above the staff
     if (place == STAFFREL_above) {
         y = alignment->GetOverflowAbove()
-            - (alignment->GetVersePositionAbove(verseN, verseCollapse)) * (verseHeight + margin) - (height);
+            - (alignment->GetVersePositionAbove(verseN, verseCollapse, voltaN)) * (verseHeight + margin) - (height);
     }
     else {
         y = -alignment->GetStaffHeight() - alignment->GetOverflowBelow()
-            + alignment->GetVersePositionBelow(verseN, verseCollapse) * (verseHeight + margin) + verseHeight - height;
+            + alignment->GetVersePositionBelow(verseN, verseCollapse, voltaN) * (verseHeight + margin) + verseHeight
+            - height;
     }
 
     return y;

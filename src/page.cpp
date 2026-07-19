@@ -758,6 +758,7 @@ void Page::AdjustSylSpacingByVerse(const IntTree &verseTree, Doc *doc)
     IntTree_t::const_iterator staves;
     IntTree_t::const_iterator layers;
     IntTree_t::const_iterator verses;
+    IntTree_t::const_iterator voltaTracks;
 
     if (verseTree.child.empty()) return;
 
@@ -767,15 +768,18 @@ void Page::AdjustSylSpacingByVerse(const IntTree &verseTree, Doc *doc)
     for (staves = verseTree.child.begin(); staves != verseTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             for (verses = layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
-                // Create ad comparison object for each type / @n
-                AttNIntegerComparison matchStaff(STAFF, staves->first);
-                AttNIntegerComparison matchLayer(LAYER, layers->first);
-                AttNIntegerComparison matchVerse(VERSE, verses->first);
-                filters = { &matchStaff, &matchLayer, &matchVerse };
+                for (voltaTracks = verses->second.child.begin(); voltaTracks != verses->second.child.end();
+                    ++voltaTracks) {
+                    // Create comparisons for staff/layer and the internal lyric-element group.
+                    AttNIntegerComparison matchStaff(STAFF, staves->first);
+                    AttNIntegerComparison matchLayer(LAYER, layers->first);
+                    LyricElementComparison matchLyricElement(verses->first);
+                    filters = { &matchStaff, &matchLayer, &matchLyricElement };
 
-                AdjustSylSpacingFunctor adjustSylSpacing(doc);
-                adjustSylSpacing.SetFilters(&filters);
-                this->Process(adjustSylSpacing);
+                    AdjustSylSpacingFunctor adjustSylSpacing(doc, voltaTracks->first);
+                    adjustSylSpacing.SetFilters(&filters);
+                    this->Process(adjustSylSpacing);
+                }
             }
         }
     }

@@ -882,21 +882,22 @@ void Doc::PrepareData()
     for (auto &staves : verseTree.child) {
         for (auto &layers : staves.second.child) {
             for (auto &verses : layers.second.child) {
-                // std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
-                filters.Clear();
-                // Create ad comparison object for each type / @n
-                AttNIntegerComparison matchStaff(STAFF, staves.first);
-                AttNIntegerComparison matchLayer(LAYER, layers.first);
-                AttNIntegerComparison matchVerse(VERSE, verses.first);
-                filters.Add(&matchStaff);
-                filters.Add(&matchLayer);
-                filters.Add(&matchVerse);
+                for (auto &voltaTracks : verses.second.child) {
+                    filters.Clear();
+                    // Create comparisons for staff/layer and the internal lyric-element group.
+                    AttNIntegerComparison matchStaff(STAFF, staves.first);
+                    AttNIntegerComparison matchLayer(LAYER, layers.first);
+                    LyricElementComparison matchLyricElement(verses.first);
+                    filters.Add(&matchStaff);
+                    filters.Add(&matchLayer);
+                    filters.Add(&matchLyricElement);
 
-                // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
-                // m_drawingLastNote is set only if the syl has a forward connector
-                PrepareLyricsFunctor prepareLyrics;
-                prepareLyrics.SetFilters(&filters);
-                root->Process(prepareLyrics);
+                    // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
+                    // m_drawingLastNote is set only if the syl has a forward connector
+                    PrepareLyricsFunctor prepareLyrics(voltaTracks.first);
+                    prepareLyrics.SetFilters(&filters);
+                    root->Process(prepareLyrics);
+                }
             }
         }
     }

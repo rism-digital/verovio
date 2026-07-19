@@ -178,6 +178,9 @@
 		4D1694491E3A44F300569BF4 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D983004192E959E00320037 /* main.cpp */; };
 		4D16944B1E3A44F300569BF4 /* metersig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D763EC51987D04D003FCAB5 /* metersig.cpp */; };
 		4D16944E1E3A44F300569BF4 /* verse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C18199F561200028D93 /* verse.cpp */; };
+		A7C500000000000000000011 /* volta.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7C500000000000000000002 /* volta.cpp */; };
+		B8C600000000000000000011 /* refrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000002 /* refrain.cpp */; };
+		B8C600000000000000000021 /* lyricelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000004 /* lyricelement.cpp */; };
 		4D16944F1E3A44F300569BF4 /* timeinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF289FE1A7545E500BA9F7D /* timeinterface.cpp */; };
 		4D1694511E3A44F300569BF4 /* glyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1D733F1A1D08DC001E08F6 /* glyph.cpp */; };
 		4D1694521E3A44F300569BF4 /* syl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C1D19A1DE2000028D93 /* syl.cpp */; };
@@ -490,6 +493,15 @@
 		4D9A9C17199F560200028D93 /* verse.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9A9C16199F560200028D93 /* verse.h */; };
 		4D9A9C19199F561200028D93 /* verse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C18199F561200028D93 /* verse.cpp */; };
 		4D9A9C1A199F561200028D93 /* verse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C18199F561200028D93 /* verse.cpp */; };
+		A7C500000000000000000010 /* volta.h in Headers */ = {isa = PBXBuildFile; fileRef = A7C500000000000000000001 /* volta.h */; };
+		A7C500000000000000000012 /* volta.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7C500000000000000000002 /* volta.cpp */; };
+		A7C500000000000000000013 /* volta.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7C500000000000000000002 /* volta.cpp */; };
+		B8C600000000000000000010 /* refrain.h in Headers */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000001 /* refrain.h */; };
+		B8C600000000000000000012 /* refrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000002 /* refrain.cpp */; };
+		B8C600000000000000000013 /* refrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000002 /* refrain.cpp */; };
+		B8C600000000000000000020 /* lyricelement.h in Headers */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000003 /* lyricelement.h */; };
+		B8C600000000000000000022 /* lyricelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000004 /* lyricelement.cpp */; };
+		B8C600000000000000000023 /* lyricelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000004 /* lyricelement.cpp */; };
 		4D9A9C1C199F576100028D93 /* syl.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9A9C1B199F576100028D93 /* syl.h */; };
 		4D9A9C1E19A1DE2000028D93 /* syl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C1D19A1DE2000028D93 /* syl.cpp */; };
 		4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C1D19A1DE2000028D93 /* syl.cpp */; };
@@ -1386,6 +1398,12 @@
 		BB4C4B7C22A932D7001F6AF0 /* tuplet.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59293018854BF800FE51AD /* tuplet.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4B7D22A932D7001F6AF0 /* verse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C18199F561200028D93 /* verse.cpp */; };
 		BB4C4B7E22A932D7001F6AF0 /* verse.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9A9C16199F560200028D93 /* verse.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A7C500000000000000000014 /* volta.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7C500000000000000000002 /* volta.cpp */; };
+		A7C500000000000000000015 /* volta.h in Headers */ = {isa = PBXBuildFile; fileRef = A7C500000000000000000001 /* volta.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B8C600000000000000000014 /* refrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000002 /* refrain.cpp */; };
+		B8C600000000000000000015 /* refrain.h in Headers */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000001 /* refrain.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B8C600000000000000000024 /* lyricelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000004 /* lyricelement.cpp */; };
+		B8C600000000000000000025 /* lyricelement.h in Headers */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000003 /* lyricelement.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4B7F22A932DF001F6AF0 /* fb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F7DD0531EAF3682001B072A /* fb.cpp */; };
 		BB4C4B8022A932DF001F6AF0 /* fb.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36C21C1EBCE14300A6DD1B /* fb.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4B8122A932DF001F6AF0 /* f.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEF8A6321B7AAF90093A76B /* f.cpp */; };
@@ -2042,6 +2060,12 @@
 		4D983004192E959E00320037 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = tools/main.cpp; sourceTree = SOURCE_ROOT; };
 		4D9A9C16199F560200028D93 /* verse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = verse.h; path = include/vrv/verse.h; sourceTree = "<group>"; };
 		4D9A9C18199F561200028D93 /* verse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = verse.cpp; path = src/verse.cpp; sourceTree = "<group>"; };
+		A7C500000000000000000001 /* volta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = volta.h; path = include/vrv/volta.h; sourceTree = "<group>"; };
+		A7C500000000000000000002 /* volta.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = volta.cpp; path = src/volta.cpp; sourceTree = "<group>"; };
+		B8C600000000000000000001 /* refrain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = refrain.h; path = include/vrv/refrain.h; sourceTree = "<group>"; };
+		B8C600000000000000000002 /* refrain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = refrain.cpp; path = src/refrain.cpp; sourceTree = "<group>"; };
+		B8C600000000000000000003 /* lyricelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lyricelement.h; path = include/vrv/lyricelement.h; sourceTree = "<group>"; };
+		B8C600000000000000000004 /* lyricelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lyricelement.cpp; path = src/lyricelement.cpp; sourceTree = "<group>"; };
 		4D9A9C1B199F576100028D93 /* syl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = syl.h; path = include/vrv/syl.h; sourceTree = "<group>"; };
 		4D9A9C1D19A1DE2000028D93 /* syl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = syl.cpp; path = src/syl.cpp; sourceTree = "<group>"; };
 		4D9C5F3A1ADBBBEB005D3031 /* git_commit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = git_commit.h; path = include/vrv/git_commit.h; sourceTree = SOURCE_ROOT; };
@@ -3220,6 +3244,12 @@
 				8F59293018854BF800FE51AD /* tuplet.h */,
 				4D9A9C18199F561200028D93 /* verse.cpp */,
 				4D9A9C16199F560200028D93 /* verse.h */,
+				A7C500000000000000000002 /* volta.cpp */,
+				A7C500000000000000000001 /* volta.h */,
+				B8C600000000000000000002 /* refrain.cpp */,
+				B8C600000000000000000001 /* refrain.h */,
+				B8C600000000000000000004 /* lyricelement.cpp */,
+				B8C600000000000000000003 /* lyricelement.h */,
 			);
 			name = layerelements;
 			sourceTree = "<group>";
@@ -3663,6 +3693,9 @@
 				4D6413762035F57800BB630E /* pages.h in Headers */,
 				4DACC9E82990F29A00B55913 /* atts_fingering.h in Headers */,
 				4D9A9C17199F560200028D93 /* verse.h in Headers */,
+				A7C500000000000000000010 /* volta.h in Headers */,
+				B8C600000000000000000010 /* refrain.h in Headers */,
+				B8C600000000000000000020 /* lyricelement.h in Headers */,
 				4DEC4DDD21C8295700D1D273 /* corr.h in Headers */,
 				4D9A9C1C199F576100028D93 /* syl.h in Headers */,
 				4DC34BA219BC4A71006175CD /* accid.h in Headers */,
@@ -3719,6 +3752,9 @@
 				BB4C4AC622A932B6001F6AF0 /* measure.h in Headers */,
 				E741AD00299A3D3500854426 /* calcslurdirectionfunctor.h in Headers */,
 				BB4C4B7E22A932D7001F6AF0 /* verse.h in Headers */,
+				A7C500000000000000000015 /* volta.h in Headers */,
+				B8C600000000000000000015 /* refrain.h in Headers */,
+				B8C600000000000000000025 /* lyricelement.h in Headers */,
 				BB4C4B0422A932C3001F6AF0 /* runningelement.h in Headers */,
 				BB4C4B1822A932CF001F6AF0 /* controlelement.h in Headers */,
 				4D7D93F12D31499C00BFAEF0 /* annotscore.h in Headers */,
@@ -4421,6 +4457,9 @@
 				4D1694491E3A44F300569BF4 /* main.cpp in Sources */,
 				4D16944B1E3A44F300569BF4 /* metersig.cpp in Sources */,
 				4D16944E1E3A44F300569BF4 /* verse.cpp in Sources */,
+				A7C500000000000000000011 /* volta.cpp in Sources */,
+				B8C600000000000000000011 /* refrain.cpp in Sources */,
+				B8C600000000000000000021 /* lyricelement.cpp in Sources */,
 				4DC12A821F741110000440E9 /* pgfoot.cpp in Sources */,
 				4DEC4D7B21C8048700D1D273 /* abbr.cpp in Sources */,
 				E7E1698F29A8BA5A00FFF482 /* adjustgracexposfunctor.cpp in Sources */,
@@ -4721,6 +4760,9 @@
 				4DEC4DA221C81EB300D1D273 /* rdg.cpp in Sources */,
 				BD96F7D12C04B297001CFF6F /* oriscus.cpp in Sources */,
 				4D9A9C19199F561200028D93 /* verse.cpp in Sources */,
+				A7C500000000000000000012 /* volta.cpp in Sources */,
+				B8C600000000000000000012 /* refrain.cpp in Sources */,
+				B8C600000000000000000022 /* lyricelement.cpp in Sources */,
 				E76046C328D496B400C36204 /* calcledgerlinesfunctor.cpp in Sources */,
 				E76A9D4A29A74E4B0044682D /* adjustdotsfunctor.cpp in Sources */,
 				4D2614192E6995D700CD28CF /* editortoolkit.cpp in Sources */,
@@ -5033,6 +5075,9 @@
 				E7E1699029A8BA5B00FFF482 /* adjustgracexposfunctor.cpp in Sources */,
 				4D1BE76C1C688F5A0086DC0E /* Binasc.cpp in Sources */,
 				4D9A9C1A199F561200028D93 /* verse.cpp in Sources */,
+				A7C500000000000000000013 /* volta.cpp in Sources */,
+				B8C600000000000000000013 /* refrain.cpp in Sources */,
+				B8C600000000000000000023 /* lyricelement.cpp in Sources */,
 				4DB3D8DC1F83D14900B5FC2B /* artic.cpp in Sources */,
 				4D674B48255F40B7008AEF4C /* plica.cpp in Sources */,
 				4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */,
@@ -5208,6 +5253,9 @@
 				E7908EA32985829F0004C1F9 /* alignfunctor.cpp in Sources */,
 				E74A806228BC9111005274E7 /* findfunctor.cpp in Sources */,
 				BB4C4B7D22A932D7001F6AF0 /* verse.cpp in Sources */,
+				A7C500000000000000000014 /* volta.cpp in Sources */,
+				B8C600000000000000000014 /* refrain.cpp in Sources */,
+				B8C600000000000000000024 /* lyricelement.cpp in Sources */,
 				BB4C4B5122A932D7001F6AF0 /* ftrem.cpp in Sources */,
 				BB4C4AEF22A932BC001F6AF0 /* lem.cpp in Sources */,
 				E73E86292A069C920089DF74 /* transposefunctor.cpp in Sources */,

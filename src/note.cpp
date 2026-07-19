@@ -136,7 +136,7 @@ void Note::Reset()
 
 bool Note::IsSupportedChild(ClassId classId)
 {
-    static const std::vector<ClassId> supported{ ACCID, ARTIC, DOTS, PLICA, STEM, SYL, VERSE };
+    static const std::vector<ClassId> supported{ ACCID, ARTIC, DOTS, PLICA, REFRAIN, STEM, SYL, VERSE };
 
     if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
         return true;

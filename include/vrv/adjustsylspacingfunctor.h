@@ -12,6 +12,8 @@
 
 namespace vrv {
 
+class LyricElement;
+
 //----------------------------------------------------------------------------
 // AdjustSylSpacingFunctor
 //----------------------------------------------------------------------------
@@ -25,7 +27,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    AdjustSylSpacingFunctor(Doc *doc);
+    AdjustSylSpacingFunctor(Doc *doc, int voltaTrack = 0);
     virtual ~AdjustSylSpacingFunctor() = default;
     ///@}
 
@@ -42,20 +44,23 @@ public:
     FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitSystem(System *system) override;
     FunctorCode VisitSystemEnd(System *system) override;
+    FunctorCode VisitRefrain(Refrain *refrain) override;
     FunctorCode VisitVerse(Verse *verse) override;
     ///@}
 
 protected:
     //
 private:
+    FunctorCode VisitLyricElement(LyricElement *lyricElement) override;
+
     //
 public:
     //
 private:
     // List of adjustment tuples (Alignment start|Alignment end|distance)
     ArrayOfAdjustmentTuples m_overlappingSyl;
-    // The previous verse
-    Verse *m_previousVerse;
+    // The previous verse or volta lyric container
+    LayerElement *m_previousContainer;
     // The previous syl
     Syl *m_lastSyl;
     // The previous measure
@@ -66,6 +71,8 @@ private:
     int m_freeSpace;
     // The staff size
     int m_staffSize;
+    // 0 for direct verse content, otherwise the normalized volta alternative.
+    int m_voltaTrack;
 };
 
 } // namespace vrv

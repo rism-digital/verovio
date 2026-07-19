@@ -22,12 +22,14 @@
 #include "hairpin.h"
 #include "layer.h"
 #include "ligature.h"
+#include "lyricelement.h"
 #include "mrest.h"
 #include "nc.h"
 #include "octave.h"
 #include "offsetinterface.h"
 #include "ossia.h"
 #include "page.h"
+#include "refrain.h"
 #include "repeatmark.h"
 #include "rest.h"
 #include "runningelement.h"
@@ -43,6 +45,7 @@
 #include "tuplet.h"
 #include "turn.h"
 #include "verse.h"
+#include "volta.h"
 
 //----------------------------------------------------------------------------
 
@@ -287,6 +290,14 @@ FunctorCode ResetDataFunctor::VisitLayerElement(LayerElement *layerElement)
     layerElement->SetDrawingCueSize(false);
     layerElement->m_crossStaff = NULL;
     layerElement->m_crossLayer = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetDataFunctor::VisitLyricElement(LyricElement *lyricElement)
+{
+    this->VisitLayerElement(lyricElement);
+    lyricElement->ResetDrawingDirectSylTrack();
 
     return FUNCTOR_CONTINUE;
 }
@@ -562,12 +573,27 @@ FunctorCode ResetDataFunctor::VisitTurn(Turn *turn)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode ResetDataFunctor::VisitVolta(Volta *volta)
+{
+    this->VisitLayerElement(volta);
+    volta->ResetDrawingVoltaN();
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ResetDataFunctor::VisitVerse(Verse *verse)
 {
     // Call parent one too
-    this->VisitLayerElement(verse);
+    this->VisitLyricElement(verse);
 
     verse->SetDrawingLabelAbbr(NULL);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetDataFunctor::VisitRefrain(Refrain *refrain)
+{
+    this->VisitLyricElement(refrain);
 
     return FUNCTOR_CONTINUE;
 }

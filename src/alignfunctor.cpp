@@ -9,17 +9,20 @@
 
 //----------------------------------------------------------------------------
 
+#include "chord.h"
 #include "div.h"
 #include "doc.h"
 #include "dot.h"
 #include "fig.h"
 #include "layer.h"
 #include "ligature.h"
+#include "lyricelement.h"
 #include "nc.h"
 #include "neume.h"
 #include "ossia.h"
 #include "page.h"
 #include "proport.h"
+#include "refrain.h"
 #include "rend.h"
 #include "rest.h"
 #include "runningelement.h"
@@ -309,11 +312,12 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         }
         // Else add a default
     }
-    else if (layerElement->Is(VERSE)) {
+    else if (layerElement->IsAnyOf(std::array{ REFRAIN, VOLTA, VERSE })) {
         // Idem
-        Note *note = vrv_cast<Note *>(layerElement->GetFirstAncestor(NOTE));
-        assert(note);
-        layerElement->SetAlignment(note->GetAlignment());
+        LayerElement *parent = vrv_cast<LayerElement *>(layerElement->GetFirstAncestor(NOTE));
+        if (!parent) parent = vrv_cast<LayerElement *>(layerElement->GetFirstAncestor(CHORD));
+        assert(parent);
+        layerElement->SetAlignment(parent->GetAlignment());
     }
     else if (layerElement->Is(NC)) {
         // Align with the neume
@@ -661,6 +665,20 @@ FunctorCode AlignVerticallyFunctor::VisitRunningElement(RunningElement *runningE
     return FUNCTOR_CONTINUE;
 }
 
+static void AddLyricElementToAlignment(StaffAlignment *alignment, LyricElement *lyricElement)
+{
+    assert(alignment && lyricElement);
+    if (lyricElement->Is(REFRAIN)) {
+        for (int line = 0; line < lyricElement->GetLyricLineCount(); ++line) {
+            alignment->AddVerseN(lyricElement->GetDrawingVerseN() + line, lyricElement->GetPlace());
+        }
+    }
+    else {
+        alignment->AddVerseN(
+            lyricElement->GetDrawingVerseN(), lyricElement->GetPlace(), lyricElement->GetLyricLineCount());
+    }
+}
+
 FunctorCode AlignVerticallyFunctor::VisitStaff(Staff *staff)
 {
     if (!staff->DrawingIsVisible()) {
@@ -674,12 +692,13 @@ FunctorCode AlignVerticallyFunctor::VisitStaff(Staff *staff)
     assert(alignment);
     staff->SetAlignment(alignment);
 
-    std::vector<Object *>::const_iterator verseIterator = std::find_if(
-        staff->m_timeSpanningElements.begin(), staff->m_timeSpanningElements.end(), ObjectComparison(VERSE));
-    if (verseIterator != staff->m_timeSpanningElements.end()) {
-        Verse *verse = vrv_cast<Verse *>(*verseIterator);
-        assert(verse);
-        alignment->AddVerseN(verse->GetN(), verse->GetPlace());
+    const auto lyricElementIterator
+        = std::find_if(staff->m_timeSpanningElements.begin(), staff->m_timeSpanningElements.end(),
+            [](const Object *object) { return object->IsAnyOf(std::array{ REFRAIN, VERSE }); });
+    if (lyricElementIterator != staff->m_timeSpanningElements.end()) {
+        LyricElement *lyricElement = vrv_cast<LyricElement *>(*lyricElementIterator);
+        assert(lyricElement);
+        AddLyricElementToAlignment(alignment, lyricElement);
     }
 
     // add verse number to alignment in case there are spanning SYL elements but there is no verse number already - this
@@ -687,17 +706,10 @@ FunctorCode AlignVerticallyFunctor::VisitStaff(Staff *staff)
     std::vector<Object *>::const_iterator sylIterator = std::find_if(
         staff->m_timeSpanningElements.begin(), staff->m_timeSpanningElements.end(), ObjectComparison(SYL));
     if (sylIterator != staff->m_timeSpanningElements.end()) {
-        Verse *verse = vrv_cast<Verse *>((*sylIterator)->GetFirstAncestor(VERSE));
-        if (verse) {
-            const int verseNumber = verse->GetN();
-            const data_STAFFREL versePlace = verse->GetPlace();
-            const bool verseCollapse = m_doc->GetOptions()->m_lyricVerseCollapse.GetValue();
-            if ((versePlace == STAFFREL_above) && !alignment->GetVersePositionAbove(verseNumber, verseCollapse)) {
-                alignment->AddVerseN(verseNumber, verse->GetPlace());
-            }
-            if ((versePlace != STAFFREL_above) && !alignment->GetVersePositionBelow(verseNumber, verseCollapse)) {
-                alignment->AddVerseN(verseNumber, verse->GetPlace());
-            }
+        LyricElement *lyricElement
+            = vrv_cast<LyricElement *>((*sylIterator)->GetFirstAncestorInRange(LYRIC_ELEMENT, LYRIC_ELEMENT_max));
+        if (lyricElement) {
+            AddLyricElementToAlignment(alignment, lyricElement);
         }
     }
 
@@ -761,7 +773,18 @@ FunctorCode AlignVerticallyFunctor::VisitVerse(Verse *verse)
     if (!alignment) return FUNCTOR_CONTINUE;
 
     // Add the number count
-    alignment->AddVerseN(verse->GetN(), verse->GetPlace());
+    alignment->AddVerseN(verse->GetDrawingVerseN(), verse->GetPlace(), verse->GetLyricLineCount());
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitRefrain(Refrain *refrain)
+{
+    StaffAlignment *alignment = m_systemAligner->GetStaffAlignmentForStaffN(m_staffN);
+
+    if (!alignment) return FUNCTOR_CONTINUE;
+
+    AddLyricElementToAlignment(alignment, refrain);
 
     return FUNCTOR_CONTINUE;
 }

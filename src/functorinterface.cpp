@@ -61,6 +61,7 @@
 #include "lb.h"
 #include "ligature.h"
 #include "lv.h"
+#include "lyricelement.h"
 #include "mdiv.h"
 #include "measure.h"
 #include "mensur.h"
@@ -92,6 +93,7 @@
 #include "pitchinflection.h"
 #include "plica.h"
 #include "proport.h"
+#include "refrain.h"
 #include "reh.h"
 #include "rend.h"
 #include "repeatmark.h"
@@ -125,6 +127,7 @@
 #include "tuplet.h"
 #include "turn.h"
 #include "verse.h"
+#include "volta.h"
 #include "zone.h"
 
 namespace vrv {
@@ -983,6 +986,16 @@ FunctorCode FunctorInterface::VisitLayerElementEnd(LayerElement *layerElement)
     return this->VisitObjectEnd(layerElement);
 }
 
+FunctorCode FunctorInterface::VisitLyricElement(LyricElement *lyricElement)
+{
+    return this->VisitLayerElement(lyricElement);
+}
+
+FunctorCode FunctorInterface::VisitLyricElementEnd(LyricElement *lyricElement)
+{
+    return this->VisitLayerElementEnd(lyricElement);
+}
+
 FunctorCode FunctorInterface::VisitLigature(Ligature *ligature)
 {
     return this->VisitLayerElement(ligature);
@@ -1243,14 +1256,34 @@ FunctorCode FunctorInterface::VisitTupletNumEnd(TupletNum *tupletNum)
     return this->VisitLayerElementEnd(tupletNum);
 }
 
+FunctorCode FunctorInterface::VisitVolta(Volta *volta)
+{
+    return this->VisitLayerElement(volta);
+}
+
+FunctorCode FunctorInterface::VisitVoltaEnd(Volta *volta)
+{
+    return this->VisitLayerElementEnd(volta);
+}
+
+FunctorCode FunctorInterface::VisitRefrain(Refrain *refrain)
+{
+    return this->VisitLyricElement(refrain);
+}
+
+FunctorCode FunctorInterface::VisitRefrainEnd(Refrain *refrain)
+{
+    return this->VisitLyricElementEnd(refrain);
+}
+
 FunctorCode FunctorInterface::VisitVerse(Verse *verse)
 {
-    return this->VisitLayerElement(verse);
+    return this->VisitLyricElement(verse);
 }
 
 FunctorCode FunctorInterface::VisitVerseEnd(Verse *verse)
 {
-    return this->VisitLayerElementEnd(verse);
+    return this->VisitLyricElementEnd(verse);
 }
 
 FunctorCode FunctorInterface::VisitF(F *f)
@@ -2347,6 +2380,16 @@ FunctorCode ConstFunctorInterface::VisitLayerElementEnd(const LayerElement *laye
     return this->VisitObjectEnd(layerElement);
 }
 
+FunctorCode ConstFunctorInterface::VisitLyricElement(const LyricElement *lyricElement)
+{
+    return this->VisitLayerElement(lyricElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitLyricElementEnd(const LyricElement *lyricElement)
+{
+    return this->VisitLayerElementEnd(lyricElement);
+}
+
 FunctorCode ConstFunctorInterface::VisitLigature(const Ligature *ligature)
 {
     return this->VisitLayerElement(ligature);
@@ -2607,14 +2650,34 @@ FunctorCode ConstFunctorInterface::VisitTupletNumEnd(const TupletNum *tupletNum)
     return this->VisitLayerElementEnd(tupletNum);
 }
 
+FunctorCode ConstFunctorInterface::VisitVolta(const Volta *volta)
+{
+    return this->VisitLayerElement(volta);
+}
+
+FunctorCode ConstFunctorInterface::VisitVoltaEnd(const Volta *volta)
+{
+    return this->VisitLayerElementEnd(volta);
+}
+
+FunctorCode ConstFunctorInterface::VisitRefrain(const Refrain *refrain)
+{
+    return this->VisitLyricElement(refrain);
+}
+
+FunctorCode ConstFunctorInterface::VisitRefrainEnd(const Refrain *refrain)
+{
+    return this->VisitLyricElementEnd(refrain);
+}
+
 FunctorCode ConstFunctorInterface::VisitVerse(const Verse *verse)
 {
-    return this->VisitLayerElement(verse);
+    return this->VisitLyricElement(verse);
 }
 
 FunctorCode ConstFunctorInterface::VisitVerseEnd(const Verse *verse)
 {
-    return this->VisitLayerElementEnd(verse);
+    return this->VisitLyricElementEnd(verse);
 }
 
 FunctorCode ConstFunctorInterface::VisitF(const F *f)
