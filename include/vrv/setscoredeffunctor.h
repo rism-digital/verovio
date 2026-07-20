@@ -256,9 +256,15 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    SetCautionaryScoreDefFunctor(ScoreDef *currentScoreDef);
+    SetCautionaryScoreDefFunctor(ScoreDef *currentScoreDef, bool restart = false);
     virtual ~SetCautionaryScoreDefFunctor() = default;
     ///@}
+
+    /**
+     * Set the list of staffNs in the scoreDef after the restart.
+     * Used only when restart flag is true.
+     */
+    void SetRestartStaffNs(const std::vector<int> &staffNs) { m_staffNs = staffNs; }
 
     /*
      * Abstract base implementation
@@ -284,6 +290,10 @@ private:
     ScoreDef *m_currentScoreDef;
     // The current staffDef
     StaffDef *m_currentStaffDef;
+    // Flag indicating we are processing a restart
+    bool m_restart;
+    // The list of staff n after the restart
+    std::vector<int> m_staffNs;
 };
 
 //----------------------------------------------------------------------------
