@@ -1,0 +1,56 @@
+{
+  "fixtures": [
+    {
+      "fixture": "/Users/simon/Repos/verovio-custom-fonts/benchmark/font-runtime/fixtures/music-only.mei",
+      "attempts": 1,
+      "cold_ms": {
+        "baseline": 5.4403334999999995,
+        "head": 5.3050619999999995,
+        "delta_percent": -2.486456023330186,
+        "pass": true
+      },
+      "warm_ms": {
+        "baseline": 0.0002585,
+        "head": 0.0002585,
+        "delta_percent": 0.0,
+        "pass": true
+      }
+    },
+    {
+      "fixture": "/Users/simon/Repos/verovio-custom-fonts/benchmark/font-runtime/fixtures/text-heavy.mei",
+      "attempts": 2,
+      "cold_ms": {
+        "baseline": 4.9313335,
+        "head": 4.978104500000001,
+        "delta_percent": 0.9484452836134638,
+        "pass": true
+      },
+      "warm_ms": {
+        "baseline": 0.0008075000000000001,
+        "head": 0.0009615,
+        "delta_percent": 19.071207430340543,
+        "pass": false
+      }
+    },
+    {
+      "fixture": "/Users/simon/Repos/verovio-custom-fonts/benchmark/font-runtime/fixtures/mixed-pages.mei",
+      "attempts": 1,
+      "cold_ms": {
+        "baseline": 6.817083,
+        "head": 7.04425,
+        "delta_percent": 3.3323197033100493,
+        "pass": true
+      },
+      "warm_ms": {
+        "baseline": 0.0002405,
+        "head": 0.000244,
+        "delta_percent": 1.455301455301461,
+        "pass": true
+      }
+    }
+  ],
+  "gates": {
+    "cold_percent": 5.0,
+    "warm_percent": 3.0
+  }
+}

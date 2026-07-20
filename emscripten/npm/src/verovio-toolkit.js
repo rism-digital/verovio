@@ -138,6 +138,44 @@ export class VerovioToolkit {
         return res;
     }
 
+    registerTextFont(data, alias = "") {
+        return this.#withFontBytes(data, (dataPtr, dataSize) =>
+            this.proxy.registerTextFontWithAlias(this.ptr, dataPtr, dataSize, alias));
+    }
+
+    registerMusicFont(data, smuflMetadata, alias = "") {
+        const metadata = typeof smuflMetadata === "string" ? smuflMetadata : JSON.stringify(smuflMetadata);
+        return this.#withFontBytes(data, (dataPtr, dataSize) =>
+            this.proxy.registerMusicFontWithAlias(this.ptr, dataPtr, dataSize, metadata, alias));
+    }
+
+    registerTextFontBase64(data, alias = "") {
+        return this.proxy.registerTextFontBase64WithAlias(this.ptr, data, alias);
+    }
+
+    registerMusicFontBase64(data, smuflMetadata, alias = "") {
+        const metadata = typeof smuflMetadata === "string" ? smuflMetadata : JSON.stringify(smuflMetadata);
+        return this.proxy.registerMusicFontBase64WithAlias(this.ptr, data, metadata, alias);
+    }
+
+    #withFontBytes(data, callback) {
+        const dataArray = data instanceof Uint8Array
+            ? data
+            : (data instanceof ArrayBuffer ? new Uint8Array(data) : null);
+        if (!dataArray) {
+            throw new TypeError("Font data must be a Uint8Array or ArrayBuffer");
+        }
+        if (dataArray.byteLength === 0) return "";
+        const dataPtr = this.VerovioModule._malloc(dataArray.byteLength);
+        try {
+            this.VerovioModule.HEAPU8.set(dataArray, dataPtr);
+            return callback(dataPtr, dataArray.byteLength);
+        }
+        finally {
+            this.VerovioModule._free(dataPtr);
+        }
+    }
+
     redoLayout(options = {}) {
         this.proxy.redoLayout(this.ptr, JSON.stringify(options));
     }

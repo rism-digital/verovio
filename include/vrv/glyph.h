@@ -9,6 +9,7 @@
 #define __VRV_GLYPH_H__
 
 #include <algorithm>
+#include <cstdint>
 #include <string>
 
 //----------------------------------------------------------------------------
@@ -62,7 +63,7 @@ public:
      * @name Setter and getter for the code string
      */
     ///@{
-    std::string GetCodeStr() const { return m_codeStr; }
+    const std::string &GetCodeStr() const { return m_codeStr; }
     void SetCodeStr(const std::string &codeStr) { m_codeStr = codeStr; }
     ///@}
 
@@ -70,7 +71,7 @@ public:
      * @name Setter and getter for the path
      */
     ///@{
-    std::string GetPath() const { return m_path; }
+    const std::string &GetPath() const { return m_path; }
     void SetPath(const std::string &path) { m_path = path; }
     ///@}
 
@@ -118,6 +119,16 @@ public:
      */
     std::string GetXML() const;
 
+    /** Identify a glyph backed by a runtime OpenType face instead of XML. */
+    void SetRuntimeGlyph(uint64_t faceIdentity, uint32_t glyphId)
+    {
+        m_faceIdentity = faceIdentity;
+        m_glyphId = glyphId;
+    }
+    bool IsRuntimeGlyph() const { return m_faceIdentity != 0; }
+    uint64_t GetFaceIdentity() const { return m_faceIdentity; }
+    uint32_t GetGlyphId() const { return m_glyphId; }
+
 private:
     //
 public:
@@ -142,6 +153,9 @@ private:
     std::map<SMuFLGlyphAnchor, Point> m_anchors;
     /** A flag indicating it is a fallback */
     bool m_isFallback;
+    /** Runtime font identity and glyph ID; both zero for legacy XML glyphs. */
+    uint64_t m_faceIdentity;
+    uint32_t m_glyphId;
 };
 
 } // namespace vrv

@@ -15,13 +15,27 @@ let package = Package(
     ],
     targets: [
         .target(
+            name: "VerovioBrotli",
+            path: "vendor/brotli/c",
+            sources: ["verovio-brotli.c"],
+            publicHeadersPath: "swift-include",
+            cSettings: [
+                .headerSearchPath("include"),
+                .define("BROTLI_STATIC")
+            ]
+        ),
+        .target(
             name: "VerovioCore",
+            dependencies: ["VerovioBrotli"],
             path: ".",
+            exclude: ["src/smufl_names.inc"],
             sources: [
                 "src",
                 "libmei/dist",
                 "libmei/addons",
-                "tools/c_wrapper.cpp"
+                "tools/c_wrapper.cpp",
+                "vendor/harfbuzz/src/verovio-harfbuzz.cc",
+                "vendor/woff2/src/verovio-woff2.cc"
             ],
             publicHeadersPath: "bindings/swift-core",
             cxxSettings: [
@@ -36,6 +50,15 @@ let package = Package(
                 .headerSearchPath("include/zip"),
                 .headerSearchPath("libmei/dist"),
                 .headerSearchPath("libmei/addons"),
+                .headerSearchPath("vendor/harfbuzz/src"),
+                .headerSearchPath("vendor/woff2/include"),
+                .headerSearchPath("vendor/woff2/src"),
+                .headerSearchPath("vendor/brotli/c/include"),
+                .define("BROTLI_STATIC"),
+                .define("HB_LEAN"),
+                .define("HB_MINI"),
+                .define("HB_OPTIMIZE_SIZE_MORE"),
+                .define("HB_CONFIG_OVERRIDE_H", to: "\"verovio-hb-config.h\""),
                 .unsafeFlags(["-std=c++23"])
             ]
         ),
@@ -48,7 +71,8 @@ let package = Package(
         ),
         .testTarget(
             name: "VerovioToolkitTests",
-            dependencies: ["VerovioToolkit"]
+            dependencies: ["VerovioToolkit"],
+            path: "bindings/swift-toolkit-tests"
         )
     ]
 )

@@ -61,10 +61,11 @@ void View::DrawTabClef(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     dc->StartGraphic(element, "", element->GetID());
 
-    this->DrawSmuflCode(dc, x, y, sym, glyphSize, false);
+    const std::string fontName = clef->HasFontname() ? clef->GetFontname() : "";
+    this->DrawSmuflCode(dc, x, y, sym, glyphSize, false, false, fontName);
 
     // Possibly draw enclosing brackets
-    this->DrawClefEnclosing(dc, clef, staff, sym, x, y);
+    this->DrawClefEnclosing(dc, clef, staff, sym, x, y, fontName);
 
     dc->EndGraphic(element, this);
 }
@@ -115,10 +116,7 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
         std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType, overline, strike, underline);
 
-        FontInfo fretTxt;
-        if (!dc->UseGlobalStyling()) {
-            fretTxt.SetFaceName(m_doc->GetResources().GetTextFont());
-        }
+        FontInfo fretTxt = m_doc->GetDrawingTextFont(glyphSize, staff->m_drawingStaffDef);
 
         TextDrawingParams params;
         params.m_x = x;

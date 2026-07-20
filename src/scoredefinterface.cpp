@@ -35,6 +35,7 @@ ScoreDefInterface::ScoreDefInterface()
     , AttOctaveDefault()
     , AttPianoPedals()
     , AttSpacing()
+    , AttTextStyle()
     , AttSystems()
 {
     this->RegisterInterfaceAttClass(ATT_BARRING);
@@ -47,6 +48,7 @@ ScoreDefInterface::ScoreDefInterface()
     this->RegisterInterfaceAttClass(ATT_OCTAVEDEFAULT);
     this->RegisterInterfaceAttClass(ATT_PIANOPEDALS);
     this->RegisterInterfaceAttClass(ATT_SPACING);
+    this->RegisterInterfaceAttClass(ATT_TEXTSTYLE);
     this->RegisterInterfaceAttClass(ATT_SYSTEMS);
 
     this->Reset();
@@ -66,6 +68,7 @@ void ScoreDefInterface::Reset()
     this->ResetOctaveDefault();
     this->ResetPianoPedals();
     this->ResetSpacing();
+    this->ResetTextStyle();
     this->ResetSystems();
 }
 

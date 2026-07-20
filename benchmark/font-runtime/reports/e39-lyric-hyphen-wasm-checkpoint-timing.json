@@ -1,0 +1,72 @@
+{
+  "fixtures": [
+    {
+      "fixture": "benchmark/font-runtime/fixtures/music-only.mei",
+      "attempts": 1,
+      "cold_ms": {
+        "baseline": 6.842438000000016,
+        "head": 6.930562500000008,
+        "delta_percent": 1.2879108294440167,
+        "pass": true
+      },
+      "warm_ms": {
+        "baseline": 0.015246186999999963,
+        "head": 0.014957208500000036,
+        "delta_percent": -1.8954148994757003,
+        "pass": true
+      }
+    },
+    {
+      "fixture": "benchmark/font-runtime/fixtures/text-heavy.mei",
+      "attempts": 1,
+      "cold_ms": {
+        "baseline": 6.478874500000018,
+        "head": 6.395021000000014,
+        "delta_percent": -1.2942602916602763,
+        "pass": true
+      },
+      "warm_ms": {
+        "baseline": 0.05291756250000003,
+        "head": 0.053274292,
+        "delta_percent": 0.6741230758691374,
+        "pass": true
+      }
+    },
+    {
+      "fixture": "benchmark/font-runtime/fixtures/mixed-pages.mei",
+      "attempts": 1,
+      "cold_ms": {
+        "baseline": 8.140041999999994,
+        "head": 8.210375000000028,
+        "delta_percent": 0.8640373108644184,
+        "pass": true
+      },
+      "warm_ms": {
+        "baseline": 0.015421603999999945,
+        "head": 0.01542154149999999,
+        "delta_percent": -0.00040527561177006177,
+        "pass": true
+      }
+    },
+    {
+      "fixture": "benchmark/font-runtime/fixtures/lyrics.mei",
+      "attempts": 2,
+      "cold_ms": {
+        "baseline": 6.286208500000015,
+        "head": 6.580291499999987,
+        "delta_percent": 4.678225356349075,
+        "pass": true
+      },
+      "warm_ms": {
+        "baseline": 0.01207295849999997,
+        "head": 0.012551062000000002,
+        "delta_percent": 3.9601188060079284,
+        "pass": false
+      }
+    }
+  ],
+  "gates": {
+    "cold_percent": 5.0,
+    "warm_percent": 3.0
+  }
+}

@@ -18,8 +18,10 @@
 #include "functor.h"
 #include "measure.h"
 #include "note.h"
+#include "scoredef.h"
 #include "smufl.h"
 #include "staff.h"
+#include "system.h"
 #include "text.h"
 #include "textelement.h"
 #include "verse.h"
@@ -89,12 +91,56 @@ bool Syl::IsSupportedChild(ClassId classId)
 
 int Syl::CalcHyphenLength(Doc *doc, int staffSize)
 {
-    FontInfo *lyricFont = doc->GetDrawingLyricFont(staffSize);
-    int dashLength = doc->GetTextGlyphWidth(L'-', lyricFont, false);
-
-    Syl::AdjustToLyricSize(doc, dashLength);
+    const FontInfo lyricFont = this->GetDrawingFont(doc, staffSize);
+    const Resources &resources = doc->GetResources();
+    const std::optional<FontStore::ShapedRun> hyphen = resources.ShapeText(lyricFont, U"-");
+    int dashLength = hyphen ? resources.GetTextAdvance(lyricFont, *hyphen) : 0;
+    if (!dashLength) dashLength = doc->GetTextGlyphWidth(L'-', &lyricFont, false);
 
     return dashLength;
+}
+
+FontInfo Syl::GetDrawingFont(Doc *doc, int staffSize) const
+{
+    const ScoreDefInterface *scoreDef = nullptr;
+    if (this->GetStart()) {
+        const Staff *staff = vrv_cast<const Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
+        if (staff) scoreDef = staff->m_drawingStaffDef;
+        if (!scoreDef) {
+            const System *system = vrv_cast<const System *>(this->GetStart()->GetFirstAncestor(SYSTEM));
+            scoreDef = system ? system->GetDrawingScoreDef() : nullptr;
+        }
+    }
+    FontInfo font = doc->GetDrawingTextFont(staffSize, scoreDef, true);
+    const Verse *verse = vrv_cast<const Verse *>(this->GetFirstAncestor(VERSE));
+    if (verse) {
+        if (verse->HasFontname()) {
+            font.SetFaceName(verse->GetFontname());
+        }
+        else if (verse->HasFontfam()) {
+            font.SetFaceName(verse->GetFontfam());
+        }
+        if (verse->HasFontweight()) font.SetWeight(verse->GetFontweight());
+        if (verse->HasFontstyle()) font.SetStyle(verse->GetFontstyle());
+        if (verse->HasLetterspacing()) {
+            font.SetLetterSpacing(verse->GetLetterspacing() * doc->GetDrawingUnit(staffSize));
+        }
+    }
+    if (this->HasFontname()) {
+        font.SetFaceName(this->GetFontname());
+    }
+    else if (this->HasFontfam()) {
+        font.SetFaceName(this->GetFontfam());
+    }
+    if (this->HasFontweight()) font.SetWeight(this->GetFontweight());
+    if (this->HasFontstyle()) font.SetStyle(this->GetFontstyle());
+    if (this->HasLetterspacing()) {
+        font.SetLetterSpacing(this->GetLetterspacing() * doc->GetDrawingUnit(staffSize));
+    }
+    if (this->GetStart() && this->GetStart()->GetDrawingCueSize()) {
+        font.SetPointSize(doc->GetCueSize(font.GetPointSize()));
+    }
+    return font;
 }
 
 int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)

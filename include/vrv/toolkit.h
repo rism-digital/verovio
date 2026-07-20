@@ -76,6 +76,13 @@ public:
      */
     std::string GetResourcePath() const;
 
+#ifdef VRV_FONT_RUNTIME_TESTING
+    FontStore::Counters GetFontStoreCountersForTesting() const
+    {
+        return m_doc.GetResources().GetFontStore().GetCounters();
+    }
+#endif
+
     /**
      * Set the resource path for the Toolkit instance and any extra fonts
      *
@@ -160,6 +167,118 @@ public:
      * @return True if the data was successfully loaded
      */
     bool LoadZipDataBuffer(const unsigned char *data, int length);
+
+    /**
+     * Register a static OTF, TTF, WOFF1, or WOFF2 text font from a byte buffer.
+     *
+     * @param data The font data
+     * @param length The size of the font data
+     * @return The canonical OpenType family, or an empty string on failure
+     */
+    std::string RegisterTextFont(const unsigned char *data, int length);
+    /**
+     * Register a static text font from a byte buffer with an exact, case-sensitive family alias.
+     *
+     * @param data The font data
+     * @param length The size of the font data
+     * @param alias The additional family name used during lookup; empty adds no alias
+     * @return The canonical OpenType family, or an empty string on failure
+     */
+    std::string RegisterTextFont(const unsigned char *data, int length, const std::string &alias);
+    /**
+     * Register a static OTF, TTF, WOFF1, or WOFF2 SMuFL music font from a byte buffer.
+     *
+     * @param data The font data
+     * @param length The size of the font data
+     * @param smuflMetadataJson The SMuFL font metadata as JSON
+     * @return The canonical SMuFL or OpenType family, or an empty string on failure
+     */
+    std::string RegisterMusicFont(const unsigned char *data, int length, const std::string &smuflMetadataJson);
+    /**
+     * Register a static SMuFL music font from a byte buffer with an exact, case-sensitive family alias.
+     *
+     * @param data The font data
+     * @param length The size of the font data
+     * @param smuflMetadataJson The SMuFL font metadata as JSON
+     * @param alias The additional family name used during lookup; empty adds no alias
+     * @return The canonical SMuFL or OpenType family, or an empty string on failure
+     */
+    std::string RegisterMusicFont(
+        const unsigned char *data, int length, const std::string &smuflMetadataJson, const std::string &alias);
+    /**
+     * Register a static text font from base64-encoded font data.
+     *
+     * @param data The base64-encoded font data
+     * @return The canonical OpenType family, or an empty string on failure
+     */
+    std::string RegisterTextFontBase64(const std::string &data);
+    /**
+     * Register a static text font from base64-encoded data with an exact, case-sensitive family alias.
+     *
+     * @param data The base64-encoded font data
+     * @param alias The additional family name used during lookup; empty adds no alias
+     * @return The canonical OpenType family, or an empty string on failure
+     */
+    std::string RegisterTextFontBase64(const std::string &data, const std::string &alias);
+    /**
+     * Register a static SMuFL music font from base64-encoded font data.
+     *
+     * @param data The base64-encoded font data
+     * @param smuflMetadataJson The SMuFL font metadata as JSON
+     * @return The canonical SMuFL or OpenType family, or an empty string on failure
+     */
+    std::string RegisterMusicFontBase64(const std::string &data, const std::string &smuflMetadataJson);
+    /**
+     * Register a static SMuFL music font from base64-encoded data with an exact, case-sensitive family alias.
+     *
+     * @param data The base64-encoded font data
+     * @param smuflMetadataJson The SMuFL font metadata as JSON
+     * @param alias The additional family name used during lookup; empty adds no alias
+     * @return The canonical SMuFL or OpenType family, or an empty string on failure
+     */
+    std::string RegisterMusicFontBase64(
+        const std::string &data, const std::string &smuflMetadataJson, const std::string &alias);
+    /**
+     * Register a static text font from a native file.
+     *
+     * @remark nojs
+     *
+     * @param filename The font filename
+     * @return The canonical OpenType family, or an empty string on failure
+     */
+    std::string RegisterTextFontFile(const std::string &filename);
+    /**
+     * Register a static text font from a native file with an exact, case-sensitive family alias.
+     *
+     * @remark nojs
+     *
+     * @param filename The font filename
+     * @param alias The additional family name used during lookup; empty adds no alias
+     * @return The canonical OpenType family, or an empty string on failure
+     */
+    std::string RegisterTextFontFile(const std::string &filename, const std::string &alias);
+    /**
+     * Register a static SMuFL music font and its metadata from native files.
+     *
+     * @remark nojs
+     *
+     * @param filename The font filename
+     * @param smuflMetadataFilename The SMuFL metadata JSON filename
+     * @return The canonical SMuFL or OpenType family, or an empty string on failure
+     */
+    std::string RegisterMusicFontFile(const std::string &filename, const std::string &smuflMetadataFilename);
+    /**
+     * Register a static SMuFL music font from native files with an exact, case-sensitive family alias.
+     *
+     * @remark nojs
+     *
+     * @param filename The font filename
+     * @param smuflMetadataFilename The SMuFL metadata JSON filename
+     * @param alias The additional family name used during lookup; empty adds no alias
+     * @return The canonical SMuFL or OpenType family, or an empty string on failure
+     */
+    std::string RegisterMusicFontFile(
+        const std::string &filename, const std::string &smuflMetadataFilename, const std::string &alias);
 
     /**
      * Validate the Plaine & Easie code from a file.
@@ -789,6 +908,8 @@ protected:
 
 private:
     bool SetFont(const std::string &fontName);
+    void EnsureFontLayout();
+    void InvalidateSvgCache();
     bool IsUTF16(const std::string &filename);
     bool LoadUTF16File(const std::string &filename);
     bool IsZip(const std::string &filename);
@@ -847,6 +968,17 @@ private:
     std::streambuf *m_cerrOriginalBuf;
 
     EditorToolkit *m_editorToolkit;
+
+    /** Deferred invalidation when registered/selected fonts change after loading. */
+    bool m_fontLayoutInvalid;
+
+    struct SvgCacheEntry {
+        int pageNo = 0;
+        bool xmlDeclaration = false;
+        uint64_t fontGeneration = 0;
+        std::string svg;
+    };
+    std::optional<SvgCacheEntry> m_svgCache;
 
 #ifndef NO_RUNTIME
     /** Measuring runtime */

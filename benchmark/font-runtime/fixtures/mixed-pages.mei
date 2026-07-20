@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1">
+  <meiHead><fileDesc><titleStmt><title>Mixed multi-page benchmark</title></titleStmt><pubStmt/></fileDesc></meiHead>
+  <music><body><mdiv><score>
+    <scoreDef meter.count="3" meter.unit="4"><staffGrp><staffDef n="1" lines="5" clef.shape="G" clef.line="2" label="Mixed benchmark"/></staffGrp></scoreDef>
+    <section>
+      <measure n="1"><staff n="1"><layer n="1"><note xml:id="m1n1" pname="c" oct="4" dur="4"/><note pname="e" oct="4" dur="4"/><note pname="g" oct="4" dur="4"/></layer></staff><dir startid="#m1n1">Page one: AV ffi and music.</dir></measure>
+      <pb/>
+      <measure n="2"><staff n="1"><layer n="1"><note xml:id="m2n1" pname="d" oct="4" dur="4" accid="f"/><rest dur="4"/><chord dur="4"><note pname="f" oct="4"/><note pname="a" oct="4"/></chord></layer></staff><dir startid="#m2n1"><rend fontstyle="italic">Page two: Greek Ωδή and combining é.</rend></dir></measure>
+      <pb/>
+      <measure n="3" right="end"><staff n="1"><layer n="1"><beam><note xml:id="m3n1" pname="g" oct="4" dur="8"/><note pname="a" oct="4" dur="8"/></beam><note pname="b" oct="4" dur="2"/></layer></staff><dir startid="#m3n1"><rend fontweight="bold">Page three: repeated mixed content.</rend></dir></measure>
+    </section>
+  </score></mdiv></body></music>
+</mei>

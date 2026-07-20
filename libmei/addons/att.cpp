@@ -306,7 +306,8 @@ std::string Att::FontsizeToStr(data_FONTSIZE data) const
 {
     std::string value;
     if (data.GetType() == FONTSIZE_fontSizeNumeric) {
-        value = StringFormat("%fpt", data.GetFontSizeNumeric());
+        const char *unit = (data.GetFontSizeNumericType() == FONTSIZENUMERIC_vu) ? "vu" : "pt";
+        value = StringFormat("%f%s", data.GetFontSizeNumeric(), unit);
     }
     else if (data.GetType() == FONTSIZE_term) {
         value = FontsizetermToStr(data.GetTerm());
@@ -321,8 +322,19 @@ std::string Att::FontsizeToStr(data_FONTSIZE data) const
 data_FONTSIZE Att::StrToFontsize(const std::string &value, bool logWarning) const
 {
     data_FONTSIZE data;
-    data.SetFontSizeNumeric(StrToFontsizenumeric(value, false));
-    if (data.HasValue()) return data;
+    const data_FONTSIZENUMERIC pointSize = StrToFontsizenumeric(value, false);
+    if (pointSize != MEI_UNSET) {
+        data.SetFontSizeNumeric(pointSize, FONTSIZENUMERIC_pt);
+        return data;
+    }
+    static const std::regex vuTest("([0-9]+(\\.[0-9]+)?|\\.[0-9]+)vu");
+    if (std::regex_match(value, vuTest)) {
+        const data_FONTSIZENUMERIC vuSize = stof(value);
+        if (vuSize > 0.0) {
+            data.SetFontSizeNumeric(vuSize, FONTSIZENUMERIC_vu);
+            return data;
+        }
+    }
     data.SetTerm(StrToFontsizeterm(value, false));
     if (data.HasValue()) return data;
     data.SetPercent(StrToPercent(value, false));
@@ -370,14 +382,21 @@ std::string Att::FontsizenumericToStr(data_FONTSIZENUMERIC data) const
 
 data_FONTSIZENUMERIC Att::StrToFontsizenumeric(const std::string &value, bool logWarning) const
 {
-    static const std::regex test("[0-9]*(\\.[0-9]+)?(pt)");
+    static const std::regex test("([0-9]+(\\.[0-9]+)?|\\.[0-9]+)pt");
     if (!std::regex_match(value, test)) {
         if (logWarning && !value.empty()) {
             LogWarning("Unsupported data.FONTSIZENUMERIC '%s'", value.c_str());
         }
         return MEI_UNSET;
     }
-    return stof(value);
+    const data_FONTSIZENUMERIC numeric = stof(value);
+    if (numeric <= 0.0) {
+        if (logWarning) {
+            LogWarning("Unsupported data.FONTSIZENUMERIC '%s'", value.c_str());
+        }
+        return MEI_UNSET;
+    }
+    return numeric;
 }
 
 std::string Att::KeysignatureToStr(data_KEYSIGNATURE data) const

@@ -52,6 +52,22 @@ bool vrvToolkit_loadData(void *tkPtr, const char *data);
 bool vrvToolkit_loadFile(void *tkPtr, const char *filename);
 bool vrvToolkit_loadZipDataBase64(void *tkPtr, const char *data);
 bool vrvToolkit_loadZipDataBuffer(void *tkPtr, const unsigned char *data, int length);
+const char *vrvToolkit_registerTextFont(void *tkPtr, const unsigned char *data, int length);
+const char *vrvToolkit_registerTextFontWithAlias(void *tkPtr, const unsigned char *data, int length, const char *alias);
+const char *vrvToolkit_registerMusicFont(
+    void *tkPtr, const unsigned char *data, int length, const char *smuflMetadataJson);
+const char *vrvToolkit_registerMusicFontWithAlias(
+    void *tkPtr, const unsigned char *data, int length, const char *smuflMetadataJson, const char *alias);
+const char *vrvToolkit_registerTextFontBase64(void *tkPtr, const char *data);
+const char *vrvToolkit_registerTextFontBase64WithAlias(void *tkPtr, const char *data, const char *alias);
+const char *vrvToolkit_registerMusicFontBase64(void *tkPtr, const char *data, const char *smuflMetadataJson);
+const char *vrvToolkit_registerMusicFontBase64WithAlias(
+    void *tkPtr, const char *data, const char *smuflMetadataJson, const char *alias);
+const char *vrvToolkit_registerTextFontFile(void *tkPtr, const char *filename);
+const char *vrvToolkit_registerTextFontFileWithAlias(void *tkPtr, const char *filename, const char *alias);
+const char *vrvToolkit_registerMusicFontFile(void *tkPtr, const char *filename, const char *smuflMetadataFilename);
+const char *vrvToolkit_registerMusicFontFileWithAlias(
+    void *tkPtr, const char *filename, const char *smuflMetadataFilename, const char *alias);
 void vrvToolkit_redoLayout(void *tkPtr, const char *c_options);
 void vrvToolkit_redoPagePitchPosLayout(void *tkPtr);
 const char *vrvToolkit_renderData(void *tkPtr, const char *data, const char *options);

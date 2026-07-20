@@ -1,0 +1,27 @@
+{
+  "artifact": "native runtime-font delivery after font-shaped lyric connectors",
+  "checkpoint": {
+    "cli": { "raw": 6308488, "gzip": 2356809, "brotli": 1684414 },
+    "installed_bundle": { "raw": 8611840, "gzip": 3629792, "brotli": 2904463 }
+  },
+  "head": {
+    "cli": { "raw": 6308984, "gzip": 2357504, "brotli": 1684494 },
+    "installed_bundle": { "raw": 8611840, "gzip": 3630628, "brotli": 2905659 },
+    "resources_raw": 1206546,
+    "source_vendor_raw": 5336091
+  },
+  "checkpoint_delta_percent": {
+    "cli": { "raw": 0.0078624228, "gzip": 0.0294890252, "brotli": 0.0047494262 },
+    "installed_bundle": { "raw": 0.0, "gzip": 0.0230316227, "brotli": 0.0411780078 }
+  },
+  "origin_develop_baseline": {
+    "cli": { "raw": 6555080, "gzip": 2335088, "brotli": 1656127 },
+    "installed_bundle": { "raw": 12206080, "gzip": 3521334, "brotli": 2659425 }
+  },
+  "origin_develop_delta_percent": {
+    "cli": { "raw": -3.7542791240, "gzip": 0.9599638215, "brotli": 1.7128517318 },
+    "installed_bundle": { "raw": -29.4463087248, "gzip": 3.1037669247, "brotli": 9.2589187512 }
+  },
+  "raw_and_gzip_gate_percent": 5.0,
+  "pass": true
+}

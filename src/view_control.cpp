@@ -1471,16 +1471,9 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         return;
     }
 
-    int thickness = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    Syl::AdjustToLyricSize(m_doc, thickness);
-
     if (syl->GetCon() == sylLog_CON_d) {
-
-        y += (m_options->m_lyricSize.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 5);
-
         // the length of the dash and the space between them
         const int dashLength = syl->CalcHyphenLength(m_doc, staff->m_drawingStaffSize);
-        const int halfDashLength = dashLength / 2;
 
         const int dashSpace = m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) * 5 / 3;
         const int dist = x2 - x1;
@@ -1499,15 +1492,21 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
             margin = (dist - ((nbDashes - 1) * dashSpace)) / 2;
         }
 
+        FontInfo hyphenFont = syl->GetDrawingFont(m_doc, staff->m_drawingStaffSize);
+        dc->SetFont(&hyphenFont);
         for (int i = 0; i < nbDashes; ++i) {
             int x = x1 + margin + (i * dashSpace);
             x = std::max(x, x1);
 
-            this->DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + thickness);
+            dc->StartText(this->ToDeviceContextX(x), this->ToDeviceContextY(y), HORIZONTALALIGNMENT_center);
+            dc->DrawText("-", U"-");
+            dc->EndText();
         }
-        // this->DrawFilledRectangle(dc, x1, y, x2, y + width);
+        dc->ResetFont();
     }
     else if (syl->GetCon() == sylLog_CON_u) {
+        int thickness = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        Syl::AdjustToLyricSize(m_doc, thickness);
         x1 += (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
         if (x2 > x1) {
             this->DrawFilledRectangle(dc, x1, y, x2, y + thickness);
@@ -1762,12 +1761,6 @@ void View::DrawControlElementText(DeviceContext *dc, ControlElement *element, Me
 
     const data_STAFFREL place = interfaceTextDir->GetPlace();
 
-    FontInfo dirTxt;
-    if (!dc->UseGlobalStyling()) {
-        dirTxt.SetFaceName(m_doc->GetResources().GetTextFont());
-        dirTxt.SetStyle(FONTSTYLE_italic);
-    }
-
     const int lineCount = interfaceTextDir->GetNumberOfLines(element);
 
     data_HORIZONTALALIGNMENT alignment = element->GetChildRendAlignment();
@@ -1790,7 +1783,14 @@ void View::DrawControlElementText(DeviceContext *dc, ControlElement *element, Me
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
+
+        const ScoreDefInterface *textStyle = staff->m_drawingStaffDef;
+        FontInfo dirTxt = m_doc->GetDrawingTextFont(staffSize, textStyle);
+        if (!dc->UseGlobalStyling() && (!textStyle || !textStyle->HasTextStyle())) {
+            dirTxt.SetStyle(FONTSTYLE_italic);
+        }
 
         int xAdjust = 0;
         const bool isBetweenStaves = (place == STAFFREL_between)
@@ -1840,12 +1840,6 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
 
     bool isSymbolOnly = dynam->IsSymbolOnly();
 
-    FontInfo dynamTxt;
-    if (!dc->UseGlobalStyling()) {
-        dynamTxt.SetFaceName(m_doc->GetResources().GetTextFont());
-        dynamTxt.SetStyle(FONTSTYLE_italic);
-    }
-
     const int lineCount = dynam->GetNumberOfLines(dynam);
 
     data_HORIZONTALALIGNMENT alignment = dynam->GetChildRendAlignment();
@@ -1870,7 +1864,14 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
+
+        const ScoreDefInterface *textStyle = staff->m_drawingStaffDef;
+        FontInfo dynamTxt = m_doc->GetDrawingTextFont(staffSize, textStyle);
+        if (!dc->UseGlobalStyling() && (!textStyle || !textStyle->HasTextStyle())) {
+            dynamTxt.SetStyle(FONTSTYLE_italic);
+        }
 
         if (dynam->HasEnclose()) {
             params.m_textEnclose = dynam->GetEnclose();
@@ -1964,13 +1965,13 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, TextDrawingParams &pa
 
     dc->StartGraphic(fb, "", fb->GetID());
 
-    FontInfo *fontDim = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-    const int lineHeight = m_doc->GetTextLineHeight(fontDim, false);
+    FontInfo fontDim = m_doc->GetDrawingTextFont(staff->m_drawingStaffSize, staff->m_drawingStaffDef);
+    const int lineHeight = m_doc->GetTextLineHeight(&fontDim, false);
     const int startX = params.m_x;
 
-    fontDim->SetPointSize(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize());
+    fontDim.SetPointSize(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize());
 
-    dc->SetFont(fontDim);
+    dc->SetFont(&fontDim);
 
     for (Object *current : fb->GetChildren()) {
         dc->StartText(this->ToDeviceContextX(params.m_x), this->ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_left);
@@ -2101,11 +2102,6 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
 
     dc->StartGraphic(fing, "", fing->GetID());
 
-    FontInfo fingTxt;
-    if (!dc->UseGlobalStyling()) {
-        fingTxt.SetFaceName(m_doc->GetResources().GetTextFont());
-    }
-
     // center fingering
     data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
 
@@ -2124,8 +2120,10 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetFingeringFont(staffSize)->GetPointSize();
 
+        FontInfo fingTxt = m_doc->GetDrawingTextFont(staffSize, staff->m_drawingStaffDef);
         fingTxt.SetPointSize(params.m_pointSize);
 
         dc->SetFont(&fingTxt);
@@ -2297,11 +2295,6 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
 
     dc->StartGraphic(harm, "", harm->GetID());
 
-    FontInfo harmTxt;
-    if (!dc->UseGlobalStyling()) {
-        harmTxt.SetFaceName(m_doc->GetResources().GetTextFont());
-    }
-
     data_HORIZONTALALIGNMENT alignment = harm->GetChildRendAlignment();
     // harm are centered aligned by default;
     if (alignment == 0) {
@@ -2324,6 +2317,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
 
         if (harm->GetFirst() && harm->GetFirst()->Is(FB)) {
             this->DrawFb(dc, staff, dynamic_cast<Fb *>(harm->GetFirst()), params);
@@ -2331,6 +2325,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
         else {
             params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
+            FontInfo harmTxt = m_doc->GetDrawingTextFont(staffSize, staff->m_drawingStaffDef);
             harmTxt.SetPointSize(params.m_pointSize);
 
             dc->SetFont(&harmTxt);
@@ -2592,12 +2587,6 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
 
     dc->StartGraphic(reh, "", reh->GetID());
 
-    FontInfo rehTxt;
-    if (!dc->UseGlobalStyling()) {
-        rehTxt.SetFaceName(m_doc->GetResources().GetTextFont());
-        rehTxt.SetWeight(FONTWEIGHT_bold);
-    }
-
     // Number of units above the staff - 3 by default, 5 when above a clef
     int yMargin = 3;
 
@@ -2650,8 +2639,14 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
+        const ScoreDefInterface *textStyle = staff->m_drawingStaffDef;
+        FontInfo rehTxt = m_doc->GetDrawingTextFont(staffSize, textStyle);
+        if (!dc->UseGlobalStyling() && (!textStyle || !textStyle->HasTextWeight())) {
+            rehTxt.SetWeight(FONTWEIGHT_bold);
+        }
         rehTxt.SetPointSize(params.m_pointSize);
 
         dc->SetFont(&rehTxt);
@@ -2743,12 +2738,6 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
 
     dc->StartGraphic(tempo, "", tempo->GetID());
 
-    FontInfo tempoTxt;
-    if (!dc->UseGlobalStyling()) {
-        tempoTxt.SetFaceName(m_doc->GetResources().GetTextFont());
-        tempoTxt.SetWeight(FONTWEIGHT_bold);
-    }
-
     int lineCount = tempo->GetNumberOfLines(tempo);
 
     data_HORIZONTALALIGNMENT alignment = tempo->GetChildRendAlignment();
@@ -2770,8 +2759,14 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
+        const ScoreDefInterface *textStyle = staff->m_drawingStaffDef;
+        FontInfo tempoTxt = m_doc->GetDrawingTextFont(staffSize, textStyle);
+        if (!dc->UseGlobalStyling() && (!textStyle || !textStyle->HasTextWeight())) {
+            tempoTxt.SetWeight(FONTWEIGHT_bold);
+        }
         tempoTxt.SetPointSize(params.m_pointSize);
 
         if (tempo->GetPlace() == STAFFREL_between) {
@@ -3167,7 +3162,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
         dc->StartCustomGraphic("voltaBracket");
 
-        FontInfo currentFont = *m_doc->GetDrawingLyricFont(staffSize);
+        FontInfo currentFont = m_doc->GetDrawingTextFont(staffSize, staff->m_drawingStaffDef);
         // currentFont.SetWeight(FONTWEIGHT_bold);
         // currentFont.SetPointSize(currentFont.GetPointSize() * 2 / 3);
         dc->SetFont(&currentFont);
@@ -3270,11 +3265,13 @@ void View::DrawTextEnclosure(DeviceContext *dc, const TextDrawingParams &params,
 
     dc->SetPushBack();
 
-    for (const auto rend : params.m_enclosedRend) {
+    for (const TextEnclosure &enclosure : params.m_enclosedRend) {
+        const TextElement *rend = enclosure.element;
+        assert(rend);
         int x1 = rend->GetContentLeft() - margin;
         int x2 = rend->GetContentRight() + margin;
-        int y1 = rend->GetContentBottom() - margin / 2;
-        int y2 = rend->GetContentTop() + margin;
+        int y1 = std::min(rend->GetContentBottom(), enclosure.fontBottom) - margin / 2;
+        int y2 = std::max(rend->GetContentTop(), enclosure.fontTop) + margin;
         const int width = std::abs(x2 - x1);
         const int height = std::abs(y2 - y1);
 

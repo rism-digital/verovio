@@ -1,0 +1,13 @@
+/* Verovio's decoder-only Brotli amalgamation. */
+#include "common/constants.c"
+#include "common/context.c"
+#include "common/dictionary.c"
+#include "common/platform.c"
+#include "common/shared_dictionary.c"
+#include "common/transform.c"
+#include "dec/bit_reader.c"
+#include "dec/decode.c"
+#include "dec/huffman.c"
+#include "dec/prefix.c"
+#include "dec/state.c"
+#include "dec/static_init.c"

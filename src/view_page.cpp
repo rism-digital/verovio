@@ -51,6 +51,7 @@
 #include "reh.h"
 #include "smufl.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "system.h"
 #include "text.h"
 #include "tuplet.h"
@@ -507,10 +508,10 @@ void View::DrawLabels(
         return;
     }
 
-    FontInfo labelTxt;
-    if (!dc->UseGlobalStyling()) {
-        labelTxt.SetFaceName(m_doc->GetResources().GetTextFont());
-    }
+    const StaffDef *labelStaffDef = dynamic_cast<const StaffDef *>(object);
+    const ScoreDefInterface *textStyle = labelStaffDef ? static_cast<const ScoreDefInterface *>(labelStaffDef)
+                                                       : static_cast<const ScoreDefInterface *>(scoreDef);
+    FontInfo labelTxt = m_doc->GetDrawingTextFont(staffSize, textStyle);
     labelTxt.SetPointSize(m_doc->GetDrawingLyricFont(staffSize)->GetPointSize());
 
     int lineCount = graphic->GetChildCount(LB) + 1;
@@ -521,6 +522,7 @@ void View::DrawLabels(
     TextDrawingParams params;
     params.m_x = x;
     params.m_y = y;
+    params.m_staffSize = staffSize;
     params.m_pointSize = labelTxt.GetPointSize();
 
     dc->SetFont(&labelTxt);
@@ -1129,10 +1131,19 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
 
         dc->StartGraphic(mnum, "", mnum->GetID());
 
-        FontInfo mnumTxt;
-        if (!dc->UseGlobalStyling()) {
-            mnumTxt.SetFaceName(m_doc->GetResources().GetTextFont());
+        const ScoreDefInterface *textStyle = staff->m_drawingStaffDef;
+        FontInfo mnumTxt = m_doc->GetDrawingTextFont(staff->m_drawingStaffSize, textStyle);
+        if (!dc->UseGlobalStyling() && !mnum->HasFontstyle() && (!textStyle || !textStyle->HasTextStyle())) {
             mnumTxt.SetStyle(FONTSTYLE_italic);
+        }
+        if (mnum->HasFontname())
+            mnumTxt.SetFaceName(mnum->GetFontname());
+        else if (mnum->HasFontfam())
+            mnumTxt.SetFaceName(mnum->GetFontfam());
+        if (mnum->HasFontstyle()) mnumTxt.SetStyle(mnum->GetFontstyle());
+        if (mnum->HasFontweight()) mnumTxt.SetWeight(mnum->GetFontweight());
+        if (mnum->HasLetterspacing()) {
+            mnumTxt.SetLetterSpacing(mnum->GetLetterspacing() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
         }
 
         TextDrawingParams params;
@@ -1145,22 +1156,25 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
         // we set mNum to a fixed height above the system and make it a bit smaller than other text
         params.m_x = measure->GetDrawingX();
         params.m_y = staff->GetDrawingY() + yOffset;
+        params.m_staffSize = staff->m_drawingStaffSize;
+        const int basePointSize = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize();
         if (mnum->HasFontsize()) {
             data_FONTSIZE *fs = mnum->GetFontsizeAlternate();
             if (fs->GetType() == FONTSIZE_fontSizeNumeric) {
-                mnumTxt.SetPointSize(fs->GetFontSizeNumeric());
+                mnumTxt.SetPointSize(this->ConvertFontSizeNumeric(*fs, staff->m_drawingStaffSize));
             }
             else if (fs->GetType() == FONTSIZE_term) {
                 const int percent = fs->GetPercentForTerm();
-                mnumTxt.SetPointSize(m_doc->GetDrawingLyricFont(percent)->GetPointSize());
+                mnumTxt.SetPointSize(basePointSize * percent / 100);
             }
             else if (fs->GetType() == FONTSIZE_percent) {
-                mnumTxt.SetPointSize(m_doc->GetDrawingLyricFont(fs->GetPercent())->GetPointSize());
+                mnumTxt.SetPointSize(basePointSize * fs->GetPercent() / 100);
             }
         }
         else {
             mnumTxt.SetPointSize(m_doc->GetDrawingLyricFont(80)->GetPointSize());
         }
+        params.m_pointSize = mnumTxt.GetPointSize();
 
         dc->SetFont(&mnumTxt);
 

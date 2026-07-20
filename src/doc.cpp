@@ -1856,12 +1856,15 @@ void Doc::ResetFocus()
     this->ScoreDefSetCurrentDoc(true);
 }
 
-int Doc::GetGlyphHeight(char32_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphHeight(char32_t code, int staffSize, bool graceSize, const std::string &fontName) const
 {
     int x, y, w, h;
     const Resources &resources = this->GetResources();
-    const Glyph *glyph = resources.GetGlyph(code);
-    assert(glyph);
+    const Glyph *glyph = fontName.empty() ? resources.GetGlyph(code) : resources.GetGlyph(code, fontName);
+    if (!glyph) {
+        LogWarning("Music glyph U+%04X is missing from the requested font and Bravura.", code);
+        return 0;
+    }
     glyph->GetBoundingBox(x, y, w, h);
     h = h * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if (graceSize) h = h * m_options->m_graceFactor.GetValue();
@@ -1869,12 +1872,15 @@ int Doc::GetGlyphHeight(char32_t code, int staffSize, bool graceSize) const
     return h;
 }
 
-int Doc::GetGlyphWidth(char32_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphWidth(char32_t code, int staffSize, bool graceSize, const std::string &fontName) const
 {
     int x, y, w, h;
     const Resources &resources = this->GetResources();
-    const Glyph *glyph = resources.GetGlyph(code);
-    assert(glyph);
+    const Glyph *glyph = fontName.empty() ? resources.GetGlyph(code) : resources.GetGlyph(code, fontName);
+    if (!glyph) {
+        LogWarning("Music glyph U+%04X is missing from the requested font and Bravura.", code);
+        return 0;
+    }
     glyph->GetBoundingBox(x, y, w, h);
     w = w * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if (graceSize) w = w * m_options->m_graceFactor.GetValue();
@@ -1882,11 +1888,14 @@ int Doc::GetGlyphWidth(char32_t code, int staffSize, bool graceSize) const
     return w;
 }
 
-int Doc::GetGlyphAdvX(char32_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphAdvX(char32_t code, int staffSize, bool graceSize, const std::string &fontName) const
 {
     const Resources &resources = this->GetResources();
-    const Glyph *glyph = resources.GetGlyph(code);
-    assert(glyph);
+    const Glyph *glyph = fontName.empty() ? resources.GetGlyph(code) : resources.GetGlyph(code, fontName);
+    if (!glyph) {
+        LogWarning("Music glyph U+%04X is missing from the requested font and Bravura.", code);
+        return 0;
+    }
     int advX = glyph->GetHorizAdvX();
     advX = advX * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if (graceSize) advX = advX * m_options->m_graceFactor.GetValue();
@@ -1912,12 +1921,15 @@ Point Doc::ConvertFontPoint(const Glyph *glyph, const Point &fontPoint, int staf
     return point;
 }
 
-int Doc::GetGlyphLeft(char32_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphLeft(char32_t code, int staffSize, bool graceSize, const std::string &fontName) const
 {
     int x, y, w, h;
     const Resources &resources = this->GetResources();
-    const Glyph *glyph = resources.GetGlyph(code);
-    assert(glyph);
+    const Glyph *glyph = fontName.empty() ? resources.GetGlyph(code) : resources.GetGlyph(code, fontName);
+    if (!glyph) {
+        LogWarning("Music glyph U+%04X is missing from the requested font and Bravura.", code);
+        return 0;
+    }
     glyph->GetBoundingBox(x, y, w, h);
     x = x * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if (graceSize) x = x * m_options->m_graceFactor.GetValue();
@@ -1925,17 +1937,21 @@ int Doc::GetGlyphLeft(char32_t code, int staffSize, bool graceSize) const
     return x;
 }
 
-int Doc::GetGlyphRight(char32_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphRight(char32_t code, int staffSize, bool graceSize, const std::string &fontName) const
 {
-    return this->GetGlyphLeft(code, staffSize, graceSize) + this->GetGlyphWidth(code, staffSize, graceSize);
+    return this->GetGlyphLeft(code, staffSize, graceSize, fontName)
+        + this->GetGlyphWidth(code, staffSize, graceSize, fontName);
 }
 
-int Doc::GetGlyphBottom(char32_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphBottom(char32_t code, int staffSize, bool graceSize, const std::string &fontName) const
 {
     int x, y, w, h;
     const Resources &resources = this->GetResources();
-    const Glyph *glyph = resources.GetGlyph(code);
-    assert(glyph);
+    const Glyph *glyph = fontName.empty() ? resources.GetGlyph(code) : resources.GetGlyph(code, fontName);
+    if (!glyph) {
+        LogWarning("Music glyph U+%04X is missing from the requested font and Bravura.", code);
+        return 0;
+    }
     glyph->GetBoundingBox(x, y, w, h);
     y = y * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if (graceSize) y = y * m_options->m_graceFactor.GetValue();
@@ -1943,9 +1959,10 @@ int Doc::GetGlyphBottom(char32_t code, int staffSize, bool graceSize) const
     return y;
 }
 
-int Doc::GetGlyphTop(char32_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphTop(char32_t code, int staffSize, bool graceSize, const std::string &fontName) const
 {
-    return this->GetGlyphBottom(code, staffSize, graceSize) + this->GetGlyphHeight(code, staffSize, graceSize);
+    return this->GetGlyphBottom(code, staffSize, graceSize, fontName)
+        + this->GetGlyphHeight(code, staffSize, graceSize, fontName);
 }
 
 int Doc::GetTextGlyphHeight(char32_t code, const FontInfo *font, bool graceSize) const
@@ -1954,7 +1971,7 @@ int Doc::GetTextGlyphHeight(char32_t code, const FontInfo *font, bool graceSize)
 
     int x, y, w, h;
     const Resources &resources = this->GetResources();
-    const Glyph *glyph = resources.GetTextGlyph(code);
+    const Glyph *glyph = resources.GetTextGlyph(code, *font);
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
     h = h * font->GetPointSize() / glyph->GetUnitsPerEm();
@@ -1968,7 +1985,7 @@ int Doc::GetTextGlyphWidth(char32_t code, const FontInfo *font, bool graceSize) 
 
     int x, y, w, h;
     const Resources &resources = this->GetResources();
-    const Glyph *glyph = resources.GetTextGlyph(code);
+    const Glyph *glyph = resources.GetTextGlyph(code, *font);
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
     w = w * font->GetPointSize() / glyph->GetUnitsPerEm();
@@ -1981,7 +1998,7 @@ int Doc::GetTextGlyphAdvX(char32_t code, const FontInfo *font, bool graceSize) c
     assert(font);
 
     const Resources &resources = this->GetResources();
-    const Glyph *glyph = resources.GetTextGlyph(code);
+    const Glyph *glyph = resources.GetTextGlyph(code, *font);
     assert(glyph);
     int advX = glyph->GetHorizAdvX();
     advX = advX * font->GetPointSize() / glyph->GetUnitsPerEm();
@@ -1995,7 +2012,7 @@ int Doc::GetTextGlyphDescender(char32_t code, const FontInfo *font, bool graceSi
 
     int x, y, w, h;
     const Resources &resources = this->GetResources();
-    const Glyph *glyph = resources.GetTextGlyph(code);
+    const Glyph *glyph = resources.GetTextGlyph(code, *font);
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
     y = y * font->GetPointSize() / glyph->GetUnitsPerEm();
@@ -2113,9 +2130,9 @@ double Doc::GetCueScaling() const
     return m_options->m_graceFactor.GetValue();
 }
 
-FontInfo *Doc::GetDrawingSmuflFont(int staffSize, bool graceSize)
+FontInfo *Doc::GetDrawingSmuflFont(int staffSize, bool graceSize, const std::string &fontName)
 {
-    m_drawingSmuflFont.SetFaceName(this->GetResources().GetCurrentFont().c_str());
+    m_drawingSmuflFont.SetFaceName(fontName.empty() ? this->GetResources().GetCurrentFont().c_str() : fontName.c_str());
     int value = m_drawingSmuflFontSize * staffSize / 100;
     if (graceSize) value = value * m_options->m_graceFactor.GetValue();
     m_drawingSmuflFont.SetPointSize(value);
@@ -2126,6 +2143,35 @@ FontInfo *Doc::GetDrawingLyricFont(int staffSize)
 {
     m_drawingLyricFont.SetPointSize(m_drawingLyricFontSize * staffSize / 100);
     return &m_drawingLyricFont;
+}
+
+FontInfo Doc::GetDrawingTextFont(int staffSize, const ScoreDefInterface *style, bool lyric)
+{
+    FontInfo font = *this->GetDrawingLyricFont(staffSize);
+    font.SetFaceName(this->GetResources().GetTextFont());
+    if (!style) return font;
+
+    if (lyric) {
+        if (style->HasLyricName()) {
+            font.SetFaceName(style->GetLyricName());
+        }
+        else if (style->HasLyricFam()) {
+            font.SetFaceName(style->GetLyricFam());
+        }
+        if (style->HasLyricStyle()) font.SetStyle(style->GetLyricStyle());
+        if (style->HasLyricWeight()) font.SetWeight(style->GetLyricWeight());
+    }
+    else {
+        if (style->HasTextName()) {
+            font.SetFaceName(style->GetTextName());
+        }
+        else if (style->HasTextFam()) {
+            font.SetFaceName(style->GetTextFam());
+        }
+        if (style->HasTextStyle()) font.SetStyle(style->GetTextStyle());
+        if (style->HasTextWeight()) font.SetWeight(style->GetTextWeight());
+    }
+    return font;
 }
 
 FontInfo *Doc::GetFingeringFont(int staffSize)

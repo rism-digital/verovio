@@ -1,0 +1,20 @@
+{
+  "artifact": "production no-Humdrum single-file WASM core before npm prebundle",
+  "baseline": {
+    "raw": 7013380,
+    "gzip": 2274929,
+    "brotli": 1768938
+  },
+  "head": {
+    "raw": 5044402,
+    "gzip": 2482099,
+    "brotli": 1990807
+  },
+  "delta_percent": {
+    "raw": -28.074594560682588,
+    "gzip": 9.106657834156584,
+    "brotli": 12.542497249762285
+  },
+  "gzip_gate_percent": 5.0,
+  "pass": false
+}

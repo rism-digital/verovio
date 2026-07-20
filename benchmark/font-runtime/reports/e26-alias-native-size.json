@@ -1,0 +1,42 @@
+{
+  "post_alias": {
+    "cli": {
+      "raw": 6308488,
+      "gzip": 2355959,
+      "brotli": 1684694
+    },
+    "installed_bundle": {
+      "raw": 8611840,
+      "gzip": 3628750,
+      "brotli": 2904592
+    },
+    "resources_raw": 1206546,
+    "source_vendor_raw": 5336091
+  },
+  "alias_delta_percent": {
+    "cli": {
+      "raw": 0.2705888486368213,
+      "gzip": 0.248412741301407,
+      "brotli": 0.2891948975971559
+    },
+    "installed_bundle": {
+      "raw": 0.23837902264600697,
+      "gzip": 0.1297720476583164,
+      "brotli": 0.14511876534926138
+    }
+  },
+  "origin_develop_delta_percent": {
+    "cli": {
+      "raw": -3.7618457745748346,
+      "gzip": 0.8937992915042159,
+      "brotli": 1.7249281003208106
+    },
+    "installed_bundle": {
+      "raw": -29.446308724832214,
+      "gzip": 3.0504348636056777,
+      "brotli": 9.218797296408066
+    }
+  },
+  "raw_and_gzip_gate_percent": 5.0,
+  "pass": true
+}

@@ -712,8 +712,13 @@ public:
     OptionDbl m_fingeringScale;
     OptionString m_font;
     OptionArray m_fontAddCustom;
-    OptionIntMap m_fontFallback;
+    OptionArray m_fontAddMusic;
+    OptionArray m_fontAddMusicAs;
+    OptionArray m_fontAddText;
+    OptionArray m_fontAddTextAs;
+    OptionString m_fontFallback;
     OptionBool m_fontLoadAll;
+    OptionString m_fontText;
     OptionBool m_fontTextLiberation;
     OptionDbl m_graceFactor;
     OptionBool m_graceRhythmAlign;

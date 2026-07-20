@@ -1,0 +1,22 @@
+{
+  "artifact": "production no-Humdrum WASM delivery after OpenType style-metadata fix",
+  "pre_style_fix": { "raw": 4430855, "gzip": 2237587, "brotli": 1958983 },
+  "post_style_fix": { "raw": 4431246, "gzip": 2237896, "brotli": 1959229 },
+  "post_style_fix_files": [
+    { "path": "emscripten/build/verovio.js", "raw": 3224700, "gzip": 1108434, "brotli": 838237 },
+    { "path": "emscripten/build/verovio.data", "raw": 1206546, "gzip": 1129462, "brotli": 1120992 }
+  ],
+  "style_fix_delta_percent": {
+    "raw": 0.008824481956648533,
+    "gzip": 0.013809518914786878,
+    "brotli": 0.012557536231816435
+  },
+  "origin_develop_baseline": { "raw": 7013380, "gzip": 2274929, "brotli": 1768938 },
+  "origin_develop_delta_percent": {
+    "raw": -36.81725501826508,
+    "gzip": -1.6278749798345316,
+    "brotli": 10.757358369824143
+  },
+  "gzip_gate_percent": 5.0,
+  "pass": true
+}

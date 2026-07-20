@@ -1,0 +1,31 @@
+{
+  "measurement": "cold process startup + constructor + load/layout + first SVG render through CLI",
+  "fixtures": [
+    {
+      "fixture": "benchmark/font-runtime/fixtures/music-only.mei",
+      "samples_per_side": 60,
+      "baseline_ms": 42.6346245,
+      "head_ms": 42.468104,
+      "delta_percent": -0.39057573967844483,
+      "pass": true
+    },
+    {
+      "fixture": "benchmark/font-runtime/fixtures/text-heavy.mei",
+      "samples_per_side": 60,
+      "baseline_ms": 42.8420835,
+      "head_ms": 42.619958,
+      "delta_percent": -0.5184750176774333,
+      "pass": true
+    },
+    {
+      "fixture": "benchmark/font-runtime/fixtures/mixed-pages.mei",
+      "samples_per_side": 60,
+      "baseline_ms": 44.9038125,
+      "head_ms": 44.627396,
+      "delta_percent": -0.6155746797668948,
+      "pass": true
+    }
+  ],
+  "gate_percent": 5.0,
+  "pass": true
+}

@@ -1,0 +1,14 @@
+{
+  "cli": {
+    "raw": 6291560,
+    "gzip": 2349938,
+    "brotli": 1680173
+  },
+  "installed_bundle": {
+    "raw": 8591360,
+    "gzip": 3623821,
+    "brotli": 2899439
+  },
+  "resources_raw": 1206546,
+  "source_vendor_raw": 5335780
+}

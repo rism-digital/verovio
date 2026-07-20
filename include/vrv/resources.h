@@ -14,9 +14,12 @@
 //----------------------------------------------------------------------------
 
 #include "filereader.h"
+#include "fontstore.h"
 #include "glyph.h"
 
 namespace vrv {
+
+class FontInfo;
 
 //----------------------------------------------------------------------------
 // Resources
@@ -51,23 +54,24 @@ public:
 
     std::string GetPath() const { return m_path; }
     void SetPath(const std::string &path) { m_path = path; }
+    const FontStore &GetFontStore() const { return m_fontStore; }
+    FontStore &GetFontStoreForModification() { return m_fontStore; }
     ///@}
 
     /** Status checker */
-    bool Ok() const { return (m_loadedFonts.size() > 1); }
+    bool Ok() const;
 
-    /**
-     * Return the name of the text font (Times or Liberation)
-     */
+    /** Return the default registered text family. */
     void UseLiberationTextFont(bool useLiberation) { m_useLiberation = useLiberation; }
     bool UseLiberationTextFont() const { return m_useLiberation; }
-    std::string GetTextFont() const { return ((m_useLiberation) ? "Liberation" : "Times"); }
+    std::string GetTextFont() const { return m_textFontName; }
+    void SetTextFont(const std::string &fontName) { m_textFontName = fontName; }
 
     /**
      * Font initialization
      */
     ///@{
-    /** Init the SMufL music and text fonts */
+    /** Register the bundled Bravura and Tinos faces. */
     bool InitFonts();
     /**  Set the font to be used and loads it if necessary */
     bool SetFont(const std::string &fontName);
@@ -75,7 +79,7 @@ public:
     bool AddCustom(const std::vector<std::string> &extraFonts);
     /** Load all music fonts available in the resource directory */
     bool LoadAll();
-    /** Set the fallback font (Leipzig or Bravura) when some glyphs are missing in the current font */
+    /** Set a registered music fallback family. Bravura remains the final fallback. */
     void SetFallbackFont(const std::string &fontName);
     /** Get the fallback font name */
     std::string GetFallbackFont() const { return m_fallbackFontName; }
@@ -83,7 +87,7 @@ public:
     /** Select a particular font */
     bool SetCurrentFont(const std::string &fontName, bool allowLoading = false);
     std::string GetCurrentFont() const { return m_currentFontName; }
-    bool IsFontLoaded(const std::string &fontName) const { return m_loadedFonts.find(fontName) != m_loadedFonts.end(); }
+    bool IsFontLoaded(const std::string &fontName) const;
     ///@}
 
     /**
@@ -92,6 +96,8 @@ public:
     ///@{
     /** Returns the glyph (if exists) for a glyph code in the current SMuFL font */
     const Glyph *GetGlyph(char32_t smuflCode) const;
+    /** Returns a music glyph using an explicit registered family. */
+    const Glyph *GetGlyph(char32_t smuflCode, const std::string &fontName) const;
     /** Returns the glyph (if exists) for a glyph name in the current SMuFL font */
     const Glyph *GetGlyph(const std::string &smuflName) const;
     /** Returns the glyph (if exists) for a glyph name in the current SMuFL font */
@@ -114,8 +120,17 @@ public:
     ///@{
     /** Set current text style*/
     void SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle) const;
-    /** Returns the glyph (if exists) for the text font (bounding box and ASCII only) */
+    /** Shape text using the family and style requested by a drawing font. */
+    std::optional<FontStore::ShapedRun> ShapeText(const FontInfo &font, const std::u32string &text) const;
+    /** Return the scaled advance of a shaped run, including letter spacing. */
+    int GetTextAdvance(const FontInfo &font, const FontStore::ShapedRun &run) const;
+    /** Returns a glyph from the selected runtime text face. */
     const Glyph *GetTextGlyph(char32_t code) const;
+    /** Returns a glyph from the runtime face selected by a drawing font. */
+    const Glyph *GetTextGlyph(char32_t code, const FontInfo &font) const;
+    /** Returns a cached runtime glyph by immutable face identity and glyph ID. */
+    const Glyph *GetRuntimeGlyph(
+        FontStore::FaceIdentity face, uint32_t glyphId, const std::string &code = std::string()) const;
     /** Returns true if the specified font is loaded and it contains the requested glyph */
     bool FontHasGlyphAvailable(const std::string &fontName, char32_t smuflCode) const;
     ///@}
@@ -169,7 +184,7 @@ private:
 
     bool LoadFont(const std::string &fontName, ZipFileReader *zipFile = NULL);
 
-    /** Init the text font (bounding boxes and ASCII only) */
+    /** Legacy ZIP-adapter text metric loader. */
     bool InitTextFont(const std::string &fontName, const StyleAttributes &style);
 
     const GlyphTable &GetCurrentGlyphTable() const { return m_loadedFonts.at(m_currentFontName).GetGlyphTable(); };
@@ -181,17 +196,25 @@ private:
     std::string m_fallbackFontName;
     std::map<std::string, LoadedFont> m_loadedFonts;
     std::string m_currentFontName;
+    std::string m_textFontName;
 
-    /** A text font used for bounding box calculations */
+    /** Text metrics retained only for the deprecated ZIP adapter. */
     GlyphTextMap m_textFont;
     mutable StyleAttributes m_currentStyle;
     /**
      * A map of glyph name / code
      */
     GlyphNameTable m_glyphNameTable;
+    std::unordered_map<char32_t, std::string> m_glyphCodeNameTable;
 
     /** Cache of the last glyph that was looked up in loaded fonts */
     mutable std::optional<std::pair<char32_t, const Glyph *>> m_cachedGlyph;
+
+    /** Runtime glyph records contain metrics only; outlines remain lazy in FontStore. */
+    mutable std::unordered_map<uint64_t, std::unordered_map<uint32_t, Glyph>> m_runtimeGlyphs;
+
+    /** Runtime OpenType faces, metrics, outlines, and shaped text. */
+    FontStore m_fontStore;
 
     //----------------//
     // Static members //

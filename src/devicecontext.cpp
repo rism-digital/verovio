@@ -228,7 +228,7 @@ void DeviceContext::ReactivateGraphic()
 
 void DeviceContext::GetTextExtent(const std::string &string, TextExtend *extend, bool typeSize)
 {
-    std::u32string wtext(string.begin(), string.end());
+    const std::u32string wtext = UTF8to32(string);
     this->GetTextExtent(wtext, extend, typeSize);
 }
 
@@ -242,6 +242,27 @@ void DeviceContext::GetTextExtent(const std::u32string &string, TextExtend *exte
 
     extend->m_width = 0;
     extend->m_height = 0;
+
+    const FontInfo *font = m_fontStack.top();
+    const std::optional<FontStore::ShapedRun> run = resources->ShapeText(*font, string);
+    if (run) {
+        for (const FontStore::GlyphPlacement &placement : run->glyphs) {
+            const auto metrics = resources->GetFontStore().GetGlyphMetrics(placement.face, placement.glyphId);
+            if (metrics) {
+                const int top = metrics->yBearing + placement.offsetY;
+                const int bottom = top + metrics->height;
+                extend->m_ascent = std::max(extend->m_ascent,
+                    static_cast<int>(
+                        std::ceil(static_cast<double>(top) * font->GetPointSize() / placement.unitsPerEm)));
+                extend->m_descent = std::max(extend->m_descent,
+                    static_cast<int>(
+                        std::ceil(static_cast<double>(-bottom) * font->GetPointSize() / placement.unitsPerEm)));
+            }
+        }
+        extend->m_width = resources->GetTextAdvance(*font, *run);
+        extend->m_height = extend->m_ascent + extend->m_descent;
+        return;
+    }
 
     if (typeSize) {
         this->AddGlyphToTextExtend(resources->GetTextGlyph(L'p'), extend);
@@ -282,8 +303,10 @@ void DeviceContext::GetSmuflTextExtent(const std::u32string &string, TextExtend 
     extend->m_width = 0;
     extend->m_height = 0;
 
+    const std::string family
+        = m_fontStack.top()->GetFaceName().empty() ? resources->GetCurrentFont() : m_fontStack.top()->GetFaceName();
     for (char32_t c : string) {
-        const Glyph *glyph = resources->GetGlyph(c);
+        const Glyph *glyph = resources->GetGlyph(c, family);
         if (!glyph) {
             continue;
         }

@@ -382,16 +382,20 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         }
     }
 
-    FontInfo rendFont;
+    FontInfo rendFont = dc->HasFont() ? *dc->GetFont() : FontInfo();
     bool customFont = false;
     if (rend->HasFontname()) {
         rendFont.SetFaceName(rend->GetFontname().c_str());
         customFont = true;
     }
+    else if (rend->HasFontfam()) {
+        rendFont.SetFaceName(rend->GetFontfam().c_str());
+        customFont = true;
+    }
     if (rend->HasFontsize()) {
         data_FONTSIZE *fs = rend->GetFontsizeAlternate();
         if (fs->GetType() == FONTSIZE_fontSizeNumeric) {
-            rendFont.SetPointSize(fs->GetFontSizeNumeric());
+            rendFont.SetPointSize(this->ConvertFontSizeNumeric(*fs, params.m_staffSize));
         }
         else if (fs->GetType() == FONTSIZE_term) {
             const int percent = fs->GetPercentForTerm();
@@ -460,7 +464,12 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
 
     // Do not render enclosings if the content is empty
     if (rend->HasEnclosure()) {
-        params.m_enclosedRend.push_back(rend);
+        const FontInfo *font = dc->GetFont();
+        const int fontBottom = params.m_y + m_doc->GetTextGlyphDescender(U'p', font, false);
+        const int hTop = m_doc->GetTextGlyphDescender(U'h', font, false) + m_doc->GetTextGlyphHeight(U'h', font, false);
+        const int tTop = m_doc->GetTextGlyphDescender(U't', font, false) + m_doc->GetTextGlyphHeight(U't', font, false);
+        const int fontTop = params.m_y + std::max(hTop, tTop);
+        params.m_enclosedRend.push_back({ rend, fontBottom, fontTop });
         params.m_x = rend->GetContentRight() + m_doc->GetDrawingUnit(100);
         params.m_explicitPosition = true;
         params.m_enclose = rend->GetRend();
@@ -604,7 +613,7 @@ void View::DrawSymbol(DeviceContext *dc, Symbol *symbol, TextDrawingParams &para
     if (symbol->HasFontsize()) {
         data_FONTSIZE *fs = symbol->GetFontsizeAlternate();
         if (fs->GetType() == FONTSIZE_fontSizeNumeric) {
-            symbolFont.SetPointSize(fs->GetFontSizeNumeric());
+            symbolFont.SetPointSize(this->ConvertFontSizeNumeric(*fs, params.m_staffSize));
         }
         else if (fs->GetType() == FONTSIZE_term) {
             const int percent = fs->GetPercentForTerm();
@@ -651,26 +660,25 @@ void View::DrawRunningElements(DeviceContext *dc, Page *page)
     }
 
     RunningElement *header = page->GetHeader();
+    const ScoreDefInterface *textStyle = &page->m_drawingScoreDef;
     if (header) {
-        this->DrawTextLayoutElement(dc, header);
+        this->DrawTextLayoutElement(dc, header, textStyle);
     }
     RunningElement *footer = page->GetFooter();
     if (footer) {
-        this->DrawTextLayoutElement(dc, footer);
+        this->DrawTextLayoutElement(dc, footer, textStyle);
     }
 }
 
-void View::DrawTextLayoutElement(DeviceContext *dc, TextLayoutElement *textLayoutElement)
+void View::DrawTextLayoutElement(
+    DeviceContext *dc, TextLayoutElement *textLayoutElement, const ScoreDefInterface *textStyle)
 {
     assert(dc);
     assert(textLayoutElement);
 
     dc->StartGraphic(textLayoutElement, "", textLayoutElement->GetID());
 
-    FontInfo textElementFont;
-    if (!dc->UseGlobalStyling()) {
-        textElementFont.SetFaceName(m_doc->GetResources().GetTextFont());
-    }
+    FontInfo textElementFont = m_doc->GetDrawingTextFont(100, textStyle);
 
     TextDrawingParams params;
 
@@ -695,7 +703,7 @@ void View::DrawTextLayoutElement(DeviceContext *dc, TextLayoutElement *textLayou
 
 void View::DrawDiv(DeviceContext *dc, Div *div, System *system)
 {
-    this->DrawTextLayoutElement(dc, div);
+    this->DrawTextLayoutElement(dc, div, system ? system->GetDrawingScoreDef() : nullptr);
 }
 
 } // namespace vrv

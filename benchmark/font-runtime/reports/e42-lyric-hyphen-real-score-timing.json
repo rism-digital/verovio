@@ -1,0 +1,24 @@
+{
+  "fixtures": [
+    {
+      "fixture": "/Users/simon/Downloads/Gott gab uns Atem_Prototyp01_Gitarrenbuch_custom-font-test.mei",
+      "attempts": 2,
+      "cold_ms": {
+        "baseline": 26.928812,
+        "head": 27.3687085,
+        "delta_percent": 1.6335533108553069,
+        "pass": true
+      },
+      "warm_ms": {
+        "baseline": 0.004229,
+        "head": 0.0041495,
+        "delta_percent": -1.8798770394892306,
+        "pass": true
+      }
+    }
+  ],
+  "gates": {
+    "cold_percent": 5.0,
+    "warm_percent": 3.0
+  }
+}

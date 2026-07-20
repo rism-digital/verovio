@@ -1,5 +1,10 @@
 This is an NPM of the stable version of the Verovio JavaScript toolkit.
 
+The package includes `dist/verovio.data`, which contains the bundled runtime
+fonts and other resources. Keep that file beside the generated Verovio module
+when copying files out of the package. If a bundler publishes assets elsewhere,
+pass a `locateFile` option to the modularized module factory.
+
 Verovio is a fast, portable and lightweight library for engraving [Music Encoding Initiative (MEI)](http://www.music-encoding.org) music scores into SVG.
 
 See it running in the [MEI Viewer](http://www.verovio.org/mei-viewer.xhtml) and check out the [tutorial](http://www.verovio.org/tutorial.xhtml) for its web integration and for enabling user interaction.
@@ -46,6 +51,25 @@ createVerovioModule().then(VerovioModule => {
 
 This is the recommended way to use Verovio when creating a website or web app with bundlers like webpack or Vite or when using JavaScript frameworks like React or Vue.js.
 
+## Runtime font aliases
+
+WebAssembly cannot read arbitrary fonts installed on the user's computer.
+Fetch a static font as application data and register its bytes explicitly. An
+optional alias links the family name used by the MEI to the font's canonical
+OpenType family without duplicating the font or its glyph caches:
+
+```js
+const response = await fetch('/fonts/Quicksand-Regular.woff2');
+const bytes = new Uint8Array(await response.arrayBuffer());
+
+const canonicalFamily = verovioToolkit.registerTextFont(bytes, 'QS');
+// canonicalFamily is "Quicksand"; <rend fontname="QS"> now uses this face.
+```
+
+`registerMusicFont(bytes, smuflMetadata, alias)`, and the corresponding base64
+methods, accept the same optional final alias. Aliases are exact and
+case-sensitive.
+
 ## Usage with CommonJS
 
 Alternatively this package also exports a version compatible with CommonJS
@@ -62,4 +86,3 @@ Since version 3.11.0 the npm package provides an additional module with Humdrum 
 ```js
 import createVerovioModule from 'verovio/wasm-hum';
 ```
-
