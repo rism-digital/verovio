@@ -6415,16 +6415,16 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetAboveorder(data_STAFFITEM aboveorder_) { m_aboveorder = aboveorder_; }
-    data_STAFFITEM GetAboveorder() const { return m_aboveorder; }
+    void SetAboveorder(data_STAFFITEM_List aboveorder_) { m_aboveorder = aboveorder_; }
+    data_STAFFITEM_List GetAboveorder() const { return m_aboveorder; }
     bool HasAboveorder() const;
     //
-    void SetBeloworder(data_STAFFITEM beloworder_) { m_beloworder = beloworder_; }
-    data_STAFFITEM GetBeloworder() const { return m_beloworder; }
+    void SetBeloworder(data_STAFFITEM_List beloworder_) { m_beloworder = beloworder_; }
+    data_STAFFITEM_List GetBeloworder() const { return m_beloworder; }
     bool HasBeloworder() const;
     //
-    void SetBetweenorder(data_STAFFITEM betweenorder_) { m_betweenorder = betweenorder_; }
-    data_STAFFITEM GetBetweenorder() const { return m_betweenorder; }
+    void SetBetweenorder(data_STAFFITEM_List betweenorder_) { m_betweenorder = betweenorder_; }
+    data_STAFFITEM_List GetBetweenorder() const { return m_betweenorder; }
     bool HasBetweenorder() const;
     ///@}
 
@@ -6433,14 +6433,14 @@ private:
      * Describes vertical order of items printed above a staff, from closest to
      * farthest away from the staff.
      **/
-    data_STAFFITEM m_aboveorder;
+    data_STAFFITEM_List m_aboveorder;
     /**
      * Describes vertical order of items printed below a staff, from closest to
      * farthest away from the staff.
      **/
-    data_STAFFITEM m_beloworder;
+    data_STAFFITEM_List m_beloworder;
     /** Describes vertical order of items printed between staves, from top to bottom. **/
-    data_STAFFITEM m_betweenorder;
+    data_STAFFITEM_List m_betweenorder;
 };
 
 //----------------------------------------------------------------------------

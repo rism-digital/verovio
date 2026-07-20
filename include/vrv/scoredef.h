@@ -40,7 +40,7 @@ class StaffDef;
  * information about clef, key signature, etc. This information can be either
  * attributes (implemented) of the ScoreDefInterface or elements (not implemented).
  */
-class ScoreDefElement : public Object, public ScoreDefInterface, public AttTyped {
+class ScoreDefElement : public Object, public ScoreDefInterface, public AttStaffItems, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, and other standard methods.
@@ -70,6 +70,15 @@ public:
     bool HasMeterSigInfo(int depth = 1) const;
     bool HasMeterSigGrpInfo(int depth = 1) const;
     ///@}
+
+    /**
+     * Copy staff-item orders that are explicitly set on the source.
+     * Return true if at least one order was copied.
+     */
+    bool ReplaceStaffItemOrders(const ScoreDefElement *source);
+
+    /** Return the explicitly set order for the given placement, or an empty list. */
+    data_STAFFITEM_List GetStaffItemOrder(data_STAFFREL place) const;
 
     /**
      * @name Get a copy of the clef, keysig, mensur and meterSig.
@@ -206,6 +215,12 @@ public:
      * Return all the \@n values of the staffDef in a scoreDef
      */
     std::vector<int> GetStaffNs() const;
+
+    /**
+     * Return the effective staff-item order for a staff and placement.
+     * A staffDef value takes precedence over the scoreDef value.
+     */
+    data_STAFFITEM_List GetStaffItemOrder(int staffN, data_STAFFREL place) const;
 
     /**
      * Set the redraw flag to all staffDefs.

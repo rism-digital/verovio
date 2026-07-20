@@ -294,7 +294,8 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitScoreDef(ScoreDef *scoreDef)
     // m_setAsDrawing to true so it will then be taken into account at the next measure
     if (scoreDef->HasClefInfo(UNLIMITED_DEPTH) || scoreDef->HasKeySigInfo(UNLIMITED_DEPTH)
         || scoreDef->HasMensurInfo(UNLIMITED_DEPTH) || scoreDef->HasMeterSigGrpInfo(UNLIMITED_DEPTH)
-        || scoreDef->HasMeterSigInfo(UNLIMITED_DEPTH)) {
+        || scoreDef->HasMeterSigInfo(UNLIMITED_DEPTH) || scoreDef->HasAboveorder() || scoreDef->HasBeloworder()
+        || scoreDef->HasBetweenorder()) {
         m_upcomingScoreDef.ReplaceDrawingValues(scoreDef);
         m_upcomingScoreDef.m_insertScoreDef = true;
     }
