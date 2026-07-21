@@ -22,7 +22,11 @@ namespace vrv {
 /**
  * This class models the MEI <fing> element.
  */
-class Fing : public ControlElement, public TimePointInterface, public TextDirInterface, public AttNNumberLike {
+class Fing : public ControlElement,
+             public TimePointInterface,
+             public TextDirInterface,
+             public AttNNumberLike,
+             public AttVerticalGroup {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
