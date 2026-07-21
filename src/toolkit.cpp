@@ -1272,7 +1272,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
         Resources &resources = m_doc.GetResourcesForModification();
         resources.LoadAll();
     }
-    if (json.has<jsonxx::String>("fontTextLiberation")) {
+    if (json.has<jsonxx::Boolean>("fontTextLiberation")) {
         Resources &resources = m_doc.GetResourcesForModification();
         resources.UseLiberationTextFont(m_options->m_fontTextLiberation.GetValue());
     }
