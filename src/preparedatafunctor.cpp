@@ -1611,24 +1611,32 @@ PrepareFloatingGrpsFunctor::PrepareFloatingGrpsFunctor()
 
 FunctorCode PrepareFloatingGrpsFunctor::VisitDir(Dir *dir)
 {
-    if (dir->HasVgrp()) {
-        dir->SetDrawingGrpId(-dir->GetVgrp());
-    }
+    this->VisitFloatingObject(dir);
 
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareFloatingGrpsFunctor::VisitDynam(Dynam *dynam)
 {
-    if (dynam->HasVgrp()) {
-        dynam->SetDrawingGrpId(-dynam->GetVgrp());
-    }
+    this->VisitFloatingObject(dynam);
 
     // Keep it for linking only if start is resolved
     if (!dynam->GetStart()) return FUNCTOR_CONTINUE;
 
     m_dynams.push_back(dynam);
 
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareFloatingGrpsFunctor::VisitFloatingObject(FloatingObject *floatingObject)
+{
+    if (!floatingObject->HasAttClass(ATT_VERTICALGROUP)) return FUNCTOR_CONTINUE;
+
+    AttVerticalGroup *verticalGroup = dynamic_cast<AttVerticalGroup *>(floatingObject);
+    assert(verticalGroup);
+    if (verticalGroup->HasVgrp()) {
+        floatingObject->SetDrawingGrpId(-verticalGroup->GetVgrp());
+    }
     return FUNCTOR_CONTINUE;
 }
 
@@ -1650,9 +1658,7 @@ FunctorCode PrepareFloatingGrpsFunctor::VisitEnding(Ending *ending)
 
 FunctorCode PrepareFloatingGrpsFunctor::VisitHairpin(Hairpin *hairpin)
 {
-    if (hairpin->HasVgrp()) {
-        hairpin->SetDrawingGrpId(-hairpin->GetVgrp());
-    }
+    this->VisitFloatingObject(hairpin);
 
     // Only try to link them if start and end are resolved
     if (!hairpin->GetStart() || !hairpin->GetEnd()) return FUNCTOR_CONTINUE;
@@ -1664,6 +1670,9 @@ FunctorCode PrepareFloatingGrpsFunctor::VisitHairpin(Hairpin *hairpin)
 
 FunctorCode PrepareFloatingGrpsFunctor::VisitHarm(Harm *harm)
 {
+    this->VisitFloatingObject(harm);
+    if (harm->GetDrawingGrpId() < 0) return FUNCTOR_CONTINUE;
+
     std::string n = harm->GetN();
     // If there is no @n on harm we use the first @staff value as negative
     // This will not work if @staff has more than one staff id, but this is probably not going to be used
@@ -1761,9 +1770,7 @@ FunctorCode PrepareFloatingGrpsFunctor::VisitMeasureEnd(Measure *measure)
 
 FunctorCode PrepareFloatingGrpsFunctor::VisitPedal(Pedal *pedal)
 {
-    if (pedal->HasVgrp()) {
-        pedal->SetDrawingGrpId(-pedal->GetVgrp());
-    }
+    this->VisitFloatingObject(pedal);
 
     return FUNCTOR_CONTINUE;
 }

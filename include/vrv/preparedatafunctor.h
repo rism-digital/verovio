@@ -942,6 +942,7 @@ public:
     FunctorCode VisitDir(Dir *dir) override;
     FunctorCode VisitDynam(Dynam *dynam) override;
     FunctorCode VisitEnding(Ending *ending) override;
+    FunctorCode VisitFloatingObject(FloatingObject *floatingObject) override;
     FunctorCode VisitHairpin(Hairpin *hairpin) override;
     FunctorCode VisitHarm(Harm *harm) override;
     FunctorCode VisitMeasure(Measure *measure) override;
