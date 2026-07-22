@@ -3174,7 +3174,9 @@ void MusicXmlInput::ReadMusicXmlNote(
                     try {
                         for (const auto &current : currentAccids) {
                             // Avoid adding empty accidentals
-                            if ((current.m_accid == ACCIDENTAL_WRITTEN_NONE || current.m_accid == ACCIDENTAL_WRITTEN_n) && current.m_glyphName.empty()) continue;
+                            if ((current.m_accid == ACCIDENTAL_WRITTEN_NONE || current.m_accid == ACCIDENTAL_WRITTEN_n)
+                                && current.m_glyphName.empty())
+                                continue;
 
                             Accid *accid = new Accid();
                             note->AddChild(accid);
