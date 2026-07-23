@@ -209,6 +209,13 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         }
         LogWarning("Action insertCursorByPitch available in CMN only");
     }
+    else if (action == "insertCursorByType") {
+        EditorToolkitCMN *editorToolkitCMN = dynamic_cast<EditorToolkitCMN *>(this);
+        if (editorToolkitCMN) {
+            return editorToolkitCMN->ParseEditorCMNAction(json);
+        }
+        LogWarning("Action insertCursorByType available in CMN only");
+    }
     else if (action == "insertMeasure") {
         EditorToolkitCMN *editorToolkitCMN = dynamic_cast<EditorToolkitCMN *>(this);
         if (editorToolkitCMN) {
@@ -294,8 +301,9 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
     else if (action == "updateCursor") {
         bool restMode;
         bool chordMode;
-        if (this->ParseUpdateCursorAction(json.get<jsonxx::Object>("param"), restMode, chordMode)) {
-            return (this->UpdateCursor(restMode, chordMode));
+        Cursor::TieMode tieMode;
+        if (this->ParseUpdateCursorAction(json.get<jsonxx::Object>("param"), restMode, chordMode, tieMode)) {
+            return (this->UpdateCursor(restMode, chordMode, tieMode));
         }
         LogWarning("Could not parse the setCursor action");
     }
@@ -484,15 +492,22 @@ bool EditorToolkitShared::ParseSetCursorAction(
     return true;
 }
 
-bool EditorToolkitShared::ParseUpdateCursorAction(const jsonxx::Object &param, bool &restMode, bool &chordMode)
+bool EditorToolkitShared::ParseUpdateCursorAction(
+    const jsonxx::Object &param, bool &restMode, bool &chordMode, Cursor::TieMode &tieMode)
 {
     chordMode = false;
     restMode = false;
+    tieMode = Cursor::TieMode::TIE_NONE;
 
-    if (param.has<jsonxx::Boolean>("chordMode"))
+    if (param.has<jsonxx::Boolean>("chordMode")) {
         chordMode = param.get<jsonxx::Boolean>("chordMode");
-    else if (param.has<jsonxx::Boolean>("restMode"))
+    }
+    else if (param.has<jsonxx::Boolean>("restMode")) {
         restMode = param.get<jsonxx::Boolean>("restMode");
+    }
+    else if (param.has<jsonxx::String>("tieMode")) {
+        tieMode = (param.get<jsonxx::String>("tieMode") == "tie") ? Cursor::TieMode::TIE : Cursor::TieMode::COPY;
+    }
 
     return true;
 }
@@ -796,13 +811,16 @@ bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode in
     return true;
 }
 
-bool EditorToolkitShared::UpdateCursor(bool restMode, bool chordMode)
+bool EditorToolkitShared::UpdateCursor(bool restMode, bool chordMode, Cursor::TieMode tieMode)
 {
     if (!InsertMode()) return true;
 
     if (chordMode) {
         m_cursor->SetRestMode(false);
         m_cursor->SetChordMode(Cursor::ChordMode::NEW);
+    }
+    else if (tieMode != Cursor::TieMode::TIE_NONE) {
+        m_cursor->SetTieMode(tieMode);
     }
     else if (m_cursor->GetInputMode() == Cursor::PITCH_FIRST) {
         m_cursor->SetRestMode(restMode);
@@ -829,10 +847,10 @@ bool EditorToolkitShared::ResetCursor(bool maintainChordMode)
         }
         if (m_cursor) {
             if (maintainChordMode) {
-                this->UpdateCursor(false, true);
+                this->UpdateCursor(false, true, Cursor::TieMode::TIE_NONE);
             }
             else {
-                m_cursor->SetChordMode(Cursor::ChordMode::NONE);
+                m_cursor->SetChordMode(Cursor::ChordMode::CHORD_NONE);
             }
         }
         return true;
@@ -1732,7 +1750,7 @@ void EditorToolkitShared::MoveCursor(LayerElement *element, bool maintainChordMo
     }
     else {
         // Exit inputMode
-        m_cursor->SetChordMode(Cursor::ChordMode::NONE);
+        m_cursor->SetChordMode(Cursor::ChordMode::CHORD_NONE);
         this->ResetCursor(false);
     }
 }

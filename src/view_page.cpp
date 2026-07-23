@@ -1625,6 +1625,7 @@ void View::DrawCursor(DeviceContext *dc, LayerElement *element, Layer *layer, St
     const int yC1 = staff->GetDrawingY() + cursor->GetYRelPitchC();
     const int yC2 = yC1 + 6 * unit;
 
+
     if (cursor->GetInputMode() == Cursor::DURATION_FIRST) {
         const int octX = x + unit;
         const int octSize = staffSize * .8;
@@ -1684,22 +1685,57 @@ void View::DrawCursor(DeviceContext *dc, LayerElement *element, Layer *layer, St
     else {
         const int y = (isNote) ? cursor->GetDrawingY() : staff->GetDrawingY() + 3 * unit;
         if (isNote) {
-            this->DrawNote(dc, layer->GetCursor(), layer, staff, measure);
+            
+            if (cursor->IsTieMode()) {
+                const int y = staff->GetDrawingY() + 1 * unit;
+                const int cursorSize = staffSize * .7;
 
-            const int octX = x - .5 * unit;
-            const int octSize = staffSize * .8;
-            int width = m_doc->GetDrawingStemWidth(octSize);
-            this->DrawVerticalLine(dc, yC1, yC2, octX, width);
-            this->DrawDot(dc, octX, yC1, octSize);
-            this->DrawDot(dc, octX, yC2, octSize);
+                FontInfo labelTxt;
+                if (!dc->UseGlobalStyling()) {
+                    labelTxt.SetFaceName(m_doc->GetResources().GetTextFont());
+                }
+                labelTxt.SetPointSize(m_doc->GetDrawingLyricFont(cursorSize)->GetPointSize());
+                labelTxt.SetWeight(FONTWEIGHT_bold);
 
-            if (cursor->HasAccid()) {
-                this->DrawAccid(dc, cursor->GetAccidElement(), layer, staff, measure);
+                TextDrawingParams params;
+                params.m_x = x;
+                params.m_y = y;
+                params.m_pointSize = labelTxt.GetPointSize();
+
+                dc->SetFont(&labelTxt);
+
+                dc->StartText(this->ToDeviceContextX(params.m_x), this->ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_center);
+                std::u32string str;
+                str.push_back((cursor->GetTieMode() == Cursor::TieMode::COPY) ? U'⧉' : U'⏜');
+                dc->DrawText(UTF32to8(str), str);
+                dc->EndText();
+            
+                dc->ResetFont();
+                
+                if (cursor->HasDots()) {
+                    int dotsX = x + 1.5 * cursor->GetDrawingRadius(m_doc);
+                    this->DrawDotsPart(dc, dotsX, y + unit, cursor->HasDots(), staff);
+                }
             }
-
-            if (cursor->HasDots()) {
-                int dotsX = x + 2.8 * cursor->GetDrawingRadius(m_doc);
-                this->DrawDotsPart(dc, dotsX, y, cursor->HasDots(), staff);
+            else {
+                
+                this->DrawNote(dc, layer->GetCursor(), layer, staff, measure);
+                
+                const int octX = x - .5 * unit;
+                const int octSize = staffSize * .8;
+                int width = m_doc->GetDrawingStemWidth(octSize);
+                this->DrawVerticalLine(dc, yC1, yC2, octX, width);
+                this->DrawDot(dc, octX, yC1, octSize);
+                this->DrawDot(dc, octX, yC2, octSize);
+                
+                if (cursor->HasAccid()) {
+                    this->DrawAccid(dc, cursor->GetAccidElement(), layer, staff, measure);
+                }
+                
+                if (cursor->HasDots()) {
+                    int dotsX = x + 2.8 * cursor->GetDrawingRadius(m_doc);
+                    this->DrawDotsPart(dc, dotsX, y, cursor->HasDots(), staff);
+                }
             }
         }
         else {

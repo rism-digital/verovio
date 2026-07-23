@@ -45,7 +45,8 @@ void Cursor::Reset()
 
     m_restMode = false;
     m_inputMode = InputMode::PITCH_FIRST;
-    m_chordMode = ChordMode::NONE;
+    m_chordMode = ChordMode::CHORD_NONE;
+    m_tieMode = TieMode::TIE_NONE;
 
     // Default pitch and duration
     this->SetPname(PITCHNAME_c);
@@ -59,6 +60,7 @@ void Cursor::CloneReset()
 
     this->ResetCursorAlignment();
     m_position = NULL;
+    m_tieMode = TieMode::TIE_NONE;
 
     m_accid.SetParent(this);
 }
@@ -126,7 +128,7 @@ void Cursor::ResetCursorAlignment()
 
 void Cursor::SetRestMode(bool restMode)
 {
-    m_chordMode = ChordMode::NONE;
+    m_chordMode = ChordMode::CHORD_NONE;
     m_restMode = restMode;
     // if (restMode) this->SetAccid(ACCIDENTAL_WRITTEN_NONE);
 }
@@ -144,6 +146,12 @@ void Cursor::SetChordMode(ChordMode chordMode)
 void Cursor::SetInputMode(InputMode intpuMode)
 {
     m_inputMode = intpuMode;
+}
+
+void Cursor::SetTieMode(TieMode tieMode)
+{
+    m_tieMode = tieMode;
+    m_restMode = false;
 }
 
 bool Cursor::Veto(const std::string &attribute) const

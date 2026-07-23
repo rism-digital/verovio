@@ -73,7 +73,8 @@ protected:
         const jsonxx::Object &param, std::string &elementId, std::string &attribute, std::string &value);
     bool ParseSetCursorAction(
         const jsonxx::Object &param, std::string &elementId, Cursor::InputMode &inputMode, bool &chordMode);
-    bool ParseUpdateCursorAction(const jsonxx::Object &param, bool &restMode, bool &chordMode);
+    bool ParseUpdateCursorAction(
+        const jsonxx::Object &param, bool &restMode, bool &chordMode, Cursor::TieMode &tieMode);
     bool ParseUpdatePitchAction(const jsonxx::Object &param, std::string &elementId, data_PITCHNAME &pname, int &oct,
         data_ACCIDENTAL_WRITTEN &accid, int &midi);
 
@@ -95,7 +96,7 @@ protected:
      */
     ///@{
     bool SetCursor(std::string &elementId, Cursor::InputMode inputMode, bool chordMode);
-    bool UpdateCursor(bool restMode, bool chordMode);
+    bool UpdateCursor(bool restMode, bool chordMode, Cursor::TieMode tieMode);
     bool ResetCursor(bool maintainChordMode);
     bool Delete(std::string &elementId, bool backspace);
     bool Drag(std::string &elementId, int x, int y);

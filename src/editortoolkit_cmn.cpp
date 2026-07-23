@@ -22,6 +22,7 @@
 #include "note.h"
 #include "rest.h"
 #include "staff.h"
+#include "tie.h"
 
 namespace vrv {
 
@@ -53,6 +54,14 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
             return (this->InsertCursorByPitch(pname, oct, accid, midi));
         }
         LogWarning("Could not parse the insertCursorByPitch action");
+    }
+    else if (action == "insertCursorByType") {
+        CursorInsertType insertType;
+        if (this->ParseInsertCursorByTypeAction(json.get<jsonxx::Object>("param"), insertType)) {
+            this->PrepareUndo();
+            return (this->InsertCursorByType(insertType));
+        }
+        LogWarning("Could not parse the insertCursorByType action");
     }
     else if (action == "insertMeasure") {
         std::string elementId;
@@ -135,6 +144,27 @@ bool EditorToolkitCMN::ParseInsertCursorByPitchAction(
     return true;
 }
 
+bool EditorToolkitCMN::ParseInsertCursorByTypeAction(const jsonxx::Object &param, CursorInsertType &insertType)
+{
+    insertType = CursorInsertType::CURSOR_INSERT_NONE;
+
+    if (!param.has<jsonxx::String>("type")) return false;
+
+    if (param.get<jsonxx::String>("type") == "rest") {
+        insertType = CURSOR_INSERT_REST;
+    }
+    else if (param.get<jsonxx::String>("type") == "tie") {
+        insertType = CURSOR_INSERT_TIE;
+    }
+    else if (param.get<jsonxx::String>("type") == "copy") {
+        insertType = CURSOR_INSERT_COPY;
+    }
+    else {
+        return false;
+    }
+    return true;
+}
+
 bool EditorToolkitCMN::ParseInsertMeasureAction(
     const jsonxx::Object &param, std::string &elementId, int &number, bool &insertBefore)
 {
@@ -210,6 +240,8 @@ bool EditorToolkitCMN::InsertCursorByDur(data_DURATION dur, int dots)
 {
     if (!this->InsertMode()) return false;
 
+    if (m_cursor->GetInputMode() != Cursor::InputMode::PITCH_FIRST) return false;
+
     data_PITCHNAME pname = (m_cursor->HasPname()) ? m_cursor->GetPname() : PITCHNAME_c;
     int oct = (m_cursor->HasOct()) ? m_cursor->GetOct() : 3;
     auto [accid, accidGes] = m_cursor->GetAccidValue();
@@ -218,7 +250,10 @@ bool EditorToolkitCMN::InsertCursorByDur(data_DURATION dur, int dots)
 
     std::string id = m_cursor->GetID();
 
-    if (m_cursor->IsRestMode()) {
+    if (m_cursor->IsTieMode()) {
+        return this->CopyCursorPosition(dur, dots, (m_cursor->GetTieMode() == Cursor::TieMode::TIE));
+    }
+    else if (m_cursor->IsRestMode()) {
         return this->InsertRest(id, dur, dots);
     }
     else {
@@ -230,7 +265,9 @@ bool EditorToolkitCMN::InsertCursorByPitch(data_PITCHNAME pname, int oct, data_A
 {
     if (!this->InsertMode()) return false;
 
-    if (midi != VRV_UNSET && midi != -1) {
+    if (m_cursor->GetInputMode() != Cursor::InputMode::DURATION_FIRST) return false;
+
+    if (midi != VRV_UNSET) {
         std::string placeholder = m_cursor->GetID();
         this->UpdatePitch(placeholder, PITCHNAME_NONE, VRV_UNSET, ACCIDENTAL_WRITTEN_NONE, midi);
         pname = m_cursor->GetPname();
@@ -243,12 +280,10 @@ bool EditorToolkitCMN::InsertCursorByPitch(data_PITCHNAME pname, int oct, data_A
     data_ACCIDENTAL_GESTURAL accidGes = ACCIDENTAL_GESTURAL_NONE;
     if (accid == ACCIDENTAL_WRITTEN_NONE) {
         // Since we did not know the pitch yet we need to calculate that actual accid
-        if (m_cursor->GetInputMode() == Cursor::InputMode::DURATION_FIRST) {
-            if (pname != PITCHNAME_NONE) m_cursor->SetPname(pname);
-            auto [actualAccid, isImplicit] = this->GetActualAccid(m_cursor, m_cursor->GetAccid());
-            m_cursor->SetAccid(actualAccid);
-            m_cursor->SetAccidImplicit(isImplicit);
-        }
+        if (pname != PITCHNAME_NONE) m_cursor->SetPname(pname);
+        auto [actualAccid, isImplicit] = this->GetActualAccid(m_cursor, m_cursor->GetAccid());
+        m_cursor->SetAccid(actualAccid);
+        m_cursor->SetAccidImplicit(isImplicit);
         const auto value = m_cursor->GetAccidValue();
         accid = value.first;
         accidGes = value.second;
@@ -259,12 +294,26 @@ bool EditorToolkitCMN::InsertCursorByPitch(data_PITCHNAME pname, int oct, data_A
 
     std::string id = m_cursor->GetID();
 
-    if (midi == -1) {
-        m_cursor->SetChordMode(Cursor::ChordMode::NONE);
+    return this->InsertNote(id, pname, oct, accid, accidGes, dur, dots, m_cursor->IsChordMode());
+}
+
+bool EditorToolkitCMN::InsertCursorByType(CursorInsertType insertType)
+{
+    if (!this->InsertMode()) return false;
+
+    if (m_cursor->GetInputMode() != Cursor::InputMode::DURATION_FIRST) return false;
+
+    data_DURATION dur = (m_cursor->HasDur()) ? m_cursor->GetDur() : DURATION_4;
+    int dots = (m_cursor->HasDots()) ? m_cursor->GetDots() : VRV_UNSET;
+
+    std::string id = m_cursor->GetID();
+
+    if (insertType == CURSOR_INSERT_REST) {
+        m_cursor->SetChordMode(Cursor::ChordMode::CHORD_NONE);
         return this->InsertRest(id, dur, dots);
     }
     else {
-        return this->InsertNote(id, pname, oct, accid, accidGes, dur, dots, m_cursor->IsChordMode());
+        return (this->CopyCursorPosition(m_cursor->GetDur(), m_cursor->GetDots(), (insertType == CURSOR_INSERT_TIE)));
     }
 }
 
@@ -344,26 +393,8 @@ bool EditorToolkitCMN::InsertNote(const std::string &elementId, data_PITCHNAME p
         if (note->IsChordTone()) target = note->IsChordTone();
     }
 
-    Object *previousElement = NULL;
-    Object *targetContainer = NULL;
-    if (!target->Is(LAYER)) {
-        Object *targetParent = target->GetParent();
-        // Inserting a note within a tuplet or a beam
-        if (targetParent && targetParent->IsAnyOf(std::array{ BEAM, TUPLET }) && targetParent->GetLast() != target) {
-            previousElement = target;
-            targetContainer = targetParent;
-        }
-        // Otherwise always insert in the layer
-        else {
-            previousElement = target->GetLastAncestorNot(LAYER);
-            if (!previousElement) return false;
-            targetContainer = previousElement->GetParent();
-            assert(targetContainer && targetContainer->Is(LAYER));
-        }
-    }
-    else {
-        targetContainer = target;
-    }
+    auto [targetContainer, previousElement] = this->GetTargetContainerFor(target);
+    if (!targetContainer) return false;
 
     Note *note = vrv_cast<Note *>(this->PrepareInsertion(targetContainer, "note"));
     if (!note) return false;
@@ -407,6 +438,31 @@ bool EditorToolkitCMN::InsertNote(const std::string &elementId, data_PITCHNAME p
     }
 
     return true;
+}
+
+std::pair<Object *, Object *> EditorToolkitCMN::GetTargetContainerFor(Object *target)
+{
+    Object *previousElement = NULL;
+    Object *targetContainer = NULL;
+    if (!target->Is(LAYER)) {
+        Object *targetParent = target->GetParent();
+        // Inserting a note within a tuplet or a beam
+        if (targetParent && targetParent->IsAnyOf(std::array{ BEAM, TUPLET }) && targetParent->GetLast() != target) {
+            previousElement = target;
+            targetContainer = targetParent;
+        }
+        // Otherwise always insert in the layer
+        else {
+            previousElement = target->GetLastAncestorNot(LAYER);
+            if (!previousElement) return { NULL, NULL };
+            targetContainer = previousElement->GetParent();
+            assert(targetContainer && targetContainer->Is(LAYER));
+        }
+    }
+    else {
+        targetContainer = target;
+    }
+    return { targetContainer, previousElement };
 }
 
 bool EditorToolkitCMN::InsertNoteInChordMode(const std::string &elementId, data_PITCHNAME pname, int oct,
@@ -586,7 +642,7 @@ void EditorToolkitCMN::AutoBeam(LayerElement *noteOrRest)
 
     // Not sure we actually want to autobeam rest - disabled for now
     // if (!noteOrRest->IsAnyOf(std::array{NOTE, REST})) return;
-    if (!noteOrRest->Is(NOTE)) return;
+    if (!noteOrRest->IsAnyOf(std::array{ CHORD, NOTE })) return;
 
     Layer *layer = vrv_cast<Layer *>(noteOrRest->GetFirstAncestor(LAYER));
     assert(layer);
@@ -657,6 +713,108 @@ void EditorToolkitCMN::AutoBeam(LayerElement *noteOrRest)
         result->MoveItselfTo(beam);
         noteOrRest->MoveItselfTo(beam);
         previousParent->ClearRelinquishedChildren();
+    }
+}
+
+bool EditorToolkitCMN::CopyCursorPosition(data_DURATION dur, int dots, bool tie)
+{
+    if (!this->InsertMode()) return false;
+
+    const LayerElement *copyFrom = (m_cursor->HasPosition()) ? m_cursor->GetPosition() : NULL;
+    if (!copyFrom) {
+        const Layer *layer = vrv_cast<const Layer *>(m_cursor->GetParent());
+        assert(layer);
+        const Layer *previousLayer = this->GetPreviousLayer(layer);
+        if (previousLayer) {
+            ClassIdsComparison comparison({ CHORD, NOTE });
+            copyFrom = vrv_cast<const LayerElement *>(
+                previousLayer->FindDescendantByComparison(&comparison, UNLIMITED_DEPTH, BACKWARD));
+        }
+    }
+
+    if (!copyFrom || !copyFrom->IsAnyOf(std::array{ CHORD, NOTE })) return false;
+
+    // Make sure we copy the whole chord
+    if (copyFrom->Is(NOTE)) {
+        const Note *note = vrv_cast<const Note *>(copyFrom);
+        if (note->IsChordTone()) copyFrom = note->IsChordTone();
+    }
+
+    LayerElement *copy = vrv_cast<LayerElement *>(copyFrom->Clone());
+    copy->CloneReset();
+    DurationInterface *durInterface = copy->GetDurationInterface();
+    assert(durInterface);
+    durInterface->SetDur(dur);
+    durInterface->SetDots(dots);
+
+    Object *target = (m_cursor->HasPosition()) ? m_cursor->GetPosition() : m_cursor->GetParent();
+    if (target->Is(NOTE)) {
+        Note *note = vrv_cast<Note *>(target);
+        if (note->IsChordTone()) target = note->IsChordTone();
+    }
+
+    auto [targetContainer, previousElement] = this->GetTargetContainerFor(target);
+    if (!targetContainer) return false;
+
+    if (previousElement) {
+        targetContainer->InsertAfter(previousElement, copy);
+    }
+    else {
+        targetContainer->InsertChild(copy, 0);
+    }
+    if (tie) TieElements(copyFrom, copy);
+
+    if (copy->IsInBeam()) {
+        durInterface->SetDur(std::max(DURATION_8, dur));
+    }
+    else if (durInterface->GetDur() > DURATION_4) {
+        this->AutoBeam(copy);
+    }
+
+    this->ClearContext();
+    this->SetEditStatus();
+
+    this->MoveCursor(copy);
+    if (m_cursor->GetInputMode() == Cursor::InputMode::DURATION_FIRST) {
+        m_cursor->SetAccid(ACCIDENTAL_WRITTEN_NONE);
+        m_cursor->SetAccidImplicit(false);
+    }
+
+    return true;
+}
+
+void EditorToolkitCMN::TieElements(const Object *start, const Object *end)
+{
+    assert(start);
+    assert(end);
+
+    // Make sure the tie is between notes or between chords
+    if (!start->IsAnyOf(std::array{ CHORD, NOTE })) return;
+    if (!end->IsAnyOf(std::array{ CHORD, NOTE })) return;
+    if (start->GetClassId() != end->GetClassId()) return;
+
+    Object *measure = const_cast<Object *>(start->GetFirstAncestor(MEASURE));
+    assert(measure);
+
+    if (end->Is(CHORD)) {
+        ListOfConstObjects startNotes = start->FindAllDescendantsByType(NOTE);
+        ListOfConstObjects endNotes = end->FindAllDescendantsByType(NOTE);
+        // No note, or not the same number of notes, which should never happen because tied chords are copied
+        if (startNotes.empty() || (startNotes.size() != endNotes.size())) return;
+        ListOfConstObjects::const_iterator startIter, endIter;
+        for (startIter = startNotes.begin(), endIter = endNotes.begin(); startIter != startNotes.end();
+            ++startIter, ++endIter) {
+            Tie *tie = new Tie();
+            measure->AddChild(tie);
+            tie->SetStartid("#" + (*startIter)->GetID());
+            tie->SetEndid("#" + (*endIter)->GetID());
+        }
+    }
+    else {
+        Tie *tie = new Tie();
+        measure->AddChild(tie);
+        tie->SetStartid("#" + start->GetID());
+        tie->SetEndid("#" + end->GetID());
     }
 }
 

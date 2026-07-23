@@ -63,15 +63,21 @@ public:
     bool IsRestMode() const { return m_restMode; }
     void SetRestMode(bool restMode);
 
-    enum ChordMode : int8_t { NONE = 0, NEW, EDIT_NEW, EDIT_EXISTING };
+    enum ChordMode : int8_t { CHORD_NONE = 0, NEW, EDIT_NEW, EDIT_EXISTING };
 
     ChordMode GetChordMode() const { return m_chordMode; }
     void SetChordMode(ChordMode chordMode);
-    bool IsChordMode() const { return (m_chordMode != ChordMode::NONE); }
+    bool IsChordMode() const { return (m_chordMode != ChordMode::CHORD_NONE); }
     bool IsChordEditMode() const
     {
         return (m_chordMode == ChordMode::EDIT_NEW) || (m_chordMode == ChordMode::EDIT_EXISTING);
     }
+
+    enum TieMode : int8_t { TIE_NONE = 0, TIE, COPY };
+
+    TieMode GetTieMode() const { return m_tieMode; }
+    void SetTieMode(TieMode tieMode);
+    bool IsTieMode() const { return (m_tieMode != TieMode::TIE_NONE); }
 
     enum InputMode : int8_t { PITCH_FIRST = 0, DURATION_FIRST };
 
@@ -117,6 +123,8 @@ private:
     InputMode m_inputMode;
     /** yRel for pitch C */
     int m_yRelPitchC;
+    /** A field indicating the tieMode status */
+    TieMode m_tieMode;
 };
 
 } // namespace vrv
