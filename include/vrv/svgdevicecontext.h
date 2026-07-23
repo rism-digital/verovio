@@ -358,6 +358,8 @@ private:
 
     bool m_committed; // did we flushed the file?
     int m_originX, m_originY;
+    /** Current text baseline, used to express vertical moves as relative SVG dy values. */
+    int m_textY;
 
     // Here we hold references to all different glyphs used so far,
     // including any glyph for the same code but from different fonts.
