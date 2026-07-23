@@ -3183,7 +3183,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
         const int unit = m_doc->GetDrawingUnit(staffSize);
         if (ending->HasN() || ending->HasLabel()) {
-            const std::string endingText = (ending->HasN()) ? ending->GetN() : ending->GetLabel();
+            const std::string endingText = (ending->HasLabel()) ? ending->GetLabel() : ending->GetN();
             std::stringstream strStream;
             // Maybe we want to add ( ) after system breaks? Or . as a styling options?
             if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << "(";
