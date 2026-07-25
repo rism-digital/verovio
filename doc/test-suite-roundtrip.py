@@ -10,7 +10,7 @@ import lxml.etree as etree
 from xmldiff.main import diff_trees as xmldiff
 
 # Add path for toolkit built in-place
-sys.path.append('.')
+sys.path.append('./verovio')
 import verovio
 
 ns = {'mei': 'http://www.music-encoding.org/ns/mei'}
