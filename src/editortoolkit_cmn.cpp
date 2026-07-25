@@ -308,8 +308,9 @@ bool EditorToolkitCMN::InsertCursorByType(CursorInsertType insertType)
 
     std::string id = m_cursor->GetID();
 
+    m_cursor->SetChordMode(Cursor::ChordMode::CHORD_NONE);
+
     if (insertType == CURSOR_INSERT_REST) {
-        m_cursor->SetChordMode(Cursor::ChordMode::CHORD_NONE);
         return this->InsertRest(id, dur, dots);
     }
     else {
