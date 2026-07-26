@@ -150,10 +150,10 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
     }
     else if (action == "delete") {
         std::string elementId;
-        bool backspace;
-        if (this->ParseDeleteAction(json.get<jsonxx::Object>("param"), elementId, backspace)) {
+        DeleteNavigation navigation;
+        if (this->ParseDeleteAction(json.get<jsonxx::Object>("param"), elementId, navigation)) {
             this->PrepareUndo();
-            return (this->Delete(elementId, backspace));
+            return (this->Delete(elementId, navigation));
         }
         LogWarning("Could not parse the delete action");
     }
@@ -347,12 +347,14 @@ bool EditorToolkitShared::ParseContextAction(
     return false;
 }
 
-bool EditorToolkitShared::ParseDeleteAction(const jsonxx::Object &param, std::string &elementId, bool &backspace)
+bool EditorToolkitShared::ParseDeleteAction(
+    const jsonxx::Object &param, std::string &elementId, DeleteNavigation &navigation)
 {
-    backspace = false;
+    navigation = DELETE_FORWARD;
     if (!param.has<jsonxx::String>("elementId")) return false;
     elementId = param.get<jsonxx::String>("elementId");
-    if (param.has<jsonxx::Boolean>("backspace")) backspace = param.get<jsonxx::Boolean>("backspace");
+    if (param.has<jsonxx::Boolean>("backspace"))
+        navigation = (param.get<jsonxx::Boolean>("backspace") ? DELETE_BACKSPACE : DELETE_FORWARD);
     return true;
 }
 
@@ -602,9 +604,8 @@ void EditorToolkitShared::ReloadEditStatus(const std::string &statusStr, bool in
     }
 
     if (!insertMode) m_chainedId = "";
-    m_selectionId = "";
-    m_selectionClassId = UNSPECIFIED;
-    m_selectionSecondaryId = "";
+
+    this->ResetSelect();
 
     // Selection object
     if (status.has<jsonxx::Object>("selection")) {
@@ -865,7 +866,7 @@ bool EditorToolkitShared::ResetCursor(bool maintainChordMode)
     return true;
 }
 
-bool EditorToolkitShared::Delete(std::string &elementId, bool backspace)
+bool EditorToolkitShared::Delete(std::string &elementId, DeleteNavigation navigation)
 {
     if (this->InsertMode()) return true;
 
@@ -873,9 +874,14 @@ bool EditorToolkitShared::Delete(std::string &elementId, bool backspace)
 
     if (!element) return false;
 
-    int direction = (backspace) ? 37 : 39;
-    this->Navigate(elementId, direction);
-    if (m_chainedId.empty() && element->GetParent()) m_chainedId = element->GetParent()->GetID();
+    if (navigation != DELETE_NO_NAVIGATON) {
+        int direction = (navigation == DELETE_BACKSPACE) ? 37 : 39;
+        this->Navigate(elementId, direction);
+        if (m_chainedId.empty() && element->GetParent()) m_chainedId = element->GetParent()->GetID();
+    }
+
+    std::set<std::string> postProcessObjects;
+    this->PostProcessDeleteObjects(element, postProcessObjects);
 
     // Find referring objects
     std::set<std::string> objectsToDelete;
@@ -887,7 +893,18 @@ bool EditorToolkitShared::Delete(std::string &elementId, bool backspace)
         if (toDelete && toDelete->GetParent()) toDelete->GetParent()->DeleteChild(toDelete);
     }
 
-    if (!m_chainedId.empty() && !m_doc->FindDescendantByID(m_chainedId)) m_chainedId = "";
+    for (auto id : postProcessObjects) {
+        this->PostProcessDelete(id);
+    }
+
+    this->ResetSelect();
+    // Check that is has not been deleted in post-processing
+    if (!m_chainedId.empty() && !m_doc->FindDescendantByID(m_chainedId)) {
+        m_chainedId = "";
+    }
+    if (!m_chainedId.empty()) {
+        this->Select(m_chainedId, false, SelectCustom::SELECT_NONE);
+    }
 
     this->ClearContext();
     this->SetEditStatus();
@@ -924,6 +941,69 @@ void EditorToolkitShared::CollectReferringObjects(
         objectsToDelete.insert(referringObject->GetID());
 
         CollectReferringObjects(referringObject, objectsToDelete, visited);
+    }
+}
+
+void EditorToolkitShared::PostProcessDeleteObjects(const Object *element, std::set<std::string> &toPostProcess)
+{
+    if (element->Is(NOTE)) {
+        const Note *note = vrv_cast<const Note *>(element);
+        assert(note);
+        if (note->IsChordTone()) toPostProcess.insert(note->IsChordTone()->GetID());
+    }
+    if (element->HasInterface(INTERFACE_DURATION) && element->IsLayerElement()) {
+        const Object *beam = element->GetFirstAncestor(BEAM);
+        if (beam) toPostProcess.insert(beam->GetID());
+    }
+}
+
+void EditorToolkitShared::PostProcessDelete(const std::string &elementId)
+{
+    Object *object = m_doc->FindDescendantByID(elementId);
+    if (!object) return;
+
+    if (object->Is(CHORD)) {
+        Chord *chord = vrv_cast<Chord *>(object);
+        assert(chord);
+        int count = chord->GetChildCount(NOTE, UNLIMITED_DEPTH);
+        if (count != 1) return;
+
+        Note *note = chord->GetTopNote();
+        note->DurationInterface::operator=(*chord);
+        note->AttCue::operator=(*chord);
+        note->AttGraced::operator=(*chord);
+        note->AttStems::operator=(*chord);
+        note->AttStemsCmn::operator=(*chord);
+        ListOfObjects artics = chord->FindAllDescendantsByType(ARTIC, false, 1);
+        for (Object *artic : artics) {
+            artic->MoveItselfTo(note);
+        }
+
+        Object *parent = chord->GetParent();
+        assert(parent);
+        int idx = chord->GetIdx();
+        chord->DetachChild(note->GetIdx());
+        parent->InsertChild(note, idx);
+
+        std::string placeholder = chord->GetID();
+        this->Delete(placeholder, DELETE_NO_NAVIGATON);
+    }
+    else if (object->Is(BEAM)) {
+        Beam *beam = vrv_cast<Beam *>(object);
+        assert(beam);
+        ListOfObjects descendants;
+        ClassIdsComparison comparison({ CHORD, NOTE, REST });
+        beam->FindAllDescendantsByComparison(&descendants, &comparison, 1);
+        if (descendants.size() != 1) return;
+
+        Object *parent = beam->GetParent();
+        assert(parent);
+        int idx = beam->GetIdx();
+        beam->DetachChild(descendants.front()->GetIdx());
+        parent->InsertChild(descendants.front(), idx);
+
+        std::string placeholder = beam->GetID();
+        this->Delete(placeholder, DELETE_NO_NAVIGATON);
     }
 }
 
@@ -1125,9 +1205,7 @@ bool EditorToolkitShared::Select(std::string &elementId, bool secondary, SelectC
         }
     }
     else {
-        m_selectionId = "";
-        m_selectionClassId = UNSPECIFIED;
-        m_selectionSecondaryId = "";
+        this->ResetSelect();
 
         Object *element = this->GetElement(elementId);
         if (!element) return false;

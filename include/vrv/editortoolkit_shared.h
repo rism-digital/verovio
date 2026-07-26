@@ -51,13 +51,15 @@ protected:
         int options;
     };
 
+    enum DeleteNavigation : int8_t { DELETE_NO_NAVIGATON = 0, DELETE_BACKSPACE, DELETE_FORWARD };
+
     /**
      * Parse JSON instructions for experimental editor functions.
      */
     ///@{
     bool Chain(const jsonxx::Array &actions);
     bool ParseContextAction(const jsonxx::Object &param, std::string &elementId, bool &scores, bool &sections);
-    bool ParseDeleteAction(const jsonxx::Object &param, std::string &elementId, bool &backspace);
+    bool ParseDeleteAction(const jsonxx::Object &param, std::string &elementId, DeleteNavigation &navigation);
     bool ParseDragAction(const jsonxx::Object &param, std::string &elementId, int &x, int &y);
     bool ParseKeyDownAction(
         const jsonxx::Object &param, std::string &elementid, int &key, bool &shiftKey, bool &ctrlKey);
@@ -98,7 +100,7 @@ protected:
     bool SetCursor(std::string &elementId, Cursor::InputMode inputMode, bool chordMode);
     bool UpdateCursor(bool restMode, bool chordMode, Cursor::TieMode tieMode);
     bool ResetCursor(bool maintainChordMode);
-    bool Delete(std::string &elementId, bool backspace);
+    bool Delete(std::string &elementId, DeleteNavigation navigation);
     bool Drag(std::string &elementId, int x, int y);
     bool InsertControl(std::string &elementName, std::string &startId, std::string &endId);
     bool KeyDown(std::string &elementId, int key, bool shiftKey, bool ctrlKey);
@@ -125,6 +127,8 @@ protected:
 
     void CollectReferringObjects(
         const Object *element, std::set<std::string> &toDelete, std::set<const Object *> &visited);
+    void PostProcessDeleteObjects(const Object *element, std::set<std::string> &toPostProcess);
+    void PostProcessDelete(const std::string &elementId);
 
     void MoveCursor(LayerElement *element, bool maintainChordMode = false);
 

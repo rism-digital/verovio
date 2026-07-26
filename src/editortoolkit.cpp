@@ -24,6 +24,13 @@ namespace vrv {
 #define SELECTION_ID "[selection-id]"
 #define SELECTION_SECONDARY_ID "[selection-secondary-id]"
 
+void EditorToolkit::ResetSelect()
+{
+    m_selectionId = "";
+    m_selectionClassId = UNSPECIFIED;
+    m_selectionSecondaryId = "";
+}
+
 bool EditorToolkit::AppendChild(std::string &elementId, const std::string &elementName, bool noDuplicate)
 {
     Object *element = this->ResolveElement(elementId);

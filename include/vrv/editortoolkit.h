@@ -64,6 +64,7 @@ public:
 
 #ifndef NO_EDIT_SUPPORT
 protected:
+    void ResetSelect();
     bool AppendChild(std::string &elementId, const std::string &elementName, bool unique);
     bool InsertBefore(std::string &elementId, const std::string &elementName);
     bool InsertAfter(std::string &elementId, const std::string &elementName);
