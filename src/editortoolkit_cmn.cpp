@@ -772,6 +772,30 @@ bool EditorToolkitCMN::CopyCursorPosition(data_DURATION dur, int dots, bool tie)
         this->AutoBeam(copy);
     }
 
+    if (tie || copyFrom->GetFirstAncestor(MEASURE) == copy->GetFirstAncestor(MEASURE)) {
+        if (copy->Is(CHORD)) {
+            ListOfObjects endNotes = copy->FindAllDescendantsByType(NOTE);
+            for (auto object : endNotes) {
+                Note *note = vrv_cast<Note *>(object);
+                assert(note);
+                Accid *accid = note->GetDrawingAccid();
+                if (accid && accid->HasAccid()) {
+                    accid->SetAccidGes(note->AccidentalWrittenToGestural(accid->GetAccid()));
+                    accid->ResetAccidental();
+                }
+            }
+        }
+        else {
+            Note *note = vrv_cast<Note *>(copy);
+            assert(note);
+            Accid *accid = note->GetDrawingAccid();
+            if (accid && accid->HasAccid()) {
+                accid->SetAccidGes(note->AccidentalWrittenToGestural(accid->GetAccid()));
+                accid->ResetAccidental();
+            }
+        }
+    }
+
     this->ClearContext();
     this->SetEditStatus();
 
