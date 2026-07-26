@@ -120,7 +120,7 @@ void Chord::CloneReset()
 {
     LayerElement::CloneReset();
 
-    this->ClearNoteGroups();
+    m_noteGroups.clear();
 }
 
 void Chord::ClearNoteGroups() const
