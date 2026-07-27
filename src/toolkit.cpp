@@ -502,13 +502,17 @@ void Toolkit::SetViewAndEditor()
     if (m_editorToolkit != NULL) {
         delete m_editorToolkit;
     }
-    switch (m_doc.m_notationType) {
-        case NOTATIONTYPE_neume: m_editorToolkit = new EditorToolkitNeume(&m_doc, &m_view); break;
-        case NOTATIONTYPE_mensural:
-        case NOTATIONTYPE_mensural_black:
-        case NOTATIONTYPE_mensural_white: m_editorToolkit = new EditorToolkitMensural(&m_doc, &m_view); break;
-        case NOTATIONTYPE_cmn: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view); break;
-        default: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view);
+    if (IsNeumeType(m_doc.m_notationType)) {
+        m_editorToolkit = new EditorToolkitNeume(&m_doc, &m_view);
+    }
+    else {
+        switch (m_doc.m_notationType) {
+            case NOTATIONTYPE_mensural:
+            case NOTATIONTYPE_mensural_black:
+            case NOTATIONTYPE_mensural_white: m_editorToolkit = new EditorToolkitMensural(&m_doc, &m_view); break;
+            case NOTATIONTYPE_cmn: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view); break;
+            default: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view);
+        }
     }
 #endif
 }
