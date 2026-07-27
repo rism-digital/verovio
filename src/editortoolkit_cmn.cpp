@@ -277,17 +277,17 @@ bool EditorToolkitCMN::InsertCursorByPitch(data_PITCHNAME pname, int oct, data_A
 
     if (oct == VRV_UNSET) oct = m_cursor->GetOct();
 
+    // Since we did not know the pitch yet we need to calculate that actual accid
+    if (pname != PITCHNAME_NONE) m_cursor->SetPname(pname);
+
     data_ACCIDENTAL_GESTURAL accidGes = ACCIDENTAL_GESTURAL_NONE;
-    if (accid == ACCIDENTAL_WRITTEN_NONE) {
-        // Since we did not know the pitch yet we need to calculate that actual accid
-        if (pname != PITCHNAME_NONE) m_cursor->SetPname(pname);
-        auto [actualAccid, isImplicit] = this->GetActualAccid(m_cursor, m_cursor->GetAccid());
-        m_cursor->SetAccid(actualAccid);
-        m_cursor->SetAccidImplicit(isImplicit);
-        const auto value = m_cursor->GetAccidValue();
-        accid = value.first;
-        accidGes = value.second;
-    }
+    auto [actualAccid, isImplicit]
+        = this->GetActualAccid(m_cursor, (accid == ACCIDENTAL_WRITTEN_NONE) ? m_cursor->GetAccid() : accid);
+    m_cursor->SetAccid(actualAccid);
+    m_cursor->SetAccidImplicit(isImplicit);
+    const auto value = m_cursor->GetAccidValue();
+    accid = value.first;
+    accidGes = value.second;
 
     data_DURATION dur = (m_cursor->HasDur()) ? m_cursor->GetDur() : DURATION_4;
     int dots = (m_cursor->HasDots()) ? m_cursor->GetDots() : VRV_UNSET;

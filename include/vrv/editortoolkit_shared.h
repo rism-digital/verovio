@@ -129,7 +129,7 @@ protected:
         const Object *element, std::set<std::string> &toDelete, std::set<const Object *> &visited);
     void PostProcessDeleteObjects(const Object *element, std::set<std::string> &toPostProcess);
     void PostProcessDelete(const std::string &elementId);
-    
+
     void PostEditRestriction(Object *element);
 
     void MoveCursor(LayerElement *element, bool maintainChordMode = false);

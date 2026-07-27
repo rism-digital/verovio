@@ -1020,7 +1020,6 @@ void EditorToolkitShared::PostEditRestriction(Object *element)
     }
 }
 
-
 bool EditorToolkitShared::Drag(std::string &elementId, int x, int y)
 {
     if (this->InsertMode()) return true;
@@ -1107,7 +1106,7 @@ bool EditorToolkitShared::KeyDown(std::string &elementId, int key, bool shiftKey
         //
         if (m_cursor && (key == KEY_LEFT || key == KEY_RIGHT)) m_cursor->OnSet("dur");
     }
-    
+
     this->PostEditRestriction(element);
 
     this->SetEditStatus();
@@ -1326,10 +1325,10 @@ bool EditorToolkitShared::Set(std::string &elementId, const std::string &attribu
     else if (AttModule::SetVisual(element, attribute, value)) {
         success = true;
     }
-    
+
     // Restiction on some actions
     this->PostEditRestriction(element);
-    
+
     this->SetEditStatus();
 
     return success;
