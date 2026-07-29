@@ -1946,28 +1946,103 @@ const Layer *EditorToolkitShared::GetNextLayer(const Layer *layer)
 
 EditorToolkitShared::MidiSpelling EditorToolkitShared::SpellMidi(int midi, const data_KEYSIGNATURE &keySig)
 {
-    static constexpr EditorToolkitShared::MidiSpelling sharpTable[12]
-        = { { PITCHNAME_c, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_c, ACCIDENTAL_WRITTEN_s },
-              { PITCHNAME_d, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_d, ACCIDENTAL_WRITTEN_s },
-              { PITCHNAME_e, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_f, ACCIDENTAL_WRITTEN_NONE },
-              { PITCHNAME_f, ACCIDENTAL_WRITTEN_s }, { PITCHNAME_g, ACCIDENTAL_WRITTEN_NONE },
-              { PITCHNAME_g, ACCIDENTAL_WRITTEN_s }, { PITCHNAME_a, ACCIDENTAL_WRITTEN_NONE },
-              { PITCHNAME_a, ACCIDENTAL_WRITTEN_s }, { PITCHNAME_b, ACCIDENTAL_WRITTEN_NONE } };
+    using Spelling = EditorToolkitShared::MidiSpelling;
 
-    static constexpr EditorToolkitShared::MidiSpelling flatTable[12]
-        = { { PITCHNAME_c, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_d, ACCIDENTAL_WRITTEN_f },
-              { PITCHNAME_d, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_e, ACCIDENTAL_WRITTEN_f },
-              { PITCHNAME_e, ACCIDENTAL_WRITTEN_NONE }, { PITCHNAME_f, ACCIDENTAL_WRITTEN_NONE },
-              { PITCHNAME_f, ACCIDENTAL_WRITTEN_s }, { PITCHNAME_g, ACCIDENTAL_WRITTEN_NONE },
-              { PITCHNAME_a, ACCIDENTAL_WRITTEN_f }, { PITCHNAME_a, ACCIDENTAL_WRITTEN_NONE },
-              { PITCHNAME_b, ACCIDENTAL_WRITTEN_f }, { PITCHNAME_b, ACCIDENTAL_WRITTEN_NONE } };
+    static constexpr Spelling naturalTable[12] = {
+        { PITCHNAME_c, ACCIDENTAL_WRITTEN_NONE }, // C
+        {}, // C#/Db
+        { PITCHNAME_d, ACCIDENTAL_WRITTEN_NONE }, // D
+        {}, // D#/Eb
+        { PITCHNAME_e, ACCIDENTAL_WRITTEN_NONE }, // E
+        { PITCHNAME_f, ACCIDENTAL_WRITTEN_NONE }, // F
+        {}, // F#/Gb
+        { PITCHNAME_g, ACCIDENTAL_WRITTEN_NONE }, // G
+        {}, // G#/Ab
+        { PITCHNAME_a, ACCIDENTAL_WRITTEN_NONE }, // A
+        {}, // A#/Bb
+        { PITCHNAME_b, ACCIDENTAL_WRITTEN_NONE } // B
+    };
 
-    int pc = ((midi % 12) + 12) % 12;
+    static constexpr Spelling sharpTable[12] = {
+        {}, // C
+        { PITCHNAME_c, ACCIDENTAL_WRITTEN_s }, // C#
+        {}, // D
+        { PITCHNAME_d, ACCIDENTAL_WRITTEN_s }, // D#
+        {}, // E
+        {}, // F
+        { PITCHNAME_f, ACCIDENTAL_WRITTEN_s }, // F#
+        {}, // G
+        { PITCHNAME_g, ACCIDENTAL_WRITTEN_s }, // G#
+        {}, // A
+        { PITCHNAME_a, ACCIDENTAL_WRITTEN_s }, // A#
+        {} // B
+    };
+
+    static constexpr Spelling flatTable[12] = {
+        {}, // C
+        { PITCHNAME_d, ACCIDENTAL_WRITTEN_f }, // Db
+        {}, // D
+        { PITCHNAME_e, ACCIDENTAL_WRITTEN_f }, // Eb
+        {}, // E
+        {}, // F
+        { PITCHNAME_g, ACCIDENTAL_WRITTEN_f }, // Gb
+        {}, // G
+        { PITCHNAME_a, ACCIDENTAL_WRITTEN_f }, // Ab
+        {}, // A
+        { PITCHNAME_b, ACCIDENTAL_WRITTEN_f }, // Bb
+        {} // B
+    };
+
+    // Major-key signature containing each sharp spelling as its tonic:
+    //
+    // C# -> D major  (+2)
+    // D# -> E major  (+4)
+    // F# -> G major  (+1)
+    // G# -> A major  (+3)
+    // A# -> B major  (+5)
+    static constexpr int sharpSignature[12] = { 0, 2, 0, 4, 0, 0, 1, 0, 3, 0, 5, 0 };
+
+    // Major-key signature containing each flat spelling as its tonic:
+    //
+    // Db -> Db major (-5)
+    // Eb -> Eb major (-3)
+    // Gb -> Gb major (-6)
+    // Ab -> Ab major (-4)
+    // Bb -> Bb major (-2)
+    static constexpr int flatSignature[12] = { 0, -5, 0, -3, 0, 0, -6, 0, -4, 0, -2, 0 };
+
+    const int pc = ((midi % 12) + 12) % 12;
     assert(pc >= 0 && pc < 12);
 
-    bool flatKey = keySig.second == ACCIDENTAL_WRITTEN_f;
+    // Naturals do not require enharmonic selection.
+    switch (pc) {
+        case 0:
+        case 2:
+        case 4:
+        case 5:
+        case 7:
+        case 9:
+        case 11: return naturalTable[pc];
+    }
 
-    return flatKey ? flatTable[pc] : sharpTable[pc];
+    int signature = 0;
+
+    if (keySig.second == ACCIDENTAL_WRITTEN_s) {
+        signature = keySig.first;
+    }
+    else if (keySig.second == ACCIDENTAL_WRITTEN_f) {
+        signature = -keySig.first;
+    }
+
+    const int sharpCost = std::abs(signature - sharpSignature[pc]);
+    const int flatCost = std::abs(signature - flatSignature[pc]);
+
+    // On same cost, preserve the current key's general direction.
+    if (sharpCost == flatCost) {
+        return signature < 0 ? flatTable[pc] : sharpTable[pc];
+    }
+
+    return flatCost < sharpCost ? flatTable[pc] : sharpTable[pc];
 }
 
 //----------------------------------------------------------------------------
