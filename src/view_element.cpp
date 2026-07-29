@@ -2317,7 +2317,8 @@ void View::DrawCursor(DeviceContext *dc, LayerElement *element, Layer *layer, St
                 dc->StartText(
                     this->ToDeviceContextX(params.m_x), this->ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_center);
                 std::u32string str;
-                str.push_back((cursor->GetTieMode() == Cursor::TieMode::COPY) ? U'⧉' : U'⏜');
+                // U+29C9 = ⧉' ; U+23DC = ⏜
+                str.push_back(cursor->GetTieMode() == Cursor::TieMode::COPY ? U'\u29C9' : U'\u23DC');
                 dc->DrawText(UTF32to8(str), str);
                 dc->EndText();
 
