@@ -3087,6 +3087,10 @@ void MusicXmlInput::ReadMusicXmlNote(
                 tabGrp->SetDurPpq(duration);
                 if (dots > 0) tabGrp->SetDots(dots);
                 tabGrp->AddChild(new TabDurSym());
+                // modern guitar tablature has CMN rests. Lute tablature use rhythm sign over empty tagGrp
+                if (staffDef->GetNotationtype() == NOTATIONTYPE_tab_guitar) {
+                    tabGrp->AddChild(new Rest());
+                }
                 this->AddLayerElement(layer, tabGrp, duration);
             }
             else {
