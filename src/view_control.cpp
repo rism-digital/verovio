@@ -1790,6 +1790,7 @@ void View::DrawControlElementText(DeviceContext *dc, ControlElement *element, Me
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         int xAdjust = 0;
@@ -1870,6 +1871,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         if (dynam->HasEnclose()) {
@@ -2124,6 +2126,7 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetFingeringFont(staffSize)->GetPointSize();
 
         fingTxt.SetPointSize(params.m_pointSize);
@@ -2324,6 +2327,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
 
         if (harm->GetFirst() && harm->GetFirst()->Is(FB)) {
             this->DrawFb(dc, staff, dynamic_cast<Fb *>(harm->GetFirst()), params);
@@ -2650,6 +2654,7 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         rehTxt.SetPointSize(params.m_pointSize);
@@ -2770,6 +2775,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         tempoTxt.SetPointSize(params.m_pointSize);
@@ -3177,7 +3183,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
         const int unit = m_doc->GetDrawingUnit(staffSize);
         if (ending->HasN() || ending->HasLabel()) {
-            const std::string endingText = (ending->HasN()) ? ending->GetN() : ending->GetLabel();
+            const std::string endingText = (ending->HasLabel()) ? ending->GetLabel() : ending->GetN();
             std::stringstream strStream;
             // Maybe we want to add ( ) after system breaks? Or . as a styling options?
             if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << "(";

@@ -51,12 +51,12 @@ std::string Att::VUToStr(data_VU data) const
 
 double Att::StrToDbl(const std::string &value) const
 {
-    return atof(value.c_str());
+    return stof(value);
 }
 
 int Att::StrToInt(const std::string &value) const
 {
-    return atoi(value.c_str());
+    return stoi(value);
 }
 
 data_VU Att::StrToVU(const std::string &value, bool logWarning) const
@@ -68,7 +68,7 @@ data_VU Att::StrToVU(const std::string &value, bool logWarning) const
         }
         return MEI_UNSET;
     }
-    return atof(value.substr(0, value.find("vu")).c_str());
+    return stof(value);
 }
 
 // Converters for writing and reading
@@ -169,7 +169,7 @@ std::string Att::DegreesToStr(data_DEGREES data) const
 
 data_DEGREES Att::StrToDegrees(const std::string &value, bool logWarning) const
 {
-    double degrees = atof(value.c_str());
+    double degrees = stof(value);
     if ((degrees > 360.0) || (degrees < -360.0)) {
         if (logWarning) LogWarning("Unsupported data.DEGREES '%s'", value.c_str());
         return 0;
@@ -306,7 +306,8 @@ std::string Att::FontsizeToStr(data_FONTSIZE data) const
 {
     std::string value;
     if (data.GetType() == FONTSIZE_fontSizeNumeric) {
-        value = StringFormat("%fpt", data.GetFontSizeNumeric());
+        const char *unit = (data.GetFontSizeNumericType() == FONTSIZENUMERIC_vu) ? "vu" : "pt";
+        value = StringFormat("%f%s", data.GetFontSizeNumeric(), unit);
     }
     else if (data.GetType() == FONTSIZE_term) {
         value = FontsizetermToStr(data.GetTerm());
@@ -321,8 +322,19 @@ std::string Att::FontsizeToStr(data_FONTSIZE data) const
 data_FONTSIZE Att::StrToFontsize(const std::string &value, bool logWarning) const
 {
     data_FONTSIZE data;
-    data.SetFontSizeNumeric(StrToFontsizenumeric(value, false));
-    if (data.HasValue()) return data;
+    const data_FONTSIZENUMERIC pointSize = StrToFontsizenumeric(value, false);
+    if (pointSize != MEI_UNSET) {
+        data.SetFontSizeNumeric(pointSize, FONTSIZENUMERIC_pt);
+        return data;
+    }
+    static const std::regex vuTest("([0-9]+(\\.[0-9]+)?|\\.[0-9]+)vu");
+    if (std::regex_match(value, vuTest)) {
+        const data_FONTSIZENUMERIC vuSize = stof(value);
+        if (vuSize > 0.0) {
+            data.SetFontSizeNumeric(vuSize, FONTSIZENUMERIC_vu);
+            return data;
+        }
+    }
     data.SetTerm(StrToFontsizeterm(value, false));
     if (data.HasValue()) return data;
     data.SetPercent(StrToPercent(value, false));
@@ -370,14 +382,21 @@ std::string Att::FontsizenumericToStr(data_FONTSIZENUMERIC data) const
 
 data_FONTSIZENUMERIC Att::StrToFontsizenumeric(const std::string &value, bool logWarning) const
 {
-    static const std::regex test("[0-9]*(\\.[0-9]+)?(pt)");
+    static const std::regex test("([0-9]+(\\.[0-9]+)?|\\.[0-9]+)pt");
     if (!std::regex_match(value, test)) {
         if (logWarning && !value.empty()) {
             LogWarning("Unsupported data.FONTSIZENUMERIC '%s'", value.c_str());
         }
         return MEI_UNSET;
     }
-    return atof(value.substr(0, value.find("pt")).c_str());
+    const data_FONTSIZENUMERIC numeric = stof(value);
+    if (numeric <= 0.0) {
+        if (logWarning) {
+            LogWarning("Unsupported data.FONTSIZENUMERIC '%s'", value.c_str());
+        }
+        return MEI_UNSET;
+    }
+    return numeric;
 }
 
 std::string Att::KeysignatureToStr(data_KEYSIGNATURE data) const
@@ -441,12 +460,12 @@ data_MEASUREBEAT Att::StrToMeasurebeat(std::string value, bool) const
     double timePoint = 0.0;
     int m = (int)value.find_first_of('m');
     int plus = (int)value.find_last_of('+');
-    if (m != -1) measure = atoi(value.substr(0, m).c_str());
+    if (m != -1) measure = stoi(value.substr(0, m));
     if (plus != -1) {
-        timePoint = atof(value.substr(plus).c_str());
+        timePoint = stof(value.substr(plus));
     }
     else {
-        timePoint = atof(value.c_str());
+        timePoint = stof(value);
     }
     return { measure, timePoint };
 }
@@ -468,12 +487,13 @@ data_MEASUREMENTSIGNED Att::StrToMeasurementsigned(const std::string &value, boo
 {
     data_MEASUREMENTSIGNED data;
 
-    static const std::regex px(".*px$");
+    static const std::regex px("[+-]?[0-9]*(\\.[0-9]+)?px");
+    static const std::regex vu("[+-]?[0-9]*(\\.[0-9]+)?(vu)?");
     if (std::regex_match(value, px)) {
-        data.SetPx(atoi(value.substr(0, value.find("px")).c_str()) * DEFINITION_FACTOR);
+        data.SetPx(stoi(value) * DEFINITION_FACTOR);
     }
-    else {
-        data.SetVu(atof(value.c_str()));
+    else if (std::regex_match(value, vu)) {
+        data.SetVu(stof(value));
     }
 
     if (logWarning && !value.empty() && !data.HasValue()) {
@@ -700,7 +720,7 @@ data_PERCENT Att::StrToPercent(const std::string &value, bool logWarning) const
         if (logWarning) LogWarning("Unsupported data.PERCENT '%s'", value.c_str());
         return 0;
     }
-    return atof(value.substr(0, value.find("%")).c_str());
+    return stof(value);
 }
 
 data_PERCENT_LIMITED Att::StrToPercentLimited(const std::string &value, bool logWarning) const
@@ -710,7 +730,7 @@ data_PERCENT_LIMITED Att::StrToPercentLimited(const std::string &value, bool log
         if (logWarning) LogWarning("Unsupported data.PERCENT.LIMITED '%s'", value.c_str());
         return 0;
     }
-    return atof(value.substr(0, value.find("%")).c_str());
+    return stof(value);
 }
 
 data_PERCENT_LIMITED_SIGNED Att::StrToPercentLimitedSigned(const std::string &value, bool logWarning) const
@@ -722,7 +742,7 @@ data_PERCENT_LIMITED_SIGNED Att::StrToPercentLimitedSigned(const std::string &va
         }
         return 0;
     }
-    return atof(value.substr(0, value.find("%")).c_str());
+    return stof(value);
 }
 
 std::string Att::PitchnameToStr(data_PITCHNAME data) const
