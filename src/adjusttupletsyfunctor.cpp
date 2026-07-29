@@ -34,8 +34,10 @@ FunctorCode AdjustTupletsYFunctor::VisitTuplet(Tuplet *tuplet)
         return FUNCTOR_SIBLINGS;
     }
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     // Nothing to do if the bracket and the num are not visible
-    if ((tuplet->GetBracketVisible() == BOOLEAN_false) && (tuplet->GetNumVisible() == BOOLEAN_false)) {
+    if (!showHidden && (tuplet->GetBracketVisible() == BOOLEAN_false) && (tuplet->GetNumVisible() == BOOLEAN_false)) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -58,8 +60,10 @@ FunctorCode AdjustTupletsYFunctor::VisitTuplet(Tuplet *tuplet)
 
 void AdjustTupletsYFunctor::AdjustTupletBracketY(Tuplet *tuplet, const Staff *staff) const
 {
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     TupletBracket *tupletBracket = vrv_cast<TupletBracket *>(tuplet->GetFirst(TUPLET_BRACKET));
-    if (!tupletBracket || (tuplet->GetBracketVisible() == BOOLEAN_false)) return;
+    if (!tupletBracket || (!showHidden && tuplet->GetBracketVisible() == BOOLEAN_false)) return;
 
     // if bracket is used for beam elements - process that part separately
     Beam *beam = tuplet->GetBracketAlignedBeam();

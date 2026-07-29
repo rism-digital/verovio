@@ -713,13 +713,13 @@ private:
 /**
  * This class adds LayerElement parts (stem, flag, dots, etc).
  */
-class PrepareLayerElementPartsFunctor : public Functor {
+class PrepareLayerElementPartsFunctor : public DocFunctor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    PrepareLayerElementPartsFunctor();
+    PrepareLayerElementPartsFunctor(Doc *doc);
     virtual ~PrepareLayerElementPartsFunctor() = default;
     ///@}
 

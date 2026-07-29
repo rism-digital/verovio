@@ -215,14 +215,18 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         this->DrawTuplet(dc, element, layer, staff, measure);
     }
     else if (element->Is(TUPLET_BRACKET)) {
-        dc->StartGraphic(element, "", element->GetID());
-        dc->EndGraphic(element, this);
+        this->DrawTupletBracket(dc, element, layer, staff, measure);
+        // const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+        // dc->StartGraphic(element, (showHidden ? CSS_SHOW_HIDDEN : ""), element->GetID());
+        // dc->EndGraphic(element, this);
         layer->AddToDrawingList(element);
     }
     else if (element->Is(TUPLET_NUM)) {
-        dc->StartGraphic(element, "", element->GetID());
-        dc->EndGraphic(element, this);
-        layer->AddToDrawingList(element);
+        // const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+        this->DrawTupletNum(dc, element, layer, staff, measure);
+        // dc->StartGraphic(element, (showHidden ? CSS_SHOW_HIDDEN : ""), element->GetID());
+        // dc->EndGraphic(element, this);
+        // layer->AddToDrawingList(element);
     }
     else if (element->Is(VERSE)) {
         this->DrawVerse(dc, element, layer, staff, measure);

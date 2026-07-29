@@ -1170,7 +1170,7 @@ FunctorCode PrepareLyricsFunctor::VisitSyl(Syl *syl)
 // PrepareLayerElementPartsFunctor
 //----------------------------------------------------------------------------
 
-PrepareLayerElementPartsFunctor::PrepareLayerElementPartsFunctor() : Functor() {}
+PrepareLayerElementPartsFunctor::PrepareLayerElementPartsFunctor(Doc *doc) : DocFunctor(doc) {}
 
 FunctorCode PrepareLayerElementPartsFunctor::VisitChord(Chord *chord)
 {
@@ -1314,6 +1314,8 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTuplet(Tuplet *tuplet)
     TupletBracket *currentBracket = vrv_cast<TupletBracket *>(tuplet->GetFirst(TUPLET_BRACKET));
     TupletNum *currentNum = vrv_cast<TupletNum *>(tuplet->GetFirst(TUPLET_NUM));
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     bool beamed = false;
     // Are we contained in a beam?
     if (tuplet->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH)) {
@@ -1328,7 +1330,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTuplet(Tuplet *tuplet)
         if ((tuplet->GetChildCount(BEAM) == 1) || (tuplet->GetChildCount(BTREM) == 1)) beamed = true;
     }
 
-    if ((!tuplet->HasBracketVisible() && !beamed) || (tuplet->GetBracketVisible() == BOOLEAN_true)) {
+    if ((!tuplet->HasBracketVisible() && !beamed) || showHidden || (tuplet->GetBracketVisible() == BOOLEAN_true)) {
         if (!currentBracket) {
             currentBracket = new TupletBracket();
             tuplet->AddChild(currentBracket);
@@ -1342,7 +1344,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTuplet(Tuplet *tuplet)
         }
     }
 
-    if (tuplet->HasNum() && (!tuplet->HasNumVisible() || (tuplet->GetNumVisible() == BOOLEAN_true))) {
+    if (tuplet->HasNum() && (!tuplet->HasNumVisible() || showHidden || (tuplet->GetNumVisible() == BOOLEAN_true))) {
         if (!currentNum) {
             currentNum = new TupletNum();
             tuplet->AddChild(currentNum);

@@ -83,10 +83,13 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
     TupletBracket *tupletBracket = vrv_cast<TupletBracket *>(element);
     assert(tupletBracket);
 
-    if (tupletBracket->GetBracketVisible() == BOOLEAN_false) {
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
+    if (!showHidden && tupletBracket->GetBracketVisible() == BOOLEAN_false) {
         tupletBracket->SetEmptyBB();
         return;
     }
+    const bool showHiddenCSS = (tupletBracket->GetBracketVisible() == BOOLEAN_false);
 
     Tuplet *tuplet = vrv_cast<Tuplet *>(tupletBracket->GetFirstAncestor(TUPLET));
     assert(tuplet);
@@ -96,7 +99,8 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
         return;
     }
 
-    dc->ResumeGraphic(tupletBracket, tupletBracket->GetID());
+    dc->StartGraphic(tupletBracket, (showHiddenCSS ? CSS_SHOW_HIDDEN : ""), tupletBracket->GetID());
+    // dc->ResumeGraphic(tupletBracket, tupletBracket->GetID());
 
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const int lineWidth
@@ -145,7 +149,8 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
 
     dc->ResetPen();
 
-    dc->EndResumedGraphic(tupletBracket, this);
+    // dc->EndResumedGraphic(tupletBracket, this);
+    dc->EndGraphic(tupletBracket, this);
 
     return;
 }
@@ -164,10 +169,13 @@ void View::DrawTupletNum(DeviceContext *dc, LayerElement *element, Layer *layer,
     Tuplet *tuplet = vrv_cast<Tuplet *>(tupletNum->GetFirstAncestor(TUPLET));
     assert(tuplet);
 
-    if (!tuplet->HasNum() || (tuplet->GetNumVisible() == BOOLEAN_false)) {
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
+    if (!tuplet->HasNum() || (!showHidden && tuplet->GetNumVisible() == BOOLEAN_false)) {
         tupletNum->SetEmptyBB();
         return;
     }
+    const bool showHiddenCSS = (tuplet->GetNumVisible() == BOOLEAN_false);
 
     if (!tuplet->GetDrawingLeft() || !tuplet->GetDrawingRight()) {
         tupletNum->SetEmptyBB();
@@ -197,11 +205,12 @@ void View::DrawTupletNum(DeviceContext *dc, LayerElement *element, Layer *layer,
     // adjust the baseline (to be improved with slanted brackets
     y -= m_doc->GetGlyphHeight(notes.back(), glyphSize, drawingCueSize) / 2;
 
-    dc->ResumeGraphic(tupletNum, tupletNum->GetID());
+    dc->StartGraphic(tupletNum, (showHiddenCSS ? CSS_SHOW_HIDDEN : ""), tupletNum->GetID());
+    // dc->ResumeGraphic(tupletNum, tupletNum->GetID());
 
     this->DrawSmuflString(dc, x, y, notes, HORIZONTALALIGNMENT_left, glyphSize, drawingCueSize);
 
-    dc->EndResumedGraphic(tupletNum, this);
+    dc->EndGraphic(tupletNum, this);
 
     dc->ResetFont();
 
