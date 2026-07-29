@@ -35,7 +35,7 @@ FunctorCode CalcDotsFunctor::VisitChord(Chord *chord)
     const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
 
     // if the chord isn't visible, stop here
-    if (!showHidden || !chord->IsVisible()) {
+    if (!showHidden && !chord->IsVisible()) {
         return FUNCTOR_SIBLINGS;
     }
     // if there aren't dot, stop here but only if no note has a dot

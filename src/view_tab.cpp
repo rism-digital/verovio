@@ -97,6 +97,8 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     Note *note = dynamic_cast<Note *>(element);
     assert(note);
 
+    dc->StartGraphic(note, "", note->GetID());
+
     // TabGrp *tabGrp = note->IsTabGrpNote();
     // assert(tabGrp);
 
@@ -208,6 +210,8 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     // Draw children (nothing yet)
     this->DrawLayerChildren(dc, note, layer, staff, measure);
+
+    dc->EndGraphic(note, this);
 }
 
 void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
