@@ -13,7 +13,9 @@
 #include <climits>
 #include <iostream>
 #include <math.h>
+#include <mutex>
 #include <random>
+#include <shared_mutex>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -1627,12 +1629,26 @@ void TextListInterface::FilterList(ListOfConstObjects &childList) const
 // ObjectFactory methods
 //----------------------------------------------------------------------------
 
-thread_local MapOfClassIdConstructors ObjectFactory::s_ctorsRegistry;
-thread_local MapOfStrClassIds ObjectFactory::s_classIdsRegistry;
+namespace {
+
+    struct ObjectFactoryRegistry {
+        MapOfClassIdConstructors constructors;
+        MapOfStrClassIds classIds;
+        std::shared_mutex mutex;
+    };
+
+    ObjectFactoryRegistry &GetObjectFactoryRegistry()
+    {
+        // Registrars run once at process startup, so their entries must be visible from every thread.
+        static ObjectFactoryRegistry registry;
+        return registry;
+    }
+
+} // namespace
 
 ObjectFactory *ObjectFactory::GetInstance()
 {
-    static thread_local ObjectFactory factory;
+    static ObjectFactory factory;
     return &factory;
 }
 
@@ -1646,13 +1662,17 @@ Object *ObjectFactory::Create(std::string name)
 
 Object *ObjectFactory::Create(ClassId classId)
 {
-    Object *object = NULL;
+    std::function<Object *()> factory;
+    ObjectFactoryRegistry &registry = GetObjectFactoryRegistry();
 
-    MapOfClassIdConstructors::iterator it = s_ctorsRegistry.find(classId);
-    if (it != s_ctorsRegistry.end()) object = it->second();
+    {
+        std::shared_lock lock(registry.mutex);
+        MapOfClassIdConstructors::iterator it = registry.constructors.find(classId);
+        if (it != registry.constructors.end()) factory = it->second;
+    }
 
-    if (object) {
-        return object;
+    if (factory) {
+        return factory();
     }
     else {
         LogError("Factory for '%d' not found", classId);
@@ -1662,24 +1682,26 @@ Object *ObjectFactory::Create(ClassId classId)
 
 ClassId ObjectFactory::GetClassId(std::string name)
 {
-    ClassId classId = OBJECT;
-
-    MapOfStrClassIds::iterator it = s_classIdsRegistry.find(name);
-    if (it != s_classIdsRegistry.end()) {
-        classId = it->second;
+    ObjectFactoryRegistry &registry = GetObjectFactoryRegistry();
+    {
+        std::shared_lock lock(registry.mutex);
+        MapOfStrClassIds::iterator it = registry.classIds.find(name);
+        if (it != registry.classIds.end()) {
+            return it->second;
+        }
     }
-    else {
-        LogError("ClassId for '%s' not found", name.c_str());
-    }
 
-    return classId;
+    LogError("ClassId for '%s' not found", name.c_str());
+    return OBJECT;
 }
 
 void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
 {
+    ObjectFactoryRegistry &registry = GetObjectFactoryRegistry();
+    std::shared_lock lock(registry.mutex);
     for (const std::string &str : classStrings) {
-        if (s_classIdsRegistry.contains(str)) {
-            classIds.push_back(s_classIdsRegistry.at(str));
+        if (registry.classIds.contains(str)) {
+            classIds.push_back(registry.classIds.at(str));
         }
         else {
             LogDebug("Class name '%s' could not be matched", str.c_str());
@@ -1689,8 +1711,10 @@ void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, st
 
 void ObjectFactory::Register(std::string name, ClassId classId, std::function<Object *(void)> function)
 {
-    s_ctorsRegistry[classId] = function;
-    s_classIdsRegistry[name] = classId;
+    ObjectFactoryRegistry &registry = GetObjectFactoryRegistry();
+    std::unique_lock lock(registry.mutex);
+    registry.constructors[classId] = function;
+    registry.classIds[name] = classId;
 }
 
 } // namespace vrv

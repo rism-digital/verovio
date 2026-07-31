@@ -1114,10 +1114,6 @@ public:
      * Get the correspondings ClassIds from the vector of MEI element string names
      */
     void GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds);
-
-public:
-    static thread_local MapOfClassIdConstructors s_ctorsRegistry;
-    static thread_local MapOfStrClassIds s_classIdsRegistry;
 };
 
 //----------------------------------------------------------------------------
