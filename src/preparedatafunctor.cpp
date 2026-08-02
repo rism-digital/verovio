@@ -1344,7 +1344,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTuplet(Tuplet *tuplet)
         }
     }
 
-    if (tuplet->HasNum() && (!tuplet->HasNumVisible() || showHidden || (tuplet->GetNumVisible() == BOOLEAN_true))) {
+    if (tuplet->HasNum() && (showHidden || (tuplet->GetNumVisible() != BOOLEAN_false))) {
         if (!currentNum) {
             currentNum = new TupletNum();
             tuplet->AddChild(currentNum);

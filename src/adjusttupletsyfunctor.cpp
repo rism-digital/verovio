@@ -130,8 +130,10 @@ void AdjustTupletsYFunctor::AdjustTupletBracketY(Tuplet *tuplet, const Staff *st
 
 void AdjustTupletsYFunctor::AdjustTupletNumY(Tuplet *tuplet, const Staff *staff) const
 {
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     TupletNum *tupletNum = vrv_cast<TupletNum *>(tuplet->GetFirst(TUPLET_NUM));
-    if (!tupletNum || (tuplet->GetNumVisible() == BOOLEAN_false)) return;
+    if (!tupletNum || (!showHidden && tuplet->GetNumVisible() == BOOLEAN_false)) return;
 
     // The num is within a bracket
     if (tupletNum->GetAlignedBracket()) {
