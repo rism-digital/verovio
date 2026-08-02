@@ -61,6 +61,7 @@ void Cursor::CloneReset()
     this->ResetCursorAlignment();
     m_position = NULL;
     m_tieMode = TieMode::TIE_NONE;
+    m_container = {};
 
     m_accid.SetParent(this);
 }

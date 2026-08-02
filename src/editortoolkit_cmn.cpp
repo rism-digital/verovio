@@ -63,6 +63,14 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
         }
         LogWarning("Could not parse the insertCursorByType action");
     }
+    else if (action == "insertCursorContainer") {
+        CursorContainer container;
+        if (this->ParseInsertCursorContainerAction(json.get<jsonxx::Object>("param"), container)) {
+            this->PrepareUndo();
+            return (this->InsertCursorContainer(container));
+        }
+        LogWarning("Could not parse the insertCursorContainer action");
+    }
     else if (action == "insertMeasure") {
         std::string elementId;
         int number;
@@ -98,6 +106,14 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
             return (this->InsertRest(elementId, dur, dots));
         }
         LogWarning("Could not parse the insertRest action");
+    }
+    else if (action == "resetCursorContainer") {
+        CursorContainer container;
+        if (this->ParseResetCursorContainerAction(json.get<jsonxx::Object>("param"), container)) {
+            this->PrepareUndo();
+            return (this->ResetCursorContainer(container));
+        }
+        LogWarning("Could not parse the resetCursorContainer action");
     }
     return false;
 }
@@ -158,6 +174,24 @@ bool EditorToolkitCMN::ParseInsertCursorByTypeAction(const jsonxx::Object &param
     }
     else if (param.get<jsonxx::String>("type") == "copy") {
         insertType = CURSOR_INSERT_COPY;
+    }
+    else {
+        return false;
+    }
+    return true;
+}
+
+bool EditorToolkitCMN::ParseInsertCursorContainerAction(const jsonxx::Object &param, CursorContainer &container)
+{
+    container = CursorContainer::CURSOR_CONTAINER_NONE;
+
+    if (!param.has<jsonxx::String>("container")) return false;
+
+    if (param.get<jsonxx::String>("container") == "tuplet") {
+        container = CURSOR_CONTAINER_TUPLET;
+    }
+    else if (param.get<jsonxx::String>("container") == "graceGrp") {
+        container = CURSOR_CONTAINER_GRACEGRP;
     }
     else {
         return false;
@@ -233,6 +267,24 @@ bool EditorToolkitCMN::ParseInsertRestAction(
 
     if (param.has<jsonxx::Number>("dots")) dots = param.get<jsonxx::Number>("dots");
 
+    return true;
+}
+
+bool EditorToolkitCMN::ParseResetCursorContainerAction(const jsonxx::Object &param, CursorContainer &container)
+{
+    container = CursorContainer::CURSOR_CONTAINER_NONE;
+
+    if (!param.has<jsonxx::String>("container")) return false;
+
+    if (param.get<jsonxx::String>("container") == "tuplet") {
+        container = CURSOR_CONTAINER_TUPLET;
+    }
+    else if (param.get<jsonxx::String>("container") == "graceGrp") {
+        container = CURSOR_CONTAINER_GRACEGRP;
+    }
+    else {
+        return false;
+    }
     return true;
 }
 
@@ -316,6 +368,11 @@ bool EditorToolkitCMN::InsertCursorByType(CursorInsertType insertType)
     else {
         return (this->CopyCursorPosition(m_cursor->GetDur(), m_cursor->GetDots(), (insertType == CURSOR_INSERT_TIE)));
     }
+}
+
+bool EditorToolkitCMN::InsertCursorContainer(CursorContainer container)
+{
+    return true;
 }
 
 bool EditorToolkitCMN::InsertMeasure(std::string &elementId, int number, bool insertBefore)
@@ -438,6 +495,11 @@ bool EditorToolkitCMN::InsertNote(const std::string &elementId, data_PITCHNAME p
         }
     }
 
+    return true;
+}
+
+bool EditorToolkitCMN::ResetCursorContainer(CursorContainer container)
+{
     return true;
 }
 

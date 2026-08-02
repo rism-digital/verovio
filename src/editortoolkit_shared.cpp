@@ -216,6 +216,13 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         }
         LogWarning("Action insertCursorByType available in CMN only");
     }
+    else if (action == "insertCursorContainer") {
+        EditorToolkitCMN *editorToolkitCMN = dynamic_cast<EditorToolkitCMN *>(this);
+        if (editorToolkitCMN) {
+            return editorToolkitCMN->ParseEditorCMNAction(json);
+        }
+        LogWarning("Action insertCursorContainer available in CMN only");
+    }
     else if (action == "insertMeasure") {
         EditorToolkitCMN *editorToolkitCMN = dynamic_cast<EditorToolkitCMN *>(this);
         if (editorToolkitCMN) {
@@ -272,6 +279,13 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
             return (this->ResetCursor(maintainChordMode));
         }
         LogWarning("Could not parse the resetCursor action");
+    }
+    else if (action == "resetCursorContainer") {
+        EditorToolkitCMN *editorToolkitCMN = dynamic_cast<EditorToolkitCMN *>(this);
+        if (editorToolkitCMN) {
+            return editorToolkitCMN->ParseEditorCMNAction(json);
+        }
+        LogWarning("Action resetCursorContainer available in CMN only");
     }
     else if (action == "select") {
         std::string elementId;

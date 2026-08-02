@@ -50,6 +50,10 @@ public:
     LayerElement *GetPosition() const { return m_position; }
     bool HasPosition() const { return (m_position); }
 
+    void SetContainer(LayerElement *container) { m_container.push(container); }
+    LayerElement *GetContainer() const { return m_container.top(); }
+    bool HasContainer() const { return (!m_container.empty()); }
+
     bool HasAccid() const { return m_accid.HasAccid(); }
     data_ACCIDENTAL_WRITTEN GetAccid() const { return m_accid.GetAccid(); }
     void SetAccid(data_ACCIDENTAL_WRITTEN accid);
@@ -125,6 +129,8 @@ private:
     int m_yRelPitchC;
     /** A field indicating the tieMode status */
     TieMode m_tieMode;
+    /** The cursor container (e.g., tuplet, graceGrp) */
+    std::stack<LayerElement *> m_container;
 };
 
 } // namespace vrv
