@@ -89,7 +89,6 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
         tupletBracket->SetEmptyBB();
         return;
     }
-    const bool showHiddenCSS = (tupletBracket->GetBracketVisible() == BOOLEAN_false);
 
     Tuplet *tuplet = vrv_cast<Tuplet *>(tupletBracket->GetFirstAncestor(TUPLET));
     assert(tuplet);
@@ -99,8 +98,7 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
         return;
     }
 
-    dc->StartGraphic(tupletBracket, (showHiddenCSS ? CSS_SHOW_HIDDEN : ""), tupletBracket->GetID());
-    // dc->ResumeGraphic(tupletBracket, tupletBracket->GetID());
+    dc->ResumeGraphic(tupletBracket, tupletBracket->GetID());
 
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const int lineWidth
@@ -149,8 +147,7 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
 
     dc->ResetPen();
 
-    // dc->EndResumedGraphic(tupletBracket, this);
-    dc->EndGraphic(tupletBracket, this);
+    dc->EndResumedGraphic(tupletBracket, this);
 
     return;
 }
@@ -175,7 +172,6 @@ void View::DrawTupletNum(DeviceContext *dc, LayerElement *element, Layer *layer,
         tupletNum->SetEmptyBB();
         return;
     }
-    const bool showHiddenCSS = (tuplet->GetNumVisible() == BOOLEAN_false);
 
     if (!tuplet->GetDrawingLeft() || !tuplet->GetDrawingRight()) {
         tupletNum->SetEmptyBB();
@@ -205,12 +201,11 @@ void View::DrawTupletNum(DeviceContext *dc, LayerElement *element, Layer *layer,
     // adjust the baseline (to be improved with slanted brackets
     y -= m_doc->GetGlyphHeight(notes.back(), glyphSize, drawingCueSize) / 2;
 
-    dc->StartGraphic(tupletNum, (showHiddenCSS ? CSS_SHOW_HIDDEN : ""), tupletNum->GetID());
-    // dc->ResumeGraphic(tupletNum, tupletNum->GetID());
+    dc->ResumeGraphic(tupletNum, tupletNum->GetID());
 
     this->DrawSmuflString(dc, x, y, notes, HORIZONTALALIGNMENT_left, glyphSize, drawingCueSize);
 
-    dc->EndGraphic(tupletNum, this);
+    dc->EndResumedGraphic(tupletNum, this);
 
     dc->ResetFont();
 

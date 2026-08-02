@@ -215,17 +215,21 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         this->DrawTuplet(dc, element, layer, staff, measure);
     }
     else if (element->Is(TUPLET_BRACKET)) {
-        //this->DrawTupletBracket(dc, element, layer, staff, measure);
-        // const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
-        // dc->StartGraphic(element, (showHidden ? CSS_SHOW_HIDDEN : ""), element->GetID());
-        // dc->EndGraphic(element, this);
+        TupletBracket *tupletBracket = vrv_cast<TupletBracket *>(element);
+        assert(element);
+        const bool showHidden
+            = (m_doc->GetOptions()->m_showHidden.GetValue() && tupletBracket->GetBracketVisible() == BOOLEAN_false);
+        dc->StartGraphic(element, (showHidden ? CSS_SHOW_HIDDEN : ""), element->GetID());
+        dc->EndGraphic(element, this);
         layer->AddToDrawingList(element);
     }
     else if (element->Is(TUPLET_NUM)) {
-        // const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
-        //this->DrawTupletNum(dc, element, layer, staff, measure);
-        // dc->StartGraphic(element, (showHidden ? CSS_SHOW_HIDDEN : ""), element->GetID());
-        // dc->EndGraphic(element, this);
+        TupletNum *tupletNum = vrv_cast<TupletNum *>(element);
+        assert(element);
+        const bool showHidden
+            = (m_doc->GetOptions()->m_showHidden.GetValue() && tupletNum->GetNumVisible() == BOOLEAN_false);
+        dc->StartGraphic(element, (showHidden ? CSS_SHOW_HIDDEN : ""), element->GetID());
+        dc->EndGraphic(element, this);
         layer->AddToDrawingList(element);
     }
     else if (element->Is(VERSE)) {
