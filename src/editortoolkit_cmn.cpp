@@ -585,26 +585,8 @@ bool EditorToolkitCMN::InsertRest(const std::string &elementId, data_DURATION du
         if (note->IsChordTone()) target = note->IsChordTone();
     }
 
-    Object *previousElement = NULL;
-    Object *targetContainer = NULL;
-    if (!target->Is(LAYER)) {
-        Object *targetParent = target->GetParent();
-        // Inserting a note within a tuplet or a beam
-        if (targetParent && targetParent->IsAnyOf(std::array{ BEAM, TUPLET }) && targetParent->GetLast() != target) {
-            previousElement = target;
-            targetContainer = targetParent;
-        }
-        // Otherwise always insert in the layer
-        else {
-            previousElement = target->GetLastAncestorNot(LAYER);
-            if (!previousElement) return false;
-            targetContainer = previousElement->GetParent();
-            assert(targetContainer && targetContainer->Is(LAYER));
-        }
-    }
-    else {
-        targetContainer = target;
-    }
+    auto [targetContainer, previousElement] = this->GetTargetContainerFor(target);
+    if (!targetContainer) return false;
 
     Rest *rest = vrv_cast<Rest *>(this->PrepareInsertion(targetContainer, "rest"));
     if (!rest) return false;
