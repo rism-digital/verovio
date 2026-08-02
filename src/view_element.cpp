@@ -573,8 +573,11 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     this->DrawStemMod(dc, element, staff);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     // draw the (tuplet) number
-    if (bTrem->HasNum() && (bTrem->GetNumVisible() != BOOLEAN_false)) {
+    if (bTrem->HasNum() && (showHidden || bTrem->GetNumVisible() != BOOLEAN_false)) {
+        dc->StartCustomGraphic("bTremNum", (bTrem->GetNumVisible() == BOOLEAN_false) ? CSS_SHOW_HIDDEN : "");
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
         // calculate the extend of the number
         TextExtend extend;
@@ -587,6 +590,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         dc->DrawMusicText(figures, this->ToDeviceContextX(element->GetDrawingX() + xOffset - extend.m_width / 2),
             this->ToDeviceContextY(yNum));
         dc->ResetFont();
+        dc->EndCustomGraphic();
     }
 
     dc->EndGraphic(element, this);
@@ -1288,9 +1292,12 @@ void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     this->DrawMRptPart(dc, element->GetDrawingX(), staff->GetDrawingY(), SMUFL_E500_repeat1Bar, 0, false, staff);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     // draw the measure count
     const int mRptNum = mRpt->HasNum() ? mRpt->GetNum() : mRpt->m_drawingMeasureCount;
-    if ((mRptNum > 0) && (mRpt->GetNumVisible() != BOOLEAN_false)) {
+    if ((mRptNum > 0) && (showHidden || mRpt->GetNumVisible() != BOOLEAN_false)) {
+        dc->StartCustomGraphic("mRptNum", (mRpt->GetNumVisible() == BOOLEAN_false) ? CSS_SHOW_HIDDEN : "");
         dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
         // calculate the extend of the number
         TextExtend extend;
@@ -1305,6 +1312,7 @@ void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         dc->DrawMusicText(
             figures, this->ToDeviceContextX(element->GetDrawingX() - extend.m_width / 2), this->ToDeviceContextY(yNum));
         dc->ResetFont();
+        dc->EndCustomGraphic();
     }
 
     dc->EndGraphic(element, this);
@@ -1451,8 +1459,11 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         if (count) this->DrawSmuflCode(dc, x1, y1, SMUFL_E4E3_restWhole, staffSize, false);
     }
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     // Draw the number
-    if (multiRest->GetNumVisible() != BOOLEAN_false) {
+    if (showHidden || multiRest->GetNumVisible() != BOOLEAN_false) {
+        dc->StartCustomGraphic("multiRestNum", (multiRest->GetNumVisible() == BOOLEAN_false) ? CSS_SHOW_HIDDEN : "");
         dc->SetFont(m_doc->GetDrawingSmuflFont(staffNotationSize, false));
 
         const int staffHeight = (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize);
@@ -1465,6 +1476,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         this->DrawSmuflString(
             dc, xCentered, y, this->IntToTimeSigFigures(num), HORIZONTALALIGNMENT_center, staffNotationSize);
         dc->ResetFont();
+        dc->EndCustomGraphic();
     }
 
     dc->EndGraphic(element, this);
