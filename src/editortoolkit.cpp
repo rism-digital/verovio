@@ -27,7 +27,7 @@ bool EditorToolkit::AppendChild(std::string &elementId, const std::string &eleme
     if (!element) return false;
 
     if (noDuplicate) {
-        ClassId classId = ObjectFactory::GetInstance()->GetClassId(elementName);
+        ClassId classId = ObjectFactory::GetInstance().GetClassId(elementName);
         Object *existingChildElement = element->FindDescendantByType(classId, 1);
         if (existingChildElement) {
             existingChildElement->Reset();
@@ -103,13 +103,13 @@ Object *EditorToolkit::PrepareInsertion(Object *parent, const std::string &eleme
 {
     assert(parent);
 
-    ClassId classId = ObjectFactory::GetInstance()->GetClassId(elementName);
+    ClassId classId = ObjectFactory::GetInstance().GetClassId(elementName);
     if (!parent->IsSupportedChild(classId)) {
         LogError("Element '%s' is not supported as child of '%s'", elementName.c_str(), parent->GetClassName().c_str());
         return NULL;
     }
 
-    Object *childElement = ObjectFactory::GetInstance()->Create(elementName);
+    Object *childElement = ObjectFactory::GetInstance().Create(elementName);
     if (!childElement) {
         LogError("Creating a '%s' object failed", elementName.c_str());
     }
