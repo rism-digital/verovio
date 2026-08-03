@@ -789,7 +789,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     // Because SMuFL does not have the origin correpsonding to the pitch as for notes, we need to correct it.
     // This will remain approximate
-    if (staff->m_drawingNotationType != NOTATIONTYPE_neume) {
+    if (!IsNeumeType(staff->m_drawingNotationType)) {
         y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
@@ -1824,7 +1824,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     Syl *syl = vrv_cast<Syl *>(element);
     assert(syl);
 
-    if (!syl->GetStart() && !(staff->m_drawingNotationType == NOTATIONTYPE_neume)) {
+    if (!syl->GetStart() && !IsNeumeType(staff->m_drawingNotationType)) {
         LogWarning("Parent note for <syl> was not found");
         return;
     }
@@ -1859,6 +1859,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     TextDrawingParams params;
     params.m_x = x;
     params.m_y = y;
+    params.m_staffSize = staff->m_drawingStaffSize;
     if (m_doc->IsFacs() || m_doc->IsNeumeLines()) {
         params.m_width = syl->GetDrawingWidth();
         params.m_height = syl->GetDrawingHeight();
@@ -1951,6 +1952,7 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         TextDrawingParams params;
         params.m_x = verse->GetDrawingX() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         params.m_y = staff->GetDrawingY() + this->GetSylYRel(std::max(1, verse->GetN()), staff, verse->GetPlace());
+        params.m_staffSize = staff->m_drawingStaffSize;
         params.m_pointSize = labelTxt.GetPointSize();
 
         dc->SetFont(&labelTxt);

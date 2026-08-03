@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <cassert>
+#include <cmath>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -337,6 +338,26 @@ void View::CalcOffsetBezier(DeviceContext *dc, Point points[4], char spanningTyp
         this->CalcOffsetY(dc, points[2].y);
         this->CalcOffsetY(dc, points[3].y);
     }
+}
+
+int View::ConvertFontSizeNumeric(const data_FONTSIZE &fontSize, int staffSize) const
+{
+    assert(fontSize.GetType() == FONTSIZE_fontSizeNumeric);
+
+    if (fontSize.GetFontSizeNumericType() == FONTSIZENUMERIC_vu) {
+        assert(m_doc);
+        return static_cast<int>(std::lround(fontSize.GetFontSizeNumeric() * m_doc->GetDrawingUnit(staffSize)));
+    }
+    return View::ConvertFontPointSize(fontSize.GetFontSizeNumeric());
+}
+
+int View::ConvertFontPointSize(double pointSize)
+{
+    constexpr double millimetersPerInch = 25.4;
+    constexpr double pointsPerInch = 72.0;
+    constexpr double drawingUnitsPerMillimeter = 10.0 * DEFINITION_FACTOR;
+
+    return static_cast<int>(std::lround(pointSize * millimetersPerInch * drawingUnitsPerMillimeter / pointsPerInch));
 }
 
 } // namespace vrv

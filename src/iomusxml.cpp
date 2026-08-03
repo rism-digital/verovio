@@ -3081,6 +3081,10 @@ void MusicXmlInput::ReadMusicXmlNote(
                 tabGrp->SetDurPpq(duration);
                 if (dots > 0) tabGrp->SetDots(dots);
                 tabGrp->AddChild(new TabDurSym());
+                // modern guitar tablature has CMN rests. Lute tablature use rhythm sign over empty tagGrp
+                if (staffDef->GetNotationtype() == NOTATIONTYPE_tab_guitar) {
+                    tabGrp->AddChild(new Rest());
+                }
                 this->AddLayerElement(layer, tabGrp, duration);
             }
             else {
@@ -4301,6 +4305,10 @@ void MusicXmlInput::ReadMusicXmlTupletStart(const pugi::xml_node &node, const pu
     tuplet->SetNumFormat(ConvertTupletNumberValue(tupletStart.attribute("show-number").as_string()));
     if (HasAttributeWithValue(tupletStart, "show-number", "none")) tuplet->SetNumVisible(BOOLEAN_false);
     tuplet->SetBracketVisible(ConvertWordToBool(tupletStart.attribute("bracket").as_string()));
+    if (HasAttributeWithValue(tupletStart.parent(), "print-object", "no")) {
+        tuplet->SetNumVisible(BOOLEAN_false);
+        tuplet->SetBracketVisible(BOOLEAN_false);
+    }
 }
 
 void MusicXmlInput::ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi::xml_node &beamStart, Layer *layer)

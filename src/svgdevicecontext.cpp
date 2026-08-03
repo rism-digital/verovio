@@ -41,6 +41,7 @@ SvgDeviceContext::SvgDeviceContext(const std::string &docId) : DeviceContext(SVG
 
     m_originX = 0;
     m_originY = 0;
+    m_textY = 0;
 
     m_smuflGlyphs.clear();
 
@@ -1016,6 +1017,7 @@ void SvgDeviceContext::StartText(int x, int y, data_HORIZONTALALIGNMENT alignmen
     m_svgNodeStack.push_back(m_currentNode);
     if (x) m_currentNode.append_attribute("x") = x;
     if (y) m_currentNode.append_attribute("y") = y;
+    m_textY = y;
     // unless dx, dy have a value they don't need to be set
     // m_currentNode.append_attribute("dx") = 0;
     // m_currentNode.append_attribute("dy") = 0;
@@ -1051,6 +1053,7 @@ void SvgDeviceContext::MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignme
 {
     m_currentNode.append_attribute("x") = x;
     m_currentNode.append_attribute("y") = y;
+    m_textY = y;
     if (alignment != HORIZONTALALIGNMENT_NONE) {
         std::string anchor = "start";
         if (alignment == HORIZONTALALIGNMENT_right) {
@@ -1065,7 +1068,10 @@ void SvgDeviceContext::MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignme
 
 void SvgDeviceContext::MoveTextVerticallyTo(int y)
 {
-    m_currentNode.append_attribute("y") = y;
+    // An absolute y starts a new anchored text chunk in SVG. Use a relative shift so
+    // superscripts and subscripts remain part of the surrounding horizontal text run.
+    m_currentNode.append_attribute("dy") = y - m_textY;
+    m_textY = y;
 }
 
 void SvgDeviceContext::EndText()
