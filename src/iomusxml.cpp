@@ -2837,13 +2837,7 @@ void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, c
     assert(node);
     assert(measure);
 
-    if (!node.next_sibling()) {
-        // fill the layer, if forward element is last sibling
-        this->FillSpace(SelectLayer(node, measure), node.child("duration").text().as_int());
-    }
-    else {
-        m_durTotal += node.child("duration").text().as_int();
-    }
+    m_durTotal += node.child("duration").text().as_int();
 }
 
 void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure)
