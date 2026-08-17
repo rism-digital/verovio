@@ -13,6 +13,8 @@
 #include <iterator>
 #include <map>
 #include <memory>
+#include <mutex>
+#include <shared_mutex>
 #include <string>
 #include <unordered_set>
 
@@ -1088,12 +1090,12 @@ public:
     /**
      * A static method returning a static object in order to guarantee initialisation
      */
-    static ObjectFactory *GetInstance();
+    static ObjectFactory &GetInstance();
 
     /**
      * Create the object from the MEI element string name by making a lookup in the register
      */
-    Object *Create(std::string name);
+    Object *Create(const std::string &name);
 
     /**
      * Create the object from the ClassId  by making a lookup in the register
@@ -1103,12 +1105,12 @@ public:
     /**
      * Add the name / constructor map entry to the static register
      */
-    void Register(std::string name, ClassId classId, std::function<Object *(void)> function);
+    void Register(const std::string &name, ClassId classId, std::function<Object *(void)> function);
 
     /**
      * Get the ClassId from the MEI element string name by making a lookup in the register
      */
-    ClassId GetClassId(std::string name);
+    ClassId GetClassId(const std::string &name);
 
     /**
      * Get the correspondings ClassIds from the vector of MEI element string names
@@ -1116,8 +1118,9 @@ public:
     void GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds);
 
 public:
-    static thread_local MapOfClassIdConstructors s_ctorsRegistry;
-    static thread_local MapOfStrClassIds s_classIdsRegistry;
+    mutable std::shared_mutex m_mutex;
+    MapOfClassIdConstructors m_ctorsRegistry;
+    MapOfStrClassIds m_classIdsRegistry;
 };
 
 //----------------------------------------------------------------------------
@@ -1129,9 +1132,9 @@ public:
     /**
      * The contructor registering the name / constructor map
      */
-    ClassRegistrar(std::string name, ClassId classId)
+    ClassRegistrar(const std::string &name, ClassId classId)
     {
-        ObjectFactory::GetInstance()->Register(name, classId, []() -> Object * { return new T(); });
+        ObjectFactory::GetInstance().Register(name, classId, []() -> Object * { return new T(); });
     }
 
     /**
@@ -1140,7 +1143,7 @@ public:
      */
     ClassRegistrar(const std::string &name, ClassId pseudoClassId, std::function<Object *()> factory)
     {
-        ObjectFactory::GetInstance()->Register(name, pseudoClassId, factory);
+        ObjectFactory::GetInstance().Register(name, pseudoClassId, factory);
     }
 };
 
