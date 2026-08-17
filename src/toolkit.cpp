@@ -1946,8 +1946,15 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
     // Get the pageNo from the first note (if any)
     int pageNo = -1;
-    Page *page = vrv_cast<Page *>(measure->GetFirstAncestor(PAGE));
-    if (page) pageNo = page->GetIdx() + 1;
+    if (m_midiDoc == &m_doc) {
+        Page *page = vrv_cast<Page *>(measure->GetFirstAncestor(PAGE));
+        if (page) pageNo = page->GetIdx() + 1;
+    }
+    else {
+        const std::string notatedId = this->GetNotatedIdForElement(measure->GetID());
+        const int notatedPageNo = this->GetPageWithElement(notatedId);
+        if (notatedPageNo > 0) pageNo = notatedPageNo;
+    }
 
     NoteOrRestOnsetOffsetComparison matchTime(millisec - measureTimeOffset);
     ListOfObjects notesOrRests;
