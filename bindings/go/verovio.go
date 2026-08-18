@@ -64,8 +64,12 @@ func (t *Toolkit) Edit(editorAction string) bool {
 	return bool(C.vrvToolkit_edit(t.ptr, cEditorAction))
 }
 
-func (t *Toolkit) EditInfo() string {
-	return goString(C.vrvToolkit_editInfo(t.ptr))
+func (t *Toolkit) EditResponse() string {
+	return goString(C.vrvToolkit_editResponse(t.ptr))
+}
+
+func (t *Toolkit) EditStatus() string {
+	return goString(C.vrvToolkit_editStatus(t.ptr))
 }
 
 func (t *Toolkit) AvailableOptions() string {

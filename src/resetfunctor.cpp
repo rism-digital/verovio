@@ -11,6 +11,7 @@
 
 #include "arpeg.h"
 #include "beamspan.h"
+#include "cursor.h"
 #include "custos.h"
 #include "div.h"
 #include "dot.h"
@@ -639,6 +640,16 @@ FunctorCode ResetHorizontalAlignmentFunctor::VisitBeamSpan(BeamSpan *beamSpan)
     return this->VisitControlElement(beamSpan);
 }
 
+FunctorCode ResetHorizontalAlignmentFunctor::VisitCursor(Cursor *cursor)
+{
+    this->VisitNote(cursor);
+
+    cursor->ResetCursorAlignment();
+    cursor->SetYRelPitchC(0);
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ResetHorizontalAlignmentFunctor::VisitCustos(Custos *custos)
 {
     this->VisitLayerElement(custos);
@@ -711,6 +722,10 @@ FunctorCode ResetHorizontalAlignmentFunctor::VisitLayer(Layer *layer)
     }
     if (layer->GetCautionStaffDefMeterSig()) {
         this->VisitMeterSig(layer->GetCautionStaffDefMeterSig());
+    }
+
+    if (layer->HasCursor()) {
+        this->VisitCursor(layer->GetCursor());
     }
 
     return FUNCTOR_CONTINUE;

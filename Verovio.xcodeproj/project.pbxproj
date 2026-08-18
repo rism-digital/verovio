@@ -197,6 +197,12 @@
 		4D1788C62CB8FD7300FE9043 /* fraction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1788C42CB8FD7300FE9043 /* fraction.cpp */; };
 		4D1788C72CB8FD7300FE9043 /* fraction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1788C42CB8FD7300FE9043 /* fraction.cpp */; };
 		4D1788C82CB8FD7300FE9043 /* fraction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1788C42CB8FD7300FE9043 /* fraction.cpp */; };
+		4D1A0BBB2FD1517B004AE805 /* cursor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1A0BBA2FD1517B004AE805 /* cursor.h */; };
+		4D1A0BBC2FD1517B004AE805 /* cursor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1A0BBA2FD1517B004AE805 /* cursor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D1A0BBE2FD1518E004AE805 /* cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A0BBD2FD1518E004AE805 /* cursor.cpp */; };
+		4D1A0BBF2FD1518E004AE805 /* cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A0BBD2FD1518E004AE805 /* cursor.cpp */; };
+		4D1A0BC02FD1518E004AE805 /* cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A0BBD2FD1518E004AE805 /* cursor.cpp */; };
+		4D1A0BC12FD1518E004AE805 /* cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A0BBD2FD1518E004AE805 /* cursor.cpp */; };
 		4D1AC9772B6A9BB200434023 /* filereader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1AC9762B6A9BB200434023 /* filereader.cpp */; };
 		4D1AC9782B6A9BB200434023 /* filereader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1AC9762B6A9BB200434023 /* filereader.cpp */; };
 		4D1AC9792B6A9BB200434023 /* filereader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1AC9762B6A9BB200434023 /* filereader.cpp */; };
@@ -1921,6 +1927,8 @@
 		4D1694601E3A44F300569BF4 /* Verovio-Humdrum */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Verovio-Humdrum"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D1788C12CB8FD0100FE9043 /* fraction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = fraction.h; path = include/vrv/fraction.h; sourceTree = "<group>"; };
 		4D1788C42CB8FD7300FE9043 /* fraction.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = fraction.cpp; path = src/fraction.cpp; sourceTree = "<group>"; };
+		4D1A0BBA2FD1517B004AE805 /* cursor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cursor.h; path = include/vrv/cursor.h; sourceTree = "<group>"; };
+		4D1A0BBD2FD1518E004AE805 /* cursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cursor.cpp; path = src/cursor.cpp; sourceTree = "<group>"; };
 		4D1AC9762B6A9BB200434023 /* filereader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = filereader.cpp; path = src/filereader.cpp; sourceTree = "<group>"; };
 		4D1AC97B2B6A9BD000434023 /* filereader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = filereader.h; path = include/vrv/filereader.h; sourceTree = "<group>"; };
 		4D1BD1B421908D6B000D35B2 /* halfmrpt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = halfmrpt.cpp; path = src/halfmrpt.cpp; sourceTree = "<group>"; };
@@ -2686,6 +2694,8 @@
 		4DA0EAFC22BB797000A7EBEB /* editor */ = {
 			isa = PBXGroup;
 			children = (
+				4D1A0BBD2FD1518E004AE805 /* cursor.cpp */,
+				4D1A0BBA2FD1517B004AE805 /* cursor.h */,
 				4DA0EAE822BB77C300A7EBEB /* editortoolkit_cmn.cpp */,
 				4DA0EACF22BB77AF00A7EBEB /* editortoolkit_cmn.h */,
 				4DA0EAE722BB77C300A7EBEB /* editortoolkit_neume.cpp */,
@@ -3404,6 +3414,7 @@
 				4DCB7AA326D3C9600047F01D /* crc.h in Headers */,
 				4DEC4DD421C8295700D1D273 /* expan.h in Headers */,
 				4DB3D8A51F828E9100B5FC2B /* areaposinterface.h in Headers */,
+				4D1A0BBB2FD1517B004AE805 /* cursor.h in Headers */,
 				4DEC4DD321C8295700D1D273 /* restore.h in Headers */,
 				4D27E13427F582AB00D64FBD /* docselection.h in Headers */,
 				406916DE23833794009E6B04 /* mspace.h in Headers */,
@@ -3988,6 +3999,7 @@
 				4D1788C32CB8FD0100FE9043 /* fraction.h in Headers */,
 				BB4C4B5C22A932D7001F6AF0 /* mensur.h in Headers */,
 				4D79641E26C152400026288B /* pageelement.h in Headers */,
+				4D1A0BBC2FD1517B004AE805 /* cursor.h in Headers */,
 				BB4C4AEC22A932BC001F6AF0 /* editorial.h in Headers */,
 				E75EA9FB29CC3A6C003A97A7 /* calcarticfunctor.h in Headers */,
 				E7770F8429D0D9F700A9BECF /* adjustslursfunctor.h in Headers */,
@@ -4347,6 +4359,7 @@
 				4D1694261E3A44F300569BF4 /* MidiEventList.cpp in Sources */,
 				4DA0EAC822BB779400A7EBEB /* facsimile.cpp in Sources */,
 				4D677B5E2D9D7224006A2EF7 /* scoringupfunctor.cpp in Sources */,
+				4D1A0BBF2FD1518E004AE805 /* cursor.cpp in Sources */,
 				4D1694271E3A44F300569BF4 /* iohumdrum.cpp in Sources */,
 				4D1694281E3A44F300569BF4 /* rest.cpp in Sources */,
 				4D1694291E3A44F300569BF4 /* scoredef.cpp in Sources */,
@@ -4655,6 +4668,7 @@
 				8F086EFF188539540037FD8E /* slur.cpp in Sources */,
 				4DEC4DAA21C81EEC00D1D273 /* restore.cpp in Sources */,
 				36E0442C2347A9150054F141 /* expansionmap.cpp in Sources */,
+				4D1A0BBE2FD1518E004AE805 /* cursor.cpp in Sources */,
 				4D7D93EE2D31498000BFAEF0 /* annotscore.cpp in Sources */,
 				8F086F00188539540037FD8E /* staff.cpp in Sources */,
 				40F910081E2799740081B7BB /* trill.cpp in Sources */,
@@ -4888,6 +4902,7 @@
 				E7F39C6329A62B440055DBE0 /* adjustclefchangesfunctor.cpp in Sources */,
 				4DEBE6E42B36E79600B67DFB /* facsimilefunctor.cpp in Sources */,
 				E79320692991454000D80975 /* calcstemfunctor.cpp in Sources */,
+				4D1A0BC02FD1518E004AE805 /* cursor.cpp in Sources */,
 				8F3DD33E18854B2E0051330C /* beam.cpp in Sources */,
 				4DED4F19294733140073E504 /* altsyminterface.cpp in Sources */,
 				E7ADB3B029D1923600825D5D /* adjustarticfunctor.cpp in Sources */,
@@ -5196,6 +5211,7 @@
 				4DED4F1A294733140073E504 /* altsyminterface.cpp in Sources */,
 				4DEBE6E52B36E79600B67DFB /* facsimilefunctor.cpp in Sources */,
 				BB4C4B9F22A932E5001F6AF0 /* positioninterface.cpp in Sources */,
+				4D1A0BC12FD1518E004AE805 /* cursor.cpp in Sources */,
 				BB4C4B5322A932D7001F6AF0 /* halfmrpt.cpp in Sources */,
 				BB4C4B8722A932DF001F6AF0 /* num.cpp in Sources */,
 				E7ADB3B129D1923700825D5D /* adjustarticfunctor.cpp in Sources */,

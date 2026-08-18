@@ -152,6 +152,11 @@ void Doc::ResetToSerialization()
     m_isMensuralMusicOnly = BOOLEAN_NONE;
     m_isNeumeLines = false;
     m_visibleScores.clear();
+
+    if (m_focusRange) {
+        delete m_focusRange;
+        m_focusRange = NULL;
+    }
     m_focusStatus = FOCUS_UNSET;
 
     m_facsimile = NULL;

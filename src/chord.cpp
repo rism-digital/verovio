@@ -116,6 +116,13 @@ void Chord::Reset()
     this->ClearNoteGroups();
 }
 
+void Chord::CloneReset()
+{
+    LayerElement::CloneReset();
+
+    m_noteGroups.clear();
+}
+
 void Chord::ClearNoteGroups() const
 {
     std::list<ChordNoteGroup *>::iterator iter;

@@ -134,6 +134,17 @@ void Note::Reset()
     m_stemSameasRole = SAMEAS_NONE;
 }
 
+void Note::CloneReset()
+{
+    m_noteGroupPosition = 0;
+    m_noteGroup = NULL;
+
+    m_flippedNotehead = false;
+
+    m_stemSameas = NULL;
+    m_stemSameasRole = SAMEAS_NONE;
+}
+
 bool Note::IsSupportedChild(ClassId classId)
 {
     static const std::vector<ClassId> supported{ ACCID, ARTIC, DOTS, PLICA, REFRAIN, STEM, SYL, VERSE };

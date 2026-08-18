@@ -895,9 +895,6 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 {
     assert(root);
 
-    // initialize accidentals map
-    this->ResetAccidentals();
-
     // check for multimetric music
     bool multiMetric = root.select_node("/score-partwise/part/measure[@non-controlling='yes']");
     if (multiMetric) {
@@ -1880,9 +1877,6 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     assert(node);
     assert(measure);
 
-    // re-initialize the accidentals to the current key signature.
-    this->ResetAccidentals(m_currentKeySig);
-
     const std::string measureNum = node.attribute("number").as_string();
     if (node.attribute("id")) measure->SetID(node.attribute("id").as_string());
     if (measure != NULL) measure->SetN(measureNum);
@@ -2843,13 +2837,7 @@ void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, c
     assert(node);
     assert(measure);
 
-    if (!node.next_sibling()) {
-        // fill the layer, if forward element is last sibling
-        this->FillSpace(SelectLayer(node, measure), node.child("duration").text().as_int());
-    }
-    else {
-        m_durTotal += node.child("duration").text().as_int();
-    }
+    m_durTotal += node.child("duration").text().as_int();
 }
 
 void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure)
@@ -3021,6 +3009,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         if (chord) duration = std::min(duration, chord->GetDurPpq());
     }
     const int noteStaffNum = node.child("staff").text().as_int();
+    // Staff the note is actually on (cross-staff aware), for control events anchored to this note
+    const int notationStaffN = (noteStaffNum > 0) ? noteStaffNum + staffOffset : staff->GetN();
     const pugi::xml_node rest = node.child("rest");
     if (m_ppq < 0 && duration && !typeStr.empty()) {
         // if divisions are missing, try to calculate
@@ -3168,51 +3158,51 @@ void MusicXmlInput::ReadMusicXmlNote(
                 std::string pitchAlter = PitchAlterToString(note->GetPname(), alterVal);
                 ListOfObjects accids = note->FindAllDescendantsByType(ACCID);
                 if (accids.empty()) {
-                    // It can happen that the doc encodes the accidentals in the pitch/alter element only,
-                    // regardless of key signature or bar lines. Handle this case here.
-                    if (alterVal != 0.0) {
-                        // In case this alter value is already associated with an accidental, use it here.
-                        if (m_alterAccids.contains(pitchAlter)) {
-                            m_currentAccids[note->GetPname()] = m_alterAccids.at(pitchAlter);
-                        }
-                        // Otherwise, deduce the generic accidental from this alter value.
-                        else {
-                            m_currentAccids[note->GetPname()].clear();
-                            m_currentAccids[note->GetPname()].push_back(musicxml::Accidental(
-                                Att::AccidentalGesturalToWritten(ConvertAlterToAccid(alterVal)), "", ""));
-                        }
+                    std::vector<musicxml::Accidental> currentAccids;
+
+                    // Use the alter value as key to the accidentals.
+                    // In case this alter value is already associated with an accidental, use it here.
+                    if (m_alterAccids.contains(pitchAlter)) {
+                        currentAccids = m_alterAccids.at(pitchAlter);
+                    }
+                    // Otherwise, deduce the generic accidental from this alter value.
+                    else {
+                        currentAccids.push_back(musicxml::Accidental(
+                            Att::AccidentalGesturalToWritten(ConvertAlterToAccid(alterVal)), "", ""));
                     }
 
                     try {
-                        for (const auto &current : m_currentAccids.at(note->GetPname())) {
+                        for (const auto &current : currentAccids) {
                             // Avoid adding empty accidentals
-                            if (current.m_accid == ACCIDENTAL_WRITTEN_NONE && current.m_glyphName.empty()) continue;
+                            if ((current.m_accid == ACCIDENTAL_WRITTEN_NONE || current.m_accid == ACCIDENTAL_WRITTEN_n)
+                                && current.m_glyphName.empty())
+                                continue;
 
                             Accid *accid = new Accid();
                             note->AddChild(accid);
                             accid->SetAccidGes(Att::AccidentalWrittenToGestural(current.m_accid));
+                            accid->IsAttribute(true);
 
                             // Because gestural accidentals do not map 1:1 to written accidentals, we may be losing
                             // information if we rely only on gestural accidentals to look up tuning tones.
                             // Instead, we set the accidental's SMuFL glyph name to whatever was carried over. The
                             // custom tuning will always choose the SMuFL glyph over the written or gestural
                             // accidentals. SPECIAL CASE: When the gestural accidental is the same as the written
-                            // accidental (and not NONE), we are sure that the gestural accidental will not lose
+                            // accidental we are sure that the gestural accidental will not lose
                             // information, and therefore we don't need to explicitly set the SMuFL glyph. This ensures
                             // that scores that only feature "regular" accidentals will never have redundant SMuFL
                             // glyphs.
-                            if (current.m_accid == ACCIDENTAL_WRITTEN_NONE
-                                || Att::AccidentalGesturalToWritten(accid->GetAccidGes()) != current.m_accid) {
-                                if (!current.m_glyphName.empty()) {
-                                    accid->SetGlyphName(current.m_glyphName);
-                                    accid->SetGlyphAuth(current.m_glyphAuth);
-                                }
-                                // We have a current.m_accid
-                                else {
-                                    char32_t glyph = Accid::GetAccidGlyph(current.m_accid);
-                                    accid->SetGlyphName(CustomTuning::GetGlyphName(glyph, m_doc));
-                                    accid->SetGlyphAuth("smufl");
-                                }
+                            if (!current.m_glyphName.empty()) {
+                                accid->SetGlyphName(current.m_glyphName);
+                                accid->SetGlyphAuth(current.m_glyphAuth);
+                                accid->IsAttribute(false);
+                            }
+                            // We have a current.m_accid, avoid adding it if it's the same as the gestural accidental.
+                            else if (Att::AccidentalGesturalToWritten(accid->GetAccidGes()) != current.m_accid) {
+                                char32_t glyph = Accid::GetAccidGlyph(current.m_accid);
+                                accid->SetGlyphName(CustomTuning::GetGlyphName(glyph, m_doc));
+                                accid->SetGlyphAuth("smufl");
+                                accid->IsAttribute(false);
                             }
                         }
                     }
@@ -3221,7 +3211,6 @@ void MusicXmlInput::ReadMusicXmlNote(
                     }
                 }
                 else {
-                    m_currentAccids[note->GetPname()].clear();
                     m_alterAccids[pitchAlter].clear();
                     for (Object *object : accids) {
                         Accid *accid = vrv_cast<Accid *>(object);
@@ -3229,8 +3218,6 @@ void MusicXmlInput::ReadMusicXmlNote(
                         if (Att::AccidentalGesturalToWritten(ges) != accid->GetAccid()) {
                             accid->SetAccidGes(ges);
                         }
-                        m_currentAccids[note->GetPname()].push_back(
-                            musicxml::Accidental(accid->GetAccid(), accid->GetGlyphName(), accid->GetGlyphAuth()));
                         m_alterAccids[pitchAlter].push_back(
                             musicxml::Accidental(accid->GetAccid(), accid->GetGlyphName(), accid->GetGlyphAuth()));
                     }
@@ -3573,7 +3560,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                     m_controlElements.push_back({ m_measureCounts.at(measure), fing });
                     const std::string startID = note ? ("#" + note->GetID()) : m_ID;
                     fing->SetStartid(startID);
-                    fing->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+                    fing->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(notationStaffN)));
                     fing->SetPlace(
                         fing->AttPlacementRelStaff::StrToStaffrel(technicalChild.attribute("placement").as_string()));
                     fing->AddChild(text);
@@ -3666,7 +3653,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     if (xmlBreath) {
         Breath *breath = new Breath();
         m_controlElements.push_back({ m_measureCounts.at(measure), breath });
-        breath->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        breath->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(notationStaffN)));
         breath->SetPlace(
             breath->AttPlacementRelStaff::StrToStaffrel(xmlBreath.node().attribute("placement").as_string()));
         breath->SetColor(xmlBreath.node().attribute("color").as_string());
@@ -3678,7 +3665,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     if (xmlCaesura) {
         Caesura *caesura = new Caesura();
         m_controlElements.push_back({ m_measureCounts.at(measure), caesura });
-        caesura->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        caesura->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(notationStaffN)));
         caesura->SetPlace(
             caesura->AttPlacementRelStaff::StrToStaffrel(xmlCaesura.node().attribute("placement").as_string()));
         caesura->SetColor(xmlCaesura.node().attribute("color").as_string());
@@ -3693,7 +3680,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     if (xmlDynam) {
         Dynam *dynam = new Dynam();
         m_controlElements.push_back({ m_measureCounts.at(measure), dynam });
-        dynam->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        dynam->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(notationStaffN)));
         dynam->SetStartid(m_ID);
         if (xmlDynam.attribute("id")) dynam->SetID(xmlDynam.attribute("id").as_string());
         // place
@@ -3723,7 +3710,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         Fermata *fermata = new Fermata();
         m_controlElements.push_back({ m_measureCounts.at(measure), fermata });
         fermata->SetStartid(m_ID);
-        fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(notationStaffN)));
         if (xmlFermata.attribute("id")) fermata->SetID(xmlFermata.attribute("id").as_string());
         this->ShapeFermata(fermata, xmlFermata);
     }
@@ -3742,7 +3729,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             gliss->SetLform(gliss->AttLineRendBase::StrToLineform(xmlGlissando.attribute("line-type").as_string()));
             gliss->SetN(xmlGlissando.attribute("number").as_string());
             gliss->SetStartid(noteID);
-            gliss->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+            gliss->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(notationStaffN)));
             gliss->SetType(xmlGlissando.name());
             if (xmlGlissando.attribute("id")) gliss->SetID(xmlGlissando.attribute("id").as_string());
             m_glissStack.push_back(gliss);
@@ -3767,7 +3754,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     if (xmlMordent) {
         Mordent *mordent = new Mordent();
         m_controlElements.push_back({ m_measureCounts.at(measure), mordent });
-        mordent->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        mordent->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(notationStaffN)));
         mordent->SetStartid(m_ID);
         // color
         mordent->SetColor(xmlMordent.node().attribute("color").as_string());
@@ -3820,7 +3807,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     if (xmlExtOrnament) {
         Mordent *mordent = new Mordent();
         m_controlElements.push_back({ m_measureCounts.at(measure), mordent });
-        mordent->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        mordent->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(notationStaffN)));
         mordent->SetStartid(m_ID);
         // color
         mordent->SetColor(xmlExtOrnament.node().attribute("color").as_string());
@@ -3838,7 +3825,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     if (xmlTrill || xmlTrillLine) {
         Trill *trill = new Trill();
         m_controlElements.push_back({ m_measureCounts.at(measure), trill });
-        trill->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        trill->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(notationStaffN)));
         trill->SetStartid(m_ID);
         // color
         trill->SetColor(xmlTrill.node().attribute("color").as_string());
@@ -3889,7 +3876,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     if (xmlTurn) {
         Turn *turn = new Turn();
         m_controlElements.push_back({ m_measureCounts.at(measure), turn });
-        turn->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        turn->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(notationStaffN)));
         turn->SetStartid(m_ID);
         turn->SetColor(xmlTurn.node().attribute("color").as_string());
         turn->SetPlace(turn->AttPlacementRelStaff::StrToStaffrel(xmlTurn.node().attribute("placement").as_string()));
@@ -4492,10 +4479,6 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
         }
     }
 
-    // adjust the accidentals map to this key signature
-    this->ResetAccidentals(keySig);
-    m_currentKeySig = keySig;
-
     return keySig;
 }
 
@@ -4512,33 +4495,6 @@ ScoreDef *MusicXmlInput::GetOrCreateLastScoreDef(Section *section)
         section->AddChild(scoreDef);
     }
     return scoreDef;
-}
-
-void MusicXmlInput::ResetAccidentals(const KeySig *keySig)
-{
-    // inspired by KeySig::FillMap() but without the octave repetitions
-    m_currentAccids.clear();
-    for (int i = PITCHNAME_c; i <= PITCHNAME_b; i++) {
-        m_currentAccids[static_cast<data_PITCHNAME>(i)] = { musicxml::Accidental() };
-    }
-
-    if (!keySig) return;
-
-    const ListOfConstObjects &childList = keySig->GetList(); // make sure it's initialized
-    if (!childList.empty()) {
-        for (const Object *child : childList) {
-            const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(child);
-            assert(keyAccid);
-            m_currentAccids[keyAccid->GetPname()]
-                = { musicxml::Accidental(keyAccid->GetAccid(), keyAccid->GetGlyphName(), keyAccid->GetGlyphAuth()) };
-        }
-        return;
-    }
-
-    data_ACCIDENTAL_WRITTEN accidType = keySig->GetAccidType();
-    for (int i = 0; i < keySig->GetAccidCount(true); ++i) {
-        m_currentAccids[KeySig::GetAccidPnameAt(accidType, i)] = { musicxml::Accidental(accidType, "", "") };
-    }
 }
 
 beamRend_FORM MusicXmlInput::ConvertBeamFanToForm(const std::string &value)

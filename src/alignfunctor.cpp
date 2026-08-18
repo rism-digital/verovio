@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include "chord.h"
+#include "cursor.h"
 #include "div.h"
 #include "doc.h"
 #include "dot.h"
@@ -112,6 +113,20 @@ FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
 
 FunctorCode AlignHorizontallyFunctor::VisitLayerEnd(Layer *layer)
 {
+    if (layer->HasCursor()) {
+        Cursor *cursor = layer->GetCursor();
+        Fraction position = 0;
+        if (cursor->HasPosition()) {
+            LayerElement *positionElement = cursor->GetPosition();
+            if (positionElement->GetAlignment()) position = positionElement->GetAlignment()->GetTime();
+            position = position + positionElement->GetAlignmentDuration(m_currentParams, true, m_notationType);
+        }
+        AlignmentType type = (cursor->IsChordEditMode()) ? ALIGNMENT_CURSOR_CHORD : ALIGNMENT_CURSOR;
+        Alignment *alignment = m_measureAligner->GetAlignmentAtTime(position, type);
+        cursor->SetCursorAlignment(alignment);
+        alignment->AddLayerElementRef(cursor);
+    }
+
     m_scoreDefRole = SCOREDEF_CAUTIONARY;
     m_time = m_measureAligner->GetMaxTime();
 
