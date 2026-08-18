@@ -272,7 +272,7 @@ public:
         for (std::string s : additionalAttributes) {
             std::string className = s.substr(0, s.find("@")); // parse <element@attribute>, e.g., "note@pname"
             std::string attributeName = s.substr(s.find("@") + 1);
-            ClassId classId = ObjectFactory::GetInstance()->GetClassId(className);
+            ClassId classId = ObjectFactory::GetInstance().GetClassId(className);
             m_svgAdditionalAttributes.insert({ classId, attributeName });
         }
     }

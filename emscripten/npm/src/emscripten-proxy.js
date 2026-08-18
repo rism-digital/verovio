@@ -21,8 +21,11 @@ function getToolkitFunction(VerovioModule, method) {
     // bool edit(Toolkit *ic, const char *editorAction) 
     mapping.edit = VerovioModule.cwrap("vrvToolkit_edit", "number", ["number", "string"]);
 
-    // char *editInfo(Toolkit *ic)
-    mapping.editInfo = VerovioModule.cwrap("vrvToolkit_editInfo", "string", ["number"]);
+    // char *editResponse(Toolkit *ic)
+    mapping.editResponse = VerovioModule.cwrap("vrvToolkit_editResponse", "string", ["number"]);
+
+    // char *editStatus(Toolkit *ic)
+    mapping.editStatus = VerovioModule.cwrap("vrvToolkit_editStatus", "string", ["number"]);
 
     // char *getAvailableOptions(Toolkit *ic)
     mapping.getAvailableOptions = VerovioModule.cwrap("vrvToolkit_getAvailableOptions", "string", ["number"]);

@@ -497,7 +497,9 @@ void SvgDeviceContext::StartPage()
         std::string css = "g.ending, g.fing, g.reh, g.tempo {font-weight:bold;} "
                           "g.dir, g.dynam, g.mNum {font-style:italic;}"
                           "g.label {font-weight:normal;} "
-                          "ellipse, path, polygon, polyline, rect {stroke:currentColor} ";
+                          "ellipse, path, polygon, polyline, rect {stroke:currentColor} "
+                          "g.cursor {fill:dodgerblue; color:dodgerblue;} "
+                          "g.cursor.chord {fill:limegreen; color:limegreen;} ";
         if (m_showHidden) {
             std::string showHidden
                 = StringFormat("g.%s {fill: silver; color:silver; stroke:silver;} ", CSS_SHOW_HIDDEN);

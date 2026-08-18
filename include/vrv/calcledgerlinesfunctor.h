@@ -39,6 +39,8 @@ public:
      */
     ///@{
     FunctorCode VisitAccid(Accid *accid) override;
+    FunctorCode VisitCursor(Cursor *cursor) override;
+    FunctorCode VisitLayer(Layer *layer) override;
     FunctorCode VisitNote(Note *note) override;
     FunctorCode VisitStaffEnd(Staff *staff) override;
     ///@}

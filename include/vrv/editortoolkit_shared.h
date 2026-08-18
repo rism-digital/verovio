@@ -15,6 +15,7 @@
 
 //--------------------------------------------------------------------------------
 
+#include "cursor.h"
 #include "doc.h"
 #include "editortoolkit.h"
 #include "view.h"
@@ -41,28 +42,51 @@ public:
 
 protected:
 #ifndef NO_EDIT_SUPPORT
+
+    enum SelectCustom : int8_t { SELECT_NONE = 0, SELECT_NOTE, SELECT_TEXT_PARENT };
+
+    struct State {
+        std::string data;
+        std::string status;
+        int options;
+    };
+
+    enum DeleteNavigation : int8_t { DELETE_NO_NAVIGATON = 0, DELETE_BACKSPACE, DELETE_FORWARD };
+
     /**
      * Parse JSON instructions for experimental editor functions.
      */
     ///@{
-    bool Chain(jsonxx::Array actions);
-    bool ParseContextAction(jsonxx::Object param, std::string &elementId, bool &scores, bool &sections);
-    bool ParseDeleteAction(jsonxx::Object param, std::string &elementId);
-    bool ParseDragAction(jsonxx::Object param, std::string &elementId, int &x, int &y);
-    bool ParseKeyDownAction(jsonxx::Object param, std::string &elementid, int &key, bool &shiftKey, bool &ctrlKey);
+    bool Chain(const jsonxx::Array &actions);
+    bool ParseContextAction(const jsonxx::Object &param, std::string &elementId, bool &scores, bool &sections);
+    bool ParseDeleteAction(const jsonxx::Object &param, std::string &elementId, DeleteNavigation &navigation);
+    bool ParseDragAction(const jsonxx::Object &param, std::string &elementId, int &x, int &y);
+    bool ParseKeyDownAction(
+        const jsonxx::Object &param, std::string &elementid, int &key, bool &shiftKey, bool &ctrlKey);
     bool ParseInsertAction(
-        jsonxx::Object param, std::string &elementName, std::string &elementId, std::string &insertMode);
+        const jsonxx::Object &param, std::string &elementName, std::string &elementId, std::string &insertMode);
     bool ParseInsertControlAction(
-        jsonxx::Object param, std::string &elementName, std::string &startId, std::string &endId);
-    bool ParseNavigate(jsonxx::Object param, std::string &elementId, int &direction);
-    bool ParsePropertiesAction(jsonxx::Object param, std::string &scoreDef);
-    bool ParseSetAction(jsonxx::Object param, std::string &elementId, std::string &attribute, std::string &value);
+        const jsonxx::Object &param, std::string &elementName, std::string &startId, std::string &endId);
+    bool ParseNavigate(const jsonxx::Object &param, std::string &elementId, int &direction);
+    bool ParsePropertiesAction(const jsonxx::Object &param, std::string &scoreDef);
+    bool ParseResetCursorAction(const jsonxx::Object &param, bool &maintainChordMode);
+    bool ParseSelectAction(const jsonxx::Object &param, std::string &elementId, bool &secondary, SelectCustom &custom);
+    bool ParseSetAction(
+        const jsonxx::Object &param, std::string &elementId, std::string &attribute, std::string &value);
+    bool ParseSetCursorAction(
+        const jsonxx::Object &param, std::string &elementId, Cursor::InputMode &inputMode, bool &chordMode);
+    bool ParseUpdateCursorAction(
+        const jsonxx::Object &param, bool &restMode, bool &chordMode, Cursor::TieMode &tieMode);
+    bool ParseUpdatePitchAction(const jsonxx::Object &param, std::string &elementId, data_PITCHNAME &pname, int &oct,
+        data_ACCIDENTAL_WRITTEN &accid, int &midi);
+
     ///@}
 
-    void SetEditInfo();
-    void PrepareUndo();
+    void SetEditStatus();
+    void ReloadEditStatus(const std::string &statusStr, bool insertMode);
+    void PrepareUndo(bool ignoreInsertMode = false);
     std::string GetCurrentState();
-    bool ReloadState(const std::string &data);
+    bool ReloadState(const State &state);
     void TrimUndoMemory();
     bool CanUndo() const;
     bool CanRedo() const;
@@ -73,18 +97,24 @@ protected:
      * Experimental editor functions.
      */
     ///@{
-    bool Delete(std::string &elementId);
+    bool SetCursor(std::string &elementId, Cursor::InputMode inputMode, bool chordMode);
+    bool UpdateCursor(bool restMode, bool chordMode, Cursor::TieMode tieMode);
+    bool ResetCursor(bool maintainChordMode);
+    bool Delete(std::string &elementId, DeleteNavigation navigation);
     bool Drag(std::string &elementId, int x, int y);
-    bool InsertControl(const std::string &elementName, const std::string startId, const std::string endId);
+    bool InsertControl(std::string &elementName, std::string &startId, std::string &endId);
     bool KeyDown(std::string &elementId, int key, bool shiftKey, bool ctrlKey);
     bool Navigate(std::string &elementId, const int &direction);
-    bool Set(std::string &elementId, std::string const &attribute, std::string const &value);
+    bool Select(std::string &elementId, bool secondary, SelectCustom custom);
+    bool Set(std::string &elementId, const std::string &attribute, const std::string &value);
+    bool UpdatePitch(std::string &elementId, data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid, int midi);
+
     ///@}
 
     void ClearContext();
     bool ContextForElement(std::string &elementId);
-    bool ContextForScores(bool editInfo);
-    bool ContextForSections(bool editInfo);
+    bool ContextForScores(bool updateResponse);
+    bool ContextForSections(bool updateResponse);
 
     bool GetScoreDef();
     bool SetScoreDef(const std::string scoreDef);
@@ -97,18 +127,43 @@ protected:
 
     void CollectReferringObjects(
         const Object *element, std::set<std::string> &toDelete, std::set<const Object *> &visited);
+    void PostProcessDeleteObjects(const Object *element, std::set<std::string> &toPostProcess);
+    void PostProcessDelete(const std::string &elementId);
+
+    void PostEditRestriction(Object *element);
+
+    void MoveCursor(LayerElement *element, bool maintainChordMode = false);
+
+    data_ACCIDENTAL_WRITTEN GetAccidBefore(const LayerElement *element, data_PITCHNAME pname, int oct);
+    std::pair<data_ACCIDENTAL_WRITTEN, bool> GetActualAccid(Object *element, data_ACCIDENTAL_WRITTEN accid);
+
+    const Measure *GetPreviousMeasure(const Measure *measure);
+    const Staff *GetPreviousStaff(const Staff *staff);
+    const Layer *GetPreviousLayer(const Layer *layer);
+    const Measure *GetNextMeasure(const Measure *measure);
+    const Staff *GetNextStaff(const Staff *staff);
+    const Layer *GetNextLayer(const Layer *layer);
 
 public:
     //
 protected:
     bool m_undoPrepared;
-    std::deque<std::string> m_undoStack;
-    std::deque<std::string> m_redoStack;
+
+    std::deque<State> m_undoStack;
+    std::deque<State> m_redoStack;
     size_t m_undoMemoryUsage = 0;
 
     EditorTreeObject *m_scoreContext;
     EditorTreeObject *m_sectionContext;
     EditorTreeObject *m_currentContext;
+
+private:
+    struct MidiSpelling {
+        data_PITCHNAME pname;
+        data_ACCIDENTAL_WRITTEN accid;
+    };
+
+    MidiSpelling SpellMidi(int midi, const data_KEYSIGNATURE &keySig);
 };
 
 //----------------------------------------------------------------------------
