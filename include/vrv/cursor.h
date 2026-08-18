@@ -8,6 +8,10 @@
 #ifndef __VRV_CURSOR_H__
 #define __VRV_CURSOR_H__
 
+#include <stack>
+
+//----------------------------------------------------------------------------
+
 #include "elementpart.h"
 #include "note.h"
 
