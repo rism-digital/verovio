@@ -790,6 +790,7 @@ bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode in
     Layer *layer = NULL;
     LayerElement *position = NULL;
     Object *element = this->ResolveElement(elementId);
+    if (!element) return false;
     bool updateAccid = false;
     if (element->Is(STAFF)) {
         updateAccid = true;
@@ -1379,7 +1380,7 @@ bool EditorToolkitShared::UpdatePitch(
 
     if (!m_cursor) {
         Accid *accid = vrv_cast<Accid *>(element->FindDescendantByType(ACCID, 1));
-        element->DeleteChild(accid);
+        if (accid) element->DeleteChild(accid);
     }
     else {
         m_cursor->SetAccid(ACCIDENTAL_WRITTEN_NONE);
