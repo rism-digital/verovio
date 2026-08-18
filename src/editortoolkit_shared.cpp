@@ -585,7 +585,7 @@ void EditorToolkitShared::SetEditStatus()
     if (!m_selectionId.empty()) {
         jsonxx::Object selection;
         selection.import("id", m_selectionId);
-        selection.import("element", ObjectFactory::GetInstance()->GetClassName(m_selectionClassId));
+        selection.import("element", ObjectFactory::GetInstance().GetClassName(m_selectionClassId));
         if (!m_selectionSecondaryId.empty()) selection.import("secondaryId", m_selectionSecondaryId);
         m_editStatus << "selection" << selection;
     }
@@ -630,7 +630,7 @@ void EditorToolkitShared::ReloadEditStatus(const std::string &statusStr, bool in
         }
         if (selection.has<jsonxx::String>("element")) {
             jsonxx::String element = selection.get<jsonxx::String>("element");
-            m_selectionClassId = ObjectFactory::GetInstance()->GetClassId(element);
+            m_selectionClassId = ObjectFactory::GetInstance().GetClassId(element);
         }
         if (selection.has<jsonxx::String>("secondaryId")) {
             m_selectionSecondaryId = selection.get<jsonxx::String>("secondaryId");

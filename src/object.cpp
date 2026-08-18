@@ -1695,7 +1695,9 @@ ClassId ObjectFactory::GetClassId(const std::string &name)
 
 std::string ObjectFactory::GetClassName(ClassId classId)
 {
-    for (const auto &[name, id] : s_classIdsRegistry) {
+    std::shared_lock lock(m_mutex);
+
+    for (const auto &[name, id] : m_classIdsRegistry) {
         if (id == classId) return name;
     }
 
