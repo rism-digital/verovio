@@ -69,6 +69,7 @@ class PgFoot;
 class PgHead;
 class PitchInflection;
 class Reh;
+class Refrain;
 class Rend;
 class RepeatMark;
 class RunningElement;
@@ -92,6 +93,7 @@ class Turn;
 class Tuplet;
 class TupletBracket;
 class TupletNum;
+class Volta;
 class Verse;
 
 // Helper enums
@@ -199,7 +201,7 @@ protected:
         int staffSize, int space);
     void DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBracketSq(DeviceContext *dc, int x, int y1, int y2, int staffSize);
-    void DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize);
+    void DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize, bool forceGlyph = false);
     void DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine, bool isLastMeasure,
         bool isLastSystem, int &yBottomPrevious);
     void DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLine, data_BARRENDITION form,
@@ -321,7 +323,8 @@ protected:
     void DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff);
     void DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
-    void DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawVolta(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawLyricElement(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     ///@}
 
     /**
@@ -607,7 +610,7 @@ private:
     std::u32string IntToTimeSigFigures(unsigned short number);
     std::u32string IntToSmuflFigures(unsigned short number, int offset);
     int NestedTuplets(Object *object);
-    int GetSylYRel(int verseN, Staff *staff, data_STAFFREL place);
+    int GetSylYRel(int verseN, Staff *staff, data_STAFFREL place, int voltaN = 1);
     int GetFYRel(F *f, Staff *staff);
     ///@}
 

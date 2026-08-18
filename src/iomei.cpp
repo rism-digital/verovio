@@ -81,6 +81,7 @@
 #include "ligature.h"
 #include "liquescent.h"
 #include "lv.h"
+#include "lyricelement.h"
 #include "mdiv.h"
 #include "measure.h"
 #include "meibasic.h"
@@ -120,6 +121,7 @@
 #include "quilisma.h"
 #include "rdg.h"
 #include "ref.h"
+#include "refrain.h"
 #include "reg.h"
 #include "reh.h"
 #include "rend.h"
@@ -160,6 +162,7 @@
 #include "turn.h"
 #include "unclear.h"
 #include "verse.h"
+#include "volta.h"
 #include "vrv.h"
 #include "zone.h"
 
@@ -848,6 +851,14 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         else if (object->Is(TUPLET)) {
             m_currentNode = m_currentNode.append_child("tuplet");
             this->WriteTuplet(m_currentNode, vrv_cast<Tuplet *>(object));
+        }
+        else if (object->Is(VOLTA)) {
+            m_currentNode = m_currentNode.append_child("volta");
+            this->WriteVolta(m_currentNode, vrv_cast<Volta *>(object));
+        }
+        else if (object->Is(REFRAIN)) {
+            m_currentNode = m_currentNode.append_child("refrain");
+            this->WriteRefrain(m_currentNode, vrv_cast<Refrain *>(object));
         }
         else if (object->Is(VERSE)) {
             m_currentNode = m_currentNode.append_child("verse");
@@ -3057,16 +3068,43 @@ void MEIOutput::WriteTuplet(pugi::xml_node currentNode, Tuplet *tuplet)
     tuplet->WriteTupletVis(currentNode);
 }
 
+void MEIOutput::WriteVolta(pugi::xml_node currentNode, Volta *volta)
+{
+    assert(volta);
+
+    this->WriteLayerElement(currentNode, volta);
+    this->WriteOffsetInterface(currentNode, volta);
+    volta->WriteColor(currentNode);
+    volta->WriteLang(currentNode);
+    volta->WriteNNumberLike(currentNode);
+    volta->WriteTypography(currentNode);
+}
+
 void MEIOutput::WriteVerse(pugi::xml_node currentNode, Verse *verse)
 {
     assert(verse);
 
-    this->WriteLayerElement(currentNode, verse);
-    verse->WriteColor(currentNode);
-    verse->WriteLang(currentNode);
+    this->WriteLyricElement(currentNode, verse);
     verse->WriteNInteger(currentNode);
-    verse->WritePlacementRelStaff(currentNode);
-    verse->WriteTypography(currentNode);
+}
+
+void MEIOutput::WriteRefrain(pugi::xml_node currentNode, Refrain *refrain)
+{
+    assert(refrain);
+    this->WriteLyricElement(currentNode, refrain);
+    refrain->WriteNNumberLike(currentNode);
+}
+
+void MEIOutput::WriteLyricElement(pugi::xml_node currentNode, LyricElement *lyricElement)
+{
+    assert(lyricElement);
+    this->WriteLayerElement(currentNode, lyricElement);
+    this->WriteOffsetInterface(currentNode, lyricElement);
+    lyricElement->WriteColor(currentNode);
+    lyricElement->WriteLang(currentNode);
+    lyricElement->WritePlacementRelStaff(currentNode);
+    lyricElement->WriteTypography(currentNode);
+    lyricElement->WriteVoltaGroupingSym(currentNode);
 }
 
 void MEIOutput::WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile)
@@ -3925,6 +3963,9 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
         else if (element == "verse") {
             return true;
         }
+        else if (element == "refrain") {
+            return true;
+        }
         else {
             return false;
         }
@@ -4077,6 +4118,9 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
         else if (element == "verse") {
             return true;
         }
+        else if (element == "refrain") {
+            return true;
+        }
         else {
             return false;
         }
@@ -4178,15 +4222,27 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
-    // filter for verse
-    else if (filterParent->Is(VERSE)) {
+    // filter for lyric elements
+    else if (filterParent->IsLyricElement()) {
         if (element == "label") {
-            return true;
+            return filterParent->Is(VERSE);
         }
         else if (element == "labelAbbr") {
-            return true;
+            return filterParent->Is(VERSE);
         }
         else if (element == "syl") {
+            return true;
+        }
+        else if (element == "volta") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    // filter for volta
+    else if (filterParent->Is(VOLTA)) {
+        if (element == "syl") {
             return true;
         }
         else {
@@ -6803,6 +6859,12 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "tuplet") {
             success = this->ReadTuplet(parent, xmlElement);
         }
+        else if (elementName == "volta") {
+            success = this->ReadVolta(parent, xmlElement);
+        }
+        else if (elementName == "refrain") {
+            success = this->ReadRefrain(parent, xmlElement);
+        }
         else if (elementName == "verse") {
             success = this->ReadVerse(parent, xmlElement);
         }
@@ -7653,20 +7715,53 @@ bool MEIInput::ReadTuplet(Object *parent, pugi::xml_node tuplet)
     return this->ReadLayerChildren(vrvTuplet, tuplet, vrvTuplet);
 }
 
+bool MEIInput::ReadVolta(Object *parent, pugi::xml_node volta)
+{
+    Volta *vrvVolta = new Volta();
+    this->ReadLayerElement(volta, vrvVolta);
+    this->ReadOffsetInterface(volta, vrvVolta);
+
+    vrvVolta->ReadColor(volta);
+    vrvVolta->ReadLang(volta);
+    vrvVolta->ReadNNumberLike(volta);
+    vrvVolta->ReadTypography(volta);
+
+    parent->AddChild(vrvVolta);
+    this->ReadUnsupportedAttr(volta, vrvVolta);
+    return this->ReadLayerChildren(vrvVolta, volta, vrvVolta);
+}
+
 bool MEIInput::ReadVerse(Object *parent, pugi::xml_node verse)
 {
     Verse *vrvVerse = new Verse();
-    this->ReadLayerElement(verse, vrvVerse);
-
-    vrvVerse->ReadColor(verse);
-    vrvVerse->ReadLang(verse);
+    this->ReadLyricElement(verse, vrvVerse);
     vrvVerse->ReadNInteger(verse);
-    vrvVerse->ReadPlacementRelStaff(verse);
-    vrvVerse->ReadTypography(verse);
 
     parent->AddChild(vrvVerse);
     this->ReadUnsupportedAttr(verse, vrvVerse);
     return this->ReadLayerChildren(vrvVerse, verse, vrvVerse);
+}
+
+bool MEIInput::ReadRefrain(Object *parent, pugi::xml_node refrain)
+{
+    Refrain *vrvRefrain = new Refrain();
+    this->ReadLyricElement(refrain, vrvRefrain);
+    vrvRefrain->ReadNNumberLike(refrain);
+
+    parent->AddChild(vrvRefrain);
+    this->ReadUnsupportedAttr(refrain, vrvRefrain);
+    return this->ReadLayerChildren(vrvRefrain, refrain, vrvRefrain);
+}
+
+void MEIInput::ReadLyricElement(pugi::xml_node element, LyricElement *lyricElement)
+{
+    this->ReadLayerElement(element, lyricElement);
+    this->ReadOffsetInterface(element, lyricElement);
+    lyricElement->ReadColor(element);
+    lyricElement->ReadLang(element);
+    lyricElement->ReadPlacementRelStaff(element);
+    lyricElement->ReadTypography(element);
+    lyricElement->ReadVoltaGroupingSym(element);
 }
 
 bool MEIInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Object *filter)

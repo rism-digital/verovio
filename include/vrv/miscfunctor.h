@@ -12,6 +12,8 @@
 
 namespace vrv {
 
+class LyricElement;
+
 //----------------------------------------------------------------------------
 // ApplyPPUFactorFunctor
 //----------------------------------------------------------------------------
@@ -119,7 +121,7 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * This class builds a tree of ints (IntTree) with the staff/layer/verse numbers.
+ * This class builds trees of ints with staff/layer and staff/layer/verse/volta-track numbers.
  */
 class InitProcessingListsFunctor : public ConstFunctor {
 public:
@@ -140,8 +142,12 @@ public:
      * Getter for the int trees
      */
     ///@{
-    const IntTree &GetLayerTree() const { return m_layerTree; }
-    const IntTree &GetVerseTree() const { return m_verseTree; }
+    const IntTree &GetLayerTree()
+    {
+        this->PrepareLyricElementTracks();
+        return m_layerTree;
+    }
+    const IntTree &GetVerseTree();
     ///@}
 
     /*
@@ -149,6 +155,7 @@ public:
      */
     ///@{
     FunctorCode VisitLayer(const Layer *layer) override;
+    FunctorCode VisitRefrain(const Refrain *refrain) override;
     FunctorCode VisitVerse(const Verse *verse) override;
     ///@}
 
@@ -159,10 +166,22 @@ private:
 public:
     //
 private:
+    void PrepareLyricElementTracks();
+    void CollectLyricElement(const LyricElement *lyricElement);
+
     // The IntTree for staff/layer
     IntTree m_layerTree;
-    // The IntTree for staff/layer/verse
+    // The IntTree for staff/layer/verse/volta-track. Track 0 is direct verse content.
     IntTree m_verseTree;
+    // Lyric elements collected before stable drawing and processing slots are assigned.
+    std::vector<const LyricElement *> m_lyricElements;
+    bool m_lyricElementTracksPrepared = false;
+    // Stable volta track numbers, allocated in document order for each staff/layer/lyric group.
+    std::map<std::tuple<int, int, int, std::string>, int> m_voltaTracks;
+    std::map<std::tuple<int, int, int>, int> m_nextVoltaTrack;
+    // Lyric elements grouped together so a direct-syllable track is reflected at every note.
+    std::map<std::tuple<int, int, int>, std::vector<const LyricElement *>> m_lyricElementGroups;
+    std::set<std::tuple<int, int, int>> m_directSylTrackGroups;
 };
 
 //----------------------------------------------------------------------------

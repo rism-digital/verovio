@@ -261,7 +261,11 @@ enum ClassId : uint16_t {
     TUPLET,
     TUPLET_BRACKET,
     TUPLET_NUM,
+    VOLTA,
+    LYRIC_ELEMENT,
     VERSE,
+    REFRAIN,
+    LYRIC_ELEMENT_max,
     LAYER_ELEMENT_max,
     // Ids for ScoreDefElement child classes
     SCOREDEF_ELEMENT,

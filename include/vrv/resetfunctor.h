@@ -59,6 +59,7 @@ public:
     FunctorCode VisitKeySig(KeySig *keySig) override;
     FunctorCode VisitLayer(Layer *layer) override;
     FunctorCode VisitLayerElement(LayerElement *layerElement) override;
+    FunctorCode VisitLyricElement(LyricElement *lyricElement) override;
     FunctorCode VisitLigature(Ligature *ligature) override;
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitMRest(MRest *mRest) override;
@@ -82,6 +83,8 @@ public:
     FunctorCode VisitTempo(Tempo *tempo) override;
     FunctorCode VisitTuplet(Tuplet *tuplet) override;
     FunctorCode VisitTurn(Turn *turn) override;
+    FunctorCode VisitRefrain(Refrain *refrain) override;
+    FunctorCode VisitVolta(Volta *volta) override;
     FunctorCode VisitVerse(Verse *verse) override;
     ///@}
 

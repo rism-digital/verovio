@@ -587,7 +587,7 @@ void View::DrawBracketSq(DeviceContext *dc, int x, int y1, int y2, int staffSize
     this->DrawSquareBracket(dc, true, x - width, y, height, width, horizontalThickness, verticalThickness);
 }
 
-void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
+void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize, bool forceGlyph)
 {
     assert(dc);
 
@@ -595,7 +595,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 
     x -= basicDist;
 
-    if (m_doc->GetOptions()->m_useBraceGlyph.GetValue()) {
+    if (forceGlyph || m_doc->GetOptions()->m_useBraceGlyph.GetValue()) {
         FontInfo *font = m_doc->GetDrawingSmuflFont(staffSize, false);
         const int width = m_doc->GetGlyphWidth(SMUFL_E000_brace, staffSize, false);
         const int height = 8 * m_doc->GetDrawingUnit(staffSize);

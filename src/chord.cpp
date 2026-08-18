@@ -178,7 +178,7 @@ void Chord::CalculateNoteGroups()
 
 bool Chord::IsSupportedChild(ClassId classId)
 {
-    static const std::vector<ClassId> supported{ ARTIC, DOTS, NOTE, STEM, VERSE };
+    static const std::vector<ClassId> supported{ ARTIC, DOTS, NOTE, REFRAIN, STEM, VERSE };
 
     if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
         return true;

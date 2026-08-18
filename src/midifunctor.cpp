@@ -26,6 +26,7 @@
 #include "multirest.h"
 #include "octave.h"
 #include "pedal.h"
+#include "refrain.h"
 #include "rest.h"
 #include "staff.h"
 #include "syl.h"
@@ -36,6 +37,7 @@
 #include "timemap.h"
 #include "tuplet.h"
 #include "verse.h"
+#include "volta.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -1058,6 +1060,11 @@ FunctorCode GenerateMIDIFunctor::VisitSyl(const Syl *syl)
     return FUNCTOR_SIBLINGS;
 }
 
+FunctorCode GenerateMIDIFunctor::VisitVolta(const Volta *volta)
+{
+    return (volta->GetDrawingVoltaN() == 1) ? FUNCTOR_CONTINUE : FUNCTOR_SIBLINGS;
+}
+
 FunctorCode GenerateMIDIFunctor::VisitVerse(const Verse *verse)
 {
     const LayerElement *parent = vrv_cast<const Note *>(verse->GetFirstAncestor(NOTE));
@@ -1067,6 +1074,18 @@ FunctorCode GenerateMIDIFunctor::VisitVerse(const Verse *verse)
     const Verse *previousVerse = vrv_cast<const Verse *>(parent->GetPrevious(verse, VERSE));
 
     if (previousVerse) return FUNCTOR_SIBLINGS;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateMIDIFunctor::VisitRefrain(const Refrain *refrain)
+{
+    const LayerElement *parent = vrv_cast<const Note *>(refrain->GetFirstAncestor(NOTE));
+    if (!parent) parent = vrv_cast<const Chord *>(refrain->GetFirstAncestor(CHORD));
+    assert(parent);
+
+    if (parent->FindDescendantByType(VERSE, 1)) return FUNCTOR_SIBLINGS;
+    if (parent->GetPrevious(refrain, REFRAIN)) return FUNCTOR_SIBLINGS;
 
     return FUNCTOR_CONTINUE;
 }
