@@ -9,6 +9,7 @@
 
 //--------------------------------------------------------------------------------
 
+#include "cursor.h"
 #include "object.h"
 #include "page.h"
 #include "vrv.h"
@@ -20,10 +21,19 @@ namespace vrv {
 #ifndef NO_EDIT_SUPPORT
 
 #define CHAINED_ID "[chained-id]"
+#define SELECTION_ID "[selection-id]"
+#define SELECTION_SECONDARY_ID "[selection-secondary-id]"
+
+void EditorToolkit::ResetSelect()
+{
+    m_selectionId = "";
+    m_selectionClassId = UNSPECIFIED;
+    m_selectionSecondaryId = "";
+}
 
 bool EditorToolkit::AppendChild(std::string &elementId, const std::string &elementName, bool noDuplicate)
 {
-    Object *element = this->GetChainedElement(elementId);
+    Object *element = this->ResolveElement(elementId);
     if (!element) return false;
 
     if (noDuplicate) {
@@ -49,7 +59,7 @@ bool EditorToolkit::AppendChild(std::string &elementId, const std::string &eleme
 
 bool EditorToolkit::InsertBefore(std::string &elementId, const std::string &elementName)
 {
-    Object *element = this->GetChainedElement(elementId);
+    Object *element = this->ResolveElement(elementId);
     if (!element) return false;
 
     Object *parent = element->GetParent();
@@ -65,7 +75,7 @@ bool EditorToolkit::InsertBefore(std::string &elementId, const std::string &elem
 
 bool EditorToolkit::InsertAfter(std::string &elementId, const std::string &elementName)
 {
-    Object *element = this->GetChainedElement(elementId);
+    Object *element = this->ResolveElement(elementId);
     if (!element) return false;
 
     Object *parent = element->GetParent();
@@ -120,10 +130,21 @@ Object *EditorToolkit::PrepareInsertion(Object *parent, const std::string &eleme
     return childElement;
 }
 
-Object *EditorToolkit::GetChainedElement(std::string &elementId)
+Object *EditorToolkit::ResolveElement(std::string &elementId, bool chain)
 {
     if (elementId == CHAINED_ID) {
+        if (m_chainedId.empty()) LogWarning("Chained id not set");
         elementId = m_chainedId;
+    }
+    else if (elementId == SELECTION_ID) {
+        if (m_selectionId.empty()) LogWarning("Selection id not set");
+        elementId = m_selectionId;
+        if (chain) m_chainedId = elementId;
+    }
+    else if (elementId == SELECTION_SECONDARY_ID) {
+        if (m_selectionSecondaryId.empty()) LogWarning("Selection secondary id not set");
+        elementId = m_selectionSecondaryId;
+        if (chain) m_chainedId = elementId;
     }
     else {
         m_chainedId = elementId;

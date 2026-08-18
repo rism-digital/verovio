@@ -123,6 +123,7 @@ public:
     FunctorCode VisitArpeg(Arpeg *arpeg) override;
     FunctorCode VisitBeam(Beam *beam) override;
     FunctorCode VisitBeamSpan(BeamSpan *beamSpan) override;
+    FunctorCode VisitCursor(Cursor *cursor) override;
     FunctorCode VisitCustos(Custos *custos) override;
     FunctorCode VisitDiv(Div *div) override;
     FunctorCode VisitDot(Dot *dot) override;

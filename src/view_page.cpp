@@ -23,6 +23,7 @@
 #include "clef.h"
 #include "comparison.h"
 #include "controlelement.h"
+#include "cursor.h"
 #include "devicecontext.h"
 #include "div.h"
 #include "doc.h"
@@ -1059,14 +1060,14 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     }
 
     /*
-    //Debug code for displaying aligner positions
-    for (auto &child : measure->m_measureAligner.GetChildren()) {
-        Alignment *alignment = vrv_cast<Alignment *>(child);
-        int x = alignment->GetXRel() + measure->GetDrawingX();
-        int y = system->GetDrawingY() - m_doc->GetDrawingStaffSize(100);
-        this->DrawVerticalLine(dc, y, y + m_doc->GetDrawingUnit(100), x, 20);
-    }
-    */
+     //Debug code for displaying aligner positions
+     for (auto &child : measure->m_measureAligner.GetChildren()) {
+     Alignment *alignment = vrv_cast<Alignment *>(child);
+     int x = alignment->GetXRel() + measure->GetDrawingX();
+     int y = system->GetDrawingY() - m_doc->GetDrawingStaffSize(100);
+     this->DrawVerticalLine(dc, y, y + m_doc->GetDrawingUnit(100), x, 20);
+     }
+     */
 }
 
 void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
@@ -1591,6 +1592,10 @@ void View::DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *mea
     dc->StartGraphic(layer, "", layer->GetID());
 
     this->DrawLayerChildren(dc, layer, layer, staff, measure);
+
+    if (layer->HasCursor()) {
+        this->DrawCursor(dc, layer->GetCursor(), layer, staff, measure);
+    }
 
     dc->EndGraphic(layer, this);
 

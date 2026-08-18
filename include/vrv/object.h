@@ -1113,6 +1113,11 @@ public:
     ClassId GetClassId(const std::string &name);
 
     /**
+     * Get the MEI element name from the ClassId by making a lookup in the register
+     */
+    std::string GetClassName(ClassId classId);
+
+    /**
      * Get the correspondings ClassIds from the vector of MEI element string names
      */
     void GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds);
