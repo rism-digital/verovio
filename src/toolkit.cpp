@@ -1753,6 +1753,10 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
         svg.SetMMOutput(true);
     }
 
+    if (m_options->m_showHidden.GetValue()) {
+        svg.SetShowHidden(true);
+    }
+
     if (m_doc.IsFacs()) {
         svg.SetFacsimile(true);
     }

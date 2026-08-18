@@ -24,6 +24,7 @@
 #include "layer.h"
 #include "ligature.h"
 #include "mrest.h"
+#include "mspace.h"
 #include "nc.h"
 #include "octave.h"
 #include "offsetinterface.h"
@@ -34,6 +35,7 @@
 #include "runningelement.h"
 #include "section.h"
 #include "slur.h"
+#include "space.h"
 #include "staff.h"
 #include "stem.h"
 #include "syl.h"
@@ -61,6 +63,8 @@ FunctorCode ResetDataFunctor::VisitAccid(Accid *accid)
     this->VisitLayerElement(accid);
     accid->PositionInterface::InterfaceResetData(*this, accid);
     accid->ClearFloatingObject();
+    // Reset show accid.ges
+    accid->ClearChildren();
 
     return FUNCTOR_CONTINUE;
 }
@@ -322,6 +326,16 @@ FunctorCode ResetDataFunctor::VisitMRest(MRest *mRest)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode ResetDataFunctor::VisitMSpace(MSpace *mSpace)
+{
+    // Call parent one too
+    this->VisitLayerElement(mSpace);
+    // Reset show mSpace
+    mSpace->ClearChildren();
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ResetDataFunctor::VisitNote(Note *note)
 {
     // Call parent one too
@@ -455,6 +469,16 @@ FunctorCode ResetDataFunctor::VisitSlur(Slur *slur)
     this->VisitControlElement(slur);
 
     slur->SetDrawingCurveDir(SlurCurveDirection::None);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetDataFunctor::VisitSpace(Space *space)
+{
+    // Call parent one too
+    this->VisitLayerElement(space);
+    // Reset show space
+    space->ClearChildren();
 
     return FUNCTOR_CONTINUE;
 }

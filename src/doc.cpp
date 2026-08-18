@@ -965,7 +965,7 @@ void Doc::PrepareData()
 
     /************ Instantiate LayerElement parts (stem, flag, dots, etc) ************/
 
-    PrepareLayerElementPartsFunctor prepareLayerElementParts;
+    PrepareLayerElementPartsFunctor prepareLayerElementParts(this);
     root->Process(prepareLayerElementParts);
 
     /************ Resolve @facs ************/

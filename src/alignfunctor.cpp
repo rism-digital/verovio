@@ -25,6 +25,7 @@
 #include "rest.h"
 #include "runningelement.h"
 #include "section.h"
+#include "space.h"
 #include "staff.h"
 #include "svg.h"
 #include "syllable.h"
@@ -60,6 +61,8 @@ AlignHorizontallyFunctor::AlignHorizontallyFunctor(Doc *doc) : DocFunctor(doc)
 
 FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
 {
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     m_currentParams.mensur = layer->GetCurrentMensur();
     m_currentParams.meterSig = layer->GetCurrentMeterSig();
     m_currentParams.proport = layer->GetCurrentProport();
@@ -77,12 +80,12 @@ FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
     }
 
     if (layer->GetStaffDefClef()) {
-        if (layer->GetStaffDefClef()->GetVisible() != BOOLEAN_false) {
+        if (showHidden || layer->GetStaffDefClef()->GetVisible() != BOOLEAN_false) {
             this->VisitClef(layer->GetStaffDefClef());
         }
     }
     if (layer->GetStaffDefKeySig()) {
-        if (layer->GetStaffDefKeySig()->GetVisible() != BOOLEAN_false) {
+        if (showHidden || layer->GetStaffDefKeySig()->GetVisible() != BOOLEAN_false) {
             this->VisitKeySig(layer->GetStaffDefKeySig());
         }
     }
@@ -95,7 +98,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
         this->ResetCode();
     }
     else if (layer->GetStaffDefMeterSig()) {
-        if (layer->GetStaffDefMeterSig()->GetVisible() != BOOLEAN_false) {
+        if (showHidden || layer->GetStaffDefMeterSig()->GetVisible() != BOOLEAN_false) {
             this->VisitMeterSig(layer->GetStaffDefMeterSig());
         }
     }
@@ -171,6 +174,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
     Ligature *ligatureParent = vrv_cast<Ligature *>(layerElement->GetFirstAncestor(LIGATURE, MAX_LIGATURE_DEPTH));
     Note *noteParent = vrv_cast<Note *>(layerElement->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH));
     Rest *restParent = vrv_cast<Rest *>(layerElement->GetFirstAncestor(REST, MAX_NOTE_DEPTH));
+    Space *spaceParent = vrv_cast<Space *>(layerElement->GetFirstAncestor(SPACE, 1));
     TabGrp *tabGrpParent = vrv_cast<TabGrp *>(layerElement->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
     const bool ligatureAsBracket = m_doc->GetOptions()->m_ligatureAsBracket.GetValue();
     const bool neumeAsNote = m_doc->GetOptions()->m_neumeAsNote.GetValue();
@@ -183,6 +187,9 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
     }
     else if (restParent) {
         layerElement->SetAlignment(restParent->GetAlignment());
+    }
+    else if (spaceParent) {
+        layerElement->SetAlignment(spaceParent->GetAlignment());
     }
     else if (tabGrpParent) {
         layerElement->SetAlignment(tabGrpParent->GetAlignment());

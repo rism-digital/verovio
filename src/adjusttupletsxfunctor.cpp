@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "elementpart.h"
 #include "tuplet.h"
 
@@ -29,8 +30,10 @@ FunctorCode AdjustTupletsXFunctor::VisitTuplet(Tuplet *tuplet)
         return FUNCTOR_SIBLINGS;
     }
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     // Nothing to do if the bracket and the num are not visible
-    if ((tuplet->GetBracketVisible() == BOOLEAN_false) && (tuplet->GetNumVisible() == BOOLEAN_false)) {
+    if (!showHidden && (tuplet->GetBracketVisible() == BOOLEAN_false) && (tuplet->GetNumVisible() == BOOLEAN_false)) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -85,13 +88,13 @@ FunctorCode AdjustTupletsXFunctor::VisitTuplet(Tuplet *tuplet)
     tuplet->GetDrawingLeftRightXRel(xRelLeft, xRelRight, m_doc);
 
     TupletBracket *tupletBracket = vrv_cast<TupletBracket *>(tuplet->GetFirst(TUPLET_BRACKET));
-    if (tupletBracket && (tuplet->GetBracketVisible() != BOOLEAN_false)) {
+    if (tupletBracket && (showHidden || tuplet->GetBracketVisible() != BOOLEAN_false)) {
         tupletBracket->SetDrawingXRelLeft(xRelLeft);
         tupletBracket->SetDrawingXRelRight(xRelRight);
     }
 
     TupletNum *tupletNum = vrv_cast<TupletNum *>(tuplet->GetFirst(TUPLET_NUM));
-    if (tupletNum && (tuplet->GetNumVisible() != BOOLEAN_false)) {
+    if (tupletNum && (showHidden || tuplet->GetNumVisible() != BOOLEAN_false)) {
         // We have a bracket and the num is not on its opposite side
         if (tupletBracket && (tuplet->GetDrawingNumPos() == tuplet->GetDrawingBracketPos())) {
             tupletNum->SetAlignedBracket(tupletBracket);

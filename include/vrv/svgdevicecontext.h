@@ -207,6 +207,11 @@ public:
     bool GetFacsimile() { return m_facsimile; }
 
     /**
+     * Setting show hidden flag (false by default)
+     */
+    void SetShowHidden(bool showHidden) { m_showHidden = showHidden; }
+
+    /**
      * Setting use Liberation flag (false by default)
      */
     void SetUseLiberation(bool useLiberation) { m_useLiberation = useLiberation; }
@@ -393,6 +398,9 @@ private:
 
     // output as mm (for pdf generation with a 72 dpi)
     bool m_mmOutput;
+    // show hidden flag
+    bool m_showHidden;
+    // facsimiler flag
     bool m_facsimile;
     // use LiberationTextFont
     bool m_useLiberation;

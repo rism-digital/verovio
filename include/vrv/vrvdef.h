@@ -738,6 +738,12 @@ enum MensuralCastOffType { MENSURAL_CAST_OFF_INIT = 0, MENSURAL_CAST_OFF_UNSET, 
 #define NEUME_LINE_TYPE "neon-neume-line"
 
 //----------------------------------------------------------------------------
+// SVG CSS value for show-hidden option
+//----------------------------------------------------------------------------
+
+#define CSS_SHOW_HIDDEN "show-hidden"
+
+//----------------------------------------------------------------------------
 // Legacy Wolfgang defines
 //----------------------------------------------------------------------------
 

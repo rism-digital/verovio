@@ -216,12 +216,20 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         this->DrawTuplet(dc, element, layer, staff, measure);
     }
     else if (element->Is(TUPLET_BRACKET)) {
-        dc->StartGraphic(element, "", element->GetID());
+        TupletBracket *tupletBracket = vrv_cast<TupletBracket *>(element);
+        assert(element);
+        const bool showHidden
+            = (m_doc->GetOptions()->m_showHidden.GetValue() && tupletBracket->GetBracketVisible() == BOOLEAN_false);
+        dc->StartGraphic(element, (showHidden ? CSS_SHOW_HIDDEN : ""), element->GetID());
         dc->EndGraphic(element, this);
         layer->AddToDrawingList(element);
     }
     else if (element->Is(TUPLET_NUM)) {
-        dc->StartGraphic(element, "", element->GetID());
+        TupletNum *tupletNum = vrv_cast<TupletNum *>(element);
+        assert(element);
+        const bool showHidden
+            = (m_doc->GetOptions()->m_showHidden.GetValue() && tupletNum->GetNumVisible() == BOOLEAN_false);
+        dc->StartGraphic(element, (showHidden ? CSS_SHOW_HIDDEN : ""), element->GetID());
         dc->EndGraphic(element, this);
         layer->AddToDrawingList(element);
     }
@@ -251,11 +259,15 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     Accid *accid = vrv_cast<Accid *>(element);
     assert(accid);
 
+    bool showAccidGes = m_doc->GetOptions()->m_showHidden.GetValue();
+    const bool showHidden = (showAccidGes && accid->GetParent()->Is(ACCID));
+
     // This can happen with accid within note with only accid.ges
     // We still create an graphic in the output
     if (!accid->HasAccid() || staff->IsTablature()) {
         dc->StartGraphic(element, "", element->GetID());
         accid->SetEmptyBB();
+        if (showAccidGes) this->DrawLayerChildren(dc, accid, layer, staff, measure);
         dc->EndGraphic(element, this);
         return;
     }
@@ -266,7 +278,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         drawingElement = editorialAccid;
     }
 
-    dc->StartGraphic(drawingElement, "", element->GetID());
+    dc->StartGraphic(drawingElement, (showHidden ? CSS_SHOW_HIDDEN : ""), element->GetID());
 
     const data_NOTATIONTYPE notationType = staff->m_drawingNotationType;
     std::u32string accidStr = accid->GetSymbolStr(notationType);
@@ -335,6 +347,8 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     this->DrawSmuflString(
         dc, x, y, accidStr, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize, accid->GetDrawingCueSize(), true);
+
+    if (showAccidGes) this->DrawLayerChildren(dc, accid, layer, staff, measure);
 
     dc->EndGraphic(drawingElement, this);
 }
@@ -560,8 +574,11 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     this->DrawStemMod(dc, element, staff);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     // draw the (tuplet) number
-    if (bTrem->HasNum() && (bTrem->GetNumVisible() != BOOLEAN_false)) {
+    if (bTrem->HasNum() && (showHidden || bTrem->GetNumVisible() != BOOLEAN_false)) {
+        dc->StartCustomGraphic("bTremNum", (bTrem->GetNumVisible() == BOOLEAN_false) ? CSS_SHOW_HIDDEN : "");
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
         // calculate the extend of the number
         TextExtend extend;
@@ -574,6 +591,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         dc->DrawMusicText(figures, this->ToDeviceContextX(element->GetDrawingX() + xOffset - extend.m_width / 2),
             this->ToDeviceContextY(yNum));
         dc->ResetFont();
+        dc->EndCustomGraphic();
     }
 
     dc->EndGraphic(element, this);
@@ -590,6 +608,8 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     Chord *chord = vrv_cast<Chord *>(element);
     assert(chord);
 
+    dc->StartGraphic(chord, "", chord->GetID());
+
     if (chord->HasCluster()) {
         this->DrawChordCluster(dc, chord, layer, staff, measure);
         return;
@@ -602,6 +622,8 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /************ Draw children (notes, accidentals, etc) ************/
 
     this->DrawLayerChildren(dc, chord, layer, staff, measure);
+
+    dc->EndGraphic(chord, this);
 }
 
 void View::DrawChordCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff *staff, Measure *measure)
@@ -677,13 +699,15 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(staff);
     assert(measure);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     Clef *clef = vrv_cast<Clef *>(element);
     assert(clef);
 
     if (clef->m_crossStaff) staff = clef->m_crossStaff;
 
     // hidden clef
-    if (clef->GetVisible() == BOOLEAN_false) {
+    if (!showHidden && (clef->GetVisible() == BOOLEAN_false)) {
         dc->StartGraphic(element, "", element->GetID());
         clef->SetEmptyBB();
         dc->EndGraphic(element, this);
@@ -893,19 +917,13 @@ void View::DrawDurationElement(DeviceContext *dc, LayerElement *element, Layer *
     assert(measure);
 
     if (dynamic_cast<Chord *>(element)) {
-        dc->StartGraphic(element, "", element->GetID());
         this->DrawChord(dc, element, layer, staff, measure);
-        dc->EndGraphic(element, this);
     }
     else if (dynamic_cast<Note *>(element)) {
-        dc->StartGraphic(element, "", element->GetID());
         this->DrawNote(dc, element, layer, staff, measure);
-        dc->EndGraphic(element, this);
     }
     else if (dynamic_cast<Rest *>(element)) {
-        dc->StartGraphic(element, "", element->GetID());
         this->DrawRest(dc, element, layer, staff, measure);
-        dc->EndGraphic(element, this);
     }
 }
 
@@ -999,6 +1017,8 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     if (staff->IsTablature()) {
         // Encoded keySig will not be shown on tablature
         return;
@@ -1016,7 +1036,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     const int clefLocOffset = clef->GetClefLocOffset();
 
     // hidden key signature
-    if (keySig->GetVisible() == BOOLEAN_false) {
+    if (!showHidden && (keySig->GetVisible() == BOOLEAN_false)) {
         dc->StartGraphic(element, "", element->GetID());
         keySig->SetEmptyBB();
         dc->EndGraphic(element, this);
@@ -1091,11 +1111,13 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(staff);
     assert(measure);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     MeterSig *meterSig = vrv_cast<MeterSig *>(element);
     assert(meterSig);
 
     // hidden time signature
-    if (meterSig->GetVisible() == BOOLEAN_false) {
+    if (!showHidden && (meterSig->GetVisible() == BOOLEAN_false)) {
         dc->StartGraphic(element, "", element->GetID());
         meterSig->SetEmptyBB();
         dc->EndGraphic(element, this);
@@ -1200,13 +1222,15 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(layer);
     assert(staff);
     assert(measure);
+    assert(element->GetParent());
 
     MRest *mRest = vrv_cast<MRest *>(element);
     assert(mRest);
 
     const int staffSize = staff->GetDrawingStaffNotationSize();
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue() && mRest->GetParent()->Is(MSPACE));
 
-    dc->StartGraphic(element, "", element->GetID());
+    dc->StartGraphic(element, (showHidden ? CSS_SHOW_HIDDEN : ""), element->GetID());
 
     if (mRest->GetCutout() == cutout_CUTOUT_cutout) {
         dc->EndGraphic(element, this);
@@ -1269,9 +1293,12 @@ void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     this->DrawMRptPart(dc, element->GetDrawingX(), staff->GetDrawingY(), SMUFL_E500_repeat1Bar, 0, false, staff);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     // draw the measure count
     const int mRptNum = mRpt->HasNum() ? mRpt->GetNum() : mRpt->m_drawingMeasureCount;
-    if ((mRptNum > 0) && (mRpt->GetNumVisible() != BOOLEAN_false)) {
+    if ((mRptNum > 0) && (showHidden || mRpt->GetNumVisible() != BOOLEAN_false)) {
+        dc->StartCustomGraphic("mRptNum", (mRpt->GetNumVisible() == BOOLEAN_false) ? CSS_SHOW_HIDDEN : "");
         dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
         // calculate the extend of the number
         TextExtend extend;
@@ -1286,6 +1313,7 @@ void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         dc->DrawMusicText(
             figures, this->ToDeviceContextX(element->GetDrawingX() - extend.m_width / 2), this->ToDeviceContextY(yNum));
         dc->ResetFont();
+        dc->EndCustomGraphic();
     }
 
     dc->EndGraphic(element, this);
@@ -1319,11 +1347,14 @@ void View::DrawMSpace(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    // MSpace *mSpace = vrv_cast<MSpace *>(element);
-    // assert(mSpace);
+    bool showMSpace = m_doc->GetOptions()->m_showHidden.GetValue();
 
     dc->StartGraphic(element, "", element->GetID());
-    // nothing to draw here
+
+    dc->DrawPlaceholder(this->ToDeviceContextX(element->GetDrawingX()), this->ToDeviceContextY(element->GetDrawingY()));
+
+    if (showMSpace) this->DrawLayerChildren(dc, element, layer, staff, measure);
+
     dc->EndGraphic(element, this);
 }
 
@@ -1429,8 +1460,11 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         if (count) this->DrawSmuflCode(dc, x1, y1, SMUFL_E4E3_restWhole, staffSize, false);
     }
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     // Draw the number
-    if (multiRest->GetNumVisible() != BOOLEAN_false) {
+    if (showHidden || multiRest->GetNumVisible() != BOOLEAN_false) {
+        dc->StartCustomGraphic("multiRestNum", (multiRest->GetNumVisible() == BOOLEAN_false) ? CSS_SHOW_HIDDEN : "");
         dc->SetFont(m_doc->GetDrawingSmuflFont(staffNotationSize, false));
 
         const int staffHeight = (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize);
@@ -1443,6 +1477,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         this->DrawSmuflString(
             dc, xCentered, y, this->IntToTimeSigFigures(num), HORIZONTALALIGNMENT_center, staffNotationSize);
         dc->ResetFont();
+        dc->EndCustomGraphic();
     }
 
     dc->EndGraphic(element, this);
@@ -1496,6 +1531,8 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
 
     if (note->m_crossStaff) staff = note->m_crossStaff;
+
+    dc->StartGraphic(note, "", note->GetID());
 
     bool drawingCueSize = note->GetDrawingCueSize();
     int x = element->GetDrawingX();
@@ -1579,6 +1616,8 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     /************ Draw children (accidentals, etc) ************/
 
     this->DrawLayerChildren(dc, note, layer, staff, measure);
+
+    dc->EndGraphic(note, this);
 }
 
 void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -1588,6 +1627,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(layer);
     assert(staff);
     assert(measure);
+    assert(element->GetParent());
 
     Rest *rest = vrv_cast<Rest *>(element);
     assert(rest);
@@ -1596,6 +1636,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     const bool drawingCueSize = rest->GetDrawingCueSize();
     const int staffSize = staff->GetDrawingStaffNotationSize();
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue() && rest->GetParent()->Is(SPACE));
     data_DURATION drawingDur = rest->GetActualDur();
     // in tablature the @dur is in the parent TabGrp - try to get if from there
     if ((drawingDur == DURATION_NONE) && (staff->IsTablature() || staff->IsTabStaffLike())) {
@@ -1607,6 +1648,8 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         LogWarning("Missing duration for rest '%s'", rest->GetID().c_str());
         drawingDur = DURATION_4;
     }
+
+    dc->StartGraphic(rest, (showHidden ? CSS_SHOW_HIDDEN : ""), rest->GetID());
 
     const char32_t drawingGlyph = rest->GetRestGlyph(drawingDur);
 
@@ -1672,6 +1715,8 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         }
         dc->EndCustomGraphic();
     }
+
+    dc->EndGraphic(rest, this);
 }
 
 void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -1682,8 +1727,14 @@ void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff);
     assert(measure);
 
+    bool showSpace = m_doc->GetOptions()->m_showHidden.GetValue();
+
     dc->StartGraphic(element, "", element->GetID());
+
     dc->DrawPlaceholder(this->ToDeviceContextX(element->GetDrawingX()), this->ToDeviceContextY(element->GetDrawingY()));
+
+    if (showSpace) this->DrawLayerChildren(dc, element, layer, staff, measure);
+
     dc->EndGraphic(element, this);
 }
 

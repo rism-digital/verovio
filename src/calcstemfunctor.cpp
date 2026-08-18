@@ -102,6 +102,8 @@ FunctorCode CalcStemFunctor::VisitBeamSpan(BeamSpan *beamSpan)
 
 FunctorCode CalcStemFunctor::VisitChord(Chord *chord)
 {
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     // Set them to NULL in any case
     m_interface = NULL;
 
@@ -112,7 +114,7 @@ FunctorCode CalcStemFunctor::VisitChord(Chord *chord)
     }
 
     // if the chord isn't visible, carry on
-    if (!chord->IsVisible() || (chord->GetStemVisible() == BOOLEAN_false)) {
+    if (!showHidden && (!chord->IsVisible() || (chord->GetStemVisible() == BOOLEAN_false))) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -206,7 +208,9 @@ FunctorCode CalcStemFunctor::VisitFTrem(FTrem *fTrem)
 
 FunctorCode CalcStemFunctor::VisitNote(Note *note)
 {
-    if (!note->IsVisible() || (note->GetStemVisible() == BOOLEAN_false)) {
+    bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
+    if (!showHidden && (!note->IsVisible() || (note->GetStemVisible() == BOOLEAN_false))) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -346,6 +350,7 @@ FunctorCode CalcStemFunctor::VisitStem(Stem *stem)
     const int staffSize = m_staff->m_drawingStaffSize;
     const int stemShift = m_doc->GetDrawingStemWidth(staffSize) / 2;
     const bool drawingCueSize = stem->GetDrawingCueSize();
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
 
     // For notes longer than half notes the stem is always 0
     if (m_dur < DURATION_2) {
@@ -433,7 +438,7 @@ FunctorCode CalcStemFunctor::VisitStem(Stem *stem)
         if ((stem->GetLen().GetVu() == 0) && flag) flag->m_drawingNbFlags = 0;
         return FUNCTOR_CONTINUE;
     }
-    if ((stem->GetVisible() == BOOLEAN_false) && flag) {
+    if (!showHidden && (stem->GetVisible() == BOOLEAN_false) && flag) {
         flag->m_drawingNbFlags = 0;
         return FUNCTOR_CONTINUE;
     }

@@ -685,6 +685,8 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
     assert(staffGrp);
     assert(barLine);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     if (staffGrp->GetDrawingVisibility() == OPTIMIZATION_HIDDEN) {
         return;
     }
@@ -731,11 +733,12 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         // Get the corresponding staff
         AttNIntegerComparison comparison(STAFF, staffDef->GetN());
         Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
-        if (!staff || (staff->HasVisible() && (staff->GetVisible() == BOOLEAN_false))) {
+        const bool hiddenStaff = (!staff || (staff->HasVisible() && (staff->GetVisible() == BOOLEAN_false)));
+        if (!showHidden && hiddenStaff) {
             yBottomPrevious = VRV_UNSET;
             continue;
         }
-        if (!barlineThrough && (staff->GetVisible() == BOOLEAN_false)) {
+        if (!barlineThrough && hiddenStaff) {
             yBottomPrevious = VRV_UNSET;
             continue;
         }
@@ -1076,15 +1079,18 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
     assert(layer);
     assert(staff);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     MeterSigGrp *meterSigGrp = layer->GetStaffDefMeterSigGrp();
     ListOfObjects childList = meterSigGrp->GetList();
 
     // Ignore invisible meter signatures and those without count
     childList.erase(std::remove_if(childList.begin(), childList.end(),
-                        [](Object *object) {
+                        [showHidden](Object *object) {
                             MeterSig *meterSig = vrv_cast<MeterSig *>(object);
                             assert(meterSig);
-                            return ((meterSig->GetVisible() == BOOLEAN_false) || !meterSig->HasCount());
+                            return (
+                                (!showHidden && (meterSig->GetVisible() == BOOLEAN_false)) || !meterSig->HasCount());
                         }),
         childList.end());
 

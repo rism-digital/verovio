@@ -48,6 +48,8 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     Note *note = vrv_cast<Note *>(element);
     assert(note);
 
+    dc->StartGraphic(note, "", note->GetID());
+
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
@@ -75,6 +77,8 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     /************ Draw children (verse / syl) ************/
 
     this->DrawLayerChildren(dc, note, layer, staff, measure);
+
+    dc->EndGraphic(note, this);
 }
 
 void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)

@@ -57,10 +57,6 @@ FunctorCode CalcLedgerLinesFunctor::VisitLayer(Layer *layer)
 
 FunctorCode CalcLedgerLinesFunctor::VisitNote(Note *note)
 {
-    if (note->GetVisible() == BOOLEAN_false) {
-        return FUNCTOR_SIBLINGS;
-    }
-
     if (!note->IsVisible()) {
         return FUNCTOR_SIBLINGS;
     }
