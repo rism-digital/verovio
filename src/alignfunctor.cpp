@@ -692,9 +692,8 @@ FunctorCode AlignVerticallyFunctor::VisitStaff(Staff *staff)
     assert(alignment);
     staff->SetAlignment(alignment);
 
-    const auto lyricElementIterator
-        = std::find_if(staff->m_timeSpanningElements.begin(), staff->m_timeSpanningElements.end(),
-            [](const Object *object) { return object->IsAnyOf(std::array{ REFRAIN, VERSE }); });
+    const auto lyricElementIterator = std::find_if(staff->m_timeSpanningElements.begin(),
+        staff->m_timeSpanningElements.end(), [](const Object *object) { return object->IsLyricElement(); });
     if (lyricElementIterator != staff->m_timeSpanningElements.end()) {
         LyricElement *lyricElement = vrv_cast<LyricElement *>(*lyricElementIterator);
         assert(lyricElement);

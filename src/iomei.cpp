@@ -4222,8 +4222,8 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
-    // filter for verse
-    else if (filterParent->IsAnyOf(std::array{ REFRAIN, VERSE })) {
+    // filter for lyric elements
+    else if (filterParent->IsLyricElement()) {
         if (element == "label") {
             return filterParent->Is(VERSE);
         }

@@ -29,7 +29,7 @@ namespace vrv {
 
 static int AdjustLyricPosition(LayerElement *container, int &overlap, int freeSpace, const Doc *doc)
 {
-    if ((container->GetClassId() > LYRIC_ELEMENT) && (container->GetClassId() < LYRIC_ELEMENT_max)) {
+    if (container->IsLyricElement()) {
         LyricElement *lyricElement = vrv_cast<LyricElement *>(container);
         return lyricElement->AdjustPosition(overlap, freeSpace, doc);
     }

@@ -309,7 +309,10 @@ private:
 /** Match a verse or refrain by its internal lyric-processing group. */
 class LyricElementComparison : public ClassIdComparison {
 public:
-    LyricElementComparison(ClassId classId, int groupN) : ClassIdComparison(classId), m_groupN(groupN) {}
+    LyricElementComparison(ClassId classId, int groupN) : ClassIdComparison(classId), m_groupN(groupN)
+    {
+        assert(Object::IsLyricElement(classId));
+    }
 
     bool operator()(const Object *object) override;
 

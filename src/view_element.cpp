@@ -230,7 +230,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(VOLTA)) {
         this->DrawVolta(dc, element, layer, staff, measure);
     }
-    else if (element->IsAnyOf(std::array{ REFRAIN, VERSE })) {
+    else if (element->IsLyricElement()) {
         this->DrawLyricElement(dc, element, layer, staff, measure);
     }
     else {
@@ -1974,7 +1974,7 @@ void View::DrawLyricElement(DeviceContext *dc, LayerElement *element, Layer *lay
     assert(staff);
     assert(measure);
 
-    assert((element->GetClassId() > LYRIC_ELEMENT) && (element->GetClassId() < LYRIC_ELEMENT_max));
+    assert(element->IsLyricElement());
     LyricElement *lyricElement = vrv_cast<LyricElement *>(element);
     assert(lyricElement);
     Verse *verse = lyricElement->Is(VERSE) ? vrv_cast<Verse *>(lyricElement) : NULL;
