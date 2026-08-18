@@ -44,6 +44,7 @@ public:
     FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitSystem(System *system) override;
     FunctorCode VisitSystemEnd(System *system) override;
+    FunctorCode VisitLyricElement(LyricElement *lyricElement) override;
     FunctorCode VisitRefrain(Refrain *refrain) override;
     FunctorCode VisitVerse(Verse *verse) override;
     ///@}
@@ -51,8 +52,6 @@ public:
 protected:
     //
 private:
-    FunctorCode VisitLyricElement(LyricElement *lyricElement) override;
-
     //
 public:
     //
