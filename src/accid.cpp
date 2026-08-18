@@ -267,12 +267,12 @@ std::u32string Accid::CreateSymbolStr(data_ACCIDENTAL_WRITTEN accid, data_ENCLOS
         // If there is glyph.num, prioritize it
         if (glyphNum != 0) {
             code = glyphNum;
-            if (NULL == resources->GetGlyph(code)) code = 0;
+            if (!resources->GetGlyph(code)) code = 0;
         }
         // If there is glyph.name (second priority)
         else if (!glyphName.empty()) {
             code = resources->GetGlyphCode(glyphName);
-            if (NULL == resources->GetGlyph(code)) code = 0;
+            if (!resources->GetGlyph(code)) code = 0;
         }
     }
 

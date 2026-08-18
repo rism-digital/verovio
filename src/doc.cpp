@@ -1866,7 +1866,7 @@ int Doc::GetGlyphHeight(char32_t code, int staffSize, bool graceSize) const
     int x, y, w, h;
     const Resources &resources = this->GetResources();
     const Glyph *glyph = resources.GetGlyph(code);
-    assert(glyph);
+    if (!glyph) return 0;
     glyph->GetBoundingBox(x, y, w, h);
     h = h * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if (graceSize) h = h * m_options->m_graceFactor.GetValue();
@@ -1879,7 +1879,7 @@ int Doc::GetGlyphWidth(char32_t code, int staffSize, bool graceSize) const
     int x, y, w, h;
     const Resources &resources = this->GetResources();
     const Glyph *glyph = resources.GetGlyph(code);
-    assert(glyph);
+    if (!glyph) return 0;
     glyph->GetBoundingBox(x, y, w, h);
     w = w * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if (graceSize) w = w * m_options->m_graceFactor.GetValue();
@@ -1891,7 +1891,7 @@ int Doc::GetGlyphAdvX(char32_t code, int staffSize, bool graceSize) const
 {
     const Resources &resources = this->GetResources();
     const Glyph *glyph = resources.GetGlyph(code);
-    assert(glyph);
+    if (!glyph) return 0;
     int advX = glyph->GetHorizAdvX();
     advX = advX * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if (graceSize) advX = advX * m_options->m_graceFactor.GetValue();

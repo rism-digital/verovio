@@ -280,13 +280,13 @@ std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType, int &overl
         // If there is @glyph.num, return glyph based on it (first priority)
         if (this->HasGlyphNum()) {
             const char32_t code = this->GetGlyphNum();
-            if (NULL != resources->GetGlyph(code)) fretStr.push_back(code);
+            if (resources->GetGlyph(code)) fretStr.push_back(code);
         }
 
         // If there is @glyph.name (second priority)
         else if (this->HasGlyphName()) {
             const char32_t code = resources->GetGlyphCode(this->GetGlyphName());
-            if (NULL != resources->GetGlyph(code)) fretStr.push_back(code);
+            if (resources->GetGlyph(code)) fretStr.push_back(code);
         }
 
         // If there is @altsym (third priority)
@@ -301,13 +301,13 @@ std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType, int &overl
                     // If there is @glyph.num, return glyph based on it (fourth priority)
                     if (symbol->HasGlyphNum()) {
                         const char32_t code = symbol->GetGlyphNum();
-                        if (NULL != resources->GetGlyph(code)) fretStr.push_back(code);
+                        if (resources->GetGlyph(code)) fretStr.push_back(code);
                     }
 
                     // If there is @glyph.name (fifth priority)
                     else if (symbol->HasGlyphName()) {
                         const char32_t code = resources->GetGlyphCode(symbol->GetGlyphName());
-                        if (NULL != resources->GetGlyph(code)) fretStr.push_back(code);
+                        if (resources->GetGlyph(code)) fretStr.push_back(code);
                     }
                 }
             }
