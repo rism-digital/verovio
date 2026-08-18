@@ -20,6 +20,7 @@
 #include "doc.h"
 #include "floatingobject.h"
 #include "functor.h"
+#include "lyricelement.h"
 #include "scoredef.h"
 #include "slur.h"
 #include "smufl.h"
@@ -449,6 +450,19 @@ void StaffAlignment::SetRequestedSpaceBelow(int space)
 {
     if (space > m_requestedSpaceBelow) {
         m_requestedSpaceBelow = space;
+    }
+}
+
+void StaffAlignment::AddLyricElement(const LyricElement *lyricElement)
+{
+    assert(lyricElement);
+    if (lyricElement->Is(REFRAIN)) {
+        for (int line = 0; line < lyricElement->GetLyricLineCount(); ++line) {
+            this->AddVerseN(lyricElement->GetDrawingVerseN() + line, lyricElement->GetPlace());
+        }
+    }
+    else {
+        this->AddVerseN(lyricElement->GetDrawingVerseN(), lyricElement->GetPlace(), lyricElement->GetLyricLineCount());
     }
 }
 

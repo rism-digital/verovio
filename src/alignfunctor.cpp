@@ -665,20 +665,6 @@ FunctorCode AlignVerticallyFunctor::VisitRunningElement(RunningElement *runningE
     return FUNCTOR_CONTINUE;
 }
 
-static void AddLyricElementToAlignment(StaffAlignment *alignment, LyricElement *lyricElement)
-{
-    assert(alignment && lyricElement);
-    if (lyricElement->Is(REFRAIN)) {
-        for (int line = 0; line < lyricElement->GetLyricLineCount(); ++line) {
-            alignment->AddVerseN(lyricElement->GetDrawingVerseN() + line, lyricElement->GetPlace());
-        }
-    }
-    else {
-        alignment->AddVerseN(
-            lyricElement->GetDrawingVerseN(), lyricElement->GetPlace(), lyricElement->GetLyricLineCount());
-    }
-}
-
 FunctorCode AlignVerticallyFunctor::VisitStaff(Staff *staff)
 {
     if (!staff->DrawingIsVisible()) {
@@ -697,7 +683,7 @@ FunctorCode AlignVerticallyFunctor::VisitStaff(Staff *staff)
     if (lyricElementIterator != staff->m_timeSpanningElements.end()) {
         LyricElement *lyricElement = vrv_cast<LyricElement *>(*lyricElementIterator);
         assert(lyricElement);
-        AddLyricElementToAlignment(alignment, lyricElement);
+        alignment->AddLyricElement(lyricElement);
     }
 
     // add verse number to alignment in case there are spanning SYL elements but there is no verse number already - this
@@ -708,7 +694,7 @@ FunctorCode AlignVerticallyFunctor::VisitStaff(Staff *staff)
         LyricElement *lyricElement
             = vrv_cast<LyricElement *>((*sylIterator)->GetFirstAncestorInRange(LYRIC_ELEMENT, LYRIC_ELEMENT_max));
         if (lyricElement) {
-            AddLyricElementToAlignment(alignment, lyricElement);
+            alignment->AddLyricElement(lyricElement);
         }
     }
 
@@ -772,7 +758,7 @@ FunctorCode AlignVerticallyFunctor::VisitVerse(Verse *verse)
     if (!alignment) return FUNCTOR_CONTINUE;
 
     // Add the number count
-    alignment->AddVerseN(verse->GetDrawingVerseN(), verse->GetPlace(), verse->GetLyricLineCount());
+    alignment->AddLyricElement(verse);
 
     return FUNCTOR_CONTINUE;
 }
@@ -783,7 +769,7 @@ FunctorCode AlignVerticallyFunctor::VisitRefrain(Refrain *refrain)
 
     if (!alignment) return FUNCTOR_CONTINUE;
 
-    AddLyricElementToAlignment(alignment, refrain);
+    alignment->AddLyricElement(refrain);
 
     return FUNCTOR_CONTINUE;
 }

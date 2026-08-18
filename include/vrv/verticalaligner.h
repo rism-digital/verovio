@@ -14,6 +14,7 @@ namespace vrv {
 
 class AttSpacing;
 class FloatingObject;
+class LyricElement;
 class ScoreDef;
 class StaffAlignment;
 class StaffDef;
@@ -195,6 +196,7 @@ public:
      * The position is calculated from the bottom.
      */
     ///@{
+    void AddLyricElement(const LyricElement *lyricElement);
     void AddVerseN(int verseN, data_STAFFREL place, int lineCount = 1);
     int GetVerseCount(bool collapse) const;
     int GetVerseCountAbove(bool collapse) const;
