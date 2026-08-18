@@ -82,3 +82,13 @@ func TestLoadDataAndRenderSVG(t *testing.T) {
 		t.Fatal("expected SVG output")
 	}
 }
+
+func TestElementsAtTimeUsesRenderedPage(t *testing.T) {
+	tk := NewToolkitWithResourcePath("../../data")
+	defer tk.Close()
+	tk.SetOptions(`{"breaks":"encoded"}`)
+	tk.LoadData(`<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.0"><music><body><mdiv><score><scoreDef><staffGrp><staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4"/></staffGrp></scoreDef><section><measure n="1"><staff n="1"><layer n="1"><note dur="4" oct="4" pname="c"/><note dur="4" oct="4" pname="d"/><note dur="4" oct="4" pname="e"/><note dur="4" oct="4" pname="f"/></layer></staff></measure><measure n="2"><staff n="1"><layer n="1"><note dur="4" oct="4" pname="g"/><note dur="4" oct="4" pname="a"/><note dur="4" oct="4" pname="b"/><note dur="4" oct="5" pname="c"/></layer></staff></measure><pb/><measure n="3"><staff n="1"><layer n="1"><note dur="4" oct="5" pname="c"/><note dur="4" oct="4" pname="b"/><note dur="4" oct="4" pname="a"/><note dur="4" oct="4" pname="g"/></layer></staff></measure></section></score></mdiv></body></music></mei>`)
+	if got := tk.ElementsAtTime(4500); !strings.Contains(got, `"page":2`) {
+		t.Fatalf("expected page 2, got %s", got)
+	}
+}
