@@ -1002,6 +1002,7 @@ void EditorToolkitShared::PostProcessDelete(const std::string &elementId)
 
         std::string placeholder = chord->GetID();
         this->Delete(placeholder, DELETE_NO_NAVIGATON);
+        m_chainedId = note->GetID();
     }
     else if (object->Is(BEAM)) {
         Beam *beam = vrv_cast<Beam *>(object);
@@ -1019,6 +1020,7 @@ void EditorToolkitShared::PostProcessDelete(const std::string &elementId)
 
         std::string placeholder = beam->GetID();
         this->Delete(placeholder, DELETE_NO_NAVIGATON);
+        m_chainedId = descendants.front()->GetID();
     }
 }
 
