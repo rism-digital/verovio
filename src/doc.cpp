@@ -887,10 +887,12 @@ void Doc::PrepareData()
                     // Create comparisons for staff/layer and the internal lyric-element group.
                     AttNIntegerComparison matchStaff(STAFF, staves.first);
                     AttNIntegerComparison matchLayer(LAYER, layers.first);
-                    LyricElementComparison matchLyricElement(verses.first);
+                    LyricElementComparison matchVerse(VERSE, verses.first);
+                    LyricElementComparison matchRefrain(REFRAIN, verses.first);
                     filters.Add(&matchStaff);
                     filters.Add(&matchLayer);
-                    filters.Add(&matchLyricElement);
+                    filters.Add(&matchVerse);
+                    filters.Add(&matchRefrain);
 
                     // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
                     // m_drawingLastNote is set only if the syl has a forward connector

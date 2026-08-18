@@ -22,8 +22,6 @@
 
 namespace vrv {
 
-class LyricElement;
-
 enum DurExtreme { LONGEST = 0, SHORTEST };
 
 //----------------------------------------------------------------------------
@@ -309,15 +307,11 @@ private:
 //----------------------------------------------------------------------------
 
 /** Match a verse or refrain by its internal lyric-processing group. */
-class LyricElementComparison : public Comparison {
+class LyricElementComparison : public ClassIdComparison {
 public:
-    explicit LyricElementComparison(int groupN) : m_groupN(groupN) {}
+    LyricElementComparison(ClassId classId, int groupN) : ClassIdComparison(classId), m_groupN(groupN) {}
 
     bool operator()(const Object *object) override;
-    bool MatchesType(const Object *object) const
-    {
-        return ((object->GetClassId() > LYRIC_ELEMENT) && (object->GetClassId() < LYRIC_ELEMENT_max));
-    }
 
 private:
     int m_groupN;
@@ -630,8 +624,6 @@ public:
             // ignore any class comparison which does not match the object class
             ClassIdComparison *cmp = dynamic_cast<ClassIdComparison *>(iter);
             if (cmp) return (cmp->GetType() != object->GetClassId()) ? true : (*iter)(object);
-            LyricElementComparison *lyricElementCmp = dynamic_cast<LyricElementComparison *>(iter);
-            if (lyricElementCmp) return lyricElementCmp->MatchesType(object) ? (*iter)(object) : true;
             return (*iter)(object);
         };
         switch (m_type) {

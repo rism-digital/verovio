@@ -773,8 +773,9 @@ void Page::AdjustSylSpacingByVerse(const IntTree &verseTree, Doc *doc)
                     // Create comparisons for staff/layer and the internal lyric-element group.
                     AttNIntegerComparison matchStaff(STAFF, staves->first);
                     AttNIntegerComparison matchLayer(LAYER, layers->first);
-                    LyricElementComparison matchLyricElement(verses->first);
-                    filters = { &matchStaff, &matchLayer, &matchLyricElement };
+                    LyricElementComparison matchVerse(VERSE, verses->first);
+                    LyricElementComparison matchRefrain(REFRAIN, verses->first);
+                    filters = { &matchStaff, &matchLayer, &matchVerse, &matchRefrain };
 
                     AdjustSylSpacingFunctor adjustSylSpacing(doc, voltaTracks->first);
                     adjustSylSpacing.SetFilters(&filters);
