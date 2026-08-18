@@ -12,7 +12,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
 #include "syl.h"
@@ -120,14 +119,6 @@ int LyricElement::AdjustPosition(int &overlap, int freeSpace, const Doc *doc)
         nextFreeSpace = std::min(-overlap, 3 * doc->GetDrawingUnit(100));
     }
     return nextFreeSpace;
-}
-
-bool LyricElementComparison::operator()(const Object *object)
-{
-    if (!this->MatchesType(object)) return false;
-    const LyricElement *lyricElement = vrv_cast<const LyricElement *>(object);
-    assert(lyricElement);
-    return (lyricElement->GetDrawingLyricGroupN() == m_groupN);
 }
 
 } // namespace vrv

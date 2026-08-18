@@ -12,6 +12,7 @@
 #include "atts_shared.h"
 #include "durationinterface.h"
 #include "horizontalaligner.h"
+#include "lyricelement.h"
 #include "measure.h"
 #include "note.h"
 #include "object.h"
@@ -314,7 +315,13 @@ public:
         assert(Object::IsLyricElement(classId));
     }
 
-    bool operator()(const Object *object) override;
+    bool operator()(const Object *object) override
+    {
+        if (!this->MatchesType(object)) return false;
+        const LyricElement *lyricElement = vrv_cast<const LyricElement *>(object);
+        assert(lyricElement);
+        return (lyricElement->GetDrawingLyricGroupN() == m_groupN);
+    }
 
 private:
     int m_groupN;
