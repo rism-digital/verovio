@@ -94,7 +94,7 @@ bool Tuplet::AddChild(Object *child)
 
     // Num and bracket are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
-    if (child->Is({ TUPLET_BRACKET, TUPLET_NUM })) {
+    if (child->IsAnyOf(std::array{ TUPLET_BRACKET, TUPLET_NUM })) {
         children.insert(children.begin(), child);
     }
     else {

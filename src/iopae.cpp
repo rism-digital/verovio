@@ -3083,7 +3083,7 @@ bool PAEInput::Parse()
             scoreDefChange = NULL;
         }
         // Place the keySig, mensur or meterSig to the scoreDefChange - create it if necessary
-        else if (token.m_object->Is({ KEYSIG, MENSUR, METERSIG })) {
+        else if (token.m_object->IsAnyOf(std::array{ KEYSIG, MENSUR, METERSIG })) {
             if (!scoreDefChange) {
                 scoreDefChange = new ScoreDef();
                 section->InsertBefore(currentMeasure, scoreDefChange);
@@ -3102,7 +3102,7 @@ bool PAEInput::Parse()
                 scoreDefChange->AddChild(token.m_object);
                 // For the meterSig and mensur, we can have them as attribute. KeySig not because of the enclose
                 // attributes
-                if (token.m_object->Is({ MENSUR, METERSIG })) {
+                if (token.m_object->IsAnyOf(std::array{ MENSUR, METERSIG })) {
                     token.m_object->IsAttribute(true);
                     if (token.m_object->Is(METERSIG)) {
                         currentMeterSig = vrv_cast<MeterSig *>(token.m_object);
@@ -3146,7 +3146,7 @@ bool PAEInput::Parse()
             layerElementContainers.back()->AddChild(element);
 
             // Add to the stack the layer element that are containers
-            if (element->Is({ BEAM, CHORD, GRACEGRP, LIGATURE, TUPLET })) {
+            if (element->IsAnyOf(std::array{ BEAM, CHORD, GRACEGRP, LIGATURE, TUPLET })) {
                 layerElementContainers.push_back(element);
             }
         }
@@ -3768,7 +3768,7 @@ bool PAEInput::ConvertFermata()
         else if (fermataToken) {
             // We have an open fermata sign but have not reached a fermata target
             if (!fermataTarget) {
-                if (token.m_object && token.m_object->Is({ MREST, NOTE, REST })) {
+                if (token.m_object && token.m_object->IsAnyOf(std::array{ MREST, NOTE, REST })) {
                     fermataTarget = token.m_object;
                     continue;
                 }
@@ -4650,7 +4650,7 @@ bool PAEInput::CheckHierarchy()
             if (!token.m_object->IsLayerElement()) continue;
 
             // These will be added to a scoreDef
-            if (token.m_object->Is({ KEYSIG, METERSIG, MENSUR })) continue;
+            if (token.m_object->IsAnyOf(std::array{ KEYSIG, METERSIG, MENSUR })) continue;
 
             // Test is the element is supported by the current top container
             if (!token.IsContainerEnd() && !stack.back()->m_object->IsSupportedChild(token.m_object->GetClassId())) {
@@ -4665,7 +4665,7 @@ bool PAEInput::CheckHierarchy()
             }
 
             // Add to the stack the layer element that are containers
-            if (token.m_object->Is({ BEAM, CHORD, GRACEGRP, TUPLET })) {
+            if (token.m_object->IsAnyOf(std::array{ BEAM, CHORD, GRACEGRP, TUPLET })) {
                 // Begining of a container - simply push it to the stack
                 if (token.m_char != pae::CONTAINER_END) {
                     stack.push_back(&token);

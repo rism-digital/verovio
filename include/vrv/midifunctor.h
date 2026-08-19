@@ -407,6 +407,8 @@ public:
     FunctorCode VisitStaff(const Staff *staff) override;
     FunctorCode VisitStaffDef(const StaffDef *staffDef) override;
     FunctorCode VisitSyl(const Syl *syl) override;
+    FunctorCode VisitVolta(const Volta *volta) override;
+    FunctorCode VisitRefrain(const Refrain *refrain) override;
     FunctorCode VisitVerse(const Verse *verse) override;
     ///@}
 

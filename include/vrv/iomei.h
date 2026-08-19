@@ -138,6 +138,7 @@ class Rend;
 class RepeatMark;
 class Rest;
 class Restore;
+class Refrain;
 class RunningElement;
 class Score;
 class ScoreDef;
@@ -178,7 +179,9 @@ class Tuning;
 class Turn;
 class Tuplet;
 class Unclear;
+class Volta;
 class Verse;
+class LyricElement;
 class Zone;
 
 // Helper enums
@@ -523,7 +526,10 @@ private:
      * @name Methods for writing other mei elements
      */
     ///@{
+    void WriteRefrain(pugi::xml_node currentNode, Refrain *refrain);
+    void WriteVolta(pugi::xml_node currentNode, Volta *volta);
     void WriteVerse(pugi::xml_node currentNode, Verse *verse);
+    void WriteLyricElement(pugi::xml_node currentNode, LyricElement *lyricElement);
     void WriteSyl(pugi::xml_node currentNode, Syl *syl);
     void WriteZone(pugi::xml_node currentNode, Zone *zone);
     void WriteSurface(pugi::xml_node currentNode, Surface *surface);
@@ -581,6 +587,12 @@ private:
 
 public:
     //
+protected:
+    /** Current xml element */
+    pugi::xml_node m_currentNode;
+    /** Xml node stack */
+    std::list<pugi::xml_node> m_nodeStack;
+
 private:
     /** The number of spaces for the indentation */
     int m_indent;
@@ -593,11 +605,6 @@ private:
 
     /** The document node */
     pugi::xml_node m_mei;
-
-    /** Current xml element */
-    pugi::xml_node m_currentNode;
-    /** Xml node stack */
-    std::list<pugi::xml_node> m_nodeStack;
     /** Boundary objects which are merged into one xml element */
     std::stack<Object *> m_boundaries;
     /** The object stack */
@@ -621,6 +628,26 @@ private:
     bool m_ignoreHeader;
     bool m_removeIds;
     SetOfConstObjects m_referredObjects;
+};
+
+//----------------------------------------------------------------------------
+// MEIOutputExtended
+//----------------------------------------------------------------------------
+
+/**
+ * Extended MEIOutput for partial exports.
+ */
+class MEIOutputExtended : public MEIOutput {
+public:
+    /** @name Constructors and destructor */
+    ///@{
+    MEIOutputExtended(Doc *doc);
+    ///@}
+
+    jsonxx::Object ExportScoreDef();
+
+private:
+    jsonxx::Object ToJson(const pugi::xml_document &doc);
 };
 
 //----------------------------------------------------------------------------
@@ -766,6 +793,7 @@ private:
     bool ReadPlica(Object *parent, pugi::xml_node plica);
     bool ReadProport(Object *parent, pugi::xml_node proport);
     bool ReadQuilisma(Object *parent, pugi::xml_node quilisma);
+    bool ReadRefrain(Object *parent, pugi::xml_node refrain);
     bool ReadRest(Object *parent, pugi::xml_node rest);
     bool ReadSpace(Object *parent, pugi::xml_node space);
     bool ReadStem(Object *parent, pugi::xml_node stem);
@@ -775,7 +803,9 @@ private:
     bool ReadTabDurSym(Object *parent, pugi::xml_node tabDurSym);
     bool ReadTabGrp(Object *parent, pugi::xml_node tabGrp);
     bool ReadTuplet(Object *parent, pugi::xml_node tuplet);
+    bool ReadVolta(Object *parent, pugi::xml_node volta);
     bool ReadVerse(Object *parent, pugi::xml_node verse);
+    void ReadLyricElement(pugi::xml_node element, LyricElement *lyricElement);
     ///@}
 
     /**
@@ -1023,6 +1053,26 @@ private:
      * A static array for storing the implemented editorial elements
      */
     static const std::vector<std::string> s_editorialElementNames;
+};
+
+//----------------------------------------------------------------------------
+// MEIInputExtended
+//----------------------------------------------------------------------------
+
+/**
+ * Extended MEIInput for partial import.
+ */
+class MEIInputExtended : public MEIInput {
+public:
+    /** @name Constructors and destructor */
+    ///@{
+    MEIInputExtended(Doc *doc);
+    ///@}
+
+    void ImportScoreDef(const jsonxx::Object &scoreDef);
+
+private:
+    pugi::xml_document FromJson(const jsonxx::Object &json);
 };
 
 } // namespace vrv

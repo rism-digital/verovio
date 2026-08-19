@@ -23,6 +23,7 @@
 #include "btrem.h"
 #include "chord.h"
 #include "clef.h"
+#include "cursor.h"
 #include "custos.h"
 #include "devicecontext.h"
 #include "divline.h"
@@ -37,6 +38,7 @@
 #include "label.h"
 #include "labelabbr.h"
 #include "layer.h"
+#include "lyricelement.h"
 #include "measure.h"
 #include "mensur.h"
 #include "mrest.h"
@@ -47,6 +49,7 @@
 #include "multirpt.h"
 #include "note.h"
 #include "options.h"
+#include "refrain.h"
 #include "rest.h"
 #include "smufl.h"
 #include "staff.h"
@@ -57,6 +60,7 @@
 #include "tie.h"
 #include "tuplet.h"
 #include "verse.h"
+#include "volta.h"
 #include "vrv.h"
 #include "zone.h"
 
@@ -215,17 +219,28 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         this->DrawTuplet(dc, element, layer, staff, measure);
     }
     else if (element->Is(TUPLET_BRACKET)) {
-        dc->StartGraphic(element, "", element->GetID());
+        TupletBracket *tupletBracket = vrv_cast<TupletBracket *>(element);
+        assert(element);
+        const bool showHidden
+            = (m_doc->GetOptions()->m_showHidden.GetValue() && tupletBracket->GetBracketVisible() == BOOLEAN_false);
+        dc->StartGraphic(element, (showHidden ? CSS_SHOW_HIDDEN : ""), element->GetID());
         dc->EndGraphic(element, this);
         layer->AddToDrawingList(element);
     }
     else if (element->Is(TUPLET_NUM)) {
-        dc->StartGraphic(element, "", element->GetID());
+        TupletNum *tupletNum = vrv_cast<TupletNum *>(element);
+        assert(element);
+        const bool showHidden
+            = (m_doc->GetOptions()->m_showHidden.GetValue() && tupletNum->GetNumVisible() == BOOLEAN_false);
+        dc->StartGraphic(element, (showHidden ? CSS_SHOW_HIDDEN : ""), element->GetID());
         dc->EndGraphic(element, this);
         layer->AddToDrawingList(element);
     }
-    else if (element->Is(VERSE)) {
-        this->DrawVerse(dc, element, layer, staff, measure);
+    else if (element->Is(VOLTA)) {
+        this->DrawVolta(dc, element, layer, staff, measure);
+    }
+    else if (element->IsLyricElement()) {
+        this->DrawLyricElement(dc, element, layer, staff, measure);
     }
     else {
         // This should never happen
@@ -250,11 +265,15 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     Accid *accid = vrv_cast<Accid *>(element);
     assert(accid);
 
+    bool showAccidGes = m_doc->GetOptions()->m_showHidden.GetValue();
+    const bool showHidden = (showAccidGes && accid->GetParent()->Is(ACCID));
+
     // This can happen with accid within note with only accid.ges
     // We still create an graphic in the output
     if (!accid->HasAccid() || staff->IsTablature()) {
         dc->StartGraphic(element, "", element->GetID());
         accid->SetEmptyBB();
+        if (showAccidGes) this->DrawLayerChildren(dc, accid, layer, staff, measure);
         dc->EndGraphic(element, this);
         return;
     }
@@ -265,7 +284,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         drawingElement = editorialAccid;
     }
 
-    dc->StartGraphic(drawingElement, "", element->GetID());
+    dc->StartGraphic(drawingElement, (showHidden ? CSS_SHOW_HIDDEN : ""), element->GetID());
 
     const data_NOTATIONTYPE notationType = staff->m_drawingNotationType;
     std::u32string accidStr = accid->GetSymbolStr(notationType);
@@ -334,6 +353,8 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     this->DrawSmuflString(
         dc, x, y, accidStr, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize, accid->GetDrawingCueSize(), true);
+
+    if (showAccidGes) this->DrawLayerChildren(dc, accid, layer, staff, measure);
 
     dc->EndGraphic(drawingElement, this);
 }
@@ -559,8 +580,11 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     this->DrawStemMod(dc, element, staff);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     // draw the (tuplet) number
-    if (bTrem->HasNum() && (bTrem->GetNumVisible() != BOOLEAN_false)) {
+    if (bTrem->HasNum() && (showHidden || bTrem->GetNumVisible() != BOOLEAN_false)) {
+        dc->StartCustomGraphic("bTremNum", (bTrem->GetNumVisible() == BOOLEAN_false) ? CSS_SHOW_HIDDEN : "");
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
         // calculate the extend of the number
         TextExtend extend;
@@ -573,6 +597,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         dc->DrawMusicText(figures, this->ToDeviceContextX(element->GetDrawingX() + xOffset - extend.m_width / 2),
             this->ToDeviceContextY(yNum));
         dc->ResetFont();
+        dc->EndCustomGraphic();
     }
 
     dc->EndGraphic(element, this);
@@ -589,6 +614,8 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     Chord *chord = vrv_cast<Chord *>(element);
     assert(chord);
 
+    dc->StartGraphic(chord, "", chord->GetID());
+
     if (chord->HasCluster()) {
         this->DrawChordCluster(dc, chord, layer, staff, measure);
         return;
@@ -601,6 +628,8 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /************ Draw children (notes, accidentals, etc) ************/
 
     this->DrawLayerChildren(dc, chord, layer, staff, measure);
+
+    dc->EndGraphic(chord, this);
 }
 
 void View::DrawChordCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff *staff, Measure *measure)
@@ -676,13 +705,15 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(staff);
     assert(measure);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     Clef *clef = vrv_cast<Clef *>(element);
     assert(clef);
 
     if (clef->m_crossStaff) staff = clef->m_crossStaff;
 
     // hidden clef
-    if (clef->GetVisible() == BOOLEAN_false) {
+    if (!showHidden && (clef->GetVisible() == BOOLEAN_false)) {
         dc->StartGraphic(element, "", element->GetID());
         clef->SetEmptyBB();
         dc->EndGraphic(element, this);
@@ -789,7 +820,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     // Because SMuFL does not have the origin correpsonding to the pitch as for notes, we need to correct it.
     // This will remain approximate
-    if (staff->m_drawingNotationType != NOTATIONTYPE_neume) {
+    if (!IsNeumeType(staff->m_drawingNotationType)) {
         y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
@@ -892,19 +923,13 @@ void View::DrawDurationElement(DeviceContext *dc, LayerElement *element, Layer *
     assert(measure);
 
     if (dynamic_cast<Chord *>(element)) {
-        dc->StartGraphic(element, "", element->GetID());
         this->DrawChord(dc, element, layer, staff, measure);
-        dc->EndGraphic(element, this);
     }
     else if (dynamic_cast<Note *>(element)) {
-        dc->StartGraphic(element, "", element->GetID());
         this->DrawNote(dc, element, layer, staff, measure);
-        dc->EndGraphic(element, this);
     }
     else if (dynamic_cast<Rest *>(element)) {
-        dc->StartGraphic(element, "", element->GetID());
         this->DrawRest(dc, element, layer, staff, measure);
-        dc->EndGraphic(element, this);
     }
 }
 
@@ -998,6 +1023,8 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     if (staff->IsTablature()) {
         // Encoded keySig will not be shown on tablature
         return;
@@ -1015,7 +1042,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     const int clefLocOffset = clef->GetClefLocOffset();
 
     // hidden key signature
-    if (keySig->GetVisible() == BOOLEAN_false) {
+    if (!showHidden && (keySig->GetVisible() == BOOLEAN_false)) {
         dc->StartGraphic(element, "", element->GetID());
         keySig->SetEmptyBB();
         dc->EndGraphic(element, this);
@@ -1090,11 +1117,13 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(staff);
     assert(measure);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     MeterSig *meterSig = vrv_cast<MeterSig *>(element);
     assert(meterSig);
 
     // hidden time signature
-    if (meterSig->GetVisible() == BOOLEAN_false) {
+    if (!showHidden && (meterSig->GetVisible() == BOOLEAN_false)) {
         dc->StartGraphic(element, "", element->GetID());
         meterSig->SetEmptyBB();
         dc->EndGraphic(element, this);
@@ -1199,13 +1228,15 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(layer);
     assert(staff);
     assert(measure);
+    assert(element->GetParent());
 
     MRest *mRest = vrv_cast<MRest *>(element);
     assert(mRest);
 
     const int staffSize = staff->GetDrawingStaffNotationSize();
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue() && mRest->GetParent()->Is(MSPACE));
 
-    dc->StartGraphic(element, "", element->GetID());
+    dc->StartGraphic(element, (showHidden ? CSS_SHOW_HIDDEN : ""), element->GetID());
 
     if (mRest->GetCutout() == cutout_CUTOUT_cutout) {
         dc->EndGraphic(element, this);
@@ -1268,9 +1299,12 @@ void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     this->DrawMRptPart(dc, element->GetDrawingX(), staff->GetDrawingY(), SMUFL_E500_repeat1Bar, 0, false, staff);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     // draw the measure count
     const int mRptNum = mRpt->HasNum() ? mRpt->GetNum() : mRpt->m_drawingMeasureCount;
-    if ((mRptNum > 0) && (mRpt->GetNumVisible() != BOOLEAN_false)) {
+    if ((mRptNum > 0) && (showHidden || mRpt->GetNumVisible() != BOOLEAN_false)) {
+        dc->StartCustomGraphic("mRptNum", (mRpt->GetNumVisible() == BOOLEAN_false) ? CSS_SHOW_HIDDEN : "");
         dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
         // calculate the extend of the number
         TextExtend extend;
@@ -1285,6 +1319,7 @@ void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         dc->DrawMusicText(
             figures, this->ToDeviceContextX(element->GetDrawingX() - extend.m_width / 2), this->ToDeviceContextY(yNum));
         dc->ResetFont();
+        dc->EndCustomGraphic();
     }
 
     dc->EndGraphic(element, this);
@@ -1318,11 +1353,14 @@ void View::DrawMSpace(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    // MSpace *mSpace = vrv_cast<MSpace *>(element);
-    // assert(mSpace);
+    bool showMSpace = m_doc->GetOptions()->m_showHidden.GetValue();
 
     dc->StartGraphic(element, "", element->GetID());
-    // nothing to draw here
+
+    dc->DrawPlaceholder(this->ToDeviceContextX(element->GetDrawingX()), this->ToDeviceContextY(element->GetDrawingY()));
+
+    if (showMSpace) this->DrawLayerChildren(dc, element, layer, staff, measure);
+
     dc->EndGraphic(element, this);
 }
 
@@ -1428,8 +1466,11 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         if (count) this->DrawSmuflCode(dc, x1, y1, SMUFL_E4E3_restWhole, staffSize, false);
     }
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     // Draw the number
-    if (multiRest->GetNumVisible() != BOOLEAN_false) {
+    if (showHidden || multiRest->GetNumVisible() != BOOLEAN_false) {
+        dc->StartCustomGraphic("multiRestNum", (multiRest->GetNumVisible() == BOOLEAN_false) ? CSS_SHOW_HIDDEN : "");
         dc->SetFont(m_doc->GetDrawingSmuflFont(staffNotationSize, false));
 
         const int staffHeight = (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize);
@@ -1442,6 +1483,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         this->DrawSmuflString(
             dc, xCentered, y, this->IntToTimeSigFigures(num), HORIZONTALALIGNMENT_center, staffNotationSize);
         dc->ResetFont();
+        dc->EndCustomGraphic();
     }
 
     dc->EndGraphic(element, this);
@@ -1495,6 +1537,8 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
 
     if (note->m_crossStaff) staff = note->m_crossStaff;
+
+    dc->StartGraphic(note, "", note->GetID());
 
     bool drawingCueSize = note->GetDrawingCueSize();
     int x = element->GetDrawingX();
@@ -1578,6 +1622,8 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     /************ Draw children (accidentals, etc) ************/
 
     this->DrawLayerChildren(dc, note, layer, staff, measure);
+
+    dc->EndGraphic(note, this);
 }
 
 void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -1587,6 +1633,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(layer);
     assert(staff);
     assert(measure);
+    assert(element->GetParent());
 
     Rest *rest = vrv_cast<Rest *>(element);
     assert(rest);
@@ -1595,6 +1642,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     const bool drawingCueSize = rest->GetDrawingCueSize();
     const int staffSize = staff->GetDrawingStaffNotationSize();
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue() && rest->GetParent()->Is(SPACE));
     data_DURATION drawingDur = rest->GetActualDur();
     // in tablature the @dur is in the parent TabGrp - try to get if from there
     if ((drawingDur == DURATION_NONE) && (staff->IsTablature() || staff->IsTabStaffLike())) {
@@ -1606,6 +1654,8 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         LogWarning("Missing duration for rest '%s'", rest->GetID().c_str());
         drawingDur = DURATION_4;
     }
+
+    dc->StartGraphic(rest, (showHidden ? CSS_SHOW_HIDDEN : ""), rest->GetID());
 
     const char32_t drawingGlyph = rest->GetRestGlyph(drawingDur);
 
@@ -1671,6 +1721,8 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         }
         dc->EndCustomGraphic();
     }
+
+    dc->EndGraphic(rest, this);
 }
 
 void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -1681,8 +1733,14 @@ void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff);
     assert(measure);
 
+    bool showSpace = m_doc->GetOptions()->m_showHidden.GetValue();
+
     dc->StartGraphic(element, "", element->GetID());
+
     dc->DrawPlaceholder(this->ToDeviceContextX(element->GetDrawingX()), this->ToDeviceContextY(element->GetDrawingY()));
+
+    if (showSpace) this->DrawLayerChildren(dc, element, layer, staff, measure);
+
     dc->EndGraphic(element, this);
 }
 
@@ -1824,25 +1882,53 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     Syl *syl = vrv_cast<Syl *>(element);
     assert(syl);
 
-    if (!syl->GetStart() && !(staff->m_drawingNotationType == NOTATIONTYPE_neume)) {
+    if (!syl->GetStart() && !IsNeumeType(staff->m_drawingNotationType)) {
         LogWarning("Parent note for <syl> was not found");
         return;
     }
 
     if (!m_doc->IsFacs() && !m_doc->IsTranscription() && !m_doc->IsNeumeLines()) {
-        syl->SetDrawingYRel(this->GetSylYRel(syl->m_drawingVerseN, staff, syl->m_drawingVersePlace));
+        syl->SetDrawingYRel(
+            this->GetSylYRel(syl->m_drawingVerseN, staff, syl->m_drawingVersePlace, syl->m_drawingVoltaN));
     }
 
     dc->StartGraphic(syl, "", syl->GetID());
     dc->DeactivateGraphicY();
 
     FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-    if (syl->HasFontweight()) {
-        currentFont.SetWeight(syl->GetFontweight());
-    }
-    if (syl->HasFontstyle()) {
-        currentFont.SetStyle(syl->GetFontstyle());
-    }
+    const auto applyTypography = [this, staff](FontInfo &font, const AttTypography *typography) {
+        if (!typography) return;
+        if (typography->HasFontname()) {
+            font.SetFaceName(typography->GetFontname());
+        }
+        else if (typography->HasFontfam()) {
+            font.SetFaceName(typography->GetFontfam());
+        }
+        if (typography->HasFontsize()) {
+            const data_FONTSIZE fontSize = typography->GetFontsize();
+            if (fontSize.GetType() == FONTSIZE_fontSizeNumeric) {
+                font.SetPointSize(fontSize.GetFontSizeNumeric());
+            }
+            else if (fontSize.GetType() == FONTSIZE_term) {
+                font.SetPointSize(font.GetPointSize() * fontSize.GetPercentForTerm() / 100);
+            }
+            else if (fontSize.GetType() == FONTSIZE_percent) {
+                font.SetPointSize(font.GetPointSize() * fontSize.GetPercent() / 100);
+            }
+        }
+        if (typography->HasFontweight()) font.SetWeight(typography->GetFontweight());
+        if (typography->HasFontstyle()) font.SetStyle(typography->GetFontstyle());
+        if (typography->HasLetterspacing()) {
+            font.SetLetterSpacing(typography->GetLetterspacing() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+        }
+    };
+
+    const LyricElement *lyricElement
+        = vrv_cast<const LyricElement *>(syl->GetFirstAncestorInRange(LYRIC_ELEMENT, LYRIC_ELEMENT_max));
+    const Volta *volta = vrv_cast<const Volta *>(syl->GetFirstAncestor(VOLTA));
+    applyTypography(currentFont, lyricElement);
+    applyTypography(currentFont, volta);
+    applyTypography(currentFont, syl);
     if (syl->GetStart() && syl->GetStart()->GetDrawingCueSize()) {
         currentFont.SetPointSize(m_doc->GetCueSize(currentFont.GetPointSize()));
     }
@@ -1856,9 +1942,18 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
 
     this->CalcOffset(dc, x, y);
 
+    syl->ResetDrawingTextInkBounds();
+    const std::u32string sylText = syl->GetText();
+    if (!sylText.empty()) {
+        TextExtend inkExtent;
+        dc->GetTextExtent(sylText, &inkExtent, false);
+        syl->SetDrawingTextInkBounds(y + inkExtent.m_ascent, y - inkExtent.m_descent);
+    }
+
     TextDrawingParams params;
     params.m_x = x;
     params.m_y = y;
+    params.m_staffSize = staff->m_drawingStaffSize;
     if (m_doc->IsFacs() || m_doc->IsNeumeLines()) {
         params.m_width = syl->GetDrawingWidth();
         params.m_height = syl->GetDrawingHeight();
@@ -1911,7 +2006,19 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     dc->EndGraphic(syl, this);
 }
 
-void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+void View::DrawVolta(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    Volta *volta = vrv_cast<Volta *>(element);
+    assert(volta);
+
+    dc->StartGraphic(volta, "", volta->GetID());
+    this->DrawLayerChildren(dc, volta, layer, staff, measure);
+    dc->EndGraphic(volta, this);
+}
+
+void View::DrawLyricElement(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
     assert(element);
@@ -1919,11 +2026,13 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff);
     assert(measure);
 
-    Verse *verse = vrv_cast<Verse *>(element);
-    assert(verse);
+    assert(element->IsLyricElement());
+    LyricElement *lyricElement = vrv_cast<LyricElement *>(element);
+    assert(lyricElement);
+    Verse *verse = lyricElement->Is(VERSE) ? vrv_cast<Verse *>(lyricElement) : NULL;
 
-    Label *label = vrv_cast<Label *>(verse->FindDescendantByType(LABEL, 1));
-    LabelAbbr *labelAbbr = verse->GetDrawingLabelAbbr();
+    Label *label = verse ? vrv_cast<Label *>(verse->FindDescendantByType(LABEL, 1)) : NULL;
+    LabelAbbr *labelAbbr = verse ? verse->GetDrawingLabelAbbr() : NULL;
 
     if (label || labelAbbr) {
 
@@ -1949,8 +2058,10 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         labelTxt.SetPointSize(pointSize);
 
         TextDrawingParams params;
-        params.m_x = verse->GetDrawingX() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        params.m_y = staff->GetDrawingY() + this->GetSylYRel(std::max(1, verse->GetN()), staff, verse->GetPlace());
+        params.m_x = lyricElement->GetDrawingX() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        params.m_y = staff->GetDrawingY()
+            + this->GetSylYRel(lyricElement->GetDrawingVerseN(), staff, lyricElement->GetPlace());
+        params.m_staffSize = staff->m_drawingStaffSize;
         params.m_pointSize = labelTxt.GetPointSize();
 
         dc->SetFont(&labelTxt);
@@ -1967,11 +2078,72 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         dc->ResetFont();
     }
 
-    dc->StartGraphic(verse, "", verse->GetID());
+    dc->StartGraphic(lyricElement, "", lyricElement->GetID());
+    this->DrawLayerChildren(dc, lyricElement, layer, staff, measure);
 
-    this->DrawLayerChildren(dc, verse, layer, staff, measure);
+    if ((lyricElement->GetVoltaCount() > 1) && lyricElement->HasVoltasym()
+        && (lyricElement->GetVoltasym() != voltaGroupingSym_VOLTASYM_none)) {
+        bool hasContentBounds = false;
+        int yTop = 0;
+        int yBottom = 0;
+        for (Object *object : lyricElement->FindAllDescendantsByType(VOLTA)) {
+            for (Object *sylObject : object->FindAllDescendantsByType(SYL)) {
+                Syl *syl = vrv_cast<Syl *>(sylObject);
+                assert(syl);
+                if (!syl->HasDrawingTextInkBounds()) continue;
+                if (!hasContentBounds) {
+                    yTop = syl->GetDrawingTextInkTop();
+                    yBottom = syl->GetDrawingTextInkBottom();
+                    hasContentBounds = true;
+                }
+                else {
+                    yTop = std::max(yTop, syl->GetDrawingTextInkTop());
+                    yBottom = std::min(yBottom, syl->GetDrawingTextInkBottom());
+                }
+            }
+        }
+        if (!hasContentBounds) {
+            const int verseN = lyricElement->GetDrawingVerseN();
+            const auto [firstVoltaTrack, lastVoltaTrack] = lyricElement->GetVoltaDrawingRange();
+            const int directTrackOffset = lyricElement->HasDrawingDirectSylTrack() ? 1 : 0;
+            const int firstVoltaLine = firstVoltaTrack + directTrackOffset;
+            const int lastVoltaLine = lastVoltaTrack + directTrackOffset;
+            const auto getLineY = [this, staff, lyricElement, verseN](int line) {
+                if (lyricElement->Is(REFRAIN)) {
+                    return staff->GetDrawingY() + this->GetSylYRel(verseN + line - 1, staff, lyricElement->GetPlace());
+                }
+                return staff->GetDrawingY() + this->GetSylYRel(verseN, staff, lyricElement->GetPlace(), line);
+            };
+            const int firstY = getLineY(firstVoltaLine);
+            const int lastY = getLineY(lastVoltaLine);
+            FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+            yTop = std::max(firstY, lastY) + m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
+            yBottom = std::min(firstY, lastY) + m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
+        }
+        const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        const int x = lyricElement->GetDrawingX() - unit;
 
-    dc->EndGraphic(verse, this);
+        dc->StartCustomGraphic("voltaGroupingSym");
+        switch (lyricElement->GetVoltasym()) {
+            case voltaGroupingSym_VOLTASYM_brace:
+                this->DrawBrace(dc, x, yTop, yBottom, staff->m_drawingStaffSize, true);
+                break;
+            case voltaGroupingSym_VOLTASYM_bracket:
+                this->DrawBracket(dc, x, yTop, yBottom, staff->m_drawingStaffSize);
+                break;
+            case voltaGroupingSym_VOLTASYM_bracketsq:
+                this->DrawBracketSq(dc, x - unit, yTop, yBottom, staff->m_drawingStaffSize);
+                break;
+            case voltaGroupingSym_VOLTASYM_line:
+                this->DrawVerticalLine(
+                    dc, yTop, yBottom, x - unit, m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize));
+                break;
+            default: break;
+        }
+        dc->EndCustomGraphic();
+    }
+
+    dc->EndGraphic(lyricElement, this);
 }
 
 //----------------------------------------------------------------------------
@@ -2178,7 +2350,7 @@ int View::GetFYRel(F *f, Staff *staff)
     return y;
 }
 
-int View::GetSylYRel(int verseN, Staff *staff, data_STAFFREL place)
+int View::GetSylYRel(int verseN, Staff *staff, data_STAFFREL place, int voltaN)
 {
     assert(staff);
 
@@ -2199,14 +2371,185 @@ int View::GetSylYRel(int verseN, Staff *staff, data_STAFFREL place)
     // above the staff
     if (place == STAFFREL_above) {
         y = alignment->GetOverflowAbove()
-            - (alignment->GetVersePositionAbove(verseN, verseCollapse)) * (verseHeight + margin) - (height);
+            - (alignment->GetVersePositionAbove(verseN, verseCollapse, voltaN)) * (verseHeight + margin) - (height);
     }
     else {
         y = -alignment->GetStaffHeight() - alignment->GetOverflowBelow()
-            + alignment->GetVersePositionBelow(verseN, verseCollapse) * (verseHeight + margin) + verseHeight - height;
+            + alignment->GetVersePositionBelow(verseN, verseCollapse, voltaN) * (verseHeight + margin) + verseHeight
+            - height;
     }
 
     return y;
+}
+
+void View::DrawCursor(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    Cursor *cursor = vrv_cast<Cursor *>(element);
+    assert(cursor);
+
+    const int staffSize = staff->m_drawingStaffSize;
+    const int unit = m_doc->GetDrawingUnit(staffSize);
+
+    bool isNote = !cursor->IsRestMode();
+
+    std::string chordCss = (cursor->IsChordMode()) ? "chord" : "";
+    dc->StartCustomGraphic("cursor", chordCss);
+
+    const int x = cursor->GetDrawingX();
+
+    const int yC1 = staff->GetDrawingY() + cursor->GetYRelPitchC();
+    const int yC2 = yC1 + 6 * unit;
+
+    if (cursor->GetInputMode() == Cursor::DURATION_FIRST) {
+        const int octX = x + unit;
+        const int octSize = staffSize * .8;
+        int width = m_doc->GetDrawingStemWidth(octSize);
+        this->DrawVerticalLine(dc, yC1, yC2, octX, width);
+        this->DrawDot(dc, octX, yC1, octSize);
+        this->DrawDot(dc, octX, yC2, octSize);
+
+        const int y = std::max(yC2, staff->GetDrawingY()) + 2 * unit;
+        const int cursorSize = staffSize * .7;
+
+        dc->SetFont(m_doc->GetDrawingSmuflFont(cursorSize, false));
+
+        std::u32string str;
+        int sym = SMUFL_ECA5_metNoteQuarterUp;
+        switch (cursor->GetDur()) {
+            case (DURATION_breve): sym = SMUFL_ECA1_metNoteDoubleWholeSquare; break;
+            case (DURATION_1): sym = SMUFL_ECA2_metNoteWhole; break;
+            case (DURATION_2): sym = SMUFL_ECA3_metNoteHalfUp; break;
+            case (DURATION_4): sym = SMUFL_ECA5_metNoteQuarterUp; break;
+            case (DURATION_8): sym = SMUFL_ECA7_metNote8thUp; break;
+            case (DURATION_16): sym = SMUFL_ECA9_metNote16thUp; break;
+            case (DURATION_32): sym = SMUFL_ECAB_metNote32ndUp; break;
+            case (DURATION_64): sym = SMUFL_ECAD_metNote64thUp; break;
+            default: break;
+        }
+        str.push_back(sym);
+
+        if (cursor->HasDots()) {
+            str.push_back(SMUFL_0020_space);
+            str.push_back(SMUFL_ECB7_metAugmentationDot);
+        }
+
+        data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
+        this->DrawSmuflString(dc, octX, y, str, alignment, cursorSize);
+        TextExtend extend;
+        dc->GetSmuflTextExtent(str, &extend);
+
+        if (cursor->HasAccid() && !cursor->IsAccidImplicit()) {
+            std::u32string strAccid;
+            int sym = SMUFL_EA65_figbassNatural;
+            switch (cursor->GetAccid()) {
+                case (ACCIDENTAL_WRITTEN_f): sym = SMUFL_EA64_figbassFlat; break;
+                case (ACCIDENTAL_WRITTEN_n): sym = SMUFL_EA65_figbassNatural; break;
+                case (ACCIDENTAL_WRITTEN_s): sym = SMUFL_EA66_figbassSharp; break;
+                case (ACCIDENTAL_WRITTEN_ff): sym = SMUFL_EA63_figbassDoubleFlat; break;
+                case (ACCIDENTAL_WRITTEN_x): sym = SMUFL_EA67_figbassDoubleSharp; break;
+                default: break;
+            }
+
+            strAccid.push_back(sym);
+            this->DrawSmuflString(dc, octX, y + extend.m_height, strAccid, alignment, cursorSize);
+        }
+
+        dc->ResetFont();
+    }
+    else {
+        const int y = (isNote) ? cursor->GetDrawingY() : staff->GetDrawingY() + 3 * unit;
+        if (isNote) {
+
+            if (cursor->IsTieMode()) {
+                const int y = staff->GetDrawingY() + 1 * unit;
+                const int cursorSize = staffSize * .7;
+
+                FontInfo labelTxt;
+                if (!dc->UseGlobalStyling()) {
+                    labelTxt.SetFaceName(m_doc->GetResources().GetTextFont());
+                }
+                labelTxt.SetPointSize(m_doc->GetDrawingLyricFont(cursorSize)->GetPointSize());
+                labelTxt.SetWeight(FONTWEIGHT_bold);
+
+                TextDrawingParams params;
+                params.m_x = x;
+                params.m_y = y;
+                params.m_pointSize = labelTxt.GetPointSize();
+
+                dc->SetFont(&labelTxt);
+
+                dc->StartText(
+                    this->ToDeviceContextX(params.m_x), this->ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_center);
+                std::u32string str;
+                // U+29C9 = ⧉' ; U+23DC = ⏜
+                str.push_back(cursor->GetTieMode() == Cursor::TieMode::COPY ? U'\u29C9' : U'\u23DC');
+                dc->DrawText(UTF32to8(str), str);
+                dc->EndText();
+
+                dc->ResetFont();
+
+                if (cursor->HasDots()) {
+                    int dotsX = x + 1.5 * cursor->GetDrawingRadius(m_doc);
+                    this->DrawDotsPart(dc, dotsX, y + unit, cursor->HasDots(), staff);
+                }
+            }
+            else {
+
+                this->DrawNote(dc, layer->GetCursor(), layer, staff, measure);
+
+                const int octX = x - .5 * unit;
+                const int octSize = staffSize * .8;
+                int width = m_doc->GetDrawingStemWidth(octSize);
+                this->DrawVerticalLine(dc, yC1, yC2, octX, width);
+                this->DrawDot(dc, octX, yC1, octSize);
+                this->DrawDot(dc, octX, yC2, octSize);
+
+                if (cursor->HasAccid()) {
+                    this->DrawAccid(dc, cursor->GetAccidElement(), layer, staff, measure);
+                }
+
+                if (cursor->HasDots()) {
+                    int dotsX = x + 2.8 * cursor->GetDrawingRadius(m_doc);
+                    this->DrawDotsPart(dc, dotsX, y, cursor->HasDots(), staff);
+                }
+            }
+        }
+        else {
+            const data_DURATION dur = (cursor->HasDur()) ? cursor->GetDur() : DURATION_4;
+            Rest rest;
+            // Needed for finding resources
+            rest.SetParent(measure);
+            const char32_t drawingGlyph = rest.GetRestGlyph(dur);
+
+            int width = m_doc->GetGlyphWidth(drawingGlyph, staffSize, true);
+
+            this->DrawSmuflCode(dc, x, y, drawingGlyph, staffSize, true);
+            if (dur == DURATION_1 || dur == DURATION_2) {
+                const int lineWidth = m_doc->GetOptions()->m_ledgerLineThickness.GetValue()
+                    * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetOptions()->m_graceFactor.GetValue();
+
+                dc->SetPen(this->ToDeviceContextX(lineWidth), PEN_SOLID);
+                dc->DrawLine(this->ToDeviceContextX(x - unit * .5), this->ToDeviceContextY(y),
+                    this->ToDeviceContextX(x + width + unit * .5), this->ToDeviceContextY(y));
+                dc->ResetPen();
+
+                width += .5 * unit;
+            }
+
+            if (cursor->HasDots()) {
+                int dotsX = x + .5 * unit + width;
+                this->DrawDotsPart(dc, dotsX, y, cursor->GetDots(), staff, true);
+            }
+        }
+    }
+
+    dc->EndCustomGraphic();
 }
 
 } // namespace vrv

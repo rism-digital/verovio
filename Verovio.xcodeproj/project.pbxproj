@@ -178,6 +178,9 @@
 		4D1694491E3A44F300569BF4 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D983004192E959E00320037 /* main.cpp */; };
 		4D16944B1E3A44F300569BF4 /* metersig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D763EC51987D04D003FCAB5 /* metersig.cpp */; };
 		4D16944E1E3A44F300569BF4 /* verse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C18199F561200028D93 /* verse.cpp */; };
+		A7C500000000000000000011 /* volta.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7C500000000000000000002 /* volta.cpp */; };
+		B8C600000000000000000011 /* refrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000002 /* refrain.cpp */; };
+		B8C600000000000000000021 /* lyricelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000004 /* lyricelement.cpp */; };
 		4D16944F1E3A44F300569BF4 /* timeinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF289FE1A7545E500BA9F7D /* timeinterface.cpp */; };
 		4D1694511E3A44F300569BF4 /* glyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1D733F1A1D08DC001E08F6 /* glyph.cpp */; };
 		4D1694521E3A44F300569BF4 /* syl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C1D19A1DE2000028D93 /* syl.cpp */; };
@@ -194,6 +197,12 @@
 		4D1788C62CB8FD7300FE9043 /* fraction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1788C42CB8FD7300FE9043 /* fraction.cpp */; };
 		4D1788C72CB8FD7300FE9043 /* fraction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1788C42CB8FD7300FE9043 /* fraction.cpp */; };
 		4D1788C82CB8FD7300FE9043 /* fraction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1788C42CB8FD7300FE9043 /* fraction.cpp */; };
+		4D1A0BBB2FD1517B004AE805 /* cursor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1A0BBA2FD1517B004AE805 /* cursor.h */; };
+		4D1A0BBC2FD1517B004AE805 /* cursor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1A0BBA2FD1517B004AE805 /* cursor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D1A0BBE2FD1518E004AE805 /* cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A0BBD2FD1518E004AE805 /* cursor.cpp */; };
+		4D1A0BBF2FD1518E004AE805 /* cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A0BBD2FD1518E004AE805 /* cursor.cpp */; };
+		4D1A0BC02FD1518E004AE805 /* cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A0BBD2FD1518E004AE805 /* cursor.cpp */; };
+		4D1A0BC12FD1518E004AE805 /* cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A0BBD2FD1518E004AE805 /* cursor.cpp */; };
 		4D1AC9772B6A9BB200434023 /* filereader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1AC9762B6A9BB200434023 /* filereader.cpp */; };
 		4D1AC9782B6A9BB200434023 /* filereader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1AC9762B6A9BB200434023 /* filereader.cpp */; };
 		4D1AC9792B6A9BB200434023 /* filereader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1AC9762B6A9BB200434023 /* filereader.cpp */; };
@@ -475,6 +484,7 @@
 		4D89F90F201771AE00A4D336 /* num.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D89F90D201771AE00A4D336 /* num.cpp */; };
 		4D89F910201771AE00A4D336 /* num.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D89F90D201771AE00A4D336 /* num.cpp */; };
 		4D89F9122018A93300A4D336 /* svg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D89F9112018A93200A4D336 /* svg.cpp */; };
+		4D8C59533015F2360063E9C2 /* iogabc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D7647A12FA66C68004F9EDA /* iogabc.cpp */; };
 		4D94721D20CA701000C780C8 /* linkinginterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D94721C20CA701000C780C8 /* linkinginterface.h */; };
 		4D94721F20CA702C00C780C8 /* linkinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D94721E20CA702C00C780C8 /* linkinginterface.cpp */; };
 		4D94722020CA702C00C780C8 /* linkinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D94721E20CA702C00C780C8 /* linkinginterface.cpp */; };
@@ -489,11 +499,19 @@
 		4D9A9C17199F560200028D93 /* verse.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9A9C16199F560200028D93 /* verse.h */; };
 		4D9A9C19199F561200028D93 /* verse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C18199F561200028D93 /* verse.cpp */; };
 		4D9A9C1A199F561200028D93 /* verse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C18199F561200028D93 /* verse.cpp */; };
+		A7C500000000000000000010 /* volta.h in Headers */ = {isa = PBXBuildFile; fileRef = A7C500000000000000000001 /* volta.h */; };
+		A7C500000000000000000012 /* volta.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7C500000000000000000002 /* volta.cpp */; };
+		A7C500000000000000000013 /* volta.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7C500000000000000000002 /* volta.cpp */; };
+		B8C600000000000000000010 /* refrain.h in Headers */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000001 /* refrain.h */; };
+		B8C600000000000000000012 /* refrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000002 /* refrain.cpp */; };
+		B8C600000000000000000013 /* refrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000002 /* refrain.cpp */; };
+		B8C600000000000000000020 /* lyricelement.h in Headers */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000003 /* lyricelement.h */; };
+		B8C600000000000000000022 /* lyricelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000004 /* lyricelement.cpp */; };
+		B8C600000000000000000023 /* lyricelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000004 /* lyricelement.cpp */; };
 		4D9A9C1C199F576100028D93 /* syl.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9A9C1B199F576100028D93 /* syl.h */; };
 		4D9A9C1E19A1DE2000028D93 /* syl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C1D19A1DE2000028D93 /* syl.cpp */; };
 		4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C1D19A1DE2000028D93 /* syl.cpp */; };
 		4DA0867D2FA9DAB400A45751 /* strophicus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D7647A52FA66CE8004F9EDA /* strophicus.cpp */; };
-		4DE9150200000000004F9EDA /* episema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE9150000000000004F9EDA /* episema.cpp */; };
 		4DA0EAC322BB779400A7EBEB /* surface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA0EAC022BB779300A7EBEB /* surface.cpp */; };
 		4DA0EAC422BB779400A7EBEB /* surface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA0EAC022BB779300A7EBEB /* surface.cpp */; };
 		4DA0EAC522BB779400A7EBEB /* surface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA0EAC022BB779300A7EBEB /* surface.cpp */; };
@@ -887,6 +905,12 @@
 		4DE0B9A12988070C00D4C939 /* interface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DE0B9A02988070C00D4C939 /* interface.h */; };
 		4DE0B9A22988070C00D4C939 /* interface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DE0B9A02988070C00D4C939 /* interface.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4DE644F51EDBEA01002FBE6C /* breath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE644F41EDBEA01002FBE6C /* breath.cpp */; };
+		4DE9150200000000004F9EDA /* episema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE9150000000000004F9EDA /* episema.cpp */; };
+		4DE9150300000000004F9EDA /* episema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE9150000000000004F9EDA /* episema.cpp */; };
+		4DE9150400000000004F9EDA /* episema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE9150000000000004F9EDA /* episema.cpp */; };
+		4DE9150500000000004F9EDA /* episema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE9150000000000004F9EDA /* episema.cpp */; };
+		4DE9150600000000004F9EDA /* episema.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DE9150100000000004F9EDA /* episema.h */; };
+		4DE9150700000000004F9EDA /* episema.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DE9150100000000004F9EDA /* episema.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4DE96E3921C4370E00CB85BE /* bracketspan.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DE96E3821C4370E00CB85BE /* bracketspan.h */; };
 		4DE96E3B21C4373200CB85BE /* bracketspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE96E3A21C4373200CB85BE /* bracketspan.cpp */; };
 		4DE96E3C21C4373200CB85BE /* bracketspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE96E3A21C4373200CB85BE /* bracketspan.cpp */; };
@@ -1018,11 +1042,6 @@
 		6D7647A82FA66CE8004F9EDA /* strophicus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D7647A52FA66CE8004F9EDA /* strophicus.cpp */; };
 		6D7647AA2FA66D0A004F9EDA /* strophicus.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D7647A92FA66D0A004F9EDA /* strophicus.h */; };
 		6D7647AB2FA66D0A004F9EDA /* strophicus.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D7647A92FA66D0A004F9EDA /* strophicus.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4DE9150300000000004F9EDA /* episema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE9150000000000004F9EDA /* episema.cpp */; };
-		4DE9150400000000004F9EDA /* episema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE9150000000000004F9EDA /* episema.cpp */; };
-		4DE9150500000000004F9EDA /* episema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE9150000000000004F9EDA /* episema.cpp */; };
-		4DE9150600000000004F9EDA /* episema.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DE9150100000000004F9EDA /* episema.h */; };
-		4DE9150700000000004F9EDA /* episema.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DE9150100000000004F9EDA /* episema.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8F086EE2188539540037FD8E /* verticalaligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* verticalaligner.cpp */; };
 		8F086EE4188539540037FD8E /* barline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB8188539540037FD8E /* barline.cpp */; };
 		8F086EE5188539540037FD8E /* bboxdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB9188539540037FD8E /* bboxdevicecontext.cpp */; };
@@ -1385,6 +1404,12 @@
 		BB4C4B7C22A932D7001F6AF0 /* tuplet.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59293018854BF800FE51AD /* tuplet.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4B7D22A932D7001F6AF0 /* verse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C18199F561200028D93 /* verse.cpp */; };
 		BB4C4B7E22A932D7001F6AF0 /* verse.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9A9C16199F560200028D93 /* verse.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A7C500000000000000000014 /* volta.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7C500000000000000000002 /* volta.cpp */; };
+		A7C500000000000000000015 /* volta.h in Headers */ = {isa = PBXBuildFile; fileRef = A7C500000000000000000001 /* volta.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B8C600000000000000000014 /* refrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000002 /* refrain.cpp */; };
+		B8C600000000000000000015 /* refrain.h in Headers */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000001 /* refrain.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B8C600000000000000000024 /* lyricelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000004 /* lyricelement.cpp */; };
+		B8C600000000000000000025 /* lyricelement.h in Headers */ = {isa = PBXBuildFile; fileRef = B8C600000000000000000003 /* lyricelement.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4B7F22A932DF001F6AF0 /* fb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F7DD0531EAF3682001B072A /* fb.cpp */; };
 		BB4C4B8022A932DF001F6AF0 /* fb.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36C21C1EBCE14300A6DD1B /* fb.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4B8122A932DF001F6AF0 /* f.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEF8A6321B7AAF90093A76B /* f.cpp */; };
@@ -1902,6 +1927,8 @@
 		4D1694601E3A44F300569BF4 /* Verovio-Humdrum */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Verovio-Humdrum"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D1788C12CB8FD0100FE9043 /* fraction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = fraction.h; path = include/vrv/fraction.h; sourceTree = "<group>"; };
 		4D1788C42CB8FD7300FE9043 /* fraction.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = fraction.cpp; path = src/fraction.cpp; sourceTree = "<group>"; };
+		4D1A0BBA2FD1517B004AE805 /* cursor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cursor.h; path = include/vrv/cursor.h; sourceTree = "<group>"; };
+		4D1A0BBD2FD1518E004AE805 /* cursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cursor.cpp; path = src/cursor.cpp; sourceTree = "<group>"; };
 		4D1AC9762B6A9BB200434023 /* filereader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = filereader.cpp; path = src/filereader.cpp; sourceTree = "<group>"; };
 		4D1AC97B2B6A9BD000434023 /* filereader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = filereader.h; path = include/vrv/filereader.h; sourceTree = "<group>"; };
 		4D1BD1B421908D6B000D35B2 /* halfmrpt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = halfmrpt.cpp; path = src/halfmrpt.cpp; sourceTree = "<group>"; };
@@ -2041,6 +2068,12 @@
 		4D983004192E959E00320037 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = tools/main.cpp; sourceTree = SOURCE_ROOT; };
 		4D9A9C16199F560200028D93 /* verse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = verse.h; path = include/vrv/verse.h; sourceTree = "<group>"; };
 		4D9A9C18199F561200028D93 /* verse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = verse.cpp; path = src/verse.cpp; sourceTree = "<group>"; };
+		A7C500000000000000000001 /* volta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = volta.h; path = include/vrv/volta.h; sourceTree = "<group>"; };
+		A7C500000000000000000002 /* volta.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = volta.cpp; path = src/volta.cpp; sourceTree = "<group>"; };
+		B8C600000000000000000001 /* refrain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = refrain.h; path = include/vrv/refrain.h; sourceTree = "<group>"; };
+		B8C600000000000000000002 /* refrain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = refrain.cpp; path = src/refrain.cpp; sourceTree = "<group>"; };
+		B8C600000000000000000003 /* lyricelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lyricelement.h; path = include/vrv/lyricelement.h; sourceTree = "<group>"; };
+		B8C600000000000000000004 /* lyricelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lyricelement.cpp; path = src/lyricelement.cpp; sourceTree = "<group>"; };
 		4D9A9C1B199F576100028D93 /* syl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = syl.h; path = include/vrv/syl.h; sourceTree = "<group>"; };
 		4D9A9C1D19A1DE2000028D93 /* syl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = syl.cpp; path = src/syl.cpp; sourceTree = "<group>"; };
 		4D9C5F3A1ADBBBEB005D3031 /* git_commit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = git_commit.h; path = include/vrv/git_commit.h; sourceTree = SOURCE_ROOT; };
@@ -2183,6 +2216,8 @@
 		4DE0B9A02988070C00D4C939 /* interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = interface.h; path = include/vrv/interface.h; sourceTree = "<group>"; };
 		4DE644F31EDBE9F8002FBE6C /* breath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = breath.h; path = include/vrv/breath.h; sourceTree = "<group>"; };
 		4DE644F41EDBEA01002FBE6C /* breath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = breath.cpp; path = src/breath.cpp; sourceTree = "<group>"; };
+		4DE9150000000000004F9EDA /* episema.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = episema.cpp; path = src/episema.cpp; sourceTree = "<group>"; };
+		4DE9150100000000004F9EDA /* episema.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = episema.h; path = include/vrv/episema.h; sourceTree = "<group>"; };
 		4DE96E3821C4370E00CB85BE /* bracketspan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bracketspan.h; path = include/vrv/bracketspan.h; sourceTree = "<group>"; };
 		4DE96E3A21C4373200CB85BE /* bracketspan.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bracketspan.cpp; path = src/bracketspan.cpp; sourceTree = "<group>"; };
 		4DEBE6E02B36E78900B67DFB /* facsimilefunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = facsimilefunctor.h; path = include/vrv/facsimilefunctor.h; sourceTree = "<group>"; };
@@ -2246,8 +2281,6 @@
 		6D7647A12FA66C68004F9EDA /* iogabc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = iogabc.cpp; path = src/iogabc.cpp; sourceTree = "<group>"; };
 		6D7647A52FA66CE8004F9EDA /* strophicus.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = strophicus.cpp; path = src/strophicus.cpp; sourceTree = "<group>"; };
 		6D7647A92FA66D0A004F9EDA /* strophicus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = strophicus.h; path = include/vrv/strophicus.h; sourceTree = "<group>"; };
-		4DE9150000000000004F9EDA /* episema.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = episema.cpp; path = src/episema.cpp; sourceTree = "<group>"; };
-		4DE9150100000000004F9EDA /* episema.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = episema.h; path = include/vrv/episema.h; sourceTree = "<group>"; };
 		8F086EA9188534680037FD8E /* Verovio */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Verovio; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F086EB6188539540037FD8E /* verticalaligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = verticalaligner.cpp; path = src/verticalaligner.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		8F086EB8188539540037FD8E /* barline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = barline.cpp; path = src/barline.cpp; sourceTree = "<group>"; };
@@ -2661,6 +2694,8 @@
 		4DA0EAFC22BB797000A7EBEB /* editor */ = {
 			isa = PBXGroup;
 			children = (
+				4D1A0BBD2FD1518E004AE805 /* cursor.cpp */,
+				4D1A0BBA2FD1517B004AE805 /* cursor.h */,
 				4DA0EAE822BB77C300A7EBEB /* editortoolkit_cmn.cpp */,
 				4DA0EACF22BB77AF00A7EBEB /* editortoolkit_cmn.h */,
 				4DA0EAE722BB77C300A7EBEB /* editortoolkit_neume.cpp */,
@@ -2668,8 +2703,8 @@
 				4DA0EAD422BB77AF00A7EBEB /* editortoolkit_mensural.h */,
 				4DF9DB2D2F32319C0003112D /* editortoolkit_shared.cpp */,
 				4DF9DB322F3231B50003112D /* editortoolkit_shared.h */,
-				4DA0EAD622BB77AF00A7EBEB /* editortoolkit.h */,
 				4D2614172E6995D700CD28CF /* editortoolkit.cpp */,
+				4DA0EAD622BB77AF00A7EBEB /* editortoolkit.h */,
 			);
 			name = editor;
 			sourceTree = "<group>";
@@ -3219,6 +3254,12 @@
 				8F59293018854BF800FE51AD /* tuplet.h */,
 				4D9A9C18199F561200028D93 /* verse.cpp */,
 				4D9A9C16199F560200028D93 /* verse.h */,
+				A7C500000000000000000002 /* volta.cpp */,
+				A7C500000000000000000001 /* volta.h */,
+				B8C600000000000000000002 /* refrain.cpp */,
+				B8C600000000000000000001 /* refrain.h */,
+				B8C600000000000000000004 /* lyricelement.cpp */,
+				B8C600000000000000000003 /* lyricelement.h */,
 			);
 			name = layerelements;
 			sourceTree = "<group>";
@@ -3373,6 +3414,7 @@
 				4DCB7AA326D3C9600047F01D /* crc.h in Headers */,
 				4DEC4DD421C8295700D1D273 /* expan.h in Headers */,
 				4DB3D8A51F828E9100B5FC2B /* areaposinterface.h in Headers */,
+				4D1A0BBB2FD1517B004AE805 /* cursor.h in Headers */,
 				4DEC4DD321C8295700D1D273 /* restore.h in Headers */,
 				4D27E13427F582AB00D64FBD /* docselection.h in Headers */,
 				406916DE23833794009E6B04 /* mspace.h in Headers */,
@@ -3662,6 +3704,9 @@
 				4D6413762035F57800BB630E /* pages.h in Headers */,
 				4DACC9E82990F29A00B55913 /* atts_fingering.h in Headers */,
 				4D9A9C17199F560200028D93 /* verse.h in Headers */,
+				A7C500000000000000000010 /* volta.h in Headers */,
+				B8C600000000000000000010 /* refrain.h in Headers */,
+				B8C600000000000000000020 /* lyricelement.h in Headers */,
 				4DEC4DDD21C8295700D1D273 /* corr.h in Headers */,
 				4D9A9C1C199F576100028D93 /* syl.h in Headers */,
 				4DC34BA219BC4A71006175CD /* accid.h in Headers */,
@@ -3718,6 +3763,9 @@
 				BB4C4AC622A932B6001F6AF0 /* measure.h in Headers */,
 				E741AD00299A3D3500854426 /* calcslurdirectionfunctor.h in Headers */,
 				BB4C4B7E22A932D7001F6AF0 /* verse.h in Headers */,
+				A7C500000000000000000015 /* volta.h in Headers */,
+				B8C600000000000000000015 /* refrain.h in Headers */,
+				B8C600000000000000000025 /* lyricelement.h in Headers */,
 				BB4C4B0422A932C3001F6AF0 /* runningelement.h in Headers */,
 				BB4C4B1822A932CF001F6AF0 /* controlelement.h in Headers */,
 				4D7D93F12D31499C00BFAEF0 /* annotscore.h in Headers */,
@@ -3951,6 +3999,7 @@
 				4D1788C32CB8FD0100FE9043 /* fraction.h in Headers */,
 				BB4C4B5C22A932D7001F6AF0 /* mensur.h in Headers */,
 				4D79641E26C152400026288B /* pageelement.h in Headers */,
+				4D1A0BBC2FD1517B004AE805 /* cursor.h in Headers */,
 				BB4C4AEC22A932BC001F6AF0 /* editorial.h in Headers */,
 				E75EA9FB29CC3A6C003A97A7 /* calcarticfunctor.h in Headers */,
 				E7770F8429D0D9F700A9BECF /* adjustslursfunctor.h in Headers */,
@@ -4076,7 +4125,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 2620;
+				LastUpgradeCheck = 2660;
 				TargetAttributes = {
 					BB4C4A5122A930A3001F6AF0 = {
 						CreatedOnToolsVersion = 10.2.1;
@@ -4310,6 +4359,7 @@
 				4D1694261E3A44F300569BF4 /* MidiEventList.cpp in Sources */,
 				4DA0EAC822BB779400A7EBEB /* facsimile.cpp in Sources */,
 				4D677B5E2D9D7224006A2EF7 /* scoringupfunctor.cpp in Sources */,
+				4D1A0BBF2FD1518E004AE805 /* cursor.cpp in Sources */,
 				4D1694271E3A44F300569BF4 /* iohumdrum.cpp in Sources */,
 				4D1694281E3A44F300569BF4 /* rest.cpp in Sources */,
 				4D1694291E3A44F300569BF4 /* scoredef.cpp in Sources */,
@@ -4325,6 +4375,7 @@
 				4DB3D8E61F83D16A00B5FC2B /* ftrem.cpp in Sources */,
 				4DACCA072990F29A00B55913 /* atts_harmony.cpp in Sources */,
 				4D1EB6AA2A2A7C5100AF2F98 /* div.cpp in Sources */,
+				4D8C59533015F2360063E9C2 /* iogabc.cpp in Sources */,
 				4DC12A5A1F716E27000440E9 /* pghead.cpp in Sources */,
 				4DACC9A72990F29A00B55913 /* atts_externalsymbols.cpp in Sources */,
 				4DACC9F92990F29A00B55913 /* atts_figtable.cpp in Sources */,
@@ -4419,6 +4470,9 @@
 				4D1694491E3A44F300569BF4 /* main.cpp in Sources */,
 				4D16944B1E3A44F300569BF4 /* metersig.cpp in Sources */,
 				4D16944E1E3A44F300569BF4 /* verse.cpp in Sources */,
+				A7C500000000000000000011 /* volta.cpp in Sources */,
+				B8C600000000000000000011 /* refrain.cpp in Sources */,
+				B8C600000000000000000021 /* lyricelement.cpp in Sources */,
 				4DC12A821F741110000440E9 /* pgfoot.cpp in Sources */,
 				4DEC4D7B21C8048700D1D273 /* abbr.cpp in Sources */,
 				E7E1698F29A8BA5A00FFF482 /* adjustgracexposfunctor.cpp in Sources */,
@@ -4614,6 +4668,7 @@
 				8F086EFF188539540037FD8E /* slur.cpp in Sources */,
 				4DEC4DAA21C81EEC00D1D273 /* restore.cpp in Sources */,
 				36E0442C2347A9150054F141 /* expansionmap.cpp in Sources */,
+				4D1A0BBE2FD1518E004AE805 /* cursor.cpp in Sources */,
 				4D7D93EE2D31498000BFAEF0 /* annotscore.cpp in Sources */,
 				8F086F00188539540037FD8E /* staff.cpp in Sources */,
 				40F910081E2799740081B7BB /* trill.cpp in Sources */,
@@ -4719,6 +4774,9 @@
 				4DEC4DA221C81EB300D1D273 /* rdg.cpp in Sources */,
 				BD96F7D12C04B297001CFF6F /* oriscus.cpp in Sources */,
 				4D9A9C19199F561200028D93 /* verse.cpp in Sources */,
+				A7C500000000000000000012 /* volta.cpp in Sources */,
+				B8C600000000000000000012 /* refrain.cpp in Sources */,
+				B8C600000000000000000022 /* lyricelement.cpp in Sources */,
 				E76046C328D496B400C36204 /* calcledgerlinesfunctor.cpp in Sources */,
 				E76A9D4A29A74E4B0044682D /* adjustdotsfunctor.cpp in Sources */,
 				4D2614192E6995D700CD28CF /* editortoolkit.cpp in Sources */,
@@ -4844,6 +4902,7 @@
 				E7F39C6329A62B440055DBE0 /* adjustclefchangesfunctor.cpp in Sources */,
 				4DEBE6E42B36E79600B67DFB /* facsimilefunctor.cpp in Sources */,
 				E79320692991454000D80975 /* calcstemfunctor.cpp in Sources */,
+				4D1A0BC02FD1518E004AE805 /* cursor.cpp in Sources */,
 				8F3DD33E18854B2E0051330C /* beam.cpp in Sources */,
 				4DED4F19294733140073E504 /* altsyminterface.cpp in Sources */,
 				E7ADB3B029D1923600825D5D /* adjustarticfunctor.cpp in Sources */,
@@ -5031,6 +5090,9 @@
 				E7E1699029A8BA5B00FFF482 /* adjustgracexposfunctor.cpp in Sources */,
 				4D1BE76C1C688F5A0086DC0E /* Binasc.cpp in Sources */,
 				4D9A9C1A199F561200028D93 /* verse.cpp in Sources */,
+				A7C500000000000000000013 /* volta.cpp in Sources */,
+				B8C600000000000000000013 /* refrain.cpp in Sources */,
+				B8C600000000000000000023 /* lyricelement.cpp in Sources */,
 				4DB3D8DC1F83D14900B5FC2B /* artic.cpp in Sources */,
 				4D674B48255F40B7008AEF4C /* plica.cpp in Sources */,
 				4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */,
@@ -5149,6 +5211,7 @@
 				4DED4F1A294733140073E504 /* altsyminterface.cpp in Sources */,
 				4DEBE6E52B36E79600B67DFB /* facsimilefunctor.cpp in Sources */,
 				BB4C4B9F22A932E5001F6AF0 /* positioninterface.cpp in Sources */,
+				4D1A0BC12FD1518E004AE805 /* cursor.cpp in Sources */,
 				BB4C4B5322A932D7001F6AF0 /* halfmrpt.cpp in Sources */,
 				BB4C4B8722A932DF001F6AF0 /* num.cpp in Sources */,
 				E7ADB3B129D1923700825D5D /* adjustarticfunctor.cpp in Sources */,
@@ -5206,6 +5269,9 @@
 				E7908EA32985829F0004C1F9 /* alignfunctor.cpp in Sources */,
 				E74A806228BC9111005274E7 /* findfunctor.cpp in Sources */,
 				BB4C4B7D22A932D7001F6AF0 /* verse.cpp in Sources */,
+				A7C500000000000000000014 /* volta.cpp in Sources */,
+				B8C600000000000000000014 /* refrain.cpp in Sources */,
+				B8C600000000000000000024 /* lyricelement.cpp in Sources */,
 				BB4C4B5122A932D7001F6AF0 /* ftrem.cpp in Sources */,
 				BB4C4AEF22A932BC001F6AF0 /* lem.cpp in Sources */,
 				E73E86292A069C920089DF74 /* transposefunctor.cpp in Sources */,

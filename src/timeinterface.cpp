@@ -145,7 +145,7 @@ std::vector<const Staff *> TimePointInterface::GetTstampStaves(const Measure *me
     else if (this->HasStaff()) {
         bool isInBetween = false;
         // limit between support to some elements?
-        if (object->Is({ DYNAM, DIR, HAIRPIN, TEMPO })) {
+        if (object->IsAnyOf(std::array{ DYNAM, DIR, HAIRPIN, TEMPO })) {
             const AttPlacementRelStaff *att = dynamic_cast<const AttPlacementRelStaff *>(object);
             assert(att);
             isInBetween = (att->GetPlace() == STAFFREL_between);
@@ -159,7 +159,7 @@ std::vector<const Staff *> TimePointInterface::GetTstampStaves(const Measure *me
             staffList = this->GetStaff();
         }
     }
-    else if (m_start && !m_start->Is({ BARLINE, TIMESTAMP_ATTR })) {
+    else if (m_start && !m_start->IsAnyOf(std::array{ BARLINE, TIMESTAMP_ATTR })) {
         const Staff *staff = m_start->GetAncestorStaff();
         staffList.push_back(staff->GetN());
     }

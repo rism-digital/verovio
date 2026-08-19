@@ -26,6 +26,7 @@
 #include "multirest.h"
 #include "octave.h"
 #include "pedal.h"
+#include "refrain.h"
 #include "rest.h"
 #include "staff.h"
 #include "syl.h"
@@ -36,6 +37,7 @@
 #include "timemap.h"
 #include "tuplet.h"
 #include "verse.h"
+#include "volta.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -166,7 +168,7 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayerElement(LayerElement *layerElement
         m_currentScoreTime = m_currentScoreTime + incrementScoreTime;
         m_currentRealTimeSeconds += incrementScoreTime.ToDouble() * 60.0 / m_currentTempo;
     }
-    else if (layerElement->Is({ BEAM, LIGATURE, FTREM, TUPLET }) && layerElement->HasSameasLink()) {
+    else if (layerElement->IsAnyOf(std::array{ BEAM, LIGATURE, FTREM, TUPLET }) && layerElement->HasSameasLink()) {
         incrementScoreTime
             = layerElement->GetSameAsContentAlignmentDuration(m_meterParams, true, m_notationType) * SCORE_TIME_UNIT;
         m_currentScoreTime = m_currentScoreTime + incrementScoreTime;
@@ -1038,6 +1040,8 @@ FunctorCode GenerateMIDIFunctor::VisitStaffDef(const StaffDef *staffDef)
 
 FunctorCode GenerateMIDIFunctor::VisitSyl(const Syl *syl)
 {
+    if (syl->IsEmpty()) return FUNCTOR_CONTINUE;
+
     const Note *note = NULL;
     if (syl->GetFirstAncestor(CHORD)) {
         const Chord *parentChord = vrv_cast<const Chord *>(syl->GetFirstAncestor(CHORD));
@@ -1056,6 +1060,11 @@ FunctorCode GenerateMIDIFunctor::VisitSyl(const Syl *syl)
     return FUNCTOR_SIBLINGS;
 }
 
+FunctorCode GenerateMIDIFunctor::VisitVolta(const Volta *volta)
+{
+    return (volta->GetDrawingVoltaN() == 1) ? FUNCTOR_CONTINUE : FUNCTOR_SIBLINGS;
+}
+
 FunctorCode GenerateMIDIFunctor::VisitVerse(const Verse *verse)
 {
     const LayerElement *parent = vrv_cast<const Note *>(verse->GetFirstAncestor(NOTE));
@@ -1065,6 +1074,18 @@ FunctorCode GenerateMIDIFunctor::VisitVerse(const Verse *verse)
     const Verse *previousVerse = vrv_cast<const Verse *>(parent->GetPrevious(verse, VERSE));
 
     if (previousVerse) return FUNCTOR_SIBLINGS;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateMIDIFunctor::VisitRefrain(const Refrain *refrain)
+{
+    const LayerElement *parent = vrv_cast<const Note *>(refrain->GetFirstAncestor(NOTE));
+    if (!parent) parent = vrv_cast<const Chord *>(refrain->GetFirstAncestor(CHORD));
+    assert(parent);
+
+    if (parent->FindDescendantByType(VERSE, 1)) return FUNCTOR_SIBLINGS;
+    if (parent->GetPrevious(refrain, REFRAIN)) return FUNCTOR_SIBLINGS;
 
     return FUNCTOR_CONTINUE;
 }
@@ -1217,7 +1238,7 @@ void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)
 {
     assert(object);
 
-    if (object->Is({ NOTE, REST })) {
+    if (object->IsAnyOf(std::array{ NOTE, REST })) {
         const DurationInterface *interface = object->GetDurationInterface();
         assert(interface);
 
@@ -1273,7 +1294,7 @@ void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)
         // Add the measureOn
         startEntry.measureOn = measure->GetID();
     }
-    else if (object->Is({ MREST, MULTIREST })) {
+    else if (object->IsAnyOf(std::array{ MREST, MULTIREST })) {
         // Get the ancestor measure
         const Measure *measure = vrv_cast<const Measure *>(object->GetFirstAncestor(MEASURE));
         assert(measure);

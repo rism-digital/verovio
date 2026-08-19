@@ -34,7 +34,6 @@ class EditorToolkitNeume : public EditorToolkit {
 public:
     EditorToolkitNeume(Doc *doc, View *view) : EditorToolkit(doc, view) {}
     bool ParseEditorAction(const std::string &json_editorAction) override;
-    std::string EditInfo() override;
 
     /**
      * Experimental editor functions.

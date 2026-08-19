@@ -30,7 +30,7 @@
         "tupletBracketThickness": 0.16
     },
     "fontName": "Leipzig",
-    "fontVersion": "5.2.100",
+    "fontVersion": "5.2.102",
     "glyphBBoxes": {
         "4stringTabClef": {
             "bBoxNE": [
@@ -50,6 +50,86 @@
             "bBoxSW": [
                 -0.012,
                 -3.0
+            ]
+        },
+        "accidental1CommaFlat": {
+            "bBoxNE": [
+                1.052,
+                1.996
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.7
+            ]
+        },
+        "accidental1CommaSharp": {
+            "bBoxNE": [
+                1.412,
+                1.996
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.356
+            ]
+        },
+        "accidental2CommaFlat": {
+            "bBoxNE": [
+                1.116,
+                1.996
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.7
+            ]
+        },
+        "accidental2CommaSharp": {
+            "bBoxNE": [
+                1.476,
+                1.996
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.356
+            ]
+        },
+        "accidental3CommaFlat": {
+            "bBoxNE": [
+                1.116,
+                1.996
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.7
+            ]
+        },
+        "accidental3CommaSharp": {
+            "bBoxNE": [
+                1.476,
+                1.996
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.356
+            ]
+        },
+        "accidental4CommaFlat": {
+            "bBoxNE": [
+                1.244,
+                1.996
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.7
+            ]
+        },
+        "accidental5CommaSharp": {
+            "bBoxNE": [
+                1.408,
+                2.016
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.356
             ]
         },
         "accidentalArrowDown": {
@@ -2754,7 +2834,7 @@
         },
         "gClef8vbCClef": {
             "bBoxNE": [
-                3.052,
+                3.212,
                 4.332
             ],
             "bBoxSW": [
@@ -3610,6 +3690,46 @@
             "bBoxSW": [
                 0.068,
                 -0.012
+            ]
+        },
+        "luteItalianTempoNeitherFastNorSlow": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "luteItalianTempoSlow": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "luteItalianTempoVerySlow": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "luteItalianTimeTriple": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
             ]
         },
         "lyricsElision": {
@@ -7564,6 +7684,106 @@
         }
     },
     "glyphsWithAnchors": {
+        "accidental1CommaFlat": {
+            "cutOutSE": [
+                0.432,
+                -0.344
+            ]
+        },
+        "accidental1CommaSharp": {
+            "cutOutNE": [
+                1.3,
+                1.12
+            ],
+            "cutOutNW": [
+                0.16,
+                0.644
+            ],
+            "cutOutSE": [
+                0.624,
+                -0.64
+            ],
+            "cutOutSW": [
+                0.16,
+                -0.82
+            ]
+        },
+        "accidental2CommaFlat": {
+            "cutOutSE": [
+                0.432,
+                -0.344
+            ]
+        },
+        "accidental2CommaSharp": {
+            "cutOutNW": [
+                0.16,
+                0.644
+            ],
+            "cutOutSE": [
+                0.624,
+                -0.64
+            ],
+            "cutOutSW": [
+                0.16,
+                -0.82
+            ]
+        },
+        "accidental3CommaFlat": {
+            "cutOutNE": [
+                1.0,
+                1.92
+            ],
+            "cutOutSE": [
+                0.432,
+                -0.344
+            ]
+        },
+        "accidental3CommaSharp": {
+            "cutOutNE": [
+                1.36,
+                1.92
+            ],
+            "cutOutNW": [
+                0.16,
+                0.644
+            ],
+            "cutOutSE": [
+                0.624,
+                -0.64
+            ],
+            "cutOutSW": [
+                0.16,
+                -0.82
+            ]
+        },
+        "accidental4CommaFlat": {
+            "cutOutNE": [
+                1.16,
+                1.4
+            ],
+            "cutOutSE": [
+                0.432,
+                -0.344
+            ]
+        },
+        "accidental5CommaSharp": {
+            "cutOutNE": [
+                0.624,
+                0.844
+            ],
+            "cutOutNW": [
+                0.16,
+                0.644
+            ],
+            "cutOutSE": [
+                0.624,
+                -0.64
+            ],
+            "cutOutSW": [
+                0.16,
+                -0.82
+            ]
+        },
         "accidentalBakiyeFlat": {
             "cutOutNE": [
                 0.312,

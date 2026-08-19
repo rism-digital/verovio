@@ -69,6 +69,7 @@ class PgFoot;
 class PgHead;
 class PitchInflection;
 class Reh;
+class Refrain;
 class Rend;
 class RepeatMark;
 class RunningElement;
@@ -92,6 +93,7 @@ class Turn;
 class Tuplet;
 class TupletBracket;
 class TupletNum;
+class Volta;
 class Verse;
 
 // Helper enums
@@ -199,7 +201,7 @@ protected:
         int staffSize, int space);
     void DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBracketSq(DeviceContext *dc, int x, int y1, int y2, int staffSize);
-    void DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize);
+    void DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize, bool forceGlyph = false);
     void DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine, bool isLastMeasure,
         bool isLastSystem, int &yBottomPrevious);
     void DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLine, data_BARRENDITION form,
@@ -213,6 +215,7 @@ protected:
     void DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
     void DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, Measure *measure, System *system);
     void DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure);
+    void DrawCursor(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawLayerList(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure, const ClassId classId);
     void DrawLayerDefLabels(
         DeviceContext *dc, ScoreDef *scoreDef, Staff *staff, StaffDef *staffDef, int x, bool abbreviations = false);
@@ -320,7 +323,8 @@ protected:
     void DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff);
     void DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
-    void DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawVolta(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawLyricElement(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     ///@}
 
     /**
@@ -606,7 +610,7 @@ private:
     std::u32string IntToTimeSigFigures(unsigned short number);
     std::u32string IntToSmuflFigures(unsigned short number, int offset);
     int NestedTuplets(Object *object);
-    int GetSylYRel(int verseN, Staff *staff, data_STAFFREL place);
+    int GetSylYRel(int verseN, Staff *staff, data_STAFFREL place, int voltaN = 1);
     int GetFYRel(F *f, Staff *staff);
     ///@}
 
@@ -721,9 +725,15 @@ protected:
     ScoreDef m_drawingScoreDef;
 
 private:
+    /** Convert a numeric MEI font size to Verovio drawing units. */
+    int ConvertFontSizeNumeric(const data_FONTSIZE &fontSize, int staffSize) const;
+
     //----------------//
     // Static members //
     //----------------//
+
+    /** Convert a font size in printer points to Verovio drawing units. */
+    static int ConvertFontPointSize(double pointSize);
 
     /** @name Internal values for storing temporary values for ligatures */
     ///@{

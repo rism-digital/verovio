@@ -151,6 +151,8 @@ Object &Object::operator=(const Object &object)
         // Also copy attribute classes
         m_attClasses = object.m_attClasses;
         m_interfaces = object.m_interfaces;
+        // Copy attribute values (necessary because assignment operator is not virtual)
+        object.CopyAttributesTo(this);
         // New id
         this->GenerateID();
         // For now do now copy them
@@ -388,23 +390,23 @@ void Object::CopyAttributesTo(Object *target) const
     AttModule::CopyCmn(this, target);
     AttModule::CopyCmnornaments(this, target);
     AttModule::CopyCritapp(this, target);
-    // AttModule::CopyEdittrans(this, target);
+    AttModule::CopyEdittrans(this, target);
     AttModule::CopyExternalsymbols(this, target);
     AttModule::CopyFacsimile(this, target);
-    // AttModule::CopyFigtable(this, target);
-    // AttModule::CopyFingering(this, target);
+    AttModule::CopyFigtable(this, target);
+    AttModule::CopyFingering(this, target);
     AttModule::CopyGestural(this, target);
-    // AttModule::CopyHarmony(this, target);
+    AttModule::CopyHarmony(this, target);
     // AttModule::CopyHeader(this, target);
     AttModule::CopyMei(this, target);
     AttModule::CopyMensural(this, target);
     AttModule::CopyMidi(this, target);
     AttModule::CopyNeumes(this, target);
     AttModule::CopyPagebased(this, target);
-    // AttModule::CopyPerformance(this, target);
+    AttModule::CopyPerformance(this, target);
     AttModule::CopyShared(this, target);
     AttModule::CopyStringtab(this, target);
-    // AttModule::CopyUsersymbols(this, target);
+    AttModule::CopyUsersymbols(this, target);
     AttModule::CopyVisual(this, target);
 
     target->m_unsupported = this->m_unsupported;
@@ -428,23 +430,23 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes, bool convertToExternal) co
     AttModule::GetCmn(this, attributes);
     AttModule::GetCmnornaments(this, attributes);
     AttModule::GetCritapp(this, attributes);
-    // AttModule::GetEdittrans(this, attributes);
+    AttModule::GetEdittrans(this, attributes);
     AttModule::GetExternalsymbols(this, attributes);
     AttModule::GetFacsimile(this, attributes);
-    // AttModule::GetFigtable(this, attributes);
-    // AttModule::GetFingering(this, attributes);
+    AttModule::GetFigtable(this, attributes);
+    AttModule::GetFingering(this, attributes);
     AttModule::GetGestural(this, attributes);
-    // AttModule::GetHarmony(this, attributes);
+    AttModule::GetHarmony(this, attributes);
     // AttModule::GetHeader(this, attributes);
     AttModule::GetMei(this, attributes);
     AttModule::GetMensural(this, attributes);
     AttModule::GetMidi(this, attributes);
     AttModule::GetNeumes(this, attributes);
     AttModule::GetPagebased(this, attributes);
-    // AttModule::GetPerformance(this, attributes);
+    AttModule::GetPerformance(this, attributes);
     AttModule::GetShared(this, attributes);
     AttModule::GetStringtab(this, attributes);
-    // AttModule::GetUsersymbols(this, attributes);
+    AttModule::GetUsersymbols(this, attributes);
     AttModule::GetVisual(this, attributes);
 
     for (auto &pair : m_unsupported) {
@@ -974,6 +976,16 @@ ListOfConstObjects Object::GetAncestors() const
     return ancestors;
 }
 
+bool Object::IsAncestorOf(const Object *object) const
+{
+    const Object *parent = object->GetParent();
+    while (parent) {
+        if (this == parent) return true;
+        parent = parent->GetParent();
+    }
+    return false;
+}
+
 Object *Object::GetFirstAncestor(const ClassId classId, int maxDepth)
 {
     return const_cast<Object *>(std::as_const(*this).GetFirstAncestor(classId, maxDepth));
@@ -1195,7 +1207,7 @@ FunctorCode Object::AcceptEnd(ConstFunctor &functor) const
 bool Object::SkipChildren(bool visibleOnly) const
 {
     if (visibleOnly) {
-        if (this->IsEditorialElement() || this->Is({ MDIV, STAFF }) || this->IsSystemElement()) {
+        if (this->IsEditorialElement() || this->IsAnyOf(std::array{ MDIV, STAFF }) || this->IsSystemElement()) {
             const VisibilityDrawingInterface *interface = this->GetVisibilityDrawingInterface();
             assert(interface);
             if (interface->IsHidden()) {
@@ -1602,7 +1614,7 @@ void TextListInterface::FilterList(ListOfConstObjects &childList) const
 {
     ListOfConstObjects::iterator iter = childList.begin();
     while (iter != childList.end()) {
-        if (!(*iter)->Is({ LB, TEXT })) {
+        if (!(*iter)->IsAnyOf(std::array{ LB, TEXT })) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc. but keep Lb)
             iter = childList.erase(iter);
             continue;
@@ -1615,59 +1627,91 @@ void TextListInterface::FilterList(ListOfConstObjects &childList) const
 // ObjectFactory methods
 //----------------------------------------------------------------------------
 
-thread_local MapOfClassIdConstructors ObjectFactory::s_ctorsRegistry;
-thread_local MapOfStrClassIds ObjectFactory::s_classIdsRegistry;
-
-ObjectFactory *ObjectFactory::GetInstance()
+ObjectFactory &ObjectFactory::GetInstance()
 {
-    static thread_local ObjectFactory factory;
-    return &factory;
+    static ObjectFactory factory;
+    return factory;
 }
 
-Object *ObjectFactory::Create(std::string name)
+Object *ObjectFactory::Create(const std::string &name)
 {
-    ClassId classId = this->GetClassId(name);
-    if (classId == OBJECT) return NULL;
+    std::function<Object *()> factory;
 
-    return this->Create(classId);
+    {
+        std::shared_lock lock(m_mutex);
+
+        const auto idIt = m_classIdsRegistry.find(name);
+        if (idIt == m_classIdsRegistry.end()) {
+            LogError("ClassId for '%s' not found", name.c_str());
+            return NULL;
+        }
+
+        const auto ctorIt = m_ctorsRegistry.find(idIt->second);
+        if (ctorIt == m_ctorsRegistry.end()) {
+            LogError("Factory for '%d' not found", idIt->second);
+            return NULL;
+        }
+
+        factory = ctorIt->second;
+        // unlock at the end of the block
+    }
+
+    return factory();
 }
 
 Object *ObjectFactory::Create(ClassId classId)
 {
-    Object *object = NULL;
+    std::function<Object *()> factory;
 
-    MapOfClassIdConstructors::iterator it = s_ctorsRegistry.find(classId);
-    if (it != s_ctorsRegistry.end()) object = it->second();
-
-    if (object) {
-        return object;
+    {
+        std::shared_lock lock(m_mutex);
+        const auto it = m_ctorsRegistry.find(classId);
+        if (it != m_ctorsRegistry.end()) {
+            factory = it->second;
+        }
+        // unlock at the end of the block
     }
-    else {
+
+    if (!factory) {
         LogError("Factory for '%d' not found", classId);
         return NULL;
     }
+
+    return factory();
 }
 
-ClassId ObjectFactory::GetClassId(std::string name)
+ClassId ObjectFactory::GetClassId(const std::string &name)
 {
-    ClassId classId = OBJECT;
+    std::shared_lock lock(m_mutex);
 
-    MapOfStrClassIds::iterator it = s_classIdsRegistry.find(name);
-    if (it != s_classIdsRegistry.end()) {
-        classId = it->second;
-    }
-    else {
+    const auto it = m_classIdsRegistry.find(name);
+    if (it == m_classIdsRegistry.end()) {
         LogError("ClassId for '%s' not found", name.c_str());
+        return OBJECT;
     }
 
-    return classId;
+    return it->second;
+}
+
+std::string ObjectFactory::GetClassName(ClassId classId)
+{
+    std::shared_lock lock(m_mutex);
+
+    for (const auto &[name, id] : m_classIdsRegistry) {
+        if (id == classId) return name;
+    }
+
+    LogError("Class name for '%d' not found", static_cast<int>(classId));
+    return "[unspecified]";
 }
 
 void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
 {
+    std::shared_lock lock(m_mutex);
+
     for (const std::string &str : classStrings) {
-        if (s_classIdsRegistry.contains(str)) {
-            classIds.push_back(s_classIdsRegistry.at(str));
+        if (m_classIdsRegistry.contains(str)) {
+            classIds.push_back(m_classIdsRegistry.at(str));
         }
         else {
             LogDebug("Class name '%s' could not be matched", str.c_str());
@@ -1675,10 +1719,12 @@ void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, st
     }
 }
 
-void ObjectFactory::Register(std::string name, ClassId classId, std::function<Object *(void)> function)
+void ObjectFactory::Register(const std::string &name, ClassId classId, std::function<Object *(void)> function)
 {
-    s_ctorsRegistry[classId] = function;
-    s_classIdsRegistry[name] = classId;
+    std::unique_lock lock(m_mutex);
+
+    m_ctorsRegistry[classId] = function;
+    m_classIdsRegistry[name] = classId;
 }
 
 } // namespace vrv

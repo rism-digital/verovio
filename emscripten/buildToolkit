@@ -112,11 +112,13 @@ if ($wasmQ) {
 	$LFLAGS .= " -s INITIAL_MEMORY=128MB";
 	$LFLAGS .= " -s STACK_SIZE=64MB";
 	$LFLAGS .= " -s ALLOW_MEMORY_GROWTH";
-	$LFLAGS .= " -s SINGLE_FILE=1";
 	$LFLAGS .= " -s INCOMING_MODULE_JS_API=onRuntimeInitialized";
 	$LFLAGS .= " -fwasm-exceptions";
 	if ($debug) {
 		$LFLAGS .= " --emit-symbol-map -sASSERTIONS";
+	}
+	else {
+		$LFLAGS .= " -s SINGLE_FILE=1";
 	}
 	$FLAGS_NAME = "-wasm";
 }

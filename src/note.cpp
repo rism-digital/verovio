@@ -134,9 +134,20 @@ void Note::Reset()
     m_stemSameasRole = SAMEAS_NONE;
 }
 
+void Note::CloneReset()
+{
+    m_noteGroupPosition = 0;
+    m_noteGroup = NULL;
+
+    m_flippedNotehead = false;
+
+    m_stemSameas = NULL;
+    m_stemSameasRole = SAMEAS_NONE;
+}
+
 bool Note::IsSupportedChild(ClassId classId)
 {
-    static const std::vector<ClassId> supported{ ACCID, ARTIC, DOTS, PLICA, STEM, SYL, VERSE };
+    static const std::vector<ClassId> supported{ ACCID, ARTIC, DOTS, PLICA, REFRAIN, STEM, SYL, VERSE };
 
     if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
         return true;
@@ -162,7 +173,7 @@ bool Note::AddChild(Object *child)
 
     // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
-    if (child->Is({ DOTS, STEM })) {
+    if (child->IsAnyOf(std::array{ DOTS, STEM })) {
         children.insert(children.begin(), child);
     }
     else {
@@ -269,13 +280,13 @@ std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType, int &overl
         // If there is @glyph.num, return glyph based on it (first priority)
         if (this->HasGlyphNum()) {
             const char32_t code = this->GetGlyphNum();
-            if (NULL != resources->GetGlyph(code)) fretStr.push_back(code);
+            if (resources->GetGlyph(code)) fretStr.push_back(code);
         }
 
         // If there is @glyph.name (second priority)
         else if (this->HasGlyphName()) {
             const char32_t code = resources->GetGlyphCode(this->GetGlyphName());
-            if (NULL != resources->GetGlyph(code)) fretStr.push_back(code);
+            if (resources->GetGlyph(code)) fretStr.push_back(code);
         }
 
         // If there is @altsym (third priority)
@@ -290,13 +301,13 @@ std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType, int &overl
                     // If there is @glyph.num, return glyph based on it (fourth priority)
                     if (symbol->HasGlyphNum()) {
                         const char32_t code = symbol->GetGlyphNum();
-                        if (NULL != resources->GetGlyph(code)) fretStr.push_back(code);
+                        if (resources->GetGlyph(code)) fretStr.push_back(code);
                     }
 
                     // If there is @glyph.name (fifth priority)
                     else if (symbol->HasGlyphName()) {
                         const char32_t code = resources->GetGlyphCode(symbol->GetGlyphName());
-                        if (NULL != resources->GetGlyph(code)) fretStr.push_back(code);
+                        if (resources->GetGlyph(code)) fretStr.push_back(code);
                     }
                 }
             }

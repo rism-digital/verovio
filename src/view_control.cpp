@@ -79,8 +79,8 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     this->StartOffset(dc, element, 100);
 
     // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
-    if (element->Is({ ANNOTSCORE, BEAMSPAN, BRACKETSPAN, FIGURE, GLISS, HAIRPIN, LV, OCTAVE, PHRASE, PITCHINFLECTION,
-            SLUR, TIE })) {
+    if (element->IsAnyOf(std::array{ ANNOTSCORE, BEAMSPAN, BRACKETSPAN, FIGURE, GLISS, HAIRPIN, LV, OCTAVE, PHRASE,
+            PITCHINFLECTION, SLUR, TIE })) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetID());
         dc->EndGraphic(element, this);
@@ -190,7 +190,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         BBoxDeviceContext *bBoxDC = vrv_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {
-            if (element->Is({ ANNOTSCORE, BRACKETSPAN, HAIRPIN, OCTAVE, PITCHINFLECTION })) return;
+            if (element->IsAnyOf(std::array{ ANNOTSCORE, BRACKETSPAN, HAIRPIN, OCTAVE, PITCHINFLECTION })) return;
         }
     }
 
@@ -326,7 +326,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
 
         // TimeSpanning elements are not necessary floating elements (e.g., syl) - we have a bounding box only for them
         if (element->IsControlElement()) {
-            if (element->Is({ PHRASE, SLUR })) {
+            if (element->IsAnyOf(std::array{ PHRASE, SLUR })) {
                 if (this->GetSlurHandling() == SlurHandling::Ignore) break;
                 Slur *slur = vrv_cast<Slur *>(element);
                 assert(slur);
@@ -446,7 +446,7 @@ bool View::HasValidTimeSpanningOrder(DeviceContext *dc, Object *element, LayerEl
                 }
             }
         }
-        else if (element->Is({ OCTAVE, SYL })) {
+        else if (element->IsAnyOf(std::array{ OCTAVE, SYL })) {
             return true;
         }
         // To avoid showing the same warning multiple times, display a warning only during actual drawing
@@ -1398,7 +1398,8 @@ void View::DrawSylConnector(
     assert(syl->GetStart() && syl->GetEnd());
     if (!syl->GetStart() || !syl->GetEnd()) return;
 
-    int y = staff->GetDrawingY() + this->GetSylYRel(syl->m_drawingVerseN, staff, syl->m_drawingVersePlace);
+    int y = staff->GetDrawingY()
+        + this->GetSylYRel(syl->m_drawingVerseN, staff, syl->m_drawingVersePlace, syl->m_drawingVoltaN);
     this->CalcOffsetY(dc, y);
 
     // Invalid bounding boxes might occur for empty syllables without text child
@@ -1790,6 +1791,7 @@ void View::DrawControlElementText(DeviceContext *dc, ControlElement *element, Me
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         int xAdjust = 0;
@@ -1870,6 +1872,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         if (dynam->HasEnclose()) {
@@ -2124,6 +2127,7 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetFingeringFont(staffSize)->GetPointSize();
 
         fingTxt.SetPointSize(params.m_pointSize);
@@ -2324,6 +2328,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
 
         if (harm->GetFirst() && harm->GetFirst()->Is(FB)) {
             this->DrawFb(dc, staff, dynamic_cast<Fb *>(harm->GetFirst()), params);
@@ -2650,6 +2655,7 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         rehTxt.SetPointSize(params.m_pointSize);
@@ -2770,6 +2776,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         tempoTxt.SetPointSize(params.m_pointSize);
@@ -3177,7 +3184,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
         const int unit = m_doc->GetDrawingUnit(staffSize);
         if (ending->HasN() || ending->HasLabel()) {
-            const std::string endingText = (ending->HasN()) ? ending->GetN() : ending->GetLabel();
+            const std::string endingText = (ending->HasLabel()) ? ending->GetLabel() : ending->GetN();
             std::stringstream strStream;
             // Maybe we want to add ( ) after system breaks? Or . as a styling options?
             if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << "(";

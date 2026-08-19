@@ -86,6 +86,17 @@ void Accid::Reset()
     this->ClearFloatingObject();
 }
 
+bool Accid::IsSupportedChild(ClassId classId)
+{
+    if (classId == ACCID) {
+        // Limit support to note/accid
+        return (this->GetParent() && this->GetParent()->Is(NOTE));
+    }
+    else {
+        return false;
+    }
+}
+
 void Accid::ClearFloatingObject()
 {
     if (m_floatingObject) {
@@ -99,6 +110,18 @@ void Accid::InitFloatingObject()
     assert(!m_floatingObject);
     m_floatingObject = new AccidFloatingObject();
     m_floatingObject->SetParent(this);
+}
+
+void Accid::InitShowAccidGes()
+{
+    // Only to make sure we never loop
+    if (!this->GetParent()->Is(NOTE)) return;
+
+    this->ClearChildren();
+    Accid *accid = new Accid();
+    accid->IsAttribute(true);
+    accid->SetAccid(Att::AccidentalGesturalToWritten(this->GetAccidGes()));
+    if (!this->AddChild(accid)) delete accid;
 }
 
 std::u32string Accid::GetSymbolStr(data_NOTATIONTYPE notationType) const
@@ -267,32 +290,29 @@ std::u32string Accid::CreateSymbolStr(data_ACCIDENTAL_WRITTEN accid, data_ENCLOS
         // If there is glyph.num, prioritize it
         if (glyphNum != 0) {
             code = glyphNum;
-            if (NULL == resources->GetGlyph(code)) code = 0;
+            if (!resources->GetGlyph(code)) code = 0;
         }
         // If there is glyph.name (second priority)
         else if (!glyphName.empty()) {
             code = resources->GetGlyphCode(glyphName);
-            if (NULL == resources->GetGlyph(code)) code = 0;
+            if (!resources->GetGlyph(code)) code = 0;
         }
     }
 
     if (!code) {
         if (accid == ACCIDENTAL_WRITTEN_NONE) return U"";
 
-        switch (notationType) {
-            case NOTATIONTYPE_neume:
-            case NOTATIONTYPE_mensural:
-            case NOTATIONTYPE_mensural_black:
-            case NOTATIONTYPE_mensural_white:
-                switch (accid) {
-                    case ACCIDENTAL_WRITTEN_s: code = SMUFL_E9E3_medRenSharpCroix; break;
-                    case ACCIDENTAL_WRITTEN_f: code = SMUFL_E9E0_medRenFlatSoftB; break;
-                    case ACCIDENTAL_WRITTEN_n: code = SMUFL_E9E2_medRenNatural; break;
-                    // we do not want to ignore non-mensural accidentals
-                    default: code = Accid::GetAccidGlyph(accid); break;
-                }
-                break;
-            default: code = Accid::GetAccidGlyph(accid); break;
+        if (IsNeumeType(notationType) || IsMensuralType(notationType)) {
+            switch (accid) {
+                case ACCIDENTAL_WRITTEN_s: code = SMUFL_E9E3_medRenSharpCroix; break;
+                case ACCIDENTAL_WRITTEN_f: code = SMUFL_E9E0_medRenFlatSoftB; break;
+                case ACCIDENTAL_WRITTEN_n: code = SMUFL_E9E2_medRenNatural; break;
+                // we do not want to ignore non-mensural accidentals
+                default: code = Accid::GetAccidGlyph(accid); break;
+            }
+        }
+        else {
+            code = Accid::GetAccidGlyph(accid);
         }
     }
 

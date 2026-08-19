@@ -34,8 +34,10 @@ FunctorCode AdjustTupletsYFunctor::VisitTuplet(Tuplet *tuplet)
         return FUNCTOR_SIBLINGS;
     }
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     // Nothing to do if the bracket and the num are not visible
-    if ((tuplet->GetBracketVisible() == BOOLEAN_false) && (tuplet->GetNumVisible() == BOOLEAN_false)) {
+    if (!showHidden && (tuplet->GetBracketVisible() == BOOLEAN_false) && (tuplet->GetNumVisible() == BOOLEAN_false)) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -58,8 +60,10 @@ FunctorCode AdjustTupletsYFunctor::VisitTuplet(Tuplet *tuplet)
 
 void AdjustTupletsYFunctor::AdjustTupletBracketY(Tuplet *tuplet, const Staff *staff) const
 {
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     TupletBracket *tupletBracket = vrv_cast<TupletBracket *>(tuplet->GetFirst(TUPLET_BRACKET));
-    if (!tupletBracket || (tuplet->GetBracketVisible() == BOOLEAN_false)) return;
+    if (!tupletBracket || (!showHidden && tuplet->GetBracketVisible() == BOOLEAN_false)) return;
 
     // if bracket is used for beam elements - process that part separately
     Beam *beam = tuplet->GetBracketAlignedBeam();
@@ -126,8 +130,10 @@ void AdjustTupletsYFunctor::AdjustTupletBracketY(Tuplet *tuplet, const Staff *st
 
 void AdjustTupletsYFunctor::AdjustTupletNumY(Tuplet *tuplet, const Staff *staff) const
 {
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     TupletNum *tupletNum = vrv_cast<TupletNum *>(tuplet->GetFirst(TUPLET_NUM));
-    if (!tupletNum || (tuplet->GetNumVisible() == BOOLEAN_false)) return;
+    if (!tupletNum || (!showHidden && tuplet->GetNumVisible() == BOOLEAN_false)) return;
 
     // The num is within a bracket
     if (tupletNum->GetAlignedBracket()) {
@@ -337,10 +343,11 @@ AdjustTupletNumOverlapFunctor::AdjustTupletNumOverlapFunctor(
 
 FunctorCode AdjustTupletNumOverlapFunctor::VisitLayerElement(const LayerElement *layerElement)
 {
-    if (!layerElement->Is({ ACCID, ARTIC, CHORD, DOT, FLAG, NOTE, REST, STEM }) || !layerElement->HasSelfBB())
+    if (!layerElement->IsAnyOf(std::array{ ACCID, ARTIC, CHORD, DOT, FLAG, NOTE, REST, STEM })
+        || !layerElement->HasSelfBB())
         return FUNCTOR_CONTINUE;
 
-    if (layerElement->Is({ CHORD, NOTE, REST })
+    if (layerElement->IsAnyOf(std::array{ CHORD, NOTE, REST })
         && ((layerElement->m_crossStaff || (layerElement->GetFirstAncestor(STAFF) != m_staff))
             && (layerElement->m_crossStaff != m_staff)))
         return FUNCTOR_SIBLINGS;
