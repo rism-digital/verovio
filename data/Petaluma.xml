@@ -903,5 +903,37 @@
   <g c="E888" x="10.0" y="-40.0" w="267.43" h="594.0" h-a-x="287" n="tuplet8" />
   <g c="E889" x="10.0" y="0.0" w="302.0" h="664.0" h-a-x="322" n="tuplet9" />
   <g c="E88A" x="10.0" y="80.0" w="125.0" h="314.0" h-a-x="145" n="tupletColon" />
+  <g c="E450" x="-30.0" y="-370.0" w="549.0" h="898.0" h-a-x="509" n="accidental1CommaSharp">
+    <a n="cutOutNW" x="0.62" y="2.16" />
+    <a n="cutOutSE" x="1.21" y="0.74" />
+    <a n="cutOutSW" x="0.55" y="0.54" />
+  </g>
+  <g c="E451" x="-30.0" y="-370.0" w="618.0" h="883.0" h-a-x="568" n="accidental2CommaSharp">
+    <a n="cutOutNW" x="0.54" y="2.26" />
+    <a n="cutOutSE" x="1.25" y="0.64" />
+    <a n="cutOutSW" x="0.55" y="0.49" />
+  </g>
+  <g c="E452" x="-30.0" y="-370.0" w="604.0" h="870.0" h-a-x="564" n="accidental3CommaSharp">
+    <a n="cutOutNW" x="0.52" y="2.23" />
+    <a n="cutOutSE" x="1.16" y="0.74" />
+    <a n="cutOutSW" x="0.55" y="0.49" />
+  </g>
+  <g c="E453" x="-30.0" y="-370.0" w="613.11" h="880.0" h-a-x="563" n="accidental5CommaSharp">
+    <a n="cutOutNW" x="1.53" y="1.58" />
+    <a n="cutOutSE" x="1.76" y="0.94" />
+    <a n="cutOutSW" x="0.74" y="-0.85" />
+  </g>
+  <g c="E454" x="0.0" y="-250.0" w="281.0" h="775.0" h-a-x="281" n="accidental1CommaFlat">
+    <a n="cutOutSE" x="0.5" y="0.25" />
+  </g>
+  <g c="E455" x="0.0" y="-250.0" w="366.0" h="733.0" h-a-x="366" n="accidental2CommaFlat">
+    <a n="cutOutSE" x="0.52" y="0.32" />
+  </g>
+  <g c="E456" x="0.0" y="-250.0" w="347.0" h="716.0" h-a-x="347" n="accidental3CommaFlat">
+    <a n="cutOutSE" x="0.52" y="0.3" />
+  </g>
+  <g c="E457" x="0.0" y="-250.0" w="317.0" h="692.09" h-a-x="317" n="accidental4CommaFlat">
+    <a n="cutOutSE" x="0.56" y="0.31" />
+  </g>
   <g c="E645" x="-157.0" y="0.0" w="314.0" h="325.0" h-a-x="157" n="vocalSprechgesang" />
 </bounding-boxes>
