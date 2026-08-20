@@ -14,7 +14,7 @@
 * Fix `getElementAttr` for `grpSym` and `keyAccid` elements
 * Fix `--font-text-liberation` option silently ignored in toolkit
 * Updated Python building process
-* Various improvement to the MusicXML importer
+* Various improvements to the MusicXML importer
 
 ## [6.2.1] – 2026-05-22
 * Fix missing file in the resources (Python and cmd-line installation)
