@@ -2,6 +2,22 @@
 
 ## [unreleased]
 
+## [6.3.0] – 2026-08-19
+* Support for `volta` and `refrain`
+* Support `pt` and `vu` MEI font sizes
+* Support for Turskish accidentals
+* Update of the experimental editor API
+* Render `ending@label` in preference to `ending@n`
+* Improve key signature display with a section restarting
+* Option `--show-hidden` to display hidden elements
+* Fix bug with the multi-threaded environments
+* Fix page lookup for timed elements and repetitions
+* Fix harmony superscript positioning
+* Fix `getElementAttr` for `grpSym` and `keyAccid` elements
+* Fix `--font-text-liberation` option silently ignored in toolkit
+* Updated Python building process
+* Various improvements to the MusicXML importer
+
 ## [6.2.0] – 2026-05-20
 * Golang binding
 * Support for G-ABC (Gregorian music notation) import
