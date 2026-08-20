@@ -68,8 +68,12 @@ void Syl::Reset()
     this->ResetSylLog();
 
     m_drawingVerseN = 1;
+    m_drawingVoltaN = 1;
     m_drawingVersePlace = STAFFREL_below;
     m_nextWordSyl = NULL;
+    m_drawingTextInkTop = 0;
+    m_drawingTextInkBottom = 0;
+    m_hasDrawingTextInkBounds = false;
 }
 
 bool Syl::IsSupportedChild(ClassId classId)
@@ -145,6 +149,11 @@ int Syl::GetDrawingHeight() const
         return FacsimileInterface::GetHeight();
     }
     return 0;
+}
+
+bool Syl::IsEmpty() const
+{
+    return this->GetText().empty();
 }
 
 void Syl::AdjustToLyricSize(const Doc *doc, int &value)

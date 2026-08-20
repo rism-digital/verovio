@@ -23,8 +23,8 @@ namespace vrv {
 // Static members
 //----------------------------------------------------------------------------
 
-std::map<std::string, char32_t> CustomTuning::s_glyphNames;
-std::map<char32_t, std::string> CustomTuning::s_glyphCodes;
+thread_local std::map<std::string, char32_t> CustomTuning::s_glyphNames;
+thread_local std::map<char32_t, std::string> CustomTuning::s_glyphCodes;
 
 //----------------------------------------------------------------------------
 // CustomTuning
@@ -56,7 +56,7 @@ void CustomTuning::CreateGlyphMapping(Doc *doc)
     std::string json((std::istreambuf_iterator<char>(glyphnames)), std::istreambuf_iterator<char>());
     jsonxx::Object glyphs;
     if (!glyphs.parse(json)) {
-        LogError("Custom tuning: Invalid or missing file glyphnames.json");
+        LogError("Custom tuning: Invalid or missing file tuning-glyphnames.json");
         return;
     }
     for (const auto &glyph : glyphs.kv_map()) {
@@ -233,6 +233,13 @@ int CustomTuning::GetMIDIPitch(const Note *note, const int shift, const int octa
 void CustomTuning::CopyCustomTunings(const Doc *src, Doc *dst)
 {
     ListOfConstObjects srcScoreDefs = src->FindAllDescendantsByType(SCOREDEF);
+    const bool hasValidCustomTuning = std::any_of(srcScoreDefs.begin(), srcScoreDefs.end(), [](auto object) {
+        const ScoreDef *scoreDef = vrv_cast<const ScoreDef *>(object);
+        assert(scoreDef);
+        return scoreDef->GetCustomTuning().IsValid();
+    });
+    if (!hasValidCustomTuning) return;
+
     ListOfObjects dstScoreDefs = dst->FindAllDescendantsByType(SCOREDEF);
     if (srcScoreDefs.size() != dstScoreDefs.size()) {
         LogError("Custom tuning: Cannot reliably copy custom tunings from original doc to MIDI doc, because ScoreDef "

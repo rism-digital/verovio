@@ -27,6 +27,7 @@ namespace vrv {
  */
 
 enum FontSizeType { FONTSIZE_NONE = 0, FONTSIZE_fontSizeNumeric, FONTSIZE_term, FONTSIZE_percent };
+enum FontSizeNumericType { FONTSIZENUMERIC_NONE = 0, FONTSIZENUMERIC_pt, FONTSIZENUMERIC_vu };
 
 class data_FONTSIZE {
 public:
@@ -37,6 +38,7 @@ public:
     {
         m_type = type;
         m_fontSizeNumeric = MEI_UNSET;
+        m_fontSizeNumericType = FONTSIZENUMERIC_NONE;
         m_term = FONTSIZETERM_NONE;
         m_percent = 0;
     }
@@ -44,10 +46,13 @@ public:
     FontSizeType GetType() const { return m_type; }
 
     data_FONTSIZENUMERIC GetFontSizeNumeric() const { return m_fontSizeNumeric; }
-    void SetFontSizeNumeric(data_FONTSIZENUMERIC value)
+    FontSizeNumericType GetFontSizeNumericType() const { return m_fontSizeNumericType; }
+    /** Default to points for programmatic callers that predate explicit numeric-unit tracking. */
+    void SetFontSizeNumeric(data_FONTSIZENUMERIC value, FontSizeNumericType numericType = FONTSIZENUMERIC_pt)
     {
         this->Reset(FONTSIZE_fontSizeNumeric);
         m_fontSizeNumeric = value;
+        m_fontSizeNumericType = numericType;
     }
 
     data_FONTSIZETERM GetTerm() const { return m_term; }
@@ -92,6 +97,7 @@ public:
     {
         if (m_type != val.GetType()) return false;
         if (m_fontSizeNumeric != val.GetFontSizeNumeric()) return false;
+        if (m_fontSizeNumericType != val.GetFontSizeNumericType()) return false;
         if (m_term != val.GetTerm()) return false;
         if (m_percent != val.GetPercent()) return false;
         return true;
@@ -101,6 +107,7 @@ public:
 protected:
     FontSizeType m_type;
     data_FONTSIZENUMERIC m_fontSizeNumeric;
+    FontSizeNumericType m_fontSizeNumericType;
     data_FONTSIZETERM m_term;
     data_PERCENT m_percent;
 };

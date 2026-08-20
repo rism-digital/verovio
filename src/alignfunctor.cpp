@@ -9,21 +9,26 @@
 
 //----------------------------------------------------------------------------
 
+#include "chord.h"
+#include "cursor.h"
 #include "div.h"
 #include "doc.h"
 #include "dot.h"
 #include "fig.h"
 #include "layer.h"
 #include "ligature.h"
+#include "lyricelement.h"
 #include "nc.h"
 #include "neume.h"
 #include "ossia.h"
 #include "page.h"
 #include "proport.h"
+#include "refrain.h"
 #include "rend.h"
 #include "rest.h"
 #include "runningelement.h"
 #include "section.h"
+#include "space.h"
 #include "staff.h"
 #include "svg.h"
 #include "syllable.h"
@@ -59,6 +64,8 @@ AlignHorizontallyFunctor::AlignHorizontallyFunctor(Doc *doc) : DocFunctor(doc)
 
 FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
 {
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     m_currentParams.mensur = layer->GetCurrentMensur();
     m_currentParams.meterSig = layer->GetCurrentMeterSig();
     m_currentParams.proport = layer->GetCurrentProport();
@@ -76,12 +83,12 @@ FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
     }
 
     if (layer->GetStaffDefClef()) {
-        if (layer->GetStaffDefClef()->GetVisible() != BOOLEAN_false) {
+        if (showHidden || layer->GetStaffDefClef()->GetVisible() != BOOLEAN_false) {
             this->VisitClef(layer->GetStaffDefClef());
         }
     }
     if (layer->GetStaffDefKeySig()) {
-        if (layer->GetStaffDefKeySig()->GetVisible() != BOOLEAN_false) {
+        if (showHidden || layer->GetStaffDefKeySig()->GetVisible() != BOOLEAN_false) {
             this->VisitKeySig(layer->GetStaffDefKeySig());
         }
     }
@@ -94,7 +101,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
         this->ResetCode();
     }
     else if (layer->GetStaffDefMeterSig()) {
-        if (layer->GetStaffDefMeterSig()->GetVisible() != BOOLEAN_false) {
+        if (showHidden || layer->GetStaffDefMeterSig()->GetVisible() != BOOLEAN_false) {
             this->VisitMeterSig(layer->GetStaffDefMeterSig());
         }
     }
@@ -109,6 +116,20 @@ FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
 
 FunctorCode AlignHorizontallyFunctor::VisitLayerEnd(Layer *layer)
 {
+    if (layer->HasCursor()) {
+        Cursor *cursor = layer->GetCursor();
+        Fraction position = 0;
+        if (cursor->HasPosition()) {
+            LayerElement *positionElement = cursor->GetPosition();
+            if (positionElement->GetAlignment()) position = positionElement->GetAlignment()->GetTime();
+            position = position + positionElement->GetAlignmentDuration(m_currentParams, true, m_notationType);
+        }
+        AlignmentType type = (cursor->IsChordEditMode()) ? ALIGNMENT_CURSOR_CHORD : ALIGNMENT_CURSOR;
+        Alignment *alignment = m_measureAligner->GetAlignmentAtTime(position, type);
+        cursor->SetCursorAlignment(alignment);
+        alignment->AddLayerElementRef(cursor);
+    }
+
     m_scoreDefRole = SCOREDEF_CAUTIONARY;
     m_time = m_measureAligner->GetMaxTime();
 
@@ -156,6 +177,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
     Ligature *ligatureParent = vrv_cast<Ligature *>(layerElement->GetFirstAncestor(LIGATURE, MAX_LIGATURE_DEPTH));
     Note *noteParent = vrv_cast<Note *>(layerElement->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH));
     Rest *restParent = vrv_cast<Rest *>(layerElement->GetFirstAncestor(REST, MAX_NOTE_DEPTH));
+    Space *spaceParent = vrv_cast<Space *>(layerElement->GetFirstAncestor(SPACE, 1));
     TabGrp *tabGrpParent = vrv_cast<TabGrp *>(layerElement->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
     const bool ligatureAsBracket = m_doc->GetOptions()->m_ligatureAsBracket.GetValue();
     const bool neumeAsNote = m_doc->GetOptions()->m_neumeAsNote.GetValue();
@@ -169,10 +191,13 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
     else if (restParent) {
         layerElement->SetAlignment(restParent->GetAlignment());
     }
+    else if (spaceParent) {
+        layerElement->SetAlignment(spaceParent->GetAlignment());
+    }
     else if (tabGrpParent) {
         layerElement->SetAlignment(tabGrpParent->GetAlignment());
     }
-    else if (layerElement->Is({ DOTS, FLAG, STEM })) {
+    else if (layerElement->IsAnyOf(std::array{ DOTS, FLAG, STEM })) {
         assert(false);
     }
     else if (ligatureParent && layerElement->Is(NOTE) && !ligatureAsBracket) {
@@ -194,7 +219,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         // Nothing to do
     }
     // We do not align these (container). Any other?
-    else if (layerElement->Is({ BEAM, FTREM, TUPLET })) {
+    else if (layerElement->IsAnyOf(std::array{ BEAM, FTREM, TUPLET })) {
         Fraction duration = layerElement->GetSameAsContentAlignmentDuration(m_currentParams, true, m_notationType);
         m_time = m_time + duration;
         return FUNCTOR_CONTINUE;
@@ -268,10 +293,10 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         }
         type = ALIGNMENT_PROPORT;
     }
-    else if (layerElement->Is({ MULTIREST, MREST, MRPT })) {
+    else if (layerElement->IsAnyOf(std::array{ MULTIREST, MREST, MRPT })) {
         type = ALIGNMENT_FULLMEASURE;
     }
-    else if (layerElement->Is({ MRPT2, MULTIRPT })) {
+    else if (layerElement->IsAnyOf(std::array{ MRPT2, MULTIRPT })) {
         type = ALIGNMENT_FULLMEASURE2;
     }
     else if (layerElement->Is(DOT)) {
@@ -309,11 +334,12 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         }
         // Else add a default
     }
-    else if (layerElement->Is(VERSE)) {
+    else if (layerElement->IsAnyOf(std::array{ REFRAIN, VOLTA, VERSE })) {
         // Idem
-        Note *note = vrv_cast<Note *>(layerElement->GetFirstAncestor(NOTE));
-        assert(note);
-        layerElement->SetAlignment(note->GetAlignment());
+        LayerElement *parent = vrv_cast<LayerElement *>(layerElement->GetFirstAncestor(NOTE));
+        if (!parent) parent = vrv_cast<LayerElement *>(layerElement->GetFirstAncestor(CHORD));
+        assert(parent);
+        layerElement->SetAlignment(parent->GetAlignment());
     }
     else if (layerElement->Is(NC)) {
         // Align with the neume
@@ -674,12 +700,12 @@ FunctorCode AlignVerticallyFunctor::VisitStaff(Staff *staff)
     assert(alignment);
     staff->SetAlignment(alignment);
 
-    std::vector<Object *>::const_iterator verseIterator = std::find_if(
-        staff->m_timeSpanningElements.begin(), staff->m_timeSpanningElements.end(), ObjectComparison(VERSE));
-    if (verseIterator != staff->m_timeSpanningElements.end()) {
-        Verse *verse = vrv_cast<Verse *>(*verseIterator);
-        assert(verse);
-        alignment->AddVerseN(verse->GetN(), verse->GetPlace());
+    const auto lyricElementIterator = std::find_if(staff->m_timeSpanningElements.begin(),
+        staff->m_timeSpanningElements.end(), [](const Object *object) { return object->IsLyricElement(); });
+    if (lyricElementIterator != staff->m_timeSpanningElements.end()) {
+        LyricElement *lyricElement = vrv_cast<LyricElement *>(*lyricElementIterator);
+        assert(lyricElement);
+        alignment->AddLyricElement(lyricElement);
     }
 
     // add verse number to alignment in case there are spanning SYL elements but there is no verse number already - this
@@ -687,17 +713,10 @@ FunctorCode AlignVerticallyFunctor::VisitStaff(Staff *staff)
     std::vector<Object *>::const_iterator sylIterator = std::find_if(
         staff->m_timeSpanningElements.begin(), staff->m_timeSpanningElements.end(), ObjectComparison(SYL));
     if (sylIterator != staff->m_timeSpanningElements.end()) {
-        Verse *verse = vrv_cast<Verse *>((*sylIterator)->GetFirstAncestor(VERSE));
-        if (verse) {
-            const int verseNumber = verse->GetN();
-            const data_STAFFREL versePlace = verse->GetPlace();
-            const bool verseCollapse = m_doc->GetOptions()->m_lyricVerseCollapse.GetValue();
-            if ((versePlace == STAFFREL_above) && !alignment->GetVersePositionAbove(verseNumber, verseCollapse)) {
-                alignment->AddVerseN(verseNumber, verse->GetPlace());
-            }
-            if ((versePlace != STAFFREL_above) && !alignment->GetVersePositionBelow(verseNumber, verseCollapse)) {
-                alignment->AddVerseN(verseNumber, verse->GetPlace());
-            }
+        LyricElement *lyricElement
+            = vrv_cast<LyricElement *>((*sylIterator)->GetFirstAncestorInRange(LYRIC_ELEMENT, LYRIC_ELEMENT_max));
+        if (lyricElement) {
+            alignment->AddLyricElement(lyricElement);
         }
     }
 
@@ -761,7 +780,18 @@ FunctorCode AlignVerticallyFunctor::VisitVerse(Verse *verse)
     if (!alignment) return FUNCTOR_CONTINUE;
 
     // Add the number count
-    alignment->AddVerseN(verse->GetN(), verse->GetPlace());
+    alignment->AddLyricElement(verse);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitRefrain(Refrain *refrain)
+{
+    StaffAlignment *alignment = m_systemAligner->GetStaffAlignmentForStaffN(m_staffN);
+
+    if (!alignment) return FUNCTOR_CONTINUE;
+
+    alignment->AddLyricElement(refrain);
 
     return FUNCTOR_CONTINUE;
 }

@@ -19,6 +19,7 @@ enum FileFormat {
     HUMMIDI,
     PAE,
     ABC,
+    GABC,
     CMME,
     DARMS,
     VOLPIANO,

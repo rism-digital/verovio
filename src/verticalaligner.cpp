@@ -11,6 +11,7 @@
 
 #include <cassert>
 #include <math.h>
+#include <numeric>
 #include <utility>
 
 //----------------------------------------------------------------------------
@@ -19,6 +20,7 @@
 #include "doc.h"
 #include "floatingobject.h"
 #include "functor.h"
+#include "lyricelement.h"
 #include "scoredef.h"
 #include "slur.h"
 #include "smufl.h"
@@ -451,11 +453,26 @@ void StaffAlignment::SetRequestedSpaceBelow(int space)
     }
 }
 
-void StaffAlignment::AddVerseN(int verseN, data_STAFFREL place)
+void StaffAlignment::AddLyricElement(const LyricElement *lyricElement)
+{
+    assert(lyricElement);
+    if (lyricElement->Is(REFRAIN)) {
+        for (int line = 0; line < lyricElement->GetLyricLineCount(); ++line) {
+            this->AddVerseN(lyricElement->GetDrawingVerseN() + line, lyricElement->GetPlace());
+        }
+    }
+    else {
+        this->AddVerseN(lyricElement->GetDrawingVerseN(), lyricElement->GetPlace(), lyricElement->GetLyricLineCount());
+    }
+}
+
+void StaffAlignment::AddVerseN(int verseN, data_STAFFREL place, int lineCount)
 {
     // if 0, then assume 1;
     verseN = std::max(verseN, 1);
-    (place == STAFFREL_above) ? m_verseAboveNs.insert(verseN) : m_verseBelowNs.insert(verseN);
+    lineCount = std::max(lineCount, 1);
+    std::map<int, int> &verses = (place == STAFFREL_above) ? m_verseAboveNs : m_verseBelowNs;
+    verses[verseN] = std::max(verses[verseN], lineCount);
 }
 
 int StaffAlignment::GetVerseCount(bool collapse) const
@@ -469,10 +486,13 @@ int StaffAlignment::GetVerseCountAbove(bool collapse) const
         return 0;
     }
     else if (collapse) {
-        return (int)m_verseAboveNs.size();
+        return std::accumulate(m_verseAboveNs.begin(), m_verseAboveNs.end(), 0,
+            [](int count, const auto &verse) { return count + verse.second; });
     }
     else {
-        return (*m_verseAboveNs.rbegin());
+        return m_verseAboveNs.rbegin()->first
+            + std::accumulate(m_verseAboveNs.begin(), m_verseAboveNs.end(), 0,
+                [](int count, const auto &verse) { return count + verse.second - 1; });
     }
 }
 
@@ -482,43 +502,45 @@ int StaffAlignment::GetVerseCountBelow(bool collapse) const
         return 0;
     }
     else if (collapse) {
-        return (int)m_verseBelowNs.size();
+        return std::accumulate(m_verseBelowNs.begin(), m_verseBelowNs.end(), 0,
+            [](int count, const auto &verse) { return count + verse.second; });
     }
     else {
-        return (*m_verseBelowNs.rbegin());
+        return m_verseBelowNs.rbegin()->first
+            + std::accumulate(m_verseBelowNs.begin(), m_verseBelowNs.end(), 0,
+                [](int count, const auto &verse) { return count + verse.second - 1; });
     }
 }
 
-int StaffAlignment::GetVersePositionAbove(int verseN, bool collapse) const
+static int GetVerseFlatPosition(const std::map<int, int> &verses, int verseN, bool collapse, int lineN)
+{
+    verseN = std::max(verseN, 1);
+    lineN = std::max(lineN, 1);
+    int position = collapse ? 0 : verseN - 1;
+    for (const auto &[number, lineCount] : verses) {
+        if (number >= verseN) break;
+        position += collapse ? lineCount : lineCount - 1;
+    }
+    return position + lineN - 1;
+}
+
+int StaffAlignment::GetVersePositionAbove(int verseN, bool collapse, int lineN) const
 {
     if (m_verseAboveNs.empty()) {
         // Syl in neumatic notation - since verse count will be 0, position is -1
         return -1;
     }
-    else if (collapse) {
-        auto it = std::find(m_verseAboveNs.begin(), m_verseAboveNs.end(), verseN);
-        int pos = (int)std::distance(m_verseAboveNs.begin(), it);
-        return pos;
-    }
-    else {
-        return verseN - 1;
-    }
+    return GetVerseFlatPosition(m_verseAboveNs, verseN, collapse, lineN);
 }
 
-int StaffAlignment::GetVersePositionBelow(int verseN, bool collapse) const
+int StaffAlignment::GetVersePositionBelow(int verseN, bool collapse, int lineN) const
 {
     if (m_verseBelowNs.empty()) {
         // Syl in neumatic notation - since verse count will be 0, position is -1
         return -1;
     }
-    else if (collapse) {
-        auto it = std::find(m_verseBelowNs.rbegin(), m_verseBelowNs.rend(), verseN);
-        int pos = (int)std::distance(m_verseBelowNs.rbegin(), it);
-        return pos;
-    }
-    else {
-        return (*m_verseBelowNs.rbegin()) - verseN;
-    }
+    const int flatPosition = GetVerseFlatPosition(m_verseBelowNs, verseN, collapse, lineN);
+    return this->GetVerseCountBelow(collapse) - flatPosition - 1;
 }
 
 double StaffAlignment::GetJustificationFactor(const Doc *doc) const
@@ -743,7 +765,7 @@ void StaffAlignment::SetCurrentFloatingPositioner(
 {
     FloatingPositioner *positioner = this->GetCorrespFloatingPositioner(object);
     if (positioner == NULL) {
-        if (object->Is({ LV, PHRASE, SLUR, TIE })) {
+        if (object->IsAnyOf(std::array{ LV, PHRASE, SLUR, TIE })) {
             positioner = new FloatingCurvePositioner(object, this, spanningType);
             m_floatingPositioners.push_back(positioner);
         }
@@ -801,7 +823,7 @@ void StaffAlignment::FindAllIntersectionPoints(
 {
     for (const auto positioner : m_floatingPositioners) {
         assert(positioner->GetObject());
-        if (!positioner->GetObject()->Is(classIds)) {
+        if (!positioner->GetObject()->IsAnyOf(classIds)) {
             continue;
         }
         if (positioner->HorizontalContentOverlap(&boundingBox, margin / 2)) {

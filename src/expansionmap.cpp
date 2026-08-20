@@ -103,7 +103,7 @@ Object *ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList,
 
     // find and add all relevant (and new) expansion sibling ids to deletionList
     for (Object *siblings : parent->GetChildren()) {
-        if (siblings->Is({ SECTION, ENDING, LEM, RDG })
+        if (siblings->IsAnyOf(std::array{ SECTION, ENDING, LEM, RDG })
             && std::count(deletionList.begin(), deletionList.end(), siblings->GetID()) == 0) {
             deletionList.push_back(siblings->GetID());
         }
@@ -174,7 +174,7 @@ Object *ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList,
                     if (prevIdx < childCount - 1) {
                         Object *nextElement = prevSect->GetParent()->GetChild(prevIdx + 1);
                         assert(nextElement);
-                        if (nextElement->Is({ SECTION, ENDING, LEM, RDG }) && nextElement != currSect) {
+                        if (nextElement->IsAnyOf(std::array{ SECTION, ENDING, LEM, RDG }) && nextElement != currSect) {
                             moveCurrentElement = true;
                         }
                     }

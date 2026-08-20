@@ -89,6 +89,23 @@ public:
     int GetDrawingWidth() const;
     int GetDrawingHeight() const;
 
+    /** Store and retrieve the actual glyph-ink bounds calculated while drawing the syllable text. */
+    void SetDrawingTextInkBounds(int top, int bottom)
+    {
+        m_drawingTextInkTop = top;
+        m_drawingTextInkBottom = bottom;
+        m_hasDrawingTextInkBounds = true;
+    }
+    void ResetDrawingTextInkBounds() { m_hasDrawingTextInkBounds = false; }
+    bool HasDrawingTextInkBounds() const { return m_hasDrawingTextInkBounds; }
+    int GetDrawingTextInkTop() const { return m_drawingTextInkTop; }
+    int GetDrawingTextInkBottom() const { return m_drawingTextInkBottom; }
+
+    /**
+     * Return true when the syl has no textual content.
+     */
+    bool IsEmpty() const;
+
     //----------------//
     // Static methods //
     //----------------//
@@ -123,6 +140,8 @@ public:
      * Value is 1 by default, set in PrepareLyrics
      */
     int m_drawingVerseN;
+    /** The normalized volta row within the verse (one by default). */
+    int m_drawingVoltaN;
     /** The verse place (below by default) */
     data_STAFFREL m_drawingVersePlace;
 
@@ -133,6 +152,9 @@ public:
     Syl *m_nextWordSyl;
 
 private:
+    int m_drawingTextInkTop;
+    int m_drawingTextInkBottom;
+    bool m_hasDrawingTextInkBounds;
 };
 
 } // namespace vrv

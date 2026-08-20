@@ -10,11 +10,14 @@
 //----------------------------------------------------------------------------
 
 #include "layer.h"
+#include "lyricelement.h"
 #include "page.h"
+#include "refrain.h"
 #include "staff.h"
 #include "surface.h"
 #include "system.h"
 #include "verse.h"
+#include "volta.h"
 #include "zone.h"
 
 //----------------------------------------------------------------------------
@@ -126,7 +129,7 @@ FunctorCode GetAlignmentLeftRightFunctor::VisitObject(const Object *object)
 
     if (!object->HasSelfBB() || object->HasEmptyBB()) return FUNCTOR_CONTINUE;
 
-    if (object->Is(m_excludeClasses)) return FUNCTOR_CONTINUE;
+    if (object->IsAnyOf(m_excludeClasses)) return FUNCTOR_CONTINUE;
 
     m_minLeft = std::min(m_minLeft, object->GetSelfLeft());
     m_maxRight = std::max(m_maxRight, object->GetSelfRight());
@@ -140,6 +143,12 @@ FunctorCode GetAlignmentLeftRightFunctor::VisitObject(const Object *object)
 
 InitProcessingListsFunctor::InitProcessingListsFunctor() : ConstFunctor() {}
 
+const IntTree &InitProcessingListsFunctor::GetVerseTree()
+{
+    this->PrepareLyricElementTracks();
+    return m_verseTree;
+}
+
 FunctorCode InitProcessingListsFunctor::VisitLayer(const Layer *layer)
 {
     const Staff *staff = vrv_cast<const Staff *>(layer->GetFirstAncestor(STAFF));
@@ -151,13 +160,142 @@ FunctorCode InitProcessingListsFunctor::VisitLayer(const Layer *layer)
 
 FunctorCode InitProcessingListsFunctor::VisitVerse(const Verse *verse)
 {
-    const Staff *staff = verse->GetAncestorStaff();
-    const Layer *layer = vrv_cast<const Layer *>(verse->GetFirstAncestor(LAYER));
-    assert(layer);
-
-    m_verseTree.child[staff->GetN()].child[layer->GetN()].child[verse->GetN()];
-
+    this->CollectLyricElement(verse);
     return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode InitProcessingListsFunctor::VisitRefrain(const Refrain *refrain)
+{
+    this->CollectLyricElement(refrain);
+    return FUNCTOR_SIBLINGS;
+}
+
+void InitProcessingListsFunctor::CollectLyricElement(const LyricElement *lyricElement)
+{
+    m_lyricElements.push_back(lyricElement);
+}
+
+static int GetRefrainPosition(const LyricElement *lyricElement)
+{
+    assert(lyricElement->Is(REFRAIN));
+    int position = 1;
+    const Object *parent = lyricElement->GetParent();
+    assert(parent);
+    for (const Object *child : parent->GetChildren()) {
+        if (child == lyricElement) break;
+        if (child->Is(REFRAIN)) ++position;
+    }
+    return position;
+}
+
+static data_STAFFREL GetLyricPlace(const LyricElement *lyricElement)
+{
+    return (lyricElement->GetPlace() == STAFFREL_above) ? STAFFREL_above : STAFFREL_below;
+}
+
+void InitProcessingListsFunctor::PrepareLyricElementTracks()
+{
+    if (m_lyricElementTracksPrepared) return;
+    m_lyricElementTracksPrepared = true;
+
+    std::map<std::pair<int, int>, int> maxVerseN;
+    std::map<std::tuple<int, int, data_STAFFREL>, int> maxVerseNByPlace;
+    for (const LyricElement *lyricElement : m_lyricElements) {
+        if (!lyricElement->Is(VERSE)) continue;
+        const Verse *verse = vrv_cast<const Verse *>(lyricElement);
+        assert(verse);
+        const Staff *staff = lyricElement->GetAncestorStaff();
+        const Layer *layer = vrv_cast<const Layer *>(lyricElement->GetFirstAncestor(LAYER));
+        assert(staff && layer);
+        const int verseN = std::max(verse->GetN(), 1);
+        const std::pair<int, int> staffLayer{ staff->GetN(), layer->GetN() };
+        maxVerseN[staffLayer] = std::max(maxVerseN[staffLayer], verseN);
+        const auto placeKey = std::make_tuple(staff->GetN(), layer->GetN(), GetLyricPlace(lyricElement));
+        maxVerseNByPlace[placeKey] = std::max(maxVerseNByPlace[placeKey], verseN);
+    }
+
+    for (const LyricElement *lyricElement : m_lyricElements) {
+        const Staff *staff = lyricElement->GetAncestorStaff();
+        const Layer *layer = vrv_cast<const Layer *>(lyricElement->GetFirstAncestor(LAYER));
+        assert(staff && layer);
+
+        const int staffN = staff->GetN();
+        const int layerN = layer->GetN();
+        int drawingVerseN = 1;
+        int lyricGroupN = 1;
+        if (lyricElement->Is(VERSE)) {
+            const Verse *verse = vrv_cast<const Verse *>(lyricElement);
+            assert(verse);
+            drawingVerseN = std::max(verse->GetN(), 1);
+            lyricGroupN = drawingVerseN;
+        }
+        else {
+            const int refrainPosition = GetRefrainPosition(lyricElement);
+            drawingVerseN
+                = maxVerseNByPlace[std::make_tuple(staffN, layerN, GetLyricPlace(lyricElement))] + refrainPosition;
+            lyricGroupN = maxVerseN[{ staffN, layerN }] + refrainPosition;
+        }
+        lyricElement->SetDrawingVerseN(drawingVerseN);
+        lyricElement->SetDrawingLyricGroupN(lyricGroupN);
+
+        IntTree &verseTree = m_verseTree.child[staffN].child[layerN].child[lyricGroupN];
+        const std::tuple<int, int, int> lyricKey{ staffN, layerN, lyricGroupN };
+        const bool hasDirectSyl = lyricElement->HasDirectSyl();
+        if (hasDirectSyl) verseTree.child[0];
+
+        std::vector<const LyricElement *> &lyricElementGroup = m_lyricElementGroups[lyricKey];
+        lyricElementGroup.push_back(lyricElement);
+        if (hasDirectSyl) m_directSylTrackGroups.insert(lyricKey);
+        if (m_directSylTrackGroups.count(lyricKey)) {
+            for (const LyricElement *groupMember : lyricElementGroup) groupMember->SetDrawingDirectSylTrack();
+        }
+
+        int position = 0;
+        for (const Object *object : lyricElement->FindAllDescendantsByType(VOLTA)) {
+            const Volta *volta = vrv_cast<const Volta *>(object);
+            assert(volta);
+            ++position;
+
+            if (volta->HasDrawingVoltaN()) {
+                verseTree.child[volta->GetDrawingVoltaN()];
+                continue;
+            }
+
+            const std::string identity = volta->HasN() ? "n:" + volta->GetN() : "position:" + std::to_string(position);
+            const auto trackKey = std::make_tuple(staffN, layerN, lyricGroupN, identity);
+            auto [track, inserted] = m_voltaTracks.emplace(trackKey, 0);
+            if (inserted) track->second = ++m_nextVoltaTrack[lyricKey];
+
+            volta->SetDrawingVoltaN(track->second);
+            verseTree.child[track->second];
+        }
+    }
+
+    // Refrain alternatives occupy consecutive outer lyric slots after all numbered verses. This keeps every refrain
+    // sub-line after the verse block with the existing above/below positioning rules.
+    std::map<std::tuple<int, int, int>, int> refrainLineCounts;
+    for (const LyricElement *lyricElement : m_lyricElements) {
+        if (!lyricElement->Is(REFRAIN)) continue;
+        const Staff *staff = lyricElement->GetAncestorStaff();
+        const Layer *layer = vrv_cast<const Layer *>(lyricElement->GetFirstAncestor(LAYER));
+        assert(staff && layer);
+        const auto key = std::make_tuple(staff->GetN(), layer->GetN(), GetRefrainPosition(lyricElement));
+        refrainLineCounts[key] = std::max(refrainLineCounts[key], lyricElement->GetLyricLineCount());
+    }
+    for (const LyricElement *lyricElement : m_lyricElements) {
+        if (!lyricElement->Is(REFRAIN)) continue;
+        const Staff *staff = lyricElement->GetAncestorStaff();
+        const Layer *layer = vrv_cast<const Layer *>(lyricElement->GetFirstAncestor(LAYER));
+        assert(staff && layer);
+        const int position = GetRefrainPosition(lyricElement);
+        int precedingLineCount = 0;
+        for (int preceding = 1; preceding < position; ++preceding) {
+            precedingLineCount += refrainLineCounts[{ staff->GetN(), layer->GetN(), preceding }];
+        }
+        const int maxVerse
+            = maxVerseNByPlace[std::make_tuple(staff->GetN(), layer->GetN(), GetLyricPlace(lyricElement))];
+        lyricElement->SetDrawingVerseN(maxVerse + precedingLineCount + 1);
+    }
 }
 
 //----------------------------------------------------------------------------

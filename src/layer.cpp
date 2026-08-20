@@ -18,6 +18,7 @@
 #include "beam.h"
 #include "clef.h"
 #include "comparison.h"
+#include "cursor.h"
 #include "custos.h"
 #include "divline.h"
 #include "doc.h"
@@ -64,6 +65,8 @@ Layer::Layer()
     m_cautionStaffDefMensur = NULL;
     m_cautionStaffDefMeterSig = NULL;
 
+    m_cursor = NULL;
+
     this->Reset();
 }
 
@@ -83,6 +86,8 @@ void Layer::Reset()
     this->ResetVisibility();
 
     this->ResetStaffDefObjects();
+
+    this->ResetCursor();
 
     m_drawingStemDir = STEMDIRECTION_NONE;
     m_crossStaffFromAbove = false;
@@ -169,17 +174,37 @@ bool Layer::IsSupportedChild(ClassId classId)
     }
 }
 
-LayerElement *Layer::GetPrevious(const LayerElement *element)
+void Layer::ResetCachedDrawingY() const
 {
-    return const_cast<LayerElement *>(std::as_const(*this).GetPrevious(element));
+    if (m_cursor) m_cursor->ResetCachedDrawingY();
+
+    Object::ResetCachedDrawingY();
 }
 
-const LayerElement *Layer::GetPrevious(const LayerElement *element) const
+LayerElement *Layer::GetPreviousInLayer(const LayerElement *element)
+{
+    return const_cast<LayerElement *>(std::as_const(*this).GetPreviousInLayer(element));
+}
+
+const LayerElement *Layer::GetPreviousInLayer(const LayerElement *element) const
 {
     this->ResetList();
     if (!element || this->HasEmptyList()) return NULL;
 
     return dynamic_cast<const LayerElement *>(this->GetListPrevious(element));
+}
+
+LayerElement *Layer::GetNextInLayer(const LayerElement *element)
+{
+    return const_cast<LayerElement *>(std::as_const(*this).GetNextInLayer(element));
+}
+
+const LayerElement *Layer::GetNextInLayer(const LayerElement *element) const
+{
+    this->ResetList();
+    if (!element || this->HasEmptyList()) return NULL;
+
+    return dynamic_cast<const LayerElement *>(this->GetListNext(element));
 }
 
 LayerElement *Layer::GetAtPos(int x)
@@ -640,6 +665,20 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
     currentStaffDef->SetDrawKeySig(false);
     currentStaffDef->SetDrawMensur(false);
     currentStaffDef->SetDrawMeterSig(false);
+}
+
+void Layer::SetCursor(Cursor *cursor)
+{
+    if (m_cursor) this->ResetCursor();
+
+    m_cursor = cursor;
+    m_cursor->SetParent(this);
+}
+
+void Layer::ResetCursor()
+{
+    if (m_cursor) delete m_cursor;
+    m_cursor = NULL;
 }
 
 //----------------------------------------------------------------------------

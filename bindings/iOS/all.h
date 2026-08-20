@@ -97,8 +97,10 @@
 #import <VerovioFramework/editortoolkit_cmn.h>
 #import <VerovioFramework/editortoolkit_mensural.h>
 #import <VerovioFramework/editortoolkit_neume.h>
+#import <VerovioFramework/editortoolkit_shared.h>
 #import <VerovioFramework/elementpart.h>
 #import <VerovioFramework/ending.h>
+#import <VerovioFramework/episema.h>
 #import <VerovioFramework/expan.h>
 #import <VerovioFramework/expansion.h>
 #import <VerovioFramework/expansionmap.h>
@@ -137,6 +139,7 @@
 #import <VerovioFramework/iobase.h>
 #import <VerovioFramework/iocmme.h>
 #import <VerovioFramework/iodarms.h>
+#import <VerovioFramework/iogabc.h>
 #import <VerovioFramework/iohumdrum.h>
 #import <VerovioFramework/iomei.h>
 #import <VerovioFramework/iomusxml.h>
@@ -158,6 +161,7 @@
 #import <VerovioFramework/linkinginterface.h>
 #import <VerovioFramework/liquescent.h>
 #import <VerovioFramework/lv.h>
+#import <VerovioFramework/lyricelement.h>
 #import <VerovioFramework/mdiv.h>
 #import <VerovioFramework/measure.h>
 #import <VerovioFramework/mensur.h>
@@ -204,6 +208,7 @@
 #import <VerovioFramework/quilisma.h>
 #import <VerovioFramework/rdg.h>
 #import <VerovioFramework/ref.h>
+#import <VerovioFramework/refrain.h>
 #import <VerovioFramework/reg.h>
 #import <VerovioFramework/reh.h>
 #import <VerovioFramework/rend.h>
@@ -230,6 +235,7 @@
 #import <VerovioFramework/staffdef.h>
 #import <VerovioFramework/staffgrp.h>
 #import <VerovioFramework/stem.h>
+#import <VerovioFramework/strophicus.h>
 #import <VerovioFramework/subst.h>
 #import <VerovioFramework/supplied.h>
 #import <VerovioFramework/surface.h>
@@ -266,6 +272,7 @@
 #import <VerovioFramework/verse.h>
 #import <VerovioFramework/verticalaligner.h>
 #import <VerovioFramework/view.h>
+#import <VerovioFramework/volta.h>
 #import <VerovioFramework/vrv.h>
 #import <VerovioFramework/vrvdef.h>
 #import <VerovioFramework/zone.h>

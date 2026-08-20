@@ -22,7 +22,8 @@ void *vrvToolkit_constructorNoResource();
 
 void vrvToolkit_destructor(void *tkPtr);
 bool vrvToolkit_edit(void *tkPtr, const char *editorAction);
-const char *vrvToolkit_editInfo(void *tkPtr);
+const char *vrvToolkit_editResponse(void *tkPtr);
+const char *vrvToolkit_editStatus(void *tkPtr);
 const char *vrvToolkit_getAvailableOptions(void *tkPtr);
 const char *vrvToolkit_getDefaultOptions(void *tkPtr);
 const char *vrvToolkit_getDescriptiveFeatures(void *tkPtr, const char *options);

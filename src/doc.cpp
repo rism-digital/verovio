@@ -152,6 +152,11 @@ void Doc::ResetToSerialization()
     m_isMensuralMusicOnly = BOOLEAN_NONE;
     m_isNeumeLines = false;
     m_visibleScores.clear();
+
+    if (m_focusRange) {
+        delete m_focusRange;
+        m_focusRange = NULL;
+    }
     m_focusStatus = FOCUS_UNSET;
 
     m_facsimile = NULL;
@@ -160,6 +165,7 @@ void Doc::ResetToSerialization()
     m_drawingLyricFontSize = 0;
 
     m_isCastOff = true;
+    m_mensuralCastOff = false;
 }
 
 void Doc::ResetToLoading()
@@ -881,21 +887,24 @@ void Doc::PrepareData()
     for (auto &staves : verseTree.child) {
         for (auto &layers : staves.second.child) {
             for (auto &verses : layers.second.child) {
-                // std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
-                filters.Clear();
-                // Create ad comparison object for each type / @n
-                AttNIntegerComparison matchStaff(STAFF, staves.first);
-                AttNIntegerComparison matchLayer(LAYER, layers.first);
-                AttNIntegerComparison matchVerse(VERSE, verses.first);
-                filters.Add(&matchStaff);
-                filters.Add(&matchLayer);
-                filters.Add(&matchVerse);
+                for (auto &voltaTracks : verses.second.child) {
+                    filters.Clear();
+                    // Create comparisons for staff/layer and the internal lyric-element group.
+                    AttNIntegerComparison matchStaff(STAFF, staves.first);
+                    AttNIntegerComparison matchLayer(LAYER, layers.first);
+                    LyricElementComparison matchVerse(VERSE, verses.first);
+                    LyricElementComparison matchRefrain(REFRAIN, verses.first);
+                    filters.Add(&matchStaff);
+                    filters.Add(&matchLayer);
+                    filters.Add(&matchVerse);
+                    filters.Add(&matchRefrain);
 
-                // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
-                // m_drawingLastNote is set only if the syl has a forward connector
-                PrepareLyricsFunctor prepareLyrics;
-                prepareLyrics.SetFilters(&filters);
-                root->Process(prepareLyrics);
+                    // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
+                    // m_drawingLastNote is set only if the syl has a forward connector
+                    PrepareLyricsFunctor prepareLyrics(voltaTracks.first);
+                    prepareLyrics.SetFilters(&filters);
+                    root->Process(prepareLyrics);
+                }
             }
         }
     }
@@ -959,7 +968,7 @@ void Doc::PrepareData()
 
     /************ Instantiate LayerElement parts (stem, flag, dots, etc) ************/
 
-    PrepareLayerElementPartsFunctor prepareLayerElementParts;
+    PrepareLayerElementPartsFunctor prepareLayerElementParts(this);
     root->Process(prepareLayerElementParts);
 
     /************ Resolve @facs ************/
@@ -1382,15 +1391,24 @@ void Doc::ConvertToPageBasedDoc()
     this->ResetDataPage();
 }
 
-void Doc::ConvertToCastOffMensuralDoc(bool castOff)
+void Doc::ConvertToCastOffMensuralDoc(MensuralCastOffType castOff)
 {
     if (!this->IsMensuralMusicOnly()) return;
+
+    // Do not convert if not an init call and mensural cast was not performed
+    if ((castOff != MENSURAL_CAST_OFF_INIT) && !m_mensuralCastOff) return;
 
     // Do not convert transcription files
     if (this->IsTranscription()) return;
 
     // Do not convert facs files
     if (this->IsFacs()) return;
+
+    // Flag it as performed
+    m_mensuralCastOff = true;
+
+    // With init and reset we are converting to cast off
+    bool convertToCastOff = (castOff != MENSURAL_CAST_OFF_UNSET);
 
     // Make sure the document is not cast-off
     if (this->IsCastOff()) this->UnCastOffDoc();
@@ -1406,7 +1424,7 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
     for (const auto item : systems) {
         System *system = vrv_cast<System *>(item);
         assert(system);
-        if (castOff) {
+        if (convertToCastOff) {
             System *convertedSystem = new System();
             ConvertToCastOffMensuralFunctor convertToCastOffMensural(this, convertedSystem);
             // Convert the system and replace it
@@ -1851,7 +1869,7 @@ int Doc::GetGlyphHeight(char32_t code, int staffSize, bool graceSize) const
     int x, y, w, h;
     const Resources &resources = this->GetResources();
     const Glyph *glyph = resources.GetGlyph(code);
-    assert(glyph);
+    if (!glyph) return 0;
     glyph->GetBoundingBox(x, y, w, h);
     h = h * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if (graceSize) h = h * m_options->m_graceFactor.GetValue();
@@ -1864,7 +1882,7 @@ int Doc::GetGlyphWidth(char32_t code, int staffSize, bool graceSize) const
     int x, y, w, h;
     const Resources &resources = this->GetResources();
     const Glyph *glyph = resources.GetGlyph(code);
-    assert(glyph);
+    if (!glyph) return 0;
     glyph->GetBoundingBox(x, y, w, h);
     w = w * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if (graceSize) w = w * m_options->m_graceFactor.GetValue();
@@ -1876,7 +1894,7 @@ int Doc::GetGlyphAdvX(char32_t code, int staffSize, bool graceSize) const
 {
     const Resources &resources = this->GetResources();
     const Glyph *glyph = resources.GetGlyph(code);
-    assert(glyph);
+    if (!glyph) return 0;
     int advX = glyph->GetHorizAdvX();
     advX = advX * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if (graceSize) advX = advX * m_options->m_graceFactor.GetValue();

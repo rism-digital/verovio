@@ -321,11 +321,18 @@ public:
     bool Edit(const std::string &editorAction);
 
     /**
+     * Return the editor response - experimental code not to rely on.
+     *
+     * @return The editor response as a string
+     **/
+    std::string EditResponse();
+
+    /**
      * Return the editor status - experimental code not to rely on.
      *
      * @return The editor status as a string
      **/
-    std::string EditInfo();
+    std::string EditStatus();
 
     ///@}
 
@@ -817,10 +824,12 @@ private:
 
 public:
     //
-private:
+protected:
     Doc m_doc;
     DocSelection m_docSelection;
     View m_view;
+
+private:
     Doc *m_midiDoc;
 
     Options *m_options;

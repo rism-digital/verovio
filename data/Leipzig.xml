@@ -115,7 +115,7 @@
   <g c="E56C" x="0.0" y="-2.0" w="605.0" h="242.0" h-a-x="605" n="ornamentShortTrill" />
   <g c="E56D" x="0.0" y="-90.0" w="586.0" h="399.0" h-a-x="587" n="ornamentMordent" />
   <g c="E004" x="0.0" y="-282.11" w="399.0" h="282.11" h-a-x="399" n="bracketBottom" />
-  <g c="E003" x="0.0" y="0.0" w="399.0" h="282.11" h-a-x="399" n="bracketTop" />
+  <g c="E003" x="0.0" y="-0.0" w="399.0" h="282.11" h-a-x="399" n="bracketTop" />
   <g c="E88A" x="17.0" y="50.0" w="110.0" h="194.0" h-a-x="144" n="tupletColon" />
   <g c="E522" x="-143.0" y="-223.0" w="448.0" h="665.0" h-a-x="232" n="dynamicForte" />
   <g c="E521" x="-44.0" y="-18.0" w="472.0" h="280.0" h-a-x="405" n="dynamicMezzo" />
@@ -520,7 +520,7 @@
   <g c="E06D" x="-3.0" y="-750.0" w="411.0" h="1500.0" h-a-x="409" n="6stringTabClef" />
   <g c="E06E" x="-3.0" y="-500.0" w="275.0" h="1000.0" h-a-x="271" n="4stringTabClef" />
   <g c="E055" x="-1.0" y="-655.0" w="1039.0" h="1738.0" h-a-x="646" n="gClef8vbOld" />
-  <g c="E056" x="-1.0" y="-655.0" w="764.0" h="1738.0" h-a-x="750" n="gClef8vbCClef" />
+  <g c="E056" x="-1.0" y="-655.0" w="804.0" h="1738.0" h-a-x="800" n="gClef8vbCClef" />
   <g c="E51A" x="0.0" y="-25.0" w="115.0" h="350.44" h-a-x="115" n="octaveParensLeft" />
   <g c="E51B" x="0.0" y="-25.0" w="115.0" h="350.0" h-a-x="115" n="octaveParensRight" />
   <g c="E0F5" x="0.0" y="-240.0" w="153.0" h="480.0" h-a-x="100" n="noteheadParenthesisLeft" />
@@ -857,4 +857,45 @@
   <g c="E0D5" x="0.0" y="-170.0" w="545.0" h="340.0" h-a-x="545" n="noteheadSlashedDoubleWhole1" />
   <g c="E0D6" x="0.0" y="-170.0" w="545.0" h="340.0" h-a-x="545" n="noteheadSlashedDoubleWhole2" />
   <g c="E4D5" x="0.0" y="-192.0" w="600.0" h="512.0" h-a-x="600" n="breathMarkSalzedo" />
+  <g c="EA29" x="-0.62" y="-138.38" w="184.82" h="274.66" h-a-x="184" n="medRenStrophicusCMN" />
+  <g c="E9D0" x="0.0" y="30.0" w="32.0" h="103.0" h-a-x="32" n="chantIctusAbove" />
+  <g c="E9D1" x="0.0" y="-133.0" w="32.0" h="104.0" h-a-x="32" n="chantIctusBelow" />
+  <g c="E9D8" x="-6.0" y="125.0" w="176.0" h="20.0" h-a-x="164" n="chantEpisema" />
+  <g c="E450" x="0.0" y="-339.0" w="353.0" h="838.0" h-a-x="355" n="accidental1CommaSharp">
+    <a n="cutOutNE" x="1.3" y="1.12" />
+    <a n="cutOutNW" x="0.16" y="0.64" />
+    <a n="cutOutSE" x="0.62" y="-0.64" />
+    <a n="cutOutSW" x="0.16" y="-0.82" />
+  </g>
+  <g c="E456" x="0.0" y="-175.0" w="279.0" h="674.0" h-a-x="280" n="accidental3CommaFlat">
+    <a n="cutOutNE" x="1.0" y="1.92" />
+    <a n="cutOutSE" x="0.43" y="-0.34" />
+  </g>
+  <g c="E457" x="0.0" y="-175.0" w="311.0" h="674.0" h-a-x="314" n="accidental4CommaFlat">
+    <a n="cutOutNE" x="1.16" y="1.4" />
+    <a n="cutOutSE" x="0.43" y="-0.34" />
+  </g>
+  <g c="E451" x="0.0" y="-339.0" w="369.0" h="838.0" h-a-x="367" n="accidental2CommaSharp">
+    <a n="cutOutNW" x="0.16" y="0.64" />
+    <a n="cutOutSE" x="0.62" y="-0.64" />
+    <a n="cutOutSW" x="0.16" y="-0.82" />
+  </g>
+  <g c="E452" x="0.0" y="-339.0" w="369.0" h="838.0" h-a-x="369" n="accidental3CommaSharp">
+    <a n="cutOutNE" x="1.36" y="1.92" />
+    <a n="cutOutNW" x="0.16" y="0.64" />
+    <a n="cutOutSE" x="0.62" y="-0.64" />
+    <a n="cutOutSW" x="0.16" y="-0.82" />
+  </g>
+  <g c="E453" x="0.0" y="-339.0" w="352.0" h="843.0" h-a-x="353" n="accidental5CommaSharp">
+    <a n="cutOutNE" x="0.62" y="0.84" />
+    <a n="cutOutNW" x="0.16" y="0.64" />
+    <a n="cutOutSE" x="0.62" y="-0.64" />
+    <a n="cutOutSW" x="0.16" y="-0.82" />
+  </g>
+  <g c="E454" x="0.0" y="-175.0" w="263.0" h="674.0" h-a-x="264" n="accidental1CommaFlat">
+    <a n="cutOutSE" x="0.43" y="-0.34" />
+  </g>
+  <g c="E455" x="0.0" y="-175.0" w="279.0" h="674.0" h-a-x="280" n="accidental2CommaFlat">
+    <a n="cutOutSE" x="0.43" y="-0.34" />
+  </g>
 </bounding-boxes>

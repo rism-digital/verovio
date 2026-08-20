@@ -127,13 +127,13 @@ jobs:
             compiler: xcode
             version: "15.4"
           
-          - os: macos-latest
+          - os: macos-15
             compiler: xcode
-            version: "16.0"
+            version: "16.2"
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v7.0.1
 
       - name: Register gcc problem matcher
         run: echo "::add-matcher::.github/problem_matchers/gcc.json"
@@ -215,10 +215,10 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v7.0.1
 
       - name: Restore cache
-        uses: actions/setup-java@v5.2.0
+        uses: actions/setup-java@v5.6.0
         with:
           distribution: 'temurin'
           java-version: '21'
@@ -243,6 +243,43 @@ jobs:
           name: java-build-${{ github.run_id }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}
 
+
+  ##################################
+  # Build and test the Go bindings #
+  ##################################
+  build_go:
+    # skip job if commit message contains "[skip-ci]"
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
+
+    name: Build Go bindings
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: ${{ github.workspace }}/bindings/go/go.mod
+          cache-dependency-path: ${{ github.workspace }}/bindings/go/go.mod
+
+      - name: Build and install Verovio shared library
+        working-directory: ${{ github.workspace }}
+        run: |
+          cmake -S cmake -B build/go -DBUILD_AS_LIBRARY=ON -DCMAKE_INSTALL_PREFIX="$PWD/build/go/install"
+          cmake --build build/go -j8
+          cmake --install build/go
+
+      - name: Run Go tests
+        working-directory: ${{ github.workspace }}/bindings/go
+        env:
+          PKG_CONFIG_PATH: ${{ github.workspace }}/build/go
+          LD_LIBRARY_PATH: ${{ github.workspace }}/build/go/install/lib
+          VEROVIO_RESOURCE_PATH: ${{ github.workspace }}/build/go/install/share/verovio
+          GOCACHE: ${{ github.workspace }}/.gocache
+        run: go test ./...
+
   
   #####################################
   # Set up and cache emscripten build #
@@ -256,7 +293,7 @@ jobs:
 
     steps:
       - name: Set up cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         id: cache
         with:
           # path for cache
@@ -265,7 +302,7 @@ jobs:
           key: ${{ runner.os }}-emsdk-${{ env.EM_VERSION }}-${{ env.EM_CACHE_ID }}
 
       - name: Set up emsdk
-        uses: mymindstorm/setup-emsdk@v14
+        uses: mymindstorm/setup-emsdk@v16
         with:
           version: ${{ env.EM_VERSION }}
           actions-cache-folder: ${{ env.EM_CACHE_FOLDER }}
@@ -289,10 +326,6 @@ jobs:
             message: "Building toolkit without humdrum"
             options: "-c -H -M"
             filepath: "verovio-toolkit.js*"
-          - target: light
-            message: "Building toolkit without humdrum as light version"
-            options: "-c -H -l -M"
-            filepath: "verovio-toolkit-light.js*"
           - target: wasm
             message: "Building toolkit without humdrum as wasm"
             options: "-c -H -w -M"
@@ -305,7 +338,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v7.0.1
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
@@ -314,7 +347,7 @@ jobs:
       # Restore system libraries from cache
       - name: Restore cache
         id: restore_cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           # path for cache
           path: ${{ env.EM_CACHE_FOLDER }}
@@ -323,7 +356,7 @@ jobs:
 
       # Install and/or activate emsdk
       - name: Set up emsdk
-        uses: mymindstorm/setup-emsdk@v14
+        uses: mymindstorm/setup-emsdk@v16
         with:
           version: ${{ env.EM_VERSION }}
           actions-cache-folder: ${{ env.EM_CACHE_FOLDER }}
@@ -360,7 +393,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v7.0.1
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
@@ -422,7 +455,7 @@ jobs:
 
     steps:
       - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v7.0.1
         with:
           # repository to check out
           repository: ${{ env.GH_PAGES_REPO }}
@@ -435,7 +468,7 @@ jobs:
           path: ${{ env.GH_PAGES_DIR }}
 
       - name: Download TOOLKIT_BUILD artifacts
-        uses: actions/download-artifact@v8.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           name: ${{ env.TOOLKIT_BUILD }}-${{ github.run_id }}
           path: artifacts/${{ env.TOOLKIT_BUILD }}
@@ -445,7 +478,7 @@ jobs:
           cp -r artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
 
       - name: Download FONTS artifacts
-        uses: actions/download-artifact@v8.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           name: ${{ env.FONTS }}-${{ github.run_id }}
           path: artifacts/${{ env.FONTS }}
@@ -515,7 +548,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v7.0.1
 
       - name: Install doxygen
         run: |
@@ -552,7 +585,7 @@ jobs:
 
     steps:
       - name: Checkout DOXYGEN_REPO into DOXYGEN_DIR
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v7.0.1
         with:
           # repository to check out
           repository: ${{ env.DOXYGEN_REPO }}
@@ -565,7 +598,7 @@ jobs:
           path: ${{ env.DOXYGEN_DIR }}
 
       - name: Download DOC_BUILD artifacts
-        uses: actions/download-artifact@v8.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           name: ${{ env.DOC_BUILD }}-${{ github.run_id }}
           path: artifacts/${{ env.DOC_BUILD }}

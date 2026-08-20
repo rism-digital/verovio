@@ -41,6 +41,7 @@ SvgDeviceContext::SvgDeviceContext(const std::string &docId) : DeviceContext(SVG
 
     m_originX = 0;
     m_originY = 0;
+    m_textY = 0;
 
     m_smuflGlyphs.clear();
 
@@ -49,6 +50,7 @@ SvgDeviceContext::SvgDeviceContext(const std::string &docId) : DeviceContext(SVG
     m_vrvTextFontFallback = false;
 
     m_mmOutput = false;
+    m_showHidden = false;
     m_svgBoundingBoxes = false;
     m_svgContentBoundingBoxes = false;
     m_svgViewBox = false;
@@ -96,7 +98,7 @@ SvgDeviceContext::GlyphRef::GlyphRef(const Glyph *glyph, int count, const std::s
     else {
         m_refId = StringFormat("%s-%d-%s", glyph->GetCodeStr().c_str(), count, postfix.c_str());
     }
-};
+}
 
 const std::string SvgDeviceContext::InsertGlyphRef(const Glyph *glyph)
 {
@@ -258,6 +260,13 @@ void SvgDeviceContext::StartGraphic(
             gClassFull.append((gClassFull.empty() ? "" : " ") + att->GetType());
         }
     }
+    if (m_showHidden && object->HasAttClass(ATT_VISIBILITY)) {
+        AttVisibility *att = dynamic_cast<AttVisibility *>(object);
+        assert(att);
+        if (att->HasVisible() && (att->GetVisible() == BOOLEAN_false)) {
+            gClassFull.append((gClassFull.empty() ? CSS_SHOW_HIDDEN : StringFormat(" %s", CSS_SHOW_HIDDEN)));
+        }
+    }
 
     if (prepend) {
         m_currentNode = m_currentNode.prepend_child("g");
@@ -342,7 +351,7 @@ void SvgDeviceContext::StartGraphic(
         AttVisibility *att = dynamic_cast<AttVisibility *>(object);
         assert(att);
         if (att->HasVisible()) {
-            if (att->GetVisible() == BOOLEAN_true) {
+            if (att->GetVisible() == BOOLEAN_true || m_showHidden) {
                 m_currentNode.append_attribute("visibility") = "visible";
             }
             else if (att->GetVisible() == BOOLEAN_false) {
@@ -488,7 +497,14 @@ void SvgDeviceContext::StartPage()
         std::string css = "g.ending, g.fing, g.reh, g.tempo {font-weight:bold;} "
                           "g.dir, g.dynam, g.mNum {font-style:italic;}"
                           "g.label {font-weight:normal;} "
-                          "ellipse, path, polygon, polyline, rect {stroke:currentColor} ";
+                          "ellipse, path, polygon, polyline, rect {stroke:currentColor} "
+                          "g.cursor {fill:dodgerblue; color:dodgerblue;} "
+                          "g.cursor.chord {fill:limegreen; color:limegreen;} ";
+        if (m_showHidden) {
+            std::string showHidden
+                = StringFormat("g.%s {fill: silver; color:silver; stroke:silver;} ", CSS_SHOW_HIDDEN);
+            css += showHidden;
+        }
         // bounding box css - for debugging
         // css += " g.bounding-box{stroke:red; stroke-width:10} "
         //        "g.content-bounding-box{stroke:blue; stroke-width:10}";
@@ -1016,6 +1032,7 @@ void SvgDeviceContext::StartText(int x, int y, data_HORIZONTALALIGNMENT alignmen
     m_svgNodeStack.push_back(m_currentNode);
     if (x) m_currentNode.append_attribute("x") = x;
     if (y) m_currentNode.append_attribute("y") = y;
+    m_textY = y;
     // unless dx, dy have a value they don't need to be set
     // m_currentNode.append_attribute("dx") = 0;
     // m_currentNode.append_attribute("dy") = 0;
@@ -1051,6 +1068,7 @@ void SvgDeviceContext::MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignme
 {
     m_currentNode.append_attribute("x") = x;
     m_currentNode.append_attribute("y") = y;
+    m_textY = y;
     if (alignment != HORIZONTALALIGNMENT_NONE) {
         std::string anchor = "start";
         if (alignment == HORIZONTALALIGNMENT_right) {
@@ -1065,7 +1083,10 @@ void SvgDeviceContext::MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignme
 
 void SvgDeviceContext::MoveTextVerticallyTo(int y)
 {
-    m_currentNode.append_attribute("y") = y;
+    // An absolute y starts a new anchored text chunk in SVG. Use a relative shift so
+    // superscripts and subscripts remain part of the surrounding horizontal text run.
+    m_currentNode.append_attribute("dy") = y - m_textY;
+    m_textY = y;
 }
 
 void SvgDeviceContext::EndText()

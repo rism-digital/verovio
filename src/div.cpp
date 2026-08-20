@@ -43,7 +43,7 @@ int Div::GetDrawingX() const
 {
     const Object *parent = this->GetParent();
     assert(parent);
-    if (m_drawingInline && parent) {
+    if (m_drawingInline) {
         return parent->GetDrawingX() + this->GetDrawingXRel();
     }
     return parent->GetDrawingX();

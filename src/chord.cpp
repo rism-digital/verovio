@@ -116,6 +116,13 @@ void Chord::Reset()
     this->ClearNoteGroups();
 }
 
+void Chord::CloneReset()
+{
+    LayerElement::CloneReset();
+
+    m_noteGroups.clear();
+}
+
 void Chord::ClearNoteGroups() const
 {
     std::list<ChordNoteGroup *>::iterator iter;
@@ -171,7 +178,7 @@ void Chord::CalculateNoteGroups()
 
 bool Chord::IsSupportedChild(ClassId classId)
 {
-    static const std::vector<ClassId> supported{ ARTIC, DOTS, NOTE, STEM, VERSE };
+    static const std::vector<ClassId> supported{ ARTIC, DOTS, NOTE, REFRAIN, STEM, VERSE };
 
     if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
         return true;
@@ -196,7 +203,7 @@ bool Chord::AddChild(Object *child)
     child->SetParent(this);
     // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
-    if (child->Is({ DOTS, STEM })) {
+    if (child->IsAnyOf(std::array{ DOTS, STEM })) {
         children.insert(children.begin(), child);
     }
     else {

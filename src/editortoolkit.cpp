@@ -9,6 +9,7 @@
 
 //--------------------------------------------------------------------------------
 
+#include "cursor.h"
 #include "object.h"
 #include "page.h"
 #include "vrv.h"
@@ -19,10 +20,31 @@ namespace vrv {
 
 #ifndef NO_EDIT_SUPPORT
 
-bool EditorToolkit::AppendChild(const std::string &elementId, const std::string &elementName)
+#define CHAINED_ID "[chained-id]"
+#define SELECTION_ID "[selection-id]"
+#define SELECTION_SECONDARY_ID "[selection-secondary-id]"
+
+void EditorToolkit::ResetSelect()
 {
-    Object *element = this->GetElement(elementId);
+    m_selectionId = "";
+    m_selectionClassId = UNSPECIFIED;
+    m_selectionSecondaryId = "";
+}
+
+bool EditorToolkit::AppendChild(std::string &elementId, const std::string &elementName, bool noDuplicate)
+{
+    Object *element = this->ResolveElement(elementId);
     if (!element) return false;
+
+    if (noDuplicate) {
+        ClassId classId = ObjectFactory::GetInstance().GetClassId(elementName);
+        Object *existingChildElement = element->FindDescendantByType(classId, 1);
+        if (existingChildElement) {
+            existingChildElement->Reset();
+            m_chainedId = existingChildElement->GetID();
+            return true;
+        }
+    }
 
     Object *childElement = this->PrepareInsertion(element, elementName);
     if (!childElement) return false;
@@ -35,9 +57,9 @@ bool EditorToolkit::AppendChild(const std::string &elementId, const std::string 
     return true;
 }
 
-bool EditorToolkit::InsertBefore(const std::string &elementId, const std::string &elementName)
+bool EditorToolkit::InsertBefore(std::string &elementId, const std::string &elementName)
 {
-    Object *element = this->GetElement(elementId);
+    Object *element = this->ResolveElement(elementId);
     if (!element) return false;
 
     Object *parent = element->GetParent();
@@ -51,9 +73,9 @@ bool EditorToolkit::InsertBefore(const std::string &elementId, const std::string
     return true;
 }
 
-bool EditorToolkit::InsertAfter(const std::string &elementId, const std::string &elementName)
+bool EditorToolkit::InsertAfter(std::string &elementId, const std::string &elementName)
 {
-    Object *element = this->GetElement(elementId);
+    Object *element = this->ResolveElement(elementId);
     if (!element) return false;
 
     Object *parent = element->GetParent();
@@ -91,18 +113,44 @@ Object *EditorToolkit::PrepareInsertion(Object *parent, const std::string &eleme
 {
     assert(parent);
 
-    ClassId classId = ObjectFactory::GetInstance()->GetClassId(elementName);
+    ClassId classId = ObjectFactory::GetInstance().GetClassId(elementName);
     if (!parent->IsSupportedChild(classId)) {
         LogError("Element '%s' is not supported as child of '%s'", elementName.c_str(), parent->GetClassName().c_str());
         return NULL;
     }
 
-    Object *childElement = ObjectFactory::GetInstance()->Create(elementName);
+    Object *childElement = ObjectFactory::GetInstance().Create(elementName);
     if (!childElement) {
         LogError("Creating a '%s' object failed", elementName.c_str());
     }
+    else {
+        m_chainedId = childElement->GetID();
+    }
 
     return childElement;
+}
+
+Object *EditorToolkit::ResolveElement(std::string &elementId, bool chain)
+{
+    if (elementId == CHAINED_ID) {
+        if (m_chainedId.empty()) LogWarning("Chained id not set");
+        elementId = m_chainedId;
+    }
+    else if (elementId == SELECTION_ID) {
+        if (m_selectionId.empty()) LogWarning("Selection id not set");
+        elementId = m_selectionId;
+        if (chain) m_chainedId = elementId;
+    }
+    else if (elementId == SELECTION_SECONDARY_ID) {
+        if (m_selectionSecondaryId.empty()) LogWarning("Selection secondary id not set");
+        elementId = m_selectionSecondaryId;
+        if (chain) m_chainedId = elementId;
+    }
+    else {
+        m_chainedId = elementId;
+    }
+
+    return this->GetElement(elementId);
 }
 
 #endif /* NO_EDIT_SUPPORT */

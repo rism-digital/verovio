@@ -14,1178 +14,879 @@
 
 //--------------------------------------------------------------------------------
 
-#include "chord.h"
-#include "clef.h"
+#include "alignfunctor.h"
 #include "comparison.h"
-#include "dir.h"
-#include "dynam.h"
-#include "editfunctor.h"
-#include "editorial.h"
-#include "findfunctor.h"
-#include "hairpin.h"
-#include "iomei.h"
+#include "cursor.h"
 #include "layer.h"
-#include "mdiv.h"
-#include "measure.h"
-#include "mnum.h"
+#include "miscfunctor.h"
 #include "note.h"
-#include "page.h"
-#include "plistinterface.h"
-#include "rend.h"
 #include "rest.h"
-#include "slur.h"
 #include "staff.h"
-#include "surface.h"
-#include "symboldef.h"
-#include "systemelement.h"
-#include "text.h"
 #include "tie.h"
-#include "timeinterface.h"
-#include "vrv.h"
-#include "zone.h"
-
-//--------------------------------------------------------------------------------
-
-#define CHAINED_ID "[chained-id]"
-
-#define UNDO_MEMORY_LIMIT (256 * 1024 * 1024) // 256 MB
 
 namespace vrv {
 
-EditorToolkitCMN::EditorToolkitCMN(Doc *doc, View *view) : EditorToolkit(doc, view)
-{
-    m_undoPrepared = false;
-    m_scoreContext = NULL;
-    m_sectionContext = NULL;
-    m_currentContext = NULL;
-}
+EditorToolkitCMN::EditorToolkitCMN(Doc *doc, View *view) : EditorToolkitShared(doc, view) {}
 
-EditorToolkitCMN::~EditorToolkitCMN()
-{
+EditorToolkitCMN::~EditorToolkitCMN() {}
+
 #ifndef NO_EDIT_SUPPORT
-    this->ClearContext();
-#endif
-}
-
-std::string EditorToolkitCMN::EditInfo()
+bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
 {
-    return m_editInfo.json();
-}
-
-bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, bool commitOnly)
-{
-#ifndef NO_EDIT_SUPPORT
-    jsonxx::Object json;
-
-    // Read JSON actions
-    if (!json.parse(json_editorAction)) {
-        LogError("Cannot parse JSON std::string.");
-        return false;
-    }
-
-    if (!json.has<jsonxx::String>("action")) {
-        LogWarning("Incorrectly formatted JSON action.");
-    }
-
     std::string action = json.get<jsonxx::String>("action");
 
-    if (action != "context") {
-        m_doc->SetFocus();
+    if (action == "insertCursorByDur") {
+        data_DURATION dur;
+        int dots;
+        if (this->ParseInsertCursorByDurAction(json.get<jsonxx::Object>("param"), dur, dots)) {
+            this->PrepareUndo();
+            return (this->InsertCursorByDur(dur, dots));
+        }
+        LogWarning("Could not parse the insertCursorByDur action");
+    }
+    else if (action == "insertCursorByPitch") {
+        data_PITCHNAME pname;
+        int oct;
+        data_ACCIDENTAL_WRITTEN accid;
+        int midi;
+        if (this->ParseInsertCursorByPitchAction(json.get<jsonxx::Object>("param"), pname, oct, accid, midi)) {
+            this->PrepareUndo();
+            return (this->InsertCursorByPitch(pname, oct, accid, midi));
+        }
+        LogWarning("Could not parse the insertCursorByPitch action");
+    }
+    else if (action == "insertCursorByType") {
+        CursorInsertType insertType;
+        if (this->ParseInsertCursorByTypeAction(json.get<jsonxx::Object>("param"), insertType)) {
+            this->PrepareUndo();
+            return (this->InsertCursorByType(insertType));
+        }
+        LogWarning("Could not parse the insertCursorByType action");
+    }
+    else if (action == "insertCursorContainer") {
+        CursorContainer container;
+        if (this->ParseInsertCursorContainerAction(json.get<jsonxx::Object>("param"), container)) {
+            this->PrepareUndo();
+            return (this->InsertCursorContainer(container));
+        }
+        LogWarning("Could not parse the insertCursorContainer action");
+    }
+    else if (action == "insertMeasure") {
+        std::string elementId;
+        int number;
+        bool insertBefore;
+        if (this->ParseInsertMeasureAction(json.get<jsonxx::Object>("param"), elementId, number, insertBefore)) {
+            this->PrepareUndo();
+            return (this->InsertMeasure(elementId, number, insertBefore));
+        }
+        LogWarning("Could not parse the insertMeasure action");
+    }
+    else if (action == "insertNote") {
+        std::string elementId;
+        data_PITCHNAME pname;
+        int oct;
+        data_ACCIDENTAL_WRITTEN accid;
+        data_ACCIDENTAL_GESTURAL accidGes;
+        data_DURATION dur;
+        int dots;
+        bool chordMode;
+        if (this->ParseInsertNoteAction(
+                json.get<jsonxx::Object>("param"), elementId, pname, oct, accid, accidGes, dur, dots, chordMode)) {
+            this->PrepareUndo();
+            return (this->InsertNote(elementId, pname, oct, accid, accidGes, dur, dots, chordMode));
+        }
+        LogWarning("Could not parse the insertNote action");
+    }
+    else if (action == "insertRest") {
+        std::string elementId;
+        data_DURATION dur;
+        int dots;
+        if (this->ParseInsertRestAction(json.get<jsonxx::Object>("param"), elementId, dur, dots)) {
+            this->PrepareUndo();
+            return (this->InsertRest(elementId, dur, dots));
+        }
+        LogWarning("Could not parse the insertRest action");
+    }
+    else if (action == "resetCursorContainer") {
+        CursorContainer container;
+        if (this->ParseResetCursorContainerAction(json.get<jsonxx::Object>("param"), container)) {
+            this->PrepareUndo();
+            return (this->ResetCursorContainer(container));
+        }
+        LogWarning("Could not parse the resetCursorContainer action");
+    }
+    return false;
+}
+
+bool EditorToolkitCMN::ParseInsertCursorByDurAction(const jsonxx::Object &param, data_DURATION &dur, int &dots)
+{
+    dur = DURATION_NONE;
+    dots = VRV_UNSET;
+    Note noteConverter;
+
+    if (!param.has<jsonxx::String>("dur")) return false;
+    dur = noteConverter.AttDurationLog::StrToDuration(param.get<jsonxx::String>("dur"));
+
+    if (param.has<jsonxx::Number>("dots")) dots = param.get<jsonxx::Number>("dots");
+
+    return true;
+}
+
+bool EditorToolkitCMN::ParseInsertCursorByPitchAction(
+    const jsonxx::Object &param, data_PITCHNAME &pname, int &oct, data_ACCIDENTAL_WRITTEN &accid, int &midi)
+{
+    pname = PITCHNAME_NONE;
+    oct = VRV_UNSET;
+    accid = ACCIDENTAL_WRITTEN_NONE;
+    midi = VRV_UNSET;
+    Note noteConverter;
+    Accid accidConverter;
+
+    // At least one of the two
+    if (param.has<jsonxx::String>("pname")) {
+        pname = noteConverter.AttPitch::StrToPitchname(param.get<jsonxx::String>("pname"));
+    }
+    else if (param.has<jsonxx::Number>("midi")) {
+        midi = param.get<jsonxx::Number>("midi");
+    }
+    else {
+        return false;
     }
 
-    // Action without parameter
-    if (action == "commit") {
-        m_doc->PrepareData();
-        m_doc->ScoreDefSetCurrentDoc(true);
-        m_doc->RefreshLayout();
-        m_undoPrepared = false;
-        m_editInfo.reset();
-        m_editInfo.import("chainedId", m_chainedId);
-        m_editInfo.import("canUndo", this->CanUndo());
-        m_editInfo.import("canRedo", this->CanRedo());
-        return true;
+    if (param.has<jsonxx::Number>("oct")) oct = param.get<jsonxx::Number>("oct");
+    if (param.has<jsonxx::String>("accid"))
+        accid = accidConverter.AttAccidental::StrToAccidentalWritten(param.get<jsonxx::String>("accid"));
+
+    return true;
+}
+
+bool EditorToolkitCMN::ParseInsertCursorByTypeAction(const jsonxx::Object &param, CursorInsertType &insertType)
+{
+    insertType = CursorInsertType::CURSOR_INSERT_NONE;
+
+    if (!param.has<jsonxx::String>("type")) return false;
+
+    if (param.get<jsonxx::String>("type") == "rest") {
+        insertType = CURSOR_INSERT_REST;
+    }
+    else if (param.get<jsonxx::String>("type") == "tie") {
+        insertType = CURSOR_INSERT_TIE;
+    }
+    else if (param.get<jsonxx::String>("type") == "copy") {
+        insertType = CURSOR_INSERT_COPY;
+    }
+    else {
+        return false;
+    }
+    return true;
+}
+
+bool EditorToolkitCMN::ParseInsertCursorContainerAction(const jsonxx::Object &param, CursorContainer &container)
+{
+    container = CursorContainer::CURSOR_CONTAINER_NONE;
+
+    if (!param.has<jsonxx::String>("container")) return false;
+
+    if (param.get<jsonxx::String>("container") == "tuplet") {
+        container = CURSOR_CONTAINER_TUPLET;
+    }
+    else if (param.get<jsonxx::String>("container") == "graceGrp") {
+        container = CURSOR_CONTAINER_GRACEGRP;
+    }
+    else {
+        return false;
+    }
+    return true;
+}
+
+bool EditorToolkitCMN::ParseInsertMeasureAction(
+    const jsonxx::Object &param, std::string &elementId, int &number, bool &insertBefore)
+{
+    number = 0;
+    elementId = "";
+    insertBefore = false;
+
+    if (param.has<jsonxx::String>("elementId")) elementId = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::Number>("number")) return false;
+    number = param.get<jsonxx::Number>("number");
+    if (param.has<jsonxx::Boolean>("insertBefore")) insertBefore = param.get<jsonxx::Boolean>("insertBefore");
+
+    return true;
+}
+
+bool EditorToolkitCMN::ParseInsertNoteAction(const jsonxx::Object &param, std::string &elementId, data_PITCHNAME &pname,
+    int &oct, data_ACCIDENTAL_WRITTEN &accid, data_ACCIDENTAL_GESTURAL &accidGes, data_DURATION &dur, int &dots,
+    bool &chordMode)
+{
+    chordMode = false;
+    pname = PITCHNAME_NONE;
+    oct = VRV_UNSET;
+    accid = ACCIDENTAL_WRITTEN_NONE;
+    accidGes = ACCIDENTAL_GESTURAL_NONE;
+    dur = DURATION_NONE;
+    dots = VRV_UNSET;
+    Note noteConverter;
+    Accid accidConverter;
+
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    elementId = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::String>("pname")) return false;
+    pname = noteConverter.AttPitch::StrToPitchname(param.get<jsonxx::String>("pname"));
+    if (!param.has<jsonxx::Number>("oct")) return false;
+    oct = param.get<jsonxx::Number>("oct");
+
+    if (param.has<jsonxx::String>("accid"))
+        accid = accidConverter.AttAccidental::StrToAccidentalWritten(param.get<jsonxx::String>("accid"));
+    if (param.has<jsonxx::String>("accidGes"))
+        accidGes = accidConverter.AttAccidentalGes::StrToAccidentalGestural(param.get<jsonxx::String>("accidGes"));
+
+    // At least one of the two
+    if (!param.has<jsonxx::String>("dur") && !param.has<jsonxx::Boolean>("chordMode")) return false;
+
+    if (param.has<jsonxx::String>("dur")) dur = noteConverter.AttPitch::StrToDuration(param.get<jsonxx::String>("dur"));
+
+    if (param.has<jsonxx::Number>("dots")) dots = param.get<jsonxx::Number>("dots");
+
+    if (param.has<jsonxx::Boolean>("chordMode")) chordMode = param.get<jsonxx::Boolean>("chordMode");
+
+    return true;
+}
+
+bool EditorToolkitCMN::ParseInsertRestAction(
+    const jsonxx::Object &param, std::string &elementId, data_DURATION &dur, int &dots)
+{
+    dur = DURATION_NONE;
+    dots = VRV_UNSET;
+    Note noteConverter;
+
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    elementId = param.get<jsonxx::String>("elementId");
+
+    if (!param.has<jsonxx::String>("dur")) return false;
+    dur = noteConverter.AttPitch::StrToDuration(param.get<jsonxx::String>("dur"));
+
+    if (param.has<jsonxx::Number>("dots")) dots = param.get<jsonxx::Number>("dots");
+
+    return true;
+}
+
+bool EditorToolkitCMN::ParseResetCursorContainerAction(const jsonxx::Object &param, CursorContainer &container)
+{
+    container = CursorContainer::CURSOR_CONTAINER_NONE;
+
+    if (!param.has<jsonxx::String>("container")) return false;
+
+    if (param.get<jsonxx::String>("container") == "tuplet") {
+        container = CURSOR_CONTAINER_TUPLET;
+    }
+    else if (param.get<jsonxx::String>("container") == "graceGrp") {
+        container = CURSOR_CONTAINER_GRACEGRP;
+    }
+    else {
+        return false;
+    }
+    return true;
+}
+
+bool EditorToolkitCMN::InsertCursorByDur(data_DURATION dur, int dots)
+{
+    if (!this->InsertMode()) return false;
+
+    if (m_cursor->GetInputMode() != Cursor::InputMode::PITCH_FIRST) return false;
+
+    data_PITCHNAME pname = (m_cursor->HasPname()) ? m_cursor->GetPname() : PITCHNAME_c;
+    int oct = (m_cursor->HasOct()) ? m_cursor->GetOct() : 3;
+    auto [accid, accidGes] = m_cursor->GetAccidValue();
+
+    if (dots == VRV_UNSET && m_cursor->HasDots()) dots = m_cursor->GetDots();
+
+    std::string id = m_cursor->GetID();
+
+    if (m_cursor->IsTieMode()) {
+        return this->CopyCursorPosition(dur, dots, (m_cursor->GetTieMode() == Cursor::TieMode::TIE));
+    }
+    else if (m_cursor->IsRestMode()) {
+        return this->InsertRest(id, dur, dots);
+    }
+    else {
+        return this->InsertNote(id, pname, oct, accid, accidGes, dur, dots, m_cursor->IsChordMode());
+    }
+}
+
+bool EditorToolkitCMN::InsertCursorByPitch(data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid, int midi)
+{
+    if (!this->InsertMode()) return false;
+
+    if (m_cursor->GetInputMode() != Cursor::InputMode::DURATION_FIRST) return false;
+
+    if (midi != VRV_UNSET) {
+        std::string placeholder = m_cursor->GetID();
+        this->UpdatePitch(placeholder, PITCHNAME_NONE, VRV_UNSET, ACCIDENTAL_WRITTEN_NONE, midi);
+        pname = m_cursor->GetPname();
+        oct = VRV_UNSET;
+        accid = ACCIDENTAL_WRITTEN_NONE;
     }
 
-    // Undo and redo - also without parameter
-    if ((action == "undo") || (action == "redo")) {
-        this->ClearContext();
-        if (action == "undo") {
-            this->Undo();
+    if (oct == VRV_UNSET) oct = m_cursor->GetOct();
+
+    // Since we did not know the pitch yet we need to calculate that actual accid
+    if (pname != PITCHNAME_NONE) m_cursor->SetPname(pname);
+
+    data_ACCIDENTAL_GESTURAL accidGes = ACCIDENTAL_GESTURAL_NONE;
+    auto [actualAccid, isImplicit]
+        = this->GetActualAccid(m_cursor, (accid == ACCIDENTAL_WRITTEN_NONE) ? m_cursor->GetAccid() : accid);
+    m_cursor->SetAccid(actualAccid);
+    m_cursor->SetAccidImplicit(isImplicit);
+    const auto value = m_cursor->GetAccidValue();
+    accid = value.first;
+    accidGes = value.second;
+
+    data_DURATION dur = (m_cursor->HasDur()) ? m_cursor->GetDur() : DURATION_4;
+    int dots = (m_cursor->HasDots()) ? m_cursor->GetDots() : VRV_UNSET;
+
+    std::string id = m_cursor->GetID();
+
+    return this->InsertNote(id, pname, oct, accid, accidGes, dur, dots, m_cursor->IsChordMode());
+}
+
+bool EditorToolkitCMN::InsertCursorByType(CursorInsertType insertType)
+{
+    if (!this->InsertMode()) return false;
+
+    if (m_cursor->GetInputMode() != Cursor::InputMode::DURATION_FIRST) return false;
+
+    data_DURATION dur = (m_cursor->HasDur()) ? m_cursor->GetDur() : DURATION_4;
+    int dots = (m_cursor->HasDots()) ? m_cursor->GetDots() : VRV_UNSET;
+
+    std::string id = m_cursor->GetID();
+
+    m_cursor->SetChordMode(Cursor::ChordMode::CHORD_NONE);
+
+    if (insertType == CURSOR_INSERT_REST) {
+        return this->InsertRest(id, dur, dots);
+    }
+    else {
+        return (this->CopyCursorPosition(m_cursor->GetDur(), m_cursor->GetDots(), (insertType == CURSOR_INSERT_TIE)));
+    }
+}
+
+bool EditorToolkitCMN::InsertCursorContainer(CursorContainer container)
+{
+    return true;
+}
+
+bool EditorToolkitCMN::InsertMeasure(std::string &elementId, int number, bool insertBefore)
+{
+    bool endInsert = (elementId.empty());
+    Measure *measure = NULL;
+
+    int measureN = VRV_UNSET;
+    if (endInsert) {
+        measure = vrv_cast<Measure *>(m_doc->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
+    }
+    else {
+        measure = vrv_cast<Measure *>(this->ResolveElement(elementId, false));
+    }
+
+    if (!measure) return false;
+
+    if (endInsert && IsValidInteger(measure->GetN())) measureN = std::stoi(measure->GetN());
+
+    InitProcessingListsFunctor initProcessingLists;
+    measure->Process(initProcessingLists);
+    const IntTree &layerTree = initProcessingLists.GetLayerTree();
+
+    for (int i = 0; i < number; i++) {
+        Measure *newMeasure = new Measure();
+        if (endInsert && (i == 0) && measure->HasRight()) {
+            newMeasure->SetRight(measure->GetRight());
+            measure->SetRight(BARRENDITION_NONE);
+        }
+        if (measureN != VRV_UNSET) {
+            newMeasure->SetN(StringFormat("%d", measureN + number - i));
+        }
+
+        // Now we can process by layer and move their content to (measure) segments
+        for (const auto &staves : layerTree.child) {
+            Staff *staff = new Staff(staves.first);
+            newMeasure->AddChildBack(staff);
+            for (const auto &layers : staves.second.child) {
+                Layer *layer = new Layer();
+                layer->SetN(layers.first);
+                staff->AddChild(layer);
+            }
+        }
+        if (insertBefore) {
+            measure->GetParent()->InsertBefore(measure, newMeasure);
         }
         else {
-            this->Redo();
+            measure->GetParent()->InsertAfter(measure, newMeasure);
         }
-        m_doc->PrepareData();
-        m_doc->ScoreDefSetCurrentDoc(true);
-        m_undoPrepared = false;
-        m_editInfo.reset();
-        m_editInfo.import("chainedId", m_chainedId);
-        m_editInfo.import("canUndo", this->CanUndo());
-        m_editInfo.import("canRedo", this->CanRedo());
-        return true;
+        m_chainedId = newMeasure->GetID();
     }
 
-    if (commitOnly) {
-        // Only process commit actions
-        return false;
+    this->ClearContext();
+
+    return true;
+}
+
+bool EditorToolkitCMN::InsertNote(const std::string &elementId, data_PITCHNAME pname, int oct,
+    data_ACCIDENTAL_WRITTEN accid, data_ACCIDENTAL_GESTURAL accidGes, data_DURATION dur, int dots, bool chordMode)
+{
+    if (chordMode && (!this->InsertMode() || m_cursor->GetChordMode() != Cursor::ChordMode::NEW)) {
+        return this->InsertNoteInChordMode(elementId, pname, oct, accid, accidGes);
     }
 
-    if (!json.has<jsonxx::Object>("param") && !json.has<jsonxx::Array>("param")) {
-        LogWarning("Incorrectly formatted JSON param.");
-    }
-
-    if (action == "chain") {
-        if (!json.has<jsonxx::Array>("param")) {
-            LogError("Incorrectly formatted JSON action");
-            return false;
-        }
-        return this->Chain(json.get<jsonxx::Array>("param"));
-    }
-    else if (action == "context") {
-        std::string elementId;
-        bool scores;
-        bool sections;
-        if (this->ParseContextAction(json.get<jsonxx::Object>("param"), elementId, scores, sections)) {
-            if (scores) {
-                return this->ContextForScores(true);
-            }
-            else if (sections) {
-                return this->ContextForSections(true);
-            }
-            else {
-                return this->ContextForElement(elementId);
-            }
-        }
-        LogWarning("Could not parse the context action");
-    }
-    else if (action == "delete") {
-        std::string elementId;
-        if (this->ParseDeleteAction(json.get<jsonxx::Object>("param"), elementId)) {
-            this->PrepareUndo();
-            return (this->Delete(elementId));
-        }
-        LogWarning("Could not parse the delete action");
-    }
-    else if (action == "drag") {
-        std::string elementId;
-        int x, y;
-        if (this->ParseDragAction(json.get<jsonxx::Object>("param"), elementId, x, y)) {
-            this->PrepareUndo();
-            return (this->Drag(elementId, x, y));
-        }
-        LogWarning("Could not parse the drag action");
-    }
-    else if (action == "keyDown") {
-        std::string elementId;
-        int key;
-        bool shiftKey, ctrlKey;
-        if (this->ParseKeyDownAction(json.get<jsonxx::Object>("param"), elementId, key, shiftKey, ctrlKey)) {
-            this->PrepareUndo();
-            return (this->KeyDown(elementId, key, shiftKey, ctrlKey));
-        }
-        LogWarning("Could not parse the keyDown action");
-    }
-    else if (action == "insert") {
-        std::string elementType, startid, endid;
-        if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), elementType, startid, endid)) {
-            this->PrepareUndo();
-            if (endid == "") {
-                return (this->Insert(elementType, startid));
-            }
-            else {
-                return (this->Insert(elementType, startid, endid));
-            }
-        }
-        LogWarning("Could not parse the insert action");
-    }
-    else if (action == "set") {
-        std::string elementId, attribute, value;
-        if (this->ParseSetAction(json.get<jsonxx::Object>("param"), elementId, attribute, value)) {
-            this->PrepareUndo();
-            return (this->Set(elementId, attribute, value));
-        }
-        LogWarning("Could not parse the set action");
+    Object *target = NULL;
+    if (this->InsertMode()) {
+        target = (m_cursor->HasPosition()) ? m_cursor->GetPosition() : m_cursor->GetParent();
     }
     else {
-        LogWarning("Unknown action type '%s'.", action.c_str());
+        target = this->GetElement(elementId);
     }
-    return false;
-#else /* NO_EDIT_SUPPORT */
-    LogError("Editor functions are not supported in this build.");
-    return false;
-#endif /* NO_EDIT_SUPPORT */
-}
+    if (!target || !target->IsAnyOf(std::array{ CHORD, LAYER, NOTE, REST })) return false;
 
-#ifndef NO_EDIT_SUPPORT
-bool EditorToolkitCMN::ParseContextAction(jsonxx::Object param, std::string &elementId, bool &scores, bool &sections)
-{
-    scores = false;
-    sections = false;
-    if (param.has<jsonxx::String>("elementId")) {
-        elementId = param.get<jsonxx::String>("elementId");
-        return true;
+    if (target->Is(NOTE)) {
+        Note *note = vrv_cast<Note *>(target);
+        if (note->IsChordTone()) target = note->IsChordTone();
     }
-    else if (param.has<jsonxx::String>("document")) {
-        scores = (param.get<jsonxx::String>("document") == "scores");
-        sections = !scores;
-        return true;
+
+    auto [targetContainer, previousElement] = this->GetTargetContainerFor(target);
+    if (!targetContainer) return false;
+
+    Note *note = vrv_cast<Note *>(this->PrepareInsertion(targetContainer, "note"));
+    if (!note) return false;
+
+    this->SetNoteAttributes(note, pname, oct, accid, accidGes);
+
+    note->SetDur(dur);
+    if (dots != VRV_UNSET) {
+        note->SetDots(dots);
     }
-    return false;
-}
 
-bool EditorToolkitCMN::ParseDeleteAction(jsonxx::Object param, std::string &elementId)
-{
-    if (!param.has<jsonxx::String>("elementId")) return false;
-    elementId = param.get<jsonxx::String>("elementId");
-    return true;
-}
-
-bool EditorToolkitCMN::ParseDragAction(jsonxx::Object param, std::string &elementId, int &x, int &y)
-{
-    if (!param.has<jsonxx::String>("elementId")) return false;
-    elementId = param.get<jsonxx::String>("elementId");
-    if (!param.has<jsonxx::Number>("x")) return false;
-    x = param.get<jsonxx::Number>("x");
-    if (!param.has<jsonxx::Number>("y")) return false;
-    y = param.get<jsonxx::Number>("y");
-    return true;
-}
-
-bool EditorToolkitCMN::ParseInsertAction(
-    jsonxx::Object param, std::string &elementType, std::string &startid, std::string &endid)
-{
-    // assign optional member
-    endid = "";
-
-    if (!param.has<jsonxx::String>("elementType")) return false;
-    elementType = param.get<jsonxx::String>("elementType");
-    if (!param.has<jsonxx::String>("startid")) return false;
-    startid = param.get<jsonxx::String>("startid");
-    // optional
-    if (param.has<jsonxx::String>("endid")) {
-        endid = param.get<jsonxx::String>("endid");
+    if (previousElement) {
+        targetContainer->InsertAfter(previousElement, note);
     }
-    return true;
-}
-
-bool EditorToolkitCMN::ParseKeyDownAction(
-    jsonxx::Object param, std::string &elementId, int &key, bool &shiftKey, bool &ctrlKey)
-{
-    // assign optional member
-    shiftKey = false;
-    ctrlKey = false;
-
-    if (!param.has<jsonxx::String>("elementId")) return false;
-    elementId = param.get<jsonxx::String>("elementId");
-    if (!param.has<jsonxx::Number>("key")) return false;
-    key = param.get<jsonxx::Number>("key");
-    // optional
-    if (param.has<jsonxx::Boolean>("shiftKey")) {
-        shiftKey = param.get<jsonxx::Boolean>("shiftKey");
+    else {
+        targetContainer->InsertChild(note, 0);
     }
-    if (param.has<jsonxx::Boolean>("ctrlKey")) {
-        ctrlKey = param.get<jsonxx::Boolean>("ctrlKey");
+
+    if (note->IsInBeam()) {
+        note->SetDur(std::max(DURATION_8, dur));
     }
-    return true;
-}
-
-bool EditorToolkitCMN::ParseSetAction(
-    jsonxx::Object param, std::string &elementId, std::string &attribute, std::string &value)
-{
-    if (!param.has<jsonxx::String>("elementId")) return false;
-    elementId = param.get<jsonxx::String>("elementId");
-    if (!param.has<jsonxx::String>("attribute")) return false;
-    attribute = param.get<jsonxx::String>("attribute");
-    if (!param.has<jsonxx::String>("value")) return false;
-    value = param.get<jsonxx::String>("value");
-    return true;
-}
-
-void EditorToolkitCMN::PrepareUndo()
-{
-    // We already have a prepared undo - nothing to prepare
-    if (m_undoPrepared) return;
-
-    std::string state = this->GetCurrentState();
-    m_undoStack.push_back(state);
-    m_undoMemoryUsage += state.size();
-    // When new edit happens, redo stack is cleared
-    while (!m_redoStack.empty()) {
-        m_undoMemoryUsage -= m_redoStack.back().size();
-        m_redoStack.pop_back();
+    else if (this->InsertMode() && (note->GetDur() > DURATION_4)) {
+        this->AutoBeam(note);
     }
-    TrimUndoMemory();
-    // Set the flag
-    m_undoPrepared = true;
-}
 
-std::string EditorToolkitCMN::GetCurrentState()
-{
-    MEIOutput meioutput(m_doc);
-    meioutput.SetSerializing(true);
-    meioutput.SetBasic(false);
-    meioutput.SetScoreBasedMEI(false);
-    return meioutput.Export();
-}
+    this->ClearContext();
+    this->SetEditStatus();
 
-bool EditorToolkitCMN::ReloadState(const std::string &data)
-{
-    MEIInput meiinput(m_doc);
-    meiinput.SetDeserializing(true);
-    return meiinput.Import(data);
-}
-
-bool EditorToolkitCMN::CanUndo() const
-{
-    return (!m_undoStack.empty());
-}
-
-bool EditorToolkitCMN::CanRedo() const
-{
-    return (!m_redoStack.empty());
-}
-
-bool EditorToolkitCMN::Undo()
-{
-    if (!CanUndo()) return false;
-
-    std::string currentState = this->GetCurrentState();
-    m_redoStack.push_back(currentState);
-
-    // Pop the previous state from undo stack
-    std::string previous = m_undoStack.back();
-    m_undoStack.pop_back();
-
-    return ReloadState(previous);
-}
-
-bool EditorToolkitCMN::Redo()
-{
-    if (!CanRedo()) return false;
-
-    std::string currentState = this->GetCurrentState();
-    m_undoStack.push_back(currentState);
-
-    // Pop redo state and load it
-    std::string redoState = m_redoStack.back();
-    m_redoStack.pop_back();
-
-    return ReloadState(redoState);
-}
-
-void EditorToolkitCMN::TrimUndoMemory()
-{
-    // Drop the oldest undo entries if we exceed the limit
-    while ((m_undoMemoryUsage > UNDO_MEMORY_LIMIT) && !m_undoStack.empty()) {
-        m_undoMemoryUsage -= m_undoStack.front().size();
-        m_undoStack.pop_front();
-    }
-    LogInfo("Undo stack size: %dMB", m_undoMemoryUsage / 1024 / 1024);
-}
-
-bool EditorToolkitCMN::Chain(jsonxx::Array actions)
-{
-    bool status = true;
-    m_chainedId = "";
-    for (int i = 0; i < (int)actions.size(); ++i) {
-        status = this->ParseEditorAction(actions.get<jsonxx::Object>(i).json(), !status);
-    }
-    return status;
-}
-
-bool EditorToolkitCMN::Delete(std::string &elementId)
-{
-    Object *element = this->GetChainedElement(elementId);
-    if (!element) return false;
-    if (element->Is(NOTE)) {
-        return this->DeleteNote(vrv_cast<Note *>(element));
-    }
-    return false;
-}
-
-bool EditorToolkitCMN::Drag(std::string &elementId, int x, int y)
-{
-    Object *element = this->GetChainedElement(elementId);
-    if (!element) return false;
-
-    // For elements whose y-position corresponds to a certain pitch
-    if (element->HasInterface(INTERFACE_PITCH)) {
-        Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
-        if (!layer) return false;
-        int oct;
-        data_PITCHNAME pname
-            = (data_PITCHNAME)m_view->CalculatePitchCode(layer, m_view->ToLogicalY(y), element->GetDrawingX(), &oct);
-        element->GetPitchInterface()->SetPname(pname);
-        element->GetPitchInterface()->SetOct(oct);
-
-        return true;
-    }
-    return false;
-}
-
-bool EditorToolkitCMN::KeyDown(std::string &elementId, int key, bool shiftKey, bool ctrlKey)
-{
-    Object *element = this->GetChainedElement(elementId);
-    if (!element) return false;
-
-    // For elements whose y-position corresponds to a certain pitch
-    if (element->HasInterface(INTERFACE_PITCH)) {
-        PitchInterface *interface = element->GetPitchInterface();
-        assert(interface);
-        int step;
-        switch (key) {
-            case KEY_UP: step = 1; break;
-            case KEY_DOWN: step = -1; break;
-            default: step = 0;
+    if (this->InsertMode()) {
+        this->MoveCursor(note);
+        if (chordMode) {
+            m_cursor->AdjustPitchByOffset(4);
+            std::string placeholder = m_cursor->GetID();
+            this->UpdatePitch(
+                placeholder, m_cursor->GetPname(), m_cursor->GetOct(), ACCIDENTAL_WRITTEN_NONE, VRV_UNSET);
         }
-        interface->AdjustPitchByOffset(step);
-        return true;
-    }
-    return false;
-}
-
-bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &startid, std::string const &endid)
-{
-    if (!m_doc->GetDrawingPage()) return false;
-
-    Object *start = m_doc->GetDrawingPage()->FindDescendantByID(startid);
-    Object *end = m_doc->GetDrawingPage()->FindDescendantByID(endid);
-    // Check if both start and end elements exist
-    if (!start || !end) {
-        LogInfo("Elements start and end ids '%s' and '%s' could not be found", startid.c_str(), endid.c_str());
-        return false;
-    }
-    // Check if it is a LayerElement
-    if (!dynamic_cast<LayerElement *>(start)) {
-        LogInfo("Element '%s' is not supported as start element", start->GetClassName().c_str());
-        return false;
-    }
-    if (!dynamic_cast<LayerElement *>(end)) {
-        LogInfo("Element '%s' is not supported as end element", start->GetClassName().c_str());
-        return false;
-    }
-
-    Measure *measure = vrv_cast<Measure *>(start->GetFirstAncestor(MEASURE));
-    assert(measure);
-
-    ControlElement *element = NULL;
-    if (elementType == "slur") {
-        element = new Slur();
-    }
-    else if (elementType == "tie") {
-        element = new Tie();
-    }
-    else if (elementType == "hairpin") {
-        element = new Hairpin();
-    }
-    else {
-        LogInfo("Inserting control event '%s' is not supported", elementType.c_str());
-        return false;
-    }
-
-    assert(element);
-    TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
-    assert(interface);
-    measure->AddChild(element);
-    interface->SetStartid("#" + startid);
-    interface->SetEndid("#" + endid);
-
-    m_chainedId = element->GetID();
-
-    return true;
-}
-
-bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &startid)
-{
-    if (!m_doc->GetDrawingPage()) return false;
-
-    Object *start = m_doc->GetDrawingPage()->FindDescendantByID(startid);
-    // Check if both start and end elements exist
-    if (!start) {
-        LogInfo("Element start id '%s' could not be found", startid.c_str());
-        return false;
-    }
-    if (elementType == "note") {
-        return this->InsertNote(start);
-    }
-    // Check if it is a LayerElement
-    if (!dynamic_cast<LayerElement *>(start)) {
-        LogInfo("Element '%s' is not supported as start element", start->GetClassName().c_str());
-        return false;
-    }
-
-    Measure *measure = vrv_cast<Measure *>(start->GetFirstAncestor(MEASURE));
-    assert(measure);
-
-    ControlElement *element = NULL;
-    if (elementType == "dir") {
-        element = new Dir();
-    }
-    else if (elementType == "dynam") {
-        element = new Dynam();
-    }
-    else {
-        LogInfo("Inserting control event '%s' is not supported", elementType.c_str());
-        return false;
-    }
-
-    assert(element);
-    TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
-    assert(interface);
-    measure->AddChild(element);
-    interface->SetStartid("#" + startid);
-
-    m_chainedId = element->GetID();
-
-    return true;
-}
-
-bool EditorToolkitCMN::Set(std::string &elementId, std::string const &attribute, std::string const &value)
-{
-    Object *element = this->GetChainedElement(elementId);
-    if (!element) return false;
-
-    bool success = false;
-    if (element->Is(TEXT) && (attribute == "text")) {
-        Text *text = vrv_cast<Text *>(element);
-        assert(text);
-        text->SetText(UTF8to32(value));
-        success = true;
-    }
-    else if (AttModule::SetAnalytical(element, attribute, value)) {
-        success = true;
-    }
-    else if (AttModule::SetCmn(element, attribute, value)) {
-        success = true;
-    }
-    else if (AttModule::SetCmnornaments(element, attribute, value)) {
-        success = true;
-    }
-    else if (AttModule::SetCritapp(element, attribute, value)) {
-        success = true;
-    }
-    else if (AttModule::SetEdittrans(element, attribute, value)) {
-        success = true;
-    }
-    else if (AttModule::SetExternalsymbols(element, attribute, value)) {
-        success = true;
-    }
-    else if (AttModule::SetFacsimile(element, attribute, value)) {
-        success = true;
-    }
-    else if (AttModule::SetFigtable(element, attribute, value)) {
-        success = true;
-    }
-    else if (AttModule::SetFingering(element, attribute, value)) {
-        success = true;
-    }
-    else if (AttModule::SetGestural(element, attribute, value)) {
-        success = true;
-    }
-    else if (AttModule::SetHarmony(element, attribute, value)) {
-        success = true;
-    }
-    else if (AttModule::SetHeader(element, attribute, value)) {
-        success = true;
-    }
-    else if (AttModule::SetMei(element, attribute, value)) {
-        success = true;
-    }
-    else if (AttModule::SetMensural(element, attribute, value)) {
-        success = true;
-    }
-    else if (AttModule::SetMidi(element, attribute, value)) {
-        success = true;
-    }
-    else if (AttModule::SetNeumes(element, attribute, value)) {
-        success = true;
-    }
-    else if (AttModule::SetPagebased(element, attribute, value)) {
-        success = true;
-    }
-    else if (AttModule::SetPerformance(element, attribute, value)) {
-        success = true;
-    }
-    else if (AttModule::SetShared(element, attribute, value)) {
-        success = true;
-    }
-    else if (AttModule::SetStringtab(element, attribute, value)) {
-        success = true;
-    }
-    else if (AttModule::SetUsersymbols(element, attribute, value)) {
-        success = true;
-    }
-    else if (AttModule::SetVisual(element, attribute, value)) {
-        success = true;
-    }
-
-    return success;
-}
-
-Object *EditorToolkitCMN::GetChainedElement(std::string &elementId)
-{
-    if (elementId == CHAINED_ID) {
-        elementId = m_chainedId;
-    }
-    else {
-        m_chainedId = elementId;
-    }
-
-    return this->GetElement(elementId);
-}
-
-bool EditorToolkitCMN::InsertNote(Object *object)
-{
-    assert(object);
-
-    if (!object->Is({ CHORD, NOTE, REST })) {
-        LogInfo("Inserting a note is possible only in a chord, note or rest");
-        return false;
-    }
-
-    if (object->Is(CHORD)) {
-        Chord *currentChord = vrv_cast<Chord *>(object);
-        assert(currentChord);
-        Note *note = new Note();
-        currentChord->AddChild(note);
-        m_chainedId = note->GetID();
-        return true;
-    }
-    else if (object->Is(NOTE)) {
-        Note *currentNote = vrv_cast<Note *>(object);
-        assert(currentNote);
-
-        Chord *currentChord = currentNote->IsChordTone();
-        if (currentChord) {
-            Note *note = new Note();
-            currentChord->AddChild(note);
-            m_chainedId = note->GetID();
-            return true;
+        if (m_cursor->GetInputMode() == Cursor::InputMode::DURATION_FIRST) {
+            m_cursor->SetAccid(ACCIDENTAL_WRITTEN_NONE);
+            m_cursor->SetAccidImplicit(false);
         }
+    }
 
-        if (currentNote->HasEditorialContent()) {
-            LogInfo("Inserting a note where a note has editorial content is not "
-                    "possible");
+    return true;
+}
+
+bool EditorToolkitCMN::ResetCursorContainer(CursorContainer container)
+{
+    return true;
+}
+
+std::pair<Object *, Object *> EditorToolkitCMN::GetTargetContainerFor(Object *target)
+{
+    Object *previousElement = NULL;
+    Object *targetContainer = NULL;
+    if (!target->Is(LAYER)) {
+        Object *targetParent = target->GetParent();
+        // Inserting a note within a tuplet or a beam
+        if (targetParent && targetParent->IsAnyOf(std::array{ BEAM, TUPLET }) && targetParent->GetLast() != target) {
+            previousElement = target;
+            targetContainer = targetParent;
+        }
+        // Otherwise always insert in the layer
+        else {
+            previousElement = target->GetLastAncestorNot(LAYER);
+            if (!previousElement) return { NULL, NULL };
+            targetContainer = previousElement->GetParent();
+            assert(targetContainer && targetContainer->Is(LAYER));
+        }
+    }
+    else {
+        targetContainer = target;
+    }
+    return { targetContainer, previousElement };
+}
+
+bool EditorToolkitCMN::InsertNoteInChordMode(const std::string &elementId, data_PITCHNAME pname, int oct,
+    data_ACCIDENTAL_WRITTEN accid, data_ACCIDENTAL_GESTURAL accidGes)
+{
+    Object *target = NULL;
+    if (this->InsertMode()) {
+        target = (m_cursor->HasPosition()) ? m_cursor->GetPosition() : m_cursor->GetParent();
+    }
+    else {
+        target = this->GetElement(elementId);
+    }
+    if (!target) return false;
+
+    Chord *chord = NULL;
+    Note *targetNote = NULL;
+
+    if (target->Is(CHORD)) {
+        chord = vrv_cast<Chord *>(target);
+    }
+    else if (target->Is(NOTE)) {
+        targetNote = vrv_cast<Note *>(target);
+        assert(targetNote);
+        chord = targetNote->IsChordTone();
+    }
+
+    if (!chord && !targetNote) return false;
+
+    if (!chord) {
+        if (targetNote->HasEditorialContent()) {
+            LogInfo("Inserting a note where a note has editorial content is not possible");
             return false;
         }
 
         ListOfObjects lyric;
         ClassIdsComparison lyricsComparison({ VERSE, SYL });
-        currentNote->FindAllDescendantsByComparison(&lyric, &lyricsComparison);
+        targetNote->FindAllDescendantsByComparison(&lyric, &lyricsComparison);
         if (!lyric.empty()) {
             LogInfo("Inserting a note where a note has lyric content is not possible");
             return false;
         }
-        Chord *chord = new Chord();
-        chord->DurationInterface::operator=(*currentNote);
-        chord->AttCue::operator=(*currentNote);
-        chord->AttGraced::operator=(*currentNote);
-        chord->AttStems::operator=(*currentNote);
-        chord->AttStemsCmn::operator=(*currentNote);
-        currentNote->DurationInterface::Reset();
-        currentNote->ResetCue();
-        currentNote->ResetGraced();
-        currentNote->ResetStems();
-        currentNote->ResetStemsCmn();
-        Object *parent = currentNote->GetParent();
+        chord = new Chord();
+        chord->DurationInterface::operator=(*targetNote);
+        chord->AttCue::operator=(*targetNote);
+        chord->AttGraced::operator=(*targetNote);
+        chord->AttStems::operator=(*targetNote);
+        chord->AttStemsCmn::operator=(*targetNote);
+        targetNote->DurationInterface::Reset();
+        targetNote->ResetCue();
+        targetNote->ResetGraced();
+        targetNote->ResetStems();
+        targetNote->ResetStemsCmn();
+        Object *parent = targetNote->GetParent();
         assert(parent);
-        parent->ReplaceChild(currentNote, chord);
-        chord->AddChild(currentNote);
+        parent->ReplaceChild(targetNote, chord);
+        chord->AddChild(targetNote);
 
-        Note *note = new Note();
-        chord->AddChild(note);
-
-        ListOfObjects artics = currentNote->FindAllDescendantsByType(ARTIC);
+        ListOfObjects artics = targetNote->FindAllDescendantsByType(ARTIC);
         for (Object *artic : artics) {
             artic->MoveItselfTo(chord);
         }
-        currentNote->ClearRelinquishedChildren();
+        targetNote->ClearRelinquishedChildren();
 
-        m_chainedId = note->GetID();
-        return true;
+        if (this->InsertMode()) m_cursor->SetPosition(chord);
     }
-    else if (object->Is(REST)) {
-        Rest *rest = vrv_cast<Rest *>(object);
-        assert(rest);
-        Note *note = new Note();
-        note->DurationInterface::operator=(*rest);
-        Object *parent = rest->GetParent();
-        assert(parent);
-        parent->ReplaceChild(rest, note);
-        delete rest;
-        m_chainedId = note->GetID();
-        return true;
+
+    Note *note = vrv_cast<Note *>(this->PrepareInsertion(chord, "note"));
+    if (!note) return NULL;
+
+    this->SetNoteAttributes(note, pname, oct, accid, accidGes);
+
+    chord->AddChild(note);
+
+    if (this->InsertMode()) {
+        if (m_cursor->GetInputMode() == Cursor::PITCH_FIRST) m_cursor->AdjustPitchByOffset(4);
+        std::string placeholder = m_cursor->GetID();
+        this->UpdatePitch(placeholder, m_cursor->GetPname(), m_cursor->GetOct(), ACCIDENTAL_WRITTEN_NONE, VRV_UNSET);
     }
-    return false;
+
+    this->ClearContext();
+    this->SetEditStatus();
+
+    return true;
 }
 
-bool EditorToolkitCMN::DeleteNote(Note *note)
+void EditorToolkitCMN::SetNoteAttributes(
+    Note *note, data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid, data_ACCIDENTAL_GESTURAL accidGes)
 {
     assert(note);
 
-    Chord *chord = note->IsChordTone();
-    Beam *beam = note->GetAncestorBeam();
-    if (chord) {
-        if (chord->HasEditorialContent()) {
-            LogInfo("Deleting a note in a chord that has editorial content is not "
-                    "possible");
-            return false;
-        }
-        int count = chord->GetChildCount(NOTE, UNLIMITED_DEPTH);
-        if (count == 2) {
-            Note *otherNote = chord->GetTopNote();
-            if (note == otherNote) {
-                otherNote = chord->GetBottomNote();
-            }
-            assert(otherNote && (otherNote != note));
-            otherNote->DurationInterface::operator=(*chord);
-            otherNote->AttCue::operator=(*chord);
-            otherNote->AttGraced::operator=(*chord);
-            otherNote->AttStems::operator=(*chord);
-            otherNote->AttStemsCmn::operator=(*chord);
-            Object *parent = chord->GetParent();
-            assert(parent);
-            chord->DetachChild(otherNote->GetIdx());
-            parent->ReplaceChild(chord, otherNote);
+    note->SetPname(pname);
+    note->SetOct(oct);
 
-            ListOfObjects artics = chord->FindAllDescendantsByType(ARTIC, false, 1);
-            for (Object *artic : artics) {
-                artic->MoveItselfTo(otherNote);
-            }
-            m_chainedId = chord->GetID();
-            delete chord;
-            return true;
-        }
-        else if (count > 2) {
-            chord->DeleteChild(note);
-            m_chainedId = chord->GetID();
-            return true;
-        }
-        // Handle cases of chords with one single note
-        else {
-            Rest *rest = new Rest();
-            rest->DurationInterface::operator=(*chord);
-            Object *parent = chord->GetParent();
-            assert(parent);
-            parent->ReplaceChild(chord, rest);
-            delete chord;
-            return true;
-        }
+    if (accid != ACCIDENTAL_WRITTEN_NONE) {
+        Accid *accidElement = new Accid();
+        accidElement->SetAccid(accid);
+        note->AddChild(accidElement);
     }
-    else if (beam) {
-        // If the beam has exactly 2 notes (take apart and leave a single note and a
-        // rest)
-        if ((int)beam->m_beamSegment.GetElementCoordRefs()->size() == 2) {
-            bool insertBefore = true;
-            LayerElement *otherElement = beam->m_beamSegment.GetElementCoordRefs()->back()->m_element;
-            if (note == otherElement) {
-                insertBefore = false;
-                otherElement = beam->m_beamSegment.GetElementCoordRefs()->front()->m_element;
-            }
-            assert(otherElement && (otherElement != note));
-            Rest *rest = new Rest();
-            rest->DurationInterface::operator=(*note);
-            Object *parent = beam->GetParent();
-            assert(parent);
-            if (insertBefore) {
-                parent->InsertBefore(beam, rest);
-            }
-            else {
-                parent->InsertAfter(beam, rest);
-            }
-            beam->DetachChild(otherElement->GetIdx());
-            parent->ReplaceChild(beam, otherElement);
-            delete beam;
-            m_chainedId = rest->GetID();
-            return true;
-        }
-        // If the beam has more than 2 and this is first
-        else if (beam->IsFirstIn(note)) {
-            Rest *rest = new Rest();
-            rest->DurationInterface::operator=(*note);
-            Object *parent = beam->GetParent();
-            assert(parent);
-            parent->InsertBefore(beam, rest);
-            beam->DeleteChild(note);
-            m_chainedId = rest->GetID();
-        }
-        // If the beam has more than 2 and this is last
-        else if (beam->IsLastIn(note)) {
-            Rest *rest = new Rest();
-            rest->DurationInterface::operator=(*note);
-            Object *parent = beam->GetParent();
-            assert(parent);
-            parent->InsertAfter(beam, rest);
-            beam->DeleteChild(note);
-            m_chainedId = rest->GetID();
-        }
-        // If the beam has more than 2 and this in the middle
-        else {
-            Rest *rest = new Rest();
-            rest->DurationInterface::operator=(*note);
-            beam->ReplaceChild(note, rest);
-            delete note;
-            m_chainedId = rest->GetID();
-        }
-        // All but the first IF statement branches lead here
-        /* Clearing the coords here fixes an error where the children get updated,
-         * but the internal m_beamElementCoordRefs does not.  By clearing it, the
-         * system is forced to update that structure to reflect the current
-         * children. */
-        beam->ClearCoords();
-        return true;
-    }
-    else {
-        // Deal with just a single note (Not in beam or chord)
-        Rest *rest = new Rest();
-        rest->DurationInterface::operator=(*note);
-        Object *parent = note->GetParent();
-        assert(parent);
-        parent->ReplaceChild(note, rest);
-        delete note;
-        m_chainedId = rest->GetID();
-        return true;
+    else if (accidGes != ACCIDENTAL_GESTURAL_NONE) {
+        Accid *accidElement = new Accid();
+        accidElement->SetAccidGes(accidGes);
+        note->AddChild(accidElement);
     }
 }
 
-bool EditorToolkitCMN::ContextForScores(bool editInfo)
+bool EditorToolkitCMN::InsertRest(const std::string &elementId, data_DURATION dur, int dots)
 {
-    if (!m_scoreContext) {
-        m_scoreContext = new EditorTreeObject(m_doc, false);
-        ScoreContextFunctor scoreContextFunctor(m_scoreContext);
-        m_doc->Process(scoreContextFunctor);
+    Object *target = NULL;
+    if (this->InsertMode()) {
+        target = (m_cursor->HasPosition()) ? m_cursor->GetPosition() : m_cursor->GetParent();
     }
-    m_currentContext = m_scoreContext;
+    else {
+        target = this->GetElement(elementId);
+    }
+    if (!target || !target->IsAnyOf(std::array{ CHORD, LAYER, NOTE, REST })) return false;
 
-    if (!editInfo) return true;
+    if (target->Is(NOTE)) {
+        Note *note = vrv_cast<Note *>(target);
+        if (note->IsChordTone()) target = note->IsChordTone();
+    }
 
-    m_editInfo.reset();
+    auto [targetContainer, previousElement] = this->GetTargetContainerFor(target);
+    if (!targetContainer) return false;
 
-    // The target object
-    jsonxx::Object jsonObject;
-    this->ContextForObject(m_scoreContext, jsonObject, true);
+    Rest *rest = vrv_cast<Rest *>(this->PrepareInsertion(targetContainer, "rest"));
+    if (!rest) return false;
 
-    m_editInfo = jsonObject;
+    rest->SetDur(dur);
+
+    if (dots != VRV_UNSET) {
+        rest->SetDots(dots);
+    }
+
+    if (previousElement) {
+        targetContainer->InsertAfter(previousElement, rest);
+    }
+    else {
+        targetContainer->InsertChild(rest, 0);
+    }
+
+    if (rest->IsInBeam()) {
+        rest->SetDur(std::max(DURATION_8, dur));
+    }
+    else if (this->InsertMode() && (rest->GetDur() > DURATION_4)) {
+        this->AutoBeam(rest);
+    }
+
+    this->ClearContext();
+    this->SetEditStatus();
+
+    if (InsertMode()) this->MoveCursor(rest);
 
     return true;
 }
 
-bool EditorToolkitCMN::ContextForSections(bool editInfo)
+void EditorToolkitCMN::AutoBeam(LayerElement *noteOrRest)
 {
-    if (!m_sectionContext) {
-        m_sectionContext = new EditorTreeObject(m_doc, false);
-        SectionContextFunctor sectionContextFunctor(m_sectionContext);
-        m_doc->Process(sectionContextFunctor);
-    }
-    m_currentContext = m_sectionContext;
+    assert(m_cursor);
 
-    if (!editInfo) return true;
+    // Not sure we actually want to autobeam rest - disabled for now
+    // if (!noteOrRest->IsAnyOf(std::array{NOTE, REST})) return;
+    if (!noteOrRest->IsAnyOf(std::array{ CHORD, NOTE })) return;
 
-    m_editInfo.reset();
+    Layer *layer = vrv_cast<Layer *>(noteOrRest->GetFirstAncestor(LAYER));
+    assert(layer);
 
-    // The target object
-    jsonxx::Object jsonObject;
-    this->ContextForObject(m_sectionContext, jsonObject, true);
+    // Auto-beam with chord and notes only - rests could be added
+    static auto classIds = { CHORD, NOTE };
 
-    m_editInfo = jsonObject;
+    LayerElement *result = noteOrRest;
 
-    return true;
-}
+    while (result) {
+        result = layer->GetPreviousInLayer(result);
 
-void EditorToolkitCMN::ClearContext()
-{
-    if (m_sectionContext) {
-        delete m_sectionContext;
-        m_sectionContext = NULL;
-    }
-}
+        if (!result || (noteOrRest->GetAlignment() == result->GetAlignment())) continue;
 
-bool EditorToolkitCMN::ContextForElement(std::string &elementId)
-{
-    m_editInfo.reset();
-
-    // Make sure we have a section tree - this also sets m_currentContext
-    this->ContextForSections(false);
-    assert(m_sectionContext);
-
-    bool hasTargetID = (elementId != "");
-    const Object *object = NULL;
-    if (hasTargetID) {
-        object = this->GetChainedElement(elementId);
-    }
-    // Retrieve the context from the first measure in the document
-    else {
-        object = m_doc->FindDescendantByType(MEASURE);
-    }
-    // We cannot continue without object
-    if (!object || !object->GetParent()) return false;
-
-    ArrayOfConstObjects siblings;
-    ArrayOfConstObjects::iterator targetIt;
-
-    const Object *contextRoot = NULL;
-
-    // If the object parent (context root) is a sytem, this means it must be selected from the MEI section context tree
-    // - and so must its siblings
-    if (object->GetParent()->Is(SYSTEM)) {
-        const Object *editorTreeObject = m_sectionContext->FindDescendantByID(object->GetID());
-        if (!editorTreeObject) {
-            return false;
-        }
-        // If the object is a milestone, the we must look for it in the editor tree
-        if (object->IsMilestoneElement()) object = editorTreeObject;
-        contextRoot = editorTreeObject->GetParent();
-        siblings = this->GetScoreBasedChildrenFor(contextRoot);
-        targetIt = std::find(siblings.begin(), siblings.end(), object);
-        // It is not found in the siblings, something is wrong
-        if (targetIt == siblings.end()) return false;
-    }
-    else {
-        contextRoot = object->GetParent();
-        siblings = object->GetParent()->GetChildren();
-        targetIt = std::find(siblings.begin(), siblings.end(), object);
-        // This should not happen
-        if (targetIt == siblings.end()) return false;
-    }
-    assert(contextRoot);
-
-    ArrayOfConstObjects previousSiblings;
-    if (targetIt != siblings.begin()) std::copy(siblings.begin(), targetIt, std::back_inserter(previousSiblings));
-
-    ArrayOfConstObjects followingSiblings;
-    if (targetIt != siblings.end())
-        std::copy(std::next(targetIt), siblings.end(), std::back_inserter(followingSiblings));
-
-    ArrayOfConstObjects ancestors;
-    // Reserved size for optimizing loop filling
-    ancestors.reserve(10);
-    jsonxx::Array jsonAncestors;
-
-    // Look for ancestors starting from the object parent
-    const Object *current = object;
-    while (current->GetParent()) {
-        if (current->GetParent()->Is(SYSTEM)) {
-            // Switch to the MEI sectionContext tree
-            current = m_sectionContext->FindDescendantByID(current->GetID());
-            if (!current || !current->GetParent()) return false;
-        }
-        // Top element in the score subtree
-        if (current->GetParent()->Is(SCORE)) break;
-        current = current->GetParent();
-        ancestors.push_back(current);
-    }
-    this->ContextForObjects(ancestors, jsonAncestors);
-    m_editInfo << "ancestors" << jsonAncestors;
-
-    jsonxx::Object jsonContextRoot;
-    this->ContextForObject(contextRoot, jsonContextRoot);
-    jsonxx::Array jsonContext;
-
-    // Preceeding siblings
-    jsonxx::Array elements;
-    this->ContextForObjects(previousSiblings, elements);
-    jsonContext << elements;
-
-    // The target object
-    jsonxx::Object jsonObject;
-    this->ContextForObject(object, jsonObject);
-    // Include its children, but only if we specified a target ID
-    if (hasTargetID) {
-        jsonxx::Array jsonObjectChildren;
-        ArrayOfConstObjects objectChildren;
-        if (dynamic_cast<const EditorTreeObject *>(object)) {
-            objectChildren = this->GetScoreBasedChildrenFor(object);
-        }
-        else {
-            objectChildren = object->GetChildren();
-        }
-        this->ContextForObjects(objectChildren, jsonObjectChildren);
-        if (!jsonObjectChildren.empty()) jsonObject << "children" << jsonObjectChildren;
-    }
-    // Add it to the list
-    jsonContext << jsonObject;
-
-    // Following siblings
-    this->ContextForObjects(followingSiblings, elements);
-    jsonContext << elements;
-
-    // Add all children of to context (include target and surrounding siblings)
-    jsonContextRoot << "children" << jsonContext;
-    m_editInfo << "context" << jsonContextRoot;
-
-    // Stop here without targetID, but still add empty objects or arrays to the info
-    if (!hasTargetID) {
-        m_editInfo << "object" << jsonxx::Object();
-        m_editInfo << "referringElements" << jsonxx::Array();
-        m_editInfo << "referencedElements" << jsonxx::Array();
-        return true;
+        if (result->IsAnyOf(classIds)) break;
     }
 
-    // Inlude all attributes
-    ArrayOfStrAttr attributes;
-    object->GetAttributes(&attributes);
-    jsonxx::Object jsonAttributes;
-    for (const auto &attribute : attributes) {
-        jsonAttributes << attribute.first << attribute.second;
-    }
-    jsonObject << "attributes" << jsonAttributes;
-    std::string textStr;
-    if (!dynamic_cast<const EditorTreeObject *>(object) && object->Is(TEXT)) {
-        const Text *text = vrv_cast<const Text *>(object);
-        assert(text);
-        jsonObject << "text" << UTF32to8(text->GetText());
-    }
-    m_editInfo << "object" << jsonObject;
+    if (!result) return;
 
-    // Find referring objects
-    ListOfObjectAttNamePairs referringObjects;
-    FindAllReferringObjectsFunctor findAllReferringObjects(object, &referringObjects);
-    m_doc->Process(findAllReferringObjects);
-    this->ContextForReferences(referringObjects, elements);
-    m_editInfo << "referringElements" << elements;
-
-    // Find referenced objects
-    ListOfObjectAttNamePairs referencedObjects;
-    FindAllReferencedObjectsFunctor findAllReferencedObjects(NULL, &referencedObjects);
-    object->Process(findAllReferencedObjects, 0);
-    this->ContextForReferences(referencedObjects, elements);
-    m_editInfo << "referencedElements" << elements;
-
-    return true;
-}
-
-void EditorToolkitCMN::ContextForObject(const Object *object, jsonxx::Object &element, bool recursive)
-{
-    element << "element" << object->GetClassName();
-    element << "id" << object->GetID();
-    jsonxx::Object attributes;
-    if (object->HasAttClass(ATT_NINTEGER)) {
-        const AttNInteger *att = dynamic_cast<const AttNInteger *>(object);
-        assert(att);
-        attributes << "n" << att->GetN();
-    }
-    if (object->HasAttClass(ATT_NNUMBERLIKE)) {
-        const AttNNumberLike *att = dynamic_cast<const AttNNumberLike *>(object);
-        assert(att);
-        attributes << "n" << att->GetN();
-    }
-    if (!attributes.empty()) {
-        element << "attributes" << attributes;
+    if (result->Is(NOTE)) {
+        Note *previousNote = vrv_cast<Note *>(result);
+        assert(noteOrRest);
+        LayerElement *chord = previousNote->IsChordTone();
+        if (chord) result = chord;
     }
 
-    ArrayOfConstObjects children;
-    // First check that this is an EditorTreeObject
-    if (dynamic_cast<const EditorTreeObject *>(object)) {
-        children = this->GetScoreBasedChildrenFor(object);
+    DurationInterface *interface = result->GetDurationInterface();
+    assert(interface);
+
+    if (interface->GetDur() < DURATION_8) return;
+
+    AlignMeterParams params;
+    params.meterSig = layer->GetCurrentMeterSig();
+    assert(params.meterSig);
+    const int meterCount = (params.meterSig->GetTotalCount() == 0) ? 4 : params.meterSig->GetTotalCount();
+    const int meterUnit = (params.meterSig->GetUnit() == VRV_UNSET) ? meterCount : params.meterSig->GetUnit();
+
+    Fraction position = (m_cursor->GetAlignment()) ? m_cursor->GetAlignment()->GetTime() : 0;
+    // Use compound-meter grouping for meters such as 6/8, 9/8 and 12/8.
+    // Simple meters use one denominator unit per beat:
+    //   4/4 -> 4 groups of 1/4
+    // Compound meters use groups of three denominator units:
+    //   6/8 -> 2 groups of 3/8
+
+    const bool isCompoundMeter = ((meterCount % 3 == 0) && params.meterSig->GetUnit() == 8);
+
+    Fraction beatDuration = Fraction(1, meterUnit);
+    if (isCompoundMeter) beatDuration = beatDuration * 3;
+
+    // A note beginning on a new beat must not be joined to the preceding
+    // beam. Do not apply this at the beginning of the measure.
+    if (position > 0) {
+        const Fraction beatPosition = position / beatDuration;
+        if (beatPosition.GetDenominator() == 1) return;
+    }
+
+    if (result->IsInBeam()) {
+        Object *previousParent = noteOrRest->GetParent();
+        Beam *beam = result->GetAncestorBeam();
+        noteOrRest->MoveItselfTo(beam);
+        previousParent->ClearRelinquishedChildren();
     }
     else {
-        children = object->GetChildren();
+        Object *previousParent = result->GetParent();
+        assert(previousParent);
+        Beam *beam = new Beam();
+        previousParent->AddChild(beam);
+        result->MoveItselfTo(beam);
+        noteOrRest->MoveItselfTo(beam);
+        previousParent->ClearRelinquishedChildren();
     }
-    // Remove children that are added as element parts (never exist in EditorTreeObject)
-    children.erase(std::remove_if(children.begin(), children.end(),
-                       [](const Object *item) { return item->Is({ DOTS, FLAG, STEM, TUPLET_NUM, TUPLET_BRACKET }); }),
-        children.end());
+}
 
-    if (children.size() > 0) {
-        // If we do not call it recusrively, still include an empty array
-        jsonxx::Array jsonChildren;
-        if (recursive) {
-            for (auto child : children) {
-                jsonxx::Object jsonChild;
-                this->ContextForObject(child, jsonChild, true);
-                jsonChildren << jsonChild;
+bool EditorToolkitCMN::CopyCursorPosition(data_DURATION dur, int dots, bool tie)
+{
+    if (!this->InsertMode()) return false;
+
+    const LayerElement *copyFrom = (m_cursor->HasPosition()) ? m_cursor->GetPosition() : NULL;
+    if (!copyFrom) {
+        const Layer *layer = vrv_cast<const Layer *>(m_cursor->GetParent());
+        assert(layer);
+        const Layer *previousLayer = this->GetPreviousLayer(layer);
+        if (previousLayer) {
+            ClassIdsComparison comparison({ CHORD, NOTE });
+            copyFrom = vrv_cast<const LayerElement *>(
+                previousLayer->FindDescendantByComparison(&comparison, UNLIMITED_DEPTH, BACKWARD));
+        }
+    }
+
+    if (!copyFrom || !copyFrom->IsAnyOf(std::array{ CHORD, NOTE })) return false;
+
+    // Make sure we copy the whole chord
+    if (copyFrom->Is(NOTE)) {
+        const Note *note = vrv_cast<const Note *>(copyFrom);
+        if (note->IsChordTone()) copyFrom = note->IsChordTone();
+    }
+
+    LayerElement *copy = vrv_cast<LayerElement *>(copyFrom->Clone());
+    copy->CloneReset();
+    DurationInterface *durInterface = copy->GetDurationInterface();
+    assert(durInterface);
+    durInterface->SetDur(dur);
+    durInterface->SetDots(dots);
+
+    Object *target = (m_cursor->HasPosition()) ? m_cursor->GetPosition() : m_cursor->GetParent();
+    if (target->Is(NOTE)) {
+        Note *note = vrv_cast<Note *>(target);
+        if (note->IsChordTone()) target = note->IsChordTone();
+    }
+
+    auto [targetContainer, previousElement] = this->GetTargetContainerFor(target);
+    if (!targetContainer) return false;
+
+    if (previousElement) {
+        targetContainer->InsertAfter(previousElement, copy);
+    }
+    else {
+        targetContainer->InsertChild(copy, 0);
+    }
+    if (tie) TieElements(copyFrom, copy);
+
+    if (copy->IsInBeam()) {
+        durInterface->SetDur(std::max(DURATION_8, dur));
+    }
+    else if (durInterface->GetDur() > DURATION_4) {
+        this->AutoBeam(copy);
+    }
+
+    if (tie || copyFrom->GetFirstAncestor(MEASURE) == copy->GetFirstAncestor(MEASURE)) {
+        if (copy->Is(CHORD)) {
+            ListOfObjects endNotes = copy->FindAllDescendantsByType(NOTE);
+            for (auto object : endNotes) {
+                Note *note = vrv_cast<Note *>(object);
+                assert(note);
+                Accid *accid = note->GetDrawingAccid();
+                if (accid && accid->HasAccid()) {
+                    accid->SetAccidGes(note->AccidentalWrittenToGestural(accid->GetAccid()));
+                    accid->ResetAccidental();
+                }
             }
         }
-        element << "children" << jsonChildren;
+        else {
+            Note *note = vrv_cast<Note *>(copy);
+            assert(note);
+            Accid *accid = note->GetDrawingAccid();
+            if (accid && accid->HasAccid()) {
+                accid->SetAccidGes(note->AccidentalWrittenToGestural(accid->GetAccid()));
+                accid->ResetAccidental();
+            }
+        }
+    }
+
+    this->ClearContext();
+    this->SetEditStatus();
+
+    this->MoveCursor(copy);
+    if (m_cursor->GetInputMode() == Cursor::InputMode::DURATION_FIRST) {
+        m_cursor->SetAccid(ACCIDENTAL_WRITTEN_NONE);
+        m_cursor->SetAccidImplicit(false);
+    }
+
+    return true;
+}
+
+void EditorToolkitCMN::TieElements(const Object *start, const Object *end)
+{
+    assert(start);
+    assert(end);
+
+    // Make sure the tie is between notes or between chords
+    if (!start->IsAnyOf(std::array{ CHORD, NOTE })) return;
+    if (!end->IsAnyOf(std::array{ CHORD, NOTE })) return;
+    if (start->GetClassId() != end->GetClassId()) return;
+
+    Object *measure = const_cast<Object *>(start->GetFirstAncestor(MEASURE));
+    assert(measure);
+
+    if (end->Is(CHORD)) {
+        ListOfConstObjects startNotes = start->FindAllDescendantsByType(NOTE);
+        ListOfConstObjects endNotes = end->FindAllDescendantsByType(NOTE);
+        // No note, or not the same number of notes, which should never happen because tied chords are copied
+        if (startNotes.empty() || (startNotes.size() != endNotes.size())) return;
+        ListOfConstObjects::const_iterator startIter, endIter;
+        for (startIter = startNotes.begin(), endIter = endNotes.begin(); startIter != startNotes.end();
+            ++startIter, ++endIter) {
+            Tie *tie = new Tie();
+            measure->AddChild(tie);
+            tie->SetStartid("#" + (*startIter)->GetID());
+            tie->SetEndid("#" + (*endIter)->GetID());
+        }
     }
     else {
-        element << "isLeaf" << true;
+        Tie *tie = new Tie();
+        measure->AddChild(tie);
+        tie->SetStartid("#" + start->GetID());
+        tie->SetEndid("#" + end->GetID());
     }
 }
 
-void EditorToolkitCMN::ContextForObjects(const ArrayOfConstObjects &objects, jsonxx::Array &elements)
-{
-    elements.reset();
-
-    for (const Object *object : objects) {
-        if (object->Is(MNUM)) {
-            const MNum *mNum = vrv_cast<const MNum *>(object);
-            assert(mNum);
-            if (mNum->IsGenerated()) continue;
-        }
-        if (object->IsAttribute()) continue;
-        if (object->Is({ DOTS, FLAG, STEM, TUPLET_NUM, TUPLET_BRACKET })) continue;
-
-        jsonxx::Object element;
-        this->ContextForObject(object, element);
-        elements << element;
-    }
-}
-
-void EditorToolkitCMN::ContextForReferences(const ListOfObjectAttNamePairs &objectAttNames, jsonxx::Array &references)
-{
-    references.reset();
-
-    for (auto &objectAttName : objectAttNames) {
-        jsonxx::Object element;
-        this->ContextForObject(objectAttName.first, element);
-        element << "referenceAttribute" << objectAttName.second;
-        references << element;
-    }
-}
-
-ArrayOfConstObjects EditorToolkitCMN::GetScoreBasedChildrenFor(const Object *object)
-{
-    // m_currentContext is set by ContextForScores or ContextForSections
-    assert(m_currentContext);
-    const EditorTreeObject *editorTreeObject = (m_currentContext->GetID() == object->GetID())
-        ? vrv_cast<const EditorTreeObject *>(object)
-        : vrv_cast<const EditorTreeObject *>(m_currentContext->FindDescendantByID(object->GetID()));
-    if (!editorTreeObject) {
-        return ArrayOfConstObjects();
-    }
-    return editorTreeObject->GetChildObjects();
-}
-
-//----------------------------------------------------------------------------
-// EditorTreeObject
-//----------------------------------------------------------------------------
-
-EditorTreeObject::EditorTreeObject(const Object *object, bool ownChildren)
-    : Object(object->GetClassId()), VisibilityDrawingInterface()
-{
-    this->Reset();
-
-    this->SetID(object->GetID());
-    m_className = object->GetClassName();
-    if (this->IsEditorialElement() || this->Is(MDIV) || this->IsSystemElement()) {
-        const VisibilityDrawingInterface *interface = object->GetVisibilityDrawingInterface();
-        assert(interface);
-        //  If we keep them hidden, then other functors will no process them.
-        this->SetVisibility(interface->IsHidden() ? Hidden : Visible);
-        // this->SetVisibility(Visible);
-    }
-    m_object = (ownChildren) ? object : NULL;
-}
-
-void EditorTreeObject::Reset()
-{
-    Object::Reset();
-    VisibilityDrawingInterface::Reset();
-}
-
-ArrayOfConstObjects EditorTreeObject::GetChildObjects() const
-{
-    ArrayOfConstObjects childObjects;
-    childObjects.reserve(this->GetChildCount());
-    for (auto child : this->GetChildren()) {
-        const EditorTreeObject *editorTreeChild = vrv_cast<const EditorTreeObject *>(child);
-
-        childObjects.push_back((editorTreeChild->m_object ? editorTreeChild->m_object : editorTreeChild));
-    }
-    return childObjects;
-}
-
-#endif /* NO_EDIT_SUPPORT */
+#endif
 
 } // namespace vrv

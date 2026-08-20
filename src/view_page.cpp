@@ -23,6 +23,7 @@
 #include "clef.h"
 #include "comparison.h"
 #include "controlelement.h"
+#include "cursor.h"
 #include "devicecontext.h"
 #include "div.h"
 #include "doc.h"
@@ -489,7 +490,7 @@ void View::DrawLabels(
 {
     assert(dc);
     assert(scoreDef);
-    assert(object->Is({ LAYERDEF, STAFFDEF, STAFFGRP }));
+    assert(object->IsAnyOf(std::array{ LAYERDEF, STAFFDEF, STAFFGRP }));
 
     Label *label = vrv_cast<Label *>(object->FindDescendantByType(LABEL, 1));
     LabelAbbr *labelAbbr = vrv_cast<LabelAbbr *>(object->FindDescendantByType(LABELABBR, 1));
@@ -521,6 +522,7 @@ void View::DrawLabels(
     TextDrawingParams params;
     params.m_x = x;
     params.m_y = y;
+    params.m_staffSize = staffSize;
     params.m_pointSize = labelTxt.GetPointSize();
 
     dc->SetFont(&labelTxt);
@@ -585,7 +587,7 @@ void View::DrawBracketSq(DeviceContext *dc, int x, int y1, int y2, int staffSize
     this->DrawSquareBracket(dc, true, x - width, y, height, width, horizontalThickness, verticalThickness);
 }
 
-void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
+void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize, bool forceGlyph)
 {
     assert(dc);
 
@@ -593,7 +595,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 
     x -= basicDist;
 
-    if (m_doc->GetOptions()->m_useBraceGlyph.GetValue()) {
+    if (forceGlyph || m_doc->GetOptions()->m_useBraceGlyph.GetValue()) {
         FontInfo *font = m_doc->GetDrawingSmuflFont(staffSize, false);
         const int width = m_doc->GetGlyphWidth(SMUFL_E000_brace, staffSize, false);
         const int height = 8 * m_doc->GetDrawingUnit(staffSize);
@@ -683,6 +685,8 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
     assert(staffGrp);
     assert(barLine);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     if (staffGrp->GetDrawingVisibility() == OPTIMIZATION_HIDDEN) {
         return;
     }
@@ -729,11 +733,12 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         // Get the corresponding staff
         AttNIntegerComparison comparison(STAFF, staffDef->GetN());
         Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
-        if (!staff || (staff->HasVisible() && (staff->GetVisible() == BOOLEAN_false))) {
+        const bool hiddenStaff = (!staff || (staff->HasVisible() && (staff->GetVisible() == BOOLEAN_false)));
+        if (!showHidden && hiddenStaff) {
             yBottomPrevious = VRV_UNSET;
             continue;
         }
-        if (!barlineThrough && (staff->GetVisible() == BOOLEAN_false)) {
+        if (!barlineThrough && hiddenStaff) {
             yBottomPrevious = VRV_UNSET;
             continue;
         }
@@ -819,7 +824,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     assert(barLine);
 
     Staff *staff = barLine->GetAncestorStaff(ANCESTOR_ONLY, false);
-    const int staffSize = (staff) ? staff->m_drawingStaffSize : 100;
+    const int staffSize = (staff) ? staff->GetDrawingStaffNotationSize() : 100;
     const int unit = m_doc->GetDrawingUnit(staffSize);
 
     const int x = barLine->GetDrawingX();
@@ -1058,14 +1063,14 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     }
 
     /*
-    //Debug code for displaying aligner positions
-    for (auto &child : measure->m_measureAligner.GetChildren()) {
-        Alignment *alignment = vrv_cast<Alignment *>(child);
-        int x = alignment->GetXRel() + measure->GetDrawingX();
-        int y = system->GetDrawingY() - m_doc->GetDrawingStaffSize(100);
-        this->DrawVerticalLine(dc, y, y + m_doc->GetDrawingUnit(100), x, 20);
-    }
-    */
+     //Debug code for displaying aligner positions
+     for (auto &child : measure->m_measureAligner.GetChildren()) {
+     Alignment *alignment = vrv_cast<Alignment *>(child);
+     int x = alignment->GetXRel() + measure->GetDrawingX();
+     int y = system->GetDrawingY() - m_doc->GetDrawingStaffSize(100);
+     this->DrawVerticalLine(dc, y, y + m_doc->GetDrawingUnit(100), x, 20);
+     }
+     */
 }
 
 void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
@@ -1074,15 +1079,18 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
     assert(layer);
     assert(staff);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     MeterSigGrp *meterSigGrp = layer->GetStaffDefMeterSigGrp();
     ListOfObjects childList = meterSigGrp->GetList();
 
     // Ignore invisible meter signatures and those without count
     childList.erase(std::remove_if(childList.begin(), childList.end(),
-                        [](Object *object) {
+                        [showHidden](Object *object) {
                             MeterSig *meterSig = vrv_cast<MeterSig *>(object);
                             assert(meterSig);
-                            return ((meterSig->GetVisible() == BOOLEAN_false) || !meterSig->HasCount());
+                            return (
+                                (!showHidden && (meterSig->GetVisible() == BOOLEAN_false)) || !meterSig->HasCount());
                         }),
         childList.end());
 
@@ -1145,22 +1153,25 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
         // we set mNum to a fixed height above the system and make it a bit smaller than other text
         params.m_x = measure->GetDrawingX();
         params.m_y = staff->GetDrawingY() + yOffset;
+        params.m_staffSize = staff->m_drawingStaffSize;
+        const int basePointSize = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize();
         if (mnum->HasFontsize()) {
             data_FONTSIZE *fs = mnum->GetFontsizeAlternate();
             if (fs->GetType() == FONTSIZE_fontSizeNumeric) {
-                mnumTxt.SetPointSize(fs->GetFontSizeNumeric());
+                mnumTxt.SetPointSize(this->ConvertFontSizeNumeric(*fs, staff->m_drawingStaffSize));
             }
             else if (fs->GetType() == FONTSIZE_term) {
                 const int percent = fs->GetPercentForTerm();
-                mnumTxt.SetPointSize(m_doc->GetDrawingLyricFont(percent)->GetPointSize());
+                mnumTxt.SetPointSize(basePointSize * percent / 100);
             }
             else if (fs->GetType() == FONTSIZE_percent) {
-                mnumTxt.SetPointSize(m_doc->GetDrawingLyricFont(fs->GetPercent())->GetPointSize());
+                mnumTxt.SetPointSize(basePointSize * fs->GetPercent() / 100);
             }
         }
         else {
             mnumTxt.SetPointSize(m_doc->GetDrawingLyricFont(80)->GetPointSize());
         }
+        params.m_pointSize = mnumTxt.GetPointSize();
 
         dc->SetFont(&mnumTxt);
 
@@ -1550,7 +1561,7 @@ int View::CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave)
 
     LayerElement *previous = NULL;
     LayerElement *pelement = layer->GetAtPos(x_pos);
-    if ((previous = layer->GetPrevious(pelement))) pelement = previous;
+    if ((previous = layer->GetPreviousInLayer(pelement))) pelement = previous;
 
     Clef *clef = layer->GetClef(pelement);
     if (clef) {
@@ -1587,6 +1598,10 @@ void View::DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *mea
     dc->StartGraphic(layer, "", layer->GetID());
 
     this->DrawLayerChildren(dc, layer, layer, staff, measure);
+
+    if (layer->HasCursor()) {
+        this->DrawCursor(dc, layer->GetCursor(), layer, staff, measure);
+    }
 
     dc->EndGraphic(layer, this);
 
@@ -1811,7 +1826,7 @@ void View::DrawLayerChildren(DeviceContext *dc, Object *parent, Layer *layer, St
             // cast to EditorialElement check in DrawLayerEditorialElement
             this->DrawLayerEditorialElement(dc, dynamic_cast<EditorialElement *>(current), layer, staff, measure);
         }
-        else if (!current->Is({ LABEL, LABELABBR })) {
+        else if (!current->IsAnyOf(std::array{ LABEL, LABELABBR })) {
             assert(false);
         }
     }

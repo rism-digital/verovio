@@ -46,7 +46,7 @@ FunctorCode AdjustSlursFunctor::VisitStaffAlignment(StaffAlignment *staffAlignme
     ArrayOfFloatingCurvePositioners positioners;
     for (FloatingPositioner *positioner : staffAlignment->GetFloatingPositioners()) {
         assert(positioner->GetObject());
-        if (!positioner->GetObject()->Is({ PHRASE, SLUR })) continue;
+        if (!positioner->GetObject()->IsAnyOf(std::array{ PHRASE, SLUR })) continue;
         Slur *slur = vrv_cast<Slur *>(positioner->GetObject());
         assert(slur);
         m_currentSlur = slur;

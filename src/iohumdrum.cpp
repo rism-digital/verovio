@@ -7803,6 +7803,7 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
     if (staffstart->isMensLike()) {
         if ((!m_omet.empty()) && (staffnumber == m_omet.back().first)) {
             auto ploc = m_omet.back().second->rfind(")");
+
             if (ploc != std::string::npos) {
                 metersig = m_omet.back().second->substr(6, ploc - 6);
             }
@@ -7954,6 +7955,7 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
         }
     }
     else {
+        /* Don't need to transmit primary mensuration?
         if ((primarymensuration == "C|") || (primarymensuration == "c|")) {
             setTimeSig(m_staffdef.back(), "*M2/1", metersig, staffstart);
             setMeterSymbol(m_staffdef.back(), primarymensuration, staffindex, staffstart, metertok);
@@ -7966,6 +7968,7 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
             setTimeSig(m_staffdef.back(), "*M3/1", metersig, staffstart, metertok);
             setMeterSymbol(m_staffdef.back(), primarymensuration, staffindex, staffstart);
         }
+        */
     }
 
     addInstrumentDefinition(m_staffdef.back(), staffstart);
@@ -14341,10 +14344,12 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 addBarLineElement(token, elements, pointers);
             }
         }
+        if (token->isClef()) {
+            ss.at(m_currentstaff - 1).last_clef = *token;
+        }
         if (!token->isData()) {
             continue;
         }
-
         if (token->isMensLike()) {
             convertMensuralToken(elements, pointers, token, staffindex);
             continue;
@@ -19739,6 +19744,7 @@ void HumdrumInput::addDynamicsMark(hum::HTp dyntok, hum::HTp token, hum::HLp lin
 void HumdrumInput::addSforzandoToNote(hum::HTp token, int staffindex)
 {
     size_t loc = token->rfind("z");
+    // deal with chord?
     if (loc == std::string::npos) {
         // No sf.
         return;
@@ -26132,6 +26138,10 @@ void HumdrumInput::setStemLength(Note *note, hum::HTp token)
 void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int staffindex, int subtoken)
 {
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    std::string subnote = *token;
+    if (subtoken >= 0) {
+        subnote = token->getSubtoken(subtoken);
+    }
 
     if (subtoken <= 0) {
         if (token->find('H') != std::string::npos) {
@@ -26156,22 +26166,10 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
 
     bool chordQ = token->isChord();
-    bool unpitchedQ = token->isUnpitched();
-    if (chordQ) {
-        // Allow rests in chords to be non-sounding fingered harmonic notes.
-        // Need to check when a percussion clef.
-        unpitchedQ = false;
-        // SetVel for harmonics handled in checkForFingeredHarmonic()
-        // bool isSilentQ = false;
-        // if (tstring.find("r") != std::string::npos) {
-        //     isSilentQ = true;
-        // }
-        // if (isSilentQ) {
-        //     note->SetVel(0);
-        // }
-    }
+    bool unpitchedQ = (subnote.find('R') != std::string::npos);
     bool badpitchedQ = false;
-    if (!unpitchedQ && (ss[staffindex].last_clef.compare(0, 6, "*clefX") == 0)) {
+    if ((unpitchedQ ^ (ss[staffindex].last_clef.compare(0, 6, "*clefX") == 0))
+        || (!unpitchedQ ^ (ss[staffindex].last_clef.compare(0, 6, "*clefX") != 0))) {
         badpitchedQ = true;
         unpitchedQ = true;
     }
@@ -26393,14 +26391,19 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
 
     if (unpitchedQ) {
-        int loc = hum::Convert::kernToStaffLocation(token, "*clefX");
+        int loc = hum::Convert::kernToStaffLocation(subnote, "*clefX");
         note->SetLoc(loc);
         // suppress note@pname (see issue https://github.com/rism-digital/verovio/issues/1385)
         // suppress note@oct as well
     }
 
     if (badpitchedQ) {
-        note->SetColor("#c41414");
+        if (ss[staffindex].last_clef.compare(0, 6, "*clefX")) {
+            note->SetColor("#c41414");
+        }
+        else {
+            note->SetColor("#c41414");
+        }
     }
 
     // These three variables keep track of whether or not verovio is allowed
@@ -26584,7 +26587,9 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
     // int accidCount = hum::Convert::kernToAccidentalCount(tstring);
     bool showInAccid = token->hasVisibleAccidental(stindex);
-    bool showInAccidGes = !showInAccid;
+    // always show mensural accidentals
+    // bool showInAccid = true;
+    bool showInAccidGes = false;
     bool brackQ = hasLayoutParameter(token, "ACC", "brack");
     bool parenQ = hasLayoutParameter(token, "ACC", "paren");
     std::string loaccid = token->getLayoutParameter("N", "acc", subtoken);
@@ -26637,6 +26642,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
 
             if (editorialQ) {
                 accid->SetGlyphAuth("smufl");
+
                 switch (accidCount) {
                     case +3:
                         accid->SetAccid(ACCIDENTAL_WRITTEN_xs);
@@ -31647,7 +31653,7 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
             else if (hre.search(value, "marked note|matched note")) {
                 m_signifiers.mens_mark.push_back(signifier);
                 m_signifiers.mens_mcolor.push_back("red");
-                if (hre.search(value, R"re(text\s*=\s*"?([^"]+)"?))re")) {
+                if (hre.search(value, "text\\s*=\\s*\"?([^\"]+)\"?")) {
                     m_signifiers.mens_markdir.push_back(hre.getMatch(1));
                 }
                 else {
@@ -32620,7 +32626,7 @@ void HumdrumInput::finalizeDocument(Doc *doc)
         doc->PrepareData();
         doc->SetMensuralMusicOnly(BOOLEAN_true);
         doc->m_notationType = NOTATIONTYPE_mensural;
-        doc->ConvertToCastOffMensuralDoc(true);
+        doc->ConvertToCastOffMensuralDoc(MENSURAL_CAST_OFF_INIT);
     }
 }
 

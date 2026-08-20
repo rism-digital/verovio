@@ -42,6 +42,7 @@ bindings/python/_verovio*.so
 bindings/python/__pycache__/*
 bindings/python/CMakeCache.txt
 bindings/python/CMakeFiles/
+bindings/python/verovio/*
 build
 verovio.egg-info
 /dist
@@ -100,3 +101,10 @@ Release/
 fonts/**/tmp
 libmei/tools/__pycache__
 doc/.venv
+
+# Golang files
+bindings/go/CMakeFiles
+bindings/go/CMakeCache.txt
+bindings/go/libverovio.dylib
+bindings/go/install_manifest.txt
+__pycache__

@@ -23,6 +23,8 @@ namespace vrv {
 // Text
 //----------------------------------------------------------------------------
 
+static const ClassRegistrar<Text> s_factory("text", TEXT);
+
 Text::Text() : TextElement(TEXT)
 {
     this->Reset();

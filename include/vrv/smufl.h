@@ -193,6 +193,14 @@ enum {
     SMUFL_E445_accidentalBakiyeSharp = 0xE445,
     SMUFL_E446_accidentalKucukMucennebSharp = 0xE446,
     SMUFL_E447_accidentalBuyukMucennebSharp = 0xE447,
+    SMUFL_E450_accidental1CommaSharp = 0xE450,
+    SMUFL_E451_accidental2CommaSharp = 0xE451,
+    SMUFL_E452_accidental3CommaSharp = 0xE452,
+    SMUFL_E453_accidental5CommaSharp = 0xE453,
+    SMUFL_E454_accidental1CommaFlat = 0xE454,
+    SMUFL_E455_accidental2CommaFlat = 0xE455,
+    SMUFL_E456_accidental3CommaFlat = 0xE456,
+    SMUFL_E457_accidental4CommaFlat = 0xE457,
     SMUFL_E460_accidentalKoron = 0xE460,
     SMUFL_E461_accidentalSori = 0xE461,
     SMUFL_E4A0_articAccentAbove = 0xE4A0,
@@ -500,6 +508,9 @@ enum {
     SMUFL_E9BF_chantConnectingLineAsc4th = 0xE9BF,
     SMUFL_E9C0_chantConnectingLineAsc5th = 0xE9C0,
     SMUFL_E9C1_chantConnectingLineAsc6th = 0xE9C1,
+    SMUFL_E9D0_chantIctusAbove = 0xE9D0,
+    SMUFL_E9D1_chantIctusBelow = 0xE9D1,
+    SMUFL_E9D8_chantEpisema = 0xE9D8,
     SMUFL_E9E0_medRenFlatSoftB = 0xE9E0,
     SMUFL_E9E1_medRenFlatHardB = 0xE9E1,
     SMUFL_E9E2_medRenNatural = 0xE9E2,
@@ -515,6 +526,7 @@ enum {
     SMUFL_E9F8_mensuralRestSemifusa = 0xE9F8,
     SMUFL_EA02_mensuralCustosUp = 0xEA02,
     SMUFL_EA06_chantCustosStemUpPosMiddle = 0xEA06,
+    SMUFL_EA29_medRenStrophicusCMN = 0xEA29,
     SMUFL_EA2A_medRenOriscusCMN = 0xEA2A,
     SMUFL_EA50_figbass0 = 0xEA50,
     SMUFL_EA51_figbass1 = 0xEA51,
@@ -671,7 +683,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 646
+#define SMUFL_COUNT 658
 
 } // namespace vrv
 

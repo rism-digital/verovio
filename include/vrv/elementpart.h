@@ -158,6 +158,7 @@ public:
     virtual ~TupletBracket();
     void Reset() override;
     std::string GetClassName() const override { return "tupletBracket"; }
+    Object *Clone() const override { return new TupletBracket(*this); }
     ///@}
 
     /**
@@ -257,6 +258,7 @@ public:
     virtual ~TupletNum();
     void Reset() override;
     std::string GetClassName() const override { return "tupletNum"; }
+    Object *Clone() const override { return new TupletNum(*this); }
     ///@}
 
     /**

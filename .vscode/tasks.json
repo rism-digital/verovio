@@ -1,12 +1,12 @@
 {
 	"version": "2.0.0",
 	"tasks": [
-        {
-          "label": "prepare_build",
-          "type": "shell",
-          "command": "mkdir -p ${workspaceFolder}/build",
-          "problemMatcher": [],
-        },
+		{
+			"label": "prepare_build",
+			"type": "shell",
+			"command": "mkdir -p ${workspaceFolder}/build",
+			"problemMatcher": []
+		},
 		{
 			"label": "cmake",
 			"type": "shell",

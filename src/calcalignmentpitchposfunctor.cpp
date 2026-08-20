@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "cursor.h"
 #include "custos.h"
 #include "doc.h"
 #include "layer.h"
@@ -111,6 +112,14 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
                 staffY->m_drawingStaffDef->GetTabAnchorline(),
                 staffY->m_drawingStaffDef->GetTabAlign() != VERTICALALIGNMENT_bottom);
         }
+        else if (note->IsCursor()) {
+            Cursor *cursor = vrv_cast<Cursor *>(note);
+            int offset = layerY->GetClefLocOffset((cursor->HasPosition() ? cursor->GetPosition() : cursor));
+            loc = PitchInterface::CalcLoc(cursor->GetPname(), cursor->GetOct(), offset);
+            int locPitchC = PitchInterface::CalcLoc(PITCHNAME_c, cursor->GetOct(), offset);
+            int yRelPitchC = staffY->CalcPitchPosYRel(m_doc, locPitchC);
+            cursor->SetYRelPitchC(yRelPitchC);
+        }
         else if ((note->HasPname() && (note->HasOct() || note->HasOctDefault())) || note->HasLoc()) {
             loc = PitchInterface::CalcLoc(note, layerY, layerElementY);
         }
@@ -150,7 +159,7 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
         mRest->SetDrawingLoc(loc);
         mRest->SetDrawingYRel(staffY->CalcPitchPosYRel(m_doc, loc));
     }
-    else if (layerElement->Is({ REST, SPACE })) {
+    else if (layerElement->Is(REST)) {
         DurationInterface *durInterface = layerElement->GetDurationInterface();
         assert(durInterface);
         Rest *rest = NULL;
@@ -328,6 +337,15 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
         int yRel = staffY->CalcPitchPosYRel(m_doc, loc);
         nc->SetDrawingLoc(loc);
         nc->SetDrawingYRel(yRel);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CalcAlignmentPitchPosFunctor::VisitLayer(Layer *layer)
+{
+    if (layer->HasCursor()) {
+        this->VisitCursor(layer->GetCursor());
     }
 
     return FUNCTOR_CONTINUE;

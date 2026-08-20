@@ -25,6 +25,7 @@
 #include "ioabc.h"
 #include "iocmme.h"
 #include "iodarms.h"
+#include "iogabc.h"
 #include "iohumdrum.h"
 #include "iomei.h"
 #include "iomusxml.h"
@@ -241,6 +242,17 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
     if (initial.find("\nCUT[") != std::string::npos) {
         // Title record for a melody in EsAC format.
         return ESAC;
+    }
+    // 17-may-2026 GABC auto-detection. A GABC file always carries a header block — a sequence of
+    // `name:value;` attributes — terminated by `%%` on its own line before the body. The body in
+    // turn uses the `lyric(music)` syntax where the music is enclosed in parentheses and the pitch
+    // letters are restricted to a..p, plus prefix/suffix punctuation (see S-GABC grammar, grule
+    // body / grule syllable / grule syl_musical_symbols, in the .tex referenced from CLAUDE.md
+    // section "GABC / S-GABC Specification Reference"). The `%%` separator is the most reliable
+    // marker because it cannot legally appear inside MEI, ABC (which starts with `X:`), or PAE.
+    // We only look at the prefix to avoid scanning very large files.
+    if (initial.find("\n%%") != std::string::npos || initial.compare(0, 3, "%%\n") == 0) {
+        return GABC;
     }
 
     // Assume that the input is MEI if other input types were not detected.
@@ -485,18 +497,22 @@ void Toolkit::SetViewAndEditor()
 {
     m_view.SetDoc(&m_doc);
 
-#if defined NO_HUMDRUM_SUPPORT
+#ifndef NO_EDIT_SUPPORT
     // Create editor toolkit based on notation type.
     if (m_editorToolkit != NULL) {
         delete m_editorToolkit;
     }
-    switch (m_doc.m_notationType) {
-        case NOTATIONTYPE_neume: m_editorToolkit = new EditorToolkitNeume(&m_doc, &m_view); break;
-        case NOTATIONTYPE_mensural:
-        case NOTATIONTYPE_mensural_black:
-        case NOTATIONTYPE_mensural_white: m_editorToolkit = new EditorToolkitMensural(&m_doc, &m_view); break;
-        case NOTATIONTYPE_cmn: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view); break;
-        default: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view);
+    if (IsNeumeType(m_doc.m_notationType)) {
+        m_editorToolkit = new EditorToolkitNeume(&m_doc, &m_view);
+    }
+    else {
+        switch (m_doc.m_notationType) {
+            case NOTATIONTYPE_mensural:
+            case NOTATIONTYPE_mensural_black:
+            case NOTATIONTYPE_mensural_white: m_editorToolkit = new EditorToolkitMensural(&m_doc, &m_view); break;
+            case NOTATIONTYPE_cmn: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view); break;
+            default: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view);
+        }
     }
 #endif
 }
@@ -530,6 +546,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
 #endif
 
     FileFormat inputFrom = m_options->GetInputFrom();
+
     if (inputFrom == AUTO) {
         inputFrom = IdentifyInputFrom(data);
     }
@@ -538,6 +555,14 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         input = new ABCInput(&m_doc);
 #else
         LogError("ABC import is not supported in this build.");
+        return false;
+#endif
+    }
+    else if (inputFrom == GABC) {
+#ifndef NO_GABC_SUPPORT
+        input = new GABCInput(&m_doc);
+#else
+        LogError("GABC import is not supported in this build.");
         return false;
 #endif
     }
@@ -834,7 +859,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
             m_doc.ConvertToCmnDoc();
         }
         else {
-            m_doc.ConvertToCastOffMensuralDoc(true);
+            m_doc.ConvertToCastOffMensuralDoc(MENSURAL_CAST_OFF_INIT);
         }
     }
 
@@ -1251,10 +1276,17 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
         Resources &resources = m_doc.GetResourcesForModification();
         resources.LoadAll();
     }
-    if (json.has<jsonxx::String>("fontTextLiberation")) {
+    if (json.has<jsonxx::Boolean>("fontTextLiberation")) {
         Resources &resources = m_doc.GetResourcesForModification();
         resources.UseLiberationTextFont(m_options->m_fontTextLiberation.GetValue());
     }
+
+    // If changing midi options, reset the MIDI doc
+    if (json.has<jsonxx::Number>("midiTempoAdjustment") || json.has<jsonxx::Boolean>("midiNoCue")) {
+        this->ResetMidiDoc();
+    }
+
+    if (m_editorToolkit) m_editorToolkit->OptionsChanged();
 
     return true;
 }
@@ -1338,11 +1370,12 @@ void Toolkit::PrintOptionUsageOutput(const vrv::Option *option, std::ostream &ou
 void Toolkit::PrintOptionUsage(const std::string &category, std::ostream &output) const
 {
     // map of all categories and expected string arguments for them
-    const std::map<vrv::OptionsCategory, std::string> categories = { { vrv::OptionsCategory::Base, "base" },
-        { vrv::OptionsCategory::General, "general" }, { vrv::OptionsCategory::Json, "json" },
-        { vrv::OptionsCategory::Layout, "layout" }, { vrv::OptionsCategory::Margins, "margins" },
-        { vrv::OptionsCategory::Mensural, "mensural" }, { vrv::OptionsCategory::Midi, "midi" },
-        { vrv::OptionsCategory::Selectors, "selectors" }, { vrv::OptionsCategory::Full, "full" } };
+    const std::map<vrv::OptionsCategory, std::string> categories
+        = { { vrv::OptionsCategory::Base, "base" }, { vrv::OptionsCategory::General, "general" },
+              { vrv::OptionsCategory::Json, "json" }, { vrv::OptionsCategory::Layout, "layout" },
+              { vrv::OptionsCategory::Margins, "margins" }, { vrv::OptionsCategory::Mensural, "mensural" },
+              { vrv::OptionsCategory::Midi, "midi" }, { vrv::OptionsCategory::Neume, "neume" },
+              { vrv::OptionsCategory::Selectors, "selectors" }, { vrv::OptionsCategory::Full, "full" } };
 
     output.precision(2);
     // display_version();
@@ -1444,7 +1477,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
                 const std::string correspId = ExtractIDFragment(link->GetCorresp());
                 Object *origin = m_doc.FindDescendantByID(correspId);
                 // if no original element was found, try searching through scoredef in score (only for certain elements)
-                if (!origin && element->Is({ CLEF, GRPSYM, KEYSIG, MENSUR, METERSIG, METERSIGGRP })) {
+                if (!origin && element->IsAnyOf(std::array{ CLEF, GRPSYM, KEYSIG, MENSUR, METERSIG, METERSIGGRP })) {
                     Page *page = vrv_cast<Page *>(m_doc.FindDescendantByType(PAGE));
                     if (page && page->m_score && page->m_score->GetScoreDef()) {
                         origin = page->m_score->GetScoreDef()->FindDescendantByID(correspId);
@@ -1511,11 +1544,18 @@ bool Toolkit::Edit(const std::string &editorAction)
     return m_editorToolkit->ParseEditorAction(editorAction);
 }
 
-std::string Toolkit::EditInfo()
+std::string Toolkit::EditResponse()
 {
     if (!m_editorToolkit) return "{}";
 
-    return m_editorToolkit->EditInfo();
+    return m_editorToolkit->EditResponse();
+}
+
+std::string Toolkit::EditStatus()
+{
+    if (!m_editorToolkit) return "{}";
+
+    return m_editorToolkit->EditStatus();
 }
 
 std::string Toolkit::GetLog()
@@ -1711,6 +1751,10 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
 
     if (m_options->m_mmOutput.GetValue()) {
         svg.SetMMOutput(true);
+    }
+
+    if (m_options->m_showHidden.GetValue()) {
+        svg.SetShowHidden(true);
     }
 
     if (m_doc.IsFacs()) {
@@ -1915,8 +1959,15 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
     // Get the pageNo from the first note (if any)
     int pageNo = -1;
-    Page *page = vrv_cast<Page *>(measure->GetFirstAncestor(PAGE));
-    if (page) pageNo = page->GetIdx() + 1;
+    if (m_midiDoc == &m_doc) {
+        Page *page = vrv_cast<Page *>(measure->GetFirstAncestor(PAGE));
+        if (page) pageNo = page->GetIdx() + 1;
+    }
+    else {
+        const std::string notatedId = this->GetNotatedIdForElement(measure->GetID());
+        const int notatedPageNo = this->GetPageWithElement(notatedId);
+        if (notatedPageNo > 0) pageNo = notatedPageNo;
+    }
 
     NoteOrRestOnsetOffsetComparison matchTime(millisec - measureTimeOffset);
     ListOfObjects notesOrRests;
@@ -1935,7 +1986,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
             Chord *chord = note->IsChordTone();
             if (chord) chords.push_back(chord);
         }
-        else if (object->Is({ MREST, MULTIREST, REST })) {
+        else if (object->IsAnyOf(std::array{ MREST, MULTIREST, REST })) {
             restArray << object->GetID();
         }
     }

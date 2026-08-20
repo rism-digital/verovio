@@ -505,6 +505,53 @@
 					</classes>
 				</elementSpec>
 
+				<macroSpec ident="data.NOTATIONTYPE" module="MEI" type="dt" mode="replace">
+					<desc xml:lang="en">Notation type and subtype</desc>
+					<content>
+						<valList type="closed">
+							<valItem ident="cmn">
+								<desc xml:lang="en">Common Music Notation.</desc>
+							</valItem>
+							<valItem ident="mensural">
+								<desc xml:lang="en">Mensural notation.</desc>
+							</valItem>
+							<valItem ident="mensural.black">
+								<desc xml:lang="en">Black mensural notation.</desc>
+							</valItem>
+							<valItem ident="mensural.white">
+								<desc xml:lang="en">White mensural notation.</desc>
+							</valItem>
+							<valItem ident="neume">
+								<desc xml:lang="en">Neumatic notation.</desc>
+							</valItem>
+							<valItem ident="neume.square">
+								<desc xml:lang="en">Square neumatic notation.</desc>
+							</valItem>
+							<valItem ident="neume.hufnagel">
+								<desc xml:lang="en">Hufnagel neumatic notation.</desc>
+							</valItem>
+							<valItem ident="tab">
+								<desc xml:lang="en">Tablature notation.</desc>
+							</valItem>
+							<valItem ident="tab.staff-like">
+								<desc xml:lang="en">"Notehead" notation: a hybrid between staff and tablature notation consisting of solid, stemless noteheads on a CMN staff with tablature rhythm flags placed above the staff.</desc>
+							</valItem>
+							<valItem ident="tab.guitar">
+								<desc xml:lang="en">Tablature notation for guitars (includes "spanish" lute tablature). Frets are indicated using numbers. Courses closest to the player's feet are at the top of the staff.</desc>
+							</valItem>
+							<valItem ident="tab.lute.french">
+								<desc xml:lang="en">"French" tablature notation for lutes. Frets are indicated using letters. Courses closest to the player's feet are at the top of the staff.</desc>
+							</valItem>
+							<valItem ident="tab.lute.italian">
+								<desc xml:lang="en">"Italian" tablature notation for lutes. Frets are indicated using numbers. Courses closest to the player's feet are at the bottom of the staff.</desc>
+							</valItem>
+							<valItem ident="tab.lute.german">
+								<desc xml:lang="en">"German" tablature notation for lutes. Fret and course information is conveyed solely by choice of symbol (vertical position is not used for this).</desc>
+							</valItem>
+						</valList>
+					</content>
+				</macroSpec>
+
 				<classSpec ident="att.xy" module="MEI.shared" type="atts" mode="change">
 					<classes mode="change">
 						<memberOf key="att.coord.x1"/>

@@ -12,7 +12,9 @@
 #include "beamspan.h"
 #include "calcalignmentpitchposfunctor.h"
 #include "calcstemfunctor.h"
+#include "cursor.h"
 #include "div.h"
+#include "layer.h"
 #include "system.h"
 
 //----------------------------------------------------------------------------

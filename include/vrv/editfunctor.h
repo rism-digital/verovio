@@ -8,9 +8,49 @@
 #ifndef __VRV_EDITFUNCTOR_H__
 #define __VRV_EDITFUNCTOR_H__
 
+#include "cursor.h"
 #include "functor.h"
 
 namespace vrv {
+
+//----------------------------------------------------------------------------
+// CursorFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This set or reset the editor cursor.
+ */
+class CursorFunctor : public Functor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    CursorFunctor(Layer *layer, LayerElement *position);
+    virtual ~CursorFunctor();
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    FunctorCode VisitLayer(Layer *layer) override;
+    ///@}
+
+    Cursor *GetCursor() { return m_cursor; }
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    Layer *m_layer;
+    LayerElement *m_position;
+    Cursor *m_cursor;
+    Cursor *m_previous;
+};
 
 //----------------------------------------------------------------------------
 // SectionContextFunctor
