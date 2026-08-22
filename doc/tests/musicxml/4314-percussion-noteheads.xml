@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
+  "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="4.0">
+  <work>
+    <work-title>MusicXML circle-x and triangle noteheads</work-title>
+  </work>
+  <identification>
+    <miscellaneous>
+      <miscellaneous-field name="description">Percussion noteheads from issue 4314: spaced circle x, hyphenated circle-x, triangle, and x control.</miscellaneous-field>
+    </miscellaneous>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name print-object="no">Drums</part-name>
+      <score-instrument id="P1-I1"><instrument-name>China</instrument-name></score-instrument>
+      <score-instrument id="P1-I2"><instrument-name>Cowbell</instrument-name></score-instrument>
+      <midi-instrument id="P1-I1"><midi-channel>10</midi-channel><midi-unpitched>53</midi-unpitched></midi-instrument>
+      <midi-instrument id="P1-I2"><midi-channel>10</midi-channel><midi-unpitched>57</midi-unpitched></midi-instrument>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>48</divisions>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <clef><sign>percussion</sign></clef>
+      </attributes>
+      <!-- Beat 1: China cymbal — circled X (spaced MusicXML form) -->
+      <note>
+        <unpitched><display-step>B</display-step><display-octave>5</display-octave></unpitched>
+        <duration>48</duration>
+        <instrument id="P1-I1"/>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>circle x</notehead>
+      </note>
+      <!-- Beat 2: Cowbell — triangle -->
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>48</duration>
+        <instrument id="P1-I2"/>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>triangle</notehead>
+      </note>
+      <!-- Beat 3: Normal X notehead (control) -->
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>48</duration>
+        <instrument id="P1-I1"/>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <!-- Beat 4: hyphenated MusicXML 4.0 enum -->
+      <note>
+        <unpitched><display-step>B</display-step><display-octave>5</display-octave></unpitched>
+        <duration>48</duration>
+        <instrument id="P1-I1"/>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>circle-x</notehead>
+      </note>
+    </measure>
+  </part>
+</score-partwise>

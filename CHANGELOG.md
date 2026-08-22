@@ -2,6 +2,8 @@
 
 ## [unreleased]
 
+* Fix MusicXML `circle-x` and `triangle` notehead mapping
+
 ## [6.3.0] – 2026-08-19
 * Support for `volta` and `refrain`
 * Support `pt` and `vu` MEI font sizes
