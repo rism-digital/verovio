@@ -26,7 +26,7 @@
         <time><beats>4</beats><beat-type>4</beat-type></time>
         <clef><sign>percussion</sign></clef>
       </attributes>
-      <!-- Beat 1: China cymbal — circled X (spaced MusicXML form) -->
+      <!-- Beat 1: China cymbal, circled X (spaced MusicXML form) -->
       <note>
         <unpitched><display-step>B</display-step><display-octave>5</display-octave></unpitched>
         <duration>48</duration>
@@ -36,7 +36,7 @@
         <stem>up</stem>
         <notehead>circle x</notehead>
       </note>
-      <!-- Beat 2: Cowbell — triangle -->
+      <!-- Beat 2: Cowbell, triangle -->
       <note>
         <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
         <duration>48</duration>
