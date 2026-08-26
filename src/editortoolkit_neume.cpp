@@ -3651,8 +3651,8 @@ bool EditorToolkitNeume::ToggleNeumeConnection(std::vector<std::string> elementI
 
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
-        m_editInfo.import("status", "FAILURE");
-        m_editInfo.import("message", "Could not get the drawing page.");
+        m_editStatus.import("status", "FAILURE");
+        m_editStatus.import("message", "Could not get the drawing page.");
         return false;
     }
 
@@ -3663,8 +3663,8 @@ bool EditorToolkitNeume::ToggleNeumeConnection(std::vector<std::string> elementI
 
     if (firstNc->GetParent() != secondNc->GetParent()) {
         LogError("The selected ncs are not in the same neume.");
-        m_editInfo.import("status", "FAILURE");
-        m_editInfo.import("message", "The selected ncs are not in the same neume.");
+        m_editStatus.import("status", "FAILURE");
+        m_editStatus.import("message", "The selected ncs are not in the same neume.");
         return false;
     }
 
@@ -3672,8 +3672,8 @@ bool EditorToolkitNeume::ToggleNeumeConnection(std::vector<std::string> elementI
     int secondIdx = secondNc->GetIdx();
     if (std::abs(firstIdx - secondIdx) != 1) {
         LogError("The selected ncs are not adjacent.");
-        m_editInfo.import("status", "FAILURE");
-        m_editInfo.import("message", "The selected ncs are not adjacent.");
+        m_editStatus.import("status", "FAILURE");
+        m_editStatus.import("message", "The selected ncs are not adjacent.");
         return false;
     }
 
@@ -3682,8 +3682,8 @@ bool EditorToolkitNeume::ToggleNeumeConnection(std::vector<std::string> elementI
     assert(staff);
     if (staff->m_drawingNotationType != NOTATIONTYPE_neume_hufnagel) {
         LogError("Neume connections are supported only for Hufnagel notation.");
-        m_editInfo.import("status", "FAILURE");
-        m_editInfo.import("message", "Neume connections are supported only for Hufnagel notation.");
+        m_editStatus.import("status", "FAILURE");
+        m_editStatus.import("message", "Neume connections are supported only for Hufnagel notation.");
         return false;
     }
 
@@ -3692,8 +3692,8 @@ bool EditorToolkitNeume::ToggleNeumeConnection(std::vector<std::string> elementI
     if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
     m_doc->GetDrawingPage()->LayOutTranscription(true);
 
-    m_editInfo.import("status", "OK");
-    m_editInfo.import("message", "");
+    m_editStatus.import("status", "OK");
+    m_editStatus.import("message", "");
     return true;
 }
 

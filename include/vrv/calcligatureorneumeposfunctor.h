@@ -45,7 +45,7 @@ public:
 protected:
     //
 private:
-    //
+    void SetChantLigatureGlyphs(Nc *nc, Nc *previousNc, int pitchDifference, int unit);
 public:
     //
 private:

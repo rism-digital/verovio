@@ -19,7 +19,8 @@
 
 namespace vrv {
 
-static void SetChantLigatureGlyphs(Nc *nc, Nc *previousNc, int pitchDifference, int unit)
+void CalcLigatureOrNeumePosFunctor::SetChantLigatureGlyphs(
+    Nc *nc, Nc *previousNc, int pitchDifference, int unit)
 {
     assert(nc);
     assert(previousNc);
@@ -292,8 +293,8 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
 
         int pitchDifference = (previousNc) ? nc->PitchOrLocDifferenceTo(previousNc) : 0;
         bool overlapWithPrevious = (pitchDifference == 0) ? false : true;
-        const bool connectsToPrevious = (isHufnagel && previousNc && (nc->GetCon() == ncForm_CON_e));
-        const bool startsConnection = (isHufnagel && nextNc && (nextNc->GetCon() == ncForm_CON_e));
+        const bool hufnagelToPrevious = (isHufnagel && previousNc && (nc->GetCon() == ncForm_CON_e));
+        const bool hufnagelStart = (isHufnagel && nextNc && (nextNc->GetCon() == ncForm_CON_e));
 
         if (hasLiquescent) {
             const bool gabcNoTailsOption = m_doc->GetOptions()->m_liquescentWithoutTails.GetValue();
@@ -341,10 +342,10 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
         else {
             nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E990_chantPunctum;
 
-            if (startsConnection) {
+            if (hufnagelStart) {
                 nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B4_chantEntryLineAsc2nd;
             }
-            else if (connectsToPrevious) {
+            else if (hufnagelToPrevious) {
                 overlapWithPrevious = false;
                 SetChantLigatureGlyphs(nc, previousNc, pitchDifference, unit);
             }
@@ -392,7 +393,7 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
             nc->SetDrawingXRel(xRel);
             // The first glyph set the spacing - unless we are starting a ligature, in which case no spacing should be
             // added between the two nc
-            if (!previousLig && !startsConnection) {
+            if (!previousLig && !hufnagelStart) {
                 xRel += m_doc->GetGlyphWidth(nc->m_drawingGlyphs.at(0).m_fontNo, staffSize, false);
             }
         }
