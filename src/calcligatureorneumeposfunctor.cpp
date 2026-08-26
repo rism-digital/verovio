@@ -19,8 +19,7 @@
 
 namespace vrv {
 
-void CalcLigatureOrNeumePosFunctor::SetChantLigatureGlyphs(
-    Nc *nc, Nc *previousNc, int pitchDifference, int unit)
+void CalcLigatureOrNeumePosFunctor::SetChantLigatureGlyphs(Nc *nc, Nc *previousNc, int pitchDifference, int unit)
 {
     assert(nc);
     assert(previousNc);
