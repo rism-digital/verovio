@@ -2,6 +2,8 @@
 
 ## [unreleased]
 
+* Fix MusicXML `circle-x` notehead mapping to SMuFL U+E0B3
+
 ## [6.3.0] – 2026-08-19
 * Support for `volta` and `refrain`
 * Support `pt` and `vu` MEI font sizes
