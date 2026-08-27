@@ -4771,7 +4771,7 @@ data_HEADSHAPE MusicXmlInput::ConvertNotehead(const std::string &value)
 
     data_HEADSHAPE hs;
     // MEI has no circle-x list value. U+E0B3 (noteheadCircleX) is the glyph Verovio actually draws.
-    if ((value == "circle-x")) {
+    if (value == "circle-x") {
         hs.SetHexnum(SMUFL_E0B3_noteheadCircleX);
         return hs;
     }
