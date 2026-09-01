@@ -6,8 +6,6 @@
   "types": "dist/types/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/verovio-toolkit-wasm.js",
-      "require": "./dist/verovio-toolkit-wasm.js",
       "default": "./dist/verovio-toolkit-wasm.js",
       "types": "./dist/types/index.d.ts"
     },
