@@ -3,20 +3,36 @@
   "version": "6.4.0-alpha",
   "description": "This is the stable version of the verovio package",
   "main": "dist/verovio-toolkit-wasm.js",
+  "types": "dist/types/index.d.ts",
   "exports": {
-    ".": "./dist/verovio-toolkit-wasm.js",
+    ".": {
+      "import": "./dist/verovio-toolkit-wasm.js",
+      "require": "./dist/verovio-toolkit-wasm.js",
+      "default": "./dist/verovio-toolkit-wasm.js",
+      "types": "./dist/types/index.d.ts"
+    },
     "./esm": {
       "import": "./dist/verovio.mjs",
-      "require": "./dist/verovio.cjs"
+      "require": "./dist/verovio.cjs",
+      "types": "./dist/types/esm/index.d.mts"
     },
-    "./wasm": "./dist/verovio-module.mjs",
-    "./wasm-hum": "./dist/verovio-module-hum.mjs"
+    "./wasm": {
+      "import": "./dist/verovio-module.mjs",
+      "default": "./dist/verovio-module.mjs",
+      "types": "./dist/types/wasm/index.d.mts"
+    },
+    "./wasm-hum": {
+      "import": "./dist/verovio-module-hum.mjs",
+      "default": "./dist/verovio-module-hum.mjs",
+      "types": "./dist/types/wasm-hum/index.d.mts"
+    }
   },
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "rollup --config",
+    "postbuild": "rm -rf ./dist/types && cp -r ./src/types ./dist",
     "prebundle": "rollup --config rollup.config.prebundle.mjs"
   },
   "keywords": [
