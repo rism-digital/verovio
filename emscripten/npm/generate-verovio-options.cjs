@@ -1,13 +1,14 @@
 /**
  * Generate the VerovioOptions and EngravingDefaults type definitions.
  *
- * Usage: node generate-verovio-options.cjs [path/to/output/VerovioOptions.d.ts]
+ * Usage: node generate-verovio-options.cjs > path/to/output/VerovioOptions.d.ts
  */
 const createVerovioModule = require('./dist/verovio-module.mjs').default;
 const { VerovioToolkit } = require('./dist/verovio.cjs');
-const fs = require('fs');
+const fs = require('node:fs');
+const path = require('node:path');
 
-const outFile = process.argv.length > 2 ? process.argv[2] : 'src/types/VerovioOptions.d.ts';
+cppFile = path.join(__dirname, '..', '..', 'src', 'options.cpp');
 
 const typeMap = {
     bool: "boolean",
@@ -18,101 +19,128 @@ const typeMap = {
     array: "string[]",
 };
 
-async function main() {
-    const VerovioModule = await createVerovioModule();
-    const tk = new VerovioToolkit(VerovioModule);
-    const availableOptions = tk.getAvailableOptions();
-    console.info(tk.getVersion());
+function parseEngravingDefaults(source) {
+    const syncBody = source.slice(source.indexOf('void Options::Sync()'));
+    const listMatch = syncBody.match(/engravingDefaults\s*=\s*\{([^]*?)\};/);
+    if (!listMatch) throw new Error('Could not find engravingDefaults initializer list in Options::Sync()');
+    const entries = [];
+    const entryRe = /^\s*\{\s*"([^"]+)"\s*,\s*&(m_\w+)\s*\}/;
+    for (const line of listMatch[1].split('\n')) {
+        const m = line.match(entryRe);
+        if (m) entries.push({ jsonKey: m[1], member: m[2] });
+    }
+    return entries;
+}
+
+function parseRegistrations(source) {
+    const map = new Map();
+    const regRe = /Register\(&(m_\w+)\s*,\s*"(\w+)"/g;
+    let m;
+    while ((m = regRe.exec(source))) map.set(m[1], m[2]);
+    return map;
+}
+
+function generateEngravingDefaults(availableOptions) {
+    const source = fs.readFileSync(cppFile, 'utf8');
+
+    // Parse the options.cpp Options::Sync() engravingDefaults map.
+    const entries = parseEngravingDefaults(source);
+
+    // Relate the engravingDefaults entries to the options registrations.
+    const registrations = parseRegistrations(source);
+
+    // Cross-reference with runtime options to get the TS type.
+    const optionTypes = new Map();
+    for (const group of Object.values(availableOptions.groups))
+        for (const [key, option] of Object.entries(group.options)) optionTypes.set(key, option.type);
+
+    const lines = [];
+    const problems = [];
+    for (const { jsonKey, member } of entries) {
+        const optionKey = registrations.get(member);
+        if (!optionKey) {
+            problems.push(`${jsonKey}: member ${member} is not registered as an option`);
+            continue;
+        }
+        const type = optionTypes.get(optionKey);
+        if (!type) {
+            problems.push(`${jsonKey}: option ${optionKey} not found in runtime options`);
+            continue;
+        }
+        const tsType = typeMap[type] || type;
+        lines.push(`    ${jsonKey}: ${tsType};`);
+    }
+    if (problems.length) console.warn('Problems:\n  ' + problems.join('\n  ') + '\n');
+    return lines;
+}
+
+function generateVerovioOptions(availableOptions) {
     const types = new Set();
-    try {
-        const optionSegments = Object.entries(availableOptions.groups).map(
-            ([key, group]) =>
-                `    /**${"*".repeat(group.name.length)}**
+    return Object.entries(availableOptions.groups).map(
+        ([key, group]) => `    /**${"*".repeat(group.name.length)}**
      * ${group.name} *
      **${"*".repeat(group.name.length)}**/
 ` +
-                Object.entries(group.options)
-                    .map(
-                        ([
-                            key,
-                            {
-                                cmdOnly,
-                                shortOption,
-                                title,
-                                type,
-                                description,
-                                values,
-                                ...option
-                            },
-                        ]) =>
-                            cmdOnly
-                                ? ""
-                                : `
+            Object.entries(group.options)
+                .map(
+                    ([
+                        key,
+                        {
+                            cmdOnly,
+                            shortOption,
+                            title,
+                            type,
+                            description,
+                            values,
+                            ...option
+                        },
+                    ]) =>
+                        cmdOnly
+                            ? ""
+                            : `
     /**
      * ${["int", "double"].includes(type) ? `(${type}) ` : ""}${
-                                      (types.add(type), description.trim())
-                                  }${Object.entries(option)
-                                      .map(
-                                          ([key, value]) => `
+                                     (types.add(type), description.trim())
+                                }${Object.entries(option)
+                                    .map(
+                                        ([key, value]) => `
      *
      * ${key}: ${JSON.stringify(value)}`
-                                      )
-                                      .join("")}
+                                    )
+                                    .join("")}
      */
     ${key}?: ${
-                                      values
-                                          ? values
-                                                .map((v) => `"${v}"`)
-                                                .join(" | ")
-                                          : typeMap[type] ||
-                                            key[0].toUpperCase() + key.slice(1)
-                                  };
+                                    values
+                                        ? values
+                                            .map((v) => `"${v}"`)
+                                            .join(" | ")
+                                        : typeMap[type] ||
+                                        key[0].toUpperCase() + key.slice(1)
+                                };
 `
-                    )
-                    .join("")
-        );
-        fs.writeFileSync(
-            outFile,
-            `export interface TransposeMdiv {
+                )
+                .join("")
+    );
+}
+
+async function main() {
+    const VerovioModule = await createVerovioModule();
+    const tk = new VerovioToolkit(VerovioModule);
+    const verovioOptions = generateVerovioOptions(tk.getAvailableOptions());
+    const engravingDefaults = generateEngravingDefaults(tk.getAvailableOptions());
+    console.log(`
+export interface TransposeMdiv {
     [xmlId: string]: string;
 }
+
 export interface EngravingDefaults {
-    arrowShaftThickness: number;
-    barlineSeparation: number;
-    beamSpacing: number;
-    beamThickness: number;
-    bracketThickness: number;
-    dashedBarlineDashLength: number;
-    dashedBarlineGapLength: number;
-    dashedBarlineThickness: number;
-    hairpinThickness: number;
-    legerLineExtension: number;
-    legerLineThickness: number;
-    lyricLineThickness: number;
-    octaveLineThickness: number;
-    pedalLineThickness: number;
-    repeatBarlineDotSeparation: number;
-    repeatEndingLineThickness: number;
-    slurEndpointThickness: number;
-    slurMidpointThickness: number;
-    staffLineThickness: number;
-    stemThickness: number;
-    subBracketThickness: number;
-    textEnclosureThickness: number;
-    thickBarlineThickness: number;
-    thinBarlineThickness: number;
-    tieEndpointThickness: number;
-    tieMidpointThickness: number;
-    tupletBracketThickness: number;
+${engravingDefaults.join("\n").trimEnd()}
 }
 
 export interface VerovioOptions {
-${optionSegments.join("\n").trimEnd()}
+${verovioOptions.join("\n").trimEnd()}
 }
-`
-        );
-    } catch (e) {
-        console.error(e);
-    }
+`.trim());
 }
+
 main();
