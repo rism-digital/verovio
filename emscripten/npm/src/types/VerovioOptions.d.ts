@@ -37,7 +37,7 @@ export interface VerovioOptions {
      **********************/
 
     /**
-     * Select input format from: "abc", "cmme.xml", "darms", "esac", "humdrum", "mei", "pae", "volpiano", "xml" (musicxml), "musicxml-hum" (musicxml via humdrum)
+     * Select input format from: "abc", "cmme.xml", "darms", "esac", "gabc", "humdrum", "mei", "pae", "volpiano", "xml" (musicxml), "musicxml-hum" (musicxml via humdrum) or "mei-pb-serialized"
      *
      * default: "mei"
      */
@@ -135,13 +135,6 @@ export interface VerovioOptions {
      * default: false
      */
     evenNoteSpacing?: boolean;
-
-    /**
-     * Expand all referenced elements in the expansion <xml:id>
-     *
-     * default: ""
-     */
-    expand?: string;
 
     /**
      * Control footer layout
@@ -365,6 +358,13 @@ export interface VerovioOptions {
     setLocale?: boolean;
 
     /**
+     * Display <space>, <mSpace> and invisible or gestural elements
+     *
+     * default: false
+     */
+    showHidden?: boolean;
+
+    /**
      * Display the total runtime on command-line
      *
      * default: false
@@ -405,6 +405,13 @@ export interface VerovioOptions {
      * default: false
      */
     svgBoundingBoxes?: boolean;
+
+    /**
+     * Include content bounding boxes in SVG output
+     *
+     * default: false
+     */
+    svgContentBoundingBoxes?: boolean;
 
     /**
      * CSS (as a string) to be added to the SVG output
@@ -663,6 +670,13 @@ export interface VerovioOptions {
     fontLoadAll?: boolean;
 
     /**
+     * Use the Liberation text font
+     *
+     * default: false
+     */
+    fontTextLiberation?: boolean;
+
+    /**
      * (double) The grace size ratio numerator
      *
      * default: 0.75
@@ -688,7 +702,7 @@ export interface VerovioOptions {
     graceRightAlign?: boolean;
 
     /**
-     * (double) The haripin size in MEI units
+     * (double) The hairpin size in MEI units
      *
      * default: 3
      *
@@ -946,6 +960,17 @@ export interface VerovioOptions {
     octaveNoSpanningParentheses?: boolean;
 
     /**
+     * (double) The ossia staff size in relation to the staff size
+     *
+     * default: 0.75
+     *
+     * max: 1
+     *
+     * min: 0.5
+     */
+    ossiaStaffSize?: number;
+
+    /**
      * (double) The thickness of the line used for piano pedaling
      *
      * default: 0.2
@@ -1107,6 +1132,17 @@ export interface VerovioOptions {
     spacingNonLinear?: number;
 
     /**
+     * (double) Specify the factor of an ossia spacing in relation to staff spacing
+     *
+     * default: 0.35
+     *
+     * max: 1
+     *
+     * min: 0.1
+     */
+    spacingOssia?: number;
+
+    /**
      * (int) The staff minimal spacing in MEI units
      *
      * default: 12
@@ -1260,7 +1296,7 @@ export interface VerovioOptions {
     tupletNumHead?: boolean;
 
     /************************************
-     * Element selectors and processing *
+     * Loading selectors and processing *
      ************************************/
 
     /**
@@ -1276,6 +1312,27 @@ export interface VerovioOptions {
      * default: []
      */
     choiceXPathQuery?: string[];
+
+    /**
+     * Expand all referenced elements in the expansion <xml:id>
+     *
+     * default: ""
+     */
+    expand?: string;
+
+    /**
+     * Expand for all outputs, using selected, first, or generated expansion
+     *
+     * default: false
+     */
+    expandAlways?: boolean;
+
+    /**
+     * Expand for no output, including MIDI and timemap
+     *
+     * default: false
+     */
+    expandNever?: boolean;
 
     /**
      * Load only the selected mdiv; the content of the other is skipped
@@ -1297,6 +1354,13 @@ export interface VerovioOptions {
      * default: ""
      */
     mdivXPathQuery?: string;
+
+    /**
+     * Hide ossias when rendering
+     *
+     * default: false
+     */
+    ossiaHidden?: boolean;
 
     /**
      * Set the xPath query for selecting <subst> child elements, for example: "./del"; by default the first child is selected
@@ -1852,6 +1916,13 @@ export interface VerovioOptions {
      */
     midiTempoAdjustment?: number;
 
+    /**
+     * A custom tuning definition or filepath to apply to the MIDI output
+     *
+     * default: ""
+     */
+    tuningFile?: string;
+
     /*****************************
      * Mensural notation options *
      *****************************/
@@ -1878,11 +1949,11 @@ export interface VerovioOptions {
     ligatureOblique?: "auto" | "straight" | "curved";
 
     /**
-     * Convert mensural content to a more responsive view reduced to the seleceted markup
+     * Make mensural content responsive (selection discards ligatures and editorial markup)
      *
-     * default: false
+     * default: "auto"
      */
-    mensuralResponsiveView?: boolean;
+    mensuralResponsiveView?: "none" | "auto" | "selection";
 
     /**
      * Score up the mensural voices by providing a dur.quality to the notes
@@ -1908,4 +1979,40 @@ export interface VerovioOptions {
      * default: "{}"
      */
     timemapOptions?: string;
+
+    /*****************************
+     * Neumatic notation options *
+     *****************************/
+
+    /**
+     * Render the GABC `V` left-stem (grule virga_left) using tilt="ne" instead of the default tilt="n" used for square notation.
+     *
+     * default: false
+     */
+    gabcAquitanianContext?: boolean;
+
+    /**
+     * Enable the S-GABC proposed symbols: `r` for uncertain reading and `"` for clarifying lines
+     *
+     * default: false
+     */
+    gabcExtendedSymbols?: boolean;
+
+    /**
+     * (int) Number of staff lines for GABC import (the GABC `staff-lines:` header value)
+     *
+     * default: 4
+     *
+     * max: 5
+     *
+     * min: 4
+     */
+    gabcStaffLines?: number;
+
+    /**
+     * Render liquescent head without tails
+     *
+     * default: false
+     */
+    liquescentWithoutTails?: boolean;
 }

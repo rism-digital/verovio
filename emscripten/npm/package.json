@@ -30,7 +30,7 @@
   ],
   "scripts": {
     "build": "rollup --config",
-    "postbuild": "rm -rf ./dist/types && cp -r ./src/types ./dist",
+    "postbuild": "node generate-verovio-options.cjs && rm -rf ./dist/types && cp -r ./src/types ./dist",
     "prebundle": "rollup --config rollup.config.prebundle.mjs"
   },
   "keywords": [
