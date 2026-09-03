@@ -4200,6 +4200,17 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure, Sec
         if (!m_sectionStop) m_sectionStop = musicxml::SectionInfo();
         m_fineInfo = musicxml::FineInfo(true);
     }
+
+    const float bpm = node.attribute("tempo").as_float();
+    if (bpm > 0) {
+        const short int offset = node.child("offset").text().as_int();
+        const double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
+        Tempo *tempo = new Tempo();
+        tempo->SetMidiBpm(bpm);
+        tempo->SetTstamp(timeStamp);
+        m_controlElements.push_back({ m_measureCounts.at(measure), tempo });
+        m_tempoStack.push_back(tempo);
+    }
 }
 
 bool MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord)
