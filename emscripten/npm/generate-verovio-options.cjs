@@ -52,7 +52,7 @@ function generateEngravingDefaults(availableOptions) {
     // Cross-reference with runtime options to get the TS type.
     const optionTypes = new Map();
     for (const group of Object.values(availableOptions.groups))
-        for (const [key, option] of Object.entries(group.options)) optionTypes.set(key, option.type);
+        for (const [key, option] of Object.entries(group.options)) optionTypes.set(key, { type: option.type, description: option.description });
 
     const lines = [];
     const problems = [];
@@ -62,13 +62,17 @@ function generateEngravingDefaults(availableOptions) {
             problems.push(`${jsonKey}: member ${member} is not registered as an option`);
             continue;
         }
-        const type = optionTypes.get(optionKey);
-        if (!type) {
+        const optionEntry = optionTypes.get(optionKey);
+        if (!optionEntry) {
             problems.push(`${jsonKey}: option ${optionKey} not found in runtime options`);
             continue;
         }
-        const tsType = typeMap[type] || type;
-        lines.push(`    ${jsonKey}: ${tsType};`);
+        const type = typeMap[optionEntry.type] || optionEntry.type;
+        lines.push(`    /**
+     * ${optionEntry.description.replace('MEI units', 'staff spaces').trim()}
+     */
+    ${jsonKey}: ${type};
+        `);
     }
     if (problems.length) console.warn('Problems:\n  ' + problems.join('\n  ') + '\n');
     return lines;

@@ -8,29 +8,124 @@ export interface TransposeMdiv {
 }
 
 export interface EngravingDefaults {
+    /**
+     * The staff line width in staff spaces
+     */
     staffLineThickness: number;
+
+    /**
+     * The stem width
+     */
     stemThickness: number;
+
+    /**
+     * The thickness of the ledger lines
+     */
     legerLineThickness: number;
+
+    /**
+     * The amount by which a ledger line should extend either side of a notehead
+     */
     legerLineExtension: number;
+
+    /**
+     * The endpoint slur thickness in staff spaces
+     */
     slurEndpointThickness: number;
+
+    /**
+     * The midpoint slur thickness in staff spaces
+     */
     slurMidpointThickness: number;
+
+    /**
+     * The Endpoint tie thickness in staff spaces
+     */
     tieEndpointThickness: number;
+
+    /**
+     * The midpoint tie thickness in staff spaces
+     */
     tieMidpointThickness: number;
+
+    /**
+     * The barline width
+     */
     thinBarlineThickness: number;
+
+    /**
+     * The thickness of the thick barline
+     */
     thickBarlineThickness: number;
+
+    /**
+     * The default distance between multiple barlines when locked together
+     */
     barlineSeparation: number;
+
+    /**
+     * The default horizontal distance between the dots and the inner barline of a repeat barline
+     */
     repeatBarlineDotSeparation: number;
+
+    /**
+     * The dash length of dashed barlines
+     */
     dashedBarlineDashLength: number;
+
+    /**
+     * The gap length of dashed barlines
+     */
     dashedBarlineGapLength: number;
+
+    /**
+     * The thickness of the system bracket
+     */
     bracketThickness: number;
+
+    /**
+     * The thickness of system sub-bracket
+     */
     subBracketThickness: number;
+
+    /**
+     * The thickness of the hairpin
+     */
     hairpinThickness: number;
+
+    /**
+     * The thickness of the line used for an octave line
+     */
     octaveLineThickness: number;
+
+    /**
+     * The thickness of the line used for piano pedaling
+     */
     pedalLineThickness: number;
+
+    /**
+     * Repeat and ending line thickness
+     */
     repeatEndingLineThickness: number;
+
+    /**
+     * The lyric extender line thickness
+     */
     lyricLineThickness: number;
+
+    /**
+     * The thickness of the tuplet bracket
+     */
     tupletBracketThickness: number;
+
+    /**
+     * The thickness of the line text enclosing box
+     */
     textEnclosureThickness: number;
+
+    /**
+     * The thickness of the multi rest in staff spaces
+     */
     hBarThickness: number;
 }
 
