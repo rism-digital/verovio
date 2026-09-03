@@ -72,7 +72,7 @@ function generateEngravingDefaults(availableOptions) {
      * ${optionEntry.description.replace('MEI units', 'staff spaces').trim()}
      */
     ${jsonKey}: ${type};
-        `);
+`);
     }
     if (problems.length) console.warn('Problems:\n  ' + problems.join('\n  ') + '\n');
     return lines;

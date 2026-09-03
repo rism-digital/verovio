@@ -30,10 +30,14 @@ export interface GetMeiOptions {
 }
 export interface TimeMapEntry {
     tstamp: number;
-    qstamp: number;
+    qstamp?: number;
+    qfrac?: [number, number];
     on?: string[];
     off?: string[];
     tempo?: number;
+    restsOn?: string[];
+    restsOff?: string[];
+    measureOn?: string;
 }
 export interface RedoLayoutOptions {
     /**
@@ -50,6 +54,10 @@ export interface TimeMapOptions {
      * Include rests in the timemap (false by default)
      */
     includeRests?: boolean;
+    /**
+     * Use fractions instead of floats for onset times (false by default)
+     */
+    useFractions?: boolean;
 }
 export interface Selection {
     measureRange?: string;
@@ -64,7 +72,9 @@ export interface PAEValidationMessage {
     type: "error" | "warning";
 }
 export interface PAEValidation {
+    keysig?: PAEValidationMessage;
     clef?: PAEValidationMessage;
+    timesig?: PAEValidationMessage;
     data?: PAEValidationMessage[];
 }
 interface ExpansionMap {
@@ -73,7 +83,10 @@ interface ExpansionMap {
 export interface DescriptiveFeatures {
     intervalsChromatic: string[];
     intervalsDiatonic: string[];
+    intervalGrossContour: string[];
+    intervalRefinedContour: string[];
     intervalsIds: string[];
+    pitchesChromaticWithDuration: string[];
     pitchesChromatic: string[];
     pitchesDiatonic: string[];
     pitchesIds: string[];
