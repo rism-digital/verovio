@@ -28,17 +28,18 @@ export interface GetMeiOptions {
      */
     removeIds?: boolean;
 }
-export interface TimeMapEntry {
+export type TimeMapEntry = {
     tstamp: number;
-    qstamp?: number;
-    qfrac?: [number, number];
     on?: string[];
     off?: string[];
     tempo?: number;
     restsOn?: string[];
     restsOff?: string[];
     measureOn?: string;
-}
+} & (
+    | { qstamp: number; qfrac?: never }
+    | { qstamp?: never; qfrac: [number, number] }
+)
 export interface RedoLayoutOptions {
     /**
      * true by default
@@ -77,7 +78,7 @@ export interface PAEValidation {
     timesig?: PAEValidationMessage;
     data?: PAEValidationMessage[];
 }
-interface ExpansionMap {
+export interface ExpansionMap {
     [key: string]: any;
 }
 export interface DescriptiveFeatures {
@@ -91,7 +92,7 @@ export interface DescriptiveFeatures {
     pitchesDiatonic: string[];
     pitchesIds: string[];
 }
-type DescriptiveFeaturesOptions = unknown;
+export type DescriptiveFeaturesOptions = unknown;
 
 export const module: VerovioModule;
 export interface VerovioModule {
