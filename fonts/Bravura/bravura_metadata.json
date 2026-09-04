@@ -37,7 +37,7 @@
         "tupletBracketThickness": 0.16
     },
     "fontName": "Bravura",
-    "fontVersion": 1.481,
+    "fontVersion": 1.482,
     "glyphAdvanceWidths": {
         "4stringTabClef": 1.084,
         "4stringTabClefSerif": 1.296,
@@ -2292,9 +2292,9 @@
         "noteheadCowellThirteenthNoteSeriesBlack": 1.172,
         "noteheadCowellThirteenthNoteSeriesHalf": 1.14,
         "noteheadCowellThirteenthNoteSeriesWhole": 1.276,
-        "noteheadDiamondBlack": 1.28,
+        "noteheadDiamondBlack": 0.98,
         "noteheadDiamondBlackOld": 1.16,
-        "noteheadDiamondBlackWide": 1.784,
+        "noteheadDiamondBlackWide": 1.36,
         "noteheadDiamondClusterBlack2nd": 1.068,
         "noteheadDiamondClusterBlack3rd": 1.096,
         "noteheadDiamondClusterBlackBottom": 1.184,
@@ -2305,16 +2305,16 @@
         "noteheadDiamondClusterWhiteBottom": 1.164,
         "noteheadDiamondClusterWhiteMiddle": 1.164,
         "noteheadDiamondClusterWhiteTop": 1.164,
-        "noteheadDiamondDoubleWhole": 2.536,
+        "noteheadDiamondDoubleWhole": 2.304,
         "noteheadDiamondDoubleWholeOld": 1.8,
-        "noteheadDiamondHalf": 1.28,
+        "noteheadDiamondHalf": 0.98,
         "noteheadDiamondHalfFilled": 1.156,
         "noteheadDiamondHalfOld": 1.164,
-        "noteheadDiamondHalfWide": 1.792,
+        "noteheadDiamondHalfWide": 1.372,
         "noteheadDiamondOpen": 1.152,
-        "noteheadDiamondWhite": 1.248,
-        "noteheadDiamondWhiteWide": 1.78,
-        "noteheadDiamondWhole": 1.832,
+        "noteheadDiamondWhite": 1.128,
+        "noteheadDiamondWhiteWide": 1.612,
+        "noteheadDiamondWhole": 1.664,
         "noteheadDiamondWholeOld": 1.172,
         "noteheadDoubleWhole": 2.396,
         "noteheadDoubleWholeAlt": 2.116,
@@ -25900,12 +25900,12 @@
         },
         "noteheadDiamondBlack": {
             "bBoxNE": [
-                1.28,
-                0.74
+                0.98,
+                0.564
             ],
             "bBoxSW": [
                 0.0,
-                -0.736
+                -0.564
             ]
         },
         "noteheadDiamondBlackOld": {
@@ -25920,12 +25920,12 @@
         },
         "noteheadDiamondBlackWide": {
             "bBoxNE": [
-                1.78,
-                0.74
+                1.36,
+                0.564
             ],
             "bBoxSW": [
                 0.0,
-                -0.736
+                -0.564
             ]
         },
         "noteheadDiamondClusterBlack2nd": {
@@ -26030,12 +26030,12 @@
         },
         "noteheadDiamondDoubleWhole": {
             "bBoxNE": [
-                2.532,
-                0.684
+                2.304,
+                0.62
             ],
             "bBoxSW": [
-                0.004,
-                -0.68
+                0.0,
+                -0.62
             ]
         },
         "noteheadDiamondDoubleWholeOld": {
@@ -26050,12 +26050,12 @@
         },
         "noteheadDiamondHalf": {
             "bBoxNE": [
-                1.28,
-                0.74
+                0.98,
+                0.564
             ],
             "bBoxSW": [
                 0.0,
-                -0.736
+                -0.564
             ]
         },
         "noteheadDiamondHalfFilled": {
@@ -26080,12 +26080,12 @@
         },
         "noteheadDiamondHalfWide": {
             "bBoxNE": [
-                1.792,
-                0.74
+                1.372,
+                0.564
             ],
             "bBoxSW": [
                 0.0,
-                -0.736
+                -0.564
             ]
         },
         "noteheadDiamondOpen": {
@@ -26100,32 +26100,32 @@
         },
         "noteheadDiamondWhite": {
             "bBoxNE": [
-                1.248,
-                0.624
+                1.128,
+                0.564
             ],
             "bBoxSW": [
                 0.0,
-                -0.624
+                -0.564
             ]
         },
         "noteheadDiamondWhiteWide": {
             "bBoxNE": [
-                1.78,
-                0.624
+                1.612,
+                0.564
             ],
             "bBoxSW": [
                 0.0,
-                -0.624
+                -0.564
             ]
         },
         "noteheadDiamondWhole": {
             "bBoxNE": [
-                1.829,
-                0.619
+                1.666,
+                0.564
             ],
             "bBoxSW": [
-                -0.001,
-                -0.62
+                0.001,
+                -0.564
             ]
         },
         "noteheadDiamondWholeOld": {
@@ -44296,7 +44296,7 @@
                 0.0
             ],
             "stemUpSE": [
-                1.28,
+                0.978212,
                 0.0
             ]
         },
@@ -44316,7 +44316,7 @@
                 0.0
             ],
             "stemUpSE": [
-                1.781924,
+                1.361796,
                 0.0
             ]
         },
@@ -44386,7 +44386,7 @@
         },
         "noteheadDiamondDoubleWhole": {
             "noteheadOrigin": [
-                0.324,
+                0.292008,
                 0.0
             ]
         },
@@ -44402,7 +44402,7 @@
                 0.0
             ],
             "stemUpSE": [
-                1.28,
+                0.978212,
                 0.0
             ]
         },
@@ -44432,7 +44432,7 @@
                 0.0
             ],
             "stemUpSE": [
-                1.793124,
+                1.370356,
                 0.0
             ]
         },
@@ -44452,18 +44452,18 @@
                 0.0
             ],
             "stemUpSE": [
-                1.246256,
-                0.004114
+                1.128,
+                0.003724
             ]
         },
         "noteheadDiamondWhiteWide": {
             "stemDownNW": [
                 0.0,
-                0.004
+                0.00362
             ],
             "stemUpSE": [
-                1.780952,
-                0.004114
+                1.61196,
+                0.003724
             ]
         },
         "noteheadDoubleWhole": {
