@@ -30,7 +30,9 @@
   ],
   "scripts": {
     "build": "rollup --config",
-    "postbuild": "node generate-verovio-options.cjs > ./src/types/VerovioOptions.d.ts && rm -rf ./dist/types && cp -r ./src/types ./dist",
+    "build:options": "node ./src/build/generate-verovio-options.cjs > ./src/types/VerovioOptions.d.ts",
+    "build:toolkit": "tsc -p tsconfig.json && node ./src/build/fix-verovio-toolkit.cjs",
+    "postbuild": "npm run build:options && npm run build:toolkit && rm -rf ./dist/types && cp -r ./src/types ./dist",
     "prebundle": "rollup --config rollup.config.prebundle.mjs"
   },
   "keywords": [
@@ -56,6 +58,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.1.0",
-    "rollup": "^3.20.6"
+    "rollup": "^3.20.6",
+    "typescript": "^6.0.3"
   }
 }

@@ -50,3 +50,5 @@ export type EditorAction =
     | KeyDownAction
     | InsertAction
     | SetAction;
+
+export type EditorResponse = any;

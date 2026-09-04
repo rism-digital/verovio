@@ -3,12 +3,12 @@
  *
  * Usage: node generate-verovio-options.cjs > path/to/output/VerovioOptions.d.ts
  */
-const createVerovioModule = require('./dist/verovio-module.mjs').default;
-const { VerovioToolkit } = require('./dist/verovio.cjs');
-const fs = require('node:fs');
-const path = require('node:path');
+const createVerovioModule = require("../../dist/verovio-module.mjs").default;
+const { VerovioToolkit } = require("../../dist/verovio.cjs");
+const fs = require("node:fs");
+const path = require("node:path");
 
-cppFile = path.join(__dirname, '..', '..', 'src', 'options.cpp');
+cppFile = path.join(__dirname, "..", "..", "..", "..", "src", "options.cpp");
 
 const typeMap = {
     bool: "boolean",
@@ -20,12 +20,15 @@ const typeMap = {
 };
 
 function parseEngravingDefaults(source) {
-    const syncBody = source.slice(source.indexOf('void Options::Sync()'));
+    const syncBody = source.slice(source.indexOf("void Options::Sync()"));
     const listMatch = syncBody.match(/engravingDefaults\s*=\s*\{([^]*?)\};/);
-    if (!listMatch) throw new Error('Could not find engravingDefaults initializer list in Options::Sync()');
+    if (!listMatch)
+        throw new Error(
+            "Could not find engravingDefaults initializer list in Options::Sync()",
+        );
     const entries = [];
     const entryRe = /^\s*\{\s*"([^"]+)"\s*,\s*&(m_\w+)\s*\}/;
-    for (const line of listMatch[1].split('\n')) {
+    for (const line of listMatch[1].split("\n")) {
         const m = line.match(entryRe);
         if (m) entries.push({ jsonKey: m[1], member: m[2] });
     }
@@ -41,7 +44,7 @@ function parseRegistrations(source) {
 }
 
 function generateEngravingDefaults(availableOptions) {
-    const source = fs.readFileSync(cppFile, 'utf8');
+    const source = fs.readFileSync(cppFile, "utf8");
 
     // Parse the options.cpp Options::Sync() engravingDefaults map.
     const entries = parseEngravingDefaults(source);
@@ -52,36 +55,46 @@ function generateEngravingDefaults(availableOptions) {
     // Cross-reference with runtime options to get the TS type.
     const optionTypes = new Map();
     for (const group of Object.values(availableOptions.groups))
-        for (const [key, option] of Object.entries(group.options)) optionTypes.set(key, { type: option.type, description: option.description });
+        for (const [key, option] of Object.entries(group.options))
+            optionTypes.set(key, {
+                type: option.type,
+                description: option.description,
+            });
 
     const lines = [];
     const problems = [];
     for (const { jsonKey, member } of entries) {
         const optionKey = registrations.get(member);
         if (!optionKey) {
-            problems.push(`${jsonKey}: member ${member} is not registered as an option`);
+            problems.push(
+                `${jsonKey}: member ${member} is not registered as an option`,
+            );
             continue;
         }
         const optionEntry = optionTypes.get(optionKey);
         if (!optionEntry) {
-            problems.push(`${jsonKey}: option ${optionKey} not found in runtime options`);
+            problems.push(
+                `${jsonKey}: option ${optionKey} not found in runtime options`,
+            );
             continue;
         }
         const type = typeMap[optionEntry.type] || optionEntry.type;
         lines.push(`    /**
-     * ${optionEntry.description.replace('MEI units', 'staff spaces').trim()}
+     * ${optionEntry.description.replace("MEI units", "staff spaces").trim()}
      */
     ${jsonKey}: ${type};
 `);
     }
-    if (problems.length) console.warn('Problems:\n  ' + problems.join('\n  ') + '\n');
+    if (problems.length)
+        console.warn("Problems:\n  " + problems.join("\n  ") + "\n");
     return lines;
 }
 
 function generateVerovioOptions(availableOptions) {
     const types = new Set();
     return Object.entries(availableOptions.groups).map(
-        ([key, group]) => `    /**${"*".repeat(group.name.length)}**
+        ([key, group]) =>
+            `    /**${"*".repeat(group.name.length)}**
      * ${group.name} *
      **${"*".repeat(group.name.length)}**/
 ` +
@@ -104,26 +117,23 @@ function generateVerovioOptions(availableOptions) {
                             : `
     /**
      * ${["int", "double"].includes(type) ? `(${type}) ` : ""}${
-                                     (types.add(type), description.trim())
-                                }${Object.entries(option)
-                                    .map(
-                                        ([key, value]) => `
+         (types.add(type), description.trim())
+     }${Object.entries(option)
+         .map(
+             ([key, value]) => `
      *
-     * ${key}: ${JSON.stringify(value)}`
-                                    )
-                                    .join("")}
+     * ${key}: ${JSON.stringify(value)}`,
+         )
+         .join("")}
      */
     ${key}?: ${
-                                    values
-                                        ? values
-                                            .map((v) => `"${v}"`)
-                                            .join(" | ")
-                                        : typeMap[type] ||
-                                        key[0].toUpperCase() + key.slice(1)
-                                };
-`
+        values
+            ? values.map((v) => `"${v}"`).join(" | ")
+            : typeMap[type] || key[0].toUpperCase() + key.slice(1)
+    };
+`,
                 )
-                .join("")
+                .join(""),
     );
 }
 
@@ -131,12 +141,15 @@ async function main() {
     const VerovioModule = await createVerovioModule();
     const tk = new VerovioToolkit(VerovioModule);
     const verovioOptions = generateVerovioOptions(tk.getAvailableOptions());
-    const engravingDefaults = generateEngravingDefaults(tk.getAvailableOptions());
-    console.log(`
-//////////////////////////////////////////////////////////////////////////////////////
-// NOTE: this file was generated by the ./emscripten/npm/generate-verovio-options.cjs
-// script and should not be edited because changes will be lost.
-//////////////////////////////////////////////////////////////////////////////////////
+    const engravingDefaults = generateEngravingDefaults(
+        tk.getAvailableOptions(),
+    );
+    console.log(
+        `
+////////////////////////////////////////////////////////////////////////////////
+// NOTE: this file was generated by the emscripten/npm build script
+// and should not be edited because changes will be lost.
+////////////////////////////////////////////////////////////////////////////////
 
 export interface TransposeMdiv {
     [xmlId: string]: string;
@@ -149,7 +162,8 @@ ${engravingDefaults.join("\n").trimEnd()}
 export interface VerovioOptions {
 ${verovioOptions.join("\n").trimEnd()}
 }
-`.trim());
+`.trim(),
+    );
 }
 
 main();
