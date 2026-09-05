@@ -4,6 +4,7 @@ import { createEmscriptenProxy } from "./emscripten-proxy.js";
 
 /** @typedef {import("./types/VerovioOptions").VerovioOptions} VerovioOptions */
 /** @typedef {import("./types/EditorAction").EditorAction} EditorAction */
+/** @typedef {import("./types/EditorAction").EditorStatus} EditorStatus */
 /** @typedef {import("./types/EditorAction").EditorResponse} EditorResponse */
 /** @typedef {import("./types/AvailableOptions").AvailableOptions} AvailableOptions */
 /** @typedef {import("./types/VerovioTypes").MIDIValues} MIDIValues */
@@ -41,7 +42,7 @@ export class VerovioToolkit {
     }
 
     /**
-     * Edit the MEI data - experimental code not to rely on.
+     * Edit the MEI data.
      * @param {EditorAction} editorAction The editor action as a JSON object
      * @returns {boolean} True if the edit action was successfully applied
      */
@@ -50,9 +51,9 @@ export class VerovioToolkit {
     }
 
     /**
-     * Return the editor status - experimental code not to rely on.
+     * Return the editor status.
      * @deprecated Use editStatus instead.
-     * @returns {EditorAction} The editor status
+     * @returns {EditorStatus} The editor status
      */
     editInfo() {
         console.warn( "This function is deprecated. Use editStatus instead." );
@@ -60,7 +61,7 @@ export class VerovioToolkit {
     }
 
     /**
-     * Return the editor response - experimental code not to rely on.
+     * Return the editor response.
      * @returns {EditorResponse} The editor response
      */
     editResponse() {
@@ -68,8 +69,8 @@ export class VerovioToolkit {
     }
 
     /**
-     * Return the editor status - experimental code not to rely on.
-     * @returns {EditorAction} The editor status
+     * Return the editor status.
+     * @returns {EditorStatus} The editor status
      */
     editStatus() {
         return JSON.parse(this.proxy.editStatus(this.ptr));

@@ -14,27 +14,27 @@ export class VerovioToolkit {
     private ptr;
     destroy(): void;
     /**
-     * Edit the MEI data - experimental code not to rely on.
+     * Edit the MEI data.
      * @param {EditorAction} editorAction The editor action as a JSON object
      * @returns {boolean} True if the edit action was successfully applied
      */
     edit(editorAction: EditorAction): boolean;
     /**
-     * Return the editor status - experimental code not to rely on.
+     * Return the editor status.
      * @deprecated Use editStatus instead.
-     * @returns {EditorAction} The editor status
+     * @returns {EditorStatus} The editor status
      */
-    editInfo(): EditorAction;
+    editInfo(): EditorStatus;
     /**
-     * Return the editor response - experimental code not to rely on.
+     * Return the editor response.
      * @returns {EditorResponse} The editor response
      */
     editResponse(): EditorResponse;
     /**
-     * Return the editor status - experimental code not to rely on.
-     * @returns {EditorAction} The editor status
+     * Return the editor status.
+     * @returns {EditorStatus} The editor status
      */
-    editStatus(): EditorAction;
+    editStatus(): EditorStatus;
     /**
      * Return all available options grouped by category.
      *
@@ -294,6 +294,7 @@ export namespace VerovioToolkit {
 }
 export type VerovioOptions = import("./VerovioOptions").VerovioOptions;
 export type EditorAction = import("./EditorAction").EditorAction;
+export type EditorStatus = import("./EditorAction").EditorStatus;
 export type EditorResponse = import("./EditorAction").EditorResponse;
 export type AvailableOptions = import("./AvailableOptions").AvailableOptions;
 export type MIDIValues = import("./VerovioTypes").MIDIValues;
