@@ -121,6 +121,10 @@ export class VerovioToolkit {
         return JSON.parse(this.proxy.getTimesForElement(this.ptr, xmlId));
     }
 
+    getPitchPosition(scoreTime, midiPitch, staff = 1) {
+        return JSON.parse(this.proxy.getPitchPosition(this.ptr, scoreTime, midiPitch, staff));
+    }
+
     getVersion() {
         return this.proxy.getVersion(this.ptr);
     }
