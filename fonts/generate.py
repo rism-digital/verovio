@@ -9,7 +9,6 @@ import tempfile
 import xml.etree.ElementTree as Et
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from pathlib import Path
-from typing import Optional
 
 from svgpathtools import Path as SvgPath  # type: ignore
 
@@ -210,7 +209,7 @@ def generate_css(opts: Namespace) -> bool:
 
     Et.register_namespace("", SVG_NS["svg"])
     svg_font: Et.ElementTree = Et.parse(str(font_pth))
-    font_el: Optional[Et.Element] = svg_font.find(".//svg:defs/svg:font", SVG_NS)
+    font_el: Et.Element | None = svg_font.find(".//svg:defs/svg:font", SVG_NS)
     if font_el is None:
         log.error("Could not find a font element in %s", font_pth.resolve())
         return False
@@ -220,7 +219,7 @@ def generate_css(opts: Namespace) -> bool:
         font_el.remove(hkern)
 
     for glyph in font_el.findall(".//svg:glyph", SVG_NS):
-        glyph_name: Optional[str] = glyph.get("glyph-name")
+        glyph_name: str | None = glyph.get("glyph-name")
         if not glyph_name.startswith("uni"):
            for codepoint, name in supported_glyphs.items():
                 if name == glyph_name:
@@ -230,7 +229,7 @@ def generate_css(opts: Namespace) -> bool:
             font_el.remove(glyph)
 
     log.debug("Shortening metadata entry to the essentials.")
-    metadata_el: Optional[Et.Element] = svg_font.find(".//svg:metadata", SVG_NS)
+    metadata_el: Et.Element | None = svg_font.find(".//svg:metadata", SVG_NS)
     if metadata_el is not None:
         metadata_el.clear()
         metadata_el.text = B64_FONT_LICENSE.format(fontname=fontname)
@@ -243,7 +242,7 @@ def generate_css(opts: Namespace) -> bool:
     log.debug("Writing SVG font %s", tmp_svg_font.resolve())
     svg_font.write(str(tmp_svg_font), encoding="UTF-8", xml_declaration=True)
 
-    tmp_woff2_pth: Optional[Path] = __fontforge_svg2woff(opts, tmpdir, svg_mtime)
+    tmp_woff2_pth: Path | None = __fontforge_svg2woff(opts, tmpdir, svg_mtime)
     if not tmp_woff2_pth:
         log.error("Could not create WOFF2")
         return False
@@ -335,8 +334,8 @@ def check(opts: Namespace) -> bool:
     supported_codes_not_in_font: set = supported_codes.difference(font_codes)
     font_codes_not_in_supported: set = font_codes.difference(supported_codes)
 
-    sc: list[str] = sorted(list(supported_codes_not_in_font))
-    fc: list[str] = sorted(list(font_codes_not_in_supported))
+    sc: list[str] = sorted(supported_codes_not_in_font)
+    fc: list[str] = sorted(font_codes_not_in_supported)
     print(f"Verovio-supported glyphs not in {fontname}: ", ", ".join(sc))
     if opts.show_unsupported:
         print(f"{fontname} glyphs not supported by Verovio: ", ", ".join(fc))
@@ -370,8 +369,8 @@ def __combine_alternates_and_supported(opts) -> dict:
     return supported_glyphs
 
 
-def __check_fontforge(opts: Namespace) -> Optional[str]:
-    fontforge_path: Optional[str] = (
+def __check_fontforge(opts: Namespace) -> str | None:
+    fontforge_path: str | None = (
         shutil.which("fontforge") if not opts.fontforge else opts.fontforge
     )
     if fontforge_path is None:
@@ -386,8 +385,8 @@ def __check_fontforge(opts: Namespace) -> Optional[str]:
     return fontforge_path
 
 
-def __fontforge_svg2woff(opts: Namespace, tmpdir: str, tstamp: float) -> Optional[Path]:
-    fontforge_path: Optional[str] = __check_fontforge(opts)
+def __fontforge_svg2woff(opts: Namespace, tmpdir: str, tstamp: float) -> Path | None:
+    fontforge_path: str | None = __check_fontforge(opts)
     if not fontforge_path:
         return None
 
@@ -434,7 +433,7 @@ def __fontforge_convert(opts: Namespace, fmt: str) -> bool:
         log.error("Unknown conversion format %s. Must be either 'svg' or 'woff2'.", fmt)
         return False
 
-    fontforge_path: Optional[str] = __check_fontforge(opts)
+    fontforge_path: str | None = __check_fontforge(opts)
     if not fontforge_path:
         return False
 
@@ -484,9 +483,9 @@ def __get_supported_glyph_codes(supported: Path) -> dict:
 
 def __read_svg_font_file(
     fontfile: str,
-) -> Optional[tuple[str, str, str, list[Et.Element]]]:
+) -> tuple[str, str, str, list[Et.Element]] | None:
     font_xml: Et.ElementTree = Et.parse(fontfile)
-    font_el: Optional[Et.Element] = font_xml.find("svg:defs/svg:font", SVG_NS)
+    font_el: Et.Element | None = font_xml.find("svg:defs/svg:font", SVG_NS)
     if font_el is None:
         log.error("Could not find a font definition in %s.", fontfile)
         return None
@@ -516,7 +515,7 @@ def __write_xml_glyphs(
 ) -> None:
     log.debug("Writing individual glyph files to %s", output.resolve())
     for glyph in glyphs:
-        glyph_name: Optional[str] = glyph.attrib.get("glyph-name")
+        glyph_name: str | None = glyph.attrib.get("glyph-name")
         if not glyph_name:
             log.debug("Could not find a glyph name. Skipping")
             continue
@@ -564,7 +563,7 @@ def __write_bb_xml(
     all_glyph_anchors: dict = metadata.get("glyphsWithAnchors", {})
 
     for glyph in glyphs:
-        glyph_name: Optional[str] = glyph.attrib.get("glyph-name")
+        glyph_name: str | None = glyph.attrib.get("glyph-name")
         if not glyph_name:
             log.debug("Could not find a glyph name. Skipping")
             continue
@@ -605,14 +604,14 @@ def __write_bb_xml(
         # If not, set it to a default value. Somewhat complicated by also trying
         # to check if the element has an attribute of "w", or if it's None.
         try:
-            wval: Optional[str] = g_element.get("w")
+            wval: str | None = g_element.get("w")
             if not wval:
                 raise TypeError
             _ = float(wval)
         except TypeError:
             g_element.set("w", glyph.attrib.get("horiz-adv-x", default_hax))
 
-        current_glyphname: Optional[str] = supported_glyphs.get(code)
+        current_glyphname: str | None = supported_glyphs.get(code)
         if current_glyphname:
             g_element.set("n", current_glyphname)
             g_anchors: dict = all_glyph_anchors.get(current_glyphname, {})
@@ -634,7 +633,7 @@ def __get_alternate_glyphs(glyphs: dict, metadata: dict) -> dict:
     additional_glyphs: dict = {}
 
     for name, alternates in glyph_alternates.items():
-        code: Optional[str] = inverted_glyphs.get(name)
+        code: str | None = inverted_glyphs.get(name)
         if not code:
             continue
 
