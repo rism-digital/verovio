@@ -293,9 +293,9 @@ export namespace VerovioToolkit {
     let instances: VerovioToolkit[];
 }
 export type VerovioOptions = import("./VerovioOptions").VerovioOptions;
-export type EditorAction = import("./EditorAction").EditorAction;
-export type EditorStatus = import("./EditorAction").EditorStatus;
-export type EditorResponse = import("./EditorAction").EditorResponse;
+export type EditorAction = import("./EditorTypes").EditorAction;
+export type EditorStatus = import("./EditorTypes").EditorStatus;
+export type EditorResponse = import("./EditorTypes").EditorResponse;
 export type AvailableOptions = import("./AvailableOptions").AvailableOptions;
 export type MIDIValues = import("./VerovioTypes").MIDIValues;
 export type GetMeiOptions = import("./VerovioTypes").GetMeiOptions;

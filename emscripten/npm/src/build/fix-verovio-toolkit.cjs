@@ -10,7 +10,7 @@
  * to name the imported types. In the declaration file they duplicate the
  * export type aliases at the bottom of the file, so they are removed.
  *
- * Usage: node fix-verovio-toolkit-dts.cjs
+ * Usage: node fix-verovio-toolkit.cjs
  */
 const fs = require("node:fs");
 const path = require("node:path");

@@ -3,9 +3,9 @@
 import { createEmscriptenProxy } from "./emscripten-proxy.js";
 
 /** @typedef {import("./types/VerovioOptions").VerovioOptions} VerovioOptions */
-/** @typedef {import("./types/EditorAction").EditorAction} EditorAction */
-/** @typedef {import("./types/EditorAction").EditorStatus} EditorStatus */
-/** @typedef {import("./types/EditorAction").EditorResponse} EditorResponse */
+/** @typedef {import("./types/EditorTypes").EditorAction} EditorAction */
+/** @typedef {import("./types/EditorTypes").EditorStatus} EditorStatus */
+/** @typedef {import("./types/EditorTypes").EditorResponse} EditorResponse */
 /** @typedef {import("./types/AvailableOptions").AvailableOptions} AvailableOptions */
 /** @typedef {import("./types/VerovioTypes").MIDIValues} MIDIValues */
 /** @typedef {import("./types/VerovioTypes").GetMeiOptions} GetMeiOptions */

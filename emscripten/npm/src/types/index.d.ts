@@ -1,7 +1,7 @@
 import { VerovioModule } from "./VerovioModule";
 
 export * from "./AvailableOptions";
-export * from "./EditorAction";
+export * from "./EditorTypes";
 export * from "./VerovioOptions";
 export * from "./VerovioTypes";
 export * from "./VerovioModule";
