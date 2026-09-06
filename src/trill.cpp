@@ -37,6 +37,7 @@ Trill::Trill()
     , AttNNumberLike()
     , AttOrnamentAccid()
     , AttPlacementRelStaff()
+    , AttVerticalGroup()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
@@ -47,6 +48,7 @@ Trill::Trill()
     this->RegisterAttClass(ATT_NNUMBERLIKE);
     this->RegisterAttClass(ATT_ORNAMENTACCID);
     this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
+    this->RegisterAttClass(ATT_VERTICALGROUP);
 
     this->Reset();
 }
@@ -65,6 +67,7 @@ void Trill::Reset()
     this->ResetNNumberLike();
     this->ResetOrnamentAccid();
     this->ResetPlacementRelStaff();
+    this->ResetVerticalGroup();
 }
 
 char32_t Trill::GetTrillGlyph() const

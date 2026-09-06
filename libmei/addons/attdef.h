@@ -56,6 +56,12 @@ typedef double data_VU;
 typedef std::vector<data_ARTICULATION> data_ARTICULATION_List;
 
 /**
+ * A typedef for an ordered list of staff items.
+ * E.g., list { data.STAFFITEM+ }
+ */
+typedef std::vector<data_STAFFITEM> data_STAFFITEM_List;
+
+/**
  * MEI data.BEATRPT_REND
  */
 enum data_BEATRPT_REND {
