@@ -209,6 +209,42 @@ export type EditorAction =
     | UpdateCursorAction
     | UpdatePitchAction;
 
-export type EditorResponse = object;
+type EditorStatusStatus = "OK" | "FAILURE";
+type EditorStatusMessage = {
+    status: EditorStatusStatus;
+    message: string;
+    elementId?: string;
+    newStaffId?: string;
+    uuid?: string[];
+}
+type EditorStatusInsertion = {
+    oct: number;
+    pname: string;
+    dur: string;
+    dots: number;
+    inputMode: "pitchFirst" | "durationFirst";
+    chordMode: boolean;
+    restMode: boolean;
+    accid: string;
+    accidImplicit: boolean;
+}
+type EditorStatusInfo = {
+    chainedId: string;
+    canUndo: boolean;
+    canRedo: boolean;
+    isMensuralMusicOnly: boolean;
+    invalidLayout?: boolean;
+    selection?: {
+        id: string;
+        element: string;
+        secondaryId?: string;
+    }
+} & (
+    | { insertMode: true; insertion: EditorStatusInsertion; }
+    | { insertMode: false; insertion?: undefined; }
+)
+export type EditorStatus =
+  | { status: EditorStatusStatus; } & (EditorStatusInfo | EditorStatusMessage) // If status exists, expect extra fields
+  | { status?: undefined; } & EditorStatusInfo; // If status is undefined, only expect info
 
-export type EditorStatus = object;
+export type EditorResponse = object;
