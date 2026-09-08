@@ -1,3 +1,6 @@
+/**
+ * EditorAction and related types.
+ */
 export interface CommitAction {
     action: "commit";
 }
@@ -209,6 +212,9 @@ export type EditorAction =
     | UpdateCursorAction
     | UpdatePitchAction;
 
+/**
+ * EditorStatus and related types.
+ */
 type EditorStatusStatus = "OK" | "FAILURE";
 type EditorStatusMessage = {
     status: EditorStatusStatus;
@@ -247,4 +253,33 @@ export type EditorStatus =
   | { status: EditorStatusStatus; } & (EditorStatusInfo | EditorStatusMessage) // If status exists, expect extra fields
   | { status?: undefined; } & EditorStatusInfo; // If status is undefined, only expect info
 
-export type EditorResponse = object;
+/**
+ * EditorResponse and related types.
+ */
+type EditorResponseObjectContext = {
+    element: string;
+    id: string;
+    attributes?: {
+        n: number;
+    }
+} & (
+    | { isLeaf: false; children: EditorResponseObjectContext[] }
+    | { isLeaf: true; children?: undefined }
+)
+type EditorResponseReferencesContext = (EditorResponseObjectContext & { referenceAttribute: string })[];
+type EditorResponseElementContext = {
+    ancestors: EditorResponseObjectContext[];
+    children: EditorResponseObjectContext[];
+    context: EditorResponseObjectContext;
+    object: {} | {
+        attributes: {
+            [key: string]: string;
+        };
+        text: string;
+    }
+    referringElements: EditorResponseReferencesContext[];
+    referencedElements: EditorResponseReferencesContext[];
+}
+// TODO @see MEIOutputExtended::ToJson()
+type EditorResponseScoreDef = object;
+export type EditorResponse = EditorResponseObjectContext | EditorResponseElementContext | EditorResponseScoreDef;
