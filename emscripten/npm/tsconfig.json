@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "outDir": "src/types",
+        "rootDir": "src",
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "target": "es2020",
+        "lib": ["es2020", "dom"],
+        "skipLibCheck": true
+    },
+    "include": ["src/verovio-toolkit.js"]
+}

@@ -1,6 +1,4 @@
-const targets = [
-    "verovio.js",
-];
+const targets = ["verovio.js"];
 
 function appendModuleExports(string) {
     return `${string}
@@ -11,7 +9,7 @@ export default function addModuleExports() {
     return {
         name: "add-module-exports",
         transform(source, id) {
-            if (!targets.some(s => id.endsWith(s))) {
+            if (!targets.some((s) => id.endsWith(s))) {
                 return;
             }
             return {
