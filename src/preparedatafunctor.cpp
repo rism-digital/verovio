@@ -1141,20 +1141,17 @@ FunctorCode PrepareLyricsFunctor::VisitSyl(Syl *syl)
     if (m_currentSyl) {
         // The previous syl was an initial or median -> The note we just parsed is the end
         if ((m_currentSyl->GetWordpos() == sylLog_WORDPOS_i) || (m_currentSyl->GetWordpos() == sylLog_WORDPOS_m)) {
-            if (!isEmptySyl) {
-                m_currentSyl->SetEnd(m_lastNoteOrChord);
-                m_currentSyl->m_nextWordSyl = syl;
-            }
+            m_currentSyl->SetEnd(m_lastNoteOrChord);
+            if (!isEmptySyl) m_currentSyl->m_nextWordSyl = syl;
         }
-        // The previous syl was an underscore -> the explicit empty endpoint or the previous but one was the end.
+        // The previous syl was an underscore -> the previous but one was the end
         else if (m_currentSyl->GetCon() == sylLog_CON_u) {
-            LayerElement *end = isEmptySyl ? syl->GetStart() : m_penultimateNoteOrChord;
-            if (end && (m_currentSyl->GetStart() == end)) {
+            if (m_currentSyl->GetStart() == m_penultimateNoteOrChord) {
                 LogWarning("Syllable with underline extender under one single note '%s'",
                     m_currentSyl->GetStart()->GetID().c_str());
             }
-            else if (end) {
-                m_currentSyl->SetEnd(end);
+            else if (m_penultimateNoteOrChord) {
+                m_currentSyl->SetEnd(m_penultimateNoteOrChord);
             }
         }
     }

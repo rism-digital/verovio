@@ -3363,6 +3363,17 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
 
         // verse / syl
+        // In MusicXML, the last note of an extender is marked with <extend type="stop"/>. In MEI, an extender is ended
+        // by the presence of a syllable on the next note.
+        std::set<int> extenderStops;
+        if (!isChord && (element->Is(CHORD) || element->Is(NOTE))) {
+            const auto pending = m_pendingExtenderStops.find({ staff->GetN(), layer->GetN() });
+            if (pending != m_pendingExtenderStops.end()) {
+                extenderStops = pending->second;
+                m_pendingExtenderStops.erase(pending);
+            }
+        }
+
         for (pugi::xml_node lyric : node.children("lyric")) {
             pugi::xml_node extendStop;
             bool hasStartingExtend = false;
@@ -3377,16 +3388,13 @@ void MusicXmlInput::ReadMusicXmlNote(
             if (!lyric.child("text") && !extendStop) continue; // Dorico exports non-valid MusicXML
             short int lyricNumber = lyric.attribute("number").as_int();
             lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
+            if (extendStop) m_pendingExtenderStops[{ staff->GetN(), layer->GetN() }].insert(lyricNumber);
+            if (!lyric.child("text")) continue;
             Verse *verse = new Verse();
             verse->SetColor(lyric.attribute("color").as_string());
             // verse->SetPlace(verse->AttPlacementRelStaff::StrToStaffrelBasic(lyric.attribute("placement").as_string()));
             verse->SetLabel(lyric.attribute("name").as_string());
             verse->SetN(lyricNumber);
-            // MusicXML represents melisma endpoints as textless <lyric><extend type="stop"/></lyric>.
-            // Keep this as a schema-valid empty syl anchor so lyric preparation can close the previous extender here.
-            if (extendStop) {
-                verse->AddChild(new Syl());
-            }
             std::string syllabic = "single";
             for (pugi::xml_node childNode : lyric.children()) {
                 if (!strcmp(childNode.name(), "syllabic")) syllabic = GetContent(childNode);
@@ -3476,6 +3484,9 @@ void MusicXmlInput::ReadMusicXmlNote(
                     verse->AddChild(syl);
                 }
             }
+            if (extenderStops.erase(lyricNumber) && !verse->GetFirst(SYL)) {
+                verse->AddChild(new Syl());
+            }
             // TODO Tablature: <tabGrp> does not support child <verse>
             if (element->Is(CHORD) || element->Is(NOTE)) {
                 element->AddChild(verse);
@@ -3484,6 +3495,14 @@ void MusicXmlInput::ReadMusicXmlNote(
                 // this should not happen
                 delete verse;
             }
+        }
+
+        // End extenders by adding a verse with empty syl
+        for (int lyricNumber : extenderStops) {
+            Verse *verse = new Verse();
+            verse->SetN(lyricNumber);
+            verse->AddChild(new Syl());
+            element->AddChild(verse);
         }
 
         // slurs
