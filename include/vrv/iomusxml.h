@@ -29,6 +29,7 @@
 namespace vrv {
 
 class Arpeg;
+class AttTypography;
 class BeamSpan;
 class BracketSpan;
 class Clef;
@@ -503,6 +504,7 @@ private:
     ///@{
     std::string GetWordsOrDynamicsText(const pugi::xml_node node) const;
     void TextRendition(const pugi::xpath_node_set words, ControlElement *element) const;
+    void SetFontStyleAndWeight(AttTypography *typography, const pugi::xml_node node) const;
     std::string StyleLabel(pugi::xml_node display);
     void PrintMetronome(pugi::xml_node metronome, Tempo *tempo);
     ///@}

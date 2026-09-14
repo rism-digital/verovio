@@ -736,8 +736,7 @@ void MusicXmlInput::TextRendition(const pugi::xpath_node_set words, ControlEleme
                 rend->AttHorizontalAlign::StrToHorizontalalignment(textNode.attribute("halign").as_string()));
             rend->SetSpace(textNode.attribute("xml:space").as_string());
             rend->SetFontfam(textNode.attribute("font-family").as_string());
-            rend->SetFontstyle(rend->AttTypography::StrToFontstyle(textNode.attribute("font-style").as_string()));
-            rend->SetFontweight(rend->AttTypography::StrToFontweight(textNode.attribute("font-weight").as_string()));
+            this->SetFontStyleAndWeight(rend, textNode);
             rend->SetRend(ConvertEnclosure(textNode.attribute("enclosure").as_string()));
             element->AddChild(rend);
             textParent = rend;
@@ -762,6 +761,35 @@ void MusicXmlInput::TextRendition(const pugi::xpath_node_set words, ControlEleme
             firstLine = false;
         }
     }
+}
+
+/**
+ * Some software (such as Finale) outputs MusicXML with font style and weight specified in @font-family, instead of
+ * using @font-style and @font-weight attributes – for example: "Times-Italic". This function converts to standard
+ * attributes so the style comes across to the MEI.
+ */
+void MusicXmlInput::SetFontStyleAndWeight(AttTypography *typography, const pugi::xml_node node) const
+{
+    assert(typography);
+
+    const std::string fontFamily = node.attribute("font-family").as_string();
+    data_FONTSTYLE fontStyle = typography->StrToFontstyle(node.attribute("font-style").as_string());
+    data_FONTWEIGHT fontWeight = typography->StrToFontweight(node.attribute("font-weight").as_string());
+
+    // Match "Bold", "Italic", or "BoldItalic", separated from the font name with a space or hyphen, case insensitive,
+    // without matching font names like "Humboldt" or "Italica"
+    static const std::regex italicFace("\\b(bold)?italic\\b", std::regex::icase);
+    static const std::regex boldFace("\\bbold(italic)?\\b", std::regex::icase);
+
+    if ((fontStyle == FONTSTYLE_NONE) || (fontStyle == FONTSTYLE_normal)) {
+        if (std::regex_search(fontFamily, italicFace)) fontStyle = FONTSTYLE_italic;
+    }
+    if ((fontWeight == FONTWEIGHT_NONE) || (fontWeight == FONTWEIGHT_normal)) {
+        if (std::regex_search(fontFamily, boldFace)) fontWeight = FONTWEIGHT_bold;
+    }
+
+    typography->SetFontstyle(fontStyle);
+    typography->SetFontweight(fontWeight);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -945,10 +973,9 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 rend->AttHorizontalAlign::StrToHorizontalalignment(words.node().attribute("justify").as_string()));
             rend->SetValign(
                 rend->AttVerticalAlign::StrToVerticalalignment(words.node().attribute("valign").as_string()));
-            rend->SetFontstyle(rend->AttTypography::StrToFontstyle(words.node().attribute("font-style").as_string()));
+            rend->SetFontfam(words.node().attribute("font-family").as_string());
             // rend->SetFontsize(rend->AttTypography::StrToFontsize(words.node().attribute("font-size").as_string()+std::string("pt")));
-            rend->SetFontweight(
-                rend->AttTypography::StrToFontweight(words.node().attribute("font-weight").as_string()));
+            this->SetFontStyleAndWeight(rend, words.node());
             rend->AddChild(text);
             if (words.node().attribute("default-y").as_float() < 2 * bottom) {
                 if (!foot) {
@@ -2737,7 +2764,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         reh->SetStaff(reh->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
         reh->SetLang(lang);
         Rend *rend = new Rend();
-        rend->SetFontweight(rend->AttTypography::StrToFontweight(rehearsal.attribute("font-weight").as_string()));
+        this->SetFontStyleAndWeight(rend, rehearsal);
         rend->SetHalign(rend->AttHorizontalAlign::StrToHorizontalalignment(halign));
         const std::string enclosure = rehearsal.attribute("enclosure").as_string();
         rend->SetRend(enclosure.empty() ? TEXTRENDITION_box : ConvertEnclosure(enclosure));
@@ -3392,8 +3419,6 @@ void MusicXmlInput::ReadMusicXmlNote(
                 if (!strcmp(childNode.name(), "syllabic")) syllabic = GetContent(childNode);
                 if (!strcmp(childNode.name(), "text") && !HasAttributeWithValue(lyric, "print-object", "no")) {
                     // const std::string textColor = textNode.attribute("color").as_string();
-                    const std::string textStyle = childNode.attribute("font-style").as_string();
-                    const std::string textWeight = childNode.attribute("font-weight").as_string();
                     const short int lineThrough = childNode.attribute("line-through").as_int();
                     const std::string lang = childNode.attribute("xml:lang").as_string();
                     std::string textStr = childNode.text().as_string();
@@ -3458,9 +3483,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                         syl->SetCon(sylLog_CON_u);
                     }
 
-                    if (!textStyle.empty()) syl->SetFontstyle(syl->AttTypography::StrToFontstyle(textStyle.c_str()));
-                    if (!textWeight.empty())
-                        syl->SetFontweight(syl->AttTypography::StrToFontweight(textWeight.c_str()));
+                    this->SetFontStyleAndWeight(syl, childNode);
 
                     Text *text = new Text();
                     text->SetText(UTF8to32(textStr));
