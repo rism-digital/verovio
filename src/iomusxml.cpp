@@ -128,9 +128,7 @@ bool MusicXmlInput::Import(const std::string &musicxml)
         m_doc->Reset();
         m_doc->SetType(Raw);
         pugi::xml_document xmlDoc;
-        // Keep whitespace-only element content: in MusicXML it can be significant - most notably
-        // `<elision> </elision>`, where the content is the symbol to be displayed for the elision.
-        xmlDoc.load_string(musicxml.c_str(), pugi::parse_default | pugi::parse_ws_pcdata_single);
+        xmlDoc.load_string(musicxml.c_str());
         pugi::xml_node root = xmlDoc.first_child();
         return ReadMusicXml(root);
     }
@@ -2809,8 +2807,7 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure)
         textStr.append(figure.child("figure-number").text().as_string());
         textStr.append(ConvertFigureGlyph(figure.child("suffix").text().as_string()));
         if (paren) textStr.append(")");
-        // MusicXML is parsed keeping whitespace-only content, which is not a figure
-        if (textStr.find_first_not_of(" \f\n\r\t\v") == std::string::npos) continue;
+        if (textStr.empty()) continue;
         F *f = new F();
         pugi::xml_node extend = figure.child("extend");
         if (extend && !HasAttributeWithValue(extend, "type", "stop")) {
@@ -2853,8 +2850,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure)
 
     std::string harmText = GetContentOfChild(node, "root/root-step");
     pugi::xpath_node alter = node.select_node("root/root-alter");
-    // MusicXML is parsed keeping whitespace-only content, which is not a root step
-    if (harmText.find_first_not_of(" \f\n\r\t\v") == std::string::npos) {
+    if (harmText.empty()) {
         pugi::xml_node numeral = node.select_node("numeral/numeral-root").node();
         harmText = numeral.attribute("text") ? numeral.attribute("text").as_string() : numeral.text().as_string();
         alter = node.select_node("numeral/numeral-alter");
@@ -4901,7 +4897,7 @@ sylLog_CON MusicXmlInput::ConvertElisionToCon(const pugi::xml_node elision)
 {
     // The content of <elision> is printed between the two syllables it joins
     static const std::map<std::string, sylLog_CON> Elision2Con{
-        { " ", sylLog_CON_s }, // space
+        { "\u00A0", sylLog_CON_s }, // no-break space
         { "-", sylLog_CON_d }, // hyphen-minus
         { "\u2010", sylLog_CON_d }, // hyphen
         { "_", sylLog_CON_u }, // low line
@@ -4939,10 +4935,7 @@ sylLog_CON MusicXmlInput::ConvertElisionToCon(const pugi::xml_node elision)
         return sylLog_CON_b;
     }
 
-    // Normalize whitespace to a single space character
-    const std::string symbol = (value.find_first_not_of(" \f\n\r\t\v\u00A0") == std::string::npos) ? " " : value;
-
-    const auto result = Elision2Con.find(symbol);
+    const auto result = Elision2Con.find(value);
     if (result != Elision2Con.end()) {
         return result->second;
     }
