@@ -2432,11 +2432,11 @@ int Doc::GetAdjustedDrawingPageHeight() const
         return m_drawingPage->m_pageHeight * m_drawingPage->GetPPUFactor() / DEFINITION_FACTOR;
     }
 
-    int contentHeight = m_drawingPage->GetContentHeight();
+    int contentHeight = m_drawingPage->GetContentHeight() + m_drawingPageMarginTop + m_drawingPageMarginBottom;
     if (m_options->m_scaleToPageSize.GetValue()) {
         contentHeight = contentHeight * m_options->m_scale.GetValue() / 100;
     }
-    return (contentHeight + m_drawingPageMarginTop + m_drawingPageMarginBottom) / DEFINITION_FACTOR;
+    return (contentHeight / DEFINITION_FACTOR);
 }
 
 int Doc::GetAdjustedDrawingPageWidth() const
@@ -2448,11 +2448,11 @@ int Doc::GetAdjustedDrawingPageWidth() const
         return m_drawingPage->m_pageWidth * m_drawingPage->GetPPUFactor() / DEFINITION_FACTOR;
     }
 
-    int contentWidth = m_drawingPage->GetContentWidth();
+    int contentWidth = m_drawingPage->GetContentWidth() + m_drawingPageMarginLeft + m_drawingPageMarginRight;
     if (m_options->m_scaleToPageSize.GetValue()) {
         contentWidth = contentWidth * m_options->m_scale.GetValue() / 100;
     }
-    return (contentWidth + m_drawingPageMarginLeft + m_drawingPageMarginRight) / DEFINITION_FACTOR;
+    return (contentWidth / DEFINITION_FACTOR);
 }
 
 void Doc::SetMensuralMusicOnly(data_BOOLEAN isMensuralMusicOnly)
