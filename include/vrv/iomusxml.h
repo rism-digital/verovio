@@ -11,6 +11,7 @@
 #include <map>
 #include <optional>
 #include <queue>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -657,6 +658,8 @@ private:
     /* A maps of time stamps (score time) to indicate write pointer of a given layer */
     std::map<Layer *, int> m_layerEndTimes;
     std::map<Layer *, std::multimap<int, LayerElement *>> m_layerTimes;
+    /* Verse numbers with a pending <extend type="stop"/> per staff/layer @n, to anchor on the following note */
+    std::map<std::pair<int, int>, std::set<int>> m_pendingExtenderStops;
     /* To remember layer of last element (note) to handle chords */
     Layer *m_prevLayer = NULL;
     /* To remember current layer to properly handle layers/staves/cross-staff elements */
