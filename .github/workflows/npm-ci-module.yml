@@ -160,18 +160,18 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [build_js]
 
-  steps:
-    - name: Create npm/dist
-      working-directory: ${{ github.workspace }}/emscripten
-      run: mkdir -p npm/dist
+    steps:
+      - name: Create npm/dist
+        working-directory: ${{ github.workspace }}/emscripten
+        run: mkdir -p npm/dist
 
-    - name: Copy JS toolkit artifacts to npm/dist
-      run: cp build/verovio.js npm/dist/verovio-module.mjs && cp build/verovio-toolkit-wasm.js npm/dist/verovio-toolkit-wasm.js
+      - name: Copy JS toolkit artifacts to npm/dist
+        run: cp build/verovio.js npm/dist/verovio-module.mjs && cp build/verovio-toolkit-wasm.js npm/dist/verovio-toolkit-wasm.js
 
-    - name: Build npm module
-      working-directory: ${{ github.workspace }}/emscripten/npm
-      run: npm install && npm run build && npm link
+      - name: Build npm module
+        working-directory: ${{ github.workspace }}/emscripten/npm
+        run: npm install && npm run build && npm link
 
-    - name: Run npm tests
-      working-directory: ${{ github.workspace }}/emscripten/npm/test
-      run: npm install && npm link verovio && npm test
+      - name: Run npm tests
+        working-directory: ${{ github.workspace }}/emscripten/npm/test
+        run: npm install && npm link verovio && npm test
