@@ -1,0 +1,177 @@
+name: NPM Module Build
+
+on:
+  pull_request:
+    branches: [develop]
+
+# globals
+env:
+  # general settings
+  MAIN_REPO_OWNER:
+    rism-digital # Main repo owner (default: rism-digital; should not be changed)
+    # If changed, owner needs deploy permission to <owner>/verovio.org and <owner>/verovio-doxygen (cf. Deploy jobs).
+    # DISABLE_DEPLOY_STEPS & IS_DRY_RUN are programmatically set to false for main repo owner.
+
+  DISABLE_DEPLOY_STEPS:
+    true # Flag used to disable deploy steps at all (default: true).
+    # TRUE (no matter what IS_DRY_RUN): Will skip deploy steps of the workflow.
+    # FALSE (together with IS_DRY_RUN = true): Will allow to run deploy steps in dry-run mode.
+    # FALSE (together with IS_DRY_RUN = false): Will allow to deploy/git push from fork.
+    # Will be programmatically set to 'false' for rism-digital repo.
+
+  IS_DRY_RUN:
+    true # Flag used for dry-run mode in 'git push' command (default: true).
+    # TRUE (needs DISABLE_DEPLOY_STEPS = false): Will allow to run deploy steps in dry-run mode.
+    # FALSE (needs DISABLE_DEPLOY_STEPS = false): Will allow to deploy/git push from fork.
+    # Will be programmatically set to 'false' for rism-digital repo.
+
+  # build artifacts
+  DOC_BUILD: doc-build
+  TOOLKIT_BUILD: toolkit-build
+  FONTS: fonts
+
+  # doxygen
+  DOXYGEN_REPO: ${{ github.repository_owner }}/verovio-doxygen # works from rism-digital and from forks
+  DOXYGEN_BRANCH: develop
+
+  # emscripten
+  EM_VERSION: latest
+  EM_CACHE_FOLDER: "emsdk-cache"
+  EM_CACHE_ID: 4
+
+  # gh-pages
+  GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org # works from rism-digital and from forks
+  GH_PAGES_BRANCH: gh-pages
+
+  # temporary directories
+  DOXYGEN_DIR: doxygen-dir
+  GH_PAGES_DIR: gh-pages-dir
+  TEMP_DIR: temp-dir
+
+jobs:
+  #####################################
+  # Set up and cache emscripten build #
+  #####################################
+  setup_emscripten:
+    # skip job if commit message contains "[skip-ci]"
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
+
+    name: Set up and cache emscripten
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Set up cache
+        uses: actions/cache@v6
+        id: cache
+        with:
+          # path for cache
+          path: ${{ env.EM_CACHE_FOLDER }}
+          # key for cache
+          key: ${{ runner.os }}-emsdk-${{ env.EM_VERSION }}-${{ env.EM_CACHE_ID }}
+
+      - name: Set up emsdk
+        uses: mymindstorm/setup-emsdk@v16
+        with:
+          version: ${{ env.EM_VERSION }}
+          actions-cache-folder: ${{ env.EM_CACHE_FOLDER }}
+
+      - name: Verify emscripten build
+        run: emcc -v
+
+  ##################################
+  # Build the JS toolkit artifacts #
+  ##################################
+  build_js:
+    name: Build JS toolkit
+    runs-on: ubuntu-22.04
+    needs: [setup_emscripten]
+
+    # set matrix with toolkit options (runs the following steps for every target in parallel)
+    strategy:
+      matrix:
+        toolkit:
+          - target: nohumdrum
+            message: "Building toolkit without humdrum"
+            options: "-c -H -M"
+            filepath: "verovio-toolkit.js*"
+          - target: wasm
+            message: "Building toolkit without humdrum as wasm"
+            options: "-c -H -w -M"
+            filepath: "verovio*wasm*"
+            upload: true
+          - target: default
+            message: "Building default toolkit with humdrum"
+            options: "-c -M"
+            filepath: "*-hum.js*"
+          - target: module
+            message: "Building modularized emscripten module without humdrum"
+            options: "-c -w -M -H -m"
+            filepath: "verovio.js*"
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v7.0.1
+
+      - name: Create TEMP_DIR
+        working-directory: ${{ github.workspace }}
+        run: mkdir -p $TEMP_DIR/
+
+      # Restore system libraries from cache
+      - name: Restore cache
+        id: restore_cache
+        uses: actions/cache@v6
+        with:
+          # path for cache
+          path: ${{ env.EM_CACHE_FOLDER }}
+          # key for cache
+          key: ${{ runner.os }}-emsdk-${{ env.EM_VERSION }}-${{ env.EM_CACHE_ID }}
+
+      # Install and/or activate emsdk
+      - name: Set up emsdk
+        uses: mymindstorm/setup-emsdk@v16
+        with:
+          version: ${{ env.EM_VERSION }}
+          actions-cache-folder: ${{ env.EM_CACHE_FOLDER }}
+
+      - name: Verify emscripten build
+        run: emcc -v
+
+      - name: ${{ matrix.toolkit.message }} (${{ matrix.toolkit.options }})
+        working-directory: ${{ github.workspace }}/emscripten
+        run: ./buildToolkit ${{ matrix.toolkit.options }}
+
+      - name: Copy build into TEMP_DIR
+        if: ${{ matrix.toolkit.upload == true }}
+        working-directory: ${{ github.workspace }}/emscripten
+        run: cp build/${{ matrix.toolkit.filepath }} $GITHUB_WORKSPACE/$TEMP_DIR/
+
+      - name: Upload js build artifact (${{ matrix.toolkit.target }})
+        if: ${{ matrix.toolkit.upload == true }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.TOOLKIT_BUILD }}-${{ github.run_id }}
+          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ matrix.toolkit.filepath }}
+
+  #########################
+  # Build the NPM package #
+  #########################
+  build_npm:
+    name: Build NPM package
+    runs-on: ubuntu-22.04
+    needs: [build_js]
+
+  steps:
+    - name: Create npm/dist
+      working-directory: ${{ github.workspace }}/emscripten
+      run: mkdir -p npm/dist
+
+    - name: Copy JS toolkit artifacts to npm/dist
+      run: cp build/verovio.js npm/dist/verovio-module.mjs && cp build/verovio-toolkit-wasm.js npm/dist/verovio-toolkit-wasm.js
+
+    - name: Build npm module
+      working-directory: ${{ github.workspace }}/emscripten/npm
+      run: npm install && npm run build && npm link
+
+    - name: Run npm tests
+      working-directory: ${{ github.workspace }}/emscripten/npm/test
+      run: npm install && npm link verovio && npm test
