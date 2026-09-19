@@ -1,0 +1,17 @@
+{
+  "name": "verovio-test",
+  "version": "1.0.0",
+  "description": "Test runner for verovio npm package.",
+  "scripts": {
+    "test:cts": "tsc -p tsconfig.cts.json && node verovio-tests.cjs",
+    "test:mts": "tsc -p tsconfig.mts.json && node verovio-tests.mjs",
+    "test": "npm run test:cts && npm run test:mts"
+  },
+  "dependencies": {
+    "verovio": "^6.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.0",
+    "typescript": "^6.0.3"
+  }
+}

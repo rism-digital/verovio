@@ -86,11 +86,11 @@ jobs:
           - os: ubuntu-24.04
             compiler: g++
             version: "12"
-            
+
           - os: ubuntu-24.04
             compiler: g++
             version: "13"
-            
+
           - os: ubuntu-24.04
             compiler: g++
             version: "14"
@@ -126,7 +126,7 @@ jobs:
           - os: macos-14
             compiler: xcode
             version: "15.4"
-          
+
           - os: macos-15
             compiler: xcode
             version: "16.2"
@@ -209,7 +209,7 @@ jobs:
   build_java:
     # skip job if commit message contains "[skip-ci]"
     if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
-  
+
     name: Build Java toolkit
     runs-on: ubuntu-22.04
 
@@ -280,7 +280,7 @@ jobs:
           GOCACHE: ${{ github.workspace }}/.gocache
         run: go test ./...
 
-  
+
   #####################################
   # Set up and cache emscripten build #
   #####################################
@@ -335,6 +335,10 @@ jobs:
             message: "Building default toolkit with humdrum"
             options: "-c -M"
             filepath: "*-hum.js*"
+          - target: module
+            message: "Building modularized emscripten module without humdrum"
+            options: "-c -w -M -H -m"
+            filepath: "verovio.js*"
 
     steps:
       - name: Checkout main repo
@@ -380,6 +384,29 @@ jobs:
           name: ${{ env.TOOLKIT_BUILD }}-${{ github.run_id }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ matrix.toolkit.filepath }}
 
+  #########################
+  # Build the NPM package #
+  #########################
+  build_npm:
+    name: Build NPM package
+    runs-on: ubuntu-22.04
+    needs: [build_js]
+
+  steps:
+    - name: Create npm/dist
+      working-directory: ${{ github.workspace }}/emscripten
+      run: mkdir -p npm/dist
+
+    - name: Copy JS toolkit artifacts to npm/dist
+      run: cp build/verovio.js npm/dist/verovio-module.mjs && cp build/verovio-toolkit-wasm.js npm/dist/verovio-toolkit-wasm.js
+
+    - name: Build npm module
+      working-directory: ${{ github.workspace }}/emscripten/npm
+      run: npm install && npm run build && npm link
+
+    - name: Run npm tests
+      working-directory: ${{ github.workspace }}/emscripten/npm/test
+      run: npm install && npm link verovio && npm test
 
   ############################
   # Copy the font CSS files  #
@@ -387,7 +414,7 @@ jobs:
   copy_font_files:
     # skip job if commit message contains "[skip-ci]"
     if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
-  
+
     name: Copy the font files
     runs-on: ubuntu-22.04
 
@@ -535,7 +562,7 @@ jobs:
 
           echo "DISABLE_DEPLOY_STEPS = ${DISABLE_DEPLOY_STEPS}"
           echo "IS_DRY_RUN = ${IS_DRY_RUN}"
-      
+
 
   ###################################
   # Build the doxygen documentation #
