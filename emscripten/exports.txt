@@ -24,6 +24,7 @@ _vrvToolkit_getPageCount
 _vrvToolkit_getPageWithElement
 _vrvToolkit_getTimeForElement
 _vrvToolkit_getTimesForElement
+_vrvToolkit_getPitchPosition
 _vrvToolkit_getVersion
 _vrvToolkit_loadData
 _vrvToolkit_loadZipDataBase64

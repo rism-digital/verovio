@@ -81,6 +81,9 @@ function getToolkitFunction(VerovioModule, method) {
     // char *getTimesForElement(Toolkit *ic, const char *xmlId)
     mapping.getTimesForElement = VerovioModule.cwrap("vrvToolkit_getTimesForElement", "string", ["number", "string"]);
 
+    // char *getPitchPosition(Toolkit *ic, double scoreTime, double midiPitch, int staff)
+    mapping.getPitchPosition = VerovioModule.cwrap("vrvToolkit_getPitchPosition", "string", ["number", "number", "number", "number"]);
+
     // char *getMIDIValuesForElement(Toolkit *ic, const char *xmlId)
     mapping.getMIDIValuesForElement = VerovioModule.cwrap("vrvToolkit_getMIDIValuesForElement", "string", ["number", "string"]);
 
