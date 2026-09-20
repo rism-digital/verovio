@@ -1,4 +1,4 @@
-import { VerovioModule } from "../index.js";
+import { VerovioModuleFactory } from "../index.js";
 
-declare function createVerovioModule(): Promise<VerovioModule>;
+declare const createVerovioModule: VerovioModuleFactory;
 export default createVerovioModule;

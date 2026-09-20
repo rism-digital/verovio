@@ -24,11 +24,11 @@ export class VerovioToolkit {
 
     /** @param {VerovioModule} [VerovioModule] */
     constructor(VerovioModule) {
-        /** @private @type {any} */
-        this.VerovioModule = VerovioModule;
-        if (!this.VerovioModule) {
+        if (!VerovioModule) {
             throw new Error("VerovioToolkit needs VerovioModule passed as argument to the constructor.");
         }
+        /** @private @type {VerovioModule} */
+        this.VerovioModule = VerovioModule;
         /** @private @type {any} */
         this.proxy = createEmscriptenProxy(this.VerovioModule);
         /** @private @type {number} */

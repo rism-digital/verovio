@@ -2114,3 +2114,4 @@ export interface VerovioOptions {
      */
     liquescentWithoutTails?: boolean;
 }
+

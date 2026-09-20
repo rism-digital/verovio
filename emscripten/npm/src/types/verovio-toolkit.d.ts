@@ -6,7 +6,7 @@
 export class VerovioToolkit {
     /** @param {VerovioModule} [VerovioModule] */
     constructor(VerovioModule?: VerovioModule);
-    /** @private @type {any} */
+    /** @private @type {VerovioModule} */
     private VerovioModule;
     /** @private @type {any} */
     private proxy;
