@@ -90,19 +90,19 @@ jobs:
     strategy:
       matrix:
         toolkit:
-          - target: nohumdrum
-            message: "Building toolkit without humdrum"
-            options: "-c -H -M"
-            filepath: "verovio-toolkit.js*"
+          # - target: nohumdrum
+          #   message: "Building toolkit without humdrum"
+          #   options: "-c -H -M"
+          #   filepath: "verovio-toolkit.js*"
           - target: wasm
             message: "Building toolkit without humdrum as wasm"
             options: "-c -H -w -M"
             filepath: "verovio*wasm*"
             upload: true
-          - target: default
-            message: "Building default toolkit with humdrum"
-            options: "-c -M"
-            filepath: "*-hum.js*"
+          # - target: default
+          #   message: "Building default toolkit with humdrum"
+          #   options: "-c -M"
+          #   filepath: "*-hum.js*"
           - target: module
             message: "Building modularized emscripten module without humdrum"
             options: "-c -w -M -H -m"
@@ -170,11 +170,13 @@ jobs:
         run: mkdir -p npm/dist
 
       - name: Download JS artifacts
+        working-directory: ${{ github.workspace }}/emscripten
         uses: actions/download-artifact@v8.0.1
         with:
           path: artifacts
 
       - name: Copy JS toolkit artifacts to npm/dist
+        working-directory: ${{ github.workspace }}/emscripten
         run: |
           cp artifacts/${{ env.TOOLKIT_BUILD }}-module-${{ github.run_id }}/verovio.js npm/dist/verovio-module.mjs
           cp artifacts/${{ env.TOOLKIT_BUILD }}-wasm-${{ github.run_id }}/verovio-toolkit-wasm.js npm/dist/verovio-toolkit-wasm.js
