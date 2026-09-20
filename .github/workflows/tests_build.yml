@@ -1,6 +1,7 @@
 name: Test Suite Evaluation
 
 on:
+  workflow_dispatch:
   #pull_request:
   #  branches: [develop]
   # TODO: run this task only on PR in production; use push event for testing
