@@ -172,10 +172,12 @@ jobs:
       - name: Download JS artifacts
         uses: actions/download-artifact@v8.0.1
         with:
-          path: npm/dist
+          path: artifacts
 
-      - name: Prepare JS artifacts
-        run: mv npm/dist/verovio.js npm/dist/verovio-module.mjs
+      - name: Copy JS toolkit artifacts to npm/dist
+        run: |
+          cp artifacts/${{ env.TOOLKIT_BUILD }}-module-${{ github.run_id }}/verovio.js npm/dist/verovio-module.mjs
+          cp artifacts/${{ env.TOOLKIT_BUILD }}-wasm-${{ github.run_id }}/verovio-toolkit-wasm.js npm/dist/verovio-toolkit-wasm.js
 
       - name: Build npm module
         working-directory: ${{ github.workspace }}/emscripten/npm
