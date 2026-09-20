@@ -170,10 +170,9 @@ jobs:
         run: mkdir -p npm/dist
 
       - name: Download JS artifacts
-        working-directory: ${{ github.workspace }}/emscripten
         uses: actions/download-artifact@v8.0.1
         with:
-          path: artifacts
+          path: ${{ github.workspace }}/emscripten/artifacts
 
       - name: Copy JS toolkit artifacts to npm/dist
         working-directory: ${{ github.workspace }}/emscripten
