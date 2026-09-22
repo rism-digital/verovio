@@ -256,30 +256,24 @@ export type EditorStatus =
 /**
  * EditorResponse and related types.
  */
-type EditorResponseObjectContext = {
-    element: string;
+type TreeNodeData = {
     id: string;
-    attributes?: {
-        n: number;
-    }
+    element: string;
+    text?: string;
+    attributes?: Record<string, unknown>;
 } & (
-    | { isLeaf: false; children: EditorResponseObjectContext[] }
+    | { isLeaf: false; children: TreeNodeData[] }
     | { isLeaf: true; children?: undefined }
 )
-type EditorResponseReferencesContext = (EditorResponseObjectContext & { referenceAttribute: string })[];
-type EditorResponseElementContext = {
-    ancestors: EditorResponseObjectContext[];
-    children: EditorResponseObjectContext[];
-    context: EditorResponseObjectContext;
-    object: {} | {
-        attributes: {
-            [key: string]: string;
-        };
-        text: string;
-    }
-    referringElements: EditorResponseReferencesContext[];
-    referencedElements: EditorResponseReferencesContext[];
+type ReferenceTreeNodeData = TreeNodeData & { referenceAttribute: string };
+type EditorResponseContent = {
+    ancestors: TreeNodeData[];
+    children: TreeNodeData[];
+    context: TreeNodeData;
+    object: TreeNodeData;
+    referringElements: ReferenceTreeNodeData[];
+    referencedElements: ReferenceTreeNodeData[];
 }
 // TODO @see MEIOutputExtended::ToJson()
 type EditorResponseScoreDef = object;
-export type EditorResponse = EditorResponseObjectContext | EditorResponseElementContext | EditorResponseScoreDef;
+export type EditorResponse = TreeNodeData | EditorResponseContent | EditorResponseScoreDef;
