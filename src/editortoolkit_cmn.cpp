@@ -17,12 +17,14 @@
 #include "alignfunctor.h"
 #include "comparison.h"
 #include "cursor.h"
+#include "gracegrp.h"
 #include "layer.h"
 #include "miscfunctor.h"
 #include "note.h"
 #include "rest.h"
 #include "staff.h"
 #include "tie.h"
+#include "tuplet.h"
 
 namespace vrv {
 
@@ -193,6 +195,9 @@ bool EditorToolkitCMN::ParseInsertCursorContainerAction(const jsonxx::Object &pa
     else if (param.get<jsonxx::String>("container") == "graceGrp") {
         container = CURSOR_CONTAINER_GRACEGRP;
     }
+    else if (param.get<jsonxx::String>("container") == "beam") {
+        container = CURSOR_CONTAINER_BEAM;
+    }
     else {
         return false;
     }
@@ -281,6 +286,9 @@ bool EditorToolkitCMN::ParseResetCursorContainerAction(const jsonxx::Object &par
     }
     else if (param.get<jsonxx::String>("container") == "graceGrp") {
         container = CURSOR_CONTAINER_GRACEGRP;
+    }
+    else if (param.get<jsonxx::String>("container") == "beam") {
+        container = CURSOR_CONTAINER_BEAM;
     }
     else {
         return false;
@@ -372,6 +380,54 @@ bool EditorToolkitCMN::InsertCursorByType(CursorInsertType insertType)
 
 bool EditorToolkitCMN::InsertCursorContainer(CursorContainer container)
 {
+    if (!this->InsertMode()) return false;
+
+    std::string id = m_cursor->GetID();
+
+    Object *target = m_cursor->GetInsertTargetObject();
+
+    if (!target || !target->IsAnyOf(std::array{ CHORD, LAYER, NOTE, REST, TUPLET })) return false;
+
+    if (target->Is(NOTE)) {
+        Note *note = vrv_cast<Note *>(target);
+        if (note->IsChordTone()) target = note->IsChordTone();
+    }
+
+    auto [targetContainer, previousElement] = this->GetTargetContainerFor(target);
+    if (!targetContainer) return false;
+
+    Object *containerObject = NULL;
+    if (container == CURSOR_CONTAINER_TUPLET) {
+        Tuplet *tuplet = vrv_cast<Tuplet *>(this->PrepareInsertion(targetContainer, "tuplet"));
+        if (!tuplet) return false;
+        tuplet->SetNum(3);
+        tuplet->SetNumbase(2);
+        m_cursor->PushContainer(tuplet);
+        containerObject = tuplet;
+    }
+    else if (container == CURSOR_CONTAINER_GRACEGRP) {
+        GraceGrp *graceGrp = vrv_cast<GraceGrp *>(this->PrepareInsertion(targetContainer, "graceGrp"));
+        if (!graceGrp) return false;
+        m_cursor->PushContainer(graceGrp);
+        containerObject = graceGrp;
+    }
+    else if (container == CURSOR_CONTAINER_BEAM) {
+        Beam *beam = vrv_cast<Beam *>(this->PrepareInsertion(targetContainer, "beam"));
+        if (!beam) return false;
+        m_cursor->PushContainer(beam);
+        containerObject = beam;
+    }
+
+    if (previousElement) {
+        targetContainer->InsertAfter(previousElement, containerObject);
+    }
+    else {
+        targetContainer->InsertChild(containerObject, 0);
+    }
+
+    this->ClearContext();
+    this->SetEditStatus();
+
     return true;
 }
 
@@ -439,12 +495,12 @@ bool EditorToolkitCMN::InsertNote(const std::string &elementId, data_PITCHNAME p
 
     Object *target = NULL;
     if (this->InsertMode()) {
-        target = (m_cursor->HasPosition()) ? m_cursor->GetPosition() : m_cursor->GetParent();
+        target = m_cursor->GetInsertTargetObject();
     }
     else {
         target = this->GetElement(elementId);
     }
-    if (!target || !target->IsAnyOf(std::array{ CHORD, LAYER, NOTE, REST })) return false;
+    if (!target || !target->IsAnyOf(std::array{ BEAM, CHORD, GRACEGRP, LAYER, NOTE, REST, TUPLET })) return false;
 
     if (target->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(target);
@@ -500,6 +556,18 @@ bool EditorToolkitCMN::InsertNote(const std::string &elementId, data_PITCHNAME p
 
 bool EditorToolkitCMN::ResetCursorContainer(CursorContainer container)
 {
+    if (!this->InsertMode() || !m_cursor->HasContainer()) return false;
+
+    if (container == CURSOR_CONTAINER_TUPLET && m_cursor->GetContainer()->Is(TUPLET)) {
+        m_cursor->PopContainer();
+    }
+    else if (container == CURSOR_CONTAINER_GRACEGRP && m_cursor->GetContainer()->Is(GRACEGRP)) {
+        m_cursor->PopContainer();
+    }
+    else if (container == CURSOR_CONTAINER_BEAM && m_cursor->GetContainer()->Is(BEAM)) {
+        m_cursor->PopContainer();
+    }
+
     return true;
 }
 
@@ -507,10 +575,11 @@ std::pair<Object *, Object *> EditorToolkitCMN::GetTargetContainerFor(Object *ta
 {
     Object *previousElement = NULL;
     Object *targetContainer = NULL;
-    if (!target->Is(LAYER)) {
+    if (!target->IsAnyOf(std::array{ BEAM, GRACEGRP, LAYER, TUPLET })) {
         Object *targetParent = target->GetParent();
         // Inserting a note within a tuplet or a beam
-        if (targetParent && targetParent->IsAnyOf(std::array{ BEAM, TUPLET }) && targetParent->GetLast() != target) {
+        if (targetParent && targetParent->IsAnyOf(std::array{ BEAM, GRACEGRP, TUPLET })
+            && targetParent->GetLast() != target) {
             previousElement = target;
             targetContainer = targetParent;
         }
@@ -524,6 +593,9 @@ std::pair<Object *, Object *> EditorToolkitCMN::GetTargetContainerFor(Object *ta
     }
     else {
         targetContainer = target;
+        if (target->IsAnyOf(std::array{ BEAM, GRACEGRP, TUPLET })) {
+            previousElement = target->GetLast();
+        }
     }
     return { targetContainer, previousElement };
 }
@@ -635,12 +707,12 @@ bool EditorToolkitCMN::InsertRest(const std::string &elementId, data_DURATION du
 {
     Object *target = NULL;
     if (this->InsertMode()) {
-        target = (m_cursor->HasPosition()) ? m_cursor->GetPosition() : m_cursor->GetParent();
+        target = m_cursor->GetInsertTargetObject();
     }
     else {
         target = this->GetElement(elementId);
     }
-    if (!target || !target->IsAnyOf(std::array{ CHORD, LAYER, NOTE, REST })) return false;
+    if (!target || !target->IsAnyOf(std::array{ BEAM, CHORD, LAYER, NOTE, REST, TUPLET })) return false;
 
     if (target->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(target);
@@ -685,9 +757,9 @@ void EditorToolkitCMN::AutoBeam(LayerElement *noteOrRest)
 {
     assert(m_cursor);
 
-    // Not sure we actually want to autobeam rest - disabled for now
-    // if (!noteOrRest->IsAnyOf(std::array{NOTE, REST})) return;
-    if (!noteOrRest->IsAnyOf(std::array{ CHORD, NOTE })) return;
+    if (m_cursor->HasContainer(BEAM)) return;
+
+    if (!noteOrRest->IsAnyOf(std::array{ CHORD, NOTE, REST })) return;
 
     Layer *layer = vrv_cast<Layer *>(noteOrRest->GetFirstAncestor(LAYER));
     assert(layer);
@@ -713,6 +785,9 @@ void EditorToolkitCMN::AutoBeam(LayerElement *noteOrRest)
         LayerElement *chord = previousNote->IsChordTone();
         if (chord) result = chord;
     }
+
+    // Do not beam notes a previous grace group when not in cursor
+    if (result->IsGraceNote() && !m_cursor->HasContainer(GRACEGRP)) return;
 
     DurationInterface *interface = result->GetDurationInterface();
     assert(interface);
@@ -753,8 +828,9 @@ void EditorToolkitCMN::AutoBeam(LayerElement *noteOrRest)
     else {
         Object *previousParent = result->GetParent();
         assert(previousParent);
+        const int idx = result->GetIdx();
         Beam *beam = new Beam();
-        previousParent->AddChild(beam);
+        previousParent->InsertChild(beam, idx);
         result->MoveItselfTo(beam);
         noteOrRest->MoveItselfTo(beam);
         previousParent->ClearRelinquishedChildren();

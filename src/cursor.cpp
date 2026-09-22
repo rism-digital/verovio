@@ -61,7 +61,6 @@ void Cursor::CloneReset()
     this->ResetCursorAlignment();
     m_position = NULL;
     m_tieMode = TieMode::TIE_NONE;
-    m_container = {};
 
     m_accid.SetParent(this);
 }
@@ -125,6 +124,24 @@ void Cursor::ResetCursorAlignment()
 {
     m_accid.SetAlignment(NULL);
     // m_yRelPitchC = 0;
+}
+
+Object *Cursor::GetInsertTargetObject() const
+{
+    // Insert at the end of the container if we have one
+    if (!m_containers.empty()) return m_containers.back();
+    // Insert at the layer element position
+    if (m_position) return m_position;
+    // Insert in the layer
+    return const_cast<Object *>(this->GetParent());
+}
+
+bool Cursor::HasContainer(ClassId classId) const
+{
+    for (auto element : m_containers) {
+        if (element->Is(classId)) return true;
+    }
+    return false;
 }
 
 void Cursor::SetRestMode(bool restMode)

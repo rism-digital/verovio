@@ -54,9 +54,14 @@ public:
     LayerElement *GetPosition() const { return m_position; }
     bool HasPosition() const { return (m_position); }
 
-    void SetContainer(LayerElement *container) { m_container.push(container); }
-    LayerElement *GetContainer() const { return m_container.top(); }
-    bool HasContainer() const { return (!m_container.empty()); }
+    Object *GetInsertTargetObject() const;
+
+    void PushContainer(LayerElement *container) { m_containers.push_back(container); }
+    void PopContainer() { m_containers.pop_back(); }
+    LayerElement *GetContainer() const { return m_containers.back(); }
+    bool HasContainer() const { return (!m_containers.empty()); }
+    bool HasContainer(ClassId classId) const;
+    void ClearContainers() { m_containers.clear(); }
 
     bool HasAccid() const { return m_accid.HasAccid(); }
     data_ACCIDENTAL_WRITTEN GetAccid() const { return m_accid.GetAccid(); }
@@ -134,7 +139,7 @@ private:
     /** A field indicating the tieMode status */
     TieMode m_tieMode;
     /** The cursor container (e.g., tuplet, graceGrp) */
-    std::stack<LayerElement *> m_container;
+    std::vector<LayerElement *> m_containers;
 };
 
 } // namespace vrv

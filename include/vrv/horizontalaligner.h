@@ -41,8 +41,6 @@ enum AlignmentType {
     // Justifiable
     ALIGNMENT_FULLMEASURE,
     ALIGNMENT_FULLMEASURE2,
-    ALIGNMENT_CURSOR,
-    ALIGNMENT_CURSOR_CHORD,
     ALIGNMENT_CLEF,
     ALIGNMENT_KEYSIG,
     ALIGNMENT_MENSUR,
@@ -52,6 +50,8 @@ enum AlignmentType {
     ALIGNMENT_CUSTOS,
     ALIGNMENT_ACCID,
     ALIGNMENT_GRACENOTE,
+    ALIGNMENT_CURSOR,
+    ALIGNMENT_CURSOR_CHORD,
     ALIGNMENT_BARLINE,
     ALIGNMENT_DIVLINE,
     ALIGNMENT_DEFAULT,
@@ -134,6 +134,10 @@ public:
     ///@{
     void SetType(AlignmentType type) { m_type = type; }
     AlignmentType GetType() const { return m_type; }
+    template <typename Range> bool IsAnyOfType(const Range &alignmentType) const
+    {
+        return std::find(std::begin(alignmentType), std::end(alignmentType), GetType()) != std::end(alignmentType);
+    }
     ///@}
 
     /**

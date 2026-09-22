@@ -969,6 +969,10 @@ void EditorToolkitShared::PostProcessDeleteObjects(const Object *element, std::s
     if (element->HasInterface(INTERFACE_DURATION) && element->IsLayerElement()) {
         const Object *beam = element->GetFirstAncestor(BEAM);
         if (beam) toPostProcess.insert(beam->GetID());
+        const Object *tuplet = element->GetFirstAncestor(TUPLET);
+        if (tuplet) toPostProcess.insert(tuplet->GetID());
+        const Object *graceGrp = element->GetFirstAncestor(GRACEGRP);
+        if (graceGrp) toPostProcess.insert(graceGrp->GetID());
     }
 }
 
@@ -1021,6 +1025,18 @@ void EditorToolkitShared::PostProcessDelete(const std::string &elementId)
         std::string placeholder = beam->GetID();
         this->Delete(placeholder, DELETE_NO_NAVIGATON);
         m_chainedId = descendants.front()->GetID();
+    }
+    else if (object->IsAnyOf(std::array{ GRACEGRP, TUPLET })) {
+        ListOfObjects descendants;
+        ClassIdsComparison comparison({ CHORD, NOTE, REST });
+        object->FindAllDescendantsByComparison(&descendants, &comparison);
+        if (!descendants.empty()) return;
+
+        Object *parent = object->GetParent();
+        assert(parent);
+        std::string placeholder = object->GetID();
+        this->Delete(placeholder, DELETE_NO_NAVIGATON);
+        m_chainedId = parent->GetID();
     }
 }
 
@@ -1828,13 +1844,15 @@ void EditorToolkitShared::MoveCursor(LayerElement *element, bool maintainChordMo
     Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
     assert(layer);
 
+    const bool isInGraceGrp = (object->GetFirstAncestor(GRACEGRP, 3));
+
     ClassIdsComparison comparison({ CHORD, NOTE, REST });
 
     if (m_cursor->GetChordMode() == Cursor::ChordMode::NEW) {
         m_cursor->SetChordMode(Cursor::ChordMode::EDIT_NEW);
     }
     // Last element in the layer, check if we need to move to the next measure (or exit inputMode)
-    else if (element == layer->FindDescendantByComparison(&comparison, UNLIMITED_DEPTH, BACKWARD)) {
+    else if (!isInGraceGrp && (element == layer->FindDescendantByComparison(&comparison, UNLIMITED_DEPTH, BACKWARD))) {
         AlignMeterParams params;
         params.meterSig = layer->GetCurrentMeterSig();
         assert(params.meterSig);
@@ -1851,6 +1869,7 @@ void EditorToolkitShared::MoveCursor(LayerElement *element, bool maintainChordMo
         if (measureDuration == 0) measureDuration = 4;
         if ((position + duration) >= measureDuration) {
             object = this->GetNextLayer(layer);
+            m_cursor->ClearContainers();
             m_cursor->SetAccidImplicit(false);
         }
     }

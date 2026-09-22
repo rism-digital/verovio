@@ -46,7 +46,12 @@ protected:
         CURSOR_INSERT_COPY
     };
 
-    enum CursorContainer : int8_t { CURSOR_CONTAINER_NONE = 0, CURSOR_CONTAINER_TUPLET, CURSOR_CONTAINER_GRACEGRP };
+    enum CursorContainer : int8_t {
+        CURSOR_CONTAINER_NONE = 0,
+        CURSOR_CONTAINER_TUPLET,
+        CURSOR_CONTAINER_GRACEGRP,
+        CURSOR_CONTAINER_BEAM
+    };
 
     /**
      * Parse JSON instructions for experimental editor functions.
