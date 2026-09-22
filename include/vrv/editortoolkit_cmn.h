@@ -46,13 +46,6 @@ protected:
         CURSOR_INSERT_COPY
     };
 
-    enum CursorContainer : int8_t {
-        CURSOR_CONTAINER_NONE = 0,
-        CURSOR_CONTAINER_TUPLET,
-        CURSOR_CONTAINER_GRACEGRP,
-        CURSOR_CONTAINER_BEAM
-    };
-
     /**
      * Parse JSON instructions for experimental editor functions.
      */
@@ -61,23 +54,23 @@ protected:
     bool ParseInsertCursorByPitchAction(
         const jsonxx::Object &param, data_PITCHNAME &pname, int &oct, data_ACCIDENTAL_WRITTEN &accid, int &midi);
     bool ParseInsertCursorByTypeAction(const jsonxx::Object &param, CursorInsertType &insertType);
-    bool ParseInsertCursorContainerAction(const jsonxx::Object &param, CursorContainer &container);
+    bool ParseInsertCursorContainerAction(const jsonxx::Object &param, ClassId &container);
     bool ParseInsertMeasureAction(const jsonxx::Object &param, std::string &elementId, int &number, bool &insertBefore);
     bool ParseInsertNoteAction(const jsonxx::Object &param, std::string &elementId, data_PITCHNAME &pname, int &oct,
         data_ACCIDENTAL_WRITTEN &accid, data_ACCIDENTAL_GESTURAL &accidGes, data_DURATION &dur, int &dots,
         bool &chordMode);
     bool ParseInsertRestAction(const jsonxx::Object &param, std::string &elementId, data_DURATION &dur, int &dots);
-    bool ParseResetCursorContainerAction(const jsonxx::Object &param, CursorContainer &container);
+    bool ParseResetCursorContainerAction(const jsonxx::Object &param, ClassId &container);
 
     bool InsertCursorByDur(data_DURATION dur, int dots);
     bool InsertCursorByPitch(data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid, int midi);
     bool InsertCursorByType(CursorInsertType insertType);
-    bool InsertCursorContainer(CursorContainer container);
+    bool InsertCursorContainer(ClassId container);
     bool InsertMeasure(std::string &elementId, int number, bool insertBefore);
     bool InsertNote(const std::string &elementId, data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid,
         data_ACCIDENTAL_GESTURAL accidGes, data_DURATION dur, int dots, bool chordMode);
     bool InsertRest(const std::string &elementId, data_DURATION dur, int dots);
-    bool ResetCursorContainer(CursorContainer container);
+    bool ResetCursorContainer(ClassId container);
 
 private:
     bool InsertNoteInChordMode(const std::string &elementId, data_PITCHNAME pname, int oct,

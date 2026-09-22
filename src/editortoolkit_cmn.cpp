@@ -66,7 +66,7 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
         LogWarning("Could not parse the insertCursorByType action");
     }
     else if (action == "insertCursorContainer") {
-        CursorContainer container;
+        ClassId container;
         if (this->ParseInsertCursorContainerAction(json.get<jsonxx::Object>("param"), container)) {
             this->PrepareUndo();
             return (this->InsertCursorContainer(container));
@@ -110,7 +110,7 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
         LogWarning("Could not parse the insertRest action");
     }
     else if (action == "resetCursorContainer") {
-        CursorContainer container;
+        ClassId container;
         if (this->ParseResetCursorContainerAction(json.get<jsonxx::Object>("param"), container)) {
             this->PrepareUndo();
             return (this->ResetCursorContainer(container));
@@ -183,20 +183,20 @@ bool EditorToolkitCMN::ParseInsertCursorByTypeAction(const jsonxx::Object &param
     return true;
 }
 
-bool EditorToolkitCMN::ParseInsertCursorContainerAction(const jsonxx::Object &param, CursorContainer &container)
+bool EditorToolkitCMN::ParseInsertCursorContainerAction(const jsonxx::Object &param, ClassId &container)
 {
-    container = CursorContainer::CURSOR_CONTAINER_NONE;
+    container = OBJECT;
 
     if (!param.has<jsonxx::String>("container")) return false;
 
     if (param.get<jsonxx::String>("container") == "tuplet") {
-        container = CURSOR_CONTAINER_TUPLET;
+        container = TUPLET;
     }
     else if (param.get<jsonxx::String>("container") == "graceGrp") {
-        container = CURSOR_CONTAINER_GRACEGRP;
+        container = GRACEGRP;
     }
     else if (param.get<jsonxx::String>("container") == "beam") {
-        container = CURSOR_CONTAINER_BEAM;
+        container = BEAM;
     }
     else {
         return false;
@@ -275,20 +275,20 @@ bool EditorToolkitCMN::ParseInsertRestAction(
     return true;
 }
 
-bool EditorToolkitCMN::ParseResetCursorContainerAction(const jsonxx::Object &param, CursorContainer &container)
+bool EditorToolkitCMN::ParseResetCursorContainerAction(const jsonxx::Object &param, ClassId &container)
 {
-    container = CursorContainer::CURSOR_CONTAINER_NONE;
+    container = OBJECT;
 
     if (!param.has<jsonxx::String>("container")) return false;
 
     if (param.get<jsonxx::String>("container") == "tuplet") {
-        container = CURSOR_CONTAINER_TUPLET;
+        container = TUPLET;
     }
     else if (param.get<jsonxx::String>("container") == "graceGrp") {
-        container = CURSOR_CONTAINER_GRACEGRP;
+        container = GRACEGRP;
     }
     else if (param.get<jsonxx::String>("container") == "beam") {
-        container = CURSOR_CONTAINER_BEAM;
+        container = BEAM;
     }
     else {
         return false;
@@ -378,15 +378,18 @@ bool EditorToolkitCMN::InsertCursorByType(CursorInsertType insertType)
     }
 }
 
-bool EditorToolkitCMN::InsertCursorContainer(CursorContainer container)
+bool EditorToolkitCMN::InsertCursorContainer(ClassId container)
 {
     if (!this->InsertMode()) return false;
 
+    // No nested containers
+    if (m_cursor->HasContainer(container)) return false;
+    
     std::string id = m_cursor->GetID();
 
     Object *target = m_cursor->GetInsertTargetObject();
 
-    if (!target || !target->IsAnyOf(std::array{ CHORD, LAYER, NOTE, REST, TUPLET })) return false;
+    if (!target || !target->IsAnyOf(std::array{ BEAM, CHORD, GRACEGRP, LAYER, NOTE, REST, TUPLET })) return false;
 
     if (target->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(target);
@@ -397,7 +400,7 @@ bool EditorToolkitCMN::InsertCursorContainer(CursorContainer container)
     if (!targetContainer) return false;
 
     Object *containerObject = NULL;
-    if (container == CURSOR_CONTAINER_TUPLET) {
+    if (container == TUPLET) {
         Tuplet *tuplet = vrv_cast<Tuplet *>(this->PrepareInsertion(targetContainer, "tuplet"));
         if (!tuplet) return false;
         tuplet->SetNum(3);
@@ -405,13 +408,13 @@ bool EditorToolkitCMN::InsertCursorContainer(CursorContainer container)
         m_cursor->PushContainer(tuplet);
         containerObject = tuplet;
     }
-    else if (container == CURSOR_CONTAINER_GRACEGRP) {
+    else if (container == GRACEGRP) {
         GraceGrp *graceGrp = vrv_cast<GraceGrp *>(this->PrepareInsertion(targetContainer, "graceGrp"));
         if (!graceGrp) return false;
         m_cursor->PushContainer(graceGrp);
         containerObject = graceGrp;
     }
-    else if (container == CURSOR_CONTAINER_BEAM) {
+    else if (container == BEAM) {
         Beam *beam = vrv_cast<Beam *>(this->PrepareInsertion(targetContainer, "beam"));
         if (!beam) return false;
         m_cursor->PushContainer(beam);
@@ -554,19 +557,11 @@ bool EditorToolkitCMN::InsertNote(const std::string &elementId, data_PITCHNAME p
     return true;
 }
 
-bool EditorToolkitCMN::ResetCursorContainer(CursorContainer container)
+bool EditorToolkitCMN::ResetCursorContainer(ClassId container)
 {
     if (!this->InsertMode() || !m_cursor->HasContainer()) return false;
 
-    if (container == CURSOR_CONTAINER_TUPLET && m_cursor->GetContainer()->Is(TUPLET)) {
-        m_cursor->PopContainer();
-    }
-    else if (container == CURSOR_CONTAINER_GRACEGRP && m_cursor->GetContainer()->Is(GRACEGRP)) {
-        m_cursor->PopContainer();
-    }
-    else if (container == CURSOR_CONTAINER_BEAM && m_cursor->GetContainer()->Is(BEAM)) {
-        m_cursor->PopContainer();
-    }
+    if (m_cursor->GetContainer()->Is(container)) m_cursor->PopContainer();
 
     return true;
 }
