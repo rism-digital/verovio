@@ -1,8 +1,8 @@
-import verovio from "verovio";
+import verovio, { type IntOption } from "verovio";
 import { VerovioToolkit } from "verovio/esm";
+import createVerovioModule from "verovio/wasm";
 
 (async () => {
-    const createVerovioModule = (await import("verovio/wasm")).default;
     const VerovioModule = await createVerovioModule();
     const tk = new VerovioToolkit(VerovioModule);
     // $ExpectType AvailableOptions
@@ -40,7 +40,7 @@ verovio.module.onRuntimeInitialized = () => {
     const definitions = Object.keys(groups)
         .map(key => Object.keys(groups[key].options).map(option => groups[key].options[option]))
         .reduce((result, array) => [...result, ...array], []);
-    const intDefinitions = definitions.filter(d => d.type === "int") as verovio.IntOption[];
+    const intDefinitions = definitions.filter(d => d.type === "int") as IntOption[];
     const firstDefinition = definitions[0];
     if (firstDefinition.type === "int") {
         // $ExpectType IntOption

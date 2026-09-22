@@ -1,8 +1,9 @@
 const verovio = require("verovio");
+import type { IntOption } from "verovio";
 const { VerovioToolkit } = require("verovio/esm");
+const createVerovioModule = require("verovio/wasm").default;
 
 (async () => {
-    const createVerovioModule = require("verovio/wasm").default;
     const VerovioModule = await createVerovioModule();
     const tk = new VerovioToolkit(VerovioModule);
     // $ExpectType AvailableOptions
@@ -11,9 +12,17 @@ const { VerovioToolkit } = require("verovio/esm");
     tk.getOptions();
     tk.select({});
 })();
+
 verovio.module.onRuntimeInitialized = () => {
     verovio.module.FS_unlink("/data/text/Times.xml");
-    verovio.module.FS_createDataFile("/data/text", "Times.xml", `<?xml version="1.0" encoding="UTF-8"?>`, true, true, false);
+    verovio.module.FS_createDataFile(
+        "/data/text",
+        "Times.xml",
+        `<?xml version="1.0" encoding="UTF-8"?>`,
+        true,
+        true,
+        false,
+    );
     const vrvTk = new verovio.toolkit();
     // $ExpectType VerovioOptions
     vrvTk.getOptions();
@@ -32,7 +41,7 @@ verovio.module.onRuntimeInitialized = () => {
     const definitions = Object.keys(groups)
         .map(key => Object.keys(groups[key].options).map(option => groups[key].options[option]))
         .reduce((result, array) => [...result, ...array], []);
-    const intDefinitions = definitions.filter(d => d.type === "int");
+    const intDefinitions = definitions.filter(d => d.type === "int") as IntOption[];
     const firstDefinition = definitions[0];
     if (firstDefinition.type === "int") {
         // $ExpectType IntOption
