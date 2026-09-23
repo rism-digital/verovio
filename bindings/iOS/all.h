@@ -76,6 +76,7 @@
 #import <VerovioFramework/course.h>
 #import <VerovioFramework/cpmark.h>
 #import <VerovioFramework/crc.h>
+#import <VerovioFramework/cursor.h>
 #import <VerovioFramework/customtuning.h>
 #import <VerovioFramework/custos.h>
 #import <VerovioFramework/damage.h>

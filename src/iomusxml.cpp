@@ -3363,6 +3363,17 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
 
         // verse / syl
+        // In MusicXML, the last note of an extender is marked with <extend type="stop"/>. In MEI, an extender is ended
+        // by the presence of a syllable on the next note.
+        std::set<int> extenderStops;
+        if (!isChord && (element->Is(CHORD) || element->Is(NOTE))) {
+            const auto pending = m_pendingExtenderStops.find({ staff->GetN(), layer->GetN() });
+            if (pending != m_pendingExtenderStops.end()) {
+                extenderStops = pending->second;
+                m_pendingExtenderStops.erase(pending);
+            }
+        }
+
         for (pugi::xml_node lyric : node.children("lyric")) {
             pugi::xml_node extendStop;
             bool hasStartingExtend = false;
@@ -3377,16 +3388,13 @@ void MusicXmlInput::ReadMusicXmlNote(
             if (!lyric.child("text") && !extendStop) continue; // Dorico exports non-valid MusicXML
             short int lyricNumber = lyric.attribute("number").as_int();
             lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
+            if (extendStop) m_pendingExtenderStops[{ staff->GetN(), layer->GetN() }].insert(lyricNumber);
+            if (!lyric.child("text")) continue;
             Verse *verse = new Verse();
             verse->SetColor(lyric.attribute("color").as_string());
             // verse->SetPlace(verse->AttPlacementRelStaff::StrToStaffrelBasic(lyric.attribute("placement").as_string()));
             verse->SetLabel(lyric.attribute("name").as_string());
             verse->SetN(lyricNumber);
-            // MusicXML represents melisma endpoints as textless <lyric><extend type="stop"/></lyric>.
-            // Keep this as a schema-valid empty syl anchor so lyric preparation can close the previous extender here.
-            if (extendStop) {
-                verse->AddChild(new Syl());
-            }
             std::string syllabic = "single";
             for (pugi::xml_node childNode : lyric.children()) {
                 if (!strcmp(childNode.name(), "syllabic")) syllabic = GetContent(childNode);
@@ -3451,8 +3459,8 @@ void MusicXmlInput::ReadMusicXmlNote(
                     }
 
                     // override @con if we have elisions or extensions
-                    if (childNode.next_sibling("elision")) {
-                        syl->SetCon(sylLog_CON_b);
+                    if (pugi::xml_node elision = childNode.next_sibling("elision")) {
+                        syl->SetCon(ConvertElisionToCon(elision));
                     }
                     else if (hasStartingExtend) {
                         syl->SetCon(sylLog_CON_u);
@@ -3476,6 +3484,9 @@ void MusicXmlInput::ReadMusicXmlNote(
                     verse->AddChild(syl);
                 }
             }
+            if (extenderStops.erase(lyricNumber) && !verse->GetFirst(SYL)) {
+                verse->AddChild(new Syl());
+            }
             // TODO Tablature: <tabGrp> does not support child <verse>
             if (element->Is(CHORD) || element->Is(NOTE)) {
                 element->AddChild(verse);
@@ -3484,6 +3495,14 @@ void MusicXmlInput::ReadMusicXmlNote(
                 // this should not happen
                 delete verse;
             }
+        }
+
+        // End extenders by adding a verse with empty syl
+        for (int lyricNumber : extenderStops) {
+            Verse *verse = new Verse();
+            verse->SetN(lyricNumber);
+            verse->AddChild(new Syl());
+            element->AddChild(verse);
         }
 
         // slurs
@@ -4200,6 +4219,17 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure, Sec
         if (!m_sectionStop) m_sectionStop = musicxml::SectionInfo();
         m_fineInfo = musicxml::FineInfo(true);
     }
+
+    const float bpm = node.attribute("tempo").as_float();
+    if (bpm > 0) {
+        const short int offset = node.child("offset").text().as_int();
+        const double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
+        Tempo *tempo = new Tempo();
+        tempo->SetMidiBpm(bpm);
+        tempo->SetTstamp(timeStamp);
+        m_controlElements.push_back({ m_measureCounts.at(measure), tempo });
+        m_tempoStack.push_back(tempo);
+    }
 }
 
 bool MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord)
@@ -4880,6 +4910,57 @@ pedalLog_DIR MusicXmlInput::ConvertPedalTypeToDir(const std::string &value)
 
     LogWarning("MusicXML import: Unsupported type '%s' for pedal", value.c_str());
     return pedalLog_DIR_NONE;
+}
+
+sylLog_CON MusicXmlInput::ConvertElisionToCon(const pugi::xml_node elision)
+{
+    // The content of <elision> is printed between the two syllables it joins
+    static const std::map<std::string, sylLog_CON> Elision2Con{
+        { "\u00A0", sylLog_CON_s }, // no-break space
+        { "-", sylLog_CON_d }, // hyphen-minus
+        { "\u2010", sylLog_CON_d }, // hyphen
+        { "_", sylLog_CON_u }, // low line
+        { "~", sylLog_CON_t }, // tilde - not rendered
+        { "\u02DC", sylLog_CON_t }, // small tilde - not rendered
+        { "^", sylLog_CON_c }, // circumflex accent - not rendered
+        { "\u02C6", sylLog_CON_c }, // modifier letter circumflex accent - not rendered
+        { "\u02C7", sylLog_CON_v }, // caron - not rendered
+        { "\u2040", sylLog_CON_i }, // character tie - not rendered
+        { "\u2054", sylLog_CON_i }, // inverted undertie - not rendered
+        { "\u203F", sylLog_CON_b } // undertie
+    };
+
+    static const std::map<std::string, sylLog_CON> Smufl2Con{
+        { "lyricsHyphenBaseline", sylLog_CON_d }, //
+        { "lyricsHyphenBaselineNonBreaking", sylLog_CON_d }, //
+        { "lyricsElisionNarrow", sylLog_CON_b }, //
+        { "lyricsElision", sylLog_CON_b }, //
+        { "lyricsElisionWide", sylLog_CON_b } //
+    };
+
+    const std::string value = elision.text().as_string();
+
+    // If there's no content, check for a @smufl attribute
+    if (value.empty()) {
+        const std::string glyph = elision.attribute("smufl").as_string();
+        if (glyph.empty()) return sylLog_CON_b;
+
+        const auto glyphResult = Smufl2Con.find(glyph);
+        if (glyphResult != Smufl2Con.end()) {
+            return glyphResult->second;
+        }
+
+        LogWarning("MusicXML import: Unsupported elision glyph '%s'", glyph.c_str());
+        return sylLog_CON_b;
+    }
+
+    const auto result = Elision2Con.find(value);
+    if (result != Elision2Con.end()) {
+        return result->second;
+    }
+
+    LogWarning("MusicXML import: Unsupported elision symbol '%s'", value.c_str());
+    return sylLog_CON_b;
 }
 
 tupletVis_NUMFORMAT MusicXmlInput::ConvertTupletNumberValue(const std::string &value)
