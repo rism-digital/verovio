@@ -2716,7 +2716,9 @@ jsonxx::Object PAEInput::SingleLineToJson(const std::string &singleLine)
     std::string::const_iterator start = singleLine.begin();
     std::string::const_iterator scoreDefEnd;
     while ((scoreDefEnd = std::find(start, singleLine.end(), ' ')) != singleLine.end()) {
-        if (*(scoreDefEnd + 1) != '@' || *(scoreDefEnd + 1) != '$') break;
+        // A space at the very end has nothing after it to inspect
+        if (scoreDefEnd + 1 == singleLine.end()) break;
+        if (*(scoreDefEnd + 1) != '@' && *(scoreDefEnd + 1) != '$') break;
         start = scoreDefEnd + 1;
     }
 
@@ -2746,8 +2748,8 @@ jsonxx::Object PAEInput::SingleLineToJson(const std::string &singleLine)
         timesig = std::string(timesigStart + 1, timesigEnd);
     }
 
-    // Extract the data - everything after the scoreDef
-    std::string data(scoreDefEnd + 1, singleLine.end());
+    // Extract the data - everything after the scoreDef (empty when the line is only a scoreDef)
+    std::string data = (scoreDefEnd == singleLine.end()) ? "" : std::string(scoreDefEnd + 1, singleLine.end());
 
     jsonInput << "clef" << clef;
     jsonInput << "timesig" << timesig.erase(timesig.find_last_not_of(' ') + 1);
@@ -4637,6 +4639,9 @@ bool PAEInput::CheckHierarchy()
     while (!isValid && checkCount < 5) {
         checkCount++;
         isValid = true;
+        // Content before the first measure token belongs to the layer too; the stack must never be empty
+        stack.clear();
+        stack.push_back(&layerToken);
         for (pae::Token &token : m_pae) {
             if (token.IsVoid()) continue;
 
@@ -4683,8 +4688,11 @@ bool PAEInput::CheckHierarchy()
                         // Remove the problematic container
                         this->RemoveContainerToken(token.m_object);
                         // If we want ot continue, we should remove the  last one added from the tokens
-                        this->RemoveContainerToken(stack.back()->m_object);
-                        stack.pop_back();
+                        // (but never the layer at the bottom of the stack - a closing token with nothing open)
+                        if (stack.size() > 1) {
+                            this->RemoveContainerToken(stack.back()->m_object);
+                            stack.pop_back();
+                        }
                         // We should also remove from the stack the object we were expecting
                         auto it = std::remove_if(stack.begin(), stack.end(),
                             [&token](const pae::Token *tokenIt) { return (tokenIt->m_object == token.m_object); });
