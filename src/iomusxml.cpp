@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <cassert>
+#include <iterator>
 #include <numeric>
 #include <regex>
 #include <sstream>
@@ -3120,10 +3121,15 @@ void MusicXmlInput::ReadMusicXmlNote(
                 note->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(noteStaffNum + staffOffset)));
 
         // accidentals
-        for (pugi::xml_node accidental : node.children("accidental")) {
+        auto accidentals = node.children("accidental");
+        for (std::reverse_iterator<pugi::xml_named_node_iterator> it(accidentals.end());
+            it != std::reverse_iterator<pugi::xml_named_node_iterator>(accidentals.begin()); ++it) {
+            pugi::xml_node accidental = *it;
             AddAccidental(accidental, note);
         }
-        for (pugi::xpath_node accidental : node.select_nodes("notations/accidental-mark")) {
+        auto accidental_marks = node.select_nodes("notations/accidental-mark");
+        accidental_marks.sort(true);
+        for (pugi::xpath_node accidental : accidental_marks) {
             AddAccidental(accidental.node(), note);
         }
 
