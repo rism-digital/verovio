@@ -2174,6 +2174,7 @@ double Doc::GetLeftMargin(const Object *object) const
     const ClassId id = object->GetClassId();
     if (id == BARLINE) {
         const BarLine *barLine = vrv_cast<const BarLine *>(object);
+        if (!barLine->HasForm() || barLine->GetForm() == BARRENDITION_invis) return 0;
         switch (barLine->GetPosition()) {
             case BarLinePosition::None: return m_options->m_leftMarginBarLine.GetValue();
             case BarLinePosition::Left: return m_options->m_leftMarginLeftBarLine.GetValue();
@@ -2211,6 +2212,7 @@ double Doc::GetRightMargin(const Object *object) const
     const ClassId id = object->GetClassId();
     if (id == BARLINE) {
         const BarLine *barLine = vrv_cast<const BarLine *>(object);
+        if (!barLine->HasForm() || barLine->GetForm() == BARRENDITION_invis) return 0;
         switch (barLine->GetPosition()) {
             case BarLinePosition::None: return m_options->m_rightMarginBarLine.GetValue();
             case BarLinePosition::Left: return m_options->m_rightMarginLeftBarLine.GetValue();
