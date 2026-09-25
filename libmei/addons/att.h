@@ -63,6 +63,9 @@ public:
     std::string ArticulationListToStr(data_ARTICULATION_List data) const;
     data_ARTICULATION_List StrToArticulationList(const std::string &value, bool = true) const;
 
+    std::string StaffitemListToStr(const data_STAFFITEM_List &data) const;
+    data_STAFFITEM_List StrToStaffitemList(const std::string &value, bool logWarning = true) const;
+
     std::string BeatrptRendToStr(data_BEATRPT_REND data) const;
     data_BEATRPT_REND StrToBeatrptRend(const std::string &value, bool logWarning = true) const;
 
