@@ -709,7 +709,7 @@ void GABCInput::ProcessWord(const std::string &lyrics, const std::string &music,
         if (con != sylLog_CON_NONE) syl->SetCon(con);
         syllable->AddChild(syl);
         Text *t = new Text();
-        t->SetText(std::u32string(lyrics.begin(), lyrics.end()));
+        t->SetText(UTF8to32(lyrics));
         syl->AddChild(t);
     }
 
