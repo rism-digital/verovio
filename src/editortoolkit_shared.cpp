@@ -263,7 +263,7 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         LogWarning("Could not parse the navigate action");
     }
     else if (action == "properties") {
-        std::string scoreDef;
+        jsonxx::Object scoreDef;
         if (this->ParsePropertiesAction(json.get<jsonxx::Object>("param"), scoreDef)) {
             if (scoreDef.empty()) {
                 return this->GetScoreDef();
@@ -437,11 +437,11 @@ bool EditorToolkitShared::ParseNavigate(const jsonxx::Object &param, std::string
     return true;
 }
 
-bool EditorToolkitShared::ParsePropertiesAction(const jsonxx::Object &param, std::string &scoreDef)
+bool EditorToolkitShared::ParsePropertiesAction(const jsonxx::Object &param, jsonxx::Object &scoreDef)
 {
-    scoreDef = "";
-    if (param.has<jsonxx::String>("scoreDef")) {
-        scoreDef = param.get<jsonxx::String>("scoreDef");
+    scoreDef.empty();
+    if (param.has<jsonxx::Object>("scoreDef")) {
+        scoreDef = param.get<jsonxx::Object>("scoreDef");
         return true;
     }
     return true;
@@ -1828,8 +1828,12 @@ bool EditorToolkitShared::GetScoreDef()
     return true;
 }
 
-bool EditorToolkitShared::SetScoreDef(const std::string scoreDef)
+bool EditorToolkitShared::SetScoreDef(const jsonxx::Object &scoreDef)
 {
+    MEIInputExtended input(m_doc);
+
+    input.ImportScoreDef(scoreDef);
+
     return true;
 }
 

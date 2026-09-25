@@ -57,6 +57,11 @@ Score::Score(bool createScoreDef) : PageElement(SCORE), PageMilestoneInterface()
 
 Score::~Score()
 {
+    this->ClearScoreDef();
+}
+
+void Score::ClearScoreDef()
+{
     if (m_scoreDefSubtree) {
         delete m_scoreDefSubtree;
         m_scoreDefSubtree = NULL;
@@ -94,8 +99,7 @@ bool Score::IsSupportedChild(ClassId classId)
 
 void Score::SetScoreDefSubtree(Object *substree, ScoreDef *scoreScoreDef)
 {
-    assert(!m_scoreDef);
-    assert(!m_scoreDefSubtree);
+    this->ClearScoreDef();
 
     m_scoreDefSubtree = substree;
     m_scoreDef = scoreScoreDef;

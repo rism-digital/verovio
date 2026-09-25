@@ -672,6 +672,14 @@ public:
      */
     void SetDeserializing(bool deserializing) { m_deserializing = deserializing; }
 
+protected:
+    /**
+     * @name Methods available in inheriting classes
+     */
+    ///@{
+    bool ReadScoreDef(Object *parent, pugi::xml_node scoreDef);
+    ///@}
+
 private:
     bool ReadDoc(pugi::xml_node root);
     bool ReadIncipits(pugi::xml_node root);
@@ -717,7 +725,6 @@ private:
      * children (see MEIInput::IsAllowed)
      */
     ///@{
-    bool ReadScoreDef(Object *parent, pugi::xml_node scoreDef);
     bool ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadGrpSym(Object *parent, pugi::xml_node grpSym);
     bool ReadPgFoot(Object *parent, pugi::xml_node pgFoot);

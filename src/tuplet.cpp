@@ -67,8 +67,8 @@ void Tuplet::Reset()
 
 bool Tuplet::IsSupportedChild(ClassId classId)
 {
-    static const std::vector<ClassId> supported{ BEAM, TUPLET_BRACKET, BTREM, CHORD, CLEF, FTREM, GRACEGRP, NOTE, TUPLET_NUM,
-        REST, SPACE, TABGRP, TUPLET };
+    static const std::vector<ClassId> supported{ BEAM, TUPLET_BRACKET, BTREM, CHORD, CLEF, FTREM, GRACEGRP, NOTE,
+        TUPLET_NUM, REST, SPACE, TABGRP, TUPLET };
 
     if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
         return true;

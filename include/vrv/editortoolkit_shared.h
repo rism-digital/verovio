@@ -68,7 +68,7 @@ protected:
     bool ParseInsertControlAction(
         const jsonxx::Object &param, std::string &elementName, std::string &startId, std::string &endId);
     bool ParseNavigate(const jsonxx::Object &param, std::string &elementId, int &direction);
-    bool ParsePropertiesAction(const jsonxx::Object &param, std::string &scoreDef);
+    bool ParsePropertiesAction(const jsonxx::Object &param, jsonxx::Object &scoreDef);
     bool ParseResetCursorAction(const jsonxx::Object &param, bool &maintainChordMode);
     bool ParseSelectAction(const jsonxx::Object &param, std::string &elementId, bool &secondary, SelectCustom &custom);
     bool ParseSetAction(
@@ -117,7 +117,7 @@ protected:
     bool ContextForSections(bool updateResponse);
 
     bool GetScoreDef();
-    bool SetScoreDef(const std::string scoreDef);
+    bool SetScoreDef(const jsonxx::Object &scoreDef);
 
     void ContextForObject(const Object *object, jsonxx::Object &element, bool recursive = false);
     void ContextForObjects(const ArrayOfConstObjects &objects, jsonxx::Array &siblings);

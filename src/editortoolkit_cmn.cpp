@@ -384,7 +384,7 @@ bool EditorToolkitCMN::InsertCursorContainer(ClassId container)
 
     // No nested containers
     if (m_cursor->HasContainer(container)) return false;
-    
+
     std::string id = m_cursor->GetID();
 
     Object *target = m_cursor->GetInsertTargetObject();

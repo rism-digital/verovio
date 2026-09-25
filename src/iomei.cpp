@@ -3643,7 +3643,8 @@ jsonxx::Object MEIOutputExtended::ExportScoreDef()
 
         m_currentNode = meiDoc.root();
         m_nodeStack.push_back(m_currentNode);
-        m_doc->GetFirstScoreDef()->SaveObject(this);
+        Score *score = m_doc->GetFirstVisibleScore();
+        score->GetScoreDef()->SaveObject(this);
 
         return ToJson(meiDoc);
     }
@@ -9364,19 +9365,39 @@ bool MEIInput::ReadFacsimile(Doc *doc, pugi::xml_node facsimile)
 
 MEIInputExtended::MEIInputExtended(Doc *doc) : MEIInput(doc) {}
 
+void MEIInputExtended::ImportScoreDef(const jsonxx::Object &scoreDef)
+{
+    try {
+        pugi::xml_document meiDoc = this->FromJson(scoreDef);
+
+        Score newScore;
+        if (this->ReadScoreDef(&newScore, meiDoc.first_child())) {
+            Score *score = m_doc->GetFirstVisibleScore();
+            ScoreDef *vrvScoreDef = vrv_cast<ScoreDef *>(newScore.GetFirst());
+            if (score && vrvScoreDef) {
+                newScore.Relinquish(0);
+                score->SetScoreDefSubtree(vrvScoreDef, vrvScoreDef);
+            }
+        }
+    }
+    catch (char *str) {
+        LogError("%s", str);
+    }
+}
+
 pugi::xml_document MEIInputExtended::FromJson(const jsonxx::Object &json)
 {
     pugi::xml_document doc;
 
     std::function<void(const jsonxx::Object &, pugi::xml_node &)> jsonToNode
         = [&](const jsonxx::Object &jsonNode, pugi::xml_node &parent) {
-              std::string elementName = jsonNode.get<std::string>("element");
+              std::string elementName = jsonNode.get<jsonxx::String>("element");
 
               // Special case for text nodes
               if (elementName == "text") {
                   pugi::xml_node textNode = parent.append_child(pugi::node_pcdata);
                   if (jsonNode.has<jsonxx::String>("text")) {
-                      textNode.set_value(jsonNode.get<std::string>("text").c_str());
+                      textNode.set_value(jsonNode.get<jsonxx::String>("text").c_str());
                   }
                   return;
               }
@@ -9386,7 +9407,7 @@ pugi::xml_document MEIInputExtended::FromJson(const jsonxx::Object &json)
 
               // Convert xml:id from top-level "id"
               if (jsonNode.has<jsonxx::String>("id")) {
-                  xmlNode.append_attribute("xml:id") = jsonNode.get<std::string>("id").c_str();
+                  xmlNode.append_attribute("xml:id") = jsonNode.get<jsonxx::String>("id").c_str();
               }
 
               // Convert attributes
@@ -9394,7 +9415,9 @@ pugi::xml_document MEIInputExtended::FromJson(const jsonxx::Object &json)
                   jsonxx::Object attrs = jsonNode.get<jsonxx::Object>("attributes");
 
                   for (auto it = attrs.kv_map().begin(); it != attrs.kv_map().end(); ++it) {
-                      xmlNode.append_attribute(it->first.c_str()) = it->second;
+                      if (it->second->is<jsonxx::String>()) {
+                          xmlNode.append_attribute(it->first.c_str()) = it->second->get<jsonxx::String>();
+                      }
                   }
               }
 
