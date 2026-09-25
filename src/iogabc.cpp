@@ -725,6 +725,26 @@ void GABCInput::ProcessWord(const std::string &lyrics, const std::string &music,
     }
 }
 
+// A GABC file starts with a header of `name:value;` attributes ended by a line holding only `%%`
+// (see Toolkit::IdentifyInputFrom); the music follows that line. Input without the separator is music only.
+static std::string GABCBody(const std::string &gabc)
+{
+    size_t pos = 0;
+    while (pos < gabc.size()) {
+        size_t end = gabc.find('\n', pos);
+        if (end == std::string::npos) end = gabc.size();
+        const size_t first = gabc.find_first_not_of(" \t\r", pos);
+        if (first != std::string::npos && first + 2 <= end && gabc.compare(first, 2, "%%") == 0) {
+            const size_t rest = gabc.find_first_not_of(" \t\r", first + 2);
+            if (rest == std::string::npos || rest >= end) {
+                return (end < gabc.size()) ? gabc.substr(end + 1) : std::string();
+            }
+        }
+        pos = end + 1;
+    }
+    return gabc;
+}
+
 bool GABCInput::Import(const std::string &gabc)
 {
     m_currentClefPitchOffset = 0;
@@ -749,7 +769,7 @@ bool GABCInput::Import(const std::string &gabc)
     measure->AddChild(staff);
     section->AddChild(measure);
 
-    this->ProcessInput(gabc);
+    this->ProcessInput(GABCBody(gabc));
 
     // add minimal scoreDef
     StaffGrp *staffGrp = new StaffGrp();
