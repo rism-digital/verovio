@@ -3499,6 +3499,8 @@ void MusicXmlInput::ReadMusicXmlNote(
 
         // End extenders by adding a verse with empty syl
         for (int lyricNumber : extenderStops) {
+            // TODO Tablature: <tabGrp> does not support child <verse>
+            if (element->Is(TABGRP)) continue;
             Verse *verse = new Verse();
             verse->SetN(lyricNumber);
             verse->AddChild(new Syl());
@@ -3535,6 +3537,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         // articulation
         std::list<Artic *> artics;
         for (pugi::xml_node articulations : notations.node().children("articulations")) {
+            // TODO Tablature: <tabGrp> does not support child <artic>
+            if (element->Is(TABGRP)) continue;
             for (pugi::xml_node articulation : articulations.children()) {
                 Artic *artic = new Artic();
                 data_ARTICULATION articVal = ConvertArticulations(articulation.name());
@@ -3936,6 +3940,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     // arpeggio
     pugi::xpath_node xmlArpeggiate = notations.node().select_node("*[contains(name(), 'arpeggiate')]");
     if (xmlArpeggiate) {
+        std::string elementID = (isTablature) ? note->GetID() : element->GetID();
         short int arpegN = xmlArpeggiate.node().attribute("number").as_int();
         arpegN = (arpegN < 1) ? 1 : arpegN;
         const std::string direction = xmlArpeggiate.node().attribute("direction").as_string();
@@ -3944,7 +3949,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             for (const auto &iter : m_ArpeggioStack) {
                 if (iter.second.m_arpegN == arpegN && onset == iter.second.m_timeStamp) {
                     // don't add other chord notes, because the chord is already referenced.
-                    if (!isChord) iter.first->GetPlistInterface()->AddRef("#" + element->GetID());
+                    if (isTablature || !isChord) iter.first->GetPlistInterface()->AddRef("#" + elementID);
                     added = true; // so that no new Arpeg gets created below
                     break;
                 }
@@ -3952,7 +3957,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
         if (!added) {
             Arpeg *arpeggio = new Arpeg();
-            arpeggio->GetPlistInterface()->AddRef("#" + element->GetID());
+            arpeggio->GetPlistInterface()->AddRef("#" + elementID);
             // color
             arpeggio->SetColor(xmlArpeggiate.node().attribute("color").as_string());
             // direction (up/down) and in MEI arrow
