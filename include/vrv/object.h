@@ -900,6 +900,12 @@ private:
      * XML id counter
      */
     static thread_local uint32_t s_xmlIDCounter;
+
+    /**
+     * Whether SeedID has run on this thread, so the first object built on
+     * a thread does not replace an explicit seed with a random one
+     */
+    static thread_local bool s_xmlIDSeeded;
 };
 
 //----------------------------------------------------------------------------

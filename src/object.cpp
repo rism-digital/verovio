@@ -67,10 +67,11 @@ namespace vrv {
 
 thread_local unsigned long Object::s_objectCounter = 0;
 thread_local uint32_t Object::s_xmlIDCounter = 0;
+thread_local bool Object::s_xmlIDSeeded = false;
 
 Object::Object() : BoundingBox()
 {
-    if (s_objectCounter++ == 0) {
+    if (s_objectCounter++ == 0 && !s_xmlIDSeeded) {
         this->SeedID();
     }
     this->Init(OBJECT);
@@ -78,7 +79,7 @@ Object::Object() : BoundingBox()
 
 Object::Object(ClassId classId) : BoundingBox()
 {
-    if (s_objectCounter++ == 0) {
+    if (s_objectCounter++ == 0 && !s_xmlIDSeeded) {
         this->SeedID();
     }
     this->Init(classId);
@@ -1275,6 +1276,7 @@ void Object::SeedID(uint32_t seed)
         // Deterministic start ID
         s_xmlIDCounter = Object::Hash(seed);
     }
+    s_xmlIDSeeded = true;
 }
 
 std::string Object::GenerateHashID()
