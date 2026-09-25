@@ -79,7 +79,7 @@ FunctorCode CalcArticFunctor::VisitArtic(Artic *artic)
     /************** adjust the xRel position **************/
 
     Stem *stem = vrv_cast<Stem *>(m_parent->FindDescendantByType(STEM));
-    artic->SetDrawingXRel(this->CalculateHorizontalShift(artic, stem->IsVirtual()));
+    if (stem) artic->SetDrawingXRel(this->CalculateHorizontalShift(artic, stem->IsVirtual()));
 
     /************** set cross-staff / layer **************/
 
