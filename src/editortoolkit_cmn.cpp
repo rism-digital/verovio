@@ -530,7 +530,7 @@ bool EditorToolkitCMN::InsertNote(const std::string &elementId, data_PITCHNAME p
         targetContainer->InsertChild(note, 0);
     }
 
-    if (note->IsInBeam()) {
+    if (note->IsInBeam() || m_cursor->HasContainer(BEAM)) {
         note->SetDur(std::max(DURATION_8, dur));
     }
     else if (this->InsertMode() && (note->GetDur() > DURATION_4)) {
