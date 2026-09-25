@@ -96,6 +96,9 @@ public:
 
     InputMode GetInputMode() const { return m_inputMode; }
     void SetInputMode(InputMode inputMode);
+    
+    bool IsAutoBeam() const { return m_autoBeam; }
+    void SetAutoBeam(bool autoBeam) { m_autoBeam = autoBeam; }
 
     int GetYRelPitchC() const { return m_yRelPitchC; }
     void SetYRelPitchC(int yRelPitchC) { m_yRelPitchC = yRelPitchC; }
@@ -140,6 +143,8 @@ private:
     TieMode m_tieMode;
     /** The cursor container (e.g., tuplet, graceGrp) */
     std::vector<LayerElement *> m_containers;
+    /** A flag indicating if autobeam is enabled */
+    bool m_autoBeam;
 };
 
 } // namespace vrv

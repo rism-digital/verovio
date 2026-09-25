@@ -307,8 +307,9 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         std::string elementId;
         Cursor::InputMode inputMode;
         bool chordMode;
-        if (this->ParseSetCursorAction(json.get<jsonxx::Object>("param"), elementId, inputMode, chordMode)) {
-            return (this->SetCursor(elementId, inputMode, chordMode));
+        bool autoBeam;
+        if (this->ParseSetCursorAction(json.get<jsonxx::Object>("param"), elementId, inputMode, chordMode, autoBeam)) {
+            return (this->SetCursor(elementId, inputMode, chordMode, autoBeam));
         }
         LogWarning("Could not parse the setCursor action");
     }
@@ -316,8 +317,9 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         bool restMode;
         bool chordMode;
         Cursor::TieMode tieMode;
-        if (this->ParseUpdateCursorAction(json.get<jsonxx::Object>("param"), restMode, chordMode, tieMode)) {
-            return (this->UpdateCursor(restMode, chordMode, tieMode));
+        bool autoBeam;
+        if (this->ParseUpdateCursorAction(json.get<jsonxx::Object>("param"), restMode, chordMode, tieMode, autoBeam)) {
+            return (this->UpdateCursor(restMode, chordMode, tieMode, autoBeam));
         }
         LogWarning("Could not parse the setCursor action");
     }
@@ -493,27 +495,31 @@ bool EditorToolkitShared::ParseSetAction(
 }
 
 bool EditorToolkitShared::ParseSetCursorAction(
-    const jsonxx::Object &param, std::string &elementId, Cursor::InputMode &inputMode, bool &chordMode)
+    const jsonxx::Object &param, std::string &elementId, Cursor::InputMode &inputMode, bool &chordMode, bool &autoBeam)
 {
     elementId = "";
     inputMode = Cursor::PITCH_FIRST;
     chordMode = false;
+    autoBeam = true;
 
     if (param.has<jsonxx::String>("elementId")) elementId = param.get<jsonxx::String>("elementId");
     if (!param.has<jsonxx::String>("inputMode")) return false;
     inputMode = (param.get<jsonxx::String>("inputMode") == "pitchFirst") ? Cursor::PITCH_FIRST : Cursor::DURATION_FIRST;
     if (!param.has<jsonxx::Boolean>("chordMode")) return false;
     chordMode = param.get<jsonxx::Boolean>("chordMode");
+    if (!param.has<jsonxx::Boolean>("autoBeam")) return false;
+    autoBeam = param.get<jsonxx::Boolean>("autoBeam");
 
     return true;
 }
 
 bool EditorToolkitShared::ParseUpdateCursorAction(
-    const jsonxx::Object &param, bool &restMode, bool &chordMode, Cursor::TieMode &tieMode)
+    const jsonxx::Object &param, bool &restMode, bool &chordMode, Cursor::TieMode &tieMode, bool &autoBeam)
 {
     chordMode = false;
     restMode = false;
     tieMode = Cursor::TieMode::TIE_NONE;
+    autoBeam = true;
 
     if (param.has<jsonxx::Boolean>("chordMode")) {
         chordMode = param.get<jsonxx::Boolean>("chordMode");
@@ -523,6 +529,9 @@ bool EditorToolkitShared::ParseUpdateCursorAction(
     }
     else if (param.has<jsonxx::String>("tieMode")) {
         tieMode = (param.get<jsonxx::String>("tieMode") == "tie") ? Cursor::TieMode::TIE : Cursor::TieMode::COPY;
+    }
+    else if (param.has<jsonxx::Boolean>("autoBeam")) {
+        autoBeam = param.get<jsonxx::Boolean>("autoBeam");
     }
 
     return true;
@@ -605,6 +614,7 @@ void EditorToolkitShared::SetEditStatus()
             (m_cursor->HasAccid()
                     ? m_cursor->GetAccidElement()->AttAccidental::AccidentalWrittenToStr(m_cursor->GetAccid())
                     : ""));
+        insertion.import("autoBeam", (m_cursor->IsAutoBeam()));
         insertion.import("accidImplicit", m_cursor->IsAccidImplicit());
         m_editStatus << "insertion" << insertion;
     }
@@ -654,8 +664,13 @@ void EditorToolkitShared::ReloadEditStatus(const std::string &statusStr, bool in
         if (insertion.has<jsonxx::Boolean>("chordMode")) {
             chordMode = insertion.get<jsonxx::Boolean>("chordMode");
         }
+        
+        bool autoBeam = true;
+        if (insertion.has<jsonxx::Boolean>("autoBeam")) {
+            autoBeam = insertion.get<jsonxx::Boolean>("autoBeam");
+        }
 
-        this->SetCursor(m_selectionId, inputMode, chordMode);
+        this->SetCursor(m_selectionId, inputMode, chordMode, autoBeam);
 
         if (insertion.has<jsonxx::Number>("oct")) {
             int oct = insertion.get<jsonxx::Number>("oct");
@@ -785,7 +800,7 @@ bool EditorToolkitShared::Chain(const jsonxx::Array &actions)
     return status;
 }
 
-bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode inputMode, bool chordMode)
+bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode inputMode, bool chordMode, bool autoBeam)
 {
     Layer *layer = NULL;
     LayerElement *position = NULL;
@@ -811,6 +826,7 @@ bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode in
     // Get the accid from the layer key signature
     if (m_cursor) {
         m_cursor->SetInputMode(inputMode);
+        m_cursor->SetAutoBeam(autoBeam);
         if (chordMode && m_cursor->GetPosition() && m_cursor->GetPosition()->IsAnyOf(std::array{ NOTE, CHORD })) {
             m_cursor->SetRestMode(false);
             m_cursor->SetChordMode(Cursor::ChordMode::EDIT_EXISTING);
@@ -827,7 +843,7 @@ bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode in
     return true;
 }
 
-bool EditorToolkitShared::UpdateCursor(bool restMode, bool chordMode, Cursor::TieMode tieMode)
+bool EditorToolkitShared::UpdateCursor(bool restMode, bool chordMode, Cursor::TieMode tieMode, bool autoBeam)
 {
     if (!InsertMode()) return true;
 
@@ -840,6 +856,9 @@ bool EditorToolkitShared::UpdateCursor(bool restMode, bool chordMode, Cursor::Ti
     }
     else if (m_cursor->GetInputMode() == Cursor::PITCH_FIRST) {
         m_cursor->SetRestMode(restMode);
+    }
+    else if (autoBeam != m_cursor->IsAutoBeam()) {
+        m_cursor->SetAutoBeam(autoBeam);
     }
 
     this->SetEditStatus();
@@ -863,7 +882,7 @@ bool EditorToolkitShared::ResetCursor(bool maintainChordMode)
         }
         if (m_cursor) {
             if (maintainChordMode) {
-                this->UpdateCursor(false, true, Cursor::TieMode::TIE_NONE);
+                this->UpdateCursor(false, true, Cursor::TieMode::TIE_NONE, false);
             }
             else {
                 m_cursor->SetChordMode(Cursor::ChordMode::CHORD_NONE);
@@ -1882,7 +1901,7 @@ void EditorToolkitShared::MoveCursor(LayerElement *element, bool maintainChordMo
         m_selectionId = object->GetID();
         m_chainedId = m_selectionId;
         m_selectionClassId = object->GetClassId();
-        this->SetCursor(m_selectionId, m_cursor->GetInputMode(), false);
+        this->SetCursor(m_selectionId, m_cursor->GetInputMode(), false, m_cursor->IsAutoBeam());
     }
     else {
         // Exit inputMode

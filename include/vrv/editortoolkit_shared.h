@@ -74,9 +74,9 @@ protected:
     bool ParseSetAction(
         const jsonxx::Object &param, std::string &elementId, std::string &attribute, std::string &value);
     bool ParseSetCursorAction(
-        const jsonxx::Object &param, std::string &elementId, Cursor::InputMode &inputMode, bool &chordMode);
+        const jsonxx::Object &param, std::string &elementId, Cursor::InputMode &inputMode, bool &chordMode, bool &autoBeam);
     bool ParseUpdateCursorAction(
-        const jsonxx::Object &param, bool &restMode, bool &chordMode, Cursor::TieMode &tieMode);
+        const jsonxx::Object &param, bool &restMode, bool &chordMode, Cursor::TieMode &tieMode, bool &autoBeam);
     bool ParseUpdatePitchAction(const jsonxx::Object &param, std::string &elementId, data_PITCHNAME &pname, int &oct,
         data_ACCIDENTAL_WRITTEN &accid, int &midi);
 
@@ -97,8 +97,8 @@ protected:
      * Experimental editor functions.
      */
     ///@{
-    bool SetCursor(std::string &elementId, Cursor::InputMode inputMode, bool chordMode);
-    bool UpdateCursor(bool restMode, bool chordMode, Cursor::TieMode tieMode);
+    bool SetCursor(std::string &elementId, Cursor::InputMode inputMode, bool chordMode, bool autoBeam);
+    bool UpdateCursor(bool restMode, bool chordMode, Cursor::TieMode tieMode, bool autoBeam);
     bool ResetCursor(bool maintainChordMode);
     bool Delete(std::string &elementId, DeleteNavigation navigation);
     bool Drag(std::string &elementId, int x, int y);

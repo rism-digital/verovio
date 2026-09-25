@@ -47,6 +47,7 @@ void Cursor::Reset()
     m_inputMode = InputMode::PITCH_FIRST;
     m_chordMode = ChordMode::CHORD_NONE;
     m_tieMode = TieMode::TIE_NONE;
+    m_autoBeam = true;
 
     // Default pitch and duration
     this->SetPname(PITCHNAME_c);
