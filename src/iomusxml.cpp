@@ -3499,6 +3499,8 @@ void MusicXmlInput::ReadMusicXmlNote(
 
         // End extenders by adding a verse with empty syl
         for (int lyricNumber : extenderStops) {
+            // TODO Tablature: <tabGrp> does not support child <verse>
+            if (element->Is(TABGRP)) continue;
             Verse *verse = new Verse();
             verse->SetN(lyricNumber);
             verse->AddChild(new Syl());
@@ -3535,6 +3537,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         // articulation
         std::list<Artic *> artics;
         for (pugi::xml_node articulations : notations.node().children("articulations")) {
+            // TODO Tablature: <tabGrp> does not support child <artic>
+            if (element->Is(TABGRP)) continue;
             for (pugi::xml_node articulation : articulations.children()) {
                 Artic *artic = new Artic();
                 data_ARTICULATION articVal = ConvertArticulations(articulation.name());
