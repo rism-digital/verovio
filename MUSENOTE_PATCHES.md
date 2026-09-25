@@ -10,6 +10,9 @@ file is unmodified upstream Verovio, under the same LGPL-3.0 licence.
 | --- | --- | --- | --- | --- | --- |
 | 1 | 2026-09-25 | Fix two crashes in the PAE importer on malformed input (cherry-picked from 82a6aa3e5) | `src/iopae.cpp`, +13 / -5 | None for multi-line (`@clef:`) Plaine & Easie. A one-line (`%`) input with a key or time signature after the clef now reads them as the opening signatures instead of a change after an empty opening; ids of such input change, pitches do not | Offered as rism-digital/verovio#4450 and withdrawn; not upstream |
 | 2 | 2026-09-25 | Keep an explicit xmlIdSeed on a thread that has not built an object yet (95ad8e834) | `include/vrv/object.h`, `src/object.cpp`, +10 / -2 | None for a load on a thread that already built a Verovio object. A seeded load on a fresh thread now keeps the seed (it got random ids) | Not offered upstream |
+| 3 | 2026-09-25 | Return instead of assert when glyph not found (97d9daaf3, cherry-picked from upstream beeeb2150, in 6.3.0) | `src/doc.cpp`, +3 / -3 | Scores that crashed now render: a rest whose glyph the font lacks made `Doc::GetGlyphWidth` dereference a null glyph (SIGSEGV while laying out). No other output changes | Upstream (6.3.0) |
+| 4 | 2026-09-25 | Decode GABC lyrics as UTF-8 (ba278bbe6) | `src/iogabc.cpp`, +1 / -1 | GABC lyrics with non-ASCII letters come out as written ("lé") instead of invalid UTF-8 (signed char) or "Ã©" (unsigned char) | Not offered upstream |
+| 5 | 2026-09-25 | Skip the GABC header before reading the music (0baa9874a) | `src/iogabc.cpp`, +21 / -1 | A GABC file's header (`name: …;` lines and `%%`) is no longer read as lyric syllables; input without a header is unchanged | Not offered upstream |
 
 ### 1. PAE importer crashes
 
@@ -41,6 +44,34 @@ Regression test: MuseNote's `corelib/verovio/tool/parity/seedthread.cpp`
 fails on tb.1 and passes on tb.2.
 
 ## Verification, 2026-09-25
+
+tb.3 against tb.2 (same toolchain, MuseNote's `tool/parity` with the
+annotation-locator corpus): 2079 outputs compared, 14 differ, all declared —
+the 10 Humdrum inputs (of 189) that crashed tb.2 now export, their status
+file, and the 3 GABC chants (header skipped, lyrics valid UTF-8). Structural
+note positions identical in every format (0 locator failures over 57,000+
+notes); seeded ids deterministic on a fresh thread for 209 of 209 scores.
+
+### 3. Missing glyph (upstream fix)
+
+Upstream's beeeb2150, released in 6.3.0, applied as is. `Doc::GetGlyphWidth`,
+`GetGlyphHeight` and `GetGlyphAdvX` asserted that the glyph exists; in a
+release build the null glyph was dereferenced. 10 of the 189 Humdrum files in
+MuseNote's parity corpus (Verovio's own Humdrum export of bundled scores)
+crashed 6.1.1 and 6.2.0 while laying out a rest. Dropped at the 6.3.0 base
+move, which contains it.
+
+### 4. GABC lyrics as UTF-8
+
+`GABCInput::ProcessWord` converted the lyric std::string to std::u32string
+byte by byte. Regression input: MuseNote's `tool/parity/gabc/kyrie.gabc`
+("eléison").
+
+### 5. GABC header
+
+`Toolkit::IdentifyInputFrom` recognises GABC by the `%%` line that ends the
+header, but `GABCInput::Import` read the header as music. Regression inputs:
+MuseNote's `tool/parity/gabc/*.gabc`; a body-only input is unchanged.
 
 tb.2 against tb.1 (same toolchain): 972 outputs compared, 0 differ; the
 fresh-thread seeded import matches on 3 of 3 scores (0 of 54 notes matched on
