@@ -41,6 +41,10 @@
 #include "object.h"
 #include "vrvdef.h"
 
+#define STB_SPRINTF_STATIC
+#define STB_SPRINTF_IMPLEMENTATION
+#include "stb_sprintf.h"
+
 //----------------------------------------------------------------------------
 
 #ifdef __EMSCRIPTEN__
@@ -205,7 +209,7 @@ std::string StringFormat(const char *fmt, ...)
     std::string str(STRING_FORMAT_MAX_LEN, 0);
     va_list args;
     va_start(args, fmt);
-    vsnprintf(&str[0], STRING_FORMAT_MAX_LEN, fmt, args);
+    stbsp_vsnprintf(&str[0], STRING_FORMAT_MAX_LEN, fmt, args);
     va_end(args);
     str.resize(strlen(str.data()));
     return str;
@@ -214,7 +218,7 @@ std::string StringFormat(const char *fmt, ...)
 std::string StringFormatVariable(const char *format, va_list arg)
 {
     std::string str(STRING_FORMAT_MAX_LEN, 0);
-    vsnprintf(&str[0], STRING_FORMAT_MAX_LEN, format, arg);
+    stbsp_vsnprintf(&str[0], STRING_FORMAT_MAX_LEN, format, arg);
     str.resize(strlen(str.data()));
     return str;
 }
