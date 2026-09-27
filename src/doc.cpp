@@ -344,7 +344,7 @@ void Doc::GenerateMEIHeader()
     // date
     time_t t = time(0); // get time now
     struct tm *now = localtime(&t);
-    std::string dateStr = StringFormat("%d-%02d-%02d-%02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
+    std::string dateStr = StringFormat("{}-{:02}-{:02}-{:02}:{:02}:{:02}", now->tm_year + 1900, now->tm_mon + 1,
         now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
     date.append_attribute("isodate") = dateStr.c_str();
 
@@ -356,11 +356,11 @@ void Doc::GenerateMEIHeader()
     application.append_attribute("xml:id") = "verovio";
     application.append_attribute("version") = GetVersion().c_str();
     pugi::xml_node name = application.append_child("name");
-    name.text().set(StringFormat("Verovio (%s)", GetVersion().c_str()).c_str());
+    name.text().set(StringFormat("Verovio ({})", GetVersion()).c_str());
     // projectDesc
     pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
     pugi::xml_node p1 = projectDesc.append_child("p");
-    p1.text().set(StringFormat("MEI encoded with Verovio").c_str());
+    p1.text().set("MEI encoded with Verovio");
 }
 
 void Doc::ConvertHeaderToMEIBasic()

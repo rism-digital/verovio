@@ -15,6 +15,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <format>
 
 #ifndef _WIN32
 #include <sys/time.h>
@@ -99,9 +100,13 @@ std::string UTF16to8(const std::u16string &in);
 
 /**
  * Format a string using vsnprintf.
- * The maximum length is giving by STRING_FORMAT_MAX_LEN
  */
-std::string StringFormat(const char *fmt, ...);
+
+template <typename... T>
+std::string StringFormat(std::format_string<T...> fmt, T&&... args)
+{
+	return std::format(fmt, std::forward<T>(args)...);
+}
 // This is the implementation callable with variable arguments
 std::string StringFormatVariable(const char *format, va_list arg);
 

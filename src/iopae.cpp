@@ -335,7 +335,7 @@ void PAEOutput::WriteClef(Clef *clef)
         }
     }
     std::string sign = (m_mensural) ? "+" : "-";
-    std::string line = StringFormat("%d", clef->GetLine());
+    std::string line = StringFormat("{}", clef->GetLine());
 
     m_streamStringOutput << outStart << shape << sign << line << outEnd;
 }
@@ -394,10 +394,10 @@ void PAEOutput::WriteMeterSig(MeterSig *meterSig)
         sig = (meterSig->GetSym() == METERSIGN_common) ? "c" : "c/";
     }
     else if (meterSig->GetForm() == METERFORM_num) {
-        sig = StringFormat("%d", meterSig->GetTotalCount());
+        sig = StringFormat("{}", meterSig->GetTotalCount());
     }
     else if (meterSig->HasCount() && meterSig->GetUnit()) {
-        sig = StringFormat("%d/%d", meterSig->GetTotalCount(), meterSig->GetUnit());
+        sig = StringFormat("{}/{}", meterSig->GetTotalCount(), meterSig->GetUnit());
     }
 
     m_streamStringOutput << outStart << sig << outEnd;
@@ -2568,9 +2568,9 @@ void PAEInput::LogPAE(int errCode, pae::Token &token, std::string value)
         case pae::TIMESIG_POS: posStr = "(timesig input key)"; break;
         case pae::INPUT_POS: posStr = "(global input error)"; break;
         case pae::UNKOWN_POS: posStr = "(unspecified position)"; break;
-        default: posStr = StringFormat("(character %d)", token.m_position);
+        default: posStr = StringFormat("(character {})", token.m_position);
     }
-    std::string fullMsg = StringFormat("PAE: %s %s", msg.c_str(), posStr.c_str());
+    std::string fullMsg = StringFormat("PAE: {} {}", msg, posStr);
 
     if (m_pedanticMode) {
         LogError(fullMsg.c_str());
@@ -3797,7 +3797,7 @@ bool PAEInput::ConvertFermata()
                 // PAE guidelines are ambiguous because they say fermata should contain only a single rest sign (=)
                 // but at the same time allow =1 for a mrest - in non pendantic mode we want to support (=1)
                 else if (fermataTarget->Is(MREST) && isdigit(token.m_inputChar)) {
-                    this->LogPAE(ERR_058_FERMATA_MREST, token, StringFormat("%c", token.m_inputChar));
+                    this->LogPAE(ERR_058_FERMATA_MREST, token, StringFormat("{}", token.m_inputChar));
                     if (m_pedanticMode) return false;
                     continue;
                 }
@@ -4655,7 +4655,7 @@ bool PAEInput::CheckHierarchy()
             // Test is the element is supported by the current top container
             if (!token.IsContainerEnd() && !stack.back()->m_object->IsSupportedChild(token.m_object->GetClassId())) {
                 this->LogPAE(ERR_040_HIERARCHY_INVALID, token,
-                    StringFormat("%s / %s", token.GetName().c_str(), stack.back()->GetName().c_str()));
+                    StringFormat("{} / {}", token.GetName(), stack.back()->GetName()));
                 if (m_pedanticMode) return false;
                 // Indicate that the data was not valid in this pass so we will check it again
                 isValid = false;
@@ -4676,7 +4676,7 @@ bool PAEInput::CheckHierarchy()
                     // This means that the hierarchy is invalid
                     if (stack.back()->m_object != token.m_object) {
                         this->LogPAE(ERR_041_NESTING_INVALID, token,
-                            StringFormat("%s / %s", token.GetName().c_str(), stack.back()->GetName().c_str()));
+                            StringFormat("{} / {}", token.GetName(), stack.back()->GetName()));
                         if (m_pedanticMode) return false;
                         // Indicate that the data was not valid in this pass so we will check it again
                         isValid = false;

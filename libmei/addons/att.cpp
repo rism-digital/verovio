@@ -39,7 +39,7 @@ std::string Att::DblToStr(double data) const
 
 std::string Att::IntToStr(int data) const
 {
-    return StringFormat("%d", data);
+    return StringFormat("{}", data);
 }
 
 std::string Att::VUToStr(data_VU data) const
@@ -164,7 +164,7 @@ data_BULGE Att::StrToBulge(const std::string &value, bool logWarning) const
 
 std::string Att::DegreesToStr(data_DEGREES data) const
 {
-    return StringFormat("%f", data);
+    return StringFormat("{}", data);
 }
 
 data_DEGREES Att::StrToDegrees(const std::string &value, bool logWarning) const
@@ -245,10 +245,7 @@ data_DURATION Att::StrToDuration(const std::string &value, bool) const
 
 std::string Att::HexnumToStr(data_HEXNUM data) const
 {
-    char buf[5];
-    memset(buf, 0, 5);
-    snprintf(buf, 5, "%.4X", (int)data);
-    return StringFormat("U+%s", buf);
+    return StringFormat("U+{:04X}", (int)data);
 }
 
 data_HEXNUM Att::StrToHexnum(std::string value, bool logWarning) const
@@ -307,7 +304,7 @@ std::string Att::FontsizeToStr(data_FONTSIZE data) const
     std::string value;
     if (data.GetType() == FONTSIZE_fontSizeNumeric) {
         const char *unit = (data.GetFontSizeNumericType() == FONTSIZENUMERIC_vu) ? "vu" : "pt";
-        value = StringFormat("%f%s", data.GetFontSizeNumeric(), unit);
+        value = StringFormat("{}{}", data.GetFontSizeNumeric(), unit);
     }
     else if (data.GetType() == FONTSIZE_term) {
         value = FontsizetermToStr(data.GetTerm());
@@ -377,7 +374,7 @@ data_LINEWIDTH Att::StrToLinewidth(const std::string &value, bool logWarning) co
 
 std::string Att::FontsizenumericToStr(data_FONTSIZENUMERIC data) const
 {
-    return StringFormat("%.2fpt", data);
+    return StringFormat("{:.2f}pt", data);
 }
 
 data_FONTSIZENUMERIC Att::StrToFontsizenumeric(const std::string &value, bool logWarning) const
@@ -410,7 +407,7 @@ std::string Att::KeysignatureToStr(data_KEYSIGNATURE data) const
         value = "0";
     }
     else if (data.first != -1) {
-        value = StringFormat("%d%s", data.first, AccidentalWrittenToStr(data.second).c_str());
+        value = StringFormat("{}{}", data.first, AccidentalWrittenToStr(data.second));
     }
 
     return value;
@@ -474,7 +471,7 @@ std::string Att::MeasurementsignedToStr(data_MEASUREMENTSIGNED data) const
 {
     std::string value;
     if (data.GetType() == MEASUREMENTTYPE_px) {
-        value = StringFormat("%dpx", data.GetPx() / DEFINITION_FACTOR);
+        value = StringFormat("{}px", data.GetPx() / DEFINITION_FACTOR);
     }
     else if (data.GetType() == MEASUREMENTTYPE_vu) {
         value = VUToStr(data.GetVu());

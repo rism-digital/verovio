@@ -1064,7 +1064,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         else if (IsElement(xpathNode.node(), "score-part")) {
             // get the attributes element of the first measure of the part
             const std::string partId = xpathNode.node().attribute("id").as_string();
-            std::string xpath = StringFormat("/score-partwise/part[@id='%s']/measure[1]", partId.c_str());
+            std::string xpath = StringFormat("/score-partwise/part[@id='{}']/measure[1]", partId);
             pugi::xpath_node partFirstMeasure = root.select_node(xpath.c_str());
             if (!partFirstMeasure.node().child("attributes")) {
                 LogWarning("MusicXML import: Could not find the 'attributes' element in the first "
@@ -1157,7 +1157,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             }
 
             // find the part and read it
-            xpath = StringFormat("/score-partwise/part[@id='%s']", partId.c_str());
+            xpath = StringFormat("/score-partwise/part[@id='{}']", partId);
             pugi::xpath_node part = root.select_node(xpath.c_str());
             if (!part) {
                 LogWarning("MusicXML import: Could not find the part '%s'", partId.c_str());
@@ -1522,7 +1522,7 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
     // isodate and version
     time_t t = time(0); // get time now
     struct tm *now = localtime(&t);
-    std::string dateStr = StringFormat("%d-%02d-%02dT%02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
+    std::string dateStr = StringFormat("{}-{:02}-{:02}T{:02}:{:02}:{:02}", now->tm_year + 1900, now->tm_mon + 1,
         now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
     app.append_attribute("isodate").set_value(dateStr.c_str());
     app.append_attribute("version").set_value(GetVersion().c_str());
@@ -1590,7 +1590,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
             }
 
             // clef sign - first look if we have a clef-sign with the corresponding staff @number
-            std::string xpath = StringFormat("clef[@number='%d']", i + 1);
+            std::string xpath = StringFormat("clef[@number='{}']", i + 1);
             pugi::xpath_node clef = child.select_node(xpath.c_str());
             // if not, look at a common one
             if (!clef) {
@@ -1605,7 +1605,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
             }
 
             // key sig
-            xpath = StringFormat("key[@number='%d']", i + 1);
+            xpath = StringFormat("key[@number='{}']", i + 1);
             pugi::xpath_node key = child.select_node(xpath.c_str());
             if (!key) {
                 key = child.select_node("key[not(@number)]");
@@ -1619,7 +1619,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
 
             // staff details
             pugi::xpath_node staffDetails;
-            xpath = StringFormat("staff-details[@number='%d']", i + 1);
+            xpath = StringFormat("staff-details[@number='{}']", i + 1);
             staffDetails = child.select_node(xpath.c_str());
             if (!staffDetails) {
                 staffDetails = child.select_node("staff-details[not(@number)]");
@@ -1702,7 +1702,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
 
             // time
             pugi::xpath_node time;
-            xpath = StringFormat("time[@number='%d']", i + 1);
+            xpath = StringFormat("time[@number='{}']", i + 1);
             time = child.select_node(xpath.c_str());
             if (!time) {
                 time = child.select_node("time[not(@number)]");
@@ -1715,7 +1715,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
 
             // transpose
             pugi::xpath_node transpose;
-            xpath = StringFormat("transpose[@number='%d']", i + 1);
+            xpath = StringFormat("transpose[@number='{}']", i + 1);
             transpose = child.select_node(xpath.c_str());
             if (!transpose) {
                 transpose = child.select_node("transpose");
@@ -2196,7 +2196,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure)
         std::string endingText = ending.text().as_string();
         if (endingType == "start") {
             // check for corresponding stop points
-            std::string xpath = StringFormat("following::ending[@number='%s'][@type != 'start']", endingNumber.c_str());
+            std::string xpath = StringFormat("following::ending[@number='{}'][@type != 'start']", endingNumber);
             pugi::xpath_node endingEnd = node.select_node(xpath.c_str());
             if (endingEnd) {
                 if (!m_sectionStart) m_sectionStart = musicxml::SectionInfo();
@@ -4473,10 +4473,10 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
         short int fifths = key.child("fifths").text().as_int();
         std::string keySigStr;
         if (fifths < 0) {
-            keySigStr = StringFormat("%df", abs(fifths));
+            keySigStr = StringFormat("{}f", abs(fifths));
         }
         else if (fifths > 0) {
-            keySigStr = StringFormat("%ds", fifths);
+            keySigStr = StringFormat("{}s", fifths);
         }
         else {
             keySigStr = "0";

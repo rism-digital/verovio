@@ -3490,11 +3490,11 @@ std::string HumdrumInput::isoDateFromDateWithErrors(const DateWithErrors &date, 
             }
         }
         if (i == 0) {
-            std::string yearStr = StringFormat("%s%d", prefix.c_str(), value);
+            std::string yearStr = StringFormat("{}{}", prefix.c_str(), value);
             dateParts.push_back(yearStr);
         }
         else {
-            std::string numStr = StringFormat("%s%02d", prefix.c_str(), value);
+            std::string numStr = StringFormat("{}{:02}", prefix.c_str(), value);
             dateParts.push_back(numStr);
         }
     }
@@ -4192,7 +4192,7 @@ void HumdrumInput::createWorkList(pugi::xml_node meiHead)
             workList = meiHead.append_child("workList");
         }
 
-        parentWorkXmlId = StringFormat("work%d_parent", workNumber++);
+        parentWorkXmlId = StringFormat("work{}_parent", workNumber++);
         pugi::xml_node parentWork = workList.append_child("work");
         parentWork.append_attribute("xml:id") = parentWorkXmlId.c_str();
         parentWork.append_attribute("type") = "parent";
@@ -4210,7 +4210,7 @@ void HumdrumInput::createWorkList(pugi::xml_node meiHead)
             workList = meiHead.append_child("workList");
         }
 
-        groupWorkXmlId = StringFormat("work%d_group", workNumber++);
+        groupWorkXmlId = StringFormat("work{}_group", workNumber++);
         pugi::xml_node groupWork = workList.append_child("work");
         groupWork.append_attribute("xml:id") = groupWorkXmlId.c_str();
         groupWork.append_attribute("type") = "group";
@@ -4228,7 +4228,7 @@ void HumdrumInput::createWorkList(pugi::xml_node meiHead)
             workList = meiHead.append_child("workList");
         }
 
-        associatedWorkXmlId = StringFormat("work%d_associated", workNumber++);
+        associatedWorkXmlId = StringFormat("work{}_associated", workNumber++);
         pugi::xml_node associatedWork = workList.append_child("work");
         associatedWork.append_attribute("xml:id") = associatedWorkXmlId.c_str();
         associatedWork.append_attribute("type") = "associated";
@@ -4246,7 +4246,7 @@ void HumdrumInput::createWorkList(pugi::xml_node meiHead)
             workList = meiHead.append_child("workList");
         }
 
-        collectionWorkXmlId = StringFormat("work%d_collection", workNumber++);
+        collectionWorkXmlId = StringFormat("work{}_collection", workNumber++);
         pugi::xml_node collectionWork = workList.append_child("work");
         collectionWork.append_attribute("xml:id") = collectionWorkXmlId.c_str();
         collectionWork.append_attribute("type") = "collection";
@@ -4273,7 +4273,7 @@ void HumdrumInput::createWorkList(pugi::xml_node meiHead)
             workList = meiHead.append_child("workList");
         }
         pugi::xml_node theWork = workList.append_child("work");
-        std::string xmlId = StringFormat("work%d_encoded", workNumber++);
+        std::string xmlId = StringFormat("work{}_encoded", workNumber++);
         theWork.append_attribute("xml:id") = xmlId.c_str();
         m_doc->m_musicDecls = "#" + xmlId;
         theWork.append_attribute("type") = "encoded";
@@ -4498,28 +4498,28 @@ void HumdrumInput::createWorkList(pugi::xml_node meiHead)
                 pugi::xml_node relation = relationList.append_child("relation");
                 relation.append_attribute("rel") = "isPartOf";
                 relation.append_attribute("type") = "isChildOfParent";
-                relation.append_attribute("target") = StringFormat("#%s", parentWorkXmlId.c_str()).c_str();
+                relation.append_attribute("target") = StringFormat("#{}", parentWorkXmlId).c_str();
             }
 
             if (!groupWorkXmlId.empty()) {
                 pugi::xml_node relation = relationList.append_child("relation");
                 relation.append_attribute("rel") = "isPartOf";
                 relation.append_attribute("type") = "isMemberOfGroup";
-                relation.append_attribute("target") = StringFormat("#%s", groupWorkXmlId.c_str()).c_str();
+                relation.append_attribute("target") = StringFormat("#{}", groupWorkXmlId).c_str();
             }
 
             if (!associatedWorkXmlId.empty()) {
                 pugi::xml_node relation = relationList.append_child("relation");
                 relation.append_attribute("rel") = "isVersionOf";
                 relation.append_attribute("type") = "isAssociatedWith";
-                relation.append_attribute("target") = StringFormat("#%s", associatedWorkXmlId.c_str()).c_str();
+                relation.append_attribute("target") = StringFormat("#{}", associatedWorkXmlId).c_str();
             }
 
             if (!collectionWorkXmlId.empty()) {
                 pugi::xml_node relation = relationList.append_child("relation");
                 relation.append_attribute("rel") = "isPartOf";
                 relation.append_attribute("type") = "isMemberOfCollection";
-                relation.append_attribute("target") = StringFormat("#%s", collectionWorkXmlId.c_str()).c_str();
+                relation.append_attribute("target") = StringFormat("#{}", collectionWorkXmlId).c_str();
             }
         }
 
@@ -4836,10 +4836,10 @@ void HumdrumInput::createComposerElements(pugi::xml_node work)
             continue;
         }
 
-        std::string madsXmlId = StringFormat("mads%d", madsXmlIdIndex++);
+        std::string madsXmlId = StringFormat("mads{}", madsXmlIdIndex++);
 
         // reference <mads> element from composer's name element
-        nameEl.append_attribute("auth.uri") = StringFormat("#%s", madsXmlId.c_str()).c_str();
+        nameEl.append_attribute("auth.uri") = StringFormat("#{}", madsXmlId.c_str()).c_str();
 
         // There is extra info about the composer, that will need to go
         // in <work><extMeta><madsCollection><mads>
@@ -5294,7 +5294,7 @@ std::string HumdrumInput::getDateString()
 {
     time_t t = time(0); // get time now
     struct tm *now = localtime(&t);
-    std::string dateStr = StringFormat("%d-%02d-%02dT%02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
+    std::string dateStr = StringFormat("{}-{:02}-{:02}T{:02}:{:02}:{:02}", now->tm_year + 1900, now->tm_mon + 1,
         now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
     return dateStr;
 }
