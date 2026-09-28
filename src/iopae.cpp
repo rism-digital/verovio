@@ -11,11 +11,11 @@
 
 #include <cassert>
 #include <cctype>
+#include <format>
 #include <fstream>
 #include <regex>
 #include <sstream>
 #include <string>
-
 //----------------------------------------------------------------------------
 
 #include "beam.h"
@@ -2313,7 +2313,7 @@ enum {
 };
 
 // clang-format off
-const std::map<int, std::string> PAEInput::s_errCodes{
+const std::map<int, std::format_string<std::string>> PAEInput::s_errCodes{
     { ERR_001_EMPTY, "The input is empty." },
     { ERR_002_JSON_PARSE, "The JSON input cannot be parsed." },
     { ERR_003_JSON_KEY, "There is no 'data' key in the JSON input." },
@@ -2336,9 +2336,9 @@ const std::map<int, std::string> PAEInput::s_errCodes{
     { ERR_020_CHORD_NOTE_BEFORE, "To indicate a chord, a '^' must be preceded by a note." },
     { ERR_021_CHORD_NOTE_AFTER, "To indicate a chord, a '^' must be followed by a note." },
     { ERR_022_BEAM_MENSURAL, "Beams cannot be used with mensural notation." },
-    { ERR_023_BEAM_NESTED, "A beam cannot be started with '{' before closing the previous one." },
-    { ERR_024_BEAM_CLOSING, "An extra '}' to close a beam is present." },
-    { ERR_025_BEAM_OPEN, "The beam must be closed with '}' before the end of the measure." },
+    { ERR_023_BEAM_NESTED, "A beam cannot be started with '{{' before closing the previous one." },
+    { ERR_024_BEAM_CLOSING, "An extra '}}' to close a beam is present." },
+    { ERR_025_BEAM_OPEN, "The beam must be closed with '}}' before the end of the measure." },
     { ERR_026_GRACE_NESTED, "The appoggiatura must be closed with 'r' before starting a new one." },
     { ERR_027_GRACE_CLOSING, "An extra 'r' is present to close an appoggiatura" },
     { ERR_028_GRACE_OPEN, "The appoggiatura must be closed with 'r' before the end of the measure." },
@@ -2353,25 +2353,25 @@ const std::map<int, std::string> PAEInput::s_errCodes{
     { ERR_037_TIE_PITCH, "A tie using '+' can only connect two notes of the same octave and pitch." },
     { ERR_038_TIE_OPEN, "A tie using '+' must be follow by a note." },
     { ERR_039_TIE_NO_NOTE, "A tie using '+' must be preceded by a note." },
-    { ERR_040_HIERARCHY_INVALID, "The resulting hierachy of elements for '%s' is invalid." },
-    { ERR_041_NESTING_INVALID, "The nesting of opening and closing tags for '%s' is invalid." },
+    { ERR_040_HIERARCHY_INVALID, "The resulting hierachy of elements for '{}' is invalid." },
+    { ERR_041_NESTING_INVALID, "The nesting of opening and closing tags for '{}' is invalid." },
     { ERR_042_CLEF_INCOMPLETE, "The clef is not complete (Setting to G-2 if running in non-pedantic mode)." },
     { ERR_043_CLEF_INVALID_2ND, "The second character in the clef sign must be either '+' or '-'." },
     { ERR_044_CLEF_MENS, "Mensural and non-mensural clefs cannot be mixed." },
     { ERR_045_CLEF_INVALID_3RD, "The third character in the clef sign must be a digit." },
-    { ERR_046_CLEF_INVALID, "The clef '%s' is invalid." },
+    { ERR_046_CLEF_INVALID, "The clef '{}' is invalid." },
     { ERR_047_TIMESIG_INCOMPLETE, "The time signature cannot be parsed (Setting to 4/4 if running in non-pedantic mode)." },
-    { ERR_048_TIMESIG_INVALID, "The time signature '%s' is invalid." },
+    { ERR_048_TIMESIG_INVALID, "The time signature '{}' is invalid." },
     { ERR_049_TIMESIG_MENS, "The mensur sign content cannot be parsed (Setting to 'O' if running in non-pedantic mode)." },
-    { ERR_050_INVALID_CHAR, "The input contains one or more character(s) '%s'." },
-    { ERR_051_BARLINE, "The barline '%s' is invalid." },
+    { ERR_050_INVALID_CHAR, "The input contains one or more character(s) '{}'." },
+    { ERR_051_BARLINE, "The barline '{}' is invalid." },
     { ERR_052_DURATION, "The duration content cannot be parsed (Setting to quarter note if running in non-pedantic mode)." },
     { ERR_053_DURATION_MENS3, "The duration cannot be '3' with mensural notation." },
     { ERR_054_DURATION_MENS5, "The duration cannot be '5' with mensural notation." },
     { ERR_055_KEYSIG_CHANGE, "The key signature cannot be changed more than once in a measure." },
     { ERR_056_TIMESIG_CHANGE, "The time signature cannot be changed more than once in a measure." },
     { ERR_057_MENSUR_CHANGE, "The mensur sign cannot be changed more than once in a measure." },
-    { ERR_058_FERMATA_MREST, "A fermata on measure rest with extra '%s' is invalid." },
+    { ERR_058_FERMATA_MREST, "A fermata on measure rest with extra '{}' is invalid." },
     { ERR_059_DOUBLE_DOTS_MENS, "Double-dotted notes are invalid with mensural notation." },
     { ERR_060_CLEF_MISSING, "A clef is required." },
     { ERR_061_LIGATURE_NOTE_BEFORE, "To indicate a ligature, a '+' must be preceded by a note." },
@@ -2537,8 +2537,11 @@ void PAEInput::LogPAE(int errCode, pae::Token &token, std::string value)
         default: column = token.m_position;
     }
     logEntry << "column" << column;
-    const std::string msg
-        = (value.empty()) ? s_errCodes.at(errCode) : StringFormat(s_errCodes.at(errCode).c_str(), value.c_str());
+
+	// Unused arguments are allowed in StringFormatDynamic, so there is no issue
+    // if s_errCodes.at(...) has no format specifier.
+    const std::string msg = StringFormatDynamic(s_errCodes.at(errCode).get(), std::make_format_args(value));
+
     logEntry << "text" << msg;
     if (!value.empty()) {
         logEntry << "value" << value;
