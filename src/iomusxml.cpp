@@ -3003,11 +3003,16 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     const std::string noteID = node.attribute("id").as_string();
     int duration = node.child("duration").text().as_int();
+    const std::vector<LayerElement *> &stack = m_elementStackMap.at(layer);
+    // A chord note after a rest at the start of a measure has no chord (or tabGrp) to join
+    if (isChord && stack.empty()) {
+        LogWarning("MusicXML import: Chord note without a chord starting point is ignored");
+        return;
+    }
     // In chords, make sure a note does not extend first note's duration.
     // See https://github.com/rism-digital/verovio/issues/4225
-    if (isChord && duration && m_elementStackMap.at(layer).back()->Is(CHORD)) {
-        Chord *chord = vrv_cast<Chord *>(m_elementStackMap.at(layer).back());
-        if (chord) duration = std::min(duration, chord->GetDurPpq());
+    if (isChord && duration && stack.back()->Is(CHORD)) {
+        duration = std::min(duration, vrv_cast<Chord *>(stack.back())->GetDurPpq());
     }
     const int noteStaffNum = node.child("staff").text().as_int();
     // Staff the note is actually on (cross-staff aware), for control events anchored to this note
@@ -3309,6 +3314,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
             if (!chord) {
                 LogError("MusicXML import: Chord starting point has not been found");
+                delete note;
                 return;
             }
             // Mark a chord as cue=true if and only if all its child notes are cue.
