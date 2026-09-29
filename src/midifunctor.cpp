@@ -678,18 +678,20 @@ FunctorCode GenerateMIDIFunctor::VisitBTrem(const BTrem *bTrem)
     }
     // Get num value if it's set
     if (bTrem->HasNum()) {
-        num = bTrem->GetNum();
+        num = std::clamp(bTrem->GetNum(), 0, 256);
     }
 
     // Calculate duration of individual note in tremolo
     const data_DURATION individualNoteDur = bTrem->CalcIndividualNoteDuration();
-    if (individualNoteDur == DURATION_NONE) return FUNCTOR_CONTINUE;
+    if ((individualNoteDur == DURATION_NONE) || (individualNoteDur > DURATION_2048)) return FUNCTOR_CONTINUE;
     const double noteInQuarterDur = pow(2.0, (DURATION_4 - individualNoteDur));
 
     // Define lambda which expands one note into multiple individual notes of the same pitch
     auto expandNote = [this, noteInQuarterDur, num](const Object *obj) {
         const Note *note = vrv_cast<const Note *>(obj);
         assert(note);
+        // Secondary tied notes are not played, their duration is already added to the first note
+        if (note->GetScoreTimeTiedDuration() < 0) return;
         const int pitch = this->GetMIDIPitch(note);
         const double totalInQuarterDur
             = note->GetScoreTimeDuration().ToDouble() + note->GetScoreTimeTiedDuration().ToDouble();
@@ -700,6 +702,7 @@ FunctorCode GenerateMIDIFunctor::VisitBTrem(const BTrem *bTrem)
             multiplicity = num;
             noteDuration = totalInQuarterDur / double(num);
         }
+        if (multiplicity < 1 || totalInQuarterDur <= 0.0) return;
         m_expandedNotes[note] = MIDINoteSequence(multiplicity, { pitch, noteDuration });
     };
 
