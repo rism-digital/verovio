@@ -1148,6 +1148,8 @@ void GenerateMIDIFunctor::HandleOctave(const LayerElement *layerElement)
 
 int GenerateMIDIFunctor::GetMIDIPitch(const Note *note)
 {
+    // The MIDI key of unpitched notes is neither transposed nor tuned
+    if (note->HasPnum() && note->HasLoc() && !note->HasPname()) return note->GetPnum();
     if (m_customTuning && m_customTuning->IsValid()) {
         return m_customTuning->GetMIDIPitch(note, m_transSemi, m_octaveShift);
     }

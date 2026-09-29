@@ -1136,6 +1136,15 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 pugi::xml_node midiVolume = midiInstrument.child("volume");
                 if (midiVolume) m_instrdef->SetMidiVolume(midiVolume.text().as_int());
             }
+            // MIDI keys of unpitched notes, only for parts playing on the percussion channel 10
+            const pugi::xpath_node_set midiInstruments = xpathNode.node().select_nodes("midi-instrument");
+            const bool isPercussion = (midiInstrument.child("midi-channel").text().as_int() == 10);
+            for (const pugi::xpath_node &instrument : midiInstruments) {
+                const int key = instrument.node().child("midi-unpitched").text().as_int();
+                if (!isPercussion || (key < 1) || (key > 128)) continue;
+                m_unpitchedKeys[partId][instrument.node().attribute("id").as_string()] = key - 1;
+                if (midiInstruments.size() == 1) m_unpitchedKeys[partId][""] = key - 1;
+            }
             // create the staffDef(s)
             StaffGrp *partStaffGrp = new StaffGrp();
             partStaffGrp->SetID(partId.c_str());
@@ -3231,6 +3240,10 @@ void MusicXmlInput::ReadMusicXmlNote(
             const int octaveNum = unpitched.child("display-octave").text().as_int();
             const int loc = note->CalcLoc(ConvertStepToPitchName(stepStr), octaveNum, -2);
             note->SetLoc(loc);
+            // MIDI key of the note's instrument, or of the only instrument of the part
+            const auto &keys = m_unpitchedKeys[node.parent().parent().attribute("id").as_string()];
+            const auto key = keys.find(node.child("instrument").attribute("id").as_string());
+            if (key != keys.end()) note->SetPnum(key->second);
         }
 
         // dynamics (MIDI velocity)
