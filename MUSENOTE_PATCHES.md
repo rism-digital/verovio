@@ -13,6 +13,7 @@ file is unmodified upstream Verovio, under the same LGPL-3.0 licence.
 | 3 | 2026-09-25 | Return instead of assert when glyph not found (97d9daaf3, cherry-picked from upstream beeeb2150, in 6.3.0) | `src/doc.cpp`, +3 / -3 | Scores that crashed now render: a rest whose glyph the font lacks made `Doc::GetGlyphWidth` dereference a null glyph (SIGSEGV while laying out). No other output changes | Upstream (6.3.0) |
 | 4 | 2026-09-25 | Decode GABC lyrics as UTF-8 (ba278bbe6) | `src/iogabc.cpp`, +1 / -1 | GABC lyrics with non-ASCII letters come out as written ("lé") instead of invalid UTF-8 (signed char) or "Ã©" (unsigned char) | Not offered upstream |
 | 5 | 2026-09-25 | Skip the GABC header before reading the music (0baa9874a) | `src/iogabc.cpp`, +21 / -1 | A GABC file's header (`name: …;` lines and `%%`) is no longer read as lyric syllables; input without a header is unchanged | Not offered upstream |
+| 6 | 2026-09-30 | Record the MIDI pitch each note is played at (eedc5ea3a) | `include/vrv/doc.h`, `include/vrv/midifunctor.h`, `include/vrv/toolkit.h`, `src/doc.cpp`, `src/midifunctor.cpp`, `src/toolkit.cpp`, +54 / -3 | None in the SVG, timemap, MIDI or MEI output. `GetMIDIValuesForElement` reports a note's pitch as the MIDI output plays it (staff transposition, octave lines, custom tuning), where it reported the notated pitch; new `Toolkit::GetMIDIPitches` (C++) | Not offered upstream |
 
 ### 1. PAE importer crashes
 
@@ -73,6 +74,36 @@ byte by byte. Regression input: MuseNote's `tool/parity/gabc/kyrie.gabc`
 header, but `GABCInput::Import` read the header as music. Regression inputs:
 MuseNote's `tool/parity/gabc/*.gabc`; a body-only input is unchanged.
 
+### 6. The pitch the MIDI plays
+
+`GenerateMIDIFunctor` plays a note at its notated pitch moved by the staff's
+`@trans.semi` (which the MusicXML importer sets from `<transpose>`) and by
+`<octave>` lines, through a custom tuning when one is set, but keeps that
+pitch private; `GetMIDIValuesForElement` reported `Note::GetMIDIPitch()`
+without them. MuseNote grades a take against a note's pitch and finds the
+note's MIDI events by it, so its bundled guitar score (`<octave-change>-1`)
+was graded an octave above what its guide plays, and every note under an
+MEI 8va/8vb line was off by an octave. The functor now records the pitch of
+each note it visits, a secondary tied note included, `Doc::ExportMIDI`
+passes the record through, and `Toolkit::GetMIDIPitches` returns it for
+every note (a note the MIDI output does not reach keeps its notated pitch);
+`GetMIDIValuesForElement` reports it. Carried because the pitch exists only
+inside the MIDI functor: outside the engine it would have to be re-derived
+from `Doc::ExportMIDI` and the functor's rules, and could drift from the
+MIDI.
+
+Regression test: MuseNote's `corelib/verovio/test/native/test_pitch_map_engine.cpp`
+(guitar and B-flat transposition, MEI 8va and 8vb, a tie, a chord, two
+parts, and the bundled "Dream (When You're Feeling Blue)"), each case also
+checked against the MIDI note-ons: 8 of 12 cases fail on tb.3, all pass on
+tb.4.
+
+tb.4 against tb.3 (same toolchain, MuseNote's `tool/parity`, which now also
+dumps each score's pitch map): 2288 outputs compared, 1 differs, as
+declared — the pitch map of "Dream (When You're Feeling Blue)", all 71
+notes 12 lower. Every SVG, timemap, MIDI, MEI and locator output is
+byte-identical; seeded ids deterministic on a fresh thread for 209 of 209.
+
 tb.2 against tb.1 (same toolchain): 972 outputs compared, 0 differ; the
 fresh-thread seeded import matches on 3 of 3 scores (0 of 54 notes matched on
 tb.1).
@@ -94,6 +125,9 @@ tb.1 against `version-6.2.0`:
 - At most about five patches of about 30 lines each. None may change the
   ids or the output of a seeded load on one thread — in practice, nothing
   in drawing (`view_*`), layout functors, or importer object construction.
+  Six are carried since 2026-09-30 by the owner's decision: patch 6
+  exposes a pitch only the MIDI functor computes, and patch 3 (upstream's
+  own fix) drops at the 6.3.0 base move.
 - Every patch lists its date, why, test input, output change and
   upstream status in this file.
 - Tags `musenote-<base>-tb.<n>` mark exact shipped states. They are
