@@ -2179,13 +2179,38 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
         Note *note = vrv_cast<Note *>(element);
         assert(note);
         const int timeOfElement = this->GetTimeForElement(xmlId);
-        const int pitchOfElement = note->GetMIDIPitch();
+        const std::map<std::string, int> notePitches = this->GetMIDIPitches();
+        const auto played = notePitches.find(xmlId);
+        const int pitchOfElement = (played != notePitches.end()) ? played->second : note->GetMIDIPitch();
         const int durationOfElement = note->GetRealTimeOffsetMilliseconds() - note->GetRealTimeOnsetMilliseconds();
         o << "time" << timeOfElement;
         o << "pitch" << pitchOfElement;
         o << "duration" << durationOfElement;
     }
     return o.json();
+}
+
+std::map<std::string, int> Toolkit::GetMIDIPitches()
+{
+    std::map<std::string, int> notePitches;
+    if (this->GetPageCount() == 0) {
+        LogWarning("No data loaded");
+        return notePitches;
+    }
+
+    this->SetMidiDoc();
+    assert(m_midiDoc);
+
+    // The pitches are recorded while the MIDI output is generated
+    smf::MidiFile midiFile;
+    m_midiDoc->ExportMIDI(&midiFile, &notePitches);
+
+    // A note the MIDI output does not reach keeps its notated pitch
+    for (Object *object : m_midiDoc->FindAllDescendantsByType(NOTE)) {
+        notePitches.emplace(object->GetID(), vrv_cast<Note *>(object)->GetMIDIPitch());
+    }
+
+    return notePitches;
 }
 
 void Toolkit::SetHumdrumBuffer(const char *data)

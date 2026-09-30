@@ -286,8 +286,9 @@ public:
     /**
      * Export the document to a MIDI file.
      * Run trough all the layers and fill the MIDI file content.
+     * With notePitches, the MIDI pitch each note is played at is recorded in it by note ID.
      */
-    void ExportMIDI(smf::MidiFile *midiFile);
+    void ExportMIDI(smf::MidiFile *midiFile, std::map<std::string, int> *notePitches = NULL);
 
     /**
      * Extract a timemap from the document to a JSON string.

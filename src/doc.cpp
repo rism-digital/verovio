@@ -437,7 +437,7 @@ void Doc::CalculateTimemap()
     m_timemapTempo = m_options->m_midiTempoAdjustment.GetValue();
 }
 
-void Doc::ExportMIDI(smf::MidiFile *midiFile)
+void Doc::ExportMIDI(smf::MidiFile *midiFile, std::map<std::string, int> *notePitches)
 {
     midiFile->absoluteTicks();
 
@@ -615,6 +615,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             generateMIDI.SetControlEvents(controlEvents);
             generateMIDI.SetInstrDef(instrDef);
             generateMIDI.SetCustomTuning(&scoreDef->GetCustomTuning());
+            generateMIDI.SetNotePitches(notePitches);
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
             this->Process(generateMIDI);

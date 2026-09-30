@@ -628,6 +628,7 @@ GenerateMIDIFunctor::GenerateMIDIFunctor(smf::MidiFile *midiFile) : ConstFunctor
     m_controlEvents = false;
     m_instrDef = NULL;
     m_customTuning = NULL;
+    m_notePitches = NULL;
 }
 
 FunctorCode GenerateMIDIFunctor::VisitBeatRpt(const BeatRpt *beatRpt)
@@ -806,6 +807,13 @@ FunctorCode GenerateMIDIFunctor::VisitMRpt(const MRpt *mRpt)
 FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
 {
     this->HandleOctave(note);
+
+    // Record the pitch the note is played at, also for the notes skipped below (e.g. secondary tied notes)
+    if (m_notePitches) {
+        const auto expanded = m_expandedNotes.find(note);
+        const bool isExpanded = (expanded != m_expandedNotes.end()) && !expanded->second.empty();
+        (*m_notePitches)[note->GetID()] = isExpanded ? expanded->second.front().pitch : this->GetMIDIPitch(note);
+    }
 
     // Skip linked notes
     if (note->HasSameasLink()) {

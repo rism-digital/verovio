@@ -8,6 +8,7 @@
 #ifndef __VRV_TOOLKIT_H__
 #define __VRV_TOOLKIT_H__
 
+#include <map>
 #include <string>
 
 //----------------------------------------------------------------------------
@@ -596,6 +597,7 @@ public:
      * Return MIDI values of the element with the ID (\@xml:id)
      *
      * RenderToMIDI() must be called prior to using this method.
+     * For a note, the pitch is the one the MIDI output plays (see GetMIDIPitches).
      *
      * @param xmlId the ID (\@xml:id) of the element being looked for
      * @return A stringified JSON object with the MIDI values
@@ -667,6 +669,17 @@ public:
      * @ingroup nodoc
      */
     Options *GetOptionsObj() { return m_options; }
+
+    /**
+     * Return the MIDI pitch of every note by note ID, as the MIDI output plays it.
+     *
+     * The pitch includes the staff transposition, octave lines and a custom tuning.
+     * A note the MIDI output does not reach (an ossia, or a cue layer with --midi-no-cue)
+     * keeps its notated MIDI pitch.
+     *
+     * @ingroup nodoc
+     */
+    std::map<std::string, int> GetMIDIPitches();
 
     /**
      * Copy the data to the cstring internal buffer.

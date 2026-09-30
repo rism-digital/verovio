@@ -385,6 +385,7 @@ public:
     void SetTransSemi(int transSemi) { m_transSemi = transSemi; }
     void SetInstrDef(const InstrDef *instrDef) { m_instrDef = instrDef; }
     void SetCustomTuning(const CustomTuning *customTuning) { m_customTuning = customTuning; }
+    void SetNotePitches(std::map<std::string, int> *notePitches) { m_notePitches = notePitches; }
     ///@}
 
     /*
@@ -470,6 +471,8 @@ private:
     const InstrDef *m_instrDef;
     // Current custom tuning
     const CustomTuning *m_customTuning;
+    // Where the MIDI pitch of each note is recorded by note ID (optional)
+    std::map<std::string, int> *m_notePitches;
 };
 
 //----------------------------------------------------------------------------
