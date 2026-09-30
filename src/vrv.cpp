@@ -200,7 +200,6 @@ void EnableLogToBuffer(bool value)
 // Various helpers
 //----------------------------------------------------------------------------
 
-
 std::string StringFormatVariable(const char *format, va_list arg)
 {
     std::string str(STRING_FORMAT_MAX_LEN, 0);

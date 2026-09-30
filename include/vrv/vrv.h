@@ -11,11 +11,11 @@
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
+#include <format>
 #include <map>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <format>
 
 #ifndef _WIN32
 #include <sys/time.h>
@@ -101,20 +101,18 @@ std::string UTF16to8(const std::u16string &in);
 /**
  * Format a string using std::format.
  */
-template <typename... T>
-std::string StringFormat(std::format_string<T...> fmt, T&&... args)
+template <typename... T> std::string StringFormat(std::format_string<T...> fmt, T &&...args)
 {
-	return std::format(fmt, std::forward<T>(args)...);
+    return std::format(fmt, std::forward<T>(args)...);
 }
 
 /**
  * Format a string using std::vformat, the format string can be chosen at runtime unlike StringFormat..
  * Prefer StringFormat when possible, as the format string will be checked at compile-time.
  */
-template <typename... T>
-std::string StringFormatDynamic(std::string_view fmt, T&&... args)
+template <typename... T> std::string StringFormatDynamic(std::string_view fmt, T &&...args)
 {
-	return std::vformat(fmt, std::forward<T>(args)...);
+    return std::vformat(fmt, std::forward<T>(args)...);
 }
 
 // This is the implementation callable with variable arguments

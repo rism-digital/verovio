@@ -2538,7 +2538,7 @@ void PAEInput::LogPAE(int errCode, pae::Token &token, std::string value)
     }
     logEntry << "column" << column;
 
-	// Unused arguments are allowed in StringFormatDynamic, so there is no issue
+    // Unused arguments are allowed in StringFormatDynamic, so there is no issue
     // if s_errCodes.at(...) has no format specifier.
     const std::string msg = StringFormatDynamic(s_errCodes.at(errCode).get(), std::make_format_args(value));
 
