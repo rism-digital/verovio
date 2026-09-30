@@ -16,7 +16,7 @@
 // #define PUGIXML_WCHAR_MODE
 
 // Uncomment this to enable from_chars/to_chars for number conversion
-#define PUGIXML_CHARCONV_FLOAT
+// #define PUGIXML_CHARCONV_FLOAT
 
 // Uncomment this to enable compact mode
 // #define PUGIXML_COMPACT
