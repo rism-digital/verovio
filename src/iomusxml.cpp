@@ -3264,7 +3264,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 tabGrp->SetDur(ConvertTypeToDur(typeStr));
                 tabGrp->SetDurPpq(duration);
                 if (dots > 0) tabGrp->SetDots(dots);
-                tabGrp->AddChild(new TabDurSym());
+                if (stemText != "none") tabGrp->AddChild(new TabDurSym());
                 this->AddLayerElement(layer, tabGrp, duration);
                 m_elementStackMap.at(layer).push_back(tabGrp);
                 element = tabGrp;
