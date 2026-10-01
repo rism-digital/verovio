@@ -53,6 +53,21 @@ protected:
 
     enum DeleteNavigation : int8_t { DELETE_NO_NAVIGATON = 0, DELETE_BACKSPACE, DELETE_FORWARD };
 
+    enum ScoreDefinitionLevel : int8_t { LEVEL_SCOREDEF = 0, LEVEL_STAFFGRP, LEVEL_STAFFDEF };
+
+    enum ScoreDefinitionUpdate : int8_t {
+        UPDATE_SCOREDEF = 0,
+        UPDATE_STAFFGRP,
+        UPDATE_STAFFDEF,
+        MOVE_UP,
+        MOVE_DOWN,
+        DELETE,
+        INSERT_ABOVE,
+        INSERT_BELOW,
+        ADD_STAFFGRP,
+        REMOVE_STAFFGRP
+    };
+
     /**
      * Parse JSON instructions for experimental editor functions.
      */
@@ -68,17 +83,19 @@ protected:
     bool ParseInsertControlAction(
         const jsonxx::Object &param, std::string &elementName, std::string &startId, std::string &endId);
     bool ParseNavigate(const jsonxx::Object &param, std::string &elementId, int &direction);
-    bool ParsePropertiesAction(const jsonxx::Object &param, jsonxx::Object &scoreDef);
+    bool ParseScoreDefinitionAction(const jsonxx::Object &param, ScoreDefinitionLevel &level);
     bool ParseResetCursorAction(const jsonxx::Object &param, bool &maintainChordMode);
     bool ParseSelectAction(const jsonxx::Object &param, std::string &elementId, bool &secondary, SelectCustom &custom);
     bool ParseSetAction(
         const jsonxx::Object &param, std::string &elementId, std::string &attribute, std::string &value);
-    bool ParseSetCursorAction(
-        const jsonxx::Object &param, std::string &elementId, Cursor::InputMode &inputMode, bool &chordMode, bool &autoBeam);
+    bool ParseSetCursorAction(const jsonxx::Object &param, std::string &elementId, Cursor::InputMode &inputMode,
+        bool &chordMode, bool &autoBeam);
     bool ParseUpdateCursorAction(
         const jsonxx::Object &param, bool &restMode, bool &chordMode, Cursor::TieMode &tieMode, bool &autoBeam);
     bool ParseUpdatePitchAction(const jsonxx::Object &param, std::string &elementId, data_PITCHNAME &pname, int &oct,
         data_ACCIDENTAL_WRITTEN &accid, int &midi);
+    bool ParseUpdateScoreDefinitionAction(const jsonxx::Object &param, jsonxx::Object &subtree, std::string &elementId,
+        std::string &secondaryId, ScoreDefinitionUpdate &update);
 
     ///@}
 
@@ -116,8 +133,9 @@ protected:
     bool ContextForScores(bool updateResponse);
     bool ContextForSections(bool updateResponse);
 
-    bool GetScoreDef();
-    bool SetScoreDef(const jsonxx::Object &scoreDef);
+    bool ScoreDefinition(ScoreDefinitionLevel level);
+    bool UpdateScoreDefinition(const jsonxx::Object &subTree, const std::string &elementId,
+        const std::string &secondaryId, ScoreDefinitionUpdate update);
 
     void ContextForObject(const Object *object, jsonxx::Object &element, bool recursive = false);
     void ContextForObjects(const ArrayOfConstObjects &objects, jsonxx::Array &siblings);

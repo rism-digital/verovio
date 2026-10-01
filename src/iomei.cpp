@@ -3654,6 +3654,67 @@ jsonxx::Object MEIOutputExtended::ExportScoreDef()
     }
 }
 
+jsonxx::Object MEIOutputExtended::ExportStaffGrp(const std::string &scoreDefId)
+{
+    try {
+        pugi::xml_document meiDoc;
+        std::ostringstream streamStringOutput;
+
+        m_currentNode = meiDoc.root();
+        m_nodeStack.push_back(m_currentNode);
+
+        ScoreDef *scoreDef = NULL;
+        if (scoreDefId.empty()) {
+            Score *score = m_doc->GetFirstVisibleScore();
+            scoreDef = (score) ? score->GetScoreDef() : NULL;
+            assert(score && score->GetScoreDef());
+        }
+        else {
+            scoreDef = vrv_cast<ScoreDef *>(m_doc->FindDescendantByID(scoreDefId));
+        }
+        StaffGrp *staffGrp = (scoreDef) ? vrv_cast<StaffGrp *>(scoreDef->FindDescendantByType(STAFFGRP)) : NULL;
+
+        if (staffGrp) staffGrp->SaveObject(this);
+        return ToJson(meiDoc);
+    }
+    catch (char *str) {
+        LogError("%s", str);
+        return jsonxx::Object();
+    }
+}
+
+jsonxx::Object MEIOutputExtended::ExportStaffDef(const std::string &scoreDefId, const std::string &staffId)
+{
+    try {
+        pugi::xml_document meiDoc;
+        std::ostringstream streamStringOutput;
+
+        m_currentNode = meiDoc.root();
+        m_nodeStack.push_back(m_currentNode);
+
+        ScoreDef *scoreDef = NULL;
+        if (scoreDefId.empty()) {
+            Score *score = m_doc->GetFirstVisibleScore();
+            scoreDef = (score) ? score->GetScoreDef() : NULL;
+            assert(score && score->GetScoreDef());
+        }
+        else {
+            scoreDef = vrv_cast<ScoreDef *>(m_doc->FindDescendantByID(scoreDefId));
+        }
+        Staff *staff = vrv_cast<Staff *>(m_doc->FindDescendantByID(staffId));
+        if (scoreDef && staff) {
+            AttNIntegerComparison staffDefN(STAFFDEF, staff->GetN());
+            StaffDef *staffDef = vrv_cast<StaffDef *>(scoreDef->FindDescendantByComparison(&staffDefN));
+            if (staffDef) staffDef->SaveObject(this);
+        }
+        return ToJson(meiDoc);
+    }
+    catch (char *str) {
+        LogError("%s", str);
+        return jsonxx::Object();
+    }
+}
+
 jsonxx::Object MEIOutputExtended::ToJson(const pugi::xml_document &doc)
 {
     std::function<jsonxx::Object(pugi::xml_node)> nodeToJson = [&](pugi::xml_node node) -> jsonxx::Object {
@@ -9371,12 +9432,62 @@ void MEIInputExtended::ImportScoreDef(const jsonxx::Object &scoreDef)
         pugi::xml_document meiDoc = this->FromJson(scoreDef);
 
         Score newScore;
-        if (this->ReadScoreDef(&newScore, meiDoc.first_child())) {
+        if (this->ReadScoreDefExt(&newScore, meiDoc.first_child())) {
             Score *score = m_doc->GetFirstVisibleScore();
             ScoreDef *vrvScoreDef = vrv_cast<ScoreDef *>(newScore.GetFirst());
             if (score && vrvScoreDef) {
                 newScore.Relinquish(0);
                 score->SetScoreDefSubtree(vrvScoreDef, vrvScoreDef);
+            }
+        }
+    }
+    catch (char *str) {
+        LogError("%s", str);
+    }
+}
+
+void MEIInputExtended::ImportStaffGrp(const jsonxx::Object &staffGrp)
+{
+    try {
+        pugi::xml_document meiDoc = this->FromJson(staffGrp);
+
+        ScoreDef newScoreDef;
+        if (this->ReadStaffGrpExt(&newScoreDef, meiDoc.first_child())) {
+            Score *score = m_doc->GetFirstVisibleScore();
+            assert(score && score->GetScoreDef());
+            StaffGrp *newStaffGrp = vrv_cast<StaffGrp *>(newScoreDef.GetFirst());
+            StaffGrp *oldStaffGrp
+                = vrv_cast<StaffGrp *>(score->GetScoreDef()->FindDescendantByID(newStaffGrp->GetID()));
+            if (!oldStaffGrp) oldStaffGrp = vrv_cast<StaffGrp *>(m_doc->FindDescendantByID(newStaffGrp->GetID()));
+            if (oldStaffGrp && newStaffGrp) {
+                newScoreDef.Relinquish(0);
+                oldStaffGrp->GetParent()->ReplaceChild(oldStaffGrp, newStaffGrp);
+                delete oldStaffGrp;
+            }
+        }
+    }
+    catch (char *str) {
+        LogError("%s", str);
+    }
+}
+
+void MEIInputExtended::ImportStaffDef(const jsonxx::Object &staffDef)
+{
+    try {
+        pugi::xml_document meiDoc = this->FromJson(staffDef);
+
+        StaffGrp newStaffGrp;
+        if (this->ReadStaffDefExt(&newStaffGrp, meiDoc.first_child())) {
+            Score *score = m_doc->GetFirstVisibleScore();
+            assert(score && score->GetScoreDef());
+            StaffDef *newStaffDef = vrv_cast<StaffDef *>(newStaffGrp.GetFirst());
+            StaffDef *oldStaffDef
+                = vrv_cast<StaffDef *>(score->GetScoreDef()->FindDescendantByID(newStaffDef->GetID()));
+            if (!oldStaffDef) oldStaffDef = vrv_cast<StaffDef *>(m_doc->FindDescendantByID(newStaffDef->GetID()));
+            if (oldStaffDef && newStaffDef) {
+                newStaffGrp.Relinquish(0);
+                oldStaffDef->GetParent()->ReplaceChild(oldStaffDef, newStaffDef);
+                delete oldStaffDef;
             }
         }
     }

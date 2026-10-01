@@ -788,26 +788,26 @@ void EditorToolkitCMN::AutoBeam(LayerElement *noteOrRest)
     assert(interface);
 
     if (interface->GetDur() < DURATION_8) return;
-    
+
     if (!result->IsGraceNote()) {
         AlignMeterParams params;
         params.meterSig = layer->GetCurrentMeterSig();
         assert(params.meterSig);
         const int meterCount = (params.meterSig->GetTotalCount() == 0) ? 4 : params.meterSig->GetTotalCount();
         const int meterUnit = (params.meterSig->GetUnit() == VRV_UNSET) ? meterCount : params.meterSig->GetUnit();
-        
+
         Fraction position = (m_cursor->GetAlignment()) ? m_cursor->GetAlignment()->GetTime() : 0;
         // Use compound-meter grouping for meters such as 6/8, 9/8 and 12/8.
         // Simple meters use one denominator unit per beat:
         //   4/4 -> 4 groups of 1/4
         // Compound meters use groups of three denominator units:
         //   6/8 -> 2 groups of 3/8
-        
+
         const bool isCompoundMeter = ((meterCount % 3 == 0) && params.meterSig->GetUnit() == 8);
-        
+
         Fraction beatDuration = Fraction(1, meterUnit);
         if (isCompoundMeter) beatDuration = beatDuration * 3;
-        
+
         // A note beginning on a new beat must not be joined to the preceding
         // beam. Do not apply this at the beginning of the measure.
         if (position > 0) {

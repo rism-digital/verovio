@@ -37,6 +37,7 @@
 #include "plistinterface.h"
 #include "rend.h"
 #include "rest.h"
+#include "score.h"
 #include "slur.h"
 #include "staff.h"
 #include "surface.h"
@@ -262,15 +263,10 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         }
         LogWarning("Could not parse the navigate action");
     }
-    else if (action == "properties") {
-        jsonxx::Object scoreDef;
-        if (this->ParsePropertiesAction(json.get<jsonxx::Object>("param"), scoreDef)) {
-            if (scoreDef.empty()) {
-                return this->GetScoreDef();
-            }
-            else {
-                return this->SetScoreDef(scoreDef);
-            }
+    else if (action == "scoreDefinition") {
+        ScoreDefinitionLevel definitionLevel;
+        if (this->ParseScoreDefinitionAction(json.get<jsonxx::Object>("param"), definitionLevel)) {
+            return this->ScoreDefinition(definitionLevel);
         }
     }
     else if (action == "resetCursor") {
@@ -334,6 +330,16 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
             return (this->UpdatePitch(elementId, pname, oct, accid, midi));
         }
         LogWarning("Could not parse the updatePitch action");
+    }
+    else if (action == "updateScoreDefinition") {
+        jsonxx::Object subTree;
+        std::string elementId, secondaryId;
+        ScoreDefinitionUpdate update;
+        if (this->ParseUpdateScoreDefinitionAction(
+                json.get<jsonxx::Object>("param"), subTree, elementId, secondaryId, update)) {
+            this->PrepareUndo();
+            return this->UpdateScoreDefinition(subTree, elementId, secondaryId, update);
+        }
     }
     else {
         LogWarning("Unknown action type '%s'.", action.c_str());
@@ -439,22 +445,31 @@ bool EditorToolkitShared::ParseNavigate(const jsonxx::Object &param, std::string
     return true;
 }
 
-bool EditorToolkitShared::ParsePropertiesAction(const jsonxx::Object &param, jsonxx::Object &scoreDef)
-{
-    scoreDef.empty();
-    if (param.has<jsonxx::Object>("scoreDef")) {
-        scoreDef = param.get<jsonxx::Object>("scoreDef");
-        return true;
-    }
-    return true;
-}
-
 bool EditorToolkitShared::ParseResetCursorAction(const jsonxx::Object &param, bool &maintainChordMode)
 {
     maintainChordMode = false;
 
     if (param.has<jsonxx::Boolean>("maintainChordMode"))
         maintainChordMode = param.get<jsonxx::Boolean>("maintainChordMode");
+
+    return true;
+}
+
+bool EditorToolkitShared::ParseScoreDefinitionAction(const jsonxx::Object &param, ScoreDefinitionLevel &level)
+{
+    level = LEVEL_SCOREDEF;
+    if (!param.has<jsonxx::String>("level")) return true;
+
+    const std::string levelStr = param.get<jsonxx::String>("level");
+    if (levelStr == "scoreDef") {
+        level = LEVEL_SCOREDEF;
+    }
+    else if (levelStr == "staffGrp") {
+        level = LEVEL_STAFFGRP;
+    }
+    else if (levelStr == "staffDef") {
+        level = LEVEL_STAFFDEF;
+    }
 
     return true;
 }
@@ -556,6 +571,57 @@ bool EditorToolkitShared::ParseUpdatePitchAction(const jsonxx::Object &param, st
     if (param.has<jsonxx::String>("accid"))
         accid = accidConverter.AttAccidental::StrToAccidentalWritten(param.get<jsonxx::String>("accid"));
     if (param.has<jsonxx::Number>("midi")) midi = param.get<jsonxx::Number>("midi");
+
+    return true;
+}
+
+bool EditorToolkitShared::ParseUpdateScoreDefinitionAction(const jsonxx::Object &param, jsonxx::Object &subTree,
+    std::string &elementId, std::string &secondaryId, ScoreDefinitionUpdate &update)
+{
+    subTree.empty();
+    if (!param.has<jsonxx::String>("update")) return false;
+
+    const std::string updateStr = param.get<jsonxx::String>("update");
+    if (updateStr == "scoreDef") {
+        update = UPDATE_SCOREDEF;
+    }
+    else if (updateStr == "staffGrp") {
+        update = UPDATE_STAFFGRP;
+    }
+    else if (updateStr == "staffDef") {
+        update = UPDATE_STAFFDEF;
+    }
+    else if (updateStr == "insertAbove") {
+        update = INSERT_ABOVE;
+    }
+    else if (updateStr == "insertBelow") {
+        update = INSERT_ABOVE;
+    }
+    else if (updateStr == "moveUp") {
+        update = INSERT_ABOVE;
+    }
+    else if (updateStr == "moveDown") {
+        update = INSERT_ABOVE;
+    }
+    else if (updateStr == "delete") {
+        update = DELETE;
+    }
+    else if (updateStr == "addStaffGrp") {
+        update = ADD_STAFFGRP;
+    }
+    else if (updateStr == "removeStaffGrp") {
+        update = REMOVE_STAFFGRP;
+    }
+    else {
+        return false;
+    }
+
+    switch (update) {
+        case (UPDATE_SCOREDEF):
+        case (UPDATE_STAFFGRP):
+        case (UPDATE_STAFFDEF): subTree = param.get<jsonxx::Object>("subTree"); break;
+        default: break;
+    }
 
     return true;
 }
@@ -664,7 +730,7 @@ void EditorToolkitShared::ReloadEditStatus(const std::string &statusStr, bool in
         if (insertion.has<jsonxx::Boolean>("chordMode")) {
             chordMode = insertion.get<jsonxx::Boolean>("chordMode");
         }
-        
+
         bool autoBeam = true;
         if (insertion.has<jsonxx::Boolean>("autoBeam")) {
             autoBeam = insertion.get<jsonxx::Boolean>("autoBeam");
@@ -1836,22 +1902,57 @@ ArrayOfConstObjects EditorToolkitShared::GetScoreBasedChildrenFor(const Object *
     return editorTreeObject->GetChildObjects();
 }
 
-bool EditorToolkitShared::GetScoreDef()
+bool EditorToolkitShared::ScoreDefinition(ScoreDefinitionLevel level)
 {
     m_editResponse.reset();
 
     MEIOutputExtended output(m_doc);
 
-    m_editResponse = output.ExportScoreDef();
+    if (level == LEVEL_SCOREDEF) {
+        m_editResponse = output.ExportScoreDef();
+    }
+    else if (level == LEVEL_STAFFGRP) {
+        std::string scoreDefId;
+        Object *selection = this->ResolveElement(m_selectionId);
+        if (selection && selection->Is(SCOREDEF)) scoreDefId = m_selectionId;
+        m_editResponse = output.ExportStaffGrp(scoreDefId);
+    }
+    else if (level == LEVEL_STAFFDEF) {
+        std::string staffId;
+        std::string scoreDefId;
+        if (!m_selectionId.empty() && !m_selectionSecondaryId.empty()) {
+            scoreDefId = m_selectionId;
+            staffId = m_selectionSecondaryId;
+        }
+        else if (!m_selectionId.empty()) {
+            staffId = m_selectionId;
+        }
+
+        if (staffId.empty()) {
+            LogError("A staff must be selected element must be a <staff>");
+            return false;
+        }
+        m_editResponse = output.ExportStaffDef(scoreDefId, staffId);
+    }
 
     return true;
 }
 
-bool EditorToolkitShared::SetScoreDef(const jsonxx::Object &scoreDef)
+bool EditorToolkitShared::UpdateScoreDefinition(const jsonxx::Object &subTree, const std::string &elementId,
+    const std::string &secondaryId, ScoreDefinitionUpdate update)
 {
     MEIInputExtended input(m_doc);
+    if (update == UPDATE_SCOREDEF) {
+        input.ImportScoreDef(subTree);
+    }
+    else if (update == UPDATE_STAFFGRP) {
+        input.ImportStaffGrp(subTree);
+    }
+    else if (update == UPDATE_STAFFDEF) {
+        input.ImportStaffDef(subTree);
+    }
 
-    input.ImportScoreDef(scoreDef);
+    this->SetEditStatus();
 
     return true;
 }

@@ -96,7 +96,7 @@ public:
 
     InputMode GetInputMode() const { return m_inputMode; }
     void SetInputMode(InputMode inputMode);
-    
+
     bool IsAutoBeam() const { return m_autoBeam; }
     void SetAutoBeam(bool autoBeam) { m_autoBeam = autoBeam; }
 

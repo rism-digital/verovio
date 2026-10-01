@@ -645,6 +645,8 @@ public:
     ///@}
 
     jsonxx::Object ExportScoreDef();
+    jsonxx::Object ExportStaffGrp(const std::string &scoreDefId);
+    jsonxx::Object ExportStaffDef(const std::string &scoreDefId, const std::string &staffId);
 
 private:
     jsonxx::Object ToJson(const pugi::xml_document &doc);
@@ -677,7 +679,9 @@ protected:
      * @name Methods available in inheriting classes
      */
     ///@{
-    bool ReadScoreDef(Object *parent, pugi::xml_node scoreDef);
+    bool ReadScoreDefExt(Object *parent, pugi::xml_node scoreDef) { return this->ReadScoreDef(parent, scoreDef); }
+    bool ReadStaffGrpExt(Object *parent, pugi::xml_node staffGrp) { return this->ReadStaffGrp(parent, staffGrp); }
+    bool ReadStaffDefExt(Object *parent, pugi::xml_node staffDef) { return this->ReadStaffDef(parent, staffDef); }
     ///@}
 
 private:
@@ -725,6 +729,7 @@ private:
      * children (see MEIInput::IsAllowed)
      */
     ///@{
+    bool ReadScoreDef(Object *parent, pugi::xml_node scoreDef);
     bool ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadGrpSym(Object *parent, pugi::xml_node grpSym);
     bool ReadPgFoot(Object *parent, pugi::xml_node pgFoot);
@@ -1077,6 +1082,10 @@ public:
     ///@}
 
     void ImportScoreDef(const jsonxx::Object &scoreDef);
+
+    void ImportStaffGrp(const jsonxx::Object &staffGrp);
+
+    void ImportStaffDef(const jsonxx::Object &staffDef);
 
 private:
     pugi::xml_document FromJson(const jsonxx::Object &json);
