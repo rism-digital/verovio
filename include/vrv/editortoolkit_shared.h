@@ -134,8 +134,8 @@ protected:
     bool ContextForSections(bool updateResponse);
 
     bool ScoreDefinition(ScoreDefinitionLevel level);
-    bool UpdateScoreDefinition(const jsonxx::Object &subTree, const std::string &elementId,
-        const std::string &secondaryId, ScoreDefinitionUpdate update);
+    bool UpdateScoreDefinition(
+        const jsonxx::Object &subTree, std::string &elementId, std::string &secondaryId, ScoreDefinitionUpdate update);
 
     void ContextForObject(const Object *object, jsonxx::Object &element, bool recursive = false);
     void ContextForObjects(const ArrayOfConstObjects &objects, jsonxx::Array &siblings);

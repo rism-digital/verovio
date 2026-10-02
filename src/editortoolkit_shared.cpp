@@ -595,7 +595,7 @@ bool EditorToolkitShared::ParseUpdateScoreDefinitionAction(const jsonxx::Object 
         update = INSERT_ABOVE;
     }
     else if (updateStr == "insertBelow") {
-        update = INSERT_ABOVE;
+        update = INSERT_BELOW;
     }
     else if (updateStr == "moveUp") {
         update = INSERT_ABOVE;
@@ -615,6 +615,8 @@ bool EditorToolkitShared::ParseUpdateScoreDefinitionAction(const jsonxx::Object 
     else {
         return false;
     }
+
+    if (param.has<jsonxx::String>("elementId")) elementId = param.get<jsonxx::String>("elementId");
 
     switch (update) {
         case (UPDATE_SCOREDEF):
@@ -1938,8 +1940,8 @@ bool EditorToolkitShared::ScoreDefinition(ScoreDefinitionLevel level)
     return true;
 }
 
-bool EditorToolkitShared::UpdateScoreDefinition(const jsonxx::Object &subTree, const std::string &elementId,
-    const std::string &secondaryId, ScoreDefinitionUpdate update)
+bool EditorToolkitShared::UpdateScoreDefinition(
+    const jsonxx::Object &subTree, std::string &elementId, std::string &secondaryId, ScoreDefinitionUpdate update)
 {
     MEIInputExtended input(m_doc);
     if (update == UPDATE_SCOREDEF) {
@@ -1951,6 +1953,22 @@ bool EditorToolkitShared::UpdateScoreDefinition(const jsonxx::Object &subTree, c
     else if (update == UPDATE_STAFFDEF) {
         input.ImportStaffDef(subTree);
     }
+    else if (update == INSERT_ABOVE || update == INSERT_BELOW) {
+        Object *element = this->ResolveElement(elementId);
+        if (!element || !element->Is(STAFF)) {
+            LogError("A staff must be selected");
+            return false;
+        }
+        Staff *staff = vrv_cast<Staff *>(element);
+        assert(staff);
+        StaffInsert staffInsert = (update == INSERT_ABOVE) ? StaffInsert::INSERT_ABOVE : StaffInsert::INSERT_BELOW;
+        AddStaffFunctor addStaffFunctor(staff->GetN(), staffInsert);
+        m_doc->Process(addStaffFunctor);
+        ReorderStaffNFunctor reorderStaffNFunctor;
+        m_doc->Process(reorderStaffNFunctor);
+    }
+
+    this->ClearContext();
 
     this->SetEditStatus();
 

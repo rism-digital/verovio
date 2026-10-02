@@ -13,6 +13,86 @@
 
 namespace vrv {
 
+enum StaffInsert : int8_t { INSERT_ABOVE = 0, INSERT_BELOW };
+
+//----------------------------------------------------------------------------
+// AddStaffFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This add a staff above or below.
+ */
+class AddStaffFunctor : public Functor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    AddStaffFunctor(int n, StaffInsert staffInsert);
+    virtual ~AddStaffFunctor();
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    StaffDef *m_staffDef;
+    Staff *m_staff;
+    int m_n;
+    StaffInsert m_insert;
+};
+
+//----------------------------------------------------------------------------
+// ReorderStaffNFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * Reoder staff N
+ */
+class ReorderStaffNFunctor : public Functor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    ReorderStaffNFunctor();
+    virtual ~ReorderStaffNFunctor();
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    FunctorCode VisitControlElement(ControlElement *controlElement) override;
+    FunctorCode VisitLayerElement(LayerElement *layerElement) override;
+    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitStaffDef(StaffDef *staffDef) override;
+    ///@}
+
+protected:
+    //
+private:
+    void MapStaffIdent(AttStaffIdent *att);
+
+public:
+    //
+private:
+    std::map<int, int> m_mapping;
+};
+
 //----------------------------------------------------------------------------
 // CursorFunctor
 //----------------------------------------------------------------------------
