@@ -270,12 +270,12 @@ bool OptionDbl::SetValue(const std::string &value)
 
 std::string OptionDbl::GetStrValue() const
 {
-    return StringFormat("%f", m_value);
+    return StringFormat("{}", m_value);
 }
 
 std::string OptionDbl::GetDefaultStrValue() const
 {
-    return StringFormat("%f", m_defaultValue);
+    return StringFormat("{}", m_defaultValue);
 }
 
 bool OptionDbl::SetValueDbl(double value)
@@ -355,12 +355,12 @@ bool OptionInt::SetValue(const std::string &value)
 
 std::string OptionInt::GetStrValue() const
 {
-    return StringFormat("%d", m_value);
+    return StringFormat("{}", m_value);
 }
 
 std::string OptionInt::GetDefaultStrValue() const
 {
-    return StringFormat("%d", m_defaultValue);
+    return StringFormat("{}", m_defaultValue);
 }
 
 int OptionInt::GetValue() const

@@ -1712,7 +1712,7 @@ FunctorCode PrepareFloatingGrpsFunctor::VisitHarm(Harm *harm)
     // If there is no @n on harm we use the first @staff value as negative
     // This will not work if @staff has more than one staff id, but this is probably not going to be used
     if (n == "" && harm->HasStaff()) {
-        n = StringFormat("%d", harm->GetStaff().at(0) * -1);
+        n = StringFormat("{}", harm->GetStaff().at(0) * -1);
     }
 
     for (auto &kv : m_harms) {

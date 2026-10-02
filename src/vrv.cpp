@@ -200,17 +200,6 @@ void EnableLogToBuffer(bool value)
 // Various helpers
 //----------------------------------------------------------------------------
 
-std::string StringFormat(const char *fmt, ...)
-{
-    std::string str(STRING_FORMAT_MAX_LEN, 0);
-    va_list args;
-    va_start(args, fmt);
-    vsnprintf(&str[0], STRING_FORMAT_MAX_LEN, fmt, args);
-    va_end(args);
-    str.resize(strlen(str.data()));
-    return str;
-}
-
 std::string StringFormatVariable(const char *format, va_list arg)
 {
     std::string str(STRING_FORMAT_MAX_LEN, 0);
@@ -393,7 +382,7 @@ std::string UTF16to8(const std::u16string &in)
 
 std::string GetFileVersion(int vmaj, int vmin, int vrev)
 {
-    return StringFormat("%04d.%04d.%04d", vmaj, vmin, vrev);
+    return StringFormat("{:04}.{:04}.{:04}", vmaj, vmin, vrev);
 }
 
 std::string GetFilename(std::string &fullpath)
@@ -415,7 +404,7 @@ std::string GetVersion()
 {
     std::string dev;
     if (VERSION_DEV) dev = "-dev";
-    return StringFormat("%d.%d.%d%s%s", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, dev.c_str(), GIT_COMMIT);
+    return StringFormat("{}.{}.{}{}{}", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, dev, GIT_COMMIT);
 }
 
 static const std::string base62Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";

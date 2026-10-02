@@ -1642,7 +1642,7 @@ void MEIOutput::WriteRevisionDesc(pugi::xml_node meiHead)
     // add isodate
     const time_t t = time(0); // get time now
     struct tm *now = localtime(&t);
-    std::string dateStr = StringFormat("%d-%02d-%02dT%02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
+    std::string dateStr = StringFormat("{}-{:02}-{:02}T{:02}:{:02}:{:02}", now->tm_year + 1900, now->tm_mon + 1,
         now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
     change.append_attribute("isodate").set_value(dateStr.c_str());
     pugi::xml_node changeDesc = change.append_child("changeDesc");
@@ -1707,21 +1707,21 @@ void MEIOutput::WritePage(pugi::xml_node currentNode, Page *page)
     this->WriteXmlId(currentNode, page);
     // size and margins but only if any - we rely on page.height only to check this
     if (page->m_pageHeight != -1) {
-        currentNode.append_attribute("page.width") = StringFormat("%d", page->m_pageWidth / DEFINITION_FACTOR).c_str();
+        currentNode.append_attribute("page.width") = StringFormat("{}", page->m_pageWidth / DEFINITION_FACTOR).c_str();
         currentNode.append_attribute("page.height")
-            = StringFormat("%d", page->m_pageHeight / DEFINITION_FACTOR).c_str();
+            = StringFormat("{}", page->m_pageHeight / DEFINITION_FACTOR).c_str();
         currentNode.append_attribute("page.leftmar")
-            = StringFormat("%d", page->m_pageMarginLeft / DEFINITION_FACTOR).c_str();
+            = StringFormat("{}", page->m_pageMarginLeft / DEFINITION_FACTOR).c_str();
         currentNode.append_attribute("page.rightmar")
-            = StringFormat("%d", page->m_pageMarginRight / DEFINITION_FACTOR).c_str();
+            = StringFormat("{}", page->m_pageMarginRight / DEFINITION_FACTOR).c_str();
         currentNode.append_attribute("page.rightmar")
-            = StringFormat("%d", page->m_pageMarginRight / DEFINITION_FACTOR).c_str();
+            = StringFormat("{}", page->m_pageMarginRight / DEFINITION_FACTOR).c_str();
     }
     if (!page->m_surface.empty()) {
         currentNode.append_attribute("surface") = page->m_surface.c_str();
     }
     if (page->m_PPUFactor != 1.0) {
-        currentNode.append_attribute("ppu") = StringFormat("%f", page->m_PPUFactor).c_str();
+        currentNode.append_attribute("ppu") = StringFormat("{}", page->m_PPUFactor).c_str();
     }
 }
 
@@ -1749,12 +1749,12 @@ void MEIOutput::WriteSystem(pugi::xml_node currentNode, System *system)
     this->WriteXmlId(currentNode, system);
     // margins
     currentNode.append_attribute("system.leftmar")
-        = StringFormat("%d", system->m_systemLeftMar / DEFINITION_FACTOR).c_str();
+        = StringFormat("{}", system->m_systemLeftMar / DEFINITION_FACTOR).c_str();
     currentNode.append_attribute("system.rightmar")
-        = StringFormat("%d", system->m_systemRightMar / DEFINITION_FACTOR).c_str();
+        = StringFormat("{}", system->m_systemRightMar / DEFINITION_FACTOR).c_str();
     // y positions
     if (system->m_drawingFacsY != VRV_UNSET) {
-        currentNode.append_attribute("uly") = StringFormat("%d", system->m_drawingFacsY / DEFINITION_FACTOR).c_str();
+        currentNode.append_attribute("uly") = StringFormat("{}", system->m_drawingFacsY / DEFINITION_FACTOR).c_str();
     }
     system->WriteTyped(currentNode);
 }
@@ -5747,7 +5747,7 @@ bool MEIInput::ReadInstrDef(Object *parent, pugi::xml_node instrDef)
     if (m_meiversion < meiVersion_MEIVERSION_4_0_0) {
         if (instrDef.attribute("midi.volume")) {
             const float midiValue = instrDef.attribute("midi.volume").as_float();
-            instrDef.attribute("midi.volume").set_value(StringFormat("%.2f%%", midiValue / 127 * 100).c_str());
+            instrDef.attribute("midi.volume").set_value(StringFormat("{:.2f}%", midiValue / 127 * 100).c_str());
         }
     }
 

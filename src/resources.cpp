@@ -240,7 +240,7 @@ bool Resources::FontHasGlyphAvailable(const std::string &fontName, char32_t smuf
 std::string Resources::GetCSSFontFor(const std::string &fontName) const
 {
     if (fontName == this->GetTextFont()) {
-        const std::string cssFontPath = StringFormat("%s/%s.css", m_path.c_str(), this->GetTextFont().c_str());
+        const std::string cssFontPath = StringFormat("{}/{}.css", m_path, this->GetTextFont());
         std::ifstream fstream(cssFontPath);
         std::stringstream sstream;
         sstream << fstream.rdbuf();
@@ -475,7 +475,7 @@ std::string Resources::LoadedFont::GetCSSFont(const std::string &path) const
         return m_css;
     }
     else {
-        const std::string cssFontPath = StringFormat("%s/%s.css", path.c_str(), m_name.c_str());
+        const std::string cssFontPath = StringFormat("{}/{}.css", path, m_name);
         std::ifstream fstream(cssFontPath);
         std::stringstream sstream;
         sstream << fstream.rdbuf();

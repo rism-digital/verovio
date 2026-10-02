@@ -205,7 +205,7 @@ public:
      */
     std::string LogDebugTreeMsg() override
     {
-        return StringFormat("%d %f", this->GetXRel(), this->GetTime().ToDouble());
+        return StringFormat("{} {}", this->GetXRel(), this->GetTime().ToDouble());
     }
 
     //----------------//

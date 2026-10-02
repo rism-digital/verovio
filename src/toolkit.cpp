@@ -2377,7 +2377,8 @@ std::string Toolkit::ConvertHumdrumToMIDI(const std::string &humdrumData)
 void Toolkit::SetLocale()
 {
     if (m_options->m_setLocale.GetValue() && !m_previousLocale) {
-        // Required for proper formatting, e.g., in StringFormat (see vrv.cpp)
+        // No longer required for proper formatting, e.g., in StringFormat (see vrv.cpp), since
+        // vsnprintf() was replaced by std::format() which is not locale-dependant unlike the former.
         m_previousLocale = std::locale::global(std::locale::classic());
     }
 }
