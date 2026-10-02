@@ -1558,18 +1558,22 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
         m_instrdef = NULL;
     }
 
+    bool attributesRead = false;
     for (pugi::xml_node child : node) {
 
         // We read all attribute elements until we reach something else
         // barline, direction, print, and sound elements may be present
+        // Anything before the first attributes (e.g., a grace note) is skipped
         if (!IsElement(child, "attributes") && !IsElement(child, "barline") && !IsElement(child, "direction")
             && !IsElement(child, "print") && !IsElement(child, "sound")) {
-            break;
+            if (attributesRead) break;
+            continue;
         }
 
         // we do not want to read it again, just change the name
         if (IsElement(child, "attributes")) {
             child.set_name("mei-read");
+            attributesRead = true;
         }
         else {
             continue;
