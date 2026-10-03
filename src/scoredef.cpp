@@ -46,17 +46,19 @@ namespace vrv {
 // ScoreDefElement
 //----------------------------------------------------------------------------
 
-ScoreDefElement::ScoreDefElement() : Object(SCOREDEF_ELEMENT), ScoreDefInterface(), AttTyped()
+ScoreDefElement::ScoreDefElement() : Object(SCOREDEF_ELEMENT), ScoreDefInterface(), AttStaffItems(), AttTyped()
 {
     this->RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
+    this->RegisterAttClass(ATT_STAFFITEMS);
     this->RegisterAttClass(ATT_TYPED);
 
     this->Reset();
 }
 
-ScoreDefElement::ScoreDefElement(ClassId classId) : Object(classId), ScoreDefInterface(), AttTyped()
+ScoreDefElement::ScoreDefElement(ClassId classId) : Object(classId), ScoreDefInterface(), AttStaffItems(), AttTyped()
 {
     this->RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
+    this->RegisterAttClass(ATT_STAFFITEMS);
     this->RegisterAttClass(ATT_TYPED);
 
     this->Reset();
@@ -68,7 +70,38 @@ void ScoreDefElement::Reset()
 {
     Object::Reset();
     ScoreDefInterface::Reset();
+    this->ResetStaffItems();
     this->ResetTyped();
+}
+
+bool ScoreDefElement::ReplaceStaffItemOrders(const ScoreDefElement *source)
+{
+    assert(source);
+
+    bool replaced = false;
+    if (source->HasAboveorder()) {
+        this->SetAboveorder(source->GetAboveorder());
+        replaced = true;
+    }
+    if (source->HasBeloworder()) {
+        this->SetBeloworder(source->GetBeloworder());
+        replaced = true;
+    }
+    if (source->HasBetweenorder()) {
+        this->SetBetweenorder(source->GetBetweenorder());
+        replaced = true;
+    }
+    return replaced;
+}
+
+data_STAFFITEM_List ScoreDefElement::GetStaffItemOrder(data_STAFFREL place) const
+{
+    switch (place) {
+        case STAFFREL_above: return this->HasAboveorder() ? this->GetAboveorder() : data_STAFFITEM_List();
+        case STAFFREL_below: return this->HasBeloworder() ? this->GetBeloworder() : data_STAFFITEM_List();
+        case STAFFREL_between: return this->HasBetweenorder() ? this->GetBetweenorder() : data_STAFFITEM_List();
+        default: return data_STAFFITEM_List();
+    }
 }
 
 bool ScoreDefElement::HasClefInfo(int depth) const
@@ -290,6 +323,7 @@ void ScoreDef::ReplaceDrawingValues(const ScoreDef *newScoreDef)
 
     m_insertScoreDef = false;
     m_setAsDrawing = true;
+    this->ReplaceStaffItemOrders(newScoreDef);
 
     int redrawFlags = 0;
     const Clef *clef = NULL;
@@ -344,6 +378,7 @@ void ScoreDef::ReplaceDrawingValues(const StaffDef *newStaffDef)
 
     // if found, replace attributes
     if (staffDef) {
+        if (staffDef->ReplaceStaffItemOrders(newStaffDef)) m_setAsDrawing = true;
         if (newStaffDef->HasClefInfo()) {
             staffDef->SetDrawClef(true);
             const Clef *clef = newStaffDef->GetClef();
@@ -552,6 +587,16 @@ std::vector<int> ScoreDef::GetStaffNs() const
         staffDef->GetOssiaBelowNs(ns);
     }
     return ns;
+}
+
+data_STAFFITEM_List ScoreDef::GetStaffItemOrder(int staffN, data_STAFFREL place) const
+{
+    const StaffDef *staffDef = this->GetStaffDef(staffN);
+    if (staffDef) {
+        const data_STAFFITEM_List order = staffDef->GetStaffItemOrder(place);
+        if (!order.empty()) return order;
+    }
+    return ScoreDefElement::GetStaffItemOrder(place);
 }
 
 void ScoreDef::SetRedrawFlags(int redrawFlags)

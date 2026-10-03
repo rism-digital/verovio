@@ -28,7 +28,8 @@ class Ornam : public ControlElement,
               public TextListInterface,
               public TextDirInterface,
               public TimePointInterface,
-              public AttOrnamentAccid {
+              public AttOrnamentAccid,
+              public AttVerticalGroup {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

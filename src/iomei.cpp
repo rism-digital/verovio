@@ -1827,6 +1827,7 @@ void MEIOutput::WriteScoreDefElement(pugi::xml_node currentNode, ScoreDefElement
     assert(scoreDefElement);
 
     this->WriteXmlId(currentNode, scoreDefElement);
+    scoreDefElement->WriteStaffItems(currentNode);
     scoreDefElement->WriteTyped(currentNode);
 }
 
@@ -2116,6 +2117,7 @@ void MEIOutput::WriteBreath(pugi::xml_node currentNode, Breath *breath)
     this->WriteControlElement(currentNode, breath);
     this->WriteTimePointInterface(currentNode, breath);
     breath->WritePlacementRelStaff(currentNode);
+    breath->WriteVerticalGroup(currentNode);
 }
 
 void MEIOutput::WriteCaesura(pugi::xml_node currentNode, Caesura *caesura)
@@ -2127,6 +2129,7 @@ void MEIOutput::WriteCaesura(pugi::xml_node currentNode, Caesura *caesura)
     caesura->WriteExtSymAuth(currentNode);
     caesura->WriteExtSymNames(currentNode);
     caesura->WritePlacementRelStaff(currentNode);
+    caesura->WriteVerticalGroup(currentNode);
 }
 
 void MEIOutput::WriteCpMark(pugi::xml_node currentNode, CpMark *cpMark)
@@ -2136,6 +2139,7 @@ void MEIOutput::WriteCpMark(pugi::xml_node currentNode, CpMark *cpMark)
     this->WriteControlElement(currentNode, cpMark);
     this->WriteTextDirInterface(currentNode, cpMark);
     this->WriteTimeSpanningInterface(currentNode, cpMark);
+    cpMark->WriteVerticalGroup(currentNode);
 }
 
 void MEIOutput::WriteDir(pugi::xml_node currentNode, Dir *dir)
@@ -2177,6 +2181,7 @@ void MEIOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
     fermata->WriteExtSymNames(currentNode);
     fermata->WriteFermataVis(currentNode);
     fermata->WritePlacementRelStaff(currentNode);
+    fermata->WriteVerticalGroup(currentNode);
 }
 
 void MEIOutput::WriteFing(pugi::xml_node currentNode, Fing *fing)
@@ -2187,6 +2192,7 @@ void MEIOutput::WriteFing(pugi::xml_node currentNode, Fing *fing)
     this->WriteTextDirInterface(currentNode, fing);
     this->WriteTimePointInterface(currentNode, fing);
     fing->WriteNNumberLike(currentNode);
+    fing->WriteVerticalGroup(currentNode);
 }
 
 void MEIOutput::WriteGliss(pugi::xml_node currentNode, Gliss *gliss)
@@ -2223,6 +2229,7 @@ void MEIOutput::WriteHarm(pugi::xml_node currentNode, Harm *harm)
     this->WriteTimeSpanningInterface(currentNode, harm);
     harm->WriteLang(currentNode);
     harm->WriteNNumberLike(currentNode);
+    harm->WriteVerticalGroup(currentNode);
 }
 
 void MEIOutput::WriteLv(pugi::xml_node currentNode, Lv *lv)
@@ -2258,6 +2265,7 @@ void MEIOutput::WriteMordent(pugi::xml_node currentNode, Mordent *mordent)
     mordent->WriteOrnamentAccid(currentNode);
     mordent->WritePlacementRelStaff(currentNode);
     mordent->WriteMordentLog(currentNode);
+    mordent->WriteVerticalGroup(currentNode);
 }
 
 void MEIOutput::WriteOctave(pugi::xml_node currentNode, Octave *octave)
@@ -2271,6 +2279,7 @@ void MEIOutput::WriteOctave(pugi::xml_node currentNode, Octave *octave)
     octave->WriteLineRendBase(currentNode);
     octave->WriteNNumberLike(currentNode);
     octave->WriteOctaveDisplacement(currentNode);
+    octave->WriteVerticalGroup(currentNode);
 }
 
 void MEIOutput::WriteOrnam(pugi::xml_node currentNode, Ornam *ornam)
@@ -2281,6 +2290,7 @@ void MEIOutput::WriteOrnam(pugi::xml_node currentNode, Ornam *ornam)
     this->WriteTextDirInterface(currentNode, ornam);
     this->WriteTimePointInterface(currentNode, ornam);
     ornam->WriteOrnamentAccid(currentNode);
+    ornam->WriteVerticalGroup(currentNode);
 }
 
 void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
@@ -2333,6 +2343,7 @@ void MEIOutput::WriteRepeatMark(pugi::xml_node currentNode, RepeatMark *repeatMa
     repeatMark->WriteExtSymAuth(currentNode);
     repeatMark->WriteExtSymNames(currentNode);
     repeatMark->WriteRepeatMarkLog(currentNode);
+    repeatMark->WriteVerticalGroup(currentNode);
 }
 
 void MEIOutput::WriteSlur(pugi::xml_node currentNode, Slur *slur)
@@ -2392,6 +2403,7 @@ void MEIOutput::WriteTempo(pugi::xml_node currentNode, Tempo *tempo)
     tempo->WriteLang(currentNode);
     tempo->WriteMidiTempo(currentNode);
     tempo->WriteMmTempo(currentNode);
+    tempo->WriteVerticalGroup(currentNode);
 }
 
 void MEIOutput::WriteTie(pugi::xml_node currentNode, Tie *tie)
@@ -2419,6 +2431,7 @@ void MEIOutput::WriteTrill(pugi::xml_node currentNode, Trill *trill)
     trill->WriteNNumberLike(currentNode);
     trill->WriteOrnamentAccid(currentNode);
     trill->WritePlacementRelStaff(currentNode);
+    trill->WriteVerticalGroup(currentNode);
 }
 
 void MEIOutput::WriteTurn(pugi::xml_node currentNode, Turn *turn)
@@ -2433,6 +2446,7 @@ void MEIOutput::WriteTurn(pugi::xml_node currentNode, Turn *turn)
     turn->WriteOrnamentAccid(currentNode);
     turn->WritePlacementRelStaff(currentNode);
     turn->WriteTurnLog(currentNode);
+    turn->WriteVerticalGroup(currentNode);
 }
 
 void MEIOutput::WriteLayer(pugi::xml_node currentNode, Layer *layer)
@@ -5170,6 +5184,7 @@ bool MEIInput::ReadSystemMilestoneEnd(Object *parent, pugi::xml_node milestoneEn
 bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *object)
 {
     this->SetMeiID(element, object);
+    object->ReadStaffItems(element);
     object->ReadTyped(element);
 
     if (m_meiversion <= meiVersion_MEIVERSION_5_0) {
@@ -6146,6 +6161,7 @@ bool MEIInput::ReadBreath(Object *parent, pugi::xml_node breath)
 
     this->ReadTimePointInterface(breath, vrvBreath);
     vrvBreath->ReadPlacementRelStaff(breath);
+    vrvBreath->ReadVerticalGroup(breath);
 
     parent->AddChild(vrvBreath);
     this->ReadUnsupportedAttr(breath, vrvBreath);
@@ -6161,6 +6177,7 @@ bool MEIInput::ReadCaesura(Object *parent, pugi::xml_node caesura)
     vrvCaesura->ReadExtSymAuth(caesura);
     vrvCaesura->ReadExtSymNames(caesura);
     vrvCaesura->ReadPlacementRelStaff(caesura);
+    vrvCaesura->ReadVerticalGroup(caesura);
 
     parent->AddChild(vrvCaesura);
     this->ReadUnsupportedAttr(caesura, vrvCaesura);
@@ -6174,6 +6191,7 @@ bool MEIInput::ReadCpMark(Object *parent, pugi::xml_node cpMark)
 
     this->ReadTextDirInterface(cpMark, vrvCpMark);
     this->ReadTimeSpanningInterface(cpMark, vrvCpMark);
+    vrvCpMark->ReadVerticalGroup(cpMark);
 
     parent->AddChild(vrvCpMark);
     this->ReadUnsupportedAttr(cpMark, vrvCpMark);
@@ -6227,6 +6245,7 @@ bool MEIInput::ReadFermata(Object *parent, pugi::xml_node fermata)
     vrvFermata->ReadExtSymNames(fermata);
     vrvFermata->ReadFermataVis(fermata);
     vrvFermata->ReadPlacementRelStaff(fermata);
+    vrvFermata->ReadVerticalGroup(fermata);
 
     parent->AddChild(vrvFermata);
     this->ReadUnsupportedAttr(fermata, vrvFermata);
@@ -6241,6 +6260,7 @@ bool MEIInput::ReadFing(Object *parent, pugi::xml_node fing)
     this->ReadTextDirInterface(fing, vrvFing);
     this->ReadTimePointInterface(fing, vrvFing);
     vrvFing->ReadNNumberLike(fing);
+    vrvFing->ReadVerticalGroup(fing);
 
     parent->AddChild(vrvFing);
     this->ReadUnsupportedAttr(fing, vrvFing);
@@ -6289,6 +6309,7 @@ bool MEIInput::ReadHarm(Object *parent, pugi::xml_node harm)
     this->ReadTimeSpanningInterface(harm, vrvHarm);
     vrvHarm->ReadLang(harm);
     vrvHarm->ReadNNumberLike(harm);
+    vrvHarm->ReadVerticalGroup(harm);
 
     parent->AddChild(vrvHarm);
     this->ReadUnsupportedAttr(harm, vrvHarm);
@@ -6348,6 +6369,7 @@ bool MEIInput::ReadMordent(Object *parent, pugi::xml_node mordent)
     vrvMordent->ReadOrnamentAccid(mordent);
     vrvMordent->ReadPlacementRelStaff(mordent);
     vrvMordent->ReadMordentLog(mordent);
+    vrvMordent->ReadVerticalGroup(mordent);
 
     parent->AddChild(vrvMordent);
     this->ReadUnsupportedAttr(mordent, vrvMordent);
@@ -6365,6 +6387,7 @@ bool MEIInput::ReadOctave(Object *parent, pugi::xml_node octave)
     vrvOctave->ReadLineRendBase(octave);
     vrvOctave->ReadNNumberLike(octave);
     vrvOctave->ReadOctaveDisplacement(octave);
+    vrvOctave->ReadVerticalGroup(octave);
 
     parent->AddChild(vrvOctave);
     this->ReadUnsupportedAttr(octave, vrvOctave);
@@ -6379,6 +6402,7 @@ bool MEIInput::ReadOrnam(Object *parent, pugi::xml_node ornam)
     this->ReadTextDirInterface(ornam, vrvOrnam);
     this->ReadTimePointInterface(ornam, vrvOrnam);
     vrvOrnam->ReadOrnamentAccid(ornam);
+    vrvOrnam->ReadVerticalGroup(ornam);
 
     parent->AddChild(vrvOrnam);
     this->ReadUnsupportedAttr(ornam, vrvOrnam);
@@ -6456,6 +6480,7 @@ bool MEIInput::ReadRepeatMark(Object *parent, pugi::xml_node repeatMark)
     vrvRepeatMark->ReadExtSymAuth(repeatMark);
     vrvRepeatMark->ReadExtSymNames(repeatMark);
     vrvRepeatMark->ReadRepeatMarkLog(repeatMark);
+    vrvRepeatMark->ReadVerticalGroup(repeatMark);
 
     parent->AddChild(vrvRepeatMark);
     this->ReadUnsupportedAttr(repeatMark, vrvRepeatMark);
@@ -6489,6 +6514,7 @@ bool MEIInput::ReadTempo(Object *parent, pugi::xml_node tempo)
     vrvTempo->ReadLang(tempo);
     vrvTempo->ReadMidiTempo(tempo);
     vrvTempo->ReadMmTempo(tempo);
+    vrvTempo->ReadVerticalGroup(tempo);
 
     parent->AddChild(vrvTempo);
     this->ReadUnsupportedAttr(tempo, vrvTempo);
@@ -6524,6 +6550,7 @@ bool MEIInput::ReadTrill(Object *parent, pugi::xml_node trill)
     vrvTrill->ReadNNumberLike(trill);
     vrvTrill->ReadOrnamentAccid(trill);
     vrvTrill->ReadPlacementRelStaff(trill);
+    vrvTrill->ReadVerticalGroup(trill);
 
     parent->AddChild(vrvTrill);
     this->ReadUnsupportedAttr(trill, vrvTrill);
@@ -6546,6 +6573,7 @@ bool MEIInput::ReadTurn(Object *parent, pugi::xml_node turn)
     vrvTurn->ReadOrnamentAccid(turn);
     vrvTurn->ReadPlacementRelStaff(turn);
     vrvTurn->ReadTurnLog(turn);
+    vrvTurn->ReadVerticalGroup(turn);
 
     parent->AddChild(vrvTurn);
     this->ReadUnsupportedAttr(turn, vrvTurn);

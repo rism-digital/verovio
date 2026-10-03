@@ -32,7 +32,8 @@ class Trill : public ControlElement,
               public AttLineRend,
               public AttNNumberLike,
               public AttOrnamentAccid,
-              public AttPlacementRelStaff {
+              public AttPlacementRelStaff,
+              public AttVerticalGroup {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

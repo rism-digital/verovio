@@ -189,6 +189,8 @@ defaults:
         -1.0
     data_STAFFITEM:
         data_STAFFITEM()
+    data_STAFFITEM_List:
+        std::vector<data_STAFFITEM>()
     data_STAFFREL:
         data_STAFFREL()
 
@@ -251,6 +253,13 @@ modules:
         att.staffIdent:
             staff:
                 type: xsdPositiveInteger_List
+        att.staffItems:
+            aboveorder:
+                type: data_STAFFITEM_List
+            beloworder:
+                type: data_STAFFITEM_List
+            betweenorder:
+                type: data_STAFFITEM_List
         att.stems:
             stem.len:
                 type: double

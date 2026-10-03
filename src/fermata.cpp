@@ -33,6 +33,7 @@ Fermata::Fermata()
     , AttExtSymNames()
     , AttFermataVis()
     , AttPlacementRelStaff()
+    , AttVerticalGroup()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
@@ -40,6 +41,7 @@ Fermata::Fermata()
     this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_FERMATAVIS);
     this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
+    this->RegisterAttClass(ATT_VERTICALGROUP);
 
     this->Reset();
 }
@@ -56,6 +58,7 @@ void Fermata::Reset()
     this->ResetExtSymNames();
     this->ResetFermataVis();
     this->ResetPlacementRelStaff();
+    this->ResetVerticalGroup();
 }
 
 char32_t Fermata::GetFermataGlyph() const

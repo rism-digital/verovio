@@ -25,11 +25,12 @@ namespace vrv {
 
 static const ClassRegistrar<Fing> s_factory("fing", FING);
 
-Fing::Fing() : ControlElement(FING), TimePointInterface(), TextDirInterface(), AttNNumberLike()
+Fing::Fing() : ControlElement(FING), TimePointInterface(), TextDirInterface(), AttNNumberLike(), AttVerticalGroup()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterAttClass(ATT_VERTICALGROUP);
 
     this->Reset();
 }
@@ -42,6 +43,7 @@ void Fing::Reset()
     TimePointInterface::Reset();
     TextDirInterface::Reset();
     this->ResetNNumberLike();
+    this->ResetVerticalGroup();
 }
 
 bool Fing::IsSupportedChild(ClassId classId)
