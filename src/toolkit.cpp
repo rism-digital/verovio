@@ -9,7 +9,10 @@
 
 //----------------------------------------------------------------------------
 
+#include <algorithm>
 #include <cassert>
+#include <climits>
+#include <cmath>
 #include <locale>
 #include <regex>
 
@@ -31,18 +34,22 @@
 #include "iomusxml.h"
 #include "iopae.h"
 #include "iovolpiano.h"
+#include "keysig.h"
 #include "layer.h"
 #include "measure.h"
 #include "nc.h"
 #include "neume.h"
 #include "note.h"
+#include "octave.h"
 #include "options.h"
 #include "page.h"
+#include "pitchinterface.h"
 #include "runtimeclock.h"
 #include "score.h"
 #include "slur.h"
 #include "staff.h"
 #include "svgdevicecontext.h"
+#include "system.h"
 #include "timemap.h"
 #include "vrv.h"
 
@@ -57,6 +64,95 @@ namespace vrv {
 const char *UTF_16_BE_BOM = "\xFE\xFF";
 const char *UTF_16_LE_BOM = "\xFF\xFE";
 const char *ZIP_SIGNATURE = "\x50\x4B\x03\x04";
+
+namespace {
+
+    Fraction ScoreTimeFromDouble(double scoreTime)
+    {
+        const int denom = 1000;
+        return Fraction(static_cast<int>(std::round(scoreTime * denom)), denom);
+    }
+
+    int AccidWrittenToSemitone(data_ACCIDENTAL_WRITTEN accid)
+    {
+        switch (accid) {
+            case ACCIDENTAL_WRITTEN_ff: return -2;
+            case ACCIDENTAL_WRITTEN_f: return -1;
+            case ACCIDENTAL_WRITTEN_n: return 0;
+            case ACCIDENTAL_WRITTEN_s: return 1;
+            case ACCIDENTAL_WRITTEN_ss: return 2;
+            default: return 0;
+        }
+    }
+
+    struct SpelledPitch {
+        data_PITCHNAME pname;
+        int accidSemitone;
+        int oct;
+    };
+
+    SpelledPitch ChooseContextualSpell(
+        int midiPitch, const MapOfOctavedPitchAccid &contextAccids, bool preferSharps, bool preferFlats)
+    {
+        const int targetPc = ((midiPitch % 12) + 12) % 12;
+        SpelledPitch best{ PITCHNAME_c, 0, midiPitch / 12 - 1 };
+        int bestCost = INT_MAX;
+
+        const data_PITCHNAME pnames[]
+            = { PITCHNAME_c, PITCHNAME_d, PITCHNAME_e, PITCHNAME_f, PITCHNAME_g, PITCHNAME_a, PITCHNAME_b };
+
+        for (data_PITCHNAME pname : pnames) {
+            const int basePc = Note::PnameToPclass(pname);
+            int accid = targetPc - basePc;
+            while (accid > 6) accid -= 12;
+            while (accid < -6) accid += 12;
+            const int naturalPc = basePc + accid;
+            const int oct = (midiPitch - naturalPc) / 12 - 1;
+            if ((oct < 0) || (oct > 9)) continue;
+
+            const int idx = pname + oct * 7;
+            int expected = 0;
+            auto found = contextAccids.find(idx);
+            if (found != contextAccids.end()) expected = AccidWrittenToSemitone(found->second);
+
+            int cost = std::abs(accid - expected) * 10 + std::abs(accid);
+            if (preferSharps && accid < 0) cost += 5;
+            if (preferFlats && accid > 0) cost += 5;
+
+            if (cost < bestCost) {
+                bestCost = cost;
+                best = { pname, accid, oct };
+            }
+        }
+
+        return best;
+    }
+
+    int ContextualAccidSemitone(const MapOfOctavedPitchAccid &contextAccids, data_PITCHNAME pname, int oct)
+    {
+        const int idx = pname + oct * 7;
+        auto found = contextAccids.find(idx);
+        if (found == contextAccids.end()) return 0;
+        return AccidWrittenToSemitone(found->second);
+    }
+
+    int MidiPitchFromSpelled(data_PITCHNAME pname, int oct, int accidSemitone)
+    {
+        const int basePc = Note::PnameToPclass(pname);
+        int pc = basePc + accidSemitone;
+        int octShift = 0;
+        if (pc >= 12) {
+            pc -= 12;
+            octShift = 1;
+        }
+        else if (pc < 0) {
+            pc += 12;
+            octShift = -1;
+        }
+        return (oct + 1 + octShift) * 12 + pc;
+    }
+
+} // namespace
 
 //----------------------------------------------------------------------------
 // Toolkit
@@ -2174,6 +2270,293 @@ std::string Toolkit::GetTimesForElement(const std::string &xmlId)
         o << "tstampOn" << realTimeOnsetMilliseconds;
         o << "tstampOff" << realTimeOffsetMilliseconds;
     }
+    return o.json();
+}
+
+std::string Toolkit::GetPitchPosition(double scoreTime, double midiPitch, int staffN)
+{
+    this->ResetLogBuffer();
+
+    jsonxx::Object o;
+
+    if (staffN <= 0) {
+        LogWarning("Invalid staff number '%d'", staffN);
+        return o.json();
+    }
+    if (!std::isfinite(midiPitch)) {
+        LogWarning("Invalid MIDI pitch '%f'", midiPitch);
+        return o.json();
+    }
+
+    if (!m_doc.HasTimemap()) {
+        // Ensure measure score-time boundaries exist for comparisons.
+        m_doc.CalculateTimemap();
+    }
+    if (!m_doc.HasTimemap()) {
+        LogWarning("Calculation of the timemap failed, pitch position is invalid.");
+        return o.json();
+    }
+    const Fraction requestedScoreTime = ScoreTimeFromDouble(scoreTime);
+
+    MeasureScoreTimeComparison matchMeasureTime(requestedScoreTime);
+    Measure *measure = NULL;
+    if (m_doc.GetDrawingPage()) {
+        measure = dynamic_cast<Measure *>(m_doc.GetDrawingPage()->FindDescendantByComparison(&matchMeasureTime));
+    }
+    if (!measure) {
+        measure = dynamic_cast<Measure *>(m_doc.FindDescendantByComparison(&matchMeasureTime));
+    }
+    if (!measure) {
+        LogWarning("No measure found at score time '%f'", scoreTime);
+        return o.json();
+    }
+
+    // Score-time boundaries are inclusive, so exact measure offsets can map to the
+    // previous measure. If the query is at the offset, advance to the next measure
+    // to keep onset notes in their own bar.
+    int repeat = measure->EnclosesScoreTime(requestedScoreTime);
+    if (repeat == VRV_UNSET) repeat = 1;
+
+    const Fraction measureOffset = measure->GetScoreTimeOffset(repeat);
+    if (requestedScoreTime == measureOffset) {
+        Object *parent = measure->GetParent();
+        if (parent) {
+            Measure *nextMeasure = vrv_cast<Measure *>(parent->GetNext(measure, MEASURE));
+            if (nextMeasure) {
+                measure = nextMeasure;
+                repeat = measure->EnclosesScoreTime(requestedScoreTime);
+                if (repeat == VRV_UNSET) repeat = 1;
+            }
+        }
+    }
+
+    const std::string measureId = measure->GetID();
+
+    Measure *layoutMeasure = measure;
+    Page *page = vrv_cast<Page *>(measure->GetFirstAncestor(PAGE));
+    System *system = vrv_cast<System *>(measure->GetFirstAncestor(SYSTEM));
+
+    if (m_doc.GetDrawingPage()) {
+        Page *drawingPage = m_doc.GetDrawingPage();
+        for (Object *child : drawingPage->GetChildren()) {
+            if (!child->Is(SYSTEM)) continue;
+            System *candidateSystem = vrv_cast<System *>(child);
+            if (!candidateSystem) continue;
+            const ListOfObjects measures = candidateSystem->FindAllDescendantsByType(MEASURE, false);
+            for (Object *measureObj : measures) {
+                Measure *candidateMeasure = vrv_cast<Measure *>(measureObj);
+                if (!candidateMeasure) continue;
+                if (candidateMeasure->GetID() == measureId) {
+                    layoutMeasure = candidateMeasure;
+                    page = drawingPage;
+                    system = candidateSystem;
+                    break;
+                }
+                const LinkingInterface *link = candidateMeasure->GetLinkingInterface();
+                if (link && link->HasCorresp()) {
+                    const std::string correspId = ExtractIDFragment(link->GetCorresp());
+                    if (correspId == measureId) {
+                        layoutMeasure = candidateMeasure;
+                        page = drawingPage;
+                        system = candidateSystem;
+                        break;
+                    }
+                }
+            }
+            if (system == candidateSystem) break;
+        }
+    }
+
+    // Use the logical measure onset for time math, even if the layout measure is
+    // found via @corresp on the drawing page.
+    Fraction measureOnset = measure->GetScoreTimeOnset(repeat);
+    Fraction localTime = requestedScoreTime - measureOnset;
+    if (localTime < 0) localTime = 0;
+
+    bool interpolated = false;
+    // Measure alignments are in quarter-note units, while Verovio score time uses
+    // SCORE_TIME_UNIT per quarter. Convert before looking up X.
+    const Fraction localTimeForX = localTime / SCORE_TIME_UNIT;
+    const int xRel = layoutMeasure->GetXAtScoreTime(localTimeForX, interpolated);
+    int x = layoutMeasure->GetDrawingX() + xRel;
+
+    int octaveShift = 0;
+    const ListOfObjects octaves = m_doc.FindAllDescendantsByType(OCTAVE, false);
+    if (!octaves.empty()) {
+        const int currentMeasureIndex = measure->GetIndex();
+        for (const Object *obj : octaves) {
+            const Octave *octave = vrv_cast<const Octave *>(obj);
+            if (!octave) continue;
+            if (!octave->HasStartAndEnd() || !octave->IsOrdered()) continue;
+            if (!octave->IsOnStaff(staffN)) continue;
+
+            const Measure *startMeasure = octave->GetStartMeasure();
+            const Measure *endMeasure = octave->GetEndMeasure();
+            if (!startMeasure || !endMeasure) continue;
+
+            const int startIndex = startMeasure->GetIndex();
+            const int endIndex = endMeasure->GetIndex();
+            if (currentMeasureIndex < startIndex || currentMeasureIndex > endIndex) continue;
+
+            bool active = false;
+            const Alignment *startAlignment = octave->GetStart()->GetAlignment();
+            const Alignment *endAlignment = octave->GetEnd()->GetAlignment();
+            if (startIndex == endIndex) {
+                if (!startAlignment || !endAlignment) {
+                    active = true;
+                }
+                else {
+                    active = (localTimeForX >= startAlignment->GetTime()) && (localTimeForX <= endAlignment->GetTime());
+                }
+            }
+            else if (currentMeasureIndex == startIndex) {
+                active = (!startAlignment) || (localTimeForX >= startAlignment->GetTime());
+            }
+            else if (currentMeasureIndex == endIndex) {
+                active = (!endAlignment) || (localTimeForX <= endAlignment->GetTime());
+            }
+            else {
+                active = true;
+            }
+
+            if (!active) continue;
+
+            int shift = 0;
+            switch (octave->GetDis()) {
+                case OCTAVE_DIS_8: shift = 1; break;
+                case OCTAVE_DIS_15: shift = 2; break;
+                case OCTAVE_DIS_22: shift = 3; break;
+                default: break;
+            }
+            if (!shift) continue;
+            const bool raisePitch = (octave->GetDisPlace() != STAFFREL_basic_below);
+            octaveShift += raisePitch ? shift : -shift;
+        }
+    }
+
+    const double adjustedMidiPitch = midiPitch - static_cast<double>(octaveShift) * 12.0;
+    const int midiPitchInt = static_cast<int>(std::floor(adjustedMidiPitch));
+    double midiFraction = adjustedMidiPitch - midiPitchInt;
+    if (midiFraction < 0.0) midiFraction = 0.0;
+    if (midiFraction > 1.0) midiFraction = 1.0;
+
+    AttNIntegerComparison staffCmp(STAFF, staffN);
+    Staff *staff = vrv_cast<Staff *>(layoutMeasure->FindDescendantByComparison(&staffCmp, 1));
+    if (!staff) {
+        LogWarning("Staff '%d' not found in measure '%s'", staffN, measureId.c_str());
+        return o.json();
+    }
+
+    Layer *layer = vrv_cast<Layer *>(staff->GetFirst(LAYER));
+    int clefOffset = 0;
+    const KeySig *keySig = NULL;
+    if (layer) {
+        keySig = layer->GetCurrentKeySig();
+    }
+
+    MapOfOctavedPitchAccid contextAccids;
+    if (keySig) {
+        keySig->FillMap(contextAccids);
+    }
+
+    const ListOfObjects notes = staff->FindAllDescendantsByType(NOTE, false);
+    const Note *anchorNote = NULL;
+    Fraction anchorOnset;
+    int anchorPitchDistance = 0;
+    for (const Object *obj : notes) {
+        const Note *note = vrv_cast<const Note *>(obj);
+        assert(note);
+        const Fraction noteOnset = note->GetScoreTimeOnset();
+        if (noteOnset > localTime) continue;
+        const Accid *accid = note->GetDrawingAccid();
+        if (accid && note->HasPname() && note->HasOct()) {
+            const int idx = note->GetPname() + note->GetOct() * 7;
+            contextAccids[idx] = accid->GetAccid();
+        }
+
+        int distance = note->GetMIDIPitch() - midiPitchInt;
+        if (distance < 0) distance = -distance;
+        if (!anchorNote || noteOnset > anchorOnset) {
+            anchorNote = note;
+            anchorOnset = noteOnset;
+            anchorPitchDistance = distance;
+        }
+        else if (noteOnset == anchorOnset && distance < anchorPitchDistance) {
+            anchorNote = note;
+            anchorPitchDistance = distance;
+        }
+    }
+
+    if (layer) {
+        clefOffset = layer->GetClefLocOffset(anchorNote);
+    }
+
+    const bool preferSharps = (keySig && (keySig->GetAccidType() == ACCIDENTAL_WRITTEN_s));
+    const bool preferFlats = (keySig && (keySig->GetAccidType() == ACCIDENTAL_WRITTEN_f));
+    const SpelledPitch spelled = ChooseContextualSpell(midiPitchInt, contextAccids, preferSharps, preferFlats);
+
+    const int loc = PitchInterface::CalcLoc(spelled.pname, spelled.oct, clefOffset);
+    const int yRelBase = staff->CalcPitchPosYRel(&m_doc, loc);
+    double yRel = static_cast<double>(yRelBase);
+    if (midiFraction > 0.0) {
+        const data_PITCHNAME stepPname
+            = (spelled.pname == PITCHNAME_b) ? PITCHNAME_c : static_cast<data_PITCHNAME>(spelled.pname + 1);
+        const int stepOct = spelled.oct + (spelled.pname == PITCHNAME_b ? 1 : 0);
+        const int stepLoc = PitchInterface::CalcLoc(stepPname, stepOct, clefOffset);
+        const int yRelStep = staff->CalcPitchPosYRel(&m_doc, stepLoc);
+        const int stepAccid = ContextualAccidSemitone(contextAccids, stepPname, stepOct);
+        const int stepMidi = MidiPitchFromSpelled(stepPname, stepOct, stepAccid);
+        int semitoneSpan = stepMidi - midiPitchInt;
+        if (semitoneSpan <= 0) semitoneSpan = 1;
+        const double ratio = std::min(1.0, midiFraction / static_cast<double>(semitoneSpan));
+        yRel = yRelBase + (yRelStep - yRelBase) * ratio;
+    }
+    const double y = staff->GetDrawingY() + yRel;
+
+    if (anchorNote) {
+        bool anchorInterpolated = false;
+        const Fraction anchorOnsetForX = anchorOnset / SCORE_TIME_UNIT;
+        const int anchorXRel = layoutMeasure->GetXAtScoreTime(anchorOnsetForX, anchorInterpolated);
+        const int anchorX = layoutMeasure->GetDrawingX() + anchorXRel;
+        const int noteHeadCenterX = anchorNote->GetDrawingX() + anchorNote->GetDrawingRadius(&m_doc);
+        x += noteHeadCenterX - anchorX;
+    }
+
+    // Convert to SVG device coordinates: include page margins and flip Y from
+    // Verovio's logical space (origin at bottom-left of content) to SVG space
+    // (origin at top-left of the page content).
+    double xOut = x;
+    double yOut = y;
+    if (page) {
+        if (!m_doc.GetDrawingPage() || m_doc.GetDrawingPage()->GetIdx() != page->GetIdx()) {
+            m_doc.SetDrawingPage(page->GetIdx());
+        }
+        xOut = x + m_doc.m_drawingPageMarginLeft;
+        yOut = m_doc.m_drawingPageContentHeight - y + m_doc.m_drawingPageMarginTop;
+    }
+
+    const int pageNo = (page) ? page->GetIdx() + 1 : 0;
+    int systemNo = 0;
+    if (page && system) {
+        int systemIndex = 0;
+        for (Object *child : page->GetChildren()) {
+            if (!child->Is(SYSTEM)) continue;
+            systemIndex++;
+            if (child == system) {
+                systemNo = systemIndex;
+                break;
+            }
+        }
+    }
+    if (!systemNo && system) {
+        systemNo = system->GetIdx() + 1;
+    }
+
+    o << "x" << xOut;
+    o << "y" << yOut;
+    o << "page" << pageNo;
+    o << "system" << systemNo;
+
     return o.json();
 }
 
