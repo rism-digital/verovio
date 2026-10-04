@@ -591,6 +591,12 @@ bool EditorToolkitShared::ParseUpdateScoreDefinitionAction(const jsonxx::Object 
     else if (updateStr == "staffDef") {
         update = UPDATE_STAFFDEF;
     }
+    else if (updateStr == "meterSig") {
+        update = UPDATE_METERSIG;
+    }
+    else if (updateStr == "keySig") {
+        update = UPDATE_KEYSIG;
+    }
     else if (updateStr == "insertAbove") {
         update = INSERT_ABOVE;
     }
@@ -621,7 +627,10 @@ bool EditorToolkitShared::ParseUpdateScoreDefinitionAction(const jsonxx::Object 
     switch (update) {
         case (UPDATE_SCOREDEF):
         case (UPDATE_STAFFGRP):
-        case (UPDATE_STAFFDEF): subTree = param.get<jsonxx::Object>("subTree"); break;
+        case (UPDATE_STAFFDEF):
+        case (UPDATE_METERSIG):
+        case (UPDATE_KEYSIG):
+            subTree = param.get<jsonxx::Object>("subTree"); break;
         default: break;
     }
 
@@ -1919,6 +1928,14 @@ bool EditorToolkitShared::UpdateScoreDefinition(
     }
     else if (update == UPDATE_STAFFDEF) {
         input.ImportStaffDef(subTree);
+    }
+    else if (update == UPDATE_METERSIG) {
+        Layer layer;
+        input.ImportMeterSigOrGrpIntoLayer(&layer, subTree);
+    }
+    else if (update == UPDATE_KEYSIG) {
+        Layer layer;
+        input.ImportKeySigIntoLayer(&layer, subTree);
     }
     else if (update == INSERT_ABOVE || update == INSERT_BELOW) {
         Object *element = this->ResolveElement(elementId);

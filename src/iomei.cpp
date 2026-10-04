@@ -9496,6 +9496,42 @@ void MEIInputExtended::ImportStaffDef(const jsonxx::Object &staffDef)
     }
 }
 
+void MEIInputExtended::ImportMeterSigOrGrpIntoLayer(Layer *layer, const jsonxx::Object &meterSig)
+{
+    assert(layer);
+    layer->ClearChildren();
+    
+    try {
+        pugi::xml_document meiDoc = this->FromJson(meterSig);
+
+        const bool isGrp = (std::string(meiDoc.first_child().name()) == "meterSigGrp") ? true : false;
+        if (isGrp) {
+            this->ReadMeterSigGrpExt(layer, meiDoc.first_child());
+        }
+        else {
+            this->ReadMeterSigExt(layer, meiDoc.first_child());
+        }
+    }
+    catch (char *str) {
+        LogError("%s", str);
+    }
+}
+
+void MEIInputExtended::ImportKeySigIntoLayer(Layer *layer, const jsonxx::Object &keySig)
+{
+    assert(layer);
+    layer->ClearChildren();
+    
+    try {
+        pugi::xml_document meiDoc = this->FromJson(keySig);
+        this->ReadMeterSigGrpExt(layer, meiDoc.first_child());
+    }
+    catch (char *str) {
+        LogError("%s", str);
+    }
+}
+  
+
 pugi::xml_document MEIInputExtended::FromJson(const jsonxx::Object &json)
 {
     pugi::xml_document doc;

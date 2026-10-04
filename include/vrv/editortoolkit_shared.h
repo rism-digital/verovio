@@ -59,6 +59,8 @@ protected:
         UPDATE_SCOREDEF = 0,
         UPDATE_STAFFGRP,
         UPDATE_STAFFDEF,
+        UPDATE_METERSIG,
+        UPDATE_KEYSIG,
         MOVE_UP,
         MOVE_DOWN,
         DELETE_STAFF,
