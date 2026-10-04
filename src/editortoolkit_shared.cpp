@@ -598,10 +598,10 @@ bool EditorToolkitShared::ParseUpdateScoreDefinitionAction(const jsonxx::Object 
         update = INSERT_BELOW;
     }
     else if (updateStr == "moveUp") {
-        update = INSERT_ABOVE;
+        update = MOVE_UP;
     }
     else if (updateStr == "moveDown") {
-        update = INSERT_ABOVE;
+        update = MOVE_DOWN;
     }
     else if (updateStr == "delete") {
         update = DELETE;
@@ -1964,6 +1964,20 @@ bool EditorToolkitShared::UpdateScoreDefinition(
         StaffInsert staffInsert = (update == INSERT_ABOVE) ? StaffInsert::INSERT_ABOVE : StaffInsert::INSERT_BELOW;
         AddStaffFunctor addStaffFunctor(staff->GetN(), staffInsert);
         m_doc->Process(addStaffFunctor);
+        ReorderStaffNFunctor reorderStaffNFunctor;
+        m_doc->Process(reorderStaffNFunctor);
+    }
+    else if (update == MOVE_UP || update == MOVE_DOWN) {
+        Object *element = this->ResolveElement(elementId);
+        if (!element || !element->Is(STAFF)) {
+            LogError("A staff must be selected");
+            return false;
+        }
+        Staff *staff = vrv_cast<Staff *>(element);
+        assert(staff);
+        StaffMove staffMove = (update == MOVE_UP) ? StaffMove::MOVE_UP : StaffMove::MOVE_DOWN;
+        MoveStaffFunctor moveStaffFunctor(staff->GetN(), staffMove);
+        m_doc->Process(moveStaffFunctor);
         ReorderStaffNFunctor reorderStaffNFunctor;
         m_doc->Process(reorderStaffNFunctor);
     }

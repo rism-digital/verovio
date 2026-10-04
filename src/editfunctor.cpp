@@ -108,6 +108,75 @@ FunctorCode AddStaffFunctor::VisitScoreDef(ScoreDef *scoreDef)
 }
 
 //----------------------------------------------------------------------------
+// MoveStaffFunctor
+//----------------------------------------------------------------------------
+
+MoveStaffFunctor::MoveStaffFunctor(int n, StaffMove move) : Functor()
+{
+    m_n = n;
+    m_move = move;
+    m_nTarget = VRV_UNSET;
+}
+
+MoveStaffFunctor::~MoveStaffFunctor() {}
+
+FunctorCode MoveStaffFunctor::VisitScore(Score *score)
+{
+    if (m_nTarget != VRV_UNSET) return FUNCTOR_SIBLINGS;
+
+    ScoreDef *scoreDef = score->GetScoreDef();
+    assert(scoreDef);
+
+    std::vector<int> staffNs = scoreDef->GetStaffNs();
+
+    const auto staffN = std::find(staffNs.begin(), staffNs.end(), m_n);
+    if (staffN == staffNs.end()) return FUNCTOR_SIBLINGS;
+
+    if (m_move == StaffMove::MOVE_UP) {
+        if (staffN == staffNs.begin()) return FUNCTOR_SIBLINGS;
+        m_nTarget = *std::prev(staffN);
+    }
+    else {
+        const auto nextStaffN = std::next(staffN);
+        if (nextStaffN == staffNs.end()) return FUNCTOR_SIBLINGS;
+        m_nTarget = *nextStaffN;
+    }
+
+    StaffDef *staffDef = scoreDef->GetStaffDef(m_n);
+    StaffDef *targetStaffDef = scoreDef->GetStaffDef(m_nTarget);
+    assert(staffDef && targetStaffDef);
+    staffDef->SwapWith(targetStaffDef);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode MoveStaffFunctor::VisitMeasure(Measure *measure)
+{
+    if (m_nTarget == VRV_UNSET) return FUNCTOR_SIBLINGS;
+
+    AttNIntegerComparison staffN(STAFF, m_n);
+    Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&staffN));
+    AttNIntegerComparison targetStaffN(STAFF, m_nTarget);
+    Staff *staffTarget = vrv_cast<Staff *>(measure->FindDescendantByComparison(&targetStaffN));
+    if (!staff || !staffTarget) return FUNCTOR_SIBLINGS;
+    staff->SwapWith(staffTarget);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode MoveStaffFunctor::VisitScoreDef(ScoreDef *scoreDef)
+{
+    if (m_nTarget == VRV_UNSET) return FUNCTOR_SIBLINGS;
+
+    StaffDef *staffDef = scoreDef->GetStaffDef(m_n);
+    StaffDef *targetStaffDef = scoreDef->GetStaffDef(m_nTarget);
+    if (!staffDef || !targetStaffDef) return FUNCTOR_SIBLINGS;
+    staffDef->SwapWith(targetStaffDef);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+//----------------------------------------------------------------------------
 // ReorderStaffNFunctor
 //----------------------------------------------------------------------------
 

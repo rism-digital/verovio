@@ -15,6 +15,8 @@ namespace vrv {
 
 enum StaffInsert : int8_t { INSERT_ABOVE = 0, INSERT_BELOW };
 
+enum StaffMove : int8_t { MOVE_UP = 0, MOVE_DOWN };
+
 //----------------------------------------------------------------------------
 // AddStaffFunctor
 //----------------------------------------------------------------------------
@@ -52,6 +54,43 @@ private:
     Staff *m_staff;
     int m_n;
     StaffInsert m_insert;
+};
+
+//----------------------------------------------------------------------------
+// MoveStaffFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This moves a staff up or down.
+ */
+class MoveStaffFunctor : public Functor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    MoveStaffFunctor(int n, StaffMove move);
+    virtual ~MoveStaffFunctor();
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
+    ///@}
+
+protected:
+    //
+private:
+public:
+    //
+private:
+    int m_n;
+    int m_nTarget;
+    StaffMove m_move;
 };
 
 //----------------------------------------------------------------------------
