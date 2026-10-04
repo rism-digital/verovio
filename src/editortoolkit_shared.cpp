@@ -986,13 +986,13 @@ bool EditorToolkitShared::Delete(std::string &elementId, DeleteNavigation naviga
     this->PostProcessDeleteObjects(element, postProcessObjects);
 
     // Find referring objects
-    std::set<std::string> objectsToDelete;
+    std::set<std::string> referringIds;
     SetOfConstObjects visited;
-    objectsToDelete.insert(element->GetID());
-    this->CollectReferringObjects(element, objectsToDelete, visited);
-    for (auto id : objectsToDelete) {
-        Object *toDelete = m_doc->FindDescendantByID(id);
-        if (toDelete && toDelete->GetParent()) toDelete->GetParent()->DeleteChild(toDelete);
+    referringIds.insert(element->GetID());
+    m_doc->CollectReferringObjects(element, referringIds, visited);
+    for (auto id : referringIds) {
+        Object *referring = m_doc->FindDescendantByID(id);
+        if (referring && referring->GetParent()) referring->GetParent()->DeleteChild(referring);
     }
 
     for (auto id : postProcessObjects) {
@@ -1011,39 +1011,6 @@ bool EditorToolkitShared::Delete(std::string &elementId, DeleteNavigation naviga
     this->ClearContext();
     this->SetEditStatus();
     return true;
-}
-
-void EditorToolkitShared::CollectReferringObjects(
-    const Object *element, std::set<std::string> &objectsToDelete, SetOfConstObjects &visited)
-{
-    assert(element);
-
-    if (visited.find(element) != visited.end()) return;
-    visited.insert(element);
-
-    // First check all children
-    for (int i = 0; i < element->GetChildCount(); ++i) {
-        const Object *child = element->GetChild(i);
-        if (!child) continue;
-
-        CollectReferringObjects(child, objectsToDelete, visited);
-    }
-
-    // Then find objects referring to this object
-    ListOfObjectAttNamePairs referringObjects;
-    FindAllReferringObjectsFunctor findAllReferringObjects(element, &referringObjects);
-    m_doc->Process(findAllReferringObjects);
-
-    for (ListOfObjectAttNamePairs::iterator it = referringObjects.begin(); it != referringObjects.end(); ++it) {
-        const Object *referringObject = it->first;
-
-        if (referringObject == NULL) continue;
-        if (referringObject == element) continue;
-
-        objectsToDelete.insert(referringObject->GetID());
-
-        CollectReferringObjects(referringObject, objectsToDelete, visited);
-    }
 }
 
 void EditorToolkitShared::PostProcessDeleteObjects(const Object *element, std::set<std::string> &toPostProcess)

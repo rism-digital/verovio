@@ -143,8 +143,6 @@ protected:
 
     ArrayOfConstObjects GetScoreBasedChildrenFor(const Object *object);
 
-    void CollectReferringObjects(
-        const Object *element, std::set<std::string> &toDelete, std::set<const Object *> &visited);
     void PostProcessDeleteObjects(const Object *element, std::set<std::string> &toPostProcess);
     void PostProcessDelete(const std::string &elementId);
 
