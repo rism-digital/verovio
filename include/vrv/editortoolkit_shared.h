@@ -61,7 +61,7 @@ protected:
         UPDATE_STAFFDEF,
         MOVE_UP,
         MOVE_DOWN,
-        DELETE,
+        DELETE_STAFF,
         INSERT_ABOVE,
         INSERT_BELOW,
         ADD_STAFFGRP,

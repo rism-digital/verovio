@@ -1814,8 +1814,7 @@ const Score *Doc::GetCorrespondingScore(const Object *object, const std::list<Sc
     return correspondingScore;
 }
 
-void Doc::CollectReferringObjects(
-    const Object *element, std::set<std::string> &referring, SetOfConstObjects &visited)
+void Doc::CollectReferringObjects(const Object *element, std::set<std::string> &referring, SetOfConstObjects &visited)
 {
     assert(element);
 

@@ -11,12 +11,14 @@
 
 #include "controlelement.h"
 #include "cursor.h"
+#include "doc.h"
 #include "editorial.h"
 #include "editortoolkit_cmn.h"
 #include "layer.h"
 #include "score.h"
 #include "staff.h"
 #include "staffdef.h"
+#include "staffgrp.h"
 
 //----------------------------------------------------------------------------
 
@@ -105,6 +107,79 @@ FunctorCode AddStaffFunctor::VisitScoreDef(ScoreDef *scoreDef)
     parent->InsertChild(newStaffDef, staffDef->GetIdx() + offset);
 
     return FUNCTOR_SIBLINGS;
+}
+
+//----------------------------------------------------------------------------
+// DeleteStaffFunctor
+//----------------------------------------------------------------------------
+
+DeleteStaffFunctor::DeleteStaffFunctor(int n) : Functor()
+{
+    m_n = n;
+    m_scoreDefProcessed = false;
+}
+
+DeleteStaffFunctor::~DeleteStaffFunctor() {}
+
+FunctorCode DeleteStaffFunctor::VisitScore(Score *score)
+{
+    if (m_scoreDefProcessed) return FUNCTOR_SIBLINGS;
+
+    ScoreDef *scoreDef = score->GetScoreDef();
+    assert(scoreDef);
+
+    std::vector<int> staffNs = scoreDef->GetStaffNs();
+    // Make sure we keep at least one staff in the score
+    if (staffNs.size() < 2) return FUNCTOR_STOP;
+
+    this->DeleteStaffDef(scoreDef);
+    m_scoreDefProcessed = true;
+
+    scoreDef->Modify();
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode DeleteStaffFunctor::VisitMeasure(Measure *measure)
+{
+    AttNIntegerComparison staffN(STAFF, m_n);
+    Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&staffN));
+    if (!staff) return FUNCTOR_SIBLINGS;
+
+    m_objectsToDelete.insert(staff->GetID());
+
+    Doc *doc = vrv_cast<Doc *>(staff->GetFirstAncestor(DOC));
+    assert(doc);
+    SetOfConstObjects visited;
+    doc->CollectReferringObjects(staff, m_objectsToDelete, visited);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode DeleteStaffFunctor::VisitScoreDef(ScoreDef *scoreDef)
+{
+    if (!m_scoreDefProcessed) return FUNCTOR_SIBLINGS;
+
+    this->DeleteStaffDef(scoreDef);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+void DeleteStaffFunctor::DeleteStaffDef(ScoreDef *scoreDef)
+{
+    StaffDef *staffDef = scoreDef->GetStaffDef(m_n);
+    if (!staffDef) return;
+
+    Object *parent = staffDef->GetParent();
+    assert(parent);
+    if (parent->Is(STAFFGRP) && (parent->GetDescendantCount(STAFFDEF) == 1)) {
+        Object *grandParent = parent->GetParent();
+        assert(grandParent);
+        grandParent->DeleteChild(parent);
+    }
+    else {
+        parent->DeleteChild(staffDef);
+    }
 }
 
 //----------------------------------------------------------------------------

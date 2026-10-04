@@ -57,6 +57,47 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// DeleteStaffFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This deletes a staff and its corresponding staffDef.
+ */
+class DeleteStaffFunctor : public Functor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    DeleteStaffFunctor(int n);
+    virtual ~DeleteStaffFunctor();
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
+    ///@}
+
+    const std::set<std::string> &GetObjectsToDelete() const { return m_objectsToDelete; }
+
+protected:
+    //
+private:
+    void DeleteStaffDef(ScoreDef *scoreDef);
+
+public:
+    //
+private:
+    int m_n;
+    bool m_scoreDefProcessed;
+    std::set<std::string> m_objectsToDelete;
+};
+
+//----------------------------------------------------------------------------
 // MoveStaffFunctor
 //----------------------------------------------------------------------------
 

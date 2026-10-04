@@ -603,8 +603,8 @@ bool EditorToolkitShared::ParseUpdateScoreDefinitionAction(const jsonxx::Object 
     else if (updateStr == "moveDown") {
         update = MOVE_DOWN;
     }
-    else if (updateStr == "delete") {
-        update = DELETE;
+    else if (updateStr == "deleteStaff") {
+        update = DELETE_STAFF;
     }
     else if (updateStr == "addStaffGrp") {
         update = ADD_STAFFGRP;
@@ -1947,6 +1947,24 @@ bool EditorToolkitShared::UpdateScoreDefinition(
         m_doc->Process(moveStaffFunctor);
         ReorderStaffNFunctor reorderStaffNFunctor;
         m_doc->Process(reorderStaffNFunctor);
+    }
+    else if (update == DELETE_STAFF) {
+        Object *element = this->ResolveElement(elementId);
+        if (!element || !element->Is(STAFF)) {
+            LogError("A staff must be selected");
+            return false;
+        }
+        Staff *staff = vrv_cast<Staff *>(element);
+        assert(staff);
+        DeleteStaffFunctor deleteStaffFunctor(staff->GetN());
+        m_doc->Process(deleteStaffFunctor);
+        for (const std::string &id : deleteStaffFunctor.GetObjectsToDelete()) {
+            Object *object = m_doc->FindDescendantByID(id);
+            if (object && object->GetParent()) object->GetParent()->DeleteChild(object);
+        }
+        ReorderStaffNFunctor reorderStaffNFunctor;
+        m_doc->Process(reorderStaffNFunctor);
+        this->ResetSelect();
     }
 
     this->ClearContext();
