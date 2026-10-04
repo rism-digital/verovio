@@ -1554,7 +1554,7 @@ int PAEInput::getClefInfo(const char *incipit, Clef *mclef, int index)
         mclef->SetDisPlace(STAFFREL_basic_below);
     }
     else {
-        LogDebug("Plaine & Easie import: undefined clef %c", clef);
+        LogDebug("Plaine & Easie import: undefined clef {}", clef);
     }
 
     // measure->clef = mclef;
@@ -2496,7 +2496,7 @@ void PAEInput::ClearTokenObjects()
     // Normally, they should be none because they are passed to the doc.
     for (pae::Token &token : m_pae) {
         if (!token.m_object || token.IsContainerEnd()) continue;
-        LogDebug("Delete token %s", token.m_object->GetClassName().c_str());
+        LogDebug("Delete token {}", token.m_object->GetClassName());
         delete token.m_object;
         token.m_object = NULL;
     }
@@ -2515,7 +2515,7 @@ jsonxx::Object PAEInput::GetValidationLog()
     if (!m_clefLog.empty()) log << "clef" << m_clefLog;
     if (!m_timesigLog.empty()) log << "timesig" << m_timesigLog;
     if (!m_dataLog.empty()) log << "data" << m_dataLog;
-    // LogDebug("%s", log.json().c_str());
+    // LogDebug("{}", log.json());
     return log;
 }
 
@@ -2560,7 +2560,7 @@ void PAEInput::LogPAE(int errCode, pae::Token &token, std::string value)
         default: m_dataLog << logEntry;
     }
 
-    // LogDebug("%s", m_validationLog.json().c_str());
+    // LogDebug("{}", m_validationLog.json());
 
     m_hasErrors = true;
     token.m_isError = true;
@@ -2592,7 +2592,7 @@ void PAEInput::LogDebugTokens(bool vertical)
             char c2 = (token.m_inputChar) ? token.m_inputChar : ' ';
             std::string className = (token.m_object) ? token.m_object->GetClassName() : "";
             if (token.m_isError) className += " <";
-            LogDebug(" %c | %c | %s", c1, c2, className.c_str());
+            LogDebug(" {} | {} | {}", c1, c2, className);
         }
     }
     else {
@@ -2601,22 +2601,21 @@ void PAEInput::LogDebugTokens(bool vertical)
             char c = (token.m_inputChar) ? token.m_inputChar : ' ';
             row.push_back(c);
         }
-        row = std::regex_replace(row, std::regex("%"), "%%");
-        LogDebug(row.c_str());
+        LogDebug("{}", row);
         if (m_hasErrors) {
             row.clear();
             for (pae::Token &token : m_pae) {
                 char c = (token.m_isError) ? '^' : ' ';
                 row.push_back(c);
             }
-            LogDebug(row.c_str());
+            LogDebug("{}", row);
         }
         row.clear();
         for (pae::Token &token : m_pae) {
             std::string className = (token.m_object) ? token.m_object->GetClassName() : " ";
             row.push_back(className.at(0));
         }
-        LogDebug(row.c_str());
+        LogDebug("{}", row);
         row.clear();
         for (pae::Token &token : m_pae) {
             char c = (token.m_char) ? token.m_char : ' ';
@@ -2701,7 +2700,7 @@ jsonxx::Object PAEInput::InputKeysToJson(const std::string &inputKeys)
             jsonInput << "data" << line.substr(line.find(":") + 1);
         }
     }
-    // LogDebug("%s", jsonInput.json().c_str());
+    // LogDebug("{}", jsonInput.json());
 
     return jsonInput;
 }
@@ -3060,7 +3059,7 @@ bool PAEInput::Parse()
 
         // No object to add to the doc - we whould also have no char left
         if (!token.m_object) {
-            if (token.m_char != 0) LogDebug("Remaining unprocessed char '%c'", token.m_char);
+            if (token.m_char != 0) LogDebug("Remaining unprocessed char '{}'", token.m_char);
             continue;
         }
 
@@ -3208,7 +3207,7 @@ bool PAEInput::ConvertKeySig()
                 token.m_char = 0;
             }
             keySigToken->m_char = 0;
-            // LogDebug("Keysig %s", paeStr.c_str());
+            // LogDebug("Keysig {}", paeStr);
             KeySig *keySig = new KeySig();
             keySigToken->m_object = keySig;
             // Will fail in pedantic mode
@@ -3340,7 +3339,7 @@ bool PAEInput::ConvertClef()
                 token.m_char = 0;
             }
             clefToken->m_char = 0;
-            // LogDebug("Clef %s", paeStr.c_str());
+            // LogDebug("Clef {}", paeStr);
             Clef *clef = new Clef();
             clefToken->m_object = clef;
             // Will fail in pedantic mode
@@ -3378,7 +3377,7 @@ bool PAEInput::ConvertMeterSigOrMensur()
                 token.m_char = 0;
             }
             meterSigOrMensurToken->m_char = 0;
-            // LogDebug("MeterSig %s", paeStr.c_str());
+            // LogDebug("MeterSig {}", paeStr);
             if (m_isMensural) {
                 Mensur *mensur = new Mensur();
                 meterSigOrMensurToken->m_object = mensur;
@@ -4780,7 +4779,7 @@ void PAEInput::RemoveContainerToken(Object *object)
         if (token.m_object == object) {
             if (!token.IsContainerEnd()) {
                 // Make sure we delete it only once - even though it should never be there more than once
-                LogDebug("Deleting %s", object->GetClassName().c_str());
+                LogDebug("Deleting {}", object->GetClassName());
                 if (!deleted) delete token.m_object;
                 deleted = true;
             }

@@ -1900,7 +1900,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     }
 
     // Normally the stack should be empty
-    // LogDebug("Measure %s", node.attribute("number").as_string());
+    // LogDebug("Measure {}", node.attribute("number").as_string());
     // assert(m_elementStack.empty());
     m_elementStackMap.erase(m_elementStackMap.begin(), m_elementStackMap.end());
 
@@ -4287,7 +4287,7 @@ bool MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
             std::string measureName = (currentMeasure.node().attribute("id"))
                 ? currentMeasure.node().attribute("id").as_string()
                 : currentMeasure.node().attribute("number").as_string();
-            LogDebug("MusicXML import: Beam without end in measure %s treated as <beamSpan>", measureName.c_str());
+            LogDebug("MusicXML import: Beam without end in measure {} treated as <beamSpan>", measureName);
             return false;
         }
         // form vector of the beam nodes and find whether there are tuplets that start or end within the beam

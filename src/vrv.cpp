@@ -86,55 +86,6 @@ void LogElapsedTimeStop(const char *msg)
     LogInfo("Elapsed time (%s): %.3fs", msg, elapsedTime / 1000);
 }
 
-void LogDebug(const char *fmt, ...)
-{
-    if (logLevel < LOG_DEBUG) return;
-
-#if defined(DEBUG)
-    std::string s;
-    va_list args;
-    va_start(args, fmt);
-    s = "[Debug] " + StringFormatVariable(fmt, args) + "\n";
-    LogString(s, LOG_DEBUG);
-    va_end(args);
-#endif
-}
-
-void LogError(const char *fmt, ...)
-{
-    if (logLevel < LOG_ERROR) return;
-
-    std::string s;
-    va_list args;
-    va_start(args, fmt);
-    s = "[Error] " + StringFormatVariable(fmt, args) + "\n";
-    LogString(s, LOG_ERROR);
-    va_end(args);
-}
-
-void LogInfo(const char *fmt, ...)
-{
-    if (logLevel < LOG_INFO) return;
-
-    std::string s;
-    va_list args;
-    va_start(args, fmt);
-    s = "[Info] " + StringFormatVariable(fmt, args) + "\n";
-    LogString(s, LOG_INFO);
-    va_end(args);
-}
-
-void LogWarning(const char *fmt, ...)
-{
-    if (logLevel < LOG_WARNING) return;
-
-    std::string s;
-    va_list args;
-    va_start(args, fmt);
-    s = "[Warning] " + StringFormatVariable(fmt, args) + "\n";
-    LogString(s, LOG_WARNING);
-    va_end(args);
-}
 
 void LogString(std::string message, LogLevel level)
 {
@@ -173,7 +124,7 @@ LogLevel StrToLogLevel(const std::string &level)
     if (level == "info") return LOG_INFO;
     if (level == "debug") return LOG_DEBUG;
 
-    LogWarning("Unkown log level '%s' (warning is default)", level.c_str());
+    LogWarning("Unkown log level '{}' (warning is default)", level.c_str());
     return LOG_WARNING;
 }
 
@@ -199,14 +150,6 @@ void EnableLogToBuffer(bool value)
 //----------------------------------------------------------------------------
 // Various helpers
 //----------------------------------------------------------------------------
-
-std::string StringFormatVariable(const char *format, va_list arg)
-{
-    std::string str(STRING_FORMAT_MAX_LEN, 0);
-    vsnprintf(&str[0], STRING_FORMAT_MAX_LEN, format, arg);
-    str.resize(strlen(str.data()));
-    return str;
-}
 
 bool ApproximatelyEqual(double firstVal, double secondVal)
 {

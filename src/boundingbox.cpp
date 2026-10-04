@@ -314,7 +314,7 @@ int BoundingBox::GetRectangles(const SMuFLGlyphAnchor &anchor, Point rect[2][2],
         }
     }
     if (!glyphRect) {
-        LogDebug("Illogical values for anchor points in glyph '%02x'", m_smuflGlyph);
+        LogDebug("Illogical values for anchor points in glyph '{:02x}'", static_cast<uint32_t>(m_smuflGlyph));
     }
 
     rect[0][0] = Point(this->GetSelfLeft(), this->GetSelfTop());
@@ -348,7 +348,7 @@ int BoundingBox::GetRectangles(const SMuFLGlyphAnchor &anchor1, const SMuFLGlyph
         }
     }
     if (!glyphRect) {
-        LogDebug("Illogical values for anchor points in glyph '%02x'", m_smuflGlyph);
+        LogDebug("Illogical values for anchor points in glyph '{:02x}'", static_cast<uint32_t>(m_smuflGlyph));
     }
 
     rect[0][0] = Point(this->GetSelfLeft(), this->GetSelfTop());

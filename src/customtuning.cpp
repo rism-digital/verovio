@@ -130,7 +130,7 @@ char32_t CustomTuning::GetGlyphCode(const std::string &glyphName, Doc *doc)
         CreateGlyphMapping(doc);
     }
     if (!s_glyphNames.count(glyphName)) {
-        LogDebug("Custom tuning: SMuFL glyph '%s' not found in glyph table", glyphName.c_str());
+        LogDebug("Custom tuning: SMuFL glyph '{}' not found in glyph table", glyphName);
         return 0;
     }
     return s_glyphNames.at(glyphName);
@@ -146,7 +146,7 @@ std::string CustomTuning::GetGlyphName(char32_t glyphCode, Doc *doc)
         CreateGlyphMapping(doc);
     }
     if (!s_glyphCodes.count(glyphCode)) {
-        LogError("Custom tuning: SMuFL glyph U+%04X not found in glyph table", glyphCode);
+        LogError("Custom tuning: SMuFL glyph U+{:04X} not found in glyph table", static_cast<uint32_t>(glyphCode));
         return "";
     }
     return s_glyphCodes.at(glyphCode);

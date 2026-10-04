@@ -1240,7 +1240,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
             std::vector<std::string> strValues;
             for (int i = 0; i < (int)values.size(); ++i) {
                 if (values.has<jsonxx::String>(i)) strValues.push_back(values.get<jsonxx::String>(i));
-                // LogDebug("String: %s", values.get<jsonxx::String>(i).c_str());
+                // LogDebug("String: {}", values.get<jsonxx::String>(i));
             }
             opt->SetValueArray(strValues);
         }

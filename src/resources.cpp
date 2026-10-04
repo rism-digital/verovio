@@ -461,7 +461,7 @@ bool Resources::InitTextFont(const std::string &fontName, const StyleAttributes 
 
             if (current.attribute("h-a-x")) glyph.SetHorizAdvX(current.attribute("h-a-x").as_float());
             if (currentTable.contains(code)) {
-                LogDebug("Redefining %d with %s", code, fontName.c_str());
+                LogDebug("Redefining {} with {}", static_cast<uint32_t>(code), fontName);
             }
             currentTable[code] = glyph;
         }

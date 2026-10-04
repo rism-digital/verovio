@@ -1538,7 +1538,7 @@ bool MEIOutput::AdjustLabel(Label *label)
 std::string MEIOutput::IDToMeiStr(Object *element)
 {
     std::string out = element->GetID();
-    // LogDebug("id: %s", out.c_str());
+    // LogDebug("id: {}", out);
     return out;
 }
 
@@ -3401,7 +3401,7 @@ void MEIOutput::WriteUnsupportedAttr(pugi::xml_node element, Object *object)
 {
     for (const auto &pair : object->m_unsupported) {
         if (element.attribute(pair.first.c_str())) {
-            LogDebug("Attribute '%s' for '%s' is not supported", pair.first.c_str(), object->GetClassName().c_str());
+            LogDebug("Attribute '{}' for '{}' is not supported", pair.first, object->GetClassName());
         }
         else {
             element.append_attribute(pair.first.c_str()) = pair.second.c_str();
@@ -4250,7 +4250,7 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
         }
     }
     else {
-        LogDebug("Unknown filter for '%s'", filterParent->GetClassName().c_str());
+        LogDebug("Unknown filter for '{}'", filterParent->GetClassName());
         return true;
     }
 }
