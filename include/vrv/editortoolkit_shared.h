@@ -53,7 +53,13 @@ protected:
 
     enum DeleteNavigation : int8_t { DELETE_NO_NAVIGATON = 0, DELETE_BACKSPACE, DELETE_FORWARD };
 
-    enum ScoreDefinitionLevel : int8_t { LEVEL_SCOREDEF = 0, LEVEL_STAFFGRP, LEVEL_STAFFDEF };
+    enum ScoreDefinitionLevel : int8_t {
+        LEVEL_SCOREDEF = 0,
+        LEVEL_STAFFGRP,
+        LEVEL_STAFFDEF,
+        LEVEL_METERSIG,
+        LEVEL_KEYSIG
+    };
 
     enum ScoreDefinitionUpdate : int8_t {
         UPDATE_SCOREDEF = 0,

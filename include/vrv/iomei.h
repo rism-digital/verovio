@@ -647,9 +647,13 @@ public:
     jsonxx::Object ExportScoreDef();
     jsonxx::Object ExportStaffGrp(const std::string &scoreDefId);
     jsonxx::Object ExportStaffDef(const std::string &scoreDefId, const std::string &staffId);
+    jsonxx::Object ExportMeterSig(const std::string &scoreDefId);
+    jsonxx::Object ExportKeySig(const std::string &scoreDefId);
 
 private:
     jsonxx::Object ToJson(const pugi::xml_document &doc);
+
+    ScoreDef *GetScoreDef(const std::string &scoreDefId);
 };
 
 //----------------------------------------------------------------------------
@@ -683,8 +687,11 @@ protected:
     bool ReadStaffGrpExt(Object *parent, pugi::xml_node staffGrp) { return this->ReadStaffGrp(parent, staffGrp); }
     bool ReadStaffDefExt(Object *parent, pugi::xml_node staffDef) { return this->ReadStaffDef(parent, staffDef); }
     bool ReadMeterSigExt(Object *parent, pugi::xml_node meterSig) { return this->ReadMeterSig(parent, meterSig); }
-    bool ReadMeterSigGrpExt(Object *parent, pugi::xml_node meterSigGrp) { return this->ReadMeterSig(parent, meterSigGrp); }
-    bool ReadKeySigExt(Object *parent, pugi::xml_node keySig) { return this->ReadMeterSig(parent, keySig); }
+    bool ReadMeterSigGrpExt(Object *parent, pugi::xml_node meterSigGrp)
+    {
+        return this->ReadMeterSigGrp(parent, meterSigGrp);
+    }
+    bool ReadKeySigExt(Object *parent, pugi::xml_node keySig) { return this->ReadKeySig(parent, keySig); }
     ///@}
 
 private:
@@ -1020,16 +1027,17 @@ private:
 
 public:
     //
+protected:
+    /**
+     * The version of the file being read
+     */
+    meiVersion_MEIVERSION m_meiversion;
+
 private:
     /**
      * The full filename of the file being read
      */
     std::string m_filename;
-
-    /**
-     * The version of the file being read
-     */
-    meiVersion_MEIVERSION m_meiversion;
 
     /**
      * A flag indicating wheather we are reading page-based or score-based MEI
@@ -1089,9 +1097,9 @@ public:
     void ImportStaffGrp(const jsonxx::Object &staffGrp);
 
     void ImportStaffDef(const jsonxx::Object &staffDef);
-    
+
     void ImportMeterSigOrGrpIntoLayer(Layer *layer, const jsonxx::Object &meterSig);
-    
+
     void ImportKeySigIntoLayer(Layer *layer, const jsonxx::Object &keySig);
 
 private:

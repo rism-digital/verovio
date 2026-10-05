@@ -40,6 +40,7 @@
 #include "score.h"
 #include "slur.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "surface.h"
 #include "symboldef.h"
 #include "system.h"
@@ -470,6 +471,12 @@ bool EditorToolkitShared::ParseScoreDefinitionAction(const jsonxx::Object &param
     else if (levelStr == "staffDef") {
         level = LEVEL_STAFFDEF;
     }
+    else if (levelStr == "meterSig") {
+        level = LEVEL_METERSIG;
+    }
+    else if (levelStr == "keySig") {
+        level = LEVEL_KEYSIG;
+    }
 
     return true;
 }
@@ -624,14 +631,19 @@ bool EditorToolkitShared::ParseUpdateScoreDefinitionAction(const jsonxx::Object 
 
     if (param.has<jsonxx::String>("elementId")) elementId = param.get<jsonxx::String>("elementId");
 
+    bool loadSubTree = false;
     switch (update) {
         case (UPDATE_SCOREDEF):
         case (UPDATE_STAFFGRP):
         case (UPDATE_STAFFDEF):
         case (UPDATE_METERSIG):
-        case (UPDATE_KEYSIG):
-            subTree = param.get<jsonxx::Object>("subTree"); break;
+        case (UPDATE_KEYSIG): loadSubTree = true;
         default: break;
+    }
+
+    if (loadSubTree) {
+        if (!param.has<jsonxx::Object>("subTree")) return false;
+        subTree = param.get<jsonxx::Object>("subTree");
     }
 
     return true;
@@ -1889,11 +1901,16 @@ bool EditorToolkitShared::ScoreDefinition(ScoreDefinitionLevel level)
     if (level == LEVEL_SCOREDEF) {
         m_editResponse = output.ExportScoreDef();
     }
-    else if (level == LEVEL_STAFFGRP) {
+    else if (level == LEVEL_STAFFGRP || level == LEVEL_KEYSIG || level == LEVEL_METERSIG) {
         std::string scoreDefId;
-        Object *selection = this->ResolveElement(m_selectionId);
+        const Object *selection = (m_selectionId.empty()) ? NULL : this->ResolveElement(m_selectionId);
         if (selection && selection->Is(SCOREDEF)) scoreDefId = m_selectionId;
-        m_editResponse = output.ExportStaffGrp(scoreDefId);
+        switch (level) {
+            case (LEVEL_STAFFGRP): m_editResponse = output.ExportStaffGrp(scoreDefId); break;
+            case (LEVEL_KEYSIG): m_editResponse = output.ExportKeySig(scoreDefId); break;
+            case (LEVEL_METERSIG): m_editResponse = output.ExportMeterSig(scoreDefId); break;
+            default: break;
+        }
     }
     else if (level == LEVEL_STAFFDEF) {
         std::string staffId;
@@ -1907,7 +1924,7 @@ bool EditorToolkitShared::ScoreDefinition(ScoreDefinitionLevel level)
         }
 
         if (staffId.empty()) {
-            LogError("A staff must be selected element must be a <staff>");
+            LogError("A staff must be selected");
             return false;
         }
         m_editResponse = output.ExportStaffDef(scoreDefId, staffId);
@@ -1919,6 +1936,20 @@ bool EditorToolkitShared::ScoreDefinition(ScoreDefinitionLevel level)
 bool EditorToolkitShared::UpdateScoreDefinition(
     const jsonxx::Object &subTree, std::string &elementId, std::string &secondaryId, ScoreDefinitionUpdate update)
 {
+    const bool checkStaffSelection = (update == INSERT_ABOVE) || (update == INSERT_BELOW) || (update == MOVE_UP)
+        || (update == MOVE_DOWN) || (update == DELETE_STAFF);
+
+    Staff *staff = NULL;
+    if (checkStaffSelection) {
+        Object *element = this->ResolveElement(elementId);
+        if (!element || !element->Is(STAFF)) {
+            LogError("A staff must be selected");
+            return false;
+        }
+        staff = vrv_cast<Staff *>(element);
+        assert(staff);
+    }
+
     MEIInputExtended input(m_doc);
     if (update == UPDATE_SCOREDEF) {
         input.ImportScoreDef(subTree);
@@ -1929,22 +1960,39 @@ bool EditorToolkitShared::UpdateScoreDefinition(
     else if (update == UPDATE_STAFFDEF) {
         input.ImportStaffDef(subTree);
     }
-    else if (update == UPDATE_METERSIG) {
-        Layer layer;
-        input.ImportMeterSigOrGrpIntoLayer(&layer, subTree);
-    }
-    else if (update == UPDATE_KEYSIG) {
-        Layer layer;
-        input.ImportKeySigIntoLayer(&layer, subTree);
+    else if (update == UPDATE_METERSIG || update == UPDATE_KEYSIG) {
+        ScoreDef *scoreDef = NULL;
+        if (!elementId.empty()) {
+            Object *element = this->ResolveElement(elementId);
+            if (!element || !element->Is(SCOREDEF)) {
+                LogError("A scoreDef must be selected");
+                return false;
+            }
+            scoreDef = vrv_cast<ScoreDef *>(element);
+        }
+        else {
+            Score *score = m_doc->GetFirstVisibleScore();
+            assert(score);
+            scoreDef = score->GetScoreDef();
+        }
+        if (!scoreDef) return false;
+
+        if (update == UPDATE_METERSIG) {
+            Layer layer;
+            input.ImportMeterSigOrGrpIntoLayer(&layer, subTree);
+            LayerElement *meterSig = (layer.GetChildCount() > 0) ? vrv_cast<LayerElement *>(layer.GetFirst()) : NULL;
+            // Passing NULL will remove it
+            scoreDef->UpdateMeterSig(meterSig);
+        }
+        else {
+            Layer layer;
+            input.ImportKeySigIntoLayer(&layer, subTree);
+            KeySig *keySig = (layer.GetChildCount() > 0) ? vrv_cast<KeySig *>(layer.GetFirst()) : NULL;
+            // Passing NULL will remove it
+            scoreDef->UpdateKeySig(keySig);
+        }
     }
     else if (update == INSERT_ABOVE || update == INSERT_BELOW) {
-        Object *element = this->ResolveElement(elementId);
-        if (!element || !element->Is(STAFF)) {
-            LogError("A staff must be selected");
-            return false;
-        }
-        Staff *staff = vrv_cast<Staff *>(element);
-        assert(staff);
         StaffInsert staffInsert = (update == INSERT_ABOVE) ? StaffInsert::INSERT_ABOVE : StaffInsert::INSERT_BELOW;
         AddStaffFunctor addStaffFunctor(staff->GetN(), staffInsert);
         m_doc->Process(addStaffFunctor);
@@ -1952,13 +2000,6 @@ bool EditorToolkitShared::UpdateScoreDefinition(
         m_doc->Process(reorderStaffNFunctor);
     }
     else if (update == MOVE_UP || update == MOVE_DOWN) {
-        Object *element = this->ResolveElement(elementId);
-        if (!element || !element->Is(STAFF)) {
-            LogError("A staff must be selected");
-            return false;
-        }
-        Staff *staff = vrv_cast<Staff *>(element);
-        assert(staff);
         StaffMove staffMove = (update == MOVE_UP) ? StaffMove::MOVE_UP : StaffMove::MOVE_DOWN;
         MoveStaffFunctor moveStaffFunctor(staff->GetN(), staffMove);
         m_doc->Process(moveStaffFunctor);
@@ -1966,13 +2007,6 @@ bool EditorToolkitShared::UpdateScoreDefinition(
         m_doc->Process(reorderStaffNFunctor);
     }
     else if (update == DELETE_STAFF) {
-        Object *element = this->ResolveElement(elementId);
-        if (!element || !element->Is(STAFF)) {
-            LogError("A staff must be selected");
-            return false;
-        }
-        Staff *staff = vrv_cast<Staff *>(element);
-        assert(staff);
         DeleteStaffFunctor deleteStaffFunctor(staff->GetN());
         m_doc->Process(deleteStaffFunctor);
         for (const std::string &id : deleteStaffFunctor.GetObjectsToDelete()) {
