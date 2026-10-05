@@ -29347,14 +29347,14 @@ int HumdrumInput::getNoteStaff(hum::HTp token, int homestaff)
 {
     hum::HumRegex hre;
     if (!m_signifiers.above.empty()) {
-        std::string sstring = "[a-g]+[-#n]*";
+        std::string sstring = "[A-Ga-g]+[-#n]*";
         sstring += m_signifiers.above;
         if (hre.search(token, sstring)) {
             return homestaff - 1;
         }
     }
     if (!m_signifiers.below.empty()) {
-        std::string sstring = "[a-g]+[-#n]*";
+        std::string sstring = "[A-Ga-g]+[-#n]*";
         sstring += m_signifiers.below;
         if (hre.search(token, sstring)) {
             return homestaff + 1;
