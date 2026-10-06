@@ -286,7 +286,7 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitScoreDef(ScoreDef *scoreDef)
     }
     return FUNCTOR_CONTINUE;
 }
-    
+
 FunctorCode ScoreDefSetCurrentFunctor::VisitScoreDefEnd(ScoreDef *scoreDef)
 {
     if (scoreDef->IsSectionRestart()) {
