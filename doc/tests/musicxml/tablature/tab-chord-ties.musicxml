@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="4.0">
+  <part-list>
+    <score-part id="P1"><part-name>Guitar TAB</part-name></score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <time><beats>2</beats><beat-type>4</beat-type></time>
+        <clef><sign>TAB</sign></clef>
+        <staff-details><staff-lines>6</staff-lines></staff-details>
+      </attributes>
+      <note>
+        <pitch><step>B</step><octave>2</octave></pitch>
+        <duration>1</duration><tie type="start"/>
+        <voice>1</voice><type>quarter</type><stem>none</stem>
+        <notations>
+          <tied type="start"/>
+          <technical><string>5</string><fret>2</fret></technical>
+        </notations>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>F</step><alter>1</alter><octave>4</octave></pitch>
+        <duration>1</duration><tie type="start"/>
+        <voice>1</voice><type>quarter</type><stem>none</stem>
+        <notations>
+          <tied type="start"/>
+          <technical><string>1</string><fret>2</fret></technical>
+        </notations>
+      </note>
+      <note>
+        <pitch><step>B</step><octave>2</octave></pitch>
+        <duration>1</duration><tie type="stop"/>
+        <voice>1</voice><type>quarter</type><stem>none</stem>
+        <notations>
+          <tied type="stop"/>
+          <technical><string>5</string><fret>2</fret></technical>
+        </notations>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>F</step><alter>1</alter><octave>4</octave></pitch>
+        <duration>1</duration><tie type="stop"/>
+        <voice>1</voice><type>quarter</type><stem>none</stem>
+        <notations>
+          <tied type="stop"/>
+          <technical><string>1</string><fret>2</fret></technical>
+        </notations>
+      </note>
+    </measure>
+  </part>
+</score-partwise>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="4.0">
+  <part-list>
+    <score-part id="P1"><part-name>Guitar</part-name></score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>3</divisions>
+        <time><beats>1</beats><beat-type>4</beat-type></time>
+        <staves>2</staves>
+        <clef number="1"><sign>G</sign><line>2</line><clef-octave-change>-1</clef-octave-change></clef>
+        <clef number="2"><sign>TAB</sign></clef>
+        <staff-details number="2"><staff-type>alternate</staff-type><staff-lines>6</staff-lines></staff-details>
+      </attributes>
+      <note>
+        <pitch><step>B</step><octave>4</octave></pitch>
+        <duration>1</duration><voice>1</voice><type>eighth</type>
+        <time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes><normal-type>eighth</normal-type></time-modification>
+        <stem>up</stem><staff>1</staff><beam number="1">begin</beam>
+        <notations><tuplet type="start" bracket="no"/></notations>
+      </note>
+      <note>
+        <pitch><step>B</step><octave>3</octave></pitch>
+        <duration>1</duration><voice>1</voice><type>eighth</type>
+        <time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes><normal-type>eighth</normal-type></time-modification>
+        <stem>up</stem><staff>1</staff><beam number="1">continue</beam>
+      </note>
+      <note>
+        <pitch><step>G</step><octave>3</octave></pitch>
+        <duration>1</duration><voice>1</voice><type>eighth</type>
+        <time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes><normal-type>eighth</normal-type></time-modification>
+        <stem>up</stem><staff>1</staff><beam number="1">end</beam>
+        <notations><tuplet type="stop"/></notations>
+      </note>
+      <backup><duration>3</duration></backup>
+      <note>
+        <pitch><step>B</step><octave>4</octave></pitch>
+        <duration>1</duration><voice>2</voice><type>eighth</type>
+        <time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes><normal-type>eighth</normal-type></time-modification>
+        <stem>none</stem><staff>2</staff>
+        <notations><technical><string>1</string><fret>7</fret></technical><tuplet type="start" bracket="no"/></notations>
+      </note>
+      <note>
+        <pitch><step>B</step><octave>3</octave></pitch>
+        <duration>1</duration><voice>2</voice><type>eighth</type>
+        <time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes><normal-type>eighth</normal-type></time-modification>
+        <stem>none</stem><staff>2</staff>
+        <notations><technical><string>2</string><fret>0</fret></technical></notations>
+      </note>
+      <note>
+        <pitch><step>G</step><octave>3</octave></pitch>
+        <duration>1</duration><voice>2</voice><type>eighth</type>
+        <time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes><normal-type>eighth</normal-type></time-modification>
+        <stem>none</stem><staff>2</staff>
+        <notations><technical><string>3</string><fret>0</fret></technical><tuplet type="stop"/></notations>
+      </note>
+    </measure>
+  </part>
+</score-partwise>
