@@ -6701,7 +6701,7 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         this->NormalizeAttributes(xmlElement);
 
         elementName = std::string(xmlElement.name());
-        // LogDebug("ReadLayerChildren: element <%s>", xmlElement.name());
+        // LogDebug("ReadLayerChildren: element <{}>", xmlElement.name());
         if (!this->IsAllowed(elementName, filter)) {
             LogWarning("Element <%s> within <%s> is not supported and will be ignored ", xmlElement.name(),
                 filter->GetClassName().c_str());
@@ -8841,7 +8841,7 @@ bool MEIInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
 
     int startIdx = startChild->GetIdx();
     int endIdx = endChild->GetIdx();
-    // LogDebug("%d %d %s!", startIdx, endIdx, start->GetID().c_str());
+    // LogDebug("{} {} {}!", startIdx, endIdx, start->GetID());
     for (int i = endIdx; i >= startIdx; --i) {
         LayerElement *element = dynamic_cast<LayerElement *>(parentLayer->DetachChild(i));
         if (element) tuplet->InsertChild(element, 0);
@@ -9282,7 +9282,7 @@ void MEIInput::UpgradePageTo_3_0_0(Page *page, Doc *doc)
     // use m_unit instead of DEFAULT_UNIT - For the upgraded call Page->SetPPU(12.5);
 
     page->m_PPUFactor = (25.0 / 2.0 / doc->GetOptions()->m_unit.GetDefault());
-    // LogDebug("PPUFactor: %f", m_PPUFactor);
+    // LogDebug("PPUFactor: {}", m_PPUFactor);
 }
 
 bool MEIInput::ReadGraphic(Object *parent, pugi::xml_node graphic)

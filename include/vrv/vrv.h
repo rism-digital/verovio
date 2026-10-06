@@ -28,6 +28,23 @@
 #include "toolkitdef.h"
 #include "vrvdef.h"
 
+
+/**
+ * A formatter for all enums types.
+ * Simply format the enum as its numerical value, but with C++26, it will be
+ * possible to use reflection to format as the enum name.
+ */
+template <typename E>
+requires std::is_enum_v<E>
+struct std::formatter<E> : std::formatter<std::string> {
+    template<class FormatContext>
+	constexpr auto format (const E& e, FormatContext& ctx) const
+	{
+		return std::formatter<std::string>::format(std::to_string(e), ctx);
+	}
+};
+
+
 namespace vrv {
 
 class Object;

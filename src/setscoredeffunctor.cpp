@@ -435,7 +435,7 @@ FunctorCode ScoreDefOptimizeFunctor::VisitStaff(Staff *staff)
     StaffDef *staffDef = m_currentScoreDef->GetStaffDef(staff->GetN());
 
     if (!staffDef) {
-        LogDebug("Could not find staffDef for staff (%d) when optimizing scoreDef", staff->GetN());
+        LogDebug("Could not find staffDef for staff ({}) when optimizing scoreDef", staff->GetN());
         return FUNCTOR_SIBLINGS;
     }
 

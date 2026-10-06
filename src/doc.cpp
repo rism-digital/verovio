@@ -621,7 +621,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             generateMIDI.SetInstrDef(instrDef);
             generateMIDI.SetCustomTuning(&scoreDef->GetCustomTuning());
 
-            // LogDebug("Exporting track %d ----------------", midiTrack);
+            // LogDebug("Exporting track {} ----------------", midiTrack);
             this->Process(generateMIDI);
 
             tempoEventTicks = generateMIDI.GetTempoEventTicks();
@@ -1185,7 +1185,7 @@ void Doc::UnCastOffDoc(bool resetCache)
 
     pages->AddChild(unCastOffPage);
 
-    // LogDebug("ContinuousLayout: %d pages", this->GetChildCount());
+    // LogDebug("ContinuousLayout: {} pages", this->GetChildCount());
 
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!

@@ -51,7 +51,7 @@ FunctorCode CalcAlignmentXPosFunctor::VisitAlignment(Alignment *alignment)
     if (intervalTime > 0) {
         intervalXRel = Alignment::HorizontalSpaceForDuration(intervalTime, m_longestActualDur,
             m_doc->GetOptions()->m_spacingLinear.GetValue(), m_doc->GetOptions()->m_spacingNonLinear.GetValue());
-        // LogDebug("CalcAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
+        // LogDebug("CalcAlignmentXPos: intervalTime={:.2} intervalXRel={}", intervalTime.ToDouble(), intervalXRel);
     }
 
     const MapOfIntGraceAligners &graceAligners = alignment->GetGraceAligners();

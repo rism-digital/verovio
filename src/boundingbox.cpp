@@ -44,7 +44,7 @@ BoundingBox::BoundingBox()
 
 void BoundingBox::UpdateContentBBoxX(int x1, int x2)
 {
-    // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
+    // LogDebug("CB Was: {} {} {} {}", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
 
     int minX = std::min(x1, x2);
     int maxX = std::max(x1, x2);
@@ -57,13 +57,13 @@ void BoundingBox::UpdateContentBBoxX(int x1, int x2)
     if (m_contentBB_x1 > minX) m_contentBB_x1 = minX;
     if (m_contentBB_x2 < maxX) m_contentBB_x2 = maxX;
 
-    // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
-    // this->GetClassName().c_str());
+    // LogDebug("CB Is:  {} {} {} {} {}", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
+    // this->GetClassName());
 }
 
 void BoundingBox::UpdateContentBBoxY(int y1, int y2)
 {
-    // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
+    // LogDebug("CB Was: {} {} {} {}", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
 
     int min_y = std::min(y1, y2);
     int max_y = std::max(y1, y2);
@@ -76,13 +76,13 @@ void BoundingBox::UpdateContentBBoxY(int y1, int y2)
     if (m_contentBB_y1 > min_y) m_contentBB_y1 = min_y;
     if (m_contentBB_y2 < max_y) m_contentBB_y2 = max_y;
 
-    // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
-    // this->GetClassName().c_str());
+    // LogDebug("CB Is:  {} {} {} {} {}", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
+    // this->GetClassName());
 }
 
 void BoundingBox::UpdateSelfBBoxX(int x1, int x2)
 {
-    // LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
+    // LogDebug("SB Was: {} {} {} {}", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
 
     int minX = std::min(x1, x2);
     int maxX = std::max(x1, x2);
@@ -95,12 +95,12 @@ void BoundingBox::UpdateSelfBBoxX(int x1, int x2)
     if (m_selfBB_x1 > minX) m_selfBB_x1 = minX;
     if (m_selfBB_x2 < maxX) m_selfBB_x2 = maxX;
 
-    // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
+    // LogDebug("SB Is:  {} {} {} {}", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
 }
 
 void BoundingBox::UpdateSelfBBoxY(int y1, int y2)
 {
-    // LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
+    // LogDebug("SB Was: {} {} {} {}", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
 
     int min_y = std::min(y1, y2);
     int max_y = std::max(y1, y2);
@@ -113,7 +113,7 @@ void BoundingBox::UpdateSelfBBoxY(int y1, int y2)
     if (m_selfBB_y1 > min_y) m_selfBB_y1 = min_y;
     if (m_selfBB_y2 < max_y) m_selfBB_y2 = max_y;
 
-    // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
+    // LogDebug("SB Is:  {} {} {} {}", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
 }
 
 void BoundingBox::ResetBoundingBox()
@@ -688,7 +688,7 @@ int BoundingBox::Intersects(const FloatingCurvePositioner *curve, Accessor type,
     }
     // The curve overflows on the left
     else if ((p1.x < this->GetLeftBy(type)) && p2.x <= this->GetRightBy(type)) {
-        // LogDebug("left T-L %d %d ; B-R %d %d", this->GetTopBy(type), this->GetLeftBy(type),
+        // LogDebug("left T-L {} {} ; B-R {} {}", this->GetTopBy(type), this->GetLeftBy(type),
         // this->GetBottom(), this->GetRight());
         if (curve->GetDir() == curvature_CURVEDIR_above) {
             int xMaxY = curve->CalcMinMaxY(topBezier);
@@ -699,7 +699,7 @@ int BoundingBox::Intersects(const FloatingCurvePositioner *curve, Accessor type,
                 return (curve->GetTopBy(type) - this->GetBottomBy(type) + margin);
             // Calcultate the Y position of the curve one the left
             int leftY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetLeftBy(type)) + margin;
-            // LogDebug("leftY %d, %d, %d", leftY, this->GetBottomBy(type), this->GetTopBy(type));
+            // LogDebug("leftY {}, {}, {}", leftY, this->GetBottomBy(type), this->GetTopBy(type));
             // The content left is below the bottom
             if (leftY < this->GetBottomBy(type)) return 0;
             // Else return the shift needed
@@ -714,7 +714,7 @@ int BoundingBox::Intersects(const FloatingCurvePositioner *curve, Accessor type,
                 return (curve->GetBottomBy(type) - this->GetTopBy(type) - margin);
             // Calcultate the Y position of the curve one the left
             int leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetLeftBy(type)) - margin;
-            // LogDebug("leftY %d, %d, %d", leftY, this->GetBottomBy(type), this->GetTopBy(type));
+            // LogDebug("leftY {}, {}, {}", leftY, this->GetBottomBy(type), this->GetTopBy(type));
             // The content left is above the top
             if (leftY > this->GetTopBy(type)) return 0;
             // Else return the shift needed
@@ -723,7 +723,7 @@ int BoundingBox::Intersects(const FloatingCurvePositioner *curve, Accessor type,
     }
     // The curve overflows on the right
     else if ((p1.x >= this->GetLeftBy(type)) && p2.x > this->GetRightBy(type)) {
-        // LogDebug("right T-L %d %d ; B-R %d %d", this->GetTopBy(type), this->GetLeftBy(type),
+        // LogDebug("right T-L {} {} ; B-R {} {}", this->GetTopBy(type), this->GetLeftBy(type),
         // this->GetBottomBy(type), this->GetRightBy(type));
         if (curve->GetDir() == curvature_CURVEDIR_above) {
             int xMaxY = curve->CalcMinMaxY(topBezier);
@@ -734,7 +734,7 @@ int BoundingBox::Intersects(const FloatingCurvePositioner *curve, Accessor type,
                 return (curve->GetTopBy(type) - this->GetBottomBy(type) + margin);
             // Calcultate the Y position of the curve one the right
             int rightY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetRightBy(type)) + margin;
-            // LogDebug("rightY %d, %d, %d", rightY, this->GetBottomBy(type), this->GetTopBy(type));
+            // LogDebug("rightY {}, {}, {}", rightY, this->GetBottomBy(type), this->GetTopBy(type));
             // The content right is below the bottom
             if (rightY < this->GetBottomBy(type)) return 0;
             // Return the shift needed
@@ -749,7 +749,7 @@ int BoundingBox::Intersects(const FloatingCurvePositioner *curve, Accessor type,
                 return (curve->GetBottomBy(type) - this->GetTopBy(type) - margin);
             // Calcultate the Y position of the curve one the right
             int rightY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetRightBy(type)) - margin;
-            // LogDebug("rightY %d, %d, %d", rightY, this->GetBottomBy(type), this->GetTopBy(type));
+            // LogDebug("rightY {}, {}, {}", rightY, this->GetBottomBy(type), this->GetTopBy(type));
             // The content right is above the top
             if (rightY > this->GetTopBy(type)) return 0;
             // Return the shift needed

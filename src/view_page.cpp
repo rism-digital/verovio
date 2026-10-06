@@ -311,7 +311,7 @@ void View::DrawStaffGrp(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 
     if (!first || !last) {
         LogDebug(
-            "Could not get staff (%d; %d) while drawing staffGrp - DrawStaffGrp", firstDef->GetN(), lastDef->GetN());
+            "Could not get staff ({}; {}) while drawing staffGrp - DrawStaffGrp", firstDef->GetN(), lastDef->GetN());
         return;
     }
 
@@ -414,7 +414,7 @@ void View::DrawGrpSym(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, i
     Staff *last = vrv_cast<Staff *>(measure->FindDescendantByComparison(&comparisonLast, 1));
 
     if (!first || !last) {
-        LogDebug("Could not get staff (%d; %d) while drawing staffGrp - DrawStaffGrp",
+        LogDebug("Could not get staff ({}; {}) while drawing staffGrp - DrawStaffGrp",
             groupSymbol->GetStartDef()->GetN(), groupSymbol->GetEndDef()->GetN());
         return;
     }
@@ -1782,7 +1782,7 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
             this->DrawMeasureEditorialElement(dc, dynamic_cast<EditorialElement *>(current), measure, system);
         }
         else {
-            LogDebug("Current is %s", current->GetClassName().c_str());
+            LogDebug("Current is {}", current->GetClassName());
             assert(false);
         }
     }

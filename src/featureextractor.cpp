@@ -167,7 +167,7 @@ void FeatureExtractor::ToJson(std::string &output)
     o << "intervalsIds" << m_intervalsIds;
 
     output = o.json();
-    LogDebug("%s", output.c_str());
+    LogDebug("{}", output);
 }
 
 } // namespace vrv

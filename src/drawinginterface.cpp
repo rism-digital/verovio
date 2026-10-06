@@ -461,7 +461,7 @@ bool BeamDrawingInterface::IsRepeatedPattern() const
             }
         }
         if (pattern) {
-            // LogDebug("Pattern found %d", divider);
+            // LogDebug("Pattern found {}", divider);
             return true;
         }
     }
