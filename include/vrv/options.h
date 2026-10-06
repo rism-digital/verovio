@@ -642,6 +642,7 @@ public:
     OptionBool m_condenseFirstPage;
     OptionBool m_condenseNotLastSystem;
     OptionBool m_condenseTempoPages;
+    OptionBool m_convertAttributes;
     OptionBool m_evenNoteSpacing;
     OptionIntMap m_footer;
     OptionIntMap m_header;
