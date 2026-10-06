@@ -543,6 +543,13 @@ SetCautionaryScoreDefFunctor::SetCautionaryScoreDefFunctor(ScoreDef *currentScor
 
 FunctorCode SetCautionaryScoreDefFunctor::VisitLayer(Layer *layer)
 {
+    if (m_restart) {
+        // Do not show cautionary clef
+        // We still show meterSig and meterSigGrp without checking if they are the same or not
+        // Possible flag to be added to MEI unless we want to start comparing meterSig
+        m_currentStaffDef->SetDrawClef(false);
+    }
+
     layer->SetDrawingCautionValues(m_currentStaffDef);
     return FUNCTOR_SIBLINGS;
 }
