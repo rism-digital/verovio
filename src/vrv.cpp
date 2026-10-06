@@ -83,7 +83,7 @@ void LogElapsedTimeStop(const char *msg)
     gettimeofday(&end, NULL);
     elapsedTime = (end.tv_sec - start.tv_sec) * 1000.0; // sec to ms
     elapsedTime += (end.tv_usec - start.tv_usec) / 1000.0; // us to ms
-    LogInfo("Elapsed time (%s): %.3fs", msg, elapsedTime / 1000);
+    LogInfo("Elapsed time ({}): {:.3f}s", msg, elapsedTime / 1000);
 }
 
 

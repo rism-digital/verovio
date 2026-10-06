@@ -2360,8 +2360,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 m_openDashesStack.push_back({ controlElement, openDashes });
             }
             else {
-                LogInfo("MusicXmlImport: dashes could not be matched to <dir> or <dynam> in measure %s.",
-                    measureNum.c_str());
+                LogInfo("MusicXmlImport: dashes could not be matched to <dir> or <dynam> in measure {}.",
+                    measureNum);
             }
         }
     }

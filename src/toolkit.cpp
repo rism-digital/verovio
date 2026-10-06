@@ -463,7 +463,7 @@ bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
     std::string filename = rootfile.attribute("full-path").value();
 
     if (!filename.empty()) {
-        LogInfo("Loading file '%s' in the archive", filename.c_str());
+        LogInfo("Loading file '{}' in the archive", filename);
         return this->LoadData(zipFileReader.ReadTextFile(filename), false);
     }
     else {
@@ -1225,15 +1225,15 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
 
         if (json.has<jsonxx::Number>(iter->first)) {
             opt->SetValueDbl(json.get<jsonxx::Number>(iter->first));
-            // LogInfo("Double: %f", json.get<jsonxx::Number>(iter->first));
+            // LogInfo("Double: {}", json.get<jsonxx::Number>(iter->first));
         }
         else if (json.has<jsonxx::Boolean>(iter->first)) {
             opt->SetValueBool(json.get<jsonxx::Boolean>(iter->first));
-            // LogInfo("Bool: %d", json.get<jsonxx::Boolean>(iter->first));
+            // LogInfo("Bool: {}", json.get<jsonxx::Boolean>(iter->first));
         }
         else if (json.has<jsonxx::String>(iter->first)) {
             opt->SetValue(json.get<jsonxx::String>(iter->first));
-            // LogInfo("String: %s", json.get<jsonxx::String>(iter->first).c_str());
+            // LogInfo("String: {}", json.get<jsonxx::String>(iter->first));
         }
         else if (json.has<jsonxx::Array>(iter->first)) {
             jsonxx::Array values = json.get<jsonxx::Array>(iter->first);
@@ -1500,7 +1500,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     // Fill the JSON object
     for (const auto &attribute : attributes) {
         o << attribute.first << attribute.second;
-        // LogInfo("Element %s - %s", attribute.first.c_str(), attribute.second.c_str());
+        // LogInfo("Element {} - {}", attribute.first, attribute.second);
     }
     return o.json();
 }
@@ -2439,10 +2439,10 @@ void Toolkit::LogRuntime() const
         const int minutes = seconds / 60.0;
         if (minutes > 0) {
             seconds -= 60.0 * minutes;
-            LogInfo("Total runtime is %d min %.3f s.", minutes, seconds);
+            LogInfo("Total runtime is {} min {:.3f} s.", minutes, seconds);
         }
         else {
-            LogInfo("Total runtime is %.3f s.", seconds);
+            LogInfo("Total runtime is {:.3f} s.", seconds);
         }
     }
     else {

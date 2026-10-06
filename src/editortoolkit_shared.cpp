@@ -170,7 +170,7 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         std::string elementName, elementId, insertMode;
         if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), elementName, elementId, insertMode)) {
             this->PrepareUndo();
-            // LogInfo("%s %s %s", elementName.c_str(), elementId.c_str(), insertMode.c_str());
+            // LogInfo("{} {} {}", elementName, elementId, insertMode);
             if (insertMode == "appendChild") {
                 return (this->AppendChild(elementId, elementName, false));
             }
@@ -190,7 +190,7 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         std::string elementName, startId, endId;
         if (this->ParseInsertControlAction(json.get<jsonxx::Object>("param"), elementName, startId, endId)) {
             this->PrepareUndo();
-            // LogInfo("%s %s %s", elementName.c_str(), elementId.c_str(), insertMode.c_str());
+            // LogInfo("{} {} {}", elementName, elementId, insertMode);
             return (this->InsertControl(elementName, startId, endId));
         }
         LogWarning("Could not parse the insertControl action");
@@ -772,7 +772,7 @@ void EditorToolkitShared::TrimUndoMemory()
         m_undoMemoryUsage -= m_undoStack.front().data.size();
         m_undoStack.pop_front();
     }
-    LogInfo("Undo stack size: %dMB", m_undoMemoryUsage / 1024 / 1024);
+    LogInfo("Undo stack size: {}MB", m_undoMemoryUsage / 1024 / 1024);
 }
 
 bool EditorToolkitShared::Chain(const jsonxx::Array &actions)
