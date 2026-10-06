@@ -1136,6 +1136,15 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 pugi::xml_node midiVolume = midiInstrument.child("volume");
                 if (midiVolume) m_instrdef->SetMidiVolume(midiVolume.text().as_int());
             }
+            // MIDI keys of unpitched notes, only for parts playing on the percussion channel 10
+            const pugi::xpath_node_set midiInstruments = xpathNode.node().select_nodes("midi-instrument");
+            const bool isPercussion = (midiInstrument.child("midi-channel").text().as_int() == 10);
+            for (const pugi::xpath_node &instrument : midiInstruments) {
+                const int key = instrument.node().child("midi-unpitched").text().as_int();
+                if (!isPercussion || (key < 1) || (key > 128)) continue;
+                m_unpitchedKeys[partId][instrument.node().attribute("id").as_string()] = key - 1;
+                if (midiInstruments.size() == 1) m_unpitchedKeys[partId][""] = key - 1;
+            }
             // create the staffDef(s)
             StaffGrp *partStaffGrp = new StaffGrp();
             partStaffGrp->SetID(partId.c_str());
@@ -1549,18 +1558,22 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
         m_instrdef = NULL;
     }
 
+    bool attributesRead = false;
     for (pugi::xml_node child : node) {
 
         // We read all attribute elements until we reach something else
         // barline, direction, print, and sound elements may be present
+        // Anything before the first attributes (e.g., a grace note) is skipped
         if (!IsElement(child, "attributes") && !IsElement(child, "barline") && !IsElement(child, "direction")
             && !IsElement(child, "print") && !IsElement(child, "sound")) {
-            break;
+            if (attributesRead) break;
+            continue;
         }
 
         // we do not want to read it again, just change the name
         if (IsElement(child, "attributes")) {
             child.set_name("mei-read");
+            attributesRead = true;
         }
         else {
             continue;
@@ -3003,11 +3016,16 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     const std::string noteID = node.attribute("id").as_string();
     int duration = node.child("duration").text().as_int();
+    const std::vector<LayerElement *> &stack = m_elementStackMap.at(layer);
+    // A chord note after a rest at the start of a measure has no chord (or tabGrp) to join
+    if (isChord && stack.empty()) {
+        LogWarning("MusicXML import: Chord note without a chord starting point is ignored");
+        return;
+    }
     // In chords, make sure a note does not extend first note's duration.
     // See https://github.com/rism-digital/verovio/issues/4225
-    if (isChord && duration && m_elementStackMap.at(layer).back()->Is(CHORD)) {
-        Chord *chord = vrv_cast<Chord *>(m_elementStackMap.at(layer).back());
-        if (chord) duration = std::min(duration, chord->GetDurPpq());
+    if (isChord && duration && stack.back()->Is(CHORD)) {
+        duration = std::min(duration, vrv_cast<Chord *>(stack.back())->GetDurPpq());
     }
     const int noteStaffNum = node.child("staff").text().as_int();
     // Staff the note is actually on (cross-staff aware), for control events anchored to this note
@@ -3231,6 +3249,10 @@ void MusicXmlInput::ReadMusicXmlNote(
             const int octaveNum = unpitched.child("display-octave").text().as_int();
             const int loc = note->CalcLoc(ConvertStepToPitchName(stepStr), octaveNum, -2);
             note->SetLoc(loc);
+            // MIDI key of the note's instrument, or of the only instrument of the part
+            const auto &keys = m_unpitchedKeys[node.parent().parent().attribute("id").as_string()];
+            const auto key = keys.find(node.child("instrument").attribute("id").as_string());
+            if (key != keys.end()) note->SetPnum(key->second);
         }
 
         // dynamics (MIDI velocity)
@@ -3264,7 +3286,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 tabGrp->SetDur(ConvertTypeToDur(typeStr));
                 tabGrp->SetDurPpq(duration);
                 if (dots > 0) tabGrp->SetDots(dots);
-                tabGrp->AddChild(new TabDurSym());
+                if (stemText != "none") tabGrp->AddChild(new TabDurSym());
                 this->AddLayerElement(layer, tabGrp, duration);
                 m_elementStackMap.at(layer).push_back(tabGrp);
                 element = tabGrp;
@@ -3309,6 +3331,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
             if (!chord) {
                 LogError("MusicXML import: Chord starting point has not been found");
+                delete note;
                 return;
             }
             // Mark a chord as cue=true if and only if all its child notes are cue.
@@ -3363,6 +3386,17 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
 
         // verse / syl
+        // In MusicXML, the last note of an extender is marked with <extend type="stop"/>. In MEI, an extender is ended
+        // by the presence of a syllable on the next note.
+        std::set<int> extenderStops;
+        if (!isChord && (element->Is(CHORD) || element->Is(NOTE))) {
+            const auto pending = m_pendingExtenderStops.find({ staff->GetN(), layer->GetN() });
+            if (pending != m_pendingExtenderStops.end()) {
+                extenderStops = pending->second;
+                m_pendingExtenderStops.erase(pending);
+            }
+        }
+
         for (pugi::xml_node lyric : node.children("lyric")) {
             pugi::xml_node extendStop;
             bool hasStartingExtend = false;
@@ -3377,16 +3411,13 @@ void MusicXmlInput::ReadMusicXmlNote(
             if (!lyric.child("text") && !extendStop) continue; // Dorico exports non-valid MusicXML
             short int lyricNumber = lyric.attribute("number").as_int();
             lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
+            if (extendStop) m_pendingExtenderStops[{ staff->GetN(), layer->GetN() }].insert(lyricNumber);
+            if (!lyric.child("text")) continue;
             Verse *verse = new Verse();
             verse->SetColor(lyric.attribute("color").as_string());
             // verse->SetPlace(verse->AttPlacementRelStaff::StrToStaffrelBasic(lyric.attribute("placement").as_string()));
             verse->SetLabel(lyric.attribute("name").as_string());
             verse->SetN(lyricNumber);
-            // MusicXML represents melisma endpoints as textless <lyric><extend type="stop"/></lyric>.
-            // Keep this as a schema-valid empty syl anchor so lyric preparation can close the previous extender here.
-            if (extendStop) {
-                verse->AddChild(new Syl());
-            }
             std::string syllabic = "single";
             for (pugi::xml_node childNode : lyric.children()) {
                 if (!strcmp(childNode.name(), "syllabic")) syllabic = GetContent(childNode);
@@ -3476,6 +3507,9 @@ void MusicXmlInput::ReadMusicXmlNote(
                     verse->AddChild(syl);
                 }
             }
+            if (extenderStops.erase(lyricNumber) && !verse->GetFirst(SYL)) {
+                verse->AddChild(new Syl());
+            }
             // TODO Tablature: <tabGrp> does not support child <verse>
             if (element->Is(CHORD) || element->Is(NOTE)) {
                 element->AddChild(verse);
@@ -3484,6 +3518,16 @@ void MusicXmlInput::ReadMusicXmlNote(
                 // this should not happen
                 delete verse;
             }
+        }
+
+        // End extenders by adding a verse with empty syl
+        for (int lyricNumber : extenderStops) {
+            // TODO Tablature: <tabGrp> does not support child <verse>
+            if (element->Is(TABGRP)) continue;
+            Verse *verse = new Verse();
+            verse->SetN(lyricNumber);
+            verse->AddChild(new Syl());
+            element->AddChild(verse);
         }
 
         // slurs
@@ -3516,6 +3560,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         // articulation
         std::list<Artic *> artics;
         for (pugi::xml_node articulations : notations.node().children("articulations")) {
+            // TODO Tablature: <tabGrp> does not support child <artic>
+            if (element->Is(TABGRP)) continue;
             for (pugi::xml_node articulation : articulations.children()) {
                 Artic *artic = new Artic();
                 data_ARTICULATION articVal = ConvertArticulations(articulation.name());
@@ -3917,6 +3963,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     // arpeggio
     pugi::xpath_node xmlArpeggiate = notations.node().select_node("*[contains(name(), 'arpeggiate')]");
     if (xmlArpeggiate) {
+        std::string elementID = (isTablature) ? note->GetID() : element->GetID();
         short int arpegN = xmlArpeggiate.node().attribute("number").as_int();
         arpegN = (arpegN < 1) ? 1 : arpegN;
         const std::string direction = xmlArpeggiate.node().attribute("direction").as_string();
@@ -3925,7 +3972,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             for (const auto &iter : m_ArpeggioStack) {
                 if (iter.second.m_arpegN == arpegN && onset == iter.second.m_timeStamp) {
                     // don't add other chord notes, because the chord is already referenced.
-                    if (!isChord) iter.first->GetPlistInterface()->AddRef("#" + element->GetID());
+                    if (isTablature || !isChord) iter.first->GetPlistInterface()->AddRef("#" + elementID);
                     added = true; // so that no new Arpeg gets created below
                     break;
                 }
@@ -3933,7 +3980,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
         if (!added) {
             Arpeg *arpeggio = new Arpeg();
-            arpeggio->GetPlistInterface()->AddRef("#" + element->GetID());
+            arpeggio->GetPlistInterface()->AddRef("#" + elementID);
             // color
             arpeggio->SetColor(xmlArpeggiate.node().attribute("color").as_string());
             // direction (up/down) and in MEI arrow

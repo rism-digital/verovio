@@ -4527,7 +4527,8 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
 
         if (success) {
             m_doc->ConvertToPageBasedDoc();
-            m_doc->ConvertMarkupDoc(!m_doc->GetOptions()->m_preserveAnalyticalMarkup.GetValue());
+            m_doc->ConvertMarkupDoc(m_doc->GetOptions()->m_convertAttributes.GetValue()
+                || !m_doc->GetOptions()->m_preserveAnalyticalMarkup.GetValue());
         }
 
         if (success && !m_hasScoreDef) {
@@ -4609,7 +4610,8 @@ bool MEIInput::ReadIncipits(pugi::xml_node root)
 
     if (success) {
         m_doc->ConvertToPageBasedDoc();
-        m_doc->ConvertMarkupDoc(!m_doc->GetOptions()->m_preserveAnalyticalMarkup.GetValue());
+        m_doc->ConvertMarkupDoc(m_doc->GetOptions()->m_convertAttributes.GetValue()
+            || !m_doc->GetOptions()->m_preserveAnalyticalMarkup.GetValue());
     }
 
     return success;
@@ -5297,7 +5299,7 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
     cleffingVis.ReadCleffingVis(element);
     if (cleffingLog.HasClefShape()) {
         Clef *vrvClef = new Clef();
-        vrvClef->IsAttribute(true);
+        vrvClef->IsAttribute(!m_doc->GetOptions()->m_convertAttributes.GetValue());
         vrvClef->SetShape(cleffingLog.GetClefShape());
         vrvClef->SetLine(cleffingLog.GetClefLine());
         vrvClef->SetDis(cleffingLog.GetClefDis());
@@ -5317,7 +5319,7 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         || keySigDefaultLog.HasKeysig() || keySigDefaultVis.HasKeysigVisible()
         || keySigDefaultVis.HasKeysigCancelaccid()) {
         KeySig *vrvKeySig = new KeySig();
-        vrvKeySig->IsAttribute(true);
+        vrvKeySig->IsAttribute(!m_doc->GetOptions()->m_convertAttributes.GetValue());
         // Broken in MEI 4.0.2 - waiting for a fix
         // vrvKeySig->SetAccid(keySigDefaultAnl.GetKeyAccid());
         vrvKeySig->SetMode(keySigDefaultAnl.GetKeyMode());
@@ -5337,7 +5339,7 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
     if (mensuralShared.HasProlatio() || mensuralShared.HasTempus() || mensuralLog.HasProportNum()
         || mensuralLog.HasProportNumbase() || mensuralVis.HasMensurSign()) {
         Mensur *vrvMensur = new Mensur();
-        vrvMensur->IsAttribute(true);
+        vrvMensur->IsAttribute(!m_doc->GetOptions()->m_convertAttributes.GetValue());
         //
         vrvMensur->SetDot(mensuralVis.GetMensurDot());
         vrvMensur->SetNum(mensuralLog.GetProportNum());
@@ -5366,7 +5368,7 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
     meterSigDefaultVis.ReadMeterSigDefaultVis(element);
     if (meterSigDefaultLog.HasMeterCount() || meterSigDefaultLog.HasMeterSym() || meterSigDefaultLog.HasMeterUnit()) {
         MeterSig *vrvMeterSig = new MeterSig();
-        vrvMeterSig->IsAttribute(true);
+        vrvMeterSig->IsAttribute(!m_doc->GetOptions()->m_convertAttributes.GetValue());
         vrvMeterSig->SetCount(meterSigDefaultLog.GetMeterCount());
         vrvMeterSig->SetSym(meterSigDefaultLog.GetMeterSym());
         vrvMeterSig->SetUnit(meterSigDefaultLog.GetMeterUnit());
@@ -5505,7 +5507,7 @@ bool MEIInput::ReadStaffGrp(Object *parent, pugi::xml_node staffGrp)
     groupingSym.ReadStaffGroupingSym(staffGrp);
     if (groupingSym.HasSymbol()) {
         GrpSym *vrvGrpSym = new GrpSym();
-        vrvGrpSym->IsAttribute(true);
+        vrvGrpSym->IsAttribute(!m_doc->GetOptions()->m_convertAttributes.GetValue());
         vrvGrpSym->SetSymbol(groupingSym.GetSymbol());
         vrvStaffGrp->AddChild(vrvGrpSym);
     }
@@ -7150,7 +7152,7 @@ bool MEIInput::ReadChord(Object *parent, pugi::xml_node chord)
     artic.ReadArticulation(chord);
     if (artic.HasArtic()) {
         Artic *vrvArtic = new Artic();
-        vrvArtic->IsAttribute(true);
+        vrvArtic->IsAttribute(!m_doc->GetOptions()->m_convertAttributes.GetValue());
         vrvArtic->SetArtic(artic.GetArtic());
         vrvChord->AddChild(vrvArtic);
     }
@@ -7196,7 +7198,7 @@ void MEIInput::ReadAccidAttr(pugi::xml_node node, Object *object)
     accidentalGestural.ReadAccidentalGes(node);
     if (accidental.HasAccid() || accidentalGestural.HasAccidGes()) {
         Accid *vrvAccid = new Accid();
-        vrvAccid->IsAttribute(true);
+        vrvAccid->IsAttribute(!m_doc->GetOptions()->m_convertAttributes.GetValue());
         vrvAccid->SetAccid(accidental.GetAccid());
         vrvAccid->SetAccidGes(accidentalGestural.GetAccidGes());
         object->AddChild(vrvAccid);
@@ -7614,7 +7616,7 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
     artic.ReadArticulation(note);
     if (artic.HasArtic()) {
         Artic *vrvArtic = new Artic();
-        vrvArtic->IsAttribute(true);
+        vrvArtic->IsAttribute(!m_doc->GetOptions()->m_convertAttributes.GetValue());
         vrvArtic->SetArtic(artic.GetArtic());
         if (artic.GetArtic().size() > 1) {
             m_doc->SetMarkup(MARKUP_ARTIC_MULTIVAL);

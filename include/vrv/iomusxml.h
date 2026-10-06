@@ -11,6 +11,7 @@
 #include <map>
 #include <optional>
 #include <queue>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -650,6 +651,8 @@ private:
     Label *m_label = NULL;
     LabelAbbr *m_labelAbbr = NULL;
     InstrDef *m_instrdef = NULL;
+    /* MIDI keys of unpitched notes per part and instrument id ("" for a part with a single instrument) */
+    std::map<std::string, std::map<std::string, int>> m_unpitchedKeys;
     /* LastElementID */
     std::string m_ID;
     /* A map of stacks for piling open LayerElements (beams, tuplets, chords, btrem, ftrem) separately per layer */
@@ -657,6 +660,8 @@ private:
     /* A maps of time stamps (score time) to indicate write pointer of a given layer */
     std::map<Layer *, int> m_layerEndTimes;
     std::map<Layer *, std::multimap<int, LayerElement *>> m_layerTimes;
+    /* Verse numbers with a pending <extend type="stop"/> per staff/layer @n, to anchor on the following note */
+    std::map<std::pair<int, int>, std::set<int>> m_pendingExtenderStops;
     /* To remember layer of last element (note) to handle chords */
     Layer *m_prevLayer = NULL;
     /* To remember current layer to properly handle layers/staves/cross-staff elements */
