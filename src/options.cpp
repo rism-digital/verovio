@@ -1024,8 +1024,7 @@ Options::Options()
     m_condenseTempoPages.Init(false);
     this->Register(&m_condenseTempoPages, "condenseTempoPages", &m_general);
 
-    m_convertAttributes.SetInfo(
-        "Convert attributes", "Convert analytical markup and attributes to permanent elements");
+    m_convertAttributes.SetInfo("Convert attributes", "Convert analytical markup and attributes to permanent elements");
     m_convertAttributes.Init(false);
     this->Register(&m_convertAttributes, "convertAttributes", &m_general);
 
