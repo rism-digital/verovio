@@ -284,6 +284,11 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitScoreDef(ScoreDef *scoreDef)
         m_upcomingScoreDef.ReplaceDrawingValues(scoreDef);
         m_upcomingScoreDef.m_insertScoreDef = true;
     }
+    return FUNCTOR_CONTINUE;
+}
+    
+FunctorCode ScoreDefSetCurrentFunctor::VisitScoreDefEnd(ScoreDef *scoreDef)
+{
     if (scoreDef->IsSectionRestart()) {
         m_drawLabels = true;
         m_restart = true;

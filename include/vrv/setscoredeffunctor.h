@@ -145,6 +145,7 @@ public:
     FunctorCode VisitProport(Proport *proport) override;
     FunctorCode VisitScore(Score *score) override;
     FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
+    FunctorCode VisitScoreDefEnd(ScoreDef *scoreDef) override;
     FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitStaffDef(StaffDef *staffDef) override;
     FunctorCode VisitStaffGrp(StaffGrp *staffGrp) override;
