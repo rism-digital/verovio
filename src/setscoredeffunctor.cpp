@@ -284,17 +284,19 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitScoreDef(ScoreDef *scoreDef)
         m_upcomingScoreDef.ReplaceDrawingValues(scoreDef);
         m_upcomingScoreDef.m_insertScoreDef = true;
     }
-    return FUNCTOR_CONTINUE;
-}
-
-FunctorCode ScoreDefSetCurrentFunctor::VisitScoreDefEnd(ScoreDef *scoreDef)
-{
     if (scoreDef->IsSectionRestart()) {
         m_drawLabels = true;
         m_restart = true;
         // Redraw the labels only if we already have a measure in the system. Otherwise this will be
         // done through the system scoreDef
         scoreDef->SetDrawLabels(m_hasMeasure);
+    }
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefSetCurrentFunctor::VisitScoreDefEnd(ScoreDef *scoreDef)
+{
+    if (scoreDef->IsSectionRestart()) {
         // If we have a previous measure, we need to set the cautionary scoreDef independently from the
         // presence of a system break
         if (m_previousMeasure) {
