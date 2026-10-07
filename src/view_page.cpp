@@ -1700,6 +1700,8 @@ void View::DrawPlaceholder(DeviceContext *dc, Object *object, System *system)
 
     if (object->GetParent() != system) return;
 
+    if (m_doc->GetOptions()->m_showHidden.GetValue()) dc->AddGraphicClass(CSS_SHOW_HIDDEN);
+
     int x = 0;
     int idx = object->GetIdx();
     const Measure *measure = vrv_cast<const Measure *>(system->GetNext(object, MEASURE));

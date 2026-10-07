@@ -124,6 +124,7 @@ public:
     void StartGraphic(Object *object, const std::string &gClass, const std::string &gId, GraphicID graphicID = PRIMARY,
         bool prepend = false) override;
     void EndGraphic(Object *object, View *view) override;
+    void AddGraphicClass(const std::string &className) override;
     ///@}
 
     /**
