@@ -2145,8 +2145,8 @@ void Options::Sync()
         }
         else if (jsonValue * 2.0 != pair.second->GetValue()) {
             LogWarning(
-                "The engraving default '%s' is skipped because the corresponding option '%s' was set before to %f.",
-                pair.first.c_str(), pair.second->GetKey().c_str(), pair.second->GetValue());
+                "The engraving default '{}' is skipped because the corresponding option '{}' was set before to {}.",
+                pair.first, pair.second->GetKey(), pair.second->GetValue());
         }
         unmatchedKeys.erase(pair.first);
     }

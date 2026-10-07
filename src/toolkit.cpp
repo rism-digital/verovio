@@ -145,7 +145,7 @@ bool Toolkit::SetFont(const std::string &fontName)
 {
     Resources &resources = m_doc.GetResourcesForModification();
     const bool ok = resources.SetCurrentFont(fontName, true);
-    if (!ok) LogWarning("Font '%s' could not be loaded", fontName.c_str());
+    if (!ok) LogWarning("Font '{}' could not be loaded", fontName);
     return ok;
 }
 
@@ -732,7 +732,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         bool status = converter.convertString(conversion, data);
         this->LogRedirectStop();
         if (!status) {
-            LogWarning("Problem converting MuseData to Humdrum (see warning above this line for possible reasons");
+            LogWarning("Problem converting MuseData to Humdrum (see warning above this line for possible reasons)");
         }
 
         if (!status) {
@@ -767,7 +767,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         bool status = converter.convert(conversion, data);
         this->LogRedirectStop();
         if (!status) {
-            LogWarning("Problem converting EsAC to Humdrum (see warning above this line for possible reasons");
+            LogWarning("Problem converting EsAC to Humdrum (see warning above this line for possible reasons)");
         }
 
         if (!status) {
@@ -1489,7 +1489,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     }
     // If not found at all
     if (!element) {
-        LogWarning("Element '%s' not found", xmlId.c_str());
+        LogWarning("Element '{}' not found", xmlId);
         return o.json();
     }
 
@@ -1593,7 +1593,7 @@ void Toolkit::LogRedirectStart()
     if (!m_cerrCaptured.str().empty()) {
         vrv::LogWarning("In Toolkit::LogRedirectStart: Log capture buffer not empty, sending current contents to "
                         "LogWarning and resetting.");
-        vrv::LogWarning(m_cerrCaptured.str().c_str());
+        vrv::LogWarning("{}", m_cerrCaptured.str());
         m_cerrCaptured.str("");
     }
     m_cerrOriginalBuf = std::cerr.rdbuf();
@@ -1603,7 +1603,7 @@ void Toolkit::LogRedirectStart()
 void Toolkit::LogRedirectStop()
 {
     if (!m_cerrCaptured.str().empty()) {
-        vrv::LogWarning(m_cerrCaptured.str().c_str());
+        vrv::LogWarning("{}", m_cerrCaptured.str());
         m_cerrCaptured.str("");
     }
 
@@ -1674,7 +1674,7 @@ void Toolkit::RedoPagePitchPosLayout()
 bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
 {
     if (pageNo > this->GetPageCount()) {
-        LogWarning("Page %d does not exist", pageNo);
+        LogWarning("Page {} does not exist", pageNo);
         return false;
     }
 
@@ -2060,7 +2060,7 @@ int Toolkit::GetPageWithElement(const std::string &xmlId)
 {
     Object *element = m_doc.FindDescendantByID(xmlId);
     if (!element) {
-        LogWarning("Element '%s' not found", xmlId.c_str());
+        LogWarning("Element '{}' not found", xmlId);
         return 0;
     }
     Page *page = vrv_cast<Page *>(element->GetFirstAncestor(PAGE));
@@ -2079,7 +2079,7 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
     Object *element = m_midiDoc->FindDescendantByID(xmlId);
 
     if (!element) {
-        LogWarning("Element '%s' not found", xmlId.c_str());
+        LogWarning("Element '{}' not found", xmlId);
         return 0;
     }
 
@@ -2129,7 +2129,7 @@ std::string Toolkit::GetTimesForElement(const std::string &xmlId)
     jsonxx::Object o;
 
     if (!element) {
-        LogWarning("Element '%s' not found", xmlId.c_str());
+        LogWarning("Element '{}' not found", xmlId);
         return o.json();
     }
 
@@ -2187,7 +2187,7 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
     jsonxx::Object o;
 
     if (!element) {
-        LogWarning("Element '%s' not found", xmlId.c_str());
+        LogWarning("Element '{}' not found", xmlId);
         return o.json();
     }
 

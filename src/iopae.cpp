@@ -771,7 +771,7 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
             strcpy(incipit, data_value);
         }
         else {
-            LogWarning("Unknown row '%s' in incipit data", data_line);
+            LogWarning("Unknown row '{}' in incipit data", data_line);
         }
     }
 
@@ -1463,7 +1463,7 @@ int PAEInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
             meter->SetUnit(2);
         }
         else {
-            LogWarning("Plaine & Easie import: unsupported time signature: %s", timesig_str);
+            LogWarning("Plaine & Easie import: unsupported time signature: {}", timesig_str);
         }
     }
     else {
@@ -1501,7 +1501,7 @@ int PAEInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
             }
         }
         else {
-            LogWarning("Plaine & Easie import: unsupported time signature: %s", timesig_str);
+            LogWarning("Plaine & Easie import: unsupported time signature: {}", timesig_str);
         }
     }
 
@@ -2576,10 +2576,10 @@ void PAEInput::LogPAE(int errCode, pae::Token &token, std::string value)
     std::string fullMsg = StringFormat("PAE: {} {}", msg, posStr);
 
     if (m_pedanticMode) {
-        LogError(fullMsg.c_str());
+        LogError("{}", fullMsg);
     }
     else {
-        LogWarning(fullMsg.c_str());
+        LogWarning("{}", fullMsg);
     }
 }
 

@@ -1361,7 +1361,7 @@ void MEIOutput::PruneAttributes(pugi::xml_node node)
 {
     if (node.text()) return;
     if (!MEIBasic::map.contains(node.name())) {
-        LogWarning("Element '%s' is not supported but will be preserved", node.name());
+        LogWarning("Element '{}' is not supported but will be preserved", node.name());
         return;
     }
     std::list<std::string> unsupported;
@@ -3120,7 +3120,7 @@ void MEIOutput::WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile)
             this->WriteSurface(childNode, dynamic_cast<Surface *>(child));
         }
         else {
-            LogWarning("Unable to write child '%s' of facsimile", child->GetClassName().c_str());
+            LogWarning("Unable to write child '{}' of facsimile", child->GetClassName());
         }
     }
 }
@@ -3153,7 +3153,7 @@ void MEIOutput::WriteSurface(pugi::xml_node currentNode, Surface *surface)
             this->WriteZone(childNode, dynamic_cast<Zone *>(child));
         }
         else {
-            LogWarning("Unable to write child '%s' of surface", child->GetClassName().c_str());
+            LogWarning("Unable to write child '{}' of surface", child->GetClassName());
         }
     }
 }
@@ -3621,7 +3621,7 @@ std::string MEIOutput::DocTypeToStr(DocType type)
         case Transcription: value = "transcription"; break;
         case Facs: value = "facsimile"; break;
         default:
-            LogWarning("Unknown document type '%d'", type);
+            LogWarning("Unknown document type '{}'", type);
             value = "";
             break;
     }
@@ -3648,7 +3648,7 @@ jsonxx::Object MEIOutputExtended::ExportScoreDef()
         return ToJson(meiDoc);
     }
     catch (char *str) {
-        LogError("%s", str);
+        LogError("{}", str);
         return jsonxx::Object();
     }
 }
@@ -3748,7 +3748,7 @@ bool MEIInput::Import(const std::string &mei)
         }
     }
     catch (char *str) {
-        LogError("%s", str);
+        LogError("{}", str);
         return false;
     }
 }
@@ -4549,7 +4549,7 @@ bool MEIInput::ReadPages(Object *parent, pugi::xml_node pages)
             success = this->ReadXMLComment(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <pages>", current.name());
+            LogWarning("Unsupported '<{}>' within <pages>", current.name());
         }
     }
 
@@ -4643,7 +4643,7 @@ bool MEIInput::ReadPageChildren(Object *parent, pugi::xml_node parentNode)
             this->ReadXMLComment(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <page>", current.name());
+            LogWarning("Unsupported '<{}>' within <page>", current.name());
         }
     }
 
@@ -4744,7 +4744,7 @@ bool MEIInput::ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool 
             success = this->ReadXMLComment(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <mdiv>", current.name());
+            LogWarning("Unsupported '<{}>' within <mdiv>", current.name());
         }
     }
 
@@ -4811,7 +4811,7 @@ bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
             success = this->ReadXMLComment(parent, current);
         }
         else {
-            LogWarning("Element <%s> within <score> is not supported and will be ignored ", elementName.c_str());
+            LogWarning("Element <{}> within <score> is not supported and will be ignored ", elementName);
         }
     }
 
@@ -4940,7 +4940,7 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
             success = this->ReadXMLComment(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <section>", current.name());
+            LogWarning("Unsupported '<{}>' within <section>", current.name());
         }
     }
 
@@ -5128,7 +5128,7 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
             success = this->ReadXMLComment(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <system>", current.name());
+            LogWarning("Unsupported '<{}>' within <system>", current.name());
         }
     }
     return success;
@@ -5365,7 +5365,7 @@ bool MEIInput::ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode)
             success = this->ReadXMLComment(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <scoreDef>", current.name());
+            LogWarning("Unsupported '<{}>' within <scoreDef>", current.name());
         }
     }
     return success;
@@ -5442,7 +5442,7 @@ bool MEIInput::ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode)
             success = this->ReadXMLComment(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <staffGrp>", current.name());
+            LogWarning("Unsupported '<{}>' within <staffGrp>", current.name());
         }
     }
 
@@ -5492,7 +5492,7 @@ bool MEIInput::ReadGrpSym(Object *parent, pugi::xml_node grpSym)
 
     if (parent->Is(SCOREDEF)) {
         if (!vrvGrpSym->HasLevel() || !vrvGrpSym->HasStartid() || !vrvGrpSym->HasEndid()) {
-            LogWarning("<%s>' nested under <scoreDef> must have @level, @startId and @endId attributes", grpSym.name());
+            LogWarning("<{}>' nested under <scoreDef> must have @level, @startId and @endId attributes", grpSym.name());
             delete vrvGrpSym;
             return true;
         }
@@ -5545,8 +5545,8 @@ bool MEIInput::ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Ob
         this->NormalizeAttributes(xmlElement);
         elementName = std::string(xmlElement.name());
         if (filter && !this->IsAllowed(elementName, filter)) {
-            LogWarning("Element <%s> within <%s> is not supported and will be ignored ", xmlElement.name(),
-                filter->GetClassName().c_str());
+            LogWarning("Element <{}> within <{}> is not supported and will be ignored ", xmlElement.name(),
+                filter->GetClassName());
             continue;
         }
         // editorial
@@ -5566,7 +5566,7 @@ bool MEIInput::ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Ob
         }
         // unknown
         else {
-            LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
+            LogWarning("Element <{}> is unknown and will be ignored", xmlElement.name());
         }
     }
     return success;
@@ -5653,7 +5653,7 @@ bool MEIInput::ReadStaffDefChildren(Object *parent, pugi::xml_node parentNode)
             success = this->ReadXMLComment(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <staffGrp>", current.name());
+            LogWarning("Unsupported '<{}>' within <staffGrp>", current.name());
         }
     }
     return success;
@@ -5686,7 +5686,7 @@ bool MEIInput::ReadTuningChildren(Object *parent, pugi::xml_node parentNode)
             success = this->ReadCourse(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <staffGrp>", current.name());
+            LogWarning("Unsupported '<{}>' within <staffGrp>", current.name());
         }
     }
     return success;
@@ -5731,7 +5731,7 @@ bool MEIInput::ReadSymbolTable(Object *parent, pugi::xml_node symbolTable)
             success = this->ReadXMLComment(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <symbolTable>", current.name());
+            LogWarning("Unsupported '<{}>' within <symbolTable>", current.name());
         }
     }
 
@@ -5817,7 +5817,7 @@ bool MEIInput::ReadLayerDefChildren(Object *parent, pugi::xml_node parentNode)
             success = this->ReadXMLComment(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <layerDef>", current.name());
+            LogWarning("Unsupported '<{}>' within <layerDef>", current.name());
         }
     }
     return success;
@@ -5982,7 +5982,7 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
             success = this->ReadXMLComment(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <measure>", current.name());
+            LogWarning("Unsupported '<{}>' within <measure>", current.name());
         }
     }
     return success;
@@ -6062,7 +6062,7 @@ bool MEIInput::ReadMeterSigGrpChildren(Object *parent, pugi::xml_node parentNode
             success = this->ReadXMLComment(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <meterSigGrp>", current.name());
+            LogWarning("Unsupported '<{}>' within <meterSigGrp>", current.name());
         }
     }
     return success;
@@ -6584,7 +6584,7 @@ bool MEIInput::ReadFbChildren(Object *parent, pugi::xml_node parentNode)
             success = this->ReadXMLComment(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <staff>", current.name());
+            LogWarning("Unsupported '<{}>' within <staff>", current.name());
         }
     }
     return success;
@@ -6657,7 +6657,7 @@ bool MEIInput::ReadStaffChildren(Object *parent, pugi::xml_node parentNode)
             success = this->ReadXMLComment(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <staff>", current.name());
+            LogWarning("Unsupported '<{}>' within <staff>", current.name());
         }
     }
     return success;
@@ -6703,8 +6703,8 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         elementName = std::string(xmlElement.name());
         // LogDebug("ReadLayerChildren: element <{}>", xmlElement.name());
         if (!this->IsAllowed(elementName, filter)) {
-            LogWarning("Element <%s> within <%s> is not supported and will be ignored ", xmlElement.name(),
-                filter->GetClassName().c_str());
+            LogWarning("Element <{}> within <{}> is not supported and will be ignored ", xmlElement.name(),
+                filter->GetClassName());
             continue;
         }
         // editorial
@@ -6874,7 +6874,7 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         }
         // unknown
         else {
-            LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
+            LogWarning("Element <{}> is unknown and will be ignored", xmlElement.name());
         }
     }
     return success;
@@ -7777,8 +7777,8 @@ bool MEIInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
         this->NormalizeAttributes(xmlElement);
         elementName = std::string(xmlElement.name());
         if (filter && !this->IsAllowed(elementName, filter)) {
-            LogWarning("Element <%s> within <%s> is not supported and will be ignored ", xmlElement.name(),
-                filter->GetClassName().c_str());
+            LogWarning("Element <{}> within <{}> is not supported and will be ignored ", xmlElement.name(),
+                filter->GetClassName());
             continue;
         }
         // editorial
@@ -7819,7 +7819,7 @@ bool MEIInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
         }
         // unknown
         else {
-            LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
+            LogWarning("Element <{}> is unknown and will be ignored", xmlElement.name());
         }
         ++i;
     }
@@ -7838,8 +7838,8 @@ bool MEIInput::ReadSymbolDefChildren(Object *parent, pugi::xml_node parentNode, 
         this->NormalizeAttributes(xmlElement);
         elementName = std::string(xmlElement.name());
         if (filter && !this->IsAllowed(elementName, filter)) {
-            LogWarning("Element <%s> within <%s> is not supported and will be ignored ", xmlElement.name(),
-                filter->GetClassName().c_str());
+            LogWarning("Element <{}> within <{}> is not supported and will be ignored ", xmlElement.name(),
+                filter->GetClassName());
             continue;
         }
         // content
@@ -7858,7 +7858,7 @@ bool MEIInput::ReadSymbolDefChildren(Object *parent, pugi::xml_node parentNode, 
         }
         // unknown
         else {
-            LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
+            LogWarning("Element <{}> is unknown and will be ignored", xmlElement.name());
         }
     }
     return success;
@@ -7938,7 +7938,7 @@ bool MEIInput::ReadRend(Object *parent, pugi::xml_node rend)
     vrvRend->ReadWhitespace(rend);
 
     if (vrvRend->GetFirstAncestor(REND) && (vrvRend->HasHalign() || vrvRend->HasValign())) {
-        LogWarning("@halign or @valign in nested <rend> element <rend> %s will be ignored", vrvRend->GetID().c_str());
+        LogWarning("@halign or @valign in nested <rend> element <rend> {} will be ignored", vrvRend->GetID());
         // Eventually to be added to unsupported attributes?
         vrvRend->SetHalign(HORIZONTALALIGNMENT_NONE);
         vrvRend->SetValign(VERTICALALIGNMENT_NONE);
@@ -7972,7 +7972,7 @@ bool MEIInput::ReadSvg(Object *parent, pugi::xml_node svg)
         vrvSvg->Set(svg);
     }
     else {
-        LogWarning("No svg content found for <fig> %s", parent->GetID().c_str());
+        LogWarning("No svg content found for <fig> {}", parent->GetID());
     }
 
     parent->AddChild(vrvSvg);
@@ -8349,7 +8349,7 @@ bool MEIInput::ReadAppChildren(Object *parent, pugi::xml_node parentNode, Editor
             success = this->ReadXMLComment(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <app>", current.name());
+            LogWarning("Unsupported '<{}>' within <app>", current.name());
         }
         // Now we check if the xpath selection (if any) matches the current node.
         // If yes, make it visible
@@ -8440,7 +8440,7 @@ bool MEIInput::ReadChoiceChildren(Object *parent, pugi::xml_node parentNode, Edi
             success = this->ReadXMLComment(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <choice>", current.name());
+            LogWarning("Unsupported '<{}>' within <choice>", current.name());
         }
         // Now we check if the xpath selection (if any) matches the current node.
         // If yes, make it visible
@@ -8654,7 +8654,7 @@ bool MEIInput::ReadSubstChildren(Object *parent, pugi::xml_node parentNode, Edit
             success = this->ReadXMLComment(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <subst>", current.name());
+            LogWarning("Unsupported '<{}>' within <subst>", current.name());
         }
         // Now we check if the xpath selection (if any) matches the current node.
         // If yes, make it visible
@@ -8812,14 +8812,14 @@ bool MEIInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
         std::string refId = ExtractIDFragment(tupletSpan.attribute("startid").value());
         start = dynamic_cast<LayerElement *>(measure->FindDescendantByID(refId));
         if (!start) {
-            LogWarning("Element with @startid '%s' not found when trying to read the <tupletSpan>", refId.c_str());
+            LogWarning("Element with @startid '{}' not found when trying to read the <tupletSpan>", refId);
         }
     }
     if (tupletSpan.attribute("endid")) {
         std::string refId = ExtractIDFragment(tupletSpan.attribute("endid").value());
         end = dynamic_cast<LayerElement *>(measure->FindDescendantByID(refId));
         if (!end) {
-            LogWarning("Element with @endid '%s' not found when trying to read the <tupletSpan>", refId.c_str());
+            LogWarning("Element with @endid '{}' not found when trying to read the <tupletSpan>", refId);
         }
     }
     if (!start || !end) {
@@ -8831,7 +8831,7 @@ bool MEIInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
     LayerElement *endChild = dynamic_cast<LayerElement *>(end->GetLastAncestorNot(LAYER));
 
     if (!startChild || !endChild || (startChild->GetParent() != endChild->GetParent())) {
-        LogWarning("Start and end elements for <tupletSpan> '%s' not in the same layer", tuplet->GetID().c_str());
+        LogWarning("Start and end elements for <tupletSpan> '{}' not in the same layer", tuplet->GetID());
         delete tuplet;
         return false;
     }
@@ -8872,7 +8872,7 @@ DocType MEIInput::StrToDocType(std::string type)
     if (type == "rendering") return Rendering;
     if (type == "transcription") return Transcription;
     if (type == "facsimile") return Facs;
-    LogWarning("Unknown layout type '%s'", type.c_str());
+    LogWarning("Unknown layout type '{}'", type);
     return Raw;
 }
 
@@ -9152,7 +9152,7 @@ void MEIInput::UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMorden
             vrvMordent->SetForm(mordentLog_FORM_upper);
         }
         else {
-            LogWarning("Unsupported value '%s' for att.mordent.log@form (MEI 3.0)", form.c_str());
+            LogWarning("Unsupported value '{}' for att.mordent.log@form (MEI 3.0)", form);
         }
         mordent.remove_attribute("form");
     }
@@ -9251,7 +9251,7 @@ void MEIInput::UpgradeTurnTo_4_0_0(pugi::xml_node turn, Turn *vrvTurn)
             vrvTurn->SetForm(turnLog_FORM_lower);
         }
         else {
-            LogWarning("Unsupported value '%s' for att.turn.log@form (MEI 3.0)", form.c_str());
+            LogWarning("Unsupported value '{}' for att.turn.log@form (MEI 3.0)", form);
         }
         turn.remove_attribute("form");
     }
@@ -9316,7 +9316,7 @@ bool MEIInput::ReadSurface(Facsimile *parent, pugi::xml_node surface)
             this->ReadZone(vrvSurface, child);
         }
         else {
-            LogWarning("Unsupported element <%s> in <surface>", child.name());
+            LogWarning("Unsupported element <{}> in <surface>", child.name());
         }
     }
     parent->AddChild(vrvSurface);
@@ -9348,7 +9348,7 @@ bool MEIInput::ReadFacsimile(Doc *doc, pugi::xml_node facsimile)
             this->ReadSurface(vrvFacsimile, child);
         }
         else {
-            LogWarning("Unsupported element <%s> in <facsimile>", child.name());
+            LogWarning("Unsupported element <{}> in <facsimile>", child.name());
         }
     }
     doc->SetFacsimile(vrvFacsimile);

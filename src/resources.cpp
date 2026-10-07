@@ -288,7 +288,7 @@ void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontSt
 
     m_currentStyle = { fontWeight, fontStyle };
     if (!m_textFont.contains(m_currentStyle)) {
-        LogWarning("Text font for style (%d, %d) is not loaded. Use default", fontWeight, fontStyle);
+        LogWarning("Text font for style ({}, {}) is not loaded. Use default", fontWeight, fontStyle);
         m_currentStyle = k_defaultStyle;
     }
 }

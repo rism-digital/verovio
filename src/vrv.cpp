@@ -124,7 +124,7 @@ LogLevel StrToLogLevel(const std::string &level)
     if (level == "info") return LOG_INFO;
     if (level == "debug") return LOG_DEBUG;
 
-    LogWarning("Unkown log level '{}' (warning is default)", level.c_str());
+    LogWarning("Unkown log level '{}' (warning is default)", level);
     return LOG_WARNING;
 }
 
