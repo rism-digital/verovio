@@ -1,32 +1,17 @@
 #!/bin/sh
 
-# Requires python
-# Requires svgpathtools python library (install with 'pip3 install svgpathtools')
+# Requires python with the fonttools and brotli libraries (install with 'pip3 install fonttools brotli')
 
 PYTHON="python3"
 
-echo "Generating C++ header file ..."
+echo "Generating C++ header and name table files ..."
 $PYTHON generate.py smufl
-
-echo "Generating Bravura files ..."
-$PYTHON generate.py extract Bravura
-$PYTHON generate.py css Bravura $@
 
 echo "Generating Leipzig files ..."
 $PYTHON generate.py check Leipzig
-$PYTHON generate.py extract Leipzig
-$PYTHON generate.py css Leipzig $@
+$PYTHON generate.py bundle Leipzig
 
-echo "Generating Gootville files ..."
-$PYTHON generate.py extract Gootville
-$PYTHON generate.py css Gootville $@
-
-echo "Generating Petaluma files ..."
-$PYTHON generate.py extract Petaluma
-$PYTHON generate.py css Petaluma $@
-
-echo "Generating Leland files ..."
-$PYTHON generate.py extract Leland
-$PYTHON generate.py css Leland $@
+echo "Generating Bravura files ..."
+$PYTHON generate.py bundle Bravura
 
 echo "Done!"

@@ -263,7 +263,7 @@ if(BUILD_FONT_TESTS)
     add_test(NAME font-runtime-registration
         COMMAND font-runtime-registration-test
             ${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/fonts/Tinos-Regular.ttf
-            ${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/fonts/Bravura.otf
+            ${CMAKE_CURRENT_SOURCE_DIR}/../fonts/Bravura/Bravura.otf
             ${CMAKE_CURRENT_SOURCE_DIR}/../data/fonts/Bravura_metadata.json
             ${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/fonts/Tinos-Regular.woff
             ${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/fonts/Tinos-Regular.woff2

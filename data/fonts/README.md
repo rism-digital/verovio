@@ -2,13 +2,13 @@
 
 ## Leipzig
 
-Leipzig 5.2.102 is the bundled default SMuFL music font. Its source is
-maintained in `fonts/Leipzig`; the bundled files are copied from there.
+Leipzig 5.2.102 is the bundled default SMuFL music font. It is developed in
+`fonts/Leipzig`, from where `Leipzig.woff2` is copied.
 
 | File | SHA-256 |
 | --- | --- |
-| Bundled `Leipzig.woff2` (copy of `fonts/Leipzig/Leipzig.woff2`) | `c7db72b33a382d5589612c1f3176ccdf5a0c38231fa839806ff1367a6cc69fe6` |
-| Source `fonts/Leipzig/leipzig_metadata.json` | `5e5c534bf3195748473eeffe6c809145305788c7b804eb679b95365d9d908040` |
+| Bundled `Leipzig.woff2` | `c7db72b33a382d5589612c1f3176ccdf5a0c38231fa839806ff1367a6cc69fe6` |
+| Source `leipzig_metadata.json` | `5e5c534bf3195748473eeffe6c809145305788c7b804eb679b95365d9d908040` |
 | Bundled `Leipzig_metadata.json` | `ad6f0732e5a803a6bba89a5c4f64cb03f7e5e494949ef062bfa934e8defa79d8` |
 
 Leipzig is licensed under the SIL Open Font License.
@@ -16,15 +16,14 @@ Leipzig is licensed under the SIL Open Font License.
 ## Bravura
 
 Bravura 1.392 is the bundled fallback SMuFL music font. Missing glyphs of any
-music font fall back to it. These
-files were imported into Verovio by commit
-`5d15bf42a06478f3ae6d9115d7ff6c1ffd3b12a5`.
+music font fall back to it. Its source files in `fonts/Bravura` were imported
+into Verovio by commit `5d15bf42a06478f3ae6d9115d7ff6c1ffd3b12a5`.
 
 | File | SHA-256 |
 | --- | --- |
 | Source `Bravura.otf` | `dca2d90c88437a701b1c2e71fa54e76f9fa41d7deee935d74dc871ea66ecfdd2` |
-| Bundled `Bravura.woff2` | `07547608313e4271a25cb8c564781c8b2e869fd4eec8abbed077f921a70ab4c6` |
-| Source `Bravura_metadata.json` | `5c18a034a857c69be2720fe0cab655a17df934556b51925690789d5530c9881c` |
+| Bundled `Bravura.woff2` | `a10e9fb553a823203beed6dfa6d0f02464ca943a59d1cab91cf581cc4c0783c0` |
+| Source `bravura_metadata.json` | `5c18a034a857c69be2720fe0cab655a17df934556b51925690789d5530c9881c` |
 | Bundled `Bravura_metadata.json` | `7083c7715937cf6a67f57463373a09bf1e9b0609906f8a7a20c56a9bf76b052e` |
 
 Bravura is licensed under the SIL Open Font License. Its copyright and
@@ -49,13 +48,14 @@ Source: `google/fonts` commit
 The family metadata identifies the license as OFL. `OFL.txt` is the standard
 SIL Open Font License text stored by Google Fonts.
 
-The release resources use deterministic WOFF2 transcodes of the pinned static
-OTF/TTF sources. Registration decodes them once to canonical SFNT bytes. This
-keeps the installed CLI and WASM resources within the size gate without
-subsetting the glyph repertoire or changing outlines, metrics, or shaping.
+The Leipzig and Bravura files are generated from `fonts/<Font>` with
+`fonts/generate_all.sh` (see `fonts/README.md`). A font without a WOFF2 source,
+such as Bravura, is converted losslessly from its OTF source with fontTools,
+keeping the timestamp of the source for a deterministic output. The Tinos files
+are deterministic WOFF2 transcodes of the pinned static TTF sources. The fonts
+are not subset, so outlines, metrics, and shaping are unchanged.
 
-The bundled Leipzig and Bravura metadata is generated with
-`fonts/compact-smufl-metadata.py`. It retains the font identity, version,
-engraving defaults, and all glyph anchors used at runtime while omitting large
-advance, bounding-box, alternate, ligature, optional-glyph, and set sections
-that are derived from the font or unused by Verovio.
+The bundled metadata retains the font identity, version, engraving defaults,
+and all glyph anchors used at runtime while omitting large advance,
+bounding-box, alternate, ligature, optional-glyph, and set sections that are
+derived from the font or unused by Verovio.
