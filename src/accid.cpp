@@ -209,6 +209,7 @@ void Accid::AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::v
             && !this->HorizontalLeftOverlap(element, doc, horizontalMargin, verticalMargin)) {
             // There is enough space on the right of the accidental, but maybe we will need to
             // adjust it again (see recursive call below), so keep the accidental that is on the left
+            // Skip this behavior for accidentals with the same parent
             leftAccids.push_back(accid);
             return;
         }

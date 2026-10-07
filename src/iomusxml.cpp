@@ -3153,10 +3153,9 @@ void MusicXmlInput::ReadMusicXmlNote(
 
         // accidentals
         auto accidentals = node.children("accidental");
-        for (std::reverse_iterator<pugi::xml_named_node_iterator> it(accidentals.end());
-            it != std::reverse_iterator<pugi::xml_named_node_iterator>(accidentals.begin()); ++it) {
-            pugi::xml_node accidental = *it;
-            AddAccidental(accidental, note);
+        for (auto it = accidentals.end(); it != accidentals.begin();) {
+            --it;
+            AddAccidental(*it, note);
         }
         auto accidental_marks = node.select_nodes("notations/accidental-mark");
         accidental_marks.sort(true);
