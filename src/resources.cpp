@@ -45,17 +45,6 @@ void SetDefaultResourcePath(const std::string &path)
 
 namespace {
 
-    FontStore::Weight ToRuntimeWeight(data_FONTWEIGHT weight)
-    {
-        return (weight == FONTWEIGHT_bold) ? FontStore::Weight::Bold : FontStore::Weight::Normal;
-    }
-
-    FontStore::Style ToRuntimeStyle(data_FONTSTYLE style)
-    {
-        return ((style == FONTSTYLE_italic) || (style == FONTSTYLE_oblique)) ? FontStore::Style::Italic
-                                                                             : FontStore::Style::Normal;
-    }
-
     /** The SMuFL names of the glyphs supported by Verovio, by name and by code */
     struct GlyphNames {
         Resources::GlyphNameTable m_codes;
@@ -248,12 +237,12 @@ std::string Resources::GetTextFontMetricEquivalent() const
 std::optional<FontStore::ShapedRun> Resources::ShapeText(const FontInfo &font, const std::u32string &text) const
 {
     const std::string family = font.GetFaceName().empty() ? m_textFontName : font.GetFaceName();
-    const FontStore::Weight weight = ToRuntimeWeight(font.GetWeight());
-    const FontStore::Style style = ToRuntimeStyle(font.GetStyle());
+    const FaceStyle faceStyle = Resources::GetFaceStyle(font);
     std::optional<FontStore::ShapedRun> run
-        = m_fontStore.ShapeText(family, text, weight, style, m_currentFontName, m_fallbackFontName);
+        = m_fontStore.ShapeText(family, text, faceStyle.first, faceStyle.second, m_currentFontName, m_fallbackFontName);
     if (!run && (family != TINOS)) {
-        run = m_fontStore.ShapeText(TINOS, text, weight, style, m_currentFontName, m_fallbackFontName);
+        run = m_fontStore.ShapeText(
+            TINOS, text, faceStyle.first, faceStyle.second, m_currentFontName, m_fallbackFontName);
     }
     return run;
 }
@@ -270,12 +259,11 @@ int Resources::GetTextAdvance(const FontInfo &font, const FontStore::ShapedRun &
 const Glyph *Resources::GetTextGlyph(char32_t code, const FontInfo &font) const
 {
     const std::string family = font.GetFaceName().empty() ? m_textFontName : font.GetFaceName();
-    const FontStore::Weight weight = ToRuntimeWeight(font.GetWeight());
-    const FontStore::Style style = ToRuntimeStyle(font.GetStyle());
+    const FaceStyle faceStyle = Resources::GetFaceStyle(font);
     std::optional<FontStore::GlyphMetrics> metrics
-        = m_fontStore.GetGlyphMetrics(FontStore::Kind::Text, family, code, weight, style);
+        = m_fontStore.GetGlyphMetrics(FontStore::Kind::Text, family, code, faceStyle.first, faceStyle.second);
     if (!metrics && (family != TINOS)) {
-        metrics = m_fontStore.GetGlyphMetrics(FontStore::Kind::Text, TINOS, code, weight, style);
+        metrics = m_fontStore.GetGlyphMetrics(FontStore::Kind::Text, TINOS, code, faceStyle.first, faceStyle.second);
     }
     if (!metrics) return NULL;
     return this->GetRuntimeGlyph(metrics->m_face, metrics->m_glyphId);
@@ -298,6 +286,16 @@ const Glyph *Resources::GetRuntimeGlyph(FontStore::FaceIdentity face, int glyphI
         metrics->m_xBearing, metrics->m_yBearing + metrics->m_height, metrics->m_width, -metrics->m_height);
     glyph.SetFace(face.m_value, glyphId);
     return &glyphs.emplace(key, std::move(glyph)).first->second;
+}
+
+Resources::FaceStyle Resources::GetFaceStyle(const FontInfo &font)
+{
+    const FontStore::Weight weight
+        = (font.GetWeight() == FONTWEIGHT_bold) ? FontStore::Weight::Bold : FontStore::Weight::Normal;
+    const FontStore::Style style = ((font.GetStyle() == FONTSTYLE_italic) || (font.GetStyle() == FONTSTYLE_oblique))
+        ? FontStore::Style::Italic
+        : FontStore::Style::Normal;
+    return { weight, style };
 }
 
 char32_t Resources::GetSmuflGlyphForUnicodeChar(const char32_t unicodeChar)

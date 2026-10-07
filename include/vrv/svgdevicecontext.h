@@ -200,9 +200,9 @@ public:
     bool UseGlobalStyling() override { return !m_mmOutput; }
 
     /**
-     * Text styles cannot be left to CSS when text is rendered as paths
+     * Text styles cannot be left to CSS when text is rendered as paths, and are needed for embedding the faces used
      */
-    bool UseGlobalTextStyling() override { return this->UseGlobalStyling() && !m_textAsPaths; }
+    bool UseGlobalTextStyling() override { return this->UseGlobalStyling() && !m_textAsPaths && !m_embedTextFont; }
 
     /**
      * Setting mm output flag (false by default)
@@ -326,9 +326,9 @@ private:
     void IncludeMusicTextFont(const std::string &fontname);
 
     /**
-     * Include the registered faces of a font family as base64 @font-face rules
+     * Include the registered faces of a text font family used as base64 @font-face rules
      */
-    void IncludeFontFaces(FontStore::Kind kind, const std::string &family);
+    void IncludeTextFontFaces(const std::string &family, const std::set<Resources::FaceStyle> &faceStyles);
 
     /**
      * Append a @font-face rule for a font file, which is embedded unless a source URL is given
@@ -395,8 +395,8 @@ private:
     int m_originX, m_originY;
     /** Current text baseline, used to express vertical moves as relative SVG dy values. */
     int m_textY;
-    /** The text font families used, for embedding them in Commit() */
-    std::set<std::string> m_textFontFamilies;
+    /** The text font families used, with the faces used, for embedding them in Commit() */
+    std::map<std::string, std::set<Resources::FaceStyle>> m_textFontFaces;
     // Text cursor and current line when text is rendered as paths
     double m_textCursorX;
     int m_textCursorY;

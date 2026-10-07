@@ -174,13 +174,30 @@ void SvgDeviceContext::IncludeMusicTextFont(const std::string &fontname)
     this->AppendFontFace(fontname, *file, src);
 }
 
-void SvgDeviceContext::IncludeFontFaces(FontStore::Kind kind, const std::string &family)
+void SvgDeviceContext::IncludeTextFontFaces(const std::string &family, const std::set<Resources::FaceStyle> &faceStyles)
 {
     const Resources *resources = this->GetResources(true);
     if (!resources) return;
 
-    for (const FontStore::FontFile &file : resources->GetFontStore().GetFontFiles(kind, family)) {
-        this->AppendFontFace(family, file);
+    const std::vector<FontStore::FontFile> files
+        = resources->GetFontStore().GetFontFiles(FontStore::Kind::Text, family);
+    const auto findFile = [&files](FontStore::Weight weight, FontStore::Style style) {
+        return std::find_if(files.begin(), files.end(), [weight, style](const FontStore::FontFile &file) {
+            return (file.m_weight == weight) && (file.m_style == style);
+        });
+    };
+
+    // A face that is not registered is synthesized from another one, as in FontStore, which is embedded instead
+    std::set<Resources::FaceStyle> included;
+    for (const Resources::FaceStyle &faceStyle : faceStyles) {
+        const std::vector<Resources::FaceStyle> candidates = { faceStyle, { faceStyle.first, FontStore::Style::Normal },
+            { FontStore::Weight::Normal, faceStyle.second }, { FontStore::Weight::Normal, FontStore::Style::Normal } };
+        for (const Resources::FaceStyle &candidate : candidates) {
+            const std::vector<FontStore::FontFile>::const_iterator file = findFile(candidate.first, candidate.second);
+            if (file == files.end()) continue;
+            if (included.insert(candidate).second) this->AppendFontFace(family, *file);
+            break;
+        }
     }
 }
 
@@ -250,8 +267,8 @@ void SvgDeviceContext::Commit(bool xml_declaration)
     }
     // add the text fonts if needed
     if (m_embedTextFont) {
-        for (const std::string &family : m_textFontFamilies) {
-            this->IncludeFontFaces(FontStore::Kind::Text, family);
+        for (const std::pair<const std::string, std::set<Resources::FaceStyle>> &font : m_textFontFaces) {
+            this->IncludeTextFontFaces(font.first, font.second);
         }
     }
 
@@ -547,7 +564,7 @@ void SvgDeviceContext::StartPage()
     // Initialize the flag to false because we want to know if the font needs to be included in the SVG
     m_vrvTextFont = false;
     m_vrvTextFontFallback = false;
-    m_textFontFamilies.clear();
+    m_textFontFaces.clear();
 
     // default styles
     if (this->UseGlobalStyling()) {
@@ -1298,7 +1315,8 @@ void SvgDeviceContext::DrawTextAsTspan(const std::u32string &wtext, int x, int y
     else {
         // Keep track of the text font for embedding it, which is the inherited one if none is given
         const std::string &fontFaceName = font->GetFaceName();
-        m_textFontFamilies.insert(fontFaceName.empty() ? resources->GetTextFont() : fontFaceName);
+        m_textFontFaces[fontFaceName.empty() ? resources->GetTextFont() : fontFaceName].insert(
+            Resources::GetFaceStyle(*font));
         // Set the @font-family only if it is not the same as in the parent node
         if (!fontFaceName.empty() && !IsInFontFamilyList(currentFaceName, fontFaceName)) {
             textChild.append_attribute("font-family") = fontFaceName.c_str();

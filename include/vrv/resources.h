@@ -33,6 +33,7 @@ class FontInfo;
 class Resources {
 public:
     using GlyphNameTable = std::unordered_map<std::string, char32_t>;
+    using FaceStyle = std::pair<FontStore::Weight, FontStore::Style>;
 
     /**
      * @name Constructors, destructors, and other standard methods
@@ -127,6 +128,11 @@ public:
      * Return the parameter char if nothing can be converted.
      */
     static char32_t GetSmuflGlyphForUnicodeChar(const char32_t unicodeChar);
+
+    /**
+     * Static method that returns the weight and style of the face for a drawing font
+     */
+    static FaceStyle GetFaceStyle(const FontInfo &font);
 
 private:
     std::string m_path;

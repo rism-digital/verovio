@@ -793,11 +793,27 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
         embeddedSvg.find("@font-face {font-family: 'Tinos'; src: url(data:font/woff2;base64,") != std::string::npos,
         "svgEmbedTextFont did not embed the text font as base64");
     ok &= Expect(embeddedSvg.find("format('woff2'); font-weight: bold; font-style: italic;}") != std::string::npos,
-        "svgEmbedTextFont did not embed all the faces of the text font");
+        "svgEmbedTextFont did not embed the bold italic face used");
     ok &= Expect(embeddedSvg.find("font-family=\"Tinos, serif\"") != std::string::npos,
         "the embedded text font was not preferred over its metric equivalent");
     ok &= Expect(
         embeddedSvg.find("font-family=\"Tinos\"") == std::string::npos, "the text font was repeated within the SVG");
+
+    vrv::Toolkit regularTextRendering(false);
+    const std::string regularTextMei = R"mei(<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1"><music><body><mdiv><score>
+<scoreDef><staffGrp><staffDef n="1" lines="5" clef.shape="G" clef.line="2"/></staffGrp></scoreDef>
+<section><measure n="1"><staff n="1"><layer n="1"><note xml:id="regular-note" pname="c" oct="4" dur="1"/>
+</layer></staff><dir startid="#regular-note"><rend fontstyle="normal">text</rend></dir></measure></section>
+</score></mdiv></body></music></mei>)mei";
+    ok &= Expect(regularTextRendering.SetResourcePath(argv[9])
+            && regularTextRendering.SetOptions("{\"svgEmbedTextFont\":true}")
+            && regularTextRendering.LoadData(regularTextMei),
+        "regular text MEI could not be loaded");
+    const std::string regularTextSvg = regularTextRendering.RenderToSVG(1);
+    ok &= Expect((CountOccurrences(regularTextSvg, "@font-face {font-family: 'Tinos'") == 1)
+            && (regularTextSvg.find("font-weight: normal; font-style: normal;}") != std::string::npos),
+        "svgEmbedTextFont did not embed only the face used");
 
     vrv::Toolkit musicTextRendering(false);
     const std::string musicTextMei = R"mei(<?xml version="1.0" encoding="UTF-8"?>
