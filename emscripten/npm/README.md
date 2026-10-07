@@ -1,10 +1,5 @@
 This is an NPM of the stable version of the Verovio JavaScript toolkit.
 
-The package includes `dist/verovio.data`, which contains the bundled runtime
-fonts and other resources. Keep that file beside the generated Verovio module
-when copying files out of the package. If a bundler publishes assets elsewhere,
-pass a `locateFile` option to the modularized module factory.
-
 Verovio is a fast, portable and lightweight library for engraving [Music Encoding Initiative (MEI)](http://www.music-encoding.org) music scores into SVG.
 
 See it running in the [MEI Viewer](http://www.verovio.org/mei-viewer.xhtml) and check out the [tutorial](http://www.verovio.org/tutorial.xhtml) for its web integration and for enabling user interaction.

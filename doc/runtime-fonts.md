@@ -104,23 +104,16 @@ the matching Tinos face and then to `.notdef`.
 
 ## WebAssembly resources
 
-Production WebAssembly builds consist of the JavaScript module plus an
-adjacent `verovio.data` file containing the bundled runtime resources. Both
-files are required. The default loader resolves the data file beside the
-module in Node and beside the script URL in browsers. Modularized callers can
-override this with Emscripten's `locateFile` option when an asset pipeline
-publishes `verovio.data` under a different URL.
-
-The data sidecar is intentional: putting already-compressed WOFF2 bytes inside
-Emscripten's single-file JavaScript encoding increased the compressed release
-by substantially more than the fonts themselves. Release size reports count
-both files.
+As before, the bundled runtime resources, including the Leipzig, Bravura, and
+Tinos fonts, are embedded in the JavaScript toolkit. Other fonts have to be
+registered at runtime.
 
 ## Migration
 
 `fontAddCustom` remains as a deprecated ZIP adapter for one compatibility
-release. `fontTextLiberation` is also deprecated and emits a warning. Applications should register any non-bundled family explicitly and
-select it with `font`, `fontText`, or MEI `fontname`.
+release. `fontTextLiberation` is also deprecated and emits a warning.
+Applications should register any non-bundled family explicitly and select it
+with `font`, `fontText`, or MEI `fontname`.
 
 Gootville, Leland, Petaluma, Liberation, and Times metric resources are no
 longer bundled. They remain usable when supplied as runtime fonts.

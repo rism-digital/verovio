@@ -3,9 +3,6 @@
 # Description: Compile script for the JavaScript toolkit version of verovio.
 #
 # Changes from bash script version:
-#   Allow for excluding specific fonts.
-#      Example:      ./buildToolkit -x "Gootville,Bravura"
-#      Long Example: ./buildToolkit --exclude "Gootville,Bravura"
 #   Allow exclusion of specific importers (only works with PAE and Humdrum for now).
 #      Example:      ./buildToolkit -P
 #      Long Example: ./buildToolkit --no-pae
@@ -15,9 +12,7 @@
 #   Automated generation of source code filelist.
 # Note:
 #   VERSION_NAME not significantly used so removed.
-#   For smallest toolkit footprint use these options:
-#     ./buildToolkit -x "Gootville,Bravura" -DHPX
-#   (no Gootville or Bravura fonts; no importers)
+#   The bundled fonts are all required and are always embedded.
 #
 
 use strict;
@@ -31,7 +26,6 @@ Options:
 -r DIR  Verovio root directory
 -v N    Version number (e.g., 1.0.0); no number by default
 -w      Webassembly version
--x      Font exclusion list (case-sensitive)
 -H      Disable Humdrum importer
 -M      Clean existing makefile
 -m      Modularize emscripten build
@@ -43,14 +37,12 @@ EOT
 chomp (my $EMCC = `which em++`);
 chomp (my $EMCMAKE = `which emcmake`);
 chomp (my $EMMAKE = `which emmake`);
-chomp (my $NODE = `which node`);
 die "ERROR: emscripten compiler (emcc) not found.\n" unless $EMCC;
 die "ERROR: emscripten cmake (emcmake) not found.\n" unless $EMCMAKE;
 die "ERROR: emscripten make (emmake) not found.\n" unless $EMMAKE;
-die "ERROR: node not found.\n" unless $NODE;
 
 # Parse command-line options
-my ($version, $chattyQ, $helpQ, $exclusion, $wasmQ, $makeQ, $modularizeQ, $debug);
+my ($version, $chattyQ, $helpQ, $wasmQ, $makeQ, $modularizeQ, $debug);
 my ($nohumdrum);
 my ($FLAGS_NAME, $VERSION, $CHATTY);
 
@@ -64,7 +56,6 @@ GetOptions (
 	'h|?|help'      => \$helpQ,
 	'r|root=s'      => \$VEROVIO_ROOT,
 	'v|version=s'   => \$VERSION,
-	'x|exclusion=s' => \$exclusion,
 	'w|wasm'        => \$wasmQ,
 	'm|modularize'  => \$modularizeQ,
 	'H|no-humdrum'  => \$nohumdrum,
@@ -159,7 +150,7 @@ print "Output files will be written to $OUTPUT_DIR\n";
 `mkdir -p $OUTPUT_DIR`;
 `mkdir -p $DATA_DIR`;
 
-syncSvgResources($exclusion);
+syncSvgResources();
 
 # Generate the git commit file
 print "Creating commit version header file...\n";
@@ -170,7 +161,7 @@ my $defines = "-DUSE_EMSCRIPTEN";
 my $cmake = "-DBUILD_AS_WASM=ON";
 $cmake .= " -DNO_HUMDRUM_SUPPORT=ON" if ($nohumdrum);
 
-my $preload = "--preload-file $DATA_DIR/";
+my $embed   = "--embed-file $DATA_DIR/";
 my $output  = "-o $BUILD_DIR/verovio.js";
 
 my $exports = "-s EXPORTED_FUNCTIONS=\@exports.txt";
@@ -197,27 +188,21 @@ print "$makeCmd\n" if $CHATTY;
 system($makeCmd);
 
 print "*************\nLinking...\n";
-my $ccCmd = "$EMCC $CHATTY libverovio.a $LFLAGS $FLAGS $preload $exports $extra_exports $output $modularize";
+my $ccCmd = "$EMCC $CHATTY libverovio.a $LFLAGS $FLAGS $embed $exports $extra_exports $output $modularize";
 print "$ccCmd\n" if $CHATTY;
 system($ccCmd);
 
 if ($? == 0) {
-	my $locatorMode = $modularizeQ ? "module" : "classic";
-	system($NODE, "patch-font-data-locator.mjs", "$BUILD_DIR/verovio.js", $locatorMode) == 0
-		or die "font data locator patch failed: $?";
 	print " Done.\n";
 
     # skip prebundled wasm module with verovio toolkit for modularized builds
     if(!$modularizeQ) {
         `npm --prefix npm install`;
         `npm --prefix npm run prebundle -- -o "\$(pwd)/$OUTPUT_DIR/$FILENAME"`;
-		`cp $BUILD_DIR/verovio.data $OUTPUT_DIR/verovio.data` if $OUTPUT_DIR ne $BUILD_DIR;
 
         # create a gzip version
         `(cd $OUTPUT_DIR && gzip -c $FILENAME > $FILENAME.gz)`;
-        `(cd $OUTPUT_DIR && gzip -c verovio.data > verovio.data.gz)`;
         print "$OUTPUT_DIR/$FILENAME.gz was created\n";
-        print "$OUTPUT_DIR/verovio.data.gz was created\n";
 
         # all good
         print "$OUTPUT_DIR/$FILENAME was created\n";
@@ -245,7 +230,6 @@ exit 0;
 ##
 
 sub syncSvgResources {
-	my ($exclusion) = @_;
 	print "Syncing SVG resources...\n";
 
 	# First clear old contents of data directory
@@ -256,15 +240,4 @@ sub syncSvgResources {
 
 	# Remove .DS_Store from the data directory
 	`find $DATA_DIR/ -name '.DS_Store' -type f -delete`;
-
-	return unless $exclusion;
-	my @list = split /[^A-Za-z0-9_]+/, $exclusion;
-	foreach my $item (@list) {
-		next unless $item;
-		my @matches = glob "$DATA_DIR/$item*";
-		if (@matches) {
-			print "\tRemoving $item from embedded resources\n";
-			`rm -rf $DATA_DIR/$item*`;
-		}
-	}
 }
