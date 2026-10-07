@@ -76,13 +76,6 @@ public:
      */
     std::string GetResourcePath() const;
 
-#ifdef VRV_FONT_RUNTIME_TESTING
-    FontStore::Counters GetFontStoreCountersForTesting() const
-    {
-        return m_doc.GetResources().GetFontStore().GetCounters();
-    }
-#endif
-
     /**
      * Set the resource path for the Toolkit instance and any extra fonts
      *

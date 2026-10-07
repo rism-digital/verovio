@@ -71,8 +71,7 @@ let package = Package(
         ),
         .testTarget(
             name: "VerovioToolkitTests",
-            dependencies: ["VerovioToolkit"],
-            path: "bindings/swift-toolkit-tests"
+            dependencies: ["VerovioToolkit"]
         )
     ]
 )

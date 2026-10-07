@@ -9,8 +9,7 @@
 
 All fonts included in Verovio are licensed under the [SIL Open Font License](http://scripts.sil.org/cms/scripts/page.php?item_id=OFL).
 
-Other fonts, such as Gootville, Leland, or Petaluma, are no longer bundled but can be registered at runtime (see
-`doc/runtime-fonts.md`).
+Other fonts, such as Gootville, Leland, or Petaluma, are no longer bundled but can be registered at runtime.
 
 ## Generate Script
 

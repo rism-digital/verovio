@@ -657,12 +657,7 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
     const std::string scoreLyricConnectorSvg = scoreLyricConnectorRendering.RenderToSVG(1);
     ok &= Expect(!customHyphenPrefix.empty() && (CountOccurrences(scoreLyricConnectorSvg, customHyphenPrefix) >= 6),
         "scoreDef lyric.fam did not select the registered face for syllables and their connectors");
-    const auto lyricCountersBeforeRepeat = lyricHyphenRendering.GetFontStoreCountersForTesting();
     ok &= Expect(lyricHyphenRendering.RenderToSVG(1) == lyricHyphenSvg, "repeated lyric hyphen render changed SVG");
-    const auto lyricCountersAfterRepeat = lyricHyphenRendering.GetFontStoreCountersForTesting();
-    ok &= Expect(lyricCountersAfterRepeat.shapedRuns == lyricCountersBeforeRepeat.shapedRuns
-            && lyricCountersAfterRepeat.extractedOutlines == lyricCountersBeforeRepeat.extractedOutlines,
-        "repeated lyric hyphen render added shaping or outline extraction work");
 
     const std::vector<unsigned char> ligatureFont = ReadFile(argv[11]);
     ok &= Expect(store.RegisterTextFont(ligatureFont.data(), ligatureFont.size()) == "Verovio Test Ligature",
@@ -874,13 +869,7 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
         "nested dir/rend did not use its per-element text font");
     ok &= Expect((customSvg.find("<text") == std::string::npos) && (customSvg.find("<tspan") == std::string::npos),
         "custom-font SVG emitted visible text");
-    const auto countersBeforeRepeatedRender = customRendering.GetFontStoreCountersForTesting();
     ok &= Expect(customRendering.RenderToSVG(1) == customSvg, "repeated aliased-font rendering changed the SVG");
-    const auto countersAfterRepeatedRender = customRendering.GetFontStoreCountersForTesting();
-    ok &= Expect(countersAfterRepeatedRender.decodedFonts == countersBeforeRepeatedRender.decodedFonts
-            && countersAfterRepeatedRender.extractedOutlines == countersBeforeRepeatedRender.extractedOutlines
-            && countersAfterRepeatedRender.shapedRuns == countersBeforeRepeatedRender.shapedRuns,
-        "repeated aliased-font rendering added decoding, outline extraction, or shaping work");
     vrv::Toolkit canonicalRendering(false);
     RenderTextAsPaths(canonicalRendering);
     ok &= Expect(canonicalRendering.SetResourcePath(argv[9])

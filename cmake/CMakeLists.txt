@@ -39,7 +39,6 @@ option(NO_RUNTIME               "Disable runtime clock support"                O
 option(BUILD_AS_LIBRARY         "Build Verovio as library"                     OFF)
 option(BUILD_AS_ANDROID_LIBRARY "Build Verovio as library for Android"         OFF)
 option(USE_PAE_OLD_PARSER       "Use old PAE parser"                           OFF)
-option(BUILD_FONT_BENCHMARKS    "Build runtime font benchmark harness"          OFF)
 option(BUILD_FONT_TESTS         "Build runtime font API tests"                   OFF)
 
 if (NO_HUMDRUM_SUPPORT AND MUSICXML_DEFAULT_HUMDRUM)
@@ -252,14 +251,9 @@ if(EMSCRIPTEN)
         APPEND PROPERTY COMPILE_OPTIONS "-Wno-unused-template;-Wno-format-pedantic")
 endif()
 
-if(BUILD_FONT_BENCHMARKS)
-    add_executable(font-runtime-benchmark ../benchmark/font-runtime/native.cpp ${all_SRC})
-endif()
-
 if(BUILD_FONT_TESTS)
     enable_testing()
     add_executable(font-runtime-registration-test ../tests/font-runtime/registration.cpp ${all_SRC})
-    target_compile_definitions(font-runtime-registration-test PRIVATE VRV_FONT_RUNTIME_TESTING)
     add_test(NAME font-runtime-registration
         COMMAND font-runtime-registration-test
             ${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/fonts/Tinos-Regular.ttf
@@ -271,7 +265,7 @@ if(BUILD_FONT_TESTS)
             ${CMAKE_CURRENT_SOURCE_DIR}/../data/fonts/Tinos-Bold.woff2
             ${CMAKE_CURRENT_SOURCE_DIR}/../data/fonts/Tinos-BoldItalic.woff2
             ${CMAKE_CURRENT_SOURCE_DIR}/../data
-            ${CMAKE_CURRENT_SOURCE_DIR}/../benchmark/font-runtime/fixtures/text-heavy.mei
+            ${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/text-heavy.mei
             ${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/VerovioTestLigature.ttf
             ${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/VerovioTestMusic.ttf
             ${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/VerovioTestMusic_metadata.json
