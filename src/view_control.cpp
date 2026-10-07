@@ -1091,13 +1091,11 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     }
 
     // set pen width and calculate tie thickness coefficient to adjust tie width in according to it
-    const int thickness
-        = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetOptions()->m_tieMidpointThickness.GetValue();
-    const int penWidth
-        = m_doc->GetOptions()->m_tieEndpointThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int staffSize = staff->IsTabGuitar() ? staff->GetDrawingStaffNotationSize() : staff->m_drawingStaffSize;
+    const int thickness = m_doc->GetDrawingUnit(staffSize) * m_doc->GetOptions()->m_tieMidpointThickness.GetValue();
+    const int penWidth = m_doc->GetOptions()->m_tieEndpointThickness.GetValue() * m_doc->GetDrawingUnit(staffSize);
     const double thicknessCoefficient = BoundingBox::GetBezierThicknessCoefficient(bezier, thickness, penWidth);
-    this->DrawThickBezierCurve(
-        dc, bezier, thicknessCoefficient * thickness, staff->m_drawingStaffSize, penWidth, penStyle);
+    this->DrawThickBezierCurve(dc, bezier, thicknessCoefficient * thickness, staffSize, penWidth, penStyle);
 
     if (graphic) {
         dc->EndResumedGraphic(graphic, this);

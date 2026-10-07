@@ -496,6 +496,7 @@ private:
     void CloseSlur(Measure *measure, short int number, LayerElement *element, curvature_CURVEDIR dir);
     void CloseBeamSpan(Staff *staff, Layer *layer, LayerElement *element);
     void MatchTies(bool matchLayers);
+    bool MatchTieNotes(const Note *start, const Note *end) const;
     ///@}
 
     /*
