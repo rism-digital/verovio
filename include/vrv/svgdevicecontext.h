@@ -360,7 +360,7 @@ private:
      * @name Text output as SVG text or as glyph paths, depending on m_textAsPaths
      */
     ///@{
-    void DrawTextAsTspan(const std::string &text, int x, int y, int width, int height);
+    void DrawTextAsTspan(const std::u32string &wtext, int x, int y, int width, int height);
     void DrawTextAsPaths(const std::u32string &wtext, int x, int y);
     void FinishTextLine();
     ///@}

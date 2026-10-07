@@ -1206,7 +1206,7 @@ void SvgDeviceContext::DrawText(
         this->DrawTextAsPaths(wtext, x, y);
     }
     else {
-        this->DrawTextAsTspan(text, x, y, width, height);
+        this->DrawTextAsTspan(wtext, x, y, width, height);
     }
 
     if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET) && (width != 0) && (height != 0)
@@ -1222,13 +1222,41 @@ void SvgDeviceContext::DrawText(
     }
 }
 
-void SvgDeviceContext::DrawTextAsTspan(const std::string &text, int x, int y, int width, int height)
+void SvgDeviceContext::DrawTextAsTspan(const std::u32string &wtext, int x, int y, int width, int height)
 {
     const FontInfo *font = m_fontStack.top();
     const Resources *resources = this->GetResources();
     assert(resources);
 
-    std::string svgText = text;
+    // Characters missing in the text font are laid out with the music font (see FontStore::ShapeText), so they
+    // are written with it as well, in a tspan of their own
+    if (font->GetSmuflFont() == SMUFL_NONE) {
+        const auto isMusic
+            = [resources, font](char32_t c) { return !resources->GetTextGlyph(c, *font) && resources->GetGlyph(c); };
+        const std::u32string::const_iterator musicBegin = std::find_if(wtext.begin(), wtext.end(), isMusic);
+        if (musicBegin != wtext.end()) {
+            const std::u32string::const_iterator musicEnd = std::find_if_not(musicBegin, wtext.end(), isMusic);
+            if (musicBegin != wtext.begin()) {
+                this->DrawTextAsTspan(std::u32string(wtext.begin(), musicBegin), x, y, width, height);
+                x = VRV_UNSET;
+                y = VRV_UNSET;
+            }
+            const std::u32string music(musicBegin, musicEnd);
+            FontInfo musicFont = *font;
+            musicFont.SetFaceName(resources->GetCurrentFont());
+            musicFont.SetSmuflWithFallback(resources->IsSmuflFallbackNeeded(music));
+            musicFont.SetStyle(FONTSTYLE_normal);
+            this->SetFont(&musicFont);
+            this->DrawTextAsTspan(music, x, y, width, height);
+            this->ResetFont();
+            if (musicEnd != wtext.end()) {
+                this->DrawTextAsTspan(std::u32string(musicEnd, wtext.end()), VRV_UNSET, VRV_UNSET, width, height);
+            }
+            return;
+        }
+    }
+
+    std::string svgText = UTF32to8(wtext);
 
     // Because IE does not support xml:space="preserve", we need to replace the initial
     // space with a non breakable space

@@ -782,6 +782,16 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
         musicTextRendering.RenderToSVG(1).find("/data/fonts/Leipzig.woff2\") format('woff2')") != std::string::npos,
         "the music font used in text was not linked");
 
+    vrv::Toolkit musicGlyphRendering(false);
+    std::string musicGlyphMei = musicTextMei;
+    ReplaceAll(musicGlyphMei, "<dynam startid=\"#dynam-note\">mf cresc.</dynam>",
+        "<harm startid=\"#dynam-note\">x&#xE050;y</harm>");
+    ok &= Expect(musicGlyphRendering.SetResourcePath(argv[9]) && musicGlyphRendering.LoadData(musicGlyphMei),
+        "music glyph MEI could not be loaded");
+    ok &= Expect(
+        musicGlyphRendering.RenderToSVG(1).find("font-family=\"Leipzig\" font-style=\"normal\"") != std::string::npos,
+        "the music glyph missing in the text font was not written with the music font");
+
     const std::vector<unsigned char> testText = ReadFile(argv[11]);
     const std::vector<unsigned char> testMusic = ReadFile(argv[12]);
     const std::vector<unsigned char> testMusicMetadataBytes = ReadFile(argv[13]);
