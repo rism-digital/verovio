@@ -1140,7 +1140,7 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
 
         const ScoreDefInterface *textStyle = staff->m_drawingStaffDef;
         FontInfo mnumTxt = m_doc->GetDrawingTextFont(staff->m_drawingStaffSize, textStyle);
-        if (!dc->UseGlobalStyling() && !mnum->HasFontstyle() && (!textStyle || !textStyle->HasTextStyle())) {
+        if (!dc->UseGlobalTextStyling() && !mnum->HasFontstyle() && (!textStyle || !textStyle->HasTextStyle())) {
             mnumTxt.SetStyle(FONTSTYLE_italic);
         }
         if (mnum->HasFontname())

@@ -336,6 +336,12 @@ public:
      */
     virtual bool UseGlobalStyling() { return false; }
 
+    /**
+     * Method indicating if text styles (e.g., bold tempo) are left to the global styling.
+     * This requires the text to be output as text so that the styling applies to it.
+     */
+    virtual bool UseGlobalTextStyling() { return this->UseGlobalStyling(); }
+
     //----------------//
     // Static methods //
     //----------------//

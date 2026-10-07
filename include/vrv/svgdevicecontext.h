@@ -17,6 +17,7 @@
 //----------------------------------------------------------------------------
 
 #include "devicecontext.h"
+#include "fontstore.h"
 #include "object.h"
 #include "options.h"
 
@@ -199,6 +200,11 @@ public:
     bool UseGlobalStyling() override { return !m_mmOutput; }
 
     /**
+     * Text styles cannot be left to CSS when text is rendered as paths
+     */
+    bool UseGlobalTextStyling() override { return this->UseGlobalStyling() && !m_textAsPaths; }
+
+    /**
      * Setting mm output flag (false by default)
      */
     void SetMMOutput(bool mmOutput) { m_mmOutput = mmOutput; }
@@ -282,6 +288,16 @@ public:
      */
     void SetSmuflTextFont(option_SMUFLTEXTFONT smuflTextFont) { m_smuflTextFont = smuflTextFont; }
 
+    /**
+     * Setting the flag for embedding the text fonts used (false by default)
+     */
+    void SetEmbedTextFont(bool embedTextFont) { m_embedTextFont = embedTextFont; }
+
+    /**
+     * Setting the flag for rendering text as glyph paths instead of SVG text (false by default)
+     */
+    void SetTextAsPaths(bool textAsPaths) { m_textAsPaths = textAsPaths; }
+
 private:
     /**
      * Copy the content of a file to the output stream.
@@ -310,6 +326,16 @@ private:
     void VrvTextFontFallback() { m_vrvTextFontFallback = true; }
 
     /**
+     * Include the smufl text font either embedded or linked depending on m_smuflTextFont
+     */
+    void IncludeMusicTextFont(const std::string &fontname);
+
+    /**
+     * Include the registered faces of a font family as base64 @font-face rules
+     */
+    void IncludeFontFaces(FontStore::Kind kind, const std::string &family);
+
+    /**
      * Flush the data to the internal buffer.
      * Adds the xml tag if necessary and the <defs> from m_smuflGlyphs
      */
@@ -334,7 +360,15 @@ private:
      * Prefix the CSS rules with a #docId for scoping them to the SVG
      */
     void PrefixCssRules(std::string &rules);
+
+    /**
+     * @name Text output as SVG text or as glyph paths, depending on m_textAsPaths
+     */
+    ///@{
+    void DrawTextAsTspan(const std::string &text, int x, int y, int width, int height);
+    void DrawTextAsPaths(const std::u32string &wtext, int x, int y);
     void FinishTextLine();
+    ///@}
 
 public:
     //
@@ -359,6 +393,11 @@ private:
 
     bool m_committed; // did we flushed the file?
     int m_originX, m_originY;
+    /** Current text baseline, used to express vertical moves as relative SVG dy values. */
+    int m_textY;
+    /** The text font families used, for embedding them in Commit() */
+    std::set<std::string> m_textFontFamilies;
+    // Text cursor and current line when text is rendered as paths
     double m_textCursorX;
     int m_textCursorY;
     double m_textLineWidth;
@@ -426,6 +465,10 @@ private:
     std::string m_glyphPostfixId;
     // embedding of the smufl text font
     option_SMUFLTEXTFONT m_smuflTextFont;
+    // embedding of the text fonts
+    bool m_embedTextFont;
+    // render text as glyph paths
+    bool m_textAsPaths;
     // the document id
     std::string m_docId;
 };

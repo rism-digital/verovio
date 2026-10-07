@@ -17,7 +17,7 @@
                   <note xml:id="n1" pname="c" oct="4" dur="4"/>
                 </layer>
               </staff>
-              <dir startid="#n1"><rend fontname="QS">ffi</rend></dir>
+              <dir startid="#n1"><rend fontname="QS" fontstyle="normal">ffi</rend></dir>
             </measure>
           </section>
         </score>

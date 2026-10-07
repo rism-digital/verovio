@@ -1789,7 +1789,7 @@ void View::DrawControlElementText(DeviceContext *dc, ControlElement *element, Me
 
         const ScoreDefInterface *textStyle = staff->m_drawingStaffDef;
         FontInfo dirTxt = m_doc->GetDrawingTextFont(staffSize, textStyle);
-        if (!dc->UseGlobalStyling() && (!textStyle || !textStyle->HasTextStyle())) {
+        if (!dc->UseGlobalTextStyling() && (!textStyle || !textStyle->HasTextStyle())) {
             dirTxt.SetStyle(FONTSTYLE_italic);
         }
 
@@ -1870,7 +1870,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
 
         const ScoreDefInterface *textStyle = staff->m_drawingStaffDef;
         FontInfo dynamTxt = m_doc->GetDrawingTextFont(staffSize, textStyle);
-        if (!dc->UseGlobalStyling() && (!textStyle || !textStyle->HasTextStyle())) {
+        if (!dc->UseGlobalTextStyling() && (!textStyle || !textStyle->HasTextStyle())) {
             dynamTxt.SetStyle(FONTSTYLE_italic);
         }
 
@@ -2124,7 +2124,11 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
         params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetFingeringFont(staffSize)->GetPointSize();
 
-        FontInfo fingTxt = m_doc->GetDrawingTextFont(staffSize, staff->m_drawingStaffDef);
+        const ScoreDefInterface *textStyle = staff->m_drawingStaffDef;
+        FontInfo fingTxt = m_doc->GetDrawingTextFont(staffSize, textStyle);
+        if (!dc->UseGlobalTextStyling() && (!textStyle || !textStyle->HasTextWeight())) {
+            fingTxt.SetWeight(FONTWEIGHT_bold);
+        }
         fingTxt.SetPointSize(params.m_pointSize);
 
         dc->SetFont(&fingTxt);
@@ -2645,7 +2649,7 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
 
         const ScoreDefInterface *textStyle = staff->m_drawingStaffDef;
         FontInfo rehTxt = m_doc->GetDrawingTextFont(staffSize, textStyle);
-        if (!dc->UseGlobalStyling() && (!textStyle || !textStyle->HasTextWeight())) {
+        if (!dc->UseGlobalTextStyling() && (!textStyle || !textStyle->HasTextWeight())) {
             rehTxt.SetWeight(FONTWEIGHT_bold);
         }
         rehTxt.SetPointSize(params.m_pointSize);
@@ -2765,7 +2769,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
 
         const ScoreDefInterface *textStyle = staff->m_drawingStaffDef;
         FontInfo tempoTxt = m_doc->GetDrawingTextFont(staffSize, textStyle);
-        if (!dc->UseGlobalStyling() && (!textStyle || !textStyle->HasTextWeight())) {
+        if (!dc->UseGlobalTextStyling() && (!textStyle || !textStyle->HasTextWeight())) {
             tempoTxt.SetWeight(FONTWEIGHT_bold);
         }
         tempoTxt.SetPointSize(params.m_pointSize);
@@ -3163,8 +3167,11 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
         dc->StartCustomGraphic("voltaBracket");
 
-        FontInfo currentFont = m_doc->GetDrawingTextFont(staffSize, staff->m_drawingStaffDef);
-        // currentFont.SetWeight(FONTWEIGHT_bold);
+        const ScoreDefInterface *textStyle = staff->m_drawingStaffDef;
+        FontInfo currentFont = m_doc->GetDrawingTextFont(staffSize, textStyle);
+        if (!dc->UseGlobalTextStyling() && (!textStyle || !textStyle->HasTextWeight())) {
+            currentFont.SetWeight(FONTWEIGHT_bold);
+        }
         // currentFont.SetPointSize(currentFont.GetPointSize() * 2 / 3);
         dc->SetFont(&currentFont);
 

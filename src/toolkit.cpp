@@ -1553,9 +1553,6 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
             m_options->m_fontTextLiberation.GetValue() ? "Liberation" : m_options->m_fontText.GetValue());
         if (this->GetPageCount() > 0) m_fontLayoutInvalid = true;
     }
-    if (json.has<jsonxx::String>("smuflTextFont")) {
-        LogWarning("Option 'smuflTextFont' is deprecated; SVG text is emitted as runtime glyph paths.");
-    }
 
     // If changing midi options, reset the MIDI doc
     if (json.has<jsonxx::Number>("midiTempoAdjustment") || json.has<jsonxx::Boolean>("midiNoCue")) {
@@ -2076,6 +2073,8 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
     svg.SetRemoveXlink(m_options->m_svgRemoveXlink.GetValue());
     svg.SetAdditionalAttributes(m_options->m_svgAdditionalAttribute.GetValue());
     svg.SetSmuflTextFont((option_SMUFLTEXTFONT)m_options->m_smuflTextFont.GetValue());
+    svg.SetEmbedTextFont(m_options->m_svgEmbedTextFont.GetValue());
+    svg.SetTextAsPaths(m_options->m_svgTextAsPaths.GetValue());
 
     // render the page
     this->RenderToDeviceContext(pageNo, &svg);

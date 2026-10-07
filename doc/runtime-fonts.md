@@ -2,9 +2,27 @@
 
 Verovio now reads static OpenType fonts while a Toolkit is running. Bravura is
 the bundled music default and fallback; the regular, italic, bold, and bold
-italic Tinos faces form the bundled text default. SVG output represents both
-music and text with deduplicated paths and `use` elements, so it does not
-depend on fonts installed in the browser or viewer.
+italic Tinos faces form the bundled text default. The layout of text always
+uses the metrics of the registered fonts.
+
+## SVG text output
+
+By default, text is written as SVG `text` and `tspan` elements, so it remains
+selectable, searchable, and stylable with CSS. The SVG names the font family
+used for the layout (for example, `font-family="Tinos, serif"`), but the
+renderer draws the text with the fonts available to it. Two options control
+this:
+
+- `svgEmbedTextFont` embeds the registered faces of the text families used in
+  the SVG as base64 `@font-face` rules, so the text renders with the same font
+  as the one used for the layout.
+- `svgTextAsPaths` writes text as deduplicated glyph paths and `use` elements
+  instead. The output then does not depend on any font, but the text is no
+  longer selectable or stylable as text.
+
+Music symbols within text (for example, in dynamics) are written with the
+music font as text font. As before, `smuflTextFont` controls whether that font
+is embedded (the default), linked, or not included.
 
 ## Registering fonts
 
@@ -100,8 +118,7 @@ both files.
 ## Migration
 
 `fontAddCustom` remains as a deprecated ZIP adapter for one compatibility
-release. `fontTextLiberation` and `smuflTextFont` are also deprecated and emit
-warnings. Applications should register any non-bundled family explicitly and
+release. `fontTextLiberation` is also deprecated and emits a warning. Applications should register any non-bundled family explicitly and
 select it with `font`, `fontText`, or MEI `fontname`.
 
 Leipzig, Gootville, Leland, Petaluma, Liberation, and Times metric resources

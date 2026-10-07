@@ -63,6 +63,16 @@ public:
         bool operator==(const ShapedRun &) const = default;
     };
 
+    /** A registered font file, kept in the format it was registered with (e.g., WOFF2 is not decompressed). */
+    struct FontFile {
+        Weight weight = Weight::Normal;
+        Style style = Style::Normal;
+        /** The CSS @font-face format: "woff2", "woff", "opentype", or "truetype" */
+        std::string format;
+        std::string mimeType;
+        std::vector<unsigned char> data;
+    };
+
     struct Counters {
         size_t decodedFonts = 0;
         size_t extractedMetrics = 0;
@@ -95,6 +105,9 @@ public:
     std::optional<ShapedRun> ShapeText(const std::string &family, const std::u32string &text,
         Weight weight = Weight::Normal, Style style = Style::Normal, const std::string &musicFamily = "",
         const std::string &musicFallbackFamily = "") const;
+
+    /** Return the files of all faces registered for a family (or alias), without synthesized faces. */
+    std::vector<FontFile> GetFontFiles(Kind kind, const std::string &family) const;
 
     uint64_t GetGeneration() const;
     /** Pin the currently registered bundled faces in the bounded process cache. */

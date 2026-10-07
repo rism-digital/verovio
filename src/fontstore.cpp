@@ -14,6 +14,7 @@
 #include <mutex>
 #include <optional>
 #include <sstream>
+#include <tuple>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -1056,6 +1057,38 @@ std::optional<FontStore::ShapedRun> FontStore::ShapeText(const std::string &fami
     m_impl->m_shapeCache.emplace(key, run);
     ++m_impl->m_counters.shapedRuns;
     return run;
+}
+
+std::vector<FontStore::FontFile> FontStore::GetFontFiles(Kind kind, const std::string &family) const
+{
+    std::lock_guard<std::mutex> lock(m_impl->m_mutex);
+    const std::string &resolvedFamily = m_impl->ResolveFamilyLocked(kind, family);
+    std::vector<FontFile> files;
+    for (const auto &[key, face] : m_impl->m_faces) {
+        if ((key.kind != kind) || (key.family != resolvedFamily)) continue;
+        FontFile file{ key.weight, key.style };
+        const auto decoded = std::ranges::find_if(
+            m_impl->m_decodedInputs, [&face](const auto &entry) { return entry.second->face == face; });
+        if (decoded != m_impl->m_decodedInputs.end()) {
+            const std::vector<unsigned char> &source = decoded->second->source;
+            const bool woff2 = !std::memcmp(source.data(), "wOF2", 4);
+            file.format = woff2 ? "woff2" : "woff";
+            file.mimeType = woff2 ? "font/woff2" : "font/woff";
+            file.data = source;
+        }
+        else {
+            const bool openType = !std::memcmp(face->bytes.data(), "OTTO", 4);
+            file.format = openType ? "opentype" : "truetype";
+            file.mimeType = openType ? "font/otf" : "font/ttf";
+            file.data = face->bytes;
+        }
+        files.push_back(std::move(file));
+    }
+    // Keep the output stable regardless of the hash map order
+    std::ranges::sort(files, [](const FontFile &left, const FontFile &right) {
+        return std::tie(left.weight, left.style) < std::tie(right.weight, right.style);
+    });
+    return files;
 }
 
 uint64_t FontStore::GetGeneration() const

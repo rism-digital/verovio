@@ -7,6 +7,7 @@ execute_process(
         --font-add-text-as "QS=${aliased_font}"
         --font-add-text-as "LongQS=${aliased_font}"
         --font-add-music-as "VM=${MUSIC_FONT}"
+        --svg-text-as-paths
         -o -
         "${FIXTURE}"
     RESULT_VARIABLE result

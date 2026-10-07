@@ -85,6 +85,13 @@ namespace {
         return transform;
     }
 
+    // The root font-family is a list with a generic fallback (e.g., "Tinos, serif")
+    bool IsFontFamilyListHead(const std::string &fontFamilyList, const std::string &family)
+    {
+        return (fontFamilyList.size() > family.size()) && fontFamilyList.starts_with(family)
+            && (fontFamilyList[family.size()] == ',');
+    }
+
 } // namespace
 
 #define space " "
@@ -100,6 +107,7 @@ SvgDeviceContext::SvgDeviceContext(const std::string &docId) : DeviceContext(SVG
 
     m_originX = 0;
     m_originY = 0;
+    m_textY = 0;
     m_textCursorX = 0;
     m_textCursorY = 0;
     m_textLineWidth = 0;
@@ -122,6 +130,9 @@ SvgDeviceContext::SvgDeviceContext(const std::string &docId) : DeviceContext(SVG
     m_facsimile = false;
     m_useLiberation = false;
     m_indent = 2;
+    m_smuflTextFont = SMUFLTEXTFONT_embedded;
+    m_embedTextFont = false;
+    m_textAsPaths = false;
 
     // create the initial SVG element
     // width and height need to be set later; these are taken care of in "commit"
@@ -189,6 +200,42 @@ const std::string &SvgDeviceContext::InsertGlyphRef(const Glyph *glyph)
     return m_smuflGlyphs.back().second.GetRefId();
 }
 
+void SvgDeviceContext::IncludeMusicTextFont(const std::string &fontname)
+{
+    if (m_smuflTextFont == SMUFLTEXTFONT_embedded) {
+        this->IncludeFontFaces(FontStore::Kind::Music, fontname);
+        return;
+    }
+
+    std::string versionPath
+        = (VERSION_DEV) ? "develop" : StringFormat("%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION);
+    pugi::xml_node css = m_svgNode.append_child("style");
+    css.append_attribute("type") = "text/css";
+    css.text().set(StringFormat(
+        "@import url(\"https://www.verovio.org/javascript/%s/data/%s.css\");", versionPath.c_str(), fontname.c_str())
+            .c_str());
+}
+
+void SvgDeviceContext::IncludeFontFaces(FontStore::Kind kind, const std::string &family)
+{
+    const Resources *resources = this->GetResources(true);
+    if (!resources) return;
+
+    std::string cssContent;
+    for (const FontStore::FontFile &file : resources->GetFontStore().GetFontFiles(kind, family)) {
+        // Not with StringFormat, which is limited in length
+        cssContent += "@font-face {font-family: '" + family + "'; src: url(data:" + file.mimeType + ";base64,"
+            + Base64Encode(file.data.data(), static_cast<unsigned int>(file.data.size())) + ") format('" + file.format
+            + "'); font-weight: " + ((file.weight == FontStore::Weight::Bold) ? "bold" : "normal")
+            + "; font-style: " + ((file.style == FontStore::Style::Italic) ? "italic" : "normal") + ";} ";
+    }
+    if (cssContent.empty()) return;
+
+    pugi::xml_node css = m_svgNode.append_child("style");
+    css.append_attribute("type") = "text/css";
+    css.text().set(cssContent.c_str());
+}
+
 void SvgDeviceContext::Commit(bool xml_declaration)
 {
     if (m_committed) {
@@ -223,6 +270,25 @@ void SvgDeviceContext::Commit(bool xml_declaration)
     else {
         m_svgNode.prepend_attribute("height") = StringFormat(format, height).c_str();
         m_svgNode.prepend_attribute("width") = StringFormat(format, width).c_str();
+    }
+
+    // add the music font used in text if needed
+    if (m_smuflTextFont != SMUFLTEXTFONT_none) {
+        const Resources *resources = this->GetResources(true);
+        // include the selected font
+        if (m_vrvTextFont && resources) {
+            this->IncludeMusicTextFont(resources->GetCurrentFont());
+        }
+        // include the fallback font
+        if (m_vrvTextFontFallback && resources) {
+            this->IncludeMusicTextFont(resources->GetFallbackFont());
+        }
+    }
+    // add the text fonts if needed
+    if (m_embedTextFont || m_useLiberation) {
+        for (const std::string &family : m_textFontFamilies) {
+            this->IncludeFontFaces(FontStore::Kind::Text, family);
+        }
     }
 
     // header
@@ -374,7 +440,12 @@ void SvgDeviceContext::StartGraphic(
     if (object->HasAttClass(ATT_TYPOGRAPHY)) {
         AttTypography *att = dynamic_cast<AttTypography *>(object);
         assert(att);
-        if (att->HasFontname()) m_currentNode.append_attribute("font-family") = att->GetFontname().c_str();
+        if (att->HasFontname()) {
+            m_currentNode.append_attribute("font-family") = att->GetFontname().c_str();
+        }
+        else if (att->HasFontfam()) {
+            m_currentNode.append_attribute("font-family") = att->GetFontfam().c_str();
+        }
         if (att->HasFontstyle())
             m_currentNode.append_attribute("font-style") = att->FontstyleToStr(att->GetFontstyle()).c_str();
         if (att->HasFontweight())
@@ -409,7 +480,7 @@ void SvgDeviceContext::StartCustomGraphic(const std::string &name, std::string g
 
 void SvgDeviceContext::StartTextGraphic(Object *object, const std::string &gClass, const std::string &gId)
 {
-    m_currentNode = AddChild("g");
+    m_currentNode = AddChild(m_textAsPaths ? "g" : "tspan");
     m_svgNodeStack.push_back(m_currentNode);
     this->AppendIdAndClass(gId, object->GetClassName(), gClass);
     this->AppendAdditionalAttributes(object);
@@ -441,7 +512,12 @@ void SvgDeviceContext::StartTextGraphic(Object *object, const std::string &gClas
     if (object->HasAttClass(ATT_TYPOGRAPHY)) {
         AttTypography *att = dynamic_cast<AttTypography *>(object);
         assert(att);
-        if (att->HasFontname()) m_currentNode.append_attribute("font-family") = att->GetFontname().c_str();
+        if (att->HasFontname()) {
+            m_currentNode.append_attribute("font-family") = att->GetFontname().c_str();
+        }
+        else if (att->HasFontfam()) {
+            m_currentNode.append_attribute("font-family") = att->GetFontfam().c_str();
+        }
         if (att->HasFontstyle())
             m_currentNode.append_attribute("font-style") = att->FontstyleToStr(att->GetFontstyle()).c_str();
         if (att->HasFontweight())
@@ -520,6 +596,7 @@ void SvgDeviceContext::StartPage()
     // Initialize the flag to false because we want to know if the font needs to be included in the SVG
     m_vrvTextFont = false;
     m_vrvTextFontFallback = false;
+    m_textFontFamilies.clear();
 
     // default styles
     if (this->UseGlobalStyling()) {
@@ -556,6 +633,11 @@ void SvgDeviceContext::StartPage()
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("class") = "definition-scale";
     m_currentNode.append_attribute("color") = "black";
+    if (!m_textAsPaths) {
+        const Resources *resources = this->GetResources();
+        assert(resources);
+        m_currentNode.append_attribute("font-family") = (resources->GetTextFont() + ", serif").c_str();
+    }
     if (this->GetFacsimile()) {
         m_currentNode.append_attribute("viewBox")
             = StringFormat("0 0 %d %d", this->GetWidth(), this->GetHeight()).c_str();
@@ -1048,38 +1130,107 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
 
 void SvgDeviceContext::StartText(int x, int y, data_HORIZONTALALIGNMENT alignment)
 {
-    m_currentNode = m_currentNode.append_child("g");
+    if (m_textAsPaths) {
+        m_currentNode = m_currentNode.append_child("g");
+        m_svgNodeStack.push_back(m_currentNode);
+        m_textLineNode = m_currentNode;
+        m_textCursorX = x;
+        m_textCursorY = y;
+        m_textLineWidth = 0;
+        m_textAlignment = alignment;
+        return;
+    }
+
+    std::string anchor;
+    if (alignment == HORIZONTALALIGNMENT_right) {
+        anchor = "end";
+    }
+    if (alignment == HORIZONTALALIGNMENT_center) {
+        anchor = "middle";
+    }
+
+    m_currentNode = m_currentNode.append_child("text");
     m_svgNodeStack.push_back(m_currentNode);
-    m_textLineNode = m_currentNode;
-    m_textCursorX = x;
-    m_textCursorY = y;
-    m_textLineWidth = 0;
-    m_textAlignment = alignment;
+    if (x) m_currentNode.append_attribute("x") = x;
+    if (y) m_currentNode.append_attribute("y") = y;
+    m_textY = y;
+    if (!anchor.empty()) {
+        m_currentNode.append_attribute("text-anchor") = anchor.c_str();
+    }
+    // font-size seems to be required in <text> in FireFox and also we set it to 0px so space
+    // is not added between tspan elements
+    m_currentNode.append_attribute("font-size") = "0px";
+
+    const FontInfo *font = m_fontStack.top();
+    // Set the @font-family only if it is not the same as in the parent node
+    pugi::xpath_node fontNode = m_currentNode.select_node("ancestor::*[@font-family][1]");
+    const std::string currentFaceName = (fontNode) ? fontNode.node().attribute("font-family").value() : "";
+    if (!font->GetFaceName().empty() && (font->GetFaceName() != currentFaceName)
+        && !IsFontFamilyListHead(currentFaceName, font->GetFaceName())) {
+        m_currentNode.append_attribute("font-family") = font->GetFaceName().c_str();
+    }
+    if (font->GetStyle() == FONTSTYLE_italic) {
+        m_currentNode.append_attribute("font-style") = "italic";
+    }
+    else if (font->GetStyle() == FONTSTYLE_normal) {
+        m_currentNode.append_attribute("font-style") = "normal";
+    }
+    else if (font->GetStyle() == FONTSTYLE_oblique) {
+        m_currentNode.append_attribute("font-style") = "oblique";
+    }
+    if (font->GetWeight() == FONTWEIGHT_bold) {
+        m_currentNode.append_attribute("font-weight") = "bold";
+    }
 }
 
 void SvgDeviceContext::MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment)
 {
-    if (m_textLineNode && m_textLineNode.first_child()) {
-        this->FinishTextLine();
-        m_svgNodeStack.pop_back();
-        m_currentNode = m_svgNodeStack.back().append_child("g");
-        m_svgNodeStack.push_back(m_currentNode);
-        m_textLineNode = m_currentNode;
+    if (m_textAsPaths) {
+        if (m_textLineNode && m_textLineNode.first_child()) {
+            this->FinishTextLine();
+            m_svgNodeStack.pop_back();
+            m_currentNode = m_svgNodeStack.back().append_child("g");
+            m_svgNodeStack.push_back(m_currentNode);
+            m_textLineNode = m_currentNode;
+        }
+        m_textCursorX = x;
+        m_textCursorY = y;
+        m_textLineWidth = 0;
+        if (alignment != HORIZONTALALIGNMENT_NONE) m_textAlignment = alignment;
+        return;
     }
-    m_textCursorX = x;
-    m_textCursorY = y;
-    m_textLineWidth = 0;
-    if (alignment != HORIZONTALALIGNMENT_NONE) m_textAlignment = alignment;
+
+    m_currentNode.append_attribute("x") = x;
+    m_currentNode.append_attribute("y") = y;
+    m_textY = y;
+    if (alignment != HORIZONTALALIGNMENT_NONE) {
+        std::string anchor = "start";
+        if (alignment == HORIZONTALALIGNMENT_right) {
+            anchor = "end";
+        }
+        if (alignment == HORIZONTALALIGNMENT_center) {
+            anchor = "middle";
+        }
+        m_currentNode.append_attribute("text-anchor") = anchor.c_str();
+    }
 }
 
 void SvgDeviceContext::MoveTextVerticallyTo(int y)
 {
-    m_textCursorY = y;
+    if (m_textAsPaths) {
+        m_textCursorY = y;
+        return;
+    }
+
+    // An absolute y starts a new anchored text chunk in SVG. Use a relative shift so
+    // superscripts and subscripts remain part of the surrounding horizontal text run.
+    m_currentNode.append_attribute("dy") = y - m_textY;
+    m_textY = y;
 }
 
 void SvgDeviceContext::EndText()
 {
-    this->FinishTextLine();
+    if (m_textAsPaths) this->FinishTextLine();
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
 }
@@ -1102,74 +1253,12 @@ void SvgDeviceContext::DrawText(
     const std::string &text, const std::u32string &wtext, int x, int y, int width, int height)
 {
     assert(m_fontStack.top());
-    const Resources *resources = this->GetResources();
-    assert(resources);
-    const FontInfo *font = m_fontStack.top();
-    if ((x != VRV_UNSET) && (y != VRV_UNSET)) {
-        m_textCursorX = x;
-        m_textCursorY = y;
-    }
 
-    if (font->GetSmuflFont() != SMUFL_NONE) {
-        this->DrawMusicText(wtext, static_cast<int>(std::round(m_textCursorX)), m_textCursorY);
-        TextExtend extend;
-        this->GetSmuflTextExtent(wtext, &extend);
-        m_textCursorX += extend.m_width;
-        m_textLineWidth += extend.m_width;
+    if (m_textAsPaths) {
+        this->DrawTextAsPaths(wtext, x, y);
     }
     else {
-        const std::optional<FontStore::ShapedRun> run = resources->ShapeText(*font, wtext);
-        if (run) {
-            double cachedY = std::numeric_limits<double>::quiet_NaN();
-            double cachedScaleX = std::numeric_limits<double>::quiet_NaN();
-            double cachedScaleY = std::numeric_limits<double>::quiet_NaN();
-            std::string formattedY;
-            std::string formattedScaleX;
-            std::string formattedScaleY;
-            uint32_t previousCluster = 0;
-            bool first = true;
-            for (const FontStore::GlyphPlacement &placement : run->glyphs) {
-                if (!first && (placement.cluster != previousCluster)) {
-                    m_textCursorX += font->GetLetterSpacing();
-                    m_textLineWidth += font->GetLetterSpacing();
-                }
-                const double scale = static_cast<double>(font->GetPointSize()) / placement.unitsPerEm;
-                const Glyph *glyph = resources->GetRuntimeGlyph(placement.face, placement.glyphId);
-                if (glyph) {
-                    int boundsX, boundsY, boundsWidth, boundsHeight;
-                    glyph->GetBoundingBox(boundsX, boundsY, boundsWidth, boundsHeight);
-                    if (boundsWidth || boundsHeight) {
-                        const std::string &id = InsertGlyphRef(glyph);
-                        pugi::xml_node use = m_currentNode.append_child("use");
-                        const char *href = m_removeXlink ? "href" : "xlink:href";
-                        use.append_attribute(href) = ('#' + id).c_str();
-                        const double glyphX = m_textCursorX + placement.offsetX * scale;
-                        const double glyphY = m_textCursorY - placement.offsetY * scale;
-                        double scaleX = scale;
-                        if (font->GetWidthToHeightRatio() != 1.0F) scaleX *= font->GetWidthToHeightRatio();
-                        if (glyphY != cachedY) {
-                            cachedY = glyphY;
-                            formattedY = SvgNumber(glyphY);
-                        }
-                        if (scaleX != cachedScaleX) {
-                            cachedScaleX = scaleX;
-                            formattedScaleX = SvgNumber(scaleX);
-                        }
-                        if (scale != cachedScaleY) {
-                            cachedScaleY = scale;
-                            formattedScaleY = SvgNumber(scale);
-                        }
-                        use.append_attribute("transform")
-                            = SvgGlyphTransform(glyphX, formattedY, formattedScaleX, formattedScaleY).c_str();
-                    }
-                }
-                const double advance = placement.advanceX * scale;
-                m_textCursorX += advance;
-                m_textLineWidth += advance;
-                previousCluster = placement.cluster;
-                first = false;
-            }
-        }
+        this->DrawTextAsTspan(text, x, y, width, height);
     }
 
     if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET) && (width != 0) && (height != 0)
@@ -1182,6 +1271,144 @@ void SvgDeviceContext::DrawText(
         rectChild.append_attribute("width") = StringFormat("%d", width).c_str();
         rectChild.append_attribute("height") = StringFormat("%d", height).c_str();
         rectChild.append_attribute("opacity") = "0.0";
+    }
+}
+
+void SvgDeviceContext::DrawTextAsTspan(const std::string &text, int x, int y, int width, int height)
+{
+    const FontInfo *font = m_fontStack.top();
+    const Resources *resources = this->GetResources();
+    assert(resources);
+
+    std::string svgText = text;
+
+    // Because IE does not support xml:space="preserve", we need to replace the initial
+    // space with a non breakable space
+    if ((svgText.length() > 0) && (svgText[0] == ' ')) {
+        svgText.replace(0, 1, "\xC2\xA0");
+    }
+    if ((svgText.length() > 0) && (svgText[svgText.size() - 1] == ' ')) {
+        svgText.replace(svgText.size() - 1, 1, "\xC2\xA0");
+    }
+
+    pugi::xpath_node fontNode = m_currentNode.select_node("ancestor-or-self::*[@font-family][1]");
+    const std::string currentFaceName = (fontNode) ? fontNode.node().attribute("font-family").value() : "";
+
+    pugi::xml_node textChild = AddChild("tspan");
+    if (font->GetSmuflFont() != SMUFL_NONE) {
+        // The music font is used as text font and needs to be included in the output
+        std::string fontFaceName = font->GetFaceName();
+        if (font->GetSmuflFont() == SMUFL_FONT_FALLBACK) {
+            this->VrvTextFontFallback();
+            fontFaceName = resources->GetFallbackFont();
+        }
+        else {
+            this->VrvTextFont();
+            if (fontFaceName.empty()) fontFaceName = resources->GetCurrentFont();
+        }
+        if (fontFaceName != currentFaceName) {
+            textChild.append_attribute("font-family") = fontFaceName.c_str();
+            if (font->GetStyle() == FONTSTYLE_normal) {
+                textChild.append_attribute("font-style") = "normal";
+            }
+        }
+    }
+    else {
+        // Keep track of the text font for embedding it, which is the inherited one if none is given
+        const std::string &fontFaceName = font->GetFaceName();
+        m_textFontFamilies.insert(fontFaceName.empty() ? resources->GetTextFont() : fontFaceName);
+        // Set the @font-family only if it is not the same as in the parent node
+        if (!fontFaceName.empty() && (fontFaceName != currentFaceName)
+            && !IsFontFamilyListHead(currentFaceName, fontFaceName)) {
+            textChild.append_attribute("font-family") = fontFaceName.c_str();
+        }
+    }
+    if (font->GetPointSize() != 0) {
+        textChild.append_attribute("font-size") = StringFormat("%dpx", font->GetPointSize()).c_str();
+    }
+    if (font->GetLetterSpacing() != 0) {
+        textChild.append_attribute("letter-spacing") = StringFormat("%dpx", font->GetLetterSpacing()).c_str();
+    }
+    textChild.text().set(svgText.c_str());
+
+    const bool hasBoundingBox = (width != 0) && (height != 0) && (width != VRV_UNSET) && (height != VRV_UNSET);
+    if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET) && !hasBoundingBox) {
+        textChild.append_attribute("x") = StringFormat("%d", x).c_str();
+        textChild.append_attribute("y") = StringFormat("%d", y).c_str();
+    }
+}
+
+void SvgDeviceContext::DrawTextAsPaths(const std::u32string &wtext, int x, int y)
+{
+    const FontInfo *font = m_fontStack.top();
+    const Resources *resources = this->GetResources();
+    assert(resources);
+
+    if ((x != VRV_UNSET) && (y != VRV_UNSET)) {
+        m_textCursorX = x;
+        m_textCursorY = y;
+    }
+
+    if (font->GetSmuflFont() != SMUFL_NONE) {
+        this->DrawMusicText(wtext, static_cast<int>(std::round(m_textCursorX)), m_textCursorY);
+        TextExtend extend;
+        this->GetSmuflTextExtent(wtext, &extend);
+        m_textCursorX += extend.m_width;
+        m_textLineWidth += extend.m_width;
+        return;
+    }
+
+    const std::optional<FontStore::ShapedRun> run = resources->ShapeText(*font, wtext);
+    if (!run) return;
+
+    double cachedY = std::numeric_limits<double>::quiet_NaN();
+    double cachedScaleX = std::numeric_limits<double>::quiet_NaN();
+    double cachedScaleY = std::numeric_limits<double>::quiet_NaN();
+    std::string formattedY;
+    std::string formattedScaleX;
+    std::string formattedScaleY;
+    uint32_t previousCluster = 0;
+    bool first = true;
+    for (const FontStore::GlyphPlacement &placement : run->glyphs) {
+        if (!first && (placement.cluster != previousCluster)) {
+            m_textCursorX += font->GetLetterSpacing();
+            m_textLineWidth += font->GetLetterSpacing();
+        }
+        const double scale = static_cast<double>(font->GetPointSize()) / placement.unitsPerEm;
+        const Glyph *glyph = resources->GetRuntimeGlyph(placement.face, placement.glyphId);
+        if (glyph) {
+            int boundsX, boundsY, boundsWidth, boundsHeight;
+            glyph->GetBoundingBox(boundsX, boundsY, boundsWidth, boundsHeight);
+            if (boundsWidth || boundsHeight) {
+                const std::string &id = InsertGlyphRef(glyph);
+                pugi::xml_node use = m_currentNode.append_child("use");
+                const char *href = m_removeXlink ? "href" : "xlink:href";
+                use.append_attribute(href) = ('#' + id).c_str();
+                const double glyphX = m_textCursorX + placement.offsetX * scale;
+                const double glyphY = m_textCursorY - placement.offsetY * scale;
+                double scaleX = scale;
+                if (font->GetWidthToHeightRatio() != 1.0F) scaleX *= font->GetWidthToHeightRatio();
+                if (glyphY != cachedY) {
+                    cachedY = glyphY;
+                    formattedY = SvgNumber(glyphY);
+                }
+                if (scaleX != cachedScaleX) {
+                    cachedScaleX = scaleX;
+                    formattedScaleX = SvgNumber(scaleX);
+                }
+                if (scale != cachedScaleY) {
+                    cachedScaleY = scale;
+                    formattedScaleY = SvgNumber(scale);
+                }
+                use.append_attribute("transform")
+                    = SvgGlyphTransform(glyphX, formattedY, formattedScaleX, formattedScaleY).c_str();
+            }
+        }
+        const double advance = placement.advanceX * scale;
+        m_textCursorX += advance;
+        m_textLineWidth += advance;
+        previousCluster = placement.cluster;
+        first = false;
     }
 }
 

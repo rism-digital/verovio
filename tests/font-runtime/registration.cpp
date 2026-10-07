@@ -14,6 +14,12 @@
 
 namespace {
 
+// Font selection is verified through the glyphs referenced in the SVG, which requires text rendered as paths
+void RenderTextAsPaths(vrv::Toolkit &toolkit)
+{
+    toolkit.SetOptions("{\"svgTextAsPaths\":true}");
+}
+
 bool Expect(bool condition, const std::string &message)
 {
     if (condition) return true;
@@ -130,6 +136,7 @@ int main(int argc, char **argv)
     if (argc != 17) return 2;
 
     vrv::Toolkit toolkit(false);
+    RenderTextAsPaths(toolkit);
     bool ok = true;
     const std::string textFamily = toolkit.RegisterTextFontFile(argv[1]);
     ok &= Expect(textFamily == "Tinos", "Tinos family was not registered (returned '" + textFamily + "')");
@@ -172,6 +179,7 @@ int main(int argc, char **argv)
             && (localizedRegularRun->glyphs.front().face != localizedBoldRun->glyphs.front().face),
         "localized regular and bold faces did not resolve to distinct font identities");
     vrv::Toolkit localizedStyleRendering(false);
+    RenderTextAsPaths(localizedStyleRendering);
     ok &= Expect(localizedStyleRendering.SetResourcePath(argv[9])
             && (localizedStyleRendering.RegisterTextFontFile(argv[11]) == "Verovio Test Ligature")
             && (localizedStyleRendering.RegisterTextFontFile(argv[15]) == "Verovio Test Ligature"),
@@ -180,7 +188,7 @@ int main(int argc, char **argv)
 <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1"><music><body><mdiv><score>
 <scoreDef><staffGrp><staffDef n="1" lines="5" clef.shape="G" clef.line="2"/></staffGrp></scoreDef>
 <section><measure n="1"><staff n="1"><layer n="1"><note xml:id="style-note" pname="c" oct="4" dur="1"/>
-</layer></staff><dir startid="#style-note"><rend fontname="Verovio Test Ligature" fontweight="bold">ffi</rend></dir>
+</layer></staff><dir startid="#style-note"><rend fontname="Verovio Test Ligature" fontweight="bold" fontstyle="normal">ffi</rend></dir>
 <dir startid="#style-note"><rend fontname="Verovio Test Ligature" fontstyle="italic">ffi</rend></dir>
 </measure></section></score></mdiv></body></music></mei>)mei";
     ok &= Expect(localizedStyleRendering.LoadData(localizedStyleMei), "localized bold render MEI could not be loaded");
@@ -204,7 +212,24 @@ int main(int argc, char **argv)
             && (localizedStyleSvg.find("font-style=\"italic\"") != std::string::npos),
         "MEI rend with an unavailable italic face did not stay within the requested family");
 
+    // Without CSS, the default text styles (here the italic of dir) have to be applied to the paths
+    vrv::Toolkit defaultStyleRendering(false);
+    RenderTextAsPaths(defaultStyleRendering);
+    ok &= Expect(defaultStyleRendering.SetResourcePath(argv[9])
+            && (defaultStyleRendering.RegisterTextFontFile(argv[11]) == "Verovio Test Ligature"),
+        "default style rendering setup failed");
+    std::string defaultStyleMei = localizedStyleMei;
+    ReplaceAll(defaultStyleMei, " fontweight=\"bold\"", "");
+    ReplaceAll(defaultStyleMei, " fontstyle=\"normal\"", "");
+    ReplaceAll(defaultStyleMei, " fontstyle=\"italic\"", "");
+    ok &= Expect(defaultStyleRendering.LoadData(defaultStyleMei), "default style MEI could not be loaded");
+    const std::string defaultStyleSvg = defaultStyleRendering.RenderToSVG(1);
+    ok &= Expect(!localizedSyntheticItalicPrefix.str().empty()
+            && (defaultStyleSvg.find(localizedSyntheticItalicPrefix.str()) != std::string::npos),
+        "dir text rendered as paths did not use the italic default style");
+
     vrv::Toolkit scoreTextStyleRendering(false);
+    RenderTextAsPaths(scoreTextStyleRendering);
     ok &= Expect(scoreTextStyleRendering.SetResourcePath(argv[9])
             && (scoreTextStyleRendering.RegisterTextFontFile(argv[11]) == "Verovio Test Ligature"),
         "score text-style rendering setup failed");
@@ -226,6 +251,7 @@ clef.line="2"/></staffGrp></scoreDef><section><measure n="1"><staff n="1"><layer
         "scoreDef text.fam did not select the registered face for harmony text");
 
     vrv::Toolkit scoreTextDirRendering(false);
+    RenderTextAsPaths(scoreTextDirRendering);
     ok &= Expect(scoreTextDirRendering.SetResourcePath(argv[9])
             && (scoreTextDirRendering.RegisterTextFontFile(argv[11]) == "Verovio Test Ligature"),
         "score text-style direction rendering setup failed");
@@ -239,6 +265,7 @@ clef.line="2"/></staffGrp></scoreDef><section><measure n="1"><staff n="1"><layer
         "scoreDef text.fam did not select the registered face for direction text");
 
     vrv::Toolkit scoreTextHeaderRendering(false);
+    RenderTextAsPaths(scoreTextHeaderRendering);
     ok &= Expect(scoreTextHeaderRendering.SetResourcePath(argv[9])
             && (scoreTextHeaderRendering.RegisterTextFontFile(argv[11]) == "Verovio Test Ligature"),
         "score text-style page-header rendering setup failed");
@@ -252,6 +279,7 @@ clef.line="2"/></staffGrp></scoreDef><section><measure n="1"><staff n="1"><layer
         "scoreDef text.fam did not select the registered face for page-header text");
 
     vrv::Toolkit textEnclosureRendering(false);
+    RenderTextAsPaths(textEnclosureRendering);
     ok &= Expect(textEnclosureRendering.SetResourcePath(argv[9]), "text-enclosure rendering setup failed");
     const std::string textEnclosureMei = R"mei(<?xml version="1.0" encoding="UTF-8"?>
 <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.0"><music><body><mdiv><score>
@@ -273,6 +301,7 @@ clef.line="2"/></staffGrp></scoreDef><section><measure n="1"><staff n="1"><layer
             + std::to_string(strophenBoxHeight.value_or(-1)) + ")");
 
     vrv::Toolkit inheritedRendRendering(false);
+    RenderTextAsPaths(inheritedRendRendering);
     ok &= Expect(inheritedRendRendering.SetResourcePath(argv[9])
             && (inheritedRendRendering.RegisterTextFontFile(argv[11]) == "Verovio Test Ligature")
             && (inheritedRendRendering.RegisterTextFontFile(argv[15]) == "Verovio Test Ligature"),
@@ -286,6 +315,7 @@ clef.line="2"/></staffGrp></scoreDef><section><measure n="1"><staff n="1"><layer
         "nested rend style did not retain its inherited runtime family");
 
     vrv::Toolkit scoreLyricStyleRendering(false);
+    RenderTextAsPaths(scoreLyricStyleRendering);
     ok &= Expect(scoreLyricStyleRendering.SetResourcePath(argv[9])
             && (scoreLyricStyleRendering.RegisterTextFontFile(argv[11]) == "Verovio Test Ligature"),
         "score lyric-style rendering setup failed");
@@ -302,6 +332,7 @@ clef.line="2"/></staffGrp></scoreDef><section><measure n="1"><staff n="1"><layer
         "scoreDef lyric.fam did not select the registered face for lyric text");
 
     vrv::Toolkit rendFamilyRendering(false);
+    RenderTextAsPaths(rendFamilyRendering);
     ok &= Expect(rendFamilyRendering.SetResourcePath(argv[9])
             && (rendFamilyRendering.RegisterTextFontFile(argv[11]) == "Verovio Test Ligature"),
         "rend font-family rendering setup failed");
@@ -310,7 +341,7 @@ clef.line="2"/></staffGrp></scoreDef><section><measure n="1"><staff n="1"><layer
 <scoreDef><staffGrp><staffDef n="1" lines="5" clef.shape="G" clef.line="2"/></staffGrp></scoreDef>
 <section><measure n="1"><staff n="1"><layer n="1"><note xml:id="rend-family-note" pname="c"
 oct="4" dur="1"/></layer></staff><dir startid="#rend-family-note"><rend
-fontfam="Verovio Test Ligature">ffi</rend></dir></measure></section></score></mdiv></body></music></mei>)mei";
+fontfam="Verovio Test Ligature" fontstyle="normal">ffi</rend></dir></measure></section></score></mdiv></body></music></mei>)mei";
     ok &= Expect(rendFamilyRendering.LoadData(rendFamilyMei), "rend font-family MEI could not be loaded");
     const std::string rendFamilySvg = rendFamilyRendering.RenderToSVG(1);
     ok &= Expect(!localizedRegularPrefix.str().empty()
@@ -318,6 +349,7 @@ fontfam="Verovio Test Ligature">ffi</rend></dir></measure></section></score></md
         "rend fontfam did not select the registered face");
 
     vrv::Toolkit verseFontRendering(false);
+    RenderTextAsPaths(verseFontRendering);
     ok &= Expect(verseFontRendering.SetResourcePath(argv[9])
             && (verseFontRendering.RegisterTextFontFile(argv[11]) == "Verovio Test Ligature"),
         "verse font rendering setup failed");
@@ -334,6 +366,7 @@ oct="4" dur="1"><verse n="1" fontname="Verovio Test Ligature"><syl>ffi</syl></ve
         "verse fontname was not inherited by its syllable");
 
     vrv::Toolkit syllableFamilyRendering(false);
+    RenderTextAsPaths(syllableFamilyRendering);
     ok &= Expect(syllableFamilyRendering.SetResourcePath(argv[9])
             && (syllableFamilyRendering.RegisterTextFontFile(argv[11]) == "Verovio Test Ligature"),
         "syllable font-family rendering setup failed");
@@ -448,9 +481,11 @@ oct="4" dur="1"><verse n="1" fontname="Verovio Test Ligature"><syl>ffi</syl></ve
         "WOFF1 was physically decompressed again in another FontStore");
 
     vrv::Toolkit woffToolkit(false);
+    RenderTextAsPaths(woffToolkit);
     ok &= Expect(woffToolkit.RegisterTextFontFile(argv[4]) == "Tinos", "WOFF1 face was not registered");
     ok &= Expect(woffToolkit.RegisterTextFontFile(argv[4]) == "Tinos", "WOFF1 duplicate was not idempotent");
     vrv::Toolkit woff2Toolkit(false);
+    RenderTextAsPaths(woff2Toolkit);
     ok &= Expect(woff2Toolkit.RegisterTextFontFile(argv[5]) == "Tinos", "WOFF2 face was not registered");
 
     std::vector<unsigned char> malformedSfnt = ttf;
@@ -559,6 +594,7 @@ oct="4" dur="1"><verse n="1" fontname="Verovio Test Ligature"><syl>ffi</syl></ve
         "lyric hyphen expected-font setup failed");
 
     vrv::Toolkit lyricHyphenRendering(false);
+    RenderTextAsPaths(lyricHyphenRendering);
     ok &= Expect(lyricHyphenRendering.SetOptions("{\"breaks\":\"encoded\",\"lyricSize\":8.0}")
             && lyricHyphenRendering.SetResourcePath(argv[9])
             && (lyricHyphenRendering.RegisterTextFontFile(argv[16], "VH") == "Verovio Test Hyphen")
@@ -600,6 +636,7 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
         "system-spanning lyric hyphens used rectangle geometry");
 
     vrv::Toolkit scoreLyricConnectorRendering(false);
+    RenderTextAsPaths(scoreLyricConnectorRendering);
     ok &= Expect(scoreLyricConnectorRendering.SetOptions("{\"breaks\":\"encoded\",\"lyricSize\":8.0}")
             && scoreLyricConnectorRendering.SetResourcePath(argv[9])
             && (scoreLyricConnectorRendering.RegisterTextFontFile(argv[16]) == "Verovio Test Hyphen"),
@@ -671,6 +708,7 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
         "cluster missing from both requested font and Tinos did not use .notdef");
 
     vrv::Toolkit rendering(false);
+    RenderTextAsPaths(rendering);
     ok &= Expect(rendering.SetResourcePath(argv[9]), "bundled runtime fonts could not be initialized");
     ok &= Expect(rendering.LoadFile(argv[10]), "text-heavy runtime font fixture could not be loaded");
     const std::string svg = rendering.RenderToSVG(1);
@@ -686,6 +724,25 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
     ok &= Expect(rendering.SetOptions("{\"scale\":110}"), "SVG cache option-invalidation setup failed");
     const std::string scaledSvg = rendering.RenderToSVG(1);
     ok &= Expect(!scaledSvg.empty() && (scaledSvg != svg), "SVG cache was not invalidated after an option change");
+
+    vrv::Toolkit textRendering(false);
+    ok &= Expect(textRendering.SetResourcePath(argv[9]) && textRendering.LoadFile(argv[10]),
+        "text-mode runtime font fixture could not be loaded");
+    const std::string textSvg = textRendering.RenderToSVG(1);
+    ok &= Expect((textSvg.find("<text") != std::string::npos) && (textSvg.find("<tspan") != std::string::npos)
+            && (textSvg.find("#text-") == std::string::npos),
+        "default SVG did not output text as SVG text");
+    ok &= Expect(textSvg.find("font-family=\"Tinos, serif\"") != std::string::npos,
+        "default SVG did not declare the text font family");
+    ok &= Expect(textSvg.find("@font-face {font-family: 'Tinos'") == std::string::npos,
+        "text font was embedded without svgEmbedTextFont");
+    ok &= Expect(textRendering.SetOptions("{\"svgEmbedTextFont\":true}"), "text font embedding option was rejected");
+    const std::string embeddedSvg = textRendering.RenderToSVG(1);
+    ok &= Expect(
+        embeddedSvg.find("@font-face {font-family: 'Tinos'; src: url(data:font/woff2;base64,") != std::string::npos,
+        "svgEmbedTextFont did not embed the text font as base64");
+    ok &= Expect(embeddedSvg.find("format('woff2'); font-weight: bold; font-style: italic;}") != std::string::npos,
+        "svgEmbedTextFont did not embed all the faces of the text font");
 
     const std::vector<unsigned char> testText = ReadFile(argv[11]);
     const std::vector<unsigned char> testMusic = ReadFile(argv[12]);
@@ -737,6 +794,7 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
         "missing custom music glyph did not fall back to Bravura");
 
     vrv::Toolkit customRendering(false);
+    RenderTextAsPaths(customRendering);
     ok &= Expect(customRendering.SetResourcePath(argv[9]), "custom-font render resources could not be initialized");
     ok &= Expect(customRendering.RegisterTextFontFile(argv[11], "QS") == "Verovio Test Ligature",
         "custom text font could not be registered on Toolkit");
@@ -744,6 +802,7 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
         "custom music font could not be registered on Toolkit");
 
     vrv::Toolkit base64Rendering(false);
+    RenderTextAsPaths(base64Rendering);
     ok &= Expect(base64Rendering.SetResourcePath(argv[9]), "base64 alias resources could not be initialized");
     const std::string textBase64 = vrv::Base64Encode(testText.data(), static_cast<unsigned int>(testText.size()));
     const std::string musicBase64 = vrv::Base64Encode(testMusic.data(), static_cast<unsigned int>(testMusic.size()));
@@ -759,7 +818,7 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
 <clef shape="G" line="2" fontname="VM"/>
 <meterSig count="3" unit="4" fontname="VM"/>
 <note xml:id="custom-note" pname="c" oct="4" dur="1"/>
-</layer></staff><dir startid="#custom-note"><rend fontname="QS">ffi</rend></dir>
+</layer></staff><dir startid="#custom-note"><rend fontname="QS" fontstyle="normal">ffi</rend></dir>
 </measure></section></score></mdiv></body></music></mei>)mei";
     customRendering.ResetXmlIdSeed(0);
     ok &= Expect(customRendering.LoadData(customMei), "mixed per-element custom-font MEI could not be loaded");
@@ -782,6 +841,7 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
             && countersAfterRepeatedRender.shapedRuns == countersBeforeRepeatedRender.shapedRuns,
         "repeated aliased-font rendering added decoding, outline extraction, or shaping work");
     vrv::Toolkit canonicalRendering(false);
+    RenderTextAsPaths(canonicalRendering);
     ok &= Expect(canonicalRendering.SetResourcePath(argv[9])
             && (canonicalRendering.RegisterTextFontFile(argv[11]) == "Verovio Test Ligature")
             && (canonicalRendering.RegisterMusicFontFile(argv[12], argv[13]) == "Verovio Test Music"),
@@ -798,6 +858,7 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
         "alias and canonical family names produced different SVG geometry or glyph identities");
 
     vrv::Toolkit optionAliasRendering(false);
+    RenderTextAsPaths(optionAliasRendering);
     const std::string aliasOptions = "{\"fontAddTextAs\":[\"QS=" + JsonEscape(argv[11])
         + "\",\"LongQS=" + JsonEscape(argv[11]) + "\"],\"fontAddMusicAs\":[\"VM=" + JsonEscape(argv[12]) + "\"]}";
     ok &= Expect(optionAliasRendering.SetOptions(aliasOptions), "aliased font options were rejected");
@@ -810,12 +871,14 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
         "repeatable aliased font options did not affect rendering");
 
     vrv::Toolkit malformedAliasOptions(false);
+    RenderTextAsPaths(malformedAliasOptions);
     ok &= Expect(malformedAliasOptions.SetOptions("{\"fontAddTextAs\":[\"missing-separator\"]}"),
         "malformed alias option setup failed unexpectedly");
     ok &= Expect(
         !malformedAliasOptions.SetResourcePath(argv[9]), "malformed aliased font option did not fail resource setup");
 
     vrv::Toolkit lateRegistration(false);
+    RenderTextAsPaths(lateRegistration);
     ok &= Expect(lateRegistration.SetResourcePath(argv[9]), "late-registration resources could not be initialized");
     ok &= Expect(lateRegistration.RegisterTextFontFile(argv[11]) == "Verovio Test Ligature",
         "late alias registration face setup failed");
