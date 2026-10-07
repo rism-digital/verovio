@@ -13,16 +13,9 @@
 
 //----------------------------------------------------------------------------
 
-#include "comparison.h"
-#include "doc.h"
-#include "editorial.h"
 #include "functor.h"
 #include "label.h"
 #include "labelabbr.h"
-#include "layer.h"
-#include "staff.h"
-#include "syl.h"
-#include "verticalaligner.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -33,14 +26,9 @@ namespace vrv {
 
 static const ClassRegistrar<Verse> s_factory("verse", VERSE);
 
-Verse::Verse() : LayerElement(VERSE), AttColor(), AttLang(), AttNInteger(), AttTypography()
+Verse::Verse() : LyricElement(VERSE), AttNInteger()
 {
-    this->RegisterAttClass(ATT_COLOR);
-    this->RegisterAttClass(ATT_LANG);
     this->RegisterAttClass(ATT_NINTEGER);
-    this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
-    this->RegisterAttClass(ATT_TYPOGRAPHY);
-
     this->Reset();
 }
 
@@ -48,55 +36,22 @@ Verse::~Verse() {}
 
 void Verse::Reset()
 {
-    LayerElement::Reset();
-    this->ResetColor();
-    this->ResetLang();
+    LyricElement::Reset();
     this->ResetNInteger();
-    this->ResetPlacementRelStaff();
-    this->ResetTypography();
 
     m_drawingLabelAbbr = NULL;
 }
 
 bool Verse::IsSupportedChild(ClassId classId)
 {
-    static const std::vector<ClassId> supported{ LABEL, LABELABBR, SYL };
+    static const std::vector<ClassId> supported{ LABEL, LABELABBR };
 
     if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
         return true;
     }
-    else if (Object::IsEditorialElement(classId)) {
-        return true;
-    }
     else {
-        return false;
+        return LyricElement::IsSupportedChild(classId);
     }
-}
-
-int Verse::AdjustPosition(int &overlap, int freeSpace, const Doc *doc)
-{
-    assert(doc);
-
-    int nextFreeSpace = 0;
-
-    if (overlap > 0) {
-        // We have enough space to absorb the overlay completely
-        if (freeSpace > overlap) {
-            this->SetDrawingXRel(this->GetDrawingXRel() - overlap);
-            // The space is set to 0. This means that consecutive overlaps will not be recursively absorbed.
-            // Only the first preceding syl will be moved.
-            overlap = 0;
-        }
-        else if (freeSpace > 0) {
-            this->SetDrawingXRel(this->GetDrawingXRel() - freeSpace);
-            overlap -= freeSpace;
-        }
-    }
-    else {
-        nextFreeSpace = std::min(-overlap, 3 * doc->GetDrawingUnit(100));
-    }
-
-    return nextFreeSpace;
 }
 
 //----------------------------------------------------------------------------

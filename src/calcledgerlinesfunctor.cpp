@@ -9,8 +9,10 @@
 
 //----------------------------------------------------------------------------
 
+#include "cursor.h"
 #include "doc.h"
 #include "dot.h"
+#include "layer.h"
 #include "note.h"
 #include "staff.h"
 
@@ -37,12 +39,24 @@ FunctorCode CalcLedgerLinesFunctor::VisitAccid(Accid *accid)
     return FUNCTOR_SIBLINGS;
 }
 
-FunctorCode CalcLedgerLinesFunctor::VisitNote(Note *note)
+FunctorCode CalcLedgerLinesFunctor::VisitCursor(Cursor *cursor)
 {
-    if (note->GetVisible() == BOOLEAN_false) {
-        return FUNCTOR_SIBLINGS;
+    if (cursor->IsRestMode() || (cursor->GetInputMode() == Cursor::InputMode::DURATION_FIRST)) return FUNCTOR_CONTINUE;
+
+    return this->VisitNote(cursor);
+}
+
+FunctorCode CalcLedgerLinesFunctor::VisitLayer(Layer *layer)
+{
+    if (layer->HasCursor()) {
+        this->VisitCursor(layer->GetCursor());
     }
 
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CalcLedgerLinesFunctor::VisitNote(Note *note)
+{
     if (!note->IsVisible()) {
         return FUNCTOR_SIBLINGS;
     }

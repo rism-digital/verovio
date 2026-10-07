@@ -188,6 +188,7 @@ public:
     FunctorCode VisitSyllable(Syllable *syllable) override;
     FunctorCode VisitSystem(System *system) override;
     FunctorCode VisitSystemEnd(System *system) override;
+    FunctorCode VisitRefrain(Refrain *refrain) override;
     FunctorCode VisitVerse(Verse *verse) override;
     ///@}
 

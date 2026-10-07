@@ -157,18 +157,12 @@ void View::DrawHarmString(DeviceContext *dc, const std::u32string &str, TextDraw
     assert(dc);
     assert(dc->HasFont());
 
-    int toDcX = this->ToDeviceContextX(params.m_x);
-    int toDcY = this->ToDeviceContextY(params.m_y);
-
     size_t prevPos = 0, pos;
     while ((pos = str.find_first_of(VRV_TEXT_HARM, prevPos)) != std::wstring::npos) {
         // If pos is > than the previous, it is the substring to extract
         if (pos > prevPos) {
             std::u32string substr = str.substr(prevPos, pos - prevPos);
-            dc->DrawText(UTF32to8(substr), substr, toDcX, toDcY);
-            // Once we have rendered the some text to not pass x / y anymore
-            toDcX = VRV_UNSET;
-            toDcY = VRV_UNSET;
+            dc->DrawText(UTF32to8(substr), substr);
         }
 
         // if it is the same or we still have space, it is the accidental
@@ -201,11 +195,8 @@ void View::DrawHarmString(DeviceContext *dc, const std::u32string &str, TextDraw
             bool isFallbackNeeded = (m_doc->GetResources()).IsSmuflFallbackNeeded(smuflAccid);
             vrvTxt.SetSmuflWithFallback(isFallbackNeeded);
             dc->SetFont(&vrvTxt);
-            // Once we have rendered the some text to not pass x / y anymore
-            dc->DrawText(UTF32to8(smuflAccid), smuflAccid, toDcX, toDcY);
+            dc->DrawText(UTF32to8(smuflAccid), smuflAccid);
             dc->ResetFont();
-            toDcX = VRV_UNSET;
-            toDcY = VRV_UNSET;
         }
         // Skip the accidental and continue
         prevPos = pos + 1;
@@ -213,11 +204,10 @@ void View::DrawHarmString(DeviceContext *dc, const std::u32string &str, TextDraw
     // Print the remainder of the string, or the full string if no accid
     if (prevPos < str.length()) {
         std::u32string substr = str.substr(prevPos, std::wstring::npos);
-        dc->DrawText(UTF32to8(substr), substr, toDcX, toDcY);
+        dc->DrawText(UTF32to8(substr), substr);
     }
 
-    // Disable x for what is coming next as child of <f>
-    // The value is reset in DrawFb
+    // Continue subsequent harmony children in the current text run.
     params.m_x = VRV_UNSET;
 }
 

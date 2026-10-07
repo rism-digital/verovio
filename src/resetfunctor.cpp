@@ -11,6 +11,7 @@
 
 #include "arpeg.h"
 #include "beamspan.h"
+#include "cursor.h"
 #include "custos.h"
 #include "div.h"
 #include "dot.h"
@@ -22,17 +23,21 @@
 #include "hairpin.h"
 #include "layer.h"
 #include "ligature.h"
+#include "lyricelement.h"
 #include "mrest.h"
+#include "mspace.h"
 #include "nc.h"
 #include "octave.h"
 #include "offsetinterface.h"
 #include "ossia.h"
 #include "page.h"
+#include "refrain.h"
 #include "repeatmark.h"
 #include "rest.h"
 #include "runningelement.h"
 #include "section.h"
 #include "slur.h"
+#include "space.h"
 #include "staff.h"
 #include "stem.h"
 #include "syl.h"
@@ -43,6 +48,7 @@
 #include "tuplet.h"
 #include "turn.h"
 #include "verse.h"
+#include "volta.h"
 
 //----------------------------------------------------------------------------
 
@@ -60,6 +66,8 @@ FunctorCode ResetDataFunctor::VisitAccid(Accid *accid)
     this->VisitLayerElement(accid);
     accid->PositionInterface::InterfaceResetData(*this, accid);
     accid->ClearFloatingObject();
+    // Reset show accid.ges
+    accid->ClearChildren();
 
     return FUNCTOR_CONTINUE;
 }
@@ -291,6 +299,14 @@ FunctorCode ResetDataFunctor::VisitLayerElement(LayerElement *layerElement)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode ResetDataFunctor::VisitLyricElement(LyricElement *lyricElement)
+{
+    this->VisitLayerElement(lyricElement);
+    lyricElement->ResetDrawingDirectSylTrack();
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ResetDataFunctor::VisitLigature(Ligature *ligature)
 {
     // Call parent one too
@@ -317,6 +333,16 @@ FunctorCode ResetDataFunctor::VisitMRest(MRest *mRest)
 {
     // Call parent one too
     this->VisitLayerElement(mRest);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetDataFunctor::VisitMSpace(MSpace *mSpace)
+{
+    // Call parent one too
+    this->VisitLayerElement(mSpace);
+    // Reset show mSpace
+    mSpace->ClearChildren();
 
     return FUNCTOR_CONTINUE;
 }
@@ -458,6 +484,16 @@ FunctorCode ResetDataFunctor::VisitSlur(Slur *slur)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode ResetDataFunctor::VisitSpace(Space *space)
+{
+    // Call parent one too
+    this->VisitLayerElement(space);
+    // Reset show space
+    space->ClearChildren();
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ResetDataFunctor::VisitStaff(Staff *staff)
 {
     // Call parent one too
@@ -562,12 +598,27 @@ FunctorCode ResetDataFunctor::VisitTurn(Turn *turn)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode ResetDataFunctor::VisitVolta(Volta *volta)
+{
+    this->VisitLayerElement(volta);
+    volta->ResetDrawingVoltaN();
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ResetDataFunctor::VisitVerse(Verse *verse)
 {
     // Call parent one too
-    this->VisitLayerElement(verse);
+    this->VisitLyricElement(verse);
 
     verse->SetDrawingLabelAbbr(NULL);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetDataFunctor::VisitRefrain(Refrain *refrain)
+{
+    this->VisitLyricElement(refrain);
 
     return FUNCTOR_CONTINUE;
 }
@@ -611,6 +662,16 @@ FunctorCode ResetHorizontalAlignmentFunctor::VisitBeamSpan(BeamSpan *beamSpan)
     beamSpan->InitBeamSegments();
 
     return this->VisitControlElement(beamSpan);
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitCursor(Cursor *cursor)
+{
+    this->VisitNote(cursor);
+
+    cursor->ResetCursorAlignment();
+    cursor->SetYRelPitchC(0);
+
+    return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitCustos(Custos *custos)
@@ -685,6 +746,10 @@ FunctorCode ResetHorizontalAlignmentFunctor::VisitLayer(Layer *layer)
     }
     if (layer->GetCautionStaffDefMeterSig()) {
         this->VisitMeterSig(layer->GetCautionStaffDefMeterSig());
+    }
+
+    if (layer->HasCursor()) {
+        this->VisitCursor(layer->GetCursor());
     }
 
     return FUNCTOR_CONTINUE;

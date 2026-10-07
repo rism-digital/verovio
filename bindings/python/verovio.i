@@ -38,9 +38,16 @@ def edit(self, editor_action: dict) -> bool:
     return $action(self, json.dumps(editor_action))
 %}
 
-// Toolkit::EditInfo
-%feature("shadow") vrv::Toolkit::EditInfo() %{
-def editInfo(self) -> dict:
+// Toolkit::EditResponse
+%feature("shadow") vrv::Toolkit::EditResponse() %{
+def editResponse(self) -> dict:
+    """Return the editor response."""
+    return json.loads($action(self))
+%}
+
+// Toolkit::EditStatus
+%feature("shadow") vrv::Toolkit::EditStatus() %{
+def editSatus(self) -> dict:
     """Return the editor status."""
     return json.loads($action(self))
 %}

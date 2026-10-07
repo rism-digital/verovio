@@ -12,6 +12,7 @@
 #include "atts_shared.h"
 #include "durationinterface.h"
 #include "horizontalaligner.h"
+#include "lyricelement.h"
 #include "measure.h"
 #include "note.h"
 #include "object.h"
@@ -300,6 +301,30 @@ public:
 
 private:
     std::vector<int> m_ns;
+};
+
+//----------------------------------------------------------------------------
+// LyricElementComparison
+//----------------------------------------------------------------------------
+
+/** Match a verse or refrain by its internal lyric-processing group. */
+class LyricElementComparison : public ClassIdComparison {
+public:
+    LyricElementComparison(ClassId classId, int groupN) : ClassIdComparison(classId), m_groupN(groupN)
+    {
+        assert(Object::IsLyricElement(classId));
+    }
+
+    bool operator()(const Object *object) override
+    {
+        if (!this->MatchesType(object)) return false;
+        const LyricElement *lyricElement = vrv_cast<const LyricElement *>(object);
+        assert(lyricElement);
+        return (lyricElement->GetDrawingLyricGroupN() == m_groupN);
+    }
+
+private:
+    int m_groupN;
 };
 
 //----------------------------------------------------------------------------
@@ -608,9 +633,7 @@ public:
         auto condition = [object](Comparison *iter) {
             // ignore any class comparison which does not match the object class
             ClassIdComparison *cmp = dynamic_cast<ClassIdComparison *>(iter);
-            if (!cmp || (cmp->GetType() != object->GetClassId())) {
-                return true;
-            }
+            if (cmp) return (cmp->GetType() != object->GetClassId()) ? true : (*iter)(object);
             return (*iter)(object);
         };
         switch (m_type) {

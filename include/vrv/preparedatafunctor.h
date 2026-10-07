@@ -47,8 +47,10 @@ public:
     FunctorCode VisitChord(Chord *chord) override;
     FunctorCode VisitFloatingObject(FloatingObject *floatingObject) override;
     FunctorCode VisitKeySig(KeySig *keySig) override;
+    FunctorCode VisitMSpace(MSpace *mSpace) override;
     FunctorCode VisitRepeatMark(RepeatMark *repeatMark) override;
     FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitSpace(Space *space) override;
     FunctorCode VisitTextLayoutElement(TextLayoutElement *textLayoutElement) override;
     ///@}
 
@@ -670,7 +672,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    PrepareLyricsFunctor();
+    PrepareLyricsFunctor(int voltaTrack = 0);
     virtual ~PrepareLyricsFunctor() = default;
     ///@}
 
@@ -702,6 +704,8 @@ private:
     LayerElement *m_lastNoteOrChord;
     // The penultimate Note or Chord
     LayerElement *m_penultimateNoteOrChord;
+    // 0 for direct <verse>/<syl>, otherwise the normalized volta alternative.
+    int m_voltaTrack;
 };
 
 //----------------------------------------------------------------------------
@@ -711,13 +715,13 @@ private:
 /**
  * This class adds LayerElement parts (stem, flag, dots, etc).
  */
-class PrepareLayerElementPartsFunctor : public Functor {
+class PrepareLayerElementPartsFunctor : public DocFunctor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    PrepareLayerElementPartsFunctor();
+    PrepareLayerElementPartsFunctor(Doc *doc);
     virtual ~PrepareLayerElementPartsFunctor() = default;
     ///@}
 

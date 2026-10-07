@@ -138,6 +138,9 @@ public:
     Fraction GetScoreTimeDuration() const;
     ///@}
 
+    void IncreaseCMNDuration();
+    void DecreaseCMNDuration();
+
     //-----------------//
     // Pseudo functors //
     //-----------------//

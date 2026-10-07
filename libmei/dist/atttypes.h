@@ -1388,6 +1388,8 @@ enum data_NOTATIONTYPE : int8_t {
     NOTATIONTYPE_mensural_black,
     NOTATIONTYPE_mensural_white,
     NOTATIONTYPE_neume,
+    NOTATIONTYPE_neume_square,
+    NOTATIONTYPE_neume_hufnagel,
     NOTATIONTYPE_tab,
     NOTATIONTYPE_tab_staff_like,
     NOTATIONTYPE_tab_guitar,

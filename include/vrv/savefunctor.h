@@ -38,6 +38,8 @@ public:
      * Functor interface
      */
     ///@{
+    FunctorCode VisitAccid(Accid *accid) override;
+    FunctorCode VisitAccidEnd(Accid *accid) override;
     FunctorCode VisitDots(Dots *dots) override;
     FunctorCode VisitDotsEnd(Dots *dots) override;
     FunctorCode VisitEditorialElement(EditorialElement *editorialElement) override;
@@ -50,8 +52,12 @@ public:
     FunctorCode VisitMeasureEnd(Measure *measure) override;
     FunctorCode VisitMNum(MNum *mNum) override;
     FunctorCode VisitMNumEnd(MNum *mNum) override;
+    FunctorCode VisitMRest(MRest *mRest) override;
+    FunctorCode VisitMRestEnd(MRest *mRest) override;
     FunctorCode VisitObject(Object *object) override;
     FunctorCode VisitObjectEnd(Object *object) override;
+    FunctorCode VisitRest(Rest *rest) override;
+    FunctorCode VisitRestEnd(Rest *rest) override;
     FunctorCode VisitRunningElement(RunningElement *runningElement) override;
     FunctorCode VisitRunningElementEnd(RunningElement *runningElement) override;
     FunctorCode VisitText(Text *text) override;

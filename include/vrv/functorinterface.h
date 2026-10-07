@@ -32,6 +32,7 @@ class Clef;
 class ControlElement;
 class Course;
 class CpMark;
+class Cursor;
 class Custos;
 class Dir;
 class Div;
@@ -69,6 +70,7 @@ class LabelAbbr;
 class Layer;
 class LayerDef;
 class LayerElement;
+class LyricElement;
 class Lb;
 class Ligature;
 class Lv;
@@ -108,6 +110,7 @@ class Plica;
 class Proport;
 class RepeatMark;
 class Reh;
+class Refrain;
 class Rend;
 class Rest;
 class RunningElement;
@@ -147,6 +150,7 @@ class Tuplet;
 class TupletBracket;
 class TupletNum;
 class Turn;
+class Volta;
 class Verse;
 class Zone;
 
@@ -365,6 +369,8 @@ public:
     virtual FunctorCode VisitChordEnd(Chord *chord);
     virtual FunctorCode VisitClef(Clef *clef);
     virtual FunctorCode VisitClefEnd(Clef *clef);
+    virtual FunctorCode VisitCursor(Cursor *cursor);
+    virtual FunctorCode VisitCursorEnd(Cursor *cursor);
     virtual FunctorCode VisitCustos(Custos *custos);
     virtual FunctorCode VisitCustosEnd(Custos *custos);
     virtual FunctorCode VisitDot(Dot *dot);
@@ -387,6 +393,8 @@ public:
     virtual FunctorCode VisitKeySigEnd(KeySig *keySig);
     virtual FunctorCode VisitLayerElement(LayerElement *layerElement);
     virtual FunctorCode VisitLayerElementEnd(LayerElement *layerElement);
+    virtual FunctorCode VisitLyricElement(LyricElement *lyricElement);
+    virtual FunctorCode VisitLyricElementEnd(LyricElement *lyricElement);
     virtual FunctorCode VisitLigature(Ligature *ligature);
     virtual FunctorCode VisitLigatureEnd(Ligature *ligature);
     virtual FunctorCode VisitMensur(Mensur *mensur);
@@ -417,6 +425,8 @@ public:
     virtual FunctorCode VisitPlicaEnd(Plica *plica);
     virtual FunctorCode VisitProport(Proport *proport);
     virtual FunctorCode VisitProportEnd(Proport *proport);
+    virtual FunctorCode VisitRefrain(Refrain *refrain);
+    virtual FunctorCode VisitRefrainEnd(Refrain *refrain);
     virtual FunctorCode VisitRest(Rest *rest);
     virtual FunctorCode VisitRestEnd(Rest *rest);
     virtual FunctorCode VisitSpace(Space *space);
@@ -439,6 +449,8 @@ public:
     virtual FunctorCode VisitTupletBracketEnd(TupletBracket *tupletBracket);
     virtual FunctorCode VisitTupletNum(TupletNum *tupletNum);
     virtual FunctorCode VisitTupletNumEnd(TupletNum *tupletNum);
+    virtual FunctorCode VisitVolta(Volta *volta);
+    virtual FunctorCode VisitVoltaEnd(Volta *volta);
     virtual FunctorCode VisitVerse(Verse *verse);
     virtual FunctorCode VisitVerseEnd(Verse *verse);
     ///@}
@@ -744,6 +756,8 @@ public:
     virtual FunctorCode VisitChordEnd(const Chord *chord);
     virtual FunctorCode VisitClef(const Clef *clef);
     virtual FunctorCode VisitClefEnd(const Clef *clef);
+    virtual FunctorCode VisitCursor(const Cursor *cursor);
+    virtual FunctorCode VisitCursorEnd(const Cursor *cursor);
     virtual FunctorCode VisitCustos(const Custos *custos);
     virtual FunctorCode VisitCustosEnd(const Custos *custos);
     virtual FunctorCode VisitDot(const Dot *dot);
@@ -766,6 +780,8 @@ public:
     virtual FunctorCode VisitKeySigEnd(const KeySig *keySig);
     virtual FunctorCode VisitLayerElement(const LayerElement *layerElement);
     virtual FunctorCode VisitLayerElementEnd(const LayerElement *layerElement);
+    virtual FunctorCode VisitLyricElement(const LyricElement *lyricElement);
+    virtual FunctorCode VisitLyricElementEnd(const LyricElement *lyricElement);
     virtual FunctorCode VisitLigature(const Ligature *ligature);
     virtual FunctorCode VisitLigatureEnd(const Ligature *ligature);
     virtual FunctorCode VisitMensur(const Mensur *mensur);
@@ -796,6 +812,8 @@ public:
     virtual FunctorCode VisitPlicaEnd(const Plica *plica);
     virtual FunctorCode VisitProport(const Proport *proport);
     virtual FunctorCode VisitProportEnd(const Proport *proport);
+    virtual FunctorCode VisitRefrain(const Refrain *refrain);
+    virtual FunctorCode VisitRefrainEnd(const Refrain *refrain);
     virtual FunctorCode VisitRest(const Rest *rest);
     virtual FunctorCode VisitRestEnd(const Rest *rest);
     virtual FunctorCode VisitSpace(const Space *space);
@@ -818,6 +836,8 @@ public:
     virtual FunctorCode VisitTupletBracketEnd(const TupletBracket *tupletBracket);
     virtual FunctorCode VisitTupletNum(const TupletNum *tupletNum);
     virtual FunctorCode VisitTupletNumEnd(const TupletNum *tupletNum);
+    virtual FunctorCode VisitVolta(const Volta *volta);
+    virtual FunctorCode VisitVoltaEnd(const Volta *volta);
     virtual FunctorCode VisitVerse(const Verse *verse);
     virtual FunctorCode VisitVerseEnd(const Verse *verse);
     ///@}

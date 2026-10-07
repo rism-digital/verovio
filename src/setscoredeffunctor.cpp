@@ -196,6 +196,8 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitLayer(Layer *layer)
 
 FunctorCode ScoreDefSetCurrentFunctor::VisitMeasure(Measure *measure)
 {
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     // If we have a restart scoreDef before, for redrawing of everything on the measure
     if (m_restart) {
         m_upcomingScoreDef.SetRedrawFlags(StaffDefRedrawFlags::REDRAW_ALL);
@@ -240,11 +242,13 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitMeasure(Measure *measure)
     // them)
     ListOfObjects currentObjects, previousObjects;
     AttVisibilityComparison comparison(STAFF, BOOLEAN_false);
-    measure->FindAllDescendantsByComparison(&currentObjects, &comparison);
+    if (!showHidden) {
+        measure->FindAllDescendantsByComparison(&currentObjects, &comparison);
+    }
     if ((int)currentObjects.size() == measure->GetStaffCount()) {
         drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT;
     }
-    if (m_previousMeasure) {
+    if (!showHidden && m_previousMeasure) {
         m_previousMeasure->FindAllDescendantsByComparison(&previousObjects, &comparison);
         if ((int)previousObjects.size() == m_previousMeasure->GetStaffCount())
             drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS;

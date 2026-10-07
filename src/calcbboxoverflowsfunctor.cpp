@@ -39,6 +39,9 @@ FunctorCode CalcBBoxOverflowsFunctor::VisitLayerEnd(Layer *layer)
     if (layer->GetCautionStaffDefMeterSig()) {
         this->VisitMeterSig(layer->GetCautionStaffDefMeterSig());
     }
+    if (layer->HasCursor()) {
+        this->VisitCursor(layer->GetCursor());
+    }
     return FUNCTOR_CONTINUE;
 }
 

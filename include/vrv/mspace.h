@@ -33,6 +33,15 @@ public:
     std::string GetClassName() const override { return "mSpace"; }
     ///@}
 
+    /**
+     * Add an element (accid) to a accid.
+     * Only supported elements will be actually added to the child list.
+     */
+    bool IsSupportedChild(ClassId classId) override;
+
+    /** Init the display mspace as mrest when the option is set */
+    void InitShowMSpace();
+
     //----------//
     // Functors //
     //----------//

@@ -121,7 +121,7 @@ void PageRange::Reset()
 
 void PageRange::SetAsFocus(Page *page)
 {
-    assert(page);
+    if (!page) return;
 
     m_focusPage = page;
 

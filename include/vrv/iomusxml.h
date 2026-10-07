@@ -11,11 +11,13 @@
 #include <map>
 #include <optional>
 #include <queue>
+#include <set>
 #include <string>
 #include <vector>
 
 //----------------------------------------------------------------------------
 
+#include "attalternates.h"
 #include "attdef.h"
 #include "iobase.h"
 #include "metersig.h"
@@ -67,27 +69,27 @@ class Trill;
 namespace musicxml {
 
     struct OpenSlur {
-        OpenSlur(const std::string &measureNum, short int number, curvature_CURVEDIR curvedir)
+        OpenSlur(int measureCount, short int number, curvature_CURVEDIR curvedir)
         {
-            m_measureNum = measureNum;
+            m_measureCount = measureCount;
             m_number = number;
             m_curvedir = curvedir;
         }
 
-        std::string m_measureNum;
+        int m_measureCount;
         short int m_number;
         curvature_CURVEDIR m_curvedir;
     };
 
     struct CloseSlur {
-        CloseSlur(const std::string &measureNum, short int number, curvature_CURVEDIR curvedir)
+        CloseSlur(int measureCount, short int number, curvature_CURVEDIR curvedir)
         {
-            m_measureNum = measureNum;
+            m_measureCount = measureCount;
             m_number = number;
             m_curvedir = curvedir;
         }
 
-        std::string m_measureNum;
+        int m_measureCount;
         short int m_number;
         curvature_CURVEDIR m_curvedir;
     };
@@ -218,10 +220,9 @@ namespace musicxml {
     };
 
     struct ClefChange {
-        ClefChange(const std::string &measureNum, Staff *staff, Layer *layer, Clef *clef, const int &scoreOnset,
-            bool afterBarline)
+        ClefChange(int measureCount, Staff *staff, Layer *layer, Clef *clef, const int &scoreOnset, bool afterBarline)
         {
-            m_measureNum = measureNum;
+            m_measureCount = measureCount;
             m_staff = staff;
             m_layer = layer;
             m_clef = clef;
@@ -229,7 +230,7 @@ namespace musicxml {
             m_afterBarline = afterBarline;
         }
 
-        std::string m_measureNum;
+        int m_measureCount;
         Staff *m_staff;
         Layer *m_layer;
         Clef *m_clef;
@@ -355,29 +356,35 @@ private:
      * @name Methods for reading the content of a MusicXML measure.
      */
     ///@{
-    void ReadMusicXmlAttributes(pugi::xml_node, Section *section, Measure *measure, const std::string &measureNum);
+    void ReadMusicXmlAttributes(pugi::xml_node, Section *section, Measure *measure);
     void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, const std::string &measureNum);
-    void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, const std::string &measureNum);
+    void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure);
     void ReadMusicXmlDirection(
         pugi::xml_node, Measure *measure, const std::string &measureNum, const short int staffOffset, Section *section);
-    void ReadMusicXmlFigures(pugi::xml_node, Measure *measure, const std::string &measureNum);
+    void ReadMusicXmlFigures(pugi::xml_node, Measure *measure);
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, const std::string &measureNum);
-    void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, const std::string &measureNum);
-    void ReadMusicXmlNote(
-        pugi::xml_node, Measure *measure, const std::string &measureNum, const short int staffOffset, Section *section);
+    void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure);
+    void ReadMusicXmlNote(pugi::xml_node, Measure *measure, const short int staffOffset, Section *section);
     void ReadMusicXmlPrint(pugi::xml_node, Section *section);
     void ReadMusicXmlSound(pugi::xml_node, Measure *measure, Section *section);
     bool ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord);
     void ReadMusicXmlTupletStart(const pugi::xml_node &node, const pugi::xml_node &tupletStart, Layer *layer);
     void ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi::xml_node &beamStart, Layer *layer);
     void ReadMusicXMLMeterSig(const pugi::xml_node &node, Object *parent);
-    void ReadMusicXmlTies(const pugi::xml_node &node, Layer *layer, Note *note, const std::string &measureNum);
+    void ReadMusicXmlTies(const pugi::xml_node &node, Layer *layer, Note *note, Measure *measure);
     ///@}
 
     /**
      * Process all clef change queue and add clefs to corresponding places in the score
      */
     void ProcessClefChangeQueue(Section *section);
+
+    /**
+     * Find the measure created for a given measure count (document position within the part).
+     * Measure numbers are not unique, so control elements and clef changes resolve their
+     * measure by count instead.
+     */
+    Measure *FindMeasureByCount(int measureCount) const;
 
     /**
      * Add clef changes to all layers of a given measure, staff, and time stamp
@@ -588,7 +595,7 @@ private:
     static data_BARRENDITION ConvertStyleToRend(const std::string &value, const bool repeat);
     static data_BOOLEAN ConvertWordToBool(const std::string &value);
     static data_DURATION ConvertTypeToDur(const std::string &value);
-    static data_HEADSHAPE_list ConvertNotehead(const std::string &value);
+    static data_HEADSHAPE ConvertNotehead(const std::string &value);
     static data_LINESTARTENDSYMBOL ConvertLineEndSymbol(const std::string &value);
     static data_MIDIVALUE ConvertDynamicsToMidiVal(const float dynamics);
     static data_PITCHNAME ConvertStepToPitchName(const std::string &value);
@@ -598,6 +605,7 @@ private:
     static fermataVis_SHAPE ConvertFermataShape(const std::string &value);
     static pedalLog_DIR ConvertPedalTypeToDir(const std::string &value);
     static repeatMarkLog_FUNC ConvertJumpType(const std::string &value);
+    static sylLog_CON ConvertElisionToCon(const pugi::xml_node elision);
     static tupletVis_NUMFORMAT ConvertTupletNumberValue(const std::string &value);
     static std::u32string ConvertTypeToVerovioText(const std::string &value);
     static std::string ConvertAlterToSymbol(const std::string &value, bool plusMinus = false);
@@ -643,6 +651,8 @@ private:
     Label *m_label = NULL;
     LabelAbbr *m_labelAbbr = NULL;
     InstrDef *m_instrdef = NULL;
+    /* MIDI keys of unpitched notes per part and instrument id ("" for a part with a single instrument) */
+    std::map<std::string, std::map<std::string, int>> m_unpitchedKeys;
     /* LastElementID */
     std::string m_ID;
     /* A map of stacks for piling open LayerElements (beams, tuplets, chords, btrem, ftrem) separately per layer */
@@ -650,6 +660,8 @@ private:
     /* A maps of time stamps (score time) to indicate write pointer of a given layer */
     std::map<Layer *, int> m_layerEndTimes;
     std::map<Layer *, std::multimap<int, LayerElement *>> m_layerTimes;
+    /* Verse numbers with a pending <extend type="stop"/> per staff/layer @n, to anchor on the following note */
+    std::map<std::pair<int, int>, std::set<int>> m_pendingExtenderStops;
     /* To remember layer of last element (note) to handle chords */
     Layer *m_prevLayer = NULL;
     /* To remember current layer to properly handle layers/staves/cross-staff elements */
@@ -691,9 +703,9 @@ private:
     std::vector<Tempo *> m_tempoStack;
     /*
      * The stack of floating elements (tie, slur, etc.) to be added at the
-     * end of each measure
+     * end of each measure, keyed by the measure count (document position)
      */
-    std::vector<std::pair<std::string, ControlElement *>> m_controlElements;
+    std::vector<std::pair<int, ControlElement *>> m_controlElements;
     /* stack of clef changes to be inserted to all layers of a given staff */
     std::deque<musicxml::ClefChange> m_clefChangeQueue;
     /* stack of new arpeggios that get more notes added. */
@@ -702,12 +714,8 @@ private:
     std::map<Measure *, int> m_measureCounts;
     /* measure rests */
     std::map<int, int> m_multiRests;
-    /* a map of pitch classes to their current accidental(s) */
-    std::map<data_PITCHNAME, std::vector<musicxml::Accidental>> m_currentAccids;
     /* a map of pitch/alter values to their corresponding accidental(s) */
     std::map<std::string, std::vector<musicxml::Accidental>> m_alterAccids;
-    /* current key signature */
-    KeySig *m_currentKeySig = NULL;
     /* A flag indicating we had a clef change */
     int m_clefChanged = 0;
 

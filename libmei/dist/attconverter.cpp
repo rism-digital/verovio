@@ -2937,6 +2937,8 @@ std::string AttConverterBase::NotationtypeToStr(data_NOTATIONTYPE data) const
         case NOTATIONTYPE_mensural_black: value = "mensural.black"; break;
         case NOTATIONTYPE_mensural_white: value = "mensural.white"; break;
         case NOTATIONTYPE_neume: value = "neume"; break;
+        case NOTATIONTYPE_neume_square: value = "neume.square"; break;
+        case NOTATIONTYPE_neume_hufnagel: value = "neume.hufnagel"; break;
         case NOTATIONTYPE_tab: value = "tab"; break;
         case NOTATIONTYPE_tab_staff_like: value = "tab.staff-like"; break;
         case NOTATIONTYPE_tab_guitar: value = "tab.guitar"; break;
@@ -2958,6 +2960,8 @@ data_NOTATIONTYPE AttConverterBase::StrToNotationtype(const std::string &value, 
     if (value == "mensural.black") return NOTATIONTYPE_mensural_black;
     if (value == "mensural.white") return NOTATIONTYPE_mensural_white;
     if (value == "neume") return NOTATIONTYPE_neume;
+    if (value == "neume.square") return NOTATIONTYPE_neume_square;
+    if (value == "neume.hufnagel") return NOTATIONTYPE_neume_hufnagel;
     if (value == "tab") return NOTATIONTYPE_tab;
     if (value == "tab.staff-like") return NOTATIONTYPE_tab_staff_like;
     if (value == "tab.guitar") return NOTATIONTYPE_tab_guitar;

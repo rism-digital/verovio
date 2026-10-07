@@ -138,6 +138,7 @@ class Rend;
 class RepeatMark;
 class Rest;
 class Restore;
+class Refrain;
 class RunningElement;
 class Score;
 class ScoreDef;
@@ -178,7 +179,9 @@ class Tuning;
 class Turn;
 class Tuplet;
 class Unclear;
+class Volta;
 class Verse;
+class LyricElement;
 class Zone;
 
 // Helper enums
@@ -523,7 +526,10 @@ private:
      * @name Methods for writing other mei elements
      */
     ///@{
+    void WriteRefrain(pugi::xml_node currentNode, Refrain *refrain);
+    void WriteVolta(pugi::xml_node currentNode, Volta *volta);
     void WriteVerse(pugi::xml_node currentNode, Verse *verse);
+    void WriteLyricElement(pugi::xml_node currentNode, LyricElement *lyricElement);
     void WriteSyl(pugi::xml_node currentNode, Syl *syl);
     void WriteZone(pugi::xml_node currentNode, Zone *zone);
     void WriteSurface(pugi::xml_node currentNode, Surface *surface);
@@ -787,6 +793,7 @@ private:
     bool ReadPlica(Object *parent, pugi::xml_node plica);
     bool ReadProport(Object *parent, pugi::xml_node proport);
     bool ReadQuilisma(Object *parent, pugi::xml_node quilisma);
+    bool ReadRefrain(Object *parent, pugi::xml_node refrain);
     bool ReadRest(Object *parent, pugi::xml_node rest);
     bool ReadSpace(Object *parent, pugi::xml_node space);
     bool ReadStem(Object *parent, pugi::xml_node stem);
@@ -796,7 +803,9 @@ private:
     bool ReadTabDurSym(Object *parent, pugi::xml_node tabDurSym);
     bool ReadTabGrp(Object *parent, pugi::xml_node tabGrp);
     bool ReadTuplet(Object *parent, pugi::xml_node tuplet);
+    bool ReadVolta(Object *parent, pugi::xml_node volta);
     bool ReadVerse(Object *parent, pugi::xml_node verse);
+    void ReadLyricElement(pugi::xml_node element, LyricElement *lyricElement);
     ///@}
 
     /**

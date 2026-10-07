@@ -23,6 +23,7 @@
 #include "clef.h"
 #include "comparison.h"
 #include "controlelement.h"
+#include "cursor.h"
 #include "devicecontext.h"
 #include "div.h"
 #include "doc.h"
@@ -587,7 +588,7 @@ void View::DrawBracketSq(DeviceContext *dc, int x, int y1, int y2, int staffSize
     this->DrawSquareBracket(dc, true, x - width, y, height, width, horizontalThickness, verticalThickness);
 }
 
-void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
+void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize, bool forceGlyph)
 {
     assert(dc);
 
@@ -595,7 +596,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 
     x -= basicDist;
 
-    if (m_doc->GetOptions()->m_useBraceGlyph.GetValue()) {
+    if (forceGlyph || m_doc->GetOptions()->m_useBraceGlyph.GetValue()) {
         FontInfo *font = m_doc->GetDrawingSmuflFont(staffSize, false);
         const int width = m_doc->GetGlyphWidth(SMUFL_E000_brace, staffSize, false);
         const int height = 8 * m_doc->GetDrawingUnit(staffSize);
@@ -685,6 +686,8 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
     assert(staffGrp);
     assert(barLine);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     if (staffGrp->GetDrawingVisibility() == OPTIMIZATION_HIDDEN) {
         return;
     }
@@ -731,11 +734,12 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         // Get the corresponding staff
         AttNIntegerComparison comparison(STAFF, staffDef->GetN());
         Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
-        if (!staff || (staff->HasVisible() && (staff->GetVisible() == BOOLEAN_false))) {
+        const bool hiddenStaff = (!staff || (staff->HasVisible() && (staff->GetVisible() == BOOLEAN_false)));
+        if (!showHidden && hiddenStaff) {
             yBottomPrevious = VRV_UNSET;
             continue;
         }
-        if (!barlineThrough && (staff->GetVisible() == BOOLEAN_false)) {
+        if (!barlineThrough && hiddenStaff) {
             yBottomPrevious = VRV_UNSET;
             continue;
         }
@@ -1060,14 +1064,14 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     }
 
     /*
-    //Debug code for displaying aligner positions
-    for (auto &child : measure->m_measureAligner.GetChildren()) {
-        Alignment *alignment = vrv_cast<Alignment *>(child);
-        int x = alignment->GetXRel() + measure->GetDrawingX();
-        int y = system->GetDrawingY() - m_doc->GetDrawingStaffSize(100);
-        this->DrawVerticalLine(dc, y, y + m_doc->GetDrawingUnit(100), x, 20);
-    }
-    */
+     //Debug code for displaying aligner positions
+     for (auto &child : measure->m_measureAligner.GetChildren()) {
+     Alignment *alignment = vrv_cast<Alignment *>(child);
+     int x = alignment->GetXRel() + measure->GetDrawingX();
+     int y = system->GetDrawingY() - m_doc->GetDrawingStaffSize(100);
+     this->DrawVerticalLine(dc, y, y + m_doc->GetDrawingUnit(100), x, 20);
+     }
+     */
 }
 
 void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
@@ -1076,15 +1080,18 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
     assert(layer);
     assert(staff);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     MeterSigGrp *meterSigGrp = layer->GetStaffDefMeterSigGrp();
     ListOfObjects childList = meterSigGrp->GetList();
 
     // Ignore invisible meter signatures and those without count
     childList.erase(std::remove_if(childList.begin(), childList.end(),
-                        [](Object *object) {
+                        [showHidden](Object *object) {
                             MeterSig *meterSig = vrv_cast<MeterSig *>(object);
                             assert(meterSig);
-                            return ((meterSig->GetVisible() == BOOLEAN_false) || !meterSig->HasCount());
+                            return (
+                                (!showHidden && (meterSig->GetVisible() == BOOLEAN_false)) || !meterSig->HasCount());
                         }),
         childList.end());
 
@@ -1601,6 +1608,10 @@ void View::DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *mea
     dc->StartGraphic(layer, "", layer->GetID());
 
     this->DrawLayerChildren(dc, layer, layer, staff, measure);
+
+    if (layer->HasCursor()) {
+        this->DrawCursor(dc, layer->GetCursor(), layer, staff, measure);
+    }
 
     dc->EndGraphic(layer, this);
 

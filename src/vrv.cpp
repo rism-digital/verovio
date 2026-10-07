@@ -478,8 +478,8 @@ bool IsMensuralType(data_NOTATIONTYPE notationType)
 
 bool IsNeumeType(data_NOTATIONTYPE notationType)
 {
-    // Maybe one day we will have other neume types too
-    return (notationType == NOTATIONTYPE_neume);
+    return (notationType == NOTATIONTYPE_neume || notationType == NOTATIONTYPE_neume_square
+        || notationType == NOTATIONTYPE_neume_hufnagel);
 }
 
 bool IsTabType(data_NOTATIONTYPE notationType)

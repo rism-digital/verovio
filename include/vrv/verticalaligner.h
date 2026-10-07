@@ -14,6 +14,7 @@ namespace vrv {
 
 class AttSpacing;
 class FloatingObject;
+class LyricElement;
 class ScoreDef;
 class StaffAlignment;
 class StaffDef;
@@ -195,12 +196,13 @@ public:
      * The position is calculated from the bottom.
      */
     ///@{
-    void AddVerseN(int verseN, data_STAFFREL place);
+    void AddLyricElement(const LyricElement *lyricElement);
+    void AddVerseN(int verseN, data_STAFFREL place, int lineCount = 1);
     int GetVerseCount(bool collapse) const;
     int GetVerseCountAbove(bool collapse) const;
     int GetVerseCountBelow(bool collapse) const;
-    int GetVersePositionAbove(int verseN, bool collapse) const;
-    int GetVersePositionBelow(int verseN, bool collapse) const;
+    int GetVersePositionAbove(int verseN, bool collapse, int lineN = 1) const;
+    int GetVersePositionBelow(int verseN, bool collapse, int lineN = 1) const;
     ///@}
 
     /**
@@ -407,8 +409,8 @@ private:
     /**
      * Stores the verse@n of the staves attached to the aligner (above and below)
      */
-    std::set<int> m_verseAboveNs;
-    std::set<int> m_verseBelowNs;
+    std::map<int, int> m_verseAboveNs;
+    std::map<int, int> m_verseBelowNs;
 
     /**
      * @name values for storing the overflow and overlap

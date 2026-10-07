@@ -917,8 +917,7 @@ void ConvertToCmnFunctor::SplitDurationInterface(
 
     // Add them to the layer using the ObjectFactory (create notes or rests)
     for (const CmnDuration &cmnDuration : cmnDurations) {
-        ObjectFactory *instance = ObjectFactory::GetInstance();
-        Object *layerElement = instance->Create(classId);
+        Object *layerElement = ObjectFactory::GetInstance().Create(classId);
         assert(layerElement);
         // Add it to the durationElement for post processing (e.g., setting note attributes or adding ties)
         m_durationElements.push_back(layerElement);

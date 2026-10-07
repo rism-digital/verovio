@@ -112,6 +112,7 @@ SvgDeviceContext::SvgDeviceContext(const std::string &docId) : DeviceContext(SVG
     m_vrvTextFontFallback = false;
 
     m_mmOutput = false;
+    m_showHidden = false;
     m_svgBoundingBoxes = false;
     m_svgContentBoundingBoxes = false;
     m_svgViewBox = false;
@@ -293,6 +294,13 @@ void SvgDeviceContext::StartGraphic(
             gClassFull.append((gClassFull.empty() ? "" : " ") + att->GetType());
         }
     }
+    if (m_showHidden && object->HasAttClass(ATT_VISIBILITY)) {
+        AttVisibility *att = dynamic_cast<AttVisibility *>(object);
+        assert(att);
+        if (att->HasVisible() && (att->GetVisible() == BOOLEAN_false)) {
+            gClassFull.append((gClassFull.empty() ? CSS_SHOW_HIDDEN : StringFormat(" %s", CSS_SHOW_HIDDEN)));
+        }
+    }
 
     if (prepend) {
         m_currentNode = m_currentNode.prepend_child("g");
@@ -377,7 +385,7 @@ void SvgDeviceContext::StartGraphic(
         AttVisibility *att = dynamic_cast<AttVisibility *>(object);
         assert(att);
         if (att->HasVisible()) {
-            if (att->GetVisible() == BOOLEAN_true) {
+            if (att->GetVisible() == BOOLEAN_true || m_showHidden) {
                 m_currentNode.append_attribute("visibility") = "visible";
             }
             else if (att->GetVisible() == BOOLEAN_false) {
@@ -520,7 +528,14 @@ void SvgDeviceContext::StartPage()
         std::string css = "g.ending, g.fing, g.reh, g.tempo {font-weight:bold;} "
                           "g.dir, g.dynam, g.mNum {font-style:italic;}"
                           "g.label {font-weight:normal;} "
-                          "ellipse, path, polygon, polyline, rect {stroke:currentColor} ";
+                          "ellipse, path, polygon, polyline, rect {stroke:currentColor} "
+                          "g.cursor {fill:dodgerblue; color:dodgerblue;} "
+                          "g.cursor.chord {fill:limegreen; color:limegreen;} ";
+        if (m_showHidden) {
+            std::string showHidden
+                = StringFormat("g.%s {fill: silver; color:silver; stroke:silver;} ", CSS_SHOW_HIDDEN);
+            css += showHidden;
+        }
         // bounding box css - for debugging
         // css += " g.bounding-box{stroke:red; stroke-width:10} "
         //        "g.content-bounding-box{stroke:blue; stroke-width:10}";

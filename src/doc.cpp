@@ -152,6 +152,11 @@ void Doc::ResetToSerialization()
     m_isMensuralMusicOnly = BOOLEAN_NONE;
     m_isNeumeLines = false;
     m_visibleScores.clear();
+
+    if (m_focusRange) {
+        delete m_focusRange;
+        m_focusRange = NULL;
+    }
     m_focusStatus = FOCUS_UNSET;
 
     m_facsimile = NULL;
@@ -882,21 +887,24 @@ void Doc::PrepareData()
     for (auto &staves : verseTree.child) {
         for (auto &layers : staves.second.child) {
             for (auto &verses : layers.second.child) {
-                // std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
-                filters.Clear();
-                // Create ad comparison object for each type / @n
-                AttNIntegerComparison matchStaff(STAFF, staves.first);
-                AttNIntegerComparison matchLayer(LAYER, layers.first);
-                AttNIntegerComparison matchVerse(VERSE, verses.first);
-                filters.Add(&matchStaff);
-                filters.Add(&matchLayer);
-                filters.Add(&matchVerse);
+                for (auto &voltaTracks : verses.second.child) {
+                    filters.Clear();
+                    // Create comparisons for staff/layer and the internal lyric-element group.
+                    AttNIntegerComparison matchStaff(STAFF, staves.first);
+                    AttNIntegerComparison matchLayer(LAYER, layers.first);
+                    LyricElementComparison matchVerse(VERSE, verses.first);
+                    LyricElementComparison matchRefrain(REFRAIN, verses.first);
+                    filters.Add(&matchStaff);
+                    filters.Add(&matchLayer);
+                    filters.Add(&matchVerse);
+                    filters.Add(&matchRefrain);
 
-                // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
-                // m_drawingLastNote is set only if the syl has a forward connector
-                PrepareLyricsFunctor prepareLyrics;
-                prepareLyrics.SetFilters(&filters);
-                root->Process(prepareLyrics);
+                    // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
+                    // m_drawingLastNote is set only if the syl has a forward connector
+                    PrepareLyricsFunctor prepareLyrics(voltaTracks.first);
+                    prepareLyrics.SetFilters(&filters);
+                    root->Process(prepareLyrics);
+                }
             }
         }
     }
@@ -960,7 +968,7 @@ void Doc::PrepareData()
 
     /************ Instantiate LayerElement parts (stem, flag, dots, etc) ************/
 
-    PrepareLayerElementPartsFunctor prepareLayerElementParts;
+    PrepareLayerElementPartsFunctor prepareLayerElementParts(this);
     root->Process(prepareLayerElementParts);
 
     /************ Resolve @facs ************/
@@ -2470,11 +2478,11 @@ int Doc::GetAdjustedDrawingPageHeight() const
         return m_drawingPage->m_pageHeight * m_drawingPage->GetPPUFactor() / DEFINITION_FACTOR;
     }
 
-    int contentHeight = m_drawingPage->GetContentHeight();
+    int contentHeight = m_drawingPage->GetContentHeight() + m_drawingPageMarginTop + m_drawingPageMarginBottom;
     if (m_options->m_scaleToPageSize.GetValue()) {
         contentHeight = contentHeight * m_options->m_scale.GetValue() / 100;
     }
-    return (contentHeight + m_drawingPageMarginTop + m_drawingPageMarginBottom) / DEFINITION_FACTOR;
+    return (contentHeight / DEFINITION_FACTOR);
 }
 
 int Doc::GetAdjustedDrawingPageWidth() const
@@ -2486,11 +2494,11 @@ int Doc::GetAdjustedDrawingPageWidth() const
         return m_drawingPage->m_pageWidth * m_drawingPage->GetPPUFactor() / DEFINITION_FACTOR;
     }
 
-    int contentWidth = m_drawingPage->GetContentWidth();
+    int contentWidth = m_drawingPage->GetContentWidth() + m_drawingPageMarginLeft + m_drawingPageMarginRight;
     if (m_options->m_scaleToPageSize.GetValue()) {
         contentWidth = contentWidth * m_options->m_scale.GetValue() / 100;
     }
-    return (contentWidth + m_drawingPageMarginLeft + m_drawingPageMarginRight) / DEFINITION_FACTOR;
+    return (contentWidth / DEFINITION_FACTOR);
 }
 
 void Doc::SetMensuralMusicOnly(data_BOOLEAN isMensuralMusicOnly)

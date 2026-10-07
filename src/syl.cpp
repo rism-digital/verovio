@@ -16,6 +16,7 @@
 #include "doc.h"
 #include "editorial.h"
 #include "functor.h"
+#include "lyricelement.h"
 #include "measure.h"
 #include "note.h"
 #include "scoredef.h"
@@ -25,6 +26,7 @@
 #include "text.h"
 #include "textelement.h"
 #include "verse.h"
+#include "volta.h"
 #include "vrv.h"
 #include "zone.h"
 
@@ -70,8 +72,12 @@ void Syl::Reset()
     this->ResetSylLog();
 
     m_drawingVerseN = 1;
+    m_drawingVoltaN = 1;
     m_drawingVersePlace = STAFFREL_below;
     m_nextWordSyl = NULL;
+    m_drawingTextInkTop = 0;
+    m_drawingTextInkBottom = 0;
+    m_hasDrawingTextInkBounds = false;
 }
 
 bool Syl::IsSupportedChild(ClassId classId)
@@ -112,31 +118,37 @@ FontInfo Syl::GetDrawingFont(Doc *doc, int staffSize) const
         }
     }
     FontInfo font = doc->GetDrawingTextFont(staffSize, scoreDef, true);
-    const Verse *verse = vrv_cast<const Verse *>(this->GetFirstAncestor(VERSE));
-    if (verse) {
-        if (verse->HasFontname()) {
-            font.SetFaceName(verse->GetFontname());
+    const auto applyTypography = [doc, staffSize](FontInfo &font, const AttTypography *typography) {
+        if (!typography) return;
+        if (typography->HasFontname()) {
+            font.SetFaceName(typography->GetFontname());
         }
-        else if (verse->HasFontfam()) {
-            font.SetFaceName(verse->GetFontfam());
+        else if (typography->HasFontfam()) {
+            font.SetFaceName(typography->GetFontfam());
         }
-        if (verse->HasFontweight()) font.SetWeight(verse->GetFontweight());
-        if (verse->HasFontstyle()) font.SetStyle(verse->GetFontstyle());
-        if (verse->HasLetterspacing()) {
-            font.SetLetterSpacing(verse->GetLetterspacing() * doc->GetDrawingUnit(staffSize));
+        if (typography->HasFontsize()) {
+            const data_FONTSIZE fontSize = typography->GetFontsize();
+            if (fontSize.GetType() == FONTSIZE_fontSizeNumeric) {
+                font.SetPointSize(fontSize.GetFontSizeNumeric());
+            }
+            else if (fontSize.GetType() == FONTSIZE_term) {
+                font.SetPointSize(font.GetPointSize() * fontSize.GetPercentForTerm() / 100);
+            }
+            else if (fontSize.GetType() == FONTSIZE_percent) {
+                font.SetPointSize(font.GetPointSize() * fontSize.GetPercent() / 100);
+            }
         }
-    }
-    if (this->HasFontname()) {
-        font.SetFaceName(this->GetFontname());
-    }
-    else if (this->HasFontfam()) {
-        font.SetFaceName(this->GetFontfam());
-    }
-    if (this->HasFontweight()) font.SetWeight(this->GetFontweight());
-    if (this->HasFontstyle()) font.SetStyle(this->GetFontstyle());
-    if (this->HasLetterspacing()) {
-        font.SetLetterSpacing(this->GetLetterspacing() * doc->GetDrawingUnit(staffSize));
-    }
+        if (typography->HasFontweight()) font.SetWeight(typography->GetFontweight());
+        if (typography->HasFontstyle()) font.SetStyle(typography->GetFontstyle());
+        if (typography->HasLetterspacing()) {
+            font.SetLetterSpacing(typography->GetLetterspacing() * doc->GetDrawingUnit(staffSize));
+        }
+    };
+
+    applyTypography(
+        font, vrv_cast<const LyricElement *>(this->GetFirstAncestorInRange(LYRIC_ELEMENT, LYRIC_ELEMENT_max)));
+    applyTypography(font, vrv_cast<const Volta *>(this->GetFirstAncestor(VOLTA)));
+    applyTypography(font, this);
     if (this->GetStart() && this->GetStart()->GetDrawingCueSize()) {
         font.SetPointSize(doc->GetCueSize(font.GetPointSize()));
     }

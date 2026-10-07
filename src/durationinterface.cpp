@@ -360,6 +360,22 @@ Fraction DurationInterface::GetScoreTimeDuration() const
     return this->GetScoreTimeOffset() - this->GetScoreTimeOnset();
 }
 
+void DurationInterface::IncreaseCMNDuration()
+{
+    data_DURATION dur = this->GetDur();
+    if (dur > DURATION_long && dur <= DURATION_1024) {
+        this->SetDur(static_cast<data_DURATION>(static_cast<int>(dur) - 1));
+    }
+}
+
+void DurationInterface::DecreaseCMNDuration()
+{
+    data_DURATION dur = this->GetDur();
+    if (dur >= DURATION_long && dur < DURATION_1024) {
+        this->SetDur(static_cast<data_DURATION>(static_cast<int>(dur) + 1));
+    }
+}
+
 //----------------------------------------------------------------------------
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------

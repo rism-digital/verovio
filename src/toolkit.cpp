@@ -719,13 +719,17 @@ void Toolkit::SetViewAndEditor()
     if (m_editorToolkit != NULL) {
         delete m_editorToolkit;
     }
-    switch (m_doc.m_notationType) {
-        case NOTATIONTYPE_neume: m_editorToolkit = new EditorToolkitNeume(&m_doc, &m_view); break;
-        case NOTATIONTYPE_mensural:
-        case NOTATIONTYPE_mensural_black:
-        case NOTATIONTYPE_mensural_white: m_editorToolkit = new EditorToolkitMensural(&m_doc, &m_view); break;
-        case NOTATIONTYPE_cmn: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view); break;
-        default: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view);
+    if (IsNeumeType(m_doc.m_notationType)) {
+        m_editorToolkit = new EditorToolkitNeume(&m_doc, &m_view);
+    }
+    else {
+        switch (m_doc.m_notationType) {
+            case NOTATIONTYPE_mensural:
+            case NOTATIONTYPE_mensural_black:
+            case NOTATIONTYPE_mensural_white: m_editorToolkit = new EditorToolkitMensural(&m_doc, &m_view); break;
+            case NOTATIONTYPE_cmn: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view); break;
+            default: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view);
+        }
     }
 #endif
 }
@@ -1558,6 +1562,8 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
         this->ResetMidiDoc();
     }
 
+    if (m_editorToolkit) m_editorToolkit->OptionsChanged();
+
     return true;
 }
 
@@ -1816,11 +1822,18 @@ bool Toolkit::Edit(const std::string &editorAction)
     return m_editorToolkit->ParseEditorAction(editorAction);
 }
 
-std::string Toolkit::EditInfo()
+std::string Toolkit::EditResponse()
 {
     if (!m_editorToolkit) return "{}";
 
-    return m_editorToolkit->EditInfo();
+    return m_editorToolkit->EditResponse();
+}
+
+std::string Toolkit::EditStatus()
+{
+    if (!m_editorToolkit) return "{}";
+
+    return m_editorToolkit->EditStatus();
 }
 
 std::string Toolkit::GetLog()
@@ -2026,6 +2039,10 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
 
     if (m_options->m_mmOutput.GetValue()) {
         svg.SetMMOutput(true);
+    }
+
+    if (m_options->m_showHidden.GetValue()) {
+        svg.SetShowHidden(true);
     }
 
     if (m_doc.IsFacs()) {
@@ -2243,8 +2260,15 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
     // Get the pageNo from the first note (if any)
     int pageNo = -1;
-    Page *page = vrv_cast<Page *>(measure->GetFirstAncestor(PAGE));
-    if (page) pageNo = page->GetIdx() + 1;
+    if (m_midiDoc == &m_doc) {
+        Page *page = vrv_cast<Page *>(measure->GetFirstAncestor(PAGE));
+        if (page) pageNo = page->GetIdx() + 1;
+    }
+    else {
+        const std::string notatedId = this->GetNotatedIdForElement(measure->GetID());
+        const int notatedPageNo = this->GetPageWithElement(notatedId);
+        if (notatedPageNo > 0) pageNo = notatedPageNo;
+    }
 
     NoteOrRestOnsetOffsetComparison matchTime(millisec - measureTimeOffset);
     ListOfObjects notesOrRests;

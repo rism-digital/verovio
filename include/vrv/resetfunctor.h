@@ -59,9 +59,11 @@ public:
     FunctorCode VisitKeySig(KeySig *keySig) override;
     FunctorCode VisitLayer(Layer *layer) override;
     FunctorCode VisitLayerElement(LayerElement *layerElement) override;
+    FunctorCode VisitLyricElement(LyricElement *lyricElement) override;
     FunctorCode VisitLigature(Ligature *ligature) override;
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitMRest(MRest *mRest) override;
+    FunctorCode VisitMSpace(MSpace *mSpace) override;
     FunctorCode VisitNote(Note *note) override;
     FunctorCode VisitNc(Nc *nc) override;
     FunctorCode VisitObject(Object *object) override;
@@ -70,6 +72,7 @@ public:
     FunctorCode VisitRest(Rest *rest) override;
     FunctorCode VisitSection(Section *section) override;
     FunctorCode VisitSlur(Slur *slur) override;
+    FunctorCode VisitSpace(Space *space) override;
     FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitStaffDef(StaffDef *staffDef) override;
     FunctorCode VisitStem(Stem *stem) override;
@@ -80,6 +83,8 @@ public:
     FunctorCode VisitTempo(Tempo *tempo) override;
     FunctorCode VisitTuplet(Tuplet *tuplet) override;
     FunctorCode VisitTurn(Turn *turn) override;
+    FunctorCode VisitRefrain(Refrain *refrain) override;
+    FunctorCode VisitVolta(Volta *volta) override;
     FunctorCode VisitVerse(Verse *verse) override;
     ///@}
 
@@ -123,6 +128,7 @@ public:
     FunctorCode VisitArpeg(Arpeg *arpeg) override;
     FunctorCode VisitBeam(Beam *beam) override;
     FunctorCode VisitBeamSpan(BeamSpan *beamSpan) override;
+    FunctorCode VisitCursor(Cursor *cursor) override;
     FunctorCode VisitCustos(Custos *custos) override;
     FunctorCode VisitDiv(Div *div) override;
     FunctorCode VisitDot(Dot *dot) override;

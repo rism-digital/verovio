@@ -93,6 +93,7 @@ public:
      * E.g., return 0 for and C4 with clef C1, -2 with clef G2.
      */
     static int CalcLoc(data_PITCHNAME pname, int oct, int clefLocOffset);
+    static std::pair<data_PITCHNAME, int> CalcPitch(int loc, int clefLocOffset);
 
 private:
     //

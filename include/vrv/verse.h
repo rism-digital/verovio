@@ -8,24 +8,17 @@
 #ifndef __VRV_VERSE_H__
 #define __VRV_VERSE_H__
 
-#include "atts_shared.h"
-#include "layerelement.h"
+#include "lyricelement.h"
 
 namespace vrv {
 
 class LabelAbbr;
-class Syl;
 
 //----------------------------------------------------------------------------
 // Verse
 //----------------------------------------------------------------------------
 
-class Verse : public LayerElement,
-              public AttColor,
-              public AttLang,
-              public AttNInteger,
-              public AttPlacementRelStaff,
-              public AttTypography {
+class Verse : public LyricElement, public AttNInteger {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -53,13 +46,6 @@ public:
     const LabelAbbr *GetDrawingLabelAbbr() const { return m_drawingLabelAbbr; }
     void SetDrawingLabelAbbr(LabelAbbr *labelAbbr) { m_drawingLabelAbbr = labelAbbr; }
     ///@}
-
-    /**
-     * Calculate the adjustment according to the overlap and the free space available before.
-     * Will move the verse accordingly.
-     * Called from AdjustSylSpacingFunctor
-     */
-    int AdjustPosition(int &overlap, int freeSpace, const Doc *doc);
 
     //----------//
     // Functors //

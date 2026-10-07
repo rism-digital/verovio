@@ -263,8 +263,7 @@ bool Staff::IsMensural() const
 
 bool Staff::IsNeume() const
 {
-    bool isNeume = (m_drawingNotationType == NOTATIONTYPE_neume);
-    return isNeume;
+    return IsNeumeType(m_drawingNotationType);
 }
 
 bool Staff::IsTablature() const
