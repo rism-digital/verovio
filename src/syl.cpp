@@ -108,47 +108,20 @@ int Syl::CalcHyphenLength(Doc *doc, int staffSize)
 
 FontInfo Syl::GetDrawingFont(Doc *doc, int staffSize) const
 {
-    const ScoreDefInterface *scoreDef = nullptr;
+    const ScoreDefInterface *scoreDef = NULL;
     if (this->GetStart()) {
         const Staff *staff = vrv_cast<const Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
         if (staff) scoreDef = staff->m_drawingStaffDef;
         if (!scoreDef) {
             const System *system = vrv_cast<const System *>(this->GetStart()->GetFirstAncestor(SYSTEM));
-            scoreDef = system ? system->GetDrawingScoreDef() : nullptr;
+            scoreDef = system ? system->GetDrawingScoreDef() : NULL;
         }
     }
     FontInfo font = doc->GetDrawingTextFont(staffSize, scoreDef, true);
-    const auto applyTypography = [doc, staffSize](FontInfo &font, const AttTypography *typography) {
-        if (!typography) return;
-        if (typography->HasFontname()) {
-            font.SetFaceName(typography->GetFontname());
-        }
-        else if (typography->HasFontfam()) {
-            font.SetFaceName(typography->GetFontfam());
-        }
-        if (typography->HasFontsize()) {
-            const data_FONTSIZE fontSize = typography->GetFontsize();
-            if (fontSize.GetType() == FONTSIZE_fontSizeNumeric) {
-                font.SetPointSize(fontSize.GetFontSizeNumeric());
-            }
-            else if (fontSize.GetType() == FONTSIZE_term) {
-                font.SetPointSize(font.GetPointSize() * fontSize.GetPercentForTerm() / 100);
-            }
-            else if (fontSize.GetType() == FONTSIZE_percent) {
-                font.SetPointSize(font.GetPointSize() * fontSize.GetPercent() / 100);
-            }
-        }
-        if (typography->HasFontweight()) font.SetWeight(typography->GetFontweight());
-        if (typography->HasFontstyle()) font.SetStyle(typography->GetFontstyle());
-        if (typography->HasLetterspacing()) {
-            font.SetLetterSpacing(typography->GetLetterspacing() * doc->GetDrawingUnit(staffSize));
-        }
-    };
-
-    applyTypography(
-        font, vrv_cast<const LyricElement *>(this->GetFirstAncestorInRange(LYRIC_ELEMENT, LYRIC_ELEMENT_max)));
-    applyTypography(font, vrv_cast<const Volta *>(this->GetFirstAncestor(VOLTA)));
-    applyTypography(font, this);
+    doc->ApplyTypography(font,
+        vrv_cast<const LyricElement *>(this->GetFirstAncestorInRange(LYRIC_ELEMENT, LYRIC_ELEMENT_max)), staffSize);
+    doc->ApplyTypography(font, vrv_cast<const Volta *>(this->GetFirstAncestor(VOLTA)), staffSize);
+    doc->ApplyTypography(font, this, staffSize);
     if (this->GetStart() && this->GetStart()->GetDrawingCueSize()) {
         font.SetPointSize(doc->GetCueSize(font.GetPointSize()));
     }

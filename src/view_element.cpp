@@ -1991,15 +1991,7 @@ void View::DrawLyricElement(DeviceContext *dc, LayerElement *element, Layer *lay
             = vrv_cast<LayerElement *>(element->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
 
         FontInfo labelTxt = m_doc->GetDrawingTextFont(staff->m_drawingStaffSize, staff->m_drawingStaffDef, true);
-        if (verse->HasFontname())
-            labelTxt.SetFaceName(verse->GetFontname());
-        else if (verse->HasFontfam())
-            labelTxt.SetFaceName(verse->GetFontfam());
-        if (verse->HasFontstyle()) labelTxt.SetStyle(verse->GetFontstyle());
-        if (verse->HasFontweight()) labelTxt.SetWeight(verse->GetFontweight());
-        if (verse->HasLetterspacing()) {
-            labelTxt.SetLetterSpacing(verse->GetLetterspacing() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
-        }
+        m_doc->ApplyTypography(labelTxt, verse, staff->m_drawingStaffSize);
         int pointSize = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize();
         if (layerElement && layerElement->GetDrawingCueSize()) {
             pointSize = m_doc->GetCueSize(pointSize);

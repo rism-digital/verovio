@@ -686,7 +686,7 @@ void View::DrawTextLayoutElement(
 
 void View::DrawDiv(DeviceContext *dc, Div *div, System *system)
 {
-    this->DrawTextLayoutElement(dc, div, system ? system->GetDrawingScoreDef() : nullptr);
+    this->DrawTextLayoutElement(dc, div, system ? system->GetDrawingScoreDef() : NULL);
 }
 
 } // namespace vrv

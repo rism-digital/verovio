@@ -246,6 +246,11 @@ public:
     ///@}
 
     /**
+     * Apply the typography attributes (font family, size, style, weight, and letter spacing) to a font
+     */
+    void ApplyTypography(FontInfo &font, const AttTypography *typography, int staffSize) const;
+
+    /**
      * Get the ratio between the lyric font size and the music font size.
      * This is used when the music font is used within text.
      */
@@ -563,6 +568,11 @@ private:
      * Calculates the music font size according to the m_interlDefin reference value.
      */
     int CalcMusicFontSize();
+
+    /**
+     * Return the glyph in the music font (the current one if empty) or in the fallback fonts
+     */
+    const Glyph *GetMusicGlyph(char32_t code, const std::string &fontName) const;
 
     /**
      * Generate the measure indices

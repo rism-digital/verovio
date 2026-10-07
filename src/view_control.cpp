@@ -3274,12 +3274,12 @@ void View::DrawTextEnclosure(DeviceContext *dc, const TextDrawingParams &params,
     dc->SetPushBack();
 
     for (const TextEnclosure &enclosure : params.m_enclosedRend) {
-        const TextElement *rend = enclosure.element;
+        const TextElement *rend = enclosure.m_element;
         assert(rend);
         int x1 = rend->GetContentLeft() - margin;
         int x2 = rend->GetContentRight() + margin;
-        int y1 = std::min(rend->GetContentBottom(), enclosure.fontBottom) - margin / 2;
-        int y2 = std::max(rend->GetContentTop(), enclosure.fontTop) + margin;
+        int y1 = std::min(rend->GetContentBottom(), enclosure.m_fontBottom) - margin / 2;
+        int y2 = std::max(rend->GetContentTop(), enclosure.m_fontTop) + margin;
         const int width = std::abs(x2 - x1);
         const int height = std::abs(y2 - y1);
 

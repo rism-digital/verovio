@@ -84,10 +84,13 @@ private:
 // TextDrawingParams
 //----------------------------------------------------------------------------
 
+/**
+ * An enclosed text element with the bottom and top of its font, for drawing the enclosure
+ */
 struct TextEnclosure {
-    TextElement *element = nullptr;
-    int fontBottom = 0;
-    int fontTop = 0;
+    TextElement *m_element = NULL;
+    int m_fontBottom = 0;
+    int m_fontTop = 0;
 };
 
 /**

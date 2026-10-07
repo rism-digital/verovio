@@ -230,7 +230,7 @@ protected:
     void DrawDiv(DeviceContext *dc, Div *div, System *system);
     void DrawRunningElements(DeviceContext *dc, Page *page);
     void DrawTextLayoutElement(
-        DeviceContext *dc, TextLayoutElement *textLayoutElement, const ScoreDefInterface *textStyle = nullptr);
+        DeviceContext *dc, TextLayoutElement *textLayoutElement, const ScoreDefInterface *textStyle = NULL);
     ///@}
 
     /**

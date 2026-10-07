@@ -1143,15 +1143,7 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
         if (!dc->UseGlobalTextStyling() && !mnum->HasFontstyle() && (!textStyle || !textStyle->HasTextStyle())) {
             mnumTxt.SetStyle(FONTSTYLE_italic);
         }
-        if (mnum->HasFontname())
-            mnumTxt.SetFaceName(mnum->GetFontname());
-        else if (mnum->HasFontfam())
-            mnumTxt.SetFaceName(mnum->GetFontfam());
-        if (mnum->HasFontstyle()) mnumTxt.SetStyle(mnum->GetFontstyle());
-        if (mnum->HasFontweight()) mnumTxt.SetWeight(mnum->GetFontweight());
-        if (mnum->HasLetterspacing()) {
-            mnumTxt.SetLetterSpacing(mnum->GetLetterspacing() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
-        }
+        m_doc->ApplyTypography(mnumTxt, mnum, staff->m_drawingStaffSize);
 
         TextDrawingParams params;
 
