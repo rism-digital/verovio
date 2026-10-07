@@ -278,24 +278,26 @@ const Glyph *Resources::GetTextGlyph(char32_t code, const FontInfo &font) const
         metrics = m_fontStore.GetGlyphMetrics(FontStore::Kind::Text, TINOS, code, weight, style);
     }
     if (!metrics) return NULL;
-    return this->GetRuntimeGlyph(metrics->m_face, metrics->m_glyphId, StringFormat("%04X", code));
+    return this->GetRuntimeGlyph(metrics->m_face, metrics->m_glyphId);
 }
 
 const Glyph *Resources::GetRuntimeGlyph(FontStore::FaceIdentity face, int glyphId, const std::string &code) const
 {
-    std::unordered_map<int, Glyph> &glyphs = m_runtimeGlyphs[face.m_value];
-    if (const auto existing = glyphs.find(glyphId); existing != glyphs.end()) return &existing->second;
+    // The glyphs are cached with their code, since the same glyph can be used as SMuFL glyph and in shaped text
+    std::map<std::pair<int, std::string>, Glyph> &glyphs = m_runtimeGlyphs[face.m_value];
+    const std::pair<int, std::string> key(glyphId, code);
+    if (const auto existing = glyphs.find(key); existing != glyphs.end()) return &existing->second;
 
     const std::optional<FontStore::GlyphMetrics> metrics = m_fontStore.GetGlyphMetrics(face, glyphId);
     if (!metrics) return NULL;
     Glyph glyph(metrics->m_unitsPerEm);
-    // Glyphs with a code keep it, as for SMuFL glyphs; the SVG output disambiguates the codes used by several fonts
+    // SMuFL glyphs are identified by their code, glyphs of shaped text by their face and glyph ID
     glyph.SetCodeStr(code.empty() ? StringFormat("text-%llX-%d", (unsigned long long)face.m_value, glyphId) : code);
     glyph.SetHorizAdvX(metrics->m_advanceX);
     glyph.SetBoundingBox(
         metrics->m_xBearing, metrics->m_yBearing + metrics->m_height, metrics->m_width, -metrics->m_height);
     glyph.SetFace(face.m_value, glyphId);
-    return &glyphs.emplace(glyphId, std::move(glyph)).first->second;
+    return &glyphs.emplace(key, std::move(glyph)).first->second;
 }
 
 char32_t Resources::GetSmuflGlyphForUnicodeChar(const char32_t unicodeChar)

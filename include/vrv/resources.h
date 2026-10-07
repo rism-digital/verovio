@@ -138,7 +138,7 @@ private:
     mutable std::optional<std::pair<char32_t, const Glyph *>> m_cachedGlyph;
 
     /** Runtime glyph records contain metrics only; outlines remain lazy in FontStore. */
-    mutable std::unordered_map<uint64_t, std::unordered_map<int, Glyph>> m_runtimeGlyphs;
+    mutable std::unordered_map<uint64_t, std::map<std::pair<int, std::string>, Glyph>> m_runtimeGlyphs;
 
     /** The subsets of the bundled music fonts with the glyphs supported by Verovio, for embedding */
     std::map<std::string, std::vector<unsigned char>> m_musicFontSubsets;
