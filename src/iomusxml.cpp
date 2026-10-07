@@ -1902,12 +1902,15 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         measure->AddChild(mNum);
     }
 
+    pugi::xml_node attributes = node.child("attributes");
     for (int i = 0; i < nbStaves; ++i) {
         // the staff @n must take into account the staffOffset
         Staff *staff = new Staff();
         staff->SetN(i + 1 + staffOffset);
-        staff->SetVisible(
-            this->ConvertWordToBool(node.child("attributes").child("staff-details").attribute("print-object").value()));
+        std::string xpath = StringFormat("staff-details[@number='%d']", i + 1);
+        pugi::xpath_node staffDetails = attributes.select_node(xpath.c_str());
+        if (!staffDetails) staffDetails = attributes.select_node("staff-details[not(@number)]");
+        staff->SetVisible(this->ConvertWordToBool(staffDetails.node().attribute("print-object").value()));
         measure->AddChild(staff);
         // layers will be added in SelectLayer
     }
