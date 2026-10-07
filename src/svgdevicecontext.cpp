@@ -208,18 +208,28 @@ const std::string &SvgDeviceContext::InsertGlyphRef(const Glyph *glyph)
 
 void SvgDeviceContext::IncludeMusicTextFont(const std::string &fontname)
 {
-    if (m_smuflTextFont == SMUFLTEXTFONT_embedded) {
-        this->IncludeFontFaces(FontStore::Kind::Music, fontname);
-        return;
+    const Resources *resources = this->GetResources(true);
+    if (!resources) return;
+
+    if (m_smuflTextFont == SMUFLTEXTFONT_linked) {
+        // Only the bundled fonts are published on the website
+        if (resources->IsBundledMusicFont(fontname)) {
+            const std::string versionPath = (VERSION_DEV)
+                ? "develop"
+                : StringFormat("%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION);
+            pugi::xml_node css = m_svgNode.append_child("style");
+            css.append_attribute("type") = "text/css";
+            css.text().set(StringFormat("@font-face {font-family: '%s'; src: "
+                                        "url(\"https://www.verovio.org/javascript/%s/data/fonts/%s.woff2\") "
+                                        "format('woff2');}",
+                fontname.c_str(), versionPath.c_str(), fontname.c_str())
+                               .c_str());
+            return;
+        }
+        LogWarning("The music font '%s' cannot be linked and is embedded instead.", fontname.c_str());
     }
 
-    std::string versionPath
-        = (VERSION_DEV) ? "develop" : StringFormat("%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION);
-    pugi::xml_node css = m_svgNode.append_child("style");
-    css.append_attribute("type") = "text/css";
-    css.text().set(StringFormat(
-        "@import url(\"https://www.verovio.org/javascript/%s/data/%s.css\");", versionPath.c_str(), fontname.c_str())
-            .c_str());
+    this->IncludeFontFaces(FontStore::Kind::Music, fontname);
 }
 
 void SvgDeviceContext::IncludeFontFaces(FontStore::Kind kind, const std::string &family)

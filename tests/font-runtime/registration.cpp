@@ -761,6 +761,23 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
     ok &= Expect(embeddedSvg.find("font-family=\"Tinos\"") == std::string::npos,
         "the text font was repeated within the SVG");
 
+    vrv::Toolkit musicTextRendering(false);
+    const std::string musicTextMei = R"mei(<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1"><music><body><mdiv><score>
+<scoreDef><staffGrp><staffDef n="1" lines="5" clef.shape="G" clef.line="2"/></staffGrp></scoreDef>
+<section><measure n="1"><staff n="1"><layer n="1"><note xml:id="dynam-note" pname="c" oct="4" dur="1"/>
+</layer></staff><dynam startid="#dynam-note">mf cresc.</dynam></measure></section></score></mdiv></body></music></mei>)mei";
+    ok &= Expect(musicTextRendering.SetResourcePath(argv[9]) && musicTextRendering.LoadData(musicTextMei),
+        "music text MEI could not be loaded");
+    ok &= Expect(musicTextRendering.RenderToSVG(1).find(
+                     "@font-face {font-family: 'Leipzig'; src: url(data:font/woff2;base64,")
+            != std::string::npos,
+        "the music font used in text was not embedded");
+    ok &= Expect(musicTextRendering.SetOptions("{\"smuflTextFont\":\"linked\"}"), "smuflTextFont was rejected");
+    ok &= Expect(musicTextRendering.RenderToSVG(1).find("/data/fonts/Leipzig.woff2\") format('woff2')")
+            != std::string::npos,
+        "the music font used in text was not linked");
+
     const std::vector<unsigned char> testText = ReadFile(argv[11]);
     const std::vector<unsigned char> testMusic = ReadFile(argv[12]);
     const std::vector<unsigned char> testMusicMetadataBytes = ReadFile(argv[13]);

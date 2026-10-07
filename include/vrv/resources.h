@@ -67,6 +67,8 @@ public:
     std::string GetTextFont() const { return m_textFontName; }
     /** The widespread font family with the same metrics as the text font, if any (e.g., Times for Tinos) */
     std::string GetTextFontMetricEquivalent() const;
+    /** Check if a music font is bundled with Verovio, in which case it is also published on the website */
+    bool IsBundledMusicFont(const std::string &fontName) const;
     void SetTextFont(const std::string &fontName) { m_textFontName = fontName; }
 
     /**

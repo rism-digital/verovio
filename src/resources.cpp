@@ -368,6 +368,11 @@ bool Resources::FontHasGlyphAvailable(const std::string &fontName, char32_t smuf
     return m_fontStore.GetGlyphMetrics(FontStore::Kind::Music, fontName, smuflCode).has_value();
 }
 
+bool Resources::IsBundledMusicFont(const std::string &fontName) const
+{
+    return (fontName == LEIPZIG) || (fontName == BRAVURA);
+}
+
 std::string Resources::GetTextFontMetricEquivalent() const
 {
     return (m_textFontName == TINOS) ? "Times" : "";

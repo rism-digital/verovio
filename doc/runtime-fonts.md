@@ -23,7 +23,8 @@ this:
 
 Music symbols within text (for example, in dynamics) are written with the
 music font as text font. As before, `smuflTextFont` controls whether that font
-is embedded (the default), linked, or not included.
+is embedded (the default), linked, or not included. Only the bundled fonts can
+be linked, to their copy on the Verovio website; other fonts are embedded.
 
 ## Registering fonts
 
