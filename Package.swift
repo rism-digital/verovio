@@ -16,7 +16,7 @@ let package = Package(
     targets: [
         .target(
             name: "VerovioBrotli",
-            path: "vendor/brotli/c",
+            path: "external/brotli/c",
             sources: ["verovio-brotli.c"],
             publicHeadersPath: "swift-include",
             cSettings: [
@@ -34,8 +34,8 @@ let package = Package(
                 "libmei/dist",
                 "libmei/addons",
                 "tools/c_wrapper.cpp",
-                "vendor/harfbuzz/src/verovio-harfbuzz.cc",
-                "vendor/woff2/src/verovio-woff2.cc"
+                "external/harfbuzz/src/verovio-harfbuzz.cc",
+                "external/woff2/src/verovio-woff2.cc"
             ],
             publicHeadersPath: "bindings/swift-core",
             cxxSettings: [
@@ -50,10 +50,10 @@ let package = Package(
                 .headerSearchPath("include/zip"),
                 .headerSearchPath("libmei/dist"),
                 .headerSearchPath("libmei/addons"),
-                .headerSearchPath("vendor/harfbuzz/src"),
-                .headerSearchPath("vendor/woff2/include"),
-                .headerSearchPath("vendor/woff2/src"),
-                .headerSearchPath("vendor/brotli/c/include"),
+                .headerSearchPath("external/harfbuzz/src"),
+                .headerSearchPath("external/woff2/include"),
+                .headerSearchPath("external/woff2/src"),
+                .headerSearchPath("external/brotli/c/include"),
                 .define("BROTLI_STATIC"),
                 .define("HB_LEAN"),
                 .define("HB_MINI"),

@@ -60,10 +60,10 @@ include_directories(
     ../include/vrv
     ../libmei/dist
     ../libmei/addons
-    ../vendor/harfbuzz/src
-    ../vendor/woff2/include
-    ../vendor/woff2/src
-    ../vendor/brotli/c/include
+    ../external/harfbuzz/src
+    ../external/woff2/include
+    ../external/woff2/src
+    ../external/brotli/c/include
 )
 
 if(WIN32)
@@ -216,38 +216,38 @@ set(all_SRC
     ${midi_SRC}
     ../src/json/jsonxx.cc
     ../src/pugi/pugixml.cpp
-    ../vendor/harfbuzz/src/verovio-harfbuzz.cc
-    ../vendor/woff2/src/verovio-woff2.cc
-    ../vendor/brotli/c/verovio-brotli.c
+    ../external/harfbuzz/src/verovio-harfbuzz.cc
+    ../external/woff2/src/verovio-woff2.cc
+    ../external/brotli/c/verovio-brotli.c
 )
 
 add_compile_definitions(BROTLI_STATIC)
 
-set_source_files_properties(../vendor/harfbuzz/src/verovio-harfbuzz.cc PROPERTIES
+set_source_files_properties(../external/harfbuzz/src/verovio-harfbuzz.cc PROPERTIES
     COMPILE_DEFINITIONS "HB_LEAN;HB_MINI;HB_OPTIMIZE_SIZE_MORE;HB_CONFIG_OVERRIDE_H=\"verovio-hb-config.h\""
 )
 
 set_source_files_properties(
-    ../vendor/woff2/src/verovio-woff2.cc
-    ../vendor/brotli/c/verovio-brotli.c
+    ../external/woff2/src/verovio-woff2.cc
+    ../external/brotli/c/verovio-brotli.c
 )
 
 if(NOT MSVC)
-    set_source_files_properties(../vendor/harfbuzz/src/verovio-harfbuzz.cc PROPERTIES COMPILE_OPTIONS "-Oz")
+    set_source_files_properties(../external/harfbuzz/src/verovio-harfbuzz.cc PROPERTIES COMPILE_OPTIONS "-Oz")
     set_source_files_properties(
-        ../vendor/woff2/src/verovio-woff2.cc
-        ../vendor/brotli/c/verovio-brotli.c
+        ../external/woff2/src/verovio-woff2.cc
+        ../external/brotli/c/verovio-brotli.c
         PROPERTIES COMPILE_OPTIONS "-Os"
     )
 endif()
 
 if(EMSCRIPTEN)
     # HarfBuzz promotes its own warnings from inside hb.hh, overriding command
-    # line controls on newer Clang. Keep the exception vendor-local.
-    set_property(SOURCE ../vendor/harfbuzz/src/verovio-harfbuzz.cc
+    # line controls on newer Clang. Keep the exception local to HarfBuzz.
+    set_property(SOURCE ../external/harfbuzz/src/verovio-harfbuzz.cc
         APPEND PROPERTY COMPILE_DEFINITIONS
         "HB_NO_PRAGMA_GCC_DIAGNOSTIC_ERROR;HB_NO_PRAGMA_GCC_DIAGNOSTIC_WARNING")
-    set_property(SOURCE ../vendor/harfbuzz/src/verovio-harfbuzz.cc
+    set_property(SOURCE ../external/harfbuzz/src/verovio-harfbuzz.cc
         APPEND PROPERTY COMPILE_OPTIONS "-Wno-unused-template;-Wno-format-pedantic")
 endif()
 

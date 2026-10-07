@@ -23,11 +23,11 @@ FILES="$SRCFILES \
  ../../src/hum/humlib.cpp \
  ../../src/json/jsonxx.cc \
  ../../src/crc/crc.cpp \
- ../../vendor/harfbuzz/src/verovio-harfbuzz.cc \
- ../../vendor/woff2/src/verovio-woff2.cc \
+ ../../external/harfbuzz/src/verovio-harfbuzz.cc \
+ ../../external/woff2/src/verovio-woff2.cc \
  target/verovio-brotli.o"
 
-CXXOPTS="-g -fpic -std=c++20 -DBROTLI_STATIC -DHB_LEAN -DHB_MINI -DHB_OPTIMIZE_SIZE_MORE -DHB_CONFIG_OVERRIDE_H=\"verovio-hb-config.h\" -I../../include -I../../include/vrv -I../../include/json -I../../include/hum -I../../include/crc -I../../include/midi -I../../include/pugi -I../../include/tuning-library -I../../include/zip -I../../libmei/addons -I../../libmei/dist -I../../vendor/harfbuzz/src -I../../vendor/woff2/include -I../../vendor/brotli/c/include -I/opt/local/include/ "
+CXXOPTS="-g -fpic -std=c++20 -DBROTLI_STATIC -DHB_LEAN -DHB_MINI -DHB_OPTIMIZE_SIZE_MORE -DHB_CONFIG_OVERRIDE_H=\"verovio-hb-config.h\" -I../../include -I../../include/vrv -I../../include/json -I../../include/hum -I../../include/crc -I../../include/midi -I../../include/pugi -I../../include/tuning-library -I../../include/zip -I../../libmei/addons -I../../libmei/dist -I../../external/harfbuzz/src -I../../external/woff2/include -I../../external/brotli/c/include -I/opt/local/include/ "
 
 PATHS=""
 unamestr=$(uname)
@@ -39,6 +39,6 @@ elif [[ "$unamestr" == 'Darwin' ]]; then
     PATHS="-I$JAVA_HOME/include -I$JAVA_HOME/include/darwin"
 fi
 
-cc -c -fpic -O2 -DBROTLI_STATIC -I../../vendor/brotli/c/include ../../vendor/brotli/c/verovio-brotli.c -o target/verovio-brotli.o
+cc -c -fpic -O2 -DBROTLI_STATIC -I../../external/brotli/c/include ../../external/brotli/c/verovio-brotli.c -o target/verovio-brotli.o
 g++ -shared -o target/libverovio.jnilib $CXXOPTS $PATHS $FILES verovio_wrap.cxx
 cp target/libverovio.jnilib target/classes/META-INF/lib
