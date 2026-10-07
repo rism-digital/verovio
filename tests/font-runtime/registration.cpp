@@ -95,22 +95,29 @@ size_t CountOccurrences(const std::string &value, const std::string &needle)
     return count;
 }
 
+// Remove the per-rendering postfix from the glyph ids and references
 std::string NormalizeFontReference(std::string value)
 {
-    size_t offset = 0;
-    while (true) {
-        const size_t music = value.find("music-", offset);
-        const size_t text = value.find("text-", offset);
-        offset = std::min(music, text);
-        if (offset == std::string::npos) break;
-        const size_t end = value.find('"', offset);
-        if (end == std::string::npos) break;
-        const size_t suffix = value.rfind('-', end);
-        if ((suffix == std::string::npos) || (suffix < offset)) break;
-        value.erase(suffix, end - suffix);
-        offset = suffix;
+    for (const std::string attribute : { "id=\"", "href=\"#" }) {
+        size_t offset = 0;
+        while ((offset = value.find(attribute, offset)) != std::string::npos) {
+            offset += attribute.size();
+            const size_t end = value.find('"', offset);
+            if (end == std::string::npos) break;
+            const size_t suffix = value.rfind('-', end);
+            if ((suffix != std::string::npos) && (suffix > offset)) value.erase(suffix, end - suffix);
+        }
     }
     return value;
+}
+
+// Check if the SVG contains the outline of the glyph, which identifies the font it comes from
+bool HasGlyphOutline(
+    const std::string &svg, const vrv::FontStore &store, const std::optional<vrv::FontStore::GlyphMetrics> &glyph)
+{
+    if (!glyph) return false;
+    const std::optional<std::string> outline = store.GetGlyphOutline(glyph->face, glyph->glyphId);
+    return outline && (svg.find("d=\"" + *outline + "\"") != std::string::npos);
 }
 
 std::string ExtractSvgGeometry(const std::string &svg)
@@ -743,10 +750,10 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
             == "Leipzig",
         "bundled Leipzig was not registered");
     const auto leipzigClef = leipzigStore.GetGlyphMetrics(vrv::FontStore::Kind::Music, "Leipzig", U'\uE050');
-    std::ostringstream leipzigClefPrefix;
-    if (leipzigClef) leipzigClefPrefix << "music-" << std::uppercase << std::hex << leipzigClef->face.value << "-E050-";
-    ok &= Expect(leipzigClef && (textSvg.find(leipzigClefPrefix.str()) != std::string::npos),
+    ok &= Expect(HasGlyphOutline(textSvg, leipzigStore, leipzigClef),
         "default SVG did not use Leipzig as music font");
+    ok &= Expect(textSvg.find("href=\"#E050-") != std::string::npos,
+        "music glyph ids did not keep the SMuFL code as prefix");
     ok &= Expect(textSvg.find("@font-face {font-family: 'Tinos'") == std::string::npos,
         "text font was embedded without svgEmbedTextFont");
     ok &= Expect(textRendering.SetOptions("{\"svgEmbedTextFont\":true}"), "text font embedding option was rejected");
@@ -857,12 +864,12 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
     customRendering.ResetXmlIdSeed(0);
     ok &= Expect(customRendering.LoadData(customMei), "mixed per-element custom-font MEI could not be loaded");
     const std::string customSvg = customRendering.RenderToSVG(1);
-    std::ostringstream musicPrefix;
-    if (customClef) musicPrefix << "music-" << std::uppercase << std::hex << customClef->face.value << "-";
     std::ostringstream textPrefix;
     if (ligature) textPrefix << "text-" << std::uppercase << std::hex << ligature->glyphs[0].face.value << "-";
-    ok &= Expect(customClef && (customSvg.find(musicPrefix.str()) != std::string::npos),
-        "clef or meterSig did not use its per-element music font");
+    const auto customTimeSig
+        = testMusicStore.GetGlyphMetrics(vrv::FontStore::Kind::Music, "Verovio Test Music", U'\uE083');
+    ok &= Expect(HasGlyphOutline(customSvg, testMusicStore, customTimeSig),
+        "meterSig did not use its per-element music font");
     ok &= Expect(ligature && (customSvg.find(textPrefix.str()) != std::string::npos),
         "nested dir/rend did not use its per-element text font");
     ok &= Expect((customSvg.find("<text") == std::string::npos) && (customSvg.find("<tspan") == std::string::npos),
@@ -900,7 +907,7 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
         optionAliasRendering.SetResourcePath(argv[9]), "aliased text/music options or SMuFL metadata discovery failed");
     ok &= Expect(optionAliasRendering.LoadData(customMei), "aliased option rendering MEI could not be loaded");
     const std::string optionAliasSvg = optionAliasRendering.RenderToSVG(1);
-    ok &= Expect(optionAliasSvg.find(musicPrefix.str()) != std::string::npos
+    ok &= Expect(HasGlyphOutline(optionAliasSvg, testMusicStore, customTimeSig)
             && optionAliasSvg.find(textPrefix.str()) != std::string::npos,
         "repeatable aliased font options did not affect rendering");
 

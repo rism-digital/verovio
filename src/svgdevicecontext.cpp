@@ -193,15 +193,13 @@ const std::string &SvgDeviceContext::InsertGlyphRef(const Glyph *glyph)
     }
 
     int count = 0;
-    if (!glyph->IsRuntimeGlyph()) {
-        auto it = m_glyphCodeFontCounter.find(code);
-        if (it != m_glyphCodeFontCounter.end()) count = it->second;
-    }
+    auto it = m_glyphCodeFontCounter.find(code);
+    if (it != m_glyphCodeFontCounter.end()) count = it->second;
 
     GlyphRef ref(glyph, count, m_glyphPostfixId);
     m_smuflGlyphs.emplace_back(glyph, ref); // preserve insertion order
     m_glyphRefs.emplace(glyph, m_smuflGlyphs.size() - 1);
-    if (!glyph->IsRuntimeGlyph()) m_glyphCodeFontCounter[code] = count + 1;
+    m_glyphCodeFontCounter[code] = count + 1;
 
     return m_smuflGlyphs.back().second.GetRefId();
 }

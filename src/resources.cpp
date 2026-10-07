@@ -509,10 +509,8 @@ const Glyph *Resources::GetRuntimeGlyph(FontStore::FaceIdentity face, uint32_t g
     const std::optional<FontStore::GlyphMetrics> metrics = m_fontStore.GetGlyphMetrics(face, glyphId);
     if (!metrics) return nullptr;
     Glyph glyph(metrics->unitsPerEm);
-    if (code.empty())
-        glyph.SetCodeStr(RuntimeTextGlyphCode(face.value, glyphId));
-    else
-        glyph.SetCodeStr(code.starts_with("text-") ? code : StringFormat("music-%llX-%s", face.value, code.c_str()));
+    // Glyphs with a code keep it, as for SMuFL glyphs; the SVG output disambiguates the codes used by several fonts
+    glyph.SetCodeStr(code.empty() ? RuntimeTextGlyphCode(face.value, glyphId) : code);
     glyph.SetHorizAdvX(metrics->advanceX);
     glyph.SetBoundingBox(metrics->xBearing, metrics->yBearing + metrics->height, metrics->width, -metrics->height);
     glyph.SetRuntimeGlyph(face.value, glyphId);
