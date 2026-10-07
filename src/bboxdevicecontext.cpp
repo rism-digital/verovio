@@ -355,9 +355,6 @@ void BBoxDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, 
 {
     assert(m_fontStack.top());
 
-    const Resources *resources = this->GetResources();
-    assert(resources);
-
     int g_x, g_y, g_w, g_h;
     int lastCharWidth = 0;
 

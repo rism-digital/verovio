@@ -279,11 +279,10 @@ void DeviceContext::AddShapedRunToTextExtend(const FontStore::ShapedRun &run, Te
         const std::optional<FontStore::GlyphMetrics> metrics
             = resources->GetFontStore().GetGlyphMetrics(placement.m_face, placement.m_glyphId);
         if (!metrics) continue;
-        const int top = metrics->m_yBearing + placement.m_offsetY;
-        const int bottom = top + metrics->m_height;
-        extend->m_ascent = std::max(extend->m_ascent, (int)std::ceil((double)top * pointSize / placement.m_unitsPerEm));
-        extend->m_descent
-            = std::max(extend->m_descent, (int)std::ceil((double)-bottom * pointSize / placement.m_unitsPerEm));
+        const double top = metrics->m_yBearing + placement.m_offsetY;
+        const double bottom = top + metrics->m_height;
+        extend->m_ascent = std::max(extend->m_ascent, (int)std::ceil(top * pointSize / placement.m_unitsPerEm));
+        extend->m_descent = std::max(extend->m_descent, (int)std::ceil(-bottom * pointSize / placement.m_unitsPerEm));
     }
 }
 
@@ -291,9 +290,6 @@ void DeviceContext::GetSmuflTextExtent(const std::u32string &string, TextExtend 
 {
     assert(m_fontStack.top());
     assert(extend);
-
-    const Resources *resources = this->GetResources();
-    assert(resources);
 
     extend->m_width = 0;
     extend->m_height = 0;
