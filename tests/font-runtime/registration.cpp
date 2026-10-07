@@ -734,6 +734,19 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
         "default SVG did not output text as SVG text");
     ok &= Expect(textSvg.find("font-family=\"Times, Tinos, serif\"") != std::string::npos,
         "default SVG did not declare the text font family");
+    const std::string resourcePath = argv[9];
+    const std::vector<unsigned char> leipzig = ReadFile(resourcePath + "/fonts/Leipzig.woff2");
+    const std::vector<unsigned char> leipzigMetadata = ReadFile(resourcePath + "/fonts/Leipzig_metadata.json");
+    vrv::FontStore leipzigStore;
+    ok &= Expect(leipzigStore.RegisterMusicFont(leipzig.data(), leipzig.size(),
+                     std::string(leipzigMetadata.begin(), leipzigMetadata.end()))
+            == "Leipzig",
+        "bundled Leipzig was not registered");
+    const auto leipzigClef = leipzigStore.GetGlyphMetrics(vrv::FontStore::Kind::Music, "Leipzig", U'\uE050');
+    std::ostringstream leipzigClefPrefix;
+    if (leipzigClef) leipzigClefPrefix << "music-" << std::uppercase << std::hex << leipzigClef->face.value << "-E050-";
+    ok &= Expect(leipzigClef && (textSvg.find(leipzigClefPrefix.str()) != std::string::npos),
+        "default SVG did not use Leipzig as music font");
     ok &= Expect(textSvg.find("@font-face {font-family: 'Tinos'") == std::string::npos,
         "text font was embedded without svgEmbedTextFont");
     ok &= Expect(textRendering.SetOptions("{\"svgEmbedTextFont\":true}"), "text font embedding option was rejected");

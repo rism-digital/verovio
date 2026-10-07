@@ -1315,7 +1315,7 @@ Options::Options()
     this->Register(&m_fingeringScale, "fingeringScale", &m_generalLayout);
 
     m_font.SetInfo("Font", "Set the music font");
-    m_font.Init("Bravura");
+    m_font.Init("Leipzig");
     this->Register(&m_font, "font", &m_generalLayout);
 
     m_fontAddCustom.SetInfo("Add custom font (deprecated)",

@@ -1,8 +1,22 @@
 # Bundled runtime fonts
 
+## Leipzig
+
+Leipzig 5.2.102 is the bundled default SMuFL music font. Its source is
+maintained in `fonts/Leipzig`; the bundled files are copied from there.
+
+| File | SHA-256 |
+| --- | --- |
+| Bundled `Leipzig.woff2` (copy of `fonts/Leipzig/Leipzig.woff2`) | `c7db72b33a382d5589612c1f3176ccdf5a0c38231fa839806ff1367a6cc69fe6` |
+| Source `fonts/Leipzig/leipzig_metadata.json` | `5e5c534bf3195748473eeffe6c809145305788c7b804eb679b95365d9d908040` |
+| Bundled `Leipzig_metadata.json` | `ad6f0732e5a803a6bba89a5c4f64cb03f7e5e494949ef062bfa934e8defa79d8` |
+
+Leipzig is licensed under the SIL Open Font License.
+
 ## Bravura
 
-Bravura 1.392 is the bundled default and fallback SMuFL music font. These
+Bravura 1.392 is the bundled fallback SMuFL music font. Missing glyphs of any
+music font fall back to it. These
 files were imported into Verovio by commit
 `5d15bf42a06478f3ae6d9115d7ff6c1ffd3b12a5`.
 
@@ -40,7 +54,7 @@ OTF/TTF sources. Registration decodes them once to canonical SFNT bytes. This
 keeps the installed CLI and WASM resources within the size gate without
 subsetting the glyph repertoire or changing outlines, metrics, or shaping.
 
-The bundled Bravura metadata is generated with
+The bundled Leipzig and Bravura metadata is generated with
 `fonts/compact-smufl-metadata.py`. It retains the font identity, version,
 engraving defaults, and all glyph anchors used at runtime while omitting large
 advance, bounding-box, alternate, ligature, optional-glyph, and set sections

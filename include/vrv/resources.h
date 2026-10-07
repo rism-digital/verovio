@@ -73,7 +73,7 @@ public:
      * Font initialization
      */
     ///@{
-    /** Register the bundled Bravura and Tinos faces. */
+    /** Register the bundled Leipzig, Bravura, and Tinos faces. */
     bool InitFonts();
     /**  Set the font to be used and loads it if necessary */
     bool SetFont(const std::string &fontName);

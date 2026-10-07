@@ -1,8 +1,8 @@
 # Runtime fonts
 
-Verovio now reads static OpenType fonts while a Toolkit is running. Bravura is
-the bundled music default and fallback; the regular, italic, bold, and bold
-italic Tinos faces form the bundled text default. The layout of text always
+Verovio now reads static OpenType fonts while a Toolkit is running. Leipzig is
+the bundled music default and Bravura the bundled music fallback; the regular,
+italic, bold, and bold italic Tinos faces form the bundled text default. The layout of text always
 uses the metrics of the registered fonts.
 
 ## SVG text output
@@ -122,5 +122,5 @@ both files.
 release. `fontTextLiberation` is also deprecated and emits a warning. Applications should register any non-bundled family explicitly and
 select it with `font`, `fontText`, or MEI `fontname`.
 
-Leipzig, Gootville, Leland, Petaluma, Liberation, and Times metric resources
-are no longer bundled. They remain usable when supplied as runtime fonts.
+Gootville, Leland, Petaluma, Liberation, and Times metric resources are no
+longer bundled. They remain usable when supplied as runtime fonts.

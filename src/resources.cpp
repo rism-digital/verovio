@@ -66,7 +66,8 @@ Resources::Resources()
 
 bool Resources::Ok() const
 {
-    return m_fontStore.HasFace(FontStore::Kind::Music, BRAVURA) && m_fontStore.HasFace(FontStore::Kind::Text, TINOS);
+    return m_fontStore.HasFace(FontStore::Kind::Music, LEIPZIG) && m_fontStore.HasFace(FontStore::Kind::Music, BRAVURA)
+        && m_fontStore.HasFace(FontStore::Kind::Text, TINOS);
 }
 
 namespace {
@@ -156,12 +157,16 @@ bool Resources::InitFonts()
     m_glyphCodeNameTable.clear();
 
     const std::string fontPath = m_path + "/fonts/";
-    const std::vector<unsigned char> bravura = ReadFontFile(fontPath + "Bravura.woff2");
-    const std::string metadata = ReadTextFile(fontPath + "Bravura_metadata.json");
-    if (bravura.empty() || metadata.empty()
-        || (m_fontStore.RegisterMusicFont(bravura.data(), bravura.size(), metadata) != BRAVURA)) {
-        LogError("Bravura runtime font could not be loaded.");
-        return false;
+    // Leipzig is the default music font and Bravura the final fallback, with the most complete SMuFL coverage
+    for (const char *family : { LEIPZIG, BRAVURA }) {
+        const std::string name = family;
+        const std::vector<unsigned char> font = ReadFontFile(fontPath + name + ".woff2");
+        const std::string metadata = ReadTextFile(fontPath + name + "_metadata.json");
+        if (font.empty() || metadata.empty()
+            || (m_fontStore.RegisterMusicFont(font.data(), font.size(), metadata) != name)) {
+            LogError("%s runtime font could not be loaded.", family);
+            return false;
+        }
     }
 
     static const std::array<const char *, 4> tinosFiles
@@ -175,7 +180,7 @@ bool Resources::InitFonts()
     }
     m_fontStore.PinBundledData();
 
-    m_defaultFontName = BRAVURA;
+    m_defaultFontName = LEIPZIG;
     m_currentFontName = m_defaultFontName;
     m_fallbackFontName = BRAVURA;
     m_textFontName = TINOS;
@@ -197,7 +202,7 @@ bool Resources::SetFont(const std::string &fontName)
         }
     }
 
-    m_defaultFontName = IsFontLoaded(fontName) ? fontName : BRAVURA;
+    m_defaultFontName = IsFontLoaded(fontName) ? fontName : LEIPZIG;
     m_currentFontName = m_defaultFontName;
 
     return true;
