@@ -246,9 +246,10 @@ void DeviceContext::GetTextExtent(const std::u32string &string, TextExtend *exte
     const FontInfo *font = m_fontStack.top();
     const std::optional<FontStore::ShapedRun> run = resources->ShapeText(*font, string);
     if (run) {
-        for (const FontStore::GlyphPlacement &placement : run->glyphs) {
-            const auto metrics = resources->GetFontStore().GetGlyphMetrics(placement.face, placement.glyphId);
-            if (metrics) {
+        const auto addInk = [resources, font, extend](const FontStore::ShapedRun &shapedRun) {
+            for (const FontStore::GlyphPlacement &placement : shapedRun.glyphs) {
+                const auto metrics = resources->GetFontStore().GetGlyphMetrics(placement.face, placement.glyphId);
+                if (!metrics) continue;
                 const int top = metrics->yBearing + placement.offsetY;
                 const int bottom = top + metrics->height;
                 extend->m_ascent = std::max(extend->m_ascent,
@@ -258,7 +259,13 @@ void DeviceContext::GetTextExtent(const std::u32string &string, TextExtend *exte
                     static_cast<int>(
                         std::ceil(static_cast<double>(-bottom) * font->GetPointSize() / placement.unitsPerEm)));
             }
+        };
+        // As with the built-in glyph tables, the type size covers 'p' and 'M' regardless of the actual text
+        if (typeSize) {
+            const std::optional<FontStore::ShapedRun> typeSizeRun = resources->ShapeText(*font, U"pM");
+            if (typeSizeRun) addInk(*typeSizeRun);
         }
+        addInk(*run);
         extend->m_width = resources->GetTextAdvance(*font, *run);
         extend->m_height = extend->m_ascent + extend->m_descent;
         return;
