@@ -98,10 +98,9 @@ bool Syl::IsSupportedChild(ClassId classId)
 int Syl::CalcHyphenLength(Doc *doc, int staffSize)
 {
     const FontInfo lyricFont = this->GetDrawingFont(doc, staffSize);
-    const Resources &resources = doc->GetResources();
-    const std::optional<FontStore::ShapedRun> hyphen = resources.ShapeText(lyricFont, U"-");
-    int dashLength = hyphen ? resources.GetTextAdvance(lyricFont, *hyphen) : 0;
-    if (!dashLength) dashLength = doc->GetTextGlyphWidth(L'-', &lyricFont, false);
+    int dashLength = doc->GetTextGlyphWidth(L'-', &lyricFont, false);
+
+    Syl::AdjustToLyricSize(doc, dashLength);
 
     return dashLength;
 }

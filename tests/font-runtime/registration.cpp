@@ -633,7 +633,7 @@ oct="4" dur="1"><verse n="1" fontname="Verovio Test Ligature"><syl>ffi</syl></ve
 
     vrv::Toolkit lyricHyphenRendering(false);
     RenderTextAsPaths(lyricHyphenRendering);
-    ok &= Expect(lyricHyphenRendering.SetOptions("{\"breaks\":\"encoded\",\"lyricSize\":8.0}")
+    ok &= Expect(lyricHyphenRendering.SetOptions("{\"breaks\":\"encoded\"}")
             && lyricHyphenRendering.SetResourcePath(argv[9])
             && (lyricHyphenRendering.RegisterTextFontFile(argv[16], "VH") == "Verovio Test Hyphen")
             && (lyricHyphenRendering.RegisterTextFontFile(argv[11], "NoHyphen") == "Verovio Test Ligature"),
@@ -668,6 +668,7 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
             && (customHyphenPrefix != fallbackHyphenPrefix)
             && (CountOccurrences(lyricHyphenSvg, customHyphenPrefix) >= 3)
             && (CountOccurrences(lyricHyphenSvg, fallbackHyphenPrefix) >= 3),
+
         "same-system or system-spanning lyric connectors did not use the selected font and fallback hyphen glyphs");
     ok &= Expect((lyricHyphenSvg.find("class=\"syl id-hyphen-start spanning\"") != std::string::npos)
             && (lyricHyphenSvg.find("class=\"syl id-fallback-start spanning\"") != std::string::npos)
@@ -676,7 +677,7 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
 
     vrv::Toolkit scoreLyricConnectorRendering(false);
     RenderTextAsPaths(scoreLyricConnectorRendering);
-    ok &= Expect(scoreLyricConnectorRendering.SetOptions("{\"breaks\":\"encoded\",\"lyricSize\":8.0}")
+    ok &= Expect(scoreLyricConnectorRendering.SetOptions("{\"breaks\":\"encoded\"}")
             && scoreLyricConnectorRendering.SetResourcePath(argv[9])
             && (scoreLyricConnectorRendering.RegisterTextFontFile(argv[16]) == "Verovio Test Hyphen"),
         "score lyric connector rendering setup failed");
@@ -811,8 +812,8 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
             != std::string::npos,
         "the music font used in text was not embedded");
     ok &= Expect(musicTextRendering.SetOptions("{\"smuflTextFont\":\"linked\"}"), "smuflTextFont was rejected");
-    ok &= Expect(
-        musicTextRendering.RenderToSVG(1).find("/data/fonts/Leipzig_subset.woff2\") format('woff2')") != std::string::npos,
+    ok &= Expect(musicTextRendering.RenderToSVG(1).find("/data/fonts/Leipzig_subset.woff2\") format('woff2')")
+            != std::string::npos,
         "the music font used in text was not linked");
 
     vrv::Toolkit musicGlyphRendering(false);
