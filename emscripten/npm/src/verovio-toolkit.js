@@ -315,42 +315,69 @@ export class VerovioToolkit {
         return res;
     }
 
+    /**
+     * Register a static OTF, TTF, WOFF, or WOFF2 text font.
+     * @param {Uint8Array | ArrayBuffer} data The font data
+     * @param {string} [alias] An additional family name for the font (exact and case-sensitive)
+     * @returns {string} The canonical family name, or an empty string on failure
+     */
     registerTextFont(data, alias = "") {
-        return this.#withFontBytes(data, (dataPtr, dataSize) =>
-            this.proxy.registerTextFontWithAlias(this.ptr, dataPtr, dataSize, alias));
+        return this.withFontData(data, (dataPtr, dataSize) =>
+            this.proxy.registerTextFont(this.ptr, dataPtr, dataSize, alias));
     }
 
+    /**
+     * Register a static OTF, TTF, WOFF, or WOFF2 SMuFL music font.
+     * @param {Uint8Array | ArrayBuffer} data The font data
+     * @param {string | Object} smuflMetadata The SMuFL font metadata
+     * @param {string} [alias] An additional family name for the font (exact and case-sensitive)
+     * @returns {string} The canonical family name, or an empty string on failure
+     */
     registerMusicFont(data, smuflMetadata, alias = "") {
         const metadata = typeof smuflMetadata === "string" ? smuflMetadata : JSON.stringify(smuflMetadata);
-        return this.#withFontBytes(data, (dataPtr, dataSize) =>
-            this.proxy.registerMusicFontWithAlias(this.ptr, dataPtr, dataSize, metadata, alias));
+        return this.withFontData(data, (dataPtr, dataSize) =>
+            this.proxy.registerMusicFont(this.ptr, dataPtr, dataSize, metadata, alias));
     }
 
+    /**
+     * Register a static text font passed as base64 string.
+     * @param {string} data The base64-encoded font data
+     * @param {string} [alias] An additional family name for the font (exact and case-sensitive)
+     * @returns {string} The canonical family name, or an empty string on failure
+     */
     registerTextFontBase64(data, alias = "") {
-        return this.proxy.registerTextFontBase64WithAlias(this.ptr, data, alias);
+        return this.proxy.registerTextFontBase64(this.ptr, data, alias);
     }
 
+    /**
+     * Register a static SMuFL music font passed as base64 string.
+     * @param {string} data The base64-encoded font data
+     * @param {string | Object} smuflMetadata The SMuFL font metadata
+     * @param {string} [alias] An additional family name for the font (exact and case-sensitive)
+     * @returns {string} The canonical family name, or an empty string on failure
+     */
     registerMusicFontBase64(data, smuflMetadata, alias = "") {
         const metadata = typeof smuflMetadata === "string" ? smuflMetadata : JSON.stringify(smuflMetadata);
-        return this.proxy.registerMusicFontBase64WithAlias(this.ptr, data, metadata, alias);
+        return this.proxy.registerMusicFontBase64(this.ptr, data, metadata, alias);
     }
 
-    #withFontBytes(data, callback) {
-        const dataArray = data instanceof Uint8Array
-            ? data
-            : (data instanceof ArrayBuffer ? new Uint8Array(data) : null);
-        if (!dataArray) {
-            throw new TypeError("Font data must be a Uint8Array or ArrayBuffer");
+    /**
+     * @private
+     * @param {Uint8Array | ArrayBuffer} data The font data
+     * @param {function(number, number): string} callback The registration with the data pointer and size
+     * @returns {string}
+     */
+    withFontData(data, callback) {
+        const dataArray = (data instanceof ArrayBuffer) ? new Uint8Array(data) : data;
+        if (!(dataArray instanceof Uint8Array)) {
+            console.error("Font data has to be of type Uint8Array or ArrayBuffer");
+            return "";
         }
-        if (dataArray.byteLength === 0) return "";
-        const dataPtr = this.VerovioModule._malloc(dataArray.byteLength);
-        try {
-            this.VerovioModule.HEAPU8.set(dataArray, dataPtr);
-            return callback(dataPtr, dataArray.byteLength);
-        }
-        finally {
-            this.VerovioModule._free(dataPtr);
-        }
+        const dataPtr = this.VerovioModule._malloc(dataArray.length);
+        this.VerovioModule.HEAPU8.set(dataArray, dataPtr);
+        const res = callback(dataPtr, dataArray.length);
+        this.VerovioModule._free(dataPtr);
+        return res;
     }
 
     /**
@@ -466,7 +493,6 @@ export class VerovioToolkit {
      * @returns {boolean} True if the options were successfully set
      */
     setOptions(options) {
-        options = this.preprocessOptions(options);
         return this.proxy.setOptions(this.ptr, JSON.stringify(options));
     }
 
@@ -482,40 +508,6 @@ export class VerovioToolkit {
             data = /** @type {string} */ (JSON.stringify(data));
         }
         return JSON.parse(this.proxy.validatePAE(this.ptr, data));
-    }
-
-    /**
-     * @private
-     * @param {VerovioOptions} options
-     * @returns {VerovioOptions}
-     */
-    preprocessOptions(options) {
-        // Nothing to do if we do not have 'fontAddCustom' set
-        if (!options.hasOwnProperty('fontAddCustom')) {
-            return options;
-        }
-        const files = /** @type {string[]} */ (options['fontAddCustom']);
-        let filesInBase64 = [];
-        // Get all the files and convert them to a base64 string if necessary
-        for ( const file of files ) {
-            // The file is already passed as base64 string - nothing to do
-            if (!/^https?:\/\//.test( file )) {
-                filesInBase64.push( file );
-                continue;
-            }
-            const request = new XMLHttpRequest();
-            request.open("GET", file, false); // `false` makes the request synchronous
-            request.send(null);
-
-            if (request.status === 200) {
-                filesInBase64.push(request.responseText);
-            }
-            else {
-                console.error(`${file} could not be retrieved`);
-            }
-        }
-        options["fontAddCustom"] = filesInBase64;
-        return options;
     }
 }
 

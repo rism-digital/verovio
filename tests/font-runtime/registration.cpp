@@ -116,7 +116,7 @@ bool HasGlyphOutline(
     const std::string &svg, const vrv::FontStore &store, const std::optional<vrv::FontStore::GlyphMetrics> &glyph)
 {
     if (!glyph) return false;
-    const std::optional<std::string> outline = store.GetGlyphOutline(glyph->face, glyph->glyphId);
+    const std::optional<std::string> outline = store.GetGlyphOutline(glyph->m_face, glyph->m_glyphId);
     return outline && (svg.find("d=\"" + *outline + "\"") != std::string::npos);
 }
 
@@ -163,16 +163,17 @@ int main(int argc, char **argv)
         = localizedStyleStore.ShapeText("Verovio Test Ligature", U"ffi", vrv::FontStore::Weight::Normal);
     const auto localizedSyntheticItalicRun = localizedStyleStore.ShapeText(
         "Verovio Test Ligature", U"ffi", vrv::FontStore::Weight::Normal, vrv::FontStore::Style::Italic);
-    ok &= Expect(localizedRegularRun && localizedSyntheticItalicRun && !localizedRegularRun->glyphs.empty()
-            && !localizedSyntheticItalicRun->glyphs.empty()
-            && (localizedRegularRun->glyphs.front().face != localizedSyntheticItalicRun->glyphs.front().face),
+    ok &= Expect(localizedRegularRun && localizedSyntheticItalicRun && !localizedRegularRun->m_glyphs.empty()
+            && !localizedSyntheticItalicRun->m_glyphs.empty()
+            && (localizedRegularRun->m_glyphs.front().m_face != localizedSyntheticItalicRun->m_glyphs.front().m_face),
         "missing italic face did not synthesize a distinct style within the requested family");
-    if (localizedRegularRun && localizedSyntheticItalicRun && !localizedRegularRun->glyphs.empty()
-        && !localizedSyntheticItalicRun->glyphs.empty()) {
+    if (localizedRegularRun && localizedSyntheticItalicRun && !localizedRegularRun->m_glyphs.empty()
+        && !localizedSyntheticItalicRun->m_glyphs.empty()) {
         const auto regularOutline = localizedStyleStore.GetGlyphOutline(
-            localizedRegularRun->glyphs.front().face, localizedRegularRun->glyphs.front().glyphId);
-        const auto syntheticItalicOutline = localizedStyleStore.GetGlyphOutline(
-            localizedSyntheticItalicRun->glyphs.front().face, localizedSyntheticItalicRun->glyphs.front().glyphId);
+            localizedRegularRun->m_glyphs.front().m_face, localizedRegularRun->m_glyphs.front().m_glyphId);
+        const auto syntheticItalicOutline
+            = localizedStyleStore.GetGlyphOutline(localizedSyntheticItalicRun->m_glyphs.front().m_face,
+                localizedSyntheticItalicRun->m_glyphs.front().m_glyphId);
         ok &= Expect(regularOutline && syntheticItalicOutline && (*regularOutline != *syntheticItalicOutline),
             "synthetic italic face did not slant the emitted glyph outline");
     }
@@ -181,9 +182,9 @@ int main(int argc, char **argv)
         "localized bold subfamily was not classified from OpenType style metadata");
     const auto localizedBoldRun
         = localizedStyleStore.ShapeText("Verovio Test Ligature", U"ffi", vrv::FontStore::Weight::Bold);
-    ok &= Expect(localizedRegularRun && localizedBoldRun && !localizedRegularRun->glyphs.empty()
-            && !localizedBoldRun->glyphs.empty()
-            && (localizedRegularRun->glyphs.front().face != localizedBoldRun->glyphs.front().face),
+    ok &= Expect(localizedRegularRun && localizedBoldRun && !localizedRegularRun->m_glyphs.empty()
+            && !localizedBoldRun->m_glyphs.empty()
+            && (localizedRegularRun->m_glyphs.front().m_face != localizedBoldRun->m_glyphs.front().m_face),
         "localized regular and bold faces did not resolve to distinct font identities");
     vrv::Toolkit localizedStyleRendering(false);
     RenderTextAsPaths(localizedStyleRendering);
@@ -201,14 +202,14 @@ int main(int argc, char **argv)
     ok &= Expect(localizedStyleRendering.LoadData(localizedStyleMei), "localized bold render MEI could not be loaded");
     const std::string localizedStyleSvg = localizedStyleRendering.RenderToSVG(1);
     std::ostringstream localizedBoldPrefix;
-    if (localizedBoldRun && !localizedBoldRun->glyphs.empty()) {
-        localizedBoldPrefix << "text-" << std::uppercase << std::hex << localizedBoldRun->glyphs.front().face.value
-                            << "-";
+    if (localizedBoldRun && !localizedBoldRun->m_glyphs.empty()) {
+        localizedBoldPrefix << "text-" << std::uppercase << std::hex
+                            << localizedBoldRun->m_glyphs.front().m_face.m_value << "-";
     }
     std::ostringstream localizedSyntheticItalicPrefix;
-    if (localizedSyntheticItalicRun && !localizedSyntheticItalicRun->glyphs.empty()) {
+    if (localizedSyntheticItalicRun && !localizedSyntheticItalicRun->m_glyphs.empty()) {
         localizedSyntheticItalicPrefix << "text-" << std::uppercase << std::hex
-                                       << localizedSyntheticItalicRun->glyphs.front().face.value << "-";
+                                       << localizedSyntheticItalicRun->m_glyphs.front().m_face.m_value << "-";
     }
     ok &= Expect(!localizedBoldPrefix.str().empty()
             && (localizedStyleSvg.find(localizedBoldPrefix.str()) != std::string::npos)
@@ -249,9 +250,9 @@ clef.line="2"/></staffGrp></scoreDef><section><measure n="1"><staff n="1"><layer
     ok &= Expect(scoreTextStyleRendering.LoadData(scoreTextStyleMei), "score text-style MEI could not be loaded");
     const std::string scoreTextStyleSvg = scoreTextStyleRendering.RenderToSVG(1);
     std::ostringstream localizedRegularPrefix;
-    if (localizedRegularRun && !localizedRegularRun->glyphs.empty()) {
+    if (localizedRegularRun && !localizedRegularRun->m_glyphs.empty()) {
         localizedRegularPrefix << "text-" << std::uppercase << std::hex
-                               << localizedRegularRun->glyphs.front().face.value << "-";
+                               << localizedRegularRun->m_glyphs.front().m_face.m_value << "-";
     }
     ok &= Expect(!localizedRegularPrefix.str().empty()
             && (scoreTextStyleSvg.find(localizedRegularPrefix.str()) != std::string::npos),
@@ -401,8 +402,8 @@ oct="4" dur="1"><verse n="1" fontname="Verovio Test Ligature"><syl>ffi</syl></ve
     const auto aliasGeneration = aliasStore.GetGeneration();
     const auto aliasMetrics = aliasStore.GetGlyphMetrics(vrv::FontStore::Kind::Text, "QS", U'A');
     const auto canonicalAliasMetrics = aliasStore.GetGlyphMetrics(vrv::FontStore::Kind::Text, "Tinos", U'A');
-    ok &= Expect(aliasMetrics && canonicalAliasMetrics && (aliasMetrics->face == canonicalAliasMetrics->face)
-            && (aliasMetrics->glyphId == canonicalAliasMetrics->glyphId),
+    ok &= Expect(aliasMetrics && canonicalAliasMetrics && (aliasMetrics->m_face == canonicalAliasMetrics->m_face)
+            && (aliasMetrics->m_glyphId == canonicalAliasMetrics->m_glyphId),
         "text alias did not share canonical metrics and identity");
     ok &= Expect(aliasStore.RegisterTextFont(ttf.data(), ttf.size(), "QS") == "Tinos"
             && (aliasStore.GetGeneration() == aliasGeneration),
@@ -411,18 +412,18 @@ oct="4" dur="1"><verse n="1" fontname="Verovio Test Ligature"><syl>ffi</syl></ve
     ok &= Expect(aliasStore.RegisterTextFont(ttf.data(), ttf.size(), "Short Tinos") == "Tinos"
             && (aliasStore.GetGeneration() == aliasGeneration + 1),
         "a second alias for an existing family was not registered");
-    ok &= Expect(aliasStore.GetCounters().decodedFonts == aliasCounters.decodedFonts
-            && aliasStore.GetCounters().extractedOutlines == aliasCounters.extractedOutlines,
+    ok &= Expect(aliasStore.GetCounters().m_decodedFonts == aliasCounters.m_decodedFonts
+            && aliasStore.GetCounters().m_extractedOutlines == aliasCounters.m_extractedOutlines,
         "adding an alias decoded the font or extracted outlines again");
     const auto canonicalAliasShape = aliasStore.ShapeText("Tinos", U"AV");
     const auto aliasShape = aliasStore.ShapeText("QS", U"AV");
-    ok &= Expect(aliasShape == canonicalAliasShape && (aliasStore.GetCounters().shapedRuns == 1),
+    ok &= Expect(aliasShape == canonicalAliasShape && (aliasStore.GetCounters().m_shapedRuns == 1),
         "text alias duplicated canonical shaping work");
     if (aliasMetrics) {
-        const auto aliasOutline = aliasStore.GetGlyphOutline(vrv::FontStore::Kind::Text, "QS", aliasMetrics->glyphId);
+        const auto aliasOutline = aliasStore.GetGlyphOutline(vrv::FontStore::Kind::Text, "QS", aliasMetrics->m_glyphId);
         const auto canonicalAliasOutline
-            = aliasStore.GetGlyphOutline(vrv::FontStore::Kind::Text, "Tinos", aliasMetrics->glyphId);
-        ok &= Expect(aliasOutline == canonicalAliasOutline && (aliasStore.GetCounters().extractedOutlines == 1),
+            = aliasStore.GetGlyphOutline(vrv::FontStore::Kind::Text, "Tinos", aliasMetrics->m_glyphId);
+        ok &= Expect(aliasOutline == canonicalAliasOutline && (aliasStore.GetCounters().m_extractedOutlines == 1),
             "text alias duplicated canonical outline extraction");
     }
     const auto generationBeforeInvalidAlias = aliasStore.GetGeneration();
@@ -433,22 +434,23 @@ oct="4" dur="1"><verse n="1" fontname="Verovio Test Ligature"><syl>ffi</syl></ve
     vrv::FontStore musicStore;
     ok &= Expect(musicStore.RegisterMusicFont(bravura.data(), bravura.size(), metadata, "QS") == "Bravura",
         "FontStore Bravura registration failed");
-    ok &= Expect(musicStore.GetCounters().extractedOutlines == 0, "Bravura registration eagerly extracted outlines");
+    ok &= Expect(musicStore.GetCounters().m_extractedOutlines == 0, "Bravura registration eagerly extracted outlines");
     const auto gClef = musicStore.GetGlyphMetrics(vrv::FontStore::Kind::Music, "Bravura", U'\uE050');
-    ok &= Expect(gClef && (gClef->glyphId == 74) && (gClef->unitsPerEm == 1000) && (gClef->advanceX == 671)
-            && (gClef->xBearing == 0) && (gClef->yBearing == 1098) && (gClef->width == 671) && (gClef->height == -1756),
+    ok &= Expect(gClef && (gClef->m_glyphId == 74) && (gClef->m_unitsPerEm == 1000) && (gClef->m_advanceX == 671)
+            && (gClef->m_xBearing == 0) && (gClef->m_yBearing == 1098) && (gClef->m_width == 671)
+            && (gClef->m_height == -1756),
         "Bravura gClef metrics differ from the trusted fixture");
     if (gClef) {
-        const auto outline = musicStore.GetGlyphOutline(gClef->face, gClef->glyphId);
+        const auto outline = musicStore.GetGlyphOutline(gClef->m_face, gClef->m_glyphId);
         ok &= Expect(outline && !outline->empty(), "Bravura CFF gClef outline was unavailable");
-        ok &= Expect(musicStore.GetCounters().extractedOutlines == 1, "Bravura outline was not extracted lazily");
+        ok &= Expect(musicStore.GetCounters().m_extractedOutlines == 1, "Bravura outline was not extracted lazily");
     }
     ok &= Expect(musicStore.GetGlyphMetrics(vrv::FontStore::Kind::Music, "Bravura", U'\uE0A2').has_value(),
         "Bravura whole-note glyph metrics were unavailable");
     const auto noteheadAnchors = musicStore.GetMusicGlyphAnchors("Bravura", "noteheadBlack");
     ok &= Expect(std::any_of(noteheadAnchors.begin(), noteheadAnchors.end(),
                      [](const auto &anchor) {
-                         return (anchor.name == "stemUpSE") && (anchor.x == 1.18) && (anchor.y == 0.168);
+                         return (anchor.m_name == "stemUpSE") && (anchor.m_x == 1.18) && (anchor.m_y == 0.168);
                      }),
         "Bravura SMuFL anchors were not loaded from metadata");
     const auto musicDuplicateGeneration = musicStore.GetGeneration();
@@ -461,7 +463,7 @@ oct="4" dur="1"><verse n="1" fontname="Verovio Test Ligature"><syl>ffi</syl></ve
     ok &= Expect(anchorsAfterDuplicate.size() == noteheadAnchors.size()
             && std::any_of(anchorsAfterDuplicate.begin(), anchorsAfterDuplicate.end(),
                 [](const auto &anchor) {
-                    return (anchor.name == "stemUpSE") && (anchor.x == 1.18) && (anchor.y == 0.168);
+                    return (anchor.m_name == "stemUpSE") && (anchor.m_x == 1.18) && (anchor.m_y == 0.168);
                 }),
         "duplicate music registration silently replaced face-owned anchors");
     const auto aliasedNoteheadAnchors = musicStore.GetMusicGlyphAnchors("QS", "noteheadBlack");
@@ -472,19 +474,19 @@ oct="4" dur="1"><verse n="1" fontname="Verovio Test Ligature"><syl>ffi</syl></ve
 
     vrv::FontStore store;
     ok &= Expect(store.RegisterTextFont(woff.data(), woff.size()) == "Tinos", "FontStore WOFF1 registration failed");
-    ok &= Expect(store.GetCounters().decodedFonts == 1, "WOFF1 was not decoded exactly once");
-    ok &= Expect(store.GetCounters().extractedOutlines == 0, "registration eagerly extracted outlines");
+    ok &= Expect(store.GetCounters().m_decodedFonts == 1, "WOFF1 was not decoded exactly once");
+    ok &= Expect(store.GetCounters().m_extractedOutlines == 0, "registration eagerly extracted outlines");
     ok &= Expect(store.RegisterTextFont(woff.data(), woff.size()) == "Tinos", "FontStore WOFF1 duplicate failed");
-    ok &= Expect(store.GetCounters().decodedFonts == 1, "duplicate WOFF1 was decoded again");
+    ok &= Expect(store.GetCounters().m_decodedFonts == 1, "duplicate WOFF1 was decoded again");
     const auto compressedAliasGeneration = store.GetGeneration();
     ok &= Expect(store.RegisterTextFont(woff.data(), woff.size(), "Compressed Tinos") == "Tinos"
-            && (store.GetGeneration() == compressedAliasGeneration + 1) && (store.GetCounters().decodedFonts == 1),
+            && (store.GetGeneration() == compressedAliasGeneration + 1) && (store.GetCounters().m_decodedFonts == 1),
         "adding an alias to a compressed face decoded it again");
     ok &= Expect(store.RegisterTextFont(woff.data(), 20).empty(), "truncated WOFF1 was accepted");
     vrv::FontStore sharedDecodeStore;
     ok &= Expect(
         sharedDecodeStore.RegisterTextFont(woff.data(), woff.size()) == "Tinos", "shared WOFF1 registration failed");
-    ok &= Expect(sharedDecodeStore.GetCounters().decodedFonts == 0,
+    ok &= Expect(sharedDecodeStore.GetCounters().m_decodedFonts == 0,
         "WOFF1 was physically decompressed again in another FontStore");
 
     vrv::Toolkit woffToolkit(false);
@@ -520,28 +522,28 @@ oct="4" dur="1"><verse n="1" fontname="Verovio Test Ligature"><syl>ffi</syl></ve
     const auto metrics = store.GetGlyphMetrics(vrv::FontStore::Kind::Text, "Tinos", U'A');
     ok &= Expect(metrics.has_value(), "Tinos A metrics were unavailable");
     if (metrics) {
-        ok &= Expect(metrics->glyphId == 36, "Tinos A glyph ID differs from the trusted fixture");
-        ok &= Expect(metrics->unitsPerEm == 2048, "Tinos units-per-em differs from the trusted fixture");
-        ok &= Expect(metrics->advanceX == 1479, "Tinos A advance differs from the trusted fixture");
-        ok &= Expect((metrics->xBearing == 20) && (metrics->yBearing == 1352) && (metrics->width == 1444)
-                && (metrics->height == -1352),
+        ok &= Expect(metrics->m_glyphId == 36, "Tinos A glyph ID differs from the trusted fixture");
+        ok &= Expect(metrics->m_unitsPerEm == 2048, "Tinos units-per-em differs from the trusted fixture");
+        ok &= Expect(metrics->m_advanceX == 1479, "Tinos A advance differs from the trusted fixture");
+        ok &= Expect((metrics->m_xBearing == 20) && (metrics->m_yBearing == 1352) && (metrics->m_width == 1444)
+                && (metrics->m_height == -1352),
             "Tinos A extents differ from the trusted fixture");
-        const auto outline = store.GetGlyphOutline(vrv::FontStore::Kind::Text, "Tinos", metrics->glyphId);
+        const auto outline = store.GetGlyphOutline(vrv::FontStore::Kind::Text, "Tinos", metrics->m_glyphId);
         ok &= Expect(outline && !outline->empty(), "Tinos A outline was unavailable");
-        const auto outlineAgain = store.GetGlyphOutline(vrv::FontStore::Kind::Text, "Tinos", metrics->glyphId);
+        const auto outlineAgain = store.GetGlyphOutline(vrv::FontStore::Kind::Text, "Tinos", metrics->m_glyphId);
         ok &= Expect(outlineAgain == outline, "cached Tinos A outline changed");
-        ok &= Expect(store.GetCounters().extractedOutlines == 1, "Tinos A outline was not extracted exactly once");
+        ok &= Expect(store.GetCounters().m_extractedOutlines == 1, "Tinos A outline was not extracted exactly once");
     }
 
     const auto shaped = store.ShapeText("Tinos", U"AV");
-    ok &= Expect(shaped && (shaped->glyphs.size() == 2), "Tinos AV shaping failed");
-    if (shaped && (shaped->glyphs.size() == 2)) {
-        ok &= Expect((shaped->glyphs[0].glyphId == 36) && (shaped->glyphs[0].advanceX == 1215)
-                && (shaped->glyphs[1].advanceX == 1479),
+    ok &= Expect(shaped && (shaped->m_glyphs.size() == 2), "Tinos AV shaping failed");
+    if (shaped && (shaped->m_glyphs.size() == 2)) {
+        ok &= Expect((shaped->m_glyphs[0].m_glyphId == 36) && (shaped->m_glyphs[0].m_advanceX == 1215)
+                && (shaped->m_glyphs[1].m_advanceX == 1479),
             "Tinos AV kerning differs from the trusted fixture");
     }
     ok &= Expect(store.ShapeText("Tinos", U"AV") == shaped, "cached Tinos AV shaping changed");
-    ok &= Expect(store.GetCounters().shapedRuns == 1, "Tinos AV was shaped more than once");
+    ok &= Expect(store.GetCounters().m_shapedRuns == 1, "Tinos AV was shaped more than once");
 
     vrv::FontStore formatStore;
     ok &= Expect(formatStore.RegisterTextFont(ttf.data(), ttf.size()) == "Tinos", "TTF format identity setup failed");
@@ -561,8 +563,8 @@ oct="4" dur="1"><verse n="1" fontname="Verovio Test Ligature"><syl>ffi</syl></ve
     vrv::FontStore woff2FormatStore;
     ok &= Expect(woff2FormatStore.RegisterTextFont(woff2.data(), woff2.size()) == "Tinos", "WOFF2 format setup failed");
     const auto woff2Identity = woff2FormatStore.GetGlyphMetrics(vrv::FontStore::Kind::Text, "Tinos", U'A');
-    ok &= Expect(ttfIdentity && woffIdentity && woff2Identity && (ttfIdentity->face == woffIdentity->face)
-            && (ttfIdentity->face == woff2Identity->face),
+    ok &= Expect(ttfIdentity && woffIdentity && woff2Identity && (ttfIdentity->m_face == woffIdentity->m_face)
+            && (ttfIdentity->m_face == woff2Identity->m_face),
         "TTF/WOFF1/WOFF2 did not produce one font identity");
 
     const std::vector<unsigned char> italic = ReadFile(argv[6]);
@@ -587,8 +589,8 @@ oct="4" dur="1"><verse n="1" fontname="Verovio Test Ligature"><syl>ffi</syl></ve
              std::pair{ vrv::FontStore::Weight::Bold, vrv::FontStore::Style::Italic } }) {
         const auto aliasStyle = aliasStore.ShapeText("QS", U"A", weight, style);
         const auto canonicalStyle = aliasStore.ShapeText("Tinos", U"A", weight, style);
-        ok &= Expect(aliasStyle && canonicalStyle && !aliasStyle->glyphs.empty() && !canonicalStyle->glyphs.empty()
-                && (aliasStyle->glyphs.front().face == canonicalStyle->glyphs.front().face),
+        ok &= Expect(aliasStyle && canonicalStyle && !aliasStyle->m_glyphs.empty() && !canonicalStyle->m_glyphs.empty()
+                && (aliasStyle->m_glyphs.front().m_face == canonicalStyle->m_glyphs.front().m_face),
             "family-wide alias did not select the canonical text weight/style face");
     }
 
@@ -624,9 +626,9 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
     const auto fallbackHyphen = hyphenStore.ShapeText("Verovio Test Ligature", U"-");
     auto glyphPrefix = [](const std::optional<vrv::FontStore::ShapedRun> &run) {
         std::ostringstream prefix;
-        if (run && !run->glyphs.empty()) {
-            prefix << "text-" << std::uppercase << std::hex << run->glyphs.front().face.value << "-" << std::dec
-                   << run->glyphs.front().glyphId << "-";
+        if (run && !run->m_glyphs.empty()) {
+            prefix << "text-" << std::uppercase << std::hex << run->m_glyphs.front().m_face.m_value << "-" << std::dec
+                   << run->m_glyphs.front().m_glyphId << "-";
         }
         return prefix.str();
     };
@@ -684,29 +686,30 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
         = canonicalConflictStore.GetGlyphMetrics(vrv::FontStore::Kind::Text, "Verovio Test Ligature", U'A');
     ok &= Expect(canonicalConflictStore.RegisterTextFont(ligatureFont.data(), ligatureFont.size()).empty()
             && (canonicalConflictStore.GetGeneration() == canonicalConflictGeneration) && canonicalConflictAlias
-            && (canonicalConflictStore.GetGlyphMetrics(vrv::FontStore::Kind::Text, "Verovio Test Ligature", U'A')->face
-                == canonicalConflictAlias->face),
+            && (canonicalConflictStore.GetGlyphMetrics(vrv::FontStore::Kind::Text, "Verovio Test Ligature", U'A')
+                    ->m_face
+                == canonicalConflictAlias->m_face),
         "canonical family collision with an existing alias was accepted");
     const auto ligature = store.ShapeText("Verovio Test Ligature", U"ffi");
-    ok &= Expect(ligature && (ligature->glyphs.size() == 1), "ffi ligature was not applied");
+    ok &= Expect(ligature && (ligature->m_glyphs.size() == 1), "ffi ligature was not applied");
     const auto combining = store.ShapeText("Tinos", U"A\u0301");
     ok &= Expect(combining
-            && std::none_of(combining->glyphs.begin(), combining->glyphs.end(),
-                [](const vrv::FontStore::GlyphPlacement &glyph) { return glyph.glyphId == 0; }),
+            && std::none_of(combining->m_glyphs.begin(), combining->m_glyphs.end(),
+                [](const vrv::FontStore::GlyphPlacement &glyph) { return glyph.m_glyphId == 0; }),
         "Tinos combining mark shaping produced .notdef");
     const auto greek = store.ShapeText("Tinos", U"Καλημέρα");
     ok &= Expect(greek
-            && std::none_of(greek->glyphs.begin(), greek->glyphs.end(),
-                [](const vrv::FontStore::GlyphPlacement &glyph) { return glyph.glyphId == 0; }),
+            && std::none_of(greek->m_glyphs.begin(), greek->m_glyphs.end(),
+                [](const vrv::FontStore::GlyphPlacement &glyph) { return glyph.m_glyphId == 0; }),
         "Tinos Greek shaping produced .notdef");
     const auto fallbackGreek = store.ShapeText("Verovio Test Ligature", U"Καλημέρα");
-    ok &= Expect(fallbackGreek && greek && !fallbackGreek->glyphs.empty()
-            && (fallbackGreek->glyphs.front().face == greek->glyphs.front().face),
+    ok &= Expect(fallbackGreek && greek && !fallbackGreek->m_glyphs.empty()
+            && (fallbackGreek->m_glyphs.front().m_face == greek->m_glyphs.front().m_face),
         "missing custom-font clusters did not fall back to Tinos");
     const auto missingCluster = store.ShapeText("Verovio Test Ligature", U"\U0001F9CC");
     ok &= Expect(missingCluster
-            && std::ranges::any_of(
-                missingCluster->glyphs, [](const vrv::FontStore::GlyphPlacement &glyph) { return glyph.glyphId == 0; }),
+            && std::ranges::any_of(missingCluster->m_glyphs,
+                [](const vrv::FontStore::GlyphPlacement &glyph) { return glyph.m_glyphId == 0; }),
         "cluster missing from both requested font and Tinos did not use .notdef");
 
     vrv::Toolkit rendering(false);
@@ -740,15 +743,14 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
     const std::vector<unsigned char> leipzig = ReadFile(resourcePath + "/fonts/Leipzig.woff2");
     const std::vector<unsigned char> leipzigMetadata = ReadFile(resourcePath + "/fonts/Leipzig_metadata.json");
     vrv::FontStore leipzigStore;
-    ok &= Expect(leipzigStore.RegisterMusicFont(leipzig.data(), leipzig.size(),
-                     std::string(leipzigMetadata.begin(), leipzigMetadata.end()))
+    ok &= Expect(leipzigStore.RegisterMusicFont(
+                     leipzig.data(), leipzig.size(), std::string(leipzigMetadata.begin(), leipzigMetadata.end()))
             == "Leipzig",
         "bundled Leipzig was not registered");
     const auto leipzigClef = leipzigStore.GetGlyphMetrics(vrv::FontStore::Kind::Music, "Leipzig", U'\uE050');
-    ok &= Expect(HasGlyphOutline(textSvg, leipzigStore, leipzigClef),
-        "default SVG did not use Leipzig as music font");
-    ok &= Expect(textSvg.find("href=\"#E050-") != std::string::npos,
-        "music glyph ids did not keep the SMuFL code as prefix");
+    ok &= Expect(HasGlyphOutline(textSvg, leipzigStore, leipzigClef), "default SVG did not use Leipzig as music font");
+    ok &= Expect(
+        textSvg.find("href=\"#E050-") != std::string::npos, "music glyph ids did not keep the SMuFL code as prefix");
     ok &= Expect(textSvg.find("@font-face {font-family: 'Tinos'") == std::string::npos,
         "text font was embedded without svgEmbedTextFont");
     ok &= Expect(textRendering.SetOptions("{\"svgEmbedTextFont\":true}"), "text font embedding option was rejected");
@@ -760,8 +762,8 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
         "svgEmbedTextFont did not embed all the faces of the text font");
     ok &= Expect(embeddedSvg.find("font-family=\"Tinos, serif\"") != std::string::npos,
         "the embedded text font was not preferred over its metric equivalent");
-    ok &= Expect(embeddedSvg.find("font-family=\"Tinos\"") == std::string::npos,
-        "the text font was repeated within the SVG");
+    ok &= Expect(
+        embeddedSvg.find("font-family=\"Tinos\"") == std::string::npos, "the text font was repeated within the SVG");
 
     vrv::Toolkit musicTextRendering(false);
     const std::string musicTextMei = R"mei(<?xml version="1.0" encoding="UTF-8"?>
@@ -771,13 +773,13 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
 </layer></staff><dynam startid="#dynam-note">mf cresc.</dynam></measure></section></score></mdiv></body></music></mei>)mei";
     ok &= Expect(musicTextRendering.SetResourcePath(argv[9]) && musicTextRendering.LoadData(musicTextMei),
         "music text MEI could not be loaded");
-    ok &= Expect(musicTextRendering.RenderToSVG(1).find(
-                     "@font-face {font-family: 'Leipzig'; src: url(data:font/woff2;base64,")
+    ok &= Expect(
+        musicTextRendering.RenderToSVG(1).find("@font-face {font-family: 'Leipzig'; src: url(data:font/woff2;base64,")
             != std::string::npos,
         "the music font used in text was not embedded");
     ok &= Expect(musicTextRendering.SetOptions("{\"smuflTextFont\":\"linked\"}"), "smuflTextFont was rejected");
-    ok &= Expect(musicTextRendering.RenderToSVG(1).find("/data/fonts/Leipzig.woff2\") format('woff2')")
-            != std::string::npos,
+    ok &= Expect(
+        musicTextRendering.RenderToSVG(1).find("/data/fonts/Leipzig.woff2\") format('woff2')") != std::string::npos,
         "the music font used in text was not linked");
 
     const std::vector<unsigned char> testText = ReadFile(argv[11]);
@@ -790,13 +792,13 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
         "custom test music font was not registered");
     const auto customClef
         = testMusicStore.GetGlyphMetrics(vrv::FontStore::Kind::Music, "Verovio Test Music", U'\uE050');
-    ok &= Expect(customClef && gClef && (customClef->face != gClef->face),
+    ok &= Expect(customClef && gClef && (customClef->m_face != gClef->m_face),
         "custom music and Bravura unexpectedly share font identity "
-            + std::to_string(customClef ? customClef->face.value : 0));
+            + std::to_string(customClef ? customClef->m_face.m_value : 0));
     vrv::Resources fallbackResources;
     fallbackResources.SetPath(argv[9]);
     ok &= Expect(fallbackResources.InitFonts(), "fallback test resources could not be initialized");
-    ok &= Expect(fallbackResources.GetFontStore().GetCounters().extractedOutlines == 0,
+    ok &= Expect(fallbackResources.GetFontStore().GetCounters().m_extractedOutlines == 0,
         "bundled font initialization eagerly extracted outlines");
     ok &= Expect(fallbackResources.GetFontStoreForModification().RegisterMusicFont(
                      testMusic.data(), testMusic.size(), testMusicMetadata)
@@ -808,22 +810,22 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
     vrv::FontInfo textWithMusicFallback;
     textWithMusicFallback.SetFaceName("Tinos");
     const auto activeMusicTextFallback = fallbackResources.ShapeText(textWithMusicFallback, U"\uE050");
-    ok &= Expect(activeMusicTextFallback && customClef && !activeMusicTextFallback->glyphs.empty()
-            && (activeMusicTextFallback->glyphs.front().face == customClef->face),
+    ok &= Expect(activeMusicTextFallback && customClef && !activeMusicTextFallback->m_glyphs.empty()
+            && (activeMusicTextFallback->m_glyphs.front().m_face == customClef->m_face),
         "text glyph missing from Tinos did not fall back to the active SMuFL font");
     const auto bravuraQuarter
         = fallbackResources.GetFontStore().GetGlyphMetrics(vrv::FontStore::Kind::Music, "Bravura", U'\u2669');
     const auto bravuraTextFallback = fallbackResources.ShapeText(textWithMusicFallback, U"\u2669");
-    ok &= Expect(bravuraTextFallback && bravuraQuarter && !bravuraTextFallback->glyphs.empty()
-            && (bravuraTextFallback->glyphs.front().face == bravuraQuarter->face)
-            && (bravuraTextFallback->glyphs.front().glyphId == bravuraQuarter->glyphId),
+    ok &= Expect(bravuraTextFallback && bravuraQuarter && !bravuraTextFallback->m_glyphs.empty()
+            && (bravuraTextFallback->m_glyphs.front().m_face == bravuraQuarter->m_face)
+            && (bravuraTextFallback->m_glyphs.front().m_glyphId == bravuraQuarter->m_glyphId),
         "text glyph missing from the active SMuFL font did not fall back to Bravura");
     const auto fallbackBravuraMetrics
         = fallbackResources.GetFontStore().GetGlyphMetrics(vrv::FontStore::Kind::Music, "Bravura", U'\uE0A2');
     ok &= Expect(fallbackBravuraMetrics.has_value(), "Bravura metrics disappeared after custom music registration");
     ok &= Expect(fallbackBravuraMetrics
             && fallbackResources.GetFontStore()
-                .GetGlyphMetrics(fallbackBravuraMetrics->face, fallbackBravuraMetrics->glyphId)
+                .GetGlyphMetrics(fallbackBravuraMetrics->m_face, fallbackBravuraMetrics->m_glyphId)
                 .has_value(),
         "Bravura identity-based metrics lookup failed after custom registration");
     ok &= Expect(fallbackResources.GetGlyph(U'\uE0A2', "Verovio Test Music") != nullptr,
@@ -860,11 +862,11 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
     ok &= Expect(customRendering.LoadData(customMei), "mixed per-element custom-font MEI could not be loaded");
     const std::string customSvg = customRendering.RenderToSVG(1);
     std::ostringstream textPrefix;
-    if (ligature) textPrefix << "text-" << std::uppercase << std::hex << ligature->glyphs[0].face.value << "-";
+    if (ligature) textPrefix << "text-" << std::uppercase << std::hex << ligature->m_glyphs[0].m_face.m_value << "-";
     const auto customTimeSig
         = testMusicStore.GetGlyphMetrics(vrv::FontStore::Kind::Music, "Verovio Test Music", U'\uE083');
-    ok &= Expect(HasGlyphOutline(customSvg, testMusicStore, customTimeSig),
-        "meterSig did not use its per-element music font");
+    ok &= Expect(
+        HasGlyphOutline(customSvg, testMusicStore, customTimeSig), "meterSig did not use its per-element music font");
     ok &= Expect(ligature && (customSvg.find(textPrefix.str()) != std::string::npos),
         "nested dir/rend did not use its per-element text font");
     ok &= Expect((customSvg.find("<text") == std::string::npos) && (customSvg.find("<tspan") == std::string::npos),

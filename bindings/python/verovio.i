@@ -217,8 +217,8 @@ def validatePAEFile(self, filename: str) -> dict:
 
 %module(package="verovio") verovio
 %include "std_string.i"
-%typemap(in, numinputs=1) (const unsigned char *data, int length) {
-    char *buffer = nullptr;
+%typemap(in, numinputs=1) (const unsigned char *fontData, int fontLength) {
+    char *buffer = NULL;
     Py_ssize_t size = 0;
     if (!PyBytes_Check($input)) {
         SWIG_exception_fail(SWIG_TypeError, "font data must be bytes");
@@ -230,7 +230,7 @@ def validatePAEFile(self, filename: str) -> dict:
     $1 = reinterpret_cast<unsigned char *>(buffer);
     $2 = static_cast<int>(size);
 }
-%typemap(typecheck, precedence=SWIG_TYPECHECK_POINTER) (const unsigned char *data, int length) {
+%typemap(typecheck, precedence=SWIG_TYPECHECK_POINTER) (const unsigned char *fontData, int fontLength) {
     $1 = PyBytes_Check($input);
 }
 %include "../../include/vrv/toolkit.h"

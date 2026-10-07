@@ -113,6 +113,11 @@ public:
     ///@}
 
     /**
+     * Return the glyph in the music font of the current font (or in the current music font if none)
+     */
+    const Glyph *GetMusicGlyph(char32_t code) const;
+
+    /**
      * @name Getters and setters for common attributes.
      * Non-virtual methods cannot be overridden and manage the width, height and user-scale
      */
@@ -351,6 +356,7 @@ public:
 
 private:
     void AddGlyphToTextExtend(const Glyph *glyph, TextExtend *extend);
+    void AddShapedRunToTextExtend(const FontStore::ShapedRun &run, TextExtend *extend);
 
 public:
     //

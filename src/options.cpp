@@ -35,9 +35,6 @@ const std::map<int, std::string> Option::s_durationEq
 const std::map<int, std::string> Option::s_elision = { { ELISION_regular, "regular" }, { ELISION_narrow, "narrow" },
     { ELISION_wide, "wide" }, { ELISION_unicode, "unicode" } };
 
-const std::map<int, std::string> Option::s_fontFallback
-    = { { FONT_FALLBACK_Leipzig, "Leipzig" }, { FONT_FALLBACK_Bravura, "Bravura" } };
-
 const std::map<int, std::string> Option::s_footer
     = { { FOOTER_none, "none" }, { FOOTER_auto, "auto" }, { FOOTER_encoded, "encoded" }, { FOOTER_always, "always" } };
 
@@ -1318,11 +1315,6 @@ Options::Options()
     m_font.Init("Leipzig");
     this->Register(&m_font, "font", &m_generalLayout);
 
-    m_fontAddCustom.SetInfo("Add custom font (deprecated)",
-        "Compatibility adapter for a custom music-font ZIP; register the font file directly instead");
-    m_fontAddCustom.Init();
-    this->Register(&m_fontAddCustom, "fontAddCustom", &m_generalLayout);
-
     m_fontAddMusic.SetInfo("Add music font", "Register a static SMuFL OTF, TTF, WOFF, or WOFF2 font file");
     m_fontAddMusic.Init();
     this->Register(&m_fontAddMusic, "fontAddMusic", &m_generalLayout);
@@ -1345,18 +1337,9 @@ Options::Options()
     m_fontFallback.Init("Bravura");
     this->Register(&m_fontFallback, "fontFallback", &m_generalLayout);
 
-    m_fontLoadAll.SetInfo("Font init all", "Load all music fonts");
-    m_fontLoadAll.Init(false);
-    this->Register(&m_fontLoadAll, "fontLoadAll", &m_generalLayout);
-
     m_fontText.SetInfo("Text font", "Set the default registered text font family");
     m_fontText.Init("Tinos");
     this->Register(&m_fontText, "fontText", &m_generalLayout);
-
-    m_fontTextLiberation.SetInfo(
-        "Font text Liberation (deprecated)", "Use Liberation as the text font for compatibility");
-    m_fontTextLiberation.Init(false);
-    this->Register(&m_fontTextLiberation, "fontTextLiberation", &m_generalLayout);
 
     m_graceFactor.SetInfo("Grace factor", "The grace size ratio numerator");
     m_graceFactor.Init(0.75, 0.5, 1.0);

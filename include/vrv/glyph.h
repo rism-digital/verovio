@@ -36,7 +36,6 @@ public:
      */
     ///@{
     Glyph();
-    Glyph(std::string path, std::string codeStr);
     Glyph(int unitsPerEm);
     virtual ~Glyph();
     ///@}
@@ -68,27 +67,11 @@ public:
     ///@}
 
     /**
-     * @name Setter and getter for the path
-     */
-    ///@{
-    const std::string &GetPath() const { return m_path; }
-    void SetPath(const std::string &path) { m_path = path; }
-    ///@}
-
-    /**
      * @name Setter and getter for the horizAdvX
      */
     ///@{
     int GetHorizAdvX() const { return m_horizAdvX; }
     void SetHorizAdvX(double horizAdvX) { m_horizAdvX = (int)(horizAdvX * 10.0); }
-    ///@}
-
-    /**
-     * @name Setter and getter for the fallback falg
-     */
-    ///@{
-    bool GetFallback() const { return m_isFallback; }
-    void SetFallback(bool isFallback) { m_isFallback = isFallback; }
     ///@}
 
     /**
@@ -108,26 +91,17 @@ public:
     const Point *GetAnchor(SMuFLGlyphAnchor anchor) const;
 
     /**
-     * Set the XML (content) of the glyph.
-     * This is used only for glyph added from zip archive custom fonts.
+     * @name Setter and getters for the face (see FontStore::FaceIdentity) and the glyph ID in the face
      */
-    void SetXML(const std::string &xml) { m_xml = xml; }
-
-    /**
-     * Return the XML (content) of the glyph.
-     * Return the stored XML or load it from the path.
-     */
-    std::string GetXML() const;
-
-    /** Identify a glyph backed by a runtime OpenType face instead of XML. */
-    void SetRuntimeGlyph(uint64_t faceIdentity, uint32_t glyphId)
+    ///@{
+    void SetFace(uint64_t faceIdentity, int glyphId)
     {
         m_faceIdentity = faceIdentity;
         m_glyphId = glyphId;
     }
-    bool IsRuntimeGlyph() const { return m_faceIdentity != 0; }
     uint64_t GetFaceIdentity() const { return m_faceIdentity; }
-    uint32_t GetGlyphId() const { return m_glyphId; }
+    int GetGlyphId() const { return m_glyphId; }
+    ///@}
 
 private:
     //
@@ -145,17 +119,11 @@ private:
     int m_unitsPerEm;
     /** The Unicode code in hexa as string */
     std::string m_codeStr;
-    /** Path to the glyph XML file */
-    std::string m_path;
-    /** XML of the content for files loaded from zip archive custom font */
-    std::string m_xml;
     /** A map of the available anchors */
     std::map<SMuFLGlyphAnchor, Point> m_anchors;
-    /** A flag indicating it is a fallback */
-    bool m_isFallback;
-    /** Runtime font identity and glyph ID; both zero for legacy XML glyphs. */
+    /** The face and the glyph ID in the face */
     uint64_t m_faceIdentity;
-    uint32_t m_glyphId;
+    int m_glyphId;
 };
 
 } // namespace vrv

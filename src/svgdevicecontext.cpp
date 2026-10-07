@@ -10,7 +10,6 @@
 //----------------------------------------------------------------------------
 
 #include <cassert>
-#include <charconv>
 #include <numeric>
 #include <regex>
 #include <sstream>
@@ -31,60 +30,6 @@
 namespace vrv {
 
 namespace {
-
-    void AppendSvgNumber(std::string &output, double value)
-    {
-        constexpr uint64_t precision = 1000000;
-        const bool negative = (value < 0.0);
-        const double magnitude = negative ? -value : value;
-        const uint64_t scaled = static_cast<uint64_t>(magnitude * precision + 0.5);
-        const uint64_t integer = scaled / precision;
-        uint64_t fraction = scaled % precision;
-
-        if (negative && scaled) output.push_back('-');
-
-        std::array<char, 32> buffer{};
-        const auto result = std::to_chars(buffer.data(), buffer.data() + buffer.size(), integer);
-        output.append(buffer.data(), result.ptr);
-
-        if (!fraction) return;
-
-        std::array<char, 6> decimals{};
-        for (auto it = decimals.rbegin(); it != decimals.rend(); ++it) {
-            *it = static_cast<char>('0' + fraction % 10);
-            fraction /= 10;
-        }
-        auto end = decimals.end();
-        while ((end != decimals.begin()) && (end[-1] == '0')) --end;
-        output.push_back('.');
-        output.append(decimals.begin(), end);
-    }
-
-    std::string SvgNumber(double value)
-    {
-        std::string output;
-        output.reserve(16);
-        AppendSvgNumber(output, value);
-        return output;
-    }
-
-    std::string SvgGlyphTransform(double x, const std::string &y, const std::string &scaleX, const std::string &scaleY)
-    {
-        std::string transform;
-        transform.reserve(64);
-        transform.append("translate(");
-        AppendSvgNumber(transform, x);
-        transform.push_back(' ');
-        transform.append(y);
-        transform.append(")scale(");
-        transform.append(scaleX);
-        if (scaleX != scaleY) {
-            transform.push_back(' ');
-            transform.append(scaleY);
-        }
-        transform.push_back(')');
-        return transform;
-    }
 
     // The root font-family is a list with fallbacks (e.g., "Times, Tinos, serif")
     bool IsInFontFamilyList(const std::string &fontFamilyList, const std::string &family)
@@ -134,7 +79,6 @@ SvgDeviceContext::SvgDeviceContext(const std::string &docId) : DeviceContext(SVG
     m_formatRaw = false;
     m_removeXlink = false;
     m_facsimile = false;
-    m_useLiberation = false;
     m_indent = 2;
     m_smuflTextFont = SMUFLTEXTFONT_embedded;
     m_embedTextFont = false;
@@ -170,38 +114,39 @@ bool SvgDeviceContext::CopyFileToStream(const std::string &filename, std::ostrea
 
 SvgDeviceContext::GlyphRef::GlyphRef(const Glyph *glyph, int count, const std::string &postfix) : m_glyph(glyph)
 {
-    m_refId.reserve(glyph->GetCodeStr().size() + postfix.size() + 8);
-    m_refId = glyph->GetCodeStr();
-    m_refId.push_back('-');
     // Add the counter only when necessary (more than one font for that glyph)
     if (count == 0) {
-        m_refId.append(postfix);
+        m_refId = StringFormat("%s-%s", glyph->GetCodeStr().c_str(), postfix.c_str());
     }
     else {
-        m_refId.append(std::to_string(count));
-        m_refId.push_back('-');
-        m_refId.append(postfix);
+        m_refId = StringFormat("%s-%d-%s", glyph->GetCodeStr().c_str(), count, postfix.c_str());
     }
 }
 
-const std::string &SvgDeviceContext::InsertGlyphRef(const Glyph *glyph)
+const std::string SvgDeviceContext::InsertGlyphRef(const Glyph *glyph)
 {
-    const std::string &code = glyph->GetCodeStr();
+    const std::string code = glyph->GetCodeStr();
 
-    if (const auto existing = m_glyphRefs.find(glyph); existing != m_glyphRefs.end()) {
-        return m_smuflGlyphs[existing->second].second.GetRefId();
+    // Check if glyph already exists
+    for (const auto &[g, ref] : m_smuflGlyphs) {
+        if (g == glyph) {
+            return ref.GetRefId();
+        }
     }
 
     int count = 0;
     auto it = m_glyphCodeFontCounter.find(code);
-    if (it != m_glyphCodeFontCounter.end()) count = it->second;
+    if (it != m_glyphCodeFontCounter.end()) {
+        count = it->second;
+    }
 
     GlyphRef ref(glyph, count, m_glyphPostfixId);
+    const std::string id = ref.GetRefId();
+
     m_smuflGlyphs.emplace_back(glyph, ref); // preserve insertion order
-    m_glyphRefs.emplace(glyph, m_smuflGlyphs.size() - 1);
     m_glyphCodeFontCounter[code] = count + 1;
 
-    return m_smuflGlyphs.back().second.GetRefId();
+    return id;
 }
 
 void SvgDeviceContext::IncludeMusicTextFont(const std::string &fontname)
@@ -237,10 +182,10 @@ void SvgDeviceContext::IncludeFontFaces(FontStore::Kind kind, const std::string 
     std::string cssContent;
     for (const FontStore::FontFile &file : resources->GetFontStore().GetFontFiles(kind, family)) {
         // Not with StringFormat, which is limited in length
-        cssContent += "@font-face {font-family: '" + family + "'; src: url(data:" + file.mimeType + ";base64,"
-            + Base64Encode(file.data.data(), static_cast<unsigned int>(file.data.size())) + ") format('" + file.format
-            + "'); font-weight: " + ((file.weight == FontStore::Weight::Bold) ? "bold" : "normal")
-            + "; font-style: " + ((file.style == FontStore::Style::Italic) ? "italic" : "normal") + ";} ";
+        cssContent += "@font-face {font-family: '" + family + "'; src: url(data:" + file.m_mimeType + ";base64,"
+            + Base64Encode(file.m_data.data(), (unsigned int)file.m_data.size()) + ") format('" + file.m_format
+            + "'); font-weight: " + ((file.m_weight == FontStore::Weight::Bold) ? "bold" : "normal")
+            + "; font-style: " + ((file.m_style == FontStore::Style::Italic) ? "italic" : "normal") + ";} ";
     }
     if (cssContent.empty()) return;
 
@@ -298,7 +243,7 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         }
     }
     // add the text fonts if needed
-    if (m_embedTextFont || m_useLiberation) {
+    if (m_embedTextFont) {
         for (const std::string &family : m_textFontFamilies) {
             this->IncludeFontFaces(FontStore::Kind::Text, family);
         }
@@ -306,33 +251,20 @@ void SvgDeviceContext::Commit(bool xml_declaration)
 
     // header
     if (m_smuflGlyphs.size() > 0) {
+        const Resources *resources = this->GetResources();
+        assert(resources);
         pugi::xml_node defs = m_svgNode.prepend_child("defs");
-        pugi::xml_document sourceDoc;
 
         // for each needed glyph
-        for (const auto &entry : m_smuflGlyphs) {
+        for (const std::pair<const Glyph *, GlyphRef> &entry : m_smuflGlyphs) {
             const Glyph *glyph = entry.first;
-            const SvgDeviceContext::GlyphRef &ref = entry.second;
-            if (glyph->IsRuntimeGlyph()) {
-                const Resources *resources = this->GetResources();
-                assert(resources);
-                const auto outline = resources->GetFontStore().GetGlyphOutline(
-                    FontStore::FaceIdentity{ glyph->GetFaceIdentity() }, glyph->GetGlyphId());
-                if (!outline) continue;
-                pugi::xml_node path = defs.append_child("path");
-                path.append_attribute("id") = ref.GetRefId().c_str();
-                path.append_attribute("transform") = "scale(1,-1)";
-                path.append_attribute("d") = outline->c_str();
-                continue;
-            }
-            // load the XML as a pugi::xml_document
-            sourceDoc.load_string(glyph->GetXML().c_str());
-
-            // copy all the nodes inside into the master document
-            for (pugi::xml_node child = sourceDoc.first_child(); child; child = child.next_sibling()) {
-                child.attribute("id").set_value(ref.GetRefId().c_str());
-                defs.append_copy(child);
-            }
+            const std::optional<std::string> outline = resources->GetFontStore().GetGlyphOutline(
+                FontStore::FaceIdentity{ glyph->GetFaceIdentity() }, glyph->GetGlyphId());
+            if (!outline) continue;
+            pugi::xml_node path = defs.append_child("path");
+            path.append_attribute("id") = entry.second.GetRefId().c_str();
+            path.append_attribute("transform") = "scale(1,-1)";
+            path.append_attribute("d") = outline->c_str();
         }
     }
 
@@ -1376,54 +1308,46 @@ void SvgDeviceContext::DrawTextAsPaths(const std::u32string &wtext, int x, int y
     const std::optional<FontStore::ShapedRun> run = resources->ShapeText(*font, wtext);
     if (!run) return;
 
-    double cachedY = std::numeric_limits<double>::quiet_NaN();
-    double cachedScaleX = std::numeric_limits<double>::quiet_NaN();
-    double cachedScaleY = std::numeric_limits<double>::quiet_NaN();
-    std::string formattedY;
-    std::string formattedScaleX;
-    std::string formattedScaleY;
-    uint32_t previousCluster = 0;
-    bool first = true;
-    for (const FontStore::GlyphPlacement &placement : run->glyphs) {
-        if (!first && (placement.cluster != previousCluster)) {
+    // remove the `xlink:` prefix for backwards compatibility with older SVG viewers.
+    std::string hrefAttrib = "href";
+    if (!m_removeXlink) {
+        hrefAttrib.insert(0, "xlink:");
+    }
+
+    int previousCluster = 0;
+    for (const FontStore::GlyphPlacement &placement : run->m_glyphs) {
+        if ((&placement != &run->m_glyphs.front()) && (placement.m_cluster != previousCluster)) {
             m_textCursorX += font->GetLetterSpacing();
             m_textLineWidth += font->GetLetterSpacing();
         }
-        const double scale = static_cast<double>(font->GetPointSize()) / placement.unitsPerEm;
-        const Glyph *glyph = resources->GetRuntimeGlyph(placement.face, placement.glyphId);
-        if (glyph) {
-            int boundsX, boundsY, boundsWidth, boundsHeight;
-            glyph->GetBoundingBox(boundsX, boundsY, boundsWidth, boundsHeight);
-            if (boundsWidth || boundsHeight) {
-                const std::string &id = InsertGlyphRef(glyph);
-                pugi::xml_node use = m_currentNode.append_child("use");
-                const char *href = m_removeXlink ? "href" : "xlink:href";
-                use.append_attribute(href) = ('#' + id).c_str();
-                const double glyphX = m_textCursorX + placement.offsetX * scale;
-                const double glyphY = m_textCursorY - placement.offsetY * scale;
-                double scaleX = scale;
-                if (font->GetWidthToHeightRatio() != 1.0F) scaleX *= font->GetWidthToHeightRatio();
-                if (glyphY != cachedY) {
-                    cachedY = glyphY;
-                    formattedY = SvgNumber(glyphY);
-                }
-                if (scaleX != cachedScaleX) {
-                    cachedScaleX = scaleX;
-                    formattedScaleX = SvgNumber(scaleX);
-                }
-                if (scale != cachedScaleY) {
-                    cachedScaleY = scale;
-                    formattedScaleY = SvgNumber(scale);
-                }
-                use.append_attribute("transform")
-                    = SvgGlyphTransform(glyphX, formattedY, formattedScaleX, formattedScaleY).c_str();
-            }
+        previousCluster = placement.m_cluster;
+        const double scale = (double)font->GetPointSize() / placement.m_unitsPerEm;
+        const double advance = placement.m_advanceX * scale;
+        const Glyph *glyph = resources->GetRuntimeGlyph(placement.m_face, placement.m_glyphId);
+        int x, y, width, height;
+        if (glyph) glyph->GetBoundingBox(x, y, width, height);
+        // Skip glyphs without outline, such as spaces
+        if (!glyph || (!width && !height)) {
+            m_textCursorX += advance;
+            m_textLineWidth += advance;
+            continue;
         }
-        const double advance = placement.advanceX * scale;
+
+        // Add the glyph to the array for the <defs>
+        const std::string id = this->InsertGlyphRef(glyph);
+
+        // Write the glyph in the SVG
+        pugi::xml_node useChild = AddChild("use");
+        useChild.append_attribute(hrefAttrib.c_str()) = StringFormat("#%s", id.c_str()).c_str();
+        const int glyphX = (int)std::round(m_textCursorX + placement.m_offsetX * scale);
+        const int glyphY = m_textCursorY - (int)std::round(placement.m_offsetY * scale);
+        double scaleX = scale;
+        if (font->GetWidthToHeightRatio() != 1.0f) scaleX *= font->GetWidthToHeightRatio();
+        useChild.append_attribute("transform")
+            = StringFormat("translate(%d, %d) scale(%g, %g)", glyphX, glyphY, scaleX, scale).c_str();
+
         m_textCursorX += advance;
         m_textLineWidth += advance;
-        previousCluster = placement.cluster;
-        first = false;
     }
 }
 
@@ -1436,9 +1360,6 @@ void SvgDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, b
 {
     assert(m_fontStack.top());
 
-    const Resources *resources = this->GetResources();
-    assert(resources);
-
     int w, h, gx, gy;
 
     // remove the `xlink:` prefix for backwards compatibility with older SVG viewers.
@@ -1449,15 +1370,13 @@ void SvgDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, b
 
     // print chars one by one
     for (char32_t c : text) {
-        const std::string family
-            = m_fontStack.top()->GetFaceName().empty() ? resources->GetCurrentFont() : m_fontStack.top()->GetFaceName();
-        const Glyph *glyph = resources->GetGlyph(c, family);
+        const Glyph *glyph = this->GetMusicGlyph(c);
         if (!glyph) {
             continue;
         }
 
         // Add the glyph to the array for the <defs>
-        const std::string &id = InsertGlyphRef(glyph);
+        const std::string id = InsertGlyphRef(glyph);
 
         // Write the char in the SVG
         pugi::xml_node useChild = AddChild("use");

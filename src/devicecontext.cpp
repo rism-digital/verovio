@@ -136,6 +136,15 @@ const Resources *DeviceContext::GetResources(bool showWarning) const
     return m_resources;
 }
 
+const Glyph *DeviceContext::GetMusicGlyph(char32_t code) const
+{
+    assert(m_fontStack.top());
+    assert(m_resources);
+
+    const std::string &faceName = m_fontStack.top()->GetFaceName();
+    return m_resources->GetGlyph(code, faceName.empty() ? m_resources->GetCurrentFont() : faceName);
+}
+
 void DeviceContext::SetViewBoxFactor(double ppuFactor)
 {
     m_viewBoxFactor = double(DEFINITION_FACTOR) / ppuFactor;
@@ -245,57 +254,36 @@ void DeviceContext::GetTextExtent(const std::u32string &string, TextExtend *exte
 
     const FontInfo *font = m_fontStack.top();
     const std::optional<FontStore::ShapedRun> run = resources->ShapeText(*font, string);
-    if (run) {
-        const auto addInk = [resources, font, extend](const FontStore::ShapedRun &shapedRun) {
-            for (const FontStore::GlyphPlacement &placement : shapedRun.glyphs) {
-                const auto metrics = resources->GetFontStore().GetGlyphMetrics(placement.face, placement.glyphId);
-                if (!metrics) continue;
-                const int top = metrics->yBearing + placement.offsetY;
-                const int bottom = top + metrics->height;
-                extend->m_ascent = std::max(extend->m_ascent,
-                    static_cast<int>(
-                        std::ceil(static_cast<double>(top) * font->GetPointSize() / placement.unitsPerEm)));
-                extend->m_descent = std::max(extend->m_descent,
-                    static_cast<int>(
-                        std::ceil(static_cast<double>(-bottom) * font->GetPointSize() / placement.unitsPerEm)));
-            }
-        };
-        // As with the built-in glyph tables, the type size covers 'p' and 'M' regardless of the actual text
-        if (typeSize) {
-            const std::optional<FontStore::ShapedRun> typeSizeRun = resources->ShapeText(*font, U"pM");
-            if (typeSizeRun) addInk(*typeSizeRun);
-        }
-        addInk(*run);
-        extend->m_width = resources->GetTextAdvance(*font, *run);
-        extend->m_height = extend->m_ascent + extend->m_descent;
-        return;
-    }
+    if (!run) return;
 
+    // As with the previous glyph tables, the type size covers 'p' and 'M' regardless of the actual text
     if (typeSize) {
-        this->AddGlyphToTextExtend(resources->GetTextGlyph(L'p'), extend);
-        this->AddGlyphToTextExtend(resources->GetTextGlyph(L'M'), extend);
-        extend->m_width = 0;
+        const std::optional<FontStore::ShapedRun> typeSizeRun = resources->ShapeText(*font, U"pM");
+        if (typeSizeRun) this->AddShapedRunToTextExtend(*typeSizeRun, extend);
     }
+    this->AddShapedRunToTextExtend(*run, extend);
+    extend->m_width = resources->GetTextAdvance(*font, *run);
+    extend->m_height = extend->m_ascent + extend->m_descent;
+}
 
-    const Glyph *unknown = resources->GetTextGlyph(L'o');
+void DeviceContext::AddShapedRunToTextExtend(const FontStore::ShapedRun &run, TextExtend *extend)
+{
+    assert(m_fontStack.top());
+    assert(extend);
 
-    for (char32_t c : string) {
-        const Glyph *glyph = resources->GetTextGlyph(c);
-        if (!glyph) {
-            glyph = resources->GetGlyph(c);
-        }
-        if (!glyph) {
-            // There is no glyph for space, and we would use 'o' to increase extend width. However 'o' is wider than
-            // space, which led to incorrect rendering. For the time being, set width to that of '.' instead.
-            // This will probably need to be improved to change with font size/style
-            if (c == U' ') {
-                glyph = resources->GetTextGlyph(L'.');
-            }
-            else {
-                glyph = unknown;
-            }
-        }
-        this->AddGlyphToTextExtend(glyph, extend);
+    const Resources *resources = this->GetResources();
+    assert(resources);
+
+    const int pointSize = m_fontStack.top()->GetPointSize();
+    for (const FontStore::GlyphPlacement &placement : run.m_glyphs) {
+        const std::optional<FontStore::GlyphMetrics> metrics
+            = resources->GetFontStore().GetGlyphMetrics(placement.m_face, placement.m_glyphId);
+        if (!metrics) continue;
+        const int top = metrics->m_yBearing + placement.m_offsetY;
+        const int bottom = top + metrics->m_height;
+        extend->m_ascent = std::max(extend->m_ascent, (int)std::ceil((double)top * pointSize / placement.m_unitsPerEm));
+        extend->m_descent
+            = std::max(extend->m_descent, (int)std::ceil((double)-bottom * pointSize / placement.m_unitsPerEm));
     }
 }
 
@@ -310,10 +298,8 @@ void DeviceContext::GetSmuflTextExtent(const std::u32string &string, TextExtend 
     extend->m_width = 0;
     extend->m_height = 0;
 
-    const std::string family
-        = m_fontStack.top()->GetFaceName().empty() ? resources->GetCurrentFont() : m_fontStack.top()->GetFaceName();
     for (char32_t c : string) {
-        const Glyph *glyph = resources->GetGlyph(c, family);
+        const Glyph *glyph = this->GetMusicGlyph(c);
         if (!glyph) {
             continue;
         }

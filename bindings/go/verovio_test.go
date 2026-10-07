@@ -91,7 +91,7 @@ func TestRegisterFontsWithAliases(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got := tk.RegisterTextFontWithAlias(textFont, "QS"); got != "Verovio Test Ligature" {
+	if got := tk.RegisterTextFont(textFont, "QS"); got != "Verovio Test Ligature" {
 		t.Fatalf("expected canonical text family, got %q", got)
 	}
 
@@ -103,7 +103,7 @@ func TestRegisterFontsWithAliases(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got := tk.RegisterMusicFontWithAlias(musicFont, string(metadata), "VM"); got != "Verovio Test Music" {
+	if got := tk.RegisterMusicFont(musicFont, string(metadata), "VM"); got != "Verovio Test Music" {
 		t.Fatalf("expected canonical music family, got %q", got)
 	}
 
@@ -115,7 +115,7 @@ func TestRegisterFontsWithAliases(t *testing.T) {
 </score></mdiv></body></music></mei>`) {
 		t.Fatal("expected aliased-font MEI to load")
 	}
-	if svg := tk.RenderToSVG(1, false); !strings.Contains(svg, "text-8BFEB250B0FDDA0E-4-") {
-		t.Fatal("expected QS to render with the registered ligature face")
+	if svg := tk.RenderToSVG(1, false); !strings.Contains(svg, `font-family="QS"`) {
+		t.Fatal("expected QS to be used as font family")
 	}
 }

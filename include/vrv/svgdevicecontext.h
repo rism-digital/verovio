@@ -218,11 +218,6 @@ public:
     void SetShowHidden(bool showHidden) { m_showHidden = showHidden; }
 
     /**
-     * Setting use Liberation flag (false by default)
-     */
-    void SetUseLiberation(bool useLiberation) { m_useLiberation = useLiberation; }
-
-    /**
      * Setting m_svgBoudingBoxes flag (false by default)
      */
     void SetSvgBoundingBoxes(bool svgBoundingBoxes) { m_svgBoundingBoxes = svgBoundingBoxes; }
@@ -423,9 +418,8 @@ private:
         const Glyph *m_glyph;
         std::string m_refId;
     };
-    const std::string &InsertGlyphRef(const Glyph *glyph);
+    const std::string InsertGlyphRef(const Glyph *glyph);
     std::vector<std::pair<const Glyph *, GlyphRef>> m_smuflGlyphs;
-    std::unordered_map<const Glyph *, size_t> m_glyphRefs;
     std::map<std::string, int> m_glyphCodeFontCounter;
 
     // pugixml data
@@ -441,8 +435,6 @@ private:
     bool m_showHidden;
     // facsimiler flag
     bool m_facsimile;
-    // use LiberationTextFont
-    bool m_useLiberation;
     // add bouding boxes in svg output
     bool m_svgBoundingBoxes;
     // add content bounding boxes in svg output
