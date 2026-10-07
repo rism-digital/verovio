@@ -87,7 +87,7 @@ func TestRegisterFontsWithAliases(t *testing.T) {
 	tk := NewToolkitWithResourcePath("../../data")
 	defer tk.Close()
 
-	textFont, err := os.ReadFile("../../tests/font-runtime/VerovioTestLigature.ttf")
+	textFont, err := os.ReadFile("../../doc/tests/fonts/VerovioTestLigature.ttf")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -95,11 +95,11 @@ func TestRegisterFontsWithAliases(t *testing.T) {
 		t.Fatalf("expected canonical text family, got %q", got)
 	}
 
-	musicFont, err := os.ReadFile("../../tests/font-runtime/VerovioTestMusic.ttf")
+	musicFont, err := os.ReadFile("../../doc/tests/fonts/VerovioTestMusic.ttf")
 	if err != nil {
 		t.Fatal(err)
 	}
-	metadata, err := os.ReadFile("../../tests/font-runtime/VerovioTestMusic_metadata.json")
+	metadata, err := os.ReadFile("../../doc/tests/fonts/VerovioTestMusic_metadata.json")
 	if err != nil {
 		t.Fatal(err)
 	}

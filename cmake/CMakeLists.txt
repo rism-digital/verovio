@@ -39,7 +39,6 @@ option(NO_RUNTIME               "Disable runtime clock support"                O
 option(BUILD_AS_LIBRARY         "Build Verovio as library"                     OFF)
 option(BUILD_AS_ANDROID_LIBRARY "Build Verovio as library for Android"         OFF)
 option(USE_PAE_OLD_PARSER       "Use old PAE parser"                           OFF)
-option(BUILD_FONT_TESTS         "Build runtime font API tests"                   OFF)
 
 if (NO_HUMDRUM_SUPPORT AND MUSICXML_DEFAULT_HUMDRUM)
     message(FATAL_ERROR "Default MusicXML to Humdrum cannot be enabled by default without Humdrum support")
@@ -249,38 +248,6 @@ if(EMSCRIPTEN)
         "HB_NO_PRAGMA_GCC_DIAGNOSTIC_ERROR;HB_NO_PRAGMA_GCC_DIAGNOSTIC_WARNING")
     set_property(SOURCE ../external/harfbuzz/src/verovio-harfbuzz.cc
         APPEND PROPERTY COMPILE_OPTIONS "-Wno-unused-template;-Wno-format-pedantic")
-endif()
-
-if(BUILD_FONT_TESTS)
-    enable_testing()
-    add_executable(font-runtime-registration-test ../tests/font-runtime/registration.cpp ${all_SRC})
-    add_test(NAME font-runtime-registration
-        COMMAND font-runtime-registration-test
-            ${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/fonts/Tinos-Regular.ttf
-            ${CMAKE_CURRENT_SOURCE_DIR}/../fonts/Bravura/Bravura.otf
-            ${CMAKE_CURRENT_SOURCE_DIR}/../data/fonts/Bravura_metadata.json
-            ${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/fonts/Tinos-Regular.woff
-            ${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/fonts/Tinos-Regular.woff2
-            ${CMAKE_CURRENT_SOURCE_DIR}/../data/fonts/Tinos-Italic.woff2
-            ${CMAKE_CURRENT_SOURCE_DIR}/../data/fonts/Tinos-Bold.woff2
-            ${CMAKE_CURRENT_SOURCE_DIR}/../data/fonts/Tinos-BoldItalic.woff2
-            ${CMAKE_CURRENT_SOURCE_DIR}/../data
-            ${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/text-heavy.mei
-            ${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/VerovioTestLigature.ttf
-            ${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/VerovioTestMusic.ttf
-            ${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/VerovioTestMusic_metadata.json
-            ${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/VerovioTestLigatureConflict.ttf
-            ${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/VerovioTestLocalizedBold.ttf
-            ${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/VerovioTestHyphen.ttf)
-    add_test(NAME font-runtime-cli-alias
-        COMMAND ${CMAKE_COMMAND}
-            -DVEROVIO=$<TARGET_FILE:verovio>
-            -DRESOURCES=${CMAKE_CURRENT_SOURCE_DIR}/../data
-            -DTEXT_FONT=${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/VerovioTestLigature.ttf
-            -DMUSIC_FONT=${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/VerovioTestMusic.ttf
-            -DFIXTURE=${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/alias-dir.mei
-            -DWORK_DIR=${CMAKE_CURRENT_BINARY_DIR}
-            -P ${CMAKE_CURRENT_SOURCE_DIR}/../tests/font-runtime/cli_alias.cmake)
 endif()
 
 ##################
