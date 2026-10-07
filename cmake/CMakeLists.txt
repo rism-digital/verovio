@@ -307,10 +307,6 @@ elseif (BUILD_AS_WASM)
     endif()
     message(STATUS "***** Building Verovio as WASM BC *****")
     add_library(verovio STATIC ../tools/c_wrapper.cpp ${all_SRC})
-    # The production WASM size gate is only achievable when the complete
-    # target is optimized for size. Source-local flags already keep the font
-    # engine small; this also prevents O3 expansion in Verovio call sites.
-    target_compile_options(verovio PRIVATE "$<$<NOT:$<CONFIG:Debug>>:-Oz>")
 
 #################
 # Python module #

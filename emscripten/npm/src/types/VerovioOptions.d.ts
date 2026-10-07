@@ -519,6 +519,13 @@ export interface VerovioOptions {
     svgCss?: string;
 
     /**
+     * Embed the registered text fonts used in the SVG as base64 @font-face rules (ignored with svgTextAsPaths)
+     *
+     * default: false
+     */
+    svgEmbedTextFont?: boolean;
+
+    /**
      * Writes SVG out with no line indenting or non-content newlines
      *
      * default: false
@@ -538,6 +545,13 @@ export interface VerovioOptions {
      * default: false
      */
     svgRemoveXlink?: boolean;
+
+    /**
+     * Render text as glyph outlines instead of SVG text elements, making the output independent of the fonts available to the SVG renderer
+     *
+     * default: false
+     */
+    svgTextAsPaths?: boolean;
 
     /**
      * Use viewBox on svg root element for easy scaling of document
@@ -747,32 +761,46 @@ export interface VerovioOptions {
     font?: string;
 
     /**
-     * Add a custom music font as zip file
+     * Register a static SMuFL OTF, TTF, WOFF, or WOFF2 font file
      *
      * default: []
      */
-    fontAddCustom?: string[];
+    fontAddMusic?: string[];
+
+    /**
+     * Register a static SMuFL font using an ALIAS=FILE specification
+     *
+     * default: []
+     */
+    fontAddMusicAs?: string[];
+
+    /**
+     * Register a static text OTF, TTF, WOFF, or WOFF2 font file
+     *
+     * default: []
+     */
+    fontAddText?: string[];
+
+    /**
+     * Register a static text font using an ALIAS=FILE specification
+     *
+     * default: []
+     */
+    fontAddTextAs?: string[];
 
     /**
      * The music font fallback for missing glyphs
      *
-     * default: "Leipzig"
+     * default: "Bravura"
      */
-    fontFallback?: "Leipzig" | "Bravura";
+    fontFallback?: string;
 
     /**
-     * Load all music fonts
+     * Set the default registered text font family
      *
-     * default: false
+     * default: "Tinos"
      */
-    fontLoadAll?: boolean;
-
-    /**
-     * Use the Liberation text font
-     *
-     * default: false
-     */
-    fontTextLiberation?: boolean;
+    fontText?: string;
 
     /**
      * (double) The grace size ratio numerator

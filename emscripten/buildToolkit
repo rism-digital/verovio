@@ -83,7 +83,6 @@ if (!$nohumdrum) {
 # Process command-line options:
 if ($wasmQ) {
 	print "Creating WASM toolkit version\n";
-	$FLAGS =~ s/^-O3/-Oz/;
 
 	# Debugging flags, see:
 	#    https://emscripten.org/docs/porting/Debugging.html
