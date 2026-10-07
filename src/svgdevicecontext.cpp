@@ -13,6 +13,7 @@
 #include <charconv>
 #include <numeric>
 #include <regex>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 
@@ -85,11 +86,16 @@ namespace {
         return transform;
     }
 
-    // The root font-family is a list with a generic fallback (e.g., "Tinos, serif")
-    bool IsFontFamilyListHead(const std::string &fontFamilyList, const std::string &family)
+    // The root font-family is a list with fallbacks (e.g., "Times, Tinos, serif")
+    bool IsInFontFamilyList(const std::string &fontFamilyList, const std::string &family)
     {
-        return (fontFamilyList.size() > family.size()) && fontFamilyList.starts_with(family)
-            && (fontFamilyList[family.size()] == ',');
+        std::istringstream stream(fontFamilyList);
+        std::string item;
+        while (std::getline(stream, item, ',')) {
+            item.erase(0, item.find_first_not_of(' '));
+            if (item == family) return true;
+        }
+        return false;
     }
 
 } // namespace
@@ -636,7 +642,11 @@ void SvgDeviceContext::StartPage()
     if (!m_textAsPaths) {
         const Resources *resources = this->GetResources();
         assert(resources);
-        m_currentNode.append_attribute("font-family") = (resources->GetTextFont() + ", serif").c_str();
+        // Prefer a widespread font with the same metrics, unless the text font is embedded
+        std::string fontFamily = resources->GetTextFont() + ", serif";
+        const std::string metricEquivalent = resources->GetTextFontMetricEquivalent();
+        if (!metricEquivalent.empty() && !m_embedTextFont) fontFamily = metricEquivalent + ", " + fontFamily;
+        m_currentNode.append_attribute("font-family") = fontFamily.c_str();
     }
     if (this->GetFacsimile()) {
         m_currentNode.append_attribute("viewBox")
@@ -1165,8 +1175,7 @@ void SvgDeviceContext::StartText(int x, int y, data_HORIZONTALALIGNMENT alignmen
     // Set the @font-family only if it is not the same as in the parent node
     pugi::xpath_node fontNode = m_currentNode.select_node("ancestor::*[@font-family][1]");
     const std::string currentFaceName = (fontNode) ? fontNode.node().attribute("font-family").value() : "";
-    if (!font->GetFaceName().empty() && (font->GetFaceName() != currentFaceName)
-        && !IsFontFamilyListHead(currentFaceName, font->GetFaceName())) {
+    if (!font->GetFaceName().empty() && !IsInFontFamilyList(currentFaceName, font->GetFaceName())) {
         m_currentNode.append_attribute("font-family") = font->GetFaceName().c_str();
     }
     if (font->GetStyle() == FONTSTYLE_italic) {
@@ -1318,8 +1327,7 @@ void SvgDeviceContext::DrawTextAsTspan(const std::string &text, int x, int y, in
         const std::string &fontFaceName = font->GetFaceName();
         m_textFontFamilies.insert(fontFaceName.empty() ? resources->GetTextFont() : fontFaceName);
         // Set the @font-family only if it is not the same as in the parent node
-        if (!fontFaceName.empty() && (fontFaceName != currentFaceName)
-            && !IsFontFamilyListHead(currentFaceName, fontFaceName)) {
+        if (!fontFaceName.empty() && !IsInFontFamilyList(currentFaceName, fontFaceName)) {
             textChild.append_attribute("font-family") = fontFaceName.c_str();
         }
     }

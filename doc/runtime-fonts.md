@@ -9,13 +9,14 @@ uses the metrics of the registered fonts.
 
 By default, text is written as SVG `text` and `tspan` elements, so it remains
 selectable, searchable, and stylable with CSS. The SVG names the font family
-used for the layout (for example, `font-family="Tinos, serif"`), but the
-renderer draws the text with the fonts available to it. Two options control
+used for the layout, but the renderer draws the text with the fonts available
+to it. For the bundled Tinos, the metric-compatible Times comes first
+(`font-family="Times, Tinos, serif"`). Two options control
 this:
 
 - `svgEmbedTextFont` embeds the registered faces of the text families used in
   the SVG as base64 `@font-face` rules, so the text renders with the same font
-  as the one used for the layout.
+  as the one used for the layout. Times is then omitted from the family list.
 - `svgTextAsPaths` writes text as deduplicated glyph paths and `use` elements
   instead. The output then does not depend on any font, but the text is no
   longer selectable or stylable as text.

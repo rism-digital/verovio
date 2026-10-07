@@ -363,6 +363,11 @@ bool Resources::FontHasGlyphAvailable(const std::string &fontName, char32_t smuf
     return m_fontStore.GetGlyphMetrics(FontStore::Kind::Music, fontName, smuflCode).has_value();
 }
 
+std::string Resources::GetTextFontMetricEquivalent() const
+{
+    return (m_textFontName == TINOS) ? "Times" : "";
+}
+
 std::string Resources::GetCSSFontFor(const std::string &fontName) const
 {
     if (fontName == this->GetTextFont()) {

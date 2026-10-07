@@ -65,6 +65,8 @@ public:
     void UseLiberationTextFont(bool useLiberation) { m_useLiberation = useLiberation; }
     bool UseLiberationTextFont() const { return m_useLiberation; }
     std::string GetTextFont() const { return m_textFontName; }
+    /** The widespread font family with the same metrics as the text font, if any (e.g., Times for Tinos) */
+    std::string GetTextFontMetricEquivalent() const;
     void SetTextFont(const std::string &fontName) { m_textFontName = fontName; }
 
     /**

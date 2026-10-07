@@ -732,7 +732,7 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
     ok &= Expect((textSvg.find("<text") != std::string::npos) && (textSvg.find("<tspan") != std::string::npos)
             && (textSvg.find("#text-") == std::string::npos),
         "default SVG did not output text as SVG text");
-    ok &= Expect(textSvg.find("font-family=\"Tinos, serif\"") != std::string::npos,
+    ok &= Expect(textSvg.find("font-family=\"Times, Tinos, serif\"") != std::string::npos,
         "default SVG did not declare the text font family");
     ok &= Expect(textSvg.find("@font-face {font-family: 'Tinos'") == std::string::npos,
         "text font was embedded without svgEmbedTextFont");
@@ -743,6 +743,10 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
         "svgEmbedTextFont did not embed the text font as base64");
     ok &= Expect(embeddedSvg.find("format('woff2'); font-weight: bold; font-style: italic;}") != std::string::npos,
         "svgEmbedTextFont did not embed all the faces of the text font");
+    ok &= Expect(embeddedSvg.find("font-family=\"Tinos, serif\"") != std::string::npos,
+        "the embedded text font was not preferred over its metric equivalent");
+    ok &= Expect(embeddedSvg.find("font-family=\"Tinos\"") == std::string::npos,
+        "the text font was repeated within the SVG");
 
     const std::vector<unsigned char> testText = ReadFile(argv[11]);
     const std::vector<unsigned char> testMusic = ReadFile(argv[12]);
