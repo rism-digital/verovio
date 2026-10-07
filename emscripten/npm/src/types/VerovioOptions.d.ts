@@ -519,13 +519,6 @@ export interface VerovioOptions {
     svgCss?: string;
 
     /**
-     * Embed the registered text fonts used in the SVG as base64 @font-face rules (ignored with svgTextAsPaths)
-     *
-     * default: false
-     */
-    svgEmbedTextFont?: boolean;
-
-    /**
      * Writes SVG out with no line indenting or non-content newlines
      *
      * default: false
@@ -552,6 +545,13 @@ export interface VerovioOptions {
      * default: false
      */
     svgTextAsPaths?: boolean;
+
+    /**
+     * Embed the registered text fonts used in the SVG as base64 @font-face rules (ignored with svgTextAsPaths)
+     *
+     * default: false
+     */
+    svgTextEmbedFont?: boolean;
 
     /**
      * Use viewBox on svg root element for easy scaling of document

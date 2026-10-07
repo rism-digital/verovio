@@ -9,16 +9,8 @@
 
 //----------------------------------------------------------------------------
 
-#include <algorithm>
 #include <cassert>
-#include <cctype>
-#include <cstdlib>
-#include <filesystem>
-#include <fstream>
-#include <iterator>
-#include <limits>
 #include <locale>
-#include <optional>
 #include <regex>
 
 //----------------------------------------------------------------------------
@@ -65,38 +57,6 @@ namespace vrv {
 const char *UTF_16_BE_BOM = "\xFE\xFF";
 const char *UTF_16_LE_BOM = "\xFF\xFE";
 const char *ZIP_SIGNATURE = "\x50\x4B\x03\x04";
-
-namespace {
-
-    std::string DiscoverSmuflMetadata(const std::string &fontFilename)
-    {
-        namespace fs = std::filesystem;
-        const fs::path fontPath(fontFilename);
-        const std::string stem = fontPath.stem().string();
-        std::vector<fs::path> candidates = { fontPath.parent_path() / (stem + ".json"),
-            fontPath.parent_path() / (stem + "_metadata.json"), fontPath.parent_path() / "metadata.json" };
-
-        std::vector<fs::path> roots
-            = { "/usr/local/share/SMuFL/Fonts", "/usr/share/SMuFL/Fonts", "/Library/Application Support/SMuFL/Fonts" };
-        if (const char *home = std::getenv("HOME")) {
-            roots.emplace_back(fs::path(home) / ".local/share/SMuFL/Fonts");
-            roots.emplace_back(fs::path(home) / "Library/Application Support/SMuFL/Fonts");
-        }
-        if (const char *commonFiles = std::getenv("COMMONPROGRAMFILES")) {
-            roots.emplace_back(fs::path(commonFiles) / "SMuFL/Fonts");
-        }
-        for (const fs::path &root : roots) {
-            candidates.emplace_back(root / stem / (stem + ".json"));
-            candidates.emplace_back(root / stem / (stem + "_metadata.json"));
-        }
-        for (const fs::path &candidate : candidates) {
-            std::error_code error;
-            if (fs::is_regular_file(candidate, error)) return candidate.string();
-        }
-        return {};
-    }
-
-} // namespace
 
 //----------------------------------------------------------------------------
 // Toolkit
@@ -201,7 +161,7 @@ bool Toolkit::RegisterFontsFromOption(const OptionArray &option, FontStore::Kind
             family = this->RegisterTextFontFile(filename, alias);
         }
         else {
-            const std::string metadata = DiscoverSmuflMetadata(filename);
+            const std::string metadata = Resources::FindSmuflMetadata(filename);
             if (metadata.empty()) {
                 LogError("No SMuFL metadata was found for music font '%s'.", filename.c_str());
                 success = false;
@@ -1926,7 +1886,7 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
     svg.SetRemoveXlink(m_options->m_svgRemoveXlink.GetValue());
     svg.SetAdditionalAttributes(m_options->m_svgAdditionalAttribute.GetValue());
     svg.SetSmuflTextFont((option_SMUFLTEXTFONT)m_options->m_smuflTextFont.GetValue());
-    svg.SetEmbedTextFont(m_options->m_svgEmbedTextFont.GetValue());
+    svg.SetTextEmbedFont(m_options->m_svgTextEmbedFont.GetValue());
     svg.SetTextAsPaths(m_options->m_svgTextAsPaths.GetValue());
 
     // render the page

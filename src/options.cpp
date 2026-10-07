@@ -1190,16 +1190,16 @@ Options::Options()
     m_svgRemoveXlink.Init(false);
     this->Register(&m_svgRemoveXlink, "svgRemoveXlink", &m_general);
 
-    m_svgEmbedTextFont.SetInfo("Embed text font in SVG",
-        "Embed the registered text fonts used in the SVG as base64 @font-face rules (ignored with svgTextAsPaths)");
-    m_svgEmbedTextFont.Init(false);
-    this->Register(&m_svgEmbedTextFont, "svgEmbedTextFont", &m_general);
-
     m_svgTextAsPaths.SetInfo("Render SVG text as paths",
         "Render text as glyph outlines instead of SVG text elements, making the output independent of the fonts "
         "available to the SVG renderer");
     m_svgTextAsPaths.Init(false);
     this->Register(&m_svgTextAsPaths, "svgTextAsPaths", &m_general);
+
+    m_svgTextEmbedFont.SetInfo("Embed text font in SVG",
+        "Embed the registered text fonts used in the SVG as base64 @font-face rules (ignored with svgTextAsPaths)");
+    m_svgTextEmbedFont.Init(false);
+    this->Register(&m_svgTextEmbedFont, "svgTextEmbedFont", &m_general);
 
     m_svgAdditionalAttribute.SetInfo("Add additional attribute in SVG",
         "Add additional attribute for graphical elements in SVG as \"data-*\", for "

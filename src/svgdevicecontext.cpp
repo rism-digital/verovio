@@ -29,22 +29,6 @@
 
 namespace vrv {
 
-namespace {
-
-    // The root font-family is a list with fallbacks (e.g., "Times, Tinos, serif")
-    bool IsInFontFamilyList(const std::string &fontFamilyList, const std::string &family)
-    {
-        std::istringstream stream(fontFamilyList);
-        std::string item;
-        while (std::getline(stream, item, ',')) {
-            item.erase(0, item.find_first_not_of(' '));
-            if (item == family) return true;
-        }
-        return false;
-    }
-
-} // namespace
-
 #define space " "
 #define semicolon ";"
 
@@ -81,7 +65,7 @@ SvgDeviceContext::SvgDeviceContext(const std::string &docId) : DeviceContext(SVG
     m_facsimile = false;
     m_indent = 2;
     m_smuflTextFont = SMUFLTEXTFONT_embedded;
-    m_embedTextFont = false;
+    m_textEmbedFont = false;
     m_textAsPaths = false;
 
     // create the initial SVG element
@@ -266,7 +250,7 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         }
     }
     // add the text fonts if needed
-    if (m_embedTextFont) {
+    if (m_textEmbedFont) {
         for (const std::pair<const std::string, std::set<Resources::FaceStyle>> &font : m_textFontFaces) {
             this->IncludeTextFontFaces(font.first, font.second);
         }
@@ -607,7 +591,7 @@ void SvgDeviceContext::StartPage()
         // Prefer a widespread font with the same metrics, unless the text font is embedded
         std::string fontFamily = resources->GetTextFont() + ", serif";
         const std::string metricEquivalent = resources->GetTextFontMetricEquivalent();
-        if (!metricEquivalent.empty() && !m_embedTextFont) fontFamily = metricEquivalent + ", " + fontFamily;
+        if (!metricEquivalent.empty() && !m_textEmbedFont) fontFamily = metricEquivalent + ", " + fontFamily;
         m_currentNode.append_attribute("font-family") = fontFamily.c_str();
     }
     if (this->GetFacsimile()) {
@@ -1137,7 +1121,7 @@ void SvgDeviceContext::StartText(int x, int y, data_HORIZONTALALIGNMENT alignmen
     // Set the @font-family only if it is not the same as in the parent node
     pugi::xpath_node fontNode = m_currentNode.select_node("ancestor::*[@font-family][1]");
     const std::string currentFaceName = (fontNode) ? fontNode.node().attribute("font-family").value() : "";
-    if (!font->GetFaceName().empty() && !IsInFontFamilyList(currentFaceName, font->GetFaceName())) {
+    if (!font->GetFaceName().empty() && !SvgDeviceContext::IsInFontFamilyList(currentFaceName, font->GetFaceName())) {
         m_currentNode.append_attribute("font-family") = font->GetFaceName().c_str();
     }
     if (font->GetStyle() == FONTSTYLE_italic) {
@@ -1318,7 +1302,7 @@ void SvgDeviceContext::DrawTextAsTspan(const std::u32string &wtext, int x, int y
         m_textFontFaces[fontFaceName.empty() ? resources->GetTextFont() : fontFaceName].insert(
             Resources::GetFaceStyle(*font));
         // Set the @font-family only if it is not the same as in the parent node
-        if (!fontFaceName.empty() && !IsInFontFamilyList(currentFaceName, fontFaceName)) {
+        if (!fontFaceName.empty() && !SvgDeviceContext::IsInFontFamilyList(currentFaceName, fontFaceName)) {
             textChild.append_attribute("font-family") = fontFaceName.c_str();
         }
     }
@@ -1667,6 +1651,21 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
             m_currentNode = currentNode;
         }
     }
+}
+
+//----------------------------------------------------------------------------
+// Static methods
+//----------------------------------------------------------------------------
+
+bool SvgDeviceContext::IsInFontFamilyList(const std::string &fontFamilyList, const std::string &family)
+{
+    std::istringstream stream(fontFamilyList);
+    std::string item;
+    while (std::getline(stream, item, ',')) {
+        item.erase(0, item.find_first_not_of(' '));
+        if (item == family) return true;
+    }
+    return false;
 }
 
 } // namespace vrv

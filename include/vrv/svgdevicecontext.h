@@ -202,7 +202,7 @@ public:
     /**
      * Text styles cannot be left to CSS when text is rendered as paths, and are needed for embedding the faces used
      */
-    bool UseGlobalTextStyling() override { return this->UseGlobalStyling() && !m_textAsPaths && !m_embedTextFont; }
+    bool UseGlobalTextStyling() override { return this->UseGlobalStyling() && !m_textAsPaths && !m_textEmbedFont; }
 
     /**
      * Setting mm output flag (false by default)
@@ -286,7 +286,7 @@ public:
     /**
      * Setting the flag for embedding the text fonts used (false by default)
      */
-    void SetEmbedTextFont(bool embedTextFont) { m_embedTextFont = embedTextFont; }
+    void SetTextEmbedFont(bool textEmbedFont) { m_textEmbedFont = textEmbedFont; }
 
     /**
      * Setting the flag for rendering text as glyph paths instead of SVG text (false by default)
@@ -369,6 +369,15 @@ private:
     void DrawTextAsPaths(const std::u32string &wtext, int x, int y);
     void FinishTextLine();
     ///@}
+
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    /**
+     * Check if a family is in a font-family list with fallbacks (e.g., "Times, Tinos, serif")
+     */
+    static bool IsInFontFamilyList(const std::string &fontFamilyList, const std::string &family);
 
 public:
     //
@@ -463,7 +472,7 @@ private:
     // embedding of the smufl text font
     option_SMUFLTEXTFONT m_smuflTextFont;
     // embedding of the text fonts
-    bool m_embedTextFont;
+    bool m_textEmbedFont;
     // render text as glyph paths
     bool m_textAsPaths;
     // the document id

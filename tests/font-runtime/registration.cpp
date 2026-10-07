@@ -786,14 +786,14 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
     ok &= Expect(
         textSvg.find("href=\"#E050-") != std::string::npos, "music glyph ids did not keep the SMuFL code as prefix");
     ok &= Expect(textSvg.find("@font-face {font-family: 'Tinos'") == std::string::npos,
-        "text font was embedded without svgEmbedTextFont");
-    ok &= Expect(textRendering.SetOptions("{\"svgEmbedTextFont\":true}"), "text font embedding option was rejected");
+        "text font was embedded without svgTextEmbedFont");
+    ok &= Expect(textRendering.SetOptions("{\"svgTextEmbedFont\":true}"), "text font embedding option was rejected");
     const std::string embeddedSvg = textRendering.RenderToSVG(1);
     ok &= Expect(
         embeddedSvg.find("@font-face {font-family: 'Tinos'; src: url(data:font/woff2;base64,") != std::string::npos,
-        "svgEmbedTextFont did not embed the text font as base64");
+        "svgTextEmbedFont did not embed the text font as base64");
     ok &= Expect(embeddedSvg.find("format('woff2'); font-weight: bold; font-style: italic;}") != std::string::npos,
-        "svgEmbedTextFont did not embed the bold italic face used");
+        "svgTextEmbedFont did not embed the bold italic face used");
     ok &= Expect(embeddedSvg.find("font-family=\"Tinos, serif\"") != std::string::npos,
         "the embedded text font was not preferred over its metric equivalent");
     ok &= Expect(
@@ -807,13 +807,13 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
 </layer></staff><dir startid="#regular-note"><rend fontstyle="normal">text</rend></dir></measure></section>
 </score></mdiv></body></music></mei>)mei";
     ok &= Expect(regularTextRendering.SetResourcePath(argv[9])
-            && regularTextRendering.SetOptions("{\"svgEmbedTextFont\":true}")
+            && regularTextRendering.SetOptions("{\"svgTextEmbedFont\":true}")
             && regularTextRendering.LoadData(regularTextMei),
         "regular text MEI could not be loaded");
     const std::string regularTextSvg = regularTextRendering.RenderToSVG(1);
     ok &= Expect((CountOccurrences(regularTextSvg, "@font-face {font-family: 'Tinos'") == 1)
             && (regularTextSvg.find("font-weight: normal; font-style: normal;}") != std::string::npos),
-        "svgEmbedTextFont did not embed only the face used");
+        "svgTextEmbedFont did not embed only the face used");
 
     vrv::Toolkit musicTextRendering(false);
     const std::string musicTextMei = R"mei(<?xml version="1.0" encoding="UTF-8"?>

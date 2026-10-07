@@ -134,6 +134,13 @@ public:
      */
     static FaceStyle GetFaceStyle(const FontInfo &font);
 
+    /**
+     * Static method that looks for the SMuFL metadata file of a music font file.
+     * The metadata is looked for next to the font file and in the standard SMuFL locations.
+     * Return an empty string if it is not found.
+     */
+    static std::string FindSmuflMetadata(const std::string &fontFilename);
+
 private:
     std::string m_path;
     std::string m_fallbackFontName;

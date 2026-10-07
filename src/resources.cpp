@@ -10,6 +10,8 @@
 //----------------------------------------------------------------------------
 
 #include <cmath>
+#include <cstdlib>
+#include <filesystem>
 
 //----------------------------------------------------------------------------
 
@@ -296,6 +298,34 @@ Resources::FaceStyle Resources::GetFaceStyle(const FontInfo &font)
         ? FontStore::Style::Italic
         : FontStore::Style::Normal;
     return { weight, style };
+}
+
+std::string Resources::FindSmuflMetadata(const std::string &fontFilename)
+{
+    const std::filesystem::path fontPath(fontFilename);
+    const std::string stem = fontPath.stem().string();
+    std::vector<std::filesystem::path> candidates = { fontPath.parent_path() / (stem + ".json"),
+        fontPath.parent_path() / (stem + "_metadata.json"), fontPath.parent_path() / "metadata.json" };
+
+    // The standard locations of the SMuFL specification
+    std::vector<std::filesystem::path> roots
+        = { "/usr/local/share/SMuFL/Fonts", "/usr/share/SMuFL/Fonts", "/Library/Application Support/SMuFL/Fonts" };
+    if (const char *home = std::getenv("HOME")) {
+        roots.push_back(std::filesystem::path(home) / ".local/share/SMuFL/Fonts");
+        roots.push_back(std::filesystem::path(home) / "Library/Application Support/SMuFL/Fonts");
+    }
+    if (const char *commonFiles = std::getenv("COMMONPROGRAMFILES")) {
+        roots.push_back(std::filesystem::path(commonFiles) / "SMuFL/Fonts");
+    }
+    for (const std::filesystem::path &root : roots) {
+        candidates.push_back(root / stem / (stem + ".json"));
+        candidates.push_back(root / stem / (stem + "_metadata.json"));
+    }
+    for (const std::filesystem::path &candidate : candidates) {
+        std::error_code error;
+        if (std::filesystem::is_regular_file(candidate, error)) return candidate.string();
+    }
+    return "";
 }
 
 char32_t Resources::GetSmuflGlyphForUnicodeChar(const char32_t unicodeChar)
