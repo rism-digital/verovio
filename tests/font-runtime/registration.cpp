@@ -825,6 +825,23 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
         musicGlyphRendering.RenderToSVG(1).find("font-family=\"Leipzig\" font-style=\"normal\"") != std::string::npos,
         "the music glyph missing in the text font was not written with the music font");
 
+    // A glyph provided by two music fonts is defined twice, with a counter in the id of the second one
+    vrv::Toolkit twoFontsRendering(false);
+    const std::string twoFontsMei = R"mei(<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1"><music><body><mdiv><score>
+<scoreDef><staffGrp><staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="3" meter.unit="4"/>
+</staffGrp></scoreDef><section><measure n="1"><staff n="1"><layer n="1"><note pname="c" oct="5" dur="2" dots="1"/>
+</layer></staff></measure><measure n="2"><staff n="1"><layer n="1"><meterSig count="3" unit="4" fontname="VM"/>
+<note pname="d" oct="5" dur="2" dots="1"/></layer></staff></measure></section></score></mdiv></body></music></mei>)mei";
+    ok &= Expect(twoFontsRendering.SetResourcePath(argv[9])
+            && (twoFontsRendering.RegisterMusicFontFile(argv[12], argv[13], "VM") == "Verovio Test Music")
+            && twoFontsRendering.LoadData(twoFontsMei),
+        "two music fonts MEI could not be loaded");
+    const std::string twoFontsSvg = twoFontsRendering.RenderToSVG(1);
+    ok &= Expect((twoFontsSvg.find("id=\"E083-") != std::string::npos)
+            && (twoFontsSvg.find("id=\"E083-1-") != std::string::npos),
+        "a glyph used from two music fonts was not defined with distinct ids");
+
     const std::vector<unsigned char> testText = ReadFile(argv[11]);
     const std::vector<unsigned char> testMusic = ReadFile(argv[12]);
     const std::vector<unsigned char> testMusicMetadataBytes = ReadFile(argv[13]);
