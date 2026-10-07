@@ -498,6 +498,7 @@ void SvgDeviceContext::StartPage()
                           "g.dir, g.dynam, g.mNum {font-style:italic;}"
                           "g.label {font-weight:normal;} "
                           "ellipse, path, polygon, polyline, rect {stroke:currentColor} "
+                          "g.placeholder ellipse {display:none}"
                           "g.cursor {fill:dodgerblue; color:dodgerblue;} "
                           "g.cursor.chord {fill:limegreen; color:limegreen;} ";
         if (m_showHidden) {
