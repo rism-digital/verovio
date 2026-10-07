@@ -108,6 +108,7 @@ bool Resources::InitFonts()
             LogError("%s runtime font could not be loaded.", family.c_str());
             return false;
         }
+        m_musicFontSubsets[family] = FontStore::ReadFile(fontPath + family + "_subset.woff2");
     }
     for (const std::string style : { "Regular", "Italic", "Bold", "BoldItalic" }) {
         const std::vector<unsigned char> font = FontStore::ReadFile(fontPath + TINOS + "-" + style + ".woff2");
@@ -223,9 +224,20 @@ bool Resources::FontHasGlyphAvailable(const std::string &fontName, char32_t smuf
     return m_fontStore.GetGlyphMetrics(FontStore::Kind::Music, fontName, smuflCode).has_value();
 }
 
-bool Resources::IsBundledMusicFont(const std::string &fontName) const
+std::optional<FontStore::FontFile> Resources::GetMusicFontForEmbedding(
+    const std::string &fontName, std::string &bundledFile) const
 {
-    return (fontName == LEIPZIG) || (fontName == BRAVURA);
+    bundledFile.clear();
+    const std::map<std::string, std::vector<unsigned char>>::const_iterator subset = m_musicFontSubsets.find(fontName);
+    if ((subset != m_musicFontSubsets.end()) && !subset->second.empty()) {
+        bundledFile = fontName + "_subset.woff2";
+        return FontStore::FontFile{ FontStore::Weight::Normal, FontStore::Style::Normal, "woff2", "font/woff2",
+            subset->second };
+    }
+    // Other fonts are embedded entirely
+    const std::vector<FontStore::FontFile> files = m_fontStore.GetFontFiles(FontStore::Kind::Music, fontName);
+    if (files.empty()) return std::nullopt;
+    return files.front();
 }
 
 std::string Resources::GetTextFontMetricEquivalent() const

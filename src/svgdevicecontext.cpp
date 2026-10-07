@@ -154,24 +154,24 @@ void SvgDeviceContext::IncludeMusicTextFont(const std::string &fontname)
     const Resources *resources = this->GetResources(true);
     if (!resources) return;
 
+    std::string bundledFile;
+    const std::optional<FontStore::FontFile> file = resources->GetMusicFontForEmbedding(fontname, bundledFile);
+    if (!file) return;
+
+    std::string src;
     if (m_smuflTextFont == SMUFLTEXTFONT_linked) {
         // Only the bundled fonts are published on the website
-        if (resources->IsBundledMusicFont(fontname)) {
+        if (!bundledFile.empty()) {
             const std::string versionPath
                 = (VERSION_DEV) ? "develop" : StringFormat("%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION);
-            pugi::xml_node css = m_svgNode.append_child("style");
-            css.append_attribute("type") = "text/css";
-            css.text().set(StringFormat("@font-face {font-family: '%s'; src: "
-                                        "url(\"https://www.verovio.org/javascript/%s/data/fonts/%s.woff2\") "
-                                        "format('woff2');}",
-                fontname.c_str(), versionPath.c_str(), fontname.c_str())
-                    .c_str());
-            return;
+            src = StringFormat("url(\"https://www.verovio.org/javascript/%s/data/fonts/%s\")", versionPath.c_str(),
+                bundledFile.c_str());
         }
-        LogWarning("The music font '%s' cannot be linked and is embedded instead.", fontname.c_str());
+        else {
+            LogWarning("The music font '%s' cannot be linked and is embedded instead.", fontname.c_str());
+        }
     }
-
-    this->IncludeFontFaces(FontStore::Kind::Music, fontname);
+    this->AppendFontFace(fontname, *file, src);
 }
 
 void SvgDeviceContext::IncludeFontFaces(FontStore::Kind kind, const std::string &family)
@@ -179,15 +179,21 @@ void SvgDeviceContext::IncludeFontFaces(FontStore::Kind kind, const std::string 
     const Resources *resources = this->GetResources(true);
     if (!resources) return;
 
-    std::string cssContent;
     for (const FontStore::FontFile &file : resources->GetFontStore().GetFontFiles(kind, family)) {
-        // Not with StringFormat, which is limited in length
-        cssContent += "@font-face {font-family: '" + family + "'; src: url(data:" + file.m_mimeType + ";base64,"
-            + Base64Encode(file.m_data.data(), (unsigned int)file.m_data.size()) + ") format('" + file.m_format
-            + "'); font-weight: " + ((file.m_weight == FontStore::Weight::Bold) ? "bold" : "normal")
-            + "; font-style: " + ((file.m_style == FontStore::Style::Italic) ? "italic" : "normal") + ";} ";
+        this->AppendFontFace(family, file);
     }
-    if (cssContent.empty()) return;
+}
+
+void SvgDeviceContext::AppendFontFace(const std::string &family, const FontStore::FontFile &file, std::string src)
+{
+    // Not with StringFormat, which is limited in length
+    if (src.empty()) {
+        src = "url(data:" + file.m_mimeType + ";base64,"
+            + Base64Encode(file.m_data.data(), (unsigned int)file.m_data.size()) + ")";
+    }
+    const std::string cssContent = "@font-face {font-family: '" + family + "'; src: " + src + " format('"
+        + file.m_format + "'); font-weight: " + ((file.m_weight == FontStore::Weight::Bold) ? "bold" : "normal")
+        + "; font-style: " + ((file.m_style == FontStore::Style::Italic) ? "italic" : "normal") + ";}";
 
     pugi::xml_node css = m_svgNode.append_child("style");
     css.append_attribute("type") = "text/css";

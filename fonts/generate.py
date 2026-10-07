@@ -9,6 +9,7 @@ from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from pathlib import Path
 from typing import Optional
 
+from fontTools import subset  # type: ignore
 from fontTools.ttLib import TTFont  # type: ignore
 
 SVG_NS: dict = {"svg": "http://www.w3.org/2000/svg"}
@@ -125,7 +126,8 @@ def generate_smufl(opts: Namespace) -> bool:
 
 def bundle_font(opts: Namespace) -> bool:
     """
-    Creates the runtime files of a font bundled with Verovio: the WOFF2 font and its compacted SMuFL metadata.
+    Creates the runtime files of a font bundled with Verovio: the WOFF2 font, its compacted SMuFL
+    metadata, and a WOFF2 subset with the glyphs supported by Verovio, for embedding in the SVG.
 
     The WOFF2 font of the source directory is used when available. Otherwise, the OTF or TTF font is
     losslessly converted to WOFF2.
@@ -139,6 +141,7 @@ def bundle_font(opts: Namespace) -> bool:
     metadata_pth: Path = Path(font_data_pth, f"{fontname.lower()}_metadata.json")
     fonts_pth: Path = Path(opts.data, "fonts")
     woff2_out_pth: Path = Path(fonts_pth, f"{fontname}.woff2")
+    subset_out_pth: Path = Path(fonts_pth, f"{fontname}_subset.woff2")
     metadata_out_pth: Path = Path(fonts_pth, f"{fontname}_metadata.json")
 
     if not os.access(fonts_pth, os.W_OK):
@@ -162,6 +165,23 @@ def bundle_font(opts: Namespace) -> bool:
         font = TTFont(str(font_pth), recalcTimestamp=False)
         font.flavor = "woff2"
         font.save(str(woff2_out_pth))
+
+    log.debug("Writing the subset %s", subset_out_pth)
+    subset_options = subset.Options()
+    subset_options.flavor = "woff2"
+    subset_options.layout_features = []
+    subset_options.notdef_outline = True
+    # Hinting and subroutines only make the font larger for embedding
+    subset_options.hinting = False
+    subset_options.desubroutinize = True
+    subset_font = TTFont(str(font_pth), recalcTimestamp=False)
+    subsetter = subset.Subsetter(subset_options)
+    subsetter.populate(
+        unicodes=[int(code, 16) for code in __combine_alternates_and_supported(opts).keys()]
+    )
+    subsetter.subset(subset_font)
+    subset_font.flavor = "woff2"
+    subset_font.save(str(subset_out_pth))
 
     if not os.access(metadata_pth, os.R_OK):
         log.error("Could not read %s. Does it exist?", metadata_pth)
@@ -393,6 +413,7 @@ if __name__ == "__main__":
         "--data", help="Path to the Verovio data directory", default="../data"
     )
     parser_bundle.add_argument("--source", help="The font source parent directory", default="./")
+    parser_bundle.add_argument("--supported", help=supported_xml_help, default="./supported.xml")
     parser_bundle.set_defaults(func=bundle_font)
 
     svg_description = """

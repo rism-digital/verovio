@@ -9,6 +9,7 @@ Leipzig 5.2.102 is the bundled default SMuFL music font. It is developed in
 | --- | --- |
 | Bundled `Leipzig.woff2` | `c7db72b33a382d5589612c1f3176ccdf5a0c38231fa839806ff1367a6cc69fe6` |
 | Source `leipzig_metadata.json` | `5e5c534bf3195748473eeffe6c809145305788c7b804eb679b95365d9d908040` |
+| Bundled `Leipzig_subset.woff2` | `b774ca972521994128afb4d727c42526b9f08f480a5525df0f417bebb162aecc` |
 | Bundled `Leipzig_metadata.json` | `ad6f0732e5a803a6bba89a5c4f64cb03f7e5e494949ef062bfa934e8defa79d8` |
 
 Leipzig is licensed under the SIL Open Font License.
@@ -24,6 +25,7 @@ into Verovio by commit `5d15bf42a06478f3ae6d9115d7ff6c1ffd3b12a5`.
 | Source `Bravura.otf` | `dca2d90c88437a701b1c2e71fa54e76f9fa41d7deee935d74dc871ea66ecfdd2` |
 | Bundled `Bravura.woff2` | `a10e9fb553a823203beed6dfa6d0f02464ca943a59d1cab91cf581cc4c0783c0` |
 | Source `bravura_metadata.json` | `5c18a034a857c69be2720fe0cab655a17df934556b51925690789d5530c9881c` |
+| Bundled `Bravura_subset.woff2` | `fca2b9f3c11e320725e4a636e7ba844d10236ac1335b092fd04d572c5be09006` |
 | Bundled `Bravura_metadata.json` | `7083c7715937cf6a67f57463373a09bf1e9b0609906f8a7a20c56a9bf76b052e` |
 
 Bravura is licensed under the SIL Open Font License. Its copyright and
@@ -54,6 +56,10 @@ such as Bravura, is converted losslessly from its OTF source with fontTools,
 keeping the timestamp of the source for a deterministic output. The Tinos files
 are deterministic WOFF2 transcodes of the pinned static TTF sources. The fonts
 are not subset, so outlines, metrics, and shaping are unchanged.
+
+The `_subset.woff2` files contain only the glyphs supported by Verovio, without hinting. They are
+embedded in (or linked from) the SVG when the music font is used in text, which keeps the SVG
+smaller than with the complete font.
 
 The bundled metadata retains the font identity, version, engraving defaults,
 and all glyph anchors used at runtime while omitting large advance,

@@ -331,6 +331,11 @@ private:
     void IncludeFontFaces(FontStore::Kind kind, const std::string &family);
 
     /**
+     * Append a @font-face rule for a font file, which is embedded unless a source URL is given
+     */
+    void AppendFontFace(const std::string &family, const FontStore::FontFile &file, std::string src = "");
+
+    /**
      * Flush the data to the internal buffer.
      * Adds the xml tag if necessary and the <defs> from m_smuflGlyphs
      */

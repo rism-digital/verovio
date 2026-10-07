@@ -8,6 +8,7 @@
 #ifndef __VRV_RESOURCES_H__
 #define __VRV_RESOURCES_H__
 
+#include <map>
 #include <optional>
 #include <unordered_map>
 
@@ -63,8 +64,12 @@ public:
     ///@{
     /** Register the bundled Leipzig, Bravura, and Tinos faces */
     bool InitFonts();
-    /** Check if a music font is bundled with Verovio, in which case it is also published on the website */
-    bool IsBundledMusicFont(const std::string &fontName) const;
+    /**
+     * Return the font file of a music font for embedding in the SVG, which is a subset for the bundled fonts.
+     * The file name is given for the bundled fonts, which are also published on the website.
+     */
+    std::optional<FontStore::FontFile> GetMusicFontForEmbedding(
+        const std::string &fontName, std::string &bundledFile) const;
     /** Set the music fallback family, which has to be registered. Bravura remains the final fallback. */
     bool SetFallbackFont(const std::string &fontName);
     /** Get the fallback font name */
@@ -134,6 +139,9 @@ private:
 
     /** Runtime glyph records contain metrics only; outlines remain lazy in FontStore. */
     mutable std::unordered_map<uint64_t, std::unordered_map<int, Glyph>> m_runtimeGlyphs;
+
+    /** The subsets of the bundled music fonts with the glyphs supported by Verovio, for embedding */
+    std::map<std::string, std::vector<unsigned char>> m_musicFontSubsets;
 
     /** Runtime OpenType faces, metrics, outlines, and shaped text. */
     FontStore m_fontStore;

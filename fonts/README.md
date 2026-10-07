@@ -19,7 +19,8 @@ The `generate.py` script is a utility for working with font files and preparing 
 
 * `smufl` generates `include/vrv/smufl.h` and `src/smufl_names.inc` from `supported.xml`.
 * `check` reports the glyphs supported by Verovio that are missing in a font.
-* `bundle` generates the WOFF2 font and the compacted SMuFL metadata of a bundled font in `data/fonts`.
+* `bundle` generates the WOFF2 font, its subset with the supported glyphs for embedding in the SVG, and the
+  compacted SMuFL metadata of a bundled font in `data/fonts`.
 
 The `bundle` sub-command requires the `fonttools` and `brotli` modules in your Python environment.
 

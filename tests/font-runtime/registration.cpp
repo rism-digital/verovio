@@ -812,7 +812,7 @@ fontname="VH">phen</syl></verse><verse n="2"><syl wordpos="t" fontname="NoHyphen
         "the music font used in text was not embedded");
     ok &= Expect(musicTextRendering.SetOptions("{\"smuflTextFont\":\"linked\"}"), "smuflTextFont was rejected");
     ok &= Expect(
-        musicTextRendering.RenderToSVG(1).find("/data/fonts/Leipzig.woff2\") format('woff2')") != std::string::npos,
+        musicTextRendering.RenderToSVG(1).find("/data/fonts/Leipzig_subset.woff2\") format('woff2')") != std::string::npos,
         "the music font used in text was not linked");
 
     vrv::Toolkit musicGlyphRendering(false);
