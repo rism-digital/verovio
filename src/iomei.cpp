@@ -5178,13 +5178,15 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         UpgradeScoreDefElementTo_5_0(element);
     }
 
+    const bool convertAttributes = m_doc->GetOptions()->m_convertAttributes.GetValue();
+
     InstCleffingLog cleffingLog;
     cleffingLog.ReadCleffingLog(element);
     InstCleffingVis cleffingVis;
     cleffingVis.ReadCleffingVis(element);
     if (cleffingLog.HasClefShape()) {
         Clef *vrvClef = new Clef();
-        vrvClef->IsAttribute(!m_doc->GetOptions()->m_convertAttributes.GetValue());
+        vrvClef->IsAttribute(!convertAttributes);
         vrvClef->SetShape(cleffingLog.GetClefShape());
         vrvClef->SetLine(cleffingLog.GetClefLine());
         vrvClef->SetDis(cleffingLog.GetClefDis());
@@ -5204,7 +5206,7 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         || keySigDefaultLog.HasKeysig() || keySigDefaultVis.HasKeysigVisible()
         || keySigDefaultVis.HasKeysigCancelaccid()) {
         KeySig *vrvKeySig = new KeySig();
-        vrvKeySig->IsAttribute(!m_doc->GetOptions()->m_convertAttributes.GetValue());
+        vrvKeySig->IsAttribute(!convertAttributes);
         // Broken in MEI 4.0.2 - waiting for a fix
         // vrvKeySig->SetAccid(keySigDefaultAnl.GetKeyAccid());
         vrvKeySig->SetMode(keySigDefaultAnl.GetKeyMode());
@@ -5224,7 +5226,7 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
     if (mensuralShared.HasProlatio() || mensuralShared.HasTempus() || mensuralLog.HasProportNum()
         || mensuralLog.HasProportNumbase() || mensuralVis.HasMensurSign()) {
         Mensur *vrvMensur = new Mensur();
-        vrvMensur->IsAttribute(!m_doc->GetOptions()->m_convertAttributes.GetValue());
+        vrvMensur->IsAttribute(!convertAttributes);
         //
         vrvMensur->SetDot(mensuralVis.GetMensurDot());
         vrvMensur->SetNum(mensuralLog.GetProportNum());
@@ -5253,7 +5255,7 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
     meterSigDefaultVis.ReadMeterSigDefaultVis(element);
     if (meterSigDefaultLog.HasMeterCount() || meterSigDefaultLog.HasMeterSym() || meterSigDefaultLog.HasMeterUnit()) {
         MeterSig *vrvMeterSig = new MeterSig();
-        vrvMeterSig->IsAttribute(!m_doc->GetOptions()->m_convertAttributes.GetValue());
+        vrvMeterSig->IsAttribute(!convertAttributes);
         vrvMeterSig->SetCount(meterSigDefaultLog.GetMeterCount());
         vrvMeterSig->SetSym(meterSigDefaultLog.GetMeterSym());
         vrvMeterSig->SetUnit(meterSigDefaultLog.GetMeterUnit());
