@@ -3037,15 +3037,18 @@ void View::DrawSystemElement(DeviceContext *dc, SystemElement *element, System *
         dc->EndGraphic(element, this);
     }
     else if (element->Is(PB)) {
-        dc->StartGraphic(element, "", element->GetID());
+        dc->StartGraphic(element, "placeholder", element->GetID());
+        this->DrawPlaceholder(dc, element, system);
         dc->EndGraphic(element, this);
     }
     else if (element->Is(SB)) {
-        dc->StartGraphic(element, "", element->GetID());
+        dc->StartGraphic(element, "placeholder", element->GetID());
+        this->DrawPlaceholder(dc, element, system);
         dc->EndGraphic(element, this);
     }
     else if (element->Is(SECTION)) {
-        dc->StartGraphic(element, "systemMilestone", element->GetID());
+        dc->StartGraphic(element, "placeholder systemMilestone", element->GetID());
+        this->DrawPlaceholder(dc, element, system);
         dc->EndGraphic(element, this);
     }
 }
