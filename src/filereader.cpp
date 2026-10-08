@@ -21,6 +21,13 @@
 
 namespace vrv {
 
+bool InflateZlib(const unsigned char *source, size_t sourceLength, unsigned char *destination, size_t destinationLength)
+{
+    mz_ulong actualLength = static_cast<mz_ulong>(destinationLength);
+    const int status = mz_uncompress(destination, &actualLength, source, static_cast<mz_ulong>(sourceLength));
+    return (status == MZ_OK) && (actualLength == destinationLength);
+}
+
 //----------------------------------------------------------------------------
 // ZipFileReader
 //----------------------------------------------------------------------------

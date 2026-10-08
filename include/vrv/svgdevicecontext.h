@@ -17,6 +17,7 @@
 //----------------------------------------------------------------------------
 
 #include "devicecontext.h"
+#include "fontstore.h"
 #include "object.h"
 #include "options.h"
 
@@ -200,6 +201,11 @@ public:
     bool UseGlobalStyling() override { return !m_mmOutput; }
 
     /**
+     * Text styles cannot be left to CSS when text is rendered as paths, and are needed for embedding the faces used
+     */
+    bool UseGlobalTextStyling() override { return this->UseGlobalStyling() && !m_textAsPaths && !m_textEmbedFont; }
+
+    /**
      * Setting mm output flag (false by default)
      */
     void SetMMOutput(bool mmOutput) { m_mmOutput = mmOutput; }
@@ -211,11 +217,6 @@ public:
      * Setting show hidden flag (false by default)
      */
     void SetShowHidden(bool showHidden) { m_showHidden = showHidden; }
-
-    /**
-     * Setting use Liberation flag (false by default)
-     */
-    void SetUseLiberation(bool useLiberation) { m_useLiberation = useLiberation; }
 
     /**
      * Setting m_svgBoudingBoxes flag (false by default)
@@ -283,6 +284,16 @@ public:
      */
     void SetSmuflTextFont(option_SMUFLTEXTFONT smuflTextFont) { m_smuflTextFont = smuflTextFont; }
 
+    /**
+     * Setting the flag for embedding the text fonts used (false by default)
+     */
+    void SetTextEmbedFont(bool textEmbedFont) { m_textEmbedFont = textEmbedFont; }
+
+    /**
+     * Setting the flag for rendering text as glyph paths instead of SVG text (false by default)
+     */
+    void SetTextAsPaths(bool textAsPaths) { m_textAsPaths = textAsPaths; }
+
 private:
     /**
      * Copy the content of a file to the output stream.
@@ -313,7 +324,17 @@ private:
     /**
      * Include the smufl text font either embedded or linked depending on m_smuflTextFont
      */
-    void IncludeTextFont(const std::string &fontname, const Resources *resources);
+    void IncludeMusicTextFont(const std::string &fontname);
+
+    /**
+     * Include the registered faces of a text font family used as base64 @font-face rules
+     */
+    void IncludeTextFontFaces(const std::string &family, const std::set<Resources::FaceStyle> &faceStyles);
+
+    /**
+     * Append a @font-face rule for a font file, which is embedded unless a source URL is given
+     */
+    void AppendFontFace(const std::string &family, const FontStore::FontFile &file, std::string src = "");
 
     /**
      * Flush the data to the internal buffer.
@@ -341,6 +362,24 @@ private:
      */
     void PrefixCssRules(std::string &rules);
 
+    /**
+     * @name Text output as SVG text or as glyph paths, depending on m_textAsPaths
+     */
+    ///@{
+    void DrawTextAsTspan(const std::u32string &wtext, int x, int y, int width, int height);
+    void DrawTextAsPaths(const std::u32string &wtext, int x, int y);
+    void FinishTextLine();
+    ///@}
+
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    /**
+     * Check if a family is in a font-family list with fallbacks (e.g., "Times, Tinos, serif")
+     */
+    static bool IsInFontFamilyList(const std::string &fontFamilyList, const std::string &family);
+
 public:
     //
 private:
@@ -366,6 +405,14 @@ private:
     int m_originX, m_originY;
     /** Current text baseline, used to express vertical moves as relative SVG dy values. */
     int m_textY;
+    /** The text font families used, with the faces used, for embedding them in Commit() */
+    std::map<std::string, std::set<Resources::FaceStyle>> m_textFontFaces;
+    // Text cursor and current line when text is rendered as paths
+    double m_textCursorX;
+    int m_textCursorY;
+    double m_textLineWidth;
+    data_HORIZONTALALIGNMENT m_textAlignment;
+    pugi::xml_node m_textLineNode;
 
     // Here we hold references to all different glyphs used so far,
     // including any glyph for the same code but from different fonts.
@@ -403,8 +450,6 @@ private:
     bool m_showHidden;
     // facsimiler flag
     bool m_facsimile;
-    // use LiberationTextFont
-    bool m_useLiberation;
     // add bouding boxes in svg output
     bool m_svgBoundingBoxes;
     // add content bounding boxes in svg output
@@ -427,6 +472,10 @@ private:
     std::string m_glyphPostfixId;
     // embedding of the smufl text font
     option_SMUFLTEXTFONT m_smuflTextFont;
+    // embedding of the text fonts
+    bool m_textEmbedFont;
+    // render text as glyph paths
+    bool m_textAsPaths;
     // the document id
     std::string m_docId;
 };

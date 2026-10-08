@@ -36,6 +36,7 @@ ScoreDefInterface::ScoreDefInterface()
     , AttPianoPedals()
     , AttSpacing()
     , AttSystems()
+    , AttTextStyle()
 {
     this->RegisterInterfaceAttClass(ATT_BARRING);
     this->RegisterInterfaceAttClass(ATT_DURATIONDEFAULT);
@@ -48,6 +49,7 @@ ScoreDefInterface::ScoreDefInterface()
     this->RegisterInterfaceAttClass(ATT_PIANOPEDALS);
     this->RegisterInterfaceAttClass(ATT_SPACING);
     this->RegisterInterfaceAttClass(ATT_SYSTEMS);
+    this->RegisterInterfaceAttClass(ATT_TEXTSTYLE);
 
     this->Reset();
 }
@@ -67,6 +69,21 @@ void ScoreDefInterface::Reset()
     this->ResetPianoPedals();
     this->ResetSpacing();
     this->ResetSystems();
+    this->ResetTextStyle();
+}
+
+void ScoreDefInterface::MergeTextStyles(const ScoreDefInterface *other)
+{
+    assert(other);
+
+    if (other->HasLyricFam()) this->SetLyricFam(other->GetLyricFam());
+    if (other->HasLyricName()) this->SetLyricName(other->GetLyricName());
+    if (other->HasLyricStyle()) this->SetLyricStyle(other->GetLyricStyle());
+    if (other->HasLyricWeight()) this->SetLyricWeight(other->GetLyricWeight());
+    if (other->HasTextFam()) this->SetTextFam(other->GetTextFam());
+    if (other->HasTextName()) this->SetTextName(other->GetTextName());
+    if (other->HasTextStyle()) this->SetTextStyle(other->GetTextStyle());
+    if (other->HasTextWeight()) this->SetTextWeight(other->GetTextWeight());
 }
 
 } // namespace vrv

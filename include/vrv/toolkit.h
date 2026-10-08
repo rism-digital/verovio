@@ -162,6 +162,72 @@ public:
     bool LoadZipDataBuffer(const unsigned char *data, int length);
 
     /**
+     * Register a static OTF, TTF, WOFF, or WOFF2 text font from a byte buffer.
+     *
+     * @param fontData The font data
+     * @param fontLength The size of the font data
+     * @param alias An additional family name for the font (exact and case-sensitive); empty adds no alias
+     * @return The canonical family name, or an empty string on failure
+     */
+    std::string RegisterTextFont(const unsigned char *fontData, int fontLength, const std::string &alias = "");
+
+    /**
+     * Register a static OTF, TTF, WOFF, or WOFF2 SMuFL music font from a byte buffer.
+     *
+     * @param fontData The font data
+     * @param fontLength The size of the font data
+     * @param smuflMetadataJson The SMuFL font metadata as JSON
+     * @param alias An additional family name for the font (exact and case-sensitive); empty adds no alias
+     * @return The canonical family name, or an empty string on failure
+     */
+    std::string RegisterMusicFont(const unsigned char *fontData, int fontLength, const std::string &smuflMetadataJson,
+        const std::string &alias = "");
+
+    /**
+     * Register a static text font from base64-encoded font data.
+     *
+     * @param data The base64-encoded font data
+     * @param alias An additional family name for the font (exact and case-sensitive); empty adds no alias
+     * @return The canonical family name, or an empty string on failure
+     */
+    std::string RegisterTextFontBase64(const std::string &data, const std::string &alias = "");
+
+    /**
+     * Register a static SMuFL music font from base64-encoded font data.
+     *
+     * @param data The base64-encoded font data
+     * @param smuflMetadataJson The SMuFL font metadata as JSON
+     * @param alias An additional family name for the font (exact and case-sensitive); empty adds no alias
+     * @return The canonical family name, or an empty string on failure
+     */
+    std::string RegisterMusicFontBase64(
+        const std::string &data, const std::string &smuflMetadataJson, const std::string &alias = "");
+
+    /**
+     * Register a static text font from a file.
+     *
+     * @remark nojs
+     *
+     * @param filename The font filename
+     * @param alias An additional family name for the font (exact and case-sensitive); empty adds no alias
+     * @return The canonical family name, or an empty string on failure
+     */
+    std::string RegisterTextFontFile(const std::string &filename, const std::string &alias = "");
+
+    /**
+     * Register a static SMuFL music font and its metadata from files.
+     *
+     * @remark nojs
+     *
+     * @param filename The font filename
+     * @param smuflMetadataFilename The SMuFL metadata JSON filename
+     * @param alias An additional family name for the font (exact and case-sensitive); empty adds no alias
+     * @return The canonical family name, or an empty string on failure
+     */
+    std::string RegisterMusicFontFile(
+        const std::string &filename, const std::string &smuflMetadataFilename, const std::string &alias = "");
+
+    /**
      * Validate the Plaine & Easie code from a file.
      *
      * The method calls Toolkit::ValidatePAE.
@@ -796,6 +862,12 @@ protected:
 
 private:
     bool SetFont(const std::string &fontName);
+    /** Register the fonts of an option, given as FILE or as ALIAS=FILE */
+    bool RegisterFontsFromOption(const OptionArray &option, FontStore::Kind kind, bool withAlias);
+    /** Invalidate the layout if a font registration changed the fonts and return the family */
+    std::string FontRegistered(const std::string &family, uint64_t previousGeneration);
+    /** Redo the layout if it was invalidated by a font registration */
+    void EnsureFontLayout();
     bool IsUTF16(const std::string &filename);
     bool LoadUTF16File(const std::string &filename);
     bool IsZip(const std::string &filename);
@@ -854,6 +926,9 @@ private:
     std::streambuf *m_cerrOriginalBuf;
 
     EditorToolkit *m_editorToolkit;
+
+    /** Deferred invalidation when registered/selected fonts change after loading. */
+    bool m_fontLayoutInvalid;
 
 #ifndef NO_RUNTIME
     /** Measuring runtime */

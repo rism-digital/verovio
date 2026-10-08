@@ -355,9 +355,6 @@ void BBoxDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, 
 {
     assert(m_fontStack.top());
 
-    const Resources *resources = this->GetResources();
-    assert(resources);
-
     int g_x, g_y, g_w, g_h;
     int lastCharWidth = 0;
 
@@ -365,7 +362,7 @@ void BBoxDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, 
     if (setSmuflGlyph && (text.length() == 1)) smuflGlyph = text.at(0);
 
     for (char32_t c : text) {
-        const Glyph *glyph = resources->GetGlyph(c);
+        const Glyph *glyph = this->GetMusicGlyph(c);
         if (!glyph) {
             continue;
         }

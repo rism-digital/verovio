@@ -59,6 +59,10 @@ include_directories(
     ../include/vrv
     ../libmei/dist
     ../libmei/addons
+    ../external/harfbuzz/src
+    ../external/woff2/include
+    ../external/woff2/src
+    ../external/brotli/c/include
 )
 
 if(WIN32)
@@ -73,6 +77,17 @@ if(MSVC)
     add_definitions(-DUSE_PAE_OLD_PARSER)
     add_definitions(/std:c++20)
 else()
+    # Keep independently compiled runtime-font code removable when a build does
+    # not exercise every decoder or shaping entry point. This is particularly
+    # important for the HarfBuzz amalgamation, which is otherwise one large
+    # linker atom on native builds.
+    add_compile_options(-ffunction-sections -fdata-sections)
+    if(APPLE)
+        add_link_options(-Wl,-dead_strip)
+    else()
+        add_link_options(-Wl,--gc-sections)
+    endif()
+
     if(CMAKE_BUILD_TYPE MATCHES Debug)
         message(STATUS "Enabling debug information")
         add_definitions(-g)
@@ -82,7 +97,6 @@ else()
     # jsonxx raises -Wdollar-in-identifier-extension
     # gcc 8.3.1 does not like -Wdollar-in-identifier-extension option.
     add_definitions(-Wall -W -pedantic -Wno-unused-parameter -Wno-dollar-in-identifier-extension)
-    add_definitions(-std=c++20)
 
     # extra warnings similar to Xcode compiling settings (most probably covered by -Wall):
     # https://github.com/llvm-mirror/clang/blob/master/include/clang/Basic/DiagnosticGroups.td
@@ -201,7 +215,40 @@ set(all_SRC
     ${midi_SRC}
     ../src/json/jsonxx.cc
     ../src/pugi/pugixml.cpp
+    ../external/harfbuzz/src/verovio-harfbuzz.cc
+    ../external/woff2/src/verovio-woff2.cc
+    ../external/brotli/c/verovio-brotli.c
 )
+
+add_compile_definitions(BROTLI_STATIC)
+
+set_source_files_properties(../external/harfbuzz/src/verovio-harfbuzz.cc PROPERTIES
+    COMPILE_DEFINITIONS "HB_LEAN;HB_MINI;HB_OPTIMIZE_SIZE_MORE;HB_CONFIG_OVERRIDE_H=\"verovio-hb-config.h\""
+)
+
+set_source_files_properties(
+    ../external/woff2/src/verovio-woff2.cc
+    ../external/brotli/c/verovio-brotli.c
+)
+
+if(NOT MSVC)
+    set_source_files_properties(../external/harfbuzz/src/verovio-harfbuzz.cc PROPERTIES COMPILE_OPTIONS "-Oz")
+    set_source_files_properties(
+        ../external/woff2/src/verovio-woff2.cc
+        ../external/brotli/c/verovio-brotli.c
+        PROPERTIES COMPILE_OPTIONS "-Os"
+    )
+endif()
+
+if(EMSCRIPTEN)
+    # HarfBuzz promotes its own warnings from inside hb.hh, overriding command
+    # line controls on newer Clang. Keep the exception local to HarfBuzz.
+    set_property(SOURCE ../external/harfbuzz/src/verovio-harfbuzz.cc
+        APPEND PROPERTY COMPILE_DEFINITIONS
+        "HB_NO_PRAGMA_GCC_DIAGNOSTIC_ERROR;HB_NO_PRAGMA_GCC_DIAGNOSTIC_WARNING")
+    set_property(SOURCE ../external/harfbuzz/src/verovio-harfbuzz.cc
+        APPEND PROPERTY COMPILE_OPTIONS "-Wno-unused-template;-Wno-format-pedantic")
+endif()
 
 ##################
 # Shared library #
@@ -321,6 +368,7 @@ if (BUILD_AS_PYTHON)
         DIRECTORY ../data/
         DESTINATION verovio/data
         FILES_MATCHING PATTERN "*.xml" PATTERN "*.svg" PATTERN "*.css" PATTERN "*.json"
+            PATTERN "*.otf" PATTERN "*.ttf" PATTERN "*.woff2" PATTERN "*.txt" PATTERN "*.pb" PATTERN "*.md"
     )
 else()
     install(TARGETS verovio
@@ -337,6 +385,7 @@ else()
         DIRECTORY ../data/
         DESTINATION share/verovio
         FILES_MATCHING PATTERN "*.xml" PATTERN "*.svg" PATTERN "*.css" PATTERN "*.json"
+            PATTERN "*.otf" PATTERN "*.ttf" PATTERN "*.woff2" PATTERN "*.txt" PATTERN "*.pb" PATTERN "*.md"
     )
 endif()
 

@@ -3368,6 +3368,7 @@ void MEIOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
     interface->WriteOctaveDefault(element);
     interface->WritePianoPedals(element);
     interface->WriteSpacing(element);
+    interface->WriteTextStyle(element);
     interface->WriteSystems(element);
 }
 
@@ -8119,6 +8120,7 @@ bool MEIInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *
     interface->ReadOctaveDefault(element);
     interface->ReadPianoPedals(element);
     interface->ReadSpacing(element);
+    interface->ReadTextStyle(element);
     interface->ReadSystems(element);
     return true;
 }

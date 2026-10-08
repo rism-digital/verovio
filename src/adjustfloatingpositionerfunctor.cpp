@@ -11,6 +11,7 @@
 
 #include "doc.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "system.h"
 
 //----------------------------------------------------------------------------
@@ -37,9 +38,10 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitStaffAlignment(StaffAlignment
     if (m_classId == SYL) {
         const bool verseCollapse = m_doc->GetOptions()->m_lyricVerseCollapse.GetValue();
         if (staffAlignment->GetVerseCount(verseCollapse) > 0) {
-            FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staffAlignment->GetStaff()->m_drawingStaffSize);
-            int verseHeight = m_doc->GetTextGlyphHeight(L'I', lyricFont, false)
-                - m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
+            Staff *staff = staffAlignment->GetStaff();
+            FontInfo lyricFont = m_doc->GetDrawingTextFont(staff->m_drawingStaffSize, staff->m_drawingStaffDef, true);
+            int verseHeight = m_doc->GetTextGlyphHeight(L'I', &lyricFont, false)
+                - m_doc->GetTextGlyphDescender(L'q', &lyricFont, false);
             verseHeight *= m_doc->GetOptions()->m_lyricHeightFactor.GetValue();
             if (staffAlignment->GetVerseCountAbove(verseCollapse)) {
                 int margin = m_doc->GetTopMargin(SYL) * drawingUnit;

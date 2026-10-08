@@ -81,6 +81,7 @@ Toolkit::Toolkit(bool initFont)
     m_options = m_doc.GetOptions();
 
     m_editorToolkit = NULL;
+    m_fontLayoutInvalid = false;
 
 #ifndef NO_RUNTIME
     m_runtimeClock = NULL;
@@ -123,20 +124,55 @@ bool Toolkit::SetResourcePath(const std::string &path)
     Resources &resources = m_doc.GetResourcesForModification();
     resources.SetPath(path);
     bool success = resources.InitFonts();
-    if (m_options->m_fontAddCustom.IsSet()) {
-        success = success && resources.AddCustom(m_options->m_fontAddCustom.GetValue());
-    }
+    success = this->RegisterFontsFromOption(m_options->m_fontAddText, FontStore::Kind::Text, false) && success;
+    success = this->RegisterFontsFromOption(m_options->m_fontAddMusic, FontStore::Kind::Music, false) && success;
+    success = this->RegisterFontsFromOption(m_options->m_fontAddTextAs, FontStore::Kind::Text, true) && success;
+    success = this->RegisterFontsFromOption(m_options->m_fontAddMusicAs, FontStore::Kind::Music, true) && success;
     if (m_options->m_font.IsSet()) {
         success = success && this->SetFont(m_options->m_font.GetValue());
     }
     if (m_options->m_fontFallback.IsSet()) {
-        resources.SetFallbackFont(m_options->m_fontFallback.GetStrValue());
+        success = success && resources.SetFallbackFont(m_options->m_fontFallback.GetValue());
     }
-    if (m_options->m_fontLoadAll.IsSet()) {
-        success = success && resources.LoadAll();
+    if (m_options->m_fontText.IsSet()) {
+        success = success && resources.SetTextFont(m_options->m_fontText.GetValue());
     }
-    if (m_options->m_fontTextLiberation.IsSet()) {
-        resources.UseLiberationTextFont(m_options->m_fontTextLiberation.GetValue());
+    return success;
+}
+
+bool Toolkit::RegisterFontsFromOption(const OptionArray &option, FontStore::Kind kind, bool withAlias)
+{
+    bool success = true;
+    for (const std::string &value : option.GetValue()) {
+        std::string filename = value;
+        std::string alias;
+        if (withAlias) {
+            const size_t separator = value.find('=');
+            if ((separator == std::string::npos) || (separator == 0) || (separator + 1 == value.size())) {
+                LogError("Option '%s' expects ALIAS=FILE, received '%s'.", option.GetKey().c_str(), value.c_str());
+                success = false;
+                continue;
+            }
+            alias = value.substr(0, separator);
+            filename = value.substr(separator + 1);
+        }
+        std::string family;
+        if (kind == FontStore::Kind::Text) {
+            family = this->RegisterTextFontFile(filename, alias);
+        }
+        else {
+            const std::string metadata = Resources::FindSmuflMetadata(filename);
+            if (metadata.empty()) {
+                LogError("No SMuFL metadata was found for music font '%s'.", filename.c_str());
+                success = false;
+                continue;
+            }
+            family = this->RegisterMusicFontFile(filename, metadata, alias);
+        }
+        if (family.empty()) {
+            LogError("Font '%s' could not be registered.", filename.c_str());
+            success = false;
+        }
     }
     return success;
 }
@@ -144,8 +180,9 @@ bool Toolkit::SetResourcePath(const std::string &path)
 bool Toolkit::SetFont(const std::string &fontName)
 {
     Resources &resources = m_doc.GetResourcesForModification();
-    const bool ok = resources.SetCurrentFont(fontName, true);
-    if (!ok) LogWarning("Font '%s' could not be loaded", fontName.c_str());
+    const bool ok = resources.SetCurrentFont(fontName);
+    if (!ok) LogWarning("Font '%s' is not registered", fontName.c_str());
+    if (ok && (this->GetPageCount() > 0)) m_fontLayoutInvalid = true;
     return ok;
 }
 
@@ -480,6 +517,60 @@ bool Toolkit::LoadZipDataBase64(const std::string &data)
 {
     std::vector<unsigned char> bytes = Base64Decode(data);
     return this->LoadZipData(bytes);
+}
+
+std::string Toolkit::RegisterTextFont(const unsigned char *fontData, int fontLength, const std::string &alias)
+{
+    FontStore &fontStore = m_doc.GetResourcesForModification().GetFontStoreForModification();
+    const uint64_t generation = fontStore.GetGeneration();
+    return this->FontRegistered(fontStore.RegisterTextFont(fontData, fontLength, alias), generation);
+}
+
+std::string Toolkit::RegisterMusicFont(
+    const unsigned char *fontData, int fontLength, const std::string &smuflMetadataJson, const std::string &alias)
+{
+    FontStore &fontStore = m_doc.GetResourcesForModification().GetFontStoreForModification();
+    const uint64_t generation = fontStore.GetGeneration();
+    return this->FontRegistered(
+        fontStore.RegisterMusicFont(fontData, fontLength, smuflMetadataJson, alias), generation);
+}
+
+std::string Toolkit::RegisterTextFontBase64(const std::string &data, const std::string &alias)
+{
+    const std::vector<unsigned char> bytes = Base64Decode(data);
+    return this->RegisterTextFont(bytes.data(), (int)bytes.size(), alias);
+}
+
+std::string Toolkit::RegisterMusicFontBase64(
+    const std::string &data, const std::string &smuflMetadataJson, const std::string &alias)
+{
+    const std::vector<unsigned char> bytes = Base64Decode(data);
+    return this->RegisterMusicFont(bytes.data(), (int)bytes.size(), smuflMetadataJson, alias);
+}
+
+std::string Toolkit::RegisterTextFontFile(const std::string &filename, const std::string &alias)
+{
+    const std::vector<unsigned char> bytes = FontStore::ReadFile(filename);
+    return this->RegisterTextFont(bytes.data(), (int)bytes.size(), alias);
+}
+
+std::string Toolkit::RegisterMusicFontFile(
+    const std::string &filename, const std::string &smuflMetadataFilename, const std::string &alias)
+{
+    const std::vector<unsigned char> metadata = FontStore::ReadFile(smuflMetadataFilename);
+    const std::vector<unsigned char> bytes = FontStore::ReadFile(filename);
+    return this->RegisterMusicFont(
+        bytes.data(), (int)bytes.size(), std::string(metadata.begin(), metadata.end()), alias);
+}
+
+std::string Toolkit::FontRegistered(const std::string &family, uint64_t previousGeneration)
+{
+    // The layout has to be redone if the registration changed the fonts
+    const FontStore &fontStore = m_doc.GetResources().GetFontStore();
+    if (!family.empty() && (fontStore.GetGeneration() != previousGeneration) && (this->GetPageCount() > 0)) {
+        m_fontLayoutInvalid = true;
+    }
+    return family;
 }
 
 bool Toolkit::LoadZipDataBuffer(const unsigned char *data, int length)
@@ -929,6 +1020,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
 
     delete input;
     this->SetViewAndEditor();
+    m_fontLayoutInvalid = false;
 
     return true;
 }
@@ -1260,25 +1352,33 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
 
     this->SetLocale();
 
-    // Forcing font resource to be reset if the font is given in the options
-    if (json.has<jsonxx::Array>("fontAddCustom")) {
-        Resources &resources = m_doc.GetResourcesForModification();
-        resources.AddCustom(m_options->m_fontAddCustom.GetValue());
+    // Register the fonts and select them if given in the options
+    if (json.has<jsonxx::Array>("fontAddText")) {
+        this->RegisterFontsFromOption(m_options->m_fontAddText, FontStore::Kind::Text, false);
+    }
+    if (json.has<jsonxx::Array>("fontAddMusic")) {
+        this->RegisterFontsFromOption(m_options->m_fontAddMusic, FontStore::Kind::Music, false);
+    }
+    if (json.has<jsonxx::Array>("fontAddTextAs")) {
+        this->RegisterFontsFromOption(m_options->m_fontAddTextAs, FontStore::Kind::Text, true);
+    }
+    if (json.has<jsonxx::Array>("fontAddMusicAs")) {
+        this->RegisterFontsFromOption(m_options->m_fontAddMusicAs, FontStore::Kind::Music, true);
     }
     if (json.has<jsonxx::String>("font")) {
         this->SetFont(m_options->m_font.GetValue());
     }
     if (json.has<jsonxx::String>("fontFallback")) {
         Resources &resources = m_doc.GetResourcesForModification();
-        resources.SetFallbackFont(m_options->m_fontFallback.GetStrValue());
+        if (resources.SetFallbackFont(m_options->m_fontFallback.GetValue()) && (this->GetPageCount() > 0)) {
+            m_fontLayoutInvalid = true;
+        }
     }
-    if (json.has<jsonxx::Boolean>("fontLoadAll")) {
+    if (json.has<jsonxx::String>("fontText")) {
         Resources &resources = m_doc.GetResourcesForModification();
-        resources.LoadAll();
-    }
-    if (json.has<jsonxx::Boolean>("fontTextLiberation")) {
-        Resources &resources = m_doc.GetResourcesForModification();
-        resources.UseLiberationTextFont(m_options->m_fontTextLiberation.GetValue());
+        if (resources.SetTextFont(m_options->m_fontText.GetValue()) && (this->GetPageCount() > 0)) {
+            m_fontLayoutInvalid = true;
+        }
     }
 
     // If changing midi options, reset the MIDI doc
@@ -1673,6 +1773,7 @@ void Toolkit::RedoPagePitchPosLayout()
 
 bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
 {
+    this->EnsureFontLayout();
     if (pageNo > this->GetPageCount()) {
         LogWarning("Page %d does not exist", pageNo);
         return false;
@@ -1740,6 +1841,7 @@ std::string Toolkit::RenderData(const std::string &data, const std::string &json
 std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
 {
     this->ResetLogBuffer();
+    this->EnsureFontLayout();
 
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
@@ -1779,21 +1881,26 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
         svg.SetSvgViewBox(true);
     }
 
-    if (m_options->m_fontTextLiberation.GetValue()) {
-        svg.SetUseLiberation(true);
-    }
-
     svg.SetHtml5(m_options->m_svgHtml5.GetValue());
     svg.SetFormatRaw(m_options->m_svgFormatRaw.GetValue());
     svg.SetRemoveXlink(m_options->m_svgRemoveXlink.GetValue());
     svg.SetAdditionalAttributes(m_options->m_svgAdditionalAttribute.GetValue());
     svg.SetSmuflTextFont((option_SMUFLTEXTFONT)m_options->m_smuflTextFont.GetValue());
+    svg.SetTextEmbedFont(m_options->m_svgTextEmbedFont.GetValue());
+    svg.SetTextAsPaths(m_options->m_svgTextAsPaths.GetValue());
 
     // render the page
     this->RenderToDeviceContext(pageNo, &svg);
 
     std::string out_str = svg.GetStringSVG(xmlDeclaration);
     return out_str;
+}
+
+void Toolkit::EnsureFontLayout()
+{
+    if (!m_fontLayoutInvalid || (this->GetPageCount() == 0)) return;
+    this->RedoLayout();
+    m_fontLayoutInvalid = false;
 }
 
 bool Toolkit::RenderToSVGFile(const std::string &filename, int pageNo)

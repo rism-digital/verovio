@@ -46,6 +46,25 @@ createVerovioModule().then(VerovioModule => {
 
 This is the recommended way to use Verovio when creating a website or web app with bundlers like webpack or Vite or when using JavaScript frameworks like React or Vue.js.
 
+## Runtime font aliases
+
+WebAssembly cannot read arbitrary fonts installed on the user's computer.
+Fetch a static font as application data and register its bytes explicitly. An
+optional alias links the family name used by the MEI to the font's canonical
+OpenType family without duplicating the font or its glyph caches:
+
+```js
+const response = await fetch('/fonts/Quicksand-Regular.woff2');
+const bytes = new Uint8Array(await response.arrayBuffer());
+
+const canonicalFamily = verovioToolkit.registerTextFont(bytes, 'QS');
+// canonicalFamily is "Quicksand"; <rend fontname="QS"> now uses this face.
+```
+
+`registerMusicFont(bytes, smuflMetadata, alias)`, and the corresponding base64
+methods, accept the same optional final alias. Aliases are exact and
+case-sensitive.
+
 ## Usage with CommonJS
 
 Alternatively this package also exports a version compatible with CommonJS
@@ -62,4 +81,3 @@ Since version 3.11.0 the npm package provides an additional module with Humdrum 
 ```js
 import createVerovioModule from 'verovio/wasm-hum';
 ```
-

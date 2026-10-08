@@ -39,7 +39,8 @@ class ScoreDefInterface : public Interface,
                           public AttOctaveDefault,
                           public AttPianoPedals,
                           public AttSpacing,
-                          public AttSystems {
+                          public AttSystems,
+                          public AttTextStyle {
 public:
     /**
      * @name Constructors, destructors, reset methods
@@ -51,6 +52,11 @@ public:
     void Reset() override;
     InterfaceId IsInterface() const override { return INTERFACE_SCOREDEF; }
     ///@}
+
+    /**
+     * Set the lyric and text style attributes given in another interface
+     */
+    void MergeTextStyles(const ScoreDefInterface *other);
 
 private:
     //

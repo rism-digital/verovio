@@ -291,6 +291,8 @@ void ScoreDef::ReplaceDrawingValues(const ScoreDef *newScoreDef)
     m_insertScoreDef = false;
     m_setAsDrawing = true;
 
+    this->MergeTextStyles(newScoreDef);
+
     int redrawFlags = 0;
     const Clef *clef = NULL;
     const KeySig *keySig = NULL;
@@ -321,7 +323,8 @@ void ScoreDef::ReplaceDrawingValues(const ScoreDef *newScoreDef)
         meterSig = newScoreDef->GetMeterSigCopy();
     }
 
-    ReplaceDrawingValuesInStaffDefFunctor replaceDrawingValuesInStaffDef(clef, keySig, mensur, meterSig, meterSigGrp);
+    ReplaceDrawingValuesInStaffDefFunctor replaceDrawingValuesInStaffDef(
+        clef, keySig, mensur, meterSig, meterSigGrp, newScoreDef);
     this->Process(replaceDrawingValuesInStaffDef);
 
     if (mensur) delete mensur;
@@ -339,6 +342,7 @@ void ScoreDef::ReplaceDrawingValues(const StaffDef *newStaffDef)
 
     // if found, replace attributes
     if (staffDef) {
+        staffDef->MergeTextStyles(newStaffDef);
         if (newStaffDef->HasClefInfo()) {
             staffDef->SetDrawClef(true);
             const Clef *clef = newStaffDef->GetClef();
