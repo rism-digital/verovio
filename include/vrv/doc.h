@@ -523,6 +523,15 @@ public:
     bool IsCastOff() const { return m_isCastOff; }
 
     /**
+     * Set the cast off flags (i.e., when loading page-based MEI).
+     */
+    void MarkAsCastOff()
+    {
+        m_isCastOff = true;
+        m_mensuralCastOff = this->IsMensuralMusicOnly();
+    }
+
+    /**
      * @name Methods for managing a selection.
      */
     ///@{
