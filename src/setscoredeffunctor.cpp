@@ -29,40 +29,22 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 ReplaceDrawingValuesInStaffDefFunctor::ReplaceDrawingValuesInStaffDefFunctor(const Clef *clef, const KeySig *keySig,
-    const Mensur *mensur, const MeterSig *meterSig, const MeterSigGrp *meterSigGrp, const ScoreDef *newScoreDef,
-    int &redrawFlags)
+    const Mensur *mensur, const MeterSig *meterSig, const MeterSigGrp *meterSigGrp)
     : Functor()
 {
-    assert(newScoreDef);
-
     m_clef = clef;
     m_keySig = keySig;
     m_mensur = mensur;
     m_meterSig = meterSig;
     m_meterSigGrp = meterSigGrp;
-    m_newScoreDef = newScoreDef;
-    m_redrawFlags = &redrawFlags;
 }
 
 FunctorCode ReplaceDrawingValuesInStaffDefFunctor::VisitStaffDef(StaffDef *staffDef)
 {
-    // Look at the values in the staffDef or the new ScoreDef
-    // We take into account only the keySig (see below)
-    const StaffDef *newStaffDef = m_newScoreDef->GetStaffDef(staffDef->GetN());
-
     if (m_clef) {
         staffDef->SetCurrentClef(m_clef);
     }
-    // Look at staffDef only for keySig
-    if (newStaffDef && newStaffDef->HasKeySigInfo()) {
-        const KeySig *keySig = newStaffDef->GetKeySig();
-        assert(keySig);
-        if (!keySig->HasCancelaccid() || (keySig->GetCancelaccid() != CANCELACCID_none)) {
-            staffDef->SetCurrentKeySig(newStaffDef->GetKeySig());
-            (*m_redrawFlags) |= StaffDefRedrawFlags::REDRAW_KEYSIG;
-        }
-    }
-    else if (m_keySig) {
+    if (m_keySig) {
         staffDef->SetCurrentKeySig(m_keySig);
     }
     if (m_mensur) {
@@ -308,6 +290,13 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitScoreDef(ScoreDef *scoreDef)
         // Redraw the labels only if we already have a measure in the system. Otherwise this will be
         // done through the system scoreDef
         scoreDef->SetDrawLabels(m_hasMeasure);
+    }
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefSetCurrentFunctor::VisitScoreDefEnd(ScoreDef *scoreDef)
+{
+    if (scoreDef->IsSectionRestart()) {
         // If we have a previous measure, we need to set the cautionary scoreDef independently from the
         // presence of a system break
         if (m_previousMeasure) {
@@ -554,6 +543,13 @@ SetCautionaryScoreDefFunctor::SetCautionaryScoreDefFunctor(ScoreDef *currentScor
 
 FunctorCode SetCautionaryScoreDefFunctor::VisitLayer(Layer *layer)
 {
+    if (m_restart) {
+        // Do not show cautionary clef
+        // We still show meterSig and meterSigGrp without checking if they are the same or not
+        // Possible flag to be added to MEI unless we want to start comparing meterSig
+        m_currentStaffDef->SetDrawClef(false);
+    }
+
     layer->SetDrawingCautionValues(m_currentStaffDef);
     return FUNCTOR_SIBLINGS;
 }

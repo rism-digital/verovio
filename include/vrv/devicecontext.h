@@ -264,6 +264,7 @@ public:
     virtual void StartGraphic(Object *object, const std::string &gClass, const std::string &gId,
         GraphicID graphicID = PRIMARY, bool preprend = false) = 0;
     virtual void EndGraphic(Object *object, View *view) = 0;
+    virtual void AddGraphicClass(const std::string &className) {};
     ///@}
 
     /**

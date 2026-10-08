@@ -73,7 +73,8 @@ void AdjustTupletsYFunctor::AdjustTupletBracketY(Tuplet *tuplet, const Staff *st
     const data_STAFFREL_basic bracketPos = tuplet->GetDrawingBracketPos();
 
     // Default position is above or below the staff
-    const int staffBoundary = (bracketPos == STAFFREL_basic_above) ? 0 : -m_doc->GetDrawingStaffSize(staffSize);
+    const int staffHeight = (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize);
+    const int staffBoundary = (bracketPos == STAFFREL_basic_above) ? 0 : -staffHeight;
     const int bracketMidX = (tupletBracket->GetDrawingXLeft() + tupletBracket->GetDrawingXRight()) / 2;
     const Point referencePos(bracketMidX, staff->GetDrawingY() + staffBoundary);
 
@@ -171,7 +172,7 @@ void AdjustTupletsYFunctor::AdjustTupletNumY(Tuplet *tuplet, const Staff *staff)
     // The num is on its own
     const data_STAFFREL_basic numPos = tuplet->GetDrawingNumPos();
     const int numVerticalMargin = (numPos == STAFFREL_basic_above) ? doubleUnit : -doubleUnit;
-    const int staffHeight = m_doc->GetDrawingStaffSize(staffSize);
+    const int staffHeight = (tupletNumStaff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize);
     const int adjustedPosition = (numPos == STAFFREL_basic_above) ? 0 : -staffHeight;
     if (!beam) {
         tupletNum->SetDrawingYRel(adjustedPosition);
@@ -289,7 +290,7 @@ void AdjustTupletsYFunctor::AdjustTupletBracketBeamY(
     // Make sure that there are no overlaps with staff lines
     const int staffMargin = (bracketPos == STAFFREL_basic_above)
         ? yReference + doubleUnit
-        : yReference - m_doc->GetDrawingStaffSize(staffSize) - doubleUnit;
+        : yReference - (staff->m_drawingLines - 1) * doubleUnit - doubleUnit;
 
     const int leftMargin = sign * (staffMargin - bracket->GetDrawingYLeft());
     const int rightMargin = sign * (staffMargin - bracket->GetDrawingYRight());

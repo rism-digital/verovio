@@ -1694,6 +1694,36 @@ void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMe
     }
 }
 
+void View::DrawPlaceholder(DeviceContext *dc, Object *object, System *system)
+{
+    assert(object && object->GetParent());
+
+    if (object->GetParent() != system) return;
+
+    if (m_doc->GetOptions()->m_showHidden.GetValue()) dc->AddGraphicClass(CSS_SHOW_HIDDEN);
+
+    int x = 0;
+    int idx = object->GetIdx();
+    const Measure *measure = vrv_cast<const Measure *>(system->GetNext(object, MEASURE));
+    if (measure) {
+        x = measure->GetDrawingX();
+        idx = measure->GetIdx() - idx;
+    }
+    else {
+        measure = vrv_cast<const Measure *>(system->GetPrevious(object, MEASURE));
+        if (!measure) return;
+        x = measure->GetDrawingX() + measure->GetWidth();
+        idx = idx - measure->GetIdx();
+    }
+    idx--;
+    const int unit = m_doc->GetDrawingUnit(100);
+    const int y = system->GetDrawingY() + (unit * 3 * idx);
+    dc->SetPen(0, PEN_SOLID);
+    dc->DrawCircle(this->ToDeviceContextX(x), this->ToDeviceContextY(y), unit);
+    dc->ResetPen();
+    // this->DrawFilledRectangle(dc, x, system->GetDrawingY(), x + 100, system->GetDrawingY() - system->GetHeight());
+}
+
 //----------------------------------------------------------------------------
 // View - Children
 //----------------------------------------------------------------------------
@@ -1715,6 +1745,9 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
             ScoreDef *scoreDef = vrv_cast<ScoreDef *>(current);
             assert(scoreDef);
 
+            dc->StartGraphic(scoreDef, "placeholder", scoreDef->GetID());
+            this->DrawPlaceholder(dc, scoreDef, system);
+
             Measure *nextMeasure = vrv_cast<Measure *>(system->GetNext(scoreDef, MEASURE));
             if (nextMeasure && scoreDef->DrawLabels()) {
                 ScoreDef *scoreDefToDraw = scoreDef;
@@ -1728,6 +1761,8 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
                 this->DrawScoreDef(
                     dc, scoreDefToDraw, nextMeasure, nextMeasure->GetDrawingX(), NULL, false, false, noLabels);
             }
+
+            dc->EndGraphic(scoreDef, this);
 
             this->SetScoreDefDrawingWidth(dc, scoreDef);
         }
