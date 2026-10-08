@@ -228,6 +228,13 @@ export interface VerovioOptions {
     condenseTempoPages?: boolean;
 
     /**
+     * Convert analytical markup and attributes to permanent elements
+     *
+     * default: false
+     */
+    convertAttributes?: boolean;
+
+    /**
      * Align notes and rests without adding duration based space
      *
      * default: false

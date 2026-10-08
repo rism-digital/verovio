@@ -134,7 +134,8 @@ bool Tie::CalculatePosition(const Doc *doc, const Staff *staff, int x1, int x2, 
 {
     if (!doc || !staff) return false;
 
-    const int drawingUnit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int staffSize = staff->IsTabGuitar() ? staff->GetDrawingStaffNotationSize() : staff->m_drawingStaffSize;
+    const int drawingUnit = doc->GetDrawingUnit(staffSize);
     /************** parent layers **************/
 
     if ((spanningType != SPANNING_START_END) && (spanningType != SPANNING_START) && (spanningType != SPANNING_END)) {
@@ -223,8 +224,9 @@ bool Tie::CalculatePosition(const Doc *doc, const Staff *staff, int x1, int x2, 
 
     // adjust the 'height' of the bezier based on the width of staff lines to make sure that the tie does not overlap
     // with them
-    const int height = (1.6 - doc->GetOptions()->m_staffLineWidth.GetValue()) * drawingUnit;
+    int height = (1.6 - doc->GetOptions()->m_staffLineWidth.GetValue()) * drawingUnit;
     const int distance = endPoint.x - startPoint.x;
+    if (staff->IsTabGuitar()) height = std::min(height, std::max(drawingUnit / 2, distance / 2));
 
     // control points
     Point c1, c2;
@@ -352,6 +354,48 @@ bool Tie::CalculateXPosition(const Doc *doc, const Staff *staff, const Chord *st
     const Note *endNote = dynamic_cast<const Note *>(this->GetEnd());
     const int r1 = startNote ? startNote->GetDrawingRadius(doc) : 0;
     const int r2 = endNote ? endNote->GetDrawingRadius(doc) : 0;
+
+    if (staff->IsTabGuitar()) {
+        const int unit = doc->GetDrawingUnit(staff->GetDrawingStaffNotationSize());
+        const bool hasStart = startNote && (spanningType != SPANNING_END);
+        const bool hasEnd = endNote && (spanningType != SPANNING_START);
+
+        // The connector adds a notehead radius, but fret glyphs are centered on the note position.
+        if (hasStart) {
+            startPoint.x -= r1;
+            startPoint.y = startNote->GetDrawingY();
+        }
+        if (hasEnd) {
+            endPoint.x -= r2;
+            endPoint.y = endNote->GetDrawingY();
+        }
+        if (!hasStart) startPoint.y = endPoint.y;
+        if (!hasEnd) endPoint.y = startPoint.y;
+        if (spanningType == SPANNING_START)
+            endPoint.x -= (unit + doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize)) / 2;
+
+        const int startOffset = (hasStart && startNote->HasSelfHorizontalBB())
+            ? startNote->GetSelfRight() - startNote->GetDrawingX() + unit / 4
+            : 0;
+        const int endOffset = (hasEnd && endNote->HasSelfHorizontalBB())
+            ? endNote->GetDrawingX() - endNote->GetSelfLeft() + unit / 4
+            : 0;
+        if (endPoint.x - startPoint.x > startOffset + endOffset + unit) {
+            startPoint.x += startOffset;
+            endPoint.x -= endOffset;
+        }
+        else {
+            // For short ties, place the endpoints over the actual fret glyphs instead of phantom noteheads.
+            const bool above = (drawingCurveDir == curvature_CURVEDIR_above);
+            if (hasStart && startNote->HasSelfVerticalBB())
+                startPoint.y = above ? startNote->GetSelfTop() : startNote->GetSelfBottom();
+            if (hasEnd && endNote->HasSelfVerticalBB())
+                endPoint.y = above ? endNote->GetSelfTop() : endNote->GetSelfBottom();
+            if (!hasStart) startPoint.y = endPoint.y;
+            if (!hasEnd) endPoint.y = startPoint.y;
+        }
+        return false;
+    }
 
     // Vertical correction cannot be applied for chords
     const int drawingUnit = doc->GetDrawingUnit(staff->m_drawingStaffSize);

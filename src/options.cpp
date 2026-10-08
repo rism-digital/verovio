@@ -1024,6 +1024,10 @@ Options::Options()
     m_condenseTempoPages.Init(false);
     this->Register(&m_condenseTempoPages, "condenseTempoPages", &m_general);
 
+    m_convertAttributes.SetInfo("Convert attributes", "Convert analytical markup and attributes to permanent elements");
+    m_convertAttributes.Init(false);
+    this->Register(&m_convertAttributes, "convertAttributes", &m_general);
+
     m_evenNoteSpacing.SetInfo("Even note spacing", "Align notes and rests without adding duration based space");
     m_evenNoteSpacing.Init(false);
     this->Register(&m_evenNoteSpacing, "evenNoteSpacing", &m_general);
