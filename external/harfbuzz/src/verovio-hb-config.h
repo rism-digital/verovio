@@ -19,4 +19,8 @@
 #define HB_NO_STYLE
 #define HB_NO_VAR
 
+// The Windows-1256 Arabic fallback table is not vendored and would otherwise
+// be included on Windows.
+#define HB_NO_WIN1256
+
 #endif
