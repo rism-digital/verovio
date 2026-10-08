@@ -624,12 +624,22 @@ void MusicXmlInput::OpenTie(Note *note, Tie *tie, int layerNum)
 
 void MusicXmlInput::CloseTie(Note *note, int layerNum)
 {
-    // add all notes with identical pitch/oct to m_tieStopStack
+    // Add notes matching an open tie to m_tieStopStack.
     for (const musicxml::OpenTie &tie : m_tieStack) {
-        if (note->IsEnharmonicWith(tie.m_note)) {
+        if (this->MatchTieNotes(tie.m_note, note)) {
             m_tieStopStack.push_back(musicxml::CloseTie(note, layerNum));
         }
     }
+}
+
+bool MusicXmlInput::MatchTieNotes(const Note *start, const Note *end) const
+{
+    // Staff drawing tuning is not initialized during import, so TAB MIDI pitches cannot be compared yet.
+    if (start->HasTabCourse() || end->HasTabCourse()) {
+        return start->HasTabCourse() && end->HasTabCourse() && start->HasTabFret() && end->HasTabFret()
+            && (start->GetTabCourse() == end->GetTabCourse()) && (start->GetTabFret() == end->GetTabFret());
+    }
+    return start->IsEnharmonicWith(end);
 }
 
 void MusicXmlInput::OpenSlur(Measure *measure, short int number, Slur *slur, curvature_CURVEDIR dir)
@@ -1902,12 +1912,15 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         measure->AddChild(mNum);
     }
 
+    pugi::xml_node attributes = node.child("attributes");
     for (int i = 0; i < nbStaves; ++i) {
         // the staff @n must take into account the staffOffset
         Staff *staff = new Staff();
         staff->SetN(i + 1 + staffOffset);
-        staff->SetVisible(
-            this->ConvertWordToBool(node.child("attributes").child("staff-details").attribute("print-object").value()));
+        std::string xpath = StringFormat("staff-details[@number='%d']", i + 1);
+        pugi::xpath_node staffDetails = attributes.select_node(xpath.c_str());
+        if (!staffDetails) staffDetails = attributes.select_node("staff-details[not(@number)]");
+        staff->SetVisible(this->ConvertWordToBool(staffDetails.node().attribute("print-object").value()));
         measure->AddChild(staff);
         // layers will be added in SelectLayer
     }
@@ -2042,9 +2055,9 @@ void MusicXmlInput::MatchTies(bool matchLayers)
         bool tieMatched = false;
         std::vector<musicxml::CloseTie>::iterator jter;
         for (jter = m_tieStopStack.begin(); jter != m_tieStopStack.end(); ++jter) {
-            // match tie stop with pitch/oct identity, with start note earlier than end note,
+            // Match a tie stop to the same pitch or TAB position, with start note earlier than end note,
             // and with earliest end note.
-            if ((iter->m_note->IsEnharmonicWith(jter->m_note))
+            if (this->MatchTieNotes(iter->m_note, jter->m_note)
                 && (iter->m_note->GetScoreTimeOnset() < jter->m_note->GetScoreTimeOnset())
                 && (!matchLayers || (iter->m_layerNum == jter->m_layerNum))) {
                 iter->m_tie->SetEndid("#" + jter->m_note->GetID());
@@ -3554,9 +3567,6 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
         }
 
-        // ties
-        this->ReadMusicXmlTies(node, layer, note, measure);
-
         // articulation
         std::list<Artic *> artics;
         for (pugi::xml_node articulations : notations.node().children("articulations")) {
@@ -3676,6 +3686,9 @@ void MusicXmlInput::ReadMusicXmlNote(
                 }
             }
         }
+
+        // Read ties after technical notation has set the TAB course and fret.
+        this->ReadMusicXmlTies(node, layer, note, measure);
 
         // add the note to the layer or to the current container
         this->AddLayerElement(layer, note, duration);
@@ -4389,8 +4402,8 @@ void MusicXmlInput::ReadMusicXmlTies(const pugi::xml_node &node, Layer *layer, N
         if (tieType.empty()) {
             continue;
         }
-        else if (tieType == "stop") { // add to stack if (endTie) or if pitch/oct match to open tie on m_tieStack
-            if (!m_tieStack.empty() && note->IsEnharmonicWith(m_tieStack.back().m_note)
+        else if (tieType == "stop") { // Match the most recent open tie or defer matching.
+            if (!m_tieStack.empty() && this->MatchTieNotes(m_tieStack.back().m_note, note)
                 && (m_tieStack.back().m_layerNum == layer->GetN())) {
                 m_tieStack.back().m_tie->SetEndid("#" + note->GetID());
                 m_tieStack.pop_back();

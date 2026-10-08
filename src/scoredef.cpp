@@ -305,12 +305,8 @@ void ScoreDef::ReplaceDrawingValues(const ScoreDef *newScoreDef)
         clef = newScoreDef->GetClef();
     }
     if (newScoreDef->HasKeySigInfo()) {
-        const KeySig *newKeySig = newScoreDef->GetKeySig();
-        assert(newKeySig);
-        if (!newKeySig->HasCancelaccid() || (newKeySig->GetCancelaccid() != CANCELACCID_none)) {
-            keySig = newKeySig;
-            redrawFlags |= StaffDefRedrawFlags::REDRAW_KEYSIG;
-        }
+        redrawFlags |= StaffDefRedrawFlags::REDRAW_KEYSIG;
+        keySig = newScoreDef->GetKeySig();
     }
     if (newScoreDef->HasMensurInfo()) {
         redrawFlags |= StaffDefRedrawFlags::REDRAW_MENSUR;
@@ -328,7 +324,7 @@ void ScoreDef::ReplaceDrawingValues(const ScoreDef *newScoreDef)
     }
 
     ReplaceDrawingValuesInStaffDefFunctor replaceDrawingValuesInStaffDef(
-        clef, keySig, mensur, meterSig, meterSigGrp, newScoreDef, redrawFlags);
+        clef, keySig, mensur, meterSig, meterSigGrp, newScoreDef);
     this->Process(replaceDrawingValuesInStaffDef);
 
     if (mensur) delete mensur;

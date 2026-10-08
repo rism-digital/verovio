@@ -220,6 +220,7 @@ protected:
     void DrawLayerDefLabels(
         DeviceContext *dc, ScoreDef *scoreDef, Staff *staff, StaffDef *staffDef, int x, bool abbreviations = false);
     void DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMeasure);
+    void DrawPlaceholder(DeviceContext *dc, Object *object, System *system);
     ///@}
 
     /**
