@@ -645,15 +645,13 @@ public:
     ///@}
 
     jsonxx::Object ExportScoreDef();
-    jsonxx::Object ExportStaffGrp(const std::string &scoreDefId);
-    jsonxx::Object ExportStaffDef(const std::string &scoreDefId, const std::string &staffId);
-    jsonxx::Object ExportMeterSig(const std::string &scoreDefId);
-    jsonxx::Object ExportKeySig(const std::string &scoreDefId);
+    jsonxx::Object ExportStaffGrp(ScoreDef *scoreDef);
+    jsonxx::Object ExportStaffDef(ScoreDef *scoreDef, int staffN);
+    jsonxx::Object ExportMeterSig(ScoreDef *scoreDef);
+    jsonxx::Object ExportKeySig(ScoreDef *scoreDef);
 
 private:
     jsonxx::Object ToJson(const pugi::xml_document &doc);
-
-    ScoreDef *GetScoreDef(const std::string &scoreDefId);
 };
 
 //----------------------------------------------------------------------------
@@ -1094,9 +1092,9 @@ public:
 
     void ImportScoreDef(const jsonxx::Object &scoreDef);
 
-    void ImportStaffGrp(const jsonxx::Object &staffGrp);
+    void ImportStaffGrp(const jsonxx::Object &staffGrp, ScoreDef *scoreDef);
 
-    void ImportStaffDef(const jsonxx::Object &staffDef);
+    void ImportStaffDef(const jsonxx::Object &staffDef, ScoreDef *scoreDef, int staffN);
 
     void ImportMeterSigOrGrpIntoLayer(Layer *layer, const jsonxx::Object &meterSig);
 

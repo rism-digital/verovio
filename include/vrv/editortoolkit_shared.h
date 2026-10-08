@@ -25,6 +25,8 @@
 namespace vrv {
 
 class EditorTreeObject;
+class ScoreDef;
+class Staff;
 
 //--------------------------------------------------------------------------------
 // EditorToolkitShared
@@ -53,28 +55,7 @@ protected:
 
     enum DeleteNavigation : int8_t { DELETE_NO_NAVIGATON = 0, DELETE_BACKSPACE, DELETE_FORWARD };
 
-    enum ScoreDefinitionLevel : int8_t {
-        LEVEL_SCOREDEF = 0,
-        LEVEL_STAFFGRP,
-        LEVEL_STAFFDEF,
-        LEVEL_METERSIG,
-        LEVEL_KEYSIG
-    };
-
-    enum ScoreDefinitionUpdate : int8_t {
-        UPDATE_SCOREDEF = 0,
-        UPDATE_STAFFGRP,
-        UPDATE_STAFFDEF,
-        UPDATE_METERSIG,
-        UPDATE_KEYSIG,
-        MOVE_UP,
-        MOVE_DOWN,
-        DELETE_STAFF,
-        INSERT_ABOVE,
-        INSERT_BELOW,
-        ADD_STAFFGRP,
-        REMOVE_STAFFGRP
-    };
+    enum ScoreDefUpdate : int8_t { INSERT_ABOVE = 0, INSERT_BELOW, MOVE_UP, MOVE_DOWN, DELETE_STAFF };
 
     /**
      * Parse JSON instructions for experimental editor functions.
@@ -91,7 +72,11 @@ protected:
     bool ParseInsertControlAction(
         const jsonxx::Object &param, std::string &elementName, std::string &startId, std::string &endId);
     bool ParseNavigate(const jsonxx::Object &param, std::string &elementId, int &direction);
-    bool ParseScoreDefinitionAction(const jsonxx::Object &param, ScoreDefinitionLevel &level);
+    bool ParseGetScoreDefAction(const jsonxx::Object &param);
+    bool ParseGetScoreDefKeySigAction(const jsonxx::Object &param, bool &selected);
+    bool ParseGetScoreDefMeterSigAction(const jsonxx::Object &param, bool &selected);
+    bool ParseGetScoreDefStaffDefAction(const jsonxx::Object &param);
+    bool ParseGetScoreDefStaffGrpAction(const jsonxx::Object &param, bool &selected);
     bool ParseResetCursorAction(const jsonxx::Object &param, bool &maintainChordMode);
     bool ParseSelectAction(const jsonxx::Object &param, std::string &elementId, bool &secondary, SelectCustom &custom);
     bool ParseSetAction(
@@ -102,8 +87,12 @@ protected:
         const jsonxx::Object &param, bool &restMode, bool &chordMode, Cursor::TieMode &tieMode, bool &autoBeam);
     bool ParseUpdatePitchAction(const jsonxx::Object &param, std::string &elementId, data_PITCHNAME &pname, int &oct,
         data_ACCIDENTAL_WRITTEN &accid, int &midi);
-    bool ParseUpdateScoreDefinitionAction(const jsonxx::Object &param, jsonxx::Object &subtree, std::string &elementId,
-        std::string &secondaryId, ScoreDefinitionUpdate &update);
+    bool ParseSetScoreDefAction(const jsonxx::Object &param, jsonxx::Object &subTree);
+    bool ParseSetScoreDefKeySigAction(const jsonxx::Object &param, bool &selected, jsonxx::Object &subTree);
+    bool ParseSetScoreDefMeterSigAction(const jsonxx::Object &param, bool &selected, jsonxx::Object &subTree);
+    bool ParseSetScoreDefStaffDefAction(const jsonxx::Object &param, jsonxx::Object &subTree);
+    bool ParseSetScoreDefStaffGrpAction(const jsonxx::Object &param, bool &selected, jsonxx::Object &subTree);
+    bool ParseUpdateScoreDefAction(const jsonxx::Object &param, ScoreDefUpdate &update);
 
     ///@}
 
@@ -141,9 +130,21 @@ protected:
     bool ContextForScores(bool updateResponse);
     bool ContextForSections(bool updateResponse);
 
-    bool ScoreDefinition(ScoreDefinitionLevel level);
-    bool UpdateScoreDefinition(
-        const jsonxx::Object &subTree, std::string &elementId, std::string &secondaryId, ScoreDefinitionUpdate update);
+    bool GetScoreDef();
+    bool GetScoreDefKeySig(bool selected);
+    bool GetScoreDefMeterSig(bool selected);
+    bool GetScoreDefStaffDef();
+    bool GetScoreDefStaffGrp(bool selected);
+    bool SetScoreDef(const jsonxx::Object &subTree);
+    bool SetScoreDefKeySig(bool selected, const jsonxx::Object &subTree);
+    bool SetScoreDefMeterSig(bool selected, const jsonxx::Object &subTree);
+    bool SetScoreDefStaffDef(const jsonxx::Object &subTree);
+    bool SetScoreDefStaffGrp(bool selected, const jsonxx::Object &subTree);
+    bool UpdateScoreDef(ScoreDefUpdate update);
+
+    ScoreDef *ResolveScoreDef(bool selected);
+    Staff *ResolveScoreDefStaff();
+    void FinalizeScoreDefUpdate();
 
     void ContextForObject(const Object *object, jsonxx::Object &element, bool recursive = false);
     void ContextForObjects(const ArrayOfConstObjects &objects, jsonxx::Array &siblings);

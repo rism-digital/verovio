@@ -264,10 +264,75 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         }
         LogWarning("Could not parse the navigate action");
     }
-    else if (action == "scoreDefinition") {
-        ScoreDefinitionLevel definitionLevel;
-        if (this->ParseScoreDefinitionAction(json.get<jsonxx::Object>("param"), definitionLevel)) {
-            return this->ScoreDefinition(definitionLevel);
+    else if (action == "getScoreDef") {
+        if (this->ParseGetScoreDefAction(json.get<jsonxx::Object>("param"))) return this->GetScoreDef();
+    }
+    else if (action == "getScoreDefKeySig") {
+        bool selected;
+        if (this->ParseGetScoreDefKeySigAction(json.get<jsonxx::Object>("param"), selected)) {
+            return this->GetScoreDefKeySig(selected);
+        }
+    }
+    else if (action == "getScoreDefMeterSig") {
+        bool selected;
+        if (this->ParseGetScoreDefMeterSigAction(json.get<jsonxx::Object>("param"), selected)) {
+            return this->GetScoreDefMeterSig(selected);
+        }
+    }
+    else if (action == "getScoreDefStaffDef") {
+        if (this->ParseGetScoreDefStaffDefAction(json.get<jsonxx::Object>("param"))) {
+            return this->GetScoreDefStaffDef();
+        }
+    }
+    else if (action == "getScoreDefStaffGrp") {
+        bool selected;
+        if (this->ParseGetScoreDefStaffGrpAction(json.get<jsonxx::Object>("param"), selected)) {
+            return this->GetScoreDefStaffGrp(selected);
+        }
+    }
+    else if (action == "setScoreDef") {
+        jsonxx::Object subTree;
+        if (this->ParseSetScoreDefAction(json.get<jsonxx::Object>("param"), subTree)) {
+            this->PrepareUndo();
+            return this->SetScoreDef(subTree);
+        }
+    }
+    else if (action == "setScoreDefKeySig") {
+        bool selected;
+        jsonxx::Object subTree;
+        if (this->ParseSetScoreDefKeySigAction(json.get<jsonxx::Object>("param"), selected, subTree)) {
+            this->PrepareUndo();
+            return this->SetScoreDefKeySig(selected, subTree);
+        }
+    }
+    else if (action == "setScoreDefMeterSig") {
+        bool selected;
+        jsonxx::Object subTree;
+        if (this->ParseSetScoreDefMeterSigAction(json.get<jsonxx::Object>("param"), selected, subTree)) {
+            this->PrepareUndo();
+            return this->SetScoreDefMeterSig(selected, subTree);
+        }
+    }
+    else if (action == "setScoreDefStaffDef") {
+        jsonxx::Object subTree;
+        if (this->ParseSetScoreDefStaffDefAction(json.get<jsonxx::Object>("param"), subTree)) {
+            this->PrepareUndo();
+            return this->SetScoreDefStaffDef(subTree);
+        }
+    }
+    else if (action == "setScoreDefStaffGrp") {
+        bool selected;
+        jsonxx::Object subTree;
+        if (this->ParseSetScoreDefStaffGrpAction(json.get<jsonxx::Object>("param"), selected, subTree)) {
+            this->PrepareUndo();
+            return this->SetScoreDefStaffGrp(selected, subTree);
+        }
+    }
+    else if (action == "updateScoreDef") {
+        ScoreDefUpdate update;
+        if (this->ParseUpdateScoreDefAction(json.get<jsonxx::Object>("param"), update)) {
+            this->PrepareUndo();
+            return this->UpdateScoreDef(update);
         }
     }
     else if (action == "resetCursor") {
@@ -331,16 +396,6 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
             return (this->UpdatePitch(elementId, pname, oct, accid, midi));
         }
         LogWarning("Could not parse the updatePitch action");
-    }
-    else if (action == "updateScoreDefinition") {
-        jsonxx::Object subTree;
-        std::string elementId, secondaryId;
-        ScoreDefinitionUpdate update;
-        if (this->ParseUpdateScoreDefinitionAction(
-                json.get<jsonxx::Object>("param"), subTree, elementId, secondaryId, update)) {
-            this->PrepareUndo();
-            return this->UpdateScoreDefinition(subTree, elementId, secondaryId, update);
-        }
     }
     else {
         LogWarning("Unknown action type '%s'.", action.c_str());
@@ -456,28 +511,34 @@ bool EditorToolkitShared::ParseResetCursorAction(const jsonxx::Object &param, bo
     return true;
 }
 
-bool EditorToolkitShared::ParseScoreDefinitionAction(const jsonxx::Object &param, ScoreDefinitionLevel &level)
+bool EditorToolkitShared::ParseGetScoreDefAction(const jsonxx::Object &)
 {
-    level = LEVEL_SCOREDEF;
-    if (!param.has<jsonxx::String>("level")) return true;
+    return true;
+}
 
-    const std::string levelStr = param.get<jsonxx::String>("level");
-    if (levelStr == "scoreDef") {
-        level = LEVEL_SCOREDEF;
-    }
-    else if (levelStr == "staffGrp") {
-        level = LEVEL_STAFFGRP;
-    }
-    else if (levelStr == "staffDef") {
-        level = LEVEL_STAFFDEF;
-    }
-    else if (levelStr == "meterSig") {
-        level = LEVEL_METERSIG;
-    }
-    else if (levelStr == "keySig") {
-        level = LEVEL_KEYSIG;
-    }
+bool EditorToolkitShared::ParseGetScoreDefKeySigAction(const jsonxx::Object &param, bool &selected)
+{
+    if (!param.has<jsonxx::Boolean>("selected")) return false;
+    selected = param.get<jsonxx::Boolean>("selected");
+    return true;
+}
 
+bool EditorToolkitShared::ParseGetScoreDefMeterSigAction(const jsonxx::Object &param, bool &selected)
+{
+    if (!param.has<jsonxx::Boolean>("selected")) return false;
+    selected = param.get<jsonxx::Boolean>("selected");
+    return true;
+}
+
+bool EditorToolkitShared::ParseGetScoreDefStaffDefAction(const jsonxx::Object &)
+{
+    return true;
+}
+
+bool EditorToolkitShared::ParseGetScoreDefStaffGrpAction(const jsonxx::Object &param, bool &selected)
+{
+    if (!param.has<jsonxx::Boolean>("selected")) return false;
+    selected = param.get<jsonxx::Boolean>("selected");
     return true;
 }
 
@@ -582,29 +643,56 @@ bool EditorToolkitShared::ParseUpdatePitchAction(const jsonxx::Object &param, st
     return true;
 }
 
-bool EditorToolkitShared::ParseUpdateScoreDefinitionAction(const jsonxx::Object &param, jsonxx::Object &subTree,
-    std::string &elementId, std::string &secondaryId, ScoreDefinitionUpdate &update)
+bool EditorToolkitShared::ParseSetScoreDefAction(const jsonxx::Object &param, jsonxx::Object &subTree)
 {
-    subTree.empty();
+    if (!param.has<jsonxx::Object>("subTree")) return false;
+    subTree = param.get<jsonxx::Object>("subTree");
+    return true;
+}
+
+bool EditorToolkitShared::ParseSetScoreDefKeySigAction(
+    const jsonxx::Object &param, bool &selected, jsonxx::Object &subTree)
+{
+    if (!param.has<jsonxx::Boolean>("selected")) return false;
+    if (!param.has<jsonxx::Object>("subTree")) return false;
+    selected = param.get<jsonxx::Boolean>("selected");
+    subTree = param.get<jsonxx::Object>("subTree");
+    return true;
+}
+
+bool EditorToolkitShared::ParseSetScoreDefMeterSigAction(
+    const jsonxx::Object &param, bool &selected, jsonxx::Object &subTree)
+{
+    if (!param.has<jsonxx::Boolean>("selected")) return false;
+    if (!param.has<jsonxx::Object>("subTree")) return false;
+    selected = param.get<jsonxx::Boolean>("selected");
+    subTree = param.get<jsonxx::Object>("subTree");
+    return true;
+}
+
+bool EditorToolkitShared::ParseSetScoreDefStaffDefAction(const jsonxx::Object &param, jsonxx::Object &subTree)
+{
+    if (!param.has<jsonxx::Object>("subTree")) return false;
+    subTree = param.get<jsonxx::Object>("subTree");
+    return true;
+}
+
+bool EditorToolkitShared::ParseSetScoreDefStaffGrpAction(
+    const jsonxx::Object &param, bool &selected, jsonxx::Object &subTree)
+{
+    if (!param.has<jsonxx::Boolean>("selected")) return false;
+    if (!param.has<jsonxx::Object>("subTree")) return false;
+    selected = param.get<jsonxx::Boolean>("selected");
+    subTree = param.get<jsonxx::Object>("subTree");
+    return true;
+}
+
+bool EditorToolkitShared::ParseUpdateScoreDefAction(const jsonxx::Object &param, ScoreDefUpdate &update)
+{
     if (!param.has<jsonxx::String>("update")) return false;
 
     const std::string updateStr = param.get<jsonxx::String>("update");
-    if (updateStr == "scoreDef") {
-        update = UPDATE_SCOREDEF;
-    }
-    else if (updateStr == "staffGrp") {
-        update = UPDATE_STAFFGRP;
-    }
-    else if (updateStr == "staffDef") {
-        update = UPDATE_STAFFDEF;
-    }
-    else if (updateStr == "meterSig") {
-        update = UPDATE_METERSIG;
-    }
-    else if (updateStr == "keySig") {
-        update = UPDATE_KEYSIG;
-    }
-    else if (updateStr == "insertAbove") {
+    if (updateStr == "insertAbove") {
         update = INSERT_ABOVE;
     }
     else if (updateStr == "insertBelow") {
@@ -619,31 +707,8 @@ bool EditorToolkitShared::ParseUpdateScoreDefinitionAction(const jsonxx::Object 
     else if (updateStr == "deleteStaff") {
         update = DELETE_STAFF;
     }
-    else if (updateStr == "addStaffGrp") {
-        update = ADD_STAFFGRP;
-    }
-    else if (updateStr == "removeStaffGrp") {
-        update = REMOVE_STAFFGRP;
-    }
     else {
         return false;
-    }
-
-    if (param.has<jsonxx::String>("elementId")) elementId = param.get<jsonxx::String>("elementId");
-
-    bool loadSubTree = false;
-    switch (update) {
-        case (UPDATE_SCOREDEF):
-        case (UPDATE_STAFFGRP):
-        case (UPDATE_STAFFDEF):
-        case (UPDATE_METERSIG):
-        case (UPDATE_KEYSIG): loadSubTree = true;
-        default: break;
-    }
-
-    if (loadSubTree) {
-        if (!param.has<jsonxx::Object>("subTree")) return false;
-        subTree = param.get<jsonxx::Object>("subTree");
     }
 
     return true;
@@ -1892,107 +1957,163 @@ ArrayOfConstObjects EditorToolkitShared::GetScoreBasedChildrenFor(const Object *
     return editorTreeObject->GetChildObjects();
 }
 
-bool EditorToolkitShared::ScoreDefinition(ScoreDefinitionLevel level)
+ScoreDef *EditorToolkitShared::ResolveScoreDef(bool selected)
+{
+    if (!selected) {
+        Score *score = m_doc->GetFirstVisibleScore();
+        return score ? score->GetScoreDef() : NULL;
+    }
+
+    std::string selectionId = m_selectionId;
+    Object *selection = selectionId.empty() ? NULL : this->ResolveElement(selectionId);
+    if (!selection || !selection->Is(SCOREDEF)) {
+        LogError("A scoreDef must be selected");
+        return NULL;
+    }
+    return vrv_cast<ScoreDef *>(selection);
+}
+
+Staff *EditorToolkitShared::ResolveScoreDefStaff()
+{
+    std::string selectionId = m_selectionId;
+    Object *selection = selectionId.empty() ? NULL : this->ResolveElement(selectionId);
+    if (!selection || !selection->Is(STAFF)) {
+        LogError("A staff must be selected");
+        return NULL;
+    }
+    return vrv_cast<Staff *>(selection);
+}
+
+void EditorToolkitShared::FinalizeScoreDefUpdate()
+{
+    this->ClearContext();
+    this->SetEditStatus();
+}
+
+bool EditorToolkitShared::GetScoreDef()
 {
     m_editResponse.reset();
-
     MEIOutputExtended output(m_doc);
-
-    if (level == LEVEL_SCOREDEF) {
-        m_editResponse = output.ExportScoreDef();
-    }
-    else if (level == LEVEL_STAFFGRP || level == LEVEL_KEYSIG || level == LEVEL_METERSIG) {
-        std::string scoreDefId;
-        const Object *selection = (m_selectionId.empty()) ? NULL : this->ResolveElement(m_selectionId);
-        if (selection && selection->Is(SCOREDEF)) scoreDefId = m_selectionId;
-        switch (level) {
-            case (LEVEL_STAFFGRP): m_editResponse = output.ExportStaffGrp(scoreDefId); break;
-            case (LEVEL_KEYSIG): m_editResponse = output.ExportKeySig(scoreDefId); break;
-            case (LEVEL_METERSIG): m_editResponse = output.ExportMeterSig(scoreDefId); break;
-            default: break;
-        }
-    }
-    else if (level == LEVEL_STAFFDEF) {
-        std::string staffId;
-        std::string scoreDefId;
-        if (!m_selectionId.empty() && !m_selectionSecondaryId.empty()) {
-            scoreDefId = m_selectionId;
-            staffId = m_selectionSecondaryId;
-        }
-        else if (!m_selectionId.empty()) {
-            staffId = m_selectionId;
-        }
-
-        if (staffId.empty()) {
-            LogError("A staff must be selected");
-            return false;
-        }
-        m_editResponse = output.ExportStaffDef(scoreDefId, staffId);
-    }
-
+    m_editResponse = output.ExportScoreDef();
     return true;
 }
 
-bool EditorToolkitShared::UpdateScoreDefinition(
-    const jsonxx::Object &subTree, std::string &elementId, std::string &secondaryId, ScoreDefinitionUpdate update)
+bool EditorToolkitShared::GetScoreDefKeySig(bool selected)
 {
-    const bool checkStaffSelection = (update == INSERT_ABOVE) || (update == INSERT_BELOW) || (update == MOVE_UP)
-        || (update == MOVE_DOWN) || (update == DELETE_STAFF);
+    m_editResponse.reset();
+    ScoreDef *scoreDef = this->ResolveScoreDef(selected);
+    if (!scoreDef) return false;
 
-    Staff *staff = NULL;
-    if (checkStaffSelection) {
-        Object *element = this->ResolveElement(elementId);
-        if (!element || !element->Is(STAFF)) {
-            LogError("A staff must be selected");
-            return false;
-        }
-        staff = vrv_cast<Staff *>(element);
-        assert(staff);
-    }
+    MEIOutputExtended output(m_doc);
+    m_editResponse = output.ExportKeySig(scoreDef);
+    return true;
+}
+
+bool EditorToolkitShared::GetScoreDefMeterSig(bool selected)
+{
+    m_editResponse.reset();
+    ScoreDef *scoreDef = this->ResolveScoreDef(selected);
+    if (!scoreDef) return false;
+
+    MEIOutputExtended output(m_doc);
+    m_editResponse = output.ExportMeterSig(scoreDef);
+    return true;
+}
+
+bool EditorToolkitShared::GetScoreDefStaffDef()
+{
+    m_editResponse.reset();
+    Staff *staff = this->ResolveScoreDefStaff();
+    if (!staff) return false;
+    ScoreDef *scoreDef = this->ResolveScoreDef(false);
+    if (!scoreDef) return false;
+
+    MEIOutputExtended output(m_doc);
+    m_editResponse = output.ExportStaffDef(scoreDef, staff->GetN());
+    return true;
+}
+
+bool EditorToolkitShared::GetScoreDefStaffGrp(bool selected)
+{
+    m_editResponse.reset();
+    ScoreDef *scoreDef = this->ResolveScoreDef(selected);
+    if (!scoreDef) return false;
+
+    MEIOutputExtended output(m_doc);
+    m_editResponse = output.ExportStaffGrp(scoreDef);
+    return true;
+}
+
+bool EditorToolkitShared::SetScoreDef(const jsonxx::Object &subTree)
+{
+    MEIInputExtended input(m_doc);
+    input.ImportScoreDef(subTree);
+    this->FinalizeScoreDefUpdate();
+    return true;
+}
+
+bool EditorToolkitShared::SetScoreDefKeySig(bool selected, const jsonxx::Object &subTree)
+{
+    ScoreDef *scoreDef = this->ResolveScoreDef(selected);
+    if (!scoreDef) return false;
 
     MEIInputExtended input(m_doc);
-    if (update == UPDATE_SCOREDEF) {
-        input.ImportScoreDef(subTree);
-    }
-    else if (update == UPDATE_STAFFGRP) {
-        input.ImportStaffGrp(subTree);
-    }
-    else if (update == UPDATE_STAFFDEF) {
-        input.ImportStaffDef(subTree);
-    }
-    else if (update == UPDATE_METERSIG || update == UPDATE_KEYSIG) {
-        ScoreDef *scoreDef = NULL;
-        if (!elementId.empty()) {
-            Object *element = this->ResolveElement(elementId);
-            if (!element || !element->Is(SCOREDEF)) {
-                LogError("A scoreDef must be selected");
-                return false;
-            }
-            scoreDef = vrv_cast<ScoreDef *>(element);
-        }
-        else {
-            Score *score = m_doc->GetFirstVisibleScore();
-            assert(score);
-            scoreDef = score->GetScoreDef();
-        }
-        if (!scoreDef) return false;
+    Layer layer;
+    input.ImportKeySigIntoLayer(&layer, subTree);
+    KeySig *keySig = (layer.GetChildCount() > 0) ? vrv_cast<KeySig *>(layer.GetFirst()) : NULL;
+    // Passing NULL will remove it
+    scoreDef->UpdateKeySig(keySig);
 
-        if (update == UPDATE_METERSIG) {
-            Layer layer;
-            input.ImportMeterSigOrGrpIntoLayer(&layer, subTree);
-            LayerElement *meterSig = (layer.GetChildCount() > 0) ? vrv_cast<LayerElement *>(layer.GetFirst()) : NULL;
-            // Passing NULL will remove it
-            scoreDef->UpdateMeterSig(meterSig);
-        }
-        else {
-            Layer layer;
-            input.ImportKeySigIntoLayer(&layer, subTree);
-            KeySig *keySig = (layer.GetChildCount() > 0) ? vrv_cast<KeySig *>(layer.GetFirst()) : NULL;
-            // Passing NULL will remove it
-            scoreDef->UpdateKeySig(keySig);
-        }
-    }
-    else if (update == INSERT_ABOVE || update == INSERT_BELOW) {
+    this->FinalizeScoreDefUpdate();
+    return true;
+}
+
+bool EditorToolkitShared::SetScoreDefMeterSig(bool selected, const jsonxx::Object &subTree)
+{
+    ScoreDef *scoreDef = this->ResolveScoreDef(selected);
+    if (!scoreDef) return false;
+
+    MEIInputExtended input(m_doc);
+    Layer layer;
+    input.ImportMeterSigOrGrpIntoLayer(&layer, subTree);
+    LayerElement *meterSig = (layer.GetChildCount() > 0) ? vrv_cast<LayerElement *>(layer.GetFirst()) : NULL;
+    // Passing NULL will remove it
+    scoreDef->UpdateMeterSig(meterSig);
+
+    this->FinalizeScoreDefUpdate();
+    return true;
+}
+
+bool EditorToolkitShared::SetScoreDefStaffDef(const jsonxx::Object &subTree)
+{
+    Staff *staff = this->ResolveScoreDefStaff();
+    if (!staff) return false;
+    ScoreDef *scoreDef = this->ResolveScoreDef(false);
+    if (!scoreDef) return false;
+
+    MEIInputExtended input(m_doc);
+    input.ImportStaffDef(subTree, scoreDef, staff->GetN());
+    this->FinalizeScoreDefUpdate();
+    return true;
+}
+
+bool EditorToolkitShared::SetScoreDefStaffGrp(bool selected, const jsonxx::Object &subTree)
+{
+    ScoreDef *scoreDef = this->ResolveScoreDef(selected);
+    if (!scoreDef) return false;
+
+    MEIInputExtended input(m_doc);
+    input.ImportStaffGrp(subTree, scoreDef);
+    this->FinalizeScoreDefUpdate();
+    return true;
+}
+
+bool EditorToolkitShared::UpdateScoreDef(ScoreDefUpdate update)
+{
+    Staff *staff = this->ResolveScoreDefStaff();
+    if (!staff) return false;
+
+    if (update == INSERT_ABOVE || update == INSERT_BELOW) {
         StaffInsert staffInsert = (update == INSERT_ABOVE) ? StaffInsert::INSERT_ABOVE : StaffInsert::INSERT_BELOW;
         AddStaffFunctor addStaffFunctor(staff->GetN(), staffInsert);
         m_doc->Process(addStaffFunctor);
@@ -2018,10 +2139,7 @@ bool EditorToolkitShared::UpdateScoreDefinition(
         this->ResetSelect();
     }
 
-    this->ClearContext();
-
-    this->SetEditStatus();
-
+    this->FinalizeScoreDefUpdate();
     return true;
 }
 

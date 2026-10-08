@@ -3653,14 +3653,13 @@ jsonxx::Object MEIOutputExtended::ExportScoreDef()
     }
 }
 
-jsonxx::Object MEIOutputExtended::ExportStaffGrp(const std::string &scoreDefId)
+jsonxx::Object MEIOutputExtended::ExportStaffGrp(ScoreDef *scoreDef)
 {
     try {
         pugi::xml_document meiDoc;
         m_currentNode = meiDoc.root();
         m_nodeStack.push_back(m_currentNode);
 
-        ScoreDef *scoreDef = this->GetScoreDef(scoreDefId);
         StaffGrp *staffGrp = (scoreDef) ? vrv_cast<StaffGrp *>(scoreDef->FindDescendantByType(STAFFGRP)) : NULL;
 
         if (staffGrp) staffGrp->SaveObject(this);
@@ -3672,17 +3671,15 @@ jsonxx::Object MEIOutputExtended::ExportStaffGrp(const std::string &scoreDefId)
     }
 }
 
-jsonxx::Object MEIOutputExtended::ExportStaffDef(const std::string &scoreDefId, const std::string &staffId)
+jsonxx::Object MEIOutputExtended::ExportStaffDef(ScoreDef *scoreDef, int staffN)
 {
     try {
         pugi::xml_document meiDoc;
         m_currentNode = meiDoc.root();
         m_nodeStack.push_back(m_currentNode);
 
-        ScoreDef *scoreDef = this->GetScoreDef(scoreDefId);
-        Staff *staff = vrv_cast<Staff *>(m_doc->FindDescendantByID(staffId));
-        if (scoreDef && staff) {
-            AttNIntegerComparison staffDefN(STAFFDEF, staff->GetN());
+        if (scoreDef) {
+            AttNIntegerComparison staffDefN(STAFFDEF, staffN);
             StaffDef *staffDef = vrv_cast<StaffDef *>(scoreDef->FindDescendantByComparison(&staffDefN));
             if (staffDef) staffDef->SaveObject(this);
         }
@@ -3694,14 +3691,13 @@ jsonxx::Object MEIOutputExtended::ExportStaffDef(const std::string &scoreDefId, 
     }
 }
 
-jsonxx::Object MEIOutputExtended::ExportMeterSig(const std::string &scoreDefId)
+jsonxx::Object MEIOutputExtended::ExportMeterSig(ScoreDef *scoreDef)
 {
     try {
         pugi::xml_document meiDoc;
         m_currentNode = meiDoc.root();
         m_nodeStack.push_back(m_currentNode);
 
-        ScoreDef *scoreDef = this->GetScoreDef(scoreDefId);
         ClassIdsComparison meterSigOrGrpComparison({ METERSIG, METERSIGGRP });
         LayerElement *meterSigOrGrp = (scoreDef)
             ? vrv_cast<LayerElement *>(scoreDef->FindDescendantByComparison(&meterSigOrGrpComparison))
@@ -3721,7 +3717,7 @@ jsonxx::Object MEIOutputExtended::ExportMeterSig(const std::string &scoreDefId)
     }
 }
 
-jsonxx::Object MEIOutputExtended::ExportKeySig(const std::string &scoreDefId)
+jsonxx::Object MEIOutputExtended::ExportKeySig(ScoreDef *scoreDef)
 {
     try {
         pugi::xml_document meiDoc;
@@ -3730,7 +3726,6 @@ jsonxx::Object MEIOutputExtended::ExportKeySig(const std::string &scoreDefId)
         m_currentNode = meiDoc.root();
         m_nodeStack.push_back(m_currentNode);
 
-        ScoreDef *scoreDef = this->GetScoreDef(scoreDefId);
         KeySig *keySig = (scoreDef) ? vrv_cast<KeySig *>(scoreDef->FindDescendantByType(KEYSIG)) : NULL;
         if (keySig) {
             StaffDef *staffDef = vrv_cast<StaffDef *>(keySig->GetFirstAncestor(STAFFDEF));
@@ -3812,20 +3807,6 @@ jsonxx::Object MEIOutputExtended::ToJson(const pugi::xml_document &doc)
     }
 
     return nodeToJson(rootNode);
-}
-
-ScoreDef *MEIOutputExtended::GetScoreDef(const std::string &scoreDefId)
-{
-    ScoreDef *scoreDef = NULL;
-    if (scoreDefId.empty()) {
-        Score *score = m_doc->GetFirstVisibleScore();
-        scoreDef = (score) ? score->GetScoreDef() : NULL;
-        assert(score && score->GetScoreDef());
-    }
-    else {
-        scoreDef = vrv_cast<ScoreDef *>(m_doc->FindDescendantByID(scoreDefId));
-    }
-    return scoreDef;
 }
 
 //----------------------------------------------------------------------------
@@ -9501,19 +9482,18 @@ void MEIInputExtended::ImportScoreDef(const jsonxx::Object &scoreDef)
     }
 }
 
-void MEIInputExtended::ImportStaffGrp(const jsonxx::Object &staffGrp)
+void MEIInputExtended::ImportStaffGrp(const jsonxx::Object &staffGrp, ScoreDef *scoreDef)
 {
+    assert(scoreDef);
+
     try {
         pugi::xml_document meiDoc = this->FromJson(staffGrp);
 
         ScoreDef newScoreDef;
         if (this->ReadStaffGrpExt(&newScoreDef, meiDoc.first_child())) {
-            Score *score = m_doc->GetFirstVisibleScore();
-            assert(score && score->GetScoreDef());
             StaffGrp *newStaffGrp = vrv_cast<StaffGrp *>(newScoreDef.GetFirst());
             StaffGrp *oldStaffGrp
-                = vrv_cast<StaffGrp *>(score->GetScoreDef()->FindDescendantByID(newStaffGrp->GetID()));
-            if (!oldStaffGrp) oldStaffGrp = vrv_cast<StaffGrp *>(m_doc->FindDescendantByID(newStaffGrp->GetID()));
+                = (newStaffGrp) ? vrv_cast<StaffGrp *>(scoreDef->FindDescendantByID(newStaffGrp->GetID())) : NULL;
             if (oldStaffGrp && newStaffGrp) {
                 newScoreDef.Relinquish(0);
                 oldStaffGrp->GetParent()->ReplaceChild(oldStaffGrp, newStaffGrp);
@@ -9526,19 +9506,18 @@ void MEIInputExtended::ImportStaffGrp(const jsonxx::Object &staffGrp)
     }
 }
 
-void MEIInputExtended::ImportStaffDef(const jsonxx::Object &staffDef)
+void MEIInputExtended::ImportStaffDef(const jsonxx::Object &staffDef, ScoreDef *scoreDef, int staffN)
 {
+    assert(scoreDef);
+
     try {
         pugi::xml_document meiDoc = this->FromJson(staffDef);
 
         StaffGrp newStaffGrp;
         if (this->ReadStaffDefExt(&newStaffGrp, meiDoc.first_child())) {
-            Score *score = m_doc->GetFirstVisibleScore();
-            assert(score && score->GetScoreDef());
             StaffDef *newStaffDef = vrv_cast<StaffDef *>(newStaffGrp.GetFirst());
-            StaffDef *oldStaffDef
-                = vrv_cast<StaffDef *>(score->GetScoreDef()->FindDescendantByID(newStaffDef->GetID()));
-            if (!oldStaffDef) oldStaffDef = vrv_cast<StaffDef *>(m_doc->FindDescendantByID(newStaffDef->GetID()));
+            AttNIntegerComparison staffDefN(STAFFDEF, staffN);
+            StaffDef *oldStaffDef = vrv_cast<StaffDef *>(scoreDef->FindDescendantByComparison(&staffDefN));
             if (oldStaffDef && newStaffDef) {
                 newStaffGrp.Relinquish(0);
                 oldStaffDef->GetParent()->ReplaceChild(oldStaffDef, newStaffDef);
