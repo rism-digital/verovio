@@ -26,7 +26,7 @@ public:
      */
     ///@{
     ReplaceDrawingValuesInStaffDefFunctor(const Clef *clef, const KeySig *keySig, const Mensur *mensur,
-        const MeterSig *meterSig, const MeterSigGrp *meterSigGrp, const ScoreDef *newScoreDef, int &redrawFlags);
+        const MeterSig *meterSig, const MeterSigGrp *meterSigGrp);
     virtual ~ReplaceDrawingValuesInStaffDefFunctor() = default;
     ///@}
 
@@ -59,10 +59,6 @@ private:
     const MeterSig *m_meterSig;
     // The meter signature group (NULL if none)
     const MeterSigGrp *m_meterSigGrp;
-    // The newScoreDef for accessing values in each new staffDef
-    const ScoreDef *m_newScoreDef;
-    // The redraw flags
-    int *m_redrawFlags;
 };
 
 //----------------------------------------------------------------------------
@@ -149,6 +145,7 @@ public:
     FunctorCode VisitProport(Proport *proport) override;
     FunctorCode VisitScore(Score *score) override;
     FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
+    FunctorCode VisitScoreDefEnd(ScoreDef *scoreDef) override;
     FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitStaffDef(StaffDef *staffDef) override;
     FunctorCode VisitStaffGrp(StaffGrp *staffGrp) override;
