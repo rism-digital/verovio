@@ -8881,12 +8881,16 @@ void HumdrumInput::setMensurationSymbol(
         vrvmensur->SetSign(MENSURATIONSIGN_O);
     }
     else {
-        // deal with cases where C or O are not displayed
-        std::stringstream warning;
-        warning << "In HumdrumInput::setMensurationSymbol: Problem parsing mensuration: ";
-        warning << metdata;
-        LogWarning(warning.str().c_str());
-        return;
+        // deal with cases where C or O are not displayed: e.g. *met(3/2)
+
+        hum::HumRegex hre;
+        if (hre.search(metdata, "\\((\\d+)/(\\d+)\\)")) {
+            int top = hre.getMatchInt(1);
+            int bot = hre.getMatchInt(2);
+            vrvmensur->SetNum(top);
+            vrvmensur->SetNumbase(bot);
+            return;
+        }
     }
 
     if (metdata.find('|') != std::string::npos) {
@@ -9031,10 +9035,13 @@ void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const 
     }
 
     if (metertok) {
-        if (*metertok == "*met()") {
-            // set time signature to be invisible
-            vrvmeter->SetVisible(BOOLEAN_false);
-        }
+        // set time signature to be invisible
+        vrvmeter->SetVisible(BOOLEAN_false);
+        // Then process the metersignature alone
+        int kerntrack = metertok->getTrack();
+        int staffindex = m_rkern[kerntrack];
+        setMensurationSymbol(part, *metertok, staffindex, metertok);
+        return;
     }
     if (timetok && timetok->find("yy") != std::string::npos) {
         vrvmeter->SetVisible(BOOLEAN_false);
