@@ -269,6 +269,17 @@ export class VerovioToolkit {
     }
 
     /**
+     * Return the drawing position for a MIDI pitch at the given score time and staff.
+     * @param {number} scoreTime The score time in quarter notes
+     * @param {number} midiPitch The MIDI pitch, including fractional pitches
+     * @param {number} [staff] The staff number (1-based)
+     * @returns {Object<string, number|string|boolean>} A JSON object with the drawing position and context
+     */
+    getPitchPosition(scoreTime, midiPitch, staff = 1) {
+        return JSON.parse(this.proxy.getPitchPosition(this.ptr, scoreTime, midiPitch, staff));
+    }
+
+    /**
      * Return the version number.
      * @returns {string} the version number as a string
      */

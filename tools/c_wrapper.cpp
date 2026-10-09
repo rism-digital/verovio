@@ -243,6 +243,13 @@ const char *vrvToolkit_getTimesForElement(void *tkPtr, const char *xmlId)
     return tk->GetCString();
 }
 
+const char *vrvToolkit_getPitchPosition(void *tkPtr, double scoreTime, double midiPitch, int staff)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->GetPitchPosition(scoreTime, midiPitch, staff));
+    return tk->GetCString();
+}
+
 const char *vrvToolkit_getVersion(void *tkPtr)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
