@@ -671,7 +671,7 @@ FunctorCode GenerateMIDIFunctor::VisitBTrem(const BTrem *bTrem)
     }
 
     // Adjust duration of the bTrem if it's nested within tuplet
-    int num = 1;
+    int num = 0;
     const Tuplet *tuplet = vrv_cast<const Tuplet *>(bTrem->GetFirstAncestor(TUPLET, MAX_TUPLET_DEPTH));
     if (tuplet) {
         num = (tuplet->GetNum() > 0) ? tuplet->GetNum() : 0;
