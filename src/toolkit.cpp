@@ -145,7 +145,7 @@ bool Toolkit::SetFont(const std::string &fontName)
 {
     Resources &resources = m_doc.GetResourcesForModification();
     const bool ok = resources.SetCurrentFont(fontName, true);
-    if (!ok) LogWarning("Font '%s' could not be loaded", fontName.c_str());
+    if (!ok) LogWarning("Font '{}' could not be loaded", fontName);
     return ok;
 }
 
@@ -463,7 +463,7 @@ bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
     std::string filename = rootfile.attribute("full-path").value();
 
     if (!filename.empty()) {
-        LogInfo("Loading file '%s' in the archive", filename.c_str());
+        LogInfo("Loading file '{}' in the archive", filename);
         return this->LoadData(zipFileReader.ReadTextFile(filename), false);
     }
     else {
@@ -732,7 +732,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         bool status = converter.convertString(conversion, data);
         this->LogRedirectStop();
         if (!status) {
-            LogWarning("Problem converting MuseData to Humdrum (see warning above this line for possible reasons");
+            LogWarning("Problem converting MuseData to Humdrum (see warning above this line for possible reasons)");
         }
 
         if (!status) {
@@ -767,7 +767,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         bool status = converter.convert(conversion, data);
         this->LogRedirectStop();
         if (!status) {
-            LogWarning("Problem converting EsAC to Humdrum (see warning above this line for possible reasons");
+            LogWarning("Problem converting EsAC to Humdrum (see warning above this line for possible reasons)");
         }
 
         if (!status) {
@@ -1224,22 +1224,22 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
 
         if (json.has<jsonxx::Number>(iter->first)) {
             opt->SetValueDbl(json.get<jsonxx::Number>(iter->first));
-            // LogInfo("Double: %f", json.get<jsonxx::Number>(iter->first));
+            // LogInfo("Double: {}", json.get<jsonxx::Number>(iter->first));
         }
         else if (json.has<jsonxx::Boolean>(iter->first)) {
             opt->SetValueBool(json.get<jsonxx::Boolean>(iter->first));
-            // LogInfo("Bool: %d", json.get<jsonxx::Boolean>(iter->first));
+            // LogInfo("Bool: {}", json.get<jsonxx::Boolean>(iter->first));
         }
         else if (json.has<jsonxx::String>(iter->first)) {
             opt->SetValue(json.get<jsonxx::String>(iter->first));
-            // LogInfo("String: %s", json.get<jsonxx::String>(iter->first).c_str());
+            // LogInfo("String: {}", json.get<jsonxx::String>(iter->first));
         }
         else if (json.has<jsonxx::Array>(iter->first)) {
             jsonxx::Array values = json.get<jsonxx::Array>(iter->first);
             std::vector<std::string> strValues;
             for (int i = 0; i < (int)values.size(); ++i) {
                 if (values.has<jsonxx::String>(i)) strValues.push_back(values.get<jsonxx::String>(i));
-                // LogDebug("String: %s", values.get<jsonxx::String>(i).c_str());
+                // LogDebug("String: {}", values.get<jsonxx::String>(i));
             }
             opt->SetValueArray(strValues);
         }
@@ -1488,7 +1488,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     }
     // If not found at all
     if (!element) {
-        LogWarning("Element '%s' not found", xmlId.c_str());
+        LogWarning("Element '{}' not found", xmlId);
         return o.json();
     }
 
@@ -1499,7 +1499,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     // Fill the JSON object
     for (const auto &attribute : attributes) {
         o << attribute.first << attribute.second;
-        // LogInfo("Element %s - %s", attribute.first.c_str(), attribute.second.c_str());
+        // LogInfo("Element {} - {}", attribute.first, attribute.second);
     }
     return o.json();
 }
@@ -1592,7 +1592,7 @@ void Toolkit::LogRedirectStart()
     if (!m_cerrCaptured.str().empty()) {
         vrv::LogWarning("In Toolkit::LogRedirectStart: Log capture buffer not empty, sending current contents to "
                         "LogWarning and resetting.");
-        vrv::LogWarning(m_cerrCaptured.str().c_str());
+        vrv::LogWarning("{}", m_cerrCaptured.str());
         m_cerrCaptured.str("");
     }
     m_cerrOriginalBuf = std::cerr.rdbuf();
@@ -1602,7 +1602,7 @@ void Toolkit::LogRedirectStart()
 void Toolkit::LogRedirectStop()
 {
     if (!m_cerrCaptured.str().empty()) {
-        vrv::LogWarning(m_cerrCaptured.str().c_str());
+        vrv::LogWarning("{}", m_cerrCaptured.str());
         m_cerrCaptured.str("");
     }
 
@@ -1673,7 +1673,7 @@ void Toolkit::RedoPagePitchPosLayout()
 bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
 {
     if (pageNo > this->GetPageCount()) {
-        LogWarning("Page %d does not exist", pageNo);
+        LogWarning("Page {} does not exist", pageNo);
         return false;
     }
 
@@ -2059,7 +2059,7 @@ int Toolkit::GetPageWithElement(const std::string &xmlId)
 {
     Object *element = m_doc.FindDescendantByID(xmlId);
     if (!element) {
-        LogWarning("Element '%s' not found", xmlId.c_str());
+        LogWarning("Element '{}' not found", xmlId);
         return 0;
     }
     Page *page = vrv_cast<Page *>(element->GetFirstAncestor(PAGE));
@@ -2078,7 +2078,7 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
     Object *element = m_midiDoc->FindDescendantByID(xmlId);
 
     if (!element) {
-        LogWarning("Element '%s' not found", xmlId.c_str());
+        LogWarning("Element '{}' not found", xmlId);
         return 0;
     }
 
@@ -2128,7 +2128,7 @@ std::string Toolkit::GetTimesForElement(const std::string &xmlId)
     jsonxx::Object o;
 
     if (!element) {
-        LogWarning("Element '%s' not found", xmlId.c_str());
+        LogWarning("Element '{}' not found", xmlId);
         return o.json();
     }
 
@@ -2186,7 +2186,7 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
     jsonxx::Object o;
 
     if (!element) {
-        LogWarning("Element '%s' not found", xmlId.c_str());
+        LogWarning("Element '{}' not found", xmlId);
         return o.json();
     }
 
@@ -2376,7 +2376,8 @@ std::string Toolkit::ConvertHumdrumToMIDI(const std::string &humdrumData)
 void Toolkit::SetLocale()
 {
     if (m_options->m_setLocale.GetValue() && !m_previousLocale) {
-        // Required for proper formatting, e.g., in StringFormat (see vrv.cpp)
+        // No longer required for proper formatting, e.g., in StringFormat (see vrv.cpp), since
+        // vsnprintf() was replaced by std::format() which is not locale-dependant unlike the former.
         m_previousLocale = std::locale::global(std::locale::classic());
     }
 }
@@ -2437,10 +2438,10 @@ void Toolkit::LogRuntime() const
         const int minutes = seconds / 60.0;
         if (minutes > 0) {
             seconds -= 60.0 * minutes;
-            LogInfo("Total runtime is %d min %.3f s.", minutes, seconds);
+            LogInfo("Total runtime is {} min {:.3f} s.", minutes, seconds);
         }
         else {
-            LogInfo("Total runtime is %.3f s.", seconds);
+            LogInfo("Total runtime is {:.3f} s.", seconds);
         }
     }
     else {

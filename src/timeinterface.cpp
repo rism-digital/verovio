@@ -60,7 +60,7 @@ void TimePointInterface::SetStart(LayerElement *start)
 
 bool TimePointInterface::SetStartOnly(LayerElement *element)
 {
-    // LogDebug("%s - %s - %s", element->GetID().c_str(), m_startID.c_str(), m_endID.c_str() );
+    // LogDebug("{} - {} - {}", element->GetID(), m_startID, m_endID );
     if (!m_start && !m_startID.empty() && (element->GetID() == m_startID)) {
         this->SetStart(element);
         return true;
@@ -173,7 +173,7 @@ std::vector<const Staff *> TimePointInterface::GetTstampStaves(const Measure *me
         AttNIntegerComparison comparison(STAFF, staffN);
         const Staff *staff = vrv_cast<const Staff *>(measure->FindDescendantByComparison(&comparison, 1));
         if (!staff) {
-            // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetID().c_str());
+            // LogDebug("Staff with @n '{}' not found in measure '{}'", *iter, measure->GetID());
             continue;
         }
         if (!staff->DrawingIsVisible()) {
@@ -235,7 +235,7 @@ void TimeSpanningInterface::SetIDStr()
 
 bool TimeSpanningInterface::SetStartAndEnd(LayerElement *element)
 {
-    // LogDebug("%s - %s - %s", element->GetID().c_str(), m_startID.c_str(), m_endID.c_str() );
+    // LogDebug("{} - {} - {}", element->GetID(), m_startID, m_endID );
     if (!m_start && !m_startID.empty() && (element->GetID() == m_startID)) {
         this->SetStart(element);
     }

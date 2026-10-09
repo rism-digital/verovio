@@ -289,7 +289,7 @@ void CmmeInput::CreateSection(pugi::xml_node musicSectionNode)
 
     // Loop through the number of voices and parse Voice or create an empty staff if not given
     for (int i = 0; i < m_numVoices; ++i) {
-        std::string xpath = StringFormat("./Voice[VoiceNum[text()='%d']]", i + 1);
+        std::string xpath = StringFormat("./Voice[VoiceNum[text()='{}']]", i + 1);
         pugi::xpath_node voice = musicSectionNode.select_node(xpath.c_str());
         if (voice) {
             this->CreateStaff(voice.node());

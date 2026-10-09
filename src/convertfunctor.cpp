@@ -485,7 +485,7 @@ FunctorCode ConvertToCmnFunctor::VisitLayerElement(LayerElement *layerElement)
         // can be ignored
     }
     else {
-        LogDebug(layerElement->GetClassName().c_str());
+        LogDebug("{}", layerElement->GetClassName());
     }
 
     return FUNCTOR_SIBLINGS;
@@ -1302,8 +1302,8 @@ void ConvertMarkupArticFunctor::SplitMultival(Artic *artic) const
     // Multiple valued attributes cannot be preserved as such
     if (artic->IsAttribute()) {
         artic->IsAttribute(false);
-        LogInfo("Multiple valued attribute @artic on '%s' permanently converted to <artic> elements",
-            parent->GetID().c_str());
+        LogInfo("Multiple valued attribute @artic on '{}' permanently converted to <artic> elements",
+            parent->GetID());
     }
 }
 

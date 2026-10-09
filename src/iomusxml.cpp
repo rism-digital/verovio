@@ -205,7 +205,7 @@ void MusicXmlInput::ProcessClefChangeQueue(Section *section)
         m_clefChangeQueue.pop_front();
         Measure *currentMeasure = this->FindMeasureByCount(clefChange.m_measureCount);
         if (!currentMeasure) {
-            LogWarning("MusicXML import: Clef change at measure %d, staff %d, time %d not inserted",
+            LogWarning("MusicXML import: Clef change at measure {}, staff {}, time {} not inserted",
                 clefChange.m_measureCount + 1, clefChange.m_staff->GetN(), clefChange.m_scoreOnset);
             delete clefChange.m_clef;
             continue;
@@ -474,7 +474,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
     // Find voice number of node
     short int layerNum = (node.child("voice")) ? node.child("voice").text().as_int() : 1;
     if (layerNum < 1) {
-        LogWarning("MusicXML import: Layer %d cannot be found", layerNum);
+        LogWarning("MusicXML import: Layer {} cannot be found", layerNum);
         layerNum = 1;
     }
 
@@ -490,7 +490,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
     // if not, take staff info of node element
     short int staffNum = (node.child("staff")) ? node.child("staff").text().as_int() : 1;
     if ((staffNum < 1) || (staffNum > measure->GetStaffCount())) {
-        LogWarning("MusicXML import: Staff %d cannot be found", staffNum);
+        LogWarning("MusicXML import: Staff {} cannot be found", staffNum);
         staffNum = 1;
     }
     staffNum--;
@@ -1074,12 +1074,12 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         else if (IsElement(xpathNode.node(), "score-part")) {
             // get the attributes element of the first measure of the part
             const std::string partId = xpathNode.node().attribute("id").as_string();
-            std::string xpath = StringFormat("/score-partwise/part[@id='%s']/measure[1]", partId.c_str());
+            std::string xpath = StringFormat("/score-partwise/part[@id='{}']/measure[1]", partId);
             pugi::xpath_node partFirstMeasure = root.select_node(xpath.c_str());
             if (!partFirstMeasure.node().child("attributes")) {
                 LogWarning("MusicXML import: Could not find the 'attributes' element in the first "
-                           "measure of part '%s'",
-                    partId.c_str());
+                           "measure of part '{}'",
+                    partId);
                 continue;
             }
             // part-name should be revised, as soon MEI can suppress labels
@@ -1176,10 +1176,10 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             }
 
             // find the part and read it
-            xpath = StringFormat("/score-partwise/part[@id='%s']", partId.c_str());
+            xpath = StringFormat("/score-partwise/part[@id='{}']", partId);
             pugi::xpath_node part = root.select_node(xpath.c_str());
             if (!part) {
-                LogWarning("MusicXML import: Could not find the part '%s'", partId.c_str());
+                LogWarning("MusicXML import: Could not find the part '{}'", partId);
                 continue;
             }
             this->ReadMusicXmlPart(part.node(), section, nbStaves, staffOffset);
@@ -1202,8 +1202,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             measureCount = iter.first;
         }
         if (!measure) {
-            LogWarning("MusicXML import: Element '%s' could not be added to measure %d",
-                iter.second->GetClassName().c_str(), iter.first + 1);
+            LogWarning("MusicXML import: Element '{}' could not be added to measure {}",
+                iter.second->GetClassName(), iter.first + 1);
             delete iter.second;
             continue;
         }
@@ -1282,38 +1282,38 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 
     // clean up stacks
     if (!m_beamspanStack.empty()) {
-        LogWarning("MusicXML import: There are %d beamspans left without ending", m_beamspanStack.size());
+        LogWarning("MusicXML import: There are {} beamspans left without ending", m_beamspanStack.size());
         m_beamspanStack.clear();
     }
 
     if (!m_tieStack.empty()) {
-        LogWarning("MusicXML import: There are %d ties left open", m_tieStack.size());
+        LogWarning("MusicXML import: There are {} ties left open", m_tieStack.size());
         m_tieStack.clear();
     }
     if (!m_slurStack.empty()) { // There are slurs left open
         for (auto iter : m_slurStack) {
-            LogWarning("MusicXML import: slur %d from measure %d could not be ended", iter.second.m_number,
+            LogWarning("MusicXML import: slur {} from measure {} could not be ended", iter.second.m_number,
                 iter.second.m_measureCount + 1);
         }
         m_slurStack.clear();
     }
     if (!m_slurStopStack.empty()) { // There are slurs ends without opening
         for (auto iter : m_slurStopStack) {
-            LogWarning("MusicXML import: slur ending for element '%s' could not be "
+            LogWarning("MusicXML import: slur ending for element '{}' could not be "
                        "matched to a start element",
-                iter.first->GetID().c_str());
+                iter.first->GetID());
         }
         m_slurStopStack.clear();
     }
     if (!m_glissStack.empty()) {
         for (Gliss *gliss : m_glissStack) {
-            LogWarning("MusicXML import: gliss for '%s' could not be closed", gliss->GetID().c_str());
+            LogWarning("MusicXML import: gliss for '{}' could not be closed", gliss->GetID());
         }
         m_glissStack.clear();
     }
     if (!m_trillStack.empty()) { // open trills without ending
         for (auto iter : m_trillStack) {
-            LogWarning("MusicXML import: trill extender for '%s' could not be ended", iter.first->GetID().c_str());
+            LogWarning("MusicXML import: trill extender for '{}' could not be ended", iter.first->GetID());
         }
         m_trillStack.clear();
     }
@@ -1448,7 +1448,7 @@ void MusicXmlInput::CreateExpansion(Section *section)
                     endIter->first.m_visited)) {
             if (!labels.contains(endIter->first.m_jumpInfo.m_label)) {
                 LogWarning(
-                    "MusicXML import: Segno/Coda label '%s' not found", endIter->first.m_jumpInfo.m_label.c_str());
+                    "MusicXML import: Segno/Coda label '{}' not found", endIter->first.m_jumpInfo.m_label);
             }
             else {
                 iter = labels.at(endIter->first.m_jumpInfo.m_label);
@@ -1541,7 +1541,7 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
     // isodate and version
     time_t t = time(0); // get time now
     struct tm *now = localtime(&t);
-    std::string dateStr = StringFormat("%d-%02d-%02dT%02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
+    std::string dateStr = StringFormat("{}-{:02}-{:02}T{:02}:{:02}:{:02}", now->tm_year + 1900, now->tm_mon + 1,
         now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
     app.append_attribute("isodate").set_value(dateStr.c_str());
     app.append_attribute("version").set_value(GetVersion().c_str());
@@ -1613,7 +1613,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
             }
 
             // clef sign - first look if we have a clef-sign with the corresponding staff @number
-            std::string xpath = StringFormat("clef[@number='%d']", i + 1);
+            std::string xpath = StringFormat("clef[@number='{}']", i + 1);
             pugi::xpath_node clef = child.select_node(xpath.c_str());
             // if not, look at a common one
             if (!clef) {
@@ -1628,7 +1628,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
             }
 
             // key sig
-            xpath = StringFormat("key[@number='%d']", i + 1);
+            xpath = StringFormat("key[@number='{}']", i + 1);
             pugi::xpath_node key = child.select_node(xpath.c_str());
             if (!key) {
                 key = child.select_node("key[not(@number)]");
@@ -1642,7 +1642,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
 
             // staff details
             pugi::xpath_node staffDetails;
-            xpath = StringFormat("staff-details[@number='%d']", i + 1);
+            xpath = StringFormat("staff-details[@number='{}']", i + 1);
             staffDetails = child.select_node(xpath.c_str());
             if (!staffDetails) {
                 staffDetails = child.select_node("staff-details[not(@number)]");
@@ -1725,7 +1725,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
 
             // time
             pugi::xpath_node time;
-            xpath = StringFormat("time[@number='%d']", i + 1);
+            xpath = StringFormat("time[@number='{}']", i + 1);
             time = child.select_node(xpath.c_str());
             if (!time) {
                 time = child.select_node("time[not(@number)]");
@@ -1738,7 +1738,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
 
             // transpose
             pugi::xpath_node transpose;
-            xpath = StringFormat("transpose[@number='%d']", i + 1);
+            xpath = StringFormat("transpose[@number='{}']", i + 1);
             transpose = child.select_node(xpath.c_str());
             if (!transpose) {
                 transpose = child.select_node("transpose");
@@ -1877,18 +1877,18 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, shor
     if (!m_openDashesStack.empty()) { // open dashes without ending
         for (auto iter : m_openDashesStack) {
             LogWarning(
-                "MusicXML import: dashes/extender lines for '%s' could not be closed", iter.first->GetID().c_str());
+                "MusicXML import: dashes/extender lines for '{}' could not be closed", iter.first->GetID());
         }
         m_openDashesStack.clear();
     }
     if (!m_bracketStack.empty()) { // open brackets without ending
         for (auto iter : m_bracketStack) {
-            LogWarning("MusicXML import: bracketSpan for '%s' could not be closed", iter.first->GetID().c_str());
+            LogWarning("MusicXML import: bracketSpan for '{}' could not be closed", iter.first->GetID());
         }
         m_bracketStack.clear();
     }
     if (!m_hairpinStack.empty()) {
-        LogWarning("MusicXML import: There are %d hairpins left open", m_hairpinStack.size());
+        LogWarning("MusicXML import: There are {} hairpins left open", m_hairpinStack.size());
         m_hairpinStack.clear();
     }
 
@@ -1926,7 +1926,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     }
 
     // Normally the stack should be empty
-    // LogDebug("Measure %s", node.attribute("number").as_string());
+    // LogDebug("Measure {}", node.attribute("number").as_string());
     // assert(m_elementStack.empty());
     m_elementStackMap.erase(m_elementStackMap.begin(), m_elementStackMap.end());
 
@@ -2199,7 +2199,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure)
             measure->SetLeft(BARRENDITION_rptstart);
         }
         else if (HasAttributeWithValue(node, "location", "middle")) {
-            LogWarning("MusicXML import: Unsupported barline location 'middle' in %s", measure->GetN().c_str());
+            LogWarning("MusicXML import: Unsupported barline location 'middle' in {}", measure->GetN());
         }
         else {
             measure->SetRight(BARRENDITION_rptend);
@@ -2222,7 +2222,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure)
         std::string endingText = ending.text().as_string();
         if (endingType == "start") {
             // check for corresponding stop points
-            std::string xpath = StringFormat("following::ending[@number='%s'][@type != 'start']", endingNumber.c_str());
+            std::string xpath = StringFormat("following::ending[@number='{}'][@type != 'start']", endingNumber);
             pugi::xpath_node endingEnd = node.select_node(xpath.c_str());
             if (endingEnd) {
                 if (!m_sectionStart) m_sectionStart = musicxml::SectionInfo();
@@ -2386,8 +2386,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 m_openDashesStack.push_back({ controlElement, openDashes });
             }
             else {
-                LogInfo("MusicXmlImport: dashes could not be matched to <dir> or <dynam> in measure %s.",
-                    measureNum.c_str());
+                LogInfo("MusicXmlImport: dashes could not be matched to <dir> or <dynam> in measure {}.",
+                    measureNum);
             }
         }
     }
@@ -2650,7 +2650,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
                         octave->SetEndid(m_ID);
                     }
                     else {
-                        LogWarning("MusicXML import: octave for '%s' could not be closed", octave->GetID().c_str());
+                        LogWarning("MusicXML import: octave for '{}' could not be closed", octave->GetID());
                     }
                 }
             }
@@ -2802,7 +2802,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     // other cases
     if (!containsDynamics && !containsTempo && !containsWords && !xmlJump && !bracket && !lead && !xmlShift && !xmlPedal
         && wedges.empty() && !dashes && !rehearsal) {
-        LogWarning("MusicXML import: Unsupported direction-type '%s'", typeNode.first_child().name());
+        LogWarning("MusicXML import: Unsupported direction-type '{}'", typeNode.first_child().name());
     }
 
     // Sound
@@ -3239,7 +3239,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                         }
                     }
                     catch (std::out_of_range &e) {
-                        LogWarning("MusicXML import: Unexpected pitch %d", note->GetPname());
+                        LogWarning("MusicXML import: Unexpected pitch {}", note->GetPname());
                     }
                 }
                 else {
@@ -4189,7 +4189,7 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure, Sec
         else if (value == "pythagorean")
             temperament = TEMPERAMENT_pythagorean;
         else
-            LogWarning("MusicXML import: Invalid MEI temperament '%s'", value.c_str());
+            LogWarning("MusicXML import: Invalid MEI temperament '{}'", value);
         ScoreDef *scoreDef = GetOrCreateLastScoreDef(section);
         assert(scoreDef);
         scoreDef->SetTuneTemper(temperament);
@@ -4323,7 +4323,7 @@ bool MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
             std::string measureName = (currentMeasure.node().attribute("id"))
                 ? currentMeasure.node().attribute("id").as_string()
                 : currentMeasure.node().attribute("number").as_string();
-            LogDebug("MusicXML import: Beam without end in measure %s treated as <beamSpan>", measureName.c_str());
+            LogDebug("MusicXML import: Beam without end in measure {} treated as <beamSpan>", measureName);
             return false;
         }
         // form vector of the beam nodes and find whether there are tuplets that start or end within the beam
@@ -4509,10 +4509,10 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
         short int fifths = key.child("fifths").text().as_int();
         std::string keySigStr;
         if (fifths < 0) {
-            keySigStr = StringFormat("%df", abs(fifths));
+            keySigStr = StringFormat("{}f", abs(fifths));
         }
         else if (fifths > 0) {
-            keySigStr = StringFormat("%ds", fifths);
+            keySigStr = StringFormat("{}s", fifths);
         }
         else {
             keySigStr = "0";
@@ -4640,7 +4640,7 @@ data_ACCIDENTAL_WRITTEN MusicXmlInput::ConvertAccidentalToAccid(const std::strin
         return result->second;
     }
 
-    LogWarning("MusicXML import: Unsupported accidental value '%s'", value.c_str());
+    LogWarning("MusicXML import: Unsupported accidental value '{}'", value);
     return ACCIDENTAL_WRITTEN_NONE;
 }
 
@@ -4724,7 +4724,7 @@ data_BARRENDITION MusicXmlInput::ConvertStyleToRend(const std::string &value, co
     if (value == "regular") return BARRENDITION_single;
     if (value == "short") return BARRENDITION_single;
     if (value == "tick") return BARRENDITION_single;
-    LogWarning("MusicXML import: Unsupported bar-style '%s'", value.c_str());
+    LogWarning("MusicXML import: Unsupported bar-style '{}'", value);
     return BARRENDITION_NONE;
 }
 
@@ -4760,7 +4760,7 @@ data_DURATION MusicXmlInput::ConvertTypeToDur(const std::string &value)
         return result->second;
     }
 
-    LogWarning("MusicXML import: Unsupported note-type-value '%s'", value.c_str());
+    LogWarning("MusicXML import: Unsupported note-type-value '{}'", value);
     return DURATION_NONE;
 }
 
@@ -4821,7 +4821,7 @@ std::u32string MusicXmlInput::ConvertTypeToVerovioText(const std::string &value)
         return result->second;
     }
 
-    LogWarning("MusicXML import: Unsupported type '%s'", value.c_str());
+    LogWarning("MusicXML import: Unsupported type '{}'", value);
     return std::u32string();
 }
 
@@ -4900,7 +4900,7 @@ data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(const std::string &value)
         return result->second;
     }
 
-    LogWarning("MusicXML import: Unsupported step value '%s'", value.c_str());
+    LogWarning("MusicXML import: Unsupported step value '{}'", value);
     return PITCHNAME_NONE;
 }
 
@@ -4949,7 +4949,7 @@ pedalLog_DIR MusicXmlInput::ConvertPedalTypeToDir(const std::string &value)
         return result->second;
     }
 
-    LogWarning("MusicXML import: Unsupported type '%s' for pedal", value.c_str());
+    LogWarning("MusicXML import: Unsupported type '{}' for pedal", value);
     return pedalLog_DIR_NONE;
 }
 
@@ -4991,7 +4991,7 @@ sylLog_CON MusicXmlInput::ConvertElisionToCon(const pugi::xml_node elision)
             return glyphResult->second;
         }
 
-        LogWarning("MusicXML import: Unsupported elision glyph '%s'", glyph.c_str());
+        LogWarning("MusicXML import: Unsupported elision glyph '{}'", glyph);
         return sylLog_CON_b;
     }
 
@@ -5000,7 +5000,7 @@ sylLog_CON MusicXmlInput::ConvertElisionToCon(const pugi::xml_node elision)
         return result->second;
     }
 
-    LogWarning("MusicXML import: Unsupported elision symbol '%s'", value.c_str());
+    LogWarning("MusicXML import: Unsupported elision symbol '{}'", value);
     return sylLog_CON_b;
 }
 

@@ -200,7 +200,7 @@ int DarmsInput::parseMeter(int pos, const char *data)
 
             meter->SetNumbase(n1);
         }
-        LogDebug("DARMS import: Meter is: %i %i", meter->GetNumbase(), meter->GetNumbase());
+        LogDebug("DARMS import: Meter is: {} {}", meter->GetNumbase(), meter->GetNumbase());
     }
 
     m_layer->AddChild(meter);
@@ -487,7 +487,7 @@ bool DarmsInput::Import(const std::string &data_str)
         char c = data[pos];
 
         if (c == '!') {
-            LogDebug("DARMS import: Global spec. at %i", pos);
+            LogDebug("DARMS import: Global spec. at {}", pos);
             res = do_globalSpec(pos, data);
             if (res) pos = res;
             // if notehead type was specified in the !Nx option preserve it
@@ -510,7 +510,7 @@ bool DarmsInput::Import(const std::string &data_str)
         }
         else {
             // if (!isspace(c))
-            // LogInfo("Other %c", c);
+            // LogInfo("Other {}", c);
         }
 
         pos++;

@@ -95,7 +95,7 @@ FunctorCode PrepareDataInitializationFunctor::VisitChord(Chord *chord)
     this->VisitLayerElement(chord);
 
     if (chord->HasEmptyList()) {
-        LogWarning("Chord '%s' has no child note - a default note is added", chord->GetID().c_str());
+        LogWarning("Chord '{}' has no child note - a default note is added", chord->GetID());
         Note *rescueNote = new Note();
         chord->AddChild(rescueNote);
     }
@@ -302,16 +302,16 @@ FunctorCode PrepareCrossStaffFunctor::VisitLayerElement(LayerElement *layerEleme
     AttNIntegerComparison comparisonFirst(STAFF, crossElement->GetStaff().at(0));
     layerElement->m_crossStaff = vrv_cast<Staff *>(m_currentMeasure->FindDescendantByComparison(&comparisonFirst, 1));
     if (!layerElement->m_crossStaff) {
-        LogWarning("Could not get the cross staff reference '%d' for element '%s'", crossElement->GetStaff().at(0),
-            layerElement->GetID().c_str());
+        LogWarning("Could not get the cross staff reference '{}' for element '{}'", crossElement->GetStaff().at(0),
+            layerElement->GetID());
         return FUNCTOR_CONTINUE;
     }
 
     Staff *parentStaff = layerElement->GetAncestorStaff();
     // Check if we have a cross-staff to itself...
     if (layerElement->m_crossStaff == parentStaff) {
-        LogWarning("The cross staff reference '%d' for element '%s' seems to be identical to the parent staff",
-            crossElement->GetStaff().at(0), layerElement->GetID().c_str());
+        LogWarning("The cross staff reference '{}' for element '{}' seems to be identical to the parent staff",
+            crossElement->GetStaff().at(0), layerElement->GetID());
         layerElement->m_crossStaff = NULL;
         return FUNCTOR_CONTINUE;
     }
@@ -333,8 +333,8 @@ FunctorCode PrepareCrossStaffFunctor::VisitLayerElement(LayerElement *layerEleme
     }
     if (!layerElement->m_crossLayer) {
         // Nothing we can do
-        LogWarning("Could not get the layer with cross-staff reference '%d' for element '%s'",
-            crossElement->GetStaff().at(0), layerElement->GetID().c_str());
+        LogWarning("Could not get the layer with cross-staff reference '{}' for element '{}'",
+            crossElement->GetStaff().at(0), layerElement->GetID());
         layerElement->m_crossStaff = NULL;
     }
     else {
@@ -505,8 +505,8 @@ FunctorCode PrepareLinkingFunctor::VisitObject(Object *object)
             // Issue a warning if classes of object and sameas do not match
             Object *owner = dynamic_cast<Object *>(j->second);
             if (owner && (owner->GetClassId() != object->GetClassId())) {
-                LogWarning("%s with @xml:id %s has @sameas to an element of class %s.", owner->GetClassName().c_str(),
-                    owner->GetID().c_str(), object->GetClassName().c_str());
+                LogWarning("{} with @xml:id {} has @sameas to an element of class {}.", owner->GetClassName(),
+                    owner->GetID(), object->GetClassName());
             }
         }
         m_sameasIDPairs.erase(r2.first, r2.second);
@@ -711,8 +711,8 @@ FunctorCode PrepareTimePointingFunctor::VisitLayerElement(LayerElement *layerEle
 FunctorCode PrepareTimePointingFunctor::VisitMeasureEnd(Measure *measure)
 {
     if (!m_timePointingInterfaces.empty()) {
-        LogWarning("%d time pointing element(s) could not be matched in measure %s", m_timePointingInterfaces.size(),
-            measure->GetID().c_str());
+        LogWarning("{} time pointing element(s) could not be matched in measure {}", m_timePointingInterfaces.size(),
+            measure->GetID());
     }
 
     ListOfPointingInterClassIdPairs::iterator iter = m_timePointingInterfaces.begin();
@@ -1147,8 +1147,8 @@ FunctorCode PrepareLyricsFunctor::VisitSyl(Syl *syl)
         // The previous syl was an underscore -> the previous but one was the end
         else if (m_currentSyl->GetCon() == sylLog_CON_u) {
             if (m_currentSyl->GetStart() == m_penultimateNoteOrChord) {
-                LogWarning("Syllable with underline extender under one single note '%s'",
-                    m_currentSyl->GetStart()->GetID().c_str());
+                LogWarning("Syllable with underline extender under one single note '{}'",
+                    m_currentSyl->GetStart()->GetID());
             }
             else if (m_penultimateNoteOrChord) {
                 m_currentSyl->SetEnd(m_penultimateNoteOrChord);
@@ -1261,7 +1261,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
 
     const bool shouldHaveDots = (note->GetDots() > 0);
     if (shouldHaveDots && chord && (chord->GetDots() == note->GetDots())) {
-        LogWarning("Note '%s' with a @dots attribute with the same value as its chord parent", note->GetID().c_str());
+        LogWarning("Note '{}' with a @dots attribute with the same value as its chord parent", note->GetID());
     }
     currentDots = this->ProcessDots(currentDots, note, shouldHaveDots);
 
@@ -1712,7 +1712,7 @@ FunctorCode PrepareFloatingGrpsFunctor::VisitHarm(Harm *harm)
     // If there is no @n on harm we use the first @staff value as negative
     // This will not work if @staff has more than one staff id, but this is probably not going to be used
     if (n == "" && harm->HasStaff()) {
-        n = StringFormat("%d", harm->GetStaff().at(0) * -1);
+        n = StringFormat("{}", harm->GetStaff().at(0) * -1);
     }
 
     for (auto &kv : m_harms) {

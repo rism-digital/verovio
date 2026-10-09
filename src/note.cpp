@@ -459,7 +459,7 @@ std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType, int &overl
         return fretStr;
     }
     else {
-        std::string str = StringFormat("%d", this->GetTabFret());
+        std::string str = StringFormat("{}", this->GetTabFret());
         return UTF8to32(str);
     }
 }

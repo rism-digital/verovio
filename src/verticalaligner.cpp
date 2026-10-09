@@ -139,7 +139,7 @@ const StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN) cons
 
         if ((alignment->GetStaff()) && (alignment->GetStaff()->GetN() == staffN)) return alignment;
     }
-    // LogDebug("Staff alignment for staff %d not found", staffN);
+    // LogDebug("Staff alignment for staff {} not found", staffN);
     return NULL;
 }
 
@@ -776,7 +776,7 @@ void StaffAlignment::SetCurrentFloatingPositioner(
         m_floatingPositionersSorted = false;
     }
     positioner->SetObjectXY(objectX, objectY);
-    // LogDebug("BB %d", item->second.m_contentBB_x1);
+    // LogDebug("BB {}", item->second.m_contentBB_x1);
     object->SetCurrentFloatingPositioner(positioner);
 }
 

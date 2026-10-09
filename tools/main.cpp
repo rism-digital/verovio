@@ -178,7 +178,7 @@ int main(int argc, char **argv)
                 }
                 else if (opt) {
                     if (!opt->SetValue(optarg)) {
-                        vrv::LogWarning("Setting option %s with %s failed, default value used",
+                        vrv::LogWarning("Setting option {} with {} failed, default value used",
                             longOptions[optionIndex].name, optarg);
                     }
                 }
@@ -211,7 +211,7 @@ int main(int argc, char **argv)
 
             case 's':
                 if (!options->m_scale.SetValue(optarg)) {
-                    vrv::LogWarning("Setting scale with %s failed, default value used", optarg);
+                    vrv::LogWarning("Setting scale with {} failed, default value used", optarg);
                 }
                 break;
 
@@ -219,7 +219,7 @@ int main(int argc, char **argv)
 
             case 'x':
                 if (!options->m_xmlIdSeed.SetValue(optarg)) {
-                    vrv::LogWarning("Setting xml id seed with %s failed, default value used", optarg);
+                    vrv::LogWarning("Setting xml id seed with {} failed, default value used", optarg);
                 }
                 vrv::Object::SeedID(options->m_xmlIdSeed.GetValue());
                 break;
@@ -354,7 +354,7 @@ int main(int argc, char **argv)
         for (int p = from; p <= to; ++p) {
             std::string curOutfile = outfile;
             if (from < to) {
-                curOutfile += vrv::StringFormat("_%03d", p);
+                curOutfile += vrv::StringFormat("_{:03}", p);
             }
             curOutfile += ".svg";
             if (stdOutput) {
@@ -561,9 +561,9 @@ int main(int argc, char **argv)
             const char *generateFacs = (outformat == "mei-facs") ? "true" : "false";
             outfile += ".mei";
             params = page ? vrv::StringFormat(
-                                "{'scoreBased': %s, 'basic': %s, 'pageNo': %d, 'removeIds': %s, 'generateFacs': %s}",
+                                "{{'scoreBased': {}, 'basic': {}, 'pageNo': {}, 'removeIds': {}, 'generateFacs': {}}}",
                                 scoreBased, basic, *page, removeIds, generateFacs)
-                          : vrv::StringFormat("{'scoreBased': %s, 'basic': %s, 'removeIds': %s, 'generateFacs': %s}",
+                          : vrv::StringFormat("{{'scoreBased': {}, 'basic': {}, 'removeIds': {}, 'generateFacs': {}}}",
                                 scoreBased, basic, removeIds, generateFacs);
         }
         if (stdOutput) {

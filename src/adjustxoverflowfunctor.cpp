@@ -49,8 +49,8 @@ FunctorCode AdjustXOverflowFunctor::VisitControlElement(ControlElement *controlE
 
     // Something is probably not right if nothing found - maybe no @staff
     if (positioners.empty()) {
-        LogDebug("Something was wrong when searching positioners for %s '%s'", controlElement->GetClassName().c_str(),
-            controlElement->GetID().c_str());
+        LogDebug("Something was wrong when searching positioners for {} '{}'", controlElement->GetClassName(),
+            controlElement->GetID());
         return FUNCTOR_SIBLINGS;
     }
 

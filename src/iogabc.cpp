@@ -261,7 +261,7 @@ bool GABCInput::ProcessClef(const std::string &word)
     }
 
     m_currentClefPitchOffset = offset;
-    LogDebug("Clef found %s", word.c_str());
+    LogDebug("Clef found {}", word);
     return true;
 }
 
@@ -301,7 +301,7 @@ int GABCInput::ProcessCustos(const std::string &word)
     }
 
     if (processedChars > 0) {
-        LogDebug("Custos found %s", word.c_str());
+        LogDebug("Custos found {}", word);
     }
     return processedChars;
 }
@@ -351,7 +351,7 @@ void GABCInput::ProcessInput(const std::string &gabc)
             pendingBoundary = false;
         }
 
-        LogDebug("Processing token: lyrics='%s' music='%s'", lyrics.c_str(), music.c_str());
+        LogDebug("Processing token: lyrics='{}' music='{}'", lyrics, music);
         tokens.push_back({ lyrics, music, boundary });
     }
 
@@ -604,7 +604,7 @@ void GABCInput::ProcessNeume(const std::string &music, Syllable *syllable)
                 currentIndex += processedChars;
             }
             else {
-                LogDebug("Unknown neume character: %c", static_cast<char>(ch));
+                LogDebug("Unknown neume character: {}", ch);
                 currentIndex++;
             }
         }
@@ -703,7 +703,7 @@ void GABCInput::ProcessWord(const std::string &lyrics, const std::string &music,
     m_layer->AddChild(syllable);
 
     if (!lyrics.empty()) {
-        LogDebug("Processing lyrics: %s", lyrics.c_str());
+        LogDebug("Processing lyrics: {}", lyrics);
         Syl *syl = new Syl();
         if (wordpos != sylLog_WORDPOS_NONE) syl->SetWordpos(wordpos);
         if (con != sylLog_CON_NONE) syl->SetCon(con);
@@ -714,7 +714,7 @@ void GABCInput::ProcessWord(const std::string &lyrics, const std::string &music,
     }
 
     if (!music.empty()) {
-        LogDebug("Processing music: %s", music.c_str());
+        LogDebug("Processing music: {}", music);
         bool isClef = this->ProcessClef(music);
         if (!isClef) {
             bool isCustos = this->ProcessCustos(music);
@@ -786,7 +786,7 @@ bool GABCInput::Import(const std::string &gabc)
 
 void GABCInput::AddAccidental(Syllable *syllable, data_ACCIDENTAL_WRITTEN accid, data_PITCHNAME pname, data_OCTAVE oct)
 {
-    LogDebug("Accidental found: %i", accid);
+    LogDebug("Accidental found: {}", accid);
     Accid *accidElem = new Accid();
     accidElem->SetAccid(accid);
     accidElem->SetPloc(pname);
@@ -933,7 +933,7 @@ int GABCInput::ProcessBarline(const std::string &music, int currentIndex, Layer 
     }
 
     if (form.has_value()) {
-        LogDebug("Divisio found: %c (form=%d)", ch, static_cast<int>(form.value()));
+        LogDebug("Divisio found: {} (form={})", ch, form.value());
         DivLine *divLine = new DivLine();
         divLine->SetForm(form.value());
         layer->AddChild(divLine);

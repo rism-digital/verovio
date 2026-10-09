@@ -436,7 +436,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
         AttNIntegerComparison matchN(STAFF, staffN);
         Staff *staff = vrv_cast<Staff *>(this->FindDescendantByComparison(&matchN, 1));
         if (!staff) {
-            // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetID().c_str());
+            // LogDebug("Staff with @n '{}' not found in measure '{}'", *iter, measure->GetID());
             continue;
         }
         staves.push_back(staff);

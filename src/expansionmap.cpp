@@ -92,8 +92,8 @@ Object *ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList,
         assert(referenceChild);
         parent->GetParent()->InsertAfter(referenceChild, newContainer);
         GeneratePredictableIDs(parent, newContainer);
-        LogDebug("Creating new container <%s> for expansion element %s", newContainer->GetClassName().c_str(),
-            newContainer->GetID().c_str());
+        LogDebug("Creating new container <{}> for expansion element {}", newContainer->GetClassName(),
+            newContainer->GetID());
 
         insertHere = newContainer;
     }
@@ -111,7 +111,7 @@ Object *ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList,
 
     // iterate over expansion plist
     for (std::string id : expansionPlist) {
-        LogDebug("Looking for element in @plist: %s", id.c_str());
+        LogDebug("Looking for element in @plist: {}", id);
         if (id.rfind("#", 0) == 0) id = id.substr(1, id.size() - 1); // remove leading hash from id
         Object *currSect = parent->FindDescendantByID(id); // find section pointer for id string
         if (currSect == NULL) {
@@ -148,7 +148,7 @@ Object *ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList,
                 // go through cloned objects, find TimePointing/SpanningInterface, PListInterface, LinkingInterface
                 this->UpdateIDs(clonedObject);
 
-                LogDebug("Cloning element in @plist: %s", clonedObject->GetID().c_str());
+                LogDebug("Cloning element in @plist: {}", clonedObject->GetID());
 
                 if (insertHere != NULL) {
                     insertHere->AddChild(clonedObject); // add to new container, if it exists
@@ -186,11 +186,11 @@ Object *ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList,
                 // move prevSect to after currSect
                 if (moveCurrentElement && currIdx < prevIdx && prevIdx < childCount) {
                     LogDebug(
-                        "Re-ordering element %s to after %s", currSect->GetID().c_str(), prevSect->GetID().c_str());
+                        "Re-ordering element {} to after {}", currSect->GetID(), prevSect->GetID());
                     currSect->GetParent()->RotateChildren(currIdx, currIdx + 1, prevIdx + 1);
                 }
                 else {
-                    LogDebug("Leaving existing element %s", currSect->GetID().c_str());
+                    LogDebug("Leaving existing element {}", currSect->GetID());
                 }
 
                 prevSect = currSect;
@@ -208,7 +208,7 @@ Object *ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList,
                 assert(currSect);
 
                 int idx = currSect->GetIdx();
-                LogDebug("ExpansionMap::Expand: Removing unused section/ending/rdg/lem with id %s", del.c_str());
+                LogDebug("ExpansionMap::Expand: Removing unused section/ending/rdg/lem with id {}", del);
                 currSect->GetParent()->DetachChild(idx);
             }
         }

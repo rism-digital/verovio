@@ -11,6 +11,7 @@
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
+#include <format>
 #include <map>
 #include <string>
 #include <unordered_map>
@@ -27,23 +28,32 @@
 #include "toolkitdef.h"
 #include "vrvdef.h"
 
+
+/**
+ * A formatter for all enums types.
+ * Simply format the enum as its numerical value, but with C++26, it will be
+ * possible to use reflection to format as the enum name.
+ */
+template <typename E>
+requires std::is_enum_v<E>
+struct std::formatter<E> : std::formatter<std::string> {
+    template<class FormatContext>
+	constexpr auto format (const E& e, FormatContext& ctx) const
+	{
+		return std::formatter<std::string>::format(std::to_string(e), ctx);
+	}
+};
+
+
 namespace vrv {
 
 class Object;
 /**
- * The following functions are helpers for formatting, conversion, or logging.
- * Most of them differ if they are used in the command line tool or in emscripten
- */
-
-void LogDebug(const char *fmt, ...);
-void LogError(const char *fmt, ...);
-void LogInfo(const char *fmt, ...);
-void LogWarning(const char *fmt, ...);
-
-/**
  * Member and functions specific to logging that uses a vector of string to buffer the logs.
  */
 extern std::vector<std::string> logBuffer;
+extern LogLevel logLevel;
+extern bool loggingToBuffer;
 bool LogBufferContains(const std::string &s);
 void LogString(std::string message, LogLevel level);
 
@@ -98,12 +108,69 @@ std::u32string UTF8to32(const std::string &in);
 std::string UTF16to8(const std::u16string &in);
 
 /**
- * Format a string using vsnprintf.
- * The maximum length is giving by STRING_FORMAT_MAX_LEN
+ * Format a string using std::format.
  */
-std::string StringFormat(const char *fmt, ...);
-// This is the implementation callable with variable arguments
-std::string StringFormatVariable(const char *format, va_list arg);
+template <typename... T> std::string StringFormat(std::format_string<T...> fmt, T &&...args)
+{
+    return std::format(fmt, std::forward<T>(args)...);
+}
+
+/**
+ * Format a string using std::vformat, the format string can be chosen at runtime unlike StringFormat..
+ * Prefer StringFormat when possible, as the format string will be checked at compile-time.
+ */
+template <typename... T> std::string StringFormatDynamic(std::string_view fmt, T &&...args)
+{
+    return std::vformat(fmt, std::forward<T>(args)...);
+}
+
+
+/**
+ * The following functions ("Log*") are helpers for formatting, conversion, or logging.
+ * Most of them differ if they are used in the command line tool or in emscripten
+ */
+
+template<typename ...T>
+void LogDebug(std::format_string<T...> fmt, T&& ...args)
+{
+    if (logLevel < LOG_DEBUG) return;
+
+#if defined(DEBUG)
+    std::string s;
+    s = "[Debug] " + StringFormat(fmt, std::forward<T>(args)...) + "\n";
+    LogString(s, LOG_DEBUG);
+#endif
+}
+
+template<typename ...T>
+void LogError(std::format_string<T...> fmt, T&& ...args)
+{
+    if (logLevel < LOG_ERROR) return;
+
+    std::string s;
+    s = "[Error] " + StringFormat(fmt, std::forward<T>(args)...) + "\n";
+    LogString(s, LOG_ERROR);
+}
+
+template<typename ...T>
+void LogInfo(std::format_string<T...> fmt, T&&... args)
+{
+    if (logLevel < LOG_INFO) return;
+
+    std::string s;
+    s = "[Info] " + StringFormat(fmt, std::forward<T>(args)...) + "\n";
+    LogString(s, LOG_INFO);
+}
+
+template<typename ...T>
+void LogWarning(std::format_string<T...> fmt, T&&... args)
+{
+    if (logLevel < LOG_WARNING) return;
+
+    std::string s;
+    s = "[Warning] " + StringFormat(fmt, std::forward<T>(args)...) + "\n";
+    LogString(s, LOG_WARNING);
+}
 
 /**
  * Return a formatted version (####.####.####) of the file version.
@@ -149,11 +216,6 @@ inline data_DURATION DurationMax(data_DURATION dur1, data_DURATION dur2)
     return std::max(dur1, dur2);
 }
 
-/**
- *
- */
-extern LogLevel logLevel;
-extern bool loggingToBuffer;
 
 /**
  * Functions for logging in milliseconds the elapsed time of an

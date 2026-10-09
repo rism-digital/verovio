@@ -141,7 +141,7 @@ void Hairpin::SetLeftLink(ControlElement *leftLink)
     if (!leftLink) return;
 
     if (this->GetDrawingGrpId() != 0) {
-        // LogDebug("Grp id LF already set %d", this->GetDrawingGrpId());
+        // LogDebug("Grp id LF already set {}", this->GetDrawingGrpId());
         return;
     }
 
@@ -163,7 +163,7 @@ void Hairpin::SetRightLink(ControlElement *rightLink)
     }
 
     if (rightLink->GetDrawingGrpId() != 0) {
-        // LogDebug("Grp id RL already set %d", rightLink->GetDrawingGrpId());
+        // LogDebug("Grp id RL already set {}", rightLink->GetDrawingGrpId());
         return;
     }
     rightLink->SetDrawingGrpId(grpId);

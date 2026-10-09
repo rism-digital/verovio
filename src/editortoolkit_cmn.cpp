@@ -403,7 +403,7 @@ bool EditorToolkitCMN::InsertMeasure(std::string &elementId, int number, bool in
             measure->SetRight(BARRENDITION_NONE);
         }
         if (measureN != VRV_UNSET) {
-            newMeasure->SetN(StringFormat("%d", measureN + number - i));
+            newMeasure->SetN(StringFormat("{}", measureN + number - i));
         }
 
         // Now we can process by layer and move their content to (measure) segments
