@@ -37,12 +37,14 @@ RepeatMark::RepeatMark()
     , AttExtSymAuth()
     , AttExtSymNames()
     , AttRepeatMarkLog()
+    , AttVerticalGroup()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_EXTSYMAUTH);
     this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_REPEATMARKLOG);
+    this->RegisterAttClass(ATT_VERTICALGROUP);
 
     this->Reset();
 }
@@ -57,6 +59,7 @@ void RepeatMark::Reset()
     this->ResetExtSymAuth();
     this->ResetExtSymNames();
     this->ResetRepeatMarkLog();
+    this->ResetVerticalGroup();
 }
 
 bool RepeatMark::IsSupportedChild(ClassId classId)

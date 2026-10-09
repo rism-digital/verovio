@@ -37,6 +37,7 @@ Turn::Turn()
     , AttOrnamentAccid()
     , AttPlacementRelStaff()
     , AttTurnLog()
+    , AttVerticalGroup()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
@@ -45,6 +46,7 @@ Turn::Turn()
     this->RegisterAttClass(ATT_ORNAMENTACCID);
     this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
     this->RegisterAttClass(ATT_TURNLOG);
+    this->RegisterAttClass(ATT_VERTICALGROUP);
 
     this->Reset();
 }
@@ -61,6 +63,7 @@ void Turn::Reset()
     this->ResetOrnamentAccid();
     this->ResetPlacementRelStaff();
     this->ResetTurnLog();
+    this->ResetVerticalGroup();
 
     m_drawingEndElement = NULL;
 }
