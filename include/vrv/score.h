@@ -57,6 +57,7 @@ public:
     ScoreDef *GetScoreDef() { return m_scoreDef; }
     const ScoreDef *GetScoreDef() const { return m_scoreDef; }
     Object *GetScoreDefSubtree() { return m_scoreDefSubtree; }
+    void ClearScoreDef();
     ///@}
 
     /**
@@ -89,8 +90,7 @@ private:
     /**
      * The score/scoreDef (first child of the score).
      * A score can have either a single scoreDef, or a subtree with editorial markup and different scoreDefs.
-     * This member holds the selected scoreDef. It is set either in the constructor, or by SetScoreDefSubtree (only
-     * once).
+     * This member holds the selected scoreDef. It is set either in the constructor, or by SetScoreDefSubtree.
      */
     ScoreDef *m_scoreDef;
     /**

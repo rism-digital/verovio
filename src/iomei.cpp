@@ -3639,12 +3639,105 @@ jsonxx::Object MEIOutputExtended::ExportScoreDef()
 {
     try {
         pugi::xml_document meiDoc;
+        m_currentNode = meiDoc.root();
+        m_nodeStack.push_back(m_currentNode);
+
+        Score *score = m_doc->GetFirstVisibleScore();
+        score->GetScoreDef()->SaveObject(this);
+
+        return ToJson(meiDoc);
+    }
+    catch (char *str) {
+        LogError("%s", str);
+        return jsonxx::Object();
+    }
+}
+
+jsonxx::Object MEIOutputExtended::ExportStaffGrp(ScoreDef *scoreDef)
+{
+    try {
+        pugi::xml_document meiDoc;
+        m_currentNode = meiDoc.root();
+        m_nodeStack.push_back(m_currentNode);
+
+        StaffGrp *staffGrp = (scoreDef) ? vrv_cast<StaffGrp *>(scoreDef->FindDescendantByType(STAFFGRP)) : NULL;
+
+        if (staffGrp) staffGrp->SaveObject(this);
+        return ToJson(meiDoc);
+    }
+    catch (char *str) {
+        LogError("%s", str);
+        return jsonxx::Object();
+    }
+}
+
+jsonxx::Object MEIOutputExtended::ExportStaffDef(ScoreDef *scoreDef, int staffN)
+{
+    try {
+        pugi::xml_document meiDoc;
+        m_currentNode = meiDoc.root();
+        m_nodeStack.push_back(m_currentNode);
+
+        if (scoreDef) {
+            AttNIntegerComparison staffDefN(STAFFDEF, staffN);
+            StaffDef *staffDef = vrv_cast<StaffDef *>(scoreDef->FindDescendantByComparison(&staffDefN));
+            if (staffDef) staffDef->SaveObject(this);
+        }
+        return ToJson(meiDoc);
+    }
+    catch (char *str) {
+        LogError("%s", str);
+        return jsonxx::Object();
+    }
+}
+
+jsonxx::Object MEIOutputExtended::ExportMeterSig(ScoreDef *scoreDef)
+{
+    try {
+        pugi::xml_document meiDoc;
+        m_currentNode = meiDoc.root();
+        m_nodeStack.push_back(m_currentNode);
+
+        ClassIdsComparison meterSigOrGrpComparison({ METERSIG, METERSIGGRP });
+        LayerElement *meterSigOrGrp = (scoreDef)
+            ? vrv_cast<LayerElement *>(scoreDef->FindDescendantByComparison(&meterSigOrGrpComparison))
+            : NULL;
+        if (meterSigOrGrp) {
+            meterSigOrGrp->SaveObject(this);
+        }
+        else {
+            MeterSig meterSigDefault;
+            meterSigDefault.SaveObject(this);
+        }
+        return ToJson(meiDoc);
+    }
+    catch (char *str) {
+        LogError("%s", str);
+        return jsonxx::Object();
+    }
+}
+
+jsonxx::Object MEIOutputExtended::ExportKeySig(ScoreDef *scoreDef)
+{
+    try {
+        pugi::xml_document meiDoc;
         std::ostringstream streamStringOutput;
 
         m_currentNode = meiDoc.root();
         m_nodeStack.push_back(m_currentNode);
-        m_doc->GetFirstScoreDef()->SaveObject(this);
 
+        KeySig *keySig = (scoreDef) ? vrv_cast<KeySig *>(scoreDef->FindDescendantByType(KEYSIG)) : NULL;
+        if (keySig) {
+            StaffDef *staffDef = vrv_cast<StaffDef *>(keySig->GetFirstAncestor(STAFFDEF));
+            if (staffDef && staffDef->HasTransDiat() && staffDef->HasTransSemi()) {
+                keySig->SetSig(keySig->ConvertFromWritten(staffDef->GetTransDiat(), staffDef->GetTransSemi()));
+            }
+            keySig->SaveObject(this);
+        }
+        else {
+            KeySig keySigDefault;
+            keySigDefault.SaveObject(this);
+        }
         return ToJson(meiDoc);
     }
     catch (char *str) {
@@ -4192,6 +4285,9 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
             return true;
         }
         else if (element == "fTrem") {
+            return true;
+        }
+        else if (element == "graceGrp") {
             return true;
         }
         else if (element == "note") {
@@ -9363,7 +9459,113 @@ bool MEIInput::ReadFacsimile(Doc *doc, pugi::xml_node facsimile)
 // MEIInputExtended
 //----------------------------------------------------------------------------
 
-MEIInputExtended::MEIInputExtended(Doc *doc) : MEIInput(doc) {}
+MEIInputExtended::MEIInputExtended(Doc *doc) : MEIInput(doc)
+{
+    m_meiversion = meiVersion_MEIVERSION_6_0_dev;
+}
+
+void MEIInputExtended::ImportScoreDef(const jsonxx::Object &scoreDef)
+{
+    try {
+        pugi::xml_document meiDoc = this->FromJson(scoreDef);
+
+        Score newScore;
+        if (this->ReadScoreDefExt(&newScore, meiDoc.first_child())) {
+            Score *score = m_doc->GetFirstVisibleScore();
+            ScoreDef *vrvScoreDef = vrv_cast<ScoreDef *>(newScore.GetFirst());
+            if (score && vrvScoreDef) {
+                newScore.Relinquish(0);
+                score->SetScoreDefSubtree(vrvScoreDef, vrvScoreDef);
+            }
+        }
+    }
+    catch (char *str) {
+        LogError("%s", str);
+    }
+}
+
+void MEIInputExtended::ImportStaffGrp(const jsonxx::Object &staffGrp, ScoreDef *scoreDef)
+{
+    assert(scoreDef);
+
+    try {
+        pugi::xml_document meiDoc = this->FromJson(staffGrp);
+
+        ScoreDef newScoreDef;
+        if (this->ReadStaffGrpExt(&newScoreDef, meiDoc.first_child())) {
+            StaffGrp *newStaffGrp = vrv_cast<StaffGrp *>(newScoreDef.GetFirst());
+            StaffGrp *oldStaffGrp
+                = (newStaffGrp) ? vrv_cast<StaffGrp *>(scoreDef->FindDescendantByID(newStaffGrp->GetID())) : NULL;
+            if (oldStaffGrp && newStaffGrp) {
+                newScoreDef.Relinquish(0);
+                oldStaffGrp->GetParent()->ReplaceChild(oldStaffGrp, newStaffGrp);
+                delete oldStaffGrp;
+            }
+        }
+    }
+    catch (char *str) {
+        LogError("%s", str);
+    }
+}
+
+void MEIInputExtended::ImportStaffDef(const jsonxx::Object &staffDef, ScoreDef *scoreDef, int staffN)
+{
+    assert(scoreDef);
+
+    try {
+        pugi::xml_document meiDoc = this->FromJson(staffDef);
+
+        StaffGrp newStaffGrp;
+        if (this->ReadStaffDefExt(&newStaffGrp, meiDoc.first_child())) {
+            StaffDef *newStaffDef = vrv_cast<StaffDef *>(newStaffGrp.GetFirst());
+            AttNIntegerComparison staffDefN(STAFFDEF, staffN);
+            StaffDef *oldStaffDef = vrv_cast<StaffDef *>(scoreDef->FindDescendantByComparison(&staffDefN));
+            if (oldStaffDef && newStaffDef) {
+                newStaffGrp.Relinquish(0);
+                oldStaffDef->GetParent()->ReplaceChild(oldStaffDef, newStaffDef);
+                delete oldStaffDef;
+            }
+        }
+    }
+    catch (char *str) {
+        LogError("%s", str);
+    }
+}
+
+void MEIInputExtended::ImportMeterSigOrGrpIntoLayer(Layer *layer, const jsonxx::Object &meterSig)
+{
+    assert(layer);
+    layer->ClearChildren();
+
+    try {
+        pugi::xml_document meiDoc = this->FromJson(meterSig);
+
+        const bool isGrp = (std::string(meiDoc.first_child().name()) == "meterSigGrp") ? true : false;
+        if (isGrp) {
+            this->ReadMeterSigGrpExt(layer, meiDoc.first_child());
+        }
+        else {
+            this->ReadMeterSigExt(layer, meiDoc.first_child());
+        }
+    }
+    catch (char *str) {
+        LogError("%s", str);
+    }
+}
+
+void MEIInputExtended::ImportKeySigIntoLayer(Layer *layer, const jsonxx::Object &keySig)
+{
+    assert(layer);
+    layer->ClearChildren();
+
+    try {
+        pugi::xml_document meiDoc = this->FromJson(keySig);
+        this->ReadKeySigExt(layer, meiDoc.first_child());
+    }
+    catch (char *str) {
+        LogError("%s", str);
+    }
+}
 
 pugi::xml_document MEIInputExtended::FromJson(const jsonxx::Object &json)
 {
@@ -9371,13 +9573,13 @@ pugi::xml_document MEIInputExtended::FromJson(const jsonxx::Object &json)
 
     std::function<void(const jsonxx::Object &, pugi::xml_node &)> jsonToNode
         = [&](const jsonxx::Object &jsonNode, pugi::xml_node &parent) {
-              std::string elementName = jsonNode.get<std::string>("element");
+              std::string elementName = jsonNode.get<jsonxx::String>("element");
 
               // Special case for text nodes
               if (elementName == "text") {
                   pugi::xml_node textNode = parent.append_child(pugi::node_pcdata);
-                  if (jsonNode.has<jsonxx::String>("text")) {
-                      textNode.set_value(jsonNode.get<std::string>("text").c_str());
+                  if (jsonNode.has<jsonxx::String>("text") && !jsonNode.get<jsonxx::String>("text").empty()) {
+                      textNode.set_value(jsonNode.get<jsonxx::String>("text").c_str());
                   }
                   return;
               }
@@ -9387,7 +9589,7 @@ pugi::xml_document MEIInputExtended::FromJson(const jsonxx::Object &json)
 
               // Convert xml:id from top-level "id"
               if (jsonNode.has<jsonxx::String>("id")) {
-                  xmlNode.append_attribute("xml:id") = jsonNode.get<std::string>("id").c_str();
+                  xmlNode.append_attribute("xml:id") = jsonNode.get<jsonxx::String>("id").c_str();
               }
 
               // Convert attributes
@@ -9395,7 +9597,9 @@ pugi::xml_document MEIInputExtended::FromJson(const jsonxx::Object &json)
                   jsonxx::Object attrs = jsonNode.get<jsonxx::Object>("attributes");
 
                   for (auto it = attrs.kv_map().begin(); it != attrs.kv_map().end(); ++it) {
-                      xmlNode.append_attribute(it->first.c_str()) = it->second;
+                      if (it->second->is<jsonxx::String>() && !it->second->get<jsonxx::String>().empty()) {
+                          xmlNode.append_attribute(it->first.c_str()) = it->second->get<jsonxx::String>();
+                      }
                   }
               }
 

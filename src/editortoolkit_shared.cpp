@@ -37,8 +37,10 @@
 #include "plistinterface.h"
 #include "rend.h"
 #include "rest.h"
+#include "score.h"
 #include "slur.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "surface.h"
 #include "symboldef.h"
 #include "system.h"
@@ -230,6 +232,13 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         }
         LogWarning("Action insertMeasure available in CMN only");
     }
+    else if (action == "insertScoreDef") {
+        EditorToolkitCMN *editorToolkitCMN = dynamic_cast<EditorToolkitCMN *>(this);
+        if (editorToolkitCMN) {
+            return editorToolkitCMN->ParseEditorCMNAction(json);
+        }
+        LogWarning("Action insertScoreDef available in CMN only");
+    }
     else if (action == "insertNote") {
         EditorToolkitCMN *editorToolkitCMN = dynamic_cast<EditorToolkitCMN *>(this);
         if (editorToolkitCMN) {
@@ -262,15 +271,75 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         }
         LogWarning("Could not parse the navigate action");
     }
-    else if (action == "properties") {
-        std::string scoreDef;
-        if (this->ParsePropertiesAction(json.get<jsonxx::Object>("param"), scoreDef)) {
-            if (scoreDef.empty()) {
-                return this->GetScoreDef();
-            }
-            else {
-                return this->SetScoreDef(scoreDef);
-            }
+    else if (action == "getScoreDef") {
+        if (this->ParseGetScoreDefAction(json.get<jsonxx::Object>("param"))) return this->GetScoreDef();
+    }
+    else if (action == "getScoreDefKeySig") {
+        bool selected;
+        if (this->ParseGetScoreDefKeySigAction(json.get<jsonxx::Object>("param"), selected)) {
+            return this->GetScoreDefKeySig(selected);
+        }
+    }
+    else if (action == "getScoreDefMeterSig") {
+        bool selected;
+        if (this->ParseGetScoreDefMeterSigAction(json.get<jsonxx::Object>("param"), selected)) {
+            return this->GetScoreDefMeterSig(selected);
+        }
+    }
+    else if (action == "getScoreDefStaffDef") {
+        if (this->ParseGetScoreDefStaffDefAction(json.get<jsonxx::Object>("param"))) {
+            return this->GetScoreDefStaffDef();
+        }
+    }
+    else if (action == "getScoreDefStaffGrp") {
+        bool selected;
+        if (this->ParseGetScoreDefStaffGrpAction(json.get<jsonxx::Object>("param"), selected)) {
+            return this->GetScoreDefStaffGrp(selected);
+        }
+    }
+    else if (action == "setScoreDef") {
+        jsonxx::Object subTree;
+        if (this->ParseSetScoreDefAction(json.get<jsonxx::Object>("param"), subTree)) {
+            this->PrepareUndo();
+            return this->SetScoreDef(subTree);
+        }
+    }
+    else if (action == "setScoreDefKeySig") {
+        bool selected;
+        jsonxx::Object subTree;
+        if (this->ParseSetScoreDefKeySigAction(json.get<jsonxx::Object>("param"), selected, subTree)) {
+            this->PrepareUndo();
+            return this->SetScoreDefKeySig(selected, subTree);
+        }
+    }
+    else if (action == "setScoreDefMeterSig") {
+        bool selected;
+        jsonxx::Object subTree;
+        if (this->ParseSetScoreDefMeterSigAction(json.get<jsonxx::Object>("param"), selected, subTree)) {
+            this->PrepareUndo();
+            return this->SetScoreDefMeterSig(selected, subTree);
+        }
+    }
+    else if (action == "setScoreDefStaffDef") {
+        jsonxx::Object subTree;
+        if (this->ParseSetScoreDefStaffDefAction(json.get<jsonxx::Object>("param"), subTree)) {
+            this->PrepareUndo();
+            return this->SetScoreDefStaffDef(subTree);
+        }
+    }
+    else if (action == "setScoreDefStaffGrp") {
+        bool selected;
+        jsonxx::Object subTree;
+        if (this->ParseSetScoreDefStaffGrpAction(json.get<jsonxx::Object>("param"), selected, subTree)) {
+            this->PrepareUndo();
+            return this->SetScoreDefStaffGrp(selected, subTree);
+        }
+    }
+    else if (action == "updateScoreDef") {
+        ScoreDefUpdate update;
+        if (this->ParseUpdateScoreDefAction(json.get<jsonxx::Object>("param"), update)) {
+            this->PrepareUndo();
+            return this->UpdateScoreDef(update);
         }
     }
     else if (action == "resetCursor") {
@@ -307,8 +376,9 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         std::string elementId;
         Cursor::InputMode inputMode;
         bool chordMode;
-        if (this->ParseSetCursorAction(json.get<jsonxx::Object>("param"), elementId, inputMode, chordMode)) {
-            return (this->SetCursor(elementId, inputMode, chordMode));
+        bool autoBeam;
+        if (this->ParseSetCursorAction(json.get<jsonxx::Object>("param"), elementId, inputMode, chordMode, autoBeam)) {
+            return (this->SetCursor(elementId, inputMode, chordMode, autoBeam));
         }
         LogWarning("Could not parse the setCursor action");
     }
@@ -316,8 +386,9 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         bool restMode;
         bool chordMode;
         Cursor::TieMode tieMode;
-        if (this->ParseUpdateCursorAction(json.get<jsonxx::Object>("param"), restMode, chordMode, tieMode)) {
-            return (this->UpdateCursor(restMode, chordMode, tieMode));
+        bool autoBeam;
+        if (this->ParseUpdateCursorAction(json.get<jsonxx::Object>("param"), restMode, chordMode, tieMode, autoBeam)) {
+            return (this->UpdateCursor(restMode, chordMode, tieMode, autoBeam));
         }
         LogWarning("Could not parse the setCursor action");
     }
@@ -437,16 +508,6 @@ bool EditorToolkitShared::ParseNavigate(const jsonxx::Object &param, std::string
     return true;
 }
 
-bool EditorToolkitShared::ParsePropertiesAction(const jsonxx::Object &param, std::string &scoreDef)
-{
-    scoreDef = "";
-    if (param.has<jsonxx::String>("scoreDef")) {
-        scoreDef = param.get<jsonxx::String>("scoreDef");
-        return true;
-    }
-    return true;
-}
-
 bool EditorToolkitShared::ParseResetCursorAction(const jsonxx::Object &param, bool &maintainChordMode)
 {
     maintainChordMode = false;
@@ -454,6 +515,37 @@ bool EditorToolkitShared::ParseResetCursorAction(const jsonxx::Object &param, bo
     if (param.has<jsonxx::Boolean>("maintainChordMode"))
         maintainChordMode = param.get<jsonxx::Boolean>("maintainChordMode");
 
+    return true;
+}
+
+bool EditorToolkitShared::ParseGetScoreDefAction(const jsonxx::Object &)
+{
+    return true;
+}
+
+bool EditorToolkitShared::ParseGetScoreDefKeySigAction(const jsonxx::Object &param, bool &selected)
+{
+    if (!param.has<jsonxx::Boolean>("selected")) return false;
+    selected = param.get<jsonxx::Boolean>("selected");
+    return true;
+}
+
+bool EditorToolkitShared::ParseGetScoreDefMeterSigAction(const jsonxx::Object &param, bool &selected)
+{
+    if (!param.has<jsonxx::Boolean>("selected")) return false;
+    selected = param.get<jsonxx::Boolean>("selected");
+    return true;
+}
+
+bool EditorToolkitShared::ParseGetScoreDefStaffDefAction(const jsonxx::Object &)
+{
+    return true;
+}
+
+bool EditorToolkitShared::ParseGetScoreDefStaffGrpAction(const jsonxx::Object &param, bool &selected)
+{
+    if (!param.has<jsonxx::Boolean>("selected")) return false;
+    selected = param.get<jsonxx::Boolean>("selected");
     return true;
 }
 
@@ -493,27 +585,31 @@ bool EditorToolkitShared::ParseSetAction(
 }
 
 bool EditorToolkitShared::ParseSetCursorAction(
-    const jsonxx::Object &param, std::string &elementId, Cursor::InputMode &inputMode, bool &chordMode)
+    const jsonxx::Object &param, std::string &elementId, Cursor::InputMode &inputMode, bool &chordMode, bool &autoBeam)
 {
     elementId = "";
     inputMode = Cursor::PITCH_FIRST;
     chordMode = false;
+    autoBeam = true;
 
     if (param.has<jsonxx::String>("elementId")) elementId = param.get<jsonxx::String>("elementId");
     if (!param.has<jsonxx::String>("inputMode")) return false;
     inputMode = (param.get<jsonxx::String>("inputMode") == "pitchFirst") ? Cursor::PITCH_FIRST : Cursor::DURATION_FIRST;
     if (!param.has<jsonxx::Boolean>("chordMode")) return false;
     chordMode = param.get<jsonxx::Boolean>("chordMode");
+    if (!param.has<jsonxx::Boolean>("autoBeam")) return false;
+    autoBeam = param.get<jsonxx::Boolean>("autoBeam");
 
     return true;
 }
 
 bool EditorToolkitShared::ParseUpdateCursorAction(
-    const jsonxx::Object &param, bool &restMode, bool &chordMode, Cursor::TieMode &tieMode)
+    const jsonxx::Object &param, bool &restMode, bool &chordMode, Cursor::TieMode &tieMode, bool &autoBeam)
 {
     chordMode = false;
     restMode = false;
     tieMode = Cursor::TieMode::TIE_NONE;
+    autoBeam = true;
 
     if (param.has<jsonxx::Boolean>("chordMode")) {
         chordMode = param.get<jsonxx::Boolean>("chordMode");
@@ -523,6 +619,9 @@ bool EditorToolkitShared::ParseUpdateCursorAction(
     }
     else if (param.has<jsonxx::String>("tieMode")) {
         tieMode = (param.get<jsonxx::String>("tieMode") == "tie") ? Cursor::TieMode::TIE : Cursor::TieMode::COPY;
+    }
+    else if (param.has<jsonxx::Boolean>("autoBeam")) {
+        autoBeam = param.get<jsonxx::Boolean>("autoBeam");
     }
 
     return true;
@@ -547,6 +646,77 @@ bool EditorToolkitShared::ParseUpdatePitchAction(const jsonxx::Object &param, st
     if (param.has<jsonxx::String>("accid"))
         accid = accidConverter.AttAccidental::StrToAccidentalWritten(param.get<jsonxx::String>("accid"));
     if (param.has<jsonxx::Number>("midi")) midi = param.get<jsonxx::Number>("midi");
+
+    return true;
+}
+
+bool EditorToolkitShared::ParseSetScoreDefAction(const jsonxx::Object &param, jsonxx::Object &subTree)
+{
+    if (!param.has<jsonxx::Object>("subTree")) return false;
+    subTree = param.get<jsonxx::Object>("subTree");
+    return true;
+}
+
+bool EditorToolkitShared::ParseSetScoreDefKeySigAction(
+    const jsonxx::Object &param, bool &selected, jsonxx::Object &subTree)
+{
+    if (!param.has<jsonxx::Boolean>("selected")) return false;
+    if (!param.has<jsonxx::Object>("subTree")) return false;
+    selected = param.get<jsonxx::Boolean>("selected");
+    subTree = param.get<jsonxx::Object>("subTree");
+    return true;
+}
+
+bool EditorToolkitShared::ParseSetScoreDefMeterSigAction(
+    const jsonxx::Object &param, bool &selected, jsonxx::Object &subTree)
+{
+    if (!param.has<jsonxx::Boolean>("selected")) return false;
+    if (!param.has<jsonxx::Object>("subTree")) return false;
+    selected = param.get<jsonxx::Boolean>("selected");
+    subTree = param.get<jsonxx::Object>("subTree");
+    return true;
+}
+
+bool EditorToolkitShared::ParseSetScoreDefStaffDefAction(const jsonxx::Object &param, jsonxx::Object &subTree)
+{
+    if (!param.has<jsonxx::Object>("subTree")) return false;
+    subTree = param.get<jsonxx::Object>("subTree");
+    return true;
+}
+
+bool EditorToolkitShared::ParseSetScoreDefStaffGrpAction(
+    const jsonxx::Object &param, bool &selected, jsonxx::Object &subTree)
+{
+    if (!param.has<jsonxx::Boolean>("selected")) return false;
+    if (!param.has<jsonxx::Object>("subTree")) return false;
+    selected = param.get<jsonxx::Boolean>("selected");
+    subTree = param.get<jsonxx::Object>("subTree");
+    return true;
+}
+
+bool EditorToolkitShared::ParseUpdateScoreDefAction(const jsonxx::Object &param, ScoreDefUpdate &update)
+{
+    if (!param.has<jsonxx::String>("update")) return false;
+
+    const std::string updateStr = param.get<jsonxx::String>("update");
+    if (updateStr == "insertAbove") {
+        update = INSERT_ABOVE;
+    }
+    else if (updateStr == "insertBelow") {
+        update = INSERT_BELOW;
+    }
+    else if (updateStr == "moveUp") {
+        update = MOVE_UP;
+    }
+    else if (updateStr == "moveDown") {
+        update = MOVE_DOWN;
+    }
+    else if (updateStr == "deleteStaff") {
+        update = DELETE_STAFF;
+    }
+    else {
+        return false;
+    }
 
     return true;
 }
@@ -605,6 +775,7 @@ void EditorToolkitShared::SetEditStatus()
             (m_cursor->HasAccid()
                     ? m_cursor->GetAccidElement()->AttAccidental::AccidentalWrittenToStr(m_cursor->GetAccid())
                     : ""));
+        insertion.import("autoBeam", (m_cursor->IsAutoBeam()));
         insertion.import("accidImplicit", m_cursor->IsAccidImplicit());
         m_editStatus << "insertion" << insertion;
     }
@@ -655,7 +826,12 @@ void EditorToolkitShared::ReloadEditStatus(const std::string &statusStr, bool in
             chordMode = insertion.get<jsonxx::Boolean>("chordMode");
         }
 
-        this->SetCursor(m_selectionId, inputMode, chordMode);
+        bool autoBeam = true;
+        if (insertion.has<jsonxx::Boolean>("autoBeam")) {
+            autoBeam = insertion.get<jsonxx::Boolean>("autoBeam");
+        }
+
+        this->SetCursor(m_selectionId, inputMode, chordMode, autoBeam);
 
         if (insertion.has<jsonxx::Number>("oct")) {
             int oct = insertion.get<jsonxx::Number>("oct");
@@ -785,7 +961,7 @@ bool EditorToolkitShared::Chain(const jsonxx::Array &actions)
     return status;
 }
 
-bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode inputMode, bool chordMode)
+bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode inputMode, bool chordMode, bool autoBeam)
 {
     Layer *layer = NULL;
     LayerElement *position = NULL;
@@ -811,6 +987,7 @@ bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode in
     // Get the accid from the layer key signature
     if (m_cursor) {
         m_cursor->SetInputMode(inputMode);
+        m_cursor->SetAutoBeam(autoBeam);
         if (chordMode && m_cursor->GetPosition() && m_cursor->GetPosition()->IsAnyOf(std::array{ NOTE, CHORD })) {
             m_cursor->SetRestMode(false);
             m_cursor->SetChordMode(Cursor::ChordMode::EDIT_EXISTING);
@@ -827,7 +1004,7 @@ bool EditorToolkitShared::SetCursor(std::string &elementId, Cursor::InputMode in
     return true;
 }
 
-bool EditorToolkitShared::UpdateCursor(bool restMode, bool chordMode, Cursor::TieMode tieMode)
+bool EditorToolkitShared::UpdateCursor(bool restMode, bool chordMode, Cursor::TieMode tieMode, bool autoBeam)
 {
     if (!InsertMode()) return true;
 
@@ -840,6 +1017,9 @@ bool EditorToolkitShared::UpdateCursor(bool restMode, bool chordMode, Cursor::Ti
     }
     else if (m_cursor->GetInputMode() == Cursor::PITCH_FIRST) {
         m_cursor->SetRestMode(restMode);
+    }
+    else if (autoBeam != m_cursor->IsAutoBeam()) {
+        m_cursor->SetAutoBeam(autoBeam);
     }
 
     this->SetEditStatus();
@@ -863,7 +1043,7 @@ bool EditorToolkitShared::ResetCursor(bool maintainChordMode)
         }
         if (m_cursor) {
             if (maintainChordMode) {
-                this->UpdateCursor(false, true, Cursor::TieMode::TIE_NONE);
+                this->UpdateCursor(false, true, Cursor::TieMode::TIE_NONE, false);
             }
             else {
                 m_cursor->SetChordMode(Cursor::ChordMode::CHORD_NONE);
@@ -899,13 +1079,13 @@ bool EditorToolkitShared::Delete(std::string &elementId, DeleteNavigation naviga
     this->PostProcessDeleteObjects(element, postProcessObjects);
 
     // Find referring objects
-    std::set<std::string> objectsToDelete;
+    std::set<std::string> referringIds;
     SetOfConstObjects visited;
-    objectsToDelete.insert(element->GetID());
-    this->CollectReferringObjects(element, objectsToDelete, visited);
-    for (auto id : objectsToDelete) {
-        Object *toDelete = m_doc->FindDescendantByID(id);
-        if (toDelete && toDelete->GetParent()) toDelete->GetParent()->DeleteChild(toDelete);
+    referringIds.insert(element->GetID());
+    m_doc->CollectReferringObjects(element, referringIds, visited);
+    for (auto id : referringIds) {
+        Object *referring = m_doc->FindDescendantByID(id);
+        if (referring && referring->GetParent()) referring->GetParent()->DeleteChild(referring);
     }
 
     for (auto id : postProcessObjects) {
@@ -926,39 +1106,6 @@ bool EditorToolkitShared::Delete(std::string &elementId, DeleteNavigation naviga
     return true;
 }
 
-void EditorToolkitShared::CollectReferringObjects(
-    const Object *element, std::set<std::string> &objectsToDelete, SetOfConstObjects &visited)
-{
-    assert(element);
-
-    if (visited.find(element) != visited.end()) return;
-    visited.insert(element);
-
-    // First check all children
-    for (int i = 0; i < element->GetChildCount(); ++i) {
-        const Object *child = element->GetChild(i);
-        if (!child) continue;
-
-        CollectReferringObjects(child, objectsToDelete, visited);
-    }
-
-    // Then find objects referring to this object
-    ListOfObjectAttNamePairs referringObjects;
-    FindAllReferringObjectsFunctor findAllReferringObjects(element, &referringObjects);
-    m_doc->Process(findAllReferringObjects);
-
-    for (ListOfObjectAttNamePairs::iterator it = referringObjects.begin(); it != referringObjects.end(); ++it) {
-        const Object *referringObject = it->first;
-
-        if (referringObject == NULL) continue;
-        if (referringObject == element) continue;
-
-        objectsToDelete.insert(referringObject->GetID());
-
-        CollectReferringObjects(referringObject, objectsToDelete, visited);
-    }
-}
-
 void EditorToolkitShared::PostProcessDeleteObjects(const Object *element, std::set<std::string> &toPostProcess)
 {
     if (element->Is(NOTE)) {
@@ -969,6 +1116,10 @@ void EditorToolkitShared::PostProcessDeleteObjects(const Object *element, std::s
     if (element->HasInterface(INTERFACE_DURATION) && element->IsLayerElement()) {
         const Object *beam = element->GetFirstAncestor(BEAM);
         if (beam) toPostProcess.insert(beam->GetID());
+        const Object *tuplet = element->GetFirstAncestor(TUPLET);
+        if (tuplet) toPostProcess.insert(tuplet->GetID());
+        const Object *graceGrp = element->GetFirstAncestor(GRACEGRP);
+        if (graceGrp) toPostProcess.insert(graceGrp->GetID());
     }
 }
 
@@ -1021,6 +1172,18 @@ void EditorToolkitShared::PostProcessDelete(const std::string &elementId)
         std::string placeholder = beam->GetID();
         this->Delete(placeholder, DELETE_NO_NAVIGATON);
         m_chainedId = descendants.front()->GetID();
+    }
+    else if (object->IsAnyOf(std::array{ GRACEGRP, TUPLET })) {
+        ListOfObjects descendants;
+        ClassIdsComparison comparison({ CHORD, NOTE, REST });
+        object->FindAllDescendantsByComparison(&descendants, &comparison);
+        if (!descendants.empty()) return;
+
+        Object *parent = object->GetParent();
+        assert(parent);
+        std::string placeholder = object->GetID();
+        this->Delete(placeholder, DELETE_NO_NAVIGATON);
+        m_chainedId = parent->GetID();
     }
 }
 
@@ -1801,19 +1964,189 @@ ArrayOfConstObjects EditorToolkitShared::GetScoreBasedChildrenFor(const Object *
     return editorTreeObject->GetChildObjects();
 }
 
+ScoreDef *EditorToolkitShared::ResolveScoreDef(bool selected)
+{
+    if (!selected) {
+        Score *score = m_doc->GetFirstVisibleScore();
+        return score ? score->GetScoreDef() : NULL;
+    }
+
+    std::string selectionId = m_selectionId;
+    Object *selection = selectionId.empty() ? NULL : this->ResolveElement(selectionId);
+    if (!selection || !selection->Is(SCOREDEF)) {
+        LogError("A scoreDef must be selected");
+        return NULL;
+    }
+    return vrv_cast<ScoreDef *>(selection);
+}
+
+Staff *EditorToolkitShared::ResolveScoreDefStaff()
+{
+    std::string selectionId = m_selectionId;
+    Object *selection = selectionId.empty() ? NULL : this->ResolveElement(selectionId);
+    if (!selection || !selection->Is(STAFF)) {
+        LogError("A staff must be selected");
+        return NULL;
+    }
+    return vrv_cast<Staff *>(selection);
+}
+
+void EditorToolkitShared::FinalizeScoreDefUpdate()
+{
+    this->ClearContext();
+    this->SetEditStatus();
+}
+
 bool EditorToolkitShared::GetScoreDef()
 {
     m_editResponse.reset();
-
     MEIOutputExtended output(m_doc);
-
     m_editResponse = output.ExportScoreDef();
-
     return true;
 }
 
-bool EditorToolkitShared::SetScoreDef(const std::string scoreDef)
+bool EditorToolkitShared::GetScoreDefKeySig(bool selected)
 {
+    m_editResponse.reset();
+    ScoreDef *scoreDef = this->ResolveScoreDef(selected);
+    if (!scoreDef) return false;
+
+    MEIOutputExtended output(m_doc);
+    m_editResponse = output.ExportKeySig(scoreDef);
+    return true;
+}
+
+bool EditorToolkitShared::GetScoreDefMeterSig(bool selected)
+{
+    m_editResponse.reset();
+    ScoreDef *scoreDef = this->ResolveScoreDef(selected);
+    if (!scoreDef) return false;
+
+    MEIOutputExtended output(m_doc);
+    m_editResponse = output.ExportMeterSig(scoreDef);
+    return true;
+}
+
+bool EditorToolkitShared::GetScoreDefStaffDef()
+{
+    m_editResponse.reset();
+    Staff *staff = this->ResolveScoreDefStaff();
+    if (!staff) return false;
+    ScoreDef *scoreDef = this->ResolveScoreDef(false);
+    if (!scoreDef) return false;
+
+    MEIOutputExtended output(m_doc);
+    m_editResponse = output.ExportStaffDef(scoreDef, staff->GetN());
+    return true;
+}
+
+bool EditorToolkitShared::GetScoreDefStaffGrp(bool selected)
+{
+    m_editResponse.reset();
+    ScoreDef *scoreDef = this->ResolveScoreDef(selected);
+    if (!scoreDef) return false;
+
+    MEIOutputExtended output(m_doc);
+    m_editResponse = output.ExportStaffGrp(scoreDef);
+    return true;
+}
+
+bool EditorToolkitShared::SetScoreDef(const jsonxx::Object &subTree)
+{
+    MEIInputExtended input(m_doc);
+    input.ImportScoreDef(subTree);
+    this->FinalizeScoreDefUpdate();
+    return true;
+}
+
+bool EditorToolkitShared::SetScoreDefKeySig(bool selected, const jsonxx::Object &subTree)
+{
+    ScoreDef *scoreDef = this->ResolveScoreDef(selected);
+    if (!scoreDef) return false;
+
+    MEIInputExtended input(m_doc);
+    Layer layer;
+    input.ImportKeySigIntoLayer(&layer, subTree);
+    KeySig *keySig = (layer.GetChildCount() > 0) ? vrv_cast<KeySig *>(layer.GetFirst()) : NULL;
+    // Passing NULL will remove it
+    scoreDef->UpdateKeySig(keySig);
+
+    this->FinalizeScoreDefUpdate();
+    return true;
+}
+
+bool EditorToolkitShared::SetScoreDefMeterSig(bool selected, const jsonxx::Object &subTree)
+{
+    ScoreDef *scoreDef = this->ResolveScoreDef(selected);
+    if (!scoreDef) return false;
+
+    MEIInputExtended input(m_doc);
+    Layer layer;
+    input.ImportMeterSigOrGrpIntoLayer(&layer, subTree);
+    LayerElement *meterSig = (layer.GetChildCount() > 0) ? vrv_cast<LayerElement *>(layer.GetFirst()) : NULL;
+    // Passing NULL will remove it
+    scoreDef->UpdateMeterSig(meterSig);
+
+    this->FinalizeScoreDefUpdate();
+    return true;
+}
+
+bool EditorToolkitShared::SetScoreDefStaffDef(const jsonxx::Object &subTree)
+{
+    Staff *staff = this->ResolveScoreDefStaff();
+    if (!staff) return false;
+    ScoreDef *scoreDef = this->ResolveScoreDef(false);
+    if (!scoreDef) return false;
+
+    MEIInputExtended input(m_doc);
+    input.ImportStaffDef(subTree, scoreDef, staff->GetN());
+    this->FinalizeScoreDefUpdate();
+    return true;
+}
+
+bool EditorToolkitShared::SetScoreDefStaffGrp(bool selected, const jsonxx::Object &subTree)
+{
+    ScoreDef *scoreDef = this->ResolveScoreDef(selected);
+    if (!scoreDef) return false;
+
+    MEIInputExtended input(m_doc);
+    input.ImportStaffGrp(subTree, scoreDef);
+    this->FinalizeScoreDefUpdate();
+    return true;
+}
+
+bool EditorToolkitShared::UpdateScoreDef(ScoreDefUpdate update)
+{
+    Staff *staff = this->ResolveScoreDefStaff();
+    if (!staff) return false;
+
+    if (update == INSERT_ABOVE || update == INSERT_BELOW) {
+        StaffInsert staffInsert = (update == INSERT_ABOVE) ? StaffInsert::INSERT_ABOVE : StaffInsert::INSERT_BELOW;
+        AddStaffFunctor addStaffFunctor(staff->GetN(), staffInsert);
+        m_doc->Process(addStaffFunctor);
+        ReorderStaffNFunctor reorderStaffNFunctor;
+        m_doc->Process(reorderStaffNFunctor);
+    }
+    else if (update == MOVE_UP || update == MOVE_DOWN) {
+        StaffMove staffMove = (update == MOVE_UP) ? StaffMove::MOVE_UP : StaffMove::MOVE_DOWN;
+        MoveStaffFunctor moveStaffFunctor(staff->GetN(), staffMove);
+        m_doc->Process(moveStaffFunctor);
+        ReorderStaffNFunctor reorderStaffNFunctor;
+        m_doc->Process(reorderStaffNFunctor);
+    }
+    else if (update == DELETE_STAFF) {
+        DeleteStaffFunctor deleteStaffFunctor(staff->GetN());
+        m_doc->Process(deleteStaffFunctor);
+        for (const std::string &id : deleteStaffFunctor.GetObjectsToDelete()) {
+            Object *object = m_doc->FindDescendantByID(id);
+            if (object && object->GetParent()) object->GetParent()->DeleteChild(object);
+        }
+        ReorderStaffNFunctor reorderStaffNFunctor;
+        m_doc->Process(reorderStaffNFunctor);
+        this->ResetSelect();
+    }
+
+    this->FinalizeScoreDefUpdate();
     return true;
 }
 
@@ -1828,13 +2161,15 @@ void EditorToolkitShared::MoveCursor(LayerElement *element, bool maintainChordMo
     Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
     assert(layer);
 
+    const bool isInGraceGrp = (object->GetFirstAncestor(GRACEGRP, 3));
+
     ClassIdsComparison comparison({ CHORD, NOTE, REST });
 
     if (m_cursor->GetChordMode() == Cursor::ChordMode::NEW) {
         m_cursor->SetChordMode(Cursor::ChordMode::EDIT_NEW);
     }
     // Last element in the layer, check if we need to move to the next measure (or exit inputMode)
-    else if (element == layer->FindDescendantByComparison(&comparison, UNLIMITED_DEPTH, BACKWARD)) {
+    else if (!isInGraceGrp && (element == layer->FindDescendantByComparison(&comparison, UNLIMITED_DEPTH, BACKWARD))) {
         AlignMeterParams params;
         params.meterSig = layer->GetCurrentMeterSig();
         assert(params.meterSig);
@@ -1851,6 +2186,7 @@ void EditorToolkitShared::MoveCursor(LayerElement *element, bool maintainChordMo
         if (measureDuration == 0) measureDuration = 4;
         if ((position + duration) >= measureDuration) {
             object = this->GetNextLayer(layer);
+            m_cursor->ClearContainers();
             m_cursor->SetAccidImplicit(false);
         }
     }
@@ -1859,7 +2195,7 @@ void EditorToolkitShared::MoveCursor(LayerElement *element, bool maintainChordMo
         m_selectionId = object->GetID();
         m_chainedId = m_selectionId;
         m_selectionClassId = object->GetClassId();
-        this->SetCursor(m_selectionId, m_cursor->GetInputMode(), false);
+        this->SetCursor(m_selectionId, m_cursor->GetInputMode(), false, m_cursor->IsAutoBeam());
     }
     else {
         // Exit inputMode

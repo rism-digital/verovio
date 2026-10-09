@@ -9,18 +9,325 @@
 
 //----------------------------------------------------------------------------
 
+#include "controlelement.h"
 #include "cursor.h"
+#include "doc.h"
 #include "editorial.h"
 #include "editortoolkit_cmn.h"
 #include "layer.h"
 #include "score.h"
+#include "staff.h"
+#include "staffdef.h"
+#include "staffgrp.h"
 
 //----------------------------------------------------------------------------
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// StructFunctor
+// AddStaffFunctor
+//----------------------------------------------------------------------------
+
+AddStaffFunctor::AddStaffFunctor(int n, StaffInsert insert) : Functor()
+{
+    m_n = n;
+    m_insert = insert;
+    m_staff = NULL;
+    m_staffDef = NULL;
+}
+
+AddStaffFunctor::~AddStaffFunctor()
+{
+    if (m_staff) delete m_staff;
+    if (m_staffDef) delete m_staffDef;
+}
+
+FunctorCode AddStaffFunctor::VisitScore(Score *score)
+{
+    if (m_staffDef) return FUNCTOR_SIBLINGS;
+
+    ScoreDef *scoreDef = score->GetScoreDef();
+    assert(scoreDef);
+
+    std::vector<int> staffNs = scoreDef->GetStaffNs();
+    int n = *std::max_element(staffNs.begin(), staffNs.end()) + 1;
+
+    m_staff = new Staff(n);
+    Layer *layer = new Layer();
+    layer->SetN(1);
+    m_staff->AddChild(layer);
+
+    StaffDef *staffDef = scoreDef->GetStaffDef(m_n);
+    m_staffDef = vrv_cast<StaffDef *>(staffDef->Clone());
+    m_staffDef->CloneReset();
+    m_staffDef->SetN(n);
+
+    StaffDef *newStaffDef = vrv_cast<StaffDef *>(m_staffDef->Clone());
+    newStaffDef->CloneReset();
+
+    int offset = (m_insert == StaffInsert::INSERT_BELOW) ? 1 : 0;
+
+    Object *parent = staffDef->GetParent();
+    parent->InsertChild(newStaffDef, staffDef->GetIdx() + offset);
+    scoreDef->Modify();
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode AddStaffFunctor::VisitMeasure(Measure *measure)
+{
+    AttNIntegerComparison staffN(STAFF, m_n);
+    Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&staffN));
+    if (!staff) return FUNCTOR_SIBLINGS;
+
+    Staff *newStaff = vrv_cast<Staff *>(m_staff->Clone());
+    newStaff->CloneReset();
+
+    int offset = (m_insert == StaffInsert::INSERT_BELOW) ? 1 : 0;
+
+    Object *parent = staff->GetParent();
+    parent->InsertChild(newStaff, staff->GetIdx() + offset);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode AddStaffFunctor::VisitScoreDef(ScoreDef *scoreDef)
+{
+    if (!m_staffDef) return FUNCTOR_SIBLINGS;
+
+    StaffDef *staffDef = scoreDef->GetStaffDef(m_n);
+
+    StaffDef *newStaffDef = vrv_cast<StaffDef *>(staffDef->Clone());
+    newStaffDef->CloneReset();
+    newStaffDef->SetN(m_staffDef->GetN());
+
+    int offset = (m_insert == StaffInsert::INSERT_BELOW) ? 1 : 0;
+
+    Object *parent = staffDef->GetParent();
+    parent->InsertChild(newStaffDef, staffDef->GetIdx() + offset);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+//----------------------------------------------------------------------------
+// DeleteStaffFunctor
+//----------------------------------------------------------------------------
+
+DeleteStaffFunctor::DeleteStaffFunctor(int n) : Functor()
+{
+    m_n = n;
+    m_scoreDefProcessed = false;
+}
+
+DeleteStaffFunctor::~DeleteStaffFunctor() {}
+
+FunctorCode DeleteStaffFunctor::VisitScore(Score *score)
+{
+    if (m_scoreDefProcessed) return FUNCTOR_SIBLINGS;
+
+    ScoreDef *scoreDef = score->GetScoreDef();
+    assert(scoreDef);
+
+    std::vector<int> staffNs = scoreDef->GetStaffNs();
+    // Make sure we keep at least one staff in the score
+    if (staffNs.size() < 2) return FUNCTOR_STOP;
+
+    this->DeleteStaffDef(scoreDef);
+    m_scoreDefProcessed = true;
+
+    scoreDef->Modify();
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode DeleteStaffFunctor::VisitMeasure(Measure *measure)
+{
+    AttNIntegerComparison staffN(STAFF, m_n);
+    Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&staffN));
+    if (!staff) return FUNCTOR_SIBLINGS;
+
+    m_objectsToDelete.insert(staff->GetID());
+
+    Doc *doc = vrv_cast<Doc *>(staff->GetFirstAncestor(DOC));
+    assert(doc);
+    SetOfConstObjects visited;
+    doc->CollectReferringObjects(staff, m_objectsToDelete, visited);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode DeleteStaffFunctor::VisitScoreDef(ScoreDef *scoreDef)
+{
+    if (!m_scoreDefProcessed) return FUNCTOR_SIBLINGS;
+
+    this->DeleteStaffDef(scoreDef);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+void DeleteStaffFunctor::DeleteStaffDef(ScoreDef *scoreDef)
+{
+    StaffDef *staffDef = scoreDef->GetStaffDef(m_n);
+    if (!staffDef) return;
+
+    Object *parent = staffDef->GetParent();
+    assert(parent);
+    if (parent->Is(STAFFGRP) && (parent->GetDescendantCount(STAFFDEF) == 1)) {
+        Object *grandParent = parent->GetParent();
+        assert(grandParent);
+        grandParent->DeleteChild(parent);
+    }
+    else {
+        parent->DeleteChild(staffDef);
+    }
+}
+
+//----------------------------------------------------------------------------
+// MoveStaffFunctor
+//----------------------------------------------------------------------------
+
+MoveStaffFunctor::MoveStaffFunctor(int n, StaffMove move) : Functor()
+{
+    m_n = n;
+    m_move = move;
+    m_nTarget = VRV_UNSET;
+}
+
+MoveStaffFunctor::~MoveStaffFunctor() {}
+
+FunctorCode MoveStaffFunctor::VisitScore(Score *score)
+{
+    if (m_nTarget != VRV_UNSET) return FUNCTOR_SIBLINGS;
+
+    ScoreDef *scoreDef = score->GetScoreDef();
+    assert(scoreDef);
+
+    std::vector<int> staffNs = scoreDef->GetStaffNs();
+
+    const auto staffN = std::find(staffNs.begin(), staffNs.end(), m_n);
+    if (staffN == staffNs.end()) return FUNCTOR_SIBLINGS;
+
+    if (m_move == StaffMove::MOVE_UP) {
+        if (staffN == staffNs.begin()) return FUNCTOR_SIBLINGS;
+        m_nTarget = *std::prev(staffN);
+    }
+    else {
+        const auto nextStaffN = std::next(staffN);
+        if (nextStaffN == staffNs.end()) return FUNCTOR_SIBLINGS;
+        m_nTarget = *nextStaffN;
+    }
+
+    StaffDef *staffDef = scoreDef->GetStaffDef(m_n);
+    StaffDef *targetStaffDef = scoreDef->GetStaffDef(m_nTarget);
+    assert(staffDef && targetStaffDef);
+    staffDef->SwapWith(targetStaffDef);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode MoveStaffFunctor::VisitMeasure(Measure *measure)
+{
+    if (m_nTarget == VRV_UNSET) return FUNCTOR_SIBLINGS;
+
+    AttNIntegerComparison staffN(STAFF, m_n);
+    Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&staffN));
+    AttNIntegerComparison targetStaffN(STAFF, m_nTarget);
+    Staff *staffTarget = vrv_cast<Staff *>(measure->FindDescendantByComparison(&targetStaffN));
+    if (!staff || !staffTarget) return FUNCTOR_SIBLINGS;
+    staff->SwapWith(staffTarget);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode MoveStaffFunctor::VisitScoreDef(ScoreDef *scoreDef)
+{
+    if (m_nTarget == VRV_UNSET) return FUNCTOR_SIBLINGS;
+
+    StaffDef *staffDef = scoreDef->GetStaffDef(m_n);
+    StaffDef *targetStaffDef = scoreDef->GetStaffDef(m_nTarget);
+    if (!staffDef || !targetStaffDef) return FUNCTOR_SIBLINGS;
+    staffDef->SwapWith(targetStaffDef);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+//----------------------------------------------------------------------------
+// ReorderStaffNFunctor
+//----------------------------------------------------------------------------
+
+ReorderStaffNFunctor::ReorderStaffNFunctor() : Functor() {}
+
+ReorderStaffNFunctor::~ReorderStaffNFunctor() {}
+
+FunctorCode ReorderStaffNFunctor::VisitControlElement(ControlElement *controlElement)
+{
+    if (!controlElement->HasAttClass(ATT_STAFFIDENT)) return FUNCTOR_CONTINUE;
+
+    this->MapStaffIdent(dynamic_cast<AttStaffIdent *>(controlElement));
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ReorderStaffNFunctor::VisitLayerElement(LayerElement *layerElement)
+{
+    if (!layerElement->HasAttClass(ATT_STAFFIDENT)) return FUNCTOR_CONTINUE;
+
+    this->MapStaffIdent(dynamic_cast<AttStaffIdent *>(layerElement));
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ReorderStaffNFunctor::VisitScore(Score *score)
+{
+    if (!m_mapping.empty()) return FUNCTOR_SIBLINGS;
+
+    ScoreDef *scoreDef = score->GetScoreDef();
+    assert(scoreDef);
+
+    std::vector<int> staffNs = scoreDef->GetStaffNs();
+    int i = 1;
+    for (auto staffN : staffNs) {
+        m_mapping[staffN] = i++;
+    }
+    if (staffNs.size() != m_mapping.size()) {
+        LogError("Count mismatch when reordering staff @n");
+        return FUNCTOR_STOP;
+    }
+
+    // No change in the mapping, nothing to do
+    if (std::all_of(m_mapping.begin(), m_mapping.end(), [](const auto &p) { return p.first == p.second; }))
+        return FUNCTOR_STOP;
+
+    scoreDef->Process(*this);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode ReorderStaffNFunctor::VisitStaff(Staff *staff)
+{
+    staff->SetN(m_mapping.at(staff->GetN()));
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ReorderStaffNFunctor::VisitStaffDef(StaffDef *staffDef)
+{
+    staffDef->SetN(m_mapping.at(staffDef->GetN()));
+
+    return FUNCTOR_SIBLINGS;
+}
+
+void ReorderStaffNFunctor::MapStaffIdent(AttStaffIdent *att)
+{
+    if (!att) return;
+
+    xsdPositiveInteger_List mappedValues;
+    for (auto staffN : att->GetStaff()) mappedValues.push_back(m_mapping.at(staffN));
+    att->SetStaff(mappedValues);
+}
+
+//----------------------------------------------------------------------------
+// CursorFunctor
 //----------------------------------------------------------------------------
 
 CursorFunctor::CursorFunctor(Layer *layer, LayerElement *position) : Functor()

@@ -645,6 +645,10 @@ public:
     ///@}
 
     jsonxx::Object ExportScoreDef();
+    jsonxx::Object ExportStaffGrp(ScoreDef *scoreDef);
+    jsonxx::Object ExportStaffDef(ScoreDef *scoreDef, int staffN);
+    jsonxx::Object ExportMeterSig(ScoreDef *scoreDef);
+    jsonxx::Object ExportKeySig(ScoreDef *scoreDef);
 
 private:
     jsonxx::Object ToJson(const pugi::xml_document &doc);
@@ -671,6 +675,22 @@ public:
      * Setter for the page-based deserialization flag (default is false).
      */
     void SetDeserializing(bool deserializing) { m_deserializing = deserializing; }
+
+protected:
+    /**
+     * @name Methods available in inheriting classes
+     */
+    ///@{
+    bool ReadScoreDefExt(Object *parent, pugi::xml_node scoreDef) { return this->ReadScoreDef(parent, scoreDef); }
+    bool ReadStaffGrpExt(Object *parent, pugi::xml_node staffGrp) { return this->ReadStaffGrp(parent, staffGrp); }
+    bool ReadStaffDefExt(Object *parent, pugi::xml_node staffDef) { return this->ReadStaffDef(parent, staffDef); }
+    bool ReadMeterSigExt(Object *parent, pugi::xml_node meterSig) { return this->ReadMeterSig(parent, meterSig); }
+    bool ReadMeterSigGrpExt(Object *parent, pugi::xml_node meterSigGrp)
+    {
+        return this->ReadMeterSigGrp(parent, meterSigGrp);
+    }
+    bool ReadKeySigExt(Object *parent, pugi::xml_node keySig) { return this->ReadKeySig(parent, keySig); }
+    ///@}
 
 private:
     bool ReadDoc(pugi::xml_node root);
@@ -1005,16 +1025,17 @@ private:
 
 public:
     //
+protected:
+    /**
+     * The version of the file being read
+     */
+    meiVersion_MEIVERSION m_meiversion;
+
 private:
     /**
      * The full filename of the file being read
      */
     std::string m_filename;
-
-    /**
-     * The version of the file being read
-     */
-    meiVersion_MEIVERSION m_meiversion;
 
     /**
      * A flag indicating wheather we are reading page-based or score-based MEI
@@ -1070,6 +1091,14 @@ public:
     ///@}
 
     void ImportScoreDef(const jsonxx::Object &scoreDef);
+
+    void ImportStaffGrp(const jsonxx::Object &staffGrp, ScoreDef *scoreDef);
+
+    void ImportStaffDef(const jsonxx::Object &staffDef, ScoreDef *scoreDef, int staffN);
+
+    void ImportMeterSigOrGrpIntoLayer(Layer *layer, const jsonxx::Object &meterSig);
+
+    void ImportKeySigIntoLayer(Layer *layer, const jsonxx::Object &keySig);
 
 private:
     pugi::xml_document FromJson(const jsonxx::Object &json);

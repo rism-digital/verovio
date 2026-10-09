@@ -509,6 +509,13 @@ public:
     void ReplaceWithCopyOf(Object *object);
 
     /**
+     * Swap an object with another.
+     * They must be of the same classId.
+     * The parent can be different but must be set for both.
+     */
+    void SwapWith(Object *object);
+
+    /**
      * Return true if the object has the child Object as descendant (reference of direct).
      * Processes in depth-first.
      */
