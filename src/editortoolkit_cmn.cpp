@@ -517,7 +517,7 @@ bool EditorToolkitCMN::InsertScoreDef(std::string &elementId, bool insertBefore)
 {
     Measure *measure = vrv_cast<Measure *>(this->ResolveElement(elementId, false));
     if (!measure) return false;
-    
+
     bool prevent = false;
     assert(measure->GetParent());
     if (insertBefore) {
@@ -539,10 +539,10 @@ bool EditorToolkitCMN::InsertScoreDef(std::string &elementId, bool insertBefore)
     Score *score = m_doc->GetFirstVisibleScore();
     ScoreDef *scoreDef = (score) ? score->GetScoreDef() : NULL;
     if (!scoreDef) return false;
-    
-    ScoreDef *newScoreDef = vrv_cast<ScoreDef*>(scoreDef->Clone());
+
+    ScoreDef *newScoreDef = vrv_cast<ScoreDef *>(scoreDef->Clone());
     newScoreDef->CloneReset();
-    
+
     if (insertBefore) {
         measure->GetParent()->InsertBefore(measure, newScoreDef);
     }
