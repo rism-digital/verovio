@@ -56,6 +56,7 @@ protected:
     bool ParseInsertCursorByTypeAction(const jsonxx::Object &param, CursorInsertType &insertType);
     bool ParseInsertCursorContainerAction(const jsonxx::Object &param, ClassId &container);
     bool ParseInsertMeasureAction(const jsonxx::Object &param, std::string &elementId, int &number, bool &insertBefore);
+    bool ParseInsertScoreDefAction(const jsonxx::Object &param, std::string &elementId, bool &insertBefore);
     bool ParseInsertNoteAction(const jsonxx::Object &param, std::string &elementId, data_PITCHNAME &pname, int &oct,
         data_ACCIDENTAL_WRITTEN &accid, data_ACCIDENTAL_GESTURAL &accidGes, data_DURATION &dur, int &dots,
         bool &chordMode);
@@ -67,6 +68,7 @@ protected:
     bool InsertCursorByType(CursorInsertType insertType);
     bool InsertCursorContainer(ClassId container);
     bool InsertMeasure(std::string &elementId, int number, bool insertBefore);
+    bool InsertScoreDef(std::string &elementId, bool insertBefore);
     bool InsertNote(const std::string &elementId, data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid,
         data_ACCIDENTAL_GESTURAL accidGes, data_DURATION dur, int dots, bool chordMode);
     bool InsertRest(const std::string &elementId, data_DURATION dur, int dots);

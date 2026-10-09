@@ -109,6 +109,13 @@ export interface InsertMeasureAction {
         insertBefore?: boolean;
     }
 }
+export interface InsertScoreDefAction {
+    action: "insertScoreDef";
+    param: {
+        elementId: string;
+        insertBefore?: boolean;
+    }
+}
 export interface InsertNoteAction {
     action: "insertNote";
     param: {
@@ -267,6 +274,7 @@ export type EditorAction =
     | InsertCursorByTypeAction
     | InsertCursorContainerAction
     | InsertMeasureAction
+    | InsertScoreDefAction
     | InsertNoteAction
     | InsertRestAction
     | KeyDownAction

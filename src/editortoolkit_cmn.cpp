@@ -22,6 +22,8 @@
 #include "miscfunctor.h"
 #include "note.h"
 #include "rest.h"
+#include "score.h"
+#include "scoredef.h"
 #include "staff.h"
 #include "tie.h"
 #include "tuplet.h"
@@ -82,6 +84,15 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
             return (this->InsertMeasure(elementId, number, insertBefore));
         }
         LogWarning("Could not parse the insertMeasure action");
+    }
+    else if (action == "insertScoreDef") {
+        std::string elementId;
+        bool insertBefore;
+        if (this->ParseInsertScoreDefAction(json.get<jsonxx::Object>("param"), elementId, insertBefore)) {
+            this->PrepareUndo();
+            return (this->InsertScoreDef(elementId, insertBefore));
+        }
+        LogWarning("Could not parse the insertScoreDef action");
     }
     else if (action == "insertNote") {
         std::string elementId;
@@ -214,6 +225,19 @@ bool EditorToolkitCMN::ParseInsertMeasureAction(
     if (param.has<jsonxx::String>("elementId")) elementId = param.get<jsonxx::String>("elementId");
     if (!param.has<jsonxx::Number>("number")) return false;
     number = param.get<jsonxx::Number>("number");
+    if (param.has<jsonxx::Boolean>("insertBefore")) insertBefore = param.get<jsonxx::Boolean>("insertBefore");
+
+    return true;
+}
+
+bool EditorToolkitCMN::ParseInsertScoreDefAction(
+    const jsonxx::Object &param, std::string &elementId, bool &insertBefore)
+{
+    insertBefore = false;
+
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    elementId = param.get<jsonxx::String>("elementId");
+    if (elementId.empty()) return false;
     if (param.has<jsonxx::Boolean>("insertBefore")) insertBefore = param.get<jsonxx::Boolean>("insertBefore");
 
     return true;
@@ -483,6 +507,49 @@ bool EditorToolkitCMN::InsertMeasure(std::string &elementId, int number, bool in
         }
         m_chainedId = newMeasure->GetID();
     }
+
+    this->ClearContext();
+
+    return true;
+}
+
+bool EditorToolkitCMN::InsertScoreDef(std::string &elementId, bool insertBefore)
+{
+    Measure *measure = vrv_cast<Measure *>(this->ResolveElement(elementId, false));
+    if (!measure) return false;
+    
+    bool prevent = false;
+    assert(measure->GetParent());
+    if (insertBefore) {
+        const Object *previous = measure->GetParent()->GetPrevious(measure);
+        if (previous && previous->Is(SCOREDEF)) prevent = true;
+        if (!this->GetPreviousMeasure(measure)) prevent = true;
+    }
+    else {
+        const Measure *nextMeasure = this->GetNextMeasure(measure);
+        if (!nextMeasure) prevent = true;
+        const Object *next = (nextMeasure) ? measure->GetParent()->GetPrevious(nextMeasure) : NULL;
+        if (next && next->Is(SCOREDEF)) prevent = true;
+    }
+    if (prevent) {
+        LogError("ScoreDef cannot be added at this place.");
+        return false;
+    }
+
+    Score *score = m_doc->GetFirstVisibleScore();
+    ScoreDef *scoreDef = (score) ? score->GetScoreDef() : NULL;
+    if (!scoreDef) return false;
+    
+    ScoreDef *newScoreDef = vrv_cast<ScoreDef*>(scoreDef->Clone());
+    newScoreDef->CloneReset();
+    
+    if (insertBefore) {
+        measure->GetParent()->InsertBefore(measure, newScoreDef);
+    }
+    else {
+        measure->GetParent()->InsertAfter(measure, newScoreDef);
+    }
+    m_chainedId = newScoreDef->GetID();
 
     this->ClearContext();
 

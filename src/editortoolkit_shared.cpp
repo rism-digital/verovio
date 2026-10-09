@@ -232,6 +232,13 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         }
         LogWarning("Action insertMeasure available in CMN only");
     }
+    else if (action == "insertScoreDef") {
+        EditorToolkitCMN *editorToolkitCMN = dynamic_cast<EditorToolkitCMN *>(this);
+        if (editorToolkitCMN) {
+            return editorToolkitCMN->ParseEditorCMNAction(json);
+        }
+        LogWarning("Action insertScoreDef available in CMN only");
+    }
     else if (action == "insertNote") {
         EditorToolkitCMN *editorToolkitCMN = dynamic_cast<EditorToolkitCMN *>(this);
         if (editorToolkitCMN) {
