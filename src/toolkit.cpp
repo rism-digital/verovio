@@ -848,7 +848,8 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     m_doc.InitSelectionDoc(m_docSelection, true);
 
     // Convert pseudo-measures into distinct segments based on barLine elements
-    if (m_doc.IsMensuralMusicOnly() && (m_options->m_mensuralResponsiveView.GetValue() != MENSURAL_RESP_none)) {
+    if (m_doc.IsMensuralMusicOnly() && (m_options->m_mensuralResponsiveView.GetValue() != MENSURAL_RESP_none)
+        && input->GetLayoutInformation() != LAYOUT_DONE) {
         if (m_options->m_mensuralScoreUp.GetValue()) {
             m_doc.ScoringUpDoc();
         }
@@ -872,11 +873,9 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     // When loading page-based MEI, the layout is marked as done
     // In this case, we do not cast-off the document (breaks is expected to be not set)
     if (input->GetLayoutInformation() == LAYOUT_DONE) {
-        if (breaks != BREAKS_auto) {
-            LogWarning("Requesting layout with specific breaks but the layout is already done");
-        }
         // We set it to 'none' for no cast-off process to be triggered
         breaks = BREAKS_none;
+        m_doc.MarkAsCastOff();
     }
 
     // Always set breaks to 'none' with Facs rendering

@@ -366,6 +366,30 @@ void SvgDeviceContext::StartGraphic(
     // this->GetColor(currentBrush.GetColor()).c_str(), currentBrush.GetOpacity()).c_str();
 }
 
+void SvgDeviceContext::AddGraphicClass(const std::string &className)
+{
+    if (className.empty()) return;
+
+    pugi::xml_attribute classAttr = m_currentNode.attribute("class");
+    if (!classAttr) {
+        m_currentNode.append_attribute("class") = className.c_str();
+        return;
+    }
+
+    std::string classes = classAttr.value();
+
+    std::istringstream stream(classes);
+    std::string existing;
+    while (stream >> existing) {
+        if (existing == className) return;
+    }
+
+    if (!classes.empty()) classes += " ";
+    classes += className;
+
+    classAttr.set_value(classes.c_str());
+}
+
 void SvgDeviceContext::StartCustomGraphic(const std::string &name, std::string gClass, std::string gId)
 {
     m_currentNode = m_currentNode.append_child("g");
@@ -504,6 +528,9 @@ void SvgDeviceContext::StartPage()
             std::string showHidden
                 = StringFormat("g.%s {fill: silver; color:silver; stroke:silver;} ", CSS_SHOW_HIDDEN);
             css += showHidden;
+        }
+        else {
+            css += "g.placeholder {visibility:hidden} ";
         }
         // bounding box css - for debugging
         // css += " g.bounding-box{stroke:red; stroke-width:10} "
