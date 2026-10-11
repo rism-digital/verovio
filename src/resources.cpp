@@ -102,7 +102,7 @@ bool Resources::SetFont(const std::string &fontName)
     // add the default font provided in options, if it is not one of the previous
     if (!fontName.empty() && !IsFontLoaded(fontName)) {
         if (!LoadFont(fontName)) {
-            LogError("%s font could not be loaded.", fontName.c_str());
+            LogError("{} font could not be loaded.", fontName);
             return false;
         }
     }
@@ -128,7 +128,7 @@ bool Resources::AddCustom(const std::vector<std::string> &extraFonts)
         }
         success = success && LoadFont(fontName, &zipFile);
         if (!success) {
-            LogError("Option supplied font %s could not be loaded.", fontName.c_str());
+            LogError("Option supplied font {} could not be loaded.", fontName);
         }
     }
     return success;
@@ -414,7 +414,7 @@ bool Resources::LoadFont(const std::string &fontName, ZipFileReader *zipFile)
     }
 
     if (isFallback && glyphTable.size() < SMUFL_COUNT) {
-        LogError("Expected %d default SMuFL glyphs but could load only %d.", SMUFL_COUNT, glyphTable.size());
+        LogError("Expected {} default SMuFL glyphs but could load only {}.", SMUFL_COUNT, glyphTable.size());
         return false;
     }
 

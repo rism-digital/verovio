@@ -103,7 +103,7 @@ Object *EditorToolkit::GetElement(const std::string &elementId)
     }
 
     if (!element) {
-        LogError("Element '%s' could not be found", elementId.c_str());
+        LogError("Element '{}' could not be found", elementId);
     }
 
     return element;
@@ -115,13 +115,13 @@ Object *EditorToolkit::PrepareInsertion(Object *parent, const std::string &eleme
 
     ClassId classId = ObjectFactory::GetInstance().GetClassId(elementName);
     if (!parent->IsSupportedChild(classId)) {
-        LogError("Element '%s' is not supported as child of '%s'", elementName.c_str(), parent->GetClassName().c_str());
+        LogError("Element '{}' is not supported as child of '{}'", elementName, parent->GetClassName());
         return NULL;
     }
 
     Object *childElement = ObjectFactory::GetInstance().Create(elementName);
     if (!childElement) {
-        LogError("Creating a '%s' object failed", elementName.c_str());
+        LogError("Creating a '{}' object failed", elementName);
     }
     else {
         m_chainedId = childElement->GetID();

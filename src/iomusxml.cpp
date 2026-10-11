@@ -133,7 +133,7 @@ bool MusicXmlInput::Import(const std::string &musicxml)
         return ReadMusicXml(root);
     }
     catch (char *str) {
-        LogError("%s", str);
+        LogError("{}", str);
         return false;
     }
 }
@@ -398,7 +398,7 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
         }
         else {
             // The measure was not transferred and not added to the tree. Its entire content will be deleted at the end.
-            LogError("MusicXML import: Mismatching measure number %s", measure->GetN().c_str());
+            LogError("MusicXML import: Mismatching measure number {}", measure->GetN());
         }
         contentMeasure = existingMeasure;
 

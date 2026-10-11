@@ -56,7 +56,7 @@ Glyph::Glyph(std::string path, std::string codeStr)
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_file(path.c_str());
     if (!result) {
-        LogError("Font file '%s' could not be loaded", path.c_str());
+        LogError("Font file '{}' could not be loaded", path);
         return;
     }
     pugi::xml_node root = doc.first_child();

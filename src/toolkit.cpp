@@ -452,7 +452,7 @@ bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
 
     const std::string metaInf = "META-INF/container.xml";
     if (!zipFileReader.HasFile(metaInf)) {
-        LogError("No '%s' file to load found in the archive", metaInf.c_str());
+        LogError("No '{}' file to load found in the archive", metaInf);
         return false;
     }
     std::string containerXml = zipFileReader.ReadTextFile("META-INF/container.xml");
@@ -1063,7 +1063,7 @@ bool Toolkit::SaveFile(const std::string &filename, const std::string &jsonOptio
     outfile.open(filename.c_str());
 
     if (!outfile.is_open()) {
-        LogError("Unable to write MEI to %s", filename.c_str());
+        LogError("Unable to write MEI to {}", filename);
         return false;
     }
 
@@ -1213,7 +1213,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
                 }
             }
             else {
-                LogError("Unsupported option '%s'", iter->first.c_str());
+                LogError("Unsupported option '{}'", iter->first);
             }
             continue;
         }
@@ -1252,7 +1252,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
             }
         }
         else {
-            LogError("Unsupported type for option '%s'", iter->first.c_str());
+            LogError("Unsupported type for option '{}'", iter->first);
         }
     }
 
@@ -2307,7 +2307,7 @@ std::string Toolkit::ConvertMEIToHumdrum(const std::string &meiData)
     this->LogRedirectStop();
 
     if (!status) {
-        LogError("Error converting MEI data to Humdrum: %s", conversion.str().c_str());
+        LogError("Error converting MEI data to Humdrum: {}", conversion.str());
     }
     this->SetHumdrumBuffer(conversion.str().c_str());
     return conversion.str();

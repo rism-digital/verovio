@@ -340,7 +340,7 @@ std::string MEIOutput::Export()
         return streamStringOutput.str();
     }
     catch (char *str) {
-        LogError("%s", str);
+        LogError("{}", str);
         return "";
     }
 }
@@ -1020,7 +1020,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
 
     else {
         // Missing output method for the class
-        LogError("Output method missing for '%s'", object->GetClassName().c_str());
+        LogError("Output method missing for '{}'", object->GetClassName());
         assert(false); // let's make it stop because this should not happen
     }
 
@@ -4380,7 +4380,7 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
                 m_selectedMdiv = selection.node();
             }
             else {
-                LogError("The <mdiv> requested with the xpath query '%s' could not be found", xPathQuery.c_str());
+                LogError("The <mdiv> requested with the xpath query '{}' could not be found", xPathQuery);
                 return false;
             }
         }
@@ -4664,14 +4664,14 @@ bool MEIInput::ReadPageMilestoneEnd(Object *parent, pugi::xml_node milestoneEnd)
     std::string startID = milestoneEnd.attribute("startid").value();
     Object *start = m_doc->FindDescendantByID(ExtractIDFragment(startID));
     if (!start) {
-        LogError("Could not find start element '%s' for milestoneEnd", startID.c_str());
+        LogError("Could not find start element '{}' for milestoneEnd", startID);
         return false;
     }
 
     // Check that it is a page milestone
     PageMilestoneInterface *interface = dynamic_cast<PageMilestoneInterface *>(start);
     if (!interface) {
-        LogError("The start element  '%s' is not a page milestone element", startID.c_str());
+        LogError("The start element  '{}' is not a page milestone element", startID);
         return false;
     }
 
@@ -5148,14 +5148,14 @@ bool MEIInput::ReadSystemMilestoneEnd(Object *parent, pugi::xml_node milestoneEn
     std::string startID = milestoneEnd.attribute("startid").value();
     Object *start = m_doc->FindDescendantByID(ExtractIDFragment(startID));
     if (!start) {
-        LogError("Could not find start element '%s' for milestoneEnd", startID.c_str());
+        LogError("Could not find start element '{}' for milestoneEnd", startID);
         return false;
     }
 
     // Check that it is a page milestone
     SystemMilestoneInterface *interface = dynamic_cast<SystemMilestoneInterface *>(start);
     if (!interface) {
-        LogError("The start element  '%s' is not a system milestone element", startID.c_str());
+        LogError("The start element  '{}' is not a system milestone element", startID);
         return false;
     }
 
@@ -9116,7 +9116,7 @@ void MEIInput::UpgradeDurGesTo_4_0_0(pugi::xml_node element, DurationInterface *
                 interface->SetDurReal(std::stof(durGes));
             }
             catch (const std::invalid_argument &ia) {
-                LogError("Upgrading to 4.0.0: %s", ia.what());
+                LogError("Upgrading to 4.0.0: {}", ia.what());
             }
         }
         element.remove_attribute("dur.ges");

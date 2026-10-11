@@ -485,7 +485,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                 tuningDef = buffer.str();
             }
             else {
-                LogError("Tuning file '%s' is not recognized", midiTuningFile.c_str());
+                LogError("Tuning file '{}' is not recognized", midiTuningFile);
             }
         }
         else {

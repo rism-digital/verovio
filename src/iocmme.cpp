@@ -163,7 +163,7 @@ bool CmmeInput::Import(const std::string &cmme)
         this->PostProcessProport();
     }
     catch (char *str) {
-        LogError("%s", str);
+        LogError("{}", str);
         return false;
     }
 

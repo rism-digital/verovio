@@ -81,28 +81,28 @@ void Option::SetShortOption(char shortOption, bool isCmdOnly)
 bool Option::SetValueBool(bool value)
 {
     // If not overriden
-    LogError("Unsupported type bool for %s", m_key.c_str());
+    LogError("Unsupported type bool for {}", m_key);
     return false;
 }
 
 bool Option::SetValueDbl(double value)
 {
     // If not overriden
-    LogError("Unsupported type double for %s", m_key.c_str());
+    LogError("Unsupported type double for {}", m_key);
     return false;
 }
 
 bool Option::SetValueArray(const std::vector<std::string> &values)
 {
     // If not overriden
-    LogError("Unsupported type array for %s", m_key.c_str());
+    LogError("Unsupported type array for {}", m_key);
     return false;
 }
 
 bool Option::SetValue(const std::string &value)
 {
     // If not overriden
-    LogError("Unsupported type string for %s", m_key.c_str());
+    LogError("Unsupported type string for {}", m_key);
     return false;
 }
 
@@ -257,8 +257,8 @@ void OptionDbl::Init(double defaultValue, double minValue, double maxValue, bool
 bool OptionDbl::SetValue(const std::string &value)
 {
     if (!IsValidDouble(value)) {
-        LogError("Unable to set parameter value %s for '%s'; conversion to double failed", value.c_str(),
-            this->GetKey().c_str());
+        LogError("Unable to set parameter value {} for '{}'; conversion to double failed", value,
+            this->GetKey());
         return false;
     }
     // Convert string to double
@@ -296,8 +296,8 @@ double OptionDbl::GetUnfactoredValue() const
 bool OptionDbl::SetValue(double value)
 {
     if ((value < m_minValue) || (value > m_maxValue)) {
-        LogError("Parameter value %f for '%s' out of bounds; default is %f, minimum %f, and maximum %f", value,
-            this->GetKey().c_str(), m_defaultValue, m_minValue, m_maxValue);
+        LogError("Parameter value {} for '{}' out of bounds; default is {}, minimum {}, and maximum {}", value,
+            this->GetKey(), m_defaultValue, m_minValue, m_maxValue);
         return false;
     }
     m_value = value;
@@ -342,8 +342,8 @@ bool OptionInt::SetValueDbl(double value)
 bool OptionInt::SetValue(const std::string &value)
 {
     if (!IsValidInteger(value)) {
-        LogError("Unable to set parameter value %s for '%s'; conversion to integer failed", value.c_str(),
-            this->GetKey().c_str());
+        LogError("Unable to set parameter value {} for '{}'; conversion to integer failed", value,
+            this->GetKey());
         return false;
     }
     // Convert string to int
@@ -376,8 +376,8 @@ int OptionInt::GetUnfactoredValue() const
 bool OptionInt::SetValue(int value)
 {
     if ((value < m_minValue) || (value > m_maxValue)) {
-        LogError("Parameter value %d for '%s' out of bounds; default is %d, minimum %d, and maximum %d", value,
-            this->GetKey().c_str(), m_defaultValue, m_minValue, m_maxValue);
+        LogError("Parameter value {} for '{}' out of bounds; default is {}, minimum {}, and maximum {}", value,
+            this->GetKey(), m_defaultValue, m_minValue, m_maxValue);
         return false;
     }
     m_value = value;
@@ -538,7 +538,7 @@ bool OptionIntMap::SetValue(const std::string &value)
             m_value = it->first;
             return true;
         }
-    LogError("Parameter '%s' not valid for '%s'", value.c_str(), this->GetKey().c_str());
+    LogError("Parameter '{}' not valid for '{}'", value, this->GetKey());
     return false;
 }
 
@@ -630,7 +630,7 @@ bool OptionStaffrel::SetValue(const std::string &value)
     AttConverter converter;
     data_STAFFREL staffrel = converter.StrToStaffrel(value);
     if (staffrel == STAFFREL_NONE) {
-        LogError("Parameter '%s' not valid", value.c_str());
+        LogError("Parameter '{}' not valid", value);
         return false;
     }
     m_value = staffrel;
@@ -699,7 +699,7 @@ bool OptionJson::SetValue(const std::string &value)
                 ok = true;
             }
             else {
-                LogError("Input file '%s' is not valid or contains errors", value.c_str());
+                LogError("Input file '{}' is not valid or contains errors", value);
             }
         }
     }
@@ -2020,7 +2020,7 @@ bool Options::SetOutputTo(std::string const &outputTo)
         m_outputToFormat = SERIALIZATION;
     }
     else if (outputTo != "svg") {
-        LogError("Output format '%s' is not supported", outputTo.c_str());
+        LogError("Output format '{}' is not supported", outputTo);
         return false;
     }
     return true;
@@ -2080,7 +2080,7 @@ bool Options::SetInputFrom(std::string const &inputFrom)
         m_inputFromFormat = AUTO;
     }
     else {
-        LogError("Input format '%s' is not supported", inputFrom.c_str());
+        LogError("Input format '{}' is not supported", inputFrom);
         return false;
     }
     return true;
@@ -2152,7 +2152,7 @@ void Options::Sync()
     }
 
     std::for_each(unmatchedKeys.cbegin(), unmatchedKeys.cend(),
-        [](const std::string &key) { LogError("Unsupported engraving default '%s'", key.c_str()); });
+        [](const std::string &key) { LogError("Unsupported engraving default '{}'", key); });
 }
 
 void Options::Register(Option *option, const std::string &key, OptionGrp *grp)

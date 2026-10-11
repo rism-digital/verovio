@@ -169,7 +169,7 @@ int main(int argc, char **argv)
                 opt = params->at(vrv::ToCamelCase(key));
                 optBool = dynamic_cast<vrv::OptionBool *>(opt);
                 if (std::string badOption; !OptionExists("--" + key, argc, argv, badOption)) {
-                    vrv::LogError("Unrecognized option %s has been skipped.", badOption.c_str());
+                    vrv::LogError("Unrecognized option {} has been skipped.", badOption);
                     continue;
                 }
 
@@ -183,7 +183,7 @@ int main(int argc, char **argv)
                     }
                 }
                 else {
-                    vrv::LogError("Something went wrong with option %s", longOptions[optionIndex].name);
+                    vrv::LogError("Something went wrong with option {}", longOptions[optionIndex].name);
                     exit(1);
                 }
                 break;

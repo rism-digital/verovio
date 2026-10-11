@@ -673,7 +673,7 @@ bool HumdrumInput::Import(const std::string &content)
         return result;
     }
     catch (char *str) {
-        LogError("%s", str);
+        LogError("{}", str);
         return false;
     }
 
@@ -30409,7 +30409,7 @@ template <class ELEMENT> void HumdrumInput::setEnclosure(ELEMENT *element, const
     }
     else {
         std::string str = "Unknown enclosure type: " + value;
-        LogError("%s", str.c_str());
+        LogError("{}", str);
     }
 }
 
@@ -30447,7 +30447,7 @@ template <class ELEMENT> void HumdrumInput::setTstamp(ELEMENT *element, const st
         return;
     }
     std::string str = "Unknown REH quarter-note offset: " + value;
-    LogError("%s", str.c_str());
+    LogError("{}", str);
 }
 
 //////////////////////////////

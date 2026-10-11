@@ -41,7 +41,7 @@ CustomTuning::CustomTuning(const std::string &tuningDef, Doc *doc, bool useMusic
         CreateNoteMapping(useMusicXmlAccidentals);
     }
     catch (Tunings::TuningError &e) {
-        LogError("Custom tuning: Invalid tuning definition: %s", e.what());
+        LogError("Custom tuning: Invalid tuning definition: {}", e.what());
     }
 }
 
@@ -62,7 +62,7 @@ void CustomTuning::CreateGlyphMapping(Doc *doc)
     for (const auto &glyph : glyphs.kv_map()) {
         std::string codepoint = glyph.second->get<jsonxx::String>();
         if (!codepoint.starts_with("U+")) {
-            LogError("Custom tuning: SMuFL glyph '%s' has invalid codepoint in glyph table", glyph.first.c_str());
+            LogError("Custom tuning: SMuFL glyph '{}' has invalid codepoint in glyph table", glyph.first);
             continue;
         }
         char32_t code = static_cast<char32_t>(std::stoul(codepoint.c_str() + 2, nullptr, 16));
@@ -103,8 +103,8 @@ void CustomTuning::CreateNoteMapping(bool useMusicXmlAccidentals)
                     glyphName = GetGlyphName(glyph);
                 }
                 if (!glyph) {
-                    LogError("Custom tuning: Tuning accidental \"%s\" is neither a %s accidental nor a SMuFL glyph",
-                        accid.c_str(), useMusicXmlAccidentals ? "MusicXML" : "MEI");
+                    LogError("Custom tuning: Tuning accidental \"{}\" is neither a {} accidental nor a SMuFL glyph",
+                        accid, useMusicXmlAccidentals ? "MusicXML" : "MEI");
                 }
                 else if (glyph != SMUFL_E261_accidentalNatural && !glyphName.empty()) {
                     if (accid_start != accids.cbegin()) mei += "+";
@@ -218,10 +218,10 @@ int CustomTuning::GetMIDIPitch(const Note *note, const int shift, const int octa
         return m_tuning.midiNoteForNoteName(m_noteMap.at(noteName), oct);
     }
     catch (Tunings::TuningError &e) {
-        LogError("Custom tuning: Error mapping note to tuning: %s", e.what());
+        LogError("Custom tuning: Error mapping note to tuning: {}", e.what());
     }
     catch (std::out_of_range &e) {
-        LogError("Custom tuning: Error mapping note to tuning: %s not mapped", noteName.c_str());
+        LogError("Custom tuning: Error mapping note to tuning: {} not mapped", noteName);
     }
     return note->GetMIDIPitch(shift, octaveShift);
 }
