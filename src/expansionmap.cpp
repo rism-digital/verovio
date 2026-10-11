@@ -55,8 +55,8 @@ Object *ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList,
 
     xsdAnyURI_List expansionPlist = expansion->GetPlist();
     if (expansionPlist.empty()) {
-        LogWarning("ExpansionMap::Expand: Expansion element %s has empty @plist. Nothing expanded.",
-            expansion->GetID().c_str());
+        LogWarning("ExpansionMap::Expand: Expansion element {} has empty @plist. Nothing expanded.",
+            expansion->GetID());
         return prevSect;
     }
 
@@ -83,7 +83,7 @@ Object *ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList,
         }
         else {
             LogWarning(
-                "ExpansionMap::Expand: Expansion element %s has unsupported parent type.", expansion->GetID().c_str());
+                "ExpansionMap::Expand: Expansion element {} has unsupported parent type.", expansion->GetID());
             return prevSect;
         }
 
@@ -116,7 +116,7 @@ Object *ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList,
         Object *currSect = parent->FindDescendantByID(id); // find section pointer for id string
         if (currSect == NULL) {
             // Warn about referenced element not found and continue
-            LogWarning("ExpansionMap::Expand: Element referenced in @plist not found: %s", id.c_str());
+            LogWarning("ExpansionMap::Expand: Element referenced in @plist not found: {}", id);
             continue;
         }
         if (currSect->Is(EXPANSION)) { // if id is itself an expansion, resolve it recursively

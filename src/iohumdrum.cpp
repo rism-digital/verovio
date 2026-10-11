@@ -136,6 +136,19 @@ namespace vrv {
 #define VGRP_PEDAL_DEFAULT 200
 #define MAXCOLORSUBTRACK 30
 
+
+/**
+ * Helper to render an object that implements "operator<<" to std::string.
+ */
+template <typename T>
+static std::string log_stream_helper(T streamable_object)
+        {
+            std::stringstream ss;
+            ss.str("");
+            ss << streamable_object;
+            return ss.str();
+        }
+
 //----------------------------------------------------------------------------
 // namespace for local IoHumdrum classes
 //----------------------------------------------------------------------------
@@ -2670,9 +2683,7 @@ void HumdrumInput::parseEmbeddedOptions(Doc *doc)
                 continue;
             }
             if (value.empty()) {
-                std::stringstream warning;
-                warning << "In HumdrumInput::parseEmbeddedOptions: value is empty for parameter " << key;
-                LogWarning(warning.str().c_str());
+                LogWarning("In HumdrumInput::parseEmbeddedOptions: value is empty for parameter {}", key);
                 continue;
             }
             inputparameters[pkey] = pvalue;
@@ -2691,9 +2702,7 @@ void HumdrumInput::parseEmbeddedOptions(Doc *doc)
                 std::string pkey = hre.getMatch(1);
                 std::string pvalue = hre.getMatch(2);
                 if (value.empty()) {
-                    std::stringstream warning;
-                    warning << "In HumdrumInput::parseEmbeddedOptions: Value is empty for parameter " << key;
-                    LogWarning(warning.str().c_str());
+                    LogWarning("In HumdrumInput::parseEmbeddedOptions: Value is empty for parameter {}", key);
                     continue;
                 }
                 inputparameters[pkey] = pvalue;
@@ -2706,10 +2715,7 @@ void HumdrumInput::parseEmbeddedOptions(Doc *doc)
     for (auto inputoption : inputparameters) {
         auto entry = optionlist->find(inputoption.first);
         if (entry == optionlist->end()) {
-            std::stringstream warning;
-            warning << "In HumdrumInput::parseEmbeddedOptions: option ";
-            warning << inputoption.first << " is not recognized";
-            LogWarning(warning.str().c_str());
+			LogWarning("In HumdrumInput::parseEmbeddedOptions: option {} is not recognized", inputoption.first);
             continue;
         }
 
@@ -4963,13 +4969,8 @@ void HumdrumInput::createHumdrumVerbatimExtMeta(pugi::xml_node meiHead)
     pugi::xml_parse_result result = tmpdoc.load_string(xmldata.str().c_str());
     if (!result) {
         // some sort of error, so give up;
-        std::stringstream warning;
-        warning << "In HumdrumInput::createHumdrumVerbatimExtMeta: ExtMeta parse error: ";
-        warning << result.description();
-        LogWarning(warning.str().c_str());
-        std::stringstream warning2;
-        warning2 << "   xmldata string is: " << xmldata.str();
-        LogWarning(warning2.str().c_str());
+        LogWarning("In HumdrumInput::createHumdrumVerbatimExtMeta: ExtMeta parse error: {}", result.description());
+        LogWarning("   xmldata string is: {}", xmldata.str());
         return;
     }
 
@@ -6291,13 +6292,9 @@ bool HumdrumInput::processStaffDecoration(const std::string &decoration)
     }
 
     if (!validQ) {
-        std::stringstream warning;
-        warning << "In HumdrumInput::processStaffDecoration: Decoration is invalid: " << decoration;
-        LogWarning(warning.str().c_str());
+        LogWarning("In HumdrumInput::processStaffDecoration: Decoration is invalid: {}", decoration);
         if (d != decoration) {
-            std::stringstream warning;
-            warning << "In HumdrumInput::processStaffDecoration: Staff version: " << d;
-            LogWarning(warning.str().c_str());
+            LogWarning("In HumdrumInput::processStaffDecoration: Staff version: {}", d);
         }
         StaffGrp *sg = new StaffGrp();
         setGroupSymbol(sg, staffGroupingSym_SYMBOL_bracket);
@@ -8882,10 +8879,7 @@ void HumdrumInput::setMensurationSymbol(
     }
     else {
         // deal with cases where C or O are not displayed
-        std::stringstream warning;
-        warning << "In HumdrumInput::setMensurationSymbol: Problem parsing mensuration: ";
-        warning << metdata;
-        LogWarning(warning.str().c_str());
+        LogWarning("In HumdrumInput::setMensurationSymbol: Problem parsing mensuration: {}", metdata);
         return;
     }
 
@@ -8941,59 +8935,45 @@ void HumdrumInput::setMensurationSymbol(
             prolatio = stoi(num4);
         }
 
-        std::stringstream warning;
         switch (prolatio) {
             case 2: vrvmensur->SetProlatio(PROLATIO_2); break;
             case 3: vrvmensur->SetProlatio(PROLATIO_3); break;
             case 0: break;
             default:
-                warning.str("");
-                warning << "In HumdrumInput::setMensurationSymbol: Unknown prolation ";
-                warning << prolatio << " in " << mensurtok;
-                LogWarning(warning.str().c_str());
+                LogWarning("In HumdrumInput::setMensurationSymbol: Unknown prolation {} in {}", prolatio,
+						   log_stream_helper(mensurtok));
         }
         switch (tempus) {
             case 2: vrvmensur->SetTempus(TEMPUS_2); break;
             case 3: vrvmensur->SetTempus(TEMPUS_3); break;
             case 0: break;
             default:
-                warning.str("");
-                warning << "In HumdrumInput::setMensurationSymbol: Unknown tempus ";
-                warning << tempus << " in " << mensurtok;
-                LogWarning(warning.str().c_str());
+                LogWarning("In HumdrumInput::setMensurationSymbol: Unknown tempus {} in {}", tempus,
+						   log_stream_helper(mensurtok));
         }
         switch (modus) {
             case 2: vrvmensur->SetModusminor(MODUSMINOR_2); break;
             case 3: vrvmensur->SetModusminor(MODUSMINOR_3); break;
             case 0: break;
             default:
-                warning.str("");
-                warning << "In HumdrumInput::setMensurationSymbol: Unknown modus ";
-                warning << modus << " in " << mensurtok;
-                LogWarning(warning.str().c_str());
+                LogWarning("In HumdrumInput::setMensurationSymbol: Unknown modus {} in {}", modus,
+						   log_stream_helper(mensurtok));
         }
         switch (maximodus) {
             case 2: vrvmensur->SetModusmaior(MODUSMAIOR_2); break;
             case 3: vrvmensur->SetModusmaior(MODUSMAIOR_3); break;
             case 0: break;
             default:
-                warning.str("");
-                warning << "In HumdrumInput::setMensurationSymbol: Unknown maximodus ";
-                warning << maximodus << " in " << mensurtok;
-                LogWarning(warning.str().c_str());
+                LogWarning("In HumdrumInput::setMensurationSymbol: Unknown maximodus {} in {}", maximodus,
+						   log_stream_helper(mensurtok));
         }
     }
 
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
     if (staffindex < 0) {
-        std::stringstream warning;
-        warning << "In HumdrumInput::setMensrationSymbol: ";
-        warning << "Initialization problem, not setting mensuration information";
-        LogWarning(warning.str().c_str());
-        std::stringstream warning2;
-        warning2 << "   Staff index = " << staffindex;
-        LogWarning(warning2.str().c_str());
+        LogWarning("In HumdrumInput::setMensrationSymbol: Initialization problem, not setting mensuration information");
+        LogWarning("   Staff index = {}", staffindex);
         return;
     }
     if (staffindex >= (int)ss.size()) {
@@ -10180,10 +10160,7 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
             }
             staffindex = rkern[track];
             if (staffindex < 0) {
-                std::stringstream warning;
-                warning << "In HumdrumInput::storeStaffLayerTokensForMeasure:";
-                warning << "Staff inex problem for track " << track;
-                LogWarning(warning.str().c_str());
+                LogWarning("In HumdrumInput::storeStaffLayerTokensForMeasure: Staff inex problem for track {}", track);
             }
             if ((int)lt[staffindex].size() < layerindex + 1) {
                 lt[staffindex].resize(lt[staffindex].size() + 1);
@@ -11189,10 +11166,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 text->SetText(UTF8to32(*token));
             }
             else {
-                std::stringstream warning;
-                warning << "In HumdrumInput::addHarmFloatsForMeasure: ";
-                warning << "Unknown type of harm data " << datatype;
-                LogWarning(warning.str().c_str());
+                LogWarning("In HumdrumInput::addHarmFloatsForMeasure: Unknown type of harm data {}", datatype);
                 continue;
             }
         }
@@ -12567,10 +12541,7 @@ void HumdrumInput::setMxHarmContent(Rend *rend, const std::string &content)
             }
         }
         else {
-            std::stringstream warning;
-            warning << "In HumdrumInput::setMxHarmContent: ";
-            warning << "Should not get here if correct input: " << content;
-            LogWarning(warning.str().c_str());
+            LogWarning("In HumdrumInput::setMxHarmContent: Should not get here if correct input: {}", content);
         }
     }
 
@@ -13236,10 +13207,7 @@ bool HumdrumInput::checkForTremolo(
     int beams = -log(duration.getFloat()) / log(2.0);
     if (beams <= 0) {
         // something went wrong calculating durations.
-        std::stringstream warning;
-        warning << "In HumdrumInput::checkForTremolo: ";
-        warning << "Problem with tremolo2 calculation, beam count: " << beams;
-        LogWarning(warning.str().c_str());
+        LogWarning("In HumdrumInput::checkForTremolo: Problem with tremolo2 calculation, beam count: {}", beams);
         return false;
     }
 
@@ -14008,13 +13976,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     }
                 }
                 else {
-                    std::stringstream warning;
-                    warning << "In HumdrumInput::fillContentsOfLayer: ";
-                    warning << "Strange error when adding rest " << trest;
-                    LogWarning(warning.str().c_str());
-                    std::stringstream warning2;
-                    warning2 << "   Line: " << trest->getLineNumber() << ", Field: " << trest->getFieldNumber();
-                    LogWarning(warning2.str().c_str());
+                    LogWarning("In HumdrumInput::fillContentsOfLayer: Strange error when adding rest {}",
+							   log_stream_helper(trest));
+                    LogWarning("   Line: {}, Field: {}", trest->getLineNumber(), trest->getFieldNumber());
                 }
             }
 
@@ -17979,10 +17943,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
             setLocationId(tempo, dirtok);
         }
         else {
-            std::stringstream warning;
-            warning << "In HumdrumInput::processLinkedDirection: dirtok for ";
-            warning << token << " is empty";
-            LogWarning(warning.str().c_str());
+            LogWarning("In HumdrumInput::processLinkedDirection: dirtok for {} is empty", log_stream_helper(token));
         }
         hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
         if (token->isMensLike()) {
@@ -18030,10 +17991,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
             setLocationId(dir, dirtok);
         }
         else {
-            std::stringstream warning;
-            warning << "In HumdrumInput::processLinkedDirection: (2) dirtok for ";
-            warning << token << " is empty";
-            LogWarning(warning.str().c_str());
+			LogWarning("In HumdrumInput::processLinkedDirection: (2) dirtok for {} is empty", log_stream_helper(token));
         }
 
         if (token->isMensLike()) {
@@ -23261,10 +23219,8 @@ void HumdrumInput::removeBeam(std::vector<std::string> &elements, std::vector<vo
         std::stringstream warning;
         LogWarning("   Element stack: ");
         for (int i = (int)elements.size() - 1; i >= 0; i--) {
-            std::stringstream warning;
-            warning.str("");
-            warning << "      " << i << ":\t" << elements[i];
-            LogWarning(warning.str().c_str());
+
+			LogWarning("      {}:\t{}", i, elements[i]);
         }
         return;
     }
@@ -23282,10 +23238,7 @@ void HumdrumInput::removeGBeam(std::vector<std::string> &elements, std::vector<v
         LogWarning("In HumdrumInput::removeGBeam: Error removing gbeam");
         LogWarning("   Element stack: ");
         for (int i = (int)elements.size() - 1; i >= 0; i--) {
-            std::stringstream warning;
-            warning.str("");
-            warning << "      " << i << ":\t" << elements[i];
-            LogWarning(warning.str().c_str());
+            LogWarning("      {}:\t{}", i,  elements[i]);
         }
         return;
     }
@@ -23301,15 +23254,10 @@ void HumdrumInput::removeTuplet(std::vector<std::string> &elements, std::vector<
 {
     if (elements.back() != "tuplet") {
         LogWarning("In HumdrumInput::removeTuplet: Error removing tuplet");
-        std::stringstream warning;
-        warning << "   Last element is: " << elements.back();
-        LogWarning(warning.str().c_str());
+		LogWarning("   Last element is: {}", elements.back());
         LogWarning("   Element stack: ");
         for (int i = (int)elements.size() - 1; i >= 0; i--) {
-            std::stringstream warning;
-            warning.str("");
-            warning << "      " << i << ":\t" << elements[i];
-            LogWarning(warning.str().c_str());
+			LogWarning("      {}:\t{}", i, elements[i]);
         }
         return;
     }
@@ -25693,7 +25641,6 @@ void HumdrumInput::adjustChordNoteDuration(Note *note, hum::HumNum hdur, int mei
 
 void HumdrumInput::setNoteMeiDur(Note *note, int meidur)
 {
-    std::stringstream warning;
     switch (meidur) {
         case -1: note->SetDur(DURATION_maxima); break;
         case 0: note->SetDur(DURATION_long); break;
@@ -25710,8 +25657,7 @@ void HumdrumInput::setNoteMeiDur(Note *note, int meidur)
         case 11: note->SetDur(DURATION_512); break;
         case 12: note->SetDur(DURATION_1024); break;
         default:
-            warning << "In HumdrumInput::setNoteMeiDur: Unknown MEI @dur: " << meidur;
-            LogWarning(warning.str().c_str());
+			LogWarning("In HumdrumInput::setNoteMeiDur: Unknown MEI @dur: {}", meidur);
     }
 }
 
@@ -25893,10 +25839,7 @@ void HumdrumInput::appendElement(const std::vector<std::string> &name, const std
         appendElement((Ligature *)pointers.back(), child);
     }
     else {
-        std::stringstream warning;
-        warning << "In HumdrumInput::appendElement: ";
-        warning << "Cannot append to unknown element: " << name.back();
-        LogWarning(warning.str().c_str());
+		LogWarning("In HumdrumInput::appendElement: Cannot append to unknown element: {}", name.back());
     }
 }
 
@@ -26706,10 +26649,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
                     case -2: myaccid->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
                     case -3: myaccid->SetAccid(ACCIDENTAL_WRITTEN_tf); break;
                     default: {
-                        std::stringstream warning;
-                        warning << "In HumdrumInput::convertNote: ";
-                        warning << "Do not know how to convert accidental: " << accidCount;
-                        LogWarning(warning.str().c_str());
+						LogWarning("In HumdrumInput::convertNote: Do not know how to convert accidental: {}", accidCount);
                     }
                 }
 
@@ -26759,10 +26699,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
                     case -2: accid->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
                     case -3: accid->SetAccid(ACCIDENTAL_WRITTEN_tf); break;
                     default: {
-                        std::stringstream warning;
-                        warning << "In HumdrumInput::convertNote: ";
-                        warning << "Do not know how to convert accidental: " << accidCount;
-                        LogWarning(warning.str().c_str());
+                        LogWarning("In HumdrumInput::convertNote: Do not know how to convert accidental: {}", accidCount);
                     }
                 }
             }
@@ -26869,10 +26806,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
                     showInAccidGes = true;
                 }
                 else {
-                    std::stringstream warning;
-                    warning << "In HumdrumInput::convertNote: ";
-                    warning << "Unknown accidental type: " << loaccid;
-                    LogWarning(warning.str().c_str());
+					LogWarning("In HumdrumInput::convertNote: Unknown accidental type: {}", loaccid);
                 }
                 // add more accidentals here as necessary.  Mostly left are quarter tones
                 // which are not dealt with directly in **kern data: su, sd, fu, fd, nu,
@@ -28876,11 +28810,9 @@ void HumdrumInput::addTurn(hum::HTp token, const string &tok, int noteIndex)
     }
     bool singleQ = false;
     if (turnstart == turnend) {
-        std::stringstream warning;
-        warning << "In HumdrumInput::addTurn: Single turn character ";
-        warning << "on line " << token->getLineNumber() << ", ";
-        warning << "field, " << token->getFieldNumber() << ".";
-        LogWarning(warning.str().c_str());
+        LogWarning("In HumdrumInput::addTurn: Single turn character on line {}, field, {}.",
+				   token->getLineNumber(),
+				   token->getFieldNumber());
         singleQ = true;
     }
 
@@ -30003,10 +29935,8 @@ template <class ELEMENT> hum::HumNum HumdrumInput::setDuration(ELEMENT element, 
     }
     // Don't know what to do, so return duration
     // There will be an error in the data.
-    std::stringstream warning;
-    warning << "In HumdrumInput::setDuration: ";
-    warning << "Unprintable duration" << duration << " quarter notes";
-    LogWarning(warning.str().c_str());
+    LogWarning("In HumdrumInput::setDuration: Unprintable duration {} quarter notes",
+			   log_stream_helper(duration));
     return duration;
 }
 

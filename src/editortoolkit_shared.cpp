@@ -334,7 +334,7 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         LogWarning("Could not parse the updatePitch action");
     }
     else {
-        LogWarning("Unknown action type '%s'.", action.c_str());
+        LogWarning("Unknown action type '{}'.", action);
     }
     return false;
 #else /* NO_EDIT_SUPPORT */

@@ -612,13 +612,13 @@ FunctorCode ScoreDefSetGrpSymFunctor::VisitGrpSym(GrpSym *grpSym)
         StaffDef *end = vrv_cast<StaffDef *>(scoreDef->FindDescendantByComparison(&compare, level));
 
         if (!start || !end) {
-            LogWarning("Could not find startid/endid on level %d for '%s'", level, grpSym->GetID().c_str());
+            LogWarning("Could not find startid/endid on level {} for '{}'", level, grpSym->GetID());
             return FUNCTOR_CONTINUE;
         }
 
         if (start->GetParent() != end->GetParent()) {
-            LogWarning("'%s' has mismatching parents for startid:%s and endid:%s", grpSym->GetID().c_str(),
-                startId.c_str(), endId.c_str());
+            LogWarning("'{}' has mismatching parents for startid:{} and endid:{}", grpSym->GetID(),
+                startId, endId);
             return FUNCTOR_CONTINUE;
         }
 

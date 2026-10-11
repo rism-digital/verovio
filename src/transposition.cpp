@@ -188,7 +188,7 @@ data_ACCIDENTAL_GESTURAL_basic TransPitch::GetAccidGesBasic() const
         case 3: return ACCIDENTAL_GESTURAL_basic_ts;
         default: break;
     }
-    LogWarning("Transposition: Could not get Gestural Basic Accidental for %i", m_accid);
+    LogWarning("Transposition: Could not get Gestural Basic Accidental for {}", m_accid);
     return ACCIDENTAL_GESTURAL_basic_NONE;
 }
 
@@ -204,7 +204,7 @@ data_ACCIDENTAL_GESTURAL TransPitch::GetAccidGes() const
         case 3: return ACCIDENTAL_GESTURAL_ts;
         default: break;
     }
-    LogWarning("Transposition: Could not get Gestural Accidental for %i", m_accid);
+    LogWarning("Transposition: Could not get Gestural Accidental for {}", m_accid);
     return ACCIDENTAL_GESTURAL_NONE;
 }
 
@@ -220,7 +220,7 @@ data_ACCIDENTAL_WRITTEN TransPitch::GetAccidWritten() const
         case 3: return ACCIDENTAL_WRITTEN_xs;
         default: break;
     }
-    LogWarning("Transposition: Could not get Written Accidental for %i", m_accid);
+    LogWarning("Transposition: Could not get Written Accidental for {}", m_accid);
     return ACCIDENTAL_WRITTEN_NONE;
 }
 
@@ -799,7 +799,7 @@ bool Transposer::GetKeyTonic(const std::string &keyTonic, TransPitch &tonic)
                     case 'a': pitch = 5; break;
                     case 'B':
                     case 'b': pitch = 6; break;
-                    default: LogWarning("Invalid keytonic pitch character: %c", keyTonic[i]); return false;
+                    default: LogWarning("Invalid keytonic pitch character: {}", keyTonic[i]); return false;
                 }
                 break;
             case 2:
@@ -810,7 +810,7 @@ bool Transposer::GetKeyTonic(const std::string &keyTonic, TransPitch &tonic)
                     case 'S':
                     case 's':
                     case '#': accid++; break;
-                    default: LogWarning("Invalid keytonic accid character: %c", keyTonic[i]); return false;
+                    default: LogWarning("Invalid keytonic accid character: {}", keyTonic[i]); return false;
                 }
                 break;
         }

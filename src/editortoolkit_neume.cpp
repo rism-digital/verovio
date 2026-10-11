@@ -268,7 +268,7 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
         LogWarning("Could not parse change staff action");
     }
     else {
-        LogWarning("Unknown action type '%s'.", action.c_str());
+        LogWarning("Unknown action type '{}'.", action);
     }
     m_editStatus.import("status", "FAILURE");
     m_editStatus.import("message", "Action " + action + " could not be parsed or is unknown.");
@@ -277,7 +277,7 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
 
 bool EditorToolkitNeume::Chain(jsonxx::Array actions)
 {
-    // LogMessage("%s", actions.get<jsonxx::Object>(0).json().c_str());
+    // LogMessage("{}", actions.get<jsonxx::Object>(0).json());
     bool status = true;
     jsonxx::Object results;
     for (int i = 0; i < (int)actions.size(); i++) {
@@ -1937,7 +1937,7 @@ bool EditorToolkitNeume::SetText(std::string elementId, const std::string &text)
     }
     Object *element = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
     if (element == NULL) {
-        LogWarning("No element with ID '%s' exists", elementId.c_str());
+        LogWarning("No element with ID '{}' exists", elementId);
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "No element with ID '" + elementId + "' exists.");
         return false;
@@ -4526,7 +4526,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj)
     obj->FindAllDescendantsByComparison(&pitchedChildren, &ic);
 
     if (pitchedChildren.empty()) {
-        LogWarning("Syllable/neume has no pitched children: %s", obj->GetID().c_str());
+        LogWarning("Syllable/neume has no pitched children: {}", obj->GetID());
         return true;
     }
 

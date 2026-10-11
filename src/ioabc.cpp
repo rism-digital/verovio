@@ -455,7 +455,7 @@ void ABCInput::AddRepeatMark(LayerElement *element)
 void ABCInput::AddTie()
 {
     if (!m_tieStack.empty()) {
-        LogWarning("ABC import: '%s' already tied", m_ID.c_str());
+        LogWarning("ABC import: '{}' already tied", m_ID);
         return;
     }
     if (!m_ID.empty()) {
@@ -490,14 +490,14 @@ void ABCInput::EndSlur()
         }
         return;
     }
-    LogWarning("ABC import: Closing slur for element '%s' could not be matched", m_ID.c_str());
+    LogWarning("ABC import: Closing slur for element '{}' could not be matched", m_ID);
 }
 
 void ABCInput::ParseDecoration(const std::string &decorationString)
 {
     // shorthand decorations hard-coded !
     if (isdigit(decorationString[0])) {
-        LogWarning("ABC import: Fingering not supported", decorationString.c_str());
+        LogWarning("ABC import: Fingering {} not supported", decorationString);
         return;
     }
     if (decorationString == ".") {
@@ -577,7 +577,7 @@ void ABCInput::ParseDecoration(const std::string &decorationString)
         m_repeatMark = repeatMarkLog_FUNC_daCapo;
     }
     else {
-        LogWarning("ABC import: Decoration %s not supported", decorationString.c_str());
+        LogWarning("ABC import: Decoration {} not supported", decorationString);
     }
 }
 
@@ -1007,8 +1007,8 @@ void ABCInput::FlushControlElements(Score *score, Section *section)
             layer = dynamic_cast<Layer *>(section->FindDescendantByID(iter.first));
         }
         if (!layer) {
-            LogWarning("ABC import: Element '%s' could not be assigned to layer '%s'",
-                iter.second->GetClassName().c_str(), iter.first.c_str());
+            LogWarning("ABC import: Element '{}' could not be assigned to layer '{}'",
+                iter.second->GetClassName(), iter.first);
             delete iter.second;
             iter.second = NULL;
             continue;
@@ -1217,7 +1217,7 @@ void ABCInput::ReadInformationField(const char &dataKey, std::string value)
         case 'W': LogWarning("ABC import: Lyrics are not supported yet"); break;
         case 'X': this->ParseReferenceNumber(value); break;
         case 'Z': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
-        default: LogWarning("ABC import: Information field %c is ignored", dataKey);
+        default: LogWarning("ABC import: Information field {} is ignored", dataKey);
     }
 }
 

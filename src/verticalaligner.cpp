@@ -252,7 +252,7 @@ SystemAligner::SpacingType SystemAligner::GetAboveSpacingType(const Staff *staff
 
     auto iter = m_spacingTypes.find(staff->GetN());
     if (iter == m_spacingTypes.end()) {
-        LogWarning("No spacing type found matching @n=%d for '<%s>'", staff->GetN(), staff->GetID().c_str());
+        LogWarning("No spacing type found matching @n={} for '<{}>'", staff->GetN(), staff->GetID());
         return SpacingType::None;
     }
 

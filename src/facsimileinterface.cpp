@@ -113,7 +113,7 @@ FunctorCode FacsimileInterface::InterfacePrepareFacsimile(PrepareFacsimileFuncto
     std::string facsID = ExtractIDFragment(this->GetFacs());
     Object *facsDescendant = facsimile->FindDescendantByID(facsID);
     if (!facsDescendant) {
-        LogWarning("Could not find @facs '%s' in facsimile element", facsID.c_str());
+        LogWarning("Could not find @facs '{}' in facsimile element", facsID);
         return FUNCTOR_CONTINUE;
     }
 

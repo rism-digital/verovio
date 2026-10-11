@@ -942,7 +942,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
         default:
             // Use solid barline as fallback
             LogWarning(
-                "%s bar lines not supported", barLine->AttBarLineLog::BarrenditionToStr(barLine->GetForm()).c_str());
+                "{} bar lines not supported", barLine->AttBarLineLog::BarrenditionToStr(barLine->GetForm()));
             this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
             break;
     }

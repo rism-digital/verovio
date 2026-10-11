@@ -655,7 +655,7 @@ FunctorCode GenerateMIDIFunctor::VisitBeatRpt(const BeatRpt *beatRpt)
     }
 
     for (int i = 0; i < beatLength * tpq; ++i) {
-        // LogWarning("%i", i);
+        // LogWarning("{}", i);
         // smf::MidiEvent event = m_midiFile->getEvent(m_midiTrack, startTime * tpq);
         // event.clearVariables();
     }

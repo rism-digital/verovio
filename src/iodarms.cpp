@@ -234,7 +234,7 @@ int DarmsInput::do_globalSpec(int pos, const char *data)
                 this->UnrollKeysig(quantity, data[pos]);
             }
             else {
-                LogWarning("DARMS import: Invalid char for 'K': %c", data[pos]);
+                LogWarning("DARMS import: Invalid char for 'K': {}", data[pos]);
             }
             break;
 
@@ -283,7 +283,7 @@ int DarmsInput::do_Clef(int pos, const char *data)
             case 3: mclef->SetLine(2); break;
             case 5: mclef->SetLine(3); break;
             case 7: mclef->SetLine(4); break;
-            default: LogWarning("DARMS import: Invalid C clef on line %i", position); break;
+            default: LogWarning("DARMS import: Invalid C clef on line {}", position); break;
         }
         m_clef_offset = 21 - position; // 21 is the position in the array, position is of the clef
     }
@@ -292,7 +292,7 @@ int DarmsInput::do_Clef(int pos, const char *data)
         switch (position) {
             case 1: mclef->SetLine(1); break;
             case 3: mclef->SetLine(2); break;
-            default: LogWarning("DARMS import: Invalid G clef on line %i", position); break;
+            default: LogWarning("DARMS import: Invalid G clef on line {}", position); break;
         }
         m_clef_offset = 25 - position;
     }
@@ -305,13 +305,13 @@ int DarmsInput::do_Clef(int pos, const char *data)
                 ;
                 break;
             case 7: mclef->SetLine(5); break;
-            default: LogWarning("DARMS import: Invalid F clef on line %i", position); break;
+            default: LogWarning("DARMS import: Invalid F clef on line {}", position); break;
         }
         m_clef_offset = 15 - position;
     }
     else {
         // what the...
-        LogWarning("DARMS import: Invalid clef specification: %c", data[pos]);
+        LogWarning("DARMS import: Invalid clef specification: {}", data[pos]);
         // avoiding memory leak
         delete mclef;
         return 0; // fail
@@ -385,7 +385,7 @@ int DarmsInput::do_Note(int pos, const char *data, bool rest)
         case 'Y': duration = DURATION_128; break;
         case 'Z': duration = DURATION_256; break;
 
-        default: LogWarning("DARMS import: Unknown note duration: %c", data[pos]); return 0;
+        default: LogWarning("DARMS import: Unknown note duration: {}", data[pos]); return 0;
     }
 
     if (data[pos + 1] == '.') {

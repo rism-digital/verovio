@@ -459,7 +459,7 @@ void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
                 this->CreateChord(eventNode);
             }
             else {
-                LogWarning("Unsupported event '%s'", name.c_str());
+                LogWarning("Unsupported event '{}'", name);
             }
         }
         else if (name == "Note") {
@@ -478,7 +478,7 @@ void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
             this->CreateApp(eventNode);
         }
         else {
-            LogWarning("Unsupported event '%s'", name.c_str());
+            LogWarning("Unsupported event '{}'", name);
         }
         if (!keySigFound) {
             m_currentSignature = NULL;
@@ -621,7 +621,7 @@ void CmmeInput::CreateChord(pugi::xml_node chordNode)
             if (inLigature) break;
         }
         else {
-            LogWarning("Unsupported chord component: '%s'", name.c_str());
+            LogWarning("Unsupported chord component: '{}'", name);
         }
     }
     if (!inLigature) m_currentContainer = m_currentContainer->GetParent();

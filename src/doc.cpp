@@ -497,7 +497,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                 scoreDef->SetCustomTuning(tuning);
             }
             else {
-                LogWarning("Error parsing tuning %s", f.good() ? "file" : "definition");
+                LogWarning("Error parsing tuning {}", f.good() ? "file" : "definition");
             }
         }
     }
@@ -548,7 +548,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                         midiFile->addTracks(midiTrack + 1 - midiFile->getTrackCount());
                     }
                     if (midiTrack > 255) {
-                        LogWarning("A high MIDI track number was assigned to staff %d", staffDef->GetN());
+                        LogWarning("A high MIDI track number was assigned to staff {}", staffDef->GetN());
                     }
                 }
                 if (instrDef->HasMidiInstrnum()) {
@@ -735,9 +735,9 @@ void Doc::PrepareData()
     for (const auto &pair : interfaceOwnerPairs) {
         if (pair.first->HasStartid() && pair.first->HasEndid()) {
             LogWarning(
-                "Time spanning element '%s' with @xml:id '%s', @startid '%s', and @endid '%s' could not be matched.",
-                pair.second->GetClassName().c_str(), pair.second->GetID().c_str(), pair.first->GetStartid().c_str(),
-                pair.first->GetEndid().c_str());
+                "Time spanning element '{}' with @xml:id '{}', @startid '{}', and @endid '{}' could not be matched.",
+                pair.second->GetClassName(), pair.second->GetID(), pair.first->GetStartid(),
+                pair.first->GetEndid());
         }
     }
 
@@ -761,7 +761,7 @@ void Doc::PrepareData()
 
     // If some are still there, then it is probably an issue in the encoding
     if (!prepareTimestamps.GetInterfaceIDPairs().empty()) {
-        LogWarning("%d time spanning element(s) with timestamps could not be matched.",
+        LogWarning("{} time spanning element(s) with timestamps could not be matched.",
             prepareTimestamps.GetInterfaceIDPairs().size());
     }
 
@@ -780,13 +780,13 @@ void Doc::PrepareData()
 
     // If some are still there, then it is probably an issue in the encoding
     if (!prepareLinking.GetNextIDPairs().empty()) {
-        LogWarning("%d element(s) with a @next could not match the target", prepareLinking.GetNextIDPairs().size());
+        LogWarning("{} element(s) with a @next could not match the target", prepareLinking.GetNextIDPairs().size());
     }
     if (!prepareLinking.GetSameasIDPairs().empty()) {
-        LogWarning("%d element(s) with a @sameas could not match the target", prepareLinking.GetSameasIDPairs().size());
+        LogWarning("{} element(s) with a @sameas could not match the target", prepareLinking.GetSameasIDPairs().size());
     }
     if (!prepareLinking.GetStemSameasIDPairs().empty()) {
-        LogWarning("%d element(s) with a @stem.sameas could not match the target",
+        LogWarning("{} element(s) with a @stem.sameas could not match the target",
             prepareLinking.GetStemSameasIDPairs().size());
     }
 
@@ -804,8 +804,8 @@ void Doc::PrepareData()
 
     // If some are still there, then it is probably an issue in the encoding
     for (const auto &pair : preparePlist.GetInterfaceIDPairs()) {
-        LogWarning("Element '%s' with @xml:id '%s' and a @plist could not match the target '%s'.",
-            pair.first->GetClassName().c_str(), pair.first->GetID().c_str(), pair.second.c_str());
+        LogWarning("Element '{}' with @xml:id '{}' and a @plist could not match the target '{}'.",
+            pair.first->GetClassName(), pair.first->GetID(), pair.second);
     }
 
     /************ Resolve cross staff ************/
@@ -919,8 +919,8 @@ void Doc::PrepareData()
 
     // Something must be wrong in the encoding because a TimeSpanningInterface was left open
     for (const auto &obj : prepareStaffCurrentTimeSpanning.GetTimeSpanningElements()) {
-        LogWarning("Time spanning element '%s' with @xml:id '%s' could not be set as running.",
-            obj->GetClassName().c_str(), obj->GetID().c_str());
+        LogWarning("Time spanning element '{}' with @xml:id '{}' could not be set as running.",
+            obj->GetClassName(), obj->GetID());
     }
 
     /************ Resolve mRpt ************/
@@ -1287,7 +1287,7 @@ void Doc::InitSelectionDoc(DocSelection &selection, bool resetCache)
         return;
     }
     else if (pages->GetChildCount() == 2) {
-        LogWarning("Selection end '%s' could not be found", m_selectionEnd.c_str());
+        LogWarning("Selection end '{}' could not be found", m_selectionEnd);
         // Add an empty page to make it work
         pages->AddChild(new Page());
     }
@@ -1553,7 +1553,7 @@ void Doc::ConvertMarkupDoc(bool permanent)
                 // After having processed one layer, we check if we have open ties - if yes, we
                 // must reset them and they will be ignored.
                 for (Note *note : convertMarkupAnalytical.GetCurrentNotes()) {
-                    LogWarning("Unable to match @tie of note '%s', skipping it", note->GetID().c_str());
+                    LogWarning("Unable to match @tie of note '{}', skipping it", note->GetID());
                 }
             }
         }
@@ -1629,8 +1629,8 @@ void Doc::TransposeDoc()
     if (m_options->m_transpose.IsSet()) {
         // Transpose the entire document
         if (m_options->m_transposeMdiv.IsSet()) {
-            LogWarning("\"%s\" is ignored when \"%s\" is set as well. Please use only one of the two options.",
-                m_options->m_transposeMdiv.GetKey().c_str(), m_options->m_transpose.GetKey().c_str());
+            LogWarning("\"{}\" is ignored when \"{}\" is set as well. Please use only one of the two options.",
+                m_options->m_transposeMdiv.GetKey(), m_options->m_transpose.GetKey());
         }
         TransposeFunctor transpose(this, &transposer);
         transpose.SetVisibleOnly(selectedOnly);
@@ -1695,7 +1695,7 @@ void Doc::ExpandExpansions()
     if (expandSelected) {
         startExpansion = dynamic_cast<Expansion *>(this->FindDescendantByID(expansionId));
         if (startExpansion == NULL) {
-            LogWarning("Expansion ID '%s' not found. Nothing expanded.", expansionId.c_str());
+            LogWarning("Expansion ID '{}' not found. Nothing expanded.", expansionId);
             return;
         }
     }

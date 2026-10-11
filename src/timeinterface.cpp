@@ -188,8 +188,8 @@ bool TimePointInterface::VerifyMeasure(const Object *owner) const
 {
     assert(owner);
     if (m_start && (owner->GetFirstAncestor(MEASURE) != this->GetStartMeasure())) {
-        LogWarning("%s '%s' is not encoded in the measure of its start '%s'. This may cause improper rendering.",
-            owner->GetClassName().c_str(), owner->GetID().c_str(), m_start->GetID().c_str());
+        LogWarning("{} '{}' is not encoded in the measure of its start '{}'. This may cause improper rendering.",
+            owner->GetClassName(), owner->GetID(), m_start->GetID());
         return false;
     }
     return true;
@@ -375,8 +375,8 @@ FunctorCode TimePointInterface::InterfacePrepareTimestamps(PrepareTimestampsFunc
     // First we check if the object has already a mapped @startid (it should not)
     if (this->HasStart()) {
         if (this->HasTstamp())
-            LogWarning("%s with @xml:id %s has both a @startid and an @tstamp; @tstamp is ignored",
-                object->GetClassName().c_str(), object->GetID().c_str());
+            LogWarning("{} with @xml:id {} has both a @startid and an @tstamp; @tstamp is ignored",
+                object->GetClassName(), object->GetID());
         return FUNCTOR_CONTINUE;
     }
     else if (!this->HasTstamp()) {
@@ -417,11 +417,11 @@ FunctorCode TimeSpanningInterface::InterfacePrepareTimestamps(PrepareTimestampsF
     // First we check if the object has already a mapped @endid (it should not)
     if (this->HasEndid()) {
         if (this->HasTstamp2())
-            LogWarning("%s with @xml:id %s has both a @endid and an @tstamp2; @tstamp2 is ignored",
-                object->GetClassName().c_str(), object->GetID().c_str());
+            LogWarning("{} with @xml:id {} has both a @endid and an @tstamp2; @tstamp2 is ignored",
+                object->GetClassName(), object->GetID());
         if ((this->GetStartid() == this->GetEndid()) && !object->Is(OCTAVE)) {
-            LogWarning("%s with @xml:id %s will not get rendered as it has identical values in @startid and @endid",
-                object->GetClassName().c_str(), object->GetID().c_str());
+            LogWarning("{} with @xml:id {} will not get rendered as it has identical values in @startid and @endid",
+                object->GetClassName(), object->GetID());
         }
         return TimePointInterface::InterfacePrepareTimestamps(functor, object);
     }

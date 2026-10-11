@@ -887,8 +887,8 @@ void ConvertToCmnFunctor::SplitDurationInterface(
             // measures - create a tuplet with according ratio
             Fraction tupletRatio = (hasProportion) ? durationWithoutProport / Fraction(noteDur) * 2
                                                    : durationWithoutProport / Fraction(noteDur);
-            LogWarning("The tuplet corresponding to proportion is not appropriate and must be changed to %s",
-                tupletRatio.ToString().c_str());
+            LogWarning("The tuplet corresponding to proportion is not appropriate and must be changed to {}",
+                tupletRatio.ToString());
             m_proportTuplet->SetNum(tupletRatio.GetDenominator());
             m_proportTuplet->SetNumbase(tupletRatio.GetNumerator());
             m_proportTuplet->SetNumFormat(tupletVis_NUMFORMAT_ratio);
@@ -1200,7 +1200,7 @@ FunctorCode ConvertMarkupAnalyticalFunctor::VisitNote(Note *note)
                 }
             }
             else {
-                LogWarning("Expected @tie median or terminal in note '%s', skipping it", note->GetID().c_str());
+                LogWarning("Expected @tie median or terminal in note '{}', skipping it", note->GetID());
             }
             iter = m_currentNotes.erase(iter);
             // we are done for this note

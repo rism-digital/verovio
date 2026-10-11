@@ -407,7 +407,7 @@ CONVERTER_METHOD2_CPP = """
 
 CONVERTER_METHOD1_END_CPP = """
         default:
-            LogWarning("Unknown value '%d' for {type}", data);
+            LogWarning("Unknown value '{{}}' for {type}", data);
             value = "";
             break;
     }}
@@ -417,7 +417,7 @@ CONVERTER_METHOD1_END_CPP = """
 
 CONVERTER_METHOD2_END_CPP = """
     if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for {type}", value.c_str());
+        LogWarning("Unsupported value '{{}}' for {type}", value);
     return {prefix}_NONE;
 }}
 """
