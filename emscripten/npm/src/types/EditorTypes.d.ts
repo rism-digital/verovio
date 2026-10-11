@@ -22,14 +22,13 @@ export interface DeleteAction {
         backspace?: boolean;
     };
 }
-export interface DragAction {
+export type EditActionDrag = {
     action: "drag";
-    param: {
-        elementId: string;
-        x: number;
-        y: number;
-    };
-}
+    param:
+        | { phase: "start" }
+        | { phase: "move"; dx: number; dy: number }
+        | { phase: "end" };
+};
 export interface GetScoreDefAction {
     action: "getScoreDef";
     param: Record<string, never>;
@@ -261,7 +260,7 @@ export type EditorAction =
     | ChainAction
     | ContextAction
     | DeleteAction
-    | DragAction
+    | EditActionDrag
     | GetScoreDefAction
     | GetScoreDefKeySigAction
     | GetScoreDefMeterSigAction

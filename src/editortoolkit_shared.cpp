@@ -63,6 +63,8 @@ EditorToolkitShared::EditorToolkitShared(Doc *doc, View *view) : EditorToolkit(d
     m_scoreContext = NULL;
     m_sectionContext = NULL;
     m_currentContext = NULL;
+    m_dragXOrigin = VRV_UNSET;
+    m_dragYOrigin = VRV_UNSET;
 
     this->SetEditStatus();
 }
@@ -160,11 +162,11 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         LogWarning("Could not parse the delete action");
     }
     else if (action == "drag") {
-        std::string elementId;
-        int x, y;
-        if (this->ParseDragAction(json.get<jsonxx::Object>("param"), elementId, x, y)) {
-            this->PrepareUndo();
-            return (this->Drag(elementId, x, y));
+        DragPhase phase;
+        int dx, dy;
+        if (this->ParseDragAction(json.get<jsonxx::Object>("param"), phase, dx, dy)) {
+            if (phase == DRAG_MOVE) this->PrepareUndo();
+            return (this->Drag(phase, dx, dy));
         }
         LogWarning("Could not parse the drag action");
     }
@@ -443,14 +445,30 @@ bool EditorToolkitShared::ParseDeleteAction(
     return true;
 }
 
-bool EditorToolkitShared::ParseDragAction(const jsonxx::Object &param, std::string &elementId, int &x, int &y)
+bool EditorToolkitShared::ParseDragAction(const jsonxx::Object &param, DragPhase &phase, int &dx, int &dy)
 {
-    if (!param.has<jsonxx::String>("elementId")) return false;
-    elementId = param.get<jsonxx::String>("elementId");
-    if (!param.has<jsonxx::Number>("x")) return false;
-    x = param.get<jsonxx::Number>("x");
-    if (!param.has<jsonxx::Number>("y")) return false;
-    y = param.get<jsonxx::Number>("y");
+    dx = 0;
+    dy = 0;
+
+    if (!param.has<jsonxx::String>("phase")) return false;
+    const std::string phaseStr = param.get<jsonxx::String>("phase");
+    if (phaseStr == "start") {
+        phase = DRAG_START;
+    }
+    else if (phaseStr == "move") {
+        phase = DRAG_MOVE;
+        if (!param.has<jsonxx::Number>("dx")) return false;
+        dx = param.get<jsonxx::Number>("dx");
+        if (!param.has<jsonxx::Number>("dy")) return false;
+        dy = param.get<jsonxx::Number>("dy");
+    }
+    else if (phaseStr == "end") {
+        phase = DRAG_END;
+    }
+    else {
+        return false;
+    }
+
     return true;
 }
 
@@ -778,6 +796,28 @@ void EditorToolkitShared::SetEditStatus()
         insertion.import("autoBeam", (m_cursor->IsAutoBeam()));
         insertion.import("accidImplicit", m_cursor->IsAccidImplicit());
         m_editStatus << "insertion" << insertion;
+    }
+}
+
+void EditorToolkitShared::ResetSelect()
+{
+    EditorToolkit::ResetSelect();
+    this->ResetDragOrigin();
+}
+
+void EditorToolkitShared::ResetDragOrigin()
+{
+    m_dragXOrigin = VRV_UNSET;
+    m_dragYOrigin = VRV_UNSET;
+}
+
+void EditorToolkitShared::SetDragOrigin(const Object *element)
+{
+    this->ResetDragOrigin();
+
+    if (element && element->IsAnyOf(std::array{ NOTE, REST })) {
+        m_dragXOrigin = element->GetDrawingX();
+        m_dragYOrigin = element->GetDrawingY();
     }
 }
 
@@ -1200,26 +1240,55 @@ void EditorToolkitShared::PostEditRestriction(Object *element)
     }
 }
 
-bool EditorToolkitShared::Drag(std::string &elementId, int x, int y)
+bool EditorToolkitShared::Drag(DragPhase phase, int dx, int dy)
 {
-    if (this->InsertMode()) return true;
-
-    Object *element = this->ResolveElement(elementId);
-    if (!element) return false;
-
-    // For elements whose y-position corresponds to a certain pitch
-    if (element->HasInterface(INTERFACE_PITCH)) {
-        Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
-        if (!layer) return false;
-        int oct;
-        data_PITCHNAME pname
-            = (data_PITCHNAME)m_view->CalculatePitchCode(layer, m_view->ToLogicalY(y), element->GetDrawingX(), &oct);
-        element->GetPitchInterface()->SetPname(pname);
-        element->GetPitchInterface()->SetOct(oct);
-
+    if (phase == DRAG_END) {
+        this->ResetDragOrigin();
         return true;
     }
-    return false;
+    if (phase == DRAG_START) this->ResetDragOrigin();
+    if (this->InsertMode()) return true;
+    if (m_selectionId.empty()) return false;
+
+    Object *element = this->GetElement(m_selectionId);
+    if (!element || !element->IsAnyOf(std::array{ NOTE, REST })) return false;
+
+    if (phase == DRAG_START) {
+        this->SetDragOrigin(element);
+        return true;
+    }
+    if ((m_dragXOrigin == VRV_UNSET) || (m_dragYOrigin == VRV_UNSET)) return false;
+
+    m_chainedId = m_selectionId;
+
+    Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
+    Staff *staff = vrv_cast<Staff *>(element->GetFirstAncestor(STAFF));
+    if (!layer || !staff) return false;
+
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int targetY = m_dragYOrigin - (dy * DEFINITION_FACTOR);
+    const int drawingY = element->GetDrawingY();
+    const int drawingDeltaY = targetY - drawingY;
+    if (std::abs(drawingDeltaY) < unit) return true;
+
+    const int quantizedY = drawingY + (drawingDeltaY / unit) * unit;
+
+    int oct;
+    const data_PITCHNAME pname
+        = (data_PITCHNAME)m_view->CalculatePitchCode(layer, quantizedY, m_dragXOrigin + dx, &oct);
+    if (element->Is(NOTE)) {
+        element->GetPitchInterface()->SetPname(pname);
+        element->GetPitchInterface()->SetOct(oct);
+    }
+    else {
+        PositionInterface *positionInterface = element->GetPositionInterface();
+        assert(positionInterface);
+        positionInterface->ResetStaffLoc();
+        positionInterface->SetPloc(pname);
+        positionInterface->SetOloc(oct);
+    }
+
+    return true;
 }
 
 bool EditorToolkitShared::InsertControl(std::string &elementName, std::string &startId, std::string &endId)

@@ -55,6 +55,8 @@ protected:
 
     enum DeleteNavigation : int8_t { DELETE_NO_NAVIGATON = 0, DELETE_BACKSPACE, DELETE_FORWARD };
 
+    enum DragPhase : int8_t { DRAG_START = 0, DRAG_MOVE, DRAG_END };
+
     enum ScoreDefUpdate : int8_t { INSERT_ABOVE = 0, INSERT_BELOW, MOVE_UP, MOVE_DOWN, DELETE_STAFF };
 
     /**
@@ -64,7 +66,7 @@ protected:
     bool Chain(const jsonxx::Array &actions);
     bool ParseContextAction(const jsonxx::Object &param, std::string &elementId, bool &scores, bool &sections);
     bool ParseDeleteAction(const jsonxx::Object &param, std::string &elementId, DeleteNavigation &navigation);
-    bool ParseDragAction(const jsonxx::Object &param, std::string &elementId, int &x, int &y);
+    bool ParseDragAction(const jsonxx::Object &param, DragPhase &phase, int &dx, int &dy);
     bool ParseKeyDownAction(
         const jsonxx::Object &param, std::string &elementid, int &key, bool &shiftKey, bool &ctrlKey);
     bool ParseInsertAction(
@@ -98,6 +100,9 @@ protected:
 
     void SetEditStatus();
     void ReloadEditStatus(const std::string &statusStr, bool insertMode);
+    void ResetSelect();
+    void ResetDragOrigin();
+    void SetDragOrigin(const Object *element);
     void PrepareUndo(bool ignoreInsertMode = false);
     std::string GetCurrentState();
     bool ReloadState(const State &state);
@@ -115,7 +120,7 @@ protected:
     bool UpdateCursor(bool restMode, bool chordMode, Cursor::TieMode tieMode, bool autoBeam);
     bool ResetCursor(bool maintainChordMode);
     bool Delete(std::string &elementId, DeleteNavigation navigation);
-    bool Drag(std::string &elementId, int x, int y);
+    bool Drag(DragPhase phase, int dx, int dy);
     bool InsertControl(std::string &elementName, std::string &startId, std::string &endId);
     bool KeyDown(std::string &elementId, int key, bool shiftKey, bool ctrlKey);
     bool Navigate(std::string &elementId, const int &direction);
@@ -181,6 +186,9 @@ protected:
     EditorTreeObject *m_scoreContext;
     EditorTreeObject *m_sectionContext;
     EditorTreeObject *m_currentContext;
+
+    int m_dragXOrigin;
+    int m_dragYOrigin;
 
 private:
     struct MidiSpelling {
