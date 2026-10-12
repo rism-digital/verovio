@@ -257,8 +257,7 @@ void OptionDbl::Init(double defaultValue, double minValue, double maxValue, bool
 bool OptionDbl::SetValue(const std::string &value)
 {
     if (!IsValidDouble(value)) {
-        LogError("Unable to set parameter value {} for '{}'; conversion to double failed", value,
-            this->GetKey());
+        LogError("Unable to set parameter value {} for '{}'; conversion to double failed", value, this->GetKey());
         return false;
     }
     // Convert string to double
@@ -342,8 +341,7 @@ bool OptionInt::SetValueDbl(double value)
 bool OptionInt::SetValue(const std::string &value)
 {
     if (!IsValidInteger(value)) {
-        LogError("Unable to set parameter value {} for '{}'; conversion to integer failed", value,
-            this->GetKey());
+        LogError("Unable to set parameter value {} for '{}'; conversion to integer failed", value, this->GetKey());
         return false;
     }
     // Convert string to int

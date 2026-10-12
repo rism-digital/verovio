@@ -191,8 +191,7 @@ void KeySig::GenerateKeyAccidAttribChildren()
         }
     }
     else if (this->HasSig()) {
-        LogWarning(
-            "Attribute key signature is ignored, since KeySig '{}' contains KeyAccid children.", this->GetID());
+        LogWarning("Attribute key signature is ignored, since KeySig '{}' contains KeyAccid children.", this->GetID());
     }
 }
 

@@ -86,7 +86,6 @@ void LogElapsedTimeStop(const char *msg)
     LogInfo("Elapsed time ({}): {:.3f}s", msg, elapsedTime / 1000);
 }
 
-
 void LogString(std::string message, LogLevel level)
 {
     if (loggingToBuffer) {

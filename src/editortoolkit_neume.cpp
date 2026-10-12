@@ -2722,8 +2722,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             return false;
         }
         if (el->GetClassId() != elementClass) {
-            LogError("Element {} was of class {}. Expected class {}", el->GetID(), el->GetClassName(),
-                groupType);
+            LogError("Element {} was of class {}. Expected class {}", el->GetID(), el->GetClassName(), groupType);
             m_editStatus.import("status", "FAILURE");
             m_editStatus.import("message",
                 "Element " + el->GetID() + " was of class " + el->GetClassName() + " but expected class " + groupType
@@ -4509,9 +4508,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj)
             pname = PITCHNAME_g;
             baseOctave = 4;
             break;
-        default:
-            LogError("Clef {} does not have a valid shape: {}", clef->GetID(), clef->GetShape());
-            return false;
+        default: LogError("Clef {} does not have a valid shape: {}", clef->GetID(), clef->GetShape()); return false;
     }
 
     // Handle custos directly
