@@ -28,22 +28,19 @@
 #include "toolkitdef.h"
 #include "vrvdef.h"
 
-
 /**
  * A formatter for all enums types.
  * Simply format the enum as its numerical value, but with C++26, it will be
  * possible to use reflection to format as the enum name.
  */
 template <typename E>
-requires std::is_enum_v<E>
+    requires std::is_enum_v<E>
 struct std::formatter<E> : std::formatter<std::string> {
-    template<class FormatContext>
-	constexpr auto format (const E& e, FormatContext& ctx) const
-	{
-		return std::formatter<std::string>::format(std::to_string(e), ctx);
-	}
+    template <class FormatContext> constexpr auto format(const E &e, FormatContext &ctx) const
+    {
+        return std::formatter<std::string>::format(std::to_string(e), ctx);
+    }
 };
-
 
 namespace vrv {
 
@@ -124,14 +121,12 @@ template <typename... T> std::string StringFormatDynamic(std::string_view fmt, T
     return std::vformat(fmt, std::forward<T>(args)...);
 }
 
-
 /**
  * The following functions ("Log*") are helpers for formatting, conversion, or logging.
  * Most of them differ if they are used in the command line tool or in emscripten
  */
 
-template<typename ...T>
-void LogDebug(std::format_string<T...> fmt, T&& ...args)
+template <typename... T> void LogDebug(std::format_string<T...> fmt, T &&...args)
 {
     if (logLevel < LOG_DEBUG) return;
 
@@ -142,8 +137,7 @@ void LogDebug(std::format_string<T...> fmt, T&& ...args)
 #endif
 }
 
-template<typename ...T>
-void LogError(std::format_string<T...> fmt, T&& ...args)
+template <typename... T> void LogError(std::format_string<T...> fmt, T &&...args)
 {
     if (logLevel < LOG_ERROR) return;
 
@@ -152,8 +146,7 @@ void LogError(std::format_string<T...> fmt, T&& ...args)
     LogString(s, LOG_ERROR);
 }
 
-template<typename ...T>
-void LogInfo(std::format_string<T...> fmt, T&&... args)
+template <typename... T> void LogInfo(std::format_string<T...> fmt, T &&...args)
 {
     if (logLevel < LOG_INFO) return;
 
@@ -162,8 +155,7 @@ void LogInfo(std::format_string<T...> fmt, T&&... args)
     LogString(s, LOG_INFO);
 }
 
-template<typename ...T>
-void LogWarning(std::format_string<T...> fmt, T&&... args)
+template <typename... T> void LogWarning(std::format_string<T...> fmt, T &&...args)
 {
     if (logLevel < LOG_WARNING) return;
 
@@ -215,7 +207,6 @@ inline data_DURATION DurationMax(data_DURATION dur1, data_DURATION dur2)
 {
     return std::max(dur1, dur2);
 }
-
 
 /**
  * Functions for logging in milliseconds the elapsed time of an
