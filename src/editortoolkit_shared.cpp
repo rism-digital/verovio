@@ -9,6 +9,7 @@
 
 //--------------------------------------------------------------------------------
 
+#include <algorithm>
 #include <locale>
 #include <set>
 
@@ -1242,16 +1243,23 @@ void EditorToolkitShared::PostEditRestriction(Object *element)
 
 bool EditorToolkitShared::Drag(DragPhase phase, int dx, int dy)
 {
-    if (phase == DRAG_END) {
-        this->ResetDragOrigin();
-        return true;
-    }
-    if (phase == DRAG_START) this->ResetDragOrigin();
+    if (phase == DRAG_START || phase == DRAG_END) this->ResetDragOrigin();
+
     if (this->InsertMode()) return true;
     if (m_selectionId.empty()) return false;
 
     Object *element = this->GetElement(m_selectionId);
     if (!element || !element->IsAnyOf(std::array{ NOTE, REST })) return false;
+
+    if (phase == DRAG_END) {
+        if (element->Is(NOTE)) {
+            // Remove or set accidental
+            Note *note = vrv_cast<Note *>(element);
+            assert(note);
+            this->UpdatePitch(m_selectionId, note->GetPname(), note->GetOct(), ACCIDENTAL_WRITTEN_NONE, VRV_UNSET);
+        }
+        return true;
+    }
 
     if (phase == DRAG_START) {
         this->SetDragOrigin(element);
@@ -1259,33 +1267,35 @@ bool EditorToolkitShared::Drag(DragPhase phase, int dx, int dy)
     }
     if ((m_dragXOrigin == VRV_UNSET) || (m_dragYOrigin == VRV_UNSET)) return false;
 
-    m_chainedId = m_selectionId;
-
     Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
     Staff *staff = vrv_cast<Staff *>(element->GetFirstAncestor(STAFF));
     if (!layer || !staff) return false;
 
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int targetY = m_dragYOrigin - (dy * DEFINITION_FACTOR);
-    const int drawingY = element->GetDrawingY();
-    const int drawingDeltaY = targetY - drawingY;
-    if (std::abs(drawingDeltaY) < unit) return true;
+    const int draggingThreshold = unit * 2 / 3;
 
-    const int quantizedY = drawingY + (drawingDeltaY / unit) * unit;
+    if (abs(dy * DEFINITION_FACTOR) > draggingThreshold) {
+        const int targetY = m_dragYOrigin - (dy * DEFINITION_FACTOR);
+        const int drawingY = element->GetDrawingY();
+        const int drawingDeltaY = targetY - drawingY;
+        if (std::abs(drawingDeltaY) < unit) return true;
 
-    int oct;
-    const data_PITCHNAME pname
-        = (data_PITCHNAME)m_view->CalculatePitchCode(layer, quantizedY, m_dragXOrigin + dx, &oct);
-    if (element->Is(NOTE)) {
-        element->GetPitchInterface()->SetPname(pname);
-        element->GetPitchInterface()->SetOct(oct);
-    }
-    else {
-        PositionInterface *positionInterface = element->GetPositionInterface();
-        assert(positionInterface);
-        positionInterface->ResetStaffLoc();
-        positionInterface->SetPloc(pname);
-        positionInterface->SetOloc(oct);
+        const int quantizedY = drawingY + (drawingDeltaY / unit) * unit;
+
+        int oct;
+        const data_PITCHNAME pname
+        = (data_PITCHNAME)m_view->CalculatePitchCode(layer, quantizedY, m_dragXOrigin, &oct);
+        if (element->Is(NOTE)) {
+            element->GetPitchInterface()->SetPname(pname);
+            element->GetPitchInterface()->SetOct(oct);
+        }
+        else {
+            PositionInterface *positionInterface = element->GetPositionInterface();
+            assert(positionInterface);
+            positionInterface->ResetStaffLoc();
+            positionInterface->SetPloc(pname);
+            positionInterface->SetOloc(oct);
+        }
     }
 
     return true;
