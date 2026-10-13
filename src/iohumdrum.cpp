@@ -136,18 +136,16 @@ namespace vrv {
 #define VGRP_PEDAL_DEFAULT 200
 #define MAXCOLORSUBTRACK 30
 
-
 /**
  * Helper to render an object that implements "operator<<" to std::string.
  */
-template <typename T>
-static std::string log_stream_helper(T streamable_object)
-        {
-            std::stringstream ss;
-            ss.str("");
-            ss << streamable_object;
-            return ss.str();
-        }
+template <typename T> static std::string log_stream_helper(T streamable_object)
+{
+    std::stringstream ss;
+    ss.str("");
+    ss << streamable_object;
+    return ss.str();
+}
 
 //----------------------------------------------------------------------------
 // namespace for local IoHumdrum classes
@@ -2715,7 +2713,7 @@ void HumdrumInput::parseEmbeddedOptions(Doc *doc)
     for (auto inputoption : inputparameters) {
         auto entry = optionlist->find(inputoption.first);
         if (entry == optionlist->end()) {
-			LogWarning("In HumdrumInput::parseEmbeddedOptions: option {} is not recognized", inputoption.first);
+            LogWarning("In HumdrumInput::parseEmbeddedOptions: option {} is not recognized", inputoption.first);
             continue;
         }
 
@@ -8941,7 +8939,7 @@ void HumdrumInput::setMensurationSymbol(
             case 0: break;
             default:
                 LogWarning("In HumdrumInput::setMensurationSymbol: Unknown prolation {} in {}", prolatio,
-						   log_stream_helper(mensurtok));
+                    log_stream_helper(mensurtok));
         }
         switch (tempus) {
             case 2: vrvmensur->SetTempus(TEMPUS_2); break;
@@ -8949,7 +8947,7 @@ void HumdrumInput::setMensurationSymbol(
             case 0: break;
             default:
                 LogWarning("In HumdrumInput::setMensurationSymbol: Unknown tempus {} in {}", tempus,
-						   log_stream_helper(mensurtok));
+                    log_stream_helper(mensurtok));
         }
         switch (modus) {
             case 2: vrvmensur->SetModusminor(MODUSMINOR_2); break;
@@ -8957,7 +8955,7 @@ void HumdrumInput::setMensurationSymbol(
             case 0: break;
             default:
                 LogWarning("In HumdrumInput::setMensurationSymbol: Unknown modus {} in {}", modus,
-						   log_stream_helper(mensurtok));
+                    log_stream_helper(mensurtok));
         }
         switch (maximodus) {
             case 2: vrvmensur->SetModusmaior(MODUSMAIOR_2); break;
@@ -8965,7 +8963,7 @@ void HumdrumInput::setMensurationSymbol(
             case 0: break;
             default:
                 LogWarning("In HumdrumInput::setMensurationSymbol: Unknown maximodus {} in {}", maximodus,
-						   log_stream_helper(mensurtok));
+                    log_stream_helper(mensurtok));
         }
     }
 
@@ -13977,7 +13975,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 }
                 else {
                     LogWarning("In HumdrumInput::fillContentsOfLayer: Strange error when adding rest {}",
-							   log_stream_helper(trest));
+                        log_stream_helper(trest));
                     LogWarning("   Line: {}, Field: {}", trest->getLineNumber(), trest->getFieldNumber());
                 }
             }
@@ -17991,7 +17989,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
             setLocationId(dir, dirtok);
         }
         else {
-			LogWarning("In HumdrumInput::processLinkedDirection: (2) dirtok for {} is empty", log_stream_helper(token));
+            LogWarning("In HumdrumInput::processLinkedDirection: (2) dirtok for {} is empty", log_stream_helper(token));
         }
 
         if (token->isMensLike()) {
@@ -23220,7 +23218,7 @@ void HumdrumInput::removeBeam(std::vector<std::string> &elements, std::vector<vo
         LogWarning("   Element stack: ");
         for (int i = (int)elements.size() - 1; i >= 0; i--) {
 
-			LogWarning("      {}:\t{}", i, elements[i]);
+            LogWarning("      {}:\t{}", i, elements[i]);
         }
         return;
     }
@@ -23238,7 +23236,7 @@ void HumdrumInput::removeGBeam(std::vector<std::string> &elements, std::vector<v
         LogWarning("In HumdrumInput::removeGBeam: Error removing gbeam");
         LogWarning("   Element stack: ");
         for (int i = (int)elements.size() - 1; i >= 0; i--) {
-            LogWarning("      {}:\t{}", i,  elements[i]);
+            LogWarning("      {}:\t{}", i, elements[i]);
         }
         return;
     }
@@ -23254,10 +23252,10 @@ void HumdrumInput::removeTuplet(std::vector<std::string> &elements, std::vector<
 {
     if (elements.back() != "tuplet") {
         LogWarning("In HumdrumInput::removeTuplet: Error removing tuplet");
-		LogWarning("   Last element is: {}", elements.back());
+        LogWarning("   Last element is: {}", elements.back());
         LogWarning("   Element stack: ");
         for (int i = (int)elements.size() - 1; i >= 0; i--) {
-			LogWarning("      {}:\t{}", i, elements[i]);
+            LogWarning("      {}:\t{}", i, elements[i]);
         }
         return;
     }
@@ -25656,8 +25654,7 @@ void HumdrumInput::setNoteMeiDur(Note *note, int meidur)
         case 10: note->SetDur(DURATION_256); break;
         case 11: note->SetDur(DURATION_512); break;
         case 12: note->SetDur(DURATION_1024); break;
-        default:
-			LogWarning("In HumdrumInput::setNoteMeiDur: Unknown MEI @dur: {}", meidur);
+        default: LogWarning("In HumdrumInput::setNoteMeiDur: Unknown MEI @dur: {}", meidur);
     }
 }
 
@@ -25839,7 +25836,7 @@ void HumdrumInput::appendElement(const std::vector<std::string> &name, const std
         appendElement((Ligature *)pointers.back(), child);
     }
     else {
-		LogWarning("In HumdrumInput::appendElement: Cannot append to unknown element: {}", name.back());
+        LogWarning("In HumdrumInput::appendElement: Cannot append to unknown element: {}", name.back());
     }
 }
 
@@ -26649,7 +26646,8 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
                     case -2: myaccid->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
                     case -3: myaccid->SetAccid(ACCIDENTAL_WRITTEN_tf); break;
                     default: {
-						LogWarning("In HumdrumInput::convertNote: Do not know how to convert accidental: {}", accidCount);
+                        LogWarning(
+                            "In HumdrumInput::convertNote: Do not know how to convert accidental: {}", accidCount);
                     }
                 }
 
@@ -26699,7 +26697,8 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
                     case -2: accid->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
                     case -3: accid->SetAccid(ACCIDENTAL_WRITTEN_tf); break;
                     default: {
-                        LogWarning("In HumdrumInput::convertNote: Do not know how to convert accidental: {}", accidCount);
+                        LogWarning(
+                            "In HumdrumInput::convertNote: Do not know how to convert accidental: {}", accidCount);
                     }
                 }
             }
@@ -26806,7 +26805,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
                     showInAccidGes = true;
                 }
                 else {
-					LogWarning("In HumdrumInput::convertNote: Unknown accidental type: {}", loaccid);
+                    LogWarning("In HumdrumInput::convertNote: Unknown accidental type: {}", loaccid);
                 }
                 // add more accidentals here as necessary.  Mostly left are quarter tones
                 // which are not dealt with directly in **kern data: su, sd, fu, fd, nu,
@@ -28810,9 +28809,8 @@ void HumdrumInput::addTurn(hum::HTp token, const string &tok, int noteIndex)
     }
     bool singleQ = false;
     if (turnstart == turnend) {
-        LogWarning("In HumdrumInput::addTurn: Single turn character on line {}, field, {}.",
-				   token->getLineNumber(),
-				   token->getFieldNumber());
+        LogWarning("In HumdrumInput::addTurn: Single turn character on line {}, field, {}.", token->getLineNumber(),
+            token->getFieldNumber());
         singleQ = true;
     }
 
@@ -29935,8 +29933,7 @@ template <class ELEMENT> hum::HumNum HumdrumInput::setDuration(ELEMENT element, 
     }
     // Don't know what to do, so return duration
     // There will be an error in the data.
-    LogWarning("In HumdrumInput::setDuration: Unprintable duration {} quarter notes",
-			   log_stream_helper(duration));
+    LogWarning("In HumdrumInput::setDuration: Unprintable duration {} quarter notes", log_stream_helper(duration));
     return duration;
 }
 

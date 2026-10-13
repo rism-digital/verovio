@@ -1007,8 +1007,8 @@ void ABCInput::FlushControlElements(Score *score, Section *section)
             layer = dynamic_cast<Layer *>(section->FindDescendantByID(iter.first));
         }
         if (!layer) {
-            LogWarning("ABC import: Element '{}' could not be assigned to layer '{}'",
-                iter.second->GetClassName(), iter.first);
+            LogWarning("ABC import: Element '{}' could not be assigned to layer '{}'", iter.second->GetClassName(),
+                iter.first);
             delete iter.second;
             iter.second = NULL;
             continue;

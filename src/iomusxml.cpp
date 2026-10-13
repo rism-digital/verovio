@@ -1183,8 +1183,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             measureCount = iter.first;
         }
         if (!measure) {
-            LogWarning("MusicXML import: Element '{}' could not be added to measure {}",
-                iter.second->GetClassName(), iter.first + 1);
+            LogWarning("MusicXML import: Element '{}' could not be added to measure {}", iter.second->GetClassName(),
+                iter.first + 1);
             delete iter.second;
             continue;
         }
@@ -1428,8 +1428,7 @@ void MusicXmlInput::CreateExpansion(Section *section)
                 != std::find(endIter->first.m_jumpInfo.m_times.begin(), endIter->first.m_jumpInfo.m_times.end(),
                     endIter->first.m_visited)) {
             if (!labels.contains(endIter->first.m_jumpInfo.m_label)) {
-                LogWarning(
-                    "MusicXML import: Segno/Coda label '{}' not found", endIter->first.m_jumpInfo.m_label);
+                LogWarning("MusicXML import: Segno/Coda label '{}' not found", endIter->first.m_jumpInfo.m_label);
             }
             else {
                 iter = labels.at(endIter->first.m_jumpInfo.m_label);
@@ -1853,8 +1852,7 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, shor
     // clean up part specific stacks
     if (!m_openDashesStack.empty()) { // open dashes without ending
         for (auto iter : m_openDashesStack) {
-            LogWarning(
-                "MusicXML import: dashes/extender lines for '{}' could not be closed", iter.first->GetID());
+            LogWarning("MusicXML import: dashes/extender lines for '{}' could not be closed", iter.first->GetID());
         }
         m_openDashesStack.clear();
     }
@@ -2360,8 +2358,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 m_openDashesStack.push_back({ controlElement, openDashes });
             }
             else {
-                LogInfo("MusicXmlImport: dashes could not be matched to <dir> or <dynam> in measure {}.",
-                    measureNum);
+                LogInfo("MusicXmlImport: dashes could not be matched to <dir> or <dynam> in measure {}.", measureNum);
             }
         }
     }
