@@ -1075,6 +1075,7 @@ PrepareLyricsFunctor::PrepareLyricsFunctor(int voltaTrack) : Functor()
     m_lastNoteOrChord = NULL;
     m_penultimateNoteOrChord = NULL;
     m_voltaTrack = voltaTrack;
+    m_spacesCarryLyrics = false;
 }
 
 FunctorCode PrepareLyricsFunctor::VisitChord(Chord *chord)
@@ -1105,11 +1106,35 @@ FunctorCode PrepareLyricsFunctor::VisitDocEnd(Doc *doc)
     return FUNCTOR_STOP;
 }
 
+FunctorCode PrepareLyricsFunctor::VisitLayer(Layer *layer)
+{
+    m_spacesCarryLyrics = false;
+    for (const Object *object : layer->FindAllDescendantsByType(SPACE)) {
+        if (vrv_cast<const Space *>(object)->HasLyrics()) {
+            m_spacesCarryLyrics = true;
+            break;
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode PrepareLyricsFunctor::VisitNote(Note *note)
 {
     if (!note->IsChordTone()) {
         m_penultimateNoteOrChord = m_lastNoteOrChord;
         m_lastNoteOrChord = note;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareLyricsFunctor::VisitSpace(Space *space)
+{
+    // In a layer with lyrics on spaces, spaces act as notes (e.g., for extenders over a melisma)
+    if (m_spacesCarryLyrics) {
+        m_penultimateNoteOrChord = m_lastNoteOrChord;
+        m_lastNoteOrChord = space;
     }
 
     return FUNCTOR_CONTINUE;
@@ -1134,6 +1159,10 @@ FunctorCode PrepareLyricsFunctor::VisitSyl(Syl *syl)
     // If there isn't an ancestor note, it should be a chord
     if (!syl->GetStart()) {
         syl->SetStart(vrv_cast<LayerElement *>(syl->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH)));
+    }
+    // Or a space carrying lyrics
+    if (!syl->GetStart()) {
+        syl->SetStart(vrv_cast<LayerElement *>(syl->GetFirstAncestor(SPACE, MAX_NOTE_DEPTH)));
     }
     const bool isEmptySyl = syl->IsEmpty();
 

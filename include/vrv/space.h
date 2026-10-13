@@ -35,13 +35,17 @@ public:
     ///@}
 
     /**
-     * Add an element (accid) to a accid.
+     * Add an element (rest, verse, refrain) to a space.
      * Only supported elements will be actually added to the child list.
+     * Lyric elements allow lyrics to be attached at a time position without a note (Verovio extension).
      */
     bool IsSupportedChild(ClassId classId) override;
 
     /** Init the display of space when the option is set */
     void InitShowSpace();
+
+    /** Return true if the space carries lyrics (a direct verse or refrain child) */
+    bool HasLyrics() const;
 
     /**
      * @name Getter to interfaces

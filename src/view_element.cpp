@@ -52,6 +52,7 @@
 #include "refrain.h"
 #include "rest.h"
 #include "smufl.h"
+#include "space.h"
 #include "staff.h"
 #include "stem.h"
 #include "syl.h"
@@ -1739,7 +1740,10 @@ void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     dc->DrawPlaceholder(this->ToDeviceContextX(element->GetDrawingX()), this->ToDeviceContextY(element->GetDrawingY()));
 
-    if (showSpace) this->DrawLayerChildren(dc, element, layer, staff, measure);
+    // Children are the placeholder rest (only with --show-hidden) and lyrics
+    if (showSpace || vrv_cast<Space *>(element)->HasLyrics()) {
+        this->DrawLayerChildren(dc, element, layer, staff, measure);
+    }
 
     dc->EndGraphic(element, this);
 }

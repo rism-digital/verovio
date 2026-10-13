@@ -7613,7 +7613,7 @@ bool MEIInput::ReadSpace(Object *parent, pugi::xml_node space)
 
     parent->AddChild(vrvSpace);
     this->ReadUnsupportedAttr(space, vrvSpace);
-    return true;
+    return this->ReadLayerChildren(vrvSpace, space, vrvSpace);
 }
 
 bool MEIInput::ReadStem(Object *parent, pugi::xml_node stem)

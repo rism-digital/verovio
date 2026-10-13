@@ -28,6 +28,7 @@
 #include "pedal.h"
 #include "refrain.h"
 #include "rest.h"
+#include "space.h"
 #include "staff.h"
 #include "syl.h"
 #include "tabgrp.h"
@@ -1072,6 +1073,7 @@ FunctorCode GenerateMIDIFunctor::VisitVerse(const Verse *verse)
 {
     const LayerElement *parent = vrv_cast<const Note *>(verse->GetFirstAncestor(NOTE));
     if (!parent) parent = vrv_cast<const Chord *>(verse->GetFirstAncestor(CHORD));
+    if (!parent) parent = vrv_cast<const Space *>(verse->GetFirstAncestor(SPACE));
     assert(parent);
 
     const Verse *previousVerse = vrv_cast<const Verse *>(parent->GetPrevious(verse, VERSE));
@@ -1085,6 +1087,7 @@ FunctorCode GenerateMIDIFunctor::VisitRefrain(const Refrain *refrain)
 {
     const LayerElement *parent = vrv_cast<const Note *>(refrain->GetFirstAncestor(NOTE));
     if (!parent) parent = vrv_cast<const Chord *>(refrain->GetFirstAncestor(CHORD));
+    if (!parent) parent = vrv_cast<const Space *>(refrain->GetFirstAncestor(SPACE));
     assert(parent);
 
     if (parent->FindDescendantByType(VERSE, 1)) return FUNCTOR_SIBLINGS;

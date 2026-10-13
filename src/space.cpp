@@ -8,6 +8,7 @@
 #include "space.h"
 //----------------------------------------------------------------------------
 
+#include <algorithm>
 #include <cassert>
 #include <math.h>
 
@@ -43,17 +44,26 @@ void Space::Reset()
 
 bool Space::IsSupportedChild(ClassId classId)
 {
-    return (classId == REST);
+    static const std::vector<ClassId> supported{ REFRAIN, REST, VERSE };
+
+    return (std::find(supported.begin(), supported.end(), classId) != supported.end());
 }
 
 void Space::InitShowSpace()
 {
-    this->ClearChildren();
+    // Remove only the placeholder rest from a previous call and keep lyrics
+    ListOfObjects rests = this->FindAllDescendantsByType(REST, false, 1);
+    for (Object *rest : rests) this->DeleteChild(rest);
     Rest *rest = new Rest();
     rest->IsAttribute(true);
     rest->SetDur(this->GetDur());
     rest->SetDots(this->GetDots());
     if (!this->AddChild(rest)) delete rest;
+}
+
+bool Space::HasLyrics() const
+{
+    return (this->FindDescendantByType(VERSE, 1) || this->FindDescendantByType(REFRAIN, 1));
 }
 
 //----------------------------------------------------------------------------

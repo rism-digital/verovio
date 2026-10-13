@@ -328,6 +328,10 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         if (note) {
             layerElement->SetAlignment(note->GetAlignment());
         }
+        else if (Space *space = vrv_cast<Space *>(layerElement->GetFirstAncestor(SPACE))) {
+            // Lyrics attached to a space
+            layerElement->SetAlignment(space->GetAlignment());
+        }
         else {
             Syllable *syllable = vrv_cast<Syllable *>(layerElement->GetFirstAncestor(SYLLABLE));
             if (syllable) layerElement->SetAlignment(syllable->GetAlignment());
