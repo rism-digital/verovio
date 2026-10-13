@@ -69,6 +69,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
     m_currentParams.mensur = layer->GetCurrentMensur();
     m_currentParams.meterSig = layer->GetCurrentMeterSig();
     m_currentParams.proport = layer->GetCurrentProport();
+    std::tie(m_currentParams.num, m_currentParams.numbase) = layer->GetCurrentNumAndNumbase();
 
     // We are starting a new layer, reset the time;
     // We set it to -1.0 for the scoreDef attributes since they have to be aligned before any timestamp event (-1.0)

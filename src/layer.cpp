@@ -569,6 +569,24 @@ const Proport *Layer::GetCurrentProport() const
     return staff->m_drawingStaffDef->GetCurrentProport();
 }
 
+std::pair<int, int> Layer::GetCurrentNumAndNumbase()
+{
+    return std::as_const(*this).GetCurrentNumAndNumbase();
+}
+
+const std::pair<int, int> Layer::GetCurrentNumAndNumbase() const
+{
+    const Staff *staff = vrv_cast<const Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff && staff->m_drawingStaffDef);
+    int num = 1;
+    int numbase = 1;
+    if (staff->m_drawingStaffDef->HasNum() && staff->m_drawingStaffDef->HasNumbase()) {
+        num = staff->m_drawingStaffDef->GetNum();
+        numbase = staff->m_drawingStaffDef->GetNumbase();
+    }
+    return { num, numbase };
+}
+
 void Layer::SetDrawingStaffDefValues(StaffDef *currentStaffDef)
 {
     if (!currentStaffDef) {
