@@ -687,7 +687,6 @@ public:
     ///@{
     FunctorCode VisitChord(Chord *chord) override;
     FunctorCode VisitDocEnd(Doc *doc) override;
-    FunctorCode VisitLayer(Layer *layer) override;
     FunctorCode VisitNote(Note *note) override;
     FunctorCode VisitSpace(Space *space) override;
     FunctorCode VisitSyl(Syl *syl) override;
@@ -702,8 +701,6 @@ public:
 private:
     // The current Syl
     Syl *m_currentSyl;
-    // True when the current layer has spaces carrying lyrics - its spaces then count as notes for connectors
-    bool m_spacesCarryLyrics;
     // The last Note or Chord
     LayerElement *m_lastNoteOrChord;
     // The penultimate Note or Chord

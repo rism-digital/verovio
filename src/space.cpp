@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "comparison.h"
 #include "functor.h"
 #include "horizontalaligner.h"
 #include "rest.h"
@@ -52,8 +53,8 @@ bool Space::IsSupportedChild(ClassId classId)
 void Space::InitShowSpace()
 {
     // Remove only the placeholder rest from a previous call and keep lyrics
-    ListOfObjects rests = this->FindAllDescendantsByType(REST, false, 1);
-    for (Object *rest : rests) this->DeleteChild(rest);
+    IsAttributeComparison isAttribute(REST);
+    this->DeleteChildrenByComparison(&isAttribute);
     Rest *rest = new Rest();
     rest->IsAttribute(true);
     rest->SetDur(this->GetDur());
@@ -63,7 +64,8 @@ void Space::InitShowSpace()
 
 bool Space::HasLyrics() const
 {
-    return (this->FindDescendantByType(VERSE, 1) || this->FindDescendantByType(REFRAIN, 1));
+    ClassIdsComparison lyricElements({ REFRAIN, VERSE });
+    return (this->FindDescendantByComparison(&lyricElements, 1) != NULL);
 }
 
 //----------------------------------------------------------------------------

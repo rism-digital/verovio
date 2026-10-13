@@ -102,17 +102,16 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayerElement(LayerElement *layerElement
 
     if (element->Is(REST) || element->Is(SPACE)) {
         incrementScoreTime = element->GetAlignmentDuration(m_meterParams, true, m_notationType) * SCORE_TIME_UNIT;
-        // For rests to be possibly added to the timemap
-        if (element->Is(REST)) {
-            Rest *rest = vrv_cast<Rest *>(element);
-            double realTimeIncrementSeconds = incrementScoreTime.ToDouble() * 60.0 / m_currentTempo;
-            rest->SetScoreTimeOnset(m_currentScoreTime);
-            rest->SetRealTimeOnsetSeconds(m_currentRealTimeSeconds);
-            rest->SetScoreTimeOffset(m_currentScoreTime + incrementScoreTime);
-            rest->SetRealTimeOffsetSeconds(m_currentRealTimeSeconds + realTimeIncrementSeconds);
-        }
+        // For rests to be possibly added to the timemap, and for spaces carrying lyrics
+        DurationInterface *interface = element->GetDurationInterface();
+        assert(interface);
+        double realTimeIncrementSeconds = incrementScoreTime.ToDouble() * 60.0 / m_currentTempo;
+        interface->SetScoreTimeOnset(m_currentScoreTime);
+        interface->SetRealTimeOnsetSeconds(m_currentRealTimeSeconds);
+        interface->SetScoreTimeOffset(m_currentScoreTime + incrementScoreTime);
+        interface->SetRealTimeOffsetSeconds(m_currentRealTimeSeconds + realTimeIncrementSeconds);
         m_currentScoreTime = m_currentScoreTime + incrementScoreTime;
-        m_currentRealTimeSeconds += incrementScoreTime.ToDouble() * 60.0 / m_currentTempo;
+        m_currentRealTimeSeconds += realTimeIncrementSeconds;
     }
     else if (element->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(element);
@@ -1046,17 +1045,18 @@ FunctorCode GenerateMIDIFunctor::VisitSyl(const Syl *syl)
 {
     if (syl->IsEmpty()) return FUNCTOR_CONTINUE;
 
-    const Note *note = NULL;
+    const DurationInterface *interface = NULL;
     if (syl->GetFirstAncestor(CHORD)) {
         const Chord *parentChord = vrv_cast<const Chord *>(syl->GetFirstAncestor(CHORD));
-        note = vrv_cast<const Note *>(parentChord->GetFirst(NOTE));
+        interface = vrv_cast<const Note *>(parentChord->GetFirst(NOTE));
     }
     else {
-        note = vrv_cast<const Note *>(syl->GetFirstAncestor(NOTE));
+        interface = vrv_cast<const Note *>(syl->GetFirstAncestor(NOTE));
+        if (!interface) interface = vrv_cast<const Space *>(syl->GetFirstAncestor(SPACE));
     }
-    if (!note) return FUNCTOR_CONTINUE;
+    if (!interface) return FUNCTOR_CONTINUE;
 
-    const double startTime = m_totalTime + note->GetScoreTimeOnset().ToDouble();
+    const double startTime = m_totalTime + interface->GetScoreTimeOnset().ToDouble();
     const std::string sylText = UTF32to8(syl->GetText());
 
     m_midiFile->addLyric(m_midiTrack, startTime * m_midiFile->getTPQ(), sylText);

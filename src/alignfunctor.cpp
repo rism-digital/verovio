@@ -177,7 +177,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
     Ligature *ligatureParent = vrv_cast<Ligature *>(layerElement->GetFirstAncestor(LIGATURE, MAX_LIGATURE_DEPTH));
     Note *noteParent = vrv_cast<Note *>(layerElement->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH));
     Rest *restParent = vrv_cast<Rest *>(layerElement->GetFirstAncestor(REST, MAX_NOTE_DEPTH));
-    Space *spaceParent = vrv_cast<Space *>(layerElement->GetFirstAncestor(SPACE, 1));
+    Space *spaceParent = vrv_cast<Space *>(layerElement->GetFirstAncestor(SPACE, MAX_NOTE_DEPTH));
     TabGrp *tabGrpParent = vrv_cast<TabGrp *>(layerElement->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
     const bool ligatureAsBracket = m_doc->GetOptions()->m_ligatureAsBracket.GetValue();
     const bool neumeAsNote = m_doc->GetOptions()->m_neumeAsNote.GetValue();
@@ -327,10 +327,6 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         Note *note = vrv_cast<Note *>(layerElement->GetFirstAncestor(NOTE));
         if (note) {
             layerElement->SetAlignment(note->GetAlignment());
-        }
-        else if (Space *space = vrv_cast<Space *>(layerElement->GetFirstAncestor(SPACE))) {
-            // Lyrics attached to a space
-            layerElement->SetAlignment(space->GetAlignment());
         }
         else {
             Syllable *syllable = vrv_cast<Syllable *>(layerElement->GetFirstAncestor(SYLLABLE));

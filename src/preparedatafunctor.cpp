@@ -1075,7 +1075,6 @@ PrepareLyricsFunctor::PrepareLyricsFunctor(int voltaTrack) : Functor()
     m_lastNoteOrChord = NULL;
     m_penultimateNoteOrChord = NULL;
     m_voltaTrack = voltaTrack;
-    m_spacesCarryLyrics = false;
 }
 
 FunctorCode PrepareLyricsFunctor::VisitChord(Chord *chord)
@@ -1106,19 +1105,6 @@ FunctorCode PrepareLyricsFunctor::VisitDocEnd(Doc *doc)
     return FUNCTOR_STOP;
 }
 
-FunctorCode PrepareLyricsFunctor::VisitLayer(Layer *layer)
-{
-    m_spacesCarryLyrics = false;
-    for (const Object *object : layer->FindAllDescendantsByType(SPACE)) {
-        if (vrv_cast<const Space *>(object)->HasLyrics()) {
-            m_spacesCarryLyrics = true;
-            break;
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 FunctorCode PrepareLyricsFunctor::VisitNote(Note *note)
 {
     if (!note->IsChordTone()) {
@@ -1131,8 +1117,10 @@ FunctorCode PrepareLyricsFunctor::VisitNote(Note *note)
 
 FunctorCode PrepareLyricsFunctor::VisitSpace(Space *space)
 {
-    // In a layer with lyrics on spaces, spaces act as notes (e.g., for extenders over a melisma)
-    if (m_spacesCarryLyrics) {
+    // Spaces act as notes when they carry lyrics, or when the open syllable is attached to a space (e.g., for an
+    // extender over a melisma continuing over spaces without lyrics, possibly in following measures)
+    const bool sylOnSpace = (m_currentSyl && m_currentSyl->GetStart() && m_currentSyl->GetStart()->Is(SPACE));
+    if (sylOnSpace || space->HasLyrics()) {
         m_penultimateNoteOrChord = m_lastNoteOrChord;
         m_lastNoteOrChord = space;
     }
