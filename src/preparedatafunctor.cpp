@@ -1147,8 +1147,8 @@ FunctorCode PrepareLyricsFunctor::VisitSyl(Syl *syl)
         // The previous syl was an underscore -> the previous but one was the end
         else if (m_currentSyl->GetCon() == sylLog_CON_u) {
             if (m_currentSyl->GetStart() == m_penultimateNoteOrChord) {
-                LogWarning(
-                    "Syllable with underline extender under one single note '{}'", m_currentSyl->GetStart()->GetID());
+                LogWarning("Syllable with underline extender under one single note '{}'",
+                    m_currentSyl->GetStart()->GetID());
             }
             else if (m_penultimateNoteOrChord) {
                 m_currentSyl->SetEnd(m_penultimateNoteOrChord);

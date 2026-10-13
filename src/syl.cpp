@@ -211,8 +211,8 @@ bool Syl::CreateDefaultZone(Doc *doc)
         int ulx, uly, lrx, lry;
         if (syllable->GenerateZoneBounds(&ulx, &uly, &lrx, &lry)) {
             if (ulx == 0 || uly == 0 || lrx == 0 || lry == 0) {
-                LogWarning(
-                    "Zero value when generating bbox from {}: ({}, {}, {}, {})", syllable->GetID(), ulx, uly, lrx, lry);
+                LogWarning("Zero value when generating bbox from {}: ({}, {}, {}, {})", syllable->GetID(), ulx,
+                    uly, lrx, lry);
             }
             zone->SetUlx(ulx);
             zone->SetUly(uly + offsetUly);

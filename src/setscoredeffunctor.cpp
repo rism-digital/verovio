@@ -617,7 +617,8 @@ FunctorCode ScoreDefSetGrpSymFunctor::VisitGrpSym(GrpSym *grpSym)
         }
 
         if (start->GetParent() != end->GetParent()) {
-            LogWarning("'{}' has mismatching parents for startid:{} and endid:{}", grpSym->GetID(), startId, endId);
+            LogWarning("'{}' has mismatching parents for startid:{} and endid:{}", grpSym->GetID(),
+                startId, endId);
             return FUNCTOR_CONTINUE;
         }
 

@@ -736,7 +736,8 @@ void Doc::PrepareData()
         if (pair.first->HasStartid() && pair.first->HasEndid()) {
             LogWarning(
                 "Time spanning element '{}' with @xml:id '{}', @startid '{}', and @endid '{}' could not be matched.",
-                pair.second->GetClassName(), pair.second->GetID(), pair.first->GetStartid(), pair.first->GetEndid());
+                pair.second->GetClassName(), pair.second->GetID(), pair.first->GetStartid(),
+                pair.first->GetEndid());
         }
     }
 
@@ -918,8 +919,8 @@ void Doc::PrepareData()
 
     // Something must be wrong in the encoding because a TimeSpanningInterface was left open
     for (const auto &obj : prepareStaffCurrentTimeSpanning.GetTimeSpanningElements()) {
-        LogWarning("Time spanning element '{}' with @xml:id '{}' could not be set as running.", obj->GetClassName(),
-            obj->GetID());
+        LogWarning("Time spanning element '{}' with @xml:id '{}' could not be set as running.",
+            obj->GetClassName(), obj->GetID());
     }
 
     /************ Resolve mRpt ************/

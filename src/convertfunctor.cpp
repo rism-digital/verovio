@@ -1302,7 +1302,8 @@ void ConvertMarkupArticFunctor::SplitMultival(Artic *artic) const
     // Multiple valued attributes cannot be preserved as such
     if (artic->IsAttribute()) {
         artic->IsAttribute(false);
-        LogInfo("Multiple valued attribute @artic on '{}' permanently converted to <artic> elements", parent->GetID());
+        LogInfo("Multiple valued attribute @artic on '{}' permanently converted to <artic> elements",
+            parent->GetID());
     }
 }
 

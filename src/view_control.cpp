@@ -452,7 +452,8 @@ bool View::HasValidTimeSpanningOrder(DeviceContext *dc, Object *element, LayerEl
         // To avoid showing the same warning multiple times, display a warning only during actual drawing
         if (!dc->Is(BBOX_DEVICE_CONTEXT) && (m_currentPage == vrv_cast<Page *>(start->GetFirstAncestor(PAGE)))) {
             LogWarning("{} '{}' is ignored, since start '{}' does not occur temporally before end '{}'.",
-                element->GetClassName(), element->GetID(), start->GetID(), end->GetID());
+                element->GetClassName(), element->GetID(), start->GetID(),
+                end->GetID());
         }
         return false;
     }

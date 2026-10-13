@@ -55,8 +55,8 @@ Object *ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList,
 
     xsdAnyURI_List expansionPlist = expansion->GetPlist();
     if (expansionPlist.empty()) {
-        LogWarning(
-            "ExpansionMap::Expand: Expansion element {} has empty @plist. Nothing expanded.", expansion->GetID());
+        LogWarning("ExpansionMap::Expand: Expansion element {} has empty @plist. Nothing expanded.",
+            expansion->GetID());
         return prevSect;
     }
 
@@ -82,7 +82,8 @@ Object *ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList,
             newContainer = static_cast<Object *>(new Rdg());
         }
         else {
-            LogWarning("ExpansionMap::Expand: Expansion element {} has unsupported parent type.", expansion->GetID());
+            LogWarning(
+                "ExpansionMap::Expand: Expansion element {} has unsupported parent type.", expansion->GetID());
             return prevSect;
         }
 
@@ -184,7 +185,8 @@ Object *ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList,
 
                 // move prevSect to after currSect
                 if (moveCurrentElement && currIdx < prevIdx && prevIdx < childCount) {
-                    LogDebug("Re-ordering element {} to after {}", currSect->GetID(), prevSect->GetID());
+                    LogDebug(
+                        "Re-ordering element {} to after {}", currSect->GetID(), prevSect->GetID());
                     currSect->GetParent()->RotateChildren(currIdx, currIdx + 1, prevIdx + 1);
                 }
                 else {
