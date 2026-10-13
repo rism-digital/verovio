@@ -864,6 +864,12 @@
 		4DCB7AA426D3C9600047F01D /* crc.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DCB7AA226D3C9600047F01D /* crc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4DD11DC42240E78B00A405D8 /* c_wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD11DC22240E78B00A405D8 /* c_wrapper.cpp */; };
 		4DD11DC52240E78B00A405D8 /* c_wrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DD11DC32240E78B00A405D8 /* c_wrapper.h */; };
+		4DD38782307E024600EBFD29 /* clipboard.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DD38781307E024600EBFD29 /* clipboard.h */; };
+		4DD38783307E024600EBFD29 /* clipboard.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DD38781307E024600EBFD29 /* clipboard.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4DD38785307E025500EBFD29 /* clipboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD38784307E025500EBFD29 /* clipboard.cpp */; };
+		4DD38786307E025500EBFD29 /* clipboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD38784307E025500EBFD29 /* clipboard.cpp */; };
+		4DD38787307E025500EBFD29 /* clipboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD38784307E025500EBFD29 /* clipboard.cpp */; };
+		4DD38788307E025500EBFD29 /* clipboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD38784307E025500EBFD29 /* clipboard.cpp */; };
 		4DD49C662BECC073006D1C2E /* adjustyrelfortranscriptionfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD49C652BECC073006D1C2E /* adjustyrelfortranscriptionfunctor.cpp */; };
 		4DD49C682BECC096006D1C2E /* adjustyrelfortranscriptionfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD49C652BECC073006D1C2E /* adjustyrelfortranscriptionfunctor.cpp */; };
 		4DD49C692BECC097006D1C2E /* adjustyrelfortranscriptionfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD49C652BECC073006D1C2E /* adjustyrelfortranscriptionfunctor.cpp */; };
@@ -2196,6 +2202,8 @@
 		4DCB7AA226D3C9600047F01D /* crc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crc.h; path = include/crc/crc.h; sourceTree = SOURCE_ROOT; };
 		4DD11DC22240E78B00A405D8 /* c_wrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = c_wrapper.cpp; path = tools/c_wrapper.cpp; sourceTree = "<group>"; };
 		4DD11DC32240E78B00A405D8 /* c_wrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = c_wrapper.h; path = tools/c_wrapper.h; sourceTree = "<group>"; };
+		4DD38781307E024600EBFD29 /* clipboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = clipboard.h; path = include/vrv/clipboard.h; sourceTree = "<group>"; };
+		4DD38784307E025500EBFD29 /* clipboard.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = clipboard.cpp; path = src/clipboard.cpp; sourceTree = "<group>"; };
 		4DD49C652BECC073006D1C2E /* adjustyrelfortranscriptionfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustyrelfortranscriptionfunctor.cpp; path = src/adjustyrelfortranscriptionfunctor.cpp; sourceTree = "<group>"; };
 		4DD49C672BECC083006D1C2E /* adjustyrelfortranscriptionfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustyrelfortranscriptionfunctor.h; path = include/vrv/adjustyrelfortranscriptionfunctor.h; sourceTree = "<group>"; };
 		4DD7C0FB27A55CEA00B9C017 /* timemap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = timemap.cpp; path = src/timemap.cpp; sourceTree = "<group>"; };
@@ -2694,6 +2702,8 @@
 		4DA0EAFC22BB797000A7EBEB /* editor */ = {
 			isa = PBXGroup;
 			children = (
+				4DD38784307E025500EBFD29 /* clipboard.cpp */,
+				4DD38781307E024600EBFD29 /* clipboard.h */,
 				4D1A0BBD2FD1518E004AE805 /* cursor.cpp */,
 				4D1A0BBA2FD1517B004AE805 /* cursor.h */,
 				4DA0EAE822BB77C300A7EBEB /* editortoolkit_cmn.cpp */,
@@ -3425,6 +3435,7 @@
 				4DD11DC52240E78B00A405D8 /* c_wrapper.h in Headers */,
 				403BEFFA206C010100D022D5 /* beatrpt.h in Headers */,
 				8F59293418854BF800FE51AD /* verticalaligner.h in Headers */,
+				4DD38782307E024600EBFD29 /* clipboard.h in Headers */,
 				E7E9C11229B0A1E100CFCE2F /* adjustaccidxfunctor.h in Headers */,
 				4DA0EAE522BB77AF00A7EBEB /* editortoolkit.h in Headers */,
 				4DB3D8E81F83D16E00B5FC2B /* ftrem.h in Headers */,
@@ -3729,6 +3740,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E79320652991452200D80975 /* calcstemfunctor.h in Headers */,
+				4DD38783307E024600EBFD29 /* clipboard.h in Headers */,
 				E7ED8A6629C1119900735875 /* cachehorizontallayoutfunctor.h in Headers */,
 				E7ADB3AC29D1921400825D5D /* adjustarticfunctor.h in Headers */,
 				4DA0EAE022BB77AF00A7EBEB /* facsimileinterface.h in Headers */,
@@ -4451,6 +4463,7 @@
 				4D1694431E3A44F300569BF4 /* view.cpp in Sources */,
 				8F7DD0561EAF3682001B072A /* fb.cpp in Sources */,
 				E7A03CD529D6176900C02941 /* adjusttupletsyfunctor.cpp in Sources */,
+				4DD38786307E025500EBFD29 /* clipboard.cpp in Sources */,
 				E71EF3C82975ED4600D36264 /* resetfunctor.cpp in Sources */,
 				40C2E4242052A6FA0003625F /* sb.cpp in Sources */,
 				4D292C1E2EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp in Sources */,
@@ -4592,6 +4605,7 @@
 				4D43C30C1A9BB22A00EA28F3 /* view_mensural.cpp in Sources */,
 				4DFB3E8523ABDFC200D688C7 /* pitchinflection.cpp in Sources */,
 				8F086EF2188539540037FD8E /* layer.cpp in Sources */,
+				4DD38785307E025500EBFD29 /* clipboard.cpp in Sources */,
 				4D27E13727F582BB00D64FBD /* docselection.cpp in Sources */,
 				E7E9C11D29B0EFB400CFCE2F /* adjusttempofunctor.cpp in Sources */,
 				4D2073F822A3BCE000E0765F /* tabdursym.cpp in Sources */,
@@ -5068,6 +5082,7 @@
 				4DEC4D8421C804E000D1D273 /* app.cpp in Sources */,
 				E71EF3C62975ED3800D36264 /* resetfunctor.cpp in Sources */,
 				E7A03CD629D6176A00C02941 /* adjusttupletsyfunctor.cpp in Sources */,
+				4DD38787307E025500EBFD29 /* clipboard.cpp in Sources */,
 				4DB3D8BC1F83D0D200B5FC2B /* expansion.cpp in Sources */,
 				4D22C41A18890E6100D0831F /* mrest.cpp in Sources */,
 				4D292C202EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp in Sources */,
@@ -5377,6 +5392,7 @@
 				4DACC9B12990F29A00B55913 /* atts_analytical.cpp in Sources */,
 				E71EF3C72975ED3800D36264 /* resetfunctor.cpp in Sources */,
 				BB4C4B5922A932D7001F6AF0 /* ligature.cpp in Sources */,
+				4DD38788307E025500EBFD29 /* clipboard.cpp in Sources */,
 				BB4C4B5522A932D7001F6AF0 /* keysig.cpp in Sources */,
 				BB4C4B8D22A932DF001F6AF0 /* svg.cpp in Sources */,
 				E7A03CD729D6176B00C02941 /* adjusttupletsyfunctor.cpp in Sources */,

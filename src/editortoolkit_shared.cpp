@@ -125,6 +125,23 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         return false;
     }
 
+    // Clipboard actions - also without parameter
+    if (action == "copy") {
+        if (this->ParseCopyAction()) return this->Copy();
+    }
+    else if (action == "cut") {
+        if (this->ParseCutAction()) {
+            this->PrepareUndo();
+            return this->Cut();
+        }
+    }
+    else if (action == "paste") {
+        if (this->ParsePasteAction()) {
+            this->PrepareUndo();
+            return this->Paste();
+        }
+    }
+
     if (!json.has<jsonxx::Object>("param") && !json.has<jsonxx::Array>("param")) {
         LogWarning("Incorrectly formatted JSON param.");
     }
@@ -418,6 +435,11 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
 }
 
 #ifndef NO_EDIT_SUPPORT
+bool EditorToolkitShared::ParseCopyAction()
+{
+    return true;
+}
+
 bool EditorToolkitShared::ParseContextAction(
     const jsonxx::Object &param, std::string &elementId, bool &scores, bool &sections)
 {
@@ -433,6 +455,11 @@ bool EditorToolkitShared::ParseContextAction(
         return true;
     }
     return false;
+}
+
+bool EditorToolkitShared::ParseCutAction()
+{
+    return true;
 }
 
 bool EditorToolkitShared::ParseDeleteAction(
@@ -524,6 +551,11 @@ bool EditorToolkitShared::ParseNavigate(const jsonxx::Object &param, std::string
     elementId = param.get<jsonxx::String>("elementId");
     if (!param.has<jsonxx::Number>("direction")) return false;
     direction = param.get<jsonxx::Number>("direction");
+    return true;
+}
+
+bool EditorToolkitShared::ParsePasteAction()
+{
     return true;
 }
 
@@ -769,6 +801,8 @@ void EditorToolkitShared::SetEditStatus()
     m_editStatus.import("chainedId", m_chainedId);
     m_editStatus.import("canUndo", this->CanUndo());
     m_editStatus.import("canRedo", this->CanRedo());
+    m_editStatus.import("canCopyOrCut", this->CanCopyOrCut());
+    m_editStatus.import("canPaste", this->CanPaste());
     m_editStatus.import("isMensuralMusicOnly", m_doc->IsMensuralMusicOnly());
     m_editStatus.import("insertMode", this->InsertMode());
     if (!m_selectionId.empty()) {
@@ -948,6 +982,16 @@ bool EditorToolkitShared::CanRedo() const
     return (!m_redoStack.empty());
 }
 
+bool EditorToolkitShared::CanCopyOrCut() const
+{
+    return true;
+}
+
+bool EditorToolkitShared::CanPaste() const
+{
+    return true;
+}
+
 bool EditorToolkitShared::Undo()
 {
     if (!CanUndo()) return false;
@@ -1098,6 +1142,27 @@ bool EditorToolkitShared::ResetCursor(bool maintainChordMode)
     m_cursor = NULL;
 
     this->SetEditStatus();
+
+    return true;
+}
+
+bool EditorToolkitShared::Copy()
+{
+    if (m_selectionId.empty()) return false;
+
+    return true;
+}
+
+bool EditorToolkitShared::Cut()
+{
+    if (m_selectionId.empty()) return false;
+
+    return true;
+}
+
+bool EditorToolkitShared::Paste()
+{
+    if (m_selectionId.empty()) return false;
 
     return true;
 }

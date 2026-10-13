@@ -64,7 +64,9 @@ protected:
      */
     ///@{
     bool Chain(const jsonxx::Array &actions);
+    bool ParseCopyAction();
     bool ParseContextAction(const jsonxx::Object &param, std::string &elementId, bool &scores, bool &sections);
+    bool ParseCutAction();
     bool ParseDeleteAction(const jsonxx::Object &param, std::string &elementId, DeleteNavigation &navigation);
     bool ParseDragAction(const jsonxx::Object &param, DragPhase &phase, int &dx, int &dy);
     bool ParseKeyDownAction(
@@ -74,6 +76,7 @@ protected:
     bool ParseInsertControlAction(
         const jsonxx::Object &param, std::string &elementName, std::string &startId, std::string &endId);
     bool ParseNavigate(const jsonxx::Object &param, std::string &elementId, int &direction);
+    bool ParsePasteAction();
     bool ParseGetScoreDefAction(const jsonxx::Object &param);
     bool ParseGetScoreDefKeySigAction(const jsonxx::Object &param, bool &selected);
     bool ParseGetScoreDefMeterSigAction(const jsonxx::Object &param, bool &selected);
@@ -109,6 +112,8 @@ protected:
     void TrimUndoMemory();
     bool CanUndo() const;
     bool CanRedo() const;
+    bool CanCopyOrCut() const;
+    bool CanPaste() const;
     bool Undo();
     bool Redo();
 
@@ -119,11 +124,14 @@ protected:
     bool SetCursor(std::string &elementId, Cursor::InputMode inputMode, bool chordMode, bool autoBeam);
     bool UpdateCursor(bool restMode, bool chordMode, Cursor::TieMode tieMode, bool autoBeam);
     bool ResetCursor(bool maintainChordMode);
+    bool Copy();
+    bool Cut();
     bool Delete(std::string &elementId, DeleteNavigation navigation);
     bool Drag(DragPhase phase, int dx, int dy);
     bool InsertControl(std::string &elementName, std::string &startId, std::string &endId);
     bool KeyDown(std::string &elementId, int key, bool shiftKey, bool ctrlKey);
     bool Navigate(std::string &elementId, const int &direction);
+    bool Paste();
     bool Select(std::string &elementId, bool secondary, SelectCustom custom);
     bool Set(std::string &elementId, const std::string &attribute, const std::string &value);
     bool UpdatePitch(std::string &elementId, data_PITCHNAME pname, int oct, data_ACCIDENTAL_WRITTEN accid, int midi);

@@ -4,6 +4,9 @@
 export interface CommitAction {
     action: "commit";
 }
+export interface CopyAction {
+    action: "copy";
+}
 export interface ChainAction {
     action: "chain";
     param: EditorAction[];
@@ -21,6 +24,9 @@ export interface DeleteAction {
         elementId: string;
         backspace?: boolean;
     };
+}
+export interface CutAction {
+    action: "cut";
 }
 export type EditActionDrag = {
     action: "drag";
@@ -153,6 +159,9 @@ export interface NavigateAction {
         direction: number;
     };
 }
+export interface PasteAction {
+    action: "paste";
+}
 export interface PropertiesAction {
     action: "properties";
     param: {
@@ -257,8 +266,10 @@ export interface UpdateScoreDefAction {
 }
 export type EditorAction =
     | CommitAction
+    | CopyAction
     | ChainAction
     | ContextAction
+    | CutAction
     | DeleteAction
     | EditActionDrag
     | GetScoreDefAction
@@ -278,6 +289,7 @@ export type EditorAction =
     | InsertRestAction
     | KeyDownAction
     | NavigateAction
+    | PasteAction
     | PropertiesAction
     | RedoAction
     | ResetCursorAction
@@ -321,6 +333,8 @@ type EditorStatusInfo = {
     chainedId: string;
     canUndo: boolean;
     canRedo: boolean;
+    canCopyOrCut: boolean;
+    canPaste: boolean;
     isMensuralMusicOnly: boolean;
     invalidLayout?: boolean;
     selection?: {

@@ -69,6 +69,7 @@
 #import <VerovioFramework/choice.h>
 #import <VerovioFramework/chord.h>
 #import <VerovioFramework/clef.h>
+#import <VerovioFramework/clipboard.h>
 #import <VerovioFramework/comparison.h>
 #import <VerovioFramework/controlelement.h>
 #import <VerovioFramework/convertfunctor.h>
