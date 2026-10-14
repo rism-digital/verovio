@@ -4310,8 +4310,9 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
         this->ReadFacsimile(m_doc, facsimile);
         if (m_doc->HasFacsimile()) {
             const bool facsimileTranscriptionType = (m_doc->GetFacsimile()->GetType() == "transcription");
-            m_doc->SetType(
-                (facsimileTranscriptionType || m_doc->GetOptions()->m_useFacsimile.GetValue()) ? FacTranscription : Raw);
+            m_doc->SetType((facsimileTranscriptionType || m_doc->GetOptions()->m_useFacsimile.GetValue())
+                    ? FacTranscription
+                    : Raw);
         }
         if (facsimile.next_sibling("facsimile")) {
             LogWarning("Only first <facsimile> is processed");
