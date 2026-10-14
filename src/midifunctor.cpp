@@ -87,6 +87,7 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayer(Layer *layer)
     m_meterParams.mensur = layer->GetCurrentMensur();
     m_meterParams.meterSig = layer->GetCurrentMeterSig();
     m_meterParams.proport = layer->GetCurrentProport();
+    std::tie(m_meterParams.num, m_meterParams.numbase) = layer->GetCurrentNumAndNumbase();
 
     return FUNCTOR_CONTINUE;
 }

@@ -21,6 +21,8 @@ namespace vrv {
 struct AlignMeterParams {
     const MeterSig *meterSig = NULL;
     const Mensur *mensur = NULL;
+    int num = 1;
+    int numbase = 1;
     // Not const since we are cumulating proportion
     Proport *proport = NULL;
     data_DURATION equivalence = DURATION_brevis;

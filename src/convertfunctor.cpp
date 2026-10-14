@@ -443,6 +443,7 @@ FunctorCode ConvertToCmnFunctor::VisitLayer(Layer *layer)
     m_currentParams.mensur = layer->GetCurrentMensur();
     m_currentParams.meterSig = layer->GetCurrentMeterSig();
     m_currentParams.proport = layer->GetCurrentProport();
+    std::tie(m_currentParams.num, m_currentParams.numbase) = layer->GetCurrentNumAndNumbase();
 
     m_ligature = NULL;
     m_coloration = NULL;

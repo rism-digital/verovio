@@ -27,6 +27,7 @@ ScoreDefInterface::ScoreDefInterface()
     : Interface()
     , AttBarring()
     , AttDurationDefault()
+    , AttDurationRatio()
     , AttLyricStyle()
     , AttMeasureNumbers()
     , AttMidiTempo()
@@ -39,6 +40,7 @@ ScoreDefInterface::ScoreDefInterface()
 {
     this->RegisterInterfaceAttClass(ATT_BARRING);
     this->RegisterInterfaceAttClass(ATT_DURATIONDEFAULT);
+    this->RegisterInterfaceAttClass(ATT_DURATIONRATIO);
     this->RegisterInterfaceAttClass(ATT_LYRICSTYLE);
     this->RegisterInterfaceAttClass(ATT_MEASURENUMBERS);
     this->RegisterInterfaceAttClass(ATT_MIDITEMPO);
@@ -58,6 +60,7 @@ void ScoreDefInterface::Reset()
 {
     this->ResetBarring();
     this->ResetDurationDefault();
+    this->ResetDurationRatio();
     this->ResetLyricStyle();
     this->ResetMeasureNumbers();
     this->ResetMidiTempo();
