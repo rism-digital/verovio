@@ -1887,7 +1887,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         return;
     }
 
-    if (!m_doc->IsFacs() && !m_doc->IsTranscription() && !m_doc->IsNeumeLines()) {
+    if (!m_doc->IsTranscription() && !m_doc->IsNeumeLines()) {
         syl->SetDrawingYRel(
             this->GetSylYRel(syl->m_drawingVerseN, staff, syl->m_drawingVersePlace, syl->m_drawingVoltaN));
     }
@@ -1954,7 +1954,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     params.m_x = x;
     params.m_y = y;
     params.m_staffSize = staff->m_drawingStaffSize;
-    if (m_doc->IsFacs() || m_doc->IsNeumeLines()) {
+    if (m_doc->IsNeumeLines()) {
         params.m_width = syl->GetDrawingWidth();
         params.m_height = syl->GetDrawingHeight();
     }

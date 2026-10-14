@@ -93,16 +93,6 @@ public:
     ///@}
 
     /**
-     * Get the current clef based on facsimile for the test element.
-     * This goes back by facsimile position until a clef is found.
-     * Returns NULL if a clef cannot be found via this method.
-     */
-    ///@{
-    Clef *GetClefFacs(const LayerElement *test);
-    const Clef *GetClefFacs(const LayerElement *test) const;
-    ///@}
-
-    /**
      * Return the clef offset for the position x.
      * The method uses Layer::GetClef first to find the clef before test.
      */

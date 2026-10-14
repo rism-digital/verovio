@@ -971,20 +971,6 @@ void Doc::PrepareData()
     PrepareLayerElementPartsFunctor prepareLayerElementParts(this);
     root->Process(prepareLayerElementParts);
 
-    /************ Resolve @facs ************/
-    if (this->IsFacs()) {
-        // Associate zones with elements
-        PrepareFacsimileFunctor prepareFacsimile(this->GetFacsimile());
-        root->Process(prepareFacsimile);
-
-        // Add default syl zone if one is not present.
-        for (Object *object : prepareFacsimile.GetZonelessSyls()) {
-            Syl *syl = vrv_cast<Syl *>(object);
-            assert(syl);
-            syl->CreateDefaultZone(this);
-        }
-    }
-
     for (Score *score : this->GetVisibleScores()) {
         ScoreDefSetGrpSymFunctor scoreDefSetGrpSym;
         assert(score->GetScoreDef());
@@ -1401,9 +1387,6 @@ void Doc::ConvertToCastOffMensuralDoc(MensuralCastOffType castOff)
     // Do not convert transcription files
     if (this->IsTranscription()) return;
 
-    // Do not convert facs files
-    if (this->IsFacs()) return;
-
     // Flag it as performed
     m_mensuralCastOff = true;
 
@@ -1451,9 +1434,6 @@ void Doc::ConvertToCmnDoc()
 
     // Do not convert transcription files
     if (this->IsTranscription()) return;
-
-    // Do not convert facs files
-    if (this->IsFacs()) return;
 
     m_isMensuralMusicOnly = BOOLEAN_false;
 
@@ -2428,7 +2408,7 @@ int Doc::GetAdjustedDrawingPageHeight() const
     assert(m_drawingPage);
 
     // Take into account the PPU when getting the page height in facsimile
-    if (this->IsTranscription() || this->IsFacs()) {
+    if (this->IsTranscription()) {
         return m_drawingPage->m_pageHeight * m_drawingPage->GetPPUFactor() / DEFINITION_FACTOR;
     }
 
@@ -2444,7 +2424,7 @@ int Doc::GetAdjustedDrawingPageWidth() const
     assert(m_drawingPage);
 
     // Take into account the PPU when getting the page width in facsimile
-    if (this->IsTranscription() || this->IsFacs()) {
+    if (this->IsTranscription()) {
         return m_drawingPage->m_pageWidth * m_drawingPage->GetPPUFactor() / DEFINITION_FACTOR;
     }
 

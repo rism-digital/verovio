@@ -878,9 +878,6 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         m_doc.MarkAsCastOff();
     }
 
-    // Always set breaks to 'none' with Facs rendering
-    if (m_doc.IsFacs()) breaks = BREAKS_none;
-
     // Always set breaks to 'none' or 'encoded' with Transcription rendering
     // rendering them differenty requires the MEI
     if (m_doc.IsTranscription()) {
@@ -1630,7 +1627,7 @@ void Toolkit::RedoLayout(const std::string &jsonOptions)
 
     this->ResetLogBuffer();
 
-    if ((this->GetPageCount() == 0) || m_doc.IsTranscription() || m_doc.IsFacs()) {
+    if ((this->GetPageCount() == 0) || m_doc.IsTranscription()) {
         LogWarning("No data to re-layout");
         return;
     }
@@ -1717,11 +1714,6 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     deviceContext->SetHeight(height);
     deviceContext->SetViewBoxFactor(m_view.GetPPUFactor());
 
-    if (m_doc.IsFacs()) {
-        deviceContext->SetWidth(m_doc.GetFacsimile()->GetMaxX());
-        deviceContext->SetHeight(m_doc.GetFacsimile()->GetMaxY());
-    }
-
     // render the page
     m_view.DrawCurrentPage(deviceContext, false);
 
@@ -1754,10 +1746,6 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
 
     if (m_options->m_showHidden.GetValue()) {
         svg.SetShowHidden(true);
-    }
-
-    if (m_doc.IsFacs()) {
-        svg.SetFacsimile(true);
     }
 
     // set the option to use viewbox on svg root

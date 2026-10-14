@@ -341,7 +341,7 @@ bool EditorToolkitNeume::AddSyl(std::string elementId, std::string sylText)
         assert(fi);
         fi->AttachZone(zone);
 
-        if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+        if (m_doc->IsTranscription()) m_doc->SyncFromFacsimileDoc();
     }
 
     m_editStatus.import("uuid", elementId);
@@ -720,7 +720,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool topLevel
 
         this->SortStaves();
 
-        if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+        if (m_doc->IsTranscription()) m_doc->SyncFromFacsimileDoc();
         m_doc->GetDrawingPage()->LayOutTranscription(true);
 
         return true; // Can't reorder by layer since staves contain layers
@@ -782,7 +782,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool topLevel
     if (topLevel) {
         Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
         layer->ReorderByXPos(); // Reflect position order of elements internally (and in the resulting output file)
-        if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+        if (m_doc->IsTranscription()) m_doc->SyncFromFacsimileDoc();
         m_doc->GetDrawingPage()->LayOutTranscription(true);
 
         m_editStatus.import("status", status);
@@ -882,7 +882,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
 
         this->SortStaves();
 
-        if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+        if (m_doc->IsTranscription()) m_doc->SyncFromFacsimileDoc();
 
         m_editStatus.import("uuid", newStaff->GetID());
         m_editStatus.import("status", status);
@@ -1309,7 +1309,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
     }
     layer->ReorderByXPos();
 
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    if (m_doc->IsTranscription()) m_doc->SyncFromFacsimileDoc();
     m_doc->GetDrawingPage()->LayOutTranscription(true);
 
     m_editStatus.import("status", status);
@@ -1760,7 +1760,7 @@ bool EditorToolkitNeume::MatchHeight(std::string elementId)
         zone->SetLry(uly + offsetY + height);
     }
 
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    if (m_doc->IsTranscription()) m_doc->SyncFromFacsimileDoc();
 
     m_editStatus.import("status", "OK");
     m_editStatus.import("message", "");
@@ -1878,7 +1878,7 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 
     fillLayer->ReorderByXPos();
 
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    if (m_doc->IsTranscription()) m_doc->SyncFromFacsimileDoc();
 
     m_editStatus.import("uuid", fillStaff->GetID());
     m_editStatus.import("status", "OK");
@@ -2024,7 +2024,7 @@ bool EditorToolkitNeume::SetText(std::string elementId, const std::string &text)
         return false;
     }
 
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    if (m_doc->IsTranscription()) m_doc->SyncFromFacsimileDoc();
 
     m_editStatus.import("status", success ? status : "FAILURE");
     m_editStatus.import("message", success ? message : "SetText method failed.");
@@ -2303,7 +2303,7 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
     }
     layer->ClearRelinquishedChildren();
 
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    if (m_doc->IsTranscription()) m_doc->SyncFromFacsimileDoc();
 
     m_editStatus.import("status", "OK");
     m_editStatus.import("message", "");
@@ -2361,7 +2361,7 @@ void EditorToolkitNeume::UnlinkSyllable(Syllable *syllable)
                 assert(fi);
                 fi->AttachZone(zone);
 
-                if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+                if (m_doc->IsTranscription()) m_doc->SyncFromFacsimileDoc();
             }
         }
     }
@@ -2622,7 +2622,7 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
                 accidZone->SetLry(accidZone->GetLry() + int(rotationOffset));
             }
         }
-        if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+        if (m_doc->IsTranscription()) m_doc->SyncFromFacsimileDoc();
         m_doc->GetDrawingPage()->LayOutTranscription(true);
     }
     else if (obj->Is(SYL)) {
@@ -2658,7 +2658,7 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
             zone->SetRotate(rotate);
         }
         zone->Modify();
-        if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+        if (m_doc->IsTranscription()) m_doc->SyncFromFacsimileDoc();
     }
     else {
         LogError("Element of type '%s' is unsupported.", obj->GetClassName().c_str());
@@ -3057,7 +3057,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
 
     secondParent->ReorderByXPos();
 
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    if (m_doc->IsTranscription()) m_doc->SyncFromFacsimileDoc();
 
     m_editStatus.import("uuid", parent->GetID());
     m_editStatus.import("status", status);
@@ -3341,7 +3341,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
         }
     }
 
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    if (m_doc->IsTranscription()) m_doc->SyncFromFacsimileDoc();
 
     m_editStatus.import("status", "OK");
     m_editStatus.import("message", "");
@@ -3528,7 +3528,7 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
         prevNc = newNc;
     }
 
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    if (m_doc->IsTranscription()) m_doc->SyncFromFacsimileDoc();
 
     m_editStatus.import("uuid", el->GetID());
     m_editStatus.import("status", "OK");
@@ -3635,7 +3635,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
         return false;
     }
 
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    if (m_doc->IsTranscription()) m_doc->SyncFromFacsimileDoc();
     m_doc->GetDrawingPage()->LayOutTranscription(true);
 
     m_editStatus.import("status", "OK");
@@ -3689,7 +3689,7 @@ bool EditorToolkitNeume::ToggleNeumeConnection(std::vector<std::string> elementI
 
     currentNc->SetCon((currentNc->GetCon() == ncForm_CON_e) ? ncForm_CON_NONE : ncForm_CON_e);
 
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    if (m_doc->IsTranscription()) m_doc->SyncFromFacsimileDoc();
     m_doc->GetDrawingPage()->LayOutTranscription(true);
 
     m_editStatus.import("status", "OK");
