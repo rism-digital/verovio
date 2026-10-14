@@ -24,7 +24,7 @@
 #include "mensur.h"
 #include "note.h"
 #include "rest.h"
-#include "score.h"
+#include "scoreorpart.h"
 #include "section.h"
 #include "staff.h"
 #include "staffdef.h"
@@ -466,7 +466,7 @@ bool DarmsInput::Import(const std::string &data_str)
     mdiv->SetVisibility(Visible);
     m_doc->AddChild(mdiv);
     // The score
-    Score *score = new Score();
+    ScoreOrPart *score = new ScoreOrPart(SCORE);
     mdiv->AddChild(score);
     // the section
     Section *section = new Section();

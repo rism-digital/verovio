@@ -104,7 +104,7 @@
 		4D1693FA1E3A44F300569BF4 /* clef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBB188539540037FD8E /* clef.cpp */; };
 		4D1693FB1E3A44F300569BF4 /* devicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBC188539540037FD8E /* devicecontext.cpp */; };
 		4D1693FC1E3A44F300569BF4 /* view_control.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D543E211B80AACF004B823C /* view_control.cpp */; };
-		4D1693FD1E3A44F300569BF4 /* score.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4FB1D74551100B2B856 /* score.cpp */; };
+		4D1693FD1E3A44F300569BF4 /* scoreorpart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4FB1D74551100B2B856 /* scoreorpart.cpp */; };
 		4D1693FE1E3A44F300569BF4 /* doc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBD188539540037FD8E /* doc.cpp */; };
 		4D1693FF1E3A44F300569BF4 /* durationinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBE188539540037FD8E /* durationinterface.cpp */; };
 		4D1694001E3A44F300569BF4 /* toolkit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBF188539540037FD8E /* toolkit.cpp */; };
@@ -323,7 +323,7 @@
 		4D4C26ED1EF7E75400681770 /* label.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C26EC1EF7E75400681770 /* label.cpp */; };
 		4D4C26EE1EF7E75400681770 /* label.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C26EC1EF7E75400681770 /* label.cpp */; };
 		4D4C26EF1EF7E75400681770 /* label.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C26EC1EF7E75400681770 /* label.cpp */; };
-		4D4C26F01EF7E75E00681770 /* score.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4FB1D74551100B2B856 /* score.cpp */; };
+		4D4C26F01EF7E75E00681770 /* scoreorpart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4FB1D74551100B2B856 /* scoreorpart.cpp */; };
 		4D4CDEA52C078FF9005621E9 /* adjustneumexfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4CDEA42C078FF9005621E9 /* adjustneumexfunctor.cpp */; };
 		4D4CDEA72C079026005621E9 /* adjustneumexfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D4CDEA62C079008005621E9 /* adjustneumexfunctor.h */; };
 		4D4CDEA82C079026005621E9 /* adjustneumexfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D4CDEA62C079008005621E9 /* adjustneumexfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -491,7 +491,7 @@
 		4D95D4F21D6E042400B2B856 /* section.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4F11D6E042400B2B856 /* section.cpp */; };
 		4D95D4F61D71866200B2B856 /* controlelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4F51D71866200B2B856 /* controlelement.cpp */; };
 		4D95D4F91D718D4A00B2B856 /* systemelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4F81D718D4A00B2B856 /* systemelement.cpp */; };
-		4D95D4FC1D74551100B2B856 /* score.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4FB1D74551100B2B856 /* score.cpp */; };
+		4D95D4FC1D74551100B2B856 /* scoreorpart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4FB1D74551100B2B856 /* scoreorpart.cpp */; };
 		4D983005192E959E00320037 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D983004192E959E00320037 /* main.cpp */; };
 		4D9A9C17199F560200028D93 /* verse.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9A9C16199F560200028D93 /* verse.h */; };
 		4D9A9C19199F561200028D93 /* verse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C18199F561200028D93 /* verse.cpp */; };
@@ -732,7 +732,7 @@
 		4DB3D8B51F83D09100B5FC2B /* iohumdrum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA20ED01D0F151900706C4A /* iohumdrum.cpp */; };
 		4DB3D8B61F83D09700B5FC2B /* iohumdrum.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DA20ECF1D0F150900706C4A /* iohumdrum.h */; };
 		4DB3D8B71F83D0A300B5FC2B /* label.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D4C26EB1EF7E73000681770 /* label.h */; };
-		4DB3D8B81F83D0B100B5FC2B /* score.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D95D4FA1D74549700B2B856 /* score.h */; };
+		4DB3D8B81F83D0B100B5FC2B /* scoreorpart.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D95D4FA1D74549700B2B856 /* scoreorpart.h */; };
 		4DB3D8B91F83D0C600B5FC2B /* systemmilestone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF4407C1D511D0200152B7E /* systemmilestone.cpp */; };
 		4DB3D8BA1F83D0CA00B5FC2B /* systemmilestone.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF4407B1D511CEE00152B7E /* systemmilestone.h */; };
 		4DB3D8BB1F83D0D100B5FC2B /* expansion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40ABF1FE1E5DF23B00F32F41 /* expansion.cpp */; };
@@ -1238,8 +1238,8 @@
 		BB4C4ACC22A932B6001F6AF0 /* pb.h in Headers */ = {isa = PBXBuildFile; fileRef = 40C2E41D2052A6E00003625F /* pb.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4ACD22A932B6001F6AF0 /* sb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40C2E41A2052A6DF0003625F /* sb.cpp */; };
 		BB4C4ACE22A932B6001F6AF0 /* sb.h in Headers */ = {isa = PBXBuildFile; fileRef = 40C2E41C2052A6E00003625F /* sb.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		BB4C4ACF22A932B6001F6AF0 /* score.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4FB1D74551100B2B856 /* score.cpp */; };
-		BB4C4AD022A932B6001F6AF0 /* score.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D95D4FA1D74549700B2B856 /* score.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BB4C4ACF22A932B6001F6AF0 /* scoreorpart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4FB1D74551100B2B856 /* scoreorpart.cpp */; };
+		BB4C4AD022A932B6001F6AF0 /* scoreorpart.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D95D4FA1D74549700B2B856 /* scoreorpart.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4AD122A932B6001F6AF0 /* scoredef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED2188539540037FD8E /* scoredef.cpp */; };
 		BB4C4AD222A932B6001F6AF0 /* scoredef.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59292918854BF800FE51AD /* scoredef.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4AD322A932B6001F6AF0 /* staffdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4FCD111F54570E0009C455 /* staffdef.cpp */; };
@@ -2063,8 +2063,8 @@
 		4D95D4F51D71866200B2B856 /* controlelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = controlelement.cpp; path = src/controlelement.cpp; sourceTree = "<group>"; };
 		4D95D4F71D718D0200B2B856 /* systemelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = systemelement.h; path = include/vrv/systemelement.h; sourceTree = "<group>"; };
 		4D95D4F81D718D4A00B2B856 /* systemelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = systemelement.cpp; path = src/systemelement.cpp; sourceTree = "<group>"; };
-		4D95D4FA1D74549700B2B856 /* score.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = score.h; path = include/vrv/score.h; sourceTree = "<group>"; };
-		4D95D4FB1D74551100B2B856 /* score.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = score.cpp; path = src/score.cpp; sourceTree = "<group>"; };
+		4D95D4FA1D74549700B2B856 /* scoreorpart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = scoreorpart.h; path = include/vrv/scoreorpart.h; sourceTree = "<group>"; };
+		4D95D4FB1D74551100B2B856 /* scoreorpart.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scoreorpart.cpp; path = src/scoreorpart.cpp; sourceTree = "<group>"; };
 		4D983004192E959E00320037 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = tools/main.cpp; sourceTree = SOURCE_ROOT; };
 		4D9A9C16199F560200028D93 /* verse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = verse.h; path = include/vrv/verse.h; sourceTree = "<group>"; };
 		4D9A9C18199F561200028D93 /* verse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = verse.cpp; path = src/verse.cpp; sourceTree = "<group>"; };
@@ -2634,8 +2634,8 @@
 			children = (
 				4D64137D2035F68600BB630E /* mdiv.cpp */,
 				4D64137B2035F67C00BB630E /* mdiv.h */,
-				4D95D4FB1D74551100B2B856 /* score.cpp */,
-				4D95D4FA1D74549700B2B856 /* score.h */,
+				4D95D4FB1D74551100B2B856 /* scoreorpart.cpp */,
+				4D95D4FA1D74549700B2B856 /* scoreorpart.h */,
 				4D79641726C1522B0026288B /* pageelement.cpp */,
 				4D79641C26C152400026288B /* pageelement.h */,
 				4D79642026C167100026288B /* pagemilestone.cpp */,
@@ -3531,7 +3531,7 @@
 				8F59294818854BF800FE51AD /* mensur.h in Headers */,
 				4D79641D26C152400026288B /* pageelement.h in Headers */,
 				4D2B24022F56E9090088C6F4 /* customtuning.h in Headers */,
-				4DB3D8B81F83D0B100B5FC2B /* score.h in Headers */,
+				4DB3D8B81F83D0B100B5FC2B /* scoreorpart.h in Headers */,
 				E738715D29CAFA7800982DE5 /* calcligatureorneumeposfunctor.h in Headers */,
 				4DA0EAD922BB77AF00A7EBEB /* facsimile.h in Headers */,
 				4DEC4DD721C8295700D1D273 /* reg.h in Headers */,
@@ -3800,7 +3800,7 @@
 				4D2B23F92F56E7980088C6F4 /* TuningsConcepts.h in Headers */,
 				BB4C4AFA22A932BC001F6AF0 /* restore.h in Headers */,
 				BB4C4B2422A932CF001F6AF0 /* dynam.h in Headers */,
-				BB4C4AD022A932B6001F6AF0 /* score.h in Headers */,
+				BB4C4AD022A932B6001F6AF0 /* scoreorpart.h in Headers */,
 				4D292C232EEB0BC000C1EB5F /* adjustossiastaffdeffunctor.h in Headers */,
 				BB4C4B8E22A932DF001F6AF0 /* svg.h in Headers */,
 				BB4C4B3822A932CF001F6AF0 /* trill.h in Headers */,
@@ -4230,7 +4230,7 @@
 				E76046C228D496B300C36204 /* calcledgerlinesfunctor.cpp in Sources */,
 				E7870358299CF07500156DC4 /* adjustarpegfunctor.cpp in Sources */,
 				4D766F0120ACAD6D006875D8 /* view_neume.cpp in Sources */,
-				4D1693FD1E3A44F300569BF4 /* score.cpp in Sources */,
+				4D1693FD1E3A44F300569BF4 /* scoreorpart.cpp in Sources */,
 				4DACC9892990F29A00B55913 /* atts_mei.cpp in Sources */,
 				4D1693FE1E3A44F300569BF4 /* doc.cpp in Sources */,
 				4D1693FF1E3A44F300569BF4 /* durationinterface.cpp in Sources */,
@@ -4547,7 +4547,7 @@
 				4DACC9FC2990F29A00B55913 /* atts_fingering.cpp in Sources */,
 				4DACC9EC2990F29A00B55913 /* atts_shared.cpp in Sources */,
 				4DA0EAEA22BB77C300A7EBEB /* editortoolkit_neume.cpp in Sources */,
-				4D95D4FC1D74551100B2B856 /* score.cpp in Sources */,
+				4D95D4FC1D74551100B2B856 /* scoreorpart.cpp in Sources */,
 				8F086EE9188539540037FD8E /* doc.cpp in Sources */,
 				8F086EEA188539540037FD8E /* durationinterface.cpp in Sources */,
 				E7B17DAC29F665C90076E75F /* midifunctor.cpp in Sources */,
@@ -4906,7 +4906,7 @@
 				8F3DD33E18854B2E0051330C /* beam.cpp in Sources */,
 				4DED4F19294733140073E504 /* altsyminterface.cpp in Sources */,
 				E7ADB3B029D1923600825D5D /* adjustarticfunctor.cpp in Sources */,
-				4D4C26F01EF7E75E00681770 /* score.cpp in Sources */,
+				4D4C26F01EF7E75E00681770 /* scoreorpart.cpp in Sources */,
 				8F3DD34018854B2E0051330C /* clef.cpp in Sources */,
 				4DC07F6B2A4DBB8500360070 /* liquescent.cpp in Sources */,
 				8F3DD34218854B2E0051330C /* durationinterface.cpp in Sources */,
@@ -5392,7 +5392,7 @@
 				BB4C4B4D22A932D7001F6AF0 /* dot.cpp in Sources */,
 				BB4C4B1722A932CF001F6AF0 /* controlelement.cpp in Sources */,
 				E778BDB429D5BD6700672D51 /* adjuststaffoverlapfunctor.cpp in Sources */,
-				BB4C4ACF22A932B6001F6AF0 /* score.cpp in Sources */,
+				BB4C4ACF22A932B6001F6AF0 /* scoreorpart.cpp in Sources */,
 				BB4C4B0122A932BC001F6AF0 /* unclear.cpp in Sources */,
 				BB4C4AC322A932B6001F6AF0 /* mdiv.cpp in Sources */,
 				BB4C4B6322A932D7001F6AF0 /* mrpt2.cpp in Sources */,

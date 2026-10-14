@@ -33,7 +33,7 @@
 #include "repeatmark.h"
 #include "rest.h"
 #include "runningelement.h"
-#include "score.h"
+#include "scoreorpart.h"
 #include "section.h"
 #include "space.h"
 #include "staff.h"
@@ -153,15 +153,15 @@ FunctorCode PrepareDataInitializationFunctor::VisitRepeatMark(RepeatMark *repeat
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode PrepareDataInitializationFunctor::VisitScore(Score *score)
+FunctorCode PrepareDataInitializationFunctor::VisitScoreOrPart(ScoreOrPart *scoreOrPart)
 {
     // Call parent one too
-    this->VisitPageElement(score);
+    this->VisitPageElement(scoreOrPart);
 
-    assert(score->GetScoreDef());
+    assert(scoreOrPart->GetScoreDef());
 
     // Evaluate functor on scoreDef
-    score->GetScoreDef()->Process(*this);
+    scoreOrPart->GetScoreDef()->Process(*this);
 
     return FUNCTOR_CONTINUE;
 }
@@ -415,11 +415,11 @@ PrepareAltSymFunctor::PrepareAltSymFunctor() : Functor()
 
 FunctorCode PrepareAltSymFunctor::VisitObject(Object *object)
 {
-    if (object->Is(SCORE)) {
-        Score *score = vrv_cast<Score *>(object);
-        assert(score);
-        assert(score->GetScoreDef());
-        m_symbolTable = vrv_cast<SymbolTable *>(score->GetScoreDef()->FindDescendantByType(SYMBOLTABLE));
+    if (object->Is(SCORE_OR_PART)) {
+        ScoreOrPart *scoreOrPart = vrv_cast<ScoreOrPart *>(object);
+        assert(scoreOrPart);
+        assert(scoreOrPart->GetScoreDef());
+        m_symbolTable = vrv_cast<SymbolTable *>(scoreOrPart->GetScoreDef()->FindDescendantByType(SYMBOLTABLE));
     }
 
     if (object->HasInterface(INTERFACE_ALT_SYM)) {
@@ -624,9 +624,9 @@ FunctorCode PrepareDurationFunctor::VisitLayerElement(LayerElement *layerElement
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode PrepareDurationFunctor::VisitScore(Score *score)
+FunctorCode PrepareDurationFunctor::VisitScoreOrPart(ScoreOrPart *scoreOrPart)
 {
-    ScoreDef *scoreDef = score->GetScoreDef();
+    ScoreDef *scoreDef = scoreOrPart->GetScoreDef();
     if (scoreDef) {
         scoreDef->Process(*this);
     }
@@ -1482,7 +1482,7 @@ FunctorCode PrepareRptFunctor::VisitStaff(Staff *staff)
     }
 
     // This is happening only for the first staff element of the staff @n
-    ScoreDef *scoreDef = m_doc->GetCorrespondingScore(staff)->GetScoreDef();
+    ScoreDef *scoreDef = m_doc->GetCorrespondingScoreOrPart(staff)->GetScoreDef();
     assert(scoreDef);
     if (StaffDef *staffDef = scoreDef->GetStaffDef(staff->GetN())) {
         const bool hideNumber = (staffDef->GetMultiNumber() == BOOLEAN_false)

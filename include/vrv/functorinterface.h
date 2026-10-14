@@ -115,7 +115,7 @@ class Rend;
 class Rest;
 class RunningElement;
 class Sb;
-class Score;
+class ScoreOrPart;
 class ScoreDef;
 class ScoreDefElement;
 class Section;
@@ -279,8 +279,8 @@ public:
     virtual FunctorCode VisitPageElementEnd(PageElement *pageElement);
     virtual FunctorCode VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd);
     virtual FunctorCode VisitPageMilestoneEnd(PageMilestoneEnd *pageMilestoneEnd);
-    virtual FunctorCode VisitScore(Score *score);
-    virtual FunctorCode VisitScoreEnd(Score *score);
+    virtual FunctorCode VisitScoreOrPart(ScoreOrPart *scoreOrPart);
+    virtual FunctorCode VisitScoreOrPartEnd(ScoreOrPart *scoreOrPart);
     ///@}
 
     /**
@@ -666,8 +666,8 @@ public:
     virtual FunctorCode VisitPageElementEnd(const PageElement *pageElement);
     virtual FunctorCode VisitPageMilestone(const PageMilestoneEnd *pageMilestoneEnd);
     virtual FunctorCode VisitPageMilestoneEnd(const PageMilestoneEnd *pageMilestoneEnd);
-    virtual FunctorCode VisitScore(const Score *score);
-    virtual FunctorCode VisitScoreEnd(const Score *score);
+    virtual FunctorCode VisitScoreOrPart(const ScoreOrPart *scoreOrPart);
+    virtual FunctorCode VisitScoreOrPartEnd(const ScoreOrPart *scoreOrPart);
     ///@}
 
     /**

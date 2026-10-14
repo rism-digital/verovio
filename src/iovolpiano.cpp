@@ -23,7 +23,7 @@
 #include "mdiv.h"
 #include "measure.h"
 #include "note.h"
-#include "score.h"
+#include "scoreorpart.h"
 #include "section.h"
 #include "staff.h"
 #include "staffdef.h"
@@ -53,7 +53,7 @@ bool VolpianoInput::Import(const std::string &volpiano)
     mdiv->SetVisibility(Visible);
     m_doc->AddChild(mdiv);
     // The score
-    Score *score = new Score();
+    ScoreOrPart *score = new ScoreOrPart(SCORE);
     mdiv->AddChild(score);
     // the section
     Section *section = new Section();

@@ -37,8 +37,8 @@
 #include "multirest.h"
 #include "note.h"
 #include "rest.h"
-#include "score.h"
 #include "scoredef.h"
+#include "scoreorpart.h"
 #include "section.h"
 #include "space.h"
 #include "staff.h"
@@ -728,7 +728,7 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
     mdiv->m_visibility = Visible;
     m_doc->AddChild(mdiv);
     // The score
-    Score *score = new Score();
+    ScoreOrPart *score = new ScoreOrPart();
     mdiv->AddChild(score);
     // the section
     Section *section = new Section();
@@ -2999,7 +2999,7 @@ bool PAEInput::Parse()
     mdiv->SetVisibility(Visible);
     m_doc->AddChild(mdiv);
     // The score
-    Score *score = new Score();
+    ScoreOrPart *score = new ScoreOrPart(SCORE);
     mdiv->AddChild(score);
     // the section
     Section *section = new Section();

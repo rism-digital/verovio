@@ -44,7 +44,7 @@
 #include "options.h"
 #include "oriscus.h"
 #include "quilisma.h"
-#include "score.h"
+#include "scoreorpart.h"
 #include "section.h"
 #include "staff.h"
 #include "staffdef.h"
@@ -737,7 +737,7 @@ bool GABCInput::Import(const std::string &gabc)
     Mdiv *mdiv = new Mdiv();
     mdiv->SetVisibility(Visible);
     m_doc->AddChild(mdiv);
-    Score *score = new Score();
+    ScoreOrPart *score = new ScoreOrPart(SCORE);
     mdiv->AddChild(score);
     Section *section = new Section();
     score->AddChild(section);

@@ -54,7 +54,7 @@
 #include "preparedatafunctor.h"
 #include "resetfunctor.h"
 #include "runningelement.h"
-#include "score.h"
+#include "scoreorpart.h"
 #include "scoringupfunctor.h"
 #include "setscoredeffunctor.h"
 #include "slur.h"
@@ -152,7 +152,7 @@ void Doc::ResetToSerialization()
     m_markup = MARKUP_DEFAULT;
     m_isMensuralMusicOnly = BOOLEAN_NONE;
     m_isNeumeLines = false;
-    m_visibleScores.clear();
+    m_visibleScoresOrParts.clear();
 
     if (m_focusRange) {
         delete m_focusRange;
@@ -245,8 +245,8 @@ bool Doc::GenerateDocumentScoreDef()
 
 void Doc::GenerateFooter()
 {
-    for (Score *score : this->GetVisibleScores()) {
-        ScoreDef *scoreDef = score->GetScoreDef();
+    for (ScoreOrPart *scoreOrPart : this->GetVisibleScoresOrParts()) {
+        ScoreDef *scoreDef = scoreOrPart->GetScoreDef();
         assert(scoreDef);
         if (scoreDef->FindDescendantByType(PGFOOT)) continue;
 
@@ -269,8 +269,8 @@ void Doc::GenerateFooter()
 
 void Doc::GenerateHeader()
 {
-    for (Score *score : this->GetVisibleScores()) {
-        ScoreDef *scoreDef = score->GetScoreDef();
+    for (ScoreOrPart *scoreOrPart : this->GetVisibleScoresOrParts()) {
+        ScoreDef *scoreDef = scoreOrPart->GetScoreDef();
         assert(scoreDef);
         if (scoreDef->FindDescendantByType(PGHEAD)) continue;
 
@@ -411,7 +411,7 @@ void Doc::CalculateTimemap()
     double tempo = MIDI_TEMPO;
 
     // Set tempo
-    ScoreDef *scoreDef = this->GetFirstVisibleScore()->GetScoreDef();
+    ScoreDef *scoreDef = this->GetFirstVisibleScoreOrPart()->GetScoreDef();
     assert(scoreDef);
     if (scoreDef->HasMidiBpm()) {
         tempo = scoreDef->GetMidiBpm();
@@ -459,7 +459,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     std::set<int> tempoEventTicks; // track the ticks of added tempo events
 
     // set MIDI tempo
-    ScoreDef *scoreDef = this->GetFirstVisibleScore()->GetScoreDef();
+    ScoreDef *scoreDef = this->GetFirstVisibleScoreOrPart()->GetScoreDef();
     assert(scoreDef);
     if (scoreDef->HasMidiBpm()) {
         tempo = scoreDef->GetMidiBpm();
@@ -708,7 +708,7 @@ void Doc::PrepareData()
 
     /************ Collect all visible scores ************/
 
-    this->CollectVisibleScores();
+    this->CollectVisibleScoresOrParts();
 
     /************ Store default durations ************/
 
@@ -986,10 +986,10 @@ void Doc::PrepareData()
         }
     }
 
-    for (Score *score : this->GetVisibleScores()) {
+    for (ScoreOrPart *scoreOrPart : this->GetVisibleScoresOrParts()) {
         ScoreDefSetGrpSymFunctor scoreDefSetGrpSym;
-        assert(score->GetScoreDef());
-        score->GetScoreDef()->Process(scoreDefSetGrpSym);
+        assert(scoreOrPart->GetScoreDef());
+        scoreOrPart->GetScoreDef()->Process(scoreDefSetGrpSym);
     }
 
     // LogElapsedTimeEnd ("Preparing drawing");
@@ -1066,7 +1066,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
         return;
     }
 
-    std::list<Score *> scores = this->GetVisibleScores();
+    std::list<ScoreOrPart *> scores = this->GetVisibleScoresOrParts();
     assert(!scores.empty());
 
     if (m_focusStatus == FOCUS_USED) {
@@ -1121,8 +1121,8 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     this->SetDrawingPage(0);
 
     bool optimize = false;
-    for (Score *score : scores) {
-        if (score->ScoreDefNeedsOptimization(m_options->m_condense.GetValue())) {
+    for (ScoreOrPart *scoreOrPart : scores) {
+        if (scoreOrPart->ScoreDefNeedsOptimization(m_options->m_condense.GetValue())) {
             optimize = true;
             break;
         }
@@ -1144,8 +1144,8 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     assert(castOffSinglePage && !castOffSinglePage->GetParent());
     this->ResetDataPage();
 
-    for (Score *score : scores) {
-        score->CalcRunningElementHeight(this);
+    for (ScoreOrPart *scoreOrPart : scores) {
+        scoreOrPart->CalcRunningElementHeight(this);
     }
 
     Page *castOffFirstPage = new Page();
@@ -1229,8 +1229,8 @@ void Doc::CastOffEncodingDoc()
     this->ScoreDefSetCurrentDoc(true);
 
     // Optimize the doc if one of the score requires optimization
-    for (Score *score : this->GetVisibleScores()) {
-        if (score->ScoreDefNeedsOptimization(m_options->m_condense.GetValue())) {
+    for (ScoreOrPart *scoreOrPart : this->GetVisibleScoresOrParts()) {
+        if (scoreOrPart->ScoreDefNeedsOptimization(m_options->m_condense.GetValue())) {
             this->ScoreDefOptimizeDoc();
             break;
         }
@@ -1324,7 +1324,7 @@ void Doc::DeactiveateSelection()
     Page *selectionPage = vrv_cast<Page *>(pages->GetChild(0));
     assert(selectionPage);
     // We need to delete the selection scoreDef
-    Score *selectionScore = vrv_cast<Score *>(selectionPage->FindDescendantByType(SCORE));
+    ScoreOrPart *selectionScore = vrv_cast<ScoreOrPart *>(selectionPage->FindDescendantByType(SCORE_OR_PART));
     assert(selectionScore);
     if (selectionScore->GetLabel() != "[selectionScore]") LogError("Deleting wrong score element. Something is wrong");
     selectionPage->DeleteChild(selectionScore);
@@ -1347,7 +1347,7 @@ void Doc::ReactivateSelection(bool resetAligners)
     Page *selectionPage = vrv_cast<Page *>(pages->GetChild(1));
     System *system = vrv_cast<System *>(selectionPage->FindDescendantByType(SYSTEM));
     // Add a selection scoreDef based on the current drawing system scoreDef
-    Score *selectionScore = new Score();
+    ScoreOrPart *selectionScore = new ScoreOrPart(UNDEFINED_SCORE_OR_PART);
     selectionScore->GetScoreDef()->ReplaceWithCopyOf(system->GetDrawingScoreDef());
     selectionScore->SetLabel("[selectionScore]");
     // Use the drawing values as actual scoreDef
@@ -1475,7 +1475,7 @@ void Doc::ConvertToCmnDoc()
     contentPage->LayOutHorizontally();
 
     ListOfObjects systems = contentPage->FindAllDescendantsByType(SYSTEM, false, 1);
-    ListOfObjects scores = contentPage->FindAllDescendantsByType(SCORE, false, 1);
+    ListOfObjects scores = contentPage->FindAllDescendantsByType(SCORE_OR_PART, false, 1);
     assert(systems.size() == scores.size());
 
     ListOfObjects::iterator systemsIt = systems.begin();
@@ -1483,10 +1483,10 @@ void Doc::ConvertToCmnDoc()
     for (; systemsIt != systems.end(); ++systemsIt, ++scoresIt) {
         System *system = vrv_cast<System *>(*systemsIt);
         assert(system);
-        Score *score = vrv_cast<Score *>(*scoresIt);
-        assert(score);
+        ScoreOrPart *scoreOrPart = vrv_cast<ScoreOrPart *>(*scoresIt);
+        assert(scoreOrPart);
         System *convertedSystem = new System();
-        ConvertToCmnFunctor convertToCmn(this, convertedSystem, score);
+        ConvertToCmnFunctor convertToCmn(this, convertedSystem, scoreOrPart);
         // Convert the system and replace it
         system->Process(convertToCmn);
         contentPage->ReplaceChild(system, convertedSystem);
@@ -1681,13 +1681,13 @@ void Doc::ExpandExpansions()
 
     // We have no --expand xmlid, so generate an expansion or use the first one (generation will be skipped)
     if (!expandSelected) {
-        ListOfObjects scores = this->FindAllDescendantsByType(SCORE);
+        ListOfObjects scores = this->FindAllDescendantsByType(SCORE_OR_PART);
         for (Object *object : scores) {
-            Score *score = vrv_cast<Score *>(object);
-            assert(score);
+            ScoreOrPart *scoreOrPart = vrv_cast<ScoreOrPart *>(object);
+            assert(scoreOrPart);
             // Do not generate an expansion if there is already one
-            if (!score->FindDescendantByType(EXPANSION)) {
-                m_expansionMap.GenerateExpansionFor(score);
+            if (!scoreOrPart->FindDescendantByType(EXPANSION)) {
+                m_expansionMap.GenerateExpansionFor(scoreOrPart);
             }
         }
     }
@@ -1759,56 +1759,56 @@ ScoreDef *Doc::GetFirstScoreDef()
 
 const ScoreDef *Doc::GetFirstScoreDef() const
 {
-    const Score *score = vrv_cast<const Score *>(this->FindDescendantByType(SCORE, 3));
+    const ScoreOrPart *scoreOrPart = vrv_cast<const ScoreOrPart *>(this->FindDescendantByType(SCORE_OR_PART, 3));
 
-    return score ? score->GetScoreDef() : NULL;
+    return scoreOrPart ? scoreOrPart->GetScoreDef() : NULL;
 }
 
-std::list<Score *> Doc::GetVisibleScores()
+std::list<ScoreOrPart *> Doc::GetVisibleScoresOrParts()
 {
-    if (m_visibleScores.empty()) {
-        this->CollectVisibleScores();
+    if (m_visibleScoresOrParts.empty()) {
+        this->CollectVisibleScoresOrParts();
 
-        assert(!m_visibleScores.empty());
+        assert(!m_visibleScoresOrParts.empty());
     }
 
-    return m_visibleScores;
+    return m_visibleScoresOrParts;
 }
 
-Score *Doc::GetFirstVisibleScore()
+ScoreOrPart *Doc::GetFirstVisibleScoreOrPart()
 {
-    if (m_visibleScores.empty()) {
-        this->CollectVisibleScores();
+    if (m_visibleScoresOrParts.empty()) {
+        this->CollectVisibleScoresOrParts();
 
-        assert(!m_visibleScores.empty());
+        assert(!m_visibleScoresOrParts.empty());
     }
 
-    return m_visibleScores.front();
+    return m_visibleScoresOrParts.front();
 }
 
-Score *Doc::GetCorrespondingScore(const Object *object)
+ScoreOrPart *Doc::GetCorrespondingScoreOrPart(const Object *object)
 {
-    return const_cast<Score *>(std::as_const(*this).GetCorrespondingScore(object));
+    return const_cast<ScoreOrPart *>(std::as_const(*this).GetCorrespondingScoreOrPart(object));
 }
 
-const Score *Doc::GetCorrespondingScore(const Object *object) const
+const ScoreOrPart *Doc::GetCorrespondingScoreOrPart(const Object *object) const
 {
-    return this->GetCorrespondingScore(object, m_visibleScores);
+    return this->GetCorrespondingScoreOrPart(object, m_visibleScoresOrParts);
 }
 
-Score *Doc::GetCorrespondingScore(const Object *object, const std::list<Score *> &scores)
+ScoreOrPart *Doc::GetCorrespondingScoreOrPart(const Object *object, const std::list<ScoreOrPart *> &scores)
 {
-    return const_cast<Score *>(std::as_const(*this).GetCorrespondingScore(object, scores));
+    return const_cast<ScoreOrPart *>(std::as_const(*this).GetCorrespondingScoreOrPart(object, scores));
 }
 
-const Score *Doc::GetCorrespondingScore(const Object *object, const std::list<Score *> &scores) const
+const ScoreOrPart *Doc::GetCorrespondingScoreOrPart(const Object *object, const std::list<ScoreOrPart *> &scores) const
 {
     assert(!scores.empty());
 
-    const Score *correspondingScore = scores.front();
-    for (Score *score : scores) {
-        if ((score == object) || Object::IsPreOrdered(score, object)) {
-            correspondingScore = score;
+    const ScoreOrPart *correspondingScore = scores.front();
+    for (ScoreOrPart *scoreOrPart : scores) {
+        if ((scoreOrPart == object) || Object::IsPreOrdered(scoreOrPart, object)) {
+            correspondingScore = scoreOrPart;
         }
     }
     return correspondingScore;
@@ -1846,16 +1846,16 @@ void Doc::CollectReferringObjects(const Object *element, std::set<std::string> &
     }
 }
 
-void Doc::CollectVisibleScores()
+void Doc::CollectVisibleScoresOrParts()
 {
-    m_visibleScores.clear();
-    ListOfObjects objects = this->FindAllDescendantsByType(SCORE, false, 3);
+    m_visibleScoresOrParts.clear();
+    ListOfObjects objects = this->FindAllDescendantsByType(SCORE_OR_PART, false, 3);
     for (Object *object : objects) {
-        Score *score = vrv_cast<Score *>(object);
-        assert(score);
+        ScoreOrPart *scoreOrPart = vrv_cast<ScoreOrPart *>(object);
+        assert(scoreOrPart);
         // Visible scores have milestone end
-        if (score->GetMilestoneEnd()) {
-            m_visibleScores.push_back(score);
+        if (scoreOrPart->GetMilestoneEnd()) {
+            m_visibleScoresOrParts.push_back(scoreOrPart);
         }
     }
 }
@@ -2271,7 +2271,7 @@ double Doc::GetTopMargin(const ClassId classId) const
 
 data_MEASUREMENTSIGNED Doc::GetStaffDistance(const Object *object, int staffIndex, data_STAFFREL staffPosition) const
 {
-    const ScoreDef *scoreDef = this->GetCorrespondingScore(object)->GetScoreDef();
+    const ScoreDef *scoreDef = this->GetCorrespondingScoreOrPart(object)->GetScoreDef();
 
     data_MEASUREMENTSIGNED distance;
     if (staffPosition == STAFFREL_above || staffPosition == STAFFREL_below) {

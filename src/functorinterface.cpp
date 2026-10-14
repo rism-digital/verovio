@@ -100,8 +100,8 @@
 #include "repeatmark.h"
 #include "rest.h"
 #include "sb.h"
-#include "score.h"
 #include "scoredef.h"
+#include "scoreorpart.h"
 #include "section.h"
 #include "slur.h"
 #include "space.h"
@@ -487,14 +487,14 @@ FunctorCode FunctorInterface::VisitPageMilestoneEnd(PageMilestoneEnd *pageMilest
     return this->VisitPageElementEnd(pageMilestoneEnd);
 }
 
-FunctorCode FunctorInterface::VisitScore(Score *score)
+FunctorCode FunctorInterface::VisitScoreOrPart(ScoreOrPart *scoreOrPart)
 {
-    return this->VisitPageElement(score);
+    return this->VisitPageElement(scoreOrPart);
 }
 
-FunctorCode FunctorInterface::VisitScoreEnd(Score *score)
+FunctorCode FunctorInterface::VisitScoreOrPartEnd(ScoreOrPart *scoreOrPart)
 {
-    return this->VisitPageElementEnd(score);
+    return this->VisitPageElementEnd(scoreOrPart);
 }
 
 FunctorCode FunctorInterface::VisitAnchoredText(AnchoredText *anchoredText)
@@ -1891,14 +1891,14 @@ FunctorCode ConstFunctorInterface::VisitPageMilestoneEnd(const PageMilestoneEnd 
     return this->VisitPageElementEnd(pageMilestoneEnd);
 }
 
-FunctorCode ConstFunctorInterface::VisitScore(const Score *score)
+FunctorCode ConstFunctorInterface::VisitScoreOrPart(const ScoreOrPart *scoreOrPart)
 {
-    return this->VisitPageElement(score);
+    return this->VisitPageElement(scoreOrPart);
 }
 
-FunctorCode ConstFunctorInterface::VisitScoreEnd(const Score *score)
+FunctorCode ConstFunctorInterface::VisitScoreOrPartEnd(const ScoreOrPart *scoreOrPart)
 {
-    return this->VisitPageElementEnd(score);
+    return this->VisitPageElementEnd(scoreOrPart);
 }
 
 FunctorCode ConstFunctorInterface::VisitAnchoredText(const AnchoredText *anchoredText)

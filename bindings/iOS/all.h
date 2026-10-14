@@ -222,7 +222,7 @@
 #import <VerovioFramework/runtimeclock.h>
 #import <VerovioFramework/savefunctor.h>
 #import <VerovioFramework/sb.h>
-#import <VerovioFramework/score.h>
+#import <VerovioFramework/scoreorpart.h>
 #import <VerovioFramework/scoredef.h>
 #import <VerovioFramework/scoredefinterface.h>
 #import <VerovioFramework/scoringupfunctor.h>

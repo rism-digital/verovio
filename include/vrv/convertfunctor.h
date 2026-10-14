@@ -50,8 +50,8 @@ public:
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitMdiv(Mdiv *mdiv) override;
     FunctorCode VisitMdivEnd(Mdiv *mdiv) override;
-    FunctorCode VisitScore(Score *score) override;
-    FunctorCode VisitScoreEnd(Score *score) override;
+    FunctorCode VisitScoreOrPart(ScoreOrPart *scoreOrPart) override;
+    FunctorCode VisitScoreOrPartEnd(ScoreOrPart *scoreOrPart) override;
     FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
     FunctorCode VisitSection(Section *section) override;
     FunctorCode VisitSectionEnd(Section *section) override;
@@ -204,7 +204,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    ConvertToCmnFunctor(Doc *doc, System *targetSystem, Score *score);
+    ConvertToCmnFunctor(Doc *doc, System *targetSystem, ScoreOrPart *scoreOrPart);
     virtual ~ConvertToCmnFunctor() = default;
     ///@}
 
@@ -297,7 +297,7 @@ public:
     //
 private:
     /** The score with the main scoreDef */
-    Score *m_score;
+    ScoreOrPart *m_score;
     /** The list of segments (i.e., measures) we are going to create */
     std::vector<MeasureInfo> m_measures;
     /** The current segment, reset at for every staff/layer */
@@ -460,7 +460,7 @@ public:
      * Functor interface
      */
     ///@{
-    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitScoreOrPart(ScoreOrPart *scoreOrPart) override;
     FunctorCode VisitScoreDefElement(ScoreDefElement *scoreDefElement) override;
     FunctorCode VisitScoreDefElementEnd(ScoreDefElement *scoreDefElement) override;
     ///@}

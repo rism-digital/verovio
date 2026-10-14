@@ -65,7 +65,7 @@ class Note;
 class Hairpin;
 class MRest;
 class Rest;
-class Score;
+class ScoreOrPart;
 class Section;
 class Space;
 class Staff;
@@ -1033,7 +1033,7 @@ private:
     // m_doc is inherited root document object.
 
     // m_score stores the music
-    Score *m_score = NULL;
+    ScoreOrPart *m_score = NULL;
 
     // m_sections stores segments of the music
     std::vector<Section *> m_sections;

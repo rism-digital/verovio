@@ -26,7 +26,7 @@ class KeySig;
 class Layer;
 class Measure;
 class Note;
-class Score;
+class ScoreOrPart;
 
 namespace cmme {
 
@@ -105,7 +105,7 @@ public:
     //
 private:
     /** The current score (only one) */
-    Score *m_score;
+    ScoreOrPart *m_score;
     /** The current un-measured measure acting a a MEI section */
     Measure *m_currentSection;
     /** The current layer (or container) to which the layer elements have to be added */

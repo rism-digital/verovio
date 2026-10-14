@@ -5,7 +5,7 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "score.h"
+#include "scoreorpart.h"
 
 //----------------------------------------------------------------------------
 
@@ -34,11 +34,15 @@ namespace vrv {
 // Score
 //----------------------------------------------------------------------------
 
-static const ClassRegistrar<Score> s_factory("score", SCORE);
+static const ClassRegistrar<ScoreOrPart> s_factoryScore(
+    "score", FACTORY_SCORE, []() -> Object * { return new ScoreOrPart(SCORE); });
+static const ClassRegistrar<ScoreOrPart> s_factoryPart(
+    "part", FACTORY_PART, []() -> Object * { return new ScoreOrPart(PART); });
 
-Score::Score() : Score(true) {}
+ScoreOrPart::ScoreOrPart(ScoreOrPartType type) : ScoreOrPart(type, true) {}
 
-Score::Score(bool createScoreDef) : PageElement(SCORE), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
+ScoreOrPart::ScoreOrPart(ScoreOrPartType type, bool createScoreDef)
+    : PageElement(SCORE_OR_PART), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
 {
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_NNUMBERLIKE);
@@ -55,12 +59,12 @@ Score::Score(bool createScoreDef) : PageElement(SCORE), PageMilestoneInterface()
     this->Reset();
 }
 
-Score::~Score()
+ScoreOrPart::~ScoreOrPart()
 {
     this->ClearScoreDef();
 }
 
-void Score::ClearScoreDef()
+void ScoreOrPart::ClearScoreDef()
 {
     if (m_scoreDefSubtree) {
         delete m_scoreDefSubtree;
@@ -69,7 +73,7 @@ void Score::ClearScoreDef()
     }
 }
 
-void Score::Reset()
+void ScoreOrPart::Reset()
 {
     Object::Reset();
     PageMilestoneInterface::Reset();
@@ -82,7 +86,7 @@ void Score::Reset()
     m_drawingPgFoot2Height = 0;
 }
 
-bool Score::IsSupportedChild(ClassId classId)
+bool ScoreOrPart::IsSupportedChild(ClassId classId)
 {
     static const std::vector<ClassId> supported{ ENDING, PB, SCOREDEF, SB, SECTION };
 
@@ -97,7 +101,7 @@ bool Score::IsSupportedChild(ClassId classId)
     }
 }
 
-void Score::SetScoreDefSubtree(Object *substree, ScoreDef *scoreScoreDef)
+void ScoreOrPart::SetScoreDefSubtree(Object *substree, ScoreDef *scoreScoreDef)
 {
     this->ClearScoreDef();
 
@@ -105,7 +109,7 @@ void Score::SetScoreDefSubtree(Object *substree, ScoreDef *scoreScoreDef)
     m_scoreDef = scoreScoreDef;
 }
 
-void Score::CalcRunningElementHeight(Doc *doc)
+void ScoreOrPart::CalcRunningElementHeight(Doc *doc)
 {
     assert(doc);
 
@@ -145,7 +149,7 @@ void Score::CalcRunningElementHeight(Doc *doc)
     doc->ResetDataPage();
 }
 
-bool Score::ScoreDefNeedsOptimization(int optionCondense) const
+bool ScoreOrPart::ScoreDefNeedsOptimization(int optionCondense) const
 {
     assert(m_scoreDef);
 
@@ -165,24 +169,24 @@ bool Score::ScoreDefNeedsOptimization(int optionCondense) const
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Score::Accept(Functor &functor)
+FunctorCode ScoreOrPart::Accept(Functor &functor)
 {
-    return functor.VisitScore(this);
+    return functor.VisitScoreOrPart(this);
 }
 
-FunctorCode Score::Accept(ConstFunctor &functor) const
+FunctorCode ScoreOrPart::Accept(ConstFunctor &functor) const
 {
-    return functor.VisitScore(this);
+    return functor.VisitScoreOrPart(this);
 }
 
-FunctorCode Score::AcceptEnd(Functor &functor)
+FunctorCode ScoreOrPart::AcceptEnd(Functor &functor)
 {
-    return functor.VisitScoreEnd(this);
+    return functor.VisitScoreOrPartEnd(this);
 }
 
-FunctorCode Score::AcceptEnd(ConstFunctor &functor) const
+FunctorCode ScoreOrPart::AcceptEnd(ConstFunctor &functor) const
 {
-    return functor.VisitScoreEnd(this);
+    return functor.VisitScoreOrPartEnd(this);
 }
 
 } // namespace vrv

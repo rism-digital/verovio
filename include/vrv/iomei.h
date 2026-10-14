@@ -140,7 +140,7 @@ class Rest;
 class Restore;
 class Refrain;
 class RunningElement;
-class Score;
+class ScoreOrPart;
 class ScoreDef;
 class ScoreDefElement;
 class ScoreDefInterface;
@@ -350,7 +350,7 @@ private:
     ///@{
     void WriteMdiv(pugi::xml_node currentNode, Mdiv *mdiv);
     void WritePages(pugi::xml_node currentNode, Pages *pages);
-    void WriteScore(pugi::xml_node currentNode, Score *score);
+    void WriteScore(pugi::xml_node currentNode, ScoreOrPart *score);
     ///@}
 
     /**
@@ -699,7 +699,9 @@ private:
     ///@{
     bool ReadMdiv(Object *parent, pugi::xml_node parentNode, bool isVisible);
     bool ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool isVisible);
+    bool ReadPart(Object *parent, pugi::xml_node parentNode);
     bool ReadScore(Object *parent, pugi::xml_node parentNode);
+    bool ReadScoreOrPart(Object *parent, pugi::xml_node score, ScoreOrPartType type);
     bool ReadScoreScoreDef(Object *parent, pugi::xml_node parentNode);
     ///@}
 
@@ -974,7 +976,7 @@ private:
      * The data is read into an object, which is then converted to page-based MEI.
      * See MEIInput::ReadDoc, Doc::CreateScoreBuffer and Doc::ConvertToPageBasedDoc
      */
-    bool ReadScoreBasedMei(pugi::xml_node element, Score *parent);
+    bool ReadScoreBasedMei(pugi::xml_node element, ScoreOrPart *parent);
 
     /**
      * @name Various methods for reading / converting values.

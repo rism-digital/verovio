@@ -21,7 +21,7 @@
 #include "mrest.h"
 #include "page.h"
 #include "rest.h"
-#include "score.h"
+#include "scoreorpart.h"
 #include "section.h"
 #include "staff.h"
 #include "syllable.h"
@@ -110,10 +110,10 @@ FunctorCode ConvertToPageBasedFunctor::VisitMdivEnd(Mdiv *mdiv)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ConvertToPageBasedFunctor::VisitScore(Score *score)
+FunctorCode ConvertToPageBasedFunctor::VisitScoreOrPart(ScoreOrPart *scoreOrPart)
 {
     assert(!m_currentSystem);
-    score->MoveItselfTo(m_page);
+    scoreOrPart->MoveItselfTo(m_page);
     System *system = new System();
     m_currentSystem = system;
     m_page->AddChild(system);
@@ -121,9 +121,9 @@ FunctorCode ConvertToPageBasedFunctor::VisitScore(Score *score)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ConvertToPageBasedFunctor::VisitScoreEnd(Score *score)
+FunctorCode ConvertToPageBasedFunctor::VisitScoreOrPartEnd(ScoreOrPart *scoreOrPart)
 {
-    score->ConvertToPageBasedMilestone(score, m_page);
+    scoreOrPart->ConvertToPageBasedMilestone(scoreOrPart, m_page);
     m_currentSystem = NULL;
 
     return FUNCTOR_CONTINUE;
@@ -374,10 +374,10 @@ FunctorCode ConvertToUnCastOffMensuralFunctor::VisitSection(Section *section)
 // ConvertToCmnFunctor
 //----------------------------------------------------------------------------
 
-ConvertToCmnFunctor::ConvertToCmnFunctor(Doc *doc, System *targetSystem, Score *score) : DocFunctor(doc)
+ConvertToCmnFunctor::ConvertToCmnFunctor(Doc *doc, System *targetSystem, ScoreOrPart *scoreOrPart) : DocFunctor(doc)
 {
     m_targetSystem = targetSystem;
-    m_score = score;
+    m_score = scoreOrPart;
     m_currentStaff = NULL;
     m_n = 0;
 }
@@ -1317,10 +1317,10 @@ ConvertMarkupScoreDefFunctor::ConvertMarkupScoreDefFunctor(Doc *doc) : DocFuncto
     m_currentScoreDef = NULL;
 }
 
-FunctorCode ConvertMarkupScoreDefFunctor::VisitScore(Score *score)
+FunctorCode ConvertMarkupScoreDefFunctor::VisitScoreOrPart(ScoreOrPart *scoreOrPart)
 {
     // Evaluate functor on scoreDef
-    score->GetScoreDef()->Process(*this);
+    scoreOrPart->GetScoreDef()->Process(*this);
 
     return FUNCTOR_CONTINUE;
 }

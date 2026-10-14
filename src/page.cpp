@@ -61,7 +61,7 @@
 #include "pgfoot.h"
 #include "pghead.h"
 #include "resetfunctor.h"
-#include "score.h"
+#include "scoreorpart.h"
 #include "staff.h"
 #include "system.h"
 #include "view.h"

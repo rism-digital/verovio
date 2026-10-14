@@ -38,7 +38,7 @@ public:
      */
     bool ImplementsEndInterface() const override { return false; }
 
-    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitScoreOrPart(ScoreOrPart *scoreOrPart) override;
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
     ///@}
@@ -77,7 +77,7 @@ public:
      */
     bool ImplementsEndInterface() const override { return false; }
 
-    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitScoreOrPart(ScoreOrPart *scoreOrPart) override;
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
     ///@}
@@ -118,7 +118,7 @@ public:
      */
     bool ImplementsEndInterface() const override { return false; }
 
-    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitScoreOrPart(ScoreOrPart *scoreOrPart) override;
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
     ///@}
@@ -157,7 +157,7 @@ public:
 
     FunctorCode VisitControlElement(ControlElement *controlElement) override;
     FunctorCode VisitLayerElement(LayerElement *layerElement) override;
-    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitScoreOrPart(ScoreOrPart *scoreOrPart) override;
     FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitStaffDef(StaffDef *staffDef) override;
     ///@}

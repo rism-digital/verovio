@@ -15,7 +15,7 @@ namespace vrv {
 
 class DeviceContext;
 class RunningElement;
-class Score;
+class ScoreOrPart;
 class Staff;
 class System;
 
@@ -205,8 +205,8 @@ public:
      * Set in ScoreDefSetCurrentPageFunctor
      */
     ///@{
-    Score *m_score;
-    Score *m_scoreEnd;
+    ScoreOrPart *m_score;
+    ScoreOrPart *m_scoreEnd;
     ///@}
 
     /**

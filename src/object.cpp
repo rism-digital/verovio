@@ -43,7 +43,7 @@
 #include "plistinterface.h"
 #include "resetfunctor.h"
 #include "savefunctor.h"
-#include "score.h"
+#include "scoreorpart.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "surface.h"
@@ -245,7 +245,7 @@ bool Object::IsMilestoneElement() const
         assert(interface);
         return (interface->IsSystemMilestone());
     }
-    else if (this->Is(MDIV) || this->Is(SCORE)) {
+    else if (this->Is(MDIV) || this->Is(SCORE_OR_PART)) {
         const PageMilestoneInterface *interface = dynamic_cast<const PageMilestoneInterface *>(this);
         assert(interface);
         return (interface->IsPageMilestone());
@@ -260,7 +260,7 @@ Object *Object::GetMilestoneEnd()
         assert(interface);
         return (interface->GetEnd());
     }
-    else if (this->Is(MDIV) || this->Is(SCORE)) {
+    else if (this->Is(MDIV) || this->Is(SCORE_OR_PART)) {
         PageMilestoneInterface *interface = dynamic_cast<PageMilestoneInterface *>(this);
         assert(interface);
         return (interface->GetEnd());

@@ -165,7 +165,7 @@ enum ClassId : uint16_t {
     PAGE_ELEMENT,
     PAGE_MILESTONE_END,
     MDIV,
-    SCORE,
+    SCORE_OR_PART,
     PAGE_ELEMENT_max,
     // Ids for SystemElement child classes
     SYSTEM_ELEMENT,
@@ -288,8 +288,10 @@ enum ClassId : uint16_t {
     SVG_DEVICE_CONTEXT,
     CUSTOM_DEVICE_CONTEXT,
     // Pseudo ids for custom factory functions
+    FACTORY_SCORE,
     FACTORY_STAGEDIR,
     FACTORY_OSTAFF,
+    FACTORY_PART,
     //
     UNSPECIFIED
 };
@@ -596,6 +598,12 @@ enum SMuFLGlyphAnchor {
 //----------------------------------------------------------------------------
 
 enum { SPANNING_START_END = 0, SPANNING_START, SPANNING_END, SPANNING_MIDDLE };
+
+//----------------------------------------------------------------------------
+// Types for scoreOrPart element
+//----------------------------------------------------------------------------
+
+enum ScoreOrPartType : int8_t { SCORE = 0, PART, UNDEFINED_SCORE_OR_PART };
 
 //----------------------------------------------------------------------------
 // Types for layer element

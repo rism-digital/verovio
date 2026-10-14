@@ -49,7 +49,7 @@
 #include "reh.h"
 #include "rend.h"
 #include "repeatmark.h"
-#include "score.h"
+#include "scoreorpart.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"

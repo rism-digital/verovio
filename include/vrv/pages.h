@@ -14,7 +14,7 @@
 namespace vrv {
 
 class Page;
-class Score;
+class ScoreOrPart;
 class System;
 
 //----------------------------------------------------------------------------
@@ -48,7 +48,7 @@ public:
     /**
      *
      */
-    void ConvertFrom(Score *score);
+    void ConvertFrom(ScoreOrPart *scoreOrPart);
 
     /**
      * Refresh the layout of all the child pages.
