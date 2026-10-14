@@ -3176,8 +3176,8 @@ void MusicXmlInput::ReadMusicXmlNote(
             const float alterVal = pitch.child("alter").text().as_float();
             const int octaveNum = pitch.child("octave").text().as_int();
             if (!stepStr.empty()) note->SetPname(ConvertStepToPitchName(stepStr));
-            if (m_octDis[staff->GetN()] != 0) {
-                note->SetOct(octaveNum - m_octDis[staff->GetN()]);
+            if (m_octDis[notationStaffN] != 0) {
+                note->SetOct(octaveNum - m_octDis[notationStaffN]);
                 note->SetOctGes(octaveNum);
             }
             else {
@@ -3428,7 +3428,9 @@ void MusicXmlInput::ReadMusicXmlNote(
             if (!lyric.child("text")) continue;
             Verse *verse = new Verse();
             verse->SetColor(lyric.attribute("color").as_string());
-            // verse->SetPlace(verse->AttPlacementRelStaff::StrToStaffrelBasic(lyric.attribute("placement").as_string()));
+            if (lyric.attribute("placement")) {
+                verse->SetPlace(verse->AttPlacementRelStaff::StrToStaffrel(lyric.attribute("placement").as_string()));
+            }
             verse->SetLabel(lyric.attribute("name").as_string());
             verse->SetN(lyricNumber);
             std::string syllabic = "single";
