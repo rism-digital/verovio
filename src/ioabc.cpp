@@ -40,8 +40,8 @@
 #include "repeatmark.h"
 #include "rest.h"
 #include "sb.h"
+#include "score.h"
 #include "scoredef.h"
-#include "scoreorpart.h"
 #include "section.h"
 #include "slur.h"
 #include "space.h"
@@ -109,7 +109,7 @@ void ABCInput::ParseABC(std::istream &infile)
     m_doc->Reset();
     m_doc->SetType(Raw);
 
-    ScoreOrPart *score = NULL;
+    Score *score = NULL;
     Section *section = NULL;
     this->CreateHeader();
     while (!infile.eof()) {
@@ -855,7 +855,7 @@ void ABCInput::ParseReferenceNumber(const std::string &referenceNumberString)
     m_title.clear();
 }
 
-void ABCInput::PrintInformationFields(ScoreOrPart *score)
+void ABCInput::PrintInformationFields(Score *score)
 {
     PgHead *pgHead = new PgHead();
     pgHead->SetFunc(PGFUNC_first);
@@ -998,7 +998,7 @@ void ABCInput::CreateWorkEntry()
     }
 }
 
-void ABCInput::FlushControlElements(ScoreOrPart *score, Section *section)
+void ABCInput::FlushControlElements(Score *score, Section *section)
 {
     Layer *layer = NULL;
     Measure *measure = NULL;
@@ -1024,11 +1024,11 @@ void ABCInput::FlushControlElements(ScoreOrPart *score, Section *section)
     m_controlElements.clear();
 }
 
-void ABCInput::InitScoreAndSection(ScoreOrPart *&score, Section *&section)
+void ABCInput::InitScoreAndSection(Score *&score, Section *&section)
 {
     // create score
     assert(m_mdiv != NULL);
-    score = new ScoreOrPart(SCORE);
+    score = new Score();
     m_mdiv->AddChild(score);
 
     StaffGrp *staffGrp = new StaffGrp();

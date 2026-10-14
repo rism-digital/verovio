@@ -41,7 +41,7 @@
 #include "proport.h"
 #include "rdg.h"
 #include "rest.h"
-#include "scoreorpart.h"
+#include "score.h"
 #include "section.h"
 #include "space.h"
 #include "staff.h"
@@ -107,7 +107,7 @@ bool CmmeInput::Import(const std::string &cmme)
         mdiv->SetVisibility(Visible);
         m_doc->AddChild(mdiv);
         // The score
-        m_score = new ScoreOrPart(SCORE);
+        m_score = new Score();
         mdiv->AddChild(m_score);
 
         // We asssume that there is always as many Voice elements than given in NumVoices

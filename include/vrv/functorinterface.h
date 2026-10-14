@@ -100,6 +100,7 @@ class Page;
 class PageElement;
 class PageMilestoneEnd;
 class Pages;
+class Part;
 class Parts;
 class Pb;
 class Pedal;
@@ -116,7 +117,8 @@ class Rend;
 class Rest;
 class RunningElement;
 class Sb;
-class ScoreOrPart;
+class Score;
+class ScoreOrPartElement;
 class ScoreDef;
 class ScoreDefElement;
 class Section;
@@ -276,14 +278,18 @@ public:
     ///@{
     virtual FunctorCode VisitMdiv(Mdiv *mdiv);
     virtual FunctorCode VisitMdivEnd(Mdiv *mdiv);
+    virtual FunctorCode VisitPart(Part *part);
+    virtual FunctorCode VisitPartEnd(Part *part);
     virtual FunctorCode VisitParts(Parts *parts);
     virtual FunctorCode VisitPartsEnd(Parts *parts);
+    virtual FunctorCode VisitScore(Score *score);
+    virtual FunctorCode VisitScoreEnd(Score *score);
     virtual FunctorCode VisitPageElement(PageElement *pageElement);
     virtual FunctorCode VisitPageElementEnd(PageElement *pageElement);
     virtual FunctorCode VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd);
     virtual FunctorCode VisitPageMilestoneEnd(PageMilestoneEnd *pageMilestoneEnd);
-    virtual FunctorCode VisitScoreOrPart(ScoreOrPart *scoreOrPart);
-    virtual FunctorCode VisitScoreOrPartEnd(ScoreOrPart *scoreOrPart);
+    virtual FunctorCode VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart);
+    virtual FunctorCode VisitScoreOrPartElementEnd(ScoreOrPartElement *scoreOrPart);
     ///@}
 
     /**
@@ -665,14 +671,18 @@ public:
     ///@{
     virtual FunctorCode VisitMdiv(const Mdiv *mdiv);
     virtual FunctorCode VisitMdivEnd(const Mdiv *mdiv);
+    virtual FunctorCode VisitPart(const Part *part);
+    virtual FunctorCode VisitPartEnd(const Part *part);
     virtual FunctorCode VisitParts(const Parts *parts);
     virtual FunctorCode VisitPartsEnd(const Parts *parts);
+    virtual FunctorCode VisitScore(const Score *score);
+    virtual FunctorCode VisitScoreEnd(const Score *score);
     virtual FunctorCode VisitPageElement(const PageElement *pageElement);
     virtual FunctorCode VisitPageElementEnd(const PageElement *pageElement);
     virtual FunctorCode VisitPageMilestone(const PageMilestoneEnd *pageMilestoneEnd);
     virtual FunctorCode VisitPageMilestoneEnd(const PageMilestoneEnd *pageMilestoneEnd);
-    virtual FunctorCode VisitScoreOrPart(const ScoreOrPart *scoreOrPart);
-    virtual FunctorCode VisitScoreOrPartEnd(const ScoreOrPart *scoreOrPart);
+    virtual FunctorCode VisitScoreOrPartElement(const ScoreOrPartElement *scoreOrPart);
+    virtual FunctorCode VisitScoreOrPartElementEnd(const ScoreOrPartElement *scoreOrPart);
     ///@}
 
     /**

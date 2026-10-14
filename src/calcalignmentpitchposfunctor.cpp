@@ -16,7 +16,7 @@
 #include "mrest.h"
 #include "nc.h"
 #include "rest.h"
-#include "scoreorpart.h"
+#include "scoreorpartelement.h"
 #include "staff.h"
 #include "tabgrp.h"
 #include "tuning.h"
@@ -351,7 +351,7 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayer(Layer *layer)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode CalcAlignmentPitchPosFunctor::VisitScoreOrPart(ScoreOrPart *scoreOrPart)
+FunctorCode CalcAlignmentPitchPosFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     ScoreDef *scoreDef = scoreOrPart->GetScoreDef();
     if (scoreDef) {

@@ -194,6 +194,8 @@
 #import <VerovioFramework/pageelement.h>
 #import <VerovioFramework/pagemilestone.h>
 #import <VerovioFramework/pages.h>
+#import <VerovioFramework/part.h>
+#import <VerovioFramework/parts.h>
 #import <VerovioFramework/pb.h>
 #import <VerovioFramework/pedal.h>
 #import <VerovioFramework/pgfoot.h>
@@ -222,9 +224,10 @@
 #import <VerovioFramework/runtimeclock.h>
 #import <VerovioFramework/savefunctor.h>
 #import <VerovioFramework/sb.h>
-#import <VerovioFramework/scoreorpart.h>
+#import <VerovioFramework/score.h>
 #import <VerovioFramework/scoredef.h>
 #import <VerovioFramework/scoredefinterface.h>
+#import <VerovioFramework/scoreorpartelement.h>
 #import <VerovioFramework/scoringupfunctor.h>
 #import <VerovioFramework/section.h>
 #import <VerovioFramework/setscoredeffunctor.h>

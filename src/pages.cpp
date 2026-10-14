@@ -16,7 +16,7 @@
 #include "doc.h"
 #include "functor.h"
 #include "page.h"
-#include "scoreorpart.h"
+#include "scoreorpartelement.h"
 #include "staff.h"
 #include "system.h"
 #include "vrv.h"
@@ -56,7 +56,7 @@ bool Pages::IsSupportedChild(ClassId classId)
     }
 }
 
-void Pages::ConvertFrom(ScoreOrPart *scoreOrPart)
+void Pages::ConvertFrom(ScoreOrPartElement *scoreOrPart)
 {
     scoreOrPart->SwapID(this);
     this->AttLabelled::operator=(*scoreOrPart);

@@ -86,6 +86,7 @@
 #include "page.h"
 #include "pagemilestone.h"
 #include "pages.h"
+#include "part.h"
 #include "parts.h"
 #include "pb.h"
 #include "pedal.h"
@@ -101,8 +102,9 @@
 #include "repeatmark.h"
 #include "rest.h"
 #include "sb.h"
+#include "score.h"
 #include "scoredef.h"
-#include "scoreorpart.h"
+#include "scoreorpartelement.h"
 #include "section.h"
 #include "slur.h"
 #include "space.h"
@@ -468,6 +470,16 @@ FunctorCode FunctorInterface::VisitMdivEnd(Mdiv *mdiv)
     return this->VisitPageElementEnd(mdiv);
 }
 
+FunctorCode FunctorInterface::VisitPart(Part *part)
+{
+    return this->VisitScoreOrPartElement(part);
+}
+
+FunctorCode FunctorInterface::VisitPartEnd(Part *part)
+{
+    return this->VisitScoreOrPartElementEnd(part);
+}
+
 FunctorCode FunctorInterface::VisitParts(Parts *parts)
 {
     return this->VisitPageElement(parts);
@@ -476,6 +488,16 @@ FunctorCode FunctorInterface::VisitParts(Parts *parts)
 FunctorCode FunctorInterface::VisitPartsEnd(Parts *parts)
 {
     return this->VisitPageElementEnd(parts);
+}
+
+FunctorCode FunctorInterface::VisitScore(Score *score)
+{
+    return this->VisitScoreOrPartElement(score);
+}
+
+FunctorCode FunctorInterface::VisitScoreEnd(Score *score)
+{
+    return this->VisitScoreOrPartElementEnd(score);
 }
 
 FunctorCode FunctorInterface::VisitPageElement(PageElement *pageElement)
@@ -498,12 +520,12 @@ FunctorCode FunctorInterface::VisitPageMilestoneEnd(PageMilestoneEnd *pageMilest
     return this->VisitPageElementEnd(pageMilestoneEnd);
 }
 
-FunctorCode FunctorInterface::VisitScoreOrPart(ScoreOrPart *scoreOrPart)
+FunctorCode FunctorInterface::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     return this->VisitPageElement(scoreOrPart);
 }
 
-FunctorCode FunctorInterface::VisitScoreOrPartEnd(ScoreOrPart *scoreOrPart)
+FunctorCode FunctorInterface::VisitScoreOrPartElementEnd(ScoreOrPartElement *scoreOrPart)
 {
     return this->VisitPageElementEnd(scoreOrPart);
 }
@@ -1882,6 +1904,16 @@ FunctorCode ConstFunctorInterface::VisitMdivEnd(const Mdiv *mdiv)
     return this->VisitPageElementEnd(mdiv);
 }
 
+FunctorCode ConstFunctorInterface::VisitPart(const Part *part)
+{
+    return this->VisitScoreOrPartElement(part);
+}
+
+FunctorCode ConstFunctorInterface::VisitPartEnd(const Part *part)
+{
+    return this->VisitScoreOrPartElementEnd(part);
+}
+
 FunctorCode ConstFunctorInterface::VisitParts(const Parts *parts)
 {
     return this->VisitPageElement(parts);
@@ -1890,6 +1922,16 @@ FunctorCode ConstFunctorInterface::VisitParts(const Parts *parts)
 FunctorCode ConstFunctorInterface::VisitPartsEnd(const Parts *parts)
 {
     return this->VisitPageElementEnd(parts);
+}
+
+FunctorCode ConstFunctorInterface::VisitScore(const Score *score)
+{
+    return this->VisitScoreOrPartElement(score);
+}
+
+FunctorCode ConstFunctorInterface::VisitScoreEnd(const Score *score)
+{
+    return this->VisitScoreOrPartElementEnd(score);
 }
 
 FunctorCode ConstFunctorInterface::VisitPageElement(const PageElement *pageElement)
@@ -1912,12 +1954,12 @@ FunctorCode ConstFunctorInterface::VisitPageMilestoneEnd(const PageMilestoneEnd 
     return this->VisitPageElementEnd(pageMilestoneEnd);
 }
 
-FunctorCode ConstFunctorInterface::VisitScoreOrPart(const ScoreOrPart *scoreOrPart)
+FunctorCode ConstFunctorInterface::VisitScoreOrPartElement(const ScoreOrPartElement *scoreOrPart)
 {
     return this->VisitPageElement(scoreOrPart);
 }
 
-FunctorCode ConstFunctorInterface::VisitScoreOrPartEnd(const ScoreOrPart *scoreOrPart)
+FunctorCode ConstFunctorInterface::VisitScoreOrPartElementEnd(const ScoreOrPartElement *scoreOrPart)
 {
     return this->VisitPageElementEnd(scoreOrPart);
 }

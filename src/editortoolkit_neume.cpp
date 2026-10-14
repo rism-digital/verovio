@@ -33,7 +33,7 @@
 #include "quilisma.h"
 #include "rend.h"
 #include "sb.h"
-#include "scoreorpart.h"
+#include "scoreorpartelement.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "surface.h"
@@ -878,7 +878,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         newSystem->AddChild(newMeasure);
         newSystem->SetDrawingScoreDef(vrv_cast<ScoreDef *>(m_doc->GetCorrespondingScoreOrPart(page)->GetScoreDef()));
 
-        page->InsertAfter(page->GetFirst(SCORE_OR_PART), newSystem);
+        page->InsertAfter(page->GetFirst(SCORE), newSystem);
 
         this->SortStaves();
 

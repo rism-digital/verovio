@@ -129,7 +129,7 @@ public:
     FunctorCode VisitPageEnd(Page *page) override;
     FunctorCode VisitPageElement(PageElement *pageElement) override;
     FunctorCode VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd) override;
-    FunctorCode VisitScoreOrPart(ScoreOrPart *scoreOrPart) override;
+    FunctorCode VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart) override;
     FunctorCode VisitSystem(System *system) override;
     ///@}
 
@@ -257,7 +257,7 @@ public:
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitPageElement(PageElement *pageElement) override;
     FunctorCode VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd) override;
-    FunctorCode VisitScoreOrPart(ScoreOrPart *scoreOrPart) override;
+    FunctorCode VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart) override;
     FunctorCode VisitSystem(System *system) override;
     ///@}
 

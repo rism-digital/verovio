@@ -14,7 +14,7 @@
 #include "ossia.h"
 #include "page.h"
 #include "pages.h"
-#include "scoreorpart.h"
+#include "scoreorpartelement.h"
 #include "staff.h"
 #include "system.h"
 #include "tuning.h"
@@ -79,7 +79,7 @@ FunctorCode ScoreDefSetCurrentPageFunctor::VisitPageEnd(Page *page)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ScoreDefSetCurrentPageFunctor::VisitScoreOrPart(ScoreOrPart *scoreOrPart)
+FunctorCode ScoreDefSetCurrentPageFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     m_scores.push_back(scoreOrPart);
 
@@ -257,7 +257,7 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitProport(Proport *proport)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ScoreDefSetCurrentFunctor::VisitScoreOrPart(ScoreOrPart *scoreOrPart)
+FunctorCode ScoreDefSetCurrentFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     m_currentScore = scoreOrPart;
     m_upcomingScoreDef = *scoreOrPart->GetScoreDef();
@@ -407,7 +407,7 @@ FunctorCode ScoreDefOptimizeFunctor::VisitMeasure(Measure *measure)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ScoreDefOptimizeFunctor::VisitScoreOrPart(ScoreOrPart *scoreOrPart)
+FunctorCode ScoreDefOptimizeFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     m_currentScoreDef = NULL;
     m_encoded = false;

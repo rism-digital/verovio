@@ -13,7 +13,7 @@
 #include "layer.h"
 #include "mdiv.h"
 #include "rest.h"
-#include "scoreorpart.h"
+#include "scoreorpartelement.h"
 #include "staff.h"
 #include "transposition.h"
 #include "vrv.h"
@@ -173,7 +173,7 @@ FunctorCode TransposeFunctor::VisitRest(Rest *rest)
     return FUNCTOR_SIBLINGS;
 }
 
-FunctorCode TransposeFunctor::VisitScoreOrPart(ScoreOrPart *scoreOrPart)
+FunctorCode TransposeFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     ScoreDef *scoreDef = scoreOrPart->GetScoreDef();
     assert(scoreDef);
@@ -288,7 +288,7 @@ FunctorCode TransposeSelectedMdivFunctor::VisitPageMilestone(PageMilestoneEnd *p
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode TransposeSelectedMdivFunctor::VisitScoreOrPart(ScoreOrPart *scoreOrPart)
+FunctorCode TransposeSelectedMdivFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     // Check whether we are in the selected mdiv
     if (!m_selectedMdivID.empty()
@@ -296,7 +296,7 @@ FunctorCode TransposeSelectedMdivFunctor::VisitScoreOrPart(ScoreOrPart *scoreOrP
         return FUNCTOR_CONTINUE;
     }
 
-    return TransposeFunctor::VisitScoreOrPart(scoreOrPart);
+    return TransposeFunctor::VisitScoreOrPartElement(scoreOrPart);
 }
 
 FunctorCode TransposeSelectedMdivFunctor::VisitSystem(System *system)
@@ -328,7 +328,7 @@ FunctorCode TransposeToSoundingPitchFunctor::VisitMdiv(Mdiv *mdiv)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode TransposeToSoundingPitchFunctor::VisitScoreOrPart(ScoreOrPart *scoreOrPart)
+FunctorCode TransposeToSoundingPitchFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     // Evaluate functor on scoreDef
     scoreOrPart->GetScoreDef()->Process(*this);

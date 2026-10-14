@@ -23,7 +23,7 @@
 #include "note.h"
 #include "rest.h"
 #include "scoredef.h"
-#include "scoreorpart.h"
+#include "scoreorpartelement.h"
 #include "staff.h"
 #include "tie.h"
 #include "tuplet.h"
@@ -536,7 +536,7 @@ bool EditorToolkitCMN::InsertScoreDef(std::string &elementId, bool insertBefore)
         return false;
     }
 
-    ScoreOrPart *scoreOrPart = m_doc->GetFirstVisibleScoreOrPart();
+    ScoreOrPartElement *scoreOrPart = m_doc->GetFirstVisibleScoreOrPart();
     ScoreDef *scoreDef = (scoreOrPart) ? scoreOrPart->GetScoreDef() : NULL;
     if (!scoreDef) return false;
 

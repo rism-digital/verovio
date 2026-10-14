@@ -27,7 +27,7 @@ class FontInfo;
 class Glyph;
 class Pages;
 class Page;
-class ScoreOrPart;
+class ScoreOrPartElement;
 
 enum DocType { Raw = 0, Rendering, Transcription, Facs };
 
@@ -169,19 +169,21 @@ public:
      * Lazily updates the visible scores or parts, hence not const
      */
     ///@{
-    std::list<ScoreOrPart *> GetVisibleScoresOrParts();
-    ScoreOrPart *GetFirstVisibleScoreOrPart();
+    std::list<ScoreOrPartElement *> GetVisibleScoresOrParts();
+    ScoreOrPartElement *GetFirstVisibleScoreOrPart();
     ///@}
 
     /**
      * Get the corresponding score for a node
      */
     ///@{
-    ScoreOrPart *GetCorrespondingScoreOrPart(const Object *object);
-    const ScoreOrPart *GetCorrespondingScoreOrPart(const Object *object) const;
+    ScoreOrPartElement *GetCorrespondingScoreOrPart(const Object *object);
+    const ScoreOrPartElement *GetCorrespondingScoreOrPart(const Object *object) const;
     // Generic version that does not necessarily rely on precalculated visible scores
-    ScoreOrPart *GetCorrespondingScoreOrPart(const Object *object, const std::list<ScoreOrPart *> &scores);
-    const ScoreOrPart *GetCorrespondingScoreOrPart(const Object *object, const std::list<ScoreOrPart *> &scores) const;
+    ScoreOrPartElement *GetCorrespondingScoreOrPart(
+        const Object *object, const std::list<ScoreOrPartElement *> &scores);
+    const ScoreOrPartElement *GetCorrespondingScoreOrPart(
+        const Object *object, const std::list<ScoreOrPartElement *> &scores) const;
     ///@}
 
     /**
@@ -674,7 +676,7 @@ private:
      * The list of all visible scores
      * Used in Doc::GetCorrespondingScoreOrPart to quickly determine the score for an object
      */
-    std::list<ScoreOrPart *> m_visibleScoresOrParts;
+    std::list<ScoreOrPartElement *> m_visibleScoresOrParts;
 
     /**
      * A flag indicating if the document has been cast off or not.

@@ -22,7 +22,7 @@
 #include "measure.h"
 #include "plistinterface.h"
 #include "rdg.h"
-#include "scoreorpart.h"
+#include "scoreorpartelement.h"
 #include "section.h"
 #include "timeinterface.h"
 #include "vrv.h"
@@ -364,7 +364,7 @@ void ExpansionMap::ToJson(std::string &output)
     output = expansionmap.json();
 }
 
-void ExpansionMap::GenerateExpansionFor(ScoreOrPart *scoreOrPart)
+void ExpansionMap::GenerateExpansionFor(ScoreOrPartElement *scoreOrPart)
 {
     m_isProcessed = true;
 

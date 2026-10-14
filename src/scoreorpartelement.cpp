@@ -5,7 +5,7 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "scoreorpart.h"
+#include "scoreorpartelement.h"
 
 //----------------------------------------------------------------------------
 
@@ -34,15 +34,10 @@ namespace vrv {
 // Score
 //----------------------------------------------------------------------------
 
-static const ClassRegistrar<ScoreOrPart> s_factoryScore(
-    "score", FACTORY_SCORE, []() -> Object * { return new ScoreOrPart(SCORE); });
-static const ClassRegistrar<ScoreOrPart> s_factoryPart(
-    "part", FACTORY_PART, []() -> Object * { return new ScoreOrPart(PART); });
+ScoreOrPartElement::ScoreOrPartElement(ClassId classId) : ScoreOrPartElement(classId, true) {}
 
-ScoreOrPart::ScoreOrPart(ScoreOrPartType type) : ScoreOrPart(type, true) {}
-
-ScoreOrPart::ScoreOrPart(ScoreOrPartType type, bool createScoreDef)
-    : PageElement(SCORE_OR_PART), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
+ScoreOrPartElement::ScoreOrPartElement(ClassId classId, bool createScoreDef)
+    : PageElement(classId), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
 {
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_NNUMBERLIKE);
@@ -59,12 +54,12 @@ ScoreOrPart::ScoreOrPart(ScoreOrPartType type, bool createScoreDef)
     this->Reset();
 }
 
-ScoreOrPart::~ScoreOrPart()
+ScoreOrPartElement::~ScoreOrPartElement()
 {
     this->ClearScoreDef();
 }
 
-void ScoreOrPart::ClearScoreDef()
+void ScoreOrPartElement::ClearScoreDef()
 {
     if (m_scoreDefSubtree) {
         delete m_scoreDefSubtree;
@@ -73,7 +68,7 @@ void ScoreOrPart::ClearScoreDef()
     }
 }
 
-void ScoreOrPart::Reset()
+void ScoreOrPartElement::Reset()
 {
     Object::Reset();
     PageMilestoneInterface::Reset();
@@ -86,7 +81,7 @@ void ScoreOrPart::Reset()
     m_drawingPgFoot2Height = 0;
 }
 
-bool ScoreOrPart::IsSupportedChild(ClassId classId)
+bool ScoreOrPartElement::IsSupportedChild(ClassId classId)
 {
     static const std::vector<ClassId> supported{ ENDING, PB, SCOREDEF, SB, SECTION };
 
@@ -101,7 +96,7 @@ bool ScoreOrPart::IsSupportedChild(ClassId classId)
     }
 }
 
-void ScoreOrPart::SetScoreDefSubtree(Object *substree, ScoreDef *scoreScoreDef)
+void ScoreOrPartElement::SetScoreDefSubtree(Object *substree, ScoreDef *scoreScoreDef)
 {
     this->ClearScoreDef();
 
@@ -109,7 +104,7 @@ void ScoreOrPart::SetScoreDefSubtree(Object *substree, ScoreDef *scoreScoreDef)
     m_scoreDef = scoreScoreDef;
 }
 
-void ScoreOrPart::CalcRunningElementHeight(Doc *doc)
+void ScoreOrPartElement::CalcRunningElementHeight(Doc *doc)
 {
     assert(doc);
 
@@ -149,7 +144,7 @@ void ScoreOrPart::CalcRunningElementHeight(Doc *doc)
     doc->ResetDataPage();
 }
 
-bool ScoreOrPart::ScoreDefNeedsOptimization(int optionCondense) const
+bool ScoreOrPartElement::ScoreDefNeedsOptimization(int optionCondense) const
 {
     assert(m_scoreDef);
 
@@ -169,24 +164,24 @@ bool ScoreOrPart::ScoreDefNeedsOptimization(int optionCondense) const
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode ScoreOrPart::Accept(Functor &functor)
+FunctorCode ScoreOrPartElement::Accept(Functor &functor)
 {
-    return functor.VisitScoreOrPart(this);
+    return functor.VisitScoreOrPartElement(this);
 }
 
-FunctorCode ScoreOrPart::Accept(ConstFunctor &functor) const
+FunctorCode ScoreOrPartElement::Accept(ConstFunctor &functor) const
 {
-    return functor.VisitScoreOrPart(this);
+    return functor.VisitScoreOrPartElement(this);
 }
 
-FunctorCode ScoreOrPart::AcceptEnd(Functor &functor)
+FunctorCode ScoreOrPartElement::AcceptEnd(Functor &functor)
 {
-    return functor.VisitScoreOrPartEnd(this);
+    return functor.VisitScoreOrPartElementEnd(this);
 }
 
-FunctorCode ScoreOrPart::AcceptEnd(ConstFunctor &functor) const
+FunctorCode ScoreOrPartElement::AcceptEnd(ConstFunctor &functor) const
 {
-    return functor.VisitScoreOrPartEnd(this);
+    return functor.VisitScoreOrPartElementEnd(this);
 }
 
 } // namespace vrv

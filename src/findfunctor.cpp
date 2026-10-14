@@ -14,7 +14,7 @@
 #include "object.h"
 #include "plistinterface.h"
 #include "scoredef.h"
-#include "scoreorpart.h"
+#include "scoreorpartelement.h"
 #include "surface.h"
 #include "symboldef.h"
 #include "system.h"
@@ -450,7 +450,7 @@ FunctorCode FindElementInLayerStaffDefFunctor::VisitLayer(const Layer *layer)
     return m_element ? FUNCTOR_STOP : FUNCTOR_SIBLINGS;
 }
 
-FunctorCode FindElementInLayerStaffDefFunctor::VisitScoreOrPart(const ScoreOrPart *scoreOrPart)
+FunctorCode FindElementInLayerStaffDefFunctor::VisitScoreOrPartElement(const ScoreOrPartElement *scoreOrPart)
 {
     assert(scoreOrPart->GetScoreDef());
 

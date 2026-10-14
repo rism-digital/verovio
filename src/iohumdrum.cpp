@@ -106,7 +106,7 @@ using namespace std;
 #include "rend.h"
 #include "rest.h"
 #include "sb.h"
-#include "scoreorpart.h"
+#include "score.h"
 #include "section.h"
 #include "slur.h"
 #include "space.h"
@@ -30825,7 +30825,7 @@ void HumdrumInput::setupMeiDocument()
     mdiv->SetVisibility(Visible);
     m_doc->AddChild(mdiv);
     // The score
-    m_score = new ScoreOrPart(SCORE);
+    m_score = new Score();
     mdiv->AddChild(m_score);
     // the section
     Section *section = new Section();

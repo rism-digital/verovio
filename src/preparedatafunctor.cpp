@@ -33,7 +33,7 @@
 #include "repeatmark.h"
 #include "rest.h"
 #include "runningelement.h"
-#include "scoreorpart.h"
+#include "scoreorpartelement.h"
 #include "section.h"
 #include "space.h"
 #include "staff.h"
@@ -153,7 +153,7 @@ FunctorCode PrepareDataInitializationFunctor::VisitRepeatMark(RepeatMark *repeat
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode PrepareDataInitializationFunctor::VisitScoreOrPart(ScoreOrPart *scoreOrPart)
+FunctorCode PrepareDataInitializationFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     // Call parent one too
     this->VisitPageElement(scoreOrPart);
@@ -415,8 +415,8 @@ PrepareAltSymFunctor::PrepareAltSymFunctor() : Functor()
 
 FunctorCode PrepareAltSymFunctor::VisitObject(Object *object)
 {
-    if (object->Is(SCORE_OR_PART)) {
-        ScoreOrPart *scoreOrPart = vrv_cast<ScoreOrPart *>(object);
+    if (object->IsScoreOrPartElement()) {
+        ScoreOrPartElement *scoreOrPart = vrv_cast<ScoreOrPartElement *>(object);
         assert(scoreOrPart);
         assert(scoreOrPart->GetScoreDef());
         m_symbolTable = vrv_cast<SymbolTable *>(scoreOrPart->GetScoreDef()->FindDescendantByType(SYMBOLTABLE));
@@ -624,7 +624,7 @@ FunctorCode PrepareDurationFunctor::VisitLayerElement(LayerElement *layerElement
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode PrepareDurationFunctor::VisitScoreOrPart(ScoreOrPart *scoreOrPart)
+FunctorCode PrepareDurationFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     ScoreDef *scoreDef = scoreOrPart->GetScoreDef();
     if (scoreDef) {

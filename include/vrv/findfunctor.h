@@ -522,7 +522,7 @@ public:
      */
     ///@{
     FunctorCode VisitLayer(const Layer *layer) override;
-    FunctorCode VisitScoreOrPart(const ScoreOrPart *scoreOrPart) override;
+    FunctorCode VisitScoreOrPartElement(const ScoreOrPartElement *scoreOrPart) override;
     FunctorCode VisitSystem(const System *system) override;
     ///@}
 

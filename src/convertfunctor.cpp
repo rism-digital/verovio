@@ -20,8 +20,9 @@
 #include "mdiv.h"
 #include "mrest.h"
 #include "page.h"
+#include "parts.h"
 #include "rest.h"
-#include "scoreorpart.h"
+#include "scoreorpartelement.h"
 #include "section.h"
 #include "staff.h"
 #include "syllable.h"
@@ -110,7 +111,22 @@ FunctorCode ConvertToPageBasedFunctor::VisitMdivEnd(Mdiv *mdiv)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ConvertToPageBasedFunctor::VisitScoreOrPart(ScoreOrPart *scoreOrPart)
+FunctorCode ConvertToPageBasedFunctor::VisitParts(Parts *parts)
+{
+    parts->MoveItselfTo(m_page);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToPageBasedFunctor::VisitPartsEnd(Parts *parts)
+{
+    parts->ConvertToPageBasedMilestone(parts, m_page);
+
+    return FUNCTOR_CONTINUE;
+    
+}
+
+FunctorCode ConvertToPageBasedFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     assert(!m_currentSystem);
     scoreOrPart->MoveItselfTo(m_page);
@@ -121,7 +137,7 @@ FunctorCode ConvertToPageBasedFunctor::VisitScoreOrPart(ScoreOrPart *scoreOrPart
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ConvertToPageBasedFunctor::VisitScoreOrPartEnd(ScoreOrPart *scoreOrPart)
+FunctorCode ConvertToPageBasedFunctor::VisitScoreOrPartElementEnd(ScoreOrPartElement *scoreOrPart)
 {
     scoreOrPart->ConvertToPageBasedMilestone(scoreOrPart, m_page);
     m_currentSystem = NULL;
@@ -374,7 +390,8 @@ FunctorCode ConvertToUnCastOffMensuralFunctor::VisitSection(Section *section)
 // ConvertToCmnFunctor
 //----------------------------------------------------------------------------
 
-ConvertToCmnFunctor::ConvertToCmnFunctor(Doc *doc, System *targetSystem, ScoreOrPart *scoreOrPart) : DocFunctor(doc)
+ConvertToCmnFunctor::ConvertToCmnFunctor(Doc *doc, System *targetSystem, ScoreOrPartElement *scoreOrPart)
+    : DocFunctor(doc)
 {
     m_targetSystem = targetSystem;
     m_score = scoreOrPart;
@@ -1317,7 +1334,7 @@ ConvertMarkupScoreDefFunctor::ConvertMarkupScoreDefFunctor(Doc *doc) : DocFuncto
     m_currentScoreDef = NULL;
 }
 
-FunctorCode ConvertMarkupScoreDefFunctor::VisitScoreOrPart(ScoreOrPart *scoreOrPart)
+FunctorCode ConvertMarkupScoreDefFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     // Evaluate functor on scoreDef
     scoreOrPart->GetScoreDef()->Process(*this);

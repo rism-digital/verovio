@@ -39,7 +39,7 @@
 #include "options.h"
 #include "page.h"
 #include "runtimeclock.h"
-#include "scoreorpart.h"
+#include "scoreorpartelement.h"
 #include "slur.h"
 #include "staff.h"
 #include "svgdevicecontext.h"

@@ -17,7 +17,7 @@
 #include "iomei.h"
 #include "page.h"
 #include "pages.h"
-#include "scoreorpart.h"
+#include "scoreorpartelement.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -28,7 +28,7 @@ namespace vrv {
 
 static const ClassRegistrar<Parts> s_factory("parts", PARTS);
 
-Parts::Parts() : PageElement(MDIV), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
+Parts::Parts() : PageElement(PARTS), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
 {
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_NNUMBERLIKE);
@@ -48,7 +48,7 @@ void Parts::Reset()
 
 bool Parts::IsSupportedChild(ClassId classId)
 {
-    static const std::vector<ClassId> supported{ SCORE_OR_PART };
+    static const std::vector<ClassId> supported{ PART };
 
     if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
         return true;

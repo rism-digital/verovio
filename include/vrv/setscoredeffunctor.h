@@ -88,7 +88,7 @@ public:
      */
     ///@{
     FunctorCode VisitPageEnd(Page *page) override;
-    FunctorCode VisitScoreOrPart(ScoreOrPart *scoreOrPart) override;
+    FunctorCode VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart) override;
     ///@}
 
 protected:
@@ -99,7 +99,7 @@ public:
     //
 private:
     // The list of all scores
-    std::list<ScoreOrPart *> m_scores;
+    std::list<ScoreOrPartElement *> m_scores;
 };
 
 //----------------------------------------------------------------------------
@@ -143,7 +143,7 @@ public:
     FunctorCode VisitOssia(Ossia *ossia) override;
     FunctorCode VisitPage(Page *page) override;
     FunctorCode VisitProport(Proport *proport) override;
-    FunctorCode VisitScoreOrPart(ScoreOrPart *scoreOrPart) override;
+    FunctorCode VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart) override;
     FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
     FunctorCode VisitScoreDefEnd(ScoreDef *scoreDef) override;
     FunctorCode VisitStaff(Staff *staff) override;
@@ -161,7 +161,7 @@ public:
     //
 private:
     // The current score
-    ScoreOrPart *m_currentScore;
+    ScoreOrPartElement *m_currentScore;
     // The current scoreDef
     ScoreDef *m_currentScoreDef;
     // The current staffDef
@@ -214,7 +214,7 @@ public:
      */
     ///@{
     FunctorCode VisitMeasure(Measure *measure) override;
-    FunctorCode VisitScoreOrPart(ScoreOrPart *scoreOrPart) override;
+    FunctorCode VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart) override;
     FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitStaffGrpEnd(StaffGrp *staffGrp) override;
     FunctorCode VisitSystem(System *system) override;

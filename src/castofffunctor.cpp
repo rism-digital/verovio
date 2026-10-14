@@ -19,7 +19,7 @@
 #include "pages.h"
 #include "pb.h"
 #include "sb.h"
-#include "scoreorpart.h"
+#include "scoreorpartelement.h"
 #include "staff.h"
 #include "system.h"
 
@@ -328,7 +328,7 @@ FunctorCode CastOffPagesFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilest
     return FUNCTOR_SIBLINGS;
 }
 
-FunctorCode CastOffPagesFunctor::VisitScoreOrPart(ScoreOrPart *scoreOrPart)
+FunctorCode CastOffPagesFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     this->VisitPageElement(scoreOrPart);
 
@@ -452,7 +452,7 @@ FunctorCode CastOffEncodingFunctor::VisitPageElement(PageElement *pageElement)
 
 FunctorCode CastOffEncodingFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
 {
-    if (pageMilestoneEnd->GetStart() && pageMilestoneEnd->GetStart()->Is(SCORE_OR_PART)) {
+    if (pageMilestoneEnd->GetStart() && pageMilestoneEnd->GetStart()->IsScoreOrPartElement()) {
         // This is the end of a score, which means that the current system has to be added
         // to the current page
         assert(m_currentSystem);
@@ -578,7 +578,7 @@ FunctorCode UnCastOffFunctor::VisitPageElement(PageElement *pageElement)
 
 FunctorCode UnCastOffFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
 {
-    if (pageMilestoneEnd->GetStart() && pageMilestoneEnd->GetStart()->Is(SCORE_OR_PART)) {
+    if (pageMilestoneEnd->GetStart() && pageMilestoneEnd->GetStart()->IsScoreOrPartElement()) {
         // This is the end of a score, which means that nothing else should be added to
         // the current system and we set it to NULL;
         assert(m_currentSystem);
@@ -590,7 +590,7 @@ FunctorCode UnCastOffFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestone
     return FUNCTOR_SIBLINGS;
 }
 
-FunctorCode UnCastOffFunctor::VisitScoreOrPart(ScoreOrPart *scoreOrPart)
+FunctorCode UnCastOffFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     this->VisitPageElement(scoreOrPart);
 

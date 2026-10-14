@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        scoreorpart.h
+// Name:        scoreorpartelement.h
 // Author:      Laurent Pugin
 // Created:     29/08/2016
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_SCOREORPART_H__
-#define __VRV_SCOREORPART_H__
+#ifndef __VRV_SCOREORPARTELEMENT_H__
+#define __VRV_SCOREORPARTELEMENT_H__
 
 #include "atts_shared.h"
 #include "options.h"
@@ -27,7 +27,10 @@ class SymbolDef;
  * It is used only for loading score-based MEI documents before they are
  * converted to page-based MEI.
  */
-class ScoreOrPart : public PageElement, public PageMilestoneInterface, public AttLabelled, public AttNNumberLike {
+class ScoreOrPartElement : public PageElement,
+                           public PageMilestoneInterface,
+                           public AttLabelled,
+                           public AttNNumberLike {
 
 public:
     /**
@@ -35,9 +38,9 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    ScoreOrPart(ScoreOrPartType type);
-    ScoreOrPart(ScoreOrPartType type, bool createScoreDef);
-    virtual ~ScoreOrPart();
+    ScoreOrPartElement(ClassId classId);
+    ScoreOrPartElement(ClassId classId, bool createScoreDef);
+    virtual ~ScoreOrPartElement();
     void Reset() override;
     std::string GetClassName() const override { return "score"; }
     ///@}
@@ -98,9 +101,6 @@ private:
      * The subtree is owned by the Score object. The m_scoreDef member is expected to be part of the subtree.
      */
     Object *m_scoreDefSubtree;
-
-    /** The type of scoreOrPart set in the constructor */
-    ScoreOrPartType m_type;
 
 public:
     /**

@@ -31,7 +31,7 @@ class Mdiv;
 class Measure;
 class MeterSig;
 class Note;
-class ScoreOrPart;
+class Score;
 class Section;
 class Slur;
 class Staff;
@@ -89,11 +89,11 @@ private:
     void AddRepeatMark(LayerElement *element);
 
     // additional functions
-    void PrintInformationFields(ScoreOrPart *score);
+    void PrintInformationFields(Score *score);
     void CreateHeader();
     void CreateWorkEntry();
-    void FlushControlElements(ScoreOrPart *score, Section *section);
-    void InitScoreAndSection(ScoreOrPart *&score, Section *&section);
+    void FlushControlElements(Score *score, Section *section);
+    void InitScoreAndSection(Score *&score, Section *&section);
 
 #endif // NO_ABC_SUPPORT
 

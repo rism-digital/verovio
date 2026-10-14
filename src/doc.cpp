@@ -54,7 +54,7 @@
 #include "preparedatafunctor.h"
 #include "resetfunctor.h"
 #include "runningelement.h"
-#include "scoreorpart.h"
+#include "score.h"
 #include "scoringupfunctor.h"
 #include "setscoredeffunctor.h"
 #include "slur.h"
@@ -245,7 +245,7 @@ bool Doc::GenerateDocumentScoreDef()
 
 void Doc::GenerateFooter()
 {
-    for (ScoreOrPart *scoreOrPart : this->GetVisibleScoresOrParts()) {
+    for (ScoreOrPartElement *scoreOrPart : this->GetVisibleScoresOrParts()) {
         ScoreDef *scoreDef = scoreOrPart->GetScoreDef();
         assert(scoreDef);
         if (scoreDef->FindDescendantByType(PGFOOT)) continue;
@@ -269,7 +269,7 @@ void Doc::GenerateFooter()
 
 void Doc::GenerateHeader()
 {
-    for (ScoreOrPart *scoreOrPart : this->GetVisibleScoresOrParts()) {
+    for (ScoreOrPartElement *scoreOrPart : this->GetVisibleScoresOrParts()) {
         ScoreDef *scoreDef = scoreOrPart->GetScoreDef();
         assert(scoreDef);
         if (scoreDef->FindDescendantByType(PGHEAD)) continue;
@@ -986,7 +986,7 @@ void Doc::PrepareData()
         }
     }
 
-    for (ScoreOrPart *scoreOrPart : this->GetVisibleScoresOrParts()) {
+    for (ScoreOrPartElement *scoreOrPart : this->GetVisibleScoresOrParts()) {
         ScoreDefSetGrpSymFunctor scoreDefSetGrpSym;
         assert(scoreOrPart->GetScoreDef());
         scoreOrPart->GetScoreDef()->Process(scoreDefSetGrpSym);
@@ -1066,7 +1066,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
         return;
     }
 
-    std::list<ScoreOrPart *> scores = this->GetVisibleScoresOrParts();
+    std::list<ScoreOrPartElement *> scores = this->GetVisibleScoresOrParts();
     assert(!scores.empty());
 
     if (m_focusStatus == FOCUS_USED) {
@@ -1121,7 +1121,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     this->SetDrawingPage(0);
 
     bool optimize = false;
-    for (ScoreOrPart *scoreOrPart : scores) {
+    for (ScoreOrPartElement *scoreOrPart : scores) {
         if (scoreOrPart->ScoreDefNeedsOptimization(m_options->m_condense.GetValue())) {
             optimize = true;
             break;
@@ -1144,7 +1144,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     assert(castOffSinglePage && !castOffSinglePage->GetParent());
     this->ResetDataPage();
 
-    for (ScoreOrPart *scoreOrPart : scores) {
+    for (ScoreOrPartElement *scoreOrPart : scores) {
         scoreOrPart->CalcRunningElementHeight(this);
     }
 
@@ -1229,7 +1229,7 @@ void Doc::CastOffEncodingDoc()
     this->ScoreDefSetCurrentDoc(true);
 
     // Optimize the doc if one of the score requires optimization
-    for (ScoreOrPart *scoreOrPart : this->GetVisibleScoresOrParts()) {
+    for (ScoreOrPartElement *scoreOrPart : this->GetVisibleScoresOrParts()) {
         if (scoreOrPart->ScoreDefNeedsOptimization(m_options->m_condense.GetValue())) {
             this->ScoreDefOptimizeDoc();
             break;
@@ -1324,7 +1324,9 @@ void Doc::DeactiveateSelection()
     Page *selectionPage = vrv_cast<Page *>(pages->GetChild(0));
     assert(selectionPage);
     // We need to delete the selection scoreDef
-    ScoreOrPart *selectionScore = vrv_cast<ScoreOrPart *>(selectionPage->FindDescendantByType(SCORE_OR_PART));
+    ClassIdsComparison matchType({ PART, SCORE });
+    ScoreOrPartElement *selectionScore
+        = vrv_cast<ScoreOrPartElement *>(selectionPage->FindDescendantByComparison(&matchType));
     assert(selectionScore);
     if (selectionScore->GetLabel() != "[selectionScore]") LogError("Deleting wrong score element. Something is wrong");
     selectionPage->DeleteChild(selectionScore);
@@ -1347,7 +1349,7 @@ void Doc::ReactivateSelection(bool resetAligners)
     Page *selectionPage = vrv_cast<Page *>(pages->GetChild(1));
     System *system = vrv_cast<System *>(selectionPage->FindDescendantByType(SYSTEM));
     // Add a selection scoreDef based on the current drawing system scoreDef
-    ScoreOrPart *selectionScore = new ScoreOrPart(UNDEFINED_SCORE_OR_PART);
+    Score *selectionScore = new Score();
     selectionScore->GetScoreDef()->ReplaceWithCopyOf(system->GetDrawingScoreDef());
     selectionScore->SetLabel("[selectionScore]");
     // Use the drawing values as actual scoreDef
@@ -1475,7 +1477,9 @@ void Doc::ConvertToCmnDoc()
     contentPage->LayOutHorizontally();
 
     ListOfObjects systems = contentPage->FindAllDescendantsByType(SYSTEM, false, 1);
-    ListOfObjects scores = contentPage->FindAllDescendantsByType(SCORE_OR_PART, false, 1);
+    ClassIdsComparison matchType({ PART, SCORE });
+    ListOfObjects scores;
+    contentPage->FindAllDescendantsByComparison(&scores, &matchType, 1);
     assert(systems.size() == scores.size());
 
     ListOfObjects::iterator systemsIt = systems.begin();
@@ -1483,7 +1487,7 @@ void Doc::ConvertToCmnDoc()
     for (; systemsIt != systems.end(); ++systemsIt, ++scoresIt) {
         System *system = vrv_cast<System *>(*systemsIt);
         assert(system);
-        ScoreOrPart *scoreOrPart = vrv_cast<ScoreOrPart *>(*scoresIt);
+        ScoreOrPartElement *scoreOrPart = vrv_cast<ScoreOrPartElement *>(*scoresIt);
         assert(scoreOrPart);
         System *convertedSystem = new System();
         ConvertToCmnFunctor convertToCmn(this, convertedSystem, scoreOrPart);
@@ -1681,9 +1685,11 @@ void Doc::ExpandExpansions()
 
     // We have no --expand xmlid, so generate an expansion or use the first one (generation will be skipped)
     if (!expandSelected) {
-        ListOfObjects scores = this->FindAllDescendantsByType(SCORE_OR_PART);
+        ClassIdsComparison matchType({ PART, SCORE });
+        ListOfObjects scores;
+        this->FindAllDescendantsByComparison(&scores, &matchType);
         for (Object *object : scores) {
-            ScoreOrPart *scoreOrPart = vrv_cast<ScoreOrPart *>(object);
+            ScoreOrPartElement *scoreOrPart = vrv_cast<ScoreOrPartElement *>(object);
             assert(scoreOrPart);
             // Do not generate an expansion if there is already one
             if (!scoreOrPart->FindDescendantByType(EXPANSION)) {
@@ -1759,12 +1765,14 @@ ScoreDef *Doc::GetFirstScoreDef()
 
 const ScoreDef *Doc::GetFirstScoreDef() const
 {
-    const ScoreOrPart *scoreOrPart = vrv_cast<const ScoreOrPart *>(this->FindDescendantByType(SCORE_OR_PART, 3));
+    ClassIdsComparison matchType({ PART, SCORE });
+    const ScoreOrPartElement *scoreOrPart
+        = vrv_cast<const ScoreOrPartElement *>(this->FindDescendantByComparison(&matchType, 3));
 
     return scoreOrPart ? scoreOrPart->GetScoreDef() : NULL;
 }
 
-std::list<ScoreOrPart *> Doc::GetVisibleScoresOrParts()
+std::list<ScoreOrPartElement *> Doc::GetVisibleScoresOrParts()
 {
     if (m_visibleScoresOrParts.empty()) {
         this->CollectVisibleScoresOrParts();
@@ -1775,7 +1783,7 @@ std::list<ScoreOrPart *> Doc::GetVisibleScoresOrParts()
     return m_visibleScoresOrParts;
 }
 
-ScoreOrPart *Doc::GetFirstVisibleScoreOrPart()
+ScoreOrPartElement *Doc::GetFirstVisibleScoreOrPart()
 {
     if (m_visibleScoresOrParts.empty()) {
         this->CollectVisibleScoresOrParts();
@@ -1786,27 +1794,29 @@ ScoreOrPart *Doc::GetFirstVisibleScoreOrPart()
     return m_visibleScoresOrParts.front();
 }
 
-ScoreOrPart *Doc::GetCorrespondingScoreOrPart(const Object *object)
+ScoreOrPartElement *Doc::GetCorrespondingScoreOrPart(const Object *object)
 {
-    return const_cast<ScoreOrPart *>(std::as_const(*this).GetCorrespondingScoreOrPart(object));
+    return const_cast<ScoreOrPartElement *>(std::as_const(*this).GetCorrespondingScoreOrPart(object));
 }
 
-const ScoreOrPart *Doc::GetCorrespondingScoreOrPart(const Object *object) const
+const ScoreOrPartElement *Doc::GetCorrespondingScoreOrPart(const Object *object) const
 {
     return this->GetCorrespondingScoreOrPart(object, m_visibleScoresOrParts);
 }
 
-ScoreOrPart *Doc::GetCorrespondingScoreOrPart(const Object *object, const std::list<ScoreOrPart *> &scores)
+ScoreOrPartElement *Doc::GetCorrespondingScoreOrPart(
+    const Object *object, const std::list<ScoreOrPartElement *> &scores)
 {
-    return const_cast<ScoreOrPart *>(std::as_const(*this).GetCorrespondingScoreOrPart(object, scores));
+    return const_cast<ScoreOrPartElement *>(std::as_const(*this).GetCorrespondingScoreOrPart(object, scores));
 }
 
-const ScoreOrPart *Doc::GetCorrespondingScoreOrPart(const Object *object, const std::list<ScoreOrPart *> &scores) const
+const ScoreOrPartElement *Doc::GetCorrespondingScoreOrPart(
+    const Object *object, const std::list<ScoreOrPartElement *> &scores) const
 {
     assert(!scores.empty());
 
-    const ScoreOrPart *correspondingScore = scores.front();
-    for (ScoreOrPart *scoreOrPart : scores) {
+    const ScoreOrPartElement *correspondingScore = scores.front();
+    for (ScoreOrPartElement *scoreOrPart : scores) {
         if ((scoreOrPart == object) || Object::IsPreOrdered(scoreOrPart, object)) {
             correspondingScore = scoreOrPart;
         }
@@ -1849,9 +1859,11 @@ void Doc::CollectReferringObjects(const Object *element, std::set<std::string> &
 void Doc::CollectVisibleScoresOrParts()
 {
     m_visibleScoresOrParts.clear();
-    ListOfObjects objects = this->FindAllDescendantsByType(SCORE_OR_PART, false, 3);
+    ClassIdsComparison matchType({ PART, SCORE });
+    ListOfObjects objects;
+    this->FindAllDescendantsByComparison(&objects, &matchType, 3);
     for (Object *object : objects) {
-        ScoreOrPart *scoreOrPart = vrv_cast<ScoreOrPart *>(object);
+        ScoreOrPartElement *scoreOrPart = vrv_cast<ScoreOrPartElement *>(object);
         assert(scoreOrPart);
         // Visible scores have milestone end
         if (scoreOrPart->GetMilestoneEnd()) {

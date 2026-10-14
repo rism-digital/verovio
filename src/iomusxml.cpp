@@ -69,7 +69,7 @@
 #include "repeatmark.h"
 #include "rest.h"
 #include "sb.h"
-#include "scoreorpart.h"
+#include "score.h"
 #include "section.h"
 #include "slur.h"
 #include "smufl.h"
@@ -920,7 +920,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     mdiv->SetVisibility(Visible);
     m_doc->AddChild(mdiv);
     // the score
-    ScoreOrPart *score = new ScoreOrPart(SCORE);
+    Score *score = new Score();
     mdiv->AddChild(score);
     // the section
     Section *section = new Section();
