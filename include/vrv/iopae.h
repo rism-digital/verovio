@@ -690,7 +690,7 @@ private:
     void ClearTokenObjects();
 
 public:
-    static const std::map<int, std::string> s_errCodes;
+    static const std::map<int, std::format_string<std::string>> s_errCodes;
 
 private:
     /**

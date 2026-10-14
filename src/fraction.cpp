@@ -113,7 +113,7 @@ double Fraction::ToDouble() const
 
 std::string Fraction::ToString() const
 {
-    return StringFormat("%d/%d", m_numerator, m_denominator);
+    return StringFormat("{}/{}", m_numerator, m_denominator);
 }
 
 void Fraction::Reduce()

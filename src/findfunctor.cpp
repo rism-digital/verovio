@@ -488,7 +488,7 @@ AddToFlatListFunctor::AddToFlatListFunctor(ListOfConstObjects *flatList) : Const
 FunctorCode AddToFlatListFunctor::VisitObject(const Object *object)
 {
     m_flatList->push_back(object);
-    // LogDebug("List %d", m_flatList->size());
+    // LogDebug("List {}", m_flatList->size());
 
     return FUNCTOR_CONTINUE;
 }

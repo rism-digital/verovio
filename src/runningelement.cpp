@@ -132,7 +132,7 @@ void RunningElement::SetCurrentPageNum(const Page *currentPage)
     Text *currentText = num->GetCurrentText();
     assert(currentText);
 
-    currentText->SetText(UTF8to32(StringFormat("%d", currentNum)));
+    currentText->SetText(UTF8to32(StringFormat("{}", currentNum)));
 }
 
 void RunningElement::LoadFooter(const Doc *doc)

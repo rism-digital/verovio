@@ -213,7 +213,7 @@ FunctorCode TransposeFunctor::VisitScore(Score *score)
         m_transposer->SetTransposition(fifths, m_transposition);
     }
     else {
-        LogWarning("Transposition is invalid: %s", m_transposition.c_str());
+        LogWarning("Transposition is invalid: {}", m_transposition);
         // there is no transposition that can be done so do not try
         // to transpose any further (if continuing in this function,
         // there will not be an error, just that the transposition

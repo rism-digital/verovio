@@ -126,7 +126,7 @@ void DocSelection::Set(Doc *doc)
         ListOfObjects measures = doc->FindAllDescendantsByType(MEASURE, false);
 
         if (measures.empty()) {
-            LogWarning("No measure found for selection '%s'.", m_measureRange.c_str());
+            LogWarning("No measure found for selection '{}'.", m_measureRange);
             return;
         }
 
@@ -139,7 +139,7 @@ void DocSelection::Set(Doc *doc)
             selectionStartId = (*it)->GetID();
         }
         else {
-            LogWarning("Measure range start for selection '%s' could not be found.", m_measureRange.c_str());
+            LogWarning("Measure range start for selection '{}' could not be found.", m_measureRange);
             return;
         }
 
@@ -152,7 +152,7 @@ void DocSelection::Set(Doc *doc)
             selectionEndId = (*it)->GetID();
         }
         else {
-            LogWarning("Measure range end for selection '%s' could not be found.", m_measureRange.c_str());
+            LogWarning("Measure range end for selection '{}' could not be found.", m_measureRange);
             return;
         }
         doc->m_selectionStart = selectionStartId;

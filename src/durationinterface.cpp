@@ -88,7 +88,7 @@ Fraction DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase) 
         Fraction durationReduction(duration.GetNumerator(), duration.GetDenominator() * pow(2, noteDots));
         duration = duration * 2 - durationReduction;
     }
-    // LogDebug("Duration %d; Dot %d; Alignment %f", noteDur, this->GetDots(), duration);
+    // LogDebug("Duration {}; Dot {}; Alignment {}", noteDur, this->GetDots(), duration);
     return duration;
 }
 

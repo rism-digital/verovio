@@ -141,9 +141,9 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayerElement(LayerElement *layerElement
         }
         double realTimeIncrementSeconds = incrementScoreTime.ToDouble() * 60.0 / m_currentTempo;
 
-        // LogDebug("Note Alignment Duration %f - Dur %d - Diatonic Pitch %d - Track %d", GetAlignmentDuration(),
+        // LogDebug("Note Alignment Duration {} - Dur {} - Diatonic Pitch {} - Track {}", GetAlignmentDuration(),
         // note->GetNoteOrChordDur(element), note->GetDiatonicPitch(), *midiTrack);
-        // LogDebug("Oct %d - Pname %d - Accid %d", note->GetOct(), note->GetPname(), note->GetAccid());
+        // LogDebug("Oct {} - Pname {} - Accid {}", note->GetOct(), note->GetPname(), note->GetAccid());
 
         // When we have a @sameas, do store the onset / offset values of the pointed note in the pointing note
         Note *storeNote = (layerElement == element) ? note : dynamic_cast<Note *>(layerElement);
@@ -656,7 +656,7 @@ FunctorCode GenerateMIDIFunctor::VisitBeatRpt(const BeatRpt *beatRpt)
     }
 
     for (int i = 0; i < beatLength * tpq; ++i) {
-        // LogWarning("%i", i);
+        // LogWarning("{}", i);
         // smf::MidiEvent event = m_midiFile->getEvent(m_midiTrack, startTime * tpq);
         // event.clearVariables();
     }

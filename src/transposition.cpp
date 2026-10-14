@@ -188,7 +188,7 @@ data_ACCIDENTAL_GESTURAL_basic TransPitch::GetAccidGesBasic() const
         case 3: return ACCIDENTAL_GESTURAL_basic_ts;
         default: break;
     }
-    LogWarning("Transposition: Could not get Gestural Basic Accidental for %i", m_accid);
+    LogWarning("Transposition: Could not get Gestural Basic Accidental for {}", m_accid);
     return ACCIDENTAL_GESTURAL_basic_NONE;
 }
 
@@ -204,7 +204,7 @@ data_ACCIDENTAL_GESTURAL TransPitch::GetAccidGes() const
         case 3: return ACCIDENTAL_GESTURAL_ts;
         default: break;
     }
-    LogWarning("Transposition: Could not get Gestural Accidental for %i", m_accid);
+    LogWarning("Transposition: Could not get Gestural Accidental for {}", m_accid);
     return ACCIDENTAL_GESTURAL_NONE;
 }
 
@@ -220,7 +220,7 @@ data_ACCIDENTAL_WRITTEN TransPitch::GetAccidWritten() const
         case 3: return ACCIDENTAL_WRITTEN_xs;
         default: break;
     }
-    LogWarning("Transposition: Could not get Written Accidental for %i", m_accid);
+    LogWarning("Transposition: Could not get Written Accidental for {}", m_accid);
     return ACCIDENTAL_WRITTEN_NONE;
 }
 
@@ -238,7 +238,7 @@ std::u32string TransPitch::GetPitchString() const
         case 0: return std::u32string({ pitchLetter });
         case 1: return std::u32string({ pitchLetter, UNICODE_SHARP });
         case 2: return std::u32string({ pitchLetter, UNICODE_DOUBLE_SHARP });
-        default: LogError("Transposition: Could not get Accidental for %i", m_accid);
+        default: LogError("Transposition: Could not get Accidental for {}", m_accid);
     }
     return U"";
 }
@@ -254,7 +254,7 @@ std::string TransPitch::GetSimplePitchString() const
         case 0: return letter;
         case 1: return letter + "-sharp";
         case 2: return letter + "-double-sharp";
-        default: LogError("Transposition: Could not get Accidental for %i", m_accid);
+        default: LogError("Transposition: Could not get Accidental for {}", m_accid);
     }
     return "";
 }
@@ -799,7 +799,7 @@ bool Transposer::GetKeyTonic(const std::string &keyTonic, TransPitch &tonic)
                     case 'a': pitch = 5; break;
                     case 'B':
                     case 'b': pitch = 6; break;
-                    default: LogWarning("Invalid keytonic pitch character: %c", keyTonic[i]); return false;
+                    default: LogWarning("Invalid keytonic pitch character: {}", keyTonic[i]); return false;
                 }
                 break;
             case 2:
@@ -810,7 +810,7 @@ bool Transposer::GetKeyTonic(const std::string &keyTonic, TransPitch &tonic)
                     case 'S':
                     case 's':
                     case '#': accid++; break;
-                    default: LogWarning("Invalid keytonic accid character: %c", keyTonic[i]); return false;
+                    default: LogWarning("Invalid keytonic accid character: {}", keyTonic[i]); return false;
                 }
                 break;
         }
@@ -889,18 +889,18 @@ int Transposer::GetInterval(const std::string &intervalName)
     }
 
     if (quality.empty()) {
-        LogError("Interval name requires a chromatic quality: %s", intervalName.c_str());
+        LogError("Interval name requires a chromatic quality: {}", intervalName);
         return INVALID_INTERVAL_CLASS;
     }
 
     if (number.empty()) {
-        LogError("Interval name requires a diatonic interval number: %s", intervalName.c_str());
+        LogError("Interval name requires a diatonic interval number: {}", intervalName);
         return INVALID_INTERVAL_CLASS;
     }
 
     int dnum = stoi(number);
     if (dnum == 0) {
-        LogError("Integer interval number cannot be zero: %s", intervalName.c_str());
+        LogError("Integer interval number cannot be zero: {}", intervalName);
         return INVALID_INTERVAL_CLASS;
     }
     dnum--;
@@ -920,7 +920,7 @@ int Transposer::GetInterval(const std::string &intervalName)
                 adjust = -(int)quality.size();
             }
             else if (quality != "P") {
-                LogError("Error in interval quality: %s", intervalName.c_str());
+                LogError("Error in interval quality: {}", intervalName);
                 return INVALID_INTERVAL_CLASS;
             }
             break;
@@ -940,7 +940,7 @@ int Transposer::GetInterval(const std::string &intervalName)
                 adjust = -(int)quality.size();
             }
             else {
-                LogError("Error in interval quality: %s", intervalName.c_str());
+                LogError("Error in interval quality: {}", intervalName);
                 return INVALID_INTERVAL_CLASS;
             }
             break;
@@ -960,7 +960,7 @@ int Transposer::GetInterval(const std::string &intervalName)
                 adjust = -(int)quality.size();
             }
             else {
-                LogError("Error in interval quality: %s", intervalName.c_str());
+                LogError("Error in interval quality: {}", intervalName);
                 return INVALID_INTERVAL_CLASS;
             }
             break;
@@ -973,7 +973,7 @@ int Transposer::GetInterval(const std::string &intervalName)
                 adjust = -(int)quality.size();
             }
             else if (quality != "P") {
-                LogError("Error in interval quality: %s", intervalName.c_str());
+                LogError("Error in interval quality: {}", intervalName);
                 return INVALID_INTERVAL_CLASS;
             }
             break;
@@ -986,7 +986,7 @@ int Transposer::GetInterval(const std::string &intervalName)
                 adjust = -(int)quality.size();
             }
             else if (quality != "P") {
-                LogError("Error in interval quality: %s", intervalName.c_str());
+                LogError("Error in interval quality: {}", intervalName);
                 return INVALID_INTERVAL_CLASS;
             }
             break;
@@ -1006,7 +1006,7 @@ int Transposer::GetInterval(const std::string &intervalName)
                 adjust = -(int)quality.size();
             }
             else {
-                LogError("Error in interval quality: %s", intervalName.c_str());
+                LogError("Error in interval quality: {}", intervalName);
                 return INVALID_INTERVAL_CLASS;
             }
             break;
@@ -1026,7 +1026,7 @@ int Transposer::GetInterval(const std::string &intervalName)
                 adjust = -(int)quality.size();
             }
             else {
-                LogError("Error in interval quality: %s", intervalName.c_str());
+                LogError("Error in interval quality: {}", intervalName);
                 return INVALID_INTERVAL_CLASS;
             }
             break;
@@ -1848,14 +1848,14 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
     }
 
     if (quality.empty()) {
-        LogError("Interval requires a chromatic quality: %s", intervalName.c_str());
+        LogError("Interval requires a chromatic quality: {}", intervalName);
         chromatic = INVALID_INTERVAL_CLASS;
         diatonic = INVALID_INTERVAL_CLASS;
         return;
     }
 
     if (number.empty()) {
-        LogError("Interval requires a diatonic interval number: %s", intervalName.c_str());
+        LogError("Interval requires a diatonic interval number: {}", intervalName);
         chromatic = INVALID_INTERVAL_CLASS;
         diatonic = INVALID_INTERVAL_CLASS;
         return;
@@ -1863,7 +1863,7 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
 
     int dnum = stoi(number);
     if (dnum == 0) {
-        LogError("Integer interval number cannot be zero: %s", intervalName.c_str());
+        LogError("Integer interval number cannot be zero: {}", intervalName);
         chromatic = INVALID_INTERVAL_CLASS;
         diatonic = INVALID_INTERVAL_CLASS;
         return;
@@ -1887,7 +1887,7 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
                 chromatic = 0;
             }
             else {
-                LogError("Error in Interval quality: %s", intervalName.c_str());
+                LogError("Error in Interval quality: {}", intervalName);
                 chromatic = INVALID_INTERVAL_CLASS;
                 diatonic = INVALID_INTERVAL_CLASS;
                 return;
@@ -1907,7 +1907,7 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
                 chromatic = 1 - (int)quality.size();
             }
             else {
-                LogError("Error in Interval quality: %s", intervalName.c_str());
+                LogError("Error in Interval quality: {}", intervalName);
                 chromatic = INVALID_INTERVAL_CLASS;
                 diatonic = INVALID_INTERVAL_CLASS;
                 return;
@@ -1927,7 +1927,7 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
                 chromatic = 3 - (int)quality.size();
             }
             else {
-                LogError("Error in Interval quality: %s", intervalName.c_str());
+                LogError("Error in Interval quality: {}", intervalName);
                 chromatic = INVALID_INTERVAL_CLASS;
                 diatonic = INVALID_INTERVAL_CLASS;
                 return;
@@ -1944,7 +1944,7 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
                 chromatic = 5;
             }
             else {
-                LogError("Error in Interval quality: %s", intervalName.c_str());
+                LogError("Error in Interval quality: {}", intervalName);
                 chromatic = INVALID_INTERVAL_CLASS;
                 diatonic = INVALID_INTERVAL_CLASS;
                 return;
@@ -1961,7 +1961,7 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
                 chromatic = 7;
             }
             else {
-                LogError("Error in Interval quality: %s", intervalName.c_str());
+                LogError("Error in Interval quality: {}", intervalName);
                 chromatic = INVALID_INTERVAL_CLASS;
                 diatonic = INVALID_INTERVAL_CLASS;
                 return;
@@ -1981,7 +1981,7 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
                 chromatic = 8 - (int)quality.size();
             }
             else {
-                LogError("Error in Interval quality: %s", intervalName.c_str());
+                LogError("Error in Interval quality: {}", intervalName);
                 chromatic = INVALID_INTERVAL_CLASS;
                 diatonic = INVALID_INTERVAL_CLASS;
                 return;
@@ -2001,7 +2001,7 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
                 chromatic = 10 - (int)quality.size();
             }
             else {
-                LogError("Error in Interval quality: %s", intervalName.c_str());
+                LogError("Error in Interval quality: {}", intervalName);
                 chromatic = INVALID_INTERVAL_CLASS;
                 diatonic = INVALID_INTERVAL_CLASS;
                 return;

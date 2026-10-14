@@ -11,11 +11,11 @@
 
 #include <cassert>
 #include <cctype>
+#include <format>
 #include <fstream>
 #include <regex>
 #include <sstream>
 #include <string>
-
 //----------------------------------------------------------------------------
 
 #include "beam.h"
@@ -335,7 +335,7 @@ void PAEOutput::WriteClef(Clef *clef)
         }
     }
     std::string sign = (m_mensural) ? "+" : "-";
-    std::string line = StringFormat("%d", clef->GetLine());
+    std::string line = StringFormat("{}", clef->GetLine());
 
     m_streamStringOutput << outStart << shape << sign << line << outEnd;
 }
@@ -394,10 +394,10 @@ void PAEOutput::WriteMeterSig(MeterSig *meterSig)
         sig = (meterSig->GetSym() == METERSIGN_common) ? "c" : "c/";
     }
     else if (meterSig->GetForm() == METERFORM_num) {
-        sig = StringFormat("%d", meterSig->GetTotalCount());
+        sig = StringFormat("{}", meterSig->GetTotalCount());
     }
     else if (meterSig->HasCount() && meterSig->GetUnit()) {
-        sig = StringFormat("%d/%d", meterSig->GetTotalCount(), meterSig->GetUnit());
+        sig = StringFormat("{}/{}", meterSig->GetTotalCount(), meterSig->GetUnit());
     }
 
     m_streamStringOutput << outStart << sig << outEnd;
@@ -771,7 +771,7 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
             strcpy(incipit, data_value);
         }
         else {
-            LogWarning("Unknown row '%s' in incipit data", data_line);
+            LogWarning("Unknown row '{}' in incipit data", data_line);
         }
     }
 
@@ -1463,7 +1463,7 @@ int PAEInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
             meter->SetUnit(2);
         }
         else {
-            LogWarning("Plaine & Easie import: unsupported time signature: %s", timesig_str);
+            LogWarning("Plaine & Easie import: unsupported time signature: {}", timesig_str);
         }
     }
     else {
@@ -1501,7 +1501,7 @@ int PAEInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
             }
         }
         else {
-            LogWarning("Plaine & Easie import: unsupported time signature: %s", timesig_str);
+            LogWarning("Plaine & Easie import: unsupported time signature: {}", timesig_str);
         }
     }
 
@@ -1554,7 +1554,7 @@ int PAEInput::getClefInfo(const char *incipit, Clef *mclef, int index)
         mclef->SetDisPlace(STAFFREL_basic_below);
     }
     else {
-        LogDebug("Plaine & Easie import: undefined clef %c", clef);
+        LogDebug("Plaine & Easie import: undefined clef {}", clef);
     }
 
     // measure->clef = mclef;
@@ -2313,7 +2313,7 @@ enum {
 };
 
 // clang-format off
-const std::map<int, std::string> PAEInput::s_errCodes{
+const std::map<int, std::format_string<std::string>> PAEInput::s_errCodes{
     { ERR_001_EMPTY, "The input is empty." },
     { ERR_002_JSON_PARSE, "The JSON input cannot be parsed." },
     { ERR_003_JSON_KEY, "There is no 'data' key in the JSON input." },
@@ -2336,9 +2336,9 @@ const std::map<int, std::string> PAEInput::s_errCodes{
     { ERR_020_CHORD_NOTE_BEFORE, "To indicate a chord, a '^' must be preceded by a note." },
     { ERR_021_CHORD_NOTE_AFTER, "To indicate a chord, a '^' must be followed by a note." },
     { ERR_022_BEAM_MENSURAL, "Beams cannot be used with mensural notation." },
-    { ERR_023_BEAM_NESTED, "A beam cannot be started with '{' before closing the previous one." },
-    { ERR_024_BEAM_CLOSING, "An extra '}' to close a beam is present." },
-    { ERR_025_BEAM_OPEN, "The beam must be closed with '}' before the end of the measure." },
+    { ERR_023_BEAM_NESTED, "A beam cannot be started with '{{' before closing the previous one." },
+    { ERR_024_BEAM_CLOSING, "An extra '}}' to close a beam is present." },
+    { ERR_025_BEAM_OPEN, "The beam must be closed with '}}' before the end of the measure." },
     { ERR_026_GRACE_NESTED, "The appoggiatura must be closed with 'r' before starting a new one." },
     { ERR_027_GRACE_CLOSING, "An extra 'r' is present to close an appoggiatura" },
     { ERR_028_GRACE_OPEN, "The appoggiatura must be closed with 'r' before the end of the measure." },
@@ -2353,25 +2353,25 @@ const std::map<int, std::string> PAEInput::s_errCodes{
     { ERR_037_TIE_PITCH, "A tie using '+' can only connect two notes of the same octave and pitch." },
     { ERR_038_TIE_OPEN, "A tie using '+' must be follow by a note." },
     { ERR_039_TIE_NO_NOTE, "A tie using '+' must be preceded by a note." },
-    { ERR_040_HIERARCHY_INVALID, "The resulting hierachy of elements for '%s' is invalid." },
-    { ERR_041_NESTING_INVALID, "The nesting of opening and closing tags for '%s' is invalid." },
+    { ERR_040_HIERARCHY_INVALID, "The resulting hierachy of elements for '{}' is invalid." },
+    { ERR_041_NESTING_INVALID, "The nesting of opening and closing tags for '{}' is invalid." },
     { ERR_042_CLEF_INCOMPLETE, "The clef is not complete (Setting to G-2 if running in non-pedantic mode)." },
     { ERR_043_CLEF_INVALID_2ND, "The second character in the clef sign must be either '+' or '-'." },
     { ERR_044_CLEF_MENS, "Mensural and non-mensural clefs cannot be mixed." },
     { ERR_045_CLEF_INVALID_3RD, "The third character in the clef sign must be a digit." },
-    { ERR_046_CLEF_INVALID, "The clef '%s' is invalid." },
+    { ERR_046_CLEF_INVALID, "The clef '{}' is invalid." },
     { ERR_047_TIMESIG_INCOMPLETE, "The time signature cannot be parsed (Setting to 4/4 if running in non-pedantic mode)." },
-    { ERR_048_TIMESIG_INVALID, "The time signature '%s' is invalid." },
+    { ERR_048_TIMESIG_INVALID, "The time signature '{}' is invalid." },
     { ERR_049_TIMESIG_MENS, "The mensur sign content cannot be parsed (Setting to 'O' if running in non-pedantic mode)." },
-    { ERR_050_INVALID_CHAR, "The input contains one or more character(s) '%s'." },
-    { ERR_051_BARLINE, "The barline '%s' is invalid." },
+    { ERR_050_INVALID_CHAR, "The input contains one or more character(s) '{}'." },
+    { ERR_051_BARLINE, "The barline '{}' is invalid." },
     { ERR_052_DURATION, "The duration content cannot be parsed (Setting to quarter note if running in non-pedantic mode)." },
     { ERR_053_DURATION_MENS3, "The duration cannot be '3' with mensural notation." },
     { ERR_054_DURATION_MENS5, "The duration cannot be '5' with mensural notation." },
     { ERR_055_KEYSIG_CHANGE, "The key signature cannot be changed more than once in a measure." },
     { ERR_056_TIMESIG_CHANGE, "The time signature cannot be changed more than once in a measure." },
     { ERR_057_MENSUR_CHANGE, "The mensur sign cannot be changed more than once in a measure." },
-    { ERR_058_FERMATA_MREST, "A fermata on measure rest with extra '%s' is invalid." },
+    { ERR_058_FERMATA_MREST, "A fermata on measure rest with extra '{}' is invalid." },
     { ERR_059_DOUBLE_DOTS_MENS, "Double-dotted notes are invalid with mensural notation." },
     { ERR_060_CLEF_MISSING, "A clef is required." },
     { ERR_061_LIGATURE_NOTE_BEFORE, "To indicate a ligature, a '+' must be preceded by a note." },
@@ -2496,7 +2496,7 @@ void PAEInput::ClearTokenObjects()
     // Normally, they should be none because they are passed to the doc.
     for (pae::Token &token : m_pae) {
         if (!token.m_object || token.IsContainerEnd()) continue;
-        LogDebug("Delete token %s", token.m_object->GetClassName().c_str());
+        LogDebug("Delete token {}", token.m_object->GetClassName());
         delete token.m_object;
         token.m_object = NULL;
     }
@@ -2515,7 +2515,7 @@ jsonxx::Object PAEInput::GetValidationLog()
     if (!m_clefLog.empty()) log << "clef" << m_clefLog;
     if (!m_timesigLog.empty()) log << "timesig" << m_timesigLog;
     if (!m_dataLog.empty()) log << "data" << m_dataLog;
-    // LogDebug("%s", log.json().c_str());
+    // LogDebug("{}", log.json());
     return log;
 }
 
@@ -2537,8 +2537,11 @@ void PAEInput::LogPAE(int errCode, pae::Token &token, std::string value)
         default: column = token.m_position;
     }
     logEntry << "column" << column;
-    const std::string msg
-        = (value.empty()) ? s_errCodes.at(errCode) : StringFormat(s_errCodes.at(errCode).c_str(), value.c_str());
+
+    // Unused arguments are allowed in StringFormatDynamic, so there is no issue
+    // if s_errCodes.at(...) has no format specifier.
+    const std::string msg = StringFormatDynamic(s_errCodes.at(errCode).get(), std::make_format_args(value));
+
     logEntry << "text" << msg;
     if (!value.empty()) {
         logEntry << "value" << value;
@@ -2557,7 +2560,7 @@ void PAEInput::LogPAE(int errCode, pae::Token &token, std::string value)
         default: m_dataLog << logEntry;
     }
 
-    // LogDebug("%s", m_validationLog.json().c_str());
+    // LogDebug("{}", m_validationLog.json());
 
     m_hasErrors = true;
     token.m_isError = true;
@@ -2568,15 +2571,15 @@ void PAEInput::LogPAE(int errCode, pae::Token &token, std::string value)
         case pae::TIMESIG_POS: posStr = "(timesig input key)"; break;
         case pae::INPUT_POS: posStr = "(global input error)"; break;
         case pae::UNKOWN_POS: posStr = "(unspecified position)"; break;
-        default: posStr = StringFormat("(character %d)", token.m_position);
+        default: posStr = StringFormat("(character {})", token.m_position);
     }
-    std::string fullMsg = StringFormat("PAE: %s %s", msg.c_str(), posStr.c_str());
+    std::string fullMsg = StringFormat("PAE: {} {}", msg, posStr);
 
     if (m_pedanticMode) {
-        LogError(fullMsg.c_str());
+        LogError("{}", fullMsg);
     }
     else {
-        LogWarning(fullMsg.c_str());
+        LogWarning("{}", fullMsg);
     }
 }
 
@@ -2589,7 +2592,7 @@ void PAEInput::LogDebugTokens(bool vertical)
             char c2 = (token.m_inputChar) ? token.m_inputChar : ' ';
             std::string className = (token.m_object) ? token.m_object->GetClassName() : "";
             if (token.m_isError) className += " <";
-            LogDebug(" %c | %c | %s", c1, c2, className.c_str());
+            LogDebug(" {} | {} | {}", c1, c2, className);
         }
     }
     else {
@@ -2598,22 +2601,21 @@ void PAEInput::LogDebugTokens(bool vertical)
             char c = (token.m_inputChar) ? token.m_inputChar : ' ';
             row.push_back(c);
         }
-        row = std::regex_replace(row, std::regex("%"), "%%");
-        LogDebug(row.c_str());
+        LogDebug("{}", row);
         if (m_hasErrors) {
             row.clear();
             for (pae::Token &token : m_pae) {
                 char c = (token.m_isError) ? '^' : ' ';
                 row.push_back(c);
             }
-            LogDebug(row.c_str());
+            LogDebug("{}", row);
         }
         row.clear();
         for (pae::Token &token : m_pae) {
             std::string className = (token.m_object) ? token.m_object->GetClassName() : " ";
             row.push_back(className.at(0));
         }
-        LogDebug(row.c_str());
+        LogDebug("{}", row);
         row.clear();
         for (pae::Token &token : m_pae) {
             char c = (token.m_char) ? token.m_char : ' ';
@@ -2698,7 +2700,7 @@ jsonxx::Object PAEInput::InputKeysToJson(const std::string &inputKeys)
             jsonInput << "data" << line.substr(line.find(":") + 1);
         }
     }
-    // LogDebug("%s", jsonInput.json().c_str());
+    // LogDebug("{}", jsonInput.json());
 
     return jsonInput;
 }
@@ -3057,7 +3059,7 @@ bool PAEInput::Parse()
 
         // No object to add to the doc - we whould also have no char left
         if (!token.m_object) {
-            if (token.m_char != 0) LogDebug("Remaining unprocessed char '%c'", token.m_char);
+            if (token.m_char != 0) LogDebug("Remaining unprocessed char '{}'", token.m_char);
             continue;
         }
 
@@ -3205,7 +3207,7 @@ bool PAEInput::ConvertKeySig()
                 token.m_char = 0;
             }
             keySigToken->m_char = 0;
-            // LogDebug("Keysig %s", paeStr.c_str());
+            // LogDebug("Keysig {}", paeStr);
             KeySig *keySig = new KeySig();
             keySigToken->m_object = keySig;
             // Will fail in pedantic mode
@@ -3337,7 +3339,7 @@ bool PAEInput::ConvertClef()
                 token.m_char = 0;
             }
             clefToken->m_char = 0;
-            // LogDebug("Clef %s", paeStr.c_str());
+            // LogDebug("Clef {}", paeStr);
             Clef *clef = new Clef();
             clefToken->m_object = clef;
             // Will fail in pedantic mode
@@ -3375,7 +3377,7 @@ bool PAEInput::ConvertMeterSigOrMensur()
                 token.m_char = 0;
             }
             meterSigOrMensurToken->m_char = 0;
-            // LogDebug("MeterSig %s", paeStr.c_str());
+            // LogDebug("MeterSig {}", paeStr);
             if (m_isMensural) {
                 Mensur *mensur = new Mensur();
                 meterSigOrMensurToken->m_object = mensur;
@@ -3797,7 +3799,7 @@ bool PAEInput::ConvertFermata()
                 // PAE guidelines are ambiguous because they say fermata should contain only a single rest sign (=)
                 // but at the same time allow =1 for a mrest - in non pendantic mode we want to support (=1)
                 else if (fermataTarget->Is(MREST) && isdigit(token.m_inputChar)) {
-                    this->LogPAE(ERR_058_FERMATA_MREST, token, StringFormat("%c", token.m_inputChar));
+                    this->LogPAE(ERR_058_FERMATA_MREST, token, StringFormat("{}", token.m_inputChar));
                     if (m_pedanticMode) return false;
                     continue;
                 }
@@ -4655,7 +4657,7 @@ bool PAEInput::CheckHierarchy()
             // Test is the element is supported by the current top container
             if (!token.IsContainerEnd() && !stack.back()->m_object->IsSupportedChild(token.m_object->GetClassId())) {
                 this->LogPAE(ERR_040_HIERARCHY_INVALID, token,
-                    StringFormat("%s / %s", token.GetName().c_str(), stack.back()->GetName().c_str()));
+                    StringFormat("{} / {}", token.GetName(), stack.back()->GetName()));
                 if (m_pedanticMode) return false;
                 // Indicate that the data was not valid in this pass so we will check it again
                 isValid = false;
@@ -4676,7 +4678,7 @@ bool PAEInput::CheckHierarchy()
                     // This means that the hierarchy is invalid
                     if (stack.back()->m_object != token.m_object) {
                         this->LogPAE(ERR_041_NESTING_INVALID, token,
-                            StringFormat("%s / %s", token.GetName().c_str(), stack.back()->GetName().c_str()));
+                            StringFormat("{} / {}", token.GetName(), stack.back()->GetName()));
                         if (m_pedanticMode) return false;
                         // Indicate that the data was not valid in this pass so we will check it again
                         isValid = false;
@@ -4777,7 +4779,7 @@ void PAEInput::RemoveContainerToken(Object *object)
         if (token.m_object == object) {
             if (!token.IsContainerEnd()) {
                 // Make sure we delete it only once - even though it should never be there more than once
-                LogDebug("Deleting %s", object->GetClassName().c_str());
+                LogDebug("Deleting {}", object->GetClassName());
                 if (!deleted) delete token.m_object;
                 deleted = true;
             }

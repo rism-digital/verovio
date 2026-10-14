@@ -455,7 +455,7 @@ void ABCInput::AddRepeatMark(LayerElement *element)
 void ABCInput::AddTie()
 {
     if (!m_tieStack.empty()) {
-        LogWarning("ABC import: '%s' already tied", m_ID.c_str());
+        LogWarning("ABC import: '{}' already tied", m_ID);
         return;
     }
     if (!m_ID.empty()) {
@@ -490,14 +490,14 @@ void ABCInput::EndSlur()
         }
         return;
     }
-    LogWarning("ABC import: Closing slur for element '%s' could not be matched", m_ID.c_str());
+    LogWarning("ABC import: Closing slur for element '{}' could not be matched", m_ID);
 }
 
 void ABCInput::ParseDecoration(const std::string &decorationString)
 {
     // shorthand decorations hard-coded !
     if (isdigit(decorationString[0])) {
-        LogWarning("ABC import: Fingering not supported", decorationString.c_str());
+        LogWarning("ABC import: Fingering {} not supported", decorationString);
         return;
     }
     if (decorationString == ".") {
@@ -577,7 +577,7 @@ void ABCInput::ParseDecoration(const std::string &decorationString)
         m_repeatMark = repeatMarkLog_FUNC_daCapo;
     }
     else {
-        LogWarning("ABC import: Decoration %s not supported", decorationString.c_str());
+        LogWarning("ABC import: Decoration {} not supported", decorationString);
     }
 }
 
@@ -700,12 +700,12 @@ void ABCInput::ParseKey(std::string &keyString)
         auto posEnd = static_cast<unsigned long>(abs(accidNum));
 
         if (accidNum < 0) {
-            keySig = StringFormat("%df", abs(accidNum));
+            keySig = StringFormat("{}f", abs(accidNum));
             posStart = pitch.size() - posEnd;
             keyPitchAlterAmount = -1;
         }
         else {
-            keySig = StringFormat("%ds", accidNum);
+            keySig = StringFormat("{}s", accidNum);
             keyPitchAlterAmount = 1;
         }
 
@@ -913,7 +913,7 @@ void ABCInput::CreateHeader()
         for (const auto &it : m_composer) {
             pugi::xml_node composer = fileTitleStmt.append_child("composer");
             composer.text().set((it.first).c_str());
-            composer.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it.second).c_str());
+            composer.append_attribute("xml:id").set_value(StringFormat("abcLine{:02}", it.second).c_str());
             composer.append_attribute("analog").set_value("abc:C");
         }
     }
@@ -927,7 +927,7 @@ void ABCInput::CreateHeader()
         for (const auto &it : m_notes) {
             pugi::xml_node annot = notes.append_child("annot");
             annot.text().set((it.first).c_str());
-            annot.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it.second).c_str());
+            annot.append_attribute("xml:id").set_value(StringFormat("abcLine{:02}", it.second).c_str());
             annot.append_attribute("analog").set_value("abc:N");
         }
     }
@@ -944,7 +944,7 @@ void ABCInput::CreateHeader()
     // isodate and version //
     const time_t t = time(0); // get time now
     struct tm *now = localtime(&t);
-    std::string dateStr = StringFormat("%d-%02d-%02dT%02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
+    std::string dateStr = StringFormat("{}-{:02}-{:02}T{:02}:{:02}:{:02}", now->tm_year + 1900, now->tm_mon + 1,
         now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
     app.append_attribute("isodate").set_value(dateStr.c_str());
     app.append_attribute("version").set_value(GetVersion().c_str());
@@ -957,11 +957,11 @@ void ABCInput::CreateWorkEntry()
     // <work> //
     pugi::xml_node work = m_workList.append_child("work");
     work.append_attribute("n").set_value(m_mdiv->GetN().c_str());
-    work.append_attribute("data").set_value(StringFormat("#%s", m_mdiv->GetID().c_str()).c_str());
+    work.append_attribute("data").set_value(StringFormat("#{}", m_mdiv->GetID()).c_str());
     for (const auto &it : m_title) {
         pugi::xml_node title = work.append_child("title");
         title.text().set((it.first).c_str());
-        if (it.second != 0) title.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it.second).c_str());
+        if (it.second != 0) title.append_attribute("xml:id").set_value(StringFormat("abcLine{:02}", it.second).c_str());
         title.append_attribute("analog").set_value("abc:T");
         if (it == m_title.front()) {
             title.append_attribute("type").set_value("main");
@@ -974,7 +974,7 @@ void ABCInput::CreateWorkEntry()
         for (const auto &it : m_composer) {
             pugi::xml_node composer = work.append_child("composer");
             composer.text().set((it.first).c_str());
-            composer.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it.second).c_str());
+            composer.append_attribute("xml:id").set_value(StringFormat("abcLine{:02}", it.second).c_str());
             composer.append_attribute("analog").set_value("abc:C");
         }
     }
@@ -984,7 +984,7 @@ void ABCInput::CreateWorkEntry()
         for (const auto &it : m_history) {
             pugi::xml_node histLine = history.append_child("p");
             histLine.text().set((it.first).c_str());
-            histLine.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it.second).c_str());
+            histLine.append_attribute("xml:id").set_value(StringFormat("abcLine{:02}", it.second).c_str());
         }
     }
     if (!m_info.empty()) {
@@ -992,8 +992,8 @@ void ABCInput::CreateWorkEntry()
         for (const auto &it : m_info) {
             pugi::xml_node annot = notes.append_child("annot");
             annot.text().set((it.first).first.c_str());
-            annot.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it.first.second).c_str());
-            annot.append_attribute("analog").set_value(StringFormat("abc:%c", it.second).c_str());
+            annot.append_attribute("xml:id").set_value(StringFormat("abcLine{:02}", it.first.second).c_str());
+            annot.append_attribute("analog").set_value(StringFormat("abc:{}", it.second).c_str());
         }
     }
 }
@@ -1007,8 +1007,8 @@ void ABCInput::FlushControlElements(Score *score, Section *section)
             layer = dynamic_cast<Layer *>(section->FindDescendantByID(iter.first));
         }
         if (!layer) {
-            LogWarning("ABC import: Element '%s' could not be assigned to layer '%s'",
-                iter.second->GetClassName().c_str(), iter.first.c_str());
+            LogWarning("ABC import: Element '{}' could not be assigned to layer '{}'", iter.second->GetClassName(),
+                iter.first);
             delete iter.second;
             iter.second = NULL;
             continue;
@@ -1060,7 +1060,7 @@ void ABCInput::InitScoreAndSection(Score *&score, Section *&section)
     // start with a new page
     if (m_linebreak != '\0') {
         Pb *pb = new Pb();
-        pb->SetID(StringFormat("abcLine%02d", m_lineNum + 1));
+        pb->SetID(StringFormat("abcLine{:02}", m_lineNum + 1));
         section->AddChild(pb);
     }
     // calculate default unit note length
@@ -1217,7 +1217,7 @@ void ABCInput::ReadInformationField(const char &dataKey, std::string value)
         case 'W': LogWarning("ABC import: Lyrics are not supported yet"); break;
         case 'X': this->ParseReferenceNumber(value); break;
         case 'Z': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
-        default: LogWarning("ABC import: Information field %c is ignored", dataKey);
+        default: LogWarning("ABC import: Information field {} is ignored", dataKey);
     }
 }
 
@@ -1810,7 +1810,7 @@ void ABCInput::ReadMusicCode(const std::string &musicCode, Section *section)
     if (sysBreak && (m_linebreak != '\0') && !(section->GetLast())->Is(SB)) {
         this->AddLayerElement();
         Sb *sb = new Sb();
-        sb->SetID(StringFormat("abcLine%02d", m_lineNum + 1));
+        sb->SetID(StringFormat("abcLine{:02}", m_lineNum + 1));
         section->AddChild(sb);
     }
 }

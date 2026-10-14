@@ -419,7 +419,7 @@ int LayerElement::GetDrawingX() const
     if (this->HasGraceAlignment()) {
         graceNoteShift = this->GetGraceAlignment()->GetXRel();
         // const Note *note = dynamic_cast<const Note*>(this);
-        // LogDebug("Grace Note %d  Shift %d", note->GetPname(), graceNoteShift);
+        // LogDebug("Grace Note {}  Shift {}", note->GetPname(), graceNoteShift);
     }
 
     m_cachedDrawingX = (measure->GetDrawingX() + m_alignment->GetXRel() + this->GetDrawingXRel() + graceNoteShift);

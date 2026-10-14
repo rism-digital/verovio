@@ -116,10 +116,10 @@ FunctorCode JustifyXFunctor::VisitSystem(System *system)
 
     if (m_justifiableRatio < 0.8) {
         // Arbitrary value for avoiding over-compressed justification
-        LogWarning("Justification is highly compressed (ratio smaller than 0.8: %lf)", m_justifiableRatio);
-        LogWarning("\tSystem full width: %d", m_systemFullWidth);
-        LogWarning("\tNon-justifiable width: %d", nonJustifiableWidth);
-        LogWarning("\tDrawing justifiable width: %d", system->m_drawingJustifiableWidth);
+        LogWarning("Justification is highly compressed (ratio smaller than 0.8: {})", m_justifiableRatio);
+        LogWarning("\tSystem full width: {}", m_systemFullWidth);
+        LogWarning("\tNon-justifiable width: {}", nonJustifiableWidth);
+        LogWarning("\tDrawing justifiable width: {}", system->m_drawingJustifiableWidth);
     }
 
     // Check if we are on the last system of an mdiv.

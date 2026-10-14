@@ -135,9 +135,9 @@ void FeatureExtractor::Extract(const Object *object)
                 m_intervalGrossContour << "U";
                 m_intervalRefinedContour << ((intervalChromatic > 2) ? "U" : "u");
             }
-            m_intervalsChromatic << StringFormat("%d", intervalChromatic);
+            m_intervalsChromatic << StringFormat("{}", intervalChromatic);
             std::string intervalDiatonicStr
-                = StringFormat("%d", note->GetDiatonicPitch() - m_previousNotes.front()->GetDiatonicPitch());
+                = StringFormat("{}", note->GetDiatonicPitch() - m_previousNotes.front()->GetDiatonicPitch());
             m_intervalsDiatonic << intervalDiatonicStr;
             jsonxx::Array intervalsIds;
             for (const Note *previousNote : m_previousNotes) {
@@ -167,7 +167,7 @@ void FeatureExtractor::ToJson(std::string &output)
     o << "intervalsIds" << m_intervalsIds;
 
     output = o.json();
-    LogDebug("%s", output.c_str());
+    LogDebug("{}", output);
 }
 
 } // namespace vrv

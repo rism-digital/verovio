@@ -268,7 +268,7 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
         LogWarning("Could not parse change staff action");
     }
     else {
-        LogWarning("Unknown action type '%s'.", action.c_str());
+        LogWarning("Unknown action type '{}'.", action);
     }
     m_editStatus.import("status", "FAILURE");
     m_editStatus.import("message", "Action " + action + " could not be parsed or is unknown.");
@@ -277,12 +277,12 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
 
 bool EditorToolkitNeume::Chain(jsonxx::Array actions)
 {
-    // LogMessage("%s", actions.get<jsonxx::Object>(0).json().c_str());
+    // LogMessage("{}", actions.get<jsonxx::Object>(0).json());
     bool status = true;
     jsonxx::Object results;
     for (int i = 0; i < (int)actions.size(); i++) {
         if (!actions.has<jsonxx::Object>(0)) {
-            LogError("Action %d was not an object", i);
+            LogError("Action {} was not an object", i);
             m_editStatus.reset();
             m_editStatus.import("status", "FAILURE");
             m_editStatus.import("message", "Action " + std::to_string(i) + " was not an object.");
@@ -306,7 +306,7 @@ bool EditorToolkitNeume::AddSyl(std::string elementId, std::string sylText)
 
     Syllable *syllable = dynamic_cast<Syllable *>(m_doc->GetDrawingPage()->FindDescendantByID(elementId));
     if (syllable == NULL) {
-        LogError("Unable to find syllable with id %s", elementId.c_str());
+        LogError("Unable to find syllable with id {}", elementId);
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "Unable to find neume with id " + elementId + ".");
         return false;
@@ -1302,7 +1302,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
     }
     else {
         delete zone;
-        LogError("Unsupported type '%s' for insertion", elementType.c_str());
+        LogError("Unsupported type '{}' for insertion", elementType);
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "Unsupported type '" + elementType + "' for insertion.");
         return false;
@@ -1338,14 +1338,14 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
     assert(parent);
 
     if (element == NULL) {
-        LogError("No element exists with ID '%s'.", elementId.c_str());
+        LogError("No element exists with ID '{}'.", elementId);
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "No element exists with ID" + elementId + ".");
         return false;
     }
     if (!(element->Is(DIVLINE) || element->Is(ACCID) || element->Is(CLEF))) {
-        LogError("Element is of type %s, but only Divlines and Accids can be inserted into syllables.",
-            element->GetClassName().c_str());
+        LogError("Element is of type {}, but only Divlines and Accids can be inserted into syllables.",
+            element->GetClassName());
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message",
             "Element is of type " + element->GetClassName()
@@ -1353,7 +1353,7 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
         return false;
     }
     if (!parent->Is(LAYER)) {
-        LogError("The selected %s is not a child of layer.", element->GetClassName().c_str());
+        LogError("The selected {} is not a child of layer.", element->GetClassName());
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "The selected " + element->GetClassName() + "is not a child of layer.");
         return false;
@@ -1367,7 +1367,7 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
         uly = element->GetFacsimileInterface()->GetZone()->GetUly();
     }
     else {
-        LogError("Selected '%s' without facsimile", element->GetClassName().c_str());
+        LogError("Selected '{}' without facsimile", element->GetClassName());
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "Selected '" + element->GetClassName() + "' without facsimile is unsupported.");
         return false;
@@ -1382,7 +1382,7 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
     staff->FindAllDescendantsByComparison(&neumes, &ac);
 
     if (neumes.empty()) {
-        LogError("A syllable must exist in the staff to insert a '%s' into.", element->GetClassName().c_str());
+        LogError("A syllable must exist in the staff to insert a '{}' into.", element->GetClassName());
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import(
             "message", "A syllable must exist in the staff to insert a '" + element->GetClassName() + "' into.");
@@ -1488,14 +1488,14 @@ bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId)
     assert(parent);
 
     if (element == NULL) {
-        LogError("No element exists with ID '%s'.", elementId.c_str());
+        LogError("No element exists with ID '{}'.", elementId);
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "No element exists with ID" + elementId + ".");
         return false;
     }
     if (!(element->Is(DIVLINE) || element->Is(ACCID) || element->Is(CLEF))) {
-        LogError("Element is of type %s, but only Divlines, Accids, and Clefs can be moved out of syllables.",
-            element->GetClassName().c_str());
+        LogError("Element is of type {}, but only Divlines, Accids, and Clefs can be moved out of syllables.",
+            element->GetClassName());
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message",
             "Element is of type " + element->GetClassName()
@@ -1503,7 +1503,7 @@ bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId)
         return false;
     }
     if (!parent->Is(SYLLABLE)) {
-        LogError("The selected %s is not a child of syllable.", element->GetClassName().c_str());
+        LogError("The selected {} is not a child of syllable.", element->GetClassName());
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "The selected " + element->GetClassName() + "is not a child of syllable.");
         return false;
@@ -1693,13 +1693,13 @@ bool EditorToolkitNeume::MatchHeight(std::string elementId)
     assert(element);
     Object *staffParent = element->GetFirstAncestor(STAFF);
     if (element == NULL) {
-        LogError("No element exists with ID '%s'.", elementId.c_str());
+        LogError("No element exists with ID '{}'.", elementId);
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "No element exists with ID" + elementId + ".");
         return false;
     }
     if (!element->Is(SYL)) {
-        LogError("Element is of type %s, but only <syl> element can match height.", element->GetClassName().c_str());
+        LogError("Element is of type {}, but only <syl> element can match height.", element->GetClassName());
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import(
             "message", "Element is of type " + element->GetClassName() + ", but only <syl> element can match height.");
@@ -1716,7 +1716,7 @@ bool EditorToolkitNeume::MatchHeight(std::string elementId)
         height = element->GetFacsimileInterface()->GetZone()->GetLry() - uly;
     }
     else {
-        LogError("Selected '%s' without facsimile", element->GetClassName().c_str());
+        LogError("Selected '{}' without facsimile", element->GetClassName());
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "Selected '" + element->GetClassName() + "' without facsimile is unsupported.");
         return false;
@@ -1781,7 +1781,7 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
             staves.push_back(obj);
         }
         else {
-            LogError("Staff with ID '%s' does not exist!", it->c_str());
+            LogError("Staff with ID '{}' does not exist!", *it);
             m_editStatus.import("status", "FAILURE");
             m_editStatus.import("message", "Staff with ID '" + *it + "' does not exist.");
             return false;
@@ -1937,7 +1937,7 @@ bool EditorToolkitNeume::SetText(std::string elementId, const std::string &text)
     }
     Object *element = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
     if (element == NULL) {
-        LogWarning("No element with ID '%s' exists", elementId.c_str());
+        LogWarning("No element with ID '{}' exists", elementId);
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "No element with ID '" + elementId + "' exists.");
         return false;
@@ -2018,7 +2018,7 @@ bool EditorToolkitNeume::SetText(std::string elementId, const std::string &text)
         }
     }
     else {
-        LogError("Element type '%s' is unsupported for SetText", element->GetClassName().c_str());
+        LogError("Element type '{}' is unsupported for SetText", element->GetClassName());
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "Element type '" + element->GetClassName() + "' is unsupported for SetText.");
         return false;
@@ -2226,7 +2226,7 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
     Staff *staff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindDescendantByID(elementId));
     // Validate parameters
     if (staff == NULL) {
-        LogError("Either no element exists with ID '%s' or it is not a staff.", elementId.c_str());
+        LogError("Either no element exists with ID '{}' or it is not a staff.", elementId);
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "Either no element exists with ID '" + elementId + "' or it is not a staff.");
         return false;
@@ -2425,7 +2425,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         result = parent->DeleteChild(element);
 
         if (!result) {
-            LogError("Failed to delete the desired element (%s)", elementId.c_str());
+            LogError("Failed to delete the desired element ({})", elementId);
             m_editStatus.reset();
             m_editStatus.import("status", "FAILURE");
             m_editStatus.import("message", "Failed to delete the desired element (" + elementId + ").");
@@ -2482,7 +2482,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         result = page->DeleteChild(system);
 
         if (!result) {
-            LogError("Failed to delete the desired element (%s)", elementId.c_str());
+            LogError("Failed to delete the desired element ({})", elementId);
             m_editStatus.reset();
             m_editStatus.import("status", "FAILURE");
             m_editStatus.import("message", "Failed to delete the desired element (" + elementId + ").");
@@ -2508,7 +2508,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
     }
 
     if (!result) {
-        LogError("Failed to delete the desired element (%s)", elementId.c_str());
+        LogError("Failed to delete the desired element ({})", elementId);
         m_editStatus.reset();
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "Failed to delete the desired element (" + elementId + ").");
@@ -2525,7 +2525,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             std::string neumeId = element->GetID();
             result &= parent->DeleteChild(element);
             if (!result) {
-                LogError("Failed to delete empty neume (%s)", neumeId.c_str());
+                LogError("Failed to delete empty neume ({})", neumeId);
                 m_editStatus.reset();
                 m_editStatus.import("status", "FAILURE");
                 m_editStatus.import("message", "Failed to delete empty neume (" + neumeId + ").");
@@ -2548,7 +2548,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             std::string syllableId = element->GetID();
             result &= parent->DeleteChild(element);
             if (!result) {
-                LogError("Failed to delete empty syllable (%s)", syllableId.c_str());
+                LogError("Failed to delete empty syllable ({})", syllableId);
                 m_editStatus.reset();
                 m_editStatus.import("status", "FAILURE");
                 m_editStatus.import("message", "Failed to delete empty syllable (" + syllableId + ").");
@@ -2580,7 +2580,7 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
 
     Object *obj = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
     if (obj == NULL) {
-        LogError("Object with ID '%s' not found.", elementId.c_str());
+        LogError("Object with ID '{}' not found.", elementId);
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "Object with ID '" + elementId + "' could not be found.");
         return false;
@@ -2661,7 +2661,7 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
         if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
     }
     else {
-        LogError("Element of type '%s' is unsupported.", obj->GetClassName().c_str());
+        LogError("Element of type '{}' is unsupported.", obj->GetClassName());
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "Element of type '" + obj->GetClassName() + "' is unsupported.");
         return false;
@@ -2705,7 +2705,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         elementClass = NEUME;
     }
     else {
-        LogError("Invalid groupType: %s", groupType.c_str());
+        LogError("Invalid groupType: {}", groupType);
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "Invalid groupType: " + groupType);
         return false;
@@ -2716,14 +2716,13 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         // Verify that the children are of the same type
         Object *el = m_doc->GetDrawingPage()->FindDescendantByID(*it);
         if (el == NULL) {
-            LogError("Could not get element with ID %s", it->c_str());
+            LogError("Could not get element with ID {}", *it);
             m_editStatus.import("status", "FAILURE");
             m_editStatus.import("message", "Could not get element with ID " + *it);
             return false;
         }
         if (el->GetClassId() != elementClass) {
-            LogError("Element %s was of class %s. Expected class %s", el->GetID().c_str(), el->GetClassName().c_str(),
-                groupType.c_str());
+            LogError("Element {} was of class {}. Expected class {}", el->GetID(), el->GetClassName(), groupType);
             m_editStatus.import("status", "FAILURE");
             m_editStatus.import("message",
                 "Element " + el->GetID() + " was of class " + el->GetClassName() + " but expected class " + groupType
@@ -2734,7 +2733,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         // Get a set of parents and the number of children they have
         Object *par = el->GetParent();
         if (par == NULL) {
-            LogError("Parent of %s is null!", el->GetID().c_str());
+            LogError("Parent of {} is null!", el->GetID());
             m_editStatus.import("status", "FAILURE");
             m_editStatus.import("message", "Parent of " + el->GetID() + " is null.");
             return false;
@@ -3438,7 +3437,7 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
     }
     Neume *el = dynamic_cast<Neume *>(m_doc->GetDrawingPage()->FindDescendantByID(elementId));
     if (el == NULL) {
-        LogError("Unable to find neume with id %s", elementId.c_str());
+        LogError("Unable to find neume with id {}", elementId);
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "Unable to find neume with id " + elementId + ".");
         return false;
@@ -3716,7 +3715,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
     Object *element = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
     assert(element);
     if (element == NULL) {
-        LogError("No element exists with ID '%s'.", elementId.c_str());
+        LogError("No element exists with ID '{}'.", elementId);
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "No element exists with ID" + elementId + ".");
         return false;
@@ -3724,8 +3723,8 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
 
     if (!(element->Is(SYLLABLE) || element->Is(CUSTOS) || element->Is(CLEF) || element->Is(DIVLINE)
             || element->Is(ACCID))) {
-        LogError("Element is of type %s, but only Syllables, Custos, Clefs, Divlines, and Accids can change staves.",
-            element->GetClassName().c_str());
+        LogError("Element is of type {}, but only Syllables, Custos, Clefs, Divlines, and Accids can change staves.",
+            element->GetClassName());
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message",
             "Element is of type " + element->GetClassName()
@@ -3780,7 +3779,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
     Staff *sParent = vrv_cast<Staff *>(parent->GetFirstAncestor(STAFF));
     assert(parent);
     if (parent == NULL || sParent == NULL) {
-        LogError("Couldn't find staff parent of element with id '%s'", elementId.c_str());
+        LogError("Couldn't find staff parent of element with id '{}'", elementId);
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "Couldn't find staff parent of element with id " + elementId);
         return false;
@@ -3856,7 +3855,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
 
         // Adjust clefline
         if (!AdjustClefLineFromPosition(dynamic_cast<Clef *>(element), staff)) {
-            LogError("Could not adjust clef line of %s", element->GetID().c_str());
+            LogError("Could not adjust clef line of {}", element->GetID());
             m_editStatus.import("status", "FAILURE");
             m_editStatus.import("message", "Failed to set clef line from facsimile.");
             return false;
@@ -3885,7 +3884,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         parent->ReorderByXPos();
         if (!(element->Is(ACCID) || element->Is(DIVLINE))) {
             if (!AdjustPitchFromPosition(element)) {
-                LogError("Could not adjust pitch of %s", element->GetID().c_str());
+                LogError("Could not adjust pitch of {}", element->GetID());
                 m_editStatus.import("status", "FAILURE");
                 m_editStatus.import("message", "Failed to properly set pitch.");
                 m_editStatus.import("elementId", element->GetID());
@@ -3921,15 +3920,15 @@ bool EditorToolkitNeume::ChangeStaffTo(std::string elementId, std::string staffI
     Object *element = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
     assert(element);
     if (element == NULL) {
-        LogError("No element exists with ID '%s'.", elementId.c_str());
+        LogError("No element exists with ID '{}'.", elementId);
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "No element exists with ID" + elementId + ".");
         return false;
     }
 
     if (!(element->Is(CLEF) || element->Is(DIVLINE) || element->Is(ACCID))) {
-        LogError("Element is of type %s, but only Clefs, Divlines, and Accids can change to a specified staff.",
-            element->GetClassName().c_str());
+        LogError("Element is of type {}, but only Clefs, Divlines, and Accids can change to a specified staff.",
+            element->GetClassName());
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message",
             "Element is of type " + element->GetClassName()
@@ -3950,7 +3949,7 @@ bool EditorToolkitNeume::ChangeStaffTo(std::string elementId, std::string staffI
     Staff *sParent = dynamic_cast<Staff *>(parent->GetFirstAncestor(STAFF));
     assert(parent);
     if (parent == NULL || sParent == NULL) {
-        LogError("Couldn't find staff parent of element with id '%s'", elementId.c_str());
+        LogError("Couldn't find staff parent of element with id '{}'", elementId);
         m_editStatus.import("status", "FAILURE");
         m_editStatus.import("message", "Couldn't find staff parent of element with id " + elementId);
         return false;
@@ -4026,7 +4025,7 @@ bool EditorToolkitNeume::ChangeStaffTo(std::string elementId, std::string staffI
 
         // Adjust clefline
         if (!AdjustClefLineFromPosition(dynamic_cast<Clef *>(element), staff)) {
-            LogError("Could not adjust clef line of %s", element->GetID().c_str());
+            LogError("Could not adjust clef line of {}", element->GetID());
             m_editStatus.import("status", "FAILURE");
             m_editStatus.import("message", "Failed to set clef line from facsimile.");
             return false;
@@ -4406,8 +4405,8 @@ bool EditorToolkitNeume::AdjustPitchAfterDrag(Object *obj, int y)
 {
     if (!obj->Is(NC) && !obj->Is(CUSTOS)) {
         LogError("AdjustPitchAfterDrag should only be called on custos or ncs."
-                 "It has been called on %s, whose id is %s",
-            obj->GetClassName().c_str(), obj->GetID().c_str());
+                 "It has been called on {}, whose id is {}",
+            obj->GetClassName(), obj->GetID());
         return false;
     }
     PitchInterface *pi = obj->GetPitchInterface();
@@ -4424,8 +4423,8 @@ bool EditorToolkitNeume::AdjustPitchAfterDrag(Object *obj, int y)
 bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj)
 {
     if (!obj->Is(CUSTOS) && !obj->Is(SYLLABLE) && !obj->Is(NEUME)) {
-        LogError("AdjustPitchFromPosition should only be called on custos or syllables/neumes. Called on %s, ID: %s",
-            obj->GetClassName().c_str(), obj->GetID().c_str());
+        LogError("AdjustPitchFromPosition should only be called on custos or syllables/neumes. Called on {}, ID: {}",
+            obj->GetClassName(), obj->GetID());
         return false;
     }
 
@@ -4509,9 +4508,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj)
             pname = PITCHNAME_g;
             baseOctave = 4;
             break;
-        default:
-            LogError("Clef %s does not have a valid shape: %s", clef->GetID().c_str(), clef->GetShape());
-            return false;
+        default: LogError("Clef {} does not have a valid shape: {}", clef->GetID(), clef->GetShape()); return false;
     }
 
     // Handle custos directly
@@ -4526,7 +4523,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj)
     obj->FindAllDescendantsByComparison(&pitchedChildren, &ic);
 
     if (pitchedChildren.empty()) {
-        LogWarning("Syllable/neume has no pitched children: %s", obj->GetID().c_str());
+        LogWarning("Syllable/neume has no pitched children: {}", obj->GetID());
         return true;
     }
 

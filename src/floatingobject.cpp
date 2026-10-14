@@ -161,11 +161,11 @@ int FloatingObject::SetDrawingGrpObject(void *drawingGrpObject)
     if (it == s_drawingObjectIds.end()) {
         idx = (int)s_drawingObjectIds.size();
         s_drawingObjectIds.push_back(drawingGrpObject);
-        // LogDebug("Creating grpId %d", idx);
+        // LogDebug("Creating grpId {}", idx);
     }
     else {
         idx = (int)(it - s_drawingObjectIds.begin());
-        // LogDebug("Using grpId %d", idx);
+        // LogDebug("Using grpId {}", idx);
     }
     m_drawingGrpId = idx + 1000;
     return m_drawingGrpId;

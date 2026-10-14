@@ -842,7 +842,7 @@ void Object::SetParent(Object *parent)
 bool Object::IsSupportedChild(ClassId classId)
 {
     // This should never happen because the method should be overridden
-    LogDebug("Method for adding %d to %s should be overridden", classId, this->GetClassName().c_str());
+    LogDebug("Method for adding {} to {} should be overridden", classId, this->GetClassName());
     // assert(false);
     return false;
 }
@@ -850,7 +850,7 @@ bool Object::IsSupportedChild(ClassId classId)
 bool Object::AddChild(Object *child)
 {
     if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        LogError("Adding '{}' to a '{}'", child->GetClassName(), this->GetClassName());
         return false;
     }
 
@@ -1262,7 +1262,7 @@ void Object::AddPlistReference(const Object *object)
 void Object::LogDebugTree(int maxDepth, int level)
 {
     std::string indent(level, '\t');
-    LogDebug("%s%s", indent.c_str(), this->LogDebugTreeMsg().c_str());
+    LogDebug("{}{}", indent, this->LogDebugTreeMsg());
 
     if (maxDepth == level) return;
 
@@ -1359,10 +1359,10 @@ bool Object::sortByUlx(Object *a, Object *b)
 
     if (fa == NULL || fb == NULL) {
         if (fa == NULL) {
-            LogInfo("No available facsimile interface for %s", a->GetID().c_str());
+            LogInfo("No available facsimile interface for {}", a->GetID());
         }
         if (fb == NULL) {
-            LogInfo("No available facsimile interface for %s", b->GetID().c_str());
+            LogInfo("No available facsimile interface for {}", b->GetID());
         }
         return false;
     }
@@ -1642,13 +1642,13 @@ Object *ObjectFactory::Create(const std::string &name)
 
         const auto idIt = m_classIdsRegistry.find(name);
         if (idIt == m_classIdsRegistry.end()) {
-            LogError("ClassId for '%s' not found", name.c_str());
+            LogError("ClassId for '{}' not found", name);
             return NULL;
         }
 
         const auto ctorIt = m_ctorsRegistry.find(idIt->second);
         if (ctorIt == m_ctorsRegistry.end()) {
-            LogError("Factory for '%d' not found", idIt->second);
+            LogError("Factory for '{}' not found", idIt->second);
             return NULL;
         }
 
@@ -1673,7 +1673,7 @@ Object *ObjectFactory::Create(ClassId classId)
     }
 
     if (!factory) {
-        LogError("Factory for '%d' not found", classId);
+        LogError("Factory for '{}' not found", classId);
         return NULL;
     }
 
@@ -1686,7 +1686,7 @@ ClassId ObjectFactory::GetClassId(const std::string &name)
 
     const auto it = m_classIdsRegistry.find(name);
     if (it == m_classIdsRegistry.end()) {
-        LogError("ClassId for '%s' not found", name.c_str());
+        LogError("ClassId for '{}' not found", name);
         return OBJECT;
     }
 
@@ -1701,7 +1701,7 @@ std::string ObjectFactory::GetClassName(ClassId classId)
         if (id == classId) return name;
     }
 
-    LogError("Class name for '%d' not found", static_cast<int>(classId));
+    LogError("Class name for '{}' not found", classId);
     return "[unspecified]";
 }
 
@@ -1714,7 +1714,7 @@ void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, st
             classIds.push_back(m_classIdsRegistry.at(str));
         }
         else {
-            LogDebug("Class name '%s' could not be matched", str.c_str());
+            LogDebug("Class name '{}' could not be matched", str);
         }
     }
 }

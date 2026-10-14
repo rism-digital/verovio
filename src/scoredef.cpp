@@ -400,7 +400,7 @@ void ScoreDef::ReplaceDrawingValues(const StaffDef *newStaffDef)
         if (newStaffDef->HasLabel()) staffDef->SetLabel(newStaffDef->GetLabel());
     }
     else {
-        LogWarning("StaffDef with xml:id '%s' could not be found", newStaffDef->GetID().c_str());
+        LogWarning("StaffDef with xml:id '{}' could not be found", newStaffDef->GetID());
     }
 }
 

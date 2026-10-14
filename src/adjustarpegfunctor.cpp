@@ -94,7 +94,7 @@ FunctorCode AdjustArpegFunctor::VisitAlignment(Alignment *alignment)
         const int drawingUnit = m_doc->GetDrawingUnit(100);
         // HARDCODED
         int adjust = overlap + drawingUnit / 2 * 3;
-        // LogDebug("maxRight %d, %d %d", maxRight, std::get<2>(*iter), overlap);
+        // LogDebug("maxRight {}, {} {}", maxRight, std::get<2>(*iter), overlap);
         if (adjust > 0) {
             ArrayOfAdjustmentTuples boundaries{ std::make_tuple(alignment, std::get<0>(*iter), adjust) };
             m_measureAligner->AdjustProportionally(boundaries);

@@ -152,7 +152,7 @@ const StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN) cons
 
         if ((alignment->GetStaff()) && (alignment->GetStaff()->GetN() == staffN)) return alignment;
     }
-    // LogDebug("Staff alignment for staff %d not found", staffN);
+    // LogDebug("Staff alignment for staff {} not found", staffN);
     return NULL;
 }
 
@@ -265,7 +265,7 @@ SystemAligner::SpacingType SystemAligner::GetAboveSpacingType(const Staff *staff
 
     auto iter = m_spacingTypes.find(staff->GetN());
     if (iter == m_spacingTypes.end()) {
-        LogWarning("No spacing type found matching @n=%d for '<%s>'", staff->GetN(), staff->GetID().c_str());
+        LogWarning("No spacing type found matching @n={} for '<{}>'", staff->GetN(), staff->GetID());
         return SpacingType::None;
     }
 
@@ -813,7 +813,7 @@ void StaffAlignment::SetCurrentFloatingPositioner(
         m_floatingPositionersSorted = false;
     }
     positioner->SetObjectXY(objectX, objectY);
-    // LogDebug("BB %d", item->second.m_contentBB_x1);
+    // LogDebug("BB {}", item->second.m_contentBB_x1);
     object->SetCurrentFloatingPositioner(positioner);
 }
 

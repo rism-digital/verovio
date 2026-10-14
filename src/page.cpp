@@ -357,7 +357,7 @@ void Page::ResetAligners()
                 DurationInterface *interface = longestDur->GetDurationInterface();
                 assert(interface);
                 longestActualDur = interface->GetActualDur();
-                // LogDebug("Longest duration is DUR_* code %d", longestActualDur);
+                // LogDebug("Longest duration is DUR_* code {}", longestActualDur);
             }
         }
 

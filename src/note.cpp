@@ -163,7 +163,7 @@ bool Note::IsSupportedChild(ClassId classId)
 bool Note::AddChild(Object *child)
 {
     if (!this->IsSupportedChild(child->GetClassId()) || !this->AddChildAdditionalCheck(child)) {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        LogError("Adding '{}' to a '{}'", child->GetClassName(), this->GetClassName());
         return false;
     }
 
@@ -459,7 +459,7 @@ std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType, int &overl
         return fretStr;
     }
     else {
-        std::string str = StringFormat("%d", this->GetTabFret());
+        std::string str = StringFormat("{}", this->GetTabFret());
         return UTF8to32(str);
     }
 }

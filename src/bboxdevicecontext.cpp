@@ -151,7 +151,7 @@ void BBoxDeviceContext::DrawCubicBezierPath(Point bezier[4])
     int minYPos, maxYPos;
 
     BoundingBox::ApproximateBezierBoundingBox(bezier, pos, width, height, minYPos, maxYPos);
-    // LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
+    // LogDebug("x {}, y {}, width {}, height {}", pos.x, pos.y, width, height);
     this->UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
 }
 
@@ -162,10 +162,10 @@ void BBoxDeviceContext::DrawCubicBezierPathFilled(Point bezier1[4], Point bezier
     int minYPos, maxYPos;
 
     BoundingBox::ApproximateBezierBoundingBox(bezier1, pos, width, height, minYPos, maxYPos);
-    // LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
+    // LogDebug("x {}, y {}, width {}, height {}", pos.x, pos.y, width, height);
     this->UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
     BoundingBox::ApproximateBezierBoundingBox(bezier2, pos, width, height, minYPos, maxYPos);
-    // LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
+    // LogDebug("x {}, y {}, width {}, height {}", pos.x, pos.y, width, height);
     this->UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
 }
 

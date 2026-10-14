@@ -86,7 +86,7 @@ void PlistInterface::SetIDStrs()
             m_ids.push_back(id);
         }
         else {
-            LogError("Cannot parse the anyURI '%s'", uri.c_str());
+            LogError("Cannot parse the anyURI '{}'", uri);
         }
     }
 }

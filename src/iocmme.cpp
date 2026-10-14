@@ -163,7 +163,7 @@ bool CmmeInput::Import(const std::string &cmme)
         this->PostProcessProport();
     }
     catch (char *str) {
-        LogError("%s", str);
+        LogError("{}", str);
         return false;
     }
 
@@ -289,7 +289,7 @@ void CmmeInput::CreateSection(pugi::xml_node musicSectionNode)
 
     // Loop through the number of voices and parse Voice or create an empty staff if not given
     for (int i = 0; i < m_numVoices; ++i) {
-        std::string xpath = StringFormat("./Voice[VoiceNum[text()='%d']]", i + 1);
+        std::string xpath = StringFormat("./Voice[VoiceNum[text()='{}']]", i + 1);
         pugi::xpath_node voice = musicSectionNode.select_node(xpath.c_str());
         if (voice) {
             this->CreateStaff(voice.node());
@@ -459,7 +459,7 @@ void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
                 this->CreateChord(eventNode);
             }
             else {
-                LogWarning("Unsupported event '%s'", name.c_str());
+                LogWarning("Unsupported event '{}'", name);
             }
         }
         else if (name == "Note") {
@@ -478,7 +478,7 @@ void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
             this->CreateApp(eventNode);
         }
         else {
-            LogWarning("Unsupported event '%s'", name.c_str());
+            LogWarning("Unsupported event '{}'", name);
         }
         if (!keySigFound) {
             m_currentSignature = NULL;
@@ -621,7 +621,7 @@ void CmmeInput::CreateChord(pugi::xml_node chordNode)
             if (inLigature) break;
         }
         else {
-            LogWarning("Unsupported chord component: '%s'", name.c_str());
+            LogWarning("Unsupported chord component: '{}'", name);
         }
     }
     if (!inLigature) m_currentContainer = m_currentContainer->GetParent();

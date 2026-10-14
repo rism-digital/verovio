@@ -67,7 +67,7 @@ FunctorCode AltSymInterface::InterfacePrepareAltSym(PrepareAltSymFunctor &functo
         if (functor.GetSymbolTable()) symbolDef = functor.GetSymbolTable()->FindDescendantByID(m_symbolDefID);
 
         if (!symbolDef || !symbolDef->Is(SYMBOLDEF)) {
-            LogWarning("Reference to the symbolDef `%s` could not be resolved", m_symbolDefID.c_str());
+            LogWarning("Reference to the symbolDef `{}` could not be resolved", m_symbolDefID);
             return FUNCTOR_CONTINUE;
         }
         this->m_symbolDef = vrv_cast<SymbolDef *>(symbolDef);

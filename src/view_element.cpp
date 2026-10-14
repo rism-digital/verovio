@@ -244,7 +244,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     else {
         // This should never happen
-        LogError("Element '%s' cannot be drawn", element->GetClassName().c_str());
+        LogError("Element '{}' cannot be drawn", element->GetClassName());
     }
 
     this->EndOffset(dc, element);
@@ -1557,7 +1557,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         data_DURATION drawingDur = note->GetDrawingDur();
         if (drawingDur == DURATION_NONE) {
             if (note->IsInBeam() && !dc->Is(BBOX_DEVICE_CONTEXT)) {
-                LogWarning("Missing duration for note '%s' in beam", note->GetID().c_str());
+                LogWarning("Missing duration for note '{}' in beam", note->GetID());
             }
             drawingDur = DURATION_4;
         }
@@ -1651,7 +1651,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
     // Make sure we have something to draw
     if ((drawingDur == DURATION_NONE) && !dc->Is(BBOX_DEVICE_CONTEXT)) {
-        LogWarning("Missing duration for rest '%s'", rest->GetID().c_str());
+        LogWarning("Missing duration for rest '{}'", rest->GetID());
         drawingDur = DURATION_4;
     }
 

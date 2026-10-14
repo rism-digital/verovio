@@ -47,6 +47,12 @@ endif()
 # Sets the compile-time value for the RESOURCE_DIR macro in the source code.
 add_compile_definitions(RESOURCE_DIR="${CMAKE_INSTALL_PREFIX}/share/verovio")
 
+# Make pugixml use charconv from standard library to parse floats. Otherwise,
+# the default function used, strtod, may not work properly when the locale is
+# not "C", as the decimal separator may not be a dot (such as in French or
+# German locale).
+add_compile_definitions(PUGIXML_CHARCONV_FLOAT)
+
 include_directories(
     ../include
     ../include/crc

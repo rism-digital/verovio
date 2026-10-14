@@ -276,7 +276,7 @@ FunctorCode SyncToFacsimileFunctor::VisitPageEnd(Page *page)
         ApplyPPUFactorFunctor applyPPUFactor(m_currentPage);
         m_surface->Process(applyPPUFactor);
         m_surface->SetType(
-            StringFormat("ppu:%f", m_ppuFactor * m_doc->GetOptions()->m_unit.GetValue() / DEFINITION_FACTOR));
+            StringFormat("ppu:{}", m_ppuFactor * m_doc->GetOptions()->m_unit.GetValue() / DEFINITION_FACTOR));
     }
 
     return FUNCTOR_CONTINUE;
@@ -355,7 +355,7 @@ Zone *SyncToFacsimileFunctor::GetZone(FacsimileInterface *interface, std::string
         std::transform(type.begin(), type.end(), type.begin(), ::tolower);
         zone->SetType(type);
         m_surface->AddChild(zone);
-        interface->SetFacs(StringFormat("#%s", zone->GetID().c_str()));
+        interface->SetFacs(StringFormat("#{}", zone->GetID().c_str()));
         interface->AttachZone(zone);
         return interface->GetZone();
     }

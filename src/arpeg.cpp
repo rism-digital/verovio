@@ -76,8 +76,7 @@ int Arpeg::GetDrawingX() const
 bool Arpeg::IsValidRef(const Object *ref) const
 {
     if (!ref->IsAnyOf(std::array{ CHORD, NOTE })) {
-        LogWarning(
-            "%s is not supported as @plist target for %s", ref->GetClassName().c_str(), this->GetClassName().c_str());
+        LogWarning("{} is not supported as @plist target for {}", ref->GetClassName(), this->GetClassName());
         return false;
     }
     return true;
