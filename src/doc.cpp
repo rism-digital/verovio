@@ -26,6 +26,7 @@
 #include "expansion.h"
 #include "facsimilefunctor.h"
 #include "featureextractor.h"
+#include "findfunctor.h"
 #include "functor.h"
 #include "glyph.h"
 #include "instrdef.h"
@@ -1811,6 +1812,38 @@ const Score *Doc::GetCorrespondingScore(const Object *object, const std::list<Sc
         }
     }
     return correspondingScore;
+}
+
+void Doc::CollectReferringObjects(const Object *element, std::set<std::string> &referring, SetOfConstObjects &visited)
+{
+    assert(element);
+
+    if (visited.find(element) != visited.end()) return;
+    visited.insert(element);
+
+    // First check all children
+    for (int i = 0; i < element->GetChildCount(); ++i) {
+        const Object *child = element->GetChild(i);
+        if (!child) continue;
+
+        this->CollectReferringObjects(child, referring, visited);
+    }
+
+    // Then find objects referring to this object
+    ListOfObjectAttNamePairs referringObjects;
+    FindAllReferringObjectsFunctor findAllReferringObjects(element, &referringObjects);
+    this->Process(findAllReferringObjects);
+
+    for (ListOfObjectAttNamePairs::iterator it = referringObjects.begin(); it != referringObjects.end(); ++it) {
+        const Object *referringObject = it->first;
+
+        if (referringObject == NULL) continue;
+        if (referringObject == element) continue;
+
+        referring.insert(referringObject->GetID());
+
+        this->CollectReferringObjects(referringObject, referring, visited);
+    }
 }
 
 void Doc::CollectVisibleScores()

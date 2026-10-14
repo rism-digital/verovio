@@ -274,6 +274,20 @@ public:
      */
     void AddOssias(int staffN, const std::list<int>, bool above);
 
+    /**
+     * Update the meterSig or meterSigGrp of all staffDefs.
+     * If NULL, removes the current meterSig.
+     * Additional checks are performed to prevent empty meter signature.
+     */
+    void UpdateMeterSig(LayerElement *meterSigOrGrp);
+
+    /**
+     * Update the keySig of all staffDefs.
+     * If NULL, removes the current keySig.
+     * Additional checks are performed to prevent empty key signature.
+     */
+    void UpdateKeySig(KeySig *keySig);
+
     //----------//
     // Functors //
     //----------//

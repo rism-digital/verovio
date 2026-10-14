@@ -185,6 +185,11 @@ public:
     ///@}
 
     /**
+     * Collect the IDs of all objects referring to the element or one of its descendants.
+     */
+    void CollectReferringObjects(const Object *element, std::set<std::string> &referring, SetOfConstObjects &visited);
+
+    /**
      * Return true if the MIDI generation is already done
      */
     bool GetMidiExportDone() const;
