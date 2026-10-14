@@ -769,6 +769,9 @@ FunctorCode AlignVerticallyFunctor::VisitSystemEnd(System *system)
         system->m_systemAligner.ReorderBy(system->GetDrawingScoreDef()->GetStaffNs());
     }
 
+    // Lyrics below a staff and above the next one share the same lyric lines
+    system->m_systemAligner.ShareLyricLines();
+
     system->m_systemAligner.Process(*this);
 
     return FUNCTOR_SIBLINGS;

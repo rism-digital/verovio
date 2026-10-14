@@ -164,7 +164,8 @@ private:
     /**
      * Adjust the horizontal position of the syl processing verse by verse
      */
-    void AdjustSylSpacingByVerse(const IntTree &verseTree, Doc *doc);
+    void AdjustSylSpacingByVerse(
+        const IntTree &verseTree, const std::set<std::tuple<int, int, data_STAFFREL>> &lyricGroupPlaces, Doc *doc);
 
     /**
      * Reduces the justifiable height based on the --justification-max-vertical option
