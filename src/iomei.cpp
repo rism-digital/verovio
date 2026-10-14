@@ -4911,23 +4911,21 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
         }
         // unmeasured music
         else if (std::string(current.name()) == "staff") {
-            if (!unmeasured) {
-                if (parent->Is(SECTION)) {
-                    if (m_doc->IsNeumeLines()) {
-                        unmeasured = new Measure(NEUMELINE);
-                    }
-                    else {
-                        unmeasured = new Measure(UNMEASURED);
-                        m_doc->SetMensuralMusicOnly(BOOLEAN_true);
-                    }
-                    parent->AddChild(unmeasured);
+            if (parent->Is(SECTION)) {
+                if (m_doc->IsNeumeLines()) {
+                    unmeasured = new Measure(NEUMELINE);
                 }
                 else {
-                    LogError("Unmeasured music within editorial markup is currently not supported");
-                    return false;
+                    unmeasured = new Measure(UNMEASURED);
+                    m_doc->SetMensuralMusicOnly(BOOLEAN_true);
                 }
+                parent->AddChild(unmeasured);
+                success = this->ReadStaff(unmeasured, current);
             }
-            success = this->ReadStaff(unmeasured, current);
+            else {
+                LogError("Unmeasured music within editorial markup is currently not supported");
+                return false;
+            }
         }
         else if (std::string(current.name()) == "measure") {
             // we should not mix measured and unmeasured music within a system...
