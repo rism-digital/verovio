@@ -1385,7 +1385,7 @@ void Doc::ConvertToCastOffMensuralDoc(MensuralCastOffType castOff)
     if ((castOff != MENSURAL_CAST_OFF_INIT) && !m_mensuralCastOff) return;
 
     // Do not convert transcription files
-    if (this->IsTranscription()) return;
+    if (this->IsFacTranscription()) return;
 
     // Flag it as performed
     m_mensuralCastOff = true;
@@ -1433,7 +1433,7 @@ void Doc::ConvertToCmnDoc()
     if (!this->IsMensuralMusicOnly()) return;
 
     // Do not convert transcription files
-    if (this->IsTranscription()) return;
+    if (this->IsFacTranscription()) return;
 
     m_isMensuralMusicOnly = BOOLEAN_false;
 
@@ -1643,7 +1643,7 @@ void Doc::ExpandExpansions()
     if (this->GetOptions()->m_expandNever.GetValue()) return;
 
     // Nothing to do in these cases - marked the map as processed
-    if (this->IsMensuralMusicOnly() || this->IsTranscription()) {
+    if (this->IsMensuralMusicOnly() || this->IsFacTranscription()) {
         m_expansionMap.SetProcessed(true);
         return;
     }
@@ -2408,7 +2408,7 @@ int Doc::GetAdjustedDrawingPageHeight() const
     assert(m_drawingPage);
 
     // Take into account the PPU when getting the page height in facsimile
-    if (this->IsTranscription()) {
+    if (this->IsFacTranscription()) {
         return m_drawingPage->m_pageHeight * m_drawingPage->GetPPUFactor() / DEFINITION_FACTOR;
     }
 
@@ -2424,7 +2424,7 @@ int Doc::GetAdjustedDrawingPageWidth() const
     assert(m_drawingPage);
 
     // Take into account the PPU when getting the page width in facsimile
-    if (this->IsTranscription()) {
+    if (this->IsFacTranscription()) {
         return m_drawingPage->m_pageWidth * m_drawingPage->GetPPUFactor() / DEFINITION_FACTOR;
     }
 

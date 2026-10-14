@@ -203,7 +203,7 @@ double Staff::GetDrawingRotate() const
     if (this->HasFacs()) {
         const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
-        if (doc->IsTranscription()) {
+        if (doc->IsFacTranscription()) {
             return FacsimileInterface::GetDrawingRotate();
         }
     }

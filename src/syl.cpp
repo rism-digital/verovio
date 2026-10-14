@@ -137,7 +137,7 @@ int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)
 
 int Syl::GetDrawingWidth() const
 {
-    if (this->HasFacs()) {
+    if (this->HasFacs() && this->GetZone()) {
         return FacsimileInterface::GetWidth();
     }
     return 0;
@@ -145,7 +145,7 @@ int Syl::GetDrawingWidth() const
 
 int Syl::GetDrawingHeight() const
 {
-    if (this->HasFacs()) {
+    if (this->HasFacs() && this->GetZone()) {
         return FacsimileInterface::GetHeight();
     }
     return 0;

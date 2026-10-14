@@ -880,7 +880,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
 
     // Always set breaks to 'none' or 'encoded' with Transcription rendering
     // rendering them differenty requires the MEI
-    if (m_doc.IsTranscription()) {
+    if (m_doc.IsFacTranscription()) {
         breaks = (m_doc.HasFacsimile()) ? BREAKS_encoded : BREAKS_none;
     }
 
@@ -919,7 +919,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         m_doc.ScoreDefSetCurrentDoc();
     }
 
-    if (m_doc.IsTranscription() && m_doc.HasFacsimile()) {
+    if (m_doc.IsFacTranscription() && m_doc.HasFacsimile()) {
         m_doc.SyncFromFacsimileDoc();
     }
 
@@ -1627,7 +1627,7 @@ void Toolkit::RedoLayout(const std::string &jsonOptions)
 
     this->ResetLogBuffer();
 
-    if ((this->GetPageCount() == 0) || m_doc.IsTranscription()) {
+    if ((this->GetPageCount() == 0) || m_doc.IsFacTranscription()) {
         LogWarning("No data to re-layout");
         return;
     }
@@ -1690,7 +1690,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     if (adjustWidth || (breaks == BREAKS_none)) width = m_doc.GetAdjustedDrawingPageWidth();
     if (adjustHeight || (breaks == BREAKS_none)) height = m_doc.GetAdjustedDrawingPageHeight();
 
-    if (m_doc.IsTranscription()) {
+    if (m_doc.IsFacTranscription()) {
         width = m_doc.GetAdjustedDrawingPageWidth();
         height = m_doc.GetAdjustedDrawingPageHeight();
     }

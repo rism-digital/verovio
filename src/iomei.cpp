@@ -3611,7 +3611,7 @@ std::string MEIOutput::DocTypeToStr(DocType type)
     switch (type) {
         case Raw: value = "raw"; break;
         case Rendering: value = "rendering"; break;
-        case Transcription: value = "transcription"; break;
+        case FacTranscription: value = "transcription"; break;
         default:
             LogWarning("Unknown document type '%d'", type);
             value = "";
@@ -4311,7 +4311,7 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
         if (m_doc->HasFacsimile()) {
             const bool facsimileTranscriptionType = (m_doc->GetFacsimile()->GetType() == "transcription");
             m_doc->SetType(
-                (facsimileTranscriptionType || m_doc->GetOptions()->m_useFacsimile.GetValue()) ? Transcription : Raw);
+                (facsimileTranscriptionType || m_doc->GetOptions()->m_useFacsimile.GetValue()) ? FacTranscription : Raw);
         }
         if (facsimile.next_sibling("facsimile")) {
             LogWarning("Only first <facsimile> is processed");
@@ -4551,7 +4551,7 @@ bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
     Page *vrvPage = new Page();
     this->SetMeiID(page, vrvPage);
 
-    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsFacTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradePageTo_3_0_0(vrvPage, m_doc);
     }
 
@@ -4590,12 +4590,12 @@ bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
     parent->AddChild(vrvPage);
     bool success = this->ReadPageChildren(vrvPage, page);
 
-    if (success && m_doc->IsTranscription() && (vrvPage->GetPPUFactor() != 1.0)) {
+    if (success && m_doc->IsFacTranscription() && (vrvPage->GetPPUFactor() != 1.0)) {
         ApplyPPUFactorFunctor applyPPUFactor;
         vrvPage->Process(applyPPUFactor);
     }
 
-    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsFacTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradePageTo_5_0(vrvPage);
     }
 
@@ -5081,7 +5081,7 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
                     assert(system);
                     unmeasured = new Measure(UNMEASURED);
                     m_doc->SetMensuralMusicOnly(BOOLEAN_true);
-                    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+                    if (m_doc->IsFacTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
                         UpgradeMeasureTo_3_0_0(unmeasured, system);
                     }
                     system->AddChild(unmeasured);
@@ -5825,7 +5825,7 @@ bool MEIInput::ReadMeasure(Object *parent, pugi::xml_node measure)
     vrvMeasure->ReadPointing(measure);
     vrvMeasure->ReadTyped(measure);
 
-    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsFacTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradeMeasureTo_5_0(measure);
     }
 
@@ -6866,7 +6866,7 @@ bool MEIInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
     object->ReadLabelled(element);
     object->ReadTyped(element);
 
-    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsFacTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradeLayerElementTo_5_0(element);
     }
 
@@ -8843,7 +8843,7 @@ DocType MEIInput::StrToDocType(std::string type)
 {
     if (type == "raw") return Raw;
     if (type == "rendering") return Rendering;
-    if (type == "transcription") return Transcription;
+    if (type == "transcription") return FacTranscription;
     LogWarning("Unknown layout type '%s'", type.c_str());
     return Raw;
 }

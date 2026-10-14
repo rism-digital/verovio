@@ -29,7 +29,7 @@ class Pages;
 class Page;
 class Score;
 
-enum DocType { Raw = 0, Rendering, Transcription };
+enum DocType { Raw = 0, Rendering, FacTranscription };
 
 //----------------------------------------------------------------------------
 // Doc
@@ -131,8 +131,7 @@ public:
     DocType GetType() const { return m_type; }
     void SetType(DocType type);
     bool IsRaw() const { return (m_type == Raw); }
-    bool IsRendering() const { return (m_type == Rendering); }
-    bool IsTranscription() const { return (m_type == Transcription); }
+    bool IsFacTranscription() const { return (m_type == FacTranscription); }
     ///@}
 
     /**
