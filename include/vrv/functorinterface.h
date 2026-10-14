@@ -100,6 +100,7 @@ class Page;
 class PageElement;
 class PageMilestoneEnd;
 class Pages;
+class Parts;
 class Pb;
 class Pedal;
 class PgFoot;
@@ -275,6 +276,8 @@ public:
     ///@{
     virtual FunctorCode VisitMdiv(Mdiv *mdiv);
     virtual FunctorCode VisitMdivEnd(Mdiv *mdiv);
+    virtual FunctorCode VisitParts(Parts *parts);
+    virtual FunctorCode VisitPartsEnd(Parts *parts);
     virtual FunctorCode VisitPageElement(PageElement *pageElement);
     virtual FunctorCode VisitPageElementEnd(PageElement *pageElement);
     virtual FunctorCode VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd);
@@ -662,6 +665,8 @@ public:
     ///@{
     virtual FunctorCode VisitMdiv(const Mdiv *mdiv);
     virtual FunctorCode VisitMdivEnd(const Mdiv *mdiv);
+    virtual FunctorCode VisitParts(const Parts *parts);
+    virtual FunctorCode VisitPartsEnd(const Parts *parts);
     virtual FunctorCode VisitPageElement(const PageElement *pageElement);
     virtual FunctorCode VisitPageElementEnd(const PageElement *pageElement);
     virtual FunctorCode VisitPageMilestone(const PageMilestoneEnd *pageMilestoneEnd);

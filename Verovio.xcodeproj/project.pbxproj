@@ -864,6 +864,12 @@
 		4DCB7AA426D3C9600047F01D /* crc.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DCB7AA226D3C9600047F01D /* crc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4DD11DC42240E78B00A405D8 /* c_wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD11DC22240E78B00A405D8 /* c_wrapper.cpp */; };
 		4DD11DC52240E78B00A405D8 /* c_wrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DD11DC32240E78B00A405D8 /* c_wrapper.h */; };
+		4DD3878F307FD9C700EBFD29 /* parts.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DD3878E307FD9C700EBFD29 /* parts.h */; };
+		4DD38790307FD9C700EBFD29 /* parts.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DD3878E307FD9C700EBFD29 /* parts.h */; };
+		4DD38792307FD9D300EBFD29 /* parts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD38791307FD9D300EBFD29 /* parts.cpp */; };
+		4DD38793307FD9D300EBFD29 /* parts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD38791307FD9D300EBFD29 /* parts.cpp */; };
+		4DD38794307FD9D300EBFD29 /* parts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD38791307FD9D300EBFD29 /* parts.cpp */; };
+		4DD38795307FD9D300EBFD29 /* parts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD38791307FD9D300EBFD29 /* parts.cpp */; };
 		4DD49C662BECC073006D1C2E /* adjustyrelfortranscriptionfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD49C652BECC073006D1C2E /* adjustyrelfortranscriptionfunctor.cpp */; };
 		4DD49C682BECC096006D1C2E /* adjustyrelfortranscriptionfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD49C652BECC073006D1C2E /* adjustyrelfortranscriptionfunctor.cpp */; };
 		4DD49C692BECC097006D1C2E /* adjustyrelfortranscriptionfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD49C652BECC073006D1C2E /* adjustyrelfortranscriptionfunctor.cpp */; };
@@ -2196,6 +2202,8 @@
 		4DCB7AA226D3C9600047F01D /* crc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crc.h; path = include/crc/crc.h; sourceTree = SOURCE_ROOT; };
 		4DD11DC22240E78B00A405D8 /* c_wrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = c_wrapper.cpp; path = tools/c_wrapper.cpp; sourceTree = "<group>"; };
 		4DD11DC32240E78B00A405D8 /* c_wrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = c_wrapper.h; path = tools/c_wrapper.h; sourceTree = "<group>"; };
+		4DD3878E307FD9C700EBFD29 /* parts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = parts.h; path = include/vrv/parts.h; sourceTree = "<group>"; };
+		4DD38791307FD9D300EBFD29 /* parts.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = parts.cpp; path = src/parts.cpp; sourceTree = "<group>"; };
 		4DD49C652BECC073006D1C2E /* adjustyrelfortranscriptionfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustyrelfortranscriptionfunctor.cpp; path = src/adjustyrelfortranscriptionfunctor.cpp; sourceTree = "<group>"; };
 		4DD49C672BECC083006D1C2E /* adjustyrelfortranscriptionfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustyrelfortranscriptionfunctor.h; path = include/vrv/adjustyrelfortranscriptionfunctor.h; sourceTree = "<group>"; };
 		4DD7C0FB27A55CEA00B9C017 /* timemap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = timemap.cpp; path = src/timemap.cpp; sourceTree = "<group>"; };
@@ -2634,6 +2642,8 @@
 			children = (
 				4D64137D2035F68600BB630E /* mdiv.cpp */,
 				4D64137B2035F67C00BB630E /* mdiv.h */,
+				4DD38791307FD9D300EBFD29 /* parts.cpp */,
+				4DD3878E307FD9C700EBFD29 /* parts.h */,
 				4D95D4FB1D74551100B2B856 /* scoreorpart.cpp */,
 				4D95D4FA1D74549700B2B856 /* scoreorpart.h */,
 				4D79641726C1522B0026288B /* pageelement.cpp */,
@@ -3489,6 +3499,7 @@
 				4DED4F1C294733280073E504 /* altsyminterface.h in Headers */,
 				4DB3D8BA1F83D0CA00B5FC2B /* systemmilestone.h in Headers */,
 				4DCA95DB1A515D33008AD7E9 /* editorial.h in Headers */,
+				4DD3878F307FD9C700EBFD29 /* parts.h in Headers */,
 				40C2E4202052A6E90003625F /* sb.h in Headers */,
 				4DE0B9A12988070C00D4C939 /* interface.h in Headers */,
 				E7870354299CF03200156DC4 /* adjustarpegfunctor.h in Headers */,
@@ -3899,6 +3910,7 @@
 				4DA0EADA22BB77AF00A7EBEB /* facsimile.h in Headers */,
 				4D71BEAA2D875DF800CE0001 /* atts_stringtab.h in Headers */,
 				BB4C4AE222A932BC001F6AF0 /* app.h in Headers */,
+				4DD38790307FD9C700EBFD29 /* parts.h in Headers */,
 				BB4C4AE822A932BC001F6AF0 /* damage.h in Headers */,
 				BB4C4B7022A932D7001F6AF0 /* proport.h in Headers */,
 				BB4C4ABA22A932A6001F6AF0 /* iopae.h in Headers */,
@@ -4435,6 +4447,7 @@
 				4DACC9AB2990F29A00B55913 /* attmodule.cpp in Sources */,
 				4DF9DB302F32319C0003112D /* editortoolkit_shared.cpp in Sources */,
 				4D16943E1E3A44F300569BF4 /* view_graph.cpp in Sources */,
+				4DD38793307FD9D300EBFD29 /* parts.cpp in Sources */,
 				4D16943F1E3A44F300569BF4 /* view_page.cpp in Sources */,
 				4D1694401E3A44F300569BF4 /* view_tuplet.cpp in Sources */,
 				4DB78742201F9F7200394520 /* svg.cpp in Sources */,
@@ -4767,6 +4780,7 @@
 				400FEDD3206FA743000D3233 /* gracegrp.cpp in Sources */,
 				4D4FCD0C1F5455FF0009C455 /* staffgrp.cpp in Sources */,
 				4D1788C82CB8FD7300FE9043 /* fraction.cpp in Sources */,
+				4DD38792307FD9D300EBFD29 /* parts.cpp in Sources */,
 				4DEC4DBE21C828AC00D1D273 /* corr.cpp in Sources */,
 				4D1BD1B521908D6B000D35B2 /* halfmrpt.cpp in Sources */,
 				4D1EB6A12A2A40B400AF2F98 /* textlayoutelement.cpp in Sources */,
@@ -5052,6 +5066,7 @@
 				4DACC9EE2990F29A00B55913 /* atts_shared.cpp in Sources */,
 				4DF9DB2F2F32319C0003112D /* editortoolkit_shared.cpp in Sources */,
 				8F3DD32018854AFB0051330C /* devicecontext.cpp in Sources */,
+				4DD38794307FD9D300EBFD29 /* parts.cpp in Sources */,
 				4DACC9AC2990F29A00B55913 /* attmodule.cpp in Sources */,
 				8F3DD32218854AFB0051330C /* svgdevicecontext.cpp in Sources */,
 				4DCA95D91A515D0E008AD7E9 /* editorial.cpp in Sources */,
@@ -5361,6 +5376,7 @@
 				4DACC9EF2990F29A00B55913 /* atts_shared.cpp in Sources */,
 				BB4C4BC322A9330D001F6AF0 /* pugixml.cpp in Sources */,
 				4D6479432C9C0F4400CD9539 /* genericlayerelement.cpp in Sources */,
+				4DD38795307FD9D300EBFD29 /* parts.cpp in Sources */,
 				4DACC9AD2990F29A00B55913 /* attmodule.cpp in Sources */,
 				4DF9DB2E2F32319C0003112D /* editortoolkit_shared.cpp in Sources */,
 				4D2E758B22BC2B5B004C51F0 /* tabgrp.cpp in Sources */,

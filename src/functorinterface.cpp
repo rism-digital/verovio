@@ -86,6 +86,7 @@
 #include "page.h"
 #include "pagemilestone.h"
 #include "pages.h"
+#include "parts.h"
 #include "pb.h"
 #include "pedal.h"
 #include "pgfoot.h"
@@ -465,6 +466,16 @@ FunctorCode FunctorInterface::VisitMdiv(Mdiv *mdiv)
 FunctorCode FunctorInterface::VisitMdivEnd(Mdiv *mdiv)
 {
     return this->VisitPageElementEnd(mdiv);
+}
+
+FunctorCode FunctorInterface::VisitParts(Parts *parts)
+{
+    return this->VisitPageElement(parts);
+}
+
+FunctorCode FunctorInterface::VisitPartsEnd(Parts *parts)
+{
+    return this->VisitPageElementEnd(parts);
 }
 
 FunctorCode FunctorInterface::VisitPageElement(PageElement *pageElement)
@@ -1869,6 +1880,16 @@ FunctorCode ConstFunctorInterface::VisitMdiv(const Mdiv *mdiv)
 FunctorCode ConstFunctorInterface::VisitMdivEnd(const Mdiv *mdiv)
 {
     return this->VisitPageElementEnd(mdiv);
+}
+
+FunctorCode ConstFunctorInterface::VisitParts(const Parts *parts)
+{
+    return this->VisitPageElement(parts);
+}
+
+FunctorCode ConstFunctorInterface::VisitPartsEnd(const Parts *parts)
+{
+    return this->VisitPageElementEnd(parts);
 }
 
 FunctorCode ConstFunctorInterface::VisitPageElement(const PageElement *pageElement)
