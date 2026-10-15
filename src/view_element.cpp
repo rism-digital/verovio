@@ -859,7 +859,7 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
 
         this->CalcOffset(dc, x, y);
 
-        if (m_doc->GetType() != Transcription) {
+        if (m_doc->GetType() != FacTranscription) {
             // Use the note to which the points to for position if no next element or for augmentation dots
             if (dot->m_drawingPreviousElement && (!dot->m_drawingNextElement || dot->GetForm() == dotLog_FORM_aug)) {
                 x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 7 / 2;
@@ -1887,7 +1887,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         return;
     }
 
-    if (!m_doc->IsFacs() && !m_doc->IsTranscription() && !m_doc->IsNeumeLines()) {
+    if (!m_doc->IsFacTranscription() && !m_doc->IsNeumeLines()) {
         syl->SetDrawingYRel(
             this->GetSylYRel(syl->m_drawingVerseN, staff, syl->m_drawingVersePlace, syl->m_drawingVoltaN));
     }
@@ -1954,7 +1954,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     params.m_x = x;
     params.m_y = y;
     params.m_staffSize = staff->m_drawingStaffSize;
-    if (m_doc->IsFacs() || m_doc->IsNeumeLines()) {
+    if (m_doc->IsNeumeLines()) {
         params.m_width = syl->GetDrawingWidth();
         params.m_height = syl->GetDrawingHeight();
     }

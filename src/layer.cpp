@@ -275,31 +275,7 @@ const Clef *Layer::GetClef(const LayerElement *test) const
         assert(clef);
         return clef;
     }
-    const Clef *facsClef = this->GetClefFacs(test);
-    if (facsClef != NULL) {
-        return facsClef;
-    }
     return this->GetCurrentClef();
-}
-
-Clef *Layer::GetClefFacs(const LayerElement *test)
-{
-    return const_cast<Clef *>(std::as_const(*this).GetClefFacs(test));
-}
-
-const Clef *Layer::GetClefFacs(const LayerElement *test) const
-{
-    const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
-    assert(doc);
-    if (doc->IsFacs()) {
-        ListOfConstObjects clefs;
-        ClassIdComparison ac(CLEF);
-        doc->FindAllDescendantsBetween(&clefs, &ac, doc->GetFirst(CLEF), test);
-        if (clefs.size() > 0) {
-            return dynamic_cast<const Clef *>(*clefs.rbegin());
-        }
-    }
-    return NULL;
 }
 
 int Layer::GetClefLocOffset(const LayerElement *test) const
