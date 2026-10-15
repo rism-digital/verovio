@@ -165,7 +165,9 @@ namespace humaux {
         m_pitch = anothertie.m_pitch;
         m_layer = anothertie.m_layer;
         m_starttokenpointer = anothertie.m_starttokenpointer;
+        m_endtokenpointer = anothertie.m_endtokenpointer;
         m_subindex = anothertie.m_subindex;
+        m_endsubindex = anothertie.m_endsubindex;
         m_meter_top = anothertie.m_meter_top;
         m_meter_bottom = anothertie.m_meter_bottom;
     }
@@ -194,7 +196,9 @@ namespace humaux {
         m_pitch = anothertie.m_pitch;
         m_layer = anothertie.m_layer;
         m_starttokenpointer = anothertie.m_starttokenpointer;
+        m_endtokenpointer = anothertie.m_endtokenpointer;
         m_subindex = anothertie.m_subindex;
+        m_endsubindex = anothertie.m_endsubindex;
         m_meter_top = anothertie.m_meter_top;
         m_meter_bottom = anothertie.m_meter_bottom;
         return *this;
@@ -211,8 +215,10 @@ namespace humaux {
         m_startid.clear();
         m_endid.clear();
         m_starttokenpointer = NULL;
+        m_endtokenpointer = NULL;
         m_starttoken = "";
         m_subindex = -1;
+        m_endsubindex = -1;
         m_meter_top = 4;
         m_meter_bottom = 4;
     }
@@ -315,7 +321,7 @@ namespace humaux {
     }
 
     void HumdrumTie::setEnd(const std::string &id, Measure *ending, int layer, const std::string &token, int pitch,
-        hum::HumNum starttime, hum::HumNum endtime, int subindex, hum::HTp starttok, int metertop, hum::HumNum meterbot)
+        hum::HumNum starttime, hum::HumNum endtime, int subindex, hum::HTp endtok, int metertop, hum::HumNum meterbot)
     {
         m_endid = id;
         m_layer = layer;
@@ -324,15 +330,15 @@ namespace humaux {
         m_pitch = pitch;
         m_starttime = starttime;
         m_endtime = endtime;
-        m_subindex = subindex;
-        m_starttokenpointer = starttok; // maybe create m_endtokenpointer for tie ends
+        m_endsubindex = subindex;
+        m_endtokenpointer = endtok;
         m_meter_top = metertop;
         m_meter_bottom = meterbot;
     }
 
     hum::HTp HumdrumTie::getEndToken()
     {
-        return m_starttokenpointer;
+        return m_endtokenpointer;
     }
 
     void HumdrumTie::setEndId(const std::string &id)
@@ -346,10 +352,10 @@ namespace humaux {
     }
 
     Tie *HumdrumTie::setEndAndInsert(const std::string &id, Measure *ending, int layer, const std::string &token,
-        int pitch, hum::HumNum starttime, hum::HumNum endtime, int subindex, hum::HTp starttok, int metertop,
+        int pitch, hum::HumNum starttime, hum::HumNum endtime, int subindex, hum::HTp endtok, int metertop,
         hum::HumNum meterbot)
     {
-        setEnd(id, ending, layer, token, pitch, starttime, endtime, subindex, starttok, metertop, meterbot);
+        setEnd(id, ending, layer, token, pitch, starttime, endtime, subindex, endtok, metertop, meterbot);
         return insertTieIntoDom();
     }
 
@@ -420,7 +426,7 @@ namespace humaux {
 
     int HumdrumTie::getEndSubindex()
     {
-        return m_subindex;
+        return m_endsubindex;
     }
 
     /////////////////////////////////////////////////////////////////////
