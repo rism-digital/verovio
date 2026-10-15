@@ -2874,9 +2874,12 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure)
 
     int durOffset = 0;
 
-    std::string harmText = GetContentOfChild(node, "root/root-step");
+    // root-step@text, when present, replaces the step in the displayed text. An empty value hides the root,
+    // which is how the "none" kind (no chord) is expected to be encoded.
+    pugi::xml_node rootStep = node.child("root").child("root-step");
+    std::string harmText = rootStep.attribute("text") ? rootStep.attribute("text").as_string() : GetContent(rootStep);
     pugi::xpath_node alter = node.select_node("root/root-alter");
-    if (harmText.empty()) {
+    if (!rootStep) {
         pugi::xml_node numeral = node.select_node("numeral/numeral-root").node();
         harmText = numeral.attribute("text") ? numeral.attribute("text").as_string() : numeral.text().as_string();
         alter = node.select_node("numeral/numeral-alter");
@@ -2887,7 +2890,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure)
         if (HasAttributeWithValue(kind, "use-symbols", "yes")) {
             harmText = harmText + ConvertKindToSymbol(GetContent(kind));
         }
-        else if (kind.attribute("text") && std::strcmp(kind.text().as_string(), "none")) {
+        else if (kind.attribute("text")) {
             harmText = harmText + kind.attribute("text").as_string();
         }
         else {
