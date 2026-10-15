@@ -186,6 +186,32 @@ void Cursor::OnSet(const std::string &attribute)
 }
 
 //----------------------------------------------------------------------------
+// Static methods
+//----------------------------------------------------------------------------
+
+Cursor::InputMode Cursor::GetInputModeFromStr(const std::string &inputModeStr)
+{
+    if (inputModeStr == "durationFirst") {
+        return Cursor::DURATION_FIRST;
+    }
+    else if (inputModeStr == "type") {
+        return Cursor::TYPE;
+    }
+    else {
+        return Cursor::PITCH_FIRST;
+    }
+}
+
+std::string Cursor::GetInputModeFromValue(Cursor::InputMode inputMode)
+{
+    switch (inputMode) {
+        case Cursor::PITCH_FIRST: return "durationFirst";
+        case Cursor::TYPE: return "type";
+        default: return "pitchFirst";
+    }
+}
+
+//----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
 

@@ -179,7 +179,10 @@ bool EditorToolkitCMN::ParseInsertCursorByTypeAction(const jsonxx::Object &param
 
     if (!param.has<jsonxx::String>("type")) return false;
 
-    if (param.get<jsonxx::String>("type") == "rest") {
+    if (param.get<jsonxx::String>("type") == "note") {
+        insertType = CURSOR_INSERT_NOTE;
+    }
+    else if (param.get<jsonxx::String>("type") == "rest") {
         insertType = CURSOR_INSERT_REST;
     }
     else if (param.get<jsonxx::String>("type") == "tie") {

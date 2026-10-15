@@ -41,6 +41,7 @@ public:
 protected:
     enum CursorInsertType : int8_t {
         CURSOR_INSERT_NONE = 0,
+        CURSOR_INSERT_NOTE,
         CURSOR_INSERT_REST,
         CURSOR_INSERT_TIE,
         CURSOR_INSERT_COPY

@@ -8,9 +8,9 @@
 #ifndef __VRV_CLIPBOARD_H__
 #define __VRV_CLIPBOARD_H__
 
-#include <vector>
 #include <cstdint>
 #include <string>
+#include <vector>
 
 //----------------------------------------------------------------------------
 
@@ -37,12 +37,12 @@ public:
     Clipboard();
     virtual ~Clipboard();
     ///@}
-    
+
     enum ClipboardType : int8_t { CLIPBOARD_NONE = 0, CLIPBOARD_MEASURES, CLIPBOARD_STAVES, CLIPBOARD_LAYERELEMENTS };
-    
+
     ClipboardType GetClipboardType() const { return m_clipboardType; }
     void ClearClipboard();
-    
+
 private:
     //
 public:

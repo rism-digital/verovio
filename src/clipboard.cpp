@@ -21,10 +21,7 @@ namespace vrv {
 // Clipboard
 //----------------------------------------------------------------------------
 
-Clipboard::Clipboard()
-{
-
-}
+Clipboard::Clipboard() {}
 
 Clipboard::~Clipboard() {}
 

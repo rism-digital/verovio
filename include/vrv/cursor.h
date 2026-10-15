@@ -92,7 +92,7 @@ public:
     void SetTieMode(TieMode tieMode);
     bool IsTieMode() const { return (m_tieMode != TieMode::TIE_NONE); }
 
-    enum InputMode : int8_t { PITCH_FIRST = 0, DURATION_FIRST };
+    enum InputMode : int8_t { PITCH_FIRST = 0, DURATION_FIRST, TYPE };
 
     InputMode GetInputMode() const { return m_inputMode; }
     void SetInputMode(InputMode inputMode);
@@ -105,6 +105,13 @@ public:
 
     bool Veto(const std::string &attribute) const;
     void OnSet(const std::string &attribute);
+
+    //--------//
+    // Static //
+    //--------//
+
+    static InputMode GetInputModeFromStr(const std::string &inputModeStr);
+    static std::string GetInputModeFromValue(InputMode inputMode);
 
     //----------//
     // Functors //

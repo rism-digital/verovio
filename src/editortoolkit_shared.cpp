@@ -645,7 +645,8 @@ bool EditorToolkitShared::ParseSetCursorAction(
 
     if (param.has<jsonxx::String>("elementId")) elementId = param.get<jsonxx::String>("elementId");
     if (!param.has<jsonxx::String>("inputMode")) return false;
-    inputMode = (param.get<jsonxx::String>("inputMode") == "pitchFirst") ? Cursor::PITCH_FIRST : Cursor::DURATION_FIRST;
+    const std::string inputModeStr = (param.get<jsonxx::String>("inputMode"));
+    inputMode = Cursor::GetInputModeFromStr(inputModeStr);
     if (!param.has<jsonxx::Boolean>("chordMode")) return false;
     chordMode = param.get<jsonxx::Boolean>("chordMode");
     if (!param.has<jsonxx::Boolean>("autoBeam")) return false;
@@ -820,8 +821,7 @@ void EditorToolkitShared::SetEditStatus()
         insertion.import(
             "dur", (m_cursor->HasDur() ? m_cursor->AttDurationLog::DurationToStr(m_cursor->GetDur()) : "4"));
         insertion.import("dots", (m_cursor->HasDots()) ? m_cursor->GetDots() : 0);
-        insertion.import(
-            "inputMode", (m_cursor->GetInputMode() == Cursor::PITCH_FIRST ? "pitchFirst" : "durationFirst"));
+        insertion.import("inputMode", (Cursor::GetInputModeFromValue(m_cursor->GetInputMode())));
         insertion.import("chordMode", (m_cursor->IsChordMode()));
         insertion.import("restMode", (m_cursor->IsRestMode()));
         insertion.import("accid",
@@ -893,7 +893,7 @@ void EditorToolkitShared::ReloadEditStatus(const std::string &statusStr, bool in
         Cursor::InputMode inputMode = Cursor::PITCH_FIRST;
         if (insertion.has<jsonxx::String>("inputMode")) {
             std::string inputModeStr = insertion.get<jsonxx::String>("inputMode");
-            inputMode = (inputModeStr == "pitchFirst") ? Cursor::PITCH_FIRST : Cursor::DURATION_FIRST;
+            inputMode = Cursor::GetInputModeFromStr(inputModeStr);
         }
 
         bool chordMode = false;
@@ -1348,8 +1348,7 @@ bool EditorToolkitShared::Drag(DragPhase phase, int dx, int dy)
         const int quantizedY = drawingY + (drawingDeltaY / unit) * unit;
 
         int oct;
-        const data_PITCHNAME pname
-        = (data_PITCHNAME)m_view->CalculatePitchCode(layer, quantizedY, m_dragXOrigin, &oct);
+        const data_PITCHNAME pname = (data_PITCHNAME)m_view->CalculatePitchCode(layer, quantizedY, m_dragXOrigin, &oct);
         if (element->Is(NOTE)) {
             element->GetPitchInterface()->SetPname(pname);
             element->GetPitchInterface()->SetOct(oct);
