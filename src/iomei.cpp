@@ -1782,15 +1782,6 @@ void MEIOutput::WriteSystem(pugi::xml_node currentNode, System *system)
     assert(system);
 
     this->WriteXmlId(currentNode, system);
-    // margins
-    currentNode.append_attribute("system.leftmar")
-        = StringFormat("%d", system->m_systemLeftMar / DEFINITION_FACTOR).c_str();
-    currentNode.append_attribute("system.rightmar")
-        = StringFormat("%d", system->m_systemRightMar / DEFINITION_FACTOR).c_str();
-    // y positions
-    if (system->m_drawingFacsY != VRV_UNSET) {
-        currentNode.append_attribute("uly") = StringFormat("%d", system->m_drawingFacsY / DEFINITION_FACTOR).c_str();
-    }
     system->WriteTyped(currentNode);
 }
 
@@ -5251,19 +5242,6 @@ bool MEIInput::ReadSystem(Object *parent, pugi::xml_node system)
     System *vrvSystem = new System();
     this->SetMeiID(system, vrvSystem);
     vrvSystem->ReadTyped(system);
-
-    if (system.attribute("system.leftmar")) {
-        vrvSystem->m_systemLeftMar = system.attribute("system.leftmar").as_int();
-        system.remove_attribute("system.leftmar");
-    }
-    if (system.attribute("system.rightmar")) {
-        vrvSystem->m_systemRightMar = system.attribute("system.rightmar").as_int();
-        system.remove_attribute("system.rightmar");
-    }
-    if (system.attribute("uly") && m_doc->IsTranscription()) {
-        vrvSystem->m_drawingFacsY = system.attribute("uly").as_int() * DEFINITION_FACTOR;
-        system.remove_attribute("uly");
-    }
 
     parent->AddChild(vrvSystem);
     this->ReadUnsupportedAttr(system, vrvSystem);
