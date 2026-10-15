@@ -390,7 +390,8 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         this->WritePart(m_currentNode, vrv_cast<Part *>(object));
     }
     else if (object->Is(PARTS)) {
-        m_currentNode = m_currentNode.append_child("parts");
+        const std::string name = (this->IsPageBasedMEI() && object->IsMilestoneElement()) ? "partsb" : "parts";
+        m_currentNode = m_currentNode.append_child(name.c_str());
         this->WriteParts(m_currentNode, vrv_cast<Parts *>(object));
     }
     else if (object->Is(SCORE)) {
@@ -4758,6 +4759,9 @@ bool MEIInput::ReadPageChildren(Object *parent, pugi::xml_node parentNode)
         if (std::string(current.name()) == "mdiv") {
             this->ReadMdiv(parent, current, true);
         }
+        else if (std::string(current.name()) == "part") {
+            this->ReadPart(parent, current);
+        }
         else if (std::string(current.name()) == "score") {
             this->ReadScore(parent, current);
         }
@@ -4767,6 +4771,9 @@ bool MEIInput::ReadPageChildren(Object *parent, pugi::xml_node parentNode)
         // mdiv in page-based MEI
         else if (std::string(current.name()) == "mdivb") {
             this->ReadMdiv(parent, current, true);
+        }
+        else if (std::string(current.name()) == "partsb") {
+            this->ReadParts(parent, current);
         }
         else if (std::string(current.name()) == "milestoneEnd") {
             this->ReadPageMilestoneEnd(parent, current);
