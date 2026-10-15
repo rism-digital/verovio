@@ -110,6 +110,8 @@
 #include "page.h"
 #include "pagemilestone.h"
 #include "pages.h"
+#include "part.h"
+#include "parts.h"
 #include "pb.h"
 #include "pedal.h"
 #include "pgfoot.h"
@@ -130,6 +132,7 @@
 #include "restore.h"
 #include "sb.h"
 #include "score.h"
+#include "scoreorpartelement.h"
 #include "section.h"
 #include "sic.h"
 #include "slur.h"
@@ -381,6 +384,15 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         else {
             return true;
         }
+    }
+    else if (object->Is(PART)) {
+        m_currentNode = m_currentNode.append_child("part");
+        this->WritePart(m_currentNode, vrv_cast<Part *>(object));
+    }
+    else if (object->Is(PARTS)) {
+        const std::string name = (this->IsPageBasedMEI() && object->IsMilestoneElement()) ? "partsb" : "parts";
+        m_currentNode = m_currentNode.append_child(name.c_str());
+        this->WriteParts(m_currentNode, vrv_cast<Parts *>(object));
     }
     else if (object->Is(SCORE)) {
         m_currentNode = m_currentNode.append_child("score");
@@ -1027,15 +1039,15 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     // Object representing an attribute have no node to push
     if (this->IsTreeObject(object)) m_nodeStack.push_back(m_currentNode);
 
-    if (object->Is(SCORE)) {
-        ScoreDef *scoreDef = vrv_cast<Score *>(object)->GetScoreDef();
+    if (object->IsScoreOrPartElement()) {
+        ScoreDef *scoreDef = vrv_cast<ScoreOrPartElement *>(object)->GetScoreDef();
         assert(scoreDef);
         if (useCustomScoreDef) {
             this->WriteCustomScoreDef(scoreDef);
         }
         else {
             // Save the main scoreDef
-            vrv_cast<Score *>(object)->GetScoreDefSubtree()->SaveObject(this);
+            vrv_cast<ScoreOrPartElement *>(object)->GetScoreDefSubtree()->SaveObject(this);
         }
     }
 
@@ -1691,13 +1703,36 @@ void MEIOutput::WritePages(pugi::xml_node currentNode, Pages *pages)
     pages->WriteNNumberLike(currentNode);
 }
 
+void MEIOutput::WriteParts(pugi::xml_node currentNode, Parts *parts)
+{
+    assert(parts);
+
+    this->WriteXmlId(currentNode, parts);
+    parts->WriteLabelled(currentNode);
+    parts->WriteNNumberLike(currentNode);
+}
+
+void MEIOutput::WriteScoreOrPartElement(pugi::xml_node currentNode, ScoreOrPartElement *scoreOrPartElement)
+{
+    assert(scoreOrPartElement);
+
+    this->WriteXmlId(currentNode, scoreOrPartElement);
+    scoreOrPartElement->WriteLabelled(currentNode);
+    scoreOrPartElement->WriteNNumberLike(currentNode);
+}
+
+void MEIOutput::WritePart(pugi::xml_node currentNode, Part *part)
+{
+    assert(part);
+
+    this->WriteScoreOrPartElement(currentNode, part);
+}
+
 void MEIOutput::WriteScore(pugi::xml_node currentNode, Score *score)
 {
     assert(score);
 
-    this->WriteXmlId(currentNode, score);
-    score->WriteLabelled(currentNode);
-    score->WriteNNumberLike(currentNode);
+    this->WriteScoreOrPartElement(currentNode, score);
 }
 
 void MEIOutput::WritePage(pugi::xml_node currentNode, Page *page)
@@ -3643,7 +3678,7 @@ jsonxx::Object MEIOutputExtended::ExportScoreDef()
         m_currentNode = meiDoc.root();
         m_nodeStack.push_back(m_currentNode);
 
-        Score *score = m_doc->GetFirstVisibleScore();
+        ScoreOrPartElement *score = m_doc->GetFirstVisibleScoreOrPart();
         score->GetScoreDef()->SaveObject(this);
 
         return ToJson(meiDoc);
@@ -4724,6 +4759,9 @@ bool MEIInput::ReadPageChildren(Object *parent, pugi::xml_node parentNode)
         if (std::string(current.name()) == "mdiv") {
             this->ReadMdiv(parent, current, true);
         }
+        else if (std::string(current.name()) == "part") {
+            this->ReadPart(parent, current);
+        }
         else if (std::string(current.name()) == "score") {
             this->ReadScore(parent, current);
         }
@@ -4733,6 +4771,9 @@ bool MEIInput::ReadPageChildren(Object *parent, pugi::xml_node parentNode)
         // mdiv in page-based MEI
         else if (std::string(current.name()) == "mdivb") {
             this->ReadMdiv(parent, current, true);
+        }
+        else if (std::string(current.name()) == "partsb") {
+            this->ReadParts(parent, current);
         }
         else if (std::string(current.name()) == "milestoneEnd") {
             this->ReadPageMilestoneEnd(parent, current);
@@ -4828,6 +4869,9 @@ bool MEIInput::ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool 
         if (std::string(current.name()) == "mdiv") {
             success = this->ReadMdiv(parent, current, makeVisible);
         }
+        else if (std::string(current.name()) == "parts") {
+            success = this->ReadParts(parent, current);
+        }
         else if (std::string(current.name()) == "score") {
             // Possibly skip content on load
             if (!isVisible && m_doc->GetOptions()->m_loadSelectedMdivOnly.GetValue()) continue;
@@ -4850,23 +4894,82 @@ bool MEIInput::ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool 
     return success;
 }
 
+bool MEIInput::ReadParts(Object *parent, pugi::xml_node parts)
+{
+    Parts *vrvParts = new Parts();
+    this->SetMeiID(parts, vrvParts);
+
+    vrvParts->ReadLabelled(parts);
+    vrvParts->ReadNNumberLike(parts);
+
+    parent->AddChild(vrvParts);
+
+    this->ReadUnsupportedAttr(parts, vrvParts);
+    return this->ReadPartsChildren(vrvParts, parts);
+}
+
+bool MEIInput::ReadPartsChildren(Object *parent, pugi::xml_node parentNode)
+{
+    assert(dynamic_cast<Parts *>(parent));
+
+    if (!m_readingScoreBased && !m_deserializing) {
+        if (parentNode.first_child()) {
+            LogWarning("Unexpected <mdiv> content in page-based MEI");
+        }
+        return true;
+    }
+
+    pugi::xml_node current;
+    bool success = true;
+    for (current = parentNode.first_child(); current; current = current.next_sibling()) {
+        if (!success) break;
+        if (std::string(current.name()) == "part") {
+            success = this->ReadPart(parent, current);
+        }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = this->ReadXMLComment(parent, current);
+        }
+        else {
+            LogWarning("Unsupported '<%s>' within <mdiv>", current.name());
+        }
+    }
+
+    return success;
+}
+
+bool MEIInput::ReadPart(Object *parent, pugi::xml_node part)
+{
+    Part *vrvPart = new Part(false);
+    parent->AddChild(vrvPart);
+    this->ReadScoreOrPartElement(part, vrvPart);
+
+    return this->ReadScoreOrPartChildren(vrvPart, part);
+}
+
 bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
 {
     Score *vrvScore = new Score(false);
-    this->SetMeiID(score, vrvScore);
-
-    vrvScore->ReadLabelled(score);
-    vrvScore->ReadNNumberLike(score);
-
     parent->AddChild(vrvScore);
+    this->ReadScoreOrPartElement(score, vrvScore);
+
+    return this->ReadScoreOrPartChildren(vrvScore, score);
+}
+
+bool MEIInput::ReadScoreOrPartElement(pugi::xml_node element, ScoreOrPartElement *object)
+{
+    this->SetMeiID(element, object);
+
+    object->ReadLabelled(element);
+    object->ReadNNumberLike(element);
 
     // This is a score-based MEI file
     m_readingScoreBased = true;
 
     // This actually sets the top-level ScoreDef for the Score
     // Use a temporary score to read it (including the surrounding editorial markup)
-    Score tmpScore;
-    bool success = this->ReadScoreScoreDef(&tmpScore, score);
+    ScoreOrPartElement tmpScore(SCORE, true);
+    bool success = this->ReadScoreScoreDef(&tmpScore, element);
     // Detach the first child
     Object *subtree = tmpScore.DetachChild(0);
     // This will find the one selected by xpath queries since the subtree is filtered by visibility
@@ -4877,33 +4980,43 @@ bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
         LogError("No top-level scoreDef could be read as child or direct descendant of score.");
         return false;
     }
-    vrvScore->SetScoreDefSubtree(subtree, scoreScoreDef);
+    object->SetScoreDefSubtree(subtree, scoreScoreDef);
     m_hasScoreDef = true;
 
     if (!success) return false;
 
+    this->ReadUnsupportedAttr(element, object);
+    return success;
+}
+
+bool MEIInput::ReadScoreOrPartChildren(Object *parent, pugi::xml_node parentNode)
+{
+    assert(dynamic_cast<Part *>(parent) || dynamic_cast<Score *>(parent));
+
+    bool success = true;
+
     // We start from the second child here (first one is supposed to be the scoreDef or scoreDef within editorial markup
-    pugi::xml_node current = score.first_child();
+    pugi::xml_node current = parentNode.first_child();
     for (current = current.next_sibling(); current; current = current.next_sibling()) {
         if (!success) break;
         this->NormalizeAttributes(current);
         std::string elementName = std::string(current.name());
         // editorial
         if (this->IsEditorialElementName(current.name())) {
-            success = this->ReadEditorialElement(vrvScore, current, EDITORIAL_TOPLEVEL);
+            success = this->ReadEditorialElement(parent, current, EDITORIAL_TOPLEVEL);
         }
         // content
         else if (elementName == "ending") {
-            success = this->ReadEnding(vrvScore, current);
+            success = this->ReadEnding(parent, current);
         }
         else if (elementName == "section") {
-            success = this->ReadSection(vrvScore, current);
+            success = this->ReadSection(parent, current);
         }
         else if (elementName == "sb") {
-            success = this->ReadSb(vrvScore, current);
+            success = this->ReadSb(parent, current);
         }
         else if (elementName == "pb") {
-            success = this->ReadPb(vrvScore, current);
+            success = this->ReadPb(parent, current);
         }
         // xml comment
         else if (std::string(current.name()) == "") {
@@ -4914,7 +5027,6 @@ bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
         }
     }
 
-    this->ReadUnsupportedAttr(score, vrvScore);
     return success;
 }
 
@@ -5366,8 +5478,8 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
 
 bool MEIInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
 {
-    assert(dynamic_cast<Pages *>(parent) || dynamic_cast<Score *>(parent) || dynamic_cast<Section *>(parent)
-        || dynamic_cast<System *>(parent) || dynamic_cast<Ending *>(parent)
+    assert(dynamic_cast<Pages *>(parent) || dynamic_cast<ScoreOrPartElement *>(parent)
+        || dynamic_cast<Section *>(parent) || dynamic_cast<System *>(parent) || dynamic_cast<Ending *>(parent)
         || dynamic_cast<EditorialElement *>(parent));
     // assert(dynamic_cast<Pages *>(parent));
 
@@ -9471,13 +9583,13 @@ void MEIInputExtended::ImportScoreDef(const jsonxx::Object &scoreDef)
     try {
         pugi::xml_document meiDoc = this->FromJson(scoreDef);
 
-        Score newScore;
-        if (this->ReadScoreDefExt(&newScore, meiDoc.first_child())) {
-            Score *score = m_doc->GetFirstVisibleScore();
-            ScoreDef *vrvScoreDef = vrv_cast<ScoreDef *>(newScore.GetFirst());
-            if (score && vrvScoreDef) {
-                newScore.Relinquish(0);
-                score->SetScoreDefSubtree(vrvScoreDef, vrvScoreDef);
+        ScoreOrPartElement newScoreOrPart(SCORE, false);
+        if (this->ReadScoreDefExt(&newScoreOrPart, meiDoc.first_child())) {
+            ScoreOrPartElement *scoreOrPart = m_doc->GetFirstVisibleScoreOrPart();
+            ScoreDef *vrvScoreDef = vrv_cast<ScoreDef *>(newScoreOrPart.GetFirst());
+            if (scoreOrPart && vrvScoreDef) {
+                newScoreOrPart.Relinquish(0);
+                scoreOrPart->SetScoreDefSubtree(vrvScoreDef, vrvScoreDef);
             }
         }
     }

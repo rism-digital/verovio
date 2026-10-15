@@ -14,7 +14,7 @@
 #include "ossia.h"
 #include "page.h"
 #include "pages.h"
-#include "score.h"
+#include "scoreorpartelement.h"
 #include "staff.h"
 #include "system.h"
 #include "tuning.h"
@@ -70,18 +70,18 @@ FunctorCode ScoreDefSetCurrentPageFunctor::VisitPageEnd(Page *page)
 {
     const Object *firstSystem = page->GetFirst(SYSTEM);
     const Object *reference = firstSystem ? firstSystem : page;
-    page->m_score = m_doc->GetCorrespondingScore(reference, m_scores);
+    page->m_score = m_doc->GetCorrespondingScoreOrPart(reference, m_scores);
 
     const Object *lastSystem = page->GetLast(SYSTEM);
     reference = lastSystem ? lastSystem : page;
-    page->m_scoreEnd = m_doc->GetCorrespondingScore(reference, m_scores);
+    page->m_scoreEnd = m_doc->GetCorrespondingScoreOrPart(reference, m_scores);
 
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ScoreDefSetCurrentPageFunctor::VisitScore(Score *score)
+FunctorCode ScoreDefSetCurrentPageFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
-    m_scores.push_back(score);
+    m_scores.push_back(scoreOrPart);
 
     return FUNCTOR_CONTINUE;
 }
@@ -257,10 +257,10 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitProport(Proport *proport)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ScoreDefSetCurrentFunctor::VisitScore(Score *score)
+FunctorCode ScoreDefSetCurrentFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
-    m_currentScore = score;
-    m_upcomingScoreDef = *score->GetScoreDef();
+    m_currentScore = scoreOrPart;
+    m_upcomingScoreDef = *scoreOrPart->GetScoreDef();
     m_upcomingScoreDef.Process(*this);
     // Trigger the redraw of everything
     m_upcomingScoreDef.SetRedrawFlags(StaffDefRedrawFlags::REDRAW_ALL);
@@ -407,7 +407,7 @@ FunctorCode ScoreDefOptimizeFunctor::VisitMeasure(Measure *measure)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ScoreDefOptimizeFunctor::VisitScore(Score *score)
+FunctorCode ScoreDefOptimizeFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     m_currentScoreDef = NULL;
     m_encoded = false;

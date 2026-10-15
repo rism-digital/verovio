@@ -179,7 +179,11 @@ void View::DrawPageElement(DeviceContext *dc, PageElement *element)
         dc->StartGraphic(element, elementStart, element->GetID());
         dc->EndGraphic(element, this);
     }
-    else if (element->Is(SCORE)) {
+    else if (element->Is(PARTS)) {
+        dc->StartGraphic(element, "pageMilestone", element->GetID());
+        dc->EndGraphic(element, this);
+    }
+    else if (element->IsScoreOrPartElement()) {
         dc->StartGraphic(element, "pageMilestone", element->GetID());
         dc->EndGraphic(element, this);
     }

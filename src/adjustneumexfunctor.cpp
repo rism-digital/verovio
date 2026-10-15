@@ -12,7 +12,7 @@
 #include "doc.h"
 #include "layer.h"
 #include "neume.h"
-#include "score.h"
+#include "scoreorpartelement.h"
 #include "staff.h"
 #include "syl.h"
 #include "syllable.h"

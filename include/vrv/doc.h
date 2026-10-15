@@ -27,7 +27,7 @@ class FontInfo;
 class Glyph;
 class Pages;
 class Page;
-class Score;
+class ScoreOrPartElement;
 
 enum DocType { Raw = 0, Rendering, Transcription, Facs };
 
@@ -165,23 +165,25 @@ public:
     ///@}
 
     /**
-     * Get all visible scores / the first visible score
-     * Lazily updates the visible scores, hence not const
+     * Get all visible scores or parts / the first visible score or part
+     * Lazily updates the visible scores or parts, hence not const
      */
     ///@{
-    std::list<Score *> GetVisibleScores();
-    Score *GetFirstVisibleScore();
+    std::list<ScoreOrPartElement *> GetVisibleScoresOrParts();
+    ScoreOrPartElement *GetFirstVisibleScoreOrPart();
     ///@}
 
     /**
      * Get the corresponding score for a node
      */
     ///@{
-    Score *GetCorrespondingScore(const Object *object);
-    const Score *GetCorrespondingScore(const Object *object) const;
+    ScoreOrPartElement *GetCorrespondingScoreOrPart(const Object *object);
+    const ScoreOrPartElement *GetCorrespondingScoreOrPart(const Object *object) const;
     // Generic version that does not necessarily rely on precalculated visible scores
-    Score *GetCorrespondingScore(const Object *object, const std::list<Score *> &scores);
-    const Score *GetCorrespondingScore(const Object *object, const std::list<Score *> &scores) const;
+    ScoreOrPartElement *GetCorrespondingScoreOrPart(
+        const Object *object, const std::list<ScoreOrPartElement *> &scores);
+    const ScoreOrPartElement *GetCorrespondingScoreOrPart(
+        const Object *object, const std::list<ScoreOrPartElement *> &scores) const;
     ///@}
 
     /**
@@ -585,7 +587,7 @@ private:
     /**
      * Determine all visible scores
      */
-    void CollectVisibleScores();
+    void CollectVisibleScoresOrParts();
 
     /**
      * Reset the document focus
@@ -672,9 +674,9 @@ private:
 
     /**
      * The list of all visible scores
-     * Used in Doc::GetCorrespondingScore to quickly determine the score for an object
+     * Used in Doc::GetCorrespondingScoreOrPart to quickly determine the score for an object
      */
-    std::list<Score *> m_visibleScores;
+    std::list<ScoreOrPartElement *> m_visibleScoresOrParts;
 
     /**
      * A flag indicating if the document has been cast off or not.
