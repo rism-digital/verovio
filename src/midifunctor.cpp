@@ -589,6 +589,9 @@ FunctorCode InitMIDIFunctor::VisitMeasure(const Measure *measure)
 
 FunctorCode InitMIDIFunctor::VisitOctave(const Octave *octave)
 {
+    // An octave without start or end (e.g., an unresolved @endid) is not rendered and is ignored
+    if (!octave->HasStartAndEnd()) return FUNCTOR_CONTINUE;
+
     const Measure *measure = vrv_cast<const Measure *>(octave->GetFirstAncestor(MEASURE));
     assert(measure);
     std::vector<const Staff *> staffList = octave->GetTstampStaves(measure, octave);
