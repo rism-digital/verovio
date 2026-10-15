@@ -26,6 +26,7 @@
 #include "expansion.h"
 #include "facsimilefunctor.h"
 #include "featureextractor.h"
+#include "findfunctor.h"
 #include "functor.h"
 #include "glyph.h"
 #include "instrdef.h"
@@ -971,20 +972,6 @@ void Doc::PrepareData()
     PrepareLayerElementPartsFunctor prepareLayerElementParts(this);
     root->Process(prepareLayerElementParts);
 
-    /************ Resolve @facs ************/
-    if (this->IsFacs()) {
-        // Associate zones with elements
-        PrepareFacsimileFunctor prepareFacsimile(this->GetFacsimile());
-        root->Process(prepareFacsimile);
-
-        // Add default syl zone if one is not present.
-        for (Object *object : prepareFacsimile.GetZonelessSyls()) {
-            Syl *syl = vrv_cast<Syl *>(object);
-            assert(syl);
-            syl->CreateDefaultZone(this);
-        }
-    }
-
     for (Score *score : this->GetVisibleScores()) {
         ScoreDefSetGrpSymFunctor scoreDefSetGrpSym;
         assert(score->GetScoreDef());
@@ -1399,10 +1386,7 @@ void Doc::ConvertToCastOffMensuralDoc(MensuralCastOffType castOff)
     if ((castOff != MENSURAL_CAST_OFF_INIT) && !m_mensuralCastOff) return;
 
     // Do not convert transcription files
-    if (this->IsTranscription()) return;
-
-    // Do not convert facs files
-    if (this->IsFacs()) return;
+    if (this->IsFacTranscription()) return;
 
     // Flag it as performed
     m_mensuralCastOff = true;
@@ -1450,10 +1434,7 @@ void Doc::ConvertToCmnDoc()
     if (!this->IsMensuralMusicOnly()) return;
 
     // Do not convert transcription files
-    if (this->IsTranscription()) return;
-
-    // Do not convert facs files
-    if (this->IsFacs()) return;
+    if (this->IsFacTranscription()) return;
 
     m_isMensuralMusicOnly = BOOLEAN_false;
 
@@ -1663,7 +1644,7 @@ void Doc::ExpandExpansions()
     if (this->GetOptions()->m_expandNever.GetValue()) return;
 
     // Nothing to do in these cases - marked the map as processed
-    if (this->IsMensuralMusicOnly() || this->IsTranscription()) {
+    if (this->IsMensuralMusicOnly() || this->IsFacTranscription()) {
         m_expansionMap.SetProcessed(true);
         return;
     }
@@ -1811,6 +1792,38 @@ const Score *Doc::GetCorrespondingScore(const Object *object, const std::list<Sc
         }
     }
     return correspondingScore;
+}
+
+void Doc::CollectReferringObjects(const Object *element, std::set<std::string> &referring, SetOfConstObjects &visited)
+{
+    assert(element);
+
+    if (visited.find(element) != visited.end()) return;
+    visited.insert(element);
+
+    // First check all children
+    for (int i = 0; i < element->GetChildCount(); ++i) {
+        const Object *child = element->GetChild(i);
+        if (!child) continue;
+
+        this->CollectReferringObjects(child, referring, visited);
+    }
+
+    // Then find objects referring to this object
+    ListOfObjectAttNamePairs referringObjects;
+    FindAllReferringObjectsFunctor findAllReferringObjects(element, &referringObjects);
+    this->Process(findAllReferringObjects);
+
+    for (ListOfObjectAttNamePairs::iterator it = referringObjects.begin(); it != referringObjects.end(); ++it) {
+        const Object *referringObject = it->first;
+
+        if (referringObject == NULL) continue;
+        if (referringObject == element) continue;
+
+        referring.insert(referringObject->GetID());
+
+        this->CollectReferringObjects(referringObject, referring, visited);
+    }
 }
 
 void Doc::CollectVisibleScores()
@@ -2428,7 +2441,7 @@ int Doc::GetAdjustedDrawingPageHeight() const
     assert(m_drawingPage);
 
     // Take into account the PPU when getting the page height in facsimile
-    if (this->IsTranscription() || this->IsFacs()) {
+    if (this->IsFacTranscription()) {
         return m_drawingPage->m_pageHeight * m_drawingPage->GetPPUFactor() / DEFINITION_FACTOR;
     }
 
@@ -2444,7 +2457,7 @@ int Doc::GetAdjustedDrawingPageWidth() const
     assert(m_drawingPage);
 
     // Take into account the PPU when getting the page width in facsimile
-    if (this->IsTranscription() || this->IsFacs()) {
+    if (this->IsFacTranscription()) {
         return m_drawingPage->m_pageWidth * m_drawingPage->GetPPUFactor() / DEFINITION_FACTOR;
     }
 

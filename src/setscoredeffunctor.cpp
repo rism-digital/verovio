@@ -136,7 +136,7 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitKeySig(KeySig *keySig)
 
 FunctorCode ScoreDefSetCurrentFunctor::VisitLayer(Layer *layer)
 {
-    if (m_doc->GetType() != Transcription) layer->SetDrawingStaffDefValues(m_currentStaffDef);
+    if (m_doc->GetType() != FacTranscription) layer->SetDrawingStaffDefValues(m_currentStaffDef);
     return FUNCTOR_CONTINUE;
 }
 

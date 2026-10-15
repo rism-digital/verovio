@@ -2009,13 +2009,6 @@ void MEIOutput::WriteMeasure(pugi::xml_node currentNode, Measure *measure)
     measure->WriteNNumberLike(currentNode);
     measure->WritePointing(currentNode);
     measure->WriteTyped(currentNode);
-    // For now we copy the adjusted value of coord.x1 and coord.x2 to xAbs and xAbs2 respectively
-    if ((measure->m_drawingFacsX1 != VRV_UNSET) && (measure->m_drawingFacsX2 != VRV_UNSET) && !m_doc->IsNeumeLines()) {
-        measure->SetCoordX1(measure->m_drawingFacsX1 / DEFINITION_FACTOR);
-        measure->SetCoordX2(measure->m_drawingFacsX2 / DEFINITION_FACTOR);
-        measure->WriteCoordX1(currentNode);
-        measure->WriteCoordX2(currentNode);
-    }
 }
 
 void MEIOutput::WriteOssia(pugi::xml_node currentNode, Ossia *ossia)
@@ -3360,6 +3353,7 @@ void MEIOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
 
     interface->WriteBarring(element);
     interface->WriteDurationDefault(element);
+    interface->WriteDurationRatio(element);
     interface->WriteLyricStyle(element);
     interface->WriteMeasureNumbers(element);
     interface->WriteMidiTempo(element);
@@ -3618,8 +3612,7 @@ std::string MEIOutput::DocTypeToStr(DocType type)
     switch (type) {
         case Raw: value = "raw"; break;
         case Rendering: value = "rendering"; break;
-        case Transcription: value = "transcription"; break;
-        case Facs: value = "facsimile"; break;
+        case FacTranscription: value = "transcription"; break;
         default:
             LogWarning("Unknown document type '%d'", type);
             value = "";
@@ -3639,12 +3632,105 @@ jsonxx::Object MEIOutputExtended::ExportScoreDef()
 {
     try {
         pugi::xml_document meiDoc;
+        m_currentNode = meiDoc.root();
+        m_nodeStack.push_back(m_currentNode);
+
+        Score *score = m_doc->GetFirstVisibleScore();
+        score->GetScoreDef()->SaveObject(this);
+
+        return ToJson(meiDoc);
+    }
+    catch (char *str) {
+        LogError("%s", str);
+        return jsonxx::Object();
+    }
+}
+
+jsonxx::Object MEIOutputExtended::ExportStaffGrp(ScoreDef *scoreDef)
+{
+    try {
+        pugi::xml_document meiDoc;
+        m_currentNode = meiDoc.root();
+        m_nodeStack.push_back(m_currentNode);
+
+        StaffGrp *staffGrp = (scoreDef) ? vrv_cast<StaffGrp *>(scoreDef->FindDescendantByType(STAFFGRP)) : NULL;
+
+        if (staffGrp) staffGrp->SaveObject(this);
+        return ToJson(meiDoc);
+    }
+    catch (char *str) {
+        LogError("%s", str);
+        return jsonxx::Object();
+    }
+}
+
+jsonxx::Object MEIOutputExtended::ExportStaffDef(ScoreDef *scoreDef, int staffN)
+{
+    try {
+        pugi::xml_document meiDoc;
+        m_currentNode = meiDoc.root();
+        m_nodeStack.push_back(m_currentNode);
+
+        if (scoreDef) {
+            AttNIntegerComparison staffDefN(STAFFDEF, staffN);
+            StaffDef *staffDef = vrv_cast<StaffDef *>(scoreDef->FindDescendantByComparison(&staffDefN));
+            if (staffDef) staffDef->SaveObject(this);
+        }
+        return ToJson(meiDoc);
+    }
+    catch (char *str) {
+        LogError("%s", str);
+        return jsonxx::Object();
+    }
+}
+
+jsonxx::Object MEIOutputExtended::ExportMeterSig(ScoreDef *scoreDef)
+{
+    try {
+        pugi::xml_document meiDoc;
+        m_currentNode = meiDoc.root();
+        m_nodeStack.push_back(m_currentNode);
+
+        ClassIdsComparison meterSigOrGrpComparison({ METERSIG, METERSIGGRP });
+        LayerElement *meterSigOrGrp = (scoreDef)
+            ? vrv_cast<LayerElement *>(scoreDef->FindDescendantByComparison(&meterSigOrGrpComparison))
+            : NULL;
+        if (meterSigOrGrp) {
+            meterSigOrGrp->SaveObject(this);
+        }
+        else {
+            MeterSig meterSigDefault;
+            meterSigDefault.SaveObject(this);
+        }
+        return ToJson(meiDoc);
+    }
+    catch (char *str) {
+        LogError("%s", str);
+        return jsonxx::Object();
+    }
+}
+
+jsonxx::Object MEIOutputExtended::ExportKeySig(ScoreDef *scoreDef)
+{
+    try {
+        pugi::xml_document meiDoc;
         std::ostringstream streamStringOutput;
 
         m_currentNode = meiDoc.root();
         m_nodeStack.push_back(m_currentNode);
-        m_doc->GetFirstScoreDef()->SaveObject(this);
 
+        KeySig *keySig = (scoreDef) ? vrv_cast<KeySig *>(scoreDef->FindDescendantByType(KEYSIG)) : NULL;
+        if (keySig) {
+            StaffDef *staffDef = vrv_cast<StaffDef *>(keySig->GetFirstAncestor(STAFFDEF));
+            if (staffDef && staffDef->HasTransDiat() && staffDef->HasTransSemi()) {
+                keySig->SetSig(keySig->ConvertFromWritten(staffDef->GetTransDiat(), staffDef->GetTransSemi()));
+            }
+            keySig->SaveObject(this);
+        }
+        else {
+            KeySig keySigDefault;
+            keySigDefault.SaveObject(this);
+        }
         return ToJson(meiDoc);
     }
     catch (char *str) {
@@ -4194,6 +4280,9 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
         else if (element == "fTrem") {
             return true;
         }
+        else if (element == "graceGrp") {
+            return true;
+        }
         else if (element == "note") {
             return true;
         }
@@ -4316,15 +4405,11 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     facsimile = music.child("facsimile");
     if (!facsimile.empty()) {
         this->ReadFacsimile(m_doc, facsimile);
-        if (m_doc->GetOptions()->m_useFacsimile.GetValue()) {
-            m_doc->SetType(Facs);
-            m_doc->m_drawingPageHeight = m_doc->GetFacsimile()->GetMaxY();
-            m_doc->m_drawingPageWidth = m_doc->GetFacsimile()->GetMaxX();
-        }
-        // Temporary solution to set the document type to Transcription when using <facsimile>
-        else if (m_doc->HasFacsimile() && !m_doc->GetFacsimile()->GetType().empty()) {
-            m_doc->SetType(StrToDocType(m_doc->GetFacsimile()->GetType()));
-            // Facsimile data eventually sync with Doc::SyncFromFacsimileDoc below
+        if (m_doc->HasFacsimile()) {
+            const bool facsimileTranscriptionType = (m_doc->GetFacsimile()->GetType() == "transcription");
+            m_doc->SetType((facsimileTranscriptionType || m_doc->GetOptions()->m_useFacsimile.GetValue())
+                    ? FacTranscription
+                    : Raw);
         }
         if (facsimile.next_sibling("facsimile")) {
             LogWarning("Only first <facsimile> is processed");
@@ -4564,7 +4649,7 @@ bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
     Page *vrvPage = new Page();
     this->SetMeiID(page, vrvPage);
 
-    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsFacTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradePageTo_3_0_0(vrvPage, m_doc);
     }
 
@@ -4603,12 +4688,12 @@ bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
     parent->AddChild(vrvPage);
     bool success = this->ReadPageChildren(vrvPage, page);
 
-    if (success && m_doc->IsTranscription() && (vrvPage->GetPPUFactor() != 1.0)) {
+    if (success && m_doc->IsFacTranscription() && (vrvPage->GetPPUFactor() != 1.0)) {
         ApplyPPUFactorFunctor applyPPUFactor;
         vrvPage->Process(applyPPUFactor);
     }
 
-    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsFacTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradePageTo_5_0(vrvPage);
     }
 
@@ -4911,23 +4996,21 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
         }
         // unmeasured music
         else if (std::string(current.name()) == "staff") {
-            if (!unmeasured) {
-                if (parent->Is(SECTION)) {
-                    if (m_doc->IsNeumeLines()) {
-                        unmeasured = new Measure(NEUMELINE);
-                    }
-                    else {
-                        unmeasured = new Measure(UNMEASURED);
-                        m_doc->SetMensuralMusicOnly(BOOLEAN_true);
-                    }
-                    parent->AddChild(unmeasured);
+            if (parent->Is(SECTION)) {
+                if (m_doc->IsNeumeLines()) {
+                    unmeasured = new Measure(NEUMELINE);
                 }
                 else {
-                    LogError("Unmeasured music within editorial markup is currently not supported");
-                    return false;
+                    unmeasured = new Measure(UNMEASURED);
+                    m_doc->SetMensuralMusicOnly(BOOLEAN_true);
                 }
+                parent->AddChild(unmeasured);
+                success = this->ReadStaff(unmeasured, current);
             }
-            success = this->ReadStaff(unmeasured, current);
+            else {
+                LogError("Unmeasured music within editorial markup is currently not supported");
+                return false;
+            }
         }
         else if (std::string(current.name()) == "measure") {
             // we should not mix measured and unmeasured music within a system...
@@ -5051,10 +5134,6 @@ bool MEIInput::ReadSystem(Object *parent, pugi::xml_node system)
         vrvSystem->m_systemRightMar = system.attribute("system.rightmar").as_int();
         system.remove_attribute("system.rightmar");
     }
-    if (system.attribute("uly") && m_doc->IsTranscription()) {
-        vrvSystem->m_drawingFacsY = system.attribute("uly").as_int() * DEFINITION_FACTOR;
-        system.remove_attribute("uly");
-    }
 
     parent->AddChild(vrvSystem);
     this->ReadUnsupportedAttr(system, vrvSystem);
@@ -5100,7 +5179,7 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
                     assert(system);
                     unmeasured = new Measure(UNMEASURED);
                     m_doc->SetMensuralMusicOnly(BOOLEAN_true);
-                    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+                    if (m_doc->IsFacTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
                         UpgradeMeasureTo_3_0_0(unmeasured, system);
                     }
                     system->AddChild(unmeasured);
@@ -5844,15 +5923,8 @@ bool MEIInput::ReadMeasure(Object *parent, pugi::xml_node measure)
     vrvMeasure->ReadPointing(measure);
     vrvMeasure->ReadTyped(measure);
 
-    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsFacTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradeMeasureTo_5_0(measure);
-    }
-
-    if (measure.attribute("coord.x1") && measure.attribute("coord.x2") && m_doc->IsTranscription()) {
-        vrvMeasure->ReadCoordX1(measure);
-        vrvMeasure->ReadCoordX2(measure);
-        vrvMeasure->m_drawingFacsX1 = vrvMeasure->GetCoordX1() * DEFINITION_FACTOR;
-        vrvMeasure->m_drawingFacsX2 = vrvMeasure->GetCoordX2() * DEFINITION_FACTOR;
     }
 
     parent->AddChild(vrvMeasure);
@@ -6892,13 +6964,8 @@ bool MEIInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
     object->ReadLabelled(element);
     object->ReadTyped(element);
 
-    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsFacTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradeLayerElementTo_5_0(element);
-    }
-
-    if (element.attribute("coord.x1") && m_doc->IsTranscription()) {
-        object->ReadCoordX1(element);
-        object->m_drawingFacsX = object->GetCoordX1() * DEFINITION_FACTOR;
     }
 
     return true;
@@ -8111,6 +8178,7 @@ bool MEIInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *
 {
     interface->ReadBarring(element);
     interface->ReadDurationDefault(element);
+    interface->ReadDurationRatio(element);
     interface->ReadLyricStyle(element);
     interface->ReadMeasureNumbers(element);
     interface->ReadMidiTempo(element);
@@ -8874,8 +8942,7 @@ DocType MEIInput::StrToDocType(std::string type)
 {
     if (type == "raw") return Raw;
     if (type == "rendering") return Rendering;
-    if (type == "transcription") return Transcription;
-    if (type == "facsimile") return Facs;
+    if (type == "transcription") return FacTranscription;
     LogWarning("Unknown layout type '%s'", type.c_str());
     return Raw;
 }
@@ -9363,7 +9430,113 @@ bool MEIInput::ReadFacsimile(Doc *doc, pugi::xml_node facsimile)
 // MEIInputExtended
 //----------------------------------------------------------------------------
 
-MEIInputExtended::MEIInputExtended(Doc *doc) : MEIInput(doc) {}
+MEIInputExtended::MEIInputExtended(Doc *doc) : MEIInput(doc)
+{
+    m_meiversion = meiVersion_MEIVERSION_6_0_dev;
+}
+
+void MEIInputExtended::ImportScoreDef(const jsonxx::Object &scoreDef)
+{
+    try {
+        pugi::xml_document meiDoc = this->FromJson(scoreDef);
+
+        Score newScore;
+        if (this->ReadScoreDefExt(&newScore, meiDoc.first_child())) {
+            Score *score = m_doc->GetFirstVisibleScore();
+            ScoreDef *vrvScoreDef = vrv_cast<ScoreDef *>(newScore.GetFirst());
+            if (score && vrvScoreDef) {
+                newScore.Relinquish(0);
+                score->SetScoreDefSubtree(vrvScoreDef, vrvScoreDef);
+            }
+        }
+    }
+    catch (char *str) {
+        LogError("%s", str);
+    }
+}
+
+void MEIInputExtended::ImportStaffGrp(const jsonxx::Object &staffGrp, ScoreDef *scoreDef)
+{
+    assert(scoreDef);
+
+    try {
+        pugi::xml_document meiDoc = this->FromJson(staffGrp);
+
+        ScoreDef newScoreDef;
+        if (this->ReadStaffGrpExt(&newScoreDef, meiDoc.first_child())) {
+            StaffGrp *newStaffGrp = vrv_cast<StaffGrp *>(newScoreDef.GetFirst());
+            StaffGrp *oldStaffGrp
+                = (newStaffGrp) ? vrv_cast<StaffGrp *>(scoreDef->FindDescendantByID(newStaffGrp->GetID())) : NULL;
+            if (oldStaffGrp && newStaffGrp) {
+                newScoreDef.Relinquish(0);
+                oldStaffGrp->GetParent()->ReplaceChild(oldStaffGrp, newStaffGrp);
+                delete oldStaffGrp;
+            }
+        }
+    }
+    catch (char *str) {
+        LogError("%s", str);
+    }
+}
+
+void MEIInputExtended::ImportStaffDef(const jsonxx::Object &staffDef, ScoreDef *scoreDef, int staffN)
+{
+    assert(scoreDef);
+
+    try {
+        pugi::xml_document meiDoc = this->FromJson(staffDef);
+
+        StaffGrp newStaffGrp;
+        if (this->ReadStaffDefExt(&newStaffGrp, meiDoc.first_child())) {
+            StaffDef *newStaffDef = vrv_cast<StaffDef *>(newStaffGrp.GetFirst());
+            AttNIntegerComparison staffDefN(STAFFDEF, staffN);
+            StaffDef *oldStaffDef = vrv_cast<StaffDef *>(scoreDef->FindDescendantByComparison(&staffDefN));
+            if (oldStaffDef && newStaffDef) {
+                newStaffGrp.Relinquish(0);
+                oldStaffDef->GetParent()->ReplaceChild(oldStaffDef, newStaffDef);
+                delete oldStaffDef;
+            }
+        }
+    }
+    catch (char *str) {
+        LogError("%s", str);
+    }
+}
+
+void MEIInputExtended::ImportMeterSigOrGrpIntoLayer(Layer *layer, const jsonxx::Object &meterSig)
+{
+    assert(layer);
+    layer->ClearChildren();
+
+    try {
+        pugi::xml_document meiDoc = this->FromJson(meterSig);
+
+        const bool isGrp = (std::string(meiDoc.first_child().name()) == "meterSigGrp") ? true : false;
+        if (isGrp) {
+            this->ReadMeterSigGrpExt(layer, meiDoc.first_child());
+        }
+        else {
+            this->ReadMeterSigExt(layer, meiDoc.first_child());
+        }
+    }
+    catch (char *str) {
+        LogError("%s", str);
+    }
+}
+
+void MEIInputExtended::ImportKeySigIntoLayer(Layer *layer, const jsonxx::Object &keySig)
+{
+    assert(layer);
+    layer->ClearChildren();
+
+    try {
+        pugi::xml_document meiDoc = this->FromJson(keySig);
+        this->ReadKeySigExt(layer, meiDoc.first_child());
+    }
+    catch (char *str) {
+        LogError("%s", str);
+    }
+}
 
 pugi::xml_document MEIInputExtended::FromJson(const jsonxx::Object &json)
 {
@@ -9371,13 +9544,13 @@ pugi::xml_document MEIInputExtended::FromJson(const jsonxx::Object &json)
 
     std::function<void(const jsonxx::Object &, pugi::xml_node &)> jsonToNode
         = [&](const jsonxx::Object &jsonNode, pugi::xml_node &parent) {
-              std::string elementName = jsonNode.get<std::string>("element");
+              std::string elementName = jsonNode.get<jsonxx::String>("element");
 
               // Special case for text nodes
               if (elementName == "text") {
                   pugi::xml_node textNode = parent.append_child(pugi::node_pcdata);
-                  if (jsonNode.has<jsonxx::String>("text")) {
-                      textNode.set_value(jsonNode.get<std::string>("text").c_str());
+                  if (jsonNode.has<jsonxx::String>("text") && !jsonNode.get<jsonxx::String>("text").empty()) {
+                      textNode.set_value(jsonNode.get<jsonxx::String>("text").c_str());
                   }
                   return;
               }
@@ -9387,7 +9560,7 @@ pugi::xml_document MEIInputExtended::FromJson(const jsonxx::Object &json)
 
               // Convert xml:id from top-level "id"
               if (jsonNode.has<jsonxx::String>("id")) {
-                  xmlNode.append_attribute("xml:id") = jsonNode.get<std::string>("id").c_str();
+                  xmlNode.append_attribute("xml:id") = jsonNode.get<jsonxx::String>("id").c_str();
               }
 
               // Convert attributes
@@ -9395,7 +9568,9 @@ pugi::xml_document MEIInputExtended::FromJson(const jsonxx::Object &json)
                   jsonxx::Object attrs = jsonNode.get<jsonxx::Object>("attributes");
 
                   for (auto it = attrs.kv_map().begin(); it != attrs.kv_map().end(); ++it) {
-                      xmlNode.append_attribute(it->first.c_str()) = it->second;
+                      if (it->second->is<jsonxx::String>() && !it->second->get<jsonxx::String>().empty()) {
+                          xmlNode.append_attribute(it->first.c_str()) = it->second->get<jsonxx::String>();
+                      }
                   }
               }
 

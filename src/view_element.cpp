@@ -859,7 +859,7 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
 
         this->CalcOffset(dc, x, y);
 
-        if (m_doc->GetType() != Transcription) {
+        if (m_doc->GetType() != FacTranscription) {
             // Use the note to which the points to for position if no next element or for augmentation dots
             if (dot->m_drawingPreviousElement && (!dot->m_drawingNextElement || dot->GetForm() == dotLog_FORM_aug)) {
                 x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 7 / 2;
@@ -1887,7 +1887,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         return;
     }
 
-    if (!m_doc->IsFacs() && !m_doc->IsTranscription() && !m_doc->IsNeumeLines()) {
+    if (!m_doc->IsFacTranscription() && !m_doc->IsNeumeLines()) {
         syl->SetDrawingYRel(
             this->GetSylYRel(syl->m_drawingVerseN, staff, syl->m_drawingVersePlace, syl->m_drawingVoltaN));
     }
@@ -1954,7 +1954,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     params.m_x = x;
     params.m_y = y;
     params.m_staffSize = staff->m_drawingStaffSize;
-    if (m_doc->IsFacs() || m_doc->IsNeumeLines()) {
+    if (m_doc->IsNeumeLines()) {
         params.m_width = syl->GetDrawingWidth();
         params.m_height = syl->GetDrawingHeight();
     }
@@ -2354,7 +2354,7 @@ int View::GetSylYRel(int verseN, Staff *staff, data_STAFFREL place, int voltaN)
 {
     assert(staff);
 
-    StaffAlignment *alignment = staff->GetAlignment();
+    const StaffAlignment *alignment = staff->GetAlignment();
     if (!alignment) return 0;
 
     const bool verseCollapse = m_options->m_lyricVerseCollapse.GetValue();
@@ -2368,6 +2368,15 @@ int View::GetSylYRel(int verseN, Staff *staff, data_STAFFREL place, int voltaN)
     verseHeight *= m_doc->GetOptions()->m_lyricHeightFactor.GetValue();
     int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
+    // Verses sharing the lyric lines below the previous staff are positioned from that staff
+    int yOffset = 0;
+    const StaffAlignment *sharedAlignment = alignment->GetSharedLyricsAlignment();
+    if ((place == STAFFREL_above) && sharedAlignment) {
+        yOffset = sharedAlignment->GetYRel() - alignment->GetYRel();
+        alignment = sharedAlignment;
+        place = STAFFREL_below;
+    }
+
     // above the staff
     if (place == STAFFREL_above) {
         y = alignment->GetOverflowAbove()
@@ -2379,7 +2388,7 @@ int View::GetSylYRel(int verseN, Staff *staff, data_STAFFREL place, int voltaN)
             - height;
     }
 
-    return y;
+    return y + yOffset;
 }
 
 void View::DrawCursor(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)

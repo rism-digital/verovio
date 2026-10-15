@@ -3433,7 +3433,9 @@ void MusicXmlInput::ReadMusicXmlNote(
             if (!lyric.child("text")) continue;
             Verse *verse = new Verse();
             verse->SetColor(lyric.attribute("color").as_string());
-            // verse->SetPlace(verse->AttPlacementRelStaff::StrToStaffrelBasic(lyric.attribute("placement").as_string()));
+            if (lyric.attribute("placement")) {
+                verse->SetPlace(verse->AttPlacementRelStaff::StrToStaffrel(lyric.attribute("placement").as_string()));
+            }
             verse->SetLabel(lyric.attribute("name").as_string());
             verse->SetN(lyricNumber);
             std::string syllabic = "single";

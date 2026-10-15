@@ -29,7 +29,7 @@ class Pages;
 class Page;
 class Score;
 
-enum DocType { Raw = 0, Rendering, Transcription, Facs };
+enum DocType { Raw = 0, Rendering, FacTranscription };
 
 //----------------------------------------------------------------------------
 // Doc
@@ -130,10 +130,8 @@ public:
     ///@{
     DocType GetType() const { return m_type; }
     void SetType(DocType type);
-    bool IsFacs() const { return (m_type == Facs); }
     bool IsRaw() const { return (m_type == Raw); }
-    bool IsRendering() const { return (m_type == Rendering); }
-    bool IsTranscription() const { return (m_type == Transcription); }
+    bool IsFacTranscription() const { return (m_type == FacTranscription); }
     ///@}
 
     /**
@@ -183,6 +181,11 @@ public:
     Score *GetCorrespondingScore(const Object *object, const std::list<Score *> &scores);
     const Score *GetCorrespondingScore(const Object *object, const std::list<Score *> &scores) const;
     ///@}
+
+    /**
+     * Collect the IDs of all objects referring to the element or one of its descendants.
+     */
+    void CollectReferringObjects(const Object *element, std::set<std::string> &referring, SetOfConstObjects &visited);
 
     /**
      * Return true if the MIDI generation is already done

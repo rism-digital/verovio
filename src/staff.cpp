@@ -179,13 +179,6 @@ bool Staff::AddChildAdditionalCheck(Object *child)
 
 int Staff::GetDrawingX() const
 {
-    if (this->HasFacs()) {
-        const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
-        assert(doc);
-        if (doc->IsFacs()) {
-            return FacsimileInterface::GetDrawingX();
-        }
-    }
     return Object::GetDrawingX();
 }
 
@@ -210,7 +203,7 @@ double Staff::GetDrawingRotate() const
     if (this->HasFacs()) {
         const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
-        if (doc->IsFacs() || doc->IsTranscription()) {
+        if (doc->IsFacTranscription()) {
             return FacsimileInterface::GetDrawingRotate();
         }
     }
@@ -222,7 +215,7 @@ void Staff::AdjustDrawingStaffSize()
     if (this->HasFacs()) {
         Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
-        if (doc->IsFacs() || doc->IsNeumeLines()) {
+        if (doc->IsNeumeLines()) {
             double rotate = this->GetDrawingRotate();
             Zone *zone = this->GetZone();
             assert(zone);
