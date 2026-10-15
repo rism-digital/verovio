@@ -1637,6 +1637,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
             if (key) {
                 KeySig *meiKey = ConvertKey(key.node());
                 staffDef->AddChild(meiKey);
+                m_keyAlteredPitches[staffDef->GetN()] = ConvertKeyAlteredPitches(key.node());
                 if (staffDef->GetNotationtype() == NOTATIONTYPE_tab_guitar) meiKey->IsAttribute(true);
             }
 
@@ -2103,6 +2104,17 @@ void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Section *section
             m_clefChangeQueue.push_back(musicxml::ClefChange(
                 m_measureCounts.at(measure), staff, m_currentLayer, meiClef, m_durTotal, afterBarline));
             m_clefChanged++;
+        }
+    }
+
+    // keep track of the pitches altered by key changes, a key without number applies to all staves
+    for (pugi::xml_node keyNode : node.children("key")) {
+        const int keyStaffNum = keyNode.attribute("number").as_int();
+        for (int i = 0; i < measure->GetChildCount(STAFF); ++i) {
+            if ((keyStaffNum > 0) && (keyStaffNum != i + 1)) continue;
+            Staff *staff = vrv_cast<Staff *>(measure->GetChild(i, STAFF));
+            assert(staff);
+            m_keyAlteredPitches[staff->GetN()] = ConvertKeyAlteredPitches(keyNode);
         }
     }
 
@@ -3191,6 +3203,10 @@ void MusicXmlInput::ReadMusicXmlNote(
                 ListOfObjects accids = note->FindAllDescendantsByType(ACCID);
                 if (accids.empty()) {
                     std::vector<musicxml::Accidental> currentAccids;
+                    // A natural needs to be explicit when the key signature alters the pitch
+                    const auto keyIter = m_keyAlteredPitches.find(notationStaffN);
+                    const bool isAlteredByKey
+                        = (keyIter != m_keyAlteredPitches.end()) && keyIter->second.contains(note->GetPname());
 
                     // Use the alter value as key to the accidentals.
                     // In case this alter value is already associated with an accidental, use it here.
@@ -3205,8 +3221,9 @@ void MusicXmlInput::ReadMusicXmlNote(
 
                     try {
                         for (const auto &current : currentAccids) {
-                            // Avoid adding empty accidentals
-                            if ((current.m_accid == ACCIDENTAL_WRITTEN_NONE || current.m_accid == ACCIDENTAL_WRITTEN_n)
+                            // Avoid adding empty accidentals, and naturals that are not altered by the key signature
+                            if ((current.m_accid == ACCIDENTAL_WRITTEN_NONE
+                                    || (current.m_accid == ACCIDENTAL_WRITTEN_n && !isAlteredByKey))
                                 && current.m_glyphName.empty())
                                 continue;
 
@@ -4552,6 +4569,27 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
     }
 
     return keySig;
+}
+
+std::set<data_PITCHNAME> MusicXmlInput::ConvertKeyAlteredPitches(const pugi::xml_node &key)
+{
+    std::set<data_PITCHNAME> alteredPitches;
+    if (key.child("fifths")) {
+        const int fifths = key.child("fifths").text().as_int();
+        const std::string order = (fifths > 0) ? "FCGDAEB" : "BEADGCF";
+        for (int i = 0; i < std::min(abs(fifths), 7); ++i) {
+            alteredPitches.insert(ConvertStepToPitchName(std::string(1, order.at(i))));
+        }
+    }
+    else {
+        for (pugi::xml_node keyStep : key.children("key-step")) {
+            const pugi::xml_node keyAlter = keyStep.next_sibling("key-alter");
+            if (keyAlter && (keyAlter.text().as_float() != 0.0)) {
+                alteredPitches.insert(ConvertStepToPitchName(keyStep.text().as_string()));
+            }
+        }
+    }
+    return alteredPitches;
 }
 
 ScoreDef *MusicXmlInput::GetOrCreateLastScoreDef(Section *section)
