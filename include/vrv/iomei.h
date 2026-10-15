@@ -118,6 +118,8 @@ class Page;
 class PageElement;
 class PageMilestoneEnd;
 class Pages;
+class Part;
+class Parts;
 class Pb;
 class Pedal;
 class PgFoot;
@@ -351,7 +353,10 @@ private:
     ///@{
     void WriteMdiv(pugi::xml_node currentNode, Mdiv *mdiv);
     void WritePages(pugi::xml_node currentNode, Pages *pages);
-    void WriteScore(pugi::xml_node currentNode, ScoreOrPartElement *score);
+    void WriteParts(pugi::xml_node currentNode, Parts *parts);
+    void WriteScoreOrPartElement(pugi::xml_node currentNode, ScoreOrPartElement *scoreOrPartElement);
+    void WritePart(pugi::xml_node currentNode, Part *part);
+    void WriteScore(pugi::xml_node currentNode, Score *score);
     ///@}
 
     /**
@@ -700,6 +705,8 @@ private:
     ///@{
     bool ReadMdiv(Object *parent, pugi::xml_node parentNode, bool isVisible);
     bool ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool isVisible);
+    bool ReadParts(Object *parent, pugi::xml_node parentNode);
+    bool ReadPartsChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadPart(Object *parent, pugi::xml_node parentNode);
     bool ReadScore(Object *parent, pugi::xml_node parentNode);
     bool ReadScoreScoreDef(Object *parent, pugi::xml_node parentNode);

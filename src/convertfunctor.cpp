@@ -123,7 +123,6 @@ FunctorCode ConvertToPageBasedFunctor::VisitPartsEnd(Parts *parts)
     parts->ConvertToPageBasedMilestone(parts, m_page);
 
     return FUNCTOR_CONTINUE;
-    
 }
 
 FunctorCode ConvertToPageBasedFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)

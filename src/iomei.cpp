@@ -387,15 +387,15 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     }
     else if (object->Is(PART)) {
         m_currentNode = m_currentNode.append_child("part");
-        //this->WriteScore(m_currentNode, vrv_cast<Part *>(object));
+        this->WritePart(m_currentNode, vrv_cast<Part *>(object));
     }
     else if (object->Is(PARTS)) {
         m_currentNode = m_currentNode.append_child("parts");
-        //this->WriteScore(m_currentNode, vrv_cast<Parts *>(object));
+        this->WriteParts(m_currentNode, vrv_cast<Parts *>(object));
     }
     else if (object->Is(SCORE)) {
         m_currentNode = m_currentNode.append_child("score");
-        this->WriteScore(m_currentNode, vrv_cast<ScoreOrPartElement *>(object));
+        this->WriteScore(m_currentNode, vrv_cast<Score *>(object));
     }
 
     // Page and content
@@ -1702,13 +1702,36 @@ void MEIOutput::WritePages(pugi::xml_node currentNode, Pages *pages)
     pages->WriteNNumberLike(currentNode);
 }
 
-void MEIOutput::WriteScore(pugi::xml_node currentNode, ScoreOrPartElement *score)
+void MEIOutput::WriteParts(pugi::xml_node currentNode, Parts *parts)
+{
+    assert(parts);
+
+    this->WriteXmlId(currentNode, parts);
+    parts->WriteLabelled(currentNode);
+    parts->WriteNNumberLike(currentNode);
+}
+
+void MEIOutput::WriteScoreOrPartElement(pugi::xml_node currentNode, ScoreOrPartElement *scoreOrPartElement)
+{
+    assert(scoreOrPartElement);
+
+    this->WriteXmlId(currentNode, scoreOrPartElement);
+    scoreOrPartElement->WriteLabelled(currentNode);
+    scoreOrPartElement->WriteNNumberLike(currentNode);
+}
+
+void MEIOutput::WritePart(pugi::xml_node currentNode, Part *part)
+{
+    assert(part);
+
+    this->WriteScoreOrPartElement(currentNode, part);
+}
+
+void MEIOutput::WriteScore(pugi::xml_node currentNode, Score *score)
 {
     assert(score);
 
-    this->WriteXmlId(currentNode, score);
-    score->WriteLabelled(currentNode);
-    score->WriteNNumberLike(currentNode);
+    this->WriteScoreOrPartElement(currentNode, score);
 }
 
 void MEIOutput::WritePage(pugi::xml_node currentNode, Page *page)
@@ -4839,6 +4862,9 @@ bool MEIInput::ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool 
         if (std::string(current.name()) == "mdiv") {
             success = this->ReadMdiv(parent, current, makeVisible);
         }
+        else if (std::string(current.name()) == "parts") {
+            success = this->ReadParts(parent, current);
+        }
         else if (std::string(current.name()) == "score") {
             // Possibly skip content on load
             if (!isVisible && m_doc->GetOptions()->m_loadSelectedMdivOnly.GetValue()) continue;
@@ -4848,6 +4874,50 @@ bool MEIInput::ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool 
                 LogWarning("Skipping nodes after <score> element");
             }
             break;
+        }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = this->ReadXMLComment(parent, current);
+        }
+        else {
+            LogWarning("Unsupported '<%s>' within <mdiv>", current.name());
+        }
+    }
+
+    return success;
+}
+
+bool MEIInput::ReadParts(Object *parent, pugi::xml_node parts)
+{
+    Parts *vrvParts = new Parts();
+    this->SetMeiID(parts, vrvParts);
+
+    vrvParts->ReadLabelled(parts);
+    vrvParts->ReadNNumberLike(parts);
+
+    parent->AddChild(vrvParts);
+
+    this->ReadUnsupportedAttr(parts, vrvParts);
+    return this->ReadPartsChildren(vrvParts, parts);
+}
+
+bool MEIInput::ReadPartsChildren(Object *parent, pugi::xml_node parentNode)
+{
+    assert(dynamic_cast<Parts *>(parent));
+
+    if (!m_readingScoreBased && !m_deserializing) {
+        if (parentNode.first_child()) {
+            LogWarning("Unexpected <mdiv> content in page-based MEI");
+        }
+        return true;
+    }
+
+    pugi::xml_node current;
+    bool success = true;
+    for (current = parentNode.first_child(); current; current = current.next_sibling()) {
+        if (!success) break;
+        if (std::string(current.name()) == "part") {
+            success = this->ReadPart(parent, current);
         }
         // xml comment
         else if (std::string(current.name()) == "") {
