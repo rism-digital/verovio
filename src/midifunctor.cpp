@@ -910,7 +910,7 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
 FunctorCode GenerateMIDIFunctor::VisitPedal(const Pedal *pedal)
 {
     if (!pedal->HasDir()) return FUNCTOR_CONTINUE;
-    // A pedal without start (e.g., an unresolved @startid) is not rendered and is ignored
+    // The start is needed to calculate the pedal time below; skip pedals without one (e.g., an unresolved @startid)
     if (!pedal->GetStart()) return FUNCTOR_CONTINUE;
 
     // Check the functor flag - filters should always be there, but just in case we change how it is called
