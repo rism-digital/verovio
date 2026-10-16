@@ -12,6 +12,7 @@
 
 //----------------------------------------------------------------------------
 
+#include <cassert>
 #include <map>
 
 //----------------------------------------------------------------------------
@@ -29,14 +30,19 @@ class CustomTuning {
 public:
     CustomTuning() {}
     CustomTuning(const std::string &tuningDef, Doc *doc, bool useMusicXmlAccidentals);
+    ~CustomTuning();
+    CustomTuning(const CustomTuning &other);
+    CustomTuning(CustomTuning &&other) noexcept;
+    CustomTuning &operator=(const CustomTuning &other);
+    CustomTuning &operator=(CustomTuning &&other) noexcept;
 
     /**
      * @name Getters and validity checkers
      */
     ///@{
-    bool IsValid() const { return m_tuning.notationMapping.count > 0; }
-    Tunings::Tuning &GetTuning() { return m_tuning; }
-    const Tunings::Tuning &GetTuning() const { return m_tuning; }
+    bool IsValid() const { return m_tuning && m_tuning->notationMapping.count > 0; }
+    Tunings::Tuning &GetTuning() { return EnsureTuning(); }
+    const Tunings::Tuning &GetTuning() const { return EnsureTuning(); }
     std::map<std::string, std::string> &GetNoteMap() { return m_noteMap; }
     const std::map<std::string, std::string> &GetNoteMap() const { return m_noteMap; }
     ///@}
@@ -75,7 +81,14 @@ public:
     //
 
 private:
-    Tunings::Tuning m_tuning;
+    // Preserve default getter behavior without constructing a tuning for every score definition.
+    Tunings::Tuning &EnsureTuning() const
+    {
+        if (!m_tuning) m_tuning = new Tunings::Tuning();
+        return *m_tuning;
+    }
+
+    mutable Tunings::Tuning *m_tuning = NULL;
     std::map<std::string, std::string> m_noteMap;
 
     //----------------//

@@ -136,6 +136,12 @@ void Object::CloneReset()
 
 Object &Object::operator=(const Object &object)
 {
+    this->AssignFrom(object, false);
+    return *this;
+}
+
+void Object::AssignFrom(const Object &object, bool withAttributes)
+{
     // not self assignement
     if (this != &object) {
         this->ClearChildren();
@@ -151,8 +157,8 @@ Object &Object::operator=(const Object &object)
         // Also copy attribute classes
         m_attClasses = object.m_attClasses;
         m_interfaces = object.m_interfaces;
-        // Copy attribute values (necessary because assignment operator is not virtual)
-        object.CopyAttributesTo(this);
+        // Copy attribute values, unless the assignment operator of the derived class does it
+        if (withAttributes) object.CopyAttributesTo(this);
         // New id
         this->GenerateID();
         // For now do now copy them
@@ -173,7 +179,6 @@ Object &Object::operator=(const Object &object)
             }
         }
     }
-    return *this;
 }
 
 Object::~Object()
@@ -578,7 +583,8 @@ Object *Object::DetachChild(int idx)
 void Object::ReplaceWithCopyOf(Object *object)
 {
     Object *parent = this->GetParent();
-    *this = *object;
+    // The assignment operator is not virtual, so the attribute values have to be copied explicitly
+    this->AssignFrom(*object, true);
     this->CloneReset();
     this->SetParent(parent);
 }

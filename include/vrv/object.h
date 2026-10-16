@@ -224,11 +224,16 @@ public:
      */
     Object(const Object &object);
 
+protected:
     /**
      * Copy assignement - see copy constructor.
+     * The attribute values are not copied here but by the (implicit) assignment operator of the derived class
+     * calling this one. Protected because assigning through an Object reference would leave them out - see
+     * ReplaceWithCopyOf.
      */
     Object &operator=(const Object &object);
 
+public:
     /**
      * Move all the children of the object passed as parameter to this one.
      * Objects must be of the same type.
@@ -503,7 +508,7 @@ public:
     Object *DetachChild(int idx);
 
     /**
-     * Replace an object with a copy of the other.
+     * Replace an object with a copy of the other, including the attribute values.
      * They must be of the same class.
      */
     void ReplaceWithCopyOf(Object *object);
@@ -801,6 +806,11 @@ private:
      * Initialisation method taking the class id argument.
      */
     void Init(ClassId classId);
+
+    /**
+     * Implementation of the copy assignment, optionally also copying the attribute values.
+     */
+    void AssignFrom(const Object &object, bool withAttributes);
 
     /**
      * Helper methods for functor processing
