@@ -2,7 +2,8 @@
 name = "Verovio-fonts"
 version = "0.1.0"
 dependencies = [
-    "svgpathtools (>=1.7.0)",
+    "fonttools (>=4.47.0)",
+    "brotli (>=1.1.0)",
 ]
 requires-python = ">=3.11"
 description = ""

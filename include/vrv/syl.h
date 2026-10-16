@@ -16,6 +16,7 @@
 
 namespace vrv {
 
+class FontInfo;
 class Note;
 class TextElement;
 
@@ -80,6 +81,9 @@ public:
      * Calculate the hyphen length using the text font
      */
     int CalcHyphenLength(Doc *doc, int staffSize);
+
+    /** Return the effective font used for the syllable and its connector. */
+    FontInfo GetDrawingFont(Doc *doc, int staffSize) const;
 
     /**
      * Calculate the spacing needed depending on the @worpos and @con
