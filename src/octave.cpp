@@ -34,6 +34,7 @@ Octave::Octave()
     , AttLineRendBase()
     , AttNNumberLike()
     , AttOctaveDisplacement()
+    , AttVerticalGroup()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_EXTENDER);
@@ -41,6 +42,7 @@ Octave::Octave()
     this->RegisterAttClass(ATT_LINERENDBASE);
     this->RegisterAttClass(ATT_NNUMBERLIKE);
     this->RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
+    this->RegisterAttClass(ATT_VERTICALGROUP);
 
     this->Reset();
 }
@@ -56,6 +58,7 @@ void Octave::Reset()
     this->ResetLineRendBase();
     this->ResetNNumberLike();
     this->ResetOctaveDisplacement();
+    this->ResetVerticalGroup();
 
     this->ResetDrawingExtenderX();
 }
