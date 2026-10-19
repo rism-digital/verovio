@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "cursor.h"
 #include "doc.h"
 #include "layer.h"
 #include "staff.h"
@@ -40,7 +41,7 @@ FunctorCode CalcBBoxOverflowsFunctor::VisitLayerEnd(Layer *layer)
         this->VisitMeterSig(layer->GetCautionStaffDefMeterSig());
     }
     if (layer->HasCursor()) {
-        this->VisitCursor(layer->GetCursor());
+        layer->GetCursor()->Process(*this);
     }
     return FUNCTOR_CONTINUE;
 }

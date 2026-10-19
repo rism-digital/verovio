@@ -49,7 +49,7 @@ FunctorCode CalcLedgerLinesFunctor::VisitCursor(Cursor *cursor)
 FunctorCode CalcLedgerLinesFunctor::VisitLayer(Layer *layer)
 {
     if (layer->HasCursor()) {
-        this->VisitCursor(layer->GetCursor());
+        layer->GetCursor()->Process(*this);
     }
 
     return FUNCTOR_CONTINUE;

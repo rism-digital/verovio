@@ -345,7 +345,7 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
 FunctorCode CalcAlignmentPitchPosFunctor::VisitLayer(Layer *layer)
 {
     if (layer->HasCursor()) {
-        this->VisitCursor(layer->GetCursor());
+        layer->GetCursor()->Process(*this);
     }
 
     return FUNCTOR_CONTINUE;

@@ -879,12 +879,12 @@ FunctorCode FunctorInterface::VisitClefEnd(Clef *clef)
 
 FunctorCode FunctorInterface::VisitCursor(Cursor *cursor)
 {
-    return this->VisitLayerElement(cursor);
+    return this->VisitNote(cursor);
 }
 
 FunctorCode FunctorInterface::VisitCursorEnd(Cursor *cursor)
 {
-    return this->VisitLayerElementEnd(cursor);
+    return this->VisitNoteEnd(cursor);
 }
 
 FunctorCode FunctorInterface::VisitCustos(Custos *custos)
@@ -2283,12 +2283,12 @@ FunctorCode ConstFunctorInterface::VisitClefEnd(const Clef *clef)
 
 FunctorCode ConstFunctorInterface::VisitCursor(const Cursor *cursor)
 {
-    return this->VisitLayerElement(cursor);
+    return this->VisitNote(cursor);
 }
 
 FunctorCode ConstFunctorInterface::VisitCursorEnd(const Cursor *cursor)
 {
-    return this->VisitLayerElementEnd(cursor);
+    return this->VisitNoteEnd(cursor);
 }
 
 FunctorCode ConstFunctorInterface::VisitCustos(const Custos *custos)

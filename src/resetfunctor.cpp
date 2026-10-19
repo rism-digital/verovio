@@ -749,7 +749,7 @@ FunctorCode ResetHorizontalAlignmentFunctor::VisitLayer(Layer *layer)
     }
 
     if (layer->HasCursor()) {
-        this->VisitCursor(layer->GetCursor());
+        layer->GetCursor()->Process(*this);
     }
 
     return FUNCTOR_CONTINUE;
