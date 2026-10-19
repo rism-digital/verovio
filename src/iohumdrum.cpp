@@ -26589,7 +26589,8 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     bool showInAccid = token->hasVisibleAccidental(stindex);
     // always show mensural accidentals
     // bool showInAccid = true;
-    bool showInAccidGes = false;
+    // an accidental that is not shown (e.g., from the key signature) is still gestural
+    bool showInAccidGes = !mensit && !showInAccid;
     bool brackQ = hasLayoutParameter(token, "ACC", "brack");
     bool parenQ = hasLayoutParameter(token, "ACC", "paren");
     std::string loaccid = token->getLayoutParameter("N", "acc", subtoken);
