@@ -388,19 +388,25 @@ bool EditorToolkitCMN::InsertCursorByType(CursorInsertType insertType)
 {
     if (!this->InsertMode()) return false;
 
-    if (m_cursor->GetInputMode() != Cursor::InputMode::DURATION_FIRST) return false;
+    if (m_cursor->GetInputMode() == Cursor::InputMode::PITCH_FIRST) return false;
 
     data_DURATION dur = (m_cursor->HasDur()) ? m_cursor->GetDur() : DURATION_4;
     int dots = (m_cursor->HasDots()) ? m_cursor->GetDots() : VRV_UNSET;
 
     std::string id = m_cursor->GetID();
 
-    m_cursor->SetChordMode(Cursor::ChordMode::CHORD_NONE);
-
-    if (insertType == CURSOR_INSERT_REST) {
+    if (insertType == CURSOR_INSERT_NOTE) {
+        data_PITCHNAME pname = (m_cursor->HasPname()) ? m_cursor->GetPname() : PITCHNAME_c;
+        int oct = (m_cursor->HasOct()) ? m_cursor->GetOct() : 3;
+        auto [accid, accidGes] = m_cursor->GetAccidValue();
+        return this->InsertNote(id, pname, oct, accid, accidGes, dur, dots, m_cursor->IsChordMode());
+    }
+    else if (insertType == CURSOR_INSERT_REST) {
+        m_cursor->SetChordMode(Cursor::ChordMode::CHORD_NONE);
         return this->InsertRest(id, dur, dots);
     }
     else {
+        m_cursor->SetChordMode(Cursor::ChordMode::CHORD_NONE);
         return (this->CopyCursorPosition(m_cursor->GetDur(), m_cursor->GetDots(), (insertType == CURSOR_INSERT_TIE)));
     }
 }

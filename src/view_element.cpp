@@ -2415,16 +2415,23 @@ void View::DrawCursor(DeviceContext *dc, LayerElement *element, Layer *layer, St
     const int yC1 = staff->GetDrawingY() + cursor->GetYRelPitchC();
     const int yC2 = yC1 + 6 * unit;
 
-    if (cursor->GetInputMode() == Cursor::DURATION_FIRST) {
-        const int octX = x + unit;
+    if (cursor->GetInputMode() != Cursor::PITCH_FIRST) {
+        const bool durationFirst = (cursor->GetInputMode() == Cursor::DURATION_FIRST);
+
+        const int octX = (durationFirst) ? x + unit : x - .5 * unit;
+        const int noteX = (durationFirst) ? octX : cursor->GetDrawingX();
         const int octSize = staffSize * .8;
         int width = m_doc->GetDrawingStemWidth(octSize);
         this->DrawVerticalLine(dc, yC1, yC2, octX, width);
         this->DrawDot(dc, octX, yC1, octSize);
         this->DrawDot(dc, octX, yC2, octSize);
 
-        const int y = std::max(yC2, staff->GetDrawingY()) + 2 * unit;
-        const int cursorSize = staffSize * .7;
+        const int y = (durationFirst) ? std::max(yC2, staff->GetDrawingY()) + 2 * unit : cursor->GetDrawingY();
+        const int cursorSize = (durationFirst) ? staffSize * .7 : staffSize;
+
+        if (!durationFirst) {
+            this->DrawNote(dc, layer->GetCursor(), layer, staff, measure);
+        }
 
         dc->SetFont(m_doc->GetDrawingSmuflFont(cursorSize, false));
 
@@ -2444,16 +2451,23 @@ void View::DrawCursor(DeviceContext *dc, LayerElement *element, Layer *layer, St
         str.push_back(sym);
 
         if (cursor->HasDots()) {
-            str.push_back(SMUFL_0020_space);
-            str.push_back(SMUFL_ECB7_metAugmentationDot);
+            if (durationFirst) {
+                str.push_back(SMUFL_0020_space);
+                str.push_back(SMUFL_ECB7_metAugmentationDot);
+            }
+            else {
+                int dotsX = x + 2.8 * cursor->GetDrawingRadius(m_doc);
+                this->DrawDotsPart(dc, dotsX, y, 1, staff);
+            }
         }
 
-        data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
-        this->DrawSmuflString(dc, octX, y, str, alignment, cursorSize);
+        data_HORIZONTALALIGNMENT alignment = (durationFirst) ? HORIZONTALALIGNMENT_center : HORIZONTALALIGNMENT_left;
+        this->DrawSmuflString(dc, noteX, y, str, alignment, cursorSize);
         TextExtend extend;
         dc->GetSmuflTextExtent(str, &extend);
 
         if (cursor->HasAccid() && !cursor->IsAccidImplicit()) {
+            const int accidShift = (durationFirst) ? 0 : unit * .7;
             std::u32string strAccid;
             int sym = SMUFL_EA65_figbassNatural;
             switch (cursor->GetAccid()) {
@@ -2466,7 +2480,7 @@ void View::DrawCursor(DeviceContext *dc, LayerElement *element, Layer *layer, St
             }
 
             strAccid.push_back(sym);
-            this->DrawSmuflString(dc, octX, y + extend.m_height, strAccid, alignment, cursorSize);
+            this->DrawSmuflString(dc, noteX + accidShift, y + extend.m_height, strAccid, alignment, cursorSize);
         }
 
         dc->ResetFont();
@@ -2525,7 +2539,7 @@ void View::DrawCursor(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
                 if (cursor->HasDots()) {
                     int dotsX = x + 2.8 * cursor->GetDrawingRadius(m_doc);
-                    this->DrawDotsPart(dc, dotsX, y, cursor->HasDots(), staff);
+                    this->DrawDotsPart(dc, dotsX, y, 1, staff);
                 }
             }
         }

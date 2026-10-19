@@ -92,7 +92,7 @@ public:
     void SetTieMode(TieMode tieMode);
     bool IsTieMode() const { return (m_tieMode != TieMode::TIE_NONE); }
 
-    enum InputMode : int8_t { PITCH_FIRST = 0, DURATION_FIRST, TYPE };
+    enum InputMode : int8_t { PITCH_FIRST = 0, DURATION_FIRST, COMBINED };
 
     InputMode GetInputMode() const { return m_inputMode; }
     void SetInputMode(InputMode inputMode);

@@ -162,9 +162,10 @@ void Cursor::SetChordMode(ChordMode chordMode)
     }
 }
 
-void Cursor::SetInputMode(InputMode intpuMode)
+void Cursor::SetInputMode(InputMode inputMode)
 {
-    m_inputMode = intpuMode;
+    m_inputMode = inputMode;
+    this->SetHeadVisible((inputMode == InputMode::COMBINED) ? BOOLEAN_false : BOOLEAN_NONE);
 }
 
 void Cursor::SetTieMode(TieMode tieMode)
@@ -194,8 +195,8 @@ Cursor::InputMode Cursor::GetInputModeFromStr(const std::string &inputModeStr)
     if (inputModeStr == "durationFirst") {
         return Cursor::DURATION_FIRST;
     }
-    else if (inputModeStr == "type") {
-        return Cursor::TYPE;
+    else if (inputModeStr == "combined") {
+        return Cursor::COMBINED;
     }
     else {
         return Cursor::PITCH_FIRST;
@@ -206,7 +207,7 @@ std::string Cursor::GetInputModeFromValue(Cursor::InputMode inputMode)
 {
     switch (inputMode) {
         case Cursor::PITCH_FIRST: return "durationFirst";
-        case Cursor::TYPE: return "type";
+        case Cursor::COMBINED: return "combined";
         default: return "pitchFirst";
     }
 }
