@@ -4500,14 +4500,6 @@ bool MEIInput::ReadPages(Object *parent, pugi::xml_node pages)
 
     parent->AddChild(vrvPages);
 
-    // check if there is a type attribute for the score
-    DocType type;
-    if (pages.attribute("type")) {
-        type = StrToDocType(pages.attribute("type").value());
-        m_doc->SetType(type);
-        pages.remove_attribute("type");
-    }
-
     // This is a page-based MEI file
     m_layoutInformation = LAYOUT_DONE;
 
