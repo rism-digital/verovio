@@ -17,12 +17,16 @@
 #include "alignfunctor.h"
 #include "comparison.h"
 #include "cursor.h"
+#include "gracegrp.h"
 #include "layer.h"
 #include "miscfunctor.h"
 #include "note.h"
 #include "rest.h"
+#include "score.h"
+#include "scoredef.h"
 #include "staff.h"
 #include "tie.h"
+#include "tuplet.h"
 
 namespace vrv {
 
@@ -64,7 +68,7 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
         LogWarning("Could not parse the insertCursorByType action");
     }
     else if (action == "insertCursorContainer") {
-        CursorContainer container;
+        ClassId container;
         if (this->ParseInsertCursorContainerAction(json.get<jsonxx::Object>("param"), container)) {
             this->PrepareUndo();
             return (this->InsertCursorContainer(container));
@@ -80,6 +84,15 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
             return (this->InsertMeasure(elementId, number, insertBefore));
         }
         LogWarning("Could not parse the insertMeasure action");
+    }
+    else if (action == "insertScoreDef") {
+        std::string elementId;
+        bool insertBefore;
+        if (this->ParseInsertScoreDefAction(json.get<jsonxx::Object>("param"), elementId, insertBefore)) {
+            this->PrepareUndo();
+            return (this->InsertScoreDef(elementId, insertBefore));
+        }
+        LogWarning("Could not parse the insertScoreDef action");
     }
     else if (action == "insertNote") {
         std::string elementId;
@@ -108,7 +121,7 @@ bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
         LogWarning("Could not parse the insertRest action");
     }
     else if (action == "resetCursorContainer") {
-        CursorContainer container;
+        ClassId container;
         if (this->ParseResetCursorContainerAction(json.get<jsonxx::Object>("param"), container)) {
             this->PrepareUndo();
             return (this->ResetCursorContainer(container));
@@ -181,17 +194,20 @@ bool EditorToolkitCMN::ParseInsertCursorByTypeAction(const jsonxx::Object &param
     return true;
 }
 
-bool EditorToolkitCMN::ParseInsertCursorContainerAction(const jsonxx::Object &param, CursorContainer &container)
+bool EditorToolkitCMN::ParseInsertCursorContainerAction(const jsonxx::Object &param, ClassId &container)
 {
-    container = CursorContainer::CURSOR_CONTAINER_NONE;
+    container = OBJECT;
 
     if (!param.has<jsonxx::String>("container")) return false;
 
     if (param.get<jsonxx::String>("container") == "tuplet") {
-        container = CURSOR_CONTAINER_TUPLET;
+        container = TUPLET;
     }
     else if (param.get<jsonxx::String>("container") == "graceGrp") {
-        container = CURSOR_CONTAINER_GRACEGRP;
+        container = GRACEGRP;
+    }
+    else if (param.get<jsonxx::String>("container") == "beam") {
+        container = BEAM;
     }
     else {
         return false;
@@ -209,6 +225,19 @@ bool EditorToolkitCMN::ParseInsertMeasureAction(
     if (param.has<jsonxx::String>("elementId")) elementId = param.get<jsonxx::String>("elementId");
     if (!param.has<jsonxx::Number>("number")) return false;
     number = param.get<jsonxx::Number>("number");
+    if (param.has<jsonxx::Boolean>("insertBefore")) insertBefore = param.get<jsonxx::Boolean>("insertBefore");
+
+    return true;
+}
+
+bool EditorToolkitCMN::ParseInsertScoreDefAction(
+    const jsonxx::Object &param, std::string &elementId, bool &insertBefore)
+{
+    insertBefore = false;
+
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    elementId = param.get<jsonxx::String>("elementId");
+    if (elementId.empty()) return false;
     if (param.has<jsonxx::Boolean>("insertBefore")) insertBefore = param.get<jsonxx::Boolean>("insertBefore");
 
     return true;
@@ -270,17 +299,20 @@ bool EditorToolkitCMN::ParseInsertRestAction(
     return true;
 }
 
-bool EditorToolkitCMN::ParseResetCursorContainerAction(const jsonxx::Object &param, CursorContainer &container)
+bool EditorToolkitCMN::ParseResetCursorContainerAction(const jsonxx::Object &param, ClassId &container)
 {
-    container = CursorContainer::CURSOR_CONTAINER_NONE;
+    container = OBJECT;
 
     if (!param.has<jsonxx::String>("container")) return false;
 
     if (param.get<jsonxx::String>("container") == "tuplet") {
-        container = CURSOR_CONTAINER_TUPLET;
+        container = TUPLET;
     }
     else if (param.get<jsonxx::String>("container") == "graceGrp") {
-        container = CURSOR_CONTAINER_GRACEGRP;
+        container = GRACEGRP;
+    }
+    else if (param.get<jsonxx::String>("container") == "beam") {
+        container = BEAM;
     }
     else {
         return false;
@@ -370,8 +402,59 @@ bool EditorToolkitCMN::InsertCursorByType(CursorInsertType insertType)
     }
 }
 
-bool EditorToolkitCMN::InsertCursorContainer(CursorContainer container)
+bool EditorToolkitCMN::InsertCursorContainer(ClassId container)
 {
+    if (!this->InsertMode()) return false;
+
+    // No nested containers
+    if (m_cursor->HasContainer(container)) return false;
+
+    std::string id = m_cursor->GetID();
+
+    Object *target = m_cursor->GetInsertTargetObject();
+
+    if (!target || !target->IsAnyOf(std::array{ BEAM, CHORD, GRACEGRP, LAYER, NOTE, REST, TUPLET })) return false;
+
+    if (target->Is(NOTE)) {
+        Note *note = vrv_cast<Note *>(target);
+        if (note->IsChordTone()) target = note->IsChordTone();
+    }
+
+    auto [targetContainer, previousElement] = this->GetTargetContainerFor(target);
+    if (!targetContainer) return false;
+
+    Object *containerObject = NULL;
+    if (container == TUPLET) {
+        Tuplet *tuplet = vrv_cast<Tuplet *>(this->PrepareInsertion(targetContainer, "tuplet"));
+        if (!tuplet) return false;
+        tuplet->SetNum(3);
+        tuplet->SetNumbase(2);
+        m_cursor->PushContainer(tuplet);
+        containerObject = tuplet;
+    }
+    else if (container == GRACEGRP) {
+        GraceGrp *graceGrp = vrv_cast<GraceGrp *>(this->PrepareInsertion(targetContainer, "graceGrp"));
+        if (!graceGrp) return false;
+        m_cursor->PushContainer(graceGrp);
+        containerObject = graceGrp;
+    }
+    else if (container == BEAM) {
+        Beam *beam = vrv_cast<Beam *>(this->PrepareInsertion(targetContainer, "beam"));
+        if (!beam) return false;
+        m_cursor->PushContainer(beam);
+        containerObject = beam;
+    }
+
+    if (previousElement) {
+        targetContainer->InsertAfter(previousElement, containerObject);
+    }
+    else {
+        targetContainer->InsertChild(containerObject, 0);
+    }
+
+    this->ClearContext();
+    this->SetEditStatus();
+
     return true;
 }
 
@@ -430,6 +513,49 @@ bool EditorToolkitCMN::InsertMeasure(std::string &elementId, int number, bool in
     return true;
 }
 
+bool EditorToolkitCMN::InsertScoreDef(std::string &elementId, bool insertBefore)
+{
+    Measure *measure = vrv_cast<Measure *>(this->ResolveElement(elementId, false));
+    if (!measure) return false;
+
+    bool prevent = false;
+    assert(measure->GetParent());
+    if (insertBefore) {
+        const Object *previous = measure->GetParent()->GetPrevious(measure);
+        if (previous && previous->Is(SCOREDEF)) prevent = true;
+        if (!this->GetPreviousMeasure(measure)) prevent = true;
+    }
+    else {
+        const Measure *nextMeasure = this->GetNextMeasure(measure);
+        if (!nextMeasure) prevent = true;
+        const Object *next = (nextMeasure) ? measure->GetParent()->GetPrevious(nextMeasure) : NULL;
+        if (next && next->Is(SCOREDEF)) prevent = true;
+    }
+    if (prevent) {
+        LogError("ScoreDef cannot be added at this place.");
+        return false;
+    }
+
+    Score *score = m_doc->GetFirstVisibleScore();
+    ScoreDef *scoreDef = (score) ? score->GetScoreDef() : NULL;
+    if (!scoreDef) return false;
+
+    ScoreDef *newScoreDef = vrv_cast<ScoreDef *>(scoreDef->Clone());
+    newScoreDef->CloneReset();
+
+    if (insertBefore) {
+        measure->GetParent()->InsertBefore(measure, newScoreDef);
+    }
+    else {
+        measure->GetParent()->InsertAfter(measure, newScoreDef);
+    }
+    m_chainedId = newScoreDef->GetID();
+
+    this->ClearContext();
+
+    return true;
+}
+
 bool EditorToolkitCMN::InsertNote(const std::string &elementId, data_PITCHNAME pname, int oct,
     data_ACCIDENTAL_WRITTEN accid, data_ACCIDENTAL_GESTURAL accidGes, data_DURATION dur, int dots, bool chordMode)
 {
@@ -439,12 +565,12 @@ bool EditorToolkitCMN::InsertNote(const std::string &elementId, data_PITCHNAME p
 
     Object *target = NULL;
     if (this->InsertMode()) {
-        target = (m_cursor->HasPosition()) ? m_cursor->GetPosition() : m_cursor->GetParent();
+        target = m_cursor->GetInsertTargetObject();
     }
     else {
         target = this->GetElement(elementId);
     }
-    if (!target || !target->IsAnyOf(std::array{ CHORD, LAYER, NOTE, REST })) return false;
+    if (!target || !target->IsAnyOf(std::array{ BEAM, CHORD, GRACEGRP, LAYER, NOTE, REST, TUPLET })) return false;
 
     if (target->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(target);
@@ -471,7 +597,7 @@ bool EditorToolkitCMN::InsertNote(const std::string &elementId, data_PITCHNAME p
         targetContainer->InsertChild(note, 0);
     }
 
-    if (note->IsInBeam()) {
+    if (note->IsInBeam() || m_cursor->HasContainer(BEAM)) {
         note->SetDur(std::max(DURATION_8, dur));
     }
     else if (this->InsertMode() && (note->GetDur() > DURATION_4)) {
@@ -498,8 +624,12 @@ bool EditorToolkitCMN::InsertNote(const std::string &elementId, data_PITCHNAME p
     return true;
 }
 
-bool EditorToolkitCMN::ResetCursorContainer(CursorContainer container)
+bool EditorToolkitCMN::ResetCursorContainer(ClassId container)
 {
+    if (!this->InsertMode() || !m_cursor->HasContainer()) return false;
+
+    if (m_cursor->GetContainer()->Is(container)) m_cursor->PopContainer();
+
     return true;
 }
 
@@ -507,10 +637,11 @@ std::pair<Object *, Object *> EditorToolkitCMN::GetTargetContainerFor(Object *ta
 {
     Object *previousElement = NULL;
     Object *targetContainer = NULL;
-    if (!target->Is(LAYER)) {
+    if (!target->IsAnyOf(std::array{ BEAM, GRACEGRP, LAYER, TUPLET })) {
         Object *targetParent = target->GetParent();
         // Inserting a note within a tuplet or a beam
-        if (targetParent && targetParent->IsAnyOf(std::array{ BEAM, TUPLET }) && targetParent->GetLast() != target) {
+        if (targetParent && targetParent->IsAnyOf(std::array{ BEAM, GRACEGRP, TUPLET })
+            && targetParent->GetLast() != target) {
             previousElement = target;
             targetContainer = targetParent;
         }
@@ -524,6 +655,9 @@ std::pair<Object *, Object *> EditorToolkitCMN::GetTargetContainerFor(Object *ta
     }
     else {
         targetContainer = target;
+        if (target->IsAnyOf(std::array{ BEAM, GRACEGRP, TUPLET })) {
+            previousElement = target->GetLast();
+        }
     }
     return { targetContainer, previousElement };
 }
@@ -635,12 +769,12 @@ bool EditorToolkitCMN::InsertRest(const std::string &elementId, data_DURATION du
 {
     Object *target = NULL;
     if (this->InsertMode()) {
-        target = (m_cursor->HasPosition()) ? m_cursor->GetPosition() : m_cursor->GetParent();
+        target = m_cursor->GetInsertTargetObject();
     }
     else {
         target = this->GetElement(elementId);
     }
-    if (!target || !target->IsAnyOf(std::array{ CHORD, LAYER, NOTE, REST })) return false;
+    if (!target || !target->IsAnyOf(std::array{ BEAM, CHORD, LAYER, NOTE, REST, TUPLET })) return false;
 
     if (target->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(target);
@@ -685,9 +819,9 @@ void EditorToolkitCMN::AutoBeam(LayerElement *noteOrRest)
 {
     assert(m_cursor);
 
-    // Not sure we actually want to autobeam rest - disabled for now
-    // if (!noteOrRest->IsAnyOf(std::array{NOTE, REST})) return;
-    if (!noteOrRest->IsAnyOf(std::array{ CHORD, NOTE })) return;
+    if (m_cursor->HasContainer(BEAM) || !m_cursor->IsAutoBeam()) return;
+
+    if (!noteOrRest->IsAnyOf(std::array{ CHORD, NOTE, REST })) return;
 
     Layer *layer = vrv_cast<Layer *>(noteOrRest->GetFirstAncestor(LAYER));
     assert(layer);
@@ -714,34 +848,39 @@ void EditorToolkitCMN::AutoBeam(LayerElement *noteOrRest)
         if (chord) result = chord;
     }
 
+    // Do not beam notes a previous grace group when not in cursor
+    if (result->IsGraceNote() && !m_cursor->HasContainer(GRACEGRP)) return;
+
     DurationInterface *interface = result->GetDurationInterface();
     assert(interface);
 
     if (interface->GetDur() < DURATION_8) return;
 
-    AlignMeterParams params;
-    params.meterSig = layer->GetCurrentMeterSig();
-    assert(params.meterSig);
-    const int meterCount = (params.meterSig->GetTotalCount() == 0) ? 4 : params.meterSig->GetTotalCount();
-    const int meterUnit = (params.meterSig->GetUnit() == VRV_UNSET) ? meterCount : params.meterSig->GetUnit();
+    if (!result->IsGraceNote()) {
+        AlignMeterParams params;
+        params.meterSig = layer->GetCurrentMeterSig();
+        assert(params.meterSig);
+        const int meterCount = (params.meterSig->GetTotalCount() == 0) ? 4 : params.meterSig->GetTotalCount();
+        const int meterUnit = (params.meterSig->GetUnit() == VRV_UNSET) ? meterCount : params.meterSig->GetUnit();
 
-    Fraction position = (m_cursor->GetAlignment()) ? m_cursor->GetAlignment()->GetTime() : 0;
-    // Use compound-meter grouping for meters such as 6/8, 9/8 and 12/8.
-    // Simple meters use one denominator unit per beat:
-    //   4/4 -> 4 groups of 1/4
-    // Compound meters use groups of three denominator units:
-    //   6/8 -> 2 groups of 3/8
+        Fraction position = (m_cursor->GetAlignment()) ? m_cursor->GetAlignment()->GetTime() : 0;
+        // Use compound-meter grouping for meters such as 6/8, 9/8 and 12/8.
+        // Simple meters use one denominator unit per beat:
+        //   4/4 -> 4 groups of 1/4
+        // Compound meters use groups of three denominator units:
+        //   6/8 -> 2 groups of 3/8
 
-    const bool isCompoundMeter = ((meterCount % 3 == 0) && params.meterSig->GetUnit() == 8);
+        const bool isCompoundMeter = ((meterCount % 3 == 0) && params.meterSig->GetUnit() == 8);
 
-    Fraction beatDuration = Fraction(1, meterUnit);
-    if (isCompoundMeter) beatDuration = beatDuration * 3;
+        Fraction beatDuration = Fraction(1, meterUnit);
+        if (isCompoundMeter) beatDuration = beatDuration * 3;
 
-    // A note beginning on a new beat must not be joined to the preceding
-    // beam. Do not apply this at the beginning of the measure.
-    if (position > 0) {
-        const Fraction beatPosition = position / beatDuration;
-        if (beatPosition.GetDenominator() == 1) return;
+        // A note beginning on a new beat must not be joined to the preceding
+        // beam. Do not apply this at the beginning of the measure.
+        if (position > 0) {
+            const Fraction beatPosition = position / beatDuration;
+            if (beatPosition.GetDenominator() == 1) return;
+        }
     }
 
     if (result->IsInBeam()) {
@@ -753,8 +892,9 @@ void EditorToolkitCMN::AutoBeam(LayerElement *noteOrRest)
     else {
         Object *previousParent = result->GetParent();
         assert(previousParent);
+        const int idx = result->GetIdx();
         Beam *beam = new Beam();
-        previousParent->AddChild(beam);
+        previousParent->InsertChild(beam, idx);
         result->MoveItselfTo(beam);
         noteOrRest->MoveItselfTo(beam);
         previousParent->ClearRelinquishedChildren();

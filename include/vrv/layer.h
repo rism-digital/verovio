@@ -169,6 +169,8 @@ public:
     const MeterSig *GetCurrentMeterSig() const;
     Proport *GetCurrentProport();
     const Proport *GetCurrentProport() const;
+    std::pair<int, int> GetCurrentNumAndNumbase();
+    const std::pair<int, int> GetCurrentNumAndNumbase() const;
     ///@}
 
     void ResetStaffDefObjects();

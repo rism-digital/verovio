@@ -2354,7 +2354,7 @@ int View::GetSylYRel(int verseN, Staff *staff, data_STAFFREL place, int voltaN)
 {
     assert(staff);
 
-    StaffAlignment *alignment = staff->GetAlignment();
+    const StaffAlignment *alignment = staff->GetAlignment();
     if (!alignment) return 0;
 
     const bool verseCollapse = m_options->m_lyricVerseCollapse.GetValue();
@@ -2368,6 +2368,15 @@ int View::GetSylYRel(int verseN, Staff *staff, data_STAFFREL place, int voltaN)
     verseHeight *= m_doc->GetOptions()->m_lyricHeightFactor.GetValue();
     int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
+    // Verses sharing the lyric lines below the previous staff are positioned from that staff
+    int yOffset = 0;
+    const StaffAlignment *sharedAlignment = alignment->GetSharedLyricsAlignment();
+    if ((place == STAFFREL_above) && sharedAlignment) {
+        yOffset = sharedAlignment->GetYRel() - alignment->GetYRel();
+        alignment = sharedAlignment;
+        place = STAFFREL_below;
+    }
+
     // above the staff
     if (place == STAFFREL_above) {
         y = alignment->GetOverflowAbove()
@@ -2379,7 +2388,7 @@ int View::GetSylYRel(int verseN, Staff *staff, data_STAFFREL place, int voltaN)
             - height;
     }
 
-    return y;
+    return y + yOffset;
 }
 
 void View::DrawCursor(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)

@@ -87,6 +87,7 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayer(Layer *layer)
     m_meterParams.mensur = layer->GetCurrentMensur();
     m_meterParams.meterSig = layer->GetCurrentMeterSig();
     m_meterParams.proport = layer->GetCurrentProport();
+    std::tie(m_meterParams.num, m_meterParams.numbase) = layer->GetCurrentNumAndNumbase();
 
     return FUNCTOR_CONTINUE;
 }
@@ -588,6 +589,9 @@ FunctorCode InitMIDIFunctor::VisitMeasure(const Measure *measure)
 
 FunctorCode InitMIDIFunctor::VisitOctave(const Octave *octave)
 {
+    // An octave without start or end (e.g., an unresolved @endid) is not rendered and is ignored
+    if (!octave->HasStartAndEnd()) return FUNCTOR_CONTINUE;
+
     const Measure *measure = vrv_cast<const Measure *>(octave->GetFirstAncestor(MEASURE));
     assert(measure);
     std::vector<const Staff *> staffList = octave->GetTstampStaves(measure, octave);
@@ -909,6 +913,8 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
 FunctorCode GenerateMIDIFunctor::VisitPedal(const Pedal *pedal)
 {
     if (!pedal->HasDir()) return FUNCTOR_CONTINUE;
+    // The start is needed to calculate the pedal time below; skip pedals without one (e.g., an unresolved @startid)
+    if (!pedal->GetStart()) return FUNCTOR_CONTINUE;
 
     // Check the functor flag - filters should always be there, but just in case we change how it is called
     if (!m_controlEvents || !this->GetFilters()) return FUNCTOR_CONTINUE;

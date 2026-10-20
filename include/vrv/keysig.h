@@ -100,6 +100,14 @@ public:
     data_KEYSIGNATURE ConvertToSig() const;
 
     /**
+     * Convert to and from a written key sig according to the diatonic and chromatic transposition values
+     */
+    ///@{
+    data_KEYSIGNATURE ConvertToWritten(int diatonic, int chromatic) const;
+    data_KEYSIGNATURE ConvertFromWritten(int diatonic, int chromatic) const;
+    ///@}
+
+    /**
      * Fill the map of modified pitches
      */
     void FillMap(MapOfOctavedPitchAccid &mapOfPitchAccid) const;
@@ -124,6 +132,7 @@ public:
      */
     static data_PITCHNAME GetAccidPnameAt(data_ACCIDENTAL_WRITTEN alterationType, int pos);
     static int GetOctave(data_ACCIDENTAL_WRITTEN alterationType, data_PITCHNAME pitch, const Clef *clef);
+    static int GetFifthsDelta(int diatonic, int chromatic);
 
     //----------//
     // Functors //
