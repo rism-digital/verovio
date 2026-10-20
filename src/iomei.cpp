@@ -2035,13 +2035,6 @@ void MEIOutput::WriteMeasure(pugi::xml_node currentNode, Measure *measure)
     measure->WriteNNumberLike(currentNode);
     measure->WritePointing(currentNode);
     measure->WriteTyped(currentNode);
-    // For now we copy the adjusted value of coord.x1 and coord.x2 to xAbs and xAbs2 respectively
-    if ((measure->m_drawingFacsX1 != VRV_UNSET) && (measure->m_drawingFacsX2 != VRV_UNSET) && !m_doc->IsNeumeLines()) {
-        measure->SetCoordX1(measure->m_drawingFacsX1 / DEFINITION_FACTOR);
-        measure->SetCoordX2(measure->m_drawingFacsX2 / DEFINITION_FACTOR);
-        measure->WriteCoordX1(currentNode);
-        measure->WriteCoordX2(currentNode);
-    }
 }
 
 void MEIOutput::WriteOssia(pugi::xml_node currentNode, Ossia *ossia)
@@ -3645,8 +3638,7 @@ std::string MEIOutput::DocTypeToStr(DocType type)
     switch (type) {
         case Raw: value = "raw"; break;
         case Rendering: value = "rendering"; break;
-        case Transcription: value = "transcription"; break;
-        case Facs: value = "facsimile"; break;
+        case FacTranscription: value = "transcription"; break;
         default:
             LogWarning("Unknown document type '%d'", type);
             value = "";
@@ -4439,15 +4431,11 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     facsimile = music.child("facsimile");
     if (!facsimile.empty()) {
         this->ReadFacsimile(m_doc, facsimile);
-        if (m_doc->GetOptions()->m_useFacsimile.GetValue()) {
-            m_doc->SetType(Facs);
-            m_doc->m_drawingPageHeight = m_doc->GetFacsimile()->GetMaxY();
-            m_doc->m_drawingPageWidth = m_doc->GetFacsimile()->GetMaxX();
-        }
-        // Temporary solution to set the document type to Transcription when using <facsimile>
-        else if (m_doc->HasFacsimile() && !m_doc->GetFacsimile()->GetType().empty()) {
-            m_doc->SetType(StrToDocType(m_doc->GetFacsimile()->GetType()));
-            // Facsimile data eventually sync with Doc::SyncFromFacsimileDoc below
+        if (m_doc->HasFacsimile()) {
+            const bool facsimileTranscriptionType = (m_doc->GetFacsimile()->GetType() == "transcription");
+            m_doc->SetType((facsimileTranscriptionType || m_doc->GetOptions()->m_useFacsimile.GetValue())
+                    ? FacTranscription
+                    : Raw);
         }
         if (facsimile.next_sibling("facsimile")) {
             LogWarning("Only first <facsimile> is processed");
@@ -4687,7 +4675,7 @@ bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
     Page *vrvPage = new Page();
     this->SetMeiID(page, vrvPage);
 
-    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsFacTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradePageTo_3_0_0(vrvPage, m_doc);
     }
 
@@ -4726,12 +4714,12 @@ bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
     parent->AddChild(vrvPage);
     bool success = this->ReadPageChildren(vrvPage, page);
 
-    if (success && m_doc->IsTranscription() && (vrvPage->GetPPUFactor() != 1.0)) {
+    if (success && m_doc->IsFacTranscription() && (vrvPage->GetPPUFactor() != 1.0)) {
         ApplyPPUFactorFunctor applyPPUFactor;
         vrvPage->Process(applyPPUFactor);
     }
 
-    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsFacTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradePageTo_5_0(vrvPage);
     }
 
@@ -5111,23 +5099,21 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
         }
         // unmeasured music
         else if (std::string(current.name()) == "staff") {
-            if (!unmeasured) {
-                if (parent->Is(SECTION)) {
-                    if (m_doc->IsNeumeLines()) {
-                        unmeasured = new Measure(NEUMELINE);
-                    }
-                    else {
-                        unmeasured = new Measure(UNMEASURED);
-                        m_doc->SetMensuralMusicOnly(BOOLEAN_true);
-                    }
-                    parent->AddChild(unmeasured);
+            if (parent->Is(SECTION)) {
+                if (m_doc->IsNeumeLines()) {
+                    unmeasured = new Measure(NEUMELINE);
                 }
                 else {
-                    LogError("Unmeasured music within editorial markup is currently not supported");
-                    return false;
+                    unmeasured = new Measure(UNMEASURED);
+                    m_doc->SetMensuralMusicOnly(BOOLEAN_true);
                 }
+                parent->AddChild(unmeasured);
+                success = this->ReadStaff(unmeasured, current);
             }
-            success = this->ReadStaff(unmeasured, current);
+            else {
+                LogError("Unmeasured music within editorial markup is currently not supported");
+                return false;
+            }
         }
         else if (std::string(current.name()) == "measure") {
             // we should not mix measured and unmeasured music within a system...
@@ -5287,7 +5273,7 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
                     assert(system);
                     unmeasured = new Measure(UNMEASURED);
                     m_doc->SetMensuralMusicOnly(BOOLEAN_true);
-                    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+                    if (m_doc->IsFacTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
                         UpgradeMeasureTo_3_0_0(unmeasured, system);
                     }
                     system->AddChild(unmeasured);
@@ -6031,15 +6017,8 @@ bool MEIInput::ReadMeasure(Object *parent, pugi::xml_node measure)
     vrvMeasure->ReadPointing(measure);
     vrvMeasure->ReadTyped(measure);
 
-    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsFacTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradeMeasureTo_5_0(measure);
-    }
-
-    if (measure.attribute("coord.x1") && measure.attribute("coord.x2") && m_doc->IsTranscription()) {
-        vrvMeasure->ReadCoordX1(measure);
-        vrvMeasure->ReadCoordX2(measure);
-        vrvMeasure->m_drawingFacsX1 = vrvMeasure->GetCoordX1() * DEFINITION_FACTOR;
-        vrvMeasure->m_drawingFacsX2 = vrvMeasure->GetCoordX2() * DEFINITION_FACTOR;
     }
 
     parent->AddChild(vrvMeasure);
@@ -7079,13 +7058,8 @@ bool MEIInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
     object->ReadLabelled(element);
     object->ReadTyped(element);
 
-    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsFacTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradeLayerElementTo_5_0(element);
-    }
-
-    if (element.attribute("coord.x1") && m_doc->IsTranscription()) {
-        object->ReadCoordX1(element);
-        object->m_drawingFacsX = object->GetCoordX1() * DEFINITION_FACTOR;
     }
 
     return true;
@@ -9062,8 +9036,7 @@ DocType MEIInput::StrToDocType(std::string type)
 {
     if (type == "raw") return Raw;
     if (type == "rendering") return Rendering;
-    if (type == "transcription") return Transcription;
-    if (type == "facsimile") return Facs;
+    if (type == "transcription") return FacTranscription;
     LogWarning("Unknown layout type '%s'", type.c_str());
     return Raw;
 }

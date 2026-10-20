@@ -878,12 +878,9 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         m_doc.MarkAsCastOff();
     }
 
-    // Always set breaks to 'none' with Facs rendering
-    if (m_doc.IsFacs()) breaks = BREAKS_none;
-
     // Always set breaks to 'none' or 'encoded' with Transcription rendering
     // rendering them differenty requires the MEI
-    if (m_doc.IsTranscription()) {
+    if (m_doc.IsFacTranscription()) {
         breaks = (m_doc.HasFacsimile()) ? BREAKS_encoded : BREAKS_none;
     }
 
@@ -922,7 +919,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         m_doc.ScoreDefSetCurrentDoc();
     }
 
-    if (m_doc.IsTranscription() && m_doc.HasFacsimile()) {
+    if (m_doc.IsFacTranscription() && m_doc.HasFacsimile()) {
         m_doc.SyncFromFacsimileDoc();
     }
 
@@ -1630,7 +1627,7 @@ void Toolkit::RedoLayout(const std::string &jsonOptions)
 
     this->ResetLogBuffer();
 
-    if ((this->GetPageCount() == 0) || m_doc.IsTranscription() || m_doc.IsFacs()) {
+    if ((this->GetPageCount() == 0) || m_doc.IsFacTranscription()) {
         LogWarning("No data to re-layout");
         return;
     }
@@ -1693,7 +1690,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     if (adjustWidth || (breaks == BREAKS_none)) width = m_doc.GetAdjustedDrawingPageWidth();
     if (adjustHeight || (breaks == BREAKS_none)) height = m_doc.GetAdjustedDrawingPageHeight();
 
-    if (m_doc.IsTranscription()) {
+    if (m_doc.IsFacTranscription()) {
         width = m_doc.GetAdjustedDrawingPageWidth();
         height = m_doc.GetAdjustedDrawingPageHeight();
     }
@@ -1716,11 +1713,6 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     deviceContext->SetWidth(width);
     deviceContext->SetHeight(height);
     deviceContext->SetViewBoxFactor(m_view.GetPPUFactor());
-
-    if (m_doc.IsFacs()) {
-        deviceContext->SetWidth(m_doc.GetFacsimile()->GetMaxX());
-        deviceContext->SetHeight(m_doc.GetFacsimile()->GetMaxY());
-    }
 
     // render the page
     m_view.DrawCurrentPage(deviceContext, false);
@@ -1754,10 +1746,6 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
 
     if (m_options->m_showHidden.GetValue()) {
         svg.SetShowHidden(true);
-    }
-
-    if (m_doc.IsFacs()) {
-        svg.SetFacsimile(true);
     }
 
     // set the option to use viewbox on svg root

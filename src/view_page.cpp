@@ -1292,16 +1292,12 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
 
     dc->StartGraphic(staff, "", staff->GetID());
 
-    if (m_doc->IsFacs()) {
-        staff->SetFromFacsimile(m_doc);
-    }
-
     MRest *mrest = vrv_cast<MRest *>(staff->FindDescendantByType(MREST));
     if (!mrest || mrest->GetCutout() != cutout_CUTOUT_cutout) {
         this->DrawStaffLines(dc, staff, staffDef, measure, system);
     }
 
-    if (staffDef && (m_doc->GetType() != Facs)) {
+    if (staffDef) {
         this->DrawStaffDef(dc, staff, measure);
     }
 
