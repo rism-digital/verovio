@@ -233,7 +233,10 @@ ScoreDef::ScoreDef()
     this->Reset();
 }
 
-ScoreDef::~ScoreDef() {}
+ScoreDef::~ScoreDef()
+{
+    this->ResetCustomTuning();
+}
 
 void ScoreDef::Reset()
 {
