@@ -45,7 +45,7 @@ public:
 protected:
 #ifndef NO_EDIT_SUPPORT
 
-    enum SelectCustom : int8_t { SELECT_NONE = 0, SELECT_NOTE, SELECT_TEXT_PARENT };
+    enum SelectCustom : int8_t { SELECT_NONE = 0, SELECT_NOTE, SELECT_STAFF, SELECT_TEXT_PARENT };
 
     struct State {
         std::string data;
