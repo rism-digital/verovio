@@ -25,6 +25,44 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// AddLayerFunctor
+//----------------------------------------------------------------------------
+
+AddLayerFunctor::AddLayerFunctor(int n) : Functor()
+{
+    m_n = n;
+    m_layerN = 1;
+}
+
+AddLayerFunctor::~AddLayerFunctor() {}
+
+FunctorCode AddLayerFunctor::VisitDoc(Doc *doc)
+{
+    for (const Object *object : doc->FindAllDescendantsByType(STAFF, false)) {
+        const Staff *staff = vrv_cast<const Staff *>(object);
+        if (staff->GetN() != m_n) continue;
+
+        for (const Object *layerObject : staff->FindAllDescendantsByType(LAYER, false)) {
+            const Layer *layer = vrv_cast<const Layer *>(layerObject);
+            if (layer->HasN()) m_layerN = std::max(m_layerN, layer->GetN() + 1);
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AddLayerFunctor::VisitStaff(Staff *staff)
+{
+    if (staff->GetN() != m_n) return FUNCTOR_SIBLINGS;
+
+    Layer *layer = new Layer();
+    layer->SetN(m_layerN);
+    staff->AddChild(layer);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+//----------------------------------------------------------------------------
 // AddStaffFunctor
 //----------------------------------------------------------------------------
 

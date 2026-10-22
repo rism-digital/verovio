@@ -760,6 +760,9 @@ bool EditorToolkitShared::ParseUpdateScoreDefAction(const jsonxx::Object &param,
     else if (updateStr == "insertBelow") {
         update = INSERT_BELOW;
     }
+    else if (updateStr == "insertLayer") {
+        update = INSERT_LAYER;
+    }
     else if (updateStr == "moveUp") {
         update = MOVE_UP;
     }
@@ -2284,6 +2287,10 @@ bool EditorToolkitShared::UpdateScoreDef(ScoreDefUpdate update)
         m_doc->Process(addStaffFunctor);
         ReorderStaffNFunctor reorderStaffNFunctor;
         m_doc->Process(reorderStaffNFunctor);
+    }
+    else if (update == INSERT_LAYER) {
+        AddLayerFunctor addLayerFunctor(staff->GetN());
+        m_doc->Process(addLayerFunctor);
     }
     else if (update == MOVE_UP || update == MOVE_DOWN) {
         StaffMove staffMove = (update == MOVE_UP) ? StaffMove::MOVE_UP : StaffMove::MOVE_DOWN;

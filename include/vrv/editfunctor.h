@@ -18,6 +18,42 @@ enum StaffInsert : int8_t { INSERT_ABOVE = 0, INSERT_BELOW };
 enum StaffMove : int8_t { MOVE_UP = 0, MOVE_DOWN };
 
 //----------------------------------------------------------------------------
+// AddLayerFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This adds a layer to a staff.
+ */
+class AddLayerFunctor : public Functor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    AddLayerFunctor(int n);
+    virtual ~AddLayerFunctor();
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    FunctorCode VisitDoc(Doc *doc) override;
+    FunctorCode VisitStaff(Staff *staff) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    int m_n;
+    int m_layerN;
+};
+
+//----------------------------------------------------------------------------
 // AddStaffFunctor
 //----------------------------------------------------------------------------
 

@@ -57,7 +57,7 @@ protected:
 
     enum DragPhase : int8_t { DRAG_START = 0, DRAG_MOVE, DRAG_END };
 
-    enum ScoreDefUpdate : int8_t { INSERT_ABOVE = 0, INSERT_BELOW, MOVE_UP, MOVE_DOWN, DELETE_STAFF };
+    enum ScoreDefUpdate : int8_t { INSERT_ABOVE = 0, INSERT_BELOW, INSERT_LAYER, MOVE_UP, MOVE_DOWN, DELETE_STAFF };
 
     /**
      * Parse JSON instructions for experimental editor functions.

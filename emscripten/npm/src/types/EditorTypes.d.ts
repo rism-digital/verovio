@@ -261,7 +261,7 @@ export interface UpdatePitchAction {
 export interface UpdateScoreDefAction {
     action: "updateScoreDef";
     param: {
-        update: "insertAbove" | "insertBelow" | "moveUp" | "moveDown" | "deleteStaff";
+        update: "insertAbove" | "insertBelow" | "insertLayer" | "moveUp" | "moveDown" | "deleteStaff";
     };
 }
 export type EditorAction =
