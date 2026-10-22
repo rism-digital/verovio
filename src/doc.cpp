@@ -972,20 +972,6 @@ void Doc::PrepareData()
     PrepareLayerElementPartsFunctor prepareLayerElementParts(this);
     root->Process(prepareLayerElementParts);
 
-    /************ Resolve @facs ************/
-    if (this->IsFacs()) {
-        // Associate zones with elements
-        PrepareFacsimileFunctor prepareFacsimile(this->GetFacsimile());
-        root->Process(prepareFacsimile);
-
-        // Add default syl zone if one is not present.
-        for (Object *object : prepareFacsimile.GetZonelessSyls()) {
-            Syl *syl = vrv_cast<Syl *>(object);
-            assert(syl);
-            syl->CreateDefaultZone(this);
-        }
-    }
-
     for (Score *score : this->GetVisibleScores()) {
         ScoreDefSetGrpSymFunctor scoreDefSetGrpSym;
         assert(score->GetScoreDef());
@@ -1400,10 +1386,7 @@ void Doc::ConvertToCastOffMensuralDoc(MensuralCastOffType castOff)
     if ((castOff != MENSURAL_CAST_OFF_INIT) && !m_mensuralCastOff) return;
 
     // Do not convert transcription files
-    if (this->IsTranscription()) return;
-
-    // Do not convert facs files
-    if (this->IsFacs()) return;
+    if (this->IsFacTranscription()) return;
 
     // Flag it as performed
     m_mensuralCastOff = true;
@@ -1451,10 +1434,7 @@ void Doc::ConvertToCmnDoc()
     if (!this->IsMensuralMusicOnly()) return;
 
     // Do not convert transcription files
-    if (this->IsTranscription()) return;
-
-    // Do not convert facs files
-    if (this->IsFacs()) return;
+    if (this->IsFacTranscription()) return;
 
     m_isMensuralMusicOnly = BOOLEAN_false;
 
@@ -1664,7 +1644,7 @@ void Doc::ExpandExpansions()
     if (this->GetOptions()->m_expandNever.GetValue()) return;
 
     // Nothing to do in these cases - marked the map as processed
-    if (this->IsMensuralMusicOnly() || this->IsTranscription()) {
+    if (this->IsMensuralMusicOnly() || this->IsFacTranscription()) {
         m_expansionMap.SetProcessed(true);
         return;
     }
@@ -2461,7 +2441,7 @@ int Doc::GetAdjustedDrawingPageHeight() const
     assert(m_drawingPage);
 
     // Take into account the PPU when getting the page height in facsimile
-    if (this->IsTranscription() || this->IsFacs()) {
+    if (this->IsFacTranscription()) {
         return m_drawingPage->m_pageHeight * m_drawingPage->GetPPUFactor() / DEFINITION_FACTOR;
     }
 
@@ -2477,7 +2457,7 @@ int Doc::GetAdjustedDrawingPageWidth() const
     assert(m_drawingPage);
 
     // Take into account the PPU when getting the page width in facsimile
-    if (this->IsTranscription() || this->IsFacs()) {
+    if (this->IsFacTranscription()) {
         return m_drawingPage->m_pageWidth * m_drawingPage->GetPPUFactor() / DEFINITION_FACTOR;
     }
 
