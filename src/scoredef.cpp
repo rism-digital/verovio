@@ -259,7 +259,7 @@ void ScoreDef::CloneReset()
 {
     ScoreDefElement::CloneReset();
 
-    this->ResetCustomTuning();
+    m_customTuning = NULL;
 }
 
 void ScoreDef::ResetCustomTuning()
