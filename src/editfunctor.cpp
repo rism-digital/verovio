@@ -63,6 +63,63 @@ FunctorCode AddLayerFunctor::VisitStaff(Staff *staff)
 }
 
 //----------------------------------------------------------------------------
+// DeleteLayerFunctor
+//----------------------------------------------------------------------------
+
+DeleteLayerFunctor::DeleteLayerFunctor(int staffN, int layerN) : Functor()
+{
+    m_staffN = staffN;
+    m_layerN = layerN;
+    m_canDelete = true;
+}
+
+DeleteLayerFunctor::~DeleteLayerFunctor() {}
+
+FunctorCode DeleteLayerFunctor::VisitDoc(Doc *doc)
+{
+    for (Object *object : doc->FindAllDescendantsByType(STAFF, false)) {
+        Staff *staff = vrv_cast<Staff *>(object);
+        if (staff->GetN() != m_staffN) continue;
+
+        const ListOfObjects layers = staff->FindAllDescendantsByType(LAYER, false);
+        const auto layer = std::find_if(layers.begin(), layers.end(), [this](const Object *object) {
+            const Layer *layer = vrv_cast<const Layer *>(object);
+            return layer->GetN() == m_layerN;
+        });
+        if ((layer != layers.end()) && (layers.size() < 2)) {
+            m_canDelete = false;
+            break;
+        }
+    }
+
+    return m_canDelete ? FUNCTOR_CONTINUE : FUNCTOR_STOP;
+}
+
+FunctorCode DeleteLayerFunctor::VisitStaff(Staff *staff)
+{
+    if (staff->GetN() != m_staffN) return FUNCTOR_SIBLINGS;
+
+    Layer *layerToDelete = NULL;
+    for (Object *object : staff->FindAllDescendantsByType(LAYER, false)) {
+        Layer *layer = vrv_cast<Layer *>(object);
+        if (layer->GetN() == m_layerN) {
+            layerToDelete = layer;
+        }
+        else if (layer->GetN() > m_layerN) {
+            layer->SetN(layer->GetN() - 1);
+        }
+    }
+
+    if (layerToDelete) {
+        Object *parent = layerToDelete->GetParent();
+        assert(parent);
+        parent->DeleteChild(layerToDelete);
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
+//----------------------------------------------------------------------------
 // AddStaffFunctor
 //----------------------------------------------------------------------------
 

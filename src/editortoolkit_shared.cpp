@@ -772,6 +772,9 @@ bool EditorToolkitShared::ParseUpdateScoreDefAction(const jsonxx::Object &param,
     else if (updateStr == "deleteStaff") {
         update = DELETE_STAFF;
     }
+    else if (updateStr == "deleteLayer") {
+        update = DELETE_LAYER;
+    }
     else {
         return false;
     }
@@ -2145,11 +2148,13 @@ Staff *EditorToolkitShared::ResolveScoreDefStaff()
 {
     std::string selectionId = m_selectionId;
     Object *selection = selectionId.empty() ? NULL : this->ResolveElement(selectionId);
-    if (!selection || !selection->Is(STAFF)) {
-        LogError("A staff must be selected");
+    if (!selection || (!selection->Is(STAFF) && !selection->Is(LAYER))) {
+        LogError("A staff or layer must be selected");
         return NULL;
     }
-    return vrv_cast<Staff *>(selection);
+    if (selection->Is(STAFF)) return vrv_cast<Staff *>(selection);
+
+    return vrv_cast<Staff *>(selection->GetFirstAncestor(STAFF));
 }
 
 void EditorToolkitShared::FinalizeScoreDefUpdate()
@@ -2308,6 +2313,17 @@ bool EditorToolkitShared::UpdateScoreDef(ScoreDefUpdate update)
         }
         ReorderStaffNFunctor reorderStaffNFunctor;
         m_doc->Process(reorderStaffNFunctor);
+        this->ResetSelect();
+    }
+    else if (update == DELETE_LAYER) {
+        Object *selection = m_selectionId.empty() ? NULL : this->ResolveElement(m_selectionId);
+        if (!selection || !selection->Is(LAYER)) {
+            LogError("A layer must be selected");
+            return false;
+        }
+        Layer *layer = vrv_cast<Layer *>(selection);
+        DeleteLayerFunctor deleteLayerFunctor(staff->GetN(), layer->GetN());
+        m_doc->Process(deleteLayerFunctor);
         this->ResetSelect();
     }
 

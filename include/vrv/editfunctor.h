@@ -54,6 +54,43 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// DeleteLayerFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This deletes a layer and updates the @n of the following layers.
+ */
+class DeleteLayerFunctor : public Functor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    DeleteLayerFunctor(int staffN, int layerN);
+    virtual ~DeleteLayerFunctor();
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    FunctorCode VisitDoc(Doc *doc) override;
+    FunctorCode VisitStaff(Staff *staff) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    int m_staffN;
+    int m_layerN;
+    bool m_canDelete;
+};
+
+//----------------------------------------------------------------------------
 // AddStaffFunctor
 //----------------------------------------------------------------------------
 
