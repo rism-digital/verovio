@@ -4921,7 +4921,7 @@ bool MEIInput::ReadPart(Object *parent, pugi::xml_node part)
 {
     Part *vrvPart = new Part(false);
     parent->AddChild(vrvPart);
-    this->ReadScoreOrPartElement(part, vrvPart);
+    if (!this->ReadScoreOrPartElement(part, vrvPart)) return false;
 
     return this->ReadScoreOrPartChildren(vrvPart, part);
 }
@@ -4930,7 +4930,7 @@ bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
 {
     Score *vrvScore = new Score(false);
     parent->AddChild(vrvScore);
-    this->ReadScoreOrPartElement(score, vrvScore);
+    if (!this->ReadScoreOrPartElement(score, vrvScore)) return false;
 
     return this->ReadScoreOrPartChildren(vrvScore, score);
 }
