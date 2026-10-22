@@ -246,6 +246,7 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitPage(Page *page)
         m_upcomingScoreDef.Process(*this);
     }
     page->m_drawingScoreDef = m_upcomingScoreDef;
+    page->m_drawingScoreDef.CloneReset();
     return FUNCTOR_CONTINUE;
 }
 
