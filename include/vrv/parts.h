@@ -19,7 +19,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 /**
- * This class represent a <parts> MEI.
+ * This class represents a <parts> MEI.
  */
 class Parts : public PageElement, public PageMilestoneInterface, public AttLabelled, public AttNNumberLike {
 
