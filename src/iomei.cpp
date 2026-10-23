@@ -1431,6 +1431,7 @@ void MEIOutput::WriteCustomScoreDef(ScoreDef *scoreDef)
         // Create a copy of the reference scoredef and adjust it to keep track of clef changes, key signature changes,
         // etc.
         ScoreDef *customScoreDef = vrv_cast<ScoreDef *>(refScoreDef->Clone());
+        customScoreDef->CloneReset();
         ListOfObjects staffDefs = customScoreDef->FindAllDescendantsByType(STAFFDEF);
         for (Object *staffDef : staffDefs) {
             this->AdjustStaffDef(vrv_cast<StaffDef *>(staffDef), measure);

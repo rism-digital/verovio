@@ -159,6 +159,7 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitMeasure(Measure *measure)
         // The cautionary scoreDef for restart is already done when hitting the scoreDef
         if (m_upcomingScoreDef.m_setAsDrawing && m_previousMeasure && !m_restart) {
             ScoreDef cautionaryScoreDef = m_upcomingScoreDef;
+            cautionaryScoreDef.CloneReset();
             SetCautionaryScoreDefFunctor setCautionaryScoreDef(&cautionaryScoreDef);
             m_previousMeasure->Process(setCautionaryScoreDef);
         }
@@ -241,9 +242,11 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitPage(Page *page)
     assert(page->m_score->GetScoreDef());
     if (!m_currentScore || (m_currentScore != page->m_score)) {
         m_upcomingScoreDef = *page->m_score->GetScoreDef();
+        m_upcomingScoreDef.CloneReset();
         m_upcomingScoreDef.Process(*this);
     }
     page->m_drawingScoreDef = m_upcomingScoreDef;
+    page->m_drawingScoreDef.CloneReset();
     return FUNCTOR_CONTINUE;
 }
 
@@ -261,6 +264,7 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitScoreOrPartElement(ScoreOrPartElemen
 {
     m_currentScore = scoreOrPart;
     m_upcomingScoreDef = *scoreOrPart->GetScoreDef();
+    m_upcomingScoreDef.CloneReset();
     m_upcomingScoreDef.Process(*this);
     // Trigger the redraw of everything
     m_upcomingScoreDef.SetRedrawFlags(StaffDefRedrawFlags::REDRAW_ALL);
@@ -301,6 +305,7 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitScoreDefEnd(ScoreDef *scoreDef)
         // presence of a system break
         if (m_previousMeasure) {
             ScoreDef cautionaryScoreDef = m_upcomingScoreDef;
+            cautionaryScoreDef.CloneReset();
             std::vector<int> restartStaffNs = scoreDef->GetStaffNs();
             SetCautionaryScoreDefFunctor setCautionaryScoreDef(&cautionaryScoreDef, true);
             setCautionaryScoreDef.SetRestartStaffNs(restartStaffNs);

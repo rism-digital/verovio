@@ -493,11 +493,12 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             tuningDef = midiTuningFile;
         }
         if (!tuningDef.empty()) {
-            CustomTuning tuning(tuningDef, this, false);
-            if (tuning.IsValid()) {
+            CustomTuning *tuning = new CustomTuning(tuningDef, this, false);
+            if (tuning->IsValid()) {
                 scoreDef->SetCustomTuning(tuning);
             }
             else {
+                delete tuning;
                 LogWarning("Error parsing tuning %s", f.good() ? "file" : "definition");
             }
         }
@@ -620,7 +621,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             generateMIDI.SetNoCue(this->GetOptions()->m_midiNoCue.GetValue());
             generateMIDI.SetControlEvents(controlEvents);
             generateMIDI.SetInstrDef(instrDef);
-            generateMIDI.SetCustomTuning(&scoreDef->GetCustomTuning());
+            generateMIDI.SetCustomTuning(scoreDef->GetCustomTuning());
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
             this->Process(generateMIDI);

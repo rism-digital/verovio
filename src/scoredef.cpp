@@ -227,10 +227,16 @@ ScoreDef::ScoreDef()
     this->RegisterAttClass(ATT_TIMEBASE);
     this->RegisterAttClass(ATT_TUNING);
 
+    // owned pointers need to be set to NULL;
+    m_customTuning = NULL;
+
     this->Reset();
 }
 
-ScoreDef::~ScoreDef() {}
+ScoreDef::~ScoreDef()
+{
+    this->ResetCustomTuning();
+}
 
 void ScoreDef::Reset()
 {
@@ -245,6 +251,23 @@ void ScoreDef::Reset()
     m_drawingWidth = 0;
     m_drawingLabelsWidth = 0;
     m_setAsDrawing = false;
+
+    this->ResetCustomTuning();
+}
+
+void ScoreDef::CloneReset()
+{
+    ScoreDefElement::CloneReset();
+
+    m_customTuning = NULL;
+}
+
+void ScoreDef::ResetCustomTuning()
+{
+    if (m_customTuning) {
+        delete m_customTuning;
+        m_customTuning = NULL;
+    }
 }
 
 bool ScoreDef::IsSupportedChild(ClassId classId)
@@ -596,6 +619,12 @@ int ScoreDef::GetMaxStaffSize() const
 {
     const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(this->FindDescendantByType(STAFFGRP));
     return (staffGrp) ? staffGrp->GetMaxStaffSize() : 100;
+}
+
+void ScoreDef::SetCustomTuning(CustomTuning *customTuning)
+{
+    this->ResetCustomTuning();
+    m_customTuning = customTuning;
 }
 
 bool ScoreDef::IsSectionRestart() const

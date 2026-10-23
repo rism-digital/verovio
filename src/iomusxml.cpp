@@ -4225,13 +4225,14 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure, Sec
     if (abletonTuning) {
         const std::string tuningDef
             = std::regex_replace(abletonTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
-        CustomTuning tuning(tuningDef, m_doc, true);
-        if (tuning.IsValid()) {
+        CustomTuning *tuning = new CustomTuning(tuningDef, m_doc, true);
+        if (tuning->IsValid()) {
             ScoreDef *scoreDef = GetOrCreateLastScoreDef(section);
             assert(scoreDef);
             scoreDef->SetCustomTuning(tuning);
         }
         else {
+            delete tuning;
             LogWarning("MusicXML import: Error parsing tuning definition");
         }
     }
