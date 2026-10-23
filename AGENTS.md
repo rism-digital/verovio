@@ -44,19 +44,20 @@ Contributions normally target `develop`. Do not open issues, publish reviews, or
   evaluation; use blocks for more complex conditions.
 - In headers, group includes as system, Verovio, then embedded libraries; alphabetize within each group. Prefer
   alphabetized forward declarations when a complete type is unnecessary. In `.cpp` files, include the matching header
-  first, then the same groups. Follow existing separator comments and header guards.
+  first, then the same groups. Separate include groups with standard comment lines (`//----------------------------------------------------------------------------`) and follow existing header guards.
 - Put core implementation in `namespace vrv`. **Do not add empty namespace blocks at global scope**, whether named or
   anonymous (`namespace {}`). Do not leave an empty block after moving or removing code.
 - Use `this->` for member method calls, not for `m_` member access. Declare methods before data members, with access groups
   ordered `public`, `protected`, `private`; group static methods and place their implementations at the end.
 - For element classes, list the `Object`-derived base first, then drawing interfaces, attribute interfaces, and individual
   attribute classes, alphabetized within each group. Keep constructor initialization, interface/attribute registration,
-  and `Reset()` calls consistent with that inheritance order. Reset new state and check clone/reset behavior.
+  and `Reset()` calls consistent with that inheritance order. In `Reset()`, reset base classes, interfaces, and individual attributes (using `Reset<AttName>()` for attributes, e.g. `ResetColoration()`). Reset new state and check clone/reset behavior.
 - Respect existing object-tree ownership and traversal semantics. Do not introduce double ownership, dangling pointers,
   unchecked casts, or mutations that invalidate traversal. Use the existing casting and interface-access patterns.
 - Validate external input and handle unsupported/missing data gracefully; assertions are not a substitute for input
   validation. Avoid unnecessary API changes and check effects on bindings when changing public interfaces or options.
 - Explain non-obvious engraving rules and invariants in comments; use the surrounding Doxygen style for API documentation.
+  For grouping related method comments in Doxygen, use `/** @name ... */` with `///@{` and `///@}` delimiters.
   Avoid unrelated cleanup, speculative abstractions, and broad modernization.
 
 ## LibMEI: generated versus hand-written code
