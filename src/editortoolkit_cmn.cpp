@@ -552,6 +552,15 @@ bool EditorToolkitCMN::InsertScoreDef(std::string &elementId, bool insertBefore)
     ScoreDef *newScoreDef = vrv_cast<ScoreDef *>(scoreDef->Clone());
     newScoreDef->CloneReset();
 
+    ClassIdsComparison comparison({ CLEF, LABEL, LABELABBR });
+    ListOfObjects toDelete;
+    m_doc->FindAllDescendantsByComparison(&toDelete, &comparison);
+    for (Object *object : toDelete) {
+        Object *parent = object->GetParent();
+        assert(parent);
+        parent->DeleteChild(object);
+    }
+
     if (insertBefore) {
         measure->GetParent()->InsertBefore(measure, newScoreDef);
     }
