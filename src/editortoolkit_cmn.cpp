@@ -22,8 +22,8 @@
 #include "miscfunctor.h"
 #include "note.h"
 #include "rest.h"
-#include "score.h"
 #include "scoredef.h"
+#include "scoreorpartelement.h"
 #include "staff.h"
 #include "tie.h"
 #include "tuplet.h"
@@ -536,8 +536,8 @@ bool EditorToolkitCMN::InsertScoreDef(std::string &elementId, bool insertBefore)
         return false;
     }
 
-    Score *score = m_doc->GetFirstVisibleScore();
-    ScoreDef *scoreDef = (score) ? score->GetScoreDef() : NULL;
+    ScoreOrPartElement *scoreOrPart = m_doc->GetFirstVisibleScoreOrPart();
+    ScoreDef *scoreDef = (scoreOrPart) ? scoreOrPart->GetScoreDef() : NULL;
     if (!scoreDef) return false;
 
     ScoreDef *newScoreDef = vrv_cast<ScoreDef *>(scoreDef->Clone());
