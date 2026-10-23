@@ -23,7 +23,7 @@ class SymbolDef;
 //----------------------------------------------------------------------------
 
 /**
- * This class represent a <score> or a <part> in MEI.
+ * This class represents a <score> or a <part> in MEI.
  * It is used only for loading score-based MEI documents before they are
  * converted to page-based MEI.
  */
