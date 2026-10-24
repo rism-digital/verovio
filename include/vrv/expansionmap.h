@@ -17,7 +17,7 @@
 
 namespace vrv {
 
-class Score;
+class ScoreOrPartElement;
 class Section;
 
 class ExpansionMap {
@@ -58,7 +58,7 @@ public:
     /**
      * Generate an expan for the score analysing the repeats and endings
      */
-    void GenerateExpansionFor(Score *score);
+    void GenerateExpansionFor(ScoreOrPartElement *scoreOrPart);
 
     /**
      * @name Setter and getter for the generating attempt flag

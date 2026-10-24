@@ -13,6 +13,8 @@
 #include <iterator>
 #include <map>
 #include <memory>
+#include <mutex>
+#include <shared_mutex>
 #include <string>
 #include <unordered_set>
 
@@ -105,9 +107,11 @@ public:
     bool IsControlElement() const { return Object::IsControlElement(m_classId); }
     bool IsEditorialElement() const { return Object::IsEditorialElement(m_classId); }
     bool IsLayerElement() const { return Object::IsLayerElement(m_classId); }
+    bool IsLyricElement() const { return Object::IsLyricElement(m_classId); }
     bool IsPageElement() const { return Object::IsPageElement(m_classId); }
     bool IsRunningElement() const { return Object::IsRunningElement(m_classId); }
     bool IsScoreDefElement() const { return Object::IsScoreDefElement(m_classId); }
+    bool IsScoreOrPartElement() const { return Object::IsScoreOrPartElement(m_classId); }
     bool IsSystemElement() const { return Object::IsSystemElement(m_classId); }
     bool IsTextElement() const { return Object::IsTextElement(m_classId); }
     ///@}
@@ -127,6 +131,7 @@ public:
         return ((classId > EDITORIAL_ELEMENT) && (classId < EDITORIAL_ELEMENT_max));
     }
     static bool IsLayerElement(ClassId classId) { return ((classId > LAYER_ELEMENT) && (classId < LAYER_ELEMENT_max)); }
+    static bool IsLyricElement(ClassId classId) { return ((classId > LYRIC_ELEMENT) && (classId < LYRIC_ELEMENT_max)); }
     static bool IsPageElement(ClassId classId) { return ((classId > PAGE_ELEMENT) && (classId < PAGE_ELEMENT_max)); }
     static bool IsRunningElement(ClassId classId)
     {
@@ -135,6 +140,10 @@ public:
     static bool IsScoreDefElement(ClassId classId)
     {
         return ((classId > SCOREDEF_ELEMENT) && (classId < SCOREDEF_ELEMENT_max));
+    }
+    static bool IsScoreOrPartElement(ClassId classId)
+    {
+        return ((classId > SCORE_OR_PART_ELEMENT) && (classId < SCORE_OR_PART_ELEMENT_max));
     }
     static bool IsSystemElement(ClassId classId)
     {
@@ -503,6 +512,13 @@ public:
      * They must be of the same class.
      */
     void ReplaceWithCopyOf(Object *object);
+
+    /**
+     * Swap an object with another.
+     * They must be of the same classId.
+     * The parent can be different but must be set for both.
+     */
+    void SwapWith(Object *object);
 
     /**
      * Return true if the object has the child Object as descendant (reference of direct).
@@ -1088,12 +1104,12 @@ public:
     /**
      * A static method returning a static object in order to guarantee initialisation
      */
-    static ObjectFactory *GetInstance();
+    static ObjectFactory &GetInstance();
 
     /**
      * Create the object from the MEI element string name by making a lookup in the register
      */
-    Object *Create(std::string name);
+    Object *Create(const std::string &name);
 
     /**
      * Create the object from the ClassId  by making a lookup in the register
@@ -1103,12 +1119,17 @@ public:
     /**
      * Add the name / constructor map entry to the static register
      */
-    void Register(std::string name, ClassId classId, std::function<Object *(void)> function);
+    void Register(const std::string &name, ClassId classId, std::function<Object *(void)> function);
 
     /**
      * Get the ClassId from the MEI element string name by making a lookup in the register
      */
-    ClassId GetClassId(std::string name);
+    ClassId GetClassId(const std::string &name);
+
+    /**
+     * Get the MEI element name from the ClassId by making a lookup in the register
+     */
+    std::string GetClassName(ClassId classId);
 
     /**
      * Get the correspondings ClassIds from the vector of MEI element string names
@@ -1116,8 +1137,9 @@ public:
     void GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds);
 
 public:
-    static thread_local MapOfClassIdConstructors s_ctorsRegistry;
-    static thread_local MapOfStrClassIds s_classIdsRegistry;
+    mutable std::shared_mutex m_mutex;
+    MapOfClassIdConstructors m_ctorsRegistry;
+    MapOfStrClassIds m_classIdsRegistry;
 };
 
 //----------------------------------------------------------------------------
@@ -1129,9 +1151,9 @@ public:
     /**
      * The contructor registering the name / constructor map
      */
-    ClassRegistrar(std::string name, ClassId classId)
+    ClassRegistrar(const std::string &name, ClassId classId)
     {
-        ObjectFactory::GetInstance()->Register(name, classId, []() -> Object * { return new T(); });
+        ObjectFactory::GetInstance().Register(name, classId, []() -> Object * { return new T(); });
     }
 
     /**
@@ -1140,7 +1162,7 @@ public:
      */
     ClassRegistrar(const std::string &name, ClassId pseudoClassId, std::function<Object *()> factory)
     {
-        ObjectFactory::GetInstance()->Register(name, pseudoClassId, factory);
+        ObjectFactory::GetInstance().Register(name, pseudoClassId, factory);
     }
 };
 

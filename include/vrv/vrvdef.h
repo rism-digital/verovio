@@ -39,7 +39,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 6
-#define VERSION_MINOR 3
+#define VERSION_MINOR 4
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -165,7 +165,11 @@ enum ClassId : uint16_t {
     PAGE_ELEMENT,
     PAGE_MILESTONE_END,
     MDIV,
+    PARTS,
+    SCORE_OR_PART_ELEMENT,
     SCORE,
+    PART,
+    SCORE_OR_PART_ELEMENT_max,
     PAGE_ELEMENT_max,
     // Ids for SystemElement child classes
     SYSTEM_ELEMENT,
@@ -261,7 +265,11 @@ enum ClassId : uint16_t {
     TUPLET,
     TUPLET_BRACKET,
     TUPLET_NUM,
+    VOLTA,
+    LYRIC_ELEMENT,
     VERSE,
+    REFRAIN,
+    LYRIC_ELEMENT_max,
     LAYER_ELEMENT_max,
     // Ids for ScoreDefElement child classes
     SCOREDEF_ELEMENT,
@@ -687,7 +695,7 @@ enum Accessor { SELF = 0, CONTENT };
 // Some keys
 //----------------------------------------------------------------------------
 
-enum { KEY_LEFT = 37, KEY_UP = 38, KEY_RIGHT = 39, KEY_DOWN = 40 };
+enum { KEY_LEFT = 37, KEY_UP = 38, KEY_RIGHT = 39, KEY_DOWN = 40, KEY_DOT = 46 };
 
 //----------------------------------------------------------------------------
 // Stem sameas drawing role
@@ -736,6 +744,12 @@ enum MensuralCastOffType { MENSURAL_CAST_OFF_INIT = 0, MENSURAL_CAST_OFF_UNSET, 
 //----------------------------------------------------------------------------
 
 #define NEUME_LINE_TYPE "neon-neume-line"
+
+//----------------------------------------------------------------------------
+// SVG CSS value for show-hidden option
+//----------------------------------------------------------------------------
+
+#define CSS_SHOW_HIDDEN "show-hidden"
 
 //----------------------------------------------------------------------------
 // Legacy Wolfgang defines

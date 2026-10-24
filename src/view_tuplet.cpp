@@ -83,7 +83,9 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
     TupletBracket *tupletBracket = vrv_cast<TupletBracket *>(element);
     assert(tupletBracket);
 
-    if (tupletBracket->GetBracketVisible() == BOOLEAN_false) {
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
+    if (!showHidden && tupletBracket->GetBracketVisible() == BOOLEAN_false) {
         tupletBracket->SetEmptyBB();
         return;
     }
@@ -164,7 +166,9 @@ void View::DrawTupletNum(DeviceContext *dc, LayerElement *element, Layer *layer,
     Tuplet *tuplet = vrv_cast<Tuplet *>(tupletNum->GetFirstAncestor(TUPLET));
     assert(tuplet);
 
-    if (!tuplet->HasNum() || (tuplet->GetNumVisible() == BOOLEAN_false)) {
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
+    if (!tuplet->HasNum() || (!showHidden && tuplet->GetNumVisible() == BOOLEAN_false)) {
         tupletNum->SetEmptyBB();
         return;
     }

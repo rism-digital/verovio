@@ -24,15 +24,18 @@
 #include "hairpin.h"
 #include "harm.h"
 #include "layer.h"
+#include "lyricelement.h"
 #include "mrpt.h"
+#include "mspace.h"
 #include "pedal.h"
 #include "plistinterface.h"
 #include "reh.h"
 #include "repeatmark.h"
 #include "rest.h"
 #include "runningelement.h"
-#include "score.h"
+#include "scoreorpartelement.h"
 #include "section.h"
+#include "space.h"
 #include "staff.h"
 #include "stem.h"
 #include "syl.h"
@@ -45,6 +48,7 @@
 #include "tuplet.h"
 #include "turn.h"
 #include "verse.h"
+#include "volta.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -60,10 +64,13 @@ PrepareDataInitializationFunctor::PrepareDataInitializationFunctor(Doc *doc) : D
 FunctorCode PrepareDataInitializationFunctor::VisitAccid(Accid *accid)
 {
     // Call parent one too
-    this->VisitObject(accid);
+    this->VisitLayerElement(accid);
 
     if (accid->GetFunc() == accidLog_FUNC_edit) {
         accid->InitFloatingObject();
+    }
+    if (accid->HasAccidGes() && m_doc->GetOptions()->m_showHidden.GetValue()) {
+        accid->InitShowAccidGes();
     }
     accid->Modify();
 
@@ -85,7 +92,7 @@ FunctorCode PrepareDataInitializationFunctor::VisitDiv(Div *div)
 FunctorCode PrepareDataInitializationFunctor::VisitChord(Chord *chord)
 {
     // Call parent one too
-    this->VisitObject(chord);
+    this->VisitLayerElement(chord);
 
     if (chord->HasEmptyList()) {
         LogWarning("Chord '%s' has no child note - a default note is added", chord->GetID().c_str());
@@ -110,10 +117,23 @@ FunctorCode PrepareDataInitializationFunctor::VisitFloatingObject(FloatingObject
 FunctorCode PrepareDataInitializationFunctor::VisitKeySig(KeySig *keySig)
 {
     // Call parent one too
-    this->VisitObject(keySig);
+    this->VisitLayerElement(keySig);
 
     // Clear and regenerate attribute children
     keySig->GenerateKeyAccidAttribChildren();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareDataInitializationFunctor::VisitMSpace(MSpace *mSpace)
+{
+    // Call parent one too
+    this->VisitLayerElement(mSpace);
+
+    if (m_doc->GetOptions()->m_showHidden.GetValue()) {
+        mSpace->InitShowMSpace();
+    }
+    mSpace->Modify();
 
     return FUNCTOR_CONTINUE;
 }
@@ -133,15 +153,28 @@ FunctorCode PrepareDataInitializationFunctor::VisitRepeatMark(RepeatMark *repeat
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode PrepareDataInitializationFunctor::VisitScore(Score *score)
+FunctorCode PrepareDataInitializationFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     // Call parent one too
-    this->VisitPageElement(score);
+    this->VisitPageElement(scoreOrPart);
 
-    assert(score->GetScoreDef());
+    assert(scoreOrPart->GetScoreDef());
 
     // Evaluate functor on scoreDef
-    score->GetScoreDef()->Process(*this);
+    scoreOrPart->GetScoreDef()->Process(*this);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareDataInitializationFunctor::VisitSpace(Space *space)
+{
+    // Call parent one too
+    this->VisitLayerElement(space);
+
+    if (m_doc->GetOptions()->m_showHidden.GetValue()) {
+        space->InitShowSpace();
+    }
+    space->Modify();
 
     return FUNCTOR_CONTINUE;
 }
@@ -382,11 +415,11 @@ PrepareAltSymFunctor::PrepareAltSymFunctor() : Functor()
 
 FunctorCode PrepareAltSymFunctor::VisitObject(Object *object)
 {
-    if (object->Is(SCORE)) {
-        Score *score = vrv_cast<Score *>(object);
-        assert(score);
-        assert(score->GetScoreDef());
-        m_symbolTable = vrv_cast<SymbolTable *>(score->GetScoreDef()->FindDescendantByType(SYMBOLTABLE));
+    if (object->IsScoreOrPartElement()) {
+        ScoreOrPartElement *scoreOrPart = vrv_cast<ScoreOrPartElement *>(object);
+        assert(scoreOrPart);
+        assert(scoreOrPart->GetScoreDef());
+        m_symbolTable = vrv_cast<SymbolTable *>(scoreOrPart->GetScoreDef()->FindDescendantByType(SYMBOLTABLE));
     }
 
     if (object->HasInterface(INTERFACE_ALT_SYM)) {
@@ -591,9 +624,9 @@ FunctorCode PrepareDurationFunctor::VisitLayerElement(LayerElement *layerElement
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode PrepareDurationFunctor::VisitScore(Score *score)
+FunctorCode PrepareDurationFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
-    ScoreDef *scoreDef = score->GetScoreDef();
+    ScoreDef *scoreDef = scoreOrPart->GetScoreDef();
     if (scoreDef) {
         scoreDef->Process(*this);
     }
@@ -657,7 +690,9 @@ FunctorCode PrepareTimePointingFunctor::VisitLayerElement(LayerElement *layerEle
     if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     // Do not look for tstamp pointing to these
-    if (layerElement->IsAnyOf(std::array{ ARTIC, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
+    if (layerElement->IsAnyOf(std::array{ ARTIC, BEAM, FLAG, REFRAIN, TUPLET, STEM, VERSE })) {
+        return FUNCTOR_CONTINUE;
+    }
 
     ListOfPointingInterClassIdPairs::iterator iter = m_timePointingInterfaces.begin();
     while (iter != m_timePointingInterfaces.end()) {
@@ -723,7 +758,9 @@ FunctorCode PrepareTimeSpanningFunctor::VisitLayerElement(LayerElement *layerEle
     if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     // Do not look for tstamp pointing to these
-    if (layerElement->IsAnyOf(std::array{ ARTIC, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
+    if (layerElement->IsAnyOf(std::array{ ARTIC, BEAM, FLAG, REFRAIN, TUPLET, STEM, VERSE })) {
+        return FUNCTOR_CONTINUE;
+    }
 
     ListOfSpanningInterOwnerPairs::iterator iter = m_timeSpanningInterfaces.begin();
     while (iter != m_timeSpanningInterfaces.end()) {
@@ -1032,11 +1069,12 @@ FunctorCode PreparePointersByLayerFunctor::VisitMeasureEnd(Measure *measure)
 // PrepareLyricsFunctor
 //----------------------------------------------------------------------------
 
-PrepareLyricsFunctor::PrepareLyricsFunctor() : Functor()
+PrepareLyricsFunctor::PrepareLyricsFunctor(int voltaTrack) : Functor()
 {
     m_currentSyl = NULL;
     m_lastNoteOrChord = NULL;
     m_penultimateNoteOrChord = NULL;
+    m_voltaTrack = voltaTrack;
 }
 
 FunctorCode PrepareLyricsFunctor::VisitChord(Chord *chord)
@@ -1079,10 +1117,17 @@ FunctorCode PrepareLyricsFunctor::VisitNote(Note *note)
 
 FunctorCode PrepareLyricsFunctor::VisitSyl(Syl *syl)
 {
-    Verse *verse = vrv_cast<Verse *>(syl->GetFirstAncestor(VERSE, MAX_NOTE_DEPTH));
-    if (verse) {
-        syl->m_drawingVerseN = std::max(verse->GetN(), 1);
-        syl->m_drawingVersePlace = verse->GetPlace();
+    const Volta *volta = vrv_cast<const Volta *>(syl->GetFirstAncestor(VOLTA));
+    const int voltaTrack = volta ? volta->GetDrawingVoltaN() : 0;
+    if (voltaTrack != m_voltaTrack) return FUNCTOR_CONTINUE;
+
+    LyricElement *lyricElement
+        = vrv_cast<LyricElement *>(syl->GetFirstAncestorInRange(LYRIC_ELEMENT, LYRIC_ELEMENT_max, MAX_NOTE_DEPTH));
+    if (lyricElement) {
+        const int lineN = volta ? lyricElement->GetVoltaLineN(volta) : 1;
+        syl->m_drawingVerseN = lyricElement->GetDrawingVerseN() + (lyricElement->Is(REFRAIN) ? lineN - 1 : 0);
+        syl->m_drawingVersePlace = lyricElement->GetPlace();
+        syl->m_drawingVoltaN = lyricElement->Is(REFRAIN) ? 1 : lineN;
     }
 
     syl->SetStart(vrv_cast<LayerElement *>(syl->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH)));
@@ -1096,20 +1141,17 @@ FunctorCode PrepareLyricsFunctor::VisitSyl(Syl *syl)
     if (m_currentSyl) {
         // The previous syl was an initial or median -> The note we just parsed is the end
         if ((m_currentSyl->GetWordpos() == sylLog_WORDPOS_i) || (m_currentSyl->GetWordpos() == sylLog_WORDPOS_m)) {
-            if (!isEmptySyl) {
-                m_currentSyl->SetEnd(m_lastNoteOrChord);
-                m_currentSyl->m_nextWordSyl = syl;
-            }
+            m_currentSyl->SetEnd(m_lastNoteOrChord);
+            if (!isEmptySyl) m_currentSyl->m_nextWordSyl = syl;
         }
-        // The previous syl was an underscore -> the explicit empty endpoint or the previous but one was the end.
+        // The previous syl was an underscore -> the previous but one was the end
         else if (m_currentSyl->GetCon() == sylLog_CON_u) {
-            LayerElement *end = isEmptySyl ? syl->GetStart() : m_penultimateNoteOrChord;
-            if (end && (m_currentSyl->GetStart() == end)) {
+            if (m_currentSyl->GetStart() == m_penultimateNoteOrChord) {
                 LogWarning("Syllable with underline extender under one single note '%s'",
                     m_currentSyl->GetStart()->GetID().c_str());
             }
-            else if (end) {
-                m_currentSyl->SetEnd(end);
+            else if (m_penultimateNoteOrChord) {
+                m_currentSyl->SetEnd(m_penultimateNoteOrChord);
             }
         }
     }
@@ -1139,7 +1181,7 @@ FunctorCode PrepareLyricsFunctor::VisitSyl(Syl *syl)
 // PrepareLayerElementPartsFunctor
 //----------------------------------------------------------------------------
 
-PrepareLayerElementPartsFunctor::PrepareLayerElementPartsFunctor() : Functor() {}
+PrepareLayerElementPartsFunctor::PrepareLayerElementPartsFunctor(Doc *doc) : DocFunctor(doc) {}
 
 FunctorCode PrepareLayerElementPartsFunctor::VisitChord(Chord *chord)
 {
@@ -1283,6 +1325,8 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTuplet(Tuplet *tuplet)
     TupletBracket *currentBracket = vrv_cast<TupletBracket *>(tuplet->GetFirst(TUPLET_BRACKET));
     TupletNum *currentNum = vrv_cast<TupletNum *>(tuplet->GetFirst(TUPLET_NUM));
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     bool beamed = false;
     // Are we contained in a beam?
     if (tuplet->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH)) {
@@ -1297,7 +1341,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTuplet(Tuplet *tuplet)
         if ((tuplet->GetChildCount(BEAM) == 1) || (tuplet->GetChildCount(BTREM) == 1)) beamed = true;
     }
 
-    if ((!tuplet->HasBracketVisible() && !beamed) || (tuplet->GetBracketVisible() == BOOLEAN_true)) {
+    if ((!tuplet->HasBracketVisible() && !beamed) || showHidden || (tuplet->GetBracketVisible() == BOOLEAN_true)) {
         if (!currentBracket) {
             currentBracket = new TupletBracket();
             tuplet->AddChild(currentBracket);
@@ -1311,7 +1355,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTuplet(Tuplet *tuplet)
         }
     }
 
-    if (tuplet->HasNum() && (!tuplet->HasNumVisible() || (tuplet->GetNumVisible() == BOOLEAN_true))) {
+    if (tuplet->HasNum() && (showHidden || (tuplet->GetNumVisible() != BOOLEAN_false))) {
         if (!currentNum) {
             currentNum = new TupletNum();
             tuplet->AddChild(currentNum);
@@ -1438,7 +1482,7 @@ FunctorCode PrepareRptFunctor::VisitStaff(Staff *staff)
     }
 
     // This is happening only for the first staff element of the staff @n
-    ScoreDef *scoreDef = m_doc->GetCorrespondingScore(staff)->GetScoreDef();
+    ScoreDef *scoreDef = m_doc->GetCorrespondingScoreOrPart(staff)->GetScoreDef();
     assert(scoreDef);
     if (StaffDef *staffDef = scoreDef->GetStaffDef(staff->GetN())) {
         const bool hideNumber = (staffDef->GetMultiNumber() == BOOLEAN_false)

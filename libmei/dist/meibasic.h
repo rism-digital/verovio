@@ -59,7 +59,7 @@ public:
         {"titleStmt", {"label", "type"}},
         {"refrain", {"label", "type", "xml:lang", "color", "place", "fontfam", "fontname", "fontsize", "fontstyle", "fontweight", "letterspacing", "lineheight", "vo", "voltasym"}},
         {"verse", {"label", "type", "color", "place", "fontfam", "fontname", "fontsize", "fontstyle", "fontweight", "letterspacing", "lineheight", "vo", "voltasym", "n"}},
-        {"volta", {"label", "type", "xml:lang", "color", "fontfam", "fontname", "fontsize", "fontstyle", "fontweight", "letterspacing", "lineheight", "vo"}},
+        {"volta", {"label", "type", "xml:lang", "color", "fontfam", "fontname", "fontsize", "fontstyle", "fontweight", "letterspacing", "lineheight", "vo", "n"}},
         {"instrDef", {"label", "n", "type", "midi.channel", "midi.duty", "midi.port", "midi.track", "midi.instrnum", "midi.instrname", "midi.pan", "midi.patchname", "midi.patchnum", "midi.volume", "azimuth", "elevation"}},
         {"persName", {"label", "type", "xml:lang", "nymref", "role", "enddate", "isodate", "notafter", "notbefore", "startdate"}},
         {"accid", {"label", "type", "accid.ges", "func", "accid", "layer", "plist", "staff", "tstamp", "color", "enclose", "glyph.auth", "glyph.uri", "glyph.name", "glyph.num", "ho", "vo"}},

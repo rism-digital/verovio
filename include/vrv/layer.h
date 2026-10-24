@@ -15,6 +15,7 @@
 namespace vrv {
 
 class Clef;
+class Cursor;
 class DeviceContext;
 class LayerElement;
 class Measure;
@@ -63,6 +64,11 @@ public:
     ///@}
 
     /**
+     * Reset cursor drawing Y
+     */
+    void ResetCachedDrawingY() const override;
+
+    /**
      * Return the index position of the layer in its staff parent.
      * The index position is 0-based.
      */
@@ -84,16 +90,6 @@ public:
     ///@{
     Clef *GetClef(const LayerElement *test);
     const Clef *GetClef(const LayerElement *test) const;
-    ///@}
-
-    /**
-     * Get the current clef based on facsimile for the test element.
-     * This goes back by facsimile position until a clef is found.
-     * Returns NULL if a clef cannot be found via this method.
-     */
-    ///@{
-    Clef *GetClefFacs(const LayerElement *test);
-    const Clef *GetClefFacs(const LayerElement *test) const;
     ///@}
 
     /**
@@ -173,6 +169,8 @@ public:
     const MeterSig *GetCurrentMeterSig() const;
     Proport *GetCurrentProport();
     const Proport *GetCurrentProport() const;
+    std::pair<int, int> GetCurrentNumAndNumbase();
+    const std::pair<int, int> GetCurrentNumAndNumbase() const;
     ///@}
 
     void ResetStaffDefObjects();
@@ -242,6 +240,16 @@ public:
     bool HasCrossStaffFromBelow() const { return m_crossStaffFromBelow; }
     ///@}
 
+    /**
+     * @name Setter and getter for cursor
+     */
+    //@{
+    bool HasCursor() const { return (m_cursor); }
+    Cursor *GetCursor() const { return m_cursor; }
+    void SetCursor(Cursor *cursor);
+    void ResetCursor();
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -287,6 +295,9 @@ private:
     Mensur *m_cautionStaffDefMensur;
     MeterSig *m_cautionStaffDefMeterSig;
     bool m_drawCautionKeySigCancel;
+
+    /** An optional cursor for the layer that has it */
+    Cursor *m_cursor;
 };
 
 } // namespace vrv

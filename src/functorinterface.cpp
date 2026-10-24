@@ -26,6 +26,7 @@
 #include "clef.h"
 #include "course.h"
 #include "cpmark.h"
+#include "cursor.h"
 #include "custos.h"
 #include "dir.h"
 #include "div.h"
@@ -61,6 +62,7 @@
 #include "lb.h"
 #include "ligature.h"
 #include "lv.h"
+#include "lyricelement.h"
 #include "mdiv.h"
 #include "measure.h"
 #include "mensur.h"
@@ -84,6 +86,8 @@
 #include "page.h"
 #include "pagemilestone.h"
 #include "pages.h"
+#include "part.h"
+#include "parts.h"
 #include "pb.h"
 #include "pedal.h"
 #include "pgfoot.h"
@@ -92,6 +96,7 @@
 #include "pitchinflection.h"
 #include "plica.h"
 #include "proport.h"
+#include "refrain.h"
 #include "reh.h"
 #include "rend.h"
 #include "repeatmark.h"
@@ -99,6 +104,7 @@
 #include "sb.h"
 #include "score.h"
 #include "scoredef.h"
+#include "scoreorpartelement.h"
 #include "section.h"
 #include "slur.h"
 #include "space.h"
@@ -125,6 +131,7 @@
 #include "tuplet.h"
 #include "turn.h"
 #include "verse.h"
+#include "volta.h"
 #include "zone.h"
 
 namespace vrv {
@@ -463,6 +470,36 @@ FunctorCode FunctorInterface::VisitMdivEnd(Mdiv *mdiv)
     return this->VisitPageElementEnd(mdiv);
 }
 
+FunctorCode FunctorInterface::VisitPart(Part *part)
+{
+    return this->VisitScoreOrPartElement(part);
+}
+
+FunctorCode FunctorInterface::VisitPartEnd(Part *part)
+{
+    return this->VisitScoreOrPartElementEnd(part);
+}
+
+FunctorCode FunctorInterface::VisitParts(Parts *parts)
+{
+    return this->VisitPageElement(parts);
+}
+
+FunctorCode FunctorInterface::VisitPartsEnd(Parts *parts)
+{
+    return this->VisitPageElementEnd(parts);
+}
+
+FunctorCode FunctorInterface::VisitScore(Score *score)
+{
+    return this->VisitScoreOrPartElement(score);
+}
+
+FunctorCode FunctorInterface::VisitScoreEnd(Score *score)
+{
+    return this->VisitScoreOrPartElementEnd(score);
+}
+
 FunctorCode FunctorInterface::VisitPageElement(PageElement *pageElement)
 {
     return this->VisitObject(pageElement);
@@ -483,14 +520,14 @@ FunctorCode FunctorInterface::VisitPageMilestoneEnd(PageMilestoneEnd *pageMilest
     return this->VisitPageElementEnd(pageMilestoneEnd);
 }
 
-FunctorCode FunctorInterface::VisitScore(Score *score)
+FunctorCode FunctorInterface::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
-    return this->VisitPageElement(score);
+    return this->VisitPageElement(scoreOrPart);
 }
 
-FunctorCode FunctorInterface::VisitScoreEnd(Score *score)
+FunctorCode FunctorInterface::VisitScoreOrPartElementEnd(ScoreOrPartElement *scoreOrPart)
 {
-    return this->VisitPageElementEnd(score);
+    return this->VisitPageElementEnd(scoreOrPart);
 }
 
 FunctorCode FunctorInterface::VisitAnchoredText(AnchoredText *anchoredText)
@@ -873,6 +910,16 @@ FunctorCode FunctorInterface::VisitClefEnd(Clef *clef)
     return this->VisitLayerElementEnd(clef);
 }
 
+FunctorCode FunctorInterface::VisitCursor(Cursor *cursor)
+{
+    return this->VisitLayerElement(cursor);
+}
+
+FunctorCode FunctorInterface::VisitCursorEnd(Cursor *cursor)
+{
+    return this->VisitLayerElementEnd(cursor);
+}
+
 FunctorCode FunctorInterface::VisitCustos(Custos *custos)
 {
     return this->VisitLayerElement(custos);
@@ -981,6 +1028,16 @@ FunctorCode FunctorInterface::VisitLayerElement(LayerElement *layerElement)
 FunctorCode FunctorInterface::VisitLayerElementEnd(LayerElement *layerElement)
 {
     return this->VisitObjectEnd(layerElement);
+}
+
+FunctorCode FunctorInterface::VisitLyricElement(LyricElement *lyricElement)
+{
+    return this->VisitLayerElement(lyricElement);
+}
+
+FunctorCode FunctorInterface::VisitLyricElementEnd(LyricElement *lyricElement)
+{
+    return this->VisitLayerElementEnd(lyricElement);
 }
 
 FunctorCode FunctorInterface::VisitLigature(Ligature *ligature)
@@ -1243,14 +1300,34 @@ FunctorCode FunctorInterface::VisitTupletNumEnd(TupletNum *tupletNum)
     return this->VisitLayerElementEnd(tupletNum);
 }
 
+FunctorCode FunctorInterface::VisitVolta(Volta *volta)
+{
+    return this->VisitLayerElement(volta);
+}
+
+FunctorCode FunctorInterface::VisitVoltaEnd(Volta *volta)
+{
+    return this->VisitLayerElementEnd(volta);
+}
+
+FunctorCode FunctorInterface::VisitRefrain(Refrain *refrain)
+{
+    return this->VisitLyricElement(refrain);
+}
+
+FunctorCode FunctorInterface::VisitRefrainEnd(Refrain *refrain)
+{
+    return this->VisitLyricElementEnd(refrain);
+}
+
 FunctorCode FunctorInterface::VisitVerse(Verse *verse)
 {
-    return this->VisitLayerElement(verse);
+    return this->VisitLyricElement(verse);
 }
 
 FunctorCode FunctorInterface::VisitVerseEnd(Verse *verse)
 {
-    return this->VisitLayerElementEnd(verse);
+    return this->VisitLyricElementEnd(verse);
 }
 
 FunctorCode FunctorInterface::VisitF(F *f)
@@ -1827,6 +1904,36 @@ FunctorCode ConstFunctorInterface::VisitMdivEnd(const Mdiv *mdiv)
     return this->VisitPageElementEnd(mdiv);
 }
 
+FunctorCode ConstFunctorInterface::VisitPart(const Part *part)
+{
+    return this->VisitScoreOrPartElement(part);
+}
+
+FunctorCode ConstFunctorInterface::VisitPartEnd(const Part *part)
+{
+    return this->VisitScoreOrPartElementEnd(part);
+}
+
+FunctorCode ConstFunctorInterface::VisitParts(const Parts *parts)
+{
+    return this->VisitPageElement(parts);
+}
+
+FunctorCode ConstFunctorInterface::VisitPartsEnd(const Parts *parts)
+{
+    return this->VisitPageElementEnd(parts);
+}
+
+FunctorCode ConstFunctorInterface::VisitScore(const Score *score)
+{
+    return this->VisitScoreOrPartElement(score);
+}
+
+FunctorCode ConstFunctorInterface::VisitScoreEnd(const Score *score)
+{
+    return this->VisitScoreOrPartElementEnd(score);
+}
+
 FunctorCode ConstFunctorInterface::VisitPageElement(const PageElement *pageElement)
 {
     return this->VisitObject(pageElement);
@@ -1847,14 +1954,14 @@ FunctorCode ConstFunctorInterface::VisitPageMilestoneEnd(const PageMilestoneEnd 
     return this->VisitPageElementEnd(pageMilestoneEnd);
 }
 
-FunctorCode ConstFunctorInterface::VisitScore(const Score *score)
+FunctorCode ConstFunctorInterface::VisitScoreOrPartElement(const ScoreOrPartElement *scoreOrPart)
 {
-    return this->VisitPageElement(score);
+    return this->VisitPageElement(scoreOrPart);
 }
 
-FunctorCode ConstFunctorInterface::VisitScoreEnd(const Score *score)
+FunctorCode ConstFunctorInterface::VisitScoreOrPartElementEnd(const ScoreOrPartElement *scoreOrPart)
 {
-    return this->VisitPageElementEnd(score);
+    return this->VisitPageElementEnd(scoreOrPart);
 }
 
 FunctorCode ConstFunctorInterface::VisitAnchoredText(const AnchoredText *anchoredText)
@@ -2237,6 +2344,16 @@ FunctorCode ConstFunctorInterface::VisitClefEnd(const Clef *clef)
     return this->VisitLayerElementEnd(clef);
 }
 
+FunctorCode ConstFunctorInterface::VisitCursor(const Cursor *cursor)
+{
+    return this->VisitLayerElement(cursor);
+}
+
+FunctorCode ConstFunctorInterface::VisitCursorEnd(const Cursor *cursor)
+{
+    return this->VisitLayerElementEnd(cursor);
+}
+
 FunctorCode ConstFunctorInterface::VisitCustos(const Custos *custos)
 {
     return this->VisitLayerElement(custos);
@@ -2345,6 +2462,16 @@ FunctorCode ConstFunctorInterface::VisitLayerElement(const LayerElement *layerEl
 FunctorCode ConstFunctorInterface::VisitLayerElementEnd(const LayerElement *layerElement)
 {
     return this->VisitObjectEnd(layerElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitLyricElement(const LyricElement *lyricElement)
+{
+    return this->VisitLayerElement(lyricElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitLyricElementEnd(const LyricElement *lyricElement)
+{
+    return this->VisitLayerElementEnd(lyricElement);
 }
 
 FunctorCode ConstFunctorInterface::VisitLigature(const Ligature *ligature)
@@ -2607,14 +2734,34 @@ FunctorCode ConstFunctorInterface::VisitTupletNumEnd(const TupletNum *tupletNum)
     return this->VisitLayerElementEnd(tupletNum);
 }
 
+FunctorCode ConstFunctorInterface::VisitVolta(const Volta *volta)
+{
+    return this->VisitLayerElement(volta);
+}
+
+FunctorCode ConstFunctorInterface::VisitVoltaEnd(const Volta *volta)
+{
+    return this->VisitLayerElementEnd(volta);
+}
+
+FunctorCode ConstFunctorInterface::VisitRefrain(const Refrain *refrain)
+{
+    return this->VisitLyricElement(refrain);
+}
+
+FunctorCode ConstFunctorInterface::VisitRefrainEnd(const Refrain *refrain)
+{
+    return this->VisitLyricElementEnd(refrain);
+}
+
 FunctorCode ConstFunctorInterface::VisitVerse(const Verse *verse)
 {
-    return this->VisitLayerElement(verse);
+    return this->VisitLyricElement(verse);
 }
 
 FunctorCode ConstFunctorInterface::VisitVerseEnd(const Verse *verse)
 {
-    return this->VisitLayerElementEnd(verse);
+    return this->VisitLyricElementEnd(verse);
 }
 
 FunctorCode ConstFunctorInterface::VisitF(const F *f)

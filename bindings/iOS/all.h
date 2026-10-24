@@ -76,6 +76,7 @@
 #import <VerovioFramework/course.h>
 #import <VerovioFramework/cpmark.h>
 #import <VerovioFramework/crc.h>
+#import <VerovioFramework/cursor.h>
 #import <VerovioFramework/customtuning.h>
 #import <VerovioFramework/custos.h>
 #import <VerovioFramework/damage.h>
@@ -161,6 +162,7 @@
 #import <VerovioFramework/linkinginterface.h>
 #import <VerovioFramework/liquescent.h>
 #import <VerovioFramework/lv.h>
+#import <VerovioFramework/lyricelement.h>
 #import <VerovioFramework/mdiv.h>
 #import <VerovioFramework/measure.h>
 #import <VerovioFramework/mensur.h>
@@ -192,6 +194,8 @@
 #import <VerovioFramework/pageelement.h>
 #import <VerovioFramework/pagemilestone.h>
 #import <VerovioFramework/pages.h>
+#import <VerovioFramework/part.h>
+#import <VerovioFramework/parts.h>
 #import <VerovioFramework/pb.h>
 #import <VerovioFramework/pedal.h>
 #import <VerovioFramework/pgfoot.h>
@@ -207,6 +211,7 @@
 #import <VerovioFramework/quilisma.h>
 #import <VerovioFramework/rdg.h>
 #import <VerovioFramework/ref.h>
+#import <VerovioFramework/refrain.h>
 #import <VerovioFramework/reg.h>
 #import <VerovioFramework/reh.h>
 #import <VerovioFramework/rend.h>
@@ -222,6 +227,7 @@
 #import <VerovioFramework/score.h>
 #import <VerovioFramework/scoredef.h>
 #import <VerovioFramework/scoredefinterface.h>
+#import <VerovioFramework/scoreorpartelement.h>
 #import <VerovioFramework/scoringupfunctor.h>
 #import <VerovioFramework/section.h>
 #import <VerovioFramework/setscoredeffunctor.h>
@@ -270,6 +276,7 @@
 #import <VerovioFramework/verse.h>
 #import <VerovioFramework/verticalaligner.h>
 #import <VerovioFramework/view.h>
+#import <VerovioFramework/volta.h>
 #import <VerovioFramework/vrv.h>
 #import <VerovioFramework/vrvdef.h>
 #import <VerovioFramework/zone.h>

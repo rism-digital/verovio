@@ -28,9 +28,15 @@ public class VerovioToolkit {
         }
     }
     
-    public func editInfo() -> String {
+    public func editReponse() -> String {
         guard let tk = toolkitPtr else { return "" }
-        guard let cStr = vrvToolkit_editInfo(tk) else { return "" }
+        guard let cStr = vrvToolkit_editResponse(tk) else { return "" }
+        return String(cString: cStr)
+    }
+
+    public func editStatus() -> String {
+        guard let tk = toolkitPtr else { return "" }
+        guard let cStr = vrvToolkit_editStatus(tk) else { return "" }
         return String(cString: cStr)
     }
     

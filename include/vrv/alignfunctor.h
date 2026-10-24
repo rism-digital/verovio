@@ -21,6 +21,8 @@ namespace vrv {
 struct AlignMeterParams {
     const MeterSig *meterSig = NULL;
     const Mensur *mensur = NULL;
+    int num = 1;
+    int numbase = 1;
     // Not const since we are cumulating proportion
     Proport *proport = NULL;
     data_DURATION equivalence = DURATION_brevis;
@@ -188,6 +190,7 @@ public:
     FunctorCode VisitSyllable(Syllable *syllable) override;
     FunctorCode VisitSystem(System *system) override;
     FunctorCode VisitSystemEnd(System *system) override;
+    FunctorCode VisitRefrain(Refrain *refrain) override;
     FunctorCode VisitVerse(Verse *verse) override;
     ///@}
 

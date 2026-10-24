@@ -34,8 +34,10 @@ FunctorCode AdjustTupletsYFunctor::VisitTuplet(Tuplet *tuplet)
         return FUNCTOR_SIBLINGS;
     }
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     // Nothing to do if the bracket and the num are not visible
-    if ((tuplet->GetBracketVisible() == BOOLEAN_false) && (tuplet->GetNumVisible() == BOOLEAN_false)) {
+    if (!showHidden && (tuplet->GetBracketVisible() == BOOLEAN_false) && (tuplet->GetNumVisible() == BOOLEAN_false)) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -58,8 +60,10 @@ FunctorCode AdjustTupletsYFunctor::VisitTuplet(Tuplet *tuplet)
 
 void AdjustTupletsYFunctor::AdjustTupletBracketY(Tuplet *tuplet, const Staff *staff) const
 {
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     TupletBracket *tupletBracket = vrv_cast<TupletBracket *>(tuplet->GetFirst(TUPLET_BRACKET));
-    if (!tupletBracket || (tuplet->GetBracketVisible() == BOOLEAN_false)) return;
+    if (!tupletBracket || (!showHidden && tuplet->GetBracketVisible() == BOOLEAN_false)) return;
 
     // if bracket is used for beam elements - process that part separately
     Beam *beam = tuplet->GetBracketAlignedBeam();
@@ -69,7 +73,8 @@ void AdjustTupletsYFunctor::AdjustTupletBracketY(Tuplet *tuplet, const Staff *st
     const data_STAFFREL_basic bracketPos = tuplet->GetDrawingBracketPos();
 
     // Default position is above or below the staff
-    const int staffBoundary = (bracketPos == STAFFREL_basic_above) ? 0 : -m_doc->GetDrawingStaffSize(staffSize);
+    const int staffHeight = (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize);
+    const int staffBoundary = (bracketPos == STAFFREL_basic_above) ? 0 : -staffHeight;
     const int bracketMidX = (tupletBracket->GetDrawingXLeft() + tupletBracket->GetDrawingXRight()) / 2;
     const Point referencePos(bracketMidX, staff->GetDrawingY() + staffBoundary);
 
@@ -126,8 +131,10 @@ void AdjustTupletsYFunctor::AdjustTupletBracketY(Tuplet *tuplet, const Staff *st
 
 void AdjustTupletsYFunctor::AdjustTupletNumY(Tuplet *tuplet, const Staff *staff) const
 {
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     TupletNum *tupletNum = vrv_cast<TupletNum *>(tuplet->GetFirst(TUPLET_NUM));
-    if (!tupletNum || (tuplet->GetNumVisible() == BOOLEAN_false)) return;
+    if (!tupletNum || (!showHidden && tuplet->GetNumVisible() == BOOLEAN_false)) return;
 
     // The num is within a bracket
     if (tupletNum->GetAlignedBracket()) {
@@ -165,7 +172,7 @@ void AdjustTupletsYFunctor::AdjustTupletNumY(Tuplet *tuplet, const Staff *staff)
     // The num is on its own
     const data_STAFFREL_basic numPos = tuplet->GetDrawingNumPos();
     const int numVerticalMargin = (numPos == STAFFREL_basic_above) ? doubleUnit : -doubleUnit;
-    const int staffHeight = m_doc->GetDrawingStaffSize(staffSize);
+    const int staffHeight = (tupletNumStaff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize);
     const int adjustedPosition = (numPos == STAFFREL_basic_above) ? 0 : -staffHeight;
     if (!beam) {
         tupletNum->SetDrawingYRel(adjustedPosition);
@@ -283,7 +290,7 @@ void AdjustTupletsYFunctor::AdjustTupletBracketBeamY(
     // Make sure that there are no overlaps with staff lines
     const int staffMargin = (bracketPos == STAFFREL_basic_above)
         ? yReference + doubleUnit
-        : yReference - m_doc->GetDrawingStaffSize(staffSize) - doubleUnit;
+        : yReference - (staff->m_drawingLines - 1) * doubleUnit - doubleUnit;
 
     const int leftMargin = sign * (staffMargin - bracket->GetDrawingYLeft());
     const int rightMargin = sign * (staffMargin - bracket->GetDrawingYRight());

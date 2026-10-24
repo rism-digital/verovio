@@ -14,7 +14,7 @@
 #include "ossia.h"
 #include "page.h"
 #include "pages.h"
-#include "score.h"
+#include "scoreorpartelement.h"
 #include "staff.h"
 #include "system.h"
 #include "tuning.h"
@@ -29,40 +29,22 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 ReplaceDrawingValuesInStaffDefFunctor::ReplaceDrawingValuesInStaffDefFunctor(const Clef *clef, const KeySig *keySig,
-    const Mensur *mensur, const MeterSig *meterSig, const MeterSigGrp *meterSigGrp, const ScoreDef *newScoreDef,
-    int &redrawFlags)
+    const Mensur *mensur, const MeterSig *meterSig, const MeterSigGrp *meterSigGrp)
     : Functor()
 {
-    assert(newScoreDef);
-
     m_clef = clef;
     m_keySig = keySig;
     m_mensur = mensur;
     m_meterSig = meterSig;
     m_meterSigGrp = meterSigGrp;
-    m_newScoreDef = newScoreDef;
-    m_redrawFlags = &redrawFlags;
 }
 
 FunctorCode ReplaceDrawingValuesInStaffDefFunctor::VisitStaffDef(StaffDef *staffDef)
 {
-    // Look at the values in the staffDef or the new ScoreDef
-    // We take into account only the keySig (see below)
-    const StaffDef *newStaffDef = m_newScoreDef->GetStaffDef(staffDef->GetN());
-
     if (m_clef) {
         staffDef->SetCurrentClef(m_clef);
     }
-    // Look at staffDef only for keySig
-    if (newStaffDef && newStaffDef->HasKeySigInfo()) {
-        const KeySig *keySig = newStaffDef->GetKeySig();
-        assert(keySig);
-        if (!keySig->HasCancelaccid() || (keySig->GetCancelaccid() != CANCELACCID_none)) {
-            staffDef->SetCurrentKeySig(newStaffDef->GetKeySig());
-            (*m_redrawFlags) |= StaffDefRedrawFlags::REDRAW_KEYSIG;
-        }
-    }
-    else if (m_keySig) {
+    if (m_keySig) {
         staffDef->SetCurrentKeySig(m_keySig);
     }
     if (m_mensur) {
@@ -88,18 +70,18 @@ FunctorCode ScoreDefSetCurrentPageFunctor::VisitPageEnd(Page *page)
 {
     const Object *firstSystem = page->GetFirst(SYSTEM);
     const Object *reference = firstSystem ? firstSystem : page;
-    page->m_score = m_doc->GetCorrespondingScore(reference, m_scores);
+    page->m_score = m_doc->GetCorrespondingScoreOrPart(reference, m_scores);
 
     const Object *lastSystem = page->GetLast(SYSTEM);
     reference = lastSystem ? lastSystem : page;
-    page->m_scoreEnd = m_doc->GetCorrespondingScore(reference, m_scores);
+    page->m_scoreEnd = m_doc->GetCorrespondingScoreOrPart(reference, m_scores);
 
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ScoreDefSetCurrentPageFunctor::VisitScore(Score *score)
+FunctorCode ScoreDefSetCurrentPageFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
-    m_scores.push_back(score);
+    m_scores.push_back(scoreOrPart);
 
     return FUNCTOR_CONTINUE;
 }
@@ -154,12 +136,14 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitKeySig(KeySig *keySig)
 
 FunctorCode ScoreDefSetCurrentFunctor::VisitLayer(Layer *layer)
 {
-    if (m_doc->GetType() != Transcription) layer->SetDrawingStaffDefValues(m_currentStaffDef);
+    if (m_doc->GetType() != FacTranscription) layer->SetDrawingStaffDefValues(m_currentStaffDef);
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ScoreDefSetCurrentFunctor::VisitMeasure(Measure *measure)
 {
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     // If we have a restart scoreDef before, for redrawing of everything on the measure
     if (m_restart) {
         m_upcomingScoreDef.SetRedrawFlags(StaffDefRedrawFlags::REDRAW_ALL);
@@ -175,6 +159,7 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitMeasure(Measure *measure)
         // The cautionary scoreDef for restart is already done when hitting the scoreDef
         if (m_upcomingScoreDef.m_setAsDrawing && m_previousMeasure && !m_restart) {
             ScoreDef cautionaryScoreDef = m_upcomingScoreDef;
+            cautionaryScoreDef.CloneReset();
             SetCautionaryScoreDefFunctor setCautionaryScoreDef(&cautionaryScoreDef);
             m_previousMeasure->Process(setCautionaryScoreDef);
         }
@@ -204,11 +189,13 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitMeasure(Measure *measure)
     // them)
     ListOfObjects currentObjects, previousObjects;
     AttVisibilityComparison comparison(STAFF, BOOLEAN_false);
-    measure->FindAllDescendantsByComparison(&currentObjects, &comparison);
+    if (!showHidden) {
+        measure->FindAllDescendantsByComparison(&currentObjects, &comparison);
+    }
     if ((int)currentObjects.size() == measure->GetStaffCount()) {
         drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT;
     }
-    if (m_previousMeasure) {
+    if (!showHidden && m_previousMeasure) {
         m_previousMeasure->FindAllDescendantsByComparison(&previousObjects, &comparison);
         if ((int)previousObjects.size() == m_previousMeasure->GetStaffCount())
             drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS;
@@ -255,9 +242,11 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitPage(Page *page)
     assert(page->m_score->GetScoreDef());
     if (!m_currentScore || (m_currentScore != page->m_score)) {
         m_upcomingScoreDef = *page->m_score->GetScoreDef();
+        m_upcomingScoreDef.CloneReset();
         m_upcomingScoreDef.Process(*this);
     }
     page->m_drawingScoreDef = m_upcomingScoreDef;
+    page->m_drawingScoreDef.CloneReset();
     return FUNCTOR_CONTINUE;
 }
 
@@ -271,10 +260,11 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitProport(Proport *proport)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ScoreDefSetCurrentFunctor::VisitScore(Score *score)
+FunctorCode ScoreDefSetCurrentFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
-    m_currentScore = score;
-    m_upcomingScoreDef = *score->GetScoreDef();
+    m_currentScore = scoreOrPart;
+    m_upcomingScoreDef = *scoreOrPart->GetScoreDef();
+    m_upcomingScoreDef.CloneReset();
     m_upcomingScoreDef.Process(*this);
     // Trigger the redraw of everything
     m_upcomingScoreDef.SetRedrawFlags(StaffDefRedrawFlags::REDRAW_ALL);
@@ -304,11 +294,21 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitScoreDef(ScoreDef *scoreDef)
         // Redraw the labels only if we already have a measure in the system. Otherwise this will be
         // done through the system scoreDef
         scoreDef->SetDrawLabels(m_hasMeasure);
+    }
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefSetCurrentFunctor::VisitScoreDefEnd(ScoreDef *scoreDef)
+{
+    if (scoreDef->IsSectionRestart()) {
         // If we have a previous measure, we need to set the cautionary scoreDef independently from the
         // presence of a system break
         if (m_previousMeasure) {
             ScoreDef cautionaryScoreDef = m_upcomingScoreDef;
-            SetCautionaryScoreDefFunctor setCautionaryScoreDef(&cautionaryScoreDef);
+            cautionaryScoreDef.CloneReset();
+            std::vector<int> restartStaffNs = scoreDef->GetStaffNs();
+            SetCautionaryScoreDefFunctor setCautionaryScoreDef(&cautionaryScoreDef, true);
+            setCautionaryScoreDef.SetRestartStaffNs(restartStaffNs);
             m_previousMeasure->Process(setCautionaryScoreDef);
         }
     }
@@ -412,7 +412,7 @@ FunctorCode ScoreDefOptimizeFunctor::VisitMeasure(Measure *measure)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ScoreDefOptimizeFunctor::VisitScore(Score *score)
+FunctorCode ScoreDefOptimizeFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     m_currentScoreDef = NULL;
     m_encoded = false;
@@ -539,14 +539,22 @@ FunctorCode ScoreDefOptimizeFunctor::VisitSystemEnd(System *system)
 // SetCautionaryScoreDefFunctor
 //----------------------------------------------------------------------------
 
-SetCautionaryScoreDefFunctor::SetCautionaryScoreDefFunctor(ScoreDef *currentScoreDef) : Functor()
+SetCautionaryScoreDefFunctor::SetCautionaryScoreDefFunctor(ScoreDef *currentScoreDef, bool restart) : Functor()
 {
     m_currentScoreDef = currentScoreDef;
     m_currentStaffDef = NULL;
+    m_restart = restart;
 }
 
 FunctorCode SetCautionaryScoreDefFunctor::VisitLayer(Layer *layer)
 {
+    if (m_restart) {
+        // Do not show cautionary clef
+        // We still show meterSig and meterSigGrp without checking if they are the same or not
+        // Possible flag to be added to MEI unless we want to start comparing meterSig
+        m_currentStaffDef->SetDrawClef(false);
+    }
+
     layer->SetDrawingCautionValues(m_currentStaffDef);
     return FUNCTOR_SIBLINGS;
 }
@@ -557,6 +565,13 @@ FunctorCode SetCautionaryScoreDefFunctor::VisitStaff(Staff *staff)
 
     assert(m_currentScoreDef);
     m_currentStaffDef = m_currentScoreDef->GetStaffDef(staff->GetN());
+
+    if (m_restart) {
+        if (std::find(m_staffNs.begin(), m_staffNs.end(), staff->GetN()) == m_staffNs.end()) {
+            m_currentStaffDef->SetDrawKeySig(false);
+        }
+    }
+
     return FUNCTOR_CONTINUE;
 }
 

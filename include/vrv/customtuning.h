@@ -82,8 +82,8 @@ private:
     // Static members //
     //----------------//
 
-    static std::map<std::string, char32_t> s_glyphNames;
-    static std::map<char32_t, std::string> s_glyphCodes;
+    static thread_local std::map<std::string, char32_t> s_glyphNames;
+    static thread_local std::map<char32_t, std::string> s_glyphCodes;
 };
 
 } // namespace vrv

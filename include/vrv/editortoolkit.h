@@ -21,6 +21,8 @@
 
 namespace vrv {
 
+class Cursor;
+
 //--------------------------------------------------------------------------------
 // EditorToolkit
 //--------------------------------------------------------------------------------
@@ -31,7 +33,14 @@ public:
     {
         m_doc = doc;
         m_view = view;
-        m_editInfo.reset();
+        m_editStatus.reset();
+
+        m_selectionId = "";
+        m_selectionClassId = UNSPECIFIED;
+        m_selectionSecondaryId = "";
+        m_cursor = NULL;
+
+        m_options = 0;
     }
     virtual ~EditorToolkit() {}
 
@@ -40,25 +49,45 @@ public:
      */
     virtual bool ParseEditorAction(const std::string &json_editorAction) = 0;
     /**
-     * Get information on the last editor function used
+     * Get status of the editor (undo, selection, etc.)
      */
-    virtual std::string EditInfo() { return m_editInfo.json(); }
+    virtual std::string EditStatus() { return m_editStatus.json(); }
+    /**
+     * Get response on the last editor function used
+     */
+    virtual std::string EditResponse() { return m_editResponse.json(); }
+
+    /**
+     * Increase the option change count
+     */
+    void OptionsChanged() { m_options++; }
 
 #ifndef NO_EDIT_SUPPORT
 protected:
+    void ResetSelect();
     bool AppendChild(std::string &elementId, const std::string &elementName, bool unique);
     bool InsertBefore(std::string &elementId, const std::string &elementName);
     bool InsertAfter(std::string &elementId, const std::string &elementName);
     Object *GetElement(const std::string &elementId);
     Object *PrepareInsertion(Object *parent, const std::string &elementName);
-    Object *GetChainedElement(std::string &elementId);
+    Object *ResolveElement(std::string &elementId, bool chain = true);
+    bool InsertMode() const { return (m_cursor); }
 #endif
 
 protected:
     std::string m_chainedId;
+    std::string m_selectionId;
+    ClassId m_selectionClassId;
+    std::string m_selectionSecondaryId;
+    Cursor *m_cursor;
+
     Doc *m_doc;
     View *m_view;
-    jsonxx::Object m_editInfo;
+    jsonxx::Object m_editStatus;
+    jsonxx::Object m_editResponse;
+
+    /** Record option changes  */
+    int m_options;
 };
 } // namespace vrv
 

@@ -49,7 +49,7 @@
 #include "reh.h"
 #include "rend.h"
 #include "repeatmark.h"
-#include "score.h"
+#include "scoreorpartelement.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -1091,13 +1091,11 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     }
 
     // set pen width and calculate tie thickness coefficient to adjust tie width in according to it
-    const int thickness
-        = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetOptions()->m_tieMidpointThickness.GetValue();
-    const int penWidth
-        = m_doc->GetOptions()->m_tieEndpointThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int staffSize = staff->IsTabGuitar() ? staff->GetDrawingStaffNotationSize() : staff->m_drawingStaffSize;
+    const int thickness = m_doc->GetDrawingUnit(staffSize) * m_doc->GetOptions()->m_tieMidpointThickness.GetValue();
+    const int penWidth = m_doc->GetOptions()->m_tieEndpointThickness.GetValue() * m_doc->GetDrawingUnit(staffSize);
     const double thicknessCoefficient = BoundingBox::GetBezierThicknessCoefficient(bezier, thickness, penWidth);
-    this->DrawThickBezierCurve(
-        dc, bezier, thicknessCoefficient * thickness, staff->m_drawingStaffSize, penWidth, penStyle);
+    this->DrawThickBezierCurve(dc, bezier, thicknessCoefficient * thickness, staffSize, penWidth, penStyle);
 
     if (graphic) {
         dc->EndResumedGraphic(graphic, this);
@@ -1398,7 +1396,8 @@ void View::DrawSylConnector(
     assert(syl->GetStart() && syl->GetEnd());
     if (!syl->GetStart() || !syl->GetEnd()) return;
 
-    int y = staff->GetDrawingY() + this->GetSylYRel(syl->m_drawingVerseN, staff, syl->m_drawingVersePlace);
+    int y = staff->GetDrawingY()
+        + this->GetSylYRel(syl->m_drawingVerseN, staff, syl->m_drawingVersePlace, syl->m_drawingVoltaN);
     this->CalcOffsetY(dc, y);
 
     // Invalid bounding boxes might occur for empty syllables without text child
@@ -1790,6 +1789,7 @@ void View::DrawControlElementText(DeviceContext *dc, ControlElement *element, Me
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         int xAdjust = 0;
@@ -1870,6 +1870,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         if (dynam->HasEnclose()) {
@@ -2124,6 +2125,7 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetFingeringFont(staffSize)->GetPointSize();
 
         fingTxt.SetPointSize(params.m_pointSize);
@@ -2324,6 +2326,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
 
         if (harm->GetFirst() && harm->GetFirst()->Is(FB)) {
             this->DrawFb(dc, staff, dynamic_cast<Fb *>(harm->GetFirst()), params);
@@ -2650,6 +2653,7 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         rehTxt.SetPointSize(params.m_pointSize);
@@ -2770,6 +2774,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
+        params.m_staffSize = staffSize;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
         tempoTxt.SetPointSize(params.m_pointSize);
@@ -3032,15 +3037,18 @@ void View::DrawSystemElement(DeviceContext *dc, SystemElement *element, System *
         dc->EndGraphic(element, this);
     }
     else if (element->Is(PB)) {
-        dc->StartGraphic(element, "", element->GetID());
+        dc->StartGraphic(element, "placeholder", element->GetID());
+        this->DrawPlaceholder(dc, element, system);
         dc->EndGraphic(element, this);
     }
     else if (element->Is(SB)) {
-        dc->StartGraphic(element, "", element->GetID());
+        dc->StartGraphic(element, "placeholder", element->GetID());
+        this->DrawPlaceholder(dc, element, system);
         dc->EndGraphic(element, this);
     }
     else if (element->Is(SECTION)) {
-        dc->StartGraphic(element, "systemMilestone", element->GetID());
+        dc->StartGraphic(element, "placeholder systemMilestone", element->GetID());
+        this->DrawPlaceholder(dc, element, system);
         dc->EndGraphic(element, this);
     }
 }
@@ -3177,7 +3185,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
         const int unit = m_doc->GetDrawingUnit(staffSize);
         if (ending->HasN() || ending->HasLabel()) {
-            const std::string endingText = (ending->HasN()) ? ending->GetN() : ending->GetLabel();
+            const std::string endingText = (ending->HasLabel()) ? ending->GetLabel() : ending->GetN();
             std::stringstream strStream;
             // Maybe we want to add ( ) after system breaks? Or . as a styling options?
             if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << "(";

@@ -1069,14 +1069,14 @@
     </arelEzgiUzdilekAeuAccidentals>
     <turkishFolkMusicAccidentals>
         <description>Turkish folk music accidentals</description>
-        <!--<glyph glyph-code="E450" smufl-name="accidental1CommaSharp" />-->
-        <!--<glyph glyph-code="E451" smufl-name="accidental2CommaSharp" />-->
-        <!--<glyph glyph-code="E452" smufl-name="accidental3CommaSharp" />-->
-        <!--<glyph glyph-code="E453" smufl-name="accidental5CommaSharp" />-->
-        <!--<glyph glyph-code="E454" smufl-name="accidental1CommaFlat" />-->
-        <!--<glyph glyph-code="E455" smufl-name="accidental2CommaFlat" />-->
-        <!--<glyph glyph-code="E456" smufl-name="accidental3CommaFlat" />-->
-        <!--<glyph glyph-code="E457" smufl-name="accidental4CommaFlat" />-->
+        <glyph glyph-code="E450" smufl-name="accidental1CommaSharp" />
+        <glyph glyph-code="E451" smufl-name="accidental2CommaSharp" />
+        <glyph glyph-code="E452" smufl-name="accidental3CommaSharp" />
+        <glyph glyph-code="E453" smufl-name="accidental5CommaSharp" />
+        <glyph glyph-code="E454" smufl-name="accidental1CommaFlat" />
+        <glyph glyph-code="E455" smufl-name="accidental2CommaFlat" />
+        <glyph glyph-code="E456" smufl-name="accidental3CommaFlat" />
+        <glyph glyph-code="E457" smufl-name="accidental4CommaFlat" />
         <range_end>U+E45F</range_end>
         <range_start>U+E450</range_start>
     </turkishFolkMusicAccidentals>

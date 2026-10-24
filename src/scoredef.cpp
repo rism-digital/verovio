@@ -227,10 +227,16 @@ ScoreDef::ScoreDef()
     this->RegisterAttClass(ATT_TIMEBASE);
     this->RegisterAttClass(ATT_TUNING);
 
+    // owned pointers need to be set to NULL;
+    m_customTuning = NULL;
+
     this->Reset();
 }
 
-ScoreDef::~ScoreDef() {}
+ScoreDef::~ScoreDef()
+{
+    this->ResetCustomTuning();
+}
 
 void ScoreDef::Reset()
 {
@@ -245,6 +251,23 @@ void ScoreDef::Reset()
     m_drawingWidth = 0;
     m_drawingLabelsWidth = 0;
     m_setAsDrawing = false;
+
+    this->ResetCustomTuning();
+}
+
+void ScoreDef::CloneReset()
+{
+    ScoreDefElement::CloneReset();
+
+    m_customTuning = NULL;
+}
+
+void ScoreDef::ResetCustomTuning()
+{
+    if (m_customTuning) {
+        delete m_customTuning;
+        m_customTuning = NULL;
+    }
 }
 
 bool ScoreDef::IsSupportedChild(ClassId classId)
@@ -303,12 +326,8 @@ void ScoreDef::ReplaceDrawingValues(const ScoreDef *newScoreDef)
         clef = newScoreDef->GetClef();
     }
     if (newScoreDef->HasKeySigInfo()) {
-        const KeySig *newKeySig = newScoreDef->GetKeySig();
-        assert(newKeySig);
-        if (!newKeySig->HasCancelaccid() || (newKeySig->GetCancelaccid() != CANCELACCID_none)) {
-            keySig = newKeySig;
-            redrawFlags |= StaffDefRedrawFlags::REDRAW_KEYSIG;
-        }
+        redrawFlags |= StaffDefRedrawFlags::REDRAW_KEYSIG;
+        keySig = newScoreDef->GetKeySig();
     }
     if (newScoreDef->HasMensurInfo()) {
         redrawFlags |= StaffDefRedrawFlags::REDRAW_MENSUR;
@@ -325,8 +344,7 @@ void ScoreDef::ReplaceDrawingValues(const ScoreDef *newScoreDef)
         meterSig = newScoreDef->GetMeterSigCopy();
     }
 
-    ReplaceDrawingValuesInStaffDefFunctor replaceDrawingValuesInStaffDef(
-        clef, keySig, mensur, meterSig, meterSigGrp, newScoreDef, redrawFlags);
+    ReplaceDrawingValuesInStaffDefFunctor replaceDrawingValuesInStaffDef(clef, keySig, mensur, meterSig, meterSigGrp);
     this->Process(replaceDrawingValuesInStaffDef);
 
     if (mensur) delete mensur;
@@ -603,6 +621,12 @@ int ScoreDef::GetMaxStaffSize() const
     return (staffGrp) ? staffGrp->GetMaxStaffSize() : 100;
 }
 
+void ScoreDef::SetCustomTuning(CustomTuning *customTuning)
+{
+    this->ResetCustomTuning();
+    m_customTuning = customTuning;
+}
+
 bool ScoreDef::IsSectionRestart() const
 {
     if (!this->GetParent()) return false;
@@ -645,6 +669,72 @@ void ScoreDef::AddOssias(int staffN, const std::list<int> ossias, bool above)
         }
         else {
             staffDef->AddOssiaBelow(ossiaStaffDef);
+        }
+    }
+}
+
+void ScoreDef::UpdateMeterSig(LayerElement *meterSigOrGrp)
+{
+    if (meterSigOrGrp && meterSigOrGrp->Is(METERSIG)) {
+        MeterSig *meterSig = vrv_cast<MeterSig *>(meterSigOrGrp);
+        assert(meterSig);
+        if (!meterSig->HasSym() && !meterSig->HasCount()) meterSigOrGrp = NULL;
+    }
+    else if (meterSigOrGrp && meterSigOrGrp->Is(METERSIGGRP)) {
+        MeterSigGrp *meterSigGrp = vrv_cast<MeterSigGrp *>(meterSigOrGrp);
+        assert(meterSigGrp);
+        // We should also check the meterSig are valid
+        if (!meterSigGrp->HasFunc() || (meterSigGrp->GetChildCount(METERSIG) < 1)) meterSigOrGrp = NULL;
+    }
+
+    ListOfObjects staffDefs = this->FindAllDescendantsByType(STAFFDEF);
+    for (auto object : staffDefs) {
+        StaffDef *staffDef = vrv_cast<StaffDef *>(object);
+        assert(staffDef);
+        ClassIdsComparison meterSigOrGrpComparison({ METERSIG, METERSIGGRP });
+        Object *previous = staffDef->FindDescendantByComparison(&meterSigOrGrpComparison, 1);
+        if (meterSigOrGrp) {
+            Object *newMeterSigOrGrp = meterSigOrGrp->Clone();
+            newMeterSigOrGrp->CloneReset();
+            if (previous) {
+                staffDef->ReplaceChild(previous, newMeterSigOrGrp);
+                delete previous;
+            }
+            else {
+                staffDef->AddChild(newMeterSigOrGrp);
+            }
+        }
+        else if (previous) {
+            staffDef->DeleteChild(previous);
+        }
+    }
+}
+
+void ScoreDef::UpdateKeySig(KeySig *keySig)
+{
+    if (keySig && !keySig->HasSig()) keySig = NULL;
+
+    ListOfObjects staffDefs = this->FindAllDescendantsByType(STAFFDEF);
+    for (auto object : staffDefs) {
+        StaffDef *staffDef = vrv_cast<StaffDef *>(object);
+        assert(staffDef);
+        Object *previous = staffDef->FindDescendantByType(KEYSIG, 1);
+        if (keySig) {
+            KeySig *newKeySig = vrv_cast<KeySig *>(keySig->Clone());
+            newKeySig->CloneReset();
+            if (staffDef->HasTransDiat() && staffDef->HasTransSemi()) {
+                newKeySig->SetSig(newKeySig->ConvertToWritten(staffDef->GetTransDiat(), staffDef->GetTransSemi()));
+            }
+            if (previous) {
+                staffDef->ReplaceChild(previous, newKeySig);
+                delete previous;
+            }
+            else {
+                staffDef->AddChild(newKeySig);
+            }
+        }
+        else if (previous) {
+            staffDef->DeleteChild(previous);
         }
     }
 }

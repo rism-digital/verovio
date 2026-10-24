@@ -64,10 +64,17 @@ bool vrvToolkit_edit(void *tkPtr, const char *editorAction)
     return true;
 }
 
-const char *vrvToolkit_editInfo(void *tkPtr)
+const char *vrvToolkit_editResponse(void *tkPtr)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
-    tk->SetCString(tk->EditInfo());
+    tk->SetCString(tk->EditResponse());
+    return tk->GetCString();
+}
+
+const char *vrvToolkit_editStatus(void *tkPtr)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->EditStatus());
     return tk->GetCString();
 }
 

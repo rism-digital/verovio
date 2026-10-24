@@ -156,12 +156,12 @@ char32_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) cons
     // If there is glyph.num, prioritize it
     if (this->HasGlyphNum()) {
         char32_t code = this->GetGlyphNum();
-        if (NULL != resources->GetGlyph(code)) return code;
+        if (resources->GetGlyph(code)) return code;
     }
     // If there is glyph.name (second priority)
     else if (this->HasGlyphName()) {
         char32_t code = resources->GetGlyphCode(this->GetGlyphName());
-        if (NULL != resources->GetGlyph(code)) return code;
+        if (resources->GetGlyph(code)) return code;
     }
 
     if (place == STAFFREL_above) {

@@ -39,7 +39,7 @@
 #include "options.h"
 #include "page.h"
 #include "runtimeclock.h"
-#include "score.h"
+#include "scoreorpartelement.h"
 #include "slur.h"
 #include "staff.h"
 #include "svgdevicecontext.h"
@@ -502,13 +502,17 @@ void Toolkit::SetViewAndEditor()
     if (m_editorToolkit != NULL) {
         delete m_editorToolkit;
     }
-    switch (m_doc.m_notationType) {
-        case NOTATIONTYPE_neume: m_editorToolkit = new EditorToolkitNeume(&m_doc, &m_view); break;
-        case NOTATIONTYPE_mensural:
-        case NOTATIONTYPE_mensural_black:
-        case NOTATIONTYPE_mensural_white: m_editorToolkit = new EditorToolkitMensural(&m_doc, &m_view); break;
-        case NOTATIONTYPE_cmn: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view); break;
-        default: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view);
+    if (IsNeumeType(m_doc.m_notationType)) {
+        m_editorToolkit = new EditorToolkitNeume(&m_doc, &m_view);
+    }
+    else {
+        switch (m_doc.m_notationType) {
+            case NOTATIONTYPE_mensural:
+            case NOTATIONTYPE_mensural_black:
+            case NOTATIONTYPE_mensural_white: m_editorToolkit = new EditorToolkitMensural(&m_doc, &m_view); break;
+            case NOTATIONTYPE_cmn: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view); break;
+            default: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view);
+        }
     }
 #endif
 }
@@ -844,7 +848,8 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     m_doc.InitSelectionDoc(m_docSelection, true);
 
     // Convert pseudo-measures into distinct segments based on barLine elements
-    if (m_doc.IsMensuralMusicOnly() && (m_options->m_mensuralResponsiveView.GetValue() != MENSURAL_RESP_none)) {
+    if (m_doc.IsMensuralMusicOnly() && (m_options->m_mensuralResponsiveView.GetValue() != MENSURAL_RESP_none)
+        && input->GetLayoutInformation() != LAYOUT_DONE) {
         if (m_options->m_mensuralScoreUp.GetValue()) {
             m_doc.ScoringUpDoc();
         }
@@ -868,19 +873,14 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     // When loading page-based MEI, the layout is marked as done
     // In this case, we do not cast-off the document (breaks is expected to be not set)
     if (input->GetLayoutInformation() == LAYOUT_DONE) {
-        if (breaks != BREAKS_auto) {
-            LogWarning("Requesting layout with specific breaks but the layout is already done");
-        }
         // We set it to 'none' for no cast-off process to be triggered
         breaks = BREAKS_none;
+        m_doc.MarkAsCastOff();
     }
-
-    // Always set breaks to 'none' with Facs rendering
-    if (m_doc.IsFacs()) breaks = BREAKS_none;
 
     // Always set breaks to 'none' or 'encoded' with Transcription rendering
     // rendering them differenty requires the MEI
-    if (m_doc.IsTranscription()) {
+    if (m_doc.IsFacTranscription()) {
         breaks = (m_doc.HasFacsimile()) ? BREAKS_encoded : BREAKS_none;
     }
 
@@ -919,7 +919,7 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         m_doc.ScoreDefSetCurrentDoc();
     }
 
-    if (m_doc.IsTranscription() && m_doc.HasFacsimile()) {
+    if (m_doc.IsFacTranscription() && m_doc.HasFacsimile()) {
         m_doc.SyncFromFacsimileDoc();
     }
 
@@ -1272,7 +1272,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
         Resources &resources = m_doc.GetResourcesForModification();
         resources.LoadAll();
     }
-    if (json.has<jsonxx::String>("fontTextLiberation")) {
+    if (json.has<jsonxx::Boolean>("fontTextLiberation")) {
         Resources &resources = m_doc.GetResourcesForModification();
         resources.UseLiberationTextFont(m_options->m_fontTextLiberation.GetValue());
     }
@@ -1281,6 +1281,8 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
     if (json.has<jsonxx::Number>("midiTempoAdjustment") || json.has<jsonxx::Boolean>("midiNoCue")) {
         this->ResetMidiDoc();
     }
+
+    if (m_editorToolkit) m_editorToolkit->OptionsChanged();
 
     return true;
 }
@@ -1538,11 +1540,18 @@ bool Toolkit::Edit(const std::string &editorAction)
     return m_editorToolkit->ParseEditorAction(editorAction);
 }
 
-std::string Toolkit::EditInfo()
+std::string Toolkit::EditResponse()
 {
     if (!m_editorToolkit) return "{}";
 
-    return m_editorToolkit->EditInfo();
+    return m_editorToolkit->EditResponse();
+}
+
+std::string Toolkit::EditStatus()
+{
+    if (!m_editorToolkit) return "{}";
+
+    return m_editorToolkit->EditStatus();
 }
 
 std::string Toolkit::GetLog()
@@ -1618,7 +1627,7 @@ void Toolkit::RedoLayout(const std::string &jsonOptions)
 
     this->ResetLogBuffer();
 
-    if ((this->GetPageCount() == 0) || m_doc.IsTranscription() || m_doc.IsFacs()) {
+    if ((this->GetPageCount() == 0) || m_doc.IsFacTranscription()) {
         LogWarning("No data to re-layout");
         return;
     }
@@ -1681,7 +1690,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     if (adjustWidth || (breaks == BREAKS_none)) width = m_doc.GetAdjustedDrawingPageWidth();
     if (adjustHeight || (breaks == BREAKS_none)) height = m_doc.GetAdjustedDrawingPageHeight();
 
-    if (m_doc.IsTranscription()) {
+    if (m_doc.IsFacTranscription()) {
         width = m_doc.GetAdjustedDrawingPageWidth();
         height = m_doc.GetAdjustedDrawingPageHeight();
     }
@@ -1704,11 +1713,6 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     deviceContext->SetWidth(width);
     deviceContext->SetHeight(height);
     deviceContext->SetViewBoxFactor(m_view.GetPPUFactor());
-
-    if (m_doc.IsFacs()) {
-        deviceContext->SetWidth(m_doc.GetFacsimile()->GetMaxX());
-        deviceContext->SetHeight(m_doc.GetFacsimile()->GetMaxY());
-    }
 
     // render the page
     m_view.DrawCurrentPage(deviceContext, false);
@@ -1740,8 +1744,8 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
         svg.SetMMOutput(true);
     }
 
-    if (m_doc.IsFacs()) {
-        svg.SetFacsimile(true);
+    if (m_options->m_showHidden.GetValue()) {
+        svg.SetShowHidden(true);
     }
 
     // set the option to use viewbox on svg root
@@ -1942,8 +1946,15 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
     // Get the pageNo from the first note (if any)
     int pageNo = -1;
-    Page *page = vrv_cast<Page *>(measure->GetFirstAncestor(PAGE));
-    if (page) pageNo = page->GetIdx() + 1;
+    if (m_midiDoc == &m_doc) {
+        Page *page = vrv_cast<Page *>(measure->GetFirstAncestor(PAGE));
+        if (page) pageNo = page->GetIdx() + 1;
+    }
+    else {
+        const std::string notatedId = this->GetNotatedIdForElement(measure->GetID());
+        const int notatedPageNo = this->GetPageWithElement(notatedId);
+        if (notatedPageNo > 0) pageNo = notatedPageNo;
+    }
 
     NoteOrRestOnsetOffsetComparison matchTime(millisec - measureTimeOffset);
     ListOfObjects notesOrRests;

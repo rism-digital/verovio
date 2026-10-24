@@ -40,7 +40,8 @@ public:
      */
     ///@{
     FunctorCode VisitLayerElement(LayerElement *layerElement) override;
-    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitLayer(Layer *layer) override;
+    FunctorCode VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart) override;
     FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
     FunctorCode VisitStaffDef(StaffDef *staffDef) override;
     ///@}

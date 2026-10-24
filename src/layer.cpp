@@ -18,6 +18,7 @@
 #include "beam.h"
 #include "clef.h"
 #include "comparison.h"
+#include "cursor.h"
 #include "custos.h"
 #include "divline.h"
 #include "doc.h"
@@ -64,6 +65,8 @@ Layer::Layer()
     m_cautionStaffDefMensur = NULL;
     m_cautionStaffDefMeterSig = NULL;
 
+    m_cursor = NULL;
+
     this->Reset();
 }
 
@@ -83,6 +86,8 @@ void Layer::Reset()
     this->ResetVisibility();
 
     this->ResetStaffDefObjects();
+
+    this->ResetCursor();
 
     m_drawingStemDir = STEMDIRECTION_NONE;
     m_crossStaffFromAbove = false;
@@ -167,6 +172,13 @@ bool Layer::IsSupportedChild(ClassId classId)
     else {
         return false;
     }
+}
+
+void Layer::ResetCachedDrawingY() const
+{
+    if (m_cursor) m_cursor->ResetCachedDrawingY();
+
+    Object::ResetCachedDrawingY();
 }
 
 LayerElement *Layer::GetPreviousInLayer(const LayerElement *element)
@@ -263,31 +275,7 @@ const Clef *Layer::GetClef(const LayerElement *test) const
         assert(clef);
         return clef;
     }
-    const Clef *facsClef = this->GetClefFacs(test);
-    if (facsClef != NULL) {
-        return facsClef;
-    }
     return this->GetCurrentClef();
-}
-
-Clef *Layer::GetClefFacs(const LayerElement *test)
-{
-    return const_cast<Clef *>(std::as_const(*this).GetClefFacs(test));
-}
-
-const Clef *Layer::GetClefFacs(const LayerElement *test) const
-{
-    const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
-    assert(doc);
-    if (doc->IsFacs()) {
-        ListOfConstObjects clefs;
-        ClassIdComparison ac(CLEF);
-        doc->FindAllDescendantsBetween(&clefs, &ac, doc->GetFirst(CLEF), test);
-        if (clefs.size() > 0) {
-            return dynamic_cast<const Clef *>(*clefs.rbegin());
-        }
-    }
-    return NULL;
 }
 
 int Layer::GetClefLocOffset(const LayerElement *test) const
@@ -557,6 +545,24 @@ const Proport *Layer::GetCurrentProport() const
     return staff->m_drawingStaffDef->GetCurrentProport();
 }
 
+std::pair<int, int> Layer::GetCurrentNumAndNumbase()
+{
+    return std::as_const(*this).GetCurrentNumAndNumbase();
+}
+
+const std::pair<int, int> Layer::GetCurrentNumAndNumbase() const
+{
+    const Staff *staff = vrv_cast<const Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff && staff->m_drawingStaffDef);
+    int num = 1;
+    int numbase = 1;
+    if (staff->m_drawingStaffDef->HasNum() && staff->m_drawingStaffDef->HasNumbase()) {
+        num = staff->m_drawingStaffDef->GetNum();
+        numbase = staff->m_drawingStaffDef->GetNumbase();
+    }
+    return { num, numbase };
+}
+
 void Layer::SetDrawingStaffDefValues(StaffDef *currentStaffDef)
 {
     if (!currentStaffDef) {
@@ -653,6 +659,20 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
     currentStaffDef->SetDrawKeySig(false);
     currentStaffDef->SetDrawMensur(false);
     currentStaffDef->SetDrawMeterSig(false);
+}
+
+void Layer::SetCursor(Cursor *cursor)
+{
+    if (m_cursor) this->ResetCursor();
+
+    m_cursor = cursor;
+    m_cursor->SetParent(this);
+}
+
+void Layer::ResetCursor()
+{
+    if (m_cursor) delete m_cursor;
+    m_cursor = NULL;
 }
 
 //----------------------------------------------------------------------------

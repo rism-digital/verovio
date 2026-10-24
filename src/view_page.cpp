@@ -23,6 +23,7 @@
 #include "clef.h"
 #include "comparison.h"
 #include "controlelement.h"
+#include "cursor.h"
 #include "devicecontext.h"
 #include "div.h"
 #include "doc.h"
@@ -78,6 +79,7 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     // Set the current score def to the page one
     // The page one has previously been set by the ScoreDefSetCurrentFunctor
     m_drawingScoreDef = m_currentPage->m_drawingScoreDef;
+    m_drawingScoreDef.CloneReset();
 
     if ((m_doc->GetAdjustedDrawingPageHeight() > dc->GetHeight()) && m_options->m_shrinkToFit.GetValue()) {
         dc->SetContentHeight(m_doc->GetAdjustedDrawingPageHeight());
@@ -178,7 +180,11 @@ void View::DrawPageElement(DeviceContext *dc, PageElement *element)
         dc->StartGraphic(element, elementStart, element->GetID());
         dc->EndGraphic(element, this);
     }
-    else if (element->Is(SCORE)) {
+    else if (element->Is(PARTS)) {
+        dc->StartGraphic(element, "pageMilestone", element->GetID());
+        dc->EndGraphic(element, this);
+    }
+    else if (element->IsScoreOrPartElement()) {
         dc->StartGraphic(element, "pageMilestone", element->GetID());
         dc->EndGraphic(element, this);
     }
@@ -521,6 +527,7 @@ void View::DrawLabels(
     TextDrawingParams params;
     params.m_x = x;
     params.m_y = y;
+    params.m_staffSize = staffSize;
     params.m_pointSize = labelTxt.GetPointSize();
 
     dc->SetFont(&labelTxt);
@@ -585,7 +592,7 @@ void View::DrawBracketSq(DeviceContext *dc, int x, int y1, int y2, int staffSize
     this->DrawSquareBracket(dc, true, x - width, y, height, width, horizontalThickness, verticalThickness);
 }
 
-void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
+void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize, bool forceGlyph)
 {
     assert(dc);
 
@@ -593,7 +600,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 
     x -= basicDist;
 
-    if (m_doc->GetOptions()->m_useBraceGlyph.GetValue()) {
+    if (forceGlyph || m_doc->GetOptions()->m_useBraceGlyph.GetValue()) {
         FontInfo *font = m_doc->GetDrawingSmuflFont(staffSize, false);
         const int width = m_doc->GetGlyphWidth(SMUFL_E000_brace, staffSize, false);
         const int height = 8 * m_doc->GetDrawingUnit(staffSize);
@@ -683,6 +690,8 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
     assert(staffGrp);
     assert(barLine);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     if (staffGrp->GetDrawingVisibility() == OPTIMIZATION_HIDDEN) {
         return;
     }
@@ -729,11 +738,12 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         // Get the corresponding staff
         AttNIntegerComparison comparison(STAFF, staffDef->GetN());
         Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
-        if (!staff || (staff->HasVisible() && (staff->GetVisible() == BOOLEAN_false))) {
+        const bool hiddenStaff = (!staff || (staff->HasVisible() && (staff->GetVisible() == BOOLEAN_false)));
+        if (!showHidden && hiddenStaff) {
             yBottomPrevious = VRV_UNSET;
             continue;
         }
-        if (!barlineThrough && (staff->GetVisible() == BOOLEAN_false)) {
+        if (!barlineThrough && hiddenStaff) {
             yBottomPrevious = VRV_UNSET;
             continue;
         }
@@ -1058,14 +1068,14 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     }
 
     /*
-    //Debug code for displaying aligner positions
-    for (auto &child : measure->m_measureAligner.GetChildren()) {
-        Alignment *alignment = vrv_cast<Alignment *>(child);
-        int x = alignment->GetXRel() + measure->GetDrawingX();
-        int y = system->GetDrawingY() - m_doc->GetDrawingStaffSize(100);
-        this->DrawVerticalLine(dc, y, y + m_doc->GetDrawingUnit(100), x, 20);
-    }
-    */
+     //Debug code for displaying aligner positions
+     for (auto &child : measure->m_measureAligner.GetChildren()) {
+     Alignment *alignment = vrv_cast<Alignment *>(child);
+     int x = alignment->GetXRel() + measure->GetDrawingX();
+     int y = system->GetDrawingY() - m_doc->GetDrawingStaffSize(100);
+     this->DrawVerticalLine(dc, y, y + m_doc->GetDrawingUnit(100), x, 20);
+     }
+     */
 }
 
 void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
@@ -1074,15 +1084,18 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
     assert(layer);
     assert(staff);
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     MeterSigGrp *meterSigGrp = layer->GetStaffDefMeterSigGrp();
     ListOfObjects childList = meterSigGrp->GetList();
 
     // Ignore invisible meter signatures and those without count
     childList.erase(std::remove_if(childList.begin(), childList.end(),
-                        [](Object *object) {
+                        [showHidden](Object *object) {
                             MeterSig *meterSig = vrv_cast<MeterSig *>(object);
                             assert(meterSig);
-                            return ((meterSig->GetVisible() == BOOLEAN_false) || !meterSig->HasCount());
+                            return (
+                                (!showHidden && (meterSig->GetVisible() == BOOLEAN_false)) || !meterSig->HasCount());
                         }),
         childList.end());
 
@@ -1145,22 +1158,25 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
         // we set mNum to a fixed height above the system and make it a bit smaller than other text
         params.m_x = measure->GetDrawingX();
         params.m_y = staff->GetDrawingY() + yOffset;
+        params.m_staffSize = staff->m_drawingStaffSize;
+        const int basePointSize = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize();
         if (mnum->HasFontsize()) {
             data_FONTSIZE *fs = mnum->GetFontsizeAlternate();
             if (fs->GetType() == FONTSIZE_fontSizeNumeric) {
-                mnumTxt.SetPointSize(fs->GetFontSizeNumeric());
+                mnumTxt.SetPointSize(this->ConvertFontSizeNumeric(*fs, staff->m_drawingStaffSize));
             }
             else if (fs->GetType() == FONTSIZE_term) {
                 const int percent = fs->GetPercentForTerm();
-                mnumTxt.SetPointSize(m_doc->GetDrawingLyricFont(percent)->GetPointSize());
+                mnumTxt.SetPointSize(basePointSize * percent / 100);
             }
             else if (fs->GetType() == FONTSIZE_percent) {
-                mnumTxt.SetPointSize(m_doc->GetDrawingLyricFont(fs->GetPercent())->GetPointSize());
+                mnumTxt.SetPointSize(basePointSize * fs->GetPercent() / 100);
             }
         }
         else {
             mnumTxt.SetPointSize(m_doc->GetDrawingLyricFont(80)->GetPointSize());
         }
+        params.m_pointSize = mnumTxt.GetPointSize();
 
         dc->SetFont(&mnumTxt);
 
@@ -1277,16 +1293,12 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
 
     dc->StartGraphic(staff, "", staff->GetID());
 
-    if (m_doc->IsFacs()) {
-        staff->SetFromFacsimile(m_doc);
-    }
-
     MRest *mrest = vrv_cast<MRest *>(staff->FindDescendantByType(MREST));
     if (!mrest || mrest->GetCutout() != cutout_CUTOUT_cutout) {
         this->DrawStaffLines(dc, staff, staffDef, measure, system);
     }
 
-    if (staffDef && (m_doc->GetType() != Facs)) {
+    if (staffDef) {
         this->DrawStaffDef(dc, staff, measure);
     }
 
@@ -1588,6 +1600,10 @@ void View::DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *mea
 
     this->DrawLayerChildren(dc, layer, layer, staff, measure);
 
+    if (layer->HasCursor()) {
+        this->DrawCursor(dc, layer->GetCursor(), layer, staff, measure);
+    }
+
     dc->EndGraphic(layer, this);
 
     // first draw the postponed tuplets
@@ -1679,6 +1695,36 @@ void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMe
     }
 }
 
+void View::DrawPlaceholder(DeviceContext *dc, Object *object, System *system)
+{
+    assert(object && object->GetParent());
+
+    if (object->GetParent() != system) return;
+
+    if (m_doc->GetOptions()->m_showHidden.GetValue()) dc->AddGraphicClass(CSS_SHOW_HIDDEN);
+
+    int x = 0;
+    int idx = object->GetIdx();
+    const Measure *measure = vrv_cast<const Measure *>(system->GetNext(object, MEASURE));
+    if (measure) {
+        x = measure->GetDrawingX();
+        idx = measure->GetIdx() - idx;
+    }
+    else {
+        measure = vrv_cast<const Measure *>(system->GetPrevious(object, MEASURE));
+        if (!measure) return;
+        x = measure->GetDrawingX() + measure->GetWidth();
+        idx = idx - measure->GetIdx();
+    }
+    idx--;
+    const int unit = m_doc->GetDrawingUnit(100);
+    const int y = system->GetDrawingY() + (unit * 3 * idx);
+    dc->SetPen(0, PEN_SOLID);
+    dc->DrawCircle(this->ToDeviceContextX(x), this->ToDeviceContextY(y), unit);
+    dc->ResetPen();
+    // this->DrawFilledRectangle(dc, x, system->GetDrawingY(), x + 100, system->GetDrawingY() - system->GetHeight());
+}
+
 //----------------------------------------------------------------------------
 // View - Children
 //----------------------------------------------------------------------------
@@ -1700,6 +1746,9 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
             ScoreDef *scoreDef = vrv_cast<ScoreDef *>(current);
             assert(scoreDef);
 
+            dc->StartGraphic(scoreDef, "placeholder", scoreDef->GetID());
+            this->DrawPlaceholder(dc, scoreDef, system);
+
             Measure *nextMeasure = vrv_cast<Measure *>(system->GetNext(scoreDef, MEASURE));
             if (nextMeasure && scoreDef->DrawLabels()) {
                 ScoreDef *scoreDefToDraw = scoreDef;
@@ -1713,6 +1762,8 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
                 this->DrawScoreDef(
                     dc, scoreDefToDraw, nextMeasure, nextMeasure->GetDrawingX(), NULL, false, false, noLabels);
             }
+
+            dc->EndGraphic(scoreDef, this);
 
             this->SetScoreDefDrawingWidth(dc, scoreDef);
         }

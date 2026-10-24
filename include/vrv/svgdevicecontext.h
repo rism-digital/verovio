@@ -124,6 +124,7 @@ public:
     void StartGraphic(Object *object, const std::string &gClass, const std::string &gId, GraphicID graphicID = PRIMARY,
         bool prepend = false) override;
     void EndGraphic(Object *object, View *view) override;
+    void AddGraphicClass(const std::string &className) override;
     ///@}
 
     /**
@@ -207,6 +208,11 @@ public:
     bool GetFacsimile() { return m_facsimile; }
 
     /**
+     * Setting show hidden flag (false by default)
+     */
+    void SetShowHidden(bool showHidden) { m_showHidden = showHidden; }
+
+    /**
      * Setting use Liberation flag (false by default)
      */
     void SetUseLiberation(bool useLiberation) { m_useLiberation = useLiberation; }
@@ -267,7 +273,7 @@ public:
         for (std::string s : additionalAttributes) {
             std::string className = s.substr(0, s.find("@")); // parse <element@attribute>, e.g., "note@pname"
             std::string attributeName = s.substr(s.find("@") + 1);
-            ClassId classId = ObjectFactory::GetInstance()->GetClassId(className);
+            ClassId classId = ObjectFactory::GetInstance().GetClassId(className);
             m_svgAdditionalAttributes.insert({ classId, attributeName });
         }
     }
@@ -358,6 +364,8 @@ private:
 
     bool m_committed; // did we flushed the file?
     int m_originX, m_originY;
+    /** Current text baseline, used to express vertical moves as relative SVG dy values. */
+    int m_textY;
 
     // Here we hold references to all different glyphs used so far,
     // including any glyph for the same code but from different fonts.
@@ -391,6 +399,9 @@ private:
 
     // output as mm (for pdf generation with a 72 dpi)
     bool m_mmOutput;
+    // show hidden flag
+    bool m_showHidden;
+    // facsimiler flag
     bool m_facsimile;
     // use LiberationTextFont
     bool m_useLiberation;
