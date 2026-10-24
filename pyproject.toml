@@ -18,7 +18,7 @@ classifiers = [
 [project.optional-dependencies]
 dev = [
     "build>=1.2",
-    "cibuildwheel>=3.4; python_version >= '3.11'",
+    "cibuildwheel>=4.3.4",
     "twine>=5",
 ]
 
@@ -66,11 +66,6 @@ test-skip = "*-macosx_arm64 *-manylinux_aarch64"
 [tool.cibuildwheel.linux]
 manylinux-x86_64-image = "manylinux2014"
 manylinux-aarch64-image = "manylinux2014"
-before-all = "yum install -y swig"
 
 [tool.cibuildwheel.macos]
-before-all = "brew update && brew install swig"
 environment = { MACOSX_DEPLOYMENT_TARGET = "13" }
-
-[tool.cibuildwheel.windows]
-before-all = "choco install swig -f -y"
