@@ -958,7 +958,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
             this->WriteDel(m_currentNode, vrv_cast<Del *>(object));
         }
         else if (object->Is(EXPAN)) {
-            m_currentNode = m_currentNode.append_child("epxan");
+            m_currentNode = m_currentNode.append_child("expan");
             this->WriteExpan(m_currentNode, vrv_cast<Expan *>(object));
         }
         else if (object->Is(LEM)) {
