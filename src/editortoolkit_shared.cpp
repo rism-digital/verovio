@@ -292,71 +292,71 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         LogWarning("Could not parse the navigate action");
     }
     else if (action == "getScoreDef") {
-        std::string elementId;
-        if (this->ParseGetScoreDefAction(json.get<jsonxx::Object>("param"), elementId)) return this->GetScoreDef(elementId);
+        std::string scoreDefId;
+        if (this->ParseGetScoreDefAction(json.get<jsonxx::Object>("param"), scoreDefId)) return this->GetScoreDef(scoreDefId);
     }
     else if (action == "getScoreDefKeySig") {
-        std::string elementId;
-        if (this->ParseGetScoreDefKeySigAction(json.get<jsonxx::Object>("param"), elementId)) {
-            return this->GetScoreDefKeySig(elementId);
+        std::string scoreDefId;
+        if (this->ParseGetScoreDefKeySigAction(json.get<jsonxx::Object>("param"), scoreDefId)) {
+            return this->GetScoreDefKeySig(scoreDefId);
         }
     }
     else if (action == "getScoreDefMeterSig") {
-        std::string elementId;
-        if (this->ParseGetScoreDefMeterSigAction(json.get<jsonxx::Object>("param"), elementId)) {
-            return this->GetScoreDefMeterSig(elementId);
+        std::string scoreDefId;
+        if (this->ParseGetScoreDefMeterSigAction(json.get<jsonxx::Object>("param"), scoreDefId)) {
+            return this->GetScoreDefMeterSig(scoreDefId);
         }
     }
     else if (action == "getScoreDefStaffDef") {
-        std::string elementId;
-        if (this->ParseGetScoreDefStaffDefAction(json.get<jsonxx::Object>("param"), elementId)) {
-            return this->GetScoreDefStaffDef(elementId);
+        std::string scoreDefId;
+        if (this->ParseGetScoreDefStaffDefAction(json.get<jsonxx::Object>("param"), scoreDefId)) {
+            return this->GetScoreDefStaffDef(scoreDefId);
         }
     }
     else if (action == "getScoreDefStaffGrp") {
-        std::string elementId;
-        if (this->ParseGetScoreDefStaffGrpAction(json.get<jsonxx::Object>("param"), elementId)) {
-            return this->GetScoreDefStaffGrp(elementId);
+        std::string scoreDefId;
+        if (this->ParseGetScoreDefStaffGrpAction(json.get<jsonxx::Object>("param"), scoreDefId)) {
+            return this->GetScoreDefStaffGrp(scoreDefId);
         }
     }
     else if (action == "setScoreDef") {
-        std::string elementId;
+        std::string scoreDefId;
         jsonxx::Object subTree;
-        if (this->ParseSetScoreDefAction(json.get<jsonxx::Object>("param"), elementId, subTree)) {
+        if (this->ParseSetScoreDefAction(json.get<jsonxx::Object>("param"), scoreDefId, subTree)) {
             this->PrepareUndo();
-            return this->SetScoreDef(elementId, subTree);
+            return this->SetScoreDef(scoreDefId, subTree);
         }
     }
     else if (action == "setScoreDefKeySig") {
-        std::string elementId;
+        std::string scoreDefId;
         jsonxx::Object subTree;
-        if (this->ParseSetScoreDefKeySigAction(json.get<jsonxx::Object>("param"), elementId, subTree)) {
+        if (this->ParseSetScoreDefKeySigAction(json.get<jsonxx::Object>("param"), scoreDefId, subTree)) {
             this->PrepareUndo();
-            return this->SetScoreDefKeySig(elementId, subTree);
+            return this->SetScoreDefKeySig(scoreDefId, subTree);
         }
     }
     else if (action == "setScoreDefMeterSig") {
-        std::string elementId;
+        std::string scoreDefId;
         jsonxx::Object subTree;
-        if (this->ParseSetScoreDefMeterSigAction(json.get<jsonxx::Object>("param"), elementId, subTree)) {
+        if (this->ParseSetScoreDefMeterSigAction(json.get<jsonxx::Object>("param"), scoreDefId, subTree)) {
             this->PrepareUndo();
-            return this->SetScoreDefMeterSig(elementId, subTree);
+            return this->SetScoreDefMeterSig(scoreDefId, subTree);
         }
     }
     else if (action == "setScoreDefStaffDef") {
-        std::string elementId;
+        std::string staffId;
         jsonxx::Object subTree;
-        if (this->ParseSetScoreDefStaffDefAction(json.get<jsonxx::Object>("param"), elementId, subTree)) {
+        if (this->ParseSetScoreDefStaffDefAction(json.get<jsonxx::Object>("param"), staffId, subTree)) {
             this->PrepareUndo();
-            return this->SetScoreDefStaffDef(elementId, subTree);
+            return this->SetScoreDefStaffDef(staffId, subTree);
         }
     }
     else if (action == "setScoreDefStaffGrp") {
-        std::string elementId;
+        std::string scoreDefId;
         jsonxx::Object subTree;
-        if (this->ParseSetScoreDefStaffGrpAction(json.get<jsonxx::Object>("param"), elementId, subTree)) {
+        if (this->ParseSetScoreDefStaffGrpAction(json.get<jsonxx::Object>("param"), scoreDefId, subTree)) {
             this->PrepareUndo();
-            return this->SetScoreDefStaffGrp(elementId, subTree);
+            return this->SetScoreDefStaffGrp(scoreDefId, subTree);
         }
     }
     else if (action == "updateScoreDef") {
@@ -573,38 +573,38 @@ bool EditorToolkitShared::ParseResetCursorAction(const jsonxx::Object &param, bo
     return true;
 }
 
-bool EditorToolkitShared::ParseGetScoreDefAction(const jsonxx::Object &param, std::string &elementId)
+bool EditorToolkitShared::ParseGetScoreDefAction(const jsonxx::Object &param, std::string &scoreDefId)
 {
-    if (!param.has<jsonxx::String>("elementId")) return false;
-    elementId = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::String>("scoreDefId")) return false;
+    scoreDefId = param.get<jsonxx::String>("scoreDefId");
     return true;
 }
 
-bool EditorToolkitShared::ParseGetScoreDefKeySigAction(const jsonxx::Object &param, std::string &elementId)
+bool EditorToolkitShared::ParseGetScoreDefKeySigAction(const jsonxx::Object &param, std::string &scoreDefId)
 {
-    if (!param.has<jsonxx::String>("elementId")) return false;
-    elementId = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::String>("scoreDefId")) return false;
+    scoreDefId = param.get<jsonxx::String>("scoreDefId");
     return true;
 }
 
-bool EditorToolkitShared::ParseGetScoreDefMeterSigAction(const jsonxx::Object &param, std::string &elementId)
+bool EditorToolkitShared::ParseGetScoreDefMeterSigAction(const jsonxx::Object &param, std::string &scoreDefId)
 {
-    if (!param.has<jsonxx::String>("elementId")) return false;
-    elementId = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::String>("scoreDefId")) return false;
+    scoreDefId = param.get<jsonxx::String>("scoreDefId");
     return true;
 }
 
-bool EditorToolkitShared::ParseGetScoreDefStaffDefAction(const jsonxx::Object &param, std::string &elementId)
+bool EditorToolkitShared::ParseGetScoreDefStaffDefAction(const jsonxx::Object &param, std::string &staffId)
 {
-    if (!param.has<jsonxx::String>("elementId")) return false;
-    elementId = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::String>("staffId")) return false;
+    staffId = param.get<jsonxx::String>("staffId");
     return true;
 }
 
-bool EditorToolkitShared::ParseGetScoreDefStaffGrpAction(const jsonxx::Object &param, std::string &elementId)
+bool EditorToolkitShared::ParseGetScoreDefStaffGrpAction(const jsonxx::Object &param, std::string &scoreDefId)
 {
-    if (!param.has<jsonxx::String>("elementId")) return false;
-    elementId = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::String>("scoreDefId")) return false;
+    scoreDefId = param.get<jsonxx::String>("scoreDefId");
     return true;
 }
 
@@ -713,49 +713,49 @@ bool EditorToolkitShared::ParseUpdatePitchAction(const jsonxx::Object &param, st
     return true;
 }
 
-bool EditorToolkitShared::ParseSetScoreDefAction(const jsonxx::Object &param, std::string &elementId, jsonxx::Object &subTree)
+bool EditorToolkitShared::ParseSetScoreDefAction(const jsonxx::Object &param, std::string &scoreDefId, jsonxx::Object &subTree)
 {
-    if (!param.has<jsonxx::String>("elementId")) return false;
-    elementId = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::String>("scoreDefId")) return false;
+    scoreDefId = param.get<jsonxx::String>("scoreDefId");
     if (!param.has<jsonxx::Object>("subTree")) return false;
     subTree = param.get<jsonxx::Object>("subTree");
     return true;
 }
 
 bool EditorToolkitShared::ParseSetScoreDefKeySigAction(
-    const jsonxx::Object &param, std::string &elementId, jsonxx::Object &subTree)
+    const jsonxx::Object &param, std::string &scoreDefId, jsonxx::Object &subTree)
 {
-    if (!param.has<jsonxx::String>("elementId")) return false;
-    elementId = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::String>("scoreDefId")) return false;
+    scoreDefId = param.get<jsonxx::String>("scoreDefId");
     if (!param.has<jsonxx::Object>("subTree")) return false;
     subTree = param.get<jsonxx::Object>("subTree");
     return true;
 }
 
 bool EditorToolkitShared::ParseSetScoreDefMeterSigAction(
-    const jsonxx::Object &param, std::string &elementId, jsonxx::Object &subTree)
+    const jsonxx::Object &param, std::string &scoreDefId, jsonxx::Object &subTree)
 {
-    if (!param.has<jsonxx::String>("elementId")) return false;
-    elementId = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::String>("scoreDefId")) return false;
+    scoreDefId = param.get<jsonxx::String>("scoreDefId");
     if (!param.has<jsonxx::Object>("subTree")) return false;
     subTree = param.get<jsonxx::Object>("subTree");
     return true;
 }
 
-bool EditorToolkitShared::ParseSetScoreDefStaffDefAction(const jsonxx::Object &param, std::string &elementId, jsonxx::Object &subTree)
+bool EditorToolkitShared::ParseSetScoreDefStaffDefAction(const jsonxx::Object &param, std::string &staffId, jsonxx::Object &subTree)
 {
-    if (!param.has<jsonxx::String>("elementId")) return false;
-    elementId = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::String>("staffId")) return false;
+    staffId = param.get<jsonxx::String>("staffId");
     if (!param.has<jsonxx::Object>("subTree")) return false;
     subTree = param.get<jsonxx::Object>("subTree");
     return true;
 }
 
 bool EditorToolkitShared::ParseSetScoreDefStaffGrpAction(
-    const jsonxx::Object &param, std::string &elementId, jsonxx::Object &subTree)
+    const jsonxx::Object &param, std::string &scoreDefId, jsonxx::Object &subTree)
 {
-    if (!param.has<jsonxx::String>("elementId")) return false;
-    elementId = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::String>("scoreDefId")) return false;
+    scoreDefId = param.get<jsonxx::String>("scoreDefId");
     if (!param.has<jsonxx::Object>("subTree")) return false;
     subTree = param.get<jsonxx::Object>("subTree");
     return true;
@@ -2178,9 +2178,9 @@ ArrayOfConstObjects EditorToolkitShared::GetScoreBasedChildrenFor(const Object *
     return editorTreeObject->GetChildObjects();
 }
 
-ScoreDef *EditorToolkitShared::ResolveScoreDef(std::string elementId)
+ScoreDef *EditorToolkitShared::ResolveScoreDef(std::string scoreDefId)
 {
-    Object *scoreDef = this->ResolveElement(elementId);
+    Object *scoreDef = this->ResolveElement(scoreDefId);
     if (!scoreDef || !scoreDef->Is(SCOREDEF)) {
         LogError("A scoreDef must be selected");
         return NULL;
@@ -2207,18 +2207,22 @@ void EditorToolkitShared::FinalizeScoreDefUpdate()
     this->SetEditStatus();
 }
 
-bool EditorToolkitShared::GetScoreDef(std::string &elementId)
+bool EditorToolkitShared::GetScoreDef(std::string &scoreDefId)
 {
+    if (scoreDefId != MAIN_SCOREDEF) {
+        LogWarning("Setting spcecific scoreDef not implemented");
+    }
+    
     m_editResponse.reset();
     MEIOutputExtended output(m_doc);
     m_editResponse = output.ExportScoreDef();
     return true;
 }
 
-bool EditorToolkitShared::GetScoreDefKeySig(std::string &elementId)
+bool EditorToolkitShared::GetScoreDefKeySig(std::string &scoreDefId)
 {
     m_editResponse.reset();
-    ScoreDef *scoreDef = this->ResolveScoreDef(elementId);
+    ScoreDef *scoreDef = this->ResolveScoreDef(scoreDefId);
     if (!scoreDef) return false;
 
     MEIOutputExtended output(m_doc);
@@ -2226,10 +2230,10 @@ bool EditorToolkitShared::GetScoreDefKeySig(std::string &elementId)
     return true;
 }
 
-bool EditorToolkitShared::GetScoreDefMeterSig(std::string &elementId)
+bool EditorToolkitShared::GetScoreDefMeterSig(std::string &scoreDefId)
 {
     m_editResponse.reset();
-    ScoreDef *scoreDef = this->ResolveScoreDef(elementId);
+    ScoreDef *scoreDef = this->ResolveScoreDef(scoreDefId);
     if (!scoreDef) return false;
 
     MEIOutputExtended output(m_doc);
@@ -2237,12 +2241,12 @@ bool EditorToolkitShared::GetScoreDefMeterSig(std::string &elementId)
     return true;
 }
 
-bool EditorToolkitShared::GetScoreDefStaffDef(std::string &elementId)
+bool EditorToolkitShared::GetScoreDefStaffDef(std::string &scoreDefId)
 {
     m_editResponse.reset();
     Staff *staff = this->ResolveScoreDefStaff();
     if (!staff) return false;
-    ScoreDef *scoreDef = this->ResolveScoreDef(elementId);
+    ScoreDef *scoreDef = this->ResolveScoreDef(scoreDefId);
     if (!scoreDef) return false;
 
     MEIOutputExtended output(m_doc);
@@ -2250,10 +2254,10 @@ bool EditorToolkitShared::GetScoreDefStaffDef(std::string &elementId)
     return true;
 }
 
-bool EditorToolkitShared::GetScoreDefStaffGrp(std::string &elementId)
+bool EditorToolkitShared::GetScoreDefStaffGrp(std::string &scoreDefId)
 {
     m_editResponse.reset();
-    ScoreDef *scoreDef = this->ResolveScoreDef(elementId);
+    ScoreDef *scoreDef = this->ResolveScoreDef(scoreDefId);
     if (!scoreDef) return false;
 
     MEIOutputExtended output(m_doc);
@@ -2261,17 +2265,21 @@ bool EditorToolkitShared::GetScoreDefStaffGrp(std::string &elementId)
     return true;
 }
 
-bool EditorToolkitShared::SetScoreDef(std::string &elementId, const jsonxx::Object &subTree)
+bool EditorToolkitShared::SetScoreDef(std::string &scoreDefId, const jsonxx::Object &subTree)
 {
+    if (scoreDefId != MAIN_SCOREDEF) {
+        LogWarning("Setting spcecific scoreDef not implemented");
+    }
+    
     MEIInputExtended input(m_doc);
     input.ImportScoreDef(subTree);
     this->FinalizeScoreDefUpdate();
     return true;
 }
 
-bool EditorToolkitShared::SetScoreDefKeySig(std::string &elementId, const jsonxx::Object &subTree)
+bool EditorToolkitShared::SetScoreDefKeySig(std::string &scoreDefId, const jsonxx::Object &subTree)
 {
-    ScoreDef *scoreDef = this->ResolveScoreDef(elementId);
+    ScoreDef *scoreDef = this->ResolveScoreDef(scoreDefId);
     if (!scoreDef) return false;
 
     MEIInputExtended input(m_doc);
@@ -2285,9 +2293,9 @@ bool EditorToolkitShared::SetScoreDefKeySig(std::string &elementId, const jsonxx
     return true;
 }
 
-bool EditorToolkitShared::SetScoreDefMeterSig(std::string &elementId, const jsonxx::Object &subTree)
+bool EditorToolkitShared::SetScoreDefMeterSig(std::string &scoreDefId, const jsonxx::Object &subTree)
 {
-    ScoreDef *scoreDef = this->ResolveScoreDef(elementId);
+    ScoreDef *scoreDef = this->ResolveScoreDef(scoreDefId);
     if (!scoreDef) return false;
 
     MEIInputExtended input(m_doc);
@@ -2301,11 +2309,11 @@ bool EditorToolkitShared::SetScoreDefMeterSig(std::string &elementId, const json
     return true;
 }
 
-bool EditorToolkitShared::SetScoreDefStaffDef(std::string &elementId, const jsonxx::Object &subTree)
+bool EditorToolkitShared::SetScoreDefStaffDef(std::string &scoreDefId, const jsonxx::Object &subTree)
 {
     Staff *staff = this->ResolveScoreDefStaff();
     if (!staff) return false;
-    ScoreDef *scoreDef = this->ResolveScoreDef(elementId);
+    ScoreDef *scoreDef = this->ResolveScoreDef(scoreDefId);
     if (!scoreDef) return false;
 
     MEIInputExtended input(m_doc);
@@ -2314,9 +2322,9 @@ bool EditorToolkitShared::SetScoreDefStaffDef(std::string &elementId, const json
     return true;
 }
 
-bool EditorToolkitShared::SetScoreDefStaffGrp(std::string &elementId, const jsonxx::Object &subTree)
+bool EditorToolkitShared::SetScoreDefStaffGrp(std::string &scoreDefId, const jsonxx::Object &subTree)
 {
-    ScoreDef *scoreDef = this->ResolveScoreDef(elementId);
+    ScoreDef *scoreDef = this->ResolveScoreDef(scoreDefId);
     if (!scoreDef) return false;
 
     MEIInputExtended input(m_doc);
