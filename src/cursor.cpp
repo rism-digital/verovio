@@ -206,7 +206,7 @@ Cursor::InputMode Cursor::GetInputModeFromStr(const std::string &inputModeStr)
 std::string Cursor::GetInputModeFromValue(Cursor::InputMode inputMode)
 {
     switch (inputMode) {
-        case Cursor::PITCH_FIRST: return "durationFirst";
+        case Cursor::DURATION_FIRST: return "durationFirst";
         case Cursor::COMBINED: return "combined";
         default: return "pitchFirst";
     }
