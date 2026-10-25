@@ -85,11 +85,11 @@ protected:
         const jsonxx::Object &param, std::string &elementName, std::string &startId, std::string &endId);
     bool ParseNavigate(const jsonxx::Object &param, std::string &elementId, int &direction);
     bool ParsePasteAction();
-    bool ParseGetScoreDefAction(const jsonxx::Object &param);
-    bool ParseGetScoreDefKeySigAction(const jsonxx::Object &param, bool &selected);
-    bool ParseGetScoreDefMeterSigAction(const jsonxx::Object &param, bool &selected);
-    bool ParseGetScoreDefStaffDefAction(const jsonxx::Object &param);
-    bool ParseGetScoreDefStaffGrpAction(const jsonxx::Object &param, bool &selected);
+    bool ParseGetScoreDefAction(const jsonxx::Object &param, std::string &elementId);
+    bool ParseGetScoreDefKeySigAction(const jsonxx::Object &param, std::string &elementId);
+    bool ParseGetScoreDefMeterSigAction(const jsonxx::Object &param, std::string &elementId);
+    bool ParseGetScoreDefStaffDefAction(const jsonxx::Object &param, std::string &elementId);
+    bool ParseGetScoreDefStaffGrpAction(const jsonxx::Object &param, std::string &elementId);
     bool ParseResetCursorAction(const jsonxx::Object &param, bool &maintainChordMode);
     bool ParseSelectAction(const jsonxx::Object &param, std::string &elementId, bool &secondary, SelectCustom &custom);
     bool ParseSetAction(
@@ -100,11 +100,11 @@ protected:
         const jsonxx::Object &param, bool &restMode, bool &chordMode, Cursor::TieMode &tieMode, bool &autoBeam);
     bool ParseUpdatePitchAction(const jsonxx::Object &param, std::string &elementId, data_PITCHNAME &pname, int &oct,
         data_ACCIDENTAL_WRITTEN &accid, int &midi);
-    bool ParseSetScoreDefAction(const jsonxx::Object &param, jsonxx::Object &subTree);
-    bool ParseSetScoreDefKeySigAction(const jsonxx::Object &param, bool &selected, jsonxx::Object &subTree);
-    bool ParseSetScoreDefMeterSigAction(const jsonxx::Object &param, bool &selected, jsonxx::Object &subTree);
-    bool ParseSetScoreDefStaffDefAction(const jsonxx::Object &param, jsonxx::Object &subTree);
-    bool ParseSetScoreDefStaffGrpAction(const jsonxx::Object &param, bool &selected, jsonxx::Object &subTree);
+    bool ParseSetScoreDefAction(const jsonxx::Object &param, std::string &elementId, jsonxx::Object &subTree);
+    bool ParseSetScoreDefKeySigAction(const jsonxx::Object &param, std::string &elementId, jsonxx::Object &subTree);
+    bool ParseSetScoreDefMeterSigAction(const jsonxx::Object &param, std::string &elementId, jsonxx::Object &subTree);
+    bool ParseSetScoreDefStaffDefAction(const jsonxx::Object &param, std::string &elementId, jsonxx::Object &subTree);
+    bool ParseSetScoreDefStaffGrpAction(const jsonxx::Object &param, std::string &elementId, jsonxx::Object &subTree);
     bool ParseUpdateScoreDefAction(const jsonxx::Object &param, ScoreDefUpdate &update);
 
     ///@}
@@ -151,19 +151,19 @@ protected:
     bool ContextForScores(bool updateResponse);
     bool ContextForSections(bool updateResponse);
 
-    bool GetScoreDef();
-    bool GetScoreDefKeySig(bool selected);
-    bool GetScoreDefMeterSig(bool selected);
-    bool GetScoreDefStaffDef();
-    bool GetScoreDefStaffGrp(bool selected);
-    bool SetScoreDef(const jsonxx::Object &subTree);
-    bool SetScoreDefKeySig(bool selected, const jsonxx::Object &subTree);
-    bool SetScoreDefMeterSig(bool selected, const jsonxx::Object &subTree);
-    bool SetScoreDefStaffDef(const jsonxx::Object &subTree);
-    bool SetScoreDefStaffGrp(bool selected, const jsonxx::Object &subTree);
+    bool GetScoreDef(std::string &elementId);
+    bool GetScoreDefKeySig(std::string &elementId);
+    bool GetScoreDefMeterSig(std::string &elementId);
+    bool GetScoreDefStaffDef(std::string &elementId);
+    bool GetScoreDefStaffGrp(std::string &elementId);
+    bool SetScoreDef(std::string &elementId, const jsonxx::Object &subTree);
+    bool SetScoreDefKeySig(std::string &elementId, const jsonxx::Object &subTree);
+    bool SetScoreDefMeterSig(std::string &elementId, const jsonxx::Object &subTree);
+    bool SetScoreDefStaffDef(std::string &elementId, const jsonxx::Object &subTree);
+    bool SetScoreDefStaffGrp(std::string &elementId, const jsonxx::Object &subTree);
     bool UpdateScoreDef(ScoreDefUpdate update);
 
-    ScoreDef *ResolveScoreDef(bool selected);
+    ScoreDef *ResolveScoreDef(std::string elementId);
     Staff *ResolveScoreDefStaff();
     void FinalizeScoreDefUpdate();
 

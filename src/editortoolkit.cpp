@@ -10,8 +10,10 @@
 //--------------------------------------------------------------------------------
 
 #include "cursor.h"
+#include "findfunctor.h"
 #include "object.h"
 #include "page.h"
+#include "score.h"
 #include "vrv.h"
 
 //--------------------------------------------------------------------------------
@@ -21,6 +23,7 @@ namespace vrv {
 #ifndef NO_EDIT_SUPPORT
 
 #define CHAINED_ID "[chained-id]"
+#define MAIN_SCOREDEF "[main-scoredef]"
 #define SELECTION_ID "[selection-id]"
 #define SELECTION_SECONDARY_ID "[selection-secondary-id]"
 
@@ -93,6 +96,11 @@ Object *EditorToolkit::GetElement(const std::string &elementId)
 {
     Object *element = NULL;
 
+    if (elementId == MAIN_SCOREDEF) {
+        Score *score = m_doc->GetFirstVisibleScore();
+        return score ? score->GetScoreDef() : NULL;
+    }
+    
     // Try to get the element on the current drawing page
     if (m_doc->GetDrawingPage()) {
         element = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
@@ -101,7 +109,6 @@ Object *EditorToolkit::GetElement(const std::string &elementId)
     if (!element) {
         element = m_doc->FindDescendantByID(elementId);
     }
-
     if (!element) {
         LogError("Element '%s' could not be found", elementId.c_str());
     }
