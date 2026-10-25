@@ -775,6 +775,15 @@ enum MensuralCastOffType { MENSURAL_CAST_OFF_INIT = 0, MENSURAL_CAST_OFF_UNSET, 
 #define NOTE_HEIGHT_TO_STAFF_SIZE_RATIO 2
 #define NOTE_WIDTH_TO_STAFF_SIZE_RATIO 1.4
 
+//----------------------------------------------------------------------------
+// Editor
+//----------------------------------------------------------------------------
+
+#define CHAINED_ID "[chained-id]"
+#define MAIN_SCOREDEF "[main-scoredef]"
+#define SELECTION_ID "[selection-id]"
+#define SELECTION_SECONDARY_ID "[selection-secondary-id]"
+
 } // namespace vrv
 
 #endif // __VRV_DEF_H__

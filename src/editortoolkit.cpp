@@ -22,11 +22,6 @@ namespace vrv {
 
 #ifndef NO_EDIT_SUPPORT
 
-#define CHAINED_ID "[chained-id]"
-#define MAIN_SCOREDEF "[main-scoredef]"
-#define SELECTION_ID "[selection-id]"
-#define SELECTION_SECONDARY_ID "[selection-secondary-id]"
-
 void EditorToolkit::ResetSelect()
 {
     m_selectionId = "";

@@ -170,6 +170,7 @@ protected:
     void ContextForObject(const Object *object, jsonxx::Object &element, bool recursive = false);
     void ContextForObjects(const ArrayOfConstObjects &objects, jsonxx::Array &siblings);
     void ContextForReferences(const ListOfObjectAttNamePairs &objects, jsonxx::Array &links);
+    bool ContextForMainScoreDef(Object *scoreDef);
 
     ArrayOfConstObjects GetScoreBasedChildrenFor(const Object *object);
 

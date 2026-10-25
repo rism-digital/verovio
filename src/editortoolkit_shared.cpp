@@ -1887,6 +1887,11 @@ bool EditorToolkitShared::ContextForElement(std::string &elementId)
     this->ContextForSections(false);
     assert(m_sectionContext);
 
+    if (elementId == MAIN_SCOREDEF) {
+        Object *scoreDef = this->ResolveElement(elementId);
+        return this->ContextForMainScoreDef(scoreDef);
+    }
+
     bool hasTargetID = (elementId != "");
     const Object *object = NULL;
     if (hasTargetID) {
@@ -2040,6 +2045,39 @@ bool EditorToolkitShared::ContextForElement(std::string &elementId)
     object->Process(findAllReferencedObjects, 0);
     this->ContextForReferences(referencedObjects, elements);
     m_editResponse << "referencedElements" << elements;
+
+    return true;
+}
+
+bool EditorToolkitShared::ContextForMainScoreDef(Object *scoreDef)
+{
+    if (!scoreDef || !scoreDef->Is(SCOREDEF)) return false;
+
+    const Object *target = scoreDef;
+
+    m_editResponse << "ancestors" << jsonxx::Array();
+
+    // The target object as it appears in the context, including its direct children.
+    jsonxx::Object jsonObject;
+    this->ContextForObject(target, jsonObject);
+    // Force the id in the context
+    jsonObject << "id" << MAIN_SCOREDEF;
+
+    // The main scoreDef is the context root and therefore has no siblings.
+    m_editResponse << "context" << jsonObject;
+
+    // Include all attributes in the detailed target object.
+    ArrayOfStrAttr attributes;
+    target->GetAttributes(&attributes);
+    jsonxx::Object jsonAttributes;
+    for (const auto &attribute : attributes) {
+        jsonAttributes << attribute.first << attribute.second;
+    }
+    jsonObject << "attributes" << jsonAttributes;
+    m_editResponse << "object" << jsonObject;
+
+    m_editResponse << "referringElements" << jsonxx::Array();
+    m_editResponse << "referencedElements" << jsonxx::Array();
 
     return true;
 }
