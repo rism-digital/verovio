@@ -309,8 +309,9 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
     }
     else if (action == "getScoreDefStaffDef") {
         std::string scoreDefId;
-        if (this->ParseGetScoreDefStaffDefAction(json.get<jsonxx::Object>("param"), scoreDefId)) {
-            return this->GetScoreDefStaffDef(scoreDefId);
+        int staffN;
+        if (this->ParseGetScoreDefStaffDefAction(json.get<jsonxx::Object>("param"), scoreDefId, staffN)) {
+            return this->GetScoreDefStaffDef(scoreDefId, staffN);
         }
     }
     else if (action == "getScoreDefStaffGrp") {
@@ -344,11 +345,12 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         }
     }
     else if (action == "setScoreDefStaffDef") {
-        std::string staffId;
+        std::string scoreDefId;
+        int staffN;
         jsonxx::Object subTree;
-        if (this->ParseSetScoreDefStaffDefAction(json.get<jsonxx::Object>("param"), staffId, subTree)) {
+        if (this->ParseSetScoreDefStaffDefAction(json.get<jsonxx::Object>("param"), scoreDefId, staffN, subTree)) {
             this->PrepareUndo();
-            return this->SetScoreDefStaffDef(staffId, subTree);
+            return this->SetScoreDefStaffDef(scoreDefId, staffN, subTree);
         }
     }
     else if (action == "setScoreDefStaffGrp") {
@@ -594,10 +596,13 @@ bool EditorToolkitShared::ParseGetScoreDefMeterSigAction(const jsonxx::Object &p
     return true;
 }
 
-bool EditorToolkitShared::ParseGetScoreDefStaffDefAction(const jsonxx::Object &param, std::string &staffId)
+bool EditorToolkitShared::ParseGetScoreDefStaffDefAction(
+    const jsonxx::Object &param, std::string &scoreDefId, int &staffN)
 {
-    if (!param.has<jsonxx::String>("staffId")) return false;
-    staffId = param.get<jsonxx::String>("staffId");
+    if (!param.has<jsonxx::String>("scoreDefId")) return false;
+    scoreDefId = param.get<jsonxx::String>("scoreDefId");
+    if (!param.has<jsonxx::Number>("staffN")) return false;
+    staffN = param.get<jsonxx::Number>("staffN");
     return true;
 }
 
@@ -742,10 +747,13 @@ bool EditorToolkitShared::ParseSetScoreDefMeterSigAction(
     return true;
 }
 
-bool EditorToolkitShared::ParseSetScoreDefStaffDefAction(const jsonxx::Object &param, std::string &staffId, jsonxx::Object &subTree)
+bool EditorToolkitShared::ParseSetScoreDefStaffDefAction(
+    const jsonxx::Object &param, std::string &scoreDefId, int &staffN, jsonxx::Object &subTree)
 {
-    if (!param.has<jsonxx::String>("staffId")) return false;
-    staffId = param.get<jsonxx::String>("staffId");
+    if (!param.has<jsonxx::String>("scoreDefId")) return false;
+    scoreDefId = param.get<jsonxx::String>("scoreDefId");
+    if (!param.has<jsonxx::Number>("staffN")) return false;
+    staffN = param.get<jsonxx::Number>("staffN");
     if (!param.has<jsonxx::Object>("subTree")) return false;
     subTree = param.get<jsonxx::Object>("subTree");
     return true;
@@ -2241,16 +2249,14 @@ bool EditorToolkitShared::GetScoreDefMeterSig(std::string &scoreDefId)
     return true;
 }
 
-bool EditorToolkitShared::GetScoreDefStaffDef(std::string &scoreDefId)
+bool EditorToolkitShared::GetScoreDefStaffDef(std::string &scoreDefId, int staffN)
 {
     m_editResponse.reset();
-    Staff *staff = this->ResolveScoreDefStaff();
-    if (!staff) return false;
     ScoreDef *scoreDef = this->ResolveScoreDef(scoreDefId);
     if (!scoreDef) return false;
 
     MEIOutputExtended output(m_doc);
-    m_editResponse = output.ExportStaffDef(scoreDef, staff->GetN());
+    m_editResponse = output.ExportStaffDef(scoreDef, staffN);
     return true;
 }
 
@@ -2309,15 +2315,13 @@ bool EditorToolkitShared::SetScoreDefMeterSig(std::string &scoreDefId, const jso
     return true;
 }
 
-bool EditorToolkitShared::SetScoreDefStaffDef(std::string &scoreDefId, const jsonxx::Object &subTree)
+bool EditorToolkitShared::SetScoreDefStaffDef(std::string &scoreDefId, int staffN, const jsonxx::Object &subTree)
 {
-    Staff *staff = this->ResolveScoreDefStaff();
-    if (!staff) return false;
     ScoreDef *scoreDef = this->ResolveScoreDef(scoreDefId);
     if (!scoreDef) return false;
 
     MEIInputExtended input(m_doc);
-    input.ImportStaffDef(subTree, scoreDef, staff->GetN());
+    input.ImportStaffDef(subTree, scoreDef, staffN);
     this->FinalizeScoreDefUpdate();
     return true;
 }

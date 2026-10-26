@@ -53,7 +53,10 @@ export interface GetScoreDefMeterSigAction {
 }
 export interface GetScoreDefStaffDefAction {
     action: "getScoreDefStaffDef";
-    param: Record<string, never>;
+    param: {
+        scoreDefId: string;
+        staffN: number;
+    };
 }
 export interface GetScoreDefStaffGrpAction {
     action: "getScoreDefStaffGrp";
@@ -219,6 +222,8 @@ export interface SetScoreDefMeterSigAction {
 export interface SetScoreDefStaffDefAction {
     action: "setScoreDefStaffDef";
     param: {
+        scoreDefId: string;
+        staffN: number;
         subTree: EditorResponseScoreDef;
     };
 }
