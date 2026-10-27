@@ -2348,6 +2348,9 @@ bool EditorToolkitShared::SetScoreDefStaffGrp(std::string &scoreDefId, const jso
     m_doc->Process(updateStaffGrpFunctor);
     if (!updateStaffGrpFunctor.IsSuccess()) return false;
 
+    ReorderStaffNFunctor reorderStaffNFunctor;
+    m_doc->Process(reorderStaffNFunctor);
+
     this->FinalizeScoreDefUpdate();
     return true;
 }
