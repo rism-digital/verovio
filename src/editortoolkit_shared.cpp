@@ -293,7 +293,8 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
     }
     else if (action == "getScoreDef") {
         std::string scoreDefId;
-        if (this->ParseGetScoreDefAction(json.get<jsonxx::Object>("param"), scoreDefId)) return this->GetScoreDef(scoreDefId);
+        if (this->ParseGetScoreDefAction(json.get<jsonxx::Object>("param"), scoreDefId))
+            return this->GetScoreDef(scoreDefId);
     }
     else if (action == "getScoreDefKeySig") {
         std::string scoreDefId;
@@ -718,7 +719,8 @@ bool EditorToolkitShared::ParseUpdatePitchAction(const jsonxx::Object &param, st
     return true;
 }
 
-bool EditorToolkitShared::ParseSetScoreDefAction(const jsonxx::Object &param, std::string &scoreDefId, jsonxx::Object &subTree)
+bool EditorToolkitShared::ParseSetScoreDefAction(
+    const jsonxx::Object &param, std::string &scoreDefId, jsonxx::Object &subTree)
 {
     if (!param.has<jsonxx::String>("scoreDefId")) return false;
     scoreDefId = param.get<jsonxx::String>("scoreDefId");
@@ -2220,7 +2222,7 @@ bool EditorToolkitShared::GetScoreDef(std::string &scoreDefId)
     if (scoreDefId != MAIN_SCOREDEF) {
         LogWarning("Setting spcecific scoreDef not implemented");
     }
-    
+
     m_editResponse.reset();
     MEIOutputExtended output(m_doc);
     m_editResponse = output.ExportScoreDef();
@@ -2276,7 +2278,7 @@ bool EditorToolkitShared::SetScoreDef(std::string &scoreDefId, const jsonxx::Obj
     if (scoreDefId != MAIN_SCOREDEF) {
         LogWarning("Setting spcecific scoreDef not implemented");
     }
-    
+
     MEIInputExtended input(m_doc);
     input.ImportScoreDef(subTree);
     this->FinalizeScoreDefUpdate();
@@ -2328,11 +2330,24 @@ bool EditorToolkitShared::SetScoreDefStaffDef(std::string &scoreDefId, int staff
 
 bool EditorToolkitShared::SetScoreDefStaffGrp(std::string &scoreDefId, const jsonxx::Object &subTree)
 {
-    ScoreDef *scoreDef = this->ResolveScoreDef(scoreDefId);
+    if (scoreDefId != MAIN_SCOREDEF) {
+        LogError("Updating a staffGrp is supported only for the main scoreDef");
+        return false;
+    }
+
+    Score *score = m_doc->GetFirstVisibleScore();
+    ScoreDef *scoreDef = score ? score->GetScoreDef() : NULL;
     if (!scoreDef) return false;
 
     MEIInputExtended input(m_doc);
     input.ImportStaffGrp(subTree, scoreDef);
+    StaffGrp *staffGrp = vrv_cast<StaffGrp *>(scoreDef->FindDescendantByType(STAFFGRP, 1));
+    if (!staffGrp) return false;
+
+    UpdateStaffGrpFunctor updateStaffGrpFunctor(m_doc, scoreDef, staffGrp);
+    m_doc->Process(updateStaffGrpFunctor);
+    if (!updateStaffGrpFunctor.IsSuccess()) return false;
+
     this->FinalizeScoreDefUpdate();
     return true;
 }

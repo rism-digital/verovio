@@ -208,6 +208,48 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// UpdateStaffGrpFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This updates the staffGrp structure and reorders the corresponding staves.
+ */
+class UpdateStaffGrpFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    UpdateStaffGrpFunctor(Doc *doc, ScoreDef *mainScoreDef, StaffGrp *staffGrp);
+    virtual ~UpdateStaffGrpFunctor();
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
+    ///@}
+
+    bool IsSuccess() const { return m_success; }
+
+protected:
+    //
+private:
+    bool GetStaffRange(const Measure *measure, int &firstStaffIdx) const;
+    bool UpdateScoreDef(ScoreDef *scoreDef, StaffGrp *staffGrp);
+
+public:
+    //
+private:
+    ScoreDef *m_mainScoreDef;
+    StaffGrp *m_staffGrpTemplate;
+    std::map<int, int> m_staffPositions;
+    bool m_success;
+};
+
+//----------------------------------------------------------------------------
 // ReorderStaffNFunctor
 //----------------------------------------------------------------------------
 

@@ -15,7 +15,9 @@
 #include "editorial.h"
 #include "editortoolkit_cmn.h"
 #include "layer.h"
+#include "measure.h"
 #include "score.h"
+#include "scoredef.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
@@ -344,6 +346,159 @@ FunctorCode MoveStaffFunctor::VisitScoreDef(ScoreDef *scoreDef)
     staffDef->SwapWith(targetStaffDef);
 
     return FUNCTOR_SIBLINGS;
+}
+
+//----------------------------------------------------------------------------
+// UpdateStaffGrpFunctor
+//----------------------------------------------------------------------------
+
+UpdateStaffGrpFunctor::UpdateStaffGrpFunctor(Doc *doc, ScoreDef *mainScoreDef, StaffGrp *staffGrp) : DocFunctor(doc)
+{
+    assert(mainScoreDef);
+    assert(staffGrp);
+
+    m_mainScoreDef = mainScoreDef;
+    // The new staffGrp now set in the main scoreDef - make a copy as a template
+    m_staffGrpTemplate = vrv_cast<StaffGrp *>(staffGrp->Clone());
+    m_staffGrpTemplate->CloneReset();
+    m_success = true;
+    this->SetVisibleOnly(false);
+
+    // Check it actually is in the main scoreDef
+    if (staffGrp != m_mainScoreDef->FindDescendantByType(STAFFGRP)) {
+        LogError("The updated staffGrp must be the first staffGrp of the main scoreDef");
+        m_success = false;
+        return;
+    }
+
+    // Build a mapping
+    const ListOfObjects staffDefs = staffGrp->FindAllDescendantsByType(STAFFDEF);
+    int position = 0;
+    for (const Object *object : staffDefs) {
+        const StaffDef *staffDef = vrv_cast<const StaffDef *>(object);
+        assert(staffDef);
+        if (!staffDef->HasN() || !m_staffPositions.emplace(staffDef->GetN(), position).second) {
+            LogError("The updated staffGrp must contain one staffDef for each unique @n");
+            m_success = false;
+            break;
+        }
+        ++position;
+    }
+    if (m_staffPositions.empty()) {
+        LogError("The updated staffGrp must contain at least one staffDef");
+        m_success = false;
+    }
+}
+
+UpdateStaffGrpFunctor::~UpdateStaffGrpFunctor()
+{
+    delete m_staffGrpTemplate;
+}
+
+FunctorCode UpdateStaffGrpFunctor::VisitMeasure(Measure *measure)
+{
+    if (!m_success || m_staffPositions.empty()) return FUNCTOR_STOP;
+
+    int firstStaffIdx = VRV_UNSET;
+    if (!this->GetStaffRange(measure, firstStaffIdx)) {
+        m_success = false;
+        return FUNCTOR_STOP;
+    }
+
+    std::vector<Staff *> orderedStaves(m_staffPositions.size(), NULL);
+    for (int i = 0; i < (int)m_staffPositions.size(); ++i) {
+        Staff *staff = vrv_cast<Staff *>(measure->GetChild(firstStaffIdx + i));
+        assert(staff);
+        orderedStaves.at(m_staffPositions.at(staff->GetN())) = staff;
+    }
+
+    ArrayOfObjects &children = measure->GetChildrenForModification();
+    std::copy(orderedStaves.begin(), orderedStaves.end(), children.begin() + firstStaffIdx);
+    measure->Modify();
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode UpdateStaffGrpFunctor::VisitScoreDef(ScoreDef *scoreDef)
+{
+    if (!m_success || m_staffPositions.empty()) return FUNCTOR_STOP;
+
+    StaffGrp *staffGrp = vrv_cast<StaffGrp *>(m_staffGrpTemplate->Clone());
+    staffGrp->CloneReset();
+    if (!this->UpdateScoreDef(scoreDef, staffGrp)) {
+        if (!staffGrp->GetParent()) delete staffGrp;
+        m_success = false;
+        return FUNCTOR_STOP;
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
+bool UpdateStaffGrpFunctor::GetStaffRange(const Measure *measure, int &firstStaffIdx) const
+{
+    firstStaffIdx = VRV_UNSET;
+    int staffCount = 0;
+    bool staffRangeEnded = false;
+    std::set<int> staffNs;
+
+    for (int i = 0; i < measure->GetChildCount(); ++i) {
+        const Object *child = measure->GetChild(i);
+        if (child->Is(STAFF)) {
+            if (staffRangeEnded) {
+                LogError("The staves in a measure must form one contiguous child range");
+                return false;
+            }
+            if (firstStaffIdx == VRV_UNSET) firstStaffIdx = i;
+            const Staff *staff = vrv_cast<const Staff *>(child);
+            assert(staff);
+            if (!m_staffPositions.count(staff->GetN()) || !staffNs.insert(staff->GetN()).second) {
+                LogError("The staves in a measure do not match the updated staffGrp");
+                return false;
+            }
+            ++staffCount;
+        }
+        else if (firstStaffIdx != VRV_UNSET) {
+            staffRangeEnded = true;
+        }
+    }
+
+    if ((staffCount != (int)m_staffPositions.size()) || (staffNs.size() != m_staffPositions.size())) {
+        LogError("The number of staves in a measure does not match the updated staffGrp");
+        return false;
+    }
+
+    return true;
+}
+
+bool UpdateStaffGrpFunctor::UpdateScoreDef(ScoreDef *scoreDef, StaffGrp *staffGrp)
+{
+    StaffGrp *oldStaffGrp = vrv_cast<StaffGrp *>(scoreDef->FindDescendantByType(STAFFGRP));
+    if (!oldStaffGrp) return false;
+
+    const ListOfObjects newStaffDefList = staffGrp->FindAllDescendantsByType(STAFFDEF);
+    if (newStaffDefList.size() != m_staffPositions.size()) return false;
+
+    std::vector<StaffDef *> newStaffDefs;
+    for (Object *object : newStaffDefList) newStaffDefs.push_back(vrv_cast<StaffDef *>(object));
+
+    std::vector<std::pair<StaffDef *, StaffDef *>> staffDefs;
+    staffDefs.reserve(m_staffPositions.size());
+
+    for (const auto &[staffN, position] : m_staffPositions) {
+        StaffDef *oldStaffDef = scoreDef->GetStaffDef(staffN);
+        StaffDef *newStaffDef = vrv_cast<StaffDef *>(newStaffDefs.at(position));
+        if (!oldStaffDef || !newStaffDef || (newStaffDef->GetN() != staffN)) return false;
+        staffDefs.emplace_back(oldStaffDef, newStaffDef);
+    }
+
+    for (const auto &[oldStaffDef, newStaffDef] : staffDefs) oldStaffDef->SwapWith(newStaffDef);
+
+    Object *parent = oldStaffGrp->GetParent();
+    assert(parent);
+    parent->ReplaceChild(oldStaffGrp, staffGrp);
+    delete oldStaffGrp;
+
+    return true;
 }
 
 //----------------------------------------------------------------------------

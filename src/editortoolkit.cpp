@@ -95,7 +95,7 @@ Object *EditorToolkit::GetElement(const std::string &elementId)
         Score *score = m_doc->GetFirstVisibleScore();
         return score ? score->GetScoreDef() : NULL;
     }
-    
+
     // Try to get the element on the current drawing page
     if (m_doc->GetDrawingPage()) {
         element = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
