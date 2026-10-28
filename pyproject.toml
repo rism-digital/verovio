@@ -37,6 +37,7 @@ sdist.include = [
     "bindings/python",
     "cmake",
     "data",
+    "external",
     "include",
     "libmei",
     "src",
