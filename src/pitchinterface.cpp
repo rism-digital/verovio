@@ -191,4 +191,14 @@ int PitchInterface::CalcLoc(data_PITCHNAME pname, int oct, int clefLocOffset)
     return ((oct - OCTAVE_OFFSET) * 7 + (pname - 1) + clefLocOffset);
 }
 
+std::pair<data_PITCHNAME, int> PitchInterface::CalcPitch(int loc, int clefLocOffset)
+{
+    const int pitchPos = loc - clefLocOffset;
+
+    const int degree = ((pitchPos % 7) + 7) % 7;
+    const int octaveOffset = (pitchPos - degree) / 7;
+
+    return { static_cast<data_PITCHNAME>(degree + 1), OCTAVE_OFFSET + octaveOffset };
+}
+
 } // namespace vrv

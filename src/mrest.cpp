@@ -106,7 +106,7 @@ int MRest::GetOptimalLayerLocation(const Layer *layer, int defaultLocation) cons
     // find all locations for other layer
     std::vector<int> locations;
     for (const Object *element : collidingElementsList) {
-        if (element->Is({ CHORD, NOTE })) {
+        if (element->IsAnyOf(std::array{ CHORD, NOTE })) {
             const LayerElement *layerElement = vrv_cast<const LayerElement *>(element);
             int loc = PitchInterface::CalcLoc(layerElement, layer, layerElement, isTopLayer);
             locations.push_back(loc);

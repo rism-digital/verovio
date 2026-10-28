@@ -22,7 +22,7 @@
 #include "measure.h"
 #include "plistinterface.h"
 #include "rdg.h"
-#include "score.h"
+#include "scoreorpartelement.h"
 #include "section.h"
 #include "timeinterface.h"
 #include "vrv.h"
@@ -103,7 +103,7 @@ Object *ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList,
 
     // find and add all relevant (and new) expansion sibling ids to deletionList
     for (Object *siblings : parent->GetChildren()) {
-        if (siblings->Is({ SECTION, ENDING, LEM, RDG })
+        if (siblings->IsAnyOf(std::array{ SECTION, ENDING, LEM, RDG })
             && std::count(deletionList.begin(), deletionList.end(), siblings->GetID()) == 0) {
             deletionList.push_back(siblings->GetID());
         }
@@ -174,7 +174,7 @@ Object *ExpansionMap::Expand(Expansion *expansion, xsdAnyURI_List &existingList,
                     if (prevIdx < childCount - 1) {
                         Object *nextElement = prevSect->GetParent()->GetChild(prevIdx + 1);
                         assert(nextElement);
-                        if (nextElement->Is({ SECTION, ENDING, LEM, RDG }) && nextElement != currSect) {
+                        if (nextElement->IsAnyOf(std::array{ SECTION, ENDING, LEM, RDG }) && nextElement != currSect) {
                             moveCurrentElement = true;
                         }
                     }
@@ -364,21 +364,21 @@ void ExpansionMap::ToJson(std::string &output)
     output = expansionmap.json();
 }
 
-void ExpansionMap::GenerateExpansionFor(Score *score)
+void ExpansionMap::GenerateExpansionFor(ScoreOrPartElement *scoreOrPart)
 {
     m_isProcessed = true;
 
-    if (score->HasEditorialContent()) {
+    if (scoreOrPart->HasEditorialContent()) {
         LogWarning("An expansion cannot be generated with editorial content");
         return;
     }
 
-    if (score->FindAllDescendantsByType(SECTION).size() > 1) {
+    if (scoreOrPart->FindAllDescendantsByType(SECTION).size() > 1) {
         LogWarning("An expansion cannot be generated with more than one section");
         return;
     }
 
-    Section *section = vrv_cast<Section *>(score->FindDescendantByType(SECTION, 1));
+    Section *section = vrv_cast<Section *>(scoreOrPart->FindDescendantByType(SECTION, 1));
     assert(section);
 
     ArrayOfObjects childrenArray = section->GetChildrenForModification();

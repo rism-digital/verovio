@@ -71,7 +71,8 @@ FunctorCode AdjustStaffOverlapFunctor::VisitStaffAlignment(StaffAlignment *staff
             iter = std::find_if(iter, end, [bboxBelow, drawingUnit](BoundingBox *elem) {
                 if (bboxBelow->Is(FLOATING_POSITIONER)) {
                     FloatingPositioner *fp = vrv_cast<FloatingPositioner *>(bboxBelow);
-                    if (fp->GetObject()->Is({ DIR, DYNAM, TEMPO }) && fp->GetObject()->IsExtenderElement()) {
+                    if (fp->GetObject()->IsAnyOf(std::array{ DIR, DYNAM, TEMPO })
+                        && fp->GetObject()->IsExtenderElement()) {
                         return bboxBelow->HorizontalContentOverlap(elem, drawingUnit * 4)
                             || bboxBelow->VerticalContentOverlap(elem);
                     }
@@ -83,7 +84,7 @@ FunctorCode AdjustStaffOverlapFunctor::VisitStaffAlignment(StaffAlignment *staff
                 int overflowBelow = m_previous->CalcOverflowBelow(bboxBelow);
                 int overflowAbove = staffAlignment->CalcOverflowAbove(*iter);
                 int minSpaceBetween = 0;
-                if ((bboxBelow->Is(ARTIC) && ((*iter)->Is({ ARTIC, NOTE })))
+                if ((bboxBelow->Is(ARTIC) && ((*iter)->IsAnyOf(std::array{ ARTIC, NOTE })))
                     || (bboxBelow->Is(NOTE) && ((*iter)->Is(ARTIC)))) {
                     minSpaceBetween = drawingUnit;
                 }

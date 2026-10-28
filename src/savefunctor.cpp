@@ -9,10 +9,13 @@
 
 //----------------------------------------------------------------------------
 
+#include "accid.h"
 #include "editorial.h"
 #include "iobase.h"
 #include "mdiv.h"
 #include "mnum.h"
+#include "mrest.h"
+#include "rest.h"
 #include "runningelement.h"
 #include "text.h"
 
@@ -29,6 +32,22 @@ SaveFunctor::SaveFunctor(Output *output) : Functor()
     assert(output);
 
     m_output = output;
+}
+
+FunctorCode SaveFunctor::VisitAccid(Accid *accid)
+{
+    // Ignore accid within accid added for showHidden
+    if (accid->GetParent() && accid->GetParent()->Is(ACCID)) return FUNCTOR_CONTINUE;
+
+    return this->VisitLayerElement(accid);
+}
+
+FunctorCode SaveFunctor::VisitAccidEnd(Accid *accid)
+{
+    // Ignore accid within accid added for showHidden
+    if (accid->GetParent() && accid->GetParent()->Is(ACCID)) return FUNCTOR_CONTINUE;
+
+    return this->VisitLayerElementEnd(accid);
 }
 
 FunctorCode SaveFunctor::VisitDots(Dots *dots)
@@ -110,6 +129,22 @@ FunctorCode SaveFunctor::VisitMNumEnd(MNum *mNum)
     return this->VisitObjectEnd(mNum);
 }
 
+FunctorCode SaveFunctor::VisitMRest(MRest *mRest)
+{
+    // Ignore mRest within mSpace added for showHidden
+    if (mRest->GetParent() && mRest->GetParent()->Is(MSPACE)) return FUNCTOR_CONTINUE;
+
+    return this->VisitLayerElement(mRest);
+}
+
+FunctorCode SaveFunctor::VisitMRestEnd(MRest *mRest)
+{
+    // Ignore mRest within mSpace added for showHidden
+    if (mRest->GetParent() && mRest->GetParent()->Is(MSPACE)) return FUNCTOR_CONTINUE;
+
+    return this->VisitLayerElementEnd(mRest);
+}
+
 FunctorCode SaveFunctor::VisitObject(Object *object)
 {
     if (!m_output->WriteObject(object)) {
@@ -140,6 +175,22 @@ FunctorCode SaveFunctor::VisitRunningElementEnd(RunningElement *runningElement)
     if (m_output->Skip(runningElement)) return FUNCTOR_SIBLINGS;
 
     return this->VisitTextLayoutElementEnd(runningElement);
+}
+
+FunctorCode SaveFunctor::VisitRest(Rest *rest)
+{
+    // Ignore rest within space added for showHidden
+    if (rest->GetParent() && rest->GetParent()->Is(SPACE)) return FUNCTOR_CONTINUE;
+
+    return this->VisitLayerElement(rest);
+}
+
+FunctorCode SaveFunctor::VisitRestEnd(Rest *rest)
+{
+    // Ignore rest within space added for showHidden
+    if (rest->GetParent() && rest->GetParent()->Is(SPACE)) return FUNCTOR_CONTINUE;
+
+    return this->VisitLayerElementEnd(rest);
 }
 
 FunctorCode SaveFunctor::VisitText(Text *text)

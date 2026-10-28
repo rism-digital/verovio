@@ -16,6 +16,7 @@
 #include "doc.h"
 #include "functor.h"
 #include "smufl.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -77,22 +78,16 @@ char32_t Custos::GetCustosGlyph(const data_NOTATIONTYPE notationtype) const
     // If there is glyph.num, prioritize it
     if (this->HasGlyphNum()) {
         char32_t code = this->GetGlyphNum();
-        if (NULL != resources->GetGlyph(code)) return code;
+        if (resources->GetGlyph(code)) return code;
     }
     // If there is glyph.name (second priority)
     else if (this->HasGlyphName()) {
         char32_t code = resources->GetGlyphCode(this->GetGlyphName());
-        if (NULL != resources->GetGlyph(code)) return code;
+        if (resources->GetGlyph(code)) return code;
     }
 
-    switch (notationtype) {
-        case NOTATIONTYPE_neume:
-            return SMUFL_EA06_chantCustosStemUpPosMiddle; // chantCustosStemUpPosMiddle
-            break;
-        default:
-            return SMUFL_EA02_mensuralCustosUp; // mensuralCustosUp
-            break;
-    }
+    if (IsNeumeType(notationtype)) return SMUFL_EA06_chantCustosStemUpPosMiddle; // chantCustosStemUpPosMiddle
+    return SMUFL_EA02_mensuralCustosUp; // mensuralCustosUp
 }
 
 //----------------------------------------------------------------------------

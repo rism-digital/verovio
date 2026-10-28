@@ -129,7 +129,7 @@ public:
     FunctorCode VisitPageEnd(Page *page) override;
     FunctorCode VisitPageElement(PageElement *pageElement) override;
     FunctorCode VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd) override;
-    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart) override;
     FunctorCode VisitSystem(System *system) override;
     ///@}
 
@@ -160,7 +160,7 @@ private:
     int m_pgFoot2Height;
     // The leftover system (last system with only one measure)
     System *m_leftoverSystem;
-    // The pending elements (Mdiv, Score) to be placed at the beginning of a page
+    // The pending elements (Mdiv, ScoreOrPart) to be placed at the beginning of a page
     ArrayOfObjects m_pendingPageElements;
 };
 
@@ -257,7 +257,7 @@ public:
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitPageElement(PageElement *pageElement) override;
     FunctorCode VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd) override;
-    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart) override;
     FunctorCode VisitSystem(System *system) override;
     ///@}
 

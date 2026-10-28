@@ -211,7 +211,7 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
         }
 
         // Skip rests and tabGrp
-        if (current->Is({ CHORD, NOTE })) {
+        if (current->IsAnyOf(std::array{ CHORD, NOTE })) {
             // Look at the stemDir to see if we have multiple stem Dir
             if (!m_hasMultipleStemDir) {
                 // At this stage, BeamCoord::m_stem is not necessary set, so we need to look at the Note / Chord
@@ -230,7 +230,7 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
             }
         }
         // Skip rests
-        if (current->Is({ CHORD, NOTE, TABGRP })) {
+        if (current->IsAnyOf(std::array{ CHORD, NOTE, TABGRP })) {
             // keep the shortest dur in the beam
             m_shortestDur = std::max(currentDur, m_shortestDur);
         }

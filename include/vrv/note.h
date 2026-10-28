@@ -81,6 +81,11 @@ public:
     ///@}
 
     /**
+     * Overriding CloneReset() method to be called after copy / assignment calls.
+     */
+    void CloneReset() override;
+
+    /**
      * @name Getter to interfaces
      */
     ///@{
@@ -261,6 +266,11 @@ public:
      * This is different than with chords. It means the the X position is actually corrected when drawing the note.
      */
     void CalcNoteHeadShiftForSameasNote(Note *stemSameas, data_STEMDIRECTION stemDir);
+
+    /**
+     * Flag indicator if or Cursor instance.
+     */
+    virtual bool IsCursor() const { return false; }
 
 public:
     //----------------//

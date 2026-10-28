@@ -502,7 +502,7 @@ void FloatingPositioner::CalcDrawingYRel(
                 assert(turn);
                 yRel += turn->GetTurnHeight(doc, staffSize) / 2;
             }
-            else if (!m_object->Is({ CPMARK, DIR, HAIRPIN })) {
+            else if (!m_object->IsAnyOf(std::array{ CPMARK, DIR, HAIRPIN })) {
                 yRel += (this->GetContentY2() - this->GetContentY1()) / 2;
             }
             this->SetDrawingYRel(yRel);
@@ -528,7 +528,7 @@ void FloatingPositioner::CalcDrawingYRel(
 
         if (!hasRefinedContentBoundary) {
             // Employ special collision detection for beams and slurs/ties
-            if (curve && curve->m_object->Is({ LV, PHRASE, SLUR, TIE })) {
+            if (curve && curve->m_object->IsAnyOf(std::array{ LV, PHRASE, SLUR, TIE })) {
                 const int shift = this->Intersects(curve, CONTENT, margin);
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
@@ -574,7 +574,7 @@ void FloatingPositioner::CalcDrawingYRel(
 
 void FloatingPositioner::AdjustExtenders()
 {
-    const bool isExtender = m_object->Is({ DIR, DYNAM, TEMPO }) && m_object->IsExtenderElement();
+    const bool isExtender = m_object->IsAnyOf(std::array{ DIR, DYNAM, TEMPO }) && m_object->IsExtenderElement();
     if (!isExtender) return;
 
     m_object->SetMaxDrawingYRel(this->GetDrawingYRel(), m_place);
@@ -737,7 +737,7 @@ void FloatingCurvePositioner::MoveBackVertical(int distance)
 int FloatingCurvePositioner::CalcMinMaxY(const Point points[4]) const
 {
     assert(this->GetObject());
-    assert(this->GetObject()->Is({ LV, PHRASE, SLUR, TIE }));
+    assert(this->GetObject()->IsAnyOf(std::array{ LV, PHRASE, SLUR, TIE }));
     assert(m_dir != curvature_CURVEDIR_NONE);
 
     if (m_cachedMinMaxY != VRV_UNSET) return m_cachedMinMaxY;
@@ -833,7 +833,7 @@ std::pair<int, int> FloatingCurvePositioner::CalcDirectionalLeftRightAdjustment(
 
         // For selected types use the cut out boundary
         int boxTopY = boundingBox->GetTopBy(type);
-        if (this->GetObject()->Is({ PHRASE, SLUR }) && boundingBox->Is(ACCID)) {
+        if (this->GetObject()->IsAnyOf(std::array{ PHRASE, SLUR }) && boundingBox->Is(ACCID)) {
             const Resources *resources = vrv_cast<const Object *>(boundingBox)->GetDocResources();
             if (resources) {
                 boxTopY = boundingBox->GetCutOutTop(*resources);
@@ -870,7 +870,7 @@ std::pair<int, int> FloatingCurvePositioner::CalcDirectionalLeftRightAdjustment(
 
         // For selected types use the cut out boundary
         int boxBottomY = boundingBox->GetBottomBy(type);
-        if (this->GetObject()->Is({ PHRASE, SLUR }) && boundingBox->Is(ACCID)) {
+        if (this->GetObject()->IsAnyOf(std::array{ PHRASE, SLUR }) && boundingBox->Is(ACCID)) {
             const Resources *resources = vrv_cast<const Object *>(boundingBox)->GetDocResources();
             if (resources) {
                 boxBottomY = boundingBox->GetCutOutBottom(*resources);

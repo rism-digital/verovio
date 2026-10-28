@@ -61,7 +61,7 @@
 #include "pgfoot.h"
 #include "pghead.h"
 #include "resetfunctor.h"
-#include "score.h"
+#include "scoreorpartelement.h"
 #include "staff.h"
 #include "system.h"
 #include "view.h"
@@ -470,7 +470,7 @@ void Page::LayOutHorizontally()
     InitProcessingListsFunctor initProcessingLists;
     this->Process(initProcessingLists);
 
-    this->AdjustSylSpacingByVerse(initProcessingLists.GetVerseTree(), doc);
+    this->AdjustSylSpacingByVerse(initProcessingLists.GetVerseTree(), initProcessingLists.GetLyricGroupPlaces(), doc);
 
     AdjustHarmGrpsSpacingFunctor adjustHarmGrpsSpacing(doc);
     this->Process(adjustHarmGrpsSpacing);
@@ -753,27 +753,52 @@ int Page::GetContentWidth() const
     return maxWidth;
 }
 
-void Page::AdjustSylSpacingByVerse(const IntTree &verseTree, Doc *doc)
+void Page::AdjustSylSpacingByVerse(
+    const IntTree &verseTree, const std::set<std::tuple<int, int, data_STAFFREL>> &lyricGroupPlaces, Doc *doc)
 {
-    IntTree_t::const_iterator staves;
-    IntTree_t::const_iterator layers;
-    IntTree_t::const_iterator verses;
-
     if (verseTree.child.empty()) return;
+
+    // The previous staff @n of each staff @n in drawing order
+    std::map<int, int> previousStaffNs;
+    if (doc->GetFirstScoreDef()) {
+        const std::vector<int> staffNs = doc->GetFirstScoreDef()->GetStaffNs();
+        for (int i = 1; i < (int)staffNs.size(); ++i) previousStaffNs[staffNs.at(i)] = staffNs.at(i - 1);
+    }
+
+    // Collect the staves, lyric-element groups and volta tracks of each lyric line (staff @n and placement)
+    std::map<std::pair<int, data_STAFFREL>, std::vector<int>> lineStaffNs;
+    std::map<std::pair<int, data_STAFFREL>, std::map<int, std::set<int>>> lineGroups;
+    for (const auto &[staffN, staffTree] : verseTree.child) {
+        for (data_STAFFREL place : { STAFFREL_below, STAFFREL_above }) {
+            const std::pair<int, data_STAFFREL> lyricLine
+                = AdjustSylSpacingFunctor::GetLyricLine(staffN, place, previousStaffNs);
+            for (const IntTree_t::value_type &layer : staffTree.child) {
+                for (const auto &[groupN, groupTree] : layer.second.child) {
+                    if (!lyricGroupPlaces.count({ staffN, groupN, place })) continue;
+                    std::set<int> &voltaTracks = lineGroups[lyricLine][groupN];
+                    for (const IntTree_t::value_type &voltaTrack : groupTree.child) {
+                        voltaTracks.insert(voltaTrack.first);
+                    }
+                    std::vector<int> &staffNs = lineStaffNs[lyricLine];
+                    if (std::find(staffNs.begin(), staffNs.end(), staffN) == staffNs.end()) staffNs.push_back(staffN);
+                }
+            }
+        }
+    }
 
     Filters filters;
 
     // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
-    for (staves = verseTree.child.begin(); staves != verseTree.child.end(); ++staves) {
-        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
-            for (verses = layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
-                // Create ad comparison object for each type / @n
-                AttNIntegerComparison matchStaff(STAFF, staves->first);
-                AttNIntegerComparison matchLayer(LAYER, layers->first);
-                AttNIntegerComparison matchVerse(VERSE, verses->first);
-                filters = { &matchStaff, &matchLayer, &matchVerse };
+    for (const auto &[lyricLine, groups] : lineGroups) {
+        AttNIntegerAnyComparison matchStaff(STAFF, lineStaffNs.at(lyricLine));
+        for (const auto &[groupN, voltaTracks] : groups) {
+            for (int voltaTrack : voltaTracks) {
+                // Create comparisons for the internal lyric-element group.
+                LyricElementComparison matchVerse(VERSE, groupN);
+                LyricElementComparison matchRefrain(REFRAIN, groupN);
+                filters = { &matchStaff, &matchVerse, &matchRefrain };
 
-                AdjustSylSpacingFunctor adjustSylSpacing(doc);
+                AdjustSylSpacingFunctor adjustSylSpacing(doc, voltaTrack, lyricLine, previousStaffNs);
                 adjustSylSpacing.SetFilters(&filters);
                 this->Process(adjustSylSpacing);
             }

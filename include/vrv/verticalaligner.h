@@ -12,8 +12,10 @@
 
 namespace vrv {
 
+class Alignment;
 class AttSpacing;
 class FloatingObject;
+class LyricElement;
 class ScoreDef;
 class StaffAlignment;
 class StaffDef;
@@ -78,6 +80,12 @@ public:
      * if some staffAlignment pointers are missing for a corresponding staffN
      */
     void ReorderBy(const std::vector<int> &staffNs);
+
+    /**
+     * Merge the verses above a staff into the verses below the previous staff when both have lyrics.
+     * Lyric lines with the same \@n then share the same vertical position between the two staves.
+     */
+    void ShareLyricLines();
 
     /**
      * Get the StaffAlignment for the staffN.
@@ -195,12 +203,22 @@ public:
      * The position is calculated from the bottom.
      */
     ///@{
-    void AddVerseN(int verseN, data_STAFFREL place);
+    void AddLyricElement(const LyricElement *lyricElement);
+    void AddVerseN(int verseN, data_STAFFREL place, int lineCount = 1);
     int GetVerseCount(bool collapse) const;
     int GetVerseCountAbove(bool collapse) const;
     int GetVerseCountBelow(bool collapse) const;
-    int GetVersePositionAbove(int verseN, bool collapse) const;
-    int GetVersePositionBelow(int verseN, bool collapse) const;
+    int GetVersePositionAbove(int verseN, bool collapse, int lineN = 1) const;
+    int GetVersePositionBelow(int verseN, bool collapse, int lineN = 1) const;
+    ///@}
+
+    /**
+     * @name Sharing of the verses above this staff with the lyric lines below the previous staff
+     * Not shared when the two staves have simultaneous syllables. The previous staff alignment can be NULL.
+     */
+    ///@{
+    void ShareLyricsWithPrevious(StaffAlignment *previous);
+    const StaffAlignment *GetSharedLyricsAlignment() const { return m_sharedLyricsAlignment; }
     ///@}
 
     /**
@@ -407,8 +425,17 @@ private:
     /**
      * Stores the verse@n of the staves attached to the aligner (above and below)
      */
-    std::set<int> m_verseAboveNs;
-    std::set<int> m_verseBelowNs;
+    std::map<int, int> m_verseAboveNs;
+    std::map<int, int> m_verseBelowNs;
+    /**
+     * Stores the verse@n and the horizontal alignment of the lyric elements (above and below)
+     */
+    std::vector<std::pair<int, const Alignment *>> m_lyricPositionsAbove;
+    std::vector<std::pair<int, const Alignment *>> m_lyricPositionsBelow;
+    /**
+     * The previous staff alignment holding the verses above this staff (if shared)
+     */
+    const StaffAlignment *m_sharedLyricsAlignment;
 
     /**
      * @name values for storing the overflow and overlap

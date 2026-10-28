@@ -2804,7 +2804,12 @@
         <valItem ident="neume">
           <desc xml:lang="en">Neumatic notation.</desc>
         </valItem>
-        
+        <valItem ident="neume.square">
+          <desc xml:lang="en">Square neumatic notation.</desc>
+        </valItem>
+        <valItem ident="neume.hufnagel">
+          <desc xml:lang="en">Hufnagel neumatic notation.</desc>
+        </valItem>
         <valItem ident="tab">
           <desc xml:lang="en">Tablature notation.</desc>
         </valItem>

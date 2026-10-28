@@ -265,12 +265,12 @@ char32_t Rest::GetRestGlyph(const data_DURATION duration) const
     // If there is glyph.num, prioritize it
     if (this->HasGlyphNum()) {
         char32_t code = this->GetGlyphNum();
-        if (NULL != resources->GetGlyph(code)) return code;
+        if (resources->GetGlyph(code)) return code;
     }
     // If there is glyph.name (second priority)
     else if (this->HasGlyphName()) {
         char32_t code = resources->GetGlyphCode(this->GetGlyphName());
-        if (NULL != resources->GetGlyph(code)) return code;
+        if (resources->GetGlyph(code)) return code;
     }
     // If there is @altsym (third priority)
     else if (this->HasAltsym() && this->HasAltSymbolDef()) {
@@ -280,12 +280,12 @@ char32_t Rest::GetRestGlyph(const data_DURATION duration) const
             // If there is @glyph.num, return glyph based on it (fourth priority)
             if (symbol->HasGlyphNum()) {
                 const char32_t code = symbol->GetGlyphNum();
-                if (NULL != resources->GetGlyph(code)) return code;
+                if (resources->GetGlyph(code)) return code;
             }
             // If there is @glyph.name (fifth priority)
             else if (symbol->HasGlyphName()) {
                 const char32_t code = resources->GetGlyphCode(symbol->GetGlyphName());
-                if (NULL != resources->GetGlyph(code)) return code;
+                if (resources->GetGlyph(code)) return code;
             }
         }
     }
@@ -542,7 +542,7 @@ int Rest::GetFirstRelativeElementLocation(
     (*layerIter)->Process(getRelativeLayerElement);
 
     const Object *lastLayerElement = getRelativeLayerElement.GetRelativeElement();
-    if (lastLayerElement && lastLayerElement->Is({ NOTE, CHORD, FTREM })) {
+    if (lastLayerElement && lastLayerElement->IsAnyOf(std::array{ NOTE, CHORD, FTREM })) {
         return this->GetElementLocation(lastLayerElement, vrv_cast<const Layer *>(*layerIter), !isTopLayer).first;
     }
 

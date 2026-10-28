@@ -43,7 +43,7 @@ FunctorCode AdjustDotsFunctor::VisitAlignmentEnd(Alignment *alignment)
             for (LayerElement *element : m_elements) {
                 if (dots->HorizontalSelfOverlap(element, thirdUnit)
                     && dots->VerticalSelfOverlap(element, 2 * thirdUnit)) {
-                    if (element->Is({ CHORD, NOTE })) {
+                    if (element->IsAnyOf(std::array{ CHORD, NOTE })) {
                         if (dynamic_cast<AttAugmentDots *>(element)->GetDots() < 1) continue;
                         overlapElements.emplace(dots, element);
                     }

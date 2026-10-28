@@ -67,8 +67,8 @@ void Tuplet::Reset()
 
 bool Tuplet::IsSupportedChild(ClassId classId)
 {
-    static const std::vector<ClassId> supported{ BEAM, TUPLET_BRACKET, BTREM, CHORD, CLEF, FTREM, NOTE, TUPLET_NUM,
-        REST, SPACE, TABGRP, TUPLET };
+    static const std::vector<ClassId> supported{ BEAM, TUPLET_BRACKET, BTREM, CHORD, CLEF, FTREM, GRACEGRP, NOTE,
+        TUPLET_NUM, REST, SPACE, TABGRP, TUPLET };
 
     if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
         return true;
@@ -94,7 +94,7 @@ bool Tuplet::AddChild(Object *child)
 
     // Num and bracket are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
-    if (child->Is({ TUPLET_BRACKET, TUPLET_NUM })) {
+    if (child->IsAnyOf(std::array{ TUPLET_BRACKET, TUPLET_NUM })) {
         children.insert(children.begin(), child);
     }
     else {

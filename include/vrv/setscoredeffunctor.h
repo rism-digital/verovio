@@ -26,7 +26,7 @@ public:
      */
     ///@{
     ReplaceDrawingValuesInStaffDefFunctor(const Clef *clef, const KeySig *keySig, const Mensur *mensur,
-        const MeterSig *meterSig, const MeterSigGrp *meterSigGrp, const ScoreDef *newScoreDef, int &redrawFlags);
+        const MeterSig *meterSig, const MeterSigGrp *meterSigGrp);
     virtual ~ReplaceDrawingValuesInStaffDefFunctor() = default;
     ///@}
 
@@ -59,10 +59,6 @@ private:
     const MeterSig *m_meterSig;
     // The meter signature group (NULL if none)
     const MeterSigGrp *m_meterSigGrp;
-    // The newScoreDef for accessing values in each new staffDef
-    const ScoreDef *m_newScoreDef;
-    // The redraw flags
-    int *m_redrawFlags;
 };
 
 //----------------------------------------------------------------------------
@@ -92,7 +88,7 @@ public:
      */
     ///@{
     FunctorCode VisitPageEnd(Page *page) override;
-    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart) override;
     ///@}
 
 protected:
@@ -103,7 +99,7 @@ public:
     //
 private:
     // The list of all scores
-    std::list<Score *> m_scores;
+    std::list<ScoreOrPartElement *> m_scores;
 };
 
 //----------------------------------------------------------------------------
@@ -147,8 +143,9 @@ public:
     FunctorCode VisitOssia(Ossia *ossia) override;
     FunctorCode VisitPage(Page *page) override;
     FunctorCode VisitProport(Proport *proport) override;
-    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart) override;
     FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
+    FunctorCode VisitScoreDefEnd(ScoreDef *scoreDef) override;
     FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitStaffDef(StaffDef *staffDef) override;
     FunctorCode VisitStaffGrp(StaffGrp *staffGrp) override;
@@ -164,7 +161,7 @@ public:
     //
 private:
     // The current score
-    Score *m_currentScore;
+    ScoreOrPartElement *m_currentScore;
     // The current scoreDef
     ScoreDef *m_currentScoreDef;
     // The current staffDef
@@ -217,7 +214,7 @@ public:
      */
     ///@{
     FunctorCode VisitMeasure(Measure *measure) override;
-    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart) override;
     FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitStaffGrpEnd(StaffGrp *staffGrp) override;
     FunctorCode VisitSystem(System *system) override;
@@ -256,9 +253,15 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    SetCautionaryScoreDefFunctor(ScoreDef *currentScoreDef);
+    SetCautionaryScoreDefFunctor(ScoreDef *currentScoreDef, bool restart = false);
     virtual ~SetCautionaryScoreDefFunctor() = default;
     ///@}
+
+    /**
+     * Set the list of staffNs in the scoreDef after the restart.
+     * Used only when restart flag is true.
+     */
+    void SetRestartStaffNs(const std::vector<int> &staffNs) { m_staffNs = staffNs; }
 
     /*
      * Abstract base implementation
@@ -284,6 +287,10 @@ private:
     ScoreDef *m_currentScoreDef;
     // The current staffDef
     StaffDef *m_currentStaffDef;
+    // Flag indicating we are processing a restart
+    bool m_restart;
+    // The list of staff n after the restart
+    std::vector<int> m_staffNs;
 };
 
 //----------------------------------------------------------------------------

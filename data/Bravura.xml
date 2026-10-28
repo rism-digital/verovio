@@ -464,6 +464,38 @@
     <a n="cutOutSE" x="1.05" y="-0.62" />
     <a n="cutOutSW" x="0.26" y="-0.96" />
   </g>
+  <g c="E450" x="0.0" y="-348.0" w="395.0" h="867.0" h-a-x="384" n="accidental1CommaSharp">
+    <a n="cutOutNW" x="0.9" y="1.51" />
+    <a n="cutOutSE" x="1.09" y="0.89" />
+    <a n="cutOutSW" x="0.11" y="-0.93" />
+  </g>
+  <g c="E451" x="0.0" y="-348.0" w="475.0" h="865.0" h-a-x="453" n="accidental2CommaSharp">
+    <a n="cutOutNW" x="0.91" y="1.52" />
+    <a n="cutOutSE" x="1.11" y="0.85" />
+    <a n="cutOutSW" x="0.1" y="-0.93" />
+  </g>
+  <g c="E452" x="0.0" y="-348.0" w="457.0" h="859.0" h-a-x="434" n="accidental3CommaSharp">
+    <a n="cutOutNW" x="0.89" y="1.52" />
+    <a n="cutOutSE" x="1.11" y="0.86" />
+    <a n="cutOutSW" x="0.11" y="-0.96" />
+  </g>
+  <g c="E453" x="0.0" y="-348.0" w="457.0" h="858.0" h-a-x="447" n="accidental5CommaSharp">
+    <a n="cutOutNW" x="0.9" y="1.5" />
+    <a n="cutOutSE" x="1.13" y="0.85" />
+    <a n="cutOutSW" x="0.11" y="-0.94" />
+  </g>
+  <g c="E454" x="0.0" y="-175.0" w="269.0" h="669.0" h-a-x="252" n="accidental1CommaFlat">
+    <a n="cutOutSE" x="0.71" y="-0.38" />
+  </g>
+  <g c="E455" x="0.0" y="-175.0" w="342.0" h="661.0" h-a-x="321" n="accidental2CommaFlat">
+    <a n="cutOutSE" x="1.0" y="0.77" />
+  </g>
+  <g c="E456" x="0.0" y="-175.0" w="319.0" h="653.0" h-a-x="302" n="accidental3CommaFlat">
+    <a n="cutOutSE" x="0.99" y="0.74" />
+  </g>
+  <g c="E457" x="0.0" y="-175.0" w="342.0" h="667.0" h-a-x="321" n="accidental4CommaFlat">
+    <a n="cutOutSE" x="1.01" y="0.8" />
+  </g>
   <g c="E460" x="0.0" y="-472.0" w="300.0" h="629.0" h-a-x="302" n="accidentalKoron">
     <a n="cutOutSE" x="0.26" y="-0.67" />
   </g>

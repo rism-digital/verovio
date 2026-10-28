@@ -40,7 +40,10 @@ public:
     virtual ~BoundingBox() {}
     virtual ClassId GetClassId() const = 0;
     bool Is(ClassId classId) const { return (this->GetClassId() == classId); }
-    bool Is(const std::vector<ClassId> &classIds) const;
+    template <typename Range> bool IsAnyOf(const Range &classIds) const
+    {
+        return std::find(std::begin(classIds), std::end(classIds), GetClassId()) != std::end(classIds);
+    }
     ///@}
 
     /**

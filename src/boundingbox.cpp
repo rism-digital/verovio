@@ -42,11 +42,6 @@ BoundingBox::BoundingBox()
     this->ResetBoundingBox();
 }
 
-bool BoundingBox::Is(const std::vector<ClassId> &classIds) const
-{
-    return (std::find(classIds.begin(), classIds.end(), this->GetClassId()) != classIds.end());
-}
-
 void BoundingBox::UpdateContentBBoxX(int x1, int x2)
 {
     // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
@@ -634,7 +629,7 @@ int BoundingBox::Intersects(const FloatingCurvePositioner *curve, Accessor type,
 {
     assert(curve);
     assert(curve->GetObject());
-    assert(curve->GetObject()->Is({ LV, PHRASE, SLUR, TIE }));
+    assert(curve->GetObject()->IsAnyOf(std::array{ LV, PHRASE, SLUR, TIE }));
 
     // for readability
     Point points[4];

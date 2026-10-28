@@ -45,9 +45,8 @@ build_dev=$1
 if [ ! -z $build_dev ]; then
     cd $devdir
     git pull
-    cd bindings
-    cmake ../cmake -B python -DBUILD_AS_PYTHON=ON -DNO_HUMDRUM_SUPPORT=ON -DVRV_DYNAMIC_CAST=ON
-    cd python
+    cd bindings/python
+    cmake ../../cmake  -DBUILD_AS_PYTHON=ON -DNO_HUMDRUM_SUPPORT=ON -DVRV_DYNAMIC_CAST=ON
     make -j8
 
     $PYTHON ../../doc/test-suite.py "$testdir" "$indir1"
@@ -56,9 +55,8 @@ if [ ! -z $build_dev ]; then
     cd $home
 fi
 
-cd ../bindings
-cmake ../cmake -B python -DBUILD_AS_PYTHON=ON -DNO_HUMDRUM_SUPPORT=ON -DVRV_DYNAMIC_CAST=ON
-cd python
+cd ../bindings/python
+cmake ../../cmake -DBUILD_AS_PYTHON=ON -DNO_HUMDRUM_SUPPORT=ON -DVRV_DYNAMIC_CAST=ON
 make -j8
 
 $PYTHON ../../doc/test-suite.py "$testdir" "$indir2" --shortlist "$shortlist"

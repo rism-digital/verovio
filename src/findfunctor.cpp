@@ -13,9 +13,11 @@
 #include "layer.h"
 #include "object.h"
 #include "plistinterface.h"
-#include "score.h"
+#include "scoredef.h"
+#include "scoreorpartelement.h"
 #include "surface.h"
 #include "symboldef.h"
+#include "system.h"
 #include "zone.h"
 
 namespace vrv {
@@ -439,19 +441,36 @@ FunctorCode FindElementInLayerStaffDefFunctor::VisitLayer(const Layer *layer)
     else if (layer->GetStaffDefMeterSigGrp() && (layer->GetStaffDefMeterSigGrp()->GetID() == m_id)) {
         m_element = layer->GetStaffDefMeterSigGrp();
     }
+    // The KeyAccid children are generated from the @sig attribute and are not matched above - look for them within
+    // the KeySig
+    if (!m_element && layer->GetStaffDefKeySig()) {
+        m_element = layer->GetStaffDefKeySig()->FindDescendantByID(m_id);
+    }
 
     return m_element ? FUNCTOR_STOP : FUNCTOR_SIBLINGS;
 }
 
-FunctorCode FindElementInLayerStaffDefFunctor::VisitScore(const Score *score)
+FunctorCode FindElementInLayerStaffDefFunctor::VisitScoreOrPartElement(const ScoreOrPartElement *scoreOrPart)
 {
-    assert(score->GetScoreDef());
+    assert(scoreOrPart->GetScoreDef());
 
-    if (score->GetScoreDef()->GetID() == m_id) {
-        m_element = score->GetScoreDef();
+    if (scoreOrPart->GetScoreDef()->GetID() == m_id) {
+        m_element = scoreOrPart->GetScoreDef();
     }
     else {
-        m_element = score->GetScoreDef()->FindDescendantByID(m_id);
+        m_element = scoreOrPart->GetScoreDef()->FindDescendantByID(m_id);
+    }
+
+    return (m_element) ? FUNCTOR_STOP : FUNCTOR_CONTINUE;
+}
+
+FunctorCode FindElementInLayerStaffDefFunctor::VisitSystem(const System *system)
+{
+    // The GrpSym drawn at the beginning of a system (as well as the running Clef, KeySig, etc.) is a generated element
+    // living in the drawing ScoreDef of the system, which is not part of the main document tree
+    const ScoreDef *drawingScoreDef = system->GetDrawingScoreDef();
+    if (drawingScoreDef) {
+        m_element = drawingScoreDef->FindDescendantByID(m_id);
     }
 
     return (m_element) ? FUNCTOR_STOP : FUNCTOR_CONTINUE;

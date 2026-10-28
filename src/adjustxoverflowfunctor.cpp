@@ -32,7 +32,7 @@ AdjustXOverflowFunctor::AdjustXOverflowFunctor(int margin) : Functor()
 
 FunctorCode AdjustXOverflowFunctor::VisitControlElement(ControlElement *controlElement)
 {
-    if (!controlElement->Is({ CPMARK, DIR, DYNAM, ORNAM, REPEATMARK, TEMPO })) {
+    if (!controlElement->IsAnyOf(std::array{ CPMARK, DIR, DYNAM, ORNAM, REPEATMARK, TEMPO })) {
         return FUNCTOR_SIBLINGS;
     }
 

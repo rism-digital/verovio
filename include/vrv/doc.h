@@ -27,9 +27,9 @@ class FontInfo;
 class Glyph;
 class Pages;
 class Page;
-class Score;
+class ScoreOrPartElement;
 
-enum DocType { Raw = 0, Rendering, Transcription, Facs };
+enum DocType { Raw = 0, Rendering, FacTranscription };
 
 //----------------------------------------------------------------------------
 // Doc
@@ -130,10 +130,8 @@ public:
     ///@{
     DocType GetType() const { return m_type; }
     void SetType(DocType type);
-    bool IsFacs() const { return (m_type == Facs); }
     bool IsRaw() const { return (m_type == Raw); }
-    bool IsRendering() const { return (m_type == Rendering); }
-    bool IsTranscription() const { return (m_type == Transcription); }
+    bool IsFacTranscription() const { return (m_type == FacTranscription); }
     ///@}
 
     /**
@@ -165,24 +163,31 @@ public:
     ///@}
 
     /**
-     * Get all visible scores / the first visible score
-     * Lazily updates the visible scores, hence not const
+     * Get all visible scores or parts / the first visible score or part
+     * Lazily updates the visible scores or parts, hence not const
      */
     ///@{
-    std::list<Score *> GetVisibleScores();
-    Score *GetFirstVisibleScore();
+    std::list<ScoreOrPartElement *> GetVisibleScoresOrParts();
+    ScoreOrPartElement *GetFirstVisibleScoreOrPart();
     ///@}
 
     /**
      * Get the corresponding score for a node
      */
     ///@{
-    Score *GetCorrespondingScore(const Object *object);
-    const Score *GetCorrespondingScore(const Object *object) const;
+    ScoreOrPartElement *GetCorrespondingScoreOrPart(const Object *object);
+    const ScoreOrPartElement *GetCorrespondingScoreOrPart(const Object *object) const;
     // Generic version that does not necessarily rely on precalculated visible scores
-    Score *GetCorrespondingScore(const Object *object, const std::list<Score *> &scores);
-    const Score *GetCorrespondingScore(const Object *object, const std::list<Score *> &scores) const;
+    ScoreOrPartElement *GetCorrespondingScoreOrPart(
+        const Object *object, const std::list<ScoreOrPartElement *> &scores);
+    const ScoreOrPartElement *GetCorrespondingScoreOrPart(
+        const Object *object, const std::list<ScoreOrPartElement *> &scores) const;
     ///@}
+
+    /**
+     * Collect the IDs of all objects referring to the element or one of its descendants.
+     */
+    void CollectReferringObjects(const Object *element, std::set<std::string> &referring, SetOfConstObjects &visited);
 
     /**
      * Return true if the MIDI generation is already done
@@ -518,6 +523,15 @@ public:
     bool IsCastOff() const { return m_isCastOff; }
 
     /**
+     * Set the cast off flags (i.e., when loading page-based MEI).
+     */
+    void MarkAsCastOff()
+    {
+        m_isCastOff = true;
+        m_mensuralCastOff = this->IsMensuralMusicOnly();
+    }
+
+    /**
      * @name Methods for managing a selection.
      */
     ///@{
@@ -571,7 +585,7 @@ private:
     /**
      * Determine all visible scores
      */
-    void CollectVisibleScores();
+    void CollectVisibleScoresOrParts();
 
     /**
      * Reset the document focus
@@ -658,9 +672,9 @@ private:
 
     /**
      * The list of all visible scores
-     * Used in Doc::GetCorrespondingScore to quickly determine the score for an object
+     * Used in Doc::GetCorrespondingScoreOrPart to quickly determine the score for an object
      */
-    std::list<Score *> m_visibleScores;
+    std::list<ScoreOrPartElement *> m_visibleScoresOrParts;
 
     /**
      * A flag indicating if the document has been cast off or not.

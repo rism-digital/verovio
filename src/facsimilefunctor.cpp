@@ -43,13 +43,14 @@ SyncFromFacsimileFunctor::SyncFromFacsimileFunctor(Doc *doc) : Functor()
 
 FunctorCode SyncFromFacsimileFunctor::VisitLayerElement(LayerElement *layerElement)
 {
-    if (!layerElement->Is({ ACCID, BARLINE, CHORD, CLEF, CUSTOS, DIVLINE, DOT, LIQUESCENT, NC, NOTE, REST, SYL }))
+    if (!layerElement->IsAnyOf(
+            std::array{ ACCID, BARLINE, CHORD, CLEF, CUSTOS, DIVLINE, DOT, LIQUESCENT, NC, NOTE, REST, SYL }))
         return FUNCTOR_CONTINUE;
 
     Zone *zone = layerElement->GetZone();
     assert(zone);
     layerElement->m_drawingFacsX = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR - m_pageMarginLeft);
-    if (m_currentNeumeLine && layerElement->Is({ ACCID, SYL })) {
+    if (m_currentNeumeLine && layerElement->IsAnyOf(std::array{ ACCID, SYL })) {
         layerElement->m_drawingFacsY = m_view.ToLogicalY(zone->GetUly() * DEFINITION_FACTOR - m_pageMarginTop);
     }
 
@@ -221,12 +222,13 @@ SyncToFacsimileFunctor::SyncToFacsimileFunctor(Doc *doc, double ppuFactor) : Fun
 
 FunctorCode SyncToFacsimileFunctor::VisitLayerElement(LayerElement *layerElement)
 {
-    if (!layerElement->Is({ ACCID, BARLINE, CHORD, CLEF, CUSTOS, DOT, DIVLINE, LIQUESCENT, NC, NOTE, REST, SYL }))
+    if (!layerElement->IsAnyOf(
+            std::array{ ACCID, BARLINE, CHORD, CLEF, CUSTOS, DOT, DIVLINE, LIQUESCENT, NC, NOTE, REST, SYL }))
         return FUNCTOR_CONTINUE;
 
     Zone *zone = this->GetZone(layerElement, layerElement->GetClassName());
     zone->SetUlx(m_view.ToDeviceContextX(layerElement->GetDrawingX()) / DEFINITION_FACTOR + m_pageMarginLeft);
-    if (m_currentNeumeLine && layerElement->Is({ ACCID, SYL })) {
+    if (m_currentNeumeLine && layerElement->IsAnyOf(std::array{ ACCID, SYL })) {
         zone->SetUly(m_view.ToDeviceContextY(layerElement->GetDrawingY()) / DEFINITION_FACTOR + m_pageMarginTop);
     }
 

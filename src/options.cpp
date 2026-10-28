@@ -1024,6 +1024,10 @@ Options::Options()
     m_condenseTempoPages.Init(false);
     this->Register(&m_condenseTempoPages, "condenseTempoPages", &m_general);
 
+    m_convertAttributes.SetInfo("Convert attributes", "Convert analytical markup and attributes to permanent elements");
+    m_convertAttributes.Init(false);
+    this->Register(&m_convertAttributes, "convertAttributes", &m_general);
+
     m_evenNoteSpacing.SetInfo("Even note spacing", "Align notes and rests without adding duration based space");
     m_evenNoteSpacing.Init(false);
     this->Register(&m_evenNoteSpacing, "evenNoteSpacing", &m_general);
@@ -1140,6 +1144,10 @@ Options::Options()
     m_setLocale.SetInfo("Set the global locale", "Changes the global locale to C (this is not thread-safe)");
     m_setLocale.Init(false);
     this->Register(&m_setLocale, "setLocale", &m_general);
+
+    m_showHidden.SetInfo("Show hidden elements", "Display <space>, <mSpace> and invisible or gestural elements");
+    m_showHidden.Init(false);
+    this->Register(&m_showHidden, "showHidden", &m_general);
 
     m_showRuntime.SetInfo("Show runtime on CLI", "Display the total runtime on command-line");
     m_showRuntime.Init(false);

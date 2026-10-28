@@ -138,25 +138,26 @@ char32_t Clef::GetClefGlyph(const data_NOTATIONTYPE notationtype) const
     // If there is glyph.num, prioritize it
     if (this->HasGlyphNum()) {
         char32_t code = this->GetGlyphNum();
-        if (NULL != resources->GetGlyph(code)) return code;
+        if (resources->GetGlyph(code)) return code;
     }
     // If there is glyph.name (second priority)
     else if (this->HasGlyphName()) {
         char32_t code = resources->GetGlyphCode(this->GetGlyphName());
-        if (NULL != resources->GetGlyph(code)) return code;
+        if (resources->GetGlyph(code)) return code;
+    }
+
+    if (IsNeumeType(notationtype)) {
+        switch (this->GetShape()) {
+            case CLEFSHAPE_F: return SMUFL_E902_chantFclef; break;
+            case CLEFSHAPE_C: return SMUFL_E906_chantCclef; break;
+            case CLEFSHAPE_G: return SMUFL_E900_mensuralGclef; break;
+            default: return SMUFL_E906_chantCclef; break;
+        }
     }
 
     switch (notationtype) {
         case NOTATIONTYPE_tab:
         case NOTATIONTYPE_tab_guitar: return SMUFL_E06D_6stringTabClef; break;
-        case NOTATIONTYPE_neume:
-            // neume clefs
-            switch (this->GetShape()) {
-                case CLEFSHAPE_F: return SMUFL_E902_chantFclef; break;
-                case CLEFSHAPE_C: return SMUFL_E906_chantCclef; break;
-                case CLEFSHAPE_G: return SMUFL_E900_mensuralGclef; break;
-                default: return SMUFL_E906_chantCclef; break;
-            }
         case NOTATIONTYPE_mensural:
         case NOTATIONTYPE_mensural_white:
             // mensural clefs
