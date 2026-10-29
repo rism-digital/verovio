@@ -87,7 +87,7 @@ bool EditorToolkit::InsertAfter(std::string &elementId, const std::string &eleme
     return true;
 }
 
-Object *EditorToolkit::GetElement(const std::string &elementId)
+Object *EditorToolkit::GetElement(const std::string &elementId, bool logError)
 {
     Object *element = NULL;
 
@@ -104,7 +104,7 @@ Object *EditorToolkit::GetElement(const std::string &elementId)
     if (!element) {
         element = m_doc->FindDescendantByID(elementId);
     }
-    if (!element) {
+    if (!element && logError) {
         LogError("Element '%s' could not be found", elementId.c_str());
     }
 

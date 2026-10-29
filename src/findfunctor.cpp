@@ -420,6 +420,7 @@ FindElementInLayerStaffDefFunctor::FindElementInLayerStaffDefFunctor(const std::
 {
     m_id = xmlId;
     m_element = NULL;
+    m_isInMainScoreDef = false;
 }
 
 FunctorCode FindElementInLayerStaffDefFunctor::VisitLayer(const Layer *layer)
@@ -460,6 +461,7 @@ FunctorCode FindElementInLayerStaffDefFunctor::VisitScore(const Score *score)
     else {
         m_element = score->GetScoreDef()->FindDescendantByID(m_id);
     }
+    if (m_element) m_isInMainScoreDef = true;
 
     return (m_element) ? FUNCTOR_STOP : FUNCTOR_CONTINUE;
 }

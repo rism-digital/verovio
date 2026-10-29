@@ -94,7 +94,9 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
 
     std::string action = json.get<jsonxx::String>("action");
 
-    if (action != "context" && action != "properties") {
+    static const std::array<const char *, 8> noSetFocus = { "context", "getScoreDef", "getScoreDefMeterSig",
+        "getScoreDefKeySig", "getScoreDefStaffDef", "getScoreDefStaffGrp", "properties", "select" };
+    if (std::find(noSetFocus.begin(), noSetFocus.end(), action) == noSetFocus.end()) {
         m_doc->SetFocus();
     }
 
@@ -1536,6 +1538,46 @@ bool EditorToolkitShared::Navigate(std::string &elementId, const int &direction)
     return true;
 }
 
+const Object *EditorToolkitShared::GetElementInScoreDef(std::string &elementId) const
+{
+    FindElementInLayerStaffDefFunctor findElementInLayerStaffDef(elementId);
+    if (m_doc->GetDrawingPage()) {
+        m_doc->GetDrawingPage()->Process(findElementInLayerStaffDef);
+    }
+    if (!findElementInLayerStaffDef.GetElement()) {
+        m_doc->Process(findElementInLayerStaffDef);
+    }
+
+    const Object *scoreDefElement = findElementInLayerStaffDef.GetElement();
+    if (!scoreDefElement) return NULL;
+
+    Score *score = m_doc->GetFirstVisibleScore();
+    const ScoreDef *mainScoreDef = score ? score->GetScoreDef() : NULL;
+    if (findElementInLayerStaffDef.IsInMainScoreDef()) {
+        elementId = MAIN_SCOREDEF;
+        return mainScoreDef;
+    }
+
+    const Object *start = scoreDefElement->GetFirstAncestor(LAYER);
+    if (!start) {
+        if (mainScoreDef) elementId = MAIN_SCOREDEF;
+        return mainScoreDef;
+    }
+
+    ClassIdComparison scoreDefComparison(SCOREDEF);
+    FindPreviousChildByComparisonFunctor findPreviousScoreDef(&scoreDefComparison, start);
+    m_doc->Process(findPreviousScoreDef);
+    const Object *scoreDef = findPreviousScoreDef.GetElement();
+
+    if (scoreDef) {
+        elementId = scoreDef->GetID();
+        return scoreDef;
+    }
+
+    if (mainScoreDef) elementId = MAIN_SCOREDEF;
+    return mainScoreDef;
+}
+
 bool EditorToolkitShared::Select(std::string &elementId, bool secondary, SelectCustom custom)
 {
     if (this->InsertMode()) return true;
@@ -1588,7 +1630,11 @@ bool EditorToolkitShared::Select(std::string &elementId, bool secondary, SelectC
     else {
         this->ResetSelect();
 
-        Object *element = this->GetElement(elementId);
+        // No log error because we would still look in staffDef
+        const Object *element = this->GetElement(elementId, false);
+        if (!element) {
+            element = this->GetElementInScoreDef(elementId);
+        }
         if (!element) return false;
 
         m_selectionId = elementId;

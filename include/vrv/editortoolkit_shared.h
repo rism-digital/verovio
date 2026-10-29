@@ -214,6 +214,7 @@ private:
         data_ACCIDENTAL_WRITTEN accid;
     };
 
+    const Object *GetElementInScoreDef(std::string &elementId) const;
     MidiSpelling SpellMidi(int midi, const data_KEYSIGNATURE &keySig);
 };
 

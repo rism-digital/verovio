@@ -516,6 +516,7 @@ public:
      * Retrieve the search result
      */
     const Object *GetElement() const { return m_element; }
+    bool IsInMainScoreDef() const { return m_isInMainScoreDef; }
 
     /*
      * Functor interface
@@ -535,6 +536,8 @@ public:
 private:
     // The search result
     const Object *m_element;
+    // Indicates that the element was found in the main scoreDef
+    bool m_isInMainScoreDef;
     // ID of the element to be found
     std::string m_id;
 };

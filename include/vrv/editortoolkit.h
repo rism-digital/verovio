@@ -68,7 +68,7 @@ protected:
     bool AppendChild(std::string &elementId, const std::string &elementName, bool unique);
     bool InsertBefore(std::string &elementId, const std::string &elementName);
     bool InsertAfter(std::string &elementId, const std::string &elementName);
-    Object *GetElement(const std::string &elementId);
+    Object *GetElement(const std::string &elementId, bool logError = true);
     Object *PrepareInsertion(Object *parent, const std::string &elementName);
     Object *ResolveElement(std::string &elementId, bool chain = true);
     bool InsertMode() const { return (m_cursor); }
