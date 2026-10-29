@@ -554,7 +554,7 @@ bool EditorToolkitCMN::InsertScoreDef(std::string &elementId, bool insertBefore)
 
     ClassIdsComparison comparison({ CLEF, LABEL, LABELABBR });
     ListOfObjects toDelete;
-    m_doc->FindAllDescendantsByComparison(&toDelete, &comparison);
+    newScoreDef->FindAllDescendantsByComparison(&toDelete, &comparison);
     for (Object *object : toDelete) {
         Object *parent = object->GetParent();
         assert(parent);
