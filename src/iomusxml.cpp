@@ -2293,7 +2293,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
 
     const pugi::xml_node typeNode = node.child("direction-type");
     const pugi::xpath_node voice = node.select_node("voice");
-    const short int offset = node.child("offset").text().as_int();
+    const int offset = node.child("offset").text().as_int();
     const pugi::xml_node staffNode = node.child("staff");
     const pugi::xml_node soundNode = node.child("sound");
 
@@ -4291,7 +4291,7 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure, Sec
     const bool inDirection = IsElement(node.parent(), "direction");
     const float bpm = node.attribute("tempo").as_float();
     if (bpm > 0 && !inDirection) {
-        const short int offset = node.child("offset").text().as_int();
+        const int offset = node.child("offset").text().as_int();
         const double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
         Tempo *tempo = new Tempo();
         tempo->SetMidiBpm(bpm);
