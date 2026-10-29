@@ -38,7 +38,7 @@
 #include "plistinterface.h"
 #include "rend.h"
 #include "rest.h"
-#include "score.h"
+#include "scoreorpartelement.h"
 #include "slur.h"
 #include "staff.h"
 #include "staffdef.h"
@@ -1551,8 +1551,8 @@ const Object *EditorToolkitShared::GetElementInScoreDef(std::string &elementId) 
     const Object *scoreDefElement = findElementInLayerStaffDef.GetElement();
     if (!scoreDefElement) return NULL;
 
-    Score *score = m_doc->GetFirstVisibleScore();
-    const ScoreDef *mainScoreDef = score ? score->GetScoreDef() : NULL;
+    ScoreOrPartElement *scoreOfPart = m_doc->GetFirstVisibleScoreOrPart();
+    const ScoreDef *mainScoreDef = scoreOfPart ? scoreOfPart->GetScoreDef() : NULL;
     if (findElementInLayerStaffDef.IsInMainScoreDef()) {
         elementId = MAIN_SCOREDEF;
         return mainScoreDef;
@@ -2021,7 +2021,7 @@ bool EditorToolkitShared::ContextForElement(std::string &elementId)
             }
         }
         // Top element in the score subtree
-        if (current->GetParent()->Is(SCORE)) break;
+        if (current->GetParent()->IsScoreOrPartElement()) break;
         current = current->GetParent();
         ancestors.push_back(current);
     }
@@ -2381,8 +2381,8 @@ bool EditorToolkitShared::SetScoreDefStaffGrp(std::string &scoreDefId, const jso
         return false;
     }
 
-    Score *score = m_doc->GetFirstVisibleScore();
-    ScoreDef *scoreDef = score ? score->GetScoreDef() : NULL;
+    ScoreOrPartElement *scoreOrPart = m_doc->GetFirstVisibleScoreOrPart();
+    ScoreDef *scoreDef = scoreOrPart ? scoreOrPart->GetScoreDef() : NULL;
     if (!scoreDef) return false;
 
     MEIInputExtended input(m_doc);

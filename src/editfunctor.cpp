@@ -18,6 +18,7 @@
 #include "measure.h"
 #include "score.h"
 #include "scoredef.h"
+#include "scoreorpartelement.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
@@ -139,11 +140,11 @@ AddStaffFunctor::~AddStaffFunctor()
     if (m_staffDef) delete m_staffDef;
 }
 
-FunctorCode AddStaffFunctor::VisitScore(Score *score)
+FunctorCode AddStaffFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     if (m_staffDef) return FUNCTOR_SIBLINGS;
 
-    ScoreDef *scoreDef = score->GetScoreDef();
+    ScoreDef *scoreDef = scoreOrPart->GetScoreDef();
     assert(scoreDef);
 
     std::vector<int> staffNs = scoreDef->GetStaffNs();
@@ -218,11 +219,11 @@ DeleteStaffFunctor::DeleteStaffFunctor(int n) : Functor()
 
 DeleteStaffFunctor::~DeleteStaffFunctor() {}
 
-FunctorCode DeleteStaffFunctor::VisitScore(Score *score)
+FunctorCode DeleteStaffFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     if (m_scoreDefProcessed) return FUNCTOR_SIBLINGS;
 
-    ScoreDef *scoreDef = score->GetScoreDef();
+    ScoreDef *scoreDef = scoreOrPart->GetScoreDef();
     assert(scoreDef);
 
     std::vector<int> staffNs = scoreDef->GetStaffNs();
@@ -292,11 +293,11 @@ MoveStaffFunctor::MoveStaffFunctor(int n, StaffMove move) : Functor()
 
 MoveStaffFunctor::~MoveStaffFunctor() {}
 
-FunctorCode MoveStaffFunctor::VisitScore(Score *score)
+FunctorCode MoveStaffFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     if (m_nTarget != VRV_UNSET) return FUNCTOR_SIBLINGS;
 
-    ScoreDef *scoreDef = score->GetScoreDef();
+    ScoreDef *scoreDef = scoreOrPart->GetScoreDef();
     assert(scoreDef);
 
     std::vector<int> staffNs = scoreDef->GetStaffNs();
@@ -527,11 +528,11 @@ FunctorCode ReorderStaffNFunctor::VisitLayerElement(LayerElement *layerElement)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ReorderStaffNFunctor::VisitScore(Score *score)
+FunctorCode ReorderStaffNFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     if (!m_mapping.empty()) return FUNCTOR_SIBLINGS;
 
-    ScoreDef *scoreDef = score->GetScoreDef();
+    ScoreDef *scoreDef = scoreOrPart->GetScoreDef();
     assert(scoreDef);
 
     std::vector<int> staffNs = scoreDef->GetStaffNs();
@@ -710,7 +711,7 @@ FunctorCode ScoreContextFunctor::VisitObject(Object *object)
     }
 
     // Do not include in the tree
-    if ((m_inScoreLevel == NOT_IN_SCORE) && !object->IsAnyOf(std::array{ MDIV, SCORE })) {
+    if ((m_inScoreLevel == NOT_IN_SCORE) && !object->IsAnyOf(std::array{ MDIV, PARTS, PART, SCORE })) {
         return FUNCTOR_CONTINUE;
     }
 
@@ -725,13 +726,13 @@ FunctorCode ScoreContextFunctor::VisitObject(Object *object)
     m_current->AddChild(treeObject);
     m_current = treeObject;
 
-    if (object->Is(SCORE)) {
-        Score *score = vrv_cast<Score *>(object);
-        assert(score);
+    if (object->IsScoreOrPartElement()) {
+        ScoreOrPartElement *scoreOrPart = vrv_cast<ScoreOrPartElement *>(object);
+        assert(scoreOrPart);
         // We are now in the score and process the scoreDef subtree
         // Include the first one in the context tree - and then own children
         m_inScoreLevel = TO_INCLUDE;
-        score->GetScoreDef()->Process(*this);
+        scoreOrPart->GetScoreDef()->Process(*this);
         m_inScoreLevel = NOT_IN_SCORE;
     }
 
@@ -750,7 +751,7 @@ FunctorCode ScoreContextFunctor::VisitObjectEnd(Object *object)
         m_current = m_current->GetParent();
     }
     // The have not been pushed, continue
-    if ((m_inScoreLevel == NOT_IN_SCORE) && !object->IsAnyOf(std::array{ MDIV, SCORE })) {
+    if ((m_inScoreLevel == NOT_IN_SCORE) && !object->IsAnyOf(std::array{ MDIV, PARTS, PART, SCORE })) {
         return FUNCTOR_CONTINUE;
     }
 

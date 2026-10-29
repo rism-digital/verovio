@@ -148,6 +148,11 @@ public:
     ///@}
 
     /**
+     * Overriding CloneReset() method to be called after copy / assignment calls.
+     */
+    void CloneReset() override;
+
+    /**
      * Check if a object is allowed as child.
      */
     bool IsSupportedChild(ClassId classId) override;
@@ -252,9 +257,11 @@ public:
      * @name Set and get the custom tuning
      */
     ///@{
-    CustomTuning &GetCustomTuning() { return m_customTuning; }
-    const CustomTuning &GetCustomTuning() const { return m_customTuning; }
-    void SetCustomTuning(const CustomTuning &customTuning) { m_customTuning = customTuning; }
+    // CustomTuning &GetCustomTuning() { return m_customTuning; }
+    void ResetCustomTuning();
+    CustomTuning *GetCustomTuning() const { return m_customTuning; }
+    bool HasCustomTuning() const { return (m_customTuning != NULL); }
+    void SetCustomTuning(CustomTuning *customTuning);
     ///@}
 
     /**
@@ -322,7 +329,7 @@ private:
     /** Store the label drawing width of the scoreDef */
     int m_drawingLabelsWidth;
     /** Custom tuning */
-    CustomTuning m_customTuning;
+    CustomTuning *m_customTuning;
 };
 
 } // namespace vrv

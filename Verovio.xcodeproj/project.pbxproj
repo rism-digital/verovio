@@ -94,6 +94,24 @@
 		4D00A28C2ED2E32700EFA853 /* offsetinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D00A2892ED2E32700EFA853 /* offsetinterface.cpp */; };
 		4D00A28D2ED2E32700EFA853 /* offsetinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D00A2892ED2E32700EFA853 /* offsetinterface.cpp */; };
 		4D09D3ED1EA8AD8500A420E6 /* horizontalaligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */; };
+		4D0C964830936AD200FB514A /* parts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C964730936AD200FB514A /* parts.cpp */; };
+		4D0C964930936AD200FB514A /* part.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C964630936AD200FB514A /* part.cpp */; };
+		4D0C964A30936AD200FB514A /* parts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C964730936AD200FB514A /* parts.cpp */; };
+		4D0C964B30936AD200FB514A /* part.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C964630936AD200FB514A /* part.cpp */; };
+		4D0C964C30936AD200FB514A /* parts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C964730936AD200FB514A /* parts.cpp */; };
+		4D0C964D30936AD200FB514A /* part.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C964630936AD200FB514A /* part.cpp */; };
+		4D0C964E30936AD200FB514A /* parts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C964730936AD200FB514A /* parts.cpp */; };
+		4D0C964F30936AD200FB514A /* part.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C964630936AD200FB514A /* part.cpp */; };
+		4D0C965130936AF400FB514A /* scoreorpartelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C965030936AF400FB514A /* scoreorpartelement.cpp */; };
+		4D0C965230936AF400FB514A /* scoreorpartelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C965030936AF400FB514A /* scoreorpartelement.cpp */; };
+		4D0C965330936AF400FB514A /* scoreorpartelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C965030936AF400FB514A /* scoreorpartelement.cpp */; };
+		4D0C965430936AF400FB514A /* scoreorpartelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C965030936AF400FB514A /* scoreorpartelement.cpp */; };
+		4D0C965630936B1200FB514A /* scoreorpartelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0C965530936B1200FB514A /* scoreorpartelement.h */; };
+		4D0C965730936B1200FB514A /* scoreorpartelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0C965530936B1200FB514A /* scoreorpartelement.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D0C965A30936B3700FB514A /* part.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0C965830936B3700FB514A /* part.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D0C965B30936B3700FB514A /* parts.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0C965930936B3700FB514A /* parts.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D0C965C30936B3700FB514A /* part.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0C965830936B3700FB514A /* part.h */; };
+		4D0C965D30936B3700FB514A /* parts.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0C965930936B3700FB514A /* parts.h */; };
 		4D15DE3B2411782300457C05 /* expansionmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36E0442B2347A9150054F141 /* expansionmap.cpp */; };
 		4D15DE3C2411782B00457C05 /* expansionmap.h in Headers */ = {isa = PBXBuildFile; fileRef = 36E0442D2347A9290054F141 /* expansionmap.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D1693F51E3A44F300569BF4 /* verticalaligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* verticalaligner.cpp */; };
@@ -1929,6 +1947,12 @@
 		4D00A2862ED2E2FD00EFA853 /* offsetinterface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = offsetinterface.h; path = include/vrv/offsetinterface.h; sourceTree = "<group>"; };
 		4D00A2892ED2E32700EFA853 /* offsetinterface.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = offsetinterface.cpp; path = src/offsetinterface.cpp; sourceTree = "<group>"; };
 		4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = horizontalaligner.cpp; path = src/horizontalaligner.cpp; sourceTree = "<group>"; };
+		4D0C964630936AD200FB514A /* part.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = part.cpp; path = src/part.cpp; sourceTree = "<group>"; };
+		4D0C964730936AD200FB514A /* parts.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = parts.cpp; path = src/parts.cpp; sourceTree = "<group>"; };
+		4D0C965030936AF400FB514A /* scoreorpartelement.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = scoreorpartelement.cpp; path = src/scoreorpartelement.cpp; sourceTree = "<group>"; };
+		4D0C965530936B1200FB514A /* scoreorpartelement.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = scoreorpartelement.h; path = include/vrv/scoreorpartelement.h; sourceTree = "<group>"; };
+		4D0C965830936B3700FB514A /* part.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = part.h; path = include/vrv/part.h; sourceTree = "<group>"; };
+		4D0C965930936B3700FB514A /* parts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = parts.h; path = include/vrv/parts.h; sourceTree = "<group>"; };
 		4D14600F1EA8A913007DB90C /* horizontalaligner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = horizontalaligner.h; path = include/vrv/horizontalaligner.h; sourceTree = "<group>"; };
 		4D1694601E3A44F300569BF4 /* Verovio-Humdrum */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Verovio-Humdrum"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D1788C12CB8FD0100FE9043 /* fraction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = fraction.h; path = include/vrv/fraction.h; sourceTree = "<group>"; };
@@ -2644,6 +2668,12 @@
 				4D64137B2035F67C00BB630E /* mdiv.h */,
 				4D95D4FB1D74551100B2B856 /* score.cpp */,
 				4D95D4FA1D74549700B2B856 /* score.h */,
+				4D0C964630936AD200FB514A /* part.cpp */,
+				4D0C965830936B3700FB514A /* part.h */,
+				4D0C964730936AD200FB514A /* parts.cpp */,
+				4D0C965930936B3700FB514A /* parts.h */,
+				4D0C965030936AF400FB514A /* scoreorpartelement.cpp */,
+				4D0C965530936B1200FB514A /* scoreorpartelement.h */,
 				4D79641726C1522B0026288B /* pageelement.cpp */,
 				4D79641C26C152400026288B /* pageelement.h */,
 				4D79642026C167100026288B /* pagemilestone.cpp */,
@@ -3461,6 +3491,7 @@
 				E7908E9F298582090004C1F9 /* alignfunctor.h in Headers */,
 				4DB3D8C71F83D0FD00B5FC2B /* breath.h in Headers */,
 				8F59293A18854BF800FE51AD /* devicecontext.h in Headers */,
+				4D0C965630936B1200FB514A /* scoreorpartelement.h in Headers */,
 				8F59293B18854BF800FE51AD /* doc.h in Headers */,
 				4DB3D8D61F83D13100B5FC2B /* tempo.h in Headers */,
 				E765675928BBFBA400BC6490 /* functorinterface.h in Headers */,
@@ -3559,6 +3590,8 @@
 				8F59294B18854BF800FE51AD /* object.h in Headers */,
 				4DACC9B42990F29A00B55913 /* atts_pagebased.h in Headers */,
 				4D1BE7831C69434C0086DC0E /* MidiMessage.h in Headers */,
+				4D0C965C30936B3700FB514A /* part.h in Headers */,
+				4D0C965D30936B3700FB514A /* parts.h in Headers */,
 				E7F39C5E29A62B260055DBE0 /* adjustclefchangesfunctor.h in Headers */,
 				E74A806628BC97D5005274E7 /* findfunctor.h in Headers */,
 				4DF9DB342F3231B50003112D /* editortoolkit_shared.h in Headers */,
@@ -3875,6 +3908,7 @@
 				BB4C4B0222A932BC001F6AF0 /* unclear.h in Headers */,
 				BB4C4B2C22A932CF001F6AF0 /* mordent.h in Headers */,
 				4DBDD67A2939E1D1009EC466 /* symboldef.h in Headers */,
+				4D0C965730936B1200FB514A /* scoreorpartelement.h in Headers */,
 				BB4C4B7A22A932D7001F6AF0 /* timestamp.h in Headers */,
 				BB4C4B6C22A932D7001F6AF0 /* neume.h in Headers */,
 				BB4C4B2E22A932CF001F6AF0 /* octave.h in Headers */,
@@ -3948,6 +3982,8 @@
 				BB4C4BA822A932EB001F6AF0 /* glyph.h in Headers */,
 				E7D48C7229D21F050031D89D /* adjustyposfunctor.h in Headers */,
 				BB4C4B8822A932DF001F6AF0 /* num.h in Headers */,
+				4D0C965A30936B3700FB514A /* part.h in Headers */,
+				4D0C965B30936B3700FB514A /* parts.h in Headers */,
 				4DACC9A12990F29A00B55913 /* atts_gestural.h in Headers */,
 				4D2E759122BC2B80004C51F0 /* tuning.h in Headers */,
 				BB4C4AC422A932B6001F6AF0 /* mdiv.h in Headers */,
@@ -4266,6 +4302,8 @@
 				4DEC4D8321C804E000D1D273 /* app.cpp in Sources */,
 				E7F1C36929F03461007E12C1 /* savefunctor.cpp in Sources */,
 				4DF092A62497711800239195 /* phrase.cpp in Sources */,
+				4D0C964C30936AD200FB514A /* parts.cpp in Sources */,
+				4D0C964D30936AD200FB514A /* part.cpp in Sources */,
 				4DB3D8D91F83D13C00B5FC2B /* turn.cpp in Sources */,
 				4D1788C62CB8FD7300FE9043 /* fraction.cpp in Sources */,
 				4DA0EAC422BB779400A7EBEB /* surface.cpp in Sources */,
@@ -4457,6 +4495,7 @@
 				4D79643A26C6B3520026288B /* featureextractor.cpp in Sources */,
 				4DEC4DA721C81ED400D1D273 /* reg.cpp in Sources */,
 				4DACC9AF2990F29A00B55913 /* atts_analytical.cpp in Sources */,
+				4D0C965230936AF400FB514A /* scoreorpartelement.cpp in Sources */,
 				E76A9D4B29A74E620044682D /* adjustdotsfunctor.cpp in Sources */,
 				4D71BEA82D875DF800CE0001 /* atts_stringtab.cpp in Sources */,
 				4D1694421E3A44F300569BF4 /* chord.cpp in Sources */,
@@ -4623,6 +4662,8 @@
 				406916DC23833770009E6B04 /* mspace.cpp in Sources */,
 				E7A1640C29AF34750099BD6A /* adjustharmgrpsspacingfunctor.cpp in Sources */,
 				4DE0198C2C495DB800B5B6BF /* iovolpiano.cpp in Sources */,
+				4D0C964830936AD200FB514A /* parts.cpp in Sources */,
+				4D0C964930936AD200FB514A /* part.cpp in Sources */,
 				4D95D4F91D718D4A00B2B856 /* systemelement.cpp in Sources */,
 				4D1EB6A92A2A7C5100AF2F98 /* div.cpp in Sources */,
 				4DDBBB5B1C7AE45900054AFF /* dynam.cpp in Sources */,
@@ -4663,6 +4704,7 @@
 				4DD7C10227A5650600B9C017 /* timemap.cpp in Sources */,
 				4D4CDEA52C078FF9005621E9 /* adjustneumexfunctor.cpp in Sources */,
 				E797C460298EC2C600CAD67E /* calcalignmentpitchposfunctor.cpp in Sources */,
+				4D0C965330936AF400FB514A /* scoreorpartelement.cpp in Sources */,
 				8F086EFA188539540037FD8E /* page.cpp in Sources */,
 				8F086EFB188539540037FD8E /* pitchinterface.cpp in Sources */,
 				BDEF9EC726725234008A3A47 /* caesura.cpp in Sources */,
@@ -4885,6 +4927,8 @@
 				4D1D73411A1D08DC001E08F6 /* glyph.cpp in Sources */,
 				4D79641A26C1522B0026288B /* pageelement.cpp in Sources */,
 				8F3DD36418854B390051330C /* view_page.cpp in Sources */,
+				4D0C964E30936AD200FB514A /* parts.cpp in Sources */,
+				4D0C964F30936AD200FB514A /* part.cpp in Sources */,
 				E7F1C36729F0345D007E12C1 /* savefunctor.cpp in Sources */,
 				4DEC4D8021C804C500D1D273 /* add.cpp in Sources */,
 				8F3DD36518854B390051330C /* view_tuplet.cpp in Sources */,
@@ -5076,6 +5120,7 @@
 				4DACC9862990F29A00B55913 /* atts_performance.cpp in Sources */,
 				4D79643B26C6B3520026288B /* featureextractor.cpp in Sources */,
 				4DB787652022F0BC00394520 /* jsonxx.cc in Sources */,
+				4D0C965430936AF400FB514A /* scoreorpartelement.cpp in Sources */,
 				4DACC9B02990F29A00B55913 /* atts_analytical.cpp in Sources */,
 				E76A9D4C29A74E630044682D /* adjustdotsfunctor.cpp in Sources */,
 				4DC12A831F741110000440E9 /* pgfoot.cpp in Sources */,
@@ -5195,6 +5240,8 @@
 				4D79641B26C1522B0026288B /* pageelement.cpp in Sources */,
 				BB4C4B9722A932E5001F6AF0 /* durationinterface.cpp in Sources */,
 				BB4C4B4F22A932D7001F6AF0 /* elementpart.cpp in Sources */,
+				4D0C964A30936AD200FB514A /* parts.cpp in Sources */,
+				4D0C964B30936AD200FB514A /* part.cpp in Sources */,
 				E7F1C36829F0345D007E12C1 /* savefunctor.cpp in Sources */,
 				BB4C4AC122A932B6001F6AF0 /* layer.cpp in Sources */,
 				BB4C4B0522A932C3001F6AF0 /* pgfoot.cpp in Sources */,
@@ -5386,6 +5433,7 @@
 				BB4C4BC022A932FC001F6AF0 /* MidiMessage.cpp in Sources */,
 				E76A9D4D29A74E630044682D /* adjustdotsfunctor.cpp in Sources */,
 				BB4C4AED22A932BC001F6AF0 /* expan.cpp in Sources */,
+				4D0C965130936AF400FB514A /* scoreorpartelement.cpp in Sources */,
 				4DACC9872990F29A00B55913 /* atts_performance.cpp in Sources */,
 				BB4C4B0F22A932C8001F6AF0 /* ending.cpp in Sources */,
 				BB4C4AB522A932A6001F6AF0 /* iomei.cpp in Sources */,

@@ -321,7 +321,7 @@ void MusicXmlInput::InsertClefToLayer(Staff *staff, Layer *layer, Clef *clef, in
                 const int actualScoreOnSet = start->first;
                 auto end = m_layerTimes.at(otherLayer).upper_bound(actualScoreOnSet);
                 LayerElement *layerElement = (--end)->second;
-                this->InsertClefIntoObject(layerElement, clefToAdd, otherLayer, scoreOnset, true);
+                this->InsertClefIntoObject(layerElement, clefToAdd, otherLayer, actualScoreOnSet, true);
             }
         }
     }
@@ -332,7 +332,6 @@ void MusicXmlInput::InsertClefIntoObject(
 {
     if (layerElement->GetParent()->Is(LAYER)) {
         this->InsertClefIntoObject(layer, clef, layerElement, insertAfter);
-        m_layerTimes.at(layer).emplace(scoreOnset, clef);
     }
     else {
         Object *parent = layerElement->GetParent();
@@ -343,6 +342,7 @@ void MusicXmlInput::InsertClefIntoObject(
             this->InsertClefIntoObject(parent, clef, layerElement, insertAfter);
         }
     }
+    if (insertAfter) m_layerTimes.at(layer).emplace(scoreOnset, clef);
 }
 
 void MusicXmlInput::InsertClefIntoObject(Object *parent, Clef *clef, Object *layerElement, bool insertAfter)
@@ -2293,7 +2293,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
 
     const pugi::xml_node typeNode = node.child("direction-type");
     const pugi::xpath_node voice = node.select_node("voice");
-    const short int offset = node.child("offset").text().as_int();
+    const int offset = node.child("offset").text().as_int();
     const pugi::xml_node staffNode = node.child("staff");
     const pugi::xml_node soundNode = node.child("sound");
 
@@ -4225,13 +4225,14 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure, Sec
     if (abletonTuning) {
         const std::string tuningDef
             = std::regex_replace(abletonTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
-        CustomTuning tuning(tuningDef, m_doc, true);
-        if (tuning.IsValid()) {
+        CustomTuning *tuning = new CustomTuning(tuningDef, m_doc, true);
+        if (tuning->IsValid()) {
             ScoreDef *scoreDef = GetOrCreateLastScoreDef(section);
             assert(scoreDef);
             scoreDef->SetCustomTuning(tuning);
         }
         else {
+            delete tuning;
             LogWarning("MusicXML import: Error parsing tuning definition");
         }
     }
@@ -4290,7 +4291,7 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure, Sec
     const bool inDirection = IsElement(node.parent(), "direction");
     const float bpm = node.attribute("tempo").as_float();
     if (bpm > 0 && !inDirection) {
-        const short int offset = node.child("offset").text().as_int();
+        const int offset = node.child("offset").text().as_int();
         const double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
         Tempo *tempo = new Tempo();
         tempo->SetMidiBpm(bpm);

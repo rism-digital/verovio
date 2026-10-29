@@ -92,8 +92,8 @@ Object *EditorToolkit::GetElement(const std::string &elementId, bool logError)
     Object *element = NULL;
 
     if (elementId == MAIN_SCOREDEF) {
-        Score *score = m_doc->GetFirstVisibleScore();
-        return score ? score->GetScoreDef() : NULL;
+        ScoreOrPartElement *scoreOrPart = m_doc->GetFirstVisibleScoreOrPart();
+        return scoreOrPart ? scoreOrPart->GetScoreDef() : NULL;
     }
 
     // Try to get the element on the current drawing page

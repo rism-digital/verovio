@@ -165,7 +165,11 @@ enum ClassId : uint16_t {
     PAGE_ELEMENT,
     PAGE_MILESTONE_END,
     MDIV,
+    PARTS,
+    SCORE_OR_PART_ELEMENT,
     SCORE,
+    PART,
+    SCORE_OR_PART_ELEMENT_max,
     PAGE_ELEMENT_max,
     // Ids for SystemElement child classes
     SYSTEM_ELEMENT,
