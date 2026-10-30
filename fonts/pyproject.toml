@@ -18,7 +18,7 @@ package-mode = false
 ipython = "^8.10.0"
 black = "^26.10.1"
 mypy = "^0.971"
-pylint = "^2.15.3"
+pylint = "^4.0.9"
 
 [tool.black]
 line-length = 99
