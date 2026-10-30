@@ -30,7 +30,8 @@ class Mordent : public ControlElement,
                 public AttExtSymNames,
                 public AttOrnamentAccid,
                 public AttPlacementRelStaff,
-                public AttMordentLog {
+                public AttMordentLog,
+                public AttVerticalGroup {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

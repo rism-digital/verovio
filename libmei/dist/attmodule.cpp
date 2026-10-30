@@ -4230,15 +4230,15 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
         AttStaffItems *att = dynamic_cast<AttStaffItems *>(element);
         assert(att);
         if (attrType == "aboveorder") {
-            att->SetAboveorder(att->StrToStaffitem(attrValue));
+            att->SetAboveorder(att->StrToStaffitemList(attrValue));
             return true;
         }
         if (attrType == "beloworder") {
-            att->SetBeloworder(att->StrToStaffitem(attrValue));
+            att->SetBeloworder(att->StrToStaffitemList(attrValue));
             return true;
         }
         if (attrType == "betweenorder") {
-            att->SetBetweenorder(att->StrToStaffitem(attrValue));
+            att->SetBetweenorder(att->StrToStaffitemList(attrValue));
             return true;
         }
     }
@@ -5693,13 +5693,13 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttStaffItems *att = dynamic_cast<const AttStaffItems *>(element);
         assert(att);
         if (att->HasAboveorder()) {
-            attributes->push_back({ "aboveorder", att->StaffitemToStr(att->GetAboveorder()) });
+            attributes->push_back({ "aboveorder", att->StaffitemListToStr(att->GetAboveorder()) });
         }
         if (att->HasBeloworder()) {
-            attributes->push_back({ "beloworder", att->StaffitemToStr(att->GetBeloworder()) });
+            attributes->push_back({ "beloworder", att->StaffitemListToStr(att->GetBeloworder()) });
         }
         if (att->HasBetweenorder()) {
-            attributes->push_back({ "betweenorder", att->StaffitemToStr(att->GetBetweenorder()) });
+            attributes->push_back({ "betweenorder", att->StaffitemListToStr(att->GetBetweenorder()) });
         }
     }
     if (element->HasAttClass(ATT_STAFFLOC)) {
