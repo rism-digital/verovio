@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
       'libmei/{dist,addons}/*.{h}'
   s.resources      = 'data'
   s.ios.deployment_target = '16.0'
-  s.osx.deployment_target = '11.0'
+  s.osx.deployment_target = '14.0'
   s.pod_target_xcconfig = {
       "CLANG_CXX_LANGUAGE_STANDARD" => "c++23",
       "CLANG_CXX_LIBRARY" => "libc++",

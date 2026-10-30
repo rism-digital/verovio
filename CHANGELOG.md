@@ -2,7 +2,7 @@
 
 ## [6.4.0]
 * Support for `parts` and `part`
-* Support for `staffdef@num` and `staff@numbase`
+* Support for `staffdef@num` and `staffdef@numbase`
 * Generation of SVG placeholder for empty system elements
 * Integrate TypeScript definitions in NPM package
 * Option `--convert-attributes` to convert attributes to elements permanently
