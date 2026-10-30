@@ -2,8 +2,19 @@
 
 ## [unreleased]
 
-* Fix MusicXML `circle-x` notehead mapping to SMuFL U+E0B3
-* Honor MusicXML `root-step@text` and `kind@text` for the `none` kind (no chord)
+## [6.4.0]
+* Support for `parts` and `part`
+* Support for `staffdef@num` and `staffdef@numbase`
+* Generation of SVG placeholder for empty system elements
+* Integrate TypeScript definitions in NPM package
+* Option `--convert-attributes` to convert attributes to elements permanently
+* Fix for cautionary score definition with section restart
+* Fix spacing and alignment of lyrics in different layers
+* Fix tablature tie and tuplet positioning
+* Fixes in the MusicXML importer
+* Fixes in the MIDI output (pedal, octave, bow tremolo, keys)
+* Various performance improvements
+* Integration of the latest addition to the editor API (in progress)
 
 ## [6.3.0] – 2026-08-19
 * Support for `volta` and `refrain`
