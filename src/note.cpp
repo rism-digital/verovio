@@ -816,6 +816,8 @@ void Note::CalcNoteHeadShiftForSameasNote(Note *stemSameas, data_STEMDIRECTION s
 
 bool Note::IsEnharmonicWith(const Note *note) const
 {
+    // Unpitched notes are all compared as equal, regardless of their MIDI key (@pnum)
+    if (this->HasLoc() && !this->HasPname() && note->HasLoc() && !note->HasPname()) return true;
     return (this->GetMIDIPitch() == note->GetMIDIPitch());
 }
 

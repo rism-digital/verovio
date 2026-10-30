@@ -366,6 +366,30 @@ void SvgDeviceContext::StartGraphic(
     // this->GetColor(currentBrush.GetColor()).c_str(), currentBrush.GetOpacity()).c_str();
 }
 
+void SvgDeviceContext::AddGraphicClass(const std::string &className)
+{
+    if (className.empty()) return;
+
+    pugi::xml_attribute classAttr = m_currentNode.attribute("class");
+    if (!classAttr) {
+        m_currentNode.append_attribute("class") = className.c_str();
+        return;
+    }
+
+    std::string classes = classAttr.value();
+
+    std::istringstream stream(classes);
+    std::string existing;
+    while (stream >> existing) {
+        if (existing == className) return;
+    }
+
+    if (!classes.empty()) classes += " ";
+    classes += className;
+
+    classAttr.set_value(classes.c_str());
+}
+
 void SvgDeviceContext::StartCustomGraphic(const std::string &name, std::string gClass, std::string gId)
 {
     m_currentNode = m_currentNode.append_child("g");
@@ -504,6 +528,9 @@ void SvgDeviceContext::StartPage()
             std::string showHidden
                 = StringFormat("g.%s {fill: silver; color:silver; stroke:silver;} ", CSS_SHOW_HIDDEN);
             css += showHidden;
+        }
+        else {
+            css += "g.placeholder {visibility:hidden} ";
         }
         // bounding box css - for debugging
         // css += " g.bounding-box{stroke:red; stroke-width:10} "
@@ -1280,14 +1307,15 @@ void SvgDeviceContext::AppendIdAndClass(
 
 void SvgDeviceContext::AppendAdditionalAttributes(Object *object)
 {
-    std::pair<std::multimap<ClassId, std::string>::iterator, std::multimap<ClassId, std::string>::iterator> range;
-    range = m_svgAdditionalAttributes.equal_range(object->GetClassId()); // if correct class name...
-    for (std::multimap<ClassId, std::string>::iterator it = range.first; it != range.second; ++it) {
-        ArrayOfStrAttr attributes;
-        object->GetAttributes(&attributes);
-        for (ArrayOfStrAttr::iterator iter = attributes.begin(); iter != attributes.end(); ++iter) {
-            if (it->second == (*iter).first) // ...and attribute exists in class name, add it to SVG element
-                m_currentNode.append_attribute(("data-" + it->second).c_str()) = (*iter).second.c_str();
+    const auto range = m_svgAdditionalAttributes.equal_range(object->GetClassId()); // if correct class name...
+    if (range.first == range.second) return;
+    // Getting the attributes is costly, so do it once for all the additional attributes of the class
+    ArrayOfStrAttr attributes;
+    object->GetAttributes(&attributes);
+    for (auto it = range.first; it != range.second; ++it) {
+        for (const auto &attribute : attributes) {
+            if (it->second == attribute.first) // ...and attribute exists in class name, add it to SVG element
+                m_currentNode.append_attribute(("data-" + it->second).c_str()) = attribute.second.c_str();
         }
     }
 }

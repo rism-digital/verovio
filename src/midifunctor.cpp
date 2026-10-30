@@ -87,6 +87,7 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayer(Layer *layer)
     m_meterParams.mensur = layer->GetCurrentMensur();
     m_meterParams.meterSig = layer->GetCurrentMeterSig();
     m_meterParams.proport = layer->GetCurrentProport();
+    std::tie(m_meterParams.num, m_meterParams.numbase) = layer->GetCurrentNumAndNumbase();
 
     return FUNCTOR_CONTINUE;
 }
@@ -588,6 +589,9 @@ FunctorCode InitMIDIFunctor::VisitMeasure(const Measure *measure)
 
 FunctorCode InitMIDIFunctor::VisitOctave(const Octave *octave)
 {
+    // An octave without start or end (e.g., an unresolved @endid) is not rendered and is ignored
+    if (!octave->HasStartAndEnd()) return FUNCTOR_CONTINUE;
+
     const Measure *measure = vrv_cast<const Measure *>(octave->GetFirstAncestor(MEASURE));
     assert(measure);
     std::vector<const Staff *> staffList = octave->GetTstampStaves(measure, octave);
@@ -678,18 +682,20 @@ FunctorCode GenerateMIDIFunctor::VisitBTrem(const BTrem *bTrem)
     }
     // Get num value if it's set
     if (bTrem->HasNum()) {
-        num = bTrem->GetNum();
+        num = std::clamp(bTrem->GetNum(), 0, 256);
     }
 
     // Calculate duration of individual note in tremolo
     const data_DURATION individualNoteDur = bTrem->CalcIndividualNoteDuration();
-    if (individualNoteDur == DURATION_NONE) return FUNCTOR_CONTINUE;
+    if ((individualNoteDur == DURATION_NONE) || (individualNoteDur > DURATION_2048)) return FUNCTOR_CONTINUE;
     const double noteInQuarterDur = pow(2.0, (DURATION_4 - individualNoteDur));
 
     // Define lambda which expands one note into multiple individual notes of the same pitch
     auto expandNote = [this, noteInQuarterDur, num](const Object *obj) {
         const Note *note = vrv_cast<const Note *>(obj);
         assert(note);
+        // Secondary tied notes are not played, their duration is already added to the first note
+        if (note->GetScoreTimeTiedDuration() < 0) return;
         const int pitch = this->GetMIDIPitch(note);
         const double totalInQuarterDur
             = note->GetScoreTimeDuration().ToDouble() + note->GetScoreTimeTiedDuration().ToDouble();
@@ -700,6 +706,7 @@ FunctorCode GenerateMIDIFunctor::VisitBTrem(const BTrem *bTrem)
             multiplicity = num;
             noteDuration = totalInQuarterDur / double(num);
         }
+        if (multiplicity < 1 || totalInQuarterDur <= 0.0) return;
         m_expandedNotes[note] = MIDINoteSequence(multiplicity, { pitch, noteDuration });
     };
 
@@ -906,6 +913,8 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
 FunctorCode GenerateMIDIFunctor::VisitPedal(const Pedal *pedal)
 {
     if (!pedal->HasDir()) return FUNCTOR_CONTINUE;
+    // The start is needed to calculate the pedal time below; skip pedals without one (e.g., an unresolved @startid)
+    if (!pedal->GetStart()) return FUNCTOR_CONTINUE;
 
     // Check the functor flag - filters should always be there, but just in case we change how it is called
     if (!m_controlEvents || !this->GetFilters()) return FUNCTOR_CONTINUE;
@@ -960,10 +969,10 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
         referencePitchClass = Note::PnameToPclass(scoreDef->GetTunePname());
     }
     // set and remember custom tuning if available
-    if (scoreDef->GetCustomTuning().IsValid()) {
-        m_customTuning = &scoreDef->GetCustomTuning();
+    if (scoreDef->HasCustomTuning() && scoreDef->GetCustomTuning()->IsValid()) {
+        m_customTuning = scoreDef->GetCustomTuning();
         const int program = m_instrDef && m_instrDef->HasMidiInstrnum() ? m_instrDef->GetMidiInstrnum() : 0;
-        const Tunings::Tuning &tuneCustom = scoreDef->GetCustomTuning().GetTuning();
+        const Tunings::Tuning &tuneCustom = m_customTuning->GetTuning();
         std::vector<std::pair<int, double>> mapping;
         // sysex messages should not have the high bit (0x80) set, which means that the full 128 MIDI notes
         // cannot be retuned in the same sysex message. For now, we skip MIDI key 0.
@@ -1148,6 +1157,8 @@ void GenerateMIDIFunctor::HandleOctave(const LayerElement *layerElement)
 
 int GenerateMIDIFunctor::GetMIDIPitch(const Note *note)
 {
+    // The MIDI key of unpitched notes is neither transposed nor tuned
+    if (note->HasPnum() && note->HasLoc() && !note->HasPname()) return note->GetPnum();
     if (m_customTuning && m_customTuning->IsValid()) {
         return m_customTuning->GetMIDIPitch(note, m_transSemi, m_octaveShift);
     }

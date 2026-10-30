@@ -118,6 +118,8 @@ class Page;
 class PageElement;
 class PageMilestoneEnd;
 class Pages;
+class Part;
+class Parts;
 class Pb;
 class Pedal;
 class PgFoot;
@@ -141,6 +143,7 @@ class Restore;
 class Refrain;
 class RunningElement;
 class Score;
+class ScoreOrPartElement;
 class ScoreDef;
 class ScoreDefElement;
 class ScoreDefInterface;
@@ -350,6 +353,9 @@ private:
     ///@{
     void WriteMdiv(pugi::xml_node currentNode, Mdiv *mdiv);
     void WritePages(pugi::xml_node currentNode, Pages *pages);
+    void WriteParts(pugi::xml_node currentNode, Parts *parts);
+    void WriteScoreOrPartElement(pugi::xml_node currentNode, ScoreOrPartElement *scoreOrPartElement);
+    void WritePart(pugi::xml_node currentNode, Part *part);
     void WriteScore(pugi::xml_node currentNode, Score *score);
     ///@}
 
@@ -645,6 +651,10 @@ public:
     ///@}
 
     jsonxx::Object ExportScoreDef();
+    jsonxx::Object ExportStaffGrp(ScoreDef *scoreDef);
+    jsonxx::Object ExportStaffDef(ScoreDef *scoreDef, int staffN);
+    jsonxx::Object ExportMeterSig(ScoreDef *scoreDef);
+    jsonxx::Object ExportKeySig(ScoreDef *scoreDef);
 
 private:
     jsonxx::Object ToJson(const pugi::xml_document &doc);
@@ -672,6 +682,22 @@ public:
      */
     void SetDeserializing(bool deserializing) { m_deserializing = deserializing; }
 
+protected:
+    /**
+     * @name Methods available in inheriting classes
+     */
+    ///@{
+    bool ReadScoreDefExt(Object *parent, pugi::xml_node scoreDef) { return this->ReadScoreDef(parent, scoreDef); }
+    bool ReadStaffGrpExt(Object *parent, pugi::xml_node staffGrp) { return this->ReadStaffGrp(parent, staffGrp); }
+    bool ReadStaffDefExt(Object *parent, pugi::xml_node staffDef) { return this->ReadStaffDef(parent, staffDef); }
+    bool ReadMeterSigExt(Object *parent, pugi::xml_node meterSig) { return this->ReadMeterSig(parent, meterSig); }
+    bool ReadMeterSigGrpExt(Object *parent, pugi::xml_node meterSigGrp)
+    {
+        return this->ReadMeterSigGrp(parent, meterSigGrp);
+    }
+    bool ReadKeySigExt(Object *parent, pugi::xml_node keySig) { return this->ReadKeySig(parent, keySig); }
+    ///@}
+
 private:
     bool ReadDoc(pugi::xml_node root);
     bool ReadIncipits(pugi::xml_node root);
@@ -679,6 +705,9 @@ private:
     ///@{
     bool ReadMdiv(Object *parent, pugi::xml_node parentNode, bool isVisible);
     bool ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool isVisible);
+    bool ReadParts(Object *parent, pugi::xml_node parentNode);
+    bool ReadPartsChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadPart(Object *parent, pugi::xml_node parentNode);
     bool ReadScore(Object *parent, pugi::xml_node parentNode);
     bool ReadScoreScoreDef(Object *parent, pugi::xml_node parentNode);
     ///@}
@@ -691,6 +720,7 @@ private:
     bool ReadPage(Object *parent, pugi::xml_node parentNode);
     bool ReadPageChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadPageMilestoneEnd(Object *parent, pugi::xml_node milestoneEnd);
+    bool ReadScoreOrPartChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadSystem(Object *parent, pugi::xml_node system);
     bool ReadSystemChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadSystemMilestoneEnd(Object *parent, pugi::xml_node milestoneEnd);
@@ -899,6 +929,7 @@ private:
     bool ReadTextLayoutElement(pugi::xml_node element, TextLayoutElement *object);
     bool ReadRunningElement(pugi::xml_node element, RunningElement *object);
     bool ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *object);
+    bool ReadScoreOrPartElement(pugi::xml_node element, ScoreOrPartElement *object);
     bool ReadSystemElement(pugi::xml_node element, SystemElement *object);
     bool ReadTextElement(pugi::xml_node element, TextElement *object);
 
@@ -954,7 +985,7 @@ private:
      * The data is read into an object, which is then converted to page-based MEI.
      * See MEIInput::ReadDoc, Doc::CreateScoreBuffer and Doc::ConvertToPageBasedDoc
      */
-    bool ReadScoreBasedMei(pugi::xml_node element, Score *parent);
+    bool ReadScoreBasedMei(pugi::xml_node element, ScoreOrPartElement *parent);
 
     /**
      * @name Various methods for reading / converting values.
@@ -1005,16 +1036,17 @@ private:
 
 public:
     //
+protected:
+    /**
+     * The version of the file being read
+     */
+    meiVersion_MEIVERSION m_meiversion;
+
 private:
     /**
      * The full filename of the file being read
      */
     std::string m_filename;
-
-    /**
-     * The version of the file being read
-     */
-    meiVersion_MEIVERSION m_meiversion;
 
     /**
      * A flag indicating wheather we are reading page-based or score-based MEI
@@ -1070,6 +1102,14 @@ public:
     ///@}
 
     void ImportScoreDef(const jsonxx::Object &scoreDef);
+
+    void ImportStaffGrp(const jsonxx::Object &staffGrp, ScoreDef *scoreDef);
+
+    void ImportStaffDef(const jsonxx::Object &staffDef, ScoreDef *scoreDef, int staffN);
+
+    void ImportMeterSigOrGrpIntoLayer(Layer *layer, const jsonxx::Object &meterSig);
+
+    void ImportKeySigIntoLayer(Layer *layer, const jsonxx::Object &keySig);
 
 private:
     pugi::xml_document FromJson(const jsonxx::Object &json);

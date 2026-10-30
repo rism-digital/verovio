@@ -111,6 +111,7 @@ public:
     bool IsPageElement() const { return Object::IsPageElement(m_classId); }
     bool IsRunningElement() const { return Object::IsRunningElement(m_classId); }
     bool IsScoreDefElement() const { return Object::IsScoreDefElement(m_classId); }
+    bool IsScoreOrPartElement() const { return Object::IsScoreOrPartElement(m_classId); }
     bool IsSystemElement() const { return Object::IsSystemElement(m_classId); }
     bool IsTextElement() const { return Object::IsTextElement(m_classId); }
     ///@}
@@ -139,6 +140,10 @@ public:
     static bool IsScoreDefElement(ClassId classId)
     {
         return ((classId > SCOREDEF_ELEMENT) && (classId < SCOREDEF_ELEMENT_max));
+    }
+    static bool IsScoreOrPartElement(ClassId classId)
+    {
+        return ((classId > SCORE_OR_PART_ELEMENT) && (classId < SCORE_OR_PART_ELEMENT_max));
     }
     static bool IsSystemElement(ClassId classId)
     {
@@ -507,6 +512,13 @@ public:
      * They must be of the same class.
      */
     void ReplaceWithCopyOf(Object *object);
+
+    /**
+     * Swap an object with another.
+     * They must be of the same classId.
+     * The parent can be different but must be set for both.
+     */
+    void SwapWith(Object *object);
 
     /**
      * Return true if the object has the child Object as descendant (reference of direct).

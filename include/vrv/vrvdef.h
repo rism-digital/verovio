@@ -39,7 +39,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 6
-#define VERSION_MINOR 3
+#define VERSION_MINOR 4
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV false
@@ -165,7 +165,11 @@ enum ClassId : uint16_t {
     PAGE_ELEMENT,
     PAGE_MILESTONE_END,
     MDIV,
+    PARTS,
+    SCORE_OR_PART_ELEMENT,
     SCORE,
+    PART,
+    SCORE_OR_PART_ELEMENT_max,
     PAGE_ELEMENT_max,
     // Ids for SystemElement child classes
     SYSTEM_ELEMENT,

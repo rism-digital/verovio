@@ -11,11 +11,13 @@
 #include <map>
 #include <optional>
 #include <queue>
+#include <set>
 #include <string>
 #include <vector>
 
 //----------------------------------------------------------------------------
 
+#include "attalternates.h"
 #include "attdef.h"
 #include "iobase.h"
 #include "metersig.h"
@@ -442,6 +444,7 @@ private:
     ///@{
     Clef *ConvertClef(const pugi::xml_node &clef);
     KeySig *ConvertKey(const pugi::xml_node &key);
+    static std::set<data_PITCHNAME> ConvertKeyAlteredPitches(const pugi::xml_node &key);
     ///@}
 
     /*
@@ -494,6 +497,7 @@ private:
     void CloseSlur(Measure *measure, short int number, LayerElement *element, curvature_CURVEDIR dir);
     void CloseBeamSpan(Staff *staff, Layer *layer, LayerElement *element);
     void MatchTies(bool matchLayers);
+    bool MatchTieNotes(const Note *start, const Note *end) const;
     ///@}
 
     /*
@@ -565,13 +569,6 @@ private:
     void SetChordStaff(Layer *layer);
     ///@}
 
-    /*
-     * @name Update the carried-over accidentals for each pitch class based on key signature
-     */
-    ///@{
-    void ResetAccidentals(const KeySig *keySig = NULL);
-    ///@}
-
     /**
      * @name Find or create a ScoreDef before the given measure
      */
@@ -593,7 +590,7 @@ private:
     static data_BARRENDITION ConvertStyleToRend(const std::string &value, const bool repeat);
     static data_BOOLEAN ConvertWordToBool(const std::string &value);
     static data_DURATION ConvertTypeToDur(const std::string &value);
-    static data_HEADSHAPE_list ConvertNotehead(const std::string &value);
+    static data_HEADSHAPE ConvertNotehead(const std::string &value);
     static data_LINESTARTENDSYMBOL ConvertLineEndSymbol(const std::string &value);
     static data_MIDIVALUE ConvertDynamicsToMidiVal(const float dynamics);
     static data_PITCHNAME ConvertStepToPitchName(const std::string &value);
@@ -603,6 +600,7 @@ private:
     static fermataVis_SHAPE ConvertFermataShape(const std::string &value);
     static pedalLog_DIR ConvertPedalTypeToDir(const std::string &value);
     static repeatMarkLog_FUNC ConvertJumpType(const std::string &value);
+    static sylLog_CON ConvertElisionToCon(const pugi::xml_node elision);
     static tupletVis_NUMFORMAT ConvertTupletNumberValue(const std::string &value);
     static std::u32string ConvertTypeToVerovioText(const std::string &value);
     static std::string ConvertAlterToSymbol(const std::string &value, bool plusMinus = false);
@@ -648,6 +646,8 @@ private:
     Label *m_label = NULL;
     LabelAbbr *m_labelAbbr = NULL;
     InstrDef *m_instrdef = NULL;
+    /* MIDI keys of unpitched notes per part and instrument id ("" for a part with a single instrument) */
+    std::map<std::string, std::map<std::string, int>> m_unpitchedKeys;
     /* LastElementID */
     std::string m_ID;
     /* A map of stacks for piling open LayerElements (beams, tuplets, chords, btrem, ftrem) separately per layer */
@@ -655,6 +655,8 @@ private:
     /* A maps of time stamps (score time) to indicate write pointer of a given layer */
     std::map<Layer *, int> m_layerEndTimes;
     std::map<Layer *, std::multimap<int, LayerElement *>> m_layerTimes;
+    /* Verse numbers with a pending <extend type="stop"/> per staff/layer @n, to anchor on the following note */
+    std::map<std::pair<int, int>, std::set<int>> m_pendingExtenderStops;
     /* To remember layer of last element (note) to handle chords */
     Layer *m_prevLayer = NULL;
     /* To remember current layer to properly handle layers/staves/cross-staff elements */
@@ -709,6 +711,8 @@ private:
     std::map<int, int> m_multiRests;
     /* a map of pitch/alter values to their corresponding accidental(s) */
     std::map<std::string, std::vector<musicxml::Accidental>> m_alterAccids;
+    /* the pitches altered by the current key signature, by staff number */
+    std::map<int, std::set<data_PITCHNAME>> m_keyAlteredPitches;
     /* A flag indicating we had a clef change */
     int m_clefChanged = 0;
 

@@ -33,7 +33,7 @@
 #include "quilisma.h"
 #include "rend.h"
 #include "sb.h"
-#include "score.h"
+#include "scoreorpartelement.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "surface.h"
@@ -246,6 +246,13 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
         }
         LogWarning("Could not parse toggle ligature action");
     }
+    else if (action == "toggleNeumeConnection") {
+        std::vector<std::string> elementIds;
+        if (this->ParseToggleNeumeConnectionAction(json.get<jsonxx::Object>("param"), &elementIds)) {
+            return this->ToggleNeumeConnection(elementIds);
+        }
+        LogWarning("Could not parse toggle neume connection action");
+    }
     else if (action == "changeStaff") {
         std::string elementId;
         if (this->ParseChangeStaffAction(json.get<jsonxx::Object>("param"), &elementId)) {
@@ -334,7 +341,7 @@ bool EditorToolkitNeume::AddSyl(std::string elementId, std::string sylText)
         assert(fi);
         fi->AttachZone(zone);
 
-        if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+        if (m_doc->IsFacTranscription()) m_doc->SyncFromFacsimileDoc();
     }
 
     m_editStatus.import("uuid", elementId);
@@ -713,7 +720,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool topLevel
 
         this->SortStaves();
 
-        if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+        if (m_doc->IsFacTranscription()) m_doc->SyncFromFacsimileDoc();
         m_doc->GetDrawingPage()->LayOutTranscription(true);
 
         return true; // Can't reorder by layer since staves contain layers
@@ -775,7 +782,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool topLevel
     if (topLevel) {
         Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
         layer->ReorderByXPos(); // Reflect position order of elements internally (and in the resulting output file)
-        if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+        if (m_doc->IsFacTranscription()) m_doc->SyncFromFacsimileDoc();
         m_doc->GetDrawingPage()->LayOutTranscription(true);
 
         m_editStatus.import("status", status);
@@ -850,7 +857,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         else {
             newStaff = new Staff(1);
             newStaff->m_drawingStaffDef = vrv_cast<StaffDef *>(
-                m_doc->GetCorrespondingScore(page)->GetScoreDef()->FindDescendantByType(STAFFDEF));
+                m_doc->GetCorrespondingScoreOrPart(page)->GetScoreDef()->FindDescendantByType(STAFFDEF));
             newStaff->m_drawingNotationType = NOTATIONTYPE_neume;
             newStaff->m_drawingLines = 4;
         }
@@ -869,13 +876,13 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         newMeasure->AddChild(newStaff);
         newSystem->AddChild(newSb);
         newSystem->AddChild(newMeasure);
-        newSystem->SetDrawingScoreDef(vrv_cast<ScoreDef *>(m_doc->GetCorrespondingScore(page)->GetScoreDef()));
+        newSystem->SetDrawingScoreDef(vrv_cast<ScoreDef *>(m_doc->GetCorrespondingScoreOrPart(page)->GetScoreDef()));
 
         page->InsertAfter(page->GetFirst(SCORE), newSystem);
 
         this->SortStaves();
 
-        if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+        if (m_doc->IsFacTranscription()) m_doc->SyncFromFacsimileDoc();
 
         m_editStatus.import("uuid", newStaff->GetID());
         m_editStatus.import("status", status);
@@ -1302,7 +1309,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
     }
     layer->ReorderByXPos();
 
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    if (m_doc->IsFacTranscription()) m_doc->SyncFromFacsimileDoc();
     m_doc->GetDrawingPage()->LayOutTranscription(true);
 
     m_editStatus.import("status", status);
@@ -1753,7 +1760,7 @@ bool EditorToolkitNeume::MatchHeight(std::string elementId)
         zone->SetLry(uly + offsetY + height);
     }
 
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    if (m_doc->IsFacTranscription()) m_doc->SyncFromFacsimileDoc();
 
     m_editStatus.import("status", "OK");
     m_editStatus.import("message", "");
@@ -1871,7 +1878,7 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 
     fillLayer->ReorderByXPos();
 
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    if (m_doc->IsFacTranscription()) m_doc->SyncFromFacsimileDoc();
 
     m_editStatus.import("uuid", fillStaff->GetID());
     m_editStatus.import("status", "OK");
@@ -2017,7 +2024,7 @@ bool EditorToolkitNeume::SetText(std::string elementId, const std::string &text)
         return false;
     }
 
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    if (m_doc->IsFacTranscription()) m_doc->SyncFromFacsimileDoc();
 
     m_editStatus.import("status", success ? status : "FAILURE");
     m_editStatus.import("message", success ? message : "SetText method failed.");
@@ -2296,7 +2303,7 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
     }
     layer->ClearRelinquishedChildren();
 
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    if (m_doc->IsFacTranscription()) m_doc->SyncFromFacsimileDoc();
 
     m_editStatus.import("status", "OK");
     m_editStatus.import("message", "");
@@ -2354,7 +2361,7 @@ void EditorToolkitNeume::UnlinkSyllable(Syllable *syllable)
                 assert(fi);
                 fi->AttachZone(zone);
 
-                if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+                if (m_doc->IsFacTranscription()) m_doc->SyncFromFacsimileDoc();
             }
         }
     }
@@ -2615,7 +2622,7 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
                 accidZone->SetLry(accidZone->GetLry() + int(rotationOffset));
             }
         }
-        if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+        if (m_doc->IsFacTranscription()) m_doc->SyncFromFacsimileDoc();
         m_doc->GetDrawingPage()->LayOutTranscription(true);
     }
     else if (obj->Is(SYL)) {
@@ -2651,7 +2658,7 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
             zone->SetRotate(rotate);
         }
         zone->Modify();
-        if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+        if (m_doc->IsFacTranscription()) m_doc->SyncFromFacsimileDoc();
     }
     else {
         LogError("Element of type '%s' is unsupported.", obj->GetClassName().c_str());
@@ -3050,7 +3057,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
 
     secondParent->ReorderByXPos();
 
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    if (m_doc->IsFacTranscription()) m_doc->SyncFromFacsimileDoc();
 
     m_editStatus.import("uuid", parent->GetID());
     m_editStatus.import("status", status);
@@ -3334,7 +3341,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
         }
     }
 
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    if (m_doc->IsFacTranscription()) m_doc->SyncFromFacsimileDoc();
 
     m_editStatus.import("status", "OK");
     m_editStatus.import("message", "");
@@ -3521,7 +3528,7 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
         prevNc = newNc;
     }
 
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    if (m_doc->IsFacTranscription()) m_doc->SyncFromFacsimileDoc();
 
     m_editStatus.import("uuid", el->GetID());
     m_editStatus.import("status", "OK");
@@ -3628,12 +3635,66 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
         return false;
     }
 
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+    if (m_doc->IsFacTranscription()) m_doc->SyncFromFacsimileDoc();
     m_doc->GetDrawingPage()->LayOutTranscription(true);
 
     m_editStatus.import("status", "OK");
     m_editStatus.import("message", "");
     return success1 && success2;
+}
+
+bool EditorToolkitNeume::ToggleNeumeConnection(std::vector<std::string> elementIds)
+{
+    assert(elementIds.size() == 2);
+    std::string firstNcId = elementIds[0];
+    std::string secondNcId = elementIds[1];
+
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page.");
+        m_editStatus.import("status", "FAILURE");
+        m_editStatus.import("message", "Could not get the drawing page.");
+        return false;
+    }
+
+    Nc *firstNc = vrv_cast<Nc *>(m_doc->GetDrawingPage()->FindDescendantByID(firstNcId));
+    assert(firstNc);
+    Nc *secondNc = vrv_cast<Nc *>(m_doc->GetDrawingPage()->FindDescendantByID(secondNcId));
+    assert(secondNc);
+
+    if (firstNc->GetParent() != secondNc->GetParent()) {
+        LogError("The selected ncs are not in the same neume.");
+        m_editStatus.import("status", "FAILURE");
+        m_editStatus.import("message", "The selected ncs are not in the same neume.");
+        return false;
+    }
+
+    int firstIdx = firstNc->GetIdx();
+    int secondIdx = secondNc->GetIdx();
+    if (std::abs(firstIdx - secondIdx) != 1) {
+        LogError("The selected ncs are not adjacent.");
+        m_editStatus.import("status", "FAILURE");
+        m_editStatus.import("message", "The selected ncs are not adjacent.");
+        return false;
+    }
+
+    Nc *currentNc = (firstIdx > secondIdx) ? firstNc : secondNc;
+    Staff *staff = vrv_cast<Staff *>(currentNc->GetFirstAncestor(STAFF));
+    assert(staff);
+    if (staff->m_drawingNotationType != NOTATIONTYPE_neume_hufnagel) {
+        LogError("Neume connections are supported only for Hufnagel notation.");
+        m_editStatus.import("status", "FAILURE");
+        m_editStatus.import("message", "Neume connections are supported only for Hufnagel notation.");
+        return false;
+    }
+
+    currentNc->SetCon((currentNc->GetCon() == ncForm_CON_e) ? ncForm_CON_NONE : ncForm_CON_e);
+
+    if (m_doc->IsFacTranscription()) m_doc->SyncFromFacsimileDoc();
+    m_doc->GetDrawingPage()->LayOutTranscription(true);
+
+    m_editStatus.import("status", "OK");
+    m_editStatus.import("message", "");
+    return true;
 }
 
 bool EditorToolkitNeume::ChangeStaff(std::string elementId)
@@ -4304,6 +4365,16 @@ bool EditorToolkitNeume::ParseChangeGroupAction(jsonxx::Object param, std::strin
 }
 
 bool EditorToolkitNeume::ParseToggleLigatureAction(jsonxx::Object param, std::vector<std::string> *elementIds)
+{
+    if (!param.has<jsonxx::Array>("elementIds")) return false;
+    jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
+    for (int i = 0; i < (int)array.size(); ++i) {
+        elementIds->push_back(array.get<jsonxx::String>(i));
+    }
+    return true;
+}
+
+bool EditorToolkitNeume::ParseToggleNeumeConnectionAction(jsonxx::Object param, std::vector<std::string> *elementIds)
 {
     if (!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");

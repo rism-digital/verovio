@@ -33,7 +33,7 @@
 #include "repeatmark.h"
 #include "rest.h"
 #include "runningelement.h"
-#include "score.h"
+#include "scoreorpartelement.h"
 #include "section.h"
 #include "space.h"
 #include "staff.h"
@@ -153,15 +153,15 @@ FunctorCode PrepareDataInitializationFunctor::VisitRepeatMark(RepeatMark *repeat
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode PrepareDataInitializationFunctor::VisitScore(Score *score)
+FunctorCode PrepareDataInitializationFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     // Call parent one too
-    this->VisitPageElement(score);
+    this->VisitPageElement(scoreOrPart);
 
-    assert(score->GetScoreDef());
+    assert(scoreOrPart->GetScoreDef());
 
     // Evaluate functor on scoreDef
-    score->GetScoreDef()->Process(*this);
+    scoreOrPart->GetScoreDef()->Process(*this);
 
     return FUNCTOR_CONTINUE;
 }
@@ -415,11 +415,11 @@ PrepareAltSymFunctor::PrepareAltSymFunctor() : Functor()
 
 FunctorCode PrepareAltSymFunctor::VisitObject(Object *object)
 {
-    if (object->Is(SCORE)) {
-        Score *score = vrv_cast<Score *>(object);
-        assert(score);
-        assert(score->GetScoreDef());
-        m_symbolTable = vrv_cast<SymbolTable *>(score->GetScoreDef()->FindDescendantByType(SYMBOLTABLE));
+    if (object->IsScoreOrPartElement()) {
+        ScoreOrPartElement *scoreOrPart = vrv_cast<ScoreOrPartElement *>(object);
+        assert(scoreOrPart);
+        assert(scoreOrPart->GetScoreDef());
+        m_symbolTable = vrv_cast<SymbolTable *>(scoreOrPart->GetScoreDef()->FindDescendantByType(SYMBOLTABLE));
     }
 
     if (object->HasInterface(INTERFACE_ALT_SYM)) {
@@ -624,9 +624,9 @@ FunctorCode PrepareDurationFunctor::VisitLayerElement(LayerElement *layerElement
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode PrepareDurationFunctor::VisitScore(Score *score)
+FunctorCode PrepareDurationFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
-    ScoreDef *scoreDef = score->GetScoreDef();
+    ScoreDef *scoreDef = scoreOrPart->GetScoreDef();
     if (scoreDef) {
         scoreDef->Process(*this);
     }
@@ -1141,20 +1141,17 @@ FunctorCode PrepareLyricsFunctor::VisitSyl(Syl *syl)
     if (m_currentSyl) {
         // The previous syl was an initial or median -> The note we just parsed is the end
         if ((m_currentSyl->GetWordpos() == sylLog_WORDPOS_i) || (m_currentSyl->GetWordpos() == sylLog_WORDPOS_m)) {
-            if (!isEmptySyl) {
-                m_currentSyl->SetEnd(m_lastNoteOrChord);
-                m_currentSyl->m_nextWordSyl = syl;
-            }
+            m_currentSyl->SetEnd(m_lastNoteOrChord);
+            if (!isEmptySyl) m_currentSyl->m_nextWordSyl = syl;
         }
-        // The previous syl was an underscore -> the explicit empty endpoint or the previous but one was the end.
+        // The previous syl was an underscore -> the previous but one was the end
         else if (m_currentSyl->GetCon() == sylLog_CON_u) {
-            LayerElement *end = isEmptySyl ? syl->GetStart() : m_penultimateNoteOrChord;
-            if (end && (m_currentSyl->GetStart() == end)) {
+            if (m_currentSyl->GetStart() == m_penultimateNoteOrChord) {
                 LogWarning("Syllable with underline extender under one single note '%s'",
                     m_currentSyl->GetStart()->GetID().c_str());
             }
-            else if (end) {
-                m_currentSyl->SetEnd(end);
+            else if (m_penultimateNoteOrChord) {
+                m_currentSyl->SetEnd(m_penultimateNoteOrChord);
             }
         }
     }
@@ -1485,7 +1482,7 @@ FunctorCode PrepareRptFunctor::VisitStaff(Staff *staff)
     }
 
     // This is happening only for the first staff element of the staff @n
-    ScoreDef *scoreDef = m_doc->GetCorrespondingScore(staff)->GetScoreDef();
+    ScoreDef *scoreDef = m_doc->GetCorrespondingScoreOrPart(staff)->GetScoreDef();
     assert(scoreDef);
     if (StaffDef *staffDef = scoreDef->GetStaffDef(staff->GetN())) {
         const bool hideNumber = (staffDef->GetMultiNumber() == BOOLEAN_false)

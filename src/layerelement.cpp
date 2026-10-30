@@ -684,8 +684,8 @@ Fraction LayerElement::GetAlignmentDuration(
     }
 
     if (this->HasInterface(INTERFACE_DURATION)) {
-        int num = 1;
-        int numbase = 1;
+        int num = params.num;
+        int numbase = params.numbase;
 
         if (params.proport) {
             // Proportion are applied reversly - higher ratio means shorter values
