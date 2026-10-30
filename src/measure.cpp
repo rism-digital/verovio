@@ -11,7 +11,7 @@
 
 #include <algorithm>
 #include <cassert>
-#include <math.h>
+#include <cmath>
 
 //----------------------------------------------------------------------------
 
@@ -372,6 +372,38 @@ int Measure::GetInnerCenterX() const
     return (this->GetDrawingX() + this->GetLeftBarLineRight() + this->GetInnerWidth() / 2);
 }
 
+int Measure::GetXAtScoreTime(const Fraction &time, bool &interpolated) const
+{
+    interpolated = false;
+
+    const Alignment *previous = NULL;
+    const Alignment *next = NULL;
+
+    for (const Object *child = m_measureAligner.GetFirst(); child; child = m_measureAligner.GetNext()) {
+        const Alignment *alignment = vrv_cast<const Alignment *>(child);
+        if (!alignment) continue;
+
+        if ((alignment->GetTime() <= time) || ApproximatelyEqual(alignment->GetTime().ToDouble(), time.ToDouble())) {
+            previous = alignment;
+            continue;
+        }
+        next = alignment;
+        break;
+    }
+
+    if (!previous && next) previous = next;
+    if (!previous) return 0;
+    if (!next || (next->GetTime() == previous->GetTime())) return previous->GetXRel();
+
+    const double deltaTime = (next->GetTime() - previous->GetTime()).ToDouble();
+    if (deltaTime == 0.0) return previous->GetXRel();
+
+    interpolated = true;
+    const double t = (time - previous->GetTime()).ToDouble() / deltaTime;
+    const int deltaX = next->GetXRel() - previous->GetXRel();
+    return previous->GetXRel() + static_cast<int>(std::round(deltaX * t));
+}
+
 int Measure::GetDrawingOverflow()
 {
     AdjustXOverflowFunctor adjustXOverflow(0);
@@ -525,6 +557,18 @@ int Measure::EnclosesTime(int time) const
     std::vector<double>::const_iterator iter;
     for (iter = m_realTimeOnsetMilliseconds.begin(); iter != m_realTimeOnsetMilliseconds.end(); ++iter) {
         if ((time >= *iter) && (time <= *iter + timeDuration)) return repeat;
+        repeat++;
+    }
+    return VRV_UNSET;
+}
+
+int Measure::EnclosesScoreTime(const Fraction &time) const
+{
+    int repeat = 1;
+    for (size_t i = 0; i < m_scoreTimeOnset.size(); ++i) {
+        const Fraction onset = m_scoreTimeOnset.at(i);
+        const Fraction offset = (i < m_scoreTimeOffset.size()) ? m_scoreTimeOffset.at(i) : onset;
+        if ((time >= onset) && (time <= offset)) return repeat;
         repeat++;
     }
     return VRV_UNSET;
