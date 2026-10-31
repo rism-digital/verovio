@@ -232,7 +232,15 @@ set_source_files_properties(
 )
 
 if(NOT MSVC)
-    set_source_files_properties(../external/harfbuzz/src/verovio-harfbuzz.cc PROPERTIES COMPILE_OPTIONS "-Oz")
+    # -Oz is supported by Clang and GCC >= 12 only, fall back to -Os otherwise
+    include(CheckCXXCompilerFlag)
+    check_cxx_compiler_flag("-Oz" VRV_CXX_HAS_OZ)
+    if(VRV_CXX_HAS_OZ)
+        set(VRV_HARFBUZZ_OPT "-Oz")
+    else()
+        set(VRV_HARFBUZZ_OPT "-Os")
+    endif()
+    set_source_files_properties(../external/harfbuzz/src/verovio-harfbuzz.cc PROPERTIES COMPILE_OPTIONS "${VRV_HARFBUZZ_OPT}")
     set_source_files_properties(
         ../external/woff2/src/verovio-woff2.cc
         ../external/brotli/c/verovio-brotli.c
