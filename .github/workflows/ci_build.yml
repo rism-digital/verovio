@@ -218,7 +218,7 @@ jobs:
         uses: actions/checkout@v7.0.1
 
       - name: Restore cache
-        uses: actions/setup-java@v6.0.1
+        uses: actions/setup-java@v6.1.0
         with:
           distribution: 'temurin'
           java-version: '21'
@@ -402,7 +402,7 @@ jobs:
         run: mkdir -p npm/dist
 
       - name: Download JS artifacts
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8.0.2
         with:
           path: ${{ github.workspace }}/emscripten/artifacts
 
@@ -507,7 +507,7 @@ jobs:
           path: ${{ env.GH_PAGES_DIR }}
 
       - name: Download TOOLKIT_BUILD artifacts
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8.0.2
         with:
           name: ${{ env.TOOLKIT_BUILD }}-wasm-${{ github.run_id }}
           path: artifacts/${{ env.TOOLKIT_BUILD }}
@@ -517,7 +517,7 @@ jobs:
           cp -r artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
 
       - name: Download FONTS artifacts
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8.0.2
         with:
           name: ${{ env.FONTS }}-${{ github.run_id }}
           path: artifacts/${{ env.FONTS }}
@@ -637,7 +637,7 @@ jobs:
           path: ${{ env.DOXYGEN_DIR }}
 
       - name: Download DOC_BUILD artifacts
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8.0.2
         with:
           name: ${{ env.DOC_BUILD }}-${{ github.run_id }}
           path: artifacts/${{ env.DOC_BUILD }}
