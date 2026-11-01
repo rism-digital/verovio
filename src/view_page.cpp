@@ -79,6 +79,7 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     // Set the current score def to the page one
     // The page one has previously been set by the ScoreDefSetCurrentFunctor
     m_drawingScoreDef = m_currentPage->m_drawingScoreDef;
+    m_drawingScoreDef.CloneReset();
 
     if ((m_doc->GetAdjustedDrawingPageHeight() > dc->GetHeight()) && m_options->m_shrinkToFit.GetValue()) {
         dc->SetContentHeight(m_doc->GetAdjustedDrawingPageHeight());
@@ -179,7 +180,11 @@ void View::DrawPageElement(DeviceContext *dc, PageElement *element)
         dc->StartGraphic(element, elementStart, element->GetID());
         dc->EndGraphic(element, this);
     }
-    else if (element->Is(SCORE)) {
+    else if (element->Is(PARTS)) {
+        dc->StartGraphic(element, "pageMilestone", element->GetID());
+        dc->EndGraphic(element, this);
+    }
+    else if (element->IsScoreOrPartElement()) {
         dc->StartGraphic(element, "pageMilestone", element->GetID());
         dc->EndGraphic(element, this);
     }

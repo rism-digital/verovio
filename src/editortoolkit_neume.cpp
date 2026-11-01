@@ -33,7 +33,7 @@
 #include "quilisma.h"
 #include "rend.h"
 #include "sb.h"
-#include "score.h"
+#include "scoreorpartelement.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "surface.h"
@@ -857,7 +857,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         else {
             newStaff = new Staff(1);
             newStaff->m_drawingStaffDef = vrv_cast<StaffDef *>(
-                m_doc->GetCorrespondingScore(page)->GetScoreDef()->FindDescendantByType(STAFFDEF));
+                m_doc->GetCorrespondingScoreOrPart(page)->GetScoreDef()->FindDescendantByType(STAFFDEF));
             newStaff->m_drawingNotationType = NOTATIONTYPE_neume;
             newStaff->m_drawingLines = 4;
         }
@@ -876,7 +876,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         newMeasure->AddChild(newStaff);
         newSystem->AddChild(newSb);
         newSystem->AddChild(newMeasure);
-        newSystem->SetDrawingScoreDef(vrv_cast<ScoreDef *>(m_doc->GetCorrespondingScore(page)->GetScoreDef()));
+        newSystem->SetDrawingScoreDef(vrv_cast<ScoreDef *>(m_doc->GetCorrespondingScoreOrPart(page)->GetScoreDef()));
 
         page->InsertAfter(page->GetFirst(SCORE), newSystem);
 

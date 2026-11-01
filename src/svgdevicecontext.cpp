@@ -1307,14 +1307,15 @@ void SvgDeviceContext::AppendIdAndClass(
 
 void SvgDeviceContext::AppendAdditionalAttributes(Object *object)
 {
-    std::pair<std::multimap<ClassId, std::string>::iterator, std::multimap<ClassId, std::string>::iterator> range;
-    range = m_svgAdditionalAttributes.equal_range(object->GetClassId()); // if correct class name...
-    for (std::multimap<ClassId, std::string>::iterator it = range.first; it != range.second; ++it) {
-        ArrayOfStrAttr attributes;
-        object->GetAttributes(&attributes);
-        for (ArrayOfStrAttr::iterator iter = attributes.begin(); iter != attributes.end(); ++iter) {
-            if (it->second == (*iter).first) // ...and attribute exists in class name, add it to SVG element
-                m_currentNode.append_attribute(("data-" + it->second).c_str()) = (*iter).second.c_str();
+    const auto range = m_svgAdditionalAttributes.equal_range(object->GetClassId()); // if correct class name...
+    if (range.first == range.second) return;
+    // Getting the attributes is costly, so do it once for all the additional attributes of the class
+    ArrayOfStrAttr attributes;
+    object->GetAttributes(&attributes);
+    for (auto it = range.first; it != range.second; ++it) {
+        for (const auto &attribute : attributes) {
+            if (it->second == attribute.first) // ...and attribute exists in class name, add it to SVG element
+                m_currentNode.append_attribute(("data-" + it->second).c_str()) = attribute.second.c_str();
         }
     }
 }

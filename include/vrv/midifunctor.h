@@ -384,7 +384,7 @@ public:
     void SetTrack(int track) { m_midiTrack = track; }
     void SetTransSemi(int transSemi) { m_transSemi = transSemi; }
     void SetInstrDef(const InstrDef *instrDef) { m_instrDef = instrDef; }
-    void SetCustomTuning(const CustomTuning *customTuning) { m_customTuning = customTuning; }
+    void SetCustomTuning(CustomTuning *customTuning) { m_customTuning = customTuning; }
     ///@}
 
     /*
@@ -471,7 +471,7 @@ private:
     // Current instrument definition
     const InstrDef *m_instrDef;
     // Current custom tuning
-    const CustomTuning *m_customTuning;
+    CustomTuning *m_customTuning;
 };
 
 //----------------------------------------------------------------------------

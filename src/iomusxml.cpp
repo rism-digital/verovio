@@ -322,7 +322,7 @@ void MusicXmlInput::InsertClefToLayer(Staff *staff, Layer *layer, Clef *clef, in
                 const int actualScoreOnSet = start->first;
                 auto end = m_layerTimes.at(otherLayer).upper_bound(actualScoreOnSet);
                 LayerElement *layerElement = (--end)->second;
-                this->InsertClefIntoObject(layerElement, clefToAdd, otherLayer, scoreOnset, true);
+                this->InsertClefIntoObject(layerElement, clefToAdd, otherLayer, actualScoreOnSet, true);
             }
         }
     }
@@ -333,7 +333,6 @@ void MusicXmlInput::InsertClefIntoObject(
 {
     if (layerElement->GetParent()->Is(LAYER)) {
         this->InsertClefIntoObject(layer, clef, layerElement, insertAfter);
-        m_layerTimes.at(layer).emplace(scoreOnset, clef);
     }
     else {
         Object *parent = layerElement->GetParent();
@@ -344,6 +343,7 @@ void MusicXmlInput::InsertClefIntoObject(
             this->InsertClefIntoObject(parent, clef, layerElement, insertAfter);
         }
     }
+    if (insertAfter) m_layerTimes.at(layer).emplace(scoreOnset, clef);
 }
 
 void MusicXmlInput::InsertClefIntoObject(Object *parent, Clef *clef, Object *layerElement, bool insertAfter)
@@ -1638,6 +1638,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
             if (key) {
                 KeySig *meiKey = ConvertKey(key.node());
                 staffDef->AddChild(meiKey);
+                m_keyAlteredPitches[staffDef->GetN()] = ConvertKeyAlteredPitches(key.node());
                 if (staffDef->GetNotationtype() == NOTATIONTYPE_tab_guitar) meiKey->IsAttribute(true);
             }
 
@@ -2107,6 +2108,17 @@ void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Section *section
         }
     }
 
+    // keep track of the pitches altered by key changes, a key without number applies to all staves
+    for (pugi::xml_node keyNode : node.children("key")) {
+        const int keyStaffNum = keyNode.attribute("number").as_int();
+        for (int i = 0; i < measure->GetChildCount(STAFF); ++i) {
+            if ((keyStaffNum > 0) && (keyStaffNum != i + 1)) continue;
+            Staff *staff = vrv_cast<Staff *>(measure->GetChild(i, STAFF));
+            assert(staff);
+            m_keyAlteredPitches[staff->GetN()] = ConvertKeyAlteredPitches(keyNode);
+        }
+    }
+
     // key and time change
     pugi::xml_node key = node.child("key");
     pugi::xml_node time = node.child("time");
@@ -2282,7 +2294,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
 
     const pugi::xml_node typeNode = node.child("direction-type");
     const pugi::xpath_node voice = node.select_node("voice");
-    const short int offset = node.child("offset").text().as_int();
+    const int offset = node.child("offset").text().as_int();
     const pugi::xml_node staffNode = node.child("staff");
     const pugi::xml_node soundNode = node.child("sound");
 
@@ -2875,9 +2887,12 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure)
 
     int durOffset = 0;
 
-    std::string harmText = GetContentOfChild(node, "root/root-step");
+    // root-step@text, when present, replaces the step in the displayed text. An empty value hides the root,
+    // which is how the "none" kind (no chord) is expected to be encoded.
+    pugi::xml_node rootStep = node.child("root").child("root-step");
+    std::string harmText = rootStep.attribute("text") ? rootStep.attribute("text").as_string() : GetContent(rootStep);
     pugi::xpath_node alter = node.select_node("root/root-alter");
-    if (harmText.empty()) {
+    if (!rootStep) {
         pugi::xml_node numeral = node.select_node("numeral/numeral-root").node();
         harmText = numeral.attribute("text") ? numeral.attribute("text").as_string() : numeral.text().as_string();
         alter = node.select_node("numeral/numeral-alter");
@@ -2888,7 +2903,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure)
         if (HasAttributeWithValue(kind, "use-symbols", "yes")) {
             harmText = harmText + ConvertKindToSymbol(GetContent(kind));
         }
-        else if (kind.attribute("text") && std::strcmp(kind.text().as_string(), "none")) {
+        else if (kind.attribute("text")) {
             harmText = harmText + kind.attribute("text").as_string();
         }
         else {
@@ -3181,7 +3196,10 @@ void MusicXmlInput::ReadMusicXmlNote(
             const float alterVal = pitch.child("alter").text().as_float();
             const int octaveNum = pitch.child("octave").text().as_int();
             if (!stepStr.empty()) note->SetPname(ConvertStepToPitchName(stepStr));
-            if (m_octDis[notationStaffN] != 0) {
+            // The written octave follows the octave shift of the staff the note is drawn on. The sounding octave
+            // is also made explicit when the staff of the layer is shifted, since a cross-staff note is not
+            // affected by it.
+            if ((m_octDis[notationStaffN] != 0) || (m_octDis[staff->GetN()] != 0)) {
                 note->SetOct(octaveNum - m_octDis[notationStaffN]);
                 note->SetOctGes(octaveNum);
             }
@@ -3196,6 +3214,10 @@ void MusicXmlInput::ReadMusicXmlNote(
                 ListOfObjects accids = note->FindAllDescendantsByType(ACCID);
                 if (accids.empty()) {
                     std::vector<musicxml::Accidental> currentAccids;
+                    // A natural needs to be explicit when the key signature alters the pitch
+                    const auto keyIter = m_keyAlteredPitches.find(notationStaffN);
+                    const bool isAlteredByKey
+                        = (keyIter != m_keyAlteredPitches.end()) && keyIter->second.contains(note->GetPname());
 
                     // Use the alter value as key to the accidentals.
                     // In case this alter value is already associated with an accidental, use it here.
@@ -3210,8 +3232,9 @@ void MusicXmlInput::ReadMusicXmlNote(
 
                     try {
                         for (const auto &current : currentAccids) {
-                            // Avoid adding empty accidentals
-                            if ((current.m_accid == ACCIDENTAL_WRITTEN_NONE || current.m_accid == ACCIDENTAL_WRITTEN_n)
+                            // Avoid adding empty accidentals, and naturals that are not altered by the key signature
+                            if ((current.m_accid == ACCIDENTAL_WRITTEN_NONE
+                                    || (current.m_accid == ACCIDENTAL_WRITTEN_n && !isAlteredByKey))
                                 && current.m_glyphName.empty())
                                 continue;
 
@@ -4207,13 +4230,14 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure, Sec
     if (abletonTuning) {
         const std::string tuningDef
             = std::regex_replace(abletonTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
-        CustomTuning tuning(tuningDef, m_doc, true);
-        if (tuning.IsValid()) {
+        CustomTuning *tuning = new CustomTuning(tuningDef, m_doc, true);
+        if (tuning->IsValid()) {
             ScoreDef *scoreDef = GetOrCreateLastScoreDef(section);
             assert(scoreDef);
             scoreDef->SetCustomTuning(tuning);
         }
         else {
+            delete tuning;
             LogWarning("MusicXML import: Error parsing tuning definition");
         }
     }
@@ -4268,9 +4292,11 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure, Sec
         m_fineInfo = musicxml::FineInfo(true);
     }
 
+    // A tempo within a direction is already handled by ReadMusicXmlDirection
+    const bool inDirection = IsElement(node.parent(), "direction");
     const float bpm = node.attribute("tempo").as_float();
-    if (bpm > 0) {
-        const short int offset = node.child("offset").text().as_int();
+    if (bpm > 0 && !inDirection) {
+        const int offset = node.child("offset").text().as_int();
         const double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
         Tempo *tempo = new Tempo();
         tempo->SetMidiBpm(bpm);
@@ -4557,6 +4583,27 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
     }
 
     return keySig;
+}
+
+std::set<data_PITCHNAME> MusicXmlInput::ConvertKeyAlteredPitches(const pugi::xml_node &key)
+{
+    std::set<data_PITCHNAME> alteredPitches;
+    if (key.child("fifths")) {
+        const int fifths = key.child("fifths").text().as_int();
+        const std::string order = (fifths > 0) ? "FCGDAEB" : "BEADGCF";
+        for (int i = 0; i < std::min(abs(fifths), 7); ++i) {
+            alteredPitches.insert(ConvertStepToPitchName(std::string(1, order.at(i))));
+        }
+    }
+    else {
+        for (pugi::xml_node keyStep : key.children("key-step")) {
+            const pugi::xml_node keyAlter = keyStep.next_sibling("key-alter");
+            if (keyAlter && (keyAlter.text().as_float() != 0.0)) {
+                alteredPitches.insert(ConvertStepToPitchName(keyStep.text().as_string()));
+            }
+        }
+    }
+    return alteredPitches;
 }
 
 ScoreDef *MusicXmlInput::GetOrCreateLastScoreDef(Section *section)

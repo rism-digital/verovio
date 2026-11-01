@@ -37,7 +37,7 @@
 #include "plistinterface.h"
 #include "rend.h"
 #include "rest.h"
-#include "score.h"
+#include "scoreorpartelement.h"
 #include "slur.h"
 #include "staff.h"
 #include "staffdef.h"
@@ -1784,7 +1784,7 @@ bool EditorToolkitShared::ContextForElement(std::string &elementId)
             }
         }
         // Top element in the score subtree
-        if (current->GetParent()->Is(SCORE)) break;
+        if (current->GetParent()->IsScoreOrPartElement()) break;
         current = current->GetParent();
         ancestors.push_back(current);
     }
@@ -1967,8 +1967,8 @@ ArrayOfConstObjects EditorToolkitShared::GetScoreBasedChildrenFor(const Object *
 ScoreDef *EditorToolkitShared::ResolveScoreDef(bool selected)
 {
     if (!selected) {
-        Score *score = m_doc->GetFirstVisibleScore();
-        return score ? score->GetScoreDef() : NULL;
+        ScoreOrPartElement *scoreOrPart = m_doc->GetFirstVisibleScoreOrPart();
+        return scoreOrPart ? scoreOrPart->GetScoreDef() : NULL;
     }
 
     std::string selectionId = m_selectionId;

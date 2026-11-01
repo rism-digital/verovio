@@ -118,6 +118,8 @@ class Page;
 class PageElement;
 class PageMilestoneEnd;
 class Pages;
+class Part;
+class Parts;
 class Pb;
 class Pedal;
 class PgFoot;
@@ -141,6 +143,7 @@ class Restore;
 class Refrain;
 class RunningElement;
 class Score;
+class ScoreOrPartElement;
 class ScoreDef;
 class ScoreDefElement;
 class ScoreDefInterface;
@@ -350,6 +353,9 @@ private:
     ///@{
     void WriteMdiv(pugi::xml_node currentNode, Mdiv *mdiv);
     void WritePages(pugi::xml_node currentNode, Pages *pages);
+    void WriteParts(pugi::xml_node currentNode, Parts *parts);
+    void WriteScoreOrPartElement(pugi::xml_node currentNode, ScoreOrPartElement *scoreOrPartElement);
+    void WritePart(pugi::xml_node currentNode, Part *part);
     void WriteScore(pugi::xml_node currentNode, Score *score);
     ///@}
 
@@ -699,6 +705,9 @@ private:
     ///@{
     bool ReadMdiv(Object *parent, pugi::xml_node parentNode, bool isVisible);
     bool ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool isVisible);
+    bool ReadParts(Object *parent, pugi::xml_node parentNode);
+    bool ReadPartsChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadPart(Object *parent, pugi::xml_node parentNode);
     bool ReadScore(Object *parent, pugi::xml_node parentNode);
     bool ReadScoreScoreDef(Object *parent, pugi::xml_node parentNode);
     ///@}
@@ -711,6 +720,7 @@ private:
     bool ReadPage(Object *parent, pugi::xml_node parentNode);
     bool ReadPageChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadPageMilestoneEnd(Object *parent, pugi::xml_node milestoneEnd);
+    bool ReadScoreOrPartChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadSystem(Object *parent, pugi::xml_node system);
     bool ReadSystemChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadSystemMilestoneEnd(Object *parent, pugi::xml_node milestoneEnd);
@@ -919,6 +929,7 @@ private:
     bool ReadTextLayoutElement(pugi::xml_node element, TextLayoutElement *object);
     bool ReadRunningElement(pugi::xml_node element, RunningElement *object);
     bool ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *object);
+    bool ReadScoreOrPartElement(pugi::xml_node element, ScoreOrPartElement *object);
     bool ReadSystemElement(pugi::xml_node element, SystemElement *object);
     bool ReadTextElement(pugi::xml_node element, TextElement *object);
 
@@ -974,7 +985,7 @@ private:
      * The data is read into an object, which is then converted to page-based MEI.
      * See MEIInput::ReadDoc, Doc::CreateScoreBuffer and Doc::ConvertToPageBasedDoc
      */
-    bool ReadScoreBasedMei(pugi::xml_node element, Score *parent);
+    bool ReadScoreBasedMei(pugi::xml_node element, ScoreOrPartElement *parent);
 
     /**
      * @name Various methods for reading / converting values.

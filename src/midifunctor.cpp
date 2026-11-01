@@ -589,6 +589,9 @@ FunctorCode InitMIDIFunctor::VisitMeasure(const Measure *measure)
 
 FunctorCode InitMIDIFunctor::VisitOctave(const Octave *octave)
 {
+    // An octave without start or end (e.g., an unresolved @endid) is not rendered and is ignored
+    if (!octave->HasStartAndEnd()) return FUNCTOR_CONTINUE;
+
     const Measure *measure = vrv_cast<const Measure *>(octave->GetFirstAncestor(MEASURE));
     assert(measure);
     std::vector<const Staff *> staffList = octave->GetTstampStaves(measure, octave);
@@ -910,6 +913,8 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
 FunctorCode GenerateMIDIFunctor::VisitPedal(const Pedal *pedal)
 {
     if (!pedal->HasDir()) return FUNCTOR_CONTINUE;
+    // The start is needed to calculate the pedal time below; skip pedals without one (e.g., an unresolved @startid)
+    if (!pedal->GetStart()) return FUNCTOR_CONTINUE;
 
     // Check the functor flag - filters should always be there, but just in case we change how it is called
     if (!m_controlEvents || !this->GetFilters()) return FUNCTOR_CONTINUE;
@@ -964,10 +969,10 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
         referencePitchClass = Note::PnameToPclass(scoreDef->GetTunePname());
     }
     // set and remember custom tuning if available
-    if (scoreDef->GetCustomTuning().IsValid()) {
-        m_customTuning = &scoreDef->GetCustomTuning();
+    if (scoreDef->HasCustomTuning() && scoreDef->GetCustomTuning()->IsValid()) {
+        m_customTuning = scoreDef->GetCustomTuning();
         const int program = m_instrDef && m_instrDef->HasMidiInstrnum() ? m_instrDef->GetMidiInstrnum() : 0;
-        const Tunings::Tuning &tuneCustom = scoreDef->GetCustomTuning().GetTuning();
+        const Tunings::Tuning &tuneCustom = m_customTuning->GetTuning();
         std::vector<std::pair<int, double>> mapping;
         // sysex messages should not have the high bit (0x80) set, which means that the full 128 MIDI notes
         // cannot be retuned in the same sysex message. For now, we skip MIDI key 0.

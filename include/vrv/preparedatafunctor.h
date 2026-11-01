@@ -49,7 +49,7 @@ public:
     FunctorCode VisitKeySig(KeySig *keySig) override;
     FunctorCode VisitMSpace(MSpace *mSpace) override;
     FunctorCode VisitRepeatMark(RepeatMark *repeatMark) override;
-    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart) override;
     FunctorCode VisitSpace(Space *space) override;
     FunctorCode VisitTextLayoutElement(TextLayoutElement *textLayoutElement) override;
     ///@}
@@ -389,7 +389,7 @@ public:
      */
     ///@{
     FunctorCode VisitLayerElement(LayerElement *layerElement) override;
-    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart) override;
     FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
     FunctorCode VisitStaffDef(StaffDef *staffDef) override;
     ///@}
