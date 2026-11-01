@@ -14,6 +14,7 @@
 
 //--------------------------------------------------------------------------------
 
+#include "clipboard.h"
 #include "doc.h"
 #include "view.h"
 
@@ -41,6 +42,7 @@ public:
         m_cursor = NULL;
 
         m_options = 0;
+        m_clipboard.SetDoc(doc);
     }
     virtual ~EditorToolkit() {}
 
@@ -88,6 +90,8 @@ protected:
 
     /** Record option changes  */
     int m_options;
+
+    Clipboard m_clipboard;
 };
 } // namespace vrv
 

@@ -16,8 +16,10 @@
 
 namespace vrv {
 
-class Layer;
+class Doc;
 class Measure;
+class Layer;
+class Object;
 class System;
 
 //----------------------------------------------------------------------------
@@ -38,10 +40,18 @@ public:
     virtual ~Clipboard();
     ///@}
 
+    void SetDoc(Doc *doc) { m_doc = doc; }
+
     enum ClipboardType : int8_t { CLIPBOARD_NONE = 0, CLIPBOARD_MEASURES, CLIPBOARD_STAVES, CLIPBOARD_LAYERELEMENTS };
 
     ClipboardType GetClipboardType() const { return m_clipboardType; }
     void ClearClipboard();
+
+    bool Copy(const Object *selection);
+    bool Paste(Object *selection);
+
+    bool CanCopy(const Object *selection) const;
+    bool CanPaste(const Object *selection) const;
 
 private:
     //
@@ -49,9 +59,10 @@ public:
     //
 private:
     ClipboardType m_clipboardType;
-    System *m_clipboardSystem;
-    std::vector<Measure *> *m_clipboardMeasures;
-    Layer *m_clipboardLayer;
+    Doc *m_doc;
+    System *m_clipboardMeasures;
+    System *m_clipboardStaves;
+    Layer *m_clipboardLayerElements;
 };
 
 } // namespace vrv

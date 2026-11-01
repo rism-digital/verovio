@@ -1017,11 +1017,15 @@ bool EditorToolkitShared::CanRedo() const
 
 bool EditorToolkitShared::CanCopyOrCut() const
 {
+    if (m_selectionId.empty()) return false;
+
     return true;
 }
 
 bool EditorToolkitShared::CanPaste() const
 {
+    if (m_selectionId.empty()) return false;
+
     return true;
 }
 
@@ -1181,21 +1185,21 @@ bool EditorToolkitShared::ResetCursor(bool maintainChordMode)
 
 bool EditorToolkitShared::Copy()
 {
-    if (m_selectionId.empty()) return false;
+    if (this->CanCopyOrCut()) return false;
 
     return true;
 }
 
 bool EditorToolkitShared::Cut()
 {
-    if (m_selectionId.empty()) return false;
+    if (this->CanCopyOrCut()) return false;
 
     return true;
 }
 
 bool EditorToolkitShared::Paste()
 {
-    if (m_selectionId.empty()) return false;
+    if (this->CanPaste()) return false;
 
     return true;
 }
