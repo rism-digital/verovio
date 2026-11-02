@@ -127,26 +127,6 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         return false;
     }
 
-    // Clipboard actions - also without parameter
-    if (action == "copy") {
-        std::string elementId;
-        if (this->ParseCopyAction(json.get<jsonxx::Object>("param"), elementId)) return this->Copy(elementId);
-    }
-    else if (action == "cut") {
-        std::string elementId;
-        if (this->ParseCutAction(json.get<jsonxx::Object>("param"), elementId)) {
-            this->PrepareUndo();
-            return this->Cut(elementId);
-        }
-    }
-    else if (action == "paste") {
-        std::string elementId;
-        if (this->ParsePasteAction(json.get<jsonxx::Object>("param"), elementId)) {
-            this->PrepareUndo();
-            return this->Paste(elementId);
-        }
-    }
-
     if (!json.has<jsonxx::Object>("param") && !json.has<jsonxx::Array>("param")) {
         LogWarning("Incorrectly formatted JSON param.");
     }
@@ -175,6 +155,18 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         }
         LogWarning("Could not parse the context action");
     }
+    // Clipboard actions
+    if (action == "copy") {
+        std::string elementId;
+        if (this->ParseCopyAction(json.get<jsonxx::Object>("param"), elementId)) return this->Copy(elementId);
+    }
+    else if (action == "cut") {
+        std::string elementId;
+        if (this->ParseCutAction(json.get<jsonxx::Object>("param"), elementId)) {
+            this->PrepareUndo();
+            return this->Cut(elementId);
+        }
+    }
     else if (action == "delete") {
         std::string elementId;
         DeleteNavigation navigation;
@@ -192,6 +184,36 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
             return (this->Drag(phase, dx, dy));
         }
         LogWarning("Could not parse the drag action");
+    }
+    else if (action == "getScoreDef") {
+        std::string scoreDefId;
+        if (this->ParseGetScoreDefAction(json.get<jsonxx::Object>("param"), scoreDefId))
+            return this->GetScoreDef(scoreDefId);
+    }
+    else if (action == "getScoreDefKeySig") {
+        std::string scoreDefId;
+        if (this->ParseGetScoreDefKeySigAction(json.get<jsonxx::Object>("param"), scoreDefId)) {
+            return this->GetScoreDefKeySig(scoreDefId);
+        }
+    }
+    else if (action == "getScoreDefMeterSig") {
+        std::string scoreDefId;
+        if (this->ParseGetScoreDefMeterSigAction(json.get<jsonxx::Object>("param"), scoreDefId)) {
+            return this->GetScoreDefMeterSig(scoreDefId);
+        }
+    }
+    else if (action == "getScoreDefStaffDef") {
+        std::string scoreDefId;
+        int staffN;
+        if (this->ParseGetScoreDefStaffDefAction(json.get<jsonxx::Object>("param"), scoreDefId, staffN)) {
+            return this->GetScoreDefStaffDef(scoreDefId, staffN);
+        }
+    }
+    else if (action == "getScoreDefStaffGrp") {
+        std::string scoreDefId;
+        if (this->ParseGetScoreDefStaffGrpAction(json.get<jsonxx::Object>("param"), scoreDefId)) {
+            return this->GetScoreDefStaffGrp(scoreDefId);
+        }
     }
     else if (action == "insert") {
         std::string elementName, elementId, insertMode;
@@ -296,34 +318,11 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         }
         LogWarning("Could not parse the navigate action");
     }
-    else if (action == "getScoreDef") {
-        std::string scoreDefId;
-        if (this->ParseGetScoreDefAction(json.get<jsonxx::Object>("param"), scoreDefId))
-            return this->GetScoreDef(scoreDefId);
-    }
-    else if (action == "getScoreDefKeySig") {
-        std::string scoreDefId;
-        if (this->ParseGetScoreDefKeySigAction(json.get<jsonxx::Object>("param"), scoreDefId)) {
-            return this->GetScoreDefKeySig(scoreDefId);
-        }
-    }
-    else if (action == "getScoreDefMeterSig") {
-        std::string scoreDefId;
-        if (this->ParseGetScoreDefMeterSigAction(json.get<jsonxx::Object>("param"), scoreDefId)) {
-            return this->GetScoreDefMeterSig(scoreDefId);
-        }
-    }
-    else if (action == "getScoreDefStaffDef") {
-        std::string scoreDefId;
-        int staffN;
-        if (this->ParseGetScoreDefStaffDefAction(json.get<jsonxx::Object>("param"), scoreDefId, staffN)) {
-            return this->GetScoreDefStaffDef(scoreDefId, staffN);
-        }
-    }
-    else if (action == "getScoreDefStaffGrp") {
-        std::string scoreDefId;
-        if (this->ParseGetScoreDefStaffGrpAction(json.get<jsonxx::Object>("param"), scoreDefId)) {
-            return this->GetScoreDefStaffGrp(scoreDefId);
+    else if (action == "paste") {
+        std::string elementId;
+        if (this->ParsePasteAction(json.get<jsonxx::Object>("param"), elementId)) {
+            this->PrepareUndo();
+            return this->Paste(elementId);
         }
     }
     else if (action == "setScoreDef") {

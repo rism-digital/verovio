@@ -6,6 +6,9 @@ export interface CommitAction {
 }
 export interface CopyAction {
     action: "copy";
+    param: {
+        elementId: string;
+    };
 }
 export interface ChainAction {
     action: "chain";
@@ -27,6 +30,9 @@ export interface DeleteAction {
 }
 export interface CutAction {
     action: "cut";
+    param: {
+        elementId: string;
+    };
 }
 export type EditActionDrag = {
     action: "drag";
@@ -164,6 +170,9 @@ export interface NavigateAction {
 }
 export interface PasteAction {
     action: "paste";
+    param: {
+        elementId: string;
+    };
 }
 export interface PropertiesAction {
     action: "properties";
