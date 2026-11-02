@@ -28,6 +28,7 @@ namespace vrv {
 
 Clipboard::Clipboard()
 {
+    m_clipboardType = CLIPBOARD_NONE;
     m_clipboardMeasures = NULL;
     m_clipboardStaves = NULL;
     m_clipboardLayerElements = NULL;
@@ -53,6 +54,7 @@ void Clipboard::ClearClipboard()
         delete m_clipboardLayerElements;
         m_clipboardLayerElements = NULL;
     }
+    m_clipboardType = CLIPBOARD_NONE;
 }
 
 bool Clipboard::Copy(const Object *selection)
@@ -70,6 +72,7 @@ bool Clipboard::Copy(const Object *selection)
         Measure *measure = new Measure();
         m_clipboardStaves->AddChild(measure);
         measure->AddChildBack(copy);
+        m_clipboardType = CLIPBOARD_STAVES;
     }
 
     return true;
@@ -84,13 +87,15 @@ bool Clipboard::Paste(Object *selection)
     if (!this->CanPaste(selection)) return false;
 
     if (selection->Is(STAFF)) {
-        Object *staff = m_clipboardStaves->FindDescendantByType(STAFF);
-        if (!staff) return false;
-        Object *copy = staff->Clone();
+        Object *clipboard = m_clipboardStaves->FindDescendantByType(STAFF);
+        if (!clipboard) return false;
+        Object *copy = clipboard->Clone();
         copy->CloneReset();
+        selection->CopyAttributesTo(copy);
 
         selection->GetParent()->ReplaceChild(selection, copy);
         delete selection;
+        selection = copy;
     }
 
     return true;

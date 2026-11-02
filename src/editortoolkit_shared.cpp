@@ -129,18 +129,21 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
 
     // Clipboard actions - also without parameter
     if (action == "copy") {
-        if (this->ParseCopyAction()) return this->Copy();
+        std::string elementId;
+        if (this->ParseCopyAction(json.get<jsonxx::Object>("param"), elementId)) return this->Copy(elementId);
     }
     else if (action == "cut") {
-        if (this->ParseCutAction()) {
+        std::string elementId;
+        if (this->ParseCutAction(json.get<jsonxx::Object>("param"), elementId)) {
             this->PrepareUndo();
-            return this->Cut();
+            return this->Cut(elementId);
         }
     }
     else if (action == "paste") {
-        if (this->ParsePasteAction()) {
+        std::string elementId;
+        if (this->ParsePasteAction(json.get<jsonxx::Object>("param"), elementId)) {
             this->PrepareUndo();
-            return this->Paste();
+            return this->Paste(elementId);
         }
     }
 
@@ -444,8 +447,11 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
 }
 
 #ifndef NO_EDIT_SUPPORT
-bool EditorToolkitShared::ParseCopyAction()
+bool EditorToolkitShared::ParseCopyAction(const jsonxx::Object &param, std::string &elementId)
 {
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    elementId = param.get<jsonxx::String>("elementId");
+
     return true;
 }
 
@@ -466,8 +472,11 @@ bool EditorToolkitShared::ParseContextAction(
     return false;
 }
 
-bool EditorToolkitShared::ParseCutAction()
+bool EditorToolkitShared::ParseCutAction(const jsonxx::Object &param, std::string &elementId)
 {
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    elementId = param.get<jsonxx::String>("elementId");
+
     return true;
 }
 
@@ -563,8 +572,11 @@ bool EditorToolkitShared::ParseNavigate(const jsonxx::Object &param, std::string
     return true;
 }
 
-bool EditorToolkitShared::ParsePasteAction()
+bool EditorToolkitShared::ParsePasteAction(const jsonxx::Object &param, std::string &elementId)
 {
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    elementId = param.get<jsonxx::String>("elementId");
+
     return true;
 }
 
@@ -1024,7 +1036,7 @@ bool EditorToolkitShared::CanCopyOrCut() const
 
 bool EditorToolkitShared::CanPaste() const
 {
-    if (m_selectionId.empty()) return false;
+    if (m_selectionId.empty() || m_clipboard.GetClipboardType() == Clipboard::CLIPBOARD_NONE) return false;
 
     return true;
 }
@@ -1183,25 +1195,41 @@ bool EditorToolkitShared::ResetCursor(bool maintainChordMode)
     return true;
 }
 
-bool EditorToolkitShared::Copy()
+bool EditorToolkitShared::Copy(std::string &elementId)
 {
-    if (this->CanCopyOrCut()) return false;
+    if (!this->CanCopyOrCut()) return false;
 
-    return true;
+    Object *object = this->ResolveElement(elementId);
+    if (!object) return false;
+
+    return m_clipboard.Copy(object);
 }
 
-bool EditorToolkitShared::Cut()
+bool EditorToolkitShared::Cut(std::string &elementId)
 {
-    if (this->CanCopyOrCut()) return false;
+    if (!this->Copy(elementId)) return false;
 
-    return true;
+    return this->Delete(elementId, DELETE_NO_NAVIGATON);
 }
 
-bool EditorToolkitShared::Paste()
+bool EditorToolkitShared::Paste(std::string &elementId)
 {
-    if (this->CanPaste()) return false;
+    if (!this->CanPaste()) return false;
 
-    return true;
+    Object *object = this->ResolveElement(elementId);
+    if (!object) return false;
+
+    if (m_clipboard.Paste(object)) {
+        this->ResetSelect();
+        m_chainedId = object->GetID();
+        this->Select(m_chainedId, false, SelectCustom::SELECT_NONE);
+        this->ClearContext();
+        this->SetEditStatus();
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 bool EditorToolkitShared::Delete(std::string &elementId, DeleteNavigation navigation)
