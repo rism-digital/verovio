@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Fix bug in PAE importer for composer name (@rettinghaus)
 
 ## [6.4.0]
 * Support for `parts` and `part`

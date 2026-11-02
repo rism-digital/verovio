@@ -3247,7 +3247,8 @@ void PAEInput::ParseHeader(jsonxx::Object &header)
     }
 
     if (header.has<jsonxx::String>("composer")) {
-        pugi::xml_node composer = titleStmt.append_child("composer");
+        pugi::xml_node composer = titleStmt.append_child("persName");
+        composer.append_attribute("role") = "composer";
         composer.text().set(header.get<jsonxx::String>("composer").c_str());
     }
 
