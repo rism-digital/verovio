@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name           = 'Verovio'
-  s.version        = '6.4.0-dev'
+  s.version        = '6.5.0-dev'
   s.license        = { :type => 'LGPL', :file => 'COPYING' }
   s.homepage       = 'https://www.verovio.org/index.xhtml'
   s.authors        = { 'Contributors List' => 'https://github.com/rism-digital/verovio/graphs/contributors' }
@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
       'libmei/{dist,addons}/*.{h}'
   s.resources      = 'data'
   s.ios.deployment_target = '16.0'
-  s.osx.deployment_target = '11.0'
+  s.osx.deployment_target = '14.0'
   s.pod_target_xcconfig = {
       "CLANG_CXX_LANGUAGE_STANDARD" => "c++23",
       "CLANG_CXX_LIBRARY" => "libc++",
