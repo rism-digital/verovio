@@ -8682,13 +8682,17 @@ template <class ELEMENT>
 void HumdrumInput::setMensurationSymbol(
     ELEMENT *element, const std::string &metersig, int staffindex, hum::HTp mensurtok)
 {
+cerr << "================= ENTERING SETMENSURATION SYMBOL" << endl;
     int maximodus = 0;
     int modus = 0;
     int tempus = 0;
     int prolatio = 0;
 
+cerr << "GOT HERE CCC" << endl;
     hum::HumRegex hre;
     Mensur *vrvmensur = getMensur(element, mensurtok);
+cerr << "VRV MENSUR:  " << vrvmensur << endl;
+cerr << "MENSUR TOK: " << mensurtok << endl;
     if (!vrvmensur) {
         return;
     }
@@ -8698,6 +8702,7 @@ void HumdrumInput::setMensurationSymbol(
 
     string metdata = metersig;
     hre.replaceDestructive(metdata, "$1", "^\\*o?met\\((.*)\\)");
+cerr << "GOT HERE BBB" << endl;
 
     if (metdata == "C") {
         if (m_mens) {
@@ -8873,6 +8878,7 @@ void HumdrumInput::setMensurationSymbol(
         tempus = 2;
         prolatio = 2;
     }
+cerr << "GOT HERE AAA" << endl;
 
     if (metdata.find('C') != std::string::npos) {
         vrvmensur->SetSign(MENSURATIONSIGN_C);
@@ -9019,6 +9025,7 @@ void HumdrumInput::setMensurationSymbol(
 void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const std::string &metersig,
     hum::HTp partstart, hum::HTp timetok, hum::HTp metertok)
 {
+cerr << "ENTERING SET TIMESIG " << timesig << "\tmeter=" << metersig << endl;
     if ((partstart != NULL) && partstart->isMensLike()) {
         // Don't display time signatures in mensural notation.
         return;
@@ -9129,6 +9136,10 @@ void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const 
 template <class ELEMENT>
 void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp metersigtok, int staffindex)
 {
+cerr << "SET TIME SIG 2 " << timesigtok << "\tmeter2=" << metersigtok << "\t" << staffindex << endl;
+    if (metersigtok) {
+    }
+
     if (!timesigtok) {
         // Not allowing meter signatures without a time signature.
         return;
