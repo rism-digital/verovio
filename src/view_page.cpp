@@ -1701,6 +1701,9 @@ void View::DrawPlaceholder(DeviceContext *dc, Object *object, System *system)
 
     if (object->GetParent() != system) return;
 
+    // Placeholders are hidden by the global CSS, so without it (e.g., with mmOutput) they are not drawn
+    if (!dc->Is(BBOX_DEVICE_CONTEXT) && !dc->UseGlobalStyling()) return;
+
     if (m_doc->GetOptions()->m_showHidden.GetValue()) dc->AddGraphicClass(CSS_SHOW_HIDDEN);
 
     int x = 0;
