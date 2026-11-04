@@ -269,7 +269,6 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
     int xRel = 0;
     Nc *previousNc = NULL;
     bool previousLig = false;
-    const bool isHufnagel = (staff->m_drawingNotationType == NOTATIONTYPE_neume_hufnagel);
 
     for (ListOfObjects::const_iterator iter = ncs.begin(); iter != ncs.end(); ++iter) {
 
@@ -292,8 +291,9 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
 
         int pitchDifference = (previousNc) ? nc->PitchOrLocDifferenceTo(previousNc) : 0;
         bool overlapWithPrevious = (pitchDifference == 0) ? false : true;
-        const bool hufnagelToPrevious = (isHufnagel && previousNc && (nc->GetCon() == ncForm_CON_e));
-        const bool hufnagelStart = (isHufnagel && nextNc && (nextNc->GetCon() == ncForm_CON_e));
+        // nc@con="e" connects the nc to the preceding nc in the same neume
+        const bool connectedToPrevious = (previousNc && (nc->GetCon() == ncForm_CON_e));
+        const bool startsConnection = (nextNc && (nextNc->GetCon() == ncForm_CON_e));
 
         if (hasLiquescent) {
             const bool gabcNoTailsOption = m_doc->GetOptions()->m_liquescentWithoutTails.GetValue();
@@ -341,11 +341,15 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
         else {
             nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E990_chantPunctum;
 
-            if (hufnagelStart) {
+            // @con takes precedence over @ligated. When a pair is marked both ways, it is processed once here and
+            // no pending ligature state is kept, so it cannot affect the following ncs.
+            if (startsConnection) {
                 nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B4_chantEntryLineAsc2nd;
+                previousLig = false;
             }
-            else if (hufnagelToPrevious) {
+            else if (connectedToPrevious) {
                 overlapWithPrevious = false;
+                previousLig = false;
                 SetChantLigatureGlyphs(nc, previousNc, pitchDifference, unit);
             }
             else if (nc->GetLigated() == BOOLEAN_true) {
@@ -392,7 +396,7 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
             nc->SetDrawingXRel(xRel);
             // The first glyph set the spacing - unless we are starting a ligature, in which case no spacing should be
             // added between the two nc
-            if (!previousLig && !hufnagelStart) {
+            if (!previousLig && !startsConnection) {
                 xRel += m_doc->GetGlyphWidth(nc->m_drawingGlyphs.at(0).m_fontNo, staffSize, false);
             }
         }
