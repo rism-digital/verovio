@@ -610,6 +610,16 @@ public:
     std::string GetMIDIValuesForElement(const std::string &xmlId);
 
     /**
+     * Return MIDI values of all the notes in the document
+     *
+     * Same values as GetMIDIValuesForElement() but in a single call. Notes of
+     * expanded repeats are included with their expansion IDs.
+     *
+     * @return A stringified JSON object with the MIDI values keyed by note ID (\@xml:id)
+     */
+    std::string GetMIDIValues();
+
+    /**
      * Return a JSON object string with the following key values for a given note.
      *
      * Return scoreTimeOnset, scoreTimeOffset, scoreTimeTiedDuration,

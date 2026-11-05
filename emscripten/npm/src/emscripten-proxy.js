@@ -84,6 +84,9 @@ function getToolkitFunction(VerovioModule, method) {
     // char *getMIDIValuesForElement(Toolkit *ic, const char *xmlId)
     mapping.getMIDIValuesForElement = VerovioModule.cwrap("vrvToolkit_getMIDIValuesForElement", "string", ["number", "string"]);
 
+    // char *getMIDIValues(Toolkit *ic)
+    mapping.getMIDIValues = VerovioModule.cwrap("vrvToolkit_getMIDIValues", "string", ["number"]);
+
     // char *getVersion(Toolkit *ic)
     mapping.getVersion = VerovioModule.cwrap("vrvToolkit_getVersion", "string", ["number"]);
 

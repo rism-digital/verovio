@@ -18,6 +18,7 @@ _vrvToolkit_convertMEIToHumdrum
 _vrvToolkit_getLog
 _vrvToolkit_getMEI
 _vrvToolkit_getMIDIValuesForElement
+_vrvToolkit_getMIDIValues
 _vrvToolkit_getNotatedIdForElement
 _vrvToolkit_getOptions
 _vrvToolkit_getPageCount

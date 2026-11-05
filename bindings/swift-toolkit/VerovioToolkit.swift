@@ -171,6 +171,12 @@ public class VerovioToolkit {
         }
     }
 
+    public func getMIDIValues() -> String {
+        guard let tk = toolkitPtr else { return "" }
+        guard let cStr = vrvToolkit_getMIDIValues(tk) else { return "" }
+        return String(cString: cStr)
+    }
+
     public func getNotatedIdForElement(_ xmlId: String) -> String {
         guard let tk = toolkitPtr else { return "" }
         return xmlId.withCString { cStr in

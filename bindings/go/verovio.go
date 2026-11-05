@@ -150,6 +150,10 @@ func (t *Toolkit) MIDIValuesForElement(xmlID string) string {
 	return goString(C.vrvToolkit_getMIDIValuesForElement(t.ptr, cXMLID))
 }
 
+func (t *Toolkit) MIDIValues() string {
+	return goString(C.vrvToolkit_getMIDIValues(t.ptr))
+}
+
 func (t *Toolkit) NotatedIDForElement(xmlID string) string {
 	cXMLID := C.CString(xmlID)
 	defer C.free(unsafe.Pointer(cXMLID))
