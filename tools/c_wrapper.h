@@ -39,6 +39,7 @@ const char *vrvToolkit_convertMEIToHumdrum(void *tkPtr, const char *meiData);
 const char *vrvToolkit_getLog(void *tkPtr);
 const char *vrvToolkit_getMEI(void *tkPtr, const char *options);
 const char *vrvToolkit_getMIDIValuesForElement(void *tkPtr, const char *xmlId);
+const char *vrvToolkit_getMIDIValues(void *tkPtr);
 const char *vrvToolkit_getNotatedIdForElement(void *tkPtr, const char *xmlId);
 const char *vrvToolkit_getOptions(void *tkPtr);
 const char *vrvToolkit_getOptionUsageString(void *tkPtr);
