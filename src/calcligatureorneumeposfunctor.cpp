@@ -311,8 +311,9 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
 
         const int lineWidth = m_doc->GetGlyphWidth(SMUFL_E9BE_chantConnectingLineAsc3rd, staffSize, false);
 
-        // Make sure we have at least one glyph
-        nc->m_drawingGlyphs.resize(1);
+        // Start from one default glyph. Glyphs and offsets set by a previous layout of the neume (e.g., a connection
+        // before editing) are only cleared on a data reset, so they must not be kept here.
+        nc->m_drawingGlyphs.assign(1, Nc::DrawingGlyph());
 
         int pitchDifference = (previousNc) ? nc->PitchOrLocDifferenceTo(previousNc) : 0;
         bool overlapWithPrevious = (pitchDifference == 0) ? false : true;
