@@ -1122,36 +1122,39 @@ void GenerateMIDIFunctor::DeferMIDINote(const Note *refNote, double shift, bool 
 
 void GenerateMIDIFunctor::HandleOctave(const LayerElement *layerElement)
 {
+    if (!layerElement->GetAlignment()) return;
+
+    const auto isBefore = [](const LayerElement *element, const LayerElement *other) {
+        const Alignment &alignment = *element->GetAlignment();
+        const Alignment &otherAlignment = *other->GetAlignment();
+        if (alignment == otherAlignment) return element->IsGraceNote() && !other->IsGraceNote();
+        return alignment < otherAlignment;
+    };
+
     // Handle octave end
-    auto octaveIter = std::find_if(m_octaves.begin(), m_octaves.end(), [this, layerElement](const OctaveInfo &octave) {
-        if (octave.isActive && (octave.staffN == m_staffN) && (octave.layerN == m_layerN)) {
-            const Alignment *endAlignment = octave.octave->GetEnd()->GetAlignment();
-            const Alignment *alignment = layerElement->GetAlignment();
-            if (endAlignment && alignment) {
-                return *endAlignment < *alignment;
+    for (auto octaveIter = m_octaves.begin(); octaveIter != m_octaves.end();) {
+        if (octaveIter->isActive && (octaveIter->staffN == m_staffN) && (octaveIter->layerN == m_layerN)) {
+            const LayerElement *end = octaveIter->octave->GetEnd();
+            if (end->GetAlignment() && isBefore(end, layerElement)) {
+                m_octaveShift -= octaveIter->octaveShift;
+                octaveIter = m_octaves.erase(octaveIter);
+                continue;
             }
         }
-        return false;
-    });
-    if (octaveIter != m_octaves.end()) {
-        m_octaveShift -= octaveIter->octaveShift;
-        m_octaves.erase(octaveIter);
+        ++octaveIter;
     }
 
     // Handle octave begin
-    octaveIter = std::find_if(m_octaves.begin(), m_octaves.end(), [this, layerElement](const OctaveInfo &octave) {
+    for (OctaveInfo &octave : m_octaves) {
         if (!octave.isActive && (octave.staffN == m_staffN) && (octave.layerN == m_layerN)) {
-            const Alignment *startAlignment = octave.octave->GetStart()->GetAlignment();
-            const Alignment *alignment = layerElement->GetAlignment();
-            if (startAlignment && alignment) {
-                return *startAlignment <= *alignment;
+            const LayerElement *start = octave.octave->GetStart();
+            const LayerElement *end = octave.octave->GetEnd();
+            if (start->GetAlignment() && end->GetAlignment() && !isBefore(layerElement, start)
+                && !isBefore(end, layerElement)) {
+                m_octaveShift += octave.octaveShift;
+                octave.isActive = true;
             }
         }
-        return false;
-    });
-    if (octaveIter != m_octaves.end()) {
-        m_octaveShift += octaveIter->octaveShift;
-        octaveIter->isActive = true;
     }
 }
 
