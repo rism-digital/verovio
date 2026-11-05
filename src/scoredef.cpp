@@ -421,6 +421,22 @@ void ScoreDef::ReplaceDrawingValues(const StaffDef *newStaffDef)
         }
         // copy other attributes if present
         if (newStaffDef->HasLabel()) staffDef->SetLabel(newStaffDef->GetLabel());
+        // Keep explicitly changed labels for subsequent systems.
+        if (staffDef == newStaffDef) return;
+        for (ClassId classId : { LABEL, LABELABBR }) {
+            const Object *newLabel = newStaffDef->FindDescendantByType(classId, 1);
+            if (!newLabel) continue;
+            Object *label = newLabel->Clone();
+            label->CloneReset();
+            Object *oldLabel = staffDef->FindDescendantByType(classId, 1);
+            if (oldLabel) {
+                staffDef->ReplaceChild(oldLabel, label);
+                delete oldLabel;
+            }
+            else {
+                staffDef->AddChild(label);
+            }
+        }
     }
     else {
         LogWarning("StaffDef with xml:id '%s' could not be found", newStaffDef->GetID().c_str());
