@@ -991,7 +991,6 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     m_staffGrpStack.push_back(staffGrp);
 
     short int staffOffset = 0;
-    m_octDis.push_back(0);
 
     pugi::xpath_node scoreMidiBpm = root.select_node("/score-partwise/part[1]/measure[1]/sound[@tempo][1]");
     if (scoreMidiBpm) {
@@ -1608,8 +1607,6 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
                     m_instrdef = NULL;
                 }
                 staffGrp->AddChild(staffDef);
-                // set initial octave shift
-                m_octDis.push_back(0);
             }
 
             // clef sign - first look if we have a clef-sign with the corresponding staff @number
@@ -1874,6 +1871,8 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, shor
         ++i;
     }
 
+    this->MatchOctaveShifts();
+
     // clean up part specific stacks
     if (!m_openDashesStack.empty()) { // open dashes without ending
         for (auto iter : m_openDashesStack) {
@@ -2074,6 +2073,106 @@ void MusicXmlInput::MatchTies(bool matchLayers)
             ++iter;
         }
     }
+}
+
+void MusicXmlInput::MatchOctaveShifts()
+{
+    std::stable_sort(m_octaveEvents.begin(), m_octaveEvents.end(),
+        [](const musicxml::OctaveEvent &first, const musicxml::OctaveEvent &second) {
+            const bool firstAfterShifts = first.m_element && !first.m_element->IsGraceNote();
+            const bool secondAfterShifts = second.m_element && !second.m_element->IsGraceNote();
+            return std::tie(first.m_measureCount, first.m_time, firstAfterShifts)
+                < std::tie(second.m_measureCount, second.m_time, secondAfterShifts);
+        });
+
+    using OctaveEventIter = std::vector<musicxml::OctaveEvent>::iterator;
+    const auto getLayerStaffN
+        = [](const musicxml::OctaveEvent &event) { return vrv_cast<Staff *>(event.m_layer->GetParent())->GetN(); };
+    const auto setAnchors = [&getLayerStaffN](OctaveEventIter shift, OctaveEventIter stop, bool isClosed) {
+        std::vector<const musicxml::OctaveEvent *> onStaff;
+        std::vector<const musicxml::OctaveEvent *> inPart;
+        for (OctaveEventIter event = shift + 1; event != stop; ++event) {
+            if (!event->m_element) continue;
+            inPart.push_back(&(*event));
+            if ((event->m_staffN == shift->m_staffN) || (getLayerStaffN(*event) == shift->m_staffN)) {
+                onStaff.push_back(&(*event));
+            }
+        }
+        const std::vector<const musicxml::OctaveEvent *> &anchors = onStaff.empty() ? inPart : onStaff;
+        if (anchors.empty()) return;
+        shift->m_octave->SetStartid("#" + anchors.front()->m_element->GetID());
+        if (!isClosed) return;
+        const musicxml::OctaveEvent *last = anchors.back();
+        const musicxml::OctaveEvent *firstAtLast
+            = *std::find_if(anchors.begin(), anchors.end(), [last](const musicxml::OctaveEvent *anchor) {
+                  return (anchor->m_measureCount == last->m_measureCount) && (anchor->m_time == last->m_time);
+              });
+        const musicxml::OctaveEvent *end = *std::find_if(anchors.rbegin(), anchors.rend(),
+            [firstAtLast](const musicxml::OctaveEvent *anchor) { return anchor->m_layer == firstAtLast->m_layer; });
+        shift->m_octave->SetEndid("#" + end->m_element->GetID());
+    };
+
+    std::vector<OctaveEventIter> openShifts;
+    const auto getDis = [&openShifts](int staffN) {
+        for (auto iter = openShifts.rbegin(); iter != openShifts.rend(); ++iter) {
+            if ((*iter)->m_staffN == staffN) return (*iter)->m_dis;
+        }
+        return 0;
+    };
+
+    for (OctaveEventIter event = m_octaveEvents.begin(); event != m_octaveEvents.end(); ++event) {
+        if (event->m_element) {
+            const int dis = getDis(event->m_staffN);
+            Note *note = event->m_note;
+            if (note && note->HasOct() && ((dis != 0) || (getDis(getLayerStaffN(*event)) != 0))) {
+                note->SetOctGes(note->GetOct());
+                note->SetOct(note->GetOct() - dis);
+            }
+        }
+        else if (event->m_octave) {
+            openShifts.push_back(event);
+        }
+        else {
+            const auto closeShifts = [&openShifts, &event, &setAnchors](const auto &isMatch) {
+                const auto startsBefore = [&event](OctaveEventIter shift) {
+                    return std::tie(shift->m_measureCount, shift->m_time)
+                        < std::tie(event->m_measureCount, event->m_time);
+                };
+                const bool hasEarlier = std::any_of(openShifts.begin(), openShifts.end(),
+                    [&isMatch, &startsBefore](OctaveEventIter shift) { return isMatch(shift) && startsBefore(shift); });
+                bool isClosed = false;
+                for (auto shift = openShifts.begin(); shift != openShifts.end();) {
+                    if (!isMatch(*shift) || (hasEarlier && !startsBefore(*shift))) {
+                        ++shift;
+                        continue;
+                    }
+                    setAnchors(*shift, event, true);
+                    shift = openShifts.erase(shift);
+                    isClosed = true;
+                }
+                return isClosed;
+            };
+            const auto isOnStaff = [&event](OctaveEventIter shift) { return shift->m_staffN == event->m_staffN; };
+            const auto isOfNumber = [&event](OctaveEventIter shift) { return shift->m_number == event->m_number; };
+            const auto isStartOfNumberOnStaff = [&event](const musicxml::OctaveEvent &other) {
+                return other.m_octave && (other.m_staffN == event->m_staffN) && (other.m_number == event->m_number);
+            };
+            bool isClosed = closeShifts(
+                [&isOnStaff, &isOfNumber](OctaveEventIter shift) { return isOnStaff(shift) && isOfNumber(shift); });
+            if (!isClosed && !event->m_hasStaff) isClosed = closeShifts(isOfNumber);
+            if (!isClosed
+                && (!event->m_hasNumber
+                    || std::none_of(m_octaveEvents.begin(), m_octaveEvents.end(), isStartOfNumberOnStaff))) {
+                closeShifts(isOnStaff);
+            }
+        }
+    }
+
+    for (OctaveEventIter shift : openShifts) {
+        setAnchors(shift, m_octaveEvents.end(), false);
+        LogWarning("MusicXML import: octave for '%s' could not be closed", shift->m_octave->GetID().c_str());
+    }
+    m_octaveEvents.clear();
 }
 
 void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Section *section, Measure *measure)
@@ -2647,43 +2746,30 @@ void MusicXmlInput::ReadMusicXmlDirection(
     // Ottava
     pugi::xml_node xmlShift = typeNode.child("octave-shift");
     if (xmlShift) {
-        const short int staffNum = (!staffNode) ? 1 : staffNode.text().as_int() + staffOffset;
+        const short int staffNum = (!staffNode) ? 1 + staffOffset : staffNode.text().as_int() + staffOffset;
+        const int number = xmlShift.attribute("number").as_int(1);
         if (HasAttributeWithValue(xmlShift, "type", "stop")) {
-            m_octDis[staffNum] = 0;
-            for (auto iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
-                if (iter->second->Is(OCTAVE)) {
-                    Octave *octave = dynamic_cast<Octave *>(iter->second);
-                    if (octave->HasEndid()) continue;
-                    std::vector<int> staffAttr = octave->GetStaff();
-                    if (std::find(staffAttr.begin(), staffAttr.end(), staffNum) != staffAttr.end()) {
-                        octave->SetEndid(m_ID);
-                    }
-                    else if (xmlShift.attribute("number").as_string() == octave->GetN()) {
-                        octave->SetEndid(m_ID);
-                    }
-                    else {
-                        LogWarning("MusicXML import: octave for '%s' could not be closed", octave->GetID().c_str());
-                    }
-                }
-            }
+            m_octaveEvents.push_back({ m_measureCounts.at(measure), m_durTotal, staffNum, number, !staffNode.empty(),
+                !xmlShift.attribute("number").empty() });
         }
         else {
             Octave *octave = new Octave();
             octave->SetColor(xmlShift.attribute("color").as_string());
             octave->SetDisPlace(octave->AttOctaveDisplacement::StrToStaffrelBasic(placeStr.c_str()));
             octave->SetN(xmlShift.attribute("number").as_string());
+            octave->SetStaff(octave->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
             const short int octDisNum = xmlShift.attribute("size") ? xmlShift.attribute("size").as_int() : 8;
             octave->SetDis(octave->AttOctaveDisplacement::StrToOctaveDis(std::to_string(octDisNum)));
-            m_octDis[staffNum] = (octDisNum + 2) / 8;
+            int dis = (octDisNum + 2) / 8;
             if (HasAttributeWithValue(xmlShift, "type", "up")) {
                 octave->SetDisPlace(STAFFREL_basic_below);
-                m_octDis[staffNum] *= -1;
+                dis *= -1;
             }
             else {
                 octave->SetDisPlace(STAFFREL_basic_above);
             }
             m_controlElements.push_back({ m_measureCounts.at(measure), octave });
-            m_octaveStack.push_back(octave);
+            m_octaveEvents.push_back({ m_measureCounts.at(measure), m_durTotal, staffNum, octave, number, dis });
         }
     }
 
@@ -3191,16 +3277,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             const float alterVal = pitch.child("alter").text().as_float();
             const int octaveNum = pitch.child("octave").text().as_int();
             if (!stepStr.empty()) note->SetPname(ConvertStepToPitchName(stepStr));
-            // The written octave follows the octave shift of the staff the note is drawn on. The sounding octave
-            // is also made explicit when the staff of the layer is shifted, since a cross-staff note is not
-            // affected by it.
-            if ((m_octDis[notationStaffN] != 0) || (m_octDis[staff->GetN()] != 0)) {
-                note->SetOct(octaveNum - m_octDis[notationStaffN]);
-                note->SetOctGes(octaveNum);
-            }
-            else {
-                note->SetOct(octaveNum);
-            }
+            note->SetOct(octaveNum);
 
             // adjust accidental (including glyph) based on carried-over accidentals
             // or update the carried-over accidentals with current accidental value.
@@ -3730,6 +3807,9 @@ void MusicXmlInput::ReadMusicXmlNote(
     }
 
     m_ID = "#" + element->GetID();
+    if (element->GetParent()) {
+        m_octaveEvents.push_back({ m_measureCounts.at(measure), m_durTotal, notationStaffN, layer, element, note });
+    }
 
     // breath marks
     pugi::xpath_node xmlBreath = notations.node().select_node("articulations/breath-mark");
@@ -4112,13 +4192,6 @@ void MusicXmlInput::ReadMusicXmlNote(
             harm->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         }
         m_harmStack.clear();
-    }
-    if (!m_octaveStack.empty()) {
-        for (Octave *oct : m_octaveStack) {
-            oct->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-            oct->SetStartid(m_ID);
-        }
-        m_octaveStack.clear();
     }
     if (!m_pedalStack.empty()) {
         for (Pedal *ped : m_pedalStack) {

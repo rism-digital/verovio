@@ -294,6 +294,50 @@ namespace musicxml {
         std::string m_glyphName;
         std::string m_glyphAuth;
     };
+
+    struct OctaveEvent {
+        OctaveEvent(int measureCount, int time, int staffN, Octave *octave, int number, int dis)
+        {
+            m_measureCount = measureCount;
+            m_time = time;
+            m_staffN = staffN;
+            m_octave = octave;
+            m_number = number;
+            m_dis = dis;
+        }
+
+        OctaveEvent(int measureCount, int time, int staffN, int number, bool hasStaff, bool hasNumber)
+        {
+            m_measureCount = measureCount;
+            m_time = time;
+            m_staffN = staffN;
+            m_number = number;
+            m_hasStaff = hasStaff;
+            m_hasNumber = hasNumber;
+        }
+
+        OctaveEvent(int measureCount, int time, int staffN, Layer *layer, LayerElement *element, Note *note)
+        {
+            m_measureCount = measureCount;
+            m_time = time;
+            m_staffN = staffN;
+            m_layer = layer;
+            m_element = element;
+            m_note = note;
+        }
+
+        int m_measureCount;
+        int m_time;
+        int m_staffN;
+        Octave *m_octave = NULL;
+        int m_number = 0;
+        int m_dis = 0;
+        bool m_hasStaff = false;
+        bool m_hasNumber = false;
+        Layer *m_layer = NULL;
+        LayerElement *m_element = NULL;
+        Note *m_note = NULL;
+    };
 } // namespace musicxml
 
 #endif // NO_MUSICXML_SUPPORT
@@ -498,6 +542,7 @@ private:
     void CloseBeamSpan(Staff *staff, Layer *layer, LayerElement *element);
     void MatchTies(bool matchLayers);
     bool MatchTieNotes(const Note *start, const Note *end) const;
+    void MatchOctaveShifts();
     ///@}
 
     /*
@@ -626,8 +671,7 @@ private:
 public:
     //
 private:
-    /* octave offset */
-    std::vector<int> m_octDis;
+    std::vector<musicxml::OctaveEvent> m_octaveEvents;
     /* measure repeats */
     bool m_mRpt = false;
     /* measure repeats */
@@ -693,7 +737,6 @@ private:
     std::vector<Dynam *> m_dynamStack;
     std::vector<Gliss *> m_glissStack;
     std::vector<Harm *> m_harmStack;
-    std::vector<Octave *> m_octaveStack;
     std::vector<Pedal *> m_pedalStack;
     std::vector<Tempo *> m_tempoStack;
     /*
