@@ -45,6 +45,13 @@ public:
 protected:
     //
 private:
+    /**
+     * Check if a pair connected with nc@con="e" can be drawn with connection glyphs.
+     * Both ncs need a known staff position (@pname and @oct, or @loc) and a plain punctum shape, and the interval
+     * (returned in staff steps) must be one for which glyphs exist.
+     */
+    bool CanDrawConnection(const Nc *previousNc, const Nc *nc, int &interval) const;
+
     void SetChantLigatureGlyphs(Nc *nc, Nc *previousNc, int pitchDifference, int unit);
 
 public:
