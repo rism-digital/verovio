@@ -319,11 +319,11 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
         bool overlapWithPrevious = (pitchDifference == 0) ? false : true;
         // nc@con="e" connects the nc to the preceding nc in the same neume. Whether the pair is drawn with connection
         // glyphs is decided once, when visiting its first nc, and applies to both ncs. Otherwise both ncs use the
-        // rendering and spacing they have without @con. An nc ending a connection cannot start another one.
+        // rendering and spacing they have without @con.
         const bool endsConnection = previousStartsConnection;
         int nextInterval = 0;
-        const bool startsConnection = (!endsConnection && nextNc && (nextNc->GetCon() == ncForm_CON_e)
-            && this->CanDrawConnection(nc, nextNc, nextInterval));
+        const bool startsConnection
+            = (nextNc && (nextNc->GetCon() == ncForm_CON_e) && this->CanDrawConnection(nc, nextNc, nextInterval));
 
         if (hasLiquescent) {
             const bool gabcNoTailsOption = m_doc->GetOptions()->m_liquescentWithoutTails.GetValue();
