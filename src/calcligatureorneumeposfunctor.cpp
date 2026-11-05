@@ -19,6 +19,28 @@
 
 namespace vrv {
 
+bool CalcLigatureOrNeumePosFunctor::CanDrawConnection(const Nc *previousNc, const Nc *nc, int &interval) const
+{
+    assert(previousNc);
+    assert(nc);
+
+    interval = 0;
+    for (const Nc *component : { previousNc, nc }) {
+        // Without @pname and @oct or @loc the nc is drawn at a default position that does not give a known interval
+        if (!(component->HasPname() && component->HasOct()) && !component->HasLoc()) return false;
+        // Only a punctum can be replaced by a connection glyph
+        if (component->FindDescendantByType(LIQUESCENT) || component->FindDescendantByType(ORISCUS)
+            || component->FindDescendantByType(QUILISMA) || component->FindDescendantByType(STROPHICUS)) {
+            return false;
+        }
+    }
+
+    // Use the staff positions the ncs are drawn at (see CalcAlignmentPitchPosFunctor::VisitLayerElement)
+    interval = nc->GetDrawingLoc() - previousNc->GetDrawingLoc();
+    // Connection glyphs exist only for descending seconds to fifths (see SetChantLigatureGlyphs)
+    return ((interval <= -1) && (interval >= -4));
+}
+
 void CalcLigatureOrNeumePosFunctor::SetChantLigatureGlyphs(Nc *nc, Nc *previousNc, int pitchDifference, int unit)
 {
     assert(nc);
@@ -269,6 +291,9 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
     int xRel = 0;
     Nc *previousNc = NULL;
     bool previousLig = false;
+    // Set when the previous nc started a connection drawn with connection glyphs, and its interval
+    bool previousStartsConnection = false;
+    int connectionInterval = 0;
 
     for (ListOfObjects::const_iterator iter = ncs.begin(); iter != ncs.end(); ++iter) {
 
@@ -291,9 +316,13 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
 
         int pitchDifference = (previousNc) ? nc->PitchOrLocDifferenceTo(previousNc) : 0;
         bool overlapWithPrevious = (pitchDifference == 0) ? false : true;
-        // nc@con="e" connects the nc to the preceding nc in the same neume
-        const bool connectedToPrevious = (previousNc && (nc->GetCon() == ncForm_CON_e));
-        const bool startsConnection = (nextNc && (nextNc->GetCon() == ncForm_CON_e));
+        // nc@con="e" connects the nc to the preceding nc in the same neume. Whether the pair is drawn with connection
+        // glyphs is decided once, when visiting its first nc, and applies to both ncs. Otherwise both ncs use the
+        // rendering and spacing they have without @con. An nc ending a connection cannot start another one.
+        const bool endsConnection = previousStartsConnection;
+        int nextInterval = 0;
+        const bool startsConnection = (!endsConnection && nextNc && (nextNc->GetCon() == ncForm_CON_e)
+            && this->CanDrawConnection(nc, nextNc, nextInterval));
 
         if (hasLiquescent) {
             const bool gabcNoTailsOption = m_doc->GetOptions()->m_liquescentWithoutTails.GetValue();
@@ -341,16 +370,16 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
         else {
             nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E990_chantPunctum;
 
-            // @con takes precedence over @ligated. When a pair is marked both ways, it is processed once here and
-            // no pending ligature state is kept, so it cannot affect the following ncs.
+            // A drawable @con connection takes precedence over @ligated. When a pair is marked both ways, it is
+            // processed once here and no pending ligature state is kept, so it cannot affect the following ncs.
             if (startsConnection) {
                 nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B4_chantEntryLineAsc2nd;
                 previousLig = false;
             }
-            else if (connectedToPrevious) {
+            else if (endsConnection) {
                 overlapWithPrevious = false;
                 previousLig = false;
-                SetChantLigatureGlyphs(nc, previousNc, pitchDifference, unit);
+                SetChantLigatureGlyphs(nc, previousNc, connectionInterval, unit);
             }
             else if (nc->GetLigated() == BOOLEAN_true) {
                 // This is the first nc of a ligature
@@ -402,6 +431,8 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
         }
 
         previousNc = nc;
+        previousStartsConnection = startsConnection;
+        connectionInterval = nextInterval;
     }
 
     return FUNCTOR_SIBLINGS;
