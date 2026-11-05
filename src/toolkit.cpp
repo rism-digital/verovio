@@ -2181,7 +2181,7 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
     if (element->Is(NOTE)) {
         if (!m_midiDoc->HasTimemap()) {
             // generate MIDI timemap before progressing
-            m_doc.CalculateTimemap();
+            m_midiDoc->CalculateTimemap();
         }
         if (!m_midiDoc->HasTimemap()) {
             LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
