@@ -522,6 +522,32 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// MeasureScoreTimeComparison
+//----------------------------------------------------------------------------
+
+/**
+ * This class evaluates if the object is a measure enclosing the given score time
+ */
+class MeasureScoreTimeComparison : public ClassIdComparison {
+
+public:
+    MeasureScoreTimeComparison(const Fraction &time) : ClassIdComparison(MEASURE) { m_time = time; }
+
+    void SetTime(const Fraction &time) { m_time = time; }
+
+    bool operator()(const Object *object) override
+    {
+        if (!MatchesType(object)) return false;
+        const Measure *measure = vrv_cast<const Measure *>(object);
+        assert(measure);
+        return (measure->EnclosesScoreTime(m_time) != VRV_UNSET);
+    }
+
+private:
+    Fraction m_time;
+};
+
+//----------------------------------------------------------------------------
 // NoteOrRestOnsetOffsetComparison
 //----------------------------------------------------------------------------
 

@@ -319,6 +319,11 @@ public:
      * Return the playing repeat time (1-based), VRV_UNSET otherwise
      */
     int EnclosesTime(int time) const;
+    /**
+     * Check if the measure encloses the given score time (in quarter-note units)
+     * Return the playing repeat time (1-based), VRV_UNSET otherwise
+     */
+    int EnclosesScoreTime(const Fraction &time) const;
 
     /**
      * Read-only access to onset and offset.
@@ -328,6 +333,10 @@ public:
     double GetRealTimeOnsetMilliseconds(int repeat = VRV_UNSET) const;
     Fraction GetScoreTimeOffset(int repeat = VRV_UNSET) const;
     double GetRealTimeOffsetMilliseconds(int repeat = VRV_UNSET) const;
+    /**
+     * Return the X relative to the measure for a score-time position.
+     */
+    int GetXAtScoreTime(const Fraction &time, bool &interpolated) const;
     ///@}
 
     /**
