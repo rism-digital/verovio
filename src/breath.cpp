@@ -24,10 +24,11 @@ namespace vrv {
 
 static const ClassRegistrar<Breath> s_factory("breath", BREATH);
 
-Breath::Breath() : ControlElement(BREATH), TimePointInterface(), AttPlacementRelStaff()
+Breath::Breath() : ControlElement(BREATH), TimePointInterface(), AttPlacementRelStaff(), AttVerticalGroup()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
+    this->RegisterAttClass(ATT_VERTICALGROUP);
 
     this->Reset();
 }
@@ -39,6 +40,7 @@ void Breath::Reset()
     ControlElement::Reset();
     TimePointInterface::Reset();
     this->ResetPlacementRelStaff();
+    this->ResetVerticalGroup();
 }
 
 FunctorCode Breath::Accept(Functor &functor)

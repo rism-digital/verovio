@@ -35,6 +35,7 @@ Mordent::Mordent()
     , AttOrnamentAccid()
     , AttPlacementRelStaff()
     , AttMordentLog()
+    , AttVerticalGroup()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
@@ -43,6 +44,7 @@ Mordent::Mordent()
     this->RegisterAttClass(ATT_ORNAMENTACCID);
     this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
     this->RegisterAttClass(ATT_MORDENTLOG);
+    this->RegisterAttClass(ATT_VERTICALGROUP);
 
     this->Reset();
 }
@@ -59,6 +61,7 @@ void Mordent::Reset()
     this->ResetOrnamentAccid();
     this->ResetPlacementRelStaff();
     this->ResetMordentLog();
+    this->ResetVerticalGroup();
 }
 
 char32_t Mordent::GetMordentGlyph() const

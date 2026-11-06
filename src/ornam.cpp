@@ -30,11 +30,17 @@ namespace vrv {
 static const ClassRegistrar<Ornam> s_factory("ornam", ORNAM);
 
 Ornam::Ornam()
-    : ControlElement(ORNAM), TextListInterface(), TextDirInterface(), TimePointInterface(), AttOrnamentAccid()
+    : ControlElement(ORNAM)
+    , TextListInterface()
+    , TextDirInterface()
+    , TimePointInterface()
+    , AttOrnamentAccid()
+    , AttVerticalGroup()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_ORNAMENTACCID);
+    this->RegisterAttClass(ATT_VERTICALGROUP);
 
     this->Reset();
 }
@@ -47,6 +53,7 @@ void Ornam::Reset()
     TextDirInterface::Reset();
     TimePointInterface::Reset();
     this->ResetOrnamentAccid();
+    this->ResetVerticalGroup();
 }
 
 bool Ornam::IsSupportedChild(ClassId classId)
