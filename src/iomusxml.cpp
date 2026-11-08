@@ -4060,7 +4060,7 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     // beam end
     bool beamEnd = node.select_node("beam[text()='end']");
-    if (beamEnd) {
+    if (beamEnd && !isChord) {
         int breakSec = (int)node.select_nodes("beam[text()='continue']").size();
         if (breakSec) {
             if (element->Is(NOTE)) {
@@ -4322,51 +4322,53 @@ bool MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
         const int distance = static_cast<int>(std::distance(beamEndIterator, tupletEndIterator));
         if (distance > 0) {
             if (!isChord) ReadMusicXmlTupletStart(node, tupletStart.node(), layer);
-            this->ReadMusicXmlBeamStart(node, beamStart.node(), layer);
+            if (!isChord) this->ReadMusicXmlBeamStart(node, beamStart.node(), layer);
         }
         else {
-            this->ReadMusicXmlBeamStart(node, beamStart.node(), layer);
+            if (!isChord) this->ReadMusicXmlBeamStart(node, beamStart.node(), layer);
             if (!isChord) ReadMusicXmlTupletStart(node, tupletStart.node(), layer);
         }
     }
     // If note is a start of the beam only - check if there is a tuplet starting/ending in the span of
     // the whole duration of this beam
     else if (beamStart) {
-        // find whether there is a tuplet that starts during the span of the beam
-        pugi::xpath_node nextTupletStart
-            = node.select_node("./following-sibling::note[notations/tuplet[@type='start']]").node();
+        if (!isChord) {
+            // find whether there is a tuplet that starts during the span of the beam
+            pugi::xpath_node nextTupletStart
+                = node.select_node("./following-sibling::note[notations/tuplet[@type='start']]").node();
 
-        // find start and end of the beam
-        const auto beamStartIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), node);
-        const auto beamEndIterator = std::find(beamStartIterator, currentMeasureNodes.end(), beamEnd);
+            // find start and end of the beam
+            const auto beamStartIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), node);
+            const auto beamEndIterator = std::find(beamStartIterator, currentMeasureNodes.end(), beamEnd);
 
-        // find staff number for the corresponding elements - we do not want to match beam start on one staff with beam
-        // end on another
-        pugi::xpath_node nodeStaff = node.select_node("staff");
-        pugi::xpath_node endBeamStaff = beamEnd.select_node("staff");
+            // find staff number for the corresponding elements - we do not want to match beam start on one staff with
+            // beam end on another
+            pugi::xpath_node nodeStaff = node.select_node("staff");
+            pugi::xpath_node endBeamStaff = beamEnd.select_node("staff");
 
-        if (beamEndIterator == currentMeasureNodes.end()
-            || (nodeStaff && endBeamStaff
-                && (nodeStaff.node().text().as_int() != endBeamStaff.node().text().as_int()))) {
-            std::string measureName = (currentMeasure.node().attribute("id"))
-                ? currentMeasure.node().attribute("id").as_string()
-                : currentMeasure.node().attribute("number").as_string();
-            LogDebug("MusicXML import: Beam without end in measure %s treated as <beamSpan>", measureName.c_str());
-            return false;
-        }
-        // form vector of the beam nodes and find whether there are tuplets that start or end within the beam
-        std::vector<pugi::xml_node> beamNodes(beamStartIterator, beamEndIterator + 1);
-        bool isTupletStartInBeam
-            = (beamNodes.end() != std::find(beamNodes.begin(), beamNodes.end(), nextTupletStart.node()));
-        bool isTupletEndInBeam = (beamNodes.end() != std::find(beamNodes.begin(), beamNodes.end(), tupletEnd));
-        // in case if there is only start/end of the tuplet in the beam, then we need to use beamSpan instead
-        if ((tupletEnd != beamEnd) && (isTupletStartInBeam != isTupletEndInBeam)) {
-            // TODO: same call as in else-case is intentional. Proper beamSpan support will need to be implemented
-            // before this case can be handled correctly
-            this->ReadMusicXmlBeamStart(node, beamStart.node(), layer);
-        }
-        else {
-            this->ReadMusicXmlBeamStart(node, beamStart.node(), layer);
+            if (beamEndIterator == currentMeasureNodes.end()
+                || (nodeStaff && endBeamStaff
+                    && (nodeStaff.node().text().as_int() != endBeamStaff.node().text().as_int()))) {
+                std::string measureName = (currentMeasure.node().attribute("id"))
+                    ? currentMeasure.node().attribute("id").as_string()
+                    : currentMeasure.node().attribute("number").as_string();
+                LogDebug("MusicXML import: Beam without end in measure %s treated as <beamSpan>", measureName.c_str());
+                return false;
+            }
+            // form vector of the beam nodes and find whether there are tuplets that start or end within the beam
+            std::vector<pugi::xml_node> beamNodes(beamStartIterator, beamEndIterator + 1);
+            bool isTupletStartInBeam
+                = (beamNodes.end() != std::find(beamNodes.begin(), beamNodes.end(), nextTupletStart.node()));
+            bool isTupletEndInBeam = (beamNodes.end() != std::find(beamNodes.begin(), beamNodes.end(), tupletEnd));
+            // in case if there is only start/end of the tuplet in the beam, then we need to use beamSpan instead
+            if ((tupletEnd != beamEnd) && (isTupletStartInBeam != isTupletEndInBeam)) {
+                // TODO: same call as in else-case is intentional. Proper beamSpan support will need to be implemented
+                // before this case can be handled correctly
+                this->ReadMusicXmlBeamStart(node, beamStart.node(), layer);
+            }
+            else {
+                this->ReadMusicXmlBeamStart(node, beamStart.node(), layer);
+            }
         }
     }
     // no special logic needed if we have just tupletStart - just read it as is
