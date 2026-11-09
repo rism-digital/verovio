@@ -573,7 +573,9 @@ void ReorderStaffNFunctor::MapStaffIdent(AttStaffIdent *att)
     if (!att) return;
 
     xsdPositiveInteger_List mappedValues;
-    for (auto staffN : att->GetStaff()) mappedValues.push_back(m_mapping.at(staffN));
+    for (auto staffN : att->GetStaff()) {
+        if (m_mapping.contains(staffN)) mappedValues.push_back(m_mapping.at(staffN));
+    }
     att->SetStaff(mappedValues);
 }
 
