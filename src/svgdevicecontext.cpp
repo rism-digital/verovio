@@ -21,6 +21,7 @@
 #include "layerelement.h"
 #include "staff.h"
 #include "staffdef.h"
+#include "syl.h"
 #include "view.h"
 #include "vrv.h"
 
@@ -634,6 +635,11 @@ Point SvgDeviceContext::GetLogicalOrigin()
 pugi::xml_node SvgDeviceContext::AddChild(std::string name)
 {
     pugi::xml_node g = m_currentNode.child("g");
+    // Bounding boxes of text graphics are added next to the <text> element (see StartBoundingBoxGraphic) and
+    // must not change where the content is added
+    while (g && m_textBoundingBoxNodes.contains(g)) {
+        g = g.next_sibling("g");
+    }
     if (g) {
         return m_currentNode.insert_child_before(name.c_str(), g);
     }
@@ -1366,6 +1372,31 @@ void SvgDeviceContext::DrawSvgBoundingBoxRectangle(int x, int y, int width, int 
     rectChild.append_attribute("stroke-width") = "0";
 }
 
+void SvgDeviceContext::StartBoundingBoxGraphic(Object *object, const std::string &gClass, const std::string &gId)
+{
+    // <g> and <rect> elements are not allowed within <text> or <tspan> elements. For text graphics, add the
+    // bounding box to the closest enclosing element that is not a text element, right after the <text> element.
+    // Inserting it after (and not prepending it) keeps the order of the content drawn after the text, since
+    // AddChild inserts new content before the first <g> child.
+    pugi::xml_node textNode;
+    while (std::string(m_currentNode.name()) == "text" || std::string(m_currentNode.name()) == "tspan") {
+        textNode = m_currentNode;
+        m_currentNode = m_currentNode.parent();
+    }
+
+    this->StartGraphic(object, gClass, gId, PRIMARY, true);
+
+    if (textNode) {
+        m_currentNode.parent().insert_move_after(m_currentNode, textNode);
+        m_textBoundingBoxNodes.insert(m_currentNode);
+    }
+
+    // The <title> of an element with @label belongs to the element itself and not to its bounding box
+    while (m_currentNode.child("title")) {
+        m_currentNode.remove_child("title");
+    }
+}
+
 void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
 {
     const Resources *resources = this->GetResources();
@@ -1387,12 +1418,18 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
             if (!box) return;
         }
 
+        // A syl is drawn with its vertical bounding box deactivated because lyric lines are spaced by the staff
+        // alignment, so the syl and its text children only have a horizontal extent. For the SVG output, complete it
+        // with the ink bounds of the syllable stored when drawing it.
+        Syl *syl = object->Is(SYL) ? vrv_cast<Syl *>(object) : vrv_cast<Syl *>(object->GetFirstAncestor(SYL));
+        if (syl && !syl->HasDrawingTextInkBounds()) syl = NULL;
+
         pugi::xml_node currentNode = m_currentNode;
         if (groupInPage) {
             m_currentNode = m_pageNode;
         }
 
-        this->StartGraphic(object, "bounding-box", "bbox-" + object->GetID(), PRIMARY, true);
+        this->StartBoundingBoxGraphic(object, "bounding-box", "bbox-" + object->GetID());
 
         if (box->HasSelfBB()) {
             this->DrawSvgBoundingBoxRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX1()),
@@ -1401,6 +1438,19 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
                     - view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX1()),
                 view->ToDeviceContextY(object->GetDrawingY() + box->GetSelfY2())
                     - view->ToDeviceContextY(object->GetDrawingY() + box->GetSelfY1()));
+        }
+        else if (syl && !box->HasSelfVerticalBB()) {
+            // The syl itself has no self bounding box and uses the horizontal extent of its content (its text)
+            const bool hasSelfX = box->HasSelfHorizontalBB();
+            if (hasSelfX || (object->Is(SYL) && box->HasContentHorizontalBB())) {
+                const int x1 = object->GetDrawingX() + (hasSelfX ? box->GetSelfX1() : box->GetContentX1());
+                const int x2 = object->GetDrawingX() + (hasSelfX ? box->GetSelfX2() : box->GetContentX2());
+                this->DrawSvgBoundingBoxRectangle(view->ToDeviceContextX(x1),
+                    view->ToDeviceContextY(syl->GetDrawingTextInkTop()),
+                    view->ToDeviceContextX(x2) - view->ToDeviceContextX(x1),
+                    view->ToDeviceContextY(syl->GetDrawingTextInkBottom())
+                        - view->ToDeviceContextY(syl->GetDrawingTextInkTop()));
+            }
         }
 
         if (drawAnchors) {
@@ -1442,17 +1492,15 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
         }
 
         if (drawContentBB) {
-            if (object->HasContentBB()) {
-                StartGraphic(object, "content-bounding-box", "cbbox-" + object->GetID(), PRIMARY, true);
-                if (object->HasContentBB()) {
-                    this->DrawSvgBoundingBoxRectangle(
-                        view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),
-                        view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()),
-                        view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX2())
-                            - view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),
-                        view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY2())
-                            - view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()));
-                }
+            // For floating objects, the content bounding box is the one of the current positioner
+            if (box->HasContentBB()) {
+                this->StartBoundingBoxGraphic(object, "content-bounding-box", "cbbox-" + object->GetID());
+                this->DrawSvgBoundingBoxRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),
+                    view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()),
+                    view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX2())
+                        - view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),
+                    view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY2())
+                        - view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()));
                 this->EndGraphic(object, NULL);
             }
         }
