@@ -794,7 +794,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
 {
     std::string rawText;
 
-    const Text *tempoText = vrv_cast<const Text *>(tempo->FindDescendantByType(TEXT, 1));
+    const Text *tempoText = vrv_cast<const Text *>(tempo->FindDescendantByType(TEXT, 2));
     if (tempoText) {
         // if there is a tempo text, insert a space
         std::string tempoString = UTF32to8(tempoText->GetText());
