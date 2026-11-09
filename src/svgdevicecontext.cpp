@@ -1089,6 +1089,7 @@ void SvgDeviceContext::StartText(int x, int y, data_HORIZONTALALIGNMENT alignmen
             m_currentNode.append_attribute("font-weight") = "bold";
         }
     }
+    m_currentNode.append_attribute("xml:space") = "preserve";
 }
 
 void SvgDeviceContext::MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment)
