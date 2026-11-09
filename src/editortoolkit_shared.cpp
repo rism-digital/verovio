@@ -178,10 +178,10 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
     }
     else if (action == "drag") {
         DragPhase phase;
-        int dx, dy;
-        if (this->ParseDragAction(json.get<jsonxx::Object>("param"), phase, dx, dy)) {
+        int startX, startY, dx, dy;
+        if (this->ParseDragAction(json.get<jsonxx::Object>("param"), phase, startX, startY, dx, dy)) {
             if (phase == DRAG_MOVE) this->PrepareUndo();
-            return (this->Drag(phase, dx, dy));
+            return (this->Drag(phase, startX, startY, dx, dy));
         }
         LogWarning("Could not parse the drag action");
     }
@@ -490,8 +490,11 @@ bool EditorToolkitShared::ParseDeleteAction(
     return true;
 }
 
-bool EditorToolkitShared::ParseDragAction(const jsonxx::Object &param, DragPhase &phase, int &dx, int &dy)
+bool EditorToolkitShared::ParseDragAction(
+    const jsonxx::Object &param, DragPhase &phase, int &startX, int &startY, int &dx, int &dy)
 {
+    startX = 0;
+    startY = 0;
     dx = 0;
     dy = 0;
 
@@ -499,6 +502,10 @@ bool EditorToolkitShared::ParseDragAction(const jsonxx::Object &param, DragPhase
     const std::string phaseStr = param.get<jsonxx::String>("phase");
     if (phaseStr == "start") {
         phase = DRAG_START;
+        if (!param.has<jsonxx::Number>("startX")) return false;
+        startX = param.get<jsonxx::Number>("startX");
+        if (!param.has<jsonxx::Number>("startY")) return false;
+        startY = param.get<jsonxx::Number>("startY");
     }
     else if (phaseStr == "move") {
         phase = DRAG_MOVE;
@@ -888,16 +895,6 @@ void EditorToolkitShared::ResetDragOrigin()
 {
     m_dragXOrigin = VRV_UNSET;
     m_dragYOrigin = VRV_UNSET;
-}
-
-void EditorToolkitShared::SetDragOrigin(const Object *element)
-{
-    this->ResetDragOrigin();
-
-    if (element && element->IsAnyOf(std::array{ NOTE, REST })) {
-        m_dragXOrigin = element->GetDrawingX();
-        m_dragYOrigin = element->GetDrawingY();
-    }
 }
 
 void EditorToolkitShared::ReloadEditStatus(const std::string &statusStr, bool insertMode)
@@ -1370,7 +1367,7 @@ void EditorToolkitShared::PostEditRestriction(Object *element)
     }
 }
 
-bool EditorToolkitShared::Drag(DragPhase phase, int dx, int dy)
+bool EditorToolkitShared::Drag(DragPhase phase, int startX, int startY, int dx, int dy)
 {
     if (phase == DRAG_START || phase == DRAG_END) this->ResetDragOrigin();
 
@@ -1391,7 +1388,8 @@ bool EditorToolkitShared::Drag(DragPhase phase, int dx, int dy)
     }
 
     if (phase == DRAG_START) {
-        this->SetDragOrigin(element);
+        m_dragXOrigin = m_view->ToLogicalX(startX * DEFINITION_FACTOR);
+        m_dragYOrigin = m_view->ToLogicalY(startY * DEFINITION_FACTOR);
         return true;
     }
     if ((m_dragXOrigin == VRV_UNSET) || (m_dragYOrigin == VRV_UNSET)) return false;

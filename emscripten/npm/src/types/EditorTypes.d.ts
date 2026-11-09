@@ -37,7 +37,7 @@ export interface CutAction {
 export type EditActionDrag = {
     action: "drag";
     param:
-        | { phase: "start" }
+        | { phase: "start"; startX: number; startY: number }
         | { phase: "move"; dx: number; dy: number }
         | { phase: "end" };
 };

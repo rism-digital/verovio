@@ -76,7 +76,7 @@ protected:
     bool ParseContextAction(const jsonxx::Object &param, std::string &elementId, bool &scores, bool &sections);
     bool ParseCutAction(const jsonxx::Object &param, std::string &elementId);
     bool ParseDeleteAction(const jsonxx::Object &param, std::string &elementId, DeleteNavigation &navigation);
-    bool ParseDragAction(const jsonxx::Object &param, DragPhase &phase, int &dx, int &dy);
+    bool ParseDragAction(const jsonxx::Object &param, DragPhase &phase, int &startX, int &startY, int &dx, int &dy);
     bool ParseKeyDownAction(
         const jsonxx::Object &param, std::string &elementid, int &key, bool &shiftKey, bool &ctrlKey);
     bool ParseInsertAction(
@@ -114,7 +114,6 @@ protected:
     void ReloadEditStatus(const std::string &statusStr, bool insertMode);
     void ResetSelect();
     void ResetDragOrigin();
-    void SetDragOrigin(const Object *element);
     void PrepareUndo(bool ignoreInsertMode = false);
     std::string GetCurrentState();
     bool ReloadState(const State &state);
@@ -136,7 +135,7 @@ protected:
     bool Copy(std::string &elementId);
     bool Cut(std::string &elementId);
     bool Delete(std::string &elementId, DeleteNavigation navigation);
-    bool Drag(DragPhase phase, int dx, int dy);
+    bool Drag(DragPhase phase, int startX, int startY, int dx, int dy);
     bool InsertControl(std::string &elementName, std::string &startId, std::string &endId);
     bool KeyDown(std::string &elementId, int key, bool shiftKey, bool ctrlKey);
     bool Navigate(std::string &elementId, const int &direction);
