@@ -31,6 +31,7 @@ namespace vrv {
 class ScoreDefInterface : public Interface,
                           public AttBarring,
                           public AttDurationDefault,
+                          public AttDurationRatio,
                           public AttLyricStyle,
                           public AttMeasureNumbers,
                           public AttMidiTempo,

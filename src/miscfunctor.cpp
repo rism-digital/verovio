@@ -237,6 +237,7 @@ void InitProcessingListsFunctor::PrepareLyricElementTracks()
         }
         lyricElement->SetDrawingVerseN(drawingVerseN);
         lyricElement->SetDrawingLyricGroupN(lyricGroupN);
+        m_lyricGroupPlaces.insert({ staffN, lyricGroupN, GetLyricPlace(lyricElement) });
 
         IntTree &verseTree = m_verseTree.child[staffN].child[layerN].child[lyricGroupN];
         const std::tuple<int, int, int> lyricKey{ staffN, layerN, lyricGroupN };

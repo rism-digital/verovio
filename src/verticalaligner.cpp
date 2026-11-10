@@ -125,6 +125,19 @@ void SystemAligner::ReorderBy(const std::vector<int> &staffNs)
     }
 }
 
+void SystemAligner::ShareLyricLines()
+{
+    StaffAlignment *previous = NULL;
+    for (Object *child : this->GetChildrenForModification()) {
+        StaffAlignment *alignment = vrv_cast<StaffAlignment *>(child);
+        assert(alignment);
+        // Skip the bottom alignment
+        if (!alignment->GetStaff()) continue;
+        alignment->ShareLyricsWithPrevious(previous);
+        previous = alignment;
+    }
+}
+
 StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN)
 {
     return const_cast<StaffAlignment *>(std::as_const(*this).GetStaffAlignmentForStaffN(staffN));
@@ -332,6 +345,7 @@ StaffAlignment::StaffAlignment() : Object(STAFF_ALIGNMENT)
     m_yRel = 0;
     m_verseAboveNs.clear();
     m_verseBelowNs.clear();
+    m_sharedLyricsAlignment = NULL;
     m_staff = NULL;
     m_floatingPositionersSorted = true;
 
@@ -456,6 +470,9 @@ void StaffAlignment::SetRequestedSpaceBelow(int space)
 void StaffAlignment::AddLyricElement(const LyricElement *lyricElement)
 {
     assert(lyricElement);
+    std::vector<std::pair<int, const Alignment *>> &positions
+        = (lyricElement->GetPlace() == STAFFREL_above) ? m_lyricPositionsAbove : m_lyricPositionsBelow;
+    positions.push_back({ lyricElement->GetDrawingVerseN(), lyricElement->GetAlignment() });
     if (lyricElement->Is(REFRAIN)) {
         for (int line = 0; line < lyricElement->GetLyricLineCount(); ++line) {
             this->AddVerseN(lyricElement->GetDrawingVerseN() + line, lyricElement->GetPlace());
@@ -473,6 +490,26 @@ void StaffAlignment::AddVerseN(int verseN, data_STAFFREL place, int lineCount)
     lineCount = std::max(lineCount, 1);
     std::map<int, int> &verses = (place == STAFFREL_above) ? m_verseAboveNs : m_verseBelowNs;
     verses[verseN] = std::max(verses[verseN], lineCount);
+}
+
+void StaffAlignment::ShareLyricsWithPrevious(StaffAlignment *previous)
+{
+    m_sharedLyricsAlignment = NULL;
+    if (!previous || previous->m_verseBelowNs.empty() || m_verseAboveNs.empty()) return;
+
+    // Simultaneous syllables of the two staves on the same lyric line would overlap
+    std::vector<std::pair<int, const Alignment *>> &positionsBelow = previous->m_lyricPositionsBelow;
+    std::sort(positionsBelow.begin(), positionsBelow.end());
+    for (const std::pair<int, const Alignment *> &position : m_lyricPositionsAbove) {
+        if (std::binary_search(positionsBelow.begin(), positionsBelow.end(), position)) return;
+    }
+
+    // Move the verses above to the previous staff so they are counted only once in the overflow
+    for (const auto &[verseN, lineCount] : m_verseAboveNs) {
+        previous->m_verseBelowNs[verseN] = std::max(previous->m_verseBelowNs[verseN], lineCount);
+    }
+    m_verseAboveNs.clear();
+    m_sharedLyricsAlignment = previous;
 }
 
 int StaffAlignment::GetVerseCount(bool collapse) const

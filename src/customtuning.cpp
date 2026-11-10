@@ -236,7 +236,7 @@ void CustomTuning::CopyCustomTunings(const Doc *src, Doc *dst)
     const bool hasValidCustomTuning = std::any_of(srcScoreDefs.begin(), srcScoreDefs.end(), [](auto object) {
         const ScoreDef *scoreDef = vrv_cast<const ScoreDef *>(object);
         assert(scoreDef);
-        return scoreDef->GetCustomTuning().IsValid();
+        return (scoreDef->HasCustomTuning() && scoreDef->GetCustomTuning()->IsValid());
     });
     if (!hasValidCustomTuning) return;
 
@@ -250,8 +250,10 @@ void CustomTuning::CopyCustomTunings(const Doc *src, Doc *dst)
     for (; srcIt != srcScoreDefs.end() && dstIt != dstScoreDefs.end(); srcIt++, dstIt++) {
         const ScoreDef *srcScoreDef = vrv_cast<const ScoreDef *>(*srcIt);
         ScoreDef *dstScoreDef = vrv_cast<ScoreDef *>(*dstIt);
-        if (srcScoreDef->GetCustomTuning().IsValid()) {
-            dstScoreDef->SetCustomTuning(srcScoreDef->GetCustomTuning());
+        if (srcScoreDef->HasCustomTuning() && srcScoreDef->GetCustomTuning()->IsValid()) {
+            CustomTuning *copyCustomTuning = new CustomTuning();
+            (*copyCustomTuning) = (*srcScoreDef->GetCustomTuning());
+            dstScoreDef->SetCustomTuning(copyCustomTuning);
         }
     }
 }

@@ -87,6 +87,7 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayer(Layer *layer)
     m_meterParams.mensur = layer->GetCurrentMensur();
     m_meterParams.meterSig = layer->GetCurrentMeterSig();
     m_meterParams.proport = layer->GetCurrentProport();
+    std::tie(m_meterParams.num, m_meterParams.numbase) = layer->GetCurrentNumAndNumbase();
 
     return FUNCTOR_CONTINUE;
 }
@@ -588,6 +589,9 @@ FunctorCode InitMIDIFunctor::VisitMeasure(const Measure *measure)
 
 FunctorCode InitMIDIFunctor::VisitOctave(const Octave *octave)
 {
+    // An octave without start or end (e.g., an unresolved @endid) is not rendered and is ignored
+    if (!octave->HasStartAndEnd()) return FUNCTOR_CONTINUE;
+
     const Measure *measure = vrv_cast<const Measure *>(octave->GetFirstAncestor(MEASURE));
     assert(measure);
     std::vector<const Staff *> staffList = octave->GetTstampStaves(measure, octave);
@@ -909,6 +913,8 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
 FunctorCode GenerateMIDIFunctor::VisitPedal(const Pedal *pedal)
 {
     if (!pedal->HasDir()) return FUNCTOR_CONTINUE;
+    // The start is needed to calculate the pedal time below; skip pedals without one (e.g., an unresolved @startid)
+    if (!pedal->GetStart()) return FUNCTOR_CONTINUE;
 
     // Check the functor flag - filters should always be there, but just in case we change how it is called
     if (!m_controlEvents || !this->GetFilters()) return FUNCTOR_CONTINUE;
@@ -963,10 +969,10 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
         referencePitchClass = Note::PnameToPclass(scoreDef->GetTunePname());
     }
     // set and remember custom tuning if available
-    if (scoreDef->GetCustomTuning().IsValid()) {
-        m_customTuning = &scoreDef->GetCustomTuning();
+    if (scoreDef->HasCustomTuning() && scoreDef->GetCustomTuning()->IsValid()) {
+        m_customTuning = scoreDef->GetCustomTuning();
         const int program = m_instrDef && m_instrDef->HasMidiInstrnum() ? m_instrDef->GetMidiInstrnum() : 0;
-        const Tunings::Tuning &tuneCustom = scoreDef->GetCustomTuning().GetTuning();
+        const Tunings::Tuning &tuneCustom = m_customTuning->GetTuning();
         std::vector<std::pair<int, double>> mapping;
         // sysex messages should not have the high bit (0x80) set, which means that the full 128 MIDI notes
         // cannot be retuned in the same sysex message. For now, we skip MIDI key 0.
@@ -1116,36 +1122,39 @@ void GenerateMIDIFunctor::DeferMIDINote(const Note *refNote, double shift, bool 
 
 void GenerateMIDIFunctor::HandleOctave(const LayerElement *layerElement)
 {
+    if (!layerElement->GetAlignment()) return;
+
+    const auto isBefore = [](const LayerElement *element, const LayerElement *other) {
+        const Alignment &alignment = *element->GetAlignment();
+        const Alignment &otherAlignment = *other->GetAlignment();
+        if (alignment == otherAlignment) return element->IsGraceNote() && !other->IsGraceNote();
+        return alignment < otherAlignment;
+    };
+
     // Handle octave end
-    auto octaveIter = std::find_if(m_octaves.begin(), m_octaves.end(), [this, layerElement](const OctaveInfo &octave) {
-        if (octave.isActive && (octave.staffN == m_staffN) && (octave.layerN == m_layerN)) {
-            const Alignment *endAlignment = octave.octave->GetEnd()->GetAlignment();
-            const Alignment *alignment = layerElement->GetAlignment();
-            if (endAlignment && alignment) {
-                return *endAlignment < *alignment;
+    for (auto octaveIter = m_octaves.begin(); octaveIter != m_octaves.end();) {
+        if (octaveIter->isActive && (octaveIter->staffN == m_staffN) && (octaveIter->layerN == m_layerN)) {
+            const LayerElement *end = octaveIter->octave->GetEnd();
+            if (end->GetAlignment() && isBefore(end, layerElement)) {
+                m_octaveShift -= octaveIter->octaveShift;
+                octaveIter = m_octaves.erase(octaveIter);
+                continue;
             }
         }
-        return false;
-    });
-    if (octaveIter != m_octaves.end()) {
-        m_octaveShift -= octaveIter->octaveShift;
-        m_octaves.erase(octaveIter);
+        ++octaveIter;
     }
 
     // Handle octave begin
-    octaveIter = std::find_if(m_octaves.begin(), m_octaves.end(), [this, layerElement](const OctaveInfo &octave) {
+    for (OctaveInfo &octave : m_octaves) {
         if (!octave.isActive && (octave.staffN == m_staffN) && (octave.layerN == m_layerN)) {
-            const Alignment *startAlignment = octave.octave->GetStart()->GetAlignment();
-            const Alignment *alignment = layerElement->GetAlignment();
-            if (startAlignment && alignment) {
-                return *startAlignment <= *alignment;
+            const LayerElement *start = octave.octave->GetStart();
+            const LayerElement *end = octave.octave->GetEnd();
+            if (start->GetAlignment() && end->GetAlignment() && !isBefore(layerElement, start)
+                && !isBefore(end, layerElement)) {
+                m_octaveShift += octave.octaveShift;
+                octave.isActive = true;
             }
         }
-        return false;
-    });
-    if (octaveIter != m_octaves.end()) {
-        m_octaveShift += octaveIter->octaveShift;
-        octaveIter->isActive = true;
     }
 }
 

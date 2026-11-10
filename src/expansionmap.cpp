@@ -22,7 +22,7 @@
 #include "measure.h"
 #include "plistinterface.h"
 #include "rdg.h"
-#include "score.h"
+#include "scoreorpartelement.h"
 #include "section.h"
 #include "timeinterface.h"
 #include "vrv.h"
@@ -364,21 +364,21 @@ void ExpansionMap::ToJson(std::string &output)
     output = expansionmap.json();
 }
 
-void ExpansionMap::GenerateExpansionFor(Score *score)
+void ExpansionMap::GenerateExpansionFor(ScoreOrPartElement *scoreOrPart)
 {
     m_isProcessed = true;
 
-    if (score->HasEditorialContent()) {
+    if (scoreOrPart->HasEditorialContent()) {
         LogWarning("An expansion cannot be generated with editorial content");
         return;
     }
 
-    if (score->FindAllDescendantsByType(SECTION).size() > 1) {
+    if (scoreOrPart->FindAllDescendantsByType(SECTION).size() > 1) {
         LogWarning("An expansion cannot be generated with more than one section");
         return;
     }
 
-    Section *section = vrv_cast<Section *>(score->FindDescendantByType(SECTION, 1));
+    Section *section = vrv_cast<Section *>(scoreOrPart->FindDescendantByType(SECTION, 1));
     assert(section);
 
     ArrayOfObjects childrenArray = section->GetChildrenForModification();

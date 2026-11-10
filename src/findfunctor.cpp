@@ -13,8 +13,8 @@
 #include "layer.h"
 #include "object.h"
 #include "plistinterface.h"
-#include "score.h"
 #include "scoredef.h"
+#include "scoreorpartelement.h"
 #include "surface.h"
 #include "symboldef.h"
 #include "system.h"
@@ -450,15 +450,15 @@ FunctorCode FindElementInLayerStaffDefFunctor::VisitLayer(const Layer *layer)
     return m_element ? FUNCTOR_STOP : FUNCTOR_SIBLINGS;
 }
 
-FunctorCode FindElementInLayerStaffDefFunctor::VisitScore(const Score *score)
+FunctorCode FindElementInLayerStaffDefFunctor::VisitScoreOrPartElement(const ScoreOrPartElement *scoreOrPart)
 {
-    assert(score->GetScoreDef());
+    assert(scoreOrPart->GetScoreDef());
 
-    if (score->GetScoreDef()->GetID() == m_id) {
-        m_element = score->GetScoreDef();
+    if (scoreOrPart->GetScoreDef()->GetID() == m_id) {
+        m_element = scoreOrPart->GetScoreDef();
     }
     else {
-        m_element = score->GetScoreDef()->FindDescendantByID(m_id);
+        m_element = scoreOrPart->GetScoreDef()->FindDescendantByID(m_id);
     }
 
     return (m_element) ? FUNCTOR_STOP : FUNCTOR_CONTINUE;

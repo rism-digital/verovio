@@ -17,7 +17,7 @@
 #include "iomei.h"
 #include "page.h"
 #include "pages.h"
-#include "score.h"
+#include "scoreorpartelement.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -52,7 +52,7 @@ void Mdiv::Reset()
 
 bool Mdiv::IsSupportedChild(ClassId classId)
 {
-    static const std::vector<ClassId> supported{ MDIV, SCORE };
+    static const std::vector<ClassId> supported{ MDIV, PARTS, SCORE };
 
     if (std::find(supported.begin(), supported.end(), classId) != supported.end()) {
         return true;

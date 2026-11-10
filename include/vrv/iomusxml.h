@@ -444,6 +444,7 @@ private:
     ///@{
     Clef *ConvertClef(const pugi::xml_node &clef);
     KeySig *ConvertKey(const pugi::xml_node &key);
+    static std::set<data_PITCHNAME> ConvertKeyAlteredPitches(const pugi::xml_node &key);
     ///@}
 
     /*
@@ -566,13 +567,6 @@ private:
      */
     ///@{
     void SetChordStaff(Layer *layer);
-    ///@}
-
-    /*
-     * @name Update the carried-over accidentals for each pitch class based on key signature
-     */
-    ///@{
-    void ResetAccidentals(const KeySig *keySig = NULL);
     ///@}
 
     /**
@@ -717,6 +711,8 @@ private:
     std::map<int, int> m_multiRests;
     /* a map of pitch/alter values to their corresponding accidental(s) */
     std::map<std::string, std::vector<musicxml::Accidental>> m_alterAccids;
+    /* the pitches altered by the current key signature, by staff number */
+    std::map<int, std::set<data_PITCHNAME>> m_keyAlteredPitches;
     /* A flag indicating we had a clef change */
     int m_clefChanged = 0;
 

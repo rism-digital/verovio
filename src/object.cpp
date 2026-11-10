@@ -43,7 +43,7 @@
 #include "plistinterface.h"
 #include "resetfunctor.h"
 #include "savefunctor.h"
-#include "score.h"
+#include "scoreorpartelement.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "surface.h"
@@ -245,7 +245,7 @@ bool Object::IsMilestoneElement() const
         assert(interface);
         return (interface->IsSystemMilestone());
     }
-    else if (this->Is(MDIV) || this->Is(SCORE)) {
+    else if (this->Is(MDIV) || this->Is(PARTS) || this->IsScoreOrPartElement()) {
         const PageMilestoneInterface *interface = dynamic_cast<const PageMilestoneInterface *>(this);
         assert(interface);
         return (interface->IsPageMilestone());
@@ -260,7 +260,7 @@ Object *Object::GetMilestoneEnd()
         assert(interface);
         return (interface->GetEnd());
     }
-    else if (this->Is(MDIV) || this->Is(SCORE)) {
+    else if (this->Is(MDIV) || this->Is(PARTS) || this->IsScoreOrPartElement()) {
         PageMilestoneInterface *interface = dynamic_cast<PageMilestoneInterface *>(this);
         assert(interface);
         return (interface->GetEnd());
@@ -581,6 +581,33 @@ void Object::ReplaceWithCopyOf(Object *object)
     *this = *object;
     this->CloneReset();
     this->SetParent(parent);
+}
+
+void Object::SwapWith(Object *object)
+{
+    assert(object);
+    assert(this != object);
+    assert(this->GetParent());
+    assert(object->GetParent());
+    assert(this->GetClassId() == object->GetClassId());
+
+    Object *parent = this->GetParent();
+    Object *otherParent = object->GetParent();
+
+    const int idx = this->GetIdx();
+    const int otherIdx = object->GetIdx();
+
+    ArrayOfObjects &children = parent->GetChildrenForModification();
+    ArrayOfObjects &otherChildren = otherParent->GetChildrenForModification();
+
+    children.at(idx) = object;
+    otherChildren.at(otherIdx) = this;
+
+    this->SetParent(otherParent);
+    object->SetParent(parent);
+
+    this->Modify();
+    object->Modify();
 }
 
 bool Object::HasDescendant(const Object *child, int deepness) const

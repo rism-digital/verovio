@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "score.h"
+#include "scoreorpartelement.h"
 
 //----------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ FunctorCode AdjustAccidXFunctor::VisitAlignmentReference(AlignmentReference *ali
     if (accids.empty()) return FUNCTOR_SIBLINGS;
 
     assert(m_doc);
-    ScoreDef *scoreDef = m_doc->GetCorrespondingScore(alignmentReference)->GetScoreDef();
+    ScoreDef *scoreDef = m_doc->GetCorrespondingScoreOrPart(alignmentReference)->GetScoreDef();
     StaffDef *staffDef = scoreDef->GetStaffDef(alignmentReference->GetN());
     int staffSize = (staffDef && staffDef->HasScale()) ? staffDef->GetScale() : 100;
 

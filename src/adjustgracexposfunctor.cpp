@@ -36,7 +36,8 @@ FunctorCode AdjustGraceXPosFunctor::VisitAlignment(Alignment *alignment)
         // Do not process AlignmentReference children if no GraceAligner
         if (alignment->GetGraceAligners().empty()) {
             // We store the default alignment before we hit the grace alignment
-            if (alignment->GetType() == ALIGNMENT_DEFAULT) m_rightDefaultAlignment = alignment;
+            if (alignment->IsAnyOfType(std::array{ ALIGNMENT_DEFAULT, ALIGNMENT_CURSOR, ALIGNMENT_CURSOR_CHORD }))
+                m_rightDefaultAlignment = alignment;
             return FUNCTOR_SIBLINGS;
         }
         assert(alignment->GetType() == ALIGNMENT_GRACENOTE);

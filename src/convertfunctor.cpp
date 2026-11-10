@@ -20,8 +20,9 @@
 #include "mdiv.h"
 #include "mrest.h"
 #include "page.h"
+#include "parts.h"
 #include "rest.h"
-#include "score.h"
+#include "scoreorpartelement.h"
 #include "section.h"
 #include "staff.h"
 #include "syllable.h"
@@ -110,10 +111,24 @@ FunctorCode ConvertToPageBasedFunctor::VisitMdivEnd(Mdiv *mdiv)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ConvertToPageBasedFunctor::VisitScore(Score *score)
+FunctorCode ConvertToPageBasedFunctor::VisitParts(Parts *parts)
+{
+    parts->MoveItselfTo(m_page);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToPageBasedFunctor::VisitPartsEnd(Parts *parts)
+{
+    parts->ConvertToPageBasedMilestone(parts, m_page);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToPageBasedFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     assert(!m_currentSystem);
-    score->MoveItselfTo(m_page);
+    scoreOrPart->MoveItselfTo(m_page);
     System *system = new System();
     m_currentSystem = system;
     m_page->AddChild(system);
@@ -121,9 +136,9 @@ FunctorCode ConvertToPageBasedFunctor::VisitScore(Score *score)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ConvertToPageBasedFunctor::VisitScoreEnd(Score *score)
+FunctorCode ConvertToPageBasedFunctor::VisitScoreOrPartElementEnd(ScoreOrPartElement *scoreOrPart)
 {
-    score->ConvertToPageBasedMilestone(score, m_page);
+    scoreOrPart->ConvertToPageBasedMilestone(scoreOrPart, m_page);
     m_currentSystem = NULL;
 
     return FUNCTOR_CONTINUE;
@@ -374,10 +389,11 @@ FunctorCode ConvertToUnCastOffMensuralFunctor::VisitSection(Section *section)
 // ConvertToCmnFunctor
 //----------------------------------------------------------------------------
 
-ConvertToCmnFunctor::ConvertToCmnFunctor(Doc *doc, System *targetSystem, Score *score) : DocFunctor(doc)
+ConvertToCmnFunctor::ConvertToCmnFunctor(Doc *doc, System *targetSystem, ScoreOrPartElement *scoreOrPart)
+    : DocFunctor(doc)
 {
     m_targetSystem = targetSystem;
-    m_score = score;
+    m_score = scoreOrPart;
     m_currentStaff = NULL;
     m_n = 0;
 }
@@ -443,6 +459,7 @@ FunctorCode ConvertToCmnFunctor::VisitLayer(Layer *layer)
     m_currentParams.mensur = layer->GetCurrentMensur();
     m_currentParams.meterSig = layer->GetCurrentMeterSig();
     m_currentParams.proport = layer->GetCurrentProport();
+    std::tie(m_currentParams.num, m_currentParams.numbase) = layer->GetCurrentNumAndNumbase();
 
     m_ligature = NULL;
     m_coloration = NULL;
@@ -1316,10 +1333,10 @@ ConvertMarkupScoreDefFunctor::ConvertMarkupScoreDefFunctor(Doc *doc) : DocFuncto
     m_currentScoreDef = NULL;
 }
 
-FunctorCode ConvertMarkupScoreDefFunctor::VisitScore(Score *score)
+FunctorCode ConvertMarkupScoreDefFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
     // Evaluate functor on scoreDef
-    score->GetScoreDef()->Process(*this);
+    scoreOrPart->GetScoreDef()->Process(*this);
 
     return FUNCTOR_CONTINUE;
 }

@@ -30,6 +30,32 @@ export interface DragAction {
         y: number;
     };
 }
+export interface GetScoreDefAction {
+    action: "getScoreDef";
+    param: Record<string, never>;
+}
+export interface GetScoreDefKeySigAction {
+    action: "getScoreDefKeySig";
+    param: {
+        selected: boolean;
+    };
+}
+export interface GetScoreDefMeterSigAction {
+    action: "getScoreDefMeterSig";
+    param: {
+        selected: boolean;
+    };
+}
+export interface GetScoreDefStaffDefAction {
+    action: "getScoreDefStaffDef";
+    param: Record<string, never>;
+}
+export interface GetScoreDefStaffGrpAction {
+    action: "getScoreDefStaffGrp";
+    param: {
+        selected: boolean;
+    };
+}
 export interface InsertAction {
     action: "insert";
     param: {
@@ -80,6 +106,13 @@ export interface InsertMeasureAction {
     param: {
         elementId?: string;
         number: number;
+        insertBefore?: boolean;
+    }
+}
+export interface InsertScoreDefAction {
+    action: "insertScoreDef";
+    param: {
+        elementId: string;
         insertBefore?: boolean;
     }
 }
@@ -155,6 +188,39 @@ export interface SetAction {
         value: string;
     };
 }
+export interface SetScoreDefAction {
+    action: "setScoreDef";
+    param: {
+        subTree: EditorResponseScoreDef;
+    };
+}
+export interface SetScoreDefKeySigAction {
+    action: "setScoreDefKeySig";
+    param: {
+        selected: boolean;
+        subTree: EditorResponseScoreDef;
+    };
+}
+export interface SetScoreDefMeterSigAction {
+    action: "setScoreDefMeterSig";
+    param: {
+        selected: boolean;
+        subTree: EditorResponseScoreDef;
+    };
+}
+export interface SetScoreDefStaffDefAction {
+    action: "setScoreDefStaffDef";
+    param: {
+        subTree: EditorResponseScoreDef;
+    };
+}
+export interface SetScoreDefStaffGrpAction {
+    action: "setScoreDefStaffGrp";
+    param: {
+        selected: boolean;
+        subTree: EditorResponseScoreDef;
+    };
+}
 export interface SetCursorAction {
     action: "setCursor";
     param: {
@@ -184,12 +250,23 @@ export interface UpdatePitchAction {
         midi?: number;
     }
 }
+export interface UpdateScoreDefAction {
+    action: "updateScoreDef";
+    param: {
+        update: "insertAbove" | "insertBelow" | "moveUp" | "moveDown" | "deleteStaff";
+    };
+}
 export type EditorAction =
     | CommitAction
     | ChainAction
     | ContextAction
     | DeleteAction
     | DragAction
+    | GetScoreDefAction
+    | GetScoreDefKeySigAction
+    | GetScoreDefMeterSigAction
+    | GetScoreDefStaffDefAction
+    | GetScoreDefStaffGrpAction
     | InsertAction
     | InsertControlAction
     | InsertCursorByDurAction
@@ -197,6 +274,7 @@ export type EditorAction =
     | InsertCursorByTypeAction
     | InsertCursorContainerAction
     | InsertMeasureAction
+    | InsertScoreDefAction
     | InsertNoteAction
     | InsertRestAction
     | KeyDownAction
@@ -207,10 +285,16 @@ export type EditorAction =
     | ResetCursorContainerAction
     | SelectAction
     | SetAction
+    | SetScoreDefAction
+    | SetScoreDefKeySigAction
+    | SetScoreDefMeterSigAction
+    | SetScoreDefStaffDefAction
+    | SetScoreDefStaffGrpAction
     | SetCursorAction
     | UndoAction
     | UpdateCursorAction
-    | UpdatePitchAction;
+    | UpdatePitchAction
+    | UpdateScoreDefAction;
 
 /**
  * EditorStatus and related types.

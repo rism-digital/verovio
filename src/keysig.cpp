@@ -250,6 +250,28 @@ int KeySig::GetFifthsInt() const
     return 0;
 }
 
+data_KEYSIGNATURE KeySig::ConvertToWritten(int diatonic, int chromatic) const
+{
+    if (!this->HasSig()) return { 0, ACCIDENTAL_WRITTEN_n };
+
+    const int fifths = this->GetFifthsInt() - GetFifthsDelta(diatonic, chromatic);
+
+    if (fifths < 0) {
+        return { -fifths, ACCIDENTAL_WRITTEN_f };
+    }
+    else if (fifths > 0) {
+        return { fifths, ACCIDENTAL_WRITTEN_s };
+    }
+    else {
+        return { 0, ACCIDENTAL_WRITTEN_n };
+    }
+}
+
+data_KEYSIGNATURE KeySig::ConvertFromWritten(int diatonic, int chromatic) const
+{
+    return this->ConvertToWritten(-diatonic, -chromatic);
+}
+
 Clef *KeySig::GetDrawingClef()
 {
     return m_drawingClef.has_value() ? &m_drawingClef.value() : NULL;
@@ -386,6 +408,27 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, c
     octave -= disPlace;
 
     return octave;
+}
+
+int KeySig::GetFifthsDelta(int diatonic, int chromatic)
+{
+    const auto positiveModulo = [](int value, int modulo) { return ((value % modulo) + modulo) % modulo; };
+
+    // Key signatures are octave-independent.
+    diatonic = positiveModulo(diatonic, 7);
+    chromatic = positiveModulo(chromatic, 12);
+
+    const int diatonicTarget = positiveModulo(2 * diatonic, 7);
+    const int chromaticTarget = positiveModulo(7 * chromatic, 12);
+
+    for (int fifths = -42; fifths <= 41; ++fifths) {
+        if ((positiveModulo(fifths, 7) == diatonicTarget) && (positiveModulo(fifths, 12) == chromaticTarget)) {
+            return fifths;
+        }
+    }
+
+    assert(false);
+    return 0;
 }
 
 //----------------------------------------------------------------------------

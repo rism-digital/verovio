@@ -151,6 +151,15 @@ public:
     ///@}
 
     /*
+     * Getter for the placements (staff @n, lyric-element group, placement) of the lyric elements
+     */
+    const std::set<std::tuple<int, int, data_STAFFREL>> &GetLyricGroupPlaces()
+    {
+        this->PrepareLyricElementTracks();
+        return m_lyricGroupPlaces;
+    }
+
+    /*
      * Functor interface
      */
     ///@{
@@ -182,6 +191,8 @@ private:
     // Lyric elements grouped together so a direct-syllable track is reflected at every note.
     std::map<std::tuple<int, int, int>, std::vector<const LyricElement *>> m_lyricElementGroups;
     std::set<std::tuple<int, int, int>> m_directSylTrackGroups;
+    // The placements of the lyric elements by staff and lyric-element group
+    std::set<std::tuple<int, int, data_STAFFREL>> m_lyricGroupPlaces;
 };
 
 //----------------------------------------------------------------------------

@@ -48,7 +48,7 @@ public:
     FunctorCode VisitMdiv(Mdiv *mdiv) override;
     FunctorCode VisitNote(Note *note) override;
     FunctorCode VisitRest(Rest *rest) override;
-    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart) override;
     FunctorCode VisitStaffDef(StaffDef *staffDef) override;
     ///@}
 
@@ -109,7 +109,7 @@ public:
     ///@{
     FunctorCode VisitMdiv(Mdiv *mdiv) override;
     FunctorCode VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd) override;
-    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart) override;
     FunctorCode VisitSystem(System *system) override;
     ///@}
 
@@ -153,7 +153,7 @@ public:
      */
     ///@{
     FunctorCode VisitMdiv(Mdiv *mdiv) override;
-    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart) override;
     FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
     FunctorCode VisitScoreDefEnd(ScoreDef *scoreDef) override;
     FunctorCode VisitStaff(Staff *staff) override;

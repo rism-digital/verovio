@@ -19,7 +19,7 @@
 #include "pages.h"
 #include "pb.h"
 #include "sb.h"
-#include "score.h"
+#include "scoreorpartelement.h"
 #include "staff.h"
 #include "system.h"
 
@@ -328,14 +328,14 @@ FunctorCode CastOffPagesFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilest
     return FUNCTOR_SIBLINGS;
 }
 
-FunctorCode CastOffPagesFunctor::VisitScore(Score *score)
+FunctorCode CastOffPagesFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
-    this->VisitPageElement(score);
+    this->VisitPageElement(scoreOrPart);
 
-    m_pgHeadHeight = score->m_drawingPgHeadHeight;
-    m_pgFootHeight = score->m_drawingPgFootHeight;
-    m_pgHead2Height = score->m_drawingPgHead2Height;
-    m_pgFoot2Height = score->m_drawingPgFoot2Height;
+    m_pgHeadHeight = scoreOrPart->m_drawingPgHeadHeight;
+    m_pgFootHeight = scoreOrPart->m_drawingPgFootHeight;
+    m_pgHead2Height = scoreOrPart->m_drawingPgHead2Height;
+    m_pgFoot2Height = scoreOrPart->m_drawingPgFoot2Height;
 
     return FUNCTOR_SIBLINGS;
 }
@@ -452,7 +452,7 @@ FunctorCode CastOffEncodingFunctor::VisitPageElement(PageElement *pageElement)
 
 FunctorCode CastOffEncodingFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
 {
-    if (pageMilestoneEnd->GetStart() && pageMilestoneEnd->GetStart()->Is(SCORE)) {
+    if (pageMilestoneEnd->GetStart() && pageMilestoneEnd->GetStart()->IsScoreOrPartElement()) {
         // This is the end of a score, which means that the current system has to be added
         // to the current page
         assert(m_currentSystem);
@@ -578,7 +578,7 @@ FunctorCode UnCastOffFunctor::VisitPageElement(PageElement *pageElement)
 
 FunctorCode UnCastOffFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
 {
-    if (pageMilestoneEnd->GetStart() && pageMilestoneEnd->GetStart()->Is(SCORE)) {
+    if (pageMilestoneEnd->GetStart() && pageMilestoneEnd->GetStart()->IsScoreOrPartElement()) {
         // This is the end of a score, which means that nothing else should be added to
         // the current system and we set it to NULL;
         assert(m_currentSystem);
@@ -590,9 +590,9 @@ FunctorCode UnCastOffFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestone
     return FUNCTOR_SIBLINGS;
 }
 
-FunctorCode UnCastOffFunctor::VisitScore(Score *score)
+FunctorCode UnCastOffFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
 {
-    this->VisitPageElement(score);
+    this->VisitPageElement(scoreOrPart);
 
     assert(!m_currentSystem);
     System *system = new System();

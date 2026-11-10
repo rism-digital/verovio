@@ -8881,12 +8881,16 @@ void HumdrumInput::setMensurationSymbol(
         vrvmensur->SetSign(MENSURATIONSIGN_O);
     }
     else {
-        // deal with cases where C or O are not displayed
-        std::stringstream warning;
-        warning << "In HumdrumInput::setMensurationSymbol: Problem parsing mensuration: ";
-        warning << metdata;
-        LogWarning(warning.str().c_str());
-        return;
+        // deal with cases where C or O are not displayed: e.g. *met(3/2)
+
+        hum::HumRegex hre;
+        if (hre.search(metdata, "\\((\\d+)/(\\d+)\\)")) {
+            int top = hre.getMatchInt(1);
+            int bot = hre.getMatchInt(2);
+            vrvmensur->SetNum(top);
+            vrvmensur->SetNumbase(bot);
+            return;
+        }
     }
 
     if (metdata.find('|') != std::string::npos) {
@@ -9031,10 +9035,13 @@ void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const 
     }
 
     if (metertok) {
-        if (*metertok == "*met()") {
-            // set time signature to be invisible
-            vrvmeter->SetVisible(BOOLEAN_false);
-        }
+        // set time signature to be invisible
+        vrvmeter->SetVisible(BOOLEAN_false);
+        // Then process the metersignature alone
+        int kerntrack = metertok->getTrack();
+        int staffindex = m_rkern[kerntrack];
+        setMensurationSymbol(part, *metertok, staffindex, metertok);
+        return;
     }
     if (timetok && timetok->find("yy") != std::string::npos) {
         vrvmeter->SetVisible(BOOLEAN_false);
@@ -26587,9 +26594,11 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
     // int accidCount = hum::Convert::kernToAccidentalCount(tstring);
     bool showInAccid = token->hasVisibleAccidental(stindex);
+    bool showInAccidGes = !showInAccid;
     // always show mensural accidentals
-    // bool showInAccid = true;
-    bool showInAccidGes = false;
+    if (m_mens && token->isMensLike()) {
+        showInAccidGes = false;
+    }
     bool brackQ = hasLayoutParameter(token, "ACC", "brack");
     bool parenQ = hasLayoutParameter(token, "ACC", "paren");
     std::string loaccid = token->getLayoutParameter("N", "acc", subtoken);
@@ -29347,14 +29356,14 @@ int HumdrumInput::getNoteStaff(hum::HTp token, int homestaff)
 {
     hum::HumRegex hre;
     if (!m_signifiers.above.empty()) {
-        std::string sstring = "[a-g]+[-#n]*";
+        std::string sstring = "[A-Ga-g]+[-#n]*";
         sstring += m_signifiers.above;
         if (hre.search(token, sstring)) {
             return homestaff - 1;
         }
     }
     if (!m_signifiers.below.empty()) {
-        std::string sstring = "[a-g]+[-#n]*";
+        std::string sstring = "[A-Ga-g]+[-#n]*";
         sstring += m_signifiers.below;
         if (hre.search(token, sstring)) {
             return homestaff + 1;

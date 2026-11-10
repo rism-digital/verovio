@@ -80,6 +80,7 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     // Set the current score def to the page one
     // The page one has previously been set by the ScoreDefSetCurrentFunctor
     m_drawingScoreDef = m_currentPage->m_drawingScoreDef;
+    m_drawingScoreDef.CloneReset();
 
     if ((m_doc->GetAdjustedDrawingPageHeight() > dc->GetHeight()) && m_options->m_shrinkToFit.GetValue()) {
         dc->SetContentHeight(m_doc->GetAdjustedDrawingPageHeight());
@@ -180,7 +181,11 @@ void View::DrawPageElement(DeviceContext *dc, PageElement *element)
         dc->StartGraphic(element, elementStart, element->GetID());
         dc->EndGraphic(element, this);
     }
-    else if (element->Is(SCORE)) {
+    else if (element->Is(PARTS)) {
+        dc->StartGraphic(element, "pageMilestone", element->GetID());
+        dc->EndGraphic(element, this);
+    }
+    else if (element->IsScoreOrPartElement()) {
         dc->StartGraphic(element, "pageMilestone", element->GetID());
         dc->EndGraphic(element, this);
     }
@@ -1290,16 +1295,12 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
 
     dc->StartGraphic(staff, "", staff->GetID());
 
-    if (m_doc->IsFacs()) {
-        staff->SetFromFacsimile(m_doc);
-    }
-
     MRest *mrest = vrv_cast<MRest *>(staff->FindDescendantByType(MREST));
     if (!mrest || mrest->GetCutout() != cutout_CUTOUT_cutout) {
         this->DrawStaffLines(dc, staff, staffDef, measure, system);
     }
 
-    if (staffDef && (m_doc->GetType() != Facs)) {
+    if (staffDef) {
         this->DrawStaffDef(dc, staff, measure);
     }
 
@@ -1701,6 +1702,9 @@ void View::DrawPlaceholder(DeviceContext *dc, Object *object, System *system)
     assert(object && object->GetParent());
 
     if (object->GetParent() != system) return;
+
+    // Placeholders are hidden by the global CSS, so without it (e.g., with mmOutput) they are not drawn
+    if (!dc->Is(BBOX_DEVICE_CONTEXT) && !dc->UseGlobalStyling()) return;
 
     if (m_doc->GetOptions()->m_showHidden.GetValue()) dc->AddGraphicClass(CSS_SHOW_HIDDEN);
 
