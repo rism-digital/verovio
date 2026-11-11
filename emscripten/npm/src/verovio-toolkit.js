@@ -198,6 +198,16 @@ export class VerovioToolkit {
     }
 
     /**
+     * Return MIDI values of all the notes in the document
+     *
+     * Same values as getMIDIValuesForElement() but in a single call
+     * @returns {Record<string, MIDIValues>} a JSON object with the MIDI values keyed by note ID (xml:id)
+     */
+    getMIDIValues() {
+        return JSON.parse(this.proxy.getMIDIValues(this.ptr));
+    }
+
+    /**
      * Returns the ID string of the notated (the original) element.
      * @param {string} xmlId the ID (@xml:id) of the element being looked for
      * @returns {string} An ID string

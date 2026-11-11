@@ -2199,6 +2199,40 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
     return o.json();
 }
 
+std::string Toolkit::GetMIDIValues()
+{
+    this->SetMidiDoc();
+    this->ResetLogBuffer();
+
+    assert(m_midiDoc);
+    jsonxx::Object o;
+
+    if (!m_midiDoc->HasTimemap()) {
+        // generate MIDI timemap before progressing
+        m_midiDoc->CalculateTimemap();
+    }
+    if (!m_midiDoc->HasTimemap()) {
+        LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
+        return o.json();
+    }
+
+    // One traversal for all notes instead of an ID lookup per note
+    ListOfObjects notes = m_midiDoc->FindAllDescendantsByType(NOTE);
+    for (Object *object : notes) {
+        Note *note = vrv_cast<Note *>(object);
+        assert(note);
+        Measure *measure = vrv_cast<Measure *>(note->GetFirstAncestor(MEASURE));
+        assert(measure);
+        jsonxx::Object values;
+        // Same values as GetMIDIValuesForElement (first repeat of the measure)
+        values << "time" << (int)(measure->GetRealTimeOnsetMilliseconds(1) + note->GetRealTimeOnsetMilliseconds());
+        values << "pitch" << note->GetMIDIPitch();
+        values << "duration" << (int)(note->GetRealTimeOffsetMilliseconds() - note->GetRealTimeOnsetMilliseconds());
+        o << note->GetID() << values;
+    }
+    return o.json();
+}
+
 void Toolkit::SetHumdrumBuffer(const char *data)
 {
     this->ClearHumdrumBuffer();
