@@ -372,10 +372,14 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         }
     }
 
-    FontInfo rendFont;
+    FontInfo rendFont = dc->HasFont() ? *dc->GetFont() : FontInfo();
     bool customFont = false;
     if (rend->HasFontname()) {
         rendFont.SetFaceName(rend->GetFontname().c_str());
+        customFont = true;
+    }
+    else if (rend->HasFontfam()) {
+        rendFont.SetFaceName(rend->GetFontfam().c_str());
         customFont = true;
     }
     if (rend->HasFontsize()) {
@@ -450,7 +454,12 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
 
     // Do not render enclosings if the content is empty
     if (rend->HasEnclosure()) {
-        params.m_enclosedRend.push_back(rend);
+        const FontInfo *font = dc->GetFont();
+        const int fontBottom = params.m_y + m_doc->GetTextGlyphDescender(U'p', font, false);
+        const int hTop = m_doc->GetTextGlyphDescender(U'h', font, false) + m_doc->GetTextGlyphHeight(U'h', font, false);
+        const int tTop = m_doc->GetTextGlyphDescender(U't', font, false) + m_doc->GetTextGlyphHeight(U't', font, false);
+        const int fontTop = params.m_y + std::max(hTop, tTop);
+        params.m_enclosedRend.push_back({ rend, fontBottom, fontTop });
         params.m_x = rend->GetContentRight() + m_doc->GetDrawingUnit(100);
         params.m_explicitPosition = true;
         params.m_enclose = rend->GetRend();
@@ -473,12 +482,7 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     assert(dc->HasFont());
     assert(text);
 
-    const Resources *resources = dc->GetResources();
-    assert(resources);
-
     dc->StartTextGraphic(text, "", text->GetID());
-
-    resources->SelectTextFont(dc->GetFont()->GetWeight(), dc->GetFont()->GetStyle());
 
     if (params.m_explicitPosition) {
         dc->MoveTextTo(
@@ -517,8 +521,6 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     }
 
     params.m_actualWidth = text->GetContentRight();
-
-    resources->SelectTextFont(FONTWEIGHT_NONE, FONTSTYLE_NONE);
 
     dc->EndTextGraphic(text, this);
 }
@@ -641,26 +643,25 @@ void View::DrawRunningElements(DeviceContext *dc, Page *page)
     }
 
     RunningElement *header = page->GetHeader();
+    const ScoreDefInterface *textStyle = &page->m_drawingScoreDef;
     if (header) {
-        this->DrawTextLayoutElement(dc, header);
+        this->DrawTextLayoutElement(dc, header, textStyle);
     }
     RunningElement *footer = page->GetFooter();
     if (footer) {
-        this->DrawTextLayoutElement(dc, footer);
+        this->DrawTextLayoutElement(dc, footer, textStyle);
     }
 }
 
-void View::DrawTextLayoutElement(DeviceContext *dc, TextLayoutElement *textLayoutElement)
+void View::DrawTextLayoutElement(
+    DeviceContext *dc, TextLayoutElement *textLayoutElement, const ScoreDefInterface *textStyle)
 {
     assert(dc);
     assert(textLayoutElement);
 
     dc->StartGraphic(textLayoutElement, "", textLayoutElement->GetID());
 
-    FontInfo textElementFont;
-    if (!dc->UseGlobalStyling()) {
-        textElementFont.SetFaceName(m_doc->GetResources().GetTextFont());
-    }
+    FontInfo textElementFont = m_doc->GetDrawingTextFont(100, textStyle);
 
     TextDrawingParams params;
 
@@ -685,7 +686,7 @@ void View::DrawTextLayoutElement(DeviceContext *dc, TextLayoutElement *textLayou
 
 void View::DrawDiv(DeviceContext *dc, Div *div, System *system)
 {
-    this->DrawTextLayoutElement(dc, div);
+    this->DrawTextLayoutElement(dc, div, system ? system->GetDrawingScoreDef() : NULL);
 }
 
 } // namespace vrv

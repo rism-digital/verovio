@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1">
+  <meiHead><fileDesc><titleStmt><title>Text-heavy benchmark</title></titleStmt><pubStmt/></fileDesc></meiHead>
+  <music><body><mdiv><score>
+    <scoreDef meter.count="4" meter.unit="4"><staffGrp><staffDef n="1" lines="5" clef.shape="G" clef.line="2" label="Violin and descriptive text"/></staffGrp></scoreDef>
+    <section><pb/><measure n="1">
+      <staff n="1"><layer n="1"><note xml:id="n1" pname="c" oct="4" dur="1"/></layer></staff>
+      <dir startid="#n1" place="above"><rend fontstyle="italic">AV ffi office affinity</rend> — Καλημέρα κόσμε — <rend fontweight="bold">Bold text 0123456789</rend></dir>
+      <dir startid="#n1" place="below">Combining marks: Á ë ñ; repeated letters and spacing for stable text-heavy measurements.</dir>
+      <dynam startid="#n1"><rend fontweight="bold" fontstyle="italic">fortissimo, expressive, sempre legato</rend></dynam>
+    </measure></section>
+  </score></mdiv></body></music>
+</mei>

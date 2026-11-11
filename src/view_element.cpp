@@ -53,6 +53,7 @@
 #include "rest.h"
 #include "smufl.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "stem.h"
 #include "syl.h"
 #include "system.h"
@@ -754,35 +755,26 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     dc->StartGraphic(element, "", element->GetID());
 
-    std::string previousFont = "";
-    if (clef->HasFontname()) {
-        Resources &resources = m_doc->GetResourcesForModification();
-        previousFont = resources.GetCurrentFont();
-        resources.SetCurrentFont(clef->GetFontname());
-    }
+    const std::string fontName = clef->HasFontname() ? clef->GetFontname() : "";
 
-    this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false);
+    this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, false, fontName);
 
     // Possibly draw enclosing brackets
-    this->DrawClefEnclosing(dc, clef, staff, sym, x, y);
-
-    if (!previousFont.empty()) {
-        Resources &resources = m_doc->GetResourcesForModification();
-        resources.SetCurrentFont(previousFont);
-    }
+    this->DrawClefEnclosing(dc, clef, staff, sym, x, y, fontName);
 
     dc->EndGraphic(element, this);
 }
 
-void View::DrawClefEnclosing(DeviceContext *dc, Clef *clef, Staff *staff, char32_t glyph, int x, int y)
+void View::DrawClefEnclosing(
+    DeviceContext *dc, Clef *clef, Staff *staff, char32_t glyph, int x, int y, const std::string &fontName)
 {
     if ((clef->GetEnclose() == ENCLOSURE_brack) || (clef->GetEnclose() == ENCLOSURE_box)) {
         const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         const int glyphSize = staff->GetDrawingStaffNotationSize();
-        x += m_doc->GetGlyphLeft(glyph, glyphSize, false);
-        y += m_doc->GetGlyphBottom(glyph, glyphSize, false);
-        const int height = m_doc->GetGlyphHeight(glyph, glyphSize, false);
-        const int width = m_doc->GetGlyphWidth(glyph, glyphSize, false);
+        x += m_doc->GetGlyphLeft(glyph, glyphSize, false, fontName);
+        y += m_doc->GetGlyphBottom(glyph, glyphSize, false, fontName);
+        const int height = m_doc->GetGlyphHeight(glyph, glyphSize, false, fontName);
+        const int width = m_doc->GetGlyphWidth(glyph, glyphSize, false, fontName);
         const int offset = unit * 3 / 4;
         // We use overlapping brackets to draw boxes :)
         const int bracketWidth = (clef->GetEnclose() == ENCLOSURE_brack) ? unit : (width + offset);
@@ -1180,12 +1172,7 @@ void View::DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int
 
     dc->StartGraphic(meterSig, "", meterSig->GetID());
 
-    std::string previousFont;
-    if (meterSig->HasFontname()) {
-        Resources &resources = m_doc->GetResourcesForModification();
-        previousFont = resources.GetCurrentFont();
-        resources.SetCurrentFont(meterSig->GetFontname());
-    }
+    const std::string fontName = meterSig->HasFontname() ? meterSig->GetFontname() : "";
 
     int y = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
     int x = meterSig->GetDrawingX() + horizOffset;
@@ -1193,29 +1180,24 @@ void View::DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int
     const int glyphSize = staff->GetDrawingStaffNotationSize();
 
     if (enclosingFront) {
-        this->DrawSmuflCode(dc, x, y, enclosingFront, glyphSize, false);
-        x += m_doc->GetGlyphWidth(enclosingFront, glyphSize, false);
+        this->DrawSmuflCode(dc, x, y, enclosingFront, glyphSize, false, false, fontName);
+        x += m_doc->GetGlyphWidth(enclosingFront, glyphSize, false, fontName);
     }
 
     if (meterSig->HasSym() || meterSig->HasGlyphNum() || meterSig->HasGlyphName()) {
         const char32_t code = meterSig->GetSymbolGlyph();
-        this->DrawSmuflCode(dc, x, y, code, glyphSize, false);
-        x += m_doc->GetGlyphWidth(code, glyphSize, false);
+        this->DrawSmuflCode(dc, x, y, code, glyphSize, false, false, fontName);
+        x += m_doc->GetGlyphWidth(code, glyphSize, false, fontName);
     }
     else if (meterSig->GetForm() == METERFORM_num) {
-        x += this->DrawMeterSigFigures(dc, x, y, meterSig, 0, staff);
+        x += this->DrawMeterSigFigures(dc, x, y, meterSig, 0, staff, fontName);
     }
     else if (meterSig->HasCount()) {
-        x += this->DrawMeterSigFigures(dc, x, y, meterSig, meterSig->GetUnit(), staff);
+        x += this->DrawMeterSigFigures(dc, x, y, meterSig, meterSig->GetUnit(), staff, fontName);
     }
 
     if (enclosingBack) {
-        this->DrawSmuflCode(dc, x, y, enclosingBack, glyphSize, false);
-    }
-
-    if (!previousFont.empty()) {
-        Resources &resources = m_doc->GetResourcesForModification();
-        resources.SetCurrentFont(previousFont);
+        this->DrawSmuflCode(dc, x, y, enclosingBack, glyphSize, false, false, fontName);
     }
 
     dc->EndGraphic(meterSig, this);
@@ -1895,46 +1877,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     dc->StartGraphic(syl, "", syl->GetID());
     dc->DeactivateGraphicY();
 
-    FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-    const auto applyTypography = [this, staff](FontInfo &font, const AttTypography *typography) {
-        if (!typography) return;
-        if (typography->HasFontname()) {
-            font.SetFaceName(typography->GetFontname());
-        }
-        else if (typography->HasFontfam()) {
-            font.SetFaceName(typography->GetFontfam());
-        }
-        if (typography->HasFontsize()) {
-            const data_FONTSIZE fontSize = typography->GetFontsize();
-            if (fontSize.GetType() == FONTSIZE_fontSizeNumeric) {
-                font.SetPointSize(fontSize.GetFontSizeNumeric());
-            }
-            else if (fontSize.GetType() == FONTSIZE_term) {
-                font.SetPointSize(font.GetPointSize() * fontSize.GetPercentForTerm() / 100);
-            }
-            else if (fontSize.GetType() == FONTSIZE_percent) {
-                font.SetPointSize(font.GetPointSize() * fontSize.GetPercent() / 100);
-            }
-        }
-        if (typography->HasFontweight()) font.SetWeight(typography->GetFontweight());
-        if (typography->HasFontstyle()) font.SetStyle(typography->GetFontstyle());
-        if (typography->HasLetterspacing()) {
-            font.SetLetterSpacing(typography->GetLetterspacing() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
-        }
-    };
-
-    const LyricElement *lyricElement
-        = vrv_cast<const LyricElement *>(syl->GetFirstAncestorInRange(LYRIC_ELEMENT, LYRIC_ELEMENT_max));
-    const Volta *volta = vrv_cast<const Volta *>(syl->GetFirstAncestor(VOLTA));
-    applyTypography(currentFont, lyricElement);
-    applyTypography(currentFont, volta);
-    applyTypography(currentFont, syl);
-    if (syl->GetStart() && syl->GetStart()->GetDrawingCueSize()) {
-        currentFont.SetPointSize(m_doc->GetCueSize(currentFont.GetPointSize()));
-    }
-    if (syl->HasLetterspacing()) {
-        currentFont.SetLetterSpacing(syl->GetLetterspacing() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
-    }
+    FontInfo currentFont = syl->GetDrawingFont(m_doc, staff->m_drawingStaffSize);
     dc->SetFont(&currentFont);
 
     int x = syl->GetDrawingX();
@@ -2047,10 +1990,8 @@ void View::DrawLyricElement(DeviceContext *dc, LayerElement *element, Layer *lay
         LayerElement *layerElement
             = vrv_cast<LayerElement *>(element->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
 
-        FontInfo labelTxt;
-        if (!dc->UseGlobalStyling()) {
-            labelTxt.SetFaceName(m_doc->GetResources().GetTextFont());
-        }
+        FontInfo labelTxt = m_doc->GetDrawingTextFont(staff->m_drawingStaffSize, staff->m_drawingStaffDef, true);
+        m_doc->ApplyTypography(labelTxt, verse, staff->m_drawingStaffSize);
         int pointSize = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize();
         if (layerElement && layerElement->GetDrawingCueSize()) {
             pointSize = m_doc->GetCueSize(pointSize);
@@ -2218,7 +2159,8 @@ void View::DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, con
     }
 }
 
-int View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, MeterSig *meterSig, int den, Staff *staff)
+int View::DrawMeterSigFigures(
+    DeviceContext *dc, int x, int y, MeterSig *meterSig, int den, Staff *staff, const std::string &fontName)
 {
     assert(dc);
     assert(staff);
@@ -2242,7 +2184,7 @@ int View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, MeterSig *meterSi
 
     const int glyphSize = staff->GetDrawingStaffNotationSize();
 
-    dc->SetFont(m_doc->GetDrawingSmuflFont(glyphSize, false));
+    dc->SetFont(m_doc->GetDrawingSmuflFont(glyphSize, false, fontName));
 
     std::u32string widthText = (timeSigCombNumerator.length() > timeSigCombDenominator.length())
         ? timeSigCombNumerator
@@ -2271,11 +2213,14 @@ int View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, MeterSig *meterSi
             dc->GetSmuflTextExtent(timeSigCombDenominator, &denExtend);
             yDen = y - denExtend.m_height / 2;
         }
-        this->DrawSmuflString(dc, x, yNum, timeSigCombNumerator, HORIZONTALALIGNMENT_center, glyphSize);
-        this->DrawSmuflString(dc, x, yDen, timeSigCombDenominator, HORIZONTALALIGNMENT_center, glyphSize);
+        this->DrawSmuflString(
+            dc, x, yNum, timeSigCombNumerator, HORIZONTALALIGNMENT_center, glyphSize, false, false, fontName);
+        this->DrawSmuflString(
+            dc, x, yDen, timeSigCombDenominator, HORIZONTALALIGNMENT_center, glyphSize, false, false, fontName);
     }
     else {
-        this->DrawSmuflString(dc, x, y, timeSigCombNumerator, HORIZONTALALIGNMENT_center, glyphSize);
+        this->DrawSmuflString(
+            dc, x, y, timeSigCombNumerator, HORIZONTALALIGNMENT_center, glyphSize, false, false, fontName);
     }
 
     dc->ResetFont();
@@ -2342,8 +2287,8 @@ int View::GetFYRel(F *f, Staff *staff)
     int line = fb->GetDescendantIndex(f, FIGURE, UNLIMITED_DEPTH);
 
     if (line > 0) {
-        FontInfo *fFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-        int lineHeight = m_doc->GetTextLineHeight(fFont, false);
+        FontInfo fFont = m_doc->GetDrawingTextFont(staff->m_drawingStaffSize, staff->m_drawingStaffDef);
+        int lineHeight = m_doc->GetTextLineHeight(&fFont, false);
         y -= (line * lineHeight);
     }
 
@@ -2360,9 +2305,9 @@ int View::GetSylYRel(int verseN, Staff *staff, data_STAFFREL place, int voltaN)
     const bool verseCollapse = m_options->m_lyricVerseCollapse.GetValue();
     int y = 0;
 
-    FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-    const int descender = m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
-    const int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
+    FontInfo lyricFont = m_doc->GetDrawingTextFont(staff->m_drawingStaffSize, staff->m_drawingStaffDef, true);
+    const int descender = m_doc->GetTextGlyphDescender(L'q', &lyricFont, false);
+    const int height = m_doc->GetTextGlyphHeight(L'I', &lyricFont, false);
 
     int verseHeight = height - descender;
     verseHeight *= m_doc->GetOptions()->m_lyricHeightFactor.GetValue();

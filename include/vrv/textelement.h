@@ -85,6 +85,15 @@ private:
 //----------------------------------------------------------------------------
 
 /**
+ * An enclosed text element with the bottom and top of its font, for drawing the enclosure
+ */
+struct TextEnclosure {
+    TextElement *m_element = NULL;
+    int m_fontBottom = 0;
+    int m_fontTop = 0;
+};
+
+/**
  * This class stores current drawing parameters for text.
  */
 class TextDrawingParams {
@@ -121,7 +130,7 @@ public:
     int m_pointSize;
     /** Staff-size percentage used for virtual units; 100 is the unscaled fallback when no staff context exists. */
     int m_staffSize;
-    std::vector<TextElement *> m_enclosedRend;
+    std::vector<TextEnclosure> m_enclosedRend;
     data_TEXTRENDITION m_enclose;
     data_ENCLOSURE m_textEnclose;
 };

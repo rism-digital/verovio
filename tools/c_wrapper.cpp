@@ -54,6 +54,51 @@ void vrvToolkit_destructor(void *tkPtr)
     delete tk;
 }
 
+const char *vrvToolkit_registerTextFont(void *tkPtr, const unsigned char *data, int length, const char *alias)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->RegisterTextFont(data, length, alias));
+    return tk->GetCString();
+}
+
+const char *vrvToolkit_registerMusicFont(
+    void *tkPtr, const unsigned char *data, int length, const char *smuflMetadataJson, const char *alias)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->RegisterMusicFont(data, length, smuflMetadataJson, alias));
+    return tk->GetCString();
+}
+
+const char *vrvToolkit_registerTextFontBase64(void *tkPtr, const char *data, const char *alias)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->RegisterTextFontBase64(data, alias));
+    return tk->GetCString();
+}
+
+const char *vrvToolkit_registerMusicFontBase64(
+    void *tkPtr, const char *data, const char *smuflMetadataJson, const char *alias)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->RegisterMusicFontBase64(data, smuflMetadataJson, alias));
+    return tk->GetCString();
+}
+
+const char *vrvToolkit_registerTextFontFile(void *tkPtr, const char *filename, const char *alias)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->RegisterTextFontFile(filename, alias));
+    return tk->GetCString();
+}
+
+const char *vrvToolkit_registerMusicFontFile(
+    void *tkPtr, const char *filename, const char *smuflMetadataFilename, const char *alias)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->RegisterMusicFontFile(filename, smuflMetadataFilename, alias));
+    return tk->GetCString();
+}
+
 bool vrvToolkit_edit(void *tkPtr, const char *editorAction)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);

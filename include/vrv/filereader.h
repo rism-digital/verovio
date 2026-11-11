@@ -23,6 +23,10 @@ class zip_file;
 
 namespace vrv {
 
+/** Inflate one zlib stream into an exactly-sized caller buffer. */
+bool InflateZlib(
+    const unsigned char *source, size_t sourceLength, unsigned char *destination, size_t destinationLength);
+
 //----------------------------------------------------------------------------
 // ZipFileReader
 //----------------------------------------------------------------------------

@@ -26,7 +26,7 @@ public:
      */
     ///@{
     ReplaceDrawingValuesInStaffDefFunctor(const Clef *clef, const KeySig *keySig, const Mensur *mensur,
-        const MeterSig *meterSig, const MeterSigGrp *meterSigGrp);
+        const MeterSig *meterSig, const MeterSigGrp *meterSigGrp, const ScoreDef *newScoreDef);
     virtual ~ReplaceDrawingValuesInStaffDefFunctor() = default;
     ///@}
 
@@ -59,6 +59,8 @@ private:
     const MeterSig *m_meterSig;
     // The meter signature group (NULL if none)
     const MeterSigGrp *m_meterSigGrp;
+    // The newScoreDef for accessing the text styles of each new staffDef
+    const ScoreDef *m_newScoreDef;
 };
 
 //----------------------------------------------------------------------------

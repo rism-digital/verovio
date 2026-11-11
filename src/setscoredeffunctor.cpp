@@ -29,14 +29,17 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 ReplaceDrawingValuesInStaffDefFunctor::ReplaceDrawingValuesInStaffDefFunctor(const Clef *clef, const KeySig *keySig,
-    const Mensur *mensur, const MeterSig *meterSig, const MeterSigGrp *meterSigGrp)
+    const Mensur *mensur, const MeterSig *meterSig, const MeterSigGrp *meterSigGrp, const ScoreDef *newScoreDef)
     : Functor()
 {
+    assert(newScoreDef);
+
     m_clef = clef;
     m_keySig = keySig;
     m_mensur = mensur;
     m_meterSig = meterSig;
     m_meterSigGrp = meterSigGrp;
+    m_newScoreDef = newScoreDef;
 }
 
 FunctorCode ReplaceDrawingValuesInStaffDefFunctor::VisitStaffDef(StaffDef *staffDef)
@@ -56,6 +59,11 @@ FunctorCode ReplaceDrawingValuesInStaffDefFunctor::VisitStaffDef(StaffDef *staff
     if (m_meterSigGrp) {
         staffDef->SetCurrentMeterSigGrp(m_meterSigGrp);
     }
+
+    // The text styles of the staffDef take precedence over the ones of the scoreDef
+    staffDef->MergeTextStyles(m_newScoreDef);
+    const StaffDef *newStaffDef = m_newScoreDef->GetStaffDef(staffDef->GetN());
+    if (newStaffDef) staffDef->MergeTextStyles(newStaffDef);
 
     return FUNCTOR_CONTINUE;
 }

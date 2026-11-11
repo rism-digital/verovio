@@ -113,6 +113,11 @@ public:
     ///@}
 
     /**
+     * Return the glyph in the music font of the current font (or in the current music font if none)
+     */
+    const Glyph *GetMusicGlyph(char32_t code) const;
+
+    /**
      * @name Getters and setters for common attributes.
      * Non-virtual methods cannot be overridden and manage the width, height and user-scale
      */
@@ -337,6 +342,12 @@ public:
      */
     virtual bool UseGlobalStyling() { return false; }
 
+    /**
+     * Method indicating if text styles (e.g., bold tempo) are left to the global styling.
+     * This requires the text to be output as text so that the styling applies to it.
+     */
+    virtual bool UseGlobalTextStyling() { return this->UseGlobalStyling(); }
+
     //----------------//
     // Static methods //
     //----------------//
@@ -346,6 +357,7 @@ public:
 
 private:
     void AddGlyphToTextExtend(const Glyph *glyph, TextExtend *extend);
+    void AddShapedRunToTextExtend(const FontStore::ShapedRun &run, TextExtend *extend);
 
 public:
     //

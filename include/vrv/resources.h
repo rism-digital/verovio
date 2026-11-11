@@ -8,15 +8,18 @@
 #ifndef __VRV_RESOURCES_H__
 #define __VRV_RESOURCES_H__
 
+#include <map>
 #include <optional>
 #include <unordered_map>
 
 //----------------------------------------------------------------------------
 
-#include "filereader.h"
+#include "fontstore.h"
 #include "glyph.h"
 
 namespace vrv {
+
+class FontInfo;
 
 //----------------------------------------------------------------------------
 // Resources
@@ -29,10 +32,8 @@ namespace vrv {
 
 class Resources {
 public:
-    using StyleAttributes = std::pair<data_FONTWEIGHT, data_FONTSTYLE>;
-    using GlyphTable = std::unordered_map<char32_t, Glyph>;
     using GlyphNameTable = std::unordered_map<std::string, char32_t>;
-    using GlyphTextMap = std::map<StyleAttributes, GlyphTable>;
+    using FaceStyle = std::pair<FontStore::Weight, FontStore::Style>;
 
     /**
      * @name Constructors, destructors, and other standard methods
@@ -51,39 +52,34 @@ public:
 
     std::string GetPath() const { return m_path; }
     void SetPath(const std::string &path) { m_path = path; }
+    const FontStore &GetFontStore() const { return m_fontStore; }
+    FontStore &GetFontStoreForModification() { return m_fontStore; }
     ///@}
 
     /** Status checker */
-    bool Ok() const { return (m_loadedFonts.size() > 1); }
-
-    /**
-     * Return the name of the text font (Times or Liberation)
-     */
-    void UseLiberationTextFont(bool useLiberation) { m_useLiberation = useLiberation; }
-    bool UseLiberationTextFont() const { return m_useLiberation; }
-    std::string GetTextFont() const { return ((m_useLiberation) ? "Liberation" : "Times"); }
+    bool Ok() const;
 
     /**
      * Font initialization
      */
     ///@{
-    /** Init the SMufL music and text fonts */
+    /** Register the bundled Leipzig, Bravura, and Tinos faces */
     bool InitFonts();
-    /**  Set the font to be used and loads it if necessary */
-    bool SetFont(const std::string &fontName);
-    /** Add custom (external) fonts */
-    bool AddCustom(const std::vector<std::string> &extraFonts);
-    /** Load all music fonts available in the resource directory */
-    bool LoadAll();
-    /** Set the fallback font (Leipzig or Bravura) when some glyphs are missing in the current font */
-    void SetFallbackFont(const std::string &fontName);
+    /**
+     * Return the font file of a music font for embedding in the SVG, which is a subset for the bundled fonts.
+     * The file name is given for the bundled fonts, which are also published on the website.
+     */
+    std::optional<FontStore::FontFile> GetMusicFontForEmbedding(
+        const std::string &fontName, std::string &bundledFile) const;
+    /** Set the music fallback family, which has to be registered. Bravura remains the final fallback. */
+    bool SetFallbackFont(const std::string &fontName);
     /** Get the fallback font name */
     std::string GetFallbackFont() const { return m_fallbackFontName; }
 
     /** Select a particular font */
-    bool SetCurrentFont(const std::string &fontName, bool allowLoading = false);
+    bool SetCurrentFont(const std::string &fontName);
     std::string GetCurrentFont() const { return m_currentFontName; }
-    bool IsFontLoaded(const std::string &fontName) const { return m_loadedFonts.find(fontName) != m_loadedFonts.end(); }
+    bool IsFontLoaded(const std::string &fontName) const;
     ///@}
 
     /**
@@ -92,6 +88,8 @@ public:
     ///@{
     /** Returns the glyph (if exists) for a glyph code in the current SMuFL font */
     const Glyph *GetGlyph(char32_t smuflCode) const;
+    /** Returns a music glyph using an explicit registered family. */
+    const Glyph *GetGlyph(char32_t smuflCode, const std::string &fontName) const;
     /** Returns the glyph (if exists) for a glyph name in the current SMuFL font */
     const Glyph *GetGlyph(const std::string &smuflName) const;
     /** Returns the glyph (if exists) for a glyph name in the current SMuFL font */
@@ -104,32 +102,26 @@ public:
     bool IsSmuflFallbackNeeded(const std::u32string &text) const;
 
     /**
-     * Check if the current font is the fallback font
-     */
-    bool IsCurrentFontFallback() const;
-
-    /**
      * Text fonts
      */
     ///@{
-    /** Set current text style*/
-    void SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle) const;
-    /** Returns the glyph (if exists) for the text font (bounding box and ASCII only) */
-    const Glyph *GetTextGlyph(char32_t code) const;
+    /** Set the default text family, which has to be registered */
+    bool SetTextFont(const std::string &fontName);
+    /** Return the default text family */
+    std::string GetTextFont() const { return m_textFontName; }
+    /** The widespread font family with the same metrics as the text font, if any (e.g., Times for Tinos) */
+    std::string GetTextFontMetricEquivalent() const;
+    /** Shape text using the family and style requested by a drawing font. */
+    std::optional<FontStore::ShapedRun> ShapeText(const FontInfo &font, const std::u32string &text) const;
+    /** Return the scaled advance of a shaped run, including letter spacing. */
+    int GetTextAdvance(const FontInfo &font, const FontStore::ShapedRun &run) const;
+    /** Returns a glyph from the runtime face selected by a drawing font. */
+    const Glyph *GetTextGlyph(char32_t code, const FontInfo &font) const;
+    /** Returns a cached runtime glyph by immutable face identity and glyph ID. */
+    const Glyph *GetRuntimeGlyph(FontStore::FaceIdentity face, int glyphId, const std::string &code = "") const;
     /** Returns true if the specified font is loaded and it contains the requested glyph */
     bool FontHasGlyphAvailable(const std::string &fontName, char32_t smuflCode) const;
     ///@}
-
-    /**
-     * Get the CSS font string for the corresponding font.
-     * Return an empty string if the font has not been loaded.
-     */
-    std::string GetCSSFontFor(const std::string &fontName) const;
-
-    /**
-     * Retrieve the font name either from the filename path or from the zipFile content.
-     */
-    std::string GetCustomFontname(const std::string &filename, const ZipFileReader &zipFile);
 
     /**
      * Static method that converts unicode music code points to SMuFL equivalent.
@@ -137,71 +129,42 @@ public:
      */
     static char32_t GetSmuflGlyphForUnicodeChar(const char32_t unicodeChar);
 
-private:
-    //----------------------------------------------------------------------------
-    // LoadedFont
-    //----------------------------------------------------------------------------
-
-    class LoadedFont {
-
-    public:
-        LoadedFont(const std::string &name, bool isFallback) : m_name(name), m_isFallback(isFallback) {}
-        ~LoadedFont() {}
-        const std::string GetName() const { return m_name; };
-        const GlyphTable &GetGlyphTable() const { return m_glyphTable; };
-        GlyphTable &GetGlyphTableForModification() { return m_glyphTable; };
-        bool isFallback() const { return m_isFallback; };
-
-        void SetCSSFont(const std::string &css) { m_css = css; }
-        std::string GetCSSFont(const std::string &path) const;
-
-    private:
-        std::string m_name;
-        /** The loaded SMuFL font */
-        GlyphTable m_glyphTable;
-        /** If the font needs to fallback when a glyph is not present **/
-        const bool m_isFallback;
-        /** CSS font for font loaded as zip archive */
-        std::string m_css;
-    };
-
-    //----------------------------------------------------------------------------
-
-    bool LoadFont(const std::string &fontName, ZipFileReader *zipFile = NULL);
-
-    /** Init the text font (bounding boxes and ASCII only) */
-    bool InitTextFont(const std::string &fontName, const StyleAttributes &style);
-
-    const GlyphTable &GetCurrentGlyphTable() const { return m_loadedFonts.at(m_currentFontName).GetGlyphTable(); };
-    const GlyphTable &GetFallbackGlyphTable() const { return m_loadedFonts.at(m_fallbackFontName).GetGlyphTable(); };
-
-    bool m_useLiberation;
-    std::string m_path;
-    std::string m_defaultFontName;
-    std::string m_fallbackFontName;
-    std::map<std::string, LoadedFont> m_loadedFonts;
-    std::string m_currentFontName;
-
-    /** A text font used for bounding box calculations */
-    GlyphTextMap m_textFont;
-    mutable StyleAttributes m_currentStyle;
     /**
-     * A map of glyph name / code
+     * Static method that returns the weight and style of the face for a drawing font
      */
-    GlyphNameTable m_glyphNameTable;
+    static FaceStyle GetFaceStyle(const FontInfo &font);
 
-    /** Cache of the last glyph that was looked up in loaded fonts */
+    /**
+     * Static method that looks for the SMuFL metadata file of a music font file.
+     * The metadata is looked for next to the font file and in the standard SMuFL locations.
+     * Return an empty string if it is not found.
+     */
+    static std::string FindSmuflMetadata(const std::string &fontFilename);
+
+private:
+    std::string m_path;
+    std::string m_fallbackFontName;
+    std::string m_currentFontName;
+    std::string m_textFontName;
+
+    /** Cache of the last glyph that was looked up in the current font */
     mutable std::optional<std::pair<char32_t, const Glyph *>> m_cachedGlyph;
+
+    /** Runtime glyph records contain metrics only; outlines remain lazy in FontStore. */
+    mutable std::unordered_map<uint64_t, std::map<std::pair<int, std::string>, Glyph>> m_runtimeGlyphs;
+
+    /** The subsets of the bundled music fonts with the glyphs supported by Verovio, for embedding */
+    std::map<std::string, std::vector<unsigned char>> m_musicFontSubsets;
+
+    /** Runtime OpenType faces, metrics, outlines, and shaped text. */
+    FontStore m_fontStore;
 
     //----------------//
     // Static members //
     //----------------//
 
-    /** The default path to the resources directory (e.g., for the svg/ subdirectory with fonts as XML */
+    /** The default path to the resources directory (e.g., for the fonts/ subdirectory) */
     static thread_local std::string s_defaultPath;
-
-    /** The default font style */
-    static const StyleAttributes k_defaultStyle;
 };
 
 } // namespace vrv
