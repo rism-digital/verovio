@@ -26,7 +26,8 @@ class Caesura : public ControlElement,
                 public TimePointInterface,
                 public AttExtSymAuth,
                 public AttExtSymNames,
-                public AttPlacementRelStaff {
+                public AttPlacementRelStaff,
+                public AttVerticalGroup {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

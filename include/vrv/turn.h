@@ -30,7 +30,8 @@ class Turn : public ControlElement,
              public AttExtSymNames,
              public AttOrnamentAccid,
              public AttPlacementRelStaff,
-             public AttTurnLog {
+             public AttTurnLog,
+             public AttVerticalGroup {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
