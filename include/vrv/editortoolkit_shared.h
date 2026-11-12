@@ -206,6 +206,8 @@ protected:
 
     int m_dragXOrigin;
     int m_dragYOrigin;
+    int m_dragElementXOrigin;
+    int m_dragElementYOrigin;
 
 private:
     struct MidiSpelling {

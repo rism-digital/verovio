@@ -66,6 +66,8 @@ EditorToolkitShared::EditorToolkitShared(Doc *doc, View *view) : EditorToolkit(d
     m_currentContext = NULL;
     m_dragXOrigin = VRV_UNSET;
     m_dragYOrigin = VRV_UNSET;
+    m_dragElementXOrigin = VRV_UNSET;
+    m_dragElementYOrigin = VRV_UNSET;
 
     this->SetEditStatus();
 }
@@ -180,7 +182,7 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         DragPhase phase;
         int startX, startY, dx, dy;
         if (this->ParseDragAction(json.get<jsonxx::Object>("param"), phase, startX, startY, dx, dy)) {
-            if (phase == DRAG_MOVE) this->PrepareUndo();
+            if (phase != DRAG_START) this->PrepareUndo();
             return (this->Drag(phase, startX, startY, dx, dy));
         }
         LogWarning("Could not parse the drag action");
@@ -516,6 +518,10 @@ bool EditorToolkitShared::ParseDragAction(
     }
     else if (phaseStr == "end") {
         phase = DRAG_END;
+        if (!param.has<jsonxx::Number>("dx")) return false;
+        dx = param.get<jsonxx::Number>("dx");
+        if (!param.has<jsonxx::Number>("dy")) return false;
+        dy = param.get<jsonxx::Number>("dy");
     }
     else {
         return false;
@@ -895,6 +901,8 @@ void EditorToolkitShared::ResetDragOrigin()
 {
     m_dragXOrigin = VRV_UNSET;
     m_dragYOrigin = VRV_UNSET;
+    m_dragElementXOrigin = VRV_UNSET;
+    m_dragElementYOrigin = VRV_UNSET;
 }
 
 void EditorToolkitShared::ReloadEditStatus(const std::string &statusStr, bool insertMode)
@@ -1369,6 +1377,10 @@ void EditorToolkitShared::PostEditRestriction(Object *element)
 
 bool EditorToolkitShared::Drag(DragPhase phase, int startX, int startY, int dx, int dy)
 {
+    const int dragXOrigin = m_dragXOrigin;
+    const int dragYOrigin = m_dragYOrigin;
+    const int dragElementXOrigin = m_dragElementXOrigin;
+    const int dragElementYOrigin = m_dragElementYOrigin;
     if (phase == DRAG_START || phase == DRAG_END) this->ResetDragOrigin();
 
     if (this->InsertMode()) return true;
@@ -1377,22 +1389,19 @@ bool EditorToolkitShared::Drag(DragPhase phase, int startX, int startY, int dx, 
     Object *element = this->GetElement(m_selectionId);
     if (!element || !element->IsAnyOf(std::array{ NOTE, REST })) return false;
 
-    if (phase == DRAG_END) {
-        if (element->Is(NOTE)) {
-            // Remove or set accidental
-            Note *note = vrv_cast<Note *>(element);
-            assert(note);
-            this->UpdatePitch(m_selectionId, note->GetPname(), note->GetOct(), ACCIDENTAL_WRITTEN_NONE, VRV_UNSET);
-        }
-        return true;
-    }
-
     if (phase == DRAG_START) {
         m_dragXOrigin = m_view->ToLogicalX(startX * DEFINITION_FACTOR);
         m_dragYOrigin = m_view->ToLogicalY(startY * DEFINITION_FACTOR);
+        // Keep the element origin stable because its drawing position can change after a partial layout.
+        m_dragElementXOrigin = element->GetDrawingX();
+        m_dragElementYOrigin = element->GetDrawingY();
         return true;
     }
-    if ((m_dragXOrigin == VRV_UNSET) || (m_dragYOrigin == VRV_UNSET)) return false;
+
+    if ((dragXOrigin == VRV_UNSET) || (dragYOrigin == VRV_UNSET) || (dragElementXOrigin == VRV_UNSET)
+        || (dragElementYOrigin == VRV_UNSET)) {
+        return false;
+    }
 
     Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
     Staff *staff = vrv_cast<Staff *>(element->GetFirstAncestor(STAFF));
@@ -1401,26 +1410,35 @@ bool EditorToolkitShared::Drag(DragPhase phase, int startX, int startY, int dx, 
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const int draggingThreshold = unit * 2 / 3;
 
-    if (abs(dy * DEFINITION_FACTOR) > draggingThreshold) {
-        const int targetY = m_dragYOrigin - (dy * DEFINITION_FACTOR);
-        const int drawingY = element->GetDrawingY();
-        const int drawingDeltaY = targetY - drawingY;
-        if (std::abs(drawingDeltaY) < unit) return true;
+    const int drawingDeltaY = -(dy * DEFINITION_FACTOR);
+    int quantizedY = dragElementYOrigin;
+    if (std::abs(drawingDeltaY) > draggingThreshold) {
+        quantizedY += (drawingDeltaY / unit) * unit;
+    }
 
-        const int quantizedY = drawingY + (drawingDeltaY / unit) * unit;
-
-        int oct;
-        const data_PITCHNAME pname = (data_PITCHNAME)m_view->CalculatePitchCode(layer, quantizedY, m_dragXOrigin, &oct);
-        if (element->Is(NOTE)) {
-            element->GetPitchInterface()->SetPname(pname);
-            element->GetPitchInterface()->SetOct(oct);
-        }
-        else {
-            PositionInterface *positionInterface = element->GetPositionInterface();
-            assert(positionInterface);
+    int oct;
+    const data_PITCHNAME pname
+        = (data_PITCHNAME)m_view->CalculatePitchCode(layer, quantizedY, dragElementXOrigin, &oct);
+    if (element->Is(NOTE)) {
+        element->GetPitchInterface()->SetPname(pname);
+        element->GetPitchInterface()->SetOct(oct);
+    }
+    else {
+        PositionInterface *positionInterface = element->GetPositionInterface();
+        assert(positionInterface);
+        if ((quantizedY != dragElementYOrigin) || positionInterface->HasPloc() || positionInterface->HasOloc()) {
             positionInterface->ResetStaffLoc();
             positionInterface->SetPloc(pname);
             positionInterface->SetOloc(oct);
+        }
+    }
+
+    if (phase == DRAG_END) {
+        if (element->Is(NOTE)) {
+            // Remove or set accidental
+            Note *note = vrv_cast<Note *>(element);
+            assert(note);
+            this->UpdatePitch(m_selectionId, note->GetPname(), note->GetOct(), ACCIDENTAL_WRITTEN_NONE, VRV_UNSET);
         }
     }
 
