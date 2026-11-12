@@ -13,6 +13,7 @@
 #include "doc.h"
 #include "dot.h"
 #include "layer.h"
+#include "measure.h"
 #include "note.h"
 #include "staff.h"
 
@@ -50,6 +51,19 @@ FunctorCode CalcLedgerLinesFunctor::VisitLayer(Layer *layer)
 {
     if (layer->HasCursor()) {
         layer->GetCursor()->Process(*this);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CalcLedgerLinesFunctor::VisitMeasure(Measure *measure)
+{
+    // Clear all staves before visiting notes because cross-staff notes can add ledger lines to another staff.
+    ListOfObjects staves = measure->FindAllDescendantsByType(STAFF, 1);
+    for (Object *object : staves) {
+        Staff *staff = vrv_cast<Staff *>(object);
+        assert(staff);
+        staff->ClearLedgerLines();
     }
 
     return FUNCTOR_CONTINUE;
