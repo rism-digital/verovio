@@ -42,7 +42,10 @@
 #include "system.h"
 #include "text.h"
 #include "vrv.h"
+
 //--------------------------------------------------------------------------------
+
+#ifndef NO_EDIT_SUPPORT
 
 namespace vrv {
 
@@ -4563,3 +4566,5 @@ bool EditorToolkitNeume::AdjustClefLineFromPosition(Clef *clef, Staff *staff)
 }
 
 } // namespace vrv
+
+#endif /* NO_EDIT_SUPPORT */

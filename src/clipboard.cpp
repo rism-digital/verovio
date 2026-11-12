@@ -20,6 +20,8 @@
 #include "system.h"
 #include "vrv.h"
 
+#ifndef NO_EDIT_SUPPORT
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -118,3 +120,5 @@ bool Clipboard::CanPaste(const Object *selection) const
 }
 
 } // namespace vrv
+
+#endif /* NO_EDIT_SUPPORT */

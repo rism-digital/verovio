@@ -42,7 +42,9 @@ public:
         m_cursor = NULL;
 
         m_options = 0;
+#ifndef NO_EDIT_SUPPORT
         m_clipboard.SetDoc(doc);
+#endif
     }
     virtual ~EditorToolkit() {}
 
@@ -91,7 +93,9 @@ protected:
     /** Record option changes  */
     int m_options;
 
+#ifndef NO_EDIT_SUPPORT
     Clipboard m_clipboard;
+#endif
 };
 } // namespace vrv
 

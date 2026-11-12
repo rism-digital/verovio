@@ -24,6 +24,8 @@
 
 #include "jsonxx.h"
 
+#ifndef NO_EDIT_SUPPORT
+
 namespace vrv {
 
 //--------------------------------------------------------------------------------
@@ -263,5 +265,7 @@ struct StaffSort {
 };
 
 } // namespace vrv
+
+#endif /* NO_EDIT_SUPPORT */
 
 #endif

@@ -28,13 +28,14 @@
 #include "tie.h"
 #include "tuplet.h"
 
+#ifndef NO_EDIT_SUPPORT
+
 namespace vrv {
 
 EditorToolkitCMN::EditorToolkitCMN(Doc *doc, View *view) : EditorToolkitShared(doc, view) {}
 
 EditorToolkitCMN::~EditorToolkitCMN() {}
 
-#ifndef NO_EDIT_SUPPORT
 bool EditorToolkitCMN::ParseEditorCMNAction(const jsonxx::Object &json)
 {
     std::string action = json.get<jsonxx::String>("action");
@@ -1045,6 +1046,6 @@ void EditorToolkitCMN::TieElements(const Object *start, const Object *end)
     }
 }
 
-#endif
-
 } // namespace vrv
+
+#endif

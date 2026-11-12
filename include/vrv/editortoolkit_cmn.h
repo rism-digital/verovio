@@ -21,6 +21,8 @@
 
 #include "jsonxx.h"
 
+#ifndef NO_EDIT_SUPPORT
+
 namespace vrv {
 
 class EditorTreeObject;
@@ -35,7 +37,6 @@ public:
     virtual ~EditorToolkitCMN();
 
 public:
-#ifndef NO_EDIT_SUPPORT
     bool ParseEditorCMNAction(const jsonxx::Object &json_editorAction);
 
 protected:
@@ -89,9 +90,10 @@ public:
     //
 protected:
     //
-#endif /* NO_EDIT_SUPPORT */
 };
 
 } // namespace vrv
+
+#endif /* NO_EDIT_SUPPORT */
 
 #endif

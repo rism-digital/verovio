@@ -25,6 +25,8 @@
 
 //----------------------------------------------------------------------------
 
+#ifndef NO_EDIT_SUPPORT
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -766,3 +768,5 @@ FunctorCode ScoreContextFunctor::VisitObjectEnd(Object *object)
 }
 
 } // namespace vrv
+
+#endif

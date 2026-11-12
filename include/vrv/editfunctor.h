@@ -11,6 +11,8 @@
 #include "cursor.h"
 #include "functor.h"
 
+#ifndef NO_EDIT_SUPPORT
+
 namespace vrv {
 
 enum StaffInsert : int8_t { INSERT_ABOVE = 0, INSERT_BELOW };
@@ -404,5 +406,7 @@ private:
 };
 
 } // namespace vrv
+
+#endif
 
 #endif // __VRV_SAVEFUNCTOR_H__

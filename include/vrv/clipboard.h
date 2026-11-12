@@ -14,6 +14,8 @@
 
 //----------------------------------------------------------------------------
 
+#ifndef NO_EDIT_SUPPORT
+
 namespace vrv {
 
 class Doc;
@@ -66,5 +68,7 @@ private:
 };
 
 } // namespace vrv
+
+#endif /* NO_EDIT_SUPPORT */
 
 #endif

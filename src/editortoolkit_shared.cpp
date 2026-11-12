@@ -56,10 +56,13 @@
 
 #define UNDO_MEMORY_LIMIT (256 * 1024 * 1024) // 256 MB
 
+#ifndef NO_EDIT_SUPPORT
+
 namespace vrv {
 
 EditorToolkitShared::EditorToolkitShared(Doc *doc, View *view) : EditorToolkit(doc, view)
 {
+
     m_undoPrepared = false;
     m_scoreContext = NULL;
     m_sectionContext = NULL;
@@ -74,14 +77,11 @@ EditorToolkitShared::EditorToolkitShared(Doc *doc, View *view) : EditorToolkit(d
 
 EditorToolkitShared::~EditorToolkitShared()
 {
-#ifndef NO_EDIT_SUPPORT
     this->ClearContext();
-#endif
 }
 
 bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction, bool commitOnly)
 {
-#ifndef NO_EDIT_SUPPORT
     jsonxx::Object json;
 
     // Read JSON actions
@@ -441,13 +441,8 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         LogWarning("Unknown action type '%s'.", action.c_str());
     }
     return false;
-#else /* NO_EDIT_SUPPORT */
-    LogError("Editor functions are not supported in this build.");
-    return false;
-#endif /* NO_EDIT_SUPPORT */
 }
 
-#ifndef NO_EDIT_SUPPORT
 bool EditorToolkitShared::ParseCopyAction(const jsonxx::Object &param, std::string &elementId)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
@@ -2795,6 +2790,6 @@ ArrayOfConstObjects EditorTreeObject::GetChildObjects() const
     return childObjects;
 }
 
-#endif /* NO_EDIT_SUPPORT */
-
 } // namespace vrv
+
+#endif /* NO_EDIT_SUPPORT */

@@ -20,6 +20,8 @@
 
 #include "jsonxx.h"
 
+#ifndef NO_EDIT_SUPPORT
+
 namespace vrv {
 
 //--------------------------------------------------------------------------------
@@ -31,5 +33,7 @@ public:
     EditorToolkitMensural(Doc *doc, View *view) : EditorToolkitShared(doc, view) {}
 };
 } // namespace vrv
+
+#endif /* NO_EDIT_SUPPORT */
 
 #endif
