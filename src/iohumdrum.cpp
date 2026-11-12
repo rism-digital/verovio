@@ -9041,14 +9041,22 @@ cerr << "ENTERING SET TIMESIG " << timesig << "\tmeter=" << metersig << endl;
         setLocationId(vrvmeter, timetok);
     }
 
+    hum::HumRegex hre;
     if (metertok) {
-        // set time signature to be invisible
-        vrvmeter->SetVisible(BOOLEAN_false);
-        // Then process the metersignature alone
-        int kerntrack = metertok->getTrack();
-        int staffindex = m_rkern[kerntrack];
-        setMensurationSymbol(part, *metertok, staffindex, metertok);
-        return;
+        // Only mensurations and proportions replace the time signature.
+        bool isModernMeterSymbol = (metersig == "c") || (metersig == "c|") || hre.search(metersig, "^\\d+$");
+        if (metersig.empty()) {
+            vrvmeter->SetVisible(BOOLEAN_false);
+        }
+        else if (!isModernMeterSymbol) {
+            // set time signature to be invisible
+            vrvmeter->SetVisible(BOOLEAN_false);
+            // Then process the metersignature alone
+            int kerntrack = metertok->getTrack();
+            int staffindex = m_rkern[kerntrack];
+            setMensurationSymbol(part, *metertok, staffindex, metertok);
+            return;
+        }
     }
     if (timetok && timetok->find("yy") != std::string::npos) {
         vrvmeter->SetVisible(BOOLEAN_false);
@@ -9064,7 +9072,6 @@ cerr << "ENTERING SET TIMESIG " << timesig << "\tmeter=" << metersig << endl;
         mensuration = true;
     }
 
-    hum::HumRegex hre;
     int top = -1000;
     int bot = -1000;
     int bot2 = -1000;
