@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Option `--lyric-avoid-bar-lines` to add space so that no syllable crosses a bar line
 
 ## [6.4.1] – 2026-11-03
 * Fix `--mm-output` option displaying placehorder dots

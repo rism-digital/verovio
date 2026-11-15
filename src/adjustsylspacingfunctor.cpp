@@ -18,6 +18,7 @@
 #include "labelabbr.h"
 #include "layer.h"
 #include "lyricelement.h"
+#include "measure.h"
 #include "refrain.h"
 #include "staff.h"
 #include "syl.h"
@@ -78,6 +79,15 @@ AdjustSylSpacingFunctor::AdjustSylSpacingFunctor(
     m_previousMeasure = NULL;
     m_freeSpace = 0;
     m_voltaTrack = voltaTrack;
+    m_measureSeen = false;
+    m_leftBarLineOverlap = 0;
+    m_leftBarLineOverlapAlignment = NULL;
+}
+
+int AdjustSylSpacingFunctor::GetBarLineClearance(int staffSize) const
+{
+    if (!m_doc->GetOptions()->m_lyricAvoidBarLines.GetValue()) return 0;
+    return m_doc->GetDrawingUnit(staffSize) / 2;
 }
 
 std::pair<int, data_STAFFREL> AdjustSylSpacingFunctor::GetLyricLine(
@@ -115,6 +125,28 @@ FunctorCode AdjustSylSpacingFunctor::VisitMeasureEnd(Measure *measure)
         this->AdjustLyricElement(lyricElement);
     }
     m_measureLyricElements.clear();
+    m_measureSeen = true;
+
+    if (m_doc->GetOptions()->m_lyricAvoidBarLines.GetValue()) {
+        // The first syllable of the measure must not reach over the left bar line
+        if (m_leftBarLineOverlap > 0) {
+            m_overlappingSyl.push_back(std::make_tuple(
+                measure->GetLeftBarLine()->GetAlignment(), m_leftBarLineOverlapAlignment, m_leftBarLineOverlap));
+        }
+        // The last syllable of the measure must end before the right bar line
+        if (m_previousContainer && m_lastSyl && (m_previousContainer->GetFirstAncestor(MEASURE) == measure)) {
+            const Staff *staff = m_lastSyl->GetAncestorStaff();
+            const int clearance = this->GetBarLineClearance(staff->m_drawingStaffSize);
+            const int overlap
+                = m_lastSyl->GetContentRight() + clearance - measure->GetRightBarLine()->GetAlignment()->GetXRel();
+            if (overlap > 0) {
+                m_overlappingSyl.push_back(std::make_tuple(
+                    m_previousContainer->GetAlignment(), measure->GetRightBarLine()->GetAlignment(), overlap));
+            }
+        }
+    }
+    m_leftBarLineOverlap = 0;
+    m_leftBarLineOverlapAlignment = NULL;
 
     // At the end of the measure - pass it along for overlapping verses
     m_previousMeasure = measure;
@@ -135,6 +167,9 @@ FunctorCode AdjustSylSpacingFunctor::VisitSystem(System *system)
     m_previousMeasure = NULL;
     m_freeSpace = 0;
     m_systemLyricSources.clear();
+    m_measureSeen = false;
+    m_leftBarLineOverlap = 0;
+    m_leftBarLineOverlapAlignment = NULL;
 
     return FUNCTOR_CONTINUE;
 }
@@ -266,6 +301,23 @@ void AdjustSylSpacingFunctor::AdjustLyricElement(LyricElement *lyricElement)
     Syl *lastSyl = vrv_cast<Syl *>(syls.back());
     assert(lastSyl);
 
+    // The first syllables of a measure must not reach over its left bar line (applied at the end of the measure)
+    int leftBarLineOverlap = 0;
+    bool afterBarLine = false;
+    if (m_measureSeen) {
+        const int clearance = this->GetBarLineClearance(staffSize);
+        Measure *measure = vrv_cast<Measure *>(container->GetFirstAncestor(MEASURE));
+        if (clearance && measure) {
+            leftBarLineOverlap
+                = measure->GetLeftBarLine()->GetAlignment()->GetXRel() + clearance - firstSyl->GetContentLeft();
+            afterBarLine = true;
+            if (leftBarLineOverlap > m_leftBarLineOverlap) {
+                m_leftBarLineOverlap = leftBarLineOverlap;
+                m_leftBarLineOverlapAlignment = container->GetAlignment();
+            }
+        }
+    }
+
     // The abbreviation is displayed on the first syllable of each staff and layer in the system
     if (m_systemLyricSources.insert(lyricSource).second && verse && !newLabelAbbr && currentLabelAbbr) {
         verse->SetDrawingLabelAbbr(currentLabelAbbr);
@@ -317,7 +369,16 @@ void AdjustSylSpacingFunctor::AdjustLyricElement(LyricElement *lyricElement)
         overlap += (label->GetContentX2() - label->GetContentX1()) + m_doc->GetDrawingDoubleUnit(staffSize);
     }
 
+    // The space added before the first syllable of the measure also separates it from the previous one
+    if (m_previousMeasure && (leftBarLineOverlap > 0)) {
+        overlap -= leftBarLineOverlap;
+    }
+
     int nextFreeSpace = this->AdjustPreviousLyricPosition(overlap);
+    // The first syllable of a measure can only move back until the bar line
+    if (m_previousMeasure && afterBarLine) {
+        nextFreeSpace = std::min(nextFreeSpace, std::max(0, -leftBarLineOverlap));
+    }
 
     if (overlap > 0) {
         // We are adjusting syl in two different measures - move only the right barline of the first measure

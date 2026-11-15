@@ -1388,6 +1388,10 @@ Options::Options()
     m_ledgerLineExtension.Init(0.54, 0.20, 1.00);
     this->Register(&m_ledgerLineExtension, "ledgerLineExtension", &m_generalLayout);
 
+    m_lyricAvoidBarLines.SetInfo("Lyric avoid bar lines", "Add space so that no syllable crosses a bar line");
+    m_lyricAvoidBarLines.Init(false);
+    this->Register(&m_lyricAvoidBarLines, "lyricAvoidBarLines", &m_generalLayout);
+
     m_lyricElision.SetInfo("Lyric elision", "The lyric elision width");
     m_lyricElision.Init(ELISION_regular, &Option::s_elision);
     this->Register(&m_lyricElision, "lyricElision", &m_generalLayout);

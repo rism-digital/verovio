@@ -70,6 +70,11 @@ private:
      */
     int AdjustPreviousLyricPosition(int &overlap);
 
+    /**
+     * Clearance between a syllable and a bar line (with --lyric-avoid-bar-lines), 0 otherwise
+     */
+    int GetBarLineClearance(int staffSize) const;
+
 public:
     //
 private:
@@ -97,6 +102,11 @@ private:
     const std::map<int, int> &m_previousStaffNs;
     // The lyric elements of the current measure
     std::vector<LyricElement *> m_measureLyricElements;
+    // Whether a measure of the current system was already processed
+    bool m_measureSeen;
+    // The largest overlap of a syllable with the left bar line of the current measure, and its alignment
+    int m_leftBarLineOverlap;
+    Alignment *m_leftBarLineOverlapAlignment;
 };
 
 } // namespace vrv

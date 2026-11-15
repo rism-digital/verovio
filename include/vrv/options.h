@@ -731,6 +731,7 @@ public:
     OptionDbl m_justificationMaxVertical;
     OptionDbl m_ledgerLineThickness;
     OptionDbl m_ledgerLineExtension;
+    OptionBool m_lyricAvoidBarLines;
     OptionIntMap m_lyricElision;
     OptionDbl m_lyricHeightFactor;
     OptionDbl m_lyricLineThickness;
