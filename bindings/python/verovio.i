@@ -112,13 +112,6 @@ def getMIDIValuesForElement(self, xmlId: str) -> dict:
     return json.loads($action(self, xmlId))
 %}
 
-// Toolkit::GetMIDIValues
-%feature("shadow") vrv::Toolkit::GetMIDIValues() %{
-def getMIDIValues(self) -> dict:
-    """Return MIDI values of all the notes in the document, keyed by note ID (xml:id)."""
-    return json.loads($action(self))
-%}
-
 // Toolkit::GetOptions
 %feature("shadow") vrv::Toolkit::GetOptions() const %{
 def getOptions(self) -> dict:
@@ -161,6 +154,13 @@ def renderToExpansionMap(self) -> list:
 def renderToExpansionMapFile(self, filename: str) -> bool:
     """Render a document's expansion map and save it to a file."""
     return $action(self, filename)
+%}
+
+// Toolkit::RenderToMIDIJson
+%feature("shadow") vrv::Toolkit::RenderToMIDIJson() %{
+def renderToMIDIJson(self) -> dict:
+    """Render the document to MIDI as JSON (structure of @tonejs/midi with note IDs)."""
+    return json.loads($action(self))
 %}
 
 // Toolkit::RenderToTimemap

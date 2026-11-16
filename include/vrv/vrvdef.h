@@ -429,6 +429,9 @@ typedef std::vector<std::pair<LayerElement *, data_DURATION>> ArrayOfElementDurP
 
 typedef std::map<int, std::list<int>> MapOfOssiaStaffNs;
 
+// Note IDs of MIDI note-on events, keyed by track, tick, channel and key number
+typedef std::map<std::tuple<int, int, int, int>, std::list<std::string>> MapOfMIDINoteIDs;
+
 /**
  * Generic int map recursive structure for storing hierachy of values
  * For example, we want to process all staves one by one, and within each staff

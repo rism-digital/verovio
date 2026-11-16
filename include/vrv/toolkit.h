@@ -393,6 +393,26 @@ public:
     bool RenderToMIDIFile(const std::string &filename);
 
     /**
+     * Render the document to MIDI as JSON.
+     *
+     * The structure is the one of \@tonejs/midi (Midi.toJSON()) for the MIDI file of RenderToMIDI(), with the ID
+     * (\@xml:id) of the note added to each note.
+     *
+     * @return The MIDI JSON as a string
+     */
+    std::string RenderToMIDIJson();
+
+    /**
+     * Render the document to MIDI as JSON and save it to the file.
+     *
+     * @remark nojs
+     *
+     * @param filename The output filename
+     * @return True if the file was successfully written
+     */
+    bool RenderToMIDIJsonFile(const std::string &filename);
+
+    /**
      * Render a document to Plaine & Easie code.
      *
      * Only the top staff / layer is exported.
@@ -608,16 +628,6 @@ public:
      * @return A stringified JSON object with the MIDI values
      */
     std::string GetMIDIValuesForElement(const std::string &xmlId);
-
-    /**
-     * Return MIDI values of all the notes in the document
-     *
-     * Same values as GetMIDIValuesForElement() but in a single call. Notes of
-     * expanded repeats are included with their expansion IDs.
-     *
-     * @return A stringified JSON object with the MIDI values keyed by note ID (\@xml:id)
-     */
-    std::string GetMIDIValues();
 
     /**
      * Return a JSON object string with the following key values for a given note.

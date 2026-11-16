@@ -634,6 +634,7 @@ GenerateMIDIFunctor::GenerateMIDIFunctor(smf::MidiFile *midiFile) : ConstFunctor
     m_controlEvents = false;
     m_instrDef = NULL;
     m_customTuning = NULL;
+    m_noteIDs = NULL;
 }
 
 FunctorCode GenerateMIDIFunctor::VisitBeatRpt(const BeatRpt *beatRpt)
@@ -850,7 +851,7 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
         for (const auto &midiNote : m_expandedNotes.at(note)) {
             const double stopTime = startTime + midiNote.duration;
 
-            m_midiFile->addNoteOn(m_midiTrack, startTime * tpq, channel, midiNote.pitch, velocity);
+            this->AddNoteOn(note, startTime * tpq, midiNote.pitch, velocity);
             m_midiFile->addNoteOff(m_midiTrack, std::max(0.0, stopTime * tpq - 1), channel, midiNote.pitch);
 
             startTime = stopTime;
@@ -893,13 +894,13 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
                     note->GetScoreTimeOffset().ToDouble() + note->GetScoreTimeTiedDuration().ToDouble());
 
             // start this note
-            m_midiFile->addNoteOn(m_midiTrack, startTime * tpq, channel, pitch, velocity);
+            this->AddNoteOn(note, startTime * tpq, pitch, velocity);
         }
         else {
             const double stopTime
                 = m_totalTime + note->GetScoreTimeOffset().ToDouble() + note->GetScoreTimeTiedDuration().ToDouble();
 
-            m_midiFile->addNoteOn(m_midiTrack, startTime * tpq, channel, pitch, velocity);
+            this->AddNoteOn(note, startTime * tpq, pitch, velocity);
             m_midiFile->addNoteOff(m_midiTrack, std::max(0.0, stopTime * tpq - 1), channel, pitch);
         }
     }
@@ -1152,6 +1153,16 @@ void GenerateMIDIFunctor::HandleOctave(const LayerElement *layerElement)
     if (octaveIter != m_octaves.end()) {
         m_octaveShift += octaveIter->octaveShift;
         octaveIter->isActive = true;
+    }
+}
+
+void GenerateMIDIFunctor::AddNoteOn(const Note *note, int tick, int pitch, int velocity)
+{
+    m_midiFile->addNoteOn(m_midiTrack, tick, m_midiChannel, pitch, velocity);
+
+    if (m_noteIDs) {
+        // Channel and key are masked as in the MIDI message, so that the ID can be found from the event
+        (*m_noteIDs)[{ m_midiTrack, tick, m_midiChannel & 0x0f, pitch & 0x7f }].push_back(note->GetID());
     }
 }
 

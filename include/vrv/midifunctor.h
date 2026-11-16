@@ -378,6 +378,7 @@ public:
     void SetCurrentTempo(double tempo) { m_currentTempo = tempo; }
     void SetDeferredNotes(const std::map<const Note *, double> &deferredNotes) { m_deferredNotes = deferredNotes; }
     void SetLayerN(int layerN) { m_layerN = layerN; }
+    void SetNoteIDs(MapOfMIDINoteIDs *noteIDs) { m_noteIDs = noteIDs; }
     void SetOctaves(const std::list<OctaveInfo> &octaves) { m_octaves = octaves; }
     void SetStaffN(int staffN) { m_staffN = staffN; }
     void SetTempoEventTicks(const std::set<int> &ticks) { m_tempoEventTicks = ticks; }
@@ -426,6 +427,11 @@ private:
     void HandleOctave(const LayerElement *layerElement);
 
     /**
+     * Add a note-on event and register the ID of the note it is played for
+     */
+    void AddNoteOn(const Note *note, int tick, int pitch, int velocity);
+
+    /**
      * Convenience helper
      */
     int GetMIDIPitch(const Note *note);
@@ -472,6 +478,8 @@ private:
     const InstrDef *m_instrDef;
     // Current custom tuning
     CustomTuning *m_customTuning;
+    // The note IDs of the note-on events (if requested)
+    MapOfMIDINoteIDs *m_noteIDs;
 };
 
 //----------------------------------------------------------------------------

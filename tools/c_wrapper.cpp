@@ -184,13 +184,6 @@ const char *vrvToolkit_getMIDIValuesForElement(void *tkPtr, const char *xmlId)
     return tk->GetCString();
 }
 
-const char *vrvToolkit_getMIDIValues(void *tkPtr)
-{
-    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
-    tk->SetCString(tk->GetMIDIValues());
-    return tk->GetCString();
-}
-
 const char *vrvToolkit_getNotatedIdForElement(void *tkPtr, const char *xmlId)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
@@ -324,6 +317,19 @@ bool vrvToolkit_renderToMIDIFile(void *tkPtr, const char *filename)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
     return tk->RenderToMIDIFile(filename);
+}
+
+const char *vrvToolkit_renderToMIDIJson(void *tkPtr)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->RenderToMIDIJson());
+    return tk->GetCString();
+}
+
+bool vrvToolkit_renderToMIDIJsonFile(void *tkPtr, const char *filename)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    return tk->RenderToMIDIJsonFile(filename);
 }
 
 const char *vrvToolkit_renderToPAE(void *tkPtr)

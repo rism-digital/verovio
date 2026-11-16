@@ -80,6 +80,7 @@
 
 #include "MidiEvent.h"
 #include "MidiFile.h"
+#include "jsonxx.h"
 
 namespace vrv {
 
@@ -443,7 +444,7 @@ void Doc::CalculateTimemap()
     m_timemapTempo = m_options->m_midiTempoAdjustment.GetValue();
 }
 
-void Doc::ExportMIDI(smf::MidiFile *midiFile)
+void Doc::ExportMIDI(smf::MidiFile *midiFile, MapOfMIDINoteIDs *noteIDs)
 {
     midiFile->absoluteTicks();
 
@@ -622,6 +623,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             generateMIDI.SetControlEvents(controlEvents);
             generateMIDI.SetInstrDef(instrDef);
             generateMIDI.SetCustomTuning(scoreDef->GetCustomTuning());
+            generateMIDI.SetNoteIDs(noteIDs);
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
             this->Process(generateMIDI);
@@ -632,6 +634,239 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         }
     }
     midiFile->sortTracksNoteOffsBeforeOns();
+}
+
+void Doc::ExportMIDIJson(std::string &output)
+{
+    smf::MidiFile midiFile;
+    MapOfMIDINoteIDs noteIDs;
+    this->ExportMIDI(&midiFile, &noteIDs);
+
+    // The MIDI data is read the way \@tonejs/midi reads a MIDI file, so the JSON is the same as Midi.toJSON() for the
+    // MIDI file, with the ID added to each note
+
+    struct TempoEvent {
+        int ticks;
+        double bpm;
+        double time;
+    };
+    struct TimeSignatureEvent {
+        int ticks;
+        int numerator;
+        int denominator;
+        double measures;
+    };
+
+    static const std::vector<std::string> keys
+        = { "Cb", "Gb", "Db", "Ab", "Eb", "Bb", "F", "C", "G", "D", "A", "E", "B", "F#", "C#" };
+    static const std::vector<std::string> pitchClasses
+        = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
+
+    const int ppq = midiFile.getTPQ();
+    const int trackCount = midiFile.getTrackCount();
+
+    // Header: tempos, time and key signatures from all the tracks, name and meta events from the first one
+    std::vector<TempoEvent> tempos;
+    std::vector<TimeSignatureEvent> timeSignatures;
+    jsonxx::Array keySignatures;
+    jsonxx::Array meta;
+    std::string name;
+    for (int track = 0; track < trackCount; ++track) {
+        for (int i = 0; i < midiFile.getEventCount(track); ++i) {
+            const smf::MidiEvent &event = midiFile.getEvent(track, i);
+            if (event.isTempo()) {
+                tempos.push_back({ event.tick, 60000000.0 / event.getTempoMicroseconds(), 0.0 });
+            }
+            else if (event.isTimeSignature()) {
+                timeSignatures.push_back({ event.tick, event[3], 1 << event[4], 0.0 });
+            }
+            else if (event.isKeySignature()) {
+                const int fifths = static_cast<signed char>(event[3]);
+                if ((fifths < -7) || (fifths > 7)) continue;
+                jsonxx::Object keySignature;
+                keySignature << "key" << keys.at(fifths + 7);
+                keySignature << "scale" << ((event[4] == 0) ? "major" : "minor");
+                keySignature << "ticks" << event.tick;
+                keySignatures << keySignature;
+            }
+            else if ((track == 0) && event.isTrackName()) {
+                name = event.getMetaContent();
+            }
+            else if ((track == 0) && event.isMetaMessage()) {
+                std::string type;
+                switch (event.getMetaType()) {
+                    case 0x01: type = "text"; break;
+                    case 0x05: type = "lyrics"; break;
+                    case 0x06: type = "marker"; break;
+                    case 0x07: type = "cuePoint"; break;
+                    default: break;
+                }
+                if (type.empty()) continue;
+                jsonxx::Object metaEvent;
+                metaEvent << "text" << event.getMetaContent();
+                metaEvent << "ticks" << event.tick;
+                metaEvent << "type" << type;
+                meta << metaEvent;
+            }
+        }
+    }
+
+    // Times in seconds of the tempo changes and positions in measures of the time signatures
+    std::stable_sort(
+        tempos.begin(), tempos.end(), [](const TempoEvent &a, const TempoEvent &b) { return a.ticks < b.ticks; });
+    double currentTime = 0.0;
+    double lastEventBeats = 0.0;
+    for (int i = 0; i < (int)tempos.size(); ++i) {
+        const double lastBpm = tempos.at(std::max(0, i - 1)).bpm;
+        const double beats = (double)tempos.at(i).ticks / ppq - lastEventBeats;
+        tempos.at(i).time = currentTime + 60.0 / lastBpm * beats;
+        currentTime = tempos.at(i).time;
+        lastEventBeats += beats;
+    }
+    std::stable_sort(timeSignatures.begin(), timeSignatures.end(),
+        [](const TimeSignatureEvent &a, const TimeSignatureEvent &b) { return a.ticks < b.ticks; });
+    for (int i = 1; i < (int)timeSignatures.size(); ++i) {
+        const TimeSignatureEvent &last = timeSignatures.at(i - 1);
+        const double elapsedBeats = (double)(timeSignatures.at(i).ticks - last.ticks) / ppq;
+        timeSignatures.at(i).measures = last.measures + elapsedBeats / last.numerator / (last.denominator / 4.0);
+    }
+
+    // Without a tempo event, 120 bpm is assumed
+    const auto ticksToSeconds = [&tempos, ppq](int ticks) {
+        std::vector<TempoEvent>::const_reverse_iterator tempo = std::find_if(
+            tempos.rbegin(), tempos.rend(), [ticks](const TempoEvent &event) { return event.ticks <= ticks; });
+        if (tempo == tempos.rend()) return 0.5 * ticks / ppq;
+        return tempo->time + 60.0 / tempo->bpm * (ticks - tempo->ticks) / ppq;
+    };
+
+    jsonxx::Object header;
+    header << "keySignatures" << keySignatures;
+    header << "meta" << meta;
+    header << "name" << name;
+    header << "ppq" << ppq;
+    jsonxx::Array tempoArray;
+    for (const TempoEvent &tempo : tempos) {
+        jsonxx::Object tempoEvent;
+        tempoEvent << "bpm" << tempo.bpm;
+        tempoEvent << "ticks" << tempo.ticks;
+        tempoArray << tempoEvent;
+    }
+    header << "tempos" << tempoArray;
+    jsonxx::Array timeSignatureArray;
+    for (const TimeSignatureEvent &timeSignature : timeSignatures) {
+        jsonxx::Array value;
+        value << timeSignature.numerator << timeSignature.denominator;
+        jsonxx::Object timeSignatureEvent;
+        timeSignatureEvent << "measures" << timeSignature.measures;
+        timeSignatureEvent << "ticks" << timeSignature.ticks;
+        timeSignatureEvent << "timeSignature" << value;
+        timeSignatureArray << timeSignatureEvent;
+    }
+    header << "timeSignatures" << timeSignatureArray;
+
+    // Tracks: the first one is left out when it has no notes (it holds the tempo events)
+    jsonxx::Array tracks;
+    for (int track = 0; track < trackCount; ++track) {
+        std::string trackName;
+        bool hasTrackName = false;
+        int program = -1;
+        int channel = 0;
+        int endOfTrackTicks = 0;
+        std::vector<const smf::MidiEvent *> noteOns;
+        // Note-off events by key number, in their order
+        std::map<int, std::list<const smf::MidiEvent *>> noteOffs;
+        std::map<int, jsonxx::Array> controlChanges;
+        jsonxx::Array pitchBends;
+        for (int i = 0; i < midiFile.getEventCount(track); ++i) {
+            const smf::MidiEvent &event = midiFile.getEvent(track, i);
+            if (event.empty()) continue;
+            if (!event.isEndOfTrack()) endOfTrackTicks = event.tick;
+            if (event.isNoteOn()) {
+                noteOns.push_back(&event);
+            }
+            else if (event.isNoteOff()) {
+                noteOffs[event.getKeyNumber()].push_back(&event);
+            }
+            else if (event.isController()) {
+                jsonxx::Object controlChange;
+                controlChange << "number" << event.getControllerNumber();
+                controlChange << "ticks" << event.tick;
+                controlChange << "time" << ticksToSeconds(event.tick);
+                controlChange << "value" << event.getControllerValue() / 127.0;
+                controlChanges[event.getControllerNumber()] << controlChange;
+            }
+            else if (event.isPitchbend()) {
+                // From -2^13 to 2^13 scaled to -2 to 2
+                const int value = ((event[2] << 7) | event[1]) - 8192;
+                jsonxx::Object pitchBend;
+                pitchBend << "ticks" << event.tick;
+                pitchBend << "time" << ticksToSeconds(event.tick);
+                pitchBend << "value" << value / 8192.0;
+                pitchBends << pitchBend;
+            }
+            else if (event.isPatchChange() && (program == -1)) {
+                program = event.getP1();
+            }
+            else if (event.isTrackName() && !hasTrackName) {
+                trackName = event.getMetaContent();
+                hasTrackName = true;
+            }
+        }
+
+        // Pair each note-on with the first following note-off of the same key
+        jsonxx::Array notes;
+        int lastNoteEndTicks = 0;
+        for (const smf::MidiEvent *noteOn : noteOns) {
+            const int key = noteOn->getKeyNumber();
+            channel = noteOn->getChannel();
+            std::list<const smf::MidiEvent *> &offs = noteOffs[key];
+            std::list<const smf::MidiEvent *>::iterator noteOff = std::find_if(offs.begin(), offs.end(),
+                [noteOn](const smf::MidiEvent *event) { return event->tick >= noteOn->tick; });
+            if (noteOff == offs.end()) continue;
+            const int ticks = noteOn->tick;
+            const int duration = (*noteOff)->tick - ticks;
+            offs.erase(noteOff);
+            lastNoteEndTicks = std::max(lastNoteEndTicks, ticks + duration);
+
+            jsonxx::Object note;
+            note << "duration" << (ticksToSeconds(ticks + duration) - ticksToSeconds(ticks));
+            note << "durationTicks" << duration;
+            note << "midi" << key;
+            note << "name" << (pitchClasses.at(key % 12) + std::to_string(key / 12 - 1));
+            note << "ticks" << ticks;
+            note << "time" << ticksToSeconds(ticks);
+            note << "velocity" << noteOn->getVelocity() / 127.0;
+            std::list<std::string> &ids = noteIDs[{ track, ticks, noteOn->getChannel(), key }];
+            if (!ids.empty()) {
+                note << "id" << ids.front();
+                ids.pop_front();
+            }
+            notes << note;
+        }
+        if ((track == 0) && (lastNoteEndTicks == 0)) continue;
+
+        jsonxx::Object controlChangeObject;
+        for (const std::pair<const int, jsonxx::Array> &controlChange : controlChanges) {
+            controlChangeObject << std::to_string(controlChange.first) << controlChange.second;
+        }
+        jsonxx::Object instrument;
+        instrument << "number" << std::max(0, program);
+
+        jsonxx::Object trackObject;
+        trackObject << "channel" << channel;
+        trackObject << "controlChanges" << controlChangeObject;
+        trackObject << "endOfTrackTicks" << endOfTrackTicks;
+        trackObject << "instrument" << instrument;
+        trackObject << "name" << trackName;
+        trackObject << "notes" << notes;
+        trackObject << "pitchBends" << pitchBends;
+        tracks << trackObject;
+    }
+
+    jsonxx::Object midi;
+    midi << "header" << header;
+    midi << "tracks" << tracks;
+    output = midi.json();
 }
 
 bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeasures, bool useFractions)

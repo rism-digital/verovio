@@ -3,6 +3,40 @@ export interface MIDIValues {
     pitch: number;
     duration: number;
 }
+/**
+ * MIDI as JSON, with the structure of @tonejs/midi (Midi.toJSON())
+ */
+export interface MIDIJson {
+    header: {
+        name: string;
+        ppq: number;
+        meta: { text: string; type: string; ticks: number }[];
+        tempos: { bpm: number; ticks: number }[];
+        timeSignatures: { ticks: number; timeSignature: number[]; measures?: number }[];
+        keySignatures: { key: string; scale: string; ticks: number }[];
+    };
+    tracks: {
+        name: string;
+        channel: number;
+        instrument: { number: number };
+        notes: {
+            /**
+             * The ID (@xml:id) of the note the MIDI note is played for
+             */
+            id?: string;
+            midi: number;
+            name: string;
+            ticks: number;
+            time: number;
+            velocity: number;
+            duration: number;
+            durationTicks: number;
+        }[];
+        controlChanges: Record<number, { number: number; ticks: number; time: number; value: number }[]>;
+        pitchBends: { ticks: number; time: number; value: number }[];
+        endOfTrackTicks?: number;
+    }[];
+}
 export interface GetMeiOptions {
     /**
      * Page number, 1-based. All pages if none (or 0) specified.

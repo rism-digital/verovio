@@ -171,12 +171,6 @@ public class VerovioToolkit {
         }
     }
 
-    public func getMIDIValues() -> String {
-        guard let tk = toolkitPtr else { return "" }
-        guard let cStr = vrvToolkit_getMIDIValues(tk) else { return "" }
-        return String(cString: cStr)
-    }
-
     public func getNotatedIdForElement(_ xmlId: String) -> String {
         guard let tk = toolkitPtr else { return "" }
         return xmlId.withCString { cStr in
@@ -303,6 +297,19 @@ public class VerovioToolkit {
         guard let tk = toolkitPtr else { return false }
         return filename.withCString { cStr in
             vrvToolkit_renderToMIDIFile(tk, cStr)
+        }
+    }
+
+    public func renderToMIDIJson() -> String {
+        guard let tk = toolkitPtr else { return "" }
+        guard let cStr = vrvToolkit_renderToMIDIJson(tk) else { return "" }
+        return String(cString: cStr)
+    }
+
+    public func renderToMIDIJsonFile(_ filename: String) -> Bool {
+        guard let tk = toolkitPtr else { return false }
+        return filename.withCString { cStr in
+            vrvToolkit_renderToMIDIJsonFile(tk, cStr)
         }
     }
 

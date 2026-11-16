@@ -84,9 +84,6 @@ function getToolkitFunction(VerovioModule, method) {
     // char *getMIDIValuesForElement(Toolkit *ic, const char *xmlId)
     mapping.getMIDIValuesForElement = VerovioModule.cwrap("vrvToolkit_getMIDIValuesForElement", "string", ["number", "string"]);
 
-    // char *getMIDIValues(Toolkit *ic)
-    mapping.getMIDIValues = VerovioModule.cwrap("vrvToolkit_getMIDIValues", "string", ["number"]);
-
     // char *getVersion(Toolkit *ic)
     mapping.getVersion = VerovioModule.cwrap("vrvToolkit_getVersion", "string", ["number"]);
 
@@ -113,6 +110,9 @@ function getToolkitFunction(VerovioModule, method) {
 
     // char *renderToMIDI(Toolkit *ic)
     mapping.renderToMIDI = VerovioModule.cwrap("vrvToolkit_renderToMIDI", "string", ["number"]);
+
+    // char *renderToMIDIJson(Toolkit *ic)
+    mapping.renderToMIDIJson = VerovioModule.cwrap("vrvToolkit_renderToMIDIJson", "string", ["number"]);
 
     // char *renderToPAE(Toolkit *ic)
     mapping.renderToPAE = VerovioModule.cwrap("vrvToolkit_renderToPAE", "string", ["number"]);

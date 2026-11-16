@@ -150,10 +150,6 @@ func (t *Toolkit) MIDIValuesForElement(xmlID string) string {
 	return goString(C.vrvToolkit_getMIDIValuesForElement(t.ptr, cXMLID))
 }
 
-func (t *Toolkit) MIDIValues() string {
-	return goString(C.vrvToolkit_getMIDIValues(t.ptr))
-}
-
 func (t *Toolkit) NotatedIDForElement(xmlID string) string {
 	cXMLID := C.CString(xmlID)
 	defer C.free(unsafe.Pointer(cXMLID))
@@ -267,6 +263,16 @@ func (t *Toolkit) RenderToMIDIFile(filename string) bool {
 	cFilename := C.CString(filename)
 	defer C.free(unsafe.Pointer(cFilename))
 	return bool(C.vrvToolkit_renderToMIDIFile(t.ptr, cFilename))
+}
+
+func (t *Toolkit) RenderToMIDIJson() string {
+	return goString(C.vrvToolkit_renderToMIDIJson(t.ptr))
+}
+
+func (t *Toolkit) RenderToMIDIJsonFile(filename string) bool {
+	cFilename := C.CString(filename)
+	defer C.free(unsafe.Pointer(cFilename))
+	return bool(C.vrvToolkit_renderToMIDIJsonFile(t.ptr, cFilename))
 }
 
 func (t *Toolkit) RenderToPAE() string {

@@ -18,7 +18,6 @@ _vrvToolkit_convertMEIToHumdrum
 _vrvToolkit_getLog
 _vrvToolkit_getMEI
 _vrvToolkit_getMIDIValuesForElement
-_vrvToolkit_getMIDIValues
 _vrvToolkit_getNotatedIdForElement
 _vrvToolkit_getOptions
 _vrvToolkit_getPageCount
@@ -34,6 +33,7 @@ _vrvToolkit_redoPagePitchPosLayout
 _vrvToolkit_renderData
 _vrvToolkit_renderToExpansionMap
 _vrvToolkit_renderToMIDI
+_vrvToolkit_renderToMIDIJson
 _vrvToolkit_renderToPAE
 _vrvToolkit_renderToSVG
 _vrvToolkit_renderToTimemap
