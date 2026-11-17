@@ -29624,7 +29624,7 @@ void HumdrumInput::addTrill(Object *linked, hum::HTp token)
     bool isrest = endtok->isRest();
 
     if (isgracenote) {
-        trill->SetEndid("#" + getLocationId("note", endtok, -1));
+        trill->SetEndid("#" + getDataTokenId(endtok));
     }
     else if (isrest && !foundbarline) {
         // use @tstamp2 because @endid does not work in verovio for rests.

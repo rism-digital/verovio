@@ -193,6 +193,43 @@ export class VerovioToolkit {
      */
     loadZipDataBuffer(data: ArrayBuffer): boolean;
     /**
+     * Register a static OTF, TTF, WOFF, or WOFF2 text font.
+     * @param {Uint8Array | ArrayBuffer} data The font data
+     * @param {string} [alias] An additional family name for the font (exact and case-sensitive)
+     * @returns {string} The canonical family name, or an empty string on failure
+     */
+    registerTextFont(data: Uint8Array | ArrayBuffer, alias?: string): string;
+    /**
+     * Register a static OTF, TTF, WOFF, or WOFF2 SMuFL music font.
+     * @param {Uint8Array | ArrayBuffer} data The font data
+     * @param {string | Object} smuflMetadata The SMuFL font metadata
+     * @param {string} [alias] An additional family name for the font (exact and case-sensitive)
+     * @returns {string} The canonical family name, or an empty string on failure
+     */
+    registerMusicFont(data: Uint8Array | ArrayBuffer, smuflMetadata: string | Object, alias?: string): string;
+    /**
+     * Register a static text font passed as base64 string.
+     * @param {string} data The base64-encoded font data
+     * @param {string} [alias] An additional family name for the font (exact and case-sensitive)
+     * @returns {string} The canonical family name, or an empty string on failure
+     */
+    registerTextFontBase64(data: string, alias?: string): string;
+    /**
+     * Register a static SMuFL music font passed as base64 string.
+     * @param {string} data The base64-encoded font data
+     * @param {string | Object} smuflMetadata The SMuFL font metadata
+     * @param {string} [alias] An additional family name for the font (exact and case-sensitive)
+     * @returns {string} The canonical family name, or an empty string on failure
+     */
+    registerMusicFontBase64(data: string, smuflMetadata: string | Object, alias?: string): string;
+    /**
+     * @private
+     * @param {Uint8Array | ArrayBuffer} data The font data
+     * @param {function(number, number): string} callback The registration with the data pointer and size
+     * @returns {string}
+     */
+    private withFontData;
+    /**
      * Redo the layout of the loaded data.
      *
      * This can be called once the rendering option were changed, for example with a new page (sceen) height or a new zoom level.
@@ -282,12 +319,6 @@ export class VerovioToolkit {
     validatePAE(data: string | {
         [x: string]: string;
     }): PAEValidation;
-    /**
-     * @private
-     * @param {VerovioOptions} options
-     * @returns {VerovioOptions}
-     */
-    private preprocessOptions;
 }
 export namespace VerovioToolkit {
     let instances: VerovioToolkit[];

@@ -96,6 +96,18 @@ function getToolkitFunction(VerovioModule, method) {
     // bool loadZipDataBuffer(Toolkit *ic, const unsigned char *data, int length)
     mapping.loadZipDataBuffer = VerovioModule.cwrap("vrvToolkit_loadZipDataBuffer", "number", ["number", "number", "number"]);
 
+    // char *registerTextFont(Toolkit *ic, const unsigned char *data, int length, const char *alias)
+    mapping.registerTextFont = VerovioModule.cwrap("vrvToolkit_registerTextFont", "string", ["number", "number", "number", "string"]);
+
+    // char *registerMusicFont(Toolkit *ic, const unsigned char *data, int length, const char *smuflMetadataJson, const char *alias)
+    mapping.registerMusicFont = VerovioModule.cwrap("vrvToolkit_registerMusicFont", "string", ["number", "number", "number", "string", "string"]);
+
+    // char *registerTextFontBase64(Toolkit *ic, const char *data, const char *alias)
+    mapping.registerTextFontBase64 = VerovioModule.cwrap("vrvToolkit_registerTextFontBase64", "string", ["number", "string", "string"]);
+
+    // char *registerMusicFontBase64(Toolkit *ic, const char *data, const char *smuflMetadataJson, const char *alias)
+    mapping.registerMusicFontBase64 = VerovioModule.cwrap("vrvToolkit_registerMusicFontBase64", "string", ["number", "string", "string", "string"]);
+
     // void redoLayout(Toolkit *ic)
     mapping.redoLayout = VerovioModule.cwrap("vrvToolkit_redoLayout", null, ["number", "string"]);
 

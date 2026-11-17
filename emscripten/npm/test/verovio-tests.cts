@@ -14,15 +14,6 @@ const createVerovioModule = require("verovio/wasm").default;
 })();
 
 verovio.module.onRuntimeInitialized = () => {
-    verovio.module.FS_unlink("/data/text/Times.xml");
-    verovio.module.FS_createDataFile(
-        "/data/text",
-        "Times.xml",
-        `<?xml version="1.0" encoding="UTF-8"?>`,
-        true,
-        true,
-        false,
-    );
     const vrvTk = new verovio.toolkit();
     // $ExpectType VerovioOptions
     vrvTk.getOptions();

@@ -9,24 +9,20 @@
 
 //----------------------------------------------------------------------------
 
+#include <cmath>
+#include <cstdlib>
 #include <filesystem>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <string>
 
 //----------------------------------------------------------------------------
 
+#include "devicecontextbase.h"
 #include "smufl.h"
 #include "vrv.h"
 #include "vrvdef.h"
 
-//----------------------------------------------------------------------------
-
-#include "pugixml.hpp"
-
 #define BRAVURA "Bravura"
 #define LEIPZIG "Leipzig"
+#define TINOS "Tinos"
 
 namespace vrv {
 
@@ -35,8 +31,6 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 thread_local std::string Resources::s_defaultPath = VRV_RESOURCE_DIR;
-const Resources::StyleAttributes Resources::k_defaultStyle{ data_FONTWEIGHT::FONTWEIGHT_normal,
-    data_FONTSTYLE::FONTSTYLE_normal };
 
 //----------------------------------------------------------------------------
 // Function defined in toolkitdef.h
@@ -51,125 +45,112 @@ void SetDefaultResourcePath(const std::string &path)
 // Resources
 //----------------------------------------------------------------------------
 
+namespace {
+
+    /** The SMuFL names of the glyphs supported by Verovio, by name and by code */
+    struct GlyphNames {
+        Resources::GlyphNameTable m_codes;
+        std::unordered_map<char32_t, std::string> m_names;
+    };
+
+    const GlyphNames &GetGlyphNames()
+    {
+        static const GlyphNames glyphNames = [] {
+            static constexpr std::pair<char32_t, const char *> entries[] = {
+#include "smufl_names.inc"
+            };
+            GlyphNames names;
+            for (const std::pair<char32_t, const char *> &entry : entries) {
+                names.m_codes.emplace(entry.second, entry.first);
+                names.m_names.emplace(entry.first, entry.second);
+            }
+            return names;
+        }();
+        return glyphNames;
+    }
+
+} // namespace
+
 Resources::Resources()
 {
     m_path = s_defaultPath;
-    m_currentStyle = k_defaultStyle;
-    m_useLiberation = false;
+    m_textFontName = TINOS;
+}
+
+bool Resources::Ok() const
+{
+    return m_fontStore.HasFace(FontStore::Kind::Music, LEIPZIG) && m_fontStore.HasFace(FontStore::Kind::Music, BRAVURA)
+        && m_fontStore.HasFace(FontStore::Kind::Text, TINOS);
 }
 
 bool Resources::InitFonts()
 {
     m_cachedGlyph.reset();
-    m_loadedFonts.clear();
+    m_runtimeGlyphs.clear();
 
-    // Font Bravura first. As it is expected to have always all symbols we build the code -> name table from it
-    if (!LoadFont(BRAVURA)) LogError("Bravura font could not be loaded.");
-    // Leipzig is our initial default font
-    if (!LoadFont(LEIPZIG)) LogError("Leipzig font could not be loaded.");
-
-    m_defaultFontName = LEIPZIG;
-    m_currentFontName = m_defaultFontName;
-    m_fallbackFontName = m_defaultFontName;
-
-    struct TextFontInfo_type {
-        const StyleAttributes m_style;
-        const std::string m_fileName;
-        bool m_isMandatory;
-    };
-
-    static const TextFontInfo_type textFontInfos[]
-        = { { k_defaultStyle, "Times", true }, { { FONTWEIGHT_bold, FONTSTYLE_normal }, "Times-bold", false },
-              { { FONTWEIGHT_bold, FONTSTYLE_italic }, "Times-bold-italic", false },
-              { { FONTWEIGHT_normal, FONTSTYLE_italic }, "Times-italic", false } };
-
-    for (const auto &textFontInfo : textFontInfos) {
-        if (!InitTextFont(textFontInfo.m_fileName, textFontInfo.m_style) && textFontInfo.m_isMandatory) {
-            LogError("Text font could not be initialized.");
+    const std::string fontPath = m_path + "/fonts/";
+    // Leipzig is the default music font and Bravura the final fallback, with the most complete SMuFL coverage
+    for (const std::string family : { LEIPZIG, BRAVURA }) {
+        const std::vector<unsigned char> font = FontStore::ReadFile(fontPath + family + ".woff2");
+        const std::vector<unsigned char> metadata = FontStore::ReadFile(fontPath + family + "_metadata.json");
+        if (font.empty() || metadata.empty()
+            || (m_fontStore.RegisterMusicFont(font.data(), font.size(), std::string(metadata.begin(), metadata.end()))
+                != family)) {
+            LogError("%s runtime font could not be loaded.", family.c_str());
+            return false;
+        }
+        m_musicFontSubsets[family] = FontStore::ReadFile(fontPath + family + "_subset.woff2");
+    }
+    for (const std::string style : { "Regular", "Italic", "Bold", "BoldItalic" }) {
+        const std::vector<unsigned char> font = FontStore::ReadFile(fontPath + TINOS + "-" + style + ".woff2");
+        if (font.empty() || (m_fontStore.RegisterTextFont(font.data(), font.size()) != TINOS)) {
+            LogError("%s %s runtime font could not be loaded.", TINOS, style.c_str());
             return false;
         }
     }
+    m_fontStore.PinBundledData();
 
-    m_currentStyle = k_defaultStyle;
+    m_currentFontName = LEIPZIG;
+    m_fallbackFontName = BRAVURA;
+    m_textFontName = TINOS;
 
     return true;
 }
 
-bool Resources::SetFont(const std::string &fontName)
+bool Resources::IsFontLoaded(const std::string &fontName) const
+{
+    return m_fontStore.HasFace(FontStore::Kind::Music, fontName);
+}
+
+bool Resources::SetFallbackFont(const std::string &fontName)
 {
     m_cachedGlyph.reset();
 
-    // add the default font provided in options, if it is not one of the previous
-    if (!fontName.empty() && !IsFontLoaded(fontName)) {
-        if (!LoadFont(fontName)) {
-            LogError("%s font could not be loaded.", fontName.c_str());
-            return false;
-        }
+    if (!this->IsFontLoaded(fontName)) {
+        LogError("Music font '%s' is not registered.", fontName.c_str());
+        return false;
     }
-
-    m_defaultFontName = IsFontLoaded(fontName) ? fontName : LEIPZIG;
-    m_currentFontName = m_defaultFontName;
-
-    return true;
-}
-
-bool Resources::AddCustom(const std::vector<std::string> &extraFonts)
-{
-    bool success = true;
-    // options supplied fonts
-    for (const std::string &fontFile : extraFonts) {
-        ZipFileReader zipFile;
-        if (!zipFile.Load(fontFile)) {
-            continue;
-        }
-        std::string fontName = GetCustomFontname(fontFile, zipFile);
-        if (fontName.empty() || IsFontLoaded(fontName)) {
-            continue;
-        }
-        success = success && LoadFont(fontName, &zipFile);
-        if (!success) {
-            LogError("Option supplied font %s could not be loaded.", fontName.c_str());
-        }
-    }
-    return success;
-}
-
-bool Resources::LoadAll()
-{
-    std::string path = Resources::GetPath() + "/";
-    return std::ranges::all_of(
-        std::filesystem::directory_iterator(path), [this](const std::filesystem::directory_entry &entry) {
-            const std::filesystem::path &path = entry.path();
-            if (path.has_extension() && path.has_stem() && path.extension() == ".xml") {
-                const std::string fontName = path.stem().string();
-                if (!this->IsFontLoaded(fontName) && !this->LoadFont(fontName)) {
-                    return false;
-                }
-            }
-            return true;
-        });
-}
-
-void Resources::SetFallbackFont(const std::string &fontName)
-{
-    m_cachedGlyph.reset();
     m_fallbackFontName = fontName;
+    return true;
 }
 
-bool Resources::SetCurrentFont(const std::string &fontName, bool allowLoading)
+bool Resources::SetTextFont(const std::string &fontName)
+{
+    if (!m_fontStore.HasFace(FontStore::Kind::Text, fontName)) {
+        LogError("Text font '%s' is not registered.", fontName.c_str());
+        return false;
+    }
+    m_textFontName = fontName;
+    return true;
+}
+
+bool Resources::SetCurrentFont(const std::string &fontName)
 {
     m_cachedGlyph.reset();
 
-    if (IsFontLoaded(fontName)) {
-        m_currentFontName = fontName;
-        return true;
-    }
-    else if (allowLoading && LoadFont(fontName)) {
-        m_currentFontName = fontName;
-        return true;
-    }
-
-    return false;
+    if (!this->IsFontLoaded(fontName)) return false;
+    m_currentFontName = fontName;
+    return true;
 }
 
 const Glyph *Resources::GetGlyph(char32_t smuflCode) const
@@ -178,19 +159,28 @@ const Glyph *Resources::GetGlyph(char32_t smuflCode) const
         return m_cachedGlyph->second;
     }
 
-    const GlyphTable &currentTable = this->GetCurrentGlyphTable();
-    if (auto glyphIter = currentTable.find(smuflCode); glyphIter != currentTable.end()) {
-        const Glyph *glyph = &glyphIter->second;
-        m_cachedGlyph = std::make_pair(glyphIter->first, glyph);
-        return glyph;
-    }
-    else if (!this->IsCurrentFontFallback()) {
-        const GlyphTable &fallbackTable = this->GetFallbackGlyphTable();
-        if (auto glyphIter = fallbackTable.find(smuflCode); glyphIter != fallbackTable.end()) {
-            const Glyph *glyph = &glyphIter->second;
-            m_cachedGlyph = std::make_pair(glyphIter->first, glyph);
-            return glyph;
+    const Glyph *glyph = this->GetGlyph(smuflCode, m_currentFontName);
+    if (glyph) m_cachedGlyph = std::make_pair(smuflCode, glyph);
+    return glyph;
+}
+
+const Glyph *Resources::GetGlyph(char32_t smuflCode, const std::string &fontName) const
+{
+    // Look for the glyph in the font, the fallback font, and Bravura, which has the most complete coverage
+    for (const std::string &family : { fontName, m_fallbackFontName, std::string(BRAVURA) }) {
+        const std::optional<FontStore::GlyphMetrics> metrics
+            = m_fontStore.GetGlyphMetrics(FontStore::Kind::Music, family, smuflCode);
+        if (!metrics) continue;
+        Glyph *glyph = const_cast<Glyph *>(
+            this->GetRuntimeGlyph(metrics->m_face, metrics->m_glyphId, StringFormat("%04X", smuflCode)));
+        if (!glyph) return NULL;
+        const std::unordered_map<char32_t, std::string> &glyphNames = GetGlyphNames().m_names;
+        if (const auto name = glyphNames.find(smuflCode); name != glyphNames.end()) {
+            for (const FontStore::GlyphAnchor &anchor : m_fontStore.GetMusicGlyphAnchors(family, name->second)) {
+                glyph->SetAnchor(anchor.m_name, anchor.m_x, anchor.m_y);
+            }
         }
+        return glyph;
     }
     return NULL;
 }
@@ -205,105 +195,137 @@ const Glyph *Resources::GetGlyph(const std::string &smuflName) const
 
 char32_t Resources::GetGlyphCode(const std::string &smuflName) const
 {
-    if (auto glyphNameIter = m_glyphNameTable.find(smuflName); glyphNameIter != m_glyphNameTable.end()) {
-        return glyphNameIter->second;
+    const GlyphNameTable &glyphCodes = GetGlyphNames().m_codes;
+    if (const auto code = glyphCodes.find(smuflName); code != glyphCodes.end()) {
+        return code->second;
     }
     return 0;
 }
 
 bool Resources::IsSmuflFallbackNeeded(const std::u32string &text) const
 {
-    if (m_loadedFonts.at(m_currentFontName).isFallback()) {
-        return false;
-    }
     for (char32_t c : text) {
-        if (!GetCurrentGlyphTable().contains(c)) return true;
+        if (!this->FontHasGlyphAvailable(m_currentFontName, c)) return true;
     }
     return false;
 }
 
-bool Resources::IsCurrentFontFallback() const
-{
-    return (m_currentFontName == m_fallbackFontName);
-}
-
 bool Resources::FontHasGlyphAvailable(const std::string &fontName, char32_t smuflCode) const
 {
-    if (!IsFontLoaded(fontName)) {
-        return false;
-    }
-
-    const GlyphTable &table = m_loadedFonts.at(fontName).GetGlyphTable();
-    return (table.find(smuflCode) != table.end());
+    return m_fontStore.GetGlyphMetrics(FontStore::Kind::Music, fontName, smuflCode).has_value();
 }
 
-std::string Resources::GetCSSFontFor(const std::string &fontName) const
+std::optional<FontStore::FontFile> Resources::GetMusicFontForEmbedding(
+    const std::string &fontName, std::string &bundledFile) const
 {
-    if (fontName == this->GetTextFont()) {
-        const std::string cssFontPath = StringFormat("%s/%s.css", m_path.c_str(), this->GetTextFont().c_str());
-        std::ifstream fstream(cssFontPath);
-        std::stringstream sstream;
-        sstream << fstream.rdbuf();
-        return sstream.str();
+    bundledFile.clear();
+    const std::map<std::string, std::vector<unsigned char>>::const_iterator subset = m_musicFontSubsets.find(fontName);
+    if ((subset != m_musicFontSubsets.end()) && !subset->second.empty()) {
+        bundledFile = fontName + "_subset.woff2";
+        return FontStore::FontFile{ FontStore::Weight::Normal, FontStore::Style::Normal, "woff2", "font/woff2",
+            subset->second };
     }
-
-    if (!IsFontLoaded(fontName)) {
-        return "";
-    }
-
-    const LoadedFont &font = m_loadedFonts.at(fontName);
-    return font.GetCSSFont(m_path);
+    // Other fonts are embedded entirely
+    const std::vector<FontStore::FontFile> files = m_fontStore.GetFontFiles(FontStore::Kind::Music, fontName);
+    if (files.empty()) return std::nullopt;
+    return files.front();
 }
 
-std::string Resources::GetCustomFontname(const std::string &filename, const ZipFileReader &zipFile)
+std::string Resources::GetTextFontMetricEquivalent() const
 {
-#ifdef __EMSCRIPTEN__
-    // Extracts the font name from the bounding box XML file
-    // For example, OneGlyph/OneGlyph.xml
-    for (auto &s : zipFile.GetFileList()) {
-        std::filesystem::path path(s);
-        if (!path.has_parent_path() || (path.parent_path() == path.stem())) {
-            if (path.has_extension() && (path.extension() == ".xml")) {
-                return path.stem();
-            }
-        }
+    return (m_textFontName == TINOS) ? "Times" : "";
+}
+
+std::optional<FontStore::ShapedRun> Resources::ShapeText(const FontInfo &font, const std::u32string &text) const
+{
+    const std::string family = font.GetFaceName().empty() ? m_textFontName : font.GetFaceName();
+    const FaceStyle faceStyle = Resources::GetFaceStyle(font);
+    std::optional<FontStore::ShapedRun> run
+        = m_fontStore.ShapeText(family, text, faceStyle.first, faceStyle.second, m_currentFontName, m_fallbackFontName);
+    if (!run && (family != TINOS)) {
+        run = m_fontStore.ShapeText(
+            TINOS, text, faceStyle.first, faceStyle.second, m_currentFontName, m_fallbackFontName);
     }
-    LogWarning("The font name could not be extracted from the archive XML file");
+    return run;
+}
+
+int Resources::GetTextAdvance(const FontInfo &font, const FontStore::ShapedRun &run) const
+{
+    double advance = 0.0;
+    for (const FontStore::GlyphPlacement &placement : run.m_glyphs) {
+        advance += static_cast<double>(placement.m_advanceX) * font.GetPointSize() / placement.m_unitsPerEm;
+    }
+    return static_cast<int>(std::ceil(advance)) + run.GetClusterGapCount() * font.GetLetterSpacing();
+}
+
+const Glyph *Resources::GetTextGlyph(char32_t code, const FontInfo &font) const
+{
+    const std::string family = font.GetFaceName().empty() ? m_textFontName : font.GetFaceName();
+    const FaceStyle faceStyle = Resources::GetFaceStyle(font);
+    std::optional<FontStore::GlyphMetrics> metrics
+        = m_fontStore.GetGlyphMetrics(FontStore::Kind::Text, family, code, faceStyle.first, faceStyle.second);
+    if (!metrics && (family != TINOS)) {
+        metrics = m_fontStore.GetGlyphMetrics(FontStore::Kind::Text, TINOS, code, faceStyle.first, faceStyle.second);
+    }
+    if (!metrics) return NULL;
+    return this->GetRuntimeGlyph(metrics->m_face, metrics->m_glyphId);
+}
+
+const Glyph *Resources::GetRuntimeGlyph(FontStore::FaceIdentity face, int glyphId, const std::string &code) const
+{
+    // The glyphs are cached with their code, since the same glyph can be used as SMuFL glyph and in shaped text
+    std::map<std::pair<int, std::string>, Glyph> &glyphs = m_runtimeGlyphs[face.m_value];
+    const std::pair<int, std::string> key(glyphId, code);
+    if (const auto existing = glyphs.find(key); existing != glyphs.end()) return &existing->second;
+
+    const std::optional<FontStore::GlyphMetrics> metrics = m_fontStore.GetGlyphMetrics(face, glyphId);
+    if (!metrics) return NULL;
+    Glyph glyph(metrics->m_unitsPerEm);
+    // SMuFL glyphs are identified by their code, glyphs of shaped text by their face and glyph ID
+    glyph.SetCodeStr(code.empty() ? StringFormat("text-%llX-%d", (unsigned long long)face.m_value, glyphId) : code);
+    glyph.SetHorizAdvX(metrics->m_advanceX);
+    glyph.SetBoundingBox(
+        metrics->m_xBearing, metrics->m_yBearing + metrics->m_height, metrics->m_width, -metrics->m_height);
+    glyph.SetFace(face.m_value, glyphId);
+    return &glyphs.emplace(key, std::move(glyph)).first->second;
+}
+
+Resources::FaceStyle Resources::GetFaceStyle(const FontInfo &font)
+{
+    const FontStore::Weight weight
+        = (font.GetWeight() == FONTWEIGHT_bold) ? FontStore::Weight::Bold : FontStore::Weight::Normal;
+    const FontStore::Style style = ((font.GetStyle() == FONTSTYLE_italic) || (font.GetStyle() == FONTSTYLE_oblique))
+        ? FontStore::Style::Italic
+        : FontStore::Style::Normal;
+    return { weight, style };
+}
+
+std::string Resources::FindSmuflMetadata(const std::string &fontFilename)
+{
+    const std::filesystem::path fontPath(fontFilename);
+    const std::string stem = fontPath.stem().string();
+    std::vector<std::filesystem::path> candidates = { fontPath.parent_path() / (stem + ".json"),
+        fontPath.parent_path() / (stem + "_metadata.json"), fontPath.parent_path() / "metadata.json" };
+
+    // The standard locations of the SMuFL specification
+    std::vector<std::filesystem::path> roots
+        = { "/usr/local/share/SMuFL/Fonts", "/usr/share/SMuFL/Fonts", "/Library/Application Support/SMuFL/Fonts" };
+    if (const char *home = std::getenv("HOME")) {
+        roots.push_back(std::filesystem::path(home) / ".local/share/SMuFL/Fonts");
+        roots.push_back(std::filesystem::path(home) / "Library/Application Support/SMuFL/Fonts");
+    }
+    if (const char *commonFiles = std::getenv("COMMONPROGRAMFILES")) {
+        roots.push_back(std::filesystem::path(commonFiles) / "SMuFL/Fonts");
+    }
+    for (const std::filesystem::path &root : roots) {
+        candidates.push_back(root / stem / (stem + ".json"));
+        candidates.push_back(root / stem / (stem + "_metadata.json"));
+    }
+    for (const std::filesystem::path &candidate : candidates) {
+        std::error_code error;
+        if (std::filesystem::is_regular_file(candidate, error)) return candidate.string();
+    }
     return "";
-#else
-    std::filesystem::path path(filename);
-    return (path.has_stem()) ? path.stem().string() : "";
-#endif
-}
-
-void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle) const
-{
-    if (fontWeight == FONTWEIGHT_NONE) {
-        fontWeight = FONTWEIGHT_normal;
-    }
-
-    if (fontStyle == FONTSTYLE_NONE) {
-        fontStyle = FONTSTYLE_normal;
-    }
-
-    m_currentStyle = { fontWeight, fontStyle };
-    if (!m_textFont.contains(m_currentStyle)) {
-        LogWarning("Text font for style (%d, %d) is not loaded. Use default", fontWeight, fontStyle);
-        m_currentStyle = k_defaultStyle;
-    }
-}
-
-const Glyph *Resources::GetTextGlyph(char32_t code) const
-{
-    const StyleAttributes style = m_textFont.contains(m_currentStyle) ? m_currentStyle : k_defaultStyle;
-    if (!m_textFont.contains(style)) return NULL;
-
-    const GlyphTable &currentTable = m_textFont.at(style);
-    if (!currentTable.contains(code)) {
-        return NULL;
-    }
-
-    return &currentTable.at(code);
 }
 
 char32_t Resources::GetSmuflGlyphForUnicodeChar(const char32_t unicodeChar)
@@ -317,170 +339,6 @@ char32_t Resources::GetSmuflGlyphForUnicodeChar(const char32_t unicodeChar)
         default: break;
     }
     return smuflChar;
-}
-
-bool Resources::LoadFont(const std::string &fontName, ZipFileReader *zipFile)
-{
-    pugi::xml_document doc;
-    // For zip archive custom font, load the data from the zipFile
-    if (zipFile) {
-        const std::string filename = fontName + ".xml";
-        if (!zipFile->HasFile(filename)) {
-            // File not found, default bounding boxes will be used
-            LogError("Failed to load the XML file containing glyph bounding boxes");
-            return false;
-        }
-        pugi::xml_parse_result parseResult = doc.load_string(zipFile->ReadTextFile(filename).c_str());
-        if (!parseResult) {
-            // File not found, default bounding boxes will be used
-            LogError("Failed to parse the XML file containing glyph bounding boxes");
-            return false;
-        }
-    }
-    // Other wise use the resource directory
-    else {
-        const std::string filename = Resources::GetPath() + "/" + fontName + ".xml";
-        pugi::xml_parse_result parseResult = doc.load_file(filename.c_str());
-        if (!parseResult) {
-            // File not found, default bounding boxes will be used
-            LogError("Failed to load font and glyph bounding boxes");
-            return false;
-        }
-    }
-    pugi::xml_node root = doc.first_child();
-    if (!root.attribute("units-per-em")) {
-        LogError("No units-per-em attribute in bounding box file");
-        return false;
-    }
-
-    bool buildNameTable = (fontName == BRAVURA) ? true : false;
-    bool isFallback = ((fontName == BRAVURA) || (fontName == LEIPZIG)) ? true : false;
-
-    m_loadedFonts.insert(std::pair<std::string, LoadedFont>(fontName, Resources::LoadedFont(fontName, isFallback)));
-    LoadedFont &font = m_loadedFonts.at(fontName);
-
-    // For zip archive custom font also store the CSS
-    if (zipFile) {
-        font.SetCSSFont(zipFile->ReadTextFile(fontName + ".css"));
-    }
-
-    GlyphTable &glyphTable = font.GetGlyphTableForModification();
-
-    const int unitsPerEm = atoi(root.attribute("units-per-em").value());
-
-    for (pugi::xml_node current = root.child("g"); current; current = current.next_sibling("g")) {
-        pugi::xml_attribute c_attribute = current.attribute("c");
-        pugi::xml_attribute n_attribute = current.attribute("n");
-        if (!c_attribute || !n_attribute) continue;
-
-        Glyph glyph;
-        glyph.SetUnitsPerEm(unitsPerEm * 10);
-        glyph.SetCodeStr(c_attribute.value());
-        float x = 0.0, y = 0.0, width = 0.0, height = 0.0;
-        if (current.attribute("x")) x = current.attribute("x").as_float();
-        if (current.attribute("y")) y = current.attribute("y").as_float();
-        if (current.attribute("w")) width = current.attribute("w").as_float();
-        if (current.attribute("h")) height = current.attribute("h").as_float();
-        glyph.SetBoundingBox(x, y, width, height);
-
-        std::string glyphFilename = fontName + "/" + c_attribute.value() + ".xml";
-        // Store the XML in the glyph for fonts loaded from zip files
-        if (zipFile) {
-            glyph.SetXML(zipFile->ReadTextFile(glyphFilename));
-        }
-        // Otherwise only store the path
-        else {
-            glyph.SetPath(Resources::GetPath() + "/" + glyphFilename);
-        }
-
-        if (current.attribute("h-a-x")) glyph.SetHorizAdvX(current.attribute("h-a-x").as_float());
-
-        // load anchors
-        pugi::xml_node anchor;
-        for (anchor = current.child("a"); anchor; anchor = anchor.next_sibling("a")) {
-            if (anchor.attribute("n")) {
-                std::string name = std::string(anchor.attribute("n").value());
-                // No check for possible x and y missing attributes - not very safe.
-
-                glyph.SetAnchor(name, anchor.attribute("x").as_float(), anchor.attribute("y").as_float());
-            }
-        }
-
-        const char32_t smuflCode = (char32_t)strtol(c_attribute.value(), NULL, 16);
-        glyphTable[smuflCode] = glyph;
-        if (buildNameTable) {
-            m_glyphNameTable[n_attribute.value()] = smuflCode;
-        }
-    }
-
-    if (isFallback && glyphTable.size() < SMUFL_COUNT) {
-        LogError("Expected %d default SMuFL glyphs but could load only %d.", SMUFL_COUNT, glyphTable.size());
-        return false;
-    }
-
-    return true;
-}
-
-bool Resources::InitTextFont(const std::string &fontName, const StyleAttributes &style)
-{
-    // For the text font, we load the bounding boxes only
-    pugi::xml_document doc;
-    // For now, we have only Times bounding boxes for ASCII chars
-    // For any other char, we currently use 'o' bounding box
-    std::string filename = GetPath() + "/text/" + fontName + ".xml";
-    pugi::xml_parse_result result = doc.load_file(filename.c_str());
-    if (!result) {
-        // File not found, default bounding boxes will be used
-        LogInfo("Cannot load bounding boxes for text font '%s'", filename.c_str());
-        return false;
-    }
-    pugi::xml_node root = doc.first_child();
-    if (!root.attribute("units-per-em")) {
-        LogWarning("No units-per-em attribute in bounding box file");
-        return false;
-    }
-    const int unitsPerEm = root.attribute("units-per-em").as_int();
-    pugi::xml_node current;
-    if (!m_textFont.contains(style)) {
-        m_textFont[style] = {};
-    }
-    GlyphTable &currentTable = m_textFont.at(style);
-    for (current = root.child("g"); current; current = current.next_sibling("g")) {
-        if (current.attribute("c")) {
-            char32_t code = (char32_t)strtol(current.attribute("c").value(), NULL, 16);
-            // We create a glyph with only the units per em which is the only info we need for
-            // the bounding boxes; path and codeStr will remain [unset]
-            Glyph glyph(unitsPerEm);
-            float x = 0.0, y = 0.0, width = 0.0, height = 0.0;
-            // Not check for missing values...
-            if (current.attribute("x")) x = current.attribute("x").as_float();
-            if (current.attribute("y")) y = current.attribute("y").as_float();
-            if (current.attribute("w")) width = current.attribute("w").as_float();
-            if (current.attribute("h")) height = current.attribute("h").as_float();
-            glyph.SetBoundingBox(x, y, width, height);
-
-            if (current.attribute("h-a-x")) glyph.SetHorizAdvX(current.attribute("h-a-x").as_float());
-            if (currentTable.contains(code)) {
-                LogDebug("Redefining %d with %s", code, fontName.c_str());
-            }
-            currentTable[code] = glyph;
-        }
-    }
-    return true;
-}
-
-std::string Resources::LoadedFont::GetCSSFont(const std::string &path) const
-{
-    if (!m_css.empty()) {
-        return m_css;
-    }
-    else {
-        const std::string cssFontPath = StringFormat("%s/%s.css", path.c_str(), m_name.c_str());
-        std::ifstream fstream(cssFontPath);
-        std::stringstream sstream;
-        sstream << fstream.rdbuf();
-        return sstream.str();
-    }
 }
 
 } // namespace vrv
