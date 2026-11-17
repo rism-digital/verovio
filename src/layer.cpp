@@ -214,7 +214,9 @@ LayerElement *Layer::GetAtPos(int x)
 
 const LayerElement *Layer::GetAtPos(int x) const
 {
-    const Object *first = this->GetFirst();
+    if (this->GetList().empty()) return NULL;
+    // The front object is Layer itself
+    const Object *first = this->GetListNext(this->GetList().front());
     if (!first) return NULL;
 
     if (first->IsEditorialElement()) {
@@ -228,8 +230,8 @@ const LayerElement *Layer::GetAtPos(int x) const
     assert(element);
     if (element->GetDrawingX() > x) return NULL;
 
-    const Object *next;
-    while ((next = this->GetNext())) {
+    const Object *next = first;
+    while ((next = this->GetListNext(next))) {
         const LayerElement *nextLayerElement = NULL;
         if (next->IsLayerElement()) {
             nextLayerElement = vrv_cast<const LayerElement *>(next);
