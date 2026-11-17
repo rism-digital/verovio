@@ -10,18 +10,10 @@
 //----------------------------------------------------------------------------
 
 #include <cassert>
-#include <cstdlib>
-#include <fstream>
-#include <iostream>
-#include <sstream>
 
 //----------------------------------------------------------------------------
 
 #include "vrv.h"
-
-//----------------------------------------------------------------------------
-
-#include "pugixml.hpp"
 
 namespace vrv {
 
@@ -38,44 +30,8 @@ Glyph::Glyph()
     m_horizAdvX = 0;
     m_unitsPerEm = 20480;
     m_codeStr = "[unset]";
-    m_path = "[unset]";
-    m_isFallback = false;
-}
-
-Glyph::Glyph(std::string path, std::string codeStr)
-{
-    m_x = 0;
-    m_y = 0;
-    m_width = 0;
-    m_height = 0;
-    m_horizAdvX = 0;
-    m_unitsPerEm = 20480;
-    m_codeStr = codeStr;
-    m_isFallback = false;
-
-    pugi::xml_document doc;
-    pugi::xml_parse_result result = doc.load_file(path.c_str());
-    if (!result) {
-        LogError("Font file '%s' could not be loaded", path.c_str());
-        return;
-    }
-    pugi::xml_node root = doc.first_child();
-
-    // look at the viewBox attribute for getting the units per em
-    if (!root.attribute("viewBox")) {
-        LogInfo("Font file '%s' does not contain a viewBox attribute", path.c_str());
-        return;
-    }
-
-    std::string viewBox(root.attribute("viewBox").value());
-    // the viewBox attribute is expected to contain four coordinates: "0 0 2048 2048"
-    // we are looking for the last value
-    if (std::count(viewBox.begin(), viewBox.end(), ' ') < 3) {
-        LogInfo("Font file viewBox attribute '%s' is not valid", viewBox.c_str());
-        return;
-    }
-
-    m_unitsPerEm = atoi(viewBox.substr(viewBox.find_last_of(' ')).c_str()) * 10;
+    m_faceIdentity = 0;
+    m_glyphId = 0;
 }
 
 Glyph::Glyph(int unitsPerEm)
@@ -87,7 +43,8 @@ Glyph::Glyph(int unitsPerEm)
     m_horizAdvX = 0;
     m_unitsPerEm = unitsPerEm * 10;
     m_codeStr = "[unset]";
-    m_path = "[unset]";
+    m_faceIdentity = 0;
+    m_glyphId = 0;
 }
 
 Glyph::~Glyph() {}
@@ -145,19 +102,6 @@ bool Glyph::HasAnchor(SMuFLGlyphAnchor anchor) const
 const Point *Glyph::GetAnchor(SMuFLGlyphAnchor anchor) const
 {
     return &m_anchors.at(anchor);
-}
-
-std::string Glyph::GetXML() const
-{
-    if (!m_xml.empty()) {
-        return m_xml;
-    }
-    else {
-        std::ifstream fstream(m_path);
-        std::stringstream sstream;
-        sstream << fstream.rdbuf();
-        return sstream.str();
-    }
 }
 
 } // namespace vrv

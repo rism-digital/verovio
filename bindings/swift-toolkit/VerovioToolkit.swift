@@ -261,7 +261,79 @@ public class VerovioToolkit {
             vrvToolkit_loadZipDataBase64(tk, cStr)
         }
     }
-    
+
+    public func registerTextFont(_ data: Data, alias: String = "") -> String {
+        guard let tk = toolkitPtr else { return "" }
+        return alias.withCString { aliasValue in
+            data.withUnsafeBytes { bytes in
+                guard let result = vrvToolkit_registerTextFont(
+                    tk, bytes.bindMemory(to: UInt8.self).baseAddress, Int32(bytes.count), aliasValue)
+                else { return "" }
+                return String(cString: result)
+            }
+        }
+    }
+
+    public func registerMusicFont(_ data: Data, smuflMetadataJSON: String, alias: String = "") -> String {
+        guard let tk = toolkitPtr else { return "" }
+        return smuflMetadataJSON.withCString { metadata in
+            alias.withCString { aliasValue in
+                data.withUnsafeBytes { bytes in
+                    guard let result = vrvToolkit_registerMusicFont(
+                        tk, bytes.bindMemory(to: UInt8.self).baseAddress, Int32(bytes.count), metadata, aliasValue)
+                    else { return "" }
+                    return String(cString: result)
+                }
+            }
+        }
+    }
+
+    public func registerTextFontBase64(_ data: String, alias: String = "") -> String {
+        guard let tk = toolkitPtr else { return "" }
+        return data.withCString { encoded in
+            alias.withCString { aliasValue in
+                guard let result = vrvToolkit_registerTextFontBase64(tk, encoded, aliasValue) else { return "" }
+                return String(cString: result)
+            }
+        }
+    }
+
+    public func registerMusicFontBase64(_ data: String, smuflMetadataJSON: String, alias: String = "") -> String {
+        guard let tk = toolkitPtr else { return "" }
+        return data.withCString { encoded in
+            smuflMetadataJSON.withCString { metadata in
+                alias.withCString { aliasValue in
+                    guard let result = vrvToolkit_registerMusicFontBase64(tk, encoded, metadata, aliasValue)
+                    else { return "" }
+                    return String(cString: result)
+                }
+            }
+        }
+    }
+
+    public func registerTextFontFile(_ filename: String, alias: String = "") -> String {
+        guard let tk = toolkitPtr else { return "" }
+        return filename.withCString { path in
+            alias.withCString { aliasValue in
+                guard let result = vrvToolkit_registerTextFontFile(tk, path, aliasValue) else { return "" }
+                return String(cString: result)
+            }
+        }
+    }
+
+    public func registerMusicFontFile(_ filename: String, smuflMetadataFilename: String, alias: String = "") -> String {
+        guard let tk = toolkitPtr else { return "" }
+        return filename.withCString { path in
+            smuflMetadataFilename.withCString { metadataPath in
+                alias.withCString { aliasValue in
+                    guard let result = vrvToolkit_registerMusicFontFile(tk, path, metadataPath, aliasValue)
+                    else { return "" }
+                    return String(cString: result)
+                }
+            }
+        }
+    }
+
     public func redoLayout(_ jsonOptions: String) {
         guard let tk = toolkitPtr else { return }
         jsonOptions.withCString { cStr in

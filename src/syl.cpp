@@ -16,13 +16,17 @@
 #include "doc.h"
 #include "editorial.h"
 #include "functor.h"
+#include "lyricelement.h"
 #include "measure.h"
 #include "note.h"
+#include "scoredef.h"
 #include "smufl.h"
 #include "staff.h"
+#include "system.h"
 #include "text.h"
 #include "textelement.h"
 #include "verse.h"
+#include "volta.h"
 #include "vrv.h"
 #include "zone.h"
 
@@ -93,12 +97,34 @@ bool Syl::IsSupportedChild(ClassId classId)
 
 int Syl::CalcHyphenLength(Doc *doc, int staffSize)
 {
-    FontInfo *lyricFont = doc->GetDrawingLyricFont(staffSize);
-    int dashLength = doc->GetTextGlyphWidth(L'-', lyricFont, false);
+    const FontInfo lyricFont = this->GetDrawingFont(doc, staffSize);
+    int dashLength = doc->GetTextGlyphWidth(L'-', &lyricFont, false);
 
     Syl::AdjustToLyricSize(doc, dashLength);
 
     return dashLength;
+}
+
+FontInfo Syl::GetDrawingFont(Doc *doc, int staffSize) const
+{
+    const ScoreDefInterface *scoreDef = NULL;
+    if (this->GetStart()) {
+        const Staff *staff = vrv_cast<const Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
+        if (staff) scoreDef = staff->m_drawingStaffDef;
+        if (!scoreDef) {
+            const System *system = vrv_cast<const System *>(this->GetStart()->GetFirstAncestor(SYSTEM));
+            scoreDef = system ? system->GetDrawingScoreDef() : NULL;
+        }
+    }
+    FontInfo font = doc->GetDrawingTextFont(staffSize, scoreDef, true);
+    doc->ApplyTypography(font,
+        vrv_cast<const LyricElement *>(this->GetFirstAncestorInRange(LYRIC_ELEMENT, LYRIC_ELEMENT_max)), staffSize);
+    doc->ApplyTypography(font, vrv_cast<const Volta *>(this->GetFirstAncestor(VOLTA)), staffSize);
+    doc->ApplyTypography(font, this, staffSize);
+    if (this->GetStart() && this->GetStart()->GetDrawingCueSize()) {
+        font.SetPointSize(doc->GetCueSize(font.GetPointSize()));
+    }
+    return font;
 }
 
 int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)

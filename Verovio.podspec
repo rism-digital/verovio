@@ -9,7 +9,14 @@ Pod::Spec.new do |s|
   s.source_files   = 
       'src/**/*.{cpp,cc}',
       'include/{crc,hum,json,midi,pugi,tuning-library,vrv,zip}/*.{h,hpp}',
-      'libmei/{dist,addons}/*.{h,cpp}'
+      'libmei/{dist,addons}/*.{h,cpp}',
+      'external/harfbuzz/src/verovio-harfbuzz.cc',
+      'external/harfbuzz/src/*.{h,hh,hpp}',
+      'external/woff2/include/woff2/decode.h',
+      'external/woff2/src/verovio-woff2.cc',
+      'external/woff2/src/{buffer,port,round,store_bytes,table_tags,variable_length,woff2_common}.{h}',
+      'external/brotli/c/verovio-brotli.c',
+      'external/brotli/c/{include,common,dec}/**/*.h'
   s.public_header_files =
       'include/{json,pugi,vrv}/*.{h,hpp}',
       'libmei/{dist,addons}/*.{h}'
@@ -33,7 +40,8 @@ Pod::Spec.new do |s|
       "MTL_FAST_MATH" => "YES",
       "SUPPORTS_UIKITFORMAC" => "NO",
       "MTL_ENABLE_DEBUG_INFO" => "NO",
-      "PRODUCT_BUNDLE_IDENTIFIER" => "digital.rism.VerovioFramework"
+      "PRODUCT_BUNDLE_IDENTIFIER" => "digital.rism.VerovioFramework",
+      "HEADER_SEARCH_PATHS" => "$(PODS_TARGET_SRCROOT)/external/harfbuzz/src $(PODS_TARGET_SRCROOT)/external/woff2/include $(PODS_TARGET_SRCROOT)/external/woff2/src $(PODS_TARGET_SRCROOT)/external/brotli/c/include",
+      "GCC_PREPROCESSOR_DEFINITIONS" => "$(inherited) BROTLI_STATIC HB_LEAN HB_MINI HB_OPTIMIZE_SIZE_MORE HB_CONFIG_OVERRIDE_H='\"verovio-hb-config.h\"'"
     }
 end
-

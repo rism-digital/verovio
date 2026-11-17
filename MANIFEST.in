@@ -1,4 +1,5 @@
 recursive-include data *
+recursive-include external *
 recursive-include src *
 recursive-include include *
 recursive-include libmei *
