@@ -3677,13 +3677,14 @@ bool EditorToolkitNeume::ToggleNeumeConnection(std::vector<std::string> elementI
         return false;
     }
 
+    // @con is set on the second nc and describes its connection to the preceding nc
     Nc *currentNc = (firstIdx > secondIdx) ? firstNc : secondNc;
-    Staff *staff = vrv_cast<Staff *>(currentNc->GetFirstAncestor(STAFF));
-    assert(staff);
-    if (staff->m_drawingNotationType != NOTATIONTYPE_neume_hufnagel) {
-        LogError("Neume connections are supported only for Hufnagel notation.");
+
+    // Only toggle the extended connection; other connection types (gapped, looped) are left unchanged
+    if (currentNc->GetCon() == ncForm_CON_g || currentNc->GetCon() == ncForm_CON_l) {
+        LogError("The selected ncs already have a gapped or looped connection.");
         m_editStatus.import("status", "FAILURE");
-        m_editStatus.import("message", "Neume connections are supported only for Hufnagel notation.");
+        m_editStatus.import("message", "The selected ncs already have a gapped or looped connection.");
         return false;
     }
 
