@@ -65,8 +65,9 @@ FunctorCode ReplaceDrawingValuesInStaffDefFunctor::VisitStaffDef(StaffDef *staff
     const StaffDef *newStaffDef = m_newScoreDef->GetStaffDef(staffDef->GetN());
     if (newStaffDef) staffDef->MergeTextStyles(newStaffDef);
 
-    // Same for the staff-item orders, which also replace the ones of a previous staffDef
-    staffDef->ReplaceStaffItemOrders(m_newScoreDef);
+    // Same for the staff-item orders. The ones of the new scoreDef replace the ones of a previous staffDef, but not the
+    // ones of the new staffDef, which is the staffDef itself when the initial scoreDef is applied to itself
+    if (newStaffDef != staffDef) staffDef->ReplaceStaffItemOrders(m_newScoreDef);
     if (newStaffDef) staffDef->ReplaceStaffItemOrders(newStaffDef);
 
     return FUNCTOR_CONTINUE;
