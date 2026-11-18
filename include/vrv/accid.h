@@ -205,7 +205,7 @@ public:
     bool operator()(const Accid *first, const Accid *second) const
     {
         if (first->GetDrawingY() == second->GetDrawingY()) {
-            // with unissons, natural should always be the last accidental
+            // with unisons, natural should always be the last accidental
             return ((first->GetAccid() == ACCIDENTAL_WRITTEN_n) && (second->GetAccid() != ACCIDENTAL_WRITTEN_n));
         }
         else {
