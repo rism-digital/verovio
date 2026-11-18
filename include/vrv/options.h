@@ -656,6 +656,7 @@ public:
     OptionBool m_outputFormatRaw;
     OptionInt m_outputIndent;
     OptionBool m_outputIndentTab;
+    OptionBool m_outputLatestSchema;
     OptionBool m_outputSmuflXmlEntities;
     OptionInt m_pageHeight;
     OptionInt m_pageMarginBottom;

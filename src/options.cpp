@@ -1092,6 +1092,10 @@ Options::Options()
     m_outputIndentTab.Init(false);
     this->Register(&m_outputIndentTab, "outputIndentTab", &m_general);
 
+    m_outputLatestSchema.SetInfo("Output latest MEI schema", "Output using the latest version of the MEI schema");
+    m_outputLatestSchema.Init(false);
+    this->Register(&m_outputLatestSchema, "outputLatestSchema", &m_general);
+
     m_outputSmuflXmlEntities.SetInfo(
         "Output SMuFL XML entities", "Output SMuFL characters as XML entities instead of hex byte codes ");
     m_outputSmuflXmlEntities.Init(false);
