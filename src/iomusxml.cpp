@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include <algorithm>
 #include <cassert>
 #include <iterator>
 #include <numeric>
@@ -915,6 +916,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     }
 
     this->ReadMusicXmlTitle(root);
+    this->ReadLyricNumbers(root);
 
     // the mdiv
     Mdiv *mdiv = new Mdiv();
@@ -1457,6 +1459,33 @@ void MusicXmlInput::CreateExpansion(Section *section)
             }
         }
     }
+}
+
+void MusicXmlInput::ReadLyricNumbers(pugi::xml_node root)
+{
+    // The lyric number is an NMTOKEN that identifies a lyric line, not necessarily an integer: Sibelius, for example,
+    // writes "part1verse1" and "part1verse2". Integers are taken as verse numbers. Every other token gets a number
+    // after the highest integer, in order of first appearance, so that distinct lines stay distinct.
+    pugi::xpath_node_set numbers = root.select_nodes("/score-partwise/part/measure/note/lyric/@number");
+    int highest = 0;
+    for (const pugi::xpath_node &number : numbers) {
+        const std::string value = number.attribute().as_string();
+        if (!value.empty() && std::all_of(value.begin(), value.end(), ::isdigit)) {
+            highest = std::max(highest, number.attribute().as_int());
+        }
+    }
+    for (const pugi::xpath_node &number : numbers) {
+        const std::string value = number.attribute().as_string();
+        if (value.empty() || std::all_of(value.begin(), value.end(), ::isdigit)) continue;
+        if (!m_lyricNumbers.contains(value)) m_lyricNumbers[value] = ++highest;
+    }
+}
+
+int MusicXmlInput::GetLyricNumber(const pugi::xml_node lyric) const
+{
+    const auto token = m_lyricNumbers.find(lyric.attribute("number").as_string());
+    const int number = (token != m_lyricNumbers.end()) ? token->second : lyric.attribute("number").as_int();
+    return (number < 1) ? 1 : number;
 }
 
 void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
@@ -3452,8 +3481,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 }
             }
             if (!lyric.child("text") && !extendStop) continue; // Dorico exports non-valid MusicXML
-            short int lyricNumber = lyric.attribute("number").as_int();
-            lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
+            const int lyricNumber = this->GetLyricNumber(lyric);
             if (extendStop) m_pendingExtenderStops[{ staff->GetN(), layer->GetN() }].insert(lyricNumber);
             if (!lyric.child("text")) continue;
             Verse *verse = new Verse();
