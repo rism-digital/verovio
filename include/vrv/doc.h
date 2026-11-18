@@ -291,15 +291,10 @@ public:
     /**
      * Export the document to a MIDI file.
      * Run trough all the layers and fill the MIDI file content.
-     * If noteIDs is given, the ID of the note is registered for each note-on event.
+     * If midiJson is given, the MIDI is also exported to it as JSON, with the structure of \@tonejs/midi
+     * (Midi.toJSON()) and the ID of the note added to each note.
      */
-    void ExportMIDI(smf::MidiFile *midiFile, MapOfMIDINoteIDs *noteIDs = NULL);
-
-    /**
-     * Export the document to MIDI as a JSON string.
-     * The structure is the one of \@tonejs/midi (Midi.toJSON()) with the ID of the note added to each note.
-     */
-    void ExportMIDIJson(std::string &output);
+    void ExportMIDI(smf::MidiFile *midiFile, std::string *midiJson = NULL);
 
     /**
      * Extract a timemap from the document to a JSON string.

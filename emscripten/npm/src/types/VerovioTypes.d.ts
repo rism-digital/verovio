@@ -13,15 +13,18 @@ export interface MIDIJson {
         meta: { text: string; type: string; ticks: number }[];
         tempos: { bpm: number; ticks: number }[];
         timeSignatures: { ticks: number; timeSignature: number[]; measures?: number }[];
-        keySignatures: { key: string; scale: string; ticks: number }[];
+        keySignatures: { key?: string; scale: string; ticks: number }[];
     };
     tracks: {
         name: string;
         channel: number;
-        instrument: { number: number };
+        /**
+         * The General MIDI program; the name is missing for unknown drum kits (channel 9)
+         */
+        instrument: { number: number; name?: string; family: string };
         notes: {
             /**
-             * The ID (@xml:id) of the note the MIDI note is played for
+             * The ID (@xml:id) of the note the MIDI note is played for (of the beatRpt for notes it repeats)
              */
             id?: string;
             midi: number;

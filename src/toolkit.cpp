@@ -1881,9 +1881,10 @@ std::string Toolkit::RenderToMIDIJson()
     this->SetMidiDoc();
     this->ResetLogBuffer();
 
+    smf::MidiFile midiFile;
     std::string output;
     assert(m_midiDoc);
-    m_midiDoc->ExportMIDIJson(output);
+    m_midiDoc->ExportMIDI(&midiFile, &output);
 
     return output;
 }
