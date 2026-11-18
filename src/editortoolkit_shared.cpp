@@ -1398,8 +1398,20 @@ bool EditorToolkitShared::Drag(DragPhase phase, int startX, int startY, int dx, 
         return false;
     }
 
+    LayerElement *layerElement = vrv_cast<LayerElement *>(element);
+    assert(layerElement);
+
     Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
     Staff *staff = vrv_cast<Staff *>(element->GetFirstAncestor(STAFF));
+
+    Layer *crossLayer = NULL;
+    Staff *crossStaff = layerElement->GetCrossStaff(crossLayer);
+    if (crossStaff) {
+        assert(crossLayer);
+        layer = crossLayer;
+        staff = crossStaff;
+    }
+
     if (!layer || !staff) return false;
 
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
