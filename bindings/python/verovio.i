@@ -47,7 +47,7 @@ def editResponse(self) -> dict:
 
 // Toolkit::EditStatus
 %feature("shadow") vrv::Toolkit::EditStatus() %{
-def editSatus(self) -> dict:
+def editStatus(self) -> dict:
     """Return the editor status."""
     return json.loads($action(self))
 %}

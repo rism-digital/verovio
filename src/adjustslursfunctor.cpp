@@ -9,6 +9,10 @@
 
 //----------------------------------------------------------------------------
 
+#include <algorithm>
+
+//----------------------------------------------------------------------------
+
 #include "doc.h"
 #include "floatingobject.h"
 #include "slur.h"
@@ -70,7 +74,9 @@ FunctorCode AdjustSlursFunctor::VisitStaffAlignment(StaffAlignment *staffAlignme
     this->ResetCurrent();
 
     // Detection of inner slurs
-    std::map<FloatingCurvePositioner *, ArrayOfFloatingCurvePositioners> innerCurveMap;
+    // A vector in the order of the positioners, not a map keyed by pointer: the order in which outer slurs are
+    // adjusted changes the result when they nest, and pointer order differs from run to run.
+    std::vector<std::pair<FloatingCurvePositioner *, ArrayOfFloatingCurvePositioners>> innerCurveMap;
     for (int i = 0; i < (int)positioners.size(); ++i) {
         Slur *firstSlur = vrv_cast<Slur *>(positioners[i]->GetObject());
         ArrayOfFloatingCurvePositioners innerCurves;
@@ -107,11 +113,14 @@ FunctorCode AdjustSlursFunctor::VisitStaffAlignment(StaffAlignment *staffAlignme
             }
         }
         if (!innerCurves.empty()) {
-            innerCurveMap[positioners[i]] = innerCurves;
+            innerCurveMap.emplace_back(positioners[i], innerCurves);
         }
     }
 
-    // Adjust outer slurs w.r.t. inner slurs
+    // Adjust outer slurs w.r.t. inner slurs: innermost first (a slur holding another outer slur holds more inner
+    // slurs), so that each outer slur avoids its inner slurs as they will be drawn
+    std::stable_sort(innerCurveMap.begin(), innerCurveMap.end(),
+        [](const auto &a, const auto &b) { return a.second.size() < b.second.size(); });
     for (const auto &mapEntry : innerCurveMap) {
         Slur *slur = vrv_cast<Slur *>(mapEntry.first->GetObject());
         assert(slur);
