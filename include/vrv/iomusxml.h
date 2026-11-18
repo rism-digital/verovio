@@ -485,6 +485,11 @@ private:
     ///@}
 
     /*
+     * Whether a rest at the current position fills the measure although its type gives another duration
+     */
+    bool IsMeasureRestByDuration(const std::string &typeStr, int dots, int duration) const;
+
+    /*
      * @name Methods for opening and closing ties and slurs.
      * Opened ties and slurs are stacked together with musicxml::OpenTie
      * and musicxml::OpenSlur objects.

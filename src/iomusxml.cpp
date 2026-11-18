@@ -1459,6 +1459,23 @@ void MusicXmlInput::CreateExpansion(Section *section)
     }
 }
 
+bool MusicXmlInput::IsMeasureRestByDuration(const std::string &typeStr, int dots, int duration) const
+{
+    // A rest from the start to the end of the measure whose type gives another duration is a measure rest: Sibelius,
+    // for example, writes the rest of a full 6/8 measure as <type>whole</type> without measure="yes". Taking the type
+    // would make the measure four quarters long.
+    if ((m_ppq <= 0) || (m_durTotal != 0) || (duration <= 0)) return false;
+    MeterSig meterSig;
+    meterSig.SetCount({ m_meterCount, m_meterSign });
+    const int totalCount = meterSig.GetTotalCount();
+    if ((totalCount <= 0) || (m_meterUnit <= 0)) return false;
+    if (duration * m_meterUnit != m_ppq * 4 * totalCount) return false;
+    // The duration of the type and dots, in divisions (a quarter is m_ppq, see the @dur values of ConvertTypeToDur)
+    const double typeDuration
+        = m_ppq * 16.0 / std::pow(2.0, (int)ConvertTypeToDur(typeStr)) * (2.0 - std::pow(0.5, dots));
+    return (std::abs(typeDuration - duration) > 0.001);
+}
+
 void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
 {
     assert(root);
@@ -3093,7 +3110,8 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
         }
         // we assume /note without /type or with duration of an entire bar to be mRest
-        else if (typeStr.empty() || rest.attribute("measure").as_bool()) {
+        else if (typeStr.empty() || rest.attribute("measure").as_bool()
+            || this->IsMeasureRestByDuration(typeStr, dots, duration)) {
             if (m_slash) {
                 MeterSig tmpMeterSig;
                 tmpMeterSig.SetCount({ m_meterCount, m_meterSign });
