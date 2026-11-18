@@ -432,8 +432,9 @@ bool FloatingPositioner::HasHorizontalOverlapWith(const BoundingBox *bbox, int u
     assert(bbox);
 
     int bboxExtenderWidth = 0;
-    const FloatingPositioner *bboxPositioner = dynamic_cast<const FloatingPositioner *>(bbox);
-    if (bboxPositioner) {
+    if (bbox->IsAnyOf(std::array{ FLOATING_POSITIONER, FLOATING_CURVE_POSITIONER })) {
+        const FloatingPositioner *bboxPositioner = vrv_cast<const FloatingPositioner *>(bbox);
+        assert(bboxPositioner);
         bboxExtenderWidth = bboxPositioner->GetDrawingExtenderWidth();
     }
 
