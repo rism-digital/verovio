@@ -1133,18 +1133,20 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     }
                 }
             }
-            if (midiInstrument && !m_instrdef) {
-                m_instrdef = new InstrDef;
-                m_instrdef->SetMidiInstrname(m_instrdef->AttMidiInstrument::StrToMidinames(
-                    midiInstrument.child("midi-name").text().as_string()));
+            // Part identity is independent of its optional MIDI settings.
+            InstrDef *instrDef = new InstrDef();
+            if (!partId.empty()) instrDef->SetID(partId);
+            if (midiInstrument) {
+                instrDef->SetMidiInstrname(
+                    instrDef->AttMidiInstrument::StrToMidinames(midiInstrument.child("midi-name").text().as_string()));
                 pugi::xml_node midiChannel = midiInstrument.child("midi-channel");
-                if (midiChannel) m_instrdef->SetMidiChannel(midiChannel.text().as_int() - 1);
+                if (midiChannel) instrDef->SetMidiChannel(midiChannel.text().as_int() - 1);
                 // pugi::xml_node midiPan = midiInstrument.child("pan");
                 // if (midiPan) instrdef->SetMidiPan(midiPan.text().as_int());
                 pugi::xml_node midiProgram = midiInstrument.child("midi-program");
-                if (midiProgram) m_instrdef->SetMidiInstrnum(midiProgram.text().as_int() - 1);
+                if (midiProgram) instrDef->SetMidiInstrnum(midiProgram.text().as_int() - 1);
                 pugi::xml_node midiVolume = midiInstrument.child("volume");
-                if (midiVolume) m_instrdef->SetMidiVolume(midiVolume.text().as_int());
+                if (midiVolume) instrDef->SetMidiVolume(midiVolume.text().as_int());
             }
             // MIDI keys of unpitched notes, only for parts playing on the percussion channel 10
             const pugi::xpath_node_set midiInstruments = xpathNode.node().select_nodes("midi-instrument");
@@ -1157,9 +1159,9 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             }
             // create the staffDef(s)
             StaffGrp *partStaffGrp = new StaffGrp();
-            partStaffGrp->SetID(partId.c_str());
             const short int nbStaves
-                = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);
+                = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset, instrDef);
+            if (!instrDef->GetParent()) delete instrDef;
             // if we have more than one staff in the part we create a new staffGrp
             if (nbStaves > 1) {
                 partStaffGrp->SetBarThru(BOOLEAN_true);
@@ -1548,10 +1550,11 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
 }
 
 short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
-    pugi::xml_node node, StaffGrp *staffGrp, const short int staffOffset)
+    pugi::xml_node node, StaffGrp *staffGrp, const short int staffOffset, InstrDef *instrDef)
 {
     assert(node);
     assert(staffGrp);
+    assert(instrDef);
 
     // First get the number of staves in the part
     short int nbStaves = 1;
@@ -1562,10 +1565,9 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
     if (nbStaves > 1) {
         if (m_label) staffGrp->AddChild(m_label);
         if (m_labelAbbr) staffGrp->AddChild(m_labelAbbr);
-        if (m_instrdef) staffGrp->AddChild(m_instrdef);
+        staffGrp->AddChild(instrDef);
         m_label = NULL;
         m_labelAbbr = NULL;
-        m_instrdef = NULL;
     }
 
     bool attributesRead = false;
@@ -1599,13 +1601,11 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
                 staffDef = new StaffDef();
                 staffDef->SetN(i + 1 + staffOffset);
                 if (nbStaves == 1) {
-                    staffDef->SetID(staffGrp->GetID());
                     if (m_label) staffDef->AddChild(m_label);
                     if (m_labelAbbr) staffDef->AddChild(m_labelAbbr);
-                    if (m_instrdef) staffDef->AddChild(m_instrdef);
+                    staffDef->AddChild(instrDef);
                     m_label = NULL;
                     m_labelAbbr = NULL;
-                    m_instrdef = NULL;
                 }
                 staffGrp->AddChild(staffDef);
                 // set initial octave shift

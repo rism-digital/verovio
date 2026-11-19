@@ -348,9 +348,10 @@ private:
     /*
      * Methods for reading the first MusicXML attributes element as MEI staffDef.
      * Returns the number of staves in the part.
+     * Attaches instrDef to the staff group or staff definition. The caller deletes it if it remains unattached.
      */
     short int ReadMusicXmlPartAttributesAsStaffDef(
-        pugi::xml_node node, StaffGrp *staffGrp, const short int staffOffset);
+        pugi::xml_node node, StaffGrp *staffGrp, const short int staffOffset, InstrDef *instrDef);
 
     /*
      * @name Methods for reading the content of a MusicXML measure.
@@ -645,7 +646,6 @@ private:
     /* part information */
     Label *m_label = NULL;
     LabelAbbr *m_labelAbbr = NULL;
-    InstrDef *m_instrdef = NULL;
     /* MIDI keys of unpitched notes per part and instrument id ("" for a part with a single instrument) */
     std::map<std::string, std::map<std::string, int>> m_unpitchedKeys;
     /* LastElementID */
