@@ -29,7 +29,8 @@ class Fermata : public ControlElement,
                 public AttExtSymAuth,
                 public AttExtSymNames,
                 public AttFermataVis,
-                public AttPlacementRelStaff {
+                public AttPlacementRelStaff,
+                public AttVerticalGroup {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

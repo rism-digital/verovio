@@ -94,6 +94,30 @@ data_ARTICULATION_List Att::StrToArticulationList(const std::string &value, bool
     return list;
 }
 
+std::string Att::StaffitemListToStr(const data_STAFFITEM_List &data) const
+{
+    std::ostringstream ss;
+    for (const data_STAFFITEM item : data) {
+        const std::string value = StaffitemToStr(item);
+        if (value.empty()) continue;
+        if (ss.tellp() > 0) ss << " ";
+        ss << value;
+    }
+    return ss.str();
+}
+
+data_STAFFITEM_List Att::StrToStaffitemList(const std::string &value, bool logWarning) const
+{
+    data_STAFFITEM_List list;
+    std::istringstream iss(value);
+    std::string token;
+    while (iss >> token) {
+        const data_STAFFITEM item = StrToStaffitem(token, logWarning);
+        if (item != STAFFITEM_NONE) list.push_back(item);
+    }
+    return list;
+}
+
 std::string Att::BeatrptRendToStr(data_BEATRPT_REND data) const
 {
     std::string value;

@@ -29,10 +29,12 @@ namespace vrv {
 
 static const ClassRegistrar<CpMark> s_factory("cpMark", CPMARK);
 
-CpMark::CpMark() : ControlElement(CPMARK), TextListInterface(), TextDirInterface(), TimeSpanningInterface()
+CpMark::CpMark()
+    : ControlElement(CPMARK), TextListInterface(), TextDirInterface(), TimeSpanningInterface(), AttVerticalGroup()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_VERTICALGROUP);
 
     this->Reset();
 }
@@ -44,6 +46,7 @@ void CpMark::Reset()
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimeSpanningInterface::Reset();
+    this->ResetVerticalGroup();
 }
 
 bool CpMark::IsSupportedChild(ClassId classId)

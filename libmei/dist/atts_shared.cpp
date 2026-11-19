@@ -5783,26 +5783,26 @@ AttStaffItems::AttStaffItems() : Att()
 
 void AttStaffItems::ResetStaffItems()
 {
-    m_aboveorder = data_STAFFITEM();
-    m_beloworder = data_STAFFITEM();
-    m_betweenorder = data_STAFFITEM();
+    m_aboveorder = std::vector<data_STAFFITEM>();
+    m_beloworder = std::vector<data_STAFFITEM>();
+    m_betweenorder = std::vector<data_STAFFITEM>();
 }
 
 bool AttStaffItems::ReadStaffItems(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("aboveorder")) {
-        this->SetAboveorder(StrToStaffitem(element.attribute("aboveorder").value()));
+        this->SetAboveorder(StrToStaffitemList(element.attribute("aboveorder").value()));
         if (removeAttr) element.remove_attribute("aboveorder");
         hasAttribute = true;
     }
     if (element.attribute("beloworder")) {
-        this->SetBeloworder(StrToStaffitem(element.attribute("beloworder").value()));
+        this->SetBeloworder(StrToStaffitemList(element.attribute("beloworder").value()));
         if (removeAttr) element.remove_attribute("beloworder");
         hasAttribute = true;
     }
     if (element.attribute("betweenorder")) {
-        this->SetBetweenorder(StrToStaffitem(element.attribute("betweenorder").value()));
+        this->SetBetweenorder(StrToStaffitemList(element.attribute("betweenorder").value()));
         if (removeAttr) element.remove_attribute("betweenorder");
         hasAttribute = true;
     }
@@ -5813,15 +5813,15 @@ bool AttStaffItems::WriteStaffItems(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasAboveorder()) {
-        element.append_attribute("aboveorder") = StaffitemToStr(this->GetAboveorder()).c_str();
+        element.append_attribute("aboveorder") = StaffitemListToStr(this->GetAboveorder()).c_str();
         wroteAttribute = true;
     }
     if (this->HasBeloworder()) {
-        element.append_attribute("beloworder") = StaffitemToStr(this->GetBeloworder()).c_str();
+        element.append_attribute("beloworder") = StaffitemListToStr(this->GetBeloworder()).c_str();
         wroteAttribute = true;
     }
     if (this->HasBetweenorder()) {
-        element.append_attribute("betweenorder") = StaffitemToStr(this->GetBetweenorder()).c_str();
+        element.append_attribute("betweenorder") = StaffitemListToStr(this->GetBetweenorder()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -5829,17 +5829,17 @@ bool AttStaffItems::WriteStaffItems(pugi::xml_node element)
 
 bool AttStaffItems::HasAboveorder() const
 {
-    return (m_aboveorder != data_STAFFITEM());
+    return (m_aboveorder != std::vector<data_STAFFITEM>());
 }
 
 bool AttStaffItems::HasBeloworder() const
 {
-    return (m_beloworder != data_STAFFITEM());
+    return (m_beloworder != std::vector<data_STAFFITEM>());
 }
 
 bool AttStaffItems::HasBetweenorder() const
 {
-    return (m_betweenorder != data_STAFFITEM());
+    return (m_betweenorder != std::vector<data_STAFFITEM>());
 }
 
 //----------------------------------------------------------------------------

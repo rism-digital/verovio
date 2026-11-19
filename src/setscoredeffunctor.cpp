@@ -65,6 +65,11 @@ FunctorCode ReplaceDrawingValuesInStaffDefFunctor::VisitStaffDef(StaffDef *staff
     const StaffDef *newStaffDef = m_newScoreDef->GetStaffDef(staffDef->GetN());
     if (newStaffDef) staffDef->MergeTextStyles(newStaffDef);
 
+    // Same for the staff-item orders. The ones of the new scoreDef replace the ones of a previous staffDef, but not the
+    // ones of the new staffDef, which is the staffDef itself when the initial scoreDef is applied to itself
+    if (newStaffDef != staffDef) staffDef->ReplaceStaffItemOrders(m_newScoreDef);
+    if (newStaffDef) staffDef->ReplaceStaffItemOrders(newStaffDef);
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -292,7 +297,8 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitScoreDef(ScoreDef *scoreDef)
     // m_setAsDrawing to true so it will then be taken into account at the next measure
     if (scoreDef->HasClefInfo(UNLIMITED_DEPTH) || scoreDef->HasKeySigInfo(UNLIMITED_DEPTH)
         || scoreDef->HasMensurInfo(UNLIMITED_DEPTH) || scoreDef->HasMeterSigGrpInfo(UNLIMITED_DEPTH)
-        || scoreDef->HasMeterSigInfo(UNLIMITED_DEPTH)) {
+        || scoreDef->HasMeterSigInfo(UNLIMITED_DEPTH) || scoreDef->HasAboveorder() || scoreDef->HasBeloworder()
+        || scoreDef->HasBetweenorder()) {
         m_upcomingScoreDef.ReplaceDrawingValues(scoreDef);
         m_upcomingScoreDef.m_insertScoreDef = true;
     }

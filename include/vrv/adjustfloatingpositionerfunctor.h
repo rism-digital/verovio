@@ -12,6 +12,9 @@
 
 namespace vrv {
 
+class Measure;
+class ScoreDef;
+
 //----------------------------------------------------------------------------
 // AdjustFloatingPositionersFunctor
 //----------------------------------------------------------------------------
@@ -45,7 +48,72 @@ public:
 protected:
     //
 private:
-    //
+    /**
+     * Adjust the positioners of the current class and placement (or of m_positioners when set).
+     */
+    FunctorCode AdjustCurrentPositioners(StaffAlignment *staffAlignment);
+
+    /**
+     * @name Process a staff alignment with staff-item orders (@aboveorder, @beloworder, @betweenorder) or with
+     * explicit vertical groups (@vgrp) shared across classes.
+     */
+    ///@{
+    FunctorCode AdjustStaffItemOrder(StaffAlignment *staffAlignment);
+    void AdjustLegacyPlace(StaffAlignment *staffAlignment, data_STAFFREL place, bool includeWithin = false);
+    void AdjustOrderedPlace(StaffAlignment *staffAlignment, data_STAFFREL place, bool includeWithin = false);
+    ///@}
+
+    /**
+     * @name Align the vertical groups of a placement and keep them aligned while resolving collisions.
+     */
+    ///@{
+    void AdjustPositionerGroups(StaffAlignment *staffAlignment, data_STAFFREL place);
+    void BuildPositionerGroups(StaffAlignment *staffAlignment, data_STAFFREL place);
+    void StabilizePositionerGroups(StaffAlignment *staffAlignment, data_STAFFREL place,
+        const ArrayOfBoundingBoxes &baseBoxes, const ArrayOfFloatingPositioners &positioners);
+    int GetPositionerGroupIndex(const FloatingPositioner *positioner) const;
+    ///@}
+
+    /**
+     * Return the positioners of a placement in their processing order.
+     * With useStaffItemOrder, the order of the measure and staff of each positioner is applied.
+     * Otherwise, the legacy class order is used above and below, and the encoding order in between.
+     */
+    ArrayOfFloatingPositioners GetOrderedPositioners(
+        StaffAlignment *staffAlignment, data_STAFFREL place, bool includeWithin, bool useStaffItemOrder) const;
+
+    /**
+     * @name Process a class or a list of positioners for a placement.
+     */
+    ///@{
+    void ProcessClass(StaffAlignment *staffAlignment, ClassId classId, data_STAFFREL place);
+    void ProcessPositioners(StaffAlignment *staffAlignment, const ArrayOfFloatingPositioners &positioners,
+        data_STAFFREL place, bool keepGroupPosition);
+    ///@}
+
+    /**
+     * @name Check for explicit vertical groups and staff-item orders.
+     */
+    ///@{
+    bool HasExplicitPositionerGroup(StaffAlignment *staffAlignment, data_STAFFREL place) const;
+    bool HasStaffItemOrder(StaffAlignment *staffAlignment, data_STAFFREL place) const;
+    ///@}
+
+    /**
+     * @name Static helpers for staff-item orders and vertical groups.
+     */
+    ///@{
+    static std::vector<std::pair<ClassId, data_STAFFITEM>> GetStaffItemSteps(const data_STAFFITEM_List &order);
+    static bool MatchesStaffItemStep(
+        const FloatingPositioner *positioner, const std::pair<ClassId, data_STAFFITEM> &step);
+    static const Measure *GetPositionerMeasure(const FloatingPositioner *positioner, const System *system);
+    static const ScoreDef *GetDrawingScoreDef(const Measure *measure, int staffN, const ScoreDef *fallback);
+    static bool HasAnyStaffItemOrder(const ScoreDef *scoreDef);
+    static bool HasSystemStaffItemOrder(const System *system);
+    static int GetAutomaticGroupBucket(const FloatingPositioner *positioner);
+    static void MovePositionerPastBoundingBox(FloatingPositioner *positioner, const BoundingBox *bbox);
+    ///@}
+
 public:
     //
 private:
@@ -53,6 +121,27 @@ private:
     ClassId m_classId;
     // Indicates if we are processing floating objects to be put in between the staff
     bool m_inBetween;
+    // Restrict processing to one placement (NONE keeps the legacy behavior)
+    data_STAFFREL m_place;
+    // Include positioners within the staff in the current below-staff pass
+    bool m_includeWithin;
+    // Restrict processing to a prepared set of positioners
+    const ArrayOfFloatingPositioners *m_positioners;
+    // Keep grouped positioners on their common baseline during collision stabilization
+    bool m_keepGroupPosition;
+    // Allow a stabilization pass to move complete groups in response to collisions
+    bool m_movePositionerGroups;
+    // The vertical groups (explicit or automatic) with at least two positioners
+    std::vector<ArrayOfFloatingPositioners> m_positionerGroups;
+    // The index in m_positionerGroups of each grouped positioner
+    std::map<const FloatingPositioner *, int> m_positionerGroupIndices;
+    // Detect explicit vertical groups that require the ordered grouping path
+    bool m_detectExplicitGroups;
+    bool m_hasExplicitGroups;
+    // Process each staff using its effective scoreDef / staffDef order
+    bool m_useStaffItemOrder;
+    // The legacy processing order of the classes above and below the staff, with their staff-item category
+    static const std::vector<std::pair<ClassId, data_STAFFITEM>> s_defaultStaffItemSteps;
 };
 
 //----------------------------------------------------------------------------
@@ -83,6 +172,7 @@ public:
     ///@{
     void SetClassIDs(const std::vector<ClassId> &classIds) { m_classIds = classIds; }
     void SetPlace(data_STAFFREL place) { m_place = place; }
+    void SetGroupType(int groupType) { m_groupType = groupType; }
     ///@}
 
     /*
@@ -107,6 +197,8 @@ private:
     std::vector<ClassId> m_classIds;
     // The place w.r.t. the staff
     data_STAFFREL m_place;
+    // Negative for explicit groups, positive for automatic groups, zero for both
+    int m_groupType;
 };
 
 //----------------------------------------------------------------------------

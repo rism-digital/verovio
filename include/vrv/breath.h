@@ -21,7 +21,7 @@ namespace vrv {
 /**
  * This class models the MEI <breath> element.
  */
-class Breath : public ControlElement, public TimePointInterface, public AttPlacementRelStaff {
+class Breath : public ControlElement, public TimePointInterface, public AttPlacementRelStaff, public AttVerticalGroup {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

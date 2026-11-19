@@ -23,7 +23,11 @@ class TextElement;
 /**
  * This class models the MEI <cpMark> element.
  */
-class CpMark : public ControlElement, public TextListInterface, public TextDirInterface, public TimeSpanningInterface {
+class CpMark : public ControlElement,
+               public TextListInterface,
+               public TextDirInterface,
+               public TimeSpanningInterface,
+               public AttVerticalGroup {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

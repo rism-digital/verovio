@@ -28,7 +28,8 @@ class Octave : public ControlElement,
                public AttLineRend,
                public AttLineRendBase,
                public AttNNumberLike,
-               public AttOctaveDisplacement {
+               public AttOctaveDisplacement,
+               public AttVerticalGroup {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
