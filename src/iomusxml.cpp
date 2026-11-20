@@ -11,6 +11,7 @@
 
 #include <cassert>
 #include <iterator>
+#include <limits>
 #include <numeric>
 #include <regex>
 #include <sstream>
@@ -48,6 +49,7 @@
 #include "label.h"
 #include "labelabbr.h"
 #include "layer.h"
+#include "layerdef.h"
 #include "lb.h"
 #include "lv.h"
 #include "mdiv.h"
@@ -1074,10 +1076,11 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         }
         else if (IsElement(xpathNode.node(), "score-part")) {
             // get the attributes element of the first measure of the part
-            const std::string partId = xpathNode.node().attribute("id").as_string();
-            std::string xpath = StringFormat("/score-partwise/part[@id='%s']/measure[1]", partId.c_str());
-            pugi::xpath_node partFirstMeasure = root.select_node(xpath.c_str());
-            if (!partFirstMeasure.node().child("attributes")) {
+            const pugi::xml_node scorePart = xpathNode.node();
+            const std::string partId = scorePart.attribute("id").as_string();
+            const pugi::xml_node part = root.find_child_by_attribute("part", "id", partId.c_str());
+            const pugi::xml_node partFirstMeasure = part.child("measure");
+            if (!partFirstMeasure.child("attributes")) {
                 LogWarning("MusicXML import: Could not find the 'attributes' element in the first "
                            "measure of part '%s'",
                     partId.c_str());
@@ -1134,18 +1137,20 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     }
                 }
             }
-            if (midiInstrument && !m_instrdef) {
-                m_instrdef = new InstrDef;
-                m_instrdef->SetMidiInstrname(m_instrdef->AttMidiInstrument::StrToMidinames(
-                    midiInstrument.child("midi-name").text().as_string()));
+            // Part identity is independent of its optional MIDI settings.
+            InstrDef *instrDef = new InstrDef();
+            if (!partId.empty()) instrDef->SetID(partId);
+            if (midiInstrument) {
+                instrDef->SetMidiInstrname(
+                    instrDef->AttMidiInstrument::StrToMidinames(midiInstrument.child("midi-name").text().as_string()));
                 pugi::xml_node midiChannel = midiInstrument.child("midi-channel");
-                if (midiChannel) m_instrdef->SetMidiChannel(midiChannel.text().as_int() - 1);
+                if (midiChannel) instrDef->SetMidiChannel(midiChannel.text().as_int() - 1);
                 // pugi::xml_node midiPan = midiInstrument.child("pan");
                 // if (midiPan) instrdef->SetMidiPan(midiPan.text().as_int());
                 pugi::xml_node midiProgram = midiInstrument.child("midi-program");
-                if (midiProgram) m_instrdef->SetMidiInstrnum(midiProgram.text().as_int() - 1);
+                if (midiProgram) instrDef->SetMidiInstrnum(midiProgram.text().as_int() - 1);
                 pugi::xml_node midiVolume = midiInstrument.child("volume");
-                if (midiVolume) m_instrdef->SetMidiVolume(midiVolume.text().as_int());
+                if (midiVolume) instrDef->SetMidiVolume(midiVolume.text().as_int());
             }
             // MIDI keys of unpitched notes, only for parts playing on the percussion channel 10
             const pugi::xpath_node_set midiInstruments = xpathNode.node().select_nodes("midi-instrument");
@@ -1158,9 +1163,10 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             }
             // create the staffDef(s)
             StaffGrp *partStaffGrp = new StaffGrp();
-            partStaffGrp->SetID(partId.c_str());
             const short int nbStaves
-                = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);
+                = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure, partStaffGrp, staffOffset, instrDef);
+            if (!instrDef->GetParent()) delete instrDef;
+            this->ReadMusicXmlLayerInstruments(scorePart, part, partStaffGrp, nbStaves, staffOffset);
             // if we have more than one staff in the part we create a new staffGrp
             if (nbStaves > 1) {
                 partStaffGrp->SetBarThru(BOOLEAN_true);
@@ -1176,14 +1182,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 delete partStaffGrp;
             }
 
-            // find the part and read it
-            xpath = StringFormat("/score-partwise/part[@id='%s']", partId.c_str());
-            pugi::xpath_node part = root.select_node(xpath.c_str());
-            if (!part) {
-                LogWarning("MusicXML import: Could not find the part '%s'", partId.c_str());
-                continue;
-            }
-            this->ReadMusicXmlPart(part.node(), section, nbStaves, staffOffset);
+            this->ReadMusicXmlPart(part, section, nbStaves, staffOffset);
             // increment the staffOffset for reading the next part
             staffOffset += nbStaves;
         }
@@ -1549,10 +1548,11 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
 }
 
 short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
-    pugi::xml_node node, StaffGrp *staffGrp, const short int staffOffset)
+    pugi::xml_node node, StaffGrp *staffGrp, const short int staffOffset, InstrDef *instrDef)
 {
     assert(node);
     assert(staffGrp);
+    assert(instrDef);
 
     // First get the number of staves in the part
     short int nbStaves = 1;
@@ -1563,10 +1563,9 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
     if (nbStaves > 1) {
         if (m_label) staffGrp->AddChild(m_label);
         if (m_labelAbbr) staffGrp->AddChild(m_labelAbbr);
-        if (m_instrdef) staffGrp->AddChild(m_instrdef);
+        staffGrp->AddChild(instrDef);
         m_label = NULL;
         m_labelAbbr = NULL;
-        m_instrdef = NULL;
     }
 
     bool attributesRead = false;
@@ -1600,13 +1599,11 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
                 staffDef = new StaffDef();
                 staffDef->SetN(i + 1 + staffOffset);
                 if (nbStaves == 1) {
-                    staffDef->SetID(staffGrp->GetID());
                     if (m_label) staffDef->AddChild(m_label);
                     if (m_labelAbbr) staffDef->AddChild(m_labelAbbr);
-                    if (m_instrdef) staffDef->AddChild(m_instrdef);
+                    staffDef->AddChild(instrDef);
                     m_label = NULL;
                     m_labelAbbr = NULL;
-                    m_instrdef = NULL;
                 }
                 staffGrp->AddChild(staffDef);
                 // set initial octave shift
@@ -1770,6 +1767,59 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
     }
 
     return nbStaves;
+}
+
+void MusicXmlInput::ReadMusicXmlLayerInstruments(
+    pugi::xml_node scorePart, pugi::xml_node part, StaffGrp *staffGrp, int nbStaves, int staffOffset)
+{
+    if (!scorePart.child("score-instrument")) return;
+
+    using StaffVoice = std::pair<int, int>;
+    std::map<StaffVoice, std::set<std::string>> instrumentsByLayer;
+    for (pugi::xml_node measure : part.children("measure")) {
+        for (pugi::xml_node note : measure.children("note")) {
+            if (note.child("unpitched")) continue;
+            const int staffNumber = note.child("staff").text().as_int(1);
+            const int voiceNumber = note.child("voice").text().as_int(1);
+            if (staffNumber < 1 || staffNumber > nbStaves || voiceNumber < 1
+                || voiceNumber > std::numeric_limits<short>::max()) {
+                continue;
+            }
+            const pugi::xml_node firstInstrument = note.child("instrument");
+            if (!firstInstrument && note.child("rest")) continue;
+
+            std::set<std::string> &instruments = instrumentsByLayer[{ staffNumber, voiceNumber }];
+            // An unassigned pitched note or multiple instrument references cannot define a single layer instrument.
+            if (!firstInstrument) instruments.insert("");
+            for (pugi::xml_node instrument : note.children("instrument")) {
+                instruments.insert(instrument.attribute("id").as_string());
+            }
+        }
+    }
+
+    // A score instrument shared by multiple voices cannot be copied to multiple instrDefs with the same XML ID.
+    std::map<std::string, int> layersByInstrument;
+    for (const std::pair<const StaffVoice, std::set<std::string>> &entry : instrumentsByLayer) {
+        for (const std::string &id : entry.second) ++layersByInstrument[id];
+    }
+    for (const std::pair<const StaffVoice, std::set<std::string>> &entry : instrumentsByLayer) {
+        if (entry.second.size() != 1) continue;
+        const std::string &id = *entry.second.begin();
+        if (id.empty() || id == scorePart.attribute("id").as_string() || layersByInstrument.at(id) != 1) continue;
+        const pugi::xml_node scoreInstrument = scorePart.find_child_by_attribute("score-instrument", "id", id.c_str());
+        if (!scoreInstrument) continue;
+
+        AttNIntegerComparison matchStaff(STAFFDEF, entry.first.first + staffOffset);
+        StaffDef *staffDef = vrv_cast<StaffDef *>(staffGrp->FindDescendantByComparison(&matchStaff, 1));
+        if (!staffDef) continue;
+        LayerDef *layerDef = new LayerDef();
+        layerDef->SetN(entry.first.second);
+        InstrDef *instrDef = new InstrDef();
+        instrDef->SetID(id);
+        instrDef->SetLabel(scoreInstrument.child("instrument-name").text().as_string());
+        if (!layerDef->AddChild(instrDef)) delete instrDef;
+        if (!staffDef->AddChild(layerDef)) delete layerDef;
+    }
 }
 
 void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *parent)
