@@ -1465,25 +1465,31 @@ void MusicXmlInput::ReadLyricNumbers(pugi::xml_node root)
 {
     // The lyric number is an NMTOKEN that identifies a lyric line, not necessarily an integer: Sibelius, for example,
     // writes "part1verse1" and "part1verse2". Integers are taken as verse numbers. Every other token gets a number
-    // after the highest integer, in order of first appearance, so that distinct lines stay distinct.
-    pugi::xpath_node_set numbers = root.select_nodes("/score-partwise/part/measure/note/lyric/@number");
-    int highest = 0;
-    for (const pugi::xpath_node &number : numbers) {
-        const std::string value = number.attribute().as_string();
-        if (!value.empty() && std::all_of(value.begin(), value.end(), ::isdigit)) {
-            highest = std::max(highest, number.attribute().as_int());
+    // after the highest integer of its part, in order of first appearance in the part, so that distinct lines stay
+    // distinct and every part counts its own lines.
+    for (const pugi::xpath_node &part : root.select_nodes("/score-partwise/part")) {
+        const std::string partId = part.node().attribute("id").as_string();
+        pugi::xpath_node_set numbers = part.node().select_nodes("measure/note/lyric/@number");
+        int highest = 0;
+        for (const pugi::xpath_node &number : numbers) {
+            const std::string value = number.attribute().as_string();
+            if (!value.empty() && std::all_of(value.begin(), value.end(), ::isdigit)) {
+                highest = std::max(highest, number.attribute().as_int());
+            }
         }
-    }
-    for (const pugi::xpath_node &number : numbers) {
-        const std::string value = number.attribute().as_string();
-        if (value.empty() || std::all_of(value.begin(), value.end(), ::isdigit)) continue;
-        if (!m_lyricNumbers.contains(value)) m_lyricNumbers[value] = ++highest;
+        for (const pugi::xpath_node &number : numbers) {
+            const std::string value = number.attribute().as_string();
+            if (value.empty() || std::all_of(value.begin(), value.end(), ::isdigit)) continue;
+            if (!m_lyricNumbers.contains({ partId, value })) m_lyricNumbers[{ partId, value }] = ++highest;
+        }
     }
 }
 
 int MusicXmlInput::GetLyricNumber(const pugi::xml_node lyric) const
 {
-    const auto token = m_lyricNumbers.find(lyric.attribute("number").as_string());
+    // lyric < note < measure < part
+    const std::string partId = lyric.parent().parent().parent().attribute("id").as_string();
+    const auto token = m_lyricNumbers.find({ partId, lyric.attribute("number").as_string() });
     const int number = (token != m_lyricNumbers.end()) ? token->second : lyric.attribute("number").as_int();
     return (number < 1) ? 1 : number;
 }
