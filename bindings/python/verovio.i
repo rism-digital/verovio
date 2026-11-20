@@ -156,6 +156,13 @@ def renderToExpansionMapFile(self, filename: str) -> bool:
     return $action(self, filename)
 %}
 
+// Toolkit::RenderToMIDIJson
+%feature("shadow") vrv::Toolkit::RenderToMIDIJson() %{
+def renderToMIDIJson(self) -> dict:
+    """Render the document to MIDI as JSON (structure of @tonejs/midi with note IDs)."""
+    return json.loads($action(self))
+%}
+
 // Toolkit::RenderToTimemap
 %feature("shadow") vrv::Toolkit::RenderToTimemap(const std::string & = "") %{
 def renderToTimemap(self, options: Optional[dict] = None) -> list:

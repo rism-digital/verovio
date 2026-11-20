@@ -55,6 +55,11 @@ public:
     ///@}
 
     /**
+     * Return true if at least one lyric or text style attribute is set
+     */
+    bool HasTextStyles() const;
+
+    /**
      * Set the lyric and text style attributes given in another interface
      */
     void MergeTextStyles(const ScoreDefInterface *other);

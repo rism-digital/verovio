@@ -11,6 +11,7 @@
 
 #include <cassert>
 #include <math.h>
+#include <memory>
 #include <ranges>
 
 //----------------------------------------------------------------------------
@@ -39,6 +40,7 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "midifunctor.h"
+#include "midijsonbuilder.h"
 #include "miscfunctor.h"
 #include "mnum.h"
 #include "mrest.h"
@@ -443,9 +445,14 @@ void Doc::CalculateTimemap()
     m_timemapTempo = m_options->m_midiTempoAdjustment.GetValue();
 }
 
-void Doc::ExportMIDI(smf::MidiFile *midiFile)
+void Doc::ExportMIDI(smf::MidiFile *midiFile, std::string *midiJson)
 {
     midiFile->absoluteTicks();
+
+    // The MIDI JSON is built from the same events as the MIDI file
+    std::unique_ptr<MIDIJsonBuilder> midiJsonBuilder;
+    if (midiJson) midiJsonBuilder = std::make_unique<MIDIJsonBuilder>(midiFile->getTPQ());
+    MIDIJsonBuilder *builder = midiJsonBuilder.get();
 
     if (!this->HasTimemap()) {
         // generate MIDI timemap before progressing
@@ -465,11 +472,13 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         tempo = scoreDef->GetMidiBpm();
         tempoEventTicks.insert(0);
         midiFile->addTempo(0, 0, tempo);
+        if (builder) builder->AddTempo(0, 0, tempo);
     }
     else if (scoreDef->HasMm()) {
         tempo = Tempo::CalcTempo(scoreDef);
         tempoEventTicks.insert(0);
         midiFile->addTempo(0, 0, tempo);
+        if (builder) builder->AddTempo(0, 0, tempo);
     }
 
     // set MIDI tuning
@@ -555,6 +564,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                 }
                 if (instrDef->HasMidiInstrnum()) {
                     midiFile->addPatchChange(midiTrack, 0, midiChannel, instrDef->GetMidiInstrnum());
+                    if (builder) builder->AddProgramChange(midiTrack, 0, midiChannel, instrDef->GetMidiInstrnum());
                 }
             }
             // set MIDI track name
@@ -566,7 +576,10 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             }
             if (label) {
                 std::string trackName = UTF32to8(label->GetText()).c_str();
-                if (!trackName.empty()) midiFile->addTrackName(midiTrack, 0, trackName);
+                if (!trackName.empty()) {
+                    midiFile->addTrackName(midiTrack, 0, trackName);
+                    if (builder) builder->AddMeta(midiTrack, 0, MIDIJsonBuilder::MetaType::TrackName, trackName);
+                }
             }
             // set MIDI key signature
             KeySig *keySig = vrv_cast<KeySig *>(staffDef->FindDescendantByType(KEYSIG));
@@ -575,6 +588,9 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             }
             if (keySig && keySig->HasSig()) {
                 midiFile->addKeySignature(midiTrack, 0, keySig->GetFifthsInt(), (keySig->GetMode() == MODE_minor));
+                if (builder) {
+                    builder->AddKeySignature(midiTrack, 0, keySig->GetFifthsInt(), (keySig->GetMode() == MODE_minor));
+                }
             }
             // set MIDI time signature
             MeterSig *meterSig = vrv_cast<MeterSig *>(staffDef->FindDescendantByType(METERSIG));
@@ -583,9 +599,13 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             }
             if (meterSig && meterSig->HasCount() && meterSig->HasUnit()) {
                 midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetUnit());
+                if (builder) builder->AddTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetUnit());
             }
             else if (meterSig && meterSig->HasSym()) {
                 midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetSymImplicitUnit());
+                if (builder) {
+                    builder->AddTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetSymImplicitUnit());
+                }
             }
         }
 
@@ -594,6 +614,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         generateScoreDefMIDI.SetChannel(midiChannel);
         generateScoreDefMIDI.SetTrack(midiTrack);
         generateScoreDefMIDI.SetInstrDef(instrDef);
+        generateScoreDefMIDI.SetMIDIJsonBuilder(builder);
 
         scoreDef->Process(generateScoreDefMIDI);
 
@@ -622,6 +643,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             generateMIDI.SetControlEvents(controlEvents);
             generateMIDI.SetInstrDef(instrDef);
             generateMIDI.SetCustomTuning(scoreDef->GetCustomTuning());
+            generateMIDI.SetMIDIJsonBuilder(builder);
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
             this->Process(generateMIDI);
@@ -632,6 +654,8 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         }
     }
     midiFile->sortTracksNoteOffsBeforeOns();
+
+    if (builder) builder->Finalize(midiFile->getTrackCount(), *midiJson);
 }
 
 bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeasures, bool useFractions)
