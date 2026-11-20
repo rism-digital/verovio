@@ -262,6 +262,13 @@ export class VerovioToolkit {
      */
     renderToMIDI(): string;
     /**
+     * Render the document to MIDI as JSON.
+     *
+     * The structure is the one of @tonejs/midi (Midi.toJSON()), with the ID of the note added to each note.
+     * @returns {MIDIJson} The MIDI as a JSON object
+     */
+    renderToMIDIJson(): MIDIJson;
+    /**
      * Render a document to Plaine and Easie code.
      *
      * Only the top staff / layer is exported.
@@ -329,6 +336,7 @@ export type EditorStatus = import("./EditorTypes").EditorStatus;
 export type EditorResponse = import("./EditorTypes").EditorResponse;
 export type AvailableOptions = import("./AvailableOptions").AvailableOptions;
 export type MIDIValues = import("./VerovioTypes").MIDIValues;
+export type MIDIJson = import("./VerovioTypes").MIDIJson;
 export type GetMeiOptions = import("./VerovioTypes").GetMeiOptions;
 export type TimeMapEntry = import("./VerovioTypes").TimeMapEntry;
 export type TimeMapOptions = import("./VerovioTypes").TimeMapOptions;

@@ -364,6 +364,19 @@ bool vrvToolkit_renderToMIDIFile(void *tkPtr, const char *filename)
     return tk->RenderToMIDIFile(filename);
 }
 
+const char *vrvToolkit_renderToMIDIJson(void *tkPtr)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->RenderToMIDIJson());
+    return tk->GetCString();
+}
+
+bool vrvToolkit_renderToMIDIJsonFile(void *tkPtr, const char *filename)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    return tk->RenderToMIDIJsonFile(filename);
+}
+
 const char *vrvToolkit_renderToPAE(void *tkPtr)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);

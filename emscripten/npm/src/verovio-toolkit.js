@@ -8,6 +8,7 @@ import { createEmscriptenProxy } from "./emscripten-proxy.js";
 /** @typedef {import("./types/EditorTypes").EditorResponse} EditorResponse */
 /** @typedef {import("./types/AvailableOptions").AvailableOptions} AvailableOptions */
 /** @typedef {import("./types/VerovioTypes").MIDIValues} MIDIValues */
+/** @typedef {import("./types/VerovioTypes").MIDIJson} MIDIJson */
 /** @typedef {import("./types/VerovioTypes").GetMeiOptions} GetMeiOptions */
 /** @typedef {import("./types/VerovioTypes").TimeMapEntry} TimeMapEntry */
 /** @typedef {import("./types/VerovioTypes").TimeMapOptions} TimeMapOptions */
@@ -425,6 +426,16 @@ export class VerovioToolkit {
      */
     renderToMIDI() {
         return this.proxy.renderToMIDI(this.ptr);
+    }
+
+    /**
+     * Render the document to MIDI as JSON.
+     *
+     * The structure is the one of @tonejs/midi (Midi.toJSON()), with the ID of the note added to each note.
+     * @returns {MIDIJson} The MIDI as a JSON object
+     */
+    renderToMIDIJson() {
+        return JSON.parse(this.proxy.renderToMIDIJson(this.ptr));
     }
 
     /**

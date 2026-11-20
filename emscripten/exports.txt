@@ -37,6 +37,7 @@ _vrvToolkit_redoPagePitchPosLayout
 _vrvToolkit_renderData
 _vrvToolkit_renderToExpansionMap
 _vrvToolkit_renderToMIDI
+_vrvToolkit_renderToMIDIJson
 _vrvToolkit_renderToPAE
 _vrvToolkit_renderToSVG
 _vrvToolkit_renderToTimemap
