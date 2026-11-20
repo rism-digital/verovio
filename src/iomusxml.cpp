@@ -1459,21 +1459,12 @@ void MusicXmlInput::CreateExpansion(Section *section)
     }
 }
 
-bool MusicXmlInput::IsMeasureRestByDuration(const std::string &typeStr, int dots, int duration) const
+void MusicXmlInput::UpdateMeasureDuration()
 {
-    // A rest from the start to the end of the measure whose type gives another duration is a measure rest: Sibelius,
-    // for example, writes the rest of a full 6/8 measure as <type>whole</type> without measure="yes". Taking the type
-    // would make the measure four quarters long.
-    if ((m_ppq <= 0) || (m_durTotal != 0) || (duration <= 0)) return false;
-    MeterSig meterSig;
-    meterSig.SetCount({ m_meterCount, m_meterSign });
-    const int totalCount = meterSig.GetTotalCount();
-    if ((totalCount <= 0) || (m_meterUnit <= 0)) return false;
-    if (duration * m_meterUnit != m_ppq * 4 * totalCount) return false;
-    // The duration of the type and dots, in divisions (a quarter is m_ppq, see the @dur values of ConvertTypeToDur)
-    const double typeDuration
-        = m_ppq * 16.0 / std::pow(2.0, (int)ConvertTypeToDur(typeStr)) * (2.0 - std::pow(0.5, dots));
-    return (std::abs(typeDuration - duration) > 0.001);
+    // A <time> without <beat-type> (senza-misura) leaves m_meterUnit at 0
+    m_measureDuration = ((m_ppq > 0) && (m_meterUnit > 0) && (m_meterTotalCount > 0))
+        ? 4.0 * m_ppq * m_meterTotalCount / m_meterUnit
+        : 0.0;
 }
 
 void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
@@ -1777,6 +1768,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
             if (divisions) {
                 m_ppq = divisions.node().text().as_int();
                 staffDef->SetPpq(m_ppq);
+                this->UpdateMeasureDuration();
             }
             // measure style
             pugi::xpath_node measureSlash = child.select_node("measure-style/slash");
@@ -1801,6 +1793,8 @@ void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *par
         meterSigGrp->SetFunc(interchangeable ? meterSigGrpLog_FUNC_interchanging : meterSigGrpLog_FUNC_mixed);
 
         std::tie(m_meterCount, m_meterUnit) = this->GetMeterSigGrpValues(time, meterSigGrp);
+        // The counts are all in m_meterUnit
+        m_meterTotalCount = std::accumulate(m_meterCount.begin(), m_meterCount.end(), 0);
         if (interchangeable) {
             std::tie(std::ignore, std::ignore) = this->GetMeterSigGrpValues(interchangeable.node(), meterSigGrp);
         }
@@ -1834,6 +1828,7 @@ void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *par
             meterSig->SetCount({ m_meterCount, m_meterSign });
             m_meterUnit = beatType.text().as_int();
             meterSig->SetUnit(m_meterUnit);
+            m_meterTotalCount = meterSig->GetTotalCount();
         }
         else if (time.child("senza-misura")) {
             if (time.child("senza-misura").text()) {
@@ -1848,6 +1843,7 @@ void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *par
         }
         parent->AddChild(meterSig);
     }
+    this->UpdateMeasureDuration();
 }
 
 bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, short int nbStaves, short int staffOffset)
@@ -2024,10 +2020,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     }
 
     // set metcon to false for pickup measures
-    int measureTotal = m_ppq * 4;
-    for (const int &num : m_meterCount) measureTotal *= num;
-    measureTotal /= m_meterUnit;
-    if (m_durTotal && m_durTotal != measureTotal) {
+    if (m_durTotal && (m_measureDuration > 0) && (std::abs(m_durTotal - m_measureDuration) > 0.001)) {
         measure->SetMetcon(BOOLEAN_false);
     }
 
@@ -2107,6 +2100,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Section *section
         // we'll only convert this to MEI if it actually changes
         divisionChange = (m_ppq != divisions.text().as_int());
         m_ppq = divisions.text().as_int();
+        this->UpdateMeasureDuration();
     }
 
     // read clef changes as MEI clef and add them to the stack
@@ -2160,6 +2154,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Section *section
     }
     else if (time && node.select_node("ancestor::part[(preceding-sibling::part)]")) {
         m_meterUnit = time.child("beat-type").text().as_int();
+        this->UpdateMeasureDuration();
     }
 
     pugi::xpath_node measureRepeat = node.select_node("measure-style/measure-repeat");
@@ -3080,11 +3075,18 @@ void MusicXmlInput::ReadMusicXmlNote(
     if (m_ppq < 0 && duration && !typeStr.empty()) {
         // if divisions are missing, try to calculate
         m_ppq = (double)duration * pow(2, ConvertTypeToDur(typeStr) - 2) / 4;
+        this->UpdateMeasureDuration();
     }
 
     if (rest) {
         const std::string stepStr = rest.child("display-step").text().as_string();
         const std::string octaveStr = rest.child("display-octave").text().as_string();
+        // A rest that fills the measure but whose type gives another duration is a measure rest: Sibelius, for
+        // example, writes the rest of a full 6/8 measure as <type>whole</type> without measure="yes"
+        const bool fillsMeasure
+            = (m_durTotal == 0) && (m_measureDuration > 0) && (std::abs(duration - m_measureDuration) < 0.001);
+        const double typeDuration
+            = m_ppq * 16.0 / std::pow(2.0, (int)ConvertTypeToDur(typeStr)) * (2.0 - std::pow(0.5, dots));
         if (HasAttributeWithValue(node, "print-object", "no")) {
             Space *space = new Space();
             element = space;
@@ -3111,7 +3113,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
         // we assume /note without /type or with duration of an entire bar to be mRest
         else if (typeStr.empty() || rest.attribute("measure").as_bool()
-            || this->IsMeasureRestByDuration(typeStr, dots, duration)) {
+            || (fillsMeasure && (std::abs(typeDuration - duration) > 0.001))) {
             if (m_slash) {
                 MeterSig tmpMeterSig;
                 tmpMeterSig.SetCount({ m_meterCount, m_meterSign });
