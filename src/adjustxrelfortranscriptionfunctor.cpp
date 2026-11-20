@@ -45,7 +45,9 @@ FunctorCode AdjustXRelForTranscriptionFunctor::VisitMeasure(Measure *measure)
 {
     // Neume lines have no barlines
     if (measure->IsNeumeLine()) return FUNCTOR_CONTINUE;
-    if ((measure->m_drawingFacsX1 == VRV_UNSET) || (measure->m_drawingFacsX2 == VRV_UNSET)) return FUNCTOR_CONTINUE;
+    if ((measure->m_drawingFacsX1 == VRV_UNSET) || (measure->m_drawingFacsX2 == VRV_UNSET)) {
+        return FUNCTOR_CONTINUE;
+    }
 
     // The measure barlines are not children of the measure and have no zone: place them at the edges of the measure
     // zone. The right barline is drawn from its left, so its width is subtracted for it to end at the right edge.
@@ -82,7 +84,9 @@ void AdjustXRelForTranscriptionFunctor::AdjustStaffDefElements(Measure *measure,
         bool hasElement = false;
         for (LayerElement *element : column) {
             // Skip elements drawing nothing, such as a key signature without accidentals
-            if (!element->HasSelfBB() || (element->GetSelfX2() <= element->GetSelfX1())) continue;
+            if (!element->HasSelfBB() || (element->GetSelfX2() <= element->GetSelfX1())) {
+                continue;
+            }
             if (!hasElement) x += doc->GetLeftMargin(element) * unit;
             hasElement = true;
             // The position without the relative x, to which the relative x is set for the left to be at x

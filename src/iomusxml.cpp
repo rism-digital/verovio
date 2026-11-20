@@ -4280,7 +4280,9 @@ bool MusicXmlInput::ReadMusicXmlLayout(pugi::xml_node root)
         }
         partStaffHeights.push_back(heights);
     }
-    if (partMeasures.empty() || partMeasures.front().empty()) return false;
+    if (partMeasures.empty() || partMeasures.front().empty()) {
+        return false;
+    }
     const std::vector<pugi::xml_node> &measures = partMeasures.front();
     for (const pugi::xml_node &measure : measures) {
         if (!measure.attribute("width")) {
@@ -4339,7 +4341,9 @@ bool MusicXmlInput::ReadMusicXmlLayout(pugi::xml_node root)
                     const bool printed = details.attribute("print-object").as_bool();
                     const int number = details.attribute("number").as_int();
                     for (int staff = 0; staff < (int)staffPrinted.at(part).size(); ++staff) {
-                        if ((number == 0) || (number == staff + 1)) staffPrinted.at(part).at(staff) = printed;
+                        if ((number == 0) || (number == staff + 1)) {
+                            staffPrinted.at(part).at(staff) = printed;
+                        }
                     }
                 }
             }
@@ -4432,7 +4436,9 @@ void MusicXmlInput::SetMeasureFacsimile(Measure *measure, int index, bool withMe
 {
     assert(measure);
 
-    if (!this->HasFacsimileLayout() || (index < 0) || (index >= (int)m_measureLayouts.size())) return;
+    if (!this->HasFacsimileLayout() || (index < 0) || (index >= (int)m_measureLayouts.size())) {
+        return;
+    }
 
     const musicxml::MeasureLayout &layout = m_measureLayouts.at(index);
     const musicxml::SystemLayout &system = m_systemLayouts.at(layout.m_system);
@@ -4440,7 +4446,7 @@ void MusicXmlInput::SetMeasureFacsimile(Measure *measure, int index, bool withMe
 
     double right = layout.m_x + layout.m_width;
     // A multi-measure rest spans the following measures of the system
-    const auto multiRest = m_multiRests.find(index);
+    const std::map<int, int>::const_iterator multiRest = m_multiRests.find(index);
     if ((multiRest != m_multiRests.end()) && (multiRest->second < (int)m_measureLayouts.size())) {
         const musicxml::MeasureLayout &last = m_measureLayouts.at(multiRest->second);
         if (last.m_system == layout.m_system) right = last.m_x + last.m_width;
@@ -4461,7 +4467,8 @@ void MusicXmlInput::SetMeasureFacsimile(Measure *measure, int index, bool withMe
             staff->SetVisible(BOOLEAN_false);
             continue;
         }
-        const auto staffLayout = system.m_staffTopsAndHeights.find(staff->GetN());
+        const std::map<int, std::pair<double, double>>::const_iterator staffLayout
+            = system.m_staffTopsAndHeights.find(staff->GetN());
         if (staffLayout == system.m_staffTopsAndHeights.end()) continue;
         const double top = staffLayout->second.first;
         const double height = staffLayout->second.second;
@@ -4474,7 +4481,9 @@ void MusicXmlInput::SetBreakFacsimile(Object *object, int index, int pageOffset)
 {
     assert(object);
 
-    if (!this->HasFacsimileLayout() || (index < 0) || (index >= (int)m_measureLayouts.size())) return;
+    if (!this->HasFacsimileLayout() || (index < 0) || (index >= (int)m_measureLayouts.size())) {
+        return;
+    }
 
     const musicxml::MeasureLayout &layout = m_measureLayouts.at(index);
     FacsimileInterface *interface = object->GetFacsimileInterface();
@@ -4497,15 +4506,20 @@ void MusicXmlInput::SetBreakFacsimile(Object *object, int index, int pageOffset)
 
 void MusicXmlInput::SetNoteFacsimile(pugi::xml_node node, LayerElement *element, Staff *staff, int index)
 {
-    if (!this->HasFacsimileLayout() || !element || !staff) return;
-    if ((index < 0) || (index >= (int)m_measureLayouts.size())) return;
+    if (!this->HasFacsimileLayout() || !element || !staff) {
+        return;
+    }
+    if ((index < 0) || (index >= (int)m_measureLayouts.size())) {
+        return;
+    }
     if (!element->IsAnyOf(std::array{ NOTE, REST })) return;
     // Without a default-x, the element is not positioned from the facsimile
     if (!node.attribute("default-x")) return;
 
     const musicxml::MeasureLayout &layout = m_measureLayouts.at(index);
     const musicxml::SystemLayout &system = m_systemLayouts.at(layout.m_system);
-    const auto staffLayout = system.m_staffTopsAndHeights.find(staff->GetN());
+    const std::map<int, std::pair<double, double>>::const_iterator staffLayout
+        = system.m_staffTopsAndHeights.find(staff->GetN());
     if (staffLayout == system.m_staffTopsAndHeights.end()) return;
     const double top = staffLayout->second.first;
     const double bottom = top + staffLayout->second.second;
@@ -4530,9 +4544,13 @@ void MusicXmlInput::SetNoteFacsimile(pugi::xml_node node, LayerElement *element,
         if (!lyric.attribute("default-y")) continue;
         const int lyricNumber = std::max(1, lyric.attribute("number").as_int());
         for (Object *child : lyricHost->GetChildren()) {
-            if (!child->Is(VERSE) || (vrv_cast<Verse *>(child)->GetN() != lyricNumber)) continue;
+            if (!child->Is(VERSE) || (vrv_cast<Verse *>(child)->GetN() != lyricNumber)) {
+                continue;
+            }
             Syl *syl = vrv_cast<Syl *>(child->FindDescendantByType(SYL));
-            if (!syl || syl->HasFacs()) break;
+            if (!syl || syl->HasFacs()) {
+                break;
+            }
             // The center of a notehead is about half a staff space from its left
             const double center = x + 5.0 + lyric.attribute("relative-x").as_double();
             const double baseline

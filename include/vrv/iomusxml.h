@@ -58,10 +58,10 @@ class Slur;
 class Staff;
 class StaffGrp;
 class Surface;
-class Zone;
 class Tempo;
 class Tie;
 class Trill;
+class Zone;
 
 //----------------------------------------------------------------------------
 // namespace for local MusicXML classes

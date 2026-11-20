@@ -62,7 +62,9 @@ FunctorCode SyncFromFacsimileFunctor::VisitLayerElement(LayerElement *layerEleme
         const Staff *staff = vrv_cast<const Staff *>(layerElement->GetFirstAncestor(STAFF));
         const bool isHidden = (staff && (staff->GetVisible() == BOOLEAN_false));
         const bool isGestural = (layerElement->Is(ACCID) && !vrv_cast<Accid *>(layerElement)->HasAccid());
-        if (!layerElement->Is(SYL) && !isHidden && !isGestural) ++m_zonelessCount;
+        if (!layerElement->Is(SYL) && !isHidden && !isGestural) {
+            ++m_zonelessCount;
+        }
         return FUNCTOR_CONTINUE;
     }
     layerElement->m_drawingFacsX = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR - m_pageMarginLeft);
