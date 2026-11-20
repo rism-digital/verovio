@@ -29,6 +29,7 @@
 #include "iohumdrum.h"
 #include "iomei.h"
 #include "iomusxml.h"
+#include "iomusxmloutput.h"
 #include "iopae.h"
 #include "iovolpiano.h"
 #include "layer.h"
@@ -1949,6 +1950,32 @@ std::string Toolkit::RenderToMIDI()
         reinterpret_cast<const unsigned char *>(stream.str().c_str()), (unsigned int)stream.str().length());
 
     return outputstr;
+}
+
+std::string Toolkit::RenderToMusicXML()
+{
+    if (this->GetPageCount() == 0) {
+        LogWarning("No data loaded");
+        return "";
+    }
+    if (m_doc.HasSelection()) {
+        LogError("MusicXML output requires the full score");
+        return "";
+    }
+
+    MusicXmlOutput output(&m_doc);
+    return output.Export();
+}
+
+bool Toolkit::RenderToMusicXMLFile(const std::string &filename)
+{
+    const std::string output = this->RenderToMusicXML();
+    if (output.empty()) return false;
+
+    std::ofstream file(filename);
+    file << output;
+    file.close();
+    return static_cast<bool>(file);
 }
 
 std::string Toolkit::RenderToPAE()

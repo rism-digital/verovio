@@ -459,6 +459,23 @@ public:
     bool RenderToMIDIFile(const std::string &filename);
 
     /**
+     * Render the loaded score to partwise MusicXML.
+     *
+     * @return The MusicXML as a string, or an empty string on failure
+     */
+    std::string RenderToMusicXML();
+
+    /**
+     * Render the loaded score to partwise MusicXML and save it to a file.
+     *
+     * @remark nojs
+     *
+     * @param filename The output filename
+     * @return True if the file was successfully written
+     */
+    bool RenderToMusicXMLFile(const std::string &filename);
+
+    /**
      * Render a document to Plaine & Easie code.
      *
      * Only the top staff / layer is exported.

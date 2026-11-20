@@ -962,7 +962,7 @@ Options::Options()
 
     m_outputTo.SetInfo("Output to",
         "Select output format to: \"mei\", \"mei-pb\", \"mei-facs\", \"mei-basic\", \"svg\", \"midi\", \"timemap\", "
-        "\"expansionmap\", \"humdrum\", \"pae\" or \"mei-pb-serialized\"");
+        "\"expansionmap\", \"humdrum\", \"pae\", \"musicxml\" or \"mei-pb-serialized\"");
     m_outputTo.Init("svg");
     m_outputTo.SetKey("outputTo");
     m_outputTo.SetShortOption('t', true);
@@ -2037,6 +2037,9 @@ bool Options::SetOutputTo(std::string const &outputTo)
     }
     else if (outputTo == "pae") {
         m_outputToFormat = PAE;
+    }
+    else if (outputTo == "musicxml") {
+        m_outputToFormat = MUSICXML;
     }
     else if (outputTo == "mei-pb-serialized") {
         m_outputToFormat = SERIALIZATION;

@@ -282,11 +282,11 @@ int main(int argc, char **argv)
     }
 
     const std::vector<std::string> outformats = { "mei", "mei-basic", "mei-pb", "mei-facs", "svg", "midi", "timemap",
-        "expansionmap", "humdrum", "hum", "pae", "mei-pb-serialized" };
+        "expansionmap", "humdrum", "hum", "pae", "musicxml", "mei-pb-serialized" };
     if (std::find(outformats.begin(), outformats.end(), outformat) == outformats.end()) {
         std::cerr << "Output format (" << outformat
                   << ") can only be 'mei', 'mei-basic', 'mei-pb', mei-facs', 'svg', 'midi', 'timemap', 'expansionmap', "
-                     "'humdrum', 'hum', 'pae', or , 'mei-pb-serialized'."
+                     "'humdrum', 'hum', 'pae', 'musicxml', or 'mei-pb-serialized'."
                   << std::endl;
         exit(1);
     }
@@ -309,9 +309,15 @@ int main(int argc, char **argv)
         outfile = RemoveExtension(outfile);
     }
 
-    // Skip the layout for MIDI and timemap output by setting --breaks to none
-    if ((outformat == "mei") || (outformat == "midi") || (outformat == "timemap") || (outformat == "expansionmap")) {
+    // These formats do not require page layout.
+    if ((outformat == "mei") || (outformat == "midi") || (outformat == "timemap") || (outformat == "expansionmap")
+        || (outformat == "musicxml")) {
         toolkit.SetOptions("{'breaks': 'none'}");
+    }
+
+    if (page && (outformat == "musicxml")) {
+        std::cerr << "MusicXML output requires the full score." << std::endl;
+        return 1;
     }
 
     // Load the std input or load the file
@@ -545,6 +551,21 @@ int main(int argc, char **argv)
             exit(1);
         }
         else {
+            std::cerr << "Output written to " << outfile << "." << std::endl;
+        }
+    }
+    else if (outformat == "musicxml") {
+        if (stdOutput) {
+            const std::string output = toolkit.RenderToMusicXML();
+            if (output.empty()) return 1;
+            std::cout << output;
+        }
+        else {
+            outfile += ".musicxml";
+            if (!toolkit.RenderToMusicXMLFile(outfile)) {
+                std::cerr << "Unable to write MusicXML to " << outfile << "." << std::endl;
+                return 1;
+            }
             std::cerr << "Output written to " << outfile << "." << std::endl;
         }
     }

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="4.0">
+   <part-list>
+      <score-part id="external-violin">
+         <part-name>Violin</part-name>
+      </score-part>
+      <score-part id="external-piano">
+         <part-name>Piano</part-name>
+         <score-instrument id="piano-sound">
+            <instrument-name>Piano</instrument-name>
+         </score-instrument>
+         <midi-instrument id="piano-sound">
+            <midi-channel>2</midi-channel>
+            <midi-program>1</midi-program>
+         </midi-instrument>
+      </score-part>
+   </part-list>
+   <part id="external-violin">
+      <measure number="1">
+         <attributes>
+            <divisions>1</divisions>
+            <time><beats>4</beats><beat-type>4</beat-type></time>
+            <clef><sign>G</sign><line>2</line></clef>
+         </attributes>
+         <note><rest measure="yes"/><duration>4</duration></note>
+      </measure>
+   </part>
+   <part id="external-piano">
+      <measure number="1">
+         <attributes>
+            <divisions>1</divisions>
+            <time><beats>4</beats><beat-type>4</beat-type></time>
+            <staves>2</staves>
+            <clef number="1"><sign>G</sign><line>2</line></clef>
+            <clef number="2"><sign>F</sign><line>4</line></clef>
+         </attributes>
+         <note><rest measure="yes"/><duration>4</duration><voice>1</voice><staff>1</staff></note>
+         <backup><duration>4</duration></backup>
+         <note><rest measure="yes"/><duration>4</duration><voice>2</voice><staff>2</staff></note>
+      </measure>
+   </part>
+</score-partwise>
