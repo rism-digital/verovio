@@ -35,6 +35,7 @@
 #include "dynam.h"
 #include "ending.h"
 #include "f.h"
+#include "facsimile.h"
 #include "fb.h"
 #include "fermata.h"
 #include "fing.h"
@@ -78,6 +79,7 @@
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
+#include "surface.h"
 #include "syl.h"
 #include "tabdursym.h"
 #include "tabgrp.h"
@@ -90,6 +92,7 @@
 #include "turn.h"
 #include "verse.h"
 #include "vrv.h"
+#include "zone.h"
 
 namespace vrv {
 
@@ -927,6 +930,10 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     Section *section = new Section();
     score->AddChild(section);
     m_sections.push_back({ musicxml::SectionInfo(), {} });
+    // the encoded layout is used to create a facsimile only when requested
+    if (m_doc->GetOptions()->m_useFacsimile.GetValue()) {
+        this->ReadMusicXmlLayout(root);
+    }
     // initialize layout
     if (root.select_node("/score-partwise/part/measure/print[@new-system or @new-page]")) {
         m_layoutInformation = LAYOUT_ENCODED;
@@ -934,7 +941,16 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             // always start with a new page
             Pb *pb = new Pb();
             section->AddChild(pb);
+            this->SetBreakFacsimile(pb, 0);
         }
+    }
+    // A facsimile needs the page break giving the surface of the first page, even without any encoded break
+    if (this->HasFacsimileLayout() && !section->FindDescendantByType(PB)
+        && !root.select_node("/score-partwise/part[1]/measure[1]/print[@new-page]")) {
+        m_layoutInformation = LAYOUT_ENCODED;
+        Pb *pb = new Pb();
+        section->AddChild(pb);
+        this->SetBreakFacsimile(pb, 0);
     }
 
     pugi::xpath_node layout = root.select_node("/score-partwise/defaults/page-layout");
@@ -1317,6 +1333,11 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             LogWarning("MusicXML import: trill extender for '%s' could not be ended", iter.first->GetID().c_str());
         }
         m_trillStack.clear();
+    }
+
+    // The facsimile positions the content (see Toolkit::LoadData)
+    if (this->HasFacsimileLayout()) {
+        m_doc->SetType(FacTranscription);
     }
 
     return true;
@@ -2006,7 +2027,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         }
         // for now only check first part
         else if (IsElement(child, "print") && node.select_node("parent::part[not(preceding-sibling::part)]")) {
-            this->ReadMusicXmlPrint(child, section);
+            this->ReadMusicXmlPrint(child, section, index);
         }
     }
 
@@ -2050,6 +2071,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     // clear current layer
     m_isLayerInitialized = false;
     m_currentLayer = NULL;
+
+    // The measure itself is kept only for the first part, the other parts are merged into it
+    this->SetMeasureFacsimile(measure, index, (staffOffset == 0));
 
     return true;
 }
@@ -4111,6 +4135,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
     }
 
+    this->SetNoteFacsimile(node, (note) ? note : element, staff, m_measureCounts.at(measure));
+
     // add StartIDs to dir, dynam, and pedal
     if (!m_dirStack.empty()) {
         for (Dir *dir : m_dirStack) {
@@ -4189,7 +4215,7 @@ void MusicXmlInput::AddAccidental(pugi::xml_node accidental, Note *note)
     note->AddChild(accid);
 }
 
-void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
+void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section, int index)
 {
     assert(node);
     assert(section);
@@ -4199,16 +4225,378 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
         for (int i = 0; i < pageBreaks; ++i) {
             Pb *pb = new Pb();
             section->AddChild(pb);
+            // blank pages come before the page of the measure
+            this->SetBreakFacsimile(pb, index, i - pageBreaks + 1);
         }
     }
 
-    if (node.attribute("new-system").as_bool()) {
+    // With a facsimile, the first measure always starts a page, so a system break is not needed there
+    if (node.attribute("new-system").as_bool() && !(this->HasFacsimileLayout() && (index == 0))) {
         Sb *sb = new Sb();
         section->AddChild(sb);
+        this->SetBreakFacsimile(sb, index);
     }
 
     if (std::string(node.child("measure-numbering").text().as_string()) == "none") {
         m_doc->GetFirstScoreDef()->SetMnumVisible(BOOLEAN_false);
+    }
+}
+
+bool MusicXmlInput::ReadMusicXmlLayout(pugi::xml_node root)
+{
+    assert(root);
+
+    // The value of a layout element (e.g., "system-layout/system-distance") in a <print> or in the <defaults>
+    auto layoutValue = [](pugi::xml_node node, const char *path, double fallback) {
+        const pugi::xml_node value = node.select_node(path).node();
+        return (value) ? value.text().as_double() : fallback;
+    };
+
+    const pugi::xml_node defaults = root.child("defaults");
+    const double pageWidth = layoutValue(defaults, "page-layout/page-width", 0.0);
+    const double pageHeight = layoutValue(defaults, "page-layout/page-height", 0.0);
+    if ((pageWidth <= 0.0) || (pageHeight <= 0.0)) {
+        LogWarning("MusicXML import: No page layout is encoded, the facsimile cannot be created");
+        return false;
+    }
+
+    // The measures of each part, and the height of each staff of each part
+    std::vector<std::vector<pugi::xml_node>> partMeasures;
+    std::vector<std::vector<double>> partStaffHeights;
+    for (pugi::xml_node part : root.children("part")) {
+        std::vector<pugi::xml_node> measures;
+        for (pugi::xml_node measure : part.children("measure")) measures.push_back(measure);
+        partMeasures.push_back(measures);
+        const pugi::xml_node staves = part.select_node("measure/attributes/staves").node();
+        const int staffCount = (staves) ? std::max(1, staves.text().as_int()) : 1;
+        std::vector<double> heights;
+        for (int staff = 1; staff <= staffCount; ++staff) {
+            const std::string xpath = StringFormat("measure/attributes/staff-details[@number='%d']/staff-lines", staff);
+            pugi::xml_node lines = part.select_node(xpath.c_str()).node();
+            if (!lines) lines = part.select_node("measure/attributes/staff-details[not(@number)]/staff-lines").node();
+            const int lineCount = (lines) ? lines.text().as_int() : 5;
+            // The distance between two staff lines is 10 tenths
+            heights.push_back(std::max(0, lineCount - 1) * 10.0);
+        }
+        partStaffHeights.push_back(heights);
+    }
+    if (partMeasures.empty() || partMeasures.front().empty()) return false;
+    const std::vector<pugi::xml_node> &measures = partMeasures.front();
+    for (const pugi::xml_node &measure : measures) {
+        if (!measure.attribute("width")) {
+            LogWarning("MusicXML import: Measure '%s' has no width, the facsimile cannot be created",
+                measure.attribute("number").as_string());
+            return false;
+        }
+    }
+
+    // The left and top margins of a page. Page numbers start at 1, so the first page (index 0) is odd.
+    auto pageMargins = [](pugi::xml_node pageLayout, int page, double &left, double &top) {
+        const std::string pageType = (page % 2 == 0) ? "odd" : "even";
+        for (pugi::xml_node margins : pageLayout.children("page-margins")) {
+            const std::string type = margins.attribute("type").as_string();
+            if (type.empty() || (type == "both") || (type == pageType)) {
+                left = margins.child("left-margin").text().as_double();
+                top = margins.child("top-margin").text().as_double();
+                return true;
+            }
+        }
+        return false;
+    };
+
+    // The distance from the previous staff, from the <print> of the part if given there or from the <defaults>
+    auto staffDistance = [&defaults](pugi::xml_node print, int staff) {
+        const std::string numbered = StringFormat("staff-layout[@number='%d']/staff-distance", staff);
+        for (pugi::xml_node node : { print, defaults }) {
+            if (!node) continue;
+            pugi::xml_node distance = node.select_node(numbered.c_str()).node();
+            if (!distance) distance = node.select_node("staff-layout[not(@number)]/staff-distance").node();
+            if (distance) return distance.text().as_double();
+        }
+        return 0.0;
+    };
+
+    const pugi::xml_node pageLayout = defaults.child("page-layout");
+    const double systemLeft = layoutValue(defaults, "system-layout/system-margins/left-margin", 0.0);
+    const double systemDistance = layoutValue(defaults, "system-layout/system-distance", 0.0);
+    const double topSystemDistance = layoutValue(defaults, "system-layout/top-system-distance", 0.0);
+
+    int page = 0;
+    double pageLeft = 0.0;
+    double pageTop = 0.0;
+    double x = 0.0;
+    // Whether each staff of each part is printed, which is changed by <staff-details print-object> and kept until
+    // changed
+    std::vector<std::vector<bool>> staffPrinted;
+    for (const std::vector<double> &heights : partStaffHeights)
+        staffPrinted.push_back(std::vector<bool>(heights.size(), true));
+    for (int i = 0; i < (int)measures.size(); ++i) {
+        for (int part = 0; part < (int)partMeasures.size(); ++part) {
+            if (i >= (int)partMeasures.at(part).size()) continue;
+            for (pugi::xml_node attributes : partMeasures.at(part).at(i).children("attributes")) {
+                for (pugi::xml_node details : attributes.children("staff-details")) {
+                    if (!details.attribute("print-object")) continue;
+                    const bool printed = details.attribute("print-object").as_bool();
+                    const int number = details.attribute("number").as_int();
+                    for (int staff = 0; staff < (int)staffPrinted.at(part).size(); ++staff) {
+                        if ((number == 0) || (number == staff + 1)) staffPrinted.at(part).at(staff) = printed;
+                    }
+                }
+            }
+        }
+        const pugi::xml_node print = measures.at(i).child("print");
+        const bool newPage = (i > 0) && print.attribute("new-page").as_bool();
+        const bool newSystem = (i == 0) || newPage || print.attribute("new-system").as_bool();
+        if (newPage) page += print.attribute("blank-page").as_int() + 1;
+        if (newSystem) {
+            // The page margins can be changed in the <print> starting the page
+            if ((i == 0) || newPage) {
+                if (!pageMargins(print.child("page-layout"), page, pageLeft, pageTop)) {
+                    pageMargins(pageLayout, page, pageLeft, pageTop);
+                }
+            }
+            musicxml::SystemLayout system(
+                page, pageLeft + layoutValue(print, "system-layout/system-margins/left-margin", systemLeft));
+            // The top of the first staff, from the top margin for the first system of a page, or from the bottom
+            // of the previous system
+            double y = 0.0;
+            if (m_systemLayouts.empty() || (m_systemLayouts.back().m_page != page)) {
+                y = pageTop + layoutValue(print, "system-layout/top-system-distance", topSystemDistance);
+            }
+            else {
+                y = m_systemLayouts.back().m_bottom
+                    + layoutValue(print, "system-layout/system-distance", systemDistance);
+            }
+            // Staff @n values are numbered across the parts, as in ReadMusicXml. A staff not printed at the start of
+            // the system (e.g., an empty staff in an optimized system) is hidden for the system and takes no space:
+            // the distance of the next staff is from the previous printed one.
+            int staffN = 0;
+            bool firstPrinted = true;
+            for (int part = 0; part < (int)partMeasures.size(); ++part) {
+                const pugi::xml_node partPrint
+                    = (i < (int)partMeasures.at(part).size()) ? partMeasures.at(part).at(i).child("print") : print;
+                for (int staff = 0; staff < (int)partStaffHeights.at(part).size(); ++staff) {
+                    ++staffN;
+                    if (!staffPrinted.at(part).at(staff)) {
+                        system.m_hiddenStaves.insert(staffN);
+                        continue;
+                    }
+                    if (!firstPrinted) y += staffDistance(partPrint, staff + 1);
+                    firstPrinted = false;
+                    const double height = partStaffHeights.at(part).at(staff);
+                    system.m_staffTopsAndHeights[staffN] = { y, height };
+                    y += height;
+                }
+            }
+            system.m_bottom = y;
+            m_systemLayouts.push_back(system);
+            x = system.m_left;
+        }
+        const double width = measures.at(i).attribute("width").as_double();
+        m_measureLayouts.push_back(musicxml::MeasureLayout(page, (int)m_systemLayouts.size() - 1, x, width));
+        x += width;
+        m_systemLayouts.back().m_right = x;
+    }
+
+    // One surface per page, in tenths
+    Facsimile *facsimile = new Facsimile();
+    facsimile->SetType("transcription");
+    for (int i = 0; i <= page; ++i) {
+        Surface *surface = new Surface();
+        surface->SetLrx((int)std::round(pageWidth));
+        surface->SetLry((int)std::round(pageHeight));
+        // The units per MEI unit: a staff space is 10 tenths and 2 MEI units
+        surface->SetType("ppu:5");
+        facsimile->AddChild(surface);
+        m_surfaces.push_back(surface);
+    }
+    m_doc->SetFacsimile(facsimile);
+
+    return true;
+}
+
+Zone *MusicXmlInput::AddFacsimileZone(int page, double ulx, double uly, double lrx, double lry)
+{
+    assert((page >= 0) && (page < (int)m_surfaces.size()));
+
+    Zone *zone = new Zone();
+    zone->SetUlx((int)std::round(ulx));
+    zone->SetUly((int)std::round(uly));
+    zone->SetLrx((int)std::round(lrx));
+    zone->SetLry((int)std::round(lry));
+    m_surfaces.at(page)->AddChild(zone);
+    return zone;
+}
+
+void MusicXmlInput::SetMeasureFacsimile(Measure *measure, int index, bool withMeasureZone)
+{
+    assert(measure);
+
+    if (!this->HasFacsimileLayout() || (index < 0) || (index >= (int)m_measureLayouts.size())) return;
+
+    const musicxml::MeasureLayout &layout = m_measureLayouts.at(index);
+    const musicxml::SystemLayout &system = m_systemLayouts.at(layout.m_system);
+    if (system.m_staffTopsAndHeights.empty()) return;
+
+    double right = layout.m_x + layout.m_width;
+    // A multi-measure rest spans the following measures of the system
+    const auto multiRest = m_multiRests.find(index);
+    if ((multiRest != m_multiRests.end()) && (multiRest->second < (int)m_measureLayouts.size())) {
+        const musicxml::MeasureLayout &last = m_measureLayouts.at(multiRest->second);
+        if (last.m_system == layout.m_system) right = last.m_x + last.m_width;
+    }
+
+    if (withMeasureZone) {
+        const double top = system.m_staffTopsAndHeights.begin()->second.first;
+        Zone *zone = this->AddFacsimileZone(layout.m_page, layout.m_x, top, right, system.m_bottom);
+        measure->SetFacs("#" + zone->GetID());
+    }
+
+    for (Object *child : measure->GetChildren()) {
+        if (!child->Is(STAFF)) continue;
+        Staff *staff = vrv_cast<Staff *>(child);
+        assert(staff);
+        // A staff hidden in the system is hidden in all its measures
+        if (system.m_hiddenStaves.contains(staff->GetN())) {
+            staff->SetVisible(BOOLEAN_false);
+            continue;
+        }
+        const auto staffLayout = system.m_staffTopsAndHeights.find(staff->GetN());
+        if (staffLayout == system.m_staffTopsAndHeights.end()) continue;
+        const double top = staffLayout->second.first;
+        const double height = staffLayout->second.second;
+        Zone *zone = this->AddFacsimileZone(layout.m_page, layout.m_x, top, right, top + height);
+        staff->SetFacs("#" + zone->GetID());
+    }
+}
+
+void MusicXmlInput::SetBreakFacsimile(Object *object, int index, int pageOffset)
+{
+    assert(object);
+
+    if (!this->HasFacsimileLayout() || (index < 0) || (index >= (int)m_measureLayouts.size())) return;
+
+    const musicxml::MeasureLayout &layout = m_measureLayouts.at(index);
+    FacsimileInterface *interface = object->GetFacsimileInterface();
+    assert(interface);
+
+    // A page break points to its surface, which gives the page size
+    if (object->Is(PB)) {
+        const int page = std::clamp(layout.m_page + pageOffset, 0, (int)m_surfaces.size() - 1);
+        interface->SetFacs("#" + m_surfaces.at(page)->GetID());
+    }
+    // A system break points to the zone of the system
+    else if (object->Is(SB)) {
+        const musicxml::SystemLayout &system = m_systemLayouts.at(layout.m_system);
+        if (system.m_staffTopsAndHeights.empty()) return;
+        const double top = system.m_staffTopsAndHeights.begin()->second.first;
+        Zone *zone = this->AddFacsimileZone(system.m_page, system.m_left, top, system.m_right, system.m_bottom);
+        interface->SetFacs("#" + zone->GetID());
+    }
+}
+
+void MusicXmlInput::SetNoteFacsimile(pugi::xml_node node, LayerElement *element, Staff *staff, int index)
+{
+    if (!this->HasFacsimileLayout() || !element || !staff) return;
+    if ((index < 0) || (index >= (int)m_measureLayouts.size())) return;
+    if (!element->IsAnyOf(std::array{ NOTE, REST })) return;
+    // Without a default-x, the element is not positioned from the facsimile
+    if (!node.attribute("default-x")) return;
+
+    const musicxml::MeasureLayout &layout = m_measureLayouts.at(index);
+    const musicxml::SystemLayout &system = m_systemLayouts.at(layout.m_system);
+    const auto staffLayout = system.m_staffTopsAndHeights.find(staff->GetN());
+    if (staffLayout == system.m_staffTopsAndHeights.end()) return;
+    const double top = staffLayout->second.first;
+    const double bottom = top + staffLayout->second.second;
+
+    // The default-x is from the left of the measure, and the relative-x from the default-x.
+    // The zone width (one staff space) is approximate since only the left position is used.
+    const double x = layout.m_x + node.attribute("default-x").as_double() + node.attribute("relative-x").as_double();
+    Zone *zone = this->AddFacsimileZone(layout.m_page, x, top, x + 10.0, bottom);
+    element->SetFacs("#" + zone->GetID());
+
+    if (!element->Is(NOTE)) return;
+    Note *note = vrv_cast<Note *>(element);
+    assert(note);
+    Object *parent = note->GetParent();
+    Chord *chord = (parent && parent->Is(CHORD)) ? vrv_cast<Chord *>(parent) : NULL;
+
+    // Lyrics are centered on the note by default (MusicXML justify) and default-y is the baseline from the top of the
+    // staff (up is positive). The zone is centered on the lyric and its bottom is the baseline, see
+    // SyncFromFacsimileFunctor. In a chord, the verses are on the chord.
+    Object *lyricHost = (chord) ? static_cast<Object *>(chord) : note;
+    for (pugi::xml_node lyric : node.children("lyric")) {
+        if (!lyric.attribute("default-y")) continue;
+        const int lyricNumber = std::max(1, lyric.attribute("number").as_int());
+        for (Object *child : lyricHost->GetChildren()) {
+            if (!child->Is(VERSE) || (vrv_cast<Verse *>(child)->GetN() != lyricNumber)) continue;
+            Syl *syl = vrv_cast<Syl *>(child->FindDescendantByType(SYL));
+            if (!syl || syl->HasFacs()) break;
+            // The center of a notehead is about half a staff space from its left
+            const double center = x + 5.0 + lyric.attribute("relative-x").as_double();
+            const double baseline
+                = top - lyric.attribute("default-y").as_double() - lyric.attribute("relative-y").as_double();
+            Zone *sylZone
+                = this->AddFacsimileZone(layout.m_page, center - 20.0, baseline - 15.0, center + 20.0, baseline);
+            syl->SetFacs("#" + sylZone->GetID());
+            break;
+        }
+    }
+
+    // MusicXML does not position accidentals: place them one staff space to the left of the note
+    std::vector<Zone *> accidZones;
+    for (Object *child : note->GetChildren()) {
+        if (!child->Is(ACCID)) continue;
+        Accid *accid = vrv_cast<Accid *>(child);
+        assert(accid);
+        Zone *accidZone = this->AddFacsimileZone(layout.m_page, x - 12.0, top, x - 2.0, bottom);
+        accid->SetFacs("#" + accidZone->GetID());
+        // Only written accidentals are drawn
+        if (accid->HasAccid()) accidZones.push_back(accidZone);
+    }
+
+    if (!chord) return;
+
+    // A chord is positioned at its main notehead column, which is the left one with the stem up and the right one
+    // with the stem down (notes forming a second are placed in the other column)
+    const int ulx = (int)std::round(x);
+    if ((m_chordFacsimile.m_chord != chord) || !chord->HasFacs()) {
+        Zone *chordZone = this->AddFacsimileZone(layout.m_page, x, top, x + 10.0, bottom);
+        chord->SetFacs("#" + chordZone->GetID());
+        m_chordFacsimile = musicxml::ChordFacsimile(chord, chordZone, x);
+    }
+    else {
+        Zone *chordZone = m_chordFacsimile.m_zone;
+        const bool stemDown = (chord->GetStemDir() == STEMDIRECTION_down);
+        if ((stemDown && (ulx > chordZone->GetUlx())) || (!stemDown && (ulx < chordZone->GetUlx()))) {
+            chordZone->SetUlx(ulx);
+            chordZone->SetLrx(ulx + 10);
+        }
+        m_chordFacsimile.m_left = std::min(m_chordFacsimile.m_left, x);
+    }
+
+    // The accidentals of a chord are stacked in columns to the left of its leftmost notehead, from the top note down.
+    // An accidental goes into the first column without an accidental less than a seventh away.
+    const int diatonicPitch = note->GetOct() * 7 + (int)note->GetPname() - (int)PITCHNAME_c;
+    for (Zone *accidZone : accidZones) m_chordFacsimile.m_accids.push_back({ diatonicPitch, accidZone });
+    std::vector<std::pair<int, Zone *>> accids = m_chordFacsimile.m_accids;
+    std::stable_sort(accids.begin(), accids.end(),
+        [](const std::pair<int, Zone *> &a, const std::pair<int, Zone *> &b) { return a.first > b.first; });
+    std::vector<std::vector<int>> columns;
+    for (const std::pair<int, Zone *> &accid : accids) {
+        int column = 0;
+        for (; column < (int)columns.size(); ++column) {
+            const std::vector<int> &pitches = columns.at(column);
+            if (std::all_of(
+                    pitches.begin(), pitches.end(), [&accid](int pitch) { return abs(pitch - accid.first) >= 6; }))
+                break;
+        }
+        if (column == (int)columns.size()) columns.push_back({});
+        columns.at(column).push_back(accid.first);
+        const double right = m_chordFacsimile.m_left - 2.0 - column * 12.0;
+        accid.second->SetUlx((int)std::round(right - 10.0));
+        accid.second->SetLrx((int)std::round(right));
     }
 }
 

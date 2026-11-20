@@ -45,6 +45,11 @@ public:
     bool ImplementsEndInterface() const override { return true; }
 
     /*
+     * Getter for the number of elements that had no zone and were not positioned from the facsimile
+     */
+    int GetZonelessCount() const { return m_zonelessCount; }
+
+    /*
      * Functor interface
      */
     ///@{
@@ -80,6 +85,8 @@ private:
     int m_pageMarginLeft;
     //
     double m_ppuFactor;
+    /** The number of elements expected to have a zone but without one */
+    int m_zonelessCount;
 };
 
 //----------------------------------------------------------------------------

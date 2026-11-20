@@ -132,6 +132,14 @@ public:
     void SetType(DocType type);
     bool IsRaw() const { return (m_type == Raw); }
     bool IsFacTranscription() const { return (m_type == FacTranscription); }
+    /**
+     * A transcription of common music notation. Unlike neume and mensural transcriptions, its clefs and signatures at
+     * the start of the systems are not encoded with zones and are drawn from the staffDef.
+     */
+    bool IsCmnFacTranscription() const
+    {
+        return (this->IsFacTranscription() && !this->IsNeumeLines() && !this->IsMensuralMusicOnly());
+    }
     ///@}
 
     /**

@@ -39,12 +39,17 @@ public:
      */
     ///@{
     FunctorCode VisitLayerElement(LayerElement *layerElement) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
     ///@}
 
 protected:
     //
 private:
-    //
+    /**
+     * Place the clefs and signatures drawn from the staffDef at the start of the measure
+     */
+    void AdjustStaffDefElements(Measure *measure, const Doc *doc);
+
 public:
     //
 private:
