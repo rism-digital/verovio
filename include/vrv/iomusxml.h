@@ -337,6 +337,14 @@ private:
     void ReadMusicXmlTitle(pugi::xml_node title);
 
     /*
+     * @name Methods for mapping lyric numbers (NMTOKEN) to verse numbers
+     */
+    ///@{
+    void ReadLyricNumbers(pugi::xml_node root);
+    int GetLyricNumber(const pugi::xml_node lyric) const;
+    ///@}
+
+    /*
      * @name Top level methods for reading MusicXML part and measure elements.
      */
     ///@{
@@ -661,6 +669,8 @@ private:
     std::map<Layer *, std::multimap<int, LayerElement *>> m_layerTimes;
     /* Verse numbers with a pending <extend type="stop"/> per staff/layer @n, to anchor on the following note */
     std::map<std::pair<int, int>, std::set<int>> m_pendingExtenderStops;
+    /* Verse numbers of lyric numbers that are not integers (e.g. "part1verse2") per part id, see ReadLyricNumbers */
+    std::map<std::pair<std::string, std::string>, int> m_lyricNumbers;
     /* To remember layer of last element (note) to handle chords */
     Layer *m_prevLayer = NULL;
     /* To remember current layer to properly handle layers/staves/cross-staff elements */
