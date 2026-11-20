@@ -294,16 +294,16 @@ std::string MEIOutput::Export()
 
         // schema processing instruction
         std::string schema;
-        const bool latestSchema = m_doc->GetOptions()->m_outputReleaseSchema.GetValue();
+        const bool releaseSchema = m_doc->GetOptions()->m_outputReleaseSchema.GetValue();
 
         if (this->IsPageBasedMEI()) {
-            schema = (latestSchema) ? MEI_RELEASE_PAGE_BASED_SCHEMA : MEI_CURRENT_PAGE_BASED_SCHEMA;
+            schema = (releaseSchema) ? MEI_RELEASE_PAGE_BASED_SCHEMA : MEI_CURRENT_PAGE_BASED_SCHEMA;
         }
         else if (this->GetBasic()) {
-            schema = (latestSchema) ? MEI_RELEASE_BASIC_SCHEMA : MEI_CURRENT_BASIC_SCHEMA;
+            schema = (releaseSchema) ? MEI_RELEASE_BASIC_SCHEMA : MEI_CURRENT_BASIC_SCHEMA;
         }
         else {
-            schema = (latestSchema) ? MEI_RELEASE_ALL_SCHEMA : MEI_CURRENT_ALL_SCHEMA;
+            schema = (releaseSchema) ? MEI_RELEASE_ALL_SCHEMA : MEI_CURRENT_ALL_SCHEMA;
         }
 
         decl = meiDoc.append_child(pugi::node_declaration);
@@ -324,8 +324,8 @@ std::string MEIOutput::Export()
         m_mei = meiDoc.append_child("mei");
         m_mei.append_attribute("xmlns") = "http://www.music-encoding.org/ns/mei";
         AttConverter converter;
-        meiVersion_MEIVERSION meiVersion = (latestSchema) ? MEI_RELEASE_VERSION : MEI_CURRENT_VERSION;
-        if (this->GetBasic()) meiVersion = (latestSchema) ? MEI_RELEASE_BASIC_VERSION : MEI_CURRENT_BASIC_VERSION;
+        meiVersion_MEIVERSION meiVersion = (releaseSchema) ? MEI_RELEASE_VERSION : MEI_CURRENT_VERSION;
+        if (this->GetBasic()) meiVersion = (releaseSchema) ? MEI_RELEASE_BASIC_VERSION : MEI_CURRENT_BASIC_VERSION;
         m_mei.append_attribute("meiversion") = (converter.MeiVersionMeiversionToStr(meiVersion)).c_str();
 
         // If the document is mensural, we have to undo the mensural (segments) cast off
