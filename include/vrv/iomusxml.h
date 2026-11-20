@@ -353,6 +353,10 @@ private:
     short int ReadMusicXmlPartAttributesAsStaffDef(
         pugi::xml_node node, StaffGrp *staffGrp, const short int staffOffset, InstrDef *instrDef);
 
+    /** Read instrument assignments that remain consistent for a staff and voice throughout the part. */
+    void ReadMusicXmlLayerInstruments(
+        pugi::xml_node scorePart, pugi::xml_node part, StaffGrp *staffGrp, int nbStaves, int staffOffset);
+
     /*
      * @name Methods for reading the content of a MusicXML measure.
      */

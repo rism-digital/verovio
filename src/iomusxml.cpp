@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <cassert>
+#include <limits>
 #include <numeric>
 #include <regex>
 #include <sstream>
@@ -47,6 +48,7 @@
 #include "label.h"
 #include "labelabbr.h"
 #include "layer.h"
+#include "layerdef.h"
 #include "lb.h"
 #include "lv.h"
 #include "mdiv.h"
@@ -1073,10 +1075,11 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         }
         else if (IsElement(xpathNode.node(), "score-part")) {
             // get the attributes element of the first measure of the part
-            const std::string partId = xpathNode.node().attribute("id").as_string();
-            std::string xpath = StringFormat("/score-partwise/part[@id='%s']/measure[1]", partId.c_str());
-            pugi::xpath_node partFirstMeasure = root.select_node(xpath.c_str());
-            if (!partFirstMeasure.node().child("attributes")) {
+            const pugi::xml_node scorePart = xpathNode.node();
+            const std::string partId = scorePart.attribute("id").as_string();
+            const pugi::xml_node part = root.find_child_by_attribute("part", "id", partId.c_str());
+            const pugi::xml_node partFirstMeasure = part.child("measure");
+            if (!partFirstMeasure.child("attributes")) {
                 LogWarning("MusicXML import: Could not find the 'attributes' element in the first "
                            "measure of part '%s'",
                     partId.c_str());
@@ -1160,8 +1163,9 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             // create the staffDef(s)
             StaffGrp *partStaffGrp = new StaffGrp();
             const short int nbStaves
-                = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset, instrDef);
+                = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure, partStaffGrp, staffOffset, instrDef);
             if (!instrDef->GetParent()) delete instrDef;
+            this->ReadMusicXmlLayerInstruments(scorePart, part, partStaffGrp, nbStaves, staffOffset);
             // if we have more than one staff in the part we create a new staffGrp
             if (nbStaves > 1) {
                 partStaffGrp->SetBarThru(BOOLEAN_true);
@@ -1177,14 +1181,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 delete partStaffGrp;
             }
 
-            // find the part and read it
-            xpath = StringFormat("/score-partwise/part[@id='%s']", partId.c_str());
-            pugi::xpath_node part = root.select_node(xpath.c_str());
-            if (!part) {
-                LogWarning("MusicXML import: Could not find the part '%s'", partId.c_str());
-                continue;
-            }
-            this->ReadMusicXmlPart(part.node(), section, nbStaves, staffOffset);
+            this->ReadMusicXmlPart(part, section, nbStaves, staffOffset);
             // increment the staffOffset for reading the next part
             staffOffset += nbStaves;
         }
@@ -1769,6 +1766,59 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
     }
 
     return nbStaves;
+}
+
+void MusicXmlInput::ReadMusicXmlLayerInstruments(
+    pugi::xml_node scorePart, pugi::xml_node part, StaffGrp *staffGrp, int nbStaves, int staffOffset)
+{
+    if (!scorePart.child("score-instrument")) return;
+
+    using StaffVoice = std::pair<int, int>;
+    std::map<StaffVoice, std::set<std::string>> instrumentsByLayer;
+    for (pugi::xml_node measure : part.children("measure")) {
+        for (pugi::xml_node note : measure.children("note")) {
+            if (note.child("unpitched")) continue;
+            const int staffNumber = note.child("staff").text().as_int(1);
+            const int voiceNumber = note.child("voice").text().as_int(1);
+            if (staffNumber < 1 || staffNumber > nbStaves || voiceNumber < 1
+                || voiceNumber > std::numeric_limits<short>::max()) {
+                continue;
+            }
+            const pugi::xml_node firstInstrument = note.child("instrument");
+            if (!firstInstrument && note.child("rest")) continue;
+
+            std::set<std::string> &instruments = instrumentsByLayer[{ staffNumber, voiceNumber }];
+            // An unassigned pitched note or multiple instrument references cannot define a single layer instrument.
+            if (!firstInstrument) instruments.insert("");
+            for (pugi::xml_node instrument : note.children("instrument")) {
+                instruments.insert(instrument.attribute("id").as_string());
+            }
+        }
+    }
+
+    // A score instrument shared by multiple voices cannot be copied to multiple instrDefs with the same XML ID.
+    std::map<std::string, int> layersByInstrument;
+    for (const std::pair<const StaffVoice, std::set<std::string>> &entry : instrumentsByLayer) {
+        for (const std::string &id : entry.second) ++layersByInstrument[id];
+    }
+    for (const std::pair<const StaffVoice, std::set<std::string>> &entry : instrumentsByLayer) {
+        if (entry.second.size() != 1) continue;
+        const std::string &id = *entry.second.begin();
+        if (id.empty() || id == scorePart.attribute("id").as_string() || layersByInstrument.at(id) != 1) continue;
+        const pugi::xml_node scoreInstrument = scorePart.find_child_by_attribute("score-instrument", "id", id.c_str());
+        if (!scoreInstrument) continue;
+
+        AttNIntegerComparison matchStaff(STAFFDEF, entry.first.first + staffOffset);
+        StaffDef *staffDef = vrv_cast<StaffDef *>(staffGrp->FindDescendantByComparison(&matchStaff, 1));
+        if (!staffDef) continue;
+        LayerDef *layerDef = new LayerDef();
+        layerDef->SetN(entry.first.second);
+        InstrDef *instrDef = new InstrDef();
+        instrDef->SetID(id);
+        instrDef->SetLabel(scoreInstrument.child("instrument-name").text().as_string());
+        if (!layerDef->AddChild(instrDef)) delete instrDef;
+        if (!staffDef->AddChild(layerDef)) delete layerDef;
+    }
 }
 
 void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *parent)
