@@ -1180,6 +1180,15 @@ void Doc::UnCastOffDoc(bool resetCache)
 {
     if (!this->IsCastOff()) {
         LogDebug("Document is not cast off");
+        // No new page is created here, so invalidate the layout and drawing sizes of the existing one
+        Pages *pages = this->GetPages();
+        assert(pages);
+        for (Object *child : pages->GetChildren()) {
+            Page *page = vrv_cast<Page *>(child);
+            assert(page);
+            page->DeprecateLayout();
+        }
+        this->ResetDataPage();
         return;
     }
 
