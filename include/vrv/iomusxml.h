@@ -490,6 +490,11 @@ private:
     ///@}
 
     /*
+     * Set m_measureDuration from the current divisions and meter; call it whenever one of them changes
+     */
+    void UpdateMeasureDuration();
+
+    /*
      * @name Methods for opening and closing ties and slurs.
      * Opened ties and slurs are stacked together with musicxml::OpenTie
      * and musicxml::OpenSlur objects.
@@ -647,6 +652,10 @@ private:
     std::vector<int> m_meterCount = { 4 };
     int m_meterUnit = 4;
     MeterCountSign m_meterSign = MeterCountSign::None;
+    /* number of m_meterUnit in a measure (MeterSig::GetTotalCount) */
+    int m_meterTotalCount = 4;
+    /* duration of a full measure in the current meter, in divisions (0 while unknown) */
+    double m_measureDuration = 0.0;
     /* part information */
     Label *m_label = NULL;
     LabelAbbr *m_labelAbbr = NULL;
