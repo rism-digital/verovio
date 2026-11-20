@@ -69,6 +69,8 @@ const char *vrvToolkit_renderToExpansionMap(void *tkPtr);
 bool vrvToolkit_renderToExpansionMapFile(void *tkPtr, const char *filename);
 const char *vrvToolkit_renderToMIDI(void *tkPtr);
 bool vrvToolkit_renderToMIDIFile(void *tkPtr, const char *filename);
+const char *vrvToolkit_renderToMIDIJson(void *tkPtr);
+bool vrvToolkit_renderToMIDIJsonFile(void *tkPtr, const char *filename);
 const char *vrvToolkit_renderToPAE(void *tkPtr);
 bool vrvToolkit_renderToPAEFile(void *tkPtr, const char *filename);
 const char *vrvToolkit_renderToSVG(void *tkPtr, int page_no, bool xmlDeclaration);

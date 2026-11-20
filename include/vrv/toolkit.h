@@ -459,6 +459,26 @@ public:
     bool RenderToMIDIFile(const std::string &filename);
 
     /**
+     * Render the document to MIDI as JSON.
+     *
+     * The structure is the one of \@tonejs/midi (Midi.toJSON()) for the MIDI file of RenderToMIDI(), with the ID
+     * (\@xml:id) of the note added to each note.
+     *
+     * @return The MIDI JSON as a string
+     */
+    std::string RenderToMIDIJson();
+
+    /**
+     * Render the document to MIDI as JSON and save it to the file.
+     *
+     * @remark nojs
+     *
+     * @param filename The output filename
+     * @return True if the file was successfully written
+     */
+    bool RenderToMIDIJsonFile(const std::string &filename);
+
+    /**
      * Render the loaded score to partwise MusicXML.
      *
      * @return The MusicXML as a string, or an empty string on failure

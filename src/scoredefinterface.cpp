@@ -75,6 +75,12 @@ void ScoreDefInterface::Reset()
     this->ResetTextStyle();
 }
 
+bool ScoreDefInterface::HasTextStyles() const
+{
+    return (this->HasLyricFam() || this->HasLyricName() || this->HasLyricStyle() || this->HasLyricWeight()
+        || this->HasTextFam() || this->HasTextName() || this->HasTextStyle() || this->HasTextWeight());
+}
+
 void ScoreDefInterface::MergeTextStyles(const ScoreDefInterface *other)
 {
     assert(other);

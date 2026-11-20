@@ -372,6 +372,19 @@ public class VerovioToolkit {
         }
     }
 
+    public func renderToMIDIJson() -> String {
+        guard let tk = toolkitPtr else { return "" }
+        guard let cStr = vrvToolkit_renderToMIDIJson(tk) else { return "" }
+        return String(cString: cStr)
+    }
+
+    public func renderToMIDIJsonFile(_ filename: String) -> Bool {
+        guard let tk = toolkitPtr else { return false }
+        return filename.withCString { cStr in
+            vrvToolkit_renderToMIDIJsonFile(tk, cStr)
+        }
+    }
+
     public func renderToPAE() -> String {
         guard let tk = toolkitPtr else { return "" }
         guard let cStr = vrvToolkit_renderToPAE(tk) else { return "" }

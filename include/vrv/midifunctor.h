@@ -23,6 +23,7 @@ namespace vrv {
 class CustomTuning;
 class FeatureExtractor;
 class InstrDef;
+class MIDIJsonBuilder;
 class Timemap;
 
 //----------------------------------------------------------------------------
@@ -378,6 +379,7 @@ public:
     void SetCurrentTempo(double tempo) { m_currentTempo = tempo; }
     void SetDeferredNotes(const std::map<const Note *, double> &deferredNotes) { m_deferredNotes = deferredNotes; }
     void SetLayerN(int layerN) { m_layerN = layerN; }
+    void SetMIDIJsonBuilder(MIDIJsonBuilder *midiJson) { m_midiJson = midiJson; }
     void SetOctaves(const std::list<OctaveInfo> &octaves) { m_octaves = octaves; }
     void SetStaffN(int staffN) { m_staffN = staffN; }
     void SetTempoEventTicks(const std::set<int> &ticks) { m_tempoEventTicks = ticks; }
@@ -426,6 +428,15 @@ private:
     void HandleOctave(const LayerElement *layerElement);
 
     /**
+     * @name Add events to the MIDI file and to the MIDI JSON (if requested)
+     */
+    ///@{
+    void AddNoteOn(const Note *note, int tick, int pitch, int velocity);
+    void AddNoteOff(int tick, int pitch);
+    void AddSustainPedal(int tick, bool on);
+    ///@}
+
+    /**
      * Convenience helper
      */
     int GetMIDIPitch(const Note *note);
@@ -472,6 +483,8 @@ private:
     const InstrDef *m_instrDef;
     // Current custom tuning
     CustomTuning *m_customTuning;
+    // The MIDI JSON collecting the same events (if requested)
+    MIDIJsonBuilder *m_midiJson;
 };
 
 //----------------------------------------------------------------------------

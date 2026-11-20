@@ -2010,6 +2010,19 @@ bool Toolkit::RenderToPAEFile(const std::string &filename)
     return true;
 }
 
+std::string Toolkit::RenderToMIDIJson()
+{
+    this->SetMidiDoc();
+    this->ResetLogBuffer();
+
+    smf::MidiFile midiFile;
+    std::string output;
+    assert(m_midiDoc);
+    m_midiDoc->ExportMIDI(&midiFile, &output);
+
+    return output;
+}
+
 std::string Toolkit::RenderToTimemap(const std::string &jsonOptions)
 {
     bool includeMeasures = false;
@@ -2134,6 +2147,19 @@ bool Toolkit::RenderToMIDIFile(const std::string &filename)
     assert(m_midiDoc);
     m_midiDoc->ExportMIDI(&outputfile);
     outputfile.write(filename);
+
+    return true;
+}
+
+bool Toolkit::RenderToMIDIJsonFile(const std::string &filename)
+{
+    std::string outputString = this->RenderToMIDIJson();
+
+    std::ofstream output(filename.c_str());
+    if (!output.is_open()) {
+        return false;
+    }
+    output << outputString;
 
     return true;
 }
