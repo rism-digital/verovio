@@ -974,9 +974,10 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     if (m_doc.IsFacTranscription()) {
         breaks = (m_doc.HasFacsimile()) ? BREAKS_encoded : BREAKS_none;
     }
-    // The encoded positions need the encoded breaks and page size
+    // The encoded positions need the encoded breaks (unless the layout is already done, e.g., in page-based MEI) and
+    // the encoded page size
     else if (m_doc.UseEncodedPositions()) {
-        breaks = BREAKS_encoded;
+        if (input->GetLayoutInformation() != LAYOUT_DONE) breaks = BREAKS_encoded;
         if (m_doc.SetEncodedPageSize() && m_options->m_landscape.GetValue()) {
             LogWarning("The landscape option is ignored with the encoded page size");
         }
