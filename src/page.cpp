@@ -53,8 +53,10 @@
 #include "comparison.h"
 #include "doc.h"
 #include "functor.h"
+#include "horizontalaligner.h"
 #include "justifyfunctor.h"
 #include "libmei.h"
+#include "measure.h"
 #include "miscfunctor.h"
 #include "pageelement.h"
 #include "pages.h"
@@ -64,6 +66,7 @@
 #include "scoreorpartelement.h"
 #include "staff.h"
 #include "system.h"
+#include "verticalaligner.h"
 #include "view.h"
 #include "vrv.h"
 
@@ -227,13 +230,23 @@ void Page::LayOut()
         return;
     }
 
-    this->LayOutHorizontally();
-    this->JustifyHorizontally();
-    this->LayOutVertically();
-    this->JustifyVertically();
-
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
+    // With the encoded x positions, the notes are not moved to make room for the lyrics, which are spaced once the
+    // measures and the notes are in place (see AdjustToEncodedPositionsHorizontally)
+    const bool useEncodedX = doc->UseEncodedXPositions();
+    this->LayOutHorizontally(!useEncodedX);
+    if (useEncodedX) {
+        // In place of the justification, and before the vertical layout, which needs the final horizontal positions
+        // (e.g., for slurs or collisions)
+        this->AdjustToEncodedPositionsHorizontally();
+    }
+    else {
+        this->JustifyHorizontally();
+    }
+    // With the encoded y positions, the staves are placed in LayOutVertically and the page is not justified
+    this->LayOutVertically();
+    if (!doc->UseEncodedYPositions()) this->JustifyVertically();
     if (doc->GetOptions()->m_svgBoundingBoxes.GetValue()) {
         View view;
         view.SetDoc(doc);
@@ -315,6 +328,174 @@ void Page::LayOutTranscription(bool force)
     m_layoutDone = true;
 }
 
+void Page::AdjustToEncodedPositionsHorizontally()
+{
+    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
+    assert(doc);
+
+    // The encoded positions are in MEI virtual units from the top-left corner of the page
+    const int unit = doc->GetDrawingUnit(100);
+    const int marginLeft = doc->m_drawingPageMarginLeft;
+    auto toDrawingX = [unit, marginLeft](double x) { return (int)std::round(x * unit) - marginLeft; };
+    const bool useEvents = (doc->GetOptions()->m_encodedXPositions.GetValue() == ENCODEDXPOSITIONS_events);
+
+    for (Object *systemObject : this->FindAllDescendantsByType(SYSTEM, false)) {
+        System *system = vrv_cast<System *>(systemObject);
+        assert(system);
+        const ListOfObjects measures = system->FindAllDescendantsByType(MEASURE);
+        if (measures.empty()) continue;
+        // The system starts at its first measure
+        const Measure *firstMeasure = vrv_cast<const Measure *>(measures.front());
+        if (!firstMeasure->HasCoordX1()) continue;
+        const int systemX = toDrawingX(firstMeasure->GetCoordX1());
+        system->SetDrawingXRel(systemX);
+
+        for (Object *measureObject : measures) {
+            Measure *measure = vrv_cast<Measure *>(measureObject);
+            assert(measure);
+            if (!measure->HasCoordX1() || !measure->HasCoordX2()) {
+                continue;
+            }
+            const int measureX = toDrawingX(measure->GetCoordX1());
+            const int width = toDrawingX(measure->GetCoordX2()) - measureX;
+
+            // The anchors: for the alignment of each event with an encoded x, the x the alignment needs for the event
+            // to be there, taking into account its offset from the alignment (e.g., a notehead displaced in a chord)
+            std::map<const Alignment *, std::vector<int>> targets;
+            ListOfObjects events;
+            ClassIdsComparison comparison({ NOTE, REST });
+            if (useEvents) measure->FindAllDescendantsByComparison(&events, &comparison);
+            for (Object *object : events) {
+                LayerElement *element = vrv_cast<LayerElement *>(object);
+                assert(element);
+                const AttXy *xy = dynamic_cast<const AttXy *>(element);
+                const Alignment *alignment = element->GetAlignment();
+                if (!xy || !xy->HasX() || !alignment || (alignment->GetType() == ALIGNMENT_GRACENOTE)) {
+                    continue;
+                }
+                const int offset = element->GetDrawingX() - measure->GetDrawingX() - alignment->GetXRel();
+                targets[alignment].push_back(toDrawingX(xy->GetX()) - measureX - offset);
+            }
+
+            MeasureAligner &aligner = measure->m_measureAligner;
+            const int right = aligner.GetRightAlignment()->GetXRel();
+            const int rightBarLine = aligner.GetRightBarLineAlignment()->GetXRel();
+            std::map<int, int> anchors;
+            for (const std::pair<const Alignment *const, std::vector<int>> &target : targets) {
+                int sum = 0;
+                for (int x : target.second) sum += x;
+                anchors[target.first->GetXRel()] = sum / (int)target.second.size();
+            }
+            anchors[right] = width;
+            // Without the events, the first event alignment is the anchor that keeps the alignments before it (e.g.,
+            // the clef and signatures at the start of a system) at their regular position, unless the measure is
+            // narrower, and the events are spaced proportionally to the measure width
+            if (!useEvents && (right > 0)) {
+                for (const Object *child : aligner.GetChildren()) {
+                    const Alignment *alignment = vrv_cast<const Alignment *>(child);
+                    assert(alignment);
+                    if (alignment->GetType() != ALIGNMENT_DEFAULT) continue;
+                    const int x = alignment->GetXRel();
+                    if ((x > 0) && (x < right)) {
+                        anchors[x] = (width < right) ? x * width / right : x;
+                    }
+                    break;
+                }
+            }
+
+            // The other alignments are interpolated between the anchors. The ones before the first anchor (e.g., the
+            // clef and signatures at the start of a system) keep their regular position, unless the first anchor
+            // moves closer to the start of the measure, in which case they are moved proportionally.
+            auto interpolate = [&anchors](int x) {
+                const std::map<int, int>::const_iterator next = anchors.lower_bound(x);
+                if (next == anchors.end()) return anchors.rbegin()->second + x - anchors.rbegin()->first;
+                if (next->first == x) return next->second;
+                if (next == anchors.begin()) {
+                    if ((next->first <= 0) || (next->second >= next->first)) {
+                        return x;
+                    }
+                    return x * next->second / next->first;
+                }
+                const std::map<int, int>::const_iterator previous = std::prev(next);
+                return previous->second
+                    + (x - previous->first) * (next->second - previous->second) / (next->first - previous->first);
+            };
+            for (Object *child : aligner.GetChildren()) {
+                Alignment *alignment = vrv_cast<Alignment *>(child);
+                assert(alignment);
+                if (alignment == aligner.GetRightBarLineAlignment()) {
+                    // The right barline keeps its distance from the end of the measure
+                    alignment->SetXRel(width - (right - rightBarLine));
+                }
+                else {
+                    alignment->SetXRel(interpolate(alignment->GetXRel()));
+                }
+            }
+            measure->SetDrawingXRel(measureX - systemX);
+        }
+    }
+    this->ResetCachedDrawingX();
+
+    // Space the lyrics for the encoded note positions, which cannot move to make room for them
+    InitProcessingListsFunctor initProcessingLists;
+    this->Process(initProcessingLists);
+    this->AdjustSylSpacingByVerse(
+        initProcessingLists.GetVerseTree(), initProcessingLists.GetLyricGroupPlaces(), doc, true);
+    this->ResetCachedDrawingX();
+}
+
+std::map<System *, int> Page::AdjustToEncodedPositionsVertically()
+{
+    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
+    assert(doc);
+
+    // The encoded positions are in MEI virtual units from the top-left corner of the page, with y going down, while
+    // the drawing y goes up from the bottom of the page content
+    const int unit = doc->GetDrawingUnit(100);
+    const int marginTop = doc->m_drawingPageMarginTop;
+    const int contentHeight = doc->m_drawingPageContentHeight;
+    auto toDrawingY = [unit, marginTop, contentHeight](
+                          double y) { return contentHeight - ((int)std::round(y * unit) - marginTop); };
+    std::map<System *, int> systemYs;
+    for (Object *systemObject : this->FindAllDescendantsByType(SYSTEM, false)) {
+        System *system = vrv_cast<System *>(systemObject);
+        assert(system);
+        const std::map<int, double> staffTops = Page::GetEncodedStaffTops(system);
+        if (staffTops.empty()) continue;
+
+        // The system keeps the position of its first positioned staff relative to it
+        bool systemPlaced = false;
+        int systemY = 0;
+        // How much the last positioned staff moved, for the bottom of the system
+        int lastShift = 0;
+        for (Object *child : system->m_systemAligner.GetChildren()) {
+            if (!child->Is(STAFF_ALIGNMENT)) continue;
+            StaffAlignment *staffAlignment = vrv_cast<StaffAlignment *>(child);
+            assert(staffAlignment);
+            const Staff *staff = staffAlignment->GetStaff();
+            if (!staff || !staffTops.contains(staff->GetN())) {
+                continue;
+            }
+            const int top = toDrawingY(staffTops.at(staff->GetN()));
+            if (!systemPlaced) {
+                systemY = top - staffAlignment->GetYRel();
+                system->SetDrawingYRel(systemY);
+                systemYs[system] = systemY;
+                systemPlaced = true;
+            }
+            lastShift = top - systemY - staffAlignment->GetYRel();
+            staffAlignment->SetEncodedYRel(top - systemY);
+        }
+        // The bottom of the system (used for its height) moves with its last staff
+        StaffAlignment *bottom = system->m_systemAligner.GetBottomAlignment();
+        if (systemPlaced && bottom) {
+            bottom->SetEncodedYRel(bottom->GetYRel() + lastShift);
+        }
+    }
+    this->ResetCachedDrawingY();
+    return systemYs;
+}
+
 void Page::ResetAligners()
 {
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
@@ -393,7 +574,7 @@ void Page::ResetAligners()
     this->Process(calcSpanningBeamSpans);
 }
 
-void Page::LayOutHorizontally()
+void Page::LayOutHorizontally(bool spaceLyrics)
 {
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
@@ -470,7 +651,10 @@ void Page::LayOutHorizontally()
     InitProcessingListsFunctor initProcessingLists;
     this->Process(initProcessingLists);
 
-    this->AdjustSylSpacingByVerse(initProcessingLists.GetVerseTree(), initProcessingLists.GetLyricGroupPlaces(), doc);
+    if (spaceLyrics) {
+        this->AdjustSylSpacingByVerse(
+            initProcessingLists.GetVerseTree(), initProcessingLists.GetLyricGroupPlaces(), doc);
+    }
 
     AdjustHarmGrpsSpacingFunctor adjustHarmGrpsSpacing(doc);
     this->Process(adjustHarmGrpsSpacing);
@@ -576,6 +760,9 @@ void Page::LayOutVertically()
     // Adjust the Y shift to make sure there is a minimal space (staffMargin) between each staff
     AdjustYPosFunctor adjustYPos(doc);
     this->Process(adjustYPos);
+    // The encoded positions replace the staff spacing, before the content between and across the staves is placed
+    std::map<System *, int> encodedSystemYs;
+    if (doc->UseEncodedYPositions()) encodedSystemYs = this->AdjustToEncodedPositionsVertically();
 
     // Adjust the positioners of floating elements placed between staves
     AdjustFloatingPositionersBetweenFunctor adjustFloatingPositionersBetween(doc);
@@ -605,6 +792,11 @@ void Page::LayOutVertically()
     alignSystems.SetShift(doc->m_drawingPageContentHeight);
     alignSystems.SetSystemSpacing(doc->GetOptions()->m_spacingSystem.GetValue() * doc->GetDrawingUnit(100));
     this->Process(alignSystems);
+
+    // The systems placed at their encoded position keep it (AlignSystems is still needed for the header and footer)
+    for (const std::pair<System *const, int> &systemY : encodedSystemYs) {
+        systemY.first->SetDrawingYRel(systemY.second);
+    }
 }
 
 void Page::JustifyHorizontally()
@@ -753,8 +945,8 @@ int Page::GetContentWidth() const
     return maxWidth;
 }
 
-void Page::AdjustSylSpacingByVerse(
-    const IntTree &verseTree, const std::set<std::tuple<int, int, data_STAFFREL>> &lyricGroupPlaces, Doc *doc)
+void Page::AdjustSylSpacingByVerse(const IntTree &verseTree,
+    const std::set<std::tuple<int, int, data_STAFFREL>> &lyricGroupPlaces, Doc *doc, bool fixedAlignments)
 {
     if (verseTree.child.empty()) return;
 
@@ -800,6 +992,7 @@ void Page::AdjustSylSpacingByVerse(
 
                 AdjustSylSpacingFunctor adjustSylSpacing(doc, voltaTrack, lyricLine, previousStaffNs);
                 adjustSylSpacing.SetFilters(&filters);
+                adjustSylSpacing.SetFixedAlignments(fixedAlignments);
                 this->Process(adjustSylSpacing);
             }
         }
@@ -828,6 +1021,25 @@ FunctorCode Page::AcceptEnd(Functor &functor)
 FunctorCode Page::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitPageEnd(this);
+}
+
+//----------------------------------------------------------------------------
+// Static methods for Page
+//----------------------------------------------------------------------------
+
+std::map<int, double> Page::GetEncodedStaffTops(const System *system)
+{
+    assert(system);
+
+    std::map<int, double> staffTops;
+    const Object *firstMeasure = system->FindDescendantByType(MEASURE);
+    if (!firstMeasure) return staffTops;
+    for (const Object *object : firstMeasure->FindAllDescendantsByType(STAFF, false)) {
+        const Staff *staff = vrv_cast<const Staff *>(object);
+        assert(staff);
+        if (staff->HasCoordY1()) staffTops[staff->GetN()] = staff->GetCoordY1();
+    }
+    return staffTops;
 }
 
 } // namespace vrv

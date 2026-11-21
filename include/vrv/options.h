@@ -70,6 +70,17 @@ enum option_ELISION {
     ELISION_unicode = UNICODE_UNDERTIE
 };
 
+/**
+ * The horizontal positions encoded in the data that are used for the layout: the systems and measures, and also the
+ * events (notes and rests), which need the measure positions.
+ */
+enum option_ENCODEDXPOSITIONS { ENCODEDXPOSITIONS_none = 0, ENCODEDXPOSITIONS_measures, ENCODEDXPOSITIONS_events };
+
+/**
+ * The vertical positions encoded in the data that are used for the layout: the staves (and so the systems)
+ */
+enum option_ENCODEDYPOSITIONS { ENCODEDYPOSITIONS_none = 0, ENCODEDYPOSITIONS_staves };
+
 enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded, FOOTER_always };
 
 enum option_HEADER { HEADER_none = 0, HEADER_auto, HEADER_encoded };
@@ -148,6 +159,8 @@ public:
     static const std::map<int, std::string> s_condense;
     static const std::map<int, std::string> s_durationEq;
     static const std::map<int, std::string> s_elision;
+    static const std::map<int, std::string> s_encodedXPositions;
+    static const std::map<int, std::string> s_encodedYPositions;
     static const std::map<int, std::string> s_footer;
     static const std::map<int, std::string> s_header;
     static const std::map<int, std::string> s_ligatureOblique;
@@ -640,6 +653,8 @@ public:
     OptionBool m_condenseNotLastSystem;
     OptionBool m_condenseTempoPages;
     OptionBool m_convertAttributes;
+    OptionIntMap m_encodedXPositions;
+    OptionIntMap m_encodedYPositions;
     OptionBool m_evenNoteSpacing;
     OptionIntMap m_footer;
     OptionIntMap m_header;

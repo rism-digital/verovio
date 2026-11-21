@@ -66,7 +66,8 @@ class Note : public LayerElement,
              public AttStemsCmn,
              public AttStringtab,
              public AttTiePresent,
-             public AttVisibility {
+             public AttVisibility,
+             public AttXy {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

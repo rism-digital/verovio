@@ -78,6 +78,7 @@ AdjustSylSpacingFunctor::AdjustSylSpacingFunctor(
     m_previousMeasure = NULL;
     m_freeSpace = 0;
     m_voltaTrack = voltaTrack;
+    m_fixedAlignments = false;
 }
 
 std::pair<int, data_STAFFREL> AdjustSylSpacingFunctor::GetLyricLine(
@@ -147,8 +148,12 @@ FunctorCode AdjustSylSpacingFunctor::VisitSystemEnd(System *system)
 
     // Here we also need to handle the last syl of the measure - we check the alignment with the right barline
     if (m_previousContainer && m_lastSyl) {
-        int overlap = m_lastSyl->GetContentRight() - m_previousMeasure->GetRightBarLine()->GetAlignment()->GetXRel();
+        int rightBarLineX = m_previousMeasure->GetRightBarLine()->GetAlignment()->GetXRel();
+        // With fixed alignments, the measures are in place and the syl positions include the measure position
+        if (m_fixedAlignments) rightBarLineX += m_previousMeasure->GetDrawingX();
+        int overlap = m_lastSyl->GetContentRight() - rightBarLineX;
         this->AdjustPreviousLyricPosition(overlap);
+        if (m_fixedAlignments) overlap = 0;
 
         // If the previous verse was not in the previous measure (but before), ignore the overlap because it is
         // not likely to go over the whole following measure
@@ -301,8 +306,8 @@ void AdjustSylSpacingFunctor::AdjustLyricElement(LyricElement *lyricElement)
     int xShift = 0;
 
     // We have a previous syllable from the previous measure - we need to add the measure width because the measures are
-    // not aligned yet
-    if (m_previousMeasure) {
+    // not aligned yet (unless they are fixed)
+    if (m_previousMeasure && !m_fixedAlignments) {
         xShift = m_previousMeasure->GetWidth();
     }
 
@@ -319,7 +324,12 @@ void AdjustSylSpacingFunctor::AdjustLyricElement(LyricElement *lyricElement)
 
     int nextFreeSpace = this->AdjustPreviousLyricPosition(overlap);
 
-    if (overlap > 0) {
+    if ((overlap > 0) && m_fixedAlignments) {
+        // The alignments cannot move to make room: the current lyric element moves to the right instead, and the
+        // following ones are spaced from it
+        container->SetDrawingXRel(container->GetDrawingXRel() + overlap);
+    }
+    else if (overlap > 0) {
         // We are adjusting syl in two different measures - move only the right barline of the first measure
         if (m_previousMeasure) {
             m_overlappingSyl.push_back(std::make_tuple(

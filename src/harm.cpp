@@ -39,11 +39,13 @@ Harm::Harm()
     , TimeSpanningInterface()
     , AttLang()
     , AttNNumberLike()
+    , AttXy()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_LANG);
     this->RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterAttClass(ATT_XY);
 
     this->Reset();
 }
@@ -57,6 +59,7 @@ void Harm::Reset()
     TimeSpanningInterface::Reset();
     this->ResetLang();
     this->ResetNNumberLike();
+    this->ResetXy();
 }
 
 bool Harm::IsSupportedChild(ClassId classId)

@@ -138,6 +138,7 @@ void Doc::ResetToSerialization()
 
     m_drawingPageHeight = -1;
     m_drawingPageWidth = -1;
+    m_drawingPageSizeEncoded = false;
     m_drawingPageContentHeight = -1;
     m_drawingPageContentWidth = -1;
     m_drawingPageMarginBottom = 0;
@@ -2426,14 +2427,49 @@ Page *Doc::SetDrawingPage(int pageIdx, bool withPageRange)
     return m_drawingPage;
 }
 
+bool Doc::UseEncodedXPositions() const
+{
+    return (m_options->m_encodedXPositions.GetValue() != ENCODEDXPOSITIONS_none);
+}
+
+bool Doc::UseEncodedYPositions() const
+{
+    return (m_options->m_encodedYPositions.GetValue() != ENCODEDYPOSITIONS_none);
+}
+
+bool Doc::SetEncodedPageSize()
+{
+    const ScoreDef *scoreDef = this->GetFirstScoreDef();
+    if (!scoreDef || !scoreDef->HasPageWidth() || !scoreDef->HasPageHeight()) {
+        return false;
+    }
+
+    // Measurements in MEI virtual units (half the distance between two staff lines) or pixels, in drawing units
+    const int unit = this->GetDrawingUnit(100);
+    auto toDrawingUnits = [unit](const data_MEASUREMENTUNSIGNED &measurement) {
+        return (measurement.GetType() == MEASUREMENTTYPE_px) ? measurement.GetPx()
+                                                             : (int)std::round(measurement.GetVu() * unit);
+    };
+    m_pageWidth = toDrawingUnits(scoreDef->GetPageWidth());
+    m_pageHeight = toDrawingUnits(scoreDef->GetPageHeight());
+    m_pageMarginLeft = (scoreDef->HasPageLeftmar()) ? toDrawingUnits(scoreDef->GetPageLeftmar()) : 0;
+    m_pageMarginRight = (scoreDef->HasPageRightmar()) ? toDrawingUnits(scoreDef->GetPageRightmar()) : 0;
+    m_pageMarginTop = (scoreDef->HasPageTopmar()) ? toDrawingUnits(scoreDef->GetPageTopmar()) : 0;
+    m_pageMarginBottom = (scoreDef->HasPageBotmar()) ? toDrawingUnits(scoreDef->GetPageBotmar()) : 0;
+    return true;
+}
+
 void Doc::UpdatePageDrawingSizes()
 {
     assert(m_drawingPage);
 
     int glyph_size;
+    // The page size used with the encoded positions has its own orientation
+    m_drawingPageSizeEncoded = false;
 
     // we use the page members only if set (!= -1)
     if (m_drawingPage->m_pageHeight != -1) {
+        m_drawingPageSizeEncoded = this->UseEncodedPositions();
         m_drawingPageHeight = m_drawingPage->m_pageHeight;
         m_drawingPageWidth = m_drawingPage->m_pageWidth;
         m_drawingPageMarginBottom = m_drawingPage->m_pageMarginBottom;
@@ -2448,6 +2484,7 @@ void Doc::UpdatePageDrawingSizes()
         m_drawingPageMarginLeft = m_pageMarginLeft;
         m_drawingPageMarginRight = m_pageMarginRight;
         m_drawingPageMarginTop = m_pageMarginTop;
+        m_drawingPageSizeEncoded = true;
     }
     else {
         m_drawingPageHeight = m_options->m_pageHeight.GetValue();
@@ -2464,7 +2501,7 @@ void Doc::UpdatePageDrawingSizes()
         }
     }
 
-    if (m_options->m_landscape.GetValue()) {
+    if (m_options->m_landscape.GetValue() && !m_drawingPageSizeEncoded) {
         int pageHeight = m_drawingPageWidth;
         m_drawingPageWidth = m_drawingPageHeight;
         m_drawingPageHeight = pageHeight;

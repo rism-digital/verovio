@@ -45,6 +45,12 @@ public:
     static std::pair<int, data_STAFFREL> GetLyricLine(
         int staffN, data_STAFFREL place, const std::map<int, int> &previousStaffNs);
 
+    /**
+     * Set to true when the alignments and the measures are already in place (e.g., at their encoded positions) and
+     * cannot move to make room for the lyrics. The overlapping lyric elements are moved to the right instead.
+     */
+    void SetFixedAlignments(bool fixedAlignments) { m_fixedAlignments = fixedAlignments; }
+
     /*
      * Functor interface
      */
@@ -97,6 +103,8 @@ private:
     const std::map<int, int> &m_previousStaffNs;
     // The lyric elements of the current measure
     std::vector<LyricElement *> m_measureLyricElements;
+    // The alignments and the measures cannot move
+    bool m_fixedAlignments;
 };
 
 } // namespace vrv

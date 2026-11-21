@@ -974,6 +974,13 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     if (m_doc.IsFacTranscription()) {
         breaks = (m_doc.HasFacsimile()) ? BREAKS_encoded : BREAKS_none;
     }
+    // The encoded positions need the encoded breaks and page size
+    else if (m_doc.UseEncodedPositions()) {
+        breaks = BREAKS_encoded;
+        if (m_doc.SetEncodedPageSize() && m_options->m_landscape.GetValue()) {
+            LogWarning("The landscape option is ignored with the encoded page size");
+        }
+    }
 
     if (breaks != BREAKS_none) {
         if (input->GetLayoutInformation() == LAYOUT_ENCODED
@@ -1795,9 +1802,14 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
         width = m_doc.GetAdjustedDrawingPageWidth();
         height = m_doc.GetAdjustedDrawingPageHeight();
     }
+    // The page size used with the encoded positions is not swapped for landscape (see Doc::UpdatePageDrawingSizes)
+    else if (m_doc.m_drawingPageSizeEncoded) {
+        width = m_doc.m_drawingPageWidth / DEFINITION_FACTOR;
+        height = m_doc.m_drawingPageHeight / DEFINITION_FACTOR;
+    }
 
     // set dimensions
-    if (m_options->m_landscape.GetValue()) {
+    if (m_options->m_landscape.GetValue() && !m_doc.m_drawingPageSizeEncoded) {
         std::swap(height, width);
     }
 

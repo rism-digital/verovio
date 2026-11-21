@@ -456,6 +456,24 @@ public:
     void UpdatePageDrawingSizes();
 
     /**
+     * Set the page size and margins from the first scoreDef (@page.width, @page.height, @page.leftmar, etc.), when
+     * encoded there. Used with the encoded positions, which are from the top-left corner of the page. Return true if
+     * set. The encoded page size has its own orientation and is not swapped with the landscape option.
+     */
+    bool SetEncodedPageSize();
+
+    /**
+     * @name Use of the encoded positions
+     * Return true if the encoded x positions, the encoded y positions, or either of them are used (encodedXPositions
+     * and encodedYPositions options). Both imply the encoded breaks and page size.
+     */
+    ///@{
+    bool UseEncodedXPositions() const;
+    bool UseEncodedYPositions() const;
+    bool UseEncodedPositions() const { return this->UseEncodedXPositions() || this->UseEncodedYPositions(); }
+    ///@}
+
+    /**
      * Reset drawing page to NULL.
      * This might be necessary if we have replaced a page in the document.
      * We need to call this because otherwise looking at the page idx will fail.
@@ -638,6 +656,8 @@ public:
     int m_drawingPageHeight;
     /** The current page width */
     int m_drawingPageWidth;
+    /** The current page size is encoded with the encoded positions, in its own orientation (see SetEncodedPageSize) */
+    bool m_drawingPageSizeEncoded;
     /** The current page content height (without margings) */
     int m_drawingPageContentHeight;
     /** The current page content width (without margins) */

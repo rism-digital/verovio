@@ -35,6 +35,12 @@ const std::map<int, std::string> Option::s_durationEq
 const std::map<int, std::string> Option::s_elision = { { ELISION_regular, "regular" }, { ELISION_narrow, "narrow" },
     { ELISION_wide, "wide" }, { ELISION_unicode, "unicode" } };
 
+const std::map<int, std::string> Option::s_encodedXPositions = { { ENCODEDXPOSITIONS_none, "none" },
+    { ENCODEDXPOSITIONS_measures, "measures" }, { ENCODEDXPOSITIONS_events, "events" } };
+
+const std::map<int, std::string> Option::s_encodedYPositions
+    = { { ENCODEDYPOSITIONS_none, "none" }, { ENCODEDYPOSITIONS_staves, "staves" } };
+
 const std::map<int, std::string> Option::s_footer
     = { { FOOTER_none, "none" }, { FOOTER_auto, "auto" }, { FOOTER_encoded, "encoded" }, { FOOTER_always, "always" } };
 
@@ -1024,6 +1030,17 @@ Options::Options()
     m_convertAttributes.SetInfo("Convert attributes", "Convert analytical markup and attributes to permanent elements");
     m_convertAttributes.Init(false);
     this->Register(&m_convertAttributes, "convertAttributes", &m_general);
+
+    m_encodedXPositions.SetInfo("Encoded x positions",
+        "Use the horizontal positions encoded in the data, for the measures or also for the notes and rests; implies "
+        "the encoded breaks and page size");
+    m_encodedXPositions.Init(ENCODEDXPOSITIONS_none, &Option::s_encodedXPositions);
+    this->Register(&m_encodedXPositions, "encodedXPositions", &m_general);
+
+    m_encodedYPositions.SetInfo("Encoded y positions",
+        "Use the vertical positions of the staves encoded in the data; implies the encoded breaks and page size");
+    m_encodedYPositions.Init(ENCODEDYPOSITIONS_none, &Option::s_encodedYPositions);
+    this->Register(&m_encodedYPositions, "encodedYPositions", &m_general);
 
     m_evenNoteSpacing.SetInfo("Even note spacing", "Align notes and rests without adding duration based space");
     m_evenNoteSpacing.Init(false);

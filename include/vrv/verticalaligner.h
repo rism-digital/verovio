@@ -195,6 +195,11 @@ public:
     int GetYRel() const { return m_yRel; }
 
     /**
+     * Set the y to the encoded position of the staff, unconditionally (SetYRel only lowers it)
+     */
+    void SetEncodedYRel(int yRel) { m_yRel = yRel; }
+
+    /**
      * @name Methods for managing verse count with / without the collapse option
      * When setting a value of 0, then 1 is assumed. This occurs
      * Typically with one single verse and no \@n in <verse>

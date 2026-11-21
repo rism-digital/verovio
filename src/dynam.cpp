@@ -46,6 +46,7 @@ Dynam::Dynam()
     , AttMidiValue()
     , AttMidiValue2()
     , AttVerticalGroup()
+    , AttXy()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
@@ -55,6 +56,7 @@ Dynam::Dynam()
     this->RegisterAttClass(ATT_MIDIVALUE);
     this->RegisterAttClass(ATT_MIDIVALUE2);
     this->RegisterAttClass(ATT_VERTICALGROUP);
+    this->RegisterAttClass(ATT_XY);
 
     this->Reset();
 }
@@ -70,6 +72,7 @@ void Dynam::Reset()
     this->ResetExtender();
     this->ResetLineRendBase();
     this->ResetVerticalGroup();
+    this->ResetXy();
 }
 
 bool Dynam::IsSupportedChild(ClassId classId)

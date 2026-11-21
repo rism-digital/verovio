@@ -182,6 +182,7 @@ Rest::Rest()
     , AttExtSymAuth()
     , AttExtSymNames()
     , AttRestVisMensural()
+    , AttXy()
 {
     this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
     this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
@@ -193,6 +194,7 @@ Rest::Rest()
     this->RegisterAttClass(ATT_EXTSYMAUTH);
     this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_RESTVISMENSURAL);
+    this->RegisterAttClass(ATT_XY);
     this->Reset();
 }
 
@@ -211,6 +213,7 @@ void Rest::Reset()
     this->ResetExtSymAuth();
     this->ResetExtSymNames();
     this->ResetRestVisMensural();
+    this->ResetXy();
 }
 
 bool Rest::IsSupportedChild(ClassId classId)

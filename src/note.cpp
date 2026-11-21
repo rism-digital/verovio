@@ -73,6 +73,7 @@ Note::Note()
     , AttStringtab()
     , AttTiePresent()
     , AttVisibility()
+    , AttXy()
 {
     this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
     this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
@@ -94,6 +95,7 @@ Note::Note()
     this->RegisterAttClass(ATT_STRINGTAB);
     this->RegisterAttClass(ATT_TIEPRESENT);
     this->RegisterAttClass(ATT_VISIBILITY);
+    this->RegisterAttClass(ATT_XY);
 
     this->Reset();
 }
@@ -124,6 +126,7 @@ void Note::Reset()
     this->ResetStringtab();
     this->ResetTiePresent();
     this->ResetVisibility();
+    this->ResetXy();
 
     m_noteGroupPosition = 0;
     m_noteGroup = NULL;

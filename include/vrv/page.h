@@ -95,9 +95,10 @@ public:
     void LayOutTranscription(bool force = false);
 
     /**
-     * Lay out the content of the page (measures and their content) horizontally
+     * Lay out the content of the page (measures and their content) horizontally.
+     * Without spacing the lyrics, the notes are not moved to make room for them.
      */
-    void LayOutHorizontally();
+    void LayOutHorizontally(bool spaceLyrics = true);
 
     /**
      * Lay out the measures horizontally using the cached values.
@@ -120,6 +121,19 @@ public:
      * Justifiy the content of the page (system/staves) vertically
      */
     void JustifyVertically();
+
+    /**
+     * @name Place the systems, measures, staves and events at their encoded positions
+     * Following the encodedXPositions and encodedYPositions options. The rest of the layout, calculated by
+     * LayOutHorizontally and LayOutVertically, moves with them: the alignments without an encoded position are
+     * interpolated between the encoded ones, and the content of a staff moves with it. The vertical one is called from
+     * LayOutVertically in place of the regular staff spacing, so the content placed between or across the staves
+     * follows them, and returns the y of the systems it placed.
+     */
+    ///@{
+    void AdjustToEncodedPositionsHorizontally();
+    std::map<System *, int> AdjustToEncodedPositionsVertically();
+    ///@}
 
     /**
      * Reset and set the horizontal and vertical alignment
@@ -162,15 +176,21 @@ public:
 
 private:
     /**
-     * Adjust the horizontal position of the syl processing verse by verse
+     * Adjust the horizontal position of the syl processing verse by verse.
+     * With fixed alignments (see AdjustSylSpacingFunctor::SetFixedAlignments), only the lyrics move.
      */
-    void AdjustSylSpacingByVerse(
-        const IntTree &verseTree, const std::set<std::tuple<int, int, data_STAFFREL>> &lyricGroupPlaces, Doc *doc);
+    void AdjustSylSpacingByVerse(const IntTree &verseTree,
+        const std::set<std::tuple<int, int, data_STAFFREL>> &lyricGroupPlaces, Doc *doc, bool fixedAlignments = false);
 
     /**
      * Reduces the justifiable height based on the --justification-max-vertical option
      */
     void ReduceJustifiableHeight(const Doc *doc);
+
+    /**
+     * Return the encoded top line (@coord.y1) of each staff of the system, by @n, from its first measure
+     */
+    static std::map<int, double> GetEncodedStaffTops(const System *system);
 
     //
 public:

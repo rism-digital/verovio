@@ -55,6 +55,7 @@ class Pedal;
 class ScoreDef;
 class Section;
 class Slur;
+class Staff;
 class StaffGrp;
 class Tempo;
 class Tie;
@@ -294,6 +295,42 @@ namespace musicxml {
         std::string m_glyphName;
         std::string m_glyphAuth;
     };
+
+    /**
+     * The encoded position of a measure, in tenths from the top-left corner of its page
+     */
+    struct MeasureLayout {
+        MeasureLayout(int system, double x, double width)
+        {
+            m_system = system;
+            m_x = x;
+            m_width = width;
+        }
+
+        int m_system;
+        double m_x;
+        double m_width;
+    };
+
+    /**
+     * The encoded position of a system, in tenths from the top-left corner of its page.
+     * The staff tops are the y positions of the top line of each staff, keyed by staff @n. The hidden staves are
+     * not printed in the system and have no position.
+     */
+    struct SystemLayout {
+        SystemLayout(int page, double left)
+        {
+            m_page = page;
+            m_left = left;
+            m_bottom = 0.0;
+        }
+
+        int m_page;
+        double m_left;
+        double m_bottom;
+        std::map<int, double> m_staffTops;
+        std::set<int> m_hiddenStaves;
+    };
 } // namespace musicxml
 
 #endif // NO_MUSICXML_SUPPORT
@@ -365,7 +402,7 @@ private:
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure);
     void ReadMusicXmlNote(pugi::xml_node, Measure *measure, const short int staffOffset, Section *section);
-    void ReadMusicXmlPrint(pugi::xml_node, Section *section);
+    void ReadMusicXmlPrint(pugi::xml_node, Section *section, int index);
     void ReadMusicXmlSound(pugi::xml_node, Measure *measure, Section *section);
     bool ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord);
     void ReadMusicXmlTupletStart(const pugi::xml_node &node, const pugi::xml_node &tupletStart, Layer *layer);
@@ -576,6 +613,33 @@ private:
     ScoreDef *GetOrCreateLastScoreDef(Section *section);
     ///@}
 
+    /**
+     * @name Methods for reading the encoded layout (page layout, measure widths, default-x and default-y)
+     * Only used with the encodedXPositions or encodedYPositions option. The positions are written in MEI virtual units
+     * (half the distance between two staff lines, i.e., 5 tenths), from the top-left corner of the page: @coord.x1 and
+     * @coord.x2 for the measures, @coord.y1 (top line) for the staves, @x and @y for the notes, rests, syllables and
+     * control events.
+     */
+    ///@{
+    void ReadMusicXmlLayout(pugi::xml_node root, ScoreDef *scoreDef);
+    bool HasEncodedLayout() const { return !m_measureLayouts.empty(); }
+    void SetMeasurePositions(Measure *measure, int index, int staffOffset);
+    void SetNotePositions(pugi::xml_node node, LayerElement *element, Staff *staff, int index);
+    void AddPendingPosition(ControlElement *element, pugi::xml_node node);
+    void SetPendingPositions(int index);
+    ///@}
+
+    /**
+     * Return the top line of the staff @n in the system of the measure index, in tenths, if encoded
+     */
+    bool GetEncodedStaffTop(int index, int staffN, double &top) const;
+
+    /**
+     * Return the y of a node (e.g., a note or a lyric) from its default-y and relative-y and the top line of its
+     * staff, in tenths from the top of the page
+     */
+    static double CalcEncodedY(double top, pugi::xml_node node);
+
     /*
      * @name Helper for detecting the slur curve direction
      */
@@ -715,6 +779,11 @@ private:
     std::map<int, std::set<data_PITCHNAME>> m_keyAlteredPitches;
     /* A flag indicating we had a clef change */
     int m_clefChanged = 0;
+    /* The encoded layout of each measure (by measure index) and of each system, for the encoded positions */
+    std::vector<musicxml::MeasureLayout> m_measureLayouts;
+    std::vector<musicxml::SystemLayout> m_systemLayouts;
+    /* The control elements of the measure being read, with the MusicXML element giving their position */
+    std::vector<std::pair<ControlElement *, pugi::xml_node>> m_pendingPositions;
 
 #endif // NO_MUSICXML_SUPPORT
 };

@@ -46,7 +46,8 @@ class Rest : public LayerElement,
              public AttEnclosingChars,
              public AttExtSymAuth,
              public AttExtSymNames,
-             public AttRestVisMensural {
+             public AttRestVisMensural,
+             public AttXy {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

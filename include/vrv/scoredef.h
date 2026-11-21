@@ -132,6 +132,7 @@ class ScoreDef : public ScoreDefElement,
                  public AttDistances,
                  public AttEndings,
                  public AttOptimization,
+                 public AttPages,
                  public AttTimeBase,
                  public AttTuning {
 public:

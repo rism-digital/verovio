@@ -93,6 +93,9 @@
 
 namespace vrv {
 
+// The tenths of MusicXML per MEI virtual unit (half the distance between two staff lines)
+constexpr double TENTHS_PER_VU = 5.0;
+
 // Using flags mordent can be easily visualized with the value. E.g.
 // 0x212 - approach and depart are both below and form is normal
 // APPR_Below | FORM_Normal | DEP_Below
@@ -927,6 +930,10 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     Section *section = new Section();
     score->AddChild(section);
     m_sections.push_back({ musicxml::SectionInfo(), {} });
+    // the encoded layout is used only when requested
+    if (m_doc->UseEncodedPositions()) {
+        this->ReadMusicXmlLayout(root, score->GetScoreDef());
+    }
     // initialize layout
     if (root.select_node("/score-partwise/part/measure/print[@new-system or @new-page]")) {
         m_layoutInformation = LAYOUT_ENCODED;
@@ -935,6 +942,13 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             Pb *pb = new Pb();
             section->AddChild(pb);
         }
+    }
+    // The encoded positions need the encoded breaks, starting with a page break, even without any break encoded
+    if (this->HasEncodedLayout() && !section->FindDescendantByType(PB)
+        && !root.select_node("/score-partwise/part[1]/measure[1]/print[@new-page]")) {
+        m_layoutInformation = LAYOUT_ENCODED;
+        Pb *pb = new Pb();
+        section->AddChild(pb);
     }
 
     pugi::xpath_node layout = root.select_node("/score-partwise/defaults/page-layout");
@@ -2006,7 +2020,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         }
         // for now only check first part
         else if (IsElement(child, "print") && node.select_node("parent::part[not(preceding-sibling::part)]")) {
-            this->ReadMusicXmlPrint(child, section);
+            this->ReadMusicXmlPrint(child, section, index);
         }
     }
 
@@ -2050,6 +2064,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     // clear current layer
     m_isLayerInitialized = false;
     m_currentLayer = NULL;
+
+    this->SetPendingPositions(index);
+    this->SetMeasurePositions(measure, index, staffOffset);
 
     return true;
 }
@@ -2463,6 +2480,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             }
             m_controlElements.push_back({ m_measureCounts.at(measure), dir });
             m_dirStack.push_back(dir);
+            this->AddPendingPosition(dir, words.first().node());
 
             pugi::xpath_node extender = (words.end() - 1)->parent().next_sibling("direction-type").first_child();
             if (!strcmp(extender.node().name(), "bracket") || !strcmp(extender.node().name(), "dashes")) {
@@ -2539,6 +2557,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         dynam->SetVgrp(defaultY);
         m_controlElements.push_back({ m_measureCounts.at(measure), dynam });
         m_dynamStack.push_back(dynam);
+        this->AddPendingPosition(dynam, dynamics.first().node());
 
         if (!dynamics.empty()) {
             pugi::xpath_node extender = (dynamics.end() - 1)->parent().next_sibling("direction-type").first_child();
@@ -2824,6 +2843,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         }
         m_controlElements.push_back({ m_measureCounts.at(measure), tempo });
         m_tempoStack.push_back(tempo);
+        this->AddPendingPosition(tempo, (metronome) ? metronome.node() : words.first().node());
     }
 
     // other cases
@@ -2942,6 +2962,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure)
     harm->SetTstamp((double)(m_durTotal + durOffset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
     m_controlElements.push_back({ m_measureCounts.at(measure), harm });
     m_harmStack.push_back(harm);
+    this->AddPendingPosition(harm, node);
 }
 
 void MusicXmlInput::ReadMusicXmlNote(
@@ -4111,6 +4132,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
     }
 
+    this->SetNotePositions(node, (note) ? note : element, staff, m_measureCounts.at(measure));
+
     // add StartIDs to dir, dynam, and pedal
     if (!m_dirStack.empty()) {
         for (Dir *dir : m_dirStack) {
@@ -4189,7 +4212,7 @@ void MusicXmlInput::AddAccidental(pugi::xml_node accidental, Note *note)
     note->AddChild(accid);
 }
 
-void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
+void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section, int index)
 {
     assert(node);
     assert(section);
@@ -4202,7 +4225,8 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
         }
     }
 
-    if (node.attribute("new-system").as_bool()) {
+    // With the encoded positions, the first measure always starts a page, so a system break is not needed there
+    if (node.attribute("new-system").as_bool() && !(this->HasEncodedLayout() && (index == 0))) {
         Sb *sb = new Sb();
         section->AddChild(sb);
     }
@@ -4210,6 +4234,312 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
     if (std::string(node.child("measure-numbering").text().as_string()) == "none") {
         m_doc->GetFirstScoreDef()->SetMnumVisible(BOOLEAN_false);
     }
+}
+
+void MusicXmlInput::ReadMusicXmlLayout(pugi::xml_node root, ScoreDef *scoreDef)
+{
+    assert(root);
+    assert(scoreDef);
+
+    // The value of a layout element (e.g., "system-layout/system-distance") in a <print> or in the <defaults>
+    auto layoutValue = [](pugi::xml_node node, const char *path, double fallback) {
+        const pugi::xml_node value = node.select_node(path).node();
+        return (value) ? value.text().as_double() : fallback;
+    };
+
+    const pugi::xml_node defaults = root.child("defaults");
+    const double pageWidth = layoutValue(defaults, "page-layout/page-width", 0.0);
+    const double pageHeight = layoutValue(defaults, "page-layout/page-height", 0.0);
+    if ((pageWidth <= 0.0) || (pageHeight <= 0.0)) {
+        LogWarning("MusicXML import: No page layout is encoded, the encoded positions cannot be used");
+        return;
+    }
+
+    // The measures of each part, and the height of each staff of each part
+    std::vector<std::vector<pugi::xml_node>> partMeasures;
+    std::vector<std::vector<double>> partStaffHeights;
+    for (pugi::xml_node part : root.children("part")) {
+        std::vector<pugi::xml_node> measures;
+        for (pugi::xml_node measure : part.children("measure")) {
+            measures.push_back(measure);
+        }
+        partMeasures.push_back(std::move(measures));
+        const pugi::xml_node staves = part.select_node("measure/attributes/staves").node();
+        const int staffCount = (staves) ? std::max(1, staves.text().as_int()) : 1;
+        std::vector<double> heights;
+        for (int staff = 1; staff <= staffCount; ++staff) {
+            const std::string xpath = StringFormat("measure/attributes/staff-details[@number='%d']/staff-lines", staff);
+            const int lineCount = (int)layoutValue(part, xpath.c_str(),
+                layoutValue(part, "measure/attributes/staff-details[not(@number)]/staff-lines", 5));
+            // The distance between two staff lines is 10 tenths
+            heights.push_back(std::max(0, lineCount - 1) * 10.0);
+        }
+        partStaffHeights.push_back(std::move(heights));
+    }
+    if (partMeasures.empty() || partMeasures.front().empty()) {
+        return;
+    }
+    const std::vector<pugi::xml_node> &measures = partMeasures.front();
+    for (const pugi::xml_node &measure : measures) {
+        if (!measure.attribute("width")) {
+            LogWarning("MusicXML import: Measure '%s' has no width, the encoded positions cannot be used",
+                measure.attribute("number").as_string());
+            return;
+        }
+    }
+
+    // The margins of a page. Page numbers start at 1, so the first page (index 0) is odd.
+    auto pageMargins = [](pugi::xml_node pageLayout, int page) {
+        const std::string pageType = (page % 2 == 0) ? "odd" : "even";
+        for (pugi::xml_node margins : pageLayout.children("page-margins")) {
+            const std::string type = margins.attribute("type").as_string();
+            if (type.empty() || (type == "both") || (type == pageType)) {
+                return margins;
+            }
+        }
+        return pugi::xml_node();
+    };
+
+    // The distance of a staff (numbered in its part) from the previous staff in a <print> or in the <defaults>
+    auto staffDistance = [&layoutValue](pugi::xml_node node, int staff, double fallback) {
+        if (!node) return fallback;
+        const std::string numbered = StringFormat("staff-layout[@number='%d']/staff-distance", staff);
+        return layoutValue(
+            node, numbered.c_str(), layoutValue(node, "staff-layout[not(@number)]/staff-distance", fallback));
+    };
+    // The ones from the <defaults>, used unless the <print> of the part changes them
+    std::vector<double> defaultStaffDistances;
+    for (const std::vector<double> &heights : partStaffHeights) {
+        for (int staff = (int)defaultStaffDistances.size(); staff < (int)heights.size(); ++staff) {
+            defaultStaffDistances.push_back(staffDistance(defaults, staff + 1, 0.0));
+        }
+    }
+
+    const pugi::xml_node pageLayout = defaults.child("page-layout");
+    const double systemLeft = layoutValue(defaults, "system-layout/system-margins/left-margin", 0.0);
+    const double systemDistance = layoutValue(defaults, "system-layout/system-distance", 0.0);
+    const double topSystemDistance = layoutValue(defaults, "system-layout/top-system-distance", 0.0);
+
+    int page = 0;
+    double pageLeft = 0.0;
+    double pageTop = 0.0;
+    double x = 0.0;
+    // Whether each staff of each part is printed, which is changed by <staff-details print-object> and kept until
+    // changed
+    std::vector<std::vector<bool>> staffPrinted;
+    for (const std::vector<double> &heights : partStaffHeights) {
+        staffPrinted.push_back(std::vector<bool>(heights.size(), true));
+    }
+    for (int i = 0; i < (int)measures.size(); ++i) {
+        for (int part = 0; part < (int)partMeasures.size(); ++part) {
+            if (i >= (int)partMeasures.at(part).size()) continue;
+            for (pugi::xml_node attributes : partMeasures.at(part).at(i).children("attributes")) {
+                for (pugi::xml_node details : attributes.children("staff-details")) {
+                    if (!details.attribute("print-object")) continue;
+                    const bool printed = details.attribute("print-object").as_bool();
+                    const int number = details.attribute("number").as_int();
+                    for (int staff = 0; staff < (int)staffPrinted.at(part).size(); ++staff) {
+                        if ((number == 0) || (number == staff + 1)) {
+                            staffPrinted.at(part).at(staff) = printed;
+                        }
+                    }
+                }
+            }
+        }
+        const pugi::xml_node print = measures.at(i).child("print");
+        const bool newPage = (i > 0) && print.attribute("new-page").as_bool();
+        const bool newSystem = (i == 0) || newPage || print.attribute("new-system").as_bool();
+        if (newPage) page += print.attribute("blank-page").as_int() + 1;
+        if (newSystem) {
+            // The page margins can be changed in the <print> starting the page
+            if ((i == 0) || newPage) {
+                pugi::xml_node margins = pageMargins(print.child("page-layout"), page);
+                if (!margins) margins = pageMargins(pageLayout, page);
+                if (margins) {
+                    pageLeft = margins.child("left-margin").text().as_double();
+                    pageTop = margins.child("top-margin").text().as_double();
+                }
+            }
+            musicxml::SystemLayout system(
+                page, pageLeft + layoutValue(print, "system-layout/system-margins/left-margin", systemLeft));
+            // The top of the first staff, from the top margin for the first system of a page, or from the bottom
+            // of the previous system
+            double y = 0.0;
+            if (m_systemLayouts.empty() || (m_systemLayouts.back().m_page != page)) {
+                y = pageTop + layoutValue(print, "system-layout/top-system-distance", topSystemDistance);
+            }
+            else {
+                y = m_systemLayouts.back().m_bottom
+                    + layoutValue(print, "system-layout/system-distance", systemDistance);
+            }
+            // Staff @n values are numbered across the parts, as in ReadMusicXml. A staff not printed at the start of
+            // the system (e.g., an empty staff in an optimized system) is hidden for the system and takes no space:
+            // the distance of the next staff is from the previous printed one.
+            int staffN = 0;
+            bool firstPrinted = true;
+            for (int part = 0; part < (int)partMeasures.size(); ++part) {
+                const pugi::xml_node partPrint
+                    = (i < (int)partMeasures.at(part).size()) ? partMeasures.at(part).at(i).child("print") : print;
+                for (int staff = 0; staff < (int)partStaffHeights.at(part).size(); ++staff) {
+                    ++staffN;
+                    if (!staffPrinted.at(part).at(staff)) {
+                        system.m_hiddenStaves.insert(staffN);
+                        continue;
+                    }
+                    if (!firstPrinted) y += staffDistance(partPrint, staff + 1, defaultStaffDistances.at(staff));
+                    firstPrinted = false;
+                    system.m_staffTops[staffN] = y;
+                    y += partStaffHeights.at(part).at(staff);
+                }
+            }
+            system.m_bottom = y;
+            m_systemLayouts.push_back(system);
+            x = system.m_left;
+        }
+        const double width = measures.at(i).attribute("width").as_double();
+        m_measureLayouts.push_back(musicxml::MeasureLayout((int)m_systemLayouts.size() - 1, x, width));
+        x += width;
+    }
+
+    // The page size and margins (of the first page), in MEI virtual units
+    auto vu = [](double tenths) {
+        data_MEASUREMENTUNSIGNED value;
+        value.SetVu(tenths / TENTHS_PER_VU);
+        return value;
+    };
+    scoreDef->SetPageWidth(vu(pageWidth));
+    scoreDef->SetPageHeight(vu(pageHeight));
+    const pugi::xml_node margins = pageMargins(pageLayout, 0);
+    if (margins) {
+        scoreDef->SetPageLeftmar(vu(margins.child("left-margin").text().as_double()));
+        scoreDef->SetPageRightmar(vu(margins.child("right-margin").text().as_double()));
+        scoreDef->SetPageTopmar(vu(margins.child("top-margin").text().as_double()));
+        scoreDef->SetPageBotmar(vu(margins.child("bottom-margin").text().as_double()));
+    }
+}
+
+void MusicXmlInput::SetMeasurePositions(Measure *measure, int index, int staffOffset)
+{
+    assert(measure);
+
+    if ((index < 0) || (index >= (int)m_measureLayouts.size())) {
+        return;
+    }
+
+    const musicxml::MeasureLayout &layout = m_measureLayouts.at(index);
+    const musicxml::SystemLayout &system = m_systemLayouts.at(layout.m_system);
+
+    // The measure itself is read with the first part, the other parts are merged into it
+    if (staffOffset == 0) {
+        double right = layout.m_x + layout.m_width;
+        // A multi-measure rest spans the following measures of the system
+        const std::map<int, int>::const_iterator multiRest = m_multiRests.find(index);
+        if ((multiRest != m_multiRests.end()) && (multiRest->second < (int)m_measureLayouts.size())) {
+            const musicxml::MeasureLayout &last = m_measureLayouts.at(multiRest->second);
+            if (last.m_system == layout.m_system) right = last.m_x + last.m_width;
+        }
+        measure->SetCoordX1(layout.m_x / TENTHS_PER_VU);
+        measure->SetCoordX2(right / TENTHS_PER_VU);
+    }
+
+    // The staves of the part just read
+    for (Object *child : measure->GetChildren()) {
+        if (!child->Is(STAFF)) continue;
+        Staff *staff = vrv_cast<Staff *>(child);
+        assert(staff);
+        if (staff->GetN() <= staffOffset) continue;
+        // A staff hidden in the system is hidden in all its measures
+        if (system.m_hiddenStaves.contains(staff->GetN())) {
+            staff->SetVisible(BOOLEAN_false);
+            continue;
+        }
+        const std::map<int, double>::const_iterator top = system.m_staffTops.find(staff->GetN());
+        if (top != system.m_staffTops.end()) staff->SetCoordY1(top->second / TENTHS_PER_VU);
+    }
+}
+
+void MusicXmlInput::SetNotePositions(pugi::xml_node node, LayerElement *element, Staff *staff, int index)
+{
+    if (!this->HasEncodedLayout() || !element || !staff) {
+        return;
+    }
+    if (!element->IsAnyOf(std::array{ NOTE, REST })) return;
+    // Without a default-x, the element has no encoded position
+    if (!node.attribute("default-x")) return;
+    double top = 0.0;
+    if (!this->GetEncodedStaffTop(index, staff->GetN(), top)) return;
+
+    // The default-x is from the left of the measure and the relative-x from the default-x; it is the left of the
+    // notehead
+    AttXy *xy = (element->Is(NOTE)) ? static_cast<AttXy *>(vrv_cast<Note *>(element)) : vrv_cast<Rest *>(element);
+    assert(xy);
+    const double x = m_measureLayouts.at(index).m_x + node.attribute("default-x").as_double()
+        + node.attribute("relative-x").as_double();
+    xy->SetX(x / TENTHS_PER_VU);
+    if (node.attribute("default-y")) xy->SetY(MusicXmlInput::CalcEncodedY(top, node) / TENTHS_PER_VU);
+
+    if (!element->Is(NOTE)) return;
+
+    // Lyrics: the x is the center of the syllable (MusicXML centers lyrics on the note by default, and its default-x
+    // is from the left of the note), and the y its baseline. In a chord, the verses are on the chord.
+    Object *parent = element->GetParent();
+    Object *lyricHost = (parent && parent->Is(CHORD)) ? parent : element;
+    for (pugi::xml_node lyric : node.children("lyric")) {
+        const int lyricNumber = std::max(1, lyric.attribute("number").as_int());
+        for (Object *child : lyricHost->GetChildren()) {
+            if (!child->Is(VERSE) || (vrv_cast<Verse *>(child)->GetN() != lyricNumber)) {
+                continue;
+            }
+            Syl *syl = vrv_cast<Syl *>(child->FindDescendantByType(SYL));
+            if (!syl || syl->HasX()) {
+                break;
+            }
+            // About half a staff space, the center of a notehead, without a default-x
+            const double lyricX = x + (lyric.attribute("default-x") ? lyric.attribute("default-x").as_double() : 5.0)
+                + lyric.attribute("relative-x").as_double();
+            syl->SetX(lyricX / TENTHS_PER_VU);
+            if (lyric.attribute("default-y")) syl->SetY(MusicXmlInput::CalcEncodedY(top, lyric) / TENTHS_PER_VU);
+            break;
+        }
+    }
+}
+
+void MusicXmlInput::AddPendingPosition(ControlElement *element, pugi::xml_node node)
+{
+    if (!this->HasEncodedLayout() || !element || !node) {
+        return;
+    }
+    m_pendingPositions.push_back({ element, node });
+}
+
+void MusicXmlInput::SetPendingPositions(int index)
+{
+    // The control elements of the measure have their staff once the measure is read
+    for (const std::pair<ControlElement *, pugi::xml_node> &pending : m_pendingPositions) {
+        AttXy *xy = dynamic_cast<AttXy *>(pending.first);
+        const TimePointInterface *interface = pending.first->GetTimePointInterface();
+        if (!xy || !interface || !interface->HasStaff() || !pending.second.attribute("default-y")) {
+            continue;
+        }
+        // The x of a control element is from its current position in the measure, which is not resolved here
+        double top = 0.0;
+        if (!this->GetEncodedStaffTop(index, interface->GetStaff().front(), top)) continue;
+        xy->SetY(MusicXmlInput::CalcEncodedY(top, pending.second) / TENTHS_PER_VU);
+    }
+    m_pendingPositions.clear();
+}
+
+bool MusicXmlInput::GetEncodedStaffTop(int index, int staffN, double &top) const
+{
+    if ((index < 0) || (index >= (int)m_measureLayouts.size())) {
+        return false;
+    }
+
+    const musicxml::SystemLayout &system = m_systemLayouts.at(m_measureLayouts.at(index).m_system);
+    const std::map<int, double>::const_iterator staffTop = system.m_staffTops.find(staffN);
+    if (staffTop == system.m_staffTops.end()) return false;
+    top = staffTop->second;
+    return true;
 }
 
 void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure, Section *section)
@@ -4646,6 +4976,12 @@ beamRend_FORM MusicXmlInput::ConvertBeamFanToForm(const std::string &value)
     if (value == "rit") return beamRend_FORM_rit;
 
     return beamRend_FORM_NONE;
+}
+
+double MusicXmlInput::CalcEncodedY(double top, pugi::xml_node node)
+{
+    // The default-y is from the top line of the staff, up being positive, and the relative-y from the default-y
+    return top - node.attribute("default-y").as_double() - node.attribute("relative-y").as_double();
 }
 
 curvature_CURVEDIR MusicXmlInput::CombineCurvedir(curvature_CURVEDIR startDir, curvature_CURVEDIR stopDir)
