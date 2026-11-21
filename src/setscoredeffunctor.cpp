@@ -148,7 +148,10 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitKeySig(KeySig *keySig)
 
 FunctorCode ScoreDefSetCurrentFunctor::VisitLayer(Layer *layer)
 {
-    if (m_doc->GetType() != FacTranscription) layer->SetDrawingStaffDefValues(m_currentStaffDef);
+    // Neume and mensural transcriptions encode their clefs in the layers, at their facsimile position
+    if (!m_doc->IsFacTranscription() || m_doc->IsCmnFacTranscription()) {
+        layer->SetDrawingStaffDefValues(m_currentStaffDef);
+    }
     return FUNCTOR_CONTINUE;
 }
 

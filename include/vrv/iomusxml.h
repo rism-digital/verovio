@@ -55,10 +55,13 @@ class Pedal;
 class ScoreDef;
 class Section;
 class Slur;
+class Staff;
 class StaffGrp;
+class Surface;
 class Tempo;
 class Tie;
 class Trill;
+class Zone;
 
 //----------------------------------------------------------------------------
 // namespace for local MusicXML classes
@@ -294,6 +297,64 @@ namespace musicxml {
         std::string m_glyphName;
         std::string m_glyphAuth;
     };
+
+    /**
+     * The encoded position of a measure, in tenths from the top-left corner of its page
+     */
+    struct MeasureLayout {
+        MeasureLayout(int page, int system, double x, double width)
+        {
+            m_page = page;
+            m_system = system;
+            m_x = x;
+            m_width = width;
+        }
+
+        int m_page;
+        int m_system;
+        double m_x;
+        double m_width;
+    };
+
+    /**
+     * The encoded position of a system, in tenths from the top-left corner of its page.
+     * The staff tops are the y positions of the top line of each staff, keyed by staff @n. The hidden staves are
+     * not printed in the system and have no position.
+     */
+    struct SystemLayout {
+        SystemLayout(int page, double left)
+        {
+            m_page = page;
+            m_left = left;
+            m_right = left;
+            m_bottom = 0.0;
+        }
+
+        int m_page;
+        double m_left;
+        double m_right;
+        double m_bottom;
+        std::map<int, std::pair<double, double>> m_staffTopsAndHeights;
+        std::set<int> m_hiddenStaves;
+    };
+
+    /**
+     * The zones of the chord being read and of its accidentals (with their diatonic pitch), and the left of its
+     * leftmost note, in tenths
+     */
+    struct ChordFacsimile {
+        ChordFacsimile(const Object *chord = NULL, Zone *zone = NULL, double left = 0.0)
+        {
+            m_chord = chord;
+            m_zone = zone;
+            m_left = left;
+        }
+
+        const Object *m_chord;
+        Zone *m_zone;
+        double m_left;
+        std::vector<std::pair<int, Zone *>> m_accids;
+    };
 } // namespace musicxml
 
 #endif // NO_MUSICXML_SUPPORT
@@ -370,7 +431,7 @@ private:
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure);
     void ReadMusicXmlNote(pugi::xml_node, Measure *measure, const short int staffOffset, Section *section);
-    void ReadMusicXmlPrint(pugi::xml_node, Section *section);
+    void ReadMusicXmlPrint(pugi::xml_node, Section *section, int index);
     void ReadMusicXmlSound(pugi::xml_node, Measure *measure, Section *section);
     bool ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord);
     void ReadMusicXmlTupletStart(const pugi::xml_node &node, const pugi::xml_node &tupletStart, Layer *layer);
@@ -586,6 +647,19 @@ private:
     ScoreDef *GetOrCreateLastScoreDef(Section *section);
     ///@}
 
+    /**
+     * @name Methods for creating a facsimile from the encoded layout (page layout, measure widths and default-x)
+     * Only used with the useFacsimile option. Coordinates are in MusicXML tenths from the top-left of each page.
+     */
+    ///@{
+    bool ReadMusicXmlLayout(pugi::xml_node root);
+    bool HasFacsimileLayout() const { return !m_measureLayouts.empty(); }
+    Zone *AddFacsimileZone(int page, double ulx, double uly, double lrx, double lry);
+    void SetMeasureFacsimile(Measure *measure, int index, bool withMeasureZone);
+    void SetNoteFacsimile(pugi::xml_node node, LayerElement *element, Staff *staff, int index);
+    void SetBreakFacsimile(Object *object, int index, int pageOffset = 0);
+    ///@}
+
     /*
      * @name Helper for detecting the slur curve direction
      */
@@ -728,6 +802,13 @@ private:
     std::map<int, std::set<data_PITCHNAME>> m_keyAlteredPitches;
     /* A flag indicating we had a clef change */
     int m_clefChanged = 0;
+    /* The encoded layout of each measure (by measure index) and of each system, for the facsimile */
+    std::vector<musicxml::MeasureLayout> m_measureLayouts;
+    std::vector<musicxml::SystemLayout> m_systemLayouts;
+    /* The facsimile surfaces, one per page */
+    std::vector<Surface *> m_surfaces;
+    /* The current chord, its zone and the zones of its accidentals, updated with each of its notes */
+    musicxml::ChordFacsimile m_chordFacsimile;
 
 #endif // NO_MUSICXML_SUPPORT
 };

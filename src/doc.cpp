@@ -1617,6 +1617,11 @@ void Doc::SyncFromFacsimileDoc()
 
     SyncFromFacsimileFunctor syncFromFacsimileFunctor(this);
     this->Process(syncFromFacsimileFunctor);
+
+    if (syncFromFacsimileFunctor.GetZonelessCount() > 0) {
+        LogWarning("%d element(s) without a facsimile zone could not be positioned from the facsimile",
+            syncFromFacsimileFunctor.GetZonelessCount());
+    }
 }
 
 void Doc::SyncToFacsimileDoc()

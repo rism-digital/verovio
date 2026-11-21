@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "accid.h"
 #include "doc.h"
 #include "layerelement.h"
 #include "measure.h"
@@ -36,10 +37,17 @@ SyncFromFacsimileFunctor::SyncFromFacsimileFunctor(Doc *doc) : Functor()
     m_view.SetDoc(doc);
     m_currentPage = NULL;
     m_currentSystem = NULL;
+    m_currentNeumeLine = NULL;
     m_pageMarginTop = 0;
     m_pageMarginLeft = 0;
     m_ppuFactor = 1.0;
+    m_zonelessCount = 0;
 }
+
+// Elements without a zone (no @facs, an unresolved @facs, or an @facs pointing to a surface) are skipped
+// instead of dereferencing a NULL zone. They are drawn at their default position, which in a transcription
+// is not spaced: e.g., a note without a zone is drawn at the left of its measure. They are counted so that
+// Doc::SyncFromFacsimileDoc can warn about them.
 
 FunctorCode SyncFromFacsimileFunctor::VisitLayerElement(LayerElement *layerElement)
 {
@@ -48,7 +56,17 @@ FunctorCode SyncFromFacsimileFunctor::VisitLayerElement(LayerElement *layerEleme
         return FUNCTOR_CONTINUE;
 
     Zone *zone = layerElement->GetZone();
-    assert(zone);
+    if (!zone) {
+        // Syllables without a zone are expected: they are positioned from their note. So are elements of hidden staves
+        // and gestural accidentals, which are not drawn (and are written as note attributes, without a zone).
+        const Staff *staff = vrv_cast<const Staff *>(layerElement->GetFirstAncestor(STAFF));
+        const bool isHidden = (staff && (staff->GetVisible() == BOOLEAN_false));
+        const bool isGestural = (layerElement->Is(ACCID) && !vrv_cast<Accid *>(layerElement)->HasAccid());
+        if (!layerElement->Is(SYL) && !isHidden && !isGestural) {
+            ++m_zonelessCount;
+        }
+        return FUNCTOR_CONTINUE;
+    }
     layerElement->m_drawingFacsX = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR - m_pageMarginLeft);
     if (m_currentNeumeLine && layerElement->IsAnyOf(std::array{ ACCID, SYL })) {
         layerElement->m_drawingFacsY = m_view.ToLogicalY(zone->GetUly() * DEFINITION_FACTOR - m_pageMarginTop);
@@ -65,7 +83,10 @@ FunctorCode SyncFromFacsimileFunctor::VisitMeasure(Measure *measure)
     }
     else {
         Zone *zone = measure->GetZone();
-        assert(zone);
+        if (!zone) {
+            ++m_zonelessCount;
+            return FUNCTOR_CONTINUE;
+        }
         measure->m_drawingFacsX1 = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR - m_pageMarginLeft);
         measure->m_drawingFacsX2 = m_view.ToLogicalX(zone->GetLrx() * DEFINITION_FACTOR - m_pageMarginLeft);
     }
@@ -119,7 +140,11 @@ FunctorCode SyncFromFacsimileFunctor::VisitPb(Pb *pb)
     Surface *surface = pb->GetSurface();
     if (!surface && zone && zone->GetParent())
         surface = (zone->GetParent()->Is(SURFACE)) ? vrv_cast<Surface *>(zone->GetParent()) : NULL;
-    assert(zone || surface);
+    // Without a zone or a surface, the page keeps its current size and margins
+    if (!zone && !surface) {
+        ++m_zonelessCount;
+        return FUNCTOR_CONTINUE;
+    }
     // Use the (parent) surface attributes if given
     if (surface && surface->HasLrx() && surface->HasLry()) {
         m_currentPage->m_pageHeight = surface->GetLry() * DEFINITION_FACTOR;
@@ -148,7 +173,7 @@ FunctorCode SyncFromFacsimileFunctor::VisitPb(Pb *pb)
         }
     }
     // Fallback on zone
-    else {
+    else if (zone) {
         m_currentPage->m_pageHeight = zone->GetLry() * DEFINITION_FACTOR;
         m_currentPage->m_pageWidth = zone->GetLrx() * DEFINITION_FACTOR;
     }
@@ -165,7 +190,10 @@ FunctorCode SyncFromFacsimileFunctor::VisitSb(Sb *sb)
     assert(m_currentSystem);
 
     Zone *zone = sb->GetZone();
-    assert(zone);
+    if (!zone) {
+        ++m_zonelessCount;
+        return FUNCTOR_CONTINUE;
+    }
     m_currentSystem->m_drawingFacsX = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR - m_pageMarginLeft);
     m_currentSystem->m_drawingFacsY = m_view.ToLogicalY(zone->GetUly() * DEFINITION_FACTOR - m_pageMarginTop);
 
@@ -175,7 +203,11 @@ FunctorCode SyncFromFacsimileFunctor::VisitSb(Sb *sb)
 FunctorCode SyncFromFacsimileFunctor::VisitStaff(Staff *staff)
 {
     Zone *zone = staff->GetZone();
-    assert(zone);
+    if (!zone) {
+        // A hidden staff is not expected to have a zone
+        if (staff->GetVisible() != BOOLEAN_false) ++m_zonelessCount;
+        return FUNCTOR_CONTINUE;
+    }
     staff->m_drawingFacsY = m_view.ToLogicalY(zone->GetUly() * DEFINITION_FACTOR - m_pageMarginTop);
 
     // neon specific code - set the position of the pseudo measure (neume line)
