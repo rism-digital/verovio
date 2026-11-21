@@ -29,8 +29,7 @@ class Harm : public ControlElement,
              public TextDirInterface,
              public TimeSpanningInterface,
              public AttLang,
-             public AttNNumberLike,
-             public AttXy {
+             public AttNNumberLike {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

@@ -36,8 +36,7 @@ class Syl : public LayerElement,
             public TimeSpanningInterface,
             public AttLang,
             public AttTypography,
-            public AttSylLog,
-            public AttXy {
+            public AttSylLog {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

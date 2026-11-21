@@ -41,8 +41,7 @@ class Chord : public LayerElement,
               public AttStems,
               public AttStemsCmn,
               public AttTiePresent,
-              public AttVisibility,
-              public AttXy {
+              public AttVisibility {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

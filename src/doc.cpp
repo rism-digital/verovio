@@ -2429,12 +2429,12 @@ Page *Doc::SetDrawingPage(int pageIdx, bool withPageRange)
 
 bool Doc::UseEncodedXPositions() const
 {
-    return (m_options->m_encodedXPositions.GetValue() != ENCODEDXPOSITIONS_none);
+    return (m_options->m_encodedXPositions.GetValue() != ENCODEDXPOSITIONS_none) && !this->HasFacsimile();
 }
 
 bool Doc::UseEncodedYPositions() const
 {
-    return (m_options->m_encodedYPositions.GetValue() != ENCODEDYPOSITIONS_none);
+    return (m_options->m_encodedYPositions.GetValue() != ENCODEDYPOSITIONS_none) && !this->HasFacsimile();
 }
 
 bool Doc::SetEncodedPageSize()

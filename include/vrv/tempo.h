@@ -30,8 +30,7 @@ class Tempo : public ControlElement,
               public AttExtender,
               public AttLang,
               public AttMidiTempo,
-              public AttMmTempo,
-              public AttXy {
+              public AttMmTempo {
 public:
     /**
      * @name Constructors, destructors, reset methods

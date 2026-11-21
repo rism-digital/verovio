@@ -79,7 +79,6 @@ Chord::Chord()
     , AttStemsCmn()
     , AttTiePresent()
     , AttVisibility()
-    , AttXy()
 {
     this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     this->RegisterAttClass(ATT_CHORDVIS);
@@ -90,7 +89,6 @@ Chord::Chord()
     this->RegisterAttClass(ATT_STEMSCMN);
     this->RegisterAttClass(ATT_TIEPRESENT);
     this->RegisterAttClass(ATT_VISIBILITY);
-    this->RegisterAttClass(ATT_XY);
 
     this->Reset();
 }
@@ -114,7 +112,6 @@ void Chord::Reset()
     this->ResetStemsCmn();
     this->ResetTiePresent();
     this->ResetVisibility();
-    this->ResetXy();
 
     this->ClearNoteGroups();
 }

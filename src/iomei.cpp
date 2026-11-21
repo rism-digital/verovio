@@ -2172,7 +2172,6 @@ void MEIOutput::WriteDir(pugi::xml_node currentNode, Dir *dir)
     dir->WriteLineRendBase(currentNode);
     dir->WriteExtender(currentNode);
     dir->WriteVerticalGroup(currentNode);
-    dir->WriteXy(currentNode);
 }
 
 void MEIOutput::WriteDynam(pugi::xml_node currentNode, Dynam *dynam)
@@ -2188,7 +2187,6 @@ void MEIOutput::WriteDynam(pugi::xml_node currentNode, Dynam *dynam)
     dynam->WriteMidiValue(currentNode);
     dynam->WriteMidiValue2(currentNode);
     dynam->WriteVerticalGroup(currentNode);
-    dynam->WriteXy(currentNode);
 }
 
 void MEIOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
@@ -2248,7 +2246,6 @@ void MEIOutput::WriteHarm(pugi::xml_node currentNode, Harm *harm)
     this->WriteTimeSpanningInterface(currentNode, harm);
     harm->WriteLang(currentNode);
     harm->WriteNNumberLike(currentNode);
-    harm->WriteXy(currentNode);
 }
 
 void MEIOutput::WriteLv(pugi::xml_node currentNode, Lv *lv)
@@ -2418,7 +2415,6 @@ void MEIOutput::WriteTempo(pugi::xml_node currentNode, Tempo *tempo)
     tempo->WriteLang(currentNode);
     tempo->WriteMidiTempo(currentNode);
     tempo->WriteMmTempo(currentNode);
-    tempo->WriteXy(currentNode);
 }
 
 void MEIOutput::WriteTie(pugi::xml_node currentNode, Tie *tie)
@@ -2594,7 +2590,6 @@ void MEIOutput::WriteChord(pugi::xml_node currentNode, Chord *chord)
     chord->WriteStemsCmn(currentNode);
     chord->WriteTiePresent(currentNode);
     chord->WriteVisibility(currentNode);
-    chord->WriteXy(currentNode);
 }
 
 void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
@@ -3057,7 +3052,6 @@ void MEIOutput::WriteSyl(pugi::xml_node currentNode, Syl *syl)
     syl->WriteLang(currentNode);
     syl->WriteTypography(currentNode);
     syl->WriteSylLog(currentNode);
-    syl->WriteXy(currentNode);
 }
 
 void MEIOutput::WriteSyllable(pugi::xml_node currentNode, Syllable *syllable)
@@ -6371,7 +6365,6 @@ bool MEIInput::ReadDir(Object *parent, pugi::xml_node dir, bool isStageDir)
     vrvDir->ReadLineRendBase(dir);
     vrvDir->ReadExtender(dir);
     vrvDir->ReadVerticalGroup(dir);
-    vrvDir->ReadXy(dir);
 
     parent->AddChild(vrvDir);
     this->ReadUnsupportedAttr(dir, vrvDir);
@@ -6391,7 +6384,6 @@ bool MEIInput::ReadDynam(Object *parent, pugi::xml_node dynam)
     vrvDynam->ReadMidiValue(dynam);
     vrvDynam->ReadMidiValue2(dynam);
     vrvDynam->ReadVerticalGroup(dynam);
-    vrvDynam->ReadXy(dynam);
 
     parent->AddChild(vrvDynam);
     this->ReadUnsupportedAttr(dynam, vrvDynam);
@@ -6471,7 +6463,6 @@ bool MEIInput::ReadHarm(Object *parent, pugi::xml_node harm)
     this->ReadTimeSpanningInterface(harm, vrvHarm);
     vrvHarm->ReadLang(harm);
     vrvHarm->ReadNNumberLike(harm);
-    vrvHarm->ReadXy(harm);
 
     parent->AddChild(vrvHarm);
     this->ReadUnsupportedAttr(harm, vrvHarm);
@@ -6672,7 +6663,6 @@ bool MEIInput::ReadTempo(Object *parent, pugi::xml_node tempo)
     vrvTempo->ReadLang(tempo);
     vrvTempo->ReadMidiTempo(tempo);
     vrvTempo->ReadMmTempo(tempo);
-    vrvTempo->ReadXy(tempo);
 
     parent->AddChild(vrvTempo);
     this->ReadUnsupportedAttr(tempo, vrvTempo);
@@ -7210,7 +7200,6 @@ bool MEIInput::ReadChord(Object *parent, pugi::xml_node chord)
     vrvChord->ReadStemsCmn(chord);
     vrvChord->ReadTiePresent(chord);
     vrvChord->ReadVisibility(chord);
-    vrvChord->ReadXy(chord);
 
     InstArticulation artic;
     artic.ReadArticulation(chord);
@@ -7838,7 +7827,6 @@ bool MEIInput::ReadSyl(Object *parent, pugi::xml_node syl)
     vrvSyl->ReadLang(syl);
     vrvSyl->ReadTypography(syl);
     vrvSyl->ReadSylLog(syl);
-    vrvSyl->ReadXy(syl);
 
     parent->AddChild(vrvSyl);
     this->ReadUnsupportedAttr(syl, vrvSyl);

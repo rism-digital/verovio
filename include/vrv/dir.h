@@ -30,8 +30,7 @@ class Dir : public ControlElement,
             public AttExtender,
             public AttLang,
             public AttLineRendBase,
-            public AttVerticalGroup,
-            public AttXy {
+            public AttVerticalGroup {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

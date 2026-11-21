@@ -30,8 +30,7 @@ class Dynam : public ControlElement,
               public AttLineRendBase,
               public AttMidiValue,
               public AttMidiValue2,
-              public AttVerticalGroup,
-              public AttXy {
+              public AttVerticalGroup {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

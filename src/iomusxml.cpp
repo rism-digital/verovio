@@ -2065,7 +2065,6 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     m_isLayerInitialized = false;
     m_currentLayer = NULL;
 
-    this->SetPendingPositions(index);
     this->SetMeasurePositions(measure, index, staffOffset);
 
     return true;
@@ -2480,7 +2479,6 @@ void MusicXmlInput::ReadMusicXmlDirection(
             }
             m_controlElements.push_back({ m_measureCounts.at(measure), dir });
             m_dirStack.push_back(dir);
-            this->AddPendingPosition(dir, words.first().node());
 
             pugi::xpath_node extender = (words.end() - 1)->parent().next_sibling("direction-type").first_child();
             if (!strcmp(extender.node().name(), "bracket") || !strcmp(extender.node().name(), "dashes")) {
@@ -2557,7 +2555,6 @@ void MusicXmlInput::ReadMusicXmlDirection(
         dynam->SetVgrp(defaultY);
         m_controlElements.push_back({ m_measureCounts.at(measure), dynam });
         m_dynamStack.push_back(dynam);
-        this->AddPendingPosition(dynam, dynamics.first().node());
 
         if (!dynamics.empty()) {
             pugi::xpath_node extender = (dynamics.end() - 1)->parent().next_sibling("direction-type").first_child();
@@ -2843,7 +2840,6 @@ void MusicXmlInput::ReadMusicXmlDirection(
         }
         m_controlElements.push_back({ m_measureCounts.at(measure), tempo });
         m_tempoStack.push_back(tempo);
-        this->AddPendingPosition(tempo, (metronome) ? metronome.node() : words.first().node());
     }
 
     // other cases
@@ -2962,7 +2958,6 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure)
     harm->SetTstamp((double)(m_durTotal + durOffset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
     m_controlElements.push_back({ m_measureCounts.at(measure), harm });
     m_harmStack.push_back(harm);
-    this->AddPendingPosition(harm, node);
 }
 
 void MusicXmlInput::ReadMusicXmlNote(
@@ -4132,7 +4127,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
     }
 
-    this->SetNotePositions(node, (note) ? note : element, staff, m_measureCounts.at(measure));
+    this->SetNotePositions(node, (note) ? note : element, m_measureCounts.at(measure));
 
     // add StartIDs to dir, dynam, and pedal
     if (!m_dirStack.empty()) {
@@ -4458,88 +4453,22 @@ void MusicXmlInput::SetMeasurePositions(Measure *measure, int index, int staffOf
     }
 }
 
-void MusicXmlInput::SetNotePositions(pugi::xml_node node, LayerElement *element, Staff *staff, int index)
+void MusicXmlInput::SetNotePositions(pugi::xml_node node, LayerElement *element, int index)
 {
-    if (!this->HasEncodedLayout() || !element || !staff) {
+    if (!element || (index < 0) || (index >= (int)m_measureLayouts.size())) {
         return;
     }
-    if (!element->IsAnyOf(std::array{ NOTE, REST })) return;
     // Without a default-x, the element has no encoded position
     if (!node.attribute("default-x")) return;
-    double top = 0.0;
-    if (!this->GetEncodedStaffTop(index, staff->GetN(), top)) return;
+    // Only the notes and the rests have one
+    AttXy *xy = dynamic_cast<AttXy *>(element);
+    if (!xy) return;
 
     // The default-x is from the left of the measure and the relative-x from the default-x; it is the left of the
-    // notehead
-    AttXy *xy = (element->Is(NOTE)) ? static_cast<AttXy *>(vrv_cast<Note *>(element)) : vrv_cast<Rest *>(element);
-    assert(xy);
+    // notehead (or of the rest), which is also where Verovio draws them from
     const double x = m_measureLayouts.at(index).m_x + node.attribute("default-x").as_double()
         + node.attribute("relative-x").as_double();
     xy->SetX(x / TENTHS_PER_VU);
-    if (node.attribute("default-y")) xy->SetY(MusicXmlInput::CalcEncodedY(top, node) / TENTHS_PER_VU);
-
-    if (!element->Is(NOTE)) return;
-
-    // Lyrics: the x is the center of the syllable (MusicXML centers lyrics on the note by default, and its default-x
-    // is from the left of the note), and the y its baseline. In a chord, the verses are on the chord.
-    Object *parent = element->GetParent();
-    Object *lyricHost = (parent && parent->Is(CHORD)) ? parent : element;
-    for (pugi::xml_node lyric : node.children("lyric")) {
-        const int lyricNumber = std::max(1, lyric.attribute("number").as_int());
-        for (Object *child : lyricHost->GetChildren()) {
-            if (!child->Is(VERSE) || (vrv_cast<Verse *>(child)->GetN() != lyricNumber)) {
-                continue;
-            }
-            Syl *syl = vrv_cast<Syl *>(child->FindDescendantByType(SYL));
-            if (!syl || syl->HasX()) {
-                break;
-            }
-            // About half a staff space, the center of a notehead, without a default-x
-            const double lyricX = x + (lyric.attribute("default-x") ? lyric.attribute("default-x").as_double() : 5.0)
-                + lyric.attribute("relative-x").as_double();
-            syl->SetX(lyricX / TENTHS_PER_VU);
-            if (lyric.attribute("default-y")) syl->SetY(MusicXmlInput::CalcEncodedY(top, lyric) / TENTHS_PER_VU);
-            break;
-        }
-    }
-}
-
-void MusicXmlInput::AddPendingPosition(ControlElement *element, pugi::xml_node node)
-{
-    if (!this->HasEncodedLayout() || !element || !node) {
-        return;
-    }
-    m_pendingPositions.push_back({ element, node });
-}
-
-void MusicXmlInput::SetPendingPositions(int index)
-{
-    // The control elements of the measure have their staff once the measure is read
-    for (const std::pair<ControlElement *, pugi::xml_node> &pending : m_pendingPositions) {
-        AttXy *xy = dynamic_cast<AttXy *>(pending.first);
-        const TimePointInterface *interface = pending.first->GetTimePointInterface();
-        if (!xy || !interface || !interface->HasStaff() || !pending.second.attribute("default-y")) {
-            continue;
-        }
-        // The x of a control element is from its current position in the measure, which is not resolved here
-        double top = 0.0;
-        if (!this->GetEncodedStaffTop(index, interface->GetStaff().front(), top)) continue;
-        xy->SetY(MusicXmlInput::CalcEncodedY(top, pending.second) / TENTHS_PER_VU);
-    }
-    m_pendingPositions.clear();
-}
-
-bool MusicXmlInput::GetEncodedStaffTop(int index, int staffN, double &top) const
-{
-    if ((index < 0) || (index >= (int)m_measureLayouts.size())) {
-        return false;
-    }
-
-    const musicxml::SystemLayout &system = m_systemLayouts.at(m_measureLayouts.at(index).m_system);
-    const std::map<int, double>::const_iterator staffTop = system.m_staffTops.find(staffN);
-    if (staffTop == system.m_staffTops.end()) return false;
-    top = staffTop->second;
-    return true;
 }
 
 void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure, Section *section)
@@ -4976,12 +4905,6 @@ beamRend_FORM MusicXmlInput::ConvertBeamFanToForm(const std::string &value)
     if (value == "rit") return beamRend_FORM_rit;
 
     return beamRend_FORM_NONE;
-}
-
-double MusicXmlInput::CalcEncodedY(double top, pugi::xml_node node)
-{
-    // The default-y is from the top line of the staff, up being positive, and the relative-y from the default-y
-    return top - node.attribute("default-y").as_double() - node.attribute("relative-y").as_double();
 }
 
 curvature_CURVEDIR MusicXmlInput::CombineCurvedir(curvature_CURVEDIR startDir, curvature_CURVEDIR stopDir)

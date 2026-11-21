@@ -40,7 +40,6 @@ Dir::Dir(bool isStageDir)
     , AttLang()
     , AttLineRendBase()
     , AttVerticalGroup()
-    , AttXy()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
@@ -48,7 +47,6 @@ Dir::Dir(bool isStageDir)
     this->RegisterAttClass(ATT_EXTENDER);
     this->RegisterAttClass(ATT_LINERENDBASE);
     this->RegisterAttClass(ATT_VERTICALGROUP);
-    this->RegisterAttClass(ATT_XY);
 
     this->Reset();
     this->SetStageDir(isStageDir);
@@ -65,7 +63,6 @@ void Dir::Reset()
     this->ResetLang();
     this->ResetLineRendBase();
     this->ResetVerticalGroup();
-    this->ResetXy();
 
     m_isStageDir = false;
 }

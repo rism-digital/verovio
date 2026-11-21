@@ -55,7 +55,6 @@ class Pedal;
 class ScoreDef;
 class Section;
 class Slur;
-class Staff;
 class StaffGrp;
 class Tempo;
 class Tie;
@@ -614,31 +613,17 @@ private:
     ///@}
 
     /**
-     * @name Methods for reading the encoded layout (page layout, measure widths, default-x and default-y)
+     * @name Methods for reading the encoded layout (page layout, measure widths, staff distances and default-x)
      * Only used with the encodedXPositions or encodedYPositions option. The positions are written in MEI virtual units
      * (half the distance between two staff lines, i.e., 5 tenths), from the top-left corner of the page: @coord.x1 and
-     * @coord.x2 for the measures, @coord.y1 (top line) for the staves, @x and @y for the notes, rests, syllables and
-     * control events.
+     * @coord.x2 for the measures, @coord.y1 (top line) for the staves, and @x (left edge) for the notes and rests.
      */
     ///@{
     void ReadMusicXmlLayout(pugi::xml_node root, ScoreDef *scoreDef);
     bool HasEncodedLayout() const { return !m_measureLayouts.empty(); }
     void SetMeasurePositions(Measure *measure, int index, int staffOffset);
-    void SetNotePositions(pugi::xml_node node, LayerElement *element, Staff *staff, int index);
-    void AddPendingPosition(ControlElement *element, pugi::xml_node node);
-    void SetPendingPositions(int index);
+    void SetNotePositions(pugi::xml_node node, LayerElement *element, int index);
     ///@}
-
-    /**
-     * Return the top line of the staff @n in the system of the measure index, in tenths, if encoded
-     */
-    bool GetEncodedStaffTop(int index, int staffN, double &top) const;
-
-    /**
-     * Return the y of a node (e.g., a note or a lyric) from its default-y and relative-y and the top line of its
-     * staff, in tenths from the top of the page
-     */
-    static double CalcEncodedY(double top, pugi::xml_node node);
 
     /*
      * @name Helper for detecting the slur curve direction
@@ -782,8 +767,6 @@ private:
     /* The encoded layout of each measure (by measure index) and of each system, for the encoded positions */
     std::vector<musicxml::MeasureLayout> m_measureLayouts;
     std::vector<musicxml::SystemLayout> m_systemLayouts;
-    /* The control elements of the measure being read, with the MusicXML element giving their position */
-    std::vector<std::pair<ControlElement *, pugi::xml_node>> m_pendingPositions;
 
 #endif // NO_MUSICXML_SUPPORT
 };

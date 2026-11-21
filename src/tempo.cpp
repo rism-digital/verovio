@@ -38,7 +38,6 @@ Tempo::Tempo()
     , AttLang()
     , AttMidiTempo()
     , AttMmTempo()
-    , AttXy()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
@@ -46,7 +45,6 @@ Tempo::Tempo()
     this->RegisterAttClass(ATT_LANG);
     this->RegisterAttClass(ATT_MIDITEMPO);
     this->RegisterAttClass(ATT_MMTEMPO);
-    this->RegisterAttClass(ATT_XY);
 
     this->Reset();
 }
@@ -62,7 +60,6 @@ void Tempo::Reset()
     this->ResetLang();
     this->ResetMidiTempo();
     this->ResetMmTempo();
-    this->ResetXy();
 }
 
 bool Tempo::IsSupportedChild(ClassId classId)

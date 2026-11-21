@@ -465,7 +465,8 @@ public:
     /**
      * @name Use of the encoded positions
      * Return true if the encoded x positions, the encoded y positions, or either of them are used (encodedXPositions
-     * and encodedYPositions options). Both imply the encoded breaks and page size.
+     * and encodedYPositions options). Both imply the encoded breaks and page size. They are not used with a
+     * facsimile, whose coordinates (e.g., the staff @coord.y1 written from it) are not in the same units.
      */
     ///@{
     bool UseEncodedXPositions() const;

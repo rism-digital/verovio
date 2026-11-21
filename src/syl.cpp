@@ -50,14 +50,12 @@ Syl::Syl()
     , AttLang()
     , AttTypography()
     , AttSylLog()
-    , AttXy()
 {
     this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_LANG);
     this->RegisterAttClass(ATT_TYPOGRAPHY);
     this->RegisterAttClass(ATT_SYLLOG);
-    this->RegisterAttClass(ATT_XY);
 
     this->Reset();
 }
@@ -72,7 +70,6 @@ void Syl::Reset()
     this->ResetLang();
     this->ResetTypography();
     this->ResetSylLog();
-    this->ResetXy();
 
     m_drawingVerseN = 1;
     m_drawingVoltaN = 1;
