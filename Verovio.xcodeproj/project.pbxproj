@@ -1531,6 +1531,14 @@
 		BD2E4D982875880600B04350 /* stem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD2E4D94287587FD00B04350 /* stem.cpp */; };
 		BD2E4D9A2875882100B04350 /* stem.h in Headers */ = {isa = PBXBuildFile; fileRef = BD2E4D992875881B00B04350 /* stem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BD2E4D9B2875882200B04350 /* stem.h in Headers */ = {isa = PBXBuildFile; fileRef = BD2E4D992875881B00B04350 /* stem.h */; };
+		BD30034630B0C93E00532AFA /* vrv in Headers */ = {isa = PBXBuildFile; fileRef = BD30034430B0C93E00532AFA /* vrv */; };
+		BD30034930B0C93E00532AFA /* vrv in Headers */ = {isa = PBXBuildFile; fileRef = BD30034430B0C93E00532AFA /* vrv */; };
+		BD30034D30B0C97B00532AFA /* midijsonbuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD30034C30B0C97B00532AFA /* midijsonbuilder.cpp */; };
+		BD30034F30B0C97B00532AFA /* midijsonbuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD30034C30B0C97B00532AFA /* midijsonbuilder.cpp */; };
+		BD30035130B0C97B00532AFA /* midijsonbuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD30034C30B0C97B00532AFA /* midijsonbuilder.cpp */; };
+		BD30035330B0C97B00532AFA /* midijsonbuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD30034C30B0C97B00532AFA /* midijsonbuilder.cpp */; };
+		BD30035630B0CD1000532AFA /* midijsonbuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = BD30035530B0CD1000532AFA /* midijsonbuilder.h */; };
+		BD30035730B0CD1000532AFA /* midijsonbuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = BD30035530B0CD1000532AFA /* midijsonbuilder.h */; };
 		BD36AF552E491B9600A8F59E /* ossia.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD36AF542E491B9600A8F59E /* ossia.cpp */; };
 		BD36AF562E491B9600A8F59E /* ossia.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD36AF542E491B9600A8F59E /* ossia.cpp */; };
 		BD36AF572E491B9600A8F59E /* ossia.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD36AF542E491B9600A8F59E /* ossia.cpp */; };
@@ -2418,6 +2426,9 @@
 		BD0562352518CD20004057EB /* beamspan.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = beamspan.cpp; path = src/beamspan.cpp; sourceTree = "<group>"; };
 		BD2E4D94287587FD00B04350 /* stem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = stem.cpp; path = src/stem.cpp; sourceTree = "<group>"; };
 		BD2E4D992875881B00B04350 /* stem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stem.h; path = include/vrv/stem.h; sourceTree = "<group>"; };
+		BD30034430B0C93E00532AFA /* vrv */ = {isa = PBXFileReference; lastKnownFileType = folder; name = vrv; path = include/vrv; sourceTree = "<group>"; };
+		BD30034C30B0C97B00532AFA /* midijsonbuilder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = midijsonbuilder.cpp; path = src/midijsonbuilder.cpp; sourceTree = "<group>"; };
+		BD30035530B0CD1000532AFA /* midijsonbuilder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = midijsonbuilder.h; path = include/vrv/midijsonbuilder.h; sourceTree = "<group>"; };
 		BD36AF542E491B9600A8F59E /* ossia.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ossia.cpp; path = src/ossia.cpp; sourceTree = "<group>"; };
 		BD36AF592E491BAC00A8F59E /* ossia.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ossia.h; path = include/vrv/ossia.h; sourceTree = "<group>"; };
 		BD87768127CE89FA005B97EA /* layerdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = layerdef.h; path = include/vrv/layerdef.h; sourceTree = "<group>"; };
@@ -3090,6 +3101,9 @@
 				4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */,
 				4D14600F1EA8A913007DB90C /* horizontalaligner.h */,
 				4DACC93F2990ED2600B55913 /* libmei.h */,
+				BD30034C30B0C97B00532AFA /* midijsonbuilder.cpp */,
+				BD30035530B0CD1000532AFA /* midijsonbuilder.h */,
+				BD30034430B0C93E00532AFA /* vrv */,
 				8F086ECD188539540037FD8E /* object.cpp */,
 				8F59292418854BF800FE51AD /* object.h */,
 				4DA80D951A6ACF5D0089802D /* options.cpp */,
@@ -3503,6 +3517,7 @@
 				4DA0EAE122BB77AF00A7EBEB /* editortoolkit_mensural.h in Headers */,
 				8F59293718854BF800FE51AD /* bboxdevicecontext.h in Headers */,
 				8F59293818854BF800FE51AD /* beam.h in Headers */,
+				BD30034930B0C93E00532AFA /* vrv in Headers */,
 				4D6331F31F46D2B400A0D6BF /* arpeg.h in Headers */,
 				4DB3D8D81F83D13900B5FC2B /* trill.h in Headers */,
 				E70E2AA029F262A200DB3044 /* miscfunctor.h in Headers */,
@@ -3691,6 +3706,7 @@
 				E78833652995007700D44B01 /* calcspanningbeamspansfunctor.h in Headers */,
 				E75EA9FA29CC3A6B003A97A7 /* calcarticfunctor.h in Headers */,
 				8F59295218854BF800FE51AD /* staff.h in Headers */,
+				BD30035630B0CD1000532AFA /* midijsonbuilder.h in Headers */,
 				4D766F0820ACAD74006875D8 /* syllable.h in Headers */,
 				4D2073FF22A3BCEF00E0765F /* tabgrp.h in Headers */,
 				4DB3D8F41F83D1C900B5FC2B /* scoredefinterface.h in Headers */,
@@ -3928,6 +3944,7 @@
 				BB4C4B1222A932C8001F6AF0 /* expansion.h in Headers */,
 				B464F4942C6D665300A778D2 /* scoringupfunctor.h in Headers */,
 				BB4C4AC822A932B6001F6AF0 /* page.h in Headers */,
+				BD30035730B0CD1000532AFA /* midijsonbuilder.h in Headers */,
 				4DACC9952990F29A00B55913 /* atts_neumes.h in Headers */,
 				4DACC9CF2990F29A00B55913 /* atts_mei.h in Headers */,
 				E79ADDC526BD1AE900527E4B /* runtimeclock.h in Headers */,
@@ -4058,6 +4075,7 @@
 				4D2E758E22BC2B5B004C51F0 /* tabdursym.h in Headers */,
 				4DACC9B72990F29A00B55913 /* atts_edittrans.h in Headers */,
 				4DACC98F2990F29A00B55913 /* atts_externalsymbols.h in Headers */,
+				BD30034630B0C93E00532AFA /* vrv in Headers */,
 				BB4C4B3022A932CF001F6AF0 /* pedal.h in Headers */,
 				E7876F1629C07EF2002147DC /* adjustsylspacingfunctor.h in Headers */,
 				4DACCA122990F2E600B55913 /* attalternates.h in Headers */,
@@ -4342,6 +4360,7 @@
 				4D00A28B2ED2E32700EFA853 /* offsetinterface.cpp in Sources */,
 				4D1EB6A22A2A40B400AF2F98 /* textlayoutelement.cpp in Sources */,
 				6D7647A82FA66CE8004F9EDA /* strophicus.cpp in Sources */,
+				BD30035330B0C97B00532AFA /* midijsonbuilder.cpp in Sources */,
 				4DE9150500000000004F9EDA /* episema.cpp in Sources */,
 				4D79642226C167100026288B /* pagemilestone.cpp in Sources */,
 				4DB3D8E31F83D16300B5FC2B /* elementpart.cpp in Sources */,
@@ -4769,6 +4788,7 @@
 				4DBDD6722939E1AE009EC466 /* symboldef.cpp in Sources */,
 				4DA80D961A6ACF5D0089802D /* options.cpp in Sources */,
 				4DACC9C82990F29A00B55913 /* attconverter.cpp in Sources */,
+				BD30035130B0C97B00532AFA /* midijsonbuilder.cpp in Sources */,
 				8F086F03188539540037FD8E /* system.cpp in Sources */,
 				4D20B5EC1B873A1300EA9EC3 /* scoredefinterface.cpp in Sources */,
 				E7BCFFBB281298630012513D /* resources.cpp in Sources */,
@@ -4973,6 +4993,7 @@
 				E75EA9FF29CC3A8B003A97A7 /* calcarticfunctor.cpp in Sources */,
 				400FEDD5206FA74D000D3233 /* gracegrp.cpp in Sources */,
 				4D00A28C2ED2E32700EFA853 /* offsetinterface.cpp in Sources */,
+				BD30034F30B0C97B00532AFA /* midijsonbuilder.cpp in Sources */,
 				4D1EB6A32A2A40B400AF2F98 /* textlayoutelement.cpp in Sources */,
 				4DA0EAC522BB779400A7EBEB /* surface.cpp in Sources */,
 				4DB726C61B8BB0E80040231B /* text.cpp in Sources */,
@@ -5289,6 +5310,7 @@
 				E75EAA0029CC3A8C003A97A7 /* calcarticfunctor.cpp in Sources */,
 				BB4C4ADB22A932BC001F6AF0 /* abbr.cpp in Sources */,
 				4D00A28D2ED2E32700EFA853 /* offsetinterface.cpp in Sources */,
+				BD30034D30B0C97B00532AFA /* midijsonbuilder.cpp in Sources */,
 				4D1EB6A42A2A40B400AF2F98 /* textlayoutelement.cpp in Sources */,
 				4D79642426C167100026288B /* pagemilestone.cpp in Sources */,
 				E741AD05299A3D6500854426 /* calcslurdirectionfunctor.cpp in Sources */,
