@@ -42,6 +42,7 @@
 #include "scoredef.h"
 #include "staff.h"
 #include "staffdef.h"
+#include "timeinterface.h"
 #include "transposition.h"
 #include "vrv.h"
 
@@ -61,6 +62,13 @@ namespace musicxmloutput {
         int dots;
         const char *beamValue = NULL;
     };
+
+    struct MusicXmlNoteControls {
+        bool tieStart = false;
+        bool tieStop = false;
+    };
+
+    using MusicXmlNoteControlMap = std::map<const LayerElement *, MusicXmlNoteControls>;
 
     struct MusicXmlVoice {
         int staff;
@@ -136,6 +144,50 @@ namespace musicxmloutput {
         return !accid
             || (GetMusicXmlAccidental(accid->GetAccid())
                 && GetMusicXmlAccidental(Att::AccidentalGesturalToWritten(accid->GetAccidGes())));
+    }
+
+    bool AddMusicXmlTie(const TimeSpanningInterface &span, MusicXmlNoteControlMap &controls)
+    {
+        if (!span.HasStartid() || !span.HasEndid()) return false;
+        const Note *start = dynamic_cast<const Note *>(span.GetStart());
+        const Note *end = dynamic_cast<const Note *>(span.GetEnd());
+        if (!start || !end || !start->IsEnharmonicWith(end) || !Object::IsPreOrdered(start, end)) {
+            return false;
+        }
+
+        const Layer *startLayer = vrv_cast<const Layer *>(start->GetFirstAncestor(LAYER));
+        const Layer *endLayer = vrv_cast<const Layer *>(end->GetFirstAncestor(LAYER));
+        const Staff *startStaff = start->GetAncestorStaff(ANCESTOR_ONLY, false);
+        const Staff *endStaff = end->GetAncestorStaff(ANCESTOR_ONLY, false);
+        if (!startLayer || !endLayer || !startStaff || !endStaff) return false;
+        if (startStaff->GetN() != endStaff->GetN() || startLayer->GetN() != endLayer->GetN()) return false;
+        const Chord *startChord = start->IsChordTone();
+        if (startChord && startChord == end->IsChordTone()) return false;
+
+        const MusicXmlNoteControlMap::const_iterator startControls = controls.find(start);
+        const MusicXmlNoteControlMap::const_iterator endControls = controls.find(end);
+        if ((startControls != controls.end() && startControls->second.tieStart)
+            || (endControls != controls.end() && endControls->second.tieStop)) {
+            return false;
+        }
+        controls[start].tieStart = true;
+        controls[end].tieStop = true;
+        return true;
+    }
+
+    MusicXmlNoteControlMap CollectMusicXmlNoteControls(const std::vector<const Measure *> &measures)
+    {
+        MusicXmlNoteControlMap controls;
+        for (const Measure *measure : measures) {
+            for (const Object *tie : measure->FindAllDescendantsByType(TIE)) {
+                // PrepareData resolves the ID references to the exact notes, including tones within chords.
+                const TimeSpanningInterface *span = tie->GetTimeSpanningInterface();
+                if (!span || !AddMusicXmlTie(*span, controls)) {
+                    LogWarning("MusicXML output omits unsupported tie '%s'", tie->GetID().c_str());
+                }
+            }
+        }
+        return controls;
     }
 
     template <typename Element>
@@ -365,10 +417,18 @@ namespace musicxmloutput {
         }
     }
 
+    void WriteMusicXmlTieEndpoints(pugi::xml_node parent, const char *tag, const MusicXmlNoteControls &controls)
+    {
+        // At the middle of a chain, close the current tie before opening the next.
+        if (controls.tieStop) parent.append_child(tag).append_attribute("type") = "stop";
+        if (controls.tieStart) parent.append_child(tag).append_attribute("type") = "start";
+    }
+
     void WriteMusicXmlNote(pugi::xml_node measure, const MusicXmlEvent &event, const Note *note, bool chordTone,
-        int divisions, const MusicXmlVoice &voice)
+        int divisions, const MusicXmlVoice &voice, const MusicXmlNoteControlMap &noteControls)
     {
         pugi::xml_node node = measure.append_child("note");
+        const MusicXmlNoteControlMap::const_iterator control = noteControls.find(note);
         const Accid *accid = NULL;
         if (chordTone) node.append_child("chord");
         if (note) {
@@ -389,6 +449,7 @@ namespace musicxmloutput {
             }
         }
         node.append_child("duration").text().set(GetMusicXmlTicks(event.duration, divisions));
+        if (control != noteControls.end()) WriteMusicXmlTieEndpoints(node, "tie", control->second);
         if (voice.instrument)
             node.append_child("instrument").append_attribute("id") = voice.instrument->GetID().c_str();
         node.append_child("voice").text().set(voice.voice);
@@ -404,22 +465,27 @@ namespace musicxmloutput {
             beam.append_attribute("number") = 1;
             beam.text().set(event.beamValue);
         }
+        if (control != noteControls.end()) {
+            WriteMusicXmlTieEndpoints(node.append_child("notations"), "tied", control->second);
+        }
     }
 
-    void WriteMusicXmlVoice(pugi::xml_node measure, const MusicXmlVoice &voice, int divisions)
+    void WriteMusicXmlVoice(
+        pugi::xml_node measure, const MusicXmlVoice &voice, int divisions, const MusicXmlNoteControlMap &noteControls)
     {
         for (const MusicXmlEvent &event : voice.events) {
             if (event.element && event.element->Is(CHORD)) {
                 bool chordTone = false;
                 for (const Object *child : event.element->GetChildren()) {
                     if (!child->Is(NOTE)) continue;
-                    WriteMusicXmlNote(measure, event, vrv_cast<const Note *>(child), chordTone, divisions, voice);
+                    WriteMusicXmlNote(
+                        measure, event, vrv_cast<const Note *>(child), chordTone, divisions, voice, noteControls);
                     chordTone = true;
                 }
             }
             else {
                 const Note *note = dynamic_cast<const Note *>(event.element);
-                WriteMusicXmlNote(measure, event, note, false, divisions, voice);
+                WriteMusicXmlNote(measure, event, note, false, divisions, voice, noteControls);
             }
         }
     }
@@ -588,6 +654,7 @@ std::string MusicXmlOutput::Export()
             scoreInstrument.append_child("instrument-name").text().set(instrumentName.c_str());
         }
     }
+    const musicxmloutput::MusicXmlNoteControlMap noteControls = musicxmloutput::CollectMusicXmlNoteControls(measures);
     std::vector<bool> implicitMeasures(measures.size(), false);
     for (const musicxmloutput::MusicXmlPart &part : parts) {
         pugi::xml_node partNode = root.append_child("part");
@@ -611,7 +678,7 @@ std::string MusicXmlOutput::Export()
                     }
                     cursor += ticks;
                 }
-                musicxmloutput::WriteMusicXmlVoice(measureNode, voice, divisions);
+                musicxmloutput::WriteMusicXmlVoice(measureNode, voice, divisions, noteControls);
                 furthest = std::max(furthest, cursor);
             }
             // End on the last occupied beat even when the final voice is shorter.
@@ -630,7 +697,10 @@ std::string MusicXmlOutput::Export()
     std::set<ClassId> omitted;
     for (const Measure *measure : measures) {
         for (const Object *child : measure->GetChildren()) {
-            if (!child->IsControlElement() || child->Is(MNUM) || !omitted.insert(child->GetClassId()).second) continue;
+            if (!child->IsControlElement() || child->Is(MNUM) || child->Is(TIE)
+                || !omitted.insert(child->GetClassId()).second) {
+                continue;
+            }
             LogWarning("MusicXML output omits '%s' elements", child->GetClassName().c_str());
         }
     }
