@@ -304,10 +304,6 @@
 		4D2BB85630B3060D006260A8 /* midibuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85430B3060D006260A8 /* midibuilder.cpp */; };
 		4D2BB85730B3060D006260A8 /* midibuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85430B3060D006260A8 /* midibuilder.cpp */; };
 		4D2BB85830B3060D006260A8 /* midibuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85430B3060D006260A8 /* midibuilder.cpp */; };
-		4D2BB85A30B30FE9006260A8 /* midibuilderjson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85930B30FE9006260A8 /* midibuilderjson.cpp */; };
-		4D2BB85B30B30FE9006260A8 /* midibuilderjson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85930B30FE9006260A8 /* midibuilderjson.cpp */; };
-		4D2BB85C30B30FE9006260A8 /* midibuilderjson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85930B30FE9006260A8 /* midibuilderjson.cpp */; };
-		4D2BB85D30B30FE9006260A8 /* midibuilderjson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85930B30FE9006260A8 /* midibuilderjson.cpp */; };
 		4D2E758A22BC2B34004C51F0 /* view_tab.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20741122A708C600E0765F /* view_tab.cpp */; };
 		4D2E758B22BC2B5B004C51F0 /* tabgrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F422A3BCDF00E0765F /* tabgrp.cpp */; };
 		4D2E758C22BC2B5B004C51F0 /* tabgrp.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2073F122A3BCB700E0765F /* tabgrp.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -2024,7 +2020,6 @@
 		4D2B24012F56E9090088C6F4 /* customtuning.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = customtuning.h; path = include/vrv/customtuning.h; sourceTree = "<group>"; };
 		4D2BB85130B305F3006260A8 /* midibuilder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = midibuilder.h; path = include/vrv/midibuilder.h; sourceTree = "<group>"; };
 		4D2BB85430B3060D006260A8 /* midibuilder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = midibuilder.cpp; path = src/midibuilder.cpp; sourceTree = "<group>"; };
-		4D2BB85930B30FE9006260A8 /* midibuilderjson.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = midibuilderjson.cpp; path = src/midibuilderjson.cpp; sourceTree = "<group>"; };
 		4D308100203DB69C00BC44F6 /* ref.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ref.h; path = include/vrv/ref.h; sourceTree = "<group>"; };
 		4D308103203DB6B500BC44F6 /* ref.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ref.cpp; path = src/ref.cpp; sourceTree = "<group>"; };
 		4D36C21C1EBCE14300A6DD1B /* fb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fb.h; path = include/vrv/fb.h; sourceTree = "<group>"; };
@@ -3092,7 +3087,6 @@
 				4D14600F1EA8A913007DB90C /* horizontalaligner.h */,
 				4DACC93F2990ED2600B55913 /* libmei.h */,
 				4D2BB85430B3060D006260A8 /* midibuilder.cpp */,
-				4D2BB85930B30FE9006260A8 /* midibuilderjson.cpp */,
 				4D2BB85130B305F3006260A8 /* midibuilder.h */,
 				8F086ECD188539540037FD8E /* object.cpp */,
 				8F59292418854BF800FE51AD /* object.h */,
@@ -4322,7 +4316,6 @@
 				4D1693FB1E3A44F300569BF4 /* devicecontext.cpp in Sources */,
 				4D766F0020ACAD6D006875D8 /* syllable.cpp in Sources */,
 				E7B17DAB29F665C90076E75F /* midifunctor.cpp in Sources */,
-				4D2BB85C30B30FE9006260A8 /* midibuilderjson.cpp in Sources */,
 				4D1693FC1E3A44F300569BF4 /* view_control.cpp in Sources */,
 				E76046C228D496B300C36204 /* calcledgerlinesfunctor.cpp in Sources */,
 				E7870358299CF07500156DC4 /* adjustarpegfunctor.cpp in Sources */,
@@ -4756,7 +4749,6 @@
 				4D4CDEA52C078FF9005621E9 /* adjustneumexfunctor.cpp in Sources */,
 				E797C460298EC2C600CAD67E /* calcalignmentpitchposfunctor.cpp in Sources */,
 				8F086EFA188539540037FD8E /* page.cpp in Sources */,
-				4D2BB85D30B30FE9006260A8 /* midibuilderjson.cpp in Sources */,
 				8F086EFB188539540037FD8E /* pitchinterface.cpp in Sources */,
 				BDEF9EC726725234008A3A47 /* caesura.cpp in Sources */,
 				8F086EFC188539540037FD8E /* positioninterface.cpp in Sources */,
@@ -4957,7 +4949,6 @@
 				4D4C26EF1EF7E75400681770 /* label.cpp in Sources */,
 				8F3DD36C18854B410051330C /* object.cpp in Sources */,
 				35FDEBD224B6DC5B00AC1696 /* fing.cpp in Sources */,
-				4D2BB85A30B30FE9006260A8 /* midibuilderjson.cpp in Sources */,
 				403B0511244F3E2900EE4F71 /* gliss.cpp in Sources */,
 				E7B17DA929F665C50076E75F /* midifunctor.cpp in Sources */,
 				8F3DD36E18854B410051330C /* vrv.cpp in Sources */,
@@ -5275,7 +5266,6 @@
 				BB4C4AFF22A932BC001F6AF0 /* supplied.cpp in Sources */,
 				BB4C4BB522A932EB001F6AF0 /* view_tuplet.cpp in Sources */,
 				BB4C4B2122A932CF001F6AF0 /* dir.cpp in Sources */,
-				4D2BB85B30B30FE9006260A8 /* midibuilderjson.cpp in Sources */,
 				BB4C4BAF22A932EB001F6AF0 /* view_mensural.cpp in Sources */,
 				35FDEBD324B6DC5B00AC1696 /* fing.cpp in Sources */,
 				E7B17DAA29F665C50076E75F /* midifunctor.cpp in Sources */,

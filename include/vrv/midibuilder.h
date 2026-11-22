@@ -33,7 +33,7 @@ public:
     enum class Format { Midi, Json };
 
     explicit MIDIBuilder(Format format);
-    /** Use a caller-owned MIDI file, as in Doc::ExportMIDI(). */
+    /** Populate a caller-owned MIDI file and also collect JSON events if requested. */
     MIDIBuilder(Format format, smf::MidiFile &midiFile);
     MIDIBuilder(const MIDIBuilder &) = delete;
     MIDIBuilder &operator=(const MIDIBuilder &) = delete;
@@ -46,7 +46,7 @@ public:
     int GetTPQ() const;
 
     /**
-     * @name Add events, with the values written to the MIDI file
+     * @name Add events to the selected output
      */
     ///@{
     void AddNoteOn(int track, int tick, int channel, int key, int velocity, const std::string &id);
@@ -68,66 +68,45 @@ public:
     void CopyNotesForBeatRepeat(int track, double firstTick, double lastTick, double tickOffset, const std::string &id);
 
 private:
-    void EnsureTrack(int track);
+    enum class EventType {
+        NoteOn,
+        NoteOff,
+        Controller,
+        ProgramChange,
+        Tempo,
+        TimeSignature,
+        KeySignature,
+        Meta,
+        Tuning
+    };
+    enum class MetaType { Text, TrackName, Lyrics, Marker, CuePoint };
 
-    /**
-     * Mirrors the binary event indices while building the Tone.js-compatible JSON with note IDs.
-     */
-    class JsonEvents {
-    public:
-        enum class MetaType { Text, TrackName, Lyrics, Marker, CuePoint };
-
-        explicit JsonEvents(int ppq);
-        void AddNoteOn(int track, int tick, int channel, int key, int velocity, const std::string &id);
-        void AddNoteOff(int track, int tick, int channel, int key);
-        void AddController(int track, int tick, int channel, int number, int value);
-        void AddProgramChange(int track, int tick, int channel, int program);
-        void AddTempo(int track, int tick, double bpm);
-        void AddTimeSignature(int track, int tick, int numerator, int denominator);
-        void AddKeySignature(int track, int tick, int fifths, bool minor);
-        void AddMeta(int track, int tick, MetaType type, const std::string &text);
-        void AddOther(int track, int tick);
-        void CopyNoteEvent(int track, int index, int tick, const std::string &id);
-        int GetEventCount(int track) const;
-        void Finalize(int trackCount, std::string &output) const;
-
-    private:
-        enum class EventType {
-            NoteOn,
-            NoteOff,
-            Controller,
-            ProgramChange,
-            Tempo,
-            TimeSignature,
-            KeySignature,
-            Meta,
-            Other
-        };
-
-        struct Event {
-            EventType type;
-            int tick;
-            int channel;
-            // Key, controller, program, numerator or fifths
-            int data1;
-            // Velocity, controller value, denominator or minor (0/1)
-            int data2;
-            double bpm;
-            MetaType metaType;
-            // The text of a meta event or the ID of the note of a note-on event
-            std::string text;
-        };
-
-        Event &AddEvent(int track, EventType type, int tick);
-        static bool IsMeta(const Event &event);
-
-        int m_ppq;
-        std::vector<std::vector<Event>> m_tracks;
+    struct Event {
+        EventType type;
+        int tick;
+        int channel = 0;
+        // Key, controller, program, numerator or fifths
+        int data1 = 0;
+        // Velocity, controller value, denominator or minor (0/1)
+        int data2 = 0;
+        double bpm = 0.0;
+        MetaType metaType = MetaType::Text;
+        // The text of a meta event or the ID of the note of a note-on event
+        std::string text;
     };
 
+    void EnsureTrack(int track);
+    Event &AddJsonEvent(int track, EventType type, int tick);
+    void AddJsonMeta(int track, int tick, MetaType type, const std::string &text);
+    void CopyJsonNotesForBeatRepeat(
+        int track, double firstTick, double lastTick, double tickOffset, const std::string &id);
+    static bool IsMeta(const Event &event);
+
+    // Use the same resolution for both output formats when we own the timing.
+    static constexpr int s_defaultTPQ = 120;
     std::optional<smf::MidiFile> m_ownedMidiFile;
-    smf::MidiFile &m_midiFile;
-    std::optional<JsonEvents> m_json;
+    smf::MidiFile *m_midiFile = NULL;
+    std::optional<std::vector<std::vector<Event>>> m_jsonTracks;
 };
 
 } // namespace vrv
