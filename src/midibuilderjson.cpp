@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        midijsonbuilder.cpp
+// Name:        midibuilderjson.cpp
 // Author:      Daniel Kasper
 // Created:     2026
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "midijsonbuilder.h"
+#include "midibuilder.h"
 
 //----------------------------------------------------------------------------
 
@@ -68,15 +68,15 @@ namespace {
 } // namespace
 
 //----------------------------------------------------------------------------
-// MIDIJsonBuilder
+// MIDIBuilder::JsonEvents
 //----------------------------------------------------------------------------
 
-MIDIJsonBuilder::MIDIJsonBuilder(int ppq)
+MIDIBuilder::JsonEvents::JsonEvents(int ppq)
 {
     m_ppq = ppq;
 }
 
-MIDIJsonBuilder::Event &MIDIJsonBuilder::AddEvent(int track, EventType type, int tick)
+MIDIBuilder::JsonEvents::Event &MIDIBuilder::JsonEvents::AddEvent(int track, EventType type, int tick)
 {
     assert(track >= 0);
     if ((int)m_tracks.size() <= track) m_tracks.resize(track + 1);
@@ -94,7 +94,7 @@ MIDIJsonBuilder::Event &MIDIJsonBuilder::AddEvent(int track, EventType type, int
 
 // Channels, keys and values are masked as in the MIDI message
 
-void MIDIJsonBuilder::AddNoteOn(int track, int tick, int channel, int key, int velocity, const std::string &id)
+void MIDIBuilder::JsonEvents::AddNoteOn(int track, int tick, int channel, int key, int velocity, const std::string &id)
 {
     // A note-on with velocity 0 is a note-off
     const bool isNoteOn = ((velocity & 0x7f) > 0);
@@ -105,14 +105,14 @@ void MIDIJsonBuilder::AddNoteOn(int track, int tick, int channel, int key, int v
     if (isNoteOn) event.text = id;
 }
 
-void MIDIJsonBuilder::AddNoteOff(int track, int tick, int channel, int key)
+void MIDIBuilder::JsonEvents::AddNoteOff(int track, int tick, int channel, int key)
 {
     Event &event = this->AddEvent(track, EventType::NoteOff, tick);
     event.channel = channel & 0x0f;
     event.data1 = key & 0x7f;
 }
 
-void MIDIJsonBuilder::AddController(int track, int tick, int channel, int number, int value)
+void MIDIBuilder::JsonEvents::AddController(int track, int tick, int channel, int number, int value)
 {
     Event &event = this->AddEvent(track, EventType::Controller, tick);
     event.channel = channel & 0x0f;
@@ -120,46 +120,46 @@ void MIDIJsonBuilder::AddController(int track, int tick, int channel, int number
     event.data2 = value & 0x7f;
 }
 
-void MIDIJsonBuilder::AddProgramChange(int track, int tick, int channel, int program)
+void MIDIBuilder::JsonEvents::AddProgramChange(int track, int tick, int channel, int program)
 {
     Event &event = this->AddEvent(track, EventType::ProgramChange, tick);
     event.channel = channel & 0x0f;
     event.data1 = program & 0x7f;
 }
 
-void MIDIJsonBuilder::AddTempo(int track, int tick, double bpm)
+void MIDIBuilder::JsonEvents::AddTempo(int track, int tick, double bpm)
 {
     Event &event = this->AddEvent(track, EventType::Tempo, tick);
     event.bpm = bpm;
 }
 
-void MIDIJsonBuilder::AddTimeSignature(int track, int tick, int numerator, int denominator)
+void MIDIBuilder::JsonEvents::AddTimeSignature(int track, int tick, int numerator, int denominator)
 {
     Event &event = this->AddEvent(track, EventType::TimeSignature, tick);
     event.data1 = numerator;
     event.data2 = denominator;
 }
 
-void MIDIJsonBuilder::AddKeySignature(int track, int tick, int fifths, bool minor)
+void MIDIBuilder::JsonEvents::AddKeySignature(int track, int tick, int fifths, bool minor)
 {
     Event &event = this->AddEvent(track, EventType::KeySignature, tick);
     event.data1 = fifths;
     event.data2 = minor ? 1 : 0;
 }
 
-void MIDIJsonBuilder::AddMeta(int track, int tick, MetaType type, const std::string &text)
+void MIDIBuilder::JsonEvents::AddMeta(int track, int tick, MetaType type, const std::string &text)
 {
     Event &event = this->AddEvent(track, EventType::Meta, tick);
     event.metaType = type;
     event.text = text;
 }
 
-void MIDIJsonBuilder::AddOther(int track, int tick)
+void MIDIBuilder::JsonEvents::AddOther(int track, int tick)
 {
     this->AddEvent(track, EventType::Other, tick);
 }
 
-void MIDIJsonBuilder::CopyNoteEvent(int track, int index, int tick, const std::string &id)
+void MIDIBuilder::JsonEvents::CopyNoteEvent(int track, int index, int tick, const std::string &id)
 {
     assert((track >= 0) && (track < (int)m_tracks.size()));
     assert((index >= 0) && (index < (int)m_tracks.at(track).size()));
@@ -171,13 +171,13 @@ void MIDIJsonBuilder::CopyNoteEvent(int track, int index, int tick, const std::s
     m_tracks.at(track).push_back(event);
 }
 
-int MIDIJsonBuilder::GetEventCount(int track) const
+int MIDIBuilder::JsonEvents::GetEventCount(int track) const
 {
     if ((track < 0) || (track >= (int)m_tracks.size())) return 0;
     return (int)m_tracks.at(track).size();
 }
 
-bool MIDIJsonBuilder::IsMeta(const Event &event)
+bool MIDIBuilder::JsonEvents::IsMeta(const Event &event)
 {
     switch (event.type) {
         case EventType::Tempo:
@@ -188,7 +188,7 @@ bool MIDIJsonBuilder::IsMeta(const Event &event)
     }
 }
 
-void MIDIJsonBuilder::Finalize(int trackCount, std::string &output) const
+void MIDIBuilder::JsonEvents::Finalize(int trackCount, std::string &output) const
 {
     // A track of the JSON: the events of one MIDI track with one channel and program (see below)
     struct JsonTrack {

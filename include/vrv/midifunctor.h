@@ -14,16 +14,12 @@
 
 #include "alignfunctor.h"
 
-namespace smf {
-class MidiFile;
-}
-
 namespace vrv {
 
 class CustomTuning;
 class FeatureExtractor;
 class InstrDef;
-class MIDIJsonBuilder;
+class MIDIBuilder;
 class Timemap;
 
 //----------------------------------------------------------------------------
@@ -345,7 +341,7 @@ struct MIDIHeldNote {
 };
 
 /**
- * This class performs the export to a MidiFile.
+ * This class turns notation and playback timing into events for MIDIBuilder.
  */
 class GenerateMIDIFunctor : public ConstFunctor {
 public:
@@ -353,7 +349,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    GenerateMIDIFunctor(smf::MidiFile *midiFile);
+    explicit GenerateMIDIFunctor(MIDIBuilder &midiBuilder);
     virtual ~GenerateMIDIFunctor() = default;
     ///@}
 
@@ -379,7 +375,6 @@ public:
     void SetCurrentTempo(double tempo) { m_currentTempo = tempo; }
     void SetDeferredNotes(const std::map<const Note *, double> &deferredNotes) { m_deferredNotes = deferredNotes; }
     void SetLayerN(int layerN) { m_layerN = layerN; }
-    void SetMIDIJsonBuilder(MIDIJsonBuilder *midiJson) { m_midiJson = midiJson; }
     void SetOctaves(const std::list<OctaveInfo> &octaves) { m_octaves = octaves; }
     void SetStaffN(int staffN) { m_staffN = staffN; }
     void SetTempoEventTicks(const std::set<int> &ticks) { m_tempoEventTicks = ticks; }
@@ -428,7 +423,7 @@ private:
     void HandleOctave(const LayerElement *layerElement);
 
     /**
-     * @name Add events to the MIDI file and to the MIDI JSON (if requested)
+     * @name Add events to the current track and channel
      */
     ///@{
     void AddNoteOn(const Note *note, int tick, int pitch, int velocity);
@@ -444,8 +439,8 @@ private:
 public:
     //
 private:
-    // The MidiFile we are writing to
-    smf::MidiFile *m_midiFile;
+    // The builder collecting the generated events
+    MIDIBuilder &m_midiBuilder;
     // The MIDI track number
     int m_midiTrack;
     // The MIDI channel number
@@ -483,8 +478,6 @@ private:
     const InstrDef *m_instrDef;
     // Current custom tuning
     CustomTuning *m_customTuning;
-    // The MIDI JSON collecting the same events (if requested)
-    MIDIJsonBuilder *m_midiJson;
 };
 
 //----------------------------------------------------------------------------
