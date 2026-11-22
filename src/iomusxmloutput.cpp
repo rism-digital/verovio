@@ -9,9 +9,11 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <limits>
 #include <map>
 #include <numeric>
+#include <optional>
 #include <set>
 #include <sstream>
 #include <string>
@@ -27,6 +29,7 @@
 #include "comparison.h"
 #include "doc.h"
 #include "durationinterface.h"
+#include "dynam.h"
 #include "fraction.h"
 #include "functor.h"
 #include "instrdef.h"
@@ -56,6 +59,8 @@ namespace vrv {
 
 #ifndef NO_MUSICXML_SUPPORT
 namespace musicxmloutput {
+
+    constexpr int maxMusicXmlDivisions = 16384;
 
     struct MusicXmlEvent {
         const LayerElement *element;
@@ -94,7 +99,15 @@ namespace musicxmloutput {
     struct MusicXmlStaff {
         const StaffDef *definition;
         Fraction measureDuration;
+        int meterUnit;
         std::map<int, MusicXmlVoiceDef> voices;
+    };
+
+    struct MusicXmlDirection {
+        std::string text;
+        data_STAFFREL placement;
+        int staff;
+        Fraction offset;
     };
 
     struct MusicXmlPart {
@@ -104,13 +117,17 @@ namespace musicxmloutput {
         std::vector<MusicXmlStaff> staves;
         std::vector<std::vector<MusicXmlVoice>> measures;
         std::map<std::string, const InstrDef *> layerInstruments;
+        std::vector<std::vector<MusicXmlDirection>> directions;
     };
 
-    struct MusicXmlNotePosition {
+    struct MusicXmlElementPosition {
         size_t part;
         size_t measure;
         size_t order;
+        Fraction offset;
     };
+
+    using MusicXmlElementPositionMap = std::map<const LayerElement *, MusicXmlElementPosition>;
 
     struct MusicXmlSlurSpan {
         const Slur *slur;
@@ -370,7 +387,7 @@ namespace musicxmloutput {
             for (const MusicXmlEvent &event : voice.events) {
                 divisions = std::lcm(divisions, event.duration.GetDenominator());
                 // Bound the resolution for consumers that calculate the measure size using integer arithmetic.
-                if (divisions > 16384) {
+                if (divisions > maxMusicXmlDivisions) {
                     LogError("MusicXML output duration resolution exceeds 16384 divisions");
                     return false;
                 }
@@ -394,33 +411,53 @@ namespace musicxmloutput {
         }
     }
 
-    void CollectMusicXmlSlurs(const std::vector<const Slur *> &slurs, const std::vector<MusicXmlPart> &parts,
-        MusicXmlNoteControlMap &controls)
+    int GetMusicXmlTicks(Fraction duration, int divisions)
     {
-        if (slurs.empty()) return;
+        // The plan chooses divisions that are multiples of every event denominator.
+        return duration.GetNumerator() * (divisions / duration.GetDenominator());
+    }
 
+    bool CollectMusicXmlElementPositions(
+        const std::vector<MusicXmlPart> &parts, int divisions, MusicXmlElementPositionMap &positions)
+    {
         // The order of notes in a MusicXML part can differ from score time when a measure has multiple voices.
-        std::map<const Note *, MusicXmlNotePosition> positions;
         for (size_t part = 0; part < parts.size(); ++part) {
             size_t order = 0;
             const std::vector<std::vector<MusicXmlVoice>> &measures = parts.at(part).measures;
             for (size_t measure = 0; measure < measures.size(); ++measure) {
                 for (const MusicXmlVoice &voice : measures.at(measure)) {
+                    int tick = 0;
                     for (const MusicXmlEvent &event : voice.events) {
-                        ForEachMusicXmlNote(event, [&positions, part, measure, &order](const Note *note, bool) {
-                            if (note) positions.emplace(note, MusicXmlNotePosition{ part, measure, order++ });
+                        const Fraction offset(tick, divisions);
+                        if (event.element && !event.element->Is(NOTE)) {
+                            positions.emplace(event.element, MusicXmlElementPosition{ part, measure, order, offset });
+                        }
+                        ForEachMusicXmlNote(event, [&positions, part, measure, &order, offset](const Note *note, bool) {
+                            if (note)
+                                positions.emplace(note, MusicXmlElementPosition{ part, measure, order++, offset });
                         });
+                        const int duration = GetMusicXmlTicks(event.duration, divisions);
+                        if (duration > std::numeric_limits<int>::max() - tick) {
+                            LogError("MusicXML output measure duration overflow");
+                            return false;
+                        }
+                        tick += duration;
                     }
                 }
             }
         }
+        return true;
+    }
 
+    void CollectMusicXmlSlurs(const std::vector<const Slur *> &slurs, const MusicXmlElementPositionMap &positions,
+        MusicXmlNoteControlMap &controls)
+    {
         std::vector<MusicXmlSlurSpan> spans;
         for (const Slur *slur : slurs) {
             const Note *start = GetMusicXmlNoteAnchor(slur->GetStart());
             const Note *end = GetMusicXmlNoteAnchor(slur->GetEnd());
-            const std::map<const Note *, MusicXmlNotePosition>::const_iterator startPosition = positions.find(start);
-            const std::map<const Note *, MusicXmlNotePosition>::const_iterator endPosition = positions.find(end);
+            const MusicXmlElementPositionMap::const_iterator startPosition = positions.find(start);
+            const MusicXmlElementPositionMap::const_iterator endPosition = positions.find(end);
             if (!slur->HasStartid() || !slur->HasEndid() || start == end || startPosition == positions.end()
                 || endPosition == positions.end() || startPosition->second.part != endPosition->second.part
                 || startPosition->second.measure > endPosition->second.measure) {
@@ -458,12 +495,83 @@ namespace musicxmloutput {
         }
     }
 
-    MusicXmlNoteControlMap CollectMusicXmlNoteControls(
-        const std::vector<const Measure *> &measures, const std::vector<MusicXmlPart> &parts)
+    std::optional<Fraction> GetMusicXmlTimestampOffset(double beat, const MusicXmlStaff &staff, int divisions)
     {
-        MusicXmlNoteControlMap controls;
+        const double quarters = (beat - 1.0) * 4.0 / staff.meterUnit;
+        if (!std::isfinite(quarters) || quarters < 0.0 || quarters > staff.measureDuration.ToDouble()) {
+            return std::nullopt;
+        }
+
+        // Recover the rhythm from the MEI double without changing any already planned ticks.
+        for (int resolution = divisions; resolution <= maxMusicXmlDivisions; resolution += divisions) {
+            const double ticks = quarters * resolution;
+            const double rounded = std::round(ticks);
+            if (std::abs(ticks - rounded) < 1e-8) return Fraction(static_cast<int>(rounded), resolution);
+        }
+        return std::nullopt;
+    }
+
+    void CollectMusicXmlDynamics(const std::vector<std::pair<size_t, const Dynam *>> &dynamics,
+        const std::vector<const Measure *> &measures, const MusicXmlElementPositionMap &positions,
+        std::vector<MusicXmlPart> &parts, int &divisions)
+    {
+        if (dynamics.empty()) return;
+
+        std::map<int, std::pair<size_t, size_t>> staffPositions;
+        for (size_t part = 0; part < parts.size(); ++part) {
+            const std::vector<MusicXmlStaff> &staves = parts.at(part).staves;
+            for (size_t staff = 0; staff < staves.size(); ++staff) {
+                staffPositions.emplace(staves.at(staff).definition->GetN(), std::pair{ part, staff });
+            }
+        }
+        for (const std::pair<size_t, const Dynam *> &entry : dynamics) {
+            const Dynam *dynam = entry.second;
+            const std::string text = UTF32to8(dynam->GetText());
+            if (text.empty() || dynam->IsExtenderElement() || dynam->HasEndid() || dynam->HasTstamp2()) {
+                LogWarning("MusicXML output omits unsupported dynam '%s'", dynam->GetID().c_str());
+                continue;
+            }
+
+            const MusicXmlElementPositionMap::const_iterator start = positions.find(dynam->GetStart());
+            if ((dynam->HasStartid() && start == positions.end()) || (!dynam->HasStartid() && !dynam->HasTstamp())) {
+                LogWarning("MusicXML output could not locate dynam '%s'", dynam->GetID().c_str());
+                continue;
+            }
+            const size_t measure = dynam->HasStartid() ? start->second.measure : entry.first;
+            bool collected = false;
+            for (const Staff *source : dynam->GetTstampStaves(measures.at(measure), dynam)) {
+                const std::map<int, std::pair<size_t, size_t>>::const_iterator position
+                    = staffPositions.find(source->GetN());
+                if (position == staffPositions.end()) continue;
+                MusicXmlPart &part = parts.at(position->second.first);
+                const size_t staffIndex = position->second.second;
+                const MusicXmlStaff &staff = part.staves.at(staffIndex);
+                const std::optional<Fraction> offset = dynam->HasStartid()
+                    ? std::optional<Fraction>(start->second.offset)
+                    : GetMusicXmlTimestampOffset(dynam->GetTstamp(), staff, divisions);
+                if (!offset || offset->ToDouble() > staff.measureDuration.ToDouble()) continue;
+
+                divisions = std::lcm(divisions, offset->GetDenominator());
+                if (part.directions.empty()) part.directions.resize(measures.size());
+                const data_STAFFREL placement
+                    = dynam->GetPlace() == STAFFREL_between ? STAFFREL_below : dynam->GetPlace();
+                part.directions.at(measure).push_back({ text, placement, static_cast<int>(staffIndex) + 1, *offset });
+                collected = true;
+            }
+            if (!collected) {
+                LogWarning("MusicXML output could not place dynam '%s' on a staff at a supported offset",
+                    dynam->GetID().c_str());
+            }
+        }
+    }
+
+    bool CollectMusicXmlControls(const std::vector<const Measure *> &measures, std::vector<MusicXmlPart> &parts,
+        int &divisions, MusicXmlNoteControlMap &controls)
+    {
         std::vector<const Slur *> slurs;
-        for (const Measure *measure : measures) {
+        std::vector<std::pair<size_t, const Dynam *>> dynamics;
+        for (size_t i = 0; i < measures.size(); ++i) {
+            const Measure *measure = measures.at(i);
             for (const Object *tie : measure->FindAllDescendantsByType(TIE)) {
                 // PrepareData resolves the ID references to the exact notes, including tones within chords.
                 const TimeSpanningInterface *span = tie->GetTimeSpanningInterface();
@@ -474,9 +582,16 @@ namespace musicxmloutput {
             for (const Object *slur : measure->FindAllDescendantsByType(SLUR)) {
                 slurs.push_back(vrv_cast<const Slur *>(slur));
             }
+            for (const Object *dynam : measure->FindAllDescendantsByType(DYNAM)) {
+                dynamics.emplace_back(i, vrv_cast<const Dynam *>(dynam));
+            }
         }
-        CollectMusicXmlSlurs(slurs, parts, controls);
-        return controls;
+        if (slurs.empty() && dynamics.empty()) return true;
+        MusicXmlElementPositionMap positions;
+        if (!CollectMusicXmlElementPositions(parts, divisions, positions)) return false;
+        CollectMusicXmlSlurs(slurs, positions, controls);
+        CollectMusicXmlDynamics(dynamics, measures, positions, parts, divisions);
+        return true;
     }
 
     std::string GetMusicXmlPartName(const MusicXmlPart &part)
@@ -488,10 +603,25 @@ namespace musicxmloutput {
         return labelled ? labelled->GetLabel() : "";
     }
 
-    int GetMusicXmlTicks(Fraction duration, int divisions)
+    void WriteMusicXmlDirection(pugi::xml_node measure, const MusicXmlDirection &direction, int divisions)
     {
-        // The plan chooses divisions that are multiples of every event denominator.
-        return duration.GetNumerator() * (divisions / duration.GetDenominator());
+        static const std::set<std::string> symbols{ "p", "pp", "ppp", "pppp", "ppppp", "pppppp", "f", "ff", "fff",
+            "ffff", "fffff", "ffffff", "mp", "mf", "sf", "sfp", "sfpp", "fp", "rf", "rfz", "sfz", "sffz", "fz", "n",
+            "pf", "sfzp" };
+
+        pugi::xml_node node = measure.append_child("direction");
+        if (direction.placement == STAFFREL_above) node.append_attribute("placement") = "above";
+        if (direction.placement == STAFFREL_below) node.append_attribute("placement") = "below";
+        pugi::xml_node dynamics = node.append_child("direction-type").append_child("dynamics");
+        if (symbols.contains(direction.text)) {
+            dynamics.append_child(direction.text.c_str());
+        }
+        else {
+            dynamics.append_child("other-dynamics").text().set(direction.text.c_str());
+        }
+        const int offset = GetMusicXmlTicks(direction.offset, divisions);
+        if (offset) node.append_child("offset").text().set(offset);
+        node.append_child("staff").text().set(direction.staff);
     }
 
     void WriteMusicXmlAttributes(
@@ -710,10 +840,10 @@ std::string MusicXmlOutput::Export()
             = partByDefinition.emplace(definition, parts.size());
         if (position.second) {
             parts.push_back({ definition, vrv_cast<const InstrDef *>(instrument), instrument ? instrument->GetID() : "",
-                {}, {}, {} });
+                {}, {}, {}, {} });
         }
         musicxmloutput::MusicXmlPart &part = parts[position.first->second];
-        part.staves.push_back({ staffDef, measureDuration, {} });
+        part.staves.push_back({ staffDef, measureDuration, meterValues.second, {} });
         musicxmloutput::MusicXmlStaff &staff = part.staves.back();
 
         std::set<int> &layers = layersByStaff[staffDef->GetN()];
@@ -756,6 +886,9 @@ std::string MusicXmlOutput::Export()
         }
     }
 
+    musicxmloutput::MusicXmlNoteControlMap noteControls;
+    if (!musicxmloutput::CollectMusicXmlControls(measures, parts, divisions, noteControls)) return "";
+
     pugi::xml_document xml;
     pugi::xml_node root = xml.append_child("score-partwise");
     root.append_attribute("version") = "4.0";
@@ -781,8 +914,6 @@ std::string MusicXmlOutput::Export()
             scoreInstrument.append_child("instrument-name").text().set(instrumentName.c_str());
         }
     }
-    const musicxmloutput::MusicXmlNoteControlMap noteControls
-        = musicxmloutput::CollectMusicXmlNoteControls(measures, parts);
     std::vector<bool> implicitMeasures(measures.size(), false);
     for (const musicxmloutput::MusicXmlPart &part : parts) {
         pugi::xml_node partNode = root.append_child("part");
@@ -793,6 +924,12 @@ std::string MusicXmlOutput::Export()
             const std::string number = measure->HasN() ? measure->GetN() : std::to_string(i + 1);
             measureNode.append_attribute("number") = number.c_str();
             if (i == 0) musicxmloutput::WriteMusicXmlAttributes(measureNode, scoreDef, part, divisions);
+            // Directions are written at cursor zero, so their offsets are relative to the start of the measure.
+            if (!part.directions.empty()) {
+                for (const musicxmloutput::MusicXmlDirection &direction : part.directions.at(i)) {
+                    musicxmloutput::WriteMusicXmlDirection(measureNode, direction, divisions);
+                }
+            }
             int cursor = 0;
             int furthest = 0;
             for (const musicxmloutput::MusicXmlVoice &voice : part.measures[i]) {
@@ -825,7 +962,7 @@ std::string MusicXmlOutput::Export()
     std::set<ClassId> omitted;
     for (const Measure *measure : measures) {
         for (const Object *child : measure->GetChildren()) {
-            if (!child->IsControlElement() || child->Is(MNUM) || child->Is(SLUR) || child->Is(TIE)
+            if (!child->IsControlElement() || child->Is(DYNAM) || child->Is(MNUM) || child->Is(SLUR) || child->Is(TIE)
                 || !omitted.insert(child->GetClassId()).second) {
                 continue;
             }
