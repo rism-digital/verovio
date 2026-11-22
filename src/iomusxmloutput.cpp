@@ -21,6 +21,7 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
+#include "beam.h"
 #include "clef.h"
 #include "comparison.h"
 #include "doc.h"
@@ -58,6 +59,7 @@ namespace musicxmloutput {
         Fraction duration;
         const char *type;
         int dots;
+        const char *beamValue = NULL;
     };
 
     struct MusicXmlVoice {
@@ -189,12 +191,44 @@ namespace musicxmloutput {
         return true;
     }
 
+    bool AddMusicXmlBeam(const Beam *beam, Fraction measureDuration, MusicXmlVoice &voice)
+    {
+        if (beam->HasSameas() || beam->HasBeamWith() || (beam->HasForm() && beam->GetForm() != beamRend_FORM_norm)) {
+            return false;
+        }
+        const ArrayOfConstObjects children = beam->GetChildren();
+        if (children.size() < 2 || children.front()->Is(REST) || children.back()->Is(REST)) {
+            return false;
+        }
+
+        const size_t first = voice.events.size();
+        for (const Object *child : children) {
+            if (!child->Is(NOTE) && !child->Is(CHORD) && !child->Is(REST)) {
+                return false;
+            }
+            const LayerElement *element = vrv_cast<const LayerElement *>(child);
+            if (element->GetDurationInterface()->GetActualDur() != DURATION_8
+                || !AddMusicXmlEvent(element, measureDuration, voice)) {
+                return false;
+            }
+            voice.events.back().beamValue = "continue";
+        }
+        voice.events.at(first).beamValue = "begin";
+        voice.events.back().beamValue = "end";
+        return true;
+    }
+
     // MusicXML uses one cursor for the entire part-measure. Each MEI layer is emitted as a separate run on this cursor.
     bool CollectMusicXmlVoice(const Layer *layer, Fraction measureDuration, MusicXmlVoice &voice)
     {
         for (const Object *object : layer->GetChildren()) {
-            const LayerElement *element = dynamic_cast<const LayerElement *>(object);
-            if (element && AddMusicXmlEvent(element, measureDuration, voice)) continue;
+            if (object->Is(BEAM)) {
+                if (AddMusicXmlBeam(vrv_cast<const Beam *>(object), measureDuration, voice)) continue;
+            }
+            else {
+                const LayerElement *element = dynamic_cast<const LayerElement *>(object);
+                if (element && AddMusicXmlEvent(element, measureDuration, voice)) continue;
+            }
             LogError("MusicXML output does not support '%s' in a layer (xml:id '%s')", object->GetClassName().c_str(),
                 object->GetID().c_str());
             return false;
@@ -364,6 +398,12 @@ namespace musicxmloutput {
             node.append_child("accidental").text().set(GetMusicXmlAccidental(accid->GetAccid()));
         }
         if (voice.staff > 0) node.append_child("staff").text().set(voice.staff);
+        // A chord is a single beam position. Write it on the chord's first MusicXML note.
+        if (event.beamValue && !chordTone) {
+            pugi::xml_node beam = node.append_child("beam");
+            beam.append_attribute("number") = 1;
+            beam.text().set(event.beamValue);
+        }
     }
 
     void WriteMusicXmlVoice(pugi::xml_node measure, const MusicXmlVoice &voice, int divisions)
