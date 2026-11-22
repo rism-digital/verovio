@@ -7,24 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F10000110000000000000000 /* fontstore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F10000010000000000000000 /* fontstore.cpp */; settings = {COMPILER_FLAGS = "-I$(SRCROOT)/external/harfbuzz/src -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/woff2/src -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000120000000000000000 /* verovio-harfbuzz.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000030000000000000000 /* verovio-harfbuzz.cc */; settings = {COMPILER_FLAGS = "-Oz -DHB_LEAN -DHB_MINI -DHB_OPTIMIZE_SIZE_MORE -DHB_CONFIG_OVERRIDE_H=\\\"verovio-hb-config.h\\\""; }; };
-		F10000130000000000000000 /* verovio-woff2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000040000000000000000 /* verovio-woff2.cc */; settings = {COMPILER_FLAGS = "-Os -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000140000000000000000 /* verovio-brotli.c in Sources */ = {isa = PBXBuildFile; fileRef = F10000050000000000000000 /* verovio-brotli.c */; settings = {COMPILER_FLAGS = "-Os -DBROTLI_STATIC -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000210000000000000000 /* fontstore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F10000010000000000000000 /* fontstore.cpp */; settings = {COMPILER_FLAGS = "-I$(SRCROOT)/external/harfbuzz/src -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/woff2/src -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000220000000000000000 /* verovio-harfbuzz.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000030000000000000000 /* verovio-harfbuzz.cc */; settings = {COMPILER_FLAGS = "-Oz -DHB_LEAN -DHB_MINI -DHB_OPTIMIZE_SIZE_MORE -DHB_CONFIG_OVERRIDE_H=\\\"verovio-hb-config.h\\\""; }; };
-		F10000230000000000000000 /* verovio-woff2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000040000000000000000 /* verovio-woff2.cc */; settings = {COMPILER_FLAGS = "-Os -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000240000000000000000 /* verovio-brotli.c in Sources */ = {isa = PBXBuildFile; fileRef = F10000050000000000000000 /* verovio-brotli.c */; settings = {COMPILER_FLAGS = "-Os -DBROTLI_STATIC -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000310000000000000000 /* fontstore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F10000010000000000000000 /* fontstore.cpp */; settings = {COMPILER_FLAGS = "-I$(SRCROOT)/external/harfbuzz/src -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/woff2/src -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000320000000000000000 /* verovio-harfbuzz.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000030000000000000000 /* verovio-harfbuzz.cc */; settings = {COMPILER_FLAGS = "-Oz -DHB_LEAN -DHB_MINI -DHB_OPTIMIZE_SIZE_MORE -DHB_CONFIG_OVERRIDE_H=\\\"verovio-hb-config.h\\\""; }; };
-		F10000330000000000000000 /* verovio-woff2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000040000000000000000 /* verovio-woff2.cc */; settings = {COMPILER_FLAGS = "-Os -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000340000000000000000 /* verovio-brotli.c in Sources */ = {isa = PBXBuildFile; fileRef = F10000050000000000000000 /* verovio-brotli.c */; settings = {COMPILER_FLAGS = "-Os -DBROTLI_STATIC -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000410000000000000000 /* fontstore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F10000010000000000000000 /* fontstore.cpp */; settings = {COMPILER_FLAGS = "-I$(SRCROOT)/external/harfbuzz/src -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/woff2/src -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000420000000000000000 /* verovio-harfbuzz.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000030000000000000000 /* verovio-harfbuzz.cc */; settings = {COMPILER_FLAGS = "-Oz -DHB_LEAN -DHB_MINI -DHB_OPTIMIZE_SIZE_MORE -DHB_CONFIG_OVERRIDE_H=\\\"verovio-hb-config.h\\\""; }; };
-		F10000430000000000000000 /* verovio-woff2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000040000000000000000 /* verovio-woff2.cc */; settings = {COMPILER_FLAGS = "-Os -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000440000000000000000 /* verovio-brotli.c in Sources */ = {isa = PBXBuildFile; fileRef = F10000050000000000000000 /* verovio-brotli.c */; settings = {COMPILER_FLAGS = "-Os -DBROTLI_STATIC -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000510000000000000000 /* fontstore.h in Headers */ = {isa = PBXBuildFile; fileRef = F10000020000000000000000 /* fontstore.h */; };
-		F10000520000000000000000 /* fontstore.h in Headers */ = {isa = PBXBuildFile; fileRef = F10000020000000000000000 /* fontstore.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		152886C51C9CA86100B515BB /* ligature.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 152886C41C9CA86100B515BB /* ligature.cpp */; };
 		1579B3431B15033100B16F5C /* proport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1579B3421B15033100B16F5C /* proport.cpp */; };
 		2D2A799A1A69812C000A441B /* chord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D2A79991A69812C000A441B /* chord.cpp */; };
@@ -316,6 +298,12 @@
 		4D2B24002F56E8F40088C6F4 /* customtuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2B23FC2F56E8F40088C6F4 /* customtuning.cpp */; };
 		4D2B24022F56E9090088C6F4 /* customtuning.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2B24012F56E9090088C6F4 /* customtuning.h */; };
 		4D2B24032F56E9090088C6F4 /* customtuning.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2B24012F56E9090088C6F4 /* customtuning.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D2BB85230B305F3006260A8 /* midijsonbuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2BB85130B305F3006260A8 /* midijsonbuilder.h */; };
+		4D2BB85330B305F3006260A8 /* midijsonbuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2BB85130B305F3006260A8 /* midijsonbuilder.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D2BB85530B3060D006260A8 /* midijsonbuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85430B3060D006260A8 /* midijsonbuilder.cpp */; };
+		4D2BB85630B3060D006260A8 /* midijsonbuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85430B3060D006260A8 /* midijsonbuilder.cpp */; };
+		4D2BB85730B3060D006260A8 /* midijsonbuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85430B3060D006260A8 /* midijsonbuilder.cpp */; };
+		4D2BB85830B3060D006260A8 /* midijsonbuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85430B3060D006260A8 /* midijsonbuilder.cpp */; };
 		4D2E758A22BC2B34004C51F0 /* view_tab.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20741122A708C600E0765F /* view_tab.cpp */; };
 		4D2E758B22BC2B5B004C51F0 /* tabgrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F422A3BCDF00E0765F /* tabgrp.cpp */; };
 		4D2E758C22BC2B5B004C51F0 /* tabgrp.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2073F122A3BCB700E0765F /* tabgrp.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1874,6 +1862,24 @@
 		E7F39C6229A62B430055DBE0 /* adjustclefchangesfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F39C6029A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp */; };
 		E7F39C6329A62B440055DBE0 /* adjustclefchangesfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F39C6029A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp */; };
 		E7F39C6429A62B440055DBE0 /* adjustclefchangesfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F39C6029A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp */; };
+		F10000110000000000000000 /* fontstore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F10000010000000000000000 /* fontstore.cpp */; settings = {COMPILER_FLAGS = "-I$(SRCROOT)/external/harfbuzz/src -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/woff2/src -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000120000000000000000 /* verovio-harfbuzz.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000030000000000000000 /* verovio-harfbuzz.cc */; settings = {COMPILER_FLAGS = "-Oz -DHB_LEAN -DHB_MINI -DHB_OPTIMIZE_SIZE_MORE -DHB_CONFIG_OVERRIDE_H=\\\"verovio-hb-config.h\\\""; }; };
+		F10000130000000000000000 /* verovio-woff2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000040000000000000000 /* verovio-woff2.cc */; settings = {COMPILER_FLAGS = "-Os -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000140000000000000000 /* verovio-brotli.c in Sources */ = {isa = PBXBuildFile; fileRef = F10000050000000000000000 /* verovio-brotli.c */; settings = {COMPILER_FLAGS = "-Os -DBROTLI_STATIC -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000210000000000000000 /* fontstore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F10000010000000000000000 /* fontstore.cpp */; settings = {COMPILER_FLAGS = "-I$(SRCROOT)/external/harfbuzz/src -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/woff2/src -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000220000000000000000 /* verovio-harfbuzz.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000030000000000000000 /* verovio-harfbuzz.cc */; settings = {COMPILER_FLAGS = "-Oz -DHB_LEAN -DHB_MINI -DHB_OPTIMIZE_SIZE_MORE -DHB_CONFIG_OVERRIDE_H=\\\"verovio-hb-config.h\\\""; }; };
+		F10000230000000000000000 /* verovio-woff2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000040000000000000000 /* verovio-woff2.cc */; settings = {COMPILER_FLAGS = "-Os -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000240000000000000000 /* verovio-brotli.c in Sources */ = {isa = PBXBuildFile; fileRef = F10000050000000000000000 /* verovio-brotli.c */; settings = {COMPILER_FLAGS = "-Os -DBROTLI_STATIC -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000310000000000000000 /* fontstore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F10000010000000000000000 /* fontstore.cpp */; settings = {COMPILER_FLAGS = "-I$(SRCROOT)/external/harfbuzz/src -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/woff2/src -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000320000000000000000 /* verovio-harfbuzz.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000030000000000000000 /* verovio-harfbuzz.cc */; settings = {COMPILER_FLAGS = "-Oz -DHB_LEAN -DHB_MINI -DHB_OPTIMIZE_SIZE_MORE -DHB_CONFIG_OVERRIDE_H=\\\"verovio-hb-config.h\\\""; }; };
+		F10000330000000000000000 /* verovio-woff2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000040000000000000000 /* verovio-woff2.cc */; settings = {COMPILER_FLAGS = "-Os -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000340000000000000000 /* verovio-brotli.c in Sources */ = {isa = PBXBuildFile; fileRef = F10000050000000000000000 /* verovio-brotli.c */; settings = {COMPILER_FLAGS = "-Os -DBROTLI_STATIC -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000410000000000000000 /* fontstore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F10000010000000000000000 /* fontstore.cpp */; settings = {COMPILER_FLAGS = "-I$(SRCROOT)/external/harfbuzz/src -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/woff2/src -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000420000000000000000 /* verovio-harfbuzz.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000030000000000000000 /* verovio-harfbuzz.cc */; settings = {COMPILER_FLAGS = "-Oz -DHB_LEAN -DHB_MINI -DHB_OPTIMIZE_SIZE_MORE -DHB_CONFIG_OVERRIDE_H=\\\"verovio-hb-config.h\\\""; }; };
+		F10000430000000000000000 /* verovio-woff2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000040000000000000000 /* verovio-woff2.cc */; settings = {COMPILER_FLAGS = "-Os -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000440000000000000000 /* verovio-brotli.c in Sources */ = {isa = PBXBuildFile; fileRef = F10000050000000000000000 /* verovio-brotli.c */; settings = {COMPILER_FLAGS = "-Os -DBROTLI_STATIC -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000510000000000000000 /* fontstore.h in Headers */ = {isa = PBXBuildFile; fileRef = F10000020000000000000000 /* fontstore.h */; };
+		F10000520000000000000000 /* fontstore.h in Headers */ = {isa = PBXBuildFile; fileRef = F10000020000000000000000 /* fontstore.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1898,11 +1904,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		F10000010000000000000000 /* fontstore.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = fontstore.cpp; path = src/fontstore.cpp; sourceTree = "<group>"; };
-		F10000020000000000000000 /* fontstore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = fontstore.h; path = include/vrv/fontstore.h; sourceTree = "<group>"; };
-		F10000030000000000000000 /* verovio-harfbuzz.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = verovio-harfbuzz.cc; path = external/harfbuzz/src/verovio-harfbuzz.cc; sourceTree = "<group>"; };
-		F10000040000000000000000 /* verovio-woff2.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = verovio-woff2.cc; path = external/woff2/src/verovio-woff2.cc; sourceTree = "<group>"; };
-		F10000050000000000000000 /* verovio-brotli.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = verovio-brotli.c; path = external/brotli/c/verovio-brotli.c; sourceTree = "<group>"; };
 		152886C11C9CA2E000B515BB /* ligature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ligature.h; path = include/vrv/ligature.h; sourceTree = "<group>"; };
 		152886C41C9CA86100B515BB /* ligature.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ligature.cpp; path = src/ligature.cpp; sourceTree = "<group>"; };
 		1579B3411B15031D00B16F5C /* proport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = proport.h; path = include/vrv/proport.h; sourceTree = "<group>"; };
@@ -2017,6 +2018,8 @@
 		4D2B23F22F56E7980088C6F4 /* TuningsImpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TuningsImpl.h; sourceTree = "<group>"; };
 		4D2B23FC2F56E8F40088C6F4 /* customtuning.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = customtuning.cpp; path = src/customtuning.cpp; sourceTree = "<group>"; };
 		4D2B24012F56E9090088C6F4 /* customtuning.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = customtuning.h; path = include/vrv/customtuning.h; sourceTree = "<group>"; };
+		4D2BB85130B305F3006260A8 /* midijsonbuilder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = midijsonbuilder.h; path = include/vrv/midijsonbuilder.h; sourceTree = "<group>"; };
+		4D2BB85430B3060D006260A8 /* midijsonbuilder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = midijsonbuilder.cpp; path = src/midijsonbuilder.cpp; sourceTree = "<group>"; };
 		4D308100203DB69C00BC44F6 /* ref.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ref.h; path = include/vrv/ref.h; sourceTree = "<group>"; };
 		4D308103203DB6B500BC44F6 /* ref.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ref.cpp; path = src/ref.cpp; sourceTree = "<group>"; };
 		4D36C21C1EBCE14300A6DD1B /* fb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fb.h; path = include/vrv/fb.h; sourceTree = "<group>"; };
@@ -2531,6 +2534,11 @@
 		E7F1C36629F0345D007E12C1 /* savefunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = savefunctor.cpp; path = src/savefunctor.cpp; sourceTree = "<group>"; };
 		E7F39C5D29A62B1F0055DBE0 /* adjustclefchangesfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustclefchangesfunctor.h; path = include/vrv/adjustclefchangesfunctor.h; sourceTree = "<group>"; };
 		E7F39C6029A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustclefchangesfunctor.cpp; path = src/adjustclefchangesfunctor.cpp; sourceTree = "<group>"; };
+		F10000010000000000000000 /* fontstore.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = fontstore.cpp; path = src/fontstore.cpp; sourceTree = "<group>"; };
+		F10000020000000000000000 /* fontstore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = fontstore.h; path = include/vrv/fontstore.h; sourceTree = "<group>"; };
+		F10000030000000000000000 /* verovio-harfbuzz.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "verovio-harfbuzz.cc"; path = "external/harfbuzz/src/verovio-harfbuzz.cc"; sourceTree = "<group>"; };
+		F10000040000000000000000 /* verovio-woff2.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "verovio-woff2.cc"; path = "external/woff2/src/verovio-woff2.cc"; sourceTree = "<group>"; };
+		F10000050000000000000000 /* verovio-brotli.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "verovio-brotli.c"; path = "external/brotli/c/verovio-brotli.c"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -3026,18 +3034,6 @@
 			);
 			sourceTree = "<group>";
 		};
-		F10000060000000000000000 /* runtime-fonts */ = {
-			isa = PBXGroup;
-			children = (
-				F10000010000000000000000 /* fontstore.cpp */,
-				F10000020000000000000000 /* fontstore.h */,
-				F10000030000000000000000 /* verovio-harfbuzz.cc */,
-				F10000040000000000000000 /* verovio-woff2.cc */,
-				F10000050000000000000000 /* verovio-brotli.c */,
-			);
-			name = "runtime-fonts";
-			sourceTree = "<group>";
-		};
 		8F086EAA188534680037FD8E /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -3090,6 +3086,8 @@
 				4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */,
 				4D14600F1EA8A913007DB90C /* horizontalaligner.h */,
 				4DACC93F2990ED2600B55913 /* libmei.h */,
+				4D2BB85130B305F3006260A8 /* midijsonbuilder.h */,
+				4D2BB85430B3060D006260A8 /* midijsonbuilder.cpp */,
 				8F086ECD188539540037FD8E /* object.cpp */,
 				8F59292418854BF800FE51AD /* object.h */,
 				4DA80D951A6ACF5D0089802D /* options.cpp */,
@@ -3376,8 +3374,8 @@
 				E71EF3C22975E4DC00D36264 /* resetfunctor.h */,
 				E7F1C36629F0345D007E12C1 /* savefunctor.cpp */,
 				E7F1C36329F033FB007E12C1 /* savefunctor.h */,
-				B464F4922C6D665300A778D2 /* scoringupfunctor.h */,
 				B464F48E2C6D664300A778D2 /* scoringupfunctor.cpp */,
+				B464F4922C6D665300A778D2 /* scoringupfunctor.h */,
 				E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */,
 				E7D33899293E057100C40B81 /* setscoredeffunctor.h */,
 				E73E86272A069C920089DF74 /* transposefunctor.cpp */,
@@ -3470,6 +3468,18 @@
 			name = "vertical-layout";
 			sourceTree = "<group>";
 		};
+		F10000060000000000000000 /* runtime-fonts */ = {
+			isa = PBXGroup;
+			children = (
+				F10000010000000000000000 /* fontstore.cpp */,
+				F10000020000000000000000 /* fontstore.h */,
+				F10000030000000000000000 /* verovio-harfbuzz.cc */,
+				F10000040000000000000000 /* verovio-woff2.cc */,
+				F10000050000000000000000 /* verovio-brotli.c */,
+			);
+			name = "runtime-fonts";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -3538,6 +3548,7 @@
 				4DDBBB571C7AE43E00054AFF /* hairpin.h in Headers */,
 				E788335D2994EC5800D44B01 /* calcchordnoteheadsfunctor.h in Headers */,
 				4D79643126C6AA720026288B /* featureextractor.h in Headers */,
+				4D2BB85230B305F3006260A8 /* midijsonbuilder.h in Headers */,
 				4DEC4DC221C8291300D1D273 /* add.h in Headers */,
 				E75A699D29CCF87B00414819 /* adjustbeamsfunctor.h in Headers */,
 				403BEFF1206C00D500D022D5 /* mrpt2.h in Headers */,
@@ -3811,6 +3822,7 @@
 				BB4C4AAE22A932A6001F6AF0 /* iobase.h in Headers */,
 				BB4C4BAA22A932EB001F6AF0 /* view.h in Headers */,
 				4DACC9DD2990F29A00B55913 /* atts_header.h in Headers */,
+				4D2BB85330B305F3006260A8 /* midijsonbuilder.h in Headers */,
 				BB4C4BC422A9330D001F6AF0 /* pugixml.hpp in Headers */,
 				4DACC9F52990F29A00B55913 /* atts_visual.h in Headers */,
 				BBC19FC322B38C1400100F42 /* VerovioFramework.h in Headers */,
@@ -4526,6 +4538,7 @@
 				4D79643A26C6B3520026288B /* featureextractor.cpp in Sources */,
 				4DEC4DA721C81ED400D1D273 /* reg.cpp in Sources */,
 				4DACC9AF2990F29A00B55913 /* atts_analytical.cpp in Sources */,
+				4D2BB85830B3060D006260A8 /* midijsonbuilder.cpp in Sources */,
 				E76A9D4B29A74E620044682D /* adjustdotsfunctor.cpp in Sources */,
 				4D71BEA82D875DF800CE0001 /* atts_stringtab.cpp in Sources */,
 				4D1694421E3A44F300569BF4 /* chord.cpp in Sources */,
@@ -4825,6 +4838,7 @@
 				8F086F0D188539540037FD8E /* vrv.cpp in Sources */,
 				409B3DDB1F2D1C550098A265 /* btrem.cpp in Sources */,
 				E71EF3C92975ED4700D36264 /* resetfunctor.cpp in Sources */,
+				4D2BB85730B3060D006260A8 /* midijsonbuilder.cpp in Sources */,
 				4D22C41918890E6100D0831F /* mrest.cpp in Sources */,
 				4DA60EE61B6307B9006E2DFC /* textdirinterface.cpp in Sources */,
 				4DACC9C02990F29A00B55913 /* atts_cmn.cpp in Sources */,
@@ -5157,6 +5171,7 @@
 				4DACC9862990F29A00B55913 /* atts_performance.cpp in Sources */,
 				4D79643B26C6B3520026288B /* featureextractor.cpp in Sources */,
 				4DB787652022F0BC00394520 /* jsonxx.cc in Sources */,
+				4D2BB85630B3060D006260A8 /* midijsonbuilder.cpp in Sources */,
 				4DACC9B02990F29A00B55913 /* atts_analytical.cpp in Sources */,
 				E76A9D4C29A74E630044682D /* adjustdotsfunctor.cpp in Sources */,
 				4DC12A831F741110000440E9 /* pgfoot.cpp in Sources */,
@@ -5473,6 +5488,7 @@
 				BB4C4BC022A932FC001F6AF0 /* MidiMessage.cpp in Sources */,
 				E76A9D4D29A74E630044682D /* adjustdotsfunctor.cpp in Sources */,
 				BB4C4AED22A932BC001F6AF0 /* expan.cpp in Sources */,
+				4D2BB85530B3060D006260A8 /* midijsonbuilder.cpp in Sources */,
 				4DACC9872990F29A00B55913 /* atts_performance.cpp in Sources */,
 				BB4C4B0F22A932C8001F6AF0 /* ending.cpp in Sources */,
 				BB4C4AB522A932A6001F6AF0 /* iomei.cpp in Sources */,
