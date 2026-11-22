@@ -8,6 +8,7 @@
 //----------------------------------------------------------------------------
 
 #include <algorithm>
+#include <array>
 #include <limits>
 #include <map>
 #include <numeric>
@@ -40,6 +41,7 @@
 #include "mnum.h"
 #include "note.h"
 #include "scoredef.h"
+#include "slur.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "timeinterface.h"
@@ -63,9 +65,16 @@ namespace musicxmloutput {
         const char *beamValue = NULL;
     };
 
+    struct MusicXmlSlurEndpoint {
+        const Slur *slur;
+        int number;
+        bool start;
+    };
+
     struct MusicXmlNoteControls {
         bool tieStart = false;
         bool tieStop = false;
+        std::vector<MusicXmlSlurEndpoint> slurs;
     };
 
     using MusicXmlNoteControlMap = std::map<const LayerElement *, MusicXmlNoteControls>;
@@ -95,6 +104,21 @@ namespace musicxmloutput {
         std::vector<MusicXmlStaff> staves;
         std::vector<std::vector<MusicXmlVoice>> measures;
         std::map<std::string, const InstrDef *> layerInstruments;
+    };
+
+    struct MusicXmlNotePosition {
+        size_t part;
+        size_t measure;
+        size_t order;
+    };
+
+    struct MusicXmlSlurSpan {
+        const Slur *slur;
+        const Note *start;
+        const Note *end;
+        size_t part;
+        size_t first;
+        size_t last;
     };
 
     class CollectMusicXmlMeasuresFunctor : public ConstFunctor {
@@ -175,19 +199,13 @@ namespace musicxmloutput {
         return true;
     }
 
-    MusicXmlNoteControlMap CollectMusicXmlNoteControls(const std::vector<const Measure *> &measures)
+    const Note *GetMusicXmlNoteAnchor(const LayerElement *element)
     {
-        MusicXmlNoteControlMap controls;
-        for (const Measure *measure : measures) {
-            for (const Object *tie : measure->FindAllDescendantsByType(TIE)) {
-                // PrepareData resolves the ID references to the exact notes, including tones within chords.
-                const TimeSpanningInterface *span = tie->GetTimeSpanningInterface();
-                if (!span || !AddMusicXmlTie(*span, controls)) {
-                    LogWarning("MusicXML output omits unsupported tie '%s'", tie->GetID().c_str());
-                }
-            }
+        if (element && element->Is(CHORD)) {
+            // MusicXML attaches notation for the whole chord to its first note.
+            return vrv_cast<const Note *>(element->GetFirst(NOTE));
         }
-        return controls;
+        return dynamic_cast<const Note *>(element);
     }
 
     template <typename Element>
@@ -361,6 +379,106 @@ namespace musicxmloutput {
         return true;
     }
 
+    template <typename Callback> void ForEachMusicXmlNote(const MusicXmlEvent &event, Callback callback)
+    {
+        if (event.element && event.element->Is(CHORD)) {
+            bool chordTone = false;
+            for (const Object *child : event.element->GetChildren()) {
+                if (!child->Is(NOTE)) continue;
+                callback(vrv_cast<const Note *>(child), chordTone);
+                chordTone = true;
+            }
+        }
+        else {
+            callback(dynamic_cast<const Note *>(event.element), false);
+        }
+    }
+
+    void CollectMusicXmlSlurs(const std::vector<const Slur *> &slurs, const std::vector<MusicXmlPart> &parts,
+        MusicXmlNoteControlMap &controls)
+    {
+        if (slurs.empty()) return;
+
+        // The order of notes in a MusicXML part can differ from score time when a measure has multiple voices.
+        std::map<const Note *, MusicXmlNotePosition> positions;
+        for (size_t part = 0; part < parts.size(); ++part) {
+            size_t order = 0;
+            const std::vector<std::vector<MusicXmlVoice>> &measures = parts.at(part).measures;
+            for (size_t measure = 0; measure < measures.size(); ++measure) {
+                for (const MusicXmlVoice &voice : measures.at(measure)) {
+                    for (const MusicXmlEvent &event : voice.events) {
+                        ForEachMusicXmlNote(event, [&positions, part, measure, &order](const Note *note, bool) {
+                            if (note) positions.emplace(note, MusicXmlNotePosition{ part, measure, order++ });
+                        });
+                    }
+                }
+            }
+        }
+
+        std::vector<MusicXmlSlurSpan> spans;
+        for (const Slur *slur : slurs) {
+            const Note *start = GetMusicXmlNoteAnchor(slur->GetStart());
+            const Note *end = GetMusicXmlNoteAnchor(slur->GetEnd());
+            const std::map<const Note *, MusicXmlNotePosition>::const_iterator startPosition = positions.find(start);
+            const std::map<const Note *, MusicXmlNotePosition>::const_iterator endPosition = positions.find(end);
+            if (!slur->HasStartid() || !slur->HasEndid() || start == end || startPosition == positions.end()
+                || endPosition == positions.end() || startPosition->second.part != endPosition->second.part
+                || startPosition->second.measure > endPosition->second.measure) {
+                LogWarning("MusicXML output omits unsupported slur '%s'", slur->GetID().c_str());
+                continue;
+            }
+            const size_t first = std::min(startPosition->second.order, endPosition->second.order);
+            const size_t last = std::max(startPosition->second.order, endPosition->second.order);
+            spans.push_back({ slur, start, end, startPosition->second.part, first, last });
+        }
+        std::stable_sort(spans.begin(), spans.end(), [](const MusicXmlSlurSpan &one, const MusicXmlSlurSpan &two) {
+            return std::tie(one.part, one.first, one.last) < std::tie(two.part, two.first, two.last);
+        });
+
+        // MusicXML number-level allows 16 numbers per part. Spans that meet at a note can share a number
+        // because the earlier span's endpoint is written first.
+        std::array<size_t, 16> availableAt{};
+        size_t part = 0;
+        for (const MusicXmlSlurSpan &span : spans) {
+            if (span.part != part) {
+                availableAt.fill(0);
+                part = span.part;
+            }
+            const std::array<size_t, 16>::iterator available = std::find_if(
+                availableAt.begin(), availableAt.end(), [&span](size_t last) { return last <= span.first; });
+            if (available == availableAt.end()) {
+                LogWarning("MusicXML output omits slur '%s' because all 16 slur numbers are in use",
+                    span.slur->GetID().c_str());
+                continue;
+            }
+            const int number = static_cast<int>(available - availableAt.begin()) + 1;
+            *available = span.last;
+            controls[span.start].slurs.push_back({ span.slur, number, true });
+            controls[span.end].slurs.push_back({ span.slur, number, false });
+        }
+    }
+
+    MusicXmlNoteControlMap CollectMusicXmlNoteControls(
+        const std::vector<const Measure *> &measures, const std::vector<MusicXmlPart> &parts)
+    {
+        MusicXmlNoteControlMap controls;
+        std::vector<const Slur *> slurs;
+        for (const Measure *measure : measures) {
+            for (const Object *tie : measure->FindAllDescendantsByType(TIE)) {
+                // PrepareData resolves the ID references to the exact notes, including tones within chords.
+                const TimeSpanningInterface *span = tie->GetTimeSpanningInterface();
+                if (!span || !AddMusicXmlTie(*span, controls)) {
+                    LogWarning("MusicXML output omits unsupported tie '%s'", tie->GetID().c_str());
+                }
+            }
+            for (const Object *slur : measure->FindAllDescendantsByType(SLUR)) {
+                slurs.push_back(vrv_cast<const Slur *>(slur));
+            }
+        }
+        CollectMusicXmlSlurs(slurs, parts, controls);
+        return controls;
+    }
+
     std::string GetMusicXmlPartName(const MusicXmlPart &part)
     {
         if (part.instrument && part.instrument->HasLabel()) return part.instrument->GetLabel();
@@ -424,6 +542,25 @@ namespace musicxmloutput {
         if (controls.tieStart) parent.append_child(tag).append_attribute("type") = "start";
     }
 
+    void WriteMusicXmlNotations(pugi::xml_node note, const MusicXmlNoteControls &controls)
+    {
+        pugi::xml_node notations = note.append_child("notations");
+        WriteMusicXmlTieEndpoints(notations, "tied", controls);
+        for (const MusicXmlSlurEndpoint &endpoint : controls.slurs) {
+            pugi::xml_node slur = notations.append_child("slur");
+            slur.append_attribute("type") = endpoint.start ? "start" : "stop";
+            slur.append_attribute("number") = endpoint.number;
+            if (!endpoint.start) continue;
+            const curvature_CURVEDIR curvedir = endpoint.slur->GetCurvedir();
+            if (curvedir == curvature_CURVEDIR_above) slur.append_attribute("placement") = "above";
+            if (curvedir == curvature_CURVEDIR_below) slur.append_attribute("placement") = "below";
+            if (endpoint.slur->HasLform()) {
+                slur.append_attribute("line-type")
+                    = endpoint.slur->AttLineRendBase::LineformToStr(endpoint.slur->GetLform()).c_str();
+            }
+        }
+    }
+
     void WriteMusicXmlNote(pugi::xml_node measure, const MusicXmlEvent &event, const Note *note, bool chordTone,
         int divisions, const MusicXmlVoice &voice, const MusicXmlNoteControlMap &noteControls)
     {
@@ -466,7 +603,7 @@ namespace musicxmloutput {
             beam.text().set(event.beamValue);
         }
         if (control != noteControls.end()) {
-            WriteMusicXmlTieEndpoints(node.append_child("notations"), "tied", control->second);
+            WriteMusicXmlNotations(node, control->second);
         }
     }
 
@@ -474,19 +611,9 @@ namespace musicxmloutput {
         pugi::xml_node measure, const MusicXmlVoice &voice, int divisions, const MusicXmlNoteControlMap &noteControls)
     {
         for (const MusicXmlEvent &event : voice.events) {
-            if (event.element && event.element->Is(CHORD)) {
-                bool chordTone = false;
-                for (const Object *child : event.element->GetChildren()) {
-                    if (!child->Is(NOTE)) continue;
-                    WriteMusicXmlNote(
-                        measure, event, vrv_cast<const Note *>(child), chordTone, divisions, voice, noteControls);
-                    chordTone = true;
-                }
-            }
-            else {
-                const Note *note = dynamic_cast<const Note *>(event.element);
-                WriteMusicXmlNote(measure, event, note, false, divisions, voice, noteControls);
-            }
+            ForEachMusicXmlNote(event, [&](const Note *note, bool chordTone) {
+                WriteMusicXmlNote(measure, event, note, chordTone, divisions, voice, noteControls);
+            });
         }
     }
 
@@ -654,7 +781,8 @@ std::string MusicXmlOutput::Export()
             scoreInstrument.append_child("instrument-name").text().set(instrumentName.c_str());
         }
     }
-    const musicxmloutput::MusicXmlNoteControlMap noteControls = musicxmloutput::CollectMusicXmlNoteControls(measures);
+    const musicxmloutput::MusicXmlNoteControlMap noteControls
+        = musicxmloutput::CollectMusicXmlNoteControls(measures, parts);
     std::vector<bool> implicitMeasures(measures.size(), false);
     for (const musicxmloutput::MusicXmlPart &part : parts) {
         pugi::xml_node partNode = root.append_child("part");
@@ -697,7 +825,7 @@ std::string MusicXmlOutput::Export()
     std::set<ClassId> omitted;
     for (const Measure *measure : measures) {
         for (const Object *child : measure->GetChildren()) {
-            if (!child->IsControlElement() || child->Is(MNUM) || child->Is(TIE)
+            if (!child->IsControlElement() || child->Is(MNUM) || child->Is(SLUR) || child->Is(TIE)
                 || !omitted.insert(child->GetClassId()).second) {
                 continue;
             }
