@@ -298,12 +298,12 @@
 		4D2B24002F56E8F40088C6F4 /* customtuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2B23FC2F56E8F40088C6F4 /* customtuning.cpp */; };
 		4D2B24022F56E9090088C6F4 /* customtuning.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2B24012F56E9090088C6F4 /* customtuning.h */; };
 		4D2B24032F56E9090088C6F4 /* customtuning.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2B24012F56E9090088C6F4 /* customtuning.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4D2BB85230B305F3006260A8 /* midijsonbuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2BB85130B305F3006260A8 /* midijsonbuilder.h */; };
-		4D2BB85330B305F3006260A8 /* midijsonbuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2BB85130B305F3006260A8 /* midijsonbuilder.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4D2BB85530B3060D006260A8 /* midijsonbuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85430B3060D006260A8 /* midijsonbuilder.cpp */; };
-		4D2BB85630B3060D006260A8 /* midijsonbuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85430B3060D006260A8 /* midijsonbuilder.cpp */; };
-		4D2BB85730B3060D006260A8 /* midijsonbuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85430B3060D006260A8 /* midijsonbuilder.cpp */; };
-		4D2BB85830B3060D006260A8 /* midijsonbuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85430B3060D006260A8 /* midijsonbuilder.cpp */; };
+		4D2BB85230B305F3006260A8 /* midibuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2BB85130B305F3006260A8 /* midibuilder.h */; };
+		4D2BB85330B305F3006260A8 /* midibuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2BB85130B305F3006260A8 /* midibuilder.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D2BB85530B3060D006260A8 /* midibuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85430B3060D006260A8 /* midibuilder.cpp */; };
+		4D2BB85630B3060D006260A8 /* midibuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85430B3060D006260A8 /* midibuilder.cpp */; };
+		4D2BB85730B3060D006260A8 /* midibuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85430B3060D006260A8 /* midibuilder.cpp */; };
+		4D2BB85830B3060D006260A8 /* midibuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85430B3060D006260A8 /* midibuilder.cpp */; };
 		4D2E758A22BC2B34004C51F0 /* view_tab.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20741122A708C600E0765F /* view_tab.cpp */; };
 		4D2E758B22BC2B5B004C51F0 /* tabgrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F422A3BCDF00E0765F /* tabgrp.cpp */; };
 		4D2E758C22BC2B5B004C51F0 /* tabgrp.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2073F122A3BCB700E0765F /* tabgrp.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -2018,8 +2018,8 @@
 		4D2B23F22F56E7980088C6F4 /* TuningsImpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TuningsImpl.h; sourceTree = "<group>"; };
 		4D2B23FC2F56E8F40088C6F4 /* customtuning.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = customtuning.cpp; path = src/customtuning.cpp; sourceTree = "<group>"; };
 		4D2B24012F56E9090088C6F4 /* customtuning.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = customtuning.h; path = include/vrv/customtuning.h; sourceTree = "<group>"; };
-		4D2BB85130B305F3006260A8 /* midijsonbuilder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = midijsonbuilder.h; path = include/vrv/midijsonbuilder.h; sourceTree = "<group>"; };
-		4D2BB85430B3060D006260A8 /* midijsonbuilder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = midijsonbuilder.cpp; path = src/midijsonbuilder.cpp; sourceTree = "<group>"; };
+		4D2BB85130B305F3006260A8 /* midibuilder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = midibuilder.h; path = include/vrv/midibuilder.h; sourceTree = "<group>"; };
+		4D2BB85430B3060D006260A8 /* midibuilder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = midibuilder.cpp; path = src/midibuilder.cpp; sourceTree = "<group>"; };
 		4D308100203DB69C00BC44F6 /* ref.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ref.h; path = include/vrv/ref.h; sourceTree = "<group>"; };
 		4D308103203DB6B500BC44F6 /* ref.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ref.cpp; path = src/ref.cpp; sourceTree = "<group>"; };
 		4D36C21C1EBCE14300A6DD1B /* fb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fb.h; path = include/vrv/fb.h; sourceTree = "<group>"; };
@@ -3086,8 +3086,8 @@
 				4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */,
 				4D14600F1EA8A913007DB90C /* horizontalaligner.h */,
 				4DACC93F2990ED2600B55913 /* libmei.h */,
-				4D2BB85130B305F3006260A8 /* midijsonbuilder.h */,
-				4D2BB85430B3060D006260A8 /* midijsonbuilder.cpp */,
+				4D2BB85430B3060D006260A8 /* midibuilder.cpp */,
+				4D2BB85130B305F3006260A8 /* midibuilder.h */,
 				8F086ECD188539540037FD8E /* object.cpp */,
 				8F59292418854BF800FE51AD /* object.h */,
 				4DA80D951A6ACF5D0089802D /* options.cpp */,
@@ -3548,7 +3548,7 @@
 				4DDBBB571C7AE43E00054AFF /* hairpin.h in Headers */,
 				E788335D2994EC5800D44B01 /* calcchordnoteheadsfunctor.h in Headers */,
 				4D79643126C6AA720026288B /* featureextractor.h in Headers */,
-				4D2BB85230B305F3006260A8 /* midijsonbuilder.h in Headers */,
+				4D2BB85230B305F3006260A8 /* midibuilder.h in Headers */,
 				4DEC4DC221C8291300D1D273 /* add.h in Headers */,
 				E75A699D29CCF87B00414819 /* adjustbeamsfunctor.h in Headers */,
 				403BEFF1206C00D500D022D5 /* mrpt2.h in Headers */,
@@ -3822,7 +3822,7 @@
 				BB4C4AAE22A932A6001F6AF0 /* iobase.h in Headers */,
 				BB4C4BAA22A932EB001F6AF0 /* view.h in Headers */,
 				4DACC9DD2990F29A00B55913 /* atts_header.h in Headers */,
-				4D2BB85330B305F3006260A8 /* midijsonbuilder.h in Headers */,
+				4D2BB85330B305F3006260A8 /* midibuilder.h in Headers */,
 				BB4C4BC422A9330D001F6AF0 /* pugixml.hpp in Headers */,
 				4DACC9F52990F29A00B55913 /* atts_visual.h in Headers */,
 				BBC19FC322B38C1400100F42 /* VerovioFramework.h in Headers */,
@@ -4538,7 +4538,7 @@
 				4D79643A26C6B3520026288B /* featureextractor.cpp in Sources */,
 				4DEC4DA721C81ED400D1D273 /* reg.cpp in Sources */,
 				4DACC9AF2990F29A00B55913 /* atts_analytical.cpp in Sources */,
-				4D2BB85830B3060D006260A8 /* midijsonbuilder.cpp in Sources */,
+				4D2BB85830B3060D006260A8 /* midibuilder.cpp in Sources */,
 				E76A9D4B29A74E620044682D /* adjustdotsfunctor.cpp in Sources */,
 				4D71BEA82D875DF800CE0001 /* atts_stringtab.cpp in Sources */,
 				4D1694421E3A44F300569BF4 /* chord.cpp in Sources */,
@@ -4838,7 +4838,7 @@
 				8F086F0D188539540037FD8E /* vrv.cpp in Sources */,
 				409B3DDB1F2D1C550098A265 /* btrem.cpp in Sources */,
 				E71EF3C92975ED4700D36264 /* resetfunctor.cpp in Sources */,
-				4D2BB85730B3060D006260A8 /* midijsonbuilder.cpp in Sources */,
+				4D2BB85730B3060D006260A8 /* midibuilder.cpp in Sources */,
 				4D22C41918890E6100D0831F /* mrest.cpp in Sources */,
 				4DA60EE61B6307B9006E2DFC /* textdirinterface.cpp in Sources */,
 				4DACC9C02990F29A00B55913 /* atts_cmn.cpp in Sources */,
@@ -5171,7 +5171,7 @@
 				4DACC9862990F29A00B55913 /* atts_performance.cpp in Sources */,
 				4D79643B26C6B3520026288B /* featureextractor.cpp in Sources */,
 				4DB787652022F0BC00394520 /* jsonxx.cc in Sources */,
-				4D2BB85630B3060D006260A8 /* midijsonbuilder.cpp in Sources */,
+				4D2BB85630B3060D006260A8 /* midibuilder.cpp in Sources */,
 				4DACC9B02990F29A00B55913 /* atts_analytical.cpp in Sources */,
 				E76A9D4C29A74E630044682D /* adjustdotsfunctor.cpp in Sources */,
 				4DC12A831F741110000440E9 /* pgfoot.cpp in Sources */,
@@ -5488,7 +5488,7 @@
 				BB4C4BC022A932FC001F6AF0 /* MidiMessage.cpp in Sources */,
 				E76A9D4D29A74E630044682D /* adjustdotsfunctor.cpp in Sources */,
 				BB4C4AED22A932BC001F6AF0 /* expan.cpp in Sources */,
-				4D2BB85530B3060D006260A8 /* midijsonbuilder.cpp in Sources */,
+				4D2BB85530B3060D006260A8 /* midibuilder.cpp in Sources */,
 				4DACC9872990F29A00B55913 /* atts_performance.cpp in Sources */,
 				BB4C4B0F22A932C8001F6AF0 /* ending.cpp in Sources */,
 				BB4C4AB522A932A6001F6AF0 /* iomei.cpp in Sources */,

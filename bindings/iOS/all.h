@@ -169,8 +169,8 @@
 #import <VerovioFramework/mensur.h>
 #import <VerovioFramework/metersig.h>
 #import <VerovioFramework/metersiggrp.h>
+#import <VerovioFramework/midibuilder.h>
 #import <VerovioFramework/midifunctor.h>
-#import <VerovioFramework/midijsonbuilder.h>
 #import <VerovioFramework/miscfunctor.h>
 #import <VerovioFramework/mnum.h>
 #import <VerovioFramework/mordent.h>
