@@ -7,9 +7,9 @@ jobs:
       matrix:
         path:
           - check: "include"
-            exclude: "(hum|crc|midi|json|pugi|tuning-library|win32|zip)"
+            exclude: "(hum|win32)"
           - check: "src"
-            exclude: "(hum|crc|midi|json|pugi)"
+            exclude: "(hum)"
           - check: "libmei/addons"
           - check: "tools"
     
