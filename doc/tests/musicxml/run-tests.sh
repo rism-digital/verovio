@@ -23,8 +23,9 @@ for fixture in staff-instrument group-instrument layer-instruments beam beam-two
     if [ -n "$schema" ]; then
         xmllint --nonet --noout --schema "$schema" "$first" "$second"
     fi
-    diff -u "$first" "$second"
     "$verovio" -r data -f musicxml -t mei -o "$output/$fixture.mei" "$first"
+    "$verovio" -r data -f musicxml -t mei -o "$output/$fixture-roundtrip.mei" "$second"
+    diff -u "$first" "$second"
     renderSvg mei "$fixtures/$fixture.mei" "$fixture-original"
     renderSvg mei "$output/$fixture.mei" "$fixture-imported"
 done
