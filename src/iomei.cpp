@@ -170,11 +170,20 @@
 #include "zone.h"
 
 #define VEROVIO_SERIALIZATION "verovio.serialization"
-#define MEI_ALL_SCHEMA "https://music-encoding.org/schema/dev/mei-all.rng"
-#define MEI_BASIC_SCHEMA "https://music-encoding.org/schema/dev/mei-basic.rng"
-#define MEI_PAGE_BASED_SCHEMA "https://www.verovio.org/schema/dev/mei-verovio.rng"
+
+#define MEI_CURRENT_ALL_SCHEMA "https://music-encoding.org/schema/dev/mei-all.rng"
+#define MEI_CURRENT_BASIC_SCHEMA "https://music-encoding.org/schema/dev/mei-basic.rng"
+#define MEI_CURRENT_PAGE_BASED_SCHEMA "https://www.verovio.org/schema/dev/mei-verovio.rng"
+
+#define MEI_RELEASE_ALL_SCHEMA "https://music-encoding.org/schema/5.1/mei-all.rng"
+#define MEI_RELEASE_BASIC_SCHEMA "https://music-encoding.org/schema/5.1/mei-basic.rng"
+#define MEI_RELEASE_PAGE_BASED_SCHEMA "https://www.verovio.org/schema/5.1/mei-verovio.rng"
+
 #define MEI_CURRENT_VERSION meiVersion_MEIVERSION_6_0_dev
 #define MEI_CURRENT_BASIC_VERSION meiVersion_MEIVERSION_6_0_devplusbasic
+
+#define MEI_RELEASE_VERSION meiVersion_MEIVERSION_5_1
+#define MEI_RELEASE_BASIC_VERSION meiVersion_MEIVERSION_5_1plusbasic
 
 namespace vrv {
 
@@ -285,14 +294,16 @@ std::string MEIOutput::Export()
 
         // schema processing instruction
         std::string schema;
+        const bool releaseSchema = m_doc->GetOptions()->m_outputReleaseSchema.GetValue();
+
         if (this->IsPageBasedMEI()) {
-            schema = MEI_PAGE_BASED_SCHEMA;
+            schema = (releaseSchema) ? MEI_RELEASE_PAGE_BASED_SCHEMA : MEI_CURRENT_PAGE_BASED_SCHEMA;
         }
         else if (this->GetBasic()) {
-            schema = MEI_BASIC_SCHEMA;
+            schema = (releaseSchema) ? MEI_RELEASE_BASIC_SCHEMA : MEI_CURRENT_BASIC_SCHEMA;
         }
         else {
-            schema = MEI_ALL_SCHEMA;
+            schema = (releaseSchema) ? MEI_RELEASE_ALL_SCHEMA : MEI_CURRENT_ALL_SCHEMA;
         }
 
         decl = meiDoc.append_child(pugi::node_declaration);
@@ -313,8 +324,8 @@ std::string MEIOutput::Export()
         m_mei = meiDoc.append_child("mei");
         m_mei.append_attribute("xmlns") = "http://www.music-encoding.org/ns/mei";
         AttConverter converter;
-        meiVersion_MEIVERSION meiVersion = MEI_CURRENT_VERSION;
-        if (this->GetBasic()) meiVersion = MEI_CURRENT_BASIC_VERSION;
+        meiVersion_MEIVERSION meiVersion = (releaseSchema) ? MEI_RELEASE_VERSION : MEI_CURRENT_VERSION;
+        if (this->GetBasic()) meiVersion = (releaseSchema) ? MEI_RELEASE_BASIC_VERSION : MEI_CURRENT_BASIC_VERSION;
         m_mei.append_attribute("meiversion") = (converter.MeiVersionMeiversionToStr(meiVersion)).c_str();
 
         // If the document is mensural, we have to undo the mensural (segments) cast off
