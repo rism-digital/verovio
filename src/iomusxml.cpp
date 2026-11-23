@@ -3145,17 +3145,18 @@ void MusicXmlInput::ReadMusicXmlNote(
     if (rest) {
         const std::string stepStr = rest.child("display-step").text().as_string();
         const std::string octaveStr = rest.child("display-octave").text().as_string();
+        const data_DURATION writtenDur = typeStr.empty() ? DURATION_NONE : ConvertTypeToDur(typeStr);
         // A rest that fills the measure but whose type gives another duration is a measure rest: Sibelius, for
         // example, writes the rest of a full 6/8 measure as <type>whole</type> without measure="yes"
         const bool fillsMeasure
             = (m_durTotal == 0) && (m_measureDuration > 0) && (std::abs(duration - m_measureDuration) < 0.001);
         const double typeDuration
-            = m_ppq * 16.0 / std::pow(2.0, (int)ConvertTypeToDur(typeStr)) * (2.0 - std::pow(0.5, dots));
+            = m_ppq * 16.0 / std::pow(2.0, static_cast<int>(writtenDur)) * (2.0 - std::pow(0.5, dots));
         if (HasAttributeWithValue(node, "print-object", "no")) {
-            Space *space = new Space();
-            element = space;
             if (!typeStr.empty()) {
-                space->SetDur(ConvertTypeToDur(typeStr));
+                Space *space = new Space();
+                element = space;
+                space->SetDur(writtenDur);
                 space->SetDurPpq(duration);
                 if (dots > 0) space->SetDots(dots);
                 if (!noteID.empty()) {
@@ -3169,6 +3170,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
             else {
                 MSpace *mSpace = new MSpace();
+                element = mSpace;
                 if (!noteID.empty()) {
                     mSpace->SetID(noteID);
                 }
@@ -3205,7 +3207,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 // rest
                 TabGrp *tabGrp = new TabGrp();
                 element = tabGrp;
-                tabGrp->SetDur(ConvertTypeToDur(typeStr));
+                tabGrp->SetDur(writtenDur);
                 tabGrp->SetDurPpq(duration);
                 if (dots > 0) tabGrp->SetDots(dots);
                 tabGrp->AddChild(new TabDurSym());
@@ -3219,7 +3221,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 Rest *rest = new Rest();
                 element = rest;
                 rest->SetColor(node.attribute("color").as_string());
-                rest->SetDur(ConvertTypeToDur(typeStr));
+                rest->SetDur(writtenDur);
                 rest->SetDurPpq(duration);
                 if (dots > 0) rest->SetDots(dots);
                 if (cue) rest->SetCue(BOOLEAN_true);
