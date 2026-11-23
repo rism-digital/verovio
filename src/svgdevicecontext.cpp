@@ -548,6 +548,16 @@ void SvgDeviceContext::SetCustomGraphicAttributes(const std::string &data, const
 
 void SvgDeviceContext::EndResumedGraphic(Object *object, View *view)
 {
+    // Replace bounds from the placeholder with those of the segment just drawn.
+    if (m_svgBoundingBoxes && object->IsFloatingObject()) {
+        const char *idAttribute = m_html5 ? "data-id" : "id";
+        for (const char *prefix : { "bbox-", "cbbox-" }) {
+            pugi::xml_node box = m_currentNode.find_child_by_attribute(
+                "g", idAttribute, (std::string(prefix) + object->GetID()).c_str());
+            if (box) m_currentNode.remove_child(box);
+        }
+        this->DrawSvgBoundingBox(object, view);
+    }
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
 }
@@ -1626,6 +1636,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
 
     if (m_svgBoundingBoxes && view) {
         BoundingBox *box = object;
+        std::string bboxId = object->GetID();
         // For floating elements, get the current bounding box set by System::SetCurrentFloatingPositioner
         if (object->IsFloatingObject()) {
             FloatingObject *floatingObject = vrv_cast<FloatingObject *>(object);
@@ -1634,6 +1645,11 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
             // No bounding box found, ignore the object - this happens when the @staff is missing because the element is
             // never drawn but there is still a EndGraphic call.
             if (!box) return;
+            // The spanning marker also identifies continuations in HTML5 output.
+            const std::string classes = std::string(m_currentNode.attribute("class").value()) + " ";
+            if (classes.find(" id-" + object->GetID() + " spanning ") != std::string::npos) {
+                bboxId += "-" + floatingObject->GetCurrentFloatingPositioner()->GetObjectY()->GetID();
+            }
         }
 
         // A syl is drawn with its vertical bounding box deactivated because lyric lines are spaced by the staff
@@ -1647,7 +1663,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
             m_currentNode = m_pageNode;
         }
 
-        this->StartBoundingBoxGraphic(object, "bounding-box", "bbox-" + object->GetID());
+        this->StartBoundingBoxGraphic(object, "bounding-box", "bbox-" + bboxId);
 
         if (box->HasSelfBB()) {
             this->DrawSvgBoundingBoxRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX1()),
@@ -1712,7 +1728,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
         if (drawContentBB) {
             // For floating objects, the content bounding box is the one of the current positioner
             if (box->HasContentBB()) {
-                this->StartBoundingBoxGraphic(object, "content-bounding-box", "cbbox-" + object->GetID());
+                this->StartBoundingBoxGraphic(object, "content-bounding-box", "cbbox-" + bboxId);
                 this->DrawSvgBoundingBoxRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),
                     view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()),
                     view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX2())
