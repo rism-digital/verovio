@@ -15,7 +15,7 @@ renderSvg() {
 }
 
 for fixture in staff-instrument group-instrument layer-instruments beam beam-two-voices tie tie-chords tie-chord-notes \
-    slur-chord slurs-overlap dynam-startid dynam-tstamp hairpin-cross-measure hairpins-overlap fermata; do
+    slur-chord slurs-overlap dynam-startid dynam-tstamp hairpin-cross-measure hairpins-overlap fermata ornaments; do
     first="$output/$fixture.musicxml"
     second="$output/$fixture-roundtrip.musicxml"
     "$verovio" -r data -f mei -t musicxml -o "$first" "$fixtures/$fixture.mei"
@@ -152,6 +152,17 @@ check fermata.musicxml '//note[pitch/step="G" and tie/@type="start" and count(no
     and articulations[breath-mark/@placement="above" and caesura/@placement="below"]]'
 check fermata.musicxml '//note[pitch/step="G" and tie/@type="stop"]/notations/articulations/breath-mark[@placement="below"]'
 check fermata.musicxml 'not(//note[chord or voice=2]/notations)'
+
+check ornaments.musicxml '//note[pitch/step="C"]/notations/ornaments[
+    trill-mark[@placement="above"] and accidental-mark[@placement="above" and .="natural"]
+    and wavy-line[@type="start" and @number="1"]]'
+check ornaments.musicxml '//note[pitch/step="D"]/notations[
+    ornaments/inverted-mordent[@long="yes" and @placement="below"] and ornaments/wavy-line[@type="stop" and @number="1"]]'
+check ornaments.musicxml '//note[pitch/step="E"]/notations/ornaments[
+    delayed-turn and accidental-mark[@placement="below" and .="natural"]]'
+check ornaments.mei '//*[local-name()="trill"][@extender="true" and @tstamp2="0m+3" and @accidupper="n"]'
+check ornaments.mei '//*[local-name()="mordent"][@form="upper" and @long="true"]'
+check ornaments.mei '//*[local-name()="turn"][@form="upper" and @delayed="true" and @accidlower="n"]'
 
 input="$fixtures/fermata-measure-rests.musicxml"
 if [ -n "$schema" ]; then

@@ -48,6 +48,7 @@
 #include "metersig.h"
 #include "metersiggrp.h"
 #include "mnum.h"
+#include "mordent.h"
 #include "note.h"
 #include "scoredef.h"
 #include "slur.h"
@@ -56,6 +57,8 @@
 #include "staffdef.h"
 #include "timeinterface.h"
 #include "transposition.h"
+#include "trill.h"
+#include "turn.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -83,11 +86,18 @@ namespace musicxmloutput {
         bool start;
     };
 
+    struct MusicXmlOrnament {
+        const ControlElement *element;
+        int lineNumber = 0;
+    };
+
     struct MusicXmlNoteControls {
         bool tieStart = false;
         bool tieStop = false;
         std::vector<MusicXmlSlurEndpoint> slurs;
         std::vector<const ControlElement *> pauses;
+        std::vector<MusicXmlOrnament> ornaments;
+        int trillStop = 0;
     };
 
     using MusicXmlNoteControlMap = std::map<const LayerElement *, MusicXmlNoteControls>;
@@ -145,6 +155,8 @@ namespace musicxmloutput {
         size_t measure;
         size_t order;
         Fraction offset;
+        int staff;
+        int voice;
     };
 
     using MusicXmlElementPositionMap = std::map<const LayerElement *, MusicXmlElementPosition>;
@@ -172,6 +184,12 @@ namespace musicxmloutput {
         size_t part;
         size_t first;
         size_t last;
+    };
+
+    struct MusicXmlTrillSpan {
+        const Note *start;
+        const Note *end;
+        size_t ornament;
     };
 
     class CollectMusicXmlMeasuresFunctor : public ConstFunctor {
@@ -466,12 +484,17 @@ namespace musicxmloutput {
                     for (const MusicXmlEvent &event : voice.events) {
                         const Fraction offset(tick, divisions);
                         if (event.element && !event.element->Is(NOTE)) {
-                            positions.emplace(event.element, MusicXmlElementPosition{ part, measure, order, offset });
+                            positions.emplace(event.element,
+                                MusicXmlElementPosition{ part, measure, order, offset, voice.staff, voice.voice });
                         }
-                        ForEachMusicXmlNote(event, [&positions, part, measure, &order, offset](const Note *note, bool) {
-                            if (note)
-                                positions.emplace(note, MusicXmlElementPosition{ part, measure, order++, offset });
-                        });
+                        ForEachMusicXmlNote(
+                            event, [&positions, part, measure, &order, offset, &voice](const Note *note, bool) {
+                                if (note) {
+                                    positions.emplace(note,
+                                        MusicXmlElementPosition{
+                                            part, measure, order++, offset, voice.staff, voice.voice });
+                                }
+                            });
                         const int duration = GetMusicXmlTicks(event.duration, divisions);
                         if (duration > std::numeric_limits<int>::max() - tick) {
                             LogError("MusicXML output measure duration overflow");
@@ -600,28 +623,40 @@ namespace musicxmloutput {
         return element && element->IsAnyOf(std::array{ NOTE, CHORD, REST, MREST });
     }
 
-    const LayerElement *FindMusicXmlPauseEvent(const std::vector<MusicXmlVoice> &voices, int staff, double tick,
-        bool fermata, bool startid, int divisions, int &endTick)
+    enum class MusicXmlEventMatch { Onset, Before, OnsetOrBefore, End };
+
+    const LayerElement *FindMusicXmlEventAtOffset(const std::vector<MusicXmlVoice> &voices, int staff, double tick,
+        MusicXmlEventMatch match, int divisions, int &endTick, int voiceNumber = 0, bool notesOnly = false)
     {
         const LayerElement *target = NULL;
         int latest = -1;
         for (const MusicXmlVoice &voice : voices) {
             int onset = 0;
             for (const MusicXmlEvent &event : voice.events) {
-                if (voice.staff == staff && onset > latest && IsMusicXmlPauseAnchor(event.element)) {
-                    const bool sameOnset = std::abs(tick - onset) < 1e-8;
-                    // A timestamped breath or caesura belongs to the preceding event. A startid names the event
-                    // itself, including when we look up a corresponding event on a different staff.
-                    if ((sameOnset && (fermata || startid)) || (!fermata && !sameOnset && onset < tick)) {
+                const int end = onset + GetMusicXmlTicks(event.duration, divisions);
+                if (voice.staff == staff && (!voiceNumber || voice.voice == voiceNumber) && onset > latest
+                    && IsMusicXmlPauseAnchor(event.element)
+                    && (!notesOnly || event.element->IsAnyOf(std::array{ NOTE, CHORD }))) {
+                    const double delta = tick - (match == MusicXmlEventMatch::End ? end : onset);
+                    const bool samePosition = std::abs(delta) < 1e-8;
+                    if ((samePosition && match != MusicXmlEventMatch::Before)
+                        || (delta >= 1e-8
+                            && (match == MusicXmlEventMatch::Before || match == MusicXmlEventMatch::OnsetOrBefore))) {
                         target = event.element;
                         latest = onset;
                     }
                 }
-                onset += GetMusicXmlTicks(event.duration, divisions);
+                onset = end;
             }
             endTick = std::max(endTick, onset);
         }
         return target;
+    }
+
+    double GetMusicXmlAnchorOffset(const MusicXmlAnchor &anchor, const MusicXmlStaff &staff)
+    {
+        if (const double *beat = std::get_if<double>(&anchor.position)) return (*beat - 1.0) * 4.0 / staff.meterUnit;
+        return std::get<Fraction>(anchor.position).ToDouble();
     }
 
     bool AddMusicXmlBarlineFermata(MusicXmlPart &part, size_t measure, bool left, const Fermata *fermata)
@@ -663,13 +698,16 @@ namespace musicxmloutput {
                             collected |= AddMusicXmlBarlineFermata(part, anchor->measure, true, fermata);
                             continue;
                         }
-                        const double offset = beat ? (*beat - 1.0) * 4.0 / part.staves.at(staffIndex).meterUnit
-                                                   : std::get<Fraction>(anchor->position).ToDouble();
+                        const double offset = GetMusicXmlAnchorOffset(*anchor, part.staves.at(staffIndex));
                         if (!std::isfinite(offset) || offset < 0.0) continue;
                         const double tick = offset * divisions;
                         int endTick = 0;
-                        target = FindMusicXmlPauseEvent(
-                            part.measures.at(anchor->measure), xmlStaff, tick, fermata, start, divisions, endTick);
+                        // A timestamped breath or caesura belongs to the preceding event.
+                        const MusicXmlEventMatch match = fermata ? MusicXmlEventMatch::Onset
+                            : start                              ? MusicXmlEventMatch::OnsetOrBefore
+                                                                 : MusicXmlEventMatch::Before;
+                        target = FindMusicXmlEventAtOffset(
+                            part.measures.at(anchor->measure), xmlStaff, tick, match, divisions, endTick);
                         if (fermata && beat && std::abs(tick - endTick) < 1e-8) {
                             collected |= AddMusicXmlBarlineFermata(part, anchor->measure, false, fermata);
                             continue;
@@ -688,6 +726,144 @@ namespace musicxmloutput {
                     "MusicXML output could not place %s '%s'", pause->GetClassName().c_str(), pause->GetID().c_str());
             }
         }
+    }
+
+    const Note *FindMusicXmlTrillEnd(const MusicXmlAnchor &anchor, const MusicXmlPart &part, size_t staffIndex,
+        const MusicXmlElementPosition &start, int divisions)
+    {
+        const double offset = GetMusicXmlAnchorOffset(anchor, part.staves.at(staffIndex));
+        if (!std::isfinite(offset) || offset < 0.0 || anchor.measure < start.measure) return NULL;
+
+        size_t measure = anchor.measure;
+        double tick = offset * divisions;
+        // MusicXML puts the stop on the last covered note, while MEI uses the position where the line ends.
+        if (tick == 0.0) {
+            if (measure == start.measure) return NULL;
+            const std::vector<MusicXmlVoice> &voices = part.measures.at(--measure);
+            const std::vector<MusicXmlVoice>::const_iterator voice = std::find_if(voices.begin(), voices.end(),
+                [&start](const MusicXmlVoice &entry) { return entry.voice == start.voice; });
+            if (voice == voices.end()) return NULL;
+            for (const MusicXmlEvent &event : voice->events) tick += GetMusicXmlTicks(event.duration, divisions);
+        }
+        int endTick = 0;
+        const LayerElement *end = FindMusicXmlEventAtOffset(part.measures.at(measure), start.staff, tick,
+            MusicXmlEventMatch::End, divisions, endTick, start.voice, true);
+        if (end && end->Is(CHORD)) return vrv_cast<const Note *>(end->GetLast(NOTE));
+        return dynamic_cast<const Note *>(end);
+    }
+
+    void AddMusicXmlTrillLines(std::vector<MusicXmlTrillSpan> &spans, const MusicXmlElementPositionMap &positions,
+        MusicXmlNoteControlMap &controls)
+    {
+        std::stable_sort(
+            spans.begin(), spans.end(), [&positions](const MusicXmlTrillSpan &one, const MusicXmlTrillSpan &two) {
+                const MusicXmlElementPosition &left = positions.at(one.start);
+                const MusicXmlElementPosition &right = positions.at(two.start);
+                return std::tie(left.part, left.order) < std::tie(right.part, right.order);
+            });
+        std::array<std::optional<size_t>, 16> availableAt{};
+        size_t part = 0;
+        for (const MusicXmlTrillSpan &span : spans) {
+            const MusicXmlElementPosition &start = positions.at(span.start);
+            if (start.part != part) {
+                availableAt.fill(std::nullopt);
+                part = start.part;
+            }
+            const std::array<std::optional<size_t>, 16>::iterator available = std::find_if(availableAt.begin(),
+                availableAt.end(), [&start](std::optional<size_t> end) { return !end || *end < start.order; });
+            MusicXmlOrnament &ornament = controls[span.start].ornaments.at(span.ornament);
+            const MusicXmlNoteControlMap::const_iterator end = controls.find(span.end);
+            if (end != controls.end() && end->second.trillStop) {
+                LogWarning(
+                    "MusicXML output omits the extender of trill '%s' because another trill ends on the same note",
+                    ornament.element->GetID().c_str());
+                continue;
+            }
+            if (available == availableAt.end()) {
+                LogWarning(
+                    "MusicXML output omits the extender of trill '%s' because all 16 wavy-line numbers are in use",
+                    ornament.element->GetID().c_str());
+                continue;
+            }
+            const int number = static_cast<int>(available - availableAt.begin()) + 1;
+            *available = positions.at(span.end).order;
+            ornament.lineNumber = number;
+            controls[span.end].trillStop = number;
+        }
+    }
+
+    void CollectMusicXmlOrnaments(const std::vector<std::pair<size_t, const ControlElement *>> &ornaments,
+        const std::vector<const Measure *> &measures, const MusicXmlElementPositionMap &positions,
+        const MusicXmlStaffPositionMap &staffPositions, const std::vector<MusicXmlPart> &parts, int divisions,
+        MusicXmlNoteControlMap &controls)
+    {
+        std::vector<MusicXmlTrillSpan> spans;
+        for (const std::pair<size_t, const ControlElement *> &entry : ornaments) {
+            const ControlElement *ornament = entry.second;
+            const Trill *trill = dynamic_cast<const Trill *>(ornament);
+            const Turn *turn = dynamic_cast<const Turn *>(ornament);
+            const TimePointInterface &timePoint = *ornament->GetTimePointInterface();
+            const std::optional<MusicXmlAnchor> anchor = GetMusicXmlStartAnchor(timePoint, entry.first, positions);
+            bool collected = false;
+            if (anchor) {
+                const LayerElement *start = timePoint.HasStartid() ? timePoint.GetStart() : NULL;
+                const Staff *startStaff = start ? start->GetAncestorStaff(ANCESTOR_ONLY, false) : NULL;
+                for (const Staff *staff : timePoint.GetTstampStaves(measures.at(anchor->measure), ornament)) {
+                    const MusicXmlStaffPositionMap::const_iterator position = staffPositions.find(staff->GetN());
+                    if (position == staffPositions.end()) continue;
+                    const MusicXmlPart &part = parts.at(position->second.first);
+                    const size_t staffIndex = position->second.second;
+                    const int xmlStaff = part.staves.size() > 1 ? static_cast<int>(staffIndex) + 1 : 0;
+                    const LayerElement *target = start;
+                    if (!start || startStaff != staff) {
+                        const double offset = GetMusicXmlAnchorOffset(*anchor, part.staves.at(staffIndex));
+                        if (!std::isfinite(offset) || offset < 0.0) continue;
+                        const MusicXmlEventMatch match = (turn && turn->GetDelayed() == BOOLEAN_true)
+                            ? MusicXmlEventMatch::OnsetOrBefore
+                            : MusicXmlEventMatch::Onset;
+                        int endTick = 0;
+                        const double tick = offset * divisions;
+                        target = FindMusicXmlEventAtOffset(
+                            part.measures.at(anchor->measure), xmlStaff, tick, match, divisions, endTick, 0, true);
+                        if (tick > endTick + 1e-8) continue;
+                    }
+                    const Note *note = GetMusicXmlNoteAnchor(target);
+                    if (!note) continue;
+                    const Note *endNote = NULL;
+                    if (trill && trill->GetExtender() != BOOLEAN_false
+                        && (trill->HasEndid() || trill->HasTstamp2() || trill->GetExtender() == BOOLEAN_true)) {
+                        const std::optional<MusicXmlAnchor> end
+                            = GetMusicXmlEndAnchor(*trill, entry.first, measures.size(), positions);
+                        const MusicXmlElementPosition &startPosition = positions.at(note);
+                        if (end) {
+                            endNote = FindMusicXmlTrillEnd(*end, part, staffIndex, startPosition, divisions);
+                        }
+                        if (!endNote || positions.at(endNote).order < startPosition.order) {
+                            LogWarning(
+                                "MusicXML output could not place the extender of trill '%s'", trill->GetID().c_str());
+                            endNote = NULL;
+                        }
+                    }
+                    if (trill && trill->GetLstartsym() == LINESTARTENDSYMBOL_none && !endNote) continue;
+                    std::vector<MusicXmlOrnament> &noteOrnaments = controls[note].ornaments;
+                    // The importer reads one ornament of each kind per MusicXML note.
+                    if (std::any_of(
+                            noteOrnaments.begin(), noteOrnaments.end(), [&ornament](const MusicXmlOrnament &mark) {
+                                return mark.element->GetClassId() == ornament->GetClassId();
+                            })) {
+                        continue;
+                    }
+                    if (endNote) spans.push_back({ note, endNote, noteOrnaments.size() });
+                    noteOrnaments.push_back({ ornament });
+                    collected = true;
+                }
+            }
+            if (!collected) {
+                LogWarning("MusicXML output could not place %s '%s'", ornament->GetClassName().c_str(),
+                    ornament->GetID().c_str());
+            }
+        }
+        AddMusicXmlTrillLines(spans, positions, controls);
     }
 
     void AddMusicXmlDirection(MusicXmlPart &part, size_t measure, MusicXmlDirection direction)
@@ -846,7 +1022,9 @@ namespace musicxmloutput {
         std::vector<std::pair<size_t, const Dynam *>> dynamics;
         std::vector<std::pair<size_t, const Hairpin *>> hairpins;
         std::vector<std::pair<size_t, const ControlElement *>> pauses;
+        std::vector<std::pair<size_t, const ControlElement *>> ornaments;
         ClassIdsComparison pauseTypes({ FERMATA, CAESURA, BREATH });
+        ClassIdsComparison ornamentTypes({ TRILL, MORDENT, TURN });
         for (size_t i = 0; i < measures.size(); ++i) {
             const Measure *measure = measures.at(i);
             for (const Object *tie : measure->FindAllDescendantsByType(TIE)) {
@@ -870,14 +1048,20 @@ namespace musicxmloutput {
             for (const Object *pause : measurePauses) {
                 pauses.emplace_back(i, vrv_cast<const ControlElement *>(pause));
             }
+            ListOfConstObjects measureOrnaments;
+            measure->FindAllDescendantsByComparison(&measureOrnaments, &ornamentTypes);
+            for (const Object *ornament : measureOrnaments) {
+                ornaments.emplace_back(i, vrv_cast<const ControlElement *>(ornament));
+            }
         }
-        if (slurs.empty() && dynamics.empty() && hairpins.empty() && pauses.empty()) return true;
+        if (slurs.empty() && dynamics.empty() && hairpins.empty() && pauses.empty() && ornaments.empty()) return true;
         MusicXmlElementPositionMap positions;
         if (!CollectMusicXmlElementPositions(parts, divisions, positions)) return false;
         CollectMusicXmlSlurs(slurs, positions, controls);
-        if (dynamics.empty() && hairpins.empty() && pauses.empty()) return true;
+        if (dynamics.empty() && hairpins.empty() && pauses.empty() && ornaments.empty()) return true;
         const MusicXmlStaffPositionMap staffPositions = GetMusicXmlStaffPositions(parts);
         CollectMusicXmlPauses(pauses, measures, positions, staffPositions, parts, divisions, controls);
+        CollectMusicXmlOrnaments(ornaments, measures, positions, staffPositions, parts, divisions, controls);
         CollectMusicXmlDynamics(dynamics, measures, positions, staffPositions, parts, divisions);
         if (!hairpins.empty()) {
             std::vector<MusicXmlHairpinSpan> spans;
@@ -1009,9 +1193,9 @@ namespace musicxmloutput {
         if (controls.tieStart) parent.append_child(tag).append_attribute("type") = "start";
     }
 
-    void WriteMusicXmlPauseColor(pugi::xml_node node, const ControlElement &pause)
+    void WriteMusicXmlColor(pugi::xml_node node, const ControlElement &control)
     {
-        std::string color = pause.GetColor();
+        std::string color = control.GetColor();
         // MusicXML uses uppercase hexadecimal RGB (or ARGB).
         if (color.size() == 7 && color.front() == '#'
             && std::all_of(color.begin() + 1, color.end(), [](unsigned char c) { return std::isxdigit(c); })) {
@@ -1057,7 +1241,7 @@ namespace musicxmloutput {
         pugi::xml_node node = parent.append_child("fermata");
         node.append_attribute("type") = inverted ? "inverted" : "upright";
         node.text().set(GetMusicXmlFermataShape(fermata, glyph));
-        WriteMusicXmlPauseColor(node, fermata);
+        WriteMusicXmlColor(node, fermata);
     }
 
     void WriteMusicXmlBarlineFermatas(
@@ -1087,7 +1271,111 @@ namespace musicxmloutput {
                 default: break;
             }
         }
-        WriteMusicXmlPauseColor(node, pause);
+        WriteMusicXmlColor(node, pause);
+    }
+
+    void WriteMusicXmlOrnamentAccidental(pugi::xml_node ornaments, const ControlElement &ornament,
+        data_ACCIDENTAL_WRITTEN accidental, const char *placement)
+    {
+        if (accidental == ACCIDENTAL_WRITTEN_NONE) return;
+        const char *value = GetMusicXmlAccidental(accidental);
+        switch (accidental) {
+            case ACCIDENTAL_WRITTEN_ss: value = "sharp-sharp"; break;
+            case ACCIDENTAL_WRITTEN_tf: value = "triple-flat"; break;
+            case ACCIDENTAL_WRITTEN_ts: value = "triple-sharp"; break;
+            case ACCIDENTAL_WRITTEN_nf: value = "natural-flat"; break;
+            case ACCIDENTAL_WRITTEN_ns: value = "natural-sharp"; break;
+            case ACCIDENTAL_WRITTEN_1qf: value = "quarter-flat"; break;
+            case ACCIDENTAL_WRITTEN_1qs: value = "quarter-sharp"; break;
+            case ACCIDENTAL_WRITTEN_3qf: value = "three-quarters-flat"; break;
+            case ACCIDENTAL_WRITTEN_3qs: value = "three-quarters-sharp"; break;
+            default: break;
+        }
+        if (!value) {
+            LogWarning("MusicXML output omits an unsupported accidental on %s '%s'", ornament.GetClassName().c_str(),
+                ornament.GetID().c_str());
+            return;
+        }
+        pugi::xml_node mark = ornaments.append_child("accidental-mark");
+        mark.append_attribute("placement") = placement;
+        mark.text().set(value);
+    }
+
+    pugi::xml_node WriteMusicXmlWavyLine(pugi::xml_node ornaments, const char *type, int number)
+    {
+        pugi::xml_node line = ornaments.append_child("wavy-line");
+        line.append_attribute("type") = type;
+        line.append_attribute("number") = number;
+        return line;
+    }
+
+    const char *GetMusicXmlTurnName(const Turn &turn, char32_t glyph)
+    {
+        const bool inverted = turn.GetForm() == turnLog_FORM_lower || glyph == SMUFL_E568_ornamentTurnInverted;
+        if (turn.GetDelayed() == BOOLEAN_true) {
+            if (inverted || glyph == SMUFL_E56A_ornamentTurnUp || glyph == SMUFL_E56B_ornamentTurnUpS) return NULL;
+            return "delayed-turn";
+        }
+        if (glyph == SMUFL_E56A_ornamentTurnUp) return "vertical-turn";
+        if (glyph == SMUFL_E56B_ornamentTurnUpS) return "inverted-vertical-turn";
+        return inverted ? "inverted-turn" : "turn";
+    }
+
+    void WriteMusicXmlOrnamentStyle(pugi::xml_node node, const ControlElement &ornament)
+    {
+        const AttPlacementRelStaff *placement = dynamic_cast<const AttPlacementRelStaff *>(&ornament);
+        if (placement->GetPlace() == STAFFREL_above) node.append_attribute("placement") = "above";
+        if (placement->GetPlace() == STAFFREL_below) node.append_attribute("placement") = "below";
+        WriteMusicXmlColor(node, ornament);
+    }
+
+    void WriteMusicXmlOrnament(pugi::xml_node notations, const MusicXmlOrnament &marking)
+    {
+        const ControlElement &ornament = *marking.element;
+        const Trill *trill = dynamic_cast<const Trill *>(&ornament);
+        const Mordent *mordent = dynamic_cast<const Mordent *>(&ornament);
+        const Turn *turn = dynamic_cast<const Turn *>(&ornament);
+        const bool lineOnly = trill && trill->GetLstartsym() == LINESTARTENDSYMBOL_none;
+        if (lineOnly && !marking.lineNumber) return;
+        const char32_t turnGlyph = turn ? turn->GetTurnGlyph() : 0;
+        const char *turnName = turn ? GetMusicXmlTurnName(*turn, turnGlyph) : NULL;
+        if (turn && !turnName) {
+            LogWarning("MusicXML output omits unsupported delayed turn '%s'", turn->GetID().c_str());
+            return;
+        }
+        pugi::xml_node ornaments = notations.append_child("ornaments");
+        pugi::xml_node symbol;
+        if (trill) {
+            symbol = lineOnly ? WriteMusicXmlWavyLine(ornaments, "start", marking.lineNumber)
+                              : ornaments.append_child("trill-mark");
+        }
+        else if (mordent) {
+            symbol
+                = ornaments.append_child(mordent->GetForm() == mordentLog_FORM_upper ? "inverted-mordent" : "mordent");
+            if (mordent->HasLong()) {
+                symbol.append_attribute("long") = mordent->GetLong() == BOOLEAN_true ? "yes" : "no";
+            }
+        }
+        else {
+            symbol = ornaments.append_child(turnName);
+            if (turnGlyph == SMUFL_E569_ornamentTurnSlash) symbol.append_attribute("slash") = "yes";
+        }
+        WriteMusicXmlOrnamentStyle(symbol, ornament);
+        const AttOrnamentAccid *accid = dynamic_cast<const AttOrnamentAccid *>(&ornament);
+        if (mordent || lineOnly) {
+            // The importer only reads nested accidentals for turns and trills with a trill-mark.
+            if (accid->HasAccidupper() || accid->HasAccidlower()) {
+                LogWarning("MusicXML output omits unsupported accidentals on %s '%s'", ornament.GetClassName().c_str(),
+                    ornament.GetID().c_str());
+            }
+        }
+        else {
+            WriteMusicXmlOrnamentAccidental(ornaments, ornament, accid->GetAccidupper(), "above");
+            WriteMusicXmlOrnamentAccidental(ornaments, ornament, accid->GetAccidlower(), "below");
+        }
+        if (marking.lineNumber && !lineOnly) {
+            WriteMusicXmlOrnamentStyle(WriteMusicXmlWavyLine(ornaments, "start", marking.lineNumber), ornament);
+        }
     }
 
     void WriteMusicXmlNotations(pugi::xml_node note, const MusicXmlNoteControls &controls)
@@ -1119,6 +1407,16 @@ namespace musicxmloutput {
                 WriteMusicXmlPauseArticulation(articulations, *pause);
             }
         }
+        // Use the same order as the importer when several kinds of ornaments share a note.
+        for (ClassId kind : { MORDENT, TRILL, TURN }) {
+            const std::vector<MusicXmlOrnament>::const_iterator ornament = std::find_if(controls.ornaments.begin(),
+                controls.ornaments.end(), [kind](const MusicXmlOrnament &mark) { return mark.element->Is(kind); });
+            if (ornament != controls.ornaments.end()) WriteMusicXmlOrnament(notations, *ornament);
+        }
+        if (controls.trillStop) {
+            WriteMusicXmlWavyLine(notations.append_child("ornaments"), "stop", controls.trillStop);
+        }
+        if (!notations.first_child()) note.remove_child(notations);
     }
 
     void WriteMusicXmlNote(pugi::xml_node measure, const MusicXmlEvent &event, const Note *note, bool chordTone,
@@ -1401,7 +1699,8 @@ std::string MusicXmlOutput::Export()
     for (const Measure *measure : measures) {
         for (const Object *child : measure->GetChildren()) {
             if (!child->IsControlElement()
-                || child->IsAnyOf(std::array{ BREATH, CAESURA, DYNAM, FERMATA, HAIRPIN, MNUM, SLUR, TIE })
+                || child->IsAnyOf(
+                    std::array{ BREATH, CAESURA, DYNAM, FERMATA, HAIRPIN, MNUM, MORDENT, SLUR, TIE, TRILL, TURN })
                 || !omitted.insert(child->GetClassId()).second) {
                 continue;
             }
