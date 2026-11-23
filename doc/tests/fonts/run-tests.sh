@@ -18,8 +18,8 @@ cmake -S "$root/cmake" -B "$build/cli" -DCMAKE_BUILD_TYPE=Release -DNO_HUMDRUM_S
 cmake --build "$build/cli" --parallel
 
 includes=""
-for dir in include include/crc include/midi include/hum include/json include/pugi include/tuning-library include/zip \
-    include/vrv libmei/dist libmei/addons; do
+for dir in include include/hum include/vrv libmei/dist libmei/addons external/crc external/jsonxx \
+    external/midifile/include external/miniz-cpp external/pugixml/src external/tuning-library/include; do
     includes="$includes -I$root/$dir"
 done
 c++ -std=c++20 -O2 $includes registration.cpp -L"$build/lib" -lverovio -Wl,-rpath,"$build/lib" \

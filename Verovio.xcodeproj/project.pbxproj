@@ -1975,19 +1975,19 @@
 		4D1AC97B2B6A9BD000434023 /* filereader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = filereader.h; path = include/vrv/filereader.h; sourceTree = "<group>"; };
 		4D1BD1B421908D6B000D35B2 /* halfmrpt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = halfmrpt.cpp; path = src/halfmrpt.cpp; sourceTree = "<group>"; };
 		4D1BD1B821908D78000D35B2 /* halfmrpt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = halfmrpt.h; path = include/vrv/halfmrpt.h; sourceTree = "<group>"; };
-		4D1BE7661C688F5A0086DC0E /* Binasc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Binasc.cpp; path = src/midi/Binasc.cpp; sourceTree = "<group>"; };
-		4D1BE7671C688F5A0086DC0E /* MidiEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiEvent.cpp; path = src/midi/MidiEvent.cpp; sourceTree = "<group>"; };
-		4D1BE7681C688F5A0086DC0E /* MidiEventList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiEventList.cpp; path = src/midi/MidiEventList.cpp; sourceTree = "<group>"; };
-		4D1BE7691C688F5A0086DC0E /* MidiFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiFile.cpp; path = src/midi/MidiFile.cpp; sourceTree = "<group>"; };
-		4D1BE76A1C688F5A0086DC0E /* MidiMessage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiMessage.cpp; path = src/midi/MidiMessage.cpp; sourceTree = "<group>"; };
-		4D1BE7761C6942930086DC0E /* pugiconfig.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = pugiconfig.hpp; path = include/pugi/pugiconfig.hpp; sourceTree = "<group>"; };
-		4D1BE7771C6942930086DC0E /* pugixml.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = pugixml.hpp; path = include/pugi/pugixml.hpp; sourceTree = "<group>"; };
-		4D1BE77A1C69434C0086DC0E /* Binasc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Binasc.h; path = include/midi/Binasc.h; sourceTree = "<group>"; };
-		4D1BE77B1C69434C0086DC0E /* MidiEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MidiEvent.h; path = include/midi/MidiEvent.h; sourceTree = "<group>"; };
-		4D1BE77C1C69434C0086DC0E /* MidiEventList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MidiEventList.h; path = include/midi/MidiEventList.h; sourceTree = "<group>"; };
-		4D1BE77D1C69434C0086DC0E /* MidiFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MidiFile.h; path = include/midi/MidiFile.h; sourceTree = "<group>"; };
-		4D1BE77E1C69434C0086DC0E /* MidiMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MidiMessage.h; path = include/midi/MidiMessage.h; sourceTree = "<group>"; };
-		4D1BE7841C6A40A80086DC0E /* pugixml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pugixml.cpp; path = src/pugi/pugixml.cpp; sourceTree = "<group>"; };
+		4D1BE7661C688F5A0086DC0E /* Binasc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Binasc.cpp; path = external/midifile/src/Binasc.cpp; sourceTree = "<group>"; };
+		4D1BE7671C688F5A0086DC0E /* MidiEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiEvent.cpp; path = external/midifile/src/MidiEvent.cpp; sourceTree = "<group>"; };
+		4D1BE7681C688F5A0086DC0E /* MidiEventList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiEventList.cpp; path = external/midifile/src/MidiEventList.cpp; sourceTree = "<group>"; };
+		4D1BE7691C688F5A0086DC0E /* MidiFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiFile.cpp; path = external/midifile/src/MidiFile.cpp; sourceTree = "<group>"; };
+		4D1BE76A1C688F5A0086DC0E /* MidiMessage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiMessage.cpp; path = external/midifile/src/MidiMessage.cpp; sourceTree = "<group>"; };
+		4D1BE7761C6942930086DC0E /* pugiconfig.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = pugiconfig.hpp; path = external/pugixml/src/pugiconfig.hpp; sourceTree = "<group>"; };
+		4D1BE7771C6942930086DC0E /* pugixml.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = pugixml.hpp; path = external/pugixml/src/pugixml.hpp; sourceTree = "<group>"; };
+		4D1BE77A1C69434C0086DC0E /* Binasc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Binasc.h; path = external/midifile/include/Binasc.h; sourceTree = "<group>"; };
+		4D1BE77B1C69434C0086DC0E /* MidiEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MidiEvent.h; path = external/midifile/include/MidiEvent.h; sourceTree = "<group>"; };
+		4D1BE77C1C69434C0086DC0E /* MidiEventList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MidiEventList.h; path = external/midifile/include/MidiEventList.h; sourceTree = "<group>"; };
+		4D1BE77D1C69434C0086DC0E /* MidiFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MidiFile.h; path = external/midifile/include/MidiFile.h; sourceTree = "<group>"; };
+		4D1BE77E1C69434C0086DC0E /* MidiMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MidiMessage.h; path = external/midifile/include/MidiMessage.h; sourceTree = "<group>"; };
+		4D1BE7841C6A40A80086DC0E /* pugixml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pugixml.cpp; path = external/pugixml/src/pugixml.cpp; sourceTree = "<group>"; };
 		4D1D733B1A1D0390001E08F6 /* smufl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = smufl.h; path = include/vrv/smufl.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		4D1D733D1A1D08CD001E08F6 /* glyph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glyph.h; path = include/vrv/glyph.h; sourceTree = "<group>"; };
 		4D1D733F1A1D08DC001E08F6 /* glyph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = glyph.cpp; path = src/glyph.cpp; sourceTree = "<group>"; };
@@ -2035,7 +2035,7 @@
 		4D4FCD0B1F5455FF0009C455 /* staffgrp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = staffgrp.cpp; path = src/staffgrp.cpp; sourceTree = "<group>"; };
 		4D4FCD0F1F5457020009C455 /* staffdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = staffdef.h; path = include/vrv/staffdef.h; sourceTree = "<group>"; };
 		4D4FCD111F54570E0009C455 /* staffdef.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = staffdef.cpp; path = src/staffdef.cpp; sourceTree = "<group>"; };
-		4D508C2F26D4E64C00020F35 /* crc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = crc.cpp; path = src/crc/crc.cpp; sourceTree = "<group>"; };
+		4D508C2F26D4E64C00020F35 /* crc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = crc.cpp; path = external/crc/crc.cpp; sourceTree = "<group>"; };
 		4D543E211B80AACF004B823C /* view_control.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_control.cpp; path = src/view_control.cpp; sourceTree = "<group>"; };
 		4D55723F1CF3F32A008D06A0 /* octave.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = octave.cpp; path = src/octave.cpp; sourceTree = "<group>"; };
 		4D5572411CF3F33C008D06A0 /* octave.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = octave.h; path = include/vrv/octave.h; sourceTree = "<group>"; };
@@ -2065,7 +2065,7 @@
 		4D6DF9F620E1072B00C12BBD /* subst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = subst.h; path = include/vrv/subst.h; sourceTree = "<group>"; };
 		4D71BEA62D875DF800CE0001 /* atts_stringtab.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = atts_stringtab.h; path = libmei/dist/atts_stringtab.h; sourceTree = "<group>"; };
 		4D71BEA72D875DF800CE0001 /* atts_stringtab.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = atts_stringtab.cpp; path = libmei/dist/atts_stringtab.cpp; sourceTree = "<group>"; };
-		4D723AF325E8DB0B0062E0A2 /* zip_file.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = zip_file.hpp; path = include/zip/zip_file.hpp; sourceTree = "<group>"; };
+		4D723AF325E8DB0B0062E0A2 /* zip_file.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = zip_file.hpp; path = "external/miniz-cpp/zip_file.hpp"; sourceTree = "<group>"; };
 		4D763EC51987D04D003FCAB5 /* metersig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = metersig.cpp; path = src/metersig.cpp; sourceTree = "<group>"; };
 		4D763EC81987D067003FCAB5 /* metersig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = metersig.h; path = include/vrv/metersig.h; sourceTree = "<group>"; };
 		4D766EF220ACAD3F006875D8 /* syllable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = syllable.h; path = include/vrv/syllable.h; sourceTree = "<group>"; };
@@ -2213,8 +2213,8 @@
 		4DB3D8A61F828EA900B5FC2B /* areaposinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = areaposinterface.cpp; path = src/areaposinterface.cpp; sourceTree = "<group>"; };
 		4DB726C41B8BB0E80040231B /* text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = text.cpp; path = src/text.cpp; sourceTree = "<group>"; };
 		4DB726C71B8BB0F30040231B /* text.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = text.h; path = include/vrv/text.h; sourceTree = "<group>"; };
-		4DB787612022F0AD00394520 /* jsonxx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jsonxx.h; path = include/json/jsonxx.h; sourceTree = "<group>"; };
-		4DB787622022F0B700394520 /* jsonxx.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = jsonxx.cc; path = src/json/jsonxx.cc; sourceTree = "<group>"; };
+		4DB787612022F0AD00394520 /* jsonxx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jsonxx.h; path = external/jsonxx/jsonxx.h; sourceTree = "<group>"; };
+		4DB787622022F0B700394520 /* jsonxx.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = jsonxx.cc; path = external/jsonxx/jsonxx.cc; sourceTree = "<group>"; };
 		4DBDD66D2939E19A009EC466 /* symboltable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = symboltable.h; path = include/vrv/symboltable.h; sourceTree = "<group>"; };
 		4DBDD66E2939E19A009EC466 /* symboldef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = symboldef.h; path = include/vrv/symboldef.h; sourceTree = "<group>"; };
 		4DBDD66F2939E1AE009EC466 /* symboltable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = symboltable.cpp; path = src/symboltable.cpp; sourceTree = "<group>"; };
@@ -2237,7 +2237,7 @@
 		4DC3B9E6239E2AD9007F185E /* transposition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = transposition.h; path = include/vrv/transposition.h; sourceTree = "<group>"; };
 		4DCA95D71A515D0E008AD7E9 /* editorial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = editorial.cpp; path = src/editorial.cpp; sourceTree = "<group>"; };
 		4DCA95DA1A515D33008AD7E9 /* editorial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = editorial.h; path = include/vrv/editorial.h; sourceTree = "<group>"; };
-		4DCB7AA226D3C9600047F01D /* crc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crc.h; path = include/crc/crc.h; sourceTree = SOURCE_ROOT; };
+		4DCB7AA226D3C9600047F01D /* crc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crc.h; path = external/crc/crc.h; sourceTree = SOURCE_ROOT; };
 		4DD11DC22240E78B00A405D8 /* c_wrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = c_wrapper.cpp; path = tools/c_wrapper.cpp; sourceTree = "<group>"; };
 		4DD11DC32240E78B00A405D8 /* c_wrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = c_wrapper.h; path = tools/c_wrapper.h; sourceTree = "<group>"; };
 		4DD3878E307FD9C700EBFD29 /* parts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = parts.h; path = include/vrv/parts.h; sourceTree = "<group>"; };
@@ -2617,7 +2617,7 @@
 				4D2B23F22F56E7980088C6F4 /* TuningsImpl.h */,
 			);
 			name = "tuning-library";
-			path = "include/tuning-library";
+			path = "external/tuning-library/include";
 			sourceTree = "<group>";
 		};
 		4D3080F9203DA03600BC44F6 /* editorialelements */ = {

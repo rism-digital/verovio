@@ -49,16 +49,16 @@ add_compile_definitions(RESOURCE_DIR="${CMAKE_INSTALL_PREFIX}/share/verovio")
 
 include_directories(
     ../include
-    ../include/crc
-    ../include/midi
     ../include/hum
-    ../include/json
-    ../include/pugi
-    ../include/tuning-library
-    ../include/zip
     ../include/vrv
     ../libmei/dist
     ../libmei/addons
+    ../external/crc
+    ../external/jsonxx
+    ../external/midifile/include
+    ../external/miniz-cpp
+    ../external/pugixml/src
+    ../external/tuning-library/include
     ../external/harfbuzz/src
     ../external/woff2/include
     ../external/woff2/src
@@ -199,12 +199,22 @@ endif()
 file(GLOB verovio_SRC "../src/*.cpp")
 file(GLOB libmei_dist_SRC "../libmei/dist/*.cpp")
 file(GLOB libmei_addons_SRC "../libmei/addons/*.cpp")
-file(GLOB midi_SRC "../src/midi/*.cpp")
-file(GLOB crc_SRC "../src/crc/*.cpp")
+file(GLOB midi_SRC "../external/midifile/src/*.cpp")
+file(GLOB crc_SRC "../external/crc/*.cpp")
+
+# Headers of the external libraries that are included by the Verovio headers
+file(GLOB external_HEADERS
+    "../external/crc/*.h"
+    "../external/jsonxx/*.h"
+    "../external/midifile/include/*.h"
+    "../external/miniz-cpp/*.hpp"
+    "../external/pugixml/src/*.hpp"
+    "../external/tuning-library/include/*.h"
+)
 
 # Add header files to custom target, otherwise they are not shown in some IDEs (e.g. QtCreator)
 file(GLOB_RECURSE LibFiles "../include/*.h")
-add_custom_target(headers SOURCES ${LibFiles})
+add_custom_target(headers SOURCES ${LibFiles} ${external_HEADERS})
 
 set(all_SRC
     ${verovio_SRC}
@@ -213,8 +223,8 @@ set(all_SRC
     ${hum_SRC}
     ${crc_SRC}
     ${midi_SRC}
-    ../src/json/jsonxx.cc
-    ../src/pugi/pugixml.cpp
+    ../external/jsonxx/jsonxx.cc
+    ../external/pugixml/src/pugixml.cpp
     ../external/harfbuzz/src/verovio-harfbuzz.cc
     ../external/woff2/src/verovio-woff2.cc
     ../external/brotli/c/verovio-brotli.c
@@ -270,6 +280,7 @@ if (BUILD_AS_LIBRARY OR BUILD_AS_ANDROID_LIBRARY)
     add_library(verovio SHARED "../tools/c_wrapper.cpp" ${all_SRC})
     # list all headers to be copied for all installation
     file(GLOB_RECURSE all_HEADERS "../include/*/*.h*" "../libmei/*/*.h*" "../tools/c_wrapper.h")
+    list(APPEND all_HEADERS ${external_HEADERS})
     configure_file(verovio.pc.in verovio.pc @ONLY)
 
 ###########
