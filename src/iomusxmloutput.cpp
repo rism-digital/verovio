@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cctype>
 #include <cmath>
 #include <limits>
 #include <map>
@@ -26,11 +27,14 @@
 
 #include "accid.h"
 #include "beam.h"
+#include "caesura.h"
 #include "clef.h"
 #include "comparison.h"
+#include "controlelement.h"
 #include "doc.h"
 #include "durationinterface.h"
 #include "dynam.h"
+#include "fermata.h"
 #include "fraction.h"
 #include "functor.h"
 #include "hairpin.h"
@@ -47,6 +51,7 @@
 #include "note.h"
 #include "scoredef.h"
 #include "slur.h"
+#include "smufl.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "timeinterface.h"
@@ -82,6 +87,7 @@ namespace musicxmloutput {
         bool tieStart = false;
         bool tieStop = false;
         std::vector<MusicXmlSlurEndpoint> slurs;
+        std::vector<const ControlElement *> pauses;
     };
 
     using MusicXmlNoteControlMap = std::map<const LayerElement *, MusicXmlNoteControls>;
@@ -118,6 +124,11 @@ namespace musicxmloutput {
         Fraction offset;
     };
 
+    struct MusicXmlBarlineFermatas {
+        std::vector<const Fermata *> left;
+        std::vector<const Fermata *> right;
+    };
+
     struct MusicXmlPart {
         const Object *definition;
         const InstrDef *instrument;
@@ -126,6 +137,7 @@ namespace musicxmloutput {
         std::vector<std::vector<MusicXmlVoice>> measures;
         std::map<std::string, const InstrDef *> layerInstruments;
         std::vector<std::vector<MusicXmlDirection>> directions;
+        std::map<size_t, MusicXmlBarlineFermatas> barlineFermatas;
     };
 
     struct MusicXmlElementPosition {
@@ -583,6 +595,101 @@ namespace musicxmloutput {
         return staffPositions;
     }
 
+    bool IsMusicXmlPauseAnchor(const LayerElement *element)
+    {
+        return element && element->IsAnyOf(std::array{ NOTE, CHORD, REST, MREST });
+    }
+
+    const LayerElement *FindMusicXmlPauseEvent(const std::vector<MusicXmlVoice> &voices, int staff, double tick,
+        bool fermata, bool startid, int divisions, int &endTick)
+    {
+        const LayerElement *target = NULL;
+        int latest = -1;
+        for (const MusicXmlVoice &voice : voices) {
+            int onset = 0;
+            for (const MusicXmlEvent &event : voice.events) {
+                if (voice.staff == staff && onset > latest && IsMusicXmlPauseAnchor(event.element)) {
+                    const bool sameOnset = std::abs(tick - onset) < 1e-8;
+                    // A timestamped breath or caesura belongs to the preceding event. A startid names the event
+                    // itself, including when we look up a corresponding event on a different staff.
+                    if ((sameOnset && (fermata || startid)) || (!fermata && !sameOnset && onset < tick)) {
+                        target = event.element;
+                        latest = onset;
+                    }
+                }
+                onset += GetMusicXmlTicks(event.duration, divisions);
+            }
+            endTick = std::max(endTick, onset);
+        }
+        return target;
+    }
+
+    bool AddMusicXmlBarlineFermata(MusicXmlPart &part, size_t measure, bool left, const Fermata *fermata)
+    {
+        MusicXmlBarlineFermatas &barlines = part.barlineFermatas[measure];
+        std::vector<const Fermata *> &marks = left ? barlines.left : barlines.right;
+        if (std::find(marks.begin(), marks.end(), fermata) != marks.end()) return true;
+        // MusicXML permits one fermata above and one below each barline.
+        if (marks.size() == 2) return false;
+        marks.push_back(fermata);
+        return true;
+    }
+
+    void CollectMusicXmlPauses(const std::vector<std::pair<size_t, const ControlElement *>> &pauses,
+        const std::vector<const Measure *> &measures, const MusicXmlElementPositionMap &positions,
+        const MusicXmlStaffPositionMap &staffPositions, std::vector<MusicXmlPart> &parts, int divisions,
+        MusicXmlNoteControlMap &controls)
+    {
+        for (const std::pair<size_t, const ControlElement *> &entry : pauses) {
+            const ControlElement *pause = entry.second;
+            const Fermata *fermata = dynamic_cast<const Fermata *>(pause);
+            const TimePointInterface *timePoint = pause->GetTimePointInterface();
+            const std::optional<MusicXmlAnchor> anchor = GetMusicXmlStartAnchor(*timePoint, entry.first, positions);
+            bool collected = false;
+            if (anchor) {
+                const LayerElement *start = timePoint->HasStartid() ? timePoint->GetStart() : NULL;
+                const Staff *startStaff = start ? start->GetAncestorStaff(ANCESTOR_ONLY, false) : NULL;
+                for (const Staff *staff : timePoint->GetTstampStaves(measures.at(anchor->measure), pause)) {
+                    const MusicXmlStaffPositionMap::const_iterator position = staffPositions.find(staff->GetN());
+                    if (position == staffPositions.end()) continue;
+                    MusicXmlPart &part = parts.at(position->second.first);
+                    const size_t staffIndex = position->second.second;
+                    const int xmlStaff = part.staves.size() > 1 ? static_cast<int>(staffIndex) + 1 : 0;
+
+                    const LayerElement *target = start;
+                    if (!start || startStaff != staff) {
+                        const double *beat = std::get_if<double>(&anchor->position);
+                        if (fermata && beat && *beat == 0.0) {
+                            collected |= AddMusicXmlBarlineFermata(part, anchor->measure, true, fermata);
+                            continue;
+                        }
+                        const double offset = beat ? (*beat - 1.0) * 4.0 / part.staves.at(staffIndex).meterUnit
+                                                   : std::get<Fraction>(anchor->position).ToDouble();
+                        if (!std::isfinite(offset) || offset < 0.0) continue;
+                        const double tick = offset * divisions;
+                        int endTick = 0;
+                        target = FindMusicXmlPauseEvent(
+                            part.measures.at(anchor->measure), xmlStaff, tick, fermata, start, divisions, endTick);
+                        if (fermata && beat && std::abs(tick - endTick) < 1e-8) {
+                            collected |= AddMusicXmlBarlineFermata(part, anchor->measure, false, fermata);
+                            continue;
+                        }
+                        if (tick > endTick + 1e-8) continue;
+                    }
+                    if (!IsMusicXmlPauseAnchor(target)) continue;
+                    if (target->Is(CHORD)) target = GetMusicXmlNoteAnchor(target);
+                    if (!target) continue;
+                    controls[target].pauses.push_back(pause);
+                    collected = true;
+                }
+            }
+            if (!collected) {
+                LogWarning(
+                    "MusicXML output could not place %s '%s'", pause->GetClassName().c_str(), pause->GetID().c_str());
+            }
+        }
+    }
+
     void AddMusicXmlDirection(MusicXmlPart &part, size_t measure, MusicXmlDirection direction)
     {
         if (part.directions.empty()) part.directions.resize(part.measures.size());
@@ -738,6 +845,8 @@ namespace musicxmloutput {
         std::vector<const Slur *> slurs;
         std::vector<std::pair<size_t, const Dynam *>> dynamics;
         std::vector<std::pair<size_t, const Hairpin *>> hairpins;
+        std::vector<std::pair<size_t, const ControlElement *>> pauses;
+        ClassIdsComparison pauseTypes({ FERMATA, CAESURA, BREATH });
         for (size_t i = 0; i < measures.size(); ++i) {
             const Measure *measure = measures.at(i);
             for (const Object *tie : measure->FindAllDescendantsByType(TIE)) {
@@ -756,13 +865,19 @@ namespace musicxmloutput {
             for (const Object *hairpin : measure->FindAllDescendantsByType(HAIRPIN)) {
                 hairpins.emplace_back(i, vrv_cast<const Hairpin *>(hairpin));
             }
+            ListOfConstObjects measurePauses;
+            measure->FindAllDescendantsByComparison(&measurePauses, &pauseTypes);
+            for (const Object *pause : measurePauses) {
+                pauses.emplace_back(i, vrv_cast<const ControlElement *>(pause));
+            }
         }
-        if (slurs.empty() && dynamics.empty() && hairpins.empty()) return true;
+        if (slurs.empty() && dynamics.empty() && hairpins.empty() && pauses.empty()) return true;
         MusicXmlElementPositionMap positions;
         if (!CollectMusicXmlElementPositions(parts, divisions, positions)) return false;
         CollectMusicXmlSlurs(slurs, positions, controls);
-        if (dynamics.empty() && hairpins.empty()) return true;
+        if (dynamics.empty() && hairpins.empty() && pauses.empty()) return true;
         const MusicXmlStaffPositionMap staffPositions = GetMusicXmlStaffPositions(parts);
+        CollectMusicXmlPauses(pauses, measures, positions, staffPositions, parts, divisions, controls);
         CollectMusicXmlDynamics(dynamics, measures, positions, staffPositions, parts, divisions);
         if (!hairpins.empty()) {
             std::vector<MusicXmlHairpinSpan> spans;
@@ -894,6 +1009,87 @@ namespace musicxmloutput {
         if (controls.tieStart) parent.append_child(tag).append_attribute("type") = "start";
     }
 
+    void WriteMusicXmlPauseColor(pugi::xml_node node, const ControlElement &pause)
+    {
+        std::string color = pause.GetColor();
+        // MusicXML uses uppercase hexadecimal RGB (or ARGB).
+        if (color.size() == 7 && color.front() == '#'
+            && std::all_of(color.begin() + 1, color.end(), [](unsigned char c) { return std::isxdigit(c); })) {
+            std::transform(color.begin() + 1, color.end(), color.begin() + 1,
+                [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
+            node.append_attribute("color") = color.c_str();
+        }
+    }
+
+    const char *GetMusicXmlFermataShape(const Fermata &fermata, char32_t glyph)
+    {
+        switch (glyph) {
+            case SMUFL_E4C2_fermataVeryShortAbove:
+            case SMUFL_E4C3_fermataVeryShortBelow: return "double-angled";
+            case SMUFL_E4C4_fermataShortAbove:
+            case SMUFL_E4C5_fermataShortBelow: return "angled";
+            case SMUFL_E4C6_fermataLongAbove:
+            case SMUFL_E4C7_fermataLongBelow: return "square";
+            case SMUFL_E4C8_fermataVeryLongAbove:
+            case SMUFL_E4C9_fermataVeryLongBelow: return "double-square";
+            case 0xE4CA:
+            case 0xE4CB: return "double-dot";
+            case 0xE4CC:
+            case 0xE4CD: return "half-curve";
+            case 0xE4D6: return "curlew";
+            case SMUFL_E4C0_fermataAbove:
+            case SMUFL_E4C1_fermataBelow: return "normal";
+            default: break;
+        }
+        if (fermata.GetShape() == fermataVis_SHAPE_angular) return "angled";
+        if (fermata.GetShape() == fermataVis_SHAPE_square) return "square";
+        return "normal";
+    }
+
+    void WriteMusicXmlFermata(pugi::xml_node parent, const Fermata &fermata)
+    {
+        const char32_t glyph = fermata.GetFermataGlyph();
+        const data_VERTICALALIGNMENT alignment = Fermata::GetVerticalAlignment(glyph);
+        const bool inverted = alignment == VERTICALALIGNMENT_bottom || glyph == 0xE4CB || glyph == 0xE4CD
+            || (alignment == VERTICALALIGNMENT_middle && glyph != 0xE4CA && glyph != 0xE4CC
+                && (fermata.GetForm() == fermataVis_FORM_inv
+                    || (!fermata.HasForm() && fermata.GetPlace() == STAFFREL_below)));
+        pugi::xml_node node = parent.append_child("fermata");
+        node.append_attribute("type") = inverted ? "inverted" : "upright";
+        node.text().set(GetMusicXmlFermataShape(fermata, glyph));
+        WriteMusicXmlPauseColor(node, fermata);
+    }
+
+    void WriteMusicXmlBarlineFermatas(
+        pugi::xml_node measure, const std::vector<const Fermata *> &fermatas, const char *location)
+    {
+        if (fermatas.empty()) return;
+        pugi::xml_node barline = measure.append_child("barline");
+        barline.append_attribute("location") = location;
+        for (const Fermata *fermata : fermatas) {
+            WriteMusicXmlFermata(barline, *fermata);
+        }
+    }
+
+    void WriteMusicXmlPauseArticulation(pugi::xml_node articulations, const ControlElement &pause)
+    {
+        const Caesura *caesura = dynamic_cast<const Caesura *>(&pause);
+        pugi::xml_node node = articulations.append_child(caesura ? "caesura" : "breath-mark");
+        const AttPlacementRelStaff *placement = dynamic_cast<const AttPlacementRelStaff *>(&pause);
+        if (placement->GetPlace() == STAFFREL_above) node.append_attribute("placement") = "above";
+        if (placement->GetPlace() == STAFFREL_below) node.append_attribute("placement") = "below";
+        if (caesura) {
+            switch (caesura->GetCaesuraGlyph()) {
+                case SMUFL_E4D2_caesuraThick: node.text().set("thick"); break;
+                case SMUFL_E4D3_caesuraShort: node.text().set("short"); break;
+                case SMUFL_E4D4_caesuraCurved: node.text().set("curved"); break;
+                case SMUFL_E4D7_caesuraSingleStroke: node.text().set("single"); break;
+                default: break;
+            }
+        }
+        WriteMusicXmlPauseColor(node, pause);
+    }
+
     void WriteMusicXmlNotations(pugi::xml_node note, const MusicXmlNoteControls &controls)
     {
         pugi::xml_node notations = note.append_child("notations");
@@ -911,13 +1107,25 @@ namespace musicxmloutput {
                     = endpoint.slur->AttLineRendBase::LineformToStr(endpoint.slur->GetLform()).c_str();
             }
         }
+        for (const ControlElement *pause : controls.pauses) {
+            if (pause->Is(FERMATA)) {
+                WriteMusicXmlFermata(notations, *vrv_cast<const Fermata *>(pause));
+            }
+        }
+        pugi::xml_node articulations;
+        for (const ControlElement *pause : controls.pauses) {
+            if (!pause->Is(FERMATA)) {
+                if (!articulations) articulations = notations.append_child("articulations");
+                WriteMusicXmlPauseArticulation(articulations, *pause);
+            }
+        }
     }
 
     void WriteMusicXmlNote(pugi::xml_node measure, const MusicXmlEvent &event, const Note *note, bool chordTone,
         int divisions, const MusicXmlVoice &voice, const MusicXmlNoteControlMap &noteControls)
     {
         pugi::xml_node node = measure.append_child("note");
-        const MusicXmlNoteControlMap::const_iterator control = noteControls.find(note);
+        const MusicXmlNoteControlMap::const_iterator control = noteControls.find(note ? note : event.element);
         const Accid *accid = NULL;
         if (chordTone) node.append_child("chord");
         if (note) {
@@ -1062,7 +1270,7 @@ std::string MusicXmlOutput::Export()
             = partByDefinition.emplace(definition, parts.size());
         if (position.second) {
             parts.push_back({ definition, vrv_cast<const InstrDef *>(instrument), instrument ? instrument->GetID() : "",
-                {}, {}, {}, {} });
+                {}, {}, {}, {}, {} });
         }
         musicxmloutput::MusicXmlPart &part = parts[position.first->second];
         part.staves.push_back({ staffDef, measureDuration, meterValues.second, {} });
@@ -1145,6 +1353,11 @@ std::string MusicXmlOutput::Export()
             pugi::xml_node measureNode = partNode.append_child("measure");
             const std::string number = measure->HasN() ? measure->GetN() : std::to_string(i + 1);
             measureNode.append_attribute("number") = number.c_str();
+            const std::map<size_t, musicxmloutput::MusicXmlBarlineFermatas>::const_iterator barlines
+                = part.barlineFermatas.find(i);
+            if (barlines != part.barlineFermatas.end()) {
+                musicxmloutput::WriteMusicXmlBarlineFermatas(measureNode, barlines->second.left, "left");
+            }
             if (i == 0) musicxmloutput::WriteMusicXmlAttributes(measureNode, scoreDef, part, divisions);
             // Directions are written at cursor zero, so their offsets are relative to the start of the measure.
             if (!part.directions.empty()) {
@@ -1172,6 +1385,9 @@ std::string MusicXmlOutput::Export()
             if (cursor < furthest) {
                 measureNode.append_child("forward").append_child("duration").text().set(furthest - cursor);
             }
+            if (barlines != part.barlineFermatas.end()) {
+                musicxmloutput::WriteMusicXmlBarlineFermatas(measureNode, barlines->second.right, "right");
+            }
             if (&part == &parts.front()) {
                 const MNum *mNum = vrv_cast<const MNum *>(measure->GetFirst(MNUM));
                 implicitMeasures[i] = measure->GetMetcon() == BOOLEAN_false
@@ -1184,8 +1400,9 @@ std::string MusicXmlOutput::Export()
     std::set<ClassId> omitted;
     for (const Measure *measure : measures) {
         for (const Object *child : measure->GetChildren()) {
-            if (!child->IsControlElement() || child->Is(DYNAM) || child->Is(HAIRPIN) || child->Is(MNUM)
-                || child->Is(SLUR) || child->Is(TIE) || !omitted.insert(child->GetClassId()).second) {
+            if (!child->IsControlElement()
+                || child->IsAnyOf(std::array{ BREATH, CAESURA, DYNAM, FERMATA, HAIRPIN, MNUM, SLUR, TIE })
+                || !omitted.insert(child->GetClassId()).second) {
                 continue;
             }
             LogWarning("MusicXML output omits '%s' elements", child->GetClassName().c_str());

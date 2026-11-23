@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1">
+   <meiHead>
+      <fileDesc>
+         <titleStmt><title>Separate ties on every chord tone</title></titleStmt>
+         <pubStmt/>
+      </fileDesc>
+   </meiHead>
+   <music>
+      <body>
+         <mdiv>
+            <score>
+               <scoreDef meter.count="2" meter.unit="4">
+                  <staffGrp>
+                     <staffDef n="1" lines="5" clef.shape="G" clef.line="2"/>
+                  </staffGrp>
+               </scoreDef>
+               <section>
+                  <measure n="1">
+                     <staff n="1">
+                        <layer n="1">
+                           <chord xml:id="first-chord" dur="2">
+                              <note xml:id="first-c" pname="c" oct="4"/>
+                              <note xml:id="first-e" pname="e" oct="4"/>
+                              <note xml:id="first-g" pname="g" oct="4"/>
+                           </chord>
+                        </layer>
+                     </staff>
+                     <tie xml:id="tie-c" startid="#first-c" endid="#second-c"/>
+                     <tie xml:id="tie-e" startid="#first-e" endid="#second-e"/>
+                     <tie xml:id="tie-g" startid="#first-g" endid="#second-g"/>
+                  </measure>
+                  <measure n="2">
+                     <staff n="1">
+                        <layer n="1">
+                           <chord xml:id="second-chord" dur="2">
+                              <note xml:id="second-c" pname="c" oct="4"/>
+                              <note xml:id="second-e" pname="e" oct="4"/>
+                              <note xml:id="second-g" pname="g" oct="4"/>
+                           </chord>
+                        </layer>
+                     </staff>
+                  </measure>
+               </section>
+            </score>
+         </mdiv>
+      </body>
+   </music>
+</mei>

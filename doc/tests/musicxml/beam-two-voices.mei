@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1">
+   <meiHead>
+      <fileDesc>
+         <titleStmt><title>Beam with chords in the upper voice</title></titleStmt>
+         <pubStmt/>
+      </fileDesc>
+   </meiHead>
+   <music>
+      <body>
+         <mdiv>
+            <score>
+               <scoreDef meter.count="2" meter.unit="4">
+                  <staffGrp>
+                     <staffDef n="1" lines="5" clef.shape="G" clef.line="2"/>
+                  </staffGrp>
+               </scoreDef>
+               <section>
+                  <measure n="1">
+                     <staff n="1">
+                        <layer n="1">
+                           <beam xml:id="upper-voice-beam">
+                              <chord dur="8">
+                                 <note pname="e" oct="4"/>
+                                 <note pname="g" oct="4"/>
+                              </chord>
+                              <rest dur="8"/>
+                              <note pname="g" oct="4" dur="8"/>
+                              <chord dur="8">
+                                 <note pname="f" oct="4"/>
+                                 <note pname="a" oct="4"/>
+                              </chord>
+                           </beam>
+                        </layer>
+                        <layer n="2">
+                           <note pname="c" oct="4" dur="2"/>
+                        </layer>
+                     </staff>
+                  </measure>
+               </section>
+            </score>
+         </mdiv>
+      </body>
+   </music>
+</mei>

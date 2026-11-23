@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1">
+   <meiHead>
+      <fileDesc>
+         <titleStmt><title>Overlapping slurs with a tie</title></titleStmt>
+         <pubStmt/>
+      </fileDesc>
+   </meiHead>
+   <music>
+      <body>
+         <mdiv>
+            <score>
+               <scoreDef meter.count="4" meter.unit="4">
+                  <staffGrp>
+                     <staffDef n="1" lines="5" clef.shape="G" clef.line="2"/>
+                  </staffGrp>
+               </scoreDef>
+               <section>
+                  <measure n="1">
+                     <staff n="1">
+                        <layer n="1">
+                           <note xml:id="slurs-first" pname="c" oct="4" dur="4"/>
+                           <note xml:id="slurs-second" pname="g" oct="4" dur="4"/>
+                           <note xml:id="slurs-third" pname="g" oct="4" dur="4"/>
+                           <note xml:id="slurs-fourth" pname="a" oct="4" dur="4"/>
+                        </layer>
+                     </staff>
+                     <slur xml:id="slur-above" startid="#slurs-first" endid="#slurs-third" curvedir="above"/>
+                     <slur xml:id="slur-below" startid="#slurs-second" endid="#slurs-fourth" curvedir="below"/>
+                     <tie xml:id="tie-between-slurs" startid="#slurs-second" endid="#slurs-third"/>
+                  </measure>
+               </section>
+            </score>
+         </mdiv>
+      </body>
+   </music>
+</mei>
