@@ -15,7 +15,8 @@ renderSvg() {
 }
 
 for fixture in staff-instrument group-instrument layer-instruments beam beam-two-voices tie tie-chords tie-chord-notes \
-    slur-chord slurs-overlap dynam-startid dynam-tstamp hairpin-cross-measure hairpins-overlap fermata ornaments; do
+    slur-chord slurs-overlap dynam-startid dynam-tstamp hairpin-cross-measure hairpins-overlap fermata ornaments \
+    measure-barlines measure-repeats; do
     first="$output/$fixture.musicxml"
     second="$output/$fixture-roundtrip.musicxml"
     "$verovio" -r data -f mei -t musicxml -o "$first" "$fixtures/$fixture.mei"
@@ -163,6 +164,23 @@ check ornaments.musicxml '//note[pitch/step="E"]/notations/ornaments[
 check ornaments.mei '//*[local-name()="trill"][@extender="true" and @tstamp2="0m+3" and @accidupper="n"]'
 check ornaments.mei '//*[local-name()="mordent"][@form="upper" and @long="true"]'
 check ornaments.mei '//*[local-name()="turn"][@form="upper" and @delayed="true" and @accidlower="n"]'
+
+check measure-barlines.musicxml 'count(//measure[@number="1"][
+    *[1][self::barline and @location="left" and bar-style="dashed"]
+    and *[last()][self::barline and @location="right" and bar-style="light-light"]])=2'
+check measure-barlines.musicxml 'count(//measure[@number="2"]/barline[@location="right" and bar-style="light-heavy"])=2
+    and not(//measure[@number="2"]/barline[@location="left"]) and count(//fermata)=1'
+check measure-barlines.musicxml '//part[@id="P2"]/measure[@number="2"]/barline[
+    bar-style="light-heavy" and fermata[@type="upright"]]'
+check measure-barlines.mei '//*[local-name()="measure"][@n="1" and @left="dashed" and @right="dbl"]
+    and //*[local-name()="measure"][@n="2" and @right="end"]'
+
+check measure-repeats.musicxml 'count(//measure[*[1][self::barline and @location="left"
+    and bar-style="heavy-light" and repeat/@direction="forward"]
+    and *[last()][self::barline and @location="right" and bar-style="light-heavy" and repeat/@direction="backward"]])=2'
+check measure-repeats.musicxml '//measure[@number="1"]/barline[@location="right"][
+    *[1][self::bar-style] and *[2][self::fermata] and *[3][self::repeat]]'
+check measure-repeats.mei 'count(//*[local-name()="measure"][@left="rptstart" and @right="rptend"])=2'
 
 input="$fixtures/fermata-measure-rests.musicxml"
 if [ -n "$schema" ]; then

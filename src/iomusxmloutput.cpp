@@ -134,6 +134,16 @@ namespace musicxmloutput {
         Fraction offset;
     };
 
+    struct MusicXmlBarline {
+        const char *style = NULL;
+        const char *repeat = NULL;
+    };
+
+    struct MusicXmlMeasureBarlines {
+        MusicXmlBarline left;
+        MusicXmlBarline right;
+    };
+
     struct MusicXmlBarlineFermatas {
         std::vector<const Fermata *> left;
         std::vector<const Fermata *> right;
@@ -1244,15 +1254,77 @@ namespace musicxmloutput {
         WriteMusicXmlColor(node, fermata);
     }
 
-    void WriteMusicXmlBarlineFermatas(
-        pugi::xml_node measure, const std::vector<const Fermata *> &fermatas, const char *location)
+    MusicXmlBarline GetMusicXmlBarline(const Measure &measure, data_BARRENDITION rendition, bool left)
     {
-        if (fermatas.empty()) return;
-        pugi::xml_node barline = measure.append_child("barline");
-        barline.append_attribute("location") = location;
-        for (const Fermata *fermata : fermatas) {
-            WriteMusicXmlFermata(barline, *fermata);
+        // The importer represents these two right-barline styles as single barlines with fixed dimensions.
+        if (!left && (rendition == BARRENDITION_NONE || rendition == BARRENDITION_single)
+            && measure.GetBarLen() == 4.0) {
+            if (measure.GetBarPlace() == 2) return { "short" };
+            if (measure.GetBarPlace() == 6) return { "tick" };
         }
+        switch (rendition) {
+            case BARRENDITION_NONE: return {};
+            case BARRENDITION_dashed: return { "dashed" };
+            case BARRENDITION_dotted: return { "dotted" };
+            case BARRENDITION_dbl: return { "light-light" };
+            case BARRENDITION_dblheavy: return { "heavy-heavy" };
+            case BARRENDITION_end: return { "light-heavy" };
+            case BARRENDITION_heavy: return { "heavy" };
+            case BARRENDITION_invis: return { "none" };
+            case BARRENDITION_rptstart: return { "heavy-light", "forward" };
+            case BARRENDITION_rptend: return { "light-heavy", "backward" };
+            case BARRENDITION_single: return { "regular" };
+            default: break;
+        }
+        LogWarning("MusicXML output omits unsupported %s barline '%s' on measure '%s'", left ? "left" : "right",
+            measure.AttMeasureLog::BarrenditionToStr(rendition).c_str(), measure.GetID().c_str());
+        return {};
+    }
+
+    std::vector<MusicXmlMeasureBarlines> CollectMusicXmlBarlines(const std::vector<const Measure *> &measures)
+    {
+        std::vector<MusicXmlMeasureBarlines> barlines;
+        barlines.reserve(measures.size());
+        for (size_t i = 0; i < measures.size(); ++i) {
+            const Measure &measure = *measures[i];
+            data_BARRENDITION left = measure.GetLeft();
+            data_BARRENDITION right = measure.GetRight();
+            const data_BARRENDITION previous = i > 0 ? measures[i - 1]->GetRight() : BARRENDITION_NONE;
+            const data_BARRENDITION next = i + 1 < measures.size() ? measures[i + 1]->GetLeft() : BARRENDITION_NONE;
+
+            // Place forward repeats at the start of a measure and backward repeats at its end.
+            // A combined repeat belongs to both measures at the boundary.
+            if (left == BARRENDITION_rptboth || previous == BARRENDITION_rptboth || previous == BARRENDITION_rptstart) {
+                left = BARRENDITION_rptstart;
+            }
+            else if (left == BARRENDITION_rptend) {
+                if (i == 0) LogWarning("MusicXML output omits a backward repeat before the first measure");
+                left = BARRENDITION_NONE;
+            }
+            if (right == BARRENDITION_rptboth || next == BARRENDITION_rptboth || next == BARRENDITION_rptend) {
+                right = BARRENDITION_rptend;
+            }
+            else if (right == BARRENDITION_rptstart) {
+                if (i + 1 == measures.size())
+                    LogWarning("MusicXML output omits a forward repeat after the last measure");
+                right = BARRENDITION_NONE;
+            }
+            barlines.push_back({ GetMusicXmlBarline(measure, left, true), GetMusicXmlBarline(measure, right, false) });
+        }
+        return barlines;
+    }
+
+    void WriteMusicXmlBarline(pugi::xml_node measure, const MusicXmlBarline &barline,
+        const std::vector<const Fermata *> &fermatas, const char *location)
+    {
+        if (!barline.style && fermatas.empty()) return;
+        pugi::xml_node node = measure.append_child("barline");
+        node.append_attribute("location") = location;
+        if (barline.style) node.append_child("bar-style").text().set(barline.style);
+        for (const Fermata *fermata : fermatas) {
+            WriteMusicXmlFermata(node, *fermata);
+        }
+        if (barline.repeat) node.append_child("repeat").append_attribute("direction") = barline.repeat;
     }
 
     void WriteMusicXmlPauseArticulation(pugi::xml_node articulations, const ControlElement &pause)
@@ -1643,6 +1715,9 @@ std::string MusicXmlOutput::Export()
         }
     }
     std::vector<bool> implicitMeasures(measures.size(), false);
+    const std::vector<musicxmloutput::MusicXmlMeasureBarlines> measureBarlines
+        = musicxmloutput::CollectMusicXmlBarlines(measures);
+    const musicxmloutput::MusicXmlBarlineFermatas noFermatas;
     for (const musicxmloutput::MusicXmlPart &part : parts) {
         pugi::xml_node partNode = root.append_child("part");
         partNode.append_attribute("id") = part.id.c_str();
@@ -1651,11 +1726,12 @@ std::string MusicXmlOutput::Export()
             pugi::xml_node measureNode = partNode.append_child("measure");
             const std::string number = measure->HasN() ? measure->GetN() : std::to_string(i + 1);
             measureNode.append_attribute("number") = number.c_str();
-            const std::map<size_t, musicxmloutput::MusicXmlBarlineFermatas>::const_iterator barlines
+            const std::map<size_t, musicxmloutput::MusicXmlBarlineFermatas>::const_iterator partFermatas
                 = part.barlineFermatas.find(i);
-            if (barlines != part.barlineFermatas.end()) {
-                musicxmloutput::WriteMusicXmlBarlineFermatas(measureNode, barlines->second.left, "left");
-            }
+            const musicxmloutput::MusicXmlBarlineFermatas &fermatas
+                = partFermatas != part.barlineFermatas.end() ? partFermatas->second : noFermatas;
+            const musicxmloutput::MusicXmlMeasureBarlines &barlines = measureBarlines[i];
+            musicxmloutput::WriteMusicXmlBarline(measureNode, barlines.left, fermatas.left, "left");
             if (i == 0) musicxmloutput::WriteMusicXmlAttributes(measureNode, scoreDef, part, divisions);
             // Directions are written at cursor zero, so their offsets are relative to the start of the measure.
             if (!part.directions.empty()) {
@@ -1683,9 +1759,7 @@ std::string MusicXmlOutput::Export()
             if (cursor < furthest) {
                 measureNode.append_child("forward").append_child("duration").text().set(furthest - cursor);
             }
-            if (barlines != part.barlineFermatas.end()) {
-                musicxmloutput::WriteMusicXmlBarlineFermatas(measureNode, barlines->second.right, "right");
-            }
+            musicxmloutput::WriteMusicXmlBarline(measureNode, barlines.right, fermatas.right, "right");
             if (&part == &parts.front()) {
                 const MNum *mNum = vrv_cast<const MNum *>(measure->GetFirst(MNUM));
                 implicitMeasures[i] = measure->GetMetcon() == BOOLEAN_false
