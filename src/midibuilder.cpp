@@ -435,7 +435,7 @@ MIDIBuilder::Event &MIDIBuilder::AddJsonEvent(int track, EventType type, int tic
 {
     assert(track >= 0);
     if (track >= (int)m_jsonTracks->size()) m_jsonTracks->resize(track + 1);
-    return m_jsonTracks->at(track).emplace_back(type, tick);
+    return m_jsonTracks->at(track).emplace_back(Event{ type, tick });
 }
 
 void MIDIBuilder::AddJsonMeta(int track, int tick, MetaType type, const std::string &text)
