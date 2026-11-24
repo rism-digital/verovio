@@ -269,6 +269,11 @@ export class VerovioToolkit {
      */
     renderToMIDIJson(): MIDIJson;
     /**
+     * Export the loaded score as partwise MusicXML.
+     * @returns {string} The MusicXML as a string, or an empty string on failure
+     */
+    exportToMusicXML(): string;
+    /**
      * Render a document to Plaine and Easie code.
      *
      * Only the top staff / layer is exported.

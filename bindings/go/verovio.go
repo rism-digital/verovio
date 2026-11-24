@@ -342,6 +342,16 @@ func (t *Toolkit) RenderToMIDIJsonFile(filename string) bool {
 	return bool(C.vrvToolkit_renderToMIDIJsonFile(t.ptr, cFilename))
 }
 
+func (t *Toolkit) ExportToMusicXML() string {
+	return goString(C.vrvToolkit_exportToMusicXML(t.ptr))
+}
+
+func (t *Toolkit) ExportToMusicXMLFile(filename string) bool {
+	cFilename := C.CString(filename)
+	defer C.free(unsafe.Pointer(cFilename))
+	return bool(C.vrvToolkit_exportToMusicXMLFile(t.ptr, cFilename))
+}
+
 func (t *Toolkit) RenderToPAE() string {
 	return goString(C.vrvToolkit_renderToPAE(t.ptr))
 }

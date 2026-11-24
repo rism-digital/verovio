@@ -556,13 +556,13 @@ int main(int argc, char **argv)
     }
     else if (outformat == "musicxml") {
         if (stdOutput) {
-            const std::string output = toolkit.RenderToMusicXML();
+            const std::string output = toolkit.ExportToMusicXML();
             if (output.empty()) return 1;
             std::cout << output;
         }
         else {
             outfile += ".musicxml";
-            if (!toolkit.RenderToMusicXMLFile(outfile)) {
+            if (!toolkit.ExportToMusicXMLFile(outfile)) {
                 std::cerr << "Unable to write MusicXML to " << outfile << "." << std::endl;
                 return 1;
             }

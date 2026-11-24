@@ -377,6 +377,19 @@ bool vrvToolkit_renderToMIDIJsonFile(void *tkPtr, const char *filename)
     return tk->RenderToMIDIJsonFile(filename);
 }
 
+const char *vrvToolkit_exportToMusicXML(void *tkPtr)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->ExportToMusicXML());
+    return tk->GetCString();
+}
+
+bool vrvToolkit_exportToMusicXMLFile(void *tkPtr, const char *filename)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    return tk->ExportToMusicXMLFile(filename);
+}
+
 const char *vrvToolkit_renderToPAE(void *tkPtr)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);

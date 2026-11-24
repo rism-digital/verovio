@@ -1952,7 +1952,7 @@ std::string Toolkit::RenderToMIDI()
     return outputstr;
 }
 
-std::string Toolkit::RenderToMusicXML()
+std::string Toolkit::ExportToMusicXML()
 {
     if (this->GetPageCount() == 0) {
         LogWarning("No data loaded");
@@ -1967,9 +1967,9 @@ std::string Toolkit::RenderToMusicXML()
     return output.Export();
 }
 
-bool Toolkit::RenderToMusicXMLFile(const std::string &filename)
+bool Toolkit::ExportToMusicXMLFile(const std::string &filename)
 {
-    const std::string output = this->RenderToMusicXML();
+    const std::string output = this->ExportToMusicXML();
     if (output.empty()) return false;
 
     std::ofstream file(filename);
