@@ -11,6 +11,7 @@
 #include <array>
 #include <cctype>
 #include <cmath>
+#include <cstdint>
 #include <cstdlib>
 #include <iomanip>
 #include <limits>
@@ -78,6 +79,9 @@ namespace vrv {
 namespace musicxmloutput {
 
     constexpr int maxMusicXmlDivisions = 16384;
+    constexpr int maxMusicXmlBeamLevels = 8;
+
+    enum class MusicXmlBeamValue : std::uint8_t { None, Begin, Continue, End, ForwardHook, BackwardHook };
 
     struct MusicXmlEvent {
         const LayerElement *element;
@@ -87,7 +91,7 @@ namespace musicxmloutput {
         const Tuplet *tuplet = NULL;
         bool tupletStart = false;
         bool tupletStop = false;
-        const char *beamValue = NULL;
+        std::array<MusicXmlBeamValue, maxMusicXmlBeamLevels> beams{};
         int startTick = 0;
         int endTick = 0;
     };
@@ -469,15 +473,90 @@ namespace musicxmloutput {
         return true;
     }
 
+    struct MusicXmlBeamPosition {
+        bool ConnectsTo(const MusicXmlBeamPosition &next, int level) const
+        {
+            return level <= levels && level <= next.levels && (breaksec <= 0 || level <= breaksec);
+        }
+
+        size_t index;
+        int levels;
+        int breaksec;
+    };
+
+    bool PlanMusicXmlBeam(std::vector<MusicXmlEvent> &events, size_t first)
+    {
+        if (events.size() - first < 2 || events.at(first).element->Is(REST) || events.back().element->Is(REST)) {
+            return false;
+        }
+
+        std::vector<MusicXmlBeamPosition> positions;
+        for (size_t i = first; i < events.size(); ++i) {
+            MusicXmlEvent &event = events.at(i);
+            event.beams.front() = MusicXmlBeamValue::Continue;
+            // Secondary beams connect sounding notes and can pass across rests.
+            if (event.element->Is(REST)) continue;
+            const DurationInterface *duration = event.element->GetDurationInterface();
+            const data_DURATION written = duration->GetActualDur();
+            if (written < DURATION_8 || written > DURATION_1024) return false;
+            positions.push_back({ i, written - DURATION_4, duration->GetBreaksec() });
+        }
+        events.at(first).beams.front() = MusicXmlBeamValue::Begin;
+        events.back().beams.front() = MusicXmlBeamValue::End;
+
+        for (size_t i = 0; i < positions.size(); ++i) {
+            const MusicXmlBeamPosition &position = positions.at(i);
+            MusicXmlEvent &event = events.at(position.index);
+            const MusicXmlBeamPosition *previous = i ? &positions.at(i - 1) : NULL;
+            const MusicXmlBeamPosition *next = i + 1 < positions.size() ? &positions.at(i + 1) : NULL;
+            for (int level = 2; level <= position.levels; ++level) {
+                const bool left = previous && previous->ConnectsTo(position, level);
+                const bool right = next && position.ConnectsTo(*next, level);
+                MusicXmlBeamValue &value = event.beams.at(level - 1);
+                if (right) {
+                    value = left ? MusicXmlBeamValue::Continue : MusicXmlBeamValue::Begin;
+                    for (size_t rest = position.index + 1; rest < next->index; ++rest) {
+                        events.at(rest).beams.at(level - 1) = MusicXmlBeamValue::Continue;
+                    }
+                }
+                else if (left) {
+                    value = MusicXmlBeamValue::End;
+                }
+                else if (!previous) {
+                    value = MusicXmlBeamValue::ForwardHook;
+                }
+                else if (!next) {
+                    value = MusicXmlBeamValue::BackwardHook;
+                }
+                else if (previous->levels >= level && previous->breaksec > 0 && previous->breaksec < level) {
+                    value = events.at(position.index - 1).element->Is(REST) ? MusicXmlBeamValue::BackwardHook
+                                                                            : MusicXmlBeamValue::ForwardHook;
+                }
+                else {
+                    // Match the secondary hook direction implied by the surrounding beams.
+                    const MusicXmlBeamValue lower = event.beams.at(level - 2);
+                    const bool backward = level == 2 || previous->ConnectsTo(position, level - 1)
+                        || lower == MusicXmlBeamValue::BackwardHook;
+                    value = backward ? MusicXmlBeamValue::BackwardHook : MusicXmlBeamValue::ForwardHook;
+                }
+            }
+
+            // The importer can retain an explicit break only when a secondary beam ends here.
+            if (next && position.breaksec > 0 && position.breaksec < std::min(position.levels, next->levels)
+                && event.beams.at(position.breaksec) != MusicXmlBeamValue::End) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     bool AddMusicXmlLayerElement(const LayerElement *element, Fraction measureDuration, MusicXmlVoice &voice,
         const Tuplet *tuplet = NULL, bool inBeam = false)
     {
         const Beam *beam = dynamic_cast<const Beam *>(element);
         const Tuplet *group = dynamic_cast<const Tuplet *>(element);
         if (!beam && !group) {
-            if (inBeam
-                && (!element->IsAnyOf(std::array{ NOTE, CHORD, REST })
-                    || element->GetDurationInterface()->GetActualDur() != DURATION_8)) {
+            if (inBeam && !element->IsAnyOf(std::array{ NOTE, CHORD, REST })) {
                 return false;
             }
             return AddMusicXmlEvent(element, measureDuration, voice, tuplet);
@@ -507,23 +586,14 @@ namespace musicxmloutput {
         MusicXmlEvent &start = voice.events.at(first);
         MusicXmlEvent &stop = voice.events.back();
         if (beam) {
-            if (&start == &stop || start.element->Is(REST) || stop.element->Is(REST)) {
-                return false;
-            }
             // The importer looks for the tuplet stop on a later note when the beam and tuplet begin together.
             if (start.tupletStart && start.tupletStop) {
                 return false;
             }
-            for (size_t i = first + 1; i + 1 < voice.events.size(); ++i) {
-                voice.events.at(i).beamValue = "continue";
-            }
-            start.beamValue = "begin";
-            stop.beamValue = "end";
+            return PlanMusicXmlBeam(voice.events, first);
         }
-        else {
-            start.tupletStart = true;
-            stop.tupletStop = true;
-        }
+        start.tupletStart = true;
+        stop.tupletStop = true;
         return true;
     }
 
@@ -2058,10 +2128,15 @@ namespace musicxmloutput {
         }
         if (voice.staff > 0) node.append_child("staff").text().set(voice.staff);
         // A chord is a single beam position. Write it on the chord's first MusicXML note.
-        if (event.beamValue && !chordTone) {
-            pugi::xml_node beam = node.append_child("beam");
-            beam.append_attribute("number") = 1;
-            beam.text().set(event.beamValue);
+        if (!chordTone) {
+            static const char *const values[] = { "", "begin", "continue", "end", "forward hook", "backward hook" };
+            int number = 0;
+            for (const MusicXmlBeamValue value : event.beams) {
+                if (value == MusicXmlBeamValue::None) break;
+                pugi::xml_node beam = node.append_child("beam");
+                beam.append_attribute("number") = ++number;
+                beam.text().set(values[static_cast<int>(value)]);
+            }
         }
         if (control != noteControls.end()) {
             WriteMusicXmlNotations(node, control->second);

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1">
+   <meiHead>
+      <fileDesc>
+         <titleStmt><title>Secondary beam levels</title></titleStmt>
+         <pubStmt/>
+      </fileDesc>
+   </meiHead>
+   <music>
+      <body>
+         <mdiv>
+            <score>
+               <scoreDef meter.count="1" meter.unit="4">
+                  <staffGrp>
+                     <staffDef n="1" lines="5" clef.shape="G" clef.line="2"/>
+                  </staffGrp>
+               </scoreDef>
+               <section>
+                  <measure n="1">
+                     <staff n="1">
+                        <layer n="1">
+                           <beam>
+                              <chord dur="16">
+                                 <note pname="c" oct="4"/>
+                                 <note pname="e" oct="4"/>
+                              </chord>
+                              <note pname="f" oct="4" dur="8"/>
+                              <note pname="g" oct="4" dur="16"/>
+                           </beam>
+                        </layer>
+                     </staff>
+                  </measure>
+                  <measure n="2">
+                     <staff n="1">
+                        <layer n="1">
+                           <beam>
+                              <note pname="c" oct="4" dur="32"/>
+                              <note pname="d" oct="4" dur="32" breaksec="2"/>
+                              <rest dur="32"/>
+                              <note pname="e" oct="4" dur="32"/>
+                              <note pname="f" oct="4" dur="32"/>
+                           </beam>
+                           <note pname="g" oct="4" dur="16" dots="1"/>
+                        </layer>
+                     </staff>
+                  </measure>
+               </section>
+            </score>
+         </mdiv>
+      </body>
+   </music>
+</mei>

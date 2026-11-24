@@ -14,9 +14,9 @@ renderSvg() {
     "$verovio" -r data -f "$1" -t svg --breaks none --adjust-page-height -o "$output/$3.svg" "$2"
 }
 
-for fixture in staff-instrument group-instrument layer-instruments beam beam-two-voices tuplet tie tie-chords tie-chord-notes \
-    slur-chord slurs-overlap dynam-startid dynam-tstamp hairpin-cross-measure hairpins-overlap fermata ornaments \
-    measure-barlines measure-repeats directives directives-fractional tempo signature-changes; do
+for fixture in staff-instrument group-instrument layer-instruments beam beam-two-voices beam-levels tuplet tie tie-chords \
+    tie-chord-notes slur-chord slurs-overlap dynam-startid dynam-tstamp hairpin-cross-measure hairpins-overlap \
+    fermata ornaments measure-barlines measure-repeats directives directives-fractional tempo signature-changes; do
     first="$output/$fixture.musicxml"
     second="$output/$fixture-roundtrip.musicxml"
     "$verovio" -r data -f mei -t musicxml -o "$first" "$fixtures/$fixture.mei"
@@ -74,6 +74,21 @@ check beam-two-voices.musicxml '//measure[backup/duration=4 and count(note[voice
 check beam-two-voices.musicxml '//note[voice=1 and rest]/beam[@number="1" and .="continue"]'
 check beam-two-voices.mei '//*[local-name()="layer" and @n="1"]/*[local-name()="beam"][count(*[local-name()="chord"])=2 and *[local-name()="rest"]]'
 check beam-two-voices.mei '//*[local-name()="layer" and @n="2"]/*[local-name()="note" and @dur="2"]'
+
+check beam-levels.musicxml '//measure[@number="1" and attributes/divisions=8 and not(@implicit)]
+    [note[1][beam[@number="1" and .="begin"] and beam[@number="2" and .="forward hook"]]
+    and note[2][chord and not(beam)]
+    and note[3][type="eighth" and count(beam)=1 and beam[@number="1" and .="continue"]]
+    and note[4][beam[@number="1" and .="end"] and beam[@number="2" and .="backward hook"]]]'
+check beam-levels.musicxml '//measure[@number="2" and not(@implicit)]
+    [count(note[1]/beam[.="begin"])=3
+    and note[2][beam[@number="2" and .="continue"] and beam[@number="3" and .="end"]]
+    and note[3][rest and count(beam[.="continue"])=2 and not(beam[@number="3"])]
+    and note[4]/beam[@number="3" and .="begin"]
+    and count(note[5]/beam[.="end"])=3 and note[6][not(beam)]]'
+check beam-levels.mei '//*[local-name()="measure" and @n="2"]//*[local-name()="beam"]
+    [count(*[local-name()="note" and @dur="32"])=4 and *[local-name()="rest" and @dur="32"]
+    and *[local-name()="note" and @pname="d" and @breaksec="2"]]'
 
 check tuplet.musicxml '//measure[@number="1" and not(@implicit) and attributes/divisions=30]
     /note[1][duration=15 and type="eighth" and dot and count(notations)=1
