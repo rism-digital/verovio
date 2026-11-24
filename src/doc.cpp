@@ -11,7 +11,6 @@
 
 #include <cassert>
 #include <math.h>
-#include <memory>
 #include <ranges>
 
 //----------------------------------------------------------------------------
@@ -30,17 +29,13 @@
 #include "findfunctor.h"
 #include "functor.h"
 #include "glyph.h"
-#include "instrdef.h"
 #include "iomei.h"
-#include "keysig.h"
-#include "label.h"
 #include "layer.h"
 #include "mdiv.h"
 #include "measure.h"
 #include "mensur.h"
-#include "metersig.h"
+#include "midibuilder.h"
 #include "midifunctor.h"
-#include "midijsonbuilder.h"
 #include "miscfunctor.h"
 #include "mnum.h"
 #include "mrest.h"
@@ -77,11 +72,6 @@
 #include "verse.h"
 #include "vrv.h"
 #include "zone.h"
-
-//----------------------------------------------------------------------------
-
-#include "MidiEvent.h"
-#include "MidiFile.h"
 
 namespace vrv {
 
@@ -447,215 +437,10 @@ void Doc::CalculateTimemap()
 
 void Doc::ExportMIDI(smf::MidiFile *midiFile, std::string *midiJson)
 {
-    midiFile->absoluteTicks();
-
-    // The MIDI JSON is built from the same events as the MIDI file
-    std::unique_ptr<MIDIJsonBuilder> midiJsonBuilder;
-    if (midiJson) midiJsonBuilder = std::make_unique<MIDIJsonBuilder>(midiFile->getTPQ());
-    MIDIJsonBuilder *builder = midiJsonBuilder.get();
-
-    if (!this->HasTimemap()) {
-        // generate MIDI timemap before progressing
-        this->CalculateTimemap();
-    }
-    if (!this->HasTimemap()) {
-        LogWarning("Calculation of the timemap failed, MIDI cannot be exported.");
-    }
-
-    double tempo = MIDI_TEMPO;
-    std::set<int> tempoEventTicks; // track the ticks of added tempo events
-
-    // set MIDI tempo
-    ScoreDef *scoreDef = this->GetFirstVisibleScoreOrPart()->GetScoreDef();
-    assert(scoreDef);
-    if (scoreDef->HasMidiBpm()) {
-        tempo = scoreDef->GetMidiBpm();
-        tempoEventTicks.insert(0);
-        midiFile->addTempo(0, 0, tempo);
-        if (builder) builder->AddTempo(0, 0, tempo);
-    }
-    else if (scoreDef->HasMm()) {
-        tempo = Tempo::CalcTempo(scoreDef);
-        tempoEventTicks.insert(0);
-        midiFile->addTempo(0, 0, tempo);
-        if (builder) builder->AddTempo(0, 0, tempo);
-    }
-
-    // set MIDI tuning
-    const auto midiTuningFile = m_options->m_midiTuningFile.GetStrValue();
-    if (!midiTuningFile.empty()) {
-        std::string tuningDef;
-        std::ifstream f(midiTuningFile.c_str());
-        if (f.good()) {
-            const std::string ext(".ascl");
-            if (midiTuningFile.size() >= ext.size()
-                && midiTuningFile.substr(midiTuningFile.size() - ext.size()) == ext) {
-                std::stringstream buffer;
-                buffer << f.rdbuf();
-                tuningDef = buffer.str();
-            }
-            else {
-                LogError("Tuning file '%s' is not recognized", midiTuningFile.c_str());
-            }
-        }
-        else {
-            tuningDef = midiTuningFile;
-        }
-        if (!tuningDef.empty()) {
-            CustomTuning *tuning = new CustomTuning(tuningDef, this, false);
-            if (tuning->IsValid()) {
-                scoreDef->SetCustomTuning(tuning);
-            }
-            else {
-                delete tuning;
-                LogWarning("Error parsing tuning %s", f.good() ? "file" : "definition");
-            }
-        }
-    }
-
-    // Capture information for MIDI generation, i.e. from control elements
-    InitMIDIFunctor initMIDI;
-    initMIDI.SetCurrentTempo(tempo);
-    this->Process(initMIDI);
-
-    // We need to populate processing lists for processing the document by Layer (by Verse will not be used)
-    InitProcessingListsFunctor initProcessingLists;
-
-    // We first fill a tree of int with [staff/layer] and [staff/layer/verse] numbers (@n) to be processed
-    this->Process(initProcessingLists);
-    const IntTree &layerTree = initProcessingLists.GetLayerTree();
-
-    // The tree is used to process each staff/layer/verse separately
-    // For this, we use a array of AttNIntegerComparison that looks for each object if it is of the type
-    // and with @n specified
-
-    // Process notes and chords, rests, spaces layer by layer
-    // track 0 (included by default) is reserved for meta messages common to all tracks
-    int midiChannel = 0;
-    int midiTrack = 1;
-    Filters filters;
-    for (auto &staves : layerTree.child) {
-        int transSemi = 0;
-        InstrDef *instrDef = NULL;
-        if (StaffDef *staffDef = scoreDef->GetStaffDef(staves.first)) {
-            // get the transposition (semi-tone) value for the staff
-            if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
-            midiTrack = staffDef->GetN();
-            if (midiFile->getTrackCount() < (midiTrack + 1)) {
-                midiFile->addTracks(midiTrack + 1 - midiFile->getTrackCount());
-            }
-            // set MIDI channel and instrument
-            instrDef = vrv_cast<InstrDef *>(staffDef->FindDescendantByType(INSTRDEF, 1));
-            if (!instrDef) {
-                StaffGrp *staffGrp = vrv_cast<StaffGrp *>(staffDef->GetFirstAncestor(STAFFGRP));
-                assert(staffGrp);
-                instrDef = vrv_cast<InstrDef *>(staffGrp->FindDescendantByType(INSTRDEF, 1));
-            }
-            if (instrDef) {
-                if (instrDef->HasMidiChannel()) midiChannel = instrDef->GetMidiChannel();
-                if (instrDef->HasMidiTrack()) {
-                    midiTrack = instrDef->GetMidiTrack();
-                    if (midiFile->getTrackCount() < (midiTrack + 1)) {
-                        midiFile->addTracks(midiTrack + 1 - midiFile->getTrackCount());
-                    }
-                    if (midiTrack > 255) {
-                        LogWarning("A high MIDI track number was assigned to staff %d", staffDef->GetN());
-                    }
-                }
-                if (instrDef->HasMidiInstrnum()) {
-                    midiFile->addPatchChange(midiTrack, 0, midiChannel, instrDef->GetMidiInstrnum());
-                    if (builder) builder->AddProgramChange(midiTrack, 0, midiChannel, instrDef->GetMidiInstrnum());
-                }
-            }
-            // set MIDI track name
-            Label *label = vrv_cast<Label *>(staffDef->FindDescendantByType(LABEL, 1));
-            if (!label) {
-                StaffGrp *staffGrp = vrv_cast<StaffGrp *>(staffDef->GetFirstAncestor(STAFFGRP));
-                assert(staffGrp);
-                label = vrv_cast<Label *>(staffGrp->FindDescendantByType(LABEL, 1));
-            }
-            if (label) {
-                std::string trackName = UTF32to8(label->GetText()).c_str();
-                if (!trackName.empty()) {
-                    midiFile->addTrackName(midiTrack, 0, trackName);
-                    if (builder) builder->AddMeta(midiTrack, 0, MIDIJsonBuilder::MetaType::TrackName, trackName);
-                }
-            }
-            // set MIDI key signature
-            KeySig *keySig = vrv_cast<KeySig *>(staffDef->FindDescendantByType(KEYSIG));
-            if (!keySig && (scoreDef->HasKeySigInfo())) {
-                keySig = vrv_cast<KeySig *>(scoreDef->GetKeySig());
-            }
-            if (keySig && keySig->HasSig()) {
-                midiFile->addKeySignature(midiTrack, 0, keySig->GetFifthsInt(), (keySig->GetMode() == MODE_minor));
-                if (builder) {
-                    builder->AddKeySignature(midiTrack, 0, keySig->GetFifthsInt(), (keySig->GetMode() == MODE_minor));
-                }
-            }
-            // set MIDI time signature
-            MeterSig *meterSig = vrv_cast<MeterSig *>(staffDef->FindDescendantByType(METERSIG));
-            if (!meterSig && (scoreDef->HasMeterSigInfo())) {
-                meterSig = vrv_cast<MeterSig *>(scoreDef->GetMeterSig());
-            }
-            if (meterSig && meterSig->HasCount() && meterSig->HasUnit()) {
-                midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetUnit());
-                if (builder) builder->AddTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetUnit());
-            }
-            else if (meterSig && meterSig->HasSym()) {
-                midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetSymImplicitUnit());
-                if (builder) {
-                    builder->AddTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetSymImplicitUnit());
-                }
-            }
-        }
-
-        // Set initial scoreDef values for tuning
-        GenerateMIDIFunctor generateScoreDefMIDI(midiFile);
-        generateScoreDefMIDI.SetChannel(midiChannel);
-        generateScoreDefMIDI.SetTrack(midiTrack);
-        generateScoreDefMIDI.SetInstrDef(instrDef);
-        generateScoreDefMIDI.SetMIDIJsonBuilder(builder);
-
-        scoreDef->Process(generateScoreDefMIDI);
-
-        bool controlEvents = true;
-
-        for (auto &layers : staves.second.child) {
-            filters.Clear();
-            // Create ad comparison object for each type / @n
-            AttNIntegerComparison matchStaff(STAFF, staves.first);
-            AttNIntegerComparison matchLayer(LAYER, layers.first);
-            filters.Add(&matchStaff);
-            filters.Add(&matchLayer);
-
-            GenerateMIDIFunctor generateMIDI(midiFile);
-            generateMIDI.SetFilters(&filters);
-
-            generateMIDI.SetChannel(midiChannel);
-            generateMIDI.SetTrack(midiTrack);
-            generateMIDI.SetStaffN(staves.first);
-            generateMIDI.SetLayerN(layers.first);
-            generateMIDI.SetTempoEventTicks(tempoEventTicks);
-            generateMIDI.SetTransSemi(transSemi);
-            generateMIDI.SetCurrentTempo(tempo);
-            generateMIDI.SetOctaves(initMIDI.GetOctaves());
-            generateMIDI.SetNoCue(this->GetOptions()->m_midiNoCue.GetValue());
-            generateMIDI.SetControlEvents(controlEvents);
-            generateMIDI.SetInstrDef(instrDef);
-            generateMIDI.SetCustomTuning(scoreDef->GetCustomTuning());
-            generateMIDI.SetMIDIJsonBuilder(builder);
-
-            // LogDebug("Exporting track %d ----------------", midiTrack);
-            this->Process(generateMIDI);
-
-            tempoEventTicks = generateMIDI.GetTempoEventTicks();
-            // Process them only once per staff
-            controlEvents = false;
-        }
-    }
-    midiFile->sortTracksNoteOffsBeforeOns();
-
-    if (builder) builder->Finalize(midiFile->getTrackCount(), *midiJson);
+    assert(midiFile);
+    MIDIBuilder builder(midiJson ? MIDIBuilder::Format::Json : MIDIBuilder::Format::Midi, *midiFile);
+    builder.Build(*this);
+    if (midiJson) *midiJson = builder.ToJson();
 }
 
 bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeasures, bool useFractions)

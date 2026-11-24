@@ -8,8 +8,14 @@ Pod::Spec.new do |s|
   s.source         = { :git => 'https://github.com/rism-digital/verovio.git', :tag => 'version-' + s.version.to_s }
   s.source_files   = 
       'src/**/*.{cpp,cc}',
-      'include/{crc,hum,json,midi,pugi,tuning-library,vrv,zip}/*.{h,hpp}',
+      'include/{hum,vrv}/*.{h,hpp}',
       'libmei/{dist,addons}/*.{h,cpp}',
+      'external/crc/crc.{h,cpp}',
+      'external/jsonxx/jsonxx.{h,cc}',
+      'external/midifile/{include,src}/*.{h,cpp}',
+      'external/miniz-cpp/zip_file.hpp',
+      'external/pugixml/src/*.{hpp,cpp}',
+      'external/tuning-library/include/*.h',
       'external/harfbuzz/src/verovio-harfbuzz.cc',
       'external/harfbuzz/src/*.{h,hh,hpp}',
       'external/woff2/include/woff2/decode.h',
@@ -18,10 +24,18 @@ Pod::Spec.new do |s|
       'external/brotli/c/verovio-brotli.c',
       'external/brotli/c/{include,common,dec}/**/*.h'
   s.public_header_files =
-      'include/{json,pugi,vrv}/*.{h,hpp}',
+      'include/vrv/*.{h,hpp}',
+      'external/jsonxx/jsonxx.h',
+      'external/pugixml/src/*.hpp',
       'libmei/{dist,addons}/*.{h}'
   s.private_header_files = 
-      'include/{crc,hum,json,midi,pugi,tuning-library,vrv,zip}/*.{h,hpp}',
+      'include/{hum,vrv}/*.{h,hpp}',
+      'external/crc/crc.h',
+      'external/jsonxx/jsonxx.h',
+      'external/midifile/include/*.h',
+      'external/miniz-cpp/zip_file.hpp',
+      'external/pugixml/src/*.hpp',
+      'external/tuning-library/include/*.h',
       'libmei/{dist,addons}/*.{h}'
   s.resources      = 'data'
   s.ios.deployment_target = '16.0'

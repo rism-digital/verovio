@@ -34,6 +34,7 @@
 #include "iovolpiano.h"
 #include "layer.h"
 #include "measure.h"
+#include "midibuilder.h"
 #include "nc.h"
 #include "neume.h"
 #include "note.h"
@@ -49,7 +50,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "MidiFile.h"
 #include "crc.h"
 #include "jsonxx.h"
 
@@ -1940,12 +1940,12 @@ std::string Toolkit::RenderToMIDI()
     this->SetMidiDoc();
     this->ResetLogBuffer();
 
-    smf::MidiFile outputfile;
+    MIDIBuilder builder(MIDIBuilder::Format::Midi);
     assert(m_midiDoc);
-    m_midiDoc->ExportMIDI(&outputfile);
+    builder.Build(*m_midiDoc);
 
     std::stringstream stream;
-    outputfile.write(stream);
+    builder.Write(stream);
     std::string outputstr = Base64Encode(
         reinterpret_cast<const unsigned char *>(stream.str().c_str()), (unsigned int)stream.str().length());
 
@@ -2015,12 +2015,11 @@ std::string Toolkit::RenderToMIDIJson()
     this->SetMidiDoc();
     this->ResetLogBuffer();
 
-    smf::MidiFile midiFile;
-    std::string output;
+    MIDIBuilder builder(MIDIBuilder::Format::Json);
     assert(m_midiDoc);
-    m_midiDoc->ExportMIDI(&midiFile, &output);
+    builder.Build(*m_midiDoc);
 
-    return output;
+    return builder.ToJson();
 }
 
 std::string Toolkit::RenderToTimemap(const std::string &jsonOptions)
@@ -2143,10 +2142,10 @@ bool Toolkit::RenderToMIDIFile(const std::string &filename)
     this->SetMidiDoc();
     this->ResetLogBuffer();
 
-    smf::MidiFile outputfile;
+    MIDIBuilder builder(MIDIBuilder::Format::Midi);
     assert(m_midiDoc);
-    m_midiDoc->ExportMIDI(&outputfile);
-    outputfile.write(filename);
+    builder.Build(*m_midiDoc);
+    builder.Write(filename);
 
     return true;
 }

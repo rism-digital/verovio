@@ -14,20 +14,20 @@ swig -c++ -java -package org.verovio.lib -outdir src/main/java/org/verovio/lib v
 SRCFILES=$(\ls ../../src/*.cpp ../../libmei/dist/*.cpp ../../libmei/addons/*.cpp)
 
 FILES="$SRCFILES \
- ../../src/pugi/pugixml.cpp \
- ../../src/midi/Binasc.cpp \
- ../../src/midi/MidiEvent.cpp \
- ../../src/midi/MidiEventList.cpp \
- ../../src/midi/MidiFile.cpp \
- ../../src/midi/MidiMessage.cpp \
  ../../src/hum/humlib.cpp \
- ../../src/json/jsonxx.cc \
- ../../src/crc/crc.cpp \
+ ../../external/crc/crc.cpp \
+ ../../external/jsonxx/jsonxx.cc \
+ ../../external/midifile/src/Binasc.cpp \
+ ../../external/midifile/src/MidiEvent.cpp \
+ ../../external/midifile/src/MidiEventList.cpp \
+ ../../external/midifile/src/MidiFile.cpp \
+ ../../external/midifile/src/MidiMessage.cpp \
+ ../../external/pugixml/src/pugixml.cpp \
  ../../external/harfbuzz/src/verovio-harfbuzz.cc \
  ../../external/woff2/src/verovio-woff2.cc \
  target/verovio-brotli.o"
 
-CXXOPTS="-g -fpic -std=c++20 -DBROTLI_STATIC -DHB_LEAN -DHB_MINI -DHB_OPTIMIZE_SIZE_MORE -DHB_CONFIG_OVERRIDE_H=\"verovio-hb-config.h\" -I../../include -I../../include/vrv -I../../include/json -I../../include/hum -I../../include/crc -I../../include/midi -I../../include/pugi -I../../include/tuning-library -I../../include/zip -I../../libmei/addons -I../../libmei/dist -I../../external/harfbuzz/src -I../../external/woff2/include -I../../external/brotli/c/include -I/opt/local/include/ "
+CXXOPTS="-g -fpic -std=c++20 -DBROTLI_STATIC -DHB_LEAN -DHB_MINI -DHB_OPTIMIZE_SIZE_MORE -DHB_CONFIG_OVERRIDE_H=\"verovio-hb-config.h\" -I../../include -I../../include/vrv -I../../include/hum -I../../libmei/addons -I../../libmei/dist -I../../external/crc -I../../external/jsonxx -I../../external/midifile/include -I../../external/miniz-cpp -I../../external/pugixml/src -I../../external/tuning-library/include -I../../external/harfbuzz/src -I../../external/woff2/include -I../../external/brotli/c/include -I/opt/local/include/ "
 
 PATHS=""
 unamestr=$(uname)

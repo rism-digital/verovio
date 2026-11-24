@@ -27,8 +27,9 @@ Contributions normally target `develop`. Do not open issues, publish reviews, or
 - `libmei/`: schema inputs, Python generator, generated attributes, and hand-written attribute helpers (see below).
 - `data/`: runtime engraving resources; `fonts/`: font sources; `bindings/` and `emscripten/`: language/platform integration.
 - `doc/test-suite*.py` and `.github/workflows/tests_build.yml`: regression evaluation.
-- Embedded third-party libraries live under directories such as `src/hum`, `src/midi`, `src/pugi`, and corresponding include
-  directories. Avoid modifying or reformatting vendored code unless the task requires it.
+- Embedded third-party libraries live under `external/<library>`, each in the layout of its upstream project and with a
+  `README.verovio.md` recording its origin and local modifications. The exception is humlib in `src/hum` and
+  `include/hum`. Avoid modifying or reformatting vendored code unless the task requires it.
 
 ## C++ style and implementation
 
