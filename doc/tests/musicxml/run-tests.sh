@@ -16,7 +16,8 @@ renderSvg() {
 
 for fixture in staff-instrument group-instrument layer-instruments beam beam-two-voices beam-levels tuplet tie tie-chords \
     tie-chord-notes slur-chord slurs-overlap dynam-startid dynam-tstamp hairpin-cross-measure hairpins-overlap \
-    fermata ornaments measure-barlines measure-repeats directives directives-fractional tempo signature-changes; do
+    fermata ornaments measure-barlines measure-repeats directives directives-fractional tempo signature-changes \
+    clef-changes; do
     first="$output/$fixture.musicxml"
     second="$output/$fixture-roundtrip.musicxml"
     "$verovio" -r data -f mei -t musicxml -o "$first" "$fixtures/$fixture.mei"
@@ -269,6 +270,26 @@ check signature-changes.mei '//*[local-name()="measure" and @n="2"]
     [*[local-name()="keySig" and @sig="2f" and @mode="minor"] and *[local-name()="meterSig" and @count="5" and @unit="8"]]
     and *[local-name()="tempo" and @staff="2" and @tstamp="2.5"]]'
 check signature-changes.mei '//*[local-name()="dir" and @tstamp="2" and @tstamp2="1m+4" and @extender="true"]'
+
+check clef-changes.musicxml '//part[@id="piano"]/measure[@number="1"][
+    attributes[1][divisions=2 and clef[@number="1" and sign="G" and line=2 and clef-octave-change=-1]
+    and clef[@number="2" and sign="F" and line=4]]
+    and attributes[clef[@number="1" and sign="C" and line=3]
+    and preceding-sibling::note[1][pitch/step="D" and beam="continue"]
+    and following-sibling::note[1][pitch/step="E" and beam="continue"]]
+    and attributes[clef[@number="2" and sign="C" and line=4]
+    and preceding-sibling::note[1][voice=3 and staff=2] and following-sibling::note[1][voice=3 and staff=2]]
+    and count(attributes/clef)=4 and count(note[voice=1]/beam)=4]'
+check clef-changes.musicxml '//measure[@number="2"][
+    attributes[not(preceding-sibling::note)]/clef[@number="1" and @after-barline="yes"
+    and sign="G" and clef-octave-change=1]
+    and attributes[clef[@number="1" and sign="F" and line=4 and not(@after-barline)]
+    and preceding-sibling::note[1][voice=2 and rest/@measure="yes"]]
+    and count(attributes/clef)=2]'
+check clef-changes.mei '//*[local-name()="layer" and @n="2"]/*[local-name()="clef"
+    and @sameas=concat("#", //*[local-name()="beam"]/*[local-name()="clef" and @shape="C"]/@xml:id)]'
+check clef-changes.mei '//*[local-name()="measure" and @n="2"]//*[local-name()="layer" and @n="1"]
+    /*[1][local-name()="clef" and @shape="G" and @dis="8" and @dis.place="above"]'
 
 input="$fixtures/fermata-measure-rests.musicxml"
 if [ -n "$schema" ]; then

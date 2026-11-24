@@ -118,12 +118,18 @@ namespace musicxmloutput {
 
     using MusicXmlNoteControlMap = std::map<const LayerElement *, MusicXmlNoteControls>;
 
+    struct MusicXmlClefChange {
+        size_t beforeEvent;
+        const Clef *clef;
+    };
+
     struct MusicXmlVoice {
         int staff;
         int voice;
         const InstrDef *instrument;
         std::vector<MusicXmlEvent> events;
         int durationTicks = 0;
+        std::vector<MusicXmlClefChange> clefs{};
     };
 
     struct MusicXmlMeter {
@@ -152,6 +158,7 @@ namespace musicxmloutput {
     struct MusicXmlStaff {
         const StaffDef *definition;
         MusicXmlMeter meter;
+        const Clef *clef;
         std::map<int, MusicXmlVoiceDef> voices;
     };
 
@@ -371,6 +378,19 @@ namespace musicxmloutput {
         return vrv_cast<const Element *>(attribute);
     }
 
+    const Clef *ResolveMusicXmlClef(const Clef *clef)
+    {
+        if (!clef->HasSameas()) return clef;
+        const Clef *target = dynamic_cast<const Clef *>(clef->GetSameasLink());
+        return target && !target->HasSameas() ? target : NULL;
+    }
+
+    bool IsSupportedMusicXmlClef(const Clef &clef)
+    {
+        if (clef.HasDis() && !clef.HasDisPlace()) return false;
+        return clef.GetShape() == CLEFSHAPE_G || clef.GetShape() == CLEFSHAPE_F || clef.GetShape() == CLEFSHAPE_C;
+    }
+
     std::optional<MusicXmlMeter> GetMusicXmlMeter(const MeterSig *meter)
     {
         if (!meter) return MusicXmlMeter{ 4, 4 };
@@ -553,6 +573,13 @@ namespace musicxmloutput {
     bool AddMusicXmlLayerElement(const LayerElement *element, Fraction measureDuration, MusicXmlVoice &voice,
         const Tuplet *tuplet = NULL, bool inBeam = false)
     {
+        if (element->Is(CLEF)) {
+            const Clef *clef = vrv_cast<const Clef *>(element);
+            const Clef *source = ResolveMusicXmlClef(clef);
+            if (!source || !IsSupportedMusicXmlClef(*source)) return false;
+            voice.clefs.push_back({ voice.events.size(), clef });
+            return true;
+        }
         const Beam *beam = dynamic_cast<const Beam *>(element);
         const Tuplet *group = dynamic_cast<const Tuplet *>(element);
         if (!beam && !group) {
@@ -665,6 +692,9 @@ namespace musicxmloutput {
                     if (voiceDef == staff.voices.end()) continue;
                     MusicXmlVoice voice{ xmlStaff, voiceDef->second.number, voiceDef->second.instrument, {} };
                     if (!CollectMusicXmlVoice(layer, measureDuration, voice)) return false;
+                    if (voice.events.empty() && !voice.clefs.empty()) {
+                        voice.events.push_back({ NULL, measureDuration, NULL, 0 });
+                    }
                     if (!voice.events.empty()) voices.push_back(std::move(voice));
                 }
             }
@@ -691,6 +721,90 @@ namespace musicxmloutput {
             for (const MusicXmlEvent &event : voice.events) {
                 if (!AddMusicXmlDuration(event.duration, divisions)) return false;
             }
+        }
+        return true;
+    }
+
+    bool PlaceMusicXmlTrailingClefs(MusicXmlMeasure &measure)
+    {
+        for (size_t i = 0; i + 1 < measure.voices.size(); ++i) {
+            MusicXmlVoice &voice = measure.voices.at(i);
+            if (measure.voices.at(i + 1).staff != voice.staff) continue;
+            const std::vector<MusicXmlClefChange>::iterator trailing
+                = std::find_if(voice.clefs.begin(), voice.clefs.end(),
+                    [&voice](const MusicXmlClefChange &change) { return change.beforeEvent == voice.events.size(); });
+            if (trailing == voice.clefs.end()) continue;
+
+            // A clef immediately before a backup can be assigned to the next voice by the importer.
+            // Place it at the same score time in a following voice that has an event boundary there.
+            MusicXmlVoice *target = NULL;
+            size_t beforeEvent = 0;
+            for (size_t j = i + 1; j < measure.voices.size(); ++j) {
+                MusicXmlVoice &candidate = measure.voices.at(j);
+                if (candidate.staff != voice.staff) break;
+                const std::vector<MusicXmlEvent>::const_iterator event
+                    = std::lower_bound(candidate.events.cbegin(), candidate.events.cend(), voice.durationTicks,
+                        [](const MusicXmlEvent &entry, int tick) { return entry.startTick < tick; });
+                const bool last = j + 1 == measure.voices.size() || measure.voices.at(j + 1).staff != voice.staff;
+                if (event != candidate.events.cend() && event->startTick == voice.durationTicks) {
+                    target = &candidate;
+                    beforeEvent = static_cast<size_t>(event - candidate.events.cbegin());
+                    break;
+                }
+                if (last && candidate.durationTicks == voice.durationTicks) {
+                    target = &candidate;
+                    beforeEvent = candidate.events.size();
+                }
+            }
+            if (!target) {
+                LogError("MusicXML output cannot preserve the trailing clef '%s' across voices",
+                    trailing->clef->GetID().c_str());
+                return false;
+            }
+
+            const std::vector<MusicXmlClefChange>::iterator insert
+                = std::lower_bound(target->clefs.begin(), target->clefs.end(), beforeEvent,
+                    [](const MusicXmlClefChange &change, size_t index) { return change.beforeEvent < index; });
+            for (std::vector<MusicXmlClefChange>::iterator change = trailing; change != voice.clefs.end(); ++change) {
+                change->beforeEvent = beforeEvent;
+            }
+            target->clefs.insert(insert, trailing, voice.clefs.end());
+            voice.clefs.erase(trailing, voice.clefs.end());
+        }
+        return true;
+    }
+
+    bool PlanMusicXmlClefChanges(MusicXmlPart &part)
+    {
+        for (size_t i = 0; i < part.measures.size(); ++i) {
+            MusicXmlMeasure &measure = part.measures.at(i);
+            std::map<const Clef *, int> sourceVoices;
+            for (const MusicXmlVoice &voice : measure.voices) {
+                for (const MusicXmlClefChange &change : voice.clefs) {
+                    if (!change.clef->HasSameas()) sourceVoices.emplace(change.clef, voice.voice);
+                }
+            }
+            for (MusicXmlVoice &voice : measure.voices) {
+                for (MusicXmlClefChange &change : voice.clefs) {
+                    const Clef *source = ResolveMusicXmlClef(change.clef);
+                    const std::map<const Clef *, int>::const_iterator owner = sourceVoices.find(source);
+                    // The importer uses sameas copies to apply a clef to the other voices on its staff.
+                    if (owner != sourceVoices.end() && owner->second != voice.voice
+                        && source->GetFirstAncestor(STAFF) == change.clef->GetFirstAncestor(STAFF)) {
+                        change.clef = NULL;
+                    }
+                    else if (i == 0 && change.beforeEvent == 0) {
+                        // First-measure clefs at score time zero are imported as initial attributes.
+                        part.staves.at(voice.staff ? voice.staff - 1 : 0).clef = source;
+                        change.clef = NULL;
+                    }
+                    else {
+                        change.clef = source;
+                    }
+                }
+                std::erase_if(voice.clefs, [](const MusicXmlClefChange &change) { return !change.clef; });
+            }
+            if (!PlaceMusicXmlTrailingClefs(measure)) return false;
         }
         return true;
     }
@@ -1721,6 +1835,27 @@ namespace musicxmloutput {
         time.append_child("beat-type").text().set(values.unit);
     }
 
+    void WriteMusicXmlClef(pugi::xml_node attributes, const Clef &clef, int staff, bool afterBarline = false)
+    {
+        pugi::xml_node node = attributes.append_child("clef");
+        if (staff) node.append_attribute("number") = staff;
+        if (afterBarline) node.append_attribute("after-barline") = "yes";
+        if (clef.GetVisible() == BOOLEAN_false) node.append_attribute("print-object") = "no";
+        node.append_child("sign").text().set(clef.AttClefShape::ClefshapeToStr(clef.GetShape()).c_str());
+        const int defaultLine = clef.GetShape() == CLEFSHAPE_G ? 2 : (clef.GetShape() == CLEFSHAPE_F ? 4 : 3);
+        node.append_child("line").text().set(clef.HasLine() ? clef.GetLine() : defaultLine);
+
+        int octaves;
+        switch (clef.GetDis()) {
+            case OCTAVE_DIS_8: octaves = 1; break;
+            case OCTAVE_DIS_15: octaves = 2; break;
+            case OCTAVE_DIS_22: octaves = 3; break;
+            default: return;
+        }
+        if (clef.GetDisPlace() == STAFFREL_basic_below) octaves = -octaves;
+        node.append_child("clef-octave-change").text().set(octaves);
+    }
+
     void WriteMusicXmlAttributes(pugi::xml_node measure, const ScoreDef *scoreDef, const MusicXmlPart &part,
         const MusicXmlMeasureSignatures &change, size_t index, int divisions)
     {
@@ -1757,12 +1892,9 @@ namespace musicxmloutput {
         int staffNumber = 0;
         for (const MusicXmlStaff &staff : part.staves) {
             ++staffNumber;
-            const Clef *clef = GetInitialAttribute<Clef>(scoreDef, staff.definition, CLEF);
-            if (!clef || !clef->HasShape()) continue;
-            pugi::xml_node clefNode = attributes.append_child("clef");
-            if (multipleStaves) clefNode.append_attribute("number") = staffNumber;
-            clefNode.append_child("sign").text().set(clef->AttClefShape::ClefshapeToStr(clef->GetShape()).c_str());
-            if (clef->HasLine()) clefNode.append_child("line").text().set(clef->GetLine());
+            if (staff.clef && staff.clef->HasShape()) {
+                WriteMusicXmlClef(attributes, *staff.clef, multipleStaves ? staffNumber : 0);
+            }
         }
     }
 
@@ -2151,7 +2283,15 @@ namespace musicxmloutput {
     void WriteMusicXmlVoice(
         pugi::xml_node measure, const MusicXmlVoice &voice, int tickScale, const MusicXmlNoteControlMap &noteControls)
     {
-        for (const MusicXmlEvent &event : voice.events) {
+        size_t clefIndex = 0;
+        for (size_t i = 0;; ++i) {
+            while (clefIndex < voice.clefs.size() && voice.clefs.at(clefIndex).beforeEvent == i) {
+                WriteMusicXmlClef(
+                    measure.append_child("attributes"), *voice.clefs.at(clefIndex).clef, voice.staff, i == 0);
+                ++clefIndex;
+            }
+            if (i == voice.events.size()) break;
+            const MusicXmlEvent &event = voice.events.at(i);
             const int duration = (event.endTick - event.startTick) * tickScale;
             ForEachMusicXmlNote(event, [&](const Note *note, bool chordTone) {
                 WriteMusicXmlNote(measure, event, note, chordTone, duration, voice, noteControls);
@@ -2223,10 +2363,7 @@ std::string MusicXmlOutput::Export()
         const Clef *clef = musicxmloutput::GetInitialAttribute<Clef>(scoreDef, staffDef, CLEF);
         if (!meterValues || musicxmloutput::GetInitialAttribute<MeterSigGrp>(scoreDef, staffDef, METERSIGGRP)
             || (key && key->HasNonAttribKeyAccidChildren()) || staffDef->HasTransDiat() || staffDef->HasTransSemi()
-            || (clef
-                && (clef->HasDis()
-                    || (clef->HasShape() && clef->GetShape() != CLEFSHAPE_G && clef->GetShape() != CLEFSHAPE_F
-                        && clef->GetShape() != CLEFSHAPE_C)))) {
+            || (clef && clef->HasShape() && !musicxmloutput::IsSupportedMusicXmlClef(*clef))) {
             LogError("MusicXML output does not support the initial attributes for staff %d yet", staffDef->GetN());
             return "";
         }
@@ -2252,7 +2389,7 @@ std::string MusicXmlOutput::Export()
                 {}, {}, {}, {}, {} });
         }
         musicxmloutput::MusicXmlPart &part = parts[position.first->second];
-        part.staves.push_back({ staffDef, *meterValues, {} });
+        part.staves.push_back({ staffDef, *meterValues, clef, {} });
         musicxmloutput::MusicXmlStaff &staff = part.staves.back();
 
         std::set<int> &layers = layersByStaff[staffDef->GetN()];
@@ -2299,6 +2436,9 @@ std::string MusicXmlOutput::Export()
 
     const int rhythmDivisions = divisions;
     if (!musicxmloutput::PlanMusicXmlEventTiming(parts, rhythmDivisions)) return "";
+    for (musicxmloutput::MusicXmlPart &part : parts) {
+        if (!musicxmloutput::PlanMusicXmlClefChanges(part)) return "";
+    }
     musicxmloutput::MusicXmlNoteControlMap noteControls;
     musicxmloutput::CollectMusicXmlControls(measures, parts, divisions, noteControls);
     const int tickScale = divisions / rhythmDivisions;
