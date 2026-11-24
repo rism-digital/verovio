@@ -145,6 +145,7 @@
 #import <VerovioFramework/iohumdrum.h>
 #import <VerovioFramework/iomei.h>
 #import <VerovioFramework/iomusxml.h>
+#import <VerovioFramework/iomusxmloutput.h>
 #import <VerovioFramework/iopae.h>
 #import <VerovioFramework/iovolpiano.h>
 #import <VerovioFramework/jsonxx.h>
