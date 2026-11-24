@@ -2002,7 +2002,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     m_clefChanged = 0;
 
     // a measure that starts a multi measure rest: the multiRest stands for its notes, the rest of it is read
-    const bool isMultiRest = node.select_node("attributes//multiple-rest");
+    const bool isMultiRest = node.select_node(".//multiple-rest");
 
     const auto mrestPositonIter = m_multiRests.find(index);
     bool isMRestInOtherSystem = (mrestPositonIter != m_multiRests.end());
