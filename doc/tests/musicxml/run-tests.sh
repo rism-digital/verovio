@@ -17,7 +17,7 @@ renderSvg() {
 for fixture in staff-instrument group-instrument layer-instruments beam beam-two-voices beam-levels tuplet tie tie-chords \
     tie-chord-notes slur-chord slurs-overlap dynam-startid dynam-tstamp hairpin-cross-measure hairpins-overlap \
     fermata ornaments measure-barlines measure-repeats directives directives-fractional tempo signature-changes \
-    clef-changes; do
+    clef-changes grace-notes; do
     first="$output/$fixture.musicxml"
     second="$output/$fixture-roundtrip.musicxml"
     "$verovio" -r data -f mei -t musicxml -o "$first" "$fixtures/$fixture.mei"
@@ -290,6 +290,27 @@ check clef-changes.mei '//*[local-name()="layer" and @n="2"]/*[local-name()="cle
     and @sameas=concat("#", //*[local-name()="beam"]/*[local-name()="clef" and @shape="C"]/@xml:id)]'
 check clef-changes.mei '//*[local-name()="measure" and @n="2"]//*[local-name()="layer" and @n="1"]
     /*[1][local-name()="clef" and @shape="G" and @dis="8" and @dis.place="above"]'
+
+check grace-notes.musicxml '//measure[@number="1" and attributes/divisions=2 and not(@implicit)][backup/duration=4
+    and count(note[grace and not(duration)])=6 and count(note[voice=1 and duration=1])=4
+    and note[1][grace/@slash="yes" and stem="up" and notations/slur/@type="start"]
+    and note[2][grace[not(@slash)] and type="16th"] and note[3][grace and chord and not(beam)]
+    and note[4][duration=1 and beam="begin" and notations[fermata and slur/@type="stop"]]
+    and not(note[grace]/notations/fermata)]'
+check grace-notes.musicxml '//measure[@number="1"][note[5][beam="continue"]
+    and note[6][grace and beam[@number="1" and .="begin"] and beam[@number="2" and .="begin"]]
+    and note[7][grace and beam[@number="1" and .="end"] and beam[@number="2" and .="end"]]
+    and note[8][beam="continue"] and note[9][grace/@slash="yes" and not(beam)]
+    and note[10][beam="end"]]'
+check grace-notes.musicxml '//measure[@number="2" and not(@implicit)][count(note[voice=1 and grace and not(duration)])=2
+    and note[1]/beam[@number="3" and .="begin"] and note[2]/beam[@number="3" and .="end"]
+    and forward/duration=1 and backup/duration=1 and note[3][voice=2 and duration=4]]'
+check grace-notes.mei '//*[local-name()="measure" and @n="1"]//*[local-name()="layer" and @n="1"]
+    [*[local-name()="note" and @grace="unacc" and @stem.mod="1slash"]
+    and *[local-name()="chord" and @grace="acc" and count(*[local-name()="note"])=2]
+    and *[local-name()="beam"]/*[local-name()="beam" and count(*[local-name()="note" and @grace="acc"])=2]]'
+check grace-notes.mei '//*[local-name()="measure" and @n="2"]//*[local-name()="layer" and @n="2"]
+    [*[local-name()="note" and @pname="g" and @dur="2"]]'
 
 input="$fixtures/fermata-measure-rests.musicxml"
 if [ -n "$schema" ]; then

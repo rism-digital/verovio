@@ -42,6 +42,7 @@
 #include "fermata.h"
 #include "fraction.h"
 #include "functor.h"
+#include "gracegrp.h"
 #include "hairpin.h"
 #include "instrdef.h"
 #include "keysig.h"
@@ -89,6 +90,7 @@ namespace musicxmloutput {
         const char *type;
         int dots;
         const Tuplet *tuplet = NULL;
+        data_GRACE grace = GRACE_NONE;
         bool tupletStart = false;
         bool tupletStop = false;
         std::array<MusicXmlBeamValue, maxMusicXmlBeamLevels> beams{};
@@ -322,8 +324,8 @@ namespace musicxmloutput {
     bool IsSupportedMusicXmlNote(const Note *note)
     {
         const int octave = note->HasOct() ? note->GetOct() : note->GetOctDefault();
-        if (!note->HasPname() || octave < 0 || octave > 9 || note->IsGraceNote() || note->HasStaff()
-            || note->HasPnameGes() || note->HasOctGes() || note->HasTie()) {
+        if (!note->HasPname() || octave < 0 || octave > 9 || note->HasStaff() || note->HasPnameGes()
+            || note->HasOctGes() || note->HasTie()) {
             return false;
         }
         const Accid *accid = note->GetDrawingAccid();
@@ -449,12 +451,26 @@ namespace musicxmloutput {
         return true;
     }
 
+    data_GRACE GetMusicXmlGrace(const LayerElement *element)
+    {
+        const AttGraced *graced = dynamic_cast<const AttGraced *>(element);
+        if (graced && graced->HasGrace()) return graced->GetGrace();
+        const GraceGrp *group = vrv_cast<const GraceGrp *>(element->GetFirstAncestor(GRACEGRP));
+        if (!group) return GRACE_NONE;
+        return group->HasGrace() ? group->GetGrace() : GRACE_acc;
+    }
+
     bool AddMusicXmlEvent(
         const LayerElement *element, Fraction measureDuration, MusicXmlVoice &voice, const Tuplet *tuplet)
     {
         const DurationInterface *duration = element->GetDurationInterface();
         const ClassId classId = element->GetClassId();
-        if (element->HasSameas() || element->IsGraceNote()) return false;
+        if (element->HasSameas()) return false;
+        const data_GRACE grace = GetMusicXmlGrace(element);
+        // The importer has no grace representation for rests or spaces.
+        if (grace != GRACE_NONE && classId != NOTE && classId != CHORD) {
+            return false;
+        }
         if (classId == MREST || classId == MSPACE) {
             if (tuplet) return false;
             voice.events.push_back({ element, measureDuration, NULL, 0 });
@@ -481,11 +497,17 @@ namespace musicxmloutput {
         const char *type = GetMusicXmlNoteType(duration->GetActualDur());
         const int dots = duration->HasDots() ? duration->GetDots() : 0;
         if (!type || dots < 0 || dots > 8) return false;
+        if (grace != GRACE_NONE) {
+            voice.events.push_back({ element, Fraction(), type, dots, NULL, grace });
+            return true;
+        }
         // Verovio durations are fractions of a whole note. MusicXML divisions are per quarter note.
         const Fraction written = duration->GetInterfaceAlignmentDuration(1, 1) * 4;
         const Fraction sounding = tuplet ? written * Fraction(tuplet->GetNumbase(), tuplet->GetNum()) : written;
-        if (tuplet && classId == REST && voice.events.empty() && tuplet->GetNum() != tuplet->GetNumbase()
-            && sounding.ToDouble() == measureDuration.ToDouble()) {
+        if (tuplet && classId == REST && tuplet->GetNum() != tuplet->GetNumbase()
+            && sounding.ToDouble() == measureDuration.ToDouble()
+            && std::none_of(voice.events.begin(), voice.events.end(),
+                [](const MusicXmlEvent &event) { return event.grace == GRACE_NONE; })) {
             // The importer would interpret this as a measure rest, which cannot be a child of a tuplet.
             return false;
         }
@@ -504,15 +526,44 @@ namespace musicxmloutput {
         int breaksec;
     };
 
-    bool PlanMusicXmlBeam(std::vector<MusicXmlEvent> &events, size_t first)
+    bool PlanMusicXmlBeam(std::vector<MusicXmlEvent> &events, size_t first, bool nested)
     {
-        if (events.size() - first < 2 || events.at(first).element->Is(REST) || events.back().element->Is(REST)) {
+        const bool allGrace = std::all_of(events.cbegin() + first, events.cend(),
+            [](const MusicXmlEvent &event) { return event.grace != GRACE_NONE; });
+        // Only grace beams can be nested. A regular beam runs past the grace notes inside it.
+        if (nested && !allGrace) return false;
+        std::vector<size_t> members;
+        for (size_t i = first; i < events.size(); ++i) {
+            if ((events.at(i).grace != GRACE_NONE) == allGrace) members.push_back(i);
+        }
+        if (members.size() < 2 || events.at(members.front()).element->Is(REST)
+            || events.at(members.back()).element->Is(REST)) {
             return false;
+        }
+        const MusicXmlEvent &start = events.at(members.front());
+        if (start.tupletStart) {
+            // The importer uses the next tuplet stop and the first beam stop to order the two containers.
+            if (start.tupletStop) return false;
+            bool graceBeamEnded = false;
+            for (size_t i = members.front() + 1; i < members.back(); ++i) {
+                const MusicXmlEvent &event = events.at(i);
+                if (event.tupletStop) {
+                    if (graceBeamEnded) {
+                        LogError("MusicXML output cannot preserve a tuplet ending within a beam after a grace beam");
+                        return false;
+                    }
+                    break;
+                }
+                if (event.grace != GRACE_NONE && event.beams.front() == MusicXmlBeamValue::End) {
+                    graceBeamEnded = true;
+                }
+            }
         }
 
         std::vector<MusicXmlBeamPosition> positions;
-        for (size_t i = first; i < events.size(); ++i) {
+        for (size_t i : members) {
             MusicXmlEvent &event = events.at(i);
+            if (event.beams.front() != MusicXmlBeamValue::None) return false;
             event.beams.front() = MusicXmlBeamValue::Continue;
             // Secondary beams connect sounding notes and can pass across rests.
             if (event.element->Is(REST)) continue;
@@ -521,8 +572,8 @@ namespace musicxmloutput {
             if (written < DURATION_8 || written > DURATION_1024) return false;
             positions.push_back({ i, written - DURATION_4, duration->GetBreaksec() });
         }
-        events.at(first).beams.front() = MusicXmlBeamValue::Begin;
-        events.back().beams.front() = MusicXmlBeamValue::End;
+        events.at(members.front()).beams.front() = MusicXmlBeamValue::Begin;
+        events.at(members.back()).beams.front() = MusicXmlBeamValue::End;
 
         for (size_t i = 0; i < positions.size(); ++i) {
             const MusicXmlBeamPosition &position = positions.at(i);
@@ -536,7 +587,9 @@ namespace musicxmloutput {
                 if (right) {
                     value = left ? MusicXmlBeamValue::Continue : MusicXmlBeamValue::Begin;
                     for (size_t rest = position.index + 1; rest < next->index; ++rest) {
-                        events.at(rest).beams.at(level - 1) = MusicXmlBeamValue::Continue;
+                        if (events.at(rest).element->Is(REST)) {
+                            events.at(rest).beams.at(level - 1) = MusicXmlBeamValue::Continue;
+                        }
                     }
                 }
                 else if (left) {
@@ -582,7 +635,8 @@ namespace musicxmloutput {
         }
         const Beam *beam = dynamic_cast<const Beam *>(element);
         const Tuplet *group = dynamic_cast<const Tuplet *>(element);
-        if (!beam && !group) {
+        const bool graceGroup = element->Is(GRACEGRP);
+        if (!beam && !group && !graceGroup) {
             if (inBeam && !element->IsAnyOf(std::array{ NOTE, CHORD, REST })) {
                 return false;
             }
@@ -590,7 +644,7 @@ namespace musicxmloutput {
         }
 
         if (element->HasSameas()) return false;
-        if (beam && (inBeam || beam->HasBeamWith() || (beam->HasForm() && beam->GetForm() != beamRend_FORM_norm))) {
+        if (beam && (beam->HasBeamWith() || (beam->HasForm() && beam->GetForm() != beamRend_FORM_norm))) {
             return false;
         }
         if (group
@@ -600,7 +654,7 @@ namespace musicxmloutput {
             return false;
         }
 
-        const size_t first = voice.events.size();
+        size_t first = voice.events.size();
         for (const Object *child : element->GetChildren()) {
             if (group && child->IsAnyOf(std::array{ TUPLET_BRACKET, TUPLET_NUM })) continue;
             const LayerElement *member = dynamic_cast<const LayerElement *>(child);
@@ -610,17 +664,14 @@ namespace musicxmloutput {
             }
         }
         if (first == voice.events.size()) return false;
-        MusicXmlEvent &start = voice.events.at(first);
-        MusicXmlEvent &stop = voice.events.back();
-        if (beam) {
-            // The importer looks for the tuplet stop on a later note when the beam and tuplet begin together.
-            if (start.tupletStart && start.tupletStop) {
-                return false;
-            }
-            return PlanMusicXmlBeam(voice.events, first);
-        }
-        start.tupletStart = true;
-        stop.tupletStop = true;
+        if (graceGroup) return true;
+        if (beam) return PlanMusicXmlBeam(voice.events, first, inBeam);
+        while (first < voice.events.size() && voice.events.at(first).grace != GRACE_NONE) ++first;
+        if (first == voice.events.size()) return false;
+        size_t last = voice.events.size() - 1;
+        while (voice.events.at(last).grace != GRACE_NONE) --last;
+        voice.events.at(first).tupletStart = true;
+        voice.events.at(last).tupletStop = true;
         return true;
     }
 
@@ -1032,7 +1083,7 @@ namespace musicxmloutput {
         for (const MusicXmlVoice &voice : voices) {
             if (voice.staff != staff || (voiceNumber && voice.voice != voiceNumber)) continue;
             for (const MusicXmlEvent &event : voice.events) {
-                if (event.startTick <= latest || !IsMusicXmlPauseAnchor(event.element)
+                if (event.grace != GRACE_NONE || event.startTick <= latest || !IsMusicXmlPauseAnchor(event.element)
                     || (notesOnly && !event.element->IsAnyOf(std::array{ NOTE, CHORD }))) {
                     continue;
                 }
@@ -2225,6 +2276,10 @@ namespace musicxmloutput {
         pugi::xml_node node = measure.append_child("note");
         const MusicXmlNoteControlMap::const_iterator control = noteControls.find(note ? note : event.element);
         const Accid *accid = NULL;
+        if (event.grace != GRACE_NONE) {
+            pugi::xml_node grace = node.append_child("grace");
+            if (event.grace == GRACE_unacc) grace.append_attribute("slash") = "yes";
+        }
         if (chordTone) node.append_child("chord");
         if (note) {
             pugi::xml_node pitch = node.append_child("pitch");
@@ -2243,7 +2298,7 @@ namespace musicxmloutput {
                 node.append_attribute("print-object") = "no";
             }
         }
-        node.append_child("duration").text().set(duration);
+        if (event.grace == GRACE_NONE) node.append_child("duration").text().set(duration);
         if (control != noteControls.end()) WriteMusicXmlTieEndpoints(node, "tie", control->second);
         if (voice.instrument)
             node.append_child("instrument").append_attribute("id") = voice.instrument->GetID().c_str();
@@ -2257,6 +2312,19 @@ namespace musicxmloutput {
             pugi::xml_node modification = node.append_child("time-modification");
             modification.append_child("actual-notes").text().set(event.tuplet->GetNum());
             modification.append_child("normal-notes").text().set(event.tuplet->GetNumbase());
+        }
+        if (event.grace != GRACE_NONE && !chordTone) {
+            if (const AttStems *stems = dynamic_cast<const AttStems *>(event.element)) {
+                if (stems->GetStemVisible() == BOOLEAN_false) {
+                    node.append_child("stem").text().set("none");
+                }
+                else if (stems->GetStemDir() == STEMDIRECTION_up) {
+                    node.append_child("stem").text().set("up");
+                }
+                else if (stems->GetStemDir() == STEMDIRECTION_down) {
+                    node.append_child("stem").text().set("down");
+                }
+            }
         }
         if (voice.staff > 0) node.append_child("staff").text().set(voice.staff);
         // A chord is a single beam position. Write it on the chord's first MusicXML note.
@@ -2286,8 +2354,9 @@ namespace musicxmloutput {
         size_t clefIndex = 0;
         for (size_t i = 0;; ++i) {
             while (clefIndex < voice.clefs.size() && voice.clefs.at(clefIndex).beforeEvent == i) {
+                const int tick = i < voice.events.size() ? voice.events.at(i).startTick : voice.durationTicks;
                 WriteMusicXmlClef(
-                    measure.append_child("attributes"), *voice.clefs.at(clefIndex).clef, voice.staff, i == 0);
+                    measure.append_child("attributes"), *voice.clefs.at(clefIndex).clef, voice.staff, tick == 0);
                 ++clefIndex;
             }
             if (i == voice.events.size()) break;
@@ -2499,10 +2568,17 @@ std::string MusicXmlOutput::Export()
                 }
             }
             int cursor = 0;
+            bool firstVoice = true;
             for (const musicxmloutput::MusicXmlVoice &voice : planned.voices) {
+                if (!firstVoice && !cursor) {
+                    // A grace-only voice leaves the cursor at zero. Use a positive backup to switch voices.
+                    measureNode.append_child("forward").append_child("duration").text().set(1);
+                    cursor = 1;
+                }
                 if (cursor) measureNode.append_child("backup").append_child("duration").text().set(cursor);
                 musicxmloutput::WriteMusicXmlVoice(measureNode, voice, tickScale, noteControls);
                 cursor = voice.durationTicks * tickScale;
+                firstVoice = false;
             }
             // End on the last occupied beat even when the final voice is shorter.
             const int furthest = planned.durationTicks * tickScale;
