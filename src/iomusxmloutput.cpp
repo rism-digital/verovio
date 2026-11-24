@@ -11,7 +11,10 @@
 #include <array>
 #include <cctype>
 #include <cmath>
+#include <cstdlib>
+#include <iomanip>
 #include <limits>
+#include <locale>
 #include <map>
 #include <numeric>
 #include <optional>
@@ -31,6 +34,7 @@
 #include "clef.h"
 #include "comparison.h"
 #include "controlelement.h"
+#include "dir.h"
 #include "doc.h"
 #include "durationinterface.h"
 #include "dynam.h"
@@ -55,6 +59,8 @@
 #include "smufl.h"
 #include "staff.h"
 #include "staffdef.h"
+#include "tempo.h"
+#include "text.h"
 #include "timeinterface.h"
 #include "transposition.h"
 #include "trill.h"
@@ -78,6 +84,8 @@ namespace musicxmloutput {
         const char *type;
         int dots;
         const char *beamValue = NULL;
+        int startTick = 0;
+        int endTick = 0;
     };
 
     struct MusicXmlSlurEndpoint {
@@ -107,6 +115,12 @@ namespace musicxmloutput {
         int voice;
         const InstrDef *instrument;
         std::vector<MusicXmlEvent> events;
+        int durationTicks = 0;
+    };
+
+    struct MusicXmlMeasure {
+        std::vector<MusicXmlVoice> voices;
+        int durationTicks = 0;
     };
 
     struct MusicXmlVoiceDef {
@@ -121,17 +135,39 @@ namespace musicxmloutput {
         std::map<int, MusicXmlVoiceDef> voices;
     };
 
-    struct MusicXmlWedge {
-        const Hairpin *hairpin;
-        int number;
-        bool start;
+    struct MusicXmlWords {
+        const Dir *directive;
+        std::string text;
     };
 
+    struct MusicXmlTempo {
+        std::string text;
+        std::string language;
+        const char *beatUnit = NULL;
+        std::string perMinute;
+        int dots = 0;
+        bool parentheses = false;
+        std::string bpm;
+    };
+
+    enum class MusicXmlDirectionKind { Dynamic, Words, Wedge, Tempo };
+    enum class MusicXmlDirectionEndpoint { Point, Start, Stop };
+
     struct MusicXmlDirection {
-        std::variant<std::string, MusicXmlWedge> marking;
+        MusicXmlDirectionKind GetKind() const
+        {
+            if (std::holds_alternative<std::string>(marking)) return MusicXmlDirectionKind::Dynamic;
+            if (std::holds_alternative<MusicXmlWords>(marking)) return MusicXmlDirectionKind::Words;
+            if (std::holds_alternative<const Hairpin *>(marking)) return MusicXmlDirectionKind::Wedge;
+            return MusicXmlDirectionKind::Tempo;
+        }
+
+        std::variant<std::string, MusicXmlWords, const Hairpin *, MusicXmlTempo> marking;
         data_STAFFREL placement;
         int staff;
         Fraction offset;
+        MusicXmlDirectionEndpoint endpoint = MusicXmlDirectionEndpoint::Point;
+        int number = 0;
     };
 
     struct MusicXmlBarline {
@@ -154,7 +190,7 @@ namespace musicxmloutput {
         const InstrDef *instrument;
         std::string id;
         std::vector<MusicXmlStaff> staves;
-        std::vector<std::vector<MusicXmlVoice>> measures;
+        std::vector<MusicXmlMeasure> measures;
         std::map<std::string, const InstrDef *> layerInstruments;
         std::vector<std::vector<MusicXmlDirection>> directions;
         std::map<size_t, MusicXmlBarlineFermatas> barlineFermatas;
@@ -177,8 +213,19 @@ namespace musicxmloutput {
         std::variant<Fraction, double> position;
     };
 
-    struct MusicXmlHairpinSpan {
-        const Hairpin *hairpin;
+    struct MusicXmlDirectionTarget {
+        int GetStaffNumber() const { return static_cast<int>(staff) + 1; }
+
+        size_t part;
+        size_t staff;
+        Fraction offset;
+    };
+
+    using MusicXmlDirectionTime = std::pair<size_t, int>;
+
+    struct MusicXmlDirectionSpan {
+        // The index refers to words already collected in the start measure.
+        std::variant<size_t, const Hairpin *> source;
         size_t part;
         int staff;
         size_t startMeasure;
@@ -409,7 +456,7 @@ namespace musicxmloutput {
 
     bool CollectMusicXmlPartMeasure(MusicXmlPart &part, const Measure *measure, int &divisions)
     {
-        std::vector<MusicXmlVoice> &voices = part.measures.emplace_back();
+        std::vector<MusicXmlVoice> &voices = part.measures.emplace_back().voices;
         int staffNumber = 0;
         for (const MusicXmlStaff &staff : part.staves) {
             ++staffNumber;
@@ -481,18 +528,42 @@ namespace musicxmloutput {
         return duration.GetNumerator() * (divisions / duration.GetDenominator());
     }
 
-    bool CollectMusicXmlElementPositions(
+    bool PlanMusicXmlEventTiming(std::vector<MusicXmlPart> &parts, int divisions)
+    {
+        // Directions may require finer divisions. Keep event timing in rhythm ticks until writing.
+        for (MusicXmlPart &part : parts) {
+            for (MusicXmlMeasure &measure : part.measures) {
+                for (MusicXmlVoice &voice : measure.voices) {
+                    int tick = 0;
+                    for (MusicXmlEvent &event : voice.events) {
+                        const int duration = GetMusicXmlTicks(event.duration, divisions);
+                        if (duration > std::numeric_limits<int>::max() - tick) {
+                            LogError("MusicXML output measure duration overflow");
+                            return false;
+                        }
+                        event.startTick = tick;
+                        tick += duration;
+                        event.endTick = tick;
+                    }
+                    voice.durationTicks = tick;
+                    measure.durationTicks = std::max(measure.durationTicks, tick);
+                }
+            }
+        }
+        return true;
+    }
+
+    void CollectMusicXmlElementPositions(
         const std::vector<MusicXmlPart> &parts, int divisions, MusicXmlElementPositionMap &positions)
     {
         // The order of notes in a MusicXML part can differ from score time when a measure has multiple voices.
         for (size_t part = 0; part < parts.size(); ++part) {
             size_t order = 0;
-            const std::vector<std::vector<MusicXmlVoice>> &measures = parts.at(part).measures;
+            const std::vector<MusicXmlMeasure> &measures = parts.at(part).measures;
             for (size_t measure = 0; measure < measures.size(); ++measure) {
-                for (const MusicXmlVoice &voice : measures.at(measure)) {
-                    int tick = 0;
+                for (const MusicXmlVoice &voice : measures.at(measure).voices) {
                     for (const MusicXmlEvent &event : voice.events) {
-                        const Fraction offset(tick, divisions);
+                        const Fraction offset(event.startTick, divisions);
                         if (event.element && !event.element->Is(NOTE)) {
                             positions.emplace(event.element,
                                 MusicXmlElementPosition{ part, measure, order, offset, voice.staff, voice.voice });
@@ -505,17 +576,10 @@ namespace musicxmloutput {
                                             part, measure, order++, offset, voice.staff, voice.voice });
                                 }
                             });
-                        const int duration = GetMusicXmlTicks(event.duration, divisions);
-                        if (duration > std::numeric_limits<int>::max() - tick) {
-                            LogError("MusicXML output measure duration overflow");
-                            return false;
-                        }
-                        tick += duration;
                     }
                 }
             }
         }
-        return true;
     }
 
     void CollectMusicXmlSlurs(const std::vector<const Slur *> &slurs, const MusicXmlElementPositionMap &positions,
@@ -571,13 +635,20 @@ namespace musicxmloutput {
             return std::nullopt;
         }
 
-        // Recover the rhythm from the MEI double without changing any already planned ticks.
+        // Prefer an exact grid position. MEI reads timestamps through float, so also accept the first
+        // position on the grid that rounds to the same float when the stored beat has that precision.
+        const bool isFloat = beat == static_cast<float>(beat);
+        std::optional<Fraction> roundedOffset;
         for (int resolution = divisions; resolution <= maxMusicXmlDivisions; resolution += divisions) {
             const double ticks = quarters * resolution;
             const double rounded = std::round(ticks);
             if (std::abs(ticks - rounded) < 1e-8) return Fraction(static_cast<int>(rounded), resolution);
+            if (isFloat && !roundedOffset) {
+                const double gridBeat = 1.0 + (rounded / resolution) * staff.meterUnit / 4.0;
+                if (static_cast<float>(gridBeat) == beat) roundedOffset.emplace(static_cast<int>(rounded), resolution);
+            }
         }
-        return std::nullopt;
+        return roundedOffset;
     }
 
     std::optional<MusicXmlAnchor> GetMusicXmlIdAnchor(
@@ -616,6 +687,21 @@ namespace musicxmloutput {
         return GetMusicXmlTimestampOffset(std::get<double>(anchor.position), staff, divisions);
     }
 
+    std::optional<Fraction> GetMusicXmlDirectionEndOffset(const std::optional<MusicXmlAnchor> &end, size_t startMeasure,
+        Fraction startOffset, const MusicXmlStaff &staff, int &divisions)
+    {
+        if (!end || end->measure < startMeasure) return std::nullopt;
+        const std::optional<Fraction> offset = GetMusicXmlDirectionOffset(*end, staff, divisions);
+        if (!offset) return std::nullopt;
+        const int resolution = std::lcm(divisions, offset->GetDenominator());
+        if (end->measure == startMeasure
+            && GetMusicXmlTicks(*offset, resolution) <= GetMusicXmlTicks(startOffset, resolution)) {
+            return std::nullopt;
+        }
+        divisions = resolution;
+        return offset;
+    }
+
     MusicXmlStaffPositionMap GetMusicXmlStaffPositions(const std::vector<MusicXmlPart> &parts)
     {
         MusicXmlStaffPositionMap staffPositions;
@@ -636,29 +722,25 @@ namespace musicxmloutput {
     enum class MusicXmlEventMatch { Onset, Before, OnsetOrBefore, End };
 
     const LayerElement *FindMusicXmlEventAtOffset(const std::vector<MusicXmlVoice> &voices, int staff, double tick,
-        MusicXmlEventMatch match, int divisions, int &endTick, int voiceNumber = 0, bool notesOnly = false)
+        MusicXmlEventMatch match, int voiceNumber = 0, bool notesOnly = false)
     {
         const LayerElement *target = NULL;
         int latest = -1;
         for (const MusicXmlVoice &voice : voices) {
-            int onset = 0;
+            if (voice.staff != staff || (voiceNumber && voice.voice != voiceNumber)) continue;
             for (const MusicXmlEvent &event : voice.events) {
-                const int end = onset + GetMusicXmlTicks(event.duration, divisions);
-                if (voice.staff == staff && (!voiceNumber || voice.voice == voiceNumber) && onset > latest
-                    && IsMusicXmlPauseAnchor(event.element)
-                    && (!notesOnly || event.element->IsAnyOf(std::array{ NOTE, CHORD }))) {
-                    const double delta = tick - (match == MusicXmlEventMatch::End ? end : onset);
-                    const bool samePosition = std::abs(delta) < 1e-8;
-                    if ((samePosition && match != MusicXmlEventMatch::Before)
-                        || (delta >= 1e-8
-                            && (match == MusicXmlEventMatch::Before || match == MusicXmlEventMatch::OnsetOrBefore))) {
-                        target = event.element;
-                        latest = onset;
-                    }
+                if (event.startTick <= latest || !IsMusicXmlPauseAnchor(event.element)
+                    || (notesOnly && !event.element->IsAnyOf(std::array{ NOTE, CHORD }))) {
+                    continue;
                 }
-                onset = end;
+                const double delta = tick - (match == MusicXmlEventMatch::End ? event.endTick : event.startTick);
+                if ((std::abs(delta) < 1e-8 && match != MusicXmlEventMatch::Before)
+                    || (delta >= 1e-8
+                        && (match == MusicXmlEventMatch::Before || match == MusicXmlEventMatch::OnsetOrBefore))) {
+                    target = event.element;
+                    latest = event.startTick;
+                }
             }
-            endTick = std::max(endTick, onset);
         }
         return target;
     }
@@ -711,18 +793,17 @@ namespace musicxmloutput {
                         const double offset = GetMusicXmlAnchorOffset(*anchor, part.staves.at(staffIndex));
                         if (!std::isfinite(offset) || offset < 0.0) continue;
                         const double tick = offset * divisions;
-                        int endTick = 0;
+                        const MusicXmlMeasure &measure = part.measures.at(anchor->measure);
                         // A timestamped breath or caesura belongs to the preceding event.
                         const MusicXmlEventMatch match = fermata ? MusicXmlEventMatch::Onset
                             : start                              ? MusicXmlEventMatch::OnsetOrBefore
                                                                  : MusicXmlEventMatch::Before;
-                        target = FindMusicXmlEventAtOffset(
-                            part.measures.at(anchor->measure), xmlStaff, tick, match, divisions, endTick);
-                        if (fermata && beat && std::abs(tick - endTick) < 1e-8) {
+                        target = FindMusicXmlEventAtOffset(measure.voices, xmlStaff, tick, match);
+                        if (fermata && beat && std::abs(tick - measure.durationTicks) < 1e-8) {
                             collected |= AddMusicXmlBarlineFermata(part, anchor->measure, false, fermata);
                             continue;
                         }
-                        if (tick > endTick + 1e-8) continue;
+                        if (tick > measure.durationTicks + 1e-8) continue;
                     }
                     if (!IsMusicXmlPauseAnchor(target)) continue;
                     if (target->Is(CHORD)) target = GetMusicXmlNoteAnchor(target);
@@ -749,15 +830,14 @@ namespace musicxmloutput {
         // MusicXML puts the stop on the last covered note, while MEI uses the position where the line ends.
         if (tick == 0.0) {
             if (measure == start.measure) return NULL;
-            const std::vector<MusicXmlVoice> &voices = part.measures.at(--measure);
+            const std::vector<MusicXmlVoice> &voices = part.measures.at(--measure).voices;
             const std::vector<MusicXmlVoice>::const_iterator voice = std::find_if(voices.begin(), voices.end(),
                 [&start](const MusicXmlVoice &entry) { return entry.voice == start.voice; });
             if (voice == voices.end()) return NULL;
-            for (const MusicXmlEvent &event : voice->events) tick += GetMusicXmlTicks(event.duration, divisions);
+            tick = voice->durationTicks;
         }
-        int endTick = 0;
-        const LayerElement *end = FindMusicXmlEventAtOffset(part.measures.at(measure), start.staff, tick,
-            MusicXmlEventMatch::End, divisions, endTick, start.voice, true);
+        const LayerElement *end = FindMusicXmlEventAtOffset(
+            part.measures.at(measure).voices, start.staff, tick, MusicXmlEventMatch::End, start.voice, true);
         if (end && end->Is(CHORD)) return vrv_cast<const Note *>(end->GetLast(NOTE));
         return dynamic_cast<const Note *>(end);
     }
@@ -831,11 +911,10 @@ namespace musicxmloutput {
                         const MusicXmlEventMatch match = (turn && turn->GetDelayed() == BOOLEAN_true)
                             ? MusicXmlEventMatch::OnsetOrBefore
                             : MusicXmlEventMatch::Onset;
-                        int endTick = 0;
                         const double tick = offset * divisions;
-                        target = FindMusicXmlEventAtOffset(
-                            part.measures.at(anchor->measure), xmlStaff, tick, match, divisions, endTick, 0, true);
-                        if (tick > endTick + 1e-8) continue;
+                        const MusicXmlMeasure &measure = part.measures.at(anchor->measure);
+                        target = FindMusicXmlEventAtOffset(measure.voices, xmlStaff, tick, match, 0, true);
+                        if (tick > measure.durationTicks + 1e-8) continue;
                     }
                     const Note *note = GetMusicXmlNoteAnchor(target);
                     if (!note) continue;
@@ -883,6 +962,31 @@ namespace musicxmloutput {
         part.directions.at(measure).push_back(std::move(direction));
     }
 
+    template <typename Collect>
+    bool CollectMusicXmlDirectionTargets(const MusicXmlAnchor &anchor, const std::vector<const Staff *> &staves,
+        const MusicXmlStaffPositionMap &staffPositions, const std::vector<MusicXmlPart> &parts, int &divisions,
+        Collect collect)
+    {
+        bool collected = false;
+        for (const Staff *source : staves) {
+            const MusicXmlStaffPositionMap::const_iterator position = staffPositions.find(source->GetN());
+            if (position == staffPositions.end()) continue;
+            const size_t part = position->second.first;
+            const size_t staff = position->second.second;
+            const std::optional<Fraction> offset
+                = GetMusicXmlDirectionOffset(anchor, parts.at(part).staves.at(staff), divisions);
+            if (!offset) continue;
+
+            // A rejected target must not change the resolution available to subsequent targets.
+            int resolution = std::lcm(divisions, offset->GetDenominator());
+            if (collect(MusicXmlDirectionTarget{ part, staff, *offset }, resolution)) {
+                divisions = resolution;
+                collected = true;
+            }
+        }
+        return collected;
+    }
+
     void CollectMusicXmlDynamics(const std::vector<std::pair<size_t, const Dynam *>> &dynamics,
         const std::vector<const Measure *> &measures, const MusicXmlElementPositionMap &positions,
         const MusicXmlStaffPositionMap &staffPositions, std::vector<MusicXmlPart> &parts, int &divisions)
@@ -900,21 +1004,13 @@ namespace musicxmloutput {
                 LogWarning("MusicXML output could not locate dynam '%s'", dynam->GetID().c_str());
                 continue;
             }
-            bool collected = false;
-            for (const Staff *source : dynam->GetTstampStaves(measures.at(start->measure), dynam)) {
-                const MusicXmlStaffPositionMap::const_iterator position = staffPositions.find(source->GetN());
-                if (position == staffPositions.end()) continue;
-                MusicXmlPart &part = parts.at(position->second.first);
-                const size_t staffIndex = position->second.second;
-                const MusicXmlStaff &staff = part.staves.at(staffIndex);
-                const std::optional<Fraction> offset = GetMusicXmlDirectionOffset(*start, staff, divisions);
-                if (!offset) continue;
-
-                divisions = std::lcm(divisions, offset->GetDenominator());
-                AddMusicXmlDirection(
-                    part, start->measure, { text, dynam->GetPlace(), static_cast<int>(staffIndex) + 1, *offset });
-                collected = true;
-            }
+            const bool collected
+                = CollectMusicXmlDirectionTargets(*start, dynam->GetTstampStaves(measures.at(start->measure), dynam),
+                    staffPositions, parts, divisions, [&](const MusicXmlDirectionTarget &target, int &) {
+                        AddMusicXmlDirection(parts.at(target.part), start->measure,
+                            { text, dynam->GetPlace(), target.GetStaffNumber(), target.offset });
+                        return true;
+                    });
             if (!collected) {
                 LogWarning("MusicXML output could not place dynam '%s' on a staff at a supported offset",
                     dynam->GetID().c_str());
@@ -922,10 +1018,247 @@ namespace musicxmloutput {
         }
     }
 
+    std::u32string GetMusicXmlText(const ListOfConstObjects &children)
+    {
+        std::u32string text;
+        for (const Object *child : children) {
+            if (child->Is(LB)) {
+                text += U'\n';
+            }
+            else {
+                text += vrv_cast<const Text *>(child)->GetText();
+            }
+        }
+        // The importer splits words into lines and discards the final line break.
+        while (!text.empty() && text.back() == U'\n') text.pop_back();
+        return text;
+    }
+
+    void AddMusicXmlDirectionSpans(std::vector<MusicXmlDirectionSpan> &spans, std::vector<MusicXmlPart> &parts,
+        int plannedDivisions, int &divisions)
+    {
+        std::stable_sort(spans.begin(), spans.end(),
+            [plannedDivisions](const MusicXmlDirectionSpan &left, const MusicXmlDirectionSpan &right) {
+                return std::tuple{ left.part, left.startMeasure, GetMusicXmlTicks(left.startOffset, plannedDivisions),
+                    left.staff }
+                < std::tuple{ right.part, right.startMeasure, GetMusicXmlTicks(right.startOffset, plannedDivisions),
+                      right.staff };
+            });
+
+        // Each call numbers a single kind of span. A number can be reused as soon as the previous span stops.
+        std::array<MusicXmlDirectionTime, 16> availableAt{};
+        size_t partIndex = 0;
+        for (const MusicXmlDirectionSpan &span : spans) {
+            if (partIndex != span.part) {
+                partIndex = span.part;
+                availableAt.fill({ 0, 0 });
+            }
+            const MusicXmlDirectionTime startTime{ span.startMeasure,
+                GetMusicXmlTicks(span.startOffset, plannedDivisions) };
+            const std::array<MusicXmlDirectionTime, 16>::iterator available = std::find_if(availableAt.begin(),
+                availableAt.end(), [&startTime](MusicXmlDirectionTime end) { return end <= startTime; });
+            const int number
+                = available == availableAt.end() ? 0 : static_cast<int>(available - availableAt.begin()) + 1;
+            MusicXmlPart &part = parts.at(span.part);
+            if (const size_t *startIndex = std::get_if<size_t>(&span.source)) {
+                MusicXmlDirection &start = part.directions.at(span.startMeasure).at(*startIndex);
+                const Dir *directive = std::get<MusicXmlWords>(start.marking).directive;
+                if (!number) {
+                    LogWarning("MusicXML output omits the extender of dir '%s' because all 16 numbers are in use",
+                        directive->GetID().c_str());
+                    continue;
+                }
+                start.endpoint = MusicXmlDirectionEndpoint::Start;
+                start.number = number;
+                AddMusicXmlDirection(part, span.endMeasure,
+                    { MusicXmlWords{ directive, {} }, start.placement, span.staff, span.endOffset,
+                        MusicXmlDirectionEndpoint::Stop, number });
+            }
+            else {
+                const Hairpin *hairpin = std::get<const Hairpin *>(span.source);
+                if (!number) {
+                    LogWarning("MusicXML output omits hairpin '%s' because all 16 wedge numbers are in use",
+                        hairpin->GetID().c_str());
+                    continue;
+                }
+                AddMusicXmlDirection(part, span.startMeasure,
+                    { hairpin, hairpin->GetPlace(), span.staff, span.startOffset, MusicXmlDirectionEndpoint::Start,
+                        number });
+                AddMusicXmlDirection(part, span.endMeasure,
+                    { hairpin, hairpin->GetPlace(), span.staff, span.endOffset, MusicXmlDirectionEndpoint::Stop,
+                        number });
+            }
+            *available = { span.endMeasure, GetMusicXmlTicks(span.endOffset, plannedDivisions) };
+            divisions = std::lcm(divisions, span.startOffset.GetDenominator());
+            divisions = std::lcm(divisions, span.endOffset.GetDenominator());
+        }
+    }
+
+    void CollectMusicXmlDirectives(const std::vector<std::pair<size_t, const Dir *>> &directives,
+        const std::vector<const Measure *> &measures, const MusicXmlElementPositionMap &positions,
+        const MusicXmlStaffPositionMap &staffPositions, std::vector<MusicXmlPart> &parts, int &divisions)
+    {
+        std::vector<MusicXmlDirectionSpan> spans;
+        for (const std::pair<size_t, const Dir *> &entry : directives) {
+            const Dir *directive = entry.second;
+            const std::string text = UTF32to8(GetMusicXmlText(directive->GetList()));
+            // The importer treats these words as dynamics even when encoded as a text direction.
+            if (directive->IsStageDir() || text.find_first_not_of(" \t\r\n") == std::string::npos
+                || text.starts_with("cresc") || text.starts_with("dim") || text.starts_with("decresc")) {
+                LogWarning("MusicXML output omits unsupported %s '%s'", directive->GetClassName().c_str(),
+                    directive->GetID().c_str());
+                continue;
+            }
+
+            const std::optional<MusicXmlAnchor> start = GetMusicXmlStartAnchor(*directive, entry.first, positions);
+            if (!start) {
+                LogWarning("MusicXML output could not locate dir '%s'", directive->GetID().c_str());
+                continue;
+            }
+            const std::optional<MusicXmlAnchor> end = directive->IsExtenderElement()
+                ? GetMusicXmlEndAnchor(*directive, entry.first, measures.size(), positions)
+                : std::nullopt;
+            bool extended = false;
+            const bool collected = CollectMusicXmlDirectionTargets(*start,
+                directive->GetTstampStaves(measures.at(start->measure), directive), staffPositions, parts, divisions,
+                [&](const MusicXmlDirectionTarget &target, int &resolution) {
+                    MusicXmlPart &part = parts.at(target.part);
+                    AddMusicXmlDirection(part, start->measure,
+                        { MusicXmlWords{ directive, text }, directive->GetPlace(), target.GetStaffNumber(),
+                            target.offset });
+                    const std::optional<Fraction> endOffset = GetMusicXmlDirectionEndOffset(
+                        end, start->measure, target.offset, part.staves.at(target.staff), resolution);
+                    if (endOffset) {
+                        spans.push_back({ part.directions.at(start->measure).size() - 1, target.part,
+                            target.GetStaffNumber(), start->measure, end->measure, target.offset, *endOffset });
+                        extended = true;
+                    }
+                    return true;
+                });
+            if (!collected) {
+                LogWarning("MusicXML output could not place dir '%s' on a staff at a supported offset",
+                    directive->GetID().c_str());
+            }
+            else if (directive->IsExtenderElement() && !extended) {
+                LogWarning("MusicXML output could not place the extender of dir '%s'", directive->GetID().c_str());
+            }
+        }
+        AddMusicXmlDirectionSpans(spans, parts, divisions, divisions);
+    }
+
+    std::string MusicXmlTempoDecimal(double value)
+    {
+        if (!std::isfinite(value) || value <= 0.0) return "";
+        // MusicXML sound/tempo has an XML decimal value, which cannot use an exponent.
+        const int exponent = static_cast<int>(std::floor(std::log10(value)));
+        const int places = std::max(0, std::numeric_limits<double>::digits10 - 1 - exponent);
+        std::ostringstream decimal;
+        decimal.imbue(std::locale::classic());
+        decimal << std::fixed << std::setprecision(places) << value;
+        std::string text = decimal.str();
+        if (places > 0) {
+            text.erase(text.find_last_not_of('0') + 1);
+            if (text.back() == '.') text.pop_back();
+        }
+        return text;
+    }
+
+    void ExtractMusicXmlMetronomeText(std::u32string &text, MusicXmlTempo &marking, data_DURATION unit, double mm)
+    {
+        static constexpr char32_t glyphs[] = { SMUFL_ECA0_metNoteDoubleWhole, SMUFL_ECA2_metNoteWhole,
+            SMUFL_ECA3_metNoteHalfUp, SMUFL_ECA5_metNoteQuarterUp, SMUFL_ECA7_metNote8thUp, SMUFL_ECA9_metNote16thUp,
+            SMUFL_ECAB_metNote32ndUp, SMUFL_ECAD_metNote64thUp, SMUFL_ECAF_metNote128thUp, SMUFL_ECB1_metNote256thUp,
+            SMUFL_ECB3_metNote512thUp, SMUFL_ECB5_metNote1024thUp };
+        const char32_t glyph = glyphs[unit - DURATION_breve];
+        const char32_t noteGlyph = glyph - (SMUFL_ECA0_metNoteDoubleWhole - SMUFL_E1D0_noteDoubleWhole);
+        const std::u32string beatGlyphs{ glyph, noteGlyph, unit == DURATION_4 ? U'\u2669' : glyph };
+        const size_t beat = text.find_last_of(beatGlyphs);
+        if (beat == std::u32string::npos) return;
+        const size_t equals = text.find(U'=', beat + 1);
+        if (equals == std::u32string::npos
+            || text.substr(beat + 1, equals - beat - 1).find_first_not_of(U" \t.\uECB7") != std::u32string::npos) {
+            return;
+        }
+        const size_t first = text.find_first_not_of(U" \t", equals + 1);
+        if (first == std::u32string::npos) return;
+        const size_t beforeBeat = beat == 0 ? std::u32string::npos : text.find_last_not_of(U" \t", beat - 1);
+        const size_t last = text.find_last_not_of(U" \t");
+        const bool parentheses = beforeBeat < beat && text[beforeBeat] == U'(' && text[last] == U')';
+        const std::string perMinute = UTF32to8(text.substr(first, last + 1 - first - (parentheses ? 1 : 0)));
+        const size_t number = perMinute.find_first_of("0123456789");
+        if (number == std::string::npos || std::strtod(perMinute.c_str() + number, NULL) != mm) return;
+
+        // The importer stores the metronome glyphs and printed rate in the MEI text as well as the tempo attributes.
+        marking.perMinute = perMinute;
+        marking.parentheses = parentheses;
+        text.resize(parentheses ? beforeBeat : beat);
+        while (!text.empty() && (text.back() == U' ' || text.back() == U'\t')) text.pop_back();
+    }
+
+    void CollectMusicXmlTempos(const std::vector<std::pair<size_t, const Tempo *>> &tempos,
+        const std::vector<const Measure *> &measures, const MusicXmlElementPositionMap &positions,
+        const MusicXmlStaffPositionMap &staffPositions, std::vector<MusicXmlPart> &parts, int &divisions)
+    {
+        ClassIdsComparison textTypes({ LB, TEXT });
+        for (const std::pair<size_t, const Tempo *> &entry : tempos) {
+            const Tempo *tempo = entry.second;
+            MusicXmlTempo marking;
+            marking.language = tempo->GetLang();
+            if (tempo->HasMidiBpm()) marking.bpm = MusicXmlTempoDecimal(tempo->GetMidiBpm());
+
+            ListOfConstObjects textElements;
+            tempo->FindAllDescendantsByComparison(&textElements, &textTypes);
+            std::u32string text = GetMusicXmlText(textElements);
+            const data_DURATION unit = tempo->HasMmUnit() ? tempo->GetMmUnit() : DURATION_4;
+            const int dots = tempo->HasMmDots() ? tempo->GetMmDots() : 0;
+            if (tempo->HasMm() && unit >= DURATION_breve && unit <= DURATION_1024 && dots >= 0 && dots <= 8) {
+                marking.perMinute = MusicXmlTempoDecimal(tempo->GetMm());
+                if (!marking.perMinute.empty()) {
+                    marking.beatUnit = GetMusicXmlNoteType(unit);
+                    marking.dots = dots;
+                    ExtractMusicXmlMetronomeText(text, marking, unit, tempo->GetMm());
+                }
+            }
+            marking.text = UTF32to8(text);
+            if (marking.text.find_first_not_of(" \t\r\n") == std::string::npos) marking.text.clear();
+            if (!marking.beatUnit && marking.bpm.empty()) {
+                // The importer recognizes a tempo direction by a metronome or sound tempo, and reads words alone as
+                // dir.
+                LogWarning("MusicXML output omits tempo '%s' without a supported metronome mark or MIDI BPM",
+                    tempo->GetID().c_str());
+                continue;
+            }
+            if (tempo->IsExtenderElement() || tempo->HasEndid() || tempo->HasTstamp2()) {
+                LogWarning("MusicXML output omits the unsupported span of tempo '%s'", tempo->GetID().c_str());
+            }
+
+            const std::optional<MusicXmlAnchor> start = GetMusicXmlStartAnchor(*tempo, entry.first, positions);
+            if (!start) {
+                LogWarning("MusicXML output could not locate tempo '%s'", tempo->GetID().c_str());
+                continue;
+            }
+            const Measure *measure = measures.at(start->measure);
+            std::vector<const Staff *> staves = tempo->GetTstampStaves(measure, tempo);
+            if (staves.empty() && !tempo->HasStaff() && !tempo->HasPart()) {
+                if (const Staff *staff = measure->GetFirstStaff()) staves.push_back(staff);
+            }
+            const bool collected = CollectMusicXmlDirectionTargets(
+                *start, staves, staffPositions, parts, divisions, [&](const MusicXmlDirectionTarget &target, int &) {
+                    AddMusicXmlDirection(parts.at(target.part), start->measure,
+                        { marking, tempo->GetPlace(), target.GetStaffNumber(), target.offset });
+                    return true;
+                });
+            if (!collected) {
+                LogWarning("MusicXML output could not place tempo '%s' on a staff at a supported offset",
+                    tempo->GetID().c_str());
+            }
+        }
+    }
+
     void PlanMusicXmlHairpinSpans(const std::vector<std::pair<size_t, const Hairpin *>> &hairpins,
         const std::vector<const Measure *> &measures, const MusicXmlElementPositionMap &positions,
         const MusicXmlStaffPositionMap &staffPositions, const std::vector<MusicXmlPart> &parts,
-        std::vector<MusicXmlHairpinSpan> &spans, int &divisions)
+        std::vector<MusicXmlDirectionSpan> &spans, int &divisions)
     {
         for (const std::pair<size_t, const Hairpin *> &entry : hairpins) {
             const Hairpin *hairpin = entry.second;
@@ -938,29 +1271,17 @@ namespace musicxmloutput {
                 continue;
             }
 
-            bool collected = false;
-            for (const Staff *source : hairpin->GetTstampStaves(measures.at(start->measure), hairpin)) {
-                const MusicXmlStaffPositionMap::const_iterator position = staffPositions.find(source->GetN());
-                if (position == staffPositions.end()) continue;
-                const size_t partIndex = position->second.first;
-                const size_t staffIndex = position->second.second;
-                const MusicXmlStaff &staff = parts.at(partIndex).staves.at(staffIndex);
-                const std::optional<Fraction> startOffset = GetMusicXmlDirectionOffset(*start, staff, divisions);
-                if (!startOffset) continue;
-                int resolution = std::lcm(divisions, startOffset->GetDenominator());
-                const std::optional<Fraction> endOffset = GetMusicXmlDirectionOffset(*end, staff, resolution);
-                if (!endOffset) continue;
-                resolution = std::lcm(resolution, endOffset->GetDenominator());
-                if (end->measure == start->measure
-                    && GetMusicXmlTicks(*endOffset, resolution) <= GetMusicXmlTicks(*startOffset, resolution)) {
-                    continue;
-                }
-
-                divisions = resolution;
-                spans.push_back({ hairpin, partIndex, static_cast<int>(staffIndex) + 1, start->measure, end->measure,
-                    *startOffset, *endOffset });
-                collected = true;
-            }
+            const bool collected = CollectMusicXmlDirectionTargets(*start,
+                hairpin->GetTstampStaves(measures.at(start->measure), hairpin), staffPositions, parts, divisions,
+                [&](const MusicXmlDirectionTarget &target, int &resolution) {
+                    const MusicXmlStaff &staff = parts.at(target.part).staves.at(target.staff);
+                    const std::optional<Fraction> endOffset
+                        = GetMusicXmlDirectionEndOffset(end, start->measure, target.offset, staff, resolution);
+                    if (!endOffset) return false;
+                    spans.push_back({ hairpin, target.part, target.GetStaffNumber(), start->measure, end->measure,
+                        target.offset, *endOffset });
+                    return true;
+                });
             if (!collected) {
                 LogWarning(
                     "MusicXML output could not place hairpin '%s' at supported offsets", hairpin->GetID().c_str());
@@ -968,69 +1289,33 @@ namespace musicxmloutput {
         }
     }
 
-    void AddMusicXmlHairpins(
-        std::vector<MusicXmlHairpinSpan> &spans, std::vector<MusicXmlPart> &parts, int plannedDivisions, int &divisions)
+    void SortMusicXmlDirections(MusicXmlPart &part, int divisions)
     {
-        if (spans.empty()) return;
-        std::stable_sort(spans.begin(), spans.end(),
-            [plannedDivisions](const MusicXmlHairpinSpan &left, const MusicXmlHairpinSpan &right) {
-                return std::tuple{ left.part, left.startMeasure, GetMusicXmlTicks(left.startOffset, plannedDivisions),
-                    left.staff }
-                < std::tuple{ right.part, right.startMeasure, GetMusicXmlTicks(right.startOffset, plannedDivisions),
-                      right.staff };
-            });
-
-        // Number wedges in the order they appear in each part. Reuse a number after its stop.
-        std::array<std::pair<size_t, int>, 16> availableAt{};
-        size_t partIndex = 0;
-        for (const MusicXmlHairpinSpan &span : spans) {
-            if (partIndex != span.part) {
-                partIndex = span.part;
-                availableAt.fill({ 0, 0 });
-            }
-            const std::pair<size_t, int> start{ span.startMeasure,
-                GetMusicXmlTicks(span.startOffset, plannedDivisions) };
-            const std::array<std::pair<size_t, int>, 16>::iterator available = std::find_if(availableAt.begin(),
-                availableAt.end(), [&start](const std::pair<size_t, int> &end) { return end <= start; });
-            if (available == availableAt.end()) {
-                LogWarning("MusicXML output omits hairpin '%s' because all 16 wedge numbers are in use",
-                    span.hairpin->GetID().c_str());
-                continue;
-            }
-            const int number = static_cast<int>(available - availableAt.begin()) + 1;
-            *available = { span.endMeasure, GetMusicXmlTicks(span.endOffset, plannedDivisions) };
-            divisions = std::lcm(divisions, span.startOffset.GetDenominator());
-            divisions = std::lcm(divisions, span.endOffset.GetDenominator());
-            MusicXmlPart &part = parts.at(partIndex);
-            const data_STAFFREL placement = span.hairpin->GetPlace();
-            AddMusicXmlDirection(part, span.startMeasure,
-                { MusicXmlWedge{ span.hairpin, number, true }, placement, span.staff, span.startOffset });
-            AddMusicXmlDirection(part, span.endMeasure,
-                { MusicXmlWedge{ span.hairpin, number, false }, placement, span.staff, span.endOffset });
-        }
-
-        for (MusicXmlPart &part : parts) {
-            for (std::vector<MusicXmlDirection> &directions : part.directions) {
-                // Keep dynamics in their existing order. Write wedge endpoints chronologically, with a reused
-                // number's stop first when a span ends at the next start.
-                std::stable_sort(directions.begin(), directions.end(),
-                    [divisions](const MusicXmlDirection &left, const MusicXmlDirection &right) {
-                        const bool leftWedge = std::holds_alternative<MusicXmlWedge>(left.marking);
-                        const bool rightWedge = std::holds_alternative<MusicXmlWedge>(right.marking);
-                        if (leftWedge != rightWedge) return rightWedge;
-                        return leftWedge
-                            && GetMusicXmlTicks(left.offset, divisions) < GetMusicXmlTicks(right.offset, divisions);
-                    });
-            }
+        for (std::vector<MusicXmlDirection> &directions : part.directions) {
+            // Keep dynamics in their existing order and sort each kind of extender chronologically.
+            std::stable_sort(directions.begin(), directions.end(),
+                [divisions](const MusicXmlDirection &left, const MusicXmlDirection &right) {
+                    const MusicXmlDirectionKind kind = left.GetKind();
+                    if (kind != right.GetKind()) return kind < right.GetKind();
+                    if (kind == MusicXmlDirectionKind::Dynamic) return false;
+                    const int leftTick = GetMusicXmlTicks(left.offset, divisions);
+                    const int rightTick = GetMusicXmlTicks(right.offset, divisions);
+                    if (leftTick != rightTick) return leftTick < rightTick;
+                    // Reused numbers must be closed before they are opened again at the same offset.
+                    return left.endpoint == MusicXmlDirectionEndpoint::Stop
+                        && right.endpoint != MusicXmlDirectionEndpoint::Stop;
+                });
         }
     }
 
-    bool CollectMusicXmlControls(const std::vector<const Measure *> &measures, std::vector<MusicXmlPart> &parts,
+    void CollectMusicXmlControls(const std::vector<const Measure *> &measures, std::vector<MusicXmlPart> &parts,
         int &divisions, MusicXmlNoteControlMap &controls)
     {
         std::vector<const Slur *> slurs;
+        std::vector<std::pair<size_t, const Dir *>> directives;
         std::vector<std::pair<size_t, const Dynam *>> dynamics;
         std::vector<std::pair<size_t, const Hairpin *>> hairpins;
+        std::vector<std::pair<size_t, const Tempo *>> tempos;
         std::vector<std::pair<size_t, const ControlElement *>> pauses;
         std::vector<std::pair<size_t, const ControlElement *>> ornaments;
         ClassIdsComparison pauseTypes({ FERMATA, CAESURA, BREATH });
@@ -1047,11 +1332,17 @@ namespace musicxmloutput {
             for (const Object *slur : measure->FindAllDescendantsByType(SLUR)) {
                 slurs.push_back(vrv_cast<const Slur *>(slur));
             }
+            for (const Object *directive : measure->FindAllDescendantsByType(DIR)) {
+                directives.emplace_back(i, vrv_cast<const Dir *>(directive));
+            }
             for (const Object *dynam : measure->FindAllDescendantsByType(DYNAM)) {
                 dynamics.emplace_back(i, vrv_cast<const Dynam *>(dynam));
             }
             for (const Object *hairpin : measure->FindAllDescendantsByType(HAIRPIN)) {
                 hairpins.emplace_back(i, vrv_cast<const Hairpin *>(hairpin));
+            }
+            for (const Object *tempo : measure->FindAllDescendantsByType(TEMPO)) {
+                tempos.emplace_back(i, vrv_cast<const Tempo *>(tempo));
             }
             ListOfConstObjects measurePauses;
             measure->FindAllDescendantsByComparison(&measurePauses, &pauseTypes);
@@ -1064,22 +1355,26 @@ namespace musicxmloutput {
                 ornaments.emplace_back(i, vrv_cast<const ControlElement *>(ornament));
             }
         }
-        if (slurs.empty() && dynamics.empty() && hairpins.empty() && pauses.empty() && ornaments.empty()) return true;
+        const bool hasStaffControls = !directives.empty() || !dynamics.empty() || !hairpins.empty() || !tempos.empty()
+            || !pauses.empty() || !ornaments.empty();
+        if (slurs.empty() && !hasStaffControls) return;
         MusicXmlElementPositionMap positions;
-        if (!CollectMusicXmlElementPositions(parts, divisions, positions)) return false;
+        CollectMusicXmlElementPositions(parts, divisions, positions);
         CollectMusicXmlSlurs(slurs, positions, controls);
-        if (dynamics.empty() && hairpins.empty() && pauses.empty() && ornaments.empty()) return true;
+        if (!hasStaffControls) return;
         const MusicXmlStaffPositionMap staffPositions = GetMusicXmlStaffPositions(parts);
         CollectMusicXmlPauses(pauses, measures, positions, staffPositions, parts, divisions, controls);
         CollectMusicXmlOrnaments(ornaments, measures, positions, staffPositions, parts, divisions, controls);
         CollectMusicXmlDynamics(dynamics, measures, positions, staffPositions, parts, divisions);
         if (!hairpins.empty()) {
-            std::vector<MusicXmlHairpinSpan> spans;
+            std::vector<MusicXmlDirectionSpan> spans;
             int plannedDivisions = divisions;
             PlanMusicXmlHairpinSpans(hairpins, measures, positions, staffPositions, parts, spans, plannedDivisions);
-            AddMusicXmlHairpins(spans, parts, plannedDivisions, divisions);
+            AddMusicXmlDirectionSpans(spans, parts, plannedDivisions, divisions);
         }
-        return true;
+        CollectMusicXmlDirectives(directives, measures, positions, staffPositions, parts, divisions);
+        CollectMusicXmlTempos(tempos, measures, positions, staffPositions, parts, divisions);
+        for (MusicXmlPart &part : parts) SortMusicXmlDirections(part, divisions);
     }
 
     std::string GetMusicXmlPartName(const MusicXmlPart &part)
@@ -1106,14 +1401,13 @@ namespace musicxmloutput {
         }
     }
 
-    void WriteMusicXmlWedge(pugi::xml_node type, const MusicXmlWedge &direction)
+    void WriteMusicXmlWedge(pugi::xml_node type, const Hairpin *hairpin, int number, bool start)
     {
-        const Hairpin *hairpin = direction.hairpin;
         const bool crescendo = hairpin->GetForm() == hairpinLog_FORM_cres;
         pugi::xml_node wedge = type.append_child("wedge");
-        wedge.append_attribute("type") = direction.start ? (crescendo ? "crescendo" : "diminuendo") : "stop";
-        wedge.append_attribute("number") = direction.number;
-        if (direction.start) {
+        wedge.append_attribute("type") = start ? (crescendo ? "crescendo" : "diminuendo") : "stop";
+        wedge.append_attribute("number") = number;
+        if (start) {
             if (hairpin->HasLform()) {
                 wedge.append_attribute("line-type")
                     = hairpin->AttLineRendBase::LineformToStr(hairpin->GetLform()).c_str();
@@ -1125,7 +1419,7 @@ namespace musicxmloutput {
             }
         }
         // A niente circle belongs at the closed end, the spread at the open end.
-        if (direction.start == crescendo) {
+        if (start == crescendo) {
             if (hairpin->HasNiente()) {
                 wedge.append_attribute("niente") = hairpin->GetNiente() == BOOLEAN_true ? "yes" : "no";
             }
@@ -1138,21 +1432,75 @@ namespace musicxmloutput {
         }
     }
 
+    void WriteMusicXmlWords(pugi::xml_node direction, const MusicXmlWords &marking, int number, bool stop)
+    {
+        if (!stop) {
+            pugi::xml_node words = direction.append_child("direction-type").append_child("words");
+            words.text().set(marking.text.c_str());
+            if (marking.directive->HasLang()) words.append_attribute("xml:lang") = marking.directive->GetLang().c_str();
+        }
+        if (!number) return;
+
+        // The importer attaches a line to the words when it follows them in its own direction-type.
+        const data_LINEFORM form = marking.directive->GetLform();
+        const bool dashed = form == LINEFORM_NONE || form == LINEFORM_dashed;
+        pugi::xml_node line = direction.append_child("direction-type").append_child(dashed ? "dashes" : "bracket");
+        line.append_attribute("type") = stop ? "stop" : "start";
+        line.append_attribute("number") = number;
+        if (!dashed) {
+            line.append_attribute("line-end") = "none";
+            line.append_attribute("line-type") = marking.directive->AttLineRendBase::LineformToStr(form).c_str();
+        }
+    }
+
+    void WriteMusicXmlTempo(pugi::xml_node direction, const MusicXmlTempo &marking)
+    {
+        if (!marking.text.empty()) {
+            pugi::xml_node words = direction.append_child("direction-type").append_child("words");
+            words.text().set(marking.text.c_str());
+            // The importer supplies Italian as the default language for tempo words.
+            if (!marking.language.empty() && marking.language != "it") {
+                words.append_attribute("xml:lang") = marking.language.c_str();
+            }
+        }
+        if (!marking.beatUnit && !marking.text.empty()) return;
+        pugi::xml_node metronome = direction.append_child("direction-type").append_child("metronome");
+        if (!marking.beatUnit) metronome.append_attribute("print-object") = "no";
+        if (marking.parentheses) metronome.append_attribute("parentheses") = "yes";
+        metronome.append_child("beat-unit").text().set(marking.beatUnit ? marking.beatUnit : "quarter");
+        for (int i = 0; i < marking.dots; ++i) metronome.append_child("beat-unit-dot");
+        metronome.append_child("per-minute")
+            .text()
+            .set(marking.beatUnit ? marking.perMinute.c_str() : marking.bpm.c_str());
+    }
+
     void WriteMusicXmlDirection(pugi::xml_node measure, const MusicXmlDirection &direction, int divisions)
     {
         pugi::xml_node node = measure.append_child("direction");
         if (direction.placement == STAFFREL_above) node.append_attribute("placement") = "above";
         if (direction.placement == STAFFREL_below) node.append_attribute("placement") = "below";
-        pugi::xml_node type = node.append_child("direction-type");
+        const MusicXmlTempo *tempo = std::get_if<MusicXmlTempo>(&direction.marking);
         if (const std::string *text = std::get_if<std::string>(&direction.marking)) {
-            WriteMusicXmlDynamic(type, *text);
+            WriteMusicXmlDynamic(node.append_child("direction-type"), *text);
+        }
+        else if (const MusicXmlWords *words = std::get_if<MusicXmlWords>(&direction.marking)) {
+            WriteMusicXmlWords(node, *words, direction.number, direction.endpoint == MusicXmlDirectionEndpoint::Stop);
+        }
+        else if (tempo) {
+            WriteMusicXmlTempo(node, *tempo);
         }
         else {
-            WriteMusicXmlWedge(type, std::get<MusicXmlWedge>(direction.marking));
+            WriteMusicXmlWedge(node.append_child("direction-type"), std::get<const Hairpin *>(direction.marking),
+                direction.number, direction.endpoint == MusicXmlDirectionEndpoint::Start);
         }
         const int offset = GetMusicXmlTicks(direction.offset, divisions);
-        if (offset) node.append_child("offset").text().set(offset);
+        if (offset) {
+            pugi::xml_node offsetNode = node.append_child("offset");
+            offsetNode.text().set(offset);
+            if (tempo && !tempo->bpm.empty()) offsetNode.append_attribute("sound") = "yes";
+        }
         node.append_child("staff").text().set(direction.staff);
+        if (tempo && !tempo->bpm.empty()) node.append_child("sound").append_attribute("tempo") = tempo->bpm.c_str();
     }
 
     void WriteMusicXmlAttributes(
@@ -1492,7 +1840,7 @@ namespace musicxmloutput {
     }
 
     void WriteMusicXmlNote(pugi::xml_node measure, const MusicXmlEvent &event, const Note *note, bool chordTone,
-        int divisions, const MusicXmlVoice &voice, const MusicXmlNoteControlMap &noteControls)
+        int duration, const MusicXmlVoice &voice, const MusicXmlNoteControlMap &noteControls)
     {
         pugi::xml_node node = measure.append_child("note");
         const MusicXmlNoteControlMap::const_iterator control = noteControls.find(note ? note : event.element);
@@ -1515,7 +1863,7 @@ namespace musicxmloutput {
                 node.append_attribute("print-object") = "no";
             }
         }
-        node.append_child("duration").text().set(GetMusicXmlTicks(event.duration, divisions));
+        node.append_child("duration").text().set(duration);
         if (control != noteControls.end()) WriteMusicXmlTieEndpoints(node, "tie", control->second);
         if (voice.instrument)
             node.append_child("instrument").append_attribute("id") = voice.instrument->GetID().c_str();
@@ -1538,11 +1886,12 @@ namespace musicxmloutput {
     }
 
     void WriteMusicXmlVoice(
-        pugi::xml_node measure, const MusicXmlVoice &voice, int divisions, const MusicXmlNoteControlMap &noteControls)
+        pugi::xml_node measure, const MusicXmlVoice &voice, int tickScale, const MusicXmlNoteControlMap &noteControls)
     {
         for (const MusicXmlEvent &event : voice.events) {
+            const int duration = (event.endTick - event.startTick) * tickScale;
             ForEachMusicXmlNote(event, [&](const Note *note, bool chordTone) {
-                WriteMusicXmlNote(measure, event, note, chordTone, divisions, voice, noteControls);
+                WriteMusicXmlNote(measure, event, note, chordTone, duration, voice, noteControls);
             });
         }
     }
@@ -1686,8 +2035,11 @@ std::string MusicXmlOutput::Export()
         }
     }
 
+    const int rhythmDivisions = divisions;
+    if (!musicxmloutput::PlanMusicXmlEventTiming(parts, rhythmDivisions)) return "";
     musicxmloutput::MusicXmlNoteControlMap noteControls;
-    if (!musicxmloutput::CollectMusicXmlControls(measures, parts, divisions, noteControls)) return "";
+    musicxmloutput::CollectMusicXmlControls(measures, parts, divisions, noteControls);
+    const int tickScale = divisions / rhythmDivisions;
 
     pugi::xml_document xml;
     pugi::xml_node root = xml.append_child("score-partwise");
@@ -1723,6 +2075,11 @@ std::string MusicXmlOutput::Export()
         partNode.append_attribute("id") = part.id.c_str();
         for (size_t i = 0; i < measures.size(); ++i) {
             const Measure *measure = measures[i];
+            const musicxmloutput::MusicXmlMeasure &planned = part.measures[i];
+            if (planned.durationTicks > std::numeric_limits<int>::max() / tickScale) {
+                LogError("MusicXML output measure duration overflow");
+                return "";
+            }
             pugi::xml_node measureNode = partNode.append_child("measure");
             const std::string number = measure->HasN() ? measure->GetN() : std::to_string(i + 1);
             measureNode.append_attribute("number") = number.c_str();
@@ -1740,22 +2097,13 @@ std::string MusicXmlOutput::Export()
                 }
             }
             int cursor = 0;
-            int furthest = 0;
-            for (const musicxmloutput::MusicXmlVoice &voice : part.measures[i]) {
+            for (const musicxmloutput::MusicXmlVoice &voice : planned.voices) {
                 if (cursor) measureNode.append_child("backup").append_child("duration").text().set(cursor);
-                cursor = 0;
-                for (const musicxmloutput::MusicXmlEvent &event : voice.events) {
-                    const int ticks = musicxmloutput::GetMusicXmlTicks(event.duration, divisions);
-                    if (ticks > std::numeric_limits<int>::max() - cursor) {
-                        LogError("MusicXML output measure duration overflow");
-                        return "";
-                    }
-                    cursor += ticks;
-                }
-                musicxmloutput::WriteMusicXmlVoice(measureNode, voice, divisions, noteControls);
-                furthest = std::max(furthest, cursor);
+                musicxmloutput::WriteMusicXmlVoice(measureNode, voice, tickScale, noteControls);
+                cursor = voice.durationTicks * tickScale;
             }
             // End on the last occupied beat even when the final voice is shorter.
+            const int furthest = planned.durationTicks * tickScale;
             if (cursor < furthest) {
                 measureNode.append_child("forward").append_child("duration").text().set(furthest - cursor);
             }
@@ -1773,8 +2121,8 @@ std::string MusicXmlOutput::Export()
     for (const Measure *measure : measures) {
         for (const Object *child : measure->GetChildren()) {
             if (!child->IsControlElement()
-                || child->IsAnyOf(
-                    std::array{ BREATH, CAESURA, DYNAM, FERMATA, HAIRPIN, MNUM, MORDENT, SLUR, TIE, TRILL, TURN })
+                || child->IsAnyOf(std::array{
+                    BREATH, CAESURA, DIR, DYNAM, FERMATA, HAIRPIN, MNUM, MORDENT, SLUR, TEMPO, TIE, TRILL, TURN })
                 || !omitted.insert(child->GetClassId()).second) {
                 continue;
             }

@@ -16,7 +16,7 @@ renderSvg() {
 
 for fixture in staff-instrument group-instrument layer-instruments beam beam-two-voices tie tie-chords tie-chord-notes \
     slur-chord slurs-overlap dynam-startid dynam-tstamp hairpin-cross-measure hairpins-overlap fermata ornaments \
-    measure-barlines measure-repeats; do
+    measure-barlines measure-repeats directives directives-fractional tempo; do
     first="$output/$fixture.musicxml"
     second="$output/$fixture-roundtrip.musicxml"
     "$verovio" -r data -f mei -t musicxml -o "$first" "$fixtures/$fixture.mei"
@@ -181,6 +181,41 @@ check measure-repeats.musicxml 'count(//measure[*[1][self::barline and @location
 check measure-repeats.musicxml '//measure[@number="1"]/barline[@location="right"][
     *[1][self::bar-style] and *[2][self::fermata] and *[3][self::repeat]]'
 check measure-repeats.mei 'count(//*[local-name()="measure"][@left="rptstart" and @right="rptend"])=2'
+
+check directives.musicxml '//measure[@number="1" and attributes/divisions=8]/direction[
+    @placement="below" and offset=4 and staff=1 and direction-type[1]/words="solo"
+    and direction-type[2]/bracket[@type="start" and @number="1" and @line-end="none" and @line-type="dotted"]]'
+check directives.musicxml '//measure[@number="1"]/direction[offset=12 and staff=1]/direction-type/bracket[
+    @type="stop" and @number="1" and @line-end="none"]'
+check directives.musicxml '//measure[@number="1"]/direction[@placement="above" and offset=8 and staff=1
+    and direction-type[1]/words="sul pont." and direction-type[2]/dashes[@type="start" and @number="2"]]'
+check directives.musicxml '//measure[@number="2"]/direction[offset=6 and staff=1]/direction-type/dashes[@type="stop" and @number="2"]'
+check directives.musicxml '//measure[@number="2"]/direction[@placement="below" and offset=1 and staff=1]
+    /direction-type/words[@xml:lang="fr" and normalize-space(.)="Très lié sans presser"]'
+check directives.mei '//*[local-name()="dir"][@tstamp="2" and @tstamp2="0m+4" and @extender="true" and @lform="dotted"]'
+check directives.mei '//*[local-name()="dir"][@tstamp="3" and @tstamp2="1m+2.5" and @extender="true" and @lform="dashed"]'
+check directives.mei '//*[local-name()="dir"][@tstamp="1.25" and @xml:lang="fr" and not(@extender)]//*[local-name()="lb"]'
+
+check directives-fractional.musicxml '//measure[attributes/divisions=10 and note/duration=40]/direction[
+    offset=1 and direction-type[1]/words="pizz." and direction-type[2]/dashes[@type="start" and @number="1"]]'
+check directives-fractional.musicxml '//direction[offset=13]/direction-type/dashes[@type="stop" and @number="1"]'
+check directives-fractional.mei '//*[local-name()="dir"][@tstamp="1.1" and @tstamp2="0m+2.3" and @extender="true"]'
+reloaded="$output/directives-fractional-mei-reload.musicxml"
+"$verovio" -r data -f mei -t musicxml -o "$reloaded" "$output/directives-fractional.mei"
+diff -u "$output/directives-fractional.musicxml" "$reloaded"
+
+check tempo.musicxml '//measure[@number="1" and attributes/divisions=8]/direction[@placement="above" and not(offset)
+    and staff=1 and direction-type[1]/words[@xml:lang="fr" and .="Modéré"]
+    and direction-type[2]/metronome[@parentheses="yes" and beat-unit="quarter" and count(beat-unit-dot)=1 and per-minute="72.5"]
+    and sound/@tempo="108.75"]'
+check tempo.musicxml '//measure[@number="2"]/direction[offset[@sound="yes" and .=1] and staff=1 and sound/@tempo="92.125"
+    and direction-type/metronome[@print-object="no" and beat-unit="quarter" and per-minute="92.125"]]'
+check tempo.musicxml '//measure[@number="2"]/direction[offset[@sound="yes" and .=8] and staff=1 and sound/@tempo="108.75"
+    and direction-type/words="a tempo" and not(direction-type/metronome)]'
+check tempo.mei '//*[local-name()="tempo"][@tstamp="1" and @mm="72.5" and @mm.unit="4" and @mm.dots="1"
+    and @midi.bpm="108.75" and @xml:lang="fr"]'
+check tempo.mei '//*[local-name()="tempo"][@tstamp="1.25" and @midi.bpm="92.125" and not(@mm)]'
+check tempo.mei '//*[local-name()="tempo"][@tstamp="3" and @midi.bpm="108.75" and normalize-space(.)="a tempo"]'
 
 input="$fixtures/fermata-measure-rests.musicxml"
 if [ -n "$schema" ]; then
