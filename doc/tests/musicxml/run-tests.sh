@@ -14,7 +14,7 @@ renderSvg() {
     "$verovio" -r data -f "$1" -t svg --breaks none --adjust-page-height -o "$output/$3.svg" "$2"
 }
 
-for fixture in staff-instrument group-instrument layer-instruments beam beam-two-voices tie tie-chords tie-chord-notes \
+for fixture in staff-instrument group-instrument layer-instruments beam beam-two-voices tuplet tie tie-chords tie-chord-notes \
     slur-chord slurs-overlap dynam-startid dynam-tstamp hairpin-cross-measure hairpins-overlap fermata ornaments \
     measure-barlines measure-repeats directives directives-fractional tempo; do
     first="$output/$fixture.musicxml"
@@ -74,6 +74,23 @@ check beam-two-voices.musicxml '//measure[backup/duration=4 and count(note[voice
 check beam-two-voices.musicxml '//note[voice=1 and rest]/beam[@number="1" and .="continue"]'
 check beam-two-voices.mei '//*[local-name()="layer" and @n="1"]/*[local-name()="beam"][count(*[local-name()="chord"])=2 and *[local-name()="rest"]]'
 check beam-two-voices.mei '//*[local-name()="layer" and @n="2"]/*[local-name()="note" and @dur="2"]'
+
+check tuplet.musicxml '//measure[@number="1" and not(@implicit) and attributes/divisions=30]
+    /note[1][duration=15 and type="eighth" and dot and count(notations)=1
+    and notations[slur/@type="start" and tuplet[@type="start" and @bracket="yes" and @show-number="both" and @placement="above"]]]'
+check tuplet.musicxml '//measure[@number="1"][count(note[time-modification[actual-notes=3 and normal-notes=2]])=4
+    and note[2][rest and duration=5 and type="16th"] and note[3][duration=10 and notations/tuplet/@type="stop"]
+    and note[4][chord and duration=10 and not(notations/tuplet)]
+    and note[5][duration=90 and not(time-modification)] and direction[direction-type/dynamics/f and offset=30]]'
+check tuplet.musicxml '//measure[@number="2" and not(@implicit)]
+    [count(note[duration=12 and time-modification[actual-notes=5 and normal-notes=4]])=5
+    and note[1][beam="begin" and notations/tuplet[@type="start" and @bracket="no" and @show-number="none"]]
+    and note[5][beam="end" and notations/tuplet/@type="stop"]]'
+check tuplet.mei '//*[local-name()="tuplet" and @num="3" and @numbase="2" and @num.format="ratio"
+    and @bracket.visible="true" and @num.place="above" and @bracket.place="above"]
+    [*[local-name()="note" and @dots="1"] and *[local-name()="rest"] and *[local-name()="chord"]]'
+check tuplet.mei '//*[local-name()="beam"]/*[local-name()="tuplet" and @num="5" and @numbase="4"
+    and @num.visible="false" and @bracket.visible="false"][count(*[local-name()="note"])=5]'
 
 check tie.musicxml '//measure[@number="1"]/note[tie/@type="start" and notations/tied/@type="start"]'
 check tie.musicxml '//measure[@number="2"]/note[1][tie[1]/@type="stop" and tie[2]/@type="start" and notations/tied[1]/@type="stop" and notations/tied[2]/@type="start"]'

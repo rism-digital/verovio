@@ -64,6 +64,7 @@
 #include "timeinterface.h"
 #include "transposition.h"
 #include "trill.h"
+#include "tuplet.h"
 #include "turn.h"
 #include "vrv.h"
 
@@ -83,6 +84,9 @@ namespace musicxmloutput {
         Fraction duration;
         const char *type;
         int dots;
+        const Tuplet *tuplet = NULL;
+        bool tupletStart = false;
+        bool tupletStop = false;
         const char *beamValue = NULL;
         int startTick = 0;
         int endTick = 0;
@@ -354,12 +358,14 @@ namespace musicxmloutput {
             meter->HasUnit() ? meter->GetUnit() : (cut ? 2 : 4) };
     }
 
-    bool AddMusicXmlEvent(const LayerElement *element, Fraction measureDuration, MusicXmlVoice &voice)
+    bool AddMusicXmlEvent(
+        const LayerElement *element, Fraction measureDuration, MusicXmlVoice &voice, const Tuplet *tuplet)
     {
         const DurationInterface *duration = element->GetDurationInterface();
         const ClassId classId = element->GetClassId();
         if (element->HasSameas() || element->IsGraceNote()) return false;
         if (classId == MREST || classId == MSPACE) {
+            if (tuplet) return false;
             voice.events.push_back({ element, measureDuration, NULL, 0 });
             return true;
         }
@@ -385,34 +391,72 @@ namespace musicxmloutput {
         const int dots = duration->HasDots() ? duration->GetDots() : 0;
         if (!type || dots < 0 || dots > 8) return false;
         // Verovio durations are fractions of a whole note. MusicXML divisions are per quarter note.
-        voice.events.push_back({ element, duration->GetInterfaceAlignmentDuration(1, 1) * 4, type, dots });
+        const Fraction written = duration->GetInterfaceAlignmentDuration(1, 1) * 4;
+        const Fraction sounding = tuplet ? written * Fraction(tuplet->GetNumbase(), tuplet->GetNum()) : written;
+        if (tuplet && classId == REST && voice.events.empty() && tuplet->GetNum() != tuplet->GetNumbase()
+            && sounding.ToDouble() == measureDuration.ToDouble()) {
+            // The importer would interpret this as a measure rest, which cannot be a child of a tuplet.
+            return false;
+        }
+        voice.events.push_back({ element, sounding, type, dots, tuplet });
         return true;
     }
 
-    bool AddMusicXmlBeam(const Beam *beam, Fraction measureDuration, MusicXmlVoice &voice)
+    bool AddMusicXmlLayerElement(const LayerElement *element, Fraction measureDuration, MusicXmlVoice &voice,
+        const Tuplet *tuplet = NULL, bool inBeam = false)
     {
-        if (beam->HasSameas() || beam->HasBeamWith() || (beam->HasForm() && beam->GetForm() != beamRend_FORM_norm)) {
+        const Beam *beam = dynamic_cast<const Beam *>(element);
+        const Tuplet *group = dynamic_cast<const Tuplet *>(element);
+        if (!beam && !group) {
+            if (inBeam
+                && (!element->IsAnyOf(std::array{ NOTE, CHORD, REST })
+                    || element->GetDurationInterface()->GetActualDur() != DURATION_8)) {
+                return false;
+            }
+            return AddMusicXmlEvent(element, measureDuration, voice, tuplet);
+        }
+
+        if (element->HasSameas()) return false;
+        if (beam && (inBeam || beam->HasBeamWith() || (beam->HasForm() && beam->GetForm() != beamRend_FORM_norm))) {
             return false;
         }
-        const ArrayOfConstObjects children = beam->GetChildren();
-        if (children.size() < 2 || children.front()->Is(REST) || children.back()->Is(REST)) {
+        if (group
+            && (tuplet || group->GetNum() <= 0 || group->GetNumbase() <= 0
+                || group->GetNum() > std::numeric_limits<short>::max()
+                || group->GetNumbase() > std::numeric_limits<short>::max())) {
             return false;
         }
 
         const size_t first = voice.events.size();
-        for (const Object *child : children) {
-            if (!child->Is(NOTE) && !child->Is(CHORD) && !child->Is(REST)) {
+        for (const Object *child : element->GetChildren()) {
+            if (group && child->IsAnyOf(std::array{ TUPLET_BRACKET, TUPLET_NUM })) continue;
+            const LayerElement *member = dynamic_cast<const LayerElement *>(child);
+            if (!member
+                || !AddMusicXmlLayerElement(member, measureDuration, voice, group ? group : tuplet, beam || inBeam)) {
                 return false;
             }
-            const LayerElement *element = vrv_cast<const LayerElement *>(child);
-            if (element->GetDurationInterface()->GetActualDur() != DURATION_8
-                || !AddMusicXmlEvent(element, measureDuration, voice)) {
-                return false;
-            }
-            voice.events.back().beamValue = "continue";
         }
-        voice.events.at(first).beamValue = "begin";
-        voice.events.back().beamValue = "end";
+        if (first == voice.events.size()) return false;
+        MusicXmlEvent &start = voice.events.at(first);
+        MusicXmlEvent &stop = voice.events.back();
+        if (beam) {
+            if (&start == &stop || start.element->Is(REST) || stop.element->Is(REST)) {
+                return false;
+            }
+            // The importer looks for the tuplet stop on a later note when the beam and tuplet begin together.
+            if (start.tupletStart && start.tupletStop) {
+                return false;
+            }
+            for (size_t i = first + 1; i + 1 < voice.events.size(); ++i) {
+                voice.events.at(i).beamValue = "continue";
+            }
+            start.beamValue = "begin";
+            stop.beamValue = "end";
+        }
+        else {
+            start.tupletStart = true;
+            stop.tupletStop = true;
+        }
         return true;
     }
 
@@ -420,13 +464,8 @@ namespace musicxmloutput {
     bool CollectMusicXmlVoice(const Layer *layer, Fraction measureDuration, MusicXmlVoice &voice)
     {
         for (const Object *object : layer->GetChildren()) {
-            if (object->Is(BEAM)) {
-                if (AddMusicXmlBeam(vrv_cast<const Beam *>(object), measureDuration, voice)) continue;
-            }
-            else {
-                const LayerElement *element = dynamic_cast<const LayerElement *>(object);
-                if (element && AddMusicXmlEvent(element, measureDuration, voice)) continue;
-            }
+            const LayerElement *element = dynamic_cast<const LayerElement *>(object);
+            if (element && AddMusicXmlLayerElement(element, measureDuration, voice)) continue;
             LogError("MusicXML output does not support '%s' in a layer (xml:id '%s')", object->GetClassName().c_str(),
                 object->GetID().c_str());
             return false;
@@ -496,12 +535,14 @@ namespace musicxmloutput {
                 }
             }
             for (const MusicXmlEvent &event : voice.events) {
-                divisions = std::lcm(divisions, event.duration.GetDenominator());
                 // Bound the resolution for consumers that calculate the measure size using integer arithmetic.
-                if (divisions > maxMusicXmlDivisions) {
-                    LogError("MusicXML output duration resolution exceeds 16384 divisions");
-                    return false;
+                const int denominator = event.duration.GetDenominator();
+                if (denominator <= maxMusicXmlDivisions) {
+                    divisions = std::lcm(divisions, denominator);
+                    if (divisions <= maxMusicXmlDivisions) continue;
                 }
+                LogError("MusicXML output duration resolution exceeds 16384 divisions");
+                return false;
             }
         }
         return true;
@@ -536,13 +577,13 @@ namespace musicxmloutput {
                 for (MusicXmlVoice &voice : measure.voices) {
                     int tick = 0;
                     for (MusicXmlEvent &event : voice.events) {
-                        const int duration = GetMusicXmlTicks(event.duration, divisions);
-                        if (duration > std::numeric_limits<int>::max() - tick) {
+                        const int scale = divisions / event.duration.GetDenominator();
+                        if (event.duration.GetNumerator() > (std::numeric_limits<int>::max() - tick) / scale) {
                             LogError("MusicXML output measure duration overflow");
                             return false;
                         }
                         event.startTick = tick;
-                        tick += duration;
+                        tick += event.duration.GetNumerator() * scale;
                         event.endTick = tick;
                     }
                     voice.durationTicks = tick;
@@ -1839,6 +1880,32 @@ namespace musicxmloutput {
         if (!notations.first_child()) note.remove_child(notations);
     }
 
+    void WriteMusicXmlTuplet(pugi::xml_node notations, const MusicXmlEvent &event)
+    {
+        const Tuplet *tuplet = event.tuplet;
+        if (event.tupletStart) {
+            pugi::xml_node start = notations.append_child("tuplet");
+            start.append_attribute("type") = "start";
+            if (tuplet->HasBracketVisible()) {
+                start.append_attribute("bracket") = tuplet->GetBracketVisible() == BOOLEAN_true ? "yes" : "no";
+            }
+            if (tuplet->GetNumVisible() == BOOLEAN_false) {
+                start.append_attribute("show-number") = "none";
+            }
+            else if (tuplet->HasNumFormat()) {
+                start.append_attribute("show-number")
+                    = tuplet->GetNumFormat() == tupletVis_NUMFORMAT_ratio ? "both" : "actual";
+            }
+            // MusicXML has one placement for both the number and the bracket.
+            const data_STAFFREL_basic place = (tuplet->HasNumPlace() && tuplet->GetNumVisible() != BOOLEAN_false)
+                ? tuplet->GetNumPlace()
+                : tuplet->GetBracketPlace();
+            if (place == STAFFREL_basic_above) start.append_attribute("placement") = "above";
+            if (place == STAFFREL_basic_below) start.append_attribute("placement") = "below";
+        }
+        if (event.tupletStop) notations.append_child("tuplet").append_attribute("type") = "stop";
+    }
+
     void WriteMusicXmlNote(pugi::xml_node measure, const MusicXmlEvent &event, const Note *note, bool chordTone,
         int duration, const MusicXmlVoice &voice, const MusicXmlNoteControlMap &noteControls)
     {
@@ -1873,6 +1940,11 @@ namespace musicxmloutput {
         if (accid && accid->HasAccid()) {
             node.append_child("accidental").text().set(GetMusicXmlAccidental(accid->GetAccid()));
         }
+        if (event.tuplet) {
+            pugi::xml_node modification = node.append_child("time-modification");
+            modification.append_child("actual-notes").text().set(event.tuplet->GetNum());
+            modification.append_child("normal-notes").text().set(event.tuplet->GetNumbase());
+        }
         if (voice.staff > 0) node.append_child("staff").text().set(voice.staff);
         // A chord is a single beam position. Write it on the chord's first MusicXML note.
         if (event.beamValue && !chordTone) {
@@ -1882,6 +1954,11 @@ namespace musicxmloutput {
         }
         if (control != noteControls.end()) {
             WriteMusicXmlNotations(node, control->second);
+        }
+        if (!chordTone && (event.tupletStart || event.tupletStop)) {
+            pugi::xml_node notations = node.child("notations");
+            if (!notations) notations = node.append_child("notations");
+            WriteMusicXmlTuplet(notations, event);
         }
     }
 
