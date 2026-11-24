@@ -17,7 +17,7 @@ renderSvg() {
 for fixture in staff-instrument group-instrument layer-instruments beam beam-two-voices beam-levels tuplet tie tie-chords \
     tie-chord-notes slur-chord slurs-overlap dynam-startid dynam-tstamp hairpin-cross-measure hairpins-overlap \
     fermata ornaments measure-barlines measure-repeats directives directives-fractional tempo signature-changes \
-    clef-changes grace-notes; do
+    clef-changes grace-notes multi-rest; do
     first="$output/$fixture.musicxml"
     second="$output/$fixture-roundtrip.musicxml"
     "$verovio" -r data -f mei -t musicxml -o "$first" "$fixtures/$fixture.mei"
@@ -311,6 +311,28 @@ check grace-notes.mei '//*[local-name()="measure" and @n="1"]//*[local-name()="l
     and *[local-name()="beam"]/*[local-name()="beam" and count(*[local-name()="note" and @grace="acc"])=2]]'
 check grace-notes.mei '//*[local-name()="measure" and @n="2"]//*[local-name()="layer" and @n="2"]
     [*[local-name()="note" and @pname="g" and @dur="2"]]'
+
+check multi-rest.musicxml 'count(//part[count(measure)=6
+    and measure[1][@number="1" and barline[@location="left"]/repeat/@direction="forward"]
+    /attributes/measure-style/multiple-rest[@use-symbols="no" and .=3]
+    and measure[2][@number="2" and not(attributes or barline)]
+    and measure[3][@number="3" and barline[@location="right"]/bar-style="light-light"]
+    and measure[4][@number="4" and attributes[time/beats=2 and key/fifths=1]
+    and attributes/measure-style/multiple-rest[@use-symbols="yes" and .=2]]
+    and measure[5][@number="5" and barline[@location="right"]/repeat/@direction="backward"]
+    and measure[6][@number="6" and note/pitch]])=2 and count(//multiple-rest)=4 and not(//measure[@implicit])'
+check multi-rest.musicxml '//part[@id="P1"]/measure[@number="1"]/direction[direction-type/words="Andante"]
+    /following-sibling::attributes/measure-style/multiple-rest'
+check multi-rest.musicxml '//part[@id="piano"][count(measure[position()<=3][backup/duration=3
+    and count(note[rest/@measure="yes" and duration=3 and not(@print-object)])=2])=3
+    and count(measure[position()=4 or position()=5][backup/duration=4
+    and count(note[rest/@measure="yes" and duration=4 and not(@print-object)])=2])=2]'
+check multi-rest.mei 'count(//*[local-name()="measure"])=3
+    and //*[local-name()="measure" and @n="1" and @left="rptstart" and @right="dbl"]
+    [count(.//*[local-name()="multiRest" and @num="3" and @block="true"])=2 and not(.//*[local-name()="clef"])]
+    and //*[local-name()="measure" and @n="4" and @right="rptend"]
+    [count(.//*[local-name()="multiRest" and @num="2" and @block="false"])=2]
+    and //*[local-name()="measure" and @n="6"][count(.//*[local-name()="note"])=3]'
 
 input="$fixtures/fermata-measure-rests.musicxml"
 if [ -n "$schema" ]; then
