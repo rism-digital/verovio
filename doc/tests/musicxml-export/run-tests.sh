@@ -5,7 +5,7 @@ set -eu
 # MusicXML, MEI, and SVG outputs are kept in a fresh directory under build/.
 verovio=${1:-build/verovio}
 schema=${2:-}
-fixtures=doc/tests/musicxml
+fixtures=doc/tests/musicxml-export
 mkdir -p build
 output=$(mktemp -d build/musicxml-test.XXXXXXXX)
 printf 'MusicXML test outputs: %s\n' "$output"
