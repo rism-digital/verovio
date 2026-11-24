@@ -390,15 +390,17 @@ void ExpansionMap::GenerateExpansionFor(ScoreOrPartElement *scoreOrPart)
     ListOfObjects::iterator last = children.begin();
 
     bool isStartFromPrevious = false;
+    bool hasPendingMeasures = false;
 
     for (auto current = children.begin(); current != children.end(); current++) {
         if ((*current)->Is(MEASURE)) {
             Measure *measure = vrv_cast<Measure *>(*current);
-            // The current measure has a repeat end on its left
-            if (ExpansionMap::IsPreviousRepeatEnd(measure)) {
+            // A left repeat end closes only measures preceding the current one.
+            if (ExpansionMap::IsPreviousRepeatEnd(measure) && hasPendingMeasures) {
                 std::string ref = "#" + this->CreateSection(section, first, last);
                 expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
                 expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
+                first = current;
             }
             if (isStartFromPrevious || ExpansionMap::IsRepeatStart(measure)) {
                 first = current;
@@ -406,10 +408,14 @@ void ExpansionMap::GenerateExpansionFor(ScoreOrPartElement *scoreOrPart)
             // The current measure has a repeat start on its right
             isStartFromPrevious = ExpansionMap::IsNextRepeatStart(measure);
             last = current;
+            hasPendingMeasures = true;
             if (ExpansionMap::IsRepeatEnd(measure)) {
                 std::string ref = "#" + this->CreateSection(section, first, last);
                 expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
                 expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
+                // A new strain follows a completed repeat even without an explicit repeat start.
+                isStartFromPrevious = true;
+                hasPendingMeasures = false;
             }
         }
     }
