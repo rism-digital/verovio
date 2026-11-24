@@ -17,7 +17,7 @@ renderSvg() {
 for fixture in staff-instrument group-instrument layer-instruments beam beam-two-voices beam-levels tuplet tie tie-chords \
     tie-chord-notes slur-chord slurs-overlap dynam-startid dynam-tstamp hairpin-cross-measure hairpins-overlap \
     fermata ornaments measure-barlines measure-repeats directives directives-fractional tempo signature-changes \
-    clef-changes grace-notes multi-rest; do
+    clef-changes grace-notes multi-rest lyrics; do
     first="$output/$fixture.musicxml"
     second="$output/$fixture-roundtrip.musicxml"
     "$verovio" -r data -f mei -t musicxml -o "$first" "$fixtures/$fixture.mei"
@@ -333,6 +333,24 @@ check multi-rest.mei 'count(//*[local-name()="measure"])=3
     and //*[local-name()="measure" and @n="4" and @right="rptend"]
     [count(.//*[local-name()="multiRest" and @num="2" and @block="false"])=2]
     and //*[local-name()="measure" and @n="6"][count(.//*[local-name()="note"])=3]'
+
+check lyrics.musicxml '//measure[@number="1"][note[1]/lyric[@number="1" and @name="Latin" and @placement="below"]
+    [text[1]="1." and elision and syllabic="begin" and text[2][@xml:lang="la" and .="Glo"]]
+    and note[2]/lyric[syllabic="middle" and text="ri"]
+    and note[3][not(chord) and lyric[@number="1"][syllabic="end" and text="a" and extend/@type="start"]]
+    and note[4][chord and not(lyric)]]'
+check lyrics.musicxml '//measure[@number="1"]/note[3]/lyric[@number="2" and @name="French"
+    and @placement="above" and @color="#224466"][syllabic[1]="single" and syllabic[2]="begin"
+    and text[1][@xml:lang="fr" and @font-style="italic" and .="Dieu"] and elision="‿"
+    and text[2][@xml:lang="fr" and @font-weight="bold" and .="cré"]]'
+check lyrics.musicxml '//measure[@number="2"][note[1]/lyric[@number="1" and extend/@type="stop" and not(text)]
+    and not(note[2]/lyric) and note[3]/lyric/text[@line-through="1" and .="in"]
+    and note[4]/lyric[@number="1" and syllabic="single" and text="pace"]]'
+check lyrics.mei '//*[local-name()="verse" and @n="1" and @label="Latin"][*[local-name()="label" and .="1."]]
+    and //*[local-name()="chord"][*[local-name()="verse" and @n="1"]/*[local-name()="syl" and @con="u" and @wordpos="t"]
+    and *[local-name()="verse" and @n="2"]/*[local-name()="syl" and @con="b" and @fontstyle="italic"]]
+    and //*[local-name()="measure" and @n="2"]//*[local-name()="note" and @pname="f"]
+    /*[local-name()="verse" and @n="1"]/*[local-name()="syl" and not(node())]'
 
 input="$fixtures/fermata-measure-rests.musicxml"
 if [ -n "$schema" ]; then

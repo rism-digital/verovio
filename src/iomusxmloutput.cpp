@@ -22,6 +22,7 @@
 #include <map>
 #include <numeric>
 #include <optional>
+#include <regex>
 #include <set>
 #include <sstream>
 #include <string>
@@ -60,11 +61,13 @@
 #include "mordent.h"
 #include "multirest.h"
 #include "note.h"
+#include "rend.h"
 #include "scoredef.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
 #include "staffdef.h"
+#include "syl.h"
 #include "tempo.h"
 #include "text.h"
 #include "timeinterface.h"
@@ -72,6 +75,7 @@
 #include "trill.h"
 #include "tuplet.h"
 #include "turn.h"
+#include "verse.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -113,12 +117,20 @@ namespace musicxmloutput {
         int lineNumber = 0;
     };
 
+    struct MusicXmlLyric {
+        const Verse *verse;
+        std::vector<const Syl *> syllables;
+        bool extend = false;
+    };
+
     struct MusicXmlNoteControls {
         bool tieStart = false;
         bool tieStop = false;
         std::vector<MusicXmlSlurEndpoint> slurs;
         std::vector<const ControlElement *> pauses;
         std::vector<MusicXmlOrnament> ornaments;
+        std::map<int, MusicXmlLyric> lyrics;
+        std::set<int> lyricStops;
         int trillStop = 0;
     };
 
@@ -1736,6 +1748,80 @@ namespace musicxmloutput {
         }
     }
 
+    void AddMusicXmlLyric(const LayerElement *anchor, const Verse *verse, std::vector<const Syl *> syllables,
+        const MusicXmlElementPositionMap &positions, MusicXmlNoteControlMap &controls)
+    {
+        if (syllables.empty()) return;
+        const int number = verse ? std::max(1, verse->GetN()) : 1;
+        const Syl *last = syllables.back();
+        if (number > std::numeric_limits<short>::max()
+            || !controls[anchor].lyrics.try_emplace(number, MusicXmlLyric{ verse, std::move(syllables) }).second) {
+            LogWarning("MusicXML output omits unsupported lyric '%s' for verse %d", last->GetID().c_str(), number);
+            return;
+        }
+        if (last->GetCon() != sylLog_CON_u || last->GetWordpos() == sylLog_WORDPOS_i
+            || last->GetWordpos() == sylLog_WORDPOS_m) {
+            return;
+        }
+
+        const MusicXmlElementPosition &start = positions.at(anchor);
+        const MusicXmlElementPositionMap::const_iterator end = positions.find(last->GetEnd());
+        if (end == positions.end() || start.part != end->second.part || start.staff != end->second.staff
+            || start.voice != end->second.voice || start.order >= end->second.order) {
+            LogWarning("MusicXML output could not place the extender of syllable '%s'", last->GetID().c_str());
+            return;
+        }
+        // MEI ends a melisma at the note before the next syllable, including an empty syllable.
+        controls[anchor].lyrics.at(number).extend = true;
+        controls[end->first].lyricStops.insert(number);
+    }
+
+    void CollectMusicXmlElementLyrics(const LayerElement *owner, const LayerElement *anchor,
+        const MusicXmlElementPositionMap &positions, MusicXmlNoteControlMap &controls)
+    {
+        std::vector<const Syl *> directSyllables;
+        for (const Object *child : owner->GetChildren()) {
+            if (const Verse *verse = dynamic_cast<const Verse *>(child)) {
+                std::vector<const Syl *> syllables;
+                for (const Object *member : verse->GetChildren()) {
+                    if (const Syl *syl = dynamic_cast<const Syl *>(member)) {
+                        if (!syl->IsEmpty()) syllables.push_back(syl);
+                    }
+                    else if (!member->Is(LABEL)) {
+                        LogWarning("MusicXML output omits '%s' in verse '%s'", member->GetClassName().c_str(),
+                            verse->GetID().c_str());
+                    }
+                }
+                AddMusicXmlLyric(anchor, verse, std::move(syllables), positions, controls);
+            }
+            else if (const Syl *syl = dynamic_cast<const Syl *>(child)) {
+                if (!syl->IsEmpty()) directSyllables.push_back(syl);
+            }
+            else if (child->Is(REFRAIN)) {
+                LogWarning("MusicXML output omits refrain '%s'", child->GetID().c_str());
+            }
+        }
+        AddMusicXmlLyric(anchor, NULL, std::move(directSyllables), positions, controls);
+    }
+
+    void CollectMusicXmlLyrics(const MusicXmlElementPositionMap &positions, MusicXmlNoteControlMap &controls)
+    {
+        for (const std::pair<const LayerElement *const, MusicXmlElementPosition> &entry : positions) {
+            const LayerElement *element = entry.first;
+            if (element->Is(CHORD)) {
+                CollectMusicXmlElementLyrics(element, element, positions, controls);
+                // The importer puts the first chord tone's lyrics on the chord itself.
+                CollectMusicXmlElementLyrics(GetMusicXmlNoteAnchor(element), element, positions, controls);
+            }
+            else if (const Note *note = dynamic_cast<const Note *>(element)) {
+                const Chord *chord = note->IsChordTone();
+                if (!chord || GetMusicXmlNoteAnchor(chord) != note) {
+                    CollectMusicXmlElementLyrics(note, note, positions, controls);
+                }
+            }
+        }
+    }
+
     void CollectMusicXmlControls(const std::vector<const Measure *> &measures, std::vector<MusicXmlPart> &parts,
         int &divisions, MusicXmlNoteControlMap &controls)
     {
@@ -1748,8 +1834,10 @@ namespace musicxmloutput {
         std::vector<std::pair<size_t, const ControlElement *>> ornaments;
         ClassIdsComparison pauseTypes({ FERMATA, CAESURA, BREATH });
         ClassIdsComparison ornamentTypes({ TRILL, MORDENT, TURN });
+        bool hasLyrics = false;
         for (size_t i = 0; i < measures.size(); ++i) {
             const Measure *measure = measures.at(i);
+            if (!hasLyrics) hasLyrics = measure->FindDescendantByType(SYL) != NULL;
             for (const Object *tie : measure->FindAllDescendantsByType(TIE)) {
                 // PrepareData resolves the ID references to the exact notes, including tones within chords.
                 const TimeSpanningInterface *span = tie->GetTimeSpanningInterface();
@@ -1785,9 +1873,10 @@ namespace musicxmloutput {
         }
         const bool hasStaffControls = !directives.empty() || !dynamics.empty() || !hairpins.empty() || !tempos.empty()
             || !pauses.empty() || !ornaments.empty();
-        if (slurs.empty() && !hasStaffControls) return;
+        if (slurs.empty() && !hasStaffControls && !hasLyrics) return;
         MusicXmlElementPositionMap positions;
         CollectMusicXmlElementPositions(parts, divisions, positions);
+        if (hasLyrics) CollectMusicXmlLyrics(positions, controls);
         CollectMusicXmlSlurs(slurs, positions, controls);
         if (!hasStaffControls) return;
         const MusicXmlStaffPositionMap staffPositions = GetMusicXmlStaffPositions(parts);
@@ -2054,9 +2143,9 @@ namespace musicxmloutput {
         if (controls.tieStart) parent.append_child(tag).append_attribute("type") = "start";
     }
 
-    void WriteMusicXmlColor(pugi::xml_node node, const ControlElement &control)
+    void WriteMusicXmlColor(pugi::xml_node node, const AttColor &element)
     {
-        std::string color = control.GetColor();
+        std::string color = element.GetColor();
         // MusicXML uses uppercase hexadecimal RGB (or ARGB).
         if (color.size() == 7 && color.front() == '#'
             && std::all_of(color.begin() + 1, color.end(), [](unsigned char c) { return std::isxdigit(c); })) {
@@ -2368,6 +2457,95 @@ namespace musicxmloutput {
         if (event.tupletStop) notations.append_child("tuplet").append_attribute("type") = "stop";
     }
 
+    const char *GetMusicXmlElision(sylLog_CON connector)
+    {
+        switch (connector) {
+            case sylLog_CON_d: return "-";
+            case sylLog_CON_u: return "_";
+            case sylLog_CON_t: return "~";
+            case sylLog_CON_c: return "^";
+            case sylLog_CON_v: return "\u02C7";
+            case sylLog_CON_i: return "\u2040";
+            case sylLog_CON_b: return "\u203F";
+            default: return "\u00A0";
+        }
+    }
+
+    void WriteMusicXmlSyllable(pugi::xml_node lyric, const Syl &syl, const Verse *verse)
+    {
+        const char *syllabic = "single";
+        switch (syl.GetWordpos()) {
+            case sylLog_WORDPOS_i: syllabic = "begin"; break;
+            case sylLog_WORDPOS_m: syllabic = "middle"; break;
+            case sylLog_WORDPOS_t: syllabic = "end"; break;
+            default: break;
+        }
+        lyric.append_child("syllabic").text().set(syllabic);
+        pugi::xml_node text = lyric.append_child("text");
+        text.text().set(UTF32to8(syl.GetText()).c_str());
+
+        std::string lang = verse ? verse->GetLang() : "";
+        data_FONTSTYLE style = verse ? verse->GetFontstyle() : FONTSTYLE_NONE;
+        data_FONTWEIGHT weight = verse ? verse->GetFontweight() : FONTWEIGHT_NONE;
+        if (syl.HasLang()) lang = syl.GetLang();
+        if (syl.HasFontstyle()) style = syl.GetFontstyle();
+        if (syl.HasFontweight()) weight = syl.GetFontweight();
+        // MusicXML import preserves strike-through on a whole syllable.
+        if (syl.GetChildCount() == 1) {
+            if (const Rend *rend = dynamic_cast<const Rend *>(syl.GetChild(0))) {
+                if (rend->HasLang()) lang = rend->GetLang();
+                if (rend->HasFontstyle()) style = rend->GetFontstyle();
+                if (rend->HasFontweight()) weight = rend->GetFontweight();
+                if (rend->GetRend() == TEXTRENDITION_line_through) text.append_attribute("line-through") = 1;
+            }
+        }
+        if (!lang.empty()) text.append_attribute("xml:lang") = lang.c_str();
+        if (style == FONTSTYLE_italic) text.append_attribute("font-style") = "italic";
+        if (style == FONTSTYLE_normal) text.append_attribute("font-style") = "normal";
+        if (weight == FONTWEIGHT_bold) text.append_attribute("font-weight") = "bold";
+        if (weight == FONTWEIGHT_normal) text.append_attribute("font-weight") = "normal";
+    }
+
+    void WriteMusicXmlLyrics(pugi::xml_node note, const MusicXmlNoteControls &controls)
+    {
+        for (const std::pair<const int, MusicXmlLyric> &entry : controls.lyrics) {
+            const MusicXmlLyric &plan = entry.second;
+            pugi::xml_node lyric = note.append_child("lyric");
+            lyric.append_attribute("number") = entry.first;
+            const Verse *verse = plan.verse;
+            if (verse) {
+                if (verse->HasLabel()) lyric.append_attribute("name") = verse->GetLabel().c_str();
+                if (verse->GetPlace() == STAFFREL_above) lyric.append_attribute("placement") = "above";
+                if (verse->GetPlace() == STAFFREL_below) lyric.append_attribute("placement") = "below";
+                WriteMusicXmlColor(lyric, *verse);
+                if (const Label *label = vrv_cast<const Label *>(verse->GetFirst(LABEL))) {
+                    const std::string text = UTF32to8(label->GetText());
+                    // The importer recognizes a numeric lyric label before an elision.
+                    static const std::regex numericLabel("[^[:alpha:]]*\\d[^[:alpha:]]*");
+                    if (std::regex_match(text, numericLabel)) {
+                        lyric.append_child("text").text().set(text.c_str());
+                        lyric.append_child("elision").text().set("\u00A0");
+                    }
+                    else {
+                        LogWarning("MusicXML output omits non-numeric label on verse '%s'", verse->GetID().c_str());
+                    }
+                }
+            }
+            const Syl *previous = NULL;
+            for (const Syl *syl : plan.syllables) {
+                if (previous) lyric.append_child("elision").text().set(GetMusicXmlElision(previous->GetCon()));
+                WriteMusicXmlSyllable(lyric, *syl, verse);
+                previous = syl;
+            }
+            if (plan.extend) lyric.append_child("extend").append_attribute("type") = "start";
+        }
+        for (int number : controls.lyricStops) {
+            pugi::xml_node lyric = note.append_child("lyric");
+            lyric.append_attribute("number") = number;
+            lyric.append_child("extend").append_attribute("type") = "stop";
+        }
+    }
+
     void WriteMusicXmlNote(pugi::xml_node measure, const MusicXmlEvent &event, const Note *note, bool chordTone,
         int duration, const MusicXmlVoice &voice, const MusicXmlNoteControlMap &noteControls)
     {
@@ -2443,6 +2621,10 @@ namespace musicxmloutput {
             pugi::xml_node notations = node.child("notations");
             if (!notations) notations = node.append_child("notations");
             WriteMusicXmlTuplet(notations, event);
+        }
+        if (note) {
+            const MusicXmlNoteControlMap::const_iterator lyrics = noteControls.find(chordTone ? note : event.element);
+            if (lyrics != noteControls.end()) WriteMusicXmlLyrics(node, lyrics->second);
         }
     }
 
