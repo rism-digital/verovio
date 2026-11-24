@@ -122,9 +122,22 @@ namespace musicxmloutput {
         int durationTicks = 0;
     };
 
+    struct MusicXmlMeter {
+        Fraction GetDuration() const { return Fraction(count * 4, unit); }
+
+        int count;
+        int unit;
+    };
+
+    struct MusicXmlMeasureSignatures {
+        const KeySig *key = NULL;
+        const MeterSig *time = NULL;
+    };
+
     struct MusicXmlMeasure {
         std::vector<MusicXmlVoice> voices;
         int durationTicks = 0;
+        std::optional<MusicXmlMeter> meterOverride;
     };
 
     struct MusicXmlVoiceDef {
@@ -134,8 +147,7 @@ namespace musicxmloutput {
 
     struct MusicXmlStaff {
         const StaffDef *definition;
-        Fraction measureDuration;
-        int meterUnit;
+        MusicXmlMeter meter;
         std::map<int, MusicXmlVoiceDef> voices;
     };
 
@@ -263,8 +275,15 @@ namespace musicxmloutput {
             return FUNCTOR_SIBLINGS;
         }
 
+        FunctorCode VisitScoreDef(const ScoreDef *scoreDef) override
+        {
+            m_scoreDefs.emplace_back(m_measures.size(), scoreDef);
+            return FUNCTOR_SIBLINGS;
+        }
+
     public:
         std::vector<const Measure *> m_measures;
+        std::vector<std::pair<size_t, const ScoreDef *>> m_scoreDefs;
     };
 
     const char *GetMusicXmlNoteType(data_DURATION duration)
@@ -348,14 +367,62 @@ namespace musicxmloutput {
         return vrv_cast<const Element *>(attribute);
     }
 
-    std::pair<int, int> GetMusicXmlMeter(const MeterSig *meter)
+    std::optional<MusicXmlMeter> GetMusicXmlMeter(const MeterSig *meter)
     {
-        if (!meter) return { 4, 4 };
-        if (meter->HasCount() && meter->GetCount().first.size() != 1) return { 0, 0 };
-        if (meter->GetSym() == METERSIGN_open) return { 0, 0 };
+        if (!meter) return MusicXmlMeter{ 4, 4 };
+        if ((meter->HasCount() && meter->GetCount().first.size() != 1) || meter->GetSym() == METERSIGN_open) {
+            return std::nullopt;
+        }
         const bool cut = (meter->GetSym() == METERSIGN_cut);
-        return { meter->HasCount() ? meter->GetCount().first.front() : (cut ? 2 : 4),
-            meter->HasUnit() ? meter->GetUnit() : (cut ? 2 : 4) };
+        const int count = meter->HasCount() ? meter->GetCount().first.front() : (cut ? 2 : 4);
+        const int unit = meter->HasUnit() ? meter->GetUnit() : (cut ? 2 : 4);
+        if (count <= 0 || count > 128 || unit <= 0 || unit > 1024) {
+            return std::nullopt;
+        }
+        return MusicXmlMeter{ count, unit };
+    }
+
+    const MusicXmlMeter &GetMusicXmlMeasureMeter(const MusicXmlPart &part, size_t measure, size_t staff)
+    {
+        const std::optional<MusicXmlMeter> &meter = part.measures.at(measure).meterOverride;
+        return meter ? *meter : part.staves.at(staff).meter;
+    }
+
+    bool CollectMusicXmlMeasureSignatures(const std::vector<std::pair<size_t, const ScoreDef *>> &scoreDefs,
+        std::vector<MusicXmlMeasureSignatures> &signatures)
+    {
+        for (const std::pair<size_t, const ScoreDef *> &entry : scoreDefs) {
+            const ScoreDef *scoreDef = entry.second;
+            ArrayOfStrAttr attributes;
+            scoreDef->GetAttributes(&attributes);
+            // The importer can attach ppq to a signature change. The export resolution is computed for the score.
+            if (std::any_of(attributes.begin(), attributes.end(),
+                    [](const std::pair<std::string, std::string> &attribute) { return attribute.first != "ppq"; })) {
+                LogError("MusicXML output supports only key and time signature changes in scoreDef '%s'",
+                    scoreDef->GetID().c_str());
+                return false;
+            }
+            MusicXmlMeasureSignatures change;
+            for (const Object *child : scoreDef->GetChildren()) {
+                if (child->Is(KEYSIG) && !vrv_cast<const KeySig *>(child)->HasNonAttribKeyAccidChildren()) {
+                    change.key = vrv_cast<const KeySig *>(child);
+                }
+                else if (child->Is(METERSIG) && GetMusicXmlMeter(vrv_cast<const MeterSig *>(child))) {
+                    change.time = vrv_cast<const MeterSig *>(child);
+                }
+                else {
+                    LogError("MusicXML output does not support '%s' in a mid-score scoreDef (xml:id '%s')",
+                        child->GetClassName().c_str(), child->GetID().c_str());
+                    return false;
+                }
+            }
+            if (entry.first < signatures.size()) {
+                MusicXmlMeasureSignatures &measure = signatures.at(entry.first);
+                if (change.key) measure.key = change.key;
+                if (change.time) measure.time = change.time;
+            }
+        }
+        return true;
     }
 
     bool AddMusicXmlEvent(
@@ -493,12 +560,29 @@ namespace musicxmloutput {
         }
     }
 
-    bool CollectMusicXmlPartMeasure(MusicXmlPart &part, const Measure *measure, int &divisions)
+    bool AddMusicXmlDuration(Fraction duration, int &divisions)
     {
-        std::vector<MusicXmlVoice> &voices = part.measures.emplace_back().voices;
+        // Bound the resolution for consumers that calculate the measure size using integer arithmetic.
+        const int denominator = duration.GetDenominator();
+        if (denominator <= maxMusicXmlDivisions) {
+            divisions = std::lcm(divisions, denominator);
+            if (divisions <= maxMusicXmlDivisions) return true;
+        }
+        LogError("MusicXML output duration resolution exceeds 16384 divisions");
+        return false;
+    }
+
+    bool CollectMusicXmlPartMeasure(
+        MusicXmlPart &part, const Measure *measure, std::optional<MusicXmlMeter> meterOverride, int &divisions)
+    {
+        MusicXmlMeasure &planned = part.measures.emplace_back();
+        planned.meterOverride = meterOverride;
+        std::vector<MusicXmlVoice> &voices = planned.voices;
         int staffNumber = 0;
         for (const MusicXmlStaff &staff : part.staves) {
             ++staffNumber;
+            const Fraction measureDuration = (meterOverride ? *meterOverride : staff.meter).GetDuration();
+            if (!AddMusicXmlDuration(measureDuration, divisions)) return false;
             const int xmlStaff = part.staves.size() > 1 ? staffNumber : 0;
             AttNIntegerComparison matchStaff(STAFF, staff.definition->GetN());
             const Staff *staffElement = vrv_cast<const Staff *>(measure->FindDescendantByComparison(&matchStaff, 1));
@@ -510,7 +594,7 @@ namespace musicxmloutput {
                     const std::map<int, MusicXmlVoiceDef>::const_iterator voiceDef = staff.voices.find(layer->GetN());
                     if (voiceDef == staff.voices.end()) continue;
                     MusicXmlVoice voice{ xmlStaff, voiceDef->second.number, voiceDef->second.instrument, {} };
-                    if (!CollectMusicXmlVoice(layer, staff.measureDuration, voice)) return false;
+                    if (!CollectMusicXmlVoice(layer, measureDuration, voice)) return false;
                     if (!voice.events.empty()) voices.push_back(std::move(voice));
                 }
             }
@@ -518,7 +602,7 @@ namespace musicxmloutput {
                 // A silent staff still needs a voice run so re-import associates the next run with its own staff.
                 const MusicXmlVoiceDef &voiceDef = staff.voices.begin()->second;
                 voices.push_back(
-                    { xmlStaff, voiceDef.number, voiceDef.instrument, { { NULL, staff.measureDuration, NULL, 0 } } });
+                    { xmlStaff, voiceDef.number, voiceDef.instrument, { { NULL, measureDuration, NULL, 0 } } });
             }
         }
         std::sort(voices.begin(), voices.end(), [](const MusicXmlVoice &one, const MusicXmlVoice &two) {
@@ -535,14 +619,7 @@ namespace musicxmloutput {
                 }
             }
             for (const MusicXmlEvent &event : voice.events) {
-                // Bound the resolution for consumers that calculate the measure size using integer arithmetic.
-                const int denominator = event.duration.GetDenominator();
-                if (denominator <= maxMusicXmlDivisions) {
-                    divisions = std::lcm(divisions, denominator);
-                    if (divisions <= maxMusicXmlDivisions) continue;
-                }
-                LogError("MusicXML output duration resolution exceeds 16384 divisions");
-                return false;
+                if (!AddMusicXmlDuration(event.duration, divisions)) return false;
             }
         }
         return true;
@@ -669,10 +746,10 @@ namespace musicxmloutput {
         }
     }
 
-    std::optional<Fraction> GetMusicXmlTimestampOffset(double beat, const MusicXmlStaff &staff, int divisions)
+    std::optional<Fraction> GetMusicXmlTimestampOffset(double beat, const MusicXmlMeter &meter, int divisions)
     {
-        const double quarters = (beat - 1.0) * 4.0 / staff.meterUnit;
-        if (!std::isfinite(quarters) || quarters < 0.0 || quarters > staff.measureDuration.ToDouble()) {
+        const double quarters = (beat - 1.0) * 4.0 / meter.unit;
+        if (!std::isfinite(quarters) || quarters < 0.0 || quarters > meter.GetDuration().ToDouble()) {
             return std::nullopt;
         }
 
@@ -685,7 +762,7 @@ namespace musicxmloutput {
             const double rounded = std::round(ticks);
             if (std::abs(ticks - rounded) < 1e-8) return Fraction(static_cast<int>(rounded), resolution);
             if (isFloat && !roundedOffset) {
-                const double gridBeat = 1.0 + (rounded / resolution) * staff.meterUnit / 4.0;
+                const double gridBeat = 1.0 + (rounded / resolution) * meter.unit / 4.0;
                 if (static_cast<float>(gridBeat) == beat) roundedOffset.emplace(static_cast<int>(rounded), resolution);
             }
         }
@@ -719,20 +796,21 @@ namespace musicxmloutput {
     }
 
     std::optional<Fraction> GetMusicXmlDirectionOffset(
-        const MusicXmlAnchor &anchor, const MusicXmlStaff &staff, int divisions)
+        const MusicXmlAnchor &anchor, const MusicXmlMeter &meter, int divisions)
     {
         if (const Fraction *offset = std::get_if<Fraction>(&anchor.position)) {
-            if (offset->ToDouble() > staff.measureDuration.ToDouble()) return std::nullopt;
+            if (offset->ToDouble() > meter.GetDuration().ToDouble()) return std::nullopt;
             return *offset;
         }
-        return GetMusicXmlTimestampOffset(std::get<double>(anchor.position), staff, divisions);
+        return GetMusicXmlTimestampOffset(std::get<double>(anchor.position), meter, divisions);
     }
 
     std::optional<Fraction> GetMusicXmlDirectionEndOffset(const std::optional<MusicXmlAnchor> &end, size_t startMeasure,
-        Fraction startOffset, const MusicXmlStaff &staff, int &divisions)
+        Fraction startOffset, const MusicXmlPart &part, size_t staff, int &divisions)
     {
         if (!end || end->measure < startMeasure) return std::nullopt;
-        const std::optional<Fraction> offset = GetMusicXmlDirectionOffset(*end, staff, divisions);
+        const std::optional<Fraction> offset
+            = GetMusicXmlDirectionOffset(*end, GetMusicXmlMeasureMeter(part, end->measure, staff), divisions);
         if (!offset) return std::nullopt;
         const int resolution = std::lcm(divisions, offset->GetDenominator());
         if (end->measure == startMeasure
@@ -786,9 +864,9 @@ namespace musicxmloutput {
         return target;
     }
 
-    double GetMusicXmlAnchorOffset(const MusicXmlAnchor &anchor, const MusicXmlStaff &staff)
+    double GetMusicXmlAnchorOffset(const MusicXmlAnchor &anchor, const MusicXmlMeter &meter)
     {
-        if (const double *beat = std::get_if<double>(&anchor.position)) return (*beat - 1.0) * 4.0 / staff.meterUnit;
+        if (const double *beat = std::get_if<double>(&anchor.position)) return (*beat - 1.0) * 4.0 / meter.unit;
         return std::get<Fraction>(anchor.position).ToDouble();
     }
 
@@ -831,7 +909,8 @@ namespace musicxmloutput {
                             collected |= AddMusicXmlBarlineFermata(part, anchor->measure, true, fermata);
                             continue;
                         }
-                        const double offset = GetMusicXmlAnchorOffset(*anchor, part.staves.at(staffIndex));
+                        const double offset = GetMusicXmlAnchorOffset(
+                            *anchor, GetMusicXmlMeasureMeter(part, anchor->measure, staffIndex));
                         if (!std::isfinite(offset) || offset < 0.0) continue;
                         const double tick = offset * divisions;
                         const MusicXmlMeasure &measure = part.measures.at(anchor->measure);
@@ -863,7 +942,8 @@ namespace musicxmloutput {
     const Note *FindMusicXmlTrillEnd(const MusicXmlAnchor &anchor, const MusicXmlPart &part, size_t staffIndex,
         const MusicXmlElementPosition &start, int divisions)
     {
-        const double offset = GetMusicXmlAnchorOffset(anchor, part.staves.at(staffIndex));
+        const double offset
+            = GetMusicXmlAnchorOffset(anchor, GetMusicXmlMeasureMeter(part, anchor.measure, staffIndex));
         if (!std::isfinite(offset) || offset < 0.0 || anchor.measure < start.measure) return NULL;
 
         size_t measure = anchor.measure;
@@ -947,7 +1027,8 @@ namespace musicxmloutput {
                     const int xmlStaff = part.staves.size() > 1 ? static_cast<int>(staffIndex) + 1 : 0;
                     const LayerElement *target = start;
                     if (!start || startStaff != staff) {
-                        const double offset = GetMusicXmlAnchorOffset(*anchor, part.staves.at(staffIndex));
+                        const double offset = GetMusicXmlAnchorOffset(
+                            *anchor, GetMusicXmlMeasureMeter(part, anchor->measure, staffIndex));
                         if (!std::isfinite(offset) || offset < 0.0) continue;
                         const MusicXmlEventMatch match = (turn && turn->GetDelayed() == BOOLEAN_true)
                             ? MusicXmlEventMatch::OnsetOrBefore
@@ -1014,8 +1095,8 @@ namespace musicxmloutput {
             if (position == staffPositions.end()) continue;
             const size_t part = position->second.first;
             const size_t staff = position->second.second;
-            const std::optional<Fraction> offset
-                = GetMusicXmlDirectionOffset(anchor, parts.at(part).staves.at(staff), divisions);
+            const std::optional<Fraction> offset = GetMusicXmlDirectionOffset(
+                anchor, GetMusicXmlMeasureMeter(parts.at(part), anchor.measure, staff), divisions);
             if (!offset) continue;
 
             // A rejected target must not change the resolution available to subsequent targets.
@@ -1168,7 +1249,7 @@ namespace musicxmloutput {
                         { MusicXmlWords{ directive, text }, directive->GetPlace(), target.GetStaffNumber(),
                             target.offset });
                     const std::optional<Fraction> endOffset = GetMusicXmlDirectionEndOffset(
-                        end, start->measure, target.offset, part.staves.at(target.staff), resolution);
+                        end, start->measure, target.offset, part, target.staff, resolution);
                     if (endOffset) {
                         spans.push_back({ part.directions.at(start->measure).size() - 1, target.part,
                             target.GetStaffNumber(), start->measure, end->measure, target.offset, *endOffset });
@@ -1315,9 +1396,8 @@ namespace musicxmloutput {
             const bool collected = CollectMusicXmlDirectionTargets(*start,
                 hairpin->GetTstampStaves(measures.at(start->measure), hairpin), staffPositions, parts, divisions,
                 [&](const MusicXmlDirectionTarget &target, int &resolution) {
-                    const MusicXmlStaff &staff = parts.at(target.part).staves.at(target.staff);
-                    const std::optional<Fraction> endOffset
-                        = GetMusicXmlDirectionEndOffset(end, start->measure, target.offset, staff, resolution);
+                    const std::optional<Fraction> endOffset = GetMusicXmlDirectionEndOffset(
+                        end, start->measure, target.offset, parts.at(target.part), target.staff, resolution);
                     if (!endOffset) return false;
                     spans.push_back({ hairpin, target.part, target.GetStaffNumber(), start->measure, end->measure,
                         target.offset, *endOffset });
@@ -1544,42 +1624,73 @@ namespace musicxmloutput {
         if (tempo && !tempo->bpm.empty()) node.append_child("sound").append_attribute("tempo") = tempo->bpm.c_str();
     }
 
-    void WriteMusicXmlAttributes(
-        pugi::xml_node measure, const ScoreDef *scoreDef, const MusicXmlPart &part, int divisions)
+    void WriteMusicXmlKey(pugi::xml_node attributes, const KeySig &key, int staff = 0)
     {
+        pugi::xml_node node = attributes.append_child("key");
+        if (staff) node.append_attribute("number") = staff;
+        if (key.GetVisible() == BOOLEAN_false) node.append_attribute("print-object") = "no";
+        node.append_child("fifths").text().set(key.GetFifthsInt());
+        if (key.HasMode()) node.append_child("mode").text().set(key.AttKeySigAnl::ModeToStr(key.GetMode()).c_str());
+    }
+
+    void WriteMusicXmlTime(pugi::xml_node attributes, const MeterSig &meter, const MusicXmlMeter &values, int staff = 0)
+    {
+        pugi::xml_node time = attributes.append_child("time");
+        if (staff) time.append_attribute("number") = staff;
+        if (meter.GetSym() == METERSIGN_common) {
+            time.append_attribute("symbol") = "common";
+        }
+        else if (meter.GetSym() == METERSIGN_cut) {
+            time.append_attribute("symbol") = "cut";
+        }
+        else if (meter.GetForm() == METERFORM_num) {
+            time.append_attribute("symbol") = "single-number";
+        }
+        if (meter.GetVisible() == BOOLEAN_false) time.append_attribute("print-object") = "no";
+        time.append_child("beats").text().set(values.count);
+        time.append_child("beat-type").text().set(values.unit);
+    }
+
+    void WriteMusicXmlAttributes(pugi::xml_node measure, const ScoreDef *scoreDef, const MusicXmlPart &part,
+        const MusicXmlMeasureSignatures &change, size_t index, int divisions)
+    {
+        if (index) {
+            if (!change.key && !change.time) return;
+            pugi::xml_node attributes = measure.append_child("attributes");
+            if (change.key) WriteMusicXmlKey(attributes, *change.key);
+            if (change.time) {
+                WriteMusicXmlTime(attributes, *change.time, GetMusicXmlMeasureMeter(part, index, 0));
+            }
+            return;
+        }
+
         pugi::xml_node attributes = measure.append_child("attributes");
         attributes.append_child("divisions").text().set(divisions);
+        const bool multipleStaves = part.staves.size() > 1;
+        for (size_t i = 0; i < part.staves.size(); ++i) {
+            const KeySig *key
+                = change.key ? change.key : GetInitialAttribute<KeySig>(scoreDef, part.staves.at(i).definition, KEYSIG);
+            if (key) {
+                WriteMusicXmlKey(attributes, *key, multipleStaves ? static_cast<int>(i) + 1 : 0);
+            }
+        }
+        for (size_t i = 0; i < part.staves.size(); ++i) {
+            const MeterSig *meter = change.time
+                ? change.time
+                : GetInitialAttribute<MeterSig>(scoreDef, part.staves.at(i).definition, METERSIG);
+            if (meter) {
+                WriteMusicXmlTime(attributes, *meter, GetMusicXmlMeasureMeter(part, index, i),
+                    multipleStaves ? static_cast<int>(i) + 1 : 0);
+            }
+        }
+        if (multipleStaves) attributes.append_child("staves").text().set(static_cast<int>(part.staves.size()));
         int staffNumber = 0;
-        for (const MusicXmlStaff &staff : part.staves) {
-            ++staffNumber;
-            const KeySig *key = GetInitialAttribute<KeySig>(scoreDef, staff.definition, KEYSIG);
-            if (!key) continue;
-            pugi::xml_node keyNode = attributes.append_child("key");
-            if (part.staves.size() > 1) keyNode.append_attribute("number") = staffNumber;
-            keyNode.append_child("fifths").text().set(key->GetFifthsInt());
-        }
-        staffNumber = 0;
-        for (const MusicXmlStaff &staff : part.staves) {
-            ++staffNumber;
-            const MeterSig *meter = GetInitialAttribute<MeterSig>(scoreDef, staff.definition, METERSIG);
-            if (!meter) continue;
-            pugi::xml_node time = attributes.append_child("time");
-            if (part.staves.size() > 1) time.append_attribute("number") = staffNumber;
-            if (meter->GetSym() == METERSIGN_common) time.append_attribute("symbol") = "common";
-            if (meter->GetSym() == METERSIGN_cut) time.append_attribute("symbol") = "cut";
-            if (meter->GetVisible() == BOOLEAN_false) time.append_attribute("print-object") = "no";
-            const std::pair<int, int> meterValues = GetMusicXmlMeter(meter);
-            time.append_child("beats").text().set(meterValues.first);
-            time.append_child("beat-type").text().set(meterValues.second);
-        }
-        if (part.staves.size() > 1) attributes.append_child("staves").text().set(static_cast<int>(part.staves.size()));
-        staffNumber = 0;
         for (const MusicXmlStaff &staff : part.staves) {
             ++staffNumber;
             const Clef *clef = GetInitialAttribute<Clef>(scoreDef, staff.definition, CLEF);
             if (!clef || !clef->HasShape()) continue;
             pugi::xml_node clefNode = attributes.append_child("clef");
-            if (part.staves.size() > 1) clefNode.append_attribute("number") = staffNumber;
+            if (multipleStaves) clefNode.append_attribute("number") = staffNumber;
             clefNode.append_child("sign").text().set(clef->AttClefShape::ClefshapeToStr(clef->GetShape()).c_str());
             if (clef->HasLine()) clefNode.append_child("line").text().set(clef->GetLine());
         }
@@ -1992,10 +2103,6 @@ std::string MusicXmlOutput::Export()
         LogError("MusicXML output requires one mdiv containing a score");
         return "";
     }
-    if (doc->FindDescendantByType(SCOREDEF)) {
-        LogError("MusicXML output does not support mid-score scoreDef changes yet");
-        return "";
-    }
     musicxmloutput::CollectMusicXmlMeasuresFunctor collectMeasures;
     doc->Process(collectMeasures);
     const std::vector<const Measure *> &measures = collectMeasures.m_measures;
@@ -2004,6 +2111,8 @@ std::string MusicXmlOutput::Export()
         LogError("MusicXML output requires at least one measure and staff definition");
         return "";
     }
+    std::vector<musicxmloutput::MusicXmlMeasureSignatures> signatures(measures.size());
+    if (!musicxmloutput::CollectMusicXmlMeasureSignatures(collectMeasures.m_scoreDefs, signatures)) return "";
 
     std::map<int, std::set<int>> layersByStaff;
     for (const Measure *measure : measures) {
@@ -2025,7 +2134,7 @@ std::string MusicXmlOutput::Export()
 
     std::vector<musicxmloutput::MusicXmlPart> parts;
     std::map<const Object *, size_t> partByDefinition;
-    Fraction expectedMeasureDuration;
+    Fraction initialMeasureDuration;
     for (const Object *object : staffDefs) {
         const StaffDef *staffDef = vrv_cast<const StaffDef *>(object);
         const data_NOTATIONTYPE notation = staffDef->GetNotationtype();
@@ -2034,11 +2143,10 @@ std::string MusicXmlOutput::Export()
             return "";
         }
         const MeterSig *meter = musicxmloutput::GetInitialAttribute<MeterSig>(scoreDef, staffDef, METERSIG);
-        const std::pair<int, int> meterValues = musicxmloutput::GetMusicXmlMeter(meter);
+        const std::optional<musicxmloutput::MusicXmlMeter> meterValues = musicxmloutput::GetMusicXmlMeter(meter);
         const KeySig *key = musicxmloutput::GetInitialAttribute<KeySig>(scoreDef, staffDef, KEYSIG);
         const Clef *clef = musicxmloutput::GetInitialAttribute<Clef>(scoreDef, staffDef, CLEF);
-        if (meterValues.first <= 0 || meterValues.first > 128 || meterValues.second <= 0 || meterValues.second > 1024
-            || musicxmloutput::GetInitialAttribute<MeterSigGrp>(scoreDef, staffDef, METERSIGGRP)
+        if (!meterValues || musicxmloutput::GetInitialAttribute<MeterSigGrp>(scoreDef, staffDef, METERSIGGRP)
             || (key && key->HasNonAttribKeyAccidChildren()) || staffDef->HasTransDiat() || staffDef->HasTransSemi()
             || (clef
                 && (clef->HasDis()
@@ -2047,9 +2155,9 @@ std::string MusicXmlOutput::Export()
             LogError("MusicXML output does not support the initial attributes for staff %d yet", staffDef->GetN());
             return "";
         }
-        const Fraction measureDuration(meterValues.first * 4, meterValues.second);
-        if (!expectedMeasureDuration.GetNumerator()) expectedMeasureDuration = measureDuration;
-        if (measureDuration != expectedMeasureDuration) {
+        const Fraction measureDuration = meterValues->GetDuration();
+        if (!initialMeasureDuration.GetNumerator()) initialMeasureDuration = measureDuration;
+        if (measureDuration != initialMeasureDuration) {
             LogError("MusicXML output requires the same measure duration on every staff");
             return "";
         }
@@ -2069,7 +2177,7 @@ std::string MusicXmlOutput::Export()
                 {}, {}, {}, {}, {} });
         }
         musicxmloutput::MusicXmlPart &part = parts[position.first->second];
-        part.staves.push_back({ staffDef, measureDuration, meterValues.second, {} });
+        part.staves.push_back({ staffDef, *meterValues, {} });
         musicxmloutput::MusicXmlStaff &staff = part.staves.back();
 
         std::set<int> &layers = layersByStaff[staffDef->GetN()];
@@ -2084,12 +2192,14 @@ std::string MusicXmlOutput::Export()
         }
     }
 
-    int divisions = expectedMeasureDuration.GetDenominator();
+    int divisions = 1;
     std::set<std::string> ids;
     for (musicxmloutput::MusicXmlPart &part : parts) {
         musicxmloutput::AssignMusicXmlVoices(part);
-        for (const Measure *measure : measures) {
-            if (!musicxmloutput::CollectMusicXmlPartMeasure(part, measure, divisions)) return "";
+        std::optional<musicxmloutput::MusicXmlMeter> meterOverride;
+        for (size_t i = 0; i < measures.size(); ++i) {
+            if (signatures[i].time) meterOverride = musicxmloutput::GetMusicXmlMeter(signatures[i].time);
+            if (!musicxmloutput::CollectMusicXmlPartMeasure(part, measures[i], meterOverride, divisions)) return "";
         }
         if (!part.id.empty() && !ids.insert(part.id).second) {
             LogError("MusicXML output requires unique instrDef IDs (duplicate '%s')", part.id.c_str());
@@ -2166,7 +2276,7 @@ std::string MusicXmlOutput::Export()
                 = partFermatas != part.barlineFermatas.end() ? partFermatas->second : noFermatas;
             const musicxmloutput::MusicXmlMeasureBarlines &barlines = measureBarlines[i];
             musicxmloutput::WriteMusicXmlBarline(measureNode, barlines.left, fermatas.left, "left");
-            if (i == 0) musicxmloutput::WriteMusicXmlAttributes(measureNode, scoreDef, part, divisions);
+            musicxmloutput::WriteMusicXmlAttributes(measureNode, scoreDef, part, signatures[i], i, divisions);
             // Directions are written at cursor zero, so their offsets are relative to the start of the measure.
             if (!part.directions.empty()) {
                 for (const musicxmloutput::MusicXmlDirection &direction : part.directions.at(i)) {
@@ -2187,9 +2297,10 @@ std::string MusicXmlOutput::Export()
             musicxmloutput::WriteMusicXmlBarline(measureNode, barlines.right, fermatas.right, "right");
             if (&part == &parts.front()) {
                 const MNum *mNum = vrv_cast<const MNum *>(measure->GetFirst(MNUM));
+                const Fraction expectedDuration = musicxmloutput::GetMusicXmlMeasureMeter(part, i, 0).GetDuration();
                 implicitMeasures[i] = measure->GetMetcon() == BOOLEAN_false
                     || (mNum && !mNum->IsGenerated() && mNum->GetText().empty())
-                    || furthest != musicxmloutput::GetMusicXmlTicks(expectedMeasureDuration, divisions);
+                    || furthest != musicxmloutput::GetMusicXmlTicks(expectedDuration, divisions);
             }
             if (implicitMeasures[i]) measureNode.append_attribute("implicit") = "yes";
         }

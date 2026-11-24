@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1">
+   <meiHead>
+      <fileDesc>
+         <titleStmt><title>Key and time signature changes</title></titleStmt>
+         <pubStmt/>
+      </fileDesc>
+   </meiHead>
+   <music>
+      <body>
+         <mdiv>
+            <score>
+               <scoreDef keysig="1s" meter.count="4" meter.unit="4">
+                  <staffGrp>
+                     <staffDef n="1" lines="5" clef.shape="G" clef.line="2"/>
+                     <staffDef n="2" lines="5" clef.shape="F" clef.line="4"/>
+                  </staffGrp>
+               </scoreDef>
+               <section>
+                  <measure n="1">
+                     <staff n="1"><layer n="1"><note pname="g" oct="4" dur="1"/></layer></staff>
+                     <staff n="2"><layer n="1"><mRest/></layer></staff>
+                     <dir staff="1" place="above" tstamp="2" tstamp2="1m+4" extender="true">sul pont.</dir>
+                  </measure>
+                  <scoreDef xml:id="both-signatures" keysig="2f" key.mode="minor" meter.count="5" meter.unit="8"/>
+                  <measure n="2">
+                     <staff n="1">
+                        <layer n="1">
+                           <note pname="b" oct="4" dur="2" accid.ges="f"/>
+                           <note pname="c" oct="5" dur="8"/>
+                        </layer>
+                     </staff>
+                     <staff n="2"><layer n="1"><mRest/></layer></staff>
+                     <tempo staff="2" tstamp="2.5" midi.bpm="90"/>
+                     <fermata staff="1" tstamp="6"/>
+                  </measure>
+                  <scoreDef xml:id="key-only"><keySig sig="0"/></scoreDef>
+                  <measure n="3">
+                     <staff n="1"><layer n="1"><mRest/></layer></staff>
+                     <staff n="2"><layer n="1"><mRest/></layer></staff>
+                     <dynam staff="1" tstamp="3" place="below">p</dynam>
+                  </measure>
+                  <scoreDef xml:id="time-only"><meterSig count="2" unit="2" sym="cut"/></scoreDef>
+                  <measure n="4">
+                     <staff n="1"><layer n="1"><note pname="d" oct="5" dur="1"/></layer></staff>
+                     <staff n="2"><layer n="1"><mRest/></layer></staff>
+                  </measure>
+               </section>
+            </score>
+         </mdiv>
+      </body>
+   </music>
+</mei>

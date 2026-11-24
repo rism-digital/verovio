@@ -16,7 +16,7 @@ renderSvg() {
 
 for fixture in staff-instrument group-instrument layer-instruments beam beam-two-voices tuplet tie tie-chords tie-chord-notes \
     slur-chord slurs-overlap dynam-startid dynam-tstamp hairpin-cross-measure hairpins-overlap fermata ornaments \
-    measure-barlines measure-repeats directives directives-fractional tempo; do
+    measure-barlines measure-repeats directives directives-fractional tempo signature-changes; do
     first="$output/$fixture.musicxml"
     second="$output/$fixture-roundtrip.musicxml"
     "$verovio" -r data -f mei -t musicxml -o "$first" "$fixtures/$fixture.mei"
@@ -233,6 +233,27 @@ check tempo.mei '//*[local-name()="tempo"][@tstamp="1" and @mm="72.5" and @mm.un
     and @midi.bpm="108.75" and @xml:lang="fr"]'
 check tempo.mei '//*[local-name()="tempo"][@tstamp="1.25" and @midi.bpm="92.125" and not(@mm)]'
 check tempo.mei '//*[local-name()="tempo"][@tstamp="3" and @midi.bpm="108.75" and normalize-space(.)="a tempo"]'
+
+check signature-changes.musicxml 'count(//part[
+    measure[@number="1"]/attributes[divisions=4 and key/fifths=1 and time[beats=4 and beat-type=4]]
+    and measure[@number="2"]/attributes[key[fifths=-2 and mode="minor" and not(@number)]
+    and time[beats=5 and beat-type=8 and not(@number)] and not(divisions)]
+    and measure[@number="3"]/attributes[key/fifths=0 and not(time)]
+    and measure[@number="4"]/attributes[time[@symbol="cut" and beats=2 and beat-type=2] and not(key)]])=2
+    and not(//measure[@implicit])'
+check signature-changes.musicxml '//part[@id="P1"]/measure[@number="2"]
+    [*[1][self::attributes] and note/pitch[step="B" and alter=-1] and barline[@location="right"]/fermata]
+    /direction[offset=6 and direction-type/dashes/@type="stop"]'
+check signature-changes.musicxml '//part[@id="P1"]/measure[@number="3"]
+    [note[rest/@measure="yes" and duration=10] and direction[direction-type/dynamics/p and offset=4]]'
+check signature-changes.musicxml '//part[@id="P2"][count(measure[note[rest/@measure="yes"]])=4
+    and count(measure[@number="2" or @number="3"]/note[duration=10])=2 and measure[@number="4"]/note[duration=16]]
+    /measure[@number="2"]/direction[offset[@sound="yes" and .=3] and sound/@tempo=90]'
+check signature-changes.mei '//*[local-name()="measure" and @n="2"]
+    [preceding-sibling::*[1][local-name()="scoreDef"]
+    [*[local-name()="keySig" and @sig="2f" and @mode="minor"] and *[local-name()="meterSig" and @count="5" and @unit="8"]]
+    and *[local-name()="tempo" and @staff="2" and @tstamp="2.5"]]'
+check signature-changes.mei '//*[local-name()="dir" and @tstamp="2" and @tstamp2="1m+4" and @extender="true"]'
 
 input="$fixtures/fermata-measure-rests.musicxml"
 if [ -n "$schema" ]; then
