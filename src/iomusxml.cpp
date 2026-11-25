@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include <algorithm>
 #include <cassert>
 #include <iterator>
 #include <limits>
@@ -1901,6 +1902,8 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, shor
     assert(node);
     assert(section);
 
+    m_lyricNumbers.clear();
+
     pugi::xpath_node_set measures = node.select_nodes("measure");
     if (measures.size() == 0) {
         LogWarning("MusicXML import: No measure to load");
@@ -3551,8 +3554,13 @@ void MusicXmlInput::ReadMusicXmlNote(
                 }
             }
             if (!lyric.child("text") && !extendStop) continue; // Dorico exports non-valid MusicXML
-            short int lyricNumber = lyric.attribute("number").as_int();
-            lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
+            // The number is an NMTOKEN: a token that is not an integer (Sibelius writes "part1verse2") gets the next
+            // free number in its part, so that distinct lines stay distinct
+            const std::string number = lyric.attribute("number").as_string();
+            const bool isInteger = std::all_of(number.begin(), number.end(), ::isdigit);
+            if (!isInteger) m_lyricNumbers.try_emplace(number, static_cast<int>(m_lyricNumbers.size()) + 1);
+            const int lyricNumber
+                = std::max(1, isInteger ? lyric.attribute("number").as_int() : m_lyricNumbers.at(number));
             if (extendStop) m_pendingExtenderStops[{ staff->GetN(), layer->GetN() }].insert(lyricNumber);
             if (!lyric.child("text")) continue;
             Verse *verse = new Verse();
