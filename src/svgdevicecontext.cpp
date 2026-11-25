@@ -1393,7 +1393,7 @@ void SvgDeviceContext::DrawTextAsPaths(const std::u32string &wtext, int x, int y
         const double scale = (double)font->GetPointSize() / placement.m_unitsPerEm;
         const double advance = placement.m_advanceX * scale;
         const Glyph *glyph = resources->GetRuntimeGlyph(placement.m_face, placement.m_glyphId);
-        int x, y, width, height;
+        int x, y, width = 0, height = 0;
         if (glyph) glyph->GetBoundingBox(x, y, width, height);
         // Skip glyphs without outline, such as spaces
         if (!glyph || (!width && !height)) {
