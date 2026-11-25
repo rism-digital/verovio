@@ -81,9 +81,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
     if (element->IsAnyOf(std::array{ ANNOTSCORE, BEAMSPAN, BRACKETSPAN, FIGURE, GLISS, HAIRPIN, LV, OCTAVE, PHRASE,
             PITCHINFLECTION, SLUR, TIE })) {
-        // create placeholder
-        dc->StartGraphic(element, "", element->GetID());
-        dc->EndGraphic(element, this);
+        dc->CreateGraphicPlaceholder(element, "", element->GetID(), this);
         system->AddToDrawingList(element);
     }
     else if (element->Is(ARPEG)) {
@@ -3026,8 +3024,7 @@ void View::DrawSystemElement(DeviceContext *dc, SystemElement *element, System *
         // Create placeholder - A graphic for the end milestone will be created
         // but only if it is on a different system - See View::DrawEnding
         // The Ending is added to the System drawing list by View::DrawMeasure
-        dc->StartGraphic(element, "systemMilestone", element->GetID());
-        dc->EndGraphic(element, this);
+        dc->CreateGraphicPlaceholder(element, "systemMilestone", element->GetID(), this);
     }
     else if (element->Is(PB)) {
         dc->StartGraphic(element, "placeholder", element->GetID());
@@ -3133,13 +3130,6 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         spanningType = SPANNING_MIDDLE;
     }
 
-    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-        dc->ResumeGraphic(ending, ending->GetID());
-    }
-    else {
-        dc->StartGraphic(ending, "", ending->GetID(), SPANNING);
-    }
-
     std::vector<Staff *> staffList;
     assert(system->GetDrawingScoreDef());
     assert(measure);
@@ -3158,7 +3148,17 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     else {
         staffList = measure->GetFirstStaffGrpStaves(system->GetDrawingScoreDef());
     }
+    if (staffList.empty()) return;
 
+    const bool resume = (spanningType == SPANNING_START_END) || (spanningType == SPANNING_START);
+    if (resume) {
+        dc->ResumeGraphic(ending, ending->GetID());
+    }
+    else {
+        dc->StartGraphic(ending, "", ending->GetID(), SPANNING);
+    }
+
+    View *boundingBoxView = NULL;
     for (Staff *staff : staffList) {
         if (!system->SetCurrentFloatingPositioner(staff->GetN(), ending, objectX, staff)) {
             continue;
@@ -3256,13 +3256,15 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         dc->ResetPen();
 
         dc->EndCustomGraphic();
+        dc->DrawGraphicBoundingBox(ending, this);
+        boundingBoxView = this;
     }
 
-    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-        dc->EndResumedGraphic(ending, this);
+    if (resume) {
+        dc->EndResumedGraphic(ending, boundingBoxView);
     }
     else {
-        dc->EndGraphic(ending, this);
+        dc->EndGraphic(ending, boundingBoxView);
     }
 }
 
