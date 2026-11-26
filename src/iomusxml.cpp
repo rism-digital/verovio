@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include <algorithm>
 #include <cassert>
 #include <iterator>
 #include <limits>
@@ -1901,6 +1902,8 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, shor
     assert(node);
     assert(section);
 
+    m_lyricNumbers.clear();
+
     pugi::xpath_node_set measures = node.select_nodes("measure");
     if (measures.size() == 0) {
         LogWarning("MusicXML import: No measure to load");
@@ -2001,6 +2004,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     // reset clef changed flag
     m_clefChanged = 0;
 
+    // a measure that starts a multi measure rest: the multiRest stands for its notes, the rest of it is read
+    const bool isMultiRest = node.select_node(".//multiple-rest");
+
     const auto mrestPositonIter = m_multiRests.find(index);
     bool isMRestInOtherSystem = (mrestPositonIter != m_multiRests.end());
     int multiRestStaffNumber = 1;
@@ -2026,12 +2032,16 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             }
             multiRest->SetNum(multiRestLength);
             Layer *layer = SelectLayer(1, measure);
+            // notes before the block have advanced the measure time: add the multiRest without filling space for them
+            const int durTotal = m_durTotal;
+            m_durTotal = 0;
             this->AddLayerElement(layer, multiRest);
+            m_durTotal = durTotal;
             m_multiRests[index] = index + multiRestLength - 1;
             this->ReadMusicXmlAttributes(child, section, measure);
-            break;
+            continue;
         }
-        else if (isMRestInOtherSystem) {
+        else if (isMRestInOtherSystem && !isMultiRest) {
             if ((multiRestStaffNumber > 1) && !IsElement(child, "backup")) continue;
             MultiRest *multiRest = new MultiRest;
             multiRest->SetNum(mrestPositonIter->second - mrestPositonIter->first + 1);
@@ -2065,7 +2075,13 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             this->ReadMusicXmlHarmony(child, measure);
         }
         else if (IsElement(child, "note")) {
-            this->ReadMusicXmlNote(child, measure, staffOffset, section);
+            if (isMultiRest) {
+                // the notes are not read, but their durations advance the measure time
+                if (!child.child("chord")) m_durTotal += child.child("duration").text().as_int();
+            }
+            else {
+                this->ReadMusicXmlNote(child, measure, staffOffset, section);
+            }
         }
         // for now only check first part
         else if (IsElement(child, "print") && node.select_node("parent::part[not(preceding-sibling::part)]")) {
@@ -3538,8 +3554,13 @@ void MusicXmlInput::ReadMusicXmlNote(
                 }
             }
             if (!lyric.child("text") && !extendStop) continue; // Dorico exports non-valid MusicXML
-            short int lyricNumber = lyric.attribute("number").as_int();
-            lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
+            // The number is an NMTOKEN: a token that is not an integer (Sibelius writes "part1verse2") gets the next
+            // free number in its part, so that distinct lines stay distinct
+            const std::string number = lyric.attribute("number").as_string();
+            const bool isInteger = std::all_of(number.begin(), number.end(), ::isdigit);
+            if (!isInteger) m_lyricNumbers.try_emplace(number, static_cast<int>(m_lyricNumbers.size()) + 1);
+            const int lyricNumber
+                = std::max(1, isInteger ? lyric.attribute("number").as_int() : m_lyricNumbers.at(number));
             if (extendStop) m_pendingExtenderStops[{ staff->GetN(), layer->GetN() }].insert(lyricNumber);
             if (!lyric.child("text")) continue;
             Verse *verse = new Verse();
