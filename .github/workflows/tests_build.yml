@@ -71,6 +71,7 @@ jobs:
       - name: Create directories and install packages
         working-directory: ${{ github.workspace }}
         run: |
+          rm -rf ${{ env.MEI_DIR }}/.git
           rm -rf ${{ env.MUSICXML_DIR }}/.git
           mkdir -p ${{ env.DEV_DIR }}
           mkdir -p ${{ env.PR_DIR }}
