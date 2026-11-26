@@ -1,11 +1,11 @@
 # This script can be run with an installed verovio package or from a CMake
 # build directory such as ./bindings/python.
 import argparse
-import importlib.resources as resources
 import json
 import os
 import sys
 import xml.etree.ElementTree as ET
+from importlib import resources
 
 from cairosvg import svg2png
 
@@ -78,6 +78,8 @@ if __name__ == '__main__':
     path2 = args.output_dir.replace(r"\ ", " ")
     dir1 = sorted(os.listdir(path1))
     for item1 in dir1:
+        if item1.startswith('.'):
+            continue
         if not (os.path.isdir(os.path.join(path1, item1))):
             continue
 
