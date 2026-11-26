@@ -5,6 +5,7 @@ import importlib.resources as resources
 import json
 import os
 import sys
+from pathlib import Path
 
 import lxml.etree as etree
 from xmldiff.main import diff_trees as xmldiff
@@ -12,6 +13,8 @@ from xmldiff.main import diff_trees as xmldiff
 # Add path for toolkit built in-place
 sys.path.append('./verovio')
 import verovio
+
+from musicxml_export_tests import run_musicxml_export_tests
 
 ns = {'mei': 'http://www.music-encoding.org/ns/mei'}
 
@@ -31,6 +34,8 @@ if __name__ == '__main__':
     parser.add_argument('test_suite_dir')
     parser.add_argument('output_dir')
     parser.add_argument('--shortlist', nargs='?', default='')
+    parser.add_argument('--musicxml-schema', type=Path, default=os.environ.get('VEROVIO_MUSICXML_SCHEMA'),
+                        help='Local MusicXML 4.0 schema for validating the export tests')
     args = parser.parse_args()
 
     # version of the toolkit
@@ -84,6 +89,11 @@ if __name__ == '__main__':
         output_files_path = os.path.join(output_dir_fpath, test_file_directory)
         if not (os.path.isdir(output_files_path)):
             os.mkdir(output_files_path)
+
+        if test_file_directory == 'musicxml-export':
+            run_musicxml_export_tests(tk, Path(testing_files_path), Path(output_files_path),
+                                      shortlist, args.musicxml_schema)
+            continue
 
         testing_files = sorted(os.listdir(testing_files_path))
 

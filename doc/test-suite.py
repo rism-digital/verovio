@@ -80,6 +80,9 @@ if __name__ == '__main__':
     for item1 in dir1:
         if item1.startswith('.'):
             continue
+        if item1 == 'musicxml-export':
+            # The round-trip runner renders these fixtures before and after MusicXML conversion.
+            continue
         if not (os.path.isdir(os.path.join(path1, item1))):
             continue
 

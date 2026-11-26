@@ -64,6 +64,6 @@ $PYTHON ../../doc/test-suite.py "$testmusicxmldir" "$indir2"
 
 $PYTHON ../../doc/test-suite-diff.py "$indir2" "$indir1" "$outdir"
 
-$PYTHON ../../doc/test-suite-roundtrip.py "$testdir" "$outdir"
+$PYTHON ../../doc/test-suite-roundtrip.py "$testdir" "$outdir" || exit $?
 
 open $outdir/index.html
