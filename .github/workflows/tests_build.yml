@@ -105,7 +105,7 @@ jobs:
         run: |
           ${{ github.workspace }}/.venv-dev/bin/python -m build --wheel
           ${{ github.workspace }}/.venv-dev/bin/python -m pip install dist/*.whl
-          ${{ github.workspace }}/.venv-dev/bin/python doc/test-suite.py ${{ github.workspace }}/${{ env.MEI_DIR }}/_tests ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/
+          ${{ github.workspace }}/.venv-dev/bin/python doc/test-suite.py ${{ github.workspace }}/${{ env.MEI_DIR }}/ ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/
           ${{ github.workspace }}/.venv-dev/bin/python doc/test-suite.py ${{ github.workspace }}/${{ env.MUSICXML_DIR }} ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/
 
       - name: Checkout the PR
@@ -119,7 +119,7 @@ jobs:
         run: |
           ${{ github.workspace }}/.venv-pr/bin/python -m build --wheel
           ${{ github.workspace }}/.venv-pr/bin/python -m pip install dist/*.whl
-          ${{ github.workspace }}/.venv-pr/bin/python doc/test-suite.py ${{ github.workspace }}/${{env.MEI_DIR}}/_tests ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/
+          ${{ github.workspace }}/.venv-pr/bin/python doc/test-suite.py ${{ github.workspace }}/${{env.MEI_DIR}}/ ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/
           ${{ github.workspace }}/.venv-pr/bin/python doc/test-suite.py ${{ github.workspace }}/${{ env.MUSICXML_DIR }} ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.PR_DIR }}/
 
       - name: Compare the tests
@@ -131,7 +131,7 @@ jobs:
       - name: Round-trip evaluation
         working-directory: ${{ github.workspace }}/${{ env.PR_DIR }}
         run: |
-          ${{ github.workspace }}/.venv-pr/bin/python doc/test-suite-roundtrip.py ${{ github.workspace }}/${{env.MEI_DIR}}/_tests ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
+          ${{ github.workspace }}/.venv-pr/bin/python doc/test-suite-roundtrip.py ${{ github.workspace }}/${{env.MEI_DIR}}/ ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
           ls -al
 
       - name: Upload results as artefacts
