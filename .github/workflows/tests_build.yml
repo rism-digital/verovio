@@ -17,7 +17,7 @@ env:
   TOOLKIT_BUILD: toolkit-build
 
   # verovio-test-suite
-  MEI_TESTS_REPO: ${{ github.repository_owner }}/verovio-test-suite # works from rism-digital and from forks
+  MEI_TESTS_REPO: rism-digital/verovio-test-suite
   MEI_TESTS_BRANCH: main
 
   # musicxmlTestSuite
