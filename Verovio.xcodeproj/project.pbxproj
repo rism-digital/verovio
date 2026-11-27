@@ -488,6 +488,12 @@
 		4D89F910201771AE00A4D336 /* num.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D89F90D201771AE00A4D336 /* num.cpp */; };
 		4D89F9122018A93300A4D336 /* svg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D89F9112018A93200A4D336 /* svg.cpp */; };
 		4D8C59533015F2360063E9C2 /* iogabc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D7647A12FA66C68004F9EDA /* iogabc.cpp */; };
+		4D90E60E30B9B31600536E76 /* clipboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D90E60D30B9B31600536E76 /* clipboard.cpp */; };
+		4D90E60F30B9B31600536E76 /* clipboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D90E60D30B9B31600536E76 /* clipboard.cpp */; };
+		4D90E61030B9B31600536E76 /* clipboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D90E60D30B9B31600536E76 /* clipboard.cpp */; };
+		4D90E61130B9B31600536E76 /* clipboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D90E60D30B9B31600536E76 /* clipboard.cpp */; };
+		4D90E61330B9B32C00536E76 /* clipboard.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D90E61230B9B32C00536E76 /* clipboard.h */; };
+		4D90E61430B9B32C00536E76 /* clipboard.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D90E61230B9B32C00536E76 /* clipboard.h */; };
 		4D94721D20CA701000C780C8 /* linkinginterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D94721C20CA701000C780C8 /* linkinginterface.h */; };
 		4D94721F20CA702C00C780C8 /* linkinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D94721E20CA702C00C780C8 /* linkinginterface.cpp */; };
 		4D94722020CA702C00C780C8 /* linkinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D94721E20CA702C00C780C8 /* linkinginterface.cpp */; };
@@ -2097,6 +2103,8 @@
 		4D89F90B201771A700A4D336 /* num.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = num.h; path = include/vrv/num.h; sourceTree = "<group>"; };
 		4D89F90D201771AE00A4D336 /* num.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = num.cpp; path = src/num.cpp; sourceTree = "<group>"; };
 		4D89F9112018A93200A4D336 /* svg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = svg.cpp; path = src/svg.cpp; sourceTree = "<group>"; };
+		4D90E60D30B9B31600536E76 /* clipboard.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = clipboard.cpp; path = src/clipboard.cpp; sourceTree = "<group>"; };
+		4D90E61230B9B32C00536E76 /* clipboard.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = clipboard.h; path = include/vrv/clipboard.h; sourceTree = "<group>"; };
 		4D9234F11A586AE100763251 /* comparison.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = comparison.h; path = include/vrv/comparison.h; sourceTree = "<group>"; };
 		4D94721C20CA701000C780C8 /* linkinginterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = linkinginterface.h; path = include/vrv/linkinginterface.h; sourceTree = "<group>"; };
 		4D94721E20CA702C00C780C8 /* linkinginterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = linkinginterface.cpp; path = src/linkinginterface.cpp; sourceTree = "<group>"; };
@@ -2768,6 +2776,8 @@
 		4DA0EAFC22BB797000A7EBEB /* editor */ = {
 			isa = PBXGroup;
 			children = (
+				4D90E60D30B9B31600536E76 /* clipboard.cpp */,
+				4D90E61230B9B32C00536E76 /* clipboard.h */,
 				4D1A0BBD2FD1518E004AE805 /* cursor.cpp */,
 				4D1A0BBA2FD1517B004AE805 /* cursor.h */,
 				4DA0EAE822BB77C300A7EBEB /* editortoolkit_cmn.cpp */,
@@ -3580,6 +3590,7 @@
 				4DE0B9A12988070C00D4C939 /* interface.h in Headers */,
 				E7870354299CF03200156DC4 /* adjustarpegfunctor.h in Headers */,
 				4DB3D8B61F83D09700B5FC2B /* iohumdrum.h in Headers */,
+				4D90E61330B9B32C00536E76 /* clipboard.h in Headers */,
 				E7D3389A293E057100C40B81 /* setscoredeffunctor.h in Headers */,
 				4DB3D8DB1F83D13F00B5FC2B /* turn.h in Headers */,
 				8F59294118854BF800FE51AD /* iomusxml.h in Headers */,
@@ -3891,6 +3902,7 @@
 				4D2B23F92F56E7980088C6F4 /* TuningsConcepts.h in Headers */,
 				BB4C4AFA22A932BC001F6AF0 /* restore.h in Headers */,
 				BB4C4B2422A932CF001F6AF0 /* dynam.h in Headers */,
+				4D90E61430B9B32C00536E76 /* clipboard.h in Headers */,
 				BB4C4AD022A932B6001F6AF0 /* scoreorpartelement.h in Headers */,
 				4D292C232EEB0BC000C1EB5F /* adjustossiastaffdeffunctor.h in Headers */,
 				BB4C4B8E22A932DF001F6AF0 /* svg.h in Headers */,
@@ -4523,6 +4535,7 @@
 				403BEFF5206C00E900D022D5 /* multirest.cpp in Sources */,
 				4DA0EAEB22BB77C300A7EBEB /* editortoolkit_neume.cpp in Sources */,
 				4D16943B1E3A44F300569BF4 /* Binasc.cpp in Sources */,
+				4D90E60F30B9B31600536E76 /* clipboard.cpp in Sources */,
 				4D3C3F0D294B89AF009993E6 /* ornam.cpp in Sources */,
 				4DACC9972990F29A00B55913 /* atts_facsimile.cpp in Sources */,
 				E7231E0629B64B33000A2BF3 /* adjustxoverflowfunctor.cpp in Sources */,
@@ -4693,6 +4706,7 @@
 				E74A806C28BC98B2005274E7 /* functorinterface.cpp in Sources */,
 				E7870357299CF06D00156DC4 /* adjustarpegfunctor.cpp in Sources */,
 				4DEBE6E62B36E9B300B67DFB /* facsimilefunctor.cpp in Sources */,
+				4D90E60E30B9B31600536E76 /* clipboard.cpp in Sources */,
 				4DEC4D9E21C81E9400D1D273 /* orig.cpp in Sources */,
 				4D292C1F2EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp in Sources */,
 				4DDBBB5D1C7AE45900054AFF /* hairpin.cpp in Sources */,
@@ -5156,6 +5170,7 @@
 				8F3DD32A18854B090051330C /* iomusxml.cpp in Sources */,
 				40E1CEDF205060FD0007C8AF /* labelabbr.cpp in Sources */,
 				4DEC4DA821C81ED400D1D273 /* reg.cpp in Sources */,
+				4D90E61030B9B31600536E76 /* clipboard.cpp in Sources */,
 				8F3DD32C18854B090051330C /* iopae.cpp in Sources */,
 				4DA0EAEC22BB77C300A7EBEB /* editortoolkit_neume.cpp in Sources */,
 				8F3DD31E18854AFB0051330C /* bboxdevicecontext.cpp in Sources */,
@@ -5473,6 +5488,7 @@
 				BB4C4B3722A932CF001F6AF0 /* trill.cpp in Sources */,
 				BB4C4B1F22A932CF001F6AF0 /* breath.cpp in Sources */,
 				4DD49C692BECC097006D1C2E /* adjustyrelfortranscriptionfunctor.cpp in Sources */,
+				4D90E61130B9B31600536E76 /* clipboard.cpp in Sources */,
 				BB4C4AC522A932B6001F6AF0 /* measure.cpp in Sources */,
 				4D2461DE246BE2E9002BBCCD /* expansionmap.cpp in Sources */,
 				E7BCFFB6281297980012513D /* resources.cpp in Sources */,
