@@ -22,6 +22,7 @@
 #include "gracegrp.h"
 #include "instrdef.h"
 #include "layer.h"
+#include "midibuilder.h"
 #include "mrest.h"
 #include "multirest.h"
 #include "octave.h"
@@ -42,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "MidiFile.h"
+#include "MidiEvent.h"
 #include "Tunings.h"
 
 namespace vrv {
@@ -619,9 +620,8 @@ FunctorCode InitMIDIFunctor::VisitOctave(const Octave *octave)
 // GenerateMIDIFunctor
 //----------------------------------------------------------------------------
 
-GenerateMIDIFunctor::GenerateMIDIFunctor(smf::MidiFile *midiFile) : ConstFunctor()
+GenerateMIDIFunctor::GenerateMIDIFunctor(MIDIBuilder &midiBuilder) : ConstFunctor(), m_midiBuilder(midiBuilder)
 {
-    m_midiFile = midiFile;
     m_midiTrack = 1;
     m_midiChannel = 0;
     m_totalTime = 0.0;
@@ -642,27 +642,9 @@ FunctorCode GenerateMIDIFunctor::VisitBeatRpt(const BeatRpt *beatRpt)
     AlignMeterParams params;
     double beatLength = beatRpt->GetAlignmentDuration(params).ToDouble() * SCORE_TIME_UNIT;
     double startTime = m_totalTime + beatRpt->GetScoreTimeOnset().ToDouble();
-    int tpq = m_midiFile->getTPQ();
-
-    // filter last beat and copy all notes
-    smf::MidiEvent event;
-    int eventCount = m_midiFile->getEventCount(m_midiTrack);
-    for (int i = 0; i < eventCount; ++i) {
-        event = m_midiFile->getEvent(m_midiTrack, i);
-        if (event.tick > startTime * tpq)
-            break;
-        else if (event.tick >= (startTime - beatLength) * tpq) {
-            if (((event[0] & 0xf0) == 0x80) || ((event[0] & 0xf0) == 0x90)) {
-                m_midiFile->addEvent(m_midiTrack, event.tick + beatLength * tpq, event);
-            }
-        }
-    }
-
-    for (int i = 0; i < beatLength * tpq; ++i) {
-        // LogWarning("%i", i);
-        // smf::MidiEvent event = m_midiFile->getEvent(m_midiTrack, startTime * tpq);
-        // event.clearVariables();
-    }
+    const int tpq = m_midiBuilder.GetTPQ();
+    m_midiBuilder.CopyNotesForBeatRepeat(
+        m_midiTrack, (startTime - beatLength) * tpq, startTime * tpq, beatLength * tpq, beatRpt->GetID());
 
     return FUNCTOR_CONTINUE;
 }
@@ -763,8 +745,7 @@ FunctorCode GenerateMIDIFunctor::VisitLayerEnd(const Layer *layer)
     // stop all previously held notes
     for (auto &held : m_heldNotes) {
         if (held.m_pitch > 0) {
-            m_midiFile->addNoteOff(
-                m_midiTrack, std::max(0.0, held.m_stopTime * m_midiFile->getTPQ() - 1), m_midiChannel, held.m_pitch);
+            this->AddNoteOff(std::max(0.0, held.m_stopTime * m_midiBuilder.GetTPQ() - 1), held.m_pitch);
         }
     }
 
@@ -795,10 +776,10 @@ FunctorCode GenerateMIDIFunctor::VisitMeasure(const Measure *measure)
 
     if ((m_totalTime == 0.0) || (measure->GetCurrentTempo() != m_currentTempo)) {
         m_currentTempo = measure->GetCurrentTempo();
-        const int tick = m_totalTime * m_midiFile->getTPQ();
+        const int tick = m_totalTime * m_midiBuilder.GetTPQ();
         // Check if there was already a tempo event added for the given tick
         if (m_tempoEventTicks.insert(tick).second) {
-            m_midiFile->addTempo(0, tick, m_currentTempo);
+            m_midiBuilder.AddTempo(0, tick, m_currentTempo);
         }
     }
 
@@ -834,8 +815,7 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
     const int velocity = (note->HasVel()) ? note->GetVel() : MIDI_VELOCITY;
     if (!velocity) return FUNCTOR_SIBLINGS;
 
-    const int channel = m_midiChannel;
-    const int tpq = m_midiFile->getTPQ();
+    const int tpq = m_midiBuilder.GetTPQ();
     double startTime = m_totalTime + note->GetScoreTimeOnset().ToDouble();
 
     // Check if note is deferred
@@ -850,8 +830,8 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
         for (const auto &midiNote : m_expandedNotes.at(note)) {
             const double stopTime = startTime + midiNote.duration;
 
-            m_midiFile->addNoteOn(m_midiTrack, startTime * tpq, channel, midiNote.pitch, velocity);
-            m_midiFile->addNoteOff(m_midiTrack, std::max(0.0, stopTime * tpq - 1), channel, midiNote.pitch);
+            this->AddNoteOn(note, startTime * tpq, midiNote.pitch, velocity);
+            this->AddNoteOff(std::max(0.0, stopTime * tpq - 1), midiNote.pitch);
 
             startTime = stopTime;
         }
@@ -877,8 +857,7 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
             // or if the new pitch is already sounding, on any course
             for (auto &held : m_heldNotes) {
                 if ((held.m_pitch > 0) && ((held.m_stopTime <= startTime) || (held.m_pitch == pitch))) {
-                    m_midiFile->addNoteOff(
-                        m_midiTrack, std::max(0.0, held.m_stopTime * tpq - 1), channel, held.m_pitch);
+                    this->AddNoteOff(std::max(0.0, held.m_stopTime * tpq - 1), held.m_pitch);
                     held.m_pitch = 0;
                     held.m_stopTime = 0;
                 }
@@ -893,14 +872,14 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
                     note->GetScoreTimeOffset().ToDouble() + note->GetScoreTimeTiedDuration().ToDouble());
 
             // start this note
-            m_midiFile->addNoteOn(m_midiTrack, startTime * tpq, channel, pitch, velocity);
+            this->AddNoteOn(note, startTime * tpq, pitch, velocity);
         }
         else {
             const double stopTime
                 = m_totalTime + note->GetScoreTimeOffset().ToDouble() + note->GetScoreTimeTiedDuration().ToDouble();
 
-            m_midiFile->addNoteOn(m_midiTrack, startTime * tpq, channel, pitch, velocity);
-            m_midiFile->addNoteOff(m_midiTrack, std::max(0.0, stopTime * tpq - 1), channel, pitch);
+            this->AddNoteOn(note, startTime * tpq, pitch, velocity);
+            this->AddNoteOff(std::max(0.0, stopTime * tpq - 1), pitch);
         }
     }
 
@@ -931,15 +910,15 @@ FunctorCode GenerateMIDIFunctor::VisitPedal(const Pedal *pedal)
 
     double pedalTime = pedal->GetStart()->GetAlignment()->GetTime().ToDouble() * SCORE_TIME_UNIT;
     double startTime = m_totalTime + pedalTime;
-    int tpq = m_midiFile->getTPQ();
+    int tpq = m_midiBuilder.GetTPQ();
 
     // todo: check pedal @func to switch between sustain/soften/damper pedals?
     switch (pedal->GetDir()) {
-        case pedalLog_DIR_down: m_midiFile->addSustainPedalOn(m_midiTrack, (startTime * tpq), m_midiChannel); break;
-        case pedalLog_DIR_up: m_midiFile->addSustainPedalOff(m_midiTrack, (startTime * tpq), m_midiChannel); break;
+        case pedalLog_DIR_down: this->AddSustainPedal((startTime * tpq), true); break;
+        case pedalLog_DIR_up: this->AddSustainPedal((startTime * tpq), false); break;
         case pedalLog_DIR_bounce:
-            m_midiFile->addSustainPedalOff(m_midiTrack, (startTime * tpq), m_midiChannel);
-            m_midiFile->addSustainPedalOn(m_midiTrack, (startTime * tpq) + 0.1, m_midiChannel);
+            this->AddSustainPedal((startTime * tpq), false);
+            this->AddSustainPedal((startTime * tpq) + 0.1, true);
             break;
         default: return FUNCTOR_CONTINUE;
     }
@@ -959,7 +938,7 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
             totalTime = nextMeasure->GetScoreTimeOnset().ToDouble();
         }
     }
-    const double currentTick = totalTime * m_midiFile->getTPQ();
+    const double currentTick = totalTime * m_midiBuilder.GetTPQ();
 
     smf::MidiEvent midiEvent;
     midiEvent.tick = currentTick;
@@ -980,7 +959,7 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
             mapping.push_back(std::make_pair(i, tuneCustom.frequencyForMidiNote(i)));
         }
         midiEvent.makeMts2_KeyTuningsByFrequency(mapping, program);
-        m_midiFile->addEvent(m_midiTrack, midiEvent);
+        m_midiBuilder.AddTuningEvent(m_midiTrack, midiEvent);
     }
     // set temperament event if corresponding attribute present
     else if (scoreDef->HasTuneTemper()) {
@@ -991,7 +970,7 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
             case TEMPERAMENT_pythagorean: midiEvent.makeTemperamentPythagorean(referencePitchClass); break;
             default: break;
         }
-        m_midiFile->addEvent(m_midiTrack, midiEvent);
+        m_midiBuilder.AddTuningEvent(m_midiTrack, midiEvent);
     }
     // set tuning
     if (scoreDef->HasTuneHz()) {
@@ -1003,13 +982,13 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
             tuneFrequencies.push_back(std::make_pair(i, freq));
         }
         midiEvent.makeMts2_KeyTuningsByFrequency(tuneFrequencies);
-        m_midiFile->addEvent(m_midiTrack, midiEvent);
+        m_midiBuilder.AddTuningEvent(m_midiTrack, midiEvent);
     }
     // set MIDI key signature
     if (scoreDef->HasKeySigInfo()) {
         const KeySig *keySig = vrv_cast<const KeySig *>(scoreDef->GetKeySig());
         if (keySig && keySig->HasSig()) {
-            // m_midiFile->addKeySignature(
+            // m_midiBuilder.AddKeySignature(
             //     m_midiTrack, currentTick, keySig->GetFifthsInt(), (keySig->GetMode() == MODE_minor));
         }
     }
@@ -1017,10 +996,10 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
     if (scoreDef->HasMeterSigInfo()) {
         const MeterSig *meterSig = vrv_cast<const MeterSig *>(scoreDef->GetMeterSig());
         if (meterSig && meterSig->HasCount() && meterSig->HasUnit()) {
-            m_midiFile->addTimeSignature(m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetUnit());
+            m_midiBuilder.AddTimeSignature(m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetUnit());
         }
         else if (meterSig && meterSig->HasUnit()) {
-            m_midiFile->addTimeSignature(
+            m_midiBuilder.AddTimeSignature(
                 m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetSymImplicitUnit());
         }
     }
@@ -1064,7 +1043,8 @@ FunctorCode GenerateMIDIFunctor::VisitSyl(const Syl *syl)
     const double startTime = m_totalTime + note->GetScoreTimeOnset().ToDouble();
     const std::string sylText = UTF32to8(syl->GetText());
 
-    m_midiFile->addLyric(m_midiTrack, startTime * m_midiFile->getTPQ(), sylText);
+    const int tick = startTime * m_midiBuilder.GetTPQ();
+    m_midiBuilder.AddLyric(m_midiTrack, tick, sylText);
 
     return FUNCTOR_SIBLINGS;
 }
@@ -1156,6 +1136,21 @@ void GenerateMIDIFunctor::HandleOctave(const LayerElement *layerElement)
             }
         }
     }
+}
+
+void GenerateMIDIFunctor::AddNoteOn(const Note *note, int tick, int pitch, int velocity)
+{
+    m_midiBuilder.AddNoteOn(m_midiTrack, tick, m_midiChannel, pitch, velocity, note->GetID());
+}
+
+void GenerateMIDIFunctor::AddNoteOff(int tick, int pitch)
+{
+    m_midiBuilder.AddNoteOff(m_midiTrack, tick, m_midiChannel, pitch);
+}
+
+void GenerateMIDIFunctor::AddSustainPedal(int tick, bool on)
+{
+    m_midiBuilder.AddSustainPedal(m_midiTrack, tick, m_midiChannel, on);
 }
 
 int GenerateMIDIFunctor::GetMIDIPitch(const Note *note)

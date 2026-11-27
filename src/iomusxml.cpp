@@ -9,7 +9,10 @@
 
 //----------------------------------------------------------------------------
 
+#include <algorithm>
 #include <cassert>
+#include <iterator>
+#include <limits>
 #include <numeric>
 #include <regex>
 #include <sstream>
@@ -47,6 +50,7 @@
 #include "label.h"
 #include "labelabbr.h"
 #include "layer.h"
+#include "layerdef.h"
 #include "lb.h"
 #include "lv.h"
 #include "mdiv.h"
@@ -1073,10 +1077,11 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         }
         else if (IsElement(xpathNode.node(), "score-part")) {
             // get the attributes element of the first measure of the part
-            const std::string partId = xpathNode.node().attribute("id").as_string();
-            std::string xpath = StringFormat("/score-partwise/part[@id='%s']/measure[1]", partId.c_str());
-            pugi::xpath_node partFirstMeasure = root.select_node(xpath.c_str());
-            if (!partFirstMeasure.node().child("attributes")) {
+            const pugi::xml_node scorePart = xpathNode.node();
+            const std::string partId = scorePart.attribute("id").as_string();
+            const pugi::xml_node part = root.find_child_by_attribute("part", "id", partId.c_str());
+            const pugi::xml_node partFirstMeasure = part.child("measure");
+            if (!partFirstMeasure.child("attributes")) {
                 LogWarning("MusicXML import: Could not find the 'attributes' element in the first "
                            "measure of part '%s'",
                     partId.c_str());
@@ -1133,18 +1138,20 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     }
                 }
             }
-            if (midiInstrument && !m_instrdef) {
-                m_instrdef = new InstrDef;
-                m_instrdef->SetMidiInstrname(m_instrdef->AttMidiInstrument::StrToMidinames(
-                    midiInstrument.child("midi-name").text().as_string()));
+            // Part identity is independent of its optional MIDI settings.
+            InstrDef *instrDef = new InstrDef();
+            if (!partId.empty()) instrDef->SetID(partId);
+            if (midiInstrument) {
+                instrDef->SetMidiInstrname(
+                    instrDef->AttMidiInstrument::StrToMidinames(midiInstrument.child("midi-name").text().as_string()));
                 pugi::xml_node midiChannel = midiInstrument.child("midi-channel");
-                if (midiChannel) m_instrdef->SetMidiChannel(midiChannel.text().as_int() - 1);
+                if (midiChannel) instrDef->SetMidiChannel(midiChannel.text().as_int() - 1);
                 // pugi::xml_node midiPan = midiInstrument.child("pan");
                 // if (midiPan) instrdef->SetMidiPan(midiPan.text().as_int());
                 pugi::xml_node midiProgram = midiInstrument.child("midi-program");
-                if (midiProgram) m_instrdef->SetMidiInstrnum(midiProgram.text().as_int() - 1);
+                if (midiProgram) instrDef->SetMidiInstrnum(midiProgram.text().as_int() - 1);
                 pugi::xml_node midiVolume = midiInstrument.child("volume");
-                if (midiVolume) m_instrdef->SetMidiVolume(midiVolume.text().as_int());
+                if (midiVolume) instrDef->SetMidiVolume(midiVolume.text().as_int());
             }
             // MIDI keys of unpitched notes, only for parts playing on the percussion channel 10
             const pugi::xpath_node_set midiInstruments = xpathNode.node().select_nodes("midi-instrument");
@@ -1157,9 +1164,10 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             }
             // create the staffDef(s)
             StaffGrp *partStaffGrp = new StaffGrp();
-            partStaffGrp->SetID(partId.c_str());
             const short int nbStaves
-                = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);
+                = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure, partStaffGrp, staffOffset, instrDef);
+            if (!instrDef->GetParent()) delete instrDef;
+            this->ReadMusicXmlLayerInstruments(scorePart, part, partStaffGrp, nbStaves, staffOffset);
             // if we have more than one staff in the part we create a new staffGrp
             if (nbStaves > 1) {
                 partStaffGrp->SetBarThru(BOOLEAN_true);
@@ -1175,14 +1183,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 delete partStaffGrp;
             }
 
-            // find the part and read it
-            xpath = StringFormat("/score-partwise/part[@id='%s']", partId.c_str());
-            pugi::xpath_node part = root.select_node(xpath.c_str());
-            if (!part) {
-                LogWarning("MusicXML import: Could not find the part '%s'", partId.c_str());
-                continue;
-            }
-            this->ReadMusicXmlPart(part.node(), section, nbStaves, staffOffset);
+            this->ReadMusicXmlPart(part, section, nbStaves, staffOffset);
             // increment the staffOffset for reading the next part
             staffOffset += nbStaves;
         }
@@ -1458,6 +1459,14 @@ void MusicXmlInput::CreateExpansion(Section *section)
     }
 }
 
+void MusicXmlInput::UpdateMeasureDuration()
+{
+    // A <time> without <beat-type> (senza-misura) leaves m_meterUnit at 0
+    m_measureDuration = ((m_ppq > 0) && (m_meterUnit > 0) && (m_meterTotalCount > 0))
+        ? 4.0 * m_ppq * m_meterTotalCount / m_meterUnit
+        : 0.0;
+}
+
 void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
 {
     assert(root);
@@ -1548,10 +1557,11 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
 }
 
 short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
-    pugi::xml_node node, StaffGrp *staffGrp, const short int staffOffset)
+    pugi::xml_node node, StaffGrp *staffGrp, const short int staffOffset, InstrDef *instrDef)
 {
     assert(node);
     assert(staffGrp);
+    assert(instrDef);
 
     // First get the number of staves in the part
     short int nbStaves = 1;
@@ -1562,10 +1572,9 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
     if (nbStaves > 1) {
         if (m_label) staffGrp->AddChild(m_label);
         if (m_labelAbbr) staffGrp->AddChild(m_labelAbbr);
-        if (m_instrdef) staffGrp->AddChild(m_instrdef);
+        staffGrp->AddChild(instrDef);
         m_label = NULL;
         m_labelAbbr = NULL;
-        m_instrdef = NULL;
     }
 
     bool attributesRead = false;
@@ -1599,13 +1608,11 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
                 staffDef = new StaffDef();
                 staffDef->SetN(i + 1 + staffOffset);
                 if (nbStaves == 1) {
-                    staffDef->SetID(staffGrp->GetID());
                     if (m_label) staffDef->AddChild(m_label);
                     if (m_labelAbbr) staffDef->AddChild(m_labelAbbr);
-                    if (m_instrdef) staffDef->AddChild(m_instrdef);
+                    staffDef->AddChild(instrDef);
                     m_label = NULL;
                     m_labelAbbr = NULL;
-                    m_instrdef = NULL;
                 }
                 staffGrp->AddChild(staffDef);
                 // set initial octave shift
@@ -1759,6 +1766,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
             if (divisions) {
                 m_ppq = divisions.node().text().as_int();
                 staffDef->SetPpq(m_ppq);
+                this->UpdateMeasureDuration();
             }
             // measure style
             pugi::xpath_node measureSlash = child.select_node("measure-style/slash");
@@ -1769,6 +1777,59 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
     }
 
     return nbStaves;
+}
+
+void MusicXmlInput::ReadMusicXmlLayerInstruments(
+    pugi::xml_node scorePart, pugi::xml_node part, StaffGrp *staffGrp, int nbStaves, int staffOffset)
+{
+    if (!scorePart.child("score-instrument")) return;
+
+    using StaffVoice = std::pair<int, int>;
+    std::map<StaffVoice, std::set<std::string>> instrumentsByLayer;
+    for (pugi::xml_node measure : part.children("measure")) {
+        for (pugi::xml_node note : measure.children("note")) {
+            if (note.child("unpitched")) continue;
+            const int staffNumber = note.child("staff").text().as_int(1);
+            const int voiceNumber = note.child("voice").text().as_int(1);
+            if (staffNumber < 1 || staffNumber > nbStaves || voiceNumber < 1
+                || voiceNumber > std::numeric_limits<short>::max()) {
+                continue;
+            }
+            const pugi::xml_node firstInstrument = note.child("instrument");
+            if (!firstInstrument && note.child("rest")) continue;
+
+            std::set<std::string> &instruments = instrumentsByLayer[{ staffNumber, voiceNumber }];
+            // An unassigned pitched note or multiple instrument references cannot define a single layer instrument.
+            if (!firstInstrument) instruments.insert("");
+            for (pugi::xml_node instrument : note.children("instrument")) {
+                instruments.insert(instrument.attribute("id").as_string());
+            }
+        }
+    }
+
+    // A score instrument shared by multiple voices cannot be copied to multiple instrDefs with the same XML ID.
+    std::map<std::string, int> layersByInstrument;
+    for (const std::pair<const StaffVoice, std::set<std::string>> &entry : instrumentsByLayer) {
+        for (const std::string &id : entry.second) ++layersByInstrument[id];
+    }
+    for (const std::pair<const StaffVoice, std::set<std::string>> &entry : instrumentsByLayer) {
+        if (entry.second.size() != 1) continue;
+        const std::string &id = *entry.second.begin();
+        if (id.empty() || id == scorePart.attribute("id").as_string() || layersByInstrument.at(id) != 1) continue;
+        const pugi::xml_node scoreInstrument = scorePart.find_child_by_attribute("score-instrument", "id", id.c_str());
+        if (!scoreInstrument) continue;
+
+        AttNIntegerComparison matchStaff(STAFFDEF, entry.first.first + staffOffset);
+        StaffDef *staffDef = vrv_cast<StaffDef *>(staffGrp->FindDescendantByComparison(&matchStaff, 1));
+        if (!staffDef) continue;
+        LayerDef *layerDef = new LayerDef();
+        layerDef->SetN(entry.first.second);
+        InstrDef *instrDef = new InstrDef();
+        instrDef->SetID(id);
+        instrDef->SetLabel(scoreInstrument.child("instrument-name").text().as_string());
+        if (!layerDef->AddChild(instrDef)) delete instrDef;
+        if (!staffDef->AddChild(layerDef)) delete layerDef;
+    }
 }
 
 void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *parent)
@@ -1783,6 +1844,8 @@ void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *par
         meterSigGrp->SetFunc(interchangeable ? meterSigGrpLog_FUNC_interchanging : meterSigGrpLog_FUNC_mixed);
 
         std::tie(m_meterCount, m_meterUnit) = this->GetMeterSigGrpValues(time, meterSigGrp);
+        // The counts are all in m_meterUnit
+        m_meterTotalCount = std::accumulate(m_meterCount.begin(), m_meterCount.end(), 0);
         if (interchangeable) {
             std::tie(std::ignore, std::ignore) = this->GetMeterSigGrpValues(interchangeable.node(), meterSigGrp);
         }
@@ -1816,6 +1879,7 @@ void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *par
             meterSig->SetCount({ m_meterCount, m_meterSign });
             m_meterUnit = beatType.text().as_int();
             meterSig->SetUnit(m_meterUnit);
+            m_meterTotalCount = meterSig->GetTotalCount();
         }
         else if (time.child("senza-misura")) {
             if (time.child("senza-misura").text()) {
@@ -1830,12 +1894,15 @@ void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *par
         }
         parent->AddChild(meterSig);
     }
+    this->UpdateMeasureDuration();
 }
 
 bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, short int nbStaves, short int staffOffset)
 {
     assert(node);
     assert(section);
+
+    m_lyricNumbers.clear();
 
     pugi::xpath_node_set measures = node.select_nodes("measure");
     if (measures.size() == 0) {
@@ -1937,12 +2004,19 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     // reset clef changed flag
     m_clefChanged = 0;
 
+    // a measure that starts a multi measure rest: the multiRest stands for its notes, the rest of it is read
+    const bool isMultiRest = node.select_node(".//multiple-rest");
+
     const auto mrestPositonIter = m_multiRests.find(index);
     bool isMRestInOtherSystem = (mrestPositonIter != m_multiRests.end());
     int multiRestStaffNumber = 1;
 
+    // the furthest point reached in the measure: the file may end it after a <backup> (e.g. to a chord symbol)
+    int durMax = 0;
+
     // read the content of the measure
     for (pugi::xml_node child : node) {
+        durMax = std::max(durMax, m_durTotal);
         // first check if there is a multi measure rest
         if (child.select_node(".//multiple-rest")) {
             const pugi::xml_node multiRestNode = child.select_node(".//multiple-rest").node();
@@ -1958,12 +2032,16 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             }
             multiRest->SetNum(multiRestLength);
             Layer *layer = SelectLayer(1, measure);
+            // notes before the block have advanced the measure time: add the multiRest without filling space for them
+            const int durTotal = m_durTotal;
+            m_durTotal = 0;
             this->AddLayerElement(layer, multiRest);
+            m_durTotal = durTotal;
             m_multiRests[index] = index + multiRestLength - 1;
             this->ReadMusicXmlAttributes(child, section, measure);
-            break;
+            continue;
         }
-        else if (isMRestInOtherSystem) {
+        else if (isMRestInOtherSystem && !isMultiRest) {
             if ((multiRestStaffNumber > 1) && !IsElement(child, "backup")) continue;
             MultiRest *multiRest = new MultiRest;
             multiRest->SetNum(mrestPositonIter->second - mrestPositonIter->first + 1);
@@ -1997,7 +2075,13 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             this->ReadMusicXmlHarmony(child, measure);
         }
         else if (IsElement(child, "note")) {
-            this->ReadMusicXmlNote(child, measure, staffOffset, section);
+            if (isMultiRest) {
+                // the notes are not read, but their durations advance the measure time
+                if (!child.child("chord")) m_durTotal += child.child("duration").text().as_int();
+            }
+            else {
+                this->ReadMusicXmlNote(child, measure, staffOffset, section);
+            }
         }
         // for now only check first part
         else if (IsElement(child, "print") && node.select_node("parent::part[not(preceding-sibling::part)]")) {
@@ -2006,10 +2090,8 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     }
 
     // set metcon to false for pickup measures
-    int measureTotal = m_ppq * 4;
-    for (const int &num : m_meterCount) measureTotal *= num;
-    measureTotal /= m_meterUnit;
-    if (m_durTotal && m_durTotal != measureTotal) {
+    durMax = std::max(durMax, m_durTotal);
+    if (durMax && (m_measureDuration > 0) && (std::abs(durMax - m_measureDuration) > 0.001)) {
         measure->SetMetcon(BOOLEAN_false);
     }
 
@@ -2089,6 +2171,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Section *section
         // we'll only convert this to MEI if it actually changes
         divisionChange = (m_ppq != divisions.text().as_int());
         m_ppq = divisions.text().as_int();
+        this->UpdateMeasureDuration();
     }
 
     // read clef changes as MEI clef and add them to the stack
@@ -2142,6 +2225,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Section *section
     }
     else if (time && node.select_node("ancestor::part[(preceding-sibling::part)]")) {
         m_meterUnit = time.child("beat-type").text().as_int();
+        this->UpdateMeasureDuration();
     }
 
     pugi::xpath_node measureRepeat = node.select_node("measure-style/measure-repeat");
@@ -2299,7 +2383,16 @@ void MusicXmlInput::ReadMusicXmlDirection(
 
     const double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
 
-    if (voice) m_prevLayer = SelectLayer(node, measure);
+    if (voice) {
+        // The voice of a direction only tells where it belongs. It must not select the layer of the notes that follow:
+        // a direction of voice 1 between the notes of voice 2 would otherwise move them into layer 1.
+        Layer *currentLayer = m_currentLayer;
+        const bool isLayerInitialized = m_isLayerInitialized;
+        m_isLayerInitialized = false;
+        m_prevLayer = this->SelectLayer(node, measure);
+        m_currentLayer = currentLayer;
+        m_isLayerInitialized = isLayerInitialized;
+    }
 
     // Bracket
     pugi::xml_node bracket = typeNode.child("bracket");
@@ -3062,16 +3155,24 @@ void MusicXmlInput::ReadMusicXmlNote(
     if (m_ppq < 0 && duration && !typeStr.empty()) {
         // if divisions are missing, try to calculate
         m_ppq = (double)duration * pow(2, ConvertTypeToDur(typeStr) - 2) / 4;
+        this->UpdateMeasureDuration();
     }
 
     if (rest) {
         const std::string stepStr = rest.child("display-step").text().as_string();
         const std::string octaveStr = rest.child("display-octave").text().as_string();
+        const data_DURATION writtenDur = typeStr.empty() ? DURATION_NONE : ConvertTypeToDur(typeStr);
+        // A rest that fills the measure but whose type gives another duration is a measure rest: Sibelius, for
+        // example, writes the rest of a full 6/8 measure as <type>whole</type> without measure="yes"
+        const bool fillsMeasure
+            = (m_durTotal == 0) && (m_measureDuration > 0) && (std::abs(duration - m_measureDuration) < 0.001);
+        const double typeDuration
+            = m_ppq * 16.0 / std::pow(2.0, static_cast<int>(writtenDur)) * (2.0 - std::pow(0.5, dots));
         if (HasAttributeWithValue(node, "print-object", "no")) {
-            Space *space = new Space();
-            element = space;
             if (!typeStr.empty()) {
-                space->SetDur(ConvertTypeToDur(typeStr));
+                Space *space = new Space();
+                element = space;
+                space->SetDur(writtenDur);
                 space->SetDurPpq(duration);
                 if (dots > 0) space->SetDots(dots);
                 if (!noteID.empty()) {
@@ -3085,6 +3186,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
             else {
                 MSpace *mSpace = new MSpace();
+                element = mSpace;
                 if (!noteID.empty()) {
                     mSpace->SetID(noteID);
                 }
@@ -3092,7 +3194,8 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
         }
         // we assume /note without /type or with duration of an entire bar to be mRest
-        else if (typeStr.empty() || rest.attribute("measure").as_bool()) {
+        else if (typeStr.empty() || rest.attribute("measure").as_bool()
+            || (fillsMeasure && (std::abs(typeDuration - duration) > 0.001))) {
             if (m_slash) {
                 MeterSig tmpMeterSig;
                 tmpMeterSig.SetCount({ m_meterCount, m_meterSign });
@@ -3120,7 +3223,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 // rest
                 TabGrp *tabGrp = new TabGrp();
                 element = tabGrp;
-                tabGrp->SetDur(ConvertTypeToDur(typeStr));
+                tabGrp->SetDur(writtenDur);
                 tabGrp->SetDurPpq(duration);
                 if (dots > 0) tabGrp->SetDots(dots);
                 tabGrp->AddChild(new TabDurSym());
@@ -3134,7 +3237,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 Rest *rest = new Rest();
                 element = rest;
                 rest->SetColor(node.attribute("color").as_string());
-                rest->SetDur(ConvertTypeToDur(typeStr));
+                rest->SetDur(writtenDur);
                 rest->SetDurPpq(duration);
                 if (dots > 0) rest->SetDots(dots);
                 if (cue) rest->SetCue(BOOLEAN_true);
@@ -3166,10 +3269,14 @@ void MusicXmlInput::ReadMusicXmlNote(
                 note->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(noteStaffNum + staffOffset)));
 
         // accidentals
-        for (pugi::xml_node accidental : node.children("accidental")) {
-            AddAccidental(accidental, note);
+        auto accidentals = node.children("accidental");
+        for (auto it = accidentals.end(); it != accidentals.begin();) {
+            --it;
+            AddAccidental(*it, note);
         }
-        for (pugi::xpath_node accidental : node.select_nodes("notations/accidental-mark")) {
+        auto accidental_marks = node.select_nodes("notations/accidental-mark");
+        accidental_marks.sort(true);
+        for (pugi::xpath_node accidental : accidental_marks) {
             AddAccidental(accidental.node(), note);
         }
 
@@ -3447,8 +3554,13 @@ void MusicXmlInput::ReadMusicXmlNote(
                 }
             }
             if (!lyric.child("text") && !extendStop) continue; // Dorico exports non-valid MusicXML
-            short int lyricNumber = lyric.attribute("number").as_int();
-            lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
+            // The number is an NMTOKEN: a token that is not an integer (Sibelius writes "part1verse2") gets the next
+            // free number in its part, so that distinct lines stay distinct
+            const std::string number = lyric.attribute("number").as_string();
+            const bool isInteger = std::all_of(number.begin(), number.end(), ::isdigit);
+            if (!isInteger) m_lyricNumbers.try_emplace(number, static_cast<int>(m_lyricNumbers.size()) + 1);
+            const int lyricNumber
+                = std::max(1, isInteger ? lyric.attribute("number").as_int() : m_lyricNumbers.at(number));
             if (extendStop) m_pendingExtenderStops[{ staff->GetN(), layer->GetN() }].insert(lyricNumber);
             if (!lyric.child("text")) continue;
             Verse *verse = new Verse();

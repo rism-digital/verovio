@@ -7,24 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F10000110000000000000000 /* fontstore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F10000010000000000000000 /* fontstore.cpp */; settings = {COMPILER_FLAGS = "-I$(SRCROOT)/external/harfbuzz/src -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/woff2/src -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000120000000000000000 /* verovio-harfbuzz.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000030000000000000000 /* verovio-harfbuzz.cc */; settings = {COMPILER_FLAGS = "-Oz -DHB_LEAN -DHB_MINI -DHB_OPTIMIZE_SIZE_MORE -DHB_CONFIG_OVERRIDE_H=\\\"verovio-hb-config.h\\\""; }; };
-		F10000130000000000000000 /* verovio-woff2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000040000000000000000 /* verovio-woff2.cc */; settings = {COMPILER_FLAGS = "-Os -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000140000000000000000 /* verovio-brotli.c in Sources */ = {isa = PBXBuildFile; fileRef = F10000050000000000000000 /* verovio-brotli.c */; settings = {COMPILER_FLAGS = "-Os -DBROTLI_STATIC -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000210000000000000000 /* fontstore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F10000010000000000000000 /* fontstore.cpp */; settings = {COMPILER_FLAGS = "-I$(SRCROOT)/external/harfbuzz/src -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/woff2/src -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000220000000000000000 /* verovio-harfbuzz.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000030000000000000000 /* verovio-harfbuzz.cc */; settings = {COMPILER_FLAGS = "-Oz -DHB_LEAN -DHB_MINI -DHB_OPTIMIZE_SIZE_MORE -DHB_CONFIG_OVERRIDE_H=\\\"verovio-hb-config.h\\\""; }; };
-		F10000230000000000000000 /* verovio-woff2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000040000000000000000 /* verovio-woff2.cc */; settings = {COMPILER_FLAGS = "-Os -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000240000000000000000 /* verovio-brotli.c in Sources */ = {isa = PBXBuildFile; fileRef = F10000050000000000000000 /* verovio-brotli.c */; settings = {COMPILER_FLAGS = "-Os -DBROTLI_STATIC -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000310000000000000000 /* fontstore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F10000010000000000000000 /* fontstore.cpp */; settings = {COMPILER_FLAGS = "-I$(SRCROOT)/external/harfbuzz/src -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/woff2/src -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000320000000000000000 /* verovio-harfbuzz.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000030000000000000000 /* verovio-harfbuzz.cc */; settings = {COMPILER_FLAGS = "-Oz -DHB_LEAN -DHB_MINI -DHB_OPTIMIZE_SIZE_MORE -DHB_CONFIG_OVERRIDE_H=\\\"verovio-hb-config.h\\\""; }; };
-		F10000330000000000000000 /* verovio-woff2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000040000000000000000 /* verovio-woff2.cc */; settings = {COMPILER_FLAGS = "-Os -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000340000000000000000 /* verovio-brotli.c in Sources */ = {isa = PBXBuildFile; fileRef = F10000050000000000000000 /* verovio-brotli.c */; settings = {COMPILER_FLAGS = "-Os -DBROTLI_STATIC -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000410000000000000000 /* fontstore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F10000010000000000000000 /* fontstore.cpp */; settings = {COMPILER_FLAGS = "-I$(SRCROOT)/external/harfbuzz/src -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/woff2/src -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000420000000000000000 /* verovio-harfbuzz.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000030000000000000000 /* verovio-harfbuzz.cc */; settings = {COMPILER_FLAGS = "-Oz -DHB_LEAN -DHB_MINI -DHB_OPTIMIZE_SIZE_MORE -DHB_CONFIG_OVERRIDE_H=\\\"verovio-hb-config.h\\\""; }; };
-		F10000430000000000000000 /* verovio-woff2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000040000000000000000 /* verovio-woff2.cc */; settings = {COMPILER_FLAGS = "-Os -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000440000000000000000 /* verovio-brotli.c in Sources */ = {isa = PBXBuildFile; fileRef = F10000050000000000000000 /* verovio-brotli.c */; settings = {COMPILER_FLAGS = "-Os -DBROTLI_STATIC -I$(SRCROOT)/external/brotli/c/include"; }; };
-		F10000510000000000000000 /* fontstore.h in Headers */ = {isa = PBXBuildFile; fileRef = F10000020000000000000000 /* fontstore.h */; };
-		F10000520000000000000000 /* fontstore.h in Headers */ = {isa = PBXBuildFile; fileRef = F10000020000000000000000 /* fontstore.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		152886C51C9CA86100B515BB /* ligature.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 152886C41C9CA86100B515BB /* ligature.cpp */; };
 		1579B3431B15033100B16F5C /* proport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1579B3421B15033100B16F5C /* proport.cpp */; };
 		2D2A799A1A69812C000A441B /* chord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D2A79991A69812C000A441B /* chord.cpp */; };
@@ -112,24 +94,6 @@
 		4D00A28C2ED2E32700EFA853 /* offsetinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D00A2892ED2E32700EFA853 /* offsetinterface.cpp */; };
 		4D00A28D2ED2E32700EFA853 /* offsetinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D00A2892ED2E32700EFA853 /* offsetinterface.cpp */; };
 		4D09D3ED1EA8AD8500A420E6 /* horizontalaligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */; };
-		4D0C964830936AD200FB514A /* parts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C964730936AD200FB514A /* parts.cpp */; };
-		4D0C964930936AD200FB514A /* part.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C964630936AD200FB514A /* part.cpp */; };
-		4D0C964A30936AD200FB514A /* parts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C964730936AD200FB514A /* parts.cpp */; };
-		4D0C964B30936AD200FB514A /* part.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C964630936AD200FB514A /* part.cpp */; };
-		4D0C964C30936AD200FB514A /* parts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C964730936AD200FB514A /* parts.cpp */; };
-		4D0C964D30936AD200FB514A /* part.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C964630936AD200FB514A /* part.cpp */; };
-		4D0C964E30936AD200FB514A /* parts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C964730936AD200FB514A /* parts.cpp */; };
-		4D0C964F30936AD200FB514A /* part.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C964630936AD200FB514A /* part.cpp */; };
-		4D0C965130936AF400FB514A /* scoreorpartelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C965030936AF400FB514A /* scoreorpartelement.cpp */; };
-		4D0C965230936AF400FB514A /* scoreorpartelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C965030936AF400FB514A /* scoreorpartelement.cpp */; };
-		4D0C965330936AF400FB514A /* scoreorpartelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C965030936AF400FB514A /* scoreorpartelement.cpp */; };
-		4D0C965430936AF400FB514A /* scoreorpartelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D0C965030936AF400FB514A /* scoreorpartelement.cpp */; };
-		4D0C965630936B1200FB514A /* scoreorpartelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0C965530936B1200FB514A /* scoreorpartelement.h */; };
-		4D0C965730936B1200FB514A /* scoreorpartelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0C965530936B1200FB514A /* scoreorpartelement.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4D0C965A30936B3700FB514A /* part.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0C965830936B3700FB514A /* part.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4D0C965B30936B3700FB514A /* parts.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0C965930936B3700FB514A /* parts.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4D0C965C30936B3700FB514A /* part.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0C965830936B3700FB514A /* part.h */; };
-		4D0C965D30936B3700FB514A /* parts.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0C965930936B3700FB514A /* parts.h */; };
 		4D15DE3B2411782300457C05 /* expansionmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36E0442B2347A9150054F141 /* expansionmap.cpp */; };
 		4D15DE3C2411782B00457C05 /* expansionmap.h in Headers */ = {isa = PBXBuildFile; fileRef = 36E0442D2347A9290054F141 /* expansionmap.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D1693F51E3A44F300569BF4 /* verticalaligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* verticalaligner.cpp */; };
@@ -140,7 +104,7 @@
 		4D1693FA1E3A44F300569BF4 /* clef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBB188539540037FD8E /* clef.cpp */; };
 		4D1693FB1E3A44F300569BF4 /* devicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBC188539540037FD8E /* devicecontext.cpp */; };
 		4D1693FC1E3A44F300569BF4 /* view_control.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D543E211B80AACF004B823C /* view_control.cpp */; };
-		4D1693FD1E3A44F300569BF4 /* score.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4FB1D74551100B2B856 /* score.cpp */; };
+		4D1693FD1E3A44F300569BF4 /* scoreorpartelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4FB1D74551100B2B856 /* scoreorpartelement.cpp */; };
 		4D1693FE1E3A44F300569BF4 /* doc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBD188539540037FD8E /* doc.cpp */; };
 		4D1693FF1E3A44F300569BF4 /* durationinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBE188539540037FD8E /* durationinterface.cpp */; };
 		4D1694001E3A44F300569BF4 /* toolkit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBF188539540037FD8E /* toolkit.cpp */; };
@@ -334,6 +298,12 @@
 		4D2B24002F56E8F40088C6F4 /* customtuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2B23FC2F56E8F40088C6F4 /* customtuning.cpp */; };
 		4D2B24022F56E9090088C6F4 /* customtuning.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2B24012F56E9090088C6F4 /* customtuning.h */; };
 		4D2B24032F56E9090088C6F4 /* customtuning.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2B24012F56E9090088C6F4 /* customtuning.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D2BB85230B305F3006260A8 /* midibuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2BB85130B305F3006260A8 /* midibuilder.h */; };
+		4D2BB85330B305F3006260A8 /* midibuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2BB85130B305F3006260A8 /* midibuilder.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D2BB85530B3060D006260A8 /* midibuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85430B3060D006260A8 /* midibuilder.cpp */; };
+		4D2BB85630B3060D006260A8 /* midibuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85430B3060D006260A8 /* midibuilder.cpp */; };
+		4D2BB85730B3060D006260A8 /* midibuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85430B3060D006260A8 /* midibuilder.cpp */; };
+		4D2BB85830B3060D006260A8 /* midibuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BB85430B3060D006260A8 /* midibuilder.cpp */; };
 		4D2E758A22BC2B34004C51F0 /* view_tab.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20741122A708C600E0765F /* view_tab.cpp */; };
 		4D2E758B22BC2B5B004C51F0 /* tabgrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F422A3BCDF00E0765F /* tabgrp.cpp */; };
 		4D2E758C22BC2B5B004C51F0 /* tabgrp.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2073F122A3BCB700E0765F /* tabgrp.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -359,7 +329,7 @@
 		4D4C26ED1EF7E75400681770 /* label.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C26EC1EF7E75400681770 /* label.cpp */; };
 		4D4C26EE1EF7E75400681770 /* label.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C26EC1EF7E75400681770 /* label.cpp */; };
 		4D4C26EF1EF7E75400681770 /* label.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C26EC1EF7E75400681770 /* label.cpp */; };
-		4D4C26F01EF7E75E00681770 /* score.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4FB1D74551100B2B856 /* score.cpp */; };
+		4D4C26F01EF7E75E00681770 /* scoreorpartelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4FB1D74551100B2B856 /* scoreorpartelement.cpp */; };
 		4D4CDEA52C078FF9005621E9 /* adjustneumexfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4CDEA42C078FF9005621E9 /* adjustneumexfunctor.cpp */; };
 		4D4CDEA72C079026005621E9 /* adjustneumexfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D4CDEA62C079008005621E9 /* adjustneumexfunctor.h */; };
 		4D4CDEA82C079026005621E9 /* adjustneumexfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D4CDEA62C079008005621E9 /* adjustneumexfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -527,7 +497,7 @@
 		4D95D4F21D6E042400B2B856 /* section.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4F11D6E042400B2B856 /* section.cpp */; };
 		4D95D4F61D71866200B2B856 /* controlelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4F51D71866200B2B856 /* controlelement.cpp */; };
 		4D95D4F91D718D4A00B2B856 /* systemelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4F81D718D4A00B2B856 /* systemelement.cpp */; };
-		4D95D4FC1D74551100B2B856 /* score.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4FB1D74551100B2B856 /* score.cpp */; };
+		4D95D4FC1D74551100B2B856 /* scoreorpartelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4FB1D74551100B2B856 /* scoreorpartelement.cpp */; };
 		4D983005192E959E00320037 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D983004192E959E00320037 /* main.cpp */; };
 		4D9A9C17199F560200028D93 /* verse.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9A9C16199F560200028D93 /* verse.h */; };
 		4D9A9C19199F561200028D93 /* verse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C18199F561200028D93 /* verse.cpp */; };
@@ -768,7 +738,7 @@
 		4DB3D8B51F83D09100B5FC2B /* iohumdrum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA20ED01D0F151900706C4A /* iohumdrum.cpp */; };
 		4DB3D8B61F83D09700B5FC2B /* iohumdrum.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DA20ECF1D0F150900706C4A /* iohumdrum.h */; };
 		4DB3D8B71F83D0A300B5FC2B /* label.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D4C26EB1EF7E73000681770 /* label.h */; };
-		4DB3D8B81F83D0B100B5FC2B /* score.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D95D4FA1D74549700B2B856 /* score.h */; };
+		4DB3D8B81F83D0B100B5FC2B /* scoreorpartelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D95D4FA1D74549700B2B856 /* scoreorpartelement.h */; };
 		4DB3D8B91F83D0C600B5FC2B /* systemmilestone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF4407C1D511D0200152B7E /* systemmilestone.cpp */; };
 		4DB3D8BA1F83D0CA00B5FC2B /* systemmilestone.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF4407B1D511CEE00152B7E /* systemmilestone.h */; };
 		4DB3D8BB1F83D0D100B5FC2B /* expansion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40ABF1FE1E5DF23B00F32F41 /* expansion.cpp */; };
@@ -900,12 +870,24 @@
 		4DCB7AA426D3C9600047F01D /* crc.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DCB7AA226D3C9600047F01D /* crc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4DD11DC42240E78B00A405D8 /* c_wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD11DC22240E78B00A405D8 /* c_wrapper.cpp */; };
 		4DD11DC52240E78B00A405D8 /* c_wrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DD11DC32240E78B00A405D8 /* c_wrapper.h */; };
-		4DD38782307E024600EBFD29 /* clipboard.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DD38781307E024600EBFD29 /* clipboard.h */; };
-		4DD38783307E024600EBFD29 /* clipboard.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DD38781307E024600EBFD29 /* clipboard.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4DD38785307E025500EBFD29 /* clipboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD38784307E025500EBFD29 /* clipboard.cpp */; };
-		4DD38786307E025500EBFD29 /* clipboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD38784307E025500EBFD29 /* clipboard.cpp */; };
-		4DD38787307E025500EBFD29 /* clipboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD38784307E025500EBFD29 /* clipboard.cpp */; };
-		4DD38788307E025500EBFD29 /* clipboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD38784307E025500EBFD29 /* clipboard.cpp */; };
+		4DD3878F307FD9C700EBFD29 /* parts.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DD3878E307FD9C700EBFD29 /* parts.h */; };
+		4DD38790307FD9C700EBFD29 /* parts.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DD3878E307FD9C700EBFD29 /* parts.h */; };
+		4DD38797307FFA5700EBFD29 /* part.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DD38796307FFA5700EBFD29 /* part.h */; };
+		4DD38798307FFA5700EBFD29 /* part.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DD38796307FFA5700EBFD29 /* part.h */; };
+		4DD387A73080152200EBFD29 /* score.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DD387A63080152200EBFD29 /* score.h */; };
+		4DD387A83080152200EBFD29 /* score.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DD387A63080152200EBFD29 /* score.h */; };
+		4DD387AA3080153600EBFD29 /* score.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD387A93080153600EBFD29 /* score.cpp */; };
+		4DD387AB3080153600EBFD29 /* score.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD387A93080153600EBFD29 /* score.cpp */; };
+		4DD387AC3080153600EBFD29 /* score.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD387A93080153600EBFD29 /* score.cpp */; };
+		4DD387AD3080153600EBFD29 /* score.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD387A93080153600EBFD29 /* score.cpp */; };
+		4DD387B0308024A100EBFD29 /* part.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD387AE308024A100EBFD29 /* part.cpp */; };
+		4DD387B1308024A100EBFD29 /* parts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD387AF308024A100EBFD29 /* parts.cpp */; };
+		4DD387B2308024A100EBFD29 /* part.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD387AE308024A100EBFD29 /* part.cpp */; };
+		4DD387B3308024A100EBFD29 /* parts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD387AF308024A100EBFD29 /* parts.cpp */; };
+		4DD387B4308024A100EBFD29 /* part.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD387AE308024A100EBFD29 /* part.cpp */; };
+		4DD387B5308024A100EBFD29 /* parts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD387AF308024A100EBFD29 /* parts.cpp */; };
+		4DD387B6308024A100EBFD29 /* part.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD387AE308024A100EBFD29 /* part.cpp */; };
+		4DD387B7308024A100EBFD29 /* parts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD387AF308024A100EBFD29 /* parts.cpp */; };
 		4DD49C662BECC073006D1C2E /* adjustyrelfortranscriptionfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD49C652BECC073006D1C2E /* adjustyrelfortranscriptionfunctor.cpp */; };
 		4DD49C682BECC096006D1C2E /* adjustyrelfortranscriptionfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD49C652BECC073006D1C2E /* adjustyrelfortranscriptionfunctor.cpp */; };
 		4DD49C692BECC097006D1C2E /* adjustyrelfortranscriptionfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD49C652BECC073006D1C2E /* adjustyrelfortranscriptionfunctor.cpp */; };
@@ -1280,8 +1262,8 @@
 		BB4C4ACC22A932B6001F6AF0 /* pb.h in Headers */ = {isa = PBXBuildFile; fileRef = 40C2E41D2052A6E00003625F /* pb.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4ACD22A932B6001F6AF0 /* sb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40C2E41A2052A6DF0003625F /* sb.cpp */; };
 		BB4C4ACE22A932B6001F6AF0 /* sb.h in Headers */ = {isa = PBXBuildFile; fileRef = 40C2E41C2052A6E00003625F /* sb.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		BB4C4ACF22A932B6001F6AF0 /* score.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4FB1D74551100B2B856 /* score.cpp */; };
-		BB4C4AD022A932B6001F6AF0 /* score.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D95D4FA1D74549700B2B856 /* score.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BB4C4ACF22A932B6001F6AF0 /* scoreorpartelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4FB1D74551100B2B856 /* scoreorpartelement.cpp */; };
+		BB4C4AD022A932B6001F6AF0 /* scoreorpartelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D95D4FA1D74549700B2B856 /* scoreorpartelement.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4AD122A932B6001F6AF0 /* scoredef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED2188539540037FD8E /* scoredef.cpp */; };
 		BB4C4AD222A932B6001F6AF0 /* scoredef.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59292918854BF800FE51AD /* scoredef.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4AD322A932B6001F6AF0 /* staffdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4FCD111F54570E0009C455 /* staffdef.cpp */; };
@@ -1880,6 +1862,24 @@
 		E7F39C6229A62B430055DBE0 /* adjustclefchangesfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F39C6029A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp */; };
 		E7F39C6329A62B440055DBE0 /* adjustclefchangesfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F39C6029A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp */; };
 		E7F39C6429A62B440055DBE0 /* adjustclefchangesfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F39C6029A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp */; };
+		F10000110000000000000000 /* fontstore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F10000010000000000000000 /* fontstore.cpp */; settings = {COMPILER_FLAGS = "-I$(SRCROOT)/external/harfbuzz/src -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/woff2/src -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000120000000000000000 /* verovio-harfbuzz.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000030000000000000000 /* verovio-harfbuzz.cc */; settings = {COMPILER_FLAGS = "-Oz -DHB_LEAN -DHB_MINI -DHB_OPTIMIZE_SIZE_MORE -DHB_CONFIG_OVERRIDE_H=\\\"verovio-hb-config.h\\\""; }; };
+		F10000130000000000000000 /* verovio-woff2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000040000000000000000 /* verovio-woff2.cc */; settings = {COMPILER_FLAGS = "-Os -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000140000000000000000 /* verovio-brotli.c in Sources */ = {isa = PBXBuildFile; fileRef = F10000050000000000000000 /* verovio-brotli.c */; settings = {COMPILER_FLAGS = "-Os -DBROTLI_STATIC -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000210000000000000000 /* fontstore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F10000010000000000000000 /* fontstore.cpp */; settings = {COMPILER_FLAGS = "-I$(SRCROOT)/external/harfbuzz/src -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/woff2/src -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000220000000000000000 /* verovio-harfbuzz.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000030000000000000000 /* verovio-harfbuzz.cc */; settings = {COMPILER_FLAGS = "-Oz -DHB_LEAN -DHB_MINI -DHB_OPTIMIZE_SIZE_MORE -DHB_CONFIG_OVERRIDE_H=\\\"verovio-hb-config.h\\\""; }; };
+		F10000230000000000000000 /* verovio-woff2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000040000000000000000 /* verovio-woff2.cc */; settings = {COMPILER_FLAGS = "-Os -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000240000000000000000 /* verovio-brotli.c in Sources */ = {isa = PBXBuildFile; fileRef = F10000050000000000000000 /* verovio-brotli.c */; settings = {COMPILER_FLAGS = "-Os -DBROTLI_STATIC -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000310000000000000000 /* fontstore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F10000010000000000000000 /* fontstore.cpp */; settings = {COMPILER_FLAGS = "-I$(SRCROOT)/external/harfbuzz/src -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/woff2/src -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000320000000000000000 /* verovio-harfbuzz.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000030000000000000000 /* verovio-harfbuzz.cc */; settings = {COMPILER_FLAGS = "-Oz -DHB_LEAN -DHB_MINI -DHB_OPTIMIZE_SIZE_MORE -DHB_CONFIG_OVERRIDE_H=\\\"verovio-hb-config.h\\\""; }; };
+		F10000330000000000000000 /* verovio-woff2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000040000000000000000 /* verovio-woff2.cc */; settings = {COMPILER_FLAGS = "-Os -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000340000000000000000 /* verovio-brotli.c in Sources */ = {isa = PBXBuildFile; fileRef = F10000050000000000000000 /* verovio-brotli.c */; settings = {COMPILER_FLAGS = "-Os -DBROTLI_STATIC -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000410000000000000000 /* fontstore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F10000010000000000000000 /* fontstore.cpp */; settings = {COMPILER_FLAGS = "-I$(SRCROOT)/external/harfbuzz/src -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/woff2/src -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000420000000000000000 /* verovio-harfbuzz.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000030000000000000000 /* verovio-harfbuzz.cc */; settings = {COMPILER_FLAGS = "-Oz -DHB_LEAN -DHB_MINI -DHB_OPTIMIZE_SIZE_MORE -DHB_CONFIG_OVERRIDE_H=\\\"verovio-hb-config.h\\\""; }; };
+		F10000430000000000000000 /* verovio-woff2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F10000040000000000000000 /* verovio-woff2.cc */; settings = {COMPILER_FLAGS = "-Os -I$(SRCROOT)/external/woff2/include -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000440000000000000000 /* verovio-brotli.c in Sources */ = {isa = PBXBuildFile; fileRef = F10000050000000000000000 /* verovio-brotli.c */; settings = {COMPILER_FLAGS = "-Os -DBROTLI_STATIC -I$(SRCROOT)/external/brotli/c/include"; }; };
+		F10000510000000000000000 /* fontstore.h in Headers */ = {isa = PBXBuildFile; fileRef = F10000020000000000000000 /* fontstore.h */; };
+		F10000520000000000000000 /* fontstore.h in Headers */ = {isa = PBXBuildFile; fileRef = F10000020000000000000000 /* fontstore.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1904,11 +1904,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		F10000010000000000000000 /* fontstore.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = fontstore.cpp; path = src/fontstore.cpp; sourceTree = "<group>"; };
-		F10000020000000000000000 /* fontstore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = fontstore.h; path = include/vrv/fontstore.h; sourceTree = "<group>"; };
-		F10000030000000000000000 /* verovio-harfbuzz.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = verovio-harfbuzz.cc; path = external/harfbuzz/src/verovio-harfbuzz.cc; sourceTree = "<group>"; };
-		F10000040000000000000000 /* verovio-woff2.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = verovio-woff2.cc; path = external/woff2/src/verovio-woff2.cc; sourceTree = "<group>"; };
-		F10000050000000000000000 /* verovio-brotli.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = verovio-brotli.c; path = external/brotli/c/verovio-brotli.c; sourceTree = "<group>"; };
 		152886C11C9CA2E000B515BB /* ligature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ligature.h; path = include/vrv/ligature.h; sourceTree = "<group>"; };
 		152886C41C9CA86100B515BB /* ligature.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ligature.cpp; path = src/ligature.cpp; sourceTree = "<group>"; };
 		1579B3411B15031D00B16F5C /* proport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = proport.h; path = include/vrv/proport.h; sourceTree = "<group>"; };
@@ -1970,12 +1965,6 @@
 		4D00A2862ED2E2FD00EFA853 /* offsetinterface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = offsetinterface.h; path = include/vrv/offsetinterface.h; sourceTree = "<group>"; };
 		4D00A2892ED2E32700EFA853 /* offsetinterface.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = offsetinterface.cpp; path = src/offsetinterface.cpp; sourceTree = "<group>"; };
 		4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = horizontalaligner.cpp; path = src/horizontalaligner.cpp; sourceTree = "<group>"; };
-		4D0C964630936AD200FB514A /* part.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = part.cpp; path = src/part.cpp; sourceTree = "<group>"; };
-		4D0C964730936AD200FB514A /* parts.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = parts.cpp; path = src/parts.cpp; sourceTree = "<group>"; };
-		4D0C965030936AF400FB514A /* scoreorpartelement.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = scoreorpartelement.cpp; path = src/scoreorpartelement.cpp; sourceTree = "<group>"; };
-		4D0C965530936B1200FB514A /* scoreorpartelement.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = scoreorpartelement.h; path = include/vrv/scoreorpartelement.h; sourceTree = "<group>"; };
-		4D0C965830936B3700FB514A /* part.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = part.h; path = include/vrv/part.h; sourceTree = "<group>"; };
-		4D0C965930936B3700FB514A /* parts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = parts.h; path = include/vrv/parts.h; sourceTree = "<group>"; };
 		4D14600F1EA8A913007DB90C /* horizontalaligner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = horizontalaligner.h; path = include/vrv/horizontalaligner.h; sourceTree = "<group>"; };
 		4D1694601E3A44F300569BF4 /* Verovio-Humdrum */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Verovio-Humdrum"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D1788C12CB8FD0100FE9043 /* fraction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = fraction.h; path = include/vrv/fraction.h; sourceTree = "<group>"; };
@@ -1986,19 +1975,19 @@
 		4D1AC97B2B6A9BD000434023 /* filereader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = filereader.h; path = include/vrv/filereader.h; sourceTree = "<group>"; };
 		4D1BD1B421908D6B000D35B2 /* halfmrpt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = halfmrpt.cpp; path = src/halfmrpt.cpp; sourceTree = "<group>"; };
 		4D1BD1B821908D78000D35B2 /* halfmrpt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = halfmrpt.h; path = include/vrv/halfmrpt.h; sourceTree = "<group>"; };
-		4D1BE7661C688F5A0086DC0E /* Binasc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Binasc.cpp; path = src/midi/Binasc.cpp; sourceTree = "<group>"; };
-		4D1BE7671C688F5A0086DC0E /* MidiEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiEvent.cpp; path = src/midi/MidiEvent.cpp; sourceTree = "<group>"; };
-		4D1BE7681C688F5A0086DC0E /* MidiEventList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiEventList.cpp; path = src/midi/MidiEventList.cpp; sourceTree = "<group>"; };
-		4D1BE7691C688F5A0086DC0E /* MidiFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiFile.cpp; path = src/midi/MidiFile.cpp; sourceTree = "<group>"; };
-		4D1BE76A1C688F5A0086DC0E /* MidiMessage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiMessage.cpp; path = src/midi/MidiMessage.cpp; sourceTree = "<group>"; };
-		4D1BE7761C6942930086DC0E /* pugiconfig.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = pugiconfig.hpp; path = include/pugi/pugiconfig.hpp; sourceTree = "<group>"; };
-		4D1BE7771C6942930086DC0E /* pugixml.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = pugixml.hpp; path = include/pugi/pugixml.hpp; sourceTree = "<group>"; };
-		4D1BE77A1C69434C0086DC0E /* Binasc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Binasc.h; path = include/midi/Binasc.h; sourceTree = "<group>"; };
-		4D1BE77B1C69434C0086DC0E /* MidiEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MidiEvent.h; path = include/midi/MidiEvent.h; sourceTree = "<group>"; };
-		4D1BE77C1C69434C0086DC0E /* MidiEventList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MidiEventList.h; path = include/midi/MidiEventList.h; sourceTree = "<group>"; };
-		4D1BE77D1C69434C0086DC0E /* MidiFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MidiFile.h; path = include/midi/MidiFile.h; sourceTree = "<group>"; };
-		4D1BE77E1C69434C0086DC0E /* MidiMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MidiMessage.h; path = include/midi/MidiMessage.h; sourceTree = "<group>"; };
-		4D1BE7841C6A40A80086DC0E /* pugixml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pugixml.cpp; path = src/pugi/pugixml.cpp; sourceTree = "<group>"; };
+		4D1BE7661C688F5A0086DC0E /* Binasc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Binasc.cpp; path = ../external/midifile/src/Binasc.cpp; sourceTree = "<group>"; };
+		4D1BE7671C688F5A0086DC0E /* MidiEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiEvent.cpp; path = ../external/midifile/src/MidiEvent.cpp; sourceTree = "<group>"; };
+		4D1BE7681C688F5A0086DC0E /* MidiEventList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiEventList.cpp; path = ../external/midifile/src/MidiEventList.cpp; sourceTree = "<group>"; };
+		4D1BE7691C688F5A0086DC0E /* MidiFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiFile.cpp; path = ../external/midifile/src/MidiFile.cpp; sourceTree = "<group>"; };
+		4D1BE76A1C688F5A0086DC0E /* MidiMessage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiMessage.cpp; path = ../external/midifile/src/MidiMessage.cpp; sourceTree = "<group>"; };
+		4D1BE7761C6942930086DC0E /* pugiconfig.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = pugiconfig.hpp; path = ../external/pugixml/src/pugiconfig.hpp; sourceTree = "<group>"; };
+		4D1BE7771C6942930086DC0E /* pugixml.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = pugixml.hpp; path = ../external/pugixml/src/pugixml.hpp; sourceTree = "<group>"; };
+		4D1BE77A1C69434C0086DC0E /* Binasc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Binasc.h; path = ../external/midifile/include/Binasc.h; sourceTree = "<group>"; };
+		4D1BE77B1C69434C0086DC0E /* MidiEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MidiEvent.h; path = ../external/midifile/include/MidiEvent.h; sourceTree = "<group>"; };
+		4D1BE77C1C69434C0086DC0E /* MidiEventList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MidiEventList.h; path = ../external/midifile/include/MidiEventList.h; sourceTree = "<group>"; };
+		4D1BE77D1C69434C0086DC0E /* MidiFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MidiFile.h; path = ../external/midifile/include/MidiFile.h; sourceTree = "<group>"; };
+		4D1BE77E1C69434C0086DC0E /* MidiMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MidiMessage.h; path = ../external/midifile/include/MidiMessage.h; sourceTree = "<group>"; };
+		4D1BE7841C6A40A80086DC0E /* pugixml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pugixml.cpp; path = ../external/pugixml/src/pugixml.cpp; sourceTree = "<group>"; };
 		4D1D733B1A1D0390001E08F6 /* smufl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = smufl.h; path = include/vrv/smufl.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		4D1D733D1A1D08CD001E08F6 /* glyph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glyph.h; path = include/vrv/glyph.h; sourceTree = "<group>"; };
 		4D1D733F1A1D08DC001E08F6 /* glyph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = glyph.cpp; path = src/glyph.cpp; sourceTree = "<group>"; };
@@ -2029,6 +2018,8 @@
 		4D2B23F22F56E7980088C6F4 /* TuningsImpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TuningsImpl.h; sourceTree = "<group>"; };
 		4D2B23FC2F56E8F40088C6F4 /* customtuning.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = customtuning.cpp; path = src/customtuning.cpp; sourceTree = "<group>"; };
 		4D2B24012F56E9090088C6F4 /* customtuning.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = customtuning.h; path = include/vrv/customtuning.h; sourceTree = "<group>"; };
+		4D2BB85130B305F3006260A8 /* midibuilder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = midibuilder.h; path = include/vrv/midibuilder.h; sourceTree = "<group>"; };
+		4D2BB85430B3060D006260A8 /* midibuilder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = midibuilder.cpp; path = src/midibuilder.cpp; sourceTree = "<group>"; };
 		4D308100203DB69C00BC44F6 /* ref.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ref.h; path = include/vrv/ref.h; sourceTree = "<group>"; };
 		4D308103203DB6B500BC44F6 /* ref.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ref.cpp; path = src/ref.cpp; sourceTree = "<group>"; };
 		4D36C21C1EBCE14300A6DD1B /* fb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fb.h; path = include/vrv/fb.h; sourceTree = "<group>"; };
@@ -2044,7 +2035,7 @@
 		4D4FCD0B1F5455FF0009C455 /* staffgrp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = staffgrp.cpp; path = src/staffgrp.cpp; sourceTree = "<group>"; };
 		4D4FCD0F1F5457020009C455 /* staffdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = staffdef.h; path = include/vrv/staffdef.h; sourceTree = "<group>"; };
 		4D4FCD111F54570E0009C455 /* staffdef.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = staffdef.cpp; path = src/staffdef.cpp; sourceTree = "<group>"; };
-		4D508C2F26D4E64C00020F35 /* crc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = crc.cpp; path = src/crc/crc.cpp; sourceTree = "<group>"; };
+		4D508C2F26D4E64C00020F35 /* crc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = crc.cpp; path = ../external/crc/crc.cpp; sourceTree = "<group>"; };
 		4D543E211B80AACF004B823C /* view_control.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_control.cpp; path = src/view_control.cpp; sourceTree = "<group>"; };
 		4D55723F1CF3F32A008D06A0 /* octave.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = octave.cpp; path = src/octave.cpp; sourceTree = "<group>"; };
 		4D5572411CF3F33C008D06A0 /* octave.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = octave.h; path = include/vrv/octave.h; sourceTree = "<group>"; };
@@ -2074,7 +2065,7 @@
 		4D6DF9F620E1072B00C12BBD /* subst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = subst.h; path = include/vrv/subst.h; sourceTree = "<group>"; };
 		4D71BEA62D875DF800CE0001 /* atts_stringtab.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = atts_stringtab.h; path = libmei/dist/atts_stringtab.h; sourceTree = "<group>"; };
 		4D71BEA72D875DF800CE0001 /* atts_stringtab.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = atts_stringtab.cpp; path = libmei/dist/atts_stringtab.cpp; sourceTree = "<group>"; };
-		4D723AF325E8DB0B0062E0A2 /* zip_file.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = zip_file.hpp; path = include/zip/zip_file.hpp; sourceTree = "<group>"; };
+		4D723AF325E8DB0B0062E0A2 /* zip_file.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = zip_file.hpp; path = "../external/miniz-cpp/zip_file.hpp"; sourceTree = "<group>"; };
 		4D763EC51987D04D003FCAB5 /* metersig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = metersig.cpp; path = src/metersig.cpp; sourceTree = "<group>"; };
 		4D763EC81987D067003FCAB5 /* metersig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = metersig.h; path = include/vrv/metersig.h; sourceTree = "<group>"; };
 		4D766EF220ACAD3F006875D8 /* syllable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = syllable.h; path = include/vrv/syllable.h; sourceTree = "<group>"; };
@@ -2116,8 +2107,8 @@
 		4D95D4F51D71866200B2B856 /* controlelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = controlelement.cpp; path = src/controlelement.cpp; sourceTree = "<group>"; };
 		4D95D4F71D718D0200B2B856 /* systemelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = systemelement.h; path = include/vrv/systemelement.h; sourceTree = "<group>"; };
 		4D95D4F81D718D4A00B2B856 /* systemelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = systemelement.cpp; path = src/systemelement.cpp; sourceTree = "<group>"; };
-		4D95D4FA1D74549700B2B856 /* score.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = score.h; path = include/vrv/score.h; sourceTree = "<group>"; };
-		4D95D4FB1D74551100B2B856 /* score.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = score.cpp; path = src/score.cpp; sourceTree = "<group>"; };
+		4D95D4FA1D74549700B2B856 /* scoreorpartelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = scoreorpartelement.h; path = include/vrv/scoreorpartelement.h; sourceTree = "<group>"; };
+		4D95D4FB1D74551100B2B856 /* scoreorpartelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scoreorpartelement.cpp; path = src/scoreorpartelement.cpp; sourceTree = "<group>"; };
 		4D983004192E959E00320037 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = tools/main.cpp; sourceTree = SOURCE_ROOT; };
 		4D9A9C16199F560200028D93 /* verse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = verse.h; path = include/vrv/verse.h; sourceTree = "<group>"; };
 		4D9A9C18199F561200028D93 /* verse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = verse.cpp; path = src/verse.cpp; sourceTree = "<group>"; };
@@ -2222,8 +2213,8 @@
 		4DB3D8A61F828EA900B5FC2B /* areaposinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = areaposinterface.cpp; path = src/areaposinterface.cpp; sourceTree = "<group>"; };
 		4DB726C41B8BB0E80040231B /* text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = text.cpp; path = src/text.cpp; sourceTree = "<group>"; };
 		4DB726C71B8BB0F30040231B /* text.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = text.h; path = include/vrv/text.h; sourceTree = "<group>"; };
-		4DB787612022F0AD00394520 /* jsonxx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jsonxx.h; path = include/json/jsonxx.h; sourceTree = "<group>"; };
-		4DB787622022F0B700394520 /* jsonxx.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = jsonxx.cc; path = src/json/jsonxx.cc; sourceTree = "<group>"; };
+		4DB787612022F0AD00394520 /* jsonxx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jsonxx.h; path = ../external/jsonxx/jsonxx.h; sourceTree = "<group>"; };
+		4DB787622022F0B700394520 /* jsonxx.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = jsonxx.cc; path = ../external/jsonxx/jsonxx.cc; sourceTree = "<group>"; };
 		4DBDD66D2939E19A009EC466 /* symboltable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = symboltable.h; path = include/vrv/symboltable.h; sourceTree = "<group>"; };
 		4DBDD66E2939E19A009EC466 /* symboldef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = symboldef.h; path = include/vrv/symboldef.h; sourceTree = "<group>"; };
 		4DBDD66F2939E1AE009EC466 /* symboltable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = symboltable.cpp; path = src/symboltable.cpp; sourceTree = "<group>"; };
@@ -2246,11 +2237,15 @@
 		4DC3B9E6239E2AD9007F185E /* transposition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = transposition.h; path = include/vrv/transposition.h; sourceTree = "<group>"; };
 		4DCA95D71A515D0E008AD7E9 /* editorial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = editorial.cpp; path = src/editorial.cpp; sourceTree = "<group>"; };
 		4DCA95DA1A515D33008AD7E9 /* editorial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = editorial.h; path = include/vrv/editorial.h; sourceTree = "<group>"; };
-		4DCB7AA226D3C9600047F01D /* crc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crc.h; path = include/crc/crc.h; sourceTree = SOURCE_ROOT; };
+		4DCB7AA226D3C9600047F01D /* crc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crc.h; path = external/crc/crc.h; sourceTree = SOURCE_ROOT; };
 		4DD11DC22240E78B00A405D8 /* c_wrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = c_wrapper.cpp; path = tools/c_wrapper.cpp; sourceTree = "<group>"; };
 		4DD11DC32240E78B00A405D8 /* c_wrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = c_wrapper.h; path = tools/c_wrapper.h; sourceTree = "<group>"; };
-		4DD38781307E024600EBFD29 /* clipboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = clipboard.h; path = include/vrv/clipboard.h; sourceTree = "<group>"; };
-		4DD38784307E025500EBFD29 /* clipboard.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = clipboard.cpp; path = src/clipboard.cpp; sourceTree = "<group>"; };
+		4DD3878E307FD9C700EBFD29 /* parts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = parts.h; path = include/vrv/parts.h; sourceTree = "<group>"; };
+		4DD38796307FFA5700EBFD29 /* part.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = part.h; path = include/vrv/part.h; sourceTree = "<group>"; };
+		4DD387A63080152200EBFD29 /* score.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = score.h; path = include/vrv/score.h; sourceTree = "<group>"; };
+		4DD387A93080153600EBFD29 /* score.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = score.cpp; path = src/score.cpp; sourceTree = "<group>"; };
+		4DD387AE308024A100EBFD29 /* part.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = part.cpp; path = src/part.cpp; sourceTree = "<group>"; };
+		4DD387AF308024A100EBFD29 /* parts.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = parts.cpp; path = src/parts.cpp; sourceTree = "<group>"; };
 		4DD49C652BECC073006D1C2E /* adjustyrelfortranscriptionfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustyrelfortranscriptionfunctor.cpp; path = src/adjustyrelfortranscriptionfunctor.cpp; sourceTree = "<group>"; };
 		4DD49C672BECC083006D1C2E /* adjustyrelfortranscriptionfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustyrelfortranscriptionfunctor.h; path = include/vrv/adjustyrelfortranscriptionfunctor.h; sourceTree = "<group>"; };
 		4DD7C0FB27A55CEA00B9C017 /* timemap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = timemap.cpp; path = src/timemap.cpp; sourceTree = "<group>"; };
@@ -2539,6 +2534,11 @@
 		E7F1C36629F0345D007E12C1 /* savefunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = savefunctor.cpp; path = src/savefunctor.cpp; sourceTree = "<group>"; };
 		E7F39C5D29A62B1F0055DBE0 /* adjustclefchangesfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustclefchangesfunctor.h; path = include/vrv/adjustclefchangesfunctor.h; sourceTree = "<group>"; };
 		E7F39C6029A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustclefchangesfunctor.cpp; path = src/adjustclefchangesfunctor.cpp; sourceTree = "<group>"; };
+		F10000010000000000000000 /* fontstore.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = fontstore.cpp; path = src/fontstore.cpp; sourceTree = "<group>"; };
+		F10000020000000000000000 /* fontstore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = fontstore.h; path = include/vrv/fontstore.h; sourceTree = "<group>"; };
+		F10000030000000000000000 /* verovio-harfbuzz.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "verovio-harfbuzz.cc"; path = "external/harfbuzz/src/verovio-harfbuzz.cc"; sourceTree = "<group>"; };
+		F10000040000000000000000 /* verovio-woff2.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "verovio-woff2.cc"; path = "external/woff2/src/verovio-woff2.cc"; sourceTree = "<group>"; };
+		F10000050000000000000000 /* verovio-brotli.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "verovio-brotli.c"; path = "external/brotli/c/verovio-brotli.c"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2617,7 +2617,7 @@
 				4D2B23F22F56E7980088C6F4 /* TuningsImpl.h */,
 			);
 			name = "tuning-library";
-			path = "include/tuning-library";
+			path = "../external/tuning-library/include";
 			sourceTree = "<group>";
 		};
 		4D3080F9203DA03600BC44F6 /* editorialelements */ = {
@@ -2687,20 +2687,20 @@
 		4D79641626C151250026288B /* pageelements */ = {
 			isa = PBXGroup;
 			children = (
+				4DD387AE308024A100EBFD29 /* part.cpp */,
+				4DD387AF308024A100EBFD29 /* parts.cpp */,
 				4D64137D2035F68600BB630E /* mdiv.cpp */,
 				4D64137B2035F67C00BB630E /* mdiv.h */,
-				4D95D4FB1D74551100B2B856 /* score.cpp */,
-				4D95D4FA1D74549700B2B856 /* score.h */,
-				4D0C964630936AD200FB514A /* part.cpp */,
-				4D0C965830936B3700FB514A /* part.h */,
-				4D0C964730936AD200FB514A /* parts.cpp */,
-				4D0C965930936B3700FB514A /* parts.h */,
-				4D0C965030936AF400FB514A /* scoreorpartelement.cpp */,
-				4D0C965530936B1200FB514A /* scoreorpartelement.h */,
+				4DD38796307FFA5700EBFD29 /* part.h */,
+				4DD3878E307FD9C700EBFD29 /* parts.h */,
+				4D95D4FB1D74551100B2B856 /* scoreorpartelement.cpp */,
+				4D95D4FA1D74549700B2B856 /* scoreorpartelement.h */,
 				4D79641726C1522B0026288B /* pageelement.cpp */,
 				4D79641C26C152400026288B /* pageelement.h */,
 				4D79642026C167100026288B /* pagemilestone.cpp */,
 				4D79642526C167200026288B /* pagemilestone.h */,
+				4DD387A93080153600EBFD29 /* score.cpp */,
+				4DD387A63080152200EBFD29 /* score.h */,
 			);
 			name = pageelements;
 			sourceTree = "<group>";
@@ -2714,6 +2714,19 @@
 				4D983004192E959E00320037 /* main.cpp */,
 			);
 			name = tools;
+			sourceTree = "<group>";
+		};
+		4D90E60430B577C300536E76 /* externals */ = {
+			isa = PBXGroup;
+			children = (
+				4D508C2E26D4E3A000020F35 /* crc */,
+				4DB787602022EFA700394520 /* json */,
+				4D1BE7751C688F6F0086DC0E /* midi */,
+				4D22C42118891D7300D0831F /* pugixml */,
+				4D2B23F32F56E7980088C6F4 /* tuning-library */,
+				4D723AF225E8DAB40062E0A2 /* zip */,
+			);
+			path = externals;
 			sourceTree = "<group>";
 		};
 		4D95D4F31D717CD600B2B856 /* systemelements */ = {
@@ -2755,8 +2768,6 @@
 		4DA0EAFC22BB797000A7EBEB /* editor */ = {
 			isa = PBXGroup;
 			children = (
-				4DD38784307E025500EBFD29 /* clipboard.cpp */,
-				4DD38781307E024600EBFD29 /* clipboard.h */,
 				4D1A0BBD2FD1518E004AE805 /* cursor.cpp */,
 				4D1A0BBA2FD1517B004AE805 /* cursor.h */,
 				4DA0EAE822BB77C300A7EBEB /* editortoolkit_cmn.cpp */,
@@ -3020,32 +3031,15 @@
 		8F086E9E188534680037FD8E = {
 			isa = PBXGroup;
 			children = (
-				F10000060000000000000000 /* runtime-fonts */,
-				40CA06431E351112009CFDD7 /* humdrum */,
 				4DEE28EC1940BCA100C76319 /* libmei */,
 				4D7D8A3C1886E36200D78B62 /* tools */,
 				8F086F351885397A0037FD8E /* source */,
-				4D508C2E26D4E3A000020F35 /* crc */,
-				4DB787602022EFA700394520 /* json */,
-				4D1BE7751C688F6F0086DC0E /* midi */,
-				4D22C42118891D7300D0831F /* pugixml */,
-				4D2B23F32F56E7980088C6F4 /* tuning-library */,
-				4D723AF225E8DAB40062E0A2 /* zip */,
+				40CA06431E351112009CFDD7 /* humdrum */,
+				F10000060000000000000000 /* runtime-fonts */,
+				4D90E60430B577C300536E76 /* externals */,
 				BB4C4A5322A930A3001F6AF0 /* VerovioFramework */,
 				8F086EAA188534680037FD8E /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		F10000060000000000000000 /* runtime-fonts */ = {
-			isa = PBXGroup;
-			children = (
-				F10000010000000000000000 /* fontstore.cpp */,
-				F10000020000000000000000 /* fontstore.h */,
-				F10000030000000000000000 /* verovio-harfbuzz.cc */,
-				F10000040000000000000000 /* verovio-woff2.cc */,
-				F10000050000000000000000 /* verovio-brotli.c */,
-			);
-			name = "runtime-fonts";
 			sourceTree = "<group>";
 		};
 		8F086EAA188534680037FD8E /* Products */ = {
@@ -3100,6 +3094,8 @@
 				4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */,
 				4D14600F1EA8A913007DB90C /* horizontalaligner.h */,
 				4DACC93F2990ED2600B55913 /* libmei.h */,
+				4D2BB85430B3060D006260A8 /* midibuilder.cpp */,
+				4D2BB85130B305F3006260A8 /* midibuilder.h */,
 				8F086ECD188539540037FD8E /* object.cpp */,
 				8F59292418854BF800FE51AD /* object.h */,
 				4DA80D951A6ACF5D0089802D /* options.cpp */,
@@ -3386,8 +3382,8 @@
 				E71EF3C22975E4DC00D36264 /* resetfunctor.h */,
 				E7F1C36629F0345D007E12C1 /* savefunctor.cpp */,
 				E7F1C36329F033FB007E12C1 /* savefunctor.h */,
-				B464F4922C6D665300A778D2 /* scoringupfunctor.h */,
 				B464F48E2C6D664300A778D2 /* scoringupfunctor.cpp */,
+				B464F4922C6D665300A778D2 /* scoringupfunctor.h */,
 				E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */,
 				E7D33899293E057100C40B81 /* setscoredeffunctor.h */,
 				E73E86272A069C920089DF74 /* transposefunctor.cpp */,
@@ -3480,6 +3476,18 @@
 			name = "vertical-layout";
 			sourceTree = "<group>";
 		};
+		F10000060000000000000000 /* runtime-fonts */ = {
+			isa = PBXGroup;
+			children = (
+				F10000010000000000000000 /* fontstore.cpp */,
+				F10000020000000000000000 /* fontstore.h */,
+				F10000030000000000000000 /* verovio-harfbuzz.cc */,
+				F10000040000000000000000 /* verovio-woff2.cc */,
+				F10000050000000000000000 /* verovio-brotli.c */,
+			);
+			name = "runtime-fonts";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -3502,7 +3510,6 @@
 				4DD11DC52240E78B00A405D8 /* c_wrapper.h in Headers */,
 				403BEFFA206C010100D022D5 /* beatrpt.h in Headers */,
 				8F59293418854BF800FE51AD /* verticalaligner.h in Headers */,
-				4DD38782307E024600EBFD29 /* clipboard.h in Headers */,
 				E7E9C11229B0A1E100CFCE2F /* adjustaccidxfunctor.h in Headers */,
 				4DA0EAE522BB77AF00A7EBEB /* editortoolkit.h in Headers */,
 				4DB3D8E81F83D16E00B5FC2B /* ftrem.h in Headers */,
@@ -3528,7 +3535,6 @@
 				E7908E9F298582090004C1F9 /* alignfunctor.h in Headers */,
 				4DB3D8C71F83D0FD00B5FC2B /* breath.h in Headers */,
 				8F59293A18854BF800FE51AD /* devicecontext.h in Headers */,
-				4D0C965630936B1200FB514A /* scoreorpartelement.h in Headers */,
 				8F59293B18854BF800FE51AD /* doc.h in Headers */,
 				4DB3D8D61F83D13100B5FC2B /* tempo.h in Headers */,
 				E765675928BBFBA400BC6490 /* functorinterface.h in Headers */,
@@ -3550,6 +3556,7 @@
 				4DDBBB571C7AE43E00054AFF /* hairpin.h in Headers */,
 				E788335D2994EC5800D44B01 /* calcchordnoteheadsfunctor.h in Headers */,
 				4D79643126C6AA720026288B /* featureextractor.h in Headers */,
+				4D2BB85230B305F3006260A8 /* midibuilder.h in Headers */,
 				4DEC4DC221C8291300D1D273 /* add.h in Headers */,
 				E75A699D29CCF87B00414819 /* adjustbeamsfunctor.h in Headers */,
 				403BEFF1206C00D500D022D5 /* mrpt2.h in Headers */,
@@ -3568,6 +3575,7 @@
 				4DED4F1C294733280073E504 /* altsyminterface.h in Headers */,
 				4DB3D8BA1F83D0CA00B5FC2B /* systemmilestone.h in Headers */,
 				4DCA95DB1A515D33008AD7E9 /* editorial.h in Headers */,
+				4DD3878F307FD9C700EBFD29 /* parts.h in Headers */,
 				40C2E4202052A6E90003625F /* sb.h in Headers */,
 				4DE0B9A12988070C00D4C939 /* interface.h in Headers */,
 				E7870354299CF03200156DC4 /* adjustarpegfunctor.h in Headers */,
@@ -3589,6 +3597,7 @@
 				8F59294418854BF800FE51AD /* layer.h in Headers */,
 				4D7AFDCC2A5554C100835ED1 /* divline.h in Headers */,
 				4D71BEAC2D875DF800CE0001 /* atts_stringtab.h in Headers */,
+				4DD387A83080152200EBFD29 /* score.h in Headers */,
 				E7F1C36429F033FB007E12C1 /* savefunctor.h in Headers */,
 				4DACCA172990F2E600B55913 /* attdef.h in Headers */,
 				4DB3D8EC1F83D18300B5FC2B /* proport.h in Headers */,
@@ -3610,7 +3619,7 @@
 				8F59294818854BF800FE51AD /* mensur.h in Headers */,
 				4D79641D26C152400026288B /* pageelement.h in Headers */,
 				4D2B24022F56E9090088C6F4 /* customtuning.h in Headers */,
-				4DB3D8B81F83D0B100B5FC2B /* score.h in Headers */,
+				4DB3D8B81F83D0B100B5FC2B /* scoreorpartelement.h in Headers */,
 				E738715D29CAFA7800982DE5 /* calcligatureorneumeposfunctor.h in Headers */,
 				4DA0EAD922BB77AF00A7EBEB /* facsimile.h in Headers */,
 				4DEC4DD721C8295700D1D273 /* reg.h in Headers */,
@@ -3627,8 +3636,6 @@
 				8F59294B18854BF800FE51AD /* object.h in Headers */,
 				4DACC9B42990F29A00B55913 /* atts_pagebased.h in Headers */,
 				4D1BE7831C69434C0086DC0E /* MidiMessage.h in Headers */,
-				4D0C965C30936B3700FB514A /* part.h in Headers */,
-				4D0C965D30936B3700FB514A /* parts.h in Headers */,
 				E7F39C5E29A62B260055DBE0 /* adjustclefchangesfunctor.h in Headers */,
 				E74A806628BC97D5005274E7 /* findfunctor.h in Headers */,
 				4DF9DB342F3231B50003112D /* editortoolkit_shared.h in Headers */,
@@ -3686,6 +3693,7 @@
 				4DACC9CE2990F29A00B55913 /* atts_mei.h in Headers */,
 				8F59294E18854BF800FE51AD /* positioninterface.h in Headers */,
 				8F59294F18854BF800FE51AD /* rest.h in Headers */,
+				4DD38797307FFA5700EBFD29 /* part.h in Headers */,
 				4DB3D8B31F83D07A00B5FC2B /* git_commit.h in Headers */,
 				BDC366E02576AFA500E4D826 /* grpsym.h in Headers */,
 				4DF289FD1A7545CC00BA9F7D /* timeinterface.h in Headers */,
@@ -3811,7 +3819,6 @@
 			files = (
 				F10000520000000000000000 /* fontstore.h in Headers */,
 				E79320652991452200D80975 /* calcstemfunctor.h in Headers */,
-				4DD38783307E024600EBFD29 /* clipboard.h in Headers */,
 				E7ED8A6629C1119900735875 /* cachehorizontallayoutfunctor.h in Headers */,
 				E7ADB3AC29D1921400825D5D /* adjustarticfunctor.h in Headers */,
 				4DA0EAE022BB77AF00A7EBEB /* facsimileinterface.h in Headers */,
@@ -3823,6 +3830,7 @@
 				BB4C4AAE22A932A6001F6AF0 /* iobase.h in Headers */,
 				BB4C4BAA22A932EB001F6AF0 /* view.h in Headers */,
 				4DACC9DD2990F29A00B55913 /* atts_header.h in Headers */,
+				4D2BB85330B305F3006260A8 /* midibuilder.h in Headers */,
 				BB4C4BC422A9330D001F6AF0 /* pugixml.hpp in Headers */,
 				4DACC9F52990F29A00B55913 /* atts_visual.h in Headers */,
 				BBC19FC322B38C1400100F42 /* VerovioFramework.h in Headers */,
@@ -3883,7 +3891,7 @@
 				4D2B23F92F56E7980088C6F4 /* TuningsConcepts.h in Headers */,
 				BB4C4AFA22A932BC001F6AF0 /* restore.h in Headers */,
 				BB4C4B2422A932CF001F6AF0 /* dynam.h in Headers */,
-				BB4C4AD022A932B6001F6AF0 /* score.h in Headers */,
+				BB4C4AD022A932B6001F6AF0 /* scoreorpartelement.h in Headers */,
 				4D292C232EEB0BC000C1EB5F /* adjustossiastaffdeffunctor.h in Headers */,
 				BB4C4B8E22A932DF001F6AF0 /* svg.h in Headers */,
 				BB4C4B3822A932CF001F6AF0 /* trill.h in Headers */,
@@ -3931,6 +3939,7 @@
 				BB4C4B2022A932CF001F6AF0 /* breath.h in Headers */,
 				4DCB7AA426D3C9600047F01D /* crc.h in Headers */,
 				4DACC99F2990F29A00B55913 /* atts_shared.h in Headers */,
+				4DD38798307FFA5700EBFD29 /* part.h in Headers */,
 				BB4C4B7222A932D7001F6AF0 /* rest.h in Headers */,
 				BB4C4B3A22A932CF001F6AF0 /* turn.h in Headers */,
 				BDA81C21268B38760065B802 /* metersiggrp.h in Headers */,
@@ -3946,7 +3955,6 @@
 				BB4C4B0222A932BC001F6AF0 /* unclear.h in Headers */,
 				BB4C4B2C22A932CF001F6AF0 /* mordent.h in Headers */,
 				4DBDD67A2939E1D1009EC466 /* symboldef.h in Headers */,
-				4D0C965730936B1200FB514A /* scoreorpartelement.h in Headers */,
 				BB4C4B7A22A932D7001F6AF0 /* timestamp.h in Headers */,
 				BB4C4B6C22A932D7001F6AF0 /* neume.h in Headers */,
 				BB4C4B2E22A932CF001F6AF0 /* octave.h in Headers */,
@@ -3983,6 +3991,7 @@
 				4DA0EADA22BB77AF00A7EBEB /* facsimile.h in Headers */,
 				4D71BEAA2D875DF800CE0001 /* atts_stringtab.h in Headers */,
 				BB4C4AE222A932BC001F6AF0 /* app.h in Headers */,
+				4DD38790307FD9C700EBFD29 /* parts.h in Headers */,
 				BB4C4AE822A932BC001F6AF0 /* damage.h in Headers */,
 				BB4C4B7022A932D7001F6AF0 /* proport.h in Headers */,
 				BB4C4ABA22A932A6001F6AF0 /* iopae.h in Headers */,
@@ -4020,8 +4029,6 @@
 				BB4C4BA822A932EB001F6AF0 /* glyph.h in Headers */,
 				E7D48C7229D21F050031D89D /* adjustyposfunctor.h in Headers */,
 				BB4C4B8822A932DF001F6AF0 /* num.h in Headers */,
-				4D0C965A30936B3700FB514A /* part.h in Headers */,
-				4D0C965B30936B3700FB514A /* parts.h in Headers */,
 				4DACC9A12990F29A00B55913 /* atts_gestural.h in Headers */,
 				4D2E759122BC2B80004C51F0 /* tuning.h in Headers */,
 				BB4C4AC422A932B6001F6AF0 /* mdiv.h in Headers */,
@@ -4089,6 +4096,7 @@
 				BB4C4AEC22A932BC001F6AF0 /* editorial.h in Headers */,
 				E75EA9FB29CC3A6C003A97A7 /* calcarticfunctor.h in Headers */,
 				E7770F8429D0D9F700A9BECF /* adjustslursfunctor.h in Headers */,
+				4DD387A73080152200EBFD29 /* score.h in Headers */,
 				BB4C4AA222A9328F001F6AF0 /* verticalaligner.h in Headers */,
 				BB4C4B0E22A932C8001F6AF0 /* systemmilestone.h in Headers */,
 				BB4C4A9622A9328F001F6AF0 /* floatingobject.h in Headers */,
@@ -4320,7 +4328,7 @@
 				E76046C228D496B300C36204 /* calcledgerlinesfunctor.cpp in Sources */,
 				E7870358299CF07500156DC4 /* adjustarpegfunctor.cpp in Sources */,
 				4D766F0120ACAD6D006875D8 /* view_neume.cpp in Sources */,
-				4D1693FD1E3A44F300569BF4 /* score.cpp in Sources */,
+				4D1693FD1E3A44F300569BF4 /* scoreorpartelement.cpp in Sources */,
 				4DACC9892990F29A00B55913 /* atts_mei.cpp in Sources */,
 				4D1693FE1E3A44F300569BF4 /* doc.cpp in Sources */,
 				4D1693FF1E3A44F300569BF4 /* durationinterface.cpp in Sources */,
@@ -4344,8 +4352,6 @@
 				4DEC4D8321C804E000D1D273 /* app.cpp in Sources */,
 				E7F1C36929F03461007E12C1 /* savefunctor.cpp in Sources */,
 				4DF092A62497711800239195 /* phrase.cpp in Sources */,
-				4D0C964C30936AD200FB514A /* parts.cpp in Sources */,
-				4D0C964D30936AD200FB514A /* part.cpp in Sources */,
 				4DB3D8D91F83D13C00B5FC2B /* turn.cpp in Sources */,
 				4D1788C62CB8FD7300FE9043 /* fraction.cpp in Sources */,
 				4DA0EAC422BB779400A7EBEB /* surface.cpp in Sources */,
@@ -4398,6 +4404,7 @@
 				4D308105203DB6B500BC44F6 /* ref.cpp in Sources */,
 				4D1694161E3A44F300569BF4 /* pedal.cpp in Sources */,
 				BD6E5C3D290007C90039B0F1 /* graphic.cpp in Sources */,
+				4DD387AA3080153600EBFD29 /* score.cpp in Sources */,
 				4D1694171E3A44F300569BF4 /* mensur.cpp in Sources */,
 				E78F204B29D98D2B00CD5910 /* adjustxrelfortranscriptionfunctor.cpp in Sources */,
 				BD0562372518CD20004057EB /* beamspan.cpp in Sources */,
@@ -4489,6 +4496,8 @@
 				4DACC9C12990F29A00B55913 /* atts_cmn.cpp in Sources */,
 				4D1694311E3A44F300569BF4 /* system.cpp in Sources */,
 				4DACCA142990F2E600B55913 /* att.cpp in Sources */,
+				4DD387B6308024A100EBFD29 /* part.cpp in Sources */,
+				4DD387B7308024A100EBFD29 /* parts.cpp in Sources */,
 				4D1694321E3A44F300569BF4 /* scoredefinterface.cpp in Sources */,
 				4D4C26EE1EF7E75400681770 /* label.cpp in Sources */,
 				4D1694331E3A44F300569BF4 /* section.cpp in Sources */,
@@ -4537,14 +4546,13 @@
 				4D79643A26C6B3520026288B /* featureextractor.cpp in Sources */,
 				4DEC4DA721C81ED400D1D273 /* reg.cpp in Sources */,
 				4DACC9AF2990F29A00B55913 /* atts_analytical.cpp in Sources */,
-				4D0C965230936AF400FB514A /* scoreorpartelement.cpp in Sources */,
+				4D2BB85830B3060D006260A8 /* midibuilder.cpp in Sources */,
 				E76A9D4B29A74E620044682D /* adjustdotsfunctor.cpp in Sources */,
 				4D71BEA82D875DF800CE0001 /* atts_stringtab.cpp in Sources */,
 				4D1694421E3A44F300569BF4 /* chord.cpp in Sources */,
 				4D1694431E3A44F300569BF4 /* view.cpp in Sources */,
 				8F7DD0561EAF3682001B072A /* fb.cpp in Sources */,
 				E7A03CD529D6176900C02941 /* adjusttupletsyfunctor.cpp in Sources */,
-				4DD38786307E025500EBFD29 /* clipboard.cpp in Sources */,
 				E71EF3C82975ED4600D36264 /* resetfunctor.cpp in Sources */,
 				40C2E4242052A6FA0003625F /* sb.cpp in Sources */,
 				4D292C1E2EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp in Sources */,
@@ -4615,6 +4623,7 @@
 				4D4FCD121F54570E0009C455 /* staffdef.cpp in Sources */,
 				B464F48F2C6D664300A778D2 /* scoringupfunctor.cpp in Sources */,
 				8F086EE2188539540037FD8E /* verticalaligner.cpp in Sources */,
+				4DD387AB3080153600EBFD29 /* score.cpp in Sources */,
 				4DEC4D9621C81E3B00D1D273 /* expan.cpp in Sources */,
 				4D508C3026D4E64C00020F35 /* crc.cpp in Sources */,
 				8F086EE4188539540037FD8E /* barline.cpp in Sources */,
@@ -4645,7 +4654,7 @@
 				4DACC9FC2990F29A00B55913 /* atts_fingering.cpp in Sources */,
 				4DACC9EC2990F29A00B55913 /* atts_shared.cpp in Sources */,
 				4DA0EAEA22BB77C300A7EBEB /* editortoolkit_neume.cpp in Sources */,
-				4D95D4FC1D74551100B2B856 /* score.cpp in Sources */,
+				4D95D4FC1D74551100B2B856 /* scoreorpartelement.cpp in Sources */,
 				8F086EE9188539540037FD8E /* doc.cpp in Sources */,
 				8F086EEA188539540037FD8E /* durationinterface.cpp in Sources */,
 				E7B17DAC29F665C90076E75F /* midifunctor.cpp in Sources */,
@@ -4690,7 +4699,6 @@
 				4D43C30C1A9BB22A00EA28F3 /* view_mensural.cpp in Sources */,
 				4DFB3E8523ABDFC200D688C7 /* pitchinflection.cpp in Sources */,
 				8F086EF2188539540037FD8E /* layer.cpp in Sources */,
-				4DD38785307E025500EBFD29 /* clipboard.cpp in Sources */,
 				4D27E13727F582BB00D64FBD /* docselection.cpp in Sources */,
 				E7E9C11D29B0EFB400CFCE2F /* adjusttempofunctor.cpp in Sources */,
 				4D2073F822A3BCE000E0765F /* tabdursym.cpp in Sources */,
@@ -4708,8 +4716,6 @@
 				406916DC23833770009E6B04 /* mspace.cpp in Sources */,
 				E7A1640C29AF34750099BD6A /* adjustharmgrpsspacingfunctor.cpp in Sources */,
 				4DE0198C2C495DB800B5B6BF /* iovolpiano.cpp in Sources */,
-				4D0C964830936AD200FB514A /* parts.cpp in Sources */,
-				4D0C964930936AD200FB514A /* part.cpp in Sources */,
 				4D95D4F91D718D4A00B2B856 /* systemelement.cpp in Sources */,
 				4D1EB6A92A2A7C5100AF2F98 /* div.cpp in Sources */,
 				4DDBBB5B1C7AE45900054AFF /* dynam.cpp in Sources */,
@@ -4750,7 +4756,6 @@
 				4DD7C10227A5650600B9C017 /* timemap.cpp in Sources */,
 				4D4CDEA52C078FF9005621E9 /* adjustneumexfunctor.cpp in Sources */,
 				E797C460298EC2C600CAD67E /* calcalignmentpitchposfunctor.cpp in Sources */,
-				4D0C965330936AF400FB514A /* scoreorpartelement.cpp in Sources */,
 				8F086EFA188539540037FD8E /* page.cpp in Sources */,
 				8F086EFB188539540037FD8E /* pitchinterface.cpp in Sources */,
 				BDEF9EC726725234008A3A47 /* caesura.cpp in Sources */,
@@ -4841,6 +4846,7 @@
 				8F086F0D188539540037FD8E /* vrv.cpp in Sources */,
 				409B3DDB1F2D1C550098A265 /* btrem.cpp in Sources */,
 				E71EF3C92975ED4700D36264 /* resetfunctor.cpp in Sources */,
+				4D2BB85730B3060D006260A8 /* midibuilder.cpp in Sources */,
 				4D22C41918890E6100D0831F /* mrest.cpp in Sources */,
 				4DA60EE61B6307B9006E2DFC /* textdirinterface.cpp in Sources */,
 				4DACC9C02990F29A00B55913 /* atts_cmn.cpp in Sources */,
@@ -4910,6 +4916,8 @@
 				4DC34BAC19BC4A83006175CD /* dot.cpp in Sources */,
 				E7901662298BCB2D008FDB4E /* calcalignmentxposfunctor.cpp in Sources */,
 				4DEC4DB221C826E000D1D273 /* supplied.cpp in Sources */,
+				4DD387B2308024A100EBFD29 /* part.cpp in Sources */,
+				4DD387B3308024A100EBFD29 /* parts.cpp in Sources */,
 				4D20740A22A4FDFA00E0765F /* course.cpp in Sources */,
 				4DA0EAC322BB779400A7EBEB /* surface.cpp in Sources */,
 				4DC3B9E5239E2ABF007F185E /* transposition.cpp in Sources */,
@@ -4977,8 +4985,6 @@
 				4D1D73411A1D08DC001E08F6 /* glyph.cpp in Sources */,
 				4D79641A26C1522B0026288B /* pageelement.cpp in Sources */,
 				8F3DD36418854B390051330C /* view_page.cpp in Sources */,
-				4D0C964E30936AD200FB514A /* parts.cpp in Sources */,
-				4D0C964F30936AD200FB514A /* part.cpp in Sources */,
 				E7F1C36729F0345D007E12C1 /* savefunctor.cpp in Sources */,
 				4DEC4D8021C804C500D1D273 /* add.cpp in Sources */,
 				8F3DD36518854B390051330C /* view_tuplet.cpp in Sources */,
@@ -5014,7 +5020,7 @@
 				8F3DD33E18854B2E0051330C /* beam.cpp in Sources */,
 				4DED4F19294733140073E504 /* altsyminterface.cpp in Sources */,
 				E7ADB3B029D1923600825D5D /* adjustarticfunctor.cpp in Sources */,
-				4D4C26F01EF7E75E00681770 /* score.cpp in Sources */,
+				4D4C26F01EF7E75E00681770 /* scoreorpartelement.cpp in Sources */,
 				8F3DD34018854B2E0051330C /* clef.cpp in Sources */,
 				4DC07F6B2A4DBB8500360070 /* liquescent.cpp in Sources */,
 				8F3DD34218854B2E0051330C /* durationinterface.cpp in Sources */,
@@ -5031,6 +5037,7 @@
 				4DB3D8DA1F83D13D00B5FC2B /* turn.cpp in Sources */,
 				4DF28A001A7545E500BA9F7D /* timeinterface.cpp in Sources */,
 				4D1BE76E1C688F5A0086DC0E /* MidiEvent.cpp in Sources */,
+				4DD387AC3080153600EBFD29 /* score.cpp in Sources */,
 				4DA60EE71B6307B9006E2DFC /* textdirinterface.cpp in Sources */,
 				40BD9391206B950B0037BF8E /* annot.cpp in Sources */,
 				4DB3D8B51F83D09100B5FC2B /* iohumdrum.cpp in Sources */,
@@ -5122,6 +5129,8 @@
 				4D766F0320ACAD6E006875D8 /* neume.cpp in Sources */,
 				4DACC9C22990F29A00B55913 /* atts_cmn.cpp in Sources */,
 				B464F4902C6D664300A778D2 /* scoringupfunctor.cpp in Sources */,
+				4DD387B4308024A100EBFD29 /* part.cpp in Sources */,
+				4DD387B5308024A100EBFD29 /* parts.cpp in Sources */,
 				4D94722120CA702C00C780C8 /* linkinginterface.cpp in Sources */,
 				4DACCA152990F2E600B55913 /* att.cpp in Sources */,
 				4DB3D8EB1F83D18000B5FC2B /* proport.cpp in Sources */,
@@ -5170,14 +5179,13 @@
 				4DACC9862990F29A00B55913 /* atts_performance.cpp in Sources */,
 				4D79643B26C6B3520026288B /* featureextractor.cpp in Sources */,
 				4DB787652022F0BC00394520 /* jsonxx.cc in Sources */,
-				4D0C965430936AF400FB514A /* scoreorpartelement.cpp in Sources */,
+				4D2BB85630B3060D006260A8 /* midibuilder.cpp in Sources */,
 				4DACC9B02990F29A00B55913 /* atts_analytical.cpp in Sources */,
 				E76A9D4C29A74E630044682D /* adjustdotsfunctor.cpp in Sources */,
 				4DC12A831F741110000440E9 /* pgfoot.cpp in Sources */,
 				4DEC4D8421C804E000D1D273 /* app.cpp in Sources */,
 				E71EF3C62975ED3800D36264 /* resetfunctor.cpp in Sources */,
 				E7A03CD629D6176A00C02941 /* adjusttupletsyfunctor.cpp in Sources */,
-				4DD38787307E025500EBFD29 /* clipboard.cpp in Sources */,
 				4DB3D8BC1F83D0D200B5FC2B /* expansion.cpp in Sources */,
 				4D22C41A18890E6100D0831F /* mrest.cpp in Sources */,
 				4D292C202EEB0BAB00C1EB5F /* adjustossiastaffdeffunctor.cpp in Sources */,
@@ -5294,8 +5302,6 @@
 				4D79641B26C1522B0026288B /* pageelement.cpp in Sources */,
 				BB4C4B9722A932E5001F6AF0 /* durationinterface.cpp in Sources */,
 				BB4C4B4F22A932D7001F6AF0 /* elementpart.cpp in Sources */,
-				4D0C964A30936AD200FB514A /* parts.cpp in Sources */,
-				4D0C964B30936AD200FB514A /* part.cpp in Sources */,
 				E7F1C36829F0345D007E12C1 /* savefunctor.cpp in Sources */,
 				BB4C4AC122A932B6001F6AF0 /* layer.cpp in Sources */,
 				BB4C4B0522A932C3001F6AF0 /* pgfoot.cpp in Sources */,
@@ -5348,6 +5354,7 @@
 				BB4C4AA822A932A0001F6AF0 /* devicecontext.cpp in Sources */,
 				BB4C4B7322A932D7001F6AF0 /* space.cpp in Sources */,
 				BD6E5C3F290007CB0039B0F1 /* graphic.cpp in Sources */,
+				4DD387AD3080153600EBFD29 /* score.cpp in Sources */,
 				402492BF232E70000017BB75 /* gracegrp.cpp in Sources */,
 				BD0562392518CD20004057EB /* beamspan.cpp in Sources */,
 				BB4C4B3D22A932D7001F6AF0 /* artic.cpp in Sources */,
@@ -5439,6 +5446,8 @@
 				BB4C4AD122A932B6001F6AF0 /* scoredef.cpp in Sources */,
 				BB4C4AAB22A932A0001F6AF0 /* svgdevicecontext.cpp in Sources */,
 				4DACC9C32990F29A00B55913 /* atts_cmn.cpp in Sources */,
+				4DD387B0308024A100EBFD29 /* part.cpp in Sources */,
+				4DD387B1308024A100EBFD29 /* parts.cpp in Sources */,
 				BB4C4AEB22A932BC001F6AF0 /* editorial.cpp in Sources */,
 				BB4C4B8F22A932DF001F6AF0 /* text.cpp in Sources */,
 				B464F4912C6D664300A778D2 /* scoringupfunctor.cpp in Sources */,
@@ -5487,14 +5496,13 @@
 				BB4C4BC022A932FC001F6AF0 /* MidiMessage.cpp in Sources */,
 				E76A9D4D29A74E630044682D /* adjustdotsfunctor.cpp in Sources */,
 				BB4C4AED22A932BC001F6AF0 /* expan.cpp in Sources */,
-				4D0C965130936AF400FB514A /* scoreorpartelement.cpp in Sources */,
+				4D2BB85530B3060D006260A8 /* midibuilder.cpp in Sources */,
 				4DACC9872990F29A00B55913 /* atts_performance.cpp in Sources */,
 				BB4C4B0F22A932C8001F6AF0 /* ending.cpp in Sources */,
 				BB4C4AB522A932A6001F6AF0 /* iomei.cpp in Sources */,
 				4DACC9B12990F29A00B55913 /* atts_analytical.cpp in Sources */,
 				E71EF3C72975ED3800D36264 /* resetfunctor.cpp in Sources */,
 				BB4C4B5922A932D7001F6AF0 /* ligature.cpp in Sources */,
-				4DD38788307E025500EBFD29 /* clipboard.cpp in Sources */,
 				BB4C4B5522A932D7001F6AF0 /* keysig.cpp in Sources */,
 				BB4C4B8D22A932DF001F6AF0 /* svg.cpp in Sources */,
 				E7A03CD729D6176B00C02941 /* adjusttupletsyfunctor.cpp in Sources */,
@@ -5510,7 +5518,7 @@
 				BB4C4B4D22A932D7001F6AF0 /* dot.cpp in Sources */,
 				BB4C4B1722A932CF001F6AF0 /* controlelement.cpp in Sources */,
 				E778BDB429D5BD6700672D51 /* adjuststaffoverlapfunctor.cpp in Sources */,
-				BB4C4ACF22A932B6001F6AF0 /* score.cpp in Sources */,
+				BB4C4ACF22A932B6001F6AF0 /* scoreorpartelement.cpp in Sources */,
 				BB4C4B0122A932BC001F6AF0 /* unclear.cpp in Sources */,
 				BB4C4AC322A932B6001F6AF0 /* mdiv.cpp in Sources */,
 				BB4C4B6322A932D7001F6AF0 /* mrpt2.cpp in Sources */,

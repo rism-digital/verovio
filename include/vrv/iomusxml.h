@@ -348,9 +348,14 @@ private:
     /*
      * Methods for reading the first MusicXML attributes element as MEI staffDef.
      * Returns the number of staves in the part.
+     * Attaches instrDef to the staff group or staff definition. The caller deletes it if it remains unattached.
      */
     short int ReadMusicXmlPartAttributesAsStaffDef(
-        pugi::xml_node node, StaffGrp *staffGrp, const short int staffOffset);
+        pugi::xml_node node, StaffGrp *staffGrp, const short int staffOffset, InstrDef *instrDef);
+
+    /** Read instrument assignments that remain consistent for a staff and voice throughout the part. */
+    void ReadMusicXmlLayerInstruments(
+        pugi::xml_node scorePart, pugi::xml_node part, StaffGrp *staffGrp, int nbStaves, int staffOffset);
 
     /*
      * @name Methods for reading the content of a MusicXML measure.
@@ -483,6 +488,11 @@ private:
     std::string GetContent(const pugi::xml_node node) const;
     std::string GetContentOfChild(const pugi::xml_node node, const std::string &child) const;
     ///@}
+
+    /*
+     * Set m_measureDuration from the current divisions and meter; call it whenever one of them changes
+     */
+    void UpdateMeasureDuration();
 
     /*
      * @name Methods for opening and closing ties and slurs.
@@ -642,10 +652,13 @@ private:
     std::vector<int> m_meterCount = { 4 };
     int m_meterUnit = 4;
     MeterCountSign m_meterSign = MeterCountSign::None;
+    /* number of m_meterUnit in a measure (MeterSig::GetTotalCount) */
+    int m_meterTotalCount = 4;
+    /* duration of a full measure in the current meter, in divisions (0 while unknown) */
+    double m_measureDuration = 0.0;
     /* part information */
     Label *m_label = NULL;
     LabelAbbr *m_labelAbbr = NULL;
-    InstrDef *m_instrdef = NULL;
     /* MIDI keys of unpitched notes per part and instrument id ("" for a part with a single instrument) */
     std::map<std::string, std::map<std::string, int>> m_unpitchedKeys;
     /* LastElementID */
@@ -657,6 +670,8 @@ private:
     std::map<Layer *, std::multimap<int, LayerElement *>> m_layerTimes;
     /* Verse numbers with a pending <extend type="stop"/> per staff/layer @n, to anchor on the following note */
     std::map<std::pair<int, int>, std::set<int>> m_pendingExtenderStops;
+    /* Verse numbers of lyric numbers that are not integers (e.g. "part1verse2") in the current part */
+    std::map<std::string, int> m_lyricNumbers;
     /* To remember layer of last element (note) to handle chords */
     Layer *m_prevLayer = NULL;
     /* To remember current layer to properly handle layers/staves/cross-staff elements */

@@ -14,15 +14,12 @@
 
 #include "alignfunctor.h"
 
-namespace smf {
-class MidiFile;
-}
-
 namespace vrv {
 
 class CustomTuning;
 class FeatureExtractor;
 class InstrDef;
+class MIDIBuilder;
 class Timemap;
 
 //----------------------------------------------------------------------------
@@ -344,7 +341,7 @@ struct MIDIHeldNote {
 };
 
 /**
- * This class performs the export to a MidiFile.
+ * This class turns notation and playback timing into events for MIDIBuilder.
  */
 class GenerateMIDIFunctor : public ConstFunctor {
 public:
@@ -352,7 +349,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    GenerateMIDIFunctor(smf::MidiFile *midiFile);
+    explicit GenerateMIDIFunctor(MIDIBuilder &midiBuilder);
     virtual ~GenerateMIDIFunctor() = default;
     ///@}
 
@@ -426,6 +423,15 @@ private:
     void HandleOctave(const LayerElement *layerElement);
 
     /**
+     * @name Add events to the current track and channel
+     */
+    ///@{
+    void AddNoteOn(const Note *note, int tick, int pitch, int velocity);
+    void AddNoteOff(int tick, int pitch);
+    void AddSustainPedal(int tick, bool on);
+    ///@}
+
+    /**
      * Convenience helper
      */
     int GetMIDIPitch(const Note *note);
@@ -433,8 +439,8 @@ private:
 public:
     //
 private:
-    // The MidiFile we are writing to
-    smf::MidiFile *m_midiFile;
+    // The builder collecting the generated events
+    MIDIBuilder &m_midiBuilder;
     // The MIDI track number
     int m_midiTrack;
     // The MIDI channel number

@@ -707,18 +707,22 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool topLevel
             return false;
         }
 
-        // Move staff and all staff children with facsimiles
+        // Move staff and all staff children with facsimiles. Several elements can refer to the same zone
+        // (e.g., a neume and its nc, or two nc), so collect the zones first and shift each one only once.
         Zone *staffZone = staff->GetZone();
         assert(staffZone);
-        staffZone->ShiftByXY(x, -y);
+        std::set<Zone *> zones = { staffZone };
         ListOfObjects children;
         InterfaceComparison ic(INTERFACE_FACSIMILE);
         staff->FindAllDescendantsByComparison(&children, &ic);
-        for (auto it = children.begin(); it != children.end(); ++it) {
-            FacsimileInterface *fi = (*it)->GetFacsimileInterface();
+        for (Object *child : children) {
+            FacsimileInterface *fi = child->GetFacsimileInterface();
             assert(fi);
             Zone *zone = fi->GetZone();
-            if (zone) zone->ShiftByXY(x, -y);
+            if (zone) zones.insert(zone);
+        }
+        for (Zone *zone : zones) {
+            zone->ShiftByXY(x, -y);
         }
 
         this->SortStaves();

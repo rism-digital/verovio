@@ -44,11 +44,13 @@ The following libraries are embedded in Verovio:
 
 | library | purpose |
 | ------- | ------- |
-| [humlib](https://github.com/craigsapp/humlib)                         | Humdrum file import/export      |
-| [JSON++](https://github.com/hjiang/jsonxx)                            | JSON data parser                |
-| [MidiFile](https://github.com/craigsapp/midifile)                     | Standard MIDI file export       |
-| [pugixml](https://pugixml.org/)                                       | XML data parser                 |
-| [MINIZ-CPP](https://github.com/kkzi/miniz-cpp)                        | ZIP files reading/writing       |
+| [brotli](https://github.com/google/brotli) | compression library |
+| [harfbuzz](https://github.com/harfbuzz/harfbuzz) | text shaping engine |
+| [humlib](https://github.com/craigsapp/humlib) | Humdrum file import/export |
+| [JSON++](https://github.com/hjiang/jsonxx) | JSON data parser |
+| [MidiFile](https://github.com/craigsapp/midifile) | Standard MIDI file export |
+| [pugixml](https://pugixml.org/) | XML data parser |
+| [MINIZ-CPP](https://github.com/kkzi/miniz-cpp) | ZIP files reading/writing |
 | [tuning-library](https://github.com/surge-synthesizer/tuning-library) | Surge Synth Team Tuning Library |
 
 ## Contributing

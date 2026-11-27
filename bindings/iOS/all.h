@@ -119,6 +119,7 @@
 #import <VerovioFramework/findlayerelementsfunctor.h>
 #import <VerovioFramework/fing.h>
 #import <VerovioFramework/floatingobject.h>
+#import <VerovioFramework/fontstore.h>
 #import <VerovioFramework/fraction.h>
 #import <VerovioFramework/ftrem.h>
 #import <VerovioFramework/functor.h>
@@ -169,6 +170,7 @@
 #import <VerovioFramework/mensur.h>
 #import <VerovioFramework/metersig.h>
 #import <VerovioFramework/metersiggrp.h>
+#import <VerovioFramework/midibuilder.h>
 #import <VerovioFramework/midifunctor.h>
 #import <VerovioFramework/miscfunctor.h>
 #import <VerovioFramework/mnum.h>
