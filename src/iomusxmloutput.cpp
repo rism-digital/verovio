@@ -1822,6 +1822,27 @@ namespace musicxmloutput {
         }
     }
 
+    class CollectMusicXmlMeasureControlsFunctor : public ConstFunctor {
+    public:
+        bool ImplementsEndInterface() const override { return false; }
+
+        FunctorCode VisitControlElement(const ControlElement *control) override
+        {
+            m_controls.push_back(control);
+            return FUNCTOR_CONTINUE;
+        }
+
+        FunctorCode VisitSyl(const Syl *) override
+        {
+            m_hasLyrics = true;
+            return FUNCTOR_CONTINUE;
+        }
+
+    public:
+        std::vector<const ControlElement *> m_controls;
+        bool m_hasLyrics = false;
+    };
+
     void CollectMusicXmlControls(const std::vector<const Measure *> &measures, std::vector<MusicXmlPart> &parts,
         int &divisions, MusicXmlNoteControlMap &controls)
     {
@@ -1832,51 +1853,41 @@ namespace musicxmloutput {
         std::vector<std::pair<size_t, const Tempo *>> tempos;
         std::vector<std::pair<size_t, const ControlElement *>> pauses;
         std::vector<std::pair<size_t, const ControlElement *>> ornaments;
-        ClassIdsComparison pauseTypes({ FERMATA, CAESURA, BREATH });
-        ClassIdsComparison ornamentTypes({ TRILL, MORDENT, TURN });
-        bool hasLyrics = false;
+        CollectMusicXmlMeasureControlsFunctor collect;
         for (size_t i = 0; i < measures.size(); ++i) {
-            const Measure *measure = measures.at(i);
-            if (!hasLyrics) hasLyrics = measure->FindDescendantByType(SYL) != NULL;
-            for (const Object *tie : measure->FindAllDescendantsByType(TIE)) {
-                // PrepareData resolves the ID references to the exact notes, including tones within chords.
-                const TimeSpanningInterface *span = tie->GetTimeSpanningInterface();
-                if (!span || !AddMusicXmlTie(*span, controls)) {
-                    LogWarning("MusicXML output omits unsupported tie '%s'", tie->GetID().c_str());
+            collect.m_controls.clear();
+            measures.at(i)->Process(collect);
+            for (const ControlElement *control : collect.m_controls) {
+                switch (control->GetClassId()) {
+                    case TIE: {
+                        // PrepareData resolves the ID references to the exact notes, including tones within chords.
+                        const TimeSpanningInterface *span = control->GetTimeSpanningInterface();
+                        if (!span || !AddMusicXmlTie(*span, controls)) {
+                            LogWarning("MusicXML output omits unsupported tie '%s'", control->GetID().c_str());
+                        }
+                        break;
+                    }
+                    case SLUR: slurs.push_back(vrv_cast<const Slur *>(control)); break;
+                    case DIR: directives.emplace_back(i, vrv_cast<const Dir *>(control)); break;
+                    case DYNAM: dynamics.emplace_back(i, vrv_cast<const Dynam *>(control)); break;
+                    case HAIRPIN: hairpins.emplace_back(i, vrv_cast<const Hairpin *>(control)); break;
+                    case TEMPO: tempos.emplace_back(i, vrv_cast<const Tempo *>(control)); break;
+                    case BREATH:
+                    case CAESURA:
+                    case FERMATA: pauses.emplace_back(i, control); break;
+                    case MORDENT:
+                    case TRILL:
+                    case TURN: ornaments.emplace_back(i, control); break;
+                    default: break;
                 }
-            }
-            for (const Object *slur : measure->FindAllDescendantsByType(SLUR)) {
-                slurs.push_back(vrv_cast<const Slur *>(slur));
-            }
-            for (const Object *directive : measure->FindAllDescendantsByType(DIR)) {
-                directives.emplace_back(i, vrv_cast<const Dir *>(directive));
-            }
-            for (const Object *dynam : measure->FindAllDescendantsByType(DYNAM)) {
-                dynamics.emplace_back(i, vrv_cast<const Dynam *>(dynam));
-            }
-            for (const Object *hairpin : measure->FindAllDescendantsByType(HAIRPIN)) {
-                hairpins.emplace_back(i, vrv_cast<const Hairpin *>(hairpin));
-            }
-            for (const Object *tempo : measure->FindAllDescendantsByType(TEMPO)) {
-                tempos.emplace_back(i, vrv_cast<const Tempo *>(tempo));
-            }
-            ListOfConstObjects measurePauses;
-            measure->FindAllDescendantsByComparison(&measurePauses, &pauseTypes);
-            for (const Object *pause : measurePauses) {
-                pauses.emplace_back(i, vrv_cast<const ControlElement *>(pause));
-            }
-            ListOfConstObjects measureOrnaments;
-            measure->FindAllDescendantsByComparison(&measureOrnaments, &ornamentTypes);
-            for (const Object *ornament : measureOrnaments) {
-                ornaments.emplace_back(i, vrv_cast<const ControlElement *>(ornament));
             }
         }
         const bool hasStaffControls = !directives.empty() || !dynamics.empty() || !hairpins.empty() || !tempos.empty()
             || !pauses.empty() || !ornaments.empty();
-        if (slurs.empty() && !hasStaffControls && !hasLyrics) return;
+        if (slurs.empty() && !hasStaffControls && !collect.m_hasLyrics) return;
         MusicXmlElementPositionMap positions;
         CollectMusicXmlElementPositions(parts, divisions, positions);
-        if (hasLyrics) CollectMusicXmlLyrics(positions, controls);
+        if (collect.m_hasLyrics) CollectMusicXmlLyrics(positions, controls);
         CollectMusicXmlSlurs(slurs, positions, controls);
         if (!hasStaffControls) return;
         const MusicXmlStaffPositionMap staffPositions = GetMusicXmlStaffPositions(parts);
