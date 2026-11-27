@@ -31,6 +31,7 @@
 #include "offsetinterface.h"
 #include "ossia.h"
 #include "page.h"
+#include "pedal.h"
 #include "refrain.h"
 #include "repeatmark.h"
 #include "rest.h"
@@ -437,6 +438,16 @@ FunctorCode ResetDataFunctor::VisitPage(Page *page)
     this->VisitObject(page);
 
     page->DeprecateLayout();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetDataFunctor::VisitPedal(Pedal *pedal)
+{
+    // Call parent one too
+    this->VisitControlElement(pedal);
+
+    pedal->SetDrawingStyle(PEDALSTYLE_NONE);
 
     return FUNCTOR_CONTINUE;
 }

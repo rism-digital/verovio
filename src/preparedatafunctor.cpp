@@ -37,6 +37,7 @@
 #include "section.h"
 #include "space.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "stem.h"
 #include "syl.h"
 #include "symboltable.h"
@@ -972,7 +973,10 @@ FunctorCode PrepareTimestampsFunctor::VisitMeasureEnd(Measure *measure)
 // PreparePedalsFunctor
 //----------------------------------------------------------------------------
 
-PreparePedalsFunctor::PreparePedalsFunctor(Doc *doc) : DocFunctor(doc) {}
+PreparePedalsFunctor::PreparePedalsFunctor(Doc *doc) : DocFunctor(doc)
+{
+    m_drawingPedalStyle = PEDALSTYLE_NONE;
+}
 
 FunctorCode PreparePedalsFunctor::VisitMeasureEnd(Measure *measure)
 {
@@ -1007,11 +1011,63 @@ FunctorCode PreparePedalsFunctor::VisitPedal(Pedal *pedal)
 {
     if (!pedal->HasDir()) return FUNCTOR_CONTINUE;
 
-    System *system = vrv_cast<System *>(pedal->GetFirstAncestor(SYSTEM));
-    assert(system);
-    data_PEDALSTYLE form = pedal->GetPedalForm(m_doc, system);
-    if ((form == PEDALSTYLE_line) || (form == PEDALSTYLE_pedline)) {
+    data_PEDALSTYLE style = static_cast<data_PEDALSTYLE>(m_doc->GetOptions()->m_pedalStyle.GetValue());
+    if (style == PEDALSTYLE_NONE) {
+        if (pedal->HasForm()) {
+            style = pedal->GetForm();
+        }
+        else {
+            style = m_drawingPedalStyle;
+            if (!m_drawingPedalStyleForStaffN.empty()) {
+                int staffN = 0;
+                if (pedal->HasStaff()) {
+                    staffN = pedal->GetStaff().at(0);
+                }
+                else if (pedal->GetStart()) {
+                    const Staff *staff = pedal->GetStart()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
+                    if (staff) staffN = staff->GetN();
+                }
+                if (m_drawingPedalStyleForStaffN.contains(staffN)) {
+                    style = m_drawingPedalStyleForStaffN.at(staffN);
+                }
+            }
+        }
+    }
+    pedal->SetDrawingStyle(style);
+
+    if ((style == PEDALSTYLE_line) || (style == PEDALSTYLE_pedline)) {
         m_pedalLines.push_back(pedal);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PreparePedalsFunctor::VisitScoreDef(ScoreDef *scoreDef)
+{
+    if (scoreDef->HasPedalStyle()) {
+        m_drawingPedalStyle = scoreDef->GetPedalStyle();
+        m_drawingPedalStyleForStaffN.clear();
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PreparePedalsFunctor::VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart)
+{
+    m_drawingPedalStyle = PEDALSTYLE_NONE;
+    m_drawingPedalStyleForStaffN.clear();
+    ScoreDef *scoreDef = scoreOrPart->GetScoreDef();
+    if (scoreDef) {
+        scoreDef->Process(*this);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PreparePedalsFunctor::VisitStaffDef(StaffDef *staffDef)
+{
+    if (staffDef->HasPedalStyle() && staffDef->HasN()) {
+        m_drawingPedalStyleForStaffN[staffDef->GetN()] = staffDef->GetPedalStyle();
     }
 
     return FUNCTOR_CONTINUE;

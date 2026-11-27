@@ -1115,6 +1115,8 @@ void View::DrawPedalLine(
     assert(pedal->GetStart());
     assert(pedal->GetEnd());
 
+    const data_PEDALSTYLE style = pedal->GetDrawingStyle();
+
     int y = pedal->GetDrawingY();
     this->CalcOffsetY(dc, y);
 
@@ -1132,8 +1134,8 @@ void View::DrawPedalLine(
     if (spanningType == SPANNING_START_END || spanningType == SPANNING_START) {
         x1 -= startRadius;
         // With pedline we need to take into account the initial symbol
-        if ((pedal->GetForm() == PEDALSTYLE_pedline) || (pedal->GetForm() == PEDALSTYLE_pedstar)) {
-            x1 += m_doc->GetGlyphWidth(SMUFL_E650_keyboardPedalPed, staff->m_drawingStaffSize, false);
+        if ((style == PEDALSTYLE_pedline) || (style == PEDALSTYLE_pedstar)) {
+            x1 += m_doc->GetGlyphWidth(pedal->GetPedalGlyph(), staff->m_drawingStaffSize, false);
         }
     }
     // Adjust the end if necessary
@@ -1153,14 +1155,14 @@ void View::DrawPedalLine(
 
     // Opening bracket - but only if not a pedline value
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-        if ((pedal->GetForm() != PEDALSTYLE_pedline && pedal->GetForm() != PEDALSTYLE_pedstar)) {
+        if ((style != PEDALSTYLE_pedline) && (style != PEDALSTYLE_pedstar)) {
             this->DrawFilledRectangle(dc, x1, y, x1 + bracketSize / 2, y + lineWidth);
             this->DrawFilledRectangle(dc, x1, y, x1 + lineWidth, y + bracketSize);
         }
     }
     // Closing bracket
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
-        if (pedal->GetForm() != PEDALSTYLE_pedstar) {
+        if (style != PEDALSTYLE_pedstar) {
             this->DrawFilledRectangle(dc, x2 - bracketSize / 2, y, x2, y + lineWidth);
             this->DrawFilledRectangle(dc, x2 - lineWidth, y, x2, y + bracketSize);
         }
@@ -2517,16 +2519,16 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
 
     dc->StartGraphic(pedal, "", pedal->GetID());
 
-    data_PEDALSTYLE form = pedal->GetPedalForm(m_doc, system);
+    const data_PEDALSTYLE style = pedal->GetDrawingStyle();
 
-    bool drawSymbol = (form != PEDALSTYLE_line);
-    if (pedal->GetDir() == pedalLog_DIR_up && form == PEDALSTYLE_pedline) drawSymbol = false;
+    bool drawSymbol = (style != PEDALSTYLE_line);
+    if ((pedal->GetDir() == pedalLog_DIR_up) && (style == PEDALSTYLE_pedline)) drawSymbol = false;
 
     // Draw a symbol, if it's not a line
     if (drawSymbol) {
 
         bool bounceStar = true;
-        if (form == PEDALSTYLE_altpedstar) bounceStar = false;
+        if (style == PEDALSTYLE_altpedstar) bounceStar = false;
 
         int drawingX = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
 

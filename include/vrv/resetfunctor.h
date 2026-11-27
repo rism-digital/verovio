@@ -68,6 +68,7 @@ public:
     FunctorCode VisitNc(Nc *nc) override;
     FunctorCode VisitObject(Object *object) override;
     FunctorCode VisitPage(Page *page) override;
+    FunctorCode VisitPedal(Pedal *pedal) override;
     FunctorCode VisitRepeatMark(RepeatMark *repeatMark) override;
     FunctorCode VisitRest(Rest *rest) override;
     FunctorCode VisitSection(Section *section) override;
