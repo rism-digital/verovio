@@ -439,6 +439,14 @@ export class VerovioToolkit {
     }
 
     /**
+     * Export the loaded score as partwise MusicXML.
+     * @returns {string} The MusicXML as a string, or an empty string on failure
+     */
+    exportToMusicXML() {
+        return this.proxy.exportToMusicXML(this.ptr);
+    }
+
+    /**
      * Render a document to Plaine and Easie code.
      *
      * Only the top staff / layer is exported.

@@ -922,9 +922,8 @@ Options::Options()
 
     m_inputFrom.SetInfo("Input from",
         "Select input format from: \"abc\", \"cmme.xml\", \"darms\", \"esac\", \"gabc\", \"humdrum\", "
-        "\"mei\", \"pae\", "
-        "\"volpiano\", \"xml\" "
-        "(musicxml), \"musicxml-hum\" (musicxml via humdrum) or \"mei-pb-serialized\"");
+        "\"mei\", \"pae\", \"volpiano\", \"xml\" (deprecated), "
+        "\"musicxml\", \"musicxml-hum\" (musicxml via humdrum) or \"mei-pb-serialized\"");
     m_inputFrom.Init("mei");
     m_inputFrom.SetKey("inputFrom");
     m_inputFrom.SetShortOption('f', false);
@@ -962,7 +961,7 @@ Options::Options()
 
     m_outputTo.SetInfo("Output to",
         "Select output format to: \"mei\", \"mei-pb\", \"mei-facs\", \"mei-basic\", \"svg\", \"midi\", \"timemap\", "
-        "\"expansionmap\", \"humdrum\", \"pae\" or \"mei-pb-serialized\"");
+        "\"expansionmap\", \"humdrum\", \"pae\", \"musicxml\" or \"mei-pb-serialized\"");
     m_outputTo.Init("svg");
     m_outputTo.SetKey("outputTo");
     m_outputTo.SetShortOption('t', true);
@@ -2042,6 +2041,9 @@ bool Options::SetOutputTo(std::string const &outputTo)
     else if (outputTo == "pae") {
         m_outputToFormat = PAE;
     }
+    else if (outputTo == "musicxml") {
+        m_outputToFormat = MUSICXML;
+    }
     else if (outputTo == "mei-pb-serialized") {
         m_outputToFormat = SERIALIZATION;
     }
@@ -2082,6 +2084,7 @@ bool Options::SetInputFrom(std::string const &inputFrom)
         m_inputFromFormat = MEI;
     }
     else if ((inputFrom == "musicxml") || (inputFrom == "xml")) {
+        if (inputFrom == "xml") LogWarning("Input from 'xml' is deprecated, use 'musicxml' instead");
         m_inputFromFormat = MUSICXML;
     }
     else if (inputFrom == "md") {

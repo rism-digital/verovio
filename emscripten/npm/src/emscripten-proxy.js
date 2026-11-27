@@ -27,6 +27,9 @@ function getToolkitFunction(VerovioModule, method) {
     // char *editStatus(Toolkit *ic)
     mapping.editStatus = VerovioModule.cwrap("vrvToolkit_editStatus", "string", ["number"]);
 
+    // char *exportToMusicXML(Toolkit *ic)
+    mapping.exportToMusicXML = VerovioModule.cwrap("vrvToolkit_exportToMusicXML", "string", ["number"]);
+
     // char *getAvailableOptions(Toolkit *ic)
     mapping.getAvailableOptions = VerovioModule.cwrap("vrvToolkit_getAvailableOptions", "string", ["number"]);
 

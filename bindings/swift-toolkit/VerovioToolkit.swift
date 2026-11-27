@@ -385,6 +385,19 @@ public class VerovioToolkit {
         }
     }
 
+    public func exportToMusicXML() -> String {
+        guard let tk = toolkitPtr else { return "" }
+        guard let cStr = vrvToolkit_exportToMusicXML(tk) else { return "" }
+        return String(cString: cStr)
+    }
+
+    public func exportToMusicXMLFile(_ filename: String) -> Bool {
+        guard let tk = toolkitPtr else { return false }
+        return filename.withCString { cStr in
+            vrvToolkit_exportToMusicXMLFile(tk, cStr)
+        }
+    }
+
     public func renderToPAE() -> String {
         guard let tk = toolkitPtr else { return "" }
         guard let cStr = vrvToolkit_renderToPAE(tk) else { return "" }

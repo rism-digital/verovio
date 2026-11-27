@@ -488,6 +488,12 @@
 		4D89F910201771AE00A4D336 /* num.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D89F90D201771AE00A4D336 /* num.cpp */; };
 		4D89F9122018A93300A4D336 /* svg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D89F9112018A93200A4D336 /* svg.cpp */; };
 		4D8C59533015F2360063E9C2 /* iogabc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D7647A12FA66C68004F9EDA /* iogabc.cpp */; };
+		4D90E60630B5E90700536E76 /* iomusxmloutput.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D90E60530B5E90700536E76 /* iomusxmloutput.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D90E60730B5E90700536E76 /* iomusxmloutput.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D90E60530B5E90700536E76 /* iomusxmloutput.h */; };
+		4D90E60930B5E92400536E76 /* iomusxmloutput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D90E60830B5E92400536E76 /* iomusxmloutput.cpp */; };
+		4D90E60A30B5E92400536E76 /* iomusxmloutput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D90E60830B5E92400536E76 /* iomusxmloutput.cpp */; };
+		4D90E60B30B5E92400536E76 /* iomusxmloutput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D90E60830B5E92400536E76 /* iomusxmloutput.cpp */; };
+		4D90E60C30B5E92400536E76 /* iomusxmloutput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D90E60830B5E92400536E76 /* iomusxmloutput.cpp */; };
 		4D94721D20CA701000C780C8 /* linkinginterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D94721C20CA701000C780C8 /* linkinginterface.h */; };
 		4D94721F20CA702C00C780C8 /* linkinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D94721E20CA702C00C780C8 /* linkinginterface.cpp */; };
 		4D94722020CA702C00C780C8 /* linkinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D94721E20CA702C00C780C8 /* linkinginterface.cpp */; };
@@ -2097,6 +2103,8 @@
 		4D89F90B201771A700A4D336 /* num.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = num.h; path = include/vrv/num.h; sourceTree = "<group>"; };
 		4D89F90D201771AE00A4D336 /* num.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = num.cpp; path = src/num.cpp; sourceTree = "<group>"; };
 		4D89F9112018A93200A4D336 /* svg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = svg.cpp; path = src/svg.cpp; sourceTree = "<group>"; };
+		4D90E60530B5E90700536E76 /* iomusxmloutput.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = iomusxmloutput.h; path = include/vrv/iomusxmloutput.h; sourceTree = "<group>"; };
+		4D90E60830B5E92400536E76 /* iomusxmloutput.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = iomusxmloutput.cpp; path = src/iomusxmloutput.cpp; sourceTree = "<group>"; };
 		4D9234F11A586AE100763251 /* comparison.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = comparison.h; path = include/vrv/comparison.h; sourceTree = "<group>"; };
 		4D94721C20CA701000C780C8 /* linkinginterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = linkinginterface.h; path = include/vrv/linkinginterface.h; sourceTree = "<group>"; };
 		4D94721E20CA702C00C780C8 /* linkinginterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = linkinginterface.cpp; path = src/linkinginterface.cpp; sourceTree = "<group>"; };
@@ -3152,6 +3160,8 @@
 				8F59291918854BF800FE51AD /* iomei.h */,
 				8F086EC3188539540037FD8E /* iomusxml.cpp */,
 				8F59291A18854BF800FE51AD /* iomusxml.h */,
+				4D90E60830B5E92400536E76 /* iomusxmloutput.cpp */,
+				4D90E60530B5E90700536E76 /* iomusxmloutput.h */,
 				8F086EC4188539540037FD8E /* iopae.cpp */,
 				8F59291B18854BF800FE51AD /* iopae.h */,
 				4DE0198B2C495DB800B5B6BF /* iovolpiano.cpp */,
@@ -3636,6 +3646,7 @@
 				8F59294B18854BF800FE51AD /* object.h in Headers */,
 				4DACC9B42990F29A00B55913 /* atts_pagebased.h in Headers */,
 				4D1BE7831C69434C0086DC0E /* MidiMessage.h in Headers */,
+				4D90E60730B5E90700536E76 /* iomusxmloutput.h in Headers */,
 				E7F39C5E29A62B260055DBE0 /* adjustclefchangesfunctor.h in Headers */,
 				E74A806628BC97D5005274E7 /* findfunctor.h in Headers */,
 				4DF9DB342F3231B50003112D /* editortoolkit_shared.h in Headers */,
@@ -3914,6 +3925,7 @@
 				BD87768827CE8A21005B97EA /* layerdef.h in Headers */,
 				BB4C4B1C22A932CF001F6AF0 /* arpeg.h in Headers */,
 				4DACC9B32990F29A00B55913 /* atts_cmnornaments.h in Headers */,
+				4D90E60630B5E90700536E76 /* iomusxmloutput.h in Headers */,
 				E78F205029D9B02700CD5910 /* calcbboxoverflowsfunctor.h in Headers */,
 				BB4C4B2A22A932CF001F6AF0 /* harm.h in Headers */,
 				4DD7C10027A55CFD00B9C017 /* timemap.h in Headers */,
@@ -4406,6 +4418,7 @@
 				BD6E5C3D290007C90039B0F1 /* graphic.cpp in Sources */,
 				4DD387AA3080153600EBFD29 /* score.cpp in Sources */,
 				4D1694171E3A44F300569BF4 /* mensur.cpp in Sources */,
+				4D90E60C30B5E92400536E76 /* iomusxmloutput.cpp in Sources */,
 				E78F204B29D98D2B00CD5910 /* adjustxrelfortranscriptionfunctor.cpp in Sources */,
 				BD0562372518CD20004057EB /* beamspan.cpp in Sources */,
 				4D1694181E3A44F300569BF4 /* text.cpp in Sources */,
@@ -4893,6 +4906,7 @@
 				E7265E7429DC701100D11F41 /* castofffunctor.cpp in Sources */,
 				4DB3D8A71F828EA900B5FC2B /* areaposinterface.cpp in Sources */,
 				E78F205229D9B03E00CD5910 /* calcbboxoverflowsfunctor.cpp in Sources */,
+				4D90E60930B5E92400536E76 /* iomusxmloutput.cpp in Sources */,
 				4DACC9D02990F29A00B55913 /* atts_mensural.cpp in Sources */,
 				4D9A9C1E19A1DE2000028D93 /* syl.cpp in Sources */,
 				40ACDEA924079F9000F82B8C /* reh.cpp in Sources */,
@@ -5039,6 +5053,7 @@
 				4D1BE76E1C688F5A0086DC0E /* MidiEvent.cpp in Sources */,
 				4DD387AC3080153600EBFD29 /* score.cpp in Sources */,
 				4DA60EE71B6307B9006E2DFC /* textdirinterface.cpp in Sources */,
+				4D90E60A30B5E92400536E76 /* iomusxmloutput.cpp in Sources */,
 				40BD9391206B950B0037BF8E /* annot.cpp in Sources */,
 				4DB3D8B51F83D09100B5FC2B /* iohumdrum.cpp in Sources */,
 				E78F204C29D98D2C00CD5910 /* adjustxrelfortranscriptionfunctor.cpp in Sources */,
@@ -5356,6 +5371,7 @@
 				BD6E5C3F290007CB0039B0F1 /* graphic.cpp in Sources */,
 				4DD387AD3080153600EBFD29 /* score.cpp in Sources */,
 				402492BF232E70000017BB75 /* gracegrp.cpp in Sources */,
+				4D90E60B30B5E92400536E76 /* iomusxmloutput.cpp in Sources */,
 				BD0562392518CD20004057EB /* beamspan.cpp in Sources */,
 				BB4C4B3D22A932D7001F6AF0 /* artic.cpp in Sources */,
 				E78F204D29D98D2D00CD5910 /* adjustxrelfortranscriptionfunctor.cpp in Sources */,
