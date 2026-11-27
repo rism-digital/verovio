@@ -328,6 +328,9 @@ void SvgDeviceContext::StartGraphic(
         m_currentNode = m_currentNode.append_child("g");
     }
     m_svgNodeStack.push_back(m_currentNode);
+    if (m_svgBoundingBoxes && graphicID == SPANNING && object->IsFloatingObject()) {
+        m_floatingSpanGraphics.emplace(m_currentNode, FloatingSpanGraphic{ graphicID });
+    }
     this->AppendIdAndClass(gId, object->GetClassName(), gClassFull, graphicID);
     this->AppendAdditionalAttributes(object);
 
@@ -513,6 +516,13 @@ void SvgDeviceContext::StartTextGraphic(Object *object, const std::string &gClas
 
 void SvgDeviceContext::ResumeGraphic(Object *object, std::string gId)
 {
+    const std::map<const Object *, pugi::xml_node>::const_iterator placeholder = m_graphicPlaceholders.find(object);
+    if (placeholder != m_graphicPlaceholders.end()) {
+        m_currentNode = placeholder->second;
+        m_svgNodeStack.push_back(m_currentNode);
+        return;
+    }
+
     std::string xpathPrefix = m_html5 ? "//g[@data-id=\"" : "//g[@id=\"";
     std::string xpath = xpathPrefix + gId + "\"]";
     pugi::xpath_node selection = m_currentNode.select_node(xpath.c_str());
@@ -524,9 +534,21 @@ void SvgDeviceContext::ResumeGraphic(Object *object, std::string gId)
 
 void SvgDeviceContext::EndGraphic(Object *object, View *view)
 {
-    this->DrawSvgBoundingBox(object, view);
+    this->DrawGraphicBoundingBox(object, view);
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
+}
+
+void SvgDeviceContext::CreateGraphicPlaceholder(
+    Object *object, const std::string &gClass, const std::string &gId, View *view)
+{
+    this->StartGraphic(object, gClass, gId);
+    if (m_svgBoundingBoxes && object->IsFloatingObject()) {
+        m_graphicPlaceholders.emplace(object, m_currentNode);
+        m_floatingSpanGraphics.emplace(m_currentNode, FloatingSpanGraphic{ PRIMARY });
+    }
+    // The current positioner may still belong to another system. Draw the box after the graphic is resumed.
+    this->EndGraphic(object, NULL);
 }
 
 void SvgDeviceContext::EndCustomGraphic()
@@ -548,13 +570,17 @@ void SvgDeviceContext::SetCustomGraphicAttributes(const std::string &data, const
 
 void SvgDeviceContext::EndResumedGraphic(Object *object, View *view)
 {
+    const std::map<const Object *, pugi::xml_node>::const_iterator placeholder = m_graphicPlaceholders.find(object);
+    if (placeholder != m_graphicPlaceholders.end() && placeholder->second == m_currentNode) {
+        this->DrawGraphicBoundingBox(object, view);
+    }
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
 }
 
 void SvgDeviceContext::EndTextGraphic(Object *object, View *view)
 {
-    this->DrawSvgBoundingBox(object, view);
+    this->DrawGraphicBoundingBox(object, view);
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
 }
@@ -570,6 +596,10 @@ void SvgDeviceContext::RotateGraphic(Point const &orig, double angle)
 
 void SvgDeviceContext::StartPage()
 {
+    m_graphicPlaceholders.clear();
+    m_floatingSpanGraphics.clear();
+    m_boundingBoxNodes.clear();
+
     // Initialize the flag to false because we want to know if the font needs to be included in the SVG
     m_vrvTextFont = false;
     m_vrvTextFontFallback = false;
@@ -703,9 +733,8 @@ Point SvgDeviceContext::GetLogicalOrigin()
 pugi::xml_node SvgDeviceContext::AddChild(std::string name)
 {
     pugi::xml_node g = m_currentNode.child("g");
-    // Bounding boxes of text graphics are added next to the <text> element (see StartBoundingBoxGraphic) and
-    // must not change where the content is added
-    while (g && m_textBoundingBoxNodes.contains(g)) {
+    // Text boxes and boxes added between segment draws must not change where later shapes are inserted.
+    while (g && m_boundingBoxNodes.contains(g)) {
         g = g.next_sibling("g");
     }
     if (g) {
@@ -1393,7 +1422,7 @@ void SvgDeviceContext::DrawTextAsPaths(const std::u32string &wtext, int x, int y
         const double scale = (double)font->GetPointSize() / placement.m_unitsPerEm;
         const double advance = placement.m_advanceX * scale;
         const Glyph *glyph = resources->GetRuntimeGlyph(placement.m_face, placement.m_glyphId);
-        int x, y, width, height;
+        int x, y, width = 0, height = 0;
         if (glyph) glyph->GetBoundingBox(x, y, width, height);
         // Skip glyphs without outline, such as spaces
         if (!glyph || (!width && !height)) {
@@ -1590,7 +1619,8 @@ void SvgDeviceContext::DrawSvgBoundingBoxRectangle(int x, int y, int width, int 
     rectChild.append_attribute("stroke-width") = "0";
 }
 
-void SvgDeviceContext::StartBoundingBoxGraphic(Object *object, const std::string &gClass, const std::string &gId)
+void SvgDeviceContext::StartBoundingBoxGraphic(
+    Object *object, const std::string &gClass, const std::string &gId, bool forSegment)
 {
     // <g> and <rect> elements are not allowed within <text> or <tspan> elements. For text graphics, add the
     // bounding box to the closest enclosing element that is not a text element, right after the <text> element.
@@ -1606,8 +1636,8 @@ void SvgDeviceContext::StartBoundingBoxGraphic(Object *object, const std::string
 
     if (textNode) {
         m_currentNode.parent().insert_move_after(m_currentNode, textNode);
-        m_textBoundingBoxNodes.insert(m_currentNode);
     }
+    if (textNode || forSegment) m_boundingBoxNodes.insert(m_currentNode);
 
     // The <title> of an element with @label belongs to the element itself and not to its bounding box
     while (m_currentNode.child("title")) {
@@ -1615,7 +1645,7 @@ void SvgDeviceContext::StartBoundingBoxGraphic(Object *object, const std::string
     }
 }
 
-void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
+void SvgDeviceContext::DrawGraphicBoundingBox(Object *object, View *view)
 {
     const Resources *resources = this->GetResources();
     assert(resources);
@@ -1625,15 +1655,29 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
     bool drawContentBB = m_svgContentBoundingBoxes;
 
     if (m_svgBoundingBoxes && view) {
-        BoundingBox *box = object;
+        const BoundingBox *box = object;
+        std::string boxId = object->GetID();
+        bool forSegment = false;
         // For floating elements, get the current bounding box set by System::SetCurrentFloatingPositioner
         if (object->IsFloatingObject()) {
             FloatingObject *floatingObject = vrv_cast<FloatingObject *>(object);
             assert(floatingObject);
-            box = floatingObject->GetCurrentFloatingPositioner();
+            const FloatingPositioner *positioner = floatingObject->GetCurrentFloatingPositioner();
             // No bounding box found, ignore the object - this happens when the @staff is missing because the element is
             // never drawn but there is still a EndGraphic call.
-            if (!box) return;
+            if (!positioner) return;
+            box = positioner;
+
+            const std::map<pugi::xml_node, FloatingSpanGraphic>::iterator graphic
+                = m_floatingSpanGraphics.find(m_currentNode);
+            forSegment = graphic != m_floatingSpanGraphics.end();
+            if (forSegment) {
+                FloatingSpanGraphic &spanGraphic = graphic->second;
+                const bool needsSuffix = spanGraphic.graphicID == SPANNING || !spanGraphic.drawnPositioners.empty();
+                if (!spanGraphic.drawnPositioners.insert(positioner).second) return;
+                // Keep the original ID for the first box in the primary graphic.
+                if (needsSuffix) boxId += "-" + positioner->GetObjectY()->GetID();
+            }
         }
 
         // A syl is drawn with its vertical bounding box deactivated because lyric lines are spaced by the staff
@@ -1647,15 +1691,13 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
             m_currentNode = m_pageNode;
         }
 
-        this->StartBoundingBoxGraphic(object, "bounding-box", "bbox-" + object->GetID());
+        this->StartBoundingBoxGraphic(object, "bounding-box", "bbox-" + boxId, forSegment);
 
         if (box->HasSelfBB()) {
-            this->DrawSvgBoundingBoxRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX1()),
-                view->ToDeviceContextY(object->GetDrawingY() + box->GetSelfY1()),
-                view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX2())
-                    - view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX1()),
-                view->ToDeviceContextY(object->GetDrawingY() + box->GetSelfY2())
-                    - view->ToDeviceContextY(object->GetDrawingY() + box->GetSelfY1()));
+            const int x = view->ToDeviceContextX(box->GetSelfLeft());
+            const int y = view->ToDeviceContextY(box->GetSelfBottom());
+            this->DrawSvgBoundingBoxRectangle(
+                x, y, view->ToDeviceContextX(box->GetSelfRight()) - x, view->ToDeviceContextY(box->GetSelfTop()) - y);
         }
         else if (syl && !box->HasSelfVerticalBB()) {
             // The syl itself has no self bounding box and uses the horizontal extent of its content (its text)
@@ -1712,13 +1754,11 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
         if (drawContentBB) {
             // For floating objects, the content bounding box is the one of the current positioner
             if (box->HasContentBB()) {
-                this->StartBoundingBoxGraphic(object, "content-bounding-box", "cbbox-" + object->GetID());
-                this->DrawSvgBoundingBoxRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),
-                    view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()),
-                    view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX2())
-                        - view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),
-                    view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY2())
-                        - view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()));
+                this->StartBoundingBoxGraphic(object, "content-bounding-box", "cbbox-" + boxId, forSegment);
+                const int x = view->ToDeviceContextX(box->GetContentLeft());
+                const int y = view->ToDeviceContextY(box->GetContentBottom());
+                this->DrawSvgBoundingBoxRectangle(x, y, view->ToDeviceContextX(box->GetContentRight()) - x,
+                    view->ToDeviceContextY(box->GetContentTop()) - y);
                 this->EndGraphic(object, NULL);
             }
         }

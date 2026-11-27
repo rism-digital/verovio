@@ -272,6 +272,16 @@ public:
     virtual void AddGraphicClass(const std::string &className) {};
     ///@}
 
+    /** Create an empty graphic that will be resumed when the object is drawn. */
+    virtual void CreateGraphicPlaceholder(Object *object, const std::string &gClass, const std::string &gId, View *view)
+    {
+        this->StartGraphic(object, gClass, gId);
+        this->EndGraphic(object, view);
+    }
+
+    /** Emit the current bounds when several positioners draw into the same graphic. */
+    virtual void DrawGraphicBoundingBox(Object *object, View *view) {}
+
     /**
      * @name Method for starting and ending a graphic custom graphic that do not correspond to an Object
      * For example, the method can be used for grouping shapes in <g></g> in SVG

@@ -10,6 +10,7 @@
 
 #include <fstream>
 #include <list>
+#include <map>
 #include <set>
 #include <string>
 #include <vector>
@@ -127,6 +128,10 @@ public:
     void EndGraphic(Object *object, View *view) override;
     void AddGraphicClass(const std::string &className) override;
     ///@}
+
+    void CreateGraphicPlaceholder(
+        Object *object, const std::string &gClass, const std::string &gId, View *view) override;
+    void DrawGraphicBoundingBox(Object *object, View *view) override;
 
     /**
      * @name Method for starting and ending a graphic custom graphic that do not correspond to an Object
@@ -302,15 +307,10 @@ private:
     bool CopyFileToStream(const std::string &filename, std::ostream &dest);
 
     /**
-     * Internal method for drawing debug SVG bounding box
-     */
-    void DrawSvgBoundingBox(Object *object, View *view);
-
-    /**
      * Internal method for starting the group of an SVG bounding box.
      * The group is never added within a text element and does not include the <title> of the object.
      */
-    void StartBoundingBoxGraphic(Object *object, const std::string &gClass, const std::string &gId);
+    void StartBoundingBoxGraphic(Object *object, const std::string &gClass, const std::string &gId, bool forSegment);
 
     /**
      * Internal method for drawing debug SVG bounding box
@@ -449,6 +449,14 @@ private:
     pugi::xml_node m_pageNode;
     pugi::xml_node m_currentNode;
     std::list<pugi::xml_node> m_svgNodeStack;
+    // Primary graphics created before their shapes are drawn.
+    std::map<const Object *, pugi::xml_node> m_graphicPlaceholders;
+    // A single graphic can contain several staff positioners, each with its own pair of boxes.
+    struct FloatingSpanGraphic {
+        GraphicID graphicID;
+        std::set<const FloatingPositioner *> drawnPositioners{};
+    };
+    std::map<pugi::xml_node, FloatingSpanGraphic> m_floatingSpanGraphics;
 
     // output as mm (for pdf generation with a 72 dpi)
     bool m_mmOutput;
@@ -460,8 +468,8 @@ private:
     bool m_svgBoundingBoxes;
     // add content bounding boxes in svg output
     bool m_svgContentBoundingBoxes;
-    // bounding box groups of text graphics, added next to the <text> element and skipped by AddChild
-    std::set<pugi::xml_node> m_textBoundingBoxNodes;
+    // Bounding box groups that AddChild skips to preserve the ordering of shapes and text.
+    std::set<pugi::xml_node> m_boundingBoxNodes;
     // use viewbox on svg root element
     bool m_svgViewBox;
     // output HTML5 data-* attributes
