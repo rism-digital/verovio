@@ -90,10 +90,10 @@ namespace humaux {
             hum::HumNum starttime, hum::HumNum endtime, int subindex, hum::HTp starttok, int metertop,
             hum::HumNum meterbot);
         void setEnd(const std::string &id, Measure *ending, int layer, const std::string &token, int pitch,
-            hum::HumNum starttime, hum::HumNum endtime, int subindex, hum::HTp starttok, int metertop,
+            hum::HumNum starttime, hum::HumNum endtime, int subindex, hum::HTp endtok, int metertop,
             hum::HumNum meterbot);
         vrv::Tie *setEndAndInsert(const std::string &id, Measure *ending, int layer, const std::string &token,
-            int pitch, hum::HumNum starttime, hum::HumNum endtime, int subindex, hum::HTp starttok, int metertop,
+            int pitch, hum::HumNum starttime, hum::HumNum endtime, int subindex, hum::HTp endtok, int metertop,
             hum::HumNum meterbot);
 
         hum::HumNum getEndTime();
@@ -136,7 +136,9 @@ namespace humaux {
         Measure *m_startmeasure;
         Measure *m_endmeasure;
         hum::HTp m_starttokenpointer = NULL;
+        hum::HTp m_endtokenpointer = NULL;
         int m_subindex; // the subtoken index for the start of the tie
+        int m_endsubindex; // the subtoken index for the end of the tie
         int m_meter_top;
         hum::HumNum m_meter_bottom;
     };
