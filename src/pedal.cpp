@@ -19,7 +19,6 @@
 #include "layerelement.h"
 #include "resources.h"
 #include "smufl.h"
-#include "system.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -69,6 +68,7 @@ void Pedal::Reset()
     this->ResetVerticalGroup();
 
     m_endsWithBounce = false;
+    m_drawingPedalStyle = PEDALSTYLE_NONE;
 }
 
 char32_t Pedal::GetPedalGlyph() const
@@ -88,22 +88,6 @@ char32_t Pedal::GetPedalGlyph() const
     }
 
     return (this->GetFunc() == "sostenuto") ? SMUFL_E659_keyboardPedalSost : SMUFL_E650_keyboardPedalPed;
-}
-
-data_PEDALSTYLE Pedal::GetPedalForm(const Doc *doc, const System *system) const
-{
-    data_PEDALSTYLE style = static_cast<data_PEDALSTYLE>(doc->GetOptions()->m_pedalStyle.GetValue());
-    if (style != PEDALSTYLE_NONE) {
-        return style;
-    }
-    else if (this->HasForm()) {
-        style = this->GetForm();
-    }
-    else if (const ScoreDef *scoreDef = system->GetDrawingScoreDef(); scoreDef && scoreDef->HasPedalStyle()) {
-        style = scoreDef->GetPedalStyle();
-    }
-
-    return style;
 }
 
 //----------------------------------------------------------------------------

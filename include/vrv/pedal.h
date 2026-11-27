@@ -16,7 +16,6 @@
 
 namespace vrv {
 
-class System;
 //----------------------------------------------------------------------------
 // Pedal
 //----------------------------------------------------------------------------
@@ -70,14 +69,17 @@ public:
     ///@}
 
     /**
+     * @name Setter and getter for the resolved drawing pedal style
+     */
+    ///@{
+    data_PEDALSTYLE GetDrawingStyle() const { return m_drawingPedalStyle; }
+    void SetDrawingStyle(data_PEDALSTYLE drawingPedalStyle) { m_drawingPedalStyle = drawingPedalStyle; }
+    ///@}
+
+    /**
      * Get the SMuFL glyph for the pedal based on function or glyph.num
      */
     char32_t GetPedalGlyph() const;
-
-    /**
-     * Get the pedal form based on the options and corresponding attributes from <pedal> and <scoreDef>
-     */
-    data_PEDALSTYLE GetPedalForm(const Doc *doc, const System *system) const;
 
     //----------//
     // Functors //
@@ -98,6 +100,10 @@ private:
      * Flag indicating if following pedal mark is a bounce
      */
     bool m_endsWithBounce;
+    /**
+     * Resolved pedal style used for drawing
+     */
+    data_PEDALSTYLE m_drawingPedalStyle;
 };
 
 } // namespace vrv

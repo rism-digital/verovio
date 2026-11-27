@@ -599,6 +599,9 @@ public:
     ///@{
     FunctorCode VisitMeasureEnd(Measure *measure) override;
     FunctorCode VisitPedal(Pedal *pedal) override;
+    FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
+    FunctorCode VisitScoreOrPartElement(ScoreOrPartElement *scoreOrPart) override;
+    FunctorCode VisitStaffDef(StaffDef *staffDef) override;
     ///@}
 
 protected:
@@ -610,6 +613,10 @@ public:
 private:
     // The current pedals to be linked / grouped
     std::list<Pedal *> m_pedalLines;
+    // The current scoreDef pedal style
+    data_PEDALSTYLE m_drawingPedalStyle;
+    // The current staffDef pedal styles
+    std::map<int, data_PEDALSTYLE> m_drawingPedalStyleForStaffN;
 };
 
 //----------------------------------------------------------------------------
